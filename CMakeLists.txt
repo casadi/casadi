@@ -1,0 +1,72 @@
+cmake_minimum_required(VERSION 2.0)
+
+project(opticon C CXX Fortran)
+
+#cmake_policy(SET CMP0003 NEW)
+
+include_directories(.)
+
+
+# set(CMAKE_VERBOSE_MAKEFILE 0)
+
+# the following commands are needed to fix a problem with the libraries
+# for linux 64 bits
+if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+  message(STATUS "x86_64 architecture detected - setting flag -fPIC")
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -fPIC")
+endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
+
+# ADD_DEFINITIONS(-DHAVE_UBLAS)
+
+add_subdirectory(casadi)
+add_subdirectory(modelica)
+add_subdirectory(toolboxes)
+add_subdirectory(examples)
+
+find_package (SWIG)
+if(SWIG_FOUND)
+add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
+add_custom_target(python DEPENDS _casadi) # the python interface is created with the command "make python"
+add_custom_target(octave DEPENDS casadi_octave) # the octave interface is created with the command "make octave"
+
+endif(SWIG_FOUND)
+
+add_subdirectory(tutorials EXCLUDE_FROM_ALL)
+add_custom_target(tutor)
+
+set(DOXYFILE_LATEX "NO")
+set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
+include(UseDoxygen OPTIONAL)
+
+find_package(SUNDIALS)
+if(FOUND_SUNDIALS)
+add_subdirectory(sundials_interface)
+endif(FOUND_SUNDIALS)
+
+find_package(IPOPT)
+IF (FOUND_IPOPT)
+add_subdirectory(ipopt_interface)
+ELSE (FOUND_IPOPT)
+ENDIF (FOUND_IPOPT)
+
+find_package(ACADO)
+if(FOUND_ACADO)
+add_subdirectory(acado_interface)
+endif(FOUND_ACADO)
+
+if(WITH_MUSCOD)
+add_subdirectory(muscod_interface)
+endif(WITH_MUSCOD)
+
+#add_subdirectory(testing/HPV)
+
+

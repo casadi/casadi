@@ -1,0 +1,139 @@
+#ifndef CVODES_INTERNAL_HPP
+#define CVODES_INTERNAL_HPP
+
+#include "cvodes_integrator.hpp"
+#include "casadi/fx/integrator_internal.hpp"
+#include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
+#include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
+#include <sundials/sundials_types.h>  /* definition of type double */
+#include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
+#include <cvodes/cvodes_dense.h>
+#include <cvodes/cvodes_band.h> 
+#include <cvodes/cvodes_spgmr.h>
+#include <cvodes/cvodes_spbcgs.h>
+#include <cvodes/cvodes_sptfqmr.h>
+
+namespace CasADi{
+namespace Sundials{
+  
+class CVodesInternal : public IntegratorInternal{
+public:
+  /** \brief  Constructor */
+  explicit CVodesInternal(const FX& f, const FX& q);
+
+  /** \brief  Destructor */
+  virtual ~CVodesInternal();
+
+  /** \brief  Initialize stage */
+  virtual void init();
+
+  /** \brief  Reset the solver and bring the time back to t0 */
+  virtual void reset(int fsens_order, int asens_order);
+
+  /** \brief  Reset the solver of the adjoint problem and take time to tf */
+  virtual void resetAdj();
+
+  /** \brief  Integrate until a specified time point */
+  virtual void integrate(double t_out);
+
+  /** \brief  Integrate backwards in time until a specified time point */
+  virtual void integrateAdj(double t_out);
+
+  /** \brief  Set the stop time of the forward integration */
+  virtual void setStopTime(double tf);
+
+  protected:
+
+  // Sundials callback functions
+  void rhs(double t, const double* y, double* ydot);
+  void ehfun(int error_code, const char *module, const char *function, char *msg);
+  void rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, N_Vector tmp1, N_Vector tmp2);
+  void rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, N_Vector tmp1, N_Vector tmp2);
+  void rhsQ(double t, const double* yy, double* rhsQ);
+  void rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *rhsvalQS, N_Vector tmp1, N_Vector tmp2);
+  void rhsB(double t, const double* y, const double *yB, double* yBdot);
+  void rhsQB(double t, const double* y, const double* yB, double* qBdot);
+  void jtimes(const double *v, double* Jv, double t, const double* y, const double* fy, double* tmp);
+  void djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void bjac(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+
+  // Static wrappers to be passed to Sundials
+  static int rhs_wrapper(double t, N_Vector y, N_Vector ydot, void *user_data);
+  static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
+  static int rhsS_wrapper(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsS1_wrapper(int Ns, double t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsQ_wrapper(double t, N_Vector yy, N_Vector rhsQ, void *user_data);
+  static int rhsQS_wrapper(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *rhsvalQS, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector yBdot, void *user_dataB);
+  static int rhsQB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector qBdot, void *user_dataB);
+  static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y, N_Vector fy, void *user_data, N_Vector tmp);
+  static int djac_wrapper(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int bjac_wrapper(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+
+  
+  
+  
+  
+  
+  
+  
+  
+  virtual void printStats(std::ostream &stream) const;
+  
+  // CVodes memory block
+  void* mem_;
+  
+  // ODE rhs
+  FX f_;
+  
+  // Quadrature function
+  FX q_;
+  
+  // The jacobian of the ODE rhs fcn
+  FX jac_f_;
+  
+  // N-vectors for the ODE integration
+  N_Vector y0_, y_, yQ0_, yQ_;
+
+  // N-vectors for the forward and adjoint sensitivities
+  std::vector<N_Vector> yS0_, yS_, yQS0_, yQS_;
+
+  // N-vectors for the adjoint sensitivities
+  std::vector<N_Vector> yB0_, yB_, /*yQB0_, */ yQB_;
+  
+  std::stringstream error_buffer;
+
+  // dimensions
+  int ny_; // number of ode states
+  int nq_; // number of quadratures
+  
+  bool is_init;
+
+  int ism_;
+  
+  // Calculate the error message map
+  static map<int,std::string> calc_flagmap();
+  
+    // Error message map
+  static std::map<int,std::string> flagmap;
+ 
+  // Throw error
+  static void cvodes_error(const std::string& module, int flag);
+
+  // Auxiliary
+  static int getNX(const FX& f, const FX& q); // count the total number of states
+  static int getNP(const FX& f); // count the number of parameters
+  
+  // Ids of backward problem
+  std::vector<int> whichB_;
+
+  int fsens_order_, asens_order_; 
+
+};
+
+
+} // namespace Sundials
+} // namespace CasADi
+
+#endif //CVODES_INTERNAL_HPP
+

@@ -1,0 +1,131 @@
+cmake_minimum_required (VERSION 2.0)
+
+#if(COMMAND cmake_policy)
+#cmake_policy(SET CMP0003 NEW)
+#endif(COMMAND cmake_policy)
+
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
+project(casadi_swig C CXX Fortran)
+
+find_package (SWIG REQUIRED QUIET)
+find_package(MPI QUIET)
+set(CASADI_SWIG_FLAGS -includeall)
+
+find_package (IPOPT QUIET)
+if(FOUND_IPOPT)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "ipopt_interface" ${IPOPT_LIBRARIES})
+endif(FOUND_IPOPT)
+
+find_package (SUNDIALS QUIET)
+if(FOUND_SUNDIALS)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUNDIALS")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "sundials_interface" ${SUNDIALS_LIBRARIES})
+endif(FOUND_SUNDIALS)
+
+find_package (ACADO QUIET)
+if(FOUND_ACADO)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_ACADO")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "acado_interface" ${ACADO_LIBRARIES})
+endif(FOUND_ACADO)
+
+set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_MODELICA")
+set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "modelica" "tinyxml")
+
+# Find SWIG and include the use swig file
+include (${SWIG_USE_FILE})
+
+# Find python library and add include path for python headers
+find_package (PythonLibs)
+include_directories (${PYTHON_INCLUDE_PATH})
+
+if(WITH_NUMPY)
+find_package (Numpy)
+include_directories (${CMAKE_CURRENT_SOURCE_DIR})
+include_directories (${NUMPY_INCLUDED_DIRS})
+endif(WITH_NUMPY)
+
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
+link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
+
+# set the global swig flags to empty
+# set(CMAKE_SWIG_FLAGS "-outdir ${PROJECT_BINARY_DIR}")
+# SEPARATE_ARGUMENTS(CMAKE_SWIG_FLAGS)
+
+# SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+# SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+
+# SEPARATE_ARGUMENTS(CASADI_SWIG_FLAGS)
+set_source_files_properties (casadi.i PROPERTIES
+  SWIG_FLAGS "-DPy_USING_UNICODE ${CASADI_SWIG_FLAGS}"
+  CPLUSPLUS ON
+)
+
+
+# failure:  ${NUMPY_LIBS}
+
+# PYTHON interface
+SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
+# add_dependencies(_casadi casadi) #workaround to add dependencies of casadi to _casadi (SWIG_ADD_MODULE does not add dependencies from c++ source files)
+IF(FOUND_NUMPY)
+cmake_policy(SET CMP0003 NEW)
+SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES} 
+ ${SWIG_LINK_LIBRARIES_LIST}
+casadi )
+ELSE(FOUND_NUMPY)
+SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES} 
+ ${SWIG_LINK_LIBRARIES_LIST}
+casadi )
+ENDIF(FOUND_NUMPY)
+# the name used for the shared module for the python interface is determined
+get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
+if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
+  set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
+endif(CASADI_PYTHON_LIBRARY_SUFFIX)
+set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+
+# a python library is built in the build directory inside swig/python 
+make_directory(${PROJECT_BINARY_DIR}/python/casadi)
+# adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
+add_custom_command(
+  TARGET _casadi
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
+)
+add_custom_command(
+  TARGET _casadi
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy ${PROJECT_BINARY_DIR}/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
+)
+add_custom_command(
+  TARGET _casadi
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY}
+)
+find_package(PythonInterp)
+IF(PYTHONINTERP_FOUND)
+  #determining the installation path for python libraries
+  EXEC_PROGRAM( "${PYTHON_EXECUTABLE}"
+    ARGS "${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py"
+    OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
+  )
+  #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
+  install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
+    DESTINATION ${PYTHON_INSTALLATION_PATH}
+    COMPONENT install_python
+  )
+  #creation of a custom installation command
+  add_custom_target(install_python
+    DEPENDS _casadi
+    COMMAND ${CMAKE_COMMAND}
+      -D COMPONENT=install_python
+      -P cmake_install.cmake
+  )
+ENDIF(PYTHONINTERP_FOUND)
+
+# OCTAVE interface
+SWIG_ADD_MODULE (casadi_octave octave casadi.i)
+SWIG_LINK_LIBRARIES (casadi_octave
+ ${SWIG_LINK_LIBRARIES_LIST}
+casadi )

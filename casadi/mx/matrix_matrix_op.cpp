@@ -1,0 +1,69 @@
+#include "matrix_matrix_op.hpp"
+#include <cassert>
+#include <vector>
+#include <sstream>
+
+using namespace std;
+
+namespace CasADi{
+
+MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_), MXNode(x,y){
+  assert(x.size1() == y.size1() || x.size2() == y.size2());
+  sz = x.size();
+}
+
+MatrixMatrixOp* MatrixMatrixOp::clone() const{
+  return new MatrixMatrixOp(*this);
+}
+
+void MatrixMatrixOp::print(std::ostream &stream) const{
+  stringstream sx; sx << dep(0);
+  stringstream sy; sy << dep(1);
+  print_c[op](stream,sx.str(),sy.str());
+}
+
+void MatrixMatrixOp::evaluate(int fsens_order, int asens_order){
+  assert(fsens_order==0 || asens_order==0);
+  if(fsens_order==0){
+  const vector<double>& x = dep(0)->val(0);  // first argument
+  const vector<double>& y = dep(1)->val(0);  // second argument
+  vector<double>& res = val(0);
+  
+  for(int i=0; i<res.size(); ++i)
+    nfun0[op](x[i],y[i],&res[i]);
+  } else {
+
+    const vector<double>& x = dep(0)->val(0);  // first argument
+  const vector<double>& dx = dep(0)->val(1); // first argument derivative
+  const vector<double>& y = dep(1)->val(0);  // second argument
+  const vector<double>& dy = dep(1)->val(1); // second argument derivative
+  vector<double>& res = val(1);
+
+  double tmp[3];
+
+  for(int i=0; i<res.size(); ++i){
+    nfun1[op](x[i],y[i],tmp);
+    res[i] = tmp[1]*dx[i] + tmp[2]*dy[i]; // chain rule
+  }
+  }
+  
+  if(asens_order>0){
+    const vector<double>& x = dep(0)->val(0);  // first  argument
+    vector<double>& dx = dep(0)->val(1); // first argument derivative
+    const vector<double>& y = dep(1)->val(0);  // second argument
+    vector<double>& dy = dep(1)->val(1); // second argument derivative
+    const vector<double>& res = val(1);
+
+    double tmp[3];
+
+    for(int i=0; i<res.size(); ++i){
+      nfun1[op](x[i],y[i],tmp);
+      dx[i] += res[i]*tmp[1];
+      dy[i] += res[i]*tmp[2];
+    }
+  }
+}
+
+
+} // namespace CasADi
+

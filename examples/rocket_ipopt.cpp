@@ -1,0 +1,104 @@
+#include <iostream>
+#include <ctime>
+#include <casadi/stl_vector_tools.hpp>
+#include <ipopt_interface/ipopt_solver.hpp>
+#include <casadi/expression_tools.hpp>
+#include <casadi/fx/jacobian.hpp>
+
+using namespace CasADi;
+using namespace std;
+
+int main(){
+  cout << "program started" << endl;
+  
+  // Dimensions
+  int nu = 1000;  // Number of control segments
+  int nj = 100; // 10000;  // // Number of integration steps per control segment
+
+  // optimization variable
+  vector<SX> u = create_symbolic("u",nu); // control
+
+  SX s_0 = 0; // initial position
+  SX v_0 = 0; // initial speed
+  SX m_0 = 1; // initial mass
+  
+  SX dt = 10.0/(nj*nu); // time step
+  SX alpha = 0.05; // friction
+  SX beta = 0.1; // fuel consumption rate
+
+  // Trajectory
+//  vector<SX> v_traj(nu);
+
+  // Integrate over the interval with Euler forward
+  SX s = s_0, v = v_0, m = m_0;
+  for(int k=0; k<nu; ++k){
+    for(int j=0; j<nj; ++j){
+      s += dt*v;
+      v += dt / m * (u[k]- alpha * v*v);
+      m += -dt * beta*u[k]*u[k];
+    }
+  //  v_traj[k] = v;
+  }
+
+  // Objective function
+  SX f = 0;
+  for(int i=0; i<u.size(); ++i)
+    f += u[i]*u[i];
+    
+  // Terminal constraints
+  vector<SX> g(2);
+  g[0] = s;
+  g[1] = v;
+/*  for(vector<SX>::const_iterator it=v_traj.begin(); it!=v_traj.end(); ++it)
+    g << *it;*/
+  
+  // Create the NLP
+  SXFunction ffcn(u,f); // objective function
+  SXFunction gfcn(u,g); // constraint
+  gfcn.setOption("ad_mode","reverse");
+  gfcn.setOption("symbolic_jacobian",false);
+  
+  // Allocate an NLP solver
+  IpoptSolver solver(ffcn,gfcn);
+//  IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
+
+  // Set options
+  solver.setOption("tol",1e-6);
+  solver.setOption("hessian_approximation","limited-memory");
+
+  // initialize the solver
+  solver.init();
+
+  // Bounds on u and initial condition
+  vector<double> umin(nu), umax(nu), usol(nu);
+  for(int i=0; i<nu; ++i){
+    umin[i] = -10;
+    umax[i] =  10;
+    usol[i] = 0.4;
+  }
+  solver.input(NLP_LBX).set(umin);
+  solver.input(NLP_UBX).set(umax);
+  solver.input(NLP_X_INIT).set(usol);
+  
+  // Bounds on g
+  vector<double> gmin(2,-numeric_limits<double>::infinity()), gmax(2,1.1);
+  gmin[0] = gmax[0] = 10;
+  gmin[1] = gmax[1] =  0;
+  solver.input(NLP_LBG).set(gmin);
+  solver.input(NLP_UBG).set(gmax);
+
+  // Solve the problem
+  solver.solve();
+
+  // Print the optimal cost
+  double cost;
+  solver.output(NLP_COST).get(cost);
+  cout << "optimal cost: " << cost << endl;
+
+  // Print the optimal solution
+  solver.output(NLP_X_OPT).get(usol);
+  cout << "optimal solution: " << usol << endl;
+
+  return 0;
+}
+

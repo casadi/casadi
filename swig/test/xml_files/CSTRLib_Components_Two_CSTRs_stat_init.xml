@@ -1,0 +1,862 @@
+<fmiExtendedModelDescription xmlns:exp="https://svn.jmodelica.org/trunk/XML/daeExpressions.xsd" xmlns:equ="https://svn.jmodelica.org/trunk/XML/daeEquations.xsd" xmlns:fun="https://svn.jmodelica.org/trunk/XML/daeFunctions.xsd" xmlns:opt="https://svn.jmodelica.org/trunk/XML/daeOptimization.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+fmiVersion="1.0" modelName="CSTRLib.Components.Two_CSTRs_stat_init" modelIdentifier="CSTRLib_Components_Two_CSTRs_stat_init" guid="unsupported" generationDateAndTime="2010-10-24T00:25:20" variableNamingConvention="flat" numberOfContinuousStates="6" numberOfEventIndicators="0">
+	<UnitDefinitions>
+		<BaseUnit unit="K">
+			<DisplayUnitDefinition displayUnit="degC" gain="1" offset="0"/>
+		</BaseUnit>
+	</UnitDefinitions>
+	
+	
+	<VendorAnnotations>
+		<Tool name="JModelica">
+		</Tool>
+	</VendorAnnotations>	
+	<ModelVariables>
+		<ScalarVariable name="c1" valueReference="0" description="Constant 1" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="c1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="c2" valueReference="1" description="Constant 2" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="c2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="qf" valueReference="2" description="Feed Volumetric Flow Rate (L/min)" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="qf"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="CAf" valueReference="3" description="Feed Concentreation of A (mol/L)" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CAf"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="Tf" valueReference="4" description="Feed Temperature (K)" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Tf"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="ko" valueReference="5" description="Pre-exponential Factor, Arrhenius Equation (min^-1)" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ko"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="EoverR" valueReference="6" description="Activation Energy/Gas Constant (K)" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="EoverR"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="rho" valueReference="7" description="Density of Fluid (g/L)" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="rho"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="Cp" valueReference="8" description="Heat Capacity of Fluid (J/(g*K))" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Cp"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="dH" valueReference="9" description="Heat of Reaction (J/mol)" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="dH"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="q1" valueReference="30" description="Volumetric Flow Rate Leaving Reactor 1 (L/min)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="100.0" start="100.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="q1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="q2" valueReference="31" description="Volumetric Flow Rate Leaving Reactor 2 (L/min)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="100.0" start="100.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="q2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="Qc" valueReference="32" description="Energy Flow from Reactor #1 - Cooling (J/min)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="50.0" start="-50.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Qc"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="V1_0" valueReference="10" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V1_0"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="CA1_0" valueReference="11" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CA1_0"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="T1_0" valueReference="12" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T1_0"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="V2_0" valueReference="13" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V2_0"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="CA2_0" valueReference="14" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CA2_0"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="T2_0" valueReference="15" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T2_0"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="V1" valueReference="22" description="Volume in Reactor 1 (L)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="200.0" start="200.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="CA1" valueReference="23" description="Concentration of Reactor 1 (mol/L)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="0.03" start="0.03" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CA1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="T1" valueReference="24" description="Temperature in Reactor 1 (K)" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" nominal="450.0" start="450.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="V2" valueReference="25" description="Volume in Reactor 2 (L)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="100.0" start="100.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="CA2" valueReference="26" description="Concentration of Reactor 2 (mol/L)" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="0.0020" start="0.0020" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CA2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="T2" valueReference="27" description="Temperature in Reactor 2 (K)" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" nominal="450.0" start="450.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="u1" valueReference="28" variability="continuous" causality="input" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="u2" valueReference="29" description="Valve position at the outlet of the second reactor" variability="continuous" causality="input" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="der(V1)" valueReference="16" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="200.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="der(CA1)" valueReference="17" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="0.03" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CA1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="der(T1)" valueReference="18" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="450.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T1"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="der(V2)" valueReference="19" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="100.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="der(CA2)" valueReference="20" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="0.0020" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="CA2"/>
+			</QualifiedName>
+		</ScalarVariable>
+		<ScalarVariable name="der(T2)" valueReference="21" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="450.0" start="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T2"/>
+			</QualifiedName>
+		</ScalarVariable>
+	</ModelVariables>
+	
+	<equ:BindingEquations>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="c1"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>10</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="c2"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>48.1909</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="qf"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>100</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="CAf"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>1.0</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="Tf"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>350</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="ko"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>7.2e10</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="EoverR"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>1e4</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="rho"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1000</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="Cp"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.239</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="dH"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>4.78e4</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="V1_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>200</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="CA1_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.03</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="T1_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>450</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="V2_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>100</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="CA2_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.002</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="T2_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>450</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+	</equ:BindingEquations>
+
+	<equ:DynamicEquations>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="Qc"/>
+					</exp:Identifier>
+				<exp:Mul>
+					<exp:Neg>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="c2"/>
+							</exp:Identifier>
+					</exp:Neg>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="u2"/>
+						</exp:Identifier>
+				</exp:Mul>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="q1"/>
+					</exp:Identifier>
+				<exp:Mul>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="c1"/>
+						</exp:Identifier>
+					<exp:Pow>
+						<exp:Sub>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V1"/>
+								</exp:Identifier>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V2"/>
+								</exp:Identifier>
+						</exp:Sub>
+						<exp:RealLiteral>.5</exp:RealLiteral>
+					</exp:Pow>
+				</exp:Mul>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="q2"/>
+					</exp:Identifier>
+				<exp:Mul>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="c1"/>
+							</exp:Identifier>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="u1"/>
+							</exp:Identifier>
+					</exp:Mul>
+					<exp:Pow>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="V2"/>
+							</exp:Identifier>
+						<exp:RealLiteral>.5</exp:RealLiteral>
+					</exp:Pow>
+				</exp:Mul>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="V1"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="qf"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="q1"/>
+						</exp:Identifier>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="CA1"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+					<exp:Sub>
+						<exp:Sub>
+							<exp:Div>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="qf"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="CAf"/>
+										</exp:Identifier>
+								</exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="V1"/>
+									</exp:Identifier>
+							</exp:Div>
+							<exp:Mul>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="ko"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="CA1"/>
+										</exp:Identifier>
+								</exp:Mul>
+								<exp:Exp>
+									<exp:Div>
+										<exp:Neg>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="EoverR"/>
+												</exp:Identifier>
+										</exp:Neg>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="T1"/>
+											</exp:Identifier>
+									</exp:Div>
+								</exp:Exp>
+							</exp:Mul>
+						</exp:Sub>
+						<exp:Div>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="q1"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="CA1"/>
+									</exp:Identifier>
+							</exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V1"/>
+								</exp:Identifier>
+						</exp:Div>
+					</exp:Sub>
+					<exp:Div>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="CA1"/>
+								</exp:Identifier>
+							<exp:Der>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V1"/>
+								</exp:Identifier>
+							</exp:Der>
+						</exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="V1"/>
+							</exp:Identifier>
+					</exp:Div>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="T1"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+					<exp:Add>
+						<exp:Sub>
+							<exp:Add>
+								<exp:Div>
+									<exp:Mul>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="qf"/>
+											</exp:Identifier>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="Tf"/>
+											</exp:Identifier>
+									</exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="V1"/>
+										</exp:Identifier>
+								</exp:Div>
+								<exp:Div>
+									<exp:Mul>
+										<exp:Div>
+											<exp:Mul>
+												<exp:Mul>
+														<exp:Identifier>
+																<exp:QualifiedNamePart name="dH"/>
+														</exp:Identifier>
+														<exp:Identifier>
+																<exp:QualifiedNamePart name="ko"/>
+														</exp:Identifier>
+												</exp:Mul>
+													<exp:Identifier>
+															<exp:QualifiedNamePart name="CA1"/>
+													</exp:Identifier>
+											</exp:Mul>
+											<exp:Exp>
+												<exp:Div>
+														<exp:Identifier>
+																<exp:QualifiedNamePart name="EoverR"/>
+														</exp:Identifier>
+													<exp:IntegerLiteral>400</exp:IntegerLiteral>
+												</exp:Div>
+											</exp:Exp>
+										</exp:Div>
+										<exp:Exp>
+											<exp:Add>
+												<exp:Div>
+													<exp:Neg>
+															<exp:Identifier>
+																	<exp:QualifiedNamePart name="EoverR"/>
+															</exp:Identifier>
+													</exp:Neg>
+														<exp:Identifier>
+																<exp:QualifiedNamePart name="T1"/>
+														</exp:Identifier>
+												</exp:Div>
+												<exp:Div>
+														<exp:Identifier>
+																<exp:QualifiedNamePart name="EoverR"/>
+														</exp:Identifier>
+													<exp:IntegerLiteral>400</exp:IntegerLiteral>
+												</exp:Div>
+											</exp:Add>
+										</exp:Exp>
+									</exp:Mul>
+									<exp:Mul>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="rho"/>
+											</exp:Identifier>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="Cp"/>
+											</exp:Identifier>
+									</exp:Mul>
+								</exp:Div>
+							</exp:Add>
+							<exp:Div>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="q1"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="T1"/>
+										</exp:Identifier>
+								</exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="V1"/>
+									</exp:Identifier>
+							</exp:Div>
+						</exp:Sub>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="Qc"/>
+							</exp:Identifier>
+					</exp:Add>
+					<exp:Div>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="T1"/>
+								</exp:Identifier>
+							<exp:Der>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V1"/>
+								</exp:Identifier>
+							</exp:Der>
+						</exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="V1"/>
+							</exp:Identifier>
+					</exp:Div>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="V2"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="q1"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="q2"/>
+						</exp:Identifier>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="CA2"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+					<exp:Sub>
+						<exp:Sub>
+							<exp:Div>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="q1"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="CA1"/>
+										</exp:Identifier>
+								</exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="V2"/>
+									</exp:Identifier>
+							</exp:Div>
+							<exp:Mul>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="ko"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="CA2"/>
+										</exp:Identifier>
+								</exp:Mul>
+								<exp:Exp>
+									<exp:Div>
+										<exp:Neg>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="EoverR"/>
+												</exp:Identifier>
+										</exp:Neg>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="T2"/>
+											</exp:Identifier>
+									</exp:Div>
+								</exp:Exp>
+							</exp:Mul>
+						</exp:Sub>
+						<exp:Div>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="q2"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="CA2"/>
+									</exp:Identifier>
+							</exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V2"/>
+								</exp:Identifier>
+						</exp:Div>
+					</exp:Sub>
+					<exp:Div>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="CA2"/>
+								</exp:Identifier>
+							<exp:Der>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V2"/>
+								</exp:Identifier>
+							</exp:Der>
+						</exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="V2"/>
+							</exp:Identifier>
+					</exp:Div>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="T2"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+					<exp:Sub>
+						<exp:Add>
+							<exp:Div>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="q1"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="T1"/>
+										</exp:Identifier>
+								</exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="V2"/>
+									</exp:Identifier>
+							</exp:Div>
+							<exp:Div>
+								<exp:Mul>
+									<exp:Mul>
+										<exp:Mul>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="dH"/>
+												</exp:Identifier>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="ko"/>
+												</exp:Identifier>
+										</exp:Mul>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="CA2"/>
+											</exp:Identifier>
+									</exp:Mul>
+									<exp:Exp>
+										<exp:Div>
+											<exp:Neg>
+													<exp:Identifier>
+															<exp:QualifiedNamePart name="EoverR"/>
+													</exp:Identifier>
+											</exp:Neg>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="T2"/>
+												</exp:Identifier>
+										</exp:Div>
+									</exp:Exp>
+								</exp:Mul>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="rho"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="Cp"/>
+										</exp:Identifier>
+								</exp:Mul>
+							</exp:Div>
+						</exp:Add>
+						<exp:Div>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="q2"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="T2"/>
+									</exp:Identifier>
+							</exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V2"/>
+								</exp:Identifier>
+						</exp:Div>
+					</exp:Sub>
+					<exp:Div>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="T2"/>
+								</exp:Identifier>
+							<exp:Der>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="V2"/>
+								</exp:Identifier>
+							</exp:Der>
+						</exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="V2"/>
+							</exp:Identifier>
+					</exp:Div>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:DynamicEquations>
+
+	<equ:InitialEquations>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="V1"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="CA1"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="T1"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="V2"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="CA2"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="T2"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:InitialEquations>
+
+		
+	<fun:FunctionsList>
+	</fun:FunctionsList>
+
+</fmiExtendedModelDescription>

@@ -1,0 +1,27 @@
+<IndependentParameters>
+	 <RealParameter name="x1_r" value="0.06410371"/>
+	 <RealParameter name="x2_r" value="0.10324302"/>
+	 <RealParameter name="x3_r" value="0.006156"/>
+	 <RealParameter name="x4_r" value="0.00870028"/>
+	 <RealParameter name="u1_r" value="2.5"/>
+	 <RealParameter name="u2_r" value="2.5"/>
+	 <RealParameter name="A1" value="0.0028"/>
+	 <RealParameter name="A2" value="0.0032"/>
+	 <RealParameter name="A3" value="0.0028"/>
+	 <RealParameter name="A4" value="0.0032"/>
+	 <RealParameter name="a1" value="7.1E-6"/>
+	 <RealParameter name="a2" value="5.7E-6"/>
+	 <RealParameter name="a3" value="7.1E-6"/>
+	 <RealParameter name="a4" value="5.7E-6"/>
+	 <RealParameter name="g" value="9.81"/>
+	 <RealParameter name="k1_nmp" value="3.14E-6"/>
+	 <RealParameter name="k2_nmp" value="3.29E-6"/>
+	 <RealParameter name="g1_nmp" value="0.7"/>
+	 <RealParameter name="g2_nmp" value="0.7"/>
+	 <RealParameter name="x1_0" value="0.04102638"/>
+	 <RealParameter name="x2_0" value="0.06607553"/>
+	 <RealParameter name="x3_0" value="0.00393984"/>
+	 <RealParameter name="x4_0" value="0.00556818"/>
+	 <RealParameter name="startTime" value="0.0"/>
+	 <RealParameter name="finalTime" value="50.0"/>
+</IndependentParameters>

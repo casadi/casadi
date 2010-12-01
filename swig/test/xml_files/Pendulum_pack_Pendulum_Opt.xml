@@ -1,0 +1,185 @@
+<jmodelicaModelDescription xmlns:exp="https://svn.jmodelica.org/trunk/XML/daeExpressions.xsd" xmlns:equ="https://svn.jmodelica.org/trunk/XML/daeEquations.xsd" xmlns:fun="https://svn.jmodelica.org/trunk/XML/daeFunctions.xsd" xmlns:opt="https://svn.jmodelica.org/trunk/XML/daeOptimization.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+fmiVersion="1.0" modelName="Pendulum_pack.Pendulum_Opt" modelIdentifier="Pendulum_pack_Pendulum_Opt" guid="unsupported" generationDateAndTime="2010-10-15T11:43:34" variableNamingConvention="flat" numberOfContinuousStates="5" numberOfEventIndicators="0">
+	
+	
+	
+	<VendorAnnotations>
+		<Tool name="JModelica">
+		</Tool>
+	</VendorAnnotations>		
+	<ModelVariables>
+		<ScalarVariable name="pend.th0" valueReference="0" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.dth0" valueReference="1" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.x0" valueReference="2" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.dx0" valueReference="3" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.theta" valueReference="13" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.1" free="false" initialGuess="0.1" />
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.dtheta" valueReference="14" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.x" valueReference="15" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.dx" valueReference="16" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="u" valueReference="17" variability="continuous" causality="input" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cost" valueReference="12" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="x_ref" valueReference="4" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="startTime" valueReference="5" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="finalTime" valueReference="6" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="der(cost)" valueReference="7" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.der(theta)" valueReference="8" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.der(dtheta)" valueReference="9" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.der(x)" valueReference="10" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.der(dx)" valueReference="11" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pend.u" valueReference="17" variability="continuous" causality="internal" alias="alias" >
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+	</ModelVariables>
+	
+	
+	
+	<opt:Optimization static="false" >
+		<opt:IntervalStartTime>
+			<opt:Value>0.0</opt:Value>
+			<opt:Free>false</opt:Free>
+			<opt:InitialGuess>0.0</opt:InitialGuess>
+		</opt:IntervalStartTime>
+		<opt:IntervalFinalTime>
+			<opt:Value>8.0</opt:Value>
+			<opt:Free>false</opt:Free>
+			<opt:InitialGuess>1.0</opt:InitialGuess>
+		</opt:IntervalFinalTime>
+		<opt:TimePoints>
+			<opt:Index>0</opt:Index>
+			<opt:Value>8.0</opt:Value>
+		</opt:TimePoints>
+	</opt:Optimization>
+
+	
+</jmodelicaModelDescription>

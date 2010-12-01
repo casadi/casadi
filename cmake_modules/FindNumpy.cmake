@@ -1,0 +1,30 @@
+FIND_PATH(NUMPY_PATH
+ndarrayobject.h
+${PYTHON_INCLUDE_DIRS}/numpy
+${PYTHON_INCLUDE_PATH}/numpy
+)
+
+FIND_PATH(NUMPY_PATH_DEP1
+endian.h
+/usr/include/
+/usr/local/include/
+)
+
+STRING(REGEX REPLACE "include" "lib" NUMPY_LIBS_INTERMEDIATE "${NUMPY_PATH}")
+
+FIND_LIBRARY(NUMPY_LIBS_1
+multiarray.so
+${NUMPY_LIBS_INTERMEDIATE}/../dist-packages/numpy/core)
+
+SET(NUMPY_LIBS "${NUMPY_LIBS_1}")
+SET(NUMPY_INCLUDED_DIRS "${NUMPY_PATH};${NUMPY_PATH_DEP1}")
+
+IF(NUMPY_PATH)
+SET(FOUND_NUMPY TRUE)
+MESSAGE(STATUS "Numpy path found: ${NUMPY_PATH}")
+MESSAGE(STATUS "Python libs: ${PYTHON_LIBRARIES}")
+MESSAGE(STATUS "Numpy includes: ${NUMPY_INCLUDED_DIRS}")
+MESSAGE(STATUS "Numpy libs: ${NUMPY_LIBS}")
+ELSE()
+MESSAGE(STATUS "Numpy not found")
+ENDIF()

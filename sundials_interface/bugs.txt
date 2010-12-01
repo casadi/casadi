@@ -1,0 +1,12 @@
+Sundials bugs:
+
+*CVodes fails to pass the user data structure at the first call for the adjoint problem (passes a null pointer instead)
+- workaround with static pointer possible (but ugly and not thread-safe)
+
+*Segfault in CVodes when using finite differences to calculate forward sensitivities
+- serious, no good workaround
+- needs more testing
+
+*Segfault in CVodes when trying to integrate outside the time interval where the forward problem (with taping) was _first_ solved
+- serious
+- needs to check if IDAS behaves the same way

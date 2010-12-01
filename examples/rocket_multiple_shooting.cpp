@@ -1,0 +1,130 @@
+#include <iostream>
+#include <casadi/stl_vector_tools.hpp>
+#include <ipopt_interface/ipopt_solver.hpp>
+#include <casadi/mx/mx_constant.hpp>
+#include <casadi/fx/external_function.hpp>
+#include <casadi/expression_tools.hpp>
+
+using namespace CasADi;
+using namespace std;
+
+// CONSTRUCT THE INTEGRATOR
+FX create_integrator(int nj, int nu){
+  SX u("u"); // control for one segment
+
+  // Initial position
+  SX s0("s0"); // initial position
+  SX v0("v0"); // initial speed
+  SX m0("m0"); // initial mass
+
+  SX dt = 10.0/(nj*nu); // time step
+  SX alpha = 0.05; // friction
+  SX beta = 0.1; // fuel consumption rate
+
+  // Integrate over the interval with Euler forward
+  SX s = s0, v = v0, m = m0;
+
+  SX dm = -dt*beta*u*u;
+  for(int j=0; j<nj; ++j){
+    s += dt*v;
+    v += dt / m * (u - alpha * v*v);
+    m += dm;
+  }
+
+  // State vector
+  SXMatrix x, x0;
+  x << s << v << m;
+  x0 << s0 << v0 << m0;
+
+  // Integrator
+  vector<SXMatrix> input(2);
+  input[0] = u;
+  input[1] = x0;
+  SXMatrix output = x;
+  SXFunction integrator(input,output);
+  integrator->setOption("ad_order",1);
+  integrator->init();
+
+//  integrator->generateCode("rocket.c");
+
+  return integrator;
+}
+
+
+int main(){
+  // Dimensions
+  int nj = 1000; // Number of integration steps per control segment
+  int nu = 1000; // Number of control segments
+
+  // Create an integrator
+  FX integrator = create_integrator(nj,nu);
+
+  // PART 2: CONSTRUCT THE NLP
+  MX U("U",nu); // control for all segments
+ 
+  // Initial position
+  vector<double> X0(3);
+  X0[0] = 0; // initial position
+  X0[1] = 0; // initial speed
+  X0[2] = 1; // initial mass
+
+  // Integrate over all intervals
+  MX X=X0;
+  for(int k=0; k<nu; ++k){
+    // Assemble the input
+    vector<MX> input(2);
+    input[0] = U[k];
+    input[1] = X;
+
+    // Integrate
+    X = integrator(input);
+  }
+
+  // Objective function
+  MX F = inner_prod(U,U);
+
+  // Terminal constraints
+  MX G = vertcat(X[0],X[1]);
+  
+  // Create the NLP
+  MXFunction ffcn(U,F); // objective function
+  MXFunction gfcn(U,G); // constraint function
+
+  // Allocate an NLP solver
+//  LiftedNewtonSolver solver(ffcn,gfcn);
+  IpoptSolver solver(ffcn,gfcn);
+  
+  // Set options
+  solver.setOption("tol",1e-10);
+  // initialize the solver
+  solver.init();
+
+  // Bounds on u and initial condition
+  vector<double> Umin(nu), Umax(nu), Usol(nu);
+  for(int i=0; i<nu; ++i){
+    Umin[i] = -10;
+    Umax[i] =  10;
+    Usol[i] = 0.4;
+  }
+  solver.input(NLP_LBX).set(Umin);
+  solver.input(NLP_UBX).set(Umax);
+  solver.input(NLP_X_INIT).set(Usol);
+
+  // Bounds on g
+  vector<double> Gmin(2), Gmax(2);
+  Gmin[0] = Gmax[0] = 10;
+  Gmin[1] = Gmax[1] =  0;
+  solver.input(NLP_LBG).set(Gmin);
+  solver.input(NLP_UBG).set(Gmax);
+
+  // Solve the problem
+  solver.solve();
+
+  // Get the solution
+  solver.output(NLP_X_OPT).get(Usol);
+  cout << "optimal solution: " << Usol << endl;
+
+  return 0;
+
+}
+

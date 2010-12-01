@@ -1,0 +1,200 @@
+#include <iostream>
+#include <ctime>
+#include "casadi/stl_vector_tools.hpp"
+#include "ipopt_interface/ipopt_solver.hpp"
+#include "ipopt_interface/ipopt_internal.hpp"
+#include "casadi/expression_tools.hpp"
+
+/** Excercise 1, chapter 10 from Larry Biegler's book */
+
+using namespace std;
+using namespace CasADi;
+
+int main(){
+  cout << "program started" << endl;
+
+  std::ofstream resfile;
+  resfile.open ("results_biegler_10_1.txt");
+
+  // Test with different number of elements
+  for(int N=1; N<=10; ++N){
+  
+  // Degree of interpolating polynomial
+  int K = 2;
+  
+  // Legrandre roots
+  vector<double> tau_root(K+1);
+  tau_root[0] = 0.;
+  tau_root[1] = 0.211325;
+  tau_root[2] = 0.788675;
+
+  // Radau roots (K=3)
+  /*  tau_root[0] = 0;
+  tau_root[1] = 0.155051;
+  tau_root[2] = 0.644949;
+  tau_root[3] = 1;*/
+
+  
+  // Time
+  SX t("t");
+  
+  // Differential equation
+  SX z("z");
+  SXFunction F(z,z*z - 2*z + 1);
+  F.setOption("name","dz/dt");
+  cout << F << endl;
+  
+  double z0 = -3;
+  
+  // Analytic solution
+  SXFunction z_analytic(t, (4*t-3)/(3*t+1));
+  z_analytic.setOption("name","analytic solution");
+  cout << z_analytic << endl;
+  
+  // Collocation point
+  SX tau("tau");
+
+  // Step size
+  double h = 1.0/N;
+  
+  // Lagrange polynomials
+  vector<SXFunction> l(K+1);
+  for(int j=0; j<=K; ++j){
+    SX L = 1;
+    for(int k=0; k<=K; ++k)
+      if(k != j)
+        L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k]);
+  
+    l[j] = SXFunction(tau,L);
+    l[j].setOption("ad_order",1);
+    stringstream ss;
+    ss << "l(" << j << ")";
+    l[j].setOption("name",ss.str());    
+    l[j].init();
+    cout << l[j] << endl;
+  }
+  
+  // Get the coefficients of the continuity equation
+  vector<double> D(K+1);
+  for(int j=0; j<=K; ++j){
+    l[j].input().set(1.0);
+    l[j].evaluate();
+    l[j].output().get(&D[j]);
+  }
+  cout << "D = " << D << endl;
+
+  // Get the coefficients of the collocation equation
+  vector<vector<double> > C(K+1);
+  for(int j=0; j<=K; ++j){
+    C[j].resize(K+1);
+    for(int k=0; k<=K; ++k){
+      l[j].input().set(&tau_root[k]);
+      l[j].evaluate();
+      
+      l[j].input().setF(1.0);
+      l[j].evaluate(1,0);
+      l[j].output().getF(&C[j][k]);
+    }
+  }
+  cout << "C = " << C << endl;
+  
+  // Collocated states
+  SXMatrix Z("Z",N,K+1);
+  
+  // State at final time
+// SXMatrix ZF("ZF");
+  
+  // All variables
+  SXMatrix x;
+  x << vec(trans(Z));
+  // x << vec(ZF);  
+  cout << "x = " << x << endl;
+  
+  // Construct the "NLP"
+  SXMatrix g;
+  for(int i=0; i<N; ++i){
+    for(int k=1; k<=K; ++k){
+      
+      // Add collocation equations to NLP
+      SXMatrix rhs = 0;
+      for(int j=0; j<=K; ++j)
+        rhs += Z(i,j)*C[j][k];
+      g << (h*F.eval(Z(i,k)) - rhs);
+    }
+    
+   // Add continuity equation to NLP
+   SXMatrix rhs = 0;
+   for(int j=0; j<=K; ++j)
+     rhs += D[j]*Z(i,j);
+
+   if(i<N-1)
+     g << (Z(i+1,0) - rhs);
+/*   else
+    g << (ZF - rhs);*/
+         
+  }
+  cout << "g = " << g << endl;
+    
+  SXFunction gfcn(x,g);
+
+  // Dummy objective function
+  SXFunction obj(x, Z(0,0)*Z(0,0));
+  
+  // ----
+  // SOLVE THE NLP
+  // ----
+  
+  // Allocate an NLP solver
+  IpoptSolver solver(obj,gfcn);
+
+  // Set options
+  solver.setOption("tol",1e-10);
+  solver.setOption("hessian_approximation","limited-memory");
+
+  // initialize the solver
+  solver.init();
+
+  // Initial condition
+  vector<double> xinit(x.numel(),0);
+  solver.input(NLP_X_INIT).set(xinit);
+
+  // Bounds on x
+  vector<double> lbx(x.numel(),-100);
+  vector<double> ubx(x.numel(), 100);
+  lbx[0] = ubx[0] = z0;
+  solver.input(NLP_LBX).set(lbx);
+  solver.input(NLP_UBX).set(ubx);
+  
+  // Bounds on the constraints
+  vector<double> lubg(g.numel(),0);
+  solver.input(NLP_LBG).set(lubg);
+  solver.input(NLP_UBG).set(lubg);
+  
+  // Solve the problem
+  solver.solve();
+  
+  // Print the time points
+  vector<double> t_opt(N*(K+1)+1);
+  for(int i=0; i<N; ++i)
+    for(int j=0; j<=K; ++j)
+      t_opt[j + (K+1)*i] = h*(i + tau_root[j]);
+  t_opt.back() = 1;
+  
+  cout << "time points: " << t_opt << endl;
+  resfile << t_opt << endl;
+  
+  // Print the optimal cost
+  cout << "optimal cost: " << solver.output(NLP_COST).data() << endl;
+
+  // Print the optimal solution
+  vector<double> xopt(x.numel());
+  solver.output(NLP_X_OPT).get(xopt);
+  cout << "optimal solution: " << xopt << endl;
+  resfile << xopt << endl;
+  
+  }
+ 
+ resfile.close();
+  
+  return 0;
+}

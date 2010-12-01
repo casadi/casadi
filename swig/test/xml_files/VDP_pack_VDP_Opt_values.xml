@@ -1,0 +1,7 @@
+<IndependentParameters>
+	 <RealParameter name="p1" value="2.0"/>
+	 <RealParameter name="x1_0" value="0.0"/>
+	 <RealParameter name="x2_0" value="1.0"/>
+	 <RealParameter name="startTime" value="0.0"/>
+	 <RealParameter name="finalTime" value="20.0"/>
+</IndependentParameters>

@@ -1,0 +1,208 @@
+#ifndef CONSTANT_NODE_HPP
+#define CONSTANT_NODE_HPP
+
+#include "sx_node.hpp"
+
+namespace CasADi{
+
+/** \brief  constants */
+const double double_inf = std::numeric_limits<double>::infinity();
+const double double_nan = std::numeric_limits<double>::quiet_NaN();
+
+/** \brief Reprsents a constant SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class ConstantSXNode : public SXNode{
+public:
+
+/** \brief  Get the value must be defined */
+virtual double getValue() const = 0;
+
+/** \brief  Properties */
+virtual bool isConstant() const{ return true; }
+
+protected:
+
+/** \brief  print */
+virtual void print(std::ostream &stream) const{
+  stream << getValue();
+}
+
+};
+
+/** \brief  DERIVED CLASSES */
+
+/** \brief  Represents a constant real SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class RealtypeSXNode : public ConstantSXNode{
+public:
+
+explicit RealtypeSXNode(double value) : value(value){} 
+
+//@{
+/** \brief  Get the value */
+virtual double getValue() const{ return value;}
+virtual int getIntValue() const{ return int(value);}
+//@}
+
+protected:
+
+/** \brief  Data members */
+double value;
+
+};
+
+
+/** \brief  Represents a constant integer SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class IntegerSXNode : public ConstantSXNode{
+public:
+
+explicit IntegerSXNode(int value) : value(value){}
+
+//@{
+/** \brief  evaluate function */
+virtual double getValue() const{  return value; }
+virtual int getIntValue() const{  return value; }
+//@}
+
+/** \brief  Properties */
+virtual bool isInteger() const{ return true; }
+
+protected:
+
+/** \brief  Data members */
+int value;
+
+};
+
+
+/** \brief  Represents a zero SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class ZeroSXNode : public ConstantSXNode{
+public:
+
+explicit ZeroSXNode(){}
+
+//@{
+/** \brief  Get the value */
+virtual double getValue() const{ return 0;}
+virtual int getIntValue() const{ return 0;}
+//@}
+
+//@{
+/** \brief  Properties */
+virtual bool isInteger() const{ return true; }
+virtual bool isZero() const{ return true; }
+//@}
+};
+
+
+/** \brief  Represents a one SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class OneSXNode : public ConstantSXNode{
+public:
+
+explicit OneSXNode(){}
+
+/** \brief  Get the value */
+virtual double getValue() const{ return 1;}
+virtual int getIntValue() const{ return 1;}
+
+/** \brief  Properties */
+virtual bool isInteger() const{ return true; }
+virtual bool isOne() const{ return true; }
+
+};
+
+
+/** \brief  Represents a minus one SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class MinusOneSXNode : public ConstantSXNode{
+public:
+
+explicit MinusOneSXNode (){}
+
+//@{
+/** \brief  Get the value */
+virtual double getValue() const{ return -1;}
+virtual int getIntValue() const{ return -1;}
+//@}
+
+//@{
+/** \brief  Properties */
+virtual bool isInteger() const{ return true; }
+virtual bool isMinusOne() const{ return true; }
+//@}
+
+};
+
+
+/** \brief  Represents an infinity SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class InfSXNode : public ConstantSXNode{
+public:
+
+explicit InfSXNode (){}
+
+/** \brief  Get the value */
+virtual double getValue() const{ return double_inf;}
+
+/** \brief  Properties */
+virtual bool isInf() const{ return true; }
+
+};
+
+
+/** \brief  Represents a minus infinity SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class MinusInfSXNode : public ConstantSXNode{
+public:
+
+explicit MinusInfSXNode (){}
+
+/** \brief  Get the value */
+virtual double getValue() const{ return -double_inf;}
+
+/** \brief  Properties */
+virtual bool isMinusInf() const{ return true; }
+
+};
+
+
+/** \brief  Represents a not-a-number SX
+  \author Joel Andersson 
+  \date 2010
+*/
+class NanSXNode : public ConstantSXNode{
+public:
+
+explicit NanSXNode (){}
+
+/** \brief  Get the value */
+virtual double getValue() const{ return double_nan;}
+
+/** \brief  Properties */
+virtual bool isNan() const{ return true; }
+
+};
+
+} // namespace CasADi
+
+
+#endif // CONSTANT_SCALAR_HPP
