@@ -32,14 +32,16 @@ add_subdirectory(toolboxes)
 add_subdirectory(examples)
 add_subdirectory(external_packages)
 
+find_package (BLAS)
+if(BLAS_FOUND)
 add_subdirectory(superlu_interface)
+endif(BLAS_FOUND)
 
 find_package (SWIG)
 if(SWIG_FOUND)
 add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
 add_custom_target(python DEPENDS _casadi) # the python interface is created with the command "make python"
 add_custom_target(octave DEPENDS casadi_octave) # the octave interface is created with the command "make octave"
-
 endif(SWIG_FOUND)
 
 add_subdirectory(tutorials EXCLUDE_FROM_ALL)

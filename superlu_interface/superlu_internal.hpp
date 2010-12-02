@@ -56,6 +56,9 @@ class SuperLUInternal : public FXNode{
     // Is initialized
     bool is_init;
     
+    // Has the solve function been called once
+    bool called_once;
+    
     // SuperLU data structures
     SuperMatrix A, L, U, B;
 

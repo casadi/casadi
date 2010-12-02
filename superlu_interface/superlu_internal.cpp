@@ -149,10 +149,32 @@ void SuperLUInternal::init(){
   // Set to initialized
   is_init = true;
   
+  // Has the routine been called once
+  called_once = false;
 }
 
 void SuperLUInternal::evaluate(int fsens_order, int asens_order){
-  solve(DOFACT);
+  Factorization fact;
+  if(called_once){
+    // Check if any element has changed
+    bool any_change = false;
+    const vector<double>& val = input(0).data();
+    for(int i=0; i<val.size(); ++i){
+      if(val[i] != a[i]){
+        any_change = true;
+        break;
+      }
+    }
+    
+    // Reuse factored matrix if matrix hasn't changed
+    fact = any_change ? SAMEPATTERN : FACTORED;
+  } else {
+    fact = DOFACT;
+    called_once = true;
+  }
+  
+  // Call the solve routine
+  solve(fact);
 }
 
 void SuperLUInternal::solve(Factorization fact){
@@ -172,15 +194,20 @@ void SuperLUInternal::solve(Factorization fact){
 
   // Solve the linear system
   dgssv(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &info);
+  if(info!=0){
+    stringstream ss;
+    ss << "SuperLU: dgssv failed with flag=" << info << ".";
+    throw CasadiException(ss.str());
+  }
 
   // Copy the result
   vector<double>& res = output(0).data();
   copy(rhs,rhs+res.size(),res.begin());
   
-  dPrint_CompCol_Matrix(const_cast<char*>("A"), &A);
+/*  dPrint_CompCol_Matrix(const_cast<char*>("A"), &A);
   dPrint_CompCol_Matrix(const_cast<char*>("U"), &U);
   dPrint_SuperNode_Matrix(const_cast<char*>("L"), &L);
-  print_int_vec(const_cast<char*>("\nperm_r"), nrow_, perm_r);
+  print_int_vec(const_cast<char*>("\nperm_r"), nrow_, perm_r);*/
   
 }
 
