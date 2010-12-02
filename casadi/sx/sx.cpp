@@ -22,7 +22,6 @@
  */
 
 #include "sx.hpp"
-#include "sx_matrix.hpp"
 #include "../expression_tools.hpp"
 #include <stack>
 #include <cassert>
@@ -45,13 +44,6 @@ SX::SX(){
 SX::SX(SXNode* node_) : node(node_){
   node->count++;
 }
-
-#if 0
-SX::SX(const Element &el){
-  node = el.mat.getElement(el.i,el.j).get();
-  node->count++;
-}
-#endif
 
 SX::SX(const SX& scalar){
   node = scalar.node;
@@ -85,12 +77,6 @@ SX::SX(const char name[]){
   node->count++;
 }
 
-// SX::SX(const SXMatrix& expr){
-//    if(!isScalar(expr)) throw "SymbolicSXNode: The expression is not scalar";
-//    node = expr(0).get();
-//    node->count++;
-// }
-
 SX::~SX(){
   if(--node->count == 0) delete node;
 }
@@ -111,10 +97,6 @@ SX& SX::operator=(const SX &scalar){
 SX& SX::operator=(double scalar){
   return *this = SX(scalar);
 }
-
-// SX& SX::operator=(const SXMatrix& scalar){
-//   return *this = SX(scalar);
-// }
 
 std::ostream &operator<<(std::ostream &stream, const SX &scalar)
 {

@@ -43,7 +43,7 @@ void OCP::print(ostream &stream) const{
   stream << variables << endl;
 
   // Print the variables
-  OCPVariables var = sortVariables();
+  OCPVariables var(variables);
   stream << var << endl;
   
   // Print the differential-algebraic equation
@@ -96,34 +96,6 @@ void OCP::print(ostream &stream) const{
   stream << "Time horizon" << endl;
   stream << "t0 = " << t0 << endl;
   stream << "tf = " << tf << endl;
-  
-}
-
-OCPVariables OCP::sortVariables() const{
-  // Get all the variables
-  vector<Variable> v = variables;
-  
-  // Return object
-  OCPVariables ret;
-  
-  // Set independent variable (time)
-  ret.t = t;
-  
-  // Loop over variables
-  for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
-    // Make sure that the variable is initialized
-    switch(it->getType()){
-      case TYPE_STATE:              ret.x.push_back(*it);  break;
-      case TYPE_ALGEBRAIC:          ret.z.push_back(*it);  break;
-      case TYPE_CONTROL:            ret.u.push_back(*it);  break;
-      case TYPE_PARAMETER:          ret.p.push_back(*it);  break;
-      case TYPE_CONSTANT:           ret.c.push_back(*it);  break;
-      case TYPE_DEPENDENT:          ret.d.push_back(*it);  break;
-      default: throw CasadiException("OCP::sortVariables: unknown type for " + it->getName());
-    }
-  }
-  
-  return ret;
   
 }
 

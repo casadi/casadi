@@ -35,7 +35,19 @@ std::string __str__()  { return $self->toString(); }
 std::string __repr__() { return $self->toString(); }
 double __float__() { return (*$self)->getValue();}
 int __int__() { return (*$self)->getIntValue();}
-
+bool isConstant() const{return (*$self)->isConstant();}
+bool isInteger() const{ return (*$self)->isInteger();}
+bool isSymbolic() const{ return (*$self)->isSymbolic();}
+bool isBinary() const{ return (*$self)->isBinary();}
+bool isZero() const{ return (*$self)->isZero();}
+bool isOne() const{ return (*$self)->isOne();}
+bool isMinusOne() const{ return (*$self)->isMinusOne();}
+bool isNan() const{ return (*$self)->isNan();}
+bool isInf() const{ return (*$self)->isInf();}
+bool isMinusInf() const{ return (*$self)->isMinusInf();}
+const std::string& getName() const{ return (*$self)->getName();}
+int getOp() const{ return (*$self)->getOp();}
+bool isEqual(const SX& scalar) const{ return (*$self)->isEqual(scalar);}
 
 //  all binary operations with a particular right argument
 #define binops(T,t) \

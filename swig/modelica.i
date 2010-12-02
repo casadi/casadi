@@ -19,8 +19,8 @@ namespace Modelica{
     /// Dynamics of the variable
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    /// Variable types (REMOVE)
-    enum VarType{TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
+    /// Variable types
+    enum VarType{TYPE_INDEPENDENT, TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
 class Variable : public OptionsFunctionality{
   public:
@@ -143,7 +143,12 @@ class Variable : public OptionsFunctionality{
     
     /// Get the differential equation
     const SX& getDifferentialEquation() const;
+
+    /// Mark the variable as independent/not independent (time)
+    void setIndependent(bool independent);
     
+    /// Check if variable is independent (time)
+    bool getIndependent() const;
 };
 
 %extend Variable {
@@ -170,9 +175,12 @@ namespace CasADi{
 
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCPVariables : public PrintableObject{
-  public:    
+  public:
+    /// Constructor (automatic type conversion allowed)
+    OCPVariables(const Variable& var);
+
     /// Time
-    SX t;
+    Variable t;
     
     /// Differential states
     std::vector<Variable> x;
@@ -202,12 +210,6 @@ class OCP : public PrintableObject{
   public:    
     /// OCP
     OCP();
-
-    /// Sort variables
-    OCPVariables sortVariables() const;
-
-    /// Independent variable (time)
-    SX t;
 
     /// Access the variables in a class hierarchy -- public data member
     Variable variables;

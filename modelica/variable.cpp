@@ -62,6 +62,7 @@ VariableNode::VariableNode(const string& name) : name_(name){
   // Differential equation undefined by default
   de_ = SX::nan;
 
+  independent_ = false;
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;
   alias_ = NO_ALIAS;
@@ -83,20 +84,24 @@ void VariableNode::init(){
   type_ = TYPE_UNKNOWN;
   
   // Try to determine the type
-  if(!sx_->isNan()){
-    if(!be_->isNan()){
-      type_ = TYPE_DEPENDENT;
-    } else {
-      if(variability_ == PARAMETER){
-        type_ = TYPE_PARAMETER;
-      } else if(variability_ == CONTINUOUS) {
-        if(causality_ == INTERNAL){
-          type_ = !dx_->isNan() ? TYPE_STATE : TYPE_ALGEBRAIC;
-        } else if(causality_ == INPUT){
-          type_ = TYPE_CONTROL;
+  if(independent_){
+    type_ = TYPE_INDEPENDENT;
+  } else {
+    if(!sx_->isNan()){
+      if(!be_->isNan()){
+        type_ = TYPE_DEPENDENT;
+      } else {
+        if(variability_ == PARAMETER){
+          type_ = TYPE_PARAMETER;
+        } else if(variability_ == CONTINUOUS) {
+          if(causality_ == INTERNAL){
+            type_ = !dx_->isNan() ? TYPE_STATE : TYPE_ALGEBRAIC;
+          } else if(causality_ == INPUT){
+            type_ = TYPE_CONTROL;
+          }
+        } else if(variability_ == CONSTANT){
+          type_ = TYPE_CONSTANT;
         }
-      } else if(variability_ == CONSTANT){
-        type_ = TYPE_CONSTANT;
       }
     }
   }
@@ -175,6 +180,10 @@ Variable Variable::operator[](int ind) const{
   } catch(exception& ex){
     throw CasadiException(string("Variable::operator[] failed <= ") + ex.what());
   }
+}
+
+int VariableNode::add(const Variable& var){
+  add(var,var.getName());
 }
 
 int VariableNode::add(const Variable& var, const string& namepart){
@@ -372,6 +381,14 @@ const SX& Variable::getDifferentialEquation() const{
   return (*this)->de_;
 }
 
+void Variable::setIndependent(bool independent){
+  (*this)->independent_ = independent;
+  init();
+}
+    
+bool Variable::getIndependent() const{
+  return (*this)->independent_;
+}
 
 
 } // namespace Modelica

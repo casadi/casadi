@@ -94,6 +94,7 @@ SET(CASADI_SRCS
 
   expression_tools.cpp
   expression_tools.hpp
+  stl_vector_tools.hpp
 )
 
 add_library(casadi STATIC ${CASADI_SRCS})

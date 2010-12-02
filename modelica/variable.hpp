@@ -43,11 +43,11 @@ namespace CasADi{
     /// Dynamics of the variable
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    /// Variable types (REMOVE)
-    enum VarType{TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
+    /// Variable types
+    enum VarType{TYPE_INDEPENDENT, TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
     /// Names of the variable types
-    static const char* typenames[] = {"STATE","ALGEBRAIC","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
+    static const char* typenames[] = {"INDEPENDENT","STATE","ALGEBRAIC","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
 
     
     // Forward declaration
@@ -193,6 +193,12 @@ namespace CasADi{
     /// Get the differential equation
     const SX& getDifferentialEquation() const;
     
+    /// Mark the variable as independent/not independent (time)
+    void setIndependent(bool independent);
+    
+    /// Check if variable is independent (time)
+    bool getIndependent() const;
+    
   };
 
   /// Internal node class
@@ -232,6 +238,9 @@ namespace CasADi{
     // Add a subcollection
     int add(const Variable& var, const std::string& namepart);
 
+    // Add a subcollection, default name
+    int add(const Variable& var);
+
     // Check if a subcollection exists
     bool has(const std::string& name) const;
 
@@ -245,6 +254,9 @@ namespace CasADi{
 
     // Variable type
     VarType type_;
+    
+    // Is the variable independent
+    bool independent_;
 
     // Attributes
     std::string name_;

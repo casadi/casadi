@@ -75,7 +75,7 @@ class SX{
 	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
     explicit SX(const char name[]);  // variable
-/*    explicit SX(const SXMatrix& expr);   // create an element from a matrix. an non-explicit type conversion would cause ambigousity, since SymbolicScalar converts to Matrix*/
+
     explicit SX(SXNode* node); // (must be explicit, otherwise 0/NULL would be ambigous)
     /** \brief Copy constructor */
     SX(const SX& scalar); // copy constructor

@@ -45,7 +45,7 @@ template<typename T>
 ostream& operator<<(ostream &stream, const vector<T> &v){
 
   // check if empty
-  if(v.empty()) return stream << "<empty vector>";
+  if(v.empty()) return stream << "[0]()";
 
   // print vector style
   stream << "[" << v.size() << "]"; // Print dimension 

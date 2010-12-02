@@ -32,15 +32,37 @@ using namespace std;
 namespace CasADi{
   namespace Modelica{
 
+OCPVariables::OCPVariables(const Variable& var){
+    
+  // Get all the variables
+  vector<Variable> v = var;
+  
+  // Loop over variables
+  for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
+    // Make sure that the variable is initialized
+    switch(it->getType()){
+      case TYPE_INDEPENDENT:        assert(t.isNull());     t = *it;  break;
+      case TYPE_STATE:              x.push_back(*it);  break;
+      case TYPE_ALGEBRAIC:          z.push_back(*it);  break;
+      case TYPE_CONTROL:            u.push_back(*it);  break;
+      case TYPE_PARAMETER:          p.push_back(*it);  break;
+      case TYPE_CONSTANT:           c.push_back(*it);  break;
+      case TYPE_DEPENDENT:          d.push_back(*it);  break;
+      default: throw CasadiException("OCP::sortVariables: unknown type for " + it->getName());
+    }
+  }
+}
+    
 void OCPVariables::print(ostream &stream) const{
-  stream << "Time:                           " << t << endl;
-  stream << "Differential states:            " << x << endl;
-  stream << "Algebraic states:               " << z << endl;
-  stream << "Controls:                       " << u << endl;
-  stream << "Parameters:                     " << p << endl;
-  stream << "Constants:                      " << c << endl;
-  stream << "Dependent:                      " << d << endl;
-  stream << endl;
+  stream << "{" << endl;
+  stream << "  t = " << t << endl;
+  stream << "  x =  " << x << endl;
+  stream << "  z =  " << z << endl;
+  stream << "  u =  " << u << endl;
+  stream << "  p =  " << p << endl;
+  stream << "  c =  " << c << endl;
+  stream << "  d =  " << d << endl;
+  stream << "}" << endl;
 }
 
   } // namespace Modelica

@@ -93,7 +93,10 @@ cout << "vars" << endl;
   map<string,int> catCounter;
   
   // Time
-  ocp_.t = SX("time");
+  Variable time("time");
+  time.setExpression(SX("time"));
+  time.setIndependent(true);
+  ocp_.variables->add(time);
   
   // Get a reference to the ModelVariables node
   const XMLNode& modvars = document[0]["ModelVariables"];
@@ -215,9 +218,6 @@ cout << "vars" << endl;
       var.setDerivative(SX(name)); // NOTE: assumes that the derivative is added after the variable
       
     }
-    
-    cout << "added " << var << " -- " << var->getTypeName() << endl;
-    
   }
   
   ocp_.variables->print(cout,0);

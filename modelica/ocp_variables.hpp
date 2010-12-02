@@ -33,11 +33,14 @@ namespace CasADi{
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCPVariables : public PrintableObject{
   public:    
+    /// Constructor (automatic type conversion allowed)
+    OCPVariables(const Variable& var);
+    
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Time
-    SX t;
+    Variable t;
     
     /// Differential states
     std::vector<Variable> x;

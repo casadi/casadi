@@ -40,17 +40,11 @@ class OCP : public PrintableObject{
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
-    /// Sort variables
-    OCPVariables sortVariables() const;
-
     /// Try to make explicit by symbolically solving for xdot (experimental, only small systems)
     void makeExplicit();
 
     /// Replace all state derivatives by algebraic variables with the same name
     void makeSemiExplicit();
-
-    /// Independent variable (time)
-    SX t;
 
     /// Access the variables in a class hierarchy -- public data member
     Variable variables;

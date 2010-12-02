@@ -64,13 +64,13 @@ ocp = parser.parse()
 print ocp
 
 # Sort the variables according to type
-var = ocp.sortVariables()
+var = OCPVariables(ocp.variables)
 
 # The right hand side of the ACADO functions
 acado_in = ACADO_FCN_NUM_IN * [[]]
 
 # Time
-acado_in[ACADO_FCN_T] = [ocp.t]
+acado_in[ACADO_FCN_T] = [var.t.sx()]
 
 # Convert stl vector of variables to list of expressions
 def toList(v, der=False):
