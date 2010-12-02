@@ -1,13 +1,8 @@
-/*! @file superlu.c
- * \brief a small 5x5 example
- * 
- * <pre>
- * * -- SuperLU routine (version 2.0) --
- * Univ. of California Berkeley, Xerox Palo Alto Research Center,
- * and Lawrence Berkeley National Lab.
- * November 15, 1997
- * </pre>
- */
+/** 
+File superlu.c from the SuperLU example collection
+Joel Andersson, K.U. Leuven, 2010
+*/
+
 #include "external_packages/superlu_4_1/SRC/slu_ddefs.h"
 
 main(int argc, char *argv[])
