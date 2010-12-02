@@ -29,7 +29,11 @@ namespace CasADi{
 SuperLU::SuperLU(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs){
   assignNode(new SuperLUInternal(nrow,ncol,rowind,col,nrhs));
 }
-  
+
+void SuperLU::solve(Factorization fact){
+//  if
+}
+ 
   
 } // namespace CasADi
 

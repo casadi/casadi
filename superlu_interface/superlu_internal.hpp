@@ -43,6 +43,9 @@ class SuperLUInternal : public FXNode{
     // Solve the system of equations
     virtual void evaluate(int fsens_order, int asens_order);
 
+    // Solve the system of equations
+    void solve(Factorization fact);
+
   protected:
     
     // Sparsity in CRS format

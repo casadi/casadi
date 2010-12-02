@@ -3,8 +3,8 @@ File superlu.c from the SuperLU example collection
 Joel Andersson, K.U. Leuven, 2010
 */
 
+#include "casadi/stl_vector_tools.hpp"
 #include "superlu_interface/superlu.hpp"
-#include "external_packages/superlu_4_1/SRC/slu_ddefs.h"
 
 using namespace CasADi;
 
@@ -26,6 +26,12 @@ main(int argc, char *argv[])
   
   // Create a solver instance
   SuperLU linear_solver(nrow,ncol,rowind,col);
+  
+  // Set options
+  linear_solver.setOption("colperm", "natural");
+  
+  
+  // Initialize
   linear_solver.init();
 
   // Pass Non-zero elements
@@ -41,5 +47,10 @@ main(int argc, char *argv[])
   vector<double> rhs(nrow,1.0);
   linear_solver.setInput(rhs,1);
   
+  // Solve
   linear_solver.evaluate();
+  
+  // Print the solution
+  cout << "solution = " << linear_solver.getOutputData() << endl;
+  
 }
