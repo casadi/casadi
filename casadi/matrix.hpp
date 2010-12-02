@@ -115,6 +115,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
     //@}
 
+    // Get the sparsity pattern
+    const std::vector<int>& getCol() const;
+    const std::vector<int>& getRowInd() const;
     
     // make protected?
   public:
@@ -291,6 +294,17 @@ void Matrix<T>::print(std::ostream &stream) const{
   else
     printMatrix(stream);
 }
+
+template<class T>
+const std::vector<int>& Matrix<T>::getCol() const{
+  return col;
+}
+
+template<class T>
+const std::vector<int>& Matrix<T>::getRowInd() const{
+  return rowind;
+}
+
 
 
 } // namespace CasADi

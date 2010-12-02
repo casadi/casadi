@@ -115,9 +115,7 @@ SXMatrix(int n, int m, const SX& val);    // dense n-by-m matrix filled with val
 /** \brief  These constructors enable implicit type conversion */
 SXMatrix(const SX &scalar);      // create a variable from a scalar
 SXMatrix(double val);            // constant
-/*SXMatrix(const std::vector<double>& x);*/
 SXMatrix(const std::vector<SX>& x);
-/*SXMatrix(const std::vector<double>& x,  int n, int m);*/
 SXMatrix(const std::vector<SX>& x,  int n, int m);
 
 /** \brief  Create a matrix of symbolic variables  */
@@ -136,6 +134,10 @@ int size2() const;       // get the second dimension
 bool empty() const; // is the matrix empty
 bool scalar() const; // is the matrix scalar
 bool vector() const; // is the matrix a vector
+
+// Get sparsity in compressed row storage (CRS) format
+const std::vector<int>& getCol() const; // vector of length nnz containing the columns for all the indices of the non-zero elements
+const std::vector<int>& getRowInd() const; // vector of length n+1 containing the index of the last non-zero element up till each row 
 
 };
 
