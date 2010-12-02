@@ -30,6 +30,7 @@ add_subdirectory(casadi)
 add_subdirectory(modelica)
 add_subdirectory(toolboxes)
 add_subdirectory(examples)
+add_subdirectory(external_packages)
 
 find_package (SWIG)
 if(SWIG_FOUND)

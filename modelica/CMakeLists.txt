@@ -23,5 +23,4 @@ if(ENABLE_SHARED)
 add_library(modelica_shared SHARED ${MODELICA})
 endif(ENABLE_SHARED)
 
-add_subdirectory(external_packages/tinyxml)
 add_subdirectory(test)
