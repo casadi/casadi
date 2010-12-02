@@ -1,0 +1,10 @@
+This directory contains the source of SuperLU, version 4.1 (November 23, 2010) as downloaded from 
+http://crd.lbl.gov/~xiaoye/SuperLU/#superlu (as of 2 December 2010).
+
+This version contains only the source code (without any modification) with the addition of a CMake based build system.
+
+For the copyright message from the original code, go to README_ORIGINAL.
+
+Joel Andersson, K.U. Leuven, 2010
+
+
