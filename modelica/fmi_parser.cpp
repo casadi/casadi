@@ -93,9 +93,7 @@ cout << "vars" << endl;
   map<string,int> catCounter;
   
   // Time
-  Variable t("time");
-  t.setType(TYPE_TIME);
-  ocp_.variables->add(t,"time");
+  ocp_.t = SX("time");
   
   // Get a reference to the ModelVariables node
   const XMLNode& modvars = document[0]["ModelVariables"];
@@ -161,11 +159,11 @@ cout << "vars" << endl;
       }
     }
 
-    // Algebraic -> state if already added
-    if(var->type==TYPE_NOT_SET){
+    // Set fields if not already added
+    if(var.getExpression()->isNan()){
       
       // Expression
-      var->sx_ = SX(name);
+      var.setExpression(SX(name));
 
       // Symbolic variable
       var.setName(name);
@@ -212,19 +210,14 @@ cout << "vars" << endl;
       if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
       if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
 
-      // Initialize the variable
-      var.init(); 
-
     } else {
-      // Make sure algebraic
-      assert(var->type == TYPE_ALGEBRAIC);
-      
       // Mark the variable differentiated
-      var->type = TYPE_STATE;
-      var->d = Variable(name); // NOTE: assumes that the derivative is added after the variable
-      var->d.setType(TYPE_DERIVATIVE);
+      var.setDerivative(SX(name)); // NOTE: assumes that the derivative is added after the variable
       
     }
+    
+    cout << "added " << var << " -- " << var->getTypeName() << endl;
+    
   }
   
   ocp_.variables->print(cout,0);
@@ -249,11 +242,7 @@ void FMIParser::addBindingEquations(){
     SX bexpr = readExpr_new(beq[1][0]);
 
     // Pass to variable
-    var->sx_ = bexpr; // dirty trick
-      
-    // Mark variable as TYPE_DEPENDENT
-    var->type = TYPE_DEPENDENT;
-    
+    var.setBindingEquation(bexpr);
   }
 }
 
@@ -269,7 +258,7 @@ void FMIParser::addDynamicEquations(){
 
     // Add the differential equation
     SX de_new = readExpr_new(dnode[0]);
-    ocp_.dyneq.push_back(de_new);
+    ocp_.dae.push_back(de_new);
   }
 }
 

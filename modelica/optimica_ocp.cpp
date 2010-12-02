@@ -38,41 +38,25 @@ OCP::OCP(){
 }
 
 void OCP::print(ostream &stream) const{
-  // Variables sorted by type
+  // Variables in the class hierarchy
   stream << "Variables" << endl;
   stream << variables << endl;
 
-  // Print the initial equations
-  stream << "Dynamic equations" << endl;
-  for(vector<SX>::const_iterator it=dyneq.begin(); it!=dyneq.end(); it++){
+  // Print the variables
+  OCPVariables var = sortVariables();
+  stream << var << endl;
+  
+  // Print the differential-algebraic equation
+  stream << "Differential-Algebraic Equations" << endl;
+  for(vector<SX>::const_iterator it=dae.begin(); it!=dae.end(); it++){
     stream << "0 == "<< *it << endl;
   }
   stream << endl;
 
-  stream << "Time state(s):                  " << t << endl;
-  stream << "Differential states (implicit): " << x << endl;
-  stream << "State derivatives:              " << xdot << endl;
-  stream << "Differential states (explicit): " << xd << endl;
-  stream << "Algebraic states:               " << xa << endl;
-  stream << "Controls:                       " << u << endl;
-  stream << "Parameter:                      " << p << endl;
-  stream << "Dependent variables:            " << d << endl;
-  stream << endl;
-  
-  // Print the equations
-  stream << "Differential-algebraic equations (implicit)" << endl;
-  for(vector<SX>::const_iterator it=dyneq.begin(); it!=dyneq.end(); it++)
-    stream << "0 == " << *it << endl;
-  stream << endl;
-  
-  stream << "Differential equations (explicit)" << endl;
-  for(int i=0; i<diffeq.size(); ++i)
-    stream << "der{" << xd[i] << "}" << " == " << diffeq[i] << endl;
-  stream << endl;
-  
   stream << "Algebraic equations" << endl;
-  for(int i=0; i<algeq.size(); ++i)
-    stream << "0 == " << algeq[i] << endl;
+  for(vector<SX>::const_iterator it=ae.begin(); it!=ae.end(); it++){
+    stream << "0 == " << *it << endl;
+  }
   stream << endl;
   
   stream << "Initial equations" << endl;
@@ -80,11 +64,20 @@ void OCP::print(ostream &stream) const{
     stream << "0 == " << *it << endl;
   }
   stream << endl;
+
+  // Print the explicit differential equations
+  stream << "Differential equations (explicit)" << endl;
+  for(vector<Variable>::const_iterator it=var.x.begin(); it!=var.x.end(); it++){
+    SX de = it->getDifferentialEquation();
+    if(!de->isNan())
+      stream << "der(" << *it << ") == " << de << endl;
+  }
+  stream << endl;
   
   // Dependent equations
   stream << "Dependent equations" << endl;
-  for(int i=0; i<d.size(); ++i)
-    stream << d[i] << " == " << depdef[i] << endl;
+  for(vector<Variable>::const_iterator it=var.d.begin(); it!=var.d.end(); it++)
+    stream << *it << " == " << it->getBindingEquation() << endl;
   stream << endl;
 
   // Mayer terms
@@ -106,45 +99,36 @@ void OCP::print(ostream &stream) const{
   
 }
 
-void OCP::sortVariables(){
-  // Clear the existing variables
-  t.clear();
-  x.clear();
-  xdot.clear();
-  xd.clear();
-  xa.clear();
-  u.clear();
-  p.clear();
-  d.clear();
-
+OCPVariables OCP::sortVariables() const{
   // Get all the variables
   vector<Variable> v = variables;
-
-  cout << "variables  111  = " << variables << endl;
+  
+  // Return object
+  OCPVariables ret;
+  
+  // Set independent variable (time)
+  ret.t = t;
   
   // Loop over variables
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
     // Make sure that the variable is initialized
-    switch((*it)->type){
-      case TYPE_TIME:               t.push_back(*it);  break;
-      case TYPE_STATE:              x.push_back(it->sx());  xdot.push_back(it->der()); break;
-      case TYPE_ALGEBRAIC:          xa.push_back(*it); break;
-      case TYPE_CONTROL:            u.push_back(*it);  break;
-      case TYPE_PARAMETER:          p.push_back(*it);  break;
-      case TYPE_DEPENDENT:          d.push_back(*it);  break;
-      default:
-        throw CasadiException("OCP::sortVariables: unknown type");
+    switch(it->getType()){
+      case TYPE_STATE:              ret.x.push_back(*it);  break;
+      case TYPE_ALGEBRAIC:          ret.z.push_back(*it);  break;
+      case TYPE_CONTROL:            ret.u.push_back(*it);  break;
+      case TYPE_PARAMETER:          ret.p.push_back(*it);  break;
+      case TYPE_CONSTANT:           ret.c.push_back(*it);  break;
+      case TYPE_DEPENDENT:          ret.d.push_back(*it);  break;
+      default: throw CasadiException("OCP::sortVariables: unknown type for " + it->getName());
     }
   }
   
-  // Collect binding equations
-  depdef.clear();
-  depdef.reserve(d.size());
-  for(vector<Variable>::iterator it=d.begin(); it!=d.end(); ++it)
-    depdef.push_back(it->sx());
+  return ret;
+  
 }
 
 void OCP::makeExplicit(){
+#if 0  
   // Dynamic equation
   SXMatrix dae(dyneq);
   SXMatrix xdot1(xdot);
@@ -170,10 +154,13 @@ void OCP::makeExplicit(){
   for(int i=0; i<diffeq.size(); ++i)
     diffeq[i] = rhs.getElement(i);
   dyneq.clear();
+
+#endif
 }
 
 
 void OCP::makeSemiExplicit(){
+#if 0  
   // Move the fully implicit dynamic equations to the list of algebraic equations
   algeq.insert(algeq.end(), dyneq.begin(), dyneq.end());
   dyneq.clear();
@@ -188,6 +175,7 @@ void OCP::makeSemiExplicit(){
   // Remove from old location
   xdot.clear();
   x.clear();
+#endif
 }
 
   

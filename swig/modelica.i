@@ -7,83 +7,142 @@
 namespace CasADi{
 namespace Modelica{
 
-    // Time variability of a variable (see Fritzon page 89)
+    /// Time variability of a variable (see Fritzon page 89)
     enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
 
-    // Causality of a variable
+    /// Causality of a variable
     enum Causality{INPUT,OUTPUT,INTERNAL};
     
-    // Dynamics of the variable
+    /// Dynamics of the variable
     enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
     
-    // Dynamics of the variable
+    /// Dynamics of the variable
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    // Variable types (REMOVE)
-    enum VarType{TYPE_TIME,TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_DEPENDENT,TYPE_DERIVATIVE, TYPE_NOT_SET};    
+    /// Variable types (REMOVE)
+    enum VarType{TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
 class Variable : public OptionsFunctionality{
   public:
-    /** \brief Default constructor */
+    /// Default (empty) constructor
     Variable();
-    
-    /** \brief Construct an expression */
+
+    /// Create a new variable
     explicit Variable(const std::string& name);
     
-    /// Set and get value
-    double getValue() const;
-    void setValue(double val);    
-    
-    /** \brief Get the scalar expression */
+    /// Destructor
+    ~Variable();
+        
+    /// Get the scalar expression or binding expression
     SX sx() const;
     
-    /** \brief Time derivative */
+    /// Get the time derivative or differential equation
     SX der() const;  
-   
-    /// Check if the variable has a certain type
-    bool isTime() const;
-    bool isDifferentialState() const;
-    bool isAlgebraicState() const;
-    bool isParameter() const;
-    bool isControl() const;
-    bool isDependent() const;
+       
+    /// Get type
+    VarType getType() const;
+    
+    /// Get numerical value
+    double getValue() const;
 
+    /// Set numerical value
+    void setValue(double val);    
+
+    /// Get variable name
     const std::string& getName() const;
+
+    /// Set variable name
     void setName(const std::string& name);
 
+    /// Get the variability (see Fritzon)
     Variability getVariability() const;
+
+    /// Set the variability (see Fritzon)
     void setVariability(Variability variability);
 
+    /// Get the causality (see Fritzon)
     Causality getCausality() const;
+
+    /// Set the causality (see Fritzon)
     void setCausality(Causality causality);
     
+    /// Check if the variable is an alias variable
     Alias getAlias() const;
+
+    /// Set if the variable is an alias variable
     void setAlias(Alias alias);
     
+    /// Get the description
     const std::string& getDescription() const;
+    
+    /// Set the description
     void setDescription(const std::string& description);
     
+    /// Get the variable reference (XML)
     int getValueReference() const;
+
+    /// Set the variable reference (XML)
     void setValueReference(int valueReference);
     
+    /// Get the lower bound
     double getMin() const;
+
+    /// Set the lower bound
     void setMin(double min);
     
+    /// Get the upper bound
     double getMax() const;
+
+    /// Set the upper bound
     void setMax(double max);
     
+    /// Get the nominal value of the variable
     double getNominal() const;
+
+    /// Set the nominal value of the variable
     void setNominal(double nominal);
     
+    /// Get the value at time 0
     double getStart() const;
+
+    /// Set the value at time 0
     void setStart(double start);
     
+    /// Get the unit
     const std::string& getUnit() const;
+
+    /// Set the unit
     void setUnit(const std::string& unit);
     
+    /// Get the display unit
     const std::string& getDisplayUnit() const;
+
+    /// Set the display unit
     void setDisplayUnit(const std::string& displayUnit);
     
+    /// Set the expression
+    void setExpression(const SX& sx);
+
+    /// Get the expression
+    const SX& getExpression() const;
+
+    /// Set the derivative expression
+    void setDerivative(const SX& dx);
+    
+    /// Get the derivative expression
+    const SX& getDerivative() const;
+    
+    /// Set the binding equation
+    void setBindingEquation(const SX& be);
+    
+    /// Get the binding equation
+    const SX& getBindingEquation() const;
+    
+    /// Set the differential equation
+    void setDifferentialEquation(const SX& de);
+    
+    /// Get the differential equation
+    const SX& getDifferentialEquation() const;
     
 };
 
@@ -98,79 +157,90 @@ class Variable : public OptionsFunctionality{
   std::string __repr__()  { return $self->getRepresentation(); }
 }
 
+} // namespace Modelica
+} // namespace CasADi
 
+// Template instantiations
+namespace std {
+%template(vector_variable) vector<CasADi::Modelica::Variable>;
+} // namespace std;
+
+namespace CasADi{
+  namespace Modelica{
+
+/** Symbolic, object oriented representation of an optimal control problem (OCP) */
+class OCPVariables : public PrintableObject{
+  public:    
+    /// Time
+    SX t;
+    
+    /// Differential states
+    std::vector<Variable> x;
+
+    /// Algebraic states
+    std::vector<Variable> z;
+    
+    /// Controls
+    std::vector<Variable> u;
+    
+    /// Free parameters
+    std::vector<Variable> p;
+
+    /// Constants
+    std::vector<Variable> c;
+
+    /// Dependent
+    std::vector<Variable> d;
+};
+
+%extend OCPVariables {
+  // Print (why is this not inherited?)
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
 
 class OCP : public PrintableObject{
   public:    
+    /// OCP
     OCP();
-    void sortVariables();
-    void makeExplicit();
-    void makeSemiExplicit();
 
-    /// Variables in a class hierarchy
+    /// Sort variables
+    OCPVariables sortVariables() const;
+
+    /// Independent variable (time)
+    SX t;
+
+    /// Access the variables in a class hierarchy -- public data member
     Variable variables;
 
+    /// Differential algebraic equations
+    std::vector<SX> dae;
     
-    
-    
-    // Time variable(s)
-    std::vector<SX> t;
-    
-    // Differential states appearing implicitly
-    std::vector<SX> x;
+    /// Algebraic equations
+    std::vector<SX> ae;
 
-    // Time derivatiev of the differential states appearing implicitly
-    std::vector<SX> xdot;
- 
-    // Differential states
-    std::vector<SX> xd;
- 
-    // Algebraic states
-    std::vector<SX> xa;
-    
-    // Controls
-    std::vector<SX> u;
-    
-    // Parameters
-    std::vector<SX> p;
-
-    // Fully implicit equations
-    std::vector<SX> dyneq;
-    
-    // Explicit differential equations
-    std::vector<SX> diffeq;
-
-    // Algebraic equations
-    std::vector<SX> algeq;
-    
-    // Initial equations
+    /// Initial equations
     std::vector<SX> initeq;
-    
-    // Definition of dependent variables
-    std::vector<SX> depdef;
 
-    // OBJECTIVE
-    // Mayer terms
-    std::vector<SX> mterm;
-    
-    // Mayer time time point
-    std::vector<double> mtp;
-    
-    // Constraint function with upper and lower bounds
+    /// Path constraint function with upper and lower bounds
     std::vector<SX> cfcn, cfcn_lb, cfcn_ub;
 
-    // Initial time
+    /// Mayer terms
+    std::vector<SX> mterm;
+    
+    /// Mayer time time points
+    std::vector<double> mtp;
+        
+    /// Initial time
     double t0;
     
-    // Initial time is free
+    /// Initial time is free
     bool t0_free;
     
-    // Final time
+    /// Final time
     double tf;
     
-    // Final time is free
+    /// Final time is free
     bool tf_free;
-
 };
 
 %extend OCP{

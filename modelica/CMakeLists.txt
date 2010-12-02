@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.0)
 SET(MODELICA
   optimica_ocp.hpp
   optimica_ocp.cpp
+  ocp_variables.hpp
+  ocp_variables.cpp
   variable.hpp
   variable.cpp
   fmi_parser.hpp

@@ -30,7 +30,6 @@ using namespace std;
 namespace CasADi{
 namespace Modelica{
   
-const char* VariableNode::typenames[] = {"time","differential state","algebraic state","control","parameter","dependent","derivative","not set"};
 Variable::Variable(){
 }
 
@@ -38,9 +37,6 @@ Variable::Variable(const string& name){
   assignNode(new VariableNode(name));
 }
 
-void Variable::setType(VarType type){
-  (*this)->type = type;
-}
 
 Variable::~Variable(){
 }
@@ -54,7 +50,17 @@ const VariableNode* Variable::operator->() const{
 }
   
 VariableNode::VariableNode(const string& name) : name_(name){
-  sx_ = SX(name);
+  // No expression by default
+  sx_ = SX::nan;
+  
+  // Not differentable by default
+  dx_ = SX::nan;
+  
+  // Binding equation undefined by default
+  be_ = SX::nan;
+  
+  // Differential equation undefined by default
+  de_ = SX::nan;
 
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;
@@ -68,31 +74,32 @@ VariableNode::VariableNode(const string& name) : name_(name){
   unit_ = "";
   displayUnit_ = "";
 
-  type = TYPE_NOT_SET;
+  // Update the type
+  init();
 }
 
 void VariableNode::init(){
-  // Determine the type
-  if(variability_ == PARAMETER){
-    type = TYPE_PARAMETER;
-  } else if(variability_ == CONTINUOUS) {
-      if(causality_ == INTERNAL){
-        type = TYPE_ALGEBRAIC;
-      } else if(causality_ == INPUT){
-        type = TYPE_CONTROL;
+  // Set the type to unknown
+  type_ = TYPE_UNKNOWN;
+  
+  // Try to determine the type
+  if(!sx_->isNan()){
+    if(!be_->isNan()){
+      type_ = TYPE_DEPENDENT;
+    } else {
+      if(variability_ == PARAMETER){
+        type_ = TYPE_PARAMETER;
+      } else if(variability_ == CONTINUOUS) {
+        if(causality_ == INTERNAL){
+          type_ = !dx_->isNan() ? TYPE_STATE : TYPE_ALGEBRAIC;
+        } else if(causality_ == INPUT){
+          type_ = TYPE_CONTROL;
+        }
+      } else if(variability_ == CONSTANT){
+        type_ = TYPE_CONSTANT;
       }
-      
-      // Continuous variables have derivatives
-      if(d.isNull()){
-        stringstream ss;
-        ss << "der(" << name_ << ")";
-        d = Variable(ss.str());
-        d.setType(TYPE_DERIVATIVE);
-      }
-      
-    } else if (variability_ == CONSTANT){
-      type = TYPE_DEPENDENT;
     }
+  }
 }
   
 VariableNode::~VariableNode(){
@@ -107,7 +114,7 @@ SX Variable::der() const{
 }
 
 SX Variable::sx() const{
-  return (*this)->sx_;  
+  return (*this)->sx();  
 }
 
 
@@ -116,43 +123,26 @@ const string& VariableNode::getName() const{
   return name_;
 }
 
-string VariableNode::getType() const{
-  return typenames[type];
+string VariableNode::getTypeName() const{
+  return typenames[type_];
 }
 
-
-bool Variable::isTime() const{
-  return (*this)->type == TYPE_TIME;
-}
-
-bool Variable::isDifferentialState() const{
-  return (*this)->type == TYPE_STATE;
-}
-
-bool Variable::isAlgebraicState() const{
-  return (*this)->type == TYPE_ALGEBRAIC;  
-}
-
-bool Variable::isControl() const{
-  return (*this)->type == TYPE_CONTROL;     
-}
-
-bool Variable::isParameter() const{
-  return (*this)->type == TYPE_PARAMETER;    
-}
-
-bool Variable::isDependent() const{
-  return (*this)->type == TYPE_DEPENDENT;     
+VarType Variable::getType() const{
+  return (*this)->type_;
 }
 
 SX VariableNode::der() const{
-  if(type!=TYPE_STATE){
-    stringstream ss;
-    ss << "VariableNode::der(): Cannot take derivative of " << sx_;
-    throw CasadiException(ss.str());
-  } else {
-    return d->sx_;
-  }
+  if(de_->isNan())
+    return dx_;
+  else
+    return de_;
+}
+
+SX VariableNode::sx() const{
+  if(be_->isNan())
+    return sx_;
+  else
+    return be_;
 }
 
 double Variable::getValue() const{
@@ -216,7 +206,7 @@ void VariableNode::print(ostream &stream, int indent) const{
   for(int i=0; i<indent; ++i) stream << "  ";
   
   // Print name
-  stream << name_ << ": " << getType() << endl;
+  stream << name_ << ": " << getTypeName() << endl;
 
   if(!col.empty()){
     for(vector<Variable>::const_iterator it = col.begin(); it!=col.end(); ++it){
@@ -261,6 +251,7 @@ Variability Variable::getVariability() const{
 
 void Variable::setVariability(Variability variability){
   (*this)->variability_ = variability;
+  init();
 }
 
 Causality Variable::getCausality() const{
@@ -269,6 +260,7 @@ Causality Variable::getCausality() const{
 
 void Variable::setCausality(Causality causality){
   (*this)->causality_ = causality;
+  init();
 }
     
 Alias Variable::getAlias() const{
@@ -277,6 +269,7 @@ Alias Variable::getAlias() const{
 
 void Variable::setAlias(Alias alias){
   (*this)->alias_ = alias;
+  init();
 }
     
 const string& Variable::getDescription() const{
@@ -341,6 +334,42 @@ const string& Variable::getDisplayUnit() const{
 
 void Variable::setDisplayUnit(const string& displayUnit){
   (*this)->displayUnit_ = displayUnit;
+}
+
+void Variable::setExpression(const SX& sx){
+  (*this)->sx_ = sx;
+  init();
+}
+
+const SX& Variable::getExpression() const{
+  return (*this)->sx_;
+}
+
+void Variable::setDerivative(const SX& dx){
+  (*this)->dx_ = dx;
+  init();
+}
+
+const SX& Variable::getDerivative() const{
+  return (*this)->dx_;
+}
+
+void Variable::setBindingEquation(const SX& be){
+  (*this)->be_ = be;
+  init();
+}
+    
+const SX& Variable::getBindingEquation() const{
+  return (*this)->be_;
+}
+    
+void Variable::setDifferentialEquation(const SX& de){
+  (*this)->de_ = de;
+  init();
+}
+    
+const SX& Variable::getDifferentialEquation() const{
+  return (*this)->de_;
 }
 
 

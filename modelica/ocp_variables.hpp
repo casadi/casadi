@@ -21,75 +21,47 @@
  *
  */
 
-#ifndef OPTIMICA_OCP_HPP
-#define OPTIMICA_OCP_HPP
+#ifndef OCP_VARIABLES_HPP
+#define OCP_VARIABLES_HPP
 
 #include "casadi/printable_object.hpp"
 #include "variable.hpp"
-#include "ocp_variables.hpp"
 
 namespace CasADi{
   namespace Modelica{
 
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
-class OCP : public PrintableObject{
+class OCPVariables : public PrintableObject{
   public:    
-    /// OCP
-    OCP();
-
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
-    /// Sort variables
-    OCPVariables sortVariables() const;
-
-    /// Try to make explicit by symbolically solving for xdot (experimental, only small systems)
-    void makeExplicit();
-
-    /// Replace all state derivatives by algebraic variables with the same name
-    void makeSemiExplicit();
-
-    /// Independent variable (time)
+    /// Time
     SX t;
-
-    /// Access the variables in a class hierarchy -- public data member
-    Variable variables;
-
-    /// Differential algebraic equations
-    std::vector<SX> dae;
     
-    /// Algebraic equations
-    std::vector<SX> ae;
+    /// Differential states
+    std::vector<Variable> x;
 
-    /// Initial equations
-    std::vector<SX> initeq;
+    /// Algebraic states
+    std::vector<Variable> z;
+    
+    /// Controls
+    std::vector<Variable> u;
+    
+    /// Free parameters
+    std::vector<Variable> p;
 
-    /// Path constraint function with upper and lower bounds
-    std::vector<SX> cfcn, cfcn_lb, cfcn_ub;
+    /// Constants
+    std::vector<Variable> c;
 
-    /// Mayer terms
-    std::vector<SX> mterm;
-    
-    /// Mayer time time points
-    std::vector<double> mtp;
-        
-    /// Initial time
-    double t0;
-    
-    /// Initial time is free
-    bool t0_free;
-    
-    /// Final time
-    double tf;
-    
-    /// Final time is free
-    bool tf_free;
+    /// Dependent
+    std::vector<Variable> d;
 
 };
 
   } // namespace Modelica
 } // namespace CasADi
 
-#endif // OPTIMICA_OCP_HPP
+#endif // OCP_VARIABLES_HPP
 
 

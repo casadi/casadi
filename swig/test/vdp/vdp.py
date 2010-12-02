@@ -60,47 +60,45 @@ print parser
 # Obtain the symbolic representation of the OCP
 ocp = parser.parse()
 
-# Sort the variables according to type
-ocp.sortVariables()
- 
-make_explicit = False
-if make_explicit:
-  ocp.makeExplicit()
- 
 # Print the ocp to screen
 print ocp
+
+# Sort the variables according to type
+var = ocp.sortVariables()
 
 # The right hand side of the ACADO functions
 acado_in = ACADO_FCN_NUM_IN * [[]]
 
 # Time
-acado_in[ACADO_FCN_T] = ocp.t
+acado_in[ACADO_FCN_T] = [ocp.t]
+
+# Convert stl vector of variables to list of expressions
+def toList(v, der=False):
+  ret = []
+  for i in v:
+    if der:
+      ret.append(i.der())
+    else:
+      ret.append(i.sx())
+  return ret
 
 # Differential state
-if make_explicit:
-  acado_in[ACADO_FCN_XD] = ocp.xd
-else:
-  acado_in[ACADO_FCN_XD] = ocp.x
+acado_in[ACADO_FCN_XD]  = toList(var.x)
 
 # Algebraic state
-acado_in[ACADO_FCN_XA] = ocp.xa
+acado_in[ACADO_FCN_XA] = toList(var.z)
 
 # Control
-acado_in[ACADO_FCN_U] = ocp.u
+acado_in[ACADO_FCN_U] = toList(var.u)
 
 # Parameter
-acado_in[ACADO_FCN_P] = ocp.p
+acado_in[ACADO_FCN_P] = toList(var.p)
 
 # State derivative
-if not make_explicit:
-  acado_in[ACADO_FCN_XDOT] = ocp.xdot
-  
+acado_in[ACADO_FCN_XDOT] = toList(var.x,True)
 
 # The DAE function
-if make_explicit:
-  ffcn_out = list(ocp.diffeq) + list(ocp.algeq)
-else:
-  ffcn_out = list(ocp.dyneq)
+ffcn_out = list(ocp.dae) + list(ocp.ae)
 
 ffcn = SXFunction(acado_in,[ffcn_out])
 ffcn.setOption("ad_order",1)

@@ -31,21 +31,25 @@
 namespace CasADi{
   namespace Modelica{
     
-    // Time variability of a variable (see Fritzon page 89)
+    /// Time variability of a variable (see Fritzon page 89)
     enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
 
-    // Causality of a variable
+    /// Causality of a variable
     enum Causality{INPUT,OUTPUT,INTERNAL};
     
-    // Dynamics of the variable
+    /// Dynamics of the variable
     enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
     
-    // Dynamics of the variable
+    /// Dynamics of the variable
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    // Variable types (REMOVE)
-    enum VarType{TYPE_TIME,TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_DEPENDENT,TYPE_DERIVATIVE, TYPE_NOT_SET};    
+    /// Variable types (REMOVE)
+    enum VarType{TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
+    /// Names of the variable types
+    static const char* typenames[] = {"STATE","ALGEBRAIC","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
+
+    
     // Forward declaration
     class VariableNode;
 
@@ -53,90 +57,141 @@ namespace CasADi{
   class Variable : public SharedObject{
     public:
     
-    /** \brief Default constructor */
+    /// Default (empty) constructor
     Variable();
 
-    /** \brief Construct an expression */
+    /// Create a new variable
     explicit Variable(const std::string& name);
     
-    /** \brief Set the type */
-    void setType(VarType type);
-    
-    /** \brief  Destructor */
+    /// Destructor
     ~Variable();
         
-    /// Set and get value
-    double getValue() const;
-    void setValue(double val);    
-    
-    /** \brief Get the scalar expression */
+    /// Get the scalar expression or binding expression
     SX sx() const;
     
-    /** \brief Time derivative */
+    /// Get the time derivative or differential equation
     SX der() const;  
-   
-    /// Check if the variable has a certain type
-    bool isTime() const;
-    bool isDifferentialState() const;
-    bool isAlgebraicState() const;
-    bool isParameter() const;
-    bool isControl() const;
-    bool isDependent() const;
-    
-    // Access a sub-collection by name
+       
+    /// Access a sub-collection by name
     Variable operator()(const std::string& name) const;
 
-    // Access a sub-collection by index
+    /// Access a sub-collection by index
     Variable operator[](int ind) const;
 
-    /** \brief Type conversion to SX */
+    /// Type conversion to SX
     operator SX() const;
 
-    /** \brief Type conversion to variable vector */
+    /// Type conversion to variable vector
     operator std::vector<Variable>() const;
     
-    /** \brief  Access functions of the node */
+    /// Access functions of the node
     VariableNode* operator->();
     const VariableNode* operator->() const;
 
-    /** \brief  Getters and setters: Public data members instead? */
-    //@{
+    /// Get type
+    VarType getType() const;
+    
+    /// Get numerical value
+    double getValue() const;
+
+    /// Set numerical value
+    void setValue(double val);    
+
+    /// Get variable name
     const std::string& getName() const;
+
+    /// Set variable name
     void setName(const std::string& name);
 
+    /// Get the variability (see Fritzon)
     Variability getVariability() const;
+
+    /// Set the variability (see Fritzon)
     void setVariability(Variability variability);
 
+    /// Get the causality (see Fritzon)
     Causality getCausality() const;
+
+    /// Set the causality (see Fritzon)
     void setCausality(Causality causality);
     
+    /// Check if the variable is an alias variable
     Alias getAlias() const;
+
+    /// Set if the variable is an alias variable
     void setAlias(Alias alias);
     
+    /// Get the description
     const std::string& getDescription() const;
+    
+    /// Set the description
     void setDescription(const std::string& description);
     
+    /// Get the variable reference (XML)
     int getValueReference() const;
+
+    /// Set the variable reference (XML)
     void setValueReference(int valueReference);
     
+    /// Get the lower bound
     double getMin() const;
+
+    /// Set the lower bound
     void setMin(double min);
     
+    /// Get the upper bound
     double getMax() const;
+
+    /// Set the upper bound
     void setMax(double max);
     
+    /// Get the nominal value of the variable
     double getNominal() const;
+
+    /// Set the nominal value of the variable
     void setNominal(double nominal);
     
+    /// Get the value at time 0
     double getStart() const;
+
+    /// Set the value at time 0
     void setStart(double start);
     
+    /// Get the unit
     const std::string& getUnit() const;
+
+    /// Set the unit
     void setUnit(const std::string& unit);
     
+    /// Get the display unit
     const std::string& getDisplayUnit() const;
+
+    /// Set the display unit
     void setDisplayUnit(const std::string& displayUnit);
-    //@}
+    
+    /// Set the expression
+    void setExpression(const SX& sx);
+
+    /// Get the expression
+    const SX& getExpression() const;
+
+    /// Set the derivative expression
+    void setDerivative(const SX& dx);
+    
+    /// Get the derivative expression
+    const SX& getDerivative() const;
+    
+    /// Set the binding equation
+    void setBindingEquation(const SX& be);
+    
+    /// Get the binding equation
+    const SX& getBindingEquation() const;
+    
+    /// Set the differential equation
+    void setDifferentialEquation(const SX& de);
+    
+    /// Get the differential equation
+    const SX& getDifferentialEquation() const;
     
   };
 
@@ -151,25 +206,46 @@ namespace CasADi{
     // Destructor
     virtual ~VariableNode();
 
-    // Get type
-    virtual std::string getType() const;
+    // Get type name
+    std::string getTypeName() const;
         
     // Get name
-    virtual const std::string& getName() const;
+    const std::string& getName() const;
 
-    // Derivative        
-    virtual SX der() const;  
+    // Variable/binding equation
+    SX sx() const;  
+
+    // Derivative/differential equation
+    SX der() const;  
     
-    // Initialize
-    virtual void init();    
+    // Update the type
+    virtual void init();
     
     // Print
     virtual void repr(std::ostream &stream) const;
     virtual void print(std::ostream &stream) const;
     void print(std::ostream &stream, int indent) const;
 
-    static const char* typenames[];
-        
+    // Get all the variables
+    void getAll(std::vector<Variable>& vars) const;
+    
+    // Add a subcollection
+    int add(const Variable& var, const std::string& namepart);
+
+    // Check if a subcollection exists
+    bool has(const std::string& name) const;
+
+    // Set of sub-collections in the current collection
+    std::vector<Variable> col;
+  
+    // Names of contained collections
+    std::map<std::string,int> name_part;
+
+    protected:
+
+    // Variable type
+    VarType type_;
+
     // Attributes
     std::string name_;
     Variability variability_;
@@ -184,30 +260,22 @@ namespace CasADi{
     std::string unit_;
     std::string displayUnit_;
     
-    SX sx_; // variable expression
+    // variable expression
+    SX sx_; 
 
-    VarType type;
+    // Derivative expression
+    SX dx_;
+
+    // Binding equation
+    SX be_;
     
-    // Derivative
-    Variable d;
+    // Differential equation
+    SX de_;
     
     // Numerical value
     double val;
     
-    // Set of sub-collections in the current collection
-    std::vector<Variable> col;
-  
-    // Names of contained collections
-    std::map<std::string,int> name_part;
 
-    // Get all the variables
-    void getAll(std::vector<Variable>& vars) const;
-    
-    // Add a subcollection
-    int add(const Variable& var, const std::string& namepart);
-
-    // Check if a subcollection exists
-    bool has(const std::string& name) const;
 
     
   };
