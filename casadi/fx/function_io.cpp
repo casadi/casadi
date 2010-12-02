@@ -283,7 +283,7 @@ void FunctionIO::getSparsity(vector<int>& row, vector<int> &col) const{
 void FunctionIO::assertNNZ(int sz) const{
   if(size()!=sz){
     stringstream ss;
-    ss << "FunctionIO::assertNNZ: wrong number of elements (" << sz << " ), but should be " << size();
+    ss << "FunctionIO::assertNNZ: wrong number of elements (" << sz << "), but should be " << size() << flush;
     throw CasadiException(ss.str());
   }
 }

@@ -199,7 +199,7 @@ SET(SUPERLU_SRC
      SRC/ccolumn_dfs.c
 )
 
-add_library(superlu_casadi STATIC ${SUPERLU_SRC})
+add_library(superlu STATIC ${SUPERLU_SRC})
 if(ENABLE_SHARED)
-add_library(superlu_casadi_shared SHARED ${SUPERLU_SRC})
+add_library(superlu_shared SHARED ${SUPERLU_SRC})
 endif(ENABLE_SHARED)

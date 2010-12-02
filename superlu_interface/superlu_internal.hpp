@@ -25,6 +25,7 @@
 #define SUPERLU_INTERNAL_HPP
 
 #include "superlu.hpp"
+#include "external_packages/superlu_4_1/SRC/slu_ddefs.h"
 
 namespace CasADi{
   
@@ -32,6 +33,12 @@ class SuperLUInternal : public FXNode{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     SuperLUInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+
+    // Destructor
+    virtual ~SuperLUInternal();
+    
+    // Initialize the solver
+    virtual void init();
 
     // Solve the system of equations
     virtual void evaluate(int fsens_order, int asens_order);
@@ -42,6 +49,21 @@ class SuperLUInternal : public FXNode{
     int nrow_, ncol_;
     std::vector<int> rowind_, col_;
     int nrhs_;
+    
+    // Is initialized
+    bool is_init;
+    
+    // SuperLU data structures
+    SuperMatrix A, L, U, B;
+
+    double   *a, *rhs;
+    int      *asub, *xa;
+    int      *perm_r; /* row permutations from partial pivoting */
+    int      *perm_c; /* column permutation vector */
+    int      info, i, permc_spec;
+    superlu_options_t options;
+    SuperLUStat_t stat;
+
     
 };
 

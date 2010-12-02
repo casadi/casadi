@@ -67,7 +67,8 @@ class CasadiException : public std::exception{
     
   //! \brief Display error
   virtual const char* what() const throw(){
-     return errbuf.str().c_str();
+    std::string msg = errbuf.str();
+    return msg.c_str();
   }
   
   //! \brief Append a message
