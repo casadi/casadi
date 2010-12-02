@@ -42,4 +42,9 @@ namespace std {
 %include "sundials_interface.i"
 #endif
 
+// SuperLU
+#ifdef WITH_SUPERLU
+%include "superlu.i"
+#endif
+
 
