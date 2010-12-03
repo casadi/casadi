@@ -26,14 +26,30 @@
 using namespace std;
 namespace CasADi{
 
+SuperLU::SuperLU(){
+}
+
 SuperLU::SuperLU(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs){
   assignNode(new SuperLUInternal(nrow,ncol,rowind,col,nrhs));
 }
-
-void SuperLU::solve(Factorization fact){
-//  if
-}
  
+SuperLUInternal* SuperLU::operator->(){
+  return static_cast<SuperLUInternal*>(FX::operator->());
+}
+
+const SuperLUInternal* SuperLU::operator->() const{
+  return static_cast<const SuperLUInternal*>(FX::operator->());
+}
+
+LinearSolver SuperLU::creator(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs){
+  return SuperLU(nrow,ncol,rowind,col,nrhs);
+}
+
+LinearSolver::Creator SuperLU::getCreator() const{
+  return creator;
+}
+
+
   
 } // namespace CasADi
 

@@ -21,38 +21,34 @@
  *
  */
 
-#ifndef SUPERLU_HPP
-#define SUPERLU_HPP
+#include "linear_solver.hpp"
 
-#include "casadi/fx/linear_solver.hpp"
-
+using namespace std;
 namespace CasADi{
-  
-/** \brief  Forward declaration of internal class */
-class SuperLUInternal;
 
-/** \brief  Public class */
-class SuperLU : public LinearSolver{
-public:
+void LinearSolver::solve(Factorization fact){
+  (*this)->solve(fact);
+}
 
-  /// Default (empty) constructor
-  SuperLU();
-  
-  /// Create a linear solver given a sparsity pattern
-  SuperLU(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
-  
-  /// Creator function
-  static LinearSolver creator(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+LinearSolverInternal* LinearSolver::operator->(){
+  return static_cast<LinearSolverInternal*>(FX::operator->());
+}
 
-  /// Get a reference to the creator
-  virtual Creator getCreator() const;
-  
-  /** \brief  Access functions of the node */
-  SuperLUInternal* operator->();
-  const SuperLUInternal* operator->() const;
-};
+const LinearSolverInternal* LinearSolver::operator->() const{
+    return static_cast<const LinearSolverInternal*>(FX::operator->());
+}
 
+LinearSolverInternal::~LinearSolverInternal(){
+}
+  
+LinearSolver::Creator LinearSolver::getCreator() const{
+  throw CasadiException("LinearSolver::getCreator: no creator for abstract base class");
+}
+    
+
+  
 } // namespace CasADi
 
-#endif //SUPERLU_HPP
+  
+
 

@@ -26,6 +26,7 @@
 
 #include "../expression_tools.hpp"
 #include "fx.hpp"
+#include "linear_solver.hpp"
 
 namespace CasADi{
 
@@ -84,7 +85,10 @@ public:
   /** \brief  Access functions of the node */
   IntegratorInternal* operator->();
   const IntegratorInternal* operator->() const;
-
+  
+  /** \brief  Set linear solver */
+  void setLinearSolver(const LinearSolver& linsol);
+  
   /** \brief  Reset the solver and bring the time back to t0 */
   void reset(int fsens_order, int asens_order=0);
 

@@ -21,38 +21,56 @@
  *
  */
 
-#ifndef SUPERLU_HPP
-#define SUPERLU_HPP
+#ifndef LINEAR_SOLVER_HPP
+#define LINEAR_SOLVER_HPP
 
-#include "casadi/fx/linear_solver.hpp"
+#include "fx.hpp"
 
 namespace CasADi{
   
-/** \brief  Forward declaration of internal class */
-class SuperLUInternal;
+/// Forward declaration of internal class
+class LinearSolverInternal;
 
-/** \brief  Public class */
-class SuperLU : public LinearSolver{
+/// Type of solve call
+enum Factorization{DOFACT, SAMEPATTERN, SAMEPATTERN_SAMEROWPERM, FACTORED};
+
+/// Public class
+class LinearSolver : public FX{
 public:
+  
+  /// Linear solver creator function
+  typedef LinearSolver (*Creator)(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
 
-  /// Default (empty) constructor
-  SuperLU();
-  
-  /// Create a linear solver given a sparsity pattern
-  SuperLU(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
-  
   /// Creator function
-  static LinearSolver creator(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
-
-  /// Get a reference to the creator
   virtual Creator getCreator() const;
   
-  /** \brief  Access functions of the node */
-  SuperLUInternal* operator->();
-  const SuperLUInternal* operator->() const;
+  /// Solve
+  void solve(Factorization fact);
+  
+  /// Access functions of the node
+  LinearSolverInternal* operator->();
+  const LinearSolverInternal* operator->() const;
 };
+
+/// Internal class
+class LinearSolverInternal : public FXNode{
+  public:
+    
+    // Destructor
+    virtual ~LinearSolverInternal() = 0;
+    
+    // Initialize the solver
+    virtual void init() = 0;
+
+    // Solve the system of equations
+    virtual void evaluate(int fsens_order, int asens_order) = 0;
+
+    // Solve the system of equations
+    virtual void solve(Factorization fact) = 0;
+};
+
 
 } // namespace CasADi
 
-#endif //SUPERLU_HPP
+#endif //LINEAR_SOLVER_HPP
 

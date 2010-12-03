@@ -64,7 +64,9 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
-  
+  /** \brief  Set linear solver */
+  void setLinearSolver(LinearSolver::Creator creator);
+
   /** Lenght of the state vector 
    (also includes "states" evaluated from quadrature formulas)
   */
@@ -85,6 +87,13 @@ public:
   int max_num_steps_;
   bool finite_difference_fsens_;  
   //@}
+  
+  /// Linear solver creator
+  LinearSolver::Creator linsolve_creator_;
+  
+  /// Create linear solver
+  LinearSolver createLinearSolver(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1) const;
+  
 };
   
 } // namespace CasADi

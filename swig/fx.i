@@ -107,6 +107,17 @@ public:
   MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
 };
 
+/// Type of solve call
+enum Factorization{DOFACT, SAMEPATTERN, SAMEPATTERN_SAMEROWPERM, FACTORED};
+
+/// Public class
+class LinearSolver : public FX{
+public:
+
+  /// Solve
+  void solve(Factorization fact);
+};
+
 // Input arguments of an integrator 
 enum IntegratorInput{INTEGRATOR_T0, INTEGRATOR_TF, INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_XP0, INTEGRATOR_NUM_IN};
 
@@ -128,6 +139,9 @@ enum DAEOutput{DAE_RES, DAE_NUM_OUT};
 //Public class 
 class Integrator : public FX{
 public:
+  // Set linear solver
+  void setLinearSolver(const LinearSolver& linsol);
+
   // Print solver statistics 
   void printStats(std::ostream &stream=std::cout) const;
   

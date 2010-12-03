@@ -79,6 +79,8 @@ SET(CASADI_SRCS
   fx/sx_function.cpp
   fx/mx_function.hpp
   fx/mx_function.cpp
+  fx/linear_solver.hpp 
+  fx/linear_solver.cpp
   fx/integrator.hpp 
   fx/integrator.cpp
   fx/integrator_internal.hpp 

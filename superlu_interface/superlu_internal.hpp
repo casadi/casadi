@@ -29,7 +29,7 @@
 
 namespace CasADi{
   
-class SuperLUInternal : public FXNode{
+class SuperLUInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     SuperLUInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
@@ -44,7 +44,7 @@ class SuperLUInternal : public FXNode{
     virtual void evaluate(int fsens_order, int asens_order);
 
     // Solve the system of equations
-    void solve(Factorization fact);
+    virtual void solve(Factorization fact);
 
   protected:
     
