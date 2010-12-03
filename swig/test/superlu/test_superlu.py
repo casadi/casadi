@@ -32,7 +32,7 @@ linear_solver.setInput(val,0)
 
 # Pass right hand side
 linear_solver.setInput(nrow*[1.],1)
-  
+
 # Solve
 linear_solver.evaluate()
   
