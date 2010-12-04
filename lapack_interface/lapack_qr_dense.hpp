@@ -21,45 +21,48 @@
  *
  */
 
-#ifndef LAPACK_LU_DENSE_HPP
-#define LAPACK_LU_DENSE_HPP
+#ifndef LAPACK_QR_DENSE_HPP
+#define LAPACK_QR_DENSE_HPP
 
 #include "casadi/fx/linear_solver.hpp"
 
 namespace CasADi{
   
 /** \brief  Forward declaration of internal class */
-class LapackLUDenseInternal;
+class LapackQRDenseInternal;
 
 /** \brief  Public class */
-class LapackLUDense : public LinearSolver{
+class LapackQRDense : public LinearSolver{
 public:
 
   /// Default (empty) constructor
-  LapackLUDense();
+  LapackQRDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackLUDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
+  LapackQRDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
     
   /// Access functions of the node
-  LapackLUDenseInternal* operator->();
-  const LapackLUDenseInternal* operator->() const;
+  LapackQRDenseInternal* operator->();
+  const LapackQRDenseInternal* operator->() const;
 };
 
-/// LU-Factorize dense matrix (lapack)
-extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
+/// QR-factorize dense matrix (lapack)
+extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
 
-/// Solve a system of equation using an LU-factorized matrix (lapack)
-extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
+/// Multiply right hand side with Q-transpose (lapack)
+extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double *work, int *lwork, int *info);
+
+/// Solve upper triangular system (lapack)
+extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
 /// Internal class
-class LapackLUDenseInternal : public LinearSolverInternal{
+class LapackQRDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+    LapackQRDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
 
     // Destructor
-    virtual ~LapackLUDenseInternal();
+    virtual ~LapackQRDenseInternal();
     
     // Initialize the solver
     virtual void init();
@@ -75,14 +78,16 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     // Matrix
     std::vector<double> mat_;
     
-    // Pivoting elements
-    std::vector<int> ipiv_;
-
+    // The scalar factors of the elementary reflectors
+    std::vector<double> tau_; 
+    
+    // qr work array
+    std::vector<double> work_; 
 };
 
 
 
 } // namespace CasADi
 
-#endif //LAPACK_LU_DENSE_HPP
+#endif //LAPACK_QR_DENSE_HPP
 

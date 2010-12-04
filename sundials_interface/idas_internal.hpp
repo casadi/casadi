@@ -174,15 +174,6 @@ class IdasInternal : public IntegratorInternal{
   // Jacobian of the ODE with respect to the parameters
   FX jacp_;
   
-  // Preconditioner
-  vector<double> pc_;
-  vector<int> ipiv_;
-  
-  // QR
-  vector<double> tau_; // The scalar factors of the elementary reflectors
-  vector<double> work_; // qr work array
-  
-  
   // For timings
   clock_t time1, time2;
   

@@ -25,29 +25,6 @@
 #include "casadi/stl_vector_tools.hpp"
 #include <cassert>
 
-#ifdef PRECOND_TEST
-  // DENSE PRECONDITIONER: REMOVE
-
-// LU-Factorize dense matrix (lapack)
-extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
-
-// Solve a system of equation using an LU-factorized matrix (lapack)
-extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
-
-// QR-factorize dense matrix (lapack)
-extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
-
-// Multiply right hand side with Q-transpose (lapack)
-extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double *work, int *lwork, int *info);
-
-// Solve upper triangular system (lapack)
-extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
-
-#endif // PRECOND_TEST
-
-// use QR factorization instead of LU
-bool use_qr = false;
-
 using namespace std;
 namespace CasADi{
 namespace Sundials{
@@ -261,28 +238,6 @@ void IdasInternal::init(){
       if(jacx_.isNull()){
         throw CasadiException("IDASInternal: no jacobian function supplied");
       }
-
-#if PRECOND_TEST
-#error
-      // REMOVE THIS!!
-      
-      // Allocate jacobian
-      pc_.resize(ny_*ny_);
-      
-      // Allocate info needed for the linear solver
-      if(use_qr){
-        tau_.resize(ny_);
-        work_.resize(10*ny_);
-      } else {
-        ipiv_.resize(ny_);
-      }
-#else
-      // Make sure that a Jacobian has been provided
-      if(jacx_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
-
-      // Make sure that a linear solver has been providided
-      if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
-#endif
 
       // Pass to IDA
       flag = IDASpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
@@ -1122,39 +1077,6 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
   // Get time
   time1 = clock();
 
-  #ifdef PRECOND_TEST
-  // DENSE PRECONDITIONER: REMOVE
-
-  // Copy input to output vector
-  N_VScale(1.0,rvec,zvec);
-
-  int nrhs = 1; // number of right hand sides
-  int info = 100;
-  
-  if(use_qr){
-    char trans = 'T';
-    char side = 'L';
-    int k = 10; // ????
-    int lwork = work_.size();
-    dormqr_(&side, &trans, &ny_, &nrhs, &k, &pc_[0], &ny_, &tau_[0], NV_DATA_S(zvec), &ny_, &work_[0], &lwork, &info);
-    
-    char uplo = 'U';
-    char transa = 'N';
-    char diag = 'N';
-    double alpha = 1.;
-    dtrsm_(&side, &uplo, &transa, &diag, &ny_, &nrhs, &alpha, &pc_[0], &ny_, NV_DATA_S(zvec), &ny_);
-
-    
-  } else {
-    char trans = 'N';
-    dgetrs_(&trans, &ny_, &nrhs, &pc_[0], &ny_, &ipiv_[0], NV_DATA_S(zvec), &ny_, &info);
-  }
-  
-  if(info != 0)
-    throw CasadiException("failed to solve the linear system");
-
-#else // PRECOND_TEST
-
   // Pass right hand side to the linear solver
   linsol_.setInput(NV_DATA_S(rvec),1);
   
@@ -1163,8 +1085,6 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(zvec));
-
-#endif // PRECOND_TEST
 
   // Log time duration
   time2 = clock();
@@ -1186,35 +1106,8 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
   // Evaluate jacobian
   jacx_.evaluate();
   
-#ifdef PRECOND_TEST
-  // DENSE PRECONDITIONER: REMOVE
-  
-  // Get the result
-  jacx_.output(JAC_J).get(pc_,DENSE);
-
-  // Log time duration
-  time2 = clock();
-  t_psetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
-
-  // Factorize the matrix
-  int info = -100;
-  
-  if(use_qr){
-    int lwork = work_.size();
-    dgeqrf_(&ny_, &ny_, &pc_[0], &ny_, &tau_[0], &work_[0], &lwork, &info);
-  } else {
-    dgetrf_(&ny_, &ny_, &pc_[0], &ny_, &ipiv_[0], &info);
-  }
-    
-  if(info != 0)
-    throw CasadiException("dgetrf_ failed to factorize the jacobian");
-#else // PRECOND_TEST
-
-
   // Pass non-zero elements to the linear solver
   linsol_.setInput(jacx_.getOutputData(),0);
-
-  #endif // PRECOND_TEST
 
   // Log time duration
   time1 = clock();

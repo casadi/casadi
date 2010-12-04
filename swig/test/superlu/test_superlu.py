@@ -20,9 +20,11 @@ r_scipy = spsolve(A,b)
 
 # Solve with SuperLU
 linear_solver = SuperLU(nrow,ncol,rowind,col)
+#linear_solver = LapackLUDense(nrow,ncol,rowind,col)
+#linear_solver = LapackQRDense(nrow,ncol,rowind,col)
   
 # Set options
-linear_solver.setOption("colperm", "natural")
+#linear_solver.setOption("colperm", "natural")
 
 # Initialize
 linear_solver.init()
