@@ -158,7 +158,7 @@ void SuperLUInternal::init(){
 }
 
 void SuperLUInternal::evaluate(int fsens_order, int asens_order){
-  Factorization fact;
+/*  Factorization fact;
   if(called_once){
     // Check if any element has changed
     bool any_change = false;
@@ -175,10 +175,10 @@ void SuperLUInternal::evaluate(int fsens_order, int asens_order){
   } else {
     fact = DOFACT;
     called_once = true;
-  }
+  }*/
   
   // Call the solve routine
-  solve(fact);
+  solve(DOFACT);
 }
 
 void SuperLUInternal::solve(Factorization fact){

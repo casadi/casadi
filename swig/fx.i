@@ -139,9 +139,6 @@ enum DAEOutput{DAE_RES, DAE_NUM_OUT};
 //Public class 
 class Integrator : public FX{
 public:
-  // Set linear solver
-  void setLinearSolver(const LinearSolver& linsol);
-
   // Print solver statistics 
   void printStats(std::ostream &stream=std::cout) const;
   

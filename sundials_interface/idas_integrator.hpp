@@ -58,12 +58,14 @@ public:
   IdasIntegrator();
   
   /** \brief  Create an integrator for explicit ODEs */
-  explicit IdasIntegrator(const FX& f, const FX& q=FX(), const FX& jacx=FX(), const FX& jacp=FX());
+  explicit IdasIntegrator(const FX& f, const FX& q=FX());
 
   /** \brief  Access functions of the node */
   IdasInternal* operator->();
   const IdasInternal* operator->() const;
   
+  /** \brief  Set linear solver */
+  void setLinearSolver(const FX& jacx, const FX& linsol);
 };
 
 

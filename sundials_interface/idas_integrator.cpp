@@ -31,8 +31,8 @@ namespace Sundials{
 IdasIntegrator::IdasIntegrator(){ 
 }
 
-IdasIntegrator::IdasIntegrator(const FX& f, const FX& q, const FX& jacx, const FX& jacp){
-  assignNode(new IdasInternal(f,q,jacx,jacp));
+IdasIntegrator::IdasIntegrator(const FX& f, const FX& q){
+  assignNode(new IdasInternal(f,q));
 }
 
 IdasInternal* IdasIntegrator::operator->(){
@@ -42,6 +42,13 @@ IdasInternal* IdasIntegrator::operator->(){
 const IdasInternal* IdasIntegrator::operator->() const{
   return (const IdasInternal*)(FX::operator->());
 }
+
+void IdasIntegrator::setLinearSolver(const FX& jacx, const FX& linsol){
+  (*this)->jacx_ = jacx;
+  (*this)->linsol_ = linsol;
+}
+
+
 } // namespace Sundials
 } // namespace CasADi
 

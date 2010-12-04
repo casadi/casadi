@@ -41,9 +41,6 @@ public:
   /// Linear solver creator function
   typedef LinearSolver (*Creator)(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
 
-  /// Creator function
-  virtual Creator getCreator() const;
-  
   /// Solve
   void solve(Factorization fact);
   

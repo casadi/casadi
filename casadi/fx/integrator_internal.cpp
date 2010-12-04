@@ -82,9 +82,7 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   output_.resize(INTEGRATOR_NUM_OUT);
   output_[INTEGRATOR_XF].setSize(nx_,1);
   output_[INTEGRATOR_XPF].setSize(nx_,1);
-  
-  // No linear solver generator
-  linsolve_creator_ = 0;
+
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
@@ -126,18 +124,7 @@ void IntegratorInternal::init(){
   fsens_reltol_ = hasSetOption("fsens_reltol") ? getOption("fsens_reltol").toDouble() : reltol_;
   asens_abstol_ = hasSetOption("asens_abstol") ? getOption("asens_abstol").toDouble() : abstol_;
   asens_reltol_ = hasSetOption("asens_reltol") ? getOption("asens_reltol").toDouble() : reltol_;
-  
 }
-
-void IntegratorInternal::setLinearSolver(LinearSolver::Creator creator){
-  linsolve_creator_ = creator;
-}
-
-LinearSolver IntegratorInternal::createLinearSolver(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs) const{
-  if(linsolve_creator_==0) throw CasadiException("createLinearSolver: no linear solver set");
-  return linsolve_creator_(nrow,ncol,rowind,col,nrhs);
-}
-
 
 
 } // namespace CasADi

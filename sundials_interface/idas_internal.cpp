@@ -64,7 +64,7 @@ int IdasInternal::getNP(const FX& f){
   return f.input(DAE_P).numel();
 }
 
-IdasInternal::IdasInternal(const FX& f, const FX& q, const FX& jacx, const FX& jacp) : IntegratorInternal(getNX(f,q), getNP(f)), f_(f), q_(q), jacx_(jacx), jacp_(jacp){
+IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(f,q), getNP(f)), f_(f), q_(q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false); // supress algebraic variables in the error testing
   addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
   addOption("abstolv",                     OT_REALVECTOR, Option());
@@ -1246,8 +1246,7 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
   linsol_.setInput(NV_DATA_S(b),1);
   
   // Solve the system
-  linsol_.solve(DOFACT);
-/*  linsol_.evaluate();*/
+  linsol_.evaluate();
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(b));
@@ -1259,23 +1258,20 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
 void IdasInternal::initUserDefinedLinearSolver(){
   // Make sure that a Jacobian has been provided
   if(jacx_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
-  
+
+  // Make sure that a linear solver has been providided
+  if(linsol_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
+
+  // Initialize the linear solver
+  linsol_.init();
+
   //  Set fields in the IDA memory
   IDAMem IDA_mem = IDAMem(mem_);
   IDA_mem->ida_lmem   = this;
   IDA_mem->ida_lsetup = lsetup_wrapper;
   IDA_mem->ida_lsolve = lsolve_wrapper;
-  
-  // Create a linear solver
-  linsol_ = createLinearSolver(jacx_.output().nrow_,
-                               jacx_.output().ncol_,
-                               jacx_.output().rowind_,
-                               jacx_.output().col_);
-                             
-  // Initialize the linear solver
-  linsol_.init();
-  
-  // Factorize the first call
+                                 
+  // Factorize at the first call
   refactor_ = true;
 }
 

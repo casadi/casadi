@@ -40,13 +40,7 @@ public:
   
   /// Create a linear solver given a sparsity pattern
   SuperLU(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
-  
-  /// Creator function
-  static LinearSolver creator(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
-
-  /// Get a reference to the creator
-  virtual Creator getCreator() const;
-  
+    
   /** \brief  Access functions of the node */
   SuperLUInternal* operator->();
   const SuperLUInternal* operator->() const;

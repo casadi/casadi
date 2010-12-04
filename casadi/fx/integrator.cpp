@@ -61,10 +61,6 @@ void Integrator::assertNode() const{
     throw CasadiException("Integrator::assertNode");
 }
   
-void Integrator::setLinearSolver(const LinearSolver& prototype){
-  (*this)->setLinearSolver(prototype.getCreator());
-}
-
  
 } // namespace CasADi
 

@@ -47,7 +47,7 @@ class IdasInternal : public IntegratorInternal{
   public:
   
   /** \brief  Constructor */
-  explicit IdasInternal(const FX& f, const FX& q, const FX& jacx, const FX& jacp);
+  explicit IdasInternal(const FX& f, const FX& q);
 
   /** \brief  Destructor */
   virtual ~IdasInternal();
@@ -201,7 +201,7 @@ class IdasInternal : public IntegratorInternal{
   int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
   
   // Linear solver
-  LinearSolver linsol_;  
+  FX linsol_;  
   
   // Refactorize
   bool refactor_;

@@ -27,7 +27,10 @@ public:
     IdasIntegrator();
     
     /// Create an integrator for fully implicit DAEs
-    explicit IdasIntegrator(const FX& f, const FX& q=FX(), const FX& jacx=FX(), const FX& jacp=FX());
+    explicit IdasIntegrator(const FX& f, const FX& q=FX());
+
+    /// Set linear solver
+    void setLinearSolver(const FX& jacx, const FX& linsol);
 };
 
 } // namespace Sundials

@@ -41,11 +41,6 @@ const LinearSolverInternal* LinearSolver::operator->() const{
 LinearSolverInternal::~LinearSolverInternal(){
 }
   
-LinearSolver::Creator LinearSolver::getCreator() const{
-  throw CasadiException("LinearSolver::getCreator: no creator for abstract base class");
-}
-    
-
   
 } // namespace CasADi
 

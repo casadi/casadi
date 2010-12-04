@@ -41,14 +41,6 @@ const SuperLUInternal* SuperLU::operator->() const{
   return static_cast<const SuperLUInternal*>(FX::operator->());
 }
 
-LinearSolver SuperLU::creator(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs){
-  return SuperLU(nrow,ncol,rowind,col,nrhs);
-}
-
-LinearSolver::Creator SuperLU::getCreator() const{
-  return creator;
-}
-
 
   
 } // namespace CasADi
