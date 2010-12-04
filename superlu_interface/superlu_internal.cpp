@@ -157,31 +157,11 @@ void SuperLUInternal::init(){
   called_once = false;
 }
 
-void SuperLUInternal::evaluate(int fsens_order, int asens_order){
-/*  Factorization fact;
-  if(called_once){
-    // Check if any element has changed
-    bool any_change = false;
-    const vector<double>& val = input(0).data();
-    for(int i=0; i<val.size(); ++i){
-      if(val[i] != a[i]){
-        any_change = true;
-        break;
-      }
-    }
-    
-    // Reuse factored matrix if matrix hasn't changed
-    fact = any_change ? SAMEPATTERN : FACTORED;
-  } else {
-    fact = DOFACT;
-    called_once = true;
-  }*/
+void SuperLUInternal::prepare(){
   
-  // Call the solve routine
-  solve(DOFACT);
 }
-
-void SuperLUInternal::solve(Factorization fact){
+  
+void SuperLUInternal::solve(){
   // Copy the non-zero entries
   const vector<double>& val = input(0).data();
   copy(val.begin(),val.end(),a);
@@ -191,10 +171,10 @@ void SuperLUInternal::solve(Factorization fact){
   copy(b.begin(),b.end(),rhs);
 
   // Choose factorization
-  if(fact==DOFACT)                        options.Fact = ::DOFACT;
-  else if(fact==SAMEPATTERN)              options.Fact = ::SamePattern;
-  else if(fact==SAMEPATTERN_SAMEROWPERM)  options.Fact = ::SamePattern_SameRowPerm;
-  else if(fact==FACTORED)                 options.Fact = ::FACTORED;
+  options.Fact = DOFACT;
+//   options.Fact = SamePattern;
+//   options.Fact = SamePattern_SameRowPerm;
+//   options.Fact = FACTORED;
 
   // Solve the linear system
   dgssv(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &info);

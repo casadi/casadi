@@ -26,10 +26,6 @@
 using namespace std;
 namespace CasADi{
 
-void LinearSolver::solve(Factorization fact){
-  (*this)->solve(fact);
-}
-
 LinearSolverInternal* LinearSolver::operator->(){
   return static_cast<LinearSolverInternal*>(FX::operator->());
 }
@@ -40,7 +36,41 @@ const LinearSolverInternal* LinearSolver::operator->() const{
 
 LinearSolverInternal::~LinearSolverInternal(){
 }
+ 
+void LinearSolverInternal::evaluate(int fsens_order, int asens_order){
+/*  Factorization fact;
+  if(called_once){
+    // Check if any element has changed
+    bool any_change = false;
+    const vector<double>& val = input(0).data();
+    for(int i=0; i<val.size(); ++i){
+      if(val[i] != a[i]){
+        any_change = true;
+        break;
+      }
+    }
+    
+    // Reuse factored matrix if matrix hasn't changed
+    fact = any_change ? SAMEPATTERN : FACTORED;
+  } else {
+    fact = DOFACT;
+    called_once = true;
+  }*/
   
+  // Call the solve routine
+  prepare();
+  solve();
+}
+ 
+ 
+void LinearSolver::prepare(){
+  (*this)->prepare();
+}
+
+void LinearSolver::solve(){
+  (*this)->solve();
+}
+ 
   
 } // namespace CasADi
 

@@ -21,59 +21,63 @@
  *
  */
 
-#ifndef SUPERLU_INTERNAL_HPP
-#define SUPERLU_INTERNAL_HPP
+#ifndef LAPACK_LU_HPP
+#define LAPACK_LU_HPP
 
-#include "superlu.hpp"
-#include "external_packages/superlu_4_1/SRC/slu_ddefs.h"
+#include "casadi/fx/linear_solver.hpp"
 
 namespace CasADi{
   
-class SuperLUInternal : public LinearSolverInternal{
+/** \brief  Forward declaration of internal class */
+class LapackLUInternal;
+
+/** \brief  Public class */
+class LapackLU : public LinearSolver{
+public:
+
+  /// Default (empty) constructor
+  LapackLU();
+  
+  /// Create a linear solver given a sparsity pattern
+  LapackLU(int nrow, int ncol, int nrhs=1);
+    
+  /// Access functions of the node
+  LapackLUInternal* operator->();
+  const LapackLUInternal* operator->() const;
+};
+
+/// LU-Factorize dense matrix (lapack)
+extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
+
+/// Solve a system of equation using an LU-factorized matrix (lapack)
+extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
+
+/// Internal class
+class LapackLUInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    SuperLUInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+    LapackLUInternal(int nrow, int ncol, int nrhs);
 
     // Destructor
-    virtual ~SuperLUInternal();
+    virtual ~LapackLUInternal();
     
     // Initialize the solver
     virtual void init();
 
-    // Factorize the matrix
+    // Prepare the solution of the linear system
     virtual void prepare();
     
     // Solve the system of equations
     virtual void solve();
 
   protected:
-    
-    // Sparsity in CRS format
     int nrow_, ncol_;
-    std::vector<int> rowind_, col_;
     int nrhs_;
-    
-    // Is initialized
-    bool is_init;
-    
-    // Has the solve function been called once
-    bool called_once;
-    
-    // SuperLU data structures
-    SuperMatrix A, L, U, B;
-
-    double   *a, *rhs;
-    int      *asub, *xa;
-    int      *perm_r; /* row permutations from partial pivoting */
-    int      *perm_c; /* column permutation vector */
-    int      info, i, permc_spec;
-    superlu_options_t options;
-    SuperLUStat_t stat;
-
-    
 };
+
+
 
 } // namespace CasADi
 
-#endif //SUPERLU_INTERNAL_HPP
+#endif //LAPACK_LU_HPP
 

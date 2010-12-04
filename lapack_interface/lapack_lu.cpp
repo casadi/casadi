@@ -21,50 +21,30 @@
  *
  */
 
-#ifndef LINEAR_SOLVER_HPP
-#define LINEAR_SOLVER_HPP
+#include "lapack_lu.hpp"
 
-#include "fx.hpp"
-
+using namespace std;
 namespace CasADi{
+
+LapackLU::LapackLU(){
+}
+
+LapackLU::LapackLU(int nrow, int ncol, int nrhs){
+  assignNode(new LapackLUInternal(nrow,ncol,nrhs));
+}
+ 
+LapackLUInternal* LapackLU::operator->(){
+  return static_cast<LapackLUInternal*>(FX::operator->());
+}
+
+const LapackLUInternal* LapackLU::operator->() const{
+  return static_cast<const LapackLUInternal*>(FX::operator->());
+}
+
+
   
-/// Forward declaration of internal class
-class LinearSolverInternal;
-
-/// Public class
-class LinearSolver : public FX{
-public:
-  
-  /// Access functions of the node
-  LinearSolverInternal* operator->();
-  const LinearSolverInternal* operator->() const;
-  
-  /// Factorize the matrix
-  void prepare();
-    
-  /// Solve the system of equations
-  void solve();
-};
-
-/// Internal class
-class LinearSolverInternal : public FXNode{
-  public:
-    
-    // Destructor
-    virtual ~LinearSolverInternal() = 0;
-    
-    // Solve the system of equations
-    virtual void evaluate(int fsens_order, int asens_order);
-
-    // Prepare the factorization
-    virtual void prepare() = 0;
-    
-    // Solve the system of equations
-    virtual void solve() = 0;
-};
-
-
 } // namespace CasADi
 
-#endif //LINEAR_SOLVER_HPP
+  
+
 

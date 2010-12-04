@@ -37,6 +37,11 @@ if(BLAS_FOUND)
 add_subdirectory(superlu_interface)
 endif(BLAS_FOUND)
 
+find_package (LAPACK)
+if(LAPACK_FOUND)
+add_subdirectory(lapack_interface)
+endif(LAPACK_FOUND)
+
 find_package (SWIG)
 if(SWIG_FOUND)
 add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"

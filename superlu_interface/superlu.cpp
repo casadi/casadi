@@ -40,8 +40,6 @@ SuperLUInternal* SuperLU::operator->(){
 const SuperLUInternal* SuperLU::operator->() const{
   return static_cast<const SuperLUInternal*>(FX::operator->());
 }
-
-
   
 } // namespace CasADi
 

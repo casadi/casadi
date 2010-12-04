@@ -107,15 +107,14 @@ public:
   MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
 };
 
-/// Type of solve call
-enum Factorization{DOFACT, SAMEPATTERN, SAMEPATTERN_SAMEROWPERM, FACTORED};
-
 /// Public class
 class LinearSolver : public FX{
 public:
-
-  /// Solve
-  void solve(Factorization fact);
+  /// Factorize the matrix / prepare the solution
+  void prepare();
+  
+  /// Solve the system of equations
+  void solve();
 };
 
 // Input arguments of an integrator 
