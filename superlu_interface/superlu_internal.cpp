@@ -54,6 +54,7 @@ SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, 
   
   // not initialized
   is_init = false;
+  
 }
 
 SuperLUInternal::~SuperLUInternal(){
@@ -75,14 +76,17 @@ void SuperLUInternal::init(){
   
   // Make sure not already initialized
   if(is_init) throw CasadiException("SuperLU: Already initialized");
+
+  // Make sure that the matrix is is square (relax later)
+  if(nrow_!=ncol_) throw CasadiException("SuperLU: Not square");
   
   // number of non-zero elements
   int nnz = col_.size();
-
+  
   // Allocate SuperLU data structures
   a = doubleMalloc(nnz);
   asub = intMalloc(nnz);
-  xa = intMalloc(ncol_+1);
+  xa = intMalloc(nrow_+1);
   rhs = doubleMalloc(nrow_ * nrhs_);
   perm_r = intMalloc(nrow_);
   perm_c = intMalloc(ncol_);
@@ -97,13 +101,13 @@ void SuperLUInternal::init(){
   // Create matrices A and B in the format expected by SuperLU.
   dCreate_CompRow_Matrix(&A, nrow_, ncol_, nnz, a, asub, xa, SLU_NR, SLU_D, SLU_GE);
   dCreate_Dense_Matrix(&B, nrow_, nrhs_, rhs, nrow_, SLU_DN, SLU_D, SLU_GE);
- 
+
   // Initialize the statistics variables
   StatInit(&stat);
 
   // Set the default input options
   set_default_options(&options);
-  
+
   // Read column permutation
   Option colperm = getOption("colperm");
   if(colperm=="natural")            options.ColPerm = ::NATURAL;
@@ -112,10 +116,10 @@ void SuperLUInternal::init(){
   else if(colperm=="colamd")        options.ColPerm = ::COLAMD;
   else if(colperm=="my_permc")      options.ColPerm = ::MY_PERMC;
   else throw CasadiException("SuperLU: Unknown column permutation: " + colperm.toString());
-  
+
   // Read transpose
   options.Trans = getOption("trans").toInt() ? ::TRANS : ::NOTRANS;
-  
+
   // Iterataive refinement
   Option iterrefine = getOption("iterrefine");
   if(iterrefine=="norefine" || iterrefine=="no")  options.IterRefine = ::NOREFINE; // user guide is inconsistent, allow both possibilties

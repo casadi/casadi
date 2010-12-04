@@ -275,7 +275,8 @@ void IdasInternal::init(){
       flag = IDASpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
       if(flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditioner",flag);
     }
-    
+  } else if(getOption("linear_solver")=="user_defined") {
+    initUserDefinedLinearSolver();
   } else throw CasadiException("IDAS: Unknown linear solver");
 
   // Quadrature equations
@@ -1189,8 +1190,93 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
 #else // PRECOND_TEST
   throw CasadiException("psetup: The preconditioner module only works if the code has been compiled with the flag PRECOND_TEST defined.");
 #endif // PRECOND_TEST
+}
 
+int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
+ try{
+    IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+    assert(this_);
+    this_->lsetup(IDA_mem,yyp,ypp,resp,vtemp1,vtemp2,vtemp3);
+    return 0;
+  } catch(exception& e){
+    cerr << "lsetup failed: " << e.what() << endl;;
+    return -1;
+  }
+}
 
+int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
+ try{
+   IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+   assert(this_);
+   this_->lsolve(IDA_mem,b,weight,ycur,ypcur,rescur);
+   return 0;
+  } catch(exception& e){
+    cerr << "lsolve failed: " << e.what() << endl;;
+    return -1;
+  }
+}
+
+void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
+  // Current time
+  double t = IDA_mem->ida_tn;
+
+  // Multiple of df_dydot to be added to the matrix
+  double cj = IDA_mem->ida_cj;
+
+  // Pass to the jacobian function
+  jacx_.setInput(t,JAC_T);
+  jacx_.setInput(NV_DATA_S(yyp),JAC_Y);
+  jacx_.setInput(NV_DATA_S(ypp),JAC_YDOT);
+  jacx_.setInput(input(INTEGRATOR_P).data(),JAC_P);
+  jacx_.setInput(cj,JAC_CJ);
+  
+  // Evaluate the Jacobian function
+  jacx_.evaluate();
+  
+  // Pass non-zero elements to the linear solver
+  linsol_.setInput(jacx_.getOutputData(),0);
+  
+  // Tell the solver to refactorize at next call
+  refactor_ = true;  
+}
+
+void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
+
+  // Pass right hand side to the linear solver
+  linsol_.setInput(NV_DATA_S(b),1);
+  
+  // Solve the system
+  linsol_.solve(DOFACT);
+/*  linsol_.evaluate();*/
+  
+  // Get the result
+  linsol_.getOutput(NV_DATA_S(b));
+  
+  // Matrix refactorized
+  refactor_ = false;
+}
+
+void IdasInternal::initUserDefinedLinearSolver(){
+  // Make sure that a Jacobian has been provided
+  if(jacx_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
+  
+  //  Set fields in the IDA memory
+  IDAMem IDA_mem = IDAMem(mem_);
+  IDA_mem->ida_lmem   = this;
+  IDA_mem->ida_lsetup = lsetup_wrapper;
+  IDA_mem->ida_lsolve = lsolve_wrapper;
+  
+  // Create a linear solver
+  linsol_ = createLinearSolver(jacx_.output().nrow_,
+                               jacx_.output().ncol_,
+                               jacx_.output().rowind_,
+                               jacx_.output().col_);
+                             
+  // Initialize the linear solver
+  linsol_.init();
+  
+  // Factorize the first call
+  refactor_ = true;
 }
 
 

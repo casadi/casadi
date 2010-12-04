@@ -104,7 +104,8 @@ namespace CasADi{
 %implicitconv SXMatrix;
 #endif WITH_IMPLICITCONV
 
-class SXMatrix : public std::vector<SX>{
+/*class SXMatrix : public std::vector<SX>{*/ // PROBLEM WITH INHERITANCE!
+class SXMatrix{
 public:
 
 /** \brief  constructors */
@@ -131,6 +132,7 @@ void reserve(int nnz);
 int numel() const;       // get the number of elements
 int size1() const;       // get the first dimension
 int size2() const;       // get the second dimension
+int size() const;        // number of non-zero elements
 bool empty() const; // is the matrix empty
 bool scalar() const; // is the matrix scalar
 bool vector() const; // is the matrix a vector
@@ -138,10 +140,7 @@ bool vector() const; // is the matrix a vector
 // Get sparsity in compressed row storage (CRS) format
 const std::vector<int>& getCol() const; // vector of length nnz containing the columns for all the indices of the non-zero elements
 const std::vector<int>& getRowInd() const; // vector of length n+1 containing the index of the last non-zero element up till each row 
-
 };
-
-
 
 %extend SXMatrix {
 std::string __str__()  { return $self->getRepresentation(); }
@@ -161,6 +160,7 @@ SETTERS(const SX&)
 SETTERS(double)
 #undef SETTERS
 
+binops(SXMatrix, const SX&)
 binops(SXMatrix, const SXMatrix&)
 binops(SXMatrix, double)
 binops(SXMatrix, const std::vector<SX>&)
@@ -170,8 +170,8 @@ unops(SXMatrix)
 
 } // namespace CasADi
 
-
-
+// Template instantiations
+%template(vector_sx_matrix) std::vector<CasADi::SXMatrix>;
 
 namespace CasADi{
 // Create an stl vector of sx variables
