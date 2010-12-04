@@ -49,6 +49,8 @@ public:
 /// Internal class
 class LinearSolverInternal : public FXNode{
   public:
+    // Constructor
+    LinearSolverInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
     
     // Destructor
     virtual ~LinearSolverInternal() = 0;
@@ -61,6 +63,11 @@ class LinearSolverInternal : public FXNode{
     
     // Solve the system of equations
     virtual void solve() = 0;
+    
+    // Sparsity in CRS format
+    int nrow_, ncol_;
+    std::vector<int> rowind_, col_;
+    int nrhs_;
 };
 
 

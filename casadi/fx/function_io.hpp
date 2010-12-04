@@ -166,7 +166,7 @@ GETTERS(std::vector<double>&)
     std::vector< std::vector<double> > dataA_;
 
     /** \brief Assert that the number of nonzeros is correct */
-    void assertNNZ(int sz) const;
+    void assertNNZ(int sz, Sparsity sp) const;
     
     /** \brief Assert that the number of elements is correct */
     void assertNumEl(int sz) const;

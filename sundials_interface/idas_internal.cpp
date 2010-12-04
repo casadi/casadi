@@ -26,6 +26,8 @@
 #include <cassert>
 
 #ifdef PRECOND_TEST
+  // DENSE PRECONDITIONER: REMOVE
+
 // LU-Factorize dense matrix (lapack)
 extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
 
@@ -260,6 +262,10 @@ void IdasInternal::init(){
         throw CasadiException("IDASInternal: no jacobian function supplied");
       }
 
+#if PRECOND_TEST
+#error
+      // REMOVE THIS!!
+      
       // Allocate jacobian
       pc_.resize(ny_*ny_);
       
@@ -270,6 +276,13 @@ void IdasInternal::init(){
       } else {
         ipiv_.resize(ny_);
       }
+#else
+      // Make sure that a Jacobian has been provided
+      if(jacx_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+
+      // Make sure that a linear solver has been providided
+      if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
+#endif
 
       // Pass to IDA
       flag = IDASpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
@@ -1106,10 +1119,12 @@ int IdasInternal::psetup_wrapper(double t, N_Vector yy, N_Vector yp, N_Vector rr
 }
 
 void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, N_Vector tmp){
-#ifdef PRECOND_TEST
-   // Get time
+  // Get time
   time1 = clock();
-  
+
+  #ifdef PRECOND_TEST
+  // DENSE PRECONDITIONER: REMOVE
+
   // Copy input to output vector
   N_VScale(1.0,rvec,zvec);
 
@@ -1135,22 +1150,30 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
     dgetrs_(&trans, &ny_, &nrhs, &pc_[0], &ny_, &ipiv_[0], NV_DATA_S(zvec), &ny_, &info);
   }
   
-  // Log time duration
-  time2 = clock();
-  t_psolve += double(time2-time1)/CLOCKS_PER_SEC;
-  
   if(info != 0)
     throw CasadiException("failed to solve the linear system");
 
 #else // PRECOND_TEST
-  throw CasadiException("psolve: The preconditioner module only works if the code has been compiled with the flag PRECOND_TEST defined.");
+
+  // Pass right hand side to the linear solver
+  linsol_.setInput(NV_DATA_S(rvec),1);
+  
+  // Solve the system
+  linsol_.evaluate();
+  
+  // Get the result
+  linsol_.getOutput(NV_DATA_S(zvec));
+
 #endif // PRECOND_TEST
+
+  // Log time duration
+  time2 = clock();
+  t_psolve += double(time2-time1)/CLOCKS_PER_SEC;
 
 }
 
 void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-#ifdef PRECOND_TEST
-   // Get time
+  // Get time
   time1 = clock();
 
   // Pass input to the jacobian function
@@ -1162,6 +1185,9 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
 
   // Evaluate jacobian
   jacx_.evaluate();
+  
+#ifdef PRECOND_TEST
+  // DENSE PRECONDITIONER: REMOVE
   
   // Get the result
   jacx_.output(JAC_J).get(pc_,DENSE);
@@ -1179,17 +1205,21 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
   } else {
     dgetrf_(&ny_, &ny_, &pc_[0], &ny_, &ipiv_[0], &info);
   }
+    
+  if(info != 0)
+    throw CasadiException("dgetrf_ failed to factorize the jacobian");
+#else // PRECOND_TEST
+
+
+  // Pass non-zero elements to the linear solver
+  linsol_.setInput(jacx_.getOutputData(),0);
+
+  #endif // PRECOND_TEST
 
   // Log time duration
   time1 = clock();
   t_psetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
-    
-  if(info != 0)
-    throw CasadiException("dgetrf_ failed to factorize the jacobian");
 
-#else // PRECOND_TEST
-  throw CasadiException("psetup: The preconditioner module only works if the code has been compiled with the flag PRECOND_TEST defined.");
-#endif // PRECOND_TEST
 }
 
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){

@@ -280,10 +280,22 @@ void FunctionIO::getSparsity(vector<int>& row, vector<int> &col) const{
   }
 }
 
-void FunctionIO::assertNNZ(int sz) const{
-  if(size()!=sz){
+void FunctionIO::assertNNZ(int sz, Sparsity sp) const{
+  int nnz_correct = -1;
+  switch(sp){
+    case SPARSE:
+      nnz_correct = size();
+      break;
+    case DENSE:
+      nnz_correct = numel();
+      break;
+    default:
+      throw CasadiException("FunctionIO::assertNNZ: unknown sparsity");
+  }
+
+  if(nnz_correct!=sz){
     stringstream ss;
-    ss << "FunctionIO::assertNNZ: wrong number of elements (" << sz << "), but should be " << size() << flush;
+    ss << "FunctionIO::assertNNZ: wrong number of elements (" << sz << "), but should be " << nnz_correct << flush;
     throw CasadiException(ss.str());
   }
 }
@@ -322,27 +334,27 @@ int FunctionIO::sizeL() const{
 
 void FunctionIO::setv(double val, vector<double>& v, Sparsity sp) const{
   assertNumEl(1);
-  assertNNZ(1);
+  assertNNZ(1,sp);
   v[0] = val;
 }
     
 void FunctionIO::getv(double& val, const vector<double>& v, Sparsity sp) const{
   assertNumEl(1);
-  assertNNZ(1);
+  assertNNZ(1,sp);
   val = v[0];
 }
 
 void FunctionIO::setv(const vector<double>& val, vector<double>& v, Sparsity sp) const{
-  assertNNZ(val.size());
+  assertNNZ(val.size(),sp);
   copy(val.begin(),val.end(),v.begin());  
 }
 
 void FunctionIO::getv(vector<double>& val, const vector<double>& v, Sparsity sp) const{
   if(sp==SPARSE || (sp==DENSE && numel()==size())){
-    assertNNZ(val.size());
+    assertNNZ(val.size(),sp);
     copy(v.begin(),v.end(),val.begin());
   } else {
-    assertNNZ(val.size());
+    assertNNZ(val.size(),sp);
     // general sparse
     int k=0; // index of the result
     for(int i=0; i<size1(); ++i) // loop over rows

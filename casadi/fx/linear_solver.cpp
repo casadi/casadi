@@ -34,6 +34,20 @@ const LinearSolverInternal* LinearSolver::operator->() const{
     return static_cast<const LinearSolverInternal*>(FX::operator->());
 }
 
+LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs) : nrow_(nrow), ncol_(ncol), rowind_(rowind), col_(col), nrhs_(nrhs){
+  // Allocate space for inputs
+  input_.resize(2);
+  input_[0].setSize(nrow,ncol);
+  input_[0].setSparsityCRS(rowind, col);
+  
+  input_[1].setSize(nrow,nrhs); // right hand side
+  
+  // Allocate space for outputs
+  output_.resize(1);
+  output_[0].setSize(ncol,nrhs);
+}
+
+
 LinearSolverInternal::~LinearSolverInternal(){
 }
  

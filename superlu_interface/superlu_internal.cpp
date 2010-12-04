@@ -26,8 +26,8 @@
 using namespace std;
 namespace CasADi{
   
-SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs) : 
-  nrow_(nrow), ncol_(ncol), rowind_(rowind), col_(col), nrhs_(nrhs){
+SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs) 
+  : LinearSolverInternal(nrow,ncol,rowind,col,nrhs){
   
   // Add options
   addOption("equil", OT_BOOLEAN, true); // Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).
@@ -40,18 +40,7 @@ SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, 
   addOption("conditionnumber",OT_BOOLEAN,false);
   addOption("rowperm",OT_STRING,"largediag");
   addOption("printstat",OT_BOOLEAN,true);
-    
-  // Allocate space for inputs
-  input_.resize(2);
-  input_[0].setSize(nrow,ncol);
-  input_[0].setSparsityCRS(rowind, col);
-  
-  input_[1].setSize(nrow,nrhs); // right hand side
-  
-  // Allocate space for outputs
-  output_.resize(1);
-  output_[0].setSize(ncol,nrhs);
-  
+      
   // not initialized
   is_init = false;
   

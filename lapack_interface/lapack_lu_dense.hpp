@@ -29,21 +29,21 @@
 namespace CasADi{
   
 /** \brief  Forward declaration of internal class */
-class LapackLUInternal;
+class LapackLUDenseInternal;
 
 /** \brief  Public class */
-class LapackLU : public LinearSolver{
+class LapackLUDense : public LinearSolver{
 public:
 
   /// Default (empty) constructor
-  LapackLU();
+  LapackLUDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackLU(int nrow, int ncol, int nrhs=1);
+  LapackLUDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
     
   /// Access functions of the node
-  LapackLUInternal* operator->();
-  const LapackLUInternal* operator->() const;
+  LapackLUDenseInternal* operator->();
+  const LapackLUDenseInternal* operator->() const;
 };
 
 /// LU-Factorize dense matrix (lapack)
@@ -53,13 +53,13 @@ extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *inf
 extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
 
 /// Internal class
-class LapackLUInternal : public LinearSolverInternal{
+class LapackLUDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUInternal(int nrow, int ncol, int nrhs);
+    LapackLUDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
 
     // Destructor
-    virtual ~LapackLUInternal();
+    virtual ~LapackLUDenseInternal();
     
     // Initialize the solver
     virtual void init();
@@ -71,8 +71,13 @@ class LapackLUInternal : public LinearSolverInternal{
     virtual void solve();
 
   protected:
-    int nrow_, ncol_;
-    int nrhs_;
+
+    // Matrix
+    std::vector<double> mat_;
+    
+    // Pivoting elements
+    std::vector<int> ipiv_;
+
 };
 
 

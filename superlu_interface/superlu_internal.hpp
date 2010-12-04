@@ -48,11 +48,6 @@ class SuperLUInternal : public LinearSolverInternal{
 
   protected:
     
-    // Sparsity in CRS format
-    int nrow_, ncol_;
-    std::vector<int> rowind_, col_;
-    int nrhs_;
-    
     // Is initialized
     bool is_init;
     

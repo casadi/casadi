@@ -47,4 +47,9 @@ namespace std {
 %include "superlu.i"
 #endif
 
+// LAPACK
+#ifdef WITH_LAPACK
+%include "lapack_interface.i"
+#endif
+
 
