@@ -26,6 +26,7 @@
 
 #include "idas_integrator.hpp"
 #include "casadi/fx/integrator_internal.hpp"
+#include "casadi/fx/linear_solver.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */
@@ -193,10 +194,9 @@ class IdasInternal : public IntegratorInternal{
   
   // Linear solver
   FX linsol_;  
-  
-  // Refactorize
-  bool refactor_;
 
+  // Linear solver
+  LinearSolver linsol2_;  
 };
 
 

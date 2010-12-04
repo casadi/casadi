@@ -85,7 +85,12 @@ void LinearSolver::solve(){
   (*this)->solve();
 }
  
-  
+void LinearSolver::assertNode() const{
+  if(!dynamic_cast<const LinearSolverInternal*>(get()))
+    throw CasadiException("LinearSolver::assertNode");
+}
+
+
 } // namespace CasADi
 
   

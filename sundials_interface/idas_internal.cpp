@@ -1159,8 +1159,8 @@ void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector r
   // Pass non-zero elements to the linear solver
   linsol_.setInput(jacx_.getOutputData(),0);
   
-  // Tell the solver to refactorize at next call
-  refactor_ = true;  
+  // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
+  if(!linsol2_.isNull()) linsol2_.prepare();
 }
 
 void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
@@ -1168,14 +1168,14 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
   // Pass right hand side to the linear solver
   linsol_.setInput(NV_DATA_S(b),1);
   
-  // Solve the system
-  linsol_.evaluate();
+  // Solve the factorized system -- only if the linear solver inherits from LinearSolver
+  if(!linsol2_.isNull())
+    linsol2_.solve();
+  else
+    linsol_.evaluate();
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(b));
-  
-  // Matrix refactorized
-  refactor_ = false;
 }
 
 void IdasInternal::initUserDefinedLinearSolver(){
@@ -1194,8 +1194,6 @@ void IdasInternal::initUserDefinedLinearSolver(){
   IDA_mem->ida_lsetup = lsetup_wrapper;
   IDA_mem->ida_lsolve = lsolve_wrapper;
                                  
-  // Factorize at the first call
-  refactor_ = true;
 }
 
 

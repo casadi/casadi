@@ -23,6 +23,7 @@
 
 #include "idas_integrator.hpp"
 #include "idas_internal.hpp"
+#include "casadi/fx/linear_solver.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -46,6 +47,11 @@ const IdasInternal* IdasIntegrator::operator->() const{
 void IdasIntegrator::setLinearSolver(const FX& jacx, const FX& linsol){
   (*this)->jacx_ = jacx;
   (*this)->linsol_ = linsol;
+  try{
+    LinearSolver ls = shared_cast<LinearSolver>(linsol);
+    (*this)->linsol2_ = ls;
+  } catch(...){
+  }
 }
 
 

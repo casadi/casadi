@@ -52,6 +52,12 @@ extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *inf
 /// Solve a system of equation using an LU-factorized matrix (lapack)
 extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
 
+/// Calculate row and column scalings
+extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, int *info);
+
+/// Equilibriate the system
+extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed );
+
 /// Internal class
 class LapackLUDenseInternal : public LinearSolverInternal{
   public:
@@ -78,6 +84,14 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     // Pivoting elements
     std::vector<int> ipiv_;
 
+    // Row and column scaling
+    std::vector<double> r_, c_;
+    
+    // Type of scaling during the last equilibration
+    char equed_;
+    
+    // Equilibriate?
+    bool equilibriate_;
 };
 
 

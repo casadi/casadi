@@ -83,6 +83,7 @@ class LapackQRDenseInternal : public LinearSolverInternal{
     
     // qr work array
     std::vector<double> work_; 
+    
 };
 
 
