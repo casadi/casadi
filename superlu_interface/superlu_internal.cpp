@@ -147,7 +147,7 @@ void SuperLUInternal::init(){
 }
 
 void SuperLUInternal::prepare(){
-  
+  refactor_ = true;
 }
   
 void SuperLUInternal::solve(){
@@ -160,10 +160,18 @@ void SuperLUInternal::solve(){
   copy(b.begin(),b.end(),rhs);
 
   // Choose factorization
-  options.Fact = DOFACT;
-//   options.Fact = SamePattern;
-//   options.Fact = SamePattern_SameRowPerm;
-//   options.Fact = FACTORED;
+  if(called_once){
+    if(refactor_){
+      options.Fact = DOFACT;
+      // options.Fact = SamePattern; // DOESN'T WORK - BUG?
+      //   options.Fact = SamePattern_SameRowPerm;
+    } else {
+      options.Fact = DOFACT;
+      // options.Fact = FACTORED; // DOESN'T WORK - BUG?
+    }
+  } else {
+    options.Fact = DOFACT;
+  }
 
   // Solve the linear system
   dgssv(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &info);
@@ -181,7 +189,9 @@ void SuperLUInternal::solve(){
   dPrint_CompCol_Matrix(const_cast<char*>("U"), &U);
   dPrint_SuperNode_Matrix(const_cast<char*>("L"), &L);
   print_int_vec(const_cast<char*>("\nperm_r"), nrow_, perm_r);*/
-  
+
+  called_once = true;
+  refactor_ = false;
 }
 
   

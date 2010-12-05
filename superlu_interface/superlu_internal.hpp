@@ -65,6 +65,8 @@ class SuperLUInternal : public LinearSolverInternal{
     superlu_options_t options;
     SuperLUStat_t stat;
 
+    // Refactor at next call
+    bool refactor_;
     
 };
 

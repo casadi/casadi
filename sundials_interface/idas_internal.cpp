@@ -622,7 +622,7 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector yy, N_Vector yp, N_Vec
 
 void IdasInternal::reset(int fsens_order, int asens_order){
   // Reset timers
-  t_res = t_fres = t_jac = t_psolve = t_psetup_jac = t_psetup_fac = 0;
+  t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
   fsens_order_ = fsens_order;
   asens_order_ = asens_order;
@@ -785,9 +785,9 @@ void IdasInternal::printStats(std::ostream &stream) const{
     stream << "Time spent in the DAE residual: " << t_res << " s." << endl;
     stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
     stream << "Time spent in the jacobian function or jacobian times vector function: " << t_jac << " s." << endl;
-    stream << "Time spent in the preconditioner solve function: " << t_psolve << " s." << endl;
-    stream << "Time spent to generate the jacobian in the preconditioner setup function: " << t_psetup_jac << " s." << endl;
-    stream << "Time spent to factorize the jacobian in the preconditioner setup function: " << t_psetup_fac << " s." << endl;
+    stream << "Time spent in the linear solver solve function: " << t_lsolve << " s." << endl;
+    stream << "Time spent to generate the jacobian in the linear solver setup function: " << t_lsetup_jac << " s." << endl;
+    stream << "Time spent to factorize the jacobian in the linear solver setup function: " << t_lsetup_fac << " s." << endl;
     
 }
 
@@ -1080,15 +1080,16 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
   // Pass right hand side to the linear solver
   linsol_.setInput(NV_DATA_S(rvec),1);
   
-  // Solve the system
-  linsol_.evaluate();
+  // Solve the (possibly factorized) system 
+  if(!linsol2_.isNull()) linsol2_.solve();
+  else                   linsol_.evaluate();
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(zvec));
 
   // Log time duration
   time2 = clock();
-  t_psolve += double(time2-time1)/CLOCKS_PER_SEC;
+  t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
 
 }
 
@@ -1106,12 +1107,19 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
   // Evaluate jacobian
   jacx_.evaluate();
   
+  // Log time duration
+  time2 = clock();
+  t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+
   // Pass non-zero elements to the linear solver
   linsol_.setInput(jacx_.getOutputData(),0);
 
+  // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
+  if(!linsol2_.isNull()) linsol2_.prepare();
+
   // Log time duration
   time1 = clock();
-  t_psetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+  t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
 
 }
 
@@ -1140,6 +1148,9 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
 }
 
 void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
+  // Get time
+  time1 = clock();
+
   // Current time
   double t = IDA_mem->ida_tn;
 
@@ -1156,23 +1167,32 @@ void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector r
   // Evaluate the Jacobian function
   jacx_.evaluate();
   
+  // Log time duration
+  time2 = clock();
+  t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+  
   // Pass non-zero elements to the linear solver
   linsol_.setInput(jacx_.getOutputData(),0);
   
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
   if(!linsol2_.isNull()) linsol2_.prepare();
+
+  // Log time duration
+  time1 = clock();
+  t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+
 }
 
 void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
+  // Get time
+  time1 = clock();
 
   // Pass right hand side to the linear solver
   linsol_.setInput(NV_DATA_S(b),1);
   
-  // Solve the factorized system -- only if the linear solver inherits from LinearSolver
-  if(!linsol2_.isNull())
-    linsol2_.solve();
-  else
-    linsol_.evaluate();
+  // Solve the (possibly factorized) system
+  if(!linsol2_.isNull()) linsol2_.solve();
+  else                   linsol_.evaluate();
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(b));

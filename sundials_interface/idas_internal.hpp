@@ -182,9 +182,9 @@ class IdasInternal : public IntegratorInternal{
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
   double t_jac; // time spent in the jacobian, or jacobian times vector function
-  double t_psolve; // preconditioner solve function
-  double t_psetup_jac; // preconditioner setup function, generate jacobian
-  double t_psetup_fac; // preconditioner setup function, factorize jacobian
+  double t_lsolve; // preconditioner/linear solver solve function
+  double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
+  double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
   // Has the adjoint problem been initialized
   bool isInitAdj_;
@@ -197,6 +197,9 @@ class IdasInternal : public IntegratorInternal{
 
   // Linear solver
   LinearSolver linsol2_;  
+  
+  
+  
 };
 
 
