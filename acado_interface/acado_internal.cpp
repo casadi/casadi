@@ -100,8 +100,10 @@ AcadoInternal::~AcadoInternal(){
   if(algorithm_) delete algorithm_;
   if(arg_) delete arg_;
 
+#ifdef ACADO_HAS_USERDEF_INTEGRATOR
   ACADO::Integrator::integrator_creator_ = 0;
   ACADO::Integrator::integrator_user_data_ = 0;
+#endif
 }
 
 
