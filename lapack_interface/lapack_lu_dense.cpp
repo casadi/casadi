@@ -49,6 +49,7 @@ LapackLUDenseInternal::LapackLUDenseInternal(int nrow, int ncol, const std::vect
   
   // Equilibriate the matrix
   addOption("equilibration",OT_BOOLEAN,true);
+  addOption("allow_equilibration_failure",OT_BOOLEAN,false);
   
 }
 
@@ -71,9 +72,16 @@ void LapackLUDenseInternal::init(){
   }
   equed_ = 'N'; // No equilibration
 
+  // Allow equilibration failures
+  allow_equilibration_failure_ = getOption("allow_equilibration_failure").toInt();
+  
+  // Has a sucessful factorization been performed?
+  factorization_sucessful_ = false;
 }
 
 void LapackLUDenseInternal::prepare(){
+  factorization_sucessful_ = false;
+  
   // Get the elements of the matrix, dense format
   input(0).get(mat_,DENSE);
 
@@ -85,10 +93,17 @@ void LapackLUDenseInternal::prepare(){
     dgeequ_(&nrow_,&ncol_,&mat_[0],&nrow_,&r_[0],&c_[0],&rowcnd, &colcnd, &amax, &info);
     if(info < 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeequ_ failed to calculate the scaling factors");
     if(info>0){
-      if(info<=nrow_)
-        cerr << "LapackLUDenseInternal::prepare: Warning: " << (info-1) << "-th column (zero-based) is exactly zero" << endl;
-      else
-        cerr << "LapackLUDenseInternal::prepare: Warning: " << (info-1-nrow_) << "-th row (zero-based) is exactly zero" << endl;
+      stringstream ss;
+      ss << "LapackLUDenseInternal::prepare: ";
+      if(info<=nrow_)  ss << (info-1) << "-th column (zero-based) is exactly zero";
+      else             ss << (info-1-nrow_) << "-th row (zero-based) is exactly zero";
+
+      cout << "Warning: " << ss.str() << endl;
+
+
+      
+      if(allow_equilibration_failure_)  cout << "Warning: " << ss.str() << endl;
+      else                              throw CasadiException(ss.str());
     }
   
     // Equilibriate the matrix if scaling was successful
@@ -102,9 +117,15 @@ void LapackLUDenseInternal::prepare(){
   int info = -100;
   dgetrf_(&nrow_, &nrow_, &mat_[0], &nrow_, &ipiv_[0], &info);
   if(info != 0) throw CasadiException("LapackLUDenseInternal::prepare: dgetrf_ failed to factorize the jacobian");
+  
+  // Sucess if reached this point
+  factorization_sucessful_ = true;
 }
     
 void LapackLUDenseInternal::solve(){
+  if(!factorization_sucessful_)
+    throw CasadiException("LapackLUDenseInternal::solve: no sucessful factorization of the matrix available");
+  
   // Input and output vectors
   const vector<double>& b = input(1).data();
   vector<double>& x = output().data();

@@ -22,6 +22,7 @@
  */
 
 #include "acado_internal.hpp"
+#include "acado_integrator_backend.hpp"
 
 #include <acado_optimal_control.hpp>
 #include <casadi/stl_vector_tools.hpp>
@@ -50,6 +51,7 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   addOption("max_num_integrator_steps", OT_INTEGER);
   addOption("relaxation_parameter",     OT_REAL);
   addOption("periodic_bounds",          OT_INTEGERVECTOR);
+  addOption("integrator",               OT_STRING);
   
   
 // Set pointers to null
@@ -74,6 +76,13 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   ACADO::IntegerParameter().clearStaticCounters();
   ACADO::IntermediateState().clearStaticCounters();
   ACADO::Parameter().clearStaticCounters();
+  
+#ifdef ACADO_HAS_USERDEF_INTEGRATOR
+  // Point the pointer in the ACADO integrator class to the AcadoIntegratorBackend create function
+  if(ACADO::Integrator::integrator_creator_ || ACADO::Integrator::integrator_user_data_)
+    throw CasadiException("AcadoInternal::AcadoInternal: An instance already exists");
+#endif
+  
 }
 
 AcadoInternal::~AcadoInternal(){
@@ -91,6 +100,8 @@ AcadoInternal::~AcadoInternal(){
   if(algorithm_) delete algorithm_;
   if(arg_) delete arg_;
 
+  ACADO::Integrator::integrator_creator_ = 0;
+  ACADO::Integrator::integrator_user_data_ = 0;
 }
 
 
@@ -292,6 +303,29 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   else throw CasadiException("Illegal print level. Allowed are \"none\", \"low\", \"medium\", \"high\", \"debug\"");
   algorithm_->set(ACADO::INTEGRATOR_PRINTLEVEL, printlevel );
 
+  // Set integrator
+  if(hasSetOption("integrator")){
+    Option integ = getOption("integrator");
+    ACADO::IntegratorType itype;
+    if(integ=="rk4")           itype=ACADO::INT_RK4;
+    else if(integ=="rk12")     itype=ACADO::INT_RK12;
+    else if(integ=="rk23")     itype=ACADO::INT_RK23;
+    else if(integ=="rk45")     itype=ACADO::INT_RK45;
+    else if(integ=="rk78")     itype=ACADO::INT_RK78;
+    else if(integ=="bdf")      itype=ACADO::INT_BDF;
+    else if(integ=="discrete") itype=ACADO::INT_DISCRETE;
+    else if(integ=="unknown")  itype=ACADO::INT_UNKNOWN;
+    #ifdef ACADO_HAS_USERDEF_INTEGRATOR
+    else if(integ=="casadi"){
+      ACADO::Integrator::integrator_creator_ = &ACADO::AcadoIntegratorBackend::create;
+      ACADO::Integrator::integrator_user_data_ = this;
+      itype=ACADO::INT_UNKNOWN;
+    }
+    #endif
+  else throw CasadiException("AcadoInternal::evaluate: no such integrator: " + integ.toString());
+    algorithm_->set(ACADO::INTEGRATOR_TYPE, itype);
+  };
+  
   // Set integrator tolerance
   if(hasSetOption("integrator_tolerance")) algorithm_->set( ACADO::INTEGRATOR_TOLERANCE, getOption("integrator_tolerance").toDouble());
   if(hasSetOption("absolute_tolerance")) algorithm_->set( ACADO::ABSOLUTE_TOLERANCE, getOption("absolute_tolerance").toDouble());

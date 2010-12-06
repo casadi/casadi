@@ -13,6 +13,8 @@ set(ACADO_INTERFACE_SRCS
   acado_interface.cpp
   acado_internal.hpp
   acado_internal.cpp
+  acado_integrator_backend.hpp
+  acado_integrator_backend.cpp
 )
 
 add_library(acado_interface STATIC ${ACADO_INTERFACE_SRCS})

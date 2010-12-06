@@ -125,7 +125,8 @@ num_nodes = 30
 ocp_solver.setOption("number_of_shooting_nodes",num_nodes)
 ocp_solver.setOption("max_num_iterations",100)
 ocp_solver.setOption("kkt_tolerance",1e-4)
-  
+ocp_solver.setOption("integrator","casadi")
+
 # Initialize
 ocp_solver.init()
 

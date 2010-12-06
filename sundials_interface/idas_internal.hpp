@@ -193,13 +193,8 @@ class IdasInternal : public IntegratorInternal{
   int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
   
   // Linear solver
-  FX linsol_;  
+  LinearSolver linsol_;  
 
-  // Linear solver
-  LinearSolver linsol2_;  
-  
-  
-  
 };
 
 

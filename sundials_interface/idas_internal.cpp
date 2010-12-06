@@ -48,7 +48,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
   addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
   addOption("abstolv",                     OT_REALVECTOR, Option());
   addOption("fsens_abstolv",               OT_REALVECTOR, Option()); 
-  addOption("dense_preconditioner",        OT_BOOLEAN, false); // precondition with a dense preconditioner
+  addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("max_step_size",               OT_REAL, 0); // maximim step size
   addOption("first_time",                  OT_REAL, 1.0); // first requested time (to pass to CalcIC)
 
@@ -233,7 +233,7 @@ void IdasInternal::init(){
     if(exact_jacobian_) throw CasadiException("IDAS: Iterataive Jacobian information not implemented");
     
     // Add a preconditioner
-    if(getOption("dense_preconditioner")==true){
+    if(getOption("use_preconditioner")==true){
       // Form and jacobian function df/dy + cj* df/dydot, if it has not already been done
       if(jacx_.isNull()){
         throw CasadiException("IDASInternal: no jacobian function supplied");
@@ -1081,8 +1081,7 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
   linsol_.setInput(NV_DATA_S(rvec),1);
   
   // Solve the (possibly factorized) system 
-  if(!linsol2_.isNull()) linsol2_.solve();
-  else                   linsol_.evaluate();
+  linsol_.solve();
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(zvec));
@@ -1115,7 +1114,7 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
   linsol_.setInput(jacx_.getOutputData(),0);
 
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
-  if(!linsol2_.isNull()) linsol2_.prepare();
+  linsol_.prepare();
 
   // Log time duration
   time1 = clock();
@@ -1175,7 +1174,7 @@ void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector r
   linsol_.setInput(jacx_.getOutputData(),0);
   
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
-  if(!linsol2_.isNull()) linsol2_.prepare();
+  linsol_.prepare();
 
   // Log time duration
   time1 = clock();
@@ -1191,8 +1190,7 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
   linsol_.setInput(NV_DATA_S(b),1);
   
   // Solve the (possibly factorized) system
-  if(!linsol2_.isNull()) linsol2_.solve();
-  else                   linsol_.evaluate();
+  linsol_.solve();
   
   // Get the result
   linsol_.getOutput(NV_DATA_S(b));
