@@ -50,6 +50,9 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Constructor */
   explicit IdasInternal(const FX& f, const FX& q);
 
+  /** \brief  Clone */
+  virtual IdasInternal* clone() const;
+
   /** \brief  Destructor */
   virtual ~IdasInternal();
 
@@ -131,10 +134,6 @@ class IdasInternal : public IntegratorInternal{
 
   // N-vectors for the adjoint sensitivities
   std::vector<N_Vector> yB0_, yB_, ypB0_, ypB_, /*yQB0_, */ yQB_;
-
-  
-  
-  std::stringstream error_buffer;
 
   // dimensions
   int ny_; // number of ode states

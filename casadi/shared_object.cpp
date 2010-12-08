@@ -32,7 +32,16 @@ namespace CasADi{
 SharedObject::SharedObject(){
   node = 0;
 }
-    
+
+SharedObjectNode::SharedObjectNode(const SharedObjectNode& node){
+  count = 0; // reference counter is _not_ copied
+}
+
+SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node){
+  // do _not_ copy the reference counter
+  return *this;
+}
+
 SharedObject::SharedObject(const SharedObject& ref){
   node = ref.node;
   count_up();

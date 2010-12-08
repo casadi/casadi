@@ -98,6 +98,12 @@ class SharedObjectNode{
   //! Default constructor
   SharedObjectNode();
 
+  //! Copy constructor
+  SharedObjectNode(const SharedObjectNode& node);
+  
+  //! Assignment operator
+  SharedObjectNode& operator=(const SharedObjectNode& node);
+  
   //! Destructor
   virtual ~SharedObjectNode() = 0;  
 

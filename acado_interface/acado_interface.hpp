@@ -25,6 +25,7 @@
 #define ACADO_INTERFACE_HPP
 
 #include <casadi/fx/fx.hpp>
+#include <casadi/fx/integrator.hpp>
 
 namespace CasADi{
   
@@ -80,9 +81,12 @@ namespace CasADi{
       /** \brief  Default constructor */
       AcadoInterface();
 
-      /** \brief  Constructor taking a DAE rhs function, an objective function and a constraint function */
+      /** \brief  Constructor taking a DAE rhs function, an objective function and a constraint function -- for use with ACADO integrators */
       explicit AcadoInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
+      /** \brief  Set a user-provided integrator */
+      void setIntegrator(const Integrator& integrator);
+            
       /** \brief  Access functions and members of the node */
       AcadoInternal* operator->();
 

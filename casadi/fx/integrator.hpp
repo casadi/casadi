@@ -77,6 +77,9 @@ class Integrator : public FX{
 public:
   /** \brief  Constructors */
   Integrator();
+
+  /** \brief  Clone */
+  Integrator clone() const;
   
   /** \brief  Print solver statistics */
   void printStats(std::ostream &stream=std::cout) const;

@@ -39,6 +39,9 @@ public:
 
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
+
+  /** \brief  Clone */
+  virtual IntegratorInternal* clone() const=0;
   
   /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const = 0;

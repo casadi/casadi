@@ -29,6 +29,14 @@ using namespace std;
 namespace CasADi{
 namespace Sundials{
 
+CVodesInternal* CVodesInternal::clone() const{
+  // Copying initialized objects are not allowed since they contain pointers
+  if(is_init) throw CasadiException("CVodesInternal::clone: cannot clone an initialized object");
+  
+  // Return a shallow copy
+  return new CVodesInternal(*this);
+}
+  
 int CVodesInternal::getNX(const FX& f, const FX& q){
   // Number of states
   int nx = f.output().numel();

@@ -80,7 +80,7 @@ void AcadoFunction::fcn( double *x, double *res){
       f_.setInput(&x[ind],i); 
       ind += dim_[i];
     }
-  
+
   // Evaluate
   f_.evaluate();
   

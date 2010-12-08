@@ -28,6 +28,10 @@
 using namespace std;
 namespace CasADi{
 
+ACADOIntegratorInternal* ACADOIntegratorInternal::clone() const{
+  throw CasadiException("ACADOIntegratorInternal::clone: cannot clone");
+}
+
 void ACADOIntegratorInternal::ffcn( double *x, double *f){
   // Pass variables
   int ind=0;

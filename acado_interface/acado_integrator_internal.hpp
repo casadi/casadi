@@ -35,6 +35,9 @@ public:
   /** \brief  Constructor */
   explicit ACADOIntegratorInternal(const FX& f);
 
+  /** \brief  Clone method */
+  virtual ACADOIntegratorInternal* clone() const;
+  
   /** \brief  Destructor */
   virtual ~ACADOIntegratorInternal();
 

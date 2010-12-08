@@ -118,6 +118,32 @@ rfcn.setOption("ad_order",1)
 # Create ACADO solver
 ocp_solver = AcadoInterface(ffcn,mfcn,cfcn,rfcn)
 
+# Create an integrator
+dae_in = DAE_NUM_IN * [[]]
+dae_in[DAE_T] = acado_in[ACADO_FCN_T]
+dae_in[DAE_Y] = acado_in[ACADO_FCN_XD] + acado_in[ACADO_FCN_XA]
+dae_in[DAE_YDOT] = acado_in[ACADO_FCN_XDOT] + list(create_symbolic("zdot",len(acado_in[ACADO_FCN_XA])))
+dae_in[DAE_P] = acado_in[ACADO_FCN_P] + acado_in[ACADO_FCN_U]
+dae = SXFunction(dae_in,[ffcn_out])
+dae.setOption("ad_order",1)
+
+integrator = IdasIntegrator(dae)
+#integrator.setOption("exact_jacobian",True)
+#integrator.setOption("linear_multistep_method","bdf") # adams or bdf
+#integrator.setOption("nonlinear_solver_iteration","newton") # newton or functional
+integrator.setOption("ad_order",1)
+integrator.setOption("number_of_fwd_dir",4)
+integrator.setOption("number_of_adj_dir",0)
+integrator.setOption("fsens_err_con",True)
+integrator.setOption("quad_err_con",True)
+integrator.setOption("abstol",1e-8)
+integrator.setOption("reltol",1e-8)
+integrator.setOption("is_differential",len(acado_in[ACADO_FCN_XD])*[1] + len(acado_in[ACADO_FCN_XA])*[0])
+
+
+# Pass the integrator to ACADO
+ocp_solver.setIntegrator(integrator)
+
 # Set options
 ocp_solver.setOption("start_time",ocp.t0)
 ocp_solver.setOption("final_time",ocp.tf)
@@ -126,6 +152,7 @@ ocp_solver.setOption("number_of_shooting_nodes",num_nodes)
 ocp_solver.setOption("max_num_iterations",100)
 ocp_solver.setOption("kkt_tolerance",1e-4)
 ocp_solver.setOption("integrator","casadi")
+ocp_solver.setOption("integrator_tolerance",1e-6)
 
 # Initialize
 ocp_solver.init()

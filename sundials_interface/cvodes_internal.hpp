@@ -44,6 +44,9 @@ public:
   /** \brief  Constructor */
   explicit CVodesInternal(const FX& f, const FX& q);
 
+  /** \brief  Clone */
+  virtual CVodesInternal* clone() const;
+
   /** \brief  Destructor */
   virtual ~CVodesInternal();
 
@@ -124,8 +127,6 @@ public:
   // N-vectors for the adjoint sensitivities
   std::vector<N_Vector> yB0_, yB_, /*yQB0_, */ yQB_;
   
-  std::stringstream error_buffer;
-
   // dimensions
   int ny_; // number of ode states
   int nq_; // number of quadratures

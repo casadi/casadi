@@ -29,6 +29,14 @@ using namespace std;
 namespace CasADi{
 namespace Sundials{
 
+IdasInternal* IdasInternal::clone() const{
+  // Copying initialized objects are not allowed since they contain pointers
+  if(is_init) throw CasadiException("IdasInternal::clone: cannot clone an initialized object");
+  
+  // Return a shallow copy
+  return new IdasInternal(*this);
+}
+
 int IdasInternal::getNX(const FX& f, const FX& q){
   // Number of states
   int nx = f.output().numel();
@@ -663,7 +671,7 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   calc_ic_ = getOption("calc_ic").toInt();
   if(calc_ic_){
     // Try to calculate consistent initial values
-    cout << "Starting IDACalcIC, t = " << t0 << endl;
+//     cout << "Starting IDACalcIC, t = " << t0 << endl;
 
     double t_scale = getOption("first_time").toDouble();
     flag = IDACalcIC(mem_, IDA_YA_YDP_INIT, t_scale);

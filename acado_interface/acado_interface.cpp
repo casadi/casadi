@@ -39,6 +39,10 @@ AcadoInterface::AcadoInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn, c
   assignNode(new AcadoInternal(ffcn, mfcn, cfcn, rfcn));
 }
 
+void AcadoInterface::setIntegrator(const Integrator& integrator){
+  (*this)->setIntegrator(integrator);
+}
+
 AcadoInternal* AcadoInterface::operator->(){
   return (AcadoInternal*)(FX::operator->());
 }

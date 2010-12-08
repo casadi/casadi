@@ -76,13 +76,10 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   ACADO::IntegerParameter().clearStaticCounters();
   ACADO::IntermediateState().clearStaticCounters();
   ACADO::Parameter().clearStaticCounters();
-  
-#ifdef ACADO_HAS_USERDEF_INTEGRATOR
-  // Point the pointer in the ACADO integrator class to the AcadoIntegratorBackend create function
-  if(ACADO::Integrator::integrator_creator_ || ACADO::Integrator::integrator_user_data_)
-    throw CasadiException("AcadoInternal::AcadoInternal: An instance already exists");
-#endif
-  
+}
+
+void AcadoInternal::setIntegrator(const Integrator& integrator){
+  integrator_ = integrator;
 }
 
 AcadoInternal::~AcadoInternal(){
@@ -109,7 +106,6 @@ AcadoInternal::~AcadoInternal(){
 
 void AcadoInternal::init(){
   // Initialize the functions and get dimensions
-  // DAE
   ffcn_.init();
   
   // Get dimensions
@@ -188,7 +184,10 @@ void AcadoInternal::init(){
 
   // Initialize
   FXNode::init();
-
+  
+  // Initialize the user_provided
+/*  if(!integrator_.isNull()) integrator_.init();*/
+  
   // Set all bounds except initial constraints to +- infinity by default
   for(int i=ACADO_LBX; i<ACADO_UBC; i = i+2){
     vector<double> &lb = input(i).data();
@@ -319,7 +318,13 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
     else if(integ=="unknown")  itype=ACADO::INT_UNKNOWN;
     #ifdef ACADO_HAS_USERDEF_INTEGRATOR
     else if(integ=="casadi"){
-      ACADO::Integrator::integrator_creator_ = &ACADO::AcadoIntegratorBackend::create;
+      if(ACADO::Integrator::integrator_creator_ || ACADO::Integrator::integrator_user_data_)
+        throw CasadiException("AcadoInternal::AcadoInternal: An instance already exists");
+      
+      if(integrator_.isNull())
+        throw CasadiException("AcadoInternal::AcadoInternal: No integrator has been provided");
+      
+      ACADO::Integrator::integrator_creator_ = &AcadoIntegratorBackend::create;
       ACADO::Integrator::integrator_user_data_ = this;
       itype=ACADO::INT_UNKNOWN;
     }

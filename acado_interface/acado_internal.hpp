@@ -50,6 +50,9 @@ class AcadoInternal : public FXNode{
   /** \brief  Constructor only accessable from the AcadoOCPSolver pointer class */
   explicit AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
   
+  /** \brief  Set a user-provided integrator */
+  void setIntegrator(const Integrator& integrator);
+  
   public:
     
     /** \brief  Destructor */
@@ -87,9 +90,12 @@ class AcadoInternal : public FXNode{
     ACADO::OCP                   *ocp_;
     ACADO::OptimizationAlgorithm *algorithm_;
 
-    // DAE rhs
+    // DAE rhs (if any)
     AcadoFunction ffcn_;
 
+    // Casadi integrator (if any)
+    Integrator integrator_;
+    
     // Meyer term
     AcadoFunction mfcn_;
 
