@@ -12,5 +12,3 @@ add_library(superlu_interface STATIC ${SUPERLU_INTERFACE_SRCS})
 if(ENABLE_SHARED)
 add_library(superlu_interface_shared SHARED ${SUPERLU_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-
-add_subdirectory(test)

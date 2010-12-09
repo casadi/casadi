@@ -9,8 +9,6 @@ SET(IPOPT_INTERFACE_SRCS
   ipopt_internal.cpp
   ipopt_nlp.hpp
   ipopt_nlp.cpp
-#   ipopt_solver_c.h
-#   ipopt_solver_c.cpp
 )
 
 
@@ -18,6 +16,3 @@ add_library(ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
 if(ENABLE_SHARED)
 add_library(ipopt_interface_shared SHARED ${IPOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-
-
-add_subdirectory(test)

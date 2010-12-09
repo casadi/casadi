@@ -16,15 +16,10 @@ set(SUNDIALS_INTERFACE_SRCS
   idas_internal.cpp
   idas_integrator.hpp
   idas_integrator.cpp
-#   sundials_interface_c.h
-#   sundials_interface_c.cpp
 )
 
 add_library(sundials_interface STATIC ${SUNDIALS_INTERFACE_SRCS})
 if(ENABLE_SHARED)
 add_library(sundials_interface_shared SHARED ${SUNDIALS_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-
-
-add_subdirectory(test)
 
