@@ -176,6 +176,10 @@ public:
   
   // Linear solver
   LinearSolver linsol_;  
+
+  // Set the user defined linear solver
+  void initUserDefinedLinearSolver();
+
 };
 
 

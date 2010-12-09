@@ -214,6 +214,8 @@ void CVodesInternal::init(){
       flag = CVSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
       if(flag != CV_SUCCESS) cvodes_error("CVSpilsSetPreconditioner",flag);
     }    
+  } else if(getOption("linear_solver")=="user_defined") {
+    initUserDefinedLinearSolver();
   } else throw CasadiException("Unknown linear solver ");
 
   // Set user data
@@ -1216,6 +1218,20 @@ int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   }
 }
 
+void CVodesInternal::initUserDefinedLinearSolver(){
+  // Make sure that a Jacobian has been provided
+  if(M_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
+
+  // Make sure that a linear solver has been providided
+  if(linsol_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
+
+  //  Set fields in the IDA memory
+  CVodeMem cv_mem = CVodeMem(mem_);
+  cv_mem->cv_lmem   = this;
+  cv_mem->cv_lsetup = lsetup_wrapper;
+  cv_mem->cv_lsolve = lsolve_wrapper;
+                                 
+}
 
 
 } // namespace Sundials
