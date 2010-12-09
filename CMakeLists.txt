@@ -24,23 +24,13 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
-# ADD_DEFINITIONS(-DHAVE_UBLAS)
-
 add_subdirectory(casadi)
 add_subdirectory(modelica)
 add_subdirectory(toolboxes)
 add_subdirectory(examples)
 add_subdirectory(external_packages)
+add_subdirectory(interfaces)
 
-find_package (BLAS)
-if(BLAS_FOUND)
-add_subdirectory(superlu_interface)
-endif(BLAS_FOUND)
-
-find_package (LAPACK)
-if(LAPACK_FOUND)
-add_subdirectory(lapack_interface)
-endif(LAPACK_FOUND)
 
 find_package (SWIG)
 if(SWIG_FOUND)
@@ -56,27 +46,5 @@ set(DOXYFILE_LATEX "NO")
 set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/doc)
 set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
 include(UseDoxygen OPTIONAL)
-
-find_package(SUNDIALS)
-if(FOUND_SUNDIALS)
-add_subdirectory(sundials_interface)
-endif(FOUND_SUNDIALS)
-
-find_package(IPOPT)
-IF (FOUND_IPOPT)
-add_subdirectory(ipopt_interface)
-ELSE (FOUND_IPOPT)
-ENDIF (FOUND_IPOPT)
-
-find_package(ACADO)
-if(FOUND_ACADO)
-add_subdirectory(acado_interface)
-endif(FOUND_ACADO)
-
-if(WITH_MUSCOD)
-add_subdirectory(muscod_interface)
-endif(WITH_MUSCOD)
-
-#add_subdirectory(testing/HPV)
 
 

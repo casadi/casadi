@@ -20,12 +20,12 @@
  *
  */
 
-#include "sundials_interface/cvodes_integrator.hpp"
-#include "sundials_interface/idas_integrator.hpp"
+#include <interfaces/sundials/cvodes_integrator.hpp>
+#include <interfaces/sundials/idas_integrator.hpp>
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/simulator.hpp>
 #include <casadi/fx/c_function.hpp>
-#include "sundials_interface/cvodes_internal.hpp"
+#include <interfaces/sundials/cvodes_internal.hpp>
 
 #include <fstream>
 #include <iostream>

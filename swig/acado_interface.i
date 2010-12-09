@@ -1,5 +1,5 @@
 %{
-#include "acado_interface/acado_interface.hpp"
+#include "interfaces/acado/acado_interface.hpp"
 %}
 
 namespace CasADi{

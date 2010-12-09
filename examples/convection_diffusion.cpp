@@ -23,8 +23,8 @@
 #include <iostream>
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/expression_tools.hpp"
-#include "ipopt_interface/ipopt_solver.hpp"
-#include "sundials_interface/cvodes_integrator.hpp"
+#include "interfaces/ipopt/ipopt_solver.hpp"
+#include "interfaces/sundials/cvodes_integrator.hpp"
 #include "ocp_tools.hpp"
 #include "casadi/fx/simulator.hpp"
 #include "casadi/fx/simulator_internal.hpp"

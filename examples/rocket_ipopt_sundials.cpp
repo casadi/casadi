@@ -22,11 +22,11 @@
 
 #include <iostream>
 #include <casadi/stl_vector_tools.hpp>
-#include <ipopt_interface/ipopt_solver.hpp>
+#include <interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/mx/mx_constant.hpp>
 #include <casadi/expression_tools.hpp>
-#include "sundials_interface/cvodes_integrator.hpp"
-#include "sundials_interface/idas_integrator.hpp"
+#include "interfaces/sundials/cvodes_integrator.hpp"
+#include "interfaces/sundials/idas_integrator.hpp"
 
 using namespace CasADi;
 using namespace std;

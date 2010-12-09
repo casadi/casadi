@@ -23,7 +23,7 @@
 #include <iostream>
 #include <ctime>
 #include <casadi/stl_vector_tools.hpp>
-#include <ipopt_interface/ipopt_solver.hpp>
+#include <interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/expression_tools.hpp>
 #include <casadi/fx/jacobian.hpp>
 

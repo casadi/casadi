@@ -26,7 +26,7 @@ Joel Andersson, K.U. Leuven, 2010
 */
 
 #include "casadi/stl_vector_tools.hpp"
-#include "superlu_interface/superlu.hpp"
+#include "interfaces/superlu/superlu.hpp"
 
 using namespace CasADi;
 

@@ -23,8 +23,8 @@
 #include <iostream>
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/expression_tools.hpp"
-#include "ipopt_interface/ipopt_solver.hpp"
-#include "ipopt_interface/ipopt_internal.hpp"
+#include "interfaces/ipopt/ipopt_solver.hpp"
+#include "interfaces/ipopt/ipopt_internal.hpp"
 
 /** Excercise 2, chapter 10 from Larry Biegler's book */
 

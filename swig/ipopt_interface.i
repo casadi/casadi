@@ -1,5 +1,5 @@
 %{
-#include "ipopt_interface/ipopt_solver.hpp"
+#include "interfaces/ipopt/ipopt_solver.hpp"
 %}
 
 namespace CasADi{

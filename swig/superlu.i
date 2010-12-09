@@ -1,5 +1,5 @@
 %{
-#include "superlu_interface/superlu.hpp"
+#include "interfaces/superlu/superlu.hpp"
 %}
 
 namespace CasADi{

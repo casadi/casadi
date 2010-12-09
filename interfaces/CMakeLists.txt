@@ -1,0 +1,25 @@
+find_package (BLAS)
+if(BLAS_FOUND)
+add_subdirectory(superlu)
+endif(BLAS_FOUND)
+
+find_package (LAPACK)
+if(LAPACK_FOUND)
+add_subdirectory(lapack)
+endif(LAPACK_FOUND)
+
+find_package(SUNDIALS)
+if(FOUND_SUNDIALS)
+add_subdirectory(sundials)
+endif(FOUND_SUNDIALS)
+
+find_package(IPOPT)
+IF (FOUND_IPOPT)
+add_subdirectory(ipopt)
+ELSE (FOUND_IPOPT)
+ENDIF (FOUND_IPOPT)
+
+find_package(ACADO)
+if(FOUND_ACADO)
+add_subdirectory(acado)
+endif(FOUND_ACADO)
