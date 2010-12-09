@@ -103,5 +103,3 @@ add_library(casadi STATIC ${CASADI_SRCS})
 if(ENABLE_SHARED)
 add_library(casadi_shared SHARED ${CASADI_SRCS})
 endif(ENABLE_SHARED)
-
-add_subdirectory(test)

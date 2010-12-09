@@ -1,5 +1,6 @@
 find_package(IPOPT QUIET)
 find_package(SUNDIALS QUIET)
+find_package(BLAS QUIET)
 
 include_directories(../)
 
@@ -36,6 +37,8 @@ target_link_libraries(convection_diffusion ipopt_interface sundials_interface ca
 ENDIF(FOUND_SUNDIALS AND FOUND_IPOPT)
 
 # SuperLU via CasADi
-# add_executable(test_superlu_casadi test_superlu_casadi.cpp)
-# target_link_libraries(test_superlu_casadi superlu_interface casadi superlu blas)
+IF(BLAS_FOUND)
+add_executable(test_superlu_casadi test_superlu_casadi.cpp)
+target_link_libraries(test_superlu_casadi superlu_interface casadi superlu ${BLAS_LIBRARIES})
+ENDIF(BLAS_FOUND)
 
