@@ -31,6 +31,9 @@ add_subdirectory(examples)
 add_subdirectory(external_packages)
 add_subdirectory(interfaces)
 
+if(WITH_MUSCOD)
+add_subdirectory(muscod_interface)
+endif(WITH_MUSCOD)
 
 find_package (SWIG)
 if(SWIG_FOUND)
