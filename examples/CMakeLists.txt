@@ -41,10 +41,12 @@ target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface c
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # SuperLU via CasADi
+if(NOT WITHOUT_SUPERLU)
 IF(BLAS_FOUND)
 add_executable(test_superlu_casadi test_superlu_casadi.cpp)
 target_link_libraries(test_superlu_casadi superlu_interface casadi superlu ${BLAS_LIBRARIES})
 ENDIF(BLAS_FOUND)
+endif(NOT WITHOUT_SUPERLU)
 
 # Det minor from ADOL-C
 add_executable(det_minor det_minor.cpp)

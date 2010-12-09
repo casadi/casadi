@@ -1,7 +1,9 @@
+if(NOT WITHOUT_SUPERLU)
 find_package (BLAS)
 if(BLAS_FOUND)
 add_subdirectory(superlu)
 endif(BLAS_FOUND)
+endif(NOT WITHOUT_SUPERLU)
 
 find_package (LAPACK)
 if(LAPACK_FOUND)
