@@ -4,15 +4,15 @@ find_package(BLAS QUIET)
 
 include_directories(../)
 
-IF(FOUND_IPOPT)
+IF(IPOPT_FOUND)
 include_directories(${IPOPT_INCLUDE_DIR})
-ENDIF(FOUND_IPOPT)
+ENDIF(IPOPT_FOUND)
 
-IF(FOUND_SUNDIALS)
+IF(SUNDIALS_FOUND)
 INCLUDE_DIRECTORIES(${SUNDIALS_INCLUDE_DIR})
-ENDIF(FOUND_SUNDIALS)
+ENDIF(SUNDIALS_FOUND)
 
-IF(FOUND_IPOPT)
+IF(IPOPT_FOUND)
 
 # Rocket using Ipopt
 add_executable(rocket_ipopt rocket_ipopt.cpp)
@@ -29,16 +29,16 @@ target_link_libraries(biegler_10_1 ipopt_interface casadi ${IPOPT_LIBRARIES})
 # Exaple 10.2 from Biegler
 add_executable(biegler_10_2 biegler_10_2.cpp)
 target_link_libraries(biegler_10_2 ipopt_interface casadi ${IPOPT_LIBRARIES})
-ENDIF(FOUND_IPOPT)
+ENDIF(IPOPT_FOUND)
 
-IF(FOUND_SUNDIALS AND FOUND_IPOPT)
+IF(SUNDIALS_FOUND AND IPOPT_FOUND)
 add_executable(convection_diffusion convection_diffusion.cpp ocp_tools.hpp ocp_tools.cpp)
 target_link_libraries(convection_diffusion ipopt_interface sundials_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
 
 # rocket example using sundials and ipopt
 add_executable(rocket_ipopt_sundials rocket_ipopt_sundials.cpp)
 target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
-ENDIF(FOUND_SUNDIALS AND FOUND_IPOPT)
+ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # SuperLU via CasADi
 IF(BLAS_FOUND)
@@ -51,14 +51,14 @@ add_executable(det_minor det_minor.cpp)
 target_link_libraries(det_minor casadi)
 
 # Sundials - just integrate
-IF(FOUND_SUNDIALS)
+IF(SUNDIALS_FOUND)
 add_executable(rocket_sundials rocket_sundials.cpp)
 target_link_libraries(rocket_sundials
   sundials_interface
   casadi
   ${SUNDIALS_LIBRARIES}
 )
-ENDIF(FOUND_SUNDIALS)
+ENDIF(SUNDIALS_FOUND)
 
 
 
