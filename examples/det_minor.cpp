@@ -20,12 +20,11 @@
  *
  */
 
-#include "../sx/sx_matrix.hpp"
-#include "../mx/mx.hpp"
-#include "../stl_vector_tools.hpp"
-#include "../fx/sx_function.hpp"
-#include "../fx/mx_function.hpp"
-#include "../fx/fx.hpp"
+#include "casadi/sx/sx_matrix.hpp"
+#include "casadi/mx/mx.hpp"
+#include "casadi/stl_vector_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
+#include "casadi/fx/fx.hpp"
 #include <ctime>
 
 using namespace std;
