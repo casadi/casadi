@@ -96,6 +96,7 @@ void CVodesInternal::init(){
   // Init ODE rhs function and quadrature functions
   f_.init();
   if(!q_.isNull()) q_.init();
+  if(!M_.isNull()) M_.init();
 
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
@@ -153,8 +154,8 @@ void CVodesInternal::init(){
     flag = CVDense(mem_, ny_);
     if(flag!=CV_SUCCESS) cvodes_error("CVDense",flag);
     if(exact_jacobian_){
-      // Create jacobian
-      jac_f_ = f_.jacobian(ODE_Y,ODE_RHS);
+      // Create jacobian if it does not exist
+      if(jac_f_.isNull()) jac_f_ = f_.jacobian(ODE_Y,ODE_RHS);
       jac_f_.init();
       
       // Pass to CVodes
@@ -200,6 +201,19 @@ void CVodesInternal::init(){
       flag = CVSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
       if(flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFn",flag);      
     }
+    
+    // Add a preconditioner
+    if(getOption("use_preconditioner")==true){
+      // Make sure that a Jacobian has been provided
+      if(M_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+
+      // Make sure that a linear solver has been providided
+      if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
+
+      // Pass to IDA
+      flag = CVSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
+      if(flag != CV_SUCCESS) cvodes_error("CVSpilsSetPreconditioner",flag);
+    }    
   } else throw CasadiException("Unknown linear solver ");
 
   // Set user data
@@ -996,30 +1010,34 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   // Get time
   time1 = clock();
 
-  // Retrieve the structure that holds the Jacobian
-  _DlsMat *Jac_ = (_DlsMat *)Jac;
+  // Pass inputs to the jacobian function
+  jac_f_.input(ODE_T).set(t);
+  jac_f_.input(ODE_Y).set(NV_DATA_S(y));
+  jac_f_.input(ODE_P).set(f_.input(ODE_P).data());
 
-    // Get a pointer to the first element of the of the jacobian
-    double *jdata = Jac->data;
-
-    // Retrieve the leading dimension of the jacobian
-    int ld_jac = Jac->ldim;
-
-    // Pass inputs to the jacobian function
-    jac_f_.input(ODE_T).set(t);
-    jac_f_.input(ODE_Y).set(NV_DATA_S(y));
-    jac_f_.input(ODE_P).set(f_.input(ODE_P).data());
-
-    // Evaluate
-    jac_f_.evaluate();
+  // Evaluate
+  jac_f_.evaluate();
   
-    // Save the results
-    assert(ld_jac == ny_);
-    jac_f_.output().get(jdata); // transpose?
-    
-    // Log time duration
-    time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jac_f_.output().rowind_;
+  const vector<int>& col = jac_f_.output().col_;
+  const vector<double>& val = jac_f_.output().data();
+
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      // Get column
+      int j = col[el];
+      
+      // Set the element
+      DENSE_ELEM(Jac,i,j) = val[el];
+    }
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_jac += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int CVodesInternal::bjac_wrapper(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,     
@@ -1030,15 +1048,44 @@ int CVodesInternal::bjac_wrapper(int N, int mupper, int mlower, double t, N_Vect
     this_->bjac(N, mupper, mlower, t, y, fy, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
-    cerr << "djac failed: " << e.what() << endl;;
+    cerr << "bjac failed: " << e.what() << endl;;
     return 1;
   }
 }
 
-void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac,     
-                        N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  // Get time
+  time1 = clock();
+
+  // Pass inputs to the jacobian function
+  jac_f_.input(ODE_T).set(t);
+  jac_f_.input(ODE_Y).set(NV_DATA_S(y));
+  jac_f_.input(ODE_P).set(f_.input(ODE_P).data());
+
+  // Evaluate
+  jac_f_.evaluate();
   
-    throw CasadiException("bjac not implemented");
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jac_f_.output().rowind_;
+  const vector<int>& col = jac_f_.output().col_;
+  const vector<double>& val = jac_f_.output().data();
+
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      // Get column
+      int j = col[el];
+      
+      // Set the element
+      if(i-j>=-mupper && i-j<=mlower)
+        BAND_ELEM(Jac,i,j) = val[el];
+    }
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_jac += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void CVodesInternal::setStopTime(double tf){
@@ -1046,6 +1093,130 @@ void CVodesInternal::setStopTime(double tf){
   int flag = CVodeSetStopTime(mem_, tf);
   if(flag != CV_SUCCESS) cvodes_error("CVodeSetStopTime",flag);
 }
+
+int CVodesInternal::psolve_wrapper(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp){
+  try{
+    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    assert(this_);
+    this_->psolve(t, y, fy, r, z, gamma, delta, lr, tmp);
+    return 0;
+  } catch(exception& e){
+    cerr << "psolve failed: " << e.what() << endl;;
+    return 1;
+  }
+}
+
+int CVodesInternal::psetup_wrapper(double t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  try{
+    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    assert(this_);
+    this_->psetup(t, y, fy, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
+    return 0;
+  } catch(exception& e){
+    cerr << "psetup failed: " << e.what() << endl;;
+    return 1;
+  }
+}
+
+void CVodesInternal::psolve(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, N_Vector tmp){
+  // Get time
+  time1 = clock();
+
+  // Pass right hand side to the linear solver
+  linsol_.setInput(NV_DATA_S(r),1);
+  
+  // Solve the (possibly factorized) system 
+  linsol_.solve();
+  
+  // Get the result
+  linsol_.getOutput(NV_DATA_S(z));
+
+  // Log time duration
+  time2 = clock();
+  t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
+}
+
+void CVodesInternal::psetup(double t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  // Get time
+  time1 = clock();
+
+  // Pass input to the jacobian function
+  M_.setInput(t,M_T);
+  M_.setInput(NV_DATA_S(y),M_Y);
+  M_.setInput(input(INTEGRATOR_P).data(),M_P);
+  M_.setInput(gamma,M_GAMMA);
+
+  // Evaluate jacobian
+  M_.evaluate();
+  
+  // Log time duration
+  time2 = clock();
+  t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+
+  // Pass non-zero elements, scaled by -gamma, to the linear solver
+  linsol_.setInput(M_.getOutputData(),0);
+
+  // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
+  linsol_.prepare();
+
+  // Log time duration
+  time1 = clock();
+  t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+}
+
+void CVodesInternal::lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
+  // Current time
+  double t = cv_mem->cv_tn;
+
+  // Scaling factor before J
+  double gamma = cv_mem->cv_gamma;
+
+  // Call the preconditioner setup function (which sets up the linear solver)
+  psetup(t, ypred, fpred, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
+}
+
+int CVodesInternal::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
+  try{
+    CVodesInternal *this_ = (CVodesInternal*)(cv_mem->cv_lmem);
+    assert(this_);
+    this_->lsetup(cv_mem, convfail, ypred, fpred, jcurPtr, vtemp1, vtemp2, vtemp3);
+    return 0;
+  } catch(exception& e){
+    cerr << "lsetup failed: " << e.what() << endl;;
+    return 1;
+  }
+}
+
+void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur){
+  // Current time
+  double t = cv_mem->cv_tn;
+
+  // Scaling factor before J
+  double gamma = cv_mem->cv_gamma;
+
+  // Accuracy
+  double delta = 0.0;
+  
+  // Left/right preconditioner
+  int lr = 1;
+  
+  // Call the preconditioner solve function (which solves the linear system)
+  psolve(t, ycur, fcur, b, b, gamma, delta, lr, 0);
+}
+
+int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur){
+  try{
+    CVodesInternal *this_ = (CVodesInternal*)(cv_mem->cv_lmem);
+    assert(this_);
+    this_->lsolve(cv_mem, b, weight, ycur, fcur);
+    return 0;
+  } catch(exception& e){
+    cerr << "lsolve failed: " << e.what() << endl;;
+    return 1;
+  }
+}
+
+
 
 } // namespace Sundials
 } // namespace CasADi

@@ -94,9 +94,10 @@ class IdasInternal : public IntegratorInternal{
   void psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, N_Vector tmp);
   void psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void djac(int Neq, double t, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void bjac(int Neq, int mupper, int mlower, double tt, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
   void lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur);
-  
+
   // Static wrappers to be passed to Sundials
   static int res_wrapper(double t, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data);
   static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
@@ -109,6 +110,7 @@ class IdasInternal : public IntegratorInternal{
   static int psolve_wrapper(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp);
   static int psetup_wrapper(double t, N_Vector yy, N_Vector yp, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int djac_wrapper(int Neq, double t, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int bjac_wrapper(int Neq, int mupper, int mlower, double tt, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
   static int lsetup_wrapper(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur);
   

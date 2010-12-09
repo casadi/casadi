@@ -24,6 +24,7 @@
 #define CVODES_INTEGRATOR_HPP
 
 #include "casadi/fx/integrator.hpp"
+#include "casadi/fx/linear_solver.hpp"
 
 /** Function that integrates the ODE:
 
@@ -38,6 +39,12 @@
 
 namespace CasADi{
 namespace Sundials{
+
+/** \brief  Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy */
+enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
+
+/** \brief  Output arguments of the Jacobian function */
+enum MOutput{M_M, M_NUM_OUT};
   
 /** \brief  Forward declaration of internal class */
 class CVodesInternal;
@@ -51,6 +58,9 @@ public:
   
   /** \brief  Create an integrator for explicit ODEs */
   explicit CVodesIntegrator(const FX& f, const FX& q=FX());
+  
+  /** \brief  Set the linear solver */
+  void setLinearSolver(const FX& M, LinearSolver& linsol);
   
   /** \brief  Access functions of the node */
   CVodesInternal* operator->();

@@ -45,6 +45,7 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("is_differential",             OT_INTEGERVECTOR,  Option());
   addOption("sensitivity_method",          OT_STRING,  "simultaneous"); // "simultaneous" or "staggered"
   addOption("max_multistep_order",         OT_INTEGER, 5);
+  addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
 
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,false); // should the quadratures affect the step size control

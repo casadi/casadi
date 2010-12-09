@@ -55,7 +55,6 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
   addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
   addOption("abstolv",                     OT_REALVECTOR, Option());
   addOption("fsens_abstolv",               OT_REALVECTOR, Option()); 
-  addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("max_step_size",               OT_REAL, 0); // maximim step size
   addOption("first_time",                  OT_REAL, 1.0); // first requested time (to pass to CalcIC)
 
@@ -110,6 +109,7 @@ void IdasInternal::init(){
   f_.init();
   if(!q_.isNull()) q_.init();
   if(!jacx_.isNull()) jacx_.init();
+  if(!linsol_.isNull()) linsol_.init();
   
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
@@ -212,8 +212,10 @@ void IdasInternal::init(){
     if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     
     // Banded Jacobian information
-    if(exact_jacobian_) throw CasadiException("IDAS: Banded Jacobian information not implemented");
-
+    if(exact_jacobian_){
+      flag = IDADlsSetBandJacFn(mem_, bjac_wrapper);
+      if(flag != IDA_SUCCESS) idas_error("IDADlsSetBandJacFn",flag);
+    }
   } else if(getOption("linear_solver")=="iterative") {
     // Max dimension of the Krylov space
     int maxl = getOption("max_krylov").toInt();
@@ -231,20 +233,18 @@ void IdasInternal::init(){
     } else throw CasadiException("Unknown sparse solver");
        
     // Attach functions for jacobian information
-    if(getOption("exact_jacobian")==true){
+    if(exact_jacobian_){
       flag = IDASpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
       if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFn",flag);
     }
-
-    // Attach functions for jacobian information
-    if(exact_jacobian_) throw CasadiException("IDAS: Iterataive Jacobian information not implemented");
     
     // Add a preconditioner
     if(getOption("use_preconditioner")==true){
-      // Form and jacobian function df/dy + cj* df/dydot, if it has not already been done
-      if(jacx_.isNull()){
-        throw CasadiException("IDASInternal: no jacobian function supplied");
-      }
+      // Make sure that a Jacobian has been provided
+      if(jacx_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+
+      // Make sure that a linear solver has been providided
+      if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
 
       // Pass to IDA
       flag = IDASpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
@@ -452,7 +452,6 @@ void IdasInternal::initAdj(){
       // Banded jacobian
       flag = IDABandB(mem_, whichB_[dir], ny_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
       if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
-      //    if(exact_jacobian) sundialsAssert(CVDlsSetBandJacFn(cvode_mem_[k], bjac_static));  
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse solver  
       int maxl = getOption("asens_max_krylov").toInt();
@@ -1010,8 +1009,6 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, 
 }
 
 void IdasInternal::djac(int Neq, double t, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-cout << "generating jac at t = " << t << endl;
-  
   // Get time
   time1 = clock();
 
@@ -1024,12 +1021,21 @@ cout << "generating jac at t = " << t << endl;
 
   // Evaluate jacobian
   jacx_.evaluate();
-  
-  // Get the result
-  const vector<double> &res = jacx_.getOutputData(JAC_J);
-  for(int i=0; i<ny_; ++i){
-    for(int j=0; j<ny_; ++j){
-      DENSE_ELEM(Jac, i, j) = res[j + i*ny_];
+
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jacx_.output().rowind_;
+  const vector<int>& col = jacx_.output().col_;
+  const vector<double>& val = jacx_.output().data();
+
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      // Get column
+      int j = col[el];
+      
+      // Set the element
+      DENSE_ELEM(Jac,i,j) = val[el];
     }
   }
   
@@ -1049,7 +1055,53 @@ int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector yy, N_Vect
   }
 }
 
+void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+  // Get time
+  time1 = clock();
 
+  // Pass input to the jacobian function
+  jacx_.setInput(tt,JAC_T);
+  jacx_.setInput(NV_DATA_S(yy),JAC_Y);
+  jacx_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jacx_.setInput(input(INTEGRATOR_P).data(),JAC_P);
+  jacx_.setInput(cj,JAC_CJ);
+
+  // Evaluate jacobian
+  jacx_.evaluate();
+
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jacx_.output().rowind_;
+  const vector<int>& col = jacx_.output().col_;
+  const vector<double>& val = jacx_.output().data();
+
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      // Get column
+      int j = col[el];
+      
+      // Set the element
+      if(i-j>=-mupper && i-j<=mlower)
+        BAND_ELEM(Jac,i,j) = val[el];
+    }
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+}
+
+int IdasInternal::bjac_wrapper(int Neq, int mupper, int mlower, double tt, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+ try{
+    IdasInternal *this_ = (IdasInternal*)user_data;
+    this_->bjac(Neq, mupper, mlower, tt, cj, yy, yp, rr, Jac, tmp1, tmp2, tmp3);
+    return 0;
+  } catch(exception& e){
+    cerr << "bjac failed: " << e.what() << endl;;
+    return 1;
+  }
+}
 
 void IdasInternal::setStopTime(double tf){
   // Set the stop time of the integration -- don't integrate past this point
@@ -1127,7 +1179,6 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
   // Log time duration
   time1 = clock();
   t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
-
 }
 
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
@@ -1155,53 +1206,28 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
 }
 
 void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
-  // Get time
-  time1 = clock();
-
   // Current time
   double t = IDA_mem->ida_tn;
 
   // Multiple of df_dydot to be added to the matrix
   double cj = IDA_mem->ida_cj;
 
-  // Pass to the jacobian function
-  jacx_.setInput(t,JAC_T);
-  jacx_.setInput(NV_DATA_S(yyp),JAC_Y);
-  jacx_.setInput(NV_DATA_S(ypp),JAC_YDOT);
-  jacx_.setInput(input(INTEGRATOR_P).data(),JAC_P);
-  jacx_.setInput(cj,JAC_CJ);
-  
-  // Evaluate the Jacobian function
-  jacx_.evaluate();
-  
-  // Log time duration
-  time2 = clock();
-  t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
-  
-  // Pass non-zero elements to the linear solver
-  linsol_.setInput(jacx_.getOutputData(),0);
-  
-  // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
-  linsol_.prepare();
-
-  // Log time duration
-  time1 = clock();
-  t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
-
+  // Call the preconditioner setup function (which sets up the linear solver)
+  psetup(t, yyp, ypp, 0, cj, vtemp1, vtemp1, vtemp3);
 }
 
 void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
-  // Get time
-  time1 = clock();
+  // Current time
+  double t = IDA_mem->ida_tn;
 
-  // Pass right hand side to the linear solver
-  linsol_.setInput(NV_DATA_S(b),1);
+  // Multiple of df_dydot to be added to the matrix
+  double cj = IDA_mem->ida_cj;
+
+  // Accuracy
+  double delta = 0.0;
   
-  // Solve the (possibly factorized) system
-  linsol_.solve();
-  
-  // Get the result
-  linsol_.getOutput(NV_DATA_S(b));
+  // Call the preconditioner solve function (which solves the linear system)
+  psolve(t, ycur, ypcur, rescur, b, b, cj, delta, 0);
 }
 
 void IdasInternal::initUserDefinedLinearSolver(){
@@ -1210,9 +1236,6 @@ void IdasInternal::initUserDefinedLinearSolver(){
 
   // Make sure that a linear solver has been providided
   if(linsol_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
-
-  // Initialize the linear solver
-  linsol_.init();
 
   //  Set fields in the IDA memory
   IDAMem IDA_mem = IDAMem(mem_);

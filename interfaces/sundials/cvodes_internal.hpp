@@ -35,12 +35,14 @@
 #include <cvodes/cvodes_spgmr.h>
 #include <cvodes/cvodes_spbcgs.h>
 #include <cvodes/cvodes_sptfqmr.h>
+#include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
 namespace CasADi{
 namespace Sundials{
   
 class CVodesInternal : public IntegratorInternal{
+  friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */
   explicit CVodesInternal(const FX& f, const FX& q);
@@ -83,7 +85,11 @@ public:
   void jtimes(const double *v, double* Jv, double t, const double* y, const double* fy, double* tmp);
   void djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void bjac(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-
+  void psolve(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, N_Vector tmp);
+  void psetup(double t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
+  
   // Static wrappers to be passed to Sundials
   static int rhs_wrapper(double t, N_Vector y, N_Vector ydot, void *user_data);
   static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
@@ -96,9 +102,11 @@ public:
   static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y, N_Vector fy, void *user_data, N_Vector tmp);
   static int djac_wrapper(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int bjac_wrapper(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-
-  
-  
+  static int psolve_wrapper(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psetup_wrapper(double t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
+ 
   
   virtual void printStats(std::ostream &stream) const;
   
@@ -162,6 +170,9 @@ public:
 
   // Number of forward and adjoint seeds for the functions f and q
   int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
+
+  // The jacobian of the nonlinear system
+  FX M_;
   
   // Linear solver
   LinearSolver linsol_;  

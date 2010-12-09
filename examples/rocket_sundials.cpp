@@ -33,8 +33,8 @@
 using namespace CasADi;
 using namespace std;
 
-// Use CVodes
-const bool implicit_integrator = false;
+// Use CVodes or IDAS
+const bool implicit_integrator = true;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -195,10 +195,10 @@ int main(){
   integrator.setOption("asens_abstol",1e-6);
   integrator.setOption("asens_reltol",1e-6);
   if(plain_c){
-    //integrator.setOption("exact_jacobian",false);
+    integrator.setOption("exact_jacobian",false);
     integrator.setOption("finite_difference_fsens",true);
   } else {
-    //integrator.setOption("exact_jacobian",true);
+    integrator.setOption("exact_jacobian",implicit_integrator ? false : true);
     integrator.setOption("finite_difference_fsens",false);    
   }
 
