@@ -506,14 +506,15 @@ void IdasInternal::res(double t, const double* y, const double* yp, double* r){
     // Get results
    f_.output().get(r);
 
-   time2 = clock();
-   t_res += double(time2-time1)/CLOCKS_PER_SEC;
-   
    // Check the result for consistency
-   for(int i=0; i<ny_; ++i)
+   for(int i=0; i<ny_; ++i){
      if(isnan(r[i]) || isinf(r[i])){
        throw 1;
      }
+   }
+   
+   time2 = clock();
+   t_res += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int IdasInternal::res_wrapper(double t, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data){

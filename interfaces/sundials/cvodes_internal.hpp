@@ -34,6 +34,7 @@
 #include <cvodes/cvodes_spgmr.h>
 #include <cvodes/cvodes_spbcgs.h>
 #include <cvodes/cvodes_sptfqmr.h>
+#include <ctime>
 
 namespace CasADi{
 namespace Sundials{
@@ -98,11 +99,6 @@ public:
   
   
   
-  
-  
-  
-  
-  
   virtual void printStats(std::ostream &stream) const;
   
   // CVodes memory block
@@ -116,6 +112,17 @@ public:
   
   // The jacobian of the ODE rhs fcn
   FX jac_f_;
+  
+  // For timings
+  clock_t time1, time2;
+  
+  // Accummulated time since last reset:
+  double t_res; // time spent in the DAE residual
+  double t_fres; // time spent in the forward sensitivity residual
+  double t_jac; // time spent in the jacobian, or jacobian times vector function
+  double t_lsolve; // preconditioner/linear solver solve function
+  double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
+  double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
   // N-vectors for the ODE integration
   N_Vector y0_, y_, yQ0_, yQ_;

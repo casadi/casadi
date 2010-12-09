@@ -414,7 +414,10 @@ void CVodesInternal::init(){
 }
 
 void CVodesInternal::rhs(double t, const double* y, double* ydot){
-    // Pass input
+  // Get time
+  time1 = clock();
+
+  // Pass input
   f_.input(ODE_T).set(t);
   f_.input(ODE_Y).set(y);
   f_.input(ODE_P).set(input(INTEGRATOR_P).data());
@@ -424,6 +427,10 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
     
     // Get results
   f_.output().get(ydot);
+
+  // Log time
+  time2 = clock();
+  t_res += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int CVodesInternal::rhs_wrapper(double t, N_Vector y, N_Vector ydot, void *user_data){
@@ -439,6 +446,9 @@ try{
 }
   
 void CVodesInternal::reset(int fsens_order, int asens_order){
+  // Reset timers
+  t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
+  
   fsens_order_ = fsens_order;
   asens_order_ = asens_order;
   
@@ -588,7 +598,16 @@ void CVodesInternal::printStats(std::ostream &stream) const{
     stream << "current internal time reached: " << tcur << std::endl;
     stream << std::endl;
 
+    stream << "Time spent in the DAE residual: " << t_res << " s." << endl;
+    stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
+    stream << "Time spent in the jacobian function or jacobian times vector function: " << t_jac << " s." << endl;
+    stream << "Time spent in the linear solver solve function: " << t_lsolve << " s." << endl;
+    stream << "Time spent to generate the jacobian in the linear solver setup function: " << t_lsetup_jac << " s." << endl;
+    stream << "Time spent to factorize the jacobian in the linear solver setup function: " << t_lsetup_fac << " s." << endl;
+    stream << std::endl;
 
+    
+    
 #if 0
   // Quadrature
   if(ops.quadrature && ocp.hasFunction(LTERM)){
@@ -670,6 +689,9 @@ void CVodesInternal::ehfun(int error_code, const char *module, const char *funct
 
 void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, N_Vector tmp1, N_Vector tmp2){
   assert(Ns==nfdir_);
+
+  // Record the current cpu time
+  time1 = clock();
   
     // Pass input
   f_.input(ODE_T).set(t);
@@ -689,6 +711,10 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
     // Get the output seeds
     f_.output().getF(NV_DATA_S(ySdot[i]));
   }
+  
+  // Record timings
+  time2 = clock();
+  t_fres += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int CVodesInternal::rhsS_wrapper(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -920,6 +946,9 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
 }
 
 void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double* y, const double* fy, double* tmp){
+  // Get time
+  time1 = clock();
+
   // Pass input
   f_.input(ODE_T).set(t);
   f_.input(ODE_Y).set(y);
@@ -935,6 +964,10 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
 
   // Get the output seeds
   f_.output(ODE_RHS).getF(Jv);
+  
+  // Log time duration
+  time2 = clock();
+  t_jac += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int CVodesInternal::djac_wrapper(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
@@ -950,8 +983,11 @@ int CVodesInternal::djac_wrapper(int N, double t, N_Vector y, N_Vector fy, DlsMa
 }
 
 void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-    // Retrieve the structure that holds the Jacobian
-    _DlsMat *Jac_ = (_DlsMat *)Jac;
+  // Get time
+  time1 = clock();
+
+  // Retrieve the structure that holds the Jacobian
+  _DlsMat *Jac_ = (_DlsMat *)Jac;
 
     // Get a pointer to the first element of the of the jacobian
     double *jdata = Jac->data;
@@ -970,6 +1006,10 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
     // Save the results
     assert(ld_jac == ny_);
     jac_f_.output().get(jdata); // transpose?
+    
+    // Log time duration
+    time2 = clock();
+    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int CVodesInternal::bjac_wrapper(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,     
