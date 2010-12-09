@@ -39,8 +39,8 @@ def recursive_traversal(dir,  oldcopyright, copyright):
                 update_source(fullfn, oldcopyright, copyright)
 
 
-#oldcright = file("license_header.txt","r+").read()
-oldcright = None
+oldcright = file("old_license_header.txt","r+").read()
+#oldcright = None
 cright = file("license_header.txt","r+").read()
 recursive_traversal("..", oldcright, cright)
 exit()
