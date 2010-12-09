@@ -34,10 +34,10 @@ using namespace CasADi;
 using namespace std;
 
 // Use CVodes
-const bool implicit_integrator = true;
+const bool implicit_integrator = false;
 
 // use plain c instead of SX
-const bool plain_c = true;
+const bool plain_c = false;
 
 // test adjoint sensitivities
 const bool with_asens = false;

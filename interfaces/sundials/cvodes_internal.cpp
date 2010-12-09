@@ -97,6 +97,12 @@ void CVodesInternal::init(){
   f_.init();
   if(!q_.isNull()) q_.init();
 
+  // Get the number of forward and adjoint directions
+  nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
+  nadir_f_ = f_.getOption("number_of_adj_dir").toInt();
+  nfdir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_fwd_dir").toInt();
+  nadir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_adj_dir").toInt();
+
   // Quick return if already initialized
   if(is_init){
     reset(ad_order_,ad_order_);
@@ -598,7 +604,7 @@ void CVodesInternal::printStats(std::ostream &stream) const{
     stream << "current internal time reached: " << tcur << std::endl;
     stream << std::endl;
 
-    stream << "Time spent in the DAE residual: " << t_res << " s." << endl;
+    stream << "Time spent in the ODE residual: " << t_res << " s." << endl;
     stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
     stream << "Time spent in the jacobian function or jacobian times vector function: " << t_jac << " s." << endl;
     stream << "Time spent in the linear solver solve function: " << t_lsolve << " s." << endl;
@@ -698,19 +704,23 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
   f_.input(ODE_Y).set(NV_DATA_S(y));
   f_.input(ODE_P).set(input(INTEGRATOR_P).data());
 
-  for(int i=0; i<nfdir_; ++i){
+   // Calculate the forward sensitivities, nfdir_f_ directions at a time
+   for(int j=0; j<nfdir_; j += nfdir_f_){
+     for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
+       // Pass forward seeds 
+       f_.setFwdSeed(0.0,ODE_T,dir);
+       f_.setFwdSeed(NV_DATA_S(yS[j+dir]),ODE_Y,dir);
+       f_.setFwdSeed(input(INTEGRATOR_P).dataF(j+dir),ODE_P,dir);
+     }
 
-    // Pass forward seeds
-    f_.input(ODE_T).setF(0.0);
-    f_.input(ODE_Y).setF(NV_DATA_S(yS[i]));
-    f_.input(ODE_P).setF(input(INTEGRATOR_P).dataF(i));
-    
-    // Evaluate the AD forward algorithm
-    f_.evaluate(1,0);
-  
-    // Get the output seeds
-    f_.output().getF(NV_DATA_S(ySdot[i]));
-  }
+     // Evaluate the AD forward algorithm
+     f_.evaluate(1,0);
+      
+     // Get the output seeds
+     for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
+       f_.getFwdSens(NV_DATA_S(ySdot[j+dir]),ODE_RHS,dir);
+     }
+   }
   
   // Record timings
   time2 = clock();

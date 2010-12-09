@@ -25,6 +25,7 @@
 
 #include "cvodes_integrator.hpp"
 #include "casadi/fx/integrator_internal.hpp"
+#include "casadi/fx/linear_solver.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */
@@ -159,6 +160,11 @@ public:
 
   int fsens_order_, asens_order_; 
 
+  // Number of forward and adjoint seeds for the functions f and q
+  int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
+  
+  // Linear solver
+  LinearSolver linsol_;  
 };
 
 
