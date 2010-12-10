@@ -22,5 +22,3 @@ add_library(modelica STATIC ${MODELICA})
 if(ENABLE_SHARED)
 add_library(modelica_shared SHARED ${MODELICA})
 endif(ENABLE_SHARED)
-
-add_subdirectory(test)

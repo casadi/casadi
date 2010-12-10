@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.0)
+project(opticon C CXX)
 
-project(opticon C CXX Fortran)
+# Options:
+option(WITH_SUPERLU "Compile the SuperLU interface and source" OFF)
+option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 
 #cmake_policy(SET CMP0003 NEW)
 
 include_directories(.)
-
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
