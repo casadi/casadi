@@ -21,9 +21,8 @@
  */
 
 #include "pre_c99_support.hpp"
-#if __STDC_VERSION__ < 199901L
+#include <limits>
 
-double isnan(double x){return x!=x;}
-double isinf(double x){return isinf(x-x);}
-
-#endif // __STDC_VERSION__ < 199901L
+int pre_c99_isnan(double x){return x!=x;}
+int pre_c99_isinf(double x){return pre_c99_isnan(x-x);}
+double pre_c99_erf(double x){return std::numeric_limits<double>::quiet_NaN();}

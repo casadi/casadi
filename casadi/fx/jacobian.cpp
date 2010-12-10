@@ -125,7 +125,7 @@ void JacobianNode::init(){
 
 	// Save to the result
 	for(int j=0; j<m_; ++j)
-	  if(isnan(bdir[j])){
+	  if(ISNAN(bdir[j])){
 	    rr_.push_back(j);
 	    cc_.push_back(i);
 	  }
@@ -143,7 +143,7 @@ void JacobianNode::init(){
 
 	// Save to the result
 	for(int i=0; i<n_; ++i)
-	  if(isnan(dir[i])){
+	  if(ISNAN(dir[i])){
 	    rr_.push_back(j);
 	    cc_.push_back(i);
 	  }

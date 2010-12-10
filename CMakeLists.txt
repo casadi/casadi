@@ -12,9 +12,6 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 
-
-#cmake_policy(SET CMP0003 NEW)
-
 include_directories(.)
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)

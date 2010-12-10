@@ -22,10 +22,22 @@
 
 #ifndef PRE_C99_SUPPORT_HPP
 #define PRE_C99_SUPPORT_HPP
-#if __STDC_VERSION__ < 199901L
+int pre_c99_isnan(double x);
+int pre_c99_isinf(double x);
+double pre_c99_erf(double x);
 
-double isnan(double x);
-double isinf(double x);
+#if __STDC_VERSION__ >= 199901L
+// C99
+#define ISNAN(x) isnan(x)
+#define ISINF(x) isinf(x)
+#define ERF(x) erf(x)
+# else
+// pre-C99
+#define ISNAN(x) pre_c99_isnan(x)
+#define ISINF(x) pre_c99_isinf(x)
+#define ERF(x) pre_c99_erf(x)
 
-#endif // __STDC_VERSION__ < 199901L
+#endif // __STDC_VERSION__ >= 199901L
+
+
 #endif // PRE_C99_SUPPORT_HPP

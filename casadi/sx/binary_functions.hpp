@@ -26,14 +26,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-
-// PRE-C99 support:
-#if __STDC_VERSION__ >= 199901L
-#define ERF(x) erf(x)
-#else
-#define ERF(x) numeric_limits<double>::quiet_NaN()
-#endif
-
+#include "../pre_c99_support.hpp"
 
 #define RES(i,j) res[i*(i+1)/2+j]
 #define F RES(0,0)

@@ -60,8 +60,8 @@ SX::SX(double val){
     else                        node = new IntegerSXNode(intval);
     node->count++;
   } else {	
-    if(isnan(val))              node = nan.node;
-    else if(isinf(val))         node = val > 0 ? inf.node : minf.node;
+    if(ISNAN(val))              node = nan.node;
+    else if(ISINF(val))         node = val > 0 ? inf.node : minf.node;
     else                        node = new RealtypeSXNode(val);
     node->count++;
   }
