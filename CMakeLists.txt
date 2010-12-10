@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 2.0)
-project(opticon C CXX)
+project(opticon C CXX Fortran)
 
 # Options:
-option(WITH_SUPERLU "Compile the SuperLU interface and source" OFF)
+option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)
 option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
+# option(WITH_IPOPT "Compile the Ipopt interface" ON)
+# option(WITH_ACADO "Compile the ACADO interface" ON)
+# option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 
 #cmake_policy(SET CMP0003 NEW)
 
