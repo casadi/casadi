@@ -48,11 +48,22 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(int n, int m, const T& val);    
 
     /** \brief  This constructor enables implicit type conversion from a scalar type */
-    template<typename A>
-    Matrix(const A &val){
+	Matrix(const T &val){
       makeEmpty(1,1);
       getElementRef()=val;
     }
+
+    /** \brief  This constructor enables implicit type conversion from a numeric type */
+	Matrix(const double &val){
+      makeEmpty(1,1);
+      getElementRef()=val;
+    }
+
+//	template<typename A>
+//    Matrix(const A &val){
+//      makeEmpty(1,1);
+//      getElementRef()=val;
+//    }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>

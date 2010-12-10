@@ -66,7 +66,7 @@ VariableNode::VariableNode(const string& name) : name_(name){
   causality_ = INTERNAL;
   alias_ = NO_ALIAS;
   description_ = "";
-  valueReference_ -1; //?
+  valueReference_ = -1; //?
   min_ = -numeric_limits<double>::infinity();
   max_ = numeric_limits<double>::infinity();
   nominal_ = 1.0;
@@ -182,7 +182,7 @@ Variable Variable::operator[](int ind) const{
 }
 
 int VariableNode::add(const Variable& var){
-  add(var,var.getName());
+  return add(var,var.getName());
 }
 
 int VariableNode::add(const Variable& var, const string& namepart){

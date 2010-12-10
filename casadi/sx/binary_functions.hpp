@@ -25,6 +25,15 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
+
+// PRE-C99 support:
+#if __STDC_VERSION__ >= 199901L
+#define ERF(x) erf(x)
+#else
+#define ERF(x) numeric_limits<double>::quiet_NaN()
+#endif
+
 
 #define RES(i,j) res[i*(i+1)/2+j]
 #define F RES(0,0)
@@ -236,7 +245,7 @@ static SX fmin_sfcn(const SX& x, const SX& y){ return fmin(x,y); }
 static SX fmin_sder1(const SX &f, const SX& x, const SX& y){ return x<=y; }
 static SX fmin_sder2(const SX &f, const SX& x, const SX& y){ return y<=x; }
 static void fmin_print(std::ostream &stream, const std::string& x, const std::string& y){stream << "fmin(" << x << "," << y << ")";}
-static void fmin_nfcn0(double x, double y, double *res){ F = fmin(x,y);}
+static void fmin_nfcn0(double x, double y, double *res){ F = min(x,y);}
 static void fmin_nfcn1(double x, double y, double *res){ fmin_nfcn0(x,y,res); FX = x<=y; FY = !FX;}
 static void fmin_nfcn2(double x, double y, double *res){ fmin_nfcn1(x,y,res); FXX = 0;   FXY = 0; FYY = 0;}
 //@}
@@ -247,7 +256,7 @@ static SX fmax_sfcn(const SX& x, const SX& y){ return fmax(x,y); }
 static SX fmax_sder1(const SX &f, const SX& x, const SX& y){ return x>=y; }
 static SX fmax_sder2(const SX &f, const SX& x, const SX& y){ return y>=x; }
 static void fmax_print(std::ostream &stream, const std::string& x, const std::string& y){stream << "fmax(" << x << "," << y << ")";}
-static void fmax_nfcn0(double x, double y, double *res){ F = fmax(x,y);}
+static void fmax_nfcn0(double x, double y, double *res){ F = max(x,y);}
 static void fmax_nfcn1(double x, double y, double *res){ fmax_nfcn0(x,y,res); FX = x>=y; FY = !FX;}
 static void fmax_nfcn2(double x, double y, double *res){ fmax_nfcn1(x,y,res); FXX = 0;   FXY = 0;  FYY = 0;}
 //@}
@@ -266,7 +275,7 @@ static void equality_nfcn2(double x, double y, double *res){ equality_nfcn1(x,y,
 static SX erf_sfcn(const SX& x, const SX& y){ return erf(x); }
 static SX erf_sder1(const SX &f, const SX& x, const SX& y){ return (2/sqrt(M_PI))*exp(-x*x);}
 static void erf_print(std::ostream &stream, const std::string& x, const std::string& y){stream << "erf(" << x << ")";}
-static void erf_nfcn0(double x, double y, double *res){ F = erf(x);}
+static void erf_nfcn0(double x, double y, double *res){ F = ERF(x);}
 static void erf_nfcn1(double x, double y, double *res){ erf_nfcn0(x,y,res); FX = (2/sqrt(M_PI))*exp(-x*x); FY = 0;}
 static void erf_nfcn2(double x, double y, double *res){ erf_nfcn1(x,y,res); FXX = FXY = FYY = 0;}
 //@}

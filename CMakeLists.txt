@@ -8,6 +8,11 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_ACADO "Compile the ACADO interface" ON)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 
+
+# Necessary for Visual C++
+add_definitions(-D_USE_MATH_DEFINES)
+
+
 #cmake_policy(SET CMP0003 NEW)
 
 include_directories(.)

@@ -24,6 +24,7 @@
 #include "../expression_tools.hpp"
 #include <stack>
 #include <cassert>
+#include "../pre_c99_support.hpp"
 
 namespace CasADi{
 
@@ -58,7 +59,7 @@ SX::SX(double val){
     else if(intval == -1)       node = mone.node;
     else                        node = new IntegerSXNode(intval);
     node->count++;
-  } else {
+  } else {	
     if(isnan(val))              node = nan.node;
     else if(isinf(val))         node = val > 0 ? inf.node : minf.node;
     else                        node = new RealtypeSXNode(val);

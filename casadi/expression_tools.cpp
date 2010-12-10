@@ -51,11 +51,11 @@ SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, cons
 
   // Gauss weights
   vector<double> wi;
-  wi.push_back((322-13*sqrt(70))/900.0);
-  wi.push_back((322+13*sqrt(70))/900.0);
+  wi.push_back((322-13*sqrt(70.0))/900.0);
+  wi.push_back((322+13*sqrt(70.0))/900.0);
   wi.push_back(128/225.0);
-  wi.push_back((322+13*sqrt(70))/900.0);
-  wi.push_back((322-13*sqrt(70))/900.0);
+  wi.push_back((322+13*sqrt(70.0))/900.0);
+  wi.push_back((322-13*sqrt(70.0))/900.0);
   
   // Evaluate at the Gauss points
   SXFunction fcn(x,f);

@@ -22,6 +22,7 @@
 
 #include "jacobian.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../pre_c99_support.hpp"
 
 #include <stack>
 #include <typeinfo>

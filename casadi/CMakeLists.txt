@@ -20,6 +20,8 @@ SET(CASADI_SRCS
   matrix.hpp
   crs_sparsity.hpp
   crs_sparsity.cpp
+  pre_c99_support.hpp
+  pre_c99_support.cpp
 
   sx/sx.hpp
   sx/sx.cpp
