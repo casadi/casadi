@@ -20,8 +20,8 @@ include_directories(.)
 # for linux 64 bits
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "x86_64 architecture detected - setting flag -fPIC")
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 
 
