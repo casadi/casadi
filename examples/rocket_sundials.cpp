@@ -25,43 +25,225 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/simulator.hpp>
 #include <casadi/fx/c_function.hpp>
-#include <interfaces/sundials/cvodes_internal.hpp>
+#include <casadi/expression_tools.hpp>
 
 #include <fstream>
 #include <iostream>
+#include <cassert>
 
 using namespace CasADi;
 using namespace std;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = true;
+const bool implicit_integrator = false;
 
 // use plain c instead of SX
 const bool plain_c = false;
 
 // test adjoint sensitivities
-const bool with_asens = false;
+const bool with_asens = true;
 
-// The DAE residual in plain c
-void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* rhs){
+// use exact jacobian
+const bool exact_jacobian = plain_c ? false : true;
+
+// Calculate the forward sensitivities using finite differences
+const bool finite_difference_fsens = !exact_jacobian;
+
+// Calculate initial condition (for IDAS only)
+const bool calc_ic = false;
+
+// Perturb x or u
+const bool perturb_u = true;
+
+// Use a user_defined linear solver
+const bool user_defined_solver = true;
+
+// The DAE residual in plain c (for IDAS)
+void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
   // Get the arguments
   double s = yy[0], v = yy[1], m = yy[2];
   double u = pp[0];
   double sdot = yydot[0], vdot = yydot[1], mdot = yydot[2];
 
   // Calculate the DAE residual
-  rhs[0] = sdot - v;
-  rhs[1] = vdot - (u-0.02*v*v)/m;
-  rhs[2] = mdot - (-0.01*u*u);
+  res[0] = sdot - v;
+  res[1] = vdot - (u-0.02*v*v)/m;
+  res[2] = mdot - (-0.01*u*u);
 }
 
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  dae_res_c(f.input(DAE_T).data()[0],
-            &f.input(DAE_Y).data()[0],
-            &f.input(DAE_YDOT).data()[0],
-            &f.input(DAE_P).data()[0],
-            &f.output(DAE_RES).data()[0]);
+  assert(fsens_order==0 && asens_order==0); // this function does not contain derivative information
+  dae_res_c(f.getInputData(DAE_T)[0], &f.getInputData(DAE_Y)[0], &f.getInputData(DAE_YDOT)[0], &f.getInputData(DAE_P)[0], &f.getOutputData(DAE_RES)[0]);
+}
+
+// The ODE right-hand-side in plain c (for CVODES)
+void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
+  // Get the arguments
+  double s = yy[0], v = yy[1], m = yy[2];
+  double u = pp[0];
+
+  // Calculate the DAE residual
+  rhs[0] = v; // sdot
+  rhs[1] = (u-0.02*v*v)/m; // vdot
+  rhs[2] = (-0.01*u*u); // mdot
+}
+
+// Wrap the function to allow creating an CasADi function
+void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
+  assert(fsens_order==0 && asens_order==0); // this function does not contain derivative information
+  ode_rhs_c(f.getInputData(ODE_T)[0], &f.getInputData(ODE_Y)[0], &f.getInputData(ODE_P)[0], &f.getOutputData(ODE_RHS)[0]);
+}
+
+// Create an IDAS instance (fully implicit integrator)
+Integrator create_IDAS(){
+  
+  // Time 
+  SX t("t");
+
+  // Differential states
+  SX s("s"), v("v"), m("m");
+  vector<SX> y(3); 
+  y[0] = s;
+  y[1] = v;
+  y[2] = m;
+  
+  // State derivatives
+  SX sdot("sdot"), vdot("vdot"), mdot("mdot");
+  vector<SX> ydot(3); 
+  ydot[0] = sdot;
+  ydot[1] = vdot;
+  ydot[2] = mdot;
+
+  // Control
+  SX u("u");
+  
+  // Reference trajectory
+  SX u_ref = 3-sin(t);
+  
+  // Square deviation from the state trajectory
+  SX u_dev = u-u_ref;
+  u_dev *= u_dev;
+  
+  // Differential equation (fully implicit form)
+  vector<SX> res(3);
+  res[0] = v - sdot;
+  res[1] = (u-0.02*v*v)/m - vdot;
+  res[2] = -0.01*u*u - mdot;
+
+  // Input of the DAE residual function
+  vector<vector<SX> > ffcn_in(DAE_NUM_IN);
+  ffcn_in[DAE_T] = vector<SX>(1,t);
+  ffcn_in[DAE_Y] = y;
+  ffcn_in[DAE_YDOT] = ydot;
+  ffcn_in[DAE_P] = vector<SX>(1,u);
+
+  // DAE residual function
+  FX ffcn = SXFunction(ffcn_in,res);
+  ffcn.setOption("ad_order",1);
+
+  // Overwrite ffcn with a plain c function (avoid this!)
+  if(plain_c){
+    // Use DAE residual defined in a c-function
+    ffcn = CFunction(dae_res_c_wrapper);
+    
+    // Specify the number of inputs and outputs
+    ffcn.setNumInputs(DAE_NUM_IN);
+    ffcn.setNumOutputs(DAE_NUM_OUT);
+    
+    // Specify dimensions of inputs and outputs
+    ffcn.input(DAE_T).setSize(1);
+    ffcn.input(DAE_Y).setSize(3);
+    ffcn.input(DAE_YDOT).setSize(3);
+    ffcn.input(DAE_P).setSize(1);
+    ffcn.output(DAE_RES).setSize(3);
+  }
+  
+  // Quadrature function
+  SXFunction qfcn(ffcn_in,u_dev);
+  qfcn.setOption("ad_order",1);
+
+  // Create an integrator
+  Sundials::IdasIntegrator integrator(ffcn,qfcn);
+  
+  // Set IDAS specific options
+  integrator.setOption("calc_ic",calc_ic);
+  integrator.setOption("is_differential",vector<int>(3,1));
+  
+  // Return the integrator
+  return integrator;
+}
+
+// Create an CVODES instance (ODE integrator)
+Integrator create_CVODES(){
+  
+  // Time 
+  SX t("t");
+
+  // Differential states
+  SX s("s"), v("v"), m("m");
+  vector<SX> y(3); 
+  y[0] = s;
+  y[1] = v;
+  y[2] = m;
+  
+  // Control
+  SX u("u");
+  
+  // Reference trajectory
+  SX u_ref = 3-sin(t);
+  
+  // Square deviation from the state trajectory
+  SX u_dev = u-u_ref;
+  u_dev *= u_dev;
+  
+  // Differential equation (fully implicit form)
+  vector<SX> rhs(3);
+  rhs[0] = v;
+  rhs[1] = (u-0.02*v*v)/m;
+  rhs[2] = -0.01*u*u;
+
+  // Input of the DAE residual function
+  vector<vector<SX> > ffcn_in(ODE_NUM_IN);
+  ffcn_in[ODE_T] = vector<SX>(1,t);
+  ffcn_in[ODE_Y] = y;
+  ffcn_in[ODE_P] = vector<SX>(1,u);
+
+  // DAE residual function
+  FX ffcn = SXFunction(ffcn_in,rhs);
+  ffcn.setOption("ad_order",1);
+
+  // Overwrite ffcn with a plain c function (avoid this!)
+  if(plain_c){
+    // Use DAE residual defined in a c-function
+    ffcn = CFunction(ode_rhs_c_wrapper);
+    
+    // Specify the number of inputs and outputs
+    ffcn.setNumInputs(ODE_NUM_IN);
+    ffcn.setNumOutputs(ODE_NUM_OUT);
+    
+    // Specify dimensions of inputs and outputs
+    ffcn.input(ODE_T).setSize(1);
+    ffcn.input(ODE_Y).setSize(3);
+    ffcn.input(ODE_P).setSize(1);
+    ffcn.output(ODE_RHS).setSize(3);
+  }
+  
+  // Quadrature function
+  SXFunction qfcn(ffcn_in,u_dev);
+  qfcn.setOption("ad_order",1);
+
+  // Create an integrator
+  Sundials::CVodesIntegrator integrator(ffcn,qfcn);
+  
+  // Formulate the Jacobian system
+  if(user_defined_solver){
+    // This will not work if the 
+    
+  }
+  
+  // Return the integrator
+  return integrator;
 }
 
 int main(){
@@ -80,15 +262,15 @@ int main(){
 
   // Control
   SX u("u");
-  
-  // Bounds on the control
-  double u_lb = -0.5, u_ub = 1.3, u_init = 1;
 
   // Differential equation
   vector<SX> rhs(3);
   rhs[0] = v;              // sdot
   rhs[1] = (u-0.02*v*v)/m; // vdot
   rhs[2] = -0.01*u*u;      // mdot
+  
+  // Bounds on the control
+  double u_lb = -0.5, u_ub = 1.3, u_init = 1;
 
   // Initial conditions
   vector<double> y0(3);
@@ -108,83 +290,9 @@ int main(){
   x0.push_back(0);
 
   // Integrator
-  Integrator integrator;
+  Integrator integrator = implicit_integrator ? create_IDAS() : create_CVODES();
   
-  if(implicit_integrator){
-    // Implicit integrator (IDAS)
-    
-    // State derivative
-    SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-    vector<SX> ydot(3); 
-    ydot[0] = sdot;
-    ydot[1] = vdot;
-    ydot[2] = mdot;
-    
-    // Input of the dae residual
-    vector<vector<SX> > ffcn_in(DAE_NUM_IN);
-    ffcn_in[DAE_T] = vector<SX>(1,t);
-    ffcn_in[DAE_Y] = y;
-    ffcn_in[DAE_YDOT] = ydot;
-    ffcn_in[DAE_P] = vector<SX>(1,u);
-
-    // DAE residual function
-    FX ffcn;
-    
-    if(plain_c){
-      // Use DAE residual defined in a c-function
-      ffcn = CFunction(dae_res_c_wrapper);
-      
-      // Specify the number of inputs and outputs
-      ffcn.setNumInputs(DAE_NUM_IN);
-      ffcn.setNumOutputs(DAE_NUM_OUT);
-      
-      // Specify dimensions of inputs and outputs
-      ffcn.input(DAE_T).setSize(1);
-      ffcn.input(DAE_Y).setSize(3);
-      ffcn.input(DAE_YDOT).setSize(3);
-      ffcn.input(DAE_P).setSize(1);
-      ffcn.output(DAE_RES).setSize(3);
-
-    } else {
-      // Use DAE residual evalable symbolically
-      std::vector<SX> res = ydot;
-      for(int i=0; i<res.size(); ++i) res[i] -= rhs[i];
-      ffcn = SXFunction(ffcn_in,res);
-      ffcn.setOption("ad_order",1);
-    }
-    ffcn.setOption("name","ODE right hand side");
-    
-    // Quadrature function
-    SXFunction qfcn(ffcn_in,u_dev);
-    qfcn.setOption("ad_order",1);
-
-    // Create an integrator
-    integrator = Sundials::IdasIntegrator(ffcn,qfcn);
-    
-    integrator.setOption("calc_ic",false);
-    
-  } else {
-    // Explicit integrator (CVODES)
-    
-    // Input of the ode rhs
-    vector<vector<SX> > ffcn_in(ODE_NUM_IN);
-    ffcn_in[ODE_T] = vector<SX>(1,t);
-    ffcn_in[ODE_Y] = y;
-    ffcn_in[ODE_P] = vector<SX>(1,u);
-  
-    // ODE right hand side
-    SXFunction ffcn(ffcn_in,rhs);
-    ffcn.setOption("name","ODE right hand side");
-    ffcn.setOption("ad_order",1);
-    
-    // Quadrature function
-    SXFunction qfcn(ffcn_in,u_dev);
-    qfcn.setOption("ad_order",1);
-  
-    // Create an integrator
-    integrator = Sundials::CVodesIntegrator(ffcn,qfcn);
-  }
-
+  // Set common integrator options
   integrator.setOption("ad_order",1);
   integrator.setOption("fsens_err_con",true);
   integrator.setOption("quad_err_con",true);
@@ -194,74 +302,81 @@ int main(){
   integrator.setOption("fsens_reltol",1e-6);
   integrator.setOption("asens_abstol",1e-6);
   integrator.setOption("asens_reltol",1e-6);
-  if(plain_c){
-    integrator.setOption("exact_jacobian",false);
-    integrator.setOption("finite_difference_fsens",true);
-  } else {
-    integrator.setOption("exact_jacobian",implicit_integrator ? false : true);
-    integrator.setOption("finite_difference_fsens",false);    
-  }
-
+  integrator.setOption("exact_jacobian",exact_jacobian);
+  integrator.setOption("finite_difference_fsens",finite_difference_fsens);
   integrator.setOption("max_num_steps",100000);
   //  integrator.setOption("linear_solver","iterative");
-  
-  //  cout << "Integrator:" << endl;
-//  integrator.printOptions();
 
-  if(1){
+  // Initialize the integrator
   integrator.init();
   
-//   integrator.input(INTEGRATOR_T0).set(t0);
-//   integrator.input(INTEGRATOR_TF).set(tf);
-//   integrator.input(INTEGRATOR_X0).set(x0);
-//   integrator.input(INTEGRATOR_P).set(u_init);
-
+  // Set time horizon
   integrator.setInput(t0,INTEGRATOR_T0);
   integrator.setInput(tf,INTEGRATOR_TF);
-  integrator.setInput(x0,INTEGRATOR_X0);
+ 
+  // Set parameters
   integrator.setInput(u_init,INTEGRATOR_P);
   
-  double yp0[] = {0,1,-0.01,0};
-  integrator.setInput(yp0,INTEGRATOR_XP0);
+  // Set inital state
+  integrator.setInput(x0,INTEGRATOR_X0);
   
+  // Set initial state derivative (if not to be calculated)
+  if(!calc_ic){
+    double yp0[] = {0,1,-0.01,0};
+    integrator.setInput(yp0,INTEGRATOR_XP0);
+  }
+  
+  // Integrate
   integrator.evaluate();
-  cout << "before " << integrator.getOutputData() << endl;
+
+  // Save the result
   vector<double> res0 = integrator.getOutputData();
 
-//  x0[1] += 0.01;
-  u_init += 0.01;
-
-  integrator.setInput(x0,INTEGRATOR_X0);
-  integrator.setInput(u_init,INTEGRATOR_P);
+  // Perturb in some direction
+  if(perturb_u){
+    double u_pert = u_init + 0.01;
+    integrator.setInput(u_pert,INTEGRATOR_P);
+  } else {
+    vector<double> x_pert = x0;
+    x_pert[1] += 0.01;
+    integrator.setInput(x_pert,INTEGRATOR_X0);
+  }
+  
+  // Integrate again
   integrator.evaluate();
   
   // Print statistics
   integrator.printStats();
 
-  cout << "after " << integrator.output().data() << endl;
-  
+  // Calculate finite difference approximation
   vector<double> fd = integrator.output().data();
   for(int i=0; i<fd.size(); ++i){
     fd[i] -= res0[i];
     fd[i] /= 0.01;
   }
   
-  cout << "fd    " << fd << endl;
+  cout << "unperturbed                     " << res0 << endl;
+  cout << "perturbed                       " << integrator.output().data() << endl;
+  cout << "finite_difference approximation " << fd << endl;
 
-  vector<double> x0_seed(x0.size(),0);
-  double u_seed = 0;
+  if(perturb_u){
+    double u_seed = 1;
+    integrator.setFwdSeed(u_seed,INTEGRATOR_P);
+  } else {
+    vector<double> x0_seed(x0.size(),0);
+    x0_seed[1] = 1;
+    integrator.setFwdSeed(x0_seed,INTEGRATOR_X0);
+  }
   
-  u_seed = 1;
-//  x0_seed[1] = 1;
-
-  
+  // Reset parameters
   integrator.setInput(u_init,INTEGRATOR_P);
+  
+  // Reset initial state
+  integrator.setInput(x0,INTEGRATOR_X0);
 
   // forward seeds
   integrator.setFwdSeed(0.0,INTEGRATOR_T0);
   integrator.setFwdSeed(0.0,INTEGRATOR_TF);
-  integrator.setFwdSeed(x0_seed,INTEGRATOR_X0);
-  integrator.setFwdSeed(u_seed,INTEGRATOR_P);
 
   if(with_asens){
     // backward seeds
@@ -277,18 +392,22 @@ int main(){
   }
     
   vector<double> &fsens = integrator.output().dataF();
-  cout << "fsens " << fsens << endl;
+  cout << "forward sensitivities           " << fsens << endl;
 
   if(with_asens){
-    cout << integrator.input(INTEGRATOR_T0).dataA() << endl;
-    cout << integrator.input(INTEGRATOR_TF).dataA() << endl;
-    cout << integrator.input(INTEGRATOR_X0).dataA() << endl;
-    cout << integrator.input(INTEGRATOR_P).dataA() << endl;
+    cout << "adjoint sensitivities           ";
+    cout << integrator.input(INTEGRATOR_T0).dataA() << "; ";
+    cout << integrator.input(INTEGRATOR_TF).dataA() << "; ";
+    cout << integrator.input(INTEGRATOR_X0).dataA() << "; ";
+    cout << integrator.input(INTEGRATOR_P).dataA() << "; ";
+    cout << endl;
   }
   
   return 0;
   }
-  
+
+#if 0
+
 //  vector<double> vv(1);
 //  setv(0,vv);
   
@@ -448,3 +567,6 @@ int main(){
 #endif
 
 }
+
+#endif
+

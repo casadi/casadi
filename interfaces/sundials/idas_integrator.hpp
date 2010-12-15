@@ -64,7 +64,7 @@ public:
   const IdasInternal* operator->() const;
   
   /** \brief  Set linear solver */
-  void setLinearSolver(const FX& jacx, const FX& linsol);
+  void setLinearSolver(const FX& jac, const FX& linsol);
 };
 
 

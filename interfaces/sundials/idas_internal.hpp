@@ -169,8 +169,11 @@ class IdasInternal : public IntegratorInternal{
   // Calculate consistent initial conditions
   bool calc_ic_;
   
-  // Jacobian of the ODE with respect to the state
-  FX jacx_;
+  // Jacobian of the ODE with respect to the state and state derivatives (separately)
+  FX jacx_, jacxdot_;
+  
+  // Jacobian of the ODE with respect to the state and state derivatives
+  FX jac_;
 
   // Jacobian of the ODE with respect to the parameters
   FX jacp_;
@@ -195,6 +198,8 @@ class IdasInternal : public IntegratorInternal{
   // Linear solver
   LinearSolver linsol_;  
 
+  // Can calcic be used?
+  bool calc_ic_ok_;
 };
 
 

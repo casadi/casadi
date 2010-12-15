@@ -22,7 +22,7 @@
 
 #include "integrator_internal.hpp"
 #include <cassert>
-#include "casadi/stl_vector_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{

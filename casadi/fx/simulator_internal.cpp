@@ -22,7 +22,7 @@
 
 #include "simulator_internal.hpp"
 #include "integrator_internal.hpp"
-#include "casadi/stl_vector_tools.hpp"
+#include "../stl_vector_tools.hpp"
 #include <cassert>
 
 using namespace std;

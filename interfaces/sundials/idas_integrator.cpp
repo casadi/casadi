@@ -43,8 +43,8 @@ const IdasInternal* IdasIntegrator::operator->() const{
   return (const IdasInternal*)(FX::operator->());
 }
 
-void IdasIntegrator::setLinearSolver(const FX& jacx, const FX& linsol){
-  (*this)->jacx_ = jacx;
+void IdasIntegrator::setLinearSolver(const FX& jac, const FX& linsol){
+  (*this)->jac_ = jac;
   (*this)->linsol_ = shared_cast<LinearSolver>(linsol);
 }
 

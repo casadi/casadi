@@ -70,6 +70,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
   ny_ = f.output().numel();
   nq_ = q.isNull() ? 0 : q.output().numel();
 
+  calc_ic_ok_ = false;
 }
 
 IdasInternal::~IdasInternal(){ 
@@ -108,7 +109,7 @@ void IdasInternal::init(){
   // Init ODE rhs function and quadrature functions, jacobian function
   f_.init();
   if(!q_.isNull()) q_.init();
-  if(!jacx_.isNull()) jacx_.init();
+  if(!jac_.isNull()) jac_.init();
   if(!linsol_.isNull()) linsol_.init();
   
   // Get the number of forward and adjoint directions
@@ -194,6 +195,9 @@ void IdasInternal::init(){
     
     // Reset the vector
     N_VConst(0.0, yp_);
+    
+    // Signal that it is okay to use calc_ic
+    calc_ic_ok_ = true;
   }
 
   // attach a linear solver
@@ -202,6 +206,14 @@ void IdasInternal::init(){
     flag = IDADense(mem_, ny_);
     if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
     if(exact_jacobian_){
+      // Generate jacobians if not already provided
+      if(jac_.isNull()){
+        if(jacx_.isNull()) jacx_ = f_.jacobian(DAE_Y,DAE_RES);
+        if(jacxdot_.isNull()) jacxdot_ = f_.jacobian(DAE_YDOT,DAE_RES);
+        jacx_.init();
+        jacxdot_.init();
+      }
+      
       // Pass to IDA
       flag = IDADlsSetDenseJacFn(mem_, djac_wrapper);
       if(flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFn",flag);
@@ -241,7 +253,7 @@ void IdasInternal::init(){
     // Add a preconditioner
     if(getOption("use_preconditioner")==true){
       // Make sure that a Jacobian has been provided
-      if(jacx_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+      if(jac_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been providided
       if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
@@ -669,12 +681,13 @@ void IdasInternal::reset(int fsens_order, int asens_order){
 
   calc_ic_ = getOption("calc_ic").toInt();
   if(calc_ic_){
-    // Try to calculate consistent initial values
-//     cout << "Starting IDACalcIC, t = " << t0 << endl;
-
+    if(!calc_ic_ok_) throw CasadiException("calc_ic requires \"is_differential\" to be set");
+    
     double t_scale = getOption("first_time").toDouble();
-    flag = IDACalcIC(mem_, IDA_YA_YDP_INIT, t_scale);
-//    flag = IDACalcIC(mem_, IDA_Y_INIT, tf);
+    int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
+    // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
+
+    flag = IDACalcIC(mem_, icopt , t_scale);
     if(flag != IDA_SUCCESS) idas_error("IDACalcIC",flag);
 
     // Retrieve the initial values
@@ -1009,33 +1022,57 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, 
 }
 
 void IdasInternal::djac(int Neq, double t, double cj, N_Vector yy, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  // NOTE: This function is extra complicated due to the fact that we either have a function that calculates df_dx and df_dxdot together or separately
+  // TODO: Change this when MXFunction becomes more stable
+  
   // Get time
   time1 = clock();
 
-  // Pass input to the jacobian function
-  jacx_.setInput(t,JAC_T);
-  jacx_.setInput(NV_DATA_S(yy),JAC_Y);
-  jacx_.setInput(NV_DATA_S(yp),JAC_YDOT);
-  jacx_.setInput(input(INTEGRATOR_P).data(),JAC_P);
-  jacx_.setInput(cj,JAC_CJ);
+  // Number of jacobian functions
+  int njac = jac_.isNull() ? 2 : 1;
+  
+  // Evaluate the functions and add to the result
+  for(int ijac = 0; ijac<njac; ++ijac){
+    // Jacobian function reference (jac_, jacx_ or jacxdot_)
+    FX& jac = njac==1 ? jac_ : ijac==0 ? jacx_ : jacxdot_;
+    
+    // Pass input to the jacobian function
+    if(njac==1){
+      // if a function calculating df_dx + cj*df_dxdot has been provided
+      jac.setInput(t,JAC_T);
+      jac.setInput(NV_DATA_S(yy),JAC_Y);
+      jac.setInput(NV_DATA_S(yp),JAC_YDOT);
+      jac.setInput(input(INTEGRATOR_P).data(),JAC_P);
+      jac.setInput(cj,JAC_CJ);
+    } else {
+      // if we need to calculate df_dx and df_dxdot separately
+      jac.setInput(t,DAE_T);
+      jac.setInput(NV_DATA_S(yy),DAE_Y);
+      jac.setInput(NV_DATA_S(yp),DAE_YDOT);
+      jac.setInput(input(INTEGRATOR_P).data(),DAE_P);
+    }
+    
+    // Evaluate jacobian
+    jac.evaluate();
 
-  // Evaluate jacobian
-  jacx_.evaluate();
+    // Get sparsity and non-zero elements
+    const vector<int>& rowind = jac.output().rowind_;
+    const vector<int>& col = jac.output().col_;
+    const vector<double>& val = jac.output().data();
 
-  // Get sparsity and non-zero elements
-  const vector<int>& rowind = jacx_.output().rowind_;
-  const vector<int>& col = jacx_.output().col_;
-  const vector<double>& val = jacx_.output().data();
-
-  // Loop over rows
-  for(int i=0; i<rowind.size()-1; ++i){
-    // Loop over non-zero entries
-    for(int el=rowind[i]; el<rowind[i+1]; ++el){
-      // Get column
-      int j = col[el];
+    // Factor
+    double c = ijac==0 ? 1 : cj;
+    
+    // Loop over rows
+    for(int i=0; i<rowind.size()-1; ++i){
+      // Loop over non-zero entries
+      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+        // Get column
+        int j = col[el];
       
-      // Set the element
-      DENSE_ELEM(Jac,i,j) = val[el];
+        // Add to the element
+        DENSE_ELEM(Jac,i,j) += c*val[el];
+      }
     }
   }
   
@@ -1060,19 +1097,19 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   time1 = clock();
 
   // Pass input to the jacobian function
-  jacx_.setInput(tt,JAC_T);
-  jacx_.setInput(NV_DATA_S(yy),JAC_Y);
-  jacx_.setInput(NV_DATA_S(yp),JAC_YDOT);
-  jacx_.setInput(input(INTEGRATOR_P).data(),JAC_P);
-  jacx_.setInput(cj,JAC_CJ);
+  jac_.setInput(tt,JAC_T);
+  jac_.setInput(NV_DATA_S(yy),JAC_Y);
+  jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jac_.setInput(input(INTEGRATOR_P).data(),JAC_P);
+  jac_.setInput(cj,JAC_CJ);
 
   // Evaluate jacobian
-  jacx_.evaluate();
+  jac_.evaluate();
 
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jacx_.output().rowind_;
-  const vector<int>& col = jacx_.output().col_;
-  const vector<double>& val = jacx_.output().data();
+  const vector<int>& rowind = jac_.output().rowind_;
+  const vector<int>& col = jac_.output().col_;
+  const vector<double>& val = jac_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1157,21 +1194,21 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
   time1 = clock();
 
   // Pass input to the jacobian function
-  jacx_.setInput(t,JAC_T);
-  jacx_.setInput(NV_DATA_S(yy),JAC_Y);
-  jacx_.setInput(NV_DATA_S(yp),JAC_YDOT);
-  jacx_.setInput(input(INTEGRATOR_P).data(),JAC_P);
-  jacx_.setInput(cj,JAC_CJ);
+  jac_.setInput(t,JAC_T);
+  jac_.setInput(NV_DATA_S(yy),JAC_Y);
+  jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jac_.setInput(input(INTEGRATOR_P).data(),JAC_P);
+  jac_.setInput(cj,JAC_CJ);
 
   // Evaluate jacobian
-  jacx_.evaluate();
+  jac_.evaluate();
   
   // Log time duration
   time2 = clock();
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
 
   // Pass non-zero elements to the linear solver
-  linsol_.setInput(jacx_.getOutputData(),0);
+  linsol_.setInput(jac_.getOutputData(),0);
 
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
   linsol_.prepare();
@@ -1232,7 +1269,7 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
 
 void IdasInternal::initUserDefinedLinearSolver(){
   // Make sure that a Jacobian has been provided
-  if(jacx_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
+  if(jac_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
 
   // Make sure that a linear solver has been providided
   if(linsol_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
