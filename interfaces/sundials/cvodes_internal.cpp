@@ -474,18 +474,11 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
   fsens_order_ = fsens_order;
   asens_order_ = asens_order;
   
-/*  if(asens_order_>0) assert(nadir_>0);
-  if(fsens_order_>0) assert(nfdir_>0);*/
-  
   // Get the time horizon
   double t0 = input(INTEGRATOR_T0).data()[0];
   double tf = input(INTEGRATOR_TF).data()[0];
   t_ = t0;
 
-  // quick-fix
-  t0 -= input(INTEGRATOR_T0).data()[0];
-  tf -= input(INTEGRATOR_T0).data()[0];
-  
   // Re-initialize
   int flag = CVodeReInit(mem_, t0, y0_);
   if(flag!=CV_SUCCESS) cvodes_error("CVodeReInit",flag);
@@ -513,9 +506,6 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
 }
 
 void CVodesInternal::integrate(double t_out){
-  // quick-fix
-  t_out -= input(INTEGRATOR_T0).data()[0];
-  
   int flag;
   
   // tolerance
@@ -561,9 +551,6 @@ void CVodesInternal::integrate(double t_out){
 void CVodesInternal::resetAdj(){
   double tf = input(INTEGRATOR_TF).data()[0];
 
-  // quick-fix
-  tf -= input(INTEGRATOR_T0).data()[0];
-  
   int flag;
   
   for(int dir=0; dir<nadir_; ++dir){
@@ -578,9 +565,6 @@ void CVodesInternal::resetAdj(){
 
 void CVodesInternal::integrateAdj(double t_out){
   int flag;
-
-  // quick-fix
-  t_out -= input(INTEGRATOR_T0).data()[0];
   
   // Integrate backwards to t_out
   flag = CVodeB(mem_, t_out, CV_NORMAL);
