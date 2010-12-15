@@ -47,6 +47,11 @@ void CVodesIntegrator::setLinearSolver(const FX& M, LinearSolver& linsol){
   (*this)->linsol_ = linsol;
 }
 
+bool CVodesIntegrator::checkNode() const{
+  return dynamic_cast<const CVodesInternal*>(get());
+}
+
+
 
 } // namespace Sundials
 } // namespace CasADi

@@ -117,9 +117,8 @@ void SharedObject::init(){
 void SharedObjectNode::init(){
 }
     
-void SharedObject::assertNode() const{
-  if(isNull())
-    throw CasadiException("SharedObject::assertNode(): Object is null");
+bool SharedObject::checkNode() const{
+  return dynamic_cast<const SharedObjectNode*>(get());
 }
 
 void SharedObject::repr(std::ostream &stream) const{

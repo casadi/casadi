@@ -47,9 +47,8 @@ const CFunctionNode* CFunction::operator->() const{
    return (const CFunctionNode*)(FX::operator->()); 
 }
   
-void CFunction::assertNode() const{
-  if(!dynamic_cast<const CFunctionNode*>(get()))
-    throw CasadiException("CFunction::assertNode");
+bool CFunction::checkNode() const{
+  return dynamic_cast<const CFunctionNode*>(get());
 }
 
 CFunctionNode::CFunctionNode(CFunctionWrapper c_fcn) : evaluate_(c_fcn){

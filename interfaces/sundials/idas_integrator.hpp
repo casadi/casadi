@@ -65,6 +65,10 @@ public:
   
   /** \brief  Set linear solver */
   void setLinearSolver(const FX& jac, const FX& linsol);
+  
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+
 };
 
 

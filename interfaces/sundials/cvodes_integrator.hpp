@@ -65,6 +65,10 @@ public:
   /** \brief  Access functions of the node */
   CVodesInternal* operator->();
   const CVodesInternal* operator->() const;
+
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+
 };
 
 

@@ -43,9 +43,8 @@ const IpoptInternal* IpoptSolver::operator->() const{
   return (const IpoptInternal*)(NLPSolver::operator->());
 }
     
-void IpoptSolver::assertNode() const{
-  if(!dynamic_cast<const IpoptInternal*>(get()))
-    throw CasadiException("IpoptSolver::assertNode");
+bool IpoptSolver::checkNode() const{
+  return dynamic_cast<const IpoptInternal*>(get());
 }
 
 } // namespace CasADi

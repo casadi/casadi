@@ -48,6 +48,11 @@ void IdasIntegrator::setLinearSolver(const FX& jac, const FX& linsol){
   (*this)->linsol_ = shared_cast<LinearSolver>(linsol);
 }
 
+bool IdasIntegrator::checkNode() const{
+  return dynamic_cast<const IdasInternal*>(get());
+}
+
+
 
 } // namespace Sundials
 } // namespace CasADi

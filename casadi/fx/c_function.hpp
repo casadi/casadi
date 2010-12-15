@@ -55,8 +55,8 @@ public:
   CFunctionNode* operator->();
   const CFunctionNode* operator->() const;
   
-  /** \brief  Make sure that the pointer points towards a valid object */
-  void assertNode() const;
+  /** \brief  Check if the pointer points towards a valid object */
+  virtual bool checkNode() const;
   
 }; // class CFunction
 

@@ -93,8 +93,8 @@ class FX : public OptionsFunctionality{
   FXNode* operator->();
   const FXNode* operator->() const;
 
-  /// Assert that the node is pointing to the right type of object
-  void assertNode() const;
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
   
 #if 0
 // SWIG doesn't support nested template instantiations -- WORKAROUND BELOW
@@ -260,7 +260,7 @@ class FXNode : public OptionsFunctionalityNode{
 
   /// Assert that the function has been initialized
   void assertInit() const;
-  
+
   protected:
 
   /** \brief  Has the function been initialized? */

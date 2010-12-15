@@ -36,9 +36,8 @@ const NLPSolverInternal* NLPSolver::operator->() const{
   return (const NLPSolverInternal*)(FX::operator->());
 }
     
-void NLPSolver::assertNode() const{
-  if(!dynamic_cast<const NLPSolverInternal*>(get()))
-    throw CasadiException("NLPSolver::assertNode");
+bool NLPSolver::checkNode() const{
+  return dynamic_cast<const NLPSolverInternal*>(get());
 }
 
 

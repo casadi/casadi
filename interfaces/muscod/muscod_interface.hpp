@@ -28,7 +28,7 @@ namespace CasADi{
       const MuscodInternal* operator->() const;
       
       /** \brief  Make sure that the pointer points towards a valid object */
-      void assertNode() const;
+      virtual bool checkNode()() const;
       
       /** \brief  Solve the problem  */
       void solve();

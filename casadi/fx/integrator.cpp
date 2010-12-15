@@ -59,9 +59,8 @@ void Integrator::setStopTime(double tf){
   (*this)->setStopTime(tf);
 }
   
-void Integrator::assertNode() const{
-  if(!dynamic_cast<const IntegratorInternal*>(get()))
-    throw CasadiException("Integrator::assertNode");
+bool Integrator::checkNode() const{
+  return dynamic_cast<const IntegratorInternal*>(get());
 }
   
  

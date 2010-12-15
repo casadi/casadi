@@ -84,9 +84,8 @@ void LinearSolver::solve(){
   (*this)->solve();
 }
  
-void LinearSolver::assertNode() const{
-  if(!dynamic_cast<const LinearSolverInternal*>(get()))
-    throw CasadiException("LinearSolver::assertNode");
+bool LinearSolver::checkNode() const{
+  return dynamic_cast<const LinearSolverInternal*>(get());
 }
 
 

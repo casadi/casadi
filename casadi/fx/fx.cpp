@@ -94,13 +94,6 @@ FX FX::hessian(int iind, int oind){
   return (*this)->hessian(iind,oind);  
 }
 
-void FX::assertNode() const{
-  if(!dynamic_cast<const FXNode*>(get()))
-    throw CasadiException("FX::assertNode");
-}
-
-
-
 
 FXNode::FXNode(){
   setOption("name",            "unnamed_function"); // name of the function
@@ -161,6 +154,9 @@ void FXNode::assertInit() const{
     throw CasadiException("FXNode::assertInit: function has not been initialized");
 }
 
+bool FX::checkNode() const{
+  return dynamic_cast<const FXNode*>(get());
+}
 
 FunctionIO& FX::input(int i){
   return (*this)->input(i);

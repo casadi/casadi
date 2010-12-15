@@ -96,8 +96,8 @@ public:
   /** \brief  Set a stop time for the forward integration */
   void setStopTime(double tf);
 
-  /// Assert that the node is pointing to the right type of object
-  void assertNode() const;
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
   
 };
 

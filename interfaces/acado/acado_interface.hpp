@@ -93,7 +93,7 @@ namespace CasADi{
       const AcadoInternal* operator->() const;
       
       /** \brief  Make sure that the pointer points towards a valid object */
-      void assertNode() const;
+      virtual bool checkNode()() const;
 
 };
 

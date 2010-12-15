@@ -145,9 +145,8 @@ void OptionsFunctionality::printOptions(ostream &stream) const{
   (*this)->printOptions(stream);  
 }
   
-void OptionsFunctionality::assertNode() const{
-  if(!dynamic_cast<const OptionsFunctionalityNode*>(get()))
-    throw CasadiException("OptionsFunctionality::assertNode");
+bool OptionsFunctionality::checkNode() const{
+  return dynamic_cast<const OptionsFunctionalityNode*>(get());
 }
 
 } // namespace CasADi

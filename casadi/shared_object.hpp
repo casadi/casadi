@@ -75,7 +75,7 @@ class SharedObject : public PrintableObject{
     bool isNull() const; 
 
     /// Assert that the node is pointing to the right type of object
-    void assertNode() const; // TODO: change to return bool instead of throwing an error? make virtual?
+    virtual bool checkNode() const;
 
     /// Assign the node to something
     void assignNode(SharedObjectNode* node);
@@ -136,8 +136,8 @@ B shared_cast(SharedObject& A){
   //! Assign node of B and return
   ret.assignNode(ptr);
       
-  //! Assert that the node is pointing to the right type of object
-  ret.assertNode();
+  //! Null pointer if not pointing towards the right type of object
+  if(!ret.checkNode()) ret.assignNode(0);
 
   return ret;
 }

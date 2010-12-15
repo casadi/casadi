@@ -77,7 +77,7 @@ class OptionsFunctionality : public SharedObject{
     void printOptions(std::ostream &stream=std::cout) const;
 
   /// Assert that the node is pointing to the right type of object
-    void assertNode() const;
+    virtual bool checkNode() const;
 
 
 };

@@ -1481,9 +1481,8 @@ void SXFunctionNode::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>& out
   }
 }
 
-void SXFunction::assertNode() const{
-  if(!dynamic_cast<const SXFunctionNode*>(get()))
-    throw CasadiException("SXFunction::assertNode");
+bool SXFunction::checkNode() const{
+  return dynamic_cast<const SXFunctionNode*>(get());
 }
 
 SXFunctionNode* SXFunctionNode::clone() const{

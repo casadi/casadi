@@ -45,8 +45,8 @@ class IpoptSolver : public NLPSolver {
     IpoptInternal* operator->();
     const IpoptInternal* operator->() const;
 
-    /// Assert that the node is pointing to the right type of object
-    void assertNode() const;
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
 
     
 };

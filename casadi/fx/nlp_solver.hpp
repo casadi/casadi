@@ -50,8 +50,8 @@ class NLPSolver : public FX{
   NLPSolverInternal* operator->();
   const NLPSolverInternal* operator->() const;
 
-  /// Assert that the node is pointing to the right type of object
-  void assertNode() const;
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
 };
 
 } // namespace CasADi

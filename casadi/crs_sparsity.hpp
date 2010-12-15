@@ -47,8 +47,8 @@ class CRSSparsity : public SharedObject{
     CRSSparsityNode* operator->();
     const CRSSparsityNode* operator->() const;
   
-    /// \brief Assert that the node is pointing to the right type of object
-    void assertNode() const;
+    /// \brief Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
     
     /// \brief Scalar expression
     static const CRSSparsity scalar;

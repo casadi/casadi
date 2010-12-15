@@ -57,9 +57,8 @@ const SimulatorInternal* Simulator::operator->() const{
    return (const SimulatorInternal*)(FX::operator->()); 
 }
 
-void Simulator::assertNode() const{
-  if(!dynamic_cast<const SimulatorInternal*>(get()))
-    throw CasadiException("Simulator::assertNode");
+bool Simulator::checkNode() const{
+  return dynamic_cast<const SimulatorInternal*>(get());
 }
 
 
