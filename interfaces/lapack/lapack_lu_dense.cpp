@@ -73,13 +73,10 @@ void LapackLUDenseInternal::init(){
 
   // Allow equilibration failures
   allow_equilibration_failure_ = getOption("allow_equilibration_failure").toInt();
-  
-  // Has a sucessful factorization been performed?
-  factorization_sucessful_ = false;
 }
 
 void LapackLUDenseInternal::prepare(){
-  factorization_sucessful_ = false;
+  prepared_ = false;
   
   // Get the elements of the matrix, dense format
   input(0).get(mat_,DENSE);
@@ -118,13 +115,10 @@ void LapackLUDenseInternal::prepare(){
   if(info != 0) throw CasadiException("LapackLUDenseInternal::prepare: dgetrf_ failed to factorize the jacobian");
   
   // Sucess if reached this point
-  factorization_sucessful_ = true;
+  prepared_ = true;
 }
     
 void LapackLUDenseInternal::solve(){
-  if(!factorization_sucessful_)
-    throw CasadiException("LapackLUDenseInternal::solve: no sucessful factorization of the matrix available");
-  
   // Input and output vectors
   const vector<double>& b = input(1).data();
   vector<double>& x = output().data();

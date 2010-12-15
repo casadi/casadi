@@ -200,6 +200,9 @@ class IdasInternal : public IntegratorInternal{
 
   // Can calcic be used?
   bool calc_ic_ok_;
+  
+  // Scaling of cj
+  bool cj_scaling_;
 };
 
 

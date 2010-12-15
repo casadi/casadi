@@ -22,6 +22,8 @@
 
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
+#include <interfaces/lapack/lapack_lu_dense.hpp>
+#include <interfaces/superlu/superlu.hpp>
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/simulator.hpp>
 #include <casadi/fx/c_function.hpp>
@@ -57,6 +59,9 @@ const bool perturb_u = true;
 
 // Use a user_defined linear solver
 const bool user_defined_solver = true;
+
+// Use sparse direct solver (SuperLU)
+const bool sparse_direct = false;
 
 // The DAE residual in plain c (for IDAS)
 void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
@@ -165,10 +170,42 @@ Integrator create_IDAS(){
 
   // Create an integrator
   Sundials::IdasIntegrator integrator(ffcn,qfcn);
-  
+
   // Set IDAS specific options
   integrator.setOption("calc_ic",calc_ic);
   integrator.setOption("is_differential",vector<int>(3,1));
+
+  // Formulate the Jacobian system
+  if(user_defined_solver){
+    // Assume we had an SX-function
+    SXFunction f = shared_cast<SXFunction>(ffcn);
+    assert(!f.isNull()); // make sure that the cast was successful
+    
+    // Get the Jacobian in the Newton iteration
+    SX cj("cj");
+    SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
+    
+    // Jacobian function
+    vector<vector<SX> > jac_in(Sundials::JAC_NUM_IN);
+    jac_in[Sundials::JAC_T] = vector<SX>(1,t);
+    jac_in[Sundials::JAC_Y] = y;
+    jac_in[Sundials::JAC_YDOT] = ydot;
+    jac_in[Sundials::JAC_P] = vector<SX>(1,u);
+    jac_in[Sundials::JAC_CJ] = vector<SX>(1,cj);
+    SXFunction J(jac_in,jac);
+    
+    // Create a linear solver (LAPACK LU or SuperLU)
+    LinearSolver linsol;
+    if(sparse_direct)
+      linsol = SuperLU(jac.size1(),jac.size2(),jac.rowind,jac.col);
+    else 
+      linsol = LapackLUDense(jac.size1(),jac.size2(),jac.rowind,jac.col);
+    
+    // Pass to CVodes
+    integrator.setLinearSolver(J,linsol);
+  }
+
+  
   
   // Return the integrator
   return integrator;
@@ -238,8 +275,31 @@ Integrator create_CVODES(){
   
   // Formulate the Jacobian system
   if(user_defined_solver){
-    // This will not work if the 
+    // Assume we had an SX-function
+    SXFunction f = shared_cast<SXFunction>(ffcn);
+    assert(!f.isNull()); // make sure that the cast was successful
     
+    // Get the Jacobian in the Newton iteration
+    SX gamma("gamma");
+    SXMatrix jac = eye(3) - gamma * f.jac(ODE_Y,ODE_RHS);
+
+    // Jacobian function
+    vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
+    jac_in[Sundials::M_T] = vector<SX>(1,t);
+    jac_in[Sundials::M_Y] = y;
+    jac_in[Sundials::M_P] = vector<SX>(1,u);
+    jac_in[Sundials::M_GAMMA] = vector<SX>(1,gamma);
+    SXFunction M(jac_in,jac);
+    
+    // Create a linear solver (LAPACK LU)
+    LinearSolver linsol;
+    if(sparse_direct)
+      linsol = SuperLU(jac.size1(),jac.size2(),jac.rowind,jac.col);
+    else
+      linsol = LapackLUDense(jac.size1(),jac.size2(),jac.rowind,jac.col);
+    
+    // Pass to CVodes
+    integrator.setLinearSolver(M,linsol);
   }
   
   // Return the integrator
@@ -305,7 +365,9 @@ int main(){
   integrator.setOption("exact_jacobian",exact_jacobian);
   integrator.setOption("finite_difference_fsens",finite_difference_fsens);
   integrator.setOption("max_num_steps",100000);
-  //  integrator.setOption("linear_solver","iterative");
+  
+ if(user_defined_solver)
+   integrator.setOption("linear_solver","user_defined");
 
   // Initialize the integrator
   integrator.init();

@@ -61,6 +61,8 @@ void LapackQRDenseInternal::init(){
 }
 
 void LapackQRDenseInternal::prepare(){
+  prepared_ = false;
+  
   // Get the elements of the matrix, dense format
   input(0).get(mat_,DENSE);
   
@@ -69,7 +71,9 @@ void LapackQRDenseInternal::prepare(){
   int lwork = work_.size();
   dgeqrf_(&nrow_, &nrow_, &mat_[0], &nrow_, &tau_[0], &work_[0], &lwork, &info);
   if(info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ failed to factorize the jacobian");
-  
+
+  // Success if reached this point
+  prepared_ = true;
 }
     
 void LapackQRDenseInternal::solve(){

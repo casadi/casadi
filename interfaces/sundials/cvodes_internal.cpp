@@ -97,6 +97,7 @@ void CVodesInternal::init(){
   f_.init();
   if(!q_.isNull()) q_.init();
   if(!M_.isNull()) M_.init();
+  if(!linsol_.isNull()) linsol_.init();
 
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
@@ -1214,7 +1215,7 @@ void CVodesInternal::initUserDefinedLinearSolver(){
   cv_mem->cv_lmem   = this;
   cv_mem->cv_lsetup = lsetup_wrapper;
   cv_mem->cv_lsolve = lsolve_wrapper;
-                                 
+  cv_mem->cv_setupNonNull = TRUE;
 }
 
 

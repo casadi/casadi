@@ -44,6 +44,9 @@ public:
   /// Solve the system of equations
   void solve();
 
+  // Check if prepared
+  bool prepared() const;
+  
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 };
@@ -65,6 +68,9 @@ class LinearSolverInternal : public FXNode{
     
     // Solve the system of equations
     virtual void solve() = 0;
+   
+    // Is prepared
+    bool prepared_;
     
     // Sparsity in CRS format
     int nrow_, ncol_;

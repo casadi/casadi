@@ -44,6 +44,9 @@ LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, const vector<int>
   // Allocate space for outputs
   output_.resize(1);
   output_[0].setSize(ncol,nrhs);
+  
+  // Not prepared
+  prepared_ = false;
 }
 
 
@@ -72,6 +75,11 @@ void LinearSolverInternal::evaluate(int fsens_order, int asens_order){
   
   // Call the solve routine
   prepare();
+  
+  // Make sure preparation successful
+  if(!prepared_) 
+    throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
+  
   solve();
 }
  
@@ -82,6 +90,10 @@ void LinearSolver::prepare(){
 
 void LinearSolver::solve(){
   (*this)->solve();
+}
+ 
+bool LinearSolver::prepared() const{
+  return (*this)->prepared_;
 }
  
 bool LinearSolver::checkNode() const{

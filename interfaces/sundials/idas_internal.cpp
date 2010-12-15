@@ -57,7 +57,8 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
   addOption("fsens_abstolv",               OT_REALVECTOR, Option()); 
   addOption("max_step_size",               OT_REAL, 0); // maximim step size
   addOption("first_time",                  OT_REAL, 1.0); // first requested time (to pass to CalcIC)
-
+  addOption("cj_scaling",                  OT_BOOLEAN, false);  // IDAS scaling on cj for the user-defined linear solver module
+  
   mem_ = 0;
 
   y0_  = y_  = 0; 
@@ -125,6 +126,7 @@ void IdasInternal::init(){
   }
 
   calc_ic_ = getOption("calc_ic").toInt();
+  cj_scaling_ = getOption("cj_scaling").toInt();
   
   // Sundials return flag
   int flag;
@@ -1176,7 +1178,7 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
 
   // Pass right hand side to the linear solver
   linsol_.setInput(NV_DATA_S(rvec),1);
-  
+
   // Solve the (possibly factorized) system 
   linsol_.solve();
   
@@ -1236,6 +1238,8 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
    assert(this_);
    this_->lsolve(IDA_mem,b,weight,ycur,ypcur,rescur);
    return 0;
+  } catch(int wrn){
+    return wrn;
   } catch(exception& e){
     cerr << "lsolve failed: " << e.what() << endl;;
     return -1;
@@ -1265,6 +1269,12 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
   
   // Call the preconditioner solve function (which solves the linear system)
   psolve(t, ycur, ypcur, rescur, b, b, cj, delta, 0);
+  
+  // Scale the correction to account for change in cj
+  if(cj_scaling_){
+    double cjratio = IDA_mem->ida_cjratio;
+    if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
+  }
 }
 
 void IdasInternal::initUserDefinedLinearSolver(){
@@ -1279,7 +1289,7 @@ void IdasInternal::initUserDefinedLinearSolver(){
   IDA_mem->ida_lmem   = this;
   IDA_mem->ida_lsetup = lsetup_wrapper;
   IDA_mem->ida_lsolve = lsolve_wrapper;
-                                 
+  IDA_mem->ida_setupNonNull = TRUE;
 }
 
 

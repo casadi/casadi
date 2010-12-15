@@ -146,6 +146,7 @@ void SuperLUInternal::init(){
 }
 
 void SuperLUInternal::prepare(){
+  prepared_ = true;
   refactor_ = true;
 }
   

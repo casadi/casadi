@@ -94,10 +94,7 @@ class LapackLUDenseInternal : public LinearSolverInternal{
 
     // Allow the equilibration to fail
     bool allow_equilibration_failure_;
-    
-    // Factorization sucessful?
-    bool factorization_sucessful_;
-    
+        
 };
 
 

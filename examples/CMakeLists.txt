@@ -1,6 +1,7 @@
 find_package(IPOPT QUIET)
 find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
+find_package(LAPACK QUIET)
 
 include_directories(../)
 
@@ -53,14 +54,19 @@ add_executable(det_minor det_minor.cpp)
 target_link_libraries(det_minor casadi)
 
 # Sundials - just integrate
-IF(SUNDIALS_FOUND)
+IF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
 add_executable(rocket_sundials rocket_sundials.cpp)
 target_link_libraries(rocket_sundials
   sundials_interface
+  superlu_interface 
+  lapack_interface
   casadi
   ${SUNDIALS_LIBRARIES}
+  ${LAPACK_LIBRARIES}
+  superlu
+  ${BLAS_LIBRARIES}
 )
-ENDIF(SUNDIALS_FOUND)
+ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
 
 
 
