@@ -8,6 +8,9 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_ACADO "Compile the ACADO interface" ON)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 
+# For code optimization
+SET(CMAKE_BUILD_TYPE Release)
+#SET(CMAKE_BUILD_TYPE Debug)
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
@@ -25,7 +28,6 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)

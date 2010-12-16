@@ -37,7 +37,7 @@ using namespace CasADi;
 using namespace std;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = false;
+const bool implicit_integrator = true;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -61,7 +61,7 @@ const bool perturb_u = true;
 const bool user_defined_solver = true;
 
 // Use sparse direct solver (SuperLU)
-const bool sparse_direct = false;
+const bool sparse_direct = true;
 
 // The DAE residual in plain c (for IDAS)
 void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
@@ -78,7 +78,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  assert(fsens_order==0 && asens_order==0); // this function does not contain derivative information
+  if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
   dae_res_c(f.getInputData(DAE_T)[0], &f.getInputData(DAE_Y)[0], &f.getInputData(DAE_YDOT)[0], &f.getInputData(DAE_P)[0], &f.getOutputData(DAE_RES)[0]);
 }
 
@@ -96,7 +96,7 @@ void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
 
 // Wrap the function to allow creating an CasADi function
 void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  assert(fsens_order==0 && asens_order==0); // this function does not contain derivative information
+  if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
   ode_rhs_c(f.getInputData(ODE_T)[0], &f.getInputData(ODE_Y)[0], &f.getInputData(ODE_P)[0], &f.getOutputData(ODE_RHS)[0]);
 }
 

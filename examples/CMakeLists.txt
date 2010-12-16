@@ -55,8 +55,8 @@ target_link_libraries(det_minor casadi)
 
 # Sundials - just integrate
 IF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
-add_executable(rocket_sundials rocket_sundials.cpp)
-target_link_libraries(rocket_sundials
+add_executable(sundials_testing sundials_testing.cpp)
+target_link_libraries(sundials_testing
   sundials_interface
   superlu_interface 
   lapack_interface

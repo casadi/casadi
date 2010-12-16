@@ -48,25 +48,35 @@ class SuperLUInternal : public LinearSolverInternal{
   protected:
     
     // Is initialized
-    bool is_init;
+    bool is_init_;
     
     // Has the solve function been called once
-    bool called_once;
+    bool called_once_;
     
     // SuperLU data structures
-    SuperMatrix A, L, U, B;
+    SuperMatrix A_, L_, U_, B_;
+    superlu_options_t options_;
+    SuperLUStat_t stat_;
 
-    double   *a, *rhs;
-    int      *asub, *xa;
-    int      *perm_r; /* row permutations from partial pivoting */
-    int      *perm_c; /* column permutation vector */
-    int      info, i, permc_spec;
-    superlu_options_t options;
-    SuperLUStat_t stat;
+    // Data
+    std::vector<double> a_, rhs_;
+    std::vector<int> perm_r_; // row permutations from partial pivoting
+    std::vector<int> perm_c_; // column permutation vector
+    int info_;
 
-    // Refactor at next call
-    bool refactor_;
+    std::vector<int> etree_;
     
+    // Work vector
+    void *work_;
+    
+    // Size of work
+    int lwork_;
+    
+    // Free SuperLU memory
+    void unInit();
+
+    // Allocate work vector
+    bool user_work_;
 };
 
 } // namespace CasADi

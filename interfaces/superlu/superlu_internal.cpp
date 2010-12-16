@@ -26,7 +26,7 @@ using namespace std;
 namespace CasADi{
   
 SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs) 
-  : LinearSolverInternal(nrow,ncol,rowind,col,nrhs){
+ : LinearSolverInternal(nrow,ncol,rowind,col,nrhs){
   
   // Add options
   addOption("equil", OT_BOOLEAN, true); // Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).
@@ -39,31 +39,44 @@ SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, 
   addOption("conditionnumber",OT_BOOLEAN,false);
   addOption("rowperm",OT_STRING,"largediag");
   addOption("printstat",OT_BOOLEAN,true);
+  addOption("user_work", OT_BOOLEAN, false); // keep work in memory
       
   // not initialized
-  is_init = false;
+  is_init_ = false;
   
+  // Work vector
+  work_ = 0;
+  lwork_ = 0;
 }
 
 SuperLUInternal::~SuperLUInternal(){
-  if(is_init){
-    Destroy_CompRow_Matrix(&A);
-    Destroy_SuperMatrix_Store(&B);
-    Destroy_SuperNode_Matrix(&L);
-    Destroy_CompCol_Matrix(&U);
-    SUPERLU_FREE (rhs);
-    SUPERLU_FREE (perm_r);
-    SUPERLU_FREE (perm_c);
-    StatFree(&stat);
+  unInit();
+  if(work_) free(work_);
+}
+
+void SuperLUInternal::unInit(){
+  if(is_init_){
+//    Destroy_CompCol_Matrix(&A_); // Not allowed since we allocate all data in stl arrays and pass as pointers
+//    Destroy_SuperMatrix_Store(&B_); // Not allowed since we allocate all data in stl arrays and pass as pointers
+    Destroy_SuperNode_Matrix(&L_);
+    Destroy_CompCol_Matrix(&U_);
+    StatFree(&stat_);
+    is_init_=false;
   }
 }
 
 void SuperLUInternal::init(){
   // Call the init method of the base class
   FXNode::init();
+
+  // Reuse work
+  user_work_ = getOption("user_work").toInt();
+
+  // Free allocated memory, if any
+  unInit();
   
   // Make sure not already initialized
-  if(is_init) throw CasadiException("SuperLU: Already initialized");
+  if(is_init_) throw CasadiException("SuperLU: Already initialized");
 
   // Make sure that the matrix is is square (relax later)
   if(nrow_!=ncol_) throw CasadiException("SuperLU: Not square");
@@ -72,131 +85,157 @@ void SuperLUInternal::init(){
   int nnz = col_.size();
   
   // Allocate SuperLU data structures
-  a = doubleMalloc(nnz);
-  asub = intMalloc(nnz);
-  xa = intMalloc(nrow_+1);
-  rhs = doubleMalloc(nrow_ * nrhs_);
-  perm_r = intMalloc(nrow_);
-  perm_c = intMalloc(ncol_);
-  
-  if(a==0 || asub==0 || xa==0 || rhs==0 || perm_r==0 || perm_c==0) 
-    throw CasadiException("SuperLU: Malloc failed.");
-
-  // Copy the values
-  copy(col_.begin(),col_.end(),asub);
-  copy(rowind_.begin(),rowind_.end(),xa);
+  a_.resize(nnz);
+  rhs_.resize(nrow_ * nrhs_);
+  perm_r_.resize(nrow_);
+  perm_c_.resize(ncol_);
 
   // Create matrices A and B in the format expected by SuperLU.
-  dCreate_CompRow_Matrix(&A, nrow_, ncol_, nnz, a, asub, xa, SLU_NR, SLU_D, SLU_GE);
-  dCreate_Dense_Matrix(&B, nrow_, nrhs_, rhs, nrow_, SLU_DN, SLU_D, SLU_GE);
+  dCreate_CompCol_Matrix(&A_, ncol_, nrow_, nnz, &a_[0], &col_[0], &rowind_[0], SLU_NC, SLU_D, SLU_GE);
+  dCreate_Dense_Matrix(&B_, nrow_, nrhs_, &rhs_[0], nrow_, SLU_DN, SLU_D, SLU_GE);
 
   // Initialize the statistics variables
-  StatInit(&stat);
+  StatInit(&stat_);
 
   // Set the default input options
-  set_default_options(&options);
+  set_default_options(&options_);
 
   // Read column permutation
   Option colperm = getOption("colperm");
-  if(colperm=="natural")            options.ColPerm = ::NATURAL;
-  else if(colperm=="mmd_ata")       options.ColPerm = ::MMD_ATA;
-  else if(colperm=="mmd_at_plus_a") options.ColPerm = ::MMD_AT_PLUS_A;
-  else if(colperm=="colamd")        options.ColPerm = ::COLAMD;
-  else if(colperm=="my_permc")      options.ColPerm = ::MY_PERMC;
+  if(colperm=="natural")            options_.ColPerm = ::NATURAL;
+  else if(colperm=="mmd_ata")       options_.ColPerm = ::MMD_ATA;
+  else if(colperm=="mmd_at_plus_a") options_.ColPerm = ::MMD_AT_PLUS_A;
+  else if(colperm=="colamd")        options_.ColPerm = ::COLAMD;
+  else if(colperm=="my_permc")      options_.ColPerm = ::MY_PERMC;
   else throw CasadiException("SuperLU: Unknown column permutation: " + colperm.toString());
 
   // Read transpose
-  options.Trans = getOption("trans").toInt() ? ::TRANS : ::NOTRANS;
+  options_.Trans = getOption("trans").toInt() ? ::NOTRANS : ::TRANS; // swap due to row-major/col-major
 
   // Iterataive refinement
   Option iterrefine = getOption("iterrefine");
-  if(iterrefine=="norefine" || iterrefine=="no")  options.IterRefine = ::NOREFINE; // user guide is inconsistent, allow both possibilties
-  else if(iterrefine=="single")                   options.IterRefine = ::SINGLE;
-  else if(iterrefine=="double")                   options.IterRefine = ::DOUBLE;
-  else if(iterrefine=="extra")                    options.IterRefine = ::EXTRA;
+  if(iterrefine=="norefine" || iterrefine=="no")  options_.IterRefine = ::NOREFINE; // user guide is inconsistent, allow both possibilties
+  else if(iterrefine=="single")                   options_.IterRefine = ::SINGLE;
+  else if(iterrefine=="double")                   options_.IterRefine = ::DOUBLE;
+  else if(iterrefine=="extra")                    options_.IterRefine = ::EXTRA;
   else throw CasadiException("SuperLU: Unknown iterative refinement: " + iterrefine.toString());
 
   // Specifies the threshold used for a diagonal entry to be an acceptable pivot.
-  options.DiagPivotThresh = getOption("diagpivotthresh").toDouble();
+  options_.DiagPivotThresh = getOption("diagpivotthresh").toDouble();
   
   // Specifies whether to use the symmetric mode. Symmetric mode gives preference to diagonal pivots, and uses an (AT + A)-based column permutation algorithm.
-  options.SymmetricMode = getOption("symmetricmode").toInt() ? YES : NO;
+  options_.SymmetricMode = getOption("symmetricmode").toInt() ? YES : NO;
 
   // Specifies whether to compute the reciprocal pivot growth.
-  options.PivotGrowth = getOption("pivotgrowth").toInt() ? YES : NO;
+  options_.PivotGrowth = getOption("pivotgrowth").toInt() ? YES : NO;
 
   // Specifies whether to compute the reciprocal condition number.
-  options.ConditionNumber = getOption("conditionnumber").toInt() ? YES : NO;
+  options_.ConditionNumber = getOption("conditionnumber").toInt() ? YES : NO;
   
   // Specifies whether to permute the rows of the original matrix.
   Option rowperm = getOption("rowperm");
-  if(rowperm=="no" || rowperm=="norowperm")    options.RowPerm = ::NOROWPERM; 
-  else if(rowperm=="largediag")                options.RowPerm = ::LargeDiag;
-  else if(rowperm=="my_permr")                 options.RowPerm = ::MY_PERMR;
+  if(rowperm=="no" || rowperm=="norowperm")    options_.RowPerm = ::NOROWPERM; 
+  else if(rowperm=="largediag")                options_.RowPerm = ::LargeDiag;
+  else if(rowperm=="my_permr")                 options_.RowPerm = ::MY_PERMR;
   else throw CasadiException("SuperLU: Unknown row permutation: " + rowperm.toString());
 
   // Specifies which version of modified ILU to use.
-  options.PrintStat = getOption("printstat").toInt() ? YES : NO;
+  options_.PrintStat = getOption("printstat").toInt() ? YES : NO;
+  
+  // Elimination tree
+  etree_.resize(A_.ncol);
   
   // Set to initialized
-  is_init = true;
+  is_init_ = true;
   
   // Has the routine been called once
-  called_once = false;
+  called_once_ = false;
+
+  // Internal work
+  work_ = 0;
+
+  // length of work vector
+  lwork_ = 0; 
 }
 
 void SuperLUInternal::prepare(){
+  prepared_ = false;
+
+  // Copy the non-zero entries
+  const vector<double>& val = input(0).data();
+  copy(val.begin(),val.end(),a_.begin());
+
+  SuperMatrix AC;
+  get_perm_c(options_.ColPerm, &A_, &perm_c_[0]);
+  sp_preorder(&options_, &A_, &perm_c_[0], &etree_[0], &AC);
+
+  int panel_size = sp_ienv(1);
+  int relax = sp_ienv(2); // no of columns in a relaxed snodes
+
+  // If no work array, estimate the needed size
+if (user_work_){
+  if(!lwork_){
+    int sz = 0;
+    lwork_ = -1;
+    dgstrf(&options_, &AC, relax, panel_size, &etree_[0], work_, lwork_, &perm_c_[0], &perm_r_[0], &L_, &U_, &stat_, &sz);
+    lwork_ = sz; // - A->ncol;
+    if(work_) free(work_);
+    work_ = malloc(lwork_);
+  }
+} // user_work_    
+    
+  // Compute the LU factorization of A
+  do{
+    info_ = 0;
+    dgstrf(&options_, &AC, relax, panel_size, &etree_[0], work_, lwork_, &perm_c_[0], &perm_r_[0], &L_, &U_, &stat_, &info_);
+
+    if(info_<0){
+      stringstream ss;
+      ss << "SuperLU: The " << (-info_) << "-th argument had an illegal value" << endl;
+      throw CasadiException(ss.str());
+    } else if(info_>0){
+      if(info_<=A_.ncol){
+        stringstream ss;
+        ss << "SuperLU: U(" << info_ << "," << info_ << ") is exactly zero. "
+        "The factorization has been completed, but the factor U is exactly singular, "
+        "and division by zero will occur if it is used to solve a system of equations.";
+        throw CasadiException(ss.str());
+      } else {
+        if (user_work_){
+          // Allocate more memory and repeat
+          cout << "Allocating more memory" << endl;
+          lwork_ *= 2;
+          work_ = realloc(work_,lwork_);
+        } else { // user_work_
+          stringstream ss;
+          ss << "SuperLU: Allocation failed after " << (info_-A_.ncol) << " bytes allocated";
+          throw CasadiException(ss.str());
+        } // user_work_    
+      }
+    }
+  } while(info_!=0);
+  
+  // Destroy temporary memory
+  Destroy_CompCol_Permuted(&AC);
+
+  called_once_ = true;
   prepared_ = true;
-  refactor_ = true;
 }
   
 void SuperLUInternal::solve(){
-  // Copy the non-zero entries
-  const vector<double>& val = input(0).data();
-  copy(val.begin(),val.end(),a);
-
   // Copy the right hand side
   const vector<double>& b = input(1).data();
-  copy(b.begin(),b.end(),rhs);
-
-  // Choose factorization
-  if(called_once){
-    if(refactor_){
-      options.Fact = DOFACT;
-      // options.Fact = SamePattern; // DOESN'T WORK - BUG?
-      //   options.Fact = SamePattern_SameRowPerm;
-    } else {
-      options.Fact = DOFACT;
-      // options.Fact = FACTORED; // DOESN'T WORK - BUG?
-    }
-  } else {
-    options.Fact = DOFACT;
-  }
-
-  // Solve the linear system
-  dgssv(&options, &A, perm_c, perm_r, &L, &U, &B, &stat, &info);
-  if(info!=0){
-    stringstream ss;
-    ss << "SuperLU: dgssv failed with flag=" << info << ".";
-    throw CasadiException(ss.str());
-  }
+  copy(b.begin(),b.end(),rhs_.begin());
+    
+  // Solve the system A*X=B, overwriting B with X. 
+  info_ = 0;
+  dgstrs(options_.Trans, &L_, &U_, &perm_c_[0], &perm_r_[0], &B_, &stat_, &info_);
+  if(info_ != 0) throw CasadiException("dgstrs failed");
 
   // Copy the result
   vector<double>& res = output(0).data();
-  copy(rhs,rhs+res.size(),res.begin());
-  
-/*  dPrint_CompCol_Matrix(const_cast<char*>("A"), &A);
-  dPrint_CompCol_Matrix(const_cast<char*>("U"), &U);
-  dPrint_SuperNode_Matrix(const_cast<char*>("L"), &L);
-  print_int_vec(const_cast<char*>("\nperm_r"), nrow_, perm_r);*/
-
-  called_once = true;
-  refactor_ = false;
+  copy(rhs_.begin(),rhs_.end(),res.begin());
 }
 
   
 } // namespace CasADi
-
-  
-
-
