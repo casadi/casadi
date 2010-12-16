@@ -80,6 +80,9 @@ public:
   /// Current time
   double t_;
 
+  // Do not integrate past the end point
+  bool stop_at_end_;
+  
   //@{
   /// options
   bool exact_jacobian_;

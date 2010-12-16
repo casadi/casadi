@@ -46,6 +46,7 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("sensitivity_method",          OT_STRING,  "simultaneous"); // "simultaneous" or "staggered"
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
+  addOption("stop_at_end",                 OT_BOOLEAN, false); // Stop the integrator at the end of the interval
 
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,false); // should the quadratures affect the step size control
@@ -96,7 +97,8 @@ void IntegratorInternal::evaluate(int fsens_order, int asens_order){
   reset(fsens_order, asens_order);
 
   // Set the stop time of the integration -- don't integrate past this point
-  // setStopTime(tf);
+  if(stop_at_end_)
+    setStopTime(tf);
 
   // Advance solution in time
   integrate(tf);
@@ -124,6 +126,7 @@ void IntegratorInternal::init(){
   fsens_reltol_ = hasSetOption("fsens_reltol") ? getOption("fsens_reltol").toDouble() : reltol_;
   asens_abstol_ = hasSetOption("asens_abstol") ? getOption("asens_abstol").toDouble() : abstol_;
   asens_reltol_ = hasSetOption("asens_reltol") ? getOption("asens_reltol").toDouble() : reltol_;
+  stop_at_end_ = getOption("stop_at_end").toInt();
 }
 
 

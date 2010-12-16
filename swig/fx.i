@@ -153,8 +153,15 @@ public:
   //Integrate until a specified time point 
   void integrate(double t_out);
 
+  // Reset the solver of the adjoint problem and take time to tf 
+  void resetAdj();
+
+  // Integrate backwards in time until a specified time point 
+  void integrateAdj(double t_out);
+
   // Set a stop time for the forward integration 
   void setStopTime(double tf);  
+
 };
 
 // Indices of the inputs of the output function

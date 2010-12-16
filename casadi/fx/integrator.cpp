@@ -67,6 +67,15 @@ void Integrator::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   (*this)->setLinearSolver(linsol,jac);
 }
 
+void Integrator::resetAdj(){
+  (*this)->resetAdj();
+}
+
+void Integrator::integrateAdj(double t_out){
+  (*this)->integrateAdj(t_out);
+}
+
+
   
  
 } // namespace CasADi

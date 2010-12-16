@@ -94,6 +94,12 @@ public:
   /** \brief  Integrate until a specified time point */
   void integrate(double t_out);
 
+  /** \brief  Reset the solver of the adjoint problem and take time to tf */
+  void resetAdj();
+
+  /** \brief  Integrate backwards in time until a specified time point */
+  void integrateAdj(double t_out);
+
   /** \brief  Set a stop time for the forward integration */
   void setStopTime(double tf);
 
