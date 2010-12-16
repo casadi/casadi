@@ -60,7 +60,7 @@ public:
   explicit CVodesIntegrator(const FX& f, const FX& q=FX());
   
   /** \brief  Set the linear solver */
-  void setLinearSolver(const FX& M, LinearSolver& linsol);
+  void setLinearSolver(const FX& M, const LinearSolver& linsol);
   
   /** \brief  Access functions of the node */
   CVodesInternal* operator->();

@@ -43,9 +43,9 @@ const IdasInternal* IdasIntegrator::operator->() const{
   return (const IdasInternal*)(FX::operator->());
 }
 
-void IdasIntegrator::setLinearSolver(const FX& jac, const FX& linsol){
+void IdasIntegrator::setLinearSolver(const FX& jac, const LinearSolver& linsol){
   (*this)->jac_ = jac;
-  (*this)->linsol_ = shared_cast<LinearSolver>(linsol);
+  (*this)->linsol_ = linsol;
 }
 
 bool IdasIntegrator::checkNode() const{

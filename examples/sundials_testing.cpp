@@ -310,25 +310,6 @@ int main(){
   // Time horizon
   double t0 = 0,  tf = 10;
   
-  // Time 
-  SX t("t");
-
-  // Differential states
-  SX s("s"), v("v"), m("m");
-  vector<SX> y(3); 
-  y[0] = s;
-  y[1] = v;
-  y[2] = m;
-
-  // Control
-  SX u("u");
-
-  // Differential equation
-  vector<SX> rhs(3);
-  rhs[0] = v;              // sdot
-  rhs[1] = (u-0.02*v*v)/m; // vdot
-  rhs[2] = -0.01*u*u;      // mdot
-  
   // Bounds on the control
   double u_lb = -0.5, u_ub = 1.3, u_init = 1;
 
@@ -338,13 +319,6 @@ int main(){
   y0[1] = 0;
   y0[2] = 1;
   
-  // Reference trajectory
-  SX u_ref = 3-sin(t);
-  
-  // Square deviation from the state trajectory
-  SX u_dev = u-u_ref;
-  u_dev *= u_dev;
-
   // Full state (includes quadratures)
   vector<double> x0=y0;
   x0.push_back(0);
@@ -411,14 +385,14 @@ int main(){
   integrator.printStats();
 
   // Calculate finite difference approximation
-  vector<double> fd = integrator.output().data();
+  vector<double> fd = integrator.getOutputData();
   for(int i=0; i<fd.size(); ++i){
     fd[i] -= res0[i];
     fd[i] /= 0.01;
   }
   
   cout << "unperturbed                     " << res0 << endl;
-  cout << "perturbed                       " << integrator.output().data() << endl;
+  cout << "perturbed                       " << integrator.getOutputData() << endl;
   cout << "finite_difference approximation " << fd << endl;
 
   if(perturb_u){
@@ -442,7 +416,7 @@ int main(){
 
   if(with_asens){
     // backward seeds
-    vector<double> &bseed = integrator.output(INTEGRATOR_XF).dataA();
+    vector<double> &bseed = integrator.getAdjSeedData(INTEGRATOR_XF);
     fill(bseed.begin(),bseed.end(),0);
     bseed[0] = 1;
 
@@ -453,15 +427,15 @@ int main(){
     integrator.evaluate(1,0);
   }
     
-  vector<double> &fsens = integrator.output().dataF();
+  vector<double> &fsens = integrator.getFwdSensData();
   cout << "forward sensitivities           " << fsens << endl;
 
   if(with_asens){
     cout << "adjoint sensitivities           ";
-    cout << integrator.input(INTEGRATOR_T0).dataA() << "; ";
-    cout << integrator.input(INTEGRATOR_TF).dataA() << "; ";
-    cout << integrator.input(INTEGRATOR_X0).dataA() << "; ";
-    cout << integrator.input(INTEGRATOR_P).dataA() << "; ";
+    cout << integrator.getAdjSensData(INTEGRATOR_T0) << "; ";
+    cout << integrator.getAdjSensData(INTEGRATOR_TF) << "; ";
+    cout << integrator.getAdjSensData(INTEGRATOR_X0) << "; ";
+    cout << integrator.getAdjSensData(INTEGRATOR_P) << "; ";
     cout << endl;
   }
   

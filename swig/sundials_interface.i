@@ -6,11 +6,11 @@
 namespace CasADi{
 namespace Sundials{
 
-/// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
-enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
+/// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
+enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
 
-/// Output arguments of an DAE residual function 
-enum JACOutput{JAC_J, JAC_NUM_OUT};
+/// Output arguments of the Jacobian function
+enum MOutput{M_M, M_NUM_OUT};
 
 class CVodesIntegrator : public Integrator{
   public:
@@ -19,7 +19,16 @@ class CVodesIntegrator : public Integrator{
 
     /// Create an integrator for explicit ODEs 
     explicit CVodesIntegrator(const FX& f, const FX& q=FX());
+
+    /// Set linear solver
+    void setLinearSolver(const FX& M, const LinearSolver& linsol);
 };
+
+/// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
+enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
+
+/// Output arguments of an DAE residual function 
+enum JACOutput{JAC_J, JAC_NUM_OUT};
 
 class IdasIntegrator : public Integrator{
 public:
@@ -30,7 +39,7 @@ public:
     explicit IdasIntegrator(const FX& f, const FX& q=FX());
 
     /// Set linear solver
-    void setLinearSolver(const FX& jacx, const FX& linsol);
+    void setLinearSolver(const FX& jacx, const LinearSolver& linsol);
 };
 
 } // namespace Sundials

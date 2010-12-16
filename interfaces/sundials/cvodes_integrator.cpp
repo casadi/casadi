@@ -42,7 +42,7 @@ const CVodesInternal* CVodesIntegrator::operator->() const{
   return (const CVodesInternal*)(FX::operator->());
 
 }
-void CVodesIntegrator::setLinearSolver(const FX& M, LinearSolver& linsol){
+void CVodesIntegrator::setLinearSolver(const FX& M, const LinearSolver& linsol){
   (*this)->M_= M;
   (*this)->linsol_ = linsol;
 }
