@@ -42,10 +42,6 @@ const CVodesInternal* CVodesIntegrator::operator->() const{
   return (const CVodesInternal*)(FX::operator->());
 
 }
-void CVodesIntegrator::setLinearSolver(const FX& M, const LinearSolver& linsol){
-  (*this)->M_= M;
-  (*this)->linsol_ = linsol;
-}
 
 bool CVodesIntegrator::checkNode() const{
   return dynamic_cast<const CVodesInternal*>(get());

@@ -19,9 +19,6 @@ class CVodesIntegrator : public Integrator{
 
     /// Create an integrator for explicit ODEs 
     explicit CVodesIntegrator(const FX& f, const FX& q=FX());
-
-    /// Set linear solver
-    void setLinearSolver(const FX& M, const LinearSolver& linsol);
 };
 
 /// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
@@ -37,9 +34,6 @@ public:
     
     /// Create an integrator for fully implicit DAEs
     explicit IdasIntegrator(const FX& f, const FX& q=FX());
-
-    /// Set linear solver
-    void setLinearSolver(const FX& jacx, const LinearSolver& linsol);
 };
 
 } // namespace Sundials

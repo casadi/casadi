@@ -25,8 +25,7 @@
 using namespace std;
 namespace CasADi{
   
-SuperLUInternal::SuperLUInternal(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs) 
- : LinearSolverInternal(nrow,ncol,rowind,col,nrhs){
+SuperLUInternal::SuperLUInternal(int nrow, int ncol, int nrhs)  : LinearSolverInternal(nrow,ncol,nrhs){
   
   // Add options
   addOption("equil", OT_BOOLEAN, true); // Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).

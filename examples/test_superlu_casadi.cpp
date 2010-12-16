@@ -47,7 +47,8 @@ main(int argc, char *argv[])
   rowind[0] = 0; rowind[1] = 3; rowind[2] = 6; rowind[3] = 8; rowind[4] = 10; rowind[5] = 12;
   
   // Create a solver instance
-  SuperLU linear_solver(nrow,ncol,rowind,col);
+  SuperLU linear_solver(nrow,ncol);
+  linear_solver.setSparsity(rowind,col);
   
   // Set options
   linear_solver.setOption("colperm", "natural");

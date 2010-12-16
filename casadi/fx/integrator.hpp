@@ -25,6 +25,7 @@
 
 #include "../expression_tools.hpp"
 #include "fx.hpp"
+#include "casadi/fx/linear_solver.hpp"
 
 namespace CasADi{
 
@@ -98,6 +99,9 @@ public:
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+
+  /** \brief  Set linear solver */
+  void setLinearSolver(const LinearSolver& linsol, const FX& jac=FX());
   
 };
 

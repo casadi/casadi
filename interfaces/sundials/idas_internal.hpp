@@ -203,6 +203,9 @@ class IdasInternal : public IntegratorInternal{
   
   // Scaling of cj
   bool cj_scaling_;
+
+  // Set linear solver
+  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
 };
 
 

@@ -62,6 +62,11 @@ void Integrator::setStopTime(double tf){
 bool Integrator::checkNode() const{
   return dynamic_cast<const IntegratorInternal*>(get());
 }
+
+void Integrator::setLinearSolver(const LinearSolver& linsol, const FX& jac){
+  (*this)->setLinearSolver(linsol,jac);
+}
+
   
  
 } // namespace CasADi

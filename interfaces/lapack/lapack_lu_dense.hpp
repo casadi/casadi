@@ -38,7 +38,7 @@ public:
   LapackLUDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackLUDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
+  LapackLUDense(int nrow, int ncol, int nrhs=1);
     
   /// Access functions of the node
   LapackLUDenseInternal* operator->();
@@ -61,7 +61,7 @@ extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *
 class LapackLUDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+    LapackLUDenseInternal(int nrow, int ncol, int nrhs);
 
     // Destructor
     virtual ~LapackLUDenseInternal();

@@ -14,7 +14,7 @@ namespace CasADi{
       LapackLUDense();
 
       /// Create a linear solver given a sparsity pattern
-      LapackLUDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
+      LapackLUDense(int nrow, int ncol, int nrhs=1);
   
   };
 
@@ -27,7 +27,7 @@ namespace CasADi{
       LapackQRDense();
 
       /// Create a linear solver given a sparsity pattern
-      LapackQRDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
+      LapackQRDense(int nrow, int ncol, int nrhs=1);
   
   };
 } // namespace CasADi

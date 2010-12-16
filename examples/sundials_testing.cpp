@@ -37,7 +37,7 @@ using namespace CasADi;
 using namespace std;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = true;
+const bool implicit_integrator = false;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -174,38 +174,6 @@ Integrator create_IDAS(){
   // Set IDAS specific options
   integrator.setOption("calc_ic",calc_ic);
   integrator.setOption("is_differential",vector<int>(3,1));
-
-  // Formulate the Jacobian system
-  if(user_defined_solver){
-    // Assume we had an SX-function
-    SXFunction f = shared_cast<SXFunction>(ffcn);
-    assert(!f.isNull()); // make sure that the cast was successful
-    
-    // Get the Jacobian in the Newton iteration
-    SX cj("cj");
-    SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
-    
-    // Jacobian function
-    vector<vector<SX> > jac_in(Sundials::JAC_NUM_IN);
-    jac_in[Sundials::JAC_T] = vector<SX>(1,t);
-    jac_in[Sundials::JAC_Y] = y;
-    jac_in[Sundials::JAC_YDOT] = ydot;
-    jac_in[Sundials::JAC_P] = vector<SX>(1,u);
-    jac_in[Sundials::JAC_CJ] = vector<SX>(1,cj);
-    SXFunction J(jac_in,jac);
-    
-    // Create a linear solver (LAPACK LU or SuperLU)
-    LinearSolver linsol;
-    if(sparse_direct)
-      linsol = SuperLU(jac.size1(),jac.size2(),jac.rowind,jac.col);
-    else 
-      linsol = LapackLUDense(jac.size1(),jac.size2(),jac.rowind,jac.col);
-    
-    // Pass to CVodes
-    integrator.setLinearSolver(J,linsol);
-  }
-
-  
   
   // Return the integrator
   return integrator;
@@ -273,35 +241,6 @@ Integrator create_CVODES(){
   // Create an integrator
   Sundials::CVodesIntegrator integrator(ffcn,qfcn);
   
-  // Formulate the Jacobian system
-  if(user_defined_solver){
-    // Assume we had an SX-function
-    SXFunction f = shared_cast<SXFunction>(ffcn);
-    assert(!f.isNull()); // make sure that the cast was successful
-    
-    // Get the Jacobian in the Newton iteration
-    SX gamma("gamma");
-    SXMatrix jac = eye(3) - gamma * f.jac(ODE_Y,ODE_RHS);
-
-    // Jacobian function
-    vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
-    jac_in[Sundials::M_T] = vector<SX>(1,t);
-    jac_in[Sundials::M_Y] = y;
-    jac_in[Sundials::M_P] = vector<SX>(1,u);
-    jac_in[Sundials::M_GAMMA] = vector<SX>(1,gamma);
-    SXFunction M(jac_in,jac);
-    
-    // Create a linear solver (LAPACK LU)
-    LinearSolver linsol;
-    if(sparse_direct)
-      linsol = SuperLU(jac.size1(),jac.size2(),jac.rowind,jac.col);
-    else
-      linsol = LapackLUDense(jac.size1(),jac.size2(),jac.rowind,jac.col);
-    
-    // Pass to CVodes
-    integrator.setLinearSolver(M,linsol);
-  }
-  
   // Return the integrator
   return integrator;
 }
@@ -325,6 +264,14 @@ int main(){
 
   // Integrator
   Integrator integrator = implicit_integrator ? create_IDAS() : create_CVODES();
+  
+  // Attach user-defined linear solver
+  if(user_defined_solver){
+    if(sparse_direct)
+      integrator.setLinearSolver(SuperLU(y0.size(),y0.size()));
+    else 
+      integrator.setLinearSolver(LapackLUDense(y0.size(),y0.size()));
+  }
   
   // Set common integrator options
   integrator.setOption("ad_order",1);

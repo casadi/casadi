@@ -96,6 +96,31 @@ void CVodesInternal::init(){
   // Init ODE rhs function and quadrature functions
   f_.init();
   if(!q_.isNull()) q_.init();
+
+  // Try to generate a jacobian of none provided
+  if(!linsol_.isNull() && M_.isNull()){
+    SXFunction f = shared_cast<SXFunction>(f_);
+    if(!f.isNull()){
+      // Get the Jacobian in the Newton iteration
+      SX gamma("gamma");
+      SXMatrix jac = eye(ny_) - gamma * f.jac(ODE_Y,ODE_RHS);
+      
+      // Jacobian function
+      vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
+      jac_in[M_T] = f->inputv.at(ODE_T);
+      jac_in[M_Y] = f->inputv.at(ODE_Y);
+      jac_in[M_P] = f->inputv.at(ODE_P);
+      jac_in[M_GAMMA] = vector<SX>(1,gamma);
+      SXFunction M(jac_in,jac);
+      
+      // Pass sparsity to linear solver
+      linsol_.setSparsity(jac.rowind,jac.col);
+      
+      // Save function
+      M_ = M;
+    }
+  }
+  
   if(!M_.isNull()) M_.init();
   if(!linsol_.isNull()) linsol_.init();
 
@@ -1216,6 +1241,11 @@ void CVodesInternal::initUserDefinedLinearSolver(){
   cv_mem->cv_lsetup = lsetup_wrapper;
   cv_mem->cv_lsolve = lsolve_wrapper;
   cv_mem->cv_setupNonNull = TRUE;
+}
+
+void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
+  linsol_ = linsol;
+  M_ = jac;
 }
 
 

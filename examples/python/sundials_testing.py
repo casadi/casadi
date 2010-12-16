@@ -103,32 +103,6 @@ def create_IDAS():
   integrator.setOption("calc_ic",calc_ic)
   integrator.setOption("is_differential",[1,1,1])
 
-  # Formulate the Jacobian system
-  if user_defined_solver:
-    # Get the Jacobian in the Newton iteration
-    cj = SX("cj")
-    jac = ffcn.jac(DAE_Y,DAE_RES) + cj*ffcn.jac(DAE_YDOT,DAE_RES)
-    
-    # Jacobian function
-    jac_in = JAC_NUM_IN * [SXMatrix()]
-    jac_in[JAC_T] = SXMatrix(t)
-    jac_in[JAC_Y] = SXMatrix(y)
-    jac_in[JAC_YDOT] = SXMatrix(ydot)
-    jac_in[JAC_P] = SXMatrix(u)
-    jac_in[JAC_CJ] = SXMatrix(cj)
-    J = SXFunction(jac_in,[jac])
-    
-    # Create a linear solver (LAPACK LU or SuperLU)
-    rowind = jac.getRowInd()
-    col = jac.getCol()
-    if sparse_direct:
-      linsol = SuperLU(jac.size1(),jac.size2(),rowind,col)
-    else:
-      linsol = LapackLUDense(jac.size1(),jac.size2(),rowind,col)
-    
-    # Pass to CVodes
-    integrator.setLinearSolver(J,linsol)
-
   # Return the integrator
   return integrator
 
@@ -173,34 +147,6 @@ def create_CVODES():
   # Create an integrator
   integrator = CVodesIntegrator(ffcn,qfcn)
   
-  # Formulate the Jacobian system
-  if user_defined_solver:
-    # Get the Jacobian in the Newton iteration
-    gamma = SX("gamma")
-    jac = SXMatrix(3,3)
-    for i in range(3):
-      jac[i,i] = 1
-    jac -= gamma * ffcn.jac(ODE_Y,ODE_RHS)
-
-    # Jacobian function
-    jac_in = M_NUM_IN * [SXMatrix()]
-    jac_in[M_T] = SXMatrix(t)
-    jac_in[M_Y] = SXMatrix(y)
-    jac_in[M_P] = SXMatrix(u)
-    jac_in[M_GAMMA] = SXMatrix(gamma)
-    M = SXFunction(jac_in,[jac])
-    
-    # Create a linear solver (LAPACK LU)
-    rowind = jac.getRowInd()
-    col = jac.getCol()
-    if sparse_direct:
-      linsol = SuperLU(jac.size1(),jac.size2(),rowind,col)
-    else:
-      linsol = LapackLUDense(jac.size1(),jac.size2(),rowind,col)
-    
-    # Pass to CVodes
-    integrator.setLinearSolver(M,linsol)
-  
   # Return the integrator
   return integrator
 
@@ -225,6 +171,13 @@ if implicit_integrator:
   integrator = create_IDAS()
 else:
   integrator = create_CVODES()
+
+# Attach user-defined linear solver
+if user_defined_solver:
+  if sparse_direct:
+    integrator.setLinearSolver(SuperLU(len(y0),len(y0)))
+  else:
+    integrator.setLinearSolver(LapackLUDense(len(y0),len(y0)))
 
 # Set common integrator options
 integrator.setOption("ad_order",1)

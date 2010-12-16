@@ -28,8 +28,8 @@ namespace CasADi{
 SuperLU::SuperLU(){
 }
 
-SuperLU::SuperLU(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs){
-  assignNode(new SuperLUInternal(nrow,ncol,rowind,col,nrhs));
+SuperLU::SuperLU(int nrow, int ncol, int nrhs){
+  assignNode(new SuperLUInternal(nrow,ncol,nrhs));
 }
  
 SuperLUInternal* SuperLU::operator->(){

@@ -38,7 +38,7 @@ public:
   LapackQRDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackQRDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
+  LapackQRDense(int nrow, int ncol, int nrhs=1);
     
   /// Access functions of the node
   LapackQRDenseInternal* operator->();
@@ -58,7 +58,7 @@ extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m,
 class LapackQRDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+    LapackQRDenseInternal(int nrow, int ncol, int nrhs);
 
     // Destructor
     virtual ~LapackQRDenseInternal();

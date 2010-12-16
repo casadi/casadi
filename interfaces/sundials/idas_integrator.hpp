@@ -24,7 +24,6 @@
 #define IDAS_INTEGRATOR_HPP
 
 #include "casadi/fx/integrator.hpp"
-#include "casadi/fx/linear_solver.hpp"
 
 /** Integrator where the differential equation is assumed to be in the form:
 
@@ -63,9 +62,6 @@ public:
   /** \brief  Access functions of the node */
   IdasInternal* operator->();
   const IdasInternal* operator->() const;
-  
-  /** \brief  Set linear solver */
-  void setLinearSolver(const FX& jac, const LinearSolver& linsol);
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;

@@ -33,11 +33,10 @@ const LinearSolverInternal* LinearSolver::operator->() const{
     return static_cast<const LinearSolverInternal*>(FX::operator->());
 }
 
-LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, const vector<int>& rowind, const vector<int>& col, int nrhs) : nrow_(nrow), ncol_(ncol), rowind_(rowind), col_(col), nrhs_(nrhs){
+LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, int nrhs) : nrow_(nrow), ncol_(ncol), nrhs_(nrhs){
   // Allocate space for inputs
   input_.resize(2);
   input_[0].setSize(nrow,ncol);
-  input_[0].setSparsityCRS(rowind, col);
   
   input_[1].setSize(nrow,nrhs); // right hand side
   
@@ -49,6 +48,11 @@ LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, const vector<int>
   prepared_ = false;
 }
 
+void LinearSolver::setSparsity(const std::vector<int>& rowind, const std::vector<int>& col){
+  (*this)->rowind_ = rowind;
+  (*this)->col_ = col;
+  input(0).setSparsityCRS(rowind, col);
+}
 
 LinearSolverInternal::~LinearSolverInternal(){
 }

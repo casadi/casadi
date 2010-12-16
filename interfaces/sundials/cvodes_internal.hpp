@@ -180,6 +180,9 @@ public:
   // Set the user defined linear solver
   void initUserDefinedLinearSolver();
 
+  // Set linear solver
+  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
+
 };
 
 

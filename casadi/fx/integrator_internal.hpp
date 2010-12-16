@@ -42,6 +42,9 @@ public:
   /** \brief  Clone */
   virtual IntegratorInternal* clone() const=0;
   
+  /** \brief  Set linear solver */
+  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac)=0;
+  
   /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const = 0;
 

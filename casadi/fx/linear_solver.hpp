@@ -37,6 +37,9 @@ public:
   /// Access functions of the node
   LinearSolverInternal* operator->();
   const LinearSolverInternal* operator->() const;
+
+  /// Set sparsity (before initialization)
+  void setSparsity(const std::vector<int>& rowind, const std::vector<int>& col);
   
   /// Factorize the matrix
   void prepare();
@@ -55,8 +58,8 @@ public:
 class LinearSolverInternal : public FXNode{
   public:
     // Constructor
-    LinearSolverInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
-    
+    LinearSolverInternal(int nrow, int ncol, int nrhs);
+        
     // Destructor
     virtual ~LinearSolverInternal() = 0;
     

@@ -38,7 +38,7 @@ public:
   SuperLU();
   
   /// Create a linear solver given a sparsity pattern
-  SuperLU(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs=1);
+  SuperLU(int nrow, int ncol, int nrhs=1);
     
   /** \brief  Access functions of the node */
   SuperLUInternal* operator->();

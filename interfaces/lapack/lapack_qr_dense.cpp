@@ -28,8 +28,8 @@ namespace CasADi{
 LapackQRDense::LapackQRDense(){
 }
 
-LapackQRDense::LapackQRDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs){
-  assignNode(new LapackQRDenseInternal(nrow,ncol,rowind,col,nrhs));
+LapackQRDense::LapackQRDense(int nrow, int ncol, int nrhs){
+  assignNode(new LapackQRDenseInternal(nrow,ncol,nrhs));
 }
  
 LapackQRDenseInternal* LapackQRDense::operator->(){
@@ -40,8 +40,7 @@ const LapackQRDenseInternal* LapackQRDense::operator->() const{
   return static_cast<const LapackQRDenseInternal*>(FX::operator->());
 }
 
-LapackQRDenseInternal::LapackQRDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs)
-  : LinearSolverInternal(nrow,ncol,rowind,col,nrhs){
+LapackQRDenseInternal::LapackQRDenseInternal(int nrow, int ncol, int nrhs) : LinearSolverInternal(nrow,ncol,nrhs){
     
   // Currently only square matrices tested
   if(nrow!=ncol) throw CasadiException("LapackQRDenseInternal::LapackQRDenseInternal: currently only square matrices implemented.");

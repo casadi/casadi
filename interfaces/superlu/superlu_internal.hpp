@@ -31,7 +31,7 @@ namespace CasADi{
 class SuperLUInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    SuperLUInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs);
+    SuperLUInternal(int nrow, int ncol, int nrhs);
 
     // Destructor
     virtual ~SuperLUInternal();

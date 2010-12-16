@@ -28,8 +28,8 @@ namespace CasADi{
 LapackLUDense::LapackLUDense(){
 }
 
-LapackLUDense::LapackLUDense(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs){
-  assignNode(new LapackLUDenseInternal(nrow,ncol,rowind,col,nrhs));
+LapackLUDense::LapackLUDense(int nrow, int ncol, int nrhs){
+  assignNode(new LapackLUDenseInternal(nrow,ncol,nrhs));
 }
  
 LapackLUDenseInternal* LapackLUDense::operator->(){
@@ -40,8 +40,8 @@ const LapackLUDenseInternal* LapackLUDense::operator->() const{
   return static_cast<const LapackLUDenseInternal*>(FX::operator->());
 }
 
-LapackLUDenseInternal::LapackLUDenseInternal(int nrow, int ncol, const std::vector<int>& rowind, const std::vector<int>& col, int nrhs)
-  : LinearSolverInternal(nrow,ncol,rowind,col,nrhs){
+LapackLUDenseInternal::LapackLUDenseInternal(int nrow, int ncol, int nrhs)
+  : LinearSolverInternal(nrow,ncol,nrhs){
     
   // Currently only square matrices tested
   if(nrow!=ncol) throw CasadiException("LapackLUDenseInternal::LapackLUDenseInternal: currently only square matrices implemented.");

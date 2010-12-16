@@ -110,6 +110,32 @@ void IdasInternal::init(){
   // Init ODE rhs function and quadrature functions, jacobian function
   f_.init();
   if(!q_.isNull()) q_.init();
+
+  // Try to generate a jacobian of none provided
+  if(!linsol_.isNull() && jac_.isNull()){
+    SXFunction f = shared_cast<SXFunction>(f_);
+    if(!f.isNull()){
+      // Get the Jacobian in the Newton iteration
+      SX cj("cj");
+      SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
+
+      // Jacobian function
+      vector<vector<SX> > jac_in(JAC_NUM_IN);
+      jac_in[JAC_T] = f->inputv.at(DAE_T);
+      jac_in[JAC_Y] = f->inputv.at(DAE_Y);
+      jac_in[JAC_YDOT] = f->inputv.at(DAE_YDOT);
+      jac_in[JAC_P] = f->inputv.at(DAE_P);
+      jac_in[JAC_CJ] = vector<SX>(1,cj);
+      SXFunction J(jac_in,jac);
+      
+      // Pass sparsity to linear solver
+      linsol_.setSparsity(jac.rowind,jac.col);
+      
+      // Save function
+      jac_ = J;
+    }
+  }
+  
   if(!jac_.isNull()) jac_.init();
   if(!linsol_.isNull()) linsol_.init();
   
@@ -1292,6 +1318,10 @@ void IdasInternal::initUserDefinedLinearSolver(){
   IDA_mem->ida_setupNonNull = TRUE;
 }
 
+void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
+  linsol_ = linsol;
+  jac_ = jac;
+}
 
 
 } // namespace Sundials

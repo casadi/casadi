@@ -110,6 +110,9 @@ public:
 /// Public class
 class LinearSolver : public FX{
 public:
+  /// Set sparsity (before initialization!)
+  void setSparsity(const std::vector<int>& rowind, const std::vector<int>& col);
+
   /// Factorize the matrix / prepare the solution
   void prepare();
   
@@ -138,6 +141,9 @@ enum DAEOutput{DAE_RES, DAE_NUM_OUT};
 //Public class 
 class Integrator : public FX{
 public:
+  // Set linear solver (before initialization)
+  void setLinearSolver(const LinearSolver& linsol, const FX& jacx=FX());
+
   // Print solver statistics 
   void printStats(std::ostream &stream=std::cout) const;
   
