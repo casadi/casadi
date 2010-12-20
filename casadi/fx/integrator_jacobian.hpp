@@ -33,29 +33,32 @@ class IntegratorJacobianInternal;
 // Forward declaration of Integrator
 class Integrator;
 
-/** IntegratorJacobian class
+/** Evaluate the Jacobian of an integrator by means of integrating the forward sensitivity equations.
+
   This class maps an integrator which is able to calculate sensitivities as a Jacobian
   This will enable a uniform treatment of all kinds of function, whether SXFunction, MXFunction, etc.
-  Joel Andersson, 2010
   
+  \author Joel Andersson
+  \date 2010
 */
 
 class IntegratorJacobian : public FX{
 public:
-  /** \brief  Default constructor */
+  /// Default constructor
   IntegratorJacobian();
 
-  /** \brief  Constructor */
-  IntegratorJacobian(const Integrator& integrator);
+  /// Constructor
+  explicit IntegratorJacobian(const Integrator& integrator);
   
-  /** \brief  Access functions of the node */
+  /// Access functions of the node
   IntegratorJacobianInternal* operator->();
+
+  /// Const access functions of the node
   const IntegratorJacobianInternal* operator->() const;
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 };
-
 
 } // namespace CasADi
 

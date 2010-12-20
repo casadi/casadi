@@ -30,28 +30,22 @@
 
 namespace CasADi{
 
-/** \brief  Input arguments of an integrator */
+/// Input arguments of an integrator
 enum IntegratorInput{INTEGRATOR_T0, INTEGRATOR_TF, INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_XP0, INTEGRATOR_NUM_IN};
 
-/** \brief  Output arguments of an integrator */
+// Input arguments of an integrator (new)
+//enum IntegratorInput{INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_NUM_IN};
+
+/// Output arguments of an integrator
 enum IntegratorOutput{INTEGRATOR_XF, INTEGRATOR_XPF, INTEGRATOR_NUM_OUT};
 
-  /** \brief  Input arguments of an explicit ODE right hand side */
-enum ODEInput{ODE_T, ODE_Y, ODE_P, ODE_NUM_IN};
+// Output arguments of an integrator (new)
+//enum IntegratorOutput{INTEGRATOR_XF, INTEGRATOR_NUM_OUT};
 
-/** \brief  Output arguments of an explicit ODE right hand side */
-enum ODEOutput{ODE_RHS, ODE_NUM_OUT};
-
-/** \brief  Input arguments of an DAE residual function */
-enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_P, DAE_NUM_IN};
-
-/** \brief  Output arguments of an DAE residual function */
-enum DAEOutput{DAE_RES, DAE_NUM_OUT};
-
-/** \brief  Forward declaration of internal class */
+/// Forward declaration of internal class
 class IntegratorInternal;
 
-/** Integrator class
+/** Integrator abstract base class
   An "integrator" is a function that solves an initial value problem (IVP) of the generic form:
   
   F(x,der(x),p,t) == 0
@@ -73,47 +67,51 @@ class IntegratorInternal;
   outputs:
   0: y(tf)
   
+  \author Joel Andersson
+  \date 2010
 */
 class Integrator : public FX{
 public:
-  /** \brief  Constructors */
+  /// Default constructor
   Integrator();
 
-  /** \brief  Clone */
+  /// Clone
   Integrator clone() const;
   
-  /** \brief  Print solver statistics */
+  /// Print solver statistics
   void printStats(std::ostream &stream=std::cout) const;
   
-  /** \brief  Access functions of the node */
+  /// Access functions of the node
   IntegratorInternal* operator->();
+
+  /// Access functions of the node
   const IntegratorInternal* operator->() const;
   
-  /** \brief  Reset the solver and bring the time back to t0 */
+  /// Reset the solver and bring the time back to t0 
   void reset(int fsens_order, int asens_order=0);
 
-  /** \brief  Integrate until a specified time point */
+  /// Integrate until a specified time point 
   void integrate(double t_out);
 
-  /** \brief  Reset the solver of the adjoint problem and take time to tf */
+  /// Reset the solver of the adjoint problem and take time to tf
   void resetAdj();
 
-  /** \brief  Integrate backwards in time until a specified time point */
+  /// Integrate backwards in time until a specified time point
   void integrateAdj(double t_out);
 
-  /** \brief  Set a stop time for the forward integration */
+  /// Set a stop time for the forward integration
   void setStopTime(double tf);
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /** \brief  Set linear solver */
+  /// Set linear solver
   void setLinearSolver(const LinearSolver& linsol, const FX& jac=FX());
   
-  /** \brief Jacobian of output oind with respect to input iind */
+  /// Jacobian of output oind with respect to input iind
   IntegratorJacobian jacobian(int iind=0, int oind=0);
 
-  /** \brief Generate a new integrator integrating the forward sensitivity augmented ODE/DAE */
+  /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
   Integrator jac(int iind=0, int oind=0);
 };
 

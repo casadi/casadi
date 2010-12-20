@@ -22,6 +22,7 @@
 
 #include "idas_internal.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include "casadi/fx/linear_solver_internal.hpp"
 #include <cassert>
 
 using namespace std;

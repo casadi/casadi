@@ -24,6 +24,7 @@
 #define SUPERLU_INTERNAL_HPP
 
 #include "superlu.hpp"
+#include "casadi/fx/linear_solver_internal.hpp"
 #include "external_packages/superlu_4_1/SRC/slu_ddefs.h"
 
 namespace CasADi{

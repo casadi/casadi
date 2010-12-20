@@ -29,6 +29,7 @@
 #include "interfaces/sundials/idas_integrator.hpp"
 
 using namespace CasADi;
+using namespace CasADi::Sundials;
 using namespace std;
 
 // CONSTRUCT THE INTEGRATOR

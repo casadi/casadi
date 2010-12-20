@@ -35,8 +35,9 @@
 #include <iostream>
 #include <cassert>
 
-using namespace CasADi;
 using namespace std;
+using namespace CasADi;
+using namespace CasADi::Sundials;
 
 // Use CVodes or IDAS
 const bool implicit_integrator = true;

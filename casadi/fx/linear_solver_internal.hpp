@@ -20,47 +20,49 @@
  *
  */
 
-#ifndef LINEAR_SOLVER_HPP
-#define LINEAR_SOLVER_HPP
+#ifndef LINEAR_SOLVER_INTERNAL_HPP
+#define LINEAR_SOLVER_INTERNAL_HPP
 
-#include "fx.hpp"
+#include "linear_solver.hpp"
+//#include "fx_node.hpp"
 
 namespace CasADi{
   
 // Forward declaration of internal class
 class LinearSolverInternal;
 
-/** Abstract base class for the linear solver classes
-
-\author Joel Andersson
-\date 2010
-*/
-class LinearSolver : public FX{
-public:
-  
-  /// Access functions of the node
-  LinearSolverInternal* operator->();
-
-  /// Const access functions of the node
-  const LinearSolverInternal* operator->() const;
-
-  /// Set sparsity (before initialization)
-  void setSparsity(const std::vector<int>& rowind, const std::vector<int>& col);
-  
-  /// Factorize the matrix
-  void prepare();
+/// Internal class
+class LinearSolverInternal : public FXNode{
+  public:
+    // Constructor
+    LinearSolverInternal(int nrow, int ncol, int nrhs);
+        
+    // Destructor
+    virtual ~LinearSolverInternal() = 0;
     
-  /// Solve the system of equations
-  void solve();
+    // Initialize
+    virtual void init();
+    
+    // Solve the system of equations
+    virtual void evaluate(int fsens_order, int asens_order);
 
-  /// Check if prepared
-  bool prepared() const;
-  
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+    // Prepare the factorization
+    virtual void prepare() = 0;
+    
+    // Solve the system of equations
+    virtual void solve() = 0;
+   
+    // Is prepared
+    bool prepared_;
+    
+    // Sparsity in CRS format
+    int nrow_, ncol_;
+    std::vector<int> rowind_, col_;
+    int nrhs_;
 };
+
 
 } // namespace CasADi
 
-#endif //LINEAR_SOLVER_HPP
+#endif //LINEAR_SOLVER_INTERNAL_HPP
 

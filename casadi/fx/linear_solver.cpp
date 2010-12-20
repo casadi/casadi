@@ -20,7 +20,7 @@
  *
  */
 
-#include "linear_solver.hpp"
+#include "linear_solver_internal.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -33,66 +33,10 @@ const LinearSolverInternal* LinearSolver::operator->() const{
     return static_cast<const LinearSolverInternal*>(FX::operator->());
 }
 
-LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, int nrhs) : nrow_(nrow), ncol_(ncol), nrhs_(nrhs){
-}
-
-void LinearSolverInternal::init(){
-  // Allocate space for inputs
-  input_.resize(2);
-  input_[0].setSize(nrow_,ncol_);
-  input_[0].setSparsityCRS(rowind_, col_);
-
-  input_[1].setSize(nrow_*nrhs_,1); // right hand side
-  
-  // Allocate space for outputs
-  output_.resize(1);
-  output_[0].setSize(ncol_*nrhs_,1);
-  
-  // Not prepared
-  prepared_ = false;
-
-  // Call the base class initializer
-  FXNode::init();
-}
-
 void LinearSolver::setSparsity(const std::vector<int>& rowind, const std::vector<int>& col){
   (*this)->rowind_ = rowind;
   (*this)->col_ = col;
 }
-
-LinearSolverInternal::~LinearSolverInternal(){
-}
- 
-void LinearSolverInternal::evaluate(int fsens_order, int asens_order){
-/*  Factorization fact;
-  if(called_once){
-    // Check if any element has changed
-    bool any_change = false;
-    const vector<double>& val = input(0).data();
-    for(int i=0; i<val.size(); ++i){
-      if(val[i] != a[i]){
-        any_change = true;
-        break;
-      }
-    }
-    
-    // Reuse factored matrix if matrix hasn't changed
-    fact = any_change ? SAMEPATTERN : FACTORED;
-  } else {
-    fact = DOFACT;
-    called_once = true;
-  }*/
-  
-  // Call the solve routine
-  prepare();
-  
-  // Make sure preparation successful
-  if(!prepared_) 
-    throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
-  
-  solve();
-}
- 
  
 void LinearSolver::prepare(){
   (*this)->prepare();

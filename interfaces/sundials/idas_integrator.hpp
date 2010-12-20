@@ -25,21 +25,6 @@
 
 #include "casadi/fx/integrator.hpp"
 
-/** Interface to IDAS from the Sundials suite.
-
-  Creates an integrator instance which solves initial value problems in differential-algebraic equations
-  of the form:
-  
-  f(t,y,der(y),p) == 0
-  der(q) = g(t,y,p)
-
-  The DAE thus consists of a fully implicit part (f) and an explicit quadrature part (g). In the same way,
-  the state vector is also composed of two parts, the differential/algebraic states and the quadrature states,
-  i.e. x = [y,q]
-  
-   \author Joel Andersson
-*/
-
 // To be able to maintain both Python and Doxygen documentation
 #ifdef SWIG
 #define SWIGDOC(x) \
@@ -51,35 +36,60 @@
 namespace CasADi{
 namespace Sundials{
 
-/** \brief  Forward declaration of internal class */
+// Forward declaration of internal class
 class IdasInternal;
 
-/** \brief  Input arguments of a jacobian function: J = df/dy + cj*df/dydot */
+/// Input arguments of an DAE residual function
+enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_P, DAE_NUM_IN};
+
+// Input arguments of an DAE residual function (new version)
+//enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
+
+/// Output arguments of an DAE residual function
+enum DAEOutput{DAE_RES, DAE_NUM_OUT};
+
+/// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
 enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
 
-/** \brief  Output arguments of an DAE residual function */
+/// Output arguments of an DAE residual function
 enum JACOutput{JAC_J, JAC_NUM_OUT};
 
+/** Interface to IDAS from the Sundials suite.
+
+  Creates an integrator instance which solves initial value problems in differential-algebraic equations
+  of the form:
+  
+  f(t,y,der(y),z,p) == 0
+  der(q) = g(t,y,z,p)
+
+  The DAE thus consists of a fully implicit part (f) and an explicit quadrature part (g). In the same way,
+  the state vector is also composed of two parts, the differential states and the quadrature states,
+  i.e. x = [y,q]
+  
+   \author Joel Andersson
+   \date 2010
+*/
 
 SWIGDOC("Interface to IDAS from the Sundials suite.");
-  /** Interface to the IDAS from the Sundials suite */
 class IdasIntegrator : public Integrator{
 public:
 
-  /** \brief  Default constructor */
+  /// Default constructor
   IdasIntegrator();
   
-  /** \brief  Create an integrator for a fully implicit DAE with quadrature states*/
+  /// Create an integrator for a fully implicit DAE with quadrature states
   explicit IdasIntegrator(const FX& f, const FX& q=FX());
 
-  /** \brief  Access functions of the node */
+  /// Access functions of the node
   IdasInternal* operator->();
+
+  /// Const access functions of the node
   const IdasInternal* operator->() const;
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /** \brief Generate a new integrator integrating the forward sensitivity augmented ODE/DAE */
+  /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
   IdasIntegrator jac(int iind=0, int oind=0);
 };
 

@@ -46,9 +46,6 @@ Simulator::Simulator(const Integrator& integrator, const vector<double>& grid){
   assignNode(new SimulatorInternal(integrator,output_fcn,grid));
 }
 
-Simulator::Simulator(const Simulator& ref) : FX((const FX&)ref){
-}
-
 SimulatorInternal* Simulator::operator->(){
   return (SimulatorInternal*)(FX::operator->());
 }

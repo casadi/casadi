@@ -39,13 +39,19 @@
 namespace CasADi{
 namespace Sundials{
 
-/** \brief  Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy */
+/// Input arguments of an explicit ODE right hand side
+enum ODEInput{ODE_T, ODE_Y, ODE_P, ODE_NUM_IN};
+
+/// Output arguments of an explicit ODE right hand side
+enum ODEOutput{ODE_RHS, ODE_NUM_OUT};
+  
+/// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
 enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
 
-/** \brief  Output arguments of the Jacobian function */
+/// Output arguments of the Jacobian function
 enum MOutput{M_M, M_NUM_OUT};
   
-/** \brief  Forward declaration of internal class */
+// Forward declaration of internal class 
 class CVodesInternal;
 
 /** \brief  Public class */

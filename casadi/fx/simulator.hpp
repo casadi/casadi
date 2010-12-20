@@ -25,7 +25,6 @@
 
 #include "integrator.hpp"
 
-
 namespace CasADi{
 
 /// Indices of the inputs of the output function
@@ -37,7 +36,7 @@ enum SimulatorInput{SIMULATOR_X0, SIMULATOR_P, SIMULATOR_NUM_IN};
 /// Indices of the outputs of the function
 //enum SimulatorOutput{SIMULATOR_Y, SIMULATOR_XF, SIMULATOR_NUM_OUT};
 
-/** \brief  Forward declaration of internal class */
+// Forward declaration of internal class
 class SimulatorInternal;
 
 /** \brief Integrator class
@@ -55,33 +54,28 @@ class SimulatorInternal;
   
   \author Joel Andersson 
   \date 2010
-
 */
+
 class Simulator : public FX{
 public:
-  
-  /** \brief  Constructor */
-  Simulator(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid);
-  
-  /** \brief  Output function equal to the state */
-  Simulator(const Integrator& integrator, const vector<double>& grid);
 
-  /** \brief  Default constructor */
+  /// Default constructor 
   Simulator();
+  
+  /// Constructor
+  Simulator(const Integrator& integrator, const FX& output_fcn, const std::vector<double>& grid);
+  
+  /// Output function equal to the state
+  Simulator(const Integrator& integrator, const std::vector<double>& grid);
 
-  /** \brief  Copy constructors */
-  Simulator(const Simulator& ref);
-
-  //@{
-  /** \brief  Access functions of the node.
-  A regular user is not supposed to use these methods*/
+  /// Access functions of the node.
   SimulatorInternal* operator->();
+
+  /// Const access functions of the node.
   const SimulatorInternal* operator->() const;
-  //@}
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-
 };
   
 } // namespace CasADi
