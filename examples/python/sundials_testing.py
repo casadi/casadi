@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 # Joel Andersson, 2010
 
 # Use CVodes or IDAS
-implicit_integrator = False
+implicit_integrator = True
 
 # test adjoint sensitivities
 with_asens = True
@@ -50,6 +50,9 @@ user_defined_solver = True
 
 # Use sparse direct solver (SuperLU)
 sparse_direct = True
+
+# Second order sensitivities by a symbolic-numeric approach
+second_order = True
 
 # Create an IDAS instance (fully implicit integrator)
 def create_IDAS():
@@ -249,7 +252,7 @@ if perturb_u:
   u_seed = 1
   integrator.setFwdSeed(u_seed,INTEGRATOR_P)
 else:
-  x0_seed = len(x0)*[0]
+  x0_seed = len(x0)*[0.]
   x0_seed[1] = 1
   print x0_seed
   integrator.setFwdSeed(x0_seed,INTEGRATOR_X0)
@@ -262,7 +265,7 @@ integrator.setInput(x0,INTEGRATOR_X0)
 
 if with_asens:
   # backward seeds
-  bseed = len(x0)*[0]
+  bseed = len(x0)*[0.]
   bseed[0] = 1
   integrator.setAdjSeed(bseed,INTEGRATOR_XF)
 
@@ -280,4 +283,38 @@ if with_asens:
   print integrator.getAdjSens(INTEGRATOR_TF), " ",
   print integrator.getAdjSens(INTEGRATOR_X0), " ",
   print integrator.getAdjSens(INTEGRATOR_P), " "
+  
+if second_order:
+  # Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
+  intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
 
+  # Set options
+  intjac.setOption("ad_order",1)
+  intjac.setOption("number_of_fwd_dir",0)
+  intjac.setOption("number_of_adj_dir",1)
+    
+  # Initialize the integrator
+  intjac.init()
+
+  # Set inputs
+  intjac.setInput(t0,INTEGRATOR_T0)
+  intjac.setInput(tf,INTEGRATOR_TF)
+  intjac.setInput(u_init,INTEGRATOR_P)
+  intjac.setInput(x0,INTEGRATOR_X0)
+    
+  # Set adjoint seed
+  jacseed = 4*[0]
+  jacseed[0] = 1;
+  intjac.setAdjSeed(jacseed)
+    
+  # Evaluate the Jacobian
+  intjac.evaluate(0,1)
+
+  # Get the results
+  print "second order (fwd-over-adj)     ",
+  print intjac.getAdjSens(INTEGRATOR_X0), ", ",
+  print intjac.getAdjSens(INTEGRATOR_P), ;
+
+  
+  
+  

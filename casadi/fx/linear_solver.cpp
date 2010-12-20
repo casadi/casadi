@@ -34,24 +34,30 @@ const LinearSolverInternal* LinearSolver::operator->() const{
 }
 
 LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, int nrhs) : nrow_(nrow), ncol_(ncol), nrhs_(nrhs){
+}
+
+void LinearSolverInternal::init(){
   // Allocate space for inputs
   input_.resize(2);
-  input_[0].setSize(nrow,ncol);
-  
-  input_[1].setSize(nrow,nrhs); // right hand side
+  input_[0].setSize(nrow_,ncol_);
+  input_[0].setSparsityCRS(rowind_, col_);
+
+  input_[1].setSize(nrow_*nrhs_,1); // right hand side
   
   // Allocate space for outputs
   output_.resize(1);
-  output_[0].setSize(ncol,nrhs);
+  output_[0].setSize(ncol_*nrhs_,1);
   
   // Not prepared
   prepared_ = false;
+
+  // Call the base class initializer
+  FXNode::init();
 }
 
 void LinearSolver::setSparsity(const std::vector<int>& rowind, const std::vector<int>& col){
   (*this)->rowind_ = rowind;
   (*this)->col_ = col;
-  input(0).setSparsityCRS(rowind, col);
 }
 
 LinearSolverInternal::~LinearSolverInternal(){

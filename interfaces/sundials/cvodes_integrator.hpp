@@ -64,6 +64,9 @@ public:
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /** \brief Generate a new integrator integrating the forward sensitivity augmented ODE/DAE */
+  CVodesIntegrator jac(int iind=0, int oind=0);
 
 };
 

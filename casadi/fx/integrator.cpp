@@ -75,6 +75,13 @@ void Integrator::integrateAdj(double t_out){
   (*this)->integrateAdj(t_out);
 }
 
+IntegratorJacobian Integrator::jacobian(int iind, int oind){
+  return shared_cast<IntegratorJacobian>(FX::jacobian(iind,oind));  
+}
+
+Integrator Integrator::jac(int iind, int oind){
+  return (*this)->jac(iind,oind);  
+}
 
   
  

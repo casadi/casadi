@@ -20,38 +20,43 @@
  *
  */
 
-#include "idas_integrator.hpp"
-#include "idas_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#ifndef INTEGRATOR_JACOBIAN_HPP
+#define INTEGRATOR_JACOBIAN_HPP
 
-using namespace std;
+#include "fx.hpp"
+
 namespace CasADi{
-namespace Sundials{
 
-IdasIntegrator::IdasIntegrator(){ 
-}
+// Forward declaration of internal class
+class IntegratorJacobianInternal;
 
-IdasIntegrator::IdasIntegrator(const FX& f, const FX& q){
-  assignNode(new IdasInternal(f,q));
-}
+// Forward declaration of Integrator
+class Integrator;
 
-IdasInternal* IdasIntegrator::operator->(){
-  return (IdasInternal*)(FX::operator->());
-}
+/** IntegratorJacobian class
+  This class maps an integrator which is able to calculate sensitivities as a Jacobian
+  This will enable a uniform treatment of all kinds of function, whether SXFunction, MXFunction, etc.
+  Joel Andersson, 2010
+  
+*/
 
-const IdasInternal* IdasIntegrator::operator->() const{
-  return (const IdasInternal*)(FX::operator->());
-}
+class IntegratorJacobian : public FX{
+public:
+  /** \brief  Default constructor */
+  IntegratorJacobian();
 
-bool IdasIntegrator::checkNode() const{
-  return dynamic_cast<const IdasInternal*>(get());
-}
+  /** \brief  Constructor */
+  IntegratorJacobian(const Integrator& integrator);
+  
+  /** \brief  Access functions of the node */
+  IntegratorJacobianInternal* operator->();
+  const IntegratorJacobianInternal* operator->() const;
+  
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+};
 
-IdasIntegrator IdasIntegrator::jac(int iind, int oind){
-  return shared_cast<IdasIntegrator>(Integrator::jac(iind,oind));  
-}
 
-} // namespace Sundials
 } // namespace CasADi
 
-
+#endif //INTEGRATOR_JACOBIAN_HPP

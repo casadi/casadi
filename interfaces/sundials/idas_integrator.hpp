@@ -56,7 +56,7 @@ public:
   /** \brief  Default constructor */
   IdasIntegrator();
   
-  /** \brief  Create an integrator for explicit ODEs */
+  /** \brief  Create an integrator for a fully implicit DAE with quadrature states*/
   explicit IdasIntegrator(const FX& f, const FX& q=FX());
 
   /** \brief  Access functions of the node */
@@ -65,7 +65,9 @@ public:
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-
+  
+  /** \brief Generate a new integrator integrating the forward sensitivity augmented ODE/DAE */
+  IdasIntegrator jac(int iind=0, int oind=0);
 };
 
 

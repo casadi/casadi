@@ -149,5 +149,14 @@ bool OptionsFunctionality::checkNode() const{
   return dynamic_cast<const OptionsFunctionalityNode*>(get());
 }
 
+void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj){
+  (*this)->copyOptions(obj);
+}
+
+void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){
+  for(map<std::string, Option>::const_iterator it=obj->options.begin(); it!=obj->options.end(); ++it)
+    setOption(it->first,it->second);
+}
+
 } // namespace CasADi
 

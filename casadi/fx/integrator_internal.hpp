@@ -69,6 +69,13 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
+  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
+  virtual Integrator jac(int iind=0, int oind=0) = 0;
+
+  /** \brief Jacobian of output oind with respect to input iind */
+  virtual FX jacobian(int iind=0, int oind=0);
+ 
+
   /** Lenght of the state vector 
    (also includes "states" evaluated from quadrature formulas)
   */
@@ -76,6 +83,9 @@ public:
   
   /// Number of parameters
   int np_;
+  
+  /// Number of right hand sides
+  int nrhs_;
   
   /// Current time
   double t_;

@@ -32,7 +32,7 @@ CVodesInternal* CVodesInternal::clone() const{
   // Copying initialized objects are not allowed since they contain pointers
   if(is_init) throw CasadiException("CVodesInternal::clone: cannot clone an initialized object");
   
-  // Return a shallow copy
+  // Return a deep copy
   return new CVodesInternal(*this);
 }
   
@@ -1246,6 +1246,10 @@ void CVodesInternal::initUserDefinedLinearSolver(){
 void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   linsol_ = linsol;
   M_ = jac;
+}
+
+Integrator CVodesInternal::jac(int iind, int oind){
+  throw CasadiException("CVodesInternal::jac: not implemented");
 }
 
 

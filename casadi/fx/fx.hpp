@@ -219,6 +219,9 @@ class FXNode : public OptionsFunctionalityNode{
   protected:
   /** \brief  Default constructor (accessable from the FX class and derived classes) */
   FXNode();
+  
+  /** \brief  Deep copy */
+  FXNode(const FXNode& node);
 
   public:
   /** \brief  Destructor */

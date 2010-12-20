@@ -25,7 +25,8 @@
 
 #include "../expression_tools.hpp"
 #include "fx.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "linear_solver.hpp"
+#include "integrator_jacobian.hpp"
 
 namespace CasADi{
 
@@ -109,6 +110,11 @@ public:
   /** \brief  Set linear solver */
   void setLinearSolver(const LinearSolver& linsol, const FX& jac=FX());
   
+  /** \brief Jacobian of output oind with respect to input iind */
+  IntegratorJacobian jacobian(int iind=0, int oind=0);
+
+  /** \brief Generate a new integrator integrating the forward sensitivity augmented ODE/DAE */
+  Integrator jac(int iind=0, int oind=0);
 };
 
 

@@ -63,6 +63,9 @@ class LinearSolverInternal : public FXNode{
     // Destructor
     virtual ~LinearSolverInternal() = 0;
     
+    // Initialize
+    virtual void init();
+    
     // Solve the system of equations
     virtual void evaluate(int fsens_order, int asens_order);
 

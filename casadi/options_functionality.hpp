@@ -79,6 +79,8 @@ class OptionsFunctionality : public SharedObject{
   /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
 
+    /** \brief  Copy all options from another object*/
+    void copyOptions(const OptionsFunctionality& obj);
 
 };
       
@@ -112,6 +114,9 @@ virtual ~OptionsFunctionalityNode();
   /** \brief  Print */
   virtual void print(std::ostream &stream) const = 0;
 
+  /** \brief  Copy all options from another object*/
+  void copyOptions(const OptionsFunctionality& obj);
+  
 protected:
 
   void addOption(const std::string &str, const opt_type& type, const Option &def_val=Option());

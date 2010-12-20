@@ -120,6 +120,13 @@ public:
   void solve();
 };
 
+class Integrator; // forward declaration
+class IntegratorJacobian : public FX{
+public:
+  //Constructor
+  IntegratorJacobian(const Integrator& integrator);
+};
+
 // Input arguments of an integrator 
 enum IntegratorInput{INTEGRATOR_T0, INTEGRATOR_TF, INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_XP0, INTEGRATOR_NUM_IN};
 
@@ -162,6 +169,11 @@ public:
   // Set a stop time for the forward integration 
   void setStopTime(double tf);  
 
+  // Jacobian of output oind with respect to input iind
+  IntegratorJacobian jacobian(int iind=0, int oind=0);
+
+  // Generate a new integrator integrating the forward sensitivity augmented ODE/DAE 
+  Integrator jac(int iind=0, int oind=0);
 };
 
 // Indices of the inputs of the output function

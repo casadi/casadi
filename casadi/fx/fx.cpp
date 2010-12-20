@@ -106,6 +106,11 @@ FXNode::FXNode(){
   is_init_ = false;
 }
 
+FXNode::FXNode(const FXNode& node): OptionsFunctionalityNode(node){
+  ad_order_ = 0;
+  is_init_ = false;  
+}
+
 FXNode::~FXNode(){
 }
 

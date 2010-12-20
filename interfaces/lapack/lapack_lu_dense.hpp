@@ -63,6 +63,9 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackLUDenseInternal(int nrow, int ncol, int nrhs);
 
+    // Clone
+    virtual LapackLUDenseInternal* clone() const;
+    
     // Destructor
     virtual ~LapackLUDenseInternal();
     

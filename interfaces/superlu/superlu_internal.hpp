@@ -33,6 +33,9 @@ class SuperLUInternal : public LinearSolverInternal{
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     SuperLUInternal(int nrow, int ncol, int nrhs);
 
+    // Copy constructor
+    SuperLUInternal(const SuperLUInternal& linsol);
+
     // Destructor
     virtual ~SuperLUInternal();
     
@@ -44,7 +47,9 @@ class SuperLUInternal : public LinearSolverInternal{
     
     // Solve the system of equations
     virtual void solve();
-
+    
+    // Clone
+    virtual SuperLUInternal* clone() const;
   protected:
     
     // Is initialized

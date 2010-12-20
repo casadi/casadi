@@ -28,6 +28,8 @@
 #include <casadi/fx/simulator.hpp>
 #include <casadi/fx/c_function.hpp>
 #include <casadi/expression_tools.hpp>
+#include <casadi/fx/integrator_internal.hpp>
+#include <interfaces/sundials/idas_internal.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -37,7 +39,7 @@ using namespace CasADi;
 using namespace std;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = false;
+const bool implicit_integrator = true;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -62,6 +64,10 @@ const bool user_defined_solver = true;
 
 // Use sparse direct solver (SuperLU)
 const bool sparse_direct = true;
+
+// Second order sensitivities by a symbolic-numeric approach
+const bool second_order = true;
+
 
 // The DAE residual in plain c (for IDAS)
 void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
@@ -271,6 +277,7 @@ int main(){
       integrator.setLinearSolver(SuperLU(y0.size(),y0.size()));
     else 
       integrator.setLinearSolver(LapackLUDense(y0.size(),y0.size()));
+    integrator.setOption("linear_solver","user_defined");
   }
   
   // Set common integrator options
@@ -286,9 +293,6 @@ int main(){
   integrator.setOption("exact_jacobian",exact_jacobian);
   integrator.setOption("finite_difference_fsens",finite_difference_fsens);
   integrator.setOption("max_num_steps",100000);
-  
- if(user_defined_solver)
-   integrator.setOption("linear_solver","user_defined");
 
   // Initialize the integrator
   integrator.init();
@@ -337,7 +341,7 @@ int main(){
     fd[i] -= res0[i];
     fd[i] /= 0.01;
   }
-  
+
   cout << "unperturbed                     " << res0 << endl;
   cout << "perturbed                       " << integrator.getOutputData() << endl;
   cout << "finite_difference approximation " << fd << endl;
@@ -384,6 +388,57 @@ int main(){
     cout << integrator.getAdjSensData(INTEGRATOR_X0) << "; ";
     cout << integrator.getAdjSensData(INTEGRATOR_P) << "; ";
     cout << endl;
+  }
+  
+  if(second_order){
+    // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
+    IntegratorJacobian intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
+
+    // Set options
+    intjac.setOption("ad_order",1);
+    intjac.setOption("number_of_fwd_dir",0);
+    intjac.setOption("number_of_adj_dir",1);
+    
+    // Initialize the integrator
+    intjac.init();
+
+    // Set inputs
+    intjac.setInput(t0,INTEGRATOR_T0);
+    intjac.setInput(tf,INTEGRATOR_TF);
+    intjac.setInput(u_init,INTEGRATOR_P);
+    intjac.setInput(x0,INTEGRATOR_X0);
+    
+    // Set adjoint seed
+    vector<double> jacseed(4*1);
+    jacseed[0] = 1;
+    intjac.setAdjSeed(jacseed);
+    
+    // Evaluate the Jacobian
+    intjac.evaluate(0,1);
+
+    // Get the results
+    cout << "unperturbed (augmented dae)     " << intjac.getOutputData(1+INTEGRATOR_XF) << endl;
+    cout << "fwd sens via jacobian           " << intjac.getOutputData() << endl;
+    cout << "second order (fwd-over-adj)     " ;
+    cout << intjac.getAdjSensData(INTEGRATOR_X0) << ", ";
+    cout << intjac.getAdjSensData(INTEGRATOR_P) << endl;
+    
+    // Perturb u
+    vector<double> unpret = intjac.getOutputData();
+    
+    intjac.setInput(u_init+0.01,INTEGRATOR_P);
+
+    intjac.evaluate();
+    vector<double> pret = intjac.getOutputData();
+    
+    // Finite differences for the sensitivities
+    vector<double> fdsens(pret.size());
+    for(int i=0; i<fdsens.size(); ++i)
+      fdsens[i] = (pret[i]-unpret[i])/0.01;
+    
+    cout << "perturbed (augmented dae)       " << pret << endl;
+    cout << "finite diff. (augmented dae)    " << fdsens << endl;
+    
   }
   
   return 0;

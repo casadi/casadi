@@ -20,38 +20,46 @@
  *
  */
 
-#include "idas_integrator.hpp"
-#include "idas_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#ifndef INTEGRATOR_JACOBIAN_INTERNAL_HPP
+#define INTEGRATOR_JACOBIAN_INTERNAL_HPP
 
-using namespace std;
+#include "integrator_jacobian.hpp"
+#include "integrator.hpp"
+
 namespace CasADi{
-namespace Sundials{
 
-IdasIntegrator::IdasIntegrator(){ 
-}
+class IntegratorJacobianInternal : public FXNode{
+public:
+  /** \brief  Constructor */
+  IntegratorJacobianInternal(const Integrator& integrator);
 
-IdasIntegrator::IdasIntegrator(const FX& f, const FX& q){
-  assignNode(new IdasInternal(f,q));
-}
+  /** \brief  Destructor */
+  virtual ~IntegratorJacobianInternal();
 
-IdasInternal* IdasIntegrator::operator->(){
-  return (IdasInternal*)(FX::operator->());
-}
+  /** \brief  Clone */
+  virtual IntegratorJacobianInternal* clone() const;
+    
+  /** \brief  evaluate */
+  virtual void evaluate(int fsens_order, int asens_order);
 
-const IdasInternal* IdasIntegrator::operator->() const{
-  return (const IdasInternal*)(FX::operator->());
-}
+  /** \brief  Initialize */
+  virtual void init();
 
-bool IdasIntegrator::checkNode() const{
-  return dynamic_cast<const IdasInternal*>(get());
-}
+  protected:
+    // Integrator integrating the ODE/DAE augmented with forward sensitivity equations
+    Integrator integrator_;
 
-IdasIntegrator IdasIntegrator::jac(int iind, int oind){
-  return shared_cast<IdasIntegrator>(Integrator::jac(iind,oind));  
-}
-
-} // namespace Sundials
+    // Number of sensitivities
+    int ns_;
+  
+    // Number of states
+    int nx_;
+    
+    // Number of states
+    std::vector<int> jacmap_;
+    
+};
+  
 } // namespace CasADi
 
-
+#endif // INTEGRATOR_JACOBIAN_INTERNAL_HPP

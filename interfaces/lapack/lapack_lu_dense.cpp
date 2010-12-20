@@ -40,8 +40,7 @@ const LapackLUDenseInternal* LapackLUDense::operator->() const{
   return static_cast<const LapackLUDenseInternal*>(FX::operator->());
 }
 
-LapackLUDenseInternal::LapackLUDenseInternal(int nrow, int ncol, int nrhs)
-  : LinearSolverInternal(nrow,ncol,nrhs){
+LapackLUDenseInternal::LapackLUDenseInternal(int nrow, int ncol, int nrhs) : LinearSolverInternal(nrow,ncol,nrhs){
     
   // Currently only square matrices tested
   if(nrow!=ncol) throw CasadiException("LapackLUDenseInternal::LapackLUDenseInternal: currently only square matrices implemented.");
@@ -141,6 +140,10 @@ void LapackLUDenseInternal::solve(){
   if(equed_=='R' || equed_=='B')
     for(int i=0; i<nrow_; ++i)
       x[i] *= r_[i];
+}
+
+LapackLUDenseInternal* LapackLUDenseInternal::clone() const{
+  return new LapackLUDenseInternal(*this);
 }
 
 

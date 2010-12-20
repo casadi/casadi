@@ -27,7 +27,7 @@
 using namespace std;
 namespace CasADi{
 
-IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){ 
+IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   // set default options
   setOption("name","unnamed integrator"); // name of the function
   
@@ -47,6 +47,8 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("stop_at_end",                 OT_BOOLEAN, false); // Stop the integrator at the end of the interval
+  addOption("jacmap",                      OT_INTEGERVECTOR, Option()); // if the integrator is the Jacobian of another integrator, this option will contain the mapping between the states
+  addOption("nrhs",                        OT_INTEGER, 1); // number of right hand sides
 
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,false); // should the quadratures affect the step size control
@@ -127,7 +129,19 @@ void IntegratorInternal::init(){
   asens_abstol_ = hasSetOption("asens_abstol") ? getOption("asens_abstol").toDouble() : abstol_;
   asens_reltol_ = hasSetOption("asens_reltol") ? getOption("asens_reltol").toDouble() : reltol_;
   stop_at_end_ = getOption("stop_at_end").toInt();
+  nrhs_ = getOption("nrhs").toInt();
 }
+
+FX IntegratorInternal::jacobian(int iind, int oind){
+  // Create a new integrator for the forward sensitivity equations
+  Integrator fwdint = jac(iind,oind);
+    
+  // Generate an jacobian
+  IntegratorJacobian intjac(fwdint);
+
+  return intjac;
+}
+
 
 
 } // namespace CasADi

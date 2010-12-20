@@ -81,20 +81,11 @@ SET(CASADI_SRCS
   fx/sx_function.cpp
   fx/mx_function.hpp
   fx/mx_function.cpp
-  fx/linear_solver.hpp 
-  fx/linear_solver.cpp
-  fx/integrator.hpp 
-  fx/integrator.cpp
-  fx/integrator_internal.hpp 
-  fx/integrator_internal.cpp
-  fx/nlp_solver.hpp 
-  fx/nlp_solver.cpp
-  fx/nlp_solver_internal.hpp 
-  fx/nlp_solver_internal.cpp
-  fx/simulator.hpp 
-  fx/simulator.cpp
-  fx/simulator_internal.hpp 
-  fx/simulator_internal.cpp
+  fx/linear_solver.hpp fx/linear_solver.cpp
+  fx/integrator_jacobian.hpp fx/integrator_jacobian.cpp fx/integrator_jacobian_internal.hpp fx/integrator_jacobian_internal.cpp
+  fx/integrator.hpp  fx/integrator.cpp fx/integrator_internal.hpp fx/integrator_internal.cpp
+  fx/nlp_solver.hpp  fx/nlp_solver.cpp fx/nlp_solver_internal.hpp fx/nlp_solver_internal.cpp
+  fx/simulator.hpp  fx/simulator.cpp fx/simulator_internal.hpp fx/simulator_internal.cpp
 
   expression_tools.cpp
   expression_tools.hpp

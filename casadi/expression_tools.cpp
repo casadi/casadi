@@ -721,13 +721,6 @@ int nnz_sym(const SXMatrix& ex) {
   return nz;
 }
 
-SXMatrix vertcat(const SXMatrix& a, const SXMatrix& b){
-  vector<SXMatrix> ab(2);
-  ab[0] = a;
-  ab[1] = b;
-  return vertcat(ab);
-}
-
 istream& operator>>(istream &stream, SXMatrix &expr){
     // try to read a double
     double realvalue;
@@ -829,6 +822,20 @@ SXMatrix horzcat(const std::vector<SXMatrix> &v){
   for(int i=0; i<v.size(); ++i)
     ret << trans(v[i]);
   return trans(ret);  
+}
+
+SXMatrix vertcat(const SXMatrix &x, const SXMatrix &y){
+  vector<SXMatrix> xy(2);
+  xy[0]=x;
+  xy[1]=y;
+  return vertcat(xy);
+}
+
+SXMatrix horzcat(const SXMatrix &x, const SXMatrix &y){
+  vector<SXMatrix> xy(2);
+  xy[0]=x;
+  xy[1]=y;
+  return horzcat(xy);
 }
 
 SXMatrix& operator<<(SXMatrix& expr, const SXMatrix& add){

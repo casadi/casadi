@@ -24,6 +24,7 @@
 #define SHARED_OBJECT_HPP
 
 #include "printable_object.hpp"
+#include "casadi_exception.hpp"
 
 namespace CasADi{
 
@@ -45,10 +46,13 @@ class SharedObject : public PrintableObject{
     /// Default constructor
     SharedObject();
     
-    /// Copy constructor
+    /// Copy constructor (shallow copy)
     SharedObject(const SharedObject& ref);
 
-    // Destructor
+    /// Deep copy
+    SharedObject clone() const;
+    
+    /// Destructor
     ~SharedObject();
     
     /// Assignment operator
@@ -118,6 +122,11 @@ class SharedObjectNode{
   /// Print a destription of the object
   virtual void print(std::ostream &stream) const;
 
+  protected:
+    /// Get a shared object from the current node
+    template<class B>
+    B shared_from_this();
+  
   private:
     //! Number of references pointing to the object
     unsigned int count;
@@ -148,6 +157,20 @@ const B shared_cast(const SharedObject& A){
   SharedObject A_copy = A;
   return shared_cast<B>(A_copy);
 }
+
+template<class B>
+B SharedObjectNode::shared_from_this(){
+  B ret;
+  ret.assignNode(this);
+  
+  // Assert that the object is valid
+  if(!ret.checkNode())
+    throw CasadiException("shared_from_this: type missmatch");
+  
+  return ret;
+}
+
+
 
 
 } // namespace CasADi

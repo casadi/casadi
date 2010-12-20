@@ -153,7 +153,16 @@ void SharedObject::makeUnique(){
 SharedObjectNode* SharedObjectNode::clone() const{
   throw CasadiException(string("clone() has not defined for class") + typeid(this).name());
 }
-    
+
+SharedObject SharedObject::clone() const{
+  if(isNull()) throw CasadiException("Cannot clone null pointer");
+  SharedObject ret;
+  ret.assignNode((*this)->clone());
+  return ret;
+}
+
+
+
 } // namespace CasADi
     
     

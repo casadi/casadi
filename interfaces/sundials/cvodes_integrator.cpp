@@ -47,6 +47,9 @@ bool CVodesIntegrator::checkNode() const{
   return dynamic_cast<const CVodesInternal*>(get());
 }
 
+CVodesIntegrator CVodesIntegrator::jac(int iind, int oind){
+  return shared_cast<CVodesIntegrator>(Integrator::jac(iind,oind));  
+}
 
 
 } // namespace Sundials

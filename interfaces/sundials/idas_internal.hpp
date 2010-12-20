@@ -79,6 +79,9 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Print solver statistics */  
   virtual void printStats(std::ostream &stream) const;
   
+  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
+  virtual Integrator jac(int iind=0, int oind=0);
+
   protected:
 
   // Sundials callback functions
@@ -157,7 +160,7 @@ class IdasInternal : public IntegratorInternal{
   // Auxiliary
   static int getNX(const FX& f, const FX& q); // count the total number of states
   static int getNP(const FX& f); // count the number of parameters
-
+  
   // Set the user defined linear solver
   void initUserDefinedLinearSolver();
   

@@ -82,6 +82,8 @@ SXMatrix outer_prod(const SXMatrix &x, const SXMatrix &y); // outer product
 SXMatrix& operator<<(SXMatrix& expr, const SXMatrix& add); // remove when C++0X becomes available
 SXMatrix vertcat(const std::vector<SXMatrix> &v);
 SXMatrix horzcat(const std::vector<SXMatrix> &v);
+SXMatrix vertcat(const SXMatrix &x, const SXMatrix &y);
+SXMatrix horzcat(const SXMatrix &x, const SXMatrix &y);
 //@}
 
 /** \brief  Matlab's linspace function */

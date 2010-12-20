@@ -19,6 +19,9 @@ class CVodesIntegrator : public Integrator{
 
     /// Create an integrator for explicit ODEs 
     explicit CVodesIntegrator(const FX& f, const FX& q=FX());
+    
+    /// Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations
+    CVodesIntegrator jac(int iind=0, int oind=0);
 };
 
 /// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
@@ -34,6 +37,10 @@ public:
     
     /// Create an integrator for fully implicit DAEs
     explicit IdasIntegrator(const FX& f, const FX& q=FX());
+
+    /// Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations
+    IdasIntegrator jac(int iind=0, int oind=0);
+
 };
 
 } // namespace Sundials

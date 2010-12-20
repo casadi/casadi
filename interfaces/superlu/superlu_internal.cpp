@@ -48,6 +48,15 @@ SuperLUInternal::SuperLUInternal(int nrow, int ncol, int nrhs)  : LinearSolverIn
   lwork_ = 0;
 }
 
+SuperLUInternal::SuperLUInternal(const SuperLUInternal& linsol) : LinearSolverInternal(linsol){
+  // not initialized
+  is_init_ = false;
+  
+  // Work vector
+  work_ = 0;
+  lwork_ = 0;
+}
+
 SuperLUInternal::~SuperLUInternal(){
   unInit();
   if(work_) free(work_);
@@ -66,7 +75,7 @@ void SuperLUInternal::unInit(){
 
 void SuperLUInternal::init(){
   // Call the init method of the base class
-  FXNode::init();
+  LinearSolverInternal::init();
 
   // Reuse work
   user_work_ = getOption("user_work").toInt();
@@ -234,6 +243,10 @@ void SuperLUInternal::solve(){
   // Copy the result
   vector<double>& res = output(0).data();
   copy(rhs_.begin(),rhs_.end(),res.begin());
+}
+
+SuperLUInternal* SuperLUInternal::clone() const{
+  return new SuperLUInternal(*this);
 }
 
   

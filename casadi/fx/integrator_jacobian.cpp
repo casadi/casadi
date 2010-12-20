@@ -20,38 +20,31 @@
  *
  */
 
-#include "idas_integrator.hpp"
-#include "idas_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "integrator.hpp"
+#include "integrator_jacobian_internal.hpp"
 
-using namespace std;
 namespace CasADi{
-namespace Sundials{
 
-IdasIntegrator::IdasIntegrator(){ 
+IntegratorJacobian::IntegratorJacobian(){
 }
 
-IdasIntegrator::IdasIntegrator(const FX& f, const FX& q){
-  assignNode(new IdasInternal(f,q));
+IntegratorJacobian::IntegratorJacobian(const Integrator& integrator){
+    assignNode(new IntegratorJacobianInternal(integrator));
 }
 
-IdasInternal* IdasIntegrator::operator->(){
-  return (IdasInternal*)(FX::operator->());
+IntegratorJacobianInternal* IntegratorJacobian::operator->(){
+  return (IntegratorJacobianInternal*)(FX::operator->());
 }
 
-const IdasInternal* IdasIntegrator::operator->() const{
-  return (const IdasInternal*)(FX::operator->());
+const IntegratorJacobianInternal* IntegratorJacobian::operator->() const{
+   return (const IntegratorJacobianInternal*)(FX::operator->()); 
+}
+    
+bool IntegratorJacobian::checkNode() const{
+  return dynamic_cast<const IntegratorJacobianInternal*>(get());
 }
 
-bool IdasIntegrator::checkNode() const{
-  return dynamic_cast<const IdasInternal*>(get());
-}
-
-IdasIntegrator IdasIntegrator::jac(int iind, int oind){
-  return shared_cast<IdasIntegrator>(Integrator::jac(iind,oind));  
-}
-
-} // namespace Sundials
+  
+ 
 } // namespace CasADi
-
 

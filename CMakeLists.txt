@@ -9,8 +9,8 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 
 # For code optimization
-SET(CMAKE_BUILD_TYPE Release)
-#SET(CMAKE_BUILD_TYPE Debug)
+# SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)

@@ -110,31 +110,6 @@ void IdasInternal::init(){
   // Init ODE rhs function and quadrature functions, jacobian function
   f_.init();
   if(!q_.isNull()) q_.init();
-
-  // Try to generate a jacobian of none provided
-  if(!linsol_.isNull() && jac_.isNull()){
-    SXFunction f = shared_cast<SXFunction>(f_);
-    if(!f.isNull()){
-      // Get the Jacobian in the Newton iteration
-      SX cj("cj");
-      SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
-
-      // Jacobian function
-      vector<vector<SX> > jac_in(JAC_NUM_IN);
-      jac_in[JAC_T] = f->inputv.at(DAE_T);
-      jac_in[JAC_Y] = f->inputv.at(DAE_Y);
-      jac_in[JAC_YDOT] = f->inputv.at(DAE_YDOT);
-      jac_in[JAC_P] = f->inputv.at(DAE_P);
-      jac_in[JAC_CJ] = vector<SX>(1,cj);
-      SXFunction J(jac_in,jac);
-      
-      // Pass sparsity to linear solver
-      linsol_.setSparsity(jac.rowind,jac.col);
-      
-      // Save function
-      jac_ = J;
-    }
-  }
   
   if(!jac_.isNull()) jac_.init();
   if(!linsol_.isNull()) linsol_.init();
@@ -544,7 +519,7 @@ void IdasInternal::res(double t, const double* y, const double* yp, double* r){
     
     // Get results
    f_.output().get(r);
-
+   
    // Check the result for consistency
    for(int i=0; i<ny_; ++i){
      if(isnan(r[i]) || isinf(r[i])){
@@ -1091,15 +1066,20 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yy, N_Vector yp, 
     // Factor
     double c = ijac==0 ? 1 : cj;
     
+    // Dimension of the jacobian
+    int jdim = jac.output().size1();
+    
     // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
-      // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+    for(int offset=0; offset<ny_; offset += jdim){
+      for(int i=0; i<rowind.size()-1; ++i){
+        // Loop over non-zero entries
+        for(int el=rowind[i]; el<rowind[i+1]; ++el){
+          // Get column
+          int j = col[el];
       
-        // Add to the element
-        DENSE_ELEM(Jac,i,j) += c*val[el];
+          // Add to the element
+          DENSE_ELEM(Jac,i+offset,j+offset) += c*val[el];
+        }
       }
     }
   }
@@ -1202,13 +1182,19 @@ void IdasInternal::psolve(double t, N_Vector yy, N_Vector yp, N_Vector rr, N_Vec
   // Get time
   time1 = clock();
 
-  // Pass right hand side to the linear solver
+  // Number of right-hand-sides
+  int nrhs = nrhs_;
+  
+  // Number of rows of the linear solver
+  int nrow = ny_/nrhs;
+  
+  // Pass right hand side to the linear solver (transpose necessary)
   linsol_.setInput(NV_DATA_S(rvec),1);
-
+  
   // Solve the (possibly factorized) system 
   linsol_.solve();
   
-  // Get the result
+  // Get the result (transpose necessary)
   linsol_.getOutput(NV_DATA_S(zvec));
 
   // Log time duration
@@ -1230,7 +1216,7 @@ void IdasInternal::psetup(double t, N_Vector yy, N_Vector yp, N_Vector rr, doubl
 
   // Evaluate jacobian
   jac_.evaluate();
-  
+
   // Log time duration
   time2 = clock();
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
@@ -1272,7 +1258,7 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
   }
 }
 
-void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
+void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){  
   // Current time
   double t = IDA_mem->ida_tn;
 
@@ -1281,9 +1267,11 @@ void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yyp, N_Vector ypp, N_Vector r
 
   // Call the preconditioner setup function (which sets up the linear solver)
   psetup(t, yyp, ypp, 0, cj, vtemp1, vtemp1, vtemp3);
+  
 }
 
 void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
+  
   // Current time
   double t = IDA_mem->ida_tn;
 
@@ -1320,7 +1308,146 @@ void IdasInternal::initUserDefinedLinearSolver(){
 
 void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   linsol_ = linsol;
-  jac_ = jac;
+
+  // Try to generate a jacobian of none provided
+  if(jac.isNull()){
+    SXFunction f = shared_cast<SXFunction>(f_);
+    if(!f.isNull()){
+      // Get the Jacobian in the Newton iteration
+      SX cj("cj");
+      SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
+
+      // Jacobian function
+      vector<vector<SX> > jac_in(JAC_NUM_IN);
+      jac_in[JAC_T] = f->inputv.at(DAE_T);
+      jac_in[JAC_Y] = f->inputv.at(DAE_Y);
+      jac_in[JAC_YDOT] = f->inputv.at(DAE_YDOT);
+      jac_in[JAC_P] = f->inputv.at(DAE_P);
+      jac_in[JAC_CJ] = vector<SX>(1,cj);
+      SXFunction J(jac_in,jac);
+      
+      // Pass sparsity to linear solver
+      linsol_.setSparsity(jac.rowind,jac.col);
+      
+      // Save function
+      jac_ = J;
+    }
+  } else {
+    jac_ = jac;
+  }
+}
+
+Integrator IdasInternal::jac(int iind, int oind){
+  // Make sure that the derivative is of the state
+  if(oind!=INTEGRATOR_XF)
+    throw CasadiException("IdasInternal::jacobian: Not derivative of state");
+  
+  // Type cast to SXMatrix
+  SXFunction f = shared_cast<SXFunction>(f_);
+  SXFunction q = shared_cast<SXFunction>(q_);
+
+  // Assert that the function is made up by SXFunctions
+  if((f_.isNull() != f.isNull()) || (q_.isNull() != q.isNull()))
+    throw CasadiException("IdasInternal::jacobian: Only supported for f and q SXFunction");
+    
+  // Generate Jacobians with respect to state, state derivative and parameters
+  SXMatrix df_dy = f.jac(DAE_Y,DAE_RES);
+  SXMatrix df_dydot = f.jac(DAE_YDOT,DAE_RES);
+  
+  // Number of sensitivities
+  int ns = iind==INTEGRATOR_P ? np_ : ny_;
+  
+  // Sensitivities and derivatives of sensitivities
+  SXMatrix ysens("ysens",ny_,ns);
+  SXMatrix ypsens("ypsens",ny_,ns);
+  
+  // Sensitivity equation
+  SXMatrix res_s = prod(df_dy,ysens) + prod(df_dydot,ypsens);
+  if(iind==INTEGRATOR_P)
+    res_s += f.jac(DAE_P,DAE_RES);
+
+  // Augmented DAE
+  SXMatrix faug = vec(horzcat(f->outputv.at(oind),res_s));
+
+  // Input to the augmented DAE (start with old)
+  vector<SXMatrix> faug_in = f->inputv;
+
+  // Augment state
+  faug_in[DAE_Y] = vec(horzcat(faug_in[DAE_Y],ysens));
+
+  // Augment state derivatives
+  faug_in[DAE_YDOT] = vec(horzcat(faug_in[DAE_YDOT],ypsens));
+
+  // Create augmented DAE function
+  SXFunction ffcn_aug(faug_in,faug);
+  ffcn_aug.setOption("ad_order",1);
+  
+  // Augmented quadratures
+  SXFunction qfcn_aug;
+  
+  if(!q.isNull()){
+    // Now lets do the same for the quadrature states
+    SXMatrix dq_dy = q.jac(DAE_Y,DAE_RES);
+    SXMatrix dq_dydot = q.jac(DAE_YDOT,DAE_RES);
+    
+    // Sensitivity quadratures
+    SXMatrix q_s = prod(dq_dy,ysens) + prod(dq_dydot,ypsens);
+    if(iind==INTEGRATOR_P)
+      q_s += q.jac(DAE_P,DAE_RES);
+
+    // Augmented quadratures
+    SXMatrix qaug = vec(horzcat(q->outputv.at(oind),q_s));
+
+    // Input to the augmented DAE (start with old)
+    vector<SXMatrix> qaug_in = q->inputv;
+
+    // Augmented state
+    qaug_in[DAE_Y] = vec(horzcat(qaug_in[DAE_Y],ysens));
+
+    // Augment state derivatives
+    qaug_in[DAE_YDOT] = vec(horzcat(qaug_in[DAE_YDOT],ypsens));
+
+    // Create augmented DAE function
+    qfcn_aug = SXFunction(qaug_in,qaug);
+    qfcn_aug.setOption("ad_order",1);
+  }
+  
+  // Create integrator instance
+  IdasIntegrator integrator(ffcn_aug,qfcn_aug);
+
+  // Set options
+  integrator.copyOptions(shared_from_this<IdasIntegrator>());
+  integrator.setOption("nrhs",1+ns);
+  
+  // Transmit information on derivative states
+  if(hasSetOption("is_differential")){
+    vector<int> is_diff = getOption("is_differential").toIntVector();
+    if(is_diff.size()!=ny_) throw CasadiException("is_differential has incorrect length");
+    vector<int> is_diff_aug(ny_*(1+ns));
+    for(int i=0; i<1+ns; ++i)
+      for(int j=0; j<ny_; ++j)
+        is_diff_aug[j+i*ny_] = is_diff[j];
+    integrator.setOption("is_differential",is_diff_aug);
+  }
+  
+  // Mapping between states in the augmented dae and the original dae
+  vector<int> jacmap(nx_*(1+ns));
+  for(int i=0; i<1+ns; ++i){
+    for(int j=0; j<ny_; ++j)
+      jacmap[j+nx_*i] = j+ny_*i;
+    for(int j=0; j<nq_; ++j)
+      jacmap[ny_+j+nx_*i] = ny_*(1+ns) + j + nq_*i;
+  }
+  integrator.setOption("jacmap",jacmap);
+
+  // Pass linear solver
+  if(!linsol_.isNull()){
+    LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
+    linsol_aug->nrhs_ = 1+ns;
+    integrator.setLinearSolver(linsol_aug,jac_);
+  }
+  
+  return integrator;
 }
 
 
