@@ -37,6 +37,14 @@
   
 */
 
+// The following is a test to see if there is an easy way to maintain both Python and Doxygen documentation
+#ifdef SWIG
+#define SWIGDOC(x) \
+%feature("autodoc", x);
+#else
+#define SWIGDOC(x)
+#endif
+
 namespace CasADi{
 namespace Sundials{
 
@@ -49,7 +57,9 @@ enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
 /** \brief  Output arguments of an DAE residual function */
 enum JACOutput{JAC_J, JAC_NUM_OUT};
 
-/** \brief  Public class */
+
+SWIGDOC("Interface to the IDAS from the Sundials suite");
+  /** Interface to the IDAS from the Sundials suite */
 class IdasIntegrator : public Integrator{
 public:
 
