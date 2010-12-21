@@ -55,8 +55,11 @@ public:
     // Number of states
     int nx_;
     
-    // Number of states
+    // Mapping between augmented dae states and jacobian
     std::vector<int> jacmap_;
+    
+    // Intitial value for the augmented dae states
+    std::vector<double> jacinit_;
     
 };
   

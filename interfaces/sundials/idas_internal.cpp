@@ -112,8 +112,14 @@ void IdasInternal::init(){
   f_.init();
   if(!q_.isNull()) q_.init();
   
-  if(!jac_.isNull()) jac_.init();
-  if(!linsol_.isNull()) linsol_.init();
+  if(!jac_.isNull()){
+    jac_.init();
+    vector<int> rowind, col;
+    jac_.output().getSparsityCRS(rowind,col);
+    if(!linsol_.isNull())
+      linsol_.setSparsity(rowind,col);
+      linsol_.init();
+  }
   
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
@@ -1309,33 +1315,11 @@ void IdasInternal::initUserDefinedLinearSolver(){
 
 void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   linsol_ = linsol;
+  jac_ = jac;
 
   // Try to generate a jacobian of none provided
-  if(jac.isNull()){
-    SXFunction f = shared_cast<SXFunction>(f_);
-    if(!f.isNull()){
-      // Get the Jacobian in the Newton iteration
-      SX cj("cj");
-      SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
-
-      // Jacobian function
-      vector<vector<SX> > jac_in(JAC_NUM_IN);
-      jac_in[JAC_T] = f->inputv.at(DAE_T);
-      jac_in[JAC_Y] = f->inputv.at(DAE_Y);
-      jac_in[JAC_YDOT] = f->inputv.at(DAE_YDOT);
-      jac_in[JAC_P] = f->inputv.at(DAE_P);
-      jac_in[JAC_CJ] = vector<SX>(1,cj);
-      SXFunction J(jac_in,jac);
-      
-      // Pass sparsity to linear solver
-      linsol_.setSparsity(jac.rowind,jac.col);
-      
-      // Save function
-      jac_ = J;
-    }
-  } else {
-    jac_ = jac;
-  }
+  if(jac_.isNull())
+    getJacobian();
 }
 
 Integrator IdasInternal::jac(int iind, int oind){
@@ -1441,6 +1425,14 @@ Integrator IdasInternal::jac(int iind, int oind){
   }
   integrator.setOption("jacmap",jacmap);
 
+  // Initial value for the integrators
+  vector<double> jacinit(nx_*ns,0.0);
+  if(iind==INTEGRATOR_X0){
+    for(int i=0; i<1+ns; ++i)
+      jacinit[i+nx_*i] = 1;
+    integrator.setOption("jacinit",jacinit);
+  }
+
   // Pass linear solver
   if(!linsol_.isNull()){
     LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
@@ -1449,6 +1441,39 @@ Integrator IdasInternal::jac(int iind, int oind){
   }
   
   return integrator;
+}
+
+FX IdasInternal::getJacobian(){
+  // Quick return if already created
+  if(!jac_.isNull())
+    return jac_;
+
+  SXFunction f = shared_cast<SXFunction>(f_);
+  if(f.isNull())
+    throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction");
+  
+  // Get the Jacobian in the Newton iteration
+  SX cj("cj");
+  SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
+
+  // Jacobian function
+  vector<vector<SX> > jac_in(JAC_NUM_IN);
+  jac_in[JAC_T] = f->inputv.at(DAE_T);
+  jac_in[JAC_Y] = f->inputv.at(DAE_Y);
+  jac_in[JAC_YDOT] = f->inputv.at(DAE_YDOT);
+  jac_in[JAC_P] = f->inputv.at(DAE_P);
+  jac_in[JAC_CJ] = vector<SX>(1,cj);
+  SXFunction J(jac_in,jac);
+      
+  // Save function
+  jac_ = J;
+  
+  return J;
+}
+
+  
+LinearSolver IdasInternal::getLinearSolver(){
+  return linsol_;
 }
 
 

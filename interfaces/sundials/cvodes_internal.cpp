@@ -1252,6 +1252,15 @@ Integrator CVodesInternal::jac(int iind, int oind){
   throw CasadiException("CVodesInternal::jac: not implemented");
 }
 
+FX CVodesInternal::getJacobian(){
+  return M_;
+}
+  
+LinearSolver CVodesInternal::getLinearSolver(){
+  return linsol_;
+}
+
+
 
 } // namespace Sundials
 } // namespace CasADi

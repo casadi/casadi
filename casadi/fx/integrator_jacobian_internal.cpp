@@ -71,9 +71,18 @@ void IntegratorJacobianInternal::init(){
   if(integrator_.hasSetOption("jacmap")){
     jacmap_ = integrator_.getOption("jacmap").toIntVector();
   } else {
+    jacmap_.clear();
     jacmap_.resize(nx_*nc);
     for(int i=0; i<nx_*nc; ++i)
       jacmap_[i] = i;
+  }
+
+  // Initial value to the Jacobian
+  if(integrator_.hasSetOption("jacinit")){
+    jacinit_ = integrator_.getOption("jacinit").toDoubleVector();
+  } else {
+    jacinit_.clear();
+    jacinit_.resize(nx_*ns_,0.0);
   }
 
   // Call the base class method
@@ -81,17 +90,23 @@ void IntegratorJacobianInternal::init(){
 }
 
 void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
+  
   // Pass arguments to the integrator
   integrator_.setInput(input(INTEGRATOR_T0).data(),INTEGRATOR_T0);
   integrator_.setInput(input(INTEGRATOR_TF).data(),INTEGRATOR_TF);
   integrator_.setInput(input(INTEGRATOR_P).data(),INTEGRATOR_P);
 
-  // State
+  // Initial value for the state
   const vector<double>& x0 = input(INTEGRATOR_X0).data();
   vector<double>& x0s = integrator_.getInputData(INTEGRATOR_X0);
   fill(x0s.begin(),x0s.end(),0.0);
   for(int i=0; i<nx_; ++i)
     x0s[jacmap_[i]] = x0[i];
+
+  // Initial values for the state derivatives
+  for(int i=0; i<nx_; ++i)
+    for(int j=0; j<ns_; ++j)
+      x0s[jacmap_[nx_+j+i*ns_]] = jacinit_[j+i*ns_];
   
   // State derivative
   const vector<double>& xp0 = input(INTEGRATOR_XP0).data();

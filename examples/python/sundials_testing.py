@@ -313,7 +313,7 @@ if second_order:
   # Get the results
   print "second order (fwd-over-adj)     ",
   print intjac.getAdjSens(INTEGRATOR_X0), ", ",
-  print intjac.getAdjSens(INTEGRATOR_P), ;
+  print intjac.getAdjSens(INTEGRATOR_P)
 
   
   

@@ -75,6 +75,11 @@ public:
   /** \brief Jacobian of output oind with respect to input iind */
   virtual FX jacobian(int iind=0, int oind=0);
  
+  /// Get the Jacobian
+  virtual FX getJacobian() = 0;
+  
+  /// Get the Linear solver
+  virtual LinearSolver getLinearSolver() = 0;
 
   /** Lenght of the state vector 
    (also includes "states" evaluated from quadrature formulas)

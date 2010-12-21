@@ -108,6 +108,12 @@ public:
   /// Set linear solver
   void setLinearSolver(const LinearSolver& linsol, const FX& jac=FX());
   
+  /// Get the Jacobian
+  FX getJacobian();
+  
+  /// Get the Linear solver
+  LinearSolver getLinearSolver();
+  
   /// Jacobian of output oind with respect to input iind
   IntegratorJacobian jacobian(int iind=0, int oind=0);
 

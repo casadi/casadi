@@ -83,6 +83,13 @@ Integrator Integrator::jac(int iind, int oind){
   return (*this)->jac(iind,oind);  
 }
 
+FX Integrator::getJacobian(){
+  return (*this)->getJacobian();  
+}
+  
+LinearSolver Integrator::getLinearSolver(){
+  return (*this)->getLinearSolver();  
+}
   
  
 } // namespace CasADi

@@ -74,6 +74,12 @@ public:
   /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
   virtual Integrator jac(int iind=0, int oind=0);
 
+  /// Get the Jacobian
+  virtual FX getJacobian();
+  
+  /// Get the Linear solver
+  virtual LinearSolver getLinearSolver();
+
   protected:
 
   // Sundials callback functions

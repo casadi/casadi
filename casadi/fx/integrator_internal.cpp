@@ -48,6 +48,7 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("stop_at_end",                 OT_BOOLEAN, false); // Stop the integrator at the end of the interval
   addOption("jacmap",                      OT_INTEGERVECTOR, Option()); // if the integrator is the Jacobian of another integrator, this option will contain the mapping between the states
+  addOption("jacinit",                     OT_REALVECTOR, Option()); // initial values to the forward sensitivities
   addOption("nrhs",                        OT_INTEGER, 1); // number of right hand sides
 
   // Quadratures
