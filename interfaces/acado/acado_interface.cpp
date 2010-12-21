@@ -50,11 +50,9 @@ const AcadoInternal* AcadoInterface::operator->() const{
    return (const AcadoInternal*)(FX::operator->()); 
 }
 
-void AcadoInterface::assertNode() const{
-  if(!dynamic_cast<const AcadoInternal*>(get()))
-    throw CasadiException("AcadoInterface::assertNode");
+bool AcadoInterface::checkNode() const{
+  return dynamic_cast<const AcadoInternal*>(get());
 }
-
 
 
 } // namespace CasADi

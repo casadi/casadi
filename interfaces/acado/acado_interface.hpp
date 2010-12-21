@@ -28,7 +28,7 @@
 
 namespace CasADi{
   
-  /** \brief  Inputs of an NLP Solver */
+  /// Inputs of an ACADO OCP solver
   enum ACADO_Input{
     ACADO_X_GUESS, // Initial guess for x [default: 0]
     ACADO_U_GUESS, // Initial guess for u [default: 0]
@@ -50,7 +50,7 @@ namespace CasADi{
     ACADO_NUM_IN // Number of inputs
   };
 
-  /** \brief  Outputs of an NLP Solver */
+  /// Outputs of an ACADO OCP solver
   enum ACADO_Output{
     ACADO_X_OPT,
     ACADO_U_OPT,
@@ -59,7 +59,7 @@ namespace CasADi{
     ACADO_NUM_OUT
   };
 
-  /** \brief  Input arguments of an ACADO function */
+  /// Input arguments of an ACADO function
   enum ACADO_FCN_Input{
     ACADO_FCN_T, 
     ACADO_FCN_XD, 
@@ -77,23 +77,23 @@ namespace CasADi{
   class AcadoInterface : public FX{
     public:
 
-      /** \brief  Default constructor */
+      /// Default constructor
       AcadoInterface();
 
-      /** \brief  Constructor taking a DAE rhs function, an objective function and a constraint function -- for use with ACADO integrators */
+      /// Constructor taking a DAE rhs function, an objective function and a constraint function -- for use with ACADO integrators
       explicit AcadoInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
-      /** \brief  Set a user-provided integrator */
+      /// Set a user-provided integrator
       void setIntegrator(const Integrator& integrator);
             
-      /** \brief  Access functions and members of the node */
+      /// Access functions and members of the node
       AcadoInternal* operator->();
 
-      /** \brief  Const access functions and members of the node */
+      /// Const access functions and members of the node
       const AcadoInternal* operator->() const;
       
-      /** \brief  Make sure that the pointer points towards a valid object */
-      virtual bool checkNode()() const;
+      /// Check if the node is pointing to the right type of object
+      virtual bool checkNode() const;
 
 };
 
