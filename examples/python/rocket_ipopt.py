@@ -136,6 +136,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   # Integrate over all intervals
   X=MX(X0)
   for k in range(nu):
+    print X
     X = integrator([MX(k*DT),MX((k+1)*DT),X,U[k],xdot])  # build up a graph with function calls
 
   # Objective function

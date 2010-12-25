@@ -7,6 +7,14 @@ from casadi import *
 x = MX("x",2,3)
 y = MX("y",3,2)
 print x
+for i in range(6):
+	print x[i]
+
+for i in range(2):
+	for j in range(4):
+		print "x[%d,%d]=" % (i,j)
+		print x[i,j]
+print x[1,1]
 print x[3] # Note that index is flattened. x[0,0] is illegal.
 # BUG Why is the output x[1]?
 print norm_2(x)

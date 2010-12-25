@@ -121,6 +121,7 @@ circle = array([[sin(x),cos(x)] for x in linspace(0,2*pi,100)]).T
 
 figure()
 plot(sol[:,0],sol[:,1])
+grid()
 for i in range(10):
 	J=out(ts[10*i])
 	e=0.1*dot(J,circle).T+sol[10*i,:]
@@ -130,4 +131,44 @@ show()
 
 
 #! The figure reveals that perturbations perpendicular to the phase space trajectory shrink.
+
+#! Symbolic intergator results
+#! ---------------------------
+#! Since CVodesIntegrator is just another FX, 
+#! the usual CasAdi rules for symbolic evaluation are active.
+#!
+#! We create an MX 'w' that contains the result of a time integration with:
+#! - a fixed integration start time , t=0s
+#! - a fixed integration end time, t=10s
+#! - a fixed initial condition (1,0)
+#! - a free symbolic input, held constant during integration interval
+u=MX("u")
+w=integrator([MX(0),MX(10),MX([1,0]),u])
+
+#! We construct an MXfunction and a python help function 'out'
+f=MXFunction([u],[w])
+f.init()
+
+def out(u):
+	f.setInput(u)
+	f.evaluate()
+	return f.getOutput()
+
+print out(0)
+print out(1)
+
+#! Let's plot the results
+uv=linspace(-1,1,100)
+
+out = array(map(out,uv))
+figure()
+plot(uv,out)
+grid()
+title('Dependence of final state on input u')
+xlabel('u')
+ylabel('state')
+legend(('x','y'))
+show()
+
+
 
