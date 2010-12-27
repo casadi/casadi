@@ -35,6 +35,9 @@ class MXNode;
 
 /** \brief The main matrix class.
   Operations on MX are lazy on the matrix level.
+
+  Index flatten happens as follows: (i,j) -> k = j+i*size2()
+
   \author Joel Andersson 
   \date 2010
 */

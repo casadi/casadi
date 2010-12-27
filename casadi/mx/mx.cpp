@@ -74,7 +74,7 @@ MX::Element MX::operator[](int k){
 
 MX MX::getElement(int k) const{
   MX ret;
-  ret.assignNode(new MatrixElement(*this,k%size1(), k/size1()));
+  ret.assignNode(new MatrixElement(*this,k/size2(), k%size2()));
   return ret;  
 }
 
