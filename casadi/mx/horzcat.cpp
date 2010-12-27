@@ -32,7 +32,7 @@ namespace CasADi{
 // Constructor
 Horzcat::Horzcat(const vector<MX>& dep__) : MXNode(dep__){
   assert(!dep_.empty());
-  int sz1=dep_[0].size1();
+  int sz1=dep(0).size1();
   int sz2=0;
   for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
     assert(sz1==it->size1());
@@ -53,7 +53,30 @@ void Horzcat::print(ostream &stream) const{
 }
 
 void Horzcat::evaluate(int fsens_order, int asens_order){
-  assert(0);
+  /** Copy-pasted code from vertcat. Needs validity check */
+  assert(fsens_order==0 || asens_order==0);
+  
+  if(fsens_order==0){
+    int i = 0;
+    for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
+      copy((*it)->val(0).begin(),(*it)->val(0).end(),&val(0)[i]);
+      i += it->numel();
+    }
+  } else {
+    int i = 0;
+    for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
+      copy((*it)->val(1).begin(),(*it)->val(1).end(),&val(1)[i]);
+      i += it->numel();
+    }
+  }
+  
+  if(asens_order>0){
+    int i = 0;
+    for(vector<MX>::iterator it=dep_.begin(); it!=dep_.end(); ++it){
+      copy(&val(1)[i],&val(1)[i] + it->numel(), (*it)->val(1).begin());
+      i += it->numel();
+    }
+  }
 }
 
 } // namespace CasADi
