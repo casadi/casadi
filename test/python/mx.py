@@ -260,6 +260,36 @@ class MXtests(unittest.TestCase):
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
 
+  def test_MXslice(self):
+    x = MX("x",1,3)
+    z=x[:]
+    self.assertEqual(z.size1(),1,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size2(),3,"Flatten returns MX of wrong dimension")
+    f = MXFunction([x],[z])
+    f.init()
+    L=[1,2,3]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    
+    for i in range(3):
+      self.assertAlmostEqual(L[i], zt[i],10)
+      
+  def test_MXslice(self):
+    x = MX("x",3,1)
+    z=x[:]
+    self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size2(),1,"Flatten returns MX of wrong dimension")
+    f = MXFunction([x],[z])
+    f.init()
+    L=[1,2,3]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    
+    for i in range(3):
+      self.assertAlmostEqual(L[i], zt[i],10)
+        
   def test_MXorder(self):
     x = MX("x",2,3)
     f = MXFunction([x],[x])
