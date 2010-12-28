@@ -259,19 +259,82 @@ class MXtests(unittest.TestCase):
     self.assertEqual(type(z2),float,"Output of MXFunction is expected to be tuple of floats")
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
+
+  def test_MXorder(self):
+    x = MX("x",2,3)
+    z=trans(x)
+    self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size2(),2,"Flatten returns MX of wrong dimension")
+    f = MXFunction([x],[x])
+    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    f.init()
+    L=[1,2,3,4,5,6]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    self.assertEqual(len(zt),6,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")
+    for i in range(len(L)):
+      self.assertAlmostEqual(L[i], zt[i],10)
+      
+    ztr=reshape(zt,(2,3))
+    Lr=reshape(zt,(2,3))
+    for i in range(2):
+      for j in range(3):
+        self.assertAlmostEqual(Lr[i,j], ztr[i,j],10)
+    
+  def test_MXtrans(self):
+    x = MX("x",2,3)
+    z=trans(x)
+    self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size2(),2,"Flatten returns MX of wrong dimension")
+    f = MXFunction([x],[z])
+    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    f.init()
+    L=[1,2,3,4,5,6]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    
+    ztr=reshape(zt,(3,2))
+    Lr=reshape(L,(2,3))
+    for i in range(2):
+      for j in range(3):
+        self.assertAlmostEqual(Lr[i,j], ztr[j,i],10)
     
   def test_MXflatten(self):
     x = MX("x",2,3)
     z=flatten(x)
     self.assertEqual(z.size1(),6,"Flatten returns MX of wrong dimension")
     self.assertEqual(z.size2(),1,"Flatten returns MX of wrong dimension")
+    f = MXFunction([x],[z])
+    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    f.init()
+    L=[1,2,3,4,5,6]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    for i in range(len(L)):
+      self.assertAlmostEqual(L[i], zt[i],10)
     
   def test_MXreshape(self):
     x = MX("x",2,3)
-    z=c.reshape(x,(3,2))
-    self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
-    self.assertEqual(z.size2(),2,"Flatten returns MX of wrong dimension")
-
+    z=c.reshape(x,(1,6))
+    self.assertEqual(z.size1(),1,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size2(),6,"Flatten returns MX of wrong dimension")
+    f = MXFunction([x],[z])
+    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    f.init()
+    L=[1,2,3,4,5,6]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    for i in range(len(L)):
+      self.assertAlmostEqual(L[i], zt[i],10)
+      
 if __name__ == '__main__':
     unittest.main()
 
