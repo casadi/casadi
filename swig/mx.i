@@ -1,6 +1,10 @@
 %{
 #include "casadi/mx/mx.hpp"
+#include <ostream>
+#include <iostream>
 %}
+
+%include "slicer.i"
 
 namespace CasADi {
 
@@ -51,7 +55,48 @@ std::string __repr__() { return $self->getRepresentation(); }
 
 // Get or set an element
 MX __getitem__(int k){ return $self->getElement(k);}
-MX __getitem__(const std::vector<int> &I ){ if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); return $self->operator()(I[0],I[1]);}
+MX __getitem__(const std::vector<int> &I ){if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); return $self->operator()(I[0],I[1]);}
+//MX __getitem__(PyObject* list){
+//		if(PyList_Size(list)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
+//		return $self->slice(CasADi::Slicer(PyList_GetItem(list, 0)),CasADi::Slicer(PyList_GetItem(list, 1))
+//		);
+//}
+
+MX __getitem__(PyObject* list){
+		if (!PyTuple_Check(list))  throw CasADi::CasadiException("__getitem__: expectong tuple");
+		if(PyTuple_Size(list)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
+		CasADi::Slicer *i[2];
+		bool delme[2];
+		bool succes=true;
+
+		for (int k=0;k<2;k++) {
+			delme[k]=true;
+			if (PyInt_Check(PyTuple_GetItem(list, k))) {
+				i[k]=new CasADi::Slicer(PyInt_AsLong(PyTuple_GetItem(list, k)));
+			} else if (PyList_Check(PyTuple_GetItem(list, k))) {
+				std::vector<int> arg;
+				for (int l=0;l<PyList_Size(PyTuple_GetItem(list, k));l++) {
+					arg.push_back(PyInt_AsLong(PyList_GetItem(PyTuple_GetItem(list, k),l)));
+				}
+				i[k]=new CasADi::Slicer(arg);
+			} else if (PyObject_TypeCheck(PyTuple_GetItem(list, k),&PySlice_Type)) {
+				i[k]=new CasADi::Slicer(PySliceObjectToSlicerPrimitiveFromTo((PySliceObject*)PyTuple_GetItem(list, k)));
+			} else {
+				succes=false;
+				delme[k]=false;
+			}
+		}
+		if (succes) {
+			return $self->slice(*i[0],*i[1]);
+		} else {
+			if (delme[0]) delete i[0];
+			if (delme[1]) delete i[1];
+			throw CasADi::CasadiException("__getitem__: wrong arguments");
+		}
+		if (delme[0]) delete i[0];
+		if (delme[1]) delete i[1];
+}
+
 //MX __setitem__(int k, const MX& el){ return $self->setElement(el,k);}
 MX __setitem__(int k, const MX& el){ $self->getElement(k) = el; return *$self;}
 MX __setitem__(const std::vector<int> &I, const MX&  el){ if(I.size()!=2) throw CasADi::CasadiException("__setitem__: not 2D"); $self->operator()(I[0],I[1]) = el; return *$self;}
@@ -124,7 +169,6 @@ MX prod(const MX &x, const MX &y); // matrix product
 MX inner_prod(const MX &x, const MX &y); // trans(x)*y with x and y vectors
 MX outer_prod(const MX &x, const MX &y); // x*trans(y) with x and y vectors
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false); // ternary operator, "cond ? if_true : if_false"
+
 } // namespace CasADi
-
-
 

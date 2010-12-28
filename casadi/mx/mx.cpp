@@ -83,6 +83,7 @@ MX MX::slice(Slicer i,Slicer j) const{
 
   i.initialize(size1());
   j.initialize(size2());
+
   for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
   	std::vector<MX> cols;
   	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
