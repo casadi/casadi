@@ -36,6 +36,8 @@
 #include "../fx/sx_function.hpp"
 #include "evaluation.hpp"
 #include "transpose.hpp"
+#include "flatten.hpp"
+#include "reshape.hpp"
 #include "symbolic_mx_node.hpp"
 #include "mx_constant.hpp"
 
@@ -216,6 +218,32 @@ MX trans(const MX &x){
   else{
     MX ret;
     ret.assignNode(new Transpose(x));
+    return ret;
+  }
+}
+
+MX reshape(const MX &x,const MatrixSize &s){
+	if (s.nrow*s.ncol!=x.numel()) {
+  	throw CasadiException("MX::reshape: size must be same before and after reshaping");
+	}
+  if (s.nrow==x.size1() && s.ncol==x.size2()) {
+    // allready correct shape
+    return x.get()->dep(0);
+  } else {
+    MX ret;
+    ret.assignNode(new Reshape(x,s));
+    return ret;
+  }
+	
+}
+
+MX flatten(const MX &x) {
+  if (x.size2()==1) {
+	  // Allready flattened
+	  return x.get()->dep(0);
+  } else {
+    MX ret;
+    ret.assignNode(new Flatten(x));
     return ret;
   }
 }

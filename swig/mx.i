@@ -12,6 +12,37 @@ namespace CasADi {
 %implicitconv SX;
 #endif WITH_IMPLICITCONV
 
+class MatrixSize{
+  public:
+  MatrixSize();
+  MatrixSize(int nrow_, int ncol_);
+};
+
+%typemap(in) const MatrixSize & {
+       $1 = new CasADi::MatrixSize(PyTupleToMatrixSize($input));
+}
+
+%typemap(freearg) const MatrixSize & {
+    if ($1) {
+        delete $1;
+    }
+}
+
+
+
+};
+
+
+%inline %{
+CasADi::MatrixSize PyTupleToMatrixSize(PyObject* tup) {
+		  if (!PyTuple_Check(tup))  throw CasADi::CasadiException("__getitem__: expecting tuple");
+      if(PyTuple_Size(tup)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
+      return CasADi::MatrixSize(PyInt_AsLong(PyTuple_GetItem(tup,0)),PyInt_AsLong(PyTuple_GetItem(tup,1)));
+}
+%}
+
+namespace CasADi {
+
 class MX : public SharedObject{
   public:
   MX();
@@ -63,7 +94,7 @@ MX __getitem__(const std::vector<int> &I ){if(I.size()!=2) throw CasADi::CasadiE
 //}
 
 MX __getitem__(PyObject* list){
-		if (!PyTuple_Check(list))  throw CasADi::CasadiException("__getitem__: expectong tuple");
+		if (!PyTuple_Check(list))  throw CasADi::CasadiException("__getitem__: expecting tuple");
 		if(PyTuple_Size(list)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
 		CasADi::Slicer *i[2];
 		bool delme[2];
@@ -143,7 +174,6 @@ MX norm_2(){  return norm_2(*$self);}
 MX norm_1(){  return norm_1(*$self);}
 MX norm_inf(){  return norm_inf(*$self);}
 MX trans(){  return trans(*$self);}
-
 }
 
 } // namespace CasADi
@@ -165,10 +195,14 @@ MX norm_2(const MX &x);
 MX norm_1(const MX &x);
 MX norm_inf(const MX &x);
 MX trans(const MX &x); // transpose
+MX flatten(const MX &x); // flatten
+MX reshape(const MX &x, const MatrixSize &s); // reshape
 MX prod(const MX &x, const MX &y); // matrix product
 MX inner_prod(const MX &x, const MX &y); // trans(x)*y with x and y vectors
 MX outer_prod(const MX &x, const MX &y); // x*trans(y) with x and y vectors
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false); // ternary operator, "cond ? if_true : if_false"
 
+
 } // namespace CasADi
+
 

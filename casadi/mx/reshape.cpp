@@ -1,0 +1,80 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#include "reshape.hpp"
+#include <cassert>
+
+using namespace std;
+
+namespace CasADi{
+
+Reshape::Reshape(const MX& x,const MatrixSize &s) : MXNode(x){
+  if (s.nrow*s.ncol!=x.numel()) {
+  	throw CasadiException("MX::reshape: size must be same before and after reshaping");
+	}
+  sz.nrow = s.nrow;
+  sz.ncol = s.ncol;
+}
+
+Reshape* Reshape::clone() const{
+  return new Reshape(*this);
+}
+
+void Reshape::print(std::ostream &stream) const{
+  stream << "reshape(" << dep(0) << ",[" << sz.nrow << "," << sz.ncol << "])";
+}
+
+void Reshape::evaluate(int fsens_order, int asens_order){
+  if(fsens_order==0 || asens_order==0);
+  
+  if(fsens_order==0){
+  // Get references to the terms
+  const vector<double>& arg = dep(0)->val(0);
+  vector<double>& res = val(0);
+  
+  // carry out the reshape
+  for(int i=0; i<sz.nrow*sz.ncol; ++i)
+      res[i] = arg[i];
+  } else {
+
+    // Get references to the terms
+    const vector<double>& arg = dep(0)->val(1);
+    vector<double>& res = val(1);
+  
+    // carry out the reshape
+    for(int i=0; i<sz.nrow*sz.ncol; ++i)
+        res[i] = arg[i];
+  }
+  
+  if(asens_order>0){
+    // Get references to the terms
+    vector<double>& arg = dep(0)->val(1);
+    const vector<double>& res = val(1);
+  
+    // carry out the reshape
+    for(int i=0; i<sz.nrow*sz.ncol; ++i)
+        arg[i] += res[i];
+    
+  }
+}
+
+} // namespace CasADi

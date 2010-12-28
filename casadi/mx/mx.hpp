@@ -246,6 +246,15 @@ Internally represented by IfElseNode.
 */
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false); 
 
+//! \brief Returns a reshaped version of the MX
+MX reshape(const MX &x, const MatrixSize &s);
+
+/** \brief Returns a flattened version of the MX
+    Flattening is a cheap (non-copying) operation
+    Same effect as reshape(size1()*size2(),1)
+*/
+MX flatten(const MX &x);
+
 } // namespace CasADi
 
 namespace std{

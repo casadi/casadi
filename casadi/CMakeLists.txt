@@ -68,6 +68,10 @@ SET(CASADI_SRCS
   mx/horzcat.hpp
   mx/slicer.cpp
   mx/slicer.hpp
+  mx/flatten.cpp
+  mx/flatten.hpp
+  mx/reshape.cpp
+  mx/reshape.hpp
 
   fx/fx.hpp
   fx/fx.cpp
