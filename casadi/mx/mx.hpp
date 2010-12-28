@@ -26,6 +26,7 @@
 #include "../matrix_size.hpp"
 #include "../shared_object.hpp"
 #include "../sx/sx.hpp"
+#include "slicer.hpp"
 #include <vector>
 
 namespace CasADi{
@@ -181,6 +182,15 @@ A regular user should never use this.
   //! \brief delayed setting or getting an element
   MX getElement(int k) const;
   MX& setElement(const MX& el, int k);
+
+  //! \brief Get a slice of an MX
+  MX slice(Slicer i, Slicer j) const;
+
+  //! \brief Get a row slice of an MX
+  MX getRow(int i) const;
+
+  //! \brief Get a column slice of an MX
+  MX getColumn(int j) const;
   
   /** \brief  Create an all zero matrix with size sz */
   explicit MX(const MatrixSize& sz);

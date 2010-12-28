@@ -37,6 +37,12 @@ class MX : public SharedObject{
   MX getElement(int k) const;
   MX& setElement(const MX& el, int k);
 
+  //! \brief Get a row slice of an MX
+  MX getRow(int i) const;
+
+  //! \brief Get a column slice of an MX
+  MX getColumn(int j) const;
+
 };
 
 %extend MX {
@@ -45,8 +51,10 @@ std::string __repr__() { return $self->getRepresentation(); }
 
 // Get or set an element
 MX __getitem__(int k){ return $self->getElement(k);}
+MX __getitem__(const std::vector<int> &I ){ if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); return $self->operator()(I[0],I[1]);}
 //MX __setitem__(int k, const MX& el){ return $self->setElement(el,k);}
 MX __setitem__(int k, const MX& el){ $self->getElement(k) = el; return *$self;}
+MX __setitem__(const std::vector<int> &I, const MX&  el){ if(I.size()!=2) throw CasADi::CasadiException("__setitem__: not 2D"); $self->operator()(I[0],I[1]) = el; return *$self;}
 
 // all binary operations with a particular right argument
 #define binops(t) \

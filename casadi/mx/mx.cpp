@@ -78,6 +78,25 @@ MX MX::getElement(int k) const{
   return ret;  
 }
 
+MX MX::slice(Slicer i,Slicer j) const{
+  std::vector<MX> rows;
+
+  i.initialize(size1());
+  j.initialize(size2());
+  for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
+  	std::vector<MX> cols;
+  	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
+		cols.push_back(operator()(*iti,*itj));
+	}
+	rows.push_back(horzcat(cols));
+  }
+  return vertcat(rows);
+}
+
+MX MX::getRow(int i) const {return slice(i,SlicerPrimitiveAll());}
+
+MX MX::getColumn(int j) const {return slice(SlicerPrimitiveAll(),j);}
+
 MX& MX::setElement(const MX& el, int k){
   throw CasadiException("MX::setElement: not implemented");
 }
