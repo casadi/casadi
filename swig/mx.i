@@ -94,6 +94,34 @@ MX __getitem__(const std::vector<int> &I ){if(I.size()!=2) throw CasADi::CasadiE
 //}
 
 MX __getitem__(PyObject* list){
+    if (!PyTuple_Check(list) && ($self->size1()==1 || $self->size2()==1)) {
+      CasADi::Slicer *i;
+		  bool succes=true;
+
+		  if (PyInt_Check(list)) {
+			  i=new CasADi::Slicer(PyInt_AsLong(list));
+		  } else if (PyList_Check(list)) {
+			  std::vector<int> arg;
+			  for (int l=0;l<PyList_Size(list);l++) {
+				  arg.push_back(PyInt_AsLong(PyList_GetItem(list,l)));
+			  }
+			  i=new CasADi::Slicer(arg);
+		  } else if (PyObject_TypeCheck(list,&PySlice_Type)) {
+			  i=new CasADi::Slicer(PySliceObjectToSlicerPrimitiveFromTo((PySliceObject*)list));
+		  } else {
+			  succes=false;
+		  }
+		  if (succes) {
+		    if ($self->size1()==1)
+			    return $self->slice(CasADi::Slicer(0),*i);
+		    if ($self->size2()==1)
+			    return $self->slice(*i,CasADi::Slicer(0));
+		  } else {
+			  if (succes) delete i;
+			  throw CasADi::CasadiException("__getitem__: wrong arguments");
+		  }
+			if (succes) delete i;
+    }
 		if (!PyTuple_Check(list))  throw CasADi::CasadiException("__getitem__: expecting tuple");
 		if(PyTuple_Size(list)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
 		CasADi::Slicer *i[2];
