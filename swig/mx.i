@@ -54,7 +54,8 @@ class MX : public SharedObject{
 
   int size1() const;       // get the first dimension
   int size2() const;       // get the second dimension
-
+  int numel() const;       // get the total number of elements
+  
   //Create nodes by their ID 
   static MX binary(int op, const MX &x, const MX &y);
   static MX unary(int op, const MX &x);
