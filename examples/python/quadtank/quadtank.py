@@ -69,7 +69,7 @@ ffcn.init()
 def res2(y,t):
   ffcn.setInput(y, ACADO_FCN_XD);
   ffcn.evaluate()
-  return list(ffcn.getOutput())
+  return list(ffcn.getOutputData())
 
 x_0 = [0.0, 0.01, 0.01, 0.01, 0.01]
 t_sim = linspace(0.,2000.,500)
@@ -131,18 +131,18 @@ ocp_solver.setInput((num_nodes+1)*[5,5],ACADO_U_GUESS)
 ocp_solver.solve()
 
 # Optimal cost
-cost = ocp_solver.getOutput(ACADO_COST)[0]
+cost = ocp_solver.getOutputData(ACADO_COST)[0]
 print "optimal cost = ", cost
 
 # Print optimal parameters
-popt = ocp_solver.getOutput(ACADO_P_OPT)
+popt = ocp_solver.getOutputData(ACADO_P_OPT)
 print "optimal parameter values = ", popt
 
 # Time grid
 t_opt = linspace(0,ocp.tf,num_nodes+1)
 
 # Plot optimal control
-u_opt = ocp_solver.getOutput(ACADO_U_OPT)
+u_opt = ocp_solver.getOutputData(ACADO_U_OPT)
 u1 = []
 for i in range(0,len(u_opt),2):
   u1.append(u_opt[i])
@@ -158,7 +158,7 @@ plt.subplot(212)
 plt.plot(t_opt,u2)
 
 # Plot optimal state trajectory
-x_opt = ocp_solver.getOutput(ACADO_X_OPT)
+x_opt = ocp_solver.getOutputData(ACADO_X_OPT)
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 5)
 plt.figure(3)

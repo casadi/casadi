@@ -172,7 +172,7 @@ for it in range(1):
         # Get the coefficients of the continuity equation
         lfcn.setInput(1.0)
         lfcn.evaluate()
-        D[j] = lfcn.getOutput()[0]
+        D[j] = lfcn.getOutputData()[0]
 
         # Get the coefficients of the collocation equation
         C[j] = (K+1) * [[]]
@@ -337,10 +337,10 @@ for it in range(1):
     solver.solve()
 
     # Print the optimal cost
-    print "optimal cost: ", solver.getOutput(NLP_COST)[0]
+    print "optimal cost: ", solver.getOutputData(NLP_COST)[0]
 
     # Get the solution
-    vars_sol = solver.getOutput(NLP_X_OPT)
+    vars_sol = solver.getOutputData(NLP_X_OPT)
 
 ## ----
 ## SAVE SOLUTION TO DISK

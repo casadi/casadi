@@ -63,7 +63,7 @@ integrator.setInput(0,INTEGRATOR_P);
 def out(t):
 	integrator.setInput(t,INTEGRATOR_TF);
 	integrator.evaluate()
-	return integrator.getOutput()
+	return integrator.getOutputData()
 
 sol = array(map(out,ts))
 figure()
@@ -80,7 +80,7 @@ show()
 def out(dx0):
 	integrator.setInput([x0+dx0,y0],INTEGRATOR_X0)
 	integrator.evaluate()
-	return integrator.getOutput()
+	return integrator.getOutputData()
 dx0=linspace(-2,2,100)
 
 out = array(map(out,dx0))
@@ -152,7 +152,7 @@ f.init()
 def out(u):
 	f.setInput(u)
 	f.evaluate()
-	return f.getOutput()
+	return f.getOutputData()
 
 print out(0)
 print out(1)

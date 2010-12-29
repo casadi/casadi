@@ -220,7 +220,7 @@ if not calc_ic:
 integrator.evaluate()
 
 # Save the result
-res0 = integrator.getOutput()
+res0 = integrator.getOutputData()
 
 # Perturb in some direction
 if perturb_u:
@@ -238,13 +238,13 @@ integrator.evaluate()
 integrator.printStats()
 
 # Calculate finite difference approximation
-fd = list(integrator.getOutput())
+fd = list(integrator.getOutputData())
 for i in range(len(fd)):
   fd[i] -= res0[i]
   fd[i] /= 0.01
   
 print "unperturbed                     ", res0
-print "perturbed                       ", integrator.getOutput()
+print "perturbed                       ", integrator.getOutputData()
 print "finite_difference approximation ", fd
 
 # forward seeds

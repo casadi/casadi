@@ -45,7 +45,7 @@ f.init()
 f.setInput([1,1,1,1,1])
 f.evaluate()
 #! Test the objective for some value of x:
-print f.getOutput()
+print f.getOutputData()
 
 # constraint function
 g = MXFunction(X,prod(A,X))
@@ -69,5 +69,5 @@ solver.setInput([-100,-100,-100,-100,-100],NLP_LBG)
 
 
 solver.solve()
-print solver.getOutput(NLP_X_OPT)
+print solver.getOutputData(NLP_X_OPT)
 #! Nested optimization

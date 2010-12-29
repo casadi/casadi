@@ -27,9 +27,20 @@ class FX : public OptionsFunctionality{
   const FunctionIO & 	input (int i=0) const;
   const FunctionIO & 	output (int i=0) const;
 
+  %pythoncode %{
+  def getOutput(self,ind=0):
+   import numpy as n
+   return n.reshape(n.array(self.getOutputData(ind)),(self.output(ind).size1(),self.output(ind).size2()))
+  %}
+  
+  %pythoncode %{
+  def getInput(self,ind=0):
+   import numpy as n
+   return n.reshape(n.array(self.getInputData(ind)),(self.input(ind).size1(),self.input(ind).size2()))
+  %}
+  
+  
   // Forward renaming declarations
-  %rename(getInput) getInputData;
-  %rename(getOutput) getOutputData;
   %rename(getFwdSeed) getFwdSeedData;
   %rename(getFwdSens) getFwdSensData;
   %rename(getAdjSeed) getAdjSeedData;

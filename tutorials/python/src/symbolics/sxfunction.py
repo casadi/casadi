@@ -46,11 +46,11 @@ print f.getArgumentOut(), type(f.getArgumentOut())
 f.init()
 f.setInput(2)
 f.evaluate()
-print f.getOutput()
+print f.getOutputData()
 #! Reevaluation does not require the init call.
 f.setInput(3)
 f.evaluate()
-print f.getOutput()
+print f.getOutputData()
 #! We can evaluate symbolically, too:
 print f.eval(y)
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
@@ -68,7 +68,7 @@ f.init()
 f.setInput(2,0)
 f.setInput(3,1)
 f.evaluate()
-print [f.getOutput(i) for i in range(2)]
+print [f.getOutputData(i) for i in range(2)]
 print [[f.grad(i,j) for i in range(2)] for j in range(2)]
 
 #! Symbolic function manipulation
@@ -101,7 +101,7 @@ print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
 f.setInput([2,3])
 f.evaluate()
-print f.getOutput()
+print f.getOutputData()
 G=f.grad()
 print G
 
@@ -126,7 +126,7 @@ f.init()
 f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
 f.setInput([4,5,6,7],1);
 f.evaluate()
-print f.getOutput() # vector instead of matrix
+print f.getOutputData() # vector instead of matrix
 print f.grad(0)
 print f.grad(1)
 

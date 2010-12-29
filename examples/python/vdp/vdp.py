@@ -172,23 +172,23 @@ ocp_solver.setInput(cfcn_ub,ACADO_UBC)
 ocp_solver.solve()
 
 # Print optimal cost
-cost = ocp_solver.getOutput(ACADO_COST)[0]
+cost = ocp_solver.getOutputData(ACADO_COST)[0]
 print "optimal cost = ", cost
 
 # Print optimal parameters
-popt = ocp_solver.getOutput(ACADO_P_OPT)
+popt = ocp_solver.getOutputData(ACADO_P_OPT)
 print "optimal parameter values = ", popt
 
 # Time grid
 t_opt = linspace(0,ocp.tf,num_nodes+1)
 
 # Plot optimal control
-u_opt = ocp_solver.getOutput(ACADO_U_OPT)
+u_opt = ocp_solver.getOutputData(ACADO_U_OPT)
 plt.figure(3)
 plt.plot(t_opt,u_opt)
 
 # Plot optimal state trajectory
-x_opt = ocp_solver.getOutput(ACADO_X_OPT)
+x_opt = ocp_solver.getOutputData(ACADO_X_OPT)
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 3)
 plt.figure(4)
