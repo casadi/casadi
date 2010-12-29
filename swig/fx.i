@@ -11,7 +11,7 @@ class FunctionIO {
   public:
     int size1() const;
     int size2() const;
-    
+    int numel() const;
 };
 
 class FX : public OptionsFunctionality{
