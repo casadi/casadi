@@ -1,5 +1,15 @@
 %module casadi
 
+#ifdef WITH_DOXDOC
+%include "../doc/doc.i"
+#endif 
+
+#ifndef WITH_DOXDOC
+#warning "Not using doxygen. Run /doc/doc2swig.py to include it. A make rebuild-cache may be necessary."
+#endif
+
+%feature("autodoc", "1");
+
 // STL
 %include "std_string.i"
 %include "std_vector.i"
