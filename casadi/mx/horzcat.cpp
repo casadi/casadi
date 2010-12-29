@@ -53,7 +53,7 @@ void Horzcat::print(ostream &stream) const{
 }
 
 void Horzcat::evaluate(int fsens_order, int asens_order){
-  /** Copy-pasted code from vertcat. Needs validity check */
+  /** Copy-pasted code from vertcat. This code is wrong. */
   assert(fsens_order==0 || asens_order==0);
   
   if(fsens_order==0){
