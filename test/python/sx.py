@@ -60,8 +60,9 @@ class SXtests(unittest.TestCase):
     sF=[1,0]
     fcn.setFwdSeed(sF);
 
+    sA=[1,0]
     # Pass adjoint seed
-    fcn.setAdjSeed([0,1])
+    fcn.setAdjSeed(sA)
 
     # Evaluate numerically
     fcn.evaluate(1,1)
@@ -78,8 +79,20 @@ class SXtests(unittest.TestCase):
     self.assertAlmostEqual(fsensn[0], fsens[0],6,'SXfunction forward mode evaluation wrong')
     self.assertAlmostEqual(fsensn[1], fsens[1],6,'SXfunction forward mode evaluation wrong')
     
+    J=fcn.jacobian()
+    J.init()
+    J.setInput(L)
+    J.evaluate()
+    J=J.getOutput()
+    
+    fsensJ=dot(J,array(sF))
+    self.assertAlmostEqual(fsensJ[0], fsens[0],10,'SXfunction forward mode evaluation wrong')
+    self.assertAlmostEqual(fsensJ[1], fsens[1],10,'SXfunction forward mode evaluation wrong')
+    
     asens = fcn.getAdjSens()
-    #print "adjoint derivative = ", asens
+    asensJ=dot(J.T,array(sA))
+    self.assertAlmostEqual(asensJ[0], asens[0],10,'SXfunction adjoint mode evaluation wrong')
+    self.assertAlmostEqual(asensJ[1], asens[1],10,'SXfunction adjoint mode evaluation wrong')
 
     # evaluate symbolically
     fsubst = fcn.eval([[1-y,1-x]])
