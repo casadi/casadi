@@ -34,7 +34,34 @@ namespace CasADi{
 /** Forward declaration of internal class */
 class FXNode;
 
-/** General function
+/** \brief General function
+
+  A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
+  Number of inputs:  nin    getNumInputs()\n
+  Number of outputs: nout   getNumOutputs()\n
+  
+  We can view this function as a being composed of a (nin, nout) grid of single-input, single-output primitive functions.\n
+  Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$, 
+  in which n,m,p,q can take different values for every (i,j) pair.\n
+  
+  When passing input, you specify which partition i is active.     You pass the numbers flattened, as a vector of size \f$(n*m)\f$.\n
+  When requesting output, you specify which partition j is active. You get the numbers flattened, as a vector of size \f$(p*q)\f$.\n
+  
+  To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
+  
+  Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
+  
+  Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
+  Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
+  
+  Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
+  Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
+  
+  We have the following relationships:
+  
+  \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
+  \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
+  
   \author Joel Andersson 
   \date 2010
 */
