@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from casadi import *
 from numpy import *
+# This example has been ported to a unittesting framework
 
 # variables
 x = SX("x")
