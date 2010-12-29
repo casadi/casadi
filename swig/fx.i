@@ -7,6 +7,13 @@
 
 namespace CasADi {
 
+class FunctionIO {
+  public:
+    int size1() const;
+    int size2() const;
+    
+};
+
 class FX : public OptionsFunctionality{
   public:
   void init();
@@ -16,6 +23,9 @@ class FX : public OptionsFunctionality{
   int getNumOutputs() const;
   FX jacobian(int iind=0, int oind=0);
   FX hessian(int iind=0, int oind=0);
+  
+  const FunctionIO & 	input (int i=0) const;
+  const FunctionIO & 	output (int i=0) const;
 
   // Forward renaming declarations
   %rename(getInput) getInputData;
