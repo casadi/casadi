@@ -72,7 +72,9 @@ SET(CASADI_SRCS
   mx/flatten.hpp
   mx/reshape.cpp
   mx/reshape.hpp
-
+  mx/reordering.cpp
+  mx/reordering.hpp
+  
   fx/fx.hpp
   fx/fx.cpp
   fx/function_io.hpp
