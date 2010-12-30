@@ -39,6 +39,20 @@ class FX : public OptionsFunctionality{
    return n.reshape(n.array(self.getInputData(ind)),(self.input(ind).size1(),self.input(ind).size2()))
   %}
   
+  %pythoncode %{
+  def setInput(self,num,ind=0):
+   import numpy as n
+   if type(num)==type([]) or type(num)==type((1,)) :
+    self.setInputData(num,ind)
+   else:
+    temp=n.array(num)
+    if len(temp.shape)>1 and not(temp.shape[0]==self.input(ind).size1() and temp.shape[1]==self.input(ind).size2()):
+      raise Exception("setInput dimension mismatch. You provided a non-vector matrix (%d,%d), but the dimensions don't match with (%d,%d). " % (temp.shape[0],temp.shape[1],self.input(ind).size1(),self.input(ind).size2()))
+    self.setInputData(n.array(num).flatten().tolist(),ind)
+  %}
+  
+  
+  %rename(setInputData) setInput;
   
   // Forward renaming declarations
   %rename(getFwdSeed) getFwdSeedData;
