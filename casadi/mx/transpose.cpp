@@ -27,13 +27,18 @@ using namespace std;
 
 namespace CasADi{
 
-Transpose::Transpose(const MX& x) : MXNode(x){
+
+Transpose::Transpose(const MX& x) : Reordering(x){
   sz.nrow = x.size2();
   sz.ncol = x.size1();
 }
 
 Transpose* Transpose::clone() const{
   return new Transpose(*this);
+}
+
+int Transpose::k2k(int k) {
+  return (k/sz.ncol) + (k%sz.ncol)*sz.nrow;
 }
 
 void Transpose::print(std::ostream &stream) const{
@@ -76,5 +81,6 @@ void Transpose::evaluate(int fsens_order, int asens_order){
     
   }
 }
+
 
 } // namespace CasADi

@@ -20,44 +20,43 @@
  *
  */
 
-#ifndef TRANSPOSE_HPP
-#define TRANSPOSE_HPP
-
-#include "mx_node.hpp"
 #include "reordering.hpp"
+#include "../stl_vector_tools.hpp"
+#include <cassert>
+#include <iterator>
+
+using namespace std;
 
 namespace CasADi{
 
-/** Represents a transposition of an MX
-  \author Joel Andersson 
-  \date 2010
-*/
-class Transpose : public Reordering {
-friend class MX;
+// Constructor
+Reordering::Reordering(const vector<MX>& dep__) : MXNode(dep__){
+}
 
-public:
+Reordering::Reordering(const MX &dep__) : MXNode(dep__){
+}
 
-/** \brief  Constructor */
-Transpose(const MX& x);
-
-/** \brief  Clone function */
-virtual Transpose* clone() const;
-
-/** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
-
-/** \brief  Evaluate the function and store the result in the node */
-virtual void evaluate(int fsens_order, int asens_order);
-
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-//  virtual void evaluateAdj();
-
-/** \brief Maps (k)  to (k*)
-*/
-virtual int k2k(int k);
-
-};
+void Reordering::evaluate(int fsens_order, int asens_order){
+ assert(fsens_order==0 || asens_order==0);
+  
+  if(fsens_order==0){
+    int lk[2];
+    for (int k=0;k<sz.nrow*sz.ncol;k++) {
+      val(0)[k]=dep(k2l(k))->val(0)[k2k(k)];
+    }
+  } else {
+    int lk[2];
+    for (int k=0;k<sz.nrow*sz.ncol;k++) {
+      val(1)[k]=dep(k2l(k))->val(1)[k2k(k)];
+    }
+  }
+  
+  if(asens_order>0){
+    int lk[2];
+    for (int k=0;k<sz.nrow*sz.ncol;k++) {
+      dep(k2k(k))->val(1)[k2l(k)]+=val(1)[k];
+    }
+  }
+}
 
 } // namespace CasADi
-
-#endif // TRANSPOSE_HPP

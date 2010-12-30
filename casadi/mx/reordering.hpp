@@ -20,44 +20,57 @@
  *
  */
 
-#ifndef TRANSPOSE_HPP
-#define TRANSPOSE_HPP
+#ifndef REORDERING_HPP
+#define REORDERING_HPP
 
 #include "mx_node.hpp"
-#include "reordering.hpp"
 
 namespace CasADi{
 
-/** Represents a transposition of an MX
-  \author Joel Andersson 
+/** \brief Base class for MXNodes that are a mere reoderening of the entries of their dependencies.
+
+  This class mainly deals with indexing magic.
+  
+  We have:
+  (i,j) matrix type indexing.
+  (k) vector type indexing.
+  
+  We map k to a dependency (l*) and a vector index for this dependency (l)
+
+  \author Joris Gillis
   \date 2010
 */
-class Transpose : public Reordering {
-friend class MX;
-
+class Reordering : public MXNode{
 public:
 
 /** \brief  Constructor */
-Transpose(const MX& x);
+explicit Reordering(const std::vector<MX> &comp);
 
-/** \brief  Clone function */
-virtual Transpose* clone() const;
+explicit Reordering(const MX &comp);
 
-/** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
-
-/** \brief  Evaluate the function and store the result in the node */
+/** \brief  Evaluate the function and store the result in the node
+ There is a default implementation that works with the indexing functions.
+ It will work, but for speed, reimplement method.
+ */
 virtual void evaluate(int fsens_order, int asens_order);
 
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-//  virtual void evaluateAdj();
+/** \brief Maps (k)  to (l)
+Default implementation: return 0
+*/
+virtual int k2l(int k) { return 0;};
 
 /** \brief Maps (k)  to (k*)
 */
-virtual int k2k(int k);
+virtual int k2k(int k)=0;
 
+// These index remapping function out to be inlined. Can one inline without losing polymorphism here?
+// Some C++ guru ought to take a look here...
+
+protected:
+  
+  
 };
 
 } // namespace CasADi
 
-#endif // TRANSPOSE_HPP
+#endif // REORDERING_HPP
