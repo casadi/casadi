@@ -62,6 +62,7 @@ if(WITH_NUMPY)
 find_package (Numpy)
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${NUMPY_INCLUDED_DIRS})
+set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_NUMPY")
 endif(WITH_NUMPY)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)

@@ -14,6 +14,16 @@
 %include "std_string.i"
 %include "std_vector.i"
 
+#ifndef WITH_NUMPY
+#warning "Not using numpy. option(WITH_NUMPY = OFF)"
+#endif
+
+#ifdef WITH_NUMPY
+#warning "Using numpy. option(WITH_NUMPY = ON)"
+%include "numpy.i"
+#endif
+
+
 // Template instantiations
 namespace std {
 %template(vector_int) vector<int>;

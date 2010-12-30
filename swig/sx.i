@@ -186,7 +186,7 @@ std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string
 #undef unops
 #undef binops
 
-//%include "numpy.i"
+
 
 
 //namespace CasADi{
