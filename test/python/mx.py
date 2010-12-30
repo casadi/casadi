@@ -24,6 +24,19 @@ def checkMXoperations(self,ztf,zrf,name):
     checkarray(self,zrf(zr),zt,name)
     return zt
 
+def checkMXoperations2(self,ztf,zrf,name):
+    x = MX("x",3,1)
+    z = horzcat([x*i for i in range(8)])
+    f = MXFunction([x],[ztf(z)])
+    f.init()
+    L=[1,2,3]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)]).T
+    checkarray(self,zrf(zr),zt,name)
+    return zt
+
 class MXtests(unittest.TestCase):
 
   def setUp(self):
@@ -398,16 +411,15 @@ class MXtests(unittest.TestCase):
     checkMXoperations(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(vertcat))') 
     checkMXoperations(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
     
-  def test_horzcat(self):
-      x = MX("x",3)
-      z=horzcat([x*i for i in range(8)])
-      f = MXFunction([x],[z])
-      f.init()
-      L=[1,2,3]
-      f.setInput(L,0)
-      f.evaluate()
-      zt = f.getOutput()
-      print zt
+  def test_MXcompose2(self):
+    checkMXoperations2(self,lambda x: x,lambda x: x,'horzcat')
+    checkMXoperations2(self,lambda x: trans(x),lambda x: x.T,'trans(horzcat)')
+    checkMXoperations2(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(horzcat))')
+    checkMXoperations2(self,lambda x: flatten(trans(x)),lambda x: reshape(x.T,(prod(x.shape),1)),'flatten(trans(horzcat))')
+    checkMXoperations2(self,lambda x: trans(flatten(x)),lambda x: reshape(x,(prod(x.shape),1)).T,'flatten(trans(horzcat))')
+    checkMXoperations2(self,lambda x: c.reshape(x,(4,6)),lambda x: reshape(x,(4,6)),'reshape(horzcat)')
+    checkMXoperations2(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(horzcat))') 
+    checkMXoperations2(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
 
          
 if __name__ == '__main__':

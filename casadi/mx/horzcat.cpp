@@ -34,8 +34,11 @@ Horzcat::Horzcat(const vector<MX>& dep__) : MXNode(dep__){
   assert(!dep_.empty());
   int sz1=dep(0).size1();
   int sz2=0;
+  cumulSize2.resize(dep_.size());
+  int cnt=0;
   for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
     assert(sz1==it->size1());
+    cumulSize2[cnt++] = sz2;
     sz2 += it->size2();
   }  
   sz.nrow = sz1;
@@ -53,29 +56,28 @@ void Horzcat::print(ostream &stream) const{
 }
 
 void Horzcat::evaluate(int fsens_order, int asens_order){
-  /** Copy-pasted code from vertcat. This code is wrong. */
   assert(fsens_order==0 || asens_order==0);
   
   if(fsens_order==0){
-    int i = 0;
+    int cnt=0;
     for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy((*it)->val(0).begin(),(*it)->val(0).end(),&val(0)[i]);
-      i += it->numel();
+      int offset = cumulSize2[cnt++];
+      for (int k=0; k < it->size1(); k++) {
+        copy(&(*it)->val(0)[k*it->size2()],&(*it)->val(0)[k*it->size2()]+it->size2(),&val(0)[offset+k*sz.ncol]);
+      }
     }
   } else {
-    int i = 0;
+    int cnt=0;
     for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy((*it)->val(1).begin(),(*it)->val(1).end(),&val(1)[i]);
-      i += it->numel();
+      int offset = cumulSize2[cnt++];
+      for (int k=0; k < it->size1(); k++) {
+        copy(&(*it)->val(1)[k*it->size2()],&(*it)->val(1)[k*it->size2()]+it->size2(),&val(1)[offset+k*sz.ncol]);
+      }
     }
   }
   
   if(asens_order>0){
-    int i = 0;
-    for(vector<MX>::iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy(&val(1)[i],&val(1)[i] + it->numel(), (*it)->val(1).begin());
-      i += it->numel();
-    }
+    throw CasadiException("Horzcat::evaluate: adjoints evaluation not implemented");
   }
 }
 

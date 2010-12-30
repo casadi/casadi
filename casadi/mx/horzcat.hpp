@@ -47,7 +47,8 @@ virtual void print(std::ostream &stream=std::cout) const;
 virtual void evaluate(int fsens_order, int asens_order);
 
 protected:
-
+  std::vector<int> cumulSize2;
+  
 };
 
 } // namespace CasADi
