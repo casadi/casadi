@@ -5,24 +5,27 @@ import unittest
 from types import *
 
 def checkarray(self,zr,zt,name):
-    self.assertEqual(zt.shape[0],zr.shape[0],"%s dimension error" % name)
-    self.assertEqual(zt.shape[1],zr.shape[1],"%s dimension error"  % name)
+    if len(zr.shape)==1 and (zt.shape[0]==1 or zt.shape[1]==1) and zr.shape[0]==zt.shape[1]*zt.shape[0]:
+      zr=reshape(zr,(zt.shape));
+    self.assertEqual(zt.shape[0],zr.shape[0],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
+    self.assertEqual(len(zt.shape),len(zr.shape),"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
+    self.assertEqual(zt.shape[1],zr.shape[1],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
     for i in range(zr.shape[0]):
       for j in range(zr.shape[1]):
-        self.assertAlmostEqual(zt[i,j],zr[i,j],10,"%s evaluation error" % name)
+        self.assertAlmostEqual(zt[i,j],zr[i,j],10,"%s evaluation error. %s <-> %s" % (name, str(zt),str(zr)))
 
 def checkMXoperations(self,ztf,zrf,name):
     x = MX("x",1,3)
-    z=vertcat([x*i for i in range(8)])
+    z=vertcat([x*(i+1) for i in range(8)])
     f = MXFunction([x],[ztf(z)])
     f.init()
     L=[1,2,3]
     f.setInput(L,0)
     f.evaluate()
     zt = f.getOutput()
-    zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
+    zr = array([[L[0]*(i+1),L[1]*(i+1),L[2]*(i+1)] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
-    return zt
+    return (zt,zrf(zr))
 
 def checkMXoperations2(self,ztf,zrf,name):
     x = MX("x",3,1)
@@ -37,6 +40,20 @@ def checkMXoperations2(self,ztf,zrf,name):
     checkarray(self,zrf(zr),zt,name)
     return zt
 
+def checkMXoperations3(self,ztf,zrf,name):
+    x = MX("x",3,1)
+    p = horzcat([x[0,0],x[1,0],x[2,0]])
+    z = vertcat([p*i for i in range(8)])
+    f = MXFunction([x],[ztf(z)])
+    f.init()
+    L=[1,2,3]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
+    checkarray(self,zrf(zr),zt,name)
+    return (zt,zrf(zr))
+    
 class MXtests(unittest.TestCase):
 
   def setUp(self):
@@ -410,7 +427,7 @@ class MXtests(unittest.TestCase):
     checkMXoperations(self,lambda x: c.reshape(x,(4,6)),lambda x: reshape(x,(4,6)),'reshape(vertcat)')
     checkMXoperations(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(vertcat))') 
     checkMXoperations(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
-    
+
   def test_MXcompose2(self):
     checkMXoperations2(self,lambda x: x,lambda x: x,'horzcat')
     checkMXoperations2(self,lambda x: trans(x),lambda x: x.T,'trans(horzcat)')
@@ -421,7 +438,57 @@ class MXtests(unittest.TestCase):
     checkMXoperations2(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(horzcat))') 
     checkMXoperations2(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
 
-         
+  def test_MXcompose3(self):
+    checkMXoperations3(self,lambda x: x,lambda x: x,'snippet')
+    checkMXoperations3(self,lambda x: trans(x),lambda x: x.T,'trans(snippet)')
+    checkMXoperations3(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(snippet))')
+    checkMXoperations3(self,lambda x: flatten(trans(x)),lambda x: reshape(x.T,(prod(x.shape),1)),'flatten(trans(snippet))')
+    checkMXoperations3(self,lambda x: trans(flatten(x)),lambda x: reshape(x,(prod(x.shape),1)).T,'flatten(trans(snippet))')
+    checkMXoperations3(self,lambda x: c.reshape(x,(4,6)),lambda x: reshape(x,(4,6)),'reshape(snippet)')
+    checkMXoperations3(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(snippet))') 
+    checkMXoperations3(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(snippet))') 
+
+  def test_MXcompose4(self):
+    checkMXoperations(self,lambda x: vertcat([x]),lambda x: x,'vertcat(vertcat)')
+    checkMXoperations(self,lambda x: vertcat([x,x*2]),lambda x: vstack((x,x*2)),'vertcat(vertcat,vertcat)')
+    checkMXoperations(self,lambda x: horzcat([x]),lambda x: x,'horzcat(vertcat)')
+    checkMXoperations(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(vertcat,vertcat)')
+    
+    checkMXoperations2(self,lambda x: vertcat([x]),lambda x: x,'vertcat(horzcat)')
+    checkMXoperations2(self,lambda x: vertcat([x,x*2]),lambda x: vstack((x,x*2)),'vertcat(horzcat,horzcat)')
+    checkMXoperations2(self,lambda x: horzcat([x]),lambda x: x,'horzcat(horzcat)')
+    checkMXoperations2(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(horzcat,horzcat)')
+    
+    checkMXoperations3(self,lambda x: vertcat([x]),lambda x: x,'vertcat(snippet)')
+    checkMXoperations3(self,lambda x: vertcat([x,x*2]),lambda x: vstack((x,x*2)),'vertcat(snippet,snippet)')
+    checkMXoperations3(self,lambda x: horzcat([x]),lambda x: x,'horzcat(snippet)')
+    checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(snippet,snippet)')
+    
+  def test_MXslicingnew(self):
+    x = MX("x",2,3)
+    xt=trans(x)
+    self.assertEqual(xt.size1(),3,"trans MX of wrong dimension")
+    self.assertEqual(xt.size2(),2,"trans MX of wrong dimension")
+    p1 = horzcat([xt[0,0],xt[1,0],xt[2,0]])
+    p2 = horzcat([xt[0,1],xt[1,1],xt[2,1]])
+    z = vertcat([p1,p2])
+    f = MXFunction([x],[z])
+    f.init()
+    L=[1,2,3,4,5,6]
+    f.setInput(L,0)
+    f.evaluate()
+    zt = f.getOutput()
+    zr = reshape(array(L),(2,3))
+    checkarray(self,zr,zt,"slicing(trans)")
+    checkMXoperations(self,lambda x: x[:,0],lambda x: x[:,0],'vertcat[:,0]')
+    checkMXoperations(self,lambda x: x[:,1],lambda x: x[:,1],'vertcat[:,1]')
+    checkMXoperations(self,lambda x: x[1,:],lambda x: x[1,:],'vertcat[1,:]')
+    checkMXoperations(self,lambda x: x[0,:],lambda x: x[0,:],'vertcat[0,:]')
+    checkMXoperations(self,lambda x: x[:,0:1],lambda x: x[:,0:1],'vertcat[:,0:1]')
+    checkMXoperations(self,lambda x: x[0:1,:],lambda x: x[0:1,:],'vertcat[0:1,:]')
+    checkMXoperations(self,lambda x: x[[0,1],0:1],lambda x: x[[0,1],0:1],'vertcat[:,0:1]')
+    checkMXoperations(self,lambda x: x[0:1,[0,1]],lambda x: x[0:1,[0,1]],'vertcat[0:1,:]')
+    
 if __name__ == '__main__':
     unittest.main()
 
