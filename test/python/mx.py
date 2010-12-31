@@ -489,6 +489,18 @@ class MXtests(unittest.TestCase):
     checkMXoperations(self,lambda x: x[[0,1],0:1],lambda x: x[[0,1],0:1],'vertcat[:,0:1]')
     checkMXoperations(self,lambda x: x[0:1,[0,1]],lambda x: x[0:1,[0,1]],'vertcat[0:1,:]')
     
+    
+  def test_getinputMX(self):
+    x=MX("x",2,3)
+    f = MXFunction([x],[3*x]) 
+    g = MXFunction([f.getInputMX()],[f.getOutputMX()]) 
+    
+    f.init()
+    g.init()
+    n=array([[1,2,3],[4,5,6]])
+    checkarray(self,f(n),g(n),"slicing(trans)")
+    
+    
 if __name__ == '__main__':
     unittest.main()
 

@@ -103,6 +103,12 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
+  /** \brief get MX input **/
+  SXMatrix getInputSX(int ind=0);
+  
+  /** \brief get MX output **/
+  SXMatrix getOutputSX(int ind=0);
+  
 };
   
 template<int n>
@@ -222,6 +228,7 @@ class SXFunctionNode : public FXNode{
 
 /** \brief  Outputs of the function (needed for symbolic calculations) */
   std::vector<SXMatrix> outputv;
+
 
 
 };

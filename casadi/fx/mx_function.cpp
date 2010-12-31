@@ -248,6 +248,14 @@ MXFunction::MXFunction(const std::vector<MX>& inputv, const std::vector<MX>& out
   assignNode(new MXFunctionNode(inputv,outputv));
 }
 
+MX MXFunction::getInputMX(int ind) {
+  return (*this)->inputv[ind];
+}
+
+MX MXFunction::getOutputMX(int ind) {
+  return (*this)->outputv[ind];
+}
+
 const MXFunctionNode* MXFunction::operator->() const{
   return (const MXFunctionNode*)FX::operator->();
 }

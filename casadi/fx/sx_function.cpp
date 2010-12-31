@@ -1501,6 +1501,14 @@ SXMatrix SXFunction::hess(int iind, int oind){
   return (*this)->hess(iind,oind);  
 }
 
+SXMatrix SXFunction::getInputSX(int ind) {
+  return (*this)->inputv[ind];
+}
+
+SXMatrix SXFunction::getOutputSX(int ind) {
+  return (*this)->outputv[ind];
+}
+
 
 } // namespace CasADi
 

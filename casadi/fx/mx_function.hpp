@@ -61,6 +61,12 @@ public:
 /** \brief  Access functions of the node */
   MXFunctionNode* operator->();
   const MXFunctionNode* operator->() const;
+  
+/** \brief get MX input **/
+  MX getInputMX(int ind=0);
+  
+/** \brief get MX output **/
+  MX getOutputMX(int ind=0);
 };
   
 

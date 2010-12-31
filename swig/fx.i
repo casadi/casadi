@@ -75,6 +75,7 @@ class FX : public OptionsFunctionality{
     self.evaluate()
     return n.array(self.getOutput(oind))
   %}
+
   
   
   %rename(setInputData) setInput;
@@ -153,6 +154,9 @@ public:
   
   /// Hessian (forward over adjoint) via source code transformation
   SXMatrix hess(int iind=0, int oind=0);
+  
+  SXMatrix getInputSX(int ind=0);
+  SXMatrix getOutputSX(int ind=0);
 
 };
 
@@ -169,6 +173,10 @@ public:
 
 /** \brief  Multiple input, multiple output*/
   MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
+  
+  MX getInputMX(int ind=0);
+  MX getOutputMX(int ind=0);
+  
 };
 
 } // namespace CasADi
