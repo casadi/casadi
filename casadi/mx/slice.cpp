@@ -59,14 +59,20 @@ void Slice::evaluate(int fsens_order, int asens_order){
       }
     }
   } else {
-    for (int k=0;k<sz.nrow*sz.ncol;k++) {
-      val(1)[k]=dep(k2l(k))->val(1)[k2k(k)];
+    int k=0;
+    for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
+     	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
+    	  val(1)[k++]=dep(0)->val(1)[(*iti)*dep(0).size2() + (*itj)];
+      }
     }
   }
   
   if(asens_order>0){
-    for (int k=0;k<sz.nrow*sz.ncol;k++) {
-      dep(k2k(k))->val(1)[k2l(k)]+=val(1)[k];
+    int k=0;
+    for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
+     	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
+    	  dep(0)->val(0)[(*iti)*dep(0).size2() + (*itj)]+=val(0)[k++];
+      }
     }
   }
 }
