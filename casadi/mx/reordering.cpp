@@ -40,19 +40,16 @@ void Reordering::evaluate(int fsens_order, int asens_order){
  assert(fsens_order==0 || asens_order==0);
   
   if(fsens_order==0){
-    int lk[2];
     for (int k=0;k<sz.nrow*sz.ncol;k++) {
       val(0)[k]=dep(k2l(k))->val(0)[k2k(k)];
     }
   } else {
-    int lk[2];
     for (int k=0;k<sz.nrow*sz.ncol;k++) {
       val(1)[k]=dep(k2l(k))->val(1)[k2k(k)];
     }
   }
   
   if(asens_order>0){
-    int lk[2];
     for (int k=0;k<sz.nrow*sz.ncol;k++) {
       dep(k2k(k))->val(1)[k2l(k)]+=val(1)[k];
     }
