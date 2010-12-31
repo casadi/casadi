@@ -62,6 +62,7 @@ MX FX::operator()(const vector<MX> &x, int ind) const{
 }
 
 void FX::evaluate(int fsens_order, int asens_order){
+  (*this)->assertInit();
   (*this)->evaluate(fsens_order,asens_order);
 }
 
@@ -92,6 +93,10 @@ FX FX::jacobian(int iind, int oind){
 
 FX FX::hessian(int iind, int oind){
   return (*this)->hessian(iind,oind);  
+}
+
+bool FX::isInit() const {
+  return (*this)->is_init_;
 }
 
 
@@ -159,6 +164,11 @@ void FXNode::assertInit() const{
     throw CasadiException("FXNode::assertInit: function has not been initialized");
 }
 
+void FX::assertInit() const{
+  if(!(*this)->is_init_)
+    throw CasadiException("FXNode::assertInit: function has not been initialized");
+}
+
 bool FX::checkNode() const{
   return dynamic_cast<const FXNode*>(get());
 }
@@ -198,7 +208,6 @@ const FunctionIO& FXNode::output(int i) const{
   if(i>=output_.size()) throw CasadiException("FXNode::output: out of bounds");
   return output_.at(i);    
 }
-
 
 
 

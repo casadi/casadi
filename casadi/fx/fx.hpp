@@ -123,35 +123,41 @@ class FX : public OptionsFunctionality{
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Is initialized?
+  bool isInit() const;
+  
+  /// Assert that the function has been initialized
+  void assertInit() const;
+  
 #if 0
 // SWIG doesn't support nested template instantiations -- WORKAROUND BELOW
   
   /** \brief  Set an input */
-  template <class T> void setInput(T val, int ind=0){input(ind).set(val); }
+  template <class T> void setInput(T val, int ind=0){assertInit();input(ind).set(val); }
 
   /** \brief  Set an output */
-  template <class T> void setOutput(T val, int ind=0){output(ind).set(val); }
+  template <class T> void setOutput(T val, int ind=0){assertInit();output(ind).set(val); }
 
   /** \brief  Set a forward seed */
-  template <class T> void setFwdSeed(T val, int ind=0, int dir=0){input(ind).setF(val,dir); }
+  template <class T> void setFwdSeed(T val, int ind=0, int dir=0){assertInit();input(ind).setF(val,dir); }
 
   /** \brief  Set a forward sensitivity */
-  template <class T> void setFwdSens(T val, int ind=0, int dir=0){output(ind).setF(val,dir); }
+  template <class T> void setFwdSens(T val, int ind=0, int dir=0){assertInit();output(ind).setF(val,dir); }
 
   /** \brief  Set an adjoint seed */
-  template <class T> void setAdjSeed(T val, int ind=0, int dir=0){output(ind).setA(val,dir); }
+  template <class T> void setAdjSeed(T val, int ind=0, int dir=0){assertInit();output(ind).setA(val,dir); }
 
   /** \brief  Set an adjoint sensitivity */
-  template <class T> void setAdjSens(T val, int ind=0, int dir=0){input(ind).setA(val,dir); }
+  template <class T> void setAdjSens(T val, int ind=0, int dir=0){assertInit();input(ind).setA(val,dir); }
 #else 
 // WORKAROUND
 #define SETTERS(T)\
-  void setInput(T val, int ind=0){input(ind).set(val); } \
-  void setOutput(T val, int ind=0){output(ind).set(val); } \
-  void setFwdSeed(T val, int ind=0, int dir=0){input(ind).setF(val,dir); } \
-  void setFwdSens(T val, int ind=0, int dir=0){output(ind).setF(val,dir); } \
-  void setAdjSeed(T val, int ind=0, int dir=0){output(ind).setA(val,dir); } \
-  void setAdjSens(T val, int ind=0, int dir=0){input(ind).setA(val,dir); }
+  void setInput(T val, int ind=0){assertInit();input(ind).set(val); } \
+  void setOutput(T val, int ind=0){assertInit();output(ind).set(val); } \
+  void setFwdSeed(T val, int ind=0, int dir=0){assertInit();input(ind).setF(val,dir); } \
+  void setFwdSens(T val, int ind=0, int dir=0){assertInit();output(ind).setF(val,dir); } \
+  void setAdjSeed(T val, int ind=0, int dir=0){assertInit();output(ind).setA(val,dir); } \
+  void setAdjSens(T val, int ind=0, int dir=0){assertInit();input(ind).setA(val,dir); }
 
 SETTERS(double);
 SETTERS(const double*);
@@ -233,6 +239,7 @@ vector<double>& getAdjSeedData(int ind=0, int dir=0) {return output(ind).dataA(d
 /** \brief  Get an adjoint sensitivity data */
 vector<double>& getAdjSensData(int ind=0, int dir=0) {return input(ind).dataA(dir); }
 
+
 };
 
 /** \brief Internal class for FX
@@ -290,6 +297,8 @@ class FXNode : public OptionsFunctionalityNode{
 
   /// Assert that the function has been initialized
   void assertInit() const;
+  
+
 
   protected:
 
