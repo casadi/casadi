@@ -61,7 +61,8 @@ class FX : public OptionsFunctionality{
      def __call__(self,x,iind=0,oind=0)
      
      When x is numeric, does the same as:
-     
+      if (self.isInit()):
+       self.init()
       self.setInput(x,iind)
       self.evaluate()
       return n.array(self.getOutput(oind))
@@ -71,12 +72,15 @@ class FX : public OptionsFunctionality{
     return self.call(x,iind)
    else:
     import numpy as n
+    if not(self.isInit()):
+      self.init()
     self.setInput(x,iind)
     self.evaluate()
     return n.array(self.getOutput(oind))
   %}
 
-  
+  /// Is initialized?
+  bool isInit() const;
   
   %rename(setInputData) setInput;
   

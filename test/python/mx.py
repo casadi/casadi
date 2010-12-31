@@ -493,12 +493,12 @@ class MXtests(unittest.TestCase):
   def test_getinputMX(self):
     x=MX("x",2,3)
     f = MXFunction([x],[3*x]) 
-    g = MXFunction([f.getInputMX()],[f.getOutputMX()]) 
+    g = MXFunction([f.getInputMX()],[6*f.getOutputMX()]) 
     
     f.init()
     g.init()
     n=array([[1,2,3],[4,5,6]])
-    checkarray(self,f(n),g(n),"slicing(trans)")
+    checkarray(self,6*f(n),g(n),"slicing(trans)")
     
     
 if __name__ == '__main__':
