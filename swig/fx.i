@@ -29,18 +29,21 @@ class FX : public OptionsFunctionality{
 
   %pythoncode %{
   def getOutput(self,ind=0):
+   """ A wrapper around getOutputData, that outputs as a numpy.ndarray """
    import numpy as n
    return n.reshape(n.array(self.getOutputData(ind)),(self.output(ind).size1(),self.output(ind).size2()))
   %}
   
   %pythoncode %{
   def getInput(self,ind=0):
+   """ A wrapper around getInputData, that outputs as a numpy.ndarray """
    import numpy as n
    return n.reshape(n.array(self.getInputData(ind)),(self.input(ind).size1(),self.input(ind).size2()))
   %}
   
   %pythoncode %{
   def setInput(self,num,ind=0):
+   """ A wrapper around setInput, that allows list,tuples and numpy.arrays """
    import numpy as n
    if type(num)==type([]) or type(num)==type((1,)) :
     self.setInputData(num,ind)
@@ -48,7 +51,29 @@ class FX : public OptionsFunctionality{
     temp=n.array(num)
     if len(temp.shape)>1 and not(temp.shape[0]==self.input(ind).size1() and temp.shape[1]==self.input(ind).size2()):
       raise Exception("setInput dimension mismatch. You provided a non-vector matrix (%d,%d), but the dimensions don't match with (%d,%d). " % (temp.shape[0],temp.shape[1],self.input(ind).size1(),self.input(ind).size2()))
-    self.setInputData(n.array(num).flatten().tolist(),ind)
+    self.setInputData(temp.flatten().tolist(),ind)
+  %}
+  
+  %pythoncode %{
+  def __call__(self,x,iind=0,oind=0):
+   """ setInput, evaluate and getOutput combined.
+   
+     def __call__(self,x,iind=0,oind=0)
+     
+     When x is numeric, does the same as:
+     
+      self.setInput(x,iind)
+      self.evaluate()
+      return n.array(self.getOutput(oind))
+   
+   """
+   if isinstance(x[0],MX):
+    return self.call(x,iind)
+   else:
+    import numpy as n
+    self.setInput(x,iind)
+    self.evaluate()
+    return n.array(self.getOutput(oind))
   %}
   
   
@@ -82,8 +107,12 @@ SETTERS(const std::vector<double>&)
 
 };
 
+
+
+  
+  
 %extend FX{
-  MX __call__(const std::vector<MX> &x, int ind=0) const{
+  MX call(const std::vector<MX> &x, int ind=0) const{
     return $self->operator()(x,ind);
 }
 
