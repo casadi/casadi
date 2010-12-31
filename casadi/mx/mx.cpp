@@ -38,6 +38,7 @@
 #include "transpose.hpp"
 #include "flatten.hpp"
 #include "reshape.hpp"
+#include "slice.hpp"
 #include "symbolic_mx_node.hpp"
 #include "mx_constant.hpp"
 
@@ -80,20 +81,10 @@ MX MX::getElement(int k) const{
   return ret;  
 }
 
-MX MX::slice(Slicer i,Slicer j) const{
-  std::vector<MX> rows;
-
-  i.initialize(size1());
-  j.initialize(size2());
-
-  for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
-  	std::vector<MX> cols;
-  	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
-		cols.push_back(operator()(*iti,*itj));
-	}
-	rows.push_back(horzcat(cols));
-  }
-  return vertcat(rows);
+MX MX::slice(Slicer i, Slicer j) const{
+  MX ret;
+  ret.assignNode(new Slice(*this,i,j));
+  return ret;
 }
 
 MX MX::getRow(int i) const {return slice(i,SlicerPrimitiveAll());}

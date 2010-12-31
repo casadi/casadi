@@ -62,13 +62,15 @@ Slicer::~Slicer()	{
 vector<int>::iterator Slicer::begin() {return p->begin();}
 vector<int>::iterator Slicer::end()  {return p->end();}
 void Slicer::initialize(int end) {p->initialize(end);}
-
-
+int Slicer::size() {return p->size();};
+int Slicer::operator()(int i){return p->operator()(i);}
 
 SlicerPrimitive::SlicerPrimitive(SlicerPrimitiveType type_): type(type_) {}
 void SlicerPrimitive::initialize(int end) {}
 vector<int>::iterator SlicerPrimitive::begin() {return ind.begin();}
 vector<int>::iterator SlicerPrimitive::end() {return ind.end();}
+int SlicerPrimitive::size() {return ind.size();}
+int SlicerPrimitive::operator()(int i){return ind[i];}
 
 SlicerPrimitiveList::SlicerPrimitiveList(std::vector<int> &i_): SlicerPrimitive(LIST) {ind = i_;}
 void SlicerPrimitiveList::initialize(int end_) {}

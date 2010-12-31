@@ -74,6 +74,8 @@ SET(CASADI_SRCS
   mx/reshape.hpp
   mx/reordering.cpp
   mx/reordering.hpp
+  mx/slice.cpp
+  mx/slice.hpp
   
   fx/fx.hpp
   fx/fx.cpp

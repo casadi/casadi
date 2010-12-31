@@ -63,12 +63,17 @@ virtual void initialize(int end=-1);
 vector<int>::iterator begin();
 //!	\brief Let SlicerPrimitive return iterators
 vector<int>::iterator end();
+//! Return resultant size of slice
+int size();
 
 //! index of end
 
 int endind;
 //! \brief vector of indices
 vector<int> ind;
+
+//! Return slice index at i
+int operator()(int i);
 
 enum SlicerPrimitiveType type;
 
@@ -182,6 +187,12 @@ Slicer(const Slicer &s);
 void initialize(int end=-1);
 vector<int>::iterator begin();
 vector<int>::iterator end();
+
+//! Return resultant size of slice
+int size();
+
+//! Return slice index at i
+int operator()(int i);
 
 ~Slicer();
 
