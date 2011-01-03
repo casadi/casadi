@@ -67,9 +67,50 @@ class IntegratorInternal;
   outputs:
   0: y(tf)
   
+  Options:
+  
+  * "max_num_steps"                OT_INTEGER  10000 ...  maximum number of steps\n
+  * "reltol"                       OT_REAL     1e-6 ...  relative tolerence for the IVP solution\n
+  * "abstol"                       OT_REAL     1e-8 ...  absolute tolerence  for the IVP solution\n
+  * "upper_bandwidth"              OT_INTEGER   Option() ...  upper band-width of banded jacobians\n
+  * "lower_bandwidth"              OT_INTEGER   Option() ...  lower band-width of banded jacobians\n
+  * "linear_solver"                OT_STRING  "dense" ...  "dense", "banded" or "iterative"\n
+  * "iterative_solver"             OT_STRING  "gmres" ...  "gmres", "bcgstab", "tfqmr"\n
+  * "pretype"                      OT_STRING  "none" ...  "none", "left", "right", "both"\n
+  * "exact_jacobian"               OT_BOOLEAN   false ...  \n
+  * "max_krylov"                   OT_INTEGER   10 ...  maximum krylov subspace size\n
+  * "is_differential"              OT_INTEGERVECTOR   Option() ...  \n
+  * "sensitivity_method"           OT_STRING   "simultaneous" ...  "simultaneous" or "staggered"\n
+  * "max_multistep_order"          OT_INTEGER  5 ...  \n
+  * "use_preconditioner"           OT_BOOLEAN  false ...  precondition an iterative solver\n
+  * "stop_at_end"                  OT_BOOLEAN  false ...  Stop the integrator at the end of the interval\n
+  * "jacmap"                       OT_INTEGERVECTOR  Option() ...  if the integrator is the Jacobian of another integrator, this option will contain the mapping between the states\n
+  * "jacinit"                      OT_REALVECTOR  Option() ...  initial values to the forward sensitivities\n
+  * "nrhs"                         OT_INTEGER  1 ...  number of right hand sides\n
+  * "quad_err_con"                 OT_BOOLEAN false ...  should the quadratures affect the step size control\n
+  * "fsens_err_con"                OT_INTEGER  false ...  include the forward sensitivities in all error controls\n
+  * "finite_difference_fsens"      OT_BOOLEAN  false ...  use finite differences to approximate the forward sensitivity equations (if AD is not available)\n
+  * "fsens_reltol"                 OT_REAL     Option() ...  relative tolerence for the forward sensitivity solution [default: equal to reltol]\n
+  * "fsens_abstol"                 OT_REAL     Option() ...  absolute tolerence for the forward sensitivity solution [default: equal to abstol]\n
+  * "fsens_scaling_factors"        OT_REALVECTOR  Option() ...  scaling factor for the components if finite differences is used\n
+  * "fsens_sensitiviy_parameters"  OT_INTEGERVECTOR  Option() ...  specifies which components will be used when estimating the sensitivity equations\n
+  * "steps_per_checkpoint"         OT_INTEGER 20 ...  number of steps between two consecutive checkpoints\n
+  * "interpolation_type"           OT_STRING "hermite" ...  type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")\n
+  * "asens_upper_bandwidth"        OT_INTEGER   Option() ...  upper band-width of banded jacobians\n
+  * "asens_lower_bandwidth"        OT_INTEGER   Option() ...  lower band-width of banded jacobians\n
+  * "asens_linear_solver"          OT_STRING  "dense" ...  "dense", "banded" or "iterative"\n
+  * "asens_iterative_solver"       OT_STRING  "gmres" ...  "gmres", "bcgstab", "tfqmr"\n
+  * "asens_pretype"                OT_STRING  "none" ...  "none", "left", "right", "both"\n
+  * "asens_max_krylov"             OT_INTEGER   10 ...  maximum krylov subspace size\n
+  * "asens_reltol"                      OT_REAL     Option() ...  relative tolerence for the adjoint sensitivity solution [default: equal to reltol]\n
+  * "asens_abstol"                      OT_REAL     Option() ...  absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]\n
+
   \author Joel Andersson
   \date 2010
 */
+
+// grep "addOption" integrator_internal.cpp | perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
+
 class Integrator : public FX{
 public:
   /// Default constructor
