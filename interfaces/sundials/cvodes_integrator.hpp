@@ -25,15 +25,7 @@
 
 #include "casadi/fx/integrator.hpp"
 
-/** Function that integrates the ODE:
 
-  ydot == f(t,y,p)
-  from t0 to tf
-  
-  given the initial condition
-  y(t0) == y0;
-  
-*/
 
 
 namespace CasADi{
@@ -54,7 +46,20 @@ enum MOutput{M_M, M_NUM_OUT};
 // Forward declaration of internal class 
 class CVodesInternal;
 
-/** \brief  Public class */
+/** Function that integrates the ODE:
+
+  ydot == f(t,y,p)
+  from t0 to tf
+  
+  given the initial condition
+  y(t0) == y0;
+  
+  A call to evaluate will integrate to the end.
+  
+  You can retrieve the entire state trajectory as follows, after the evaluate call: 
+  Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
+
+*/
 class CVodesIntegrator : public Integrator{
 public:
 
