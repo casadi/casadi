@@ -264,30 +264,59 @@ int FunctionIO::sizeL() const{
   return nnz;
 }
 
-void FunctionIO::setv(double val, vector<double>& v, Sparsity sp) const{
+vector<double>& FunctionIO::data(int dir){
+  return data_.at(nadir_+dir);
+}
+
+const vector<double>& FunctionIO::data(int dir) const{
+  return data_.at(nadir_+dir);
+}
+
+void FunctionIO::set(double val, int dir, Sparsity sp){
   assertNumEl(1);
   assertNNZ(1,sp);
-  v[0] = val;
+  data(dir)[0] = val;
 }
     
-void FunctionIO::getv(double& val, const vector<double>& v, Sparsity sp) const{
+void FunctionIO::get(double& val, int dir, Sparsity sp) const{
   assertNumEl(1);
   assertNNZ(1,sp);
-  val = v[0];
+  val = data(dir)[0];
 }
 
-void FunctionIO::setv(const vector<double>& val, vector<double>& v, Sparsity sp) const{
+void FunctionIO::set(const std::vector<double>& val, int dir, Sparsity sp){
   assertNNZ(val.size(),sp);
-  copy(val.begin(),val.end(),v.begin());  
+  set(&val[0],dir,sp);
 }
 
-void FunctionIO::getv(vector<double>& val, const vector<double>& v, Sparsity sp) const{
+void FunctionIO::get(std::vector<double>& val, int dir, Sparsity sp) const{
+  assertNNZ(val.size(),sp);
+  get(&val[0],dir,sp);
+}
+
+void FunctionIO::set(const double* val, int dir, Sparsity sp){
+  vector<double> &v = data(dir);
   if(sp==SPARSE || (sp==DENSE && numel()==size())){
-    assertNNZ(val.size(),sp);
-    copy(v.begin(),v.end(),val.begin());
+    copy(val,val+v.size(),v.begin());
+  } else if(sp==DENSE){
+    for(int i=0; i<size1(); ++i) // loop over rows
+      for(int el=rowind_[i]; el<rowind_[i+1]; ++el){ // loop over the non-zero elements
+        // column
+        int j=col_[el];
+        
+        // Set the element
+        v[el] = val[i*size2()+j];
+    }
   } else {
-    assertNNZ(val.size(),sp);
-    // general sparse
+    throw CasadiException("FunctionIO::set: not SPARSE or DENSE");
+  }
+}
+
+void FunctionIO::get(double* val, int dir, Sparsity sp) const{
+  const vector<double> &v = data(dir);
+  if(sp==SPARSE || (sp==DENSE && numel()==size())){
+    copy(v.begin(),v.end(),val);
+  } else if(sp==DENSE){
     int k=0; // index of the result
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){ // loop over the non-zero elements
@@ -302,47 +331,9 @@ void FunctionIO::getv(vector<double>& val, const vector<double>& v, Sparsity sp)
     // add sparse zeros at the end of the matrix
     for(; k<numel(); ++k)
      val[k] = 0;
+  } else {
+    throw CasadiException("FunctionIO::get: not SPARSE or DENSE");
   }
-}
-
-void FunctionIO::setv(const double* val, vector<double>& v, Sparsity sp) const{
-  copy(val,val+v.size(),v.begin());  
-}
-
-void FunctionIO::getv(double* val, const vector<double>& v, Sparsity sp) const{
-  copy(v.begin(),v.end(),val);
-}
-
-vector<double>& FunctionIO::data(int dir){
-  return data_.at(nadir_+dir);
-}
-
-const vector<double>& FunctionIO::data(int dir) const{
-  return data_.at(nadir_+dir);
-}
-
-void FunctionIO::set(double val, int dir, Sparsity sp){
-  setv(val,data(dir),sp);
-}
-    
-void FunctionIO::get(double& val, int dir, Sparsity sp) const{
-  getv(val,data(dir),sp);
-}
-
-void FunctionIO::set(const std::vector<double>& val, int dir, Sparsity sp){
-  setv(val,data(dir),sp);
-}
-
-void FunctionIO::get(std::vector<double>& val, int dir, Sparsity sp) const{
-  getv(val,data(dir),sp);
-}
-
-void FunctionIO::set(const double* val, int dir, Sparsity sp){
-  setv(val,data(dir),sp);
-}
-
-void FunctionIO::get(double* val, int dir, Sparsity sp) const{
-  getv(val,data(dir),sp);
 }
 
 

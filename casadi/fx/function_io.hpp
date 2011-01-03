@@ -119,14 +119,18 @@ class FunctionIO{
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<double>& val, int dir=0, Sparsity sp=SPARSE) const;
 
-    /** \brief  Set the non-zero elements, array */
-    void set(const double* val, int dir=0, Sparsity sp=SPARSE);
-
     /** \brief  Get the non-zero elements, array */
     void get(double* val, int dir=0, Sparsity sp=SPARSE) const;    
+
+#ifndef SWIG
+    /** \brief  Set the non-zero elements, array */
+    void set(const double* val, int dir=0, Sparsity sp=SPARSE);
+#endif
     
     /** \brief  Get the result */
     void getSparseSym(double *res, int dir=0) const;    // general sparse, symmetric matrix
+
+    /** \brief  Get the result times a vector */
     void getTimesVector(const double *v, double *res, int dir=0) const;
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
@@ -135,7 +139,7 @@ class FunctionIO{
     ldres: The leading dimension in res 
     res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, double *res, int dir=0) const;
-    
+        
   protected:
 
     /** \brief  Size */
@@ -149,27 +153,7 @@ class FunctionIO{
     
     /** \brief Assert that the number of elements is correct */
     void assertNumEl(int sz) const;
-    
-    /** \brief  Set the non-zero elements, scalar */
-    void setv(double val, std::vector<double>& v, Sparsity sp) const;
-    
-    /** \brief  Get the non-zero elements, scalar */
-    void getv(double& val, const std::vector<double>& v, Sparsity sp) const;
-
-    /** \brief  Set the non-zero elements, vector */
-    void setv(const std::vector<double>& val, std::vector<double>& v, Sparsity sp) const;
-
-    /** \brief  Get the non-zero elements, vector */
-    void getv(std::vector<double>& val, const std::vector<double>& v, Sparsity sp) const;
-
-    /** \brief  Set the non-zero elements, array */
-    void setv(const double* val, std::vector<double>& v, Sparsity sp) const;
-
-    /** \brief  Get the non-zero elements, array */
-    void getv(double* val, const std::vector<double>& v, Sparsity sp) const;
-
-    
-    
+        
 };
 
 } // namespace CasADi
