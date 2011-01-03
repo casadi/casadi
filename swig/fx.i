@@ -21,7 +21,7 @@
 %template(vector_integrator) std::vector<CasADi::Integrator>;
 
 
-
+#if 0
 namespace CasADi {
 %extend FX {
   %pythoncode %{
@@ -77,3 +77,5 @@ namespace CasADi {
   %}
 } // %extend FX
 } // namespace CasADi
+
+#endif

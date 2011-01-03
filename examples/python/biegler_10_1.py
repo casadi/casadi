@@ -62,7 +62,7 @@ for N in range(1,11):
   for j in range(K+1):
     l[j].setInput(1.)
     l[j].evaluate()
-    res = l[j].getOutputData()
+    res = l[j].getOutput()
     D.append(res[0])
 
   print "D = ", D
@@ -169,10 +169,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", solver.getOutputData(NLP_COST)
+  print "optimal cost: ", tuple(solver.getOutput(NLP_COST))
 
   # Print the optimal solution
-  xopt = solver.getOutputData(NLP_X_OPT)
+  xopt = tuple(solver.getOutput(NLP_X_OPT))
   print "optimal solution: ", xopt
  
   # plot to screen

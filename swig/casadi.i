@@ -14,6 +14,12 @@
 %include "std_string.i"
 %include "std_vector.i"
 
+// Template instantiations
+namespace std {
+%template(vector_int) vector<int>;
+%template(vector_double) vector<double>;
+} // namespace std;
+
 #ifndef WITH_NUMPY
 #warning "Not using numpy. option(WITH_NUMPY = OFF)"
 #endif
@@ -22,13 +28,6 @@
 #warning "Using numpy. option(WITH_NUMPY = ON)"
 %include "numpy.i"
 #endif
-
-
-// Template instantiations
-namespace std {
-%template(vector_int) vector<int>;
-%template(vector_double) vector<double>;
-} // namespace std;
 
 // Auxilliary casadi functions
 %include "casadi_aux.i"

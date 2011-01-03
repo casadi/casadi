@@ -185,6 +185,9 @@ const std::vector<double>& getAdjSeedData(int ind=0, int dir=0) const;
 /** \brief  Get an adjoint sensitivity data */
 const std::vector<double>& getAdjSensData(int ind=0, int dir=0) const;
 
+// Not in the SWIG interface since it causes problems with the typemap
+#ifndef SWIG
+
 /** \brief  Get the input data */
 std::vector<double>& getInputData(int ind=0);
 
@@ -202,6 +205,8 @@ std::vector<double>& getAdjSeedData(int ind=0, int dir=0);
 
 /** \brief  Get an adjoint sensitivity data */
 std::vector<double>& getAdjSensData(int ind=0, int dir=0);
+
+#endif // SWIG
 
 
 };
