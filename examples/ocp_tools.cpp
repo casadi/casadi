@@ -66,21 +66,19 @@ void get_collocation_coeff(int K, vector<vector<double> >& C, vector<double>& D,
   
   // Get the coefficients of the continuity equation
   for(int j=0; j<=K; ++j){
-    l[j].input().set(1.0);
+    l[j].setInput(1.0);
     l[j].evaluate();
-    l[j].output().get(&D[j]);
+    l[j].getOutput(&D[j]);
   }
 
   // Get the coefficients of the collocation equation
   for(int j=0; j<=K; ++j){
     C[j].resize(K+1);
     for(int k=0; k<=K; ++k){
-      l[j].input().set(&tau_root[k]);
-      l[j].evaluate();
-      
-      l[j].input().setF(1.0);
+      l[j].setInput(&tau_root[k]);
+      l[j].setFwdSeed(1.0);
       l[j].evaluate(1,0);
-      l[j].output().getF(&C[j][k]);
+      l[j].getFwdSens(&C[j][k]);
     }
   }
 }

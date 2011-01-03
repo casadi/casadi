@@ -99,9 +99,9 @@ int main(){
   // Get the coefficients of the continuity equation
   vector<double> D(K+1);
   for(int j=0; j<=K; ++j){
-    l[j].input().set(1.0);
+    l[j].setInput(1.0);
     l[j].evaluate();
-    l[j].output().get(&D[j]);
+    l[j].getOutput(D[j]);
   }
   cout << "D = " << D << endl;
 
@@ -110,12 +110,16 @@ int main(){
   for(int j=0; j<=K; ++j){
     C[j].resize(K+1);
     for(int k=0; k<=K; ++k){
-      l[j].input().set(&tau_root[k]);
-      l[j].evaluate();
+      l[j].setInput(tau_root[k]);
+      cout << "ok" << endl; 
       
-      l[j].input().setF(1.0);
+      cout << l[j].getOption("number_of_adj_dir") << endl;
+      cout << l[j].getOption("number_of_fwd_dir") << endl;
+      l[j].setFwdSeed(1.0);
+      cout << "ok" << endl; 
+      
       l[j].evaluate(1,0);
-      l[j].output().getF(&C[j][k]);
+      l[j].getFwdSens(C[j][k]);
     }
   }
   cout << "C = " << C << endl;
@@ -178,19 +182,19 @@ int main(){
 
   // Initial condition
   vector<double> xinit(x.numel(),0);
-  solver.input(NLP_X_INIT).set(xinit);
+  solver.setInput(xinit,NLP_X_INIT);
 
   // Bounds on x
   vector<double> lbx(x.numel(),-100);
   vector<double> ubx(x.numel(), 100);
   lbx[0] = ubx[0] = z0;
-  solver.input(NLP_LBX).set(lbx);
-  solver.input(NLP_UBX).set(ubx);
+  solver.setInput(lbx,NLP_LBX);
+  solver.setInput(ubx,NLP_UBX);
   
   // Bounds on the constraints
   vector<double> lubg(g.numel(),0);
-  solver.input(NLP_LBG).set(lubg);
-  solver.input(NLP_UBG).set(lubg);
+  solver.setInput(lubg,NLP_LBG);
+  solver.setInput(lubg,NLP_UBG);
   
   // Solve the problem
   solver.solve();
@@ -210,7 +214,7 @@ int main(){
 
   // Print the optimal solution
   vector<double> xopt(x.numel());
-  solver.output(NLP_X_OPT).get(xopt);
+  solver.getOutput(xopt,NLP_X_OPT);
   cout << "optimal solution: " << xopt << endl;
   resfile << xopt << endl;
   

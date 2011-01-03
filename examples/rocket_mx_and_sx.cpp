@@ -64,8 +64,8 @@ FX create_integrator(int nj, int nu){
   input[1] = x0;
   SXMatrix output = x;
   SXFunction integrator(input,output);
-  integrator->setOption("ad_order",1);
-  integrator->init();
+  integrator.setOption("ad_order",1);
+  integrator.init();
 
 //  integrator->generateCode("rocket.c");
 
@@ -128,22 +128,22 @@ int main(){
     Umax[i] =  10;
     Usol[i] = 0.4;
   }
-  solver.input(NLP_LBX).set(Umin);
-  solver.input(NLP_UBX).set(Umax);
-  solver.input(NLP_X_INIT).set(Usol);
+  solver.setInput(Umin,NLP_LBX);
+  solver.setInput(Umax,NLP_UBX);
+  solver.setInput(Usol,NLP_X_INIT);
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.input(NLP_LBG).set(Gmin);
-  solver.input(NLP_UBG).set(Gmax);
+  solver.setInput(Gmin,NLP_LBG);
+  solver.setInput(Gmax,NLP_UBG);
 
   // Solve the problem
   solver.solve();
 
   // Get the solution
-  solver.output(NLP_X_OPT).get(Usol);
+  solver.getOutput(Usol,NLP_X_OPT);
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

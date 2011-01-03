@@ -34,7 +34,7 @@
 namespace CasADi{
 
 /** \brief  Forward declaration of internal class */
-class MXFunctionNode;
+class MXFunctionInternal;
 
   /** \brief  General function mapping from/to MX
   \author Joel Andersson 
@@ -45,102 +45,37 @@ public:
 
   /** \brief  Ddefault constructor */
   MXFunction();
-  
-/** \brief  Single input, single output */
+
+#ifndef SWIG  
+  /** \brief  Single input, single output */
   MXFunction(const MX& input, const MX& output);
 
-/** \brief  Single input, multiple output */
+  /** \brief  Single input, multiple output */
   MXFunction(const MX& input, const std::vector<MX>& output);
 
-/** \brief  Multiple input, single output */
+  /** \brief  Multiple input, single output */
   MXFunction(const std::vector<MX>& input, const MX& output);
+#endif // SWIG  
 
-/** \brief  Multiple input, multiple output*/
+  /** \brief  Multiple input, multiple output*/
   MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
 
-/** \brief  Access functions of the node */
-  MXFunctionNode* operator->();
-  const MXFunctionNode* operator->() const;
-  
-/** \brief get MX input **/
+  /** \brief  Access functions of the node */
+  MXFunctionInternal* operator->();
+
+  /** \brief  Const access functions of the node */
+  const MXFunctionInternal* operator->() const;
+
+  /** \brief get MX input **/
   MX getInputMX(int ind=0);
   
-/** \brief get MX output **/
+  /** \brief get MX output **/
   MX getOutputMX(int ind=0);
+  
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
 };
   
-
-/** \brief  Internal node class for MX
-  \author Joel Andersson 
-  \date 2010
-A regular user should never work with any Node class. Use MX directly.
-*/
-class MXFunctionNode : public FXNode{
-  friend class MXFunction;
-
-  public:
-/** \brief  no public constructors */
-
-/** \brief  Make a deep copy */
-  virtual MXFunctionNode* clone() const;
-
-/** \brief  Destructor */
-  ~MXFunctionNode();
-
-/** \brief  Order all nodes of a matrix syntax tree in the order of calculation */
-  static void makeAlgorithm(MXNode* root, std::vector<MXNode*> &nodes, std::map<const MXNode*,int>  &nodemap);
-
-/** \brief  Find a runtime element corresponding to a matrix expression */
-  int findEl(const MX& mx) const;
-
-/** \brief  Set the value of an node in the algorithm */
-  virtual void setElement(int ind, const double* x, int ord=0);
-
-/** \brief  Get the value of an node in the algorithm */
-  virtual void getElement(int ind, double *x, int ord=0) const;
-
-/** \brief  Set values to zero for all nodes */
-  virtual void clear(int ord=0);
-
-/** \brief  Evaluate the algorithm */
-  virtual void evaluate(int fsens_order, int asens_order);
-
-/** \brief  Print the algorithm */
-  void printAlgorithm(std::ostream &stream=std::cout);
-  
-/** \brief  Print the values */
-  void printValues(int ord=0, std::ostream &stream=std::cout);
-
-  /** \brief  Print */
-  virtual void print(std::ostream &stream) const;
-  
-/** \brief  Initialize */
-  virtual void init();
-  
-  
-  protected:
-/** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction, therefore protected */
-  MXFunctionNode(const std::vector<MX>& input, const std::vector<MX>& output);
-
-/** \brief  All the runtime elements in the order of evaluation */
-  std::vector<MX> alg;
-  
-/** \brief  Maps for quickly finding the place in the algorithm of a runtime element */
-  std::map<const MXNode*,int>  nodemap;
-
-/** \brief  Matrix expressions that are to be evaluated */
-  std::vector<MX> outputv;
-
-/** \brief  Dependent expressions */
-  std::vector<MX> inputv;
-
-  
-/** \brief  Does an element exist in the algorithm */  
-  bool hasEl(const MX& mx) const;
-
-  
-};
-
 } // namespace CasADi
 
 

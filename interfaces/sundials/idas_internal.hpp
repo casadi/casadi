@@ -49,6 +49,9 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Constructor */
   explicit IdasInternal(const FX& f, const FX& q);
 
+  /** \brief  Copy constructor */
+//  IdasInternal(const IdasInternal& integrator);
+
   /** \brief  Clone */
   virtual IdasInternal* clone() const;
 

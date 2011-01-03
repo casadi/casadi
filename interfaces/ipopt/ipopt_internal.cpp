@@ -300,15 +300,15 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
       }
   } else {
     // Pass input
-    H_.input().set(x);
-    H_.input(1).set(lambda);
-    H_.input(2).set(obj_factor);
+    H_.setInput(x);
+    H_.setInput(lambda,1);
+    H_.setInput(obj_factor,2);
 
     // Evaluate
     H_.evaluate();
 
     // Get results
-    H_.output().get(values);
+    H_.getOutput(values);
   }
   return true;
 }
@@ -328,13 +328,13 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
       }
   } else {
     // Pass the argument to the function
-    J_.input().set(x);
+    J_.setInput(x);
 
     // Evaluate the function
     J_.evaluate();
 
     // Get the output
-    J_.output().get(values);
+    J_.getOutput(values);
   }
   
   return true;
@@ -345,14 +345,13 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
   assert(n == n_);
 
   // Pass the argument to the function
-  F_.input().set(x);
+  F_.setInput(x);
 
   // Evaluate the function
   F_.evaluate();
 
   // Get the result
-//  F_.output().get(obj_value);
-  F_.output().get(obj_value);
+  F_.getOutput(obj_value);
 
   return true;
 }
@@ -363,13 +362,13 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
   assert(m == m_);
 
   // Pass the argument to the function
-  G_.input().set(x);
+  G_.setInput(x);
 
   // Evaluate the function and tape
   G_.evaluate();
 
   // Ge the result
-  G_.output().get(g);
+  G_.getOutput(g);
 
   return true;
 }
@@ -378,16 +377,16 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
 {
   assert(n == n_);
   // Pass the argument to the function
-  F_.input().set(x);
+  F_.setInput(x);
   
   // Give a seed to the function
-  F_.output().setA(1.0);
+  F_.setAdjSeed(1.0);
 
   // Evaluate, adjoint mode
   F_.evaluate(0,1);
 
   // Get the result
-  F_.input().getA(grad_f);
+  F_.getAdjSens(grad_f);
 
   return true;
 }

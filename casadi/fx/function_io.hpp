@@ -23,7 +23,6 @@
 #ifndef FUNCTION_IO_HPP
 #define FUNCTION_IO_HPP
 
-#include "../matrix_size.hpp"
 #include <vector>
 
 // TODO: Remove this class and replace with functions for the sparsity pattern as well as a small structure to be placed inside the FX class
@@ -41,7 +40,7 @@ enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
 class FunctionIO{
   public:
 /** \brief  Constructor */
-    explicit FunctionIO();
+    FunctionIO();
 
     /** \brief  Set size */
     void setSize(int nrow, int ncol=1);
@@ -57,54 +56,7 @@ class FunctionIO{
 
     /** \brief  Set the sparsity pattern, general sparse format */
     void setSparsity(const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& elind);
-
-    /** \brief  Set the non-zero elements */
-    template <class T> void set(const T& val, Sparsity sp=SPARSE){setv(val,data(),sp);}
-
-    /** \brief  Set the adjoint sensitivity non-zero elements */
-    template <class T> void setA(const T& val, int dir=0, Sparsity sp=SPARSE) {setv(val,dataA(dir),sp);}
-
-    /** \brief  Set the forward sensitivity non-zero elements */
-    template <class T> void setF(const T& val, int dir=0, Sparsity sp=SPARSE) {setv(val,dataF(dir),sp);}
-
-    
-#if 0
-// THIS IMPLEMENTATION SEEMS TO BE INCORRECT FOR SCALAR ARGUMENTS! WORKAROUND BELOW
-
-    /** \brief  Get the non-zero elements */
-    template <class T> void get(T& val) const{getv(val,data());}
-    
-    /** \brief  Get the forward sensitivity non-zero elements */
-    template <class T> void getF(T& val, int dir=0) const {getv(val,dataF(dir));}
-
-    /** \brief  Get the adjoint sensitivity non-zero elements */
-    template <class T> void getA(T& val, int dir=0) const {getv(val,dataA(dir));}
-#else
-// WORKAROUND
-#define GETTERS(T)\
-    void get(T val, Sparsity sp=SPARSE) const{getv(val,data(),sp);} \
-    void getF(T val, int dir=0, Sparsity sp=SPARSE) const {getv(val,dataF(dir),sp);} \
-    void getA(T val, int dir=0, Sparsity sp=SPARSE) const {getv(val,dataA(dir),sp);}
-
-GETTERS(double&)
-GETTERS(double*)
-GETTERS(std::vector<double>&)
-#undef GETTERS
-#endif
-
-    
-    /** \brief  Get the result */
-    void getDense(double *x, int ord=0) const;
-    void getSparseSym(double *res, int ord=0) const;    // general sparse, symmetric matrix
-    void getTimesVector(const double *v, double *res, int ord=0) const;
-
-    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation */
-    /** \brief  kl:  The number of subdiagonals in res */
-    /** \brief  ku:  The number of superdiagonals in res */
-    /** \brief  ldres:  The leading dimension in res */
-    /** \brief  res:  The number of superdiagonals */
-    void getBand(int kl, int ku, int ldres, double *res, int ord=0) const;
-        
+            
     /// Set the number of derivative directions
     void setNumFwdDir(int ndir);
     void setNumAdjDir(int ndir);
@@ -112,10 +64,6 @@ GETTERS(std::vector<double>&)
     /// Get the number of derivative directions    
     int numFwdDir() const;
     int numAdjDir() const;
-    
-  /** \brief  Access the non-zero entries */
-    std::vector<double>& data();
-    const std::vector<double>& data() const;
     
   /** \brief  Access the non-zero entries of the forward sensitivities */
     std::vector<double>& dataF(int dir=0);
@@ -153,16 +101,48 @@ GETTERS(std::vector<double>&)
     /** \brief  Size */
     int nrow_, ncol_;
 
-  protected:
+    /** \brief  Access the non-zero entries */
+    std::vector<double>& data(int dir=0);
+
+    /** \brief  Const access the non-zero entries */
+    const std::vector<double>& data(int dir=0) const;
+
+    /** \brief  Set the non-zero elements, scalar */
+    void set(double val, int dir=0, Sparsity sp=SPARSE);
     
-    /** \brief  Non-zero elements for the input/output */
-    std::vector<double> data_;
+    /** \brief  Get the non-zero elements, scalar */
+    void get(double& val, int dir=0, Sparsity sp=SPARSE) const;
 
-    /** \brief  Non-zero elements for the first order forward seeds/derivatives */
-    std::vector< std::vector<double> > dataF_;
+    /** \brief  Set the non-zero elements, vector */
+    void set(const std::vector<double>& val, int dir=0, Sparsity sp=SPARSE);
 
-    /** \brief  Non-zero elements for the first order adjoint seeds/derivatives */
-    std::vector< std::vector<double> > dataA_;
+    /** \brief  Get the non-zero elements, vector */
+    void get(std::vector<double>& val, int dir=0, Sparsity sp=SPARSE) const;
+
+    /** \brief  Set the non-zero elements, array */
+    void set(const double* val, int dir=0, Sparsity sp=SPARSE);
+
+    /** \brief  Get the non-zero elements, array */
+    void get(double* val, int dir=0, Sparsity sp=SPARSE) const;    
+    
+    /** \brief  Get the result */
+    void getSparseSym(double *res, int dir=0) const;    // general sparse, symmetric matrix
+    void getTimesVector(const double *v, double *res, int dir=0) const;
+
+    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
+    kl:    The number of subdiagonals in res 
+    ku:    The number of superdiagonals in res 
+    ldres: The leading dimension in res 
+    res:   The number of superdiagonals */
+    void getBand(int kl, int ku, int ldres, double *res, int dir=0) const;
+    
+  protected:
+
+    /** \brief  Size */
+    int nfdir_, nadir_;
+    
+    /** \brief  Non-zero elements for the input/output or forward/adjoint seeds/derivatives */
+    std::vector< std::vector<double> > data_;
 
     /** \brief Assert that the number of nonzeros is correct */
     void assertNNZ(int sz, Sparsity sp) const;
@@ -170,10 +150,6 @@ GETTERS(std::vector<double>&)
     /** \brief Assert that the number of elements is correct */
     void assertNumEl(int sz) const;
     
-    // Legacy
-    std::vector<double>& data(int ord);
-    const std::vector<double>& data(int ord) const;
-
     /** \brief  Set the non-zero elements, scalar */
     void setv(double val, std::vector<double>& v, Sparsity sp) const;
     

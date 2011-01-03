@@ -44,7 +44,7 @@ void LinearSolverInternal::init(){
   prepared_ = false;
 
   // Call the base class initializer
-  FXNode::init();
+  FXInternal::init();
 }
 
 LinearSolverInternal::~LinearSolverInternal(){

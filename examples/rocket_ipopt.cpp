@@ -98,27 +98,27 @@ int main(){
     umax[i] =  10;
     usol[i] = 0.4;
   }
-  solver.input(NLP_LBX).set(umin);
-  solver.input(NLP_UBX).set(umax);
-  solver.input(NLP_X_INIT).set(usol);
+  solver.setInput(umin,NLP_LBX);
+  solver.setInput(umax,NLP_UBX);
+  solver.setInput(usol,NLP_X_INIT);
   
   // Bounds on g
   vector<double> gmin(2,-numeric_limits<double>::infinity()), gmax(2,1.1);
   gmin[0] = gmax[0] = 10;
   gmin[1] = gmax[1] =  0;
-  solver.input(NLP_LBG).set(gmin);
-  solver.input(NLP_UBG).set(gmax);
+  solver.setInput(gmin,NLP_LBG);
+  solver.setInput(gmax,NLP_UBG);
 
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.output(NLP_COST).get(cost);
+  solver.getOutput(cost,NLP_COST);
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
-  solver.output(NLP_X_OPT).get(usol);
+  solver.getOutput(usol,NLP_X_OPT);
   cout << "optimal solution: " << usol << endl;
 
   return 0;

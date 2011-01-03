@@ -76,8 +76,8 @@ FX create_integrator_euler(){
 
   SXMatrix output = x;
   SXFunction integrator(input,output);
-  integrator->setOption("ad_order",1);
-  integrator->init();
+  integrator.setOption("ad_order",1);
+  integrator.init();
 
 //  integrator->generateCode("rocket.c");
 
@@ -170,6 +170,7 @@ FX create_integrator_sundials(bool explicit_integrator){
   integrator.setOption("quad_err_con",true);
   integrator.setOption("abstol",1e-6);
   integrator.setOption("reltol",1e-6);
+  integrator.setOption("stop_at_end",true);
 //  integrator.setOption("fsens_all_at_once",false);
   
   integrator.init();
@@ -285,23 +286,23 @@ int main(){
     Umax[i] =  10;
     Usol[i] = 0.4;
   }
-  solver.input(NLP_LBX).set(Umin);
-  solver.input(NLP_UBX).set(Umax);
-  solver.input(NLP_X_INIT).set(Usol);
+  solver.setInput(Umin,NLP_LBX);
+  solver.setInput(Umax,NLP_UBX);
+  solver.setInput(Usol,NLP_X_INIT);
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.input(NLP_LBG).set(Gmin);
-  solver.input(NLP_UBG).set(Gmax);
+  solver.setInput(Gmin,NLP_LBG);
+  solver.setInput(Gmax,NLP_UBG);
 
   // Solve the problem
   solver.solve();
 return 0;
 
   // Get the solution
-  solver.output(NLP_X_OPT).get(Usol);
+  solver.getOutput(Usol,NLP_X_OPT);
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

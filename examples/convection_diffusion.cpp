@@ -199,17 +199,17 @@ int main(){
   simulator.init();
   
   // Initial condition
-  simulator.input(SIMULATOR_X0).set(ocp.x_init);
+  simulator.setInput(ocp.x_init,SIMULATOR_X0);
 
   // Pass parameters
-  simulator.input(SIMULATOR_P).set(ocp.u_init);
+  simulator.setInput(ocp.u_init,SIMULATOR_P);
   
   // Simulate
   simulator.evaluate();
   
   // Print the output to screen
   vector<double> T_sim(ngrid*ocp.x.numel());
-  simulator.output().get(T_sim);
+  simulator.getOutput(T_sim);
   cout << "T_sim = " << T_sim << endl;
   
   // Degree of interpolating polynomial
@@ -396,20 +396,20 @@ int main(){
   solver.init();
 
   // Bounds on x and initial guess
-  solver.input(NLP_LBX).set(vars_lb);
-  solver.input(NLP_UBX).set(vars_ub);
-  solver.input(NLP_X_INIT).set(vars_sol);
+  solver.setInput(vars_lb,NLP_LBX);
+  solver.setInput(vars_ub,NLP_UBX);
+  solver.setInput(vars_sol,NLP_X_INIT);
   
   // Bounds on the constraints
-  solver.input(NLP_LBG).set(lbg);
-  solver.input(NLP_UBG).set(ubg);
+  solver.setInput(lbg,NLP_LBG);
+  solver.setInput(ubg,NLP_UBG);
   
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.output(NLP_COST).get(cost);
+  solver.getOutput(cost,NLP_COST);
   cout << "optimal cost: " << cost << endl;
 
   // ----
@@ -429,7 +429,7 @@ int main(){
   resfile.open ("results_convection_diffusion.txt");
 
   // Get the solution
-  solver.output(NLP_X_OPT).get(vars_sol);
+  solver.getOutput(vars_sol,NLP_X_OPT);
   resfile << "T_opt " << vars_sol << endl;
   
   // Save optimal solution to disk

@@ -49,7 +49,7 @@ SimulatorInternal::~SimulatorInternal(){
 
 void SimulatorInternal::init(){
   // Call base class method
-  FXNode::init();
+  FXInternal::init();
   
   // Initialize the integrator_ and output functions
   integrator_.init();
@@ -59,13 +59,13 @@ void SimulatorInternal::init(){
 void SimulatorInternal::evaluate(int fsens_order, int asens_order){
 
   // Pass the parameters and initial state
-  integrator_.input(INTEGRATOR_X0).set(input(SIMULATOR_X0).data());
-  integrator_.input(INTEGRATOR_P).set(input(SIMULATOR_P).data());
+  integrator_.setInput(input(SIMULATOR_X0).data(),INTEGRATOR_X0);
+  integrator_.setInput(input(SIMULATOR_P).data(),INTEGRATOR_P);
 
   // Pass sensitivities if fsens
   if(fsens_order>0){
-    integrator_.input(INTEGRATOR_X0).setF(input(SIMULATOR_X0).dataF());
-    integrator_.input(INTEGRATOR_P).setF(input(SIMULATOR_P).dataF());
+    integrator_.setFwdSeed(input(SIMULATOR_X0).dataF(),INTEGRATOR_X0);
+    integrator_.setFwdSeed(input(SIMULATOR_P).dataF(),INTEGRATOR_P);
   }
   
   // Reset the integrator_
@@ -78,9 +78,9 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     integrator_.integrate(grid_[k]);
     
     // Pass integrator_ output to the output function
-    output_fcn_.input(OUTPUT_T).set(grid_[k]);
-    output_fcn_.input(OUTPUT_X).set(integrator_.output().data());
-    output_fcn_.input(OUTPUT_P).set(input(SIMULATOR_P).data());
+    output_fcn_.setInput(grid_[k],OUTPUT_T);
+    output_fcn_.setInput(integrator_.output().data(),OUTPUT_X);
+    output_fcn_.setInput(input(SIMULATOR_P).data(),OUTPUT_P);
 
     // Evaluate output function
     output_fcn_.evaluate();
@@ -94,8 +94,8 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     if(fsens_order>0){
       
       // Pass the forward seed to the output function
-      output_fcn_.input(OUTPUT_X).setF(integrator_.output().dataF());
-      output_fcn_.input(OUTPUT_P).setF(input(SIMULATOR_P).dataF());
+      output_fcn_.setFwdSeed(integrator_.output().dataF(),OUTPUT_X);
+      output_fcn_.setFwdSeed(input(SIMULATOR_P).dataF(),OUTPUT_P);
       
       // Evaluate output function
       output_fcn_.evaluate(1,0);

@@ -84,7 +84,7 @@ namespace CasADi{
       explicit AcadoInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
       /// Set a user-provided integrator
-      void setIntegrator(const Integrator& integrator);
+      void setIntegrators(const std::vector<Integrator>& integrators);
             
       /// Access functions and members of the node
       AcadoInternal* operator->();

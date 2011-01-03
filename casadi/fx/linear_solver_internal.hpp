@@ -24,7 +24,7 @@
 #define LINEAR_SOLVER_INTERNAL_HPP
 
 #include "linear_solver.hpp"
-//#include "fx_node.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
   
@@ -32,7 +32,7 @@ namespace CasADi{
 class LinearSolverInternal;
 
 /// Internal class
-class LinearSolverInternal : public FXNode{
+class LinearSolverInternal : public FXInternal{
   public:
     // Constructor
     LinearSolverInternal(int nrow, int ncol, int nrhs);

@@ -117,7 +117,7 @@ void IntegratorInternal::evaluate(int fsens_order, int asens_order){
 
 void IntegratorInternal::init(){
   // Call the base class method
-  FXNode::init();
+  FXInternal::init();
 
   // read options
   exact_jacobian_ = getOption("exact_jacobian").toInt();

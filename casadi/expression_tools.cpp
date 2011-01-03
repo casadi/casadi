@@ -21,6 +21,7 @@
  */
 
 #include "expression_tools.hpp"
+#include "fx/sx_function_internal.hpp"
 #include "sx/binary_functions.hpp"
 
 #include <cassert>

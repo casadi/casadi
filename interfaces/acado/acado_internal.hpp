@@ -25,6 +25,8 @@
 
 #include "acado_interface.hpp"
 #include "acado_function.hpp"
+#include "casadi/fx/fx_internal.hpp"
+#include <stack>
 
 /** \brief  forward declarations */
 namespace ACADO{
@@ -43,14 +45,14 @@ namespace ACADO{
 namespace CasADi{
 
   
-class AcadoInternal : public FXNode{
+class AcadoInternal : public FXInternal{
   friend class AcadoInterface;
   
   /** \brief  Constructor only accessable from the AcadoOCPSolver pointer class */
   explicit AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
   
   /** \brief  Set a user-provided integrator */
-  void setIntegrator(const Integrator& integrator);
+  void setIntegrators(const std::vector<Integrator>& integrators);
   
   public:
     
@@ -93,7 +95,7 @@ class AcadoInternal : public FXNode{
     AcadoFunction ffcn_;
 
     // Casadi integrator (if any)
-    Integrator integrator_;
+    std::vector<Integrator> integrators_;
     
     // Meyer term
     AcadoFunction mfcn_;
@@ -103,6 +105,15 @@ class AcadoInternal : public FXNode{
     
     // Initial equation
     AcadoFunction rfcn_;
+    
+    // Manage integrator backends
+    int getRef(void *);
+    void returnRef(int ref);
+    
+    vector<void*> backends_;
+    stack<int> free_backends_;
+    
+    
     
     
 };

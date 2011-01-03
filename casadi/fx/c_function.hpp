@@ -24,6 +24,7 @@
 #define C_FUNCTION_HPP
 
 #include "fx.hpp"
+#include "fx_internal.hpp"
 #include <string>
 
 namespace CasADi{
@@ -65,7 +66,7 @@ public:
   \date 2010
  A regular user should never work with any Node class. Use CFunction directly.
 */
-class CFunctionNode : public FXNode{
+class CFunctionNode : public FXInternal{
   friend class CFunction;
   public:
     

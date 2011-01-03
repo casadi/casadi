@@ -25,10 +25,11 @@
 
 #include "integrator_jacobian.hpp"
 #include "integrator.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
 
-class IntegratorJacobianInternal : public FXNode{
+class IntegratorJacobianInternal : public FXInternal{
 public:
   /** \brief  Constructor */
   IntegratorJacobianInternal(const Integrator& integrator);

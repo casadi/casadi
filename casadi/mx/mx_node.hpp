@@ -36,7 +36,7 @@ namespace CasADi{
 */
 class MXNode : public SharedObjectNode{
 friend class MX;
-friend class MXFunctionNode;
+friend class MXFunctionInternal;
 
 public:
   

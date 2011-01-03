@@ -26,6 +26,8 @@ std::string __repr__()  { return $self->getRepresentation(); }
 }
 
 class SharedObject : public PrintableObject{
+  public:
+    void init();
 };
 
 class OptionsFunctionality : public SharedObject{

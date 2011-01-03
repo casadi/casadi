@@ -31,9 +31,13 @@ namespace CasADi{
 
 FunctionIO::FunctionIO(){
   setSize(0);
+  nfdir_ = 0;
+  nadir_ = 0;
 }
 
 void FunctionIO::init(){
+  data_.resize(nadir_+1+nfdir_);
+  
   // Dense matrix if no sparsity defined
   if(rowind_.empty()){
     rowind_.resize(nrow_+1);
@@ -48,15 +52,8 @@ void FunctionIO::init(){
   }
 
   // Non-zeros
-  data_.resize(col_.size());
-
-  // forward derivatives
-  for(int i=0; i<dataF_.size(); ++i)
-    dataF_[i].resize(col_.size());
-
-  // adjoint derivatives
-  for(int i=0; i<dataA_.size(); ++i)
-    dataA_[i].resize(col_.size());
+  for(vector<vector<double> >::iterator it=data_.begin(); it!=data_.end(); ++it)
+    it->resize(col_.size());
 }
 
 void FunctionIO::setSize(int nrow, int ncol){
@@ -69,72 +66,37 @@ void FunctionIO::setSparsityCRS(const vector<int>& rowind, const vector<int> &co
   col_ = col;
 }
 
-void FunctionIO::setNumFwdDir(int ndir){
-  dataF_.resize(ndir);
+void FunctionIO::setNumFwdDir(int nfdir){
+  nfdir_ = nfdir;
 }
 
-void FunctionIO::setNumAdjDir(int ndir){
-  dataA_.resize(ndir);
+void FunctionIO::setNumAdjDir(int nadir){
+  nadir_ = nadir;
 }
 
 int FunctionIO::numFwdDir() const{
-  return dataF_.size();
+  return nfdir_;
 }
 
 int FunctionIO::numAdjDir() const{
-  return dataA_.size();
+  return nadir_;
 }
 
 vector<double>& FunctionIO::dataF(int dir){
-  return dataF_.at(dir);
+  return data(1+dir);
 }
 
 const vector<double>& FunctionIO::dataF(int dir) const{
-  return dataF_.at(dir);
+  return data(1+dir);
 }
 
 vector<double>& FunctionIO::dataA(int dir){
-  return dataA_.at(dir);
+  return data(-1-dir);
 }
 
 const vector<double>& FunctionIO::dataA(int dir) const{
-  return dataA_.at(dir);
+  return data(-1-dir);
 }
-
-vector<double>& FunctionIO::data(){
-  return data_;
-}
-
-const vector<double>& FunctionIO::data() const{
-  return data_;
-}
-
-
-vector<double>& FunctionIO::data(int ord){
-  assert(ord==0 || ord==1);
-  if(ord==0)
-    return data_;
-  else 
-    return dataF_.at(0);
-}
-
-const vector<double>& FunctionIO::data(int ord) const{
-  assert(ord==0 || ord==1);
-  if(ord==0)
-    return data_;
-  else 
-    return dataF_.at(0);
-}
-
-
-
-
-
-
-
-// MatrixSize FunctionIO::size() const{
-//   return MatrixSize(nrow_,ncol_);
-// }
 
 int FunctionIO::numel() const{
   return nrow_*ncol_;
@@ -178,7 +140,7 @@ void FunctionIO::setSparsity(const vector<int>& rr, const vector<int>& cc, vecto
   assert(el==nnz);
 }
 
-void FunctionIO::getSparseSym(double *res, int ord) const{
+void FunctionIO::getSparseSym(double *res, int dir) const{
   // copy to the result vector
   int nz = 0;
   for(int row=0; row<size1(); ++row)
@@ -186,13 +148,13 @@ void FunctionIO::getSparseSym(double *res, int ord) const{
     // Loop over the elements in the row
     for(int el=rowind_[row]; el<rowind_[row+1]; ++el){ // loop over the non-zero elements
       if(col_[el] > row) break; // break inner loop (only lower triangular part is used)
-      res[nz] = data(ord)[el];
+      res[nz] = data(dir)[el];
       nz++;
     }
   }
 }
 
-void FunctionIO::getTimesVector(const double *v, double *res, int ord) const{
+void FunctionIO::getTimesVector(const double *v, double *res, int dir) const{
   // copy the result
   for(int i=0; i<size1(); ++i){ // loop over rows
     res[i] = 0;
@@ -200,12 +162,12 @@ void FunctionIO::getTimesVector(const double *v, double *res, int ord) const{
       int j=col_[el];  // column
 
       // Multiply with the vector
-      res[i] += v[j]*data(ord)[el];
+      res[i] += v[j]*data(dir)[el];
     }
   }
 }
 
-void FunctionIO::getBand(int kl, int ku, int ldres, double *res, int ord) const{
+void FunctionIO::getBand(int kl, int ku, int ldres, double *res, int dir) const{
   // delete the content of the matrix
   for(int j=0; j<size2(); ++j) // loop over columns
     for(int s=0; s<kl+ku+1; ++s) // loop over the subdiagonals
@@ -228,37 +190,8 @@ void FunctionIO::getBand(int kl, int ku, int ldres, double *res, int ord) const{
       int s = i - j + ku;
 
       // Store the element
-      res[s + ldres*j] = data(ord)[el];
+      res[s + ldres*j] = data(dir)[el];
     }
-  }
-}
-
-void FunctionIO::getDense(double *x, int ord) const{
-  const vector<double>& arg = data(ord);
-
-  
-  if(col_.size() == numel()){
-    // if dense matrix
-    for(int i=0; i<arg.size(); ++i)
-      x[i] = arg[i];
-  } else {
-    // general sparse
-    int k=0; // index of the result
-    for(int i=0; i<size1(); ++i) // loop over rows
-      for(int el=rowind_[i]; el<rowind_[i+1]; ++el){ // loop over the non-zero elements
-        int j=col_[el];  // column
-        for(; k<i*size2()+j; ++k) 
-          x[k] = 0; // add zeros before the non-zero element
-
-      // add the non-zero element
-      x[k] = data(ord)[el];
-      k++;
-    }
-    // add sparse zeros at the end of the matrix
-    for(; k<numel(); ++k)
-     x[k] = 0;
-   
-    assert(k==numel());
   }
 }
 
@@ -380,6 +313,37 @@ void FunctionIO::getv(double* val, const vector<double>& v, Sparsity sp) const{
   copy(v.begin(),v.end(),val);
 }
 
+vector<double>& FunctionIO::data(int dir){
+  return data_.at(nadir_+dir);
+}
+
+const vector<double>& FunctionIO::data(int dir) const{
+  return data_.at(nadir_+dir);
+}
+
+void FunctionIO::set(double val, int dir, Sparsity sp){
+  setv(val,data(dir),sp);
+}
+    
+void FunctionIO::get(double& val, int dir, Sparsity sp) const{
+  getv(val,data(dir),sp);
+}
+
+void FunctionIO::set(const std::vector<double>& val, int dir, Sparsity sp){
+  setv(val,data(dir),sp);
+}
+
+void FunctionIO::get(std::vector<double>& val, int dir, Sparsity sp) const{
+  getv(val,data(dir),sp);
+}
+
+void FunctionIO::set(const double* val, int dir, Sparsity sp){
+  setv(val,data(dir),sp);
+}
+
+void FunctionIO::get(double* val, int dir, Sparsity sp) const{
+  getv(val,data(dir),sp);
+}
 
 
 

@@ -24,6 +24,7 @@
 #define NLP_SOLVER_INTERNAL_HPP
 
 #include "nlp_solver.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
     
@@ -31,7 +32,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class NLPSolverInternal : public FXNode{
+class NLPSolverInternal : public FXInternal{
 
 public:
   explicit NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J);

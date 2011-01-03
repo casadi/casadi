@@ -20,38 +20,61 @@
  *
  */
 
-#ifndef SIMULATOR_INTERNAL_HPP
-#define SIMULATOR_INTERNAL_HPP
+#ifndef JACOBIAN_INTERNAL_HPP
+#define JACOBIAN_INTERNAL_HPP
 
-#include "simulator.hpp"
+#include <vector>
+#include "jacobian.hpp"
 #include "fx_internal.hpp"
 
 namespace CasADi{
-
-/** \brief Simulator data storage classs
+ 
+  /** \brief  Internal node class for Jacobian
   \author Joel Andersson 
   \date 2010
 */
-class SimulatorInternal : public FXInternal{
-public:
+class JacobianInternal : public FXInternal{
+  friend class Jacobian;
   
-  /** \brief  Constructor */
-  SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const std::vector<double>& grid);
-  
-  /** \brief  Destructor */
-  virtual ~SimulatorInternal();
-  
-  /** \brief  initialize */
-  virtual void init();
+  protected:
+    /// Constructor
+    JacobianInternal(const FX& fcn, int iind, int oind);
 
-  /** \brief  Integrate */
-  virtual void evaluate(int fsens_order, int asens_order);
+    public:
+      /// Destructor
+      virtual ~JacobianInternal();
+      
+      /// Evaluate the jacobian
+      virtual void evaluate(int fsens_order, int asens_order);
 
-  Integrator integrator_;
-  FX output_fcn_;
-  std::vector<double> grid_;
+      /// Initialize
+      virtual void init();
+  
+      bool sparse_jac_, use_fd_, use_ad_fwd_;
+  
+      std::vector<int> elind_;
+      std::vector<int> rr_, cc_, rind_;
+      std::vector<double> epsilon_; // perturbations
+  
+      // Dimensions
+      int n_,m_;
+  
+      // Function to be differentiated
+      FX fcn_;
+  
+      // Output and input indices
+      int oind_, iind_;
+
+      // Number of forward directions of the function to be differentiated
+      int nadir_fcn_;
+      int nfdir_fcn_;
+
 };
-  
+
+
+
 } // namespace CasADi
 
-#endif // SIMULATOR_INTERNAL_HPP
+
+#endif // JACOBIAN_INTERNAL_HPP
+

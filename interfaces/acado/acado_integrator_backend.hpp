@@ -50,8 +50,11 @@ class AcadoIntegratorBackend : public ACADO::Integrator{
     /// Initialize the solver given a differential equation
     virtual ACADO::returnValue init( const ACADO::DifferentialEquation &rhs);
 
-    // Deep copy of the integrator
+    // Reference to the integrator
     CasADi::Integrator integrator_;
+    
+    // Integrator index
+    int my_ref_;
     
 public:
     

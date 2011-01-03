@@ -71,7 +71,7 @@ void CFunctionNode::evaluate(int fsens_order, int asens_order){
 }
 
 void CFunctionNode::init(){
-  FXNode::init();
+  FXInternal::init();
 }
 
 

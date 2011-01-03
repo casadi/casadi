@@ -38,8 +38,9 @@ ACADO::Integrator* AcadoIntegratorBackend::create(void *user_data){
 
 AcadoIntegratorBackend::AcadoIntegratorBackend(void *user_data){
    ocp_solver_ = (CasADi::AcadoInternal*)user_data;
-   integrator_ = ocp_solver_->integrator_.clone();
-   integrator_.init();
+   my_ref_ = ocp_solver_->getRef(this);
+   assert(ocp_solver_->integrators_.size()>my_ref_);
+   integrator_ = ocp_solver_->integrators_[my_ref_];
 }
 
 
@@ -49,8 +50,9 @@ AcadoIntegratorBackend::AcadoIntegratorBackend( const ACADO::DifferentialEquatio
 
 AcadoIntegratorBackend::AcadoIntegratorBackend( const AcadoIntegratorBackend& arg ){
   ocp_solver_ = arg.ocp_solver_;
-  integrator_ = arg.ocp_solver_->integrator_.clone();
-  integrator_.init();
+  my_ref_ = ocp_solver_->getRef(this);
+  assert(ocp_solver_->integrators_.size()>my_ref_);
+  integrator_ = ocp_solver_->integrators_[my_ref_];
   
   // The following is necessary for the base class (WHY?)
   if(rhs){
@@ -77,6 +79,7 @@ AcadoIntegratorBackend::AcadoIntegratorBackend( const AcadoIntegratorBackend& ar
 
 
 AcadoIntegratorBackend::~AcadoIntegratorBackend( ){
+  ocp_solver_->returnRef(my_ref_);
 }
 
 

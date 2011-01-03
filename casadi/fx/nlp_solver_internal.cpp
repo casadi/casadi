@@ -64,7 +64,7 @@ NLPSolverInternal::~NLPSolverInternal(){
 
 void NLPSolverInternal::init(){
   // Call the initialization method of the base class
-  FXNode::init();
+  FXInternal::init();
 
     // Initialize functions
   F_.setOption("ad_order",1);

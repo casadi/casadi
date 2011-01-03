@@ -86,7 +86,7 @@ void IntegratorJacobianInternal::init(){
   }
 
   // Call the base class method
-  FXNode::init();
+  FXInternal::init();
 }
 
 void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
@@ -158,10 +158,9 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
         for(int j=0; j<ns_; ++j)
           jacsens[j+i*ns_] = jacsens_s[jacmap_[nx_+j+i*ns_]];
         
-      input(INTEGRATOR_P).setA(integrator_.input(INTEGRATOR_P).dataA(dir),dir);
+      input(INTEGRATOR_P).set(integrator_.input(INTEGRATOR_P).dataA(dir),-1-dir);
     }
   }
-
 }
 
 IntegratorJacobianInternal* IntegratorJacobianInternal::clone() const{

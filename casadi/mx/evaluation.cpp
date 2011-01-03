@@ -21,6 +21,7 @@
  */
 
 #include "evaluation.hpp"
+#include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include <cassert>
 
@@ -43,33 +44,30 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
   
   // Pass the input to the function
   for(int i=0; i<ndep(); ++i)
-    fcn_.input(i).set(dep(i)->val(0));
+    fcn_.setInput(dep(i)->val(0),i);
 
   // Give the forward seed to the function
   if(fsens_order>0) 
     for(int i=0; i<ndep(); ++i)
-      fcn_.input(i).setF(dep(i)->val(1));
-  
+      fcn_.setFwdSeed(dep(i)->val(1),i);
+
+  // Pass the adjoint seed to the function
+  if(asens_order>0)
+    fcn_.setAdjSeed(val(1),oind);
+
   // Evaluate
   fcn_.evaluate(fsens_order, asens_order);
   
   // Get the results
-  fcn_.output(oind).get(&val(0)[0]);
+  fcn_.getOutput(val(0),oind);
+
+  // Fwd sens
   if(fsens_order>0)
-    fcn_.output(oind).getF(val(1));
+    fcn_.getFwdSens(val(1),oind);
 
-  // Adjoints
-  if(asens_order>0){
-    // Pass the adjoint seed to the function
-    fcn_.output(oind).setA(val(1));
-    
-    // Evaluate
-    fcn_->evaluate(0,1);
-
-    // Get the results
-    for(int i=0; i<ndep(); ++i)
-      fcn_.input(i).getA(dep(i)->val(1));
-  }
+  // Adjoint sens
+  for(int i=0; i<ndep(); ++i)
+    fcn_.getAdjSens(dep(i)->val(1),i);
 }
 
 } // namespace CasADi

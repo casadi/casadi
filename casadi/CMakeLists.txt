@@ -77,26 +77,19 @@ SET(CASADI_SRCS
   mx/slice.cpp
   mx/slice.hpp
   
-  fx/fx.hpp
-  fx/fx.cpp
   fx/function_io.hpp
   fx/function_io.cpp
-  fx/c_function.hpp
-  fx/c_function.cpp
-  fx/external_function.hpp
-  fx/external_function.cpp
-  fx/jacobian.hpp
-  fx/jacobian.cpp
-  fx/sx_function.hpp
-  fx/sx_function.cpp
-  fx/mx_function.hpp
-  fx/mx_function.cpp
-  fx/linear_solver.hpp fx/linear_solver.cpp fx/linear_solver_internal.hpp fx/linear_solver_internal.cpp
+  fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
+  fx/c_function.hpp          fx/c_function.cpp
+  fx/external_function.hpp   fx/external_function.cpp
+  fx/jacobian.hpp            fx/jacobian.cpp            fx/jacobian_internal.hpp            fx/jacobian_internal.cpp
+  fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp
+  fx/mx_function.hpp         fx/mx_function.cpp         fx/mx_function_internal.hpp         fx/mx_function_internal.cpp
+  fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
   fx/integrator_jacobian.hpp fx/integrator_jacobian.cpp fx/integrator_jacobian_internal.hpp fx/integrator_jacobian_internal.cpp
-  fx/integrator.hpp  fx/integrator.cpp fx/integrator_internal.hpp fx/integrator_internal.cpp
-  fx/nlp_solver.hpp  fx/nlp_solver.cpp fx/nlp_solver_internal.hpp fx/nlp_solver_internal.cpp
-  fx/simulator.hpp  fx/simulator.cpp fx/simulator_internal.hpp fx/simulator_internal.cpp
-
+  fx/integrator.hpp          fx/integrator.cpp          fx/integrator_internal.hpp          fx/integrator_internal.cpp
+  fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
+  fx/simulator.hpp           fx/simulator.cpp           fx/simulator_internal.hpp           fx/simulator_internal.cpp
   expression_tools.cpp
   expression_tools.hpp
   stl_vector_tools.hpp

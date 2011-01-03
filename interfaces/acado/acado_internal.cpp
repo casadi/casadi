@@ -52,6 +52,8 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   addOption("periodic_bounds",          OT_INTEGERVECTOR);
   addOption("integrator",               OT_STRING);
   
+  // Set options
+  setOption("name", "unnamed acado interface");
   
 // Set pointers to null
   t_=0;
@@ -65,6 +67,7 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   ocp_ = 0;
   algorithm_ = 0;
   
+  
   // The following will make sure that all counters are set to zero
   ACADO::AlgebraicState().clearStaticCounters();
   ACADO::Control().clearStaticCounters();
@@ -77,8 +80,8 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   ACADO::Parameter().clearStaticCounters();
 }
 
-void AcadoInternal::setIntegrator(const Integrator& integrator){
-  integrator_ = integrator;
+void AcadoInternal::setIntegrators(const vector<Integrator>& integrators){
+  integrators_ = integrators;
 }
 
 AcadoInternal::~AcadoInternal(){
@@ -154,7 +157,6 @@ void AcadoInternal::init(){
   input(ACADO_X_GUESS).setSize(nx_,n_nodes_+1);
   input(ACADO_U_GUESS).setSize(nu_,n_nodes_+1);
   input(ACADO_P_GUESS).setSize(np_);
-
   input(ACADO_LBX).setSize(nx_);
   input(ACADO_UBX).setSize(nx_);
   input(ACADO_LBX0).setSize(nx_);
@@ -182,10 +184,11 @@ void AcadoInternal::init(){
   output(ACADO_COST).setSize(1);
 
   // Initialize
-  FXNode::init();
+  FXInternal::init();
   
-  // Initialize the user_provided
-/*  if(!integrator_.isNull()) integrator_.init();*/
+  // Initialize the user_provided integrators
+  for(vector<Integrator>::iterator it=integrators_.begin(); it!=integrators_.end(); ++it)
+    it->init();
   
   // Set all bounds except initial constraints to +- infinity by default
   for(int i=ACADO_LBX; i<ACADO_UBC; i = i+2){
@@ -320,8 +323,8 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
       if(ACADO::Integrator::integrator_creator_ || ACADO::Integrator::integrator_user_data_)
         throw CasadiException("AcadoInternal::AcadoInternal: An instance already exists");
       
-      if(integrator_.isNull())
-        throw CasadiException("AcadoInternal::AcadoInternal: No integrator has been provided");
+      if(integrators_.size() <= n_nodes_)
+        throw CasadiException("AcadoInternal::AcadoInternal: Number of integrators does not match number of shooting nodes");
       
       ACADO::Integrator::integrator_creator_ = &AcadoIntegratorBackend::create;
       ACADO::Integrator::integrator_user_data_ = this;
@@ -482,7 +485,24 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   output(ACADO_COST).set(cost);
 }
 
+int AcadoInternal::getRef(void *obj){
+  int ref;
+  if(free_backends_.empty()){
+    ref = backends_.size();
+    backends_.push_back(obj);
+  } else {
+    ref = free_backends_.top();
+    free_backends_.pop();
+    backends_[ref] = obj;
+  }
+  cout << "created ref = " << ref << endl;
+  return ref;
+}
 
+void AcadoInternal::returnRef(int ref){
+  cout << "deleted ref = " << ref << endl;
+  free_backends_.push(ref);
+}
 
 } // namespace CasADi
 

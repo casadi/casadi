@@ -78,7 +78,7 @@ void LapackLUDenseInternal::prepare(){
   prepared_ = false;
   
   // Get the elements of the matrix, dense format
-  input(0).get(mat_,DENSE);
+  input(0).get(mat_,0,DENSE);
 
   if(equilibriate_){
     // Calculate the row and column scaling factors

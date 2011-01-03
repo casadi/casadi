@@ -20,7 +20,7 @@
  *
  */
 
-#include "fx.hpp"
+#include "fx_internal.hpp"
 #include "../mx/evaluation.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
@@ -36,15 +36,12 @@ FX::FX(){
 FX::~FX(){
 }
 
-FX::FX(const FX& fx) : OptionsFunctionality(fx){
-}
-    
-const FXNode* FX::operator->() const{
-  return (const FXNode*)OptionsFunctionality::operator->();
+const FXInternal* FX::operator->() const{
+  return (const FXInternal*)OptionsFunctionality::operator->();
 }
 
-FXNode* FX::operator->(){
-  return (FXNode*)OptionsFunctionality::operator->();
+FXInternal* FX::operator->(){
+  return (FXInternal*)OptionsFunctionality::operator->();
 }
 
 MX FX::operator()(const MX &x, int ind) const{
@@ -99,78 +96,13 @@ bool FX::isInit() const {
   return (*this)->is_init_;
 }
 
-
-FXNode::FXNode(){
-  setOption("name",            "unnamed_function"); // name of the function
-  addOption("ad_order",          OT_INTEGER,   0); // use sparse jacobian
-  addOption("sparse",            OT_BOOLEAN,   true); // function is sparse
-  addOption("number_of_fwd_dir", OT_INTEGER,  1); // number of forward derivatives
-  addOption("number_of_adj_dir", OT_INTEGER,  1); // number of adjoint derivatives
-
-  ad_order_ = 0;
-  is_init_ = false;
-}
-
-FXNode::FXNode(const FXNode& node): OptionsFunctionalityNode(node){
-  ad_order_ = 0;
-  is_init_ = false;  
-}
-
-FXNode::~FXNode(){
-}
-
-void FXNode::init(){
-  ad_order_ = getOption("ad_order").toInt();
-  nfdir_ = getOption("number_of_fwd_dir").toInt();
-  nadir_ = getOption("number_of_adj_dir").toInt();
-
-  for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
-    if(ad_order_==1){
-      it->setNumFwdDir(nfdir_);
-      it->setNumAdjDir(nadir_);
-    }
-    it->init();
-  }
-
-  for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
-    if(ad_order_==1){
-      it->setNumFwdDir(nfdir_);
-      it->setNumAdjDir(nadir_);
-    }
-    it->init();
-  }
-
-  is_init_ = true;
-}
-
-void FXNode::print(ostream &stream) const{
-  stream << "function(\"" << getOption("name") << "\")";
-}
-
-FX FXNode::jacobian(int iind, int oind){
-  FX fcn;
-  fcn.assignNode(this);
-  return Jacobian(fcn,iind,oind);
-}
-
-FX FXNode::hessian(int iind, int oind){
-  stringstream ss;
-  ss << "FXNode::hessian: hessian not defined for class " << typeid(*this).name();
-  throw CasadiException(ss.str());
-}
-
-void FXNode::assertInit() const{
-  if(!is_init_)
-    throw CasadiException("FXNode::assertInit: function has not been initialized");
-}
-
 void FX::assertInit() const{
   if(!(*this)->is_init_)
-    throw CasadiException("FXNode::assertInit: function has not been initialized");
+    throw CasadiException("FX::assertInit: function has not been initialized");
 }
 
 bool FX::checkNode() const{
-  return dynamic_cast<const FXNode*>(get());
+  return dynamic_cast<const FXInternal*>(get());
 }
 
 FunctionIO& FX::input(int i){
@@ -189,61 +121,29 @@ const FunctionIO& FX::output(int i) const{
   return (*this)->output(i);
 }
 
-FunctionIO& FXNode::input(int i){
-  if(i>=input_.size()) throw CasadiException("FXNode::input: out of bounds");
-  return input_.at(i);
+const vector<double>& FX::getInputData(int ind) const {
+  return input(ind).data(); 
 }
 
-const FunctionIO& FXNode::input(int i) const{
-  if(i>=input_.size()) throw CasadiException("FXNode::input: out of bounds");
-  return input_.at(i);  
-}
-  
-FunctionIO& FXNode::output(int i){
-  if(i>=output_.size()) throw CasadiException("FXNode::output: out of bounds");
-  return output_.at(i);  
+const vector<double>& FX::getOutputData(int ind) const {
+  return output(ind).data(); 
 }
 
-const FunctionIO& FXNode::output(int i) const{
-  if(i>=output_.size()) throw CasadiException("FXNode::output: out of bounds");
-  return output_.at(i);    
-}
+const vector<double>& FX::getFwdSeedData(int ind, int dir) const {return input(ind).dataF(dir); }
+const vector<double>& FX::getFwdSensData(int ind, int dir) const {return output(ind).dataF(dir); }
+const vector<double>& FX::getAdjSeedData(int ind, int dir) const {return output(ind).dataA(dir); }
+const vector<double>& FX::getAdjSensData(int ind, int dir) const {return input(ind).dataA(dir); }
+vector<double>& FX::getInputData(int ind) {return input(ind).data(); }
+vector<double>& FX::getOutputData(int ind) {return output(ind).data(); }
+vector<double>& FX::getFwdSeedData(int ind, int dir) {return input(ind).dataF(dir); }
+vector<double>& FX::getFwdSensData(int ind, int dir) {return output(ind).dataF(dir); }
+vector<double>& FX::getAdjSeedData(int ind, int dir) {return output(ind).dataA(dir); }
+vector<double>& FX::getAdjSensData(int ind, int dir) {return input(ind).dataA(dir); }
 
 
 
-// void setv(double val, vector<double>& v){
-//   if(v.size() != 1) throw CasadiException("setv(double,vector<double>&): dimension mismatch");
-//   v[0] = val;
-// }
-// 
-// void setv(int val, vector<double>& v){
-//   setv(double(val),v);
-// }
-// 
-// void setv(const double* val, vector<double>& v){
-//   // no checking
-//   copy(val,val+v.size(),v.begin());
-// }
-// 
-// void setv(const vector<double>& val, vector<double>& v){
-//   if(v.size() != val.size()) throw CasadiException("setv(const vector<double>&,vector<double>&): dimension mismatch");
-//   copy(val.begin(),val.end(),v.begin());
-// }
-//   
-// void getv(double &val, const vector<double>& v){
-//   if(v.size() != 1) throw CasadiException("getv(double&,vector<double>&): dimension mismatch");
-//   val = v[0];  
-// }
-// 
-// void getv(double* val, const vector<double>& v){
-//   // no checking
-//   copy(v.begin(),v.end(),val);
-// }
-// 
-// void getv(vector<double>& val, const vector<double>& v){
-//   if(v.size() != val.size()) throw CasadiException("getv(vector<double>&,const vector<double>&): dimension mismatch");
-//   copy(v.begin(),v.end(),val.begin());
-// }
+
+
 
 } // namespace CasADi
 

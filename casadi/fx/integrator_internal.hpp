@@ -24,6 +24,7 @@
 #define INTEGRATOR_INTERNAL_HPP
 
 #include "integrator.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
 
@@ -31,7 +32,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class IntegratorInternal : public FXNode{
+class IntegratorInternal : public FXInternal{
 public:
   /** \brief  Constructor */
   IntegratorInternal(int nx, int np);
