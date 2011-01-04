@@ -66,8 +66,9 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
     fcn_.getFwdSens(val(1),oind);
 
   // Adjoint sens
-  for(int i=0; i<ndep(); ++i)
-    fcn_.getAdjSens(dep(i)->val(1),i);
+  if(asens_order>0)
+    for(int i=0; i<ndep(); ++i)
+      fcn_.getAdjSens(dep(i)->val(1),i);
 }
 
 } // namespace CasADi
