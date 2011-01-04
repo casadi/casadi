@@ -80,6 +80,8 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
   nq_ = q.isNull() ? 0 : q.output().numel();
 
   calc_ic_ok_ = false;
+
+  ncheck_ = 0;
 }
 
 IdasInternal::~IdasInternal(){ 
@@ -500,7 +502,8 @@ void IdasInternal::initAdj(){
     // Quadratures for the adjoint problem
     N_VConst(0.0, yQB_[dir]);
     flag = IDAQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,yQB_[dir]);
-    if(flag!=IDA_SUCCESS) idas_error("CVodeQuadInitB",flag);
+    if(flag!=IDA_SUCCESS) idas_error("IDAQuadInitB",flag);
+    cout << "quad init B " << dir << endl;
   
     // Quadrature error control
     if(getOption("quad_err_con").toInt()){
@@ -661,7 +664,7 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   cout << input(INTEGRATOR_X0).data() << endl;
   cout << input(INTEGRATOR_XP0).data() << endl;
   cout << input(INTEGRATOR_P).data() << endl;*/
-  
+
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
@@ -737,8 +740,7 @@ void IdasInternal::integrate(double t_out){
   }
 
   if(asens_order_>0){
-    int ncheck; // number of checkpoints stored so far
-    flag = IDASolveF(mem_, t_out, &t_, y_, yp_, IDA_NORMAL, &ncheck);
+    flag = IDASolveF(mem_, t_out, &t_, y_, yp_, IDA_NORMAL, &ncheck_);
     if(flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolveF",flag);
     
   } else {
@@ -770,25 +772,24 @@ void IdasInternal::resetAdj(){
 
   int flag;
 
-  for(int dir=0; dir<nadir_; ++dir){
-    if(isInitAdj_){
+  if(isInitAdj_){
+    for(int dir=0; dir<nadir_; ++dir){
       flag = IDAReInitB(mem_, whichB_[dir], tf, yB0_[dir], ypB0_[dir]);
       if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
       
       N_VConst(0.0,yQB_[dir]);
-      flag = IDAQuadReInitB(mem_,whichB_[dir],yQB_[dir]);
+      flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),yQB_[dir]);
+//      flag = IDAQuadReInitB(mem_,whichB_[dir],yQB_[dir]);
       if(flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB",flag);
-
-    } else {
-      // Initialize the adjoint integration
-      initAdj();
     }
+  } else {
+    // Initialize the adjoint integration
+    initAdj();
   }
 }
 
 void IdasInternal::integrateAdj(double t_out){
   int flag;
-
   // Integrate backwards to t_out
   flag = IDASolveB(mem_, t_out, IDA_NORMAL);
   if(flag<IDA_SUCCESS) idas_error("IDASolveB",flag);
@@ -824,6 +825,9 @@ void IdasInternal::printStats(std::ostream &stream) const{
     stream << "current internal time reached: " << tcur << std::endl;
     stream << std::endl;
 
+    stream << "number of checkpoints stored: " << ncheck_ << endl;
+    stream << std::endl;
+    
     stream << "Time spent in the DAE residual: " << t_res << " s." << endl;
     stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
     stream << "Time spent in the jacobian function or jacobian times vector function: " << t_jac << " s." << endl;

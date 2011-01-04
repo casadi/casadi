@@ -172,7 +172,8 @@ FX create_integrator_sundials(bool explicit_integrator){
   integrator.setOption("reltol",1e-6);
   integrator.setOption("stop_at_end",false);
 //  integrator.setOption("fsens_all_at_once",false);
-  
+  integrator.setOption("steps_per_checkpoint",100); // BUG: Too low number causes segfaults
+
   integrator.init();
 
   return integrator;
@@ -185,7 +186,7 @@ int main(){
   double T = 10.0;
 
   // Shooting length
-  int nu = 100; // Number of control segments
+  int nu = 20; // Number of control segments
   double DT = T/nu;
 
   // Initial position
@@ -197,7 +198,7 @@ int main(){
 
   // Create an integrator
   FX integrator = create_integrator_euler();
-  FX integrator2 = create_integrator_sundials(true);
+  FX integrator2 = create_integrator_sundials(false);
 
 #if 1
   for(int k=0; k<1; ++k){
@@ -227,6 +228,13 @@ int main(){
   cout << "der                  " << ii.output().dataF() << endl;
   cout << "bder                 " << ii.input(INTEGRATOR_P).dataA() << endl;
   cout << "bder                 " << ii.input(INTEGRATOR_X0).dataA() << endl;
+  
+/*  ii.evaluate(1,1);
+
+  cout << "integrator.output()  " << ii.output().data() << endl;
+  cout << "der                  " << ii.output().dataF() << endl;
+  cout << "bder                 " << ii.input(INTEGRATOR_P).dataA() << endl;
+  cout << "bder                 " << ii.input(INTEGRATOR_X0).dataA() << endl;*/
   
   }
   }
@@ -299,6 +307,12 @@ int main(){
 
   // Solve the problem
   solver.solve();
+  
+  
+  Integrator i2 = shared_cast<Integrator>(integrator);
+  if(!i2.isNull())
+    i2.printStats();
+  
 return 0;
 
   // Get the solution

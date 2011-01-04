@@ -201,6 +201,9 @@ class IdasInternal : public IntegratorInternal{
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
+  // number of checkpoints stored so far
+  int ncheck_; 
+  
   // Has the adjoint problem been initialized
   bool isInitAdj_;
   

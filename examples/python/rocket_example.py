@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+from casadi import *
+from numpy import *
+import matplotlib.pyplot as plt
+
+# Time 
+t = SX("t")
+
+# Differential states
+s = SX("s"); v = SX("v"); m = SX("m")
+y = [s,v,m]
+
+# Control
+u = SX("u")
+
+alpha = 0.05 # friction
+beta = 0.1 # fuel consumption rate
+
+# Differential equation
+sdot = v
+vdot = (u-alpha*v*v)/m
+mdot = -beta*u*u
+rhs = [sdot,vdot,mdot]
+
+# ODE right hand side
+ffcn = SXFunction([[t],y,[u]],[rhs])
+ffcn.setOption("name","ODE right hand side")
+ffcn.setOption("ad_order",1)
+
+# Explicit integrator (CVODES)
+integrator = CVodesIntegrator(ffcn)
+
+# Set options
+integrator.setOption("ad_order",1)
+integrator.setOption("fsens_err_con",True)
+integrator.setOption("quad_err_con",True)
+integrator.setOption("abstol",1e-6)
+integrator.setOption("reltol",1e-6)
+
+# Initialize the integrator
+integrator.init()
+
+# Time horizon
+T = 10.0
+
+# Shooting length
+nu = 100 # Number of control segments
+DT = T/nu
+
+# Initial position, speed and mass
+s0 = 0 # initial position
+v0 = 0 # initial speed
+m0 = 1 # initial mass
+
+# control for all segments
+U = MX("U",nu)
+
+# Dummy input corresponding to the state derivative
+xdot = MX([0,0,0]) 
+
+# Integrate over all intervals
+X=MX([s0,v0,m0])
+for k in range(nu):
+  t0 = k*DT # Beginning of time interval
+  tf = (k+1)*DT # End of time interval
+  uk = U[k] # Control
+  X = integrator([MX(t0),MX(tf),X,uk,xdot])  # build up a graph with function calls
+
+# Objective function
+F = inner_prod(U,U)
+
+# Terminal constraints
+G = vertcat(X[0],X[1])
+
+# Create the NLP
+ffcn = MXFunction([U],[F]) # objective function
+gfcn = MXFunction([U],[G]) # constraint function
+
+# Allocate an NLP solver
+solver = IpoptSolver(ffcn,gfcn)
+
+# Set options
+solver.setOption("tol",1e-10)
+solver.setOption("hessian_approximation","limited-memory");
+
+# initialize the solver
+solver.init()
+
+# Bounds on u and initial condition
+Umin = nu * [-10] # lower bound
+solver.setInput(Umin,NLP_LBX)
+
+Umax = nu * [10]  # upper bound
+solver.setInput(Umax,NLP_UBX)
+
+Usol = nu * [0.4] # initial guess
+solver.setInput(Usol,NLP_X_INIT)
+
+# Bounds on g
+Gmin = Gmax = [10, 0]
+solver.setInput(Gmin,NLP_LBG)
+solver.setInput(Gmax,NLP_UBG)
+
+# Solve the problem
+solver.solve()
+
+# Get the solution
+uopt = solver.getOutput(NLP_X_OPT)
+
+# Plot the optimal trajectory
+tgrid = linspace(0,T,nu+1)
+tgrid_u = linspace(0,T,nu)
+plt.figure(1)
+plt.clf()
+plt.ylabel('Optimal control')
+plt.xlabel('time')
+plt.plot(tgrid_u,uopt) 
+
+x = [0, 0, 1]
+sopt = [x[0]]
+vopt = [x[1]]
+mopt = [x[2]]
+for k in range(nu):
+  integrator.setInput(k*DT,INTEGRATOR_T0)
+  integrator.setInput((k+1)*DT,INTEGRATOR_TF)
+  integrator.setInput(uopt[k],INTEGRATOR_P)
+  integrator.setInput(x,INTEGRATOR_X0)
+  integrator.evaluate()
+  x = integrator.getOutput()
+  sopt.append(x[0])
+  vopt.append(x[1])
+  mopt.append(x[2])
+
+plt.figure(2)
+plt.clf()
+plt.subplot(3,1,1)
+plt.ylabel('Distance')
+plt.xlabel('time')
+plt.plot(tgrid,sopt) 
+
+plt.subplot(3,1,2)
+plt.ylabel('Velocity')
+plt.xlabel('time')
+plt.plot(tgrid,vopt) 
+
+plt.subplot(3,1,3)
+plt.ylabel('Mass')
+plt.xlabel('time')
+plt.plot(tgrid,mopt) 
+
+plt.show()
+  
