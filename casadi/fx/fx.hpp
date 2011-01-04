@@ -62,6 +62,19 @@ class FXInternal;
   \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
   \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
   
+  \section Notes for developers
+  
+  Each function consists of 4 files:\n
+  1. public class header file: imported in python\n
+  2. public class implementation\n
+  3. internal class header file: should only be used by derived classes\n
+  4. internal class implementation\n
+  
+  python and c++ should be 1-to-1\n
+  There should be no extra features in 1.\n
+  All the functionality should exist in 1.\n
+  If it means that c++ will be more "pythonic", so be it.
+  
   \author Joel Andersson 
   \date 2010
 */
