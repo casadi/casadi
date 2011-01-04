@@ -2,6 +2,7 @@
 import os
 import sys
 from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 import zipfile
 
@@ -180,7 +181,7 @@ popt = ocp_solver.getOutputData(ACADO_P_OPT)
 print "optimal parameter values = ", popt
 
 # Time grid
-t_opt = linspace(0,ocp.tf,num_nodes+1)
+t_opt = NP.linspace(0,ocp.tf,num_nodes+1)
 
 # Plot optimal control
 u_opt = ocp_solver.getOutputData(ACADO_U_OPT)

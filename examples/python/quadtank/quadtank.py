@@ -2,6 +2,7 @@
 import os
 import sys
 from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 import scipy.integrate as integr
 
@@ -72,7 +73,7 @@ def res2(y,t):
   return list(ffcn.getOutputData())
 
 x_0 = [0.0, 0.01, 0.01, 0.01, 0.01]
-t_sim = linspace(0.,2000.,500)
+t_sim = NP.linspace(0.,2000.,500)
 
 u_A = [2.,2]
 ffcn.setInput(u_A, ACADO_FCN_U);

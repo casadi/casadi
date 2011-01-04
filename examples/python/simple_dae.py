@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 
 # CasADi
@@ -67,7 +68,7 @@ ocp_solver.setInput(ubx0,ACADO_UBX0)
 ocp_solver.solve()
 
 # Time grid
-t_opt = linspace(t0,tf,num_nodes+1)
+t_opt = NP.linspace(t0,tf,num_nodes+1)
 
 # Plot optimal state trajectory
 x_opt = ocp_solver.getOutput(ACADO_X_OPT)
