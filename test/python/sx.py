@@ -18,7 +18,7 @@ class SXtests(unittest.TestCase):
     L=[2,3]
     f.setInput(L)
     f.evaluate()
-    z=f.getOutput()
+    z=f.output(0).getArray()
     zr=fun(*L)
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
@@ -27,7 +27,7 @@ class SXtests(unittest.TestCase):
     J.init()
     J.setInput(L)
     J.evaluate()
-    J=J.getOutput()
+    J=J.output(0).getArray()
     Jr=matrix([[1,1],[3,2],[4,27]])
     for i in range(3):
         for j in range(2):
@@ -68,7 +68,7 @@ class SXtests(unittest.TestCase):
     fcn.evaluate(1,1)
 
     # Get the results
-    res = fcn.getOutputData()
+    res = fcn.getOutput()
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
 
@@ -83,7 +83,7 @@ class SXtests(unittest.TestCase):
     J.init()
     J.setInput(L)
     J.evaluate()
-    J=J.getOutput()
+    J=J.output(0).getArray()
     
     fsensJ=dot(J,array(sF))
     self.assertAlmostEqual(fsensJ[0], fsens[0],10,'SXfunction forward mode evaluation wrong')

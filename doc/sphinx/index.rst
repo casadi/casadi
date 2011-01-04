@@ -22,6 +22,12 @@ Indices and tables
 
 .. automodule:: casadi
    
+.. autoclass:: Simulator
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
 =================
 SX
 =================
