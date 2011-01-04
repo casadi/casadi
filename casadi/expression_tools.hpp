@@ -42,6 +42,7 @@ void expand(const SXMatrix& ex, SXMatrix &weights, SXMatrix& terms);
 /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
 void simplify(SX& ex);
 
+#ifndef SWIG
 /** \brief Make a vector/matrix of symbolic variables */
 template <typename iter_type, typename func_type>
 void make_symbolic(iter_type first, func_type last, const std::string& name){
@@ -52,7 +53,7 @@ void make_symbolic(iter_type first, func_type last, const std::string& name){
     *cur = SX(ss.str());
   }
 }
-
+#endif
   
   
 /// Make the 2-norm of an SXMatrix
@@ -164,6 +165,7 @@ void setColumn(const SXMatrix& expr, SXMatrix &res, int j, int nj=1, int kj=1);
 SXMatrix getRow(const SXMatrix &expr, int i, int ni=1, int ki=1);
 SXMatrix getColumn(const SXMatrix &expr, int j, int nj=1, int kj=1);
 
+#ifndef SWIG
 /** \brief  Convert stl vector to expression */
 template<typename T>
 SXMatrix toSXMatrix(const std::vector<T> &v){
@@ -171,7 +173,9 @@ SXMatrix toSXMatrix(const std::vector<T> &v){
   for(int i=0; i<v.size(); ++i) ret << SXMatrix(v[i]);
   return ret;
 }
+#endif
 
+#ifndef SWIG
 /** \brief  concatenate */
 template<typename T>
 SXMatrix vertcat(const std::vector<T> &v){
@@ -179,10 +183,11 @@ SXMatrix vertcat(const std::vector<T> &v){
   for(int i=0; i<v.size(); ++i) ret << SXMatrix(v[i]);
   return ret;
 }
-
+#endif
 // SXMatrix vertcat(const std::vector<SX>& comp);
 SXMatrix vertcat(const SXMatrix& a, const SXMatrix& b);
 
+#ifndef SWIG
 /** \brief  the following functions ensures ublas compability */
 #ifdef HAVE_UBLAS
 template<typename T>
@@ -202,12 +207,18 @@ SXMatrix toSXMatrix(const ublas::matrix<T> &v){
   return ret;
 }
 #endif
+#endif
 
+// For some mysterious reason, activating this function for SWIG will throw an 
+// ImportError: /home/jg/programs/casadi/build/swig/python/casadi/_casadi.so: undefined symbol: _ZN6CasADi8containsERKNS_8SXMatrixES2_
+// when importing casadi in python
 
+#ifndef SWIG
 /**
 Returns true if at least one element in list contains the scalar e.
 */
 bool contains(const SXMatrix &list, const SXMatrix &e);
+#endif
 
 /** \brief  Simplify an expression */
 void simplify(SXMatrix &ex);
@@ -222,11 +233,13 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr);
 /** \brief  Substitute derivatives with variables */
 /** \brief void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar); */
 
+#ifndef SWIG
 // "operator?:" can not be overloaded
 template<typename T>
 T if_else(const SX& cond, const T& if_true, const T &if_false){
   return if_false + (if_true-if_false)*cond;
 }
+#endif
 
 /** \brief  QR factorization using the modified Gram-Schmidt algorithm */
 /** \brief  More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent */
@@ -245,6 +258,7 @@ SXMatrix solve(const SXMatrix& A, const SXMatrix& b);
 /** \brief  Get the sparsity pattern of a matrix */
 SXMatrix spy(const SXMatrix& A);
 
+#ifndef SWIG
 /** \brief  Create a block matrix */
 template<int n, int m>
 SXMatrix blockmatrix(SXMatrix array[n][m]){
@@ -282,6 +296,7 @@ SXMatrix blockmatrix(SXMatrix array[n]){
 
   return ret;
 }
+#endif
 
 /** \brief  Get the number of nodes of the tree of a SXMatrix */
 int numNodes(const SXMatrix& A);
@@ -290,7 +305,7 @@ int numNodes(const SXMatrix& A);
 bool dependsOn(const SXMatrix& f, const SXMatrix &arg);
 
 //@{
-/** \brief  check if the matrix has a certain properties */
+/** \brief  check if the matrix has certain properties */
 bool isConstant(const SXMatrix& ex);
 bool isSymbolic(const SXMatrix& ex);
 bool isDense(const SXMatrix& ex);
@@ -334,11 +349,14 @@ SXMatrix operator<=(const SXMatrix &a, const SXMatrix &b);
 SXMatrix operator>=(const SXMatrix &a, const SXMatrix &b);
 SXMatrix operator<(const SXMatrix &a, const SXMatrix &b);
 SXMatrix operator>(const SXMatrix &a, const SXMatrix &b);
+#ifndef SWIG
 SXMatrix operator&&(const SXMatrix &a, const SXMatrix &b);
 SXMatrix operator||(const SXMatrix &a, const SXMatrix &b);
+SXMatrix operator!(const SXMatrix &a);
+#endif
 SXMatrix operator==(const SXMatrix &a, const SXMatrix &b);
 SXMatrix operator!=(const SXMatrix &a, const SXMatrix &b);
-SXMatrix operator!(const SXMatrix &a);
+
 
 
 } // namespace CasADi
