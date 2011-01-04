@@ -197,65 +197,22 @@ int main(){
 
 
   // Create an integrator
-  FX integrator = create_integrator_euler();
-  FX integrator2 = create_integrator_sundials(false);
+//  FX integrator = create_integrator_euler();
+//  FX integrator = create_integrator_sundials(true);
+   FX integrator = create_integrator_sundials(false);
 
-#if 1
-  for(int k=0; k<1; ++k){
-    cout << endl<< endl<< endl;
-
-  vector<double> x0_seed(X0.size(),0);
-  x0_seed[k] = 1;
-
-  for(int kk=0; kk<2; ++kk){
-    FX ii = kk==0 ? integrator : integrator2;
-  
-  ii.setInput(0.0,INTEGRATOR_T0);
-  ii.setInput(1.0,INTEGRATOR_TF);
-  ii.setInput(X0,INTEGRATOR_X0);
-  ii.setInput(1.1,INTEGRATOR_P);
-
-  ii.setFwdSeed(0.0,INTEGRATOR_T0);
-  ii.setFwdSeed(0.0,INTEGRATOR_TF);
-  ii.setFwdSeed(x0_seed,INTEGRATOR_X0);
-  ii.setFwdSeed(k,INTEGRATOR_P);
-
-  ii.setAdjSeed(x0_seed,INTEGRATOR_XF);
-
-  ii.evaluate(1,1);
-
-  cout << "integrator.output()  " << ii.output().data() << endl;
-  cout << "der                  " << ii.output().dataF() << endl;
-  cout << "bder                 " << ii.input(INTEGRATOR_P).dataA() << endl;
-  cout << "bder                 " << ii.input(INTEGRATOR_X0).dataA() << endl;
-  
-/*  ii.evaluate(1,1);
-
-  cout << "integrator.output()  " << ii.output().data() << endl;
-  cout << "der                  " << ii.output().dataF() << endl;
-  cout << "bder                 " << ii.input(INTEGRATOR_P).dataA() << endl;
-  cout << "bder                 " << ii.input(INTEGRATOR_X0).dataA() << endl;*/
-  
-  }
-  }
-
-#endif
-
-
- integrator = integrator2;
-  
-//return 1;
-  
   // control for all segments
   MX U("U",nu); 
 
   // Integrate over all intervals
   MX X=X0;
+  MX T0 = 0;
+  MX TF = DT;
   for(int k=0; k<nu; ++k){
     // Assemble the input
     vector<MX> input(INTEGRATOR_NUM_IN);
-    input[INTEGRATOR_T0] = k*DT;
-    input[INTEGRATOR_TF] = (k+1)*DT;
+    input[INTEGRATOR_T0] = T0; // k*DT
+    input[INTEGRATOR_TF] = TF; // (k+1)*DT
     input[INTEGRATOR_X0] = X;
     input[INTEGRATOR_P] = U[k];
 

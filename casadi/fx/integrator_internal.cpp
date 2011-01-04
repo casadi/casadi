@@ -31,7 +31,7 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   // set default options
   setOption("name","unnamed integrator"); // name of the function
   
-  // Add new options
+  // IVP solution
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
@@ -50,6 +50,8 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("jacmap",                      OT_INTEGERVECTOR, Option()); // if the integrator is the Jacobian of another integrator, this option will contain the mapping between the states
   addOption("jacinit",                     OT_REALVECTOR, Option()); // initial values to the forward sensitivities
   addOption("nrhs",                        OT_INTEGER, 1); // number of right hand sides
+  addOption("t0",                          OT_REAL, 0.0); // start of the integration (gives an initial value for INTEGRATOR_T0, which will be removed)
+  addOption("tf",                          OT_REAL, 1.0); // end of the integration (gives an initial value for INTEGRATOR_TF, which will be removed)
 
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,false); // should the quadratures affect the step size control
@@ -71,8 +73,8 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("asens_iterative_solver",      OT_STRING, "gmres"); // "gmres", "bcgstab", "tfqmr"
   addOption("asens_pretype",               OT_STRING, "none"); // "none", "left", "right", "both"
   addOption("asens_max_krylov",            OT_INTEGER,  10);        // maximum krylov subspace size
-  addOption("asens_reltol",                     OT_REAL,    Option()); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
-  addOption("asens_abstol",                     OT_REAL,    Option()); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
+  addOption("asens_reltol",                OT_REAL,    Option()); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
+  addOption("asens_abstol",                OT_REAL,    Option()); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
 
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
@@ -131,6 +133,10 @@ void IntegratorInternal::init(){
   asens_reltol_ = hasSetOption("asens_reltol") ? getOption("asens_reltol").toDouble() : reltol_;
   stop_at_end_ = getOption("stop_at_end").toInt();
   nrhs_ = getOption("nrhs").toInt();
+  
+  // Give an intial value for the time horizon
+  input(INTEGRATOR_T0).set(getOption("t0").toDouble());
+  input(INTEGRATOR_TF).set(getOption("tf").toDouble());
 }
 
 FX IntegratorInternal::jacobian(int iind, int oind){
