@@ -66,12 +66,12 @@ public:
   /** \brief  Const access functions of the node */
   const MXFunctionInternal* operator->() const;
 
-  /** \brief get MX input **/
-  MX getInputMX(int ind=0);
+  /// get an input argument symbolically 
+  MX getArgumentIn(int iind=0) const;
   
-  /** \brief get MX output **/
-  MX getOutputMX(int ind=0);
-  
+  /// get an output argument symbolically 
+  MX getArgumentOut(int oind=0) const;
+
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 };

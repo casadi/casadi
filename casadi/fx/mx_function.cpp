@@ -72,12 +72,12 @@ MXFunctionInternal* MXFunction::operator->(){
   return (MXFunctionInternal*)FX::operator->();
 }
 
-MX MXFunction::getInputMX(int ind){
-  return (*this)->inputv.at(ind);
+MX MXFunction::getArgumentIn(int iind) const{
+  return (*this)->inputv.at(iind);
 }
 
-MX MXFunction::getOutputMX(int ind){
-  return (*this)->outputv.at(ind);
+MX MXFunction::getArgumentOut(int oind) const{
+  return (*this)->outputv.at(oind);
 }
 
 
