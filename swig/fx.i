@@ -40,41 +40,10 @@ namespace CasADi {
   %pythoncode %{
   def getMatrix(self,dir=0):
     import numpy as n
-    return n.matrix(getArray(self,dir))
+    return n.matrix(self.getArray(dir))
   %}
 } // %extend FX
 } // namespace CasADi
 // #endif // WITH_NUMPY
-
-
-#if 0
-namespace CasADi {
-%extend FX {
-  %pythoncode %{
-  def __call__(self,x,iind=0,oind=0):
-   """ setInput, evaluate and getOutput combined.
-   
-     def __call__(self,x,iind=0,oind=0)
-     
-     When x is numeric, does the same as:
-      if (self.isInit()):
-       self.init()
-      self.setInput(x,iind)
-      self.evaluate()
-      return n.array(self.getOutput(oind))
-   
-   """
-   if isinstance(x[0],MX):
-    return self.call(x,iind)
-   else:
-    import numpy as n
-    if not(self.isInit()):
-      self.init()
-    self.setInput(x,iind)
-    self.evaluate()
-    return n.array(self.getOutput(oind))
-  %}
-} // %extend FX
-} // namespace CasADi
 
 #endif
