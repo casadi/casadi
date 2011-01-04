@@ -408,8 +408,12 @@ class MXtests(unittest.TestCase):
     
     f.init()
     g.init()
-    n=MX([1,2,3,4,5,6],2,3)
-    checkarray(self,6*f(n),g(n),"slicing(trans)")
+    n=[1,2,3,4,5,6]
+    f.setInput(n)
+    f.evaluate()
+    g.setInput(n)
+    g.evaluate()
+    checkarray(self,6*f.output().getArray(),g.output().getArray(),"slicing(trans)")
     
     
 if __name__ == '__main__':
