@@ -123,12 +123,23 @@ class FX : public OptionsFunctionality{
   /** \brief Hessian of output oind with respect to input iind */
   FX hessian(int iind=0, int oind=0);
 
-  /** \brief  Evaluate symbolically (generate mx node), single input */
+#ifndef SWIG
+  /** \brief  Create a function call (evaluation mx node), single input */
+  std::vector<MX> call(const MX &x) const;
+#endif // SWIG
+
+  /** \brief  Create a function call (evaluation mx node) */
+  std::vector<MX> call(const std::vector<MX> &x) const;
+
+  // Legacy code: change for something else, but what??
+#ifndef USE_FUNCTORS
+  /** \brief  Create a function call (generate mx node), single input: DEPRECIATED, USE "call" instead */
   MX operator()(const MX &x, int ind=0) const;
 
-  /** \brief  Evaluate symbolically (generate mx node) */
+  /** \brief  Create a function call (generate mx node): DEPRECIATED, USE "call" instead. */
   MX operator()(const std::vector<MX> &x, int ind=0) const;
-
+#endif // USE_FUNCTORS
+  
   /** \brief  Access functions of the node */
   FXInternal* operator->();
 

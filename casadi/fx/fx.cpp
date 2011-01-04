@@ -44,9 +44,22 @@ FXInternal* FX::operator->(){
   return (FXInternal*)OptionsFunctionality::operator->();
 }
 
+vector<MX> FX::call(const MX &x) const{
+  vector<MX> xvec(1,x);
+  return call(xvec);
+}
+
+vector<MX> FX::call(const vector<MX> &x) const{
+  vector<MX> ret(getNumOutputs());
+  for(int i=0; i<ret.size(); ++i){
+    ret[i].assignNode(new Evaluation(*this,x,i));
+  }
+  return ret;
+}
+
+#ifndef USE_FUNCTORS
 MX FX::operator()(const MX &x, int ind) const{
-  vector<MX> dep(1);
-  dep[0] = x;
+  vector<MX> dep(1,x);
   MX ret;
   ret.assignNode(new Evaluation(*this,dep,ind));
   return ret;
@@ -57,6 +70,7 @@ MX FX::operator()(const vector<MX> &x, int ind) const{
   ret.assignNode(new Evaluation(*this,x,ind));
   return ret;
 }
+#endif // USE_FUNCTORS
 
 void FX::evaluate(int fsens_order, int asens_order){
   (*this)->assertInit();
