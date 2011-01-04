@@ -45,5 +45,3 @@ namespace CasADi {
 } // %extend FX
 } // namespace CasADi
 // #endif // WITH_NUMPY
-
-#endif
