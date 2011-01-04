@@ -32,7 +32,7 @@ namespace CasADi {
     for i in range(self.size1()):  # loop over rows
       for el in range(self.rowind_[i],self.rowind_[i+1]): # loop over the non-zero elements
         j=self.col_[el]  # column
-        r[i*self.size2()+j] = v[el] # add the non-zero element
+        r[i,j] = v[el] # add the non-zero element
 
     return r
   %}

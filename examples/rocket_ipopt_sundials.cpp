@@ -170,7 +170,7 @@ FX create_integrator_sundials(bool explicit_integrator){
   integrator.setOption("quad_err_con",true);
   integrator.setOption("abstol",1e-6);
   integrator.setOption("reltol",1e-6);
-  integrator.setOption("stop_at_end",true);
+  integrator.setOption("stop_at_end",false);
 //  integrator.setOption("fsens_all_at_once",false);
   
   integrator.init();
@@ -199,7 +199,7 @@ int main(){
   FX integrator = create_integrator_euler();
   FX integrator2 = create_integrator_sundials(true);
 
-#if 0
+#if 1
   for(int k=0; k<1; ++k){
     cout << endl<< endl<< endl;
 
@@ -209,17 +209,17 @@ int main(){
   for(int kk=0; kk<2; ++kk){
     FX ii = kk==0 ? integrator : integrator2;
   
-  ii.input(INTEGRATOR_T0).set(0.0);
-  ii.input(INTEGRATOR_TF).set(1.0);
-  ii.input(INTEGRATOR_X0).set(X0);
-  ii.input(INTEGRATOR_P).set(1.1);
+  ii.setInput(0.0,INTEGRATOR_T0);
+  ii.setInput(1.0,INTEGRATOR_TF);
+  ii.setInput(X0,INTEGRATOR_X0);
+  ii.setInput(1.1,INTEGRATOR_P);
 
-  ii.input(INTEGRATOR_T0).setF(0.0);
-  ii.input(INTEGRATOR_TF).setF(0.0);
-  ii.input(INTEGRATOR_P).setF(k);
-  ii.input(INTEGRATOR_X0).setF(x0_seed);
+  ii.setFwdSeed(0.0,INTEGRATOR_T0);
+  ii.setFwdSeed(0.0,INTEGRATOR_TF);
+  ii.setFwdSeed(x0_seed,INTEGRATOR_X0);
+  ii.setFwdSeed(k,INTEGRATOR_P);
 
-  ii.output(INTEGRATOR_XF).setA(x0_seed);
+  ii.setAdjSeed(x0_seed,INTEGRATOR_XF);
 
   ii.evaluate(1,1);
 
