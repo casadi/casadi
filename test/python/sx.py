@@ -3,12 +3,42 @@ import casadi as c
 from numpy import *
 import unittest
 from types import *
+from helpers import *
 
-class SXtests(unittest.TestCase):
+class SXtests(casadiTestCase):
 
   def setUp(self):
-    pass
+    self.pool=FunctionPool()
+    self.pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
+    self.pool.append(lambda x: sin(x[0]),sin,"sin")
+    self.pool.append(lambda x: cos(x[0]),cos,"cos")
+    self.pool.append(lambda x: tan(x[0]),tan,"tan")
+    self.pool.append(lambda x: arctan(x[0]),arctan,"arctan")
+    self.pool.append(lambda x: arcsin(x[0]),arcsin,"arcsin")
+    self.pool.append(lambda x: arccos(x[0]),arccos,"arccos")
+    self.pool.append(lambda x: exp(x[0]),exp,"exp")
+    self.pool.append(lambda x: log(x[0]),log,"log")
+    self.pool.append(lambda x: x[0]**0,lambda x : x**0,"x^0")
+    self.pool.append(lambda x: x[0]**1,lambda x : x**1,"^1")
+    self.pool.append(lambda x: x[0]**(-2),lambda x : x**(-2),"^-2")
+    self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
+    self.pool.append(lambda x: floor(x[0]),floor,"floor")
+    self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
+    #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
+    
+  def test_scalarSX(self):
+      x=SXMatrix("x")
+      x0=0.738
+      
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
+      
+  def test_SXMAtrix(self):
+      x=SXMatrix("x",3,2)
+      x0=array([[0.738,0.2],[ 0,0.39 ],[0.99,0.999999]])
+      
+      #self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
+  
   def test_SX1(self):
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
     x=SX("x")
