@@ -155,6 +155,10 @@ class FX : public OptionsFunctionality{
   /// Assert that the function has been initialized
   void assertInit() const;
   
+#ifdef SWIG
+  %rename(setInputOriginal) setInput; // Should be replaced by a typemap later on.
+#endif // SWIG
+
   /// Set an input, output, forward seed/sensitivity or adjoint seed/sensitivity
 #define SETTERS(T)\
   void setInput(T val, int ind=0)             { assertInit(); input(ind).set(val);  } \

@@ -43,5 +43,24 @@ namespace CasADi {
     return n.matrix(self.getArray(dir))
   %}
 } // %extend FX
+
+%extend FX {
+
+
+  %pythoncode %{
+  def setInput(self,num,ind=0):
+    """ A wrapper around setInput, that allows 2D numpy.arrays.
+    Should be replaced by a typemap later on. """
+    import numpy as n
+    if (isinstance(num,n.ndarray)):
+     temp=n.array(num)
+     if len(temp.shape)>1 and not(temp.shape[0]==self.input(ind).size1() and temp.shape[1]==self.input(ind).size2()):
+       raise Exception("setInput dimension mismatch. You provided a non-vector matrix (%d,%d), but the dimensions don't match with (%d,%d). " % (temp.shape[0],temp.shape[1],self.input(ind).size1(),self.input(ind).size2()))
+     self.setInputOriginal(temp.flatten().tolist(),ind)
+    else:
+     self.setInputOriginal(num,ind)
+  %}
+} // %extend FX
+
 } // namespace CasADi
 // #endif // WITH_NUMPY

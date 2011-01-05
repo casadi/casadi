@@ -35,9 +35,9 @@ class SXtests(casadiTestCase):
       
   def test_SXMAtrix(self):
       x=SXMatrix("x",3,2)
-      x0=array([[0.738,0.2],[ 0,0.39 ],[0.99,0.999999]])
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
-      #self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
   
   def test_SX1(self):
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
