@@ -264,13 +264,6 @@ int main(){
 
   // Solve the problem
   solver.solve();
-  
-  
-  Integrator i2 = shared_cast<Integrator>(integrator);
-  if(!i2.isNull())
-    i2.printStats();
-  
-return 0;
 
   // Get the solution
   solver.getOutput(Usol,NLP_X_OPT);

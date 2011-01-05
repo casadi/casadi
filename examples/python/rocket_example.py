@@ -60,11 +60,11 @@ xdot = MX([0,0,0])
 
 # Integrate over all intervals
 X=MX([s0,v0,m0])
+T0 = MX(0) # Beginning of time interval (changed from k*DT due to probable Sundials bug)
+TF = MX(DT) # End of time interval (changed from (k+1)*DT due to probable Sundials bug)
 for k in range(nu):
-  t0 = k*DT # Beginning of time interval
-  tf = (k+1)*DT # End of time interval
-  uk = U[k] # Control
-  X = integrator([MX(t0),MX(tf),X,uk,xdot])  # build up a graph with function calls
+  # build up a graph with function calls
+  X = integrator([T0,TF,X,U[k],xdot])  
 
 # Objective function
 F = inner_prod(U,U)

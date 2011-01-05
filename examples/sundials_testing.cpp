@@ -58,7 +58,7 @@ const bool finite_difference_fsens = !exact_jacobian;
 const bool calc_ic = false;
 
 // Perturb x or u
-const bool perturb_u = true;
+const bool perturb_u = false;
 
 // Use a user_defined linear solver
 const bool user_defined_solver = true;
@@ -379,7 +379,7 @@ int main(){
     integrator.evaluate(1,0);
   }
     
-  vector<double> &fsens = integrator.getFwdSensData();
+  vector<double> fsens = integrator.getFwdSensData();
   cout << "forward sensitivities           " << fsens << endl;
 
   if(with_asens){
@@ -392,6 +392,27 @@ int main(){
   }
   
   if(second_order){
+    // Preturb the forward seeds
+    if(perturb_u){
+      double u_seed = 1.01;
+      integrator.setFwdSeed(u_seed,INTEGRATOR_P);
+    } else {
+      vector<double> x0_seed(x0.size(),0);
+      x0_seed[1] = 1.01;
+      integrator.setFwdSeed(x0_seed,INTEGRATOR_X0);
+    }
+    
+    // evaluate again with forward sensitivities
+    integrator.evaluate(1,0);
+
+    vector<double> fsens_pret = integrator.getFwdSensData();
+    cout << "forward sensitivities preturbed " << fsens_pret << endl;
+
+    vector<double> fd2(fsens.size());
+    for(int i=0; i<fd2.size(); ++i)
+      fd2[i] = (fsens_pret[i]-fsens[i])/0.01;
+    cout << "finite differences, 2nd order   " << fd2 << endl;
+    
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
     IntegratorJacobian intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
 
@@ -418,15 +439,15 @@ int main(){
     intjac.evaluate(0,1);
 
     // Get the results
-    cout << "unperturbed (augmented dae)     " << intjac.getOutputData(1+INTEGRATOR_XF) << endl;
+    cout << "unperturbed via jacobian        " << intjac.getOutputData(1+INTEGRATOR_XF) << endl;
     cout << "fwd sens via jacobian           " << intjac.getOutputData() << endl;
     cout << "second order (fwd-over-adj)     " ;
     cout << intjac.getAdjSensData(INTEGRATOR_X0) << ", ";
     cout << intjac.getAdjSensData(INTEGRATOR_P) << endl;
-    
-    // Perturb u
+
     vector<double> unpret = intjac.getOutputData();
     
+    // Perturb X0
     intjac.setInput(u_init+0.01,INTEGRATOR_P);
 
     intjac.evaluate();
@@ -437,7 +458,7 @@ int main(){
     for(int i=0; i<fdsens.size(); ++i)
       fdsens[i] = (pret[i]-unpret[i])/0.01;
     
-    cout << "perturbed (augmented dae)       " << pret << endl;
+    cout << "perturbed fwd sens              " << pret << endl;
     cout << "finite diff. (augmented dae)    " << fdsens << endl;
     
   }

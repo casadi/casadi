@@ -60,10 +60,11 @@ def create_integrator_cvodes():
   # Control
   u = SX("u")
 
+  # Parameters
   alpha = 0.05 # friction
   beta = 0.1 # fuel consumption rate
-  
-  # Differential equation
+
+  # Differential equation - explicit form
   sdot = v
   vdot = (u-alpha*v*v)/m
   mdot = -beta*u*u
@@ -92,13 +93,67 @@ def create_integrator_cvodes():
   #integrator.setOption("nonlinear_solver_iteration","newton") # newton or functional
   integrator.setOption("ad_order",1)
   integrator.setOption("fsens_err_con",True)
-  integrator.setOption("quad_err_con",True)
   integrator.setOption("abstol",1e-6)
   integrator.setOption("reltol",1e-6)
   #integrator.setOption("fsens_all_at_once",False)
 
   return integrator
 
+# Create an IDAS instance (fully implicit integrator)
+def create_integrator_idas():
+  # Time 
+  t = SX("t")
+
+  # Differential states
+  s = SX("s")
+  v = SX("v")
+  m = SX("m")
+  y = [s,v,m]
+  
+  # State derivatives
+  sdot = SX("sdot")
+  vdot = SX("vdot")
+  mdot = SX("mdot")
+  ydot = [sdot,vdot,mdot]
+
+  # Control
+  u = SX("u")
+
+  # Parameters
+  alpha = 0.05 # friction
+  beta = 0.1 # fuel consumption rate
+
+  # Differential equation (fully implicit form)
+  sres = v - sdot
+  vres = (u-alpha*v*v)/m - vdot
+  mres = -beta*u*u - mdot
+  res = [sres, vres, mres]
+
+  # Input of the DAE residual function
+  ffcn_in = DAE_NUM_IN * [[]]
+  ffcn_in[DAE_T] = [t]
+  ffcn_in[DAE_Y] = y
+  ffcn_in[DAE_YDOT] = ydot
+  ffcn_in[DAE_P] = [u]
+
+  # DAE residual function
+  ffcn = SXFunction(ffcn_in,[res])
+  ffcn.setOption("name","DAE residual")
+  ffcn.setOption("ad_order",1)
+  
+  # Create an integrator
+  integrator = IdasIntegrator(ffcn)
+
+  # Set options
+  integrator.setOption("ad_order",1)
+  integrator.setOption("calc_ic",True)
+  integrator.setOption("is_differential",[1,1,1])
+  integrator.setOption("fsens_err_con",True)
+  integrator.setOption("abstol",1e-6)
+  integrator.setOption("reltol",1e-6)
+  integrator.setOption("steps_per_checkpoint",100)
+
+  return integrator
 
 
 # Main function
@@ -107,7 +162,7 @@ def create_integrator_cvodes():
 T = 10.0
 
 # Shooting length
-nu = 1000 # Number of control segments
+nu = 20 # Number of control segments
 DT = double(T)/nu
 
 # Initial position, speed and mass
@@ -119,6 +174,7 @@ X0 = [s0,v0,m0]
 # Create integrators
 integrator_euler = create_integrator_euler()
 integrator_cvodes = create_integrator_cvodes()
+#integrator_idas = create_integrator_idas()
 
 for integrator in [integrator_euler, integrator_cvodes]:
   # Enable AD
@@ -135,8 +191,11 @@ for integrator in [integrator_euler, integrator_cvodes]:
 
   # Integrate over all intervals
   X=MX(X0)
+  T0 = MX(0) # Beginning of time interval (changed from k*DT due to probable Sundials bug)
+  TF = MX(DT) # End of time interval (changed from (k+1)*DT due to probable Sundials bug)
   for k in range(nu):
-    X = integrator([MX(k*DT),MX((k+1)*DT),X,U[k],xdot])  # build up a graph with function calls
+    # build up a graph with function calls
+    X = integrator([T0,TF,X,U[k],xdot])
 
   # Objective function
   F = inner_prod(U,U)

@@ -38,6 +38,14 @@ CVodesInternal* CVodesInternal::clone() const{
 }
   
 int CVodesInternal::getNX(const FX& f, const FX& q){
+  // Check dimensions
+  if(f.getNumInputs()!=ODE_NUM_IN) throw CasadiException("CVodesInternal: f has wrong number of inputs");
+  if(f.getNumOutputs()!=ODE_NUM_OUT) throw CasadiException("CVodesInternal: f has wrong number of outputs");
+  if(!q.isNull()){
+    if(q.getNumInputs()!=ODE_NUM_IN) throw CasadiException("CVodesInternal: q has wrong number of inputs");
+    if(q.getNumOutputs()!=ODE_NUM_OUT) throw CasadiException("CVodesInternal: q has wrong number of outputs");
+  }
+
   // Number of states
   int nx = f.output().numel();
   

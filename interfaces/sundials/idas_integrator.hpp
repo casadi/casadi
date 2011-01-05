@@ -33,6 +33,7 @@
 #define SWIGDOC(x)
 #endif
 
+
 namespace CasADi{
 namespace Sundials{
 
@@ -40,16 +41,13 @@ namespace Sundials{
 class IdasInternal;
 
 /// Input arguments of an DAE residual function
-enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_P, DAE_NUM_IN};
-
-// Input arguments of an DAE residual function (new version)
-//enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
+enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
 
 /// Output arguments of an DAE residual function
 enum DAEOutput{DAE_RES, DAE_NUM_OUT};
 
 /// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
-enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
+enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_Z, JAC_P, JAC_CJ, JAC_NUM_IN};
 
 /// Output arguments of an DAE residual function
 enum JACOutput{JAC_J, JAC_NUM_OUT};
@@ -77,7 +75,7 @@ public:
   /// Default constructor
   IdasIntegrator();
   
-  /// Create an integrator for a fully implicit DAE with quadrature states
+  /// Create an integrator for a fully implicit DAE with quadrature states (nz is the number of states not to be included in the state vector)
   explicit IdasIntegrator(const FX& f, const FX& q=FX());
 
   /// Access functions of the node
