@@ -36,11 +36,36 @@ class SXtests(casadiTestCase):
   def test_gradient(self):
       x=SXMatrix("x");
       x0=1;
-      y=x**10;
+      p=10 # increase to 20 to showcase ticket #56
+      y=x**p;
       dx=jacobian(y,x);
-      dxr=10;
-      #print dx
+      dxr=p;
       self.evaluationCheck([dx],dxr,[x],x0,name="jacobian");
+      
+      dxr=1
+      for i in list(range(p)):
+        y=jacobian(y,x)
+        dxr=dxr*(p-i)
+      
+      
+      self.evaluationCheck([y],dxr,[x],x0,name="recursive jacobian");
+
+  def test_gradient2(self):
+      x=SXMatrix("x");
+      p=SXMatrix("p");
+      x0=1;
+      p0=10 # increase to 20 to showcase ticket #56
+      y=x**p;
+      dx=jacobian(y,x);
+      dxr=p0;
+      self.evaluationCheck([dx],dxr,[x,p],[x0,p0],name="jacobian");
+
+      dxr=1
+      for i in list(range(p0)):
+        y=jacobian(y,x)
+        dxr=dxr*(p0-i)
+      
+      self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
   def test_SXMAtrix(self):
       x=SXMatrix("x",3,2)

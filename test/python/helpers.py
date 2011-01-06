@@ -56,7 +56,10 @@ class casadiTestCase(unittest.TestCase):
       f = MXFunction(x,yt)
       
     f.init()
-    f.setInput(x0,0)
+    if not(type(x0)==list):
+      x0=[x0]
+    for i in range(len(x0)):
+      f.setInput(x0[i],i)
     f.evaluate()
     zt = f.output(0).getArray()
     self.checkarray(yr,zt,name)
