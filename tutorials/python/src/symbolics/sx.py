@@ -47,8 +47,12 @@ print f
 print x+y
 #! Expression substitution
 #! ------------------------------------
+x=SXMatrix("x")
+
 y=x*x
-substitute(y,x,SX("w"))
+print y
+substitute(y,x,SXMatrix("w"))
+print y
 #! More operators
 #! ------------------------------
 #! Some familiar mathematical operations are supported that mimic the standard numpy functions:
