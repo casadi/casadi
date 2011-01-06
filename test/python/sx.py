@@ -33,6 +33,15 @@ class SXtests(casadiTestCase):
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
       
+  def test_gradient(self):
+      x=SXMatrix("x");
+      x0=1;
+      y=x**10;
+      dx=jacobian(y,x);
+      dxr=10;
+      #print dx
+      self.evaluationCheck([dx],dxr,[x],x0,name="jacobian");
+      
   def test_SXMAtrix(self):
       x=SXMatrix("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])

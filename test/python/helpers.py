@@ -33,15 +33,14 @@ class casadiTestCase(unittest.TestCase):
           self.assertAlmostEqual(zt[i,j],zr[i,j],10,"%s evaluation error. %s <-> %s" % (name, str(zt),str(zr)))
 
 
-
-  def numpyEvaluationCheck(self,ft,fr,x,x0,name=""):
-    """ General unit test for checking casadi versus numpy evaluation.
+  def evaluationCheck(self,yt,yr,x,x0,name=""):
+    """ General unit test for checking casadi evaluation against a reference solution.
     
-        Checks if 'fr(x0)' yields the same as S/MXFunction(x,[y]) , evaluated for x0
+        Checks if yr is the same as S/MXFunction(x,yt) , evaluated for x0
     
         x: the symbolic seed for the test. It should be of a form accepted as first argument of SXFunction/MXFunction
-        ft: the test function. This function should operate on the casadi matrix x and return MX or SXMatrix.
-        fr: the reference function. This function works on the numpy array x0.
+        yt: the test expression.
+        yr: the reference solution: a numpy matrix.
         
         name - a descriptor that will be included in error messages
     """
@@ -50,18 +49,30 @@ class casadiTestCase(unittest.TestCase):
     else :
       sample = x
       
-    y=ft(x)
+
     if isinstance(sample,SX) or isinstance(sample,SXMatrix):
-      f = SXFunction(x,[y])
+      f = SXFunction(x,yt)
     else:
-      f = MXFunction(x,[y])
+      f = MXFunction(x,yt)
       
     f.init()
     f.setInput(x0,0)
     f.evaluate()
-    yt = f.output(0).getArray()
-    yr = fr(x0)
-    self.checkarray(yr,yt,name)
+    zt = f.output(0).getArray()
+    self.checkarray(yr,zt,name)
+    
+  def numpyEvaluationCheck(self,ft,fr,x,x0,name=""):
+    """ General unit test for checking casadi versus numpy evaluation.
+    
+        Checks if 'fr(x0)' yields the same as S/MXFunction(x,[ft(x)]) , evaluated for x0
+    
+        x: the symbolic seed for the test. It should be of a form accepted as first argument of SXFunction/MXFunction
+        ft: the test function. This function should operate on the casadi matrix x and return MX or SXMatrix.
+        fr: the reference function. This function works on the numpy array x0.
+        
+        name - a descriptor that will be included in error messages
+    """
+    self.evaluationCheck([ft(x)],fr(x0),x,x0,name)
   
   def numpyEvaluationCheckPool(self,pool,x,x0,name=""):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""
