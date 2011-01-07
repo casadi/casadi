@@ -23,80 +23,48 @@
 #ifndef FMI_PARSER_HPP
 #define FMI_PARSER_HPP
 
-#include "xml_parser.hpp"
 #include "optimica_ocp.hpp"
 #include "xml_node.hpp"
-#include "casadi/printable_object.hpp"
-
-/** \brief  Forward declarations */
-class TiXmlElement;
-class TiXmlNode;
 
 namespace CasADi{
 namespace Modelica{
 
-class FMIParser : public PrintableObject{
+// Forward declaration
+class FMIParserInternal;
+  
+class FMIParser : public SharedObject{
+  public:
+    /// Default (empty) constructor
+    FMIParser();
+    
+    /// Create an FMI instance given the filename
+    FMIParser(const std::string& filename);
 
-public:
-FMIParser(const std::string& filename);
-virtual ~FMIParser(); // destructor
+    /// Parse from XML to C++ format
+    OCP& parse();
 
-/** \brief Parse from XML to C++ format */
-OCP& parse();
+    /// Get the OCP
+    OCP& ocp();
 
-/** \brief Get the OCP */
-OCP& ocp();
+    /// Get the OCP (const ref)
+    const OCP& ocp() const;
 
-/** \brief Get the OCP (const ref)*/
-const OCP& ocp() const;
+    /// Access functions of the node
+    FMIParserInternal* operator->();
 
-/** \brief Print description */
-virtual void print(std::ostream &stream=std::cout) const;
+    /// Const access functions of the node
+    const FMIParserInternal* operator->() const;
 
-protected:
-
-/** \brief  Add model variables */
-void addModelVariables();
-
-/** \brief  Add binding equations */
-void addBindingEquations();
-
-/** \brief  Add dynamic equations */
-void addDynamicEquations();
-
-/** \brief  Read an equation */
-SX readExpr_new(const XMLNode& odenode);
-
-/** \brief  Read a variable */
-Variable readVariable(const XMLNode& node) const;
-
-/** \brief  Add initial equations */
-void addInitialEquations();
-
-/** \brief  Add optimization */
-void addOptimization();
-void addObjectiveFunction(const XMLNode& onode);
-void addConstraints(const XMLNode& onode);
-void addIntervalStartTime(const XMLNode& onode);
-void addIntervalFinalTime(const XMLNode& onode);
-
-// NOTE 1: Joel: The FMIParser class will later have to be changed to work with the MX class instead of SX, 
-//               therefore I had to change the implementation so that it is more generic
-
-// NOTE 2: Joel: Will there really ever be so many functions that it will motivate a binary search of the functions rather than a simple linear search?
-
-/// Look-up table mapping XML names to SX unary functions
-std::map<std::string,SX (*)(const SX&)> unary_;
-
-/// Look-up table mapping XML names to SX binary functions
-std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
-
-/** \brief  The optimal control problem representation -- keep synchronized with the XML representation! */
-OCP ocp_;
-
-XMLNode document;
-
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
 };
+
+#ifdef SWIG
+%extend FMIParser {
+  // Not inherited
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+#endif // SWIG
 
 } // namespace Modelica
 } // namespace CasADi

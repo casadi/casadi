@@ -249,6 +249,9 @@ bool Variable::getIndependent() const{
   return (*this)->independent_;
 }
 
+bool Variable::checkNode() const{
+  return dynamic_cast<const VariableInternal*>(get());
+}
 
 } // namespace Modelica
 } // namespace CasADi

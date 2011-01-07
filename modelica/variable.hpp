@@ -83,6 +83,8 @@ namespace CasADi{
     
     /// Access functions of the node
     VariableInternal* operator->();
+
+    /// Const access functions of the node
     const VariableInternal* operator->() const;
 
     /// Get type
@@ -195,7 +197,9 @@ namespace CasADi{
     
     /// Check if variable is independent (time)
     bool getIndependent() const;
-    
+
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
   };
 } // namespace Modelica
 } // namespace CasADi
