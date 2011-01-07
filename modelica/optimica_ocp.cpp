@@ -36,6 +36,16 @@ OCP::OCP(){
   variables = Variable("variables");
 }
 
+void OCP::repr(ostream &stream) const{
+  stream << "Optimal control problem (";
+  stream << "#dae = " << dae.size() << ", ";
+  stream << "#ae = " << ae.size() << ", ";
+  stream << "#initeq = " << initeq.size() << ", ";
+  stream << "#cfcn = " << cfcn.size() << ", ";
+  stream << "#mterm = " << mterm.size() << ", ";
+  stream << "#lterm = " << lterm.size() << ")";
+}
+
 void OCP::print(ostream &stream) const{
   // Variables in the class hierarchy
   stream << "Variables" << endl;
@@ -85,6 +95,12 @@ void OCP::print(ostream &stream) const{
     stream << mterm[i] << " at time == " << mtp[i] << endl;
   stream << endl;
   
+  // Lagrange terms
+  stream << "Lagrange objective terms" << endl;
+  for(int i=0; i<lterm.size(); ++i)
+    stream << lterm[i] << endl;
+  stream << endl;
+  
   // Constraint functions
   stream << "Constraint functions" << endl;
   for(int i=0; i<cfcn.size(); ++i)
@@ -99,6 +115,7 @@ void OCP::print(ostream &stream) const{
 }
 
 void OCP::makeExplicit(){
+  throw CasadiException("OCP::makeExplicit: Commented out");
 #if 0  
   // Dynamic equation
   SXMatrix dae(dyneq);
@@ -131,6 +148,7 @@ void OCP::makeExplicit(){
 
 
 void OCP::makeSemiExplicit(){
+  throw CasadiException("OCP::makeSemiExplicit: Commented out");
 #if 0  
   // Move the fully implicit dynamic equations to the list of algebraic equations
   algeq.insert(algeq.end(), dyneq.begin(), dyneq.end());

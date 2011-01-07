@@ -80,6 +80,7 @@ class FMIParserInternal : public SharedObjectNode{
     /// Add optimization */
     void addOptimization();
     void addObjectiveFunction(const XMLNode& onode);
+    void addIntegrandObjectiveFunction(const XMLNode& onode);
     void addConstraints(const XMLNode& onode);
     void addIntervalStartTime(const XMLNode& onode);
     void addIntervalFinalTime(const XMLNode& onode);

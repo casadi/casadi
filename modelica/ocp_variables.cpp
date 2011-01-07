@@ -51,7 +51,17 @@ OCPVariables::OCPVariables(const Variable& var){
     }
   }
 }
-    
+
+void OCPVariables::repr(ostream &stream) const{
+  stream << "OCP variable collection ("; 
+  stream << "#x = " << x.size() << ", ";
+  stream << "#z = " << z.size() << ", ";
+  stream << "#u = " << u.size() << ", ";
+  stream << "#p = " << p.size() << ", ";
+  stream << "#c = " << c.size() << ", ";
+  stream << "#d = " << d.size() << ")";
+}
+
 void OCPVariables::print(ostream &stream) const{
   stream << "{" << endl;
   stream << "  t = " << t << endl;

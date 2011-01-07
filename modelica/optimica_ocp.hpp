@@ -37,6 +37,9 @@ class OCP : public PrintableObject{
     OCP();
 
 #ifndef SWIG
+    /// Print a representation of the object
+    virtual void repr(std::ostream &stream=std::cout) const;
+    
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
 #endif
@@ -62,12 +65,15 @@ class OCP : public PrintableObject{
     /// Path constraint function with upper and lower bounds
     std::vector<SX> cfcn, cfcn_lb, cfcn_ub;
 
-    /// Mayer terms
+    /// Mayer objective terms
     std::vector<SX> mterm;
     
     /// Mayer time time points
     std::vector<double> mtp;
         
+    /// Lagrange objective terms
+    std::vector<SX> lterm;
+    
     /// Initial time
     double t0;
     

@@ -119,10 +119,10 @@ class FunctionIO{
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<double>& val, int dir=0, Sparsity sp=SPARSE) const;
 
+#ifndef SWIG
     /** \brief  Get the non-zero elements, array */
     void get(double* val, int dir=0, Sparsity sp=SPARSE) const;    
 
-#ifndef SWIG
     /** \brief  Set the non-zero elements, array */
     void set(const double* val, int dir=0, Sparsity sp=SPARSE);
 #endif

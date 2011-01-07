@@ -70,10 +70,10 @@ namespace CasADi{
     /// Access a sub-collection by name
     Variable operator()(const std::string& name) const;
 
+#ifndef SWIG
     /// Access a sub-collection by index
     Variable operator[](int ind) const;
 
-#ifndef SWIG
     /// Type conversion to SX
     operator SX() const;
 
@@ -206,9 +206,12 @@ namespace CasADi{
 
   
 #ifdef SWIG  
-// Not inherited: Bug?
 %extend CasADi::Modelica::Variable {
+  // Not inherited: Bug?
   std::string __repr__()  { return $self->getRepresentation(); }
+  
+  // Not automatically translated
+  CasADi::Modelica::Variable __getitem__(int ind) const { return (*$self)[ind];}
 }
 
 // Template instantiations

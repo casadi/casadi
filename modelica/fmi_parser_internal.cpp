@@ -309,7 +309,7 @@ void FMIParserInternal::addOptimization(){
     if(onode.checkName("opt:ObjectiveFunction")){ // mayer term
       addObjectiveFunction(onode);
     } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
-//      addIntegrandObjectiveFunction(onode);
+      addIntegrandObjectiveFunction(onode);
     } else if(onode.checkName("opt:IntervalStartTime")) {
        addIntervalStartTime(onode);
     } else if(onode.checkName("opt:IntervalFinalTime")) {
@@ -323,13 +323,6 @@ void FMIParserInternal::addOptimization(){
 }
 
 void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
-// 		<opt:ObjectiveFunction>
-// 			<exp:TimedVariable>
-// 				<exp:Identifier>cost</exp:Identifier>
-// 				<exp:Instant>20.0</exp:Instant>
-// 			</exp:TimedVariable>
-// 		</opt:ObjectiveFunction>
-
   // Add components
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
@@ -340,6 +333,14 @@ void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
       ocp_.mterm.push_back(v);
       ocp_.mtp.push_back(tp->getValue());  // always a constant???
     }
+  }
+}
+
+void FMIParserInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
+  for(int i=0; i<onode.size(); ++i){
+    const XMLNode& var = onode[i];
+    SX v = readExpr_new(var[0]);
+    ocp_.lterm.push_back(v);
   }
 }
 

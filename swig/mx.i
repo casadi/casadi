@@ -2,6 +2,7 @@
 #include "casadi/mx/mx.hpp"
 #include <ostream>
 #include <iostream>
+#include "casadi/mx/mx_tools.hpp"
 %}
 
 %include "slicer.i"
@@ -234,4 +235,6 @@ MX if_else(const MX &cond, const MX &if_true, const MX &if_false); // ternary op
 
 } // namespace CasADi
 
+
+%include "casadi/mx/mx_tools.hpp"
 
