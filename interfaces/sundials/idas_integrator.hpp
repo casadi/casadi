@@ -89,6 +89,7 @@ public:
   
   /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
   IdasIntegrator jac(int iind=0, int oind=0);
+  
 };
 
 

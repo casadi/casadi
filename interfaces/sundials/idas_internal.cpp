@@ -69,10 +69,11 @@ int IdasInternal::getNP(const FX& f){
 IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(f,q), getNP(f)), f_(f), q_(q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false); // supress algebraic variables in the error testing
   addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
-  addOption("abstolv",                     OT_REALVECTOR, Option());
-  addOption("fsens_abstolv",               OT_REALVECTOR, Option()); 
+  addOption("calc_icB",                    OT_BOOLEAN, false);  // use IDACalcIC to get consistent initial conditions
+  addOption("abstolv",                     OT_REALVECTOR);
+  addOption("fsens_abstolv",               OT_REALVECTOR); 
   addOption("max_step_size",               OT_REAL, 0); // maximim step size
-  addOption("first_time",                  OT_REAL, 1.0); // first requested time (to pass to CalcIC)
+  addOption("first_time",                  OT_REAL); // first requested time as a fraction of the time interval
   addOption("cj_scaling",                  OT_BOOLEAN, false);  // IDAS scaling on cj for the user-defined linear solver module
   
   
@@ -81,6 +82,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
   yz_  = 0; 
   yP_ = 0, 
   yQ_ = 0;
+  id_ = 0;
 
   is_init = false;
 
@@ -99,6 +101,7 @@ IdasInternal::~IdasInternal(){
   if(yz_) N_VDestroy_Serial(yz_);
   if(yP_) N_VDestroy_Serial(yP_);
   if(yQ_) N_VDestroy_Serial(yQ_);
+  if(id_) N_VDestroy_Serial(id_);
   
     // Forward problem
   for(vector<N_Vector>::iterator it=yzS_.begin(); it != yzS_.end(); ++it)   N_VDestroy_Serial(*it);
@@ -106,12 +109,9 @@ IdasInternal::~IdasInternal(){
   for(vector<N_Vector>::iterator it=yQS_.begin(); it != yQS_.end(); ++it)   N_VDestroy_Serial(*it);
 
   // Adjoint problem
-  for(vector<N_Vector>::iterator it=yB0_.begin(); it != yB0_.end(); ++it)   N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yB_.begin(); it != yB_.end(); ++it)     N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=ypB0_.begin(); it != ypB0_.end(); ++it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=ypB_.begin(); it != ypB_.end(); ++it)   N_VDestroy_Serial(*it);
-//  for(vector<N_Vector>::iterator it=yQB0_.begin(); it != yQB0_.end(); ++it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yQB_.begin(); it != yQB_.end(); ++it)   N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yzB_.begin(); it != yzB_.end(); ++it)   N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yPB_.begin(); it != yPB_.end(); ++it)   N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yBB_.begin(); it != yBB_.end(); ++it)   N_VDestroy_Serial(*it);
 
 }
 
@@ -144,7 +144,6 @@ void IdasInternal::init(){
     return;
   }
 
-  calc_ic_ = getOption("calc_ic").toInt();
   cj_scaling_ = getOption("cj_scaling").toInt();
   
   // Sundials return flag
@@ -157,6 +156,7 @@ void IdasInternal::init(){
   // Allocate n-vectors for ivp
   yz_ = N_VNew_Serial(ny_+nz_);
   yP_ = N_VNew_Serial(ny_+nz_);
+  id_ = N_VNew_Serial(ny_+nz_);
 
   // Initialize Idas
   double t0 = 0;
@@ -202,27 +202,21 @@ void IdasInternal::init(){
   IDASetMaxNumSteps(mem_, getOption("max_num_steps").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDASetMaxNumSteps",flag);
 
-  // Temporary vector
-  N_Vector temp = yP_;
-
   // Set algebraic components
   if(hasSetOption("is_differential")){
     // User-specified differential components
     const vector<int>& is_differential = getOption("is_differential").toIntVector();
-    copy(is_differential.begin(),is_differential.end(),NV_DATA_S(temp));
+    copy(is_differential.begin(),is_differential.end(),NV_DATA_S(id_));
   } else {
     // By default, the ny_ first components are differential, the nz_ following algebraic
-    fill_n(NV_DATA_S(temp),ny_,1);
-    fill_n(NV_DATA_S(temp)+ny_,nz_,0);
+    fill_n(NV_DATA_S(id_),ny_,1);
+    fill_n(NV_DATA_S(id_)+ny_,nz_,0);
   }
   
   // Pass this information to IDAS
-  flag = IDASetId(mem_, temp);
+  flag = IDASetId(mem_, id_);
   if(flag != IDA_SUCCESS) idas_error("IDASetId",flag);
     
-  // Reset the vector
-  N_VConst(0.0, temp);
-
   // attach a linear solver
   if(getOption("linear_solver")=="dense"){
     // Dense jacobian
@@ -232,10 +226,11 @@ void IdasInternal::init(){
       // Generate jacobians if not already provided
       if(jac_.isNull()){
         if(jacx_.isNull()) jacx_ = f_.jacobian(DAE_Y,DAE_RES);
-        if(jacz_.isNull()) jacz_ = f_.jacobian(DAE_Z,DAE_RES);
         if(jacxdot_.isNull()) jacxdot_ = f_.jacobian(DAE_YDOT,DAE_RES);
+        if(jacz_.isNull()) jacz_ = f_.jacobian(DAE_Z,DAE_RES);
         jacx_.init();
         jacxdot_.init();
+        jacz_.init();
       }
       
       // Pass to IDA
@@ -413,22 +408,19 @@ void IdasInternal::init(){
   whichB_.resize(nadir_);
 
   // Allocate n-vectors
-  yB0_.resize(nadir_);
-  yB_.resize(nadir_);
-  ypB0_.resize(nadir_);
-  ypB_.resize(nadir_);
+  yzB_.resize(nadir_);
+  yPB_.resize(nadir_);
   for(int i=0; i<nadir_; ++i){
-    yB0_[i] = N_VMake_Serial(ny_,&output(INTEGRATOR_XF).dataA(i)[0]);
-    yB_[i] = N_VMake_Serial(ny_,&input(INTEGRATOR_X0).dataA(i)[0]);
-    ypB0_[i] = N_VMake_Serial(ny_,&output(INTEGRATOR_XPF).dataA(i)[0]);
-    ypB_[i] = N_VMake_Serial(ny_,&input(INTEGRATOR_XP0).dataA(i)[0]);
+    yzB_[i] = N_VNew_Serial(ny_+nz_);
+    yPB_[i] = N_VNew_Serial(ny_+nz_);
   }
 
-  // Allocate n-vectors for quadratures
-  yQB_.resize(nadir_);
-  for(int i=0; i<nadir_; ++i){
-    //yQB0_[i] = N_VNew_Serial(np_);
-    yQB_[i] = N_VMake_Serial(np_,&input(INTEGRATOR_P).dataA(i)[0]);
+  // Allocate n-vectors for the adjoint sensitivities of the parameters
+  if(np_>0){
+    yBB_.resize(nadir_);
+    for(int i=0; i<nadir_; ++i){
+      yBB_[i] = N_VMake_Serial(np_,&input(INTEGRATOR_P).dataA(i)[0]);
+    }
   }
 
   if(nadir_>0){
@@ -461,10 +453,10 @@ void IdasInternal::initAdj(){
     // Create backward problem
     flag = IDACreateB(mem_, &whichB_[dir]);
     if(flag != IDA_SUCCESS) idas_error("IDACreateB",flag);
-    
+  
     // Initialize the backward problem
     double tB0 = input(INTEGRATOR_TF).data()[0];
-    flag = IDAInitB(mem_, whichB_[dir], resB_wrapper, tB0, yB0_[dir], ypB0_[dir]);
+    flag = IDAInitB(mem_, whichB_[dir], resB_wrapper, tB0, yzB_[dir], yPB_[dir]);
     if(flag != IDA_SUCCESS) idas_error("IDAInitB",flag);
 
     // Set tolerances
@@ -474,6 +466,14 @@ void IdasInternal::initAdj(){
     // User data
     flag = IDASetUserDataB(mem_, whichB_[dir], this);
     if(flag != IDA_SUCCESS) idas_error("IDASetUserDataB",flag);
+
+    // Maximum number of steps
+    IDASetMaxNumStepsB(mem_, whichB_[dir], getOption("max_num_steps").toInt());
+    if(flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB",flag);
+  
+    // Pass this information to IDAS
+    flag = IDASetIdB(mem_, whichB_[dir], id_);
+    if(flag != IDA_SUCCESS) idas_error("IDASetIdB",flag);
       
     // attach linear solver
     if(getOption("asens_linear_solver")=="dense"){
@@ -501,10 +501,8 @@ void IdasInternal::initAdj(){
     } else throw CasadiException("Unknown linear solver for backward problem");
       
     // Quadratures for the adjoint problem
-    N_VConst(0.0, yQB_[dir]);
-    flag = IDAQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,yQB_[dir]);
+    flag = IDAQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,yBB_[dir]);
     if(flag!=IDA_SUCCESS) idas_error("IDAQuadInitB",flag);
-    cout << "quad init B " << dir << endl;
   
     // Quadrature error control
     if(getOption("quad_err_con").toInt()){
@@ -542,6 +540,8 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
    // Check the result for consistency
    for(int i=0; i<ny_; ++i){
      if(isnan(r[i]) || isinf(r[i])){
+       if(verbose_)
+         cerr << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << "." << endl;
        throw 1;
      }
    }
@@ -667,11 +667,6 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Vec
 }
 
 void IdasInternal::reset(int fsens_order, int asens_order){
-/*  cout << fsens_order << ", " << asens_order << endl;
-  cout << input(INTEGRATOR_X0).data() << endl;
-  cout << input(INTEGRATOR_XP0).data() << endl;
-  cout << input(INTEGRATOR_P).data() << endl;*/
-
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
@@ -699,11 +694,11 @@ void IdasInternal::reset(int fsens_order, int asens_order){
     if(flag != IDA_SUCCESS) idas_error("IDAQuadReInit",flag);
   }
   
-  // Get the forward seeds
-  getForwardSeeds();
-  
-  // Re-initialize sensitivities
   if(fsens_order_>0){
+    // Get the forward seeds
+    getForwardSeeds();
+    
+    // Re-initialize sensitivities
     flag = IDASensReInit(mem_,ism_,&yzS_[0],&yPS_[0]);
     if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
 
@@ -717,13 +712,13 @@ void IdasInternal::reset(int fsens_order, int asens_order){
     if(flag != IDA_SUCCESS) idas_error("IDASensToggleOff",flag);
   }
 
-  calc_ic_ = getOption("calc_ic").toInt();
-  if(calc_ic_){
-    double t_scale = getOption("first_time").toDouble();
+  int calc_ic = getOption("calc_ic").toInt();
+  if(calc_ic){
     int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
     // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
 
-    flag = IDACalcIC(mem_, icopt , t_scale);
+    double t_first = hasSetOption("first_time") ? getOption("first_time").toDouble() : tf;
+    flag = IDACalcIC(mem_, icopt , t_first);
     if(flag != IDA_SUCCESS) idas_error("IDACalcIC",flag);
 
     // Retrieve the initial values
@@ -784,23 +779,49 @@ void IdasInternal::integrate(double t_out){
 }
 
 void IdasInternal::resetAdj(){
+  double t0 = input(INTEGRATOR_T0).data()[0];
   double tf = input(INTEGRATOR_TF).data()[0];
-
+  
   int flag;
-
+  // Reset adjoint sensitivities for the parameters
+  if(np_>0)
+    for(int dir=0; dir<nadir_; ++dir)
+      N_VConst(0.0, yBB_[dir]);
+  
+  // Get the adjoint seeds
+  getAdjointSeeds();
+    
   if(isInitAdj_){
     for(int dir=0; dir<nadir_; ++dir){
-      flag = IDAReInitB(mem_, whichB_[dir], tf, yB0_[dir], ypB0_[dir]);
+      flag = IDAReInitB(mem_, whichB_[dir], tf, yzB_[dir], yPB_[dir]);
       if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
       
-      N_VConst(0.0,yQB_[dir]);
-      flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),yQB_[dir]);
-//      flag = IDAQuadReInitB(mem_,whichB_[dir],yQB_[dir]);
+      flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),yBB_[dir]);
+//      flag = IDAQuadReInitB(mem_,whichB_[dir],yBB_[dir]); // BUG in Sundials - do not use this!
       if(flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB",flag);
     }
   } else {
     // Initialize the adjoint integration
     initAdj();
+  }
+
+  // Correct initial values for the integration if necessary
+  int calc_icB = getOption("calc_icB").toInt();
+  if(calc_icB){
+    for(int dir=0; dir<nadir_; ++dir){
+      flag = IDACalcICB(mem_, whichB_[dir], t0, yzB_[dir], yPB_[dir]);
+      if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
+
+      N_VPrint_Serial(yzB_[dir]);
+      N_VPrint_Serial(yPB_[dir]);
+
+      // Retrieve the initial values
+      flag = IDAGetConsistentICB(mem_, whichB_[dir], yzB_[dir], yPB_[dir]);
+      if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
+      
+      N_VPrint_Serial(yzB_[dir]);
+      N_VPrint_Serial(yPB_[dir]);
+    }
   }
 }
 
@@ -813,12 +834,15 @@ void IdasInternal::integrateAdj(double t_out){
   // Get the sensitivities
   double tret;
   for(int dir=0; dir<nadir_; ++dir){
-    flag = IDAGetB(mem_, whichB_[dir], &tret, yB_[dir], ypB_[dir]);
+    flag = IDAGetB(mem_, whichB_[dir], &tret, yzB_[dir], yPB_[dir]);
     if(flag!=IDA_SUCCESS) idas_error("IDAGetB",flag);
 
-    flag = IDAGetQuadB(mem_, whichB_[dir], &tret, yQB_[dir]);
+    flag = IDAGetQuadB(mem_, whichB_[dir], &tret, yBB_[dir]);
     if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
   }
+  
+  // Save the adjoint sensitivities
+  setAdjointSensitivities();
 }
 
 void IdasInternal::printStats(std::ostream &stream) const{
@@ -1081,6 +1105,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
 
   // Number of jacobian functions
   int njac = jac_.isNull() ? 2 : 1;
+  assert(njac!=2);
   
   // Evaluate the functions and add to the result
   for(int ijac = 0; ijac<njac; ++ijac){
@@ -1605,6 +1630,31 @@ void IdasInternal::setForwardSensitivities(){
   }
 }
 
+void IdasInternal::getAdjointSeeds(){
+  for(int i=0; i<nadir_; ++i){
+    const double *x0 = &output(INTEGRATOR_XF).dataA(i)[0];
+    const double *xp0 = &output(INTEGRATOR_XPF).dataA(i)[0];
+
+    double *yz = NV_DATA_S(yzB_[i]);
+    double *yp = NV_DATA_S(yPB_[i]);
+
+    copy(x0,x0+ny_,yz);
+    copy(xp0,xp0+ny_,yp);
+  }
+}
+
+void IdasInternal::setAdjointSensitivities(){
+  for(int i=0; i<nadir_; ++i){
+    double *xf = &input(INTEGRATOR_X0).dataA(i)[0];
+    double *xpf = &input(INTEGRATOR_XP0).dataA(i)[0];
+    
+    const double *yz = NV_DATA_S(yzB_[i]);
+    const double *yp = NV_DATA_S(yPB_[i]);
+  
+    copy(yz,yz+ny_,xf);
+    copy(yp,yp+ny_,xpf);
+  }
+}
 
 } // namespace Sundials
 } // namespace CasADi

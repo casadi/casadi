@@ -55,13 +55,13 @@ const bool exact_jacobian = plain_c ? false : true;
 const bool finite_difference_fsens = !exact_jacobian;
 
 // Calculate initial condition (for IDAS only)
-const bool calc_ic = false;
+const bool calc_ic = true;
 
 // Perturb x or u
-const bool perturb_u = false;
+const bool perturb_u = true;
 
 // Use a user_defined linear solver
-const bool user_defined_solver = true;
+const bool user_defined_solver = false;
 
 // Use sparse direct solver (SuperLU)
 const bool sparse_direct = true;

@@ -59,8 +59,8 @@ ocp_solver.setOption("kkt_tolerance",1e-5)
 ocp_solver.init()
 
 # Pass bounds
-lbx0 = [1.0, 0.0, -inf]
-ubx0 = [1.0, 0.0, inf]
+lbx0 = [1.0, 0.0, -NP.inf]
+ubx0 = [1.0, 0.0, NP.inf]
 ocp_solver.setInput(lbx0,ACADO_LBX0)
 ocp_solver.setInput(ubx0,ACADO_UBX0)
 
@@ -92,3 +92,91 @@ plt.plot(t_opt,u_opt)
 plt.title("CONTROL u")
 
 plt.show()
+
+
+# State derivative
+xdot = SX("xdot")
+ldot = SX("ldot")
+
+# The residual of the IDAS dae
+dae_in = DAE_NUM_IN * [[]]
+dae_in[DAE_T] = [t]     # Time
+dae_in[DAE_Y] = [x,l]   # Differential states
+dae_in[DAE_YDOT] = [xdot,ldot]   # Differential states
+dae_in[DAE_Z] = [z]     # Algebraic state
+dae_in[DAE_P] = [u]     # Control
+
+# The DAE residual
+dae_res = list(f)
+dae_res[0] -= xdot
+dae_res[1] -= ldot
+
+# To make it work with a direct solver
+#dae_res[2] -= 0.43*exp(z)
+
+# The DAE residual function
+dae = SXFunction(dae_in,[dae_res])
+dae.setOption("ad_order",1)
+
+# Create an integrator
+integrator = IdasIntegrator(dae)
+
+# Set options
+integrator.setOption("abstol",1e-6)
+integrator.setOption("reltol",1e-6)
+#integrator.setOption("exact_jacobian",True)
+integrator.setOption("stop_at_end",True)
+#integrator.setOption("suppress_algebraic",True)
+#integrator.setOption("linear_solver","dense")
+integrator.setOption("linear_solver","iterative")
+
+# Initialize the integrator
+integrator.init()
+
+# Initial state
+xi = (1.0,0.0)
+
+# Simulated trajectory
+x_opt2 = array((num_nodes+1)*[xi])
+
+# Loop over the time points
+for i in range(num_nodes):
+  # Set initial time
+  ti = t_opt[i]
+  integrator.setInput(ti,INTEGRATOR_T0)
+  
+  # Set stop time
+  ts = t_opt[i+1]
+  integrator.setInput(ts,INTEGRATOR_TF)
+
+  # Set the control
+  ui = u_opt[i]
+  integrator.setInput(ui,INTEGRATOR_P)
+
+  # Pass the state
+  integrator.setInput(xi,INTEGRATOR_X0)
+  
+  # Integrate
+  integrator.evaluate()
+  
+  # Get the state
+  xi = integrator.getOutput(INTEGRATOR_XF)
+  x_opt2[i+1] = xi
+
+plt.figure(3)
+plt.clf()
+plt.subplot(121)
+plt.plot(t_opt,x_opt[:,0])
+plt.title("ACADO x")
+
+plt.plot(t_opt,x_opt[:,1])
+plt.title("ACADO l")
+
+plt.subplot(122)
+plt.plot(t_opt,x_opt2[:,0])
+plt.title("CASADI x")
+
+plt.plot(t_opt,x_opt2[:,1])
+plt.title("CASADI l")
+
+

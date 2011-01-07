@@ -100,7 +100,7 @@ class IdasInternal : public IntegratorInternal{
   virtual void initAdj();
   
   /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int fsens_order, int asens_order);
+  virtual void reset(int nfsens=0, int nasens=0);
 
   /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj();
@@ -179,8 +179,11 @@ class IdasInternal : public IntegratorInternal{
   std::vector<N_Vector> yzS_, yPS_, yQS_;
 
   // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> yB0_, yB_, ypB0_, ypB_, /*yQB0_, */ yQB_;
+  std::vector<N_Vector> yzB_, yPB_, yBB_;
 
+  // Which components are differential
+  N_Vector id_;
+  
   // dimensions
   int ny_; // number of differential states
   int nz_; // number of algebraic states
@@ -211,9 +214,6 @@ class IdasInternal : public IntegratorInternal{
   std::vector<int> whichB_;
 
   int fsens_order_, asens_order_;
-  
-  // Calculate consistent initial conditions
-  bool calc_ic_;
   
   // Jacobian of the ODE with respect to the state and state derivatives (separately)
   FX jacx_, jacxdot_, jacz_;
@@ -262,8 +262,14 @@ class IdasInternal : public IntegratorInternal{
   // Get the forward seeds
   void getForwardSeeds();
   
-  // Set the final state
+  // Set the forward sensitivities
   void setForwardSensitivities();
+  
+  // Get the adjoint seeds
+  void getAdjointSeeds();
+  
+  // Set the adjoint sensitivities
+  void setAdjointSensitivities();
   
 };
 
