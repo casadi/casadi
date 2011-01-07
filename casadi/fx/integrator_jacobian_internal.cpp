@@ -28,6 +28,7 @@ using namespace std;
 namespace CasADi{
 
 IntegratorJacobianInternal::IntegratorJacobianInternal(const Integrator& integrator) : integrator_(integrator){
+  addOption("derivative_index", OT_INTEGER, INTEGRATOR_P); // integrate with respect to what?
 }
 
 IntegratorJacobianInternal::~IntegratorJacobianInternal(){ 
@@ -149,14 +150,17 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   for(int i=0; i<nx_; ++i)
     xpf[i] = xpfs[jacmap_[i]];
   
+  
   // Get adjoint sensitivities
   if(asens_order>0){
     for(int dir=0; dir<nadir_; ++dir){
-      vector<double>& jacsens = input(INTEGRATOR_X0).dataA(dir);
+      vector<double>& asens = input(INTEGRATOR_X0).dataA(dir);
+      fill(asens.begin(),asens.end(),0);
+      
       const vector<double>& jacsens_s = integrator_.input(INTEGRATOR_X0).dataA(dir);
       for(int i=0; i<nx_; ++i)
         for(int j=0; j<ns_; ++j)
-          jacsens[j+i*ns_] = jacsens_s[jacmap_[nx_+j+i*ns_]];
+          asens[i] += jacsens_s[jacmap_[nx_+j+i*ns_]];
         
       input(INTEGRATOR_P).set(integrator_.input(INTEGRATOR_P).dataA(dir),-1-dir);
     }

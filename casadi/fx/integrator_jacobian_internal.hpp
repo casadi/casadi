@@ -32,7 +32,7 @@ namespace CasADi{
 class IntegratorJacobianInternal : public FXInternal{
 public:
   /** \brief  Constructor */
-  IntegratorJacobianInternal(const Integrator& integrator);
+  explicit IntegratorJacobianInternal(const Integrator& integrator);
 
   /** \brief  Destructor */
   virtual ~IntegratorJacobianInternal();

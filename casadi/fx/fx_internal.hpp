@@ -39,9 +39,6 @@ class FXInternal : public OptionsFunctionalityNode{
   /** \brief  Default constructor (accessable from the FX class and derived classes) */
   FXInternal();
   
-  /** \brief  Deep copy */
-  FXInternal(const FXInternal& node);
-
   public:
   /** \brief  Destructor */
   virtual ~FXInternal() = 0;
@@ -93,6 +90,9 @@ class FXInternal : public OptionsFunctionalityNode{
   /** \brief  Number of forward and adjoint derivatives */
   int nfdir_, nadir_;
 
+  /** \brief  Verbose -- for debugging purposes */
+  bool verbose_;
+  
 };
 
 

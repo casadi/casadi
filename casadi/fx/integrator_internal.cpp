@@ -146,6 +146,9 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   // Generate an jacobian
   IntegratorJacobian intjac(fwdint);
 
+  // Derivative with respect to what?
+  intjac.setOption("derivative_index",iind);
+  
   return intjac;
 }
 
