@@ -35,75 +35,74 @@ namespace CasADi{
 namespace Modelica{
 
 class FMIParserInternal : public SharedObjectNode{
-
-public:
-  // Constructor
-  explicit FMIParserInternal(const std::string& filename);
+  public:
+    /// Constructor
+    explicit FMIParserInternal(const std::string& filename);
   
-  // destructor
-  virtual ~FMIParserInternal(); 
+    /// destructor
+    virtual ~FMIParserInternal(); 
 
-/** \brief Parse from XML to C++ format */
-OCP& parse();
+    /// Parse from XML to C++ format
+    OCP& parse();
 
-/** \brief Get the OCP */
-OCP& ocp();
+    /// Get the OCP
+    OCP& ocp();
 
-    /** \brief Get the OCP (const ref)*/
+    /// Get the OCP (const ref)
     const OCP& ocp() const;
 
-    /** \brief Print representation */
+    ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
 
-    /** \brief Print description */
+    /// Print description 
     virtual void print(std::ostream &stream=std::cout) const;
 
   protected:
+    
+    /// Add model variables */
+    void addModelVariables();
 
-/** \brief  Add model variables */
-void addModelVariables();
+    /// Add binding equations */
+    void addBindingEquations();
 
-/** \brief  Add binding equations */
-void addBindingEquations();
+    /// Add dynamic equations
+    void addDynamicEquations();
 
-/** \brief  Add dynamic equations */
-void addDynamicEquations();
+    /// Read an equation
+    SX readExpr_new(const XMLNode& odenode);
 
-/** \brief  Read an equation */
-SX readExpr_new(const XMLNode& odenode);
+    /// Read a variable
+    Variable readVariable(const XMLNode& node) const;
 
-/** \brief  Read a variable */
-Variable readVariable(const XMLNode& node) const;
+    /// Add initial equations
+    void addInitialEquations();
 
-/** \brief  Add initial equations */
-void addInitialEquations();
+    /// Add optimization */
+    void addOptimization();
+    void addObjectiveFunction(const XMLNode& onode);
+    void addConstraints(const XMLNode& onode);
+    void addIntervalStartTime(const XMLNode& onode);
+    void addIntervalFinalTime(const XMLNode& onode);
 
-/** \brief  Add optimization */
-void addOptimization();
-void addObjectiveFunction(const XMLNode& onode);
-void addConstraints(const XMLNode& onode);
-void addIntervalStartTime(const XMLNode& onode);
-void addIntervalFinalTime(const XMLNode& onode);
+    // NOTE 1: Joel: The FMIParserInternal class will later have to be changed to work with the MX class instead of SX, 
+    //               therefore I had to change the implementation so that it is more generic
 
-// NOTE 1: Joel: The FMIParserInternal class will later have to be changed to work with the MX class instead of SX, 
-//               therefore I had to change the implementation so that it is more generic
+    // NOTE 2: Joel: Will there really ever be so many functions that it will motivate a binary search of the functions rather than a simple linear search?
 
-// NOTE 2: Joel: Will there really ever be so many functions that it will motivate a binary search of the functions rather than a simple linear search?
+    /// Look-up table mapping XML names to SX unary functions
+    std::map<std::string,SX (*)(const SX&)> unary_;
 
-/// Look-up table mapping XML names to SX unary functions
-std::map<std::string,SX (*)(const SX&)> unary_;
+    /// Look-up table mapping XML names to SX binary functions
+    std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
 
-/// Look-up table mapping XML names to SX binary functions
-std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
+    /// The optimal control problem representation -- keep synchronized with the XML representation!
+    OCP ocp_;
 
-  /** \brief  The optimal control problem representation -- keep synchronized with the XML representation! */
-  OCP ocp_;
+    /// Parsed XML document
+    XMLNode document_;
 
-  // Parsed XML document
-  XMLNode document_;
-
-  // Filename
-  std::string filename_;
+    /// Filename
+    std::string filename_;
 
 };
 

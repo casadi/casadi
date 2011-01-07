@@ -37,7 +37,7 @@ class FMIParser : public SharedObject{
     /// Default (empty) constructor
     FMIParser();
     
-    /// Create an FMI instance given the filename
+    /// Create an FMI parser instance given the filename
     FMIParser(const std::string& filename);
 
     /// Parse from XML to C++ format
@@ -49,10 +49,10 @@ class FMIParser : public SharedObject{
     /// Get the OCP (const ref)
     const OCP& ocp() const;
 
-    /// Access functions of the node
+    /// Access to the internal class
     FMIParserInternal* operator->();
 
-    /// Const access functions of the node
+    /// Const access to the internal class
     const FMIParserInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
