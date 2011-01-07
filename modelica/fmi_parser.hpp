@@ -25,11 +25,17 @@
 
 #include "xml_parser.hpp"
 #include "optimica_ocp.hpp"
+#include "xml_node.hpp"
+#include "casadi/printable_object.hpp"
+
+/** \brief  Forward declarations */
+class TiXmlElement;
+class TiXmlNode;
 
 namespace CasADi{
 namespace Modelica{
 
-class FMIParser : public XMLParser{
+class FMIParser : public PrintableObject{
 
 public:
 FMIParser(const std::string& filename);
@@ -43,6 +49,9 @@ OCP& ocp();
 
 /** \brief Get the OCP (const ref)*/
 const OCP& ocp() const;
+
+/** \brief Print description */
+virtual void print(std::ostream &stream=std::cout) const;
 
 protected:
 
@@ -84,6 +93,9 @@ std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
 
 /** \brief  The optimal control problem representation -- keep synchronized with the XML representation! */
 OCP ocp_;
+
+XMLNode document;
+
 };
 
 } // namespace Modelica

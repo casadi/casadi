@@ -34,9 +34,11 @@ class OCPVariables : public PrintableObject{
   public:    
     /// Constructor (automatic type conversion allowed)
     OCPVariables(const Variable& var);
-    
+
+#ifndef SWIG    
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
+#endif // SWIG
 
     /// Time
     Variable t;
@@ -60,6 +62,13 @@ class OCPVariables : public PrintableObject{
     std::vector<Variable> d;
 
 };
+
+#ifdef SWIG
+%extend OCPVariables {
+  // Print (why is this not inherited?)
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+#endif
 
   } // namespace Modelica
 } // namespace CasADi

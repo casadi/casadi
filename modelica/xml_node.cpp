@@ -145,6 +145,10 @@ const string& XMLNode::getName() const{
   return name;
 }
 
+void XMLNode::setName(const string& name){
+  this->name = name;
+}
+
 void XMLNode::dump(ostream &stream, int indent) const{
   // Print name
   stream << string( indent,' ') << "Node: " << name << endl;

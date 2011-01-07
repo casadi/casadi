@@ -36,7 +36,6 @@ namespace CasADi{
 namespace Modelica{
 
 class XMLNode{
-friend class XMLParser;
 public:
   XMLNode();
   XMLNode(const std::string& name);
@@ -68,6 +67,9 @@ public:
 
 /** \brief  Get the name of the node */
   const std::string& getName() const;
+
+/** \brief  Set the name of the node */
+  void setName(const std::string& name);
 
 /** \brief  check if the name is equal to something */
   bool checkName(const std::string& str) const;

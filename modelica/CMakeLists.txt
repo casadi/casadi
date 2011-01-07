@@ -5,12 +5,8 @@ SET(MODELICA
   optimica_ocp.cpp
   ocp_variables.hpp
   ocp_variables.cpp
-  variable.hpp
-  variable.cpp
-  fmi_parser.hpp
-  fmi_parser.cpp
-  xml_parser.hpp
-  xml_parser.cpp
+  variable.hpp    variable.cpp    variable_internal.hpp  variable_internal.cpp
+  fmi_parser.hpp  fmi_parser.cpp  
   xml_node.hpp
   xml_node.cpp
   xml_arg.hpp

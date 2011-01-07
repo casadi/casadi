@@ -21,18 +21,30 @@
  */
 
 #include "fmi_parser.hpp"
+#include "variable_internal.hpp"
 #include <map>
 #include <string>
 #include <sstream>
 #include <cassert>
 #include "casadi/expression_tools.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include "external_packages/tinyxml/tinyxml.h"
 
 using namespace std;
 namespace CasADi{
 namespace Modelica{
 
-FMIParser::FMIParser(const std::string& filename) : XMLParser(filename){
+FMIParser::FMIParser(const std::string& filename){
+  TiXmlDocument doc;
+  bool flag = doc.LoadFile(filename.data());
+
+  if(!flag){
+    throw CasadiException("XMLParser::loadFile: Cound not open " + filename);
+  }
+
+  // parse
+  document.setName(filename);
+  document.addNode(&doc);
 }
 
 FMIParser::~FMIParser(){
@@ -462,6 +474,10 @@ SX FMIParser::readExpr_new(const XMLNode& node){
   // throw error if reached this point
   throw CasadiException(string("FMIParser::readExpr: unknown node: ") + name);
   
+}
+
+void FMIParser::print(std::ostream &stream) const{
+  stream << document;
 }
 
 } // namespace Modelica

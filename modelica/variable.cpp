@@ -20,8 +20,7 @@
  *
  */
 
-#include "variable.hpp"
-#include <cassert>
+#include "variable_internal.hpp"
 #include "../casadi/expression_tools.hpp"
 #include "../casadi/casadi_exception.hpp"
 
@@ -33,82 +32,21 @@ Variable::Variable(){
 }
 
 Variable::Variable(const string& name){
-  assignNode(new VariableNode(name));
+  assignNode(new VariableInternal(name));
 }
 
 
 Variable::~Variable(){
 }
 
-VariableNode* Variable::operator->(){
-  return (VariableNode*)(SharedObject::operator->());
+VariableInternal* Variable::operator->(){
+  return (VariableInternal*)(SharedObject::operator->());
 }
 
-const VariableNode* Variable::operator->() const{
-  return (const VariableNode*)(SharedObject::operator->());
+const VariableInternal* Variable::operator->() const{
+  return (const VariableInternal*)(SharedObject::operator->());
 }
   
-VariableNode::VariableNode(const string& name) : name_(name){
-  // No expression by default
-  sx_ = SX::nan;
-  
-  // Not differentable by default
-  dx_ = SX::nan;
-  
-  // Binding equation undefined by default
-  be_ = SX::nan;
-  
-  // Differential equation undefined by default
-  de_ = SX::nan;
-
-  independent_ = false;
-  variability_ = CONTINUOUS;
-  causality_ = INTERNAL;
-  alias_ = NO_ALIAS;
-  description_ = "";
-  valueReference_ = -1; //?
-  min_ = -numeric_limits<double>::infinity();
-  max_ = numeric_limits<double>::infinity();
-  nominal_ = 1.0;
-  start_ = 0.0;
-  unit_ = "";
-  displayUnit_ = "";
-
-  // Update the type
-  init();
-}
-
-void VariableNode::init(){
-  // Set the type to unknown
-  type_ = TYPE_UNKNOWN;
-  
-  // Try to determine the type
-  if(independent_){
-    type_ = TYPE_INDEPENDENT;
-  } else {
-    if(!sx_->isNan()){
-      if(!be_->isNan()){
-        type_ = TYPE_DEPENDENT;
-      } else {
-        if(variability_ == PARAMETER){
-          type_ = TYPE_PARAMETER;
-        } else if(variability_ == CONTINUOUS) {
-          if(causality_ == INTERNAL){
-            type_ = !dx_->isNan() ? TYPE_STATE : TYPE_ALGEBRAIC;
-          } else if(causality_ == INPUT){
-            type_ = TYPE_CONTROL;
-          }
-        } else if(variability_ == CONSTANT){
-          type_ = TYPE_CONSTANT;
-        }
-      }
-    }
-  }
-}
-  
-VariableNode::~VariableNode(){
-}
-
 Variable::operator SX() const{
   return sx();  
 }
@@ -121,32 +59,8 @@ SX Variable::sx() const{
   return (*this)->sx();  
 }
 
-
-
-const string& VariableNode::getName() const{
-  return name_;
-}
-
-string VariableNode::getTypeName() const{
-  return typenames[type_];
-}
-
 VarType Variable::getType() const{
   return (*this)->type_;
-}
-
-SX VariableNode::der() const{
-  if(de_->isNan())
-    return dx_;
-  else
-    return de_;
-}
-
-SX VariableNode::sx() const{
-  if(be_->isNan())
-    return sx_;
-  else
-    return be_;
 }
 
 double Variable::getValue() const{
@@ -178,60 +92,6 @@ Variable Variable::operator[](int ind) const{
     return (*this)->col.at(ind-base);
   } catch(exception& ex){
     throw CasadiException(string("Variable::operator[] failed <= ") + ex.what());
-  }
-}
-
-int VariableNode::add(const Variable& var){
-  return add(var,var.getName());
-}
-
-int VariableNode::add(const Variable& var, const string& namepart){
-  col.push_back(var);
-  int ind = col.size()-1;
-  name_part[namepart] = ind;
-  return ind;
-}
-
-bool VariableNode::has(const string& name) const{
-  // try to locate the variable
-  map<string, int>::const_iterator it = name_part.find(name);
-
-  // check if the variable exists
-  return it!=name_part.end();
-}
-
-void VariableNode::repr(ostream &stream) const{
-  stream << name_;
-}
-
-
-void VariableNode::print(ostream &stream) const{
-  print(stream,0);
-}
-
-void VariableNode::print(ostream &stream, int indent) const{
-  // Add indentation
-  for(int i=0; i<indent; ++i) stream << "  ";
-  
-  // Print name
-  stream << name_ << ": " << getTypeName() << endl;
-
-  if(!col.empty()){
-    for(vector<Variable>::const_iterator it = col.begin(); it!=col.end(); ++it){
-      (*it)->print(stream,indent+2);
-    }
-  }
-}
-
-void VariableNode::getAll(vector<Variable>& vars) const{
-  if(col.empty()){
-    Variable temp;
-    temp.assignNode(const_cast<VariableNode*>(this)); // ugly trick
-    vars.push_back(temp);
-  } else {
-    for(vector<Variable>::const_iterator it=col.begin(); it!=col.end(); ++it)
-      if(!it->isNull())
-        (*it)->getAll(vars);
   }
 }
 

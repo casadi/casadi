@@ -36,8 +36,10 @@ class OCP : public PrintableObject{
     /// OCP
     OCP();
 
+#ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
+#endif
 
     /// Try to make explicit by symbolically solving for xdot (experimental, only small systems)
     void makeExplicit();
@@ -79,6 +81,13 @@ class OCP : public PrintableObject{
     bool tf_free;
 
 };
+
+#ifdef SWIG
+%extend OCP{
+  // Print (why is this not inherited?)
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+#endif
 
   } // namespace Modelica
 } // namespace CasADi

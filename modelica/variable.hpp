@@ -45,12 +45,8 @@ namespace CasADi{
     /// Variable types
     enum VarType{TYPE_INDEPENDENT, TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
-    /// Names of the variable types
-    static const char* typenames[] = {"INDEPENDENT","STATE","ALGEBRAIC","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
-
-    
     // Forward declaration
-    class VariableNode;
+    class VariableInternal;
 
   // Smart pointer class
   class Variable : public SharedObject{
@@ -77,15 +73,17 @@ namespace CasADi{
     /// Access a sub-collection by index
     Variable operator[](int ind) const;
 
+#ifndef SWIG
     /// Type conversion to SX
     operator SX() const;
 
     /// Type conversion to variable vector
     operator std::vector<Variable>() const;
+#endif // SWIG
     
     /// Access functions of the node
-    VariableNode* operator->();
-    const VariableNode* operator->() const;
+    VariableInternal* operator->();
+    const VariableInternal* operator->() const;
 
     /// Get type
     VarType getType() const;
@@ -199,100 +197,19 @@ namespace CasADi{
     bool getIndependent() const;
     
   };
-
-  /// Internal node class
-  class VariableNode : public SharedObjectNode{
-    friend class Variable;
-    public:
-
-    // Constructor only available to the smart pointer class!
-    VariableNode(const std::string& name);
-          
-    // Destructor
-    virtual ~VariableNode();
-
-    // Get type name
-    std::string getTypeName() const;
-        
-    // Get name
-    const std::string& getName() const;
-
-    // Variable/binding equation
-    SX sx() const;  
-
-    // Derivative/differential equation
-    SX der() const;  
-    
-    // Update the type
-    virtual void init();
-    
-    // Print
-    virtual void repr(std::ostream &stream) const;
-    virtual void print(std::ostream &stream) const;
-    void print(std::ostream &stream, int indent) const;
-
-    // Get all the variables
-    void getAll(std::vector<Variable>& vars) const;
-    
-    // Add a subcollection
-    int add(const Variable& var, const std::string& namepart);
-
-    // Add a subcollection, default name
-    int add(const Variable& var);
-
-    // Check if a subcollection exists
-    bool has(const std::string& name) const;
-
-    // Set of sub-collections in the current collection
-    std::vector<Variable> col;
-  
-    // Names of contained collections
-    std::map<std::string,int> name_part;
-
-    protected:
-
-    // Variable type
-    VarType type_;
-    
-    // Is the variable independent
-    bool independent_;
-
-    // Attributes
-    std::string name_;
-    Variability variability_;
-    Causality causality_;
-    Alias alias_;
-    std::string description_;
-    int valueReference_;
-    double min_;
-    double max_;
-    double nominal_;
-    double start_;
-    std::string unit_;
-    std::string displayUnit_;
-    
-    // variable expression
-    SX sx_; 
-
-    // Derivative expression
-    SX dx_;
-
-    // Binding equation
-    SX be_;
-    
-    // Differential equation
-    SX de_;
-    
-    // Numerical value
-    double val;
-    
-
-
-    
-  };
-  
 } // namespace Modelica
 } // namespace CasADi
+
+  
+#ifdef SWIG  
+// Not inherited: Bug?
+%extend CasADi::Modelica::Variable {
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+
+// Template instantiations
+%template(vector_variable) std::vector<CasADi::Modelica::Variable>;
+#endif // SWIG  
 
 
 #endif // VARIABLE_HPP
