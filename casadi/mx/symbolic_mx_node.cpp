@@ -29,7 +29,8 @@ using namespace std;
 namespace CasADi{
 
 SymbolicMatrix::SymbolicMatrix(const std::string& name_, int n, int m) : name(name_) {
-  sz = MatrixSize(n,m);
+  nrow_ = n;
+  ncol_ = m;
 }
 
 SymbolicMatrix* SymbolicMatrix::clone() const{

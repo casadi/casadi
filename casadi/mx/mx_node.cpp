@@ -121,7 +121,7 @@ void MXNode::init(){
   for(int ord=0; ord<=maxord_; ++ord){
     val_[ord].resize(nfdir_+nadir_);
     for(int dir=0; dir<nfdir_+nadir_; ++dir){
-      val_[ord][dir].resize(sz.nrow*sz.ncol);
+      val_[ord][dir].resize(nrow_*ncol_);
     }
   }
 }

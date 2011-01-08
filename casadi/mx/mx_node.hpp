@@ -99,7 +99,8 @@ public:
     int nfdir_, nadir_;
     
     /** \brief  expression size */
-    MatrixSize sz;
+    int nrow_;
+    int ncol_;
   
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;

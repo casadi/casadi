@@ -31,7 +31,8 @@ namespace CasADi{
 
 MatrixScalarOp::MatrixScalarOp(OPERATION op_, const MX& x, const MX& y) : op(op_), MXNode(x,y){
   assert(y.numel() == 1);
-  sz = x.size();
+  nrow_ = x.size1();
+  ncol_ = x.size2();
 }
 
 MatrixScalarOp* MatrixScalarOp::clone() const{

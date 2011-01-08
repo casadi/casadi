@@ -76,8 +76,13 @@ Internally represented by IfElseNode.
 */
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false); 
 
+#ifndef SWIG
 //! \brief Returns a reshaped version of the MX
-MX reshape(const MX &x, const MatrixSize &s);
+MX reshape(const MX &x, int n, int m);
+#endif // SWIG
+
+//! \brief Returns a reshaped version of the MX, dimensions as a vector
+MX reshape(const MX &x, const std::vector<int> sz);
 
 /** \brief Returns a flattened version of the MX
     Flattening is a cheap (non-copying) operation

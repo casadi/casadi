@@ -32,8 +32,8 @@ Slice::Slice(const MX& x, Slicer i_, Slicer j_) : Reordering(x), i(i_), j(j_) {
   i.initialize(x.size1());
   j.initialize(x.size2());
   
-  sz.nrow = i.size();
-  sz.ncol = j.size();
+  nrow_ = i.size();
+  ncol_ = j.size();
 }
 
 Slice* Slice::clone() const{
@@ -41,7 +41,7 @@ Slice* Slice::clone() const{
 }
 
 int Slice::k2k(int k) {
-  return i((k/sz.ncol))*dep(0).size2() + j((k%sz.ncol));
+  return i((k/ncol_))*dep(0).size2() + j((k%ncol_));
 }
 
 void Slice::evaluate(int fsens_order, int asens_order){

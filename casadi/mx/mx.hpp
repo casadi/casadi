@@ -23,7 +23,6 @@
 #ifndef MX_HPP
 #define MX_HPP
 
-#include "../matrix_size.hpp"
 #include "../shared_object.hpp"
 #include "../sx/sx.hpp"
 #include "slicer.hpp"
@@ -116,7 +115,7 @@ Internally represented by SymbolicMatrix
 #endif // SWIG
 
   /** \brief  Get the number of (structural) non-zero elements */
-  const MatrixSize& size() const;
+  int size_new() const;
 
   /** \brief  Get the number of elements */
   int numel() const;
@@ -202,11 +201,6 @@ A regular user should never use this.
   //! \brief Get a column slice of an MX
   MX getColumn(int j) const;
   
-#ifndef SWIG  
-  /// Marked for deletion
-  explicit MX(const MatrixSize& sz);
-#endif // SWIG
-
 };
 
 } // namespace CasADi

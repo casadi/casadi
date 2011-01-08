@@ -37,7 +37,7 @@ friend class MX;
 public:
 
 /** \brief  Constructor */
-Reshape(const MX& x,const MatrixSize &s);
+Reshape(const MX& x, int n, int m);
 
 /** \brief  Clone function */
 virtual Reshape* clone() const;

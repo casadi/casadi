@@ -6,7 +6,6 @@ project(casadi)
 
 SET(CASADI_SRCS
   # MISC
-  matrix_size.hpp
   casadi_exception.hpp
   printable_object.hpp
   printable_object.cpp

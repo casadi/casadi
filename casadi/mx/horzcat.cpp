@@ -41,8 +41,8 @@ Horzcat::Horzcat(const vector<MX>& dep__) : MXNode(dep__){
     cumulSize2[cnt++] = sz2;
     sz2 += it->size2();
   }  
-  sz.nrow = sz1;
-  sz.ncol = sz2;
+  nrow_ = sz1;
+  ncol_ = sz2;
 }
 
 Horzcat* Horzcat::clone() const{
@@ -63,7 +63,7 @@ void Horzcat::evaluate(int fsens_order, int asens_order){
     for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
       int offset = cumulSize2[cnt++];
       for (int k=0; k < it->size1(); k++) {
-        copy(&(*it)->val(0)[k*it->size2()],&(*it)->val(0)[k*it->size2()]+it->size2(),&val(0)[offset+k*sz.ncol]);
+        copy(&(*it)->val(0)[k*it->size2()],&(*it)->val(0)[k*it->size2()]+it->size2(),&val(0)[offset+k*ncol_]);
       }
     }
   } else {
@@ -71,7 +71,7 @@ void Horzcat::evaluate(int fsens_order, int asens_order){
     for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
       int offset = cumulSize2[cnt++];
       for (int k=0; k < it->size1(); k++) {
-        copy(&(*it)->val(1)[k*it->size2()],&(*it)->val(1)[k*it->size2()]+it->size2(),&val(1)[offset+k*sz.ncol]);
+        copy(&(*it)->val(1)[k*it->size2()],&(*it)->val(1)[k*it->size2()]+it->size2(),&val(1)[offset+k*ncol_]);
       }
     }
   }

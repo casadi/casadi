@@ -96,12 +96,12 @@ const MX MX::operator[](int k) const{
   return getElement(k);
 }
 
-const MatrixSize& MX::size() const{
-  return (*this)->sz;
+int MX::size_new() const{
+  return (*this)->ncol_ * (*this)->nrow_;
 }
 
 int MX::size1() const{
-  return (*this)->sz.nrow;
+  return (*this)->nrow_;
 }
 
 int MX::numel() const{
@@ -109,7 +109,7 @@ int MX::numel() const{
 }
 
 int MX::size2() const{
-  return (*this)->sz.ncol;
+  return (*this)->ncol_;
 }
 
 MX operator+(const MX &x, const MX &y){
@@ -228,11 +228,6 @@ MX& MX::Element::operator/=(const MX &y){
 
 bool MX::isEmpty() const{
   return numel()==0;
-}
-
-MX::MX(const MatrixSize& sz){
-  vector<double> v(sz.nrow*sz.ncol,0);
-  assignNode(new MXConstant(&v[0],sz.nrow,sz.ncol,'R'));
 }
 
 MX MX::zeros(int nrow, int ncol){

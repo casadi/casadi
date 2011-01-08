@@ -28,8 +28,8 @@ using namespace std;
 namespace CasADi{
 
 Flatten::Flatten(const MX& x) : MXNode(x){
-  sz.nrow = x.size2()*x.size1();
-  sz.ncol = 1;
+  nrow_ = x.size2()*x.size1();
+  ncol_ = 1;
 }
 
 Flatten* Flatten::clone() const{
@@ -49,7 +49,7 @@ void Flatten::evaluate(int fsens_order, int asens_order){
   vector<double>& res = val(0);
   
   // carry out the flattening 
-  for(int i=0; i<sz.nrow; ++i)
+  for(int i=0; i<nrow_; ++i)
     res[i] = arg[i];
   } else {
 
@@ -58,7 +58,7 @@ void Flatten::evaluate(int fsens_order, int asens_order){
     vector<double>& res = val(1);
   
     // carry out the flattening 
-    for(int i=0; i<sz.nrow; ++i)
+    for(int i=0; i<nrow_; ++i)
        res[i] = arg[i];
   }
   
@@ -68,7 +68,7 @@ void Flatten::evaluate(int fsens_order, int asens_order){
     const vector<double>& res = val(1);
   
     // carry out the flattening 
-    for(int i=0; i<sz.nrow; ++i)
+    for(int i=0; i<nrow_; ++i)
         arg[i] += res[i];
     
   }

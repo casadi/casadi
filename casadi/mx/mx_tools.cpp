@@ -103,16 +103,22 @@ MX trans(const MX &x){
   }
 }
 
-MX reshape(const MX &x,const MatrixSize &s){
-        if (s.nrow*s.ncol!=x.numel()) {
-        throw CasadiException("MX::reshape: size must be same before and after reshaping");
-        }
-  if (s.nrow==x.size1() && s.ncol==x.size2()) {
+MX reshape(const MX &x, const std::vector<int> sz){
+  if(sz.size() != 2)
+    throw CasadiException("MX::reshape: not two dimensions");
+  return reshape(x,sz[0],sz[1]);
+}
+
+MX reshape(const MX &x, int n, int m){
+  if (n*m!=x.numel()) {
+    throw CasadiException("MX::reshape: size must be same before and after reshaping");
+  }
+  if (n==x.size1() && m==x.size2()) {
     // allready correct shape
     return x.get()->dep(0);
   } else {
     MX ret;
-    ret.assignNode(new Reshape(x,s));
+    ret.assignNode(new Reshape(x,n,m));
     return ret;
   }
         

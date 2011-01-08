@@ -31,8 +31,8 @@ namespace CasADi{
 
 // Constructor
 Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : MXNode(dep), fcn_(fcn), oind(oind_) {
-  sz.nrow = fcn_->output_[oind].size1();
-  sz.ncol = fcn_->output_[oind].size2();
+  nrow_ = fcn_->output_[oind].size1();
+  ncol_ = fcn_->output_[oind].size2();
 }
 
 void Evaluation::print(ostream &stream) const{
