@@ -21,9 +21,115 @@
  */
 
 #include "mx_tools.hpp"
+#include "vertcat.hpp"
+#include "horzcat.hpp"
+#include "transpose.hpp"
+#include "flatten.hpp"
+#include "reshape.hpp"
+#include "norm.hpp"
+#include "multiplication.hpp"
+
+
 namespace CasADi{
 
-  
+MX vertcat(const vector<MX>& comp){
+  MX ret;
+  ret.assignNode(new Vertcat(comp));
+  return ret;
+}
+
+MX horzcat(const vector<MX>& comp){
+  MX ret;
+  ret.assignNode(new Horzcat(comp));
+  return ret;
+}
+
+MX vertcat(const MX& a, const MX& b){
+  vector<MX> ab;
+  ab.push_back(a);
+  ab.push_back(b);
+  return vertcat(ab);
+}
+
+MX horzcat(const MX& a, const MX& b){
+  vector<MX> ab;
+  ab.push_back(a);
+  ab.push_back(b);
+  return horzcat(ab);
+}
+
+MX norm_2(const MX &x){
+  MX ret;
+  ret.assignNode(new Norm2(x));
+  return ret;
+}
+
+MX norm_1(const MX &x){
+  MX ret;
+  ret.assignNode(new Norm1(x));
+  return ret;
+}
+
+MX norm_inf(const MX &x){
+  MX ret;
+  ret.assignNode(new NormInf(x));
+  return ret;
+}
+
+MX prod(const MX &x, const MX &y){
+  MX ret;
+  ret.assignNode(new Multiplication(x,y));
+  return ret;
+}
+
+MX inner_prod(const MX &x, const MX &y){
+  return prod(trans(x),y);
+}
+
+MX outer_prod(const MX &x, const MX &y){
+  return prod(x,trans(y));
+}
+
+MX trans(const MX &x){
+  // Check if the node is already a transpose
+  const Transpose* t = dynamic_cast<const Transpose*>(x.get());
+
+  if(t) // already a transpose
+    return t->dep(0);
+  else{
+    MX ret;
+    ret.assignNode(new Transpose(x));
+    return ret;
+  }
+}
+
+MX reshape(const MX &x,const MatrixSize &s){
+        if (s.nrow*s.ncol!=x.numel()) {
+        throw CasadiException("MX::reshape: size must be same before and after reshaping");
+        }
+  if (s.nrow==x.size1() && s.ncol==x.size2()) {
+    // allready correct shape
+    return x.get()->dep(0);
+  } else {
+    MX ret;
+    ret.assignNode(new Reshape(x,s));
+    return ret;
+  }
+        
+}
+
+MX flatten(const MX &x) {
+  if (x.size2()==1) {
+          // Allready flattened
+          return x.get()->dep(0);
+  } else {
+    MX ret;
+    ret.assignNode(new Flatten(x));
+    return ret;
+  }
+}
+
+
   
 } // namespace CasADi
 

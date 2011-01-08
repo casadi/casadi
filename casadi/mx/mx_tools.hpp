@@ -27,6 +27,64 @@
 
 namespace CasADi{
 
+//@{
+/** \brief  concatenate */
+MX vertcat(const std::vector<MX>& comp);
+MX horzcat(const std::vector<MX>& comp);
+MX vertcat(const MX& a, const MX& b);
+MX horzcat(const MX& a, const MX& b);
+//@}
+
+/** \brief  Take the 2-norm of a MX
+Internally represented by Norm2
+*/
+MX norm_2(const MX &x);
+/** \brief  Take the 1-norm of a MX
+Internally represented by Norm1
+*/
+MX norm_1(const MX &x);
+/** \brief  Take the infinity-norm of a MX
+Internally represented by NormInf
+*/
+MX norm_inf(const MX &x);
+/** \brief  Take the transpose of a MX 
+Internally represented by Transpose
+*/
+MX trans(const MX &x); // transpose
+/** \brief  Take the matrix product of 2 MX objects */
+MX prod(const MX &x, const MX &y); // matrix product
+/** \brief  Take the inner product of two vectors 
+        Equals
+        \code
+        trans(x)*y
+        \endcode
+        with x and y vectors
+*/
+MX inner_prod(const MX &x, const MX &y); // 
+/** \brief  Take the outer product of two vectors 
+        Equals
+        \code
+        x*trans(y)
+        \endcode
+         with x and y vectors
+*/
+MX outer_prod(const MX &x, const MX &y); // x*trans(y) with x and y vectors
+
+/** \brief Branching on MX nodes
+Ternary operator, "cond ? if_true : if_false"
+Internally represented by IfElseNode.
+*/
+MX if_else(const MX &cond, const MX &if_true, const MX &if_false); 
+
+//! \brief Returns a reshaped version of the MX
+MX reshape(const MX &x, const MatrixSize &s);
+
+/** \brief Returns a flattened version of the MX
+    Flattening is a cheap (non-copying) operation
+    Same effect as reshape(size1()*size2(),1)
+*/
+MX flatten(const MX &x);
+  
 } // namespace CasADi
 
 #endif // MX_TOOLS_HPP

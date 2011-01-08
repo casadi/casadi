@@ -27,6 +27,11 @@
 
 namespace CasADi{
 
+/*
+ NOTE: THIS CLASS HAS BEEN MARKED FOR DELETION! Joel
+*/
+  
+  
 /** \brief  Container class for size of a matrix
   \author Joel Andersson 
   \date 2010	
@@ -35,22 +40,41 @@ class MatrixSize{
   public:
   MatrixSize() : nrow(0), ncol(0){ }  // default constructor 0-by-0 matrix
   MatrixSize(int nrow_, int ncol_) : nrow(nrow_), ncol(ncol_){ }  // size n-by-m
-
-/*  bool operator==(const MatrixSize &x) const{
-     return nrow == x.nrow && ncol == x.ncol;
-  }
-
-  bool operator!=(const MatrixSize &x) const{
-      return nrow != x.nrow || ncol != x.ncol;
-  }*/
  
+#ifndef SWIG
  friend std::ostream& operator<<(std::ostream &stream, const MatrixSize &x) {
       return stream << "[" << x.nrow << "," << x.ncol << "]"; 
   }
-
+#endif  
+  
   int nrow, ncol;
 };
 
+#ifdef SWIG
+%typemap(in) const MatrixSize & {
+       $1 = new CasADi::MatrixSize(PyTupleToMatrixSize($input));
+}
+
+%typemap(freearg) const MatrixSize & {
+    if ($1) {
+        delete $1;
+    }
+}
+#endif // SWIG
+
+
 } // namespace CasADi
+
+#ifdef SWIG
+%inline %{
+CasADi::MatrixSize PyTupleToMatrixSize(PyObject* tup) {
+                  if (!PyTuple_Check(tup))  throw CasADi::CasadiException("__getitem__: expecting tuple");
+      if(PyTuple_Size(tup)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
+      return CasADi::MatrixSize(PyInt_AsLong(PyTuple_GetItem(tup,0)),PyInt_AsLong(PyTuple_GetItem(tup,1)));
+}
+%}
+#endif // SWIG
+
+
 
 #endif // MATRIX_SIZE_HPP
