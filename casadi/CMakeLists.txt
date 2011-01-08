@@ -22,6 +22,8 @@ SET(CASADI_SRCS
 
   matrix/element.hpp
   matrix/matrix.hpp
+  matrix/matrix_tools.hpp
+  matrix/matrix_tools.cpp
 
   sx/sx.hpp
   sx/sx.cpp
