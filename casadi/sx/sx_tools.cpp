@@ -504,9 +504,9 @@ SXMatrix spy(const SXMatrix& A){
 bool isTril(const SXMatrix &A){
   // loop over rows
   for(int i=0; i<A.size1(); ++i){
-    if(A.rowind[i] != A.rowind[i+1]){ // if there are any elements of the row
+    if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
       // check column of the right-most element of the row
-      int col = A.col[A.rowind[i+1]-1];
+      int col = A.col(A.rowind(i+1)-1);
 
       // not lower triangular if col>i
       if(col>i) return false;
@@ -519,9 +519,9 @@ bool isTril(const SXMatrix &A){
 bool isTriu(const SXMatrix &A){
   // loop over rows
   for(int i=0; i<A.size1(); ++i){
-    if(A.rowind[i] != A.rowind[i+1]){ // if there are any elements of the row
+    if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
       // check column of the left-most element of the row
-      int col = A.col[A.rowind[i]];
+      int col = A.col(A.rowind(i));
 
       // not lower triangular if col>i
       if(col<i) return false;
@@ -714,8 +714,8 @@ int nnz_sym(const SXMatrix& ex) {
   for(int row=0; row<ex.size1(); ++row)
   {
     // Loop over the elements in the row
-    for(int el=ex.rowind[row]; el<ex.rowind[row+1]; ++el){ // loop over the non-zero elements
-      if(ex.col[el] > row) break; // break inner loop (only lower triangular part is used)
+    for(int el=ex.rowind(row); el<ex.rowind(row+1); ++el){ // loop over the non-zero elements
+      if(ex.col(el) > row) break; // break inner loop (only lower triangular part is used)
       nz++;
     }
   }
@@ -1013,8 +1013,8 @@ SXMatrix trans(const SXMatrix& x){
   for(int i=0; i<x.size1(); ++i)
   {
     // Loop over the elements in the row
-    for(int el=x.rowind[i]; el<x.rowind[i+1]; ++el){ // loop over the non-zero elements
-      int j=x.col[el];  // column
+    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over the non-zero elements
+      int j=x.col(el);  // column
       
      // put the element into the right bucket
      buckets[j].push_back(el);
@@ -1028,8 +1028,8 @@ SXMatrix trans(const SXMatrix& x){
 
   // reserve space (to make the calculations quicker)
   ret.reserve(x.capacity());
-  ret.col.reserve(x.col.size());
-  ret.rowind.reserve(x.rowind.size());
+  ret.col().reserve(x.col().size());
+  ret.rowind().reserve(x.rowind().size());
 
   for(int j=0; j<x.size2(); ++j)   // loop over the columns
     for(int r=0; r<buckets[j].size(); ++r){ // loop over the bucket content
@@ -1049,11 +1049,11 @@ SXMatrix prod(const SXMatrix &x, const SXMatrix &y){
 
   for(int i=0; i<x.size1(); ++i) // loop over the row of the resulting matrix)
     for(int j=0; j<b.size1(); ++j){ // loop over the column of the resulting matrix
-      int el1 = x.rowind[i];
-      int el2 = b.rowind[j];
-      while(el1 < x.rowind[i+1] && el2 < b.rowind[j+1]){ // loop over non-zero elements
-        int j1 = x.col[el1];
-        int i2 = b.col[el2];      
+      int el1 = x.rowind(i);
+      int el2 = b.rowind(j);
+      while(el1 < x.rowind(i+1) && el2 < b.rowind(j+1)){ // loop over non-zero elements
+        int j1 = x.col(el1);
+        int i2 = b.col(el2);      
         if(j1==i2){
           SX temp = x[el1++] * b[el2++];
           if(!temp->isZero())

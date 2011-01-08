@@ -27,6 +27,7 @@
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
 #include "element.hpp"
+#include "crs_sparsity.hpp"
 
 namespace CasADi{
 
@@ -118,14 +119,13 @@ class Matrix : public std::vector<T>, public PrintableObject{
     const std::vector<int>& rowind() const;
     std::vector<int>& col();
     std::vector<int>& rowind();
-    int col(int el);
-    int rowind(int row);
+    int col(int el) const;
+    int rowind(int row) const;
     
-    // make protected?
   private:
-    // For efficiency, the following elements can be moved to a reference counted object, in which case the functions that actually change the sparsity or size have to be implemented a bit more carefully. Changes should only be permitted if only one instance exists, otherwise a deep copy must be made. This is probably simular to STL's std::string implementation.
+    /// Sparsity of the matrix in a compressed row storage (CRS) format
+//    CRSSparsity sparsity_;
     
-    /** \brief  Elements of the matrix in a compressed row storage (CRS) format */
     std::vector<int> col_;          // vector of length nnz containing the columns for all the indices of the non-zero elements
     std::vector<int> rowind_;       // vector of length n+1 containing the index of the last non-zero element up till each row 
     int nrow_;
@@ -318,12 +318,12 @@ std::vector<int>& Matrix<T>::rowind(){
 }
 
 template<class T>
-int Matrix<T>::col(int el){
+int Matrix<T>::col(int el) const{
   return col_.at(el);
 }
 
 template<class T>
-int Matrix<T>::rowind(int row){
+int Matrix<T>::rowind(int row) const{
   return rowind_.at(row);
 }
 
