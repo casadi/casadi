@@ -1068,6 +1068,88 @@ SXMatrix prod(const SXMatrix &x, const SXMatrix &y){
 return ret;
 }
 
+void fill(SXMatrix& mat, const SX& val){
+  if(val->isZero())    mat.makeEmpty(mat.size1(),mat.size2());
+  else                 mat.makeDense(mat.size1(),mat.size2(),val);
+}
+
+SXMatrix binary(int op, const SXMatrix &x, const SXMatrix &y){
+  SXMatrix r;
+  if(x.scalar())
+    if(y.scalar())
+      return sfcn[op](x(0),y(0));
+    else
+      return scalar_matrix(op,x(0),y);
+  else if(y.scalar())
+    return matrix_scalar(op,x,y(0));
+  else
+    return matrix_matrix(op,x,y);
+}
+
+SXMatrix unary(int op, const SXMatrix &x){
+  if(x.scalar()){
+    return sfcn[op](x(0),SX::nan);
+  } else {
+    SXMatrix r(x.size1(),x.size2());
+    SX y; // dummy argument
+    fill(r,sfcn[op](0,y));
+    for(int i=0; i<r.size1(); ++i){ // loop over rows
+      for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
+        int j = x.col(el);
+        r(i,j) = sfcn[op](x[el],y);
+      }
+    }  
+    return r;
+  }
+}
+
+SXMatrix scalar_matrix(int op, const SX &x, const SXMatrix &y){
+  SXMatrix r(y.size1(),y.size2());
+  fill(r,sfcn[op](x,0));
+  for(int i=0; i<r.size1(); ++i){ // loop over rows
+    for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
+      int j = y.col(el);
+      r(i,j) = sfcn[op](x,y[el]);
+    }
+  }
+  return r;
+}
+
+SXMatrix matrix_scalar(int op, const SXMatrix &x, const SX &y){
+  SXMatrix r(x.size1(),x.size2());
+  fill(r,sfcn[op](0,y));
+  for(int i=0; i<r.size1(); ++i){ // loop over rows
+    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
+      int j = x.col(el);
+      r(i,j) = sfcn[op](x[el],y);
+    }
+  }
+  return r;
+}
+
+SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y){
+if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matrix_matrix: dimension mismatch");
+  SXMatrix r(x.size1(),x.size2());
+  fill(r,sfcn[op](0,0));
+  for(int i=0; i<r.size1(); ++i){ // loop over rows
+    int el1 = x.rowind(i);
+    int el2 = y.rowind(i);
+    int k1 = x.rowind(i+1);
+    int k2 = y.rowind(i+1);
+    while(el1 < k1 || el2 < k2){
+      int j1 = (el1 < k1) ? x.col(el1) : r.numel() ;
+      int j2 = (el2 < k2) ? y.col(el2) : r.numel() ;
+      
+      if(j1==j2)
+        r(i,j1) = sfcn[op](x[el1++],y[el2++]); 
+      else if(j1>j2)
+        r(i,j2) = sfcn[op](0,y[el2++]);
+      else
+        r(i,j1) = sfcn[op](x[el1++],0);
+      }
+    }
+  return r;
+}
 
 } // namespace CasADi
 

@@ -123,7 +123,13 @@ class Matrix : public std::vector<T>, public PrintableObject{
     int col(int el) const;
     int rowind(int row) const;
     
-  protected:
+    
+    void clear();
+    void resize(int n, int m);
+    void reserve(int nnz);
+
+    
+  private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     std::vector<int> col_;          // vector of length nnz containing the columns for all the indices of the non-zero elements
     std::vector<int> rowind_;       // vector of length n+1 containing the index of the last non-zero element up till each row 
@@ -325,6 +331,31 @@ template<class T>
 int Matrix<T>::rowind(int row) const{
   return rowind_.at(row);
 }
+
+template<class T>
+void Matrix<T>::reserve(int nnz){
+  std::vector<T>::reserve(nnz);
+  col_.reserve(nnz);
+}
+
+template<class T>
+void Matrix<T>::resize(int n_, int m_){
+  if(n_==size1() && m_== size2()) // if the dimensions remain the same
+    return; // do nothing
+  else if(n_ < size1() || m_ < size2()){ // if we need to remove some elements
+    throw CasadiException("Matrix::resize: Can only make larger");
+  } else { // make the object larger (CHEAP!)
+    nrow_ = n_; ncol_ = m_;
+    rowind_.resize(size1()+1,std::vector<T>::size());
+  }
+}
+
+template<class T>
+void Matrix<T>::clear(){
+  *this = Matrix<T>();
+}
+
+
 
 
 } // namespace CasADi

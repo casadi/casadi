@@ -356,6 +356,15 @@ SXMatrix operator!(const SXMatrix &a);
 SXMatrix operator==(const SXMatrix &a, const SXMatrix &b);
 SXMatrix operator!=(const SXMatrix &a, const SXMatrix &b);
 
+/** \brief  Fill the matrix with the value val, make empty sparse if zero */
+void fill(SXMatrix& mat, const SX& val);
+
+  /** \brief  Perform operations by ID */
+SXMatrix binary(int op, const SXMatrix &x, const SXMatrix &y);
+SXMatrix unary(int op, const SXMatrix &x);
+SXMatrix scalar_matrix(int op, const SX &x, const SXMatrix &y);
+SXMatrix matrix_scalar(int op, const SXMatrix &x, const SX &y);
+SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y);
 
 
 } // namespace CasADi

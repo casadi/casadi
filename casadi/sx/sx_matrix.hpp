@@ -59,9 +59,11 @@ public:
 
 /** \brief  constructors */
 /// empty 0-by-0 matrix constructor
-SXMatrix();                               // 
+SXMatrix();
+
 /// empty n-by-m matrix constructor
-SXMatrix(int n, int m);                   
+SXMatrix(int n, int m);
+
 /// dense n-by-m matrix filled with val constructor
 SXMatrix(int n, int m, const SX& val);    
 
@@ -109,8 +111,6 @@ class Element{
     void operator*=(const SXMatrix &y){*this = *this * y;}
     void operator/=(const SXMatrix &y){*this = *this / y;}
     //@}
-    
-//    operator SXMatrix(){ return mat.getElement(i,j);}
     
     /// Get a pointer to the node
     SXNode* const get() const;
@@ -165,10 +165,6 @@ class Element{
   /// Get a reference to a submatrix (for A(I,J) = B and B = A(I,J))
   Sub operator()(const std::vector<int>& i, const std::vector<int>& j=std::vector<int>(1,0));
 
-void clear();
-/// Resize/reshape an SXMatrix in-place
-void resize(int n, int m);
-void reserve(int nnz);
 
 
 //@{
@@ -190,23 +186,7 @@ friend SXMatrix operator-(const SXMatrix &x, const SXMatrix &y);
 friend SXMatrix operator*(const SXMatrix &x, const SXMatrix &y);
 friend SXMatrix operator/(const SXMatrix &x, const SXMatrix &y);
 
-//@{
-  /** \brief  Perform operations by ID */
-friend SXMatrix binary(int op, const SXMatrix &x, const SXMatrix &y);
-friend SXMatrix unary(int op, const SXMatrix &x);
-friend SXMatrix scalar_matrix(int op, const SX &x, const SXMatrix &y);
-friend SXMatrix matrix_scalar(int op, const SXMatrix &x, const SX &y);
-friend SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y);
-//@}
-
 friend std::ostream& operator<<(std::ostream &stream, const SXMatrix &mat);
-
-/** \brief  Fill the matrix with the value val, make empty sparse if zero */
-void fill(const SX& val);
-
-/** \brief  Not implemented */
-void push_back(const SX& el); // Add element at the end (public member function)
-void pop_back();              // Delete last element (public member function)
 
 };
 
