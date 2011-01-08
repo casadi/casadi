@@ -52,6 +52,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(const T &val){
       makeEmpty(1,1);
       getElementRef()=val;
+/*      makeDense(1,1,val);*/
     }
 
     /** \brief  Create an expression from an stl vector  */
@@ -122,10 +123,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     int col(int el) const;
     int rowind(int row) const;
     
-  private:
+  protected:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
-//    CRSSparsity sparsity_;
-    
     std::vector<int> col_;          // vector of length nnz containing the columns for all the indices of the non-zero elements
     std::vector<int> rowind_;       // vector of length n+1 containing the index of the last non-zero element up till each row 
     int nrow_;

@@ -52,7 +52,7 @@ SXMatrix::SXMatrix(int n, int m, const SX& val) : Matrix<SX>(n,m,val){
 }
 
 SXMatrix::SXMatrix(const string& name, int n, int m){
-  nrow = ncol = 0;
+  nrow_ = ncol_ = 0;
   if(n*m == 0) return;
   resize(n,m);
   reserve(n*m);
@@ -68,14 +68,11 @@ SXMatrix::SXMatrix(const string& name, int n, int m){
 	}
 }
 
-SXMatrix::SXMatrix(const SX& scalar){
-  nrow = ncol = 0;
-  resize(1,1);
-  getElementRef() = scalar;
+SXMatrix::SXMatrix(const SX& scalar) : Matrix<SX>(scalar){
 }
 
 SXMatrix::SXMatrix(const SXMatrix::Element &el){
-  nrow = ncol = 0;
+  nrow_ = ncol_ = 0;
   resize(1,1);
   getElementRef() = el.mat.getElement(el.i,el.j);  
 }
@@ -147,7 +144,7 @@ SXMatrix operator/(const SXMatrix &x, const SXMatrix &y){
 
 void SXMatrix::reserve(int nnz){
   std::vector<SX>::reserve(nnz);
-  col.reserve(nnz);
+  col_.reserve(nnz);
 }
 
 void SXMatrix::clear(){
@@ -174,8 +171,8 @@ void SXMatrix::resize(int n_, int m_){
 
     *this = newexpr;
   } else { // make the object larger (CHEAP!)
-    nrow = n_; ncol = m_;
-    rowind.resize(size1()+1,size());
+    nrow_ = n_; ncol_ = m_;
+    rowind_.resize(size1()+1,size());
   }
 }
 
@@ -231,8 +228,8 @@ SXMatrix unary(int op, const SXMatrix &x){
     SX y; // dummy argument
     r.fill(sfcn[op](0,y));
     for(int i=0; i<r.size1(); ++i){ // loop over rows
-      for(int el=x.rowind[i]; el<x.rowind[i+1]; ++el){
-        int j = x.col[el];
+      for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
+        int j = x.col(el);
         r(i,j) = sfcn[op](x[el],y);
       }
     }  
@@ -244,8 +241,8 @@ SXMatrix scalar_matrix(int op, const SX &x, const SXMatrix &y){
   SXMatrix r(y.size1(),y.size2());
   r.fill(sfcn[op](x,0));
   for(int i=0; i<r.size1(); ++i){ // loop over rows
-    for(int el=y.rowind[i]; el<y.rowind[i+1]; ++el){
-      int j = y.col[el];
+    for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
+      int j = y.col(el);
       r(i,j) = sfcn[op](x,y[el]);
     }
   }
@@ -256,8 +253,8 @@ SXMatrix matrix_scalar(int op, const SXMatrix &x, const SX &y){
   SXMatrix r(x.size1(),x.size2());
   r.fill(sfcn[op](0,y));
   for(int i=0; i<r.size1(); ++i){ // loop over rows
-    for(int el=x.rowind[i]; el<x.rowind[i+1]; ++el){
-      int j = x.col[el];
+    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
+      int j = x.col(el);
       r(i,j) = sfcn[op](x[el],y);
     }
   }
@@ -269,13 +266,13 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
   SXMatrix r(x.size1(),x.size2());
   r.fill(sfcn[op](0,0));
   for(int i=0; i<r.size1(); ++i){ // loop over rows
-    int el1 = x.rowind[i];
-    int el2 = y.rowind[i];
-    int k1 = x.rowind[i+1];
-    int k2 = y.rowind[i+1];
+    int el1 = x.rowind(i);
+    int el2 = y.rowind(i);
+    int k1 = x.rowind(i+1);
+    int k2 = y.rowind(i+1);
     while(el1 < k1 || el2 < k2){
-      int j1 = (el1 < k1) ? x.col[el1] : r.numel() ;
-      int j2 = (el2 < k2) ? y.col[el2] : r.numel() ;
+      int j1 = (el1 < k1) ? x.col(el1) : r.numel() ;
+      int j2 = (el2 < k2) ? y.col(el2) : r.numel() ;
       
       if(j1==j2)
         r(i,j1) = sfcn[op](x[el1++],y[el2++]); 
