@@ -15,12 +15,13 @@ SET(CASADI_SRCS
   option.cpp
   options_functionality.cpp
   options_functionality.hpp
-  element.hpp
-  matrix.hpp
   crs_sparsity.hpp
   crs_sparsity.cpp
   pre_c99_support.hpp
   pre_c99_support.cpp
+
+  matrix/element.hpp
+  matrix/matrix.hpp
 
   sx/sx.hpp
   sx/sx.cpp

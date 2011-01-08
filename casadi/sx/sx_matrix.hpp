@@ -27,7 +27,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "../matrix.hpp"
+#include "../matrix/matrix.hpp"
 
 namespace CasADi{
   

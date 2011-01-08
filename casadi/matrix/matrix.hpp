@@ -24,8 +24,8 @@
 #define MATRIX_HPP
 
 #include <vector>
-#include "casadi_exception.hpp"
-#include "printable_object.hpp"
+#include "../casadi_exception.hpp"
+#include "../printable_object.hpp"
 #include "element.hpp"
 
 namespace CasADi{
@@ -48,13 +48,13 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(int n, int m, const T& val);    
 
     /** \brief  This constructor enables implicit type conversion from a scalar type */
-	Matrix(const T &val){
+    Matrix(const T &val){
       makeEmpty(1,1);
       getElementRef()=val;
     }
 
     /** \brief  This constructor enables implicit type conversion from a numeric type */
-	Matrix(const double &val){
+    Matrix(const double &val){
       makeEmpty(1,1);
       getElementRef()=val;
     }
