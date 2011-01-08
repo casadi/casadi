@@ -27,7 +27,8 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/simulator.hpp>
 #include <casadi/fx/c_function.hpp>
-#include <casadi/expression_tools.hpp>
+#include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
 #include <casadi/fx/integrator_internal.hpp>
 #include <interfaces/sundials/idas_internal.hpp>
 

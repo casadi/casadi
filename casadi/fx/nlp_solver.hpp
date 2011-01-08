@@ -23,7 +23,6 @@
 #ifndef NLP_SOLVER_HPP
 #define NLP_SOLVER_HPP
 
-#include "../expression_tools.hpp"
 #include "fx.hpp"
 
 namespace CasADi{

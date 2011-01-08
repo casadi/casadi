@@ -21,12 +21,12 @@
  */
 
 #include "ocp_tools.hpp"
-#include "casadi/expression_tools.hpp"
+#include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
 #include "casadi/stl_vector_tools.hpp"
 
 #include <algorithm>
 #include <set>
-#include <cassert>
 
 #ifdef HAVE_LAPACK
 extern "C" void dsterf_(int *n, double *d, double *e, int *info); // needed by LG_matrices

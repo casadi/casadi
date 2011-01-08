@@ -41,8 +41,8 @@ namespace std {
 // FX
 %include "fx.i"
 
-// Expression tools
-%include "casadi/expression_tools.hpp"
+// SX tools
+%include "casadi/sx/sx_tools.hpp"
 
 // IPOPT
 #ifdef WITH_IPOPT

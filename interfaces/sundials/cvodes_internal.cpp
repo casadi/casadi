@@ -23,6 +23,7 @@
 #include "cvodes_internal.hpp"
 #include "casadi/fx/sx_function_internal.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include "casadi/sx/sx_tools.hpp"
 #include <cassert>
 
 using namespace std;

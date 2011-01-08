@@ -25,7 +25,8 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/ipopt/ipopt_internal.hpp"
-#include "casadi/expression_tools.hpp"
+#include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
 
 /** Excercise 1, chapter 10 from Larry Biegler's book */
 

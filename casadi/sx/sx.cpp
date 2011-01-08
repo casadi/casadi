@@ -21,7 +21,6 @@
  */
 
 #include "sx.hpp"
-#include "../expression_tools.hpp"
 #include <stack>
 #include <cassert>
 #include "../pre_c99_support.hpp"

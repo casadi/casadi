@@ -23,7 +23,6 @@
 #ifndef INTEGRATOR_HPP
 #define INTEGRATOR_HPP
 
-#include "../expression_tools.hpp"
 #include "fx.hpp"
 #include "linear_solver.hpp"
 #include "integrator_jacobian.hpp"

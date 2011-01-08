@@ -23,7 +23,7 @@
 #include "simulator.hpp"
 #include "simulator_internal.hpp"
 #include "integrator_internal.hpp"
-#include <cassert>
+#include "sx_function.hpp"
 
 namespace CasADi{
 

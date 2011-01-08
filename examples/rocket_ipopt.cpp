@@ -24,7 +24,8 @@
 #include <ctime>
 #include <casadi/stl_vector_tools.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/expression_tools.hpp>
+#include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
 #include <casadi/fx/jacobian.hpp>
 
 using namespace CasADi;

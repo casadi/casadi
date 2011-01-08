@@ -26,7 +26,8 @@
 #include <casadi/fx/mx_function.hpp>
 #include <casadi/mx/mx_tools.hpp>
 #include <casadi/fx/external_function.hpp>
-#include <casadi/expression_tools.hpp>
+#include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
 
 using namespace CasADi;
 using namespace std;

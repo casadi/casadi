@@ -1,7 +1,7 @@
 %{
 #include "casadi/sx/sx.hpp"
 #include "casadi/sx/sx_matrix.hpp"
-#include "casadi/expression_tools.hpp"
+#include "casadi/sx/sx_tools.hpp"
 %}
 
 %include "typemaps.i"

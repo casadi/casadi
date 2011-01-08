@@ -20,11 +20,10 @@
  *
  */
 
-#ifndef EXPRESSION_TOOLS_HPP
-#define EXPRESSION_TOOLS_HPP
+#ifndef SX_TOOLS_HPP
+#define SX_TOOLS_HPP
 
-#include "sx/sx_matrix.hpp"
-#include "fx/sx_function.hpp"
+#include "sx_matrix.hpp"
 
 #ifdef WITH_UBLAS
 #include <boost/numeric/ublas/matrix_sparse.hpp>
@@ -361,4 +360,4 @@ SXMatrix operator!=(const SXMatrix &a, const SXMatrix &b);
 
 } // namespace CasADi
 
-#endif // EXPRESSION_TOOLS_HPP
+#endif // SX_TOOLS_HPP

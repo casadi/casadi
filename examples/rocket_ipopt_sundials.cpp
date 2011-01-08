@@ -25,7 +25,8 @@
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/mx/mx_tools.hpp>
 #include <casadi/fx/mx_function.hpp>
-#include <casadi/expression_tools.hpp>
+#include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "interfaces/sundials/idas_integrator.hpp"
 

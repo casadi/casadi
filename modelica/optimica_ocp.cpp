@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <set>
 #include <cassert>
-#include "../casadi/expression_tools.hpp"
 #include "../casadi/casadi_exception.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 

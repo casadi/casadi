@@ -21,7 +21,7 @@
  */
 
 #include "xml_arg.hpp"
-#include "casadi/expression_tools.hpp"
+#include <casadi/sx/sx_tools.hpp>
 
 namespace CasADi{
 namespace Modelica{

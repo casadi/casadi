@@ -28,7 +28,6 @@
 #include <fstream>
 #include <sstream>
 #include "../stl_vector_tools.hpp"
-#include "../expression_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../mx/evaluation.hpp"
 
