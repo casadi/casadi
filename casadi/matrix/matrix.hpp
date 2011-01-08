@@ -42,23 +42,22 @@ class Matrix : public std::vector<T>, public PrintableObject{
   public:
     /** \brief  constructors */
     /// empty 0-by-0 matrix constructor
-    Matrix();                               // 
+    Matrix();
+    
     /// empty n-by-m matrix constructor
-    Matrix(int n, int m);                   
+    Matrix(int n, int m);
+    
     /// dense n-by-m matrix filled with val constructor
-    Matrix(int n, int m, const T& val);    
+    Matrix(int n, int m, const T& val);
 
-    /** \brief  This constructor enables implicit type conversion from a scalar type */
-    Matrix(const T &val){
-      makeEmpty(1,1);
-      getElementRef()=val;
-/*      makeDense(1,1,val);*/
-    }
+    /// This constructor enables implicit type conversion from a scalar type
+    Matrix(const T &val);
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     Matrix(const std::vector<A>& x){
-      makeDense(x.size(),1,1);
+      sparsity_ = CRSSparsity(x.size(),1,true);
+      std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
     }
 
@@ -66,7 +65,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     template<typename A>
     Matrix(const std::vector<A>& x,  int n, int m){
       if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<double>& x,  int n, int m): dimension mismatch");
-      makeDense(n,m,1);
+      sparsity_ = CRSSparsity(n,m,true);
+      std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
     }
     
@@ -131,57 +131,36 @@ class Matrix : public std::vector<T>, public PrintableObject{
     
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
-    std::vector<int> col_;          // vector of length nnz containing the columns for all the indices of the non-zero elements
-    std::vector<int> rowind_;       // vector of length n+1 containing the index of the last non-zero element up till each row 
-    int nrow_;
-    int ncol_;
-
+    CRSSparsity sparsity_;
 };
 
 // Implementations
 template<class T>
 const T Matrix<T>::getElement(int i, int j) const{
-  if(i >= size1() || j>=size2()) throw CasadiException("Matrix::getElement: out of bounds");
-  for(int ind=rowind_.at(i); ind<rowind_.at(i+1); ++ind){
-    if(col_[ind] == j)
-      return std::vector<T>::at(ind);     // quick return if element exists
-    else if(col_[ind] > j)
-      break;                // break at the place where the element should be added
-  }
-  return 0;
+  int ind = sparsity_.getNZ(i,j);
+  if(ind==-1)
+    return 0;
+  else
+    return std::vector<T>::at(ind);
 }
 
 template<class T>
 T& Matrix<T>::getElementRef(int i, int j){
-  if(i >= size1() || j>=size2()) throw CasadiException("Matrix::getElementRef: out of bounds");
-
-  // go to the place where the element should be
-  int ind;
-  for(ind=rowind_[i]; ind<rowind_[i+1]; ++ind){ // better: loop from the back to the front
-    if(col_[ind] == j){
-      return std::vector<T>::at(ind); // element exists
-    } else if(col_[ind] > j)
-      break;                // break at the place where the element should be added
-  }
-  
-  // insert the element
-  std::vector<T>::insert(std::vector<T>::begin()+ind,0);
-  col_.insert(col_.begin()+ind,j);
-
-  for(int row=i+1; row<size1()+1; ++row)
-    rowind_[row]++;
-    
+  int oldsize = sparsity_.size();
+  int ind = sparsity_.getNZ(i,j);
+  if(oldsize != sparsity_.size())
+    std::vector<T>::insert(std::vector<T>::begin()+ind,0);
   return std::vector<T>::at(ind);
 }
 
 template<class T>
 int Matrix<T>::size1() const{
-  return nrow_;
+  return sparsity_.size1();
 }
 
 template<class T>
 int Matrix<T>::size2() const{
-  return ncol_;
+  return sparsity_.size2();
 }
 
 template<class T>
@@ -192,22 +171,11 @@ int Matrix<T>::numel() const{
         
 template<class T>
 void Matrix<T>::makeDense(int n, int m, const T& val){
-  nrow_ = n;
-  ncol_ = m;
-  std::vector<T>::clear();
-  std::vector<T>::resize(n*m, val);
-  col_.resize(n*m);
-  rowind_.resize(n+1);
-  
-  int el =0;
-  for(int i=0; i<size1(); ++i){
-    rowind_[i] = el;
-    for(int j=0; j<size2(); ++j){
-      col_[el] = j;
-      el++;
-    }
+  if(n*m != numel()){
+    sparsity_ = CRSSparsity(n,m,true);
+    std::vector<T>::clear();
+    std::vector<T>::resize(n*m, val);
   }
-  rowind_.back() = el;
 }
 
 template<class T>
@@ -227,27 +195,24 @@ bool Matrix<T>::vector() const{
 
 template<class T>
 Matrix<T>::Matrix(){
-  makeEmpty(0,0);
+  sparsity_ = CRSSparsity(0,0,false);
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m){
-  makeEmpty(n,m);
+  sparsity_ = CRSSparsity(n,m,false);
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m, const T& val){
-  makeDense(n,m,val);
+  sparsity_ = CRSSparsity(n,m,true);
+  std::vector<T>::resize(n*m, val);
 }
 
 template<class T>
 void Matrix<T>::makeEmpty(int n, int m){
-  nrow_ = n;
-  ncol_ = m;
+  sparsity_ = CRSSparsity(n,m,false);
   std::vector<T>::clear();
-  col_.clear();
-  rowind_.clear();
-  rowind_.resize(n+1, 0);
 }
 
 template<class T>
@@ -304,59 +269,56 @@ void Matrix<T>::print(std::ostream &stream) const{
 
 template<class T>
 const std::vector<int>& Matrix<T>::col() const{
-  return col_;
+  return sparsity_.col();
 }
 
 template<class T>
 std::vector<int>& Matrix<T>::col(){
-  return col_;
+  return sparsity_.col();
 }
 
 template<class T>
 const std::vector<int>& Matrix<T>::rowind() const{
-  return rowind_;
+  return sparsity_.rowind();
 }
 
 template<class T>
 std::vector<int>& Matrix<T>::rowind(){
-  return rowind_;
+  return sparsity_.rowind();
 }
 
 template<class T>
 int Matrix<T>::col(int el) const{
-  return col_.at(el);
+  return sparsity_.col(el);
 }
 
 template<class T>
 int Matrix<T>::rowind(int row) const{
-  return rowind_.at(row);
+  return sparsity_.rowind(row);
 }
 
 template<class T>
 void Matrix<T>::reserve(int nnz){
   std::vector<T>::reserve(nnz);
-  col_.reserve(nnz);
+  col().reserve(nnz);
 }
 
 template<class T>
 void Matrix<T>::resize(int n_, int m_){
-  if(n_==size1() && m_== size2()) // if the dimensions remain the same
-    return; // do nothing
-  else if(n_ < size1() || m_ < size2()){ // if we need to remove some elements
-    throw CasadiException("Matrix::resize: Can only make larger");
-  } else { // make the object larger (CHEAP!)
-    nrow_ = n_; ncol_ = m_;
-    rowind_.resize(size1()+1,std::vector<T>::size());
-  }
+  sparsity_.resize(n_,m_);
 }
 
 template<class T>
 void Matrix<T>::clear(){
-  *this = Matrix<T>();
+  sparsity_ = CRSSparsity(0,0,false);
+  std::vector<T>::clear();
 }
 
-
-
+template<class T>
+Matrix<T>::Matrix(const T &val){
+  sparsity_ = CRSSparsity(1,1,true);
+  std::vector<T>::resize(1,val);
+}
 
 } // namespace CasADi
 

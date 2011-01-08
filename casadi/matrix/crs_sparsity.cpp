@@ -36,7 +36,7 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
     for(int i=0; i<nrow+1; ++i)
       rowind[i] = i*ncol;
     for(int i=0; i<nrow; ++i)
-      for(int j=0; j<nrow; ++j)
+      for(int j=0; j<ncol; ++j)
         col[j+i*ncol] = j;
   }
   assignNode(new CRSSparsityNode(nrow, ncol, col, rowind));
@@ -47,6 +47,7 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, std::vector<int> col, std::vector<i
 }
     
 CRSSparsityNode* CRSSparsity::operator->(){
+  makeUnique();
   return (CRSSparsityNode*)(SharedObject::operator->());
 }
 
@@ -92,12 +93,79 @@ std::vector<int>& CRSSparsity::rowind(){
   return (*this)->rowind_;
 }
     
-int CRSSparsity::col(int el){
+int CRSSparsity::col(int el) const{
   return col()[el];
 }
     
-int CRSSparsity::rowind(int row){
+int CRSSparsity::rowind(int row) const{
   return rowind()[row];
+}
+
+void CRSSparsity::resize(int nrow, int ncol){
+  if(nrow != size1() || ncol != size2()){
+    makeUnique();
+    if(nrow < size1() || ncol < size2())
+      throw CasadiException("CRSSparsity::resize: Can only make larger");
+
+    (*this)->nrow_ = nrow;
+    (*this)->ncol_ = ncol;
+    (*this)->rowind_.resize(size1()+1,size());
+  }
+}
+
+int CRSSparsity::getNZ(int i, int j){
+  if(i >= size1() || j>=size2()) throw CasadiException("CRSSparsity::getNZ: out of bounds");
+
+  // go to the place where the element should be
+  int ind;
+  for(ind=rowind(i); ind<rowind(i+1); ++ind){ // better: loop from the back to the front
+    if(col(ind) == j){
+      return ind; // element exists
+    } else if(col(ind) > j)
+      break;                // break at the place where the element should be added
+  }
+  
+  // Make sure that there no other objects are affected
+  makeUnique();
+  
+  // insert the element
+  col().insert(col().begin()+ind,j);
+  for(int row=i+1; row<size1()+1; ++row)
+    rowind()[row]++;
+  
+  // Return the location of the new element
+  return ind;
+}
+
+int CRSSparsity::getNZ(int i, int j) const{
+  if(i >= size1() || j>=size2()) throw CasadiException("CRSSparsity::getNZ: out of bounds");
+  for(int ind=rowind(i); ind<rowind(i+1); ++ind){
+    if(col(ind) == j)
+      return ind;     // element exists
+    else if(col(ind) > j)
+      break;                // break at the place where the element should be added
+  }
+  return -1;
+}
+
+int CRSSparsity::sizeU() const{
+  int nnz = 0;
+  for(int r=0; r<size1(); ++r){
+    for(int el = rowind(r); el < rowind(r+1); ++el){
+      nnz += col(el)>=r;
+    }
+  }
+  return nnz;
+}
+
+int CRSSparsity::sizeL() const{
+  int nnz = 0;
+  for(int r=0; r<size1(); ++r){
+    for(int el = rowind(r); el < rowind(r+1); ++el){
+      nnz += col(el)<=r;
+    }
+  }
+  return nnz;
 }
 
 } // namespace CasADi

@@ -57,13 +57,19 @@ class CRSSparsity : public SharedObject{
     
     /// Get the number of columns
     int size2() const;
-    
+
     /// Get the number of elements
     int numel() const;
     
     /// Get the number of (structural) non-zeros
     int size() const;
-    
+
+    /// Number of non-zeros in the upper triangular half
+    int sizeU() const;
+
+    /// Number of non-zeros in the lower triangular half
+    int sizeL() const;
+
     /// Get a const reference to the columns of all non-zero element
     const std::vector<int>& col() const;
     
@@ -77,11 +83,21 @@ class CRSSparsity : public SharedObject{
     std::vector<int>& rowind();
     
     /// Get the column of a non-zero element
-    int col(int el);
+    int col(int el) const;
     
     /// Get the index of the first non-zero element a row
-    int rowind(int row);
+    int rowind(int row) const;
 
+    /// Resize
+    void resize(int nrow, int ncol);
+    
+    /// Get the index of a non-zero element (copy object if necessary)
+    int getNZ(int i, int j);
+    
+    /// Get the index of a non-zero element (return -1 if not exists)
+    int getNZ(int i, int j) const;
+
+    
     /// Scalar expression
 //    static const CRSSparsity scalar;
 
@@ -91,6 +107,9 @@ class CRSSparsityNode : public SharedObjectNode{
   public:
     /// Construct a sparsity pattern from vectors
     CRSSparsityNode(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind){}
+
+    /// Clone
+    virtual CRSSparsityNode* clone() const{ return new CRSSparsityNode(*this); }
 
     /// Number of rows
     int nrow_;
