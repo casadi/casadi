@@ -124,7 +124,7 @@ void CVodesInternal::init(){
       SXFunction M(jac_in,jac);
       
       // Pass sparsity to linear solver
-      linsol_.setSparsity(jac.rowind,jac.col);
+      linsol_.setSparsity(jac.rowind(),jac.col());
       
       // Save function
       M_ = M;

@@ -25,6 +25,7 @@
 
 #include "mx.hpp"
 #include "../fx/mx_function.hpp"
+#include "../matrix/matrix.hpp"
 #include <vector>
 
 namespace CasADi{
@@ -110,7 +111,8 @@ public:
     /** \brief  Numerical value */
     std::vector< std::vector<std::vector<double> > > val_;
 
-
+    /** \brief  Numerical value */
+    Matrix<double> mat_;
 
 };
 

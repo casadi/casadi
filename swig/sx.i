@@ -138,8 +138,8 @@ bool scalar() const; // is the matrix scalar
 bool vector() const; // is the matrix a vector
 
 // Get sparsity in compressed row storage (CRS) format
-const std::vector<int>& getCol() const; // vector of length nnz containing the columns for all the indices of the non-zero elements
-const std::vector<int>& getRowInd() const; // vector of length n+1 containing the index of the last non-zero element up till each row 
+const std::vector<int>& col() const; // vector of length nnz containing the columns for all the indices of the non-zero elements
+const std::vector<int>& rowind() const; // vector of length n+1 containing the index of the last non-zero element up till each row 
 };
 
 %extend SXMatrix {

@@ -53,18 +53,6 @@ class Matrix : public std::vector<T>, public PrintableObject{
       getElementRef()=val;
     }
 
-    /** \brief  This constructor enables implicit type conversion from a numeric type */
-    Matrix(const double &val){
-      makeEmpty(1,1);
-      getElementRef()=val;
-    }
-
-//	template<typename A>
-//    Matrix(const A &val){
-//      makeEmpty(1,1);
-//      getElementRef()=val;
-//    }
-
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     Matrix(const std::vector<A>& x){
@@ -126,18 +114,22 @@ class Matrix : public std::vector<T>, public PrintableObject{
     //@}
 
     // Get the sparsity pattern
-    const std::vector<int>& getCol() const;
-    const std::vector<int>& getRowInd() const;
+    const std::vector<int>& col() const;
+    const std::vector<int>& rowind() const;
+    std::vector<int>& col();
+    std::vector<int>& rowind();
+    int col(int el);
+    int rowind(int row);
     
     // make protected?
-  public:
+  private:
     // For efficiency, the following elements can be moved to a reference counted object, in which case the functions that actually change the sparsity or size have to be implemented a bit more carefully. Changes should only be permitted if only one instance exists, otherwise a deep copy must be made. This is probably simular to STL's std::string implementation.
     
     /** \brief  Elements of the matrix in a compressed row storage (CRS) format */
-    std::vector<int> col;          // vector of length nnz containing the columns for all the indices of the non-zero elements
-    std::vector<int> rowind;       // vector of length n+1 containing the index of the last non-zero element up till each row 
-    int nrow;
-    int ncol;
+    std::vector<int> col_;          // vector of length nnz containing the columns for all the indices of the non-zero elements
+    std::vector<int> rowind_;       // vector of length n+1 containing the index of the last non-zero element up till each row 
+    int nrow_;
+    int ncol_;
 
 };
 
@@ -145,10 +137,10 @@ class Matrix : public std::vector<T>, public PrintableObject{
 template<class T>
 const T Matrix<T>::getElement(int i, int j) const{
   if(i >= size1() || j>=size2()) throw CasadiException("Matrix::getElement: out of bounds");
-  for(int ind=rowind.at(i); ind<rowind.at(i+1); ++ind){
-    if(col[ind] == j)
+  for(int ind=rowind_.at(i); ind<rowind_.at(i+1); ++ind){
+    if(col_[ind] == j)
       return std::vector<T>::at(ind);     // quick return if element exists
-    else if(col[ind] > j)
+    else if(col_[ind] > j)
       break;                // break at the place where the element should be added
   }
   return 0;
@@ -160,31 +152,31 @@ T& Matrix<T>::getElementRef(int i, int j){
 
   // go to the place where the element should be
   int ind;
-  for(ind=rowind[i]; ind<rowind[i+1]; ++ind){ // better: loop from the back to the front
-    if(col[ind] == j){
+  for(ind=rowind_[i]; ind<rowind_[i+1]; ++ind){ // better: loop from the back to the front
+    if(col_[ind] == j){
       return std::vector<T>::at(ind); // element exists
-    } else if(col[ind] > j)
+    } else if(col_[ind] > j)
       break;                // break at the place where the element should be added
   }
   
   // insert the element
   std::vector<T>::insert(std::vector<T>::begin()+ind,0);
-  col.insert(col.begin()+ind,j);
+  col_.insert(col_.begin()+ind,j);
 
   for(int row=i+1; row<size1()+1; ++row)
-    rowind[row]++;
+    rowind_[row]++;
     
   return std::vector<T>::at(ind);
 }
 
 template<class T>
 int Matrix<T>::size1() const{
-  return nrow;
+  return nrow_;
 }
 
 template<class T>
 int Matrix<T>::size2() const{
-  return ncol;
+  return ncol_;
 }
 
 template<class T>
@@ -195,22 +187,22 @@ int Matrix<T>::numel() const{
         
 template<class T>
 void Matrix<T>::makeDense(int n, int m, const T& val){
-  nrow = n;
-  ncol = m;
+  nrow_ = n;
+  ncol_ = m;
   std::vector<T>::clear();
   std::vector<T>::resize(n*m, val);
-  col.resize(n*m);
-  rowind.resize(n+1);
+  col_.resize(n*m);
+  rowind_.resize(n+1);
   
   int el =0;
   for(int i=0; i<size1(); ++i){
-    rowind[i] = el;
+    rowind_[i] = el;
     for(int j=0; j<size2(); ++j){
-      col[el] = j;
+      col_[el] = j;
       el++;
     }
   }
-  rowind.back() = el;
+  rowind_.back() = el;
 }
 
 template<class T>
@@ -245,12 +237,12 @@ Matrix<T>::Matrix(int n, int m, const T& val){
 
 template<class T>
 void Matrix<T>::makeEmpty(int n, int m){
-  nrow = n;
-  ncol = m;
+  nrow_ = n;
+  ncol_ = m;
   std::vector<T>::clear();
-  col.clear();
-  rowind.clear();
-  rowind.resize(n+1, 0);
+  col_.clear();
+  rowind_.clear();
+  rowind_.resize(n+1, 0);
 }
 
 template<class T>
@@ -306,15 +298,34 @@ void Matrix<T>::print(std::ostream &stream) const{
 }
 
 template<class T>
-const std::vector<int>& Matrix<T>::getCol() const{
-  return col;
+const std::vector<int>& Matrix<T>::col() const{
+  return col_;
 }
 
 template<class T>
-const std::vector<int>& Matrix<T>::getRowInd() const{
-  return rowind;
+std::vector<int>& Matrix<T>::col(){
+  return col_;
 }
 
+template<class T>
+const std::vector<int>& Matrix<T>::rowind() const{
+  return rowind_;
+}
+
+template<class T>
+std::vector<int>& Matrix<T>::rowind(){
+  return rowind_;
+}
+
+template<class T>
+int Matrix<T>::col(int el){
+  return col_.at(el);
+}
+
+template<class T>
+int Matrix<T>::rowind(int row){
+  return rowind_.at(row);
+}
 
 
 } // namespace CasADi
