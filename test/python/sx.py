@@ -96,7 +96,19 @@ class SXtests(casadiTestCase):
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
       self.assertRaises(RuntimeError, lambda : c.prod(x,y))
-    
+      
+  def test_SXMatrixslicing(self):
+      x=SXMatrix("x",3,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+      
+      for i in range(3):
+        self.numpyEvaluationCheck(lambda x: getRow(x[0],i), lambda x: x[i,:] ,[x],x0,name="getRow(SXMatrix)")
+        
+      for j in range(2):
+        self.numpyEvaluationCheck(lambda x: trans(getColumn(x[0],j)), lambda x: x[:,j] ,[x],x0,name="getColumn(SXMatrix)")
+      self.assertRaises(RuntimeError,lambda : getRow(x,3))
+      self.assertRaises(RuntimeError,lambda : getColumn(x,2))
+      
   def test_SXMAtrixSparse(self):
       x=SXMatrix("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
