@@ -94,13 +94,14 @@ class Matrix : public std::vector<T>, public PrintableObject{
     bool vector() const; // is the matrix a vector
     //@}
 
+
 #ifndef SWIG    
     /// get an element
     const T getElement(int i=0, int j=0) const;
     
     /// set an element
     void setElement(int i, int j, const T& el);
-    
+
     /// get a reference to an element
     T& getElementRef(int i=0, int j=0);
   
@@ -110,6 +111,17 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Const access an element 
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
 #endif // SWIG
+    /// Python: get a non-zero entry
+    const T __getitem__(int i) const;
+    
+    /// Python: get a matrix entry
+    const T __getitem__(const std::vector<int> &I) const;
+    
+    /// Python: set a non-zero entry
+    void __setitem__(int k, const T& el);
+    
+    /// Python: set a matrix entry
+    void __setitem__(const std::vector<int> &I, const T&  el);
 
     /** \brief  Make the matrix an dense n-by-m matrix */
     void makeDense(int n, int m, const T& val);
@@ -135,6 +147,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     int col(int el) const;
     int rowind(int row) const;
     
+    std::string __repr__() { return getRepresentation(); }
     
     void clear();
     void resize(int n, int m);
@@ -150,11 +163,23 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
 };
 
-#ifdef SWIG
-%extend MX {
-std::string __repr__() { return $self->getRepresentation(); }
-}
-#endif // SWIG
+// #ifdef SWIG
+// %extend Matrix<T>{
+// T __getitem__(const std::vector<PyObject*> &I ) {
+//   throw CasadiException("ok!");
+// }
+// }
+// // 
+// #endif // SWIG
+
+
+
+// #ifdef SWIG
+// %extend Matrix<T> {
+// std::string __str__() { return $self->getDescription(); }
+// std::string __repr__() { return $self->getRepresentation(); }
+// }
+// #endif // SWIG
 
 #ifndef SWIG
 // Implementations
@@ -354,6 +379,31 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
   sparsity_ = CRSSparsity(n,m,col,rowind);
   std::vector<T>::resize(sparsity_.size());
 }
+
+template<class T>
+const T Matrix<T>::__getitem__(int i) const{
+  return std::vector<T>::at(i);
+}
+
+template<class T>
+const T Matrix<T>::__getitem__(const std::vector<int> &I) const{
+  if(I.size()!=2) 
+    throw CasADi::CasadiException("__getitem__: not 2D"); 
+  return getElement(I[0],I[1]);
+}
+
+template<class T>
+void Matrix<T>::__setitem__(int k, const T& el){ 
+  std::vector<T>::at(k) = el;
+}
+
+template<class T>
+void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){ 
+  if(I.size()!=2) 
+    throw CasADi::CasadiException("__setitem__: not 2D"); 
+  getElementRef(I[0],I[1]) = el;
+}
+
 
 #endif // SWIG
 

@@ -29,6 +29,16 @@
 %template(vector_matrix_sx) std::vector<CasADi::Matrix<CasADi::SX> >;
 %template(vector_matrix_double) std::vector<CasADi::Matrix<double> >;
 
+// %extend CasADi::Matrix<CasADi::SX> {
+// std::string __repr__() { return $self->getRepresentation(); }
+// }
+// 
+// %extend CasADi::Matrix<double> {
+// std::string __repr__() { return $self->getRepresentation(); }
+// }
+
+
+
 namespace CasADi{
 
 #ifdef WITH_IMPLICITCONV
