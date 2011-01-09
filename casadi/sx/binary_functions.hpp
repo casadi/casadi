@@ -127,7 +127,7 @@ static void log_nfcn2(double x, double y, double *res){ log_nfcn1(x,y,res); FXX 
 //@{
 /** \brief  Power */
 static SX pow_sfcn(const SX& x, const SX& y){ return pow(x,y); }
-static SX pow_sder1(const SX &f, const SX& x, const SX& y){ return y*pow(x,y-1); }
+static SX pow_sder1(const SX &f, const SX& x, const SX& y){ return y*f/x; }
 static SX pow_sder2(const SX &f, const SX& x, const SX& y){ return log(x)*f; }
 static void pow_print(std::ostream &stream, const std::string& x, const std::string& y){stream << "pow(" << x << "," << y << ")";}
 static void pow_nfcn0(double x, double y, double *res){ F = pow(x,y);}
