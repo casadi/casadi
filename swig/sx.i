@@ -160,7 +160,7 @@ SX __getitem__(const std::vector<int> &I ){ if(I.size()!=2) throw CasADi::Casadi
 
 SXMatrix __getitem__(const std::vector<PyObject*> &I ) {
       if(I.size()!=2) throw CasADi::CasadiException("__getitem__(vector<PyObject*>): not 2D");
-      int  	i[2];
+      int  	i[2]; // numpy - style:  i:n:k
 		  int  	n[2];
 		  int  	k[2];
 		  
@@ -171,19 +171,26 @@ SXMatrix __getitem__(const std::vector<PyObject*> &I ) {
         if( PySlice_Check(q) ) {
           PySliceObject* slice=(PySliceObject*) q;
           if (slice->start==Py_None) {i[j]=0; } else {i[j]=PyInt_AsLong(slice->start);}
-          if (slice->stop==Py_None)  {n[j]=s[j]-i[j];} else {n[j]=PyInt_AsLong(slice->stop)-i[j];}
+          if (slice->stop==Py_None)  {n[j]=s[j];} else {n[j]=PyInt_AsLong(slice->stop);}
           if (slice->step==Py_None)  {k[j]=1; } else {k[j]=PyInt_AsLong(slice->step);}
+          if (i[j]<0)
+            i[j]+=s[j];
+          if (n[j]<0)
+            n[j]+=s[j];
         } else if (PyInt_Check(q)) {
           i[j]=PyInt_AsLong(q);
-          n[j]=1;
+          if (i[j]<0)
+            i[j]+=s[j];
+          n[j]=i[j]+1;
           k[j]=1;
         } else {
           SWIG_Error(SWIG_TypeError, "__getitem__: Slice or int expected");
         }
+
 		  }
 		  
 		  CasADi::SXMatrix res;
-      getSub(res,*$self,i[0],i[1],n[0],n[1],k[0],k[1]);
+      getSub(res,*$self,i[0],i[1],n[0]-i[0],n[1]-i[1],k[0],k[1]);
       return res;
 }
 
