@@ -22,7 +22,6 @@
 
 #include "vertcat.hpp"
 #include "../stl_vector_tools.hpp"
-#include <cassert>
 #include <iterator>
 #include <algorithm>
 
@@ -33,12 +32,15 @@ namespace CasADi{
 // Constructor
 Vertcat::Vertcat(const vector<MX>& dep__){
   setDependencies(dep__);
-  assert(!dep_.empty());
+  if(dep_.empty())
+    throw CasadiException("Vertcat: empty concatenation not allowed");
   int sz1=0;
   int sz2=dep(0).size2();
   for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
     sz1 += it->size1();
-    assert(sz2==it->size2());
+    if(sz2!=it->size2())
+      throw CasadiException("Vertcat: dimension mismatch");
+
   }
   setSize(sz1,sz2);
 }
