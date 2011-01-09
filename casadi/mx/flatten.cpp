@@ -21,7 +21,7 @@
  */
 
 #include "flatten.hpp"
-#include <cassert>
+#include <algorithm>
 
 using namespace std;
 
@@ -29,7 +29,7 @@ namespace CasADi{
 
 Flatten::Flatten(const MX& x){
   setDependencies(x);
-  setSize(x.size2()*x.size1(),1);
+  setSize(x.numel(),1);
 }
 
 Flatten* Flatten::clone() const{
@@ -41,36 +41,18 @@ void Flatten::print(std::ostream &stream) const{
 }
 
 void Flatten::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0 || asens_order==0);
-  
+  // All non-zero elements remains the same
   if(fsens_order==0){
-  // Get references to the terms
-  const vector<double>& arg = input(0);
-  vector<double>& res = output();
-  
-  // carry out the flattening 
-  for(int i=0; i<size1(); ++i)
-    res[i] = arg[i];
+    copy(input(0).begin(),input(0).end(),output().begin());
   } else {
-
-    // Get references to the terms
-    const vector<double>& arg = fwdSeed(0);
-    vector<double>& res = fwdSens();
-  
-    // carry out the flattening 
-    for(int i=0; i<size1(); ++i)
-       res[i] = arg[i];
+    copy(fwdSeed(0).begin(),fwdSeed(0).end(),fwdSens().begin());
   }
   
   if(asens_order>0){
-    // Get references to the terms
-    vector<double>& arg = adjSens(0);
-    const vector<double>& res = adjSeed();
-  
-    // carry out the flattening 
-    for(int i=0; i<size1(); ++i)
-        arg[i] += res[i];
-    
+    transform(adjSeed().begin(),adjSeed().end(),
+              adjSens(0).begin(),
+              adjSens(0).begin(),
+              plus<double>());
   }
 }
 

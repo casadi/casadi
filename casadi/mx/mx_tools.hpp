@@ -86,7 +86,7 @@ MX reshape(const MX &x, const std::vector<int> sz);
 
 /** \brief Returns a flattened version of the MX
     Flattening is a cheap (non-copying) operation
-    Same effect as reshape(size1()*size2(),1)
+    Same as reshape(x, x.numel(),1)
 */
 MX flatten(const MX &x);
   

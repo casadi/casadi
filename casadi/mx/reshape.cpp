@@ -21,16 +21,17 @@
  */
 
 #include "reshape.hpp"
+#include <algorithm>
 
 using namespace std;
 
 namespace CasADi{
 
 Reshape::Reshape(const MX& x, int n, int m){
-  setDependencies(x);
   if (n*m != x.numel()) {
     throw CasadiException("MX::reshape: size must be same before and after reshaping");
   }
+  setDependencies(x);
   setSize(n,m);
 }
 
@@ -43,36 +44,18 @@ void Reshape::print(std::ostream &stream) const{
 }
 
 void Reshape::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0 || asens_order==0);
-  
+  // All non-zero elements remains the same
   if(fsens_order==0){
-  // Get references to the terms
-  const vector<double>& arg = input(0);
-  vector<double>& res = output();
-  
-  // carry out the reshape
-  for(int i=0; i<size1()*size2(); ++i)
-      res[i] = arg[i];
+    copy(input(0).begin(),input(0).end(),output().begin());
   } else {
-
-    // Get references to the terms
-    const vector<double>& arg = fwdSeed(0);
-    vector<double>& res = fwdSens();
-  
-    // carry out the reshape
-    for(int i=0; i<size1()*size2(); ++i)
-        res[i] = arg[i];
+    copy(fwdSeed(0).begin(),fwdSeed(0).end(),fwdSens().begin());
   }
   
   if(asens_order>0){
-    // Get references to the terms
-    vector<double>& arg = adjSens(0);
-    const vector<double>& res = adjSeed();
-  
-    // carry out the reshape
-    for(int i=0; i<size1()*size2(); ++i)
-        arg[i] += res[i];
-    
+    transform(adjSeed().begin(),adjSeed().end(),
+              adjSens(0).begin(),
+              adjSens(0).begin(),
+              plus<double>());
   }
 }
 
