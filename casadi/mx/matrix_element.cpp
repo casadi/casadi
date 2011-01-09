@@ -49,15 +49,15 @@ void MatrixElement::evaluate(int fsens_order, int asens_order){
   
   if(fsens_order==0){
   // Get references to the terms
-  const vector<double>& arg = dep(0)->val(0); // first term
-  vector<double>& res = val(0);
+  const vector<double>& arg = input(0); // first term
+  vector<double>& res = output();
   
   // carry out the assignment
   res[0] = arg[j+i*dep(0).size2()];
   } else {
     // Get references to the terms
-    const vector<double>& arg = dep(0)->val(1); // first term
-    vector<double>& res = val(1);
+    const vector<double>& arg = fwdSeed(0); // first term
+    vector<double>& res = fwdSens(0);
   
     // carry out the assignment
     res[0] = arg[j+i*dep(0).size2()];
@@ -65,8 +65,8 @@ void MatrixElement::evaluate(int fsens_order, int asens_order){
   
   if(asens_order>0){
     // Get references to the terms
-    vector<double>& arg = dep(0)->val(1); // first term
-    const vector<double>& res = val(1);
+    vector<double>& arg = adjSens(0); // first term
+    const vector<double>& res = adjSeed();
   
     // carry out the addition
     // where's the plus sign?

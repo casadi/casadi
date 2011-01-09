@@ -50,8 +50,8 @@ void Transpose::evaluate(int fsens_order, int asens_order){
   
   if(fsens_order==0){
   // Get references to the terms
-  const vector<double>& arg = dep(0)->val(0);
-  vector<double>& res = val(0);
+  const vector<double>& arg = input(0);
+  vector<double>& res = output();
   
   // carry out the transpose
   for(int i=0; i<nrow_; ++i)
@@ -60,8 +60,8 @@ void Transpose::evaluate(int fsens_order, int asens_order){
   } else {
 
     // Get references to the terms
-    const vector<double>& arg = dep(0)->val(1);
-    vector<double>& res = val(1);
+    const vector<double>& arg = fwdSeed(0);
+    vector<double>& res = fwdSens();
   
     // carry out the transpose
     for(int i=0; i<nrow_; ++i)
@@ -71,8 +71,8 @@ void Transpose::evaluate(int fsens_order, int asens_order){
   
   if(asens_order>0){
     // Get references to the terms
-    vector<double>& arg = dep(0)->val(1);
-    const vector<double>& res = val(1);
+    vector<double>& arg = adjSens(0);
+    const vector<double>& res = adjSeed();
   
     // carry out the transpose
     for(int i=0; i<nrow_; ++i)

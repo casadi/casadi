@@ -86,14 +86,34 @@ bool MXNode::isConstant() const{
   return false;
 }
 
-void MXNode::setOutput(const vector<double>& x, int ord){
-  assert(x.size() == val(ord).size());
-  copy(x.begin(),x.end(), val(ord).begin());
+void MXNode::setOutput(const vector<double>& x){
+  assert(x.size() == output().size());
+  copy(x.begin(),x.end(), output().begin());
 }
 
-void MXNode::getOutput(vector<double>& x, int ord) const{
-  assert(x.size() == val(ord).size());
-  copy(val(ord).begin(),val(ord).end(),x.begin());
+void MXNode::getOutput(vector<double>& x) const{
+  assert(x.size() == output().size());
+  copy(output().begin(),output().end(),x.begin());
+}
+
+void MXNode::setFwdSeed(const vector<double>& x, int dir){
+  assert(x.size() == fwdSens(dir).size());
+  copy(x.begin(),x.end(), fwdSens(dir).begin());
+}
+
+void MXNode::getFwdSens(vector<double>& x, int dir) const{
+  assert(x.size() == fwdSens(dir).size());
+  copy(fwdSens(dir).begin(),fwdSens(dir).end(),x.begin());
+}
+
+void MXNode::setAdjSeed(const vector<double>& x, int dir){
+  assert(x.size() == adjSeed(dir).size());
+  copy(x.begin(),x.end(), adjSeed(dir).begin());
+}
+
+void MXNode::getAdjSens(vector<double>& x, int dir) const{
+  assert(x.size() == adjSeed(dir).size());
+  copy(adjSeed(dir).begin(),adjSeed(dir).end(),x.begin());
 }
 
 MX& MXNode::dep(int ind){
@@ -104,27 +124,76 @@ const MX& MXNode::dep(int ind) const{
   return dep_.at(ind);
 }
   
-const vector<double>& MXNode::val(int order, int dir) const{
-  return val_.at(order).at(dir);
-}
-
-vector<double>& MXNode::val(int order, int dir){
-  return val_.at(order).at(dir);
-}
+// const vector<double>& MXNode::val(int order, int dir) const{
+//   return val_.at(order).at(dir);
+// }
+// 
+// vector<double>& MXNode::val(int order, int dir){
+//   return val_.at(order).at(dir);
+// }
 
 int MXNode::ndep() const{
   return dep_.size();
 }
 
 void MXNode::init(){
-  val_.resize(maxord_ +1);
-  for(int ord=0; ord<=maxord_; ++ord){
-    val_[ord].resize(nfdir_+nadir_);
-    for(int dir=0; dir<nfdir_+nadir_; ++dir){
-      val_[ord][dir].resize(nrow_*ncol_);
-    }
-  }
+  output_.resize(nrow_*ncol_);
+  
+  forward_sensitivities_.resize(nfdir_);
+  for(int dir=0; dir<nfdir_; ++dir)
+    forward_sensitivities_[dir] = output_;
+    
+  adjoint_seeds_.resize(nadir_);
+  for(int dir=0; dir<nadir_; ++dir)
+    adjoint_seeds_[dir] = output_;
 }
 
+const std::vector<double>& MXNode::input(int ind) const{
+  return dep_.at(ind)->output();
+}
+
+std::vector<double>& MXNode::input(int ind){
+  return dep_.at(ind)->output();
+}
+
+const std::vector<double>& MXNode::output() const{
+  return output_;
+}
+
+std::vector<double>& MXNode::output(){
+  return output_;
+}
+  
+const std::vector<double>& MXNode::fwdSeed(int ind, int dir) const{
+  return dep_.at(ind)->fwdSens(dir);
+}
+
+std::vector<double>& MXNode::fwdSeed(int ind, int dir){
+  return dep_.at(ind)->fwdSens(dir);
+}
+
+const std::vector<double>& MXNode::adjSeed(int dir) const{
+  return adjoint_seeds_.at(dir);
+}
+
+std::vector<double>& MXNode::adjSeed(int dir){
+  return adjoint_seeds_.at(dir);
+}
+  
+const std::vector<double>& MXNode::fwdSens(int dir) const{
+  return forward_sensitivities_.at(dir);
+}
+
+std::vector<double>& MXNode::fwdSens(int dir){
+  return forward_sensitivities_.at(dir);
+}
+
+const std::vector<double>& MXNode::adjSens(int ind, int dir) const{
+  return dep_.at(ind)->adjSeed(dir);
+}
+
+std::vector<double>& MXNode::adjSens(int ind, int dir){
+  return dep_.at(ind)->adjSeed(dir);
+}
 
 } // namespace CasADi

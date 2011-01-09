@@ -57,13 +57,10 @@ class MXFunctionInternal : public FXInternal{
   int findEl(const MX& mx) const;
 
 /** \brief  Set the value of an node in the algorithm */
-  virtual void setElement(int ind, const double* x, int ord=0);
+//  virtual void setElement(int ind, const double* x, int ord=0);
 
 /** \brief  Get the value of an node in the algorithm */
-  virtual void getElement(int ind, double *x, int ord=0) const;
-
-/** \brief  Set values to zero for all nodes */
-  virtual void clear(int ord=0);
+//  virtual void getElement(int ind, double *x, int ord=0) const;
 
 /** \brief  Evaluate the algorithm */
   virtual void evaluate(int fsens_order, int asens_order);

@@ -50,19 +50,19 @@ void ScalarMatrixOp::evaluate(int fsens_order, int asens_order){
   assert(fsens_order==0 || asens_order==0);
   
   if(fsens_order==0){
-  const vector<double>& x = dep(0)->val(0);  // first (scalar) argument
-  const vector<double>& y = dep(1)->val(0);  // second (possibly non-scalar) argument
-  vector<double>& res = val(0);
+  const vector<double>& x = input(0);  // first (scalar) argument
+  const vector<double>& y = input(1);  // second (possibly non-scalar) argument
+  vector<double>& res = output();
   
   for(int i=0; i<res.size(); ++i)
     nfun0[op](x[0],y[i],&res[i]);
   } else {
 
-    const vector<double>& x = dep(0)->val(0);  // first (scalar) argument
-  const vector<double>& dx = dep(0)->val(1); // first (scalar) argument derivative
-  const vector<double>& y = dep(1)->val(0);  // second (possibly non-scalar) argument
-  const vector<double>& dy = dep(1)->val(1); // second (possibly non-scalar) argument derivative
-  vector<double>& res = val(1);
+    const vector<double>& x = input(0);  // first (scalar) argument
+  const vector<double>& dx = fwdSeed(0); // first (scalar) argument derivative
+  const vector<double>& y = input(1);  // second (possibly non-scalar) argument
+  const vector<double>& dy = fwdSeed(1); // second (possibly non-scalar) argument derivative
+  vector<double>& res = fwdSens();
 
   double tmp[3];
   
@@ -73,11 +73,11 @@ void ScalarMatrixOp::evaluate(int fsens_order, int asens_order){
   }
   
   if(asens_order>0){
-    const vector<double>& x = dep(0)->val(0);  // first (scalar) argument
-    vector<double>& dx = dep(0)->val(1); // first (scalar) argument derivative
-    const vector<double>& y = dep(1)->val(0);  // second (possibly non-scalar) argument
-    vector<double>& dy = dep(1)->val(1); // second (possibly non-scalar) argument derivative
-    const vector<double>& res = val(1);
+    const vector<double>& x = input(0);  // first (scalar) argument
+    vector<double>& dx = adjSens(0); // first (scalar) argument derivative
+    const vector<double>& y = input(1);  // second (possibly non-scalar) argument
+    vector<double>& dy = adjSens(1); // second (possibly non-scalar) argument derivative
+    const vector<double>& res = adjSeed();
 
     double tmp[3];
 

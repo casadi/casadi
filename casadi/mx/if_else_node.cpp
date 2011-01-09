@@ -52,26 +52,26 @@ void IfElseNode::evaluate(int fsens_order, int asens_order){
   
 if(fsens_order==0){
   
-  const vector<double>& cond = dep(0)->val(0);  // condition
-  const vector<double>& if_true = dep(1)->val(0);  // if condition true
-  const vector<double>& if_false = dep(2)->val(0);  // if condition false
-  vector<double>& res = val(0);
+  const vector<double>& cond = input(0);  // condition
+  const vector<double>& if_true = input(1);  // if condition true
+  const vector<double>& if_false = input(2);  // if condition false
+  vector<double>& res = output();
 
   res = fabs(cond[0])>tol ? if_true : if_false;
 } else {
-  const vector<double>& cond = dep(0)->val(0);  // condition
-  const vector<double>& if_true_der = dep(1)->val(1);  // if condition true derivative
-  const vector<double>& if_false_der = dep(2)->val(1);  // if condition false derivative
-  vector<double>& res_der = val(1);
+  const vector<double>& cond = input(0);  // condition
+  const vector<double>& if_true_der = fwdSeed(1);  // if condition true derivative
+  const vector<double>& if_false_der = fwdSeed(2);  // if condition false derivative
+  vector<double>& res_der = fwdSens();
 
   res_der = fabs(cond[0])>tol ? if_true_der : if_false_der;
 }
 
 if(asens_order>0){
-  const vector<double>& cond = dep(0)->val(0);  // condition
-  vector<double>& if_true_der = dep(1)->val(1);  // if condition true derivative
-  vector<double>& if_false_der = dep(2)->val(1);  // if condition false derivative
-  const vector<double>& res_der = val(1);
+  const vector<double>& cond = input(0);  // condition
+  vector<double>& if_true_der = adjSens(1);  // if condition true derivative
+  vector<double>& if_false_der = adjSens(2);  // if condition false derivative
+  const vector<double>& res_der = adjSeed();
 
   if(fabs(cond[0])>tol){ // if true
     for(int i=0; i<res_der.size(); ++i)

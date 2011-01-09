@@ -44,31 +44,31 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
   
   // Pass the input to the function
   for(int i=0; i<ndep(); ++i)
-    fcn_.setInput(dep(i)->val(0),i);
+    fcn_.setInput(input(i),i);
 
   // Give the forward seed to the function
   if(fsens_order>0) 
     for(int i=0; i<ndep(); ++i)
-      fcn_.setFwdSeed(dep(i)->val(1),i);
+      fcn_.setFwdSeed(fwdSeed(i),i);
 
   // Pass the adjoint seed to the function
   if(asens_order>0)
-    fcn_.setAdjSeed(val(1),oind);
+    fcn_.setAdjSeed(adjSeed(),oind);
 
   // Evaluate
   fcn_.evaluate(fsens_order, asens_order);
   
   // Get the results
-  fcn_.getOutput(val(0),oind);
+  fcn_.getOutput(output(),oind);
 
   // Fwd sens
   if(fsens_order>0)
-    fcn_.getFwdSens(val(1),oind);
+    fcn_.getFwdSens(fwdSens(),oind);
 
   // Adjoint sens
   if(asens_order>0)
     for(int i=0; i<ndep(); ++i)
-      fcn_.getAdjSens(dep(i)->val(1),i);
+      fcn_.getAdjSens(adjSens(i),i);
 }
 
 } // namespace CasADi

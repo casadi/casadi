@@ -1088,7 +1088,7 @@ return ret;
               
     for(int i=0; i<output_.at(oind).size1(); ++i) // loop over rows of the output
       for(int el=output_.at(oind).rowind(i); el<output_.at(oind).rowind(i+1); ++el){ // loop over the non-zero elements
-        assert(output_.at(oind).col_[el] == 0); // column
+        assert(output_.at(oind).col(el) == 0); // column
 
         // Clear seeds (from symbolic components)
         for(vector<int>::const_iterator ii=snodes.begin(); ii!=snodes.end(); ++ii)

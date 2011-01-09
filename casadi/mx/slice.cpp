@@ -55,14 +55,14 @@ void Slice::evaluate(int fsens_order, int asens_order){
     int k=0;
     for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
      	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
-    	  val(0)[k++]=dep(0)->val(0)[(*iti)*dep(0).size2() + (*itj)];
+    	  output()[k++]=input(0)[(*iti)*dep(0).size2() + (*itj)];
       }
     }
   } else {
     int k=0;
     for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
      	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
-    	  val(1)[k++]=dep(0)->val(1)[(*iti)*dep(0).size2() + (*itj)];
+    	  fwdSens()[k++]=fwdSeed(0)[(*iti)*dep(0).size2() + (*itj)];
       }
     }
   }
@@ -71,7 +71,7 @@ void Slice::evaluate(int fsens_order, int asens_order){
     int k=0;
     for (vector<int>::iterator iti=i.begin();iti!=i.end();++iti) {
      	for (vector<int>::iterator itj=j.begin();itj!=j.end();++itj) {
-    	  dep(0)->val(0)[(*iti)*dep(0).size2() + (*itj)]+=val(0)[k++];
+          input(0)[(*iti)*dep(0).size2() + (*itj)]+=output()[k++]; // NOTE TO JORIS: This must be wrong
       }
     }
   }

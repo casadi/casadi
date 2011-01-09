@@ -82,9 +82,9 @@ void MXConstant::print(std::ostream &stream) const{
 
 void MXConstant::evaluate(int fsens_order, int asens_order){
   if(fsens_order==0){
-    val(0) = data;
+    output() = data; // todo: change to copy!
   } else {
-    vector<double>& res = val(1);
+    vector<double>& res = fwdSens();
     for(vector<double>::iterator it=res.begin(); it!=res.end(); ++it) 
       *it = 0;
   }

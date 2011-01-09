@@ -76,28 +76,28 @@ void Multiplication::evaluate(int fsens_order, int asens_order){
   
   if(fsens_order==0){
   // Erase result
-  for(vector<double>::iterator it=val(0).begin(); it!=val(0).end(); ++it) *it = 0; 
+  for(vector<double>::iterator it=output().begin(); it!=output().end(); ++it) *it = 0; 
 
   // Matrix multiplication
-  matrix_matrix_mult(dep(0)->val(0),dep(1)->val(0),val(0));
+  matrix_matrix_mult(input(0),input(1),output());
 } else {
 
   //   // Erase result
 //   for(vector<double>::iterator it=res.begin(); it!=res.end(); ++it) *it = 0; 
 
   // Matrix multiplication, first argument
-  matrix_matrix_mult(dep(0)->val(1),dep(1)->val(0),val(1));
+  matrix_matrix_mult(fwdSeed(0),input(1),fwdSens());
 
   // Matrix multiplication, second argument
-  matrix_matrix_mult(dep(0)->val(0),dep(1)->val(1),val(1));
+  matrix_matrix_mult(input(0),fwdSeed(1),fwdSens());
 }
 
 if(asens_order>0){
   // Matrix multiplication, first argument
-  matrix_matrix_mult1(dep(0)->val(1),dep(1)->val(0),val(1));
+  matrix_matrix_mult1(adjSens(0),input(1),adjSeed());
 
   // Matrix multiplication, second argument
-  matrix_matrix_mult2(dep(0)->val(0),dep(1)->val(1),val(1));
+  matrix_matrix_mult2(input(0),adjSens(1),adjSeed());
 }
 }
 

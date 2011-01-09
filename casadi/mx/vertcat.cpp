@@ -58,13 +58,13 @@ void Vertcat::evaluate(int fsens_order, int asens_order){
   if(fsens_order==0){
     int i = 0;
     for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy((*it)->val(0).begin(),(*it)->val(0).end(),&val(0)[i]);
+      copy((*it)->output().begin(),(*it)->output().end(),&output()[i]);
       i += it->numel();
     }
   } else {
     int i = 0;
     for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy((*it)->val(1).begin(),(*it)->val(1).end(),&val(1)[i]);
+      copy((*it)->fwdSens().begin(),(*it)->fwdSens().end(),&fwdSens()[i]);
       i += it->numel();
     }
   }
@@ -72,7 +72,7 @@ void Vertcat::evaluate(int fsens_order, int asens_order){
   if(asens_order>0){
     int i = 0;
     for(vector<MX>::iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy(&val(1)[i],&val(1)[i] + it->numel(), (*it)->val(1).begin());
+      copy(&adjSeed()[i],&adjSeed()[i] + it->numel(), (*it)->adjSeed().begin());
       i += it->numel();
     }
   }

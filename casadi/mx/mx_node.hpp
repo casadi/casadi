@@ -78,8 +78,12 @@ public:
   virtual bool isConstant() const;
     
 /** \brief  Set/get input/output */
-  void setOutput(const vector<double>& val, int ord=0);
-  void getOutput(vector<double>&, int ord=0) const;
+  void setOutput(const vector<double>& x);
+  void getOutput(vector<double>& x) const;
+  void setFwdSeed(const vector<double>& x, int dir=0);
+  void getFwdSens(vector<double>& val, int dir=0) const;
+  void setAdjSeed(const vector<double>& x, int dir=0);
+  void getAdjSens(vector<double>& val, int dir=0) const;
 
   /** \brief  dependencies - functions that have to be evaluated before this one */
   MX& dep(int ind=0);
@@ -87,10 +91,25 @@ public:
   
   /** \brief  Number of dependencies */
   int ndep() const;
-  
+
   /** \brief  Numerical value */
-  const std::vector<double>& val(int order=0, int dir=0) const;
-  std::vector<double>& val(int order=0, int dir=0);
+  const std::vector<double>& output() const;
+  std::vector<double>& output();
+  
+  const std::vector<double>& input(int ind) const;
+  std::vector<double>& input(int ind);
+  
+  const std::vector<double>& fwdSeed(int ind, int dir=0) const;
+  std::vector<double>& fwdSeed(int ind, int dir=0);
+
+  const std::vector<double>& adjSeed(int dir=0) const;
+  std::vector<double>& adjSeed(int dir=0);
+  
+  const std::vector<double>& fwdSens(int dir=0) const;
+  std::vector<double>& fwdSens(int dir=0);
+
+  const std::vector<double>& adjSens(int ind, int dir=0) const;
+  std::vector<double>& adjSens(int ind, int dir=0);
 
   protected:
     //! Number of derivatives
@@ -107,12 +126,14 @@ public:
     std::vector<MX> dep_;
     
   private:
-  
-    /** \brief  Numerical value */
-    std::vector< std::vector<std::vector<double> > > val_;
+    /** \brief  Numerical value of output */
+   std::vector<double> output_;
 
-    /** \brief  Numerical value */
-    Matrix<double> mat_;
+    /** \brief  Numerical value of forward sensitivities */
+   std::vector<std::vector<double> > forward_sensitivities_;
+
+    /** \brief  Numerical value of adjoint seeds */
+   std::vector<std::vector<double> > adjoint_seeds_;
 
 };
 
