@@ -21,6 +21,8 @@
  */
 
 #include "crs_sparsity.hpp"
+#include "../stl_vector_tools.hpp"
+
 using namespace std;
 
 namespace CasADi{
@@ -190,6 +192,19 @@ int CRSSparsity::sizeL() const{
   }
   return nnz;
 }
+
+
+void CRSSparsityNode::repr(std::ostream &stream) const{
+  stream << "Compressed Row Storage: " << nrow_ << "-by-" << ncol_ << " matrix, " << col_.size() << " structural non-zeros";
+}
+
+void CRSSparsityNode::print(std::ostream &stream) const{
+  repr(stream);
+  stream << endl;
+  stream << "col:    " << col_ << endl;
+  stream << "rowind: " << rowind_ << endl;
+}
+
 
 } // namespace CasADi
 

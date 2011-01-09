@@ -30,8 +30,16 @@
 #include "../matrix/matrix.hpp"
 
 namespace CasADi{
+#ifdef SWIG
+#ifdef WITH_IMPLICITCONV
+%implicitconv SXMatrix;
+#endif // WITH_IMPLICITCONV
+#endif // SWIG
   
 /** \brief General sparse symbolic matrix class
+  NOTE NOTE NOTE
+  MARKED FOR REMOVAL
+
   General sparse symbolic matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.
   This philosophy makes it easy to use and to interface in particularily with Matlab and Python.
   It is likely not as efficient as expression template based matrix classes, since this is not the objective,
@@ -86,90 +94,10 @@ SXMatrix(const std::vector<double>& x,  int n, int m);
 //@}
 
 /** \brief  Create a matrix of symbolic variables  */
-explicit SXMatrix(const std::string& name, int n=1, int m=1);   // variable
-
-/** \brief  destructor */
-~SXMatrix();
-
-/** Element class for SXmatrix 
-    Element is the return type for operator[] and operator() of the SXMatrix class.
-    From several alternative solutions, this was the only one which didn't cause ambigousity.
-    Suggestions for improvement are welcome.
-  \author Joel Andersson 
-  \date 2010
-
-*/
-class Element{
-  friend class SXMatrix;
-  public:
-    //@{
-    /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
-    SX& operator=(const Element &y);
-    SX& operator=(const SXMatrix &y);
-    void operator-=(const SXMatrix &y){*this = *this - y;}
-    void operator+=(const SXMatrix &y){*this = *this + y;}
-    void operator*=(const SXMatrix &y){*this = *this * y;}
-    void operator/=(const SXMatrix &y){*this = *this / y;}
-    //@}
-    
-    /// Get a pointer to the node
-    SXNode* const get() const;
-
-    /// Access functions of the node
-    const SXNode* operator->() const;
-    SXNode* operator->();
-
-    private:
-    Element(SXMatrix& mat, int i, int j);
-    SXMatrix& mat;
-    int i, j;
-};
-
-  /// Implicit type conversion from Element to SXMatrix
-  SXMatrix(const Element &el);
-
-  /// Access an element 
-  SXMatrix::Element operator()(int i, int j=0);             // matrix style access 
-
-  /// Const access an element 
-  const SX operator()(int i, int j=0) const; // matrix style access
-
-  /// Const access a non-zero element
-  const SX& operator[](int k) const;
-  
-  /// Access a non-zero element
-  SX& operator[](int k);
-
-  /// Get several non-zero elements
-  const std::vector<SX> operator[](const std::vector<int>& ind) const;
-
-  /// A submatrix class enabling the syntax "A({1,3},{2,4}) = B;"
-  class Sub{
-    friend class SXMatrix;
-    public:
-      void operator=(const Element &y);
-      void operator=(const SXMatrix &y);
-
-      operator const SXMatrix() const;
-      operator SXMatrix& ();
-    
-      private:
-      Sub(SXMatrix& mat, std::vector<int> i, std::vector<int> j);
-      SXMatrix& mat;
-      std::vector<int> i, j;
-    };
-
-  /// Get a const submatrix (for B = A(I,J))
-  const SXMatrix operator()(const std::vector<int>& i, const std::vector<int>& j=std::vector<int>(1,0)) const;
-
-  /// Get a reference to a submatrix (for A(I,J) = B and B = A(I,J))
-  Sub operator()(const std::vector<int>& i, const std::vector<int>& j=std::vector<int>(1,0));
-
-
+explicit SXMatrix(const std::string& name, int n=1, int m=1);
 
 //@{
 /** \brief  Operators that changes the object */
-// They do not, in fact change the object do they?
 friend SXMatrix& operator+=(SXMatrix &ex, const SXMatrix &expr);
 friend SXMatrix& operator-=(SXMatrix &ex, const SXMatrix &expr);
 friend SXMatrix& operator*=(SXMatrix &ex, const SXMatrix &expr);
@@ -182,6 +110,7 @@ friend SXMatrix operator-(SXMatrix &ex);
 /** \brief  Operators that create new objects */
 friend SXMatrix operator+(const SXMatrix &x, const SXMatrix &y);
 friend SXMatrix operator-(const SXMatrix &x, const SXMatrix &y);
+
 /** \brief Element-wise multiplication */
 friend SXMatrix operator*(const SXMatrix &x, const SXMatrix &y);
 friend SXMatrix operator/(const SXMatrix &x, const SXMatrix &y);
@@ -191,29 +120,6 @@ friend std::ostream& operator<<(std::ostream &stream, const SXMatrix &mat);
 };
 
 } // namespace CasADi
-
-
-/** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
-namespace std{
-#define SXMatrix CasADi::SXMatrix
-SXMatrix sin(const SXMatrix &x);
-SXMatrix cos(const SXMatrix &x);
-SXMatrix tan(const SXMatrix &x);
-SXMatrix atan(const SXMatrix &x);
-SXMatrix asin(const SXMatrix &x);
-SXMatrix acos(const SXMatrix &x);
-SXMatrix exp(const SXMatrix &x); // natural expontial
-SXMatrix log(const SXMatrix &x); // natuaral logarithm
-SXMatrix pow(const SXMatrix &x, const SXMatrix &n); // power function
-SXMatrix sqrt(const SXMatrix &x); // square root
-SXMatrix fmin(const SXMatrix &x, const SXMatrix &y);
-SXMatrix fmax(const SXMatrix &x, const SXMatrix &y);
-SXMatrix floor(const SXMatrix &x);
-SXMatrix ceil(const SXMatrix &x); 
-SXMatrix erf(const SXMatrix &x); 
-#undef SXMatrix
-} // namespace std
-
 
 #endif // SX_MATRIX_HPP
 

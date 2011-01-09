@@ -56,6 +56,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// This constructor enables implicit type conversion from a scalar type
     Matrix(const T &val);
 
+#ifndef SWIG    
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     Matrix(const std::vector<A>& x){
@@ -72,7 +73,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
       std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
     }
-    
+#endif // SWIG
+
     // get the number of non-zeros
     //int size() const;        
 
@@ -92,8 +94,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     bool vector() const; // is the matrix a vector
     //@}
 
+#ifndef SWIG    
     /// get an element
     const T getElement(int i=0, int j=0) const;
+    
+    /// set an element
+    void setElement(int i, int j, const T& el);
     
     /// get a reference to an element
     T& getElementRef(int i=0, int j=0);
@@ -103,6 +109,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
     /// Const access an element 
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
+#endif // SWIG
 
     /** \brief  Make the matrix an dense n-by-m matrix */
     void makeDense(int n, int m, const T& val);
@@ -112,7 +119,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
     //@{
     /// Printing
+#ifndef SWIG
     virtual void print(std::ostream &stream=std::cout) const; // print default style
+#endif
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
     void printVector(std::ostream &stream=std::cout) const; // print vector-style
     void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
@@ -131,13 +140,25 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void resize(int n, int m);
     void reserve(int nnz);
 
+  protected:
+    // Constant zero
+//    static const T zero;
     
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
+
 };
 
+#ifdef SWIG
+%extend MX {
+std::string __repr__() { return $self->getRepresentation(); }
+}
+#endif // SWIG
+
+#ifndef SWIG
 // Implementations
+
 template<class T>
 const T Matrix<T>::getElement(int i, int j) const{
   int ind = sparsity_.getNZ(i,j);
@@ -145,6 +166,11 @@ const T Matrix<T>::getElement(int i, int j) const{
     return 0;
   else
     return std::vector<T>::at(ind);
+}
+
+template<class T>
+void Matrix<T>::setElement(int i, int j, const T& el){
+  getElementRef(i,j) = el;
 }
 
 template<class T>
@@ -329,6 +355,7 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
   std::vector<T>::resize(sparsity_.size());
 }
 
+#endif // SWIG
 
 } // namespace CasADi
 

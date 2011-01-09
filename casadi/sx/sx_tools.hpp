@@ -35,6 +35,31 @@ namespace ublas = boost::numeric::ublas;
 
 namespace CasADi{
 
+  #ifndef SWIG
+/** \brief Make a vector/matrix of symbolic variables - dimension 0 */
+void make_symbolic(SX& v, const std::string& name);
+
+/** \brief Make a vector/matrix of symbolic variables - higher dimension recursively */
+template<typename A>
+void make_symbolic(std::vector< A >& v, const std::string& name){
+  for(int i=0; i<v.size(); ++i){
+    std::stringstream ss;
+    ss << name << "_" << i;
+    make_symbolic(v[i],ss.str());
+  }
+}
+#endif
+
+/** \brief Create a one-dimensional stl vector of length n with symbolic variables */
+std::vector<SX> create_symbolic(const std::string& name, int n);
+
+/** \brief Create a two-dimensional stl vector of length n-by-m with symbolic variables */
+std::vector< std::vector<SX> > create_symbolic(const std::string& name, int n, int m);
+
+/** \brief Create a three-dimensional stl vector of length n-by-m-by-p with symbolic variables */
+std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
+
+  
 /** \brief  Expand the expression as a weighted sum (with constant weights)  */
 void expand(const SXMatrix& ex, SXMatrix &weights, SXMatrix& terms);
 
@@ -370,5 +395,30 @@ SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y);
 
 
 } // namespace CasADi
+
+#ifndef SWIG
+
+/** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
+namespace std{
+#define SXMatrix CasADi::SXMatrix
+SXMatrix sin(const SXMatrix &x);
+SXMatrix cos(const SXMatrix &x);
+SXMatrix tan(const SXMatrix &x);
+SXMatrix atan(const SXMatrix &x);
+SXMatrix asin(const SXMatrix &x);
+SXMatrix acos(const SXMatrix &x);
+SXMatrix exp(const SXMatrix &x); // natural expontial
+SXMatrix log(const SXMatrix &x); // natuaral logarithm
+SXMatrix pow(const SXMatrix &x, const SXMatrix &n); // power function
+SXMatrix sqrt(const SXMatrix &x); // square root
+SXMatrix fmin(const SXMatrix &x, const SXMatrix &y);
+SXMatrix fmax(const SXMatrix &x, const SXMatrix &y);
+SXMatrix floor(const SXMatrix &x);
+SXMatrix ceil(const SXMatrix &x); 
+SXMatrix erf(const SXMatrix &x); 
+#undef SXMatrix
+} // namespace std
+
+#endif
 
 #endif // SX_TOOLS_HPP

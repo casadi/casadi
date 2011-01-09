@@ -146,7 +146,7 @@ int main(){
       SXMatrix rhs = 0;
       for(int j=0; j<=K; ++j)
         rhs += Z(i,j)*C[j][k];
-      g << (h*F.eval(Z(i,k)) - rhs);
+      g << (h*F.eval(SX(Z(i,k))) - rhs);
     }
     
    // Add continuity equation to NLP
@@ -155,7 +155,7 @@ int main(){
      rhs += D[j]*Z(i,j);
 
    if(i<N-1)
-     g << (Z(i+1,0) - rhs);
+     g << (SX(Z(i+1,0)) - rhs);
 /*   else
     g << (ZF - rhs);*/
          

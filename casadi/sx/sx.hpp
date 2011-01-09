@@ -37,7 +37,7 @@
 
 namespace CasADi{
 
-/** \brief  forward declaration of Node and Matrix */
+  /** \brief  forward declaration of Node and Matrix */
 class SXNode; // include will follow in the end
 class SXMatrix; 
 
@@ -45,6 +45,14 @@ class SXMatrix;
   \author Joel Andersson 
   \date 2010
 */ 
+
+#ifdef SWIG
+#ifdef WITH_IMPLICITCONV
+%implicitconv SX;
+#endif // WITH_IMPLICITCONV
+#endif // SWIG
+
+
 class SX{
   friend class SXNode;
 
@@ -73,6 +81,7 @@ class SX{
 	This is the name that wil be used by the "operator<<" and "toSTring" methods.
 	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
+#ifndef SWIG
     explicit SX(const char name[]);  // variable
 
     explicit SX(SXNode* node); // (must be explicit, otherwise 0/NULL would be ambigous)
@@ -86,7 +95,9 @@ class SX{
   SX& operator=(const SX& scalar);
   SX& operator=(double scalar); // needed since otherwise both a = SX(double) and a = Matrix(double) would be ok
 //   SX& operator=(const SXMatrix& scalar);
+#endif // SWIG
 
+#ifndef SWIG
   //@{
   /** \brief  Operators that change the object */
   friend SX& operator+=(SX &ex, const SX &scalar);
@@ -118,7 +129,8 @@ class SX{
   friend SX operator!=(const SX &a, const SX &b);
   friend SX operator!(const SX &a);
   //@}
-  
+#endif // SWIG
+
   //@{
   /** \brief  constant nodes (to make sure that there are no dublications of them) */
   static const SX zero; // constant 0
@@ -129,7 +141,8 @@ class SX{
   static const SX inf; // infinity
   static const SX minf; // minus infinity
   //@}
-  
+
+#ifndef SWIG
   /** \brief  print to stream */
   friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
 
@@ -142,44 +155,89 @@ class SX{
   /** \brief  Access functions of the node */
   const SXNode* operator->() const;
   SXNode* operator->();
-
+#endif // SWIG
+  
   /** \brief  Perform operations by ID */
   static SX binary(int op, const SX& x, const SX& y);
   static SX unary(int op, const SX& x);
 
   protected:
+#ifndef SWIG
 SXNode* node;
 
 /** \brief  Function that do not have corresponding c-functions and are therefore not available publically */
 friend SX sign(const SX &x);
 /** \brief inline if-test */
 friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
+#endif // SWIG
 
 };
 
-/** \brief Make a vector/matrix of symbolic variables - dimension 0 */
-void make_symbolic(SX& v, const std::string& name);
 
-/** \brief Make a vector/matrix of symbolic variables - higher dimension recursively */
-template<typename A>
-void make_symbolic(std::vector< A >& v, const std::string& name){
-  for(int i=0; i<v.size(); ++i){
-    std::stringstream ss;
-    ss << name << "_" << i;
-    make_symbolic(v[i],ss.str());
-  }
+#ifdef SWIG
+%extend SX {
+std::string __str__()  { return $self->toString(); }
+std::string __repr__() { return $self->toString(); }
+double __float__() { return (*$self)->getValue();}
+int __int__() { return (*$self)->getIntValue();}
+bool isConstant() const{return (*$self)->isConstant();}
+bool isInteger() const{ return (*$self)->isInteger();}
+bool isSymbolic() const{ return (*$self)->isSymbolic();}
+bool isBinary() const{ return (*$self)->isBinary();}
+bool isZero() const{ return (*$self)->isZero();}
+bool isOne() const{ return (*$self)->isOne();}
+bool isMinusOne() const{ return (*$self)->isMinusOne();}
+bool isNan() const{ return (*$self)->isNan();}
+bool isInf() const{ return (*$self)->isInf();}
+bool isMinusInf() const{ return (*$self)->isMinusInf();}
+const std::string& getName() const{ return (*$self)->getName();}
+int getOp() const{ return (*$self)->getOp();}
+bool isEqual(const SX& scalar) const{ return (*$self)->isEqual(scalar);}
+
+//  all binary operations with a particular right argument
+#define binops(T,t) \
+T __add__(t b){  return *$self + b;} \
+T __radd__(t b){ return b + *$self;} \
+T __sub__(t b){  return *$self - b;} \
+T __rsub__(t b){ return b - *$self;} \
+T __mul__(t b){  return *$self * b;} \
+T __rmul__(t b){ return b * *$self;} \
+T __div__(t b){  return *$self / b;} \
+T __rdiv__(t b){ return b / *$self;} \
+T __pow__(t b){  return std::pow(*$self,b);} \
+T __rpow__(t b){ return std::pow(b,*$self);} \
+T fmin(t b){     return std::fmin(*$self,b);} \
+T fmax(t b){     return std::fmax(*$self,b);}
+
+// Binary operations with all right hand sides
+binops(SX, const SX&)
+binops(SX, double)
+
+// all unary operations
+#define unops(T) \
+T __neg__(){ return - *$self;}\
+T exp(){ return std::exp(*$self);}\
+T log(){ return std::log(*$self);}\
+T sqrt(){ return std::sqrt(*$self);}\
+T sin(){ return std::sin(*$self);}\
+T cos(){ return std::cos(*$self);}\
+T tan(){ return std::tan(*$self);}\
+T arcsin(){ return std::asin(*$self);}\
+T arccos(){ return std::acos(*$self);}\
+T arctan(){ return std::atan(*$self);}\
+T floor(){ return std::floor(*$self);}\
+T ceil(){ return std::ceil(*$self);}\
+T erf(){ return std::erf(*$self);}
+
+unops(SX)
+
 }
+#endif // SWIG
 
-/** \brief Create a one-dimensional stl vector of length n with symbolic variables */
-std::vector<SX> create_symbolic(const std::string& name, int n);
-
-/** \brief Create a two-dimensional stl vector of length n-by-m with symbolic variables */
-std::vector< std::vector<SX> > create_symbolic(const std::string& name, int n, int m);
-
-/** \brief Create a three-dimensional stl vector of length n-by-m-by-p with symbolic variables */
-std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
 
 } // namespace CasADi
+
+#ifndef SWIG
 
 /** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
 namespace std{
@@ -206,6 +264,8 @@ SX fmax(const SX &a, const SX &b);
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */
 #include "sx_node.hpp"
+
+#endif // SWIG
 
 
 #endif // SX_HPP

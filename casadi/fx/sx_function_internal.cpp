@@ -820,7 +820,7 @@ void SXFunctionInternal::eval(
         for(int j=0; j<x.size2(); ++j){
           SXMatrix mres;
           eval(x(i,j),mres);
-          res(i,j) = mres(0);
+          res(i,j) = SX(mres(0));
       }
       return;
   }

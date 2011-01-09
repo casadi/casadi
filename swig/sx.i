@@ -1,105 +1,33 @@
 %{
+#include "casadi/matrix/crs_sparsity.hpp"
+#include "casadi/matrix/matrix.hpp"
 #include "casadi/sx/sx.hpp"
 #include "casadi/sx/sx_matrix.hpp"
 #include "casadi/sx/sx_tools.hpp"
-#include "casadi/expression_tools.hpp"
 %}
 
 %include "typemaps.i"
+%include "casadi/matrix/crs_sparsity.hpp"
+%include "casadi/matrix/matrix.hpp"
+// %include "casadi/sx/sx.hpp"
 
 #ifdef WITH_NUMPY
 #include <numpy/arrayobject.h>
-
-//%typemap(in) SXMatrix
-// {
-//     PyErr_SetString(PyExc_TypeError,"Expected an SXMatrix");
-//}
-
 #endif // WITH_NUMPY
 
-namespace CasADi {
-
-#ifdef WITH_IMPLICITCONV
-%implicitconv SX;
-#endif WITH_IMPLICITCONV
-
-class SX {
-  public:
-  SX();
-  SX(const std::string& name);
-  SX(double val);
-  ~SX();
-};
-
-%extend SX {
-std::string __str__()  { return $self->toString(); }
-std::string __repr__() { return $self->toString(); }
-double __float__() { return (*$self)->getValue();}
-int __int__() { return (*$self)->getIntValue();}
-bool isConstant() const{return (*$self)->isConstant();}
-bool isInteger() const{ return (*$self)->isInteger();}
-bool isSymbolic() const{ return (*$self)->isSymbolic();}
-bool isBinary() const{ return (*$self)->isBinary();}
-bool isZero() const{ return (*$self)->isZero();}
-bool isOne() const{ return (*$self)->isOne();}
-bool isMinusOne() const{ return (*$self)->isMinusOne();}
-bool isNan() const{ return (*$self)->isNan();}
-bool isInf() const{ return (*$self)->isInf();}
-bool isMinusInf() const{ return (*$self)->isMinusInf();}
-const std::string& getName() const{ return (*$self)->getName();}
-int getOp() const{ return (*$self)->getOp();}
-bool isEqual(const SX& scalar) const{ return (*$self)->isEqual(scalar);}
-
-//  all binary operations with a particular right argument
-#define binops(T,t) \
-T __add__(t b){  return *$self + b;} \
-T __radd__(t b){ return b + *$self;} \
-T __sub__(t b){  return *$self - b;} \
-T __rsub__(t b){ return b - *$self;} \
-T __mul__(t b){  return *$self * b;} \
-T __rmul__(t b){ return b * *$self;} \
-T __div__(t b){  return *$self / b;} \
-T __rdiv__(t b){ return b / *$self;} \
-T __pow__(t b){  return std::pow(*$self,b);} \
-T __rpow__(t b){ return std::pow(b,*$self);} \
-T fmin(t b){     return std::fmin(*$self,b);} \
-T fmax(t b){     return std::fmax(*$self,b);}
-
-// Binary operations with all right hand sides
-binops(SX, const SX&)
-binops(SX, double)
-
-// all unary operations
-#define unops(T) \
-T __neg__(){ return - *$self;}\
-T exp(){ return std::exp(*$self);}\
-T log(){ return std::log(*$self);}\
-T sqrt(){ return std::sqrt(*$self);}\
-T sin(){ return std::sin(*$self);}\
-T cos(){ return std::cos(*$self);}\
-T tan(){ return std::tan(*$self);}\
-T arcsin(){ return std::asin(*$self);}\
-T arccos(){ return std::acos(*$self);}\
-T arctan(){ return std::atan(*$self);}\
-T floor(){ return std::floor(*$self);}\
-T ceil(){ return std::ceil(*$self);}\
-T erf(){ return std::erf(*$self);}
-
-unops(SX)
-
-}
-//SX if_else(const SX &cond, const SX &if_true, const SX &if_false); // ternary operator, "cond ? if_true : if_false"
-
-} // namespace CasADi
+%include "casadi/sx/sx.hpp"
 
 
 // Template instantiations
 %template(vector_PyObject) std::vector<PyObject*>;
-namespace std {
-%template(vector_sx) vector<CasADi::SX>;
-%template(vector_vector_sx) vector< vector<CasADi::SX> >;
-%template(vector_vector_vector_sx) vector< vector< vector<CasADi::SX> > >;
-} // namespace std;
+%template(vector_sx) std::vector<CasADi::SX>;
+%template(vector_vector_sx) std::vector< std::vector<CasADi::SX> >;
+%template(vector_vector_vector_sx) std::vector< std::vector< std::vector<CasADi::SX> > >;
+
+%template(matrix_sx) CasADi::Matrix<CasADi::SX>;
+%template(matrix_double) CasADi::Matrix<double>;
+%template(vector_matrix_sx) std::vector<CasADi::Matrix<CasADi::SX> >;
+%template(vector_matrix_double) std::vector<CasADi::Matrix<double> >;
 
 namespace CasADi{
 
@@ -107,6 +35,7 @@ namespace CasADi{
 %implicitconv SXMatrix;
 #endif WITH_IMPLICITCONV
 
+// NOTE NOTE NOTE: SXMatrix should be deleted!!!
 /*class SXMatrix : public std::vector<SX>{*/ // PROBLEM WITH INHERITANCE!
 class SXMatrix{
 public:
@@ -213,16 +142,6 @@ unops(SXMatrix)
 
 // Template instantiations
 %template(vector_sx_matrix) std::vector<CasADi::SXMatrix>;
-
-namespace CasADi{
-// Create an stl vector of sx variables
-std::vector<SX> create_symbolic(const std::string& name, int n);
-std::vector< vector<SX> > create_symbolic(const std::string& name, int n, int m);
-std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
-
-} // namespace CasADi
-
-
 
 #undef unops
 #undef binops

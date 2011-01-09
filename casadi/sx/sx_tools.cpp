@@ -24,13 +24,17 @@
 #include "../fx/sx_function_internal.hpp"
 #include "binary_functions.hpp"
 
-#include <cassert>
-
 namespace CasADi{
 
+void casadi_assert(bool cond, const std::string& msg="undefined error"){
+  if(!cond){
+    throw CasadiException(msg);
+  }
+}
+  
 SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, const SXMatrix &b, int order, const SXMatrix& w){
-  assert(order == 5);
-  assert(w.empty());
+  casadi_assert(order == 5, "gauss_quadrature: order must be 5");
+  casadi_assert(w.empty(),"gauss_quadrature: empty weights");
 
   // Change variables to [-1,1]
   if(!isEqual(a,-1) || !isEqual(b,1)){
@@ -178,7 +182,7 @@ SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val){
 SXMatrix pw_lin(const SX &t, const SXMatrix &tval, const SXMatrix &val){
   // Number of points
   int N = tval.numel();
-  assert(N>=2);
+  casadi_assert(N>=2,"pw_lin: N>=2");
 
   // Gradient for each line segment
   SXMatrix g(N-1,1);
@@ -250,8 +254,8 @@ SXMatrix vec(const SXMatrix &expr){
 }
 
 void getSub(SXMatrix &res, const SXMatrix &expr, int i, int j, int ni, int nj, int ki, int kj){
-  assert(ki==1 && kj==1);
-  assert(i+ni <= expr.size1() && j+nj <= expr.size2());
+  casadi_assert(ki==1 && kj==1,"getSub: ki==1 && kj==1");
+  casadi_assert(i+ni <= expr.size1() && j+nj <= expr.size2(),"getSub: i+ni <= expr.size1() && j+nj <= expr.size2()");
   res = SXMatrix(ni,nj);
   for(int r=0; r<ni; ++r)
     for(int c=0; c<nj; ++c)
@@ -268,7 +272,7 @@ void setSub(const SXMatrix &expr, SXMatrix &res, int i, int j){
 }
 
 void getRow(SXMatrix &res, const SXMatrix &expr, int i, int ni, int ki){
-  assert(i<expr.size1());
+  casadi_assert(i<expr.size1(),"getRow: i<expr.size1()");
   res = SXMatrix(ni,expr.size2());
   for(int ii=0; ii<ni; ++ii)
     for(int j=0; j<expr.size2(); ++j){
@@ -284,7 +288,7 @@ SXMatrix getRow( const SXMatrix &expr, int i, int ni, int ki){
 }
 
 void getColumn(SXMatrix &res, const SXMatrix &expr, int j, int nj, int kj){
-  assert(j<expr.size2());
+  casadi_assert(j<expr.size2(),"getColumn: j<expr.size2()");
   res = SXMatrix(expr.size1(),nj);
   for(int i=0; i<expr.size1(); ++i)
     for(int jj=0; jj<nj; ++jj){
@@ -300,7 +304,7 @@ SXMatrix getColumn( const SXMatrix &expr, int j, int nj, int kj){
 }
 
 void setRow(const SXMatrix& expr, SXMatrix &res, int i, int ni, int ki){
-  assert(i<res.size1());
+  casadi_assert(i<res.size1(),"setRow: i<res.size1()");
   for(int j=0; j<res.size2(); ++j){
     if(!expr(0,j)->isZero())
       res(i,j) = expr(0,j);
@@ -308,7 +312,7 @@ void setRow(const SXMatrix& expr, SXMatrix &res, int i, int ni, int ki){
 }
 
 void setColumn(const SXMatrix& expr, SXMatrix &res, int j, int nj, int kj){
-  assert(j<res.size2());
+  casadi_assert(j<res.size2(),"setColumn: j<res.size2()");
   for(int i=0; i<res.size1(); ++i){
     if(!expr(i,0)->isZero())
       res(i,j) = expr(i,0);
@@ -367,7 +371,7 @@ void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar)
 
           // find the corresponding derivative
           std::map<int, SX>::iterator r = dermap.find(fcn.algorithm[i].ch0);
-          assert(r != dermap.end());
+          casadi_assert(r != dermap.end());
 
           replace[i] = r->second;
         }
@@ -377,7 +381,7 @@ void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar)
   fcn.eval_symbolic(SXMatrix(),res,replace,repres);
   ex = res;
 
-  assert(0);
+  casadi_assert(0);
 
 }
 #endif
@@ -387,7 +391,7 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
   // Initialize
   SXFunction fcn(SXMatrix(),ex);
 
-  assert(bexpr.empty());
+  casadi_assert(bexpr.empty());
 
   // Nodes to be replaced
   std::map<int,SX> replace;
@@ -431,8 +435,8 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
   SXMatrix res;
   fcn->eval(SXMatrix(),res,replace,bexpr);
 
-  for(int i=0; i<bexpr.numel(); ++i)
-    bexpr(i) = bexpr(i)->dependent(0);
+  for(int i=0; i<bexpr.size(); ++i)
+    bexpr[i] = bexpr[i]->dependent(0);
 
   ex = res;
 
@@ -449,7 +453,7 @@ void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R){
   // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
   int m = A.size1();
   int n = A.size2();
-  assert(m>=n);
+  casadi_assert(m>=n);
 
   // Transpose of A
   SXMatrix AT = trans(A);
@@ -470,16 +474,16 @@ void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R){
       // Get the j-th column of Q
       SXMatrix qj = getRow(QT,j);
 
-      ri(0,j) = prod(qj,trans(qi))(0); // Modified Gram-Schmidt
+      ri(0,j) = prod(qj,trans(qi))[0]; // Modified Gram-Schmidt
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
 
       // Remove projection in direction j
-      qi -= ri(0,j) * qj;
+      qi -= SX(ri(0,j)) * qj;
     }
 
     // Normalize qi
-    ri(0,i) = norm_2(trans(qi));
-    qi /= ri(0,i);
+    ri(0,i) = norm_2(trans(qi))[0];
+    qi /= SX(ri(0,i));
 
     // Update RT and QT
     QT << qi;
@@ -533,8 +537,8 @@ bool isTriu(const SXMatrix &A){
 
 SXMatrix solve(const SXMatrix& A, const SXMatrix& b){
   // check dimensions
-  assert(A.size1() == b.size1());
-  assert(A.size1() == A.size2()); // make sure that A is square  
+  casadi_assert(A.size1() == b.size1());
+  casadi_assert(A.size1() == A.size2()); // make sure that A is square  
 
   if(isTril(A)){
     // forward substiution if lower triangular
@@ -671,12 +675,12 @@ SXMatrix hessian(const SXMatrix& ex, const SXMatrix &arg) {
 }
 
 double getValue(const SXMatrix& ex, int i, int j) {
-  assert(i<ex.size1() && j<ex.size2());
+  casadi_assert(i<ex.size1() && j<ex.size2());
   return ex(i,j)->getValue();
 }
 
 int getIntValue(const SXMatrix& ex, int i, int j) {
-  assert(i<ex.size1() && j<ex.size2());
+  casadi_assert(i<ex.size1() && j<ex.size2());
   return ex(i,j)->getIntValue();
 }
 
@@ -866,7 +870,7 @@ std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string
 
 
 void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
-  assert(ex2.scalar());
+  casadi_assert(ex2.scalar());
   SX ex = ex2.getElement();
   
   // Terms, weights and indices of the nodes that are already expanded
@@ -899,7 +903,7 @@ void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
       f.push_back(to_be_expanded.top());
     } else { // binary node
 
-        assert(to_be_expanded.top()->isBinary()); // make sure that the node is binary
+        casadi_assert(to_be_expanded.top()->isBinary()); // make sure that the node is binary
 
         // Check if addition, subtracton or multiplication
         BinarySXNode*     binnode = (BinarySXNode*)to_be_expanded.top();
@@ -1151,5 +1155,99 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
   return r;
 }
 
+void make_symbolic(SX& v, const std::string& name){
+  v = SX(name);
+}
+
+vector<SX> create_symbolic(const string& name, int n){
+  vector<SX> ret(n);
+  make_symbolic(ret,name);
+  return ret;
+}
+
+vector< vector<SX> > create_symbolic(const std::string& name, int n, int m){
+  vector< vector<SX> > ret(n,vector<SX>(m));
+  make_symbolic(ret,name);
+  return ret;
+}
+
+vector< vector< vector<SX> > > create_symbolic(const std::string& name, int n, int m, int p){
+  vector< vector< vector<SX> > > ret(n,vector< vector<SX> >(m, vector<SX>(p)));
+  make_symbolic(ret,name);
+  return ret;
+}
+
+
 } // namespace CasADi
+
+
+namespace std{
+using namespace CasADi;
+
+
+SXMatrix sin(const SXMatrix& x){
+  return unary(SIN_NODE,x);
+}
+
+SXMatrix cos(const SXMatrix& x){
+  return unary(COS_NODE,x);
+}
+
+SXMatrix tan(const SXMatrix& x){
+  return unary(TAN_NODE,x);
+}
+
+SXMatrix atan(const SXMatrix& x){
+  return unary(ATAN_NODE,x);
+}
+
+SXMatrix asin(const SXMatrix& x){
+  return unary(ASIN_NODE,x);
+}
+
+SXMatrix acos(const SXMatrix& x){
+  return unary(ACOS_NODE,x);
+}
+
+SXMatrix exp(const SXMatrix& x){
+  return unary(EXP_NODE,x);
+}
+
+SXMatrix log(const SXMatrix& x){
+  return unary(LOG_NODE,x);
+}
+
+SXMatrix pow(const SXMatrix& x, const SXMatrix& n){
+  return binary(POW_NODE,x,n);
+}
+
+SXMatrix sqrt(const SXMatrix& x){
+  return unary(SQRT_NODE,x);
+}
+
+SXMatrix fmin(const SXMatrix& x, const SXMatrix& y){
+  return binary(FMIN_NODE,x,y);
+}
+
+SXMatrix fmax(const SXMatrix& x, const SXMatrix& y){
+  return binary(FMAX_NODE,x,y);
+}
+
+SXMatrix floor(const SXMatrix& x){
+  return unary(FLOOR_NODE,x);
+}
+
+SXMatrix ceil(const SXMatrix& x){
+  return unary(CEIL_NODE,x);
+}
+
+SXMatrix erf(const SXMatrix& x){
+  return unary(ERF_NODE,x);
+}
+
+
+} // namespace std
+
+
+
 

@@ -24,6 +24,7 @@
 #include "casadi/mx/mx.hpp"
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
+#include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/fx.hpp"
 #include <ctime>
 

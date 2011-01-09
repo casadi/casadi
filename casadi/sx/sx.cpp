@@ -264,27 +264,6 @@ string SX::toString() const{
   return ss.str();
 }
 
-void make_symbolic(SX& v, const std::string& name){
-  v = SX(name);
-}
-
-vector<SX> create_symbolic(const string& name, int n){
-  vector<SX> ret(n);
-  make_symbolic(ret,name);
-  return ret;
-}
-
-vector< vector<SX> > create_symbolic(const std::string& name, int n, int m){
-  vector< vector<SX> > ret(n,vector<SX>(m));
-  make_symbolic(ret,name);
-  return ret;
-}
-
-vector< vector< vector<SX> > > create_symbolic(const std::string& name, int n, int m, int p){
-  vector< vector< vector<SX> > > ret(n,vector< vector<SX> >(m, vector<SX>(p)));
-  make_symbolic(ret,name);
-  return ret;
-}
 
 } // namespace CasADi
 

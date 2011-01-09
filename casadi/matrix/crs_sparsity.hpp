@@ -96,13 +96,19 @@ class CRSSparsity : public SharedObject{
     
     /// Get the index of a non-zero element (return -1 if not exists)
     int getNZ(int i, int j) const;
-
     
     /// Scalar expression
 //    static const CRSSparsity scalar;
 
 };
 
+#ifdef SWIG
+%extend CRSSparsity {
+std::string __repr__() { return $self->getRepresentation(); }
+}
+#endif // SWIG
+
+#ifndef SWIG
 class CRSSparsityNode : public SharedObjectNode{
   public:
     /// Construct a sparsity pattern from vectors
@@ -110,6 +116,12 @@ class CRSSparsityNode : public SharedObjectNode{
 
     /// Clone
     virtual CRSSparsityNode* clone() const{ return new CRSSparsityNode(*this); }
+
+    /// Print representation
+    virtual void repr(std::ostream &stream) const;
+
+    /// Print description
+    virtual void print(std::ostream &stream) const;
 
     /// Number of rows
     int nrow_;
@@ -123,6 +135,7 @@ class CRSSparsityNode : public SharedObjectNode{
     /// vector of length n+1 containing the index of the last non-zero element up till each row 
     std::vector<int> rowind_;
 };
+#endif // SWIG
 
 } // namespace CasADi
 
