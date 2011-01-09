@@ -41,14 +41,8 @@ friend class MXFunctionInternal;
 
 public:
   
-/** \brief  Default constructor, multiple dependencies */
- explicit MXNode(const std::vector<MX>& dep=std::vector<MX>()); // multiple dependencies, default constructor
-/** \brief Unary node constructor */
- explicit MXNode(const MX& dep); // unary node
-/** \brief Binary node constructor */
- explicit MXNode(const MX& dep1, const MX& dep2); // binary node
-/** \brief Ternary node constructor */
- explicit MXNode(const MX& dep1, const MX& dep2, const MX& dep3); // ternary node
+  /** \brief  Constructor */
+  explicit MXNode();
 
 /** \brief  Destructor */
   virtual ~MXNode();
@@ -112,6 +106,17 @@ public:
     /// Set size
     void setSize(int nrow, int ncol);
     
+    /// Set unary dependency
+    void setDependencies(const MX& dep);
+    
+    /// Set binary dependencies
+    void setDependencies(const MX& dep1, const MX& dep2);
+    
+    /// Set ternary dependencies
+    void setDependencies(const MX& dep1, const MX& dep2, const MX& dep3);
+    
+    /// Set multiple dependencies
+    void setDependencies(const std::vector<MX>& dep);
     
     //! Number of derivatives
     int maxord_;

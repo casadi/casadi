@@ -32,7 +32,8 @@ namespace CasADi{
 
 double IfElseNode::tol = 1e-6;
   
-IfElseNode::IfElseNode(const MX& cond, const MX& if_true, const MX& if_false) : MXNode(cond,if_true,if_false){
+IfElseNode::IfElseNode(const MX& cond, const MX& if_true, const MX& if_false){
+  setDependencies(cond,if_true,if_false);
   assert(cond.numel()==1);
   assert(if_true.size1()==if_false.size1() || if_true.size2()==if_false.size2());
   setSize(if_true.size1(),if_true.size2());

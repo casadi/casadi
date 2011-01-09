@@ -30,7 +30,8 @@ using namespace std;
 namespace CasADi{
 
 // Constructor
-Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : MXNode(dep), fcn_(fcn), oind(oind_) {
+Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : fcn_(fcn), oind(oind_) {
+  setDependencies(dep);
   setSize(fcn_->output_[oind].size1(),fcn_->output_[oind].size2());
 }
 

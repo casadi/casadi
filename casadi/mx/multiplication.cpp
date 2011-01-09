@@ -28,7 +28,8 @@ using namespace std;
 
 namespace CasADi{
 
-Multiplication::Multiplication(const MX& x, const MX& y) : MXNode(x,y){
+Multiplication::Multiplication(const MX& x, const MX& y){
+  setDependencies(x,y);
   if(x.size2() != y.size1()) throw CasadiException("Multiplication::dimension mismatch");
   setSize(x.size1(),y.size2());
   ni = dep(0).size1();

@@ -29,7 +29,8 @@ using namespace std;
 
 namespace CasADi{
 
-UnaryOp::UnaryOp(OPERATION op_, const MX& x) : op(op_), MXNode(x){
+UnaryOp::UnaryOp(OPERATION op_, const MX& x) : op(op_){
+  setDependencies(x);
   setSize(x.size1(),x.size2());
 }
 

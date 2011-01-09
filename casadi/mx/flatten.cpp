@@ -27,7 +27,8 @@ using namespace std;
 
 namespace CasADi{
 
-Flatten::Flatten(const MX& x) : MXNode(x){
+Flatten::Flatten(const MX& x){
+  setDependencies(x);
   setSize(x.size2()*x.size1(),1);
 }
 

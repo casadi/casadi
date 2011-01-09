@@ -30,10 +30,12 @@ using namespace std;
 namespace CasADi{
 
 // Constructor
-Reordering::Reordering(const vector<MX>& dep__) : MXNode(dep__){
+Reordering::Reordering(const vector<MX>& dep__){
+  setDependencies(dep__);
 }
 
-Reordering::Reordering(const MX &dep__) : MXNode(dep__){
+Reordering::Reordering(const MX &dep__){
+  setDependencies(dep__);
 }
 
 void Reordering::evaluate(int fsens_order, int asens_order){

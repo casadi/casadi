@@ -30,7 +30,8 @@ using namespace std;
 namespace CasADi{
 
 // Constructor
-Vertcat::Vertcat(const vector<MX>& dep__) : MXNode(dep__){
+Vertcat::Vertcat(const vector<MX>& dep__){
+  setDependencies(dep__);
   assert(!dep_.empty());
   int sz1=0;
   int sz2=dep(0).size2();

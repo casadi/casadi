@@ -21,13 +21,13 @@
  */
 
 #include "reshape.hpp"
-#include <cassert>
 
 using namespace std;
 
 namespace CasADi{
 
-Reshape::Reshape(const MX& x, int n, int m) : MXNode(x){
+Reshape::Reshape(const MX& x, int n, int m){
+  setDependencies(x);
   if (n*m != x.numel()) {
     throw CasadiException("MX::reshape: size must be same before and after reshaping");
   }

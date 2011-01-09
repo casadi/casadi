@@ -28,37 +28,10 @@ using namespace std;
 
 namespace CasADi{
 
-MXNode::MXNode(const vector<MX>& dep) : dep_(dep){
+MXNode::MXNode(){
   maxord_ = 0;
   nfdir_ = 1;
   nadir_ = 1;
-}
-
-MXNode::MXNode(const MX& dep){
-  maxord_ = 0;
-  nfdir_ = 1;
-  nadir_ = 1;
-  dep_.resize(1);
-  dep_[0] = dep;
-}
-
-MXNode::MXNode(const MX& dep1, const MX& dep2){
-  maxord_ = 0;
-  nfdir_ = 1;
-  nadir_ = 1;
-  dep_.resize(2);
-  dep_[0] = dep1;
-  dep_[1] = dep2;
-}
-
-MXNode::MXNode(const MX& dep1, const MX& dep2, const MX& dep3){
-  maxord_ = 0;
-  nfdir_ = 1;
-  nadir_ = 1;
-  dep_.resize(3);
-  dep_[0] = dep1;
-  dep_[1] = dep2;
-  dep_[2] = dep3;
 }
 
 MXNode::~MXNode(){
@@ -183,6 +156,28 @@ std::vector<double>& MXNode::adjSens(int ind, int dir){
 
 void MXNode::setSize(int nrow, int ncol){
   output_ = Matrix<double>(nrow,ncol,0);
+}
+
+void MXNode::setDependencies(const MX& dep){
+  dep_.resize(1);
+  dep_[0] = dep;
+}
+    
+void MXNode::setDependencies(const MX& dep1, const MX& dep2){
+  dep_.resize(2);
+  dep_[0] = dep1;
+  dep_[1] = dep2;
+}
+    
+void MXNode::setDependencies(const MX& dep1, const MX& dep2, const MX& dep3){
+  dep_.resize(3);
+  dep_[0] = dep1;
+  dep_[1] = dep2;
+  dep_[2] = dep3;
+}
+
+void MXNode::setDependencies(const std::vector<MX>& dep){
+  dep_ = dep;
 }
 
 int MXNode::size1() const{

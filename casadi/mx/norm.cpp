@@ -24,7 +24,8 @@
 
 namespace CasADi{
 
-Norm::Norm(const MX& x) : MXNode(x){
+Norm::Norm(const MX& x){
+  setDependencies(x);
   setSize(1,1);
 }
 

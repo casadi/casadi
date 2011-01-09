@@ -30,7 +30,8 @@ using namespace std;
 namespace CasADi{
 
 // Constructor
-Horzcat::Horzcat(const vector<MX>& dep__) : MXNode(dep__){
+Horzcat::Horzcat(const vector<MX>& dep__){
+  setDependencies(dep__);
   assert(!dep_.empty());
   int sz1=dep(0).size1();
   int sz2=0;

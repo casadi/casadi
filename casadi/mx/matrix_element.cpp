@@ -26,7 +26,8 @@ using namespace std;
 
 namespace CasADi{
 
-MatrixElement::MatrixElement(const MX& x, int i_, int j_) : MXNode(x), i(i_), j(j_){
+MatrixElement::MatrixElement(const MX& x, int i_, int j_) : i(i_), j(j_){
+  setDependencies(x);
   assert(i>=0 && i<x.size1());
   assert(j>=0 && j<x.size2());
   setSize(1,1);

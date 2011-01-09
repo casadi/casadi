@@ -30,7 +30,8 @@ using namespace std;
 
 namespace CasADi{
 
-ScalarMatrixOp::ScalarMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_), MXNode(x,y){
+ScalarMatrixOp::ScalarMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
+  setDependencies(x,y);
   assert(x.numel() == 1);
   setSize(y.size1(),y.size2());
 }
