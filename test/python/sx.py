@@ -24,6 +24,15 @@ class SXtests(casadiTestCase):
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
+    self.matrixpool=FunctionPool()
+    self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
+    self.matrixbinarypool=FunctionPool()
+    self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
+    self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
+    self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
+    #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
+    self.matrixbinarypool.append(lambda a: c.prod(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"prod(Matrix,Matrix.T)")
+
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
     
@@ -57,6 +66,7 @@ class SXtests(casadiTestCase):
       p0=10 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
+      print dx
       dxr=p0;
       self.evaluationCheck([dx],dxr,[x,p],[x0,p0],name="jacobian");
 
@@ -67,11 +77,31 @@ class SXtests(casadiTestCase):
       
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
-  def test_SXMAtrix(self):
+  def test_SXMatrix(self):
       x=SXMatrix("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
-      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix")
+      
+      x=SXMatrix("x",3,3)
+      x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
+      #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
+      self.numpyEvaluationCheck(lambda x: SXMatrix(c.det(x[0])), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
+      self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
+        
+  def test_SXMatrixbinary(self):
+      x=SXMatrix("x",3,2)
+      y=SXMatrix("x",3,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
+      self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
+      self.assertRaises(RuntimeError, lambda : c.prod(x,y))
+    
+  def test_SXMAtrixSparse(self):
+      x=SXMatrix("x",3,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+      
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix_sparse")
   
   def test_SX1(self):
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
