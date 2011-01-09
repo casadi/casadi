@@ -1135,8 +1135,8 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
     jac.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac.output().rowind_;
-    const vector<int>& col = jac.output().col_;
+    const vector<int>& rowind = jac.output().rowind();
+    const vector<int>& col = jac.output().col();
     const vector<double>& val = jac.output().data();
 
     // Factor
@@ -1192,8 +1192,8 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   jac_.evaluate();
 
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_.output().rowind_;
-  const vector<int>& col = jac_.output().col_;
+  const vector<int>& rowind = jac_.output().rowind();
+  const vector<int>& col = jac_.output().col();
   const vector<double>& val = jac_.output().data();
 
   // Loop over rows

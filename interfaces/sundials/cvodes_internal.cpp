@@ -1041,8 +1041,8 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   jac_f_.evaluate();
   
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_f_.output().rowind_;
-  const vector<int>& col = jac_f_.output().col_;
+  const vector<int>& rowind = jac_f_.output().rowind();
+  const vector<int>& col = jac_f_.output().col();
   const vector<double>& val = jac_f_.output().data();
 
   // Loop over rows
@@ -1088,8 +1088,8 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   jac_f_.evaluate();
   
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_f_.output().rowind_;
-  const vector<int>& col = jac_f_.output().col_;
+  const vector<int>& rowind = jac_f_.output().rowind();
+  const vector<int>& col = jac_f_.output().col();
   const vector<double>& val = jac_f_.output().data();
 
   // Loop over rows

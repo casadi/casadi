@@ -30,8 +30,8 @@ namespace CasADi {
     r = n.array((),dtype=float)
     r.resize(self.size1(),self.size2())
     for i in range(self.size1()):  # loop over rows
-      for el in range(self.rowind_[i],self.rowind_[i+1]): # loop over the non-zero elements
-        j=self.col_[el]  # column
+      for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
+        j=self.col(el)  # column
         r[i,j] = v[el] # add the non-zero element
 
     return r

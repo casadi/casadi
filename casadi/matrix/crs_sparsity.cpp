@@ -103,13 +103,36 @@ int CRSSparsity::rowind(int row) const{
 
 void CRSSparsity::resize(int nrow, int ncol){
   if(nrow != size1() || ncol != size2()){
-    makeUnique();
-    if(nrow < size1() || ncol < size2())
-      throw CasadiException("CRSSparsity::resize: Can only make larger");
+    if(nrow < size1() || ncol < size2()){
+      // Row and column index of the new
+      vector<int> col_new, rowind_new(nrow+1,0);
 
-    (*this)->nrow_ = nrow;
-    (*this)->ncol_ = ncol;
-    (*this)->rowind_.resize(size1()+1,size());
+      // Loop over the rows which may contain nonzeros
+      int i;
+      for(i=0; i<size1() && i<nrow; ++i){
+        // First nonzero element of the row
+        rowind_new[i] = col_new.size();
+        
+        // Record columns of the nonzeros
+        for(int el=rowind(i); el<rowind(i+1) && col(el)<ncol; ++el){
+          col_new.push_back(col(el));
+        }
+      }
+      
+      // Save row-indices for the rest of the rows
+      for(; i<nrow+1; ++i){
+        rowind_new[i] = col_new.size();
+      }
+        
+      // Save the sparsity
+      *this = CRSSparsity(nrow,ncol,col_new,rowind_new);
+      
+    } else {
+      // Make larger: Very cheap operation
+      (*this)->nrow_ = nrow;
+      (*this)->ncol_ = ncol;
+      (*this)->rowind_.resize(size1()+1,size());
+    }
   }
 }
 

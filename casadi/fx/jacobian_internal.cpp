@@ -38,13 +38,13 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   setOption("sparse", false);
 
   // make sure that input and output are vectors (not matrices)
-  if(fcn_->input_.at(iind_).ncol_ != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
-  if(fcn_->output_.at(oind_).ncol_ != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
+  if(fcn_->input_.at(iind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
+  if(fcn_->output_.at(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
 
   // get the dimensions
   
-  n_ = fcn_->input_[iind_].nrow_;
-  m_ = fcn_->output_[oind_].nrow_;
+  n_ = fcn_->input_[iind_].size1();
+  m_ = fcn_->output_[oind_].size1();
 
   input_ = fcn_->input_;
   
@@ -90,6 +90,7 @@ void JacobianInternal::init(){
   }
   
   assert(0);
+  throw CasadiException("JacobianInternal::init: sparse deactivated");
   
   // Input and output seed vectors
   std::vector<double>& dir = fcn_.input(iind_).dataF();
@@ -136,7 +137,7 @@ void JacobianInternal::init(){
     }
 
   // Set the sparsity of the output
-  output_.at(0).setSparsity(rr_,cc_,elind_);
+//  output_.at(0).setSparsity(rr_,cc_,elind_);
     
 }
 

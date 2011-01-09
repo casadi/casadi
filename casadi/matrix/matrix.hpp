@@ -50,6 +50,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// dense n-by-m matrix filled with val constructor
     Matrix(int n, int m, const T& val);
 
+    /// sparse n-by-m matrix filled with given sparsity
+    Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind);
+
     /// This constructor enables implicit type conversion from a scalar type
     Matrix(const T &val);
 
@@ -319,6 +322,13 @@ Matrix<T>::Matrix(const T &val){
   sparsity_ = CRSSparsity(1,1,true);
   std::vector<T>::resize(1,val);
 }
+
+template<class T>
+Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind){
+  sparsity_ = CRSSparsity(n,m,col,rowind);
+  std::vector<T>::resize(sparsity_.size());
+}
+
 
 } // namespace CasADi
 

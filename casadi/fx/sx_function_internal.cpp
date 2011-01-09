@@ -861,8 +861,8 @@ void SXFunctionInternal::eval(
 
   // copy the result
   for(int i=0; i<output_[0].size1(); ++i) // loop over rows
-    for(int el=output_[0].rowind_[i]; el<output_[0].rowind_[i+1]; ++el){ // loop over the non-zero elements of the original matrix
-      int j=output_[0].col_[el];  // column
+    for(int el=output_[0].rowind(i); el<output_[0].rowind(i+1); ++el){ // loop over the non-zero elements of the original matrix
+      int j=output_[0].col(el);  // column
       res(i,j) = work[output_ind[0][el]];
   }
 
@@ -1087,7 +1087,7 @@ return ret;
     }
               
     for(int i=0; i<output_.at(oind).size1(); ++i) // loop over rows of the output
-      for(int el=output_.at(oind).rowind_[i]; el<output_.at(oind).rowind_[i+1]; ++el){ // loop over the non-zero elements
+      for(int el=output_.at(oind).rowind(i); el<output_.at(oind).rowind(i+1); ++el){ // loop over the non-zero elements
         assert(output_.at(oind).col_[el] == 0); // column
 
         // Clear seeds (from symbolic components)
@@ -1131,8 +1131,8 @@ return ret;
     
     
     for(int i=0; i<input_.at(iind).size1(); ++i) // loop over rows of the gradient
-      for(int el=input_.at(iind).rowind_[i]; el<input_.at(iind).rowind_[i+1]; ++el){ // loop over the non-zero elements
-        assert(input_.at(iind).col_[el] == 0); // column
+      for(int el=input_.at(iind).rowind(i); el<input_.at(iind).rowind(i+1); ++el){ // loop over the non-zero elements
+        assert(input_.at(iind).col(el) == 0); // column
      
         // set all components to zero (a bit quicker than to use fill)
         for(vector<SX>::iterator it=g.begin(); it!=g.end(); ++it)

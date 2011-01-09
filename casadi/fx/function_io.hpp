@@ -24,6 +24,7 @@
 #define FUNCTION_IO_HPP
 
 #include <vector>
+#include "../matrix/matrix.hpp"
 
 // TODO: Remove this class and replace with functions for the sparsity pattern as well as a small structure to be placed inside the FX class
 
@@ -31,7 +32,7 @@ namespace CasADi{
 
 /** Sparsity format for getting and setting inputs and outputs */
 enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
-  
+
 /** \brief  An output or input of the function (forward or adjoint)
   \author Joel Andersson 
   \date 2010
@@ -55,7 +56,7 @@ class FunctionIO{
     void setSparsityCRS(const std::vector<int>& rowind, const std::vector<int> &col); // Compressed row storage
 
     /** \brief  Set the sparsity pattern, general sparse format */
-    void setSparsity(const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& elind);
+/*    void setSparsity(const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& elind);*/
             
     /// Set the number of derivative directions
     void setNumFwdDir(int ndir);
@@ -92,15 +93,9 @@ class FunctionIO{
     // (Re)allocate the data
     void init();
 
-    /** \brief  Sparsity (CRS format): index of the first element on each row */
-    std::vector<int> rowind_;
-
-    /** \brief  Sparsity (CRS format): column for each non-zero element */
-    std::vector<int> col_;
+    /** \brief  Dense? */
+    bool dense_;
     
-    /** \brief  Size */
-    int nrow_, ncol_;
-
     /** \brief  Access the non-zero entries */
     std::vector<double>& data(int dir=0);
 
@@ -139,21 +134,29 @@ class FunctionIO{
     ldres: The leading dimension in res 
     res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, double *res, int dir=0) const;
-        
+
+    
+    const std::vector<int>& rowind() const;
+    std::vector<int>& rowind();
+    const std::vector<int>& col() const;
+    std::vector<int>& col();
+    int rowind(int i) const;
+    int col(int el) const;
+    
   protected:
 
     /** \brief  Size */
     int nfdir_, nadir_;
     
     /** \brief  Non-zero elements for the input/output or forward/adjoint seeds/derivatives */
-    std::vector< std::vector<double> > data_;
+    std::vector< Matrix<double> > data_;
 
     /** \brief Assert that the number of nonzeros is correct */
     void assertNNZ(int sz, Sparsity sp) const;
     
     /** \brief Assert that the number of elements is correct */
     void assertNumEl(int sz) const;
-        
+            
 };
 
 } // namespace CasADi
