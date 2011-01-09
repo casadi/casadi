@@ -2,6 +2,8 @@
 #include "casadi/sx/sx.hpp"
 #include "casadi/sx/sx_matrix.hpp"
 #include "casadi/sx/sx_tools.hpp"
+#include "casadi/expression_tools.hpp"
+#include <iostream>
 %}
 
 %include "typemaps.i"
@@ -91,7 +93,9 @@ unops(SX)
 
 } // namespace CasADi
 
+
 // Template instantiations
+%template(vector_PyObject) std::vector<PyObject*>;
 namespace std {
 %template(vector_sx) vector<CasADi::SX>;
 %template(vector_vector_sx) vector< vector<CasADi::SX> >;
@@ -152,6 +156,38 @@ SXMatrix dot(const SXMatrix &y){ return prod(*$self,y); }
 // Get and set elements
 SX __getitem__(int i){ return $self->getElement(i);}
 SX __getitem__(const std::vector<int> &I ){ if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); return $self->getElement(I[0],I[1]);}
+
+
+
+SXMatrix __getitem__(const std::vector<PyObject*> &I ) {
+      if(I.size()!=2) throw CasADi::CasadiException("__getitem__(vector<PyObject*>): not 2D");
+      int  	i[2];
+		  int  	n[2];
+		  int  	k[2];
+		  
+		  int s[2]={(*$self).size1(),(*$self).size2()};
+		  
+		  for (int j=0;j<2;j++) {
+		    PyObject *q = I[j];
+        if( PySlice_Check(q) ) {
+          PySliceObject* slice=(PySliceObject*) q;
+          if (slice->start==Py_None) {i[j]=0; } else {i[j]=PyInt_AsLong(slice->start);}
+          if (slice->stop==Py_None)  {n[j]=s[j]-i[j];} else {n[j]=PyInt_AsLong(slice->stop)-i[j];}
+          if (slice->step==Py_None)  {k[j]=1; } else {k[j]=PyInt_AsLong(slice->step);}
+        } else if (PyInt_Check(q)) {
+          i[j]=PyInt_AsLong(q);
+          n[j]=1;
+          k[j]=1;
+        } else {
+          SWIG_Error(SWIG_TypeError, "__getitem__: Slice or int expected");
+        }
+		  }
+		  
+		  CasADi::SXMatrix res;
+		  std::cout << "tuut " << i[0]<< ", " << i[1]<< ", " << n[0]<< ", " << n[1]<< ", " << k[0]<< ", " <<k[1];
+      getSub(res,*$self,i[0],i[1],n[0],n[1],k[0],k[1]);
+      return res;
+}
 
 #define SETTERS(T) \
 void __setitem__(int i, T el){ $self->getElementRef(i) = el;}\

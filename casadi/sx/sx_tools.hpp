@@ -144,7 +144,9 @@ SXMatrix sign(const SXMatrix &x);     // sign function
 /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
 SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, const SXMatrix &b, int order=5, const SXMatrix& w=SXMatrix());
 
-/** \brief  make a vector */
+/** \brief  make a vector
+  Reshapes/flattens the SXMatrix such that the shape becomes (expr.numel(),1)
+ */
 SXMatrix vec(const SXMatrix &expr); 
 
 /// ... = A(i:ki:i+ni,j:kj:j+nj)
