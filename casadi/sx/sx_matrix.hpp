@@ -30,11 +30,6 @@
 #include "../matrix/matrix.hpp"
 
 namespace CasADi{
-#ifdef SWIG
-#ifdef WITH_IMPLICITCONV
-%implicitconv SXMatrix;
-#endif // WITH_IMPLICITCONV
-#endif // SWIG
   
 /** \brief General sparse symbolic matrix class
   NOTE NOTE NOTE
