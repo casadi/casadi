@@ -124,10 +124,6 @@ public:
     //! Number of derivative directions
     int nfdir_, nadir_;
     
-    /** \brief  expression size */
-/*    int nrow_;
-    int ncol_;*/
-  
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;
     
@@ -137,16 +133,15 @@ public:
     /// Get size
     int size2() const;
     
-    
   private:
     /** \brief  Numerical value of output */
    Matrix<double> output_;
 
     /** \brief  Numerical value of forward sensitivities */
-   std::vector<std::vector<double> > forward_sensitivities_;
+   std::vector<Matrix<double> > forward_sensitivities_;
 
     /** \brief  Numerical value of adjoint seeds */
-   std::vector<std::vector<double> > adjoint_seeds_;
+   std::vector<Matrix<double> > adjoint_seeds_;
 
 };
 
