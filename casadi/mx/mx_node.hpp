@@ -62,9 +62,6 @@ public:
 /** \brief  Evaluate the function and store the result in the node */
   virtual void evaluate(int fsens_order, int asens_order) = 0;
 
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-//  virtual void evaluateAdj();
-
 /** \brief  Initialize */
   virtual void init();
   
@@ -112,6 +109,10 @@ public:
   std::vector<double>& adjSens(int ind, int dir=0);
 
   protected:
+    /// Set size
+    void setSize(int nrow, int ncol);
+    
+    
     //! Number of derivatives
     int maxord_;
     
@@ -119,15 +120,22 @@ public:
     int nfdir_, nadir_;
     
     /** \brief  expression size */
-    int nrow_;
-    int ncol_;
+/*    int nrow_;
+    int ncol_;*/
   
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;
     
+    /// Get size
+    int size1() const;
+    
+    /// Get size
+    int size2() const;
+    
+    
   private:
     /** \brief  Numerical value of output */
-   std::vector<double> output_;
+   Matrix<double> output_;
 
     /** \brief  Numerical value of forward sensitivities */
    std::vector<std::vector<double> > forward_sensitivities_;

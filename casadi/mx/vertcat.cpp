@@ -37,9 +37,8 @@ Vertcat::Vertcat(const vector<MX>& dep__) : MXNode(dep__){
   for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
     sz1 += it->size1();
     assert(sz2==it->size2());
-  }  
-  nrow_ = sz1;
-  ncol_ = sz2;
+  }
+  setSize(sz1,sz2);
 }
 
 Vertcat* Vertcat::clone() const{

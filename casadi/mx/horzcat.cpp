@@ -40,9 +40,8 @@ Horzcat::Horzcat(const vector<MX>& dep__) : MXNode(dep__){
     assert(sz1==it->size1());
     cumulSize2[cnt++] = sz2;
     sz2 += it->size2();
-  }  
-  nrow_ = sz1;
-  ncol_ = sz2;
+  }
+  setSize(sz1,sz2);
 }
 
 Horzcat* Horzcat::clone() const{
@@ -63,7 +62,7 @@ void Horzcat::evaluate(int fsens_order, int asens_order){
     for(int i=0; i<ndep(); ++i){
       int offset = cumulSize2[cnt++];
       for (int k=0; k < dep_[i].size1(); k++) {
-        copy(&input(i)[k*dep_[i].size2()],&input(i)[k*dep_[i].size2()]+dep_[i].size2(),&output()[offset+k*ncol_]);
+        copy(&input(i)[k*dep_[i].size2()],&input(i)[k*dep_[i].size2()]+dep_[i].size2(),&output()[offset+k*size2()]);
       }
     }
   } else {
@@ -71,7 +70,7 @@ void Horzcat::evaluate(int fsens_order, int asens_order){
     for(int i=0; i<ndep(); ++i){
       int offset = cumulSize2[cnt++];
       for (int k=0; k < dep_[i].size1(); k++) {
-        copy(&fwdSeed(i)[k*dep_[i].size2()],&fwdSeed(i)[k*dep_[i].size2()]+dep_[i].size2(),&fwdSens()[offset+k*ncol_]);
+        copy(&fwdSeed(i)[k*dep_[i].size2()],&fwdSeed(i)[k*dep_[i].size2()]+dep_[i].size2(),&fwdSens()[offset+k*size2()]);
       }
     }
   }

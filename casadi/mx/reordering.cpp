@@ -40,17 +40,17 @@ void Reordering::evaluate(int fsens_order, int asens_order){
  assert(fsens_order==0 || asens_order==0);
   
   if(fsens_order==0){
-    for (int k=0;k<nrow_*ncol_;k++) {
+    for (int k=0;k<size1()*size2();k++) {
       output()[k]=input(k2l(k))[k2k(k)];
     }
   } else {
-    for (int k=0;k<nrow_*ncol_;k++) {
+    for (int k=0;k<size1()*size2();k++) {
       fwdSens()[k]=fwdSeed(k2l(k))[k2k(k)];
     }
   }
   
   if(asens_order>0){
-    for (int k=0;k<nrow_*ncol_;k++) {
+    for (int k=0;k<size1()*size2();k++) {
       adjSens(k2k(k))[k2l(k)]+=adjSeed()[k];
     }
   }

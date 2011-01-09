@@ -25,8 +25,7 @@
 namespace CasADi{
 
 Norm::Norm(const MX& x) : MXNode(x){
-  nrow_ = 1;
-  ncol_ = 1;
+  setSize(1,1);
 }
 
 void Norm::evaluate(int fsens_order, int asens_order){

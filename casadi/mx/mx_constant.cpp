@@ -31,8 +31,7 @@ using namespace std;
 namespace CasADi{
 
 MXConstant::MXConstant(const double *x, int n, int m, char order){
-  nrow_ = n;
-  ncol_ = m;
+  setSize(n,m);
   data.resize(n*m);
 
   if(order=='R'){
@@ -48,8 +47,7 @@ MXConstant::MXConstant(const double *x, int n, int m, char order){
 }
 
 MXConstant::MXConstant(int n, int m){
-  nrow_ = n;
-  ncol_ = m;
+  setSize(n,m);
   data.resize(n*m);
 }
 
@@ -58,22 +56,22 @@ MXConstant* MXConstant::clone() const{
 }
 
 void MXConstant::print(std::ostream &stream) const{
-  if(nrow_==1 && ncol_==1)
+  if(size1()==1 && size2()==1)
     stream << data;
-  else if(nrow_==1){
+  else if(size1()==1){
     stream << "[";
     stream << data[0];
-    for(int i=1; i<ncol_; ++i)
+    for(int i=1; i<size2(); ++i)
       stream << "," << data[i];
      stream << "]";
   } else {
     stream << "[";
-    for(int i=0; i<nrow_; ++i){
+    for(int i=0; i<size1(); ++i){
       stream << data[i];
-      for(int j=1; j<ncol_; ++j){
-	stream << "," << data[i + nrow_*j];
+      for(int j=1; j<size2(); ++j){
+	stream << "," << data[i + size1()*j];
       }
-      if(i!=nrow_-1)
+      if(i!=size1()-1)
 	stream << ";";
     }    
     stream << "]";
@@ -96,13 +94,13 @@ void MXConstant::evaluate(int fsens_order, int asens_order){
 
 
 double MXConstant::operator()(int i, int j) const{
-  assert(i<nrow_ && j<ncol_);
-  return data[i+nrow_*j];
+  assert(i<size1() && j<size2());
+  return data[i+size1()*j];
 }
 
 double& MXConstant::operator()(int i, int j){
-  assert(i<nrow_ && j<ncol_);
-  return data[i+nrow_*j];  
+  assert(i<size1() && j<size2());
+  return data[i+size1()*j];  
 }
 
 double MXConstant::operator[](int k) const{

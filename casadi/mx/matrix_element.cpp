@@ -29,8 +29,7 @@ namespace CasADi{
 MatrixElement::MatrixElement(const MX& x, int i_, int j_) : MXNode(x), i(i_), j(j_){
   assert(i>=0 && i<x.size1());
   assert(j>=0 && j<x.size2());
-  nrow_ = 1;
-  ncol_ = 1;
+  setSize(1,1);
 }
 
 MatrixElement* MatrixElement::clone() const{

@@ -29,8 +29,7 @@ namespace CasADi{
 
 
 Transpose::Transpose(const MX& x) : Reordering(x){
-  nrow_ = x.size2();
-  ncol_ = x.size1();
+  setSize(x.size2(),x.size1());
 }
 
 Transpose* Transpose::clone() const{
@@ -38,7 +37,7 @@ Transpose* Transpose::clone() const{
 }
 
 int Transpose::k2k(int k) {
-  return (k/ncol_) + (k%ncol_)*nrow_;
+  return (k/size2()) + (k%size2())*size1();
 }
 
 void Transpose::print(std::ostream &stream) const{
@@ -54,9 +53,9 @@ void Transpose::evaluate(int fsens_order, int asens_order){
   vector<double>& res = output();
   
   // carry out the transpose
-  for(int i=0; i<nrow_; ++i)
-    for(int j=0; j<ncol_; ++j)
-      res[j + i*ncol_] = arg[i + j*nrow_];
+  for(int i=0; i<size1(); ++i)
+    for(int j=0; j<size2(); ++j)
+      res[j + i*size2()] = arg[i + j*size1()];
   } else {
 
     // Get references to the terms
@@ -64,9 +63,9 @@ void Transpose::evaluate(int fsens_order, int asens_order){
     vector<double>& res = fwdSens();
   
     // carry out the transpose
-    for(int i=0; i<nrow_; ++i)
-      for(int j=0; j<ncol_; ++j)
-        res[j + i*ncol_] = arg[i + j*nrow_];
+    for(int i=0; i<size1(); ++i)
+      for(int j=0; j<size2(); ++j)
+        res[j + i*size2()] = arg[i + j*size1()];
   }
   
   if(asens_order>0){
@@ -75,9 +74,9 @@ void Transpose::evaluate(int fsens_order, int asens_order){
     const vector<double>& res = adjSeed();
   
     // carry out the transpose
-    for(int i=0; i<nrow_; ++i)
-      for(int j=0; j<ncol_; ++j)
-        arg[i + j*nrow_] += res[j + i*ncol_];
+    for(int i=0; i<size1(); ++i)
+      for(int j=0; j<size2(); ++j)
+        arg[i + j*size1()] += res[j + i*size2()];
     
   }
 }

@@ -31,8 +31,7 @@ namespace CasADi{
 
 MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_), MXNode(x,y){
   assert(x.size1() == y.size1() || x.size2() == y.size2());
-  nrow_ = x.size1();
-  ncol_ = x.size2();
+  setSize(x.size1(),x.size2());
 }
 
 MatrixMatrixOp* MatrixMatrixOp::clone() const{

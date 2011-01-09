@@ -97,19 +97,19 @@ const MX MX::operator[](int k) const{
 }
 
 int MX::size_new() const{
-  return (*this)->ncol_ * (*this)->nrow_;
+  return (*this)->output_.size();
 }
 
 int MX::size1() const{
-  return (*this)->nrow_;
+  return (*this)->output_.size1();
 }
 
 int MX::numel() const{
-  return size1()*size2();
+  return (*this)->output_.numel();
 }
 
 int MX::size2() const{
-  return (*this)->ncol_;
+  return (*this)->output_.size2();
 }
 
 MX operator+(const MX &x, const MX &y){

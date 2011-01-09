@@ -30,8 +30,7 @@ using namespace std;
 namespace CasADi{
 
 UnaryOp::UnaryOp(OPERATION op_, const MX& x) : op(op_), MXNode(x){
-  nrow_ = x.size1();
-  ncol_ = x.size2();
+  setSize(x.size1(),x.size2());
 }
 
 UnaryOp* UnaryOp::clone() const{

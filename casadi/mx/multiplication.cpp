@@ -30,9 +30,7 @@ namespace CasADi{
 
 Multiplication::Multiplication(const MX& x, const MX& y) : MXNode(x,y){
   if(x.size2() != y.size1()) throw CasadiException("Multiplication::dimension mismatch");
-  nrow_ = x.size1();
-  ncol_ = y.size2();
-
+  setSize(x.size1(),y.size2());
   ni = dep(0).size1();
   nk = dep(0).size2();
   nj = dep(1).size2();

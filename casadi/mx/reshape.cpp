@@ -31,8 +31,7 @@ Reshape::Reshape(const MX& x, int n, int m) : MXNode(x){
   if (n*m != x.numel()) {
     throw CasadiException("MX::reshape: size must be same before and after reshaping");
   }
-  nrow_ = n;
-  ncol_ = m;
+  setSize(n,m);
 }
 
 Reshape* Reshape::clone() const{
@@ -40,7 +39,7 @@ Reshape* Reshape::clone() const{
 }
 
 void Reshape::print(std::ostream &stream) const{
-  stream << "reshape(" << dep(0) << ",[" << nrow_ << "," << ncol_ << "])";
+  stream << "reshape(" << dep(0) << ",[" << size1() << "," << size2() << "])";
 }
 
 void Reshape::evaluate(int fsens_order, int asens_order){
@@ -52,7 +51,7 @@ void Reshape::evaluate(int fsens_order, int asens_order){
   vector<double>& res = output();
   
   // carry out the reshape
-  for(int i=0; i<nrow_*ncol_; ++i)
+  for(int i=0; i<size1()*size2(); ++i)
       res[i] = arg[i];
   } else {
 
@@ -61,7 +60,7 @@ void Reshape::evaluate(int fsens_order, int asens_order){
     vector<double>& res = fwdSens();
   
     // carry out the reshape
-    for(int i=0; i<nrow_*ncol_; ++i)
+    for(int i=0; i<size1()*size2(); ++i)
         res[i] = arg[i];
   }
   
@@ -71,7 +70,7 @@ void Reshape::evaluate(int fsens_order, int asens_order){
     const vector<double>& res = adjSeed();
   
     // carry out the reshape
-    for(int i=0; i<nrow_*ncol_; ++i)
+    for(int i=0; i<size1()*size2(); ++i)
         arg[i] += res[i];
     
   }

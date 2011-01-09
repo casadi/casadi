@@ -67,11 +67,6 @@ MXNode::~MXNode(){
 void MXNode::print(ostream &stream) const{
   stream << "<empty matrix expression>";
 }
-
-/*void MXNode::evaluateAdj(){
-  cerr << "evaluateAdj not defined for class " << typeid(*this).name() << endl;
-  throw "RuntimeElement::evaluateAdj";
-}*/
   
 const string& MXNode::getName() const{
   cerr << "getName not defined for class " << typeid(*this).name() << endl;
@@ -124,21 +119,11 @@ const MX& MXNode::dep(int ind) const{
   return dep_.at(ind);
 }
   
-// const vector<double>& MXNode::val(int order, int dir) const{
-//   return val_.at(order).at(dir);
-// }
-// 
-// vector<double>& MXNode::val(int order, int dir){
-//   return val_.at(order).at(dir);
-// }
-
 int MXNode::ndep() const{
   return dep_.size();
 }
 
 void MXNode::init(){
-  output_.resize(nrow_*ncol_);
-  
   forward_sensitivities_.resize(nfdir_);
   for(int dir=0; dir<nfdir_; ++dir)
     forward_sensitivities_[dir] = output_;
@@ -195,5 +180,19 @@ const std::vector<double>& MXNode::adjSens(int ind, int dir) const{
 std::vector<double>& MXNode::adjSens(int ind, int dir){
   return dep_.at(ind)->adjSeed(dir);
 }
+
+void MXNode::setSize(int nrow, int ncol){
+  output_ = Matrix<double>(nrow,ncol,0);
+}
+
+int MXNode::size1() const{
+  return output_.size1();
+}
+
+int MXNode::size2() const{
+  return output_.size2();
+}
+
+
 
 } // namespace CasADi
