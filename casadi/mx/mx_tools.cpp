@@ -22,7 +22,6 @@
 
 #include "mx_tools.hpp"
 #include "vertcat.hpp"
-#include "horzcat.hpp"
 #include "transpose.hpp"
 #include "flatten.hpp"
 #include "reshape.hpp"
@@ -39,9 +38,10 @@ MX vertcat(const vector<MX>& comp){
 }
 
 MX horzcat(const vector<MX>& comp){
-  MX ret;
-  ret.assignNode(new Horzcat(comp));
-  return ret;
+  vector<MX> v(comp.size());
+  for(int i=0; i<v.size(); ++i)
+    v[i] = trans(comp[i]);
+  return trans(vertcat(v));
 }
 
 MX vertcat(const MX& a, const MX& b){

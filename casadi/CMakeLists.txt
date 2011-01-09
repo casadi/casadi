@@ -68,8 +68,6 @@ SET(CASADI_SRCS
   mx/symbolic_mx_node.hpp  
   mx/vertcat.cpp
   mx/vertcat.hpp
-  mx/horzcat.cpp
-  mx/horzcat.hpp
   mx/slicer.cpp
   mx/slicer.hpp
   mx/flatten.cpp
