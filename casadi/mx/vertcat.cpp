@@ -24,6 +24,7 @@
 #include "../stl_vector_tools.hpp"
 #include <cassert>
 #include <iterator>
+#include <algorithm>
 
 using namespace std;
 
@@ -53,47 +54,31 @@ void Vertcat::print(ostream &stream) const{
 }
 
 void Vertcat::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  
   if(fsens_order==0){
-    int i = 0;
-    for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy((*it)->output().begin(),(*it)->output().end(),&output()[i]);
-      i += it->numel();
+    vector<double>::iterator out = output().begin();
+    for(int i=0; i<ndep(); ++i){
+      copy(input(i).begin(),input(i).end(),out);
+      out += input(i).size();
     }
   } else {
-    int i = 0;
-    for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy((*it)->fwdSens().begin(),(*it)->fwdSens().end(),&fwdSens()[i]);
-      i += it->numel();
+    vector<double>::iterator fsens = fwdSens().begin();
+    for(int i=0; i<ndep(); ++i){
+      copy(fwdSeed(i).begin(),fwdSeed(i).end(),fsens);
+      fsens += fwdSeed(i).size();
     }
   }
   
   if(asens_order>0){
-    int i = 0;
-    for(vector<MX>::iterator it=dep_.begin(); it!=dep_.end(); ++it){
-      copy(&adjSeed()[i],&adjSeed()[i] + it->numel(), (*it)->adjSeed().begin());
-      i += it->numel();
+    int offset = 0;
+    for(int i=0; i<ndep(); ++i){
+      transform(adjSeed().begin()+offset,adjSeed().begin()+offset+adjSens(i).size(),
+                adjSens(i).begin(),
+                adjSens(i).begin(),
+                plus<double>());
+      offset += adjSens(i).size();
     }
   }
 }
-
-// void Vertcat::setOutput(const vector<double>& x, int ord){
-//   int i = 0;
-//   for(vector<MX>::iterator it=dep_.begin(); it!=dep_.end(); ++it){
-//     (*it)->setOutput(&x[i],ord);
-//     i += it->size();
-//   }
-// }
-// 
-// void Vertcat::getOutput(vector<double>& x, int ord) const{
-//   int i = 0;
-//   for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-//     (*it)->getOutput(&x[i],ord);
-//     i += it->size();
-//   }
-// }
-
 
 
 } // namespace CasADi
