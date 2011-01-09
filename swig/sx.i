@@ -3,7 +3,6 @@
 #include "casadi/sx/sx_matrix.hpp"
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/expression_tools.hpp"
-#include <iostream>
 %}
 
 %include "typemaps.i"
@@ -184,7 +183,6 @@ SXMatrix __getitem__(const std::vector<PyObject*> &I ) {
 		  }
 		  
 		  CasADi::SXMatrix res;
-		  std::cout << "tuut " << i[0]<< ", " << i[1]<< ", " << n[0]<< ", " << n[1]<< ", " << k[0]<< ", " <<k[1];
       getSub(res,*$self,i[0],i[1],n[0],n[1],k[0],k[1]);
       return res;
 }
