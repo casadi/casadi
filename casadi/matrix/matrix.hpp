@@ -30,14 +30,6 @@
 #include "crs_sparsity.hpp"
 
 namespace CasADi{
-// Helper class
-/*template<class T>
-class ElementChecker{
-  bool isZero(const T& val){ return val==0; }
-  bool isOne(const T& val){ return val==1;}
-};*/
-  
-
   
   /** \brief General sparse matrix class
   \author Joel Andersson 
@@ -50,6 +42,18 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  constructors */
     /// empty 0-by-0 matrix constructor
     Matrix();
+    
+    /// Copy constructor (normal)
+    Matrix(const Matrix<T>& m);
+    
+    /// Copy constructor (possible swap)
+    Matrix(Matrix<T>& m);
+    
+    /// Assignment (normal)
+    Matrix<T>& operator=(const Matrix<T>& m);
+    
+    /// Assignment (possible swap)
+    Matrix<T>& operator=(Matrix<T>& m);
     
     /// empty n-by-m matrix constructor
     Matrix(int n, int m);
@@ -168,6 +172,14 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
     //@}
 
+    /** \brief Swap the the vector content upon the next copy assignment, saves a copy operation: 
+    After the copy operation has taken place, the object can not be used for anything,
+    as its vector is no longer of correct length. Only the destructor is allowed to get called.
+    Make sure that is the function is only called e.g. for temporary objects at the end of the 
+    scope, before copying to a return value. Caution is adviced.
+    */
+    void swapOnCopy();
+
     // Get the sparsity pattern
     const std::vector<int>& col() const;
     const std::vector<int>& rowind() const;
@@ -183,12 +195,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void reserve(int nnz);
     
   protected:
-    // Constant zero
-//    static ElementChecker<T> element_checker_;
-    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
+    
+    /// Swap the content of the vector upon the next copy action
+    bool swap_on_copy_;
 
 };
 
@@ -278,16 +290,62 @@ bool Matrix<T>::vector() const{
 
 template<class T>
 Matrix<T>::Matrix(){
+  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(0,0,false);
 }
 
 template<class T>
+Matrix<T>::Matrix(const Matrix<T>& m){
+  swap_on_copy_ = false;
+  sparsity_ = m.sparsity_;
+  static_cast<std::vector<T>&>(*this) = m;
+}
+
+template<class T>
+Matrix<T>::Matrix(Matrix<T>& m){
+  swap_on_copy_ = false;
+  sparsity_ = m.sparsity_;
+  if(m.swap_on_copy_){
+    // Swap the vector with m
+    m.swap(*this);
+  } else {
+    // Copy the content
+    static_cast<std::vector<T>&>(*this) = m;
+  }
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
+  sparsity_ = m.sparsity_;
+  static_cast<std::vector<T>&>(*this) = m;
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator=(Matrix<T>& m){
+  sparsity_ = m.sparsity_;
+  if(m.swap_on_copy_){
+    // Swap the vector with m
+    m.swap(*this);
+  } else {
+    // Copy the content
+    static_cast<std::vector<T>&>(*this) = m;
+  }
+}
+
+template<class T>
+void Matrix<T>::swapOnCopy(){
+  swap_on_copy_ = true;
+}
+
+template<class T>
 Matrix<T>::Matrix(int n, int m){
+  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,false);
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m, const T& val){
+  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,true);
   std::vector<T>::resize(n*m, val);
 }
@@ -399,12 +457,14 @@ void Matrix<T>::clear(){
 
 template<class T>
 Matrix<T>::Matrix(const T &val){
+  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(1,1,true);
   std::vector<T>::resize(1,val);
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind){
+  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,col,rowind);
   std::vector<T>::resize(sparsity_.size());
 }
