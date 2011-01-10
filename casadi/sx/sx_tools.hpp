@@ -367,7 +367,6 @@ void fill(SXMatrix& mat, const SX& val);
 
   /** \brief  Perform operations by ID */
 SXMatrix binary(int op, const SXMatrix &x, const SXMatrix &y);
-SXMatrix unary(int op, const SXMatrix &x);
 SXMatrix scalar_matrix(int op, const SX &x, const SXMatrix &y);
 SXMatrix matrix_scalar(int op, const SXMatrix &x, const SX &y);
 SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y);
@@ -394,7 +393,7 @@ SXMatrix fmin(const SXMatrix &x, const SXMatrix &y);
 SXMatrix fmax(const SXMatrix &x, const SXMatrix &y);
 SXMatrix floor(const SXMatrix &x);
 SXMatrix ceil(const SXMatrix &x); 
-SXMatrix erf(const SXMatrix &x); 
+SXMatrix erf(const SXMatrix &x);
 #undef SXMatrix
 } // namespace std
 

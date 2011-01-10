@@ -106,10 +106,7 @@ class SX{
   friend SX& operator*=(SX &ex, const SX &scalar);
   friend SX& operator/=(SX &ex, const SX &scalar);
   //@}
-  
-  /** \brief  Negation */
-  friend SX operator-(const SX &ex);
-  
+    
   //@{
   /** \brief  Operators that create new objects (SX on the left hand side) */
   friend SX operator+(const SX &x, const SX &y);
@@ -168,6 +165,28 @@ class SX{
   double getValue() const;
   int getIntValue() const;
 
+  /** \brief  Negation */
+  SX operator-() const;
+  
+  /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
+  SX exp() const;
+  SX log() const;
+  SX sqrt() const;
+  SX sin() const;
+  SX cos() const;
+  SX tan() const;
+  SX arcsin() const;
+  SX arccos() const;
+  SX arctan() const;
+  SX floor() const;
+  SX ceil() const;
+  SX erf() const;
+  SX fabs() const;
+  SX add(const SX& y) const;
+  SX sub(const SX& y) const;
+  SX mul(const SX& y) const;
+  SX div(const SX& y) const;
+  
   protected:
 #ifndef SWIG
 SXNode* node;
@@ -207,24 +226,6 @@ T fmax(t b){     return std::fmax(*$self,b);}
 binops(SX, const SX&)
 binops(SX, double)
 
-// all unary operations
-#define unops(T) \
-T __neg__(){ return - *$self;}\
-T exp(){ return std::exp(*$self);}\
-T log(){ return std::log(*$self);}\
-T sqrt(){ return std::sqrt(*$self);}\
-T sin(){ return std::sin(*$self);}\
-T cos(){ return std::cos(*$self);}\
-T tan(){ return std::tan(*$self);}\
-T arcsin(){ return std::asin(*$self);}\
-T arccos(){ return std::acos(*$self);}\
-T arctan(){ return std::atan(*$self);}\
-T floor(){ return std::floor(*$self);}\
-T ceil(){ return std::ceil(*$self);}\
-T erf(){ return std::erf(*$self);}
-
-unops(SX)
-
 }
 #endif // SWIG
 
@@ -247,6 +248,38 @@ class casadi_limits<SX>{
     static const SX minus_inf;
 };
 
+template<>
+class casadi_operators<SX>{
+  public:
+    static SX add(const SX&x, const SX&y);
+    static SX sub(const SX&x, const SX&y);
+    static SX mul(const SX&x, const SX&y);
+    static SX div(const SX&x, const SX&y);
+    static SX neg(const SX&x);
+    static SX exp(const SX&x);
+    static SX log(const SX&x);
+    static SX pow(const SX&x, const SX&y);
+    static SX sqrt(const SX&x);
+    static SX sin(const SX&x);
+    static SX cos(const SX&x);
+    static SX tan(const SX&x);
+    static SX asin(const SX&x);
+    static SX acos(const SX&x);
+    static SX atan(const SX&x);
+    static SX floor(const SX&x);
+    static SX ceil(const SX&x);
+    static SX equality(const SX&x, const SX&y);
+    static SX fmin(const SX&x, const SX&y);
+    static SX fmax(const SX&x, const SX&y);
+    static SX fabs(const SX&x);
+};
+
+
+
+
+
+
+
 #endif // SWIG
 
 
@@ -267,21 +300,21 @@ class numeric_limits<CasADi::SX>{
 
 /** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
 #define SX CasADi::SX
-SX sqrt(const SX &x);
-SX sin(const SX &x);
-SX cos(const SX &x);
-SX tan(const SX &x);
-SX atan(const SX &x);
-SX asin(const SX &x);
-SX acos(const SX &x);
-SX exp(const SX &x);
-SX log(const SX &x);
+inline SX sqrt(const SX &x){return x.sqrt();}
+inline SX sin(const SX &x){return x.sin();}
+inline SX cos(const SX &x){return x.cos();}
+inline SX tan(const SX &x){return x.tan();}
+inline SX atan(const SX &x){return x.arctan();}
+inline SX asin(const SX &x){return x.arcsin();}
+inline SX acos(const SX &x){return x.arccos();}
+inline SX exp(const SX &x){return x.exp();}
+inline SX log(const SX &x){return x.log();}
 SX pow(const SX &x, const SX &n);
-SX abs(const SX &x);
-SX fabs(const SX &x); // same as abs
-SX floor(const SX &x);
-SX ceil(const SX &x);
-SX erf(const SX &x);
+inline SX abs(const SX &x){return x.fabs();}
+inline SX fabs(const SX &x){return x.fabs();}
+inline SX floor(const SX &x){return x.floor();}
+inline SX ceil(const SX &x){return x.ceil();}
+inline SX erf(const SX &x){return x.erf();}
 SX fmin(const SX &a, const SX &b);
 SX fmax(const SX &a, const SX &b);
 #undef SX

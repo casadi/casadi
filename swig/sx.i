@@ -144,6 +144,22 @@ binops(SXMatrix, const SX&)
 binops(SXMatrix, const SXMatrix&)
 binops(SXMatrix, double)
 binops(SXMatrix, const std::vector<SX>&)
+
+// all unary operations
+#define unops(T) \
+T __neg__(){ return - *$self;}\
+T exp(){ return std::exp(*$self);}\
+T log(){ return std::log(*$self);}\
+T sqrt(){ return std::sqrt(*$self);}\
+T sin(){ return std::sin(*$self);}\
+T cos(){ return std::cos(*$self);}\
+T tan(){ return std::tan(*$self);}\
+T arcsin(){ return std::asin(*$self);}\
+T arccos(){ return std::acos(*$self);}\
+T arctan(){ return std::atan(*$self);}\
+T floor(){ return std::floor(*$self);}\
+T ceil(){ return std::ceil(*$self);}\
+T erf(){ return std::erf(*$self);}
 unops(SXMatrix)
 
 }

@@ -163,6 +163,27 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Make the matrix an empty n-by-m matrix */
     void makeEmpty(int n, int m);
 
+    /** \brief  Unary function */
+    void unary(T (*fcn)(const T&), const Matrix<T>& x);
+    void binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y);
+    void matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y);
+    void matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y);
+    void scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y);
+
+    Matrix<T> operator+() const;
+    Matrix<T> operator-() const;
+    
+    Matrix<T> operator+(const Matrix<T> &y) const;
+    Matrix<T> operator-(const Matrix<T> &y) const;
+    Matrix<T> operator*(const Matrix<T> &y) const;
+    Matrix<T> operator/(const Matrix<T> &y) const;
+
+    Matrix<T>& operator+=(const Matrix<T> &y);
+    Matrix<T>& operator-=(const Matrix<T> &y);
+    Matrix<T>& operator*=(const Matrix<T> &y);
+    Matrix<T>& operator/=(const Matrix<T> &y);
+    
+    
     //@{
     /// Printing
 #ifndef SWIG
@@ -493,6 +514,172 @@ void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){
     throw CasADi::CasadiException("__setitem__: not 2D"); 
   getElementRef(I[0],I[1]) = el;
 }
+
+template<class T>
+void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
+  T temp = fcn(0);
+  if(casadi_limits<T>::isZero(temp))
+    makeEmpty(x.size1(),x.size2());
+  else
+    makeDense(x.size1(),x.size2(),temp);
+    
+  for(int i=0; i<size1(); ++i){ // loop over rows
+    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
+      int j = x.col(el);
+      getElementRef(i,j) = fcn(x[el]);
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y){
+  if(x.scalar())
+    if(y.scalar())
+      *this = fcn(x(0),y(0));
+    else
+      scalar_matrix(fcn,x(0),y);
+  else if(y.scalar())
+    matrix_scalar(fcn,x,y(0));
+  else
+    matrix_matrix(fcn,x,y);
+}
+
+template<class T>
+void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y){
+  T temp = fcn(x,0);
+  if(casadi_limits<T>::isZero(temp))
+    makeEmpty(y.size1(),y.size2());
+  else
+    makeDense(y.size1(),y.size2(),temp);
+  
+  for(int i=0; i<size1(); ++i){ // loop over rows
+    for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
+      int j = y.col(el);
+      getElementRef(i,j) = fcn(x,y[el]);
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y){
+  T temp = fcn(0,y);
+  if(casadi_limits<T>::isZero(temp))
+    makeEmpty(x.size1(),x.size2());
+  else
+    makeDense(x.size1(),x.size2(),temp);
+  
+  for(int i=0; i<size1(); ++i){ // loop over rows
+    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
+      int j = x.col(el);
+      getElementRef(i,j) = fcn(x[el],y);
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
+if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matrix_matrix: dimension mismatch");
+  T temp = fcn(0,0);
+  if(casadi_limits<T>::isZero(temp))
+    makeEmpty(x.size1(),x.size2());
+  else
+    makeDense(x.size1(),x.size2(),temp);
+ 
+  for(int i=0; i<size1(); ++i){ // loop over rows
+    int el1 = x.rowind(i);
+    int el2 = y.rowind(i);
+    int k1 = x.rowind(i+1);
+    int k2 = y.rowind(i+1);
+    while(el1 < k1 || el2 < k2){
+      int j1 = (el1 < k1) ? x.col(el1) : numel() ;
+      int j2 = (el2 < k2) ? y.col(el2) : numel() ;
+      
+      if(j1==j2)
+        getElementRef(i,j1) = fcn(x[el1++],y[el2++]); 
+      else if(j1>j2)
+        getElementRef(i,j2) = fcn(0,y[el2++]);
+      else
+        getElementRef(i,j1) = fcn(x[el1++],0);
+      }
+    }
+}
+
+template<class T>
+Matrix<T> Matrix<T>::operator-() const{
+  Matrix<T> temp;
+  temp.unary(casadi_operators<T>::neg,*this);
+  return temp;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::operator+() const{
+  return *this;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::operator+(const Matrix<T> &y) const{
+  Matrix<T> r;
+  r.binary(casadi_operators<T>::add,*this,y);
+  return r;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::operator-(const Matrix<T> &y) const{
+  Matrix<T> r;
+  r.binary(casadi_operators<T>::sub,*this,y);
+  return r;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::operator*(const Matrix<T> &y) const{
+  Matrix<T> r;
+  r.binary(casadi_operators<T>::mul,*this,y);
+  return r;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::operator/(const Matrix<T> &y) const{
+  Matrix<T> r;
+  r.binary(casadi_operators<T>::div,*this,y);
+  return r;
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator+=(const Matrix<T> &y){
+  Matrix<T> x = *this;
+  binary(casadi_operators<T>::add,x,y);
+  return *this;
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator-=(const Matrix<T> &y){
+  Matrix<T> x = *this;
+  binary(casadi_operators<T>::sub,x,y);
+  return *this;
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator*=(const Matrix<T> &y){
+  Matrix<T> x = *this;
+  binary(casadi_operators<T>::mul,x,y);
+  return *this;
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator/=(const Matrix<T> &y){
+  Matrix<T> x = *this;
+  binary(casadi_operators<T>::div,x,y);
+  return *this;
+}
+
+
+
+
+
+
+
+
+
 
 
 #endif // SWIG

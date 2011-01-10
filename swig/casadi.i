@@ -45,10 +45,8 @@ namespace std {
 %include "casadi/matrix/matrix_tools.hpp"
 
 // Instansiate the functions
-namespace CasADi{
 MATRIX_TOOLS_TEMPLATES(double)
-MATRIX_TOOLS_TEMPLATES(SX)
-} // namespace CasADi
+MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 
 // SX tools
 %include "casadi/sx/sx_tools.hpp"

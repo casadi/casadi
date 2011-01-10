@@ -67,6 +67,9 @@ SXMatrix();
 /// empty n-by-m matrix constructor
 SXMatrix(int n, int m);
 
+/// from base class
+explicit SXMatrix(const Matrix<SX>& x);
+
 /// dense n-by-m matrix filled with val constructor
 SXMatrix(int n, int m, const SX& val);    
 

@@ -23,6 +23,8 @@
 #ifndef CASADI_LIMITS_HPP
 #define CASADI_LIMITS_HPP
 
+#include <cmath>
+
 /** \brief casadi_limits class
 The following class, which acts as a complements to the standard numeric_limits class, allows
 to specify certain properties of scalar objects. The template can be specialized for 
@@ -46,6 +48,33 @@ class casadi_limits{
     static const T two = 2;
     static const T minus_one = -1;
 };
+
+template<class T>
+class casadi_operators{
+  public:
+    static T add(const T&x, const T&y){ return x+y;}
+    static T sub(const T&x, const T&y){ return x-y;}
+    static T mul(const T&x, const T&y){ return x*y;}
+    static T div(const T&x, const T&y){ return x/y;}
+    static T neg(const T&x){ return -x;}
+    static T exp(const T&x){ return std::exp(x);}
+    static T log(const T&x){ return std::log(x);}
+    static T pow(const T&x, const T&y){ return std::pow(x,y);}
+    static T sqrt(const T&x){ return std::sqrt(x);}
+    static T sin(const T&x){ return std::sin(x);}
+    static T cos(const T&x){ return std::cos(x);}
+    static T tan(const T&x){ return std::tan(x);}
+    static T asin(const T&x){ return std::asin(x);}
+    static T acos(const T&x){ return std::acos(x);}
+    static T atan(const T&x){ return std::atan(x);}
+    static T floor(const T&x){ return std::floor(x);}
+    static T ceil(const T&x){ return std::ceil(x);}
+    static T equality(const T&x, const T&y){ return x==y;}
+    static T fmin(const T&x, const T&y){ return std::min(x,y);}
+    static T fmax(const T&x, const T&y){ return std::max(x,y);}
+    static T fabs(const T&x){ return std::abs(x);}
+};
+
 
 } // namespace CasADi
 #endif // CASADI_LIMITS_HPP

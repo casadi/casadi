@@ -104,15 +104,15 @@ SX& operator-=(SX &ex, const SX &el){
   return ex = ex - el;
 }
 
-SX operator-(const SX &ex){
-  if(ex->isBinary() && ex->getOp() == NEG_NODE)
-    return ex->dependent(0);
-  else if(ex->isMinusOne())
+SX SX::operator-() const{
+  if(node->isBinary() && node->getOp() == NEG_NODE)
+    return node->dependent(0);
+  else if(node->isMinusOne())
     return 1;
-  else if(ex->isOne())
+  else if(node->isOne())
     return -1;
   else
-   return SX(new BinarySXNode(NEG_NODE, ex));
+   return SX(new BinarySXNode(NEG_NODE, *this));
 }
 
 SX& operator*=(SX &ex, const SX &el){
@@ -128,53 +128,69 @@ SX sign(const SX& x){
 }
 
 
-SX operator+(const SX &x, const SX &y){
-    if(x->isZero())
+SX SX::add(const SX& y) const{
+  if(node->isZero())
+    return y;
+  else if(y->isZero()) // term2 is zero
+    return *this;
+  else // create a new branch
+    return SX(new BinarySXNode(ADD_NODE, *this, y));
+}
+
+SX SX::sub(const SX& y) const{
+  if(y->isZero()) // term2 is zero
+    return *this;
+  if(node->isZero()) // term1 is zero
+    return -y;
+  if(node->isEqual(y)) // the terms are equal
+    return 0;
+  else // create a new branch
+    return SX(new BinarySXNode(SUB_NODE, *this, y));
+}
+
+SX SX::mul(const SX& y) const{
+  if(node->isZero() || y->isZero()) // one of the terms is zero
+      return 0;
+    else if(node->isOne()) // term1 is one
       return y;
-    else if(y->isZero()) // term2 is zero
-      return x;
-    else // create a new branch
-      return SX(new BinarySXNode(ADD_NODE, x, y));
+    else if(y->isOne()) // term2 is one
+      return *this;
+    else if(y->isMinusOne())
+      return -(*this);
+    else if(node->isMinusOne())
+      return -y;
+    else     // create a new branch
+      return SX(new BinarySXNode(MUL_NODE,*this,y));
+}
+
+SX SX::div(const SX& y) const{
+  if(y->isZero()) // term2 is zero
+    return casadi_limits<SX>::nan;
+  else if(node->isZero()) // term1 is zero
+    return 0;
+  else if(y->isOne()) // term2 is one
+    return *this;
+  else if(node->isEqual(y)) // terms are equal
+    return 1;
+  else // create a new branch
+    return SX(new BinarySXNode(DIV_NODE,*this,y));
+}
+
+SX operator+(const SX &x, const SX &y){
+  return x.add(y);
 }
 
 SX operator-(const SX &x, const SX &y){
-    if(y->isZero()) // term2 is zero
-      return x;
-    if(x->isZero()) // term1 is zero
-      return -y;
-    if(x->isEqual(y)) // the terms are equal
-      return 0;
-    else // create a new branch
-      return SX(new BinarySXNode(SUB_NODE, x, y));
+  return x.sub(y);
 }
 
 SX operator*(const SX &x, const SX &y){
-  if(x->isZero() || y->isZero()) // one of the terms is zero
-      return 0;
-    else if(x->isOne()) // term1 is one
-      return y;
-    else if(y->isOne()) // term2 is one
-      return x;
-    else if(y->isMinusOne())
-      return -x;
-    else if(x->isMinusOne())
-      return -y;
-    else     // create a new branch
-      return SX(new BinarySXNode(MUL_NODE,x,y));
+  return x.mul(y);
 }
 
 
 SX operator/(const SX &x, const SX &y){
-    if(y->isZero()) // term2 is zero
-      return casadi_limits<SX>::nan;
-    else if(x->isZero()) // term1 is zero
-      return 0;
-    else if(y->isOne()) // term2 is one
-      return x;
-    else if(x->isEqual(y)) // terms are equal
-      return 1;
-    else // create a new branch
-      return SX(new BinarySXNode(DIV_NODE,x,y));
+  return x.div(y);
 }
 
 SX operator<=(const SX &a, const SX &b){
@@ -341,50 +357,137 @@ bool casadi_limits<SX>::isInteger(const SX& val){
   return val.isInteger();
 }
 
+SX SX::exp() const{
+  return SX(new BinarySXNode(EXP_NODE,*this));
+}
+
+SX SX::log() const{
+  return SX(new BinarySXNode(LOG_NODE,*this));
+}
+
+SX SX::sqrt() const{
+  return SX(new BinarySXNode(SQRT_NODE,*this));
+}
+
+SX SX::sin() const{
+  return SX(new BinarySXNode(SIN_NODE,*this));
+}
+
+SX SX::cos() const{
+  return SX(new BinarySXNode(COS_NODE,*this));
+}
+
+SX SX::tan() const{
+  return SX(new BinarySXNode(TAN_NODE,*this));
+}
+
+SX SX::arcsin() const{
+  return SX(new BinarySXNode(ASIN_NODE,*this));
+}
+
+SX SX::arccos() const{
+  return SX(new BinarySXNode(ACOS_NODE,*this));
+}
+
+SX SX::arctan() const{
+  return SX(new BinarySXNode(ATAN_NODE,*this));
+}
+
+SX SX::floor() const{
+  return SX(new BinarySXNode(FLOOR_NODE,*this));
+}
+
+SX SX::ceil() const{
+  return SX(new BinarySXNode(CEIL_NODE,*this));
+}
+
+SX SX::erf() const{
+  return SX(new BinarySXNode(ERF_NODE,*this));
+}
+
+SX SX::fabs() const{
+  return sign(*this)**this;
+}
+
+SX casadi_operators<SX>::add(const SX&x, const SX&y){
+  return x.add(y);
+}
+
+SX casadi_operators<SX>::sub(const SX&x, const SX&y){
+  return x.sub(y);
+}
+
+SX casadi_operators<SX>::mul(const SX&x, const SX&y){
+  return x.mul(y);
+}
+
+SX casadi_operators<SX>::div(const SX&x, const SX&y){
+  return x.div(y);
+}
+
+SX casadi_operators<SX>::sin(const SX&x){ 
+  return x.sin();
+}
+
+SX casadi_operators<SX>::cos(const SX&x){ 
+  return x.cos();
+}
+
+SX casadi_operators<SX>::tan(const SX&x){ 
+  return x.tan();
+}
+
+SX casadi_operators<SX>::asin(const SX&x){ 
+  return x.arcsin();
+}
+
+SX casadi_operators<SX>::acos(const SX&x){ 
+  return x.arccos();
+}
+
+SX casadi_operators<SX>::atan(const SX&x){ 
+  return x.arctan();
+}
+
+SX casadi_operators<SX>::neg(const SX&x){
+  return x.operator-();
+}
+
+SX casadi_operators<SX>::log(const SX&x){ 
+  return x.log();
+}
+
+SX casadi_operators<SX>::exp(const SX&x){ 
+  return x.exp();
+}
+
+SX casadi_operators<SX>::sqrt(const SX&x){ 
+  return x.sqrt();
+}
+
+SX casadi_operators<SX>::floor(const SX&x){ 
+  return x.floor();
+}
+
+SX casadi_operators<SX>::ceil(const SX&x){ 
+  return x.ceil();
+}
+
+SX casadi_operators<SX>::fabs(const SX&x){ 
+  return x.fabs();
+}
 
 } // namespace CasADi
 
 using namespace CasADi;
 namespace std{
 
-SX fabs(const SX& x){
-  return sign(x)*x;
+SX fmin(const SX &a, const SX &b){
+  return SX(new BinarySXNode(FMIN_NODE,a,b));
 }
 
-SX exp(const SX& x){
-  return SX(new BinarySXNode(EXP_NODE,x));
-}
-
-SX log(const SX& x){
-  return SX(new BinarySXNode(LOG_NODE,x));
-}
-
-SX sqrt(const SX& x){
-  return SX(new BinarySXNode(SQRT_NODE,x));
-}
-
-SX sin(const SX& x){
-  return SX(new BinarySXNode(SIN_NODE,x));
-}
-
-SX cos(const SX& x){;  
-  return SX(new BinarySXNode(COS_NODE,x));
-}
-
-SX tan(const SX& x){
-  return SX(new BinarySXNode(TAN_NODE,x));
-}
-
-SX atan(const SX& x){
-  return SX(new BinarySXNode(ATAN_NODE,x));
-}
-
-SX asin(const SX& x){
-  return SX(new BinarySXNode(ASIN_NODE,x));
-}
-
-SX acos(const SX& x){
-  return SX(new BinarySXNode(ACOS_NODE,x));
+SX fmax(const SX &a, const SX &b){
+  return SX(new BinarySXNode(FMAX_NODE,a,b));
 }
 
 
@@ -408,29 +511,6 @@ SX pow(const SX& x, const SX& n){
   }
 }
 
-SX erf(const SX& x){
-  return SX(new BinarySXNode(ERF_NODE,x));
-}
-
-SX abs(const SX& x){
-  return sign(x)*x;
-}
-
-SX fmin(const SX &a, const SX &b){
-  return SX(new BinarySXNode(FMIN_NODE,a,b));
-}
-
-SX fmax(const SX &a, const SX &b){
-  return SX(new BinarySXNode(FMAX_NODE,a,b));
-}
-
-SX floor(const SX& x){
-  return SX(new BinarySXNode(FLOOR_NODE,x));
-}
-
-SX ceil(const SX& x){
-  return SX(new BinarySXNode(CEIL_NODE,x));
-}
 
 CasADi::SX numeric_limits<CasADi::SX>::infinity() throw(){
   return CasADi::casadi_limits<CasADi::SX>::inf;

@@ -31,6 +31,9 @@ namespace CasADi{
 SXMatrix::SXMatrix(const std::vector<SX>& x) : Matrix<SX>(x){
 }
 
+SXMatrix::SXMatrix(const Matrix<SX>& x) : Matrix<SX>(x){
+}
+
 SXMatrix::SXMatrix(const std::vector<double>& x) : Matrix<SX>(x){
 }
 
@@ -70,11 +73,11 @@ SXMatrix& operator-=(SXMatrix &ex, const SXMatrix &expr){
  return ex = ex - expr;
 }
 
-SXMatrix operator-(SXMatrix &ex){
-  return unary(NEG_NODE,ex);
+SXMatrix operator-(SXMatrix &x){
+  return SXMatrix(-(dynamic_cast<const Matrix<SX>&>(x)));
 }
 
-SXMatrix operator-(const SXMatrix &x, const SXMatrix &y){ 
+SXMatrix operator-(const SXMatrix &x, const SXMatrix &y){
   return binary(SUB_NODE,x,y);
 }
 

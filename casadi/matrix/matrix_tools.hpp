@@ -25,6 +25,47 @@
 
 #include "matrix.hpp"
 
+// The following functions must be placed in the standard namespace so that the old ones are not shadowed when CasADi namespace is used
+namespace std{
+
+template<class T>
+CasADi::Matrix<T> sin(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> cos(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> tan(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> asin(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> acos(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> atan(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> exp(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> log(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> sqrt(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> floor(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> ceil(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x);
+  
+} // namespace std
+
 namespace CasADi{
   
 /// Transpose of a matrix
@@ -62,7 +103,6 @@ void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj=1, int kj=1)
 template<class T>
 void setColumn(const Matrix<T>& expr, Matrix<T> &res, int j, int nj=1, int kj=1);
 
-//@{
 /** \brief  check if the matrix has certain properties */
 template<class T>
 bool isConstant(const Matrix<T>& ex);
@@ -82,8 +122,6 @@ bool isScalar(const Matrix<T>& ex);
 template<class T>
 bool isVector(const Matrix<T>& ex);
 
-//@}
-
 /** \brief  Check if a matrix is lower triangular (complexity ~ A.size1()) */
 template<class T>
 bool isTril(const Matrix<T> &A);
@@ -92,8 +130,54 @@ bool isTril(const Matrix<T> &A);
 template<class T>
 bool isTriu(const Matrix<T> &A);
 
+template<class T>
+T det(const Matrix<T>& a);
+
+template<class T>
+T getMinor(const Matrix<T> &x, int i, int j);
+
+template<class T>
+T cofactor(const Matrix<T> &x, int i, int j);
+
+template<class T>
+Matrix<T> adj(const Matrix<T>& a);
+
+template<class T>
+Matrix<T> inv(const Matrix<T>& a);
+
+} // namespace CasADi
+
 #ifndef SWIG
+
+// Implementations of the functions in standard namespace
+namespace std{
+  
+#define UNOP_DEF(fname,opname) \
+template<class T> \
+CasADi::Matrix<T> fname(const CasADi::Matrix<T>& x){ \
+  CasADi::Matrix<T> temp; \
+  temp.unary(CasADi::casadi_operators<T>::opname,x); \
+  return temp;\
+}
+
+UNOP_DEF(sin,sin)
+UNOP_DEF(cos,cos)
+UNOP_DEF(tan,tan)
+UNOP_DEF(asin,asin)
+UNOP_DEF(acos,acos)
+UNOP_DEF(atan,atan)
+UNOP_DEF(exp,exp)
+UNOP_DEF(log,log)
+UNOP_DEF(sqrt,sqrt)
+UNOP_DEF(floor,floor)
+UNOP_DEF(ceil,ceil)
+UNOP_DEF(fabs,fabs)
+  
+} // namespace std
+
+namespace CasADi{
 // Implementations
+
 template<class T>
 Matrix<T> trans(const Matrix<T> &x){
   // TODO: Possiblt move a part of the implementation to CRSSparsity
@@ -349,37 +433,141 @@ bool isTriu(const Matrix<T> &A){
   return true;
 }
 
-# else // SWIG
+template<class T>
+T det(const Matrix<T>& a){
+  int n = a.size1();
+  if(n != a.size2()) throw CasadiException("det: matrix must be square");
+
+  // Trivial return if scalar
+  if(isScalar(a)) return a(0);
+
+  // Return expression
+  T ret = 0;
+
+  // We expand the matrix along the first column
+  for(int i=0; i<n; ++i){
+
+    // Sum up the cofactors
+    ret += a(i,0)*cofactor(a,i,0);
+
+  }
+  return ret;
+}
+
+template<class T>
+T getMinor(const Matrix<T> &x, int i, int j){
+  int n = x.size1();
+  if(n != x.size2()) throw CasadiException("getMinor: matrix must be square");
+
+  // Trivial return if scalar
+  if(n==1) return 1;
+
+  // Remove row i and column j
+  Matrix<T> M(n-1,n-1);
+
+   for(int i1=0; i1<n; ++i1)
+       for(int j1=0; j1<n; ++j1){
+           if(i1 == i || j1 == j)
+              continue;
+
+            int i2 = (i1<i)?i1:i1-1;
+            int j2 = (j1<j)?j1:j1-1;
+    
+            M(i2,j2) = x(i1,j1);
+       }
+  return det(M);
+}
+
+template<class T>
+T cofactor(const Matrix<T> &x, int i, int j){
+
+    // Calculate the i,j minor
+    T minor_ij = getMinor(x,i,j);
+
+    // Calculate the cofactor
+    int sign_i = 1-2*((i+j) % 2);
+
+    return sign_i * minor_ij;
+}
+
+template<class T>
+Matrix<T> adj(const Matrix<T>& a){
+  int n = a.size1();
+  if(n != a.size2()) throw CasadiException("adj: matrix must be square");
+
+  // Cofactor matrix
+  Matrix<T> C(n,n);
+  for(int i=0; i<n; ++i)
+    for(int j=0; j<n; ++j)
+      C(i,j) = cofactor(a,i,j);
+  
+  return trans(C);
+}
+
+template<class T>
+Matrix<T> inv(const Matrix<T>& a){
+  // laplace formula
+  return adj(a)/det(a);
+}
+
+
+
+
+
+
+} // namespace CasADi
+
+#endif //SWIG
+
+
+
+
+#ifdef SWIG
 
 // map the template name to the instantiated name
-#define MTT_INST(T,function_name) \
-%template(function_name) function_name<T>;
+#define MTT_INST(T,function_name,ns) \
+%template(function_name) ns::function_name<T>;
 
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES(T) \
-MTT_INST(T,trans) \
-MTT_INST(T,prod) \
-MTT_INST(T,append) \
-MTT_INST(T,getSub) \
-MTT_INST(T,setSub) \
-MTT_INST(T,getRow) \
-MTT_INST(T,setRow) \
-MTT_INST(T,getColumn) \
-MTT_INST(T,setColumn) \
-MTT_INST(T,isConstant) \
-MTT_INST(T,isDense) \
-MTT_INST(T,isEmpty) \
-MTT_INST(T,isInteger) \
-MTT_INST(T,isScalar) \
-MTT_INST(T,isVector) \
-MTT_INST(T,isTril) \
-MTT_INST(T,isTriu) \
-
+MTT_INST(T,trans,CasADi) \
+MTT_INST(T,prod,CasADi) \
+MTT_INST(T,append,CasADi) \
+MTT_INST(T,getSub,CasADi) \
+MTT_INST(T,setSub,CasADi) \
+MTT_INST(T,getRow,CasADi) \
+MTT_INST(T,setRow,CasADi) \
+MTT_INST(T,getColumn,CasADi) \
+MTT_INST(T,setColumn,CasADi) \
+MTT_INST(T,isConstant,CasADi) \
+MTT_INST(T,isDense,CasADi) \
+MTT_INST(T,isEmpty,CasADi) \
+MTT_INST(T,isInteger,CasADi) \
+MTT_INST(T,isScalar,CasADi) \
+MTT_INST(T,isVector,CasADi) \
+MTT_INST(T,isTril,CasADi) \
+MTT_INST(T,isTriu,CasADi) \
+MTT_INST(T,sin,std) \
+MTT_INST(T,cos,std) \
+MTT_INST(T,tan,std) \
+MTT_INST(T,asin,std) \
+MTT_INST(T,acos,std) \
+MTT_INST(T,atan,std) \
+MTT_INST(T,exp,std) \
+MTT_INST(T,log,std) \
+MTT_INST(T,sqrt,std) \
+MTT_INST(T,floor,std) \
+MTT_INST(T,ceil,std) \
+MTT_INST(T,fabs,std) \
+MTT_INST(T,det,CasADi) \
+MTT_INST(T,getMinor,CasADi) \
+MTT_INST(T,cofactor,CasADi) \
+MTT_INST(T,adj,CasADi) \
+MTT_INST(T,inv,CasADi) \
 
 
 #endif //SWIG
 
 
-} // namespace CasADi
 
 #endif // MATRIX_TOOLS_HPP
