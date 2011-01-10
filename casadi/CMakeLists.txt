@@ -6,6 +6,7 @@ project(casadi)
 
 SET(CASADI_SRCS
   # MISC
+  casadi_limits.hpp
   casadi_exception.hpp
   printable_object.hpp
   printable_object.cpp

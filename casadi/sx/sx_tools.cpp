@@ -223,7 +223,7 @@ SXMatrix inf(int n, int m){
   SXMatrix ret(n,m);
   for(int i=0; i<n; ++i)
     for(int j=0; j<m; ++j)
-      ret(i,j) = SX::inf;
+      ret(i,j) = casadi_limits<SX>::inf;
   return ret;
 }
 
@@ -897,7 +897,7 @@ void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
 
     if(to_be_expanded.top()->isConstant()){ // constant nodes are seen as multiples of one
       w.push_back(to_be_expanded.top()->getValue());
-      f.push_back(SX::one.get());
+      f.push_back(casadi_limits<SX>::one.get());
     } else if(to_be_expanded.top()->isSymbolic()){ // symbolic nodes have weight one and itself as factor
       w.push_back(1);
       f.push_back(to_be_expanded.top());
@@ -1092,7 +1092,7 @@ SXMatrix binary(int op, const SXMatrix &x, const SXMatrix &y){
 
 SXMatrix unary(int op, const SXMatrix &x){
   if(x.scalar()){
-    return sfcn[op](x(0),SX::nan);
+    return sfcn[op](x(0),casadi_limits<SX>::nan);
   } else {
     SXMatrix r(x.size1(),x.size2());
     SX y; // dummy argument

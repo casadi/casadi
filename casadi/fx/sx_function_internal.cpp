@@ -911,7 +911,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
   }
 
   // Gradient (this is also the working array)
-  vector<SX> g(tree.size(),SX::zero);
+  vector<SX> g(tree.size(),casadi_limits<SX>::zero);
 
   // if reverse AD
 //  if(getOption("ad_mode") == "reverse"){
@@ -1092,10 +1092,10 @@ return ret;
 
         // Clear seeds (from symbolic components)
         for(vector<int>::const_iterator ii=snodes.begin(); ii!=snodes.end(); ++ii)
-          g[*ii] = SX::zero;
+          g[*ii] = casadi_limits<SX>::zero;
                 
         // add a seed to the element corresponding to the output of the function
-        g[output_ind.at(oind)[el]] = SX::one;
+        g[output_ind.at(oind)[el]] = casadi_limits<SX>::one;
         
         // backward sweep
         for(int k = algorithm.size()-1; k>=0; --k){
@@ -1111,7 +1111,7 @@ return ret;
               g[ae.ch[1]] += der2[k] * g[ae.ind];
           
             // Remove the seed
-            g[ae.ind] = SX::zero;
+            g[ae.ind] = casadi_limits<SX>::zero;
           }
         }
 
@@ -1137,10 +1137,10 @@ return ret;
         // set all components to zero (a bit quicker than to use fill)
         for(vector<SX>::iterator it=g.begin(); it!=g.end(); ++it)
           if(!(*it)->isZero())
-            *it = SX::zero;
+            *it = casadi_limits<SX>::zero;
                 
         // add a seed to the element corresponding to the output of the function
-        g[input_ind.at(iind)[el]] = SX::one;
+        g[input_ind.at(iind)[el]] = casadi_limits<SX>::one;
 
         // forward sweep
         for(int k = 0; k<algorithm.size(); ++k){

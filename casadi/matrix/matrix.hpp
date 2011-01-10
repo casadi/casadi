@@ -30,9 +30,16 @@
 #include "crs_sparsity.hpp"
 
 namespace CasADi{
+// Helper class
+/*template<class T>
+class ElementChecker{
+  bool isZero(const T& val){ return val==0; }
+  bool isOne(const T& val){ return val==1;}
+};*/
+  
 
   
-/** \brief General sparse matrix class
+  /** \brief General sparse matrix class
   \author Joel Andersson 
   \date 2010	
 */
@@ -111,6 +118,28 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Const access an element 
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
 #endif // SWIG
+
+#if 0
+    /// Get a non-zero entry
+    const T getitem(int k) const;
+    
+    /// Get a matrix entry
+    const T getitem(int I[2]) const;
+    
+    /// Get a slice
+    const T getslice(int start1, int stop1, int stride1, int start2, int stop2, int stride2);
+    
+    /// Set a non-zero entry
+    void setitem(int k, const T& el);
+    
+    /// Set a matrix entry
+    void setitem(int i, int j, const T&  el);
+
+    /// Set a slice
+    void setslice(int start1, int stop1, int stride1, int start2, int stop2, int stride2, const std::vector<T>& el);
+#endif    
+
+
     /// Python: get a non-zero entry
     const T __getitem__(int i) const;
     
@@ -152,10 +181,10 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void clear();
     void resize(int n, int m);
     void reserve(int nnz);
-
+    
   protected:
     // Constant zero
-//    static const T zero;
+//    static ElementChecker<T> element_checker_;
     
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format

@@ -29,16 +29,16 @@ namespace Modelica{
   
 VariableInternal::VariableInternal(const string& name) : name_(name){
   // No expression by default
-  sx_ = SX::nan;
+  sx_ = casadi_limits<SX>::nan;
   
   // Not differentable by default
-  dx_ = SX::nan;
+  dx_ = casadi_limits<SX>::nan;
   
   // Binding equation undefined by default
-  be_ = SX::nan;
+  be_ = casadi_limits<SX>::nan;
   
   // Differential equation undefined by default
-  de_ = SX::nan;
+  de_ = casadi_limits<SX>::nan;
 
   independent_ = false;
   variability_ = CONTINUOUS;

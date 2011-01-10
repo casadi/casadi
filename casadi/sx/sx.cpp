@@ -27,16 +27,9 @@
 
 namespace CasADi{
 
-const SX SX::zero(new ZeroSXNode()); // node corresponding to a constant 0
-const SX SX::one(new OneSXNode()); // node corresponding to a constant 1
-const SX SX::two(new IntegerSXNode(2)); // node corresponding to a constant 2
-const SX SX::mone(new MinusOneSXNode()); // node corresponding to a constant -1
-const SX SX::nan(new NanSXNode());
-const SX SX::inf(new InfSXNode());
-const SX SX::minf(new MinusInfSXNode());
 
 SX::SX(){
-  node = nan.node;
+  node = casadi_limits<SX>::nan.node;
   node->count++;
 }
 
@@ -52,15 +45,15 @@ SX::SX(const SX& scalar){
 SX::SX(double val){
   int intval = int(val);
   if(val-intval == 0){ // check if integer
-    if(intval == 0)             node = zero.node;
-    else if(intval == 1)        node = one.node;
-    else if(intval == 2)        node = two.node;
-    else if(intval == -1)       node = mone.node;
+    if(intval == 0)             node = casadi_limits<SX>::zero.node;
+    else if(intval == 1)        node = casadi_limits<SX>::one.node;
+    else if(intval == 2)        node = casadi_limits<SX>::two.node;
+    else if(intval == -1)       node = casadi_limits<SX>::minus_one.node;
     else                        node = new IntegerSXNode(intval);
     node->count++;
   } else {	
-    if(ISNAN(val))              node = nan.node;
-    else if(ISINF(val))         node = val > 0 ? inf.node : minf.node;
+    if(ISNAN(val))              node = casadi_limits<SX>::nan.node;
+    else if(ISINF(val))         node = val > 0 ? casadi_limits<SX>::inf.node : casadi_limits<SX>::minus_inf.node;
     else                        node = new RealtypeSXNode(val);
     node->count++;
   }
@@ -173,7 +166,7 @@ SX operator*(const SX &x, const SX &y){
 
 SX operator/(const SX &x, const SX &y){
     if(y->isZero()) // term2 is zero
-      return SX::nan;
+      return casadi_limits<SX>::nan;
     else if(x->isZero()) // term1 is zero
       return 0;
     else if(y->isOne()) // term2 is one
@@ -264,6 +257,81 @@ string SX::toString() const{
   return ss.str();
 }
 
+bool SX::isConstant() const{
+  return node->isConstant();
+}
+
+bool SX::isInteger() const{
+  return node->isInteger();
+}
+
+bool SX::isSymbolic() const{
+  return node->isSymbolic();
+}
+
+bool SX::isBinary() const{
+  return node->isBinary();
+}
+
+bool SX::isZero() const{
+  return node->isZero();
+}
+
+bool SX::isOne() const{
+  return node->isOne();
+}
+
+bool SX::isMinusOne() const{
+  return node->isMinusOne();
+}
+
+bool SX::isNan() const{
+  return node->isNan();
+}
+
+bool SX::isInf() const{
+  return node->isInf();
+}
+
+bool SX::isMinusInf() const{
+  return node->isMinusInf();
+}
+
+const std::string& SX::getName() const{
+  return node->getName();
+}
+
+int SX::getOp() const{
+  return node->getOp();
+}
+
+bool SX::isEqual(const SX& scalar) const{
+  return node->isEqual(scalar);
+}
+
+double SX::getValue() const{
+  return node->getValue();
+}
+
+int SX::getIntValue() const{
+  return node->getIntValue();
+}
+
+const SX casadi_limits<SX>::zero(new ZeroSXNode()); // node corresponding to a constant 0
+const SX casadi_limits<SX>::one(new OneSXNode()); // node corresponding to a constant 1
+const SX casadi_limits<SX>::two(new IntegerSXNode(2)); // node corresponding to a constant 2
+const SX casadi_limits<SX>::minus_one(new MinusOneSXNode()); // node corresponding to a constant -1
+const SX casadi_limits<SX>::nan(new NanSXNode());
+const SX casadi_limits<SX>::inf(new InfSXNode());
+const SX casadi_limits<SX>::minus_inf(new MinusInfSXNode());
+
+bool casadi_limits<SX>::isZero(const SX& val){ 
+  return val.isZero();
+}
+
+bool casadi_limits<SX>::isOne(const SX& val){ 
+  return val.isOne();
+}
 
 } // namespace CasADi
 
@@ -355,6 +423,13 @@ SX ceil(const SX& x){
   return SX(new BinarySXNode(CEIL_NODE,x));
 }
 
+CasADi::SX numeric_limits<CasADi::SX>::infinity() throw(){
+  return CasADi::casadi_limits<CasADi::SX>::inf;
+}
+
+CasADi::SX numeric_limits<CasADi::SX>::quiet_NaN() throw(){
+  return CasADi::casadi_limits<CasADi::SX>::nan;
+}
 
 
 } // namespace std

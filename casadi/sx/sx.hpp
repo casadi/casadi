@@ -25,6 +25,7 @@
 
 // exception class
 #include "../casadi_exception.hpp"
+#include "../casadi_limits.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>
@@ -131,16 +132,6 @@ class SX{
   //@}
 #endif // SWIG
 
-  //@{
-  /** \brief  constant nodes (to make sure that there are no dublications of them) */
-  static const SX zero; // constant 0
-  static const SX one;  // constant 1
-  static const SX two;  // constant 2
-  static const SX mone;  // constant -1
-  static const SX nan; // not a number
-  static const SX inf; // infinity
-  static const SX minf; // minus infinity
-  //@}
 
 #ifndef SWIG
   /** \brief  print to stream */
@@ -161,6 +152,22 @@ class SX{
   static SX binary(int op, const SX& x, const SX& y);
   static SX unary(int op, const SX& x);
 
+  bool isConstant() const;
+  bool isInteger() const;
+  bool isSymbolic() const;
+  bool isBinary() const;
+  bool isZero() const;
+  bool isOne() const;
+  bool isMinusOne() const;
+  bool isNan() const;
+  bool isInf() const;
+  bool isMinusInf() const;
+  const std::string& getName() const;
+  int getOp() const;
+  bool isEqual(const SX& scalar) const;
+  double getValue() const;
+  int getIntValue() const;
+
   protected:
 #ifndef SWIG
 SXNode* node;
@@ -178,21 +185,8 @@ friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // rep
 %extend SX {
 std::string __str__()  { return $self->toString(); }
 std::string __repr__() { return $self->toString(); }
-double __float__() { return (*$self)->getValue();}
-int __int__() { return (*$self)->getIntValue();}
-bool isConstant() const{return (*$self)->isConstant();}
-bool isInteger() const{ return (*$self)->isInteger();}
-bool isSymbolic() const{ return (*$self)->isSymbolic();}
-bool isBinary() const{ return (*$self)->isBinary();}
-bool isZero() const{ return (*$self)->isZero();}
-bool isOne() const{ return (*$self)->isOne();}
-bool isMinusOne() const{ return (*$self)->isMinusOne();}
-bool isNan() const{ return (*$self)->isNan();}
-bool isInf() const{ return (*$self)->isInf();}
-bool isMinusInf() const{ return (*$self)->isMinusInf();}
-const std::string& getName() const{ return (*$self)->getName();}
-int getOp() const{ return (*$self)->getOp();}
-bool isEqual(const SX& scalar) const{ return (*$self)->isEqual(scalar);}
+double __float__() { return $self->getValue();}
+int __int__() { return $self->getIntValue();}
 
 //  all binary operations with a particular right argument
 #define binops(T,t) \
@@ -234,13 +228,41 @@ unops(SX)
 }
 #endif // SWIG
 
+#ifndef SWIG
+// Template specialization
+template<>
+class casadi_limits<SX>{
+  public:
+    static bool isZero(const SX& val);
+    static bool isOne(const SX& val);
+    static const SX zero;
+    static const SX one;
+    static const SX two;
+    static const SX minus_one;
+    static const SX nan;
+    static const SX inf; 
+    static const SX minus_inf;
+};
+
+#endif // SWIG
+
 
 } // namespace CasADi
 
 #ifndef SWIG
 
-/** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
+// Template specialization
 namespace std{
+template<>
+class numeric_limits<CasADi::SX>{
+  public:
+    static CasADi::SX infinity() throw();
+    static CasADi::SX quiet_NaN() throw();
+    // More to come
+};
+
+
+/** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
 #define SX CasADi::SX
 SX sqrt(const SX &x);
 SX sin(const SX &x);
