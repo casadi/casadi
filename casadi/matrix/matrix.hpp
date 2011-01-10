@@ -26,6 +26,7 @@
 #include <vector>
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
+#include "../casadi_limits.hpp"
 #include "element.hpp"
 #include "crs_sparsity.hpp"
 

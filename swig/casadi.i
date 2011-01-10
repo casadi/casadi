@@ -41,6 +41,15 @@ namespace std {
 // FX
 %include "fx.i"
 
+// Matrix tools
+%include "casadi/matrix/matrix_tools.hpp"
+
+// Instansiate the functions
+namespace CasADi{
+MATRIX_TOOLS_TEMPLATES(double)
+MATRIX_TOOLS_TEMPLATES(SX)
+} // namespace CasADi
+
 // SX tools
 %include "casadi/sx/sx_tools.hpp"
 

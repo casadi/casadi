@@ -23,6 +23,7 @@
 #include "sx_tools.hpp"
 #include "../fx/sx_function_internal.hpp"
 #include "binary_functions.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 namespace CasADi{
 
@@ -253,70 +254,16 @@ SXMatrix vec(const SXMatrix &expr){
   return ret;
 }
 
-void getSub(SXMatrix &res, const SXMatrix &expr, int i, int j, int ni, int nj, int ki, int kj){
-  casadi_assert(ki==1 && kj==1,"getSub: ki==1 && kj==1");
-  casadi_assert(i+ni <= expr.size1() && j+nj <= expr.size2(),"getSub: i+ni <= expr.size1() && j+nj <= expr.size2()");
-  res = SXMatrix(ni,nj);
-  for(int r=0; r<ni; ++r)
-    for(int c=0; c<nj; ++c)
-      if(!expr(i+r,j+c)->isZero())
-        res(r,c) = expr(i+r,j+c);
-}
-
-//void SXMatrix::set(const SXMatrix &expr, int i, int j, int ni, int nj, int ki, int kj){
-void setSub(const SXMatrix &expr, SXMatrix &res, int i, int j){
-  for(int r=0; r<expr.size1(); ++r)
-    for(int c=0; c<expr.size2(); ++c)
-      if(!expr(r,c)->isZero())
-        res(i+r,j+c) = expr(r,c);
-}
-
-void getRow(SXMatrix &res, const SXMatrix &expr, int i, int ni, int ki){
-  casadi_assert(i<expr.size1(),"getRow: i<expr.size1()");
-  res = SXMatrix(ni,expr.size2());
-  for(int ii=0; ii<ni; ++ii)
-    for(int j=0; j<expr.size2(); ++j){
-      SX temp = expr(i+ii,j);
-      if(!temp->isZero()) res(ii,j) = temp;
-      }
-}
-
 SXMatrix getRow( const SXMatrix &expr, int i, int ni, int ki){
   SXMatrix res(ni,expr.size2());
   getRow(res,expr,i,ni,ki);
   return res;
 }
 
-void getColumn(SXMatrix &res, const SXMatrix &expr, int j, int nj, int kj){
-  casadi_assert(j<expr.size2(),"getColumn: j<expr.size2()");
-  res = SXMatrix(expr.size1(),nj);
-  for(int i=0; i<expr.size1(); ++i)
-    for(int jj=0; jj<nj; ++jj){
-      SX temp = expr(i,j+jj);
-      if(!temp->isZero()) res(i,jj) = temp;
-      }
-}
-
 SXMatrix getColumn( const SXMatrix &expr, int j, int nj, int kj){
   SXMatrix res(expr.size1(),nj);
   getColumn(res,expr,j,nj,kj);
   return res;
-}
-
-void setRow(const SXMatrix& expr, SXMatrix &res, int i, int ni, int ki){
-  casadi_assert(i<res.size1(),"setRow: i<res.size1()");
-  for(int j=0; j<res.size2(); ++j){
-    if(!expr(0,j)->isZero())
-      res(i,j) = expr(0,j);
-    }
-}
-
-void setColumn(const SXMatrix& expr, SXMatrix &res, int j, int nj, int kj){
-  casadi_assert(j<res.size2(),"setColumn: j<res.size2()");
-  for(int i=0; i<res.size1(); ++i){
-    if(!expr(i,0)->isZero())
-      res(i,j) = expr(i,0);
-    }
 }
 
 bool contains(const SXMatrix &list, const SX &e) {
@@ -815,6 +762,7 @@ SXMatrix outer_prod(const SXMatrix &x, const SXMatrix &y){
   if(!x.vector() || !y.vector()) throw CasadiException("outer_prod: arguments must be vectors");
   return prod(x,trans(y));  
 }
+
 SXMatrix vertcat(const std::vector<SXMatrix> &v){
   SXMatrix ret;
   for(int i=0; i<v.size(); ++i)
@@ -844,26 +792,9 @@ SXMatrix horzcat(const SXMatrix &x, const SXMatrix &y){
 }
 
 SXMatrix& operator<<(SXMatrix& expr, const SXMatrix& add){
-  // Quick return if we are adding an empty expression
-  if(add.empty()) return expr;
-
-  // Likewise if expr is empty
-  if(expr.empty()) return expr=add;
-
-  // Check dimensions
-  if(expr.size2() != add.size2()) throw "operator<<: dimensions do not match";
-
-  // Resize the expression
-  int oldn = expr.size1();
-  int n    = expr.size1() + add.size1();  
-  int m    = expr.size2();
-  expr.resize(n,m);
-
-  // Copy the lower expression to the end
-  setSub(add, expr, oldn, 0);
+  append(expr,add);
   return expr;
 }
-
   
 std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
 
@@ -1004,72 +935,15 @@ void simplify(SX& ex){
 }
 
 SXMatrix trans(const SXMatrix& x){
-  // quick return if empty or scalar
-  if(x.empty() || x.scalar()) return x;
-
-  // We do matrix transpose by the (linear time) "bucket sort" algorithm
-  vector<vector<int> > buckets(x.size2()); // one bucket for each column
-  
-  // Create a vector with the rows for each non-zero element
-  vector<int> row(x.size());
-  
-  // Loop over the rows of the original matrix
-  for(int i=0; i<x.size1(); ++i)
-  {
-    // Loop over the elements in the row
-    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over the non-zero elements
-      int j=x.col(el);  // column
-      
-     // put the element into the right bucket
-     buckets[j].push_back(el);
-     
-     // save the row index
-     row[el] = i;
-    }
-  }
-
-  SXMatrix ret(x.size2(),x.size1()); // create the return matrix
-
-  // reserve space (to make the calculations quicker)
-  ret.reserve(x.capacity());
-  ret.col().reserve(x.col().size());
-  ret.rowind().reserve(x.rowind().size());
-
-  for(int j=0; j<x.size2(); ++j)   // loop over the columns
-    for(int r=0; r<buckets[j].size(); ++r){ // loop over the bucket content
-     int el =  buckets[j][r]; // the index of the non-zero element
-     int i = row[el]; // the row of the element
-     ret.getElementRef(j,i) = x[el]; // add the element
-    }
-
-    return ret;
+  SXMatrix ret;
+  dynamic_cast<Matrix<SX>&>(ret) = trans(dynamic_cast<const Matrix<SX>&>(x));
+  return ret;
 }
 
 SXMatrix prod(const SXMatrix &x, const SXMatrix &y){
-  if(x.size2() != y.size1()) throw CasadiException("prod: dimension mismatch");
-
-  SXMatrix ret(x.size1(),y.size2());
-  SXMatrix b = trans(y); // take the transpose of the second matrix: linear time operation
-
-  for(int i=0; i<x.size1(); ++i) // loop over the row of the resulting matrix)
-    for(int j=0; j<b.size1(); ++j){ // loop over the column of the resulting matrix
-      int el1 = x.rowind(i);
-      int el2 = b.rowind(j);
-      while(el1 < x.rowind(i+1) && el2 < b.rowind(j+1)){ // loop over non-zero elements
-        int j1 = x.col(el1);
-        int i2 = b.col(el2);      
-        if(j1==i2){
-          SX temp = x[el1++] * b[el2++];
-          if(!temp->isZero())
-            ret(i,j) += temp;
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
-return ret;
+  SXMatrix ret;
+  dynamic_cast<Matrix<SX>&>(ret) = prod(dynamic_cast<const Matrix<SX>&>(x),dynamic_cast<const Matrix<SX>&>(y));
+  return ret;
 }
 
 void fill(SXMatrix& mat, const SX& val){

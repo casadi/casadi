@@ -24,6 +24,7 @@
 #define SX_TOOLS_HPP
 
 #include "sx_matrix.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 #ifdef WITH_UBLAS
 #include <boost/numeric/ublas/matrix_sparse.hpp>
@@ -32,6 +33,10 @@
 #include <boost/numeric/ublas/io.hpp>
 namespace ublas = boost::numeric::ublas;
 #endif
+
+/** NOTE: This file needs some cleaning up
+    Basically everything which deals with SXMatrix should be turned into template functions and moved to matrix_tools.hpp
+*/
 
 namespace CasADi{
 
@@ -173,20 +178,6 @@ SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, cons
   Reshapes/flattens the SXMatrix such that the shape becomes (expr.numel(),1)
  */
 SXMatrix vec(const SXMatrix &expr); 
-
-/// ... = A(i:ki:i+ni,j:kj:j+nj)
-void getSub(SXMatrix &res, const SXMatrix &expr, int i, int j=0, int ni=1, int nj=1, int ki=1, int kj=1); 
-/** \brief  A(i:ki:i+ni,j:kj:j+nj) = expr */
-void setSub(const SXMatrix &expr, SXMatrix &res, int i, int j=0);
-/// ... = A(i:ki:i+ni,:)
-void getRow(SXMatrix &res, const SXMatrix &expr, int i, int ni=1, int ki=1);
-/** \brief  A(i:ki:i+ni,:) = expr */
-void setRow(const SXMatrix& expr, SXMatrix &res, int i, int ni=1, int ki=1);
-/// ... = A(:,j:kj:j+nj)
-void getColumn(SXMatrix &res, const SXMatrix &expr, int j, int nj=1, int kj=1);
-/** \brief  A(:,j:kj:j+nj) = expr */
-void setColumn(const SXMatrix& expr, SXMatrix &res, int j, int nj=1, int kj=1);
-
 
 SXMatrix getRow(const SXMatrix &expr, int i, int ni=1, int ki=1);
 SXMatrix getColumn(const SXMatrix &expr, int j, int nj=1, int kj=1);
