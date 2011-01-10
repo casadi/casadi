@@ -39,6 +39,8 @@ class casadi_limits{
   public:
     static bool isZero(const T& val){ return val==0; }
     static bool isOne(const T& val){ return val==1;}
+    static bool isConstant(const T& val){ return true;}
+    static bool isInteger(const T& val){ return val==int(val);}
     static const T zero = 0;
     static const T one = 1;
     static const T two = 2;

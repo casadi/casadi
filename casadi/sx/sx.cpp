@@ -333,6 +333,15 @@ bool casadi_limits<SX>::isOne(const SX& val){
   return val.isOne();
 }
 
+bool casadi_limits<SX>::isConstant(const SX& val){
+  return val.isConstant();
+}
+
+bool casadi_limits<SX>::isInteger(const SX& val){
+  return val.isInteger();
+}
+
+
 } // namespace CasADi
 
 using namespace CasADi;

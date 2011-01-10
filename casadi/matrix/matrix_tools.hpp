@@ -62,10 +62,42 @@ void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj=1, int kj=1)
 template<class T>
 void setColumn(const Matrix<T>& expr, Matrix<T> &res, int j, int nj=1, int kj=1);
 
+//@{
+/** \brief  check if the matrix has certain properties */
+template<class T>
+bool isConstant(const Matrix<T>& ex);
+
+template<class T>
+bool isDense(const Matrix<T>& ex);
+
+template<class T>
+bool isEmpty(const Matrix<T>& ex);
+
+template<class T>
+bool isInteger(const Matrix<T>& ex);
+
+template<class T>
+bool isScalar(const Matrix<T>& ex);
+
+template<class T>
+bool isVector(const Matrix<T>& ex);
+
+//@}
+
+/** \brief  Check if a matrix is lower triangular (complexity ~ A.size1()) */
+template<class T>
+bool isTril(const Matrix<T> &A);
+
+/** \brief  Check if a matrix is upper triangular (complexity ~ A.size1()) */
+template<class T>
+bool isTriu(const Matrix<T> &A);
+
 #ifndef SWIG
 // Implementations
 template<class T>
 Matrix<T> trans(const Matrix<T> &x){
+  // TODO: Possiblt move a part of the implementation to CRSSparsity
+  
   // quick return if empty or scalar
   if(x.empty() || x.scalar()) return x;
 
@@ -172,6 +204,7 @@ void getSub(Matrix<T> &res, const Matrix<T> &expr, int i, int j, int ni, int nj,
 
 template<class T>
 void setSub(const Matrix<T> &expr, Matrix<T> &res, int i, int j){
+  // TODO: Very inefficient, exploit sparsity
   for(int r=0; r<expr.size1(); ++r)
     for(int c=0; c<expr.size2(); ++c)
       if(!casadi_limits<T>::isZero(expr(r,c)))
@@ -180,6 +213,7 @@ void setSub(const Matrix<T> &expr, Matrix<T> &res, int i, int j){
 
 template<class T>
 void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni, int ki){
+  // TODO: Very inefficient, exploit sparsity
   if(!(i<expr.size1())) throw CasadiException("getRow: dimension mismatch");
   res = Matrix<T>(ni,expr.size2());
   for(int ii=0; ii<ni; ++ii)
@@ -192,6 +226,7 @@ void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni, int ki){
 
 template<class T>
 Matrix<T> getRow( const Matrix<T> &expr, int i, int ni, int ki){
+  // TODO: lacks header
   Matrix<T> res(ni,expr.size2());
   getRow(res,expr,i,ni,ki);
   return res;
@@ -199,6 +234,7 @@ Matrix<T> getRow( const Matrix<T> &expr, int i, int ni, int ki){
 
 template<class T>
 void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj, int kj){
+  // TODO: Very inefficient, exploit sparsity
   if(!(j<expr.size2())) throw CasadiException("getColumn: dimension mismatch");
   res = Matrix<T>(expr.size1(),nj);
   for(int i=0; i<expr.size1(); ++i)
@@ -211,6 +247,7 @@ void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj, int kj){
 
 template<class T>
 Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj, int kj){
+  // TODO: lacks a header
   Matrix<T> res(expr.size1(),nj);
   getColumn(res,expr,j,nj,kj);
   return res;
@@ -218,6 +255,7 @@ Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj, int kj){
 
 template<class T>
 void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni, int ki){
+  // TODO: Very inefficient, exploit sparsity
   if(!(i<res.size1())) throw CasadiException("setRow: dimension mismatch");
   for(int j=0; j<res.size2(); ++j){
     if(!casadi_limits<T>::isZero(expr(0,j)))
@@ -227,11 +265,88 @@ void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni, int ki){
 
 template<class T>
 void setColumn(const Matrix<T>& expr, Matrix<T> &res, int j, int nj, int kj){
+  // TODO: Very inefficient, exploit sparsity
   if(!(j<res.size2())) throw CasadiException("setColumn: dimension mismatch");
   for(int i=0; i<res.size1(); ++i){
     if(!casadi_limits<T>::isZero(expr(i,0)))
       res(i,j) = expr(i,0);
     }
+}
+
+template<class T>
+bool isScalar(const Matrix<T>& ex){
+  return ex.size1()==1 && ex.size2()==1;
+}
+
+template<class T>
+bool isVector(const Matrix<T>& ex){
+  return ex.size2()==1;
+}
+
+template<class T>
+bool isInteger(const Matrix<T>& ex){
+  // loop over non-zero elements
+  for(int k=0; k<ex.size(); ++k) 
+    if(!casadi_limits<T>::isInteger(ex[k])) // if an element is not integer
+      return false;
+    
+  // Integer if reached this point
+  return true;
+}
+
+template<class T>
+bool isConstant(const Matrix<T>& ex){
+  // loop over non-zero elements
+  for(int k=0; k<ex.size(); ++k) 
+    if(!casadi_limits<T>::isConstant(ex[k])) // if an element is not constant
+      return false;
+    
+  // Constant if we reach this point
+  return true;
+}
+
+template<class T>
+bool isDense(const Matrix<T>& ex){
+  return ex.size() == ex.numel();
+}
+
+template<class T>
+bool isEmpty(const Matrix<T>& ex){
+  return ex.empty();
+}
+
+template<class T>
+bool isTril(const Matrix<T> &A){
+  // TODO: Move implementation to CRSSparsity as it does not depend on the matrix entries 
+  // loop over rows
+  for(int i=0; i<A.size1(); ++i){
+    if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
+      // check column of the right-most element of the row
+      int col = A.col(A.rowind(i+1)-1);
+
+      // not lower triangular if col>i
+      if(col>i) return false;
+    }
+  }
+  // all rows ok
+  return true;
+}
+
+template<class T>
+bool isTriu(const Matrix<T> &A){
+  // TODO: Move implementation to CRSSparsity as it does not depend on the matrix entries 
+  // loop over rows
+  for(int i=0; i<A.size1(); ++i){
+    if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
+      // check column of the left-most element of the row
+      int col = A.col(A.rowind(i));
+
+      // not lower triangular if col>i
+      if(col<i) return false;
+    }
+  }
+  // all rows ok
+  return true;
 }
 
 # else // SWIG
@@ -251,6 +366,16 @@ MTT_INST(T,getRow) \
 MTT_INST(T,setRow) \
 MTT_INST(T,getColumn) \
 MTT_INST(T,setColumn) \
+MTT_INST(T,isConstant) \
+MTT_INST(T,isDense) \
+MTT_INST(T,isEmpty) \
+MTT_INST(T,isInteger) \
+MTT_INST(T,isScalar) \
+MTT_INST(T,isVector) \
+MTT_INST(T,isTril) \
+MTT_INST(T,isTriu) \
+
+
 
 #endif //SWIG
 

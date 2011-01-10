@@ -396,6 +396,9 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
 #endif
 }
 
+
+
+
 void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R){
   // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
   int m = A.size1();
@@ -452,35 +455,6 @@ SXMatrix spy(const SXMatrix& A){
   return s;
 }
 
-bool isTril(const SXMatrix &A){
-  // loop over rows
-  for(int i=0; i<A.size1(); ++i){
-    if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
-      // check column of the right-most element of the row
-      int col = A.col(A.rowind(i+1)-1);
-
-      // not lower triangular if col>i
-      if(col>i) return false;
-    }
-  }
-  // all rows ok
-  return true;
-}
-
-bool isTriu(const SXMatrix &A){
-  // loop over rows
-  for(int i=0; i<A.size1(); ++i){
-    if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
-      // check column of the left-most element of the row
-      int col = A.col(A.rowind(i));
-
-      // not lower triangular if col>i
-      if(col<i) return false;
-    }
-  }
-  // all rows ok
-  return true;
-}
 
 SXMatrix solve(const SXMatrix& A, const SXMatrix& b){
   // check dimensions
@@ -533,13 +507,6 @@ bool dependsOn(const SXMatrix& ex, const SXMatrix &arg){
   return !isZero(g);
 }
 
-bool isScalar(const SXMatrix& ex){
-  return ex.size1()==1 && ex.size2()==1;
-}
-
-bool isVector(const SXMatrix& ex){
-  return ex.size2()==1;
-}
 
 bool isSmooth(const SXMatrix& ex){
  // Make a function
@@ -549,39 +516,6 @@ bool isSmooth(const SXMatrix& ex){
  return temp->isSmooth();
 }
 
-bool isInteger(const SXMatrix& ex){
-  if(ex.empty())
-    throw "isConstant(): SXMatrix is empty";
-  else if(isScalar(ex))
-    return ex(0)->isInteger();
-  else
-  {
-    for(int k=0; k<ex.size(); ++k) // loop over non-zero elements
-      if(!ex[k]->isInteger()) // if an element is not integer
-        return false;
-  }
-  return true;
-}
-
-bool isConstant(const SXMatrix& ex){
-  if(ex.empty())
-    throw "SXMatrix::isConstant(): SXMatrix is empty";
-  else
-  {
-    for(int k=0; k<ex.size(); ++k) // loop over non-zero elements
-      if(!ex[k]->isConstant()) // if an element is not constant
-        return false;
-  }
-  return true;
-}
-
-bool isDense(const SXMatrix& ex){
-  return ex.size() == ex.numel();
-}
-
-bool isEmpty(const SXMatrix& ex){
-  return ex.empty();
-}
 
 bool isSymbolic(const SXMatrix& ex){
   if(!isDense(ex)) return false;

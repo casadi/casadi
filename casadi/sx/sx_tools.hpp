@@ -258,16 +258,10 @@ T if_else(const SX& cond, const T& if_true, const T &if_false){
 }
 #endif
 
-/** \brief  QR factorization using the modified Gram-Schmidt algorithm */
-/** \brief  More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent */
-/** \brief  See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.) */
+/** \brief  QR factorization using the modified Gram-Schmidt algorithm 
+More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent
+See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.) */
 void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R);
-
-/** \brief  Check if a matrix is lower triangular (complexity ~ A.size1()) */
-bool isTril(const SXMatrix &A);
-
-/** \brief  Check if a matrix is upper triangular (complexity ~ A.size1()) */
-bool isTriu(const SXMatrix &A);
 
 /** \brief  Solve a system of equations: A*x = b */
 SXMatrix solve(const SXMatrix& A, const SXMatrix& b);
@@ -321,17 +315,11 @@ int numNodes(const SXMatrix& A);
 /// Check dependency: very inefficient algorithm
 bool dependsOn(const SXMatrix& f, const SXMatrix &arg);
 
-//@{
-/** \brief  check if the matrix has certain properties */
-bool isConstant(const SXMatrix& ex);
-bool isSymbolic(const SXMatrix& ex);
-bool isDense(const SXMatrix& ex);
-bool isEmpty(const SXMatrix& ex);
-bool isInteger(const SXMatrix& ex);
-bool isScalar(const SXMatrix& ex);
-bool isVector(const SXMatrix& ex);
+/** \brief  check if smooth */
 bool isSmooth(const SXMatrix& ex);
-//@}
+
+/** \brief  check if symbolic */
+bool isSymbolic(const SXMatrix& ex);
 
 /** \brief  check if two expressions are the same */
 bool isEqual(const SXMatrix &ex1, const SXMatrix &ex2);
