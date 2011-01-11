@@ -4,6 +4,24 @@ from random import *
 import time
 import numpy as N
 
+"""
+Test generating some matrices by random accessing, convert between scipy and casadi types.
+
+Conclusions:
+CasADi is significantly quicker than scipy for random accessing and inserting new elements
+(about 10 times) when compared to the csr_matrix matrix which uses the same storage format
+as CasADi. However, csr_matrix is not intended to be used for random access, a more suitable
+scipy class is lil_matrix and then when the assembly is finished, convert back to csr_matrix.
+This is somewhat quicker than casadi. Since Matrix<> was designed for flexibility rather
+than numerical efficiency, the result is satisfactory.
+
+Converting between scipy csr_matrix and casadi matrix works fine.
+
+Summary:
+Use scipy for numerical operations on floating points and casadi when working with symbolic
+types.
+"""
+
 n = 1000
 m = 1000
 
