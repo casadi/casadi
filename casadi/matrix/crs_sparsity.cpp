@@ -225,6 +225,81 @@ void CRSSparsity::getSparsity(std::vector<int>& row, std::vector<int> &col) cons
   col = this->col();
 }
 
+void CRSSparsity::bucketSort(std::vector<std::vector<int> >& buckets, std::vector<int>& row) const{
+  // Assert dimensions
+  buckets.resize(size2());
+
+  // Create a vector with the rows for each non-zero element
+  row.resize(size());
+
+  // Empty the buckets
+  for(std::vector<std::vector<int> >::iterator it=buckets.begin(); it!=buckets.end(); ++it)
+    it->clear();
+  
+  // Loop over the rows of the original matrix
+  for(int i=0; i<size1(); ++i)
+  {
+    // Loop over the elements in the row
+    for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
+      int j=col(el);  // column
+      
+     // put the element into the right bucket
+     buckets[j].push_back(el);
+     
+     // save the row index
+     row[el] = i;
+    }
+  }
+}
+
+CRSSparsity CRSSparsity::transpose(std::vector<int>& mapping) const{
+  // Non-zero entries on each column
+  std::vector<std::vector<int> > buckets;
+
+  // Create a vector with the rows for each non-zero element
+  std::vector<int> row;
+
+  // Do a bucket sorting
+  bucketSort(buckets,row);
+
+  // create the return object
+  CRSSparsity ret(size2(),size1());
+
+  // reserve space (to make the calculations quicker)
+  ret.reserve(size(),size2());
+
+  // Store the mapping of the nonzero entries
+  mapping.resize(size());
+
+  // loop over the columns of the object to be transposed
+  for(int j=0; j<size2(); ++j){
+    
+    // Loop over the non-zero entries of the column
+    for(int r=0; r<buckets[j].size(); ++r){
+      // the index of the non-zero element
+     int el =  buckets[j][r];
+     
+     // Get the row of the element
+     int i = row[el]; 
+     
+     // add the element (can be done much more efficiently!)
+     int el_ret = ret.getNZ(j,i);
+     
+     // Store the mapping
+     mapping[el_ret] = el;
+    }
+  }
+  
+  // Return the sparsity
+  return ret;
+
+}
+
+void CRSSparsity::reserve(int nnz, int nrow){
+  col().reserve(nnz);
+  rowind().reserve(nrow+1);
+}
+
 
 } // namespace CasADi
 

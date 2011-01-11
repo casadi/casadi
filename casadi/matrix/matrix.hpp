@@ -70,6 +70,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// sparse n-by-m matrix filled with given sparsity
     Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind);
 
+    /// sparse matrix with a given sparsity
+    explicit Matrix(const CRSSparsity& sparsity);
+    
     /// This constructor enables implicit type conversion from a scalar type
     Matrix(const T &val);
 
@@ -220,6 +223,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void clear();
     void resize(int n, int m);
     void reserve(int nnz);
+    void reserve(int nnz, int nrow);
     
     // Access the sparsity
     const CRSSparsity& sparsity() const;
@@ -517,8 +521,13 @@ int Matrix<T>::rowind(int row) const{
 
 template<class T>
 void Matrix<T>::reserve(int nnz){
+  reserve(nnz,size1());
+}
+
+template<class T>
+void Matrix<T>::reserve(int nnz, int nrow){
   std::vector<T>::reserve(nnz);
-  col().reserve(nnz);
+  sparsity_.reserve(nnz,nrow);
 }
 
 template<class T>
@@ -545,6 +554,14 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
   sparsity_ = CRSSparsity(n,m,col,rowind);
   std::vector<T>::resize(sparsity_.size());
 }
+
+template<class T>
+Matrix<T>::Matrix(const CRSSparsity& sparsity){
+  swap_on_copy_ = false;
+  sparsity_ = sparsity;
+  std::vector<T>::resize(sparsity_.size());
+}
+
 
 template<class T>
 const T Matrix<T>::__getitem__(int i) const{

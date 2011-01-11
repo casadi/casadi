@@ -106,8 +106,14 @@ class CRSSparsity : public SharedObject{
     /// Get the sparsity in sparse triplet format
     void getSparsity(std::vector<int>& row, std::vector<int> &col) const;
     
-    /// Scalar expression
-//    static const CRSSparsity scalar;
+    /// Bucket sort the elements by column
+    void bucketSort(std::vector<std::vector<int> >& buckets, std::vector<int>& row) const;
+
+    /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
+    CRSSparsity transpose(std::vector<int>& mapping) const;
+    
+    /// Reserve space
+    void reserve(int nnz, int nrow);
 
 };
 

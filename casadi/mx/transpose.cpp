@@ -21,6 +21,7 @@
  */
 
 #include "transpose.hpp"
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 
@@ -39,10 +40,13 @@ Transpose* Transpose::clone() const{
 void Transpose::init(){
   // Base class initializations
   Reordering::init();
+
+  // Mapping of the non-zeros: move to constructor?
+  CRSSparsity sp = dep(0)->output().sparsity().transpose(nzind_);
+  if(sp.size()!=sp.numel())
+    throw CasadiException("Error in Transpose::init: sparse nodes not yet allowed");
   
-  // Mapping: NOTE: does not handle sparsity correctly, should get the reordering from the Matrix<> class (which will calculate it using binsorting)
-  for(int k=0; k<size1()*size2(); ++k)
-    nzind_[k] = (k/size2()) + (k%size2())*size1();
+  // Where to store this information?
 }
 
 void Transpose::print(std::ostream &stream) const{

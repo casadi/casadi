@@ -180,47 +180,21 @@ namespace CasADi{
 
 template<class T>
 Matrix<T> trans(const Matrix<T> &x){
-  // TODO: Possiblt move a part of the implementation to CRSSparsity
-  
   // quick return if empty or scalar
   if(x.empty() || x.scalar()) return x;
 
-  // We do matrix transpose by the (linear time) "bucket sort" algorithm
-  std::vector<std::vector<int> > buckets(x.size2()); // one bucket for each column
+  // Create the new sparsity pattern and the mapping
+  std::vector<int> mapping;
+  CRSSparsity sparsity = x.sparsity().transpose(mapping);
+
+  // create the return matrix
+  Matrix<T> ret(sparsity);
   
-  // Create a vector with the rows for each non-zero element
-  std::vector<int> row(x.size());
+  // Copy the content
+  for(int i=0; i<mapping.size(); ++i)
+    ret[i] = x[mapping[i]];
   
-  // Loop over the rows of the original matrix
-  for(int i=0; i<x.size1(); ++i)
-  {
-    // Loop over the elements in the row
-    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over the non-zero elements
-      int j=x.col(el);  // column
-      
-     // put the element into the right bucket
-     buckets[j].push_back(el);
-     
-     // save the row index
-     row[el] = i;
-    }
-  }
-
-  Matrix<T> ret(x.size2(),x.size1()); // create the return matrix
-
-  // reserve space (to make the calculations quicker)
-  ret.reserve(x.capacity());
-  ret.col().reserve(x.col().size());
-  ret.rowind().reserve(x.rowind().size());
-
-  for(int j=0; j<x.size2(); ++j)   // loop over the columns
-    for(int r=0; r<buckets[j].size(); ++r){ // loop over the bucket content
-     int el =  buckets[j][r]; // the index of the non-zero element
-     int i = row[el]; // the row of the element
-     ret.getElementRef(j,i) = x[el]; // add the element
-    }
-
-    return ret;
+  return ret;
 }
 
 template<class T>

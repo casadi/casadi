@@ -84,8 +84,8 @@ public:
   int ndep() const;
 
   /** \brief  Numerical value */
-  const std::vector<double>& output() const;
-  std::vector<double>& output();
+  const Matrix<double>& output() const;
+  Matrix<double>& output();
   
   const std::vector<double>& input(int ind) const;
   std::vector<double>& input(int ind);

@@ -113,11 +113,11 @@ std::vector<double>& MXNode::input(int ind){
   return dep_.at(ind)->output();
 }
 
-const std::vector<double>& MXNode::output() const{
+const Matrix<double>& MXNode::output() const{
   return output_;
 }
 
-std::vector<double>& MXNode::output(){
+Matrix<double>& MXNode::output(){
   return output_;
 }
   
