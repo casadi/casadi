@@ -370,15 +370,24 @@ SX SX::sqrt() const{
 }
 
 SX SX::sin() const{
-  return SX(new BinarySXNode(SIN_NODE,*this));
+  if(node->isZero())
+    return 0;
+  else
+    return SX(new BinarySXNode(SIN_NODE,*this));
 }
 
 SX SX::cos() const{
-  return SX(new BinarySXNode(COS_NODE,*this));
+  if(node->isZero())
+    return 1;
+  else
+    return SX(new BinarySXNode(COS_NODE,*this));
 }
 
 SX SX::tan() const{
-  return SX(new BinarySXNode(TAN_NODE,*this));
+  if(node->isZero())
+    return 0;
+  else
+    return SX(new BinarySXNode(TAN_NODE,*this));
 }
 
 SX SX::arcsin() const{

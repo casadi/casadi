@@ -95,8 +95,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     }
 #endif // SWIG
 
-    // get the number of non-zeros
-    //int size() const;        
+    /// get the number of non-zeros
+    int size() const;
 
     /// get the number of elements
     int numel() const;
@@ -325,6 +325,11 @@ T& Matrix<T>::getElementRef(int i, int j){
   if(oldsize != sparsity_.size())
     std::vector<T>::insert(std::vector<T>::begin()+ind,0);
   return std::vector<T>::at(ind);
+}
+
+template<class T>
+int Matrix<T>::size() const{
+  return std::vector<T>::size();
 }
 
 template<class T>
@@ -589,16 +594,23 @@ void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){
 
 template<class T>
 void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
+  // First check the value of the zero-entries
   T temp = fcn(0);
-  if(casadi_limits<T>::isZero(temp))
-    makeEmpty(x.size1(),x.size2());
-  else
-    makeDense(x.size1(),x.size2(),temp);
+  if(casadi_limits<T>::isZero(temp)){
+    // Copy the matrix, including the sparsity pattern
+    *this = x;
     
-  for(int i=0; i<size1(); ++i){ // loop over rows
-    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
-      int j = x.col(el);
-      getElementRef(i,j) = fcn(x[el]);
+    // Do the operation on all non-zero elements
+    for(int el=0; el<size(); ++el)
+      (*this)[el] = fcn(x[el]);
+    
+  } else {
+    makeDense(x.size1(),x.size2(),temp);
+    for(int i=0; i<size1(); ++i){ // loop over rows
+      for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over non-zero elements
+        int j = x.col(el);
+        (*this)[j+i*size2()] = fcn(x[el]);
+      }
     }
   }
 }
@@ -836,7 +848,7 @@ void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
 template<class T>
 void Matrix<T>::set(const T* val, Sparsity sp){
   std::vector<T> &v = *this;
-  if(sp==SPARSE || (sp==DENSE && numel()==std::vector<T>::size())){
+  if(sp==SPARSE || (sp==DENSE && numel()==size())){
     copy(val,val+v.size(),v.begin());
   } else if(sp==DENSE){
     for(int i=0; i<size1(); ++i) // loop over rows
@@ -882,7 +894,7 @@ void Matrix<T>::assertNNZ(int sz, Sparsity sp) const{
   int nnz_correct = -1;
   switch(sp){
     case SPARSE:
-      nnz_correct = std::vector<T>::size();
+      nnz_correct = size();
       break;
     case DENSE:
       nnz_correct = numel();
