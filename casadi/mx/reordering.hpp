@@ -65,7 +65,6 @@ class Reordering : public MXNode{
     /// Print
     virtual void print(std::ostream &stream=std::cout) const;
 
-  protected:
     /// Mapping from the output non-zero to the input nonzero
     std::vector<int> nzind_;
 
