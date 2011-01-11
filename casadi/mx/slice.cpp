@@ -38,16 +38,17 @@ Slice* Slice::clone() const{
   return new Slice(*this);
 }
 
-int Slice::k2k(int k) {
-  return i((k/size2()))*dep(0).size2() + j((k%size2()));
+void Slice::init(){
+  // Base class initializations
+  Reordering::init();
+  
+  // Mapping: NOTE: does not handle sparsity correctly, should get the reordering from the Matrix<> class
+  for(int k=0; k<size1()*size2(); ++k)
+    nzind_[k] = i((k/size2()))*dep(0).size2() + j((k%size2()));
 }
 
 void Slice::evaluate(int fsens_order, int asens_order){
  assert(fsens_order==0 || asens_order==0);
- 
- 
-
-
  
   if(fsens_order==0){
     int k=0;

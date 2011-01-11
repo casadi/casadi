@@ -27,27 +27,57 @@ using namespace std;
 
 namespace CasADi{
 
-Reordering::Reordering(const MX &dep__){
-  setDependencies(dep__);
+Reordering::Reordering(const MX &dep){
+  setDependencies(dep);
 }
 
-void Reordering::evaluate(int fsens_order, int asens_order){
+Reordering::Reordering(const std::vector<MX> &dep){
+  setDependencies(dep);
+}
+
+void Reordering::init(){
+  // Call the base class initialization
+  MXNode::init();
   
+  // Allocate place for the indices
+  nzind_.resize(output().size());
+  argind_.resize(output().size());
+  fill(nzind_.begin(),nzind_.end(),0);
+  fill(argind_.begin(),argind_.end(),0);
+}
+
+
+void Reordering::evaluate(int fsens_order, int asens_order){
   if(fsens_order==0){
-    for (int k=0;k<size1()*size2();k++) {
-      output()[k]=input(k2l(k))[k2k(k)];
-    }
+    vector<double>& res = output();
+    for(int k=0; k<res.size(); ++k)
+      res[k] = input(k2l(k))[k2k(k)];
   } else {
-    for (int k=0;k<size1()*size2();k++) {
-      fwdSens()[k]=fwdSeed(k2l(k))[k2k(k)];
-    }
+    vector<double>& fsens = fwdSens();
+    for(int k=0; k<fsens.size(); ++k)
+      fsens[k] = fwdSeed(k2l(k))[k2k(k)];
   }
   
   if(asens_order>0){
-    for (int k=0;k<size1()*size2();k++) {
-      adjSens(k2k(k))[k2l(k)]+=adjSeed()[k];
-    }
+    const vector<double>& aseed = adjSeed();
+    for(int k=0; k<aseed.size(); ++k)
+      adjSens(k2l(k))[k2k(k)] += aseed[k];
   }
 }
+
+int Reordering::k2l(int k) const{
+  return argind_[k];
+}
+
+int Reordering::k2k(int k) const{
+  return nzind_[k];
+}
+
+void Reordering::print(std::ostream &stream) const{
+  stream << "reordering(" << dep(0) << "," << nzind_;
+  if(ndep()>1) stream << "," << argind_;
+  stream << ")";
+}
+
 
 } // namespace CasADi

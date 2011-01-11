@@ -26,49 +26,52 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
+  /** \brief Base class for different reorderings of matrices, such as transpose, slicing etc.
 
-/** \brief Base class for MXNodes that are a mere reoderening of the entries of their dependencies.
-
-  This class mainly deals with indexing magic.
-  
   We have:
-  (i,j) matrix type indexing.
-  (k) vector type indexing.
-  
-  We map k to a dependency (l*) and a vector index for this dependency (l)
+  (l) input index
+  (k) nonzero index of input
+  (k') nonzero index of output 
+
+  We map the nonzeros (k') of the output of the function to the input index (l) and the nonzero (k) of the input
+
+  NOTE:
+  Joel: Adapted to handle sparsity correctly, changed to vector for index mappings (for efficiency)
 
   \author Joris Gillis
   \date 2010
 */
 class Reordering : public MXNode{
-public:
+  public:
 
-/// Constructor
-explicit Reordering(const MX &comp);
+    /// Single input
+    explicit Reordering(const MX &dep);
 
-/** \brief  Evaluate the function and store the result in the node
- There is a default implementation that works with the indexing functions.
- It will work, but for speed, reimplement method.
- */
-virtual void evaluate(int fsens_order, int asens_order);
+    /// Multiple inputs
+    explicit Reordering(const std::vector<MX> &dep);
 
-/** \brief Maps (k)  to (l)
-Default implementation: return 0
-*/
-virtual int k2l(int k) { return 0;};
+    /// Evaluate the function and store the result in the node
+    virtual void evaluate(int fsens_order, int asens_order);
 
-/** \brief Maps (k)  to (k*)
-*/
-virtual int k2k(int k)=0;
+    /// Initialize
+    virtual void init();
 
-// These index remapping function out to be inlined. Can one inline without losing polymorphism here?
-// Some C++ guru ought to take a look here...
-// NOTE: C++ guru speaking, kidding... This design is probably not very efficient, as virtual functions can't be inlined (afaik). 
-// A better design is to include in this class a vector which maps the non-zero entries to each other
+    /// Maps the non-zero of the result to the input index: Default all zeros
+    int k2l(int k) const;
 
-protected:
-  
-  
+    /// Maps the non-zero of the result to the non-zero of the input
+    int k2k(int k) const;
+
+    /// Print
+    virtual void print(std::ostream &stream=std::cout) const;
+
+  protected:
+    /// Mapping from the output non-zero to the input nonzero
+    std::vector<int> nzind_;
+
+    /// Mapping from the output non-zero to the input index
+    std::vector<int> argind_;
+
 };
 
 } // namespace CasADi

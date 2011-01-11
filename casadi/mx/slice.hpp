@@ -47,13 +47,11 @@ virtual Slice* clone() const;
 /** \brief  Print */
 virtual void print(std::ostream &stream=std::cout) const;
 
-virtual void evaluate(int fsens_order, int asens_order);
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-//  virtual void evaluateAdj();
+/// Initialize
+virtual void init();
 
-/** \brief Maps (k)  to (k*)
-*/
-virtual int k2k(int k);
+/// Evaluate (do you really need this?)
+virtual void evaluate(int fsens_order, int asens_order);
 
 protected:
 Slicer i;

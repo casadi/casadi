@@ -35,49 +35,17 @@ Transpose* Transpose::clone() const{
   return new Transpose(*this);
 }
 
-int Transpose::k2k(int k) {
-  return (k/size2()) + (k%size2())*size1();
+void Transpose::init(){
+  // Base class initializations
+  Reordering::init();
+  
+  // Mapping: NOTE: does not handle sparsity correctly, should get the reordering from the Matrix<> class (which will calculate it using binsorting)
+  for(int k=0; k<size1()*size2(); ++k)
+    nzind_[k] = (k/size2()) + (k%size2())*size1();
 }
 
 void Transpose::print(std::ostream &stream) const{
   stream << "trans(" << dep(0) << ")";
-}
-
-void Transpose::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0 || asens_order==0);
-  
-  if(fsens_order==0){
-  // Get references to the terms
-  const vector<double>& arg = input(0);
-  vector<double>& res = output();
-  
-  // carry out the transpose
-  for(int i=0; i<size1(); ++i)
-    for(int j=0; j<size2(); ++j)
-      res[j + i*size2()] = arg[i + j*size1()];
-  } else {
-
-    // Get references to the terms
-    const vector<double>& arg = fwdSeed(0);
-    vector<double>& res = fwdSens();
-  
-    // carry out the transpose
-    for(int i=0; i<size1(); ++i)
-      for(int j=0; j<size2(); ++j)
-        res[j + i*size2()] = arg[i + j*size1()];
-  }
-  
-  if(asens_order>0){
-    // Get references to the terms
-    vector<double>& arg = adjSens(0);
-    const vector<double>& res = adjSeed();
-  
-    // carry out the transpose
-    for(int i=0; i<size1(); ++i)
-      for(int j=0; j<size2(); ++j)
-        arg[i + j*size1()] += res[j + i*size2()];
-    
-  }
 }
 
 

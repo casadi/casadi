@@ -46,15 +46,8 @@ virtual Transpose* clone() const;
 /** \brief  Print */
 virtual void print(std::ostream &stream=std::cout) const;
 
-/** \brief  Evaluate the function and store the result in the node */
-virtual void evaluate(int fsens_order, int asens_order);
-
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-//  virtual void evaluateAdj();
-
-/** \brief Maps (k)  to (k*)
-*/
-virtual int k2k(int k);
+/// Initialize
+virtual void init();
 
 };
 
