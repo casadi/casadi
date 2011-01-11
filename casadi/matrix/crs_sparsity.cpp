@@ -141,6 +141,10 @@ void CRSSparsity::resize(int nrow, int ncol){
 int CRSSparsity::getNZ(int i, int j){
   if(i >= size1() || j>=size2()) throw CasadiException("CRSSparsity::getNZ: out of bounds");
 
+  // Quick return if matrix is dense
+  if(numel()==size())
+    return j+i*size2();
+  
   // go to the place where the element should be
   int ind;
   for(ind=rowind(i); ind<rowind(i+1); ++ind){ // better: loop from the back to the front
@@ -164,6 +168,12 @@ int CRSSparsity::getNZ(int i, int j){
 
 int CRSSparsity::getNZ(int i, int j) const{
   if(i >= size1() || j>=size2()) throw CasadiException("CRSSparsity::getNZ: out of bounds");
+  
+  // Quick return if matrix is dense
+  if(numel()==size())
+    return j+i*size2();
+
+  // Find sparse element
   for(int ind=rowind(i); ind<rowind(i+1); ++ind){
     if(col(ind) == j)
       return ind;     // element exists

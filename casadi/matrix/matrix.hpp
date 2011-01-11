@@ -595,8 +595,8 @@ void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){
 template<class T>
 void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
   // First check the value of the zero-entries
-  T temp = fcn(0);
-  if(casadi_limits<T>::isZero(temp)){
+  T fcn_0 = fcn(0);
+  if(casadi_limits<T>::isZero(fcn_0)){
     // Copy the matrix, including the sparsity pattern
     *this = x;
     
@@ -605,7 +605,7 @@ void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
       (*this)[el] = fcn(x[el]);
     
   } else {
-    makeDense(x.size1(),x.size2(),temp);
+    makeDense(x.size1(),x.size2(),fcn_0);
     for(int i=0; i<size1(); ++i){ // loop over rows
       for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over non-zero elements
         int j = x.col(el);
@@ -630,11 +630,13 @@ void Matrix<T>::binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const M
 
 template<class T>
 void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y){
-  T temp = fcn(x,0);
-  if(casadi_limits<T>::isZero(temp))
+  T fcn_x_0 = fcn(x,0);
+  if(casadi_limits<T>::isZero(fcn_x_0))
+    // Start with an empty matrix: all elements are added to the end!
     makeEmpty(y.size1(),y.size2());
   else
-    makeDense(y.size1(),y.size2(),temp);
+    // Start with an dense matrix: element access in constant time
+    makeDense(y.size1(),y.size2(),fcn_x_0);
   
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
@@ -646,11 +648,13 @@ void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Ma
 
 template<class T>
 void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y){
-  T temp = fcn(0,y);
-  if(casadi_limits<T>::isZero(temp))
+  T fcn_0_y = fcn(0,y);
+  if(casadi_limits<T>::isZero(fcn_0_y))
+    // Start with an empty matrix: all elements are added to the end!
     makeEmpty(x.size1(),x.size2());
   else
-    makeDense(x.size1(),x.size2(),temp);
+    // Start with an dense matrix: element access in constant time
+    makeDense(x.size1(),x.size2(),fcn_0_y);
   
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
@@ -663,11 +667,13 @@ void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, 
 template<class T>
 void Matrix<T>::matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
 if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matrix_matrix: dimension mismatch");
-  T temp = fcn(0,0);
-  if(casadi_limits<T>::isZero(temp))
+  T fcn_0_0 = fcn(0,0);
+  if(casadi_limits<T>::isZero(fcn_0_0))
+    // Start with an empty matrix: all elements are added to the end!
     makeEmpty(x.size1(),x.size2());
   else
-    makeDense(x.size1(),x.size2(),temp);
+    // Start with an dense matrix: element access in constant time
+    makeDense(x.size1(),x.size2(),fcn_0_0);
  
   for(int i=0; i<size1(); ++i){ // loop over rows
     int el1 = x.rowind(i);
