@@ -161,7 +161,11 @@ SharedObject SharedObject::clone() const{
   return ret;
 }
 
-
+void SharedObject::swap(SharedObject& other){
+  SharedObject temp = *this;
+  *this = other;
+  other = temp;
+}
 
 } // namespace CasADi
     

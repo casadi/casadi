@@ -205,6 +205,17 @@ void CRSSparsityNode::print(std::ostream &stream) const{
   stream << "rowind: " << rowind_ << endl;
 }
 
+vector<int> CRSSparsity::getRow() const{
+  vector<int> row(size());
+  for(int r=0; r<size1(); ++r){
+    for(int el = rowind(r); el < rowind(r+1); ++el){
+        row[el] = r;
+      }
+  }
+  return row;
+}
+
+
 
 } // namespace CasADi
 

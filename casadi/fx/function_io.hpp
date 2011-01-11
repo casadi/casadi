@@ -30,9 +30,6 @@
 
 namespace CasADi{
 
-/** Sparsity format for getting and setting inputs and outputs */
-enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
-
 /** \brief  An output or input of the function (forward or adjoint)
   \author Joel Andersson 
   \date 2010
@@ -56,7 +53,7 @@ class FunctionIO{
     void setSparsityCRS(const std::vector<int>& rowind, const std::vector<int> &col); // Compressed row storage
 
     /** \brief  Set the sparsity pattern, general sparse format */
-/*    void setSparsity(const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& elind);*/
+    /*    void setSparsity(const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& elind);*/
             
     /// Set the number of derivative directions
     void setNumFwdDir(int ndir);
@@ -66,15 +63,15 @@ class FunctionIO{
     int numFwdDir() const;
     int numAdjDir() const;
     
-  /** \brief  Access the non-zero entries of the forward sensitivities */
+    /** \brief  Access the non-zero entries of the forward sensitivities */
     std::vector<double>& dataF(int dir=0);
     const std::vector<double>& dataF(int dir=0) const;
 
-  /** \brief  Access the non-zero entries of the adjoint sensitivities */
+    /** \brief  Access the non-zero entries of the adjoint sensitivities */
     std::vector<double>& dataA(int dir=0);
     const std::vector<double>& dataA(int dir=0) const;
         
-  /** \brief  Get the size */
+    /** \brief  Get the size */
     int size1() const;
     int size2() const;
 
@@ -122,40 +119,31 @@ class FunctionIO{
     void set(const double* val, int dir=0, Sparsity sp=SPARSE);
 #endif
     
-    /** \brief  Get the result */
-    void getSparseSym(double *res, int dir=0) const;    // general sparse, symmetric matrix
-
-    /** \brief  Get the result times a vector */
-    void getTimesVector(const double *v, double *res, int dir=0) const;
-
-    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
-    kl:    The number of subdiagonals in res 
-    ku:    The number of superdiagonals in res 
-    ldres: The leading dimension in res 
-    res:   The number of superdiagonals */
-    void getBand(int kl, int ku, int ldres, double *res, int dir=0) const;
-
-    
     const std::vector<int>& rowind() const;
     std::vector<int>& rowind();
     const std::vector<int>& col() const;
     std::vector<int>& col();
     int rowind(int i) const;
     int col(int el) const;
+
+    Matrix<double>& mat(int dir=0);
+    const Matrix<double>& mat(int dir=0) const;
+    Matrix<double>& matF(int dir=0);
+    const Matrix<double>& matF(int dir=0) const;
+    Matrix<double>& matA(int dir=0);
+    const Matrix<double>& matA(int dir=0) const;
+
     
   protected:
 
-    /** \brief  Size */
-    int nfdir_, nadir_;
+    /** \brief  Input/output data */
+    Matrix<double> mat_;
     
-    /** \brief  Non-zero elements for the input/output or forward/adjoint seeds/derivatives */
-    std::vector< Matrix<double> > data_;
-
-    /** \brief Assert that the number of nonzeros is correct */
-    void assertNNZ(int sz, Sparsity sp) const;
+    /** \brief  Forward sensitivity data */
+    std::vector< Matrix<double> > matF_;
     
-    /** \brief Assert that the number of elements is correct */
-    void assertNumEl(int sz) const;
+    /** \brief  Adjoint sensitivity data */
+    std::vector< Matrix<double> > matA_;
             
 };
 

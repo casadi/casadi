@@ -97,6 +97,9 @@ class CRSSparsity : public SharedObject{
     /// Get the index of a non-zero element (return -1 if not exists)
     int getNZ(int i, int j) const;
     
+    /// Get the row for each non-zero entry
+    std::vector<int> getRow() const;
+
     /// Scalar expression
 //    static const CRSSparsity scalar;
 

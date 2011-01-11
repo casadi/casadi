@@ -397,9 +397,6 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
 #endif
 }
 
-
-
-
 void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R){
   // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
   int m = A.size1();

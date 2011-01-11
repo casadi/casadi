@@ -32,6 +32,9 @@
 
 namespace CasADi{
   
+  /** Sparsity format for getting and setting inputs and outputs */
+  enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
+
   /** \brief General sparse matrix class
   \author Joel Andersson 
   \date 2010	
@@ -80,7 +83,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
     Matrix(const std::vector<A>& x,  int n, int m){
-      if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<double>& x,  int n, int m): dimension mismatch");
+      if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
       sparsity_ = CRSSparsity(n,m,true);
       std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
@@ -216,7 +219,55 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void resize(int n, int m);
     void reserve(int nnz);
     
-  protected:
+    // Access the sparsity
+    const CRSSparsity& sparsity() const;
+    
+    // The following need cleaning up
+
+    /** \brief  Set the non-zero elements, scalar */
+    void set(T val, Sparsity sp=SPARSE);
+    
+    /** \brief  Get the non-zero elements, scalar */
+    void get(T& val, Sparsity sp=SPARSE) const;
+
+    /** \brief  Set the non-zero elements, vector */
+    void set(const std::vector<T>& val, Sparsity sp=SPARSE);
+
+    /** \brief  Get the non-zero elements, vector */
+    void get(std::vector<T>& val, Sparsity sp=SPARSE) const;
+
+    /** \brief  Set the non-zero elements, matrix */
+    //void set(const Matrix<T>& val);
+
+    /** \brief  Get the non-zero elements, matrix */
+    //void get(Matrix<T>& val) const;
+
+    #ifndef SWIG
+    /** \brief  Get the non-zero elements, array */
+    void get(T* val, Sparsity sp=SPARSE) const;    
+
+    /** \brief  Set the non-zero elements, array */
+    void set(const T* val, Sparsity sp=SPARSE);
+    #endif
+
+    /** \brief  Get the result */
+    void getSparseSym(T *res) const;    // general sparse, symmetric matrix
+
+    /** \brief  Get the result times a vector */
+    void getTimesVector(const T *v, T *res) const;
+
+    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
+    kl:    The number of subdiagonals in res 
+    ku:    The number of superdiagonals in res 
+    ldres: The leading dimension in res 
+    res:   The number of superdiagonals */
+    void getBand(int kl, int ku, int ldres, T *res) const;
+
+    // Make sure that the number of non-zeros is sz
+    void assertNNZ(int sz, Sparsity sp) const;
+    void assertNumEl(int sz) const;
+    
+    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
@@ -326,13 +377,14 @@ Matrix<T>::Matrix(const Matrix<T>& m){
 template<class T>
 Matrix<T>::Matrix(Matrix<T>& m){
   swap_on_copy_ = false;
-  sparsity_ = m.sparsity_;
   if(m.swap_on_copy_){
     // Swap the vector with m
     m.swap(*this);
+    m.sparsity_.swap(sparsity_);
   } else {
     // Copy the content
     static_cast<std::vector<T>&>(*this) = m;
+    sparsity_ = m.sparsity_; // shallow copy!
   }
 }
 
@@ -344,13 +396,14 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
 
 template<class T>
 Matrix<T>& Matrix<T>::operator=(Matrix<T>& m){
-  sparsity_ = m.sparsity_;
   if(m.swap_on_copy_){
     // Swap the vector with m
     m.swap(*this);
+    m.sparsity_.swap(sparsity_);
   } else {
     // Copy the content
     static_cast<std::vector<T>&>(*this) = m;
+    sparsity_ = m.sparsity_; // shallow copy!
   }
 }
 
@@ -672,7 +725,168 @@ Matrix<T>& Matrix<T>::operator/=(const Matrix<T> &y){
   return *this;
 }
 
+template<class T>
+const CRSSparsity& Matrix<T>::sparsity() const{
+  return sparsity_;
+}
 
+template<class T>
+void Matrix<T>::getSparseSym(T *res) const{
+  // copy to the result vector
+  int nz = 0;
+  for(int row=0; row<size1(); ++row)
+  {
+    // Loop over the elements in the row
+    for(int el=rowind(row); el<rowind(row+1); ++el){ // loop over the non-zero elements
+      if(col(el) > row) break; // break inner loop (only lower triangular part is used)
+      res[nz] = (*this)[el];
+      nz++;
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::getTimesVector(const T *v, T *res) const{
+  // copy the result
+  for(int i=0; i<size1(); ++i){ // loop over rows
+    res[i] = 0;
+    for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
+      int j=col(el);  // column
+
+      // Multiply with the vector
+      res[i] += v[j]*(*this)[el];
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::getBand(int kl, int ku, int ldres, T *res) const{
+  // delete the content of the matrix
+  for(int j=0; j<size2(); ++j) // loop over columns
+    for(int s=0; s<kl+ku+1; ++s) // loop over the subdiagonals
+      res[s + ldres*j] = 0;
+  
+  // loop over rows
+  for(int i=0; i<size1(); ++i){ 
+    
+    // loop over the non-zero elements
+    for(int el=rowind(i); el<rowind(i+1); ++el){ 
+      int j=col(el);  // column
+      
+      // Check if we have not yet inside the band
+      if(j<i-kl) continue;
+
+      // Check if we are already outside the band
+      if(j>i+ku) break;
+
+      // Get the subdiagonal
+      int s = i - j + ku;
+
+      // Store the element
+      res[s + ldres*j] = (*this)[el];
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::set(T val, Sparsity sp){
+  assertNumEl(1);
+  assertNNZ(1,sp);
+  (*this)[0] = val;
+}
+    
+template<class T>
+void Matrix<T>::get(T& val, Sparsity sp) const{
+  assertNumEl(1);
+  assertNNZ(1,sp);
+  val = (*this)[0];
+}
+
+template<class T>
+void Matrix<T>::set(const std::vector<T>& val, Sparsity sp){
+  assertNNZ(val.size(),sp);
+  set(&val[0],sp);
+}
+
+template<class T>
+void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
+  assertNNZ(val.size(),sp);
+  get(&val[0],sp);
+}
+
+template<class T>
+void Matrix<T>::set(const T* val, Sparsity sp){
+  std::vector<T> &v = *this;
+  if(sp==SPARSE || (sp==DENSE && numel()==std::vector<T>::size())){
+    copy(val,val+v.size(),v.begin());
+  } else if(sp==DENSE){
+    for(int i=0; i<size1(); ++i) // loop over rows
+      for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
+        // column
+        int j=col(el);
+        
+        // Set the element
+        v[el] = val[i*size2()+j];
+    }
+  } else {
+    throw CasadiException("Matrix<T>::set: not SPARSE or DENSE");
+  }
+}
+
+template<class T>
+void Matrix<T>::get(T* val, Sparsity sp) const{
+  const std::vector<T> &v = *this;
+  if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
+    copy(v.begin(),v.end(),val);
+  } else if(sp==DENSE){
+    int k=0; // index of the result
+    for(int i=0; i<size1(); ++i) // loop over rows
+      for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
+        int j=col(el);  // column
+        for(; k<i*size2()+j; ++k)
+          val[k] = 0; // add zeros before the non-zero element
+
+      // add the non-zero element
+      val[k] = v[el];
+      k++;
+    }
+    // add sparse zeros at the end of the matrix
+    for(; k<numel(); ++k)
+     val[k] = 0;
+  } else {
+    throw CasadiException("Matrix<T>::get: not SPARSE or DENSE");
+  }
+}
+
+template<class T>
+void Matrix<T>::assertNNZ(int sz, Sparsity sp) const{
+  int nnz_correct = -1;
+  switch(sp){
+    case SPARSE:
+      nnz_correct = std::vector<T>::size();
+      break;
+    case DENSE:
+      nnz_correct = numel();
+      break;
+    default:
+      throw CasadiException("Matrix<T>::assertNNZ: unknown sparsity");
+  }
+
+  if(nnz_correct!=sz){
+    std::stringstream ss;
+    ss << "Matrix<T>::assertNNZ: wrong number of elements (" << sz << "), but should be " << nnz_correct << std::flush;
+    throw CasadiException(ss.str());
+  }
+}
+
+template<class T>
+void Matrix<T>::assertNumEl(int sz) const{
+  if(numel()!=sz){
+    std::stringstream ss;
+    ss << "Matrix<T>::assertNumEl: wrong number of elements (" << sz << " ), but should be " << numel();
+    throw CasadiException(ss.str());
+  }
+}
 
 
 

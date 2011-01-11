@@ -81,12 +81,16 @@ class SharedObject : public PrintableObject{
     /// Assignment operator
     SharedObject& operator=(const SharedObject& ref);
     
-    /// Get a pointer to the node
+    /// Get a const pointer to the node
     const SharedObjectNode* get() const;
+
+    /// Get a pointer to the node
     SharedObjectNode* get();
 
     /// Access a member function or object
     SharedObjectNode* operator->();
+
+    /// Const access a member function or object
     const SharedObjectNode* operator->() const;
 
     /// Print a representation of the object
@@ -109,6 +113,9 @@ class SharedObject : public PrintableObject{
     
     /// If there are other references to the object, then make a deep copy of it and point to this new object
     void makeUnique();
+    
+    /// Swap content with another instance
+    void swap(SharedObject& other);
     
   private:
     SharedObjectNode *node;
