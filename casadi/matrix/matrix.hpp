@@ -68,13 +68,19 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(int n, int m, const T& val);
 
     /// sparse n-by-m matrix filled with given sparsity
-    Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind);
+    Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data=std::vector<T>());
 
     /// sparse matrix with a given sparsity
     explicit Matrix(const CRSSparsity& sparsity);
     
     /// This constructor enables implicit type conversion from a scalar type
     Matrix(const T &val);
+
+    /// Construct from a vector
+    Matrix(const std::vector<T>& x);
+    
+    /// Construct dense matrix from a vector with the elements in column major ordering
+    Matrix(const std::vector<T>& x, int n, int m);
 
 #ifndef SWIG    
     /** \brief  Create an expression from an stl vector  */
@@ -379,12 +385,24 @@ Matrix<T>::Matrix(){
 }
 
 template<class T>
-Matrix<T>::Matrix(const Matrix<T>& m){
+Matrix<T>::Matrix(const Matrix<T>& m) : std::vector<T>(m){
   swap_on_copy_ = false;
   sparsity_ = m.sparsity_;
-  static_cast<std::vector<T>&>(*this) = m;
 }
 
+template<class T>
+Matrix<T>::Matrix(const std::vector<T>& x) : std::vector<T>(x){
+  swap_on_copy_ = false;
+  sparsity_ = CRSSparsity(x.size(),1,true);
+}
+
+template<class T>
+Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : std::vector<T>(x){
+  swap_on_copy_ = false;
+  if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
+  sparsity_ = CRSSparsity(n,m,true);
+}
+    
 template<class T>
 Matrix<T>::Matrix(Matrix<T>& m){
   swap_on_copy_ = false;
@@ -554,10 +572,11 @@ Matrix<T>::Matrix(const T &val){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind){
+Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data) : std::vector<T>(data){
   swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,col,rowind);
-  std::vector<T>::resize(sparsity_.size());
+  if(data.size() != sparsity_.size())
+    std::vector<T>::resize(sparsity_.size());
 }
 
 template<class T>
