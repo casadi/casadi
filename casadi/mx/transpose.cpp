@@ -27,7 +27,8 @@ using namespace std;
 namespace CasADi{
 
 
-Transpose::Transpose(const MX& x) : Reordering(x){
+Transpose::Transpose(const MX& x){
+  setDependencies(x);
   setSize(x.size2(),x.size1());
 }
 

@@ -28,7 +28,8 @@ using namespace std;
 namespace CasADi{
 
 
-Slice::Slice(const MX& x, Slicer i_, Slicer j_) : Reordering(x), i(i_), j(j_) {
+Slice::Slice(const MX& x, Slicer i_, Slicer j_) : i(i_), j(j_) {
+  setDependencies(x);
   i.initialize(x.size1());
   j.initialize(x.size2());
   setSize(i.size(),j.size());

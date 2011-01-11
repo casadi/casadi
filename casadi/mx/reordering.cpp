@@ -27,23 +27,31 @@ using namespace std;
 
 namespace CasADi{
 
-Reordering::Reordering(const MX &dep){
-  setDependencies(dep);
-}
-
-Reordering::Reordering(const std::vector<MX> &dep){
-  setDependencies(dep);
+Reordering::Reordering(){
 }
 
 void Reordering::init(){
   // Call the base class initialization
   MXNode::init();
   
-  // Allocate place for the indices
-  nzind_.resize(output().size());
-  argind_.resize(output().size());
-  fill(nzind_.begin(),nzind_.end(),0);
-  fill(argind_.begin(),argind_.end(),0);
+  // Allocate indices if this has not been done
+  if(nzind_.empty()){
+    nzind_.resize(output().size());
+    fill(nzind_.begin(),nzind_.end(),0);
+  }
+  
+  if(argind_.empty()){
+    argind_.resize(output().size());
+    fill(argind_.begin(),argind_.end(),0);
+  }
+  if(nzind_.empty()){
+    nzind_.resize(output().size());
+    fill(nzind_.begin(),nzind_.end(),0);
+  }
+  
+  if(argind_.size() != output().size() || nzind_.size() != output().size()) 
+    throw CasadiException("Reordering::init: dimension mismatch");
+    
 }
 
 

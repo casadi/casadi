@@ -44,11 +44,8 @@ namespace CasADi{
 class Reordering : public MXNode{
   public:
 
-    /// Single input
-    explicit Reordering(const MX &dep);
-
-    /// Multiple inputs
-    explicit Reordering(const std::vector<MX> &dep);
+    /// Default constructor
+    explicit Reordering();
 
     /// Evaluate the function and store the result in the node
     virtual void evaluate(int fsens_order, int asens_order);
