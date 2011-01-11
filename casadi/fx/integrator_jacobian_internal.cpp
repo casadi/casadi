@@ -93,12 +93,12 @@ void IntegratorJacobianInternal::init(){
 void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   
   // Pass arguments to the integrator
-  integrator_.setInput(input(INTEGRATOR_T0).data(),INTEGRATOR_T0);
-  integrator_.setInput(input(INTEGRATOR_TF).data(),INTEGRATOR_TF);
-  integrator_.setInput(input(INTEGRATOR_P).data(),INTEGRATOR_P);
+  integrator_.setInput(input(INTEGRATOR_T0).get(),INTEGRATOR_T0);
+  integrator_.setInput(input(INTEGRATOR_TF).get(),INTEGRATOR_TF);
+  integrator_.setInput(input(INTEGRATOR_P).get(),INTEGRATOR_P);
 
   // Initial value for the state
-  const vector<double>& x0 = input(INTEGRATOR_X0).data();
+  const vector<double>& x0 = input(INTEGRATOR_X0).get();
   vector<double>& x0s = integrator_.getInputData(INTEGRATOR_X0);
   fill(x0s.begin(),x0s.end(),0.0);
   for(int i=0; i<nx_; ++i)
@@ -110,7 +110,7 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
       x0s[jacmap_[nx_+j+i*ns_]] = jacinit_[j+i*ns_];
   
   // State derivative
-  const vector<double>& xp0 = input(INTEGRATOR_XP0).data();
+  const vector<double>& xp0 = input(INTEGRATOR_XP0).get();
   vector<double>& xp0s = integrator_.getInputData(INTEGRATOR_XP0);
   fill(xp0s.begin(),xp0s.end(),0.0);
   for(int i=0; i<nx_; ++i)
@@ -119,8 +119,8 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   // Pass adjoint seeds
   if(asens_order>0){
     for(int dir=0; dir<nadir_; ++dir){
-      const vector<double>& jacseed = output().dataA(dir);
-      vector<double>& jacseed_s = integrator_.output(INTEGRATOR_XF).dataA(dir);
+      const vector<double>& jacseed = output().getAdj(dir);
+      vector<double>& jacseed_s = integrator_.output(INTEGRATOR_XF).getAdj(dir);
       for(int i=0; i<nx_; ++i)
         for(int j=0; j<ns_; ++j)
           jacseed_s[jacmap_[nx_+j+i*ns_]] = jacseed[j+i*ns_];
@@ -135,18 +135,18 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   const vector<double>& xpfs = integrator_.getOutputData(INTEGRATOR_XPF);
 
   // Jacobian
-  vector<double>& jac = output(0).data();
+  vector<double>& jac = output(0).get();
   for(int i=0; i<nx_; ++i)
     for(int j=0; j<ns_; ++j)
       jac[j+i*ns_] = xfs[jacmap_[nx_+j+i*ns_]];
   
   // State
-  vector<double>& xf = output(1+INTEGRATOR_XF).data();
+  vector<double>& xf = output(1+INTEGRATOR_XF).get();
   for(int i=0; i<nx_; ++i)
     xf[i] = xfs[jacmap_[i]];
     
   // State derivative
-  vector<double>& xpf = output(1+INTEGRATOR_XPF).data();
+  vector<double>& xpf = output(1+INTEGRATOR_XPF).get();
   for(int i=0; i<nx_; ++i)
     xpf[i] = xpfs[jacmap_[i]];
   
@@ -154,15 +154,15 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   // Get adjoint sensitivities
   if(asens_order>0){
     for(int dir=0; dir<nadir_; ++dir){
-      vector<double>& asens = input(INTEGRATOR_X0).dataA(dir);
+      vector<double>& asens = input(INTEGRATOR_X0).getAdj(dir);
       fill(asens.begin(),asens.end(),0);
       
-      const vector<double>& jacsens_s = integrator_.input(INTEGRATOR_X0).dataA(dir);
+      const vector<double>& jacsens_s = integrator_.input(INTEGRATOR_X0).getAdj(dir);
       for(int i=0; i<nx_; ++i)
         for(int j=0; j<ns_; ++j)
           asens[i] += jacsens_s[jacmap_[nx_+j+i*ns_]];
         
-      input(INTEGRATOR_P).set(integrator_.input(INTEGRATOR_P).dataA(dir),-1-dir);
+      input(INTEGRATOR_P).getAdj(dir).set(integrator_.input(INTEGRATOR_P).getAdj(dir));
     }
   }
 }

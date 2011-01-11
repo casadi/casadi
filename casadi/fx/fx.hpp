@@ -154,6 +154,44 @@ class FX : public OptionsFunctionality{
   
   /// Assert that the function has been initialized
   void assertInit() const;
+
+  /// Access input argument
+  Matrix<double>& argument(int iind=0);
+    
+  /// Const access input argument
+  const Matrix<double>& argument(int iind=0) const;
+
+  /// Access input argument
+  Matrix<double>& result(int oind=0);
+    
+  /// Const access input argument
+  const Matrix<double>& result(int oind=0) const;
+
+  /// Access forward seed
+  Matrix<double>& fwdSeed(int iind=0, int dir=0);
+    
+  /// Const access forward seed
+  const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
+
+  /// Access forward sensitivity
+  Matrix<double>& fwdSens(int oind=0, int dir=0);
+    
+  /// Const access forward sensitivity
+  const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
+
+  /// Access adjoint seed
+  Matrix<double>& adjSeed(int oind=0, int dir=0);
+    
+  /// Const access adjoint seed
+  const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
+
+  /// Access forward sensitivity
+  Matrix<double>& adjSens(int iind=0, int dir=0);
+    
+  /// Const access forward sensitivity
+  const Matrix<double>& adjSens(int iind=0, int dir=0) const;
+
+  
   
 #ifdef SWIG
   %rename(setInputOriginal) setInput; // Should be replaced by a typemap later on.
@@ -161,12 +199,12 @@ class FX : public OptionsFunctionality{
 
   /// Set an input, output, forward seed/sensitivity or adjoint seed/sensitivity
 #define SETTERS(T)\
-  void setInput(T val, int ind=0)             { assertInit(); input(ind).set(val);  } \
-  void setOutput(T val, int ind=0)            { assertInit(); output(ind).set(val); } \
-  void setFwdSeed(T val, int ind=0, int dir=0){ assertInit(); input(ind).set(val,1+dir); } \
-  void setFwdSens(T val, int ind=0, int dir=0){ assertInit(); output(ind).set(val,1+dir); } \
-  void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); output(ind).set(val,-1-dir); } \
-  void setAdjSens(T val, int ind=0, int dir=0){ assertInit(); input(ind).set(val,-1-dir); }
+  void setInput(T val, int ind=0)             { assertInit(); argument(ind).set(val);  } \
+  void setOutput(T val, int ind=0)            { assertInit(); argument(ind).set(val); } \
+  void setFwdSeed(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
+  void setFwdSens(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
+  void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); adjSeed(ind,dir).set(val); } \
+  void setAdjSens(T val, int ind=0, int dir=0){ assertInit(); adjSens(ind,dir).set(val); }
 
 SETTERS(double);
 SETTERS(const double*);
@@ -183,12 +221,12 @@ SETTERS(const std::vector<double>&);
 %rename(getAdjSens) getAdjSensData;
 #else // SWIG
 #define GETTERS(T)\
-    void getInput(T val, int ind=0) const             { assertInit(); input(ind).get(val);} \
-    void getOutput(T val, int ind=0) const            { assertInit(); output(ind).get(val);} \
-    void getFwdSeed(T val, int ind=0, int dir=0) const{ assertInit(); input(ind).get(val,1+dir);} \
-    void getFwdSens(T val, int ind=0, int dir=0) const{ assertInit(); output(ind).get(val,1+dir);} \
-    void getAdjSeed(T val, int ind=0, int dir=0) const{ assertInit(); output(ind).get(val,-1-dir);} \
-    void getAdjSens(T val, int ind=0, int dir=0) const{ assertInit(); input(ind).get(val,-1-dir);}
+    void getInput(T val, int ind=0) const             { assertInit(); argument(ind).get(val);} \
+    void getOutput(T val, int ind=0) const            { assertInit(); result(ind).get(val);} \
+    void getFwdSeed(T val, int ind=0, int dir=0) const{ assertInit(); fwdSeed(ind,dir).get(val);} \
+    void getFwdSens(T val, int ind=0, int dir=0) const{ assertInit(); fwdSens(ind,dir).get(val);} \
+    void getAdjSeed(T val, int ind=0, int dir=0) const{ assertInit(); adjSeed(ind,dir).get(val);} \
+    void getAdjSens(T val, int ind=0, int dir=0) const{ assertInit(); adjSens(ind,dir).get(val);}
 GETTERS(double&);
 GETTERS(double*);
 GETTERS(std::vector<double>&);

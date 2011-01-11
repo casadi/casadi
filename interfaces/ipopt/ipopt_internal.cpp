@@ -277,11 +277,11 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
-  copy(x,x+n_,output_[NLP_X_OPT].data().begin());
-  copy(z_L,z_L+n_,output_[NLP_LAMBDA_LBX].data().begin());
-  copy(z_U,z_U+n_,output_[NLP_LAMBDA_UBX].data().begin());
-  copy(lambda,lambda+m_,output_[NLP_LAMBDA_OPT].data().begin());
-  output_[NLP_COST].data().at(0) = obj_value;
+  copy(x,x+n_,output_[NLP_X_OPT].get().begin());
+  copy(z_L,z_L+n_,output_[NLP_LAMBDA_LBX].get().begin());
+  copy(z_U,z_U+n_,output_[NLP_LAMBDA_UBX].get().begin());
+  copy(lambda,lambda+m_,output_[NLP_LAMBDA_OPT].get().begin());
+  output_[NLP_COST].get().at(0) = obj_value;
 
 }
 
@@ -289,7 +289,7 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
-    H_.output().getSparsityCRS(rowind,col);
+    H_.result().sparsity().getSparsityCRS(rowind,col);
     for(int r=0; r<rowind.size()-1; ++r)
       for(int el=rowind[r]; el<rowind[r+1]; ++el){
 //        if(col[el]>=r){
@@ -317,7 +317,7 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
-    J_.output().getSparsityCRS(rowind,col);
+    J_.result().sparsity().getSparsityCRS(rowind,col);
     for(int r=0; r<rowind.size()-1; ++r)
       for(int el=rowind[r]; el<rowind[r+1]; ++el){
 //        if(col[el]>=r){
@@ -396,10 +396,10 @@ bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
 {
   assert(n == n_);
   assert(m == m_);
-  vector<double> &lbx = input(NLP_LBX).data();  copy(lbx.begin(),lbx.end(),x_l);
-  vector<double> &ubx = input(NLP_UBX).data();  copy(ubx.begin(),ubx.end(),x_u);
-  vector<double> &lbg = input(NLP_LBG).data();  copy(lbg.begin(),lbg.end(),g_l);
-  vector<double> &ubg = input(NLP_UBG).data();  copy(ubg.begin(),ubg.end(),g_u);
+  vector<double> &lbx = input(NLP_LBX).get();  copy(lbx.begin(),lbx.end(),x_l);
+  vector<double> &ubx = input(NLP_UBX).get();  copy(ubx.begin(),ubx.end(),x_u);
+  vector<double> &lbg = input(NLP_LBG).get();  copy(lbg.begin(),lbg.end(),g_l);
+  vector<double> &ubg = input(NLP_UBG).get();  copy(ubg.begin(),ubg.end(),g_u);
   return true;
 }
 
@@ -413,7 +413,7 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   assert(init_x == true);
   assert(init_z == false);
   assert(init_lambda == false);
-  const vector<double> &xinit = input_[NLP_X_INIT].data();
+  const vector<double> &xinit = input_[NLP_X_INIT].get();
   copy(xinit.begin(),xinit.end(),x);
   return true;
 }
@@ -429,13 +429,13 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
   if(G_.isNull())
     nnz_jac_g = 0;
   else
-    nnz_jac_g = J_.output().size();
+    nnz_jac_g = J_.output().get().size();
 
   // Get Hessian sparsity pattern
   if(H_.isNull())
     nnz_h_lag = 0;
   else
-    nnz_h_lag = H_.output().size();
+    nnz_h_lag = H_.output().get().size();
 }
 
 } // namespace CasADi

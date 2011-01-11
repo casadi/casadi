@@ -42,8 +42,7 @@ void MXNode::print(ostream &stream) const{
 }
   
 const string& MXNode::getName() const{
-  cerr << "getName not defined for class " << typeid(*this).name() << endl;
-  throw "MXNode::getName()";
+  throw CasadiException(string("MXNode::getName() not defined for class ") + typeid(*this).name());
 }
 
 bool MXNode::isSymbolic() const{

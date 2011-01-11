@@ -50,6 +50,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Copy constructor (normal)
     Matrix(const Matrix<T>& m);
     
+    #ifndef SWIG
     /// Copy constructor (possible swap)
     Matrix(Matrix<T>& m);
     
@@ -58,6 +59,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     
     /// Assignment (possible swap)
     Matrix<T>& operator=(Matrix<T>& m);
+    #endif // SWIG
     
     /// empty n-by-m matrix constructor
     Matrix(int n, int m);

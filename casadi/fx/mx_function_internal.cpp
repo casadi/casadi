@@ -157,13 +157,13 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind)
-    inputv[ind]->setOutput(input(ind).data());
+    inputv[ind]->setOutput(input(ind).get());
 
   // Pass the inputs seeds
   if(fsens_order>0)
     for(int dir=0; dir<nfdir_; ++dir)
       for(int ind=0; ind<input_.size(); ++ind)
-        inputv[ind]->setFwdSeed(input(ind).dataF(dir));
+        inputv[ind]->setFwdSeed(input(ind).getFwd(dir));
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<MX>::iterator it=alg.begin(); it!=alg.end(); it++)
@@ -171,13 +171,13 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the outputs
   for(int ind=0; ind<outputv.size(); ++ind)
-    outputv[ind]->getOutput(output(ind).data());
+    outputv[ind]->getOutput(output(ind).get());
 
   // Get the output seeds
   if(fsens_order>0)
     for(int dir=0; dir<nfdir_; ++dir)
       for(int ind=0; ind<outputv.size(); ++ind)
-        outputv[ind]->getFwdSens(output(ind).dataF(dir)); // TODO: add dir
+        outputv[ind]->getFwdSens(output(ind).getFwd(dir)); // TODO: add dir
           
   if(asens_order>0){
 
@@ -189,7 +189,7 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
     // Pass the adjoint seeds
     for(int ind=0; ind<outputv.size(); ++ind)
-      outputv[ind]->setAdjSeed(output(ind).dataA());
+      outputv[ind]->setAdjSeed(output(ind).getAdj());
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<MX>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
@@ -198,7 +198,7 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
     // Get the adjoint sensitivities
     for(int ind=0; ind<input_.size(); ++ind)
-      inputv[ind]->getAdjSens(input(ind).dataA());
+      inputv[ind]->getAdjSens(input(ind).getAdj());
     
     }
 }

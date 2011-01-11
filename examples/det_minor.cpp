@@ -194,7 +194,7 @@ for (int i=0; i<n*n; i++)
 SXFunction fcn(symA,deter);
 fcn.setOption("ad_order",1);
 fcn.init();
-vector<double>& inp = fcn.input().data();
+vector<double>& inp = fcn.argument();
     for (i=0; i<n; i++) {
         double* ppt = PA[i];
         for (j=0; j<n; j++)
@@ -209,7 +209,7 @@ fcn.evaluate();
 
 // get result
     double detout = 0.0;
-    detout = fcn.output().data()[0];
+    detout = fcn.result()[0];
 
     double t3 = myclock();
 
@@ -222,7 +222,7 @@ for(int k=0; k<100; ++k)
 
 
 // evaluate 100 times
-fcn.input().dataA()[0] = 1;
+fcn.adjSeed()[0] = 1;
 for(int k=0; k<100; ++k)
   fcn.evaluate(0,1);
 

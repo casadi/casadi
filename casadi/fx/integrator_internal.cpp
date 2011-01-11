@@ -95,8 +95,8 @@ IntegratorInternal::~IntegratorInternal(){
 }
 
 void IntegratorInternal::evaluate(int fsens_order, int asens_order){
-  double t0 = input(INTEGRATOR_T0).data()[0];
-  double tf = input(INTEGRATOR_TF).data()[0];
+  double t0 = input(INTEGRATOR_T0).get()[0];
+  double tf = input(INTEGRATOR_TF).get()[0];
   
   // Reset solver
   reset(fsens_order, asens_order);
@@ -135,8 +135,8 @@ void IntegratorInternal::init(){
   nrhs_ = getOption("nrhs").toInt();
   
   // Give an intial value for the time horizon
-  input(INTEGRATOR_T0).set(getOption("t0").toDouble());
-  input(INTEGRATOR_TF).set(getOption("tf").toDouble());
+  input(INTEGRATOR_T0).get().set(getOption("t0").toDouble());
+  input(INTEGRATOR_TF).get().set(getOption("tf").toDouble());
 }
 
 FX IntegratorInternal::jacobian(int iind, int oind){

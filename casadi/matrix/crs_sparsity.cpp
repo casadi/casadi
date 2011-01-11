@@ -215,6 +215,15 @@ vector<int> CRSSparsity::getRow() const{
   return row;
 }
 
+void CRSSparsity::getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const{
+  rowind = this->rowind();
+  col = this->col();
+}
+
+void CRSSparsity::getSparsity(std::vector<int>& row, std::vector<int> &col) const{
+  row = this->getRow();
+  col = this->col();
+}
 
 
 } // namespace CasADi

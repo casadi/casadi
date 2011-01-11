@@ -38,13 +38,13 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   setOption("sparse", false);
 
   // make sure that input and output are vectors (not matrices)
-  if(fcn_->input_.at(iind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
-  if(fcn_->output_.at(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
+  if(fcn_->input(iind_).get().size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
+  if(fcn_->output(oind_).get().size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
 
   // get the dimensions
   
-  n_ = fcn_->input_[iind_].size1();
-  m_ = fcn_->output_[oind_].size1();
+  n_ = fcn_->input(iind_).get().size1();
+  m_ = fcn_->output(oind_).get().size1();
 
   input_ = fcn_->input_;
   
@@ -93,8 +93,8 @@ void JacobianInternal::init(){
   throw CasadiException("JacobianInternal::init: sparse deactivated");
   
   // Input and output seed vectors
-  std::vector<double>& dir = fcn_.input(iind_).dataF();
-  std::vector<double>& bdir = fcn_.output(oind_).dataF(); // TODO: fix this
+  std::vector<double>& dir = fcn_.fwdSeed(iind_);
+  std::vector<double>& bdir = fcn_.fwdSens(oind_); // TODO: fix this
   
   if(use_ad_fwd_){ // forward AD if less inputs than outputs 
       assert(0);
@@ -144,8 +144,8 @@ void JacobianInternal::init(){
 void JacobianInternal::evaluate(int fsens_order, int asens_order){
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
-    fcn_.setInput(input(i).data(),i);
-  vector<double>& res2 = output().data();
+    fcn_.setInput(input(i).get(),i);
+  vector<double>& res2 = output().get();
   
   int el = 0; // running index
 

@@ -37,7 +37,7 @@ void FunctionIO::init(){
   
   // Make dense if necessary
   if(dense_){
-    mat_ = Matrix<double>(size1(),size2(),0);
+    get() = Matrix<double>(get().size1(),get().size2(),0);
   }
 
   // Non-zeros
@@ -52,7 +52,7 @@ void FunctionIO::setSize(int nrow, int ncol){
 }
 
 void FunctionIO::setSparsityCRS(const vector<int>& rowind, const vector<int> &col){
-  mat_ = Matrix<double>(size1(),size2(),col,rowind);
+  mat_ = Matrix<double>(get().size1(),get().size2(),col,rowind);
   dense_ = false;
 }
 
@@ -72,144 +72,28 @@ int FunctionIO::numAdjDir() const{
   return matA_.size();
 }
 
-Matrix<double>& FunctionIO::mat(int dir){
-  if(dir<0)
-    return matA_.at(-1-dir);
-  else if(dir==0)
-    return mat_;
-  else
-    return matF_.at(-1+dir);
-}
-
-const Matrix<double>& FunctionIO::mat(int dir) const{
-  if(dir<0)
-    return matA_.at(-1-dir);
-  else if(dir==0)
-    return mat_;
-  else
-    return matF_.at(-1+dir);
-}
-
-Matrix<double>& FunctionIO::matF(int dir){
-  return matF_.at(dir);
-}
-
-const Matrix<double>& FunctionIO::matF(int dir) const{
-  return matF_.at(dir);
-}
-
-Matrix<double>& FunctionIO::matA(int dir){
-  return matA_.at(dir);
-}
-
-const Matrix<double>& FunctionIO::matA(int dir) const{
-  return matA_.at(dir);
-}
-
-vector<double>& FunctionIO::dataF(int dir){
-  return matF(dir);
-}
-
-const vector<double>& FunctionIO::dataF(int dir) const{
-  return matF(dir);
-}
-
-vector<double>& FunctionIO::dataA(int dir){
-  return matA(dir);
-}
-
-const vector<double>& FunctionIO::dataA(int dir) const{
-  return matA(dir);
-}
-
-int FunctionIO::numel() const{
-  return size1()*size2();
-}
-
-int FunctionIO::size1() const{
-  return mat_.size1();
-}
-
-int FunctionIO::size2() const{
-  return mat_.size2();
-}
-
-void FunctionIO::getSparsityCRS(vector<int>& rowind, vector<int> &col) const{
-  rowind = mat_.rowind();
-  col = mat_.col();
-}
-
-void FunctionIO::getSparsity(vector<int>& row, vector<int> &col) const{
-  col = mat_.col();
-  row = mat_.sparsity().getRow();
-}
-
-int FunctionIO::size() const{
-  return col().size();
-}
-
-int FunctionIO::sizeU() const{
-  return mat_.sparsity().sizeU();
-}
-
-int FunctionIO::sizeL() const{
-  return mat_.sparsity().sizeL();
-}
-
-vector<double>& FunctionIO::data(int dir){
-  return mat(dir);
-}
-
-const vector<double>& FunctionIO::data(int dir) const{
-  return mat(dir);
-}
-
-void FunctionIO::set(double val, int dir, Sparsity sp){
-  mat(dir).set(val,sp);
+Matrix<double>& FunctionIO::get(){
+  return mat_;
 }
     
-void FunctionIO::get(double& val, int dir, Sparsity sp) const{
-  mat(dir).get(val,sp);
+const Matrix<double>& FunctionIO::get() const{
+  return mat_;
 }
-
-void FunctionIO::set(const std::vector<double>& val, int dir, Sparsity sp){
-  mat(dir).set(val,sp);
+    
+Matrix<double>& FunctionIO::getFwd(int dir){
+  return matF_.at(dir);
 }
-
-void FunctionIO::get(std::vector<double>& val, int dir, Sparsity sp) const{
-  mat(dir).get(val,sp);
+    
+const Matrix<double>& FunctionIO::getFwd(int dir) const{
+  return matF_.at(dir);
 }
-
-void FunctionIO::set(const double* val, int dir, Sparsity sp){
-  mat(dir).set(val,sp);
+    
+Matrix<double>& FunctionIO::getAdj(int dir){
+  return matA_.at(dir);
 }
-
-void FunctionIO::get(double* val, int dir, Sparsity sp) const{
-  mat(dir).get(val,sp);
-}
-
-const std::vector<int>& FunctionIO::rowind() const{
-  return mat_.rowind();
-}
-
-std::vector<int>& FunctionIO::rowind(){
-  return mat_.rowind();
-}
-
-const std::vector<int>& FunctionIO::col() const{
-  return mat_.col();
-}
-
-std::vector<int>& FunctionIO::col(){
-  return mat_.col();
-}
-
-int FunctionIO::rowind(int i) const{
-  return mat_.rowind(i);
-}
-
-int FunctionIO::col(int el) const{
-  return mat_.col(el);
+    
+const Matrix<double>& FunctionIO::getAdj(int dir) const{
+  return matA_.at(dir);
 }
 
 

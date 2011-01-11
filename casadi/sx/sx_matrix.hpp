@@ -71,7 +71,7 @@ SXMatrix(int n, int m);
 explicit SXMatrix(const Matrix<SX>& x);
 
 /// dense n-by-m matrix filled with val constructor
-SXMatrix(int n, int m, const SX& val);    
+SXMatrix(int n, int m, const SX& val);
 
 //@{
 /** \brief  These constructors enable implicit type conversion */

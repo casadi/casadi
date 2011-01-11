@@ -100,6 +100,12 @@ class CRSSparsity : public SharedObject{
     /// Get the row for each non-zero entry
     std::vector<int> getRow() const;
 
+    /// Get the sparsity in CRS format
+    void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;
+
+    /// Get the sparsity in sparse triplet format
+    void getSparsity(std::vector<int>& row, std::vector<int> &col) const;
+    
     /// Scalar expression
 //    static const CRSSparsity scalar;
 
