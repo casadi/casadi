@@ -22,24 +22,16 @@
 
 #include "reordering.hpp"
 #include "../stl_vector_tools.hpp"
-#include <cassert>
-#include <iterator>
 
 using namespace std;
 
 namespace CasADi{
-
-// Constructor
-Reordering::Reordering(const vector<MX>& dep__){
-  setDependencies(dep__);
-}
 
 Reordering::Reordering(const MX &dep__){
   setDependencies(dep__);
 }
 
 void Reordering::evaluate(int fsens_order, int asens_order){
- assert(fsens_order==0 || asens_order==0);
   
   if(fsens_order==0){
     for (int k=0;k<size1()*size2();k++) {

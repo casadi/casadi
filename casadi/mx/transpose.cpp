@@ -21,7 +21,6 @@
  */
 
 #include "transpose.hpp"
-#include <cassert>
 
 using namespace std;
 

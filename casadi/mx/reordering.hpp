@@ -43,9 +43,7 @@ namespace CasADi{
 class Reordering : public MXNode{
 public:
 
-/** \brief  Constructor */
-explicit Reordering(const std::vector<MX> &comp);
-
+/// Constructor
 explicit Reordering(const MX &comp);
 
 /** \brief  Evaluate the function and store the result in the node
@@ -65,6 +63,8 @@ virtual int k2k(int k)=0;
 
 // These index remapping function out to be inlined. Can one inline without losing polymorphism here?
 // Some C++ guru ought to take a look here...
+// NOTE: C++ guru speaking, kidding... This design is probably not very efficient, as virtual functions can't be inlined (afaik). 
+// A better design is to include in this class a vector which maps the non-zero entries to each other
 
 protected:
   
