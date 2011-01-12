@@ -36,6 +36,17 @@ class CRSSparsityNode;
  * 
  * The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
  * 
+  The following indices exist. All start with 0.\n
+  (i) row index \n
+  (j) column index \n
+  (k) non-zero elements index \n
+ *
+ *
+ *  col(k)=j \n
+ *  rowind(i)<=k<=rowind(i+1) \n
+ *  getRow()[k]=i \n
+ * 
+ * The actual col and rowind vectors are stored inside CRSSparsityNode\n
  * 
  * \see Matrix
  *
@@ -69,47 +80,73 @@ class CRSSparsity : public SharedObject{
     /// Get the number of columns
     int size2() const;
 
-    /// Get the number of elements
+    /** \brief Get the number of elements, including structural zeros.
+     * \see size()
+    */
     int numel() const;
     
-    /// Get the number of (structural) non-zeros
+    /** \brief Get the number of (structural) non-zeros
+     * \see numel()
+     */
     int size() const;
 
-    /// Number of non-zeros in the upper triangular half
+    /** \brief Number of non-zeros in the upper triangular half
+    *
+    * Counts (i,j) if j>=i
+    * 
+    */
     int sizeU() const;
 
-    /// Number of non-zeros in the lower triangular half
+    /** \brief Number of non-zeros in the lower triangular half
+     * Counts (i,j) if j<=i
+    */
     int sizeL() const;
 
+    /// @{
+    /** \brief Get a reference to the columns of all non-zero element (copy if not unique!)
+     * The length of the returned vector is exactly size()
+     *  \post col()[k]=j
+     */
+    std::vector<int>& col();
     /// Get a const reference to the columns of all non-zero element
     const std::vector<int>& col() const;
+    /** \brief Get the column of a non-zero element
+     *  \post col(k)=j
+     */
+    int col(int k) const;
+    /// @}
     
+    /// @{
+    /** \brief Get a reference to the rowindex of all row element (copy if not unique!)
+     * The length of the returned vector is exactly size2()+1
+     *  \post rowind()[i]<=k<=rowind()[i+1]
+    */
+    std::vector<int>& rowind();
     /// Get a const reference to the rowindex of all row element
     const std::vector<int>& rowind() const;
-    
-    /// Get a reference to the columns of all non-zero element (copy if not unique!)
-    std::vector<int>& col();
-    
-    /// Get a reference to the rowindex of all row element (copy if not unique!)
-    std::vector<int>& rowind();
-    
-    /// Get the column of a non-zero element
-    int col(int el) const;
-    
-    /// Get the index of the first non-zero element a row
+    /** \brief Get the index of the first non-zero element in a row
+     * \post rowind(i)<=k<=rowind(i+)
+     */
     int rowind(int row) const;
+    /// @}
 
+    /** \brief Get the row for each non-zero entry
+     *  \post getRow()[k]=i
+     */
+    std::vector<int> getRow() const;
+    
     /// Resize
     void resize(int nrow, int ncol);
     
-    /// Get the index of a non-zero element (copy object if necessary)
+    /// @{
+    /** Get the index of a non-zero element (copy object if necessary)
+     * \post getNZ(i,j)=k
+     */
     int getNZ(int i, int j);
     
     /// Get the index of a non-zero element (return -1 if not exists)
     int getNZ(int i, int j) const;
-    
-    /// Get the row for each non-zero entry
-    std::vector<int> getRow() const;
+    /// @}
 
     /// Get the sparsity in CRS format
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;

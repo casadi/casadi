@@ -40,19 +40,18 @@ namespace CasADi{
   This philosophy makes it easy to use and to interface in particularily with Matlab and Python.\n
   
   The syntax tries to stay as close as possible to the ublas syntax when it comes to vector/matrix operations.\n
+  Matrix<T> is polymorphic with a std::vector<T> that contain all non-identical-zero elements.\n
+  The sparsity can be accessed with CRSSparsity& sparsity()\n
   
   The following indices exist. All start with 0.\n
   (i) row index \n
   (j) column index \n
-  (k) non-zero elments index \n
+  (k) structural non-zero elements index \n
   
-  For dense matrix, index flatten happens as follows: (i,j) -> k=j+i*size2()\n
+  Index flatten (i,j) -> (k) happens by scanning row-by-row.\n
+  For dense matrix, the index flattening can be written as (i,j) -> k=j+i*size2()\n
+  
   Vectors are considered to be column vectors.\n
-  
-  The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
-  
-  Matrix<T> is polymorphic with a std::vector<T> that contain all non-identical-zero elements.\n
-  The sparsity can be accessed with CRSSparsity& sparsity()\n
   
   \see CRSSparsity
   
