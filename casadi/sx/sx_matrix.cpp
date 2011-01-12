@@ -22,7 +22,6 @@
 
 #include "sx_matrix.hpp"
 #include "sx_tools.hpp"
-#include "../matrix/matrix.cpp"
 
 using namespace std;
 
