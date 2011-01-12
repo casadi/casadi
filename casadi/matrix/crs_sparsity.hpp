@@ -32,6 +32,16 @@ namespace CasADi{
 // Forward declaration
 class CRSSparsityNode;
   
+/** \brief General sparsity class
+ * 
+ * The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
+ * 
+ * 
+ * \see Matrix
+ *
+ * \author Joel Andersson 
+ * \date 2010	
+*/
 class CRSSparsity : public SharedObject{
   public:
   
