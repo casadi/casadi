@@ -36,6 +36,20 @@ namespace CasADi{
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
 
   /** \brief General sparse matrix class
+  General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
+  This philosophy makes it easy to use and to interface in particularily with Matlab and Python.\n
+  
+  The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
+
+  Index starts with 0.\n
+  Index flatten happens as follows: (i,j) -> k = j+i*size2()\n
+  Vectors are considered to be column vectors.\n
+  
+  The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
+  
+  Matrix<T> is polymorphic with a std::vector<T> that contain all non-identical-zero elements.\n
+  The sparsity can be accessed with CRSSparsity& sparsity()\n
+  
   \author Joel Andersson 
   \date 2010	
 */
@@ -231,7 +245,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void reserve(int nnz);
     void reserve(int nnz, int nrow);
     
-    // Access the sparsity
+    /// Access the sparsity
     const CRSSparsity& sparsity() const;
     
     // The following need cleaning up
