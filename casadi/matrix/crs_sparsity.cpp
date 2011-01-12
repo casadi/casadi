@@ -235,7 +235,7 @@ void CRSSparsity::getSparsity(std::vector<int>& row, std::vector<int> &col) cons
   col = this->col();
 }
 
-void CRSSparsity::bucketSort(std::vector<std::vector<int> >& buckets, std::vector<int>& row) const{
+void CRSSparsity::bucketSort(std::vector<std::list<int> >& buckets, std::vector<int>& row) const{
   // Assert dimensions
   buckets.resize(size2());
 
@@ -243,18 +243,21 @@ void CRSSparsity::bucketSort(std::vector<std::vector<int> >& buckets, std::vecto
   row.resize(size());
 
   // Empty the buckets
-  for(std::vector<std::vector<int> >::iterator it=buckets.begin(); it!=buckets.end(); ++it)
+  for(std::vector<std::list<int> >::iterator it=buckets.begin(); it!=buckets.end(); ++it)
     it->clear();
+  
+  // Quick access
+  const vector<int>& c = col();
   
   // Loop over the rows of the original matrix
   for(int i=0; i<size1(); ++i)
   {
     // Loop over the elements in the row
     for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
-      int j=col(el);  // column
+      int j=c[el];  // column
       
-     // put the element into the right bucket
-     buckets[j].push_back(el);
+      // put the element into the right bucket
+      buckets[j].push_back(el);
      
      // save the row index
      row[el] = i;
@@ -264,40 +267,47 @@ void CRSSparsity::bucketSort(std::vector<std::vector<int> >& buckets, std::vecto
 
 CRSSparsity CRSSparsity::transpose(std::vector<int>& mapping) const{
   // Non-zero entries on each column
-  std::vector<std::vector<int> > buckets;
+  vector<list<int> > buckets;
 
   // Create a vector with the rows for each non-zero element
-  std::vector<int> row;
+  vector<int> row;
 
   // Do a bucket sorting
   bucketSort(buckets,row);
 
   // create the return object
   CRSSparsity ret(size2(),size1());
-
+  
+  // Get references to the column vector and row indices
+  vector<int> &rrowind = ret->rowind_;
+  vector<int> &rcol = ret->col_;
+  
   // reserve space (to make the calculations quicker)
-  ret.reserve(size(),size2());
+  rcol.reserve(size());
 
   // Store the mapping of the nonzero entries
-  mapping.resize(size());
+  mapping.clear();
+  mapping.reserve(size());
 
-  // loop over the columns of the object to be transposed
-  for(int j=0; j<size2(); ++j){
+  // loop over the rows of the resulting object
+  for(int i=0; i<size2(); ++i){
     
-    // Loop over the non-zero entries of the column
-    for(int r=0; r<buckets[j].size(); ++r){
+    // Loop over the non-zero entries of the row
+    for(list<int>::const_iterator it=buckets[i].begin(); it!=buckets[i].end(); ++it){
       // the index of the non-zero element
-     int el =  buckets[j][r];
+     int el =  *it;
      
-     // Get the row of the element
-     int i = row[el]; 
-     
-     // add the element (can be done much more efficiently!)
-     int el_ret = ret.getNZ(j,i);
+     // Get the column of the element
+     int j = row[el];
      
      // Store the mapping
-     mapping[el_ret] = el;
+     mapping.push_back(el);
+     
+     // Store the column index
+     rcol.push_back(j);
     }
+    // Log the row index
+    rrowind[i+1] = rcol.size();
   }
   
   // Return the sparsity

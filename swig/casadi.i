@@ -14,11 +14,34 @@
 %include "std_string.i"
 %include "std_vector.i"
 
-// Template instantiations
-namespace std {
-%template(vector_int) vector<int>;
-%template(vector_double) vector<double>;
-} // namespace std;
+// Move to C++
+#ifndef SWIG
+namespace CasADi{
+  typedef std::vector<bool> BVector;
+  typedef std::vector<std::vector<bool> > BVectorVector;
+  typedef std::vector< std::vector<std::vector<bool> > > BVectorVectorVector;
+  
+  typedef std::vector<int> IVector;
+  typedef std::vector<std::vector<int> > IVectorVector;
+  typedef std::vector< std::vector<std::vector<int> > > IVectorVectorVector;
+  
+  typedef std::vector<double> DVector;
+  typedef std::vector<std::vector<double> > DVectorVector;
+  typedef std::vector< std::vector<std::vector<double> > > DVectorVectorVector;
+} // namespace CasADi
+#else // SWIG
+%template(BVector)             std::vector<bool>;
+%template(BVectorVector)       std::vector<std::vector<bool> > ;
+%template(BVectorVectorVector) std::vector< std::vector<std::vector<bool> > > ;
+
+%template(IVector)             std::vector<int>;
+%template(IVectorVector)       std::vector<std::vector<int> > ;
+%template(IVectorVectorVector) std::vector< std::vector<std::vector<int> > > ;
+
+%template(DVector)             std::vector<double>;
+%template(DVectorVector)       std::vector<std::vector<double> > ;
+%template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
+#endif // SWIG
 
 #ifndef WITH_NUMPY
 #warning "Not using numpy. option(WITH_NUMPY = OFF)"

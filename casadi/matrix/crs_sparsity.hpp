@@ -25,6 +25,7 @@
 
 #include "../shared_object.hpp"
 #include <vector>
+#include <list>
 
 namespace CasADi{
 
@@ -107,7 +108,7 @@ class CRSSparsity : public SharedObject{
     void getSparsity(std::vector<int>& row, std::vector<int> &col) const;
     
     /// Bucket sort the elements by column
-    void bucketSort(std::vector<std::vector<int> >& buckets, std::vector<int>& row) const;
+    void bucketSort(std::vector<std::list<int> >& buckets, std::vector<int>& row) const;
 
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;

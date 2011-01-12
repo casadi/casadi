@@ -286,6 +286,20 @@ class casadi_operators<SX>{
 } // namespace CasADi
 
 #ifndef SWIG
+namespace CasADi{
+  typedef std::vector<SX> SXVector;
+  typedef std::vector<std::vector<SX> > SXVectorVector;
+  typedef std::vector< std::vector<std::vector<SX> > > SXVectorVectorVector;
+} // namespace CasADi
+#else // SWIG
+%template(SXVector)             std::vector<CasADi::SX>;
+%template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
+%template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
+#endif // SWIG
+
+
+
+#ifndef SWIG
 
 // Template specialization
 namespace std{

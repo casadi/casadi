@@ -20,14 +20,9 @@
 
 // Template instantiations
 %template(vector_PyObject) std::vector<PyObject*>;
-%template(vector_sx) std::vector<CasADi::SX>;
-%template(vector_vector_sx) std::vector< std::vector<CasADi::SX> >;
-%template(vector_vector_vector_sx) std::vector< std::vector< std::vector<CasADi::SX> > >;
+%template(matrix_sx)           CasADi::Matrix<CasADi::SX>;
+%template(vector_matrix_sx)    std::vector<CasADi::Matrix<CasADi::SX> >;
 
-%template(matrix_sx) CasADi::Matrix<CasADi::SX>;
-%template(matrix_double) CasADi::Matrix<double>;
-%template(vector_matrix_sx) std::vector<CasADi::Matrix<CasADi::SX> >;
-%template(vector_matrix_double) std::vector<CasADi::Matrix<double> >;
 
 // %extend CasADi::Matrix<CasADi::SX> {
 // std::string __repr__() { return $self->getRepresentation(); }

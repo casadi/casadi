@@ -289,6 +289,23 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
 };
 
+} // namespace CasADi
+
+// Typedefs/template initializations
+#ifndef SWIG
+namespace CasADi{
+  typedef Matrix<double> DMatrix;
+  typedef std::vector<Matrix<double> > DMatrixVector;
+  typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
+} // namespace CasADi
+#else // SWIG
+%template(DMatrix)             CasADi::Matrix<double>;
+%template(DMatrixVector)       std::vector<CasADi::Matrix<double> > ;
+%template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
+#endif // SWIG
+
+
+
 // #ifdef SWIG
 // %extend Matrix<T>{
 // T __getitem__(const std::vector<PyObject*> &I ) {
@@ -308,6 +325,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
 // #endif // SWIG
 
 #ifndef SWIG
+namespace CasADi{
 // Implementations
 
 template<class T>
@@ -717,6 +735,7 @@ template<class T>
 Matrix<T> Matrix<T>::operator-() const{
   Matrix<T> temp;
   temp.unary(casadi_operators<T>::neg,*this);
+  temp.swapOnCopy();
   return temp;
 }
 
@@ -729,6 +748,7 @@ template<class T>
 Matrix<T> Matrix<T>::operator+(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::add,*this,y);
+  r.swapOnCopy();
   return r;
 }
 
@@ -736,6 +756,7 @@ template<class T>
 Matrix<T> Matrix<T>::operator-(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::sub,*this,y);
+  r.swapOnCopy();
   return r;
 }
 
@@ -743,6 +764,7 @@ template<class T>
 Matrix<T> Matrix<T>::operator*(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::mul,*this,y);
+  r.swapOnCopy();
   return r;
 }
 
@@ -750,6 +772,7 @@ template<class T>
 Matrix<T> Matrix<T>::operator/(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::div,*this,y);
+  r.swapOnCopy();
   return r;
 }
 
@@ -944,17 +967,9 @@ void Matrix<T>::assertNumEl(int sz) const{
   }
 }
 
-
-
-
-
-
-
-
-
+} // namespace CasADi
 #endif // SWIG
 
-} // namespace CasADi
 
 
 #endif // MATRIX_HPP

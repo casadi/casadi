@@ -22,11 +22,11 @@ Use scipy for numerical operations on floating points and casadi when working wi
 types.
 """
 
-n = 1000
-m = 1000
+n = 2000
+m = 2000
 
 # ~10 % non-zeros
-nel = n*m/10
+nel = n*m/100
 
 # tests
 solvers = ["scipy","casadi"]
@@ -37,15 +37,20 @@ use_lil = True
 # number of repeats
 rep = 4
 
+# Generate test matrices
+CM = []
+SM = []
+
 for sol in solvers:
   print "testing ", sol
   dur_build = []
   dur_convert = []
+  dur_operation = []
 
   for i in range(rep):
     # create empty matrix
     if sol=="casadi":
-      M = matrix_double(n,m)
+      M = DMatrix(n,m)
     else:
       if use_lil:
         M = lil_matrix((n,m))
@@ -57,7 +62,7 @@ for sol in solvers:
     for i in range(nel):
       row = randrange(n)
       col = randrange(m)
-      res = float(row+col)
+      res = random()
       M[row,col] = res
 
     # need to convert back to csr
@@ -72,16 +77,16 @@ for sol in solvers:
       M = csr_matrix((M,M.col(),M.rowind()),(M.size1(),M.size2()),dtype=float)
     
     # Save the matrix
-    scipyM = M
+    SM.append(M)
 
     # convert scipy to casadi
     dim = M.shape
     col = list(int(i) for i in M.indices)
     rowind = list(int(i) for i in M.indptr)
-    M = matrix_double(dim[0],dim[1],col,rowind,M.data)
+    M = DMatrix(dim[0],dim[1],col,rowind,M.data)
     
     # Save the matrix
-    casadiM = M
+    CM.append(M)
 
     # convert back again
     if sol!="casadi":
@@ -90,25 +95,41 @@ for sol in solvers:
     t_convert = time.time()
     dur_convert.append(t_convert-t_build)
 
-
-    ## Make a couple of operations
-    #if sol=="casadi":
-      #M2 = trans(M)
-      ##M2 = prod(M,M)
-      ###M = M2 + M
-    #else:
-      #M2 = M.transpose()
-      ##M2 = N.dot(M,M)
-      ##M = M2 + M       
-    ##M = M2
+    # Make a couple of operations
+    if len(SM)>1:
+      if sol=="casadi":
+        M2_C = prod(CM[0],CM[1])
+        #for i in range(100):
+          #M = trans(M)
+        
+        #M2 = trans(M)
+        #M3 = trans(M2)
+        #M4 = M2 + M3
+        #M5 = prod(M4,M)
+        #M5 = prod(M4,M)
+      else:
+        M2_S = N.dot(SM[0],SM[1])
+        #for i in range(1000):
+          #M = M.transpose()
+        #M2 = M.transpose()
+        #M3 = M2.transpose()
+        #M4 = M2 + M3
+        #M5 = N.dot(M4,M)
       
+    t_operation = time.time()
+    dur_operation.append(t_operation-t_convert)
     
 
   print "durations to build:                      ", dur_build
   print "durations for converting back and forth: ", dur_convert
+  print "durations for operations:                ", dur_operation
   print "number of non-zeros for the last matrix: ",
   if sol=="casadi":
     print M.size()
   else:
     print M.getnnz()
 
+
+M2_C_S = csr_matrix((M2_C,M2_C.col(),M2_C.rowind()),(M2_C.size1(),M2_C.size2()),dtype=float)
+M2_DIFF = M2_C_S-M2_S
+print "difference is ", repr(M2_DIFF)
