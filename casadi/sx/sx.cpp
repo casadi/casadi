@@ -507,6 +507,8 @@ SX pow(const SX& x, const SX& n){
       return 1;
     else if(nn<0) // negative power
       return 1/pow(x,-nn);
+    else if(nn>100) // maximum depth
+      return SX(new BinarySXNode(POW_NODE,x,nn));
     else if(nn%2 == 1) // odd power
       return x*pow(x,nn-1);
     else{ // even power
