@@ -39,14 +39,14 @@ class CRSSparsityNode;
   The following indices exist. All start with 0.\n
   (i) row index \n
   (j) column index \n
-  (k) non-zero elements index \n
+  (k) structural non-zero elements index \n
  *
  *
  *  col(k)=j \n
  *  rowind(i)<=k<=rowind(i+1) \n
  *  getRow()[k]=i \n
  * 
- * The actual col and rowind vectors are stored inside CRSSparsityNode\n
+ * The actual col and rowind vectors are stored inside CRSSparsityNode \n
  * 
  * \see Matrix
  *
@@ -74,6 +74,8 @@ class CRSSparsity : public SharedObject{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
+    /// \name Size and element counting
+    /// @{
     /// Get the number of rows
     int size1() const;
     
@@ -101,6 +103,7 @@ class CRSSparsity : public SharedObject{
      * Counts (i,j) if j<=i
     */
     int sizeL() const;
+    /// @}
 
     /// @{
     /** \brief Get a reference to the columns of all non-zero element (copy if not unique!)
@@ -131,7 +134,11 @@ class CRSSparsity : public SharedObject{
     /// @}
 
     /** \brief Get the row for each non-zero entry
-     *  \post getRow()[k]=i
+     * \post getRow()[k]=i
+     * 
+     * 
+     *  This method relies on rowind().
+     *  \see rowind()
      */
     std::vector<int> getRow() const;
     
@@ -139,7 +146,7 @@ class CRSSparsity : public SharedObject{
     void resize(int nrow, int ncol);
     
     /// @{
-    /** Get the index of a non-zero element (copy object if necessary)
+    /** \brief Get the index of a non-zero element (copy object if necessary)
      * \post getNZ(i,j)=k
      */
     int getNZ(int i, int j);
