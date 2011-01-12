@@ -197,7 +197,40 @@ class FX : public OptionsFunctionality{
   %rename(setInputOriginal) setInput; // Should be replaced by a typemap later on.
 #endif // SWIG
 
-  /// Set an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+#ifdef DOXYGENPROC
+/// \name Setters
+/// Set an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+/// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+/// Assumes a properly allocated val.\n
+/// @{
+/** 
+    \brief Reads in the input argument from val.
+*/
+void setInput(T val, int ind=0) const;
+/** 
+    \brief Reads in the output argument from val.
+*/
+void setOutput(T val, int ind=0) const;
+/** 
+    \brief Reads in the forward seed from val.
+*/
+void setFwdSeed(T val,  int ind=0, int dir=0) const;
+/** 
+    \brief Reads in the forward sensitivity from val.
+*/
+void setFwdSens(T val, int ind=0, int dir=0) const ;
+/** 
+    \brief Reads in the adjoint seed from val.
+*/
+void setAdjSeed(T val,  int ind=0, int dir=0) const;
+/** 
+    \brief Reads in the adjoint sensitivity from val.
+*/
+void setAdjSens(T val, int ind=0, int dir=0) const ;
+/// @}
+
+#endif
+
 #define SETTERS(T)\
   void setInput(T val, int ind=0)             { assertInit(); argument(ind).set(val);  } \
   void setOutput(T val, int ind=0)            { assertInit(); argument(ind).set(val); } \
@@ -206,10 +239,15 @@ class FX : public OptionsFunctionality{
   void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); adjSeed(ind,dir).set(val); } \
   void setAdjSens(T val, int ind=0, int dir=0){ assertInit(); adjSens(ind,dir).set(val); }
 
+/// \cond
 SETTERS(double);
 SETTERS(const double*);
 SETTERS(const std::vector<double>&);
+/// \endcond
 #undef SETTERS
+
+
+
 
 #ifdef SWIG
 // Forward renaming declarations
@@ -227,11 +265,53 @@ SETTERS(const std::vector<double>&);
     void getFwdSens(T val, int ind=0, int dir=0) const{ assertInit(); fwdSens(ind,dir).get(val);} \
     void getAdjSeed(T val, int ind=0, int dir=0) const{ assertInit(); adjSeed(ind,dir).get(val);} \
     void getAdjSens(T val, int ind=0, int dir=0) const{ assertInit(); adjSens(ind,dir).get(val);}
+/// \cond
 GETTERS(double&);
 GETTERS(double*);
 GETTERS(std::vector<double>&);
+/// \endcond
 #undef GETTERS
 #endif // SWIG
+
+#ifdef DOXYGENPROC
+/// \name Getters
+/// A group of accessor for numerical data that operate on preallocated data.\n
+/// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+/// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+/// Assumes a properly allocated val.\n
+/// @{
+
+/** \brief Writes out the input argument into val.
+*/
+void getInput(T val, int ind=0) const;
+ 
+/** 
+    \brief Writes out the output argument into val.
+*/
+void getOutput(T val, int ind=0) const;
+
+/** 
+    \brief Writes out the forward seed into val.
+*/
+void getFwdSeed(T val,  int ind=0, int dir=0) const;
+
+/**  
+    \brief Writes out the forward sensitivity into val.
+*/
+void getFwdSens(T val, int ind=0, int dir=0) const;
+/** 
+    \brief Writes out the adjoint seed into val.
+*/
+void getAdjSeed(T val,  int ind=0, int dir=0) const ;
+
+/** 
+    \brief Writes out the adjoint sensitivity into val.
+*/
+void getAdjSens(T val, int ind=0, int dir=0) const;
+/// @}
+#endif
+
+
 
 /** \brief  Get the input data */
 const std::vector<double>& getInputData(int ind=0) const;
