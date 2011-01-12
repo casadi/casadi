@@ -308,7 +308,11 @@ void FMIParserInternal::addOptimization(){
     if(onode.checkName("opt:ObjectiveFunction")){ // mayer term
       addObjectiveFunction(onode);
     } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
-      addIntegrandObjectiveFunction(onode);
+      try{
+        addIntegrandObjectiveFunction(onode);
+      } catch(exception& ex){
+        cout << "WARNING: addIntegrandObjectiveFunction" << ex.what() << endl;
+      }
     } else if(onode.checkName("opt:IntervalStartTime")) {
        addIntervalStartTime(onode);
     } else if(onode.checkName("opt:IntervalFinalTime")) {

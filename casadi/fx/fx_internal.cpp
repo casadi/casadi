@@ -118,6 +118,19 @@ const FunctionIO& FXInternal::output(int i) const{
   return const_cast<FXInternal*>(this)->output(i);
 }
 
+void FXInternal::log(const std::string& msg) const{
+  if(verbose()){
+    cout << "CasADi log message: " << msg << endl;
+  }
+}
+
+bool FXInternal::verbose() const{
+  return verbose_;
+}
+
+bool FXInternal::monitored(const std::string& mod) const{
+  return monitors_.count(mod)>0;
+}
 
 
 

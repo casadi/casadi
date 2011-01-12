@@ -203,6 +203,14 @@ const Matrix<double>& FX::adjSens(int iind, int dir) const{
   return input(iind).getAdj(dir);
 }
 
+void FX::addMonitor(const std::string& mon){
+  (*this)->monitors_.insert(mon);
+}
+
+void FX::removeMonitor(const std::string& mon){
+  (*this)->monitors_.erase(mon);
+}
+
 
 
 } // namespace CasADi

@@ -286,6 +286,7 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
 }
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
+  log("eval_h started");
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
@@ -310,10 +311,12 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     // Get results
     H_.getOutput(values);
   }
+  log("eval_h ok");
   return true;
 }
 
 bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
+  log("eval_jac_g started");
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
@@ -335,13 +338,21 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
 
     // Get the output
     J_.getOutput(values);
+    
+    if(monitored("eval_jac_g")){
+      cout << "J = " << endl;
+      J_.result().printSparse();
+    }
   }
   
+  log("eval_jac_g ok");
   return true;
 }
 
 bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value)
 {
+  log("eval_f started");
+  
   assert(n == n_);
 
   // Pass the argument to the function
@@ -353,11 +364,19 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
   // Get the result
   F_.getOutput(obj_value);
 
+  // Printing
+  if(monitored("eval_f")){
+    cout << "obj_value = " << obj_value << endl;
+  }
+
+  log("eval_f ok");
   return true;
 }
 
 bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 {
+  log("eval_g started");
+
   assert(n == n_);
   assert(m == m_);
 
@@ -370,11 +389,18 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
   // Ge the result
   G_.getOutput(g);
 
+  // Printing
+  if(monitored("eval_g"))
+    cout << "g = " << G_.result() << endl;
+    
+  log("eval_g ok");
   return true;
 }
 
 bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f)
 {
+  log("eval_grad_f started");
+
   assert(n == n_);
   // Pass the argument to the function
   F_.setInput(x);
@@ -388,6 +414,12 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
   // Get the result
   F_.getAdjSens(grad_f);
 
+  // Printing
+  if(monitored("eval_grad_f")){
+    cout << "grad_f = " << F_.adjSens() << endl;
+  }
+  
+  log("eval_grad_f ok");
   return true;
 }
 

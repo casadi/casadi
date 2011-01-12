@@ -220,6 +220,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
     void printVector(std::ostream &stream=std::cout) const; // print vector-style
     void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
+    void printSparse(std::ostream &stream=std::cout) const; // print the non-zeros
     //@}
 
     /** \brief Swap the the vector content upon the next copy assignment, saves a copy operation: 
@@ -530,6 +531,15 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     stream << ")";
   }
   stream << ")";  
+}
+
+template<class T>
+void Matrix<T>::printSparse(std::ostream &stream) const {
+  for(int i=0; i<size1(); ++i)
+    for(int el=rowind(i); el<rowind(i+1); ++el){
+      int j=col(el);
+      stream << "(" << i << "," << j << "): " << (*this)[el] << std::endl;
+    }
 }
 
 template<class T>

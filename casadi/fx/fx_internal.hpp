@@ -24,6 +24,7 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
+#include <set>
 
 namespace CasADi{
   
@@ -80,6 +81,12 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Assert that the function has been initialized
   void assertInit() const;
 
+  /// Verbose mode?
+  bool verbose() const;
+  
+  /// Is function fcn being monitored
+  bool monitored(const std::string& mod) const;
+  
   protected:
 
   /** \brief  Has the function been initialized? */
@@ -92,6 +99,14 @@ class FXInternal : public OptionsFunctionalityNode{
 
   /** \brief  Verbose -- for debugging purposes */
   bool verbose_;
+  
+  /** \brief  Log the status of the solver */
+  void log(const std::string& msg) const;
+
+  /// Set of module names which are extra monitored
+  std::set<std::string> monitors_;
+  
+  
   
 };
 
