@@ -38,6 +38,8 @@ namespace CasADi{
   It also contains error checking, making sure that the option exists and that the value type is correct.
   
   A derived class should add option names, types and default values to the corresponding vectors.
+  
+
   \author Joel Andersson 
   \date 2010
   Joel Andersson, K.U. Leuven 2010
@@ -61,7 +63,13 @@ class OptionsFunctionality : public SharedObject{
     OptionsFunctionalityNode* operator->();
     const OptionsFunctionalityNode* operator->() const;
         
-    /** \brief  set option */
+    /** \brief  set option.
+    
+   The setOptions are in general only considered before the init function, if any.
+   If properties changes, the init function should be called again.
+   (Ticket #54)
+   
+    */
     void setOption(const std::string &str, const Option& val);
 
     /** \brief  get an option value */
