@@ -419,6 +419,14 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
     cout << "grad_f = " << F_.adjSens() << endl;
   }
   
+  // Check the result for regularity
+  for(vector<double>::const_iterator it=F_.adjSens().begin(); it!=F_.adjSens().end(); ++it){
+      if(isnan(*it) || isinf(*it)){
+        log("eval_grad_f: result not regular");
+        return false;
+    }
+  }
+  
   log("eval_grad_f ok");
   return true;
 }

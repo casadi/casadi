@@ -145,11 +145,21 @@ Matrix<T> adj(const Matrix<T>& a);
 template<class T>
 Matrix<T> inv(const Matrix<T>& a);
 
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, int n, int m);
+
+template<class T>
+Matrix<T> vec(const Matrix<T>& a);
+
+
 } // namespace CasADi
 
 #ifndef SWIG
 
 // Implementations of the functions in standard namespace
+
+#include <iterator>
+
 namespace std{
   
 #define UNOP_DEF(fname,opname) \
@@ -557,6 +567,31 @@ Matrix<T> inv(const Matrix<T>& a){
   return adj(a)/det(a);
 }
 
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, int n, int m){
+  if(a.numel() != n*m)
+    throw CasadiException("resize: number of elements must remain the same");
+  
+  Matrix<T> ret(n,m);
+  for(int i=0; i<a.size1(); ++i){
+    for(int el=a.rowind(i); el<a.rowind(i+1); ++el){
+      int j = a.col(el);
+      int k = j+i*a.size1();
+      ret(k/m,k%m) = a[el];
+    }
+  }
+  ret.swapOnCopy();
+  return ret;
+}
+
+template<class T>
+Matrix<T> vec(const Matrix<T>& a){
+  Matrix<T> ret = reshape(trans(a),a.numel(),1);
+  ret.swapOnCopy();
+  return ret;
+}
+
+
 
 
 
@@ -611,7 +646,8 @@ MTT_INST(T,getMinor,CasADi) \
 MTT_INST(T,cofactor,CasADi) \
 MTT_INST(T,adj,CasADi) \
 MTT_INST(T,inv,CasADi) \
-
+MTT_INST(T,reshape,CasADi) \
+MTT_INST(T,vec,CasADi) \
 
 #endif //SWIG
 

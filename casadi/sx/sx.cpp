@@ -357,6 +357,18 @@ bool casadi_limits<SX>::isInteger(const SX& val){
   return val.isInteger();
 }
 
+bool casadi_limits<SX>::isInf(const SX& val){
+  return val.isInf();
+}
+
+bool casadi_limits<SX>::isMinusInf(const SX& val){
+  return val.isMinusInf();
+}
+
+bool casadi_limits<SX>::isNaN(const SX& val){
+  return val.isNan();
+}
+
 SX SX::exp() const{
   return SX(new BinarySXNode(EXP_NODE,*this));
 }
@@ -523,12 +535,28 @@ SX pow(const SX& x, const SX& n){
 }
 
 
-CasADi::SX numeric_limits<CasADi::SX>::infinity() throw(){
-  return CasADi::casadi_limits<CasADi::SX>::inf;
+SX numeric_limits<SX>::infinity() throw(){
+  return CasADi::casadi_limits<SX>::inf;
 }
 
-CasADi::SX numeric_limits<CasADi::SX>::quiet_NaN() throw(){
-  return CasADi::casadi_limits<CasADi::SX>::nan;
+SX numeric_limits<SX>::quiet_NaN() throw(){
+  return CasADi::casadi_limits<SX>::nan;
+}
+
+SX numeric_limits<SX>::min() throw(){
+  return SX(numeric_limits<double>::min());
+}
+
+SX numeric_limits<SX>::max() throw(){
+  return SX(numeric_limits<double>::max());
+}
+
+SX numeric_limits<SX>::epsilon() throw(){
+  return SX(numeric_limits<double>::epsilon());
+}
+
+SX numeric_limits<SX>::round_error() throw(){
+  return SX(numeric_limits<double>::round_error());
 }
 
 

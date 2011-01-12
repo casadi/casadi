@@ -24,6 +24,7 @@
 #define CASADI_LIMITS_HPP
 
 #include <cmath>
+#include <limits>
 
 /** \brief casadi_limits class
 The following class, which acts as a complements to the standard numeric_limits class, allows
@@ -43,6 +44,9 @@ class casadi_limits{
     static bool isOne(const T& val){ return val==1;}
     static bool isConstant(const T& val){ return true;}
     static bool isInteger(const T& val){ return val==int(val);}
+    static bool isInf(const T& val){ return std::numeric_limits<T>::has_infinity ? val==std::numeric_limits<T>::infinity() : false;}
+    static bool isMinusInf(const T& val){ return std::numeric_limits<T>::has_infinity ? val==-std::numeric_limits<T>::infinity() : false;}
+    static bool isNaN(const T& val){ return std::numeric_limits<T>::has_quiet_NaN ? val!=val : false;}
     static const T zero = 0;
     static const T one = 1;
     static const T two = 2;

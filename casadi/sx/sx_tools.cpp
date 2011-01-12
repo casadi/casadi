@@ -245,7 +245,7 @@ SXMatrix sign(const SXMatrix& a){
 }
 
 
-SXMatrix vec(const SXMatrix &expr){  
+SXMatrix vec(const SXMatrix &expr){
   // Quick return if empty or scalar
   if(expr.empty() || isScalar(expr)) return expr;
   SXMatrix ret(expr.numel(),1);
