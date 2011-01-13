@@ -9,6 +9,7 @@ class SXtests(casadiTestCase):
 
   def setUp(self):
     self.pool=FunctionPool()
+    #self.pool.append(lambda x: abs(x[0]),abs,"abs")
     self.pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
     self.pool.append(lambda x: sin(x[0]),sin,"sin")
     self.pool.append(lambda x: cos(x[0]),cos,"cos")
@@ -39,7 +40,6 @@ class SXtests(casadiTestCase):
   def test_scalarSX(self):
       x=SXMatrix("x")
       x0=0.738
-      
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
       
   def test_gradient(self):
@@ -66,7 +66,6 @@ class SXtests(casadiTestCase):
       p0=10 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
-      print dx
       dxr=p0;
       self.evaluationCheck([dx],dxr,[x,p],[x0,p0],name="jacobian");
 

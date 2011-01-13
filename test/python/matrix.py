@@ -6,7 +6,7 @@ from types import *
 from helpers import *
 from scipy.sparse import *
 
-class SXtests(casadiTestCase):
+class Matrixtests(casadiTestCase):
   def setUp(self):
     """
     We use this sparse matrix as the test object:
