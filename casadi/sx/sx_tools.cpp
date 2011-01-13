@@ -703,6 +703,10 @@ SXMatrix operator!(const SXMatrix &a){
   return !a.getElement();
 }
 
+SXMatrix norm_1(const SXMatrix& x){
+  return sum_all(fabs(x));
+}
+
 SXMatrix norm_2(const SXMatrix& x){
   return sqrt(inner_prod(x,x));
 }

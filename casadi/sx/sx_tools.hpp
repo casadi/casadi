@@ -84,6 +84,8 @@ void make_symbolic(iter_type first, func_type last, const std::string& name){
 }
 #endif
   
+/// Make the 1-norm of an SXMatrix
+SXMatrix norm_1(const SXMatrix& x);
   
 /// Make the 2-norm of an SXMatrix
 SXMatrix norm_2(const SXMatrix& x);

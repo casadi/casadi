@@ -90,7 +90,14 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: SXMatrix(c.sum_all(x[0])), lambda   x: sum(x),[x],x0,name="sum_all(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: c.sum(x[0],0), lambda   x: sum(x,0),[x],x0,name="sum(SXMatrix,0)")
       self.numpyEvaluationCheck(lambda x: c.sum(x[0],1), lambda   x: array(sum(matrix(x),1)),[x],x0,name="sum(SXMatrix,1)")
-       
+      
+      x=SXMatrix("x",3,1)
+      x0=array([[0.738],[0.2],[0.3]])
+      
+      self.numpyEvaluationCheck(lambda x: norm_2(x[0]),linalg.norm,[x],x0,name="norm_2")
+      self.numpyEvaluationCheck(lambda x: norm_1(x[0]),lambda x: linalg.norm(x,1),[x],x0,name="norm_2")
+
+   
   def test_SXMatrixbinary(self):
       x=SXMatrix("x",3,2)
       y=SXMatrix("x",3,2)
