@@ -25,8 +25,8 @@
 
 #include "casadi/sx/sx_matrix.hpp"
 
-namespace OPTICON{
-  using namespace CasADi;
+namespace CasADi{
+  namespace Modelica{
 
   // Go through the equations of an ocp and make them explicit, if possible
 /*  void makeExplicit(AcadoOCP &ocp);*/
@@ -123,7 +123,8 @@ namespace OPTICON{
 
 #endif
   
-} // namespace OPTICON
+} // namespace Modelica
+} // namespace CasADi
 
 #endif // OCP_TOOLS_HPP
 

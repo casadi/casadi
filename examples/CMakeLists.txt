@@ -33,8 +33,8 @@ target_link_libraries(biegler_10_2 ipopt_interface casadi ${IPOPT_LIBRARIES})
 ENDIF(IPOPT_FOUND)
 
 IF(SUNDIALS_FOUND AND IPOPT_FOUND)
-add_executable(convection_diffusion convection_diffusion.cpp ocp_tools.hpp ocp_tools.cpp)
-target_link_libraries(convection_diffusion ipopt_interface sundials_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+add_executable(convection_diffusion convection_diffusion.cpp)
+target_link_libraries(convection_diffusion ipopt_interface sundials_interface modelica casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
 
 # rocket example using sundials and ipopt
 add_executable(rocket_ipopt_sundials rocket_ipopt_sundials.cpp)

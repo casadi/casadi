@@ -145,6 +145,19 @@ int CRSSparsity::getNZ(int i, int j){
   if(numel()==size())
     return j+i*size2();
   
+// TEST THIS  
+#ifdef CRS_QUICK_APPEND
+  // Quick return if we are adding an element to the end
+  if(rowind(i)==size() || (rowind(i+1)==size() && col.back()<j)){
+    vector<int>& colv = col();
+    vector<int>& rowindv = rowind();
+    colv.push_back(j);
+    for(int ii=i; ii<size1(); ++ii){
+      rowindv[ii+1]++;
+    }
+  }
+#endif
+
   // go to the place where the element should be
   int ind;
   for(ind=rowind(i); ind<rowind(i+1); ++ind){ // better: loop from the back to the front

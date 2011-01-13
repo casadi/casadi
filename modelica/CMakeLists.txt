@@ -19,6 +19,8 @@ SET(MODELICA
   xml_node.cpp
   xml_arg.hpp
   xml_arg.cpp
+  ocp_tools.hpp
+  ocp_tools.cpp
 )
 
 
