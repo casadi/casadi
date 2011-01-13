@@ -119,6 +119,15 @@ SXMatrix horzcat(const SXMatrix &x, const SXMatrix &y);
 /** \brief  Matlab's linspace function */
 SXMatrix linspace(const SXMatrix &a, const SXMatrix &b, int nsteps); 
 
+/** \brief Return summation of all elements
+*/
+SX sum_all(const SXMatrix &x); 
+
+/** \brief Return summation of elements along specific axis
+ \param axis either 0 or 1
+*/
+SXMatrix sum(const SXMatrix &x, int axis=0);  
+
 //@{
 /** \brief  Calculating the inverse of a (very small) matrix: for larger matrices, make a QR factorization and solve R*x = trans(Q) for x */
 SX det(const SXMatrix &x);  // determinant

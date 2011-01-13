@@ -93,6 +93,28 @@ SXMatrix linspace(const SXMatrix &a_, const SXMatrix &b_, int nsteps){
   return ret;
 }
 
+SX sum_all(const SXMatrix &x) {
+  // Exploits sparsity
+  SX res=0;
+  for (int k=0;k<x.size();k++) {
+    res+=x[k];
+  }
+  return res;
+}
+
+SXMatrix sum(const SXMatrix &x, int axis) {
+  if (axis==1)
+    return trans(sum(trans(x),0));
+  if (axis!=0)
+    throw "SXMatrix::sum: axis argument should be zero or one";
+  SXMatrix res=zeros(1,x.size2());
+  const std::vector<int> &col = x.sparsity().col();
+  for (int k=0;k<col.size();k++) {
+    res.setElement(0,col[k],res.getElement(0,col[k])+x[k]);
+  }
+  return res;
+}  
+
 SX det(const SXMatrix& a){
   int n = a.size1();
   if(n != a.size2()) throw "det: matrix must be square";

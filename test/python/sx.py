@@ -87,7 +87,10 @@ class SXtests(casadiTestCase):
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: SXMatrix(c.det(x[0])), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
-        
+      self.numpyEvaluationCheck(lambda x: SXMatrix(c.sum_all(x[0])), lambda   x: sum(x),[x],x0,name="sum_all(SXMatrix)")
+      self.numpyEvaluationCheck(lambda x: c.sum(x[0],0), lambda   x: sum(x,0),[x],x0,name="sum(SXMatrix,0)")
+      self.numpyEvaluationCheck(lambda x: c.sum(x[0],1), lambda   x: array(sum(matrix(x),1)),[x],x0,name="sum(SXMatrix,1)")
+       
   def test_SXMatrixbinary(self):
       x=SXMatrix("x",3,2)
       y=SXMatrix("x",3,2)
