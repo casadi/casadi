@@ -33,7 +33,12 @@ namespace CasADi{
   
   // Make all equations implicit
 /*  void makeImplicit(AcadoOCP &ocp);*/
-  
+
+// Type of collocation points
+enum CollocationPoints{LEGENDRE,RADAU};
+
+
+#ifndef SWIG
   // Legendre collocation points
   static double legendre_points1[] = {0,0.500000};
   static double legendre_points2[] = {0,0.211325,0.788675};
@@ -50,20 +55,21 @@ namespace CasADi{
   static double radau_points5[] = {0,0.057104,0.276843,0.583590,0.860240,1.000000};
   static double* radau_points[] = {0,radau_points1,radau_points2,radau_points3,radau_points4,radau_points5};
 
-  // Type of collocation points
-  enum CollocationPoints{LEGENDRE,RADAU};
   static double** collocation_points[] = {legendre_points,radau_points};
+  
+#endif // SWIG 
+
 
   // Get the coefficeints for the collocation and continuity equations
   void get_collocation_coeff(int K, std::vector<std::vector<double> >& C, std::vector<double>& D, CollocationPoints cp);
 
-  // Collocate a variable (one variable per finite element)
+  // Collocate a variable (one variable per finite element) // TODO: change to Matrix<SX>
   void collocate(const SXMatrix& var, std::vector< SXMatrix >& VAR, int N);
 
-  // Collocate a variable (K variables per finite element)
+  // Collocate a variable (K variables per finite element) // TODO: change to Matrix<SX>
   void collocate(const SXMatrix& var, std::vector< std::vector< SXMatrix > >& VAR, int N, int K);
   
-  // Collocate a variable (K variables per finite element)
+  // Collocate a variable (K variables per finite element) // TODO: change to Matrix<SX>
   void collocate_final(const SXMatrix& var, SXMatrix &VARF);
 
 
