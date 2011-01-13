@@ -27,7 +27,7 @@
 using namespace std;
 namespace CasADi{
 
-IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
+IntegratorInternal::IntegratorInternal(){
   // set default options
   setOption("name","unnamed integrator"); // name of the function
   
@@ -75,7 +75,20 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   addOption("asens_max_krylov",            OT_INTEGER,  10);        // maximum krylov subspace size
   addOption("asens_reltol",                OT_REAL,    Option()); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
   addOption("asens_abstol",                OT_REAL,    Option()); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
+  
+  nx_ = 0;
+  np_ = 0;
+  nz_ = 0;
+}
 
+IntegratorInternal::~IntegratorInternal(){ 
+}
+
+void IntegratorInternal::setDimensions(int nx, int np, int nz){
+  nx_ = nx;
+  np_ = np;
+  nz_ = nz;
+  
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
   input_[INTEGRATOR_T0].setSize(1,1); // initial time
@@ -88,10 +101,6 @@ IntegratorInternal::IntegratorInternal(int nx, int np) : nx_(nx), np_(np){
   output_.resize(INTEGRATOR_NUM_OUT);
   output_[INTEGRATOR_XF].setSize(nx_,1);
   output_[INTEGRATOR_XPF].setSize(nx_,1);
-
-}
-
-IntegratorInternal::~IntegratorInternal(){ 
 }
 
 void IntegratorInternal::evaluate(int fsens_order, int asens_order){

@@ -67,7 +67,7 @@ int IdasInternal::getNP(const FX& f){
 //   
 // }
 
-IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(f,q), getNP(f)), f_(f), q_(q){
+IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false); // supress algebraic variables in the error testing
   addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
   addOption("calc_icB",                    OT_BOOLEAN, false);  // use IDACalcIC to get consistent initial conditions
@@ -87,9 +87,10 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(
 
   is_init = false;
 
-  // Get dimensions
+  // Set dimensions
+  setDimensions(getNX(f,q),getNP(f),f.input(DAE_Z).get().numel());
+
   ny_ = f.input(DAE_Y).get().numel();
-  nz_ = f.input(DAE_Z).get().numel();
   nq_ = q.isNull() ? 0 : q.output().get().numel();
 
   ncheck_ = 0;
@@ -1566,11 +1567,13 @@ LinearSolver IdasInternal::getLinearSolver(){
 void IdasInternal::getInitialState(){
   const double *x0 = &input(INTEGRATOR_X0).get()[0];
   const double *xp0 = &input(INTEGRATOR_XP0).get()[0];
+  const double *z0 = &input(INTEGRATOR_Z0).get()[0];
   
   double *yz = NV_DATA_S(yz_);
   double *yp = NV_DATA_S(yP_);
   
   copy(x0,x0+ny_,yz);
+  copy(z0,z0+nz_,yz+ny_);
   copy(xp0,xp0+ny_,yp);
 
   if(nq_>0){
@@ -1582,11 +1585,13 @@ void IdasInternal::getInitialState(){
 void IdasInternal::setFinalState(){
   double *xf = &output(INTEGRATOR_XF).get()[0];
   double *xpf = &output(INTEGRATOR_XPF).get()[0];
+  double *zf = &output(INTEGRATOR_ZF).get()[0];
 
   const double *yz = NV_DATA_S(yz_);
   const double *yp = NV_DATA_S(yP_);
   
   copy(yz,yz+ny_,xf);
+  copy(yz+ny_,yz+ny_+nz_,zf);
   copy(yp,yp+ny_,xpf);
   
   if(nq_>0){
@@ -1599,12 +1604,14 @@ void IdasInternal::getForwardSeeds(){
   for(int i=0; i<nfdir_; ++i){
     const double *x0 = &input(INTEGRATOR_X0).getFwd(i)[0];
     const double *xp0 = &input(INTEGRATOR_XP0).getFwd(i)[0];
-  
+    const double *z0 = &input(INTEGRATOR_Z0).getFwd(i)[0];
+
     double *yz = NV_DATA_S(yzS_[i]);
     double *yp = NV_DATA_S(yPS_[i]);
 
     copy(x0,x0+ny_,yz);
     copy(xp0,xp0+ny_,yp);
+    copy(z0,z0+nz_,yz+ny_);
     
     if(nq_>0){
       double *yQ = NV_DATA_S(yQS_[i]);
@@ -1617,12 +1624,14 @@ void IdasInternal::setForwardSensitivities(){
   for(int i=0; i<nfdir_; ++i){
     double *xf = &output(INTEGRATOR_XF).getFwd(i)[0];
     double *xpf = &output(INTEGRATOR_XPF).getFwd(i)[0];
+    double *zf = &output(INTEGRATOR_ZF).getFwd(i)[0];
 
     const double *yz = NV_DATA_S(yzS_[i]);
     const double *yp = NV_DATA_S(yPS_[i]);
   
     copy(yz,yz+ny_,xf);
     copy(yp,yp+ny_,xpf);
+    copy(yz+ny_,yz+ny_+nz_,zf);
     
     if(nq_>0){
       const double *yQ = NV_DATA_S(yQS_[i]);
@@ -1635,12 +1644,14 @@ void IdasInternal::getAdjointSeeds(){
   for(int i=0; i<nadir_; ++i){
     const double *x0 = &output(INTEGRATOR_XF).getAdj(i)[0];
     const double *xp0 = &output(INTEGRATOR_XPF).getAdj(i)[0];
+    const double *z0 = &output(INTEGRATOR_ZF).getAdj(i)[0];
 
     double *yz = NV_DATA_S(yzB_[i]);
     double *yp = NV_DATA_S(yPB_[i]);
 
     copy(x0,x0+ny_,yz);
     copy(xp0,xp0+ny_,yp);
+    copy(z0,z0+nz_,yz+ny_);
   }
 }
 
@@ -1648,12 +1659,14 @@ void IdasInternal::setAdjointSensitivities(){
   for(int i=0; i<nadir_; ++i){
     double *xf = &input(INTEGRATOR_X0).getAdj(i)[0];
     double *xpf = &input(INTEGRATOR_XP0).getAdj(i)[0];
+    double *zf = &input(INTEGRATOR_Z0).getAdj(i)[0];
     
     const double *yz = NV_DATA_S(yzB_[i]);
     const double *yp = NV_DATA_S(yPB_[i]);
   
     copy(yz,yz+ny_,xf);
     copy(yp,yp+ny_,xpf);
+    copy(yz+ny_,yz+ny_+nz_,zf);
   }
 }
 

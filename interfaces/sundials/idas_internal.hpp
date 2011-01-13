@@ -186,7 +186,6 @@ class IdasInternal : public IntegratorInternal{
   
   // dimensions
   int ny_; // number of differential states
-  int nz_; // number of algebraic states
   int nq_; // number of quadratures
   
   bool is_init;

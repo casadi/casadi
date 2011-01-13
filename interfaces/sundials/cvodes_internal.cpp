@@ -60,7 +60,7 @@ int CVodesInternal::getNP(const FX& f){
   return f.input(ODE_P).get().numel();
 }
   
-CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(f,q), getNP(f)), f_(f), q_(q){
+CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("linear_multistep_method",     OT_STRING,  "bdf"); // "bdf" or "adams"
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton"); // "newton" or "functional"
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
@@ -73,6 +73,8 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(ge
   is_init = false;
 
   // Get dimensions
+  setDimensions(getNX(f,q), getNP(f),0);
+  
   ny_ = f.output().get().numel();
   nq_ = q.isNull() ? 0 : q.output().get().numel();
 

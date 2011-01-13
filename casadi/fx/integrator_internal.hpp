@@ -35,7 +35,7 @@ namespace CasADi{
 class IntegratorInternal : public FXInternal{
 public:
   /** \brief  Constructor */
-  IntegratorInternal(int nx, int np);
+  IntegratorInternal();
 
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
@@ -82,13 +82,14 @@ public:
   /// Get the Linear solver
   virtual LinearSolver getLinearSolver() = 0;
 
-  /** Lenght of the state vector 
-   (also includes "states" evaluated from quadrature formulas)
-  */
+  /// Number of differential states (including quadrature states)
   int nx_;
   
   /// Number of parameters
   int np_;
+  
+  /// Number of algebraic states
+  int nz_;
   
   /// Number of right hand sides
   int nrhs_;
@@ -109,6 +110,9 @@ public:
   bool finite_difference_fsens_;  
   //@}
   
+  protected:
+    // Set dimensions
+    void setDimensions(int nx, int np, int nz);
 };
   
 } // namespace CasADi
