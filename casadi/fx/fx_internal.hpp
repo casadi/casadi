@@ -139,6 +139,9 @@ class FXInternal : public OptionsFunctionalityNode{
   /** \brief  Log the status of the solver */
   void log(const std::string& msg) const;
 
+  /** \brief  Log the status of the solver, function given */
+  void log(const std::string& fcn, const std::string& msg) const;
+
   /// Set of module names which are extra monitored
   std::set<std::string> monitors_;
   

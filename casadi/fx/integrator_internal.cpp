@@ -96,11 +96,13 @@ void IntegratorInternal::setDimensions(int nx, int np, int nz){
   input_[INTEGRATOR_X0].setSize(nx_,1); // initial state value
   input_[INTEGRATOR_XP0].setSize(nx_,1); // initial state derivative value
   input_[INTEGRATOR_P].setSize(np_,1); // parameter
+  input_[INTEGRATOR_Z0].setSize(nz_,1); // initial algebraic statee
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
   output_[INTEGRATOR_XF].setSize(nx_,1);
   output_[INTEGRATOR_XPF].setSize(nx_,1);
+  output_[INTEGRATOR_ZF].setSize(nz_,1);
 }
 
 void IntegratorInternal::evaluate(int fsens_order, int asens_order){

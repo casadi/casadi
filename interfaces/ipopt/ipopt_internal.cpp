@@ -256,8 +256,6 @@ void IpoptInternal::init(){
   if (status != Solve_Succeeded) {
     throw "Error during initialization!\n";
   }
-        J_.evaluate();
-
 }
 
 void IpoptInternal::evaluate(int fsens_order, int asens_order){

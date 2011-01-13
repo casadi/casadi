@@ -39,7 +39,13 @@ IdasInternal* IdasInternal::clone() const{
   return new IdasInternal(*this);
 }
 
-int IdasInternal::getNX(const FX& f, const FX& q){
+// IdasInternal::IdasInternal(const IdasInternal& integrator): IntegratorInternal(integrator){
+//   f_ = integrator_.f_;
+//   q_ = integrator_.q_;
+//   
+// }
+
+IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
   // Check dimensions
   if(f.getNumInputs()!=DAE_NUM_IN) throw CasadiException("IdasInternal: f has wrong number of inputs");
   if(f.getNumOutputs()!=DAE_NUM_OUT) throw CasadiException("IdasInternal: f has wrong number of outputs");
@@ -48,26 +54,6 @@ int IdasInternal::getNX(const FX& f, const FX& q){
     if(q.getNumOutputs()!=DAE_NUM_OUT) throw CasadiException("IdasInternal: q has wrong number of outputs");
   }
 
-  // Number of states
-  int nx = f.input(DAE_Y).get().numel();
-  
-  // Add quadratures, if any_
-  if(!q.isNull()) nx += q.output().get().numel();
-  
-  return nx;
-}
-
-int IdasInternal::getNP(const FX& f){
-  return f.input(DAE_P).get().numel();
-}
-
-// IdasInternal::IdasInternal(const IdasInternal& integrator): IntegratorInternal(integrator){
-//   f_ = integrator_.f_;
-//   q_ = integrator_.q_;
-//   
-// }
-
-IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false); // supress algebraic variables in the error testing
   addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
   addOption("calc_icB",                    OT_BOOLEAN, false);  // use IDACalcIC to get consistent initial conditions
@@ -87,12 +73,12 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
 
   is_init = false;
 
-  // Set dimensions
-  setDimensions(getNX(f,q),getNP(f),f.input(DAE_Z).get().numel());
-
   ny_ = f.input(DAE_Y).get().numel();
   nq_ = q.isNull() ? 0 : q.output().get().numel();
-
+  int np = f.input(DAE_P).get().numel();
+  int nz = f.input(DAE_Z).get().numel();
+  setDimensions(ny_+nq_,np,nz);
+  nyz_ = ny_ + nz;
   ncheck_ = 0;
 }
 
@@ -120,10 +106,18 @@ IdasInternal::~IdasInternal(){
 void IdasInternal::init(){
   // Call the base class init
   IntegratorInternal::init();
-
+  log("IdasInternal::init","begin");
+  
+  // Print
+  if(verbose()){
+    cout << "Initializing IDAS with ny_ = " << ny_ << ", nq_ = " << nq_ << ", np_ = " << np_ << " and nz_ = " << nz_ << endl;
+  }
+  
   // Init ODE rhs function and quadrature functions, jacobian function
   f_.init();
   if(!q_.isNull()) q_.init();
+  
+  log("IdasInternal::init","functions initialized");
   
   if(!jac_.isNull()){
     jac_.init();
@@ -132,8 +126,10 @@ void IdasInternal::init(){
     if(!linsol_.isNull())
       linsol_.setSparsity(rowind,col);
       linsol_.init();
+    
+    log("IdasInternal::init","user defined linear solver initialized");
   }
-  
+
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
   nadir_f_ = f_.getOption("number_of_adj_dir").toInt();
@@ -143,6 +139,7 @@ void IdasInternal::init(){
   // Quick return if already initialized
   if(is_init){
     reset(ad_order_,ad_order_);
+    log("IdasInternal::init","end, Idas already initialized");
     return;
   }
 
@@ -156,15 +153,16 @@ void IdasInternal::init(){
   if(mem_==0) throw CasadiException("IDACreate(): Creation failed");
 
   // Allocate n-vectors for ivp
-  yz_ = N_VNew_Serial(ny_+nz_);
-  yP_ = N_VNew_Serial(ny_+nz_);
-  id_ = N_VNew_Serial(ny_+nz_);
+  yz_ = N_VNew_Serial(nyz_);
+  yP_ = N_VNew_Serial(nyz_);
+  id_ = N_VNew_Serial(nyz_);
 
   // Initialize Idas
   double t0 = 0;
   N_VConst(0.0, yz_);
   N_VConst(0.0, yP_);
   IDAInit(mem_, res_wrapper, t0, yz_, yP_);
+  log("IdasInternal::init","IDA initialized");
 
   // Set error handler function
   flag = IDASetErrHandlerFn(mem_, ehfun_wrapper, this);
@@ -186,7 +184,6 @@ void IdasInternal::init(){
   flag = IDASetMaxStep(mem_, getOption("max_step_size").toDouble());
   if(flag != IDA_SUCCESS) idas_error("IDASetMaxStep",flag);
   
-
   if(hasSetOption("abstolv")){
     // Vector absolute tolerances
     vector<double> abstolv = getOption("abstolv").toDoubleVector();
@@ -222,7 +219,7 @@ void IdasInternal::init(){
   // attach a linear solver
   if(getOption("linear_solver")=="dense"){
     // Dense jacobian
-    flag = IDADense(mem_, ny_);
+    flag = IDADense(mem_, nyz_);
     if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
     if(exact_jacobian_){
       // Generate jacobians if not already provided
@@ -241,7 +238,7 @@ void IdasInternal::init(){
     }
   } else if(getOption("linear_solver")=="banded") {
     // Banded jacobian
-    flag = IDABand(mem_, ny_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+    flag = IDABand(mem_, nyz_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
     if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     
     // Banded Jacobian information
@@ -307,6 +304,8 @@ void IdasInternal::init(){
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSStolerances",flag);
     }
   }
+  
+  log("IdasInternal::init","attached linear solver");
     
  // Sensitivities
  if(ad_order_>0){
@@ -317,8 +316,8 @@ void IdasInternal::init(){
      yzS_.resize(nfdir_);
      yPS_.resize(nfdir_);
      for(int i=0; i<nfdir_; ++i){
-        yzS_[i] = N_VNew_Serial(ny_+nz_);
-        yPS_[i] = N_VNew_Serial(ny_+nz_);
+        yzS_[i] = N_VNew_Serial(nyz_);
+        yPS_[i] = N_VNew_Serial(nyz_);
       }
 
       // Allocate n-vectors for quadratures
@@ -404,29 +403,31 @@ void IdasInternal::init(){
       flag = IDAQuadSensSStolerances(mem_,fsens_reltol_,&fsens_abstol[0]);
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensSStolerances",flag);
     }
+    
+    log("IdasInternal::init","initialized forward sensitivities");
   } // enable fsens
 
-  // Adjoint sensitivity problem
-  whichB_.resize(nadir_);
-
-  // Allocate n-vectors
-  yzB_.resize(nadir_);
-  yPB_.resize(nadir_);
-  for(int i=0; i<nadir_; ++i){
-    yzB_[i] = N_VNew_Serial(ny_+nz_);
-    yPB_[i] = N_VNew_Serial(ny_+nz_);
-  }
-
-  // Allocate n-vectors for the adjoint sensitivities of the parameters
-  if(np_>0){
-    yBB_.resize(nadir_);
-    for(int i=0; i<nadir_; ++i){
-      yBB_[i] = N_VMake_Serial(np_,&input(INTEGRATOR_P).getAdj(i)[0]);
-    }
-  }
-
   if(nadir_>0){
-    // Get the number of steos per checkpoint
+      // Adjoint sensitivity problem
+      whichB_.resize(nadir_);
+
+      // Allocate n-vectors
+      yzB_.resize(nadir_);
+      yPB_.resize(nadir_);
+      for(int i=0; i<nadir_; ++i){
+        yzB_[i] = N_VNew_Serial(nyz_);
+        yPB_[i] = N_VNew_Serial(nyz_);
+      }
+
+      // Allocate n-vectors for the adjoint sensitivities of the parameters
+      if(np_>0){
+        yBB_.resize(nadir_);
+        for(int i=0; i<nadir_; ++i){
+          yBB_[i] = N_VMake_Serial(np_,&input(INTEGRATOR_P).getAdj(i)[0]);
+        }
+      }
+
+      // Get the number of steos per checkpoint
       int Nd = getOption("steps_per_checkpoint").toInt();
 
       // Get the interpolation type
@@ -441,10 +442,12 @@ void IdasInternal::init(){
       flag = IDAAdjInit(mem_, Nd, interpType);
       if(flag != IDA_SUCCESS) idas_error("IDAAdjInit",flag);
   }
+  log("IdasInternal::init","initialized adjoint sensitivities");
  } // ad_order>0
  
  is_init = true;
  isInitAdj_ = false;
+ log("IdasInternal::init","end");
 }
 
 void IdasInternal::initAdj(){
@@ -480,11 +483,11 @@ void IdasInternal::initAdj(){
     // attach linear solver
     if(getOption("asens_linear_solver")=="dense"){
       // Dense jacobian
-      flag = IDADenseB(mem_, whichB_[dir], ny_);
+      flag = IDADenseB(mem_, whichB_[dir], nyz_);
       if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
     } else if(getOption("asens_linear_solver")=="banded") {
       // Banded jacobian
-      flag = IDABandB(mem_, whichB_[dir], ny_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+      flag = IDABandB(mem_, whichB_[dir], nyz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
       if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse solver  
@@ -521,35 +524,36 @@ void IdasInternal::initAdj(){
 }
 
 
-
+static int counter = 0;
 void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
+
   // Get time
   time1 = clock();
   
-   // Pass input
-   f_.setInput(t,DAE_T);
-   f_.setInput(yz,DAE_Y);
-   f_.setInput(yp,DAE_YDOT);
-   f_.setInput(yz+ny_,DAE_Z);
-   f_.setInput(input(INTEGRATOR_P).get(),DAE_P);
+  // Pass input
+  f_.setInput(t,DAE_T);
+  f_.setInput(yz,DAE_Y);
+  f_.setInput(yp,DAE_YDOT);
+  f_.setInput(yz+ny_,DAE_Z);
+  f_.setInput(input(INTEGRATOR_P).get(),DAE_P);
 
-    // Evaluate
-   f_.evaluate();
-    
-    // Get results
-   f_.getOutput(r);
-   
-   // Check the result for consistency
-   for(int i=0; i<ny_; ++i){
-     if(isnan(r[i]) || isinf(r[i])){
-       if(verbose_)
-         cerr << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << "." << endl;
-       throw 1;
-     }
-   }
-   
-   time2 = clock();
-   t_res += double(time2-time1)/CLOCKS_PER_SEC;
+  // Evaluate
+  f_.evaluate();
+  
+  // Get results
+  f_.getOutput(r);
+
+  // Check the result for consistency
+  for(int i=0; i<ny_+nz_; ++i){
+    if(isnan(r[i]) || isinf(r[i])){
+      if(verbose_)
+        cerr << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << "." << endl;
+      throw 1;
+    }
+  }
+  
+  time2 = clock();
+  t_res += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int IdasInternal::res_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr, void *user_data){
@@ -669,6 +673,8 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Vec
 }
 
 void IdasInternal::reset(int fsens_order, int asens_order){
+  log("IdasInternal::reset","begin");
+
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
@@ -716,6 +722,14 @@ void IdasInternal::reset(int fsens_order, int asens_order){
 
   int calc_ic = getOption("calc_ic").toInt();
   if(calc_ic){
+    log("IdasInternal::reset","trying to find initial values");
+    if(monitored("IdasInternal::reset")){
+      cout << "initial guess: " << endl;
+      cout << "x0 = " << argument(INTEGRATOR_X0) << endl;
+      cout << "xp0 = " << argument(INTEGRATOR_XP0) << endl;
+      cout << "z0 = " << argument(INTEGRATOR_Z0) << endl;
+    }
+
     int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
     // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
 
@@ -726,35 +740,57 @@ void IdasInternal::reset(int fsens_order, int asens_order){
     // Retrieve the initial values
     flag = IDAGetConsistentIC(mem_, yz_, yP_);
     if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC",flag);
+
+    // Save the algebraic state
+    const double *yzd = NV_DATA_S(yz_);
+    copy(yzd+ny_,yzd+ny_+nz_, argument(INTEGRATOR_Z0).begin());
+    
+    // Save the differential state derivatives
+    const double *yPd = NV_DATA_S(yP_);
+    copy(yPd,yPd+ny_, argument(INTEGRATOR_XP0).begin());
+    
+    // Print progress
+    log("IdasInternal::reset","found consistent initial values");
+    if(monitored("IdasInternal::reset")){
+      cout << "x0 = " << argument(INTEGRATOR_X0) << endl;
+      cout << "xp0 = " << argument(INTEGRATOR_XP0) << endl;
+      cout << "z0 = " << argument(INTEGRATOR_Z0) << endl;
+    }
   }
+  log("IdasInternal::reset","end");
 }
   
 void IdasInternal::integrate(double t_out){
+  log("IdasInternal::integrate","begin");
   int flag;
   
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
-    copy(input(INTEGRATOR_X0).get().begin(),input(INTEGRATOR_X0).get().end(),output(INTEGRATOR_XF).get().begin());
-    copy(input(INTEGRATOR_XP0).get().begin(),input(INTEGRATOR_XP0).get().end(),output(INTEGRATOR_XPF).get().begin());
+    // Save the final state
+    setFinalState();
+    
     if(fsens_order_>0){
-      for(int i=0; i<nfdir_; ++i){
-        copy(input(INTEGRATOR_X0).getFwd(i).begin(),input(INTEGRATOR_X0).getFwd(i).end(),output(INTEGRATOR_XF).getFwd(i).begin());
-        copy(input(INTEGRATOR_XP0).getFwd(i).begin(),input(INTEGRATOR_XP0).getFwd(i).end(),output(INTEGRATOR_XPF).getFwd(i).begin());
-      }
+      // Set the obtained forward sensitivities
+      setForwardSensitivities();
     }
+    log("IdasInternal::integrate","end, already at the end of the horizon end");
     return;
   }
 
   if(asens_order_>0){
+    log("IdasInternal::integrate","integration with taping");
     flag = IDASolveF(mem_, t_out, &t_, yz_, yP_, IDA_NORMAL, &ncheck_);
     if(flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolveF",flag);
     
   } else {
+    log("IdasInternal::integrate","integration without taping");
     flag = IDASolve(mem_, t_out, &t_, yz_, yP_, IDA_NORMAL);
     if(flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolve",flag);
   }
-  
+
+  log("IdasInternal::integrate","integration complete");
+
   if(nq_>0){
     double tret;
     flag = IDAGetQuad(mem_, &tret, yQ_);
@@ -778,6 +814,7 @@ void IdasInternal::integrate(double t_out){
     // Set the obtained forward sensitivities
     setForwardSensitivities();
   }
+  log("IdasInternal::integrate","end");
 }
 
 void IdasInternal::resetAdj(){
@@ -1030,7 +1067,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
 
     const vector<double>& asens_z = q_.input(DAE_Z).getAdj();
     for(int i=0; i<nz_; ++i)
-      resvalB[i] += asens_z[i];
+      resvalB[i+ny_] += asens_z[i];
   }
 }
 
@@ -1264,7 +1301,7 @@ void IdasInternal::psolve(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vec
   int nrhs = nrhs_;
   
   // Number of rows of the linear solver
-  int nrow = ny_/nrhs;
+  int nrow = nyz_/nrhs;
   
   // Pass right hand side to the linear solver (transpose necessary)
   linsol_.setInput(NV_DATA_S(rvec),1);
@@ -1282,6 +1319,8 @@ void IdasInternal::psolve(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vec
 }
 
 void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  log("IdasInternal::psetup","begin");
+
   // Get time
   time1 = clock();
 
@@ -1309,6 +1348,8 @@ void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, doubl
   // Log time duration
   time1 = clock();
   t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+
+  log("IdasInternal::psetup","end");
 }
 
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
@@ -1494,21 +1535,21 @@ Integrator IdasInternal::jac(int iind, int oind){
   // Transmit information on derivative states
   if(hasSetOption("is_differential")){
     vector<int> is_diff = getOption("is_differential").toIntVector();
-    if(is_diff.size()!=ny_) throw CasadiException("is_differential has incorrect length");
-    vector<int> is_diff_aug(ny_*(1+ns));
+    if(is_diff.size()!=nyz_) throw CasadiException("is_differential has incorrect length");
+    vector<int> is_diff_aug(nyz_*(1+ns));
     for(int i=0; i<1+ns; ++i)
-      for(int j=0; j<ny_; ++j)
-        is_diff_aug[j+i*ny_] = is_diff[j];
+      for(int j=0; j<nyz_; ++j)
+        is_diff_aug[j+i*nyz_] = is_diff[j];
     integrator.setOption("is_differential",is_diff_aug);
   }
   
   // Mapping between states in the augmented dae and the original dae
   vector<int> jacmap(nx_*(1+ns));
   for(int i=0; i<1+ns; ++i){
-    for(int j=0; j<ny_; ++j)
-      jacmap[j+nx_*i] = j+ny_*i;
+    for(int j=0; j<nyz_; ++j)
+      jacmap[j+nx_*i] = j+nyz_*i;
     for(int j=0; j<nq_; ++j)
-      jacmap[ny_+j+nx_*i] = ny_*(1+ns) + j + nq_*i;
+      jacmap[nyz_+j+nx_*i] = nyz_*(1+ns) + j + nq_*i;
   }
   integrator.setOption("jacmap",jacmap);
 
@@ -1573,8 +1614,8 @@ void IdasInternal::getInitialState(){
   double *yp = NV_DATA_S(yP_);
   
   copy(x0,x0+ny_,yz);
-  copy(z0,z0+nz_,yz+ny_);
   copy(xp0,xp0+ny_,yp);
+  copy(z0,z0+nz_,yz+ny_);
 
   if(nq_>0){
     double *yQ = NV_DATA_S(yQ_);

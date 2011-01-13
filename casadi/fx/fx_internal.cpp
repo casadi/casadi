@@ -124,6 +124,12 @@ void FXInternal::log(const std::string& msg) const{
   }
 }
 
+void FXInternal::log(const std::string& fcn, const std::string& msg) const{
+  if(verbose()){
+    cout << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
+  }
+}
+
 bool FXInternal::verbose() const{
   return verbose_;
 }

@@ -230,11 +230,11 @@ cout << "vars" << endl;
     }
   }
   
-  ocp_.variables->print(cout,0);
+//  ocp_.variables->print(cout,0);
   
-  cout << "VariableCategories:" << endl;
+/*  cout << "VariableCategories:" << endl;
   for(map<string,int>::const_iterator it=catCounter.begin(); it!=catCounter.end(); ++it)
-    cout << "  " << it->first << ": " << it->second << endl;
+    cout << "  " << it->first << ": " << it->second << endl;*/
 }
 
 
