@@ -175,7 +175,8 @@ SXMatrix sign(const SXMatrix &x);     // sign function
 SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, const SXMatrix &b, int order=5, const SXMatrix& w=SXMatrix());
 
 /** \brief  make a vector
-  Reshapes/flattens the SXMatrix such that the shape becomes (expr.numel(),1)
+  Reshapes/flattens the SXMatrix such that the shape becomes (expr.numel(),1).
+  Columns are stacked on top of each other.
  */
 SXMatrix vec(const SXMatrix &expr); 
 
@@ -393,6 +394,7 @@ SXMatrix fmin(const SXMatrix &x, const SXMatrix &y);
 SXMatrix fmax(const SXMatrix &x, const SXMatrix &y);
 SXMatrix floor(const SXMatrix &x);
 SXMatrix ceil(const SXMatrix &x); 
+SXMatrix fabs(const SXMatrix &x); 
 SXMatrix erf(const SXMatrix &x);
 #undef SXMatrix
 } // namespace std

@@ -993,6 +993,10 @@ SXMatrix ceil(const SXMatrix& x){
   return SXMatrix(ceil(dynamic_cast<const Matrix<SX>&>(x)));
 }
 
+SXMatrix fabs(const SXMatrix& x){
+  return SXMatrix(fabs(dynamic_cast<const Matrix<SX>&>(x)));
+}
+
 SXMatrix erf(const SXMatrix& x){
   return SXMatrix(erf(dynamic_cast<const Matrix<SX>&>(x)));
 }

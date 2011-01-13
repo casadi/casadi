@@ -154,6 +154,7 @@ T arccos(){ return std::acos(*$self);}\
 T arctan(){ return std::atan(*$self);}\
 T floor(){ return std::floor(*$self);}\
 T ceil(){ return std::ceil(*$self);}\
+T fabs(){ return std::fabs(*$self);}\
 T erf(){ return std::erf(*$self);}
 unops(SXMatrix)
 
