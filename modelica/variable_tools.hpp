@@ -32,7 +32,10 @@ namespace Modelica{
 
   /// Get a vector of derivative expressions from a vector of variables
   std::vector<SX> der(const std::vector<Variable> v);
-  
+
+  /// Get a vector of the nominal values of a vector of variables
+  std::vector<double> nominal(const std::vector<Variable> v);
+
 } // namespace Modelica
 } // namespace CasADi
 

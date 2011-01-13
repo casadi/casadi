@@ -40,6 +40,13 @@ vector<SX> der(const vector<Variable> v){
   return ret;
 }
 
+vector<double> nominal(const vector<Variable> v){
+  vector<double> ret(v.size());
+  for(int i=0; i<v.size(); ++i)
+    ret[i] = v[i].getNominal();
+  return ret;
+}
+
     
 } // namespace Modelica
 } // namespace CasADi
