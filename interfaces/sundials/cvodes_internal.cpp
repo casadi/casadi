@@ -980,7 +980,7 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
   try{
     assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    assert(this_->f_.output(ODE_RHS).dataF().size() == this_->ny_);
+    assert(this_->f_.fwdSens(ODE_RHS).size() == this_->ny_);
     assert(NV_LENGTH_S(v) == this_->ny_);
     assert(NV_LENGTH_S(Jv) == this_->ny_);
     this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(y),NV_DATA_S(fy),NV_DATA_S(tmp));

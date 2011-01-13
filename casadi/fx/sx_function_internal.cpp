@@ -891,8 +891,8 @@ SXMatrix SXFunctionInternal::grad(int iind, int oind){
 
 SXMatrix SXFunctionInternal::jac(int iind, int oind){
   if(input_ind.at(iind).empty() || output_ind.at(oind).empty()) return SXMatrix(); // quick return
-  assert(input_.at(iind).size2()==1);
-  assert(output_.at(oind).size2()==1);
+  assert(input(iind).get().size2()==1);
+  assert(output(oind).get().size2()==1);
 
   // Calculate the partial derivatives     // The loop can be executed in parallel!
   vector<SX> der1, der2;
@@ -1132,7 +1132,7 @@ return ret;
     
     for(int i=0; i<input(iind).get().size1(); ++i) // loop over rows of the gradient
       for(int el=input(iind).get().rowind(i); el<input_.at(iind).get().rowind(i+1); ++el){ // loop over the non-zero elements
-        assert(input_.at(iind).col(el) == 0); // column
+        assert(input(iind).get().col(el) == 0); // column
      
         // set all components to zero (a bit quicker than to use fill)
         for(vector<SX>::iterator it=g.begin(); it!=g.end(); ++it)

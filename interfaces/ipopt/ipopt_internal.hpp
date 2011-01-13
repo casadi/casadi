@@ -52,7 +52,6 @@ std::map<std::string,opt_type> ops_;
 
 
 /** \brief  options */
-  bool verbose_;           // verbosity
   bool exact_hessian_; // use exact hessian
 
   bool eval_f(int n, const double* x, bool new_x, double& obj_value);

@@ -87,6 +87,42 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Is function fcn being monitored
   bool monitored(const std::string& mod) const;
   
+    /// Access input argument
+  Matrix<double>& argument(int iind=0);
+    
+  /// Const access input argument
+  const Matrix<double>& argument(int iind=0) const;
+
+  /// Access input argument
+  Matrix<double>& result(int oind=0);
+    
+  /// Const access input argument
+  const Matrix<double>& result(int oind=0) const;
+
+  /// Access forward seed
+  Matrix<double>& fwdSeed(int iind=0, int dir=0);
+    
+  /// Const access forward seed
+  const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
+
+  /// Access forward sensitivity
+  Matrix<double>& fwdSens(int oind=0, int dir=0);
+    
+  /// Const access forward sensitivity
+  const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
+
+  /// Access adjoint seed
+  Matrix<double>& adjSeed(int oind=0, int dir=0);
+    
+  /// Const access adjoint seed
+  const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
+
+  /// Access forward sensitivity
+  Matrix<double>& adjSens(int iind=0, int dir=0);
+    
+  /// Const access forward sensitivity
+  const Matrix<double>& adjSens(int iind=0, int dir=0) const;
+
   protected:
 
   /** \brief  Has the function been initialized? */

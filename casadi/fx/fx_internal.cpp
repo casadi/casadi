@@ -132,6 +132,55 @@ bool FXInternal::monitored(const std::string& mod) const{
   return monitors_.count(mod)>0;
 }
 
+Matrix<double>& FXInternal::argument(int iind){
+  return input(iind).get();
+}
+    
+const Matrix<double>& FXInternal::argument(int iind) const{
+  return input(iind).get();
+}
+
+Matrix<double>& FXInternal::result(int oind){
+  return output(oind).get();
+}
+    
+const Matrix<double>& FXInternal::result(int oind) const{
+  return output(oind).get();
+}
+
+Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
+  return input(iind).getFwd(dir);
+}
+    
+const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
+  return input(iind).getFwd(dir);
+}
+
+Matrix<double>& FXInternal::fwdSens(int oind, int dir){
+  return output(oind).getFwd(dir);
+}
+    
+const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
+  return output(oind).getFwd(dir);
+}
+
+Matrix<double>& FXInternal::adjSeed(int oind, int dir){
+  return output(oind).getAdj(dir);
+}
+    
+const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
+  return output(oind).getAdj(dir);
+}
+
+Matrix<double>& FXInternal::adjSens(int iind, int dir){
+  return input(iind).getAdj(dir);
+}
+    
+const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
+  return input(iind).getAdj(dir);
+}
+
+
 
 
 // void setv(double val, vector<double>& v){

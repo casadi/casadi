@@ -224,9 +224,8 @@ void IpoptInternal::init(){
   NLPSolverInternal::init();
 
   // read options
-  verbose_ = getOption("verbose").toBool();
   exact_hessian_ = !H_.isNull();
-
+  
   if(verbose_){
     cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
     if(exact_hessian_) std::cout << "Using exact Hessian" << std::endl;
@@ -257,6 +256,8 @@ void IpoptInternal::init(){
   if (status != Solve_Succeeded) {
     throw "Error during initialization!\n";
   }
+        J_.evaluate();
+
 }
 
 void IpoptInternal::evaluate(int fsens_order, int asens_order){
@@ -316,37 +317,42 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
 }
 
 bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
-  log("eval_jac_g started");
-  if (values == NULL) {
-    int nz=0;
-    vector<int> rowind,col;
-    J_.result().sparsity().getSparsityCRS(rowind,col);
-    for(int r=0; r<rowind.size()-1; ++r)
-      for(int el=rowind[r]; el<rowind[r+1]; ++el){
-//        if(col[el]>=r){
-          iRow[nz] = r;
-          jCol[nz] = col[el];
-          nz++;
-  //      }
+  try{
+    log("eval_jac_g started");
+    if (values == NULL) {
+      int nz=0;
+      vector<int> rowind,col;
+      J_.result().sparsity().getSparsityCRS(rowind,col);
+      for(int r=0; r<rowind.size()-1; ++r)
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+  //        if(col[el]>=r){
+            iRow[nz] = r;
+            jCol[nz] = col[el];
+            nz++;
+    //      }
+        }
+    } else {
+      // Pass the argument to the function
+      J_.setInput(x);
+      
+       // Evaluate the function
+      J_.evaluate();
+
+      // Get the output
+      J_.getOutput(values);
+      
+      if(monitored("eval_jac_g")){
+        cout << "J = " << endl;
+        J_.result().printSparse();
       }
-  } else {
-    // Pass the argument to the function
-    J_.setInput(x);
-
-    // Evaluate the function
-    J_.evaluate();
-
-    // Get the output
-    J_.getOutput(values);
-    
-    if(monitored("eval_jac_g")){
-      cout << "J = " << endl;
-      J_.result().printSparse();
     }
+    
+    log("eval_jac_g ok");
+    return true;
+  } catch (exception& ex){
+    cerr << "eval_jac_g failed: " << ex.what() << endl;
+    return false;
   }
-  
-  log("eval_jac_g ok");
-  return true;
 }
 
 bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value)

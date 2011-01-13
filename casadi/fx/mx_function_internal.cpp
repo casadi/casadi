@@ -65,13 +65,14 @@ void MXFunctionInternal::makeAlgorithm(MXNode* root, vector<MXNode*> &nodes, map
 
         // Loop over the children of the topmost element
         bool all_dependencies_added = true;
-        for(vector<MX>::iterator it = s.top()->dep_.begin(); it!=s.top()->dep_.end(); ++it)
-          if(nodemap.find(it->get()) == nodemap.end()){ // a dependency has not been added
+        for(vector<MX>::iterator it = s.top()->dep_.begin(); it!=s.top()->dep_.end(); ++it){
+          if(!it->isNull() && nodemap.find(it->get()) == nodemap.end()){ // a dependency has not been added
             // Push the dependency to the top of the stack
             s.push(it->get());
             all_dependencies_added = false;
             break;
           }
+        }
   
         // Continue to the next loop if a dependency has been added
         if(!all_dependencies_added) continue;
