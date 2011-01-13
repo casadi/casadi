@@ -9,7 +9,7 @@ class SXtests(casadiTestCase):
 
   def setUp(self):
     self.pool=FunctionPool()
-    self.pool.append(lambda x: abs(x[0]),abs,"abs")
+    #self.pool.append(lambda x: abs(x[0]),abs,"abs")
     self.pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
     self.pool.append(lambda x: sin(x[0]),sin,"sin")
     self.pool.append(lambda x: cos(x[0]),cos,"cos")
