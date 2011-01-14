@@ -20,7 +20,6 @@
  *
  */
 
-#include "casadi/sx/sx_matrix.hpp"
 #include "casadi/mx/mx.hpp"
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/fx/sx_function.hpp"

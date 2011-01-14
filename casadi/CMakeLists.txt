@@ -34,8 +34,6 @@ SET(CASADI_SRCS
   sx/constant_sx_node.hpp
   sx/binary_sx_node.cpp
   sx/binary_sx_node.hpp
-  sx/sx_matrix.hpp
-  sx/sx_matrix.cpp
   sx/sx_tools.cpp
   sx/sx_tools.hpp
 

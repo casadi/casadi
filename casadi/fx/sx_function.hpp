@@ -24,7 +24,7 @@
 #define SX_FUNCTION_HPP
 
 #include "fx.hpp"
-#include "../sx/sx_matrix.hpp"
+#include "../sx/sx.hpp"
 #include <vector>
 
 namespace CasADi{

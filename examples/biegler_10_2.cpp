@@ -359,7 +359,7 @@ int main(){
   lfcn_input[0] = vars;
   lfcn_input[1] = lambda;
   lfcn_input[2] = vector<SX>(1,sigma);
-  SXFunction lfcn(lfcn_input, sigma*f + inner_prod(lambda,g));
+  SXFunction lfcn(lfcn_input, sigma*f + inner_prod(Matrix<SX>(lambda),Matrix<SX>(g)));
   
   // Hessian of the Lagrangian
   SXFunction HL = lfcn.hessian();

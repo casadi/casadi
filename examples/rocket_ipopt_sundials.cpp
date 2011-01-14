@@ -73,8 +73,9 @@ FX create_integrator_euler(){
   input[INTEGRATOR_X0] = x0;
   input[INTEGRATOR_P] = u;
 
-  vector<SX> xp0(x0.size()); make_symbolic(xp0.begin(),xp0.end(),"xp0");
-  input[INTEGRATOR_XP0] = vertcat(xp0);
+  vector<SX> xp0(x0.size());
+  make_symbolic(xp0.begin(),xp0.end(),"xp0");
+  input[INTEGRATOR_XP0] = xp0;
 
   SXMatrix output = x;
   SXFunction integrator(input,output);

@@ -22,7 +22,6 @@
 
 #include "mx.hpp"
 #include "mx_node.hpp"
-#include "../sx/sx_matrix.hpp"
 #include "scalar_matrix_op.hpp"
 #include "matrix_scalar_op.hpp"
 #include "matrix_matrix_op.hpp"

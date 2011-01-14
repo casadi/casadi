@@ -849,7 +849,7 @@ void SXFunctionInternal::eval(
         map<int,SX>::const_iterator it2 = replace.find(i); // try to locate the node
         if(it2 != replace.end()){ // replace
           work[it->ind] = SX(it2->second);
-          repres << r;
+          append(repres,SXMatrix(r));
         }
         else // do not replace
           work[it->ind] = r;

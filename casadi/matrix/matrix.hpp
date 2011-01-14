@@ -114,6 +114,26 @@ class Matrix : public std::vector<T>, public PrintableObject{
       std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
     }
+    
+    /** \brief  ublas vector */
+    #ifdef HAVE_UBLAS
+    template<typename T, typename A>
+    explicit Matrix<T>(const ublas::vector<A> &x) : swap_on_copy_(false){
+      sparsity_ = CRSSparsity(x.size(),1,true);
+      std::vector<T>::resize(x.size());
+      copy(x.begin(),x.end(),std::vector<T>::begin());
+    }
+
+    template<typename T, typename A>
+    explicit Matrix<T>(const ublas::matrix<A> &x) : swap_on_copy_(false){
+      sparsity_ = CRSSparsity(x.size1(),x.size2(),true);
+      std::vector<T>::resize(numel());
+      copy(x.begin(),x.end(),std::vector<T>::begin());
+      return ret;
+    }
+    #endif
+
+    
 #endif // SWIG
 
     /// get the number of non-zeros

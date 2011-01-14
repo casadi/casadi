@@ -63,6 +63,15 @@ CasADi::Matrix<T> ceil(const CasADi::Matrix<T>& x);
 
 template<class T>
 CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x);
+
+template<class T>
+CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y);
+
+template<class T>
+CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y);
+
+template<class T>
+CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y);
   
 } // namespace std
 
@@ -91,6 +100,9 @@ void setSub(const Matrix<T> &expr, Matrix<T> &res, int i, int j=0);
 template<class T>
 void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni=1, int ki=1);
 
+template<class T>
+Matrix<T> getRow( const Matrix<T> &expr, int i, int ni=1, int ki=1);
+
 /** \brief  A(i:ki:i+ni,:) = expr */
 template<class T>
 void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni=1, int ki=1);
@@ -98,6 +110,9 @@ void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni=1, int ki=1);
 /// ... = A(:,j:kj:j+nj)
 template<class T>
 void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj=1, int kj=1);
+
+template<class T>
+Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj=1, int kj=1);
 
 /** \brief  A(:,j:kj:j+nj) = expr */
 template<class T>
@@ -151,6 +166,69 @@ Matrix<T> reshape(const Matrix<T>& a, int n, int m);
 template<class T>
 Matrix<T> vec(const Matrix<T>& a);
 
+template<class T>
+Matrix<T> vertcat(const std::vector<Matrix<T> > &v);
+
+template<class T>
+Matrix<T> horzcat(const std::vector<Matrix<T> > &v);
+
+#ifndef SWIG
+template<class T>
+Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y);
+
+template<class T>
+Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y);
+#endif // SWIG
+
+/** \brief Inner product of two vectors
+        Equals
+        \code
+        trans(x)*y
+        \endcode
+        with x and y vectors
+*/
+template<class T>
+Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y); // inner product
+
+/** \brief Outer product of two vectors
+        Equals
+        \code
+        x*trans(y)
+        \endcode
+        with x and y vectors
+*/
+template<class T>
+Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y);
+
+/// Get the 2-norm of a vector
+template<class T>
+Matrix<T> norm_2(const Matrix<T>& x);
+
+/** \brief  QR factorization using the modified Gram-Schmidt algorithm 
+More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent
+See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.) */
+template<class T>
+void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R);
+
+/** \brief  Solve a system of equations: A*x = b */
+template<class T>
+Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
+
+/** \brief  Matlab's linspace function */
+template<class T>
+Matrix<T> linspace(const Matrix<T> &a, const Matrix<T> &b, int nsteps);
+
+template<class T>
+bool isZero(const Matrix<T>& ex);
+
+template<class T>
+int nnz(const Matrix<T>& ex);
+
+template<class T>
+int nnz_sym(const Matrix<T>& ex);
+
+template<class T>
+bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 
 } // namespace CasADi
 
@@ -170,6 +248,14 @@ CasADi::Matrix<T> fname(const CasADi::Matrix<T>& x){ \
   return temp;\
 }
 
+#define BINOP_DEF(fname,opname) \
+template<class T> \
+CasADi::Matrix<T> fname(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ \
+  CasADi::Matrix<T> temp; \
+  temp.binary(CasADi::casadi_operators<T>::opname,x,y); \
+  return temp;\
+}
+
 UNOP_DEF(sin,sin)
 UNOP_DEF(cos,cos)
 UNOP_DEF(tan,tan)
@@ -182,6 +268,9 @@ UNOP_DEF(sqrt,sqrt)
 UNOP_DEF(floor,floor)
 UNOP_DEF(ceil,ceil)
 UNOP_DEF(fabs,fabs)
+UNOP_DEF(fmin,fmin)
+UNOP_DEF(fmax,fmax)
+UNOP_DEF(pow,pow)
   
 } // namespace std
 
@@ -362,7 +451,6 @@ void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni, int ki){
 
 template<class T>
 Matrix<T> getRow( const Matrix<T> &expr, int i, int ni, int ki){
-  // TODO: lacks header
   Matrix<T> res(ni,expr.size2());
   getRow(res,expr,i,ni,ki);
   return res;
@@ -383,7 +471,6 @@ void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj, int kj){
 
 template<class T>
 Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj, int kj){
-  // TODO: lacks a header
   Matrix<T> res(expr.size1(),nj);
   getColumn(res,expr,j,nj,kj);
   return res;
@@ -584,10 +671,189 @@ Matrix<T> vec(const Matrix<T>& a){
   return ret;
 }
 
+template<class T>
+Matrix<T> vertcat(const std::vector<Matrix<T> > &v){
+  Matrix<T> ret;
+  for(int i=0; i<v.size(); ++i)
+    append(ret,v[i]);
+  return ret;
+}
 
+template<class T>
+Matrix<T> horzcat(const std::vector<Matrix<T> > &v){
+  Matrix<T> ret;
+  for(int i=0; i<v.size(); ++i)
+    append(ret,trans(v[i]));
+  return trans(ret);  
+}
 
+template<class T>
+Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y){
+  Matrix<T> xy = x;
+  append(xy,y);
+  return xy;
+}
 
+template<class T>
+Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
+  return trans(vertcat(trans(x),trans(y)));
+}
 
+template<class T>
+Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
+  if(!x.vector() || !y.vector()) throw CasadiException("inner_prod: arguments must be vectors");
+  return prod(trans(x),y);
+}
+
+template<class T>
+Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
+  if(!x.vector() || !y.vector()) throw CasadiException("outer_prod: arguments must be vectors");
+  return prod(x,trans(y));  
+}
+
+template<class T>
+Matrix<T> norm_2(const Matrix<T>& x){
+  return sqrt(inner_prod(x,x));
+}
+
+template<class T>
+void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
+  // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
+  int m = A.size1();
+  int n = A.size2();
+  if(m<n) throw CasadiException("qr: fewer rows than columns");
+
+  // Transpose of A
+  Matrix<T> AT = trans(A);
+
+  // Transposes of the output matrices
+  Matrix<T> QT, RT;
+
+  // compute Q and R column by column
+  for(int i=0; i<n; ++i){
+    // Initialize qi to be the i-th column of A
+    Matrix<T> ai = getRow(AT,i);
+    Matrix<T> qi = ai;
+    // The i-th column of R
+    Matrix<T> ri(1,n);
+  
+    // subtract the projection of of qi in the previous directions from ai
+    for(int j=0; j<i; ++j){
+      // Get the j-th column of Q
+      Matrix<T> qj = getRow(QT,j);
+
+      ri(0,j) = prod(qj,trans(qi))[0]; // Modified Gram-Schmidt
+      // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
+
+      // Remove projection in direction j
+      qi -= T(ri(0,j)) * qj;
+    }
+
+    // Normalize qi
+    ri(0,i) = norm_2(trans(qi))[0];
+    qi /= T(ri(0,i));
+
+    // Update RT and QT
+    append(QT,qi);
+    append(RT,ri);
+  }
+
+  // Save to output
+  Q = trans(QT);
+  R = trans(RT);
+}
+
+template<class T>
+Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
+  // check dimensions
+  if(A.size1() != b.size1()) throw CasadiException("solve: dimension mismatch");
+  if(A.size1() != A.size2()) throw CasadiException("solve: A not square");
+  if(isTril(A)){
+    // forward substiution if lower triangular
+    Matrix<T> x = b;
+    for(int i=0; i<A.size1(); ++i){ // loop over rows
+      for(int k=0; k<b.size2(); ++k){ // for every right hand side
+        for(int j=0; j<i; ++j){
+          x(i,k) -= A(i,j)*x(j,k);
+        }
+        x(i,k) /= A(i,i);
+      }
+    }
+    return x;
+  } else if(isTriu(A)){
+    // backward substiution if upper triangular
+    Matrix<T> x = b;
+    for(int i=A.size1()-1; i>=0; --i){ // loop over rows from the back
+      for(int k=0; k<b.size2(); ++k){ // for every right hand side
+        for(int j=A.size1()-1; j>i; --j){
+          x(i,k) -= A(i,j)*x(j,k);
+        }
+        x(i,k) /= A(i,i);
+      }
+    }
+    return x;
+  } else {
+    // Make a QR factorization
+    Matrix<T> Q,R;
+    qr(A,Q,R);
+
+    // Solve the factorized system
+    return solve(R,prod(trans(Q),b));
+  }
+}
+
+template<class T>
+Matrix<T> linspace(const Matrix<T> &a_, const Matrix<T> &b_, int nsteps){
+  if(!isScalar(a_) || !isScalar(b_)) throw CasadiException("Matrix<T>::linspace: a and b must be scalar");
+  T a = a_(0);
+  T b = b_(0);
+  Matrix<T> ret(nsteps,1);
+  ret(0) = a;
+  T step = (b-a)/(nsteps-1);
+
+  for(int i=1; i<nsteps-1; ++i)
+    ret(i) = ret(i-1) + step;
+  
+  ret(nsteps-1) = b;
+  return ret;
+}
+
+template<class T>
+bool isZero(const Matrix<T>& ex) {  
+
+  // loop over (potentially) non-zero elements
+  for(int el=0; el<ex.size(); ++el)
+    if(!casadi_limits<T>::isZero(ex[el]))
+      return false;
+  
+  return true;
+}
+
+template<class T>
+int nnz(const Matrix<T>& ex) {
+  return ex.size();
+}
+
+template<class T>
+int nnz_sym(const Matrix<T>& ex) {
+  int nz = 0; // number of non-zeros  
+  for(int row=0; row<ex.size1(); ++row)
+  {
+    // Loop over the elements in the row
+    for(int el=ex.rowind(row); el<ex.rowind(row+1); ++el){ // loop over the non-zero elements
+      if(ex.col(el) > row) break; // break inner loop (only lower triangular part is used)
+      nz++;
+    }
+  }
+  return nz;
+}
+
+template<class T>
+bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
+  if ((nnz(ex1)!=0 || nnz(ex2)!=0) && (ex1.size1()!=ex2.size1() || ex1.size2()!=ex2.size2())) return false;
+  Matrix<T> difference = ex1 - ex2;  
+  return isZero(difference);
+}
 
 
 } // namespace CasADi
@@ -641,6 +907,22 @@ MTT_INST(T,adj,CasADi) \
 MTT_INST(T,inv,CasADi) \
 MTT_INST(T,reshape,CasADi) \
 MTT_INST(T,vec,CasADi) \
+MTT_INST(T,horzcat,CasADi) \
+MTT_INST(T,vertcat,CasADi) \
+MTT_INST(T,inner_prod,CasADi) \
+MTT_INST(T,outer_prod,CasADi) \
+MTT_INST(T,norm_2,CasADi) \
+MTT_INST(T,qr,CasADi) \
+MTT_INST(T,solve,CasADi) \
+MTT_INST(T,linspace,CasADi) \
+MTT_INST(T,isZero,CasADi) \
+MTT_INST(T,nnz,CasADi) \
+MTT_INST(T,nnz_sym,CasADi) \
+MTT_INST(T,isEqual,CasADi) \
+
+
+
+
 
 #endif //SWIG
 

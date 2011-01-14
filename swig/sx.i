@@ -2,7 +2,6 @@
 #include "casadi/matrix/crs_sparsity.hpp"
 #include "casadi/matrix/matrix.hpp"
 #include "casadi/sx/sx.hpp"
-#include "casadi/sx/sx_matrix.hpp"
 #include "casadi/sx/sx_tools.hpp"
 %}
 

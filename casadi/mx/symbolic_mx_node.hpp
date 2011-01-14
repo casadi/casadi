@@ -24,7 +24,6 @@
 #define SYMBOLIC_MATRIX_HPP
 
 #include "mx_node.hpp"
-#include "../sx/sx_matrix.hpp"
 
 namespace CasADi{
 /** \brief Represents a symbolic MX
