@@ -28,10 +28,7 @@ namespace CasADi{
 NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
-  
-  // add new options
-  addOption("verbose",         OT_BOOLEAN, true); // print progress
-  
+    
   n_ = F_.input(0).get().numel();
   m_ = G_.isNull() ? 0 : G_.output(0).get().numel();
 

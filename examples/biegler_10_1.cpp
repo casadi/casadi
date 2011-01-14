@@ -126,7 +126,7 @@ int main(){
   cout << "C = " << C << endl;
   
   // Collocated states
-  SXMatrix Z("Z",N,K+1);
+  SXMatrix Z = symbolic("Z",N,K+1);
   
   // State at final time
 // SXMatrix ZF("ZF");

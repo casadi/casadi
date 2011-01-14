@@ -23,6 +23,8 @@
 #include "sx_matrix.hpp"
 #include "sx_tools.hpp"
 
+#if 0
+
 using namespace std;
 
 namespace CasADi{
@@ -61,16 +63,8 @@ SXMatrix::SXMatrix(const string& name, int n, int m) : Matrix<SX>(create_symboli
 SXMatrix::SXMatrix(const SX& scalar) : Matrix<SX>(scalar){
 }
 
-SXMatrix& operator+=(SXMatrix &ex, const SXMatrix &expr){
-  return ex = ex + expr;
-}
-
 SXMatrix operator+(const SXMatrix &x, const SXMatrix &y){
   return binary(ADD_NODE,x,y);
-}
-
-SXMatrix& operator-=(SXMatrix &ex, const SXMatrix &expr){
- return ex = ex - expr;
 }
 
 SXMatrix operator-(SXMatrix &x){
@@ -81,28 +75,16 @@ SXMatrix operator-(const SXMatrix &x, const SXMatrix &y){
   return binary(SUB_NODE,x,y);
 }
 
-SXMatrix& operator*=(SXMatrix &ex, const SXMatrix &expr){
- return ex = ex * expr;
-}
-
 SXMatrix operator*(const SXMatrix &x, const SXMatrix &y){
   return binary(MUL_NODE,x,y);
-}
-
-
-SXMatrix& operator/=(SXMatrix &ex, const SXMatrix &expr){
-  return ex = ex / expr;
 }
 
 SXMatrix operator/(const SXMatrix &x, const SXMatrix &y){
   return binary(DIV_NODE,x,y);
 }
 
-ostream& operator<<(ostream &stream, const SXMatrix &mat){
-  mat.print(stream);
-  return stream;
-}
-
 
 } //namespace CasADi
+#endif // 0
+
 

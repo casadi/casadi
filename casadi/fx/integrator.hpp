@@ -30,16 +30,10 @@
 namespace CasADi{
 
 /// Input arguments of an integrator
-enum IntegratorInput{INTEGRATOR_T0, INTEGRATOR_TF, INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_XP0, INTEGRATOR_NUM_IN};
-
-// Input arguments of an integrator (new)
-//enum IntegratorInput{INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_NUM_IN};
+enum IntegratorInput{INTEGRATOR_T0, INTEGRATOR_TF, INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_XP0, INTEGRATOR_Z0, INTEGRATOR_NUM_IN};
 
 /// Output arguments of an integrator
-enum IntegratorOutput{INTEGRATOR_XF, INTEGRATOR_XPF, INTEGRATOR_NUM_OUT};
-
-// Output arguments of an integrator (new)
-//enum IntegratorOutput{INTEGRATOR_XF, INTEGRATOR_NUM_OUT};
+enum IntegratorOutput{INTEGRATOR_XF, INTEGRATOR_XPF, INTEGRATOR_ZF, INTEGRATOR_NUM_OUT};
 
 /// Forward declaration of internal class
 class IntegratorInternal;
@@ -47,24 +41,31 @@ class IntegratorInternal;
 /** Integrator abstract base class
   An "integrator" is a function that solves an initial value problem (IVP) of the generic form:
   
-  F(x,der(x),p,t) == 0
+  F(t,x,der(x),z,p) == 0
   x(t0) = x0
+  over a time interval [t0, tf].
 
-  It has 4 inputs, initial time, final time, initial state (vector-valued) and parameter (vector-valued) and one output, the state at the final time. 
+  It has (currently) 6 inputs, initial time, final time, initial state (vector-valued), parameter (vector-valued), as well as guesses for the initial 
+  state derivative and algebraic variables. The latter two are only relevant for implicit integrators.
+  
   In addition to this, the integrator provides some additional functionality, such as getting the value of the state and/or sensitivities at certain time points.
   Controls are assumed to be parametrized at this point. 
     
-  The class does not specify how the function F above should be represented, nor the method used for the integration, but assumes that it steps forward in time (ruling out collocation in particular). 
-  The actual form of the ODE/DAE is defined in the derived classes.
+  The class does not specify how the function F above should be represented, nor the method used for the integration, but assumes that it steps forward in time 
+  (ruling out collocation in particular). The actual form of the ODE/DAE is defined in the derived classes.
     
   inputs:
   0: Initial time t0 (dimension 1-by-1)
   1: Final time tf (dimension 1-by-1)
-  2: State at t0  (dimension nx-by-1)
+  2: Differential state at t0  (dimension nx-by-1)
   3: p  (dimension np-by-1)
+  4: Differential state derivative at t0  (dimension nx-by-1)
+  5: Algebraic state at t0  (dimension nz-by-1)
   
   outputs:
-  0: y(tf)
+  0: Differential state at tf
+  1: Differential state derivative at tf
+  2: Algebraic state at tf
   
   Options:
   

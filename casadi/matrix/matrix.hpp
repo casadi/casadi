@@ -87,8 +87,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// sparse matrix with a given sparsity
     explicit Matrix(const CRSSparsity& sparsity);
     
-    /// This constructor enables implicit type conversion from a scalar type
-    Matrix(const T &val);
+    /// This constructor enables implicit type conversion from a numeric type
+    Matrix(double val);
 
     /// Construct from a vector
     Matrix(const std::vector<T>& x);
@@ -96,10 +96,11 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Construct dense matrix from a vector with the elements in column major ordering
     Matrix(const std::vector<T>& x, int n, int m);
 
-#ifndef SWIG    
+#ifndef SWIG
+
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x){
+    Matrix(const std::vector<A>& x) : swap_on_copy_(false){
       sparsity_ = CRSSparsity(x.size(),1,true);
       std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
@@ -107,7 +108,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int n, int m){
+    Matrix(const std::vector<A>& x,  int n, int m) : swap_on_copy_(false){
       if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
       sparsity_ = CRSSparsity(n,m,true);
       std::vector<T>::resize(x.size());
@@ -201,16 +202,33 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;
     
-    Matrix<T> operator+(const Matrix<T> &y) const;
-    Matrix<T> operator-(const Matrix<T> &y) const;
-    Matrix<T> operator*(const Matrix<T> &y) const;
-    Matrix<T> operator/(const Matrix<T> &y) const;
+    /// Elementary operations -- Python naming
+    Matrix<T> __add__(const Matrix<T> &y) const;
+    Matrix<T> __sub__(const Matrix<T> &y) const;
+    Matrix<T> __mul__(const Matrix<T> &y) const;
+    Matrix<T> __div__(const Matrix<T> &y) const;
 
+#ifndef SWIG
+    /// Friend functions to allow implicit type conversion from the left and from the right
+    friend Matrix<T> operator+(const Matrix<T> &x, const Matrix<T> &y){ return x.__add__(y); }
+    friend Matrix<T> operator-(const Matrix<T> &x, const Matrix<T> &y){ return x.__sub__(y); }
+    friend Matrix<T> operator*(const Matrix<T> &x, const Matrix<T> &y){ return x.__mul__(y); }
+    friend Matrix<T> operator/(const Matrix<T> &x, const Matrix<T> &y){ return x.__div__(y); }
+#endif // SWIG
+
+    Matrix<T> __add__ (const T& b) const{ return *this + b;}
+    Matrix<T> __radd__(const T& b) const{ return b + *this;}
+    Matrix<T> __sub__ (const T& b) const{ return *this - b;}
+    Matrix<T> __rsub__(const T& b) const{ return b - *this;}
+    Matrix<T> __mul__ (const T& b) const{ return *this * b;}
+    Matrix<T> __rmul__(const T& b) const{ return b * *this;}
+    Matrix<T> __div__ (const T& b) const{ return *this / b;}
+    Matrix<T> __rdiv__(const T& b) const{ return b / *this;}
+    
     Matrix<T>& operator+=(const Matrix<T> &y);
     Matrix<T>& operator-=(const Matrix<T> &y);
     Matrix<T>& operator*=(const Matrix<T> &y);
     Matrix<T>& operator/=(const Matrix<T> &y);
-    
     
     //@{
     /// Printing
@@ -220,15 +238,14 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
     void printVector(std::ostream &stream=std::cout) const; // print vector-style
     void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
+    void printSparse(std::ostream &stream=std::cout) const; // print the non-zeros
     //@}
 
     /** \brief Swap the the vector content upon the next copy assignment, saves a copy operation: 
     After the copy operation has taken place, the object can not be used for anything,
     as its vector is no longer of correct length. Only the destructor is allowed to get called.
-    Make sure that is the function is only called e.g. for temporary objects at the end of the 
-    scope, before copying to a return value. Caution is adviced.
     */
-    void swapOnCopy();
+    Matrix<T>& noCopy();
 
     // Get the sparsity pattern
     const std::vector<int>& col() const;
@@ -469,8 +486,9 @@ Matrix<T>& Matrix<T>::operator=(Matrix<T>& m){
 }
 
 template<class T>
-void Matrix<T>::swapOnCopy(){
+Matrix<T>& Matrix<T>::noCopy(){
   swap_on_copy_ = true;
+  return *this;
 }
 
 template<class T>
@@ -530,6 +548,15 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     stream << ")";
   }
   stream << ")";  
+}
+
+template<class T>
+void Matrix<T>::printSparse(std::ostream &stream) const {
+  for(int i=0; i<size1(); ++i)
+    for(int el=rowind(i); el<rowind(i+1); ++el){
+      int j=col(el);
+      stream << "(" << i << "," << j << "): " << (*this)[el] << std::endl;
+    }
 }
 
 template<class T>
@@ -597,8 +624,7 @@ void Matrix<T>::clear(){
 }
 
 template<class T>
-Matrix<T>::Matrix(const T &val){
-  swap_on_copy_ = false;
+Matrix<T>::Matrix(double val) : swap_on_copy_(false){
   sparsity_ = CRSSparsity(1,1,true);
   std::vector<T>::resize(1,val);
 }
@@ -749,7 +775,6 @@ template<class T>
 Matrix<T> Matrix<T>::operator-() const{
   Matrix<T> temp;
   temp.unary(casadi_operators<T>::neg,*this);
-  temp.swapOnCopy();
   return temp;
 }
 
@@ -759,34 +784,30 @@ Matrix<T> Matrix<T>::operator+() const{
 }
 
 template<class T>
-Matrix<T> Matrix<T>::operator+(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::__add__(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::add,*this,y);
-  r.swapOnCopy();
   return r;
 }
 
 template<class T>
-Matrix<T> Matrix<T>::operator-(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::__sub__(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::sub,*this,y);
-  r.swapOnCopy();
   return r;
 }
 
 template<class T>
-Matrix<T> Matrix<T>::operator*(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::__mul__(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::mul,*this,y);
-  r.swapOnCopy();
   return r;
 }
 
 template<class T>
-Matrix<T> Matrix<T>::operator/(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
   Matrix<T> r;
   r.binary(casadi_operators<T>::div,*this,y);
-  r.swapOnCopy();
   return r;
 }
 

@@ -24,6 +24,7 @@
 #include "simulator_internal.hpp"
 #include "integrator_internal.hpp"
 #include "sx_function.hpp"
+#include "../sx/sx_tools.hpp"
 
 namespace CasADi{
 
@@ -36,9 +37,9 @@ Simulator::Simulator(const Integrator& integrator, const FX& output_fcn, const v
 
 Simulator::Simulator(const Integrator& integrator, const vector<double>& grid){
   // Create a dummy function (returns the whole state)
-  SXMatrix t("t");
-  SXMatrix x("x",integrator->nx_);
-  SXMatrix p("p",integrator->np_);
+  SXMatrix t = symbolic("t");
+  SXMatrix x = symbolic("x",integrator->nx_);
+  SXMatrix p = symbolic("p",integrator->np_);
   vector<SXMatrix> arg(OUTPUT_NUM_IN);  arg[OUTPUT_T] = t; arg[OUTPUT_X] = x; arg[OUTPUT_P] = p;
   
   // Create the output function

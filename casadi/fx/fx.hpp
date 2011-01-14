@@ -191,6 +191,11 @@ class FX : public OptionsFunctionality{
   /// Const access forward sensitivity
   const Matrix<double>& adjSens(int iind=0, int dir=0) const;
 
+  /// Add modules to be monitored
+  void addMonitor(const std::string& mon);
+  
+  /// Remove modules to be monitored
+  void removeMonitor(const std::string& mon);
   
   
 #ifdef SWIG

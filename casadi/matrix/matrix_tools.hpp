@@ -145,11 +145,21 @@ Matrix<T> adj(const Matrix<T>& a);
 template<class T>
 Matrix<T> inv(const Matrix<T>& a);
 
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, int n, int m);
+
+template<class T>
+Matrix<T> vec(const Matrix<T>& a);
+
+
 } // namespace CasADi
 
 #ifndef SWIG
 
 // Implementations of the functions in standard namespace
+
+#include <iterator>
+
 namespace std{
   
 #define UNOP_DEF(fname,opname) \
@@ -157,7 +167,6 @@ template<class T> \
 CasADi::Matrix<T> fname(const CasADi::Matrix<T>& x){ \
   CasADi::Matrix<T> temp; \
   temp.unary(CasADi::casadi_operators<T>::opname,x); \
-  temp.swapOnCopy();\
   return temp;\
 }
 
@@ -195,8 +204,6 @@ Matrix<T> trans(const Matrix<T> &x){
   for(int i=0; i<mapping.size(); ++i)
     ret[i] = x[mapping[i]];
   
-  // Swap the content upon copying
-  ret.swapOnCopy();
   return ret;
 }
 
@@ -293,8 +300,6 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   copy(val.begin(),val.end(),ret_val.begin());
 #endif // LISTS_IN_PROD
   
-  // Swap the content on the upcoming copy operation
-  ret.swapOnCopy();
   return ret;
 }
 
@@ -557,6 +562,29 @@ Matrix<T> inv(const Matrix<T>& a){
   return adj(a)/det(a);
 }
 
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, int n, int m){
+  if(a.numel() != n*m)
+    throw CasadiException("resize: number of elements must remain the same");
+  
+  Matrix<T> ret(n,m);
+  for(int i=0; i<a.size1(); ++i){
+    for(int el=a.rowind(i); el<a.rowind(i+1); ++el){
+      int j = a.col(el);
+      int k = j+i*a.size1();
+      ret(k/m,k%m) = a[el];
+    }
+  }
+  return ret;
+}
+
+template<class T>
+Matrix<T> vec(const Matrix<T>& a){
+  Matrix<T> ret = reshape(trans(a),a.numel(),1);
+  return ret;
+}
+
+
 
 
 
@@ -611,7 +639,8 @@ MTT_INST(T,getMinor,CasADi) \
 MTT_INST(T,cofactor,CasADi) \
 MTT_INST(T,adj,CasADi) \
 MTT_INST(T,inv,CasADi) \
-
+MTT_INST(T,reshape,CasADi) \
+MTT_INST(T,vec,CasADi) \
 
 #endif //SWIG
 

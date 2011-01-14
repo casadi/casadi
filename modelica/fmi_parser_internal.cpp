@@ -230,11 +230,11 @@ cout << "vars" << endl;
     }
   }
   
-  ocp_.variables->print(cout,0);
+//  ocp_.variables->print(cout,0);
   
-  cout << "VariableCategories:" << endl;
+/*  cout << "VariableCategories:" << endl;
   for(map<string,int>::const_iterator it=catCounter.begin(); it!=catCounter.end(); ++it)
-    cout << "  " << it->first << ": " << it->second << endl;
+    cout << "  " << it->first << ": " << it->second << endl;*/
 }
 
 
@@ -308,7 +308,11 @@ void FMIParserInternal::addOptimization(){
     if(onode.checkName("opt:ObjectiveFunction")){ // mayer term
       addObjectiveFunction(onode);
     } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
-      addIntegrandObjectiveFunction(onode);
+      try{
+        addIntegrandObjectiveFunction(onode);
+      } catch(exception& ex){
+        cout << "WARNING: addIntegrandObjectiveFunction" << ex.what() << endl;
+      }
     } else if(onode.checkName("opt:IntervalStartTime")) {
        addIntervalStartTime(onode);
     } else if(onode.checkName("opt:IntervalFinalTime")) {

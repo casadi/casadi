@@ -24,14 +24,14 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
-#include "ocp_tools.hpp"
+#include "modelica/ocp_tools.hpp"
 #include "casadi/fx/simulator.hpp"
 #include "casadi/fx/simulator_internal.hpp"
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
 
 using namespace CasADi;
-using namespace OPTICON;
+using namespace CasADi::Modelica;
 using namespace std;
 
 // Symbolc representation of the optimal control problem
@@ -90,7 +90,7 @@ void model(SymbolicOCP &ocp){
   int n = 30;
   
   // Temperatures
-  SXMatrix T("T",n);
+  SXMatrix T = symbolic("T",n);
   
   ocp.x = T;
   

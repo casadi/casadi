@@ -40,7 +40,7 @@ namespace ublas = boost::numeric::ublas;
 
 namespace CasADi{
 
-  #ifndef SWIG
+#ifndef SWIG
 /** \brief Make a vector/matrix of symbolic variables - dimension 0 */
 void make_symbolic(SX& v, const std::string& name);
 
@@ -55,6 +55,12 @@ void make_symbolic(std::vector< A >& v, const std::string& name){
 }
 #endif
 
+/** \brief Create an n-by-m matrix with symbolic variables */
+SXMatrix symbolic(const std::string& name, int n=1, int m=1);
+
+/** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
+std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p);
+
 /** \brief Create a one-dimensional stl vector of length n with symbolic variables */
 std::vector<SX> create_symbolic(const std::string& name, int n);
 
@@ -63,7 +69,6 @@ std::vector< std::vector<SX> > create_symbolic(const std::string& name, int n, i
 
 /** \brief Create a three-dimensional stl vector of length n-by-m-by-p with symbolic variables */
 std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
-
   
 /** \brief  Expand the expression as a weighted sum (with constant weights)  */
 void expand(const SXMatrix& ex, SXMatrix &weights, SXMatrix& terms);

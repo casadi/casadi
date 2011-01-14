@@ -26,6 +26,7 @@
 // exception class
 #include "../casadi_exception.hpp"
 #include "../casadi_limits.hpp"
+#include "../matrix/matrix.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>
@@ -40,7 +41,7 @@ namespace CasADi{
 
   /** \brief  forward declaration of Node and Matrix */
 class SXNode; // include will follow in the end
-class SXMatrix; 
+// class SXMatrix; 
 
 /** \brief The basic scalar symbolic class of CasADi
   \author Joel Andersson 
@@ -99,6 +100,9 @@ class SX{
 #endif // SWIG
 
 #ifndef SWIG
+  // Convert to a 1-by-1 Matrix
+  operator Matrix<SX>() const;
+
   //@{
   /** \brief  Operators that change the object */
   friend SX& operator+=(SX &ex, const SX &scalar);
@@ -226,11 +230,12 @@ T fmax(t b){     return std::fmax(*$self,b);}
 binops(SX, const SX&)
 binops(SX, double)
 
+#undef binops
 }
 #endif // SWIG
 
 #ifndef SWIG
-// Template specialization
+// Template specializations
 template<>
 class casadi_limits<SX>{
   public:
@@ -238,6 +243,9 @@ class casadi_limits<SX>{
     static bool isOne(const SX& val);
     static bool isConstant(const SX& val);
     static bool isInteger(const SX& val);
+    static bool isInf(const SX& val);
+    static bool isMinusInf(const SX& val);
+    static bool isNaN(const SX& val);
 
     static const SX zero;
     static const SX one;
@@ -274,30 +282,47 @@ class casadi_operators<SX>{
     static SX fabs(const SX&x);
 };
 
-
-
-
-
+// Template specializations
+template<>
+class Element<Matrix<SX>,SX> : public SX{
+  public:
+    /// Constructor
+    Element(Matrix<SX>& mat, int i, int j);
+      
+    //@{
+    /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
+    Matrix<SX>& operator=(const SX &y);
+    Matrix<SX>& operator+=(const SX &y);
+    Matrix<SX>& operator-=(const SX &y);
+    Matrix<SX>& operator*=(const SX &y);
+    Matrix<SX>& operator/=(const SX &y);
+    //@}
+  
+  private:
+    Matrix<SX>& mat_;
+    int i_, j_;
+};
 
 
 #endif // SWIG
 
-
-} // namespace CasADi
-
-#ifndef SWIG
-namespace CasADi{
   typedef std::vector<SX> SXVector;
   typedef std::vector<std::vector<SX> > SXVectorVector;
   typedef std::vector< std::vector<std::vector<SX> > > SXVectorVectorVector;
+  typedef Matrix<SX> SXMatrix;
+  typedef std::vector<Matrix<SX> > SXMatrixVector;
+  typedef std::vector< std::vector<Matrix<SX> > > SXMatrixVectorVector;
+
 } // namespace CasADi
-#else // SWIG
+
+#ifdef SWIG
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
 %template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
+%template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
+%template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
+%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 #endif // SWIG
-
-
 
 #ifndef SWIG
 
@@ -306,9 +331,38 @@ namespace std{
 template<>
 class numeric_limits<CasADi::SX>{
   public:
+    static const bool is_specialized = true;
+    static CasADi::SX min() throw();
+    static CasADi::SX max() throw();
+    static const int  digits = 0;
+    static const int  digits10 = 0;
+    static const bool is_signed = false;
+    static const bool is_integer = false;
+    static const bool is_exact = false;
+    static const int radix = 0;
+    static CasADi::SX epsilon() throw();
+    static CasADi::SX round_error() throw();
+    static const int  min_exponent = 0;
+    static const int  min_exponent10 = 0;
+    static const int  max_exponent = 0;
+    static const int  max_exponent10 = 0;
+    
+    static const bool has_infinity = true;
+    static const bool has_quiet_NaN = true;
+    static const bool has_signaling_NaN = false;
+//    static const float_denorm_style has_denorm = denorm absent;
+    static const bool has_denorm_loss = false;
     static CasADi::SX infinity() throw();
     static CasADi::SX quiet_NaN() throw();
-    // More to come
+//    static SX signaling_NaN() throw();
+//    static SX denorm_min() throw();
+    static const bool is_iec559 = false;
+    static const bool is_bounded = false;
+    static const bool is_modulo = false;
+
+    static const bool traps = false;
+    static const bool tinyness_before = false;
+    static const float_round_style round_style = round_toward_zero;
 };
 
 

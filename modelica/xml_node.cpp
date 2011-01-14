@@ -58,9 +58,12 @@ StrArg XMLNode::attribute(const string& attribute_name) const{
 }
 
 XMLNode& XMLNode::operator[](int i) const{
-  if(i<0 || i>=size()) throw CasadiException("XMLNode::operator[]: index out of bounds");
-
-  return *children[i];
+  if(i<0 || i>=size()){
+    stringstream ss;
+    ss << "XMLNode::operator[]: index out of bounds for element " << i << " of node " << getName(); 
+    throw CasadiException(ss.str());
+  }
+  return *children.at(i);
 }
 
 bool XMLNode::hasChild(const string& childname) const{

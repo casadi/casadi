@@ -245,7 +245,7 @@ SXMatrix sign(const SXMatrix& a){
 }
 
 
-SXMatrix vec(const SXMatrix &expr){  
+SXMatrix vec(const SXMatrix &expr){
   // Quick return if empty or scalar
   if(expr.empty() || isScalar(expr)) return expr;
   SXMatrix ret(expr.numel(),1);
@@ -623,7 +623,7 @@ istream& operator>>(istream &stream, SXMatrix &expr){
     // else create a symbolic variable    
     string str;
     stream >> str;
-    expr = SXMatrix(str);
+    expr = symbolic(str);
     return stream;
 }
 
@@ -727,8 +727,6 @@ SXMatrix& operator<<(SXMatrix& expr, const SXMatrix& add){
   append(expr,add);
   return expr;
 }
-  
-std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
 
 
 
@@ -909,6 +907,32 @@ SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y){
 
 void make_symbolic(SX& v, const std::string& name){
   v = SX(name);
+}
+
+SXMatrix symbolic(const std::string& name, int n, int m){
+  // Create a dense n-by-m matrix
+  SXMatrix ret(n,m,0);
+  
+  // Fill with expressions
+  for(int i=0; i<n; ++i){
+    for(int j=0; j<m; ++j){
+      stringstream ss;
+      ss << name << "_" << i << "_" << j;
+      ret[j+i*m] = SX(ss.str());
+    }
+  }
+      
+  // return
+  return ret;
+}
+
+std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p){
+  std::vector<Matrix<SX> > ret(p);
+  for(int k=0; k<p; ++k){
+    stringstream ss;
+    ss << name << k;
+    ret[k] = symbolic(ss.str(),n,m);
+  }
 }
 
 vector<SX> create_symbolic(const string& name, int n){

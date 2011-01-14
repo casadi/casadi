@@ -224,9 +224,8 @@ void IpoptInternal::init(){
   NLPSolverInternal::init();
 
   // read options
-  verbose_ = getOption("verbose").toBool();
   exact_hessian_ = !H_.isNull();
-
+  
   if(verbose_){
     cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
     if(exact_hessian_) std::cout << "Using exact Hessian" << std::endl;
@@ -286,6 +285,7 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
 }
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
+  log("eval_h started");
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
@@ -310,38 +310,53 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     // Get results
     H_.getOutput(values);
   }
+  log("eval_h ok");
   return true;
 }
 
 bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
-  if (values == NULL) {
-    int nz=0;
-    vector<int> rowind,col;
-    J_.result().sparsity().getSparsityCRS(rowind,col);
-    for(int r=0; r<rowind.size()-1; ++r)
-      for(int el=rowind[r]; el<rowind[r+1]; ++el){
-//        if(col[el]>=r){
-          iRow[nz] = r;
-          jCol[nz] = col[el];
-          nz++;
-  //      }
+  try{
+    log("eval_jac_g started");
+    if (values == NULL) {
+      int nz=0;
+      vector<int> rowind,col;
+      J_.result().sparsity().getSparsityCRS(rowind,col);
+      for(int r=0; r<rowind.size()-1; ++r)
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+  //        if(col[el]>=r){
+            iRow[nz] = r;
+            jCol[nz] = col[el];
+            nz++;
+    //      }
+        }
+    } else {
+      // Pass the argument to the function
+      J_.setInput(x);
+      
+       // Evaluate the function
+      J_.evaluate();
+
+      // Get the output
+      J_.getOutput(values);
+      
+      if(monitored("eval_jac_g")){
+        cout << "J = " << endl;
+        J_.result().printSparse();
       }
-  } else {
-    // Pass the argument to the function
-    J_.setInput(x);
-
-    // Evaluate the function
-    J_.evaluate();
-
-    // Get the output
-    J_.getOutput(values);
+    }
+    
+    log("eval_jac_g ok");
+    return true;
+  } catch (exception& ex){
+    cerr << "eval_jac_g failed: " << ex.what() << endl;
+    return false;
   }
-  
-  return true;
 }
 
 bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value)
 {
+  log("eval_f started");
+  
   assert(n == n_);
 
   // Pass the argument to the function
@@ -353,11 +368,19 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
   // Get the result
   F_.getOutput(obj_value);
 
+  // Printing
+  if(monitored("eval_f")){
+    cout << "obj_value = " << obj_value << endl;
+  }
+
+  log("eval_f ok");
   return true;
 }
 
 bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 {
+  log("eval_g started");
+
   assert(n == n_);
   assert(m == m_);
 
@@ -370,11 +393,18 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
   // Ge the result
   G_.getOutput(g);
 
+  // Printing
+  if(monitored("eval_g"))
+    cout << "g = " << G_.result() << endl;
+    
+  log("eval_g ok");
   return true;
 }
 
 bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f)
 {
+  log("eval_grad_f started");
+
   assert(n == n_);
   // Pass the argument to the function
   F_.setInput(x);
@@ -388,6 +418,20 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
   // Get the result
   F_.getAdjSens(grad_f);
 
+  // Printing
+  if(monitored("eval_grad_f")){
+    cout << "grad_f = " << F_.adjSens() << endl;
+  }
+  
+  // Check the result for regularity
+  for(vector<double>::const_iterator it=F_.adjSens().begin(); it!=F_.adjSens().end(); ++it){
+      if(isnan(*it) || isinf(*it)){
+        log("eval_grad_f: result not regular");
+        return false;
+    }
+  }
+  
+  log("eval_grad_f ok");
   return true;
 }
 

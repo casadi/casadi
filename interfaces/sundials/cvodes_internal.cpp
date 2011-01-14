@@ -60,7 +60,7 @@ int CVodesInternal::getNP(const FX& f){
   return f.input(ODE_P).get().numel();
 }
   
-CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(getNX(f,q), getNP(f)), f_(f), q_(q){
+CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("linear_multistep_method",     OT_STRING,  "bdf"); // "bdf" or "adams"
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton"); // "newton" or "functional"
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
@@ -73,6 +73,8 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(ge
   is_init = false;
 
   // Get dimensions
+  setDimensions(getNX(f,q), getNP(f),0);
+  
   ny_ = f.output().get().numel();
   nq_ = q.isNull() ? 0 : q.output().get().numel();
 
@@ -980,7 +982,7 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
   try{
     assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    assert(this_->f_.output(ODE_RHS).dataF().size() == this_->ny_);
+    assert(this_->f_.fwdSens(ODE_RHS).size() == this_->ny_);
     assert(NV_LENGTH_S(v) == this_->ny_);
     assert(NV_LENGTH_S(Jv) == this_->ny_);
     this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(y),NV_DATA_S(fy),NV_DATA_S(tmp));

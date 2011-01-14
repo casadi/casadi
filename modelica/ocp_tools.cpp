@@ -34,7 +34,8 @@ extern "C" void dsterf_(int *n, double *d, double *e, int *info); // needed by L
 
 using namespace std;
 
-namespace OPTICON{
+namespace CasADi{
+  namespace Modelica{
 
 // Get the coefficeints for the collocation and continuity equations
 void get_collocation_coeff(int K, vector<vector<double> >& C, vector<double>& D, CollocationPoints cp){
@@ -710,5 +711,6 @@ void eliminateDependent(OCP_old& ocp){
 }
 #endif
 
-} // namespace OPTICON
+} // namespace Modelica
+} // namespace CasADi
 

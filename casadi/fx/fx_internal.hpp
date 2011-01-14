@@ -24,6 +24,7 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
+#include <set>
 
 namespace CasADi{
   
@@ -80,6 +81,48 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Assert that the function has been initialized
   void assertInit() const;
 
+  /// Verbose mode?
+  bool verbose() const;
+  
+  /// Is function fcn being monitored
+  bool monitored(const std::string& mod) const;
+  
+    /// Access input argument
+  Matrix<double>& argument(int iind=0);
+    
+  /// Const access input argument
+  const Matrix<double>& argument(int iind=0) const;
+
+  /// Access input argument
+  Matrix<double>& result(int oind=0);
+    
+  /// Const access input argument
+  const Matrix<double>& result(int oind=0) const;
+
+  /// Access forward seed
+  Matrix<double>& fwdSeed(int iind=0, int dir=0);
+    
+  /// Const access forward seed
+  const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
+
+  /// Access forward sensitivity
+  Matrix<double>& fwdSens(int oind=0, int dir=0);
+    
+  /// Const access forward sensitivity
+  const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
+
+  /// Access adjoint seed
+  Matrix<double>& adjSeed(int oind=0, int dir=0);
+    
+  /// Const access adjoint seed
+  const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
+
+  /// Access forward sensitivity
+  Matrix<double>& adjSens(int iind=0, int dir=0);
+    
+  /// Const access forward sensitivity
+  const Matrix<double>& adjSens(int iind=0, int dir=0) const;
+
   protected:
 
   /** \brief  Has the function been initialized? */
@@ -92,6 +135,17 @@ class FXInternal : public OptionsFunctionalityNode{
 
   /** \brief  Verbose -- for debugging purposes */
   bool verbose_;
+  
+  /** \brief  Log the status of the solver */
+  void log(const std::string& msg) const;
+
+  /** \brief  Log the status of the solver, function given */
+  void log(const std::string& fcn, const std::string& msg) const;
+
+  /// Set of module names which are extra monitored
+  std::set<std::string> monitors_;
+  
+  
   
 };
 

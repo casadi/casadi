@@ -186,8 +186,8 @@ class IdasInternal : public IntegratorInternal{
   
   // dimensions
   int ny_; // number of differential states
-  int nz_; // number of algebraic states
   int nq_; // number of quadratures
+  int nyz_; // number of states seen by IDA (differential states and algebraic states)
   
   bool is_init;
   
@@ -202,10 +202,6 @@ class IdasInternal : public IntegratorInternal{
  
   // Throw error
   static void idas_error(const std::string& module, int flag);
-  
-  // Auxiliary
-  static int getNX(const FX& f, const FX& q); // count the total number of states
-  static int getNP(const FX& f); // count the number of parameters
   
   // Set the user defined linear solver
   void initUserDefinedLinearSolver();
