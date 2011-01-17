@@ -101,7 +101,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Construct dense matrix from a vector with the elements in column major ordering
     Matrix(const std::vector<T>& x, int n, int m);
 
-#ifndef SWIG    
+#ifndef SWIG
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     Matrix(const std::vector<A>& x){

@@ -695,11 +695,14 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   // Re-initialize
   flag = IDAReInit(mem_, t0, yz_, yP_);
   if(flag != IDA_SUCCESS) idas_error("IDAReInit",flag);
+  log("IdasInternal::reset","re-initialized IVP solution");
+
 
   // Re-initialize quadratures
   if(nq_>0){
     flag = IDAQuadReInit(mem_, yQ_);
     if(flag != IDA_SUCCESS) idas_error("IDAQuadReInit",flag);
+    log("IdasInternal::reset","re-initialized quadratures");
   }
   
   if(fsens_order_>0){
@@ -709,10 +712,12 @@ void IdasInternal::reset(int fsens_order, int asens_order){
     // Re-initialize sensitivities
     flag = IDASensReInit(mem_,ism_,&yzS_[0],&yPS_[0]);
     if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
+    log("IdasInternal::reset","re-initialized forward sensitivity solution");
 
     if(nq_>0){
       flag = IDAQuadSensReInit(mem_, &yQS_[0]);
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
+      log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
     }
   } else {
     // Turn of sensitivities
@@ -1319,7 +1324,7 @@ void IdasInternal::psolve(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vec
 }
 
 void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  log("IdasInternal::psetup","begin");
+//   log("IdasInternal::psetup","begin");
 
   // Get time
   time1 = clock();
@@ -1349,7 +1354,7 @@ void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, doubl
   time1 = clock();
   t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
 
-  log("IdasInternal::psetup","end");
+  // log("IdasInternal::psetup","end");
 }
 
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){

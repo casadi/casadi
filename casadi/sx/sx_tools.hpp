@@ -275,6 +275,9 @@ More stable than the classical Gram-Schmidt, but may break down if the columns o
 See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.) */
 void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R);
 
+// QR
+std::vector<SXMatrix> qr(const SXMatrix& A);
+
 /** \brief  Solve a system of equations: A*x = b */
 SXMatrix solve(const SXMatrix& A, const SXMatrix& b);
 

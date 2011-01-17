@@ -419,6 +419,12 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
 #endif
 }
 
+std::vector<SXMatrix> qr(const SXMatrix& A){
+  std::vector<SXMatrix> QR(2);
+  qr(A,QR[0],QR[1]);
+  return QR;
+}
+
 void qr(const SXMatrix& A, SXMatrix& Q, SXMatrix &R){
   // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
   int m = A.size1();
