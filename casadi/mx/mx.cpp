@@ -32,7 +32,6 @@
 #include "evaluation.hpp"
 #include "symbolic_mx_node.hpp"
 #include "mx_constant.hpp"
-#include "slice.hpp"
 
 namespace CasADi{
 
@@ -43,59 +42,75 @@ MX::MX(){
 }
 
 MX::MX(double x){
-  assignNode(new MXConstant(&x,1,1));
+  assignNode(new MXConstant(x));
+}
+
+MX::MX(const Matrix<double> &x){
+  assignNode(new MXConstant(x));
 }
 
 MX::MX(const std::vector<double> &x){
-  assignNode(new MXConstant(&x[0],x.size(),1,'R'));  
-}
-
-MX::MX(const std::vector<double> &x, int n, int m, char order){
-  if(x.size() != n*m) throw CasadiException("MX(const std::vector<double> &, ...): dimension mismatch");
-  assignNode(new MXConstant(&x[0],n,m,order));  
+  assignNode(new MXConstant(x));
 }
 
 MX::MX(const std::string& name, int n, int m){
   assignNode(new SymbolicMatrix(name,n,m));
 }
 
-MX::Element MX::operator()(int i, int j){
-  return Element(*this, j+i*size2());
+const MX MX::__getitem__(const vector<int>& I) const{
+  if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); 
+  return (*this)(I[0],I[1]);
 }
 
-MX::Element MX::operator[](int k){
- return Element(*this, k);
+const MX MX::__getitem__(int k) const{
+  // change this!
+  return (*this)(k/size2(),k%size2());
 }
 
-MX MX::getElement(int k) const{
+MX& MX::__setitem__(int k, const MX& el){ 
+  (*this)[k] = el;
+  return *this;
+}
+
+MX& MX::__setitem__(const std::vector<int> &I, const MX&  el){ 
+  if(I.size()!=2) throw CasADi::CasadiException("__setitem__: not 2D"); 
+  (*this)(I[0],I[1]) = el;
+  return *this;
+}
+
+
+
+
+const MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   MX ret;
-  ret.assignNode(new MatrixElement(*this,k/size2(), k%size2()));
-  return ret;  
-}
-
-MX MX::slice(Slicer i, Slicer j) const{
-  MX ret;
-  ret.assignNode(new Slice(*this,i,j));
+  ret.assignNode(new MatrixElement(*this,ii,jj));
   return ret;
 }
 
-MX MX::getRow(int i) const {return slice(i,SlicerPrimitiveAll());}
-
-MX MX::getColumn(int j) const {return slice(SlicerPrimitiveAll(),j);}
-
-MX& MX::setElement(const MX& el, int k){
-  throw CasadiException("MX::setElement: not implemented");
+void MX::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el){
+  throw CasadiException("MX::setSub: not implemented");
 }
 
 const MX MX::operator()(int i, int j) const{
-  return getElement(j+i*size2());
+  MX ret;
+  ret.assignNode(new MatrixElement(*this,vector<int>(1,i), vector<int>(1,j)));
+  return ret;  
 }
 
 const MX MX::operator[](int k) const{
-  return getElement(k);
+  return __getitem__(k);
 }
 
-int MX::size_new() const{
+SubMatrix<MX> MX::operator()(int i, int j){
+  return SubMatrix<MX>(*this,vector<int>(1,i), vector<int>(1,j));
+}
+ 
+SubMatrix<MX> MX::operator[](int k){
+  // change this!!!
+  return SubMatrix<MX>(*this,vector<int>(1,k/size2()), vector<int>(1,k%size2()));
+}
+
+int MX::size() const{
   return (*this)->output_.size();
 }
 
@@ -168,14 +183,6 @@ const MXNode* MX::operator->() const{
   return (const MXNode*)SharedObject::operator->();
 }
 
-MXNode* MX::get(){
-  return (MXNode*)SharedObject::get();
-}
-
-const MXNode* MX::get() const{
-  return (const MXNode*)SharedObject::get();
-}
-
 MX& MX::operator+=(const MX &y){
   return *this = *this + y;
 }
@@ -198,53 +205,20 @@ MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
   return ret;
 }
 
-MX::Element::Element(MX& mx_, int k_) : mx(mx_), k(k_){ 
-}
-
-MX::Element::operator MX() const{
-  return mx.getElement(k);
-}
-
-MX& MX::Element::operator=(const MX &y){
-   return mx.setElement(y,k);
-}
-
-MX& MX::Element::operator+=(const MX &y){
-   return mx.setElement(mx.getElement(k)+y,k);
-}
-
-MX& MX::Element::operator-=(const MX &y){
-   return mx.setElement(mx.getElement(k)-y,k);  
-}
-
-MX& MX::Element::operator*=(const MX &y){
-     return mx.setElement(mx.getElement(k)*y,k);
-}
-
-MX& MX::Element::operator/=(const MX &y){
-    return mx.setElement(mx.getElement(k)/y,k); 
-}
-
-bool MX::isEmpty() const{
+bool MX::empty() const{
   return numel()==0;
 }
 
 MX MX::zeros(int nrow, int ncol){
-  vector<double> v(nrow*ncol,0);
-  return MX(v,nrow,ncol);
+  return MX(Matrix<double>(nrow,ncol,0));
 }
 
 MX MX::ones(int nrow, int ncol){
-  vector<double> v(nrow*ncol,1);
-  return MX(v,nrow,ncol);
+  return MX(Matrix<double>(nrow,ncol,1));
 }
 
 MX MX::operator-() const{
   return unary(NEG_NODE,*this);
-}
-
-void MX::Element::print(std::ostream &stream) const{
-  mx.getElement(k).print(stream);
 }
 
 } // namespace CasADi

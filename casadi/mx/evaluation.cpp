@@ -23,7 +23,6 @@
 #include "evaluation.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
-#include <cassert>
 
 using namespace std;
 
@@ -40,26 +39,26 @@ void Evaluation::print(ostream &stream) const{
 }
 
 void Evaluation::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  
   // Pass the input to the function
-  for(int i=0; i<ndep(); ++i)
+  for(int i=0; i<ndep(); ++i){
     if(!dep(i).isNull()){
       fcn_.setInput(input(i),i);
-/*      cout << fcn_.argument(i) << endl;*/
     }
+  }
 
   // Give the forward seed to the function
-  if(fsens_order>0)
-    for(int i=0; i<ndep(); ++i)
+  if(fsens_order>0){
+    for(int i=0; i<ndep(); ++i){
       if(!dep(i).isNull()){
         fcn_.setFwdSeed(fwdSeed(i),i);
- /*       cout << fcn_.fwdSeed(i) << endl;
- */     }
+      }
+    }
+  }
 
   // Pass the adjoint seed to the function
-  if(asens_order>0)
+  if(asens_order>0){
     fcn_.setAdjSeed(adjSeed(),oind);
+  }
 
   // Evaluate
   fcn_.evaluate(fsens_order, asens_order);
@@ -70,7 +69,6 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
   // Fwd sens
   if(fsens_order>0){
     fcn_.getFwdSens(fwdSens(),oind);
-/*    cout << fcn_.fwdSens() << endl;*/
   }
 
   // Adjoint sens

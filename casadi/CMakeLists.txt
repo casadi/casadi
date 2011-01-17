@@ -62,22 +62,16 @@ SET(CASADI_SRCS
   mx/matrix_matrix_op.hpp
   mx/multiplication.cpp
   mx/multiplication.hpp
-  mx/matrix_element.cpp
-  mx/matrix_element.hpp
+  mx/matrix_element.cpp # remove this!
+  mx/matrix_element.hpp # remove this!
   mx/symbolic_mx_node.cpp
   mx/symbolic_mx_node.hpp  
   mx/vertcat.cpp
   mx/vertcat.hpp
-  mx/slicer.cpp
-  mx/slicer.hpp
-  mx/flatten.cpp
-  mx/flatten.hpp
   mx/reshape.cpp
   mx/reshape.hpp
   mx/reordering.cpp
   mx/reordering.hpp
-  mx/slice.cpp
-  mx/slice.hpp
   mx/mx_tools.cpp            mx/mx_tools.hpp
 
   fx/function_io.hpp

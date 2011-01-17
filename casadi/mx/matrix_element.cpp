@@ -21,16 +21,13 @@
  */
 
 #include "matrix_element.hpp"
-#include <cassert>
 using namespace std;
 
 namespace CasADi{
 
-MatrixElement::MatrixElement(const MX& x, int i_, int j_) : i(i_), j(j_){
+MatrixElement::MatrixElement(const MX& x, const std::vector<int>& ii, const std::vector<int>& jj) : ii_(ii), jj_(jj){
   setDependencies(x);
-  assert(i>=0 && i<x.size1());
-  assert(j>=0 && j<x.size2());
-  setSize(1,1);
+  setSize(ii.size(),jj.size());
 }
 
 MatrixElement* MatrixElement::clone() const{
@@ -39,39 +36,46 @@ MatrixElement* MatrixElement::clone() const{
 
 void MatrixElement::print(std::ostream &stream) const{
   if(dep(0).size2()==1)
-    stream << dep(0) << "[" << i << "]";
+    if(ii_.size()==1)
+      stream << dep(0) << "[" << ii_[0] << "]";
+    else
+      stream << dep(0) << "[" << ii_ << "]";
   else
-    stream << dep(0) << "(" << i << "," << j << ")";
+    if(ii_.size()==1 && jj_.size()==1)
+      stream << dep(0) << "(" << ii_[0] << "," << jj_[0] << ")";
+    else
+      stream << dep(0) << "(" << ii_ << "," << jj_ << ")";
 }
 
 void MatrixElement::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
+  if(ii_.size() != 1 || jj_.size() != 1)
+    throw CasadiException("MatrixElement::evaluate: only scalar submatrices implemented");
   
-  if(fsens_order==0){
+  int i = ii_[0], j = jj_[0];
+  
   // Get references to the terms
   const vector<double>& arg = input(0); // first term
   vector<double>& res = output();
   
   // carry out the assignment
   res[0] = arg[j+i*dep(0).size2()];
-  } else {
+  
+  if(fsens_order>0){
     // Get references to the terms
-    const vector<double>& arg = fwdSeed(0); // first term
-    vector<double>& res = fwdSens(0);
+    const vector<double>& fseed = fwdSeed(0); // first term
+    vector<double>& fsens = fwdSens(0);
   
     // carry out the assignment
-    res[0] = arg[j+i*dep(0).size2()];
+    fsens[0] = fseed[j+i*dep(0).size2()];
   }
   
   if(asens_order>0){
     // Get references to the terms
-    vector<double>& arg = adjSens(0); // first term
-    const vector<double>& res = adjSeed();
+    const vector<double>& aseed = adjSeed();
+    vector<double>& asens = adjSens(0); // first term
   
     // carry out the addition
-    // where's the plus sign?
-    arg[j+i*dep(0).size2()] = res[0];
-    
+    asens[j+i*dep(0).size2()] += aseed[0];
   }
 }
 

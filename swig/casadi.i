@@ -42,10 +42,6 @@ namespace CasADi{
 %template(DVectorVector)       std::vector<std::vector<double> > ;
 %template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
 
-%extend DVector{
-  std::string __str__()  { std::stringstream ss; ss<< *self; return ss.str();}
-  std::string __repr__()  { std::stringstream ss; ss<< *self; return ss.str();}
-}
 #endif // SWIG
 
 #ifndef WITH_NUMPY

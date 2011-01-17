@@ -66,9 +66,9 @@ void MXFunctionInternal::makeAlgorithm(MXNode* root, vector<MXNode*> &nodes, map
         // Loop over the children of the topmost element
         bool all_dependencies_added = true;
         for(vector<MX>::iterator it = s.top()->dep_.begin(); it!=s.top()->dep_.end(); ++it){
-          if(!it->isNull() && nodemap.find(it->get()) == nodemap.end()){ // a dependency has not been added
+          if(!it->isNull() && nodemap.find((MXNode*)it->get()) == nodemap.end()){ // a dependency has not been added
             // Push the dependency to the top of the stack
-            s.push(it->get());
+            s.push((MXNode*)it->get());
             all_dependencies_added = false;
             break;
           }
@@ -102,7 +102,7 @@ void MXFunctionInternal::init(){
 
   // Order all nodes of a matrix syntax tree in the order of calculation
   for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
-    makeAlgorithm(it->get(), nodes, nodemap);
+    makeAlgorithm((MXNode*)it->get(), nodes, nodemap);
 
   // Create runtime elements for each node
   alg.resize(nodes.size());
@@ -125,7 +125,7 @@ void MXFunctionInternal::init(){
 
 bool MXFunctionInternal::hasEl(const MX& mx) const{
   // Locate the node:
-  map<const MXNode*,int>::const_iterator it = nodemap.find(mx.get());
+  map<const MXNode*,int>::const_iterator it = nodemap.find((MXNode*)mx.get());
 
   // Make sure that the node was indeed found
   return it != nodemap.end();
@@ -134,7 +134,7 @@ bool MXFunctionInternal::hasEl(const MX& mx) const{
 
 int MXFunctionInternal::findEl(const MX& mx) const{
   // Locate the node:
-  map<const MXNode*,int>::const_iterator it = nodemap.find(mx.get());
+  map<const MXNode*,int>::const_iterator it = nodemap.find((MXNode*)mx.get());
 
   // Make sure that the node was indeed found
   if(it == nodemap.end()){

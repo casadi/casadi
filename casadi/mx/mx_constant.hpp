@@ -36,46 +36,25 @@ namespace CasADi{
 	\sa zeros , ones
 */
 class MXConstant : public MXNode{
-public:
+  public:
 
-/** \brief  Constructor */
-  MXConstant(const double *x, int n, int m, char order ='R');
-/** \brief Constructor that initialize to all zeros
-     \sa zeros
-*/
-  MXConstant(int n, int m); // all zeros
+  /** \brief  Constructor */
+  MXConstant(const Matrix<double> &x);
 
-/** \brief  Clone function */
+  /** \brief  Clone function */
   virtual MXConstant* clone() const;
 
-/** \brief  Print */
+  /** \brief  Print */
   virtual void print(std::ostream &stream=std::cout) const;
 
-/** \brief  Evaluate the function and store the result in the node */
+  /** \brief  Evaluate the function and store the result in the node */
   virtual void evaluate(int fsens_order, int asens_order);
 
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-/* virtual void evaluateAdj();*/
-  
-/** \brief  Evaluate the second order derivative (adjoint of the forward gradient) and store the result in the dependency nodes */
-/** \brief    virtual void evaluateFoA(); */
-
-/** \brief  Access an element matrix style */
-   double operator()(int i, int j) const;
-   double& operator()(int i, int j);
-
-/** \brief  Access an element vector style */
-   double operator[](int k) const;
-   double& operator[](int k);
-
-/** \brief  Print */
-  friend std::ostream& operator<<(std::ostream &stream, const MXConstant &x);
-
   virtual bool isConstant() const;
-  
-/** \brief  data member */
+    
   protected:
-  std::vector<double> data;
+    /** \brief  data member */
+    Matrix<double> x_;
 
 };
 

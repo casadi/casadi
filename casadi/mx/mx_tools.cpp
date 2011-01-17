@@ -23,7 +23,6 @@
 #include "mx_tools.hpp"
 #include "vertcat.hpp"
 #include "transpose.hpp"
-#include "flatten.hpp"
 #include "reshape.hpp"
 #include "norm.hpp"
 #include "multiplication.hpp"
@@ -115,7 +114,7 @@ MX reshape(const MX &x, int n, int m){
   }
   if (n==x.size1() && m==x.size2()) {
     // allready correct shape
-    return x.get()->dep(0);
+    return x->dep(0);
   } else {
     MX ret;
     ret.assignNode(new Reshape(x,n,m));
@@ -125,14 +124,7 @@ MX reshape(const MX &x, int n, int m){
 }
 
 MX flatten(const MX &x) {
-  if (x.size2()==1) {
-          // Allready flattened
-          return x.get()->dep(0);
-  } else {
-    MX ret;
-    ret.assignNode(new Flatten(x));
-    return ret;
-  }
+  return reshape(x,x.numel(),1);
 }
 
 
