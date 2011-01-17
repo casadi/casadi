@@ -34,6 +34,8 @@ namespace CasADi{
 */
 class PrintableObject{
   public:
+    
+#ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
@@ -48,7 +50,15 @@ class PrintableObject{
 
     /// Return a string with a destription (for SWIG)
     std::string getDescription() const;
+#endif // SWIG    
 };
+
+#ifdef SWIG
+%extend PrintableObject{
+  std::string __str__()  { return $self->getDescription(); }
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+#endif // SWIG    
 
 } // namespace CasADi
 

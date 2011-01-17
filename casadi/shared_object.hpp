@@ -62,10 +62,13 @@ class SharedObjectNode;
   \date 2010	
 */
 class SharedObject : public PrintableObject{
+#ifndef SWIG
   template<class B> friend B shared_cast(SharedObject& A);
   template<class B> friend const B shared_cast(const SharedObject& A);
-
+#endif // SWIG
+  
   public:
+#ifndef SWIG
     /// Default constructor
     SharedObject();
     
@@ -81,11 +84,17 @@ class SharedObject : public PrintableObject{
     /// Assignment operator
     SharedObject& operator=(const SharedObject& ref);
     
+    /// Assign the node to something
+    void assignNode(SharedObjectNode* node);
+    
     /// Get a const pointer to the node
     const SharedObjectNode* get() const;
 
     /// Get a pointer to the node
     SharedObjectNode* get();
+
+    /// Swap content with another instance
+    void swap(SharedObject& other);
 
     /// Access a member function or object
     SharedObjectNode* operator->();
@@ -98,6 +107,7 @@ class SharedObject : public PrintableObject{
 
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
+#endif // SWIG
     
     /// Initialize the object: more documentation in the node class (SharedObjectNode and derived classes)
     void init();
@@ -107,21 +117,19 @@ class SharedObject : public PrintableObject{
 
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
-
-    /// Assign the node to something
-    void assignNode(SharedObjectNode* node);
     
     /// If there are other references to the object, then make a deep copy of it and point to this new object
     void makeUnique();
     
-    /// Swap content with another instance
-    void swap(SharedObject& other);
-    
   private:
+#ifndef SWIG
     SharedObjectNode *node;
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
+#endif // SWIG
 };
+
+#ifndef SWIG
 
 /// Internal class for the reference counting framework, see comments on the public class.
 class SharedObjectNode{
@@ -202,6 +210,7 @@ B SharedObjectNode::shared_from_this(){
 }
 
 
+#endif // SWIG
 
 
 } // namespace CasADi

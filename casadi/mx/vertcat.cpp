@@ -30,23 +30,22 @@ using namespace std;
 namespace CasADi{
 
 // Constructor
-Vertcat::Vertcat(const vector<MX>& dep__){
-  setDependencies(dep__);
-  if(dep_.empty())
+Vertcat::Vertcat(const vector<MX>& d){
+  setDependencies(d);
+  if(d.empty())
     throw CasadiException("Vertcat: empty concatenation not allowed");
   int sz1=0;
   int sz2=dep(0).size2();
-  for(vector<MX>::const_iterator it=dep_.begin(); it!=dep_.end(); ++it){
-    sz1 += it->size1();
-    if(sz2!=it->size2())
+  for(int i=0; i<ndep(); ++i){
+    sz1 += dep(i).size1();
+    if(sz2!=dep(i).size2())
       throw CasadiException("Vertcat: dimension mismatch");
-
   }
   setSize(sz1,sz2);
 }
 
 Vertcat* Vertcat::clone() const{
-  return new Vertcat(dep_);
+  return new Vertcat(*this);
 }
 
 void Vertcat::print(ostream &stream) const{

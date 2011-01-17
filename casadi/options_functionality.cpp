@@ -106,14 +106,6 @@ OptionsFunctionality::OptionsFunctionality(){
 OptionsFunctionality::~OptionsFunctionality(){
 }
 
-OptionsFunctionalityNode* OptionsFunctionality::get(){
-  return (OptionsFunctionalityNode*)(SharedObject::get());
-}
-
-const OptionsFunctionalityNode* OptionsFunctionality::get() const{
-  return (const OptionsFunctionalityNode*)(SharedObject::get());
-}
-
 OptionsFunctionalityNode* OptionsFunctionality::operator->(){
   return (OptionsFunctionalityNode*)(SharedObject::operator->());
 }

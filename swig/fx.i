@@ -6,6 +6,7 @@
 #include "casadi/fx/sx_function.hpp"
 #include "casadi/fx/integrator.hpp"
 #include "casadi/fx/simulator.hpp"
+#include "casadi/fx/nlp_solver.hpp"
 %}
 
 %include "casadi/fx/function_io.hpp"
@@ -17,8 +18,9 @@
 %include "casadi/fx/integrator_jacobian.hpp"
 %include "casadi/fx/integrator.hpp"
 %include "casadi/fx/simulator.hpp"
+%include "casadi/fx/nlp_solver.hpp"
 
-%template(vector_integrator) std::vector<CasADi::Integrator>;
+%template(IntegratorVector) std::vector<CasADi::Integrator>;
 
 /*#ifdef WITH_NUMPY*/
 namespace CasADi {

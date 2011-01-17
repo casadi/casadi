@@ -35,14 +35,17 @@ namespace CasADi{
 class Evaluation : public MXNode{
   public:
 
-  /** \brief  Constructor */
-  explicit Evaluation(const FX& fcn, const std::vector<MX> &dep, int oind);
- 
-  /** \brief  Print */
-  virtual void print(std::ostream &stream=std::cout) const;
+    /** \brief  Constructor */
+    explicit Evaluation(const FX& fcn, const std::vector<MX> &dep, int oind);
+  
+    /** \brief  Clone function */
+    virtual Evaluation* clone() const;
 
-  /** \brief  Evaluate the function and store the result in the node */
-  virtual void evaluate(int fsens_order, int asens_order);
+    /** \brief  Print */
+    virtual void print(std::ostream &stream=std::cout) const;
+
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(int fsens_order, int asens_order);
 
   protected:
     FX fcn_;

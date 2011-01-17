@@ -34,6 +34,10 @@ Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : fcn_(f
   setSize(fcn_->output(oind).get().size1(),fcn_->output(oind).get().size2());
 }
 
+Evaluation* Evaluation::clone() const{
+  return new Evaluation(*this);
+}
+
 void Evaluation::print(ostream &stream) const{
   stream << fcn_ << "[" << dep() << "]";
 }
