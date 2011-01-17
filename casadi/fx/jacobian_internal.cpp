@@ -149,7 +149,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
   
   int el = 0; // running index
 
-  if(n_<=m_){ // forward AD if less inputs than outputs
+  if(use_ad_fwd_){ // forward AD if less inputs than outputs
     // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
     for(int ofs=0; ofs<n_; ofs += nfdir_fcn_){
         for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){

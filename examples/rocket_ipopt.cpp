@@ -34,6 +34,11 @@ using namespace std;
 int main(){
   cout << "program started" << endl;
   
+  SXMatrix a = symbolic("A");
+  a += a;
+  cout << a << endl;
+  return 0;
+  
   // Dimensions
   int nu = 1000;  // Number of control segments
   int nj = 100; // 10000;  // // Number of integration steps per control segment

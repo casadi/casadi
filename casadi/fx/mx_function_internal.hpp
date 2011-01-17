@@ -65,15 +65,12 @@ class MXFunctionInternal : public FXInternal{
 /** \brief  Evaluate the algorithm */
   virtual void evaluate(int fsens_order, int asens_order);
 
-/** \brief  Print the algorithm */
-  void printAlgorithm(std::ostream &stream=std::cout);
-  
-/** \brief  Print the values */
-  void printValues(int ord=0, std::ostream &stream=std::cout);
+  /** \brief  Print representation */
+  virtual void repr(std::ostream &stream) const;
 
-  /** \brief  Print */
+  /** \brief  Print description */
   virtual void print(std::ostream &stream) const;
-  
+
 /** \brief  Initialize */
   virtual void init();
   

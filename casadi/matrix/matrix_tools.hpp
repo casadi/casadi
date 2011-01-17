@@ -25,65 +25,21 @@
 
 #include "matrix.hpp"
 
-// The following functions must be placed in the standard namespace so that the old ones are not shadowed when CasADi namespace is used
-namespace std{
-
-template<class T>
-CasADi::Matrix<T> sin(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> cos(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> tan(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> asin(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> acos(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> atan(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> exp(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> log(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> sqrt(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> floor(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> ceil(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x);
-
-template<class T>
-CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y);
-
-template<class T>
-CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y);
-
-template<class T>
-CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y);
-  
-} // namespace std
-
 namespace CasADi{
-  
+
 /// Transpose of a matrix
 template<class T>
 Matrix<T> trans(const Matrix<T> &x);
 
-/// Product of two matrices
+#ifndef SWIG
+/// Matrix product of two matrices - not available in Python since prod in numpy means elementwise multiplication
 template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y);
+#endif // SWIG
+
+/// Product of two matrices - Python naming
+template<class T>
+Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y);
 
 template<class T>
 void append(Matrix<T>& expr, const Matrix<T>& add);
@@ -210,6 +166,9 @@ See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.) */
 template<class T>
 void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R);
 
+template<class T>
+std::vector<Matrix<T> > qr(const Matrix<T>& A);
+
 /** \brief  Solve a system of equations: A*x = b */
 template<class T>
 Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
@@ -238,42 +197,6 @@ bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 
 #include <iterator>
 
-namespace std{
-  
-#define UNOP_DEF(fname,opname) \
-template<class T> \
-CasADi::Matrix<T> fname(const CasADi::Matrix<T>& x){ \
-  CasADi::Matrix<T> temp; \
-  temp.unary(CasADi::casadi_operators<T>::opname,x); \
-  return temp;\
-}
-
-#define BINOP_DEF(fname,opname) \
-template<class T> \
-CasADi::Matrix<T> fname(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ \
-  CasADi::Matrix<T> temp; \
-  temp.binary(CasADi::casadi_operators<T>::opname,x,y); \
-  return temp;\
-}
-
-UNOP_DEF(sin,sin)
-UNOP_DEF(cos,cos)
-UNOP_DEF(tan,tan)
-UNOP_DEF(asin,asin)
-UNOP_DEF(acos,acos)
-UNOP_DEF(atan,atan)
-UNOP_DEF(exp,exp)
-UNOP_DEF(log,log)
-UNOP_DEF(sqrt,sqrt)
-UNOP_DEF(floor,floor)
-UNOP_DEF(ceil,ceil)
-UNOP_DEF(fabs,fabs)
-UNOP_DEF(fmin,fmin)
-UNOP_DEF(fmax,fmax)
-UNOP_DEF(pow,pow)
-  
-} // namespace std
-
 namespace CasADi{
 // Implementations
 
@@ -297,6 +220,11 @@ Matrix<T> trans(const Matrix<T> &x){
 }
 
 template<class T>
+Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y){
+  return prod<T>(x,y);
+}
+
+template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   if(x.size2() != y.size1()) throw CasadiException("prod: dimension mismatch");
   
@@ -306,7 +234,7 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
 
   // Create the return object
   Matrix<T> ret(x.size1(),y.size2());
-  std::vector<int>& rowind = ret.rowind();
+  std::vector<int>& rowind = ret.sparsityRef().rowind();
 
 #ifdef LISTS_IN_PROD
   // ALTERNATIVE 1: GROWING LISTS, THEN COPY: BETTER FOR SYMBOLIC TYPES WHEN COPYING IS EXPENSIVE?
@@ -316,7 +244,7 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   std::vector<T>& ret_val = ret;
 #else // LISTS_IN_PROD
   // ALTERNATIVE 2: GROWING VECTORS: APPEARS FASTER
-  std::vector<int>& col = ret.col();
+  std::vector<int>& col = ret.sparsityRef().col();
   std::vector<T>& val = ret;
 
 #ifdef ESTIMATE_NNZ_IN_PROD
@@ -717,6 +645,17 @@ Matrix<T> norm_2(const Matrix<T>& x){
 }
 
 template<class T>
+std::vector<Matrix<T> > qr(const Matrix<T>& A){
+  // Create return value
+  std::vector<Matrix<T> > QR(2);
+  Matrix<T> &Q = QR[0];
+  Matrix<T> &R = QR[1];
+  
+  qr(A,Q,R);
+  return QR;
+}
+
+template<class T>
 void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
   // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
   int m = A.size1();
@@ -746,12 +685,12 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
 
       // Remove projection in direction j
-      qi -= T(ri(0,j)) * qj;
+      qi -= ri(0,j) * qj;
     }
 
     // Normalize qi
     ri(0,i) = norm_2(trans(qi))[0];
-    qi /= T(ri(0,i));
+    qi /= ri(0,i);
 
     // Update RT and QT
     append(QT,qi);
@@ -866,62 +805,47 @@ bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
 #ifdef SWIG
 
 // map the template name to the instantiated name
-#define MTT_INST(T,function_name,ns) \
-%template(function_name) ns::function_name<T>;
+#define MTT_INST(T,function_name) \
+%template(function_name) CasADi::function_name<T>;
 
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES(T) \
-MTT_INST(T,trans,CasADi) \
-MTT_INST(T,prod,CasADi) \
-MTT_INST(T,append,CasADi) \
-MTT_INST(T,getSub,CasADi) \
-MTT_INST(T,setSub,CasADi) \
-MTT_INST(T,getRow,CasADi) \
-MTT_INST(T,setRow,CasADi) \
-MTT_INST(T,getColumn,CasADi) \
-MTT_INST(T,setColumn,CasADi) \
-MTT_INST(T,isConstant,CasADi) \
-MTT_INST(T,isDense,CasADi) \
-MTT_INST(T,isEmpty,CasADi) \
-MTT_INST(T,isInteger,CasADi) \
-MTT_INST(T,isScalar,CasADi) \
-MTT_INST(T,isVector,CasADi) \
-MTT_INST(T,isTril,CasADi) \
-MTT_INST(T,isTriu,CasADi) \
-MTT_INST(T,sin,std) \
-MTT_INST(T,cos,std) \
-MTT_INST(T,tan,std) \
-MTT_INST(T,asin,std) \
-MTT_INST(T,acos,std) \
-MTT_INST(T,atan,std) \
-MTT_INST(T,exp,std) \
-MTT_INST(T,log,std) \
-MTT_INST(T,sqrt,std) \
-MTT_INST(T,floor,std) \
-MTT_INST(T,ceil,std) \
-MTT_INST(T,fabs,std) \
-MTT_INST(T,det,CasADi) \
-MTT_INST(T,getMinor,CasADi) \
-MTT_INST(T,cofactor,CasADi) \
-MTT_INST(T,adj,CasADi) \
-MTT_INST(T,inv,CasADi) \
-MTT_INST(T,reshape,CasADi) \
-MTT_INST(T,vec,CasADi) \
-MTT_INST(T,horzcat,CasADi) \
-MTT_INST(T,vertcat,CasADi) \
-MTT_INST(T,inner_prod,CasADi) \
-MTT_INST(T,outer_prod,CasADi) \
-MTT_INST(T,norm_2,CasADi) \
-MTT_INST(T,qr,CasADi) \
-MTT_INST(T,solve,CasADi) \
-MTT_INST(T,linspace,CasADi) \
-MTT_INST(T,isZero,CasADi) \
-MTT_INST(T,nnz,CasADi) \
-MTT_INST(T,nnz_sym,CasADi) \
-MTT_INST(T,isEqual,CasADi) \
-
-
-
+MTT_INST(T,trans) \
+MTT_INST(T,dot) \
+MTT_INST(T,append) \
+MTT_INST(T,getSub) \
+MTT_INST(T,setSub) \
+MTT_INST(T,getRow) \
+MTT_INST(T,setRow) \
+MTT_INST(T,getColumn) \
+MTT_INST(T,setColumn) \
+MTT_INST(T,isConstant) \
+MTT_INST(T,isDense) \
+MTT_INST(T,isEmpty) \
+MTT_INST(T,isInteger) \
+MTT_INST(T,isScalar) \
+MTT_INST(T,isVector) \
+MTT_INST(T,isTril) \
+MTT_INST(T,isTriu) \
+MTT_INST(T,det) \
+MTT_INST(T,getMinor) \
+MTT_INST(T,cofactor) \
+MTT_INST(T,adj) \
+MTT_INST(T,inv) \
+MTT_INST(T,reshape) \
+MTT_INST(T,vec) \
+MTT_INST(T,horzcat) \
+MTT_INST(T,vertcat) \
+MTT_INST(T,inner_prod) \
+MTT_INST(T,outer_prod) \
+MTT_INST(T,norm_2) \
+MTT_INST(T,qr) \
+MTT_INST(T,solve) \
+MTT_INST(T,linspace) \
+MTT_INST(T,isZero) \
+MTT_INST(T,nnz) \
+MTT_INST(T,nnz_sym) \
+MTT_INST(T,isEqual) \
 
 
 #endif //SWIG

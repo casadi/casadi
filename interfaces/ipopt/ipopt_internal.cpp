@@ -28,7 +28,7 @@ using namespace std;
 #include <coin/IpIpoptApplication.hpp>
 namespace CasADi{
 
-IpoptInternal::IpoptInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_) : NLPSolverInternal(F_,G_,H_,J_){
+IpoptInternal::IpoptInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_, const FX& GF_) : NLPSolverInternal(F_,G_,H_,J_,GF_){
   
   // Output
   ops_["print_level"] = OT_INTEGER;

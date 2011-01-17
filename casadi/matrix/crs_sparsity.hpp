@@ -77,11 +77,13 @@ class CRSSparsity : public SharedObject{
     /// Get a const reference to the rowindex of all row element
     const std::vector<int>& rowind() const;
     
+#ifndef SWIG
     /// Get a reference to the columns of all non-zero element (copy if not unique!)
     std::vector<int>& col();
     
     /// Get a reference to the rowindex of all row element (copy if not unique!)
     std::vector<int>& rowind();
+#endif // SWIG
     
     /// Get the column of a non-zero element
     int col(int el) const;

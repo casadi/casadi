@@ -50,10 +50,10 @@ class Element{
     //@}
 
     /// Get a reference to the element (? = A[i], ? += A[i], etc.)
-    operator T();
+    operator const T() const;
   
   private:
-    /// The value of the matrix entry
+    /// The value of the matrix entry at the time of creation
     T val_;
     
     /// A reference to the matrix that is allowed to be modified
@@ -97,12 +97,13 @@ M& Element<M,T>::operator/=(const T &y){
 }
 
 template<typename M, typename T>
-Element<M,T>::operator T(){
+Element<M,T>::operator const T() const{
   return val_;
 }
 
 template<typename M, typename T>
-Element<M,T>::Element(M& mat, int i, int j) : val_(mat_.getElement(i_,j_)), mat_(mat), i_(i), j_(j){
+Element<M,T>::Element(M& mat, int i, int j) : mat_(mat), i_(i), j_(j){
+  val_ = mat_.getElement(i,j);
 }
 
 

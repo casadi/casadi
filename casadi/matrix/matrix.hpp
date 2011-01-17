@@ -64,7 +64,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Copy constructor (normal)
     Matrix(const Matrix<T>& m);
     
-    #ifndef SWIG
+#ifndef SWIG
     /// Copy constructor (possible swap)
     Matrix(Matrix<T>& m);
     
@@ -73,7 +73,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     
     /// Assignment (possible swap)
     Matrix<T>& operator=(Matrix<T>& m);
-    #endif // SWIG
+#endif // SWIG
     
     /// empty n-by-m matrix constructor
     Matrix(int n, int m);
@@ -97,6 +97,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(const std::vector<T>& x, int n, int m);
 
 #ifndef SWIG
+    /// This constructor enables implicit type conversion from a matrix element
+    Matrix(const Element<Matrix<T>,T>& val);
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
@@ -116,7 +118,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     }
     
     /** \brief  ublas vector */
-    #ifdef HAVE_UBLAS
+#ifdef HAVE_UBLAS
     template<typename T, typename A>
     explicit Matrix<T>(const ublas::vector<A> &x) : swap_on_copy_(false){
       sparsity_ = CRSSparsity(x.size(),1,true);
@@ -131,9 +133,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
       copy(x.begin(),x.end(),std::vector<T>::begin());
       return ret;
     }
-    #endif
-
-    
+#endif // HAVE_UBLAS
 #endif // SWIG
 
     /// get the number of non-zeros
@@ -173,27 +173,6 @@ class Matrix : public std::vector<T>, public PrintableObject{
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
 #endif // SWIG
 
-#if 0
-    /// Get a non-zero entry
-    const T getitem(int k) const;
-    
-    /// Get a matrix entry
-    const T getitem(int I[2]) const;
-    
-    /// Get a slice
-    const T getslice(int start1, int stop1, int stride1, int start2, int stop2, int stride2);
-    
-    /// Set a non-zero entry
-    void setitem(int k, const T& el);
-    
-    /// Set a matrix entry
-    void setitem(int i, int j, const T&  el);
-
-    /// Set a slice
-    void setslice(int start1, int stop1, int stride1, int start2, int stop2, int stride2, const std::vector<T>& el);
-#endif    
-
-
     /// Python: get a non-zero entry
     const T __getitem__(int i) const;
     
@@ -212,30 +191,57 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Make the matrix an empty n-by-m matrix */
     void makeEmpty(int n, int m);
 
+    Matrix<T> operator+() const;
+    Matrix<T> operator-() const;
+
     /** \brief  Unary function */
+#ifndef SWIG
+    Matrix<T> unary(T (*fcn)(const T&)) const;
+    Matrix<T> binary(T (*fcn)(const T&, const T&), const Matrix<T>& y) const;
+        
     void unary(T (*fcn)(const T&), const Matrix<T>& x);
     void binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y);
     void matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y);
     void matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y);
     void scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y);
+#endif
 
-    Matrix<T> operator+() const;
-    Matrix<T> operator-() const;
-    
+    //@{
     /// Elementary operations -- Python naming
     Matrix<T> __add__(const Matrix<T> &y) const;
     Matrix<T> __sub__(const Matrix<T> &y) const;
     Matrix<T> __mul__(const Matrix<T> &y) const;
     Matrix<T> __div__(const Matrix<T> &y) const;
+    Matrix<T> __pow__(const Matrix<T>& y) const;
+    //@}
 
 #ifndef SWIG
-    /// Friend functions to allow implicit type conversion from the left and from the right
+    /// Addition
     friend Matrix<T> operator+(const Matrix<T> &x, const Matrix<T> &y){ return x.__add__(y); }
+    
+    /// Subtraction
     friend Matrix<T> operator-(const Matrix<T> &x, const Matrix<T> &y){ return x.__sub__(y); }
+    
+    /// Elementwise multiplication
     friend Matrix<T> operator*(const Matrix<T> &x, const Matrix<T> &y){ return x.__mul__(y); }
-    friend Matrix<T> operator/(const Matrix<T> &x, const Matrix<T> &y){ return x.__div__(y); }
-#endif // SWIG
 
+    /// Elementwise division
+    friend Matrix<T> operator/(const Matrix<T> &x, const Matrix<T> &y){ return x.__div__(y); }
+
+    /// In-place addition
+    Matrix<T>& operator+=(const Matrix<T> &y){return *this = this->__add__(y);}
+
+    /// In-place subtraction
+    Matrix<T>& operator-=(const Matrix<T> &y){return *this = this->__sub__(y);}
+
+    /// In-place elementwise multiplication
+    Matrix<T>& operator*=(const Matrix<T> &y){return *this = this->__mul__(y);}
+
+    /// In-place elementwise division
+    Matrix<T>& operator/=(const Matrix<T> &y){return *this = this->__div__(y);}
+#endif // SWIG
+    //@{
+    /// Python operator overloading
     Matrix<T> __add__ (const T& b) const{ return *this + b;}
     Matrix<T> __radd__(const T& b) const{ return b + *this;}
     Matrix<T> __sub__ (const T& b) const{ return *this - b;}
@@ -244,22 +250,38 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix<T> __rmul__(const T& b) const{ return b * *this;}
     Matrix<T> __div__ (const T& b) const{ return *this / b;}
     Matrix<T> __rdiv__(const T& b) const{ return b / *this;}
+    //@}
     
-    Matrix<T>& operator+=(const Matrix<T> &y);
-    Matrix<T>& operator-=(const Matrix<T> &y);
-    Matrix<T>& operator*=(const Matrix<T> &y);
-    Matrix<T>& operator/=(const Matrix<T> &y);
+    //@{
+    /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
+    Matrix<T> sin() const;
+    Matrix<T> cos() const;
+    Matrix<T> tan() const;
+    Matrix<T> arcsin() const;
+    Matrix<T> arccos() const;
+    Matrix<T> arctan() const;
+    Matrix<T> exp() const;
+    Matrix<T> log() const;
+    Matrix<T> sqrt() const;
+    Matrix<T> floor() const;
+    Matrix<T> ceil() const;
+    Matrix<T> fabs() const;
+    Matrix<T> fmin(const Matrix<T>& y) const;
+    Matrix<T> fmax(const Matrix<T>& y) const;
+    //@}
     
     //@{
     /// Printing
 #ifndef SWIG
     virtual void print(std::ostream &stream=std::cout) const; // print default style
 #endif
+    std::string __repr__() { return getRepresentation(); } // python default print (calls print())
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
     void printVector(std::ostream &stream=std::cout) const; // print vector-style
     void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
     void printSparse(std::ostream &stream=std::cout) const; // print the non-zeros
     //@}
+
 
     /** \brief Swap the the vector content upon the next copy assignment, saves a copy operation: 
     After the copy operation has taken place, the object can not be used for anything,
@@ -270,23 +292,19 @@ class Matrix : public std::vector<T>, public PrintableObject{
     // Get the sparsity pattern
     const std::vector<int>& col() const;
     const std::vector<int>& rowind() const;
-    std::vector<int>& col();
-    std::vector<int>& rowind();
     int col(int el) const;
     int rowind(int row) const;
-    
-    std::string __repr__() { return getRepresentation(); }
-    
     void clear();
     void resize(int n, int m);
     void reserve(int nnz);
     void reserve(int nnz, int nrow);
     
-    /// Access the sparsity
+    /// Const access the sparsity
     const CRSSparsity& sparsity() const;
     
-    // The following need cleaning up
-
+    /// Access the sparsity, make a copy if there are multiple references to it
+    CRSSparsity& sparsityRef();
+    
     /** \brief  Set the non-zero elements, scalar */
     void set(T val, Sparsity sp=SPARSE);
     
@@ -299,19 +317,13 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<T>& val, Sparsity sp=SPARSE) const;
 
-    /** \brief  Set the non-zero elements, matrix */
-    //void set(const Matrix<T>& val);
-
-    /** \brief  Get the non-zero elements, matrix */
-    //void get(Matrix<T>& val) const;
-
-    #ifndef SWIG
+#ifndef SWIG
     /** \brief  Get the non-zero elements, array */
     void get(T* val, Sparsity sp=SPARSE) const;    
 
     /** \brief  Set the non-zero elements, array */
     void set(const T* val, Sparsity sp=SPARSE);
-    #endif
+#endif
 
     /** \brief  Get the result */
     void getSparseSym(T *res) const;    // general sparse, symmetric matrix
@@ -330,14 +342,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void assertNNZ(int sz, Sparsity sp) const;
     void assertNumEl(int sz) const;
     
-    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
     
     /// Swap the content of the vector upon the next copy action
-    bool swap_on_copy_;
-
+    bool swap_on_copy_; // NOTE: C++ language standard allows compilers to arbitrary skip copy constructors - this makes this functionality possibly dangerous!
 };
 
 } // namespace CasADi
@@ -355,25 +365,57 @@ namespace CasADi{
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
 #endif // SWIG
 
+// The following functions must be placed in the standard namespace so that the old ones are not shadowed when CasADi namespace is used
+#ifndef SWIG
+namespace std{
 
+  template<class T>
+  CasADi::Matrix<T> sin(const CasADi::Matrix<T>& x){ return x.sin(); }
 
-// #ifdef SWIG
-// %extend Matrix<T>{
-// T __getitem__(const std::vector<PyObject*> &I ) {
-//   throw CasadiException("ok!");
-// }
-// }
-// // 
-// #endif // SWIG
+  template<class T>
+  CasADi::Matrix<T> cos(const CasADi::Matrix<T>& x){ return x.cos(); }
 
+  template<class T>
+  CasADi::Matrix<T> tan(const CasADi::Matrix<T>& x){ return x.tan(); }
 
+  template<class T>
+  CasADi::Matrix<T> asin(const CasADi::Matrix<T>& x){ return x.arcsin(); }
 
-// #ifdef SWIG
-// %extend Matrix<T> {
-// std::string __str__() { return $self->getDescription(); }
-// std::string __repr__() { return $self->getRepresentation(); }
-// }
-// #endif // SWIG
+  template<class T>
+  CasADi::Matrix<T> acos(const CasADi::Matrix<T>& x){ return x.arccos(); }
+
+  template<class T>
+  CasADi::Matrix<T> atan(const CasADi::Matrix<T>& x){ return x.arctan(); }
+
+  template<class T>
+  CasADi::Matrix<T> exp(const CasADi::Matrix<T>& x){ return x.exp();}
+
+  template<class T>
+  CasADi::Matrix<T> log(const CasADi::Matrix<T>& x){ return x.log(); }
+
+  template<class T>
+  CasADi::Matrix<T> sqrt(const CasADi::Matrix<T>& x){ return x.sqrt();}
+
+  template<class T>
+  CasADi::Matrix<T> floor(const CasADi::Matrix<T>& x){ return x.floor();}
+
+  template<class T>
+  CasADi::Matrix<T> ceil(const CasADi::Matrix<T>& x){ return x.ceil();}
+
+  template<class T>
+  CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
+
+  template<class T>
+  CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
+
+  template<class T>
+  CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
+
+  template<class T>
+  CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__pow__(y);}
+  
+} // namespace std
+#endif // SWIG
 
 #ifndef SWIG
 namespace CasADi{
@@ -381,7 +423,7 @@ namespace CasADi{
 
 template<class T>
 const T Matrix<T>::getElement(int i, int j) const{
-  int ind = sparsity_.getNZ(i,j);
+  int ind = sparsity().getNZ(i,j);
   if(ind==-1)
     return 0;
   else
@@ -395,9 +437,9 @@ void Matrix<T>::setElement(int i, int j, const T& el){
 
 template<class T>
 T& Matrix<T>::getElementRef(int i, int j){
-  int oldsize = sparsity_.size();
-  int ind = sparsity_.getNZ(i,j);
-  if(oldsize != sparsity_.size())
+  int oldsize = sparsity().size();
+  int ind = sparsityRef().getNZ(i,j);
+  if(oldsize != sparsity().size())
     std::vector<T>::insert(std::vector<T>::begin()+ind,0);
   return std::vector<T>::at(ind);
 }
@@ -475,15 +517,15 @@ Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : std::vector<T>(x){
 template<class T>
 Matrix<T>::Matrix(Matrix<T>& m){
   swap_on_copy_ = false;
-  if(m.swap_on_copy_){
+/*  if(m.swap_on_copy_){
     // Swap the vector with m
     m.swap(*this);
     m.sparsity_.swap(sparsity_);
-  } else {
+  } else {*/
     // Copy the content
     static_cast<std::vector<T>&>(*this) = m;
     sparsity_ = m.sparsity_; // shallow copy!
-  }
+/*  }*/
 }
 
 template<class T>
@@ -494,15 +536,15 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
 
 template<class T>
 Matrix<T>& Matrix<T>::operator=(Matrix<T>& m){
-  if(m.swap_on_copy_){
+/*  if(m.swap_on_copy_){
     // Swap the vector with m
     m.swap(*this);
     m.sparsity_.swap(sparsity_);
-  } else {
+  } else {*/
     // Copy the content
     static_cast<std::vector<T>&>(*this) = m;
     sparsity_ = m.sparsity_; // shallow copy!
-  }
+/*  }*/
 }
 
 template<class T>
@@ -593,21 +635,11 @@ void Matrix<T>::print(std::ostream &stream) const{
 
 template<class T>
 const std::vector<int>& Matrix<T>::col() const{
-  return sparsity_.col();
-}
-
-template<class T>
-std::vector<int>& Matrix<T>::col(){
-  return sparsity_.col();
+  return sparsity().col();
 }
 
 template<class T>
 const std::vector<int>& Matrix<T>::rowind() const{
-  return sparsity_.rowind();
-}
-
-template<class T>
-std::vector<int>& Matrix<T>::rowind(){
   return sparsity_.rowind();
 }
 
@@ -641,6 +673,12 @@ template<class T>
 void Matrix<T>::clear(){
   sparsity_ = CRSSparsity(0,0,false);
   std::vector<T>::clear();
+}
+
+template<class T>
+Matrix<T>::Matrix(const Element<Matrix<T>,T>& val) : swap_on_copy_(false){
+  sparsity_ = CRSSparsity(1,1,true);
+  std::vector<T>::resize(1,T(val));
 }
 
 template<class T>
@@ -690,6 +728,13 @@ void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){
 }
 
 template<class T>
+Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{
+  Matrix<T> temp;
+  temp.unary(fcn,*this);
+  return temp;
+}
+
+template<class T>
 void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
   // First check the value of the zero-entries
   T fcn_0 = fcn(0);
@@ -710,6 +755,13 @@ void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
       }
     }
   }
+}
+
+template<class T>
+Matrix<T> Matrix<T>::binary(T (*fcn)(const T&, const T&), const Matrix<T>& y) const{
+  Matrix<T> temp;
+  temp.binary(fcn,*this,y);
+  return temp;
 }
 
 template<class T>
@@ -764,6 +816,12 @@ void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, 
 template<class T>
 void Matrix<T>::matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
 if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matrix_matrix: dimension mismatch");
+  // Make a deep copy if *this and x or y is the same object
+  if(this == &x)
+    *this = x;
+  else if(this == &y)
+    *this = y;
+
   T fcn_0_0 = fcn(0,0);
   if(casadi_limits<T>::isZero(fcn_0_0))
     // Start with an empty matrix: all elements are added to the end!
@@ -831,36 +889,42 @@ Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
   return r;
 }
 
-template<class T>
-Matrix<T>& Matrix<T>::operator+=(const Matrix<T> &y){
-  Matrix<T> x = *this;
-  binary(casadi_operators<T>::add,x,y);
-  return *this;
-}
-
-template<class T>
-Matrix<T>& Matrix<T>::operator-=(const Matrix<T> &y){
-  Matrix<T> x = *this;
-  binary(casadi_operators<T>::sub,x,y);
-  return *this;
-}
-
-template<class T>
-Matrix<T>& Matrix<T>::operator*=(const Matrix<T> &y){
-  Matrix<T> x = *this;
-  binary(casadi_operators<T>::mul,x,y);
-  return *this;
-}
-
-template<class T>
-Matrix<T>& Matrix<T>::operator/=(const Matrix<T> &y){
-  Matrix<T> x = *this;
-  binary(casadi_operators<T>::div,x,y);
-  return *this;
-}
+// template<class T>
+// Matrix<T>& Matrix<T>::operator+=(const double &y){
+//   Matrix<T> x = *this;
+//   binary(casadi_operators<T>::add,x,y);
+//   return *this;
+// }
+// 
+// template<class T>
+// Matrix<T>& Matrix<T>::operator-=(const double &y){
+//   Matrix<T> x = *this;
+//   binary(casadi_operators<T>::sub,x,y);
+//   return *this;
+// }
+// 
+// template<class T>
+// Matrix<T>& Matrix<T>::operator*=(const double &y){
+//   Matrix<T> x = *this;
+//   binary(casadi_operators<T>::mul,x,y);
+//   return *this;
+// }
+// 
+// template<class T>
+// Matrix<T>& Matrix<T>::operator/=(const double &y){
+//   Matrix<T> x = *this;
+//   binary(casadi_operators<T>::div,x,y);
+//   return *this;
+// }
 
 template<class T>
 const CRSSparsity& Matrix<T>::sparsity() const{
+  return sparsity_;
+}
+
+template<class T>
+CRSSparsity& Matrix<T>::sparsityRef(){
+  sparsity_.makeUnique();
   return sparsity_;
 }
 
@@ -1021,6 +1085,85 @@ void Matrix<T>::assertNumEl(int sz) const{
     throw CasadiException(ss.str());
   }
 }
+
+template<class T>
+Matrix<T> Matrix<T>::__pow__(const Matrix<T>& y) const{
+  return binary(CasADi::casadi_operators<T>::pow,y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sin() const{
+  return unary(CasADi::casadi_operators<T>::sin);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::cos() const{
+  return unary(CasADi::casadi_operators<T>::cos);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::tan() const{
+  return unary(CasADi::casadi_operators<T>::tan);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arcsin() const{
+  return unary(CasADi::casadi_operators<T>::tan);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arccos() const{
+  return unary(CasADi::casadi_operators<T>::acos);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arctan() const{
+  return unary(CasADi::casadi_operators<T>::atan);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::exp() const{
+  return unary(CasADi::casadi_operators<T>::exp);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::log() const{
+  return unary(CasADi::casadi_operators<T>::log);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sqrt() const{
+  return unary(CasADi::casadi_operators<T>::sqrt);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::floor() const{
+  return unary(CasADi::casadi_operators<T>::floor);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::ceil() const{
+  return unary(CasADi::casadi_operators<T>::ceil);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::fabs() const{
+  return unary(CasADi::casadi_operators<T>::fabs);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
+  return binary(CasADi::casadi_operators<T>::fmin, y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
+  return binary(CasADi::casadi_operators<T>::fmax, y);
+}
+
+
+
+
 
 } // namespace CasADi
 #endif // SWIG

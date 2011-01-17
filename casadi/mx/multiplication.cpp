@@ -46,6 +46,7 @@ void Multiplication::print(std::ostream &stream) const{
 }
 
 void Multiplication::matrix_matrix_mult(const vector<double>& t1, const vector<double>& t2, vector<double>& t3){
+  // NOTE: Remove as it does not exploit sparsity - use a method in Matrix<> instead!
   // t3 = t1*t2
   for(int i=0; i<ni; ++i)
     for(int j=0; j<nj; ++j)
@@ -54,6 +55,7 @@ void Multiplication::matrix_matrix_mult(const vector<double>& t1, const vector<d
 }
 
 void Multiplication::matrix_matrix_mult1(vector<double>& t1, const vector<double>& t2, const vector<double>& t3){
+  // NOTE: Remove as it does not exploit sparsity - use a method in Matrix<> instead!
   // t1 = t3*trans(t2)
   for(int i=0; i<ni; ++i)
     for(int k=0; k<nk; ++k)
@@ -62,6 +64,7 @@ void Multiplication::matrix_matrix_mult1(vector<double>& t1, const vector<double
 }
 
 void Multiplication::matrix_matrix_mult2(const vector<double>& t1, vector<double>& t2, const vector<double>& t3){
+  // NOTE: Remove as it does not exploit sparsity - use a method in Matrix<> instead!
   // t2 = trans(t1)*t3
   for(int k=0; k<nk; ++k)
     for(int j=0; j<nj; ++j)

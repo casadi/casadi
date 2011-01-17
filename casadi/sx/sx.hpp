@@ -190,6 +190,9 @@ class SX{
   SX sub(const SX& y) const;
   SX mul(const SX& y) const;
   SX div(const SX& y) const;
+  SX fmin(const SX &b) const;
+  SX fmax(const SX &b) const;
+  SX pow(const SX& n) const;
   
   protected:
 #ifndef SWIG
@@ -377,14 +380,14 @@ inline SX asin(const SX &x){return x.arcsin();}
 inline SX acos(const SX &x){return x.arccos();}
 inline SX exp(const SX &x){return x.exp();}
 inline SX log(const SX &x){return x.log();}
-SX pow(const SX &x, const SX &n);
+inline SX pow(const SX &x, const SX &n){ return x.pow(n);}
 inline SX abs(const SX &x){return x.fabs();}
 inline SX fabs(const SX &x){return x.fabs();}
 inline SX floor(const SX &x){return x.floor();}
 inline SX ceil(const SX &x){return x.ceil();}
 inline SX erf(const SX &x){return x.erf();}
-SX fmin(const SX &a, const SX &b);
-SX fmax(const SX &a, const SX &b);
+inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
+inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
 #undef SX
 } // namespace std
 

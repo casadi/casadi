@@ -44,7 +44,7 @@ SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& out
     output(i).setSize(grid_.size(),output_fcn_->output(i).get().numel());
 }
   
-SimulatorInternal::~SimulatorInternal(){ 
+SimulatorInternal::~SimulatorInternal(){
 }
 
 void SimulatorInternal::init(){

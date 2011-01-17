@@ -37,7 +37,7 @@ class IpoptInternal : public NLPSolverInternal{
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J);
+  explicit IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
   virtual ~IpoptInternal();
 
 virtual void init();

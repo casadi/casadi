@@ -34,23 +34,23 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: c.prod(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"prod(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
+    print "ss"
     
     
   def test_scalarSX(self):
-      x=SXMatrix("x")
+      x=symbolic("x")
       x0=0.738
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
       
   def test_gradient(self):
-      x=SXMatrix("x");
+      x=symbolic("x");
       x0=1;
       p=10 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
       dxr=p;
       self.evaluationCheck([dx],dxr,[x],x0,name="jacobian");
-      
       dxr=1
       for i in list(range(p)):
         y=jacobian(y,x)
@@ -60,8 +60,8 @@ class SXtests(casadiTestCase):
       self.evaluationCheck([y],dxr,[x],x0,name="recursive jacobian");
 
   def test_gradient2(self):
-      x=SXMatrix("x");
-      p=SXMatrix("p");
+      x=symbolic("x");
+      p=symbolic("p");
       x0=1;
       p0=10 # increase to 20 to showcase ticket #56
       y=x**p;
@@ -78,27 +78,27 @@ class SXtests(casadiTestCase):
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
   def test_SXMatrix(self):
-      x=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix")
       
-      x=SXMatrix("x",3,3)
+      x=symbolic("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: SXMatrix(c.det(x[0])), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
         
   def test_SXMatrixbinary(self):
-      x=SXMatrix("x",3,2)
-      y=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
+      y=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
       self.assertRaises(RuntimeError, lambda : c.prod(x,y))
       
   def test_SXMatrixslicing(self):
-      x=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       for i in range(3):
@@ -122,7 +122,7 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
       
   def test_SXMAtrixSparse(self):
-      x=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix_sparse")

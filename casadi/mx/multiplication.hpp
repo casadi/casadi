@@ -25,6 +25,11 @@
 
 #include "mx_node.hpp"
 
+/* NOTE: This class has not yet been restructured to
+  1. Deal with sparsity
+  2. Use generic methods from Matrix<>
+*/
+
 namespace CasADi{
 /** \brief Represents matrix products
   \author Joel Andersson 

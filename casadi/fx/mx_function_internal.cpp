@@ -90,6 +90,8 @@ void MXFunctionInternal::makeAlgorithm(MXNode* root, vector<MXNode*> &nodes, map
 }
 
 void MXFunctionInternal::init(){
+  log("MXFunctionInternal::init begin");
+  
   // Call the init function of the base class
   FXInternal::init();
 
@@ -99,9 +101,8 @@ void MXFunctionInternal::init(){
   std::vector<MXNode*> nodes;
 
   // Order all nodes of a matrix syntax tree in the order of calculation
-  for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it){
+  for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
     makeAlgorithm(it->get(), nodes, nodemap);
-  }
 
   // Create runtime elements for each node
   alg.resize(nodes.size());
@@ -118,6 +119,8 @@ void MXFunctionInternal::init(){
 
     nodes[i]->init();
   }
+  
+  log("MXFunctionInternal::init end");
 }
 
 bool MXFunctionInternal::hasEl(const MX& mx) const{
@@ -154,6 +157,7 @@ int MXFunctionInternal::findEl(const MX& mx) const{
 // }
 
 void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
+  log("MXFunctionInternal::evaluate begin");
   assert(fsens_order==0 || nfdir_==1);
 
   // Pass the inputs
@@ -202,24 +206,19 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
       inputv[ind]->getAdjSens(input(ind).getAdj());
     
     }
+  log("MXFunctionInternal::evaluate end");
 }
 
-void MXFunctionInternal::printAlgorithm(ostream &stream){
+void MXFunctionInternal::print(ostream &stream) const{
   int algcount = 0;
-  for(vector<MX>::const_iterator it=alg.begin(); it!=alg.end(); ++it)
-    cout << "[" << algcount++ << "]: " << *it << endl;
+  for(vector<MX>::const_iterator it=alg.begin(); it!=alg.end(); ++it){
+    stream << "[" << algcount << "]: " << *it << ", " << (*it)->output() << endl;
+    algcount++;
+  }
 }
 
-void MXFunctionInternal::printValues(int ord, ostream &stream){
-  int algcount = 0;
-  for(vector<MX>::const_iterator it=alg.begin(); it!=alg.end(); ++it)
-    cout << "[" << algcount++ << "]: " << (*it)->output() << endl;
-}
-
-void MXFunctionInternal::print(std::ostream &stream) const{
-  FXInternal::print(stream);
-  stream << "input = " << inputv << endl;
-  stream << "output = " << outputv << endl;  
+void MXFunctionInternal::repr(std::ostream &stream) const{
+  stream << "MXFunction \"" << getOption("name") << "\"";
 }
 
 MXFunctionInternal* MXFunctionInternal::clone() const{

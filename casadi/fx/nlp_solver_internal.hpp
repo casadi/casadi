@@ -35,7 +35,7 @@ namespace CasADi{
 class NLPSolverInternal : public FXInternal{
 
 public:
-  explicit NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J);
+  explicit NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
   virtual ~NLPSolverInternal() = 0;
 
   virtual void init();
@@ -52,6 +52,8 @@ protected:
   FX H_;
   /// Jacobian of the constraint function
   FX J_; 
+  /// Gradient of the objective function
+  FX GF_; 
 
 };
 

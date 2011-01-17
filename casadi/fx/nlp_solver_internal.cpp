@@ -25,7 +25,7 @@
 using namespace std;
 namespace CasADi{
 
-NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
+NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
     
@@ -72,6 +72,7 @@ void NLPSolverInternal::init(){
   if(!G_.isNull()) G_.init();
   if(!J_.isNull()) J_.init();
   if(!H_.isNull()) H_.init();
+  if(!GF_.isNull()) GF_.init();
 }
 
 
