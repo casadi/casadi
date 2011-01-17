@@ -87,24 +87,27 @@ public:
   const Matrix<double>& output() const;
   Matrix<double>& output();
   
-  const std::vector<double>& input(int ind) const;
-  std::vector<double>& input(int ind);
+  const Matrix<double>& input(int ind) const;
+  Matrix<double>& input(int ind);
   
-  const std::vector<double>& fwdSeed(int ind, int dir=0) const;
-  std::vector<double>& fwdSeed(int ind, int dir=0);
+  const Matrix<double>& fwdSeed(int ind, int dir=0) const;
+  Matrix<double>& fwdSeed(int ind, int dir=0);
 
-  const std::vector<double>& adjSeed(int dir=0) const;
-  std::vector<double>& adjSeed(int dir=0);
+  const Matrix<double>& adjSeed(int dir=0) const;
+  Matrix<double>& adjSeed(int dir=0);
   
-  const std::vector<double>& fwdSens(int dir=0) const;
-  std::vector<double>& fwdSens(int dir=0);
+  const Matrix<double>& fwdSens(int dir=0) const;
+  Matrix<double>& fwdSens(int dir=0);
 
-  const std::vector<double>& adjSens(int ind, int dir=0) const;
-  std::vector<double>& adjSens(int ind, int dir=0);
+  const Matrix<double>& adjSens(int ind, int dir=0) const;
+  Matrix<double>& adjSens(int ind, int dir=0);
 
   protected:
     /// Set size
     void setSize(int nrow, int ncol);
+    
+    /// Set the sparsity
+    void setSparsity(const CRSSparsity& sparsity);
     
     /// Set unary dependency
     void setDependencies(const MX& dep);

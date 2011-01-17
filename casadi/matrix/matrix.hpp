@@ -154,6 +154,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     bool empty() const; // is the matrix empty
     bool scalar() const; // is the matrix scalar
     bool vector() const; // is the matrix a vector
+    bool dense() const; // is the matrix dense
     //@}
 
 
@@ -530,6 +531,11 @@ bool Matrix<T>::scalar() const{
 template<class T>
 bool Matrix<T>::vector() const{
   return size2()==1;
+}
+
+template<class T>
+bool Matrix<T>::dense() const{
+  return size()==numel();
 }
 
 template<class T>

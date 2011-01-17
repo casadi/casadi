@@ -21,8 +21,8 @@
  */
 
 #include "multiplication.hpp"
+#include "../matrix/matrix_tools.hpp"
 #include <vector>
-#include <cassert>
 
 using namespace std;
 
@@ -32,9 +32,6 @@ Multiplication::Multiplication(const MX& x, const MX& y){
   setDependencies(x,y);
   if(x.size2() != y.size1()) throw CasadiException("Multiplication::dimension mismatch");
   setSize(x.size1(),y.size2());
-  ni = dep(0).size1();
-  nk = dep(0).size2();
-  nj = dep(1).size2();
 }
 
 Multiplication* Multiplication::clone() const{
@@ -45,62 +42,32 @@ void Multiplication::print(std::ostream &stream) const{
   stream << "prod(" << dep(0) << "," << dep(1) << ")";
 }
 
-void Multiplication::matrix_matrix_mult(const vector<double>& t1, const vector<double>& t2, vector<double>& t3){
-  // NOTE: Remove as it does not exploit sparsity - use a method in Matrix<> instead!
-  // t3 = t1*t2
-  for(int i=0; i<ni; ++i)
-    for(int j=0; j<nj; ++j)
-      for(int k=0; k<nk; ++k)
-        t3[i + ni*j] += t1[i + ni*k]*t2[k + nk*j];
-}
-
-void Multiplication::matrix_matrix_mult1(vector<double>& t1, const vector<double>& t2, const vector<double>& t3){
-  // NOTE: Remove as it does not exploit sparsity - use a method in Matrix<> instead!
-  // t1 = t3*trans(t2)
-  for(int i=0; i<ni; ++i)
-    for(int k=0; k<nk; ++k)
-      for(int j=0; j<nj; ++j)
-        t1[i + ni*k] += t3[i + ni*j]*t2[k + nk*j];
-}
-
-void Multiplication::matrix_matrix_mult2(const vector<double>& t1, vector<double>& t2, const vector<double>& t3){
-  // NOTE: Remove as it does not exploit sparsity - use a method in Matrix<> instead!
-  // t2 = trans(t1)*t3
-  for(int k=0; k<nk; ++k)
-    for(int j=0; j<nj; ++j)
-      for(int i=0; i<ni; ++i)
-        t2[k + nk*j] += t1[i + ni*k]*t3[i + ni*j];
-}
-
 
 void Multiplication::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  
-  if(fsens_order==0){
   // Erase result
-  for(vector<double>::iterator it=output().begin(); it!=output().end(); ++it) *it = 0; 
-
+  fill(output().begin(), output().end(), 0);
+  
   // Matrix multiplication
   matrix_matrix_mult(input(0),input(1),output());
-} else {
+  
+  if(fsens_order>0){
+    // Erase result
+    fill(fwdSens().begin(), fwdSens().end(), 0);
 
-  //   // Erase result
-//   for(vector<double>::iterator it=res.begin(); it!=res.end(); ++it) *it = 0; 
+    // Matrix multiplication, first argument
+    matrix_matrix_mult(fwdSeed(0),input(1),fwdSens());
 
-  // Matrix multiplication, first argument
-  matrix_matrix_mult(fwdSeed(0),input(1),fwdSens());
+    // Matrix multiplication, second argument
+    matrix_matrix_mult(input(0),fwdSeed(1),fwdSens());
+  }
+  
+  if(asens_order>0){
+    // Matrix multiplication, first argument
+    matrix_matrix_trans_mult(adjSeed(),input(1),adjSens(0));
 
-  // Matrix multiplication, second argument
-  matrix_matrix_mult(input(0),fwdSeed(1),fwdSens());
-}
-
-if(asens_order>0){
-  // Matrix multiplication, first argument
-  matrix_matrix_mult1(adjSens(0),input(1),adjSeed());
-
-  // Matrix multiplication, second argument
-  matrix_matrix_mult2(input(0),adjSens(1),adjSeed());
-}
+    // Matrix multiplication, second argument
+    matrix_trans_matrix_mult(input(0),adjSeed(),adjSens(1));
+  }
 }
 
 

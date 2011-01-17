@@ -189,6 +189,18 @@ int nnz_sym(const Matrix<T>& ex);
 template<class T>
 bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 
+/** \brief  z += x*y: with x and y given (currently only if dense) */
+template<class T>
+void matrix_matrix_mult(const Matrix<T>& x, const Matrix<T>& y, Matrix<T>& z);
+
+/** \brief  z += x*trans(y): with x and y and (currently only if dense) */
+template<class T>
+void matrix_matrix_trans_mult(const Matrix<T>& x, const Matrix<T>& y_trans, Matrix<T>& z);
+
+/** \brief  z += trans(x)*y with x and y givem (currently only if dense)*/
+template<class T>
+void matrix_trans_matrix_mult(const Matrix<T>& x_trans, const Matrix<T>& y, Matrix<T>& z);
+
 } // namespace CasADi
 
 #ifndef SWIG
@@ -793,6 +805,55 @@ bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
   Matrix<T> difference = ex1 - ex2;  
   return isZero(difference);
 }
+
+template<class T>
+void matrix_matrix_mult(const Matrix<T>& x, const Matrix<T>& y, Matrix<T>& z){
+  //dimensions
+  int ni = x.size1();
+  int nk = x.size2();
+  int nj = y.size2();
+  if(x.dense() && y.dense() && z.dense()){
+    for(int j=0; j<nj; ++j)
+      for(int k=0; k<nk; ++k)
+        for(int i=0; i<ni; ++i)
+          z[i + ni*j] += x[i + ni*k]*y[k + nk*j];
+  } else {
+    throw CasadiException("matrix_matrix_mult: not dense");
+  }
+}
+
+template<class T>
+void matrix_matrix_trans_mult(const Matrix<T>& x, const Matrix<T>& y_trans, Matrix<T>& z){
+  //dimensions
+  int ni = z.size1();
+  int nk = z.size2();
+  int nj = y_trans.size2();
+  if(x.dense() && y_trans.dense() && z.dense()){
+    for(int j=0; j<nj; ++j)
+      for(int k=0; k<nk; ++k)
+        for(int i=0; i<ni; ++i)
+          z[i + ni*k] += x[i + ni*j]*y_trans[k + nk*j];
+  } else {
+    throw CasadiException("matrix_matrix_trans_mult: not dense");
+  }
+}
+
+template<class T>
+void matrix_trans_matrix_mult(const Matrix<T>& x_trans, const Matrix<T>& y, Matrix<T>& z){
+  //dimensions
+  int ni = x_trans.size1();
+  int nk = x_trans.size2();
+  int nj = z.size2();
+  if(x_trans.dense() && y.dense() && z.dense()){
+    for(int j=0; j<nj; ++j)
+      for(int k=0; k<nk; ++k)
+        for(int i=0; i<ni; ++i)
+          z[k + nk*j] += x_trans[i + ni*k]*y[i + ni*j];
+  } else {
+    throw CasadiException("matrix_trans_matrix_mult: not dense");
+  }
+}
+
 
 
 } // namespace CasADi

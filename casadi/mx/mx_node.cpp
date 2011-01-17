@@ -105,11 +105,11 @@ void MXNode::init(){
     adjoint_seeds_[dir] = output_;
 }
 
-const std::vector<double>& MXNode::input(int ind) const{
+const Matrix<double>& MXNode::input(int ind) const{
   return dep_.at(ind)->output();
 }
 
-std::vector<double>& MXNode::input(int ind){
+Matrix<double>& MXNode::input(int ind){
   return dep_.at(ind)->output();
 }
 
@@ -121,40 +121,44 @@ Matrix<double>& MXNode::output(){
   return output_;
 }
   
-const std::vector<double>& MXNode::fwdSeed(int ind, int dir) const{
+const Matrix<double>& MXNode::fwdSeed(int ind, int dir) const{
   return dep_.at(ind)->fwdSens(dir);
 }
 
-std::vector<double>& MXNode::fwdSeed(int ind, int dir){
+Matrix<double>& MXNode::fwdSeed(int ind, int dir){
   return dep_.at(ind)->fwdSens(dir);
 }
 
-const std::vector<double>& MXNode::adjSeed(int dir) const{
+const Matrix<double>& MXNode::adjSeed(int dir) const{
   return adjoint_seeds_.at(dir);
 }
 
-std::vector<double>& MXNode::adjSeed(int dir){
+Matrix<double>& MXNode::adjSeed(int dir){
   return adjoint_seeds_.at(dir);
 }
   
-const std::vector<double>& MXNode::fwdSens(int dir) const{
+const Matrix<double>& MXNode::fwdSens(int dir) const{
   return forward_sensitivities_.at(dir);
 }
 
-std::vector<double>& MXNode::fwdSens(int dir){
+Matrix<double>& MXNode::fwdSens(int dir){
   return forward_sensitivities_.at(dir);
 }
 
-const std::vector<double>& MXNode::adjSens(int ind, int dir) const{
+const Matrix<double>& MXNode::adjSens(int ind, int dir) const{
   return dep_.at(ind)->adjSeed(dir);
 }
 
-std::vector<double>& MXNode::adjSens(int ind, int dir){
+Matrix<double>& MXNode::adjSens(int ind, int dir){
   return dep_.at(ind)->adjSeed(dir);
 }
 
 void MXNode::setSize(int nrow, int ncol){
   output_ = Matrix<double>(nrow,ncol,0);
+}
+
+void MXNode::setSparsity(const CRSSparsity& sparsity){
+  setSize(sparsity.size1(),sparsity.size2());
 }
 
 void MXNode::setDependencies(const MX& dep){

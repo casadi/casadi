@@ -79,12 +79,10 @@ void MXConstant::print(std::ostream &stream) const{
 }
 
 void MXConstant::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0){
-    output() = data; // todo: change to copy!
-  } else {
-    vector<double>& res = fwdSens();
-    for(vector<double>::iterator it=res.begin(); it!=res.end(); ++it) 
-      *it = 0;
+/*  cout << "evaluating constant" << endl;*/
+  copy(data.begin(),data.end(),output().begin());
+  if(fsens_order>0){
+    fill(fwdSens().begin(),fwdSens().end(),0);
   }
 }
 

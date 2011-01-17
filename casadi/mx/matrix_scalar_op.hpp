@@ -31,26 +31,23 @@ namespace CasADi{
   \date 2010
 */	
 class MatrixScalarOp : public MXNode{
-public:
+  public:
 
-/** \brief  Constructor */
-MatrixScalarOp (OPERATION op, const MX& x, const MX& y);
+    /** \brief  Constructor */
+    MatrixScalarOp (OPERATION op, const MX& x, const MX& y);
 
-/** \brief  Clone function */
-virtual MatrixScalarOp * clone() const;
+    /** \brief  Clone function */
+    virtual MatrixScalarOp * clone() const;
 
-/** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
+    /** \brief  Print */
+    virtual void print(std::ostream &stream=std::cout) const;
 
-/** \brief  Evaluate the function and store the result in the node */
-  virtual void evaluate(int fsens_order, int asens_order);
-
-/** \brief  Evaluate the adjoint gradient and add the result in the dependency nodes */
-//  virtual void evaluateAdj();
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(int fsens_order, int asens_order);
   
-protected:
+  protected:
 
-  OPERATION op;
+    OPERATION op;
 };
 
 } // namespace CasADi

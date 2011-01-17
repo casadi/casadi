@@ -524,7 +524,6 @@ void IdasInternal::initAdj(){
 }
 
 
-static int counter = 0;
 void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
 
   // Get time
@@ -546,8 +545,19 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
   // Check the result for consistency
   for(int i=0; i<ny_+nz_; ++i){
     if(isnan(r[i]) || isinf(r[i])){
-      if(verbose_)
-        cerr << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << "." << endl;
+      if(verbose_){
+        stringstream ss;
+        ss << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << ".";
+        log("IdasInternal::res",ss.str());
+        if(monitored("IdasInternal::res")){
+          cout << "DAE_T    = " << t << endl;
+          cout << "DAE_Y    = " << f_.argument(DAE_Y) << endl;
+          cout << "DAE_YDOT = " << f_.argument(DAE_YDOT) << endl;
+          cout << "DAE_Z    = " << f_.argument(DAE_Z) << endl;
+          cout << "DAE_P    = " << f_.argument(DAE_P) << endl;
+          cout << "residual = " << f_.result() << endl;
+        }
+      }
       throw 1;
     }
   }

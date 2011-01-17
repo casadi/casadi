@@ -44,14 +44,18 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
   
   // Pass the input to the function
   for(int i=0; i<ndep(); ++i)
-    if(!dep(i).isNull())
+    if(!dep(i).isNull()){
       fcn_.setInput(input(i),i);
+/*      cout << fcn_.argument(i) << endl;*/
+    }
 
   // Give the forward seed to the function
   if(fsens_order>0)
     for(int i=0; i<ndep(); ++i)
-      if(!dep(i).isNull())
+      if(!dep(i).isNull()){
         fcn_.setFwdSeed(fwdSeed(i),i);
+ /*       cout << fcn_.fwdSeed(i) << endl;
+ */     }
 
   // Pass the adjoint seed to the function
   if(asens_order>0)
@@ -64,8 +68,10 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
   fcn_.getOutput(output(),oind);
 
   // Fwd sens
-  if(fsens_order>0)
+  if(fsens_order>0){
     fcn_.getFwdSens(fwdSens(),oind);
+/*    cout << fcn_.fwdSens() << endl;*/
+  }
 
   // Adjoint sens
   if(asens_order>0)
