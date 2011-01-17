@@ -111,19 +111,19 @@ SubMatrix<MX> MX::operator[](int k){
 }
 
 int MX::size() const{
-  return (*this)->output_.size();
+  return sparsity().size();
 }
 
 int MX::size1() const{
-  return (*this)->output_.size1();
+  return sparsity().size1();
 }
 
 int MX::numel() const{
-  return (*this)->output_.numel();
+  return sparsity().numel();
 }
 
 int MX::size2() const{
-  return (*this)->output_.size2();
+  return sparsity().size2();
 }
 
 MX operator+(const MX &x, const MX &y){
@@ -219,6 +219,10 @@ MX MX::ones(int nrow, int ncol){
 
 MX MX::operator-() const{
   return unary(NEG_NODE,*this);
+}
+
+const CRSSparsity& MX::sparsity() const{
+  return (*this)->sparsity_;
 }
 
 } // namespace CasADi

@@ -63,7 +63,7 @@ class MX : public SharedObject{
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
     
-    /** \brief  Create matrix constant (also implicit type conversion) */
+    /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
 
     /** \brief  Destructor */
@@ -95,6 +95,9 @@ class MX : public SharedObject{
     
     /** \brief get the first dimension (i.e. m for a n-by-m matrix) */
     int size2() const;
+
+    /** \brief Get the sparsity pattern */
+    const CRSSparsity& sparsity() const;
 
   //@{
   /** \brief  Operators that changes the object */

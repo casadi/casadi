@@ -139,6 +139,9 @@ class MXNode : public SharedObjectNode{
     
   private:
     
+    /** \brief  The sparsity pattern */
+    CRSSparsity sparsity_;
+    
     /** \brief  Numerical value of output  - move this into the MXFunction class */
     Matrix<double> output_;
 

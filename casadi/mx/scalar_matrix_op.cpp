@@ -31,7 +31,7 @@ namespace CasADi{
 
 ScalarMatrixOp::ScalarMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
-  setSize(y.size1(),y.size2());
+  setSparsity(y.sparsity());
 }
 
 ScalarMatrixOp* ScalarMatrixOp::clone() const{

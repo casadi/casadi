@@ -154,11 +154,13 @@ Matrix<double>& MXNode::adjSens(int ind, int dir){
 }
 
 void MXNode::setSize(int nrow, int ncol){
-  output_ = Matrix<double>(nrow,ncol,0);
+  sparsity_ = CRSSparsity(nrow,ncol,true);
+  output_ = Matrix<double>(sparsity_);
 }
 
 void MXNode::setSparsity(const CRSSparsity& sparsity){
-  setSize(sparsity.size1(),sparsity.size2());
+  sparsity_ = sparsity;
+  output_ = Matrix<double>(sparsity_);
 }
 
 void MXNode::setDependencies(const MX& dep){
@@ -184,11 +186,11 @@ void MXNode::setDependencies(const std::vector<MX>& dep){
 }
 
 int MXNode::size1() const{
-  return output_.size1();
+  return sparsity_.size1();
 }
 
 int MXNode::size2() const{
-  return output_.size2();
+  return sparsity_.size2();
 }
 
 
