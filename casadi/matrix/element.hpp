@@ -63,7 +63,6 @@ class Element{
     int i_, j_;
 };
 
-
 // Implementation
 
 template<typename M, typename T>

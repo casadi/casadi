@@ -22,6 +22,7 @@ SET(CASADI_SRCS
   matrix/crs_sparsity.hpp
   matrix/crs_sparsity.cpp
   matrix/element.hpp
+  matrix/submatrix.hpp
   matrix/matrix.hpp
   matrix/matrix_tools.hpp
   matrix/matrix_tools.cpp

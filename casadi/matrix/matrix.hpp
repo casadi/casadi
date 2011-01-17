@@ -28,6 +28,7 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "element.hpp"
+#include "submatrix.hpp"
 #include "crs_sparsity.hpp"
 
 namespace CasADi{
@@ -166,11 +167,24 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// get a reference to an element
     T& getElementRef(int i=0, int j=0);
   
+    /// Get a submatrix
+    const Matrix<T> getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
+    
+    /// Set a submatrix
+    void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m);
+    
     /// Access an element 
     Element<Matrix<T>,T> operator()(int i, int j=0){ return Element<Matrix<T>,T>(*this,i,j); }
 
-    /// Const access an element 
+    /// Get an element 
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
+
+    /// Access a submatrix
+    SubMatrix<Matrix<T> > operator()(const std::vector<int>& ii, const std::vector<int>& jj=std::vector<int>(1,0)){ return SubMatrix<Matrix<T> >(*this,ii,jj);}
+    
+    /// Get a submatrix
+    const Matrix<T> operator()(const std::vector<int>& ii, const std::vector<int>& jj=std::vector<int>(1,0)) const{ return getSub(ii,jj);}
+    
 #endif // SWIG
 
     /// Python: get a non-zero entry
@@ -179,12 +193,18 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Python: get a matrix entry
     const T __getitem__(const std::vector<int> &I) const;
     
+    /// Python: get a submatrix
+    const Matrix<T> __getitem__(const std::vector< std::vector<int> > &II) const;
+    
     /// Python: set a non-zero entry
     void __setitem__(int k, const T& el);
     
     /// Python: set a matrix entry
     void __setitem__(const std::vector<int> &I, const T&  el);
 
+    /// Python: set a submatrix
+    void __setitem__(const std::vector< std::vector<int> > &II, const Matrix<T>& m);
+    
     /** \brief  Make the matrix an dense n-by-m matrix */
     void makeDense(int n, int m, const T& val);
 
@@ -442,6 +462,29 @@ T& Matrix<T>::getElementRef(int i, int j){
   if(oldsize != sparsity().size())
     std::vector<T>::insert(std::vector<T>::begin()+ind,0);
   return std::vector<T>::at(ind);
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+  Matrix<T> ret(ii.size(),jj.size());
+  for(int i=0; i<ii.size(); ++i){
+    for(int j=0; j<jj.size(); ++j){
+      T temp = getElement(ii[i],jj[j]);
+      if(!casadi_limits<T>::isZero(temp))
+        ret(i,j) = temp;
+    }
+  }
+  return ret;
+}
+
+template<class T>
+void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m){
+  if(ii.size() != m.size1() || jj.size() != m.size2()) throw CasadiException("Matrix<T>::setSub: dimension mismatch");
+  for(int i=0; i<m.size1(); ++i)
+    for(int el=m.rowind(i); el<m.rowind(i+1); ++el){
+      int j=m.col(el);
+      setElement(ii[i],jj[j],m[el]);
+    }
 }
 
 template<class T>
@@ -716,6 +759,13 @@ const T Matrix<T>::__getitem__(const std::vector<int> &I) const{
 }
 
 template<class T>
+const Matrix<T> Matrix<T>::__getitem__(const std::vector< std::vector<int> > &II) const{
+  if(II.size()!=2) 
+    throw CasADi::CasadiException("__getitem__ (submatrix): not 2D "); 
+  return (*this)(II[0],II[1]);
+}
+
+template<class T>
 void Matrix<T>::__setitem__(int k, const T& el){ 
   std::vector<T>::at(k) = el;
 }
@@ -725,6 +775,13 @@ void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){
   if(I.size()!=2) 
     throw CasADi::CasadiException("__setitem__: not 2D"); 
   getElementRef(I[0],I[1]) = el;
+}
+
+template<class T>
+void Matrix<T>::__setitem__(const std::vector< std::vector<int> > &II, const Matrix<T>& m){
+  if(II.size()!=2) 
+    throw CasADi::CasadiException("__setitem__ (submatrix): not 2D "); 
+  setSub(II[0],II[1],m);
 }
 
 template<class T>
