@@ -1,8 +1,14 @@
 %{
+#include <sstream>
+#include "casadi/stl_vector_tools.hpp"
 #include "casadi/printable_object.hpp"
 #include "casadi/shared_object.hpp"
 #include "casadi/options_functionality.hpp"
 %}
+
+%include "casadi/printable_object.hpp"
+%include "casadi/shared_object.hpp"
+%include "casadi/options_functionality.hpp"
 
 // Exceptions handling
 %include "exception.i"
@@ -15,10 +21,6 @@ try {
     SWIG_exception(SWIG_RuntimeError, e);
   }
 }
-
-%include "casadi/printable_object.hpp"
-%include "casadi/shared_object.hpp"
-%include "casadi/options_functionality.hpp"
 
 namespace CasADi {
   %extend OptionsFunctionality {

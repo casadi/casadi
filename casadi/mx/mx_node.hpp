@@ -67,14 +67,6 @@ class MXNode : public SharedObjectNode{
 
     /** \brief  Check if constant */
     virtual bool isConstant() const;
-      
-    /** \brief  Set/get input/output */
-    void setOutput(const vector<double>& x);
-    void getOutput(vector<double>& x) const;
-    void setFwdSeed(const vector<double>& x, int dir=0);
-    void getFwdSens(vector<double>& val, int dir=0) const;
-    void setAdjSeed(const vector<double>& x, int dir=0);
-    void getAdjSens(vector<double>& val, int dir=0) const;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
     MX& dep(int ind=0);
@@ -84,23 +76,13 @@ class MXNode : public SharedObjectNode{
     int ndep() const;
 
     /** \brief  Numerical value */
-    const Matrix<double>& output() const;
-    Matrix<double>& output();
-    
     const Matrix<double>& input(int ind) const;
-    Matrix<double>& input(int ind);
-    
     const Matrix<double>& fwdSeed(int ind, int dir=0) const;
-    Matrix<double>& fwdSeed(int ind, int dir=0);
-
     const Matrix<double>& adjSeed(int dir=0) const;
-    Matrix<double>& adjSeed(int dir=0);
-    
-    const Matrix<double>& fwdSens(int dir=0) const;
+    Matrix<double>& output();
     Matrix<double>& fwdSens(int dir=0);
-
-    const Matrix<double>& adjSens(int ind, int dir=0) const;
     Matrix<double>& adjSens(int ind, int dir=0);
+    Matrix<double>& adjSeed(int dir=0);
 
   protected:
     

@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -47,7 +48,7 @@ ostream& operator<<(ostream &stream, const vector<T> &v){
   if(v.empty()) return stream << "[0]()";
 
   // print vector style
-  stream << "[" << v.size() << "]"; // Print dimension 
+  stream << "[" << v.size() << "]"; // Print dimension
 
   // Print elements
   stream << "(";
@@ -155,17 +156,26 @@ void read_matlab(ifstream &file, vector<vector<T> > &v){
     }
 }
 
-// Push back using the stream operator (convenient when adding many elements)
-// template<typename T, typename E>
-// vector<T> & operator<<(vector<T> &v, const E &el){
-//   v.push_back(el);
-//   return v;
-// }
+/// Print representation
+template<typename T>
+std::string repr(const std::vector<T> &v){
+  std::stringstream ss;
+  ss << v;
+  return ss.str();
+}
+
+/// Print description
+template<typename T>
+std::string print(const std::vector<T> &v){
+  std::stringstream ss;
+  ss << v;
+  return ss.str();
+}
 
 } // namespace std
 
 namespace CasADi{
-  
+
 // Linspace
 template<typename T, typename F, typename L>
 void linspace(std::vector<T> &v, const F& first, const L& last){

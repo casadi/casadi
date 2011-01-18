@@ -33,69 +33,56 @@
 
 namespace CasADi{
 
-/** \brief  Internal node class for MX
+/** \brief  Internal node class for MXFunction
   \author Joel Andersson 
   \date 2010
-A regular user should never work with any Node class. Use MX directly.
 */
 class MXFunctionInternal : public FXInternal{
   friend class MXFunction;
-
+  
   public:
-/** \brief  no public constructors */
 
-/** \brief  Make a deep copy */
-  virtual MXFunctionInternal* clone() const;
+    /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction, therefore protected */
+    MXFunctionInternal(const std::vector<MX>& input, const std::vector<MX>& output);
 
-/** \brief  Destructor */
-  ~MXFunctionInternal();
+    /** \brief  Make a deep copy */
+    virtual MXFunctionInternal* clone() const;
 
-/** \brief  Order all nodes of a matrix syntax tree in the order of calculation */
-  static void makeAlgorithm(MXNode* root, std::vector<MXNode*> &nodes, std::map<const MXNode*,int>  &nodemap);
+    /** \brief  Destructor */
+    ~MXFunctionInternal();
 
-/** \brief  Find a runtime element corresponding to a matrix expression */
-  int findEl(const MX& mx) const;
+    /** \brief  Order all nodes of a matrix syntax tree in the order of calculation */
+    static void makeAlgorithm(MXNode* root, std::vector<MXNode*> &nodes, std::map<const MXNode*,int>  &nodemap);
 
-/** \brief  Set the value of an node in the algorithm */
-//  virtual void setElement(int ind, const double* x, int ord=0);
+    /** \brief  Find a runtime element corresponding to a matrix expression */
+    int findEl(const MX& mx) const;
 
-/** \brief  Get the value of an node in the algorithm */
-//  virtual void getElement(int ind, double *x, int ord=0) const;
+    /** \brief  Evaluate the algorithm */
+    virtual void evaluate(int fsens_order, int asens_order);
 
-/** \brief  Evaluate the algorithm */
-  virtual void evaluate(int fsens_order, int asens_order);
+    /** \brief  Print representation */
+    virtual void repr(std::ostream &stream) const;
 
-  /** \brief  Print representation */
-  virtual void repr(std::ostream &stream) const;
+    /** \brief  Print description */
+    virtual void print(std::ostream &stream) const;
 
-  /** \brief  Print description */
-  virtual void print(std::ostream &stream) const;
-
-/** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
   
+    /** \brief  All the runtime elements in the order of evaluation */
+    std::vector<MX> alg;
   
-  protected:
-/** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction, therefore protected */
-  MXFunctionInternal(const std::vector<MX>& input, const std::vector<MX>& output);
+    /** \brief  Maps for quickly finding the place in the algorithm of a runtime element */
+    std::map<const MXNode*,int>  nodemap;
 
-/** \brief  All the runtime elements in the order of evaluation */
-  std::vector<MX> alg;
+    /** \brief  Matrix expressions that are to be evaluated */
+    std::vector<MX> outputv;
+
+    /** \brief  Dependent expressions */
+    std::vector<MX> inputv;
   
-/** \brief  Maps for quickly finding the place in the algorithm of a runtime element */
-  std::map<const MXNode*,int>  nodemap;
-
-/** \brief  Matrix expressions that are to be evaluated */
-  std::vector<MX> outputv;
-
-/** \brief  Dependent expressions */
-  std::vector<MX> inputv;
-
-  
-/** \brief  Does an element exist in the algorithm */  
-  bool hasEl(const MX& mx) const;
-
-  
+    /** \brief  Does an element exist in the algorithm */  
+    bool hasEl(const MX& mx) const;
 };
 
 } // namespace CasADi

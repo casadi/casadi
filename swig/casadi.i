@@ -105,4 +105,58 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "lapack_interface.i"
 #endif
 
+%extend std::vector<double>{
+  std::string __repr__(){
+    char buffer[32];
+    std::string ret;
+    ret += "[";
+    for(int i=0; i<$self->size(); ++i){
+      if(i!=0)
+        ret += ",";
+      
+      // Print to buffer
+      snprintf(buffer, 32, "%g", $self->at(i));
+      
+      // Append to string
+      ret += buffer;
+      
+      if(i==0){
+        // We can now estimate the total size of the string
+        ret.reserve(ret.size()*$self->size() + 10);
+      }
+      
+    }
+    ret += "]";
+    return ret;
+  }
+
+  std::string __str__(){
+    char buffer[32];
+    std::string ret;
+    
+    // Add dimensions
+    snprintf(buffer, 32, "[%d]", $self->size());
+    ret += buffer;
+    
+    ret += "(";
+    for(int i=0; i<$self->size(); ++i){
+      if(i!=0)
+        ret += ",";
+      
+      // Print to buffer
+      snprintf(buffer, 32, "%g", $self->at(i));
+      
+      // Append to string
+      ret += buffer;
+      
+      if(i==0){
+        // We can now estimate the total size of the string
+        ret.reserve(ret.size()*$self->size() + 10);
+      }
+      
+    }
+    ret += ")";
+    return ret;
+  }
+};
 

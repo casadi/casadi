@@ -38,21 +38,23 @@ namespace CasADi{
 class MXConstant : public MXNode{
   public:
 
-  /** \brief  Constructor */
-  MXConstant(const Matrix<double> &x);
+    /** \brief  Constructor */
+    MXConstant(const Matrix<double> &x);
 
-  /** \brief  Clone function */
-  virtual MXConstant* clone() const;
+    /** \brief  Clone function */
+    virtual MXConstant* clone() const;
 
-  /** \brief  Print */
-  virtual void print(std::ostream &stream=std::cout) const;
+    /** \brief  Print */
+    virtual void print(std::ostream &stream=std::cout) const;
 
-  /** \brief  Evaluate the function and store the result in the node */
-  virtual void evaluate(int fsens_order, int asens_order);
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(int fsens_order, int asens_order);
 
-  virtual bool isConstant() const;
+    /** \brief  Indicate that the node is constant */
+    virtual bool isConstant() const;
     
   protected:
+    
     /** \brief  data member */
     Matrix<double> x_;
 
