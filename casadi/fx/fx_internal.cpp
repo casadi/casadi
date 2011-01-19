@@ -92,7 +92,7 @@ void FXInternal::assertInit() const{
     throw CasadiException("FXInternal::assertInit: function has not been initialized");
 }
 
-FunctionIO& FXInternal::input(int i){
+FunctionIO& FXInternal::inputStruct(int i){
   if(i<0 || i>=input_.size()){
     stringstream ss;
     ss << "In function " << getOption("name") << ": input " << i << " not in interval [0," << input_.size() << "]"; 
@@ -101,11 +101,11 @@ FunctionIO& FXInternal::input(int i){
   return input_.at(i);
 }
 
-const FunctionIO& FXInternal::input(int i) const{
-  return const_cast<FXInternal*>(this)->input(i);
+const FunctionIO& FXInternal::inputStruct(int i) const{
+  return const_cast<FXInternal*>(this)->inputStruct(i);
 }
   
-FunctionIO& FXInternal::output(int i){
+FunctionIO& FXInternal::outputStruct(int i){
   if(i<0 || i>=output_.size()){
     stringstream ss;
     ss << "In function " << getOption("name") << ": output " << i << " not in interval [0," << output_.size() << "]"; 
@@ -114,8 +114,8 @@ FunctionIO& FXInternal::output(int i){
   return output_.at(i);
 }
 
-const FunctionIO& FXInternal::output(int i) const{
-  return const_cast<FXInternal*>(this)->output(i);
+const FunctionIO& FXInternal::outputStruct(int i) const{
+  return const_cast<FXInternal*>(this)->outputStruct(i);
 }
 
 void FXInternal::log(const std::string& msg) const{
@@ -139,51 +139,51 @@ bool FXInternal::monitored(const std::string& mod) const{
 }
 
 Matrix<double>& FXInternal::argument(int iind){
-  return input(iind).get();
+  return inputStruct(iind).get();
 }
     
 const Matrix<double>& FXInternal::argument(int iind) const{
-  return input(iind).get();
+  return inputStruct(iind).get();
 }
 
 Matrix<double>& FXInternal::result(int oind){
-  return output(oind).get();
+  return outputStruct(oind).get();
 }
     
 const Matrix<double>& FXInternal::result(int oind) const{
-  return output(oind).get();
+  return outputStruct(oind).get();
 }
 
 Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
-  return input(iind).getFwd(dir);
+  return inputStruct(iind).getFwd(dir);
 }
     
 const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
-  return input(iind).getFwd(dir);
+  return inputStruct(iind).getFwd(dir);
 }
 
 Matrix<double>& FXInternal::fwdSens(int oind, int dir){
-  return output(oind).getFwd(dir);
+  return outputStruct(oind).getFwd(dir);
 }
     
 const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
-  return output(oind).getFwd(dir);
+  return outputStruct(oind).getFwd(dir);
 }
 
 Matrix<double>& FXInternal::adjSeed(int oind, int dir){
-  return output(oind).getAdj(dir);
+  return outputStruct(oind).getAdj(dir);
 }
     
 const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
-  return output(oind).getAdj(dir);
+  return outputStruct(oind).getAdj(dir);
 }
 
 Matrix<double>& FXInternal::adjSens(int iind, int dir){
-  return input(iind).getAdj(dir);
+  return inputStruct(iind).getAdj(dir);
 }
     
 const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
-  return input(iind).getAdj(dir);
+  return inputStruct(iind).getAdj(dir);
 }
 
 void FXInternal::setNumInputs(int num_in){

@@ -31,7 +31,7 @@ namespace CasADi{
 // Constructor
 Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : fcn_(fcn), oind(oind_) {
   setDependencies(dep);
-  setSize(fcn_->output(oind).get().size1(),fcn_->output(oind).get().size2());
+  setSize(fcn_->result(oind).size1(),fcn_->result(oind).size2());
 }
 
 Evaluation* Evaluation::clone() const{

@@ -440,10 +440,10 @@ bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
 {
   assert(n == n_);
   assert(m == m_);
-  vector<double> &lbx = input(NLP_LBX).get();  copy(lbx.begin(),lbx.end(),x_l);
-  vector<double> &ubx = input(NLP_UBX).get();  copy(ubx.begin(),ubx.end(),x_u);
-  vector<double> &lbg = input(NLP_LBG).get();  copy(lbg.begin(),lbg.end(),g_l);
-  vector<double> &ubg = input(NLP_UBG).get();  copy(ubg.begin(),ubg.end(),g_u);
+  vector<double> &lbx = argument(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
+  vector<double> &ubx = argument(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
+  vector<double> &lbg = argument(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
+  vector<double> &ubg = argument(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
   return true;
 }
 

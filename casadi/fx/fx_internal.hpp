@@ -58,16 +58,16 @@ class FXInternal : public OptionsFunctionalityNode{
   virtual FX hessian(int iind=0, int oind=0);
 
   /** \brief  Access an input */
-  FunctionIO& input(int i=0);
+  FunctionIO& inputStruct(int i=0);
 
   /** \brief  Const access an input */
-  const FunctionIO& input(int i=0) const;
+  const FunctionIO& inputStruct(int i=0) const;
   
   /** \brief  Access an output*/
-  FunctionIO& output(int i=0);
+  FunctionIO& outputStruct(int i=0);
 
   /** \brief  Const access an output*/
-  const FunctionIO& output(int i=0) const;
+  const FunctionIO& outputStruct(int i=0) const;
     
   /** \brief  Print */
   virtual void print(std::ostream &stream) const;
