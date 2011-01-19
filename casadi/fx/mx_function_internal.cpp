@@ -161,6 +161,8 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<MX>::iterator it=alg.begin(); it!=alg.end(); it++)
     (*it)->evaluate(fsens_order,0);
+  
+  log("MXFunctionInternal::evaluate evaluated forward");
 
   // Get the outputs
   for(int ind=0; ind<outputv.size(); ++ind)
@@ -192,7 +194,9 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
     // Get the adjoint sensitivities
     for(int ind=0; ind<input_.size(); ++ind)
       inputv[ind]->adjSeed().get(adjSens(ind));
-    }
+    
+    log("MXFunctionInternal::evaluate evaluated adjoint");
+  }
   log("MXFunctionInternal::evaluate end");
 }
 

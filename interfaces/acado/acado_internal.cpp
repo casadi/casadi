@@ -111,13 +111,13 @@ void AcadoInternal::init(){
   ffcn_.init();
   
   // Get dimensions
-  nt_ = ffcn_.f_.input(ACADO_FCN_T).get().numel();
-  nxd_ = ffcn_.f_.input(ACADO_FCN_XD).get().numel();
-  nxa_ = ffcn_.f_.input(ACADO_FCN_XA).get().numel();
+  nt_ = ffcn_.f_.argument(ACADO_FCN_T).numel();
+  nxd_ = ffcn_.f_.argument(ACADO_FCN_XD).numel();
+  nxa_ = ffcn_.f_.argument(ACADO_FCN_XA).numel();
   nx_ = nxd_ + nxa_;
-  nu_  = ffcn_.f_.input(ACADO_FCN_U).get().numel();
-  np_  = ffcn_.f_.input(ACADO_FCN_P).get().numel();
-  nxdot_  = ffcn_.f_.input(ACADO_FCN_XDOT).get().numel();
+  nu_  = ffcn_.f_.argument(ACADO_FCN_U).numel();
+  np_  = ffcn_.f_.argument(ACADO_FCN_P).numel();
+  nxdot_  = ffcn_.f_.argument(ACADO_FCN_XDOT).numel();
 
   // Objective
   mfcn_.init();
@@ -125,7 +125,7 @@ void AcadoInternal::init(){
   // Path constraints
   if(!cfcn_.f_.isNull()){
     cfcn_.init();
-    nc_ = cfcn_.f_.output().get().numel();
+    nc_ = cfcn_.f_.result().numel();
   } else {
     nc_ = 0;
   }
@@ -133,7 +133,7 @@ void AcadoInternal::init(){
   // Initial constraint
   if(!rfcn_.f_.isNull()){
     rfcn_.init();
-    nr_ = rfcn_.f_.output().get().numel();
+    nr_ = rfcn_.f_.result().numel();
   } else {
     nr_ = 0;
   }

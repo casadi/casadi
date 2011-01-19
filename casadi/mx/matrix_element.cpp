@@ -63,7 +63,7 @@ void MatrixElement::evaluate(int fsens_order, int asens_order){
   if(fsens_order>0){
     // Get references to the terms
     const vector<double>& fseed = fwdSeed(0); // first term
-    vector<double>& fsens = fwdSens(0);
+    vector<double>& fsens = fwdSens();
   
     // carry out the assignment
     fsens[0] = fseed[j+i*dep(0).size2()];

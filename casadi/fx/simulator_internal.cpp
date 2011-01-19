@@ -79,7 +79,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     
     // Pass integrator_ output to the output function
     output_fcn_.setInput(grid_[k],OUTPUT_T);
-    output_fcn_.setInput(integrator_.output().get(),OUTPUT_X);
+    output_fcn_.setInput(integrator_.result(),OUTPUT_X);
     output_fcn_.setInput(input(SIMULATOR_P).get(),OUTPUT_P);
 
     // Evaluate output function
@@ -87,14 +87,14 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     
     // Save the output of the function
     for(int i=0; i<output_.size(); ++i){
-      const vector<double> &res = output_fcn_.output(i).get();
+      const vector<double> &res = output_fcn_.result(i);
       copy(res.begin(),res.end(),&output(i).get()[k*res.size()]);
     }
     
     if(fsens_order>0){
       
       // Pass the forward seed to the output function
-      output_fcn_.setFwdSeed(integrator_.output().getFwd(),OUTPUT_X);
+      output_fcn_.setFwdSeed(integrator_.fwdSens(OUTPUT_X));
       output_fcn_.setFwdSeed(input(SIMULATOR_P).getFwd(),OUTPUT_P);
       
       // Evaluate output function
@@ -102,7 +102,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
 
       // Save the output of the function
       for(int i=0; i<output_.size(); ++i){
-        const vector<double> &res = output_fcn_.output(i).getFwd();
+        const vector<double> &res = output_fcn_.fwdSens(i);
         copy(res.begin(),res.end(),&output(i).getFwd()[k*res.size()]);
       }
     }

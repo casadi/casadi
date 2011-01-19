@@ -29,8 +29,8 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
     
-  n_ = F_.input(0).get().numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).get().numel();
+  n_ = F_.argument(0).numel();
+  m_ = G_.isNull() ? 0 : G_.result(0).numel();
 
   input_.resize(6);
   input_[NLP_X_INIT].setSize(n_,1);

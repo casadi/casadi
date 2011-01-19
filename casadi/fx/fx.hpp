@@ -98,18 +98,6 @@ class FX : public OptionsFunctionality{
 
   /** \brief  Set number of outputs  (invoked automatically) */
   void setNumOutputs(int num_out);
-
-  /** \brief  Access an input */
-  FunctionIO& input(int i=0);
-
-  /** \brief  Const access an input */
-  const FunctionIO& input(int i=0) const;
-  
-  /** \brief  Access an output*/
-  FunctionIO& output(int i=0);
-
-  /** \brief  Const access an output*/
-  const FunctionIO& output(int i=0) const;
   
   /** \brief  Evaluate */
   void evaluate(int fsens_order=0, int asens_order=0);
@@ -198,10 +186,6 @@ class FX : public OptionsFunctionality{
   void removeMonitor(const std::string& mon);
   
   
-#ifdef SWIG
-  %rename(setInputOriginal) setInput; // Should be replaced by a typemap later on.
-#endif // SWIG
-
 #ifdef DOXYGENPROC
 /// \name Setters
 /// Set an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
@@ -251,18 +235,6 @@ SETTERS(const std::vector<double>&);
 /// \endcond
 #undef SETTERS
 
-
-
-
-#ifdef SWIG
-// Forward renaming declarations
-%rename(getInput) getInputData;
-%rename(getOutput) getOutputData;
-%rename(getFwdSeed) getFwdSeedData;
-%rename(getFwdSens) getFwdSensData;
-%rename(getAdjSeed) getAdjSeedData;
-%rename(getAdjSens) getAdjSensData;
-#else // SWIG
 #define GETTERS(T)\
     void getInput(T val, int ind=0) const             { assertInit(); argument(ind).get(val);} \
     void getOutput(T val, int ind=0) const            { assertInit(); result(ind).get(val);} \
@@ -276,7 +248,6 @@ GETTERS(double*);
 GETTERS(std::vector<double>&);
 /// \endcond
 #undef GETTERS
-#endif // SWIG
 
 #ifdef DOXYGENPROC
 /// \name Getters
@@ -315,49 +286,6 @@ void getAdjSeed(T val,  int ind=0, int dir=0) const ;
 void getAdjSens(T val, int ind=0, int dir=0) const;
 /// @}
 #endif
-
-
-
-/** \brief  Get the input data */
-const std::vector<double>& getInputData(int ind=0) const;
-
-/** \brief  Get the output data */
-const std::vector<double>& getOutputData(int ind=0) const;
-
-/** \brief  Get the forward seed data  */
-const std::vector<double>& getFwdSeedData(int ind=0, int dir=0) const;
-
-/** \brief  Get the forward sensitivity data */
-const std::vector<double>& getFwdSensData(int ind=0, int dir=0) const;
-
-/** \brief  Get an adjoint seed data */
-const std::vector<double>& getAdjSeedData(int ind=0, int dir=0) const;
-
-/** \brief  Get an adjoint sensitivity data */
-const std::vector<double>& getAdjSensData(int ind=0, int dir=0) const;
-
-// Not in the SWIG interface since it causes problems with the typemap
-#ifndef SWIG
-
-/** \brief  Get the input data */
-std::vector<double>& getInputData(int ind=0);
-
-/** \brief  Get the output data */
-std::vector<double>& getOutputData(int ind=0);
-
-/** \brief  Get the forward seed data  */
-std::vector<double>& getFwdSeedData(int ind=0, int dir=0);
-
-/** \brief  Get the forward sensitivity data */
-std::vector<double>& getFwdSensData(int ind=0, int dir=0);
-
-/** \brief  Get an adjoint seed data */
-std::vector<double>& getAdjSeedData(int ind=0, int dir=0);
-
-/** \brief  Get an adjoint sensitivity data */
-std::vector<double>& getAdjSensData(int ind=0, int dir=0);
-
-#endif // SWIG
 
 
 };

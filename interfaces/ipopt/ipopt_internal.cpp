@@ -473,13 +473,13 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
   if(G_.isNull())
     nnz_jac_g = 0;
   else
-    nnz_jac_g = J_.output().get().size();
+    nnz_jac_g = J_.result().size();
 
   // Get Hessian sparsity pattern
   if(H_.isNull())
     nnz_h_lag = 0;
   else
-    nnz_h_lag = H_.output().get().size();
+    nnz_h_lag = H_.result().size();
 }
 
 } // namespace CasADi

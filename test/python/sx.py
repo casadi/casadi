@@ -34,7 +34,6 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: c.prod(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"prod(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
-    print "ss"
     
     
   def test_scalarSX(self):
@@ -66,7 +65,7 @@ class SXtests(casadiTestCase):
       p0=10 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
-      print dx
+      #print dx
       dxr=p0;
       self.evaluationCheck([dx],dxr,[x,p],[x0,p0],name="jacobian");
 

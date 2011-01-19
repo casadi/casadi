@@ -48,16 +48,16 @@ int CVodesInternal::getNX(const FX& f, const FX& q){
   }
 
   // Number of states
-  int nx = f.output().get().numel();
+  int nx = f.result().numel();
   
   // Add quadratures, if any_
-  if(!q.isNull()) nx += q.output().get().numel();
+  if(!q.isNull()) nx += q.result().numel();
   
   return nx;
 }
 
 int CVodesInternal::getNP(const FX& f){
-  return f.input(ODE_P).get().numel();
+  return f.argument(ODE_P).numel();
 }
   
 CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
@@ -75,8 +75,8 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   // Get dimensions
   setDimensions(getNX(f,q), getNP(f),0);
   
-  ny_ = f.output().get().numel();
-  nq_ = q.isNull() ? 0 : q.output().get().numel();
+  ny_ = f.result().numel();
+  nq_ = q.isNull() ? 0 : q.result().numel();
 
 }
 
@@ -90,16 +90,16 @@ CVodesInternal::~CVodesInternal(){
   if(yQ_) N_VDestroy_Serial(yQ_);
   
   // Forward problem
-  for(vector<N_Vector>::iterator it=yS0_.begin(); it != yS0_.end(); ++it)   N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yS_.begin(); it != yS_.end(); ++it)     N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yQS0_.begin(); it != yQS0_.end(); ++it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yQS_.begin(); it != yQS_.end(); ++it)   N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yS0_.begin(); it != yS0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yS_.begin(); it != yS_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yQS0_.begin(); it != yQS0_.end(); ++it) if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yQS_.begin(); it != yQS_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   
   // Adjoint problem
-  for(vector<N_Vector>::iterator it=yB0_.begin(); it != yB0_.end(); ++it)   N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yB_.begin(); it != yB_.end(); ++it)     N_VDestroy_Serial(*it);
-//  for(vector<N_Vector>::iterator it=yQB0_.begin(); it != yQB0_.end(); ++it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yQB_.begin(); it != yQB_.end(); ++it)   N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yB0_.begin(); it != yB0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yB_.begin(); it != yB_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
+//  for(vector<N_Vector>::iterator it=yQB0_.begin(); it != yQB0_.end(); ++it) if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=yQB_.begin(); it != yQB_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
 }
 
 void CVodesInternal::init(){
@@ -287,8 +287,8 @@ void CVodesInternal::init(){
     // Forward sensitivity problem
     if(nfdir_>0){
       // Allocate n-vectors
-      yS0_.resize(nfdir_);
-      yS_.resize(nfdir_);
+      yS0_.resize(nfdir_,0);
+      yS_.resize(nfdir_,0);
       for(int i=0; i<nfdir_; ++i){
         yS0_[i] = N_VMake_Serial(ny_,&input(INTEGRATOR_X0).getFwd(i)[0]);
         yS_[i] = N_VMake_Serial(ny_,&output(INTEGRATOR_XF).getFwd(i)[0]);
@@ -296,8 +296,8 @@ void CVodesInternal::init(){
 
       // Allocate n-vectors for quadratures
       if(nq_>0){
-        yQS0_.resize(nfdir_);
-        yQS_.resize(nfdir_);
+        yQS0_.resize(nfdir_,0);
+        yQS_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
           yQS0_[i] = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).getFwd(i)[ny_]);
           yQS_[i] = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).getFwd(i)[ny_]);
@@ -366,15 +366,15 @@ void CVodesInternal::init(){
   whichB_.resize(nadir_);
 
   // Allocate n-vectors
-  yB0_.resize(nadir_);
-  yB_.resize(nadir_);
+  yB0_.resize(nadir_,0);
+  yB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
     yB0_[i] = N_VMake_Serial(ny_,&output(INTEGRATOR_XF).getAdj(i)[0]);
     yB_[i] = N_VMake_Serial(ny_,&input(INTEGRATOR_X0).getAdj(i)[0]);
   }
 
   // Allocate n-vectors for quadratures
-  yQB_.resize(nadir_);
+  yQB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
     //yQB0_[i] = N_VNew_Serial(np_);
     yQB_[i] = N_VMake_Serial(np_,&input(INTEGRATOR_P).getAdj(i)[0]);
@@ -549,10 +549,10 @@ void CVodesInternal::integrate(double t_out){
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
-    copy(input(INTEGRATOR_X0).get().begin(),input(INTEGRATOR_X0).get().end(),output(INTEGRATOR_XF).get().begin());
+    copy(input(INTEGRATOR_X0).get().begin(),input(INTEGRATOR_X0).get().end(),result(INTEGRATOR_XF).begin());
     if(fsens_order_>0){
       for(int i=0; i<nfdir_; ++i){
-        copy(input(INTEGRATOR_X0).getFwd(i).begin(),input(INTEGRATOR_X0).getFwd(i).end(),output(INTEGRATOR_XF).getFwd(i).begin());
+        copy(input(INTEGRATOR_X0).getFwd(i).begin(),input(INTEGRATOR_X0).getFwd(i).end(),fwdSens(INTEGRATOR_XF,i).begin());
       }
     }
     return;
@@ -886,7 +886,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   f_.evaluate(0,1);
 
   // Save to output
-  const vector<double>& fres = f_.input(ODE_Y).getAdj();
+  const vector<double>& fres = f_.adjSens(ODE_Y);
   for(int i=0; i<ny_; ++i)
     yBdot[i] = -fres[i];
 
@@ -1178,7 +1178,7 @@ void CVodesInternal::psetup(double t, N_Vector y, N_Vector fy, booleantype jok, 
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
 
   // Pass non-zero elements, scaled by -gamma, to the linear solver
-  linsol_.setInput(M_.getOutputData(),0);
+  linsol_.setInput(M_.result(),0);
 
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
   linsol_.prepare();

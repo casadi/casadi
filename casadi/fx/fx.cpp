@@ -119,88 +119,52 @@ bool FX::checkNode() const{
   return dynamic_cast<const FXInternal*>(get());
 }
 
-FunctionIO& FX::input(int i){
-  return (*this)->input(i);
-}
-
-const FunctionIO& FX::input(int i) const{
-  return (*this)->input(i);
-}
-  
-FunctionIO& FX::output(int i){
-  return (*this)->output(i);
-}
-
-const FunctionIO& FX::output(int i) const{
-  return (*this)->output(i);
-}
-
-const vector<double>& FX::getInputData(int ind) const {
-  return input(ind).get(); 
-}
-
-const vector<double>& FX::getOutputData(int ind) const {
-  return output(ind).get(); 
-}
-
-const vector<double>& FX::getFwdSeedData(int ind, int dir) const {return input(ind).getFwd(dir); }
-const vector<double>& FX::getFwdSensData(int ind, int dir) const {return output(ind).getFwd(dir); }
-const vector<double>& FX::getAdjSeedData(int ind, int dir) const {return output(ind).getAdj(dir); }
-const vector<double>& FX::getAdjSensData(int ind, int dir) const {return input(ind).getAdj(dir); }
-vector<double>& FX::getInputData(int ind) {return input(ind).get(); }
-vector<double>& FX::getOutputData(int ind) {return output(ind).get(); }
-vector<double>& FX::getFwdSeedData(int ind, int dir) {return input(ind).getFwd(dir); }
-vector<double>& FX::getFwdSensData(int ind, int dir) {return output(ind).getFwd(dir); }
-vector<double>& FX::getAdjSeedData(int ind, int dir) {return output(ind).getAdj(dir); }
-vector<double>& FX::getAdjSensData(int ind, int dir) {return input(ind).getAdj(dir); }
-
-
 Matrix<double>& FX::argument(int iind){
-  return input(iind).get();
+  return (*this)->argument(iind);
 }
     
 const Matrix<double>& FX::argument(int iind) const{
-  return input(iind).get();
+  return (*this)->argument(iind);
 }
 
 Matrix<double>& FX::result(int oind){
-  return output(oind).get();
+  return (*this)->result(oind);
 }
     
 const Matrix<double>& FX::result(int oind) const{
-  return output(oind).get();
+  return (*this)->result(oind);
 }
 
 Matrix<double>& FX::fwdSeed(int iind, int dir){
-  return input(iind).getFwd(dir);
+  return (*this)->fwdSeed(iind,dir);
 }
     
 const Matrix<double>& FX::fwdSeed(int iind, int dir) const{
-  return input(iind).getFwd(dir);
+  return (*this)->fwdSeed(iind,dir);
 }
 
 Matrix<double>& FX::fwdSens(int oind, int dir){
-  return output(oind).getFwd(dir);
+  return (*this)->fwdSens(oind,dir);
 }
     
 const Matrix<double>& FX::fwdSens(int oind, int dir) const{
-  return output(oind).getFwd(dir);
+  return (*this)->fwdSens(oind,dir);
 }
 
 Matrix<double>& FX::adjSeed(int oind, int dir){
-  return output(oind).getAdj(dir);
+  return (*this)->adjSeed(oind,dir);
 }
     
 const Matrix<double>& FX::adjSeed(int oind, int dir) const{
-  return output(oind).getAdj(dir);
+  return (*this)->adjSeed(oind,dir);
 }
 
 Matrix<double>& FX::adjSens(int iind, int dir){
-  return input(iind).getAdj(dir);
+  return (*this)->adjSens(iind,dir);
 }
     
 const Matrix<double>& FX::adjSens(int iind, int dir) const{
-  return input(iind).getAdj(dir);
+  return (*this)->adjSens(iind,dir);
 }
 
 void FX::addMonitor(const std::string& mon){

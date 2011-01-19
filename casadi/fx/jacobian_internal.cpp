@@ -155,7 +155,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
         for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
           // Pass forward seeds
           int i=ofs+dir;
-          vector<double>& fseed = fcn_.getFwdSeedData(iind_,dir);
+          vector<double>& fseed = fcn_.fwdSeed(iind_,dir);
           fill(fseed.begin(),fseed.end(),0);
           fseed[i] = 1;
         }
@@ -167,7 +167,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
       for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
         // Save to the result
         int i=ofs+dir;
-        const vector<double>& fsens = fcn_.getFwdSensData(oind_,dir);
+        const vector<double>& fsens = fcn_.fwdSens(oind_,dir);
         if(sparse_jac_){
           while(el<cc_.size() && cc_[el]==i){
             res2[elind_[el]] = fsens[rr_[el]];
@@ -185,7 +185,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
         for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
           // Pass forward seeds
           int j=ofs+dir;
-          vector<double>& aseed = fcn_.getAdjSeedData(oind_,dir);
+          vector<double>& aseed = fcn_.adjSeed(oind_,dir);
           fill(aseed.begin(),aseed.end(),0);
           aseed[j] = 1;
         }
@@ -197,7 +197,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
       for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
         // Save to the result
         int j=ofs+dir;
-        const vector<double>& asens = fcn_.getAdjSensData(iind_,dir);
+        const vector<double>& asens = fcn_.adjSens(iind_,dir);
         if(sparse_jac_){
           while(el<rr_.size() && rr_[el]==j){
             res2[elind_[el]] = asens[cc_[el]];

@@ -51,6 +51,11 @@ IdasIntegrator IdasIntegrator::jac(int iind, int oind){
   return shared_cast<IdasIntegrator>(Integrator::jac(iind,oind));  
 }
 
+void IdasIntegrator::correctInitialConditions(){
+  (*this)->correctInitialConditions();
+}
+
+
 } // namespace Sundials
 } // namespace CasADi
 
