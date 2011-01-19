@@ -54,16 +54,16 @@ void FXInternal::init(){
 
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
     if(ad_order_==1){
-      it->setNumFwdDir(nfdir_);
-      it->setNumAdjDir(nadir_);
+      it->dataF.resize(nfdir_);
+      it->dataA.resize(nadir_);
     }
     it->init();
   }
 
   for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
     if(ad_order_==1){
-      it->setNumFwdDir(nfdir_);
-      it->setNumAdjDir(nadir_);
+      it->dataF.resize(nfdir_);
+      it->dataA.resize(nadir_);
     }
     it->init();
   }
@@ -139,51 +139,51 @@ bool FXInternal::monitored(const std::string& mod) const{
 }
 
 Matrix<double>& FXInternal::argument(int iind){
-  return inputStruct(iind).get();
+  return inputStruct(iind).data;
 }
     
 const Matrix<double>& FXInternal::argument(int iind) const{
-  return inputStruct(iind).get();
+  return inputStruct(iind).data;
 }
 
 Matrix<double>& FXInternal::result(int oind){
-  return outputStruct(oind).get();
+  return outputStruct(oind).data;
 }
     
 const Matrix<double>& FXInternal::result(int oind) const{
-  return outputStruct(oind).get();
+  return outputStruct(oind).data;
 }
 
 Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
-  return inputStruct(iind).getFwd(dir);
+  return inputStruct(iind).dataF.at(dir);
 }
     
 const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
-  return inputStruct(iind).getFwd(dir);
+  return inputStruct(iind).dataF.at(dir);
 }
 
 Matrix<double>& FXInternal::fwdSens(int oind, int dir){
-  return outputStruct(oind).getFwd(dir);
+  return outputStruct(oind).dataF.at(dir);
 }
     
 const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
-  return outputStruct(oind).getFwd(dir);
+  return outputStruct(oind).dataF.at(dir);
 }
 
 Matrix<double>& FXInternal::adjSeed(int oind, int dir){
-  return outputStruct(oind).getAdj(dir);
+  return outputStruct(oind).dataA.at(dir);
 }
     
 const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
-  return outputStruct(oind).getAdj(dir);
+  return outputStruct(oind).dataA.at(dir);
 }
 
 Matrix<double>& FXInternal::adjSens(int iind, int dir){
-  return inputStruct(iind).getAdj(dir);
+  return inputStruct(iind).dataA.at(dir);
 }
     
 const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
-  return inputStruct(iind).getAdj(dir);
+  return inputStruct(iind).dataA.at(dir);
 }
 
 void FXInternal::setNumInputs(int num_in){

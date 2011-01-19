@@ -30,65 +30,21 @@ using namespace std;
 namespace CasADi{
 
 FunctionIO::FunctionIO(){
-  dense_ = true;
+  dense = true;
 }
 
 void FunctionIO::init(){
   
   // Make dense if necessary
-  if(dense_){
-    get() = Matrix<double>(get().size1(),get().size2(),0);
+  if(dense){
+    data = Matrix<double>(data.size1(),data.size2(),0);
   }
 
   // Non-zeros
-  for(int i=0; i<matF_.size(); ++i)
-    matF_[i] = mat_;
-  for(int i=0; i<matA_.size(); ++i)
-    matA_[i] = mat_;
-}
-
-void FunctionIO::setSparse(){
-  dense_ = false;
-}
-
-void FunctionIO::setNumFwdDir(int nfdir){
-  matF_.resize(nfdir);
-}
-
-void FunctionIO::setNumAdjDir(int nadir){
-  matA_.resize(nadir);
-}
-
-int FunctionIO::numFwdDir() const{
-  return matF_.size();
-}
-
-int FunctionIO::numAdjDir() const{
-  return matA_.size();
-}
-
-Matrix<double>& FunctionIO::get(){
-  return mat_;
-}
-    
-const Matrix<double>& FunctionIO::get() const{
-  return mat_;
-}
-    
-Matrix<double>& FunctionIO::getFwd(int dir){
-  return matF_.at(dir);
-}
-    
-const Matrix<double>& FunctionIO::getFwd(int dir) const{
-  return matF_.at(dir);
-}
-    
-Matrix<double>& FunctionIO::getAdj(int dir){
-  return matA_.at(dir);
-}
-    
-const Matrix<double>& FunctionIO::getAdj(int dir) const{
-  return matA_.at(dir);
+  for(int i=0; i<dataF.size(); ++i)
+    dataF[i] = data;
+  for(int i=0; i<dataA.size(); ++i)
+    dataA[i] = data;
 }
 
 

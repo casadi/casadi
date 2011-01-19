@@ -236,7 +236,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
     // References
     const SXMatrix& op = outputv[i];
     result(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
-    outputStruct(i).setSparse();
+    outputStruct(i).dense = false;
     
     // Allocate space for the indices
     vector<int>& oi = output_ind[i];  
@@ -1130,7 +1130,7 @@ return ret;
     ret.reserve(input_ind.at(iind).size()+result(oind).numel());
     
     for(int i=0; i<argument(iind).size1(); ++i) // loop over rows of the gradient
-      for(int el=argument(iind).rowind(i); el<input_.at(iind).get().rowind(i+1); ++el){ // loop over the non-zero elements
+      for(int el=argument(iind).rowind(i); el<argument(iind).rowind(i+1); ++el){ // loop over the non-zero elements
         assert(argument(iind).col(el) == 0); // column
      
         // set all components to zero (a bit quicker than to use fill)

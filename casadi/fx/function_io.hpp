@@ -29,64 +29,28 @@
 namespace CasADi{
 
 /** \brief  Structure that contains the numerical values for the inputs or outputs of a function
-    This class is bound to disappear in the future.
   \author Joel Andersson 
-  \date 2010
+  \date 2010-2011
 */
 class FunctionIO{
   public:
     /// Constructor
     FunctionIO();
 
-    /// Get a reference to the data
-    Matrix<double>& get();
-    
-    /// Get a const reference to the data
-    const Matrix<double>& get() const;
-
-    /// Get a reference to the forward derivative data
-    Matrix<double>& getFwd(int dir=0);
-    
-    /// Get a const reference to the forward derivative data
-    const Matrix<double>& getFwd(int dir=0) const;
-
-    /// Get a reference to the adjoint derivative data
-    Matrix<double>& getAdj(int dir=0);
-    
-    /// Get a const reference to the adjoint derivative data
-    const Matrix<double>& getAdj(int dir=0) const;
-
-    /// Set the number of forward derivative directions
-    void setNumFwdDir(int ndir);
-    
-    /// Set the number of adjoint derivative directions
-    void setNumAdjDir(int ndir);
-
-    /// Get the number of forward derivative directions    
-    int numFwdDir() const;
-
-    /// Get the number of adjoint derivative directions    
-    int numAdjDir() const;
-    
     /// (Re)allocate the data
     void init();
     
-    /// The input is sparse
-    void setSparse();
-    
-  protected:
-    
     /// Input/output data
-    Matrix<double> mat_;
+    Matrix<double> data;
     
     /// Forward derivative data
-    std::vector< Matrix<double> > matF_;
+    std::vector< Matrix<double> > dataF;
     
     /// Adjoint derivative data
-    std::vector< Matrix<double> > matA_;
+    std::vector< Matrix<double> > dataA;
 
     /// Is dense?
-    bool dense_;
+    bool dense;
     
 };
 

@@ -276,12 +276,11 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
-  copy(x,x+n_,output_[NLP_X_OPT].get().begin());
-  copy(z_L,z_L+n_,output_[NLP_LAMBDA_LBX].get().begin());
-  copy(z_U,z_U+n_,output_[NLP_LAMBDA_UBX].get().begin());
-  copy(lambda,lambda+m_,output_[NLP_LAMBDA_OPT].get().begin());
-  output_[NLP_COST].get().at(0) = obj_value;
-
+  copy(x,x+n_,result(NLP_X_OPT).begin());
+  copy(z_L,z_L+n_,result(NLP_LAMBDA_LBX).begin());
+  copy(z_U,z_U+n_,result(NLP_LAMBDA_UBX).begin());
+  copy(lambda,lambda+m_,result(NLP_LAMBDA_OPT).begin());
+  result(NLP_COST).at(0) = obj_value;
 }
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
@@ -457,7 +456,7 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   assert(init_x == true);
   assert(init_z == false);
   assert(init_lambda == false);
-  const vector<double> &xinit = input_[NLP_X_INIT].get();
+  const vector<double> &xinit = argument(NLP_X_INIT);
   copy(xinit.begin(),xinit.end(),x);
   return true;
 }
