@@ -47,12 +47,7 @@ void FunctionIO::init(){
     matA_[i] = mat_;
 }
 
-void FunctionIO::setSize(int nrow, int ncol){
-  mat_.resize(nrow,ncol);
-}
-
-void FunctionIO::setSparsityCRS(const vector<int>& rowind, const vector<int> &col){
-  mat_ = Matrix<double>(get().size1(),get().size2(),col,rowind);
+void FunctionIO::setSparse(){
   dense_ = false;
 }
 

@@ -91,18 +91,18 @@ void IntegratorInternal::setDimensions(int nx, int np, int nz){
   
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
-  input_[INTEGRATOR_T0].setSize(1,1); // initial time
-  input_[INTEGRATOR_TF].setSize(1,1); // final time
-  input_[INTEGRATOR_X0].setSize(nx_,1); // initial state value
-  input_[INTEGRATOR_XP0].setSize(nx_,1); // initial state derivative value
-  input_[INTEGRATOR_P].setSize(np_,1); // parameter
-  input_[INTEGRATOR_Z0].setSize(nz_,1); // initial algebraic statee
+  argument(INTEGRATOR_T0).resize(1,1); // initial time
+  argument(INTEGRATOR_TF).resize(1,1); // final time
+  argument(INTEGRATOR_X0).resize(nx_,1); // initial state value
+  argument(INTEGRATOR_XP0).resize(nx_,1); // initial state derivative value
+  argument(INTEGRATOR_P).resize(np_,1); // parameter
+  argument(INTEGRATOR_Z0).resize(nz_,1); // initial algebraic statee
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
-  output_[INTEGRATOR_XF].setSize(nx_,1);
-  output_[INTEGRATOR_XPF].setSize(nx_,1);
-  output_[INTEGRATOR_ZF].setSize(nz_,1);
+  result(INTEGRATOR_XF).resize(nx_,1);
+  result(INTEGRATOR_XPF).resize(nx_,1);
+  result(INTEGRATOR_ZF).resize(nz_,1);
 }
 
 void IntegratorInternal::evaluate(int fsens_order, int asens_order){

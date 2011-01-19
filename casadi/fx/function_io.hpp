@@ -71,6 +71,9 @@ class FunctionIO{
     /// (Re)allocate the data
     void init();
     
+    /// The input is sparse
+    void setSparse();
+    
   protected:
     
     /// Input/output data
@@ -84,19 +87,6 @@ class FunctionIO{
 
     /// Is dense?
     bool dense_;
-
-    // The rest is legacy code
-    
-    
-    
-  public:
-    
-
-    /** \brief  Set size */
-    void setSize(int nrow, int ncol=1);
-    
-    /** \brief  Set the sparsity pattern, CRS format */
-    void setSparsityCRS(const std::vector<int>& rowind, const std::vector<int> &col); // Compressed row storage
     
 };
 

@@ -56,17 +56,17 @@ void IntegratorJacobianInternal::init(){
 
   // Set the dimensions
   input_.resize(INTEGRATOR_NUM_IN);
-  input_[INTEGRATOR_T0].setSize(1,1); // initial time
-  input_[INTEGRATOR_TF].setSize(1,1); // final time
-  input_[INTEGRATOR_X0].setSize(nx_,1); // initial state value
-  input_[INTEGRATOR_XP0].setSize(nx_,1); // initial state derivative value
-  input_[INTEGRATOR_P].setSize(np,1); // parameter
+  argument(INTEGRATOR_T0).resize(1,1); // initial time
+  argument(INTEGRATOR_TF).resize(1,1); // final time
+  argument(INTEGRATOR_X0).resize(nx_,1); // initial state value
+  argument(INTEGRATOR_XP0).resize(nx_,1); // initial state derivative value
+  argument(INTEGRATOR_P).resize(np,1); // parameter
   
   // Allocate space for outputs
   output_.resize(1+INTEGRATOR_NUM_OUT);
-  output_[0].setSize(nx_,ns_);
-  output_[1+INTEGRATOR_XF].setSize(nx_,1);
-  output_[1+INTEGRATOR_XPF].setSize(nx_,1);
+  result(0).resize(nx_,ns_);
+  result(1+INTEGRATOR_XF).resize(nx_,1);
+  result(1+INTEGRATOR_XPF).resize(nx_,1);
 
   // Map Jacobian indices
   if(integrator_.hasSetOption("jacmap")){

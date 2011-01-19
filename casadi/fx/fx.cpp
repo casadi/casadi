@@ -90,13 +90,12 @@ int FX::getNumOutputs() const{
 }
 
 void FX::setNumInputs(int num_in){
-  return (*this)->input_.resize(num_in);
+  return (*this)->setNumInputs(num_in);
 }
 
 void FX::setNumOutputs(int num_out){
-  return (*this)->output_.resize(num_out);  
+  return (*this)->setNumOutputs(num_out);  
 }
-
 
 FX FX::jacobian(int iind, int oind){
   return (*this)->jacobian(iind,oind);  

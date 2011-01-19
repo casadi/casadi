@@ -35,13 +35,13 @@ SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& out
       
   // Allocate inputs
   input_.resize(SIMULATOR_NUM_IN);
-  input(SIMULATOR_X0).setSize(integrator_->nx_);
-  input(SIMULATOR_P).setSize(integrator_->np_);
+  argument(SIMULATOR_X0).resize(integrator_->nx_,1);
+  argument(SIMULATOR_P).resize(integrator_->np_,1);
   
   // Allocate outputs
   output_.resize(output_fcn_->output_.size());
   for(int i=0; i<output_.size(); ++i)
-    output(i).setSize(grid_.size(),output_fcn_->output(i).get().numel());
+    result(i).resize(grid_.size(),output_fcn_.result(i).numel());
 }
   
 SimulatorInternal::~SimulatorInternal(){
@@ -59,8 +59,8 @@ void SimulatorInternal::init(){
 void SimulatorInternal::evaluate(int fsens_order, int asens_order){
 
   // Pass the parameters and initial state
-  integrator_.setInput(input(SIMULATOR_X0).get(),INTEGRATOR_X0);
-  integrator_.setInput(input(SIMULATOR_P).get(),INTEGRATOR_P);
+  integrator_.setInput(argument(SIMULATOR_X0),INTEGRATOR_X0);
+  integrator_.setInput(argument(SIMULATOR_P),INTEGRATOR_P);
 
   // Pass sensitivities if fsens
   if(fsens_order>0){

@@ -235,9 +235,9 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(int i=0; i<outputv.size(); ++i){
     // References
     const SXMatrix& op = outputv[i];
-    result(i).resize(op.size1(),op.size2());
-    output_[i].setSparsityCRS(op.rowind(),op.col());
-
+    result(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
+    output(i).setSparse();
+    
     // Allocate space for the indices
     vector<int>& oi = output_ind[i];  
     oi.resize(op.size());

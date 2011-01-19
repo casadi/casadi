@@ -49,7 +49,7 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   input_ = fcn_->input_;
   
   output_.resize(1);
-  output_[0].setSize(m_,n_);
+  result(0).resize(m_,n_);
 //  output[1] = fcn_->output[oind_];
 }
 

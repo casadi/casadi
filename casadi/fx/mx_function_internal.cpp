@@ -38,12 +38,12 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
   // Allocate space for inputs
   input_.resize(inputv.size());
   for(int i=0; i<input_.size(); ++i)
-    input_[i].setSize(inputv[i].size1(),inputv[i].size2());
+    argument(i).resize(inputv[i].size1(),inputv[i].size2());
 
   // Allocate space for outputs
   output_.resize(outputv.size());
   for(int i=0; i<output_.size(); ++i)
-    output_[i].setSize(outputv[i].size1(),outputv[i].size2());
+    result(i).resize(outputv[i].size1(),outputv[i].size2());
 
 }
 

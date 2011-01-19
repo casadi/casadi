@@ -186,6 +186,14 @@ const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
   return input(iind).getAdj(dir);
 }
 
+void FXInternal::setNumInputs(int num_in){
+  return input_.resize(num_in);
+}
+
+void FXInternal::setNumOutputs(int num_out){
+  return output_.resize(num_out);  
+}
+
 
 
 

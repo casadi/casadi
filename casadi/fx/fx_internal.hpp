@@ -123,6 +123,12 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Const access forward sensitivity
   const Matrix<double>& adjSens(int iind=0, int dir=0) const;
 
+  /// Set the number of function inputs
+  void setNumInputs(int num_in);
+
+  /// Set the number of function outputs
+  void setNumOutputs(int num_out);
+
   protected:
 
   /** \brief  Has the function been initialized? */

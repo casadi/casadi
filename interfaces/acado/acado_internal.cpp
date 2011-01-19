@@ -154,34 +154,34 @@ void AcadoInternal::init(){
 
   // Input dimensions
   input_.resize(ACADO_NUM_IN);
-  input(ACADO_X_GUESS).setSize(nx_,n_nodes_+1);
-  input(ACADO_U_GUESS).setSize(nu_,n_nodes_+1);
-  input(ACADO_P_GUESS).setSize(np_);
-  input(ACADO_LBX).setSize(nx_);
-  input(ACADO_UBX).setSize(nx_);
-  input(ACADO_LBX0).setSize(nx_);
-  input(ACADO_UBX0).setSize(nx_);
-  input(ACADO_LBXF).setSize(nx_);
-  input(ACADO_UBXF).setSize(nx_);
+  argument(ACADO_X_GUESS).resize(nx_,n_nodes_+1);
+  argument(ACADO_U_GUESS).resize(nu_,n_nodes_+1);
+  argument(ACADO_P_GUESS).resize(np_,1);
+  argument(ACADO_LBX).resize(nx_,1);
+  argument(ACADO_UBX).resize(nx_,1);
+  argument(ACADO_LBX0).resize(nx_,1);
+  argument(ACADO_UBX0).resize(nx_,1);
+  argument(ACADO_LBXF).resize(nx_,1);
+  argument(ACADO_UBXF).resize(nx_,1);
   
-  input(ACADO_LBU).setSize(nu_);
-  input(ACADO_UBU).setSize(nu_);
+  argument(ACADO_LBU).resize(nu_,1);
+  argument(ACADO_UBU).resize(nu_,1);
   
-  input(ACADO_LBP).setSize(np_);
-  input(ACADO_UBP).setSize(np_);
+  argument(ACADO_LBP).resize(np_,1);
+  argument(ACADO_UBP).resize(np_,1);
   
-  input(ACADO_LBC).setSize(nc_);
-  input(ACADO_UBC).setSize(nc_);
+  argument(ACADO_LBC).resize(nc_,1);
+  argument(ACADO_UBC).resize(nc_,1);
   
-  input(ACADO_LBR).setSize(nr_);
-  input(ACADO_UBR).setSize(nr_);
+  argument(ACADO_LBR).resize(nr_,1);
+  argument(ACADO_UBR).resize(nr_,1);
   
   // Output dimensions
   output_.resize(ACADO_NUM_OUT);
-  output(ACADO_X_OPT).setSize(nx_,n_nodes_+1);
-  output(ACADO_U_OPT).setSize(nu_,n_nodes_+1);
-  output(ACADO_P_OPT).setSize(np_);
-  output(ACADO_COST).setSize(1);
+  result(ACADO_X_OPT).resize(nx_,n_nodes_+1);
+  result(ACADO_U_OPT).resize(nu_,n_nodes_+1);
+  result(ACADO_P_OPT).resize(np_,1);
+  result(ACADO_COST).resize(1,1);
 
   // Initialize
   FXInternal::init();
