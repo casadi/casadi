@@ -11,18 +11,18 @@
 %include "casadi/sx/sx.hpp"
 
 %extend std::vector<CasADi::SX>{
-  std::string __repr__(){ return repr(*$self); }
-  std::string __str__(){ return print(*$self); }
+  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
+  std::string __str__(){ return CasADi::getDescription(*$self); }
 };
 
 %extend std::vector<CasADi::Matrix< CasADi::SX> >{
-  std::string __repr__(){ return repr(*$self); }
-  std::string __str__(){ return print(*$self); }
+  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
+  std::string __str__(){ return CasADi::getDescription(*$self); }
 };
 
 %extend std::vector<std::vector< CasADi::SX> >{
-  std::string __repr__(){ return repr(*$self); }
-  std::string __str__(){ return print(*$self); }
+  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
+  std::string __str__(){ return CasADi::getDescription(*$self); }
 };
 
 #ifdef WITH_NUMPY
