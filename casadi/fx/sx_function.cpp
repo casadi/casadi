@@ -87,17 +87,6 @@ SXFunctionInternal* SXFunction::operator->(){
   return (SXFunctionInternal*)FX::operator->();
 }
 
-SXMatrix SXFunction::getArgumentIn(int iind) const {
-	vector<SXMatrix> argv = (*this)->inputv;
-	return argv[iind];
-}
-
-SXMatrix SXFunction::getArgumentOut(int iind) const {
-	vector<SXMatrix> argv = (*this)->outputv;
-	return argv[iind];
-}
-
-
 vector<SXMatrix> SXFunction::eval(const vector<SXMatrix>& arg){
   vector<SXMatrix> res;
   (*this)->eval(arg,res);
@@ -160,11 +149,11 @@ SXMatrix SXFunction::hess(int iind, int oind){
   return (*this)->hess(iind,oind);  
 }
 
-SXMatrix SXFunction::getInputSX(int ind) {
+const SXMatrix& SXFunction::inputSX(int ind) const{
   return (*this)->inputv[ind];
 }
 
-SXMatrix SXFunction::getOutputSX(int ind) {
+const SXMatrix& SXFunction::outputSX(int ind) const{
   return (*this)->outputv[ind];
 }
 

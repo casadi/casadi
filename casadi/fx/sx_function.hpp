@@ -104,11 +104,11 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /** \brief get MX input **/
-  SXMatrix getInputSX(int ind=0);
+  /** \brief get SX input **/
+  const SXMatrix& inputSX(int ind=0) const;
   
-  /** \brief get MX output **/
-  SXMatrix getOutputSX(int ind=0);
+  /** \brief get SX output **/
+  const SXMatrix& outputSX(int ind=0) const;
   
 };
   
