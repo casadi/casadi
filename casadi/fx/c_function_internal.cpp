@@ -20,36 +20,39 @@
  *
  */
 
-#include "external_function_internal.hpp"
+#include "c_function_internal.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
-//#include <dlfcn.h>
-#include <cassert>
 
 namespace CasADi{
 
 using namespace std;
 
-ExternalFunction::ExternalFunction(){
+CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn) : evaluate_(c_fcn){
+  user_data_ = 0;
 }
 
-ExternalFunction::ExternalFunction(const std::string& bin_name){
-  assignNode(new ExternalFunctionInternal(bin_name));
-}
-
-ExternalFunctionInternal* ExternalFunction::operator->(){
-  return (ExternalFunctionInternal*)(FX::operator->());
-}
-
-const ExternalFunctionInternal* ExternalFunction::operator->() const{
-   return (const ExternalFunctionInternal*)(FX::operator->()); 
-}
+CFunctionInternal::~CFunctionInternal(){
   
-bool ExternalFunction::checkNode() const{
-  return dynamic_cast<const ExternalFunctionInternal*>(get());
+}
+
+void CFunctionInternal::setUserData(void* user_data){
+  user_data_ = user_data;
+}
+
+void CFunctionInternal::evaluate(int fsens_order, int asens_order){
+  if(evaluate_==0) throw CasadiException("CFunctionInternal::evaluate: pointer is null");
+  ref_.assignNode(this); // make the reference point to this object
+  evaluate_(ref_,fsens_order, asens_order,user_data_);  
+  ref_.assignNode(0); // make sure to remove the reference, otherwise the object will never be deleted
+}
+
+void CFunctionInternal::init(){
+  FXInternal::init();
 }
 
 
 } // namespace CasADi
+

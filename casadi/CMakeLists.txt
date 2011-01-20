@@ -52,8 +52,8 @@ SET(CASADI_SRCS
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp
   fx/mx_function.hpp         fx/mx_function.cpp         fx/mx_function_internal.hpp         fx/mx_function_internal.cpp
-  fx/c_function.hpp          fx/c_function.cpp
-  fx/external_function.hpp   fx/external_function.cpp
+  fx/c_function.hpp          fx/c_function.cpp          fx/c_function_internal.hpp          fx/c_function_internal.cpp
+  fx/external_function.hpp   fx/external_function.cpp   fx/external_function_internal.hpp   fx/external_function_internal.cpp
   fx/jacobian.hpp            fx/jacobian.cpp            fx/jacobian_internal.hpp            fx/jacobian_internal.cpp
   fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
   fx/integrator_jacobian.hpp fx/integrator_jacobian.cpp fx/integrator_jacobian_internal.hpp fx/integrator_jacobian_internal.cpp

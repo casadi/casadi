@@ -20,51 +20,52 @@
  *
  */
 
-#ifndef C_FUNCTION_HPP
-#define C_FUNCTION_HPP
+#ifndef C_FUNCTION_INTERNAL_HPP
+#define C_FUNCTION_INTERNAL_HPP
 
-#include "fx.hpp"
+#include "c_function.hpp"
+#include "fx_internal.hpp"
 #include <string>
 
 namespace CasADi{
   
-/** \brief  Forward declaration of internal class */
-class CFunctionInternal;
-
-// Forward declaration
-class CFunction;
-
-/** \brief  Wrapper around functions */
-typedef void (*CFunctionWrapper)(CFunction &f, int fsens_order, int asens_order, void* user_data);
-
-/** \brief  Interface to function implemented as plan code 
+  /** \brief  Internal class for CFunction
   \author Joel Andersson 
   \date 2010
-*/
-class CFunction : public FX{
+  A regular user should never work with any Node class. Use CFunction directly.
+  */
+class CFunctionInternal : public FXInternal{
+  friend class CFunction;
+  public:
+    
+    /** \brief  Create a function */
+    explicit CFunctionInternal(CFunctionWrapper c_fcn);
+    
+    /** \brief  Destructor */
+    virtual ~CFunctionInternal();
 
-public:
-
-/** \brief  default constructor */
-  CFunction();
-
-  /** \brief  Create a function */
-  explicit CFunction(CFunctionWrapper c_fcn);
-
-  /** \brief  Access functions of the node */
-  CFunctionInternal* operator->();
+    /** \brief  Set user data structure (to be passed to all functions) */
+    void setUserData(void* user_data);
   
-  /** \brief  Const access functions of the node */
-  const CFunctionInternal* operator->() const;
+    /** \brief  Evaluate */
+    virtual void evaluate(int fsens_order, int asens_order);
   
-  /** \brief  Check if the pointer points towards a valid object */
-  virtual bool checkNode() const;
+    /** \brief  Initialize */
+    virtual void init();
   
-}; // class CFunction
+  
+  protected:
+    void* user_data_;
+    CFunctionWrapper evaluate_;
+  
+    /// A reference to this object to be passed to the user functions
+    CFunction ref_;
+    
+}; // class CFunctionInternal 
   
 
 
 } // namespace CasADi
 
 
-#endif // C_FUNCTION_HPP
+#endif // C_FUNCTION_INTERNAL_HPP

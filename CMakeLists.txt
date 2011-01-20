@@ -8,13 +8,18 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_ACADO "Compile the ACADO interface" ON)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 # option(WITH_NUMPY "Include the Python Numpy interface" ON)
+option(WITH_JIT "Enable just-in-time compilation" OFF)
 
 # For code optimization
-# SET(CMAKE_BUILD_TYPE Release)
-SET(CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_BUILD_TYPE Release)
+#SET(CMAKE_BUILD_TYPE Debug)
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
+
+if(WITH_JIT)
+add_definitions(-DWITH_JIT)
+endif(WITH_JIT)
 
 include_directories(.)
 
