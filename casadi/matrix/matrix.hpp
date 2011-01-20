@@ -66,14 +66,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(const Matrix<T>& m);
     
 #ifndef SWIG
-    /// Copy constructor (possible swap)
-    Matrix(Matrix<T>& m);
-    
     /// Assignment (normal)
     Matrix<T>& operator=(const Matrix<T>& m);
-    
-    /// Assignment (possible swap)
-    Matrix<T>& operator=(Matrix<T>& m);
 #endif // SWIG
     
     /// empty n-by-m matrix constructor
@@ -103,7 +97,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x) : swap_on_copy_(false){
+    Matrix(const std::vector<A>& x){
       sparsity_ = CRSSparsity(x.size(),1,true);
       std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
@@ -111,7 +105,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int n, int m) : swap_on_copy_(false){
+    Matrix(const std::vector<A>& x,  int n, int m){
       if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
       sparsity_ = CRSSparsity(n,m,true);
       std::vector<T>::resize(x.size());
@@ -121,14 +115,14 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  ublas vector */
 #ifdef HAVE_UBLAS
     template<typename T, typename A>
-    explicit Matrix<T>(const ublas::vector<A> &x) : swap_on_copy_(false){
+    explicit Matrix<T>(const ublas::vector<A> &x){
       sparsity_ = CRSSparsity(x.size(),1,true);
       std::vector<T>::resize(x.size());
       copy(x.begin(),x.end(),std::vector<T>::begin());
     }
 
     template<typename T, typename A>
-    explicit Matrix<T>(const ublas::matrix<A> &x) : swap_on_copy_(false){
+    explicit Matrix<T>(const ublas::matrix<A> &x){
       sparsity_ = CRSSparsity(x.size1(),x.size2(),true);
       std::vector<T>::resize(numel());
       copy(x.begin(),x.end(),std::vector<T>::begin());
@@ -305,13 +299,6 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void printSparse(std::ostream &stream=std::cout) const; // print the non-zeros
     //@}
 
-
-    /** \brief Swap the the vector content upon the next copy assignment, saves a copy operation: 
-    After the copy operation has taken place, the object can not be used for anything,
-    as its vector is no longer of correct length. Only the destructor is allowed to get called.
-    */
-    Matrix<T>& noCopy();
-
     // Get the sparsity pattern
     const std::vector<int>& col() const;
     const std::vector<int>& rowind() const;
@@ -368,9 +355,6 @@ class Matrix : public std::vector<T>, public PrintableObject{
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
-    
-    /// Swap the content of the vector upon the next copy action
-    bool swap_on_copy_; // NOTE: C++ language standard allows compilers to arbitrary skip copy constructors - this makes this functionality possibly dangerous!
 };
 
 } // namespace CasADi
@@ -542,77 +526,39 @@ bool Matrix<T>::dense() const{
 
 template<class T>
 Matrix<T>::Matrix(){
-  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(0,0,false);
 }
 
 template<class T>
 Matrix<T>::Matrix(const Matrix<T>& m) : std::vector<T>(m){
-  swap_on_copy_ = false;
   sparsity_ = m.sparsity_;
 }
 
 template<class T>
 Matrix<T>::Matrix(const std::vector<T>& x) : std::vector<T>(x){
-  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(x.size(),1,true);
 }
 
 template<class T>
 Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : std::vector<T>(x){
-  swap_on_copy_ = false;
   if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
   sparsity_ = CRSSparsity(n,m,true);
-}
-    
-template<class T>
-Matrix<T>::Matrix(Matrix<T>& m){
-  swap_on_copy_ = false;
-/*  if(m.swap_on_copy_){
-    // Swap the vector with m
-    m.swap(*this);
-    m.sparsity_.swap(sparsity_);
-  } else {*/
-    // Copy the content
-    static_cast<std::vector<T>&>(*this) = m;
-    sparsity_ = m.sparsity_; // shallow copy!
-/*  }*/
 }
 
 template<class T>
 Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
   sparsity_ = m.sparsity_;
   static_cast<std::vector<T>&>(*this) = m;
-}
-
-template<class T>
-Matrix<T>& Matrix<T>::operator=(Matrix<T>& m){
-/*  if(m.swap_on_copy_){
-    // Swap the vector with m
-    m.swap(*this);
-    m.sparsity_.swap(sparsity_);
-  } else {*/
-    // Copy the content
-    static_cast<std::vector<T>&>(*this) = m;
-    sparsity_ = m.sparsity_; // shallow copy!
-/*  }*/
-}
-
-template<class T>
-Matrix<T>& Matrix<T>::noCopy(){
-  swap_on_copy_ = true;
   return *this;
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m){
-  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,false);
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m, const T& val){
-  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,true);
   std::vector<T>::resize(n*m, val);
 }
@@ -727,20 +673,19 @@ void Matrix<T>::clear(){
 }
 
 template<class T>
-Matrix<T>::Matrix(const Element<Matrix<T>,T>& val) : swap_on_copy_(false){
+Matrix<T>::Matrix(const Element<Matrix<T>,T>& val){
   sparsity_ = CRSSparsity(1,1,true);
   std::vector<T>::resize(1,T(val));
 }
 
 template<class T>
-Matrix<T>::Matrix(double val) : swap_on_copy_(false){
+Matrix<T>::Matrix(double val){
   sparsity_ = CRSSparsity(1,1,true);
   std::vector<T>::resize(1,val);
 }
 
 template<class T>
 Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data) : std::vector<T>(data){
-  swap_on_copy_ = false;
   sparsity_ = CRSSparsity(n,m,col,rowind);
   if(data.size() != sparsity_.size())
     std::vector<T>::resize(sparsity_.size());
@@ -748,7 +693,6 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
 
 template<class T>
 Matrix<T>::Matrix(const CRSSparsity& sparsity){
-  swap_on_copy_ = false;
   sparsity_ = sparsity;
   std::vector<T>::resize(sparsity_.size());
 }
