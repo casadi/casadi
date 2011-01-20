@@ -71,7 +71,7 @@ ocp_solver.solve()
 t_opt = NP.linspace(t0,tf,num_nodes+1)
 
 # Plot optimal state trajectory
-x_opt = ocp_solver.getOutput(ACADO_X_OPT)
+x_opt = ocp_solver.output(ACADO_X_OPT)
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 3)
 plt.figure(1)
@@ -85,7 +85,7 @@ plt.plot(t_opt,x_opt[:,2])
 plt.title("ALGEBRAIC STATE  z")
 
 # Plot optimal control
-u_opt = ocp_solver.getOutput(ACADO_U_OPT)
+u_opt = ocp_solver.output(ACADO_U_OPT)
 plt.figure(2)
 plt.clf()
 plt.plot(t_opt,u_opt)
@@ -160,7 +160,7 @@ for i in range(num_nodes):
   integrator.evaluate()
   
   # Get the state
-  xi = integrator.getOutput(INTEGRATOR_XF)
+  xi = integrator.output(INTEGRATOR_XF)
   x_opt2[i+1] = xi
 
 plt.figure(3)

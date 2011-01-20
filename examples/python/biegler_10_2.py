@@ -172,7 +172,7 @@ for it in range(1):
         # Get the coefficients of the continuity equation
         lfcn.setInput(1.0)
         lfcn.evaluate()
-        D[j] = lfcn.getOutput()[0]
+        D[j] = lfcn.output()[0]
 
         # Get the coefficients of the collocation equation
         C[j] = (K+1) * [[]]
@@ -180,7 +180,7 @@ for it in range(1):
           lfcn.setInput(tau_root[k])
           lfcn.setFwdSeed(1.0)
           lfcn.evaluate(1,0)
-          C[j][k] = lfcn.getFwdSens()[0]
+          C[j][k] = lfcn.fwdSens()[0]
 
     # Collocated times
     T = N * [[]]
@@ -337,10 +337,10 @@ for it in range(1):
     solver.solve()
 
     # Print the optimal cost
-    print "optimal cost: ", solver.getOutput(NLP_COST)[0]
+    print "optimal cost: ", solver.output(NLP_COST)[0]
 
     # Get the solution
-    vars_sol = solver.getOutput(NLP_X_OPT)
+    vars_sol = solver.output(NLP_X_OPT)
 
 ## ----
 ## SAVE SOLUTION TO DISK

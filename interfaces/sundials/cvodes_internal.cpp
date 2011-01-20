@@ -115,7 +115,7 @@ void CVodesInternal::init(){
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration
       SX gamma("gamma");
-      SXMatrix jac = eye(ny_) - gamma * f.jac(ODE_Y,ODE_RHS);
+      SXMatrix jac = eyeSX(ny_) - gamma * f.jac(ODE_Y,ODE_RHS);
       
       // Jacobian function
       vector<vector<SX> > jac_in(Sundials::M_NUM_IN);

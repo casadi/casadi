@@ -121,27 +121,19 @@ Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matr
   return if_false + (if_true-if_false)*cond;
 }
 
-Matrix<SX> ones(int n, int m){
-  Matrix<SX> ret(n,m);
-  for(int i=0; i<n; ++i)
-    for(int j=0; j<m; ++j)
-      ret(i,j) = 1;
-  return ret;
+Matrix<SX> onesSX(int n, int m){
+  return Matrix<SX>(n,m,1);
 }
 
-Matrix<SX> zeros(int n, int m){
+Matrix<SX> zerosSX(int n, int m){
   return Matrix<SX>(n,m);
 }
 
-Matrix<SX> inf(int n, int m){
-  Matrix<SX> ret(n,m);
-  for(int i=0; i<n; ++i)
-    for(int j=0; j<m; ++j)
-      ret(i,j) = casadi_limits<SX>::inf;
-  return ret;
+Matrix<SX> infSX(int n, int m){
+  return Matrix<SX>(n,m,casadi_limits<SX>::inf);
 }
 
-Matrix<SX> eye(int n){
+Matrix<SX> eyeSX(int n){
   Matrix<SX> ret(n,n);
   for(int i=0; i<n; ++i)
     ret(i,i) = 1;

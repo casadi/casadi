@@ -91,16 +91,16 @@ void make_symbolic(iter_type first, func_type last, const std::string& name){
 Matrix<SX>& operator<<(Matrix<SX>& expr, const Matrix<SX>& add); // remove when C++0X becomes available
 
 /** \brief  create an n-by-n identity matrix */
-Matrix<SX> eye(int n); 
+Matrix<SX> eyeSX(int n); 
 
 /** \brief  create a matrix with all infinities */
-Matrix<SX> inf(int n=1,int m=1);
+Matrix<SX> infSX(int n=1,int m=1);
 
 /** \brief  create a matrix with all ones */
-Matrix<SX> ones(int n, int m=1);
+Matrix<SX> onesSX(int n, int m=1);
 
 /** \brief  create a matrix with all ones */
-Matrix<SX> zeros(int n, int m=1);
+Matrix<SX> zerosSX(int n, int m=1);
 
 
 /** \brief Create a piecewise constant function 

@@ -70,7 +70,7 @@ for k in range(nu):
 F = inner_prod(U,U)
 
 # Terminal constraints
-G = vertcat(X[0],X[1])
+G = vertcat((X[0],X[1]))
 
 # Create the NLP
 ffcn = MXFunction([U],[F]) # objective function
@@ -105,7 +105,7 @@ solver.setInput(Gmax,NLP_UBG)
 solver.solve()
 
 # Get the solution
-uopt = solver.getOutput(NLP_X_OPT)
+uopt = solver.output(NLP_X_OPT)
 
 # Plot the optimal trajectory
 tgrid = linspace(0,T,nu+1)
@@ -126,7 +126,7 @@ for k in range(nu):
   integrator.setInput(uopt[k],INTEGRATOR_P)
   integrator.setInput(x,INTEGRATOR_X0)
   integrator.evaluate()
-  x = integrator.getOutput()
+  x = integrator.output()
   sopt.append(x[0])
   vopt.append(x[1])
   mopt.append(x[2])
