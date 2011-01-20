@@ -167,7 +167,7 @@ void CVodesInternal::init(){
 
   // Allocate n-vectors for ivp
   y0_ = N_VMake_Serial(ny_,&argument(INTEGRATOR_X0)[0]);
-  y_ = N_VMake_Serial(ny_,&argument(INTEGRATOR_XF)[0]);
+  y_ = N_VMake_Serial(ny_,&result(INTEGRATOR_XF)[0]);
 
   // Set error handler function
   flag = CVodeSetErrHandlerFn(mem_, ehfun_wrapper, this);

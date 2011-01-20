@@ -38,8 +38,8 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   setOption("sparse", false);
 
   // make sure that input and output are vectors (not matrices)
-  if(fcn_.argument(iind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
-  if(fcn_.argument(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
+  if(fcn_->argument(iind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
+  if(fcn_->result(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
 
   // get the dimensions
   

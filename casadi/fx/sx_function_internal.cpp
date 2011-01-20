@@ -748,7 +748,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
     // Pass the output seeds
     for(int ind=0; ind<output_.size(); ++ind){
-      const vector<double> &aseed = adjSens(ind,dir);
+      const vector<double> &aseed = adjSeed(ind,dir);
       for(int i=0; i<output_ind[ind].size(); ++i){
         work[1][output_ind[ind][i]] = aseed[i];
       }
