@@ -189,22 +189,22 @@ class Matrix : public std::vector<T>, public PrintableObject{
 #endif // SWIG
 
     /// Python: get a non-zero entry
-    const T __getitem__(int i) const;
+    const T getitem(int i) const;
     
     /// Python: get a matrix entry
-    const T __getitem__(const std::vector<int> &I) const;
+    const T getitem(const std::vector<int> &I) const;
     
     /// Python: get a submatrix
-    const Matrix<T> __getitem__(const std::vector< std::vector<int> > &II) const;
+    const Matrix<T> getitem(const std::vector< std::vector<int> > &II) const;
     
     /// Python: set a non-zero entry
-    void __setitem__(int k, const T& el);
+    void setitem(int k, const T& el);
     
     /// Python: set a matrix entry
-    void __setitem__(const std::vector<int> &I, const T&  el);
+    void setitem(const std::vector<int> &I, const T&  el);
 
     /// Python: set a submatrix
-    void __setitem__(const std::vector< std::vector<int> > &II, const Matrix<T>& m);
+    void setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m);
     
     /** \brief  Make the matrix an dense n-by-m matrix */
     void makeDense(int n, int m, const T& val);
@@ -755,40 +755,40 @@ Matrix<T>::Matrix(const CRSSparsity& sparsity){
 
 
 template<class T>
-const T Matrix<T>::__getitem__(int i) const{
+const T Matrix<T>::getitem(int i) const{
   return std::vector<T>::at(i);
 }
 
 template<class T>
-const T Matrix<T>::__getitem__(const std::vector<int> &I) const{
+const T Matrix<T>::getitem(const std::vector<int> &I) const{
   if(I.size()!=2) 
-    throw CasADi::CasadiException("__getitem__: not 2D"); 
+    throw CasADi::CasadiException("getitem: not 2D"); 
   return getElement(I[0],I[1]);
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const std::vector< std::vector<int> > &II) const{
+const Matrix<T> Matrix<T>::getitem(const std::vector< std::vector<int> > &II) const{
   if(II.size()!=2) 
-    throw CasADi::CasadiException("__getitem__ (submatrix): not 2D "); 
+    throw CasADi::CasadiException("getitem (submatrix): not 2D "); 
   return (*this)(II[0],II[1]);
 }
 
 template<class T>
-void Matrix<T>::__setitem__(int k, const T& el){ 
+void Matrix<T>::setitem(int k, const T& el){ 
   std::vector<T>::at(k) = el;
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const std::vector<int> &I, const T&  el){ 
+void Matrix<T>::setitem(const std::vector<int> &I, const T&  el){ 
   if(I.size()!=2) 
-    throw CasADi::CasadiException("__setitem__: not 2D"); 
+    throw CasADi::CasadiException("setitem: not 2D"); 
   getElementRef(I[0],I[1]) = el;
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const std::vector< std::vector<int> > &II, const Matrix<T>& m){
+void Matrix<T>::setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m){
   if(II.size()!=2) 
-    throw CasADi::CasadiException("__setitem__ (submatrix): not 2D "); 
+    throw CasADi::CasadiException("setitem (submatrix): not 2D "); 
   setSub(II[0],II[1],m);
 }
 
