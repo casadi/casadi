@@ -712,11 +712,14 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   // Re-initialize
   flag = IDAReInit(mem_, t0, yz_, yP_);
   if(flag != IDA_SUCCESS) idas_error("IDAReInit",flag);
+  log("IdasInternal::reset","re-initialized IVP solution");
+
 
   // Re-initialize quadratures
   if(nq_>0){
     flag = IDAQuadReInit(mem_, yQ_);
     if(flag != IDA_SUCCESS) idas_error("IDAQuadReInit",flag);
+    log("IdasInternal::reset","re-initialized quadratures");
   }
   
   if(fsens_order_>0){
@@ -728,10 +731,12 @@ void IdasInternal::reset(int fsens_order, int asens_order){
     // Re-initialize sensitivities
     flag = IDASensReInit(mem_,ism_,&yzS_[0],&yPS_[0]);
     if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
+    log("IdasInternal::reset","re-initialized forward sensitivity solution");
 
     if(nq_>0){
       flag = IDAQuadSensReInit(mem_, &yQS_[0]);
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
+      log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
     }
   } else {
     // Turn of sensitivities

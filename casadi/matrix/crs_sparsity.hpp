@@ -32,6 +32,37 @@ namespace CasADi{
 // Forward declaration
 class CRSSparsityNode;
   
+/** \brief General sparsity class
+ * 
+ * The storage format is a compressed row storage (CRS) format.\n
+ * 
+  In this format, the structural non-zero elements are stored in row-major order, starting from 
+  the upper left corner of the matrix and ending in the lower right corner.
+  
+  In addition to the dimension (size1(),size2()), (i.e. the number of rows and the number of columns
+  respectively), there are also two vectors of integers:
+  
+  1. "rowind" [length size1()+1], which contains the index to the first non-zero element on or after
+     the corresponding row. All the non-zero elements of a particular i are thus the elements with 
+     index el that fulfils: rowind[i] <= el < rowind[i+1].
+     
+  2. "col" [same length as the number of non-zero elements, size()] The columns for each of the
+     structural non-zeros.
+     
+  Note that with this format, it is cheap to loop over all the non-zero elements of a particular row,
+  constant time per elment, but expensive to jump to access a location (i,j).
+  
+  If the matrix is dense, i.e. length(col) == size1()*size2(), the format reduces to standard dense
+  row major format, which allows access to an arbitrary element in constant time.
+  
+  Since the object is reference counted (it inherits from SharedObject), severl matrices are allowed
+  to share the same sparsity pattern.
+  
+ * \see Matrix
+ *
+ * \author Joel Andersson 
+ * \date 2010
+*/
 class CRSSparsity : public SharedObject{
   public:
   
@@ -53,30 +84,42 @@ class CRSSparsity : public SharedObject{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
+    /// \name Size and element counting
+    /// @{
+    
     /// Get the number of rows
     int size1() const;
     
     /// Get the number of columns
     int size2() const;
 
-    /// Get the number of elements
+    /** \brief The total number of elements, including structural zeros, i.e. size1()*size2()
+        \see size()  */
     int numel() const;
     
-    /// Get the number of (structural) non-zeros
+    /** \brief Get the number of (structural) non-zeros
+        \see numel() */
     int size() const;
 
-    /// Number of non-zeros in the upper triangular half
+    /** \brief Number of non-zeros in the upper triangular half, i.e. the number of elements (i,j) with j>=i */
     int sizeU() const;
 
-    /// Number of non-zeros in the lower triangular half
+    /** \brief Number of non-zeros in the lower triangular half, i.e. the number of elements (i,j) with j<=i */
     int sizeL() const;
+    /// @}
 
-    /// Get a const reference to the columns of all non-zero element
+    /** \brief Get a reference to col-vector, containing columns for all non-zero elements (see class description) */
     const std::vector<int>& col() const;
     
-    /// Get a const reference to the rowindex of all row element
-    const std::vector<int>& rowind() const;
+    /** \brief Get the column of a non-zero element */
+    int col(int el) const;
     
+    /** \brief Get a reference to the rowindex of all row element (see class description) */
+    const std::vector<int>& rowind() const;
+
+    /** \brief  Get a reference to the rowindex of row i (see class description) */
+    int rowind(int i) const;
+
 #ifndef SWIG
     /// Get a reference to the columns of all non-zero element (copy if not unique!)
     std::vector<int>& col();
@@ -85,23 +128,21 @@ class CRSSparsity : public SharedObject{
     std::vector<int>& rowind();
 #endif // SWIG
     
-    /// Get the column of a non-zero element
-    int col(int el) const;
+    /** \brief Get the row for each non-zero entry
+    Together with the col-vector, this vector gives the sparsity of the matrix in
+    sparse triplet format, i.e. the row and column for each non-zero elements  */
+    std::vector<int> getRow() const;
     
-    /// Get the index of the first non-zero element a row
-    int rowind(int row) const;
-
     /// Resize
     void resize(int nrow, int ncol);
     
-    /// Get the index of a non-zero element (copy object if necessary)
+    /** \brief Get the index of a non-zero element
+         Add the element if it does not exist and copy object if it's not unique */
     int getNZ(int i, int j);
     
-    /// Get the index of a non-zero element (return -1 if not exists)
+    /** \brief Get the index of an existing non-zero element
+         return -1 if the element does not exists */
     int getNZ(int i, int j) const;
-    
-    /// Get the row for each non-zero entry
-    std::vector<int> getRow() const;
 
     /// Get the sparsity in CRS format
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;

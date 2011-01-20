@@ -119,6 +119,10 @@ Matrix<T> inv(const Matrix<T>& a);
 template<class T>
 Matrix<T> reshape(const Matrix<T>& a, int n, int m);
 
+/** \brief  make a vector
+  Reshapes/flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
+  Columns are stacked on top of each other.
+ */
 template<class T>
 Matrix<T> vec(const Matrix<T>& a);
 
@@ -155,10 +159,6 @@ Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y); // inner product
 */
 template<class T>
 Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y);
-
-/// Get the 2-norm of a vector
-template<class T>
-Matrix<T> norm_2(const Matrix<T>& x);
 
 /** \brief  QR factorization using the modified Gram-Schmidt algorithm 
 More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent
@@ -200,6 +200,23 @@ void matrix_matrix_trans_mult(const Matrix<T>& x, const Matrix<T>& y_trans, Matr
 /** \brief  z += trans(x)*y with x and y givem (currently only if dense)*/
 template<class T>
 void matrix_trans_matrix_mult(const Matrix<T>& x_trans, const Matrix<T>& y, Matrix<T>& z);
+
+/// Make the vector 1-norm of an Matrix<T>
+template<class T>
+Matrix<T> norm_1(const Matrix<T>& x);
+  
+/// Make the vector 2-norm of an Matrix<T>
+template<class T>
+Matrix<T> norm_2(const Matrix<T>& x);
+
+/// Return summation of all elements
+template<class T>
+T sum_all(const Matrix<T> &x); 
+
+/** \brief Return summation of elements along specific axis
+    \param axis either 0 or 1 */
+template<class T>
+Matrix<T> sum(const Matrix<T> &x, int axis=0);  
 
 } // namespace CasADi
 
@@ -649,6 +666,35 @@ template<class T>
 Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
   if(!x.vector() || !y.vector()) throw CasadiException("outer_prod: arguments must be vectors");
   return prod(x,trans(y));  
+}
+
+template<class T>
+T sum_all(const Matrix<T> &x) {
+  // Sum non-zero elements
+  T res=0;
+  for(int k=0; k<x.size(); k++){
+    res += x[k];
+  }
+  return res;
+}
+
+template<class T>
+Matrix<T> sum(const Matrix<T> &x, int axis) {
+  if (axis==1)
+    return trans(sum(trans(x),0));
+  if (axis!=0)
+    throw CasadiException("Matrix<T>::sum: axis argument should be zero or one");
+  Matrix<T> res(1,x.size2());
+  const std::vector<int> &col = x.col();
+  for(int k=0; k<col.size(); k++){
+    res(0,col[k]) += x[k];
+  }
+  return res;
+}
+
+template<class T>
+Matrix<T> norm_1(const Matrix<T>& x){
+  return sum_all(fabs(x));
 }
 
 template<class T>
