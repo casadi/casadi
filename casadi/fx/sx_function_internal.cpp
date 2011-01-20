@@ -1259,9 +1259,9 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   cfile << "};" << endl;
 
   // Memory
-  cfile << "double i0[" << work[0].size() << "];" << endl;
+/*  cfile << "double i0[" << work[0].size() << "];" << endl;
   cfile << "double i1[" << work[1].size() << "];" << endl;
-  cfile << "double i2[" << work[2].size() << "];" << endl;
+  cfile << "double i2[" << work[2].size() << "];" << endl;*/
   
 
   // Initializer
@@ -1283,22 +1283,47 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   cfile << "}" << endl << endl;
 
   // Evaluate function
-  cfile << "int evaluate(){" << endl;
-//   cfile << "printf(\"hello world!\\n\");" << endl;
+  cfile << "int evaluate(const double** x, double** r){" << endl;
 
+  // Which variables have been declared
+  vector<bool> declared(work[1].size(),false);
+  
+  // Copy the function arguments to the work vector
+  for(int ind=0; ind<input_.size(); ++ind){
+    for(int i=0; i<input_ind[ind].size(); ++i){
+      int el = input_ind[ind][i];
+      cfile << "double i" << el << "=x[" << ind << "][" << i << "];" << endl;
+      declared[el] = true;
+    }
+  }
+
+ // Run the algorithm
  for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
+    stringstream s0,s1;
     int op = it->op;
-    stringstream s,s0,s1;
-    s << "i0[" << it->ind << "]";
-
+    if(!declared[it->ind]){
+      cfile << "double ";
+      declared[it->ind]=true;
+    }
+    cfile << "i" << it->ind << "=";
     if(tree[it->ch[0]]->isConstant())  s0 << tree[it->ch[0]]->getValue();
-    else                             s0 << "i0[" << it->ch[0] << "]";
+    else                               s0 << "i" << it->ch[0];
     if(tree[it->ch[1]]->isConstant())  s1 << tree[it->ch[1]]->getValue();
-    else                             s1 << "i0[" << it->ch[1] << "]";
-
-    cfile  << s.str() << "=";
+    else                               s1 << "i" << it->ch[1];
     print_c[op](cfile ,s0.str(),s1.str());
     cfile  << ";" << endl;
+  }
+  
+  // Get the results
+  for(int ind=0; ind<output_.size(); ++ind){
+    for(int i=0; i<output_ind[ind].size(); ++i){
+      cfile << "r[" << ind << "][" << i << "]=";
+      int el = output_ind[ind][i];
+      if(tree[el]->isConstant())
+        cfile << tree[el]->getValue() << ";" << endl;
+      else
+        cfile << "i" << el << ";" << endl;
+    }
   }
 
   cfile << "return 0;" << endl;
