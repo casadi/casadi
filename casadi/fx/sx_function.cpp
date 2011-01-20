@@ -157,6 +157,11 @@ const SXMatrix& SXFunction::outputSX(int ind) const{
   return (*this)->outputv[ind];
 }
 
+void SXFunction::generateCode(const std::string& filename) const{
+  (*this)->generateCode(filename);
+}
+
+
 
 } // namespace CasADi
 

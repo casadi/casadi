@@ -1,4 +1,4 @@
-Non-backwards compatible changes:
+Non-backwards compatible changes since previous version:
 
 SXMatrix:
 Constructor SXMatrix("name",n,m) -> symbolic("name",n,m)
@@ -9,3 +9,6 @@ ones -> onesSX
 zeros -> zerosSX
 eye -> eyeSX
 horzcat(x,y)/vertcat(x,y) no longer available from python (use horzcat((x,y))/vertcat((x,y)) instead)
+integrator has additional inputs and outputs (algebraic state)
+getArray in FunctionIO -> toArray in Matrix<>
+getMatrix in FunctionIO -> toMatrix in Matrix<>
