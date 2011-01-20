@@ -1,0 +1,11 @@
+Non-backwards compatible changes:
+
+SXMatrix:
+Constructor SXMatrix("name",n,m) -> symbolic("name",n,m)
+input/output -> gone (inputStruct, internal class)
+getOutputData etc (in python getOutput) -> output 
+inf -> infSX
+ones -> onesSX
+zeros -> zerosSX
+eye -> eyeSX
+horzcat(x,y)/vertcat(x,y) no longer available from python (use horzcat((x,y))/vertcat((x,y)) instead)
