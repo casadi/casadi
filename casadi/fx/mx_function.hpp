@@ -66,10 +66,10 @@ public:
   /** \brief  Const access functions of the node */
   const MXFunctionInternal* operator->() const;
 
-  /// get an input argument symbolically
+  /// get function input argument 
   const MX inputMX(int iind=0) const;
   
-  /// get an output argument symbolically 
+  /// get function output argument
   const MX outputMX(int oind=0) const;
 
   /// Check if the node is pointing to the right type of object

@@ -94,20 +94,14 @@ public:
   
   /// Hessian (forward over adjoint) via source code transformation
   SXMatrix hess(int iind=0, int oind=0);
-
-  /// get an input argument symbolically 
-  SXMatrix getArgumentIn(int iind=0) const;
-
-  /// get an output argument symbolically 
-  SXMatrix getArgumentOut(int iind=0) const;
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /** \brief get SX input **/
+  /** \brief get function input **/
   const SXMatrix& inputSX(int ind=0) const;
   
-  /** \brief get SX output **/
+  /** \brief get function output **/
   const SXMatrix& outputSX(int ind=0) const;
   
 };
