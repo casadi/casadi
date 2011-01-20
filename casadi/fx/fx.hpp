@@ -93,17 +93,17 @@ class FX : public OptionsFunctionality{
   /** \brief  Get number of outputs */
   int getNumOutputs() const;
 
-  /** \brief  Set number of inputs (invoked autmatically) */
+  /** \brief  Set number of inputs (normally invoked internally) */
   void setNumInputs(int num_in);
 
-  /** \brief  Set number of outputs  (invoked automatically) */
+  /** \brief  Set number of outputs  (normally invoked internally) */
   void setNumOutputs(int num_out);
   
   /** \brief  Evaluate */
   void evaluate(int fsens_order=0, int asens_order=0);
   
   /// the same as evaluate(0,0)
-  void solve(); 
+  void solve();
     
   /** \brief Jacobian of output oind with respect to input iind */
   FX jacobian(int iind=0, int oind=0);
@@ -143,42 +143,52 @@ class FX : public OptionsFunctionality{
   /// Assert that the function has been initialized
   void assertInit() const;
 
-  /// Access input argument
-  Matrix<double>& input(int iind=0);
-    
   /// Const access input argument
   const Matrix<double>& input(int iind=0) const;
 
-  /// Access input argument
-  Matrix<double>& output(int oind=0);
-    
   /// Const access input argument
   const Matrix<double>& output(int oind=0) const;
 
-  /// Access forward seed
-  Matrix<double>& fwdSeed(int iind=0, int dir=0);
-    
   /// Const access forward seed
   const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
 
-  /// Access forward sensitivity
-  Matrix<double>& fwdSens(int oind=0, int dir=0);
-    
   /// Const access forward sensitivity
   const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
-
-  /// Access adjoint seed
-  Matrix<double>& adjSeed(int oind=0, int dir=0);
-    
+  
   /// Const access adjoint seed
   const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
 
-  /// Access forward sensitivity
-  Matrix<double>& adjSens(int iind=0, int dir=0);
-    
   /// Const access forward sensitivity
   const Matrix<double>& adjSens(int iind=0, int dir=0) const;
 
+#ifdef SWIG
+  // Rename the following functions in Python to avoid creating objects which can change the internal data of the FX class by mistake
+  %rename(inputRef) input;
+  %rename(outputRef) output;
+  %rename(fwdSeedRef) fwdSeed;
+  %rename(fwdSensRef) fwdSens;
+  %rename(adjSeedRef) adjSeed;
+  %rename(adjSensRef) adjSens;
+#endif // SWIG
+
+  /// Access input argument
+  Matrix<double>& input(int iind=0);
+    
+  /// Access input argument
+  Matrix<double>& output(int oind=0);  
+
+  /// Access forward seed
+  Matrix<double>& fwdSeed(int iind=0, int dir=0);
+  
+  /// Access forward sensitivity
+  Matrix<double>& fwdSens(int oind=0, int dir=0);
+
+  /// Access adjoint seed
+  Matrix<double>& adjSeed(int oind=0, int dir=0);
+
+  /// Access forward sensitivity
+  Matrix<double>& adjSens(int iind=0, int dir=0);
+  
   /// Add modules to be monitored
   void addMonitor(const std::string& mon);
   
@@ -230,7 +240,9 @@ void setAdjSens(T val, int ind=0, int dir=0) const ;
 
 /// \cond
 SETTERS(double);
+#ifndef SWIG
 SETTERS(const double*);
+#endif // SWIG
 SETTERS(const std::vector<double>&);
 /// \endcond
 #undef SETTERS
@@ -244,7 +256,9 @@ SETTERS(const std::vector<double>&);
     void getAdjSens(T val, int ind=0, int dir=0) const{ assertInit(); adjSens(ind,dir).get(val);}
 /// \cond
 GETTERS(double&);
+#ifndef SWIG
 GETTERS(double*);
+#endif // SWIG
 GETTERS(std::vector<double>&);
 /// \endcond
 #undef GETTERS

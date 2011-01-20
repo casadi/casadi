@@ -25,23 +25,64 @@
   std::string __str__(){ return CasADi::getDescription(*$self); }
 };
 
+namespace CasADi {
+  %extend Matrix<double> {
+    %pythoncode %{
+    def toArray(self):
+      import numpy as n
+      r = n.array((),dtype=float)
+      r.resize(self.size1(),self.size2())
+      for i in range(self.size1()):  # loop over rows
+        for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
+          j=self.col(el)  # column
+          r[i,j] = self[el] # add the non-zero element
 
-%extend CasADi::Matrix<CasADi::SX>{
-  // The constructor has to be added since SX::operator Matrix<SX does not work
-  // CasADi::Matrix<CasADi::SX>(const CasADi::SX&){ *$self
-  
-  // These methods must be added since the implicit type cast does not work
-  CasADi::Matrix<CasADi::SX> __pow__ (double b) const{ return $self->__pow__(CasADi::Matrix<CasADi::SX>(b));}
-  CasADi::Matrix<CasADi::SX> __rpow__(double b) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(*$self);}
-  CasADi::Matrix<CasADi::SX> __add__ (double b) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);}
-  CasADi::Matrix<CasADi::SX> __radd__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;}
-  CasADi::Matrix<CasADi::SX> __sub__ (double b) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);}
-  CasADi::Matrix<CasADi::SX> __rsub__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;}
-  CasADi::Matrix<CasADi::SX> __mul__ (double b) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);}
-  CasADi::Matrix<CasADi::SX> __rmul__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;}
-  CasADi::Matrix<CasADi::SX> __div__ (double b) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);}
-  CasADi::Matrix<CasADi::SX> __rdiv__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
-};
+      return r
+    %}
+        
+    %pythoncode %{
+    def toMatrix(self):
+      import numpy as n
+      return n.matrix(self.toArray())
+    %}
+  };
+
+%extend Matrix<SX>{
+    // The constructor has to be added since SX::operator Matrix<SX does not work
+    // Matrix<SX>(const SX&){ *$self
+    
+    // These methods must be added since the implicit type cast does not work
+    Matrix<SX> __pow__ (double b) const{ return $self->__pow__(CasADi::Matrix<CasADi::SX>(b));}
+    Matrix<SX> __rpow__(double b) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(*$self);}
+    Matrix<SX> __add__ (double b) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);}
+    Matrix<SX> __radd__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;}
+    Matrix<SX> __sub__ (double b) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);}
+    Matrix<SX> __rsub__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;}
+    Matrix<SX> __mul__ (double b) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);}
+    Matrix<SX> __rmul__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;}
+    Matrix<SX> __div__ (double b) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);}
+    Matrix<SX> __rdiv__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
+
+    %pythoncode %{
+    def toArray(self):
+      import numpy as n
+      r = n.array((),dtype=object)
+      r.resize(self.size1(),self.size2())
+      for i in range(self.size1()):  # loop over rows
+        for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
+          j=self.col(el)  # column
+          r[i,j] = self[el] # add the non-zero element
+
+      return r
+    %}
+        
+    %pythoncode %{
+    def toMatrix(self):
+      import numpy as n
+      return n.matrix(self.toArray())
+    %}
+  };
+} // namespace CasADi
 
 
 

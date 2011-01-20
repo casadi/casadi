@@ -22,7 +22,7 @@ def checkMXoperations(self,ztf,zrf,name):
     L=[1,2,3]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     zr = array([[L[0]*(i+1),L[1]*(i+1),L[2]*(i+1)] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
     return (zt,zrf(zr))
@@ -35,7 +35,7 @@ def checkMXoperations2(self,ztf,zrf,name):
     L=[1,2,3]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)]).T
     checkarray(self,zrf(zr),zt,name)
     return zt
@@ -49,7 +49,7 @@ def checkMXoperations3(self,ztf,zrf,name):
     L=[1,2,3]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
     return (zt,zrf(zr))
@@ -95,7 +95,7 @@ class MXtests(unittest.TestCase):
     f.init()
     f.setInput(3,0);
     f.evaluate()
-    yt = f.getOutput()
+    yt = tuple(f.output())
     self.assertEqual(type(yt),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(len(yt),1,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")
     y=yt[0]
@@ -115,8 +115,8 @@ class MXtests(unittest.TestCase):
     f.setInput(3,0);
     f.setInput(7,1);
     f.evaluate()
-    zt1 = f.getOutput(0)
-    zt2 = f.getOutput(1)
+    zt1 = tuple(f.output(0))
+    zt2 = tuple(f.output(1))
     self.assertEqual(type(zt1),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(type(zt2),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(len(zt1),1,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")
@@ -141,8 +141,8 @@ class MXtests(unittest.TestCase):
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
-    zt1 = f.getOutput(0)
-    zt2 = f.getOutput(1)
+    zt1 = tuple(f.output(0))
+    zt2 = tuple(f.output(1))
     self.assertEqual(type(zt1),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(type(zt2),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(len(zt1),1,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")
@@ -165,8 +165,8 @@ class MXtests(unittest.TestCase):
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
-    zt1 = f.output(0).getArray()
-    zt2 = f.output(1).getArray()
+    zt1 = f.output(0).toArray()
+    zt2 = f.output(1).toArray()
     
     self.assertEqual(type(zt1),ndarray,"Output of MXFunction is expected to be numpy.ndarray")
     self.assertEqual(zt1.shape[0],1,"Output of MXFunction is of wrong shape.")
@@ -195,7 +195,7 @@ class MXtests(unittest.TestCase):
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
-    zt=f.output(0).getArray()
+    zt=f.output(0).toArray()
     self.assertEqual(type(zt),ndarray,"Output of MXFunction is expected to be numpy.ndarray")
     self.assertEqual(zt.shape[0],2,"Output of MXFunction is of wrong shape.")
     self.assertEqual(zt.shape[1],1,"Output of MXFunction is of wrong shape.")
@@ -218,7 +218,7 @@ class MXtests(unittest.TestCase):
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     self.assertEqual(type(zt),ndarray,"Output of MXFunction is expected to be numpy.ndarray")
     self.assertEqual(zt.shape[0],1,"Output of MXFunction is of wrong shape.")
     self.assertEqual(zt.shape[1],2,"Output of MXFunction is of wrong shape.")
@@ -239,7 +239,7 @@ class MXtests(unittest.TestCase):
     #L=[1,2,3]
     #f.setInput(L,0)
     #f.evaluate()
-    #zt = f.output(0).getArray()
+    #zt = f.output(0).toArray()
     
     #for i in range(3):
       #self.assertAlmostEqual(L[i], zt[i],10)
@@ -254,7 +254,7 @@ class MXtests(unittest.TestCase):
     #L=[1,2,3]
     #f.setInput(L,0)
     #f.evaluate()
-    #zt = f.output(0).getArray()
+    #zt = f.output(0).toArray()
     
     #for i in range(3):
       #self.assertAlmostEqual(L[i], zt[i],10)
@@ -268,7 +268,7 @@ class MXtests(unittest.TestCase):
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     self.assertEqual(zt.shape[0],2,"Output of MXFunction is of wrong shape.")
     self.assertEqual(zt.shape[1],3,"Output of MXFunction is of wrong shape.")
       
@@ -289,7 +289,7 @@ class MXtests(unittest.TestCase):
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     
     ztr=reshape(zt,(3,2))
     Lr=reshape(L,(2,3))
@@ -309,7 +309,7 @@ class MXtests(unittest.TestCase):
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     for i in range(len(L)):
       self.assertAlmostEqual(L[i], zt[i],10)
       
@@ -326,7 +326,7 @@ class MXtests(unittest.TestCase):
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     for i in range(len(L)):
       self.assertAlmostEqual(L[i], zt[0,i],10)
   
@@ -389,7 +389,7 @@ class MXtests(unittest.TestCase):
     #L=[1,2,3,4,5,6]
     #f.setInput(L,0)
     #f.evaluate()
-    #zt = f.output(0).getArray()
+    #zt = f.output(0).toArray()
     #zr = reshape(array(L),(2,3))
     #checkarray(self,zr,zt,"slicing(trans)")
     #checkMXoperations(self,lambda x: x[:,0],lambda x: x[:,0],'vertcat[:,0]')
@@ -414,7 +414,7 @@ class MXtests(unittest.TestCase):
     f.evaluate()
     g.setInput(n)
     g.evaluate()
-    checkarray(self,6*f.output().getArray(),g.output().getArray(),"slicing(trans)")
+    checkarray(self,6*f.output().toArray(),g.output().toArray(),"slicing(trans)")
     
     
 if __name__ == '__main__':
