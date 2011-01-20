@@ -630,6 +630,7 @@ std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p){
     ss << name << k;
     ret[k] = symbolic(ss.str(),n,m);
   }
+  return ret;
 }
 
 vector<SX> create_symbolic(const string& name, int n){
