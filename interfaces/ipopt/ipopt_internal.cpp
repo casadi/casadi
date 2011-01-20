@@ -439,10 +439,10 @@ bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
 {
   assert(n == n_);
   assert(m == m_);
-  vector<double> &lbx = argument(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
-  vector<double> &ubx = argument(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
-  vector<double> &lbg = argument(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
-  vector<double> &ubg = argument(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
+  vector<double> &lbx = input(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
+  vector<double> &ubx = input(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
+  vector<double> &lbg = input(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
+  vector<double> &ubg = input(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
   return true;
 }
 
@@ -456,7 +456,7 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   assert(init_x == true);
   assert(init_z == false);
   assert(init_lambda == false);
-  const vector<double> &xinit = argument(NLP_X_INIT);
+  const vector<double> &xinit = input(NLP_X_INIT);
   copy(xinit.begin(),xinit.end(),x);
   return true;
 }

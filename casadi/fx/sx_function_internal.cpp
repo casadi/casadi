@@ -217,7 +217,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(int i=0; i<inputv.size(); ++i){
     // References
     const SXMatrix& ip = inputv[i];
-    argument(i).resize(ip.size1(),ip.size2());
+    input(i).resize(ip.size1(),ip.size2());
 
     // Allocate space for the indices
     vector<int>& ii = input_ind[i];
@@ -649,7 +649,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_.size(); ++ind)
     for(int i=0; i<input_ind[ind].size(); ++i){
-      work[0][input_ind[ind][i]] = argument(ind)[i];
+      work[0][input_ind[ind][i]] = input(ind)[i];
     }
   
   // Taping order
@@ -891,7 +891,7 @@ SXMatrix SXFunctionInternal::grad(int iind, int oind){
 
 SXMatrix SXFunctionInternal::jac(int iind, int oind){
   if(input_ind.at(iind).empty() || output_ind.at(oind).empty()) return SXMatrix(); // quick return
-  assert(argument(iind).size2()==1);
+  assert(input(iind).size2()==1);
   assert(result(oind).size2()==1);
 
   // Calculate the partial derivatives     // The loop can be executed in parallel!
@@ -1129,9 +1129,9 @@ return ret;
     SXMatrix ret(input_ind.at(iind).size(),result(oind).numel());
     ret.reserve(input_ind.at(iind).size()+result(oind).numel());
     
-    for(int i=0; i<argument(iind).size1(); ++i) // loop over rows of the gradient
-      for(int el=argument(iind).rowind(i); el<argument(iind).rowind(i+1); ++el){ // loop over the non-zero elements
-        assert(argument(iind).col(el) == 0); // column
+    for(int i=0; i<input(iind).size1(); ++i) // loop over rows of the gradient
+      for(int el=input(iind).rowind(i); el<input(iind).rowind(i+1); ++el){ // loop over the non-zero elements
+        assert(input(iind).col(el) == 0); // column
      
         // set all components to zero (a bit quicker than to use fill)
         for(vector<SX>::iterator it=g.begin(); it!=g.end(); ++it)
@@ -1226,17 +1226,17 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   // rows
   cfile << "int in_nrow[] = {";
   if(!input_.empty()){
-    cfile << argument(0).size1();
+    cfile << input(0).size1();
     for(int i=1; i<input_.size(); ++i)
-      cfile << "," << argument(i).size1();
+      cfile << "," << input(i).size1();
   }
   cfile << "};" << endl;
   // columns
   cfile << "int in_ncol_[] = {";
   if(!input_.empty()){
-    cfile << argument(0).size2();
+    cfile << input(0).size2();
     for(int i=1; i<input_.size(); ++i)
-      cfile << "," << argument(i).size2();
+      cfile << "," << input(i).size2();
   }
   cfile << "};" << endl;
 

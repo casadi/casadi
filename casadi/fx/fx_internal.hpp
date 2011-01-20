@@ -88,10 +88,10 @@ class FXInternal : public OptionsFunctionalityNode{
   bool monitored(const std::string& mod) const;
   
     /// Access input argument
-  Matrix<double>& argument(int iind=0);
+  Matrix<double>& input(int iind=0);
     
   /// Const access input argument
-  const Matrix<double>& argument(int iind=0) const;
+  const Matrix<double>& input(int iind=0) const;
 
   /// Access input argument
   Matrix<double>& result(int oind=0);

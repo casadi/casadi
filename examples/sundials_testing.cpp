@@ -87,7 +87,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
   if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
-  dae_res_c(f.argument(DAE_T)[0], &f.argument(DAE_Y)[0], &f.argument(DAE_YDOT)[0], &f.argument(DAE_P)[0], &f.result(DAE_RES)[0]);
+  dae_res_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_YDOT)[0], &f.input(DAE_P)[0], &f.result(DAE_RES)[0]);
 }
 
 // The ODE right-hand-side in plain c (for CVODES)
@@ -105,7 +105,7 @@ void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
 // Wrap the function to allow creating an CasADi function
 void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
   if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
-  ode_rhs_c(f.argument(ODE_T)[0], &f.argument(ODE_Y)[0], &f.argument(ODE_P)[0], &f.result(ODE_RHS)[0]);
+  ode_rhs_c(f.input(ODE_T)[0], &f.input(ODE_Y)[0], &f.input(ODE_P)[0], &f.result(ODE_RHS)[0]);
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -165,10 +165,10 @@ Integrator create_IDAS(){
     ffcn.setNumOutputs(DAE_NUM_OUT);
     
     // Specify dimensions of inputs and outputs
-    ffcn.argument(DAE_T).resize(1,1);
-    ffcn.argument(DAE_Y).resize(3,1);
-    ffcn.argument(DAE_YDOT).resize(3,1);
-    ffcn.argument(DAE_P).resize(1,1);
+    ffcn.input(DAE_T).resize(1,1);
+    ffcn.input(DAE_Y).resize(3,1);
+    ffcn.input(DAE_YDOT).resize(3,1);
+    ffcn.input(DAE_P).resize(1,1);
     ffcn.result(DAE_RES).resize(3,1);
   }
   
@@ -236,10 +236,10 @@ Integrator create_CVODES(){
     ffcn.setNumOutputs(ODE_NUM_OUT);
     
     // Specify dimensions of inputs and outputs
-    ffcn.argument(ODE_T).resize(1,1);
-    ffcn.argument(ODE_Y).resize(3,1);
-    ffcn.argument(ODE_P).resize(1,1);
-    ffcn.argument(ODE_RHS).resize(3,1);
+    ffcn.input(ODE_T).resize(1,1);
+    ffcn.input(ODE_Y).resize(3,1);
+    ffcn.input(ODE_P).resize(1,1);
+    ffcn.input(ODE_RHS).resize(3,1);
   }
   
   // Quadrature function

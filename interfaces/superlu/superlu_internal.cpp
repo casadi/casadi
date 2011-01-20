@@ -170,7 +170,7 @@ void SuperLUInternal::prepare(){
   prepared_ = false;
 
   // Copy the non-zero entries
-  const vector<double>& val = argument(0);
+  const vector<double>& val = input(0);
   copy(val.begin(),val.end(),a_.begin());
 
   SuperMatrix AC;
@@ -232,7 +232,7 @@ if (user_work_){
   
 void SuperLUInternal::solve(){
   // Copy the right hand side
-  const vector<double>& b = argument(1);
+  const vector<double>& b = input(1);
   copy(b.begin(),b.end(),rhs_.begin());
     
   // Solve the system A*X=B, overwriting B with X. 

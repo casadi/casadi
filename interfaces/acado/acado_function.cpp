@@ -42,7 +42,7 @@ void AcadoFunction::init(){
   // Get dimensions
   dim_.resize(f_.getNumInputs());
   for(int i=0; i<dim_.size(); ++i)
-    dim_[i] = f_.argument(i).numel();
+    dim_[i] = f_.input(i).numel();
 
   // Get number of equations
   neq_ = f_.result().numel();

@@ -56,11 +56,11 @@ void IntegratorJacobianInternal::init(){
 
   // Set the dimensions
   input_.resize(INTEGRATOR_NUM_IN);
-  argument(INTEGRATOR_T0).resize(1,1); // initial time
-  argument(INTEGRATOR_TF).resize(1,1); // final time
-  argument(INTEGRATOR_X0).resize(nx_,1); // initial state value
-  argument(INTEGRATOR_XP0).resize(nx_,1); // initial state derivative value
-  argument(INTEGRATOR_P).resize(np,1); // parameter
+  input(INTEGRATOR_T0).resize(1,1); // initial time
+  input(INTEGRATOR_TF).resize(1,1); // final time
+  input(INTEGRATOR_X0).resize(nx_,1); // initial state value
+  input(INTEGRATOR_XP0).resize(nx_,1); // initial state derivative value
+  input(INTEGRATOR_P).resize(np,1); // parameter
   
   // Allocate space for outputs
   output_.resize(1+INTEGRATOR_NUM_OUT);
@@ -93,13 +93,13 @@ void IntegratorJacobianInternal::init(){
 void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   
   // Pass arguments to the integrator
-  integrator_.setInput(argument(INTEGRATOR_T0),INTEGRATOR_T0);
-  integrator_.setInput(argument(INTEGRATOR_TF),INTEGRATOR_TF);
-  integrator_.setInput(argument(INTEGRATOR_P),INTEGRATOR_P);
+  integrator_.setInput(input(INTEGRATOR_T0),INTEGRATOR_T0);
+  integrator_.setInput(input(INTEGRATOR_TF),INTEGRATOR_TF);
+  integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
 
   // Initial value for the state
-  const vector<double>& x0 = argument(INTEGRATOR_X0);
-  vector<double>& x0s = integrator_.argument(INTEGRATOR_X0);
+  const vector<double>& x0 = input(INTEGRATOR_X0);
+  vector<double>& x0s = integrator_.input(INTEGRATOR_X0);
   fill(x0s.begin(),x0s.end(),0.0);
   for(int i=0; i<nx_; ++i)
     x0s[jacmap_[i]] = x0[i];
@@ -110,8 +110,8 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
       x0s[jacmap_[nx_+j+i*ns_]] = jacinit_[j+i*ns_];
   
   // State derivative
-  const vector<double>& xp0 = argument(INTEGRATOR_XP0);
-  vector<double>& xp0s = integrator_.argument(INTEGRATOR_XP0);
+  const vector<double>& xp0 = input(INTEGRATOR_XP0);
+  vector<double>& xp0s = integrator_.input(INTEGRATOR_XP0);
   fill(xp0s.begin(),xp0s.end(),0.0);
   for(int i=0; i<nx_; ++i)
     xp0s[jacmap_[i]] = xp0[i];

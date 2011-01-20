@@ -29,16 +29,16 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
     
-  n_ = F_.argument(0).numel();
+  n_ = F_.input(0).numel();
   m_ = G_.isNull() ? 0 : G_.result(0).numel();
 
   input_.resize(6);
-  argument(NLP_X_INIT).resize(n_,1);
-  argument(NLP_LBX).resize(n_,1);
-  argument(NLP_UBX).resize(n_,1);
-  argument(NLP_LBG).resize(m_,1);
-  argument(NLP_UBG).resize(m_,1);
-  argument(NLP_LAMBDA_INIT).resize(m_,1);
+  input(NLP_X_INIT).resize(n_,1);
+  input(NLP_LBX).resize(n_,1);
+  input(NLP_UBX).resize(n_,1);
+  input(NLP_LBG).resize(m_,1);
+  input(NLP_UBG).resize(m_,1);
+  input(NLP_LAMBDA_INIT).resize(m_,1);
   
   // Allocate space for outputs
   output_.resize(5);

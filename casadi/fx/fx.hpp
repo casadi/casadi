@@ -144,10 +144,10 @@ class FX : public OptionsFunctionality{
   void assertInit() const;
 
   /// Access input argument
-  Matrix<double>& argument(int iind=0);
+  Matrix<double>& input(int iind=0);
     
   /// Const access input argument
-  const Matrix<double>& argument(int iind=0) const;
+  const Matrix<double>& input(int iind=0) const;
 
   /// Access input argument
   Matrix<double>& result(int oind=0);
@@ -221,8 +221,8 @@ void setAdjSens(T val, int ind=0, int dir=0) const ;
 #endif
 
 #define SETTERS(T)\
-  void setInput(T val, int ind=0)             { assertInit(); argument(ind).set(val);  } \
-  void setOutput(T val, int ind=0)            { assertInit(); argument(ind).set(val); } \
+  void setInput(T val, int ind=0)             { assertInit(); input(ind).set(val);  } \
+  void setOutput(T val, int ind=0)            { assertInit(); input(ind).set(val); } \
   void setFwdSeed(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
   void setFwdSens(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
   void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); adjSeed(ind,dir).set(val); } \
@@ -236,7 +236,7 @@ SETTERS(const std::vector<double>&);
 #undef SETTERS
 
 #define GETTERS(T)\
-    void getInput(T val, int ind=0) const             { assertInit(); argument(ind).get(val);} \
+    void getInput(T val, int ind=0) const             { assertInit(); input(ind).get(val);} \
     void getOutput(T val, int ind=0) const            { assertInit(); result(ind).get(val);} \
     void getFwdSeed(T val, int ind=0, int dir=0) const{ assertInit(); fwdSeed(ind,dir).get(val);} \
     void getFwdSens(T val, int ind=0, int dir=0) const{ assertInit(); fwdSens(ind,dir).get(val);} \

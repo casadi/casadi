@@ -74,10 +74,10 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
 
   is_init = false;
 
-  ny_ = f.argument(DAE_Y).numel();
+  ny_ = f.input(DAE_Y).numel();
   nq_ = q.isNull() ? 0 : q.result().numel();
-  int np = f.argument(DAE_P).numel();
-  int nz = f.argument(DAE_Z).numel();
+  int np = f.input(DAE_P).numel();
+  int nz = f.input(DAE_Z).numel();
   setDimensions(ny_+nq_,np,nz);
   nyz_ = ny_ + nz;
   ncheck_ = 0;
@@ -363,7 +363,7 @@ void IdasInternal::init(){
       }
 
       // Specify parameters
-      flag = IDASetSensParams(mem_,&argument(INTEGRATOR_P)[0],pbar,plist);
+      flag = IDASetSensParams(mem_,&input(INTEGRATOR_P)[0],pbar,plist);
       if(flag != IDA_SUCCESS) idas_error("IDASetSensParams",flag);
 
       //  IDASetSensDQMethod
@@ -463,7 +463,7 @@ void IdasInternal::initAdj(){
     if(flag != IDA_SUCCESS) idas_error("IDACreateB",flag);
   
     // Initialize the backward problem
-    double tB0 = argument(INTEGRATOR_TF)[0];
+    double tB0 = input(INTEGRATOR_TF)[0];
     flag = IDAInitB(mem_, whichB_[dir], resB_wrapper, tB0, yzB_[dir], yPB_[dir]);
     if(flag != IDA_SUCCESS) idas_error("IDAInitB",flag);
 
@@ -537,7 +537,7 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
   f_.setInput(yz,DAE_Y);
   f_.setInput(yp,DAE_YDOT);
   f_.setInput(yz+ny_,DAE_Z);
-  f_.setInput(argument(INTEGRATOR_P),DAE_P);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Evaluate
   f_.evaluate();
@@ -554,10 +554,10 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
         log("IdasInternal::res",ss.str());
         if(monitored("IdasInternal::res")){
           cout << "DAE_T    = " << t << endl;
-          cout << "DAE_Y    = " << f_.argument(DAE_Y) << endl;
-          cout << "DAE_YDOT = " << f_.argument(DAE_YDOT) << endl;
-          cout << "DAE_Z    = " << f_.argument(DAE_Z) << endl;
-          cout << "DAE_P    = " << f_.argument(DAE_P) << endl;
+          cout << "DAE_Y    = " << f_.input(DAE_Y) << endl;
+          cout << "DAE_YDOT = " << f_.input(DAE_YDOT) << endl;
+          cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
+          cout << "DAE_P    = " << f_.input(DAE_P) << endl;
           cout << "residual = " << f_.result() << endl;
         }
       }
@@ -604,7 +604,7 @@ void IdasInternal::jtimes(double t, const double *yz, const double *yp, const do
    f_.setInput(yz,DAE_Y);
    f_.setInput(yp,DAE_YDOT);
    f_.setInput(yz+ny_,DAE_Z);
-   f_.setInput(argument(INTEGRATOR_P),DAE_P);
+   f_.setInput(input(INTEGRATOR_P),DAE_P);
      
    // Pass seeds of the state vectors
    f_.setFwdSeed(v,DAE_Y);
@@ -647,7 +647,7 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
    f_.setInput(yz,DAE_Y);
    f_.setInput(yp,DAE_YDOT);
    f_.setInput(yz+ny_,DAE_Z);
-   f_.setInput(argument(INTEGRATOR_P),DAE_P);
+   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
    // Calculate the forward sensitivities, nfdir_f_ directions at a time
    for(int j=0; j<nfdir_; j += nfdir_f_){
@@ -699,15 +699,15 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   asens_order_ = asens_order;
   
   // Get the time horizon
-  double t0 = argument(INTEGRATOR_T0)[0];
-  double tf = argument(INTEGRATOR_TF)[0];
+  double t0 = input(INTEGRATOR_T0)[0];
+  double tf = input(INTEGRATOR_TF)[0];
   t_ = t0;
   
   // Return flag
   int flag;
   
   // Copy to N_Vectors
-  copyNV(argument(INTEGRATOR_X0),argument(INTEGRATOR_XP0),argument(INTEGRATOR_Z0),yz_,yP_,yQ_);
+  copyNV(input(INTEGRATOR_X0),input(INTEGRATOR_XP0),input(INTEGRATOR_Z0),yz_,yP_,yQ_);
   
   // Re-initialize
   flag = IDAReInit(mem_, t0, yz_, yP_);
@@ -750,15 +750,15 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   
   
 void IdasInternal::correctInitialConditions(){
-  double t0 = argument(INTEGRATOR_T0)[0];
-  double tf = argument(INTEGRATOR_TF)[0];
+  double t0 = input(INTEGRATOR_T0)[0];
+  double tf = input(INTEGRATOR_TF)[0];
   log("IdasInternal::correctInitialConditions","begin");
   if(monitored("IdasInternal::correctInitialConditions")){
     cout << "initial guess: " << endl;
-    cout << "p = " << argument(INTEGRATOR_P) << endl;
-    cout << "x0 = " << argument(INTEGRATOR_X0) << endl;
-    cout << "xp0 = " << argument(INTEGRATOR_XP0) << endl;
-    cout << "z0 = " << argument(INTEGRATOR_Z0) << endl;
+    cout << "p = " << input(INTEGRATOR_P) << endl;
+    cout << "x0 = " << input(INTEGRATOR_X0) << endl;
+    cout << "xp0 = " << input(INTEGRATOR_XP0) << endl;
+    cout << "z0 = " << input(INTEGRATOR_Z0) << endl;
     if(fsens_order_>0){
       for(int dir=0; dir<nfdir_; ++dir){
         cout << "forward seed guess, direction " << dir << ": " << endl;
@@ -782,7 +782,7 @@ void IdasInternal::correctInitialConditions(){
   if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC",flag);
 
   // Save the corrected input to the function arguments
-  copyNV(yz_,yP_,yQ_,argument(INTEGRATOR_X0),argument(INTEGRATOR_XP0),argument(INTEGRATOR_Z0));
+  copyNV(yz_,yP_,yQ_,input(INTEGRATOR_X0),input(INTEGRATOR_XP0),input(INTEGRATOR_Z0));
   if(fsens_order_>0){
     for(int i=0; i<nfdir_; ++i){
       copyNV(yzS_[i],yPS_[i],yQS_[i],fwdSeed(INTEGRATOR_X0,i),fwdSeed(INTEGRATOR_XP0,i),fwdSeed(INTEGRATOR_Z0,i));
@@ -792,10 +792,10 @@ void IdasInternal::correctInitialConditions(){
   // Print progress
   log("IdasInternal::correctInitialConditions","found consistent initial values");
   if(monitored("IdasInternal::correctInitialConditions")){
-    cout << "p = " << argument(INTEGRATOR_P) << endl;
-    cout << "x0 = " << argument(INTEGRATOR_X0) << endl;
-    cout << "xp0 = " << argument(INTEGRATOR_XP0) << endl;
-    cout << "z0 = " << argument(INTEGRATOR_Z0) << endl;
+    cout << "p = " << input(INTEGRATOR_P) << endl;
+    cout << "x0 = " << input(INTEGRATOR_X0) << endl;
+    cout << "xp0 = " << input(INTEGRATOR_XP0) << endl;
+    cout << "z0 = " << input(INTEGRATOR_Z0) << endl;
     if(fsens_order_>0){
       for(int dir=0; dir<nfdir_; ++dir){
         cout << "forward seed, direction " << dir << ": " << endl;
@@ -865,8 +865,8 @@ void IdasInternal::integrate(double t_out){
 }
 
 void IdasInternal::resetAdj(){
-  double t0 = argument(INTEGRATOR_T0)[0];
-  double tf = argument(INTEGRATOR_TF)[0];
+  double t0 = input(INTEGRATOR_T0)[0];
+  double tf = input(INTEGRATOR_TF)[0];
   
   int flag;
   // Reset adjoint sensitivities for the parameters
@@ -1014,7 +1014,7 @@ void IdasInternal::rhsQ(double t, const double* yz, const double* yp, double* rh
    q_.setInput(yz,DAE_Y);
    q_.setInput(yp,DAE_YDOT);
    q_.setInput(yz+ny_,DAE_Z);
-   q_.setInput(argument(INTEGRATOR_P),DAE_P);
+   q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Evaluate
    q_.evaluate();
@@ -1032,7 +1032,7 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *y
    q_.setInput(NV_DATA_S(yz),DAE_Y);
    q_.setInput(NV_DATA_S(yp),DAE_YDOT);
    q_.setInput(NV_DATA_S(yz)+ny_,DAE_Z);
-   q_.setInput(argument(INTEGRATOR_P),DAE_P);
+   q_.setInput(input(INTEGRATOR_P),DAE_P);
      
    // Pass forward seeds
   for(int i=0; i<nfdir_; ++i){
@@ -1069,7 +1069,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
   f_.setInput(yz,DAE_Y);
   f_.setInput(yp,DAE_YDOT);
   f_.setInput(yz+ny_,DAE_Z);
-  f_.setInput(argument(INTEGRATOR_P),DAE_P);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
   
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_RES);
@@ -1099,7 +1099,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     q_.setInput(yz,DAE_Y);
     q_.setInput(yp,DAE_YDOT);
     q_.setInput(yz+ny_,DAE_Z);
-    q_.setInput(argument(INTEGRATOR_P),DAE_P);
+    q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
     q_.setAdjSeed(&result(INTEGRATOR_XF)[ny_],DAE_RES);
@@ -1135,7 +1135,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
   f_.setInput(yz,DAE_Y);
   f_.setInput(yp,DAE_YDOT);
   f_.setInput(yz+ny_,DAE_Z);
-  f_.setInput(argument(INTEGRATOR_P),DAE_P);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_RES);
@@ -1153,7 +1153,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
     q_.setInput(yz,DAE_Y);
     q_.setInput(yp,DAE_YDOT);
     q_.setInput(yz+ny_,DAE_Z);
-    q_.setInput(argument(INTEGRATOR_P),DAE_P);
+    q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
     q_.setAdjSeed(&result(INTEGRATOR_XF)[ny_],DAE_RES);
@@ -1205,7 +1205,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
       jac.setInput(NV_DATA_S(yz),JAC_Y);
       jac.setInput(NV_DATA_S(yp),JAC_YDOT);
       jac.setInput(NV_DATA_S(yz)+ny_,JAC_Z);
-      jac.setInput(argument(INTEGRATOR_P),JAC_P);
+      jac.setInput(input(INTEGRATOR_P),JAC_P);
       jac.setInput(cj,JAC_CJ);
     } else {
       // if we need to calculate df_dx and df_dxdot separately
@@ -1213,7 +1213,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
       jac.setInput(NV_DATA_S(yz),DAE_Y);
       jac.setInput(NV_DATA_S(yp),DAE_YDOT);
       jac.setInput(NV_DATA_S(yz)+ny_,DAE_Z);
-      jac.setInput(argument(INTEGRATOR_P),DAE_P);
+      jac.setInput(input(INTEGRATOR_P),DAE_P);
     }
     
     // Evaluate jacobian
@@ -1270,7 +1270,7 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   jac_.setInput(NV_DATA_S(yz),JAC_Y);
   jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
   jac_.setInput(NV_DATA_S(yz)+ny_,JAC_Z);
-  jac_.setInput(argument(INTEGRATOR_P),JAC_P);
+  jac_.setInput(input(INTEGRATOR_P),JAC_P);
   jac_.setInput(cj,JAC_CJ);
 
   // Evaluate jacobian
@@ -1374,7 +1374,7 @@ void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, doubl
   jac_.setInput(NV_DATA_S(yz),JAC_Y);
   jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
   jac_.setInput(NV_DATA_S(yz)+ny_,JAC_Z);
-  jac_.setInput(argument(INTEGRATOR_P),JAC_P);
+  jac_.setInput(input(INTEGRATOR_P),JAC_P);
   jac_.setInput(cj,JAC_CJ);
 
   // Evaluate jacobian

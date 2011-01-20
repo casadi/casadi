@@ -57,7 +57,7 @@ int CVodesInternal::getNX(const FX& f, const FX& q){
 }
 
 int CVodesInternal::getNP(const FX& f){
-  return f.argument(ODE_P).numel();
+  return f.input(ODE_P).numel();
 }
   
 CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
@@ -166,7 +166,7 @@ void CVodesInternal::init(){
   if(mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
   // Allocate n-vectors for ivp
-  y0_ = N_VMake_Serial(ny_,&argument(INTEGRATOR_X0)[0]);
+  y0_ = N_VMake_Serial(ny_,&input(INTEGRATOR_X0)[0]);
   y_ = N_VMake_Serial(ny_,&result(INTEGRATOR_XF)[0]);
 
   // Set error handler function
@@ -263,7 +263,7 @@ void CVodesInternal::init(){
   // Quadrature equations
   if(nq_>0){
     // Allocate n-vectors for quadratures
-    yQ0_ = N_VMake_Serial(nq_,&argument(INTEGRATOR_X0)[ny_]);
+    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0)[ny_]);
     yQ_ = N_VMake_Serial(nq_,&result(INTEGRATOR_XF)[ny_]);
 
     // Initialize quadratures in CVodes
@@ -324,7 +324,7 @@ void CVodesInternal::init(){
       }
       
       // Pass pointer to parameters
-      flag = CVodeSetSensParams(mem_,&argument(INTEGRATOR_P)[0],0,0);
+      flag = CVodeSetSensParams(mem_,&input(INTEGRATOR_P)[0],0,0);
       if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensParams",flag);
 
       //  CVodeSetSensDQMethod
@@ -480,7 +480,7 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(y,ODE_Y);
-  f_.setInput(argument(INTEGRATOR_P),ODE_P);
+  f_.setInput(input(INTEGRATOR_P),ODE_P);
 
     // Evaluate
   f_.evaluate();
@@ -513,8 +513,8 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
   asens_order_ = asens_order;
   
   // Get the time horizon
-  double t0 = argument(INTEGRATOR_T0)[0];
-  double tf = argument(INTEGRATOR_TF)[0];
+  double t0 = input(INTEGRATOR_T0)[0];
+  double tf = input(INTEGRATOR_TF)[0];
   t_ = t0;
 
   // Re-initialize
@@ -549,7 +549,7 @@ void CVodesInternal::integrate(double t_out){
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
-    copy(argument(INTEGRATOR_X0).begin(),argument(INTEGRATOR_X0).end(),result(INTEGRATOR_XF).begin());
+    copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),result(INTEGRATOR_XF).begin());
     if(fsens_order_>0){
       for(int i=0; i<nfdir_; ++i){
         copy(fwdSeed(INTEGRATOR_X0,i).begin(),fwdSeed(INTEGRATOR_X0,i).end(),fwdSens(INTEGRATOR_XF,i).begin());
@@ -587,7 +587,7 @@ void CVodesInternal::integrate(double t_out){
 }
 
 void CVodesInternal::resetAdj(){
-  double tf = argument(INTEGRATOR_TF)[0];
+  double tf = input(INTEGRATOR_TF)[0];
 
   int flag;
   
@@ -740,7 +740,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
     // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(NV_DATA_S(y),ODE_Y);
-  f_.setInput(argument(INTEGRATOR_P),ODE_P);
+  f_.setInput(input(INTEGRATOR_P),ODE_P);
 
    // Calculate the forward sensitivities, nfdir_f_ directions at a time
    for(int j=0; j<nfdir_; j += nfdir_f_){
@@ -783,7 +783,7 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, 
     // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(NV_DATA_S(y),ODE_Y);
-  f_.setInput(argument(INTEGRATOR_P),ODE_P);
+  f_.setInput(input(INTEGRATOR_P),ODE_P);
 
   // Pass forward seeds
   f_.setFwdSeed(0.0,ODE_T);
@@ -825,7 +825,7 @@ void CVodesInternal::rhsQ(double t, const double* yy, double* rhsQ){
 // Pass input
   q_.setInput(t,ODE_T);
   q_.setInput(yy,ODE_Y);
-  q_.setInput(argument(INTEGRATOR_P),ODE_P);
+  q_.setInput(input(INTEGRATOR_P),ODE_P);
 
   // Evaluate
   q_.evaluate();
@@ -840,7 +840,7 @@ void CVodesInternal::rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector 
   // Pass input
   q_.setInput(t,ODE_T);
   q_.setInput(NV_DATA_S(y),ODE_Y);
-  q_.setInput(argument(INTEGRATOR_P),ODE_P);
+  q_.setInput(input(INTEGRATOR_P),ODE_P);
 
   for(int i=0; i<nfdir_; ++i){
     // Pass forward seeds
@@ -877,7 +877,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(y,ODE_Y);
-  f_.setInput(argument(INTEGRATOR_P),ODE_P);
+  f_.setInput(input(INTEGRATOR_P),ODE_P);
 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,ODE_RHS);
@@ -895,7 +895,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     // Pass input to quadratures
     q_.setInput(t,ODE_T);
     q_.setInput(y,ODE_Y);
-    q_.setInput(argument(INTEGRATOR_P),ODE_P);
+    q_.setInput(input(INTEGRATOR_P),ODE_P);
 
     // Pass adjoint seeds
     q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],ODE_RHS);
@@ -940,7 +940,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(y,ODE_Y);
-  f_.setInput(argument(INTEGRATOR_P),ODE_P);
+  f_.setInput(input(INTEGRATOR_P),ODE_P);
 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,ODE_RHS);
@@ -956,7 +956,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     // Pass input to quadratures
     q_.setInput(t,ODE_T);
     q_.setInput(y,ODE_Y);
-    q_.setInput(argument(INTEGRATOR_P),ODE_P);
+    q_.setInput(input(INTEGRATOR_P),ODE_P);
 
     // Pass adjoint seeds
     q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],ODE_RHS);
@@ -1000,7 +1000,7 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(y,ODE_Y);
-  f_.setInput(argument(INTEGRATOR_P),ODE_P);
+  f_.setInput(input(INTEGRATOR_P),ODE_P);
 
   // Pass input seeds
   f_.setFwdSeed(0.0,ODE_T);
@@ -1037,7 +1037,7 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   // Pass inputs to the jacobian function
   jac_f_.setInput(t,ODE_T);
   jac_f_.setInput(NV_DATA_S(y),ODE_Y);
-  jac_f_.setInput(f_.argument(ODE_P),ODE_P);
+  jac_f_.setInput(f_.input(ODE_P),ODE_P);
 
   // Evaluate
   jac_f_.evaluate();
@@ -1084,7 +1084,7 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   // Pass inputs to the jacobian function
   jac_f_.setInput(t,ODE_T);
   jac_f_.setInput(NV_DATA_S(y),ODE_Y);
-  jac_f_.setInput(f_.argument(ODE_P),ODE_P);
+  jac_f_.setInput(f_.input(ODE_P),ODE_P);
 
   // Evaluate
   jac_f_.evaluate();
@@ -1167,7 +1167,7 @@ void CVodesInternal::psetup(double t, N_Vector y, N_Vector fy, booleantype jok, 
   // Pass input to the jacobian function
   M_.setInput(t,M_T);
   M_.setInput(NV_DATA_S(y),M_Y);
-  M_.setInput(argument(INTEGRATOR_P),M_P);
+  M_.setInput(input(INTEGRATOR_P),M_P);
   M_.setInput(gamma,M_GAMMA);
 
   // Evaluate jacobian

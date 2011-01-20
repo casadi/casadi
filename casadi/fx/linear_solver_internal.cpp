@@ -31,9 +31,9 @@ LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, int nrhs) : nrow_
 void LinearSolverInternal::init(){
   // Allocate space for inputs
   input_.resize(2);
-  argument(0) = Matrix<double>(nrow_,ncol_,col_,rowind_);
+  input(0) = Matrix<double>(nrow_,ncol_,col_,rowind_);
   input_[0].dense = false;
-  argument(1).resize(nrow_*nrhs_,1); // right hand side
+  input(1).resize(nrow_*nrhs_,1); // right hand side
   
   // Allocate space for outputs
   output_.resize(1);

@@ -63,7 +63,7 @@ void LapackQRDenseInternal::prepare(){
   prepared_ = false;
   
   // Get the elements of the matrix, dense format
-  argument(0).get(mat_,DENSE);
+  input(0).get(mat_,DENSE);
   
   // Factorize the matrix
   int info = -100;
@@ -77,7 +77,7 @@ void LapackQRDenseInternal::prepare(){
     
 void LapackQRDenseInternal::solve(){
   // Input and output vectors
-  const vector<double>& b = argument(1);
+  const vector<double>& b = input(1);
   vector<double>& x = result();
   
   // Copy the right hand side to the solution vector

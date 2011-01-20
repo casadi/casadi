@@ -138,11 +138,11 @@ bool FXInternal::monitored(const std::string& mod) const{
   return monitors_.count(mod)>0;
 }
 
-Matrix<double>& FXInternal::argument(int iind){
+Matrix<double>& FXInternal::input(int iind){
   return inputStruct(iind).data;
 }
     
-const Matrix<double>& FXInternal::argument(int iind) const{
+const Matrix<double>& FXInternal::input(int iind) const{
   return inputStruct(iind).data;
 }
 

@@ -145,13 +145,13 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
   integrator_.setInput(t_.getLastTime(),CasADi::INTEGRATOR_TF);
   
   // Set the initial conditions
-  vector<double>& yy = integrator_.argument(CasADi::INTEGRATOR_X0);
+  vector<double>& yy = integrator_.input(CasADi::INTEGRATOR_X0);
   &yy[0] << const_cast<Vector &>(x0);
 //  &yy[md] << const_cast<Vector &>(xa);
   
 
   // Parameters and controls
-  vector<double>& pp = integrator_.argument(CasADi::INTEGRATOR_P);
+  vector<double>& pp = integrator_.input(CasADi::INTEGRATOR_P);
   &pp[0] << const_cast<Vector &>(p);
   &pp[mp] << const_cast<Vector &>(u);
   

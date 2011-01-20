@@ -118,12 +118,12 @@ bool FX::checkNode() const{
   return dynamic_cast<const FXInternal*>(get());
 }
 
-Matrix<double>& FX::argument(int iind){
-  return (*this)->argument(iind);
+Matrix<double>& FX::input(int iind){
+  return (*this)->input(iind);
 }
     
-const Matrix<double>& FX::argument(int iind) const{
-  return (*this)->argument(iind);
+const Matrix<double>& FX::input(int iind) const{
+  return (*this)->input(iind);
 }
 
 Matrix<double>& FX::result(int oind){
