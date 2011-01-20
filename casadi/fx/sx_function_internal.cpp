@@ -1292,7 +1292,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   for(int ind=0; ind<input_.size(); ++ind){
     for(int i=0; i<input_ind[ind].size(); ++i){
       int el = input_ind[ind][i];
-      cfile << "double i" << el << "=x[" << ind << "][" << i << "];" << endl;
+      cfile << "double i_" << el << "=x[" << ind << "][" << i << "];" << endl;
       declared[el] = true;
     }
   }
@@ -1305,11 +1305,11 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
       cfile << "double ";
       declared[it->ind]=true;
     }
-    cfile << "i" << it->ind << "=";
+    cfile << "i_" << it->ind << "=";
     if(tree[it->ch[0]]->isConstant())  s0 << tree[it->ch[0]]->getValue();
-    else                               s0 << "i" << it->ch[0];
+    else                               s0 << "i_" << it->ch[0];
     if(tree[it->ch[1]]->isConstant())  s1 << tree[it->ch[1]]->getValue();
-    else                               s1 << "i" << it->ch[1];
+    else                               s1 << "i_" << it->ch[1];
     print_c[op](cfile ,s0.str(),s1.str());
     cfile  << ";" << endl;
   }
@@ -1322,7 +1322,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
       if(tree[el]->isConstant())
         cfile << tree[el]->getValue() << ";" << endl;
       else
-        cfile << "i" << el << ";" << endl;
+        cfile << "i_" << el << ";" << endl;
     }
   }
 
