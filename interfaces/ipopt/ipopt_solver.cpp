@@ -31,8 +31,8 @@ namespace CasADi{
 IpoptSolver::IpoptSolver(){
 }
   
-IpoptSolver::IpoptSolver(const FX& F, const FX& G, const FX& H, const FX& J){
-  assignNode(new IpoptInternal(F,G,H,J));
+IpoptSolver::IpoptSolver(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF){
+  assignNode(new IpoptInternal(F,G,H,J,GF));
 }
 
 IpoptInternal* IpoptSolver::operator->(){

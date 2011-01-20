@@ -59,9 +59,12 @@ class casadiTestCase(unittest.TestCase):
     if not(type(x0)==list):
       x0=[x0]
     for i in range(len(x0)):
-      f.setInput(x0[i],i)
+      try:
+        f.setInput(x0[i],i)
+      except:
+         raise Exception("ERROR! Tried to set input with ", x0[i], " which is of type ", type(x0[i]))
     f.evaluate()
-    zt = f.output(0).getArray()
+    zt = f.output(0).toArray()
     self.checkarray(yr,zt,name)
     
   def numpyEvaluationCheck(self,ft,fr,x,x0,name=""):

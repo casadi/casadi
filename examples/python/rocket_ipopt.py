@@ -201,7 +201,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   F = inner_prod(U,U)
 
   # Terminal constraints
-  G = vertcat(X[0],X[1])
+  G = vertcat((X[0],X[1]))
   
   # Create the NLP
   ffcn = MXFunction([U],[F]) # objective function
@@ -237,7 +237,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   solver.solve()
 
   # Get the solution
-  xopt = solver.getOutput(NLP_X_OPT)
+  xopt = solver.output(NLP_X_OPT)
 
   # Plot the optimal trajectory
   plt.figure()

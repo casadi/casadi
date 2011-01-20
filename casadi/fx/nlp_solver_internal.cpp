@@ -25,28 +25,28 @@
 using namespace std;
 namespace CasADi{
 
-NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
+NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
     
-  n_ = F_.input(0).get().numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).get().numel();
+  n_ = F_.input(0).numel();
+  m_ = G_.isNull() ? 0 : G_.output(0).numel();
 
   input_.resize(6);
-  input_[NLP_X_INIT].setSize(n_,1);
-  input_[NLP_LBX].setSize(n_,1);
-  input_[NLP_UBX].setSize(n_,1);
-  input_[NLP_LBG].setSize(m_,1);
-  input_[NLP_UBG].setSize(m_,1);
-  input_[NLP_LAMBDA_INIT].setSize(m_,1);
+  input(NLP_X_INIT).resize(n_,1);
+  input(NLP_LBX).resize(n_,1);
+  input(NLP_UBX).resize(n_,1);
+  input(NLP_LBG).resize(m_,1);
+  input(NLP_UBG).resize(m_,1);
+  input(NLP_LAMBDA_INIT).resize(m_,1);
   
   // Allocate space for outputs
   output_.resize(5);
-  output_[NLP_X_OPT].setSize(n_,1);
-  output_[NLP_COST].setSize(1,1);
-  output_[NLP_LAMBDA_OPT].setSize(m_,1);
-  output_[NLP_LAMBDA_LBX].setSize(n_,1);
-  output_[NLP_LAMBDA_UBX].setSize(n_,1);
+  output(NLP_X_OPT).resize(n_,1);
+  output(NLP_COST).resize(1,1);
+  output(NLP_LAMBDA_OPT).resize(m_,1);
+  output(NLP_LAMBDA_LBX).resize(n_,1);
+  output(NLP_LAMBDA_UBX).resize(n_,1);
 
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){
@@ -72,6 +72,7 @@ void NLPSolverInternal::init(){
   if(!G_.isNull()) G_.init();
   if(!J_.isNull()) J_.init();
   if(!H_.isNull()) H_.init();
+  if(!GF_.isNull()) GF_.init();
 }
 
 

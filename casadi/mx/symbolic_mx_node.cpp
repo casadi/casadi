@@ -21,14 +21,12 @@
  */
 
 #include "symbolic_mx_node.hpp"
-#include <cassert>
-#include <vector>
 
 using namespace std;
 
 namespace CasADi{
 
-SymbolicMatrix::SymbolicMatrix(const std::string& name_, int n, int m) : name(name_) {
+SymbolicMatrix::SymbolicMatrix(const std::string& name, int n, int m) : name_(name) {
   setSize(n,m);
 }
 
@@ -37,21 +35,18 @@ SymbolicMatrix* SymbolicMatrix::clone() const{
 }
 
 void SymbolicMatrix::print(std::ostream &stream) const{
-  stream << name;
+  stream << name_;
 }
 
 void SymbolicMatrix::evaluate(int fsens_order, int asens_order){
 }
-
-// void SymbolicMatrix::evaluateAdj(){
-// }
 
 bool SymbolicMatrix::isSymbolic() const{
   return true;
 }
 
 const std::string& SymbolicMatrix::getName() const{
-  return name;
+  return name_;
 }
 
 } // namespace CasADi

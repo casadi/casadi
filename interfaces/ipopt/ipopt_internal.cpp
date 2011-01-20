@@ -28,7 +28,7 @@ using namespace std;
 #include <coin/IpIpoptApplication.hpp>
 namespace CasADi{
 
-IpoptInternal::IpoptInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_) : NLPSolverInternal(F_,G_,H_,J_){
+IpoptInternal::IpoptInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_, const FX& GF_) : NLPSolverInternal(F_,G_,H_,J_,GF_){
   
   // Output
   ops_["print_level"] = OT_INTEGER;
@@ -276,12 +276,11 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
-  copy(x,x+n_,output_[NLP_X_OPT].get().begin());
-  copy(z_L,z_L+n_,output_[NLP_LAMBDA_LBX].get().begin());
-  copy(z_U,z_U+n_,output_[NLP_LAMBDA_UBX].get().begin());
-  copy(lambda,lambda+m_,output_[NLP_LAMBDA_OPT].get().begin());
-  output_[NLP_COST].get().at(0) = obj_value;
-
+  copy(x,x+n_,output(NLP_X_OPT).begin());
+  copy(z_L,z_L+n_,output(NLP_LAMBDA_LBX).begin());
+  copy(z_U,z_U+n_,output(NLP_LAMBDA_UBX).begin());
+  copy(lambda,lambda+m_,output(NLP_LAMBDA_OPT).begin());
+  output(NLP_COST).at(0) = obj_value;
 }
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
@@ -289,7 +288,7 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
-    H_.result().sparsity().getSparsityCRS(rowind,col);
+    H_.output().sparsity().getSparsityCRS(rowind,col);
     for(int r=0; r<rowind.size()-1; ++r)
       for(int el=rowind[r]; el<rowind[r+1]; ++el){
 //        if(col[el]>=r){
@@ -320,7 +319,7 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
     if (values == NULL) {
       int nz=0;
       vector<int> rowind,col;
-      J_.result().sparsity().getSparsityCRS(rowind,col);
+      J_.output().sparsity().getSparsityCRS(rowind,col);
       for(int r=0; r<rowind.size()-1; ++r)
         for(int el=rowind[r]; el<rowind[r+1]; ++el){
   //        if(col[el]>=r){
@@ -341,7 +340,7 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
       
       if(monitored("eval_jac_g")){
         cout << "J = " << endl;
-        J_.result().printSparse();
+        J_.output().printSparse();
       }
     }
     
@@ -395,7 +394,7 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 
   // Printing
   if(monitored("eval_g"))
-    cout << "g = " << G_.result() << endl;
+    cout << "g = " << G_.output() << endl;
     
   log("eval_g ok");
   return true;
@@ -440,10 +439,10 @@ bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
 {
   assert(n == n_);
   assert(m == m_);
-  vector<double> &lbx = input(NLP_LBX).get();  copy(lbx.begin(),lbx.end(),x_l);
-  vector<double> &ubx = input(NLP_UBX).get();  copy(ubx.begin(),ubx.end(),x_u);
-  vector<double> &lbg = input(NLP_LBG).get();  copy(lbg.begin(),lbg.end(),g_l);
-  vector<double> &ubg = input(NLP_UBG).get();  copy(ubg.begin(),ubg.end(),g_u);
+  vector<double> &lbx = input(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
+  vector<double> &ubx = input(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
+  vector<double> &lbg = input(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
+  vector<double> &ubg = input(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
   return true;
 }
 
@@ -457,7 +456,7 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   assert(init_x == true);
   assert(init_z == false);
   assert(init_lambda == false);
-  const vector<double> &xinit = input_[NLP_X_INIT].get();
+  const vector<double> &xinit = input(NLP_X_INIT);
   copy(xinit.begin(),xinit.end(),x);
   return true;
 }
@@ -473,13 +472,13 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
   if(G_.isNull())
     nnz_jac_g = 0;
   else
-    nnz_jac_g = J_.output().get().size();
+    nnz_jac_g = J_.output().size();
 
   // Get Hessian sparsity pattern
   if(H_.isNull())
     nnz_h_lag = 0;
   else
-    nnz_h_lag = H_.output().get().size();
+    nnz_h_lag = H_.output().size();
 }
 
 } // namespace CasADi

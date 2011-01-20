@@ -20,36 +20,52 @@
  *
  */
 
-#ifndef SCALAR_MATRIX_OP_HPP
-#define SCALAR_MATRIX_OP_HPP
+#ifndef C_FUNCTION_INTERNAL_HPP
+#define C_FUNCTION_INTERNAL_HPP
 
-#include "mx_node.hpp"
+#include "c_function.hpp"
+#include "fx_internal.hpp"
+#include <string>
 
 namespace CasADi{
-/** Represents any binary operation that involves a matrix and a scalar
+  
+  /** \brief  Internal class for CFunction
   \author Joel Andersson 
   \date 2010
-*/
-class ScalarMatrixOp : public MXNode{
+  A regular user should never work with any Node class. Use CFunction directly.
+  */
+class CFunctionInternal : public FXInternal{
+  friend class CFunction;
   public:
+    
+    /** \brief  Create a function */
+    explicit CFunctionInternal(CFunctionWrapper c_fcn);
+    
+    /** \brief  Destructor */
+    virtual ~CFunctionInternal();
 
-    /** \brief  Constructor */
-    ScalarMatrixOp (OPERATION op, const MX& x, const MX& y);
+    /** \brief  Set user data structure (to be passed to all functions) */
+    void setUserData(void* user_data);
+  
+    /** \brief  Evaluate */
+    virtual void evaluate(int fsens_order, int asens_order);
+  
+    /** \brief  Initialize */
+    virtual void init();
+  
+  
+  protected:
+    void* user_data_;
+    CFunctionWrapper evaluate_;
+  
+    /// A reference to this object to be passed to the user functions
+    CFunction ref_;
+    
+}; // class CFunctionInternal 
+  
 
-    /** \brief  Clone function */
-    virtual ScalarMatrixOp * clone() const;
-
-    /** \brief  Print */
-    virtual void print(std::ostream &stream=std::cout) const;
-
-    /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(int fsens_order, int asens_order);  
-
-    //! \brief Operation
-    OPERATION op;
-};
 
 } // namespace CasADi
 
 
-#endif // SCALAR_MATRIX_OP_HPP
+#endif // C_FUNCTION_INTERNAL_HPP

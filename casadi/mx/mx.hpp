@@ -24,8 +24,8 @@
 #define MX_HPP
 
 #include "../shared_object.hpp"
+#include "../matrix/matrix.hpp"
 #include "../sx/sx.hpp"
-#include "slicer.hpp"
 #include <vector>
 
 namespace CasADi{
@@ -33,152 +33,110 @@ namespace CasADi{
 /** \brief  Forward declaration */
 class MXNode;
 
-/** \brief The main matrix class.
-  Operations on MX are lazy on the matrix level.
-
-  Index flatten happens as follows: (i,j) -> k = j+i*size2()
+/** \brief MX - Matrix expression
+  The MX class is used to build up trees made up from MXNodes. It is a more general graph representation than the scalar expression,
+  SX, and much less efficient for small objects. On the other hand, the class allows much more general operations than does SX,
+  in particular matrix valued operations and calls to arbitrary differentiable functions.
+  
+  The MX class is designed to have identical syntax with the Matrix<> template class, and uses Matrix<double> as its internal 
+  representation of the values at a node. By keeping the syntaxes identical, it is possible to switch from one class to the other, 
+  as well as inlining MX functions to SX functions.
+  
+  Note that an operation is always "lazy", making a matrix multiplication will create a matrix multiplication node, not perform
+  the actual multiplication.
 
   \author Joel Andersson 
-  \date 2010
+  \date 2010-2011
 */
 class MX : public SharedObject{
-public:
- 
-/** \brief  Default constructor */
-  MX();
+  public:
+  
+    /** \brief  Default constructor */
+    MX();
 
-/** \brief  Construct a symbolic matrix (matrix variable)
-Internally represented by SymbolicMatrix
-*/
-  explicit MX(const std::string& name, int n=1, int m=1);
+    /** \brief  Construct a symbolic matrix (matrix variable) */
+    explicit MX(const std::string& name, int n=1, int m=1);
 
-/** \brief  Create constant */
-  MX(double x);
-  MX(const std::vector<double> &x);
-  MX(const std::vector<double> &x, int n, int m=1, char order='R');
-#ifdef WITH_CPP0X
-  MX(std::initializer_list<double> list);
-#endif
-
-/** \brief  Destructor */
-  ~MX();
-
-#ifndef SWIG
-/** \brief  Immutable matrix style access
-   Get an element of the matrix (without changing this object)
- */  
- const MX operator()(int i, int j) const;
-/** \brief  Immutable vector style access
-   Get an element of the matrix (without changing this object)
- */  
- const MX operator[](int k) const;          
-
-/** \brief  Element of the matrix which is allowed to change the object (vector style index)
-  \author Joel Andersson 
-  \date 2010
-  Allows to get elements from an MX and changing them.
-  Elements are scalars, use other techniques for having sliced access.
-  \see MatrixElement	
-*/
-  class Element : public PrintableObject{
-    public:
-      /** \brief Vector style access constructor */
-      Element(MX& mx, int k);
-      
-      /** \brief  Print */
-      virtual void print(std::ostream &stream=std::cout) const;
-      
-      /** \brief  Automatic type conversion (? =  A[i], sqrt(A[i]) etc.) */
-      operator MX() const;
-      //@{
-      /** \brief  Objects that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.) */
-      MX& operator=(const MX &y);
-      MX& operator+=(const MX &y);
-      MX& operator-=(const MX &y);
-      MX& operator*=(const MX &y);
-      MX& operator/=(const MX &y);
-      //@}
+    /** \brief  Create scalar constant (also implicit type conversion) */
+    MX(double x);
     
-    protected:
-      MX& mx;
-      int k;
-  };
+    /** \brief  Create vector constant (also implicit type conversion) */
+    MX(const std::vector<double> &x);
+    
+    /** \brief  Create sparse matrix constant (also implicit type conversion) */
+    MX(const Matrix<double> &x);
 
-/** \brief  Mutable matrix style access
-   Get an element of the matrix (possibly changing this object)
- */  
-  Element operator()(int i, int j);
-/** \brief  Mutable vector style access
-   Get an element of the matrix (possibly changing this object)
- */  
-  Element operator[](int k);
-#endif // SWIG
-
-  /** \brief  Get the number of (structural) non-zero elements */
-  int size_new() const;
-
-  /** \brief  Get the number of elements */
-  int numel() const;
-
-  /** \brief get the first dimension
-  For an n-by-m matrix, returns n
-  */
-  int size1() const;
-/** \brief get the second dimension
-For an n-by-m matrix, returns m
-  */
-  int size2() const;
-
-//@{
-/** \brief  Operators that changes the object */
-  MX& operator+=(const MX &y);
-  MX& operator-=(const MX &y);
-  MX& operator*=(const MX &y);
-  MX& operator/=(const MX &y);
-//@}
+    /** \brief  Destructor */
+    ~MX();
 
 #ifndef SWIG
-//@{
-/** \brief  Operators */
-  friend MX operator+(const MX &x, const MX &y);
-  friend MX operator-(const MX &x, const MX &y);
-  friend MX operator*(const MX &x, const MX &y);
-  friend MX operator/(const MX &x, const MX &y);
-  MX operator-() const;
-//@}
+    /** \brief  Get matrix element */
+    const MX operator()(int i, int j) const;
+ 
+    /** \brief  Get matrix non-zero */
+    const MX operator[](int k) const;          
+
+    /** \brief  Get matrix element */
+    SubMatrix<MX> operator()(int i, int j);
+ 
+    /** \brief  Get matrix non-zero */
+    SubMatrix<MX> operator[](int k);
+
 #endif // SWIG
+
+    /** \brief  Get the number of (structural) non-zero elements */
+    int size() const;
+
+    /** \brief  Get the number of elements */
+    int numel() const;
+
+    /** \brief get the first dimension (i.e. n for a n-by-m matrix) */
+    int size1() const;
+    
+    /** \brief get the first dimension (i.e. m for a n-by-m matrix) */
+    int size2() const;
+
+    /** \brief Get the sparsity pattern */
+    const CRSSparsity& sparsity() const;
+
+  //@{
+  /** \brief  Operators that changes the object */
+    MX& operator+=(const MX &y);
+    MX& operator-=(const MX &y);
+    MX& operator*=(const MX &y);
+    MX& operator/=(const MX &y);
+  //@}
+
+  #ifndef SWIG
+  //@{
+  /** \brief  Operators */
+    friend MX operator+(const MX &x, const MX &y);
+    friend MX operator-(const MX &x, const MX &y);
+    friend MX operator*(const MX &x, const MX &y);
+    friend MX operator/(const MX &x, const MX &y);
+    MX operator-() const;
+  //@}
+  #endif // SWIG
 
   /** \brief  Check if the matrix expression is empty */
-  bool isEmpty() const;
+  bool empty() const;
   
-/** \brief  Initialize the tree */
-/** \brief    void init(); */
-
-#ifndef SWIG
-/** \brief  Lowlevel. Get a pointer to the node
-A regular user should never use this.
-*/
-  MXNode* get();
-/** \brief  Lowlevel. Get a pointer to the node
-A regular user should never use this.
-*/
-  const MXNode* get() const;
-#endif // SWIG
-
-//@{
-/** \brief  Quick access a member of the node */
+  //@{
+  /** \brief  Access a member of the node */
   MXNode* operator->();
-  const MXNode* operator->() const;
-//@}
 
-//@{
-  /** \brief  Create nodes by their ID */
-  static MX binary(int op, const MX &x, const MX &y);
-  static MX unary(int op, const MX &x);
-  static MX scalar_matrix(int op, const MX &x, const MX &y);
-  static MX matrix_scalar(int op, const MX &x, const MX &y);
-  static MX matrix_matrix(int op, const MX &x, const MX &y);
-//@}
+  /** \brief  Const access a member of the node */
+  const MXNode* operator->() const;
+  //@}
+
+  //@{
+    /** \brief  Create nodes by their ID */
+    static MX binary(int op, const MX &x, const MX &y);
+    static MX unary(int op, const MX &x);
+    static MX scalar_matrix(int op, const MX &x, const MX &y);
+    static MX matrix_scalar(int op, const MX &x, const MX &y);
+    static MX matrix_matrix(int op, const MX &x, const MX &y);
+  //@}
 
   /** \brief  Matrix of all zeros */  
   static MX zeros(int nrow, int ncol);
@@ -186,21 +144,16 @@ A regular user should never use this.
   /** \brief  Matrix of all ones */  
   static MX ones(int nrow, int ncol);
   
-  //! \brief delayed setting or getting an element
-  MX getElement(int k) const;
-  MX& setElement(const MX& el, int k);
+  //@{
+  /// Python stuff
+  const MX __getitem__(int k) const;
+  const MX __getitem__(const std::vector<int>& I) const;
+  MX& __setitem__(int k, const MX& el);
+  MX& __setitem__(const std::vector<int> &I, const MX&  el);
+  //@}
 
-#ifndef SWIG
-  //! \brief Get a slice of an MX
-  MX slice(Slicer i, Slicer j) const;
-#endif // SWIG
-
-  //! \brief Get a row slice of an MX
-  MX getRow(int i) const;
-
-  //! \brief Get a column slice of an MX
-  MX getColumn(int j) const;
-  
+  const MX getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
+  void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el);
 };
 
 } // namespace CasADi
@@ -236,84 +189,8 @@ MX fmax(const MX &a, const MX &b);
 namespace CasADi {
 
 %extend MX {
-std::string __repr__() { return $self->getRepresentation(); }
-
-
-// Get or set an element
-MX __getitem__(int k){ return $self->getElement(k);}
-MX __getitem__(const std::vector<int> &I ){if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); return $self->operator()(I[0],I[1]);}
-//MX __getitem__(PyObject* list){
-//              if(PyList_Size(list)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
-//              return $self->slice(CasADi::Slicer(PyList_GetItem(list, 0)),CasADi::Slicer(PyList_GetItem(list, 1))
-//              );
-//}
-
-MX __getitem__(PyObject* list){
-    if (!PyTuple_Check(list) && ($self->size1()==1 || $self->size2()==1)) {
-      CasADi::Slicer *i;
-                  bool succes=true;
-
-                  if (PyInt_Check(list)) {
-                          i=new CasADi::Slicer(PyInt_AsLong(list));
-                  } else if (PyList_Check(list)) {
-                          std::vector<int> arg;
-                          for (int l=0;l<PyList_Size(list);l++) {
-                                  arg.push_back(PyInt_AsLong(PyList_GetItem(list,l)));
-                          }
-                          i=new CasADi::Slicer(arg);
-                  } else if (PyObject_TypeCheck(list,&PySlice_Type)) {
-                          i=new CasADi::Slicer(PySliceObjectToSlicerPrimitiveFromTo((PySliceObject*)list));
-                  } else {
-                          succes=false;
-                  }
-                  if (succes) {
-                    if ($self->size1()==1)
-                            return $self->slice(CasADi::Slicer(0),*i);
-                    if ($self->size2()==1)
-                            return $self->slice(*i,CasADi::Slicer(0));
-                  } else {
-                          if (succes) delete i;
-                          throw CasADi::CasadiException("__getitem__: wrong arguments");
-                  }
-                        if (succes) delete i;
-    }
-                if (!PyTuple_Check(list))  throw CasADi::CasadiException("__getitem__: expecting tuple");
-                if(PyTuple_Size(list)!=2) throw CasADi::CasadiException("__getitem__: not 2D");
-                CasADi::Slicer *i[2];
-                bool delme[2];
-                bool succes=true;
-
-                for (int k=0;k<2;k++) {
-                        delme[k]=true;
-                        if (PyInt_Check(PyTuple_GetItem(list, k))) {
-                                i[k]=new CasADi::Slicer(PyInt_AsLong(PyTuple_GetItem(list, k)));
-                        } else if (PyList_Check(PyTuple_GetItem(list, k))) {
-                                std::vector<int> arg;
-                                for (int l=0;l<PyList_Size(PyTuple_GetItem(list, k));l++) {
-                                        arg.push_back(PyInt_AsLong(PyList_GetItem(PyTuple_GetItem(list, k),l)));
-                                }
-                                i[k]=new CasADi::Slicer(arg);
-                        } else if (PyObject_TypeCheck(PyTuple_GetItem(list, k),&PySlice_Type)) {
-                                i[k]=new CasADi::Slicer(PySliceObjectToSlicerPrimitiveFromTo((PySliceObject*)PyTuple_GetItem(list, k)));
-                        } else {
-                                succes=false;
-                                delme[k]=false;
-                        }
-                }
-                if (succes) {
-                        return $self->slice(*i[0],*i[1]);
-                } else {
-                        if (delme[0]) delete i[0];
-                        if (delme[1]) delete i[1];
-                        throw CasADi::CasadiException("__getitem__: wrong arguments");
-                }
-                if (delme[0]) delete i[0];
-                if (delme[1]) delete i[1];
+std::string __repr__() { return $self->getRepresentation();
 }
-
-//MX __setitem__(int k, const MX& el){ return $self->setElement(el,k);}
-MX __setitem__(int k, const MX& el){ $self->getElement(k) = el; return *$self;}
-MX __setitem__(const std::vector<int> &I, const MX&  el){ if(I.size()!=2) throw CasADi::CasadiException("__setitem__: not 2D"); $self->operator()(I[0],I[1]) = el; return *$self;}
 
 // all binary operations with a particular right argument
 #define binops(t) \
@@ -358,9 +235,7 @@ MX erf(){ return std::erf(*$self);}
 } // namespace CasADi
 
 // Template instantiations
-namespace std {
-%template(vector_mx) vector<CasADi::MX>;
-} // namespace std;
+%template(MXVector) std::vector<CasADi::MX>;
 
 #endif // SWIG
 

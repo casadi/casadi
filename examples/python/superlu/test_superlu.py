@@ -19,7 +19,8 @@ b = ones((nrow,1),dtype=float)
 r_scipy = spsolve(A,b)
 
 # Solve with SuperLU
-linear_solver = SuperLU(nrow,ncol,rowind,col)
+linear_solver = SuperLU(nrow,ncol)
+linear_solver.setSparsity(rowind,col)
 #linear_solver = LapackLUDense(nrow,ncol,rowind,col)
 #linear_solver = LapackQRDense(nrow,ncol,rowind,col)
   
@@ -39,7 +40,7 @@ linear_solver.setInput(nrow*[1.],1)
 linear_solver.evaluate()
   
 # Print the solution
-r_superlu = linear_solver.getOutput()
+r_superlu = linear_solver.output()
   
 # print 
 print "r_scipy = ", r_scipy

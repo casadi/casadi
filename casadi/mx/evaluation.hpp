@@ -33,20 +33,23 @@ namespace CasADi{
   \date 2010
 */
 class Evaluation : public MXNode{
-public:
+  public:
 
-/** \brief  Constructor */
-explicit Evaluation(const FX& fcn, const std::vector<MX> &dep, int oind);
+    /** \brief  Constructor */
+    explicit Evaluation(const FX& fcn, const std::vector<MX> &dep, int oind);
+  
+    /** \brief  Clone function */
+    virtual Evaluation* clone() const;
 
-/** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
+    /** \brief  Print */
+    virtual void print(std::ostream &stream=std::cout) const;
 
-/** \brief  Evaluate the function and store the result in the node */
-virtual void evaluate(int fsens_order, int asens_order);
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(int fsens_order, int asens_order);
 
-protected:
-  FX fcn_;
-  int oind;
+  protected:
+    FX fcn_;
+    int oind;
 
 };
 

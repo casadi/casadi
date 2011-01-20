@@ -35,13 +35,13 @@ fcn.setAdjSeed([0,1])
 fcn.evaluate(1,1)
 
 # Get the results
-res = fcn.getOutput()
+res = fcn.output()
 print "result = ", res
 
-fsens = fcn.getFwdSens()
+fsens = fcn.fwdSens()
 print "forward derivative = ", fsens
 
-asens = fcn.getAdjSens()
+asens = fcn.adjSens()
 print "adjoint derivative = ", asens
 
 # evaluate symbolically

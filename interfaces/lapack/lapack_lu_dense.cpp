@@ -78,7 +78,7 @@ void LapackLUDenseInternal::prepare(){
   prepared_ = false;
   
   // Get the elements of the matrix, dense format
-  input(0).get().get(mat_,DENSE);
+  input(0).get(mat_,DENSE);
 
   if(equilibriate_){
     // Calculate the row and column scaling factors
@@ -119,8 +119,8 @@ void LapackLUDenseInternal::prepare(){
     
 void LapackLUDenseInternal::solve(){
   // Input and output vectors
-  const vector<double>& b = input(1).get();
-  vector<double>& x = output().get();
+  const vector<double>& b = input(1);
+  vector<double>& x = output();
   
   // Copy the right hand side to the solution vector
   copy(b.begin(),b.end(),x.begin());

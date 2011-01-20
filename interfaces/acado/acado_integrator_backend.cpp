@@ -145,13 +145,13 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
   integrator_.setInput(t_.getLastTime(),CasADi::INTEGRATOR_TF);
   
   // Set the initial conditions
-  vector<double>& yy = integrator_.getInputData(CasADi::INTEGRATOR_X0);
+  vector<double>& yy = integrator_.input(CasADi::INTEGRATOR_X0);
   &yy[0] << const_cast<Vector &>(x0);
 //  &yy[md] << const_cast<Vector &>(xa);
   
 
   // Parameters and controls
-  vector<double>& pp = integrator_.getInputData(CasADi::INTEGRATOR_P);
+  vector<double>& pp = integrator_.input(CasADi::INTEGRATOR_P);
   &pp[0] << const_cast<Vector &>(p);
   &pp[mp] << const_cast<Vector &>(u);
   
@@ -161,11 +161,11 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
   
   if(with_sens){
     for(int i=0; i<md; ++i){
-      vector<double> &xsens = integrator_.getFwdSeedData(CasADi::INTEGRATOR_X0,i);
+      vector<double> &xsens = integrator_.fwdSeed(CasADi::INTEGRATOR_X0,i);
       xsens[i] = 1;
     }
     for(int i=0; i<mu+mp; ++i){
-      vector<double> &usens = integrator_.getFwdSeedData(CasADi::INTEGRATOR_P,i+md);
+      vector<double> &usens = integrator_.fwdSeed(CasADi::INTEGRATOR_P,i+md);
       usens[i] = 1;
     }
   }
@@ -237,7 +237,7 @@ ACADO::returnValue AcadoIntegratorBackend::stop(){
 
 
 ACADO::returnValue AcadoIntegratorBackend::getProtectedX( Vector *xEnd ) const{
-  const vector<double>& xf = integrator_.getOutputData(CasADi::INTEGRATOR_XF);
+  const vector<double>& xf = integrator_.output(CasADi::INTEGRATOR_XF);
   if( (int) xEnd[0].getDim() != xf.size() )
     return RET_INPUT_HAS_WRONG_DIMENSION;
 
@@ -249,7 +249,7 @@ ACADO::returnValue AcadoIntegratorBackend::getProtectedX( Vector *xEnd ) const{
 
 
 returnValue AcadoIntegratorBackend::getProtectedForwardSensitivities( ACADO::Matrix *Dx, int order ) const{
-  const vector<double> &sens = integrator_.getFwdSensData(CasADi::INTEGRATOR_XF,ider_);
+  const vector<double> &sens = integrator_.fwdSens(CasADi::INTEGRATOR_XF,ider_);
 
   if( Dx == NULL ){
     return SUCCESSFUL_RETURN;

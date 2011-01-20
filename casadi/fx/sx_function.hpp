@@ -24,7 +24,7 @@
 #define SX_FUNCTION_HPP
 
 #include "fx.hpp"
-#include "../sx/sx_matrix.hpp"
+#include "../sx/sx.hpp"
 #include <vector>
 
 namespace CasADi{
@@ -94,22 +94,19 @@ public:
   
   /// Hessian (forward over adjoint) via source code transformation
   SXMatrix hess(int iind=0, int oind=0);
-
-  /// get an input argument symbolically 
-  SXMatrix getArgumentIn(int iind=0) const;
-
-  /// get an output argument symbolically 
-  SXMatrix getArgumentOut(int iind=0) const;
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /** \brief get MX input **/
-  SXMatrix getInputSX(int ind=0);
+  /** \brief get function input **/
+  const SXMatrix& inputSX(int ind=0) const;
   
-  /** \brief get MX output **/
-  SXMatrix getOutputSX(int ind=0);
+  /** \brief get function output **/
+  const SXMatrix& outputSX(int ind=0) const;
   
+  /** \brief Generate C code for the function **/
+  void generateCode(const std::string& filename) const;
+
 };
   
 } // namespace CasADi

@@ -90,7 +90,7 @@ void model(SymbolicOCP &ocp){
   int n = 30;
   
   // Temperatures
-  SXMatrix T("T",n);
+  SXMatrix T = symbolic("T",n);
   
   ocp.x = T;
   
@@ -348,7 +348,7 @@ int main(){
    ubg.insert(ubg.end(),ocp.x.numel(),0); // equality constraints
   }
   
-  SXMatrix v = vertcat(vars);
+  SXMatrix v = vars;
   SXFunction gfcn_nlp(v,g);
   
   // Objective function of the NLP

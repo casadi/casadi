@@ -9,7 +9,6 @@ class SXtests(casadiTestCase):
 
   def setUp(self):
     self.pool=FunctionPool()
-    self.pool.append(lambda x: fabs(x[0]),abs,"abs")
     self.pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
     self.pool.append(lambda x: sin(x[0]),sin,"sin")
     self.pool.append(lambda x: cos(x[0]),cos,"cos")
@@ -38,19 +37,19 @@ class SXtests(casadiTestCase):
     
     
   def test_scalarSX(self):
-      x=SXMatrix("x")
+      x=symbolic("x")
       x0=0.738
+      
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
       
   def test_gradient(self):
-      x=SXMatrix("x");
+      x=symbolic("x");
       x0=1;
       p=10 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
       dxr=p;
       self.evaluationCheck([dx],dxr,[x],x0,name="jacobian");
-      
       dxr=1
       for i in list(range(p)):
         y=jacobian(y,x)
@@ -60,12 +59,13 @@ class SXtests(casadiTestCase):
       self.evaluationCheck([y],dxr,[x],x0,name="recursive jacobian");
 
   def test_gradient2(self):
-      x=SXMatrix("x");
-      p=SXMatrix("p");
+      x=symbolic("x");
+      p=symbolic("p");
       x0=1;
       p0=10 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
+      #print dx
       dxr=p0;
       self.evaluationCheck([dx],dxr,[x,p],[x0,p0],name="jacobian");
 
@@ -77,61 +77,51 @@ class SXtests(casadiTestCase):
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
   def test_SXMatrix(self):
-      x=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix")
       
-      x=SXMatrix("x",3,3)
+      x=symbolic("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: SXMatrix(c.det(x[0])), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(c.sum_all(x[0])), lambda   x: sum(x),[x],x0,name="sum_all(SXMatrix)")
-      self.numpyEvaluationCheck(lambda x: c.sum(x[0],0), lambda   x: sum(x,0),[x],x0,name="sum(SXMatrix,0)")
-      self.numpyEvaluationCheck(lambda x: c.sum(x[0],1), lambda   x: array(sum(matrix(x),1)),[x],x0,name="sum(SXMatrix,1)")
-      
-      x=SXMatrix("x",3,1)
-      x0=array([[0.738],[0.2],[0.3]])
-      
-      self.numpyEvaluationCheck(lambda x: norm_2(x[0]),linalg.norm,[x],x0,name="norm_2")
-      self.numpyEvaluationCheck(lambda x: norm_1(x[0]),lambda x: linalg.norm(x,1),[x],x0,name="norm_2")
-
-   
+        
   def test_SXMatrixbinary(self):
-      x=SXMatrix("x",3,2)
-      y=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
+      y=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
       self.assertRaises(RuntimeError, lambda : c.prod(x,y))
       
-  def test_SXMatrixslicing(self):
-      x=SXMatrix("x",3,2)
-      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+  #def test_SXMatrixslicing(self):
+      #x=symbolic("x",3,2)
+      #x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
-      for i in range(3):
-        self.numpyEvaluationCheck(lambda x: getRow(x[0],i), lambda x: x[i,:] ,[x],x0,name="getRow(SXMatrix)")
+      #for i in range(3):
+        #self.numpyEvaluationCheck(lambda x: getRow(x[0],i), lambda x: x[i,:] ,[x],x0,name="getRow(SXMatrix)")
         
-      for j in range(2):
-        self.numpyEvaluationCheck(lambda x: trans(getColumn(x[0],j)), lambda x: x[:,j] ,[x],x0,name="getColumn(SXMatrix)")
-      self.assertRaises(RuntimeError,lambda : getRow(x,3))
-      self.assertRaises(RuntimeError,lambda : getColumn(x,2))
+      #for j in range(2):
+        #self.numpyEvaluationCheck(lambda x: trans(getColumn(x[0],j)), lambda x: x[:,j] ,[x],x0,name="getColumn(SXMatrix)")
+      #self.assertRaises(RuntimeError,lambda : getRow(x,3))
+      #self.assertRaises(RuntimeError,lambda : getColumn(x,2))
 
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
-      self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
-      self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
-      self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
-      self.numpyEvaluationCheck(lambda x: x[0][0,:], lambda x: matrix(x)[0,:],[x],x0,name="x[0,:]")
-      self.numpyEvaluationCheck(lambda x: x[0][-1,:], lambda x: matrix(x)[-1,:],[x],x0,name="x[-1,:]")
-      self.numpyEvaluationCheck(lambda x: x[0][:,-2], lambda x: matrix(x)[:,-2],[x],x0,name="x[:,-2]")
-      self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
-      self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
+      #self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
+      #self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
+      #self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
+      #self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
+      #self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
+      #self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
+      #self.numpyEvaluationCheck(lambda x: x[0][0,:], lambda x: matrix(x)[0,:],[x],x0,name="x[0,:]")
+      #self.numpyEvaluationCheck(lambda x: x[0][-1,:], lambda x: matrix(x)[-1,:],[x],x0,name="x[-1,:]")
+      #self.numpyEvaluationCheck(lambda x: x[0][:,-2], lambda x: matrix(x)[:,-2],[x],x0,name="x[:,-2]")
+      #self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
+      #self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
       
   def test_SXMAtrixSparse(self):
-      x=SXMatrix("x",3,2)
+      x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix_sparse")
@@ -145,7 +135,7 @@ class SXtests(casadiTestCase):
     L=[2,3]
     f.setInput(L)
     f.evaluate()
-    z=f.output(0).getArray()
+    z=f.output(0).toArray()
     zr=fun(*L)
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
@@ -154,7 +144,7 @@ class SXtests(casadiTestCase):
     J.init()
     J.setInput(L)
     J.evaluate()
-    J=J.output(0).getArray()
+    J=J.output(0).toArray()
     Jr=matrix([[1,1],[3,2],[4,27]])
     for i in range(3):
         for j in range(2):
@@ -195,11 +185,11 @@ class SXtests(casadiTestCase):
     fcn.evaluate(1,1)
 
     # Get the results
-    res = fcn.getOutput()
+    res = tuple(fcn.output())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
 
-    fsens = fcn.getFwdSens()
+    fsens = tuple(fcn.fwdSens())
     e=1e-8
     p=fun((L[0]+e*sF[0]),(L[1]+e*sF[1]))
     fsensn=[(p[0]-res[0])/e,(p[1]-res[1])/e]
@@ -210,13 +200,13 @@ class SXtests(casadiTestCase):
     J.init()
     J.setInput(L)
     J.evaluate()
-    J=J.output(0).getArray()
+    J=J.output(0).toArray()
     
     fsensJ=dot(J,array(sF))
     self.assertAlmostEqual(fsensJ[0], fsens[0],10,'SXfunction forward mode evaluation wrong')
     self.assertAlmostEqual(fsensJ[1], fsens[1],10,'SXfunction forward mode evaluation wrong')
     
-    asens = fcn.getAdjSens()
+    asens = tuple(fcn.adjSens())
     asensJ=dot(J.T,array(sA))
     self.assertAlmostEqual(asensJ[0], asens[0],10,'SXfunction adjoint mode evaluation wrong')
     self.assertAlmostEqual(asensJ[1], asens[1],10,'SXfunction adjoint mode evaluation wrong')

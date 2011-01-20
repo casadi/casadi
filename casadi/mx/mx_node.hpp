@@ -36,75 +36,61 @@ namespace CasADi{
   A regular user is not supposed to work with this Node class. Use Option directly.
 */
 class MXNode : public SharedObjectNode{
-friend class MX;
-friend class MXFunctionInternal;
-
-public:
+  friend class MX;
+  friend class MXFunctionInternal;
   
-  /** \brief  Constructor */
-  explicit MXNode();
-
-/** \brief  Destructor */
-  virtual ~MXNode();
-
-/** \brief  Clone function */
-//  virtual MXNode* clone() const;
-
-/** \brief  Print description */
-  virtual void print(std::ostream &stream) const;
-
-/** \brief  Evaluate the function and store the result in the node */
-  virtual void evaluate(int fsens_order, int asens_order) = 0;
-
-/** \brief  Initialize */
-  virtual void init();
+  public:
   
-/** \brief  Get the name */
-  virtual const std::string& getName() const;
-  
-/** \brief  Check if symbolic */
-  virtual bool isSymbolic() const;
+    /** \brief  Constructor */
+    explicit MXNode();
 
-/** \brief  Check if constant */
-  virtual bool isConstant() const;
+    /** \brief  Destructor */
+    virtual ~MXNode();
+
+    /** \brief  Clone function */
+    virtual MXNode* clone() const = 0;
+
+    /** \brief  Print description */
+    virtual void print(std::ostream &stream) const;
+
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(int fsens_order, int asens_order) = 0;
+
+    /** \brief  Initialize */
+    virtual void init();
     
-/** \brief  Set/get input/output */
-  void setOutput(const vector<double>& x);
-  void getOutput(vector<double>& x) const;
-  void setFwdSeed(const vector<double>& x, int dir=0);
-  void getFwdSens(vector<double>& val, int dir=0) const;
-  void setAdjSeed(const vector<double>& x, int dir=0);
-  void getAdjSens(vector<double>& val, int dir=0) const;
+    /** \brief  Get the name */
+    virtual const std::string& getName() const;
+    
+    /** \brief  Check if symbolic */
+    virtual bool isSymbolic() const;
 
-  /** \brief  dependencies - functions that have to be evaluated before this one */
-  MX& dep(int ind=0);
-  const MX& dep(int ind=0) const;
-  
-  /** \brief  Number of dependencies */
-  int ndep() const;
+    /** \brief  Check if constant */
+    virtual bool isConstant() const;
 
-  /** \brief  Numerical value */
-  const Matrix<double>& output() const;
-  Matrix<double>& output();
-  
-  const std::vector<double>& input(int ind) const;
-  std::vector<double>& input(int ind);
-  
-  const std::vector<double>& fwdSeed(int ind, int dir=0) const;
-  std::vector<double>& fwdSeed(int ind, int dir=0);
+    /** \brief  dependencies - functions that have to be evaluated before this one */
+    MX& dep(int ind=0);
+    const MX& dep(int ind=0) const;
+    
+    /** \brief  Number of dependencies */
+    int ndep() const;
 
-  const std::vector<double>& adjSeed(int dir=0) const;
-  std::vector<double>& adjSeed(int dir=0);
-  
-  const std::vector<double>& fwdSens(int dir=0) const;
-  std::vector<double>& fwdSens(int dir=0);
-
-  const std::vector<double>& adjSens(int ind, int dir=0) const;
-  std::vector<double>& adjSens(int ind, int dir=0);
+    /** \brief  Numerical value */
+    const Matrix<double>& input(int ind) const;
+    const Matrix<double>& fwdSeed(int ind, int dir=0) const;
+    const Matrix<double>& adjSeed(int dir=0) const;
+    Matrix<double>& output();
+    Matrix<double>& fwdSens(int dir=0);
+    Matrix<double>& adjSens(int ind, int dir=0);
+    Matrix<double>& adjSeed(int dir=0);
 
   protected:
+    
     /// Set size
     void setSize(int nrow, int ncol);
+    
+    /// Set the sparsity
+    void setSparsity(const CRSSparsity& sparsity);
     
     /// Set unary dependency
     void setDependencies(const MX& dep);
@@ -121,11 +107,8 @@ public:
     //! Number of derivatives
     int maxord_;
     
-    //! Number of derivative directions
+    //! Number of derivative directions - move to MXFunction
     int nfdir_, nadir_;
-    
-    /** \brief  dependencies - functions that have to be evaluated before this one */
-    std::vector<MX> dep_;
     
     /// Get size
     int size1() const;
@@ -133,16 +116,23 @@ public:
     /// Get size
     int size2() const;
     
+    /** \brief  dependencies - functions that have to be evaluated before this one */
+    std::vector<MX> dep_;
+    
   private:
-    /** \brief  Numerical value of output */
-   Matrix<double> output_;
+    
+    /** \brief  The sparsity pattern */
+    CRSSparsity sparsity_;
+    
+    /** \brief  Numerical value of output  - move this into the MXFunction class */
+    Matrix<double> output_;
 
-    /** \brief  Numerical value of forward sensitivities */
-   std::vector<Matrix<double> > forward_sensitivities_;
+    /** \brief  Numerical value of forward sensitivities - move this into the MXFunction class */
+    std::vector<Matrix<double> > forward_sensitivities_;
 
-    /** \brief  Numerical value of adjoint seeds */
-   std::vector<Matrix<double> > adjoint_seeds_;
-
+    /** \brief  Numerical value of adjoint seeds - move this into the MXFunction class */
+    std::vector<Matrix<double> > adjoint_seeds_;
+    
 };
 
 } // namespace CasADi

@@ -220,7 +220,7 @@ if not calc_ic:
 integrator.evaluate()
 
 # Save the result
-res0 = integrator.getOutput()
+res0 = integrator.output()
 
 # Perturb in some direction
 if perturb_u:
@@ -238,13 +238,13 @@ integrator.evaluate()
 integrator.printStats()
 
 # Calculate finite difference approximation
-fd = list(integrator.getOutput())
+fd = list(integrator.output())
 for i in range(len(fd)):
   fd[i] -= res0[i]
   fd[i] /= 0.01
   
 print "unperturbed                     ", res0
-print "perturbed                       ", integrator.getOutput()
+print "perturbed                       ", integrator.output()
 print "finite_difference approximation ", fd
 
 # forward seeds
@@ -275,14 +275,14 @@ else:
   # evaluate with only forward sensitivities
   integrator.evaluate(1,0)
     
-print "forward sensitivities           ", integrator.getFwdSens()
+print "forward sensitivities           ", integrator.fwdSens()
 
 if with_asens:
   print "adjoint sensitivities           ",
-  print integrator.getAdjSens(INTEGRATOR_T0), " ",
-  print integrator.getAdjSens(INTEGRATOR_TF), " ",
-  print integrator.getAdjSens(INTEGRATOR_X0), " ",
-  print integrator.getAdjSens(INTEGRATOR_P), " "
+  print integrator.adjSens(INTEGRATOR_T0), " ",
+  print integrator.adjSens(INTEGRATOR_TF), " ",
+  print integrator.adjSens(INTEGRATOR_X0), " ",
+  print integrator.adjSens(INTEGRATOR_P), " "
   
 if second_order:
   # Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
@@ -312,8 +312,8 @@ if second_order:
 
   # Get the results
   print "second order (fwd-over-adj)     ",
-  print intjac.getAdjSens(INTEGRATOR_X0), ", ",
-  print intjac.getAdjSens(INTEGRATOR_P)
+  print intjac.adjSens(INTEGRATOR_X0), ", ",
+  print intjac.adjSens(INTEGRATOR_P)
 
   
   

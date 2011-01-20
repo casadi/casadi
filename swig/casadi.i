@@ -1,5 +1,9 @@
 %module casadi
 
+// Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
+// for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
+#pragma SWIG nowarn=509
+
 #ifdef WITH_DOXDOC
 %include "../doc/doc.i"
 #endif 
@@ -41,7 +45,81 @@ namespace CasADi{
 %template(DVector)             std::vector<double>;
 %template(DVectorVector)       std::vector<std::vector<double> > ;
 %template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
+
 #endif // SWIG
+
+// The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
+// nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
+%extend std::vector<double>{  
+  std::string __repr__(){
+    char buffer[32];
+    std::string ret;
+    ret += "[";
+    for(int i=0; i<$self->size(); ++i){
+      if(i!=0) ret += ",";
+
+      // Print to buffer and append
+      snprintf(buffer, 32, "%g", $self->at(i));
+      ret += buffer;
+    }
+    ret += "]";
+    return ret;
+  }
+  std::string __str__(){
+    char buffer[32];
+    std::string ret;
+    
+    // Add dimension
+    snprintf(buffer, 32, "[%d]", $self->size());
+    ret += buffer; 
+    ret += "(";
+    for(int i=0; i<$self->size(); ++i){
+      if(i!=0) ret += ",";
+
+      // Print to buffer and append
+      snprintf(buffer, 32, "%g", $self->at(i));
+      ret += buffer;
+    }
+    ret += ")";
+    return ret;
+  }
+};
+
+// The same workaround for vector<double>
+%extend std::vector<int>{  
+  std::string __repr__(){
+    char buffer[32];
+    std::string ret;
+    ret += "[";
+    for(int i=0; i<$self->size(); ++i){
+      if(i!=0) ret += ",";
+
+      // Print to buffer and append
+      snprintf(buffer, 32, "%d", $self->at(i));
+      ret += buffer;
+    }
+    ret += "]";
+    return ret;
+  }
+  std::string __str__(){
+    char buffer[32];
+    std::string ret;
+    
+    // Add dimension
+    snprintf(buffer, 32, "[%d]", $self->size());
+    ret += buffer; 
+    ret += "(";
+    for(int i=0; i<$self->size(); ++i){
+      if(i!=0) ret += ",";
+
+      // Print to buffer and append
+      snprintf(buffer, 32, "%d", $self->at(i));
+      ret += buffer;
+    }
+    ret += ")";
+    return ret;
+  }
+};
 
 #ifndef WITH_NUMPY
 #warning "Not using numpy. option(WITH_NUMPY = OFF)"
@@ -103,5 +181,4 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 #ifdef WITH_LAPACK
 %include "lapack_interface.i"
 #endif
-
 

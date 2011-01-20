@@ -46,9 +46,6 @@ virtual Transpose* clone() const;
 /** \brief  Print */
 virtual void print(std::ostream &stream=std::cout) const;
 
-/// Initialize
-virtual void init();
-
 };
 
 } // namespace CasADi

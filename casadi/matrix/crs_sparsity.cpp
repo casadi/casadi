@@ -188,8 +188,9 @@ int CRSSparsity::getNZ(int i, int j) const{
 
   // Find sparse element
   for(int ind=rowind(i); ind<rowind(i+1); ++ind){
-    if(col(ind) == j)
+    if(col(ind) == j){
       return ind;     // element exists
+    }
     else if(col(ind) > j)
       break;                // break at the place where the element should be added
   }

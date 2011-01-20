@@ -23,7 +23,7 @@
 #ifndef OCP_TOOLS_HPP
 #define OCP_TOOLS_HPP
 
-#include "casadi/sx/sx_matrix.hpp"
+#include "casadi/sx/sx.hpp"
 
 namespace CasADi{
   namespace Modelica{

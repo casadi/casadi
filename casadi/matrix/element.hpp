@@ -50,53 +50,59 @@ class Element{
     //@}
 
     /// Get a reference to the element (? = A[i], ? += A[i], etc.)
-    operator T();
+    operator const T() const;
   
   private:
+    /// The value of the matrix entry at the time of creation
+    T val_;
+    
+    /// A reference to the matrix that is allowed to be modified
     M& mat_;
+    
+    /// The element of the matrix that is allowed to be modified
     int i_, j_;
 };
-
 
 // Implementation
 
 template<typename M, typename T>
 M& Element<M,T>::operator=(const T &y){
-  mat_.getElementRef(i_,j_) = y;
+  mat_.setElement(i_,j_, y);
   return mat_;
 }
 
 template<typename M, typename T>
 M& Element<M,T>::operator+=(const T &y){
-  mat_.getElementRef(i_,j_) += y;
+  mat_.setElement(i_,j_,val_+y);
   return mat_;
 }
 
 template<typename M, typename T>
 M& Element<M,T>::operator-=(const T &y){
-  mat_.getElementRef(i_,j_) -= y;
+  mat_.setElement(i_,j_,val_-y);
   return mat_;
 }
 
 template<typename M, typename T>
 M& Element<M,T>::operator*=(const T &y){
-  mat_.getElementRef(i_,j_) *= y;
+  mat_.setElement(i_,j_,val_*y);
   return mat_;
 }
 
 template<typename M, typename T>
 M& Element<M,T>::operator/=(const T &y){
-  mat_.getElementRef(i_,j_) /= y;
+  mat_.setElement(i_,j_,val_/y);
   return mat_;
 }
 
 template<typename M, typename T>
-Element<M,T>::operator T(){
-  return mat_.getElement(i_,j_);
+Element<M,T>::operator const T() const{
+  return val_;
 }
 
 template<typename M, typename T>
 Element<M,T>::Element(M& mat, int i, int j) : mat_(mat), i_(i), j_(j){
+  val_ = mat_.getElement(i,j);
 }
 
 

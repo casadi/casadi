@@ -23,7 +23,6 @@
 #include "evaluation.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
-#include <cassert>
 
 using namespace std;
 
@@ -32,7 +31,11 @@ namespace CasADi{
 // Constructor
 Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : fcn_(fcn), oind(oind_) {
   setDependencies(dep);
-  setSize(fcn_->output(oind).get().size1(),fcn_->output(oind).get().size2());
+  setSize(fcn_->output(oind).size1(),fcn_->output(oind).size2());
+}
+
+Evaluation* Evaluation::clone() const{
+  return new Evaluation(*this);
 }
 
 void Evaluation::print(ostream &stream) const{
@@ -40,22 +43,26 @@ void Evaluation::print(ostream &stream) const{
 }
 
 void Evaluation::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  
   // Pass the input to the function
-  for(int i=0; i<ndep(); ++i)
-    if(!dep(i).isNull())
+  for(int i=0; i<ndep(); ++i){
+    if(!dep(i).isNull()){
       fcn_.setInput(input(i),i);
+    }
+  }
 
   // Give the forward seed to the function
-  if(fsens_order>0)
-    for(int i=0; i<ndep(); ++i)
-      if(!dep(i).isNull())
+  if(fsens_order>0){
+    for(int i=0; i<ndep(); ++i){
+      if(!dep(i).isNull()){
         fcn_.setFwdSeed(fwdSeed(i),i);
+      }
+    }
+  }
 
   // Pass the adjoint seed to the function
-  if(asens_order>0)
+  if(asens_order>0){
     fcn_.setAdjSeed(adjSeed(),oind);
+  }
 
   // Evaluate
   fcn_.evaluate(fsens_order, asens_order);
@@ -64,8 +71,9 @@ void Evaluation::evaluate(int fsens_order, int asens_order){
   fcn_.getOutput(output(),oind);
 
   // Fwd sens
-  if(fsens_order>0)
+  if(fsens_order>0){
     fcn_.getFwdSens(fwdSens(),oind);
+  }
 
   // Adjoint sens
   if(asens_order>0)

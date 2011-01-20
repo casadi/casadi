@@ -20,37 +20,39 @@
  *
  */
 
-#ifndef FLATTEN_HPP
-#define FLATTEN_HPP
+#include "c_function_internal.hpp"
 
-#include "mx_node.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 namespace CasADi{
 
-/** Represents a flattening of an MX
-  The shape of the MX is mimiced to be (ncol*nrow,1)
-  \author Joris Gillis 
-  \date 2010
-*/
-class Flatten : public MXNode{
-friend class MX;
+using namespace std;
 
-public:
+CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn) : evaluate_(c_fcn){
+  user_data_ = 0;
+}
 
-  /** \brief  Constructor */
-  Flatten(const MX& x);
+CFunctionInternal::~CFunctionInternal(){
+  
+}
 
-  /** \brief  Clone function */
-  virtual Flatten* clone() const;
+void CFunctionInternal::setUserData(void* user_data){
+  user_data_ = user_data;
+}
 
-  /** \brief  Print */
-  virtual void print(std::ostream &stream=std::cout) const;
+void CFunctionInternal::evaluate(int fsens_order, int asens_order){
+  if(evaluate_==0) throw CasadiException("CFunctionInternal::evaluate: pointer is null");
+  ref_.assignNode(this); // make the reference point to this object
+  evaluate_(ref_,fsens_order, asens_order,user_data_);  
+  ref_.assignNode(0); // make sure to remove the reference, otherwise the object will never be deleted
+}
 
-  /** \brief  Evaluate the function and store the result in the node */
-  virtual void evaluate(int fsens_order, int asens_order);
+void CFunctionInternal::init(){
+  FXInternal::init();
+}
 
-};
 
 } // namespace CasADi
 
-#endif // FLATTEN_HPP

@@ -446,6 +446,18 @@ SX casadi_operators<SX>::div(const SX&x, const SX&y){
   return x.div(y);
 }
 
+SX casadi_operators<SX>::fmin(const SX&x, const SX&y){
+  return x.fmin(y);
+}
+
+SX casadi_operators<SX>::fmax(const SX&x, const SX&y){
+  return x.fmax(y);
+}
+
+SX casadi_operators<SX>::pow(const SX&x, const SX&y){
+  return x.pow(y);
+}
+
 SX casadi_operators<SX>::sin(const SX&x){ 
   return x.sin();
 }
@@ -498,42 +510,73 @@ SX casadi_operators<SX>::fabs(const SX&x){
   return x.fabs();
 }
 
-} // namespace CasADi
-
-using namespace CasADi;
-namespace std{
-
-SX fmin(const SX &a, const SX &b){
-  return SX(new BinarySXNode(FMIN_NODE,a,b));
+Element<Matrix<SX>,SX>::Element(Matrix<SX>& mat, int i, int j) : i_(i), j_(j), mat_(mat){
+  static_cast<SX&>(*this) = SX(mat_.getElement(i,j)); // cant put this in the parameter list!!!
 }
 
-SX fmax(const SX &a, const SX &b){
-  return SX(new BinarySXNode(FMAX_NODE,a,b));
+Matrix<SX>& Element<Matrix<SX>,SX>::operator=(const SX &y){
+  mat_.setElement(i_,j_,y);
+  return mat_;
+}
+  
+Matrix<SX>& Element<Matrix<SX>,SX>::operator+=(const SX &y){
+  mat_.setElement(i_,j_,*this+y);
+  return mat_;
 }
 
+Matrix<SX>& Element<Matrix<SX>,SX>::operator-=(const SX &y){
+  mat_.setElement(i_,j_,*this-y);
+  return mat_;
+}
 
-SX pow(const SX& x, const SX& n){
+Matrix<SX>& Element<Matrix<SX>,SX>::operator*=(const SX &y){
+  mat_.setElement(i_,j_,*this*y);
+  return mat_;
+}
+
+Matrix<SX>& Element<Matrix<SX>,SX>::operator/=(const SX &y){
+  mat_.setElement(i_,j_,*this/y);
+  return mat_;
+}
+
+SX::operator Matrix<SX>() const{
+  return Matrix<SX>(1,1,*this);
+}
+
+SX SX::fmin(const SX &b) const{
+  return SX(new BinarySXNode(FMIN_NODE,*this,b));
+}
+
+SX SX::fmax(const SX &b) const{
+  return SX(new BinarySXNode(FMAX_NODE,*this,b));
+}
+
+SX SX::pow(const SX& n) const{
   if (n->isInteger()){
     int nn = n->getIntValue();
     if(nn == 0)
       return 1;
+    else if(nn>100 || nn<-100) // maximum depth
+      return SX(new BinarySXNode(POW_NODE,*this,nn));
     else if(nn<0) // negative power
-      return 1/pow(x,-nn);
-    else if(nn>100) // maximum depth
-      return SX(new BinarySXNode(POW_NODE,x,nn));
+      return 1/pow(-nn);
     else if(nn%2 == 1) // odd power
-      return x*pow(x,nn-1);
+      return *this*pow(nn-1);
     else{ // even power
-      SX rt = pow(x,nn/2);
+      SX rt = pow(nn/2);
       return rt*rt;
     }
   } if(n->isConstant() && n->getValue()==0.5) {
-    return sqrt(x);
+    return sqrt();
   } else {
-    return SX(new BinarySXNode(POW_NODE,x,n));
+    return SX(new BinarySXNode(POW_NODE,*this,n));
   }
 }
 
+} // namespace CasADi
+
+using namespace CasADi;
+namespace std{
 
 SX numeric_limits<SX>::infinity() throw(){
   return CasADi::casadi_limits<SX>::inf;

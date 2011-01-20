@@ -30,23 +30,16 @@ namespace CasADi{
 
 Transpose::Transpose(const MX& x){
   setDependencies(x);
-  setSize(x.size2(),x.size1());
+  
+  // Mapping of the non-zeros
+  CRSSparsity sp = dep(0)->output().sparsity().transpose(nzind_);
+  
+  // Save the sparsity pattern
+  setSparsity(sp);
 }
 
 Transpose* Transpose::clone() const{
   return new Transpose(*this);
-}
-
-void Transpose::init(){
-  // Base class initializations
-  Reordering::init();
-
-  // Mapping of the non-zeros: move to constructor?
-  CRSSparsity sp = dep(0)->output().sparsity().transpose(nzind_);
-  if(sp.size()!=sp.numel())
-    throw CasadiException("Error in Transpose::init: sparse nodes not yet allowed");
-  
-  // Where to store this information?
 }
 
 void Transpose::print(std::ostream &stream) const{

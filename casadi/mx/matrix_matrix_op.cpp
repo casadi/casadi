@@ -21,7 +21,6 @@
  */
 
 #include "matrix_matrix_op.hpp"
-#include <cassert>
 #include <vector>
 #include <sstream>
 
@@ -31,7 +30,9 @@ namespace CasADi{
 
 MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
-  assert(x.size1() == y.size1() || x.size2() == y.size2());
+  if(x.size1() != y.size1() || x.size2() != y.size2())
+    throw CasadiException("MatrixMatrixOp: dimension mismatch");
+    
   setSize(x.size1(),x.size2());
 }
 
@@ -46,43 +47,34 @@ void MatrixMatrixOp::print(std::ostream &stream) const{
 }
 
 void MatrixMatrixOp::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  if(fsens_order==0){
   const vector<double>& x = input(0);  // first argument
   const vector<double>& y = input(1);  // second argument
   vector<double>& res = output();
-  
   for(int i=0; i<res.size(); ++i)
     nfun0[op](x[i],y[i],&res[i]);
-  } else {
-
-    const vector<double>& x = input(0);  // first argument
+    
+  if(fsens_order>0){
     const vector<double>& dx = fwdSeed(0); // first argument derivative
-    const vector<double>& y = input(1);  // second argument
     const vector<double>& dy = fwdSeed(1); // second argument derivative
-    vector<double>& res = fwdSens();
+    vector<double>& fsens = fwdSens();
 
-  double tmp[3];
-
-  for(int i=0; i<res.size(); ++i){
-    nfun1[op](x[i],y[i],tmp);
-    res[i] = tmp[1]*dx[i] + tmp[2]*dy[i]; // chain rule
-  }
+    double tmp[3];
+    for(int i=0; i<fsens.size(); ++i){
+      nfun1[op](x[i],y[i],tmp);
+      fsens[i] = tmp[1]*dx[i] + tmp[2]*dy[i]; // chain rule
+    }
   }
   
   if(asens_order>0){
-    const vector<double>& x = input(0);  // first  argument
+    const vector<double>& aseed = adjSeed();
     vector<double>& dx = adjSens(0); // first argument derivative
-    const vector<double>& y = input(1);  // second argument
     vector<double>& dy = adjSens(1); // second argument derivative
-    const vector<double>& res = adjSeed();
 
     double tmp[3];
-
-    for(int i=0; i<res.size(); ++i){
+    for(int i=0; i<aseed.size(); ++i){
       nfun1[op](x[i],y[i],tmp);
-      dx[i] += res[i]*tmp[1];
-      dy[i] += res[i]*tmp[2];
+      dx[i] += aseed[i]*tmp[1];
+      dy[i] += aseed[i]*tmp[2];
     }
   }
 }

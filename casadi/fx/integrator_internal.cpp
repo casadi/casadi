@@ -91,23 +91,23 @@ void IntegratorInternal::setDimensions(int nx, int np, int nz){
   
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
-  input_[INTEGRATOR_T0].setSize(1,1); // initial time
-  input_[INTEGRATOR_TF].setSize(1,1); // final time
-  input_[INTEGRATOR_X0].setSize(nx_,1); // initial state value
-  input_[INTEGRATOR_XP0].setSize(nx_,1); // initial state derivative value
-  input_[INTEGRATOR_P].setSize(np_,1); // parameter
-  input_[INTEGRATOR_Z0].setSize(nz_,1); // initial algebraic statee
+  input(INTEGRATOR_T0).resize(1,1); // initial time
+  input(INTEGRATOR_TF).resize(1,1); // final time
+  input(INTEGRATOR_X0).resize(nx_,1); // initial state value
+  input(INTEGRATOR_XP0).resize(nx_,1); // initial state derivative value
+  input(INTEGRATOR_P).resize(np_,1); // parameter
+  input(INTEGRATOR_Z0).resize(nz_,1); // initial algebraic statee
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
-  output_[INTEGRATOR_XF].setSize(nx_,1);
-  output_[INTEGRATOR_XPF].setSize(nx_,1);
-  output_[INTEGRATOR_ZF].setSize(nz_,1);
+  output(INTEGRATOR_XF).resize(nx_,1);
+  output(INTEGRATOR_XPF).resize(nx_,1);
+  output(INTEGRATOR_ZF).resize(nz_,1);
 }
 
 void IntegratorInternal::evaluate(int fsens_order, int asens_order){
-  double t0 = input(INTEGRATOR_T0).get()[0];
-  double tf = input(INTEGRATOR_TF).get()[0];
+  double t0 = input(INTEGRATOR_T0)[0];
+  double tf = input(INTEGRATOR_TF)[0];
   
   // Reset solver
   reset(fsens_order, asens_order);
@@ -146,8 +146,8 @@ void IntegratorInternal::init(){
   nrhs_ = getOption("nrhs").toInt();
   
   // Give an intial value for the time horizon
-  input(INTEGRATOR_T0).get().set(getOption("t0").toDouble());
-  input(INTEGRATOR_TF).get().set(getOption("tf").toDouble());
+  input(INTEGRATOR_T0).set(getOption("t0").toDouble());
+  input(INTEGRATOR_TF).set(getOption("tf").toDouble());
 }
 
 FX IntegratorInternal::jacobian(int iind, int oind){

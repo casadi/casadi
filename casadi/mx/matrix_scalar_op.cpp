@@ -21,7 +21,6 @@
  */
 
 #include "matrix_scalar_op.hpp"
-#include <cassert>
 #include <vector>
 #include <sstream>
 
@@ -31,8 +30,7 @@ namespace CasADi{
 
 MatrixScalarOp::MatrixScalarOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
-  assert(y.numel() == 1);
-  setSize(x.size1(),x.size2());
+  setSparsity(x.sparsity());
 }
 
 MatrixScalarOp* MatrixScalarOp::clone() const{
@@ -46,43 +44,33 @@ void MatrixScalarOp::print(std::ostream &stream) const{
 }
 
 void MatrixScalarOp::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  
-  if(fsens_order==0){
   const vector<double>& x = input(0);  // first (possibly non-scalar) argument
   const vector<double>& y = input(1);  // second (scalar) argument
   vector<double>& res = output();
-  
   for(int i=0; i<res.size(); ++i)
     nfun0[op](x[i],y[0],&res[i]);
-  } else {
-      const vector<double>& x = input(0);  // first (possibly non-scalar) argument
-  const vector<double>& dx = fwdSeed(0); // first (possibly non-scalar) argument derivative
-  const vector<double>& y = input(1);  // second (scalar) argument
-  const vector<double>& dy = fwdSeed(1); // second (scalar) argument derivative
-  vector<double>& res = fwdSens();
-
-  double tmp[3];
   
-  for(int i=0; i<res.size(); ++i){
-    nfun1[op](x[i],y[0],tmp);
-    res[i] = tmp[1]*dx[i] + tmp[2]*dy[0]; // chain rule
-  }
+  if(fsens_order>0){
+    const vector<double>& dx = fwdSeed(0); // first (possibly non-scalar) argument derivative
+    const vector<double>& dy = fwdSeed(1); // second (scalar) argument derivative
+    vector<double>& fsens = fwdSens();
+    double tmp[3];
+    for(int i=0; i<fsens.size(); ++i){
+      nfun1[op](x[i],y[0],tmp);
+      fsens[i] = tmp[1]*dx[i] + tmp[2]*dy[0]; // chain rule
+    }
   }
   
   if(asens_order>0){
-    const vector<double>& x = input(0);  // first (scalar) argument
+    const vector<double>& aseed = adjSeed();
     vector<double>& dx = adjSens(0); // first (scalar) argument derivative
-    const vector<double>& y = input(1);  // second (possibly non-scalar) argument
     vector<double>& dy = adjSens(1); // second (possibly non-scalar) argument derivative
-    const vector<double>& res = adjSeed();
 
     double tmp[3];
-
-    for(int i=0; i<res.size(); ++i){
+    for(int i=0; i<aseed.size(); ++i){
       nfun1[op](x[i],y[0],tmp);
-      dx[i] += res[i]*tmp[1];
-      dy[0] += res[i]*tmp[1];
+      dx[i] += aseed[i]*tmp[1];
+      dy[0] += aseed[i]*tmp[1];
     }
   }
 }

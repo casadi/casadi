@@ -126,7 +126,7 @@ int main(){
   cout << "C = " << C << endl;
   
   // Collocated states
-  SXMatrix Z("Z",N,K+1);
+  SXMatrix Z = symbolic("Z",N,K+1);
   
   // State at final time
 // SXMatrix ZF("ZF");
@@ -211,7 +211,7 @@ int main(){
   resfile << t_opt << endl;
   
   // Print the optimal cost
-  cout << "optimal cost: " << solver.output(NLP_COST).get() << endl;
+  cout << "optimal cost: " << solver.output(NLP_COST) << endl;
 
   // Print the optimal solution
   vector<double> xopt(x.numel());

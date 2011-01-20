@@ -62,7 +62,7 @@ for N in range(1,11):
   for j in range(K+1):
     l[j].setInput(1.)
     l[j].evaluate()
-    res = l[j].getOutput()
+    res = tuple(l[j].output())
     D.append(res[0])
 
   print "D = ", D
@@ -75,7 +75,7 @@ for N in range(1,11):
       l[j].setInput(tau_root[k])
       l[j].setFwdSeed(1.0)
       l[j].evaluate(1,0)
-      sens = l[j].getFwdSens()
+      sens = tuple(l[j].fwdSens())
       Cj.append(sens[0])
     C.append(Cj)
   
@@ -169,10 +169,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", tuple(solver.getOutput(NLP_COST))
+  print "optimal cost: ", tuple(solver.output(NLP_COST))
 
   # Print the optimal solution
-  xopt = tuple(solver.getOutput(NLP_X_OPT))
+  xopt = tuple(solver.output(NLP_X_OPT))
   print "optimal solution: ", xopt
  
   # plot to screen

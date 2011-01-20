@@ -74,6 +74,6 @@ main(int argc, char *argv[])
   linear_solver.evaluate();
   
   // Print the solution
-  cout << "solution = " << linear_solver.getOutputData() << endl;
+  cout << "solution = " << linear_solver.output() << endl;
   
 }

@@ -25,7 +25,7 @@
 
 #include <string>
 #include <sstream>
-#include <casadi/sx/sx_matrix.hpp>
+#include <casadi/sx/sx.hpp>
 #include <casadi/mx/mx.hpp>
 
 namespace CasADi{

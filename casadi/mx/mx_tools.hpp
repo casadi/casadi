@@ -27,13 +27,19 @@
 
 namespace CasADi{
 
-//@{
-/** \brief  concatenate */
+/** \brief  concatenate vertically */
 MX vertcat(const std::vector<MX>& comp);
+
+/** \brief  concatenate horizontally */
 MX horzcat(const std::vector<MX>& comp);
+
+#ifndef SWIG
+/** \brief  concatenate vertically, two matrices */
 MX vertcat(const MX& a, const MX& b);
+
+/** \brief  concatenate horizontally, two matrices */
 MX horzcat(const MX& a, const MX& b);
-//@}
+#endif // SWIG
 
 /** \brief  Take the 2-norm of a MX
 Internally represented by Norm2

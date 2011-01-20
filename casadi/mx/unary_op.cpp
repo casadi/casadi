@@ -21,7 +21,6 @@
  */
 
 #include "unary_op.hpp"
-#include <cassert>
 #include <vector>
 #include <sstream>
 
@@ -44,37 +43,33 @@ void UnaryOp::print(std::ostream &stream) const{
 }
 
 void UnaryOp::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 || asens_order==0);
-  if(fsens_order==0){
   const vector<double>& x = input(0);  // first argument
   vector<double>& res = output();
-  
   for(int i=0; i<res.size(); ++i)
     nfun0[op](x[i],0,&res[i]);
-  } else {
 
-    const vector<double>& x = input(0);  // first argument
+  
+  if(fsens_order>0){
     const vector<double>& dx = fwdSeed(0); // first argument derivative
-    vector<double>& res = fwdSens();
+    vector<double>& fsens = fwdSens();
 
     double tmp[3];
   
-    for(int i=0; i<res.size(); ++i){
+    for(int i=0; i<fsens.size(); ++i){
       nfun1[op](x[i],0,tmp);
-      res[i] = tmp[1]*dx[i]; // chain rule
+      fsens[i] = tmp[1]*dx[i]; // chain rule
     }
   }
   
   if(asens_order>0){
-    const vector<double>& x = input(0);  // first  argument
+    const vector<double>& aseed = adjSeed();
     vector<double>& dx = adjSens(0); // first argument derivative
-    const vector<double>& res = adjSeed();
 
     double tmp[3];
   
-    for(int i=0; i<res.size(); ++i){
+    for(int i=0; i<aseed.size(); ++i){
       nfun1[op](x[i],0,tmp);
-      dx[i] += res[i]*tmp[1];
+      dx[i] += aseed[i]*tmp[1];
     }
   }
 }

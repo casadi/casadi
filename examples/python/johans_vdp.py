@@ -166,7 +166,7 @@ solver.setInput(lubg,casadi.NLP_UBG)
 # Solve the problem
 solver.solve()
 
-xx_opt = solver.getOutputData(casadi.NLP_X_OPT)
+xx_opt = solver.output(casadi.NLP_X_OPT)
 
 # Retrieve output
 

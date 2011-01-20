@@ -47,34 +47,30 @@ namespace CasADi{
 */
 class OptionsFunctionality : public SharedObject{
   public:
-
-    
     /// Default constructor
     OptionsFunctionality();
     
     /// Destructor
     ~OptionsFunctionality();
     
-    /// Get a pointer to the node
-    const OptionsFunctionalityNode* get() const;
-    OptionsFunctionalityNode* get();
-
     /// Access a member function or object
     OptionsFunctionalityNode* operator->();
+    
+    /// Const access a member function or object
     const OptionsFunctionalityNode* operator->() const;
         
+#ifndef SWIG
     /** \brief  set option.
-    
-   The setOptions are in general only considered before the init function, if any.
-   If properties changes, the init function should be called again.
-   (Ticket #54)
-   
+    The setOptions are in general only considered before the init function, if any.
+    If properties changes, the init function should be called again.
+    (Ticket #54)
     */
     void setOption(const std::string &str, const Option& val);
 
     /** \brief  get an option value */
     Option getOption(const std::string &str) const;
-
+#endif // SWIG
+    
     /** \brief  check if there is an option str */
     bool hasOption(const std::string &str) const;
 
@@ -84,14 +80,15 @@ class OptionsFunctionality : public SharedObject{
     /** \brief  Print options to a stream */
     void printOptions(std::ostream &stream=std::cout) const;
 
-  /// Assert that the node is pointing to the right type of object
+    /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
 
     /** \brief  Copy all options from another object*/
     void copyOptions(const OptionsFunctionality& obj);
-
 };
-      
+
+#ifndef SWIG
+
 /** \brief Internal class
   \author Joel Andersson 
   \date 2010
@@ -137,6 +134,9 @@ private:
   std::map<std::string, Option> options;
 
 };
+
+#endif // SWIG
+
 
 } // namespace CasADi
 

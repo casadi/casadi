@@ -58,16 +58,16 @@ class FXInternal : public OptionsFunctionalityNode{
   virtual FX hessian(int iind=0, int oind=0);
 
   /** \brief  Access an input */
-  FunctionIO& input(int i=0);
+  FunctionIO& inputStruct(int i=0);
 
   /** \brief  Const access an input */
-  const FunctionIO& input(int i=0) const;
+  const FunctionIO& inputStruct(int i=0) const;
   
   /** \brief  Access an output*/
-  FunctionIO& output(int i=0);
+  FunctionIO& outputStruct(int i=0);
 
   /** \brief  Const access an output*/
-  const FunctionIO& output(int i=0) const;
+  const FunctionIO& outputStruct(int i=0) const;
     
   /** \brief  Print */
   virtual void print(std::ostream &stream) const;
@@ -88,16 +88,16 @@ class FXInternal : public OptionsFunctionalityNode{
   bool monitored(const std::string& mod) const;
   
     /// Access input argument
-  Matrix<double>& argument(int iind=0);
+  Matrix<double>& input(int iind=0);
     
   /// Const access input argument
-  const Matrix<double>& argument(int iind=0) const;
+  const Matrix<double>& input(int iind=0) const;
 
   /// Access input argument
-  Matrix<double>& result(int oind=0);
+  Matrix<double>& output(int oind=0);
     
   /// Const access input argument
-  const Matrix<double>& result(int oind=0) const;
+  const Matrix<double>& output(int oind=0) const;
 
   /// Access forward seed
   Matrix<double>& fwdSeed(int iind=0, int dir=0);
@@ -122,6 +122,12 @@ class FXInternal : public OptionsFunctionalityNode{
     
   /// Const access forward sensitivity
   const Matrix<double>& adjSens(int iind=0, int dir=0) const;
+
+  /// Set the number of function inputs
+  void setNumInputs(int num_in);
+
+  /// Set the number of function outputs
+  void setNumOutputs(int num_out);
 
   protected:
 

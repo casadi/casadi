@@ -31,14 +31,13 @@ LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, int nrhs) : nrow_
 void LinearSolverInternal::init(){
   // Allocate space for inputs
   input_.resize(2);
-  input_[0].setSize(nrow_,ncol_);
-  input_[0].setSparsityCRS(rowind_, col_);
-
-  input_[1].setSize(nrow_*nrhs_,1); // right hand side
+  input(0) = Matrix<double>(nrow_,ncol_,col_,rowind_);
+  input_[0].dense = false;
+  input(1).resize(nrow_*nrhs_,1); // right hand side
   
   // Allocate space for outputs
   output_.resize(1);
-  output_[0].setSize(ncol_*nrhs_,1);
+  output(0).resize(ncol_*nrhs_,1);
   
   // Not prepared
   prepared_ = false;

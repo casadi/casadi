@@ -90,6 +90,9 @@ public:
   /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
   IdasIntegrator jac(int iind=0, int oind=0);
   
+  /// Correct the initial value for yp and z after resetting the solver
+  void correctInitialConditions();
+
 };
 
 

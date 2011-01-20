@@ -126,6 +126,9 @@ class IdasInternal : public IntegratorInternal{
   /// Get the Linear solver
   virtual LinearSolver getLinearSolver();
 
+  /// Correct the initial conditions, i.e. calculate
+  void correctInitialConditions();
+  
   protected:
 
   // Sundials callback functions
@@ -248,6 +251,12 @@ class IdasInternal : public IntegratorInternal{
 
   // Set linear solver
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
+  
+  // Copy n-vectors to Matrix<double>
+  void copyNV(const Matrix<double>& x, const Matrix<double>& xp, const Matrix<double>& z, N_Vector& yz, N_Vector& yP, N_Vector& yQ);
+  
+  // Copy Matrix<double> to n-vectors
+  void copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x, Matrix<double>& xp, Matrix<double>& z);
   
   // Get the initial state
   void getInitialState();

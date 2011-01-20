@@ -20,7 +20,6 @@
  *
  */
 
-#include "casadi/sx/sx_matrix.hpp"
 #include "casadi/mx/mx.hpp"
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
@@ -194,7 +193,7 @@ for (int i=0; i<n*n; i++)
 SXFunction fcn(symA,deter);
 fcn.setOption("ad_order",1);
 fcn.init();
-vector<double>& inp = fcn.argument();
+vector<double>& inp = fcn.input();
     for (i=0; i<n; i++) {
         double* ppt = PA[i];
         for (j=0; j<n; j++)
@@ -209,7 +208,7 @@ fcn.evaluate();
 
 // get result
     double detout = 0.0;
-    detout = fcn.result()[0];
+    detout = fcn.output()[0];
 
     double t3 = myclock();
 

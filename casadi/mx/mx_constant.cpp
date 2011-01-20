@@ -30,25 +30,8 @@ using namespace std;
 
 namespace CasADi{
 
-MXConstant::MXConstant(const double *x, int n, int m, char order){
-  setSize(n,m);
-  data.resize(n*m);
-
-  if(order=='R'){
-    for(int i=0; i<n; ++i)
-      for(int j=0; j<m; ++j)
-	data[i + n*j] = x[i + n*j];
-  } else {
-    assert(order=='C');
-    for(int i=0; i<n; ++i)
-      for(int j=0; j<m; ++j)
-	data[i + n*j] = x[j + m*i];
-  }
-}
-
-MXConstant::MXConstant(int n, int m){
-  setSize(n,m);
-  data.resize(n*m);
+MXConstant::MXConstant(const Matrix<double> &x) : x_(x){
+  setSize(x.size1(),x.size2());
 }
 
 MXConstant* MXConstant::clone() const{
@@ -56,63 +39,14 @@ MXConstant* MXConstant::clone() const{
 }
 
 void MXConstant::print(std::ostream &stream) const{
-  if(size1()==1 && size2()==1)
-    stream << data;
-  else if(size1()==1){
-    stream << "[";
-    stream << data[0];
-    for(int i=1; i<size2(); ++i)
-      stream << "," << data[i];
-     stream << "]";
-  } else {
-    stream << "[";
-    for(int i=0; i<size1(); ++i){
-      stream << data[i];
-      for(int j=1; j<size2(); ++j){
-	stream << "," << data[i + size1()*j];
-      }
-      if(i!=size1()-1)
-	stream << ";";
-    }    
-    stream << "]";
-  }
+  stream << x_;
 }
 
 void MXConstant::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0){
-    output() = data; // todo: change to copy!
-  } else {
-    vector<double>& res = fwdSens();
-    for(vector<double>::iterator it=res.begin(); it!=res.end(); ++it) 
-      *it = 0;
+  copy(x_.begin(),x_.end(),output().begin());
+  if(fsens_order>0){
+    fill(fwdSens().begin(),fwdSens().end(),0);
   }
-}
-
-// void MXConstant::evaluateAdj(){
-// 
-// }
-
-
-double MXConstant::operator()(int i, int j) const{
-  assert(i<size1() && j<size2());
-  return data[i+size1()*j];
-}
-
-double& MXConstant::operator()(int i, int j){
-  assert(i<size1() && j<size2());
-  return data[i+size1()*j];  
-}
-
-double MXConstant::operator[](int k) const{
-  return data[k];
-}
-
-double& MXConstant::operator[](int k){
-  return data[k];
-}
-
-ostream& operator<<(ostream &stream, const MXConstant& x){
-  return stream << x.data;
 }
 
 bool MXConstant::isConstant() const{

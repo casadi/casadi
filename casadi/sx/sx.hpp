@@ -26,6 +26,7 @@
 // exception class
 #include "../casadi_exception.hpp"
 #include "../casadi_limits.hpp"
+#include "../matrix/matrix.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>
@@ -40,7 +41,7 @@ namespace CasADi{
 
   /** \brief  forward declaration of Node and Matrix */
 class SXNode; // include will follow in the end
-class SXMatrix; 
+// class SXMatrix; 
 
 /** \brief The basic scalar symbolic class of CasADi
   \author Joel Andersson 
@@ -99,6 +100,9 @@ class SX{
 #endif // SWIG
 
 #ifndef SWIG
+  // Convert to a 1-by-1 Matrix
+  operator Matrix<SX>() const;
+
   //@{
   /** \brief  Operators that change the object */
   friend SX& operator+=(SX &ex, const SX &scalar);
@@ -186,6 +190,9 @@ class SX{
   SX sub(const SX& y) const;
   SX mul(const SX& y) const;
   SX div(const SX& y) const;
+  SX fmin(const SX &b) const;
+  SX fmax(const SX &b) const;
+  SX pow(const SX& n) const;
   
   protected:
 #ifndef SWIG
@@ -226,11 +233,12 @@ T fmax(t b){     return std::fmax(*$self,b);}
 binops(SX, const SX&)
 binops(SX, double)
 
+#undef binops
 }
 #endif // SWIG
 
 #ifndef SWIG
-// Template specialization
+// Template specializations
 template<>
 class casadi_limits<SX>{
   public:
@@ -277,30 +285,47 @@ class casadi_operators<SX>{
     static SX fabs(const SX&x);
 };
 
-
-
-
-
+// Template specializations
+template<>
+class Element<Matrix<SX>,SX> : public SX{
+  public:
+    /// Constructor
+    Element(Matrix<SX>& mat, int i, int j);
+      
+    //@{
+    /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
+    Matrix<SX>& operator=(const SX &y);
+    Matrix<SX>& operator+=(const SX &y);
+    Matrix<SX>& operator-=(const SX &y);
+    Matrix<SX>& operator*=(const SX &y);
+    Matrix<SX>& operator/=(const SX &y);
+    //@}
+  
+  private:
+    Matrix<SX>& mat_;
+    int i_, j_;
+};
 
 
 #endif // SWIG
 
-
-} // namespace CasADi
-
-#ifndef SWIG
-namespace CasADi{
   typedef std::vector<SX> SXVector;
   typedef std::vector<std::vector<SX> > SXVectorVector;
   typedef std::vector< std::vector<std::vector<SX> > > SXVectorVectorVector;
+  typedef Matrix<SX> SXMatrix;
+  typedef std::vector<Matrix<SX> > SXMatrixVector;
+  typedef std::vector< std::vector<Matrix<SX> > > SXMatrixVectorVector;
+
 } // namespace CasADi
-#else // SWIG
+
+#ifdef SWIG
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
 %template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
+%template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
+%template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
+%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 #endif // SWIG
-
-
 
 #ifndef SWIG
 
@@ -355,14 +380,14 @@ inline SX asin(const SX &x){return x.arcsin();}
 inline SX acos(const SX &x){return x.arccos();}
 inline SX exp(const SX &x){return x.exp();}
 inline SX log(const SX &x){return x.log();}
-SX pow(const SX &x, const SX &n);
+inline SX pow(const SX &x, const SX &n){ return x.pow(n);}
 inline SX abs(const SX &x){return x.fabs();}
 inline SX fabs(const SX &x){return x.fabs();}
 inline SX floor(const SX &x){return x.floor();}
 inline SX ceil(const SX &x){return x.ceil();}
 inline SX erf(const SX &x){return x.erf();}
-SX fmin(const SX &a, const SX &b);
-SX fmax(const SX &a, const SX &b);
+inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
+inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
 #undef SX
 } // namespace std
 
