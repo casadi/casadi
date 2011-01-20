@@ -126,12 +126,12 @@ const Matrix<double>& FX::input(int iind) const{
   return (*this)->input(iind);
 }
 
-Matrix<double>& FX::result(int oind){
-  return (*this)->result(oind);
+Matrix<double>& FX::output(int oind){
+  return (*this)->output(oind);
 }
     
-const Matrix<double>& FX::result(int oind) const{
-  return (*this)->result(oind);
+const Matrix<double>& FX::output(int oind) const{
+  return (*this)->output(oind);
 }
 
 Matrix<double>& FX::fwdSeed(int iind, int dir){

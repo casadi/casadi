@@ -211,7 +211,7 @@ int main(){
   resfile << t_opt << endl;
   
   // Print the optimal cost
-  cout << "optimal cost: " << solver.result(NLP_COST) << endl;
+  cout << "optimal cost: " << solver.output(NLP_COST) << endl;
 
   // Print the optimal solution
   vector<double> xopt(x.numel());

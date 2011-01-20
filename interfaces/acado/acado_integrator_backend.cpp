@@ -237,7 +237,7 @@ ACADO::returnValue AcadoIntegratorBackend::stop(){
 
 
 ACADO::returnValue AcadoIntegratorBackend::getProtectedX( Vector *xEnd ) const{
-  const vector<double>& xf = integrator_.result(CasADi::INTEGRATOR_XF);
+  const vector<double>& xf = integrator_.output(CasADi::INTEGRATOR_XF);
   if( (int) xEnd[0].getDim() != xf.size() )
     return RET_INPUT_HAS_WRONG_DIMENSION;
 

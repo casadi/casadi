@@ -64,9 +64,9 @@ void IntegratorJacobianInternal::init(){
   
   // Allocate space for outputs
   output_.resize(1+INTEGRATOR_NUM_OUT);
-  result(0).resize(nx_,ns_);
-  result(1+INTEGRATOR_XF).resize(nx_,1);
-  result(1+INTEGRATOR_XPF).resize(nx_,1);
+  output(0).resize(nx_,ns_);
+  output(1+INTEGRATOR_XF).resize(nx_,1);
+  output(1+INTEGRATOR_XPF).resize(nx_,1);
 
   // Map Jacobian indices
   if(integrator_.hasSetOption("jacmap")){
@@ -131,22 +131,22 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   integrator_.evaluate(fsens_order,asens_order);
   
   // Get the results
-  const vector<double>& xfs = integrator_.result(INTEGRATOR_XF);
-  const vector<double>& xpfs = integrator_.result(INTEGRATOR_XPF);
+  const vector<double>& xfs = integrator_.output(INTEGRATOR_XF);
+  const vector<double>& xpfs = integrator_.output(INTEGRATOR_XPF);
 
   // Jacobian
-  vector<double>& jac = result(0);
+  vector<double>& jac = output(0);
   for(int i=0; i<nx_; ++i)
     for(int j=0; j<ns_; ++j)
       jac[j+i*ns_] = xfs[jacmap_[nx_+j+i*ns_]];
   
   // State
-  vector<double>& xf = result(1+INTEGRATOR_XF);
+  vector<double>& xf = output(1+INTEGRATOR_XF);
   for(int i=0; i<nx_; ++i)
     xf[i] = xfs[jacmap_[i]];
     
   // State derivative
-  vector<double>& xpf = result(1+INTEGRATOR_XPF);
+  vector<double>& xpf = output(1+INTEGRATOR_XPF);
   for(int i=0; i<nx_; ++i)
     xpf[i] = xpfs[jacmap_[i]];
   

@@ -125,7 +125,7 @@ void AcadoInternal::init(){
   // Path constraints
   if(!cfcn_.f_.isNull()){
     cfcn_.init();
-    nc_ = cfcn_.f_.result().numel();
+    nc_ = cfcn_.f_.output().numel();
   } else {
     nc_ = 0;
   }
@@ -133,7 +133,7 @@ void AcadoInternal::init(){
   // Initial constraint
   if(!rfcn_.f_.isNull()){
     rfcn_.init();
-    nr_ = rfcn_.f_.result().numel();
+    nr_ = rfcn_.f_.output().numel();
   } else {
     nr_ = 0;
   }
@@ -178,10 +178,10 @@ void AcadoInternal::init(){
   
   // Output dimensions
   output_.resize(ACADO_NUM_OUT);
-  result(ACADO_X_OPT).resize(nx_,n_nodes_+1);
-  result(ACADO_U_OPT).resize(nu_,n_nodes_+1);
-  result(ACADO_P_OPT).resize(np_,1);
-  result(ACADO_COST).resize(1,1);
+  output(ACADO_X_OPT).resize(nx_,n_nodes_+1);
+  output(ACADO_U_OPT).resize(nu_,n_nodes_+1);
+  output(ACADO_P_OPT).resize(np_,1);
+  output(ACADO_COST).resize(1,1);
 
   // Initialize
   FXInternal::init();
@@ -437,7 +437,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the optimal state trajectory
   if(nxd_>0){
-    vector<double> &xopt = result(ACADO_X_OPT);
+    vector<double> &xopt = output(ACADO_X_OPT);
     ACADO::VariablesGrid xd;
     algorithm_->getDifferentialStates(xd);
     assert(xd.getNumPoints()==n_nodes_+1);
@@ -448,7 +448,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
     }
   }
   if(nxa_>0){
-    vector<double> &xopt = result(ACADO_X_OPT);
+    vector<double> &xopt = output(ACADO_X_OPT);
     ACADO::VariablesGrid xa;
     algorithm_->getAlgebraicStates(xa);
     assert(xa.getNumPoints()==n_nodes_+1);
@@ -461,7 +461,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the optimal control trajectory
   if(nu_>0){
-    vector<double> &uopt = result(ACADO_U_OPT);
+    vector<double> &uopt = output(ACADO_U_OPT);
     ACADO::VariablesGrid u;
     algorithm_->getControls(u);
     assert(u.getNumPoints()==n_nodes_+1);
@@ -474,7 +474,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the optimal parameters
   if(np_>0){
-    vector<double> &popt = result(ACADO_P_OPT);
+    vector<double> &popt = output(ACADO_P_OPT);
     ACADO::Vector p;
     algorithm_->getParameters(p);
     &popt[0] << p;
@@ -482,7 +482,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   
   // Get the optimal cost
   double cost = algorithm_->getObjectiveValue();
-  result(ACADO_COST).set(cost);
+  output(ACADO_COST).set(cost);
 }
 
 int AcadoInternal::getRef(void *obj){

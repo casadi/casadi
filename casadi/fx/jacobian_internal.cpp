@@ -39,17 +39,17 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
 
   // make sure that input and output are vectors (not matrices)
   if(fcn_->input(iind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
-  if(fcn_->result(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
+  if(fcn_->output(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
 
   // get the dimensions
   
   n_ = fcn_.input(iind_).size1();
-  m_ = fcn_.result(oind_).size1();
+  m_ = fcn_.output(oind_).size1();
 
   input_ = fcn_->input_;
   
   output_.resize(1);
-  result(0).resize(m_,n_);
+  output(0).resize(m_,n_);
 //  output[1] = fcn_->output[oind_];
 }
 
@@ -145,7 +145,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
     fcn_.setInput(input(i),i);
-  vector<double>& res2 = result();
+  vector<double>& res2 = output();
   
   int el = 0; // running index
 

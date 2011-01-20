@@ -30,7 +30,7 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   setOption("name",            "unnamed NLP solver"); // name of the function
     
   n_ = F_.input(0).numel();
-  m_ = G_.isNull() ? 0 : G_.result(0).numel();
+  m_ = G_.isNull() ? 0 : G_.output(0).numel();
 
   input_.resize(6);
   input(NLP_X_INIT).resize(n_,1);
@@ -42,11 +42,11 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   
   // Allocate space for outputs
   output_.resize(5);
-  result(NLP_X_OPT).resize(n_,1);
-  result(NLP_COST).resize(1,1);
-  result(NLP_LAMBDA_OPT).resize(m_,1);
-  result(NLP_LAMBDA_LBX).resize(n_,1);
-  result(NLP_LAMBDA_UBX).resize(n_,1);
+  output(NLP_X_OPT).resize(n_,1);
+  output(NLP_COST).resize(1,1);
+  output(NLP_LAMBDA_OPT).resize(m_,1);
+  output(NLP_LAMBDA_LBX).resize(n_,1);
+  output(NLP_LAMBDA_UBX).resize(n_,1);
 
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){

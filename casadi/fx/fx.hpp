@@ -150,10 +150,10 @@ class FX : public OptionsFunctionality{
   const Matrix<double>& input(int iind=0) const;
 
   /// Access input argument
-  Matrix<double>& result(int oind=0);
+  Matrix<double>& output(int oind=0);
     
   /// Const access input argument
-  const Matrix<double>& result(int oind=0) const;
+  const Matrix<double>& output(int oind=0) const;
 
   /// Access forward seed
   Matrix<double>& fwdSeed(int iind=0, int dir=0);
@@ -237,7 +237,7 @@ SETTERS(const std::vector<double>&);
 
 #define GETTERS(T)\
     void getInput(T val, int ind=0) const             { assertInit(); input(ind).get(val);} \
-    void getOutput(T val, int ind=0) const            { assertInit(); result(ind).get(val);} \
+    void getOutput(T val, int ind=0) const            { assertInit(); output(ind).get(val);} \
     void getFwdSeed(T val, int ind=0, int dir=0) const{ assertInit(); fwdSeed(ind,dir).get(val);} \
     void getFwdSens(T val, int ind=0, int dir=0) const{ assertInit(); fwdSens(ind,dir).get(val);} \
     void getAdjSeed(T val, int ind=0, int dir=0) const{ assertInit(); adjSeed(ind,dir).get(val);} \

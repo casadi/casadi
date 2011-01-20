@@ -276,11 +276,11 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
-  copy(x,x+n_,result(NLP_X_OPT).begin());
-  copy(z_L,z_L+n_,result(NLP_LAMBDA_LBX).begin());
-  copy(z_U,z_U+n_,result(NLP_LAMBDA_UBX).begin());
-  copy(lambda,lambda+m_,result(NLP_LAMBDA_OPT).begin());
-  result(NLP_COST).at(0) = obj_value;
+  copy(x,x+n_,output(NLP_X_OPT).begin());
+  copy(z_L,z_L+n_,output(NLP_LAMBDA_LBX).begin());
+  copy(z_U,z_U+n_,output(NLP_LAMBDA_UBX).begin());
+  copy(lambda,lambda+m_,output(NLP_LAMBDA_OPT).begin());
+  output(NLP_COST).at(0) = obj_value;
 }
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
@@ -288,7 +288,7 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
-    H_.result().sparsity().getSparsityCRS(rowind,col);
+    H_.output().sparsity().getSparsityCRS(rowind,col);
     for(int r=0; r<rowind.size()-1; ++r)
       for(int el=rowind[r]; el<rowind[r+1]; ++el){
 //        if(col[el]>=r){
@@ -319,7 +319,7 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
     if (values == NULL) {
       int nz=0;
       vector<int> rowind,col;
-      J_.result().sparsity().getSparsityCRS(rowind,col);
+      J_.output().sparsity().getSparsityCRS(rowind,col);
       for(int r=0; r<rowind.size()-1; ++r)
         for(int el=rowind[r]; el<rowind[r+1]; ++el){
   //        if(col[el]>=r){
@@ -340,7 +340,7 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
       
       if(monitored("eval_jac_g")){
         cout << "J = " << endl;
-        J_.result().printSparse();
+        J_.output().printSparse();
       }
     }
     
@@ -394,7 +394,7 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 
   // Printing
   if(monitored("eval_g"))
-    cout << "g = " << G_.result() << endl;
+    cout << "g = " << G_.output() << endl;
     
   log("eval_g ok");
   return true;
@@ -472,13 +472,13 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
   if(G_.isNull())
     nnz_jac_g = 0;
   else
-    nnz_jac_g = J_.result().size();
+    nnz_jac_g = J_.output().size();
 
   // Get Hessian sparsity pattern
   if(H_.isNull())
     nnz_h_lag = 0;
   else
-    nnz_h_lag = H_.result().size();
+    nnz_h_lag = H_.output().size();
 }
 
 } // namespace CasADi

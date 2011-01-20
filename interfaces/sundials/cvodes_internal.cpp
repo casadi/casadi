@@ -48,10 +48,10 @@ int CVodesInternal::getNX(const FX& f, const FX& q){
   }
 
   // Number of states
-  int nx = f.result().numel();
+  int nx = f.output().numel();
   
   // Add quadratures, if any_
-  if(!q.isNull()) nx += q.result().numel();
+  if(!q.isNull()) nx += q.output().numel();
   
   return nx;
 }
@@ -75,8 +75,8 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   // Get dimensions
   setDimensions(getNX(f,q), getNP(f),0);
   
-  ny_ = f.result().numel();
-  nq_ = q.isNull() ? 0 : q.result().numel();
+  ny_ = f.output().numel();
+  nq_ = q.isNull() ? 0 : q.output().numel();
 
 }
 
@@ -167,7 +167,7 @@ void CVodesInternal::init(){
 
   // Allocate n-vectors for ivp
   y0_ = N_VMake_Serial(ny_,&input(INTEGRATOR_X0)[0]);
-  y_ = N_VMake_Serial(ny_,&result(INTEGRATOR_XF)[0]);
+  y_ = N_VMake_Serial(ny_,&output(INTEGRATOR_XF)[0]);
 
   // Set error handler function
   flag = CVodeSetErrHandlerFn(mem_, ehfun_wrapper, this);
@@ -264,7 +264,7 @@ void CVodesInternal::init(){
   if(nq_>0){
     // Allocate n-vectors for quadratures
     yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0)[ny_]);
-    yQ_ = N_VMake_Serial(nq_,&result(INTEGRATOR_XF)[ny_]);
+    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF)[ny_]);
 
     // Initialize quadratures in CVodes
     flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ0_);
@@ -549,7 +549,7 @@ void CVodesInternal::integrate(double t_out){
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
-    copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),result(INTEGRATOR_XF).begin());
+    copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),output(INTEGRATOR_XF).begin());
     if(fsens_order_>0){
       for(int i=0; i<nfdir_; ++i){
         copy(fwdSeed(INTEGRATOR_X0,i).begin(),fwdSeed(INTEGRATOR_X0,i).end(),fwdSens(INTEGRATOR_XF,i).begin());
@@ -1043,9 +1043,9 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   jac_f_.evaluate();
   
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_f_.result().rowind();
-  const vector<int>& col = jac_f_.result().col();
-  const vector<double>& val = jac_f_.result();
+  const vector<int>& rowind = jac_f_.output().rowind();
+  const vector<int>& col = jac_f_.output().col();
+  const vector<double>& val = jac_f_.output();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1090,9 +1090,9 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   jac_f_.evaluate();
   
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_f_.result().rowind();
-  const vector<int>& col = jac_f_.result().col();
-  const vector<double>& val = jac_f_.result();
+  const vector<int>& rowind = jac_f_.output().rowind();
+  const vector<int>& col = jac_f_.output().col();
+  const vector<double>& val = jac_f_.output();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1178,7 +1178,7 @@ void CVodesInternal::psetup(double t, N_Vector y, N_Vector fy, booleantype jok, 
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
 
   // Pass non-zero elements, scaled by -gamma, to the linear solver
-  linsol_.setInput(M_.result(),0);
+  linsol_.setInput(M_.output(),0);
 
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
   linsol_.prepare();

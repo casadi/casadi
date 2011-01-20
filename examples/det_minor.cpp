@@ -208,7 +208,7 @@ fcn.evaluate();
 
 // get result
     double detout = 0.0;
-    detout = fcn.result()[0];
+    detout = fcn.output()[0];
 
     double t3 = myclock();
 

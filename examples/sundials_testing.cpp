@@ -87,7 +87,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
   if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
-  dae_res_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_YDOT)[0], &f.input(DAE_P)[0], &f.result(DAE_RES)[0]);
+  dae_res_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_YDOT)[0], &f.input(DAE_P)[0], &f.output(DAE_RES)[0]);
 }
 
 // The ODE right-hand-side in plain c (for CVODES)
@@ -105,7 +105,7 @@ void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
 // Wrap the function to allow creating an CasADi function
 void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
   if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
-  ode_rhs_c(f.input(ODE_T)[0], &f.input(ODE_Y)[0], &f.input(ODE_P)[0], &f.result(ODE_RHS)[0]);
+  ode_rhs_c(f.input(ODE_T)[0], &f.input(ODE_Y)[0], &f.input(ODE_P)[0], &f.output(ODE_RHS)[0]);
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -169,7 +169,7 @@ Integrator create_IDAS(){
     ffcn.input(DAE_Y).resize(3,1);
     ffcn.input(DAE_YDOT).resize(3,1);
     ffcn.input(DAE_P).resize(1,1);
-    ffcn.result(DAE_RES).resize(3,1);
+    ffcn.output(DAE_RES).resize(3,1);
   }
   
   // Quadrature function
@@ -319,7 +319,7 @@ int main(){
   integrator.evaluate();
 
   // Save the result
-  vector<double> res0 = integrator.result();
+  vector<double> res0 = integrator.output();
 
   // Perturb in some direction
   if(perturb_u){
@@ -338,14 +338,14 @@ int main(){
   integrator.printStats();
 
   // Calculate finite difference approximation
-  vector<double> fd = integrator.result();
+  vector<double> fd = integrator.output();
   for(int i=0; i<fd.size(); ++i){
     fd[i] -= res0[i];
     fd[i] /= 0.01;
   }
 
   cout << "unperturbed                     " << res0 << endl;
-  cout << "perturbed                       " << integrator.result() << endl;
+  cout << "perturbed                       " << integrator.output() << endl;
   cout << "finite_difference approximation " << fd << endl;
 
   if(perturb_u){
@@ -440,19 +440,19 @@ int main(){
     intjac.evaluate(0,1);
 
     // Get the results
-    cout << "unperturbed via jacobian        " << intjac.result(1+INTEGRATOR_XF) << endl;
-    cout << "fwd sens via jacobian           " << intjac.result() << endl;
+    cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;
+    cout << "fwd sens via jacobian           " << intjac.output() << endl;
     cout << "second order (fwd-over-adj)     " ;
     cout << intjac.adjSens(INTEGRATOR_X0) << ", ";
     cout << intjac.adjSens(INTEGRATOR_P) << endl;
 
-    vector<double> unpret = intjac.result();
+    vector<double> unpret = intjac.output();
     
     // Perturb X0
     intjac.setInput(u_init+0.01,INTEGRATOR_P);
 
     intjac.evaluate();
-    vector<double> pret = intjac.result();
+    vector<double> pret = intjac.output();
     
     // Finite differences for the sensitivities
     vector<double> fdsens(pret.size());

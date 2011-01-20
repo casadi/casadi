@@ -43,7 +43,7 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
   // Allocate space for outputs
   output_.resize(outputv.size());
   for(int i=0; i<output_.size(); ++i)
-    result(i).resize(outputv[i].size1(),outputv[i].size2());
+    output(i).resize(outputv[i].size1(),outputv[i].size2());
 
 }
 
@@ -166,7 +166,7 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the outputs
   for(int ind=0; ind<outputv.size(); ++ind)
-    outputv[ind]->output().get(result(ind));
+    outputv[ind]->output().get(output(ind));
 
   // Get the output seeds
   if(fsens_order>0)

@@ -37,7 +37,7 @@ void LinearSolverInternal::init(){
   
   // Allocate space for outputs
   output_.resize(1);
-  result(0).resize(ncol_*nrhs_,1);
+  output(0).resize(ncol_*nrhs_,1);
   
   // Not prepared
   prepared_ = false;

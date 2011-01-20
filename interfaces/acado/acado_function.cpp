@@ -45,7 +45,7 @@ void AcadoFunction::init(){
     dim_[i] = f_.input(i).numel();
 
   // Get number of equations
-  neq_ = f_.result().numel();
+  neq_ = f_.output().numel();
   
   // Create an acado function
   fcn_ = new ACADO::CFunction( neq_, fcn_wrapper, fcn_fwd_wrapper, fcn_adj_wrapper);

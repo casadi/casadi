@@ -100,9 +100,9 @@ void IntegratorInternal::setDimensions(int nx, int np, int nz){
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
-  result(INTEGRATOR_XF).resize(nx_,1);
-  result(INTEGRATOR_XPF).resize(nx_,1);
-  result(INTEGRATOR_ZF).resize(nz_,1);
+  output(INTEGRATOR_XF).resize(nx_,1);
+  output(INTEGRATOR_XPF).resize(nx_,1);
+  output(INTEGRATOR_ZF).resize(nz_,1);
 }
 
 void IntegratorInternal::evaluate(int fsens_order, int asens_order){

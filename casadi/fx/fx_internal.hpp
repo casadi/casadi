@@ -94,10 +94,10 @@ class FXInternal : public OptionsFunctionalityNode{
   const Matrix<double>& input(int iind=0) const;
 
   /// Access input argument
-  Matrix<double>& result(int oind=0);
+  Matrix<double>& output(int oind=0);
     
   /// Const access input argument
-  const Matrix<double>& result(int oind=0) const;
+  const Matrix<double>& output(int oind=0) const;
 
   /// Access forward seed
   Matrix<double>& fwdSeed(int iind=0, int dir=0);

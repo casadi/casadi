@@ -75,7 +75,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
   is_init = false;
 
   ny_ = f.input(DAE_Y).numel();
-  nq_ = q.isNull() ? 0 : q.result().numel();
+  nq_ = q.isNull() ? 0 : q.output().numel();
   int np = f.input(DAE_P).numel();
   int nz = f.input(DAE_Z).numel();
   setDimensions(ny_+nq_,np,nz);
@@ -123,7 +123,7 @@ void IdasInternal::init(){
   if(!jac_.isNull()){
     jac_.init();
     vector<int> rowind, col;
-    jac_.result().sparsity().getSparsityCRS(rowind,col);
+    jac_.output().sparsity().getSparsityCRS(rowind,col);
     if(!linsol_.isNull())
       linsol_.setSparsity(rowind,col);
       linsol_.init();
@@ -558,7 +558,7 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
           cout << "DAE_YDOT = " << f_.input(DAE_YDOT) << endl;
           cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
           cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-          cout << "residual = " << f_.result() << endl;
+          cout << "residual = " << f_.output() << endl;
         }
       }
       throw 1;
@@ -855,7 +855,7 @@ void IdasInternal::integrate(double t_out){
   }
   
   // Save the final state
-  copyNV(yz_,yP_,yQ_,result(INTEGRATOR_XF),result(INTEGRATOR_XPF),result(INTEGRATOR_ZF));
+  copyNV(yz_,yP_,yQ_,output(INTEGRATOR_XF),output(INTEGRATOR_XPF),output(INTEGRATOR_ZF));
   if(fsens_order_>0){
     for(int i=0; i<nfdir_; ++i){
       copyNV(yzS_[i],yPS_[i],yQS_[i],fwdSens(INTEGRATOR_XF,i),fwdSens(INTEGRATOR_XPF,i),fwdSens(INTEGRATOR_ZF,i));
@@ -1102,7 +1102,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&result(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&output(INTEGRATOR_XF)[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1156,7 +1156,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&result(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&output(INTEGRATOR_XF)[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1220,15 +1220,15 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
     jac.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac.result().rowind();
-    const vector<int>& col = jac.result().col();
-    const vector<double>& val = jac.result();
+    const vector<int>& rowind = jac.output().rowind();
+    const vector<int>& col = jac.output().col();
+    const vector<double>& val = jac.output();
 
     // Factor
     double c = ijac==0 ? 1 : cj;
     
     // Dimension of the jacobian
-    int jdim = jac.result().size1();
+    int jdim = jac.output().size1();
     
     // Loop over rows
     for(int offset=0; offset<ny_; offset += jdim){
@@ -1277,9 +1277,9 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   jac_.evaluate();
 
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_.result().rowind();
-  const vector<int>& col = jac_.result().col();
-  const vector<double>& val = jac_.result();
+  const vector<int>& rowind = jac_.output().rowind();
+  const vector<int>& col = jac_.output().col();
+  const vector<double>& val = jac_.output();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1385,7 +1385,7 @@ void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, doubl
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
 
   // Pass non-zero elements to the linear solver
-  linsol_.setInput(jac_.result(),0);
+  linsol_.setInput(jac_.output(),0);
 
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
   linsol_.prepare();

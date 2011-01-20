@@ -146,11 +146,11 @@ const Matrix<double>& FXInternal::input(int iind) const{
   return inputStruct(iind).data;
 }
 
-Matrix<double>& FXInternal::result(int oind){
+Matrix<double>& FXInternal::output(int oind){
   return outputStruct(oind).data;
 }
     
-const Matrix<double>& FXInternal::result(int oind) const{
+const Matrix<double>& FXInternal::output(int oind) const{
   return outputStruct(oind).data;
 }
 

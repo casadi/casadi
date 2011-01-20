@@ -120,7 +120,7 @@ void LapackLUDenseInternal::prepare(){
 void LapackLUDenseInternal::solve(){
   // Input and output vectors
   const vector<double>& b = input(1);
-  vector<double>& x = result();
+  vector<double>& x = output();
   
   // Copy the right hand side to the solution vector
   copy(b.begin(),b.end(),x.begin());

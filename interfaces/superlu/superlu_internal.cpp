@@ -241,7 +241,7 @@ void SuperLUInternal::solve(){
   if(info_ != 0) throw CasadiException("dgstrs failed");
 
   // Copy the result
-  vector<double>& res = result(0);
+  vector<double>& res = output(0);
   copy(rhs_.begin(),rhs_.end(),res.begin());
 }
 

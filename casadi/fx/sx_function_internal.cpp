@@ -235,7 +235,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(int i=0; i<outputv.size(); ++i){
     // References
     const SXMatrix& op = outputv[i];
-    result(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
+    output(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
     outputStruct(i).dense = false;
     
     // Allocate space for the indices
@@ -703,7 +703,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind)
     for(int i=0; i<output_ind[ind].size(); ++i){
-      result(ind)[i] = work[0][output_ind[ind][i]];
+      output(ind)[i] = work[0][output_ind[ind][i]];
     }
 
   if(fsens_order>0){
@@ -857,19 +857,19 @@ void SXFunctionInternal::eval(
   }
 
   // Create a new expression to save to
-  res = SXMatrix(result(0).size1(),result(0).size2());
+  res = SXMatrix(output(0).size1(),output(0).size2());
 
   // copy the result
-  for(int i=0; i<result(0).size1(); ++i) // loop over rows
-    for(int el=result(0).rowind(i); el<result(0).rowind(i+1); ++el){ // loop over the non-zero elements of the original matrix
-      int j=result(0).col(el);  // column
+  for(int i=0; i<output(0).size1(); ++i) // loop over rows
+    for(int el=output(0).rowind(i); el<output(0).rowind(i+1); ++el){ // loop over the non-zero elements of the original matrix
+      int j=output(0).col(el);  // column
       res(i,j) = work[output_ind[0][el]];
   }
 
 }
 
 SXMatrix SXFunctionInternal::hess(int iind, int oind){
-  if(result(oind).numel() != 1)
+  if(output(oind).numel() != 1)
     throw CasadiException("SXFunctionInternal::hess: function must be scalar");
   
   // Reverse mode to calculate gradient
@@ -892,7 +892,7 @@ SXMatrix SXFunctionInternal::grad(int iind, int oind){
 SXMatrix SXFunctionInternal::jac(int iind, int oind){
   if(input_ind.at(iind).empty() || output_ind.at(oind).empty()) return SXMatrix(); // quick return
   assert(input(iind).size2()==1);
-  assert(result(oind).size2()==1);
+  assert(output(oind).size2()==1);
 
   // Calculate the partial derivatives     // The loop can be executed in parallel!
   vector<SX> der1, der2;
@@ -918,8 +918,8 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
   if(1){ // problem with the forward mode!
     
   // Jacobian
-  SXMatrix ret(result(oind).numel(),input_ind.at(iind).size()); 
-  ret.reserve(input_ind.at(iind).size()+result(oind).numel());
+  SXMatrix ret(output(oind).numel(),input_ind.at(iind).size()); 
+  ret.reserve(input_ind.at(iind).size()+output(oind).numel());
 
 #if 0
   // Backward seed (symbolic direction)
@@ -1086,9 +1086,9 @@ return ret;
         snodes.push_back(i);
     }
               
-    for(int i=0; i<result(oind).size1(); ++i) // loop over rows of the output
-      for(int el=result(oind).rowind(i); el<result(oind).rowind(i+1); ++el){ // loop over the non-zero elements
-        assert(result(oind).col(el) == 0); // column
+    for(int i=0; i<output(oind).size1(); ++i) // loop over rows of the output
+      for(int el=output(oind).rowind(i); el<output(oind).rowind(i+1); ++el){ // loop over the non-zero elements
+        assert(output(oind).col(el) == 0); // column
 
         // Clear seeds (from symbolic components)
         for(vector<int>::const_iterator ii=snodes.begin(); ii!=snodes.end(); ++ii)
@@ -1126,8 +1126,8 @@ return ret;
     return ret;
   } else if(getOption("ad_mode") == "forward"){
     // Gradient
-    SXMatrix ret(input_ind.at(iind).size(),result(oind).numel());
-    ret.reserve(input_ind.at(iind).size()+result(oind).numel());
+    SXMatrix ret(input_ind.at(iind).size(),output(oind).numel());
+    ret.reserve(input_ind.at(iind).size()+output(oind).numel());
     
     for(int i=0; i<input(iind).size1(); ++i) // loop over rows of the gradient
       for(int el=input(iind).rowind(i); el<input(iind).rowind(i+1); ++el){ // loop over the non-zero elements
@@ -1244,17 +1244,17 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   // rows
   cfile << "int out_nrow[] = {";
   if(!output_.empty()){
-    cfile << result(0).size1();
+    cfile << output(0).size1();
     for(int i=1; i<output_.size(); ++i)
-      cfile << "," << result(i).size1();
+      cfile << "," << output(i).size1();
   }
   cfile << "};" << endl;
   // columns
   cfile << "int out_ncol_[] = {";
   if(!output_.empty()){
-    cfile << result(0).size2();
+    cfile << output(0).size2();
     for(int i=1; i<output_.size(); ++i)
-      cfile << "," << result(i).size2();
+      cfile << "," << output(i).size2();
   }
   cfile << "};" << endl;
 

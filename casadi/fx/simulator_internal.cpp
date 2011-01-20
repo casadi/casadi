@@ -41,7 +41,7 @@ SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& out
   // Allocate outputs
   output_.resize(output_fcn_->output_.size());
   for(int i=0; i<output_.size(); ++i)
-    result(i).resize(grid_.size(),output_fcn_.result(i).numel());
+    output(i).resize(grid_.size(),output_fcn_.output(i).numel());
 }
   
 SimulatorInternal::~SimulatorInternal(){
@@ -79,7 +79,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     
     // Pass integrator_ output to the output function
     output_fcn_.setInput(grid_[k],OUTPUT_T);
-    output_fcn_.setInput(integrator_.result(),OUTPUT_X);
+    output_fcn_.setInput(integrator_.output(),OUTPUT_X);
     output_fcn_.setInput(input(SIMULATOR_P),OUTPUT_P);
 
     // Evaluate output function
@@ -87,8 +87,8 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     
     // Save the output of the function
     for(int i=0; i<output_.size(); ++i){
-      const vector<double> &res = output_fcn_.result(i);
-      copy(res.begin(),res.end(),&result(i)[k*res.size()]);
+      const vector<double> &res = output_fcn_.output(i);
+      copy(res.begin(),res.end(),&output(i)[k*res.size()]);
     }
     
     if(fsens_order>0){
