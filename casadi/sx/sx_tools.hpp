@@ -45,7 +45,7 @@ void make_symbolic(SX& v, const std::string& name);
 /** \brief Make a vector/matrix of symbolic variables - higher dimension recursively */
 template<typename A>
 void make_symbolic(std::vector< A >& v, const std::string& name){
-  for(int i=0; i<v.size(); ++i){
+  for(unsigned int i=0; i<v.size(); ++i){
     std::stringstream ss;
     ss << name << "_" << i;
     make_symbolic(v[i],ss.str());

@@ -25,7 +25,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include <cassert>
+
 #include "casadi/stl_vector_tools.hpp"
 #include "external_packages/tinyxml/tinyxml.h"
 

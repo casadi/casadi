@@ -23,7 +23,7 @@
 #ifndef STL_VECTOR_TOOLS_HPP
 #define STL_VECTOR_TOOLS_HPP
 
-#include <cassert>
+
 #include <iostream>
 #include <string>
 #include <sstream>

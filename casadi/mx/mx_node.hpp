@@ -30,10 +30,38 @@
 
 namespace CasADi{
 
+  /// Input and output structure for the evaluation
+  struct MXNodeIO{
+    
+    /// Input
+    std::vector<const double*> input;
+    
+    /// Result of the evaluation
+    double* output;
+    
+    /// Forward seeds
+    std::vector< std::vector<const double*> > fwdSeed;
+
+    /// Forward sensitivities
+    std::vector<double*> fwdSens;
+    
+    /// Adjoint seeds
+    std::vector<const double*> adjSeed;
+
+    /// Adjoint sensitivities
+    std::vector< std::vector<double*> > adjSens;
+    
+    /// Number of forward sensitivities to be calculated
+    int nfwd;
+    
+    /// Number of adjoint sensitivities to be calculated
+    int nadj;
+  };
+  
 /** \brief Node class for MX objects
-  \author Joel Andersson 
-  \date 2010
-  A regular user is not supposed to work with this Node class. Use Option directly.
+    \author Joel Andersson 
+    \date 2010
+    Internal class.
 */
 class MXNode : public SharedObjectNode{
   friend class MX;
@@ -53,9 +81,18 @@ class MXNode : public SharedObjectNode{
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
 
-    /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(int fsens_order, int asens_order) = 0;
+    /** \brief  Evaluate the function and store the result in the node (old!) */
+    virtual void evaluate(int fsens_order, int asens_order)=0;
 
+    /** \brief  Evaluate the function (new, option 1, easier to debug) */
+    virtual void evaluate(MXNodeIO& arg);
+
+    /** \brief  Evaluate the function (new, option 2, compatibility with C) */
+    virtual void evaluate(const double** input, double* output, 
+                          const double*** fwdSeed, double** fwdSens, 
+                          const double** adjSeed, double*** adjSens, 
+                          int nfwd, int nadj);
+    
     /** \brief  Initialize */
     virtual void init();
     

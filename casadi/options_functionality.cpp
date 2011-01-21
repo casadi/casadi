@@ -21,7 +21,7 @@
  */
 
 #include "options_functionality.hpp"
-#include <cassert>
+
 #include "stl_vector_tools.hpp"
 #include "casadi_exception.hpp"
 

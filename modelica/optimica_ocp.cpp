@@ -23,7 +23,7 @@
 #include "optimica_ocp.hpp"
 #include <algorithm>
 #include <set>
-#include <cassert>
+
 #include "../casadi/casadi_exception.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 

@@ -34,7 +34,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <cassert>
+
 
 using namespace std;
 using namespace CasADi;

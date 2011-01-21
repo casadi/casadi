@@ -466,7 +466,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
 
 template<class T>
 void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m){
-  if(ii.size() != m.size1() || jj.size() != m.size2()) throw CasadiException("Matrix<T>::setSub: dimension mismatch");
+  casadi_assert_message(ii.size() == m.size1() && jj.size() == m.size2(),"Dimension mismatch.");
   for(int i=0; i<m.size1(); ++i)
     for(int el=m.rowind(i); el<m.rowind(i+1); ++el){
       int j=m.col(el);
@@ -541,7 +541,7 @@ Matrix<T>::Matrix(const std::vector<T>& x) : std::vector<T>(x){
 
 template<class T>
 Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : std::vector<T>(x){
-  if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
+  casadi_assert_message(x.size() == n*m, "dimension mismatch");
   sparsity_ = CRSSparsity(n,m,true);
 }
 
@@ -571,7 +571,7 @@ void Matrix<T>::makeEmpty(int n, int m){
 
 template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {
-  if(numel()!=1) throw CasadiException("operator=: argument not scalar");
+  casadi_assert_message(numel()==1, "not a scalar");
   stream << (*this)(0);
 }
   
@@ -705,15 +705,13 @@ const T Matrix<T>::getitem(int i) const{
 
 template<class T>
 const T Matrix<T>::getitem(const std::vector<int> &I) const{
-  if(I.size()!=2) 
-    throw CasADi::CasadiException("getitem: not 2D"); 
+  casadi_assert_message(I.size()==2,"Index vector must be two-dimensional");
   return getElement(I[0],I[1]);
 }
 
 template<class T>
 const Matrix<T> Matrix<T>::getitem(const std::vector< std::vector<int> > &II) const{
-  if(II.size()!=2) 
-    throw CasADi::CasadiException("getitem (submatrix): not 2D "); 
+  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
   return (*this)(II[0],II[1]);
 }
 
@@ -724,15 +722,13 @@ void Matrix<T>::setitem(int k, const T& el){
 
 template<class T>
 void Matrix<T>::setitem(const std::vector<int> &I, const T&  el){ 
-  if(I.size()!=2) 
-    throw CasADi::CasadiException("setitem: not 2D"); 
+  casadi_assert_message(I.size()==2,"Index vector must be two-dimensional");
   getElementRef(I[0],I[1]) = el;
 }
 
 template<class T>
 void Matrix<T>::setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m){
-  if(II.size()!=2) 
-    throw CasADi::CasadiException("setitem (submatrix): not 2D "); 
+  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
   setSub(II[0],II[1],m);
 }
 

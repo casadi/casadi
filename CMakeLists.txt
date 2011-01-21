@@ -11,8 +11,12 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 option(WITH_JIT "Enable just-in-time compilation" OFF)
 
 # For code optimization
+if(CMAKE_BUILD_TYPE)
+else(CMAKE_BUILD_TYPE)
 SET(CMAKE_BUILD_TYPE Release)
-#SET(CMAKE_BUILD_TYPE Debug)
+# SET(CMAKE_BUILD_TYPE Debug)
+endif(CMAKE_BUILD_TYPE)
+
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)

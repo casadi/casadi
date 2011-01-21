@@ -23,7 +23,7 @@
 #include "ocp_variables.hpp"
 #include <algorithm>
 #include <set>
-#include <cassert>
+
 #include "../casadi/casadi_exception.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 
@@ -40,7 +40,7 @@ OCPVariables::OCPVariables(const Variable& var){
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
     // Make sure that the variable is initialized
     switch(it->getType()){
-      case TYPE_INDEPENDENT:        assert(t.isNull());     t = *it;  break;
+      case TYPE_INDEPENDENT:        casadi_assert(t.isNull());     t = *it;  break;
       case TYPE_STATE:              x.push_back(*it);  break;
       case TYPE_ALGEBRAIC:          z.push_back(*it);  break;
       case TYPE_CONTROL:            u.push_back(*it);  break;

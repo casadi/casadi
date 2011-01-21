@@ -22,7 +22,7 @@
 
 #include "shared_object.hpp"
 #include "casadi_exception.hpp"
-#include <cassert>
+
 #include <typeinfo>
 
 using namespace std;
@@ -107,7 +107,7 @@ SharedObjectNode::SharedObjectNode(){
 }
 
 SharedObjectNode::~SharedObjectNode(){
-   assert(count==0);
+   casadi_assert(count==0);
 }
 
 void SharedObject::init(){

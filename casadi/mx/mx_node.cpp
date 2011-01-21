@@ -143,6 +143,64 @@ int MXNode::size2() const{
   return sparsity_.size2();
 }
 
+void MXNode::evaluate(int fsens_order, int asens_order){
+  // workaround function to ensure backward compatibility
+  MXNodeIO arg;
+  arg.nfwd = fsens_order;
+  arg.nadj = asens_order;
+  
+  // Inputs
+  arg.input.resize(ndep());
+  for(int i=0; i<ndep(); ++i)
+    arg.input[i] = &input(i)[0];
+  
+  // Output
+  arg.output = &output()[0];
+  
+  // Forward seeds
+  arg.fwdSeed.resize(ndep());
+  for(int i=0; i<ndep(); ++i){
+    arg.fwdSeed[i].resize(arg.nfwd);
+    for(int d=0; d<arg.nfwd; ++d){
+      arg.fwdSeed[i][d] = &fwdSeed(i,d)[0];
+    }
+  }
+  
+  // Forward sensitivities
+  arg.fwdSens.resize(arg.nfwd);
+  for(int d=0; d<arg.nfwd; ++d){
+    arg.fwdSens[d] = &fwdSens(d)[0];
+  }
+
+  // Adjoint seeds
+  arg.fwdSens.resize(arg.nadj);
+  for(int d=0; d<arg.nadj; ++d){
+    arg.adjSeed[d] = &adjSeed(d)[0];
+  }
+  
+  // Adjoint sensitivities
+  arg.adjSens.resize(ndep());
+  for(int i=0; i<ndep(); ++i){
+    arg.adjSens[i].resize(arg.nadj);
+    for(int d=0; d<arg.nadj; ++d){
+      arg.adjSens[i][d] = &adjSens(i,d)[0];
+    }
+  }
+  
+  // Evaluate
+  evaluate(arg);
+}
+
+void MXNode::evaluate(MXNodeIO& arg){
+  throw CasadiException("MXNode::evaluate: not implemented");
+}
+
+void MXNode::evaluate(const double** input, double* output, 
+                      const double*** fwdSeed, double** fwdSens, 
+                      const double** adjSeed, double*** adjSens, 
+                      int nfwd, int nadj){
+  throw CasadiException("MXNode::evaluate: not implemented");
+}
 
 
 } // namespace CasADi
