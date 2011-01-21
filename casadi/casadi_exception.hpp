@@ -90,13 +90,17 @@ class CasadiException : public std::exception{
 // Convert to string
 #define CASADI_ASSERT_STR1(x) #x
 #define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
-// This assersion if for errors caused by bugs in CasADi
-#define casadi_assert(x) \
-if(!(x)) throw CasadiException("The assertion " CASADI_ASSERT_STR(x) " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__) " failed. Please notify the CasADi developers.")
+
+// String denoting where the assertation is situated
+#define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__)
 
 // This assersion if for illigal user inputs that should not be checked in the release version for effiency resonds, for example out of bounds
 #define casadi_assert_message(x,msg) \
-if(!(x)) throw CasadiException("The assertion " CASADI_ASSERT_STR(x) " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__) " failed. " msg)
+if(!(x)) throw CasadiException("The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. " msg)
+
+// This assersion if for errors caused by bugs in CasADi
+#define casadi_assert(x) casadi_assert_message(x,"Please notify the CasADi developers.")
+
 
 #endif // NDEBUG
   

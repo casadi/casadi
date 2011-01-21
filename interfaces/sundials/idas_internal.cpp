@@ -25,7 +25,6 @@
 #include "casadi/fx/linear_solver_internal.hpp"
 #include "casadi/fx/sx_function_internal.hpp"
 #include "casadi/sx/sx_tools.hpp"
-#include <cassert>
 
 using namespace std;
 namespace CasADi{
@@ -637,7 +636,7 @@ int IdasInternal::jtimes_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr
 }
 
 void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, const double *resval, N_Vector *yS, N_Vector* ypS, N_Vector *resvalS, double *tmp1, double *tmp2, double *tmp3){
-  assert(Ns==nfdir_);
+  casadi_assert(Ns==nfdir_);
 
   // Record the current cpu time
   time1 = clock();
@@ -1030,7 +1029,7 @@ void IdasInternal::rhsQ(double t, const double* yz, const double* yp, double* rh
   
 void IdasInternal::rhsQS(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *yzS, N_Vector *ypS, N_Vector rrQ, N_Vector *rhsvalQS, 
                         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  assert(Ns==nfdir_);
+  casadi_assert(Ns==nfdir_);
 
   // Pass input
    q_.setInput(t,DAE_T);
@@ -1196,7 +1195,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
 
   // Number of jacobian functions
   int njac = jac_.isNull() ? 2 : 1;
-  assert(njac!=2);
+  casadi_assert(njac!=2);
   
   // Evaluate the functions and add to the result
   for(int ijac = 0; ijac<njac; ++ijac){
@@ -1324,7 +1323,7 @@ void IdasInternal::setStopTime(double tf){
 int IdasInternal::psolve_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp){
  try{
     IdasInternal *this_ = (IdasInternal*)user_data;
-    assert(this_);
+    casadi_assert(this_);
     this_->psolve(t, yz, yp, rr, rvec, zvec, cj, delta, tmp);
     return 0;
   } catch(exception& e){
@@ -1336,7 +1335,7 @@ int IdasInternal::psolve_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr
 int IdasInternal::psetup_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
  try{
     IdasInternal *this_ = (IdasInternal*)user_data;
-    assert(this_);
+    casadi_assert(this_);
     this_->psetup(t, yz, yp, rr, cj, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
@@ -1404,7 +1403,7 @@ void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, doubl
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
  try{
     IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
-    assert(this_);
+    casadi_assert(this_);
     this_->lsetup(IDA_mem,yzp,ypp,resp,vtemp1,vtemp2,vtemp3);
     return 0;
   } catch(exception& e){
@@ -1416,7 +1415,7 @@ int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_V
 int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
  try{
    IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
-   assert(this_);
+   casadi_assert(this_);
    this_->lsolve(IDA_mem,b,weight,ycur,ypcur,rescur);
    return 0;
   } catch(int wrn){

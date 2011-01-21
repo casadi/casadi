@@ -255,7 +255,7 @@ Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y){
 
 template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
-  if(x.size2() != y.size1()) throw CasadiException("prod: dimension mismatch");
+  casadi_assert_message(x.size2() == y.size1(),"prod: dimension mismatch");
   
   // Find the mapping corresponding to the transpose of y (no need to form the transpose explicitly)
   std::vector<int> y_trans_map;
@@ -361,7 +361,7 @@ void append(Matrix<T>& expr, const Matrix<T>& add){
   }
 
   // Check dimensions
-  if(expr.size2() != add.size2()) throw CasadiException("append: dimensions do not match");
+  casadi_assert_message(expr.size2() == add.size2(),"append: dimensions do not match");
 
   // Resize the expression
   int oldn = expr.size1();
@@ -375,8 +375,8 @@ void append(Matrix<T>& expr, const Matrix<T>& add){
 
 template<class T>
 void getSub(Matrix<T> &res, const Matrix<T> &expr, int i, int j, int ni, int nj, int ki, int kj){
-  if(!(ki==1 && kj==1)) throw CasadiException("getSub: ki!=1 and kj!=1 not implemented");
-  if(!(i+ni <= expr.size1() && j+nj <= expr.size2())) throw CasadiException("getSub: dimension mismatch");
+  casadi_assert_message(ki==1 && kj==1, "getSub: ki!=1 and kj!=1 not implemented");
+  casadi_assert_message(i+ni <= expr.size1() && j+nj <= expr.size2(),"getSub: dimension mismatch");
   res = Matrix<T>(ni,nj);
   for(int r=0; r<ni; ++r)
     for(int c=0; c<nj; ++c)
@@ -396,7 +396,7 @@ void setSub(const Matrix<T> &expr, Matrix<T> &res, int i, int j){
 template<class T>
 void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni, int ki){
   // TODO: Very inefficient, exploit sparsity
-  if(!(i<expr.size1())) throw CasadiException("getRow: dimension mismatch");
+  casadi_assert_message(i<expr.size1(),"dimension mismatch");
   res = Matrix<T>(ni,expr.size2());
   for(int ii=0; ii<ni; ++ii)
     for(int j=0; j<expr.size2(); ++j){
@@ -416,7 +416,7 @@ Matrix<T> getRow( const Matrix<T> &expr, int i, int ni, int ki){
 template<class T>
 void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj, int kj){
   // TODO: Very inefficient, exploit sparsity
-  if(!(j<expr.size2())) throw CasadiException("getColumn: dimension mismatch");
+  casadi_assert_message(j<expr.size2(),"dimension mismatch");
   res = Matrix<T>(expr.size1(),nj);
   for(int i=0; i<expr.size1(); ++i)
     for(int jj=0; jj<nj; ++jj){
@@ -436,7 +436,7 @@ Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj, int kj){
 template<class T>
 void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni, int ki){
   // TODO: Very inefficient, exploit sparsity
-  if(!(i<res.size1())) throw CasadiException("setRow: dimension mismatch");
+  casadi_assert_message(i<res.size1(),"dimension mismatch");
   for(int j=0; j<res.size2(); ++j){
     if(!casadi_limits<T>::isZero(expr(0,j)))
       res(i,j) = expr(0,j);
@@ -446,7 +446,7 @@ void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni, int ki){
 template<class T>
 void setColumn(const Matrix<T>& expr, Matrix<T> &res, int j, int nj, int kj){
   // TODO: Very inefficient, exploit sparsity
-  if(!(j<res.size2())) throw CasadiException("setColumn: dimension mismatch");
+  casadi_assert_message(j<res.size2(),"dimension mismatch");
   for(int i=0; i<res.size1(); ++i){
     if(!casadi_limits<T>::isZero(expr(i,0)))
       res(i,j) = expr(i,0);
@@ -532,7 +532,7 @@ bool isTriu(const Matrix<T> &A){
 template<class T>
 T det(const Matrix<T>& a){
   int n = a.size1();
-  if(n != a.size2()) throw CasadiException("det: matrix must be square");
+  casadi_assert_message(n == a.size2(),"matrix must be square");
 
   // Trivial return if scalar
   if(isScalar(a)) return a(0);
@@ -553,7 +553,7 @@ T det(const Matrix<T>& a){
 template<class T>
 T getMinor(const Matrix<T> &x, int i, int j){
   int n = x.size1();
-  if(n != x.size2()) throw CasadiException("getMinor: matrix must be square");
+  casadi_assert_message(n == x.size2(), "getMinor: matrix must be square");
 
   // Trivial return if scalar
   if(n==1) return 1;
@@ -589,7 +589,7 @@ T cofactor(const Matrix<T> &x, int i, int j){
 template<class T>
 Matrix<T> adj(const Matrix<T>& a){
   int n = a.size1();
-  if(n != a.size2()) throw CasadiException("adj: matrix must be square");
+  casadi_assert_message(n == a.size2(),"adj: matrix must be square");
 
   // Cofactor matrix
   Matrix<T> C(n,n);
@@ -608,9 +608,8 @@ Matrix<T> inv(const Matrix<T>& a){
 
 template<class T>
 Matrix<T> reshape(const Matrix<T>& a, int n, int m){
-  if(a.numel() != n*m)
-    throw CasadiException("resize: number of elements must remain the same");
-  
+  casadi_assert_message(a.numel() == n*m, "resize: number of elements must remain the same");
+
   Matrix<T> ret(n,m);
   for(int i=0; i<a.size1(); ++i){
     for(int el=a.rowind(i); el<a.rowind(i+1); ++el){
@@ -658,13 +657,13 @@ Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
 
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
-  if(!x.vector() || !y.vector()) throw CasadiException("inner_prod: arguments must be vectors");
+  casadi_assert_message(x.vector() && y.vector(), "inner_prod: arguments must be vectors");
   return prod(trans(x),y);
 }
 
 template<class T>
 Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
-  if(!x.vector() || !y.vector()) throw CasadiException("outer_prod: arguments must be vectors");
+  casadi_assert_message(x.vector() && y.vector(), "outer_prod: arguments must be vectors");
   return prod(x,trans(y));  
 }
 
@@ -680,16 +679,17 @@ T sum_all(const Matrix<T> &x) {
 
 template<class T>
 Matrix<T> sum(const Matrix<T> &x, int axis) {
-  if (axis==1)
+  casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
+  if (axis==1){
     return trans(sum(trans(x),0));
-  if (axis!=0)
-    throw CasadiException("Matrix<T>::sum: axis argument should be zero or one");
-  Matrix<T> res(1,x.size2());
-  const std::vector<int> &col = x.col();
-  for(int k=0; k<col.size(); k++){
-    res(0,col[k]) += x[k];
+  } else {
+    Matrix<T> res(1,x.size2());
+    const std::vector<int> &col = x.col();
+    for(int k=0; k<col.size(); k++){
+      res(0,col[k]) += x[k];
+    }
+    return res;
   }
-  return res;
 }
 
 template<class T>
@@ -718,7 +718,7 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
   // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
   int m = A.size1();
   int n = A.size2();
-  if(m<n) throw CasadiException("qr: fewer rows than columns");
+  casadi_assert_message(m>=n, "qr: fewer rows than columns");
 
   // Transpose of A
   Matrix<T> AT = trans(A);
@@ -763,8 +763,8 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
 template<class T>
 Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
   // check dimensions
-  if(A.size1() != b.size1()) throw CasadiException("solve: dimension mismatch");
-  if(A.size1() != A.size2()) throw CasadiException("solve: A not square");
+  casadi_assert_message(A.size1() == b.size1(),"solve: dimension mismatch");
+  casadi_assert_message(A.size1() == A.size2(),"solve: A not square");
   if(isTril(A)){
     // forward substiution if lower triangular
     Matrix<T> x = b;
@@ -801,7 +801,7 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
 
 template<class T>
 Matrix<T> linspace(const Matrix<T> &a_, const Matrix<T> &b_, int nsteps){
-  if(!isScalar(a_) || !isScalar(b_)) throw CasadiException("Matrix<T>::linspace: a and b must be scalar");
+  casadi_assert_message(isScalar(a_) && isScalar(b_), "linspace: a and b must be scalar");
   T a = a_(0);
   T b = b_(0);
   Matrix<T> ret(nsteps,1);
