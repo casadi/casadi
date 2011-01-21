@@ -614,7 +614,7 @@ Matrix<T> reshape(const Matrix<T>& a, int n, int m){
   for(int i=0; i<a.size1(); ++i){
     for(int el=a.rowind(i); el<a.rowind(i+1); ++el){
       int j = a.col(el);
-      int k = j+i*a.size1();
+      int k = j+i*a.size2();
       ret(k/m,k%m) = a[el];
     }
   }
