@@ -36,6 +36,11 @@ namespace CasADi{
   /** Sparsity format for getting and setting inputs and outputs */
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
 
+  /// Dummy class denoting all rows/columns
+  class AllRange{
+  };
+  static AllRange ALL;
+
   /** \brief General sparse matrix class
   General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
   This philosophy makes it easy to use and to interface in particularily with Matlab and Python.\n
@@ -175,11 +180,39 @@ class Matrix : public std::vector<T>, public PrintableObject{
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
 
     /// Access a submatrix
-    SubMatrix<Matrix<T> > operator()(const std::vector<int>& ii, const std::vector<int>& jj=std::vector<int>(1,0)){ return SubMatrix<Matrix<T> >(*this,ii,jj);}
+    SubMatrix<Matrix<T> > operator()(const std::vector<int>& ii, const std::vector<int>& jj){ return SubMatrix<Matrix<T> >(*this,ii,jj);}
     
     /// Get a submatrix
-    const Matrix<T> operator()(const std::vector<int>& ii, const std::vector<int>& jj=std::vector<int>(1,0)) const{ return getSub(ii,jj);}
+    const Matrix<T> operator()(const std::vector<int>& ii, const std::vector<int>& jj) const{ return getSub(ii,jj);}
+
+    /// Access a row
+    SubMatrix<Matrix<T> > operator()(int i, const std::vector<int>& jj){ return SubMatrix<Matrix<T> >(*this,std::vector<int>(1,i),jj);}
     
+    /// Get a row
+    const Matrix<T> operator()(int i, const std::vector<int>& jj) const{ return getSub(std::vector<int>(1,i),jj);}
+
+    /// Access a column
+    SubMatrix<Matrix<T> > operator()(const std::vector<int>& ii, int j){ return SubMatrix<Matrix<T> >(*this,ii,std::vector<int>(1,j));}
+    
+    /// Get a column
+    const Matrix<T> operator()(const std::vector<int>& ii, int j) const{ return getSub(ii,std::vector<int>(1,j));}
+
+    /// Access all rows
+    template<class A>
+    const Matrix<T> operator()(const AllRange& i, A j) const{ return operator()(range(size1()),j);}
+    
+    /// Get all rows
+    template<class A>
+    SubMatrix<Matrix<T> > operator()(const AllRange& i, A j){ return operator()(range(size1()),j);}
+  
+    /// Access all columns
+    template<class A>
+    const Matrix<T> operator()(A i, const AllRange& j) const{ return operator()(i,range(size2()));}
+
+    /// Get all columns
+    template<class A>
+    SubMatrix<Matrix<T> > operator()(A i, const AllRange& j){ return operator()(i,range(size2()));}
+
 #endif // SWIG
 
     /// Python: get a non-zero entry
@@ -455,10 +488,23 @@ template<class T>
 const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   Matrix<T> ret(ii.size(),jj.size());
   for(int i=0; i<ii.size(); ++i){
+    // The row of the original matrix
+    int i0 = ii[i];
+    
+    // The first non-zero element of the row of the original matrix
+    int el = rowind(i0);
+    
+    // The last non-zero element on the row of the original matrix
+    int el_last = rowind(i0+1);
+    
+    // Loop over the columns of the returb matrix
     for(int j=0; j<jj.size(); ++j){
-      T temp = getElement(ii[i],jj[j]);
-      if(!casadi_limits<T>::isZero(temp))
-        ret(i,j) = temp;
+      // Break if no more elements on the row
+      if(el>=el_last) break;
+      
+      // Save the non-zero element if column maches
+      if(col(el)==jj[j])
+        ret(i,j) = (*this)[el++];
     }
   }
   return ret;
@@ -466,12 +512,32 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
 
 template<class T>
 void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m){
-  casadi_assert_message(ii.size() == m.size1() && jj.size() == m.size2(),"Dimension mismatch.");
-  for(int i=0; i<m.size1(); ++i)
-    for(int el=m.rowind(i); el<m.rowind(i+1); ++el){
-      int j=m.col(el);
-      setElement(ii[i],jj[j],m[el]);
+  casadi_assert_message(m.numel()==1 || (ii.size() == m.size1() && jj.size() == m.size2()),"Dimension mismatch.");
+  
+  // If m is scalar
+  if(m.numel() !=ii.size() * jj.size()){
+    setSub(ii,jj,Matrix<T>(ii.size(),jj.size(),m(0,0)));
+    return;
+  }
+  
+  // Loop over the rows of both of the matrices
+  for(int im=0; im<ii.size(); ++im){
+    // Row of the original matrix
+    int i=ii[im];
+    
+    // Loop over the columns of both matrices (inefficient!!!)
+    for(int jm=0; jm<jj.size(); ++jm){
+      // Column of the original matrix
+      int j=jj[jm];
+      
+      // Get the value of m and the original
+      T mval = m(im,jm);
+      T val = (*this)(i,j);
+      if(!casadi_limits<T>::isZero(mval-val)){
+        (*this)(i,j) = mval;
+      }
     }
+  }
 }
 
 template<class T>

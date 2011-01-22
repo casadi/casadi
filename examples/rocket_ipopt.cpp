@@ -70,11 +70,9 @@ int main(){
   // Print the code
   cout << "The code was : " << endl;
   print_code(TOSTRING(SOURCE_CODE(hello_modified)));
-  
-  casadi_assert(0==1);
-  
+    
   cout << "program started" << endl;
-  
+      
   // Dimensions
   int nu = 100;  // Number of control segments
   int nj = 100; // 10000;  // // Number of integration steps per control segment

@@ -32,6 +32,12 @@ template<class T>
 Matrix<T> trans(const Matrix<T> &x);
 
 #ifndef SWIG
+/// Python's range function
+std::vector<int> range(int start, int stop, int step=1);
+
+/// Python's range function, start = 0
+std::vector<int> range(int stop);
+
 /// Matrix product of two matrices - not available in Python since prod in numpy means elementwise multiplication
 template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y);
@@ -43,36 +49,6 @@ Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y);
 
 template<class T>
 void append(Matrix<T>& expr, const Matrix<T>& add);
-
-/// ... = A(i:ki:i+ni,j:kj:j+nj)
-template<class T>
-void getSub(Matrix<T> &res, const Matrix<T> &expr, int i, int j=0, int ni=1, int nj=1, int ki=1, int kj=1); 
-
-/** \brief  A(i:ki:i+ni,j:kj:j+nj) = expr */
-template<class T>
-void setSub(const Matrix<T> &expr, Matrix<T> &res, int i, int j=0);
-
-/// ... = A(i:ki:i+ni,:)
-template<class T>
-void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni=1, int ki=1);
-
-template<class T>
-Matrix<T> getRow( const Matrix<T> &expr, int i, int ni=1, int ki=1);
-
-/** \brief  A(i:ki:i+ni,:) = expr */
-template<class T>
-void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni=1, int ki=1);
-
-/// ... = A(:,j:kj:j+nj)
-template<class T>
-void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj=1, int kj=1);
-
-template<class T>
-Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj=1, int kj=1);
-
-/** \brief  A(:,j:kj:j+nj) = expr */
-template<class T>
-void setColumn(const Matrix<T>& expr, Matrix<T> &res, int j, int nj=1, int kj=1);
 
 /** \brief  check if the matrix has certain properties */
 template<class T>
@@ -370,87 +346,7 @@ void append(Matrix<T>& expr, const Matrix<T>& add){
   expr.resize(n,m);
 
   // Copy the lower expression to the end
-  setSub(add, expr, oldn, 0);
-}
-
-template<class T>
-void getSub(Matrix<T> &res, const Matrix<T> &expr, int i, int j, int ni, int nj, int ki, int kj){
-  casadi_assert_message(ki==1 && kj==1, "getSub: ki!=1 and kj!=1 not implemented");
-  casadi_assert_message(i+ni <= expr.size1() && j+nj <= expr.size2(),"getSub: dimension mismatch");
-  res = Matrix<T>(ni,nj);
-  for(int r=0; r<ni; ++r)
-    for(int c=0; c<nj; ++c)
-      if(!casadi_limits<T>::isZero(expr(i+r,j+c)))
-        res(r,c) = expr(i+r,j+c);
-}
-
-template<class T>
-void setSub(const Matrix<T> &expr, Matrix<T> &res, int i, int j){
-  // TODO: Very inefficient, exploit sparsity
-  for(int r=0; r<expr.size1(); ++r)
-    for(int c=0; c<expr.size2(); ++c)
-      if(!casadi_limits<T>::isZero(expr(r,c)))
-        res(i+r,j+c) = expr(r,c);
-}
-
-template<class T>
-void getRow(Matrix<T> &res, const Matrix<T> &expr, int i, int ni, int ki){
-  // TODO: Very inefficient, exploit sparsity
-  casadi_assert_message(i<expr.size1(),"dimension mismatch");
-  res = Matrix<T>(ni,expr.size2());
-  for(int ii=0; ii<ni; ++ii)
-    for(int j=0; j<expr.size2(); ++j){
-      T temp = expr(i+ii,j);
-      if(!casadi_limits<T>::isZero(temp))
-        res(ii,j) = temp;
-    }
-}
-
-template<class T>
-Matrix<T> getRow( const Matrix<T> &expr, int i, int ni, int ki){
-  Matrix<T> res(ni,expr.size2());
-  getRow(res,expr,i,ni,ki);
-  return res;
-}
-
-template<class T>
-void getColumn(Matrix<T> &res, const Matrix<T> &expr, int j, int nj, int kj){
-  // TODO: Very inefficient, exploit sparsity
-  casadi_assert_message(j<expr.size2(),"dimension mismatch");
-  res = Matrix<T>(expr.size1(),nj);
-  for(int i=0; i<expr.size1(); ++i)
-    for(int jj=0; jj<nj; ++jj){
-      T temp = expr(i,j+jj);
-      if(!casadi_limits<T>::isZero(temp))
-        res(i,jj) = temp;
-    }
-}
-
-template<class T>
-Matrix<T> getColumn( const Matrix<T> &expr, int j, int nj, int kj){
-  Matrix<T> res(expr.size1(),nj);
-  getColumn(res,expr,j,nj,kj);
-  return res;
-}
-
-template<class T>
-void setRow(const Matrix<T>& expr, Matrix<T> &res, int i, int ni, int ki){
-  // TODO: Very inefficient, exploit sparsity
-  casadi_assert_message(i<res.size1(),"dimension mismatch");
-  for(int j=0; j<res.size2(); ++j){
-    if(!casadi_limits<T>::isZero(expr(0,j)))
-      res(i,j) = expr(0,j);
-    }
-}
-
-template<class T>
-void setColumn(const Matrix<T>& expr, Matrix<T> &res, int j, int nj, int kj){
-  // TODO: Very inefficient, exploit sparsity
-  casadi_assert_message(j<res.size2(),"dimension mismatch");
-  for(int i=0; i<res.size1(); ++i){
-    if(!casadi_limits<T>::isZero(expr(i,0)))
-      res(i,j) = expr(i,0);
-    }
+  expr(range(oldn,n),ALL) = add;
 }
 
 template<class T>
@@ -729,7 +625,7 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
   // compute Q and R column by column
   for(int i=0; i<n; ++i){
     // Initialize qi to be the i-th column of A
-    Matrix<T> ai = getRow(AT,i);
+    Matrix<T> ai = AT(i,ALL);
     Matrix<T> qi = ai;
     // The i-th column of R
     Matrix<T> ri(1,n);
@@ -737,7 +633,7 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
     // subtract the projection of of qi in the previous directions from ai
     for(int j=0; j<i; ++j){
       // Get the j-th column of Q
-      Matrix<T> qj = getRow(QT,j);
+      Matrix<T> qj = QT(j,ALL);
 
       ri(0,j) = prod(qj,trans(qi))[0]; // Modified Gram-Schmidt
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
@@ -920,12 +816,6 @@ void matrix_trans_matrix_mult(const Matrix<T>& x_trans, const Matrix<T>& y, Matr
 MTT_INST(T,trans) \
 MTT_INST(T,dot) \
 MTT_INST(T,append) \
-MTT_INST(T,getSub) \
-MTT_INST(T,setSub) \
-MTT_INST(T,getRow) \
-MTT_INST(T,setRow) \
-MTT_INST(T,getColumn) \
-MTT_INST(T,setColumn) \
 MTT_INST(T,isConstant) \
 MTT_INST(T,isDense) \
 MTT_INST(T,isEmpty) \

@@ -23,7 +23,18 @@
 #include "matrix_tools.hpp"
 
 namespace CasADi{
-
+  
+  std::vector<int> range(int start, int stop, int step){
+    std::vector<int> ret;
+    ret.reserve((stop-start)/step);
+    for(int i=start; i<stop; i += step)
+      ret.push_back(i);
+    return ret;
+  }
+  
+  std::vector<int> range(int stop){
+    return range(0,stop);
+  }
   
 } // namespace CasADi
 

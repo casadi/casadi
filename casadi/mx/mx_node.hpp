@@ -92,7 +92,7 @@ class MXNode : public SharedObjectNode{
                           const double*** fwdSeed, double** fwdSens, 
                           const double** adjSeed, double*** adjSens, 
                           int nfwd, int nadj);
-    
+                          
     /** \brief  Initialize */
     virtual void init();
     

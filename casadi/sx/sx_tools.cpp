@@ -104,8 +104,7 @@ Matrix<SX> pw_lin(const SX &t, const Matrix<SX> &tval, const Matrix<SX> &val){
     lseg(i) = val(i) + g(i)*(t-tval(i)); 
 
   // interior time points
-  Matrix<SX> tint;
-  getSub(tint,tval,1,0,N-2); 
+  Matrix<SX> tint = tval(range(N-2),0);
 
   // Return piecewise linear function
   return pw_const(t, tint, lseg);

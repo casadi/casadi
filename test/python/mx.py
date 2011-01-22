@@ -405,7 +405,7 @@ class MXtests(unittest.TestCase):
   def test_getinputMX(self):
     x=MX("x",2,3)
     f = MXFunction([x],[3*x]) 
-    g = MXFunction([f.getArgumentIn()],[6*f.getArgumentOut()]) 
+    g = MXFunction([f.inputMX()],[6*f.outputMX()]) 
     
     f.init()
     g.init()
