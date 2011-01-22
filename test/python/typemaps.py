@@ -75,9 +75,9 @@ class typemaptests(casadiTestCase):
     #self.assertRaises(lambda : dm.get(z), Exception)
     
     z=list(zeros(12))
-    print z
+    #print z
     #dm.get(z)
-    print z
+    #print z
     
 if __name__ == '__main__':
     unittest.main()
