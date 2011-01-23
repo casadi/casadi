@@ -54,30 +54,28 @@ void Vertcat::print(ostream &stream) const{
   stream << "]";
 }
 
-void Vertcat::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0){
-    vector<double>::iterator out = output().begin();
-    for(int i=0; i<ndep(); ++i){
-      copy(input(i).begin(),input(i).end(),out);
-      out += input(i).size();
-    }
-  } else {
-    vector<double>::iterator fsens = fwdSens().begin();
-    for(int i=0; i<ndep(); ++i){
-      copy(fwdSeed(i).begin(),fwdSeed(i).end(),fsens);
-      fsens += fwdSeed(i).size();
-    }
-  }
-  
-  if(asens_order>0){
-    int offset = 0;
-    for(int i=0; i<ndep(); ++i){
-      transform(adjSeed().begin()+offset,adjSeed().begin()+offset+adjSens(i).size(),
-                adjSens(i).begin(),
-                adjSens(i).begin(),
-                plus<double>());
-      offset += adjSens(i).size();
-    }
+void Vertcat::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  int offset = 0;
+  for(int i=0; i<ndep(); ++i){
+    // Number of rows
+    int ni = dep(i).size();
+    
+    // Copy values
+    for(int k=0; k<ni; ++k)
+      output[k+offset] = input[i][k];
+    
+    // Transmit forward derivatives
+    for(int d=0; d<nfwd; ++d)
+      for(int k=0; k<ni; ++k)
+        fwdSens[d][k+offset] = fwdSeed[i][d][k];
+    
+    // Transmit adjoint derivatives
+    for(int d=0; d<nadj; ++d)
+      for(int k=0; k<ni; ++k)
+        adjSens[i][d][k] += adjSeed[d][k+offset];
+    
+    // Update offset
+    offset += ni;
   }
 }
 

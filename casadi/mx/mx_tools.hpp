@@ -78,9 +78,13 @@ MX outer_prod(const MX &x, const MX &y); // x*trans(y) with x and y vectors
 
 /** \brief Branching on MX nodes
 Ternary operator, "cond ? if_true : if_false"
-Internally represented by IfElseNode.
 */
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false); 
+
+/** \brief Conditional evaluation
+cond ? if_true : 0
+*/
+MX if_else_zero(const MX &cond, const MX &if_true); 
 
 #ifndef SWIG
 //! \brief Returns a reshaped version of the MX

@@ -26,7 +26,7 @@
 #include "reshape.hpp"
 #include "norm.hpp"
 #include "multiplication.hpp"
-
+#include "if_else_node.hpp"
 
 namespace CasADi{
 
@@ -120,13 +120,22 @@ MX reshape(const MX &x, int n, int m){
     ret.assignNode(new Reshape(x,n,m));
     return ret;
   }
-        
 }
 
 MX flatten(const MX &x) {
   return reshape(x,x.numel(),1);
 }
 
+MX if_else_zero(const MX &cond, const MX &if_true){
+  MX ret;
+  ret.assignNode(new IfNode(cond,if_true));
+  return ret;
+}
+
+
+MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
+  return if_else_zero(cond,if_true) + if_else_zero(1-cond,if_false);
+}
 
   
 } // namespace CasADi

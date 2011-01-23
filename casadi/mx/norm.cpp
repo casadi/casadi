@@ -29,7 +29,7 @@ Norm::Norm(const MX& x){
   setSize(1,1);
 }
 
-void Norm::evaluate(int fsens_order, int asens_order){
+void Norm::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   throw CasadiException("Norm::evaluate not implemented");
 }
 

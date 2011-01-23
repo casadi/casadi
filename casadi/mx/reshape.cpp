@@ -43,19 +43,18 @@ void Reshape::print(std::ostream &stream) const{
   stream << "reshape(" << dep(0) << ",[" << size1() << "," << size2() << "])";
 }
 
-void Reshape::evaluate(int fsens_order, int asens_order){
-  // All non-zero elements remains the same
-  if(fsens_order==0){
-    copy(input(0).begin(),input(0).end(),output().begin());
-  } else {
-    copy(fwdSeed(0).begin(),fwdSeed(0).end(),fwdSens().begin());
-  }
-  
-  if(asens_order>0){
-    transform(adjSeed().begin(),adjSeed().end(),
-              adjSens(0).begin(),
-              adjSens(0).begin(),
-              plus<double>());
+void Reshape::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  for(int i=0; i<size(); ++i){
+    // Function
+    output[i] = input[0][i];
+    
+    // Forward seeds
+    for(int d=0; d<nfwd; ++d)
+      fwdSens[d][i] = fwdSeed[0][d][i];
+    
+    // Adjoint seeds
+    for(int d=0; d<nadj; ++d)
+      adjSens[0][d][i] += adjSeed[d][i];
   }
 }
 

@@ -29,7 +29,6 @@ using namespace std;
 namespace CasADi{
 
 MXNode::MXNode(){
-  maxord_ = 0;
   nfdir_ = 1;
   nadir_ = 1;
 }
@@ -66,51 +65,46 @@ int MXNode::ndep() const{
 }
 
 void MXNode::init(){
-  forward_sensitivities_.resize(nfdir_);
-  for(int dir=0; dir<nfdir_; ++dir)
-    forward_sensitivities_[dir] = output_;
-    
-  adjoint_seeds_.resize(nadir_);
-  for(int dir=0; dir<nadir_; ++dir)
-    adjoint_seeds_[dir] = output_;
+  val_.dataF.resize(nfdir_);
+  val_.dataA.resize(nadir_);
+  val_.init();
+
+  input_.resize(ndep(),0);
+  fwdSeed_.resize(ndep());
+  adjSens_.resize(ndep());
+  for(int i=0; i<ndep(); ++i){
+    fwdSeed_[i].resize(nfdir_,0);
+    adjSens_[i].resize(nadir_,0);
+    if(!dep(i).isNull()){
+      input_[i] = &dep(i)->val_.data[0];
+      for(int d=0; d<nfdir_; ++d)
+        fwdSeed_[i][d] = &dep(i)->val_.dataF[d][0];
+      for(int d=0; d<nadir_; ++d)
+        adjSens_[i][d] = &dep(i)->val_.dataA[d][0];
+    }
+  }
+
+  output_ = &val_.data[0];
+  fwdSens_.resize(nfdir_);
+  for(int d=0; d<nfdir_; ++d)
+    fwdSens_[d] = &val_.dataF[d][0];
+  adjSeed_.resize(nadir_);
+  for(int d=0; d<nadir_; ++d)
+    adjSeed_[d] = &val_.dataA[d][0];
+
 }
 
-const Matrix<double>& MXNode::input(int ind) const{
-  return dep(ind)->output_;
-}
-
-Matrix<double>& MXNode::output(){
-  return output_;
-}
-  
-const Matrix<double>& MXNode::fwdSeed(int ind, int dir) const{
-  return dep(ind)->forward_sensitivities_.at(dir);
-}
-
-Matrix<double>& MXNode::fwdSens(int dir){
-  return forward_sensitivities_.at(dir);
-}
-
-const Matrix<double>& MXNode::adjSeed(int dir) const{
-  return adjoint_seeds_.at(dir);
-}
-
-Matrix<double>& MXNode::adjSeed(int dir){
-  return adjoint_seeds_.at(dir);
-}
-
-Matrix<double>& MXNode::adjSens(int ind, int dir){
-  return dep(ind)->adjoint_seeds_.at(dir);
-}
 
 void MXNode::setSize(int nrow, int ncol){
   sparsity_ = CRSSparsity(nrow,ncol,true);
-  output_ = Matrix<double>(sparsity_);
+  val_.data = Matrix<double>(sparsity_);
+  val_.dense = false;
 }
 
 void MXNode::setSparsity(const CRSSparsity& sparsity){
   sparsity_ = sparsity;
-  output_ = Matrix<double>(sparsity_);
+  val_.data = Matrix<double>(sparsity_);
+  val_.dense = false;
 }
 
 void MXNode::setDependencies(const MX& dep){
@@ -135,6 +129,10 @@ void MXNode::setDependencies(const std::vector<MX>& dep){
   dep_ = dep;
 }
 
+int MXNode::size() const{
+  return sparsity_.size();
+}
+
 int MXNode::size1() const{
   return sparsity_.size1();
 }
@@ -143,63 +141,8 @@ int MXNode::size2() const{
   return sparsity_.size2();
 }
 
-void MXNode::evaluate(int fsens_order, int asens_order){
-  // workaround function to ensure backward compatibility
-  MXNodeIO arg;
-  arg.nfwd = fsens_order;
-  arg.nadj = asens_order;
-  
-  // Inputs
-  arg.input.resize(ndep());
-  for(int i=0; i<ndep(); ++i)
-    arg.input[i] = &input(i)[0];
-  
-  // Output
-  arg.output = &output()[0];
-  
-  // Forward seeds
-  arg.fwdSeed.resize(ndep());
-  for(int i=0; i<ndep(); ++i){
-    arg.fwdSeed[i].resize(arg.nfwd);
-    for(int d=0; d<arg.nfwd; ++d){
-      arg.fwdSeed[i][d] = &fwdSeed(i,d)[0];
-    }
-  }
-  
-  // Forward sensitivities
-  arg.fwdSens.resize(arg.nfwd);
-  for(int d=0; d<arg.nfwd; ++d){
-    arg.fwdSens[d] = &fwdSens(d)[0];
-  }
-
-  // Adjoint seeds
-  arg.fwdSens.resize(arg.nadj);
-  for(int d=0; d<arg.nadj; ++d){
-    arg.adjSeed[d] = &adjSeed(d)[0];
-  }
-  
-  // Adjoint sensitivities
-  arg.adjSens.resize(ndep());
-  for(int i=0; i<ndep(); ++i){
-    arg.adjSens[i].resize(arg.nadj);
-    for(int d=0; d<arg.nadj; ++d){
-      arg.adjSens[i][d] = &adjSens(i,d)[0];
-    }
-  }
-  
-  // Evaluate
-  evaluate(arg);
-}
-
-void MXNode::evaluate(MXNodeIO& arg){
-  throw CasadiException("MXNode::evaluate: not implemented");
-}
-
-void MXNode::evaluate(const double** input, double* output, 
-                      const double*** fwdSeed, double** fwdSens, 
-                      const double** adjSeed, double*** adjSens, 
-                      int nfwd, int nadj){
-  throw CasadiException("MXNode::evaluate: not implemented");
+const CRSSparsity& MXNode::sparsity() const{
+  return sparsity_;
 }
 
 

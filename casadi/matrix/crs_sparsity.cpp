@@ -334,6 +334,33 @@ void CRSSparsity::reserve(int nnz, int nrow){
   rowind().reserve(nrow+1);
 }
 
+bool CRSSparsity::operator==(const CRSSparsity& y) const{
+  // Quick true if the objects are the same
+  if(get() == y.get())
+    return true;
+  
+  // Quick false if dimensions or number of non-zeros are different
+  if(size1() != y.size1() || size2() != y.size2() || size() != y.size())
+    return false;
+  
+  // Check rowind vectors
+  const std::vector<int>& r1 = rowind();
+  const std::vector<int>& r2 = y.rowind();
+  for(int i=0; i<r1.size(); ++i)
+    if(r1[i]!=r2[i])
+      return false;
+  
+  // Check column vector
+  const std::vector<int>& c1 = col();
+  const std::vector<int>& c2 = y.col();
+  for(int i=0; i<c1.size(); ++i)
+    if(c1[i]!=c2[i])
+      return false;
+
+  // Patterns are identical if we reached this point
+  return true;
+}
+
 
 } // namespace CasADi
 

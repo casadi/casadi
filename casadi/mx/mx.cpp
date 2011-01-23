@@ -26,12 +26,12 @@
 #include "matrix_scalar_op.hpp"
 #include "matrix_matrix_op.hpp"
 #include "unary_op.hpp"
-#include "if_else_node.hpp"
 #include "matrix_element.hpp"
 #include "../fx/sx_function.hpp"
 #include "evaluation.hpp"
 #include "symbolic_mx_node.hpp"
 #include "mx_constant.hpp"
+
 
 namespace CasADi{
 
@@ -82,8 +82,10 @@ MX& MX::__setitem__(const std::vector<int> &I, const MX&  el){
 
 
 const MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+  casadi_assert(ii.size()==1 && jj.size()==1);
+  
   MX ret;
-  ret.assignNode(new MatrixElement(*this,ii,jj));
+  ret.assignNode(new MatrixElement(*this,ii[0],jj[0]));
   return ret;
 }
 
@@ -93,7 +95,7 @@ void MX::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX
 
 const MX MX::operator()(int i, int j) const{
   MX ret;
-  ret.assignNode(new MatrixElement(*this,vector<int>(1,i), vector<int>(1,j)));
+  ret.assignNode(new MatrixElement(*this,i, j));
   return ret;  
 }
 
@@ -197,12 +199,6 @@ MX& MX::operator*=(const MX &y){
 
 MX& MX::operator/=(const MX &y){
   return *this = *this / y;
-}
-
-MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
-  MX ret;
-  ret.assignNode(new IfElseNode(cond,if_true,if_false));
-  return ret;
 }
 
 bool MX::empty() const{

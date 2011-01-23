@@ -30,46 +30,16 @@ namespace CasADi{
 Reordering::Reordering(){
 }
 
-void Reordering::init(){
-  // Call the base class initialization
-  MXNode::init();
+void Reordering::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   
-  // Allocate indices if this has not been done
-  if(nzind_.empty()){
-    nzind_.resize(output().size());
-    fill(nzind_.begin(),nzind_.end(),0);
-  }
-  
-  if(argind_.empty()){
-    argind_.resize(output().size());
-    fill(argind_.begin(),argind_.end(),0);
-  }
-  if(nzind_.empty()){
-    nzind_.resize(output().size());
-    fill(nzind_.begin(),nzind_.end(),0);
-  }
-  
-  if(argind_.size() != output().size() || nzind_.size() != output().size()) 
-    throw CasadiException("Reordering::init: dimension mismatch");
+  for(int k=0; k<size(); ++k){
+    output[k] = input[k2l(k)][k2k(k)];
     
-}
-
-
-void Reordering::evaluate(int fsens_order, int asens_order){
-  if(fsens_order==0){
-    vector<double>& res = output();
-    for(int k=0; k<res.size(); ++k)
-      res[k] = input(k2l(k))[k2k(k)];
-  } else {
-    vector<double>& fsens = fwdSens();
-    for(int k=0; k<fsens.size(); ++k)
-      fsens[k] = fwdSeed(k2l(k))[k2k(k)];
-  }
-  
-  if(asens_order>0){
-    const vector<double>& aseed = adjSeed();
-    for(int k=0; k<aseed.size(); ++k)
-      adjSens(k2l(k))[k2k(k)] += aseed[k];
+    for(int d=0; d<nfwd; ++d)
+      fwdSens[d][k] = fwdSeed[k2l(k)][d][k2k(k)];
+    
+    for(int d=0; d<nadj; ++d)
+      adjSens[k2l(k)][d][k2k(k)] += adjSeed[d][k];
   }
 }
 

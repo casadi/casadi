@@ -30,7 +30,7 @@ namespace CasADi{
 
 UnaryOp::UnaryOp(OPERATION op_, const MX& x) : op(op_){
   setDependencies(x);
-  setSize(x.size1(),x.size2());
+  setSparsity(x->sparsity());
 }
 
 UnaryOp* UnaryOp::clone() const{
@@ -42,37 +42,34 @@ void UnaryOp::print(std::ostream &stream) const{
   print_c[op](stream,sx.str(),"nan");
 }
 
-void UnaryOp::evaluate(int fsens_order, int asens_order){
-  const vector<double>& x = input(0);  // first argument
-  vector<double>& res = output();
-  for(int i=0; i<res.size(); ++i)
-    nfun0[op](x[i],0,&res[i]);
+void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  double nan = numeric_limits<double>::quiet_NaN();
+  if(nfwd==0 && nadj==0){
+    // No sensitivities
+    for(int i=0; i<size(); ++i)
+      nfun0[op](input[0][0],nan,&output[i]);
+    
+  } else {
+    // Sensitivities
+    double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+    for(int i=0; i<size(); ++i){
+      // Evaluate and get partial derivatives
+      nfun1[op](input[0][0],nan,tmp);
+      output[i] = tmp[0];
+      
+      // Propagate forward seeds
+      for(int d=0; d<nfwd; ++d){
+        fwdSens[d][i] = tmp[1]*fwdSeed[0][d][0];
+      }
 
-  
-  if(fsens_order>0){
-    const vector<double>& dx = fwdSeed(0); // first argument derivative
-    vector<double>& fsens = fwdSens();
-
-    double tmp[3];
-  
-    for(int i=0; i<fsens.size(); ++i){
-      nfun1[op](x[i],0,tmp);
-      fsens[i] = tmp[1]*dx[i]; // chain rule
-    }
-  }
-  
-  if(asens_order>0){
-    const vector<double>& aseed = adjSeed();
-    vector<double>& dx = adjSens(0); // first argument derivative
-
-    double tmp[3];
-  
-    for(int i=0; i<aseed.size(); ++i){
-      nfun1[op](x[i],0,tmp);
-      dx[i] += aseed[i]*tmp[1];
+      // Propagate adjoint seeds
+      for(int d=0; d<nadj; ++d){
+        adjSens[0][d][0] += adjSeed[d][i]*tmp[1];
+      }
     }
   }
 }
+
 
 } // namespace CasADi
 

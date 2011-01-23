@@ -48,10 +48,7 @@ class Reordering : public MXNode{
     explicit Reordering();
 
     /// Evaluate the function and store the result in the node
-    virtual void evaluate(int fsens_order, int asens_order);
-
-    /// Initialize
-    virtual void init();
+    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
     /// Maps the non-zero of the result to the input index: Default all zeros
     int k2l(int k) const;
@@ -61,7 +58,9 @@ class Reordering : public MXNode{
 
     /// Print
     virtual void print(std::ostream &stream=std::cout) const;
-
+    
+  protected:
+    
     /// Mapping from the output non-zero to the input nonzero
     std::vector<int> nzind_;
 

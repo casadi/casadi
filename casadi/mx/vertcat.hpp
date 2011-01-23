@@ -43,10 +43,7 @@ virtual Vertcat* clone() const;
 virtual void print(std::ostream &stream=std::cout) const;
 
 /** \brief  Evaluate the function and store the result in the node */
-virtual void evaluate(int fsens_order, int asens_order);
-
-// virtual void setOutput(const std::vector<double>& val, int ord=0);
-// virtual void getOutput(std::vector<double>& val, int ord=0) const;
+virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
 protected:
 

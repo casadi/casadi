@@ -25,9 +25,16 @@ using namespace std;
 
 namespace CasADi{
 
-MatrixElement::MatrixElement(const MX& x, const std::vector<int>& ii, const std::vector<int>& jj) : ii_(ii), jj_(jj){
+MatrixElement::MatrixElement(const MX& x, int i, int j) : i_(i), j_(j){
   setDependencies(x);
-  setSize(ii.size(),jj.size());
+  setSize(1,1);
+  
+  // Only one non-zero
+  int ind = x->sparsity().getNZ(i,j);
+  casadi_assert(ind>=0);
+  
+  nzind_.resize(1,ind);
+  argind_.resize(1,0);
 }
 
 MatrixElement* MatrixElement::clone() const{
@@ -35,48 +42,7 @@ MatrixElement* MatrixElement::clone() const{
 }
 
 void MatrixElement::print(std::ostream &stream) const{
-  if(dep(0).size2()==1)
-    if(ii_.size()==1)
-      stream << dep(0) << "[" << ii_[0] << "]";
-    else
-      stream << dep(0) << "[" << ii_ << "]";
-  else
-    if(ii_.size()==1 && jj_.size()==1)
-      stream << dep(0) << "(" << ii_[0] << "," << jj_[0] << ")";
-    else
-      stream << dep(0) << "(" << ii_ << "," << jj_ << ")";
-}
-
-void MatrixElement::evaluate(int fsens_order, int asens_order){
-  if(ii_.size() != 1 || jj_.size() != 1)
-    throw CasadiException("MatrixElement::evaluate: only scalar submatrices implemented");
-  
-  int i = ii_[0], j = jj_[0];
-  
-  // Get references to the terms
-  const vector<double>& arg = input(0); // first term
-  vector<double>& res = output();
-  
-  // carry out the assignment
-  res[0] = arg[j+i*dep(0).size2()];
-  
-  if(fsens_order>0){
-    // Get references to the terms
-    const vector<double>& fseed = fwdSeed(0); // first term
-    vector<double>& fsens = fwdSens();
-  
-    // carry out the assignment
-    fsens[0] = fseed[j+i*dep(0).size2()];
-  }
-  
-  if(asens_order>0){
-    // Get references to the terms
-    const vector<double>& aseed = adjSeed();
-    vector<double>& asens = adjSens(0); // first term
-  
-    // carry out the addition
-    asens[j+i*dep(0).size2()] += aseed[0];
-  }
+  stream << dep(0) << "(" << i_ << "," << j_ << ")";
 }
 
 } // namespace CasADi

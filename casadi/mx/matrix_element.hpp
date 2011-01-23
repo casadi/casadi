@@ -23,8 +23,7 @@
 #ifndef MATRIX_ELEMENT_HPP
 #define MATRIX_ELEMENT_HPP
 
-#include "mx_node.hpp"
-#include "../stl_vector_tools.hpp"
+#include "reordering.hpp"
 
 namespace CasADi{
 /** \brief  A submatrix (currently element)
@@ -32,11 +31,11 @@ namespace CasADi{
     \author Joel Andersson 
     \date 2010-2011
 */
-class MatrixElement : public MXNode{
+class MatrixElement : public Reordering {
   public:
 
     /** \brief  Constructor */
-    MatrixElement(const MX& x, const std::vector<int>& ii, const std::vector<int>& jj);
+    MatrixElement(const MX& x, int i, int j);
 
     /** \brief  Clone function */
     virtual MatrixElement* clone() const;
@@ -44,11 +43,8 @@ class MatrixElement : public MXNode{
     /** \brief  Print */
     virtual void print(std::ostream &stream=std::cout) const;
 
-    /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(int fsens_order, int asens_order);
-
   protected:
-    std::vector<int> ii_, jj_;
+    int i_, j_;
 };
 
 } // namespace CasADi

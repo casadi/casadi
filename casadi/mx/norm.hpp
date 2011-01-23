@@ -38,7 +38,7 @@ public:
 Norm(const MX& x);
 
 /** \brief  Constructor */
-virtual void evaluate(int fsens_order, int asens_order);
+virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
 };
 

@@ -28,23 +28,25 @@
 namespace CasADi{
 
 /** \brief Represents a branch in an MX tree
+  // TODO: Change name of file
+
   \author Joel Andersson 
   \date 2010
 */
-class IfElseNode : public MXNode{
+class IfNode : public MXNode{
   public:
     
     /** \brief  Constructors */
-    IfElseNode(const MX& cond, const MX& if_true, const MX& if_false);
+    IfNode(const MX& cond, const MX& if_true);
 
     /** \brief  Clone function */
-    virtual IfElseNode* clone() const;
+    virtual IfNode* clone() const;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream=std::cout) const;
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(int fsens_order, int asens_order);
+    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
   
   protected:
     

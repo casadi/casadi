@@ -42,44 +42,50 @@ void Evaluation::print(ostream &stream) const{
   stream << fcn_ << "[" << dep() << "]";
 }
 
-void Evaluation::evaluate(int fsens_order, int asens_order){
-  // Pass the input to the function
+void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
-    if(!dep(i).isNull()){
-      fcn_.setInput(input(i),i);
-    }
-  }
-
-  // Give the forward seed to the function
-  if(fsens_order>0){
-    for(int i=0; i<ndep(); ++i){
-      if(!dep(i).isNull()){
-        fcn_.setFwdSeed(fwdSeed(i),i);
+    if(input[i] != 0){
+      fcn_.setInput(input[i],i);
+      for(int d=0; d<nfwd; ++d){
+        fcn_.setFwdSeed(fwdSeed[i][d],i,d);
       }
     }
   }
 
   // Pass the adjoint seed to the function
-  if(asens_order>0){
-    fcn_.setAdjSeed(adjSeed(),oind);
+  for(int d=0; d<nadj; ++d)
+    fcn_.setAdjSeed(adjSeed[d],oind,d);
+    
+  // Set adjoint seed to zero for all other outputs in all other directions
+  for(int ind=0; ind<fcn_.getNumOutputs(); ++ind){
+    if(ind!=oind){
+      for(int d=0; d<nadj; ++d){
+        fill(fcn_.adjSeed(ind,d).begin(),fcn_.adjSeed(ind,d).end(),0);
+      }
+    }
   }
 
   // Evaluate
-  fcn_.evaluate(fsens_order, asens_order);
+  fcn_.evaluate(nfwd>0, nadj>0);
   
   // Get the results
-  fcn_.getOutput(output(),oind);
+  fcn_.getOutput(output,oind);
 
-  // Fwd sens
-  if(fsens_order>0){
-    fcn_.getFwdSens(fwdSens(),oind);
+  // Get the fwd sensitivities
+  for(int d=0; d<nadj; ++d)
+    fcn_.getFwdSens(fwdSens[d],oind,d);
+  
+  // Get the adjoint sensitivities
+  for(int i=0; i<ndep(); ++i){
+    for(int d=0; d<nadj; ++d){
+      if(adjSens[i][d] != 0){
+        const vector<double>& asens = fcn_.adjSens(i,d);
+        for(int j=0; j<asens.size(); ++j)
+          adjSens[i][d][j] += asens[j];
+      }
+    }
   }
-
-  // Adjoint sens
-  if(asens_order>0)
-    for(int i=0; i<ndep(); ++i)
-      if(!dep(i).isNull())
-        fcn_.getAdjSens(adjSens(i),i);
 }
 
 } // namespace CasADi

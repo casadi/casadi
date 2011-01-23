@@ -44,34 +44,30 @@ void ScalarMatrixOp::print(std::ostream &stream) const{
   print_c[op](stream,sx.str(),sy.str());
 }
 
-void ScalarMatrixOp::evaluate(int fsens_order, int asens_order){
-  const vector<double>& x = input(0);  // first (scalar) argument
-  const vector<double>& y = input(1);  // second (possibly non-scalar) argument
-  vector<double>& res = output();
-  for(int i=0; i<res.size(); ++i)
-    nfun0[op](x[0],y[i],&res[i]);
-  
-  if(fsens_order>0){
-    const vector<double>& dx = fwdSeed(0); // first (scalar) argument derivative
-    const vector<double>& dy = fwdSeed(1); // second (possibly non-scalar) argument derivative
-    vector<double>& fsens = fwdSens();
-    double tmp[3];  
-    for(int i=0; i<fsens.size(); ++i){
-      nfun1[op](x[0],y[i],tmp);
-      fsens[i] = tmp[1]*dx[0] + tmp[2]*dy[i]; // chain rule
-    }
-  }
-  
-  if(asens_order>0){
-    const vector<double>& aseed = adjSeed();
-    vector<double>& dx = adjSens(0); // first (scalar) argument derivative
-    vector<double>& dy = adjSens(1); // second (possibly non-scalar) argument derivative
-    double tmp[3];
+void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  if(nfwd==0 && nadj==0){
+    // No sensitivities
+    for(int i=0; i<size(); ++i)
+      nfun0[op](input[0][0],input[1][i],&output[i]);
+    
+  } else {
+    // Sensitivities
+    double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+    for(int i=0; i<size(); ++i){
+      // Evaluate and get partial derivatives
+      nfun1[op](input[0][0],input[1][i],tmp);
+      output[i] = tmp[0];
+      
+      // Propagate forward seeds
+      for(int d=0; d<nfwd; ++d){
+        fwdSens[d][i] = tmp[1]*fwdSeed[0][d][0] + tmp[2]*fwdSeed[1][d][i];
+      }
 
-    for(int i=0; i<aseed.size(); ++i){
-      nfun1[op](x[0],y[i],tmp);
-      dx[0] += aseed[i]*tmp[1];
-      dy[i] += aseed[i]*tmp[2];
+      // Propagate adjoint seeds
+      for(int d=0; d<nadj; ++d){
+        adjSens[0][d][0] += adjSeed[d][i]*tmp[1];
+        adjSens[1][d][i] += adjSeed[d][i]*tmp[2];
+      }
     }
   }
 }

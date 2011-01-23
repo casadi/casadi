@@ -43,11 +43,15 @@ class MatrixMatrixOp : public MXNode{
     virtual void print(std::ostream &stream=std::cout) const;
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(int fsens_order, int asens_order);
+    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
   protected:
     //! \brief Operation
     OPERATION op;
+    
+    /// Does the two matrices have the same sparsity
+    bool same_sparsity_;
+    
 };
 
 } // namespace CasADi

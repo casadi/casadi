@@ -43,7 +43,7 @@ class ScalarMatrixOp : public MXNode{
     virtual void print(std::ostream &stream=std::cout) const;
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(int fsens_order, int asens_order);  
+    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
     //! \brief Operation
     OPERATION op;

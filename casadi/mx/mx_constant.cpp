@@ -42,10 +42,10 @@ void MXConstant::print(std::ostream &stream) const{
   stream << x_;
 }
 
-void MXConstant::evaluate(int fsens_order, int asens_order){
-  copy(x_.begin(),x_.end(),output().begin());
-  if(fsens_order>0){
-    fill(fwdSens().begin(),fwdSens().end(),0);
+void MXConstant::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  copy(x_.begin(),x_.end(),output);
+  for(int d=0; d<nfwd; ++d){
+    fill_n(fwdSens[d],size(),0);
   }
 }
 

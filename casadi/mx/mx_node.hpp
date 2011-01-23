@@ -25,38 +25,15 @@
 
 #include "mx.hpp"
 #include "../fx/mx_function.hpp"
+#include "../fx/function_io.hpp"
 #include "../matrix/matrix.hpp"
 #include <vector>
 
 namespace CasADi{
-
-  /// Input and output structure for the evaluation
-  struct MXNodeIO{
-    
-    /// Input
-    std::vector<const double*> input;
-    
-    /// Result of the evaluation
-    double* output;
-    
-    /// Forward seeds
-    std::vector< std::vector<const double*> > fwdSeed;
-
-    /// Forward sensitivities
-    std::vector<double*> fwdSens;
-    
-    /// Adjoint seeds
-    std::vector<const double*> adjSeed;
-
-    /// Adjoint sensitivities
-    std::vector< std::vector<double*> > adjSens;
-    
-    /// Number of forward sensitivities to be calculated
-    int nfwd;
-    
-    /// Number of adjoint sensitivities to be calculated
-    int nadj;
-  };
+  typedef double* Dptr;
+  typedef std::vector<double*> VDptr;
+  typedef std::vector<std::vector<double* > > VVDptr;
+  
   
 /** \brief Node class for MX objects
     \author Joel Andersson 
@@ -81,17 +58,8 @@ class MXNode : public SharedObjectNode{
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
 
-    /** \brief  Evaluate the function and store the result in the node (old!) */
-    virtual void evaluate(int fsens_order, int asens_order)=0;
-
-    /** \brief  Evaluate the function (new, option 1, easier to debug) */
-    virtual void evaluate(MXNodeIO& arg);
-
-    /** \brief  Evaluate the function (new, option 2, compatibility with C) */
-    virtual void evaluate(const double** input, double* output, 
-                          const double*** fwdSeed, double** fwdSens, 
-                          const double** adjSeed, double*** adjSens, 
-                          int nfwd, int nadj);
+    /** \brief  Evaluate the function */
+    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj) = 0;
                           
     /** \brief  Initialize */
     virtual void init();
@@ -112,14 +80,8 @@ class MXNode : public SharedObjectNode{
     /** \brief  Number of dependencies */
     int ndep() const;
 
-    /** \brief  Numerical value */
-    const Matrix<double>& input(int ind) const;
-    const Matrix<double>& fwdSeed(int ind, int dir=0) const;
-    const Matrix<double>& adjSeed(int dir=0) const;
-    Matrix<double>& output();
-    Matrix<double>& fwdSens(int dir=0);
-    Matrix<double>& adjSens(int ind, int dir=0);
-    Matrix<double>& adjSeed(int dir=0);
+    /// Get the sparsity
+    const CRSSparsity& sparsity() const;
 
   protected:
     
@@ -140,12 +102,9 @@ class MXNode : public SharedObjectNode{
     
     /// Set multiple dependencies
     void setDependencies(const std::vector<MX>& dep);
-    
-    //! Number of derivatives
-    int maxord_;
-    
-    //! Number of derivative directions - move to MXFunction
-    int nfdir_, nadir_;
+        
+    /// Get size
+    int size() const;
     
     /// Get size
     int size1() const;
@@ -157,19 +116,24 @@ class MXNode : public SharedObjectNode{
     std::vector<MX> dep_;
     
   private:
-    
+    //! Number of derivative directions - move to MXFunction
+    int nfdir_, nadir_;
+
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
-    
-    /** \brief  Numerical value of output  - move this into the MXFunction class */
-    Matrix<double> output_;
 
-    /** \brief  Numerical value of forward sensitivities - move this into the MXFunction class */
-    std::vector<Matrix<double> > forward_sensitivities_;
-
-    /** \brief  Numerical value of adjoint seeds - move this into the MXFunction class */
-    std::vector<Matrix<double> > adjoint_seeds_;
+    // Numerical value of the node  move this into the MXFunction class
+    FunctionIO val_;
     
+    // Pointers set during init -> move away from the class
+    VDptr input_;
+    Dptr output_;
+    VVDptr fwdSeed_;
+    VDptr  fwdSens_;
+    VDptr adjSeed_;
+    VVDptr adjSens_;
+
+
 };
 
 } // namespace CasADi

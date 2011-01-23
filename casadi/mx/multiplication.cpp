@@ -42,31 +42,57 @@ void Multiplication::print(std::ostream &stream) const{
   stream << "prod(" << dep(0) << "," << dep(1) << ")";
 }
 
-
-void Multiplication::evaluate(int fsens_order, int asens_order){
-  // Erase result
-  fill(output().begin(), output().end(), 0);
+void Multiplication::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  if(dep(0).size() == dep(0).numel() && dep(1).size() == dep(1).numel()){
+    // Dense
   
-  // Matrix multiplication
-  matrix_matrix_mult(input(0),input(1),output());
-  
-  if(fsens_order>0){
-    // Erase result
-    fill(fwdSens().begin(), fwdSens().end(), 0);
-
-    // Matrix multiplication, first argument
-    matrix_matrix_mult(fwdSeed(0),input(1),fwdSens());
-
-    // Matrix multiplication, second argument
-    matrix_matrix_mult(input(0),fwdSeed(1),fwdSens());
-  }
-  
-  if(asens_order>0){
-    // Matrix multiplication, first argument
-    matrix_matrix_trans_mult(adjSeed(),input(1),adjSens(0));
-
-    // Matrix multiplication, second argument
-    matrix_trans_matrix_mult(input(0),adjSeed(),adjSens(1));
+    // Get dimensions
+    int nx1 = dep(0).size1();
+    int nx2 = dep(0).size2();
+    int ny1 = dep(1).size1();
+    int ny2 = dep(1).size2();
+    int nz1 = nx1;
+    int nz2 = ny2;
+      
+    for(int i=0; i<nx1; ++i){
+      for(int j=0; j<ny2; ++j){
+        // Add scalar product
+        double sum = 0;
+        for(int k=0; k<nx2; ++k){
+          sum += input[0][k+i*nx2] * input[1][j+k*ny2];
+        }
+        output[j+i*nz2] = sum;
+      }
+    }
+    
+    // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
+    for(int d=0; d<nfwd; ++d){
+      for(int i=0; i<nx1; ++i){
+        for(int j=0; j<ny2; ++j){
+          // Add scalar product
+          double sum = 0;
+          for(int k=0; k<nx2; ++k){
+            sum += fwdSeed[0][d][k+i*nx2] * input[1][j+k*ny2] + input[0][k+i*nx2] * fwdSeed[1][d][j+k*ny2];
+          }
+          fwdSens[d][j+i*nz2] = sum;
+        }
+      }
+    }
+    
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      for(int i=0; i<nx1; ++i){
+        for(int j=0; j<ny2; ++j){
+          for(int k=0; k<nx2; ++k){
+            adjSens[0][d][j+k*ny2] += adjSeed[d][j+i*nz2]*input[1][k+i*nx2];
+            adjSens[1][d][j+k*ny2] += adjSeed[d][j+i*nz2]*input[0][k+i*nx2];
+          }
+        }
+      }
+    }
+  } else {
+    // Sparse
+    throw CasadiException("sparse matrix multiplication not implemented in MX");
   }
 }
 

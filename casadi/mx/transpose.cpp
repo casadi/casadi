@@ -32,10 +32,13 @@ Transpose::Transpose(const MX& x){
   setDependencies(x);
   
   // Mapping of the non-zeros
-  CRSSparsity sp = dep(0)->output().sparsity().transpose(nzind_);
+  CRSSparsity sp = x->sparsity().transpose(nzind_);
   
   // Save the sparsity pattern
   setSparsity(sp);
+  
+  // Only one imput
+  argind_.resize(size(),0);
 }
 
 Transpose* Transpose::clone() const{

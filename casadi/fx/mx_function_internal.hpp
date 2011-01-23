@@ -28,7 +28,7 @@
 #include <vector>
 #include <iostream>
 
-#include "../mx/mx.hpp"
+#include "../mx/mx_node.hpp"
 #include "fx_internal.hpp"
 
 namespace CasADi{
@@ -69,6 +69,23 @@ class MXFunctionInternal : public FXInternal{
     /** \brief  Initialize */
     virtual void init();
   
+    /** \brief  An elemenent of the algorithm, namely an MX node */
+    struct AlgEl{
+      // Function to be evaluated
+      MX node;
+      
+      // Numerical value of the node
+      FunctionIO val;
+    
+      // Pointers to be passed to evaluate
+      VDptr input;
+      Dptr output;
+      VVDptr fwdSeed;
+      VDptr  fwdSens;
+      VDptr adjSeed;
+      VVDptr adjSens;
+    };
+
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<MX> alg;
   

@@ -30,10 +30,10 @@ namespace CasADi{
 
 MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
-  if(x.size1() != y.size1() || x.size2() != y.size2())
-    throw CasadiException("MatrixMatrixOp: dimension mismatch");
-    
-  setSize(x.size1(),x.size2());
+  casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(), "MatrixMatrixOp: dimension mismatch");
+  same_sparsity_ = x->sparsity() == y->sparsity();
+  casadi_assert_message(same_sparsity_, "different sparsity not implemented");
+  setSparsity(x->sparsity());
 }
 
 MatrixMatrixOp* MatrixMatrixOp::clone() const{
@@ -46,39 +46,37 @@ void MatrixMatrixOp::print(std::ostream &stream) const{
   print_c[op](stream,sx.str(),sy.str());
 }
 
-void MatrixMatrixOp::evaluate(int fsens_order, int asens_order){
-  const vector<double>& x = input(0);  // first argument
-  const vector<double>& y = input(1);  // second argument
-  vector<double>& res = output();
-  for(int i=0; i<res.size(); ++i)
-    nfun0[op](x[i],y[i],&res[i]);
-    
-  if(fsens_order>0){
-    const vector<double>& dx = fwdSeed(0); // first argument derivative
-    const vector<double>& dy = fwdSeed(1); // second argument derivative
-    vector<double>& fsens = fwdSens();
+void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  if(same_sparsity_){
+    if(nfwd==0 && nadj==0){
+      // No sensitivities
+      for(int i=0; i<size(); ++i)
+        nfun0[op](input[0][i],input[1][i],&output[i]);
+      
+    } else {
+      // Sensitivities
+      double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+      for(int i=0; i<size(); ++i){
+        // Evaluate and get partial derivatives
+        nfun1[op](input[0][i],input[1][i],tmp);
+        output[i] = tmp[0];
+        
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          fwdSens[d][i] = tmp[1]*fwdSeed[0][d][i] + tmp[2]*fwdSeed[1][d][i];
+        }
 
-    double tmp[3];
-    for(int i=0; i<fsens.size(); ++i){
-      nfun1[op](x[i],y[i],tmp);
-      fsens[i] = tmp[1]*dx[i] + tmp[2]*dy[i]; // chain rule
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          adjSens[0][d][i] += adjSeed[d][i]*tmp[1];
+          adjSens[1][d][i] += adjSeed[d][i]*tmp[2];
+        }
+      }
     }
-  }
-  
-  if(asens_order>0){
-    const vector<double>& aseed = adjSeed();
-    vector<double>& dx = adjSens(0); // first argument derivative
-    vector<double>& dy = adjSens(1); // second argument derivative
-
-    double tmp[3];
-    for(int i=0; i<aseed.size(); ++i){
-      nfun1[op](x[i],y[i],tmp);
-      dx[i] += aseed[i]*tmp[1];
-      dy[i] += aseed[i]*tmp[2];
-    }
+  } else {
+    casadi_assert_message(0, "different sparsity not implemented");
   }
 }
-
 
 } // namespace CasADi
 

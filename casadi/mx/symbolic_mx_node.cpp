@@ -38,7 +38,7 @@ void SymbolicMatrix::print(std::ostream &stream) const{
   stream << name_;
 }
 
-void SymbolicMatrix::evaluate(int fsens_order, int asens_order){
+void SymbolicMatrix::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
 }
 
 bool SymbolicMatrix::isSymbolic() const{

@@ -84,6 +84,9 @@ class CRSSparsity : public SharedObject{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
+    /// Check if two sparsity patterns are the same
+    bool operator==(const CRSSparsity& y) const;
+    
     /// \name Size and element counting
     /// @{
     
