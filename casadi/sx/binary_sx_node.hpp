@@ -48,6 +48,9 @@ BinarySXNode(OPERATION op_, const SX& child1_, const SX& child2_){
  child[1] = child2_;
 }
 
+/// This is a rather complex destructor which is necessary since the default destructor can cause stack overflow due to recursive calling
+virtual ~BinarySXNode();
+
 virtual bool isSmooth() const;
 
 virtual bool isBinary() const{ return true; }

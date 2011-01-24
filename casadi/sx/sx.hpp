@@ -57,6 +57,7 @@ class SXNode; // include will follow in the end
 
 class SX{
   friend class SXNode;
+  friend class BinarySXNode;
 
   public:
     
@@ -90,7 +91,7 @@ class SX{
     /** \brief Copy constructor */
     SX(const SX& scalar); // copy constructor
 
-    // Destructor
+    /// Destructor
     ~SX();
 
   // Assignment
@@ -194,7 +195,7 @@ class SX{
   SX fmax(const SX &b) const;
   SX pow(const SX& n) const;
   
-  protected:
+  private:
 #ifndef SWIG
 SXNode* node;
 

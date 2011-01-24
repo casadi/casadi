@@ -28,8 +28,9 @@
 #include <vector>
 #include <iostream>
 
-#include "../mx/mx_node.hpp"
+#include "mx_function.hpp"
 #include "fx_internal.hpp"
+#include "../mx/mx_node.hpp"
 
 namespace CasADi{
 
@@ -72,7 +73,7 @@ class MXFunctionInternal : public FXInternal{
     /** \brief  An elemenent of the algorithm, namely an MX node */
     struct AlgEl{
       // Function to be evaluated
-      MX node;
+      MX mx;
       
       // Numerical value of the node
       FunctionIO val;
@@ -84,19 +85,24 @@ class MXFunctionInternal : public FXInternal{
       VDptr  fwdSens;
       VDptr adjSeed;
       VVDptr adjSens;
+      
+      // Indices of the children nodes
+      vector<int> ch;
     };
 
     /** \brief  All the runtime elements in the order of evaluation */
-    std::vector<MX> alg;
+    std::vector<AlgEl> alg;
   
     /** \brief  Maps for quickly finding the place in the algorithm of a runtime element */
     std::map<const MXNode*,int>  nodemap;
 
     /** \brief  Matrix expressions that are to be evaluated */
     std::vector<MX> outputv;
+    std::vector<int> outputv_ind;
 
     /** \brief  Dependent expressions */
     std::vector<MX> inputv;
+    std::vector<int> inputv_ind;
   
     /** \brief  Does an element exist in the algorithm */  
     bool hasEl(const MX& mx) const;

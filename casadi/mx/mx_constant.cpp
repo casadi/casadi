@@ -31,7 +31,7 @@ using namespace std;
 namespace CasADi{
 
 MXConstant::MXConstant(const Matrix<double> &x) : x_(x){
-  setSize(x.size1(),x.size2());
+  setSparsity(x.sparsity());
 }
 
 MXConstant* MXConstant::clone() const{

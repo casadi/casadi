@@ -32,7 +32,7 @@ Reshape::Reshape(const MX& x, int n, int m){
     throw CasadiException("MX::reshape: size must be same before and after reshaping");
   }
   setDependencies(x);
-  setSize(n,m);
+  setSparsity(CRSSparsity(n,m,true));
 }
 
 Reshape* Reshape::clone() const{

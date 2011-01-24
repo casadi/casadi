@@ -29,6 +29,8 @@
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
 
+#include <casadi/mx/mx_node.hpp>
+
 using namespace CasADi;
 using namespace std;
 
@@ -76,6 +78,7 @@ FX create_integrator(int nj, int nu){
 
 
 int main(){
+  {
   // Dimensions
   int nj = 1000; // Number of integration steps per control segment
   int nu = 1000; // Number of control segments
@@ -148,6 +151,8 @@ int main(){
   solver.getOutput(Usol,NLP_X_OPT);
   cout << "optimal solution: " << Usol << endl;
 
+  }
+  
   return 0;
 
 }

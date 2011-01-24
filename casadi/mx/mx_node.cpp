@@ -29,8 +29,6 @@ using namespace std;
 namespace CasADi{
 
 MXNode::MXNode(){
-  nfdir_ = 1;
-  nadir_ = 1;
 }
 
 MXNode::~MXNode(){
@@ -52,10 +50,6 @@ bool MXNode::isConstant() const{
   return false;
 }
 
-MX& MXNode::dep(int ind){
-  return dep_.at(ind);
-}
-
 const MX& MXNode::dep(int ind) const{
   return dep_.at(ind);
 }
@@ -64,47 +58,8 @@ int MXNode::ndep() const{
   return dep_.size();
 }
 
-void MXNode::init(){
-  val_.dataF.resize(nfdir_);
-  val_.dataA.resize(nadir_);
-  val_.init();
-
-  input_.resize(ndep(),0);
-  fwdSeed_.resize(ndep());
-  adjSens_.resize(ndep());
-  for(int i=0; i<ndep(); ++i){
-    fwdSeed_[i].resize(nfdir_,0);
-    adjSens_[i].resize(nadir_,0);
-    if(!dep(i).isNull()){
-      input_[i] = &dep(i)->val_.data[0];
-      for(int d=0; d<nfdir_; ++d)
-        fwdSeed_[i][d] = &dep(i)->val_.dataF[d][0];
-      for(int d=0; d<nadir_; ++d)
-        adjSens_[i][d] = &dep(i)->val_.dataA[d][0];
-    }
-  }
-
-  output_ = &val_.data[0];
-  fwdSens_.resize(nfdir_);
-  for(int d=0; d<nfdir_; ++d)
-    fwdSens_[d] = &val_.dataF[d][0];
-  adjSeed_.resize(nadir_);
-  for(int d=0; d<nadir_; ++d)
-    adjSeed_[d] = &val_.dataA[d][0];
-
-}
-
-
-void MXNode::setSize(int nrow, int ncol){
-  sparsity_ = CRSSparsity(nrow,ncol,true);
-  val_.data = Matrix<double>(sparsity_);
-  val_.dense = false;
-}
-
 void MXNode::setSparsity(const CRSSparsity& sparsity){
   sparsity_ = sparsity;
-  val_.data = Matrix<double>(sparsity_);
-  val_.dense = false;
 }
 
 void MXNode::setDependencies(const MX& dep){
@@ -127,6 +82,10 @@ void MXNode::setDependencies(const MX& dep1, const MX& dep2, const MX& dep3){
 
 void MXNode::setDependencies(const std::vector<MX>& dep){
   dep_ = dep;
+}
+
+int MXNode::numel() const{
+  return sparsity_.numel();
 }
 
 int MXNode::size() const{

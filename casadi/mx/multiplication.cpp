@@ -31,7 +31,7 @@ namespace CasADi{
 Multiplication::Multiplication(const MX& x, const MX& y){
   setDependencies(x,y);
   if(x.size2() != y.size1()) throw CasadiException("Multiplication::dimension mismatch");
-  setSize(x.size1(),y.size2());
+  setSparsity(CRSSparsity(x.size1(),y.size2(),true));
 }
 
 Multiplication* Multiplication::clone() const{

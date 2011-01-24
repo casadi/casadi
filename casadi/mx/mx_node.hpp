@@ -24,9 +24,6 @@
 #define MX_NODE_HPP
 
 #include "mx.hpp"
-#include "../fx/mx_function.hpp"
-#include "../fx/function_io.hpp"
-#include "../matrix/matrix.hpp"
 #include <vector>
 
 namespace CasADi{
@@ -45,11 +42,10 @@ class MXNode : public SharedObjectNode{
   friend class MXFunctionInternal;
   
   public:
+    /// Constructor
+    MXNode();
   
-    /** \brief  Constructor */
-    explicit MXNode();
-
-    /** \brief  Destructor */
+    /** \brief  Destructor: better _not_ to make this destructor virtual? In the SX class, a virtual destructor leads to stack overflow due to recursive calling */
     virtual ~MXNode();
 
     /** \brief  Clone function */
@@ -61,9 +57,6 @@ class MXNode : public SharedObjectNode{
     /** \brief  Evaluate the function */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj) = 0;
                           
-    /** \brief  Initialize */
-    virtual void init();
-    
     /** \brief  Get the name */
     virtual const std::string& getName() const;
     
@@ -74,7 +67,6 @@ class MXNode : public SharedObjectNode{
     virtual bool isConstant() const;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
-    MX& dep(int ind=0);
     const MX& dep(int ind=0) const;
     
     /** \brief  Number of dependencies */
@@ -84,9 +76,6 @@ class MXNode : public SharedObjectNode{
     const CRSSparsity& sparsity() const;
 
   protected:
-    
-    /// Set size
-    void setSize(int nrow, int ncol);
     
     /// Set the sparsity
     void setSparsity(const CRSSparsity& sparsity);
@@ -103,6 +92,9 @@ class MXNode : public SharedObjectNode{
     /// Set multiple dependencies
     void setDependencies(const std::vector<MX>& dep);
         
+    /// Number of elements
+    int numel() const;
+    
     /// Get size
     int size() const;
     
@@ -115,25 +107,8 @@ class MXNode : public SharedObjectNode{
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;
     
-  private:
-    //! Number of derivative directions - move to MXFunction
-    int nfdir_, nadir_;
-
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
-
-    // Numerical value of the node  move this into the MXFunction class
-    FunctionIO val_;
-    
-    // Pointers set during init -> move away from the class
-    VDptr input_;
-    Dptr output_;
-    VVDptr fwdSeed_;
-    VDptr  fwdSens_;
-    VDptr adjSeed_;
-    VVDptr adjSens_;
-
-
 };
 
 } // namespace CasADi

@@ -27,7 +27,7 @@ using namespace std;
 namespace CasADi{
 
 SymbolicMatrix::SymbolicMatrix(const std::string& name, int n, int m) : name_(name) {
-  setSize(n,m);
+  setSparsity(CRSSparsity(n,m,true));
 }
 
 SymbolicMatrix* SymbolicMatrix::clone() const{

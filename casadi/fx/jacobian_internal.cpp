@@ -51,6 +51,7 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   output_.resize(1);
   output(0).resize(m_,n_);
 //  output[1] = fcn_->output[oind_];
+
 }
 
 
@@ -72,6 +73,8 @@ void JacobianInternal::init(){
   
   // Use forward or adjoint ad?
   if(use_fd_){
+    use_ad_fwd_ = true;
+  } else {
     if(getOption("ad_mode") == "forward")
       use_ad_fwd_ = true;
     else if(getOption("ad_mode") == "adjoint")

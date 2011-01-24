@@ -41,7 +41,7 @@ Vertcat::Vertcat(const vector<MX>& d){
     if(sz2!=dep(i).size2())
       throw CasadiException("Vertcat: dimension mismatch");
   }
-  setSize(sz1,sz2);
+  setSparsity(CRSSparsity(sz1,sz2,true));
 }
 
 Vertcat* Vertcat::clone() const{

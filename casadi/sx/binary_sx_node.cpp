@@ -22,10 +22,51 @@
 
 #include "binary_sx_node.hpp"
 #include <cassert>
+#include <stack>
 
 using namespace std;
 namespace CasADi{
 
+BinarySXNode::~BinarySXNode(){
+  for(int c=0; c<2; ++c){
+    if(child[c]->isBinary()){
+      if(--child[c].node->count == 0){
+        // Do not delete directly, add to a stack instead
+        stack<BinarySXNode*> s;
+        s.push((BinarySXNode*)child[c].node);
+
+        // Process the stack
+        while(!s.empty()){
+          BinarySXNode* t = s.top();
+          // Delete the nodes of both children
+          for(int cc=0; cc<2; ++cc){
+            if(t->child[cc]->isBinary()){
+              if(--t->child[cc].node->count == 0){ // "delete"
+                // Add to delete stack
+                s.push((BinarySXNode*)t->child[cc].node);
+              }
+              // Replace the binary node with a nan-node
+              t->child[cc].node = casadi_limits<SX>::nan.node;
+              t->child[cc].node->count++;
+            }
+          }
+          
+          // If the node is still on the top, delete it
+          if(t==s.top()){
+            delete t;
+            s.pop();
+          }
+        }
+      }
+      
+      // Replace the binary node with a nan-node
+      child[c].node = casadi_limits<SX>::nan.node;
+      child[c].node->count++;
+    }
+  }
+}
+
+  
 void BinarySXNode::print(ostream &stream) const{
   stringstream s0,s1;
   s0 << child[0];

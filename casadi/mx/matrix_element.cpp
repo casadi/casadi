@@ -27,7 +27,7 @@ namespace CasADi{
 
 MatrixElement::MatrixElement(const MX& x, int i, int j) : i_(i), j_(j){
   setDependencies(x);
-  setSize(1,1);
+  setSparsity(CRSSparsity(1,1,true));
   
   // Only one non-zero
   int ind = x->sparsity().getNZ(i,j);

@@ -218,7 +218,7 @@ MX MX::operator-() const{
 }
 
 const CRSSparsity& MX::sparsity() const{
-  return (*this)->sparsity_;
+  return (*this)->sparsity();
 }
 
 } // namespace CasADi

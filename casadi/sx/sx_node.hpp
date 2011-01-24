@@ -46,7 +46,7 @@ public:
 SXNode();
 
 /** \brief  destructor  */
-~SXNode(); // non-virtual to avoid stack overflow upon destruction!
+virtual ~SXNode(); // non-virtual to avoid stack overflow upon destruction!
 //@{
 /** \brief  check properties of a node */
 virtual bool isConstant() const; // check if constant
@@ -93,7 +93,6 @@ virtual void print(std::ostream &stream) const = 0;
 int temp;
 // int temp2;
 
-protected:
 // Reference counter -- counts the number of parents of the node
 unsigned int count;
 

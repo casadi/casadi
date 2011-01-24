@@ -26,7 +26,7 @@ namespace CasADi{
 
 Norm::Norm(const MX& x){
   setDependencies(x);
-  setSize(1,1);
+  setSparsity(CRSSparsity(1,1,true));
 }
 
 void Norm::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

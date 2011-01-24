@@ -74,8 +74,8 @@ int main(){
   cout << "program started" << endl;
       
   // Dimensions
-  int nu = 100;  // Number of control segments
-  int nj = 100; // 10000;  // // Number of integration steps per control segment
+  int nu = 1000;  // Number of control segments
+  int nj = 1000; // 10000;  // // Number of integration steps per control segment
 
   // optimization variable
   vector<SX> u = create_symbolic("u",nu); // control
