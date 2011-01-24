@@ -306,7 +306,11 @@ void FMIParserInternal::addOptimization(){
 
     // Get the type
     if(onode.checkName("opt:ObjectiveFunction")){ // mayer term
-      addObjectiveFunction(onode);
+      try{
+        addObjectiveFunction(onode);
+      } catch(exception& ex){
+        cout << "WARNING: addObjectiveFunction" << ex.what() << endl;
+      }
     } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
       try{
         addIntegrandObjectiveFunction(onode);
@@ -342,7 +346,7 @@ void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
 void FMIParserInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
-    SX v = readExpr_new(var[0]);
+    SX v = readExpr_new(var);
     ocp_.lterm.push_back(v);
   }
 }
@@ -416,6 +420,8 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
   // The switch below is alphabetical, and can be thus made more efficient
   if(name.compare("Add")==0){
     return readExpr_new(node[0]) + readExpr_new(node[1]);
+  } else if(name.compare("StringLiteral")==0){
+    throw CasadiException(string(node.getText()));
   } else if(name.compare("Der")==0){
     return readVariable(node[0]).der();
   } else if(name.compare("Div")==0){
