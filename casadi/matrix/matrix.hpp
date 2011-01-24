@@ -1122,6 +1122,15 @@ void Matrix<T>::get(T* val, Sparsity sp) const{
     // add sparse zeros at the end of the matrix
     for(; k<numel(); ++k)
      val[k] = 0;
+  } else if(sp==SPARSESYM){
+    // Set lower triangular part
+    int k = 0; // index of the result
+    for(int r=0; r<size1(); ++r)
+      for(int el=rowind(r); el<rowind(r+1); ++el){
+        if(col(el)<=r){
+          val[k++] = v[el];
+        }
+      }
   } else {
     throw CasadiException("Matrix<T>::get: not SPARSE or DENSE");
   }

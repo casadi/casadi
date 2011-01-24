@@ -291,11 +291,11 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     H_.output().sparsity().getSparsityCRS(rowind,col);
     for(int r=0; r<rowind.size()-1; ++r)
       for(int el=rowind[r]; el<rowind[r+1]; ++el){
-//        if(col[el]>=r){
+       if(col[el]<=r){
           iRow[nz] = r;
           jCol[nz] = col[el];
           nz++;
-  //      }
+       }
       }
   } else {
     // Pass input
@@ -307,7 +307,7 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     H_.evaluate();
 
     // Get results
-    H_.getOutput(values);
+    H_.output().get(values,SPARSESYM);
   }
   log("eval_h ok");
   return true;
@@ -478,7 +478,7 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
   if(H_.isNull())
     nnz_h_lag = 0;
   else
-    nnz_h_lag = H_.output().size();
+    nnz_h_lag = H_.output().sparsity().sizeL();
 }
 
 } // namespace CasADi
