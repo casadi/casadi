@@ -31,9 +31,15 @@
 namespace CasADi{
 
 MX vertcat(const vector<MX>& comp){
-  MX ret;
-  ret.assignNode(new Vertcat(comp));
-  return ret;
+  if(comp.empty()){
+    return MX();
+  } else if(comp.size()==1){
+    return comp[0];
+  } else {
+    MX ret;
+    ret.assignNode(new Vertcat(comp));
+    return ret;
+  }
 }
 
 MX horzcat(const vector<MX>& comp){

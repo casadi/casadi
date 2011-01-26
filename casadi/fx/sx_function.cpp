@@ -161,6 +161,9 @@ void SXFunction::generateCode(const std::string& filename) const{
   (*this)->generateCode(filename);
 }
 
+const std::vector<SXAlgEl>& SXFunction::algorithm() const{
+  (*this)->algorithm;
+}
 
 
 } // namespace CasADi

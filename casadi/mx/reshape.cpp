@@ -39,8 +39,8 @@ Reshape* Reshape::clone() const{
   return new Reshape(*this);
 }
 
-void Reshape::print(std::ostream &stream) const{
-  stream << "reshape(" << dep(0) << ",[" << size1() << "," << size2() << "])";
+void Reshape::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << "reshape(" << args.at(0) << ",[" << size1() << "," << size2() << "])";
 }
 
 void Reshape::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

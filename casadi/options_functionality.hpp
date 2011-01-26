@@ -116,8 +116,11 @@ virtual ~OptionsFunctionalityNode();
   /** \brief  get an option value */
   Option getOption(const std::string &str) const;
 
-  /** \brief  Print */
+  /** \brief  Print description */
   virtual void print(std::ostream &stream) const = 0;
+
+  /** \brief  Print representation */
+  virtual void repr(std::ostream &stream) const;
 
   /** \brief  Copy all options from another object*/
   void copyOptions(const OptionsFunctionality& obj);

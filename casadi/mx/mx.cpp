@@ -31,7 +31,7 @@
 #include "evaluation.hpp"
 #include "symbolic_mx_node.hpp"
 #include "mx_constant.hpp"
-
+#include "mx_tools.hpp"
 
 namespace CasADi{
 
@@ -57,36 +57,46 @@ MX::MX(const std::string& name, int n, int m){
   assignNode(new SymbolicMatrix(name,n,m));
 }
 
-const MX MX::__getitem__(const vector<int>& I) const{
-  if(I.size()!=2) throw CasADi::CasadiException("__getitem__: not 2D"); 
+const MX MX::getitem(const vector<int>& I) const{
+  if(I.size()!=2) throw CasADi::CasadiException("getitem: not 2D"); 
   return (*this)(I[0],I[1]);
 }
 
-const MX MX::__getitem__(int k) const{
+const MX MX::getitem(int k) const{
   // change this!
   return (*this)(k/size2(),k%size2());
 }
 
-MX& MX::__setitem__(int k, const MX& el){ 
+MX& MX::setitem(int k, const MX& el){ 
   (*this)[k] = el;
   return *this;
 }
 
-MX& MX::__setitem__(const std::vector<int> &I, const MX&  el){ 
-  if(I.size()!=2) throw CasADi::CasadiException("__setitem__: not 2D"); 
+MX& MX::setitem(const std::vector<int> &I, const MX&  el){ 
+  if(I.size()!=2) throw CasADi::CasadiException("setitem: not 2D"); 
   (*this)(I[0],I[1]) = el;
   return *this;
 }
 
+const MX MX::getitem(const std::vector< std::vector<int> > &II) const{
+  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
+  return (*this)(II[0],II[1]);
+}
 
-
+MX& MX::setitem(const std::vector< std::vector<int> > &II, const MX&  m){
+  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
+  setSub(II[0],II[1],m);
+}
 
 const MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
-  casadi_assert(ii.size()==1 && jj.size()==1);
-  
-  MX ret;
-  ret.assignNode(new MatrixElement(*this,ii[0],jj[0]));
-  return ret;
+  if(jj.size()==1){
+    vector<MX> v(ii.size());
+    for(int i=0; i<v.size(); ++i)
+      v[i] = (*this)[ii[i]];
+    return vertcat(v);
+  } else {
+    throw casadi_assert_message(0,"MX::getSub: not implemented");
+  }
 }
 
 void MX::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el){
@@ -100,7 +110,15 @@ const MX MX::operator()(int i, int j) const{
 }
 
 const MX MX::operator[](int k) const{
-  return __getitem__(k);
+  return getitem(k);
+}
+
+const MX MX::operator()(const std::vector<int>& ii, const std::vector<int>& jj) const{
+  return getSub(ii,jj);
+}
+
+SubMatrix<MX > MX::operator()(const std::vector<int>& ii, const std::vector<int>& jj){
+  return SubMatrix<MX>(*this,ii, jj);
 }
 
 SubMatrix<MX> MX::operator()(int i, int j){
@@ -211,6 +229,13 @@ MX MX::zeros(int nrow, int ncol){
 
 MX MX::ones(int nrow, int ncol){
   return MX(Matrix<double>(nrow,ncol,1));
+}
+
+MX MX::eye(int n){
+  Matrix<double> I(n,n);
+  for(int i=0; i<n; ++i)
+    I(i,i) = 1;
+  return MX(I);
 }
 
 MX MX::operator-() const{

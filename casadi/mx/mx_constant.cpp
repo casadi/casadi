@@ -38,7 +38,7 @@ MXConstant* MXConstant::clone() const{
   return new MXConstant(*this);
 }
 
-void MXConstant::print(std::ostream &stream) const{
+void MXConstant::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << x_;
 }
 

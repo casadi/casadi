@@ -55,6 +55,9 @@ public:
 
   /** \brief  Initialize stage */
   virtual void init();
+  
+  /** \brief Initialize the adjoint problem (can only be called after the first integration) */
+  virtual void initAdj();
 
   /** \brief  Reset the solver and bring the time back to t0 */
   virtual void reset(int fsens_order, int asens_order);
@@ -156,6 +159,7 @@ public:
   int nq_; // number of quadratures
   
   bool is_init;
+  bool isInitAdj_;
 
   int ism_;
   
@@ -191,6 +195,9 @@ public:
 
   // Set linear solver
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
+
+  int lmm_; // linear multistep method
+  int iter_; // nonlinear solver iteration
 
 };
 

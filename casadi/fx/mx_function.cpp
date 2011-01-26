@@ -79,6 +79,10 @@ const MX MXFunction::outputMX(int oind) const{
   return (*this)->outputv.at(oind);
 }
 
+const std::vector<MXAlgEl>& MXFunction::algorithm() const{
+  return (*this)->alg;
+}
+
 
 } // namespace CasADi
 

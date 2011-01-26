@@ -41,7 +41,7 @@ class MatrixElement : public Reordering {
     virtual MatrixElement* clone() const;
 
     /** \brief  Print */
-    virtual void print(std::ostream &stream=std::cout) const;
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
   protected:
     int i_, j_;

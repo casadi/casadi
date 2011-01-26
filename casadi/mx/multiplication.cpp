@@ -38,8 +38,8 @@ Multiplication* Multiplication::clone() const{
   return new Multiplication(*this);
 }
 
-void Multiplication::print(std::ostream &stream) const{
-  stream << "prod(" << dep(0) << "," << dep(1) << ")";
+void Multiplication::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
 void Multiplication::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

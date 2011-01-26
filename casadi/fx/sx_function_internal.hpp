@@ -72,18 +72,14 @@ class SXFunctionInternal : public FXInternal{
 /** \brief  Check if smooth */
   bool isSmooth() const;
 
-/** \brief  Print the algorithm */
-  void printAlgorithm(std::ostream &stream=std::cout) const;
-//   void printValues(std::ostream &stream=std::cout);
+  /** \brief  Print the algorithm */
+  virtual void print(std::ostream &stream) const;
 
   /** \brief Jacobian of output oind with respect to input iind */
   virtual FX jacobian(int iind=0, int oind=0);
   
   /** \brief Hessian of output oind with respect to input iind */
   virtual FX hessian(int iind=0, int oind=0);
-  
-  /** \brief  Print */
-  virtual void print(std::ostream &stream) const;
 
   /// Jacobian via source code transformation
   SXMatrix jac(int iind=0, int oind=0);
@@ -102,13 +98,9 @@ class SXFunctionInternal : public FXInternal{
 /** \brief  Indices of the nodes corresponding the non-zeros of the outputs */
   std::vector<std::vector<int> > output_ind;
 
-/** \brief  An elemenent of the algorithm, namely a binary operation */
-  struct AlgEl{
-    unsigned short op; // operator
-    int ind; // index of the binary operaton to be evaluated
-    int ch[2]; // indices of the arguments
-  };
-    
+  /** \brief  An elemenent of the algorithm, namely a binary operation */
+  typedef SXAlgEl AlgEl;
+  
 /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm;
   std::vector<AlgElData<1> > pder1;

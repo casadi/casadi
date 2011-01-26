@@ -70,6 +70,7 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   yQ0_ = yQ_ = 0;
 
   is_init = false;
+  isInitAdj_ = false;
 
   // Get dimensions
   setDimensions(getNX(f,q), getNP(f),0);
@@ -150,18 +151,16 @@ void CVodesInternal::init(){
   // Sundials return flag
   int flag;
 
-  int lmm; // linear multistep method
-  if(getOption("linear_multistep_method")=="adams")  lmm = CV_ADAMS;
-  else if(getOption("linear_multistep_method")=="bdf") lmm = CV_BDF;
+  if(getOption("linear_multistep_method")=="adams")  lmm_ = CV_ADAMS;
+  else if(getOption("linear_multistep_method")=="bdf") lmm_ = CV_BDF;
   else throw CasadiException("Unknown linear multistep method");
 
-  int iter; // nonlinear solver iteration
-  if(getOption("nonlinear_solver_iteration")=="newton") iter = CV_NEWTON;
-  else if(getOption("nonlinear_solver_iteration")=="functional") iter = CV_FUNCTIONAL;
+  if(getOption("nonlinear_solver_iteration")=="newton") iter_ = CV_NEWTON;
+  else if(getOption("nonlinear_solver_iteration")=="functional") iter_ = CV_FUNCTIONAL;
   else throw CasadiException("Unknown nonlinear solver iteration");
 
   // Create CVodes memory block
-  mem_ = CVodeCreate(lmm,iter);
+  mem_ = CVodeCreate(lmm_,iter_);
   if(mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
   // Allocate n-vectors for ivp
@@ -391,15 +390,25 @@ void CVodesInternal::init(){
       interpType = CV_POLYNOMIAL;
     else throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
       
-      // Initialize adjoint sensitivities
-      flag = CVodeAdjInit(mem_, Nd, interpType);
-      if(flag != CV_SUCCESS) cvodes_error("CVodeAdjInit",flag);
+    // Initialize adjoint sensitivities
+    flag = CVodeAdjInit(mem_, Nd, interpType);
+    if(flag != CV_SUCCESS) cvodes_error("CVodeAdjInit",flag);
   }
+      
+  } // ad_order>0
   
+  is_init = true;
+  isInitAdj_ = false;
+}
+
+
+void CVodesInternal::initAdj(){
+  int flag;
+
   for(int dir=0; dir<nadir_; ++dir){
 
       // Create backward problem (use the same lmm and iter)
-      flag = CVodeCreateB(mem_, lmm, iter, &whichB_[dir]);
+      flag = CVodeCreateB(mem_, lmm_, iter_, &whichB_[dir]);
       if(flag != CV_SUCCESS) cvodes_error("CVodeCreateB",flag);
       
       // Initialize the backward problem
@@ -425,51 +434,48 @@ void CVodesInternal::init(){
       flag = CVBandB(mem_, whichB_[dir], ny_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
       if(flag!=CV_SUCCESS) cvodes_error("CVBandB",flag);
     } else if(getOption("asens_linear_solver")=="iterative") {
-    // Sparse jacobian
-    // Preconditioning type
-    int pretype;
-    if(getOption("asens_pretype")=="none")               pretype = PREC_NONE;
-    else if(getOption("asens_pretype")=="left")          pretype = PREC_LEFT;
-    else if(getOption("asens_pretype")=="right")         pretype = PREC_RIGHT;
-    else if(getOption("asens_pretype")=="both")          pretype = PREC_BOTH;
-    else                                            throw CasadiException("Unknown preconditioning type for backward problem");
+      // Sparse jacobian
+      // Preconditioning type
+      int pretype;
+      if(getOption("asens_pretype")=="none")               pretype = PREC_NONE;
+      else if(getOption("asens_pretype")=="left")          pretype = PREC_LEFT;
+      else if(getOption("asens_pretype")=="right")         pretype = PREC_RIGHT;
+      else if(getOption("asens_pretype")=="both")          pretype = PREC_BOTH;
+      else                                            throw CasadiException("Unknown preconditioning type for backward problem");
 
-    // Attach the sparse solver  
-    int maxl = getOption("asens_max_krylov").toInt();
-    if(getOption("asens_iterative_solver")=="gmres"){
-      flag = CVSpgmrB(mem_, whichB_[dir], pretype, maxl);
-      if(flag!=CV_SUCCESS) cvodes_error("CVSpgmrB",flag);      
-    } else if(getOption("asens_iterative_solver")=="bcgstab") {
-      flag = CVSpbcgB(mem_, whichB_[dir], pretype, maxl);
-      if(flag!=CV_SUCCESS) cvodes_error("CVSpbcgB",flag);
-    } else if(getOption("asens_iterative_solver")=="tfqmr") {
-      flag = CVSptfqmrB(mem_, whichB_[dir], pretype, maxl);
-      if(flag!=CV_SUCCESS) cvodes_error("CVSptfqmrB",flag);
-    } else throw CasadiException("Unknown sparse solver for backward problem");
-      
-    // Attach functions for jacobian information
-  } else throw CasadiException("Unknown linear solver for backward problem");
+      // Attach the sparse solver  
+      int maxl = getOption("asens_max_krylov").toInt();
+      if(getOption("asens_iterative_solver")=="gmres"){
+        flag = CVSpgmrB(mem_, whichB_[dir], pretype, maxl);
+        if(flag!=CV_SUCCESS) cvodes_error("CVSpgmrB",flag);      
+      } else if(getOption("asens_iterative_solver")=="bcgstab") {
+        flag = CVSpbcgB(mem_, whichB_[dir], pretype, maxl);
+        if(flag!=CV_SUCCESS) cvodes_error("CVSpbcgB",flag);
+      } else if(getOption("asens_iterative_solver")=="tfqmr") {
+        flag = CVSptfqmrB(mem_, whichB_[dir], pretype, maxl);
+        if(flag!=CV_SUCCESS) cvodes_error("CVSptfqmrB",flag);
+      } else throw CasadiException("Unknown sparse solver for backward problem");
+        
+      // Attach functions for jacobian information
+    } else throw CasadiException("Unknown linear solver for backward problem");
 
-  // Quadratures for the adjoint problem
+    // Quadratures for the adjoint problem
 
-  N_VConst(0.0, yQB_[dir]);
-  flag = CVodeQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,yQB_[dir]);
-  if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB",flag);
-  
-  if(getOption("quad_err_con").toInt()){
-    flag = CVodeSetQuadErrConB(mem_, whichB_[dir],true);
-    if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB",flag);
-      
-    flag = CVodeQuadSStolerancesB(mem_, whichB_[dir], asens_reltol_, asens_abstol_);
-    if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB",flag);
-  }
-
-  
-    } // enable asens
+    N_VConst(0.0, yQB_[dir]);
+    flag = CVodeQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,yQB_[dir]);
+    if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB",flag);
     
-  } // ad_order>0
+    if(getOption("quad_err_con").toInt()){
+      flag = CVodeSetQuadErrConB(mem_, whichB_[dir],true);
+      if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB",flag);
+        
+      flag = CVodeQuadSStolerancesB(mem_, whichB_[dir], asens_reltol_, asens_abstol_);
+      if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB",flag);
+    }
+  }
   
-  is_init = true;
+  // Mark initialized
+  isInitAdj_ = true;
 }
 
 void CVodesInternal::rhs(double t, const double* y, double* ydot){
@@ -505,6 +511,12 @@ try{
 }
   
 void CVodesInternal::reset(int fsens_order, int asens_order){
+  if(monitored("CVodesInternal::reset")){
+    cout << "initial state: " << endl;
+    cout << "p = " << input(INTEGRATOR_P) << endl;
+    cout << "x0 = " << input(INTEGRATOR_X0) << endl;
+  }
+
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
   
@@ -587,16 +599,20 @@ void CVodesInternal::integrate(double t_out){
 
 void CVodesInternal::resetAdj(){
   double tf = input(INTEGRATOR_TF)[0];
-
   int flag;
   
-  for(int dir=0; dir<nadir_; ++dir){
-    flag = CVodeReInitB(mem_, whichB_[dir], tf, yB0_[dir]);
-    if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
+  if(isInitAdj_){
+    for(int dir=0; dir<nadir_; ++dir){
+      flag = CVodeReInitB(mem_, whichB_[dir], tf, yB0_[dir]);
+      if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
 
-    N_VConst(0.0,yQB_[dir]);
-    flag = CVodeQuadReInitB(mem_,whichB_[dir],yQB_[dir]);
-    if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB",flag);
+      N_VConst(0.0,yQB_[dir]);
+      flag = CVodeQuadReInitB(mem_,whichB_[dir],yQB_[dir]);
+      if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB",flag);
+    }
+  } else {
+    // Initialize the adjoint integration
+    initAdj();
   }
 }
 

@@ -37,9 +37,8 @@ UnaryOp* UnaryOp::clone() const{
   return new UnaryOp(*this);
 }
 
-void UnaryOp::print(std::ostream &stream) const{
-  stringstream sx; sx << dep(0);
-  print_c[op](stream,sx.str(),"nan");
+void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  print_c[op](stream,args.at(0),"nan");
 }
 
 void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

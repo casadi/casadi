@@ -44,7 +44,7 @@ Transpose(const MX& x);
 virtual Transpose* clone() const;
 
 /** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
+virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 };
 

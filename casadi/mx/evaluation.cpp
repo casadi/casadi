@@ -38,8 +38,8 @@ Evaluation* Evaluation::clone() const{
   return new Evaluation(*this);
 }
 
-void Evaluation::print(ostream &stream) const{
-  stream << fcn_ << "[" << dep() << "]";
+void Evaluation::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << fcn_ << ".call(" << args << ")[" << oind <<  "]";
 }
 
 void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
@@ -55,7 +55,8 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
 
   // Pass the adjoint seed to the function
   for(int d=0; d<nadj; ++d)
-    fcn_.setAdjSeed(adjSeed[d],oind,d);
+    if(adjSeed[d]!=0)
+      fcn_.setAdjSeed(adjSeed[d],oind,d);
     
   // Set adjoint seed to zero for all other outputs in all other directions
   for(int ind=0; ind<fcn_.getNumOutputs(); ++ind){
@@ -73,8 +74,9 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
   fcn_.getOutput(output,oind);
 
   // Get the fwd sensitivities
-  for(int d=0; d<nadj; ++d)
-    fcn_.getFwdSens(fwdSens[d],oind,d);
+  for(int d=0; d<nfwd; ++d)
+    if(fwdSens[d]!=0)
+      fcn_.getFwdSens(fwdSens[d],oind,d);
   
   // Get the adjoint sensitivities
   for(int i=0; i<ndep(); ++i){

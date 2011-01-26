@@ -40,7 +40,7 @@ class Multiplication : public MXNode{
     virtual Multiplication* clone() const;
 
     /** \brief  Print */
-    virtual void print(std::ostream &stream=std::cout) const;
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);

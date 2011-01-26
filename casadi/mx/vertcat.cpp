@@ -48,9 +48,11 @@ Vertcat* Vertcat::clone() const{
   return new Vertcat(*this);
 }
 
-void Vertcat::print(ostream &stream) const{
+void Vertcat::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << "[";
-  copy(dep_.begin(), dep_.end(), ostream_iterator<MX>(stream, ";"));
+  stream << args.at(0);
+  for(int i=1; i<args.size(); ++i)
+    stream << " ; " << args.at(i);
   stream << "]";
 }
 

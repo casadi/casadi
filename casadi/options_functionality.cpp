@@ -150,5 +150,10 @@ void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){
     setOption(it->first,it->second);
 }
 
+void OptionsFunctionalityNode::repr(std::ostream &stream) const{
+  stream << getOption("name").toString();
+}
+
+
 } // namespace CasADi
 

@@ -373,7 +373,8 @@ int main(){
 
   // Set options
   solver.setOption("tol",1e-6);
-//  solver.setOption("hessian_approximation","limited-memory");
+/*  solver.setOption("hessian_approximation","limited-memory");
+  solver.setOption("pass_nonlinear_variables",false);*/
 //  solver.setOption("derivative_test","first-order");
 
   // initialize the solver

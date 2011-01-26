@@ -51,8 +51,8 @@ int Reordering::k2k(int k) const{
   return nzind_[k];
 }
 
-void Reordering::print(std::ostream &stream) const{
-  stream << "reordering(" << dep(0) << "," << nzind_;
+void Reordering::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << "reordering(" << args.at(0) << "," << nzind_;
   if(ndep()>1) stream << "," << argind_;
   stream << ")";
 }

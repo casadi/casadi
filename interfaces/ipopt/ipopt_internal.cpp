@@ -29,6 +29,7 @@ using namespace std;
 namespace CasADi{
 
 IpoptInternal::IpoptInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_, const FX& GF_) : NLPSolverInternal(F_,G_,H_,J_,GF_){
+  addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
   
   // Output
   ops_["print_level"] = OT_INTEGER;
@@ -224,7 +225,8 @@ void IpoptInternal::init(){
   NLPSolverInternal::init();
 
   // read options
-  exact_hessian_ = !H_.isNull();
+  exact_hessian_ = !(hasSetOption("hessian_approximation") && getOption("hessian_approximation")=="limited-memory");
+  casadi_assert_message(!(exact_hessian_ && H_.isNull()), "No hessian has been provided");
   
   if(verbose_){
     cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
@@ -403,33 +405,53 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f)
 {
   log("eval_grad_f started");
-
   assert(n == n_);
-  // Pass the argument to the function
-  F_.setInput(x);
   
-  // Give a seed to the function
-  F_.setAdjSeed(1.0);
+  // If no gradient function has been provided, use AD adjoint
+  if(GF_.isNull()){
+  
+    // Pass the argument to the function
+    F_.setInput(x);
+    
+    // Give a seed to the function
+    F_.setAdjSeed(1.0);
 
-  // Evaluate, adjoint mode
-  F_.evaluate(0,1);
+    // Evaluate, adjoint mode
+    F_.evaluate(0,1);
 
-  // Get the result
-  F_.getAdjSens(grad_f);
+    // Get the result
+    F_.getAdjSens(grad_f);
 
-  // Printing
-  if(monitored("eval_grad_f")){
-    cout << "grad_f = " << F_.adjSens() << endl;
+    // Printing
+    if(monitored("eval_grad_f")){
+      cout << "grad_f = " << F_.adjSens() << endl;
+    }
+    
+  } else {
+    
+    // Pass the argument to the function
+    GF_.setInput(x);
+    
+    // Evaluate, adjoint mode
+    GF_.evaluate();
+
+    // Get the result
+    GF_.getOutput(grad_f);
+    
+    // Printing
+    if(monitored("eval_grad_f")){
+      cout << "grad_f = " << GF_.output() << endl;
+    }
   }
-  
+
   // Check the result for regularity
-  for(vector<double>::const_iterator it=F_.adjSens().begin(); it!=F_.adjSens().end(); ++it){
-      if(isnan(*it) || isinf(*it)){
+  for(int i=0; i<n; ++i){
+      if(isnan(grad_f[i]) || isinf(grad_f[i])){
         log("eval_grad_f: result not regular");
         return false;
     }
   }
-  
+
   log("eval_grad_f ok");
   return true;
 }
@@ -475,10 +497,47 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
     nnz_jac_g = J_.output().size();
 
   // Get Hessian sparsity pattern
-  if(H_.isNull())
-    nnz_h_lag = 0;
-  else
+  if(exact_hessian_)
     nnz_h_lag = H_.output().sparsity().sizeL();
+  else
+    nnz_h_lag = 0;
+}
+
+int IpoptInternal::get_number_of_nonlinear_variables() const{
+  if(H_.isNull() || getOption("pass_nonlinear_variables") == false){
+    // No Hessian has been interfaced
+    return -1;
+  } else {
+    // Number of variables that appear nonlinearily
+    int nv = 0;
+    
+    // Loop over the rows
+    for(int i=0; i<H_.output().size1(); ++i){
+      // If the row contains any non-zeros, the corresponding variable appears nonlinearily
+      if(H_.output().rowind(i)!=H_.output().rowind(i+1))
+        nv++;
+    }
+    
+    // Return the number
+    return nv;
+  }
+}
+
+bool IpoptInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const{
+  // Running index
+  int el = 0;
+  
+  // Loop over the rows
+  for(int i=0; i<H_.output().size1(); ++i){
+    // If the row contains any non-zeros, the corresponding variable appears nonlinearily
+    if(H_.output().rowind(i)!=H_.output().rowind(i+1)){
+      pos_nonlin_vars[el++] = i;
+    }
+  }
+  
+  // Assert number and return
+  casadi_assert(el==num_nonlin_vars);
+  return true;
 }
 
 } // namespace CasADi

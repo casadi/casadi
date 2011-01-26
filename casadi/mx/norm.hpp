@@ -56,7 +56,7 @@ Norm2(const MX& x);
 virtual Norm2* clone() const;
 
 /** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
+virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 };
 
 /** \brief Represents a 1-norm operation on a MX
@@ -73,7 +73,7 @@ Norm1(const MX& x);
 virtual Norm1* clone() const;
 
 /** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
+virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 };
 
 /** \brief Represents an infinity-norm operation on a MX
@@ -90,7 +90,7 @@ NormInf(const MX& x);
 virtual NormInf* clone() const;
 
 /** \brief  Print */
-virtual void print(std::ostream &stream=std::cout) const;
+virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 };
 
 } // namespace CasADi

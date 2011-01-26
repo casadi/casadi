@@ -45,8 +45,8 @@ Transpose* Transpose::clone() const{
   return new Transpose(*this);
 }
 
-void Transpose::print(std::ostream &stream) const{
-  stream << "trans(" << dep(0) << ")";
+void Transpose::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << "trans(" << args.at(0) << ")";
 }
 
 

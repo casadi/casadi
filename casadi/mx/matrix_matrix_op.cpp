@@ -40,10 +40,8 @@ MatrixMatrixOp* MatrixMatrixOp::clone() const{
   return new MatrixMatrixOp(*this);
 }
 
-void MatrixMatrixOp::print(std::ostream &stream) const{
-  stringstream sx; sx << dep(0);
-  stringstream sy; sy << dep(1);
-  print_c[op](stream,sx.str(),sy.str());
+void MatrixMatrixOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  print_c[op](stream,args.at(0),args.at(1));
 }
 
 void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

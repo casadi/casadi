@@ -34,7 +34,7 @@ SymbolicMatrix* SymbolicMatrix::clone() const{
   return new SymbolicMatrix(*this);
 }
 
-void SymbolicMatrix::print(std::ostream &stream) const{
+void SymbolicMatrix::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << name_;
 }
 

@@ -61,34 +61,14 @@ class MXFunctionInternal : public FXInternal{
     /** \brief  Evaluate the algorithm */
     virtual void evaluate(int fsens_order, int asens_order);
 
-    /** \brief  Print representation */
-    virtual void repr(std::ostream &stream) const;
-
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
 
     /** \brief  Initialize */
     virtual void init();
-  
-    /** \brief  An elemenent of the algorithm, namely an MX node */
-    struct AlgEl{
-      // Function to be evaluated
-      MX mx;
-      
-      // Numerical value of the node
-      FunctionIO val;
     
-      // Pointers to be passed to evaluate
-      VDptr input;
-      Dptr output;
-      VVDptr fwdSeed;
-      VDptr  fwdSens;
-      VDptr adjSeed;
-      VVDptr adjSens;
-      
-      // Indices of the children nodes
-      vector<int> ch;
-    };
+    /** \brief  An elemenent of the algorithm, namely an MX node */
+    typedef MXAlgEl AlgEl;
 
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> alg;

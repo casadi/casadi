@@ -33,6 +33,35 @@
 
 namespace CasADi{
 
+/** \brief  An elemenent of the algorithm, namely an MX node */
+struct MXAlgEl{
+  // Function to be evaluated
+  MX mx;
+  
+  // Numerical value of the node
+  FunctionIO val;
+
+  // Pointers to be passed to evaluate
+  VDptr input;
+  Dptr output;
+  VVDptr fwdSeed;
+  VDptr  fwdSens;
+  VDptr adjSeed;
+  VVDptr adjSens;
+  
+  // Indices of the children nodes
+  std::vector<int> ch;
+};
+
+} // namespace CasADi
+
+#ifdef SWIG
+// Template instantiation
+%template(MXAlgElVector) std::vector<CasADi::MXAlgEl>;
+#endif // SWIG
+
+namespace CasADi{
+
 /** \brief  Forward declaration of internal class */
 class MXFunctionInternal;
 
@@ -71,10 +100,22 @@ public:
   
   /// get function output argument
   const MX outputMX(int oind=0) const;
-
+  
+  /** \brief Access the algorithm */
+  const std::vector<MXAlgEl>& algorithm() const;
+  
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 };
+
+#ifdef SWIG
+%extend MXFunction{
+  // Print (why is this not inherited?)
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+#endif
+
+
   
 } // namespace CasADi
 

@@ -29,7 +29,7 @@ namespace CasADi{
 
 IntegratorInternal::IntegratorInternal(){
   // set default options
-  setOption("name","unnamed integrator"); // name of the function
+  setOption("name","unnamed_integrator"); // name of the function
   
   // IVP solution
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps

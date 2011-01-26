@@ -33,6 +33,7 @@ namespace CasADi{
 
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std::vector<MX>& outputv_) : inputv(inputv_), outputv(outputv_){
   setOption("ad_order",1); // one by default
+  setOption("name", "unnamed_mx_function");
 
   // Allocate space for inputs
   input_.resize(inputv.size());
@@ -131,9 +132,12 @@ void MXFunctionInternal::init(){
     it->val.init();
 
     // Save the indices of the children nodes
-    it->ch.clear();
+    it->ch.resize(m->ndep());
     for(int i=0; i<m->ndep(); ++i){
-      it->ch.push_back(nodemap[(MXNode*)m->dep(i).get()]);
+      if(m->dep(i).isNull())
+        it->ch[i] = -1;
+      else
+        it->ch[i] = nodemap[(MXNode*)m->dep(i).get()];
     }
     
     it->input.resize(m->ndep(),0);
@@ -142,7 +146,7 @@ void MXFunctionInternal::init(){
     for(int i=0; i<m->ndep(); ++i){
       it->fwdSeed[i].resize(nfdir_,0);
       it->adjSens[i].resize(nadir_,0);
-      if(!m->dep(i).isNull()){
+      if(it->ch[i]>=0){
         it->input[i] = &alg[it->ch[i]].val.data[0];
         for(int d=0; d<nfdir_; ++d)
           it->fwdSeed[i][d] = &alg[it->ch[i]].val.dataF[d][0];
@@ -194,7 +198,7 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
   for(int ind=0; ind<input_.size(); ++ind)
     alg[inputv_ind[ind]].val.data.set(input(ind));
 
-  // Pass the inputs seeds
+  // Pass the forward seeds
   if(fsens_order>0)
     for(int dir=0; dir<nfdir_; ++dir)
       for(int ind=0; ind<input_.size(); ++ind)
@@ -210,7 +214,7 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
   for(int ind=0; ind<outputv.size(); ++ind)
     alg[outputv_ind[ind]].val.data.get(output(ind));
 
-  // Get the forward seeds
+  // Get the forward sensitivities
   if(fsens_order>0)
     for(int dir=0; dir<nfdir_; ++dir)
       for(int ind=0; ind<outputv.size(); ++ind)
@@ -243,15 +247,21 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void MXFunctionInternal::print(ostream &stream) const{
-  int algcount = 0;
-  for(vector<AlgEl>::const_iterator it=alg.begin(); it!=alg.end(); ++it){
-    stream << "[" << algcount << "]: " << it->mx << endl;
-    algcount++;
+  for(int i=0; i<alg.size(); ++i){
+    stream << "i_" << i<< " =  ";
+    vector<string> chname(alg[i].ch.size());
+    for(int j=0; j<chname.size(); ++j){
+      if(alg[i].ch[j]>=0){
+        stringstream ss;
+        ss << "i_" << alg[i].ch[j];
+        chname[j] = ss.str();
+      } else {
+        chname[j] = "[]";
+      }
+    }
+    alg[i].mx->print(stream, chname);
+    stream << endl;
   }
-}
-
-void MXFunctionInternal::repr(std::ostream &stream) const{
-  stream << "MXFunction \"" << getOption("name") << "\"";
 }
 
 MXFunctionInternal* MXFunctionInternal::clone() const{

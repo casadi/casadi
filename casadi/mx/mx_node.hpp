@@ -26,12 +26,28 @@
 #include "mx.hpp"
 #include <vector>
 
+/* Developer nodes:
+  
+  This MX classes need to get the ability to generate whole Jacobian matrices, not just directional derivatives. There exist two principle ways of
+  doing this:
+  
+  1. The current approach:
+     Generate the Jacobian by seeding in all directions, using curtis powel reed scaling, the number of directions can be reduced.
+     - Problems:
+       * Need a way to calculate the Jacobian sparsity pattern, detecting it completely black box is expensiveunsafe and potentially unsafe.
+       * No easy way to generate second and higher order sensitivities
+       
+  2. The source code approach:
+     Generate a new tree for the derivatives, as for the SXFunction class.
+     - Advantages:
+      * Arbitrary order derivatives
+      * Easier to parallelize efficiently
+     - Problems:
+      * More implementation than approach 1.
+*/
+
+
 namespace CasADi{
-  typedef double* Dptr;
-  typedef std::vector<double*> VDptr;
-  typedef std::vector<std::vector<double* > > VVDptr;
-  
-  
 /** \brief Node class for MX objects
     \author Joel Andersson 
     \date 2010
@@ -51,7 +67,10 @@ class MXNode : public SharedObjectNode{
     /** \brief  Clone function */
     virtual MXNode* clone() const = 0;
 
-    /** \brief  Print description */
+    /** \brief  Print expression */
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const=0;
+    
+    /** \brief  Print expression */
     virtual void print(std::ostream &stream) const;
 
     /** \brief  Evaluate the function */
@@ -74,6 +93,9 @@ class MXNode : public SharedObjectNode{
 
     /// Get the sparsity
     const CRSSparsity& sparsity() const;
+    
+    /** \brief Generate all the partial derivatives for the node - needed for symbolic AD algorithm */
+    virtual std::vector<MX> partial() const;
 
   protected:
     

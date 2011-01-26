@@ -83,6 +83,12 @@ public:
                                  Number obj_value,
 				 const IpoptData* ip_data,
 				 IpoptCalculatedQuantities* ip_cq);
+                                 
+ /** Specify the number of variables that appear in the Hessian */
+ virtual Index get_number_of_nonlinear_variables();
+                                 
+ /** Specify which variables that appear in the Hessian */
+ virtual bool get_list_of_nonlinear_variables(Index num_nonlin_vars, Index* pos_nonlin_vars);
 
 private:
   IpoptUserClass(const IpoptUserClass&);

@@ -43,6 +43,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   addOption("ad_mode",OT_STRING,"reverse");
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("ad_order",1); // one by default
+  setOption("name","unnamed_sx_function");
   
   if(outputv.empty() || inputv.empty()) return;
 
@@ -1182,7 +1183,7 @@ bool SXFunctionInternal::isSmooth() const{
     return true;
 }
 
-void SXFunctionInternal::printAlgorithm(ostream &stream) const{
+void SXFunctionInternal::print(ostream &stream) const{
  for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
     int op = it->op;
     stringstream s,s0,s1;
@@ -1340,10 +1341,6 @@ void SXFunctionInternal::init(){
   // allocate a vector with the values at the nodes, the first vector also contains the partial derivatives
   if(ad_order_>=1) work[1].resize(worksize,numeric_limits<double>::quiet_NaN());
   if(ad_order_>=2) work[2].resize(worksize,numeric_limits<double>::quiet_NaN());
-}
-
-void SXFunctionInternal::print(ostream &stream) const{
-  stream << "sx function(\"" << getOption("name") << "\")";
 }
 
 FX SXFunctionInternal::jacobian(int iind, int oind){

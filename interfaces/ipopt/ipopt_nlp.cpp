@@ -106,4 +106,15 @@ void IpoptUserClass::finalize_solution(SolverReturn status,
   solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value);
 }
 
+Index IpoptUserClass::get_number_of_nonlinear_variables(){
+  return solver->get_number_of_nonlinear_variables();
+}
+
+bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars, Index* pos_nonlin_vars){
+  return solver->get_list_of_nonlinear_variables(num_nonlin_vars,pos_nonlin_vars);
+}
+
+
+
+
 } // namespace CasADi

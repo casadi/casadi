@@ -41,8 +41,8 @@ MatrixElement* MatrixElement::clone() const{
   return new MatrixElement(*this);
 }
 
-void MatrixElement::print(std::ostream &stream) const{
-  stream << dep(0) << "(" << i_ << "," << j_ << ")";
+void MatrixElement::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << args.at(0) << "(" << i_ << "," << j_ << ")";
 }
 
 } // namespace CasADi

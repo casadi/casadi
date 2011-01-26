@@ -112,13 +112,7 @@ int main(){
     C[j].resize(K+1);
     for(int k=0; k<=K; ++k){
       l[j].setInput(tau_root[k]);
-      cout << "ok" << endl; 
-      
-      cout << l[j].getOption("number_of_adj_dir") << endl;
-      cout << l[j].getOption("number_of_fwd_dir") << endl;
       l[j].setFwdSeed(1.0);
-      cout << "ok" << endl; 
-      
       l[j].evaluate(1,0);
       l[j].getFwdSens(C[j][k]);
     }
@@ -177,6 +171,7 @@ int main(){
   // Set options
   solver.setOption("tol",1e-10);
   solver.setOption("hessian_approximation","limited-memory");
+//   pass_nonlinear_variables
 
   // initialize the solver
   solver.init();

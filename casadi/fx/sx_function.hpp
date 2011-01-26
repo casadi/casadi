@@ -29,6 +29,13 @@
 
 namespace CasADi{
 
+/** \brief  An elemenent of the algorithm, namely a binary operation */
+struct SXAlgEl{
+  unsigned short op; // operator
+  int ind; // index of the binary operaton to be evaluated
+  int ch[2]; // indices of the arguments
+};
+  
 /// Forward declaration of internal class
 class SXFunctionInternal;
 
@@ -98,15 +105,17 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /** \brief get function input **/
+  /** \brief get function input */
   const SXMatrix& inputSX(int ind=0) const;
   
-  /** \brief get function output **/
+  /** \brief get function output */
   const SXMatrix& outputSX(int ind=0) const;
   
-  /** \brief Generate C code for the function **/
+  /** \brief Generate C code for the function */
   void generateCode(const std::string& filename) const;
-
+  
+  /** \brief Access the algorithm */
+  const std::vector<SXAlgEl>& algorithm() const;
 };
   
 } // namespace CasADi

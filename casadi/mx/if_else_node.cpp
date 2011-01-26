@@ -41,8 +41,8 @@ IfNode* IfNode::clone() const{
   return new IfNode(*this);
 }
 
-void IfNode::print(std::ostream &stream) const{
-  stream << "(" << dep(0) << "?" <<  dep(1) << ":" << dep(2) << ")";
+void IfNode::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << "(" << args.at(0) << "?" <<  args.at(1) << ":" << args.at(2) << ")";
 }
 
 void IfNode::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

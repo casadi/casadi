@@ -29,7 +29,7 @@
 #include <vector>
 
 namespace CasADi{
-
+  
 /** \brief  Forward declaration */
 class MXNode;
 
@@ -76,12 +76,18 @@ class MX : public SharedObject{
     /** \brief  Get matrix non-zero */
     const MX operator[](int k) const;          
 
-    /** \brief  Get matrix element */
+    /** \brief  Get a submatrix */
+    const MX operator()(const std::vector<int>& ii, const std::vector<int>& jj) const;
+
+    /** \brief  Access matrix element */
     SubMatrix<MX> operator()(int i, int j);
  
-    /** \brief  Get matrix non-zero */
+    /** \brief  Access matrix non-zero */
     SubMatrix<MX> operator[](int k);
 
+    /** \brief  Access a submatrix */
+    SubMatrix<MX > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
+    
 #endif // SWIG
 
     /** \brief  Get the number of (structural) non-zero elements */
@@ -144,17 +150,31 @@ class MX : public SharedObject{
   /** \brief  Matrix of all ones */  
   static MX ones(int nrow, int ncol);
   
+  /** \brief  Identity matrix */  
+  static MX eye(int n);
+
+  
   //@{
   /// Python stuff
-  const MX __getitem__(int k) const;
-  const MX __getitem__(const std::vector<int>& I) const;
-  MX& __setitem__(int k, const MX& el);
-  MX& __setitem__(const std::vector<int> &I, const MX&  el);
+  const MX getitem(int k) const;
+  const MX getitem(const std::vector<int>& I) const;
+  const MX getitem(const std::vector< std::vector<int> > &II) const;
+  MX& setitem(int k, const MX& el);
+  MX& setitem(const std::vector<int> &I, const MX&  el);
+  MX& setitem(const std::vector< std::vector<int> > &II, const MX&  el);
   //@}
 
   const MX getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
   void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el);
 };
+
+//@{
+/// Some typedefs
+typedef double* Dptr;
+typedef std::vector<double*> VDptr;
+typedef std::vector<std::vector<double* > > VVDptr;
+//@}
+
 
 } // namespace CasADi
 

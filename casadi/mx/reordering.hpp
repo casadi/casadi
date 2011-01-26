@@ -57,7 +57,7 @@ class Reordering : public MXNode{
     int k2k(int k) const;
 
     /// Print
-    virtual void print(std::ostream &stream=std::cout) const;
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
     
   protected:
     

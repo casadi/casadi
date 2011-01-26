@@ -34,10 +34,6 @@ MXNode::MXNode(){
 MXNode::~MXNode(){
 }
 
-void MXNode::print(ostream &stream) const{
-  stream << "<empty matrix expression>";
-}
-  
 const string& MXNode::getName() const{
   throw CasadiException(string("MXNode::getName() not defined for class ") + typeid(*this).name());
 }
@@ -103,6 +99,21 @@ int MXNode::size2() const{
 const CRSSparsity& MXNode::sparsity() const{
   return sparsity_;
 }
+
+void MXNode::print(std::ostream &stream) const{
+  vector<string> args(ndep());
+  for(int i=0; i<ndep(); ++i){
+    stringstream ss;
+    dep(i)->print(ss);
+    args[i] = ss.str();
+  }
+  print(stream,args);
+}
+
+std::vector<MX> MXNode::partial() const{
+  throw CasadiException(string("MXNode::partial() no partial derivatives defined for class ") + typeid(*this).name());
+}
+
 
 
 } // namespace CasADi

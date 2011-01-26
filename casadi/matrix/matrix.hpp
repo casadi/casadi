@@ -323,13 +323,15 @@ class Matrix : public std::vector<T>, public PrintableObject{
     //@{
     /// Printing
 #ifndef SWIG
-    virtual void print(std::ostream &stream=std::cout) const; // print default style
+    virtual void print(std::ostream &stream=std::cout) const; // print print description
+    virtual void repr(std::ostream &stream=std::cout) const; // print representation
 #endif
-    std::string __repr__() { return getRepresentation(); } // python default print (calls print())
+    std::string __repr__() { return getRepresentation(); } // python default print
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
-    void printVector(std::ostream &stream=std::cout) const; // print vector-style
-    void printMatrix(std::ostream &stream=std::cout) const; // print matrix-style
-    void printSparse(std::ostream &stream=std::cout) const; // print the non-zeros
+    void printVector(std::ostream &stream=std::cout) const; // print one row vector-style
+    void printMatrix(std::ostream &stream=std::cout) const; // print one row, matrix-style
+    void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
+    void printDense(std::ostream &stream=std::cout) const; // Print dense matrix stype
     //@}
 
     // Get the sparsity pattern
@@ -644,25 +646,23 @@ void Matrix<T>::printScalar(std::ostream &stream) const {
 template<class T>
 void Matrix<T>::printVector(std::ostream &stream) const {
   // print dimension and first element
-  stream << "[" << size1() << "](";
+  stream << "[";
   stream << (*this)(0);
   for(int i=1; i<size1(); i++){
     stream << "," << (*this)(i);
   }
-  stream << ")";  
+  stream << "]";  
 }
 
 template<class T>
 void Matrix<T>::printMatrix(std::ostream &stream) const{ 
- // print dimension
- stream << "[" << size1() << "," << size2() << "]";
  // print the first row
- stream << "((";
+ stream << "[[";
   stream << (*this)(0,0);
   for(int j=1; j<size2(); j++){
     stream << "," << (*this)(0,j);
  }
- stream << ")";
+ stream << "]";
  // print the rest of the rows
  for(int i=1; i<size1(); i++){  
     stream << ",("; 
@@ -670,13 +670,44 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     for(int j=1; j<size2(); j++){
       stream << "," << (*this)(i,j);
     }
-    stream << ")";
+    stream << "]";
   }
-  stream << ")";  
+  stream << "]";  
+}
+
+template<class T>
+void Matrix<T>::printDense(std::ostream &stream) const{
+  stream << size1() << "-by-" << size2() << " matrix:" << std::endl;
+  for(int i=0; i<size1(); ++i){
+    if(i==0)
+      stream << "[[";
+    else
+      stream << " [";
+    int j=0;
+    for(int el=rowind(i); el<rowind(i+1); ++el){
+      // Print leading zeros
+      for(;j<col(el); ++j)
+        stream << "0,  ";
+      
+      // Print element
+      stream << (*this)[el] << ",  ";
+    }
+    
+    // Print trailing zeros
+    for(;j<size2(); ++j)
+      stream << "0,  ";
+    
+    // New row
+    if(i==size1()-1)
+      stream << "]]" << std::endl;
+    else
+      stream << "]" << std::endl;
+  }
 }
 
 template<class T>
 void Matrix<T>::printSparse(std::ostream &stream) const {
+  stream << "Sparse " << size1() << "-by-" << size2() << " matrix with " << size() << " structural non-zeros:" << std::endl;
   for(int i=0; i<size1(); ++i)
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j=col(el);
@@ -686,8 +717,17 @@ void Matrix<T>::printSparse(std::ostream &stream) const {
 
 template<class T>
 void Matrix<T>::print(std::ostream &stream) const{
+  if(dense()){
+    printDense(stream);
+  } else {
+    printSparse(stream);
+  }
+}
+
+template<class T>
+void Matrix<T>::repr(std::ostream &stream) const{
   if (empty())
-    stream << "<empty expression>";
+    stream << "[]";
   else if (numel()==1)
     printScalar(stream);
   else if (size2()==1)
