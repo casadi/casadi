@@ -113,7 +113,7 @@ class SharedObject : public PrintableObject{
     void init();
     
     /// Is a null pointer?
-    bool isNull() const; 
+    bool isNull() const;
 
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
@@ -203,8 +203,7 @@ B SharedObjectNode::shared_from_this(){
   ret.assignNode(this);
   
   // Assert that the object is valid
-  if(!ret.checkNode())
-    throw CasadiException("shared_from_this: type missmatch");
+  casadi_assert(ret.checkNode());
   
   return ret;
 }

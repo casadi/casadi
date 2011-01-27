@@ -13,6 +13,10 @@ IF(SUNDIALS_FOUND)
 INCLUDE_DIRECTORIES(${SUNDIALS_INCLUDE_DIR})
 ENDIF(SUNDIALS_FOUND)
 
+# Error handling
+add_executable(casadi_error_handling casadi_error_handling.cpp)
+target_link_libraries(casadi_error_handling casadi)
+
 IF(IPOPT_FOUND)
 
 # Rocket using Ipopt

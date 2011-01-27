@@ -23,7 +23,6 @@
 #include "simulator_internal.hpp"
 #include "integrator_internal.hpp"
 #include "../stl_vector_tools.hpp"
-#include <cassert>
 
 using namespace std;
 namespace CasADi{
@@ -127,7 +126,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
 
     // Seeds from the output function
     const vector<double> &xf_seed = output(0).data(1); // TODO: output is here assumed to be trivial, returning the state
-    assert(xf_seed.size() == grid_.size()*xfs.size());
+    casadi_assert(xf_seed.size() == grid_.size()*xfs.size());
 
     // Integrate backwards
     for(int k=grid_.size()-1; k>=0; --k){

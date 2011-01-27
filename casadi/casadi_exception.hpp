@@ -26,6 +26,7 @@
 #include <exception>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 namespace CasADi{
 
@@ -81,11 +82,14 @@ class CasadiException : public std::exception{
 
 
 // Assertion similar to the standard C assert statement, with the difference that it throws an exception with the same information
-#ifdef NDEBUG
+#ifdef CASADI_NDEBUG
 // Release mode
 #define casadi_assert(x)
 #define casadi_assert_message(x,msg)
-#else // NDEBUG
+#define casadi_assert_warning(x,msg)
+#define casadi_warning(msg)
+
+#else // CASADI_NDEBUG
 // Debug mode
 // Convert to string
 #define CASADI_ASSERT_STR1(x) #x
@@ -94,15 +98,32 @@ class CasadiException : public std::exception{
 // String denoting where the assertation is situated
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__)
 
-// This assersion if for illigal user inputs that should not be checked in the release version for effiency resonds, for example out of bounds
+// This assersion if for illigal user inputs and will not be checked if casadi is in release mode (CASADI_NDEBUG is defined)
 #define casadi_assert_message(x,msg) \
-if(!(x)) throw CasadiException("The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. " msg)
+{ \
+  bool is_ok; \
+  try{ \
+    is_ok = x; \
+  } catch(std::exception& ex){ \
+      throw CasADi::CasadiException(std::string("When trying to check the assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what());\
+  } \
+ if(!is_ok) throw CasADi::CasadiException("The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. " msg); \
+}
 
-// This assersion if for errors caused by bugs in CasADi
+// This assersion if for errors caused by bugs in CasADi, use it instead of C:s assert(), but never in destructors
 #define casadi_assert(x) casadi_assert_message(x,"Please notify the CasADi developers.")
 
+// This is for warnings to be issued when casadi is not in release mode and an assertion fails
+#define casadi_assert_warning(x,msg) \
+if((x)==false){ \
+  std::cerr << "CasADi warning: \"" msg "\" (assertion " CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed." << std::endl;\
+}
 
-#endif // NDEBUG
+// This is for warnings to be issued when casadi is not in release mode
+#define casadi_warning(msg) \
+std::cerr << "CasADi warning: \"" msg "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
+
+#endif // CASADI_NDEBUG
   
 } // namespace CasADi
 

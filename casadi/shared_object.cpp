@@ -93,12 +93,12 @@ void SharedObject::count_down(){
 }
 
 const SharedObjectNode* SharedObject::operator->() const{
-  if(node==0) throw CasadiException("SharedObject::operator->(): Node is null"); 
+  casadi_assert(!isNull());
   return node;
 }
 
 SharedObjectNode* SharedObject::operator->(){
-  if(node==0) throw CasadiException("SharedObject::operator->(): Node is null"); 
+  casadi_assert(!isNull());
   return node;
 }
     
@@ -155,7 +155,7 @@ SharedObjectNode* SharedObjectNode::clone() const{
 }
 
 SharedObject SharedObject::clone() const{
-  if(isNull()) throw CasadiException("Cannot clone null pointer");
+  casadi_assert(!isNull());
   SharedObject ret;
   ret.assignNode((*this)->clone());
   return ret;

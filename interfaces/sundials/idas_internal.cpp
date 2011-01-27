@@ -166,35 +166,35 @@ void IdasInternal::init(){
 
   // Set error handler function
   flag = IDASetErrHandlerFn(mem_, ehfun_wrapper, this);
-  if(flag != IDA_SUCCESS) idas_error("IDASetErrHandlerFn",flag);
+  casadi_assert_message(flag == IDA_SUCCESS,"IDASetErrHandlerFn");
 
   // Include algebraic variables in error testing
   flag = IDASetSuppressAlg(mem_, getOption("suppress_algebraic").toInt());
-  if(flag != IDA_SUCCESS) idas_error("IDASetSuppressAlg",flag);
+  casadi_assert_message(flag == IDA_SUCCESS,"IDASetSuppressAlg");
 
   // Maxinum order for the multistep method
   flag = IDASetMaxOrd(mem_, getOption("max_multistep_order").toInt());
-  if(flag != IDA_SUCCESS) idas_error("IDASetMaxOrd",flag);
+  casadi_assert_message(flag == IDA_SUCCESS,"IDASetMaxOrd");
 
   // Set user data
   flag = IDASetUserData(mem_,this);
-  if(flag != IDA_SUCCESS) idas_error("IDASetUserData",flag);
+  casadi_assert_message(flag == IDA_SUCCESS,"IDASetUserData");
 
   // Set maximum step size
   flag = IDASetMaxStep(mem_, getOption("max_step_size").toDouble());
-  if(flag != IDA_SUCCESS) idas_error("IDASetMaxStep",flag);
+  casadi_assert_message(flag == IDA_SUCCESS,"IDASetMaxStep");
   
   if(hasSetOption("abstolv")){
     // Vector absolute tolerances
     vector<double> abstolv = getOption("abstolv").toDoubleVector();
     N_Vector nv_abstol = N_VMake_Serial(abstolv.size(),&abstolv[0]);
     flag = IDASVtolerances(mem_, reltol_, nv_abstol);
-    if(flag != IDA_SUCCESS) idas_error("IDASVtolerances",flag);
+    casadi_assert_message(flag == IDA_SUCCESS,"IDASVtolerances");
     N_VDestroy_Serial(nv_abstol);
   } else {
     // Scalar absolute tolerances
     flag = IDASStolerances(mem_, reltol_, abstol_); 
-    if(flag != IDA_SUCCESS) idas_error("IDASStolerances",flag);
+    casadi_assert_message(flag == IDA_SUCCESS,"IDASStolerances");
   }
   
   // Maximum number of steps
@@ -297,7 +297,7 @@ void IdasInternal::init(){
     // Should the quadrature errors be used for step size control?
     if(getOption("quad_err_con").toInt()){
       flag = IDASetQuadErrCon(mem_, true);
-      if(flag != IDA_SUCCESS) idas_error("IDASetQuadErrCon",flag);
+      casadi_assert_message(flag == IDA_SUCCESS, "IDASetQuadErrCon");
       
       // Quadrature error tolerances
       flag = IDAQuadSStolerances(mem_, reltol_, abstol_); // TODO: vector absolute tolerances

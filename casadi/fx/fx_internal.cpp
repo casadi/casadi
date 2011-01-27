@@ -87,9 +87,8 @@ FX FXInternal::hessian(int iind, int oind){
   throw CasadiException(ss.str());
 }
 
-void FXInternal::assertInit() const{
-  if(!is_init_)
-    throw CasadiException("FXInternal::assertInit: function has not been initialized");
+bool FXInternal::isInit() const{
+  return is_init_;
 }
 
 FunctionIO& FXInternal::inputStruct(int i){

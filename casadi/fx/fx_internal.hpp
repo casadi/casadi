@@ -79,7 +79,7 @@ class FXInternal : public OptionsFunctionalityNode{
   std::vector<FunctionIO> output_;
 
   /// Assert that the function has been initialized
-  void assertInit() const;
+  bool isInit() const;
 
   /// Verbose mode?
   bool verbose() const;

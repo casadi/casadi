@@ -74,7 +74,7 @@ MX FX::operator()(const vector<MX> &x, int ind) const{
 #endif // USE_FUNCTORS
 
 void FX::evaluate(int fsens_order, int asens_order){
-  (*this)->assertInit();
+  casadi_assert(isInit());
   (*this)->evaluate(fsens_order,asens_order);
 }
 
@@ -108,11 +108,6 @@ FX FX::hessian(int iind, int oind){
 
 bool FX::isInit() const {
   return (*this)->is_init_;
-}
-
-void FX::assertInit() const{
-  if(!(*this)->is_init_)
-    throw CasadiException("FX::assertInit: function has not been initialized");
 }
 
 bool FX::checkNode() const{
