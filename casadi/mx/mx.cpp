@@ -95,7 +95,7 @@ const MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) cons
       v[i] = (*this)[ii[i]];
     return vertcat(v);
   } else {
-    throw casadi_assert_message(0,"MX::getSub: not implemented");
+    casadi_assert_message(0,"MX::getSub: not implemented");
   }
 }
 

@@ -139,6 +139,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// get the number of non-zeros
     int size() const;
 
+    /// get the number of non-zeros in the lower triangular half
+    int sizeL() const;
+
+    /// get the number of non-zeros in the upper triangular half
+    int sizeU() const;
+
     /// get the number of elements
     int numel() const;
 
@@ -362,16 +368,25 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<T>& val, Sparsity sp=SPARSE) const;
 
-#ifndef SWIG
     /** \brief  Get the non-zero elements, array */
-    void get(T* val, Sparsity sp=SPARSE) const;    
+    void getArray(T* val, int len, Sparsity sp=SPARSE) const;
 
     /** \brief  Set the non-zero elements, array */
+    void setArray(const T* val, int len, Sparsity sp=SPARSE);
+
+    /** \brief  Get the non-zero elements, array, sparse and correct length */
+    void getArray(T* val) const;
+
+    /** \brief  Set the non-zero elements, array, sparse and correct length */
+    void setArray(const T* val);
+    
+#ifndef SWIG
+    /** \brief  Legacy - use getArray instead */
+    void get(T* val, Sparsity sp=SPARSE) const;
+
+    /** \brief  Legacy - use setArray instead */
     void set(const T* val, Sparsity sp=SPARSE);
 #endif
-
-    /** \brief  Get the result */
-    void getSparseSym(T *res) const;    // general sparse, symmetric matrix
 
     /** \brief  Get the result times a vector */
     void getTimesVector(const T *v, T *res) const;
@@ -383,9 +398,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, T *res) const;
 
-    // Make sure that the number of non-zeros is sz
-    void assertNNZ(int sz, Sparsity sp) const;
-    void assertNumEl(int sz) const;
+    // get the number if non-zeros for a given sparsity pattern
+    int size(Sparsity sp) const;
     
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
@@ -545,6 +559,16 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
 template<class T>
 int Matrix<T>::size() const{
   return std::vector<T>::size();
+}
+
+template<class T>
+int Matrix<T>::sizeU() const{
+  return sparsity_.sizeU();
+}
+
+template<class T>
+int Matrix<T>::sizeL() const{
+  return sparsity_.sizeL();
 }
 
 template<class T>
@@ -1040,21 +1064,6 @@ CRSSparsity& Matrix<T>::sparsityRef(){
 }
 
 template<class T>
-void Matrix<T>::getSparseSym(T *res) const{
-  // copy to the result vector
-  int nz = 0;
-  for(int row=0; row<size1(); ++row)
-  {
-    // Loop over the elements in the row
-    for(int el=rowind(row); el<rowind(row+1); ++el){ // loop over the non-zero elements
-      if(col(el) > row) break; // break inner loop (only lower triangular part is used)
-      res[nz] = (*this)[el];
-      nz++;
-    }
-  }
-}
-
-template<class T>
 void Matrix<T>::getTimesVector(const T *v, T *res) const{
   // copy the result
   for(int i=0; i<size1(); ++i){ // loop over rows
@@ -1099,55 +1108,44 @@ void Matrix<T>::getBand(int kl, int ku, int ldres, T *res) const{
 
 template<class T>
 void Matrix<T>::set(T val, Sparsity sp){
-  assertNumEl(1);
-  assertNNZ(1,sp);
-  (*this)[0] = val;
+  setArray(&val,1,DENSE);
 }
     
 template<class T>
 void Matrix<T>::get(T& val, Sparsity sp) const{
-  assertNumEl(1);
-  assertNNZ(1,sp);
-  val = (*this)[0];
+  getArray(&val,1,DENSE);
 }
 
 template<class T>
 void Matrix<T>::set(const std::vector<T>& val, Sparsity sp){
-  assertNNZ(val.size(),sp);
-  set(&val[0],sp);
+  setArray(&val[0],val.size(),sp);
 }
 
 template<class T>
 void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
-  assertNNZ(val.size(),sp);
-  get(&val[0],sp);
+  getArray(&val[0],val.size(),sp);
 }
 
 template<class T>
 void Matrix<T>::set(const T* val, Sparsity sp){
-  std::vector<T> &v = *this;
-  if(sp==SPARSE || (sp==DENSE && numel()==size())){
-    copy(val,val+v.size(),v.begin());
-  } else if(sp==DENSE){
-    for(int i=0; i<size1(); ++i) // loop over rows
-      for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
-        // column
-        int j=col(el);
-        
-        // Set the element
-        v[el] = val[i*size2()+j];
-    }
-  } else {
-    throw CasadiException("Matrix<T>::set: not SPARSE or DENSE");
-  }
+  int len = sp==SPARSE ? size() : sp==DENSE ? numel() : sp==SPARSESYM ? sizeL() : -1;
+  setArray(val,len,sp);
 }
 
 template<class T>
 void Matrix<T>::get(T* val, Sparsity sp) const{
+  int len = sp==SPARSE ? size() : sp==DENSE ? numel() : sp==SPARSESYM ? sizeL() : -1;
+  getArray(val,len,sp);
+}
+
+template<class T>
+void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
   const std::vector<T> &v = *this;
   if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
+    casadi_assert(len==size());
     copy(v.begin(),v.end(),val);
   } else if(sp==DENSE){
+    casadi_assert(len==numel());
     int k=0; // index of the result
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
@@ -1163,46 +1161,68 @@ void Matrix<T>::get(T* val, Sparsity sp) const{
     for(; k<numel(); ++k)
      val[k] = 0;
   } else if(sp==SPARSESYM){
-    // Set lower triangular part
-    int k = 0; // index of the result
-    for(int r=0; r<size1(); ++r)
-      for(int el=rowind(r); el<rowind(r+1); ++el){
-        if(col(el)<=r){
-          val[k++] = v[el];
-        }
+    // copy to the result vector
+    int nz = 0;
+    for(int row=0; row<size1(); ++row){
+      // Loop over the elements in the row
+      for(int el=rowind(row); el<rowind(row+1); ++el){ // loop over the non-zero elements
+        if(col(el) > row) break; // break inner loop (only lower triangular part is used)
+        val[nz++] = v[el];
       }
+    }
   } else {
-    throw CasadiException("Matrix<T>::get: not SPARSE or DENSE");
+    throw CasadiException("Matrix<T>::getArray: not SPARSE or DENSE");
   }
 }
 
 template<class T>
-void Matrix<T>::assertNNZ(int sz, Sparsity sp) const{
-  int nnz_correct = -1;
-  switch(sp){
-    case SPARSE:
-      nnz_correct = size();
-      break;
-    case DENSE:
-      nnz_correct = numel();
-      break;
-    default:
-      throw CasadiException("Matrix<T>::assertNNZ: unknown sparsity");
-  }
-
-  if(nnz_correct!=sz){
-    std::stringstream ss;
-    ss << "Matrix<T>::assertNNZ: wrong number of elements (" << sz << "), but should be " << nnz_correct << std::flush;
-    throw CasadiException(ss.str());
+void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
+  std::vector<T> &v = *this;
+  if(sp==SPARSE || (sp==DENSE && numel()==size())){
+    casadi_assert(len==size());
+    copy(val,val+len,v.begin());
+  } else if(sp==DENSE){
+    casadi_assert(len==numel());
+    for(int i=0; i<size1(); ++i) // loop over rows
+      for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
+        // column
+        int j=col(el);
+        
+        // Set the element
+        v[el] = val[i*size2()+j];
+    }
+  } else {
+    throw CasadiException("Matrix<T>::setArray: not SPARSE or DENSE");
   }
 }
 
 template<class T>
-void Matrix<T>::assertNumEl(int sz) const{
-  if(numel()!=sz){
-    std::stringstream ss;
-    ss << "Matrix<T>::assertNumEl: wrong number of elements (" << sz << " ), but should be " << numel();
-    throw CasadiException(ss.str());
+void Matrix<T>::getArray(T* val) const{
+  getArray(val,size(),SPARSE);
+}
+
+template<class T>
+void Matrix<T>::setArray(const T* val){
+  setArray(val,size(),SPARSE);
+}
+
+
+
+
+
+
+template<class T>
+int Matrix<T>::size(Sparsity sp) const{
+  if(sp==SPARSE){
+    return size();
+  } else if(sp==SPARSESYM){
+    return sizeL();
+  } else if(sp==DENSE){
+    return numel();
+  } else if(sp==DENSESYM){
+    return (numel()+size1())/2;
+  } else {
+      throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
   }
 }
 

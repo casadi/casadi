@@ -755,20 +755,6 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
       }
     }
 
-    // Evaluate the backward algorithm
-
-  // Doesn't work on mac, why?
-  //   vector<AlgEl>::const_reverse_iterator it = algorithm.rbegin();
-  //   vector<AlgElData<1> >::const_reverse_iterator it2 = pder1.rbegin();
-  //   for(; it!=algorithm.rend(); ++it, ++it2){
-  //     // copy the seed and clear the cache entry
-  //     double seed = work[1][it->ind];
-  //     work[1][it->ind] = 0;
-  // 
-  //     work[1][it->ch[0]] += it2->d[0] * seed;
-  //     work[1][it->ch[1]] += it2->d[1] * seed;
-  //   }
-  
   for(int i=algorithm.size()-1; i>=0; --i){
     const AlgEl& ae = algorithm[i];
     const AlgElData<1>& aed = pder1[i];

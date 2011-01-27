@@ -197,6 +197,24 @@ int CRSSparsity::getNZ(int i, int j) const{
   return -1;
 }
 
+std::vector<int> CRSSparsity::getNZ(std::vector<int> ii, std::vector<int> jj) const{
+  std::vector<int> ret;
+  for(vector<int>::const_iterator it=ii.begin(); it!=ii.end(); ++it){
+    int el=rowind(*it);
+    for(vector<int>::const_iterator jt=jj.begin(); jt!=jj.end(); ++jt){
+      // Continue to the non-zero element
+      for(; el<rowind(*it+1) && col(el)<*jt; ++el){}
+      
+      // Add the non-zero element, if there was an element in the location exists
+      if(el<rowind(*it+1) && col(el)== *jt)
+        ret.push_back(el);
+      else
+        ret.push_back(-1);
+    }
+  }
+  return ret;
+}
+
 int CRSSparsity::sizeU() const{
   int nnz = 0;
   for(int r=0; r<size1(); ++r){
@@ -210,8 +228,8 @@ int CRSSparsity::sizeU() const{
 int CRSSparsity::sizeL() const{
   int nnz = 0;
   for(int r=0; r<size1(); ++r){
-    for(int el = rowind(r); el < rowind(r+1); ++el){
-      nnz += col(el)<=r;
+    for(int el = rowind(r); el < rowind(r+1) && col(el)<=r; ++el){
+      nnz ++;
     }
   }
   return nnz;
