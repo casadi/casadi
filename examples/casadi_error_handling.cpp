@@ -1,3 +1,6 @@
+// Uncomment this line to compile without error handling
+//#define CASADI_NDEBUG
+
 #include <casadi/casadi_exception.hpp>
 
 bool bad_test(){
