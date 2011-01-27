@@ -15,6 +15,22 @@ bool bad_test2(){
   return true;
 }
 
+bool bad_test3(){
+  // This will fail
+  casadi_assert(bad_test2());
+  
+  // Returns true, but the code won't reach this place
+  return true;
+}
+
+bool bad_test4(){
+  // This will fail
+  casadi_assert(bad_test3());
+  
+  // Returns true, but the code won't reach this place
+  return true;
+}
+
 int main(){
   
   // Warning
@@ -27,7 +43,7 @@ int main(){
   casadi_assert_warning(1==0, "I am telling you, it WILL fail.");
   
   // Recursive error
-  casadi_assert(bad_test2());
+  casadi_assert(bad_test4());
 
   return 0;
 }
