@@ -91,6 +91,10 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(double val);
 
     /// Construct from a vector
+    /**
+    * Thanks to implicit conversion, you can pretend that Matrix(const SX& x); exists.
+    * Note: above remark applies only to C++, not python or octave interfaces
+    */
     Matrix(const std::vector<T>& x);
     
     /// Construct dense matrix from a vector with the elements in column major ordering
