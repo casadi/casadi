@@ -129,7 +129,7 @@ public:
   const IntegratorInternal* operator->() const;
   
   /// Reset the solver and bring the time back to t0 
-  void reset(int fsens_order, int asens_order=0);
+  void reset(int fsens_order=0, int asens_order=0);
 
   /// Integrate until a specified time point 
   void integrate(double t_out);
