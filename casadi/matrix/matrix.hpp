@@ -693,7 +693,7 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
  stream << "]";
  // print the rest of the rows
  for(int i=1; i<size1(); i++){  
-    stream << ",("; 
+    stream << ",["; 
     stream << (*this)(i,0);
     for(int j=1; j<size2(); j++){
       stream << "," << (*this)(i,j);
