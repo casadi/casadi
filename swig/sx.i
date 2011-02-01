@@ -27,24 +27,6 @@
 
 namespace CasADi {
   %extend Matrix<double> {
-    %pythoncode %{
-    def toArray(self):
-      import numpy as n
-      r = n.array((),dtype=float)
-      r.resize(self.size1(),self.size2())
-      for i in range(self.size1()):  # loop over rows
-        for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
-          j=self.col(el)  # column
-          r[i,j] = self[el] # add the non-zero element
-
-      return r
-    %}
-        
-    %pythoncode %{
-    def toMatrix(self):
-      import numpy as n
-      return n.matrix(self.toArray())
-    %}
     
     %pythoncode %{
     def __getitem__(self,s):

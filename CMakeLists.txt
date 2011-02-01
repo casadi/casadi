@@ -7,7 +7,7 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_IPOPT "Compile the Ipopt interface" ON)
 # option(WITH_ACADO "Compile the ACADO interface" ON)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
-# option(WITH_NUMPY "Include the Python Numpy interface" ON)
+option(WITH_NUMPY "Include the Python Numpy interface" ON)
 option(WITH_JIT "Enable just-in-time compilation" OFF)
 
 # For code optimization

@@ -9,6 +9,7 @@
 #! s.t         g_L <= g(x) <= g_U
 #! x_L <= x    <= x_U
 from numpy import *
+import numpy as n
 from casadi import *
 #! Let's solve a simple scalar non-linear program:
 
@@ -16,17 +17,17 @@ x = SX("x")
 
 y = SX("y")
 
-f  = SXFunction([x,y], tan(x)-1) 
+#f  = SXFunction([x,y], tan(x)-1) 
 
-g=SXFunction([x,y],y)
+#g=SXFunction([x,y],y)
 
-print f.eval(x)
+#print f.eval(x)
 #! Quadractic program
 #! ------------------
 #! (Ab)using Ipopt to do a simple quadratic problem
 #!
 #! 
-P = eye(5)
+P = n.eye(5)
 A = diag([2.0,1,4,10,-2])
 q = [1,0,0,0,0]
 b = [1,1,1,1,1]
@@ -39,16 +40,16 @@ A = MX(list(A.ravel()),5,5)
 # Objective function
 F = 0.5*prod(prod(trans(X),P),X) + prod(trans(q),X)
 
-f = MXFunction(X,F)
+f = MXFunction([X],[F])
 f.setOption("ad_order",1)
 f.init()
 f.setInput([1,1,1,1,1])
 f.evaluate()
 #! Test the objective for some value of x:
-print f.getOutputData()
+print f.output().toArray()
 
 # constraint function
-g = MXFunction(X,prod(A,X))
+g = MXFunction([X],[X])
 g.setOption("ad_order",1)
 g.init()
 
@@ -69,5 +70,5 @@ solver.setInput([-100,-100,-100,-100,-100],NLP_LBG)
 
 
 solver.solve()
-print solver.getOutputData(NLP_X_OPT)
+print solver.getOutput(NLP_X_OPT)
 #! Nested optimization

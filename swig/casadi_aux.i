@@ -29,3 +29,4 @@ namespace CasADi {
     void setOption(const std::string &name, double val){$self->setOption(name,val);} 
   }
 } // namespace CasADi
+

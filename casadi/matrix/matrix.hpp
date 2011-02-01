@@ -372,6 +372,11 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<T>& val, Sparsity sp=SPARSE) const;
 
+#ifdef SWIG
+    %rename(get) getArray;
+    %rename(set) setArray;
+#endif
+
     /** \brief  Get the non-zero elements, array */
     void getArray(T* val, int len, Sparsity sp=SPARSE) const;
 

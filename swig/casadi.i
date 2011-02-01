@@ -127,11 +127,21 @@ namespace CasADi{
 
 #ifdef WITH_NUMPY
 #warning "Using numpy. option(WITH_NUMPY = ON)"
+%{
+#define SWIG_FILE_WITH_INIT
+%}
+// Get the NumPy typemaps
 %include "numpy.i"
+%init %{
+  import_array();
+%}
 #endif
 
 // Auxilliary casadi functions
 %include "casadi_aux.i"
+
+// Matrix typemaps class
+%include "matrixtypemaps.i"
 
 // SX class
 %include "sx.i"

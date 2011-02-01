@@ -787,6 +787,4 @@ MTT_INST(T,isEqual) \
 
 #endif //SWIG
 
-
-
 #endif // MATRIX_TOOLS_HPP

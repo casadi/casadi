@@ -24,7 +24,10 @@ class casadiTestCase(unittest.TestCase):
       name - a descriptor that will be included in error messages
       
       """
-      zr=array(zr,ndmin=2)
+      if not(hasattr(zr,'shape')):
+        zr=array([[zr]])
+      if len(zr.shape)==1:
+        zr=array(zr,ndmin=2).T
       self.assertEqual(zt.shape[0],zr.shape[0],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
       self.assertEqual(len(zt.shape),len(zr.shape),"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
       self.assertEqual(zt.shape[1],zr.shape[1],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
