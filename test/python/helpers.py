@@ -1,6 +1,7 @@
 from casadi import *
 from numpy import *
 import unittest
+import sys
 
 class FunctionPool:
   def __init__(self):
@@ -13,6 +14,9 @@ class FunctionPool:
     self.names.append(name)
 
 class casadiTestCase(unittest.TestCase):
+  def message(self,s):
+      print s
+      sys.stdout.flush()
   def checkarray(self,zr,zt,name):
       """
       Checks for equality of two numpy matrices.

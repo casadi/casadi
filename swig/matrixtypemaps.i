@@ -8,6 +8,13 @@
 namespace CasADi{
 %extend Matrix<double> {
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
+
+%pythoncode %{
+    @property
+    def shape(self):
+        return (self.size1(),self.size2())
+%}
+
 %pythoncode %{
   def toArray(self):
     import numpy as n
@@ -15,11 +22,21 @@ namespace CasADi{
     self.get(r)
     return r
 %}
+
+%pythoncode %{
+  def __array__(self,dtype=None):
+    import numpy as n
+    if isinstance(dtype,n.double) or dtype is None:
+      return self.toArray()
+    else:
+      return n.array(self.toArray(),dtype=dtype)
+%}
+
 // Can this be done in C?
 %pythoncode %{
   def toMatrix(self):
     import numpy as n
-    return n.matrix(self.getArray())
+    return n.matrix(self.toArray())
 %}
 
 %pythoncode %{
@@ -37,7 +54,7 @@ namespace CasADi{
   def toCsr_matrix(self):
     import numpy as n
     from scipy.sparse import csr_matrix
-    return csr_matrix( (self,self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
+    return csr_matrix( (list(self),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
 %}
 };
 }
@@ -131,6 +148,7 @@ namespace CasADi{
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<double> & {
     PyObject* p = $input;
+    // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
     if ((is_array(p) && array_numdims(p)==2) || PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) {
 	$1=1;
     } else {

@@ -16,15 +16,16 @@ f  = SXFunction([[x,y],[u]], [[(1-y*y)*x-y+u,x]])
 #! f(time;states;parameters)
 t = SX("t")
 fmod = ODE_NUM_IN * [[]]
-fmod[ODE_T] = SXMatrix(t)
-fmod[ODE_Y] = f.getArgumentIn(0)
-fmod[ODE_P] = f.getArgumentIn(1)
+fmod[ODE_T] = SXMatrix([t])
+fmod[ODE_Y] = f.inputSX(0)
+fmod[ODE_P] = f.inputSX(1)
 print fmod
-fmod=SXFunction(fmod,[f.getArgumentOut(0)])
+fmod=SXFunction(fmod,[f.outputSX(0)])
 fmod.setOption("name","ODE right hand side")
 fmod.setOption("ad_order",1)
 #! Create the CVodesIntegrator
 integrator = CVodesIntegrator(fmod)
+#! The whole series of sundials options are available for the user
 integrator.setOption("ad_order",1)
 integrator.setOption("fsens_err_con",True)
 integrator.setOption("quad_err_con",True)
@@ -52,39 +53,68 @@ integrator.init()
 print isinstance(integrator,FX)
 print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
+#! The output of Integrator is the state at the end of integration.
+#! There are two basic mechanisms two retrieve the whole trajectory of states:
+#!  - method A, using reset + integrate
+#!  - method B, using Simulator
+#!
+#! We demonstrate first method A:
 tend=10
 ts=linspace(0,tend,100)
 x0 = 0;y0 = 1
-integrator.setInput(0,INTEGRATOR_T0);   
-integrator.setInput([x0,y0],INTEGRATOR_X0);
-integrator.setInput(0,INTEGRATOR_P); 
-
+integrator.input(INTEGRATOR_T0).set(0)
+integrator.input(INTEGRATOR_TF).set(tend)
+integrator.input(INTEGRATOR_X0).set([x0,y0])
+integrator.input(INTEGRATOR_P).set(0)
+integrator.evaluate()
+integrator.reset(0)
+	
 #! Define a convenience function to acces x(t)
 def out(t):
-	integrator.setInput(t,INTEGRATOR_TF);
-	integrator.evaluate()
-	return integrator.getOutputData()
+	integrator.integrate(t)
+	return integrator.output().toArray()
+	
 
-sol = array(map(out,ts))
+sol = array([out(t) for t in ts]).squeeze()
+	
+#! Plot the trajectory
 figure()
 plot(sol[:,0],sol[:,1])
 title('Van der Pol phase space')
 xlabel('x')
 ylabel('y')
 show()
+
+#! We demonstrate method B:
+sim=Simulator(integrator,ts)
+sim.init()
+sim.input(SIMULATOR_X0).set([x0,y0])
+sim.input(SIMULATOR_P).set(0)
+sim.evaluate()
+
+sol2 = sim.output().toArray()
+#! sol and sol2 are exactly the same
+print linalg.norm(sol-sol2)
+
 #! Sensitivity for initial conditions
 #! ------------------------------------
 #$ Let's see how a perturbation $\delta x(0)$ on the initial state $x(0)=x'(0) + \delta x(0)$
 #$ affects the solution at tend $x(tend)=x'(tend)+\delta x(tend)$.
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
+
+integrator.input(INTEGRATOR_T0).set(0)
+integrator.input(INTEGRATOR_TF).set(tend)
+
 def out(dx0):
-	integrator.setInput([x0+dx0,y0],INTEGRATOR_X0)
+	integrator.input(INTEGRATOR_X0).set([x0+dx0,y0])
 	integrator.evaluate()
-	return integrator.getOutputData()
+	return integrator.output().toArray()
 dx0=linspace(-2,2,100)
 
-out = array(map(out,dx0))
+out = array([out(dx) for dx in dx0]).squeeze()
+	
 dxtend=out[:,0]-sol[-1,0]
+
 figure()
 plot(dx0,dxtend)
 grid()
@@ -95,11 +125,10 @@ show()
 #$ By definition, this mapping goes through the origin. In the limit of $dx0 \to 0$, this map is purely linear. The slope at the origin is exactly what we call 'sensitivity'
 #
 
-integrator.setInput([x0,y0],INTEGRATOR_X0)
-integrator.setFwdSeed([1,0],INTEGRATOR_X0)
+integrator.input(INTEGRATOR_X0).set([x0,y0])
+integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
 integrator.evaluate(1,0)
-A = integrator.getFwdSens()[0]
-print A
+A = integrator.fwdSens()[0]
 plot(dx0,A*dx0)
 legend(('True sensitivity','Linearised sensitivity'))
 plot(0,0,'o')
@@ -108,14 +137,14 @@ show()
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
 def out(t):
-	integrator.setInput(t,INTEGRATOR_TF);
-	integrator.setFwdSeed([1,0],INTEGRATOR_X0)
+	integrator.input(INTEGRATOR_TF).set(t);
+	integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
 	integrator.evaluate(1,0)
-	A=integrator.getFwdSens()
-	integrator.setFwdSeed([0,1],INTEGRATOR_X0)
+	A=integrator.fwdSens().toArray()
+	integrator.fwdSeed(INTEGRATOR_X0).set([0,1])
 	integrator.evaluate(1,0)
-	B=integrator.getFwdSens()
-	return array([A,B]).T
+	B=integrator.fwdSens().toArray()
+	return array([A,B]).squeeze().T
 
 circle = array([[sin(x),cos(x)] for x in linspace(0,2*pi,100)]).T
 
@@ -129,6 +158,18 @@ for i in range(10):
 	
 show()
 
+
+#J=integrator.jacobian(INTEGRATOR_X0,0)
+#print J
+#print type(J)
+#J.setOption("ad_order",1)
+#J.init()
+#J.input(INTEGRATOR_T0).set(0)
+#J.input(INTEGRATOR_TF).set(tend)
+#J.input(INTEGRATOR_X0).set([x0,y0])
+#J.input(INTEGRATOR_P).set(0)
+#J.evaluate()
+#print J.output().toArray()
 
 #! The figure reveals that perturbations perpendicular to the phase space trajectory shrink.
 
@@ -152,7 +193,7 @@ f.init()
 def out(u):
 	f.setInput(u)
 	f.evaluate()
-	return f.getOutputData()
+	return f.output().toArray()
 
 print out(0)
 print out(1)
@@ -160,7 +201,7 @@ print out(1)
 #! Let's plot the results
 uv=linspace(-1,1,100)
 
-out = array(map(out,uv))
+out = array([out(i) for i in uv]).squeeze()
 figure()
 plot(uv,out)
 grid()

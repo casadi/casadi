@@ -45,7 +45,7 @@ class SXtests(casadiTestCase):
   def test_gradient(self):
       x=symbolic("x");
       x0=1;
-      p=10 # increase to 20 to showcase ticket #56
+      p=3 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
       dxr=p;
@@ -62,7 +62,7 @@ class SXtests(casadiTestCase):
       x=symbolic("x");
       p=symbolic("p");
       x0=1;
-      p0=10 # increase to 20 to showcase ticket #56
+      p0=3 # increase to 20 to showcase ticket #56
       y=x**p;
       dx=jacobian(y,x);
       #print dx

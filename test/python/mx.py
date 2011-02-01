@@ -60,11 +60,13 @@ class MXtests(unittest.TestCase):
     pass
 
   def test_MX1(self):
+    self.message("MX constructor")
     x = MX("x",2,3)
     self.assertEqual(x.size1(),2,"MX fails to indicate its size1")
     self.assertEqual(x.size2(),3,"MX fails to indicate its size2")
 
   def test_MXvertcat(self):
+    self.message("MX vertcat")
     x = MX("x",1,3)
     y = MX("y",1,3)
     z=vertcat((x,y))
@@ -72,6 +74,7 @@ class MXtests(unittest.TestCase):
     self.assertEqual(z.size2(),3,"MX fails to indicate its size2")
 
   def test_MXindices(self):
+    self.message("MX simple indexing")
     x = MX("x",2,3)
     for i in range(2):
       for j in range(3):
@@ -85,6 +88,7 @@ class MXtests(unittest.TestCase):
     #u = U.getRow(1) # NOTE: the correct syntax should be U[1,:], there is a workaround that allow this, but it is not yet supported in C++
 
   def test_MXfunction1(self):
+    self.message("MXFunction single input, single output")
     # check if x->2*x
     # evaluates correctly for x=3
     x = MX("x")
@@ -103,6 +107,7 @@ class MXtests(unittest.TestCase):
     self.assertAlmostEqual(y, 2*3,10)
 
   def test_MXfunction2(self):
+    self.message("MXFunction multi input, multi output")
       # check if [x,y]->[y+x,y*x]
     # evaluates correctly for x=3,y=7
     x = MX("x")
@@ -131,6 +136,7 @@ class MXtests(unittest.TestCase):
 
 
   def test_MXfunction3(self):
+    self.message("MXFunction single input, multi output (1)")
     # check if [x,y]->[y+x,y*x]
     # evaluates correctly for x=3,y=7
     # now with single input, multi output
@@ -155,6 +161,7 @@ class MXtests(unittest.TestCase):
     self.assertAlmostEqual(z1, 10,10)
 
   def test_MXfunction3b(self):
+    self.message("MXFunction single input, multi output (2)")
     # check if [x,y]->[y+x,y*x]
     # evaluates correctly for x=3,y=7
     # now with single input, multi output
@@ -184,6 +191,7 @@ class MXtests(unittest.TestCase):
     self.assertAlmostEqual(z1, 10,10)
 
   def test_MXfunction4(self):
+    self.message("MXFunction single input, single output , using vertcat")
     # check if [x,y]->[y+x,y*x]
     # evaluates correctly for x=3,y=7
     # now with single input, single output
@@ -207,6 +215,7 @@ class MXtests(unittest.TestCase):
     self.assertAlmostEqual(z1, 10,10)
 
   def test_MXfunction5(self):
+    self.message("MXFunction single input, single output , using horzcat")
     # check if [x,y]->[y+x,y*x]
     # evaluates correctly for x=3,y=7
     # now with single input, single output
@@ -260,6 +269,7 @@ class MXtests(unittest.TestCase):
       #self.assertAlmostEqual(L[i], zt[i],10)
         
   def test_MXorder(self):
+    self.message("MXFunction order of non-zero elements")
     x = MX("x",2,3)
     f = MXFunction([x],[x])
     self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
@@ -278,6 +288,7 @@ class MXtests(unittest.TestCase):
         self.assertAlmostEqual(Lr[i,j], zt[i,j],10)
     
   def test_MXtrans(self):
+    self.message("trans(MX)")
     x = MX("x",2,3)
     z=trans(x)
     self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
@@ -298,6 +309,7 @@ class MXtests(unittest.TestCase):
         self.assertAlmostEqual(Lr[i,j], ztr[j,i],10)
     
   def test_MXflatten(self):
+    self.message("trans(MX)")
     x = MX("x",2,3)
     z=flatten(x)
     self.assertEqual(z.size1(),6,"Flatten returns MX of wrong dimension")
@@ -315,6 +327,7 @@ class MXtests(unittest.TestCase):
       
     
   def test_MXreshape(self):
+    self.message("reshape(MX)")
     x = MX("x",2,3)
     z=c.reshape(x,(1,6))
     self.assertEqual(z.size1(),1,"Flatten returns MX of wrong dimension")
@@ -331,6 +344,7 @@ class MXtests(unittest.TestCase):
       self.assertAlmostEqual(L[i], zt[0,i],10)
   
   def test_MXcompose(self):
+    self.message("compositions of flatten, trans, reshape with vertcat")
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')
     checkMXoperations(self,lambda x: trans(x),lambda x: x.T,'trans(vertcat)')
     checkMXoperations(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(vertcat))')
@@ -341,6 +355,7 @@ class MXtests(unittest.TestCase):
     checkMXoperations(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
 
   def test_MXcompose2(self):
+    self.message("compositions of flatten, trans, reshape with horzcat")
     checkMXoperations2(self,lambda x: x,lambda x: x,'horzcat')
     checkMXoperations2(self,lambda x: trans(x),lambda x: x.T,'trans(horzcat)')
     checkMXoperations2(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(horzcat))')
@@ -351,6 +366,7 @@ class MXtests(unittest.TestCase):
     checkMXoperations2(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
 
   def test_MXcompose3(self):
+    self.message("compositions of flatten, trans, reshape with vertcat")
     checkMXoperations3(self,lambda x: x,lambda x: x,'snippet')
     checkMXoperations3(self,lambda x: trans(x),lambda x: x.T,'trans(snippet)')
     checkMXoperations3(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(snippet))')
