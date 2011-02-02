@@ -28,17 +28,30 @@ class casadiTestCase(unittest.TestCase):
       name - a descriptor that will be included in error messages
       
       """
-      if not(hasattr(zr,'shape')):
+      if isinstance(zr,tuple):
+        zr=array([list(zr)])
+      if isinstance(zt,tuple):
+        zt=array([list(zt)])
+      if not(hasattr(zt,'shape')) or len(zt.shape)==0:
+        zt=array([[zt]])
+      if not(hasattr(zr,'shape')) or len(zr.shape)==0:
         zr=array([[zr]])
       if len(zr.shape)==1:
         zr=array(zr,ndmin=2).T
-      self.assertEqual(zt.shape[0],zr.shape[0],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
-      self.assertEqual(len(zt.shape),len(zr.shape),"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
-      self.assertEqual(zt.shape[1],zr.shape[1],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
-      for i in range(zr.shape[0]):
-        for j in range(zr.shape[1]):
-          self.assertAlmostEqual(zt[i,j],zr[i,j],10,"%s evaluation error. %s <-> %s" % (name, str(zt),str(zr)))
-
+      if len(zt.shape)==1:
+        zt=array(zt,ndmin=2).T
+        
+      try:
+        self.assertEqual(zt.shape[0],zr.shape[0],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
+        self.assertEqual(len(zt.shape),len(zr.shape),"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
+        self.assertEqual(zt.shape[1],zr.shape[1],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
+        for i in range(zr.shape[0]):
+          for j in range(zr.shape[1]):
+            self.assertAlmostEqual(zt[i,j],zr[i,j],10,"%s evaluation error. %s <-> %s" % (name, str(zt),str(zr)))
+      except:
+        print "shape error"
+        print zr, zr.shape
+        print zt, zt.shape
 
   def evaluationCheck(self,yt,yr,x,x0,name=""):
     """ General unit test for checking casadi evaluation against a reference solution.
@@ -69,8 +82,7 @@ class casadiTestCase(unittest.TestCase):
       try:
         f.input(i).set(x0[i])
       except Exception as e:
-         #print f.input(i).shape
-         #raise e
+         print f.input(i).shape
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
     zt = f.output(0).toArray()
@@ -87,7 +99,16 @@ class casadiTestCase(unittest.TestCase):
         
         name - a descriptor that will be included in error messages
     """
-    self.evaluationCheck([ft(x)],fr(x0),x,x0,name)
+    fx=None
+    frx=None
+    try:
+      fx=ft(x)
+      frx=fr(x0)
+    except Exception as e:
+      print "Error calling functions in %s" % name
+      raise e
+    self.evaluationCheck([fx],frx,x,x0,name)
+
   
   def numpyEvaluationCheckPool(self,pool,x,x0,name=""):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""

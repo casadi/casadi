@@ -50,13 +50,14 @@ public:
   /// Default constructor
   SXFunction();
 
-  /// Multiple (vector valued) input, multiple (vector valued) output 
-  SXFunction(const std::vector< std::vector<SX> >& arg, const std::vector< std::vector<SX> >& res);
-
   /// Multiple (matrix valued) input, multiple (matrix valued) output 
   SXFunction(const std::vector< SXMatrix>& arg, const std::vector<SXMatrix>& res);
 
 #ifndef SWIG
+
+  /// Multiple (vector valued) input, multiple (vector valued) output 
+  SXFunction(const std::vector< std::vector<SX> >& arg, const std::vector< std::vector<SX> >& res);
+
   /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output  
   SXFunction(const SXMatrix& arg, const SXMatrix& res);
 

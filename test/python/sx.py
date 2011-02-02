@@ -31,7 +31,7 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
     #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: c.prod(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"prod(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: c.dot(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
@@ -44,6 +44,7 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarSX")
       
   def test_gradient(self):
+      self.message("jacobian of SX**number")
       x=symbolic("x");
       x0=1;
       p=3 # increase to 20 to showcase ticket #56
@@ -60,6 +61,7 @@ class SXtests(casadiTestCase):
       self.evaluationCheck([y],dxr,[x],x0,name="recursive jacobian");
 
   def test_gradient2(self):
+      self.message("jacobian of SX**SX")
       x=symbolic("x");
       p=symbolic("p");
       x0=1;
@@ -78,6 +80,7 @@ class SXtests(casadiTestCase):
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
   def test_SXMatrix(self):
+      self.message("SXMatrix unary operations")
       x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
@@ -86,16 +89,17 @@ class SXtests(casadiTestCase):
       x=symbolic("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(c.det(x[0])), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
+      self.numpyEvaluationCheck(lambda x: SXMatrix([c.det(x[0])]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
         
   def test_SXMatrixbinary(self):
+      self.message("SXMatrix binary operations")
       x=symbolic("x",3,2)
       y=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
-      self.assertRaises(RuntimeError, lambda : c.prod(x,y))
+      self.assertRaises(RuntimeError, lambda : c.dot(x,y))
       
   #def test_SXMatrixslicing(self):
       #x=symbolic("x",3,2)
@@ -121,21 +125,15 @@ class SXtests(casadiTestCase):
       #self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
       #self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
       
-  def test_SXMAtrixSparse(self):
+  def test_SXMatrixSparse(self):
+      self.message("SXMatrix sparse")
       x=symbolic("x",3,2)
-      print (x.size1(),x.size2())
+
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
-      print "let's have it"
-      f = SXFunction([x],[sqrt(x)])
-      print ".. had it"
-      f.init()
-      print f.input().shape
-      print f.output().shape
-      f.input().set(x0)
-      pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
-      self.numpyEvaluationCheckPool(pool,[x],x0,name="SXMatrix_sparse")
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix_sparse")
   
   def test_SX1(self):
+    self.message("SXFunction evaluation")
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
     x=SX("x")
     y=SX("y")
@@ -153,13 +151,11 @@ class SXtests(casadiTestCase):
     J.init()
     J.setInput(L)
     J.evaluate()
-    J=J.output(0).toArray()
     Jr=matrix([[1,1],[3,2],[4,27]])
-    for i in range(3):
-        for j in range(2):
-          self.assertAlmostEqual(J[i,j], Jr[i,j],10,'SXfunction jacobian in correct')
+    self.checkarray(J.output(0),Jr,"SXfunction jacobian evaluates incorrectly")
           
   def test_SX2(self):
+    self.message("SXFunction evalution + forward and adjoint seeds")
     fun = lambda x,y: [3-sin(x*x)-y, sqrt(y)*x]
     # variables
     x = SX("x")
@@ -174,7 +170,7 @@ class SXtests(casadiTestCase):
     fcn.setOption("name","f")
     fcn.setOption("ad_order",1)
 
-    self.assertEqual(str(fcn),'sx function("f")','SX representation is wrong')
+    self.assertEqual(repr(fcn),'f','SX representation is wrong')
     # Initialize the function for numerical calculations
     fcn.init()
 
@@ -223,7 +219,31 @@ class SXtests(casadiTestCase):
     # evaluate symbolically
     fsubst = fcn.eval([[1-y,1-x]])
     #print "fsubst = ", fsubst
-      
+    
+  def test_SXFunctionc(self):
+    self.message("SXFunction constructors")
+    x=SX("x")
+    y=symbolic("y",2,3)
+    f=SXFunction(([x,x,x],[x,x,x,x]),[[x]])
+    self.checkarray(f.input(0).shape,(3,1),"SXFunction constructors")
+    self.checkarray(f.input(1).shape,(4,1),"SXFunction constructors")
+    self.checkarray(f.output(0).shape,(1,1),"SXFunction constructors")
+    
+    f=SXFunction(((x,x),(x,x)),[(x,x)])
+    self.checkarray(f.input(0).shape,(2,1),"SXFunction constructors")
+    self.checkarray(f.input(1).shape,(2,1),"SXFunction constructors")
+    self.checkarray(f.output(0).shape,(2,1),"SXFunction constructors")
+    
+    f=SXFunction([y],[y])
+    self.checkarray(f.input(0).shape,(2,3),"SXFunction constructors")
+    self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
+    
+    f=SXFunction([y,[x,x]],[y,y])
+    self.checkarray(f.input(0).shape,(2,3),"SXFunction constructors")
+    self.checkarray(f.input(1).shape,(2,1),"SXFunction constructors")
+    self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
+    self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
+    
 if __name__ == '__main__':
     unittest.main()
 
