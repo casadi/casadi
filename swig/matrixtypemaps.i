@@ -24,12 +24,28 @@ namespace CasADi{
 %}
 
 %pythoncode %{
-  def __array__(self,dtype=None):
+  def __array_wrap__(self,*args,**kwargs):
+    fun=getattr(self, args[1][0].__name__)
+    return fun()
+%}
+
+// The following code has some trickery to fool numpy ufunc.
+// Normally, because of the presence of __array__, an ufunctor like nump.sqrt
+// will unleash its activity on the output of __array__
+// However, we wish DMatrix to remain a DMatrix
+// So when we receive a call from a functor, we return a dummy empty array
+// and return the real result during the postprocessing of the functor.
+%pythoncode %{
+  def __array__(self,*args,**kwargs):
     import numpy as n
-    if isinstance(dtype,n.double) or dtype is None:
-      return self.toArray()
+    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
+      return n.array([])
     else:
-      return n.array(self.toArray(),dtype=dtype)
+      if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
+        return n.array(self.toArray(),dtype=kwargs["dtype"])
+      else:
+        return self.toArray()
+
 %}
 
 // Can this be done in C?
@@ -271,6 +287,9 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 }
 
 }
+
+
+
 #endif
 
 
