@@ -38,7 +38,6 @@ OCP::OCP(){
 void OCP::repr(ostream &stream) const{
   stream << "Optimal control problem (";
   stream << "#dae = " << dae.size() << ", ";
-  stream << "#ae = " << ae.size() << ", ";
   stream << "#initeq = " << initeq.size() << ", ";
   stream << "#cfcn = " << cfcn.size() << ", ";
   stream << "#mterm = " << mterm.size() << ", ";
@@ -61,12 +60,6 @@ void OCP::print(ostream &stream) const{
   }
   stream << endl;
 
-  stream << "Algebraic equations" << endl;
-  for(vector<SX>::const_iterator it=ae.begin(); it!=ae.end(); it++){
-    stream << "0 == " << *it << endl;
-  }
-  stream << endl;
-  
   stream << "Initial equations" << endl;
   for(vector<SX>::const_iterator it=initeq.begin(); it!=initeq.end(); it++){
     stream << "0 == " << *it << endl;

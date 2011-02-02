@@ -56,9 +56,6 @@ class OCP : public PrintableObject{
     /// Differential algebraic equations
     std::vector<SX> dae;
     
-    /// Algebraic equations
-    std::vector<SX> ae;
-
     /// Initial equations
     std::vector<SX> initeq;
 
