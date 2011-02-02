@@ -243,6 +243,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Python: set a submatrix
     void setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m);
     
+    /// Set all elements to zero
+    void setZero();
+    
     /** \brief  Make the matrix an dense n-by-m matrix */
     void makeDense(int n, int m, const T& val);
 
@@ -860,6 +863,11 @@ void Matrix<T>::setitem(int k, const T& el){
 }
 
 template<class T>
+void Matrix<T>::setZero(){
+  std::fill(std::vector<T>::begin(),std::vector<T>::end(),0);
+}
+
+template<class T>
 void Matrix<T>::setitem(const std::vector<int> &I, const T&  el){ 
   casadi_assert_message(I.size()==2,"Index vector must be two-dimensional");
   getElementRef(I[0],I[1]) = el;
@@ -1257,7 +1265,7 @@ Matrix<T> Matrix<T>::tan() const{
 
 template<class T>
 Matrix<T> Matrix<T>::arcsin() const{
-  return unary(CasADi::casadi_operators<T>::tan);
+  return unary(CasADi::casadi_operators<T>::asin);
 }
 
 template<class T>
