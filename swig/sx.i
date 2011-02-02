@@ -73,6 +73,12 @@ namespace CasADi {
     Matrix<SX> __rdiv__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
 
     %pythoncode %{
+        @property
+        def shape(self):
+            return (self.size1(),self.size2())
+    %}
+
+    %pythoncode %{
     def toArray(self):
       import numpy as n
       r = n.array((),dtype=object)

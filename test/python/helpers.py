@@ -67,9 +67,11 @@ class casadiTestCase(unittest.TestCase):
       x0=[x0]
     for i in range(len(x0)):
       try:
-        f.setInput(x0[i],i)
-      except:
-         raise Exception("ERROR! Tried to set input with ", x0[i], " which is of type ", type(x0[i]))
+        f.input(i).set(x0[i])
+      except Exception as e:
+         #print f.input(i).shape
+         #raise e
+         raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
     zt = f.output(0).toArray()
     self.checkarray(yr,zt,name)

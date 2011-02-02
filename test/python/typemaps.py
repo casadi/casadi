@@ -15,6 +15,7 @@ class typemaptests(casadiTestCase):
     pass
 
   def test_0(self):
+    self.message("Typemap array -> DMatrix")
     arrays = [array([[1,2,3],[4,5,6]]),array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
     for i in range(len(arrays)):
       m = arrays[i]
@@ -25,6 +26,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt.toCsr_matrix(),"DMatrix(numpy.ndarray).toCsr_matrix()")
       
   def test_1(self):
+    self.message("DMatrix -> DMatrix")
     arrays = [DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])]
     for i in range(len(arrays)):
       m = arrays[i]
@@ -35,6 +37,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt.toCsr_matrix(),"DMatrix(DMatrix).toCsr_matrix()")
    
   def test_2(self):
+    self.message("crs_matrix -> DMatrix")
     arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),
               csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=int )
               ]
@@ -48,6 +51,7 @@ class typemaptests(casadiTestCase):
       
       
   def test_setget(self):
+    self.message("DMatrix set/get")
     data = n.array([3,2.3,8])
     dm=DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
     
@@ -91,6 +95,7 @@ class typemaptests(casadiTestCase):
     self.assertRaises(TypeError,lambda :  dm.get(c))
 
   def test_conversion(self):
+    self.message("DMatrix conversions")
     w = DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     

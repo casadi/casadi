@@ -36,6 +36,7 @@ class SXtests(casadiTestCase):
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
     
+  
   def test_scalarSX(self):
       x=symbolic("x")
       x0=0.738
@@ -122,9 +123,17 @@ class SXtests(casadiTestCase):
       
   def test_SXMAtrixSparse(self):
       x=symbolic("x",3,2)
+      print (x.size1(),x.size2())
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
-      
-      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix_sparse")
+      print "let's have it"
+      f = SXFunction([x],[sqrt(x)])
+      print ".. had it"
+      f.init()
+      print f.input().shape
+      print f.output().shape
+      f.input().set(x0)
+      pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
+      self.numpyEvaluationCheckPool(pool,[x],x0,name="SXMatrix_sparse")
   
   def test_SX1(self):
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
