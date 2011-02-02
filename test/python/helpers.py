@@ -113,4 +113,5 @@ class casadiTestCase(unittest.TestCase):
   def numpyEvaluationCheckPool(self,pool,x,x0,name=""):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""
     for i in range(len(pool.numpyoperators)):
+      print " :%s:%s" % (name,pool.names[i])
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,name="\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)))
