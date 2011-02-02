@@ -117,7 +117,14 @@ public:
   /** \brief Access the algorithm */
   const std::vector<SXAlgEl>& algorithm() const;
 };
-  
+
+#ifdef SWIG
+%extend SXFunction{
+  // Print (why is this not inherited?)
+  std::string __repr__()  { return $self->getRepresentation(); }
+}
+#endif
+
 } // namespace CasADi
 
 #endif // SX_FUNCTION_HPP
