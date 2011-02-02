@@ -116,7 +116,7 @@ class CasadiException : public std::exception{
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x,msg) \
 if((x)==false){ \
-  std::cerr << "CasADi warning: \"" msg "\" (assertion " CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed." << std::endl;\
+  std::cerr << "CasADi warning: \"" msg "\" (assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed." << std::endl;\
 }
 
 // This is for warnings to be issued when casadi is not in release mode

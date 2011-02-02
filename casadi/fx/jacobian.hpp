@@ -51,6 +51,7 @@ public:
 
   /// Const access functions of the node
   const JacobianInternal* operator->() const;
+  
 };
 
 } // namespace CasADi

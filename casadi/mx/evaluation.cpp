@@ -39,6 +39,8 @@ Evaluation* Evaluation::clone() const{
 }
 
 void Evaluation::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  cout << fcn_ << ".call(" << args << ")[" << oind <<  "]";
+  
   stream << fcn_ << ".call(" << args << ")[" << oind <<  "]";
 }
 

@@ -38,11 +38,10 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   setOption("sparse", false);
 
   // make sure that input and output are vectors (not matrices)
-  if(fcn_->input(iind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: input not a vector");
-  if(fcn_->output(oind_).size2() != 1) throw CasadiException("JacobianInternal::JacobianInternal: output not a vector");
+  casadi_assert(fcn_.input(iind_).size2() == 1);
+  casadi_assert(fcn_.output(oind_).size2() == 1);
 
   // get the dimensions
-  
   n_ = fcn_.input(iind_).size1();
   m_ = fcn_.output(oind_).size1();
 
@@ -50,8 +49,6 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   
   output_.resize(1);
   output(0).resize(m_,n_);
-//  output[1] = fcn_->output[oind_];
-
 }
 
 
@@ -84,64 +81,6 @@ void JacobianInternal::init(){
     else
       throw CasadiException("unknown ad mode: " +  getOption("ad_mode").toString());
   }
-
-  sparse_jac_ = getOption("sparse").toBool();
-  
-  // Quick return if dense
-  if(!sparse_jac_){
-    return;
-  }
-  
-  assert(0);
-  throw CasadiException("JacobianInternal::init: sparse deactivated");
-  
-  // Input and output seed vectors
-  std::vector<double>& dir = fcn_.fwdSeed(iind_);
-  std::vector<double>& bdir = fcn_.fwdSens(oind_); // TODO: fix this
-  
-  if(use_ad_fwd_){ // forward AD if less inputs than outputs 
-      assert(0);
-
-      // forward AD in all directions
-      for(int i=0; i<n_; ++i){ // (COLUMN-BY-COLUMN)
-	
-	// Give a seed in the k-th direction
-        fill(dir.begin(),dir.end(),0);
-	dir[i] = numeric_limits<double>::quiet_NaN();
-      
-	// Execute forward AD algorithm
-	fcn_.evaluate(1,0);
-
-	// Save to the result
-	for(int j=0; j<m_; ++j)
-	  if(ISNAN(bdir[j])){
-	    rr_.push_back(j);
-	    cc_.push_back(i);
-	  }
-      }
-      
-    } else { // adjoint AD 
-      // Adjoint AD in all directions
-      for(int j=0; j<m_; ++j){ // (ROW-BY-ROW)
-	// Give a backward seed in the j-th direction
-        fill(bdir.begin(),bdir.end(),0);
-	bdir[j] = numeric_limits<double>::quiet_NaN();
-            
-	// Execute the adjoint AD algorithm
-	fcn_.evaluate(0,1);
-
-	// Save to the result
-	for(int i=0; i<n_; ++i)
-	  if(ISNAN(dir[i])){
-	    rr_.push_back(j);
-	    cc_.push_back(i);
-	  }
-      }
-    }
-
-  // Set the sparsity of the output
-//  output_.at(0).setSparsity(rr_,cc_,elind_);
-    
 }
 
 void JacobianInternal::evaluate(int fsens_order, int asens_order){
@@ -171,16 +110,9 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
         // Save to the result
         int i=ofs+dir;
         const vector<double>& fsens = fcn_.fwdSens(oind_,dir);
-        if(sparse_jac_){
-          while(el<cc_.size() && cc_[el]==i){
-            res2[elind_[el]] = fsens[rr_[el]];
-            el++;
-          }
-          } else {
-            for(int j=0; j<m_; ++j){
-              res2[i+j*n_] = fsens[j];
-            }
-          }
+        for(int j=0; j<m_; ++j){
+          res2[i+j*n_] = fsens[j];
+        }
       }
     }
   } else { // adjoint AD
@@ -201,20 +133,24 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
         // Save to the result
         int j=ofs+dir;
         const vector<double>& asens = fcn_.adjSens(iind_,dir);
-        if(sparse_jac_){
-          while(el<rr_.size() && rr_[el]==j){
-            res2[elind_[el]] = asens[cc_[el]];
-            el++;
-          }
-        } else {
-          for(int i=0; i<n_; ++i){
-            res2[i+j*n_] = asens[i];
-          }
+        for(int i=0; i<n_; ++i){
+          res2[i+j*n_] = asens[i];
         }
       }
     }
   }
 }
+
+// void JacobianInternal::evaluateNew(int fsens_order, int asens_order){
+//   casadi_assert(fsens_order==0);
+//   casadi_assert(asens_order==0);
+//   
+//   // Loop over the seeding directions
+// /*  for(int i=0; i<*/
+//   
+//   
+//   
+// }
 
 
 
@@ -284,23 +220,10 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// void JacobianInternal::compress(){
+//   casadi_assert(isInit());
+//   
+// }
 
 } // namespace CasADi
 

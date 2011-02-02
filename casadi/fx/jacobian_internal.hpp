@@ -50,10 +50,11 @@ class JacobianInternal : public FXInternal{
       /// Initialize
       virtual void init();
   
-      bool sparse_jac_, use_fd_, use_ad_fwd_;
+      /// Compress the number of evaluations using curtis-powel reed seeding
+/*      void compress();*/
+      
+      bool use_fd_, use_ad_fwd_;
   
-      std::vector<int> elind_;
-      std::vector<int> rr_, cc_, rind_;
       std::vector<double> epsilon_; // perturbations
   
       // Dimensions
@@ -68,7 +69,9 @@ class JacobianInternal : public FXInternal{
       // Number of forward directions of the function to be differentiated
       int nadir_fcn_;
       int nfdir_fcn_;
-
+      
+      // Seeding, contains which jacobian row/column is calculated by which component seeding vector
+      std::vector<std::vector<int> > seeding_;
 };
 
 
