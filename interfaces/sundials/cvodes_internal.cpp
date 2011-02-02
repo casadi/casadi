@@ -412,7 +412,7 @@ void CVodesInternal::initAdj(){
       if(flag != CV_SUCCESS) cvodes_error("CVodeCreateB",flag);
       
       // Initialize the backward problem
-      double tB0 = 1.0; // will be overwritten during re-init
+      double tB0 = input(INTEGRATOR_TF)[0];
       flag = CVodeInitB(mem_, whichB_[dir], rhsB_wrapper, tB0, yB0_[dir]);
       if(flag != CV_SUCCESS) cvodes_error("CVodeInitB",flag);
 
