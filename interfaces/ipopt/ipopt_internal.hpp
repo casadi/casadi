@@ -67,7 +67,13 @@ std::map<std::string,opt_type> ops_;
   int get_number_of_nonlinear_variables() const;
   bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;
 
-
+  // Accummulated time since last reset:
+  double t_eval_f_; // time spent in eval_f
+  double t_eval_grad_f_; // time spent in eval_grad_f
+  double t_eval_g_; // time spent in eval_g
+  double t_eval_jac_g_; // time spent in eval_jac_g
+  double t_eval_h_; // time spent in eval_h
+  
 };
 
 } // namespace CasADi

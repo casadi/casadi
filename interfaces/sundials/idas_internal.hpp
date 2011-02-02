@@ -214,9 +214,6 @@ class IdasInternal : public IntegratorInternal{
 
   int fsens_order_, asens_order_;
   
-  // Jacobian of the ODE with respect to the state and state derivatives (separately)
-  FX jacx_, jacxdot_, jacz_;
-  
   // Jacobian of the ODE with respect to the state and state derivatives
   FX jac_;
 

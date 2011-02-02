@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 # Joel Andersson, 2010
 
 # Use CVodes or IDAS
-implicit_integrator = True
+implicit_integrator = False
 
 # test adjoint sensitivities
 with_asens = True
@@ -220,7 +220,7 @@ if not calc_ic:
 integrator.evaluate()
 
 # Save the result
-res0 = integrator.output()
+res0 = DMatrix(integrator.output())
 
 # Perturb in some direction
 if perturb_u:
@@ -238,10 +238,7 @@ integrator.evaluate()
 integrator.printStats()
 
 # Calculate finite difference approximation
-fd = list(integrator.output())
-for i in range(len(fd)):
-  fd[i] -= res0[i]
-  fd[i] /= 0.01
+fd = (integrator.output() - res0) / 0.01
   
 print "unperturbed                     ", res0
 print "perturbed                       ", integrator.output()
@@ -254,7 +251,6 @@ if perturb_u:
 else:
   x0_seed = len(x0)*[0.]
   x0_seed[1] = 1
-  print x0_seed
   integrator.setFwdSeed(x0_seed,INTEGRATOR_X0)
   
 # Reset parameters

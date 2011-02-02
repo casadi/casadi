@@ -23,6 +23,7 @@
 #include "ipopt_internal.hpp"
 #include "ipopt_nlp.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include <ctime>
 
 using namespace std;
 #include <coin/IpIpoptApplication.hpp>
@@ -263,12 +264,22 @@ void IpoptInternal::init(){
 void IpoptInternal::evaluate(int fsens_order, int asens_order){
   assert(fsens_order==0 && asens_order==0);
 
+  // Reset the counters
+  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = 0;
+  
   // Get back the smart pointer
   Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = (Ipopt::SmartPtr<Ipopt::TNLP>*)userclass;
   Ipopt::SmartPtr<Ipopt::TNLP> &uc = *ucptr;
 
   // Ask Ipopt to solve the problem
   Ipopt::ApplicationReturnStatus status = app->OptimizeTNLP(uc);
+  
+  // Write timings
+  cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
+  cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
+  cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
+  cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
+  cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
 
   if (status == Solve_Succeeded)
     std::cout << "*** The problem solved!" << std::endl;
@@ -287,6 +298,7 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
   log("eval_h started");
+  double time1 = clock();
   if (values == NULL) {
     int nz=0;
     vector<int> rowind,col;
@@ -311,6 +323,8 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     // Get results
     H_.output().get(values,SPARSESYM);
   }
+  double time2 = clock();
+  t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
   log("eval_h ok");
   return true;
 }
@@ -318,6 +332,7 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
 bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
   try{
     log("eval_jac_g started");
+    double time1 = clock();
     if (values == NULL) {
       int nz=0;
       vector<int> rowind,col;
@@ -346,6 +361,9 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
       }
     }
     
+    double time2 = clock();
+    t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+    
     log("eval_jac_g ok");
     return true;
   } catch (exception& ex){
@@ -358,6 +376,8 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
 {
   log("eval_f started");
   
+  // Log time
+  double time1 = clock();
   assert(n == n_);
 
   // Pass the argument to the function
@@ -374,6 +394,9 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
     cout << "obj_value = " << obj_value << endl;
   }
 
+  double time2 = clock();
+  t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+
   log("eval_f ok");
   return true;
 }
@@ -381,6 +404,7 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
 bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 {
   log("eval_g started");
+  double time1 = clock();
 
   assert(n == n_);
   assert(m == m_);
@@ -398,6 +422,9 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
   if(monitored("eval_g"))
     cout << "g = " << G_.output() << endl;
     
+  double time2 = clock();
+  t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+  
   log("eval_g ok");
   return true;
 }
@@ -405,6 +432,7 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f)
 {
   log("eval_grad_f started");
+  double time1 = clock();
   assert(n == n_);
   
   // If no gradient function has been provided, use AD adjoint
@@ -443,6 +471,9 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       cout << "grad_f = " << GF_.output() << endl;
     }
   }
+  
+  double time2 = clock();
+  t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
 
   // Check the result for regularity
   for(int i=0; i<n; ++i){

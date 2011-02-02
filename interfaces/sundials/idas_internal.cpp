@@ -224,12 +224,8 @@ void IdasInternal::init(){
     if(exact_jacobian_){
       // Generate jacobians if not already provided
       if(jac_.isNull()){
-        if(jacx_.isNull()) jacx_ = f_.jacobian(DAE_Y,DAE_RES);
-        if(jacxdot_.isNull()) jacxdot_ = f_.jacobian(DAE_YDOT,DAE_RES);
-        if(jacz_.isNull()) jacz_ = f_.jacobian(DAE_Z,DAE_RES);
-        jacx_.init();
-        jacxdot_.init();
-        jacz_.init();
+        getJacobian();
+        jac_.init();
       }
       
       // Pass to IDA
@@ -874,9 +870,8 @@ void IdasInternal::resetAdj(){
   
   int flag;
   // Reset adjoint sensitivities for the parameters
-  if(np_>0)
-    for(int dir=0; dir<nadir_; ++dir)
-      N_VConst(0.0, yBB_[dir]);
+  for(int dir=0; dir<yBB_.size(); ++dir)
+    N_VConst(0.0, yBB_[dir]);
   
   // Get the adjoint seeds
   getAdjointSeeds();
@@ -886,8 +881,10 @@ void IdasInternal::resetAdj(){
       flag = IDAReInitB(mem_, whichB_[dir], tf, yzB_[dir], yPB_[dir]);
       if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
       
-      flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),yBB_[dir]);
-//      flag = IDAQuadReInitB(mem_,whichB_[dir],yBB_[dir]); // BUG in Sundials - do not use this!
+      if(np_>0){
+        flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),yBB_[dir]);
+        // flag = IDAQuadReInitB(mem_,whichB_[dir],yBB_[dir]); // BUG in Sundials - do not use this!
+      }
       if(flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB",flag);
     }
   } else {
@@ -1106,7 +1103,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&output(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1160,7 +1157,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&output(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1187,65 +1184,38 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, 
 }
 
 void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  // NOTE: This function is extra complicated due to the fact that we either have a function that calculates df_dx and df_dxdot together or separately
-  // TODO: Change this when MXFunction becomes more stable
-  
   // Get time
   time1 = clock();
-
-  // Number of jacobian functions
-  int njac = jac_.isNull() ? 2 : 1;
-  casadi_assert(njac!=2);
   
-  // Evaluate the functions and add to the result
-  for(int ijac = 0; ijac<njac; ++ijac){
-    // Jacobian function reference (jac_, jacx_ or jacxdot_)
-    FX& jac = njac==1 ? jac_ : ijac==0 ? jacx_ : jacxdot_;
+  // Pass input to the Jacobian function
+  jac_.setInput(t,JAC_T);
+  jac_.setInput(NV_DATA_S(yz),JAC_Y);
+  jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jac_.setInput(NV_DATA_S(yz)+ny_,JAC_Z);
+  jac_.setInput(input(INTEGRATOR_P),JAC_P);
+  jac_.setInput(cj,JAC_CJ);
     
-    // Pass input to the jacobian function
-    if(njac==1){
-      // if a function calculating df_dx + cj*df_dxdot has been provided
-      jac.setInput(t,JAC_T);
-      jac.setInput(NV_DATA_S(yz),JAC_Y);
-      jac.setInput(NV_DATA_S(yp),JAC_YDOT);
-      jac.setInput(NV_DATA_S(yz)+ny_,JAC_Z);
-      jac.setInput(input(INTEGRATOR_P),JAC_P);
-      jac.setInput(cj,JAC_CJ);
-    } else {
-      // if we need to calculate df_dx and df_dxdot separately
-      jac.setInput(t,DAE_T);
-      jac.setInput(NV_DATA_S(yz),DAE_Y);
-      jac.setInput(NV_DATA_S(yp),DAE_YDOT);
-      jac.setInput(NV_DATA_S(yz)+ny_,DAE_Z);
-      jac.setInput(input(INTEGRATOR_P),DAE_P);
-    }
-    
-    // Evaluate jacobian
-    jac.evaluate();
+  // Evaluate Jacobian
+  jac_.evaluate();
 
-    // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac.output().rowind();
-    const vector<int>& col = jac.output().col();
-    const vector<double>& val = jac.output();
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jac_.output().rowind();
+  const vector<int>& col = jac_.output().col();
+  const vector<double>& val = jac_.output();
 
-    // Factor
-    double c = ijac==0 ? 1 : cj;
+  // Dimension of the Jacobian
+  int jdim = jac_.output().size1();
     
-    // Dimension of the jacobian
-    int jdim = jac.output().size1();
-    
-    // Loop over rows
-    for(int offset=0; offset<ny_; offset += jdim){
-      for(int i=0; i<rowind.size()-1; ++i){
-        // Loop over non-zero entries
-        for(int el=rowind[i]; el<rowind[i+1]; ++el){
-          // Get column
-          int j = col[el];
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
       
-          // Add to the element
-          DENSE_ELEM(Jac,i+offset,j+offset) += c*val[el];
-        }
-      }
+      // Get column
+      int j = col[el];
+      
+      // Add to the element
+      DENSE_ELEM(Jac,i,j) = val[el];
     }
   }
   
@@ -1633,13 +1603,13 @@ FX IdasInternal::getJacobian(){
   SXMatrix jac = horzcat(f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES),f.jac(DAE_Z,DAE_RES));
 
   // Jacobian function
-  vector<vector<SX> > jac_in(JAC_NUM_IN);
-  jac_in[JAC_T] = f->inputv.at(DAE_T);
-  jac_in[JAC_Y] = f->inputv.at(DAE_Y);
-  jac_in[JAC_YDOT] = f->inputv.at(DAE_YDOT);
-  jac_in[JAC_Z] = f->inputv.at(DAE_Z);
-  jac_in[JAC_P] = f->inputv.at(DAE_P);
-  jac_in[JAC_CJ] = vector<SX>(1,cj);
+  vector<Matrix<SX> > jac_in(JAC_NUM_IN);
+  jac_in[JAC_T] = f.inputSX(DAE_T);
+  jac_in[JAC_Y] = f.inputSX(DAE_Y);
+  jac_in[JAC_YDOT] = f.inputSX(DAE_YDOT);
+  jac_in[JAC_Z] = f.inputSX(DAE_Z);
+  jac_in[JAC_P] = f.inputSX(DAE_P);
+  jac_in[JAC_CJ] = cj;
   SXFunction J(jac_in,jac);
       
   // Save function

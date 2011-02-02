@@ -15,6 +15,7 @@ I.setOption("ad_order",1) # enable AD
 I.setOption("abstol",1e-10) # abs. tolerance
 I.setOption("reltol",1e-10) # rel. tolerance
 I.setOption("steps_per_checkpoint",1000)
+I.setOption("stop_at_end",True)
 I.init()
 
 # All controls (use complex, general DAG)
@@ -47,6 +48,7 @@ solver.setOption("tol",1e-5)
 solver.setOption("hessian_approximation", \
                 "limited-memory")
 solver.setOption("max_iter",1000)
+solver.setOption("linear_solver","ma57")
 #solver.setOption("verbose",True)
 solver.init()
 

@@ -46,7 +46,7 @@ enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
 /// Output arguments of an DAE residual function
 enum DAEOutput{DAE_RES, DAE_NUM_OUT};
 
-/// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
+/// Input arguments of a jacobian function: J = [df/dy + cj*df/dydot, df/dz]
 enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_Z, JAC_P, JAC_CJ, JAC_NUM_IN};
 
 /// Output arguments of an DAE residual function

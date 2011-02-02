@@ -41,7 +41,7 @@ using namespace CasADi;
 using namespace CasADi::Sundials;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = false;
+const bool implicit_integrator = true;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -319,7 +319,7 @@ int main(){
   integrator.evaluate();
 
   // Save the result
-  vector<double> res0 = integrator.output();
+  Matrix<double> res0 = integrator.output();
 
   // Perturb in some direction
   if(perturb_u){
@@ -338,19 +338,14 @@ int main(){
   integrator.printStats();
 
   // Calculate finite difference approximation
-  vector<double> fd = integrator.output();
-  for(int i=0; i<fd.size(); ++i){
-    fd[i] -= res0[i];
-    fd[i] /= 0.01;
-  }
+  Matrix<double> fd = (integrator.output() - res0)/0.01;
 
   cout << "unperturbed                     " << res0 << endl;
   cout << "perturbed                       " << integrator.output() << endl;
   cout << "finite_difference approximation " << fd << endl;
 
   if(perturb_u){
-    double u_seed = 1;
-    integrator.setFwdSeed(u_seed,INTEGRATOR_P);
+    integrator.setFwdSeed(1.0,INTEGRATOR_P);
   } else {
     vector<double> x0_seed(x0.size(),0);
     x0_seed[1] = 1;

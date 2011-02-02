@@ -374,7 +374,7 @@ void CVodesInternal::init(){
   // Allocate n-vectors for quadratures
   yQB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
-    //yQB0_[i] = N_VNew_Serial(np_);
+    casadi_assert(adjSens(INTEGRATOR_P,i).size()==np_);
     yQB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i)[0]);
   }
   
@@ -606,7 +606,7 @@ void CVodesInternal::resetAdj(){
       flag = CVodeReInitB(mem_, whichB_[dir], tf, yB0_[dir]);
       if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
 
-      N_VConst(0.0,yQB_[dir]);
+      N_VConst(0.0,yQB_.at(dir));
       flag = CVodeQuadReInitB(mem_,whichB_[dir],yQB_[dir]);
       if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB",flag);
     }
@@ -631,6 +631,7 @@ void CVodesInternal::integrateAdj(double t_out){
 
     flag = CVodeGetQuadB(mem_, whichB_[dir], &tret, yQB_[dir]);
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
+        
   }
 }
 
