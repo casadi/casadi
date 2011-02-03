@@ -29,11 +29,9 @@ acado_in[ACADO_FCN_P] = []      # Parameter
 
 # The DAE function
 ffcn = SXFunction(acado_in,[f])
-ffcn.setOption("ad_order",1)
 
 ## Objective function
 mfcn = SXFunction(acado_in,[[l]])
-mfcn.setOption("ad_order",1)
 
 # Create ACADO solver
 ocp_solver = AcadoInterface(ffcn,mfcn)
@@ -116,7 +114,6 @@ dae_res[1] -= ldot
 
 # The DAE residual function
 dae = SXFunction(dae_in,[dae_res])
-dae.setOption("ad_order",1)
 
 # Create an integrator
 integrator = IdasIntegrator(dae)

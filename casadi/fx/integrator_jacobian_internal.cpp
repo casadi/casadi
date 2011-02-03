@@ -35,10 +35,6 @@ IntegratorJacobianInternal::~IntegratorJacobianInternal(){
 }
 
 void IntegratorJacobianInternal::init(){
-  integrator_.setOption("ad_order",getOption("ad_order"));
-  integrator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
-  integrator_.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
-
   // Initialize the integrator
   integrator_.init();
 

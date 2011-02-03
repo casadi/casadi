@@ -25,13 +25,11 @@ rhs = [sdot,vdot,mdot]
 # ODE right hand side
 ffcn = SXFunction([[t],y,[u]],[rhs])
 ffcn.setOption("name","ODE right hand side")
-ffcn.setOption("ad_order",1)
 
 # Explicit integrator (CVODES)
 integrator = CVodesIntegrator(ffcn)
 
 # Set options
-integrator.setOption("ad_order",1)
 integrator.setOption("fsens_err_con",True)
 integrator.setOption("quad_err_con",True)
 integrator.setOption("abstol",1e-6)

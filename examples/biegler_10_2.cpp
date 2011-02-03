@@ -71,7 +71,6 @@ void get_coeff(int K, vector<vector<double> >& C, vector<double>& D, Collocation
   
     // Lagrange polynomial function
     SXFunction lfcn(tau,L);
-    lfcn.setOption("ad_order",1);
     lfcn.init();
     
     // Get the coefficients of the continuity equation

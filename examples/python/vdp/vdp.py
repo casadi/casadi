@@ -102,19 +102,15 @@ acado_in[ACADO_FCN_XDOT] = toList(var.x,True)
 ffcn_out = list(ocp.dae) + list(ocp.ae)
 
 ffcn = SXFunction(acado_in,[ffcn_out])
-ffcn.setOption("ad_order",1)
 
 # Objective function
 mfcn = SXFunction(acado_in,[ocp.mterm])
-mfcn.setOption("ad_order",1)
 
 # Path constraint function
 cfcn = SXFunction(acado_in,[ocp.cfcn])
-cfcn.setOption("ad_order",1)
   
 # Initial constraint function
 rfcn = SXFunction(acado_in,[ocp.initeq])
-rfcn.setOption("ad_order",1)
 
 # Create ACADO solver
 ocp_solver = AcadoInterface(ffcn,mfcn,cfcn,rfcn)
@@ -126,13 +122,11 @@ dae_in[DAE_Y] = acado_in[ACADO_FCN_XD] + acado_in[ACADO_FCN_XA]
 dae_in[DAE_YDOT] = acado_in[ACADO_FCN_XDOT] + list(create_symbolic("zdot",len(acado_in[ACADO_FCN_XA])))
 dae_in[DAE_P] = acado_in[ACADO_FCN_P] + acado_in[ACADO_FCN_U]
 dae = SXFunction(dae_in,[ffcn_out])
-dae.setOption("ad_order",1)
 
 integrator = IdasIntegrator(dae)
 #integrator.setOption("exact_jacobian",True)
 #integrator.setOption("linear_multistep_method","bdf") # adams or bdf
 #integrator.setOption("nonlinear_solver_iteration","newton") # newton or functional
-integrator.setOption("ad_order",1)
 integrator.setOption("number_of_fwd_dir",4)
 integrator.setOption("number_of_adj_dir",0)
 integrator.setOption("fsens_err_con",True)

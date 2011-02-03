@@ -68,7 +68,6 @@ FX create_integrator(int nj, int nu){
   input[1] = x0;
   SXMatrix output = x;
   SXFunction integrator(input,output);
-  integrator.setOption("ad_order",1);
   integrator.init();
 
 //  integrator->generateCode("rocket.c");

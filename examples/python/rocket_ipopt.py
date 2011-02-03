@@ -82,7 +82,6 @@ def create_integrator_cvodes():
   # ODE right hand side
   ffcn = SXFunction(ffcn_in,[rhs])
   ffcn.setOption("name","ODE right hand side")
-  ffcn.setOption("ad_order",1)
 
   # Explicit integrator (CVODES)
   integrator = CVodesIntegrator(ffcn)
@@ -91,7 +90,6 @@ def create_integrator_cvodes():
   #integrator.setOption("exact_jacobian",True)
   #integrator.setOption("linear_multistep_method","bdf") # adams or bdf
   #integrator.setOption("nonlinear_solver_iteration","newton") # newton or functional
-  integrator.setOption("ad_order",1)
   integrator.setOption("fsens_err_con",True)
   integrator.setOption("abstol",1e-6)
   integrator.setOption("reltol",1e-6)
@@ -139,13 +137,11 @@ def create_integrator_idas():
   # DAE residual function
   ffcn = SXFunction(ffcn_in,[res])
   ffcn.setOption("name","DAE residual")
-  ffcn.setOption("ad_order",1)
   
   # Create an integrator
   integrator = IdasIntegrator(ffcn)
 
   # Set options
-  integrator.setOption("ad_order",1)
   integrator.setOption("calc_ic",True)
   integrator.setOption("is_differential",[1,1,1])
   integrator.setOption("fsens_err_con",True)
@@ -178,7 +174,6 @@ integrator_cvodes = create_integrator_cvodes()
 
 for integrator in [integrator_euler, integrator_cvodes]:
   # Enable AD
-  integrator.setOption("ad_order",1)
 
   # Initialize the integrator
   integrator.init()

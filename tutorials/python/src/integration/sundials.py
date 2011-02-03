@@ -22,11 +22,9 @@ fmod[ODE_P] = f.inputSX(1)
 print fmod
 fmod=SXFunction(fmod,[f.outputSX(0)])
 fmod.setOption("name","ODE right hand side")
-fmod.setOption("ad_order",1)
 #! Create the CVodesIntegrator
 integrator = CVodesIntegrator(fmod)
 #! The whole series of sundials options are available for the user
-integrator.setOption("ad_order",1)
 integrator.setOption("fsens_err_con",True)
 integrator.setOption("quad_err_con",True)
 integrator.setOption("abstol",1e-6)
@@ -162,7 +160,6 @@ show()
 #J=integrator.jacobian(INTEGRATOR_X0,0)
 #print J
 #print type(J)
-#J.setOption("ad_order",1)
 #J.init()
 #J.input(INTEGRATOR_T0).set(0)
 #J.input(INTEGRATOR_TF).set(tend)

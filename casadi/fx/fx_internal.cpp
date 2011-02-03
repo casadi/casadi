@@ -32,13 +32,10 @@ namespace CasADi{
   
 FXInternal::FXInternal(){
   setOption("name",            "unnamed_function"); // name of the function
-  addOption("ad_order",          OT_INTEGER,   0); // use sparse jacobian
   addOption("sparse",            OT_BOOLEAN,   true); // function is sparse
   addOption("number_of_fwd_dir", OT_INTEGER,  1); // number of forward derivatives
   addOption("number_of_adj_dir", OT_INTEGER,  1); // number of adjoint derivatives
   addOption("verbose",           OT_BOOLEAN,   false); // verbose evaluation -- for debugging
-
-  ad_order_ = 0;
   is_init_ = false;
   verbose_ = false;
 }
@@ -47,24 +44,19 @@ FXInternal::~FXInternal(){
 }
 
 void FXInternal::init(){
-  ad_order_ = getOption("ad_order").toInt();
   nfdir_ = getOption("number_of_fwd_dir").toInt();
   nadir_ = getOption("number_of_adj_dir").toInt();
   verbose_ = getOption("verbose").toInt();
 
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
-    if(ad_order_==1){
-      it->dataF.resize(nfdir_);
-      it->dataA.resize(nadir_);
-    }
+    it->dataF.resize(nfdir_);
+    it->dataA.resize(nadir_);
     it->init();
   }
 
   for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
-    if(ad_order_==1){
-      it->dataF.resize(nfdir_);
-      it->dataA.resize(nadir_);
-    }
+    it->dataF.resize(nfdir_);
+    it->dataA.resize(nadir_);
     it->init();
   }
 

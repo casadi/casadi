@@ -41,7 +41,6 @@ A = MX(list(A.ravel()),5,5)
 F = 0.5*prod(prod(trans(X),P),X) + prod(trans(q),X)
 
 f = MXFunction([X],[F])
-f.setOption("ad_order",1)
 f.init()
 f.setInput([1,1,1,1,1])
 f.evaluate()
@@ -50,7 +49,6 @@ print f.output().toArray()
 
 # constraint function
 g = MXFunction([X],[X])
-g.setOption("ad_order",1)
 g.init()
 
 solver = IpoptSolver(f,g)

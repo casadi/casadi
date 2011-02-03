@@ -11,7 +11,6 @@ rhs = SXFunction([[t],[x,y,L],[u]],[f])
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
-I.setOption("ad_order",1) # enable AD
 I.setOption("abstol",1e-10) # abs. tolerance
 I.setOption("reltol",1e-10) # rel. tolerance
 I.setOption("steps_per_checkpoint",1000)

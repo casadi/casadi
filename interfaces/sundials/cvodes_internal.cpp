@@ -145,7 +145,7 @@ void CVodesInternal::init(){
 
   // Quick return if already initialized
   if(is_init){
-    reset(ad_order_,ad_order_);
+    log("CVodesInternal::init","end, Idas already initialized");
     return;
   }
 
@@ -280,9 +280,6 @@ void CVodesInternal::init(){
     }
   }
   
-// Sensitivities
-  if(ad_order_>0){
-
     // Forward sensitivity problem
     if(nfdir_>0){
       // Allocate n-vectors
@@ -395,9 +392,7 @@ void CVodesInternal::init(){
     flag = CVodeAdjInit(mem_, Nd, interpType);
     if(flag != CV_SUCCESS) cvodes_error("CVodeAdjInit",flag);
   }
-      
-  } // ad_order>0
-  
+        
   is_init = true;
   isInitAdj_ = false;
 }
@@ -1316,7 +1311,6 @@ Integrator CVodesInternal::jac(int iind, int oind){
   
   // Create augmented DAE function
   SXFunction ffcn_aug(faug_in,faug);
-  ffcn_aug.setOption("ad_order",1);
   
   // Augmented quadratures
   SXFunction qfcn_aug;
@@ -1340,7 +1334,6 @@ Integrator CVodesInternal::jac(int iind, int oind){
 
     // Create augmented DAE function
     qfcn_aug = SXFunction(qaug_in,qaug);
-    qfcn_aug.setOption("ad_order",1);
   }
   
   // Create integrator instance

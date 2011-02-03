@@ -89,7 +89,6 @@ int main(){
         L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k]);
   
     l[j] = SXFunction(tau,L);
-    l[j].setOption("ad_order",1);
     stringstream ss;
     ss << "l(" << j << ")";
     l[j].setOption("name",ss.str());    

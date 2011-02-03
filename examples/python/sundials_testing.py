@@ -93,11 +93,9 @@ def create_IDAS():
 
   # DAE residual function
   ffcn = SXFunction(ffcn_in,[res])
-  ffcn.setOption("ad_order",1)
   
   # Quadrature function
   qfcn = SXFunction(ffcn_in,[[u_dev]])
-  qfcn.setOption("ad_order",1)
 
   # Create an integrator
   integrator = IdasIntegrator(ffcn,qfcn)
@@ -141,11 +139,9 @@ def create_CVODES():
 
   # DAE residual function
   ffcn = SXFunction(ffcn_in,[rhs])
-  ffcn.setOption("ad_order",1)
   
   # Quadrature function
   qfcn = SXFunction(ffcn_in,[[u_dev]])
-  qfcn.setOption("ad_order",1)
 
   # Create an integrator
   integrator = CVodesIntegrator(ffcn,qfcn)
@@ -183,7 +179,6 @@ if user_defined_solver:
     integrator.setLinearSolver(LapackLUDense(len(y0),len(y0)))
 
 # Set common integrator options
-integrator.setOption("ad_order",1)
 integrator.setOption("fsens_err_con",True)
 integrator.setOption("quad_err_con",True)
 integrator.setOption("abstol",1e-12)
@@ -285,7 +280,6 @@ if second_order:
   intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
 
   # Set options
-  intjac.setOption("ad_order",1)
   intjac.setOption("number_of_fwd_dir",0)
   intjac.setOption("number_of_adj_dir",1)
     

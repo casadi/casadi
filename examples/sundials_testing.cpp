@@ -29,6 +29,7 @@
 #include <casadi/fx/c_function.hpp>
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
+#include "casadi/fx/jacobian.hpp"
 #include <casadi/fx/integrator_internal.hpp>
 #include <interfaces/sundials/idas_internal.hpp>
 
@@ -153,7 +154,6 @@ Integrator create_IDAS(){
 
   // DAE residual function
   FX ffcn = SXFunction(ffcn_in,res);
-  ffcn.setOption("ad_order",1);
 
   // Overwrite ffcn with a plain c function (avoid this!)
   if(plain_c){
@@ -174,7 +174,6 @@ Integrator create_IDAS(){
   
   // Quadrature function
   SXFunction qfcn(ffcn_in,u_dev);
-  qfcn.setOption("ad_order",1);
 
   // Create an integrator
   Sundials::IdasIntegrator integrator(ffcn,qfcn);
@@ -224,7 +223,6 @@ Integrator create_CVODES(){
 
   // DAE residual function
   FX ffcn = SXFunction(ffcn_in,rhs);
-  ffcn.setOption("ad_order",1);
 
   // Overwrite ffcn with a plain c function (avoid this!)
   if(plain_c){
@@ -244,7 +242,6 @@ Integrator create_CVODES(){
   
   // Quadrature function
   SXFunction qfcn(ffcn_in,u_dev);
-  qfcn.setOption("ad_order",1);
 
   // Create an integrator
   Sundials::CVodesIntegrator integrator(ffcn,qfcn);
@@ -283,7 +280,6 @@ int main(){
   }
   
   // Set common integrator options
-  integrator.setOption("ad_order",1);
   integrator.setOption("fsens_err_con",true);
   integrator.setOption("quad_err_con",true);
   integrator.setOption("abstol",1e-12);
@@ -411,20 +407,26 @@ int main(){
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
     IntegratorJacobian intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
+    Jacobian intjac2(integrator,INTEGRATOR_P,INTEGRATOR_XF);
 
     // Set options
-    intjac.setOption("ad_order",1);
     intjac.setOption("number_of_fwd_dir",0);
     intjac.setOption("number_of_adj_dir",1);
     
     // Initialize the integrator
     intjac.init();
+    intjac2.init();
 
     // Set inputs
     intjac.setInput(t0,INTEGRATOR_T0);
     intjac.setInput(tf,INTEGRATOR_TF);
     intjac.setInput(u_init,INTEGRATOR_P);
     intjac.setInput(x0,INTEGRATOR_X0);
+    
+    intjac2.setInput(t0,INTEGRATOR_T0);
+    intjac2.setInput(tf,INTEGRATOR_TF);
+    intjac2.setInput(u_init,INTEGRATOR_P);
+    intjac2.setInput(x0,INTEGRATOR_X0);
     
     // Set adjoint seed
     vector<double> jacseed(4*1);
@@ -433,29 +435,34 @@ int main(){
     
     // Evaluate the Jacobian
     intjac.evaluate(0,1);
+    intjac2.evaluate(0,0);
 
     // Get the results
     cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;
-    cout << "fwd sens via jacobian           " << intjac.output() << endl;
     cout << "second order (fwd-over-adj)     " ;
     cout << intjac.adjSens(INTEGRATOR_X0) << ", ";
     cout << intjac.adjSens(INTEGRATOR_P) << endl;
 
-    vector<double> unpret = intjac.output();
+    // Save the unpreturbed value
+    Matrix<double> unpret = intjac.output();
+    Matrix<double> unpret2 = intjac2.output();
     
     // Perturb X0
     intjac.setInput(u_init+0.01,INTEGRATOR_P);
+    intjac2.setInput(u_init+0.01,INTEGRATOR_P);
 
     intjac.evaluate();
-    vector<double> pret = intjac.output();
+    intjac2.evaluate();
+    Matrix<double> pret = intjac.output();
+    Matrix<double> pret2 = intjac2.output();
     
-    // Finite differences for the sensitivities
-    vector<double> fdsens(pret.size());
-    for(int i=0; i<fdsens.size(); ++i)
-      fdsens[i] = (pret[i]-unpret[i])/0.01;
-    
+    cout << "unperturbed fwd sens            " << unpret << endl;
     cout << "perturbed fwd sens              " << pret << endl;
-    cout << "finite diff. (augmented dae)    " << fdsens << endl;
+    cout << "finite diff. (augmented dae)    " << (pret-unpret)/0.01 << endl;
+    
+    cout << "unperturbed fwd sens 2           " << unpret2 << endl;
+    cout << "perturbed fwd sens 2             " << pret2 << endl;
+    cout << "finite diff. (augmented dae) 2   " << (pret2-unpret2)/0.01 << endl;
     
   }
   

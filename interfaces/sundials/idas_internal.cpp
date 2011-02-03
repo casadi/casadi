@@ -138,7 +138,6 @@ void IdasInternal::init(){
 
   // Quick return if already initialized
   if(is_init){
-    reset(ad_order_,ad_order_);
     log("IdasInternal::init","end, Idas already initialized");
     return;
   }
@@ -303,16 +302,13 @@ void IdasInternal::init(){
   
   log("IdasInternal::init","attached linear solver");
     
- // Sensitivities
- if(ad_order_>0){
-   
-   // Forward sensitivity problem
-   if(nfdir_>0){
-     // Allocate n-vectors
-     yzS_.resize(nfdir_,0);
-     yPS_.resize(nfdir_,0);
-     yQS_.resize(nfdir_,0);
-     for(int i=0; i<nfdir_; ++i){
+    // Forward sensitivity problem
+    if(nfdir_>0){
+      // Allocate n-vectors
+      yzS_.resize(nfdir_,0);
+      yPS_.resize(nfdir_,0);
+      yQS_.resize(nfdir_,0);
+      for(int i=0; i<nfdir_; ++i){
         yzS_[i] = N_VNew_Serial(nyz_);
         yPS_[i] = N_VNew_Serial(nyz_);
       }
@@ -323,7 +319,7 @@ void IdasInternal::init(){
           yQS_[i] = N_VNew_Serial(nq_);
         }
       }
-     
+      
     // Get the sensitivity method
     if(getOption("sensitivity_method")== "simultaneous") ism_ = IDA_SIMULTANEOUS;
     else if(getOption("sensitivity_method")=="staggered") ism_ = IDA_STAGGERED;
@@ -336,7 +332,7 @@ void IdasInternal::init(){
 
     // Initialize forward sensitivities
     if(finite_difference_fsens_){
-     
+      
       // Use finite differences to calculate the residual in the forward sensitivity equations
       flag = IDASensInit(mem_,nfdir_,ism_,0,&yzS_[0],&yPS_[0]);
       if(flag != IDA_SUCCESS) idas_error("IDASensInit",flag);
@@ -441,7 +437,6 @@ void IdasInternal::init(){
       if(flag != IDA_SUCCESS) idas_error("IDAAdjInit",flag);
   }
   log("IdasInternal::init","initialized adjoint sensitivities");
- } // ad_order>0
  
  is_init = true;
  isInitAdj_ = false;
@@ -1500,7 +1495,6 @@ Integrator IdasInternal::jac(int iind, int oind){
   
   // Create augmented DAE function
   SXFunction ffcn_aug(faug_in,faug);
-  ffcn_aug.setOption("ad_order",1);
   
   // Augmented quadratures
   SXFunction qfcn_aug;
@@ -1529,7 +1523,6 @@ Integrator IdasInternal::jac(int iind, int oind){
 
     // Create augmented DAE function
     qfcn_aug = SXFunction(qaug_in,qaug);
-    qfcn_aug.setOption("ad_order",1);
   }
   
   // Create integrator instance

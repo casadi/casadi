@@ -108,7 +108,6 @@ print G
 #$ Notice how G is a 2-nd order tensor $ {\buildrel\leftrightarrow\over{G}} = \vec{\nabla}{\vec{f}} = \frac{\partial [x*y, x+y]}{\partial [x , y]}$
 #$ Let's define $ \vec{v} = {\buildrel\leftrightarrow\over{G}} . \vec{p} $
 #! The evaluation of v can be efficiently achieved by automatic differentiation as follows:
-f.setOption("ad_order",1)
 f.init()
 f.setInput([2,3])
 f.setFwdSeed([7,6]) # p

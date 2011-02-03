@@ -42,7 +42,6 @@ using namespace std;
 SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const vector<SXMatrix>& outputv_) : inputv(inputv_),  outputv(outputv_) {
   addOption("ad_mode",OT_STRING,"reverse");
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
-  setOption("ad_order",1); // one by default
   setOption("name","unnamed_sx_function");
   
   if(outputv.empty() || inputv.empty()) return;
@@ -250,7 +249,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   }
 
   // Allocate a work vector
-  work.resize(3); // first and second derivatives
+  work.resize(2);
   work[0].resize(worksize,numeric_limits<double>::quiet_NaN());
 
   // Save the constants to the work vector
@@ -1247,10 +1246,8 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
 
   // Memory
 /*  cfile << "double i0[" << work[0].size() << "];" << endl;
-  cfile << "double i1[" << work[1].size() << "];" << endl;
-  cfile << "double i2[" << work[2].size() << "];" << endl;*/
+  cfile << "double i1[" << work[1].size() << "];" << endl;;*/
   
-
   // Initializer
   cfile << "int init(int *n_in_, int *n_out_){" << endl;
   cfile << "*n_in_ = n_in, *n_out_ = n_out;" << endl;
@@ -1325,8 +1322,9 @@ void SXFunctionInternal::init(){
   FXInternal::init();
 
   // allocate a vector with the values at the nodes, the first vector also contains the partial derivatives
-  if(ad_order_>=1) work[1].resize(worksize,numeric_limits<double>::quiet_NaN());
-  if(ad_order_>=2) work[2].resize(worksize,numeric_limits<double>::quiet_NaN());
+  
+  if(nfdir_>0 || nadir_>0)
+    work[1].resize(worksize,numeric_limits<double>::quiet_NaN());
 }
 
 FX SXFunctionInternal::jacobian(int iind, int oind){

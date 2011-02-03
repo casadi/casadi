@@ -32,7 +32,6 @@ using namespace std;
 namespace CasADi{
 
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std::vector<MX>& outputv_) : inputv(inputv_), outputv(outputv_){
-  setOption("ad_order",1); // one by default
   setOption("name", "unnamed_mx_function");
 
   // Allocate space for inputs

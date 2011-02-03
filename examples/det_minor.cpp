@@ -191,7 +191,6 @@ for (int i=0; i<n*n; i++)
 
 // making function
 SXFunction fcn(symA,deter);
-fcn.setOption("ad_order",1);
 fcn.init();
 vector<double>& inp = fcn.input();
     for (i=0; i<n; i++) {

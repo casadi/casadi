@@ -166,7 +166,6 @@ for it in range(1):
       
         # Lagrange polynomial function
         lfcn = SXFunction([[tau]],[[L]])
-        lfcn.setOption("ad_order",1)
         lfcn.init()
         
         # Get the coefficients of the continuity equation

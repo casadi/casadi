@@ -135,15 +135,12 @@ acado_in[ACADO_FCN_P]  = [ ]  # Parameter
 # ODE rhs
 f = [dr, dphi, dtheta, ddr0, ddphi, ddtheta, dn, dPsi, dCL, (-power + regularisation)*1.0e-6]
 ffcn = SXFunction(acado_in,[f])
-ffcn.setOption("ad_order",1)
-
+f
 # Objective function
 mfcn = SXFunction(acado_in,[[W]])
-mfcn.setOption("ad_order",1)
 
 # Path constraint function
 cfcn = SXFunction(acado_in,[[ddr0, dPsi, dCL]])
-cfcn.setOption("ad_order",1)
 
 # Time horizon
 t0 = 0.0

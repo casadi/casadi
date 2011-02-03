@@ -79,19 +79,13 @@ class SXtests(casadiTestCase):
       
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
-  def test_SXconversion(self):
-      self.message("Conversions from and to SXMatrix")
-      x=symbolic("x",3,3)
-      c.det(x)
-      y=array(x)
-      c.det(y)
-      
   def test_SXMatrix(self):
       self.message("SXMatrix unary operations")
       x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix")
+      
       x=symbolic("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
@@ -174,7 +168,6 @@ class SXtests(casadiTestCase):
 
     # Set some options
     fcn.setOption("name","f")
-    fcn.setOption("ad_order",1)
 
     self.assertEqual(repr(fcn),'f','SX representation is wrong')
     # Initialize the function for numerical calculations
@@ -250,29 +243,6 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
     
-  def test_SXineq(self):
-    self.message("Test (in)equality operators")
-    
-    list= {"x>y": lambda x,y: x>y,
-              "x<y": lambda x,y: x<y,
-              "x<=y": lambda x,y: x<=y,
-              "x>=y": lambda x,y: x>=y,
-              "x==y": lambda x,y: x==y,
-              "x!=y": lambda x,y: x!=y
-    }
-    
-    
-    group = { "x SXMatrix, y SXMatrix": (symbolic("x"),symbolic("y")),
-                    "x SX, y SXMatrix": (SX("x"),symbolic("y")),
-                    "x SXMatrix, y SX": (SX("x"),SX("y")),
-                    "x SX, y SX": (SX("x"),SX("y"))
-                  }
-    for gname, e in group.items():
-      self.message(":"+ gname)
-      for name, op in list.items():
-        self.message("::" + name)
-        self.assertTrue(isinstance(op(*e),SXMatrix),gname + "/" + name)
-
 if __name__ == '__main__':
     unittest.main()
 

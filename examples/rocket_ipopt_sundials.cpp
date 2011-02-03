@@ -79,7 +79,6 @@ FX create_integrator_euler(){
 
   SXMatrix output = x;
   SXFunction integrator(input,output);
-  integrator.setOption("ad_order",1);
   integrator.init();
 
 //  integrator->generateCode("rocket.c");
@@ -131,7 +130,6 @@ FX create_integrator_sundials(bool explicit_integrator){
     // ODE right hand side
     SXFunction ffcn(ffcn_in,rhs);
     ffcn.setOption("name","ODE right hand side");
-    ffcn.setOption("ad_order",1);
 
     // Explicit integrator (CVODES)
     integrator = Sundials::CVodesIntegrator(ffcn);
@@ -161,14 +159,12 @@ FX create_integrator_sundials(bool explicit_integrator){
         res[i] -= rhs[i];
       SXFunction ffcn(ffcn_in,res);
       ffcn.setOption("name","ODE right hand side");
-      ffcn.setOption("ad_order",1);
 
       // Create an integrator
       integrator = Sundials::IdasIntegrator(ffcn);
       integrator.setOption("calc_ic",false);
   }
 
-  integrator.setOption("ad_order",1);
   integrator.setOption("fsens_err_con",true);
   integrator.setOption("quad_err_con",true);
   integrator.setOption("abstol",1e-6);

@@ -63,7 +63,6 @@ acado_in[ACADO_FCN_P] = ocp.p
 # The DAE function
 ffcn_out = list(ocp.diffeq) + list(ocp.algeq)
 ffcn = SXFunction(acado_in,[ffcn_out])
-ffcn.setOption("ad_order",1)
 
 ffcn.init()
 
@@ -98,11 +97,9 @@ plt.grid()
 
 # Objective function
 mfcn = SXFunction(acado_in,[ocp.mterm])
-mfcn.setOption("ad_order",1)
 
 # Initial constraint function
 rfcn = SXFunction(acado_in,[ocp.initeq])
-rfcn.setOption("ad_order",1)
 
 # Create ACADO solver
 ocp_solver = AcadoInterface(ffcn,mfcn,FX(),rfcn)

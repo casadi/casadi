@@ -14,7 +14,6 @@ fcn = SXFunction([[x,y]],[f])
 
 # Set some options
 fcn.setOption("name","f")
-fcn.setOption("ad_order",1)
 
 # Print
 print "fcn = ", fcn

@@ -50,7 +50,6 @@ for N in range(1,11):
     print "l(", j, ") = ", L
 
     f = SXFunction([[tau]],[[L]])
-    f.setOption("ad_order",1)
     f.setOption("name", "l(" + str(j) + ")")
     
     # initialize

@@ -159,7 +159,6 @@ int main(){
   
   // Create an integrator
   Sundials::CVodesIntegrator integrator(ocp.ffcn);
-//  integrator.setOption("ad_order",1);
 //  integrator.init();
 
 /*  // Pass initial values

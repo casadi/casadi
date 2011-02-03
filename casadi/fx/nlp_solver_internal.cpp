@@ -63,10 +63,6 @@ void NLPSolverInternal::init(){
   // Call the initialization method of the base class
   FXInternal::init();
 
-    // Initialize functions
-  F_.setOption("ad_order",1);
-  if(!G_.isNull()) G_.setOption("ad_order",1);
-  
   // Initialize the functions
   F_.init();
   if(!G_.isNull()) G_.init();
