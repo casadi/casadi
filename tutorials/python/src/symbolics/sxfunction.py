@@ -41,34 +41,34 @@ print z
 #$ f : $\mathbb{R} \mapsto \mathbb{R}$
 f = SXFunction([[x]], [[z]]) # z = f(x)
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
-print f.getArgumentIn(), type(f.getArgumentIn())
-print f.getArgumentOut(), type(f.getArgumentOut())
+print f.inputSX(), type(f.inputSX())
+print f.outputSX(), type(f.outputSX())
 f.init()
 f.setInput(2)
 f.evaluate()
-print f.getOutputData()
+print f.output()
 #! Reevaluation does not require the init call.
 f.setInput(3)
 f.evaluate()
-print f.getOutputData()
+print f.output()
 #! We can evaluate symbolically, too:
-print f.eval(y)
+print f.eval([[y]])
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
-print f.eval(2)
+print f.eval([[SX(2)]])
 #! We can do symbolic derivatives: f' = dz/dx . 
 #$ The result is $2 x \cos(x^2)+2 x$:
 print f.grad()
 #! The following code creates and evaluates a multi input (scalar valued), multi output (scalar valued) function.
 #$ The mathematical notation could be $ f_{i,j} : $\mathbb{R} \mapsto \mathbb{R} \quad  i,j \in [0,1]$
-x = SXMatrix("x") # 1 by 1 matrix serves as scalar
-y = SXMatrix("y") # 1 by 1 matrix serves as scalar
+x = symbolic("x") # 1 by 1 matrix serves as scalar
+y = symbolic("y") # 1 by 1 matrix serves as scalar
 f = SXFunction([x , y ], [x*y, x+y])
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
 f.setInput(2,0)
 f.setInput(3,1)
 f.evaluate()
-print [f.getOutputData(i) for i in range(2)]
+print [f.output(i) for i in range(2)]
 print [[f.grad(i,j) for i in range(2)] for j in range(2)]
 
 #! Symbolic function manipulation
@@ -101,7 +101,7 @@ print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
 f.setInput([2,3])
 f.evaluate()
-print f.getOutputData()
+print f.output()
 G=f.grad()
 print G
 
@@ -112,11 +112,11 @@ f.init()
 f.setInput([2,3])
 f.setFwdSeed([7,6]) # p
 f.evaluate(1,0) # evaluate(int fsens_order=0, int asens_order=0)
-print f.getFwdSens() # v
+print f.fwdSens() # v
 #! Functions with matrix valued input
 #! ----------------------------------
-x = SXMatrix("x",2,2)
-y = SXMatrix("y",2,2)
+x = symbolic("x",2,2)
+y = symbolic("y",2,2)
 print x*y # Not a dot product
 f = SXFunction([x,y], [x*y])
 print f.eval([x,y])
@@ -125,7 +125,7 @@ f.init()
 f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
 f.setInput([4,5,6,7],1);
 f.evaluate()
-print f.getOutputData() # vector instead of matrix
+print f.output()
 print f.grad(0)
 print f.grad(1)
 

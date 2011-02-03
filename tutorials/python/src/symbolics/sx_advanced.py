@@ -16,7 +16,7 @@ k=SXMatrix(x)
 l=k[0]
 print SXFunction([[l]],[[y]]).eval([SX("w")])
 #! We expect w^2.
-k=SXMatrix("d",2,2)
+k=symbolic("d",2,2)
 k[1] = x
 l=k[1]
 print SXFunction([[l]],[[y]]).eval([SX("w")])

@@ -47,11 +47,11 @@ print f
 print x+y
 #! Expression substitution
 #! ------------------------------------
-x=SXMatrix("x")
+x=symbolic("x")
 
 y=x*x
 print y
-substitute(y,x,SXMatrix("w"))
+substitute(y,x,symbolic("w"))
 print y
 #! More operators
 #! ------------------------------
