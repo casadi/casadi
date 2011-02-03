@@ -58,6 +58,23 @@ namespace CasADi {
 
   };
 
+%extend SX {
+  %pythoncode %{
+    def __lt__(self,other):
+      return _casadi.__lt__(self,other)
+    def __le__(self,other):
+      return _casadi.__le__(self,other)
+    def __eq__(self,other):
+      return _casadi.__eq__(self,other)
+    def __ne__(self,other):
+      return _casadi.__ne__(self,other)
+    def __gt__(self,other):
+      return _casadi.__gt__(self,other)
+    def __ge__(self,other):
+      return _casadi.__ge__(self,other)
+  %}
+};
+  
 %extend Matrix<SX>{
     // The constructor has to be added since SX::operator Matrix<SX does not work
     // Matrix<SX>(const SX&){ *$self
@@ -255,8 +272,7 @@ bool VSXMatrix(PyObject *p, std::vector<CasADi::SXMatrix> * v) {
 *  \return bool                     indicates succes
 */
 bool typemapSXMatrixHelper(PyObject* p, CasADi::Matrix< CasADi::SX > * & m,  bool& freearg) {
-  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
-    std::cout << "array" << std::endl;
+  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 		if (array_type(p)!=NPY_OBJECT) {
 			SWIG_Error(SWIG_TypeError, "asSXMatrix: numpy.ndarray must be of dtype object");
 			return false;
@@ -293,19 +309,15 @@ bool typemapSXMatrixHelper(PyObject* p, CasADi::Matrix< CasADi::SX > * & m,  boo
 		freearg = true; // Memory will be freed in typemap(freearg)
 	} else if (isSXMatrix(p)) { // SXMatrix object get passed on as-is.
     int result = getSXMatrix(p,m);
-		if (!result) {
-			SWIG_Error(SWIG_TypeError, "asSXMatrix: SXMatrix cast problem");
+		if (!result)
 			return false;
-		}
 	} else if (isSX(p)) {
     CasADi::SX * sx;
     int result = getSX(p,sx);
-		if (!result) {
-			SWIG_Error(SWIG_TypeError, "asSXMatrix: SX cast problem");
+		if (!result)
 			return false;
-		}
     m = new CasADi::Matrix< CasADi::SX >(*sx);
-    freearg=true; / Memory will be freed in typemap(freearg)
+    freearg=true; // Memory will be freed in typemap(freearg)
   } else {
     SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -347,7 +359,7 @@ Accepts: sequence(sequence(SX)), sequence(SXMatrix), sequence(numpy.ndarray(SX))
   bool result=typemapSXMatrixHelper($input, m, freearg);
   if (!result) {
     if (freearg && m) delete m;
-    SWIG_exception_fail(SWIG_TypeError,"Expecting SXMatrix or nump.ndarray(SX)");
+    SWIG_exception_fail(SWIG_TypeError,"Expecting SXMatrix or nump.ndarray(SX) or SX");
   }
   $1 = m;
 }

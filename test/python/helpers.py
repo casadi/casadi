@@ -66,7 +66,7 @@ class casadiTestCase(unittest.TestCase):
         
         name - a descriptor that will be included in error messages
     """
-    print ":", name
+    self.message(":"+ name)
     if (type(x)==list):
       sample = x[0]
     else :
@@ -102,7 +102,7 @@ class casadiTestCase(unittest.TestCase):
         
         name - a descriptor that will be included in error messages
     """
-    print ":", name
+    self.message(":"+ name)
     fx=None
     frx=None
     try:

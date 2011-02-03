@@ -250,6 +250,29 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
     
+  def test_SXineq(self):
+    self.message("Test (in)equality operators")
+    
+    list= {"x>y": lambda x,y: x>y,
+              "x<y": lambda x,y: x<y,
+              "x<=y": lambda x,y: x<=y,
+              "x>=y": lambda x,y: x>=y,
+              "x==y": lambda x,y: x==y,
+              "x!=y": lambda x,y: x!=y
+    }
+    
+    
+    group = { "x SXMatrix, y SXMatrix": (symbolic("x"),symbolic("y")),
+                    "x SX, y SXMatrix": (SX("x"),symbolic("y")),
+                    "x SXMatrix, y SX": (SX("x"),SX("y")),
+                    "x SX, y SX": (SX("x"),SX("y"))
+                  }
+    for gname, e in group.items():
+      self.message(":"+ gname)
+      for name, op in list.items():
+        self.message("::" + name)
+        self.assertTrue(isinstance(op(*e),SXMatrix),gname + "/" + name)
+
 if __name__ == '__main__':
     unittest.main()
 
