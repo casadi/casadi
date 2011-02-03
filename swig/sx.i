@@ -27,6 +27,8 @@
 
 namespace CasADi {
   %extend Matrix<double> {
+  
+
     
     %pythoncode %{
     def __getitem__(self,s):
@@ -59,6 +61,22 @@ namespace CasADi {
 %extend Matrix<SX>{
     // The constructor has to be added since SX::operator Matrix<SX does not work
     // Matrix<SX>(const SX&){ *$self
+    
+    
+    %pythoncode %{
+      def __lt__(self,other):
+        return _casadi.__lt__(self,other)
+      def __le__(self,other):
+        return _casadi.__le__(self,other)
+      def __eq__(self,other):
+        return _casadi.__eq__(self,other)
+      def __ne__(self,other):
+        return _casadi.__ne__(self,other)
+      def __gt__(self,other):
+        return _casadi.__gt__(self,other)
+      def __ge__(self,other):
+        return _casadi.__ge__(self,other)
+    %}
     
     // These methods must be added since the implicit type cast does not work
     Matrix<SX> __pow__ (double b) const{ return $self->__pow__(CasADi::Matrix<CasADi::SX>(b));}
@@ -165,6 +183,26 @@ bool isSX(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__SX);
 }
 
+int getSXMatrix(PyObject * p, CasADi::SXMatrix * & m) {
+  void *pd = 0 ;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t, 0 );
+  if (!SWIG_IsOK(res)) {
+    return false;
+  }
+  m = reinterpret_cast< CasADi::SXMatrix* >(pd);
+  return true;
+}
+
+int getSX(PyObject * p, CasADi::SX * & m) {
+  void *pd = 0 ;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__SX, 0 );
+  if (!SWIG_IsOK(res)) {
+    return false;
+  }
+  m = reinterpret_cast< CasADi::SX * >(pd);
+  return true;
+}
+
 bool VSXMatrix(PyObject *p, std::vector<CasADi::SXMatrix> * v) {
   if (PySequence_Check(p)) {                                                  // Look for a sequence
      PyObject *ite = PyObject_GetIter(p);
@@ -253,18 +291,26 @@ bool typemapSXMatrixHelper(PyObject* p, CasADi::Matrix< CasADi::SX > * & m,  boo
 
 		m = new CasADi::Matrix< CasADi::SX >(v, nrows, ncols);
 		freearg = true; // Memory will be freed in typemap(freearg)
-		return true;
 	} else if (isSXMatrix(p)) { // SXMatrix object get passed on as-is.
-		void *pd = 0 ;
-		int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t, 0 |  0 );
-		if (!SWIG_IsOK(res)) {
+    int result = getSXMatrix(p,m);
+		if (!result) {
 			SWIG_Error(SWIG_TypeError, "asSXMatrix: SXMatrix cast problem");
 			return false;
 		}
-		m = reinterpret_cast< CasADi::Matrix< CasADi::SX > * >(pd);
-		return true;
-	}
-	return false;
+	} else if (isSX(p)) {
+    CasADi::SX * sx;
+    int result = getSX(p,sx);
+		if (!result) {
+			SWIG_Error(SWIG_TypeError, "asSXMatrix: SX cast problem");
+			return false;
+		}
+    m = new CasADi::Matrix< CasADi::SX >(*sx);
+    freearg=true; / Memory will be freed in typemap(freearg)
+  } else {
+    SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
+    return false;
+  }
+	return true;
 }
 
 %}
@@ -309,7 +355,7 @@ Accepts: sequence(sequence(SX)), sequence(SXMatrix), sequence(numpy.ndarray(SX))
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<SX> & {
   PyObject* p = $input;
-  if ((is_array(p) && array_numdims(p) < 3) && array_type(p)==NPY_OBJECT|| isSXMatrix(p)) {
+  if ((is_array(p) && array_numdims(p) < 3) && array_type(p)==NPY_OBJECT || isSXMatrix(p) || isSX(p)) {
     $1=1;
   } else {
     $1=0;
