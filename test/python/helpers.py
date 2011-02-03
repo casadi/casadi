@@ -17,7 +17,7 @@ class casadiTestCase(unittest.TestCase):
   def message(self,s):
       print s
       sys.stdout.flush()
-  def checkarray(self,zr,zt,name):
+  def checkarray(self,zr,zt,name,failmessage=""):
       """
       Checks for equality of two numpy matrices.
       The check uses dense form.
@@ -42,18 +42,20 @@ class casadiTestCase(unittest.TestCase):
         zt=array(zt,ndmin=2).T
         
       try:
-        self.assertEqual(zt.shape[0],zr.shape[0],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
-        self.assertEqual(len(zt.shape),len(zr.shape),"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
-        self.assertEqual(zt.shape[1],zr.shape[1],"%s dimension error. Got %s, expected %s" % (name,str(zt.shape),str(zr.shape)))
+        self.assertEqual(zt.shape[0],zr.shape[0],"In %s: %s dimension error. Got %s, expected %s" % (name,failmessage,str(zt.shape),str(zr.shape)))
+        self.assertEqual(len(zt.shape),len(zr.shape),"In %s: %s dimension error. Got %s, expected %s" % (name,failmessage,str(zt.shape),str(zr.shape)))
+        self.assertEqual(zt.shape[1],zr.shape[1],"In %s: %s dimension error. Got %s, expected %s" % (name,failmessage,str(zt.shape),str(zr.shape)))
         for i in range(zr.shape[0]):
           for j in range(zr.shape[1]):
-            self.assertAlmostEqual(zt[i,j],zr[i,j],10,"%s evaluation error. %s <-> %s" % (name, str(zt),str(zr)))
+            self.assertAlmostEqual(zt[i,j],zr[i,j],10,"In %s: %s evaluation error. %s <-> %s" % (name,failmessage, str(zt),str(zr)))
       except:
-        print "shape error"
+        print "In %s:" % name
+        print failmessage
+        print "shapes"
         print zr, zr.shape
         print zt, zt.shape
 
-  def evaluationCheck(self,yt,yr,x,x0,name=""):
+  def evaluationCheck(self,yt,yr,x,x0,name="",failmessage=""):
     """ General unit test for checking casadi evaluation against a reference solution.
     
         Checks if yr is the same as S/MXFunction(x,yt) , evaluated for x0
@@ -64,6 +66,7 @@ class casadiTestCase(unittest.TestCase):
         
         name - a descriptor that will be included in error messages
     """
+    print ":", name
     if (type(x)==list):
       sample = x[0]
     else :
@@ -86,9 +89,9 @@ class casadiTestCase(unittest.TestCase):
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
     zt = f.output(0).toArray()
-    self.checkarray(yr,zt,name)
+    self.checkarray(yr,zt,name,failmessage)
     
-  def numpyEvaluationCheck(self,ft,fr,x,x0,name=""):
+  def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage=""):
     """ General unit test for checking casadi versus numpy evaluation.
     
         Checks if 'fr(x0)' yields the same as S/MXFunction(x,[ft(x)]) , evaluated for x0
@@ -99,6 +102,7 @@ class casadiTestCase(unittest.TestCase):
         
         name - a descriptor that will be included in error messages
     """
+    print ":", name
     fx=None
     frx=None
     try:
@@ -107,11 +111,10 @@ class casadiTestCase(unittest.TestCase):
     except Exception as e:
       print "Error calling functions in %s" % name
       raise e
-    self.evaluationCheck([fx],frx,x,x0,name)
+    self.evaluationCheck([fx],frx,x,x0,name,failmessage)
 
   
   def numpyEvaluationCheckPool(self,pool,x,x0,name=""):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""
     for i in range(len(pool.numpyoperators)):
-      print " :%s:%s" % (name,pool.names[i])
-      self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,name="\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)))
+      self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)))

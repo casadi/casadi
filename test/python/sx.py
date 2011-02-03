@@ -79,13 +79,19 @@ class SXtests(casadiTestCase):
       
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
+  def test_SXconversion(self):
+      self.message("Conversions from and to SXMatrix")
+      x=symbolic("x",3,3)
+      c.det(x)
+      y=array(x)
+      c.det(y)
+      
   def test_SXMatrix(self):
       self.message("SXMatrix unary operations")
       x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix")
-      
       x=symbolic("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")

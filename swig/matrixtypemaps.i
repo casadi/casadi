@@ -84,7 +84,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 	return strcmp(PyString_AsString(PyObject_GetAttrString(PyObject_GetAttrString( p, "__class__"),"__name__")),name)==0;
 }
 
-CasADi::Matrix<double> * typemapDMatrixHelper(PyObject* p, PyArrayObject* array, int& array_is_new_object, bool& freearg) {
+CasADi::Matrix<double> * typemapDMatrixHelper(PyObject* p, PyArrayObject* &array, int& array_is_new_object, bool& freearg) {
 if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 		if (array_numdims(p)>2 || array_numdims(p)<1)
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: Number of dimensions must be 1 or 2.");
@@ -136,7 +136,7 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 		return new CasADi::Matrix<double>(nrows,ncols,colv,rowindv, v);
 	} else if (PyObjectHasClassName(p,"DMatrix")) { // Dmatrix object get passed on as-is.
 		void *pd = 0 ;
-		int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_double_t, 0 |  0 );
+		int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_double_t, 0 );
 		if (!SWIG_IsOK(res)) {
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: DMatrix cast problem");
 		}
@@ -165,7 +165,7 @@ namespace CasADi{
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<double> & {
     PyObject* p = $input;
     // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
-    if ((is_array(p) && array_numdims(p)==2) || PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) {
+    if ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) {
 	$1=1;
     } else {
 	$1=0;
@@ -270,7 +270,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (double * val,int len,Sparsity sp) {
     PyObject* p = $input;
-    if ((is_array(p) && array_numdims(p) < 3 )|| PyObjectHasClassName(p,"csr_matrix")) {
+    if ((is_array(p) && array_numdims(p) < 3)  && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix")) {
 	$1=1;
     } else {
 	$1=0;
@@ -279,7 +279,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (const double * val,int len,Sparsity sp) {
     PyObject* p = $input;
-    if ((is_array(p) && array_numdims(p) < 3 ) || PyObjectHasClassName(p,"csr_matrix")) {
+    if ((is_array(p) && array_numdims(p) < 3)  && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix")) {
 	$1=1;
     } else {
 	$1=0;

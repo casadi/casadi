@@ -206,16 +206,77 @@ bool VSXMatrix(PyObject *p, std::vector<CasADi::SXMatrix> * v) {
     return 0;
   }
 }
+
+/**
+*  \param   PyObject* p             input: python object
+*                                     numpy.ndarray(SX) or SXMatrix
+*
+*  \param   CasADi::SXMatrix * m    output: pointer to an SXMatrix
+*  \param   bool& freearg           output: boolean flag indicating wheter m pointer must be deleted in typemap(freearg)
+*
+*  \return bool                     indicates succes
+*/
+bool typemapSXMatrixHelper(PyObject* p, CasADi::Matrix< CasADi::SX > * & m,  bool& freearg) {
+  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
+    std::cout << "array" << std::endl;
+		if (array_type(p)!=NPY_OBJECT) {
+			SWIG_Error(SWIG_TypeError, "asSXMatrix: numpy.ndarray must be of dtype object");
+			return false;
+		}
+		if (array_numdims(p)>2 || array_numdims(p)<1) {
+			SWIG_Error(SWIG_TypeError, "asSXMatrix: Number of dimensions must be 1 or 2.");
+			return false;
+		}
+		int nrows = array_size(p,0); // 1D array is cast into column vector
+		int ncols  = 1;
+		if (array_numdims(p)==2)
+			ncols=array_size(p,1); 
+		int size=nrows*ncols; // number of elements in the dense matrix
+		std::vector<CasADi::SX> v(size);
+    PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
+    PyObject *pe;
+    int i=-1;
+		while (it->index < it->size) { 
+		  i++;
+		  pe = *((PyObject**) PyArray_ITER_DATA(it));
+		  void *pd = 0;
+		  int res = SWIG_ConvertPtr(pe, &pd,SWIGTYPE_p_CasADi__SX, 0 );
+		  if (!SWIG_IsOK(res)) {
+		    Py_DECREF(it);
+			  SWIG_Error(SWIG_TypeError, "asSXMatrix: SXMatrix cast problem");
+			  return false;
+		  }
+		  v[i] = *(reinterpret_cast< CasADi::SX * >(pd));
+		  PyArray_ITER_NEXT(it);
+		}
+    Py_DECREF(it);
+
+		m = new CasADi::Matrix< CasADi::SX >(v, nrows, ncols);
+		freearg = true; // Memory will be freed in typemap(freearg)
+		return true;
+	} else if (isSXMatrix(p)) { // SXMatrix object get passed on as-is.
+		void *pd = 0 ;
+		int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t, 0 |  0 );
+		if (!SWIG_IsOK(res)) {
+			SWIG_Error(SWIG_TypeError, "asSXMatrix: SXMatrix cast problem");
+			return false;
+		}
+		m = reinterpret_cast< CasADi::Matrix< CasADi::SX > * >(pd);
+		return true;
+	}
+	return false;
+}
+
 %}
 
 namespace CasADi{
 /*
 Attempts to form its argument into a std::vector<SXMatrix> form
-Accepts: sequence(sequence(SX))
+Accepts: sequence(sequence(SX)), sequence(SXMatrix), sequence(numpy.ndarray(SX))
 */
 %typemap(in) const std::vector<SXMatrix> &  {
   std::vector<CasADi::SXMatrix> *p = new std::vector<CasADi::SXMatrix>(PySequence_Size($input));
-  int result=VSXMatrix($input,p);
+  bool result=VSXMatrix($input,p);
   if (!result) {
     delete p;
     SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(sequence(SX)) or sequence(SXMatrix)");
@@ -233,6 +294,33 @@ Accepts: sequence(sequence(SX))
     } else {
       $1=0;
     }
+}
+
+%typemap(in) const Matrix<SX> & (bool freearg = false) {
+  CasADi::Matrix<CasADi::SX> * m = 0;
+  bool result=typemapSXMatrixHelper($input, m, freearg);
+  if (!result) {
+    if (freearg && m) delete m;
+    SWIG_exception_fail(SWIG_TypeError,"Expecting SXMatrix or nump.ndarray(SX)");
+  }
+  $1 = m;
+}
+
+
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<SX> & {
+  PyObject* p = $input;
+  if ((is_array(p) && array_numdims(p) < 3) && array_type(p)==NPY_OBJECT|| isSXMatrix(p)) {
+    $1=1;
+  } else {
+    $1=0;
+  }
+}
+
+
+%typemap(freearg) const Matrix<SX> & {
+   if (freearg$argnum) {
+    if ($1) delete $1;
+   }
 }
 
 
