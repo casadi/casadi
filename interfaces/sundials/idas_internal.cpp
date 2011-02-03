@@ -1454,17 +1454,14 @@ void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
 }
 
 Integrator IdasInternal::jac(int iind, int oind){
-  // Make sure that the derivative is of the state
-  if(oind!=INTEGRATOR_XF)
-    throw CasadiException("IdasInternal::jacobian: Not derivative of state");
+  casadi_assert_message(oind==INTEGRATOR_XF,"IdasInternal::jacobian: Not derivative of state");
   
-  // Type cast to SXMatrix
+  // Type cast to SXMatrix (currently supported)
   SXFunction f = shared_cast<SXFunction>(f_);
+  casadi_assert(!f.isNull());
+  
   SXFunction q = shared_cast<SXFunction>(q_);
-
-  // Assert that the function is made up by SXFunctions
-  if((f_.isNull() != f.isNull()) || (q_.isNull() != q.isNull()))
-    throw CasadiException("IdasInternal::jacobian: Only supported for f and q SXFunction");
+  casadi_assert(q_.isNull() == q.isNull());
     
   // Generate Jacobians with respect to state, state derivative and parameters
   SXMatrix df_dy = f.jac(DAE_Y,DAE_RES);
@@ -1472,7 +1469,13 @@ Integrator IdasInternal::jac(int iind, int oind){
   SXMatrix df_dz = f.jac(DAE_Z,DAE_RES);
   
   // Number of sensitivities
-  int ns = iind==INTEGRATOR_P ? np_ : ny_;
+  int ns;
+  switch(iind){
+    case INTEGRATOR_P: ns = np_; break;
+    case INTEGRATOR_X0: ns = nx_; break;
+    case INTEGRATOR_Z0: ns = nz_; break;
+    default: casadi_assert_message(false,"iind must be INTEGRATOR_P, INTEGRATOR_X0 or INTEGRATOR_Z0");
+  }
   
   // Sensitivities and derivatives of sensitivities
   SXMatrix ysens = symbolic("ysens",ny_,ns);
@@ -1481,26 +1484,19 @@ Integrator IdasInternal::jac(int iind, int oind){
   
   // Sensitivity equation
   SXMatrix res_s = prod(df_dy,ysens) + prod(df_dydot,ypsens);
-  if(nz_>0)
-    res_s += prod(df_dz,zsens);
-  
-  if(iind==INTEGRATOR_P)
-    res_s += f.jac(DAE_P,DAE_RES);
+  if(nz_>0) res_s += prod(df_dz,zsens);
+  if(iind==INTEGRATOR_P) res_s += f.jac(DAE_P,DAE_RES);
 
   // Augmented DAE
-  SXMatrix faug = vec(horzcat(f->outputv.at(oind),res_s));
+  SXMatrix faug = vec(horzcat(f.outputSX(oind),res_s));
 
-  // Input to the augmented DAE (start with old)
-  vector<SXMatrix> faug_in = f->inputv;
-
-  // Augment differential state
-  faug_in[DAE_Y] = vec(horzcat(faug_in[DAE_Y],ysens));
-
-  // Augment state derivatives
-  faug_in[DAE_YDOT] = vec(horzcat(faug_in[DAE_YDOT],ypsens));
-
-  // Augment algebraic state
-  faug_in[DAE_Z] = vec(horzcat(faug_in[DAE_Z],zsens));
+  // Input arguments for the augmented DAE
+  vector<SXMatrix> faug_in(DAE_NUM_IN);
+  faug_in[DAE_T] = f.inputSX(DAE_T);
+  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
+  faug_in[DAE_YDOT] = vec(horzcat(f.inputSX(DAE_YDOT),ypsens));
+  faug_in[DAE_Z] = vec(horzcat(f.inputSX(DAE_Z),zsens));
+  faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
   SXFunction ffcn_aug(faug_in,faug);
@@ -1517,26 +1513,19 @@ Integrator IdasInternal::jac(int iind, int oind){
     
     // Sensitivity quadratures
     SXMatrix q_s = prod(dq_dy,ysens) + prod(dq_dydot,ypsens);
-    if(nz_>0)
-      q_s += prod(dq_dz,zsens);
-      
-    if(iind==INTEGRATOR_P)
-      q_s += q.jac(DAE_P,DAE_RES);
+    if(nz_>0) q_s += prod(dq_dz,zsens);
+    if(iind==INTEGRATOR_P) q_s += q.jac(DAE_P,DAE_RES);
 
     // Augmented quadratures
-    SXMatrix qaug = vec(horzcat(q->outputv.at(oind),q_s));
+    SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
 
     // Input to the augmented DAE (start with old)
-    vector<SXMatrix> qaug_in = q->inputv;
-
-    // Augmented differential state
-    qaug_in[DAE_Y] = vec(horzcat(qaug_in[DAE_Y],ysens));
-
-    // Augment state derivatives
-    qaug_in[DAE_YDOT] = vec(horzcat(qaug_in[DAE_YDOT],ypsens));
-
-    // Augmented algebraic state
-    qaug_in[DAE_Z] = vec(horzcat(qaug_in[DAE_Z],zsens));
+    vector<SXMatrix> qaug_in(DAE_NUM_IN);
+    qaug_in[DAE_T] = q.inputSX(DAE_T);
+    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
+    qaug_in[DAE_YDOT] = vec(horzcat(q.inputSX(DAE_YDOT),ypsens));
+    qaug_in[DAE_Z] = vec(horzcat(q.inputSX(DAE_Z),zsens));
+    qaug_in[DAE_P] = q.inputSX(DAE_P);
 
     // Create augmented DAE function
     qfcn_aug = SXFunction(qaug_in,qaug);
@@ -1561,24 +1550,6 @@ Integrator IdasInternal::jac(int iind, int oind){
     integrator.setOption("is_differential",is_diff_aug);
   }
   
-  // Mapping between states in the augmented dae and the original dae
-  vector<int> jacmap(nx_*(1+ns));
-  for(int i=0; i<1+ns; ++i){
-    for(int j=0; j<nyz_; ++j)
-      jacmap[j+nx_*i] = j+nyz_*i;
-    for(int j=0; j<nq_; ++j)
-      jacmap[nyz_+j+nx_*i] = nyz_*(1+ns) + j + nq_*i;
-  }
-  integrator.setOption("jacmap",jacmap);
-
-  // Initial value for the integrators
-  vector<double> jacinit(nx_*ns,0.0);
-  if(iind==INTEGRATOR_X0){
-    for(int i=0; i<1+ns; ++i)
-      jacinit[i+nx_*i] = 1;
-    integrator.setOption("jacinit",jacinit);
-  }
-
   // Pass linear solver
   if(!linsol_.isNull()){
     LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
@@ -1587,6 +1558,17 @@ Integrator IdasInternal::jac(int iind, int oind){
   }
   
   return integrator;
+}
+
+vector<int> IdasInternal::jacmap(int ns){
+  vector<int> jmap(nx_*(1+ns));
+  for(int i=0; i<1+ns; ++i){
+    for(int j=0; j<nyz_; ++j)
+      jmap[j+nx_*i] = j+nyz_*i;
+    for(int j=0; j<nq_; ++j)
+      jmap[nyz_+j+nx_*i] = nyz_*(1+ns) + j + nq_*i;
+  }
+  return jmap;
 }
 
 FX IdasInternal::getJacobian(){

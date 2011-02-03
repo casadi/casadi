@@ -113,6 +113,10 @@ public:
   protected:
     // Set dimensions
     void setDimensions(int nx, int np, int nz);
+    
+    // Get the mapping of the states for the augmented DAE
+    virtual vector<int> jacmap(int ns) = 0;
+    
 };
   
 } // namespace CasADi

@@ -41,7 +41,7 @@ using namespace CasADi;
 using namespace CasADi::Sundials;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = true;
+const bool implicit_integrator = false;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -86,7 +86,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
+  casadi_assert(fsens_order==0 && asens_order==0);
   dae_res_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_YDOT)[0], &f.input(DAE_P)[0], &f.output(DAE_RES)[0]);
 }
 
@@ -104,7 +104,7 @@ void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
 
 // Wrap the function to allow creating an CasADi function
 void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  if(fsens_order!=0 || asens_order!=0) throw CasadiException("this function does not contain derivative information");
+  casadi_assert(fsens_order==0 && asens_order==0);
   ode_rhs_c(f.input(ODE_T)[0], &f.input(ODE_Y)[0], &f.input(ODE_P)[0], &f.output(ODE_RHS)[0]);
 }
 

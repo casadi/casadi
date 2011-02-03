@@ -273,6 +273,9 @@ class IdasInternal : public IntegratorInternal{
   // Set the adjoint sensitivities
   void setAdjointSensitivities();
   
+  // Get the mapping of the states for the augmented DAE
+  virtual std::vector<int> jacmap(int ns);
+
 };
 
 

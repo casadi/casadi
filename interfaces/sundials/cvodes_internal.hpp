@@ -199,6 +199,9 @@ public:
   int lmm_; // linear multistep method
   int iter_; // nonlinear solver iteration
 
+  // Get the mapping of the states for the augmented DAE
+  virtual std::vector<int> jacmap(int ns);
+
 };
 
 

@@ -24,6 +24,7 @@
 #include "casadi/fx/sx_function_internal.hpp"
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/sx/sx_tools.hpp"
+#include "casadi/fx/linear_solver_internal.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -241,10 +242,10 @@ void CVodesInternal::init(){
     // Add a preconditioner
     if(getOption("use_preconditioner")==true){
       // Make sure that a Jacobian has been provided
-      if(M_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+      if(M_.isNull()) throw CasadiException("CVodesInternal::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been providided
-      if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
+      if(linsol_.isNull()) throw CasadiException("CVodesInternal::init(): No user defined linear solver has been provided.");
 
       // Pass to IDA
       flag = CVSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
@@ -1277,7 +1278,86 @@ void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
 }
 
 Integrator CVodesInternal::jac(int iind, int oind){
-  throw CasadiException("CVodesInternal::jac: not implemented");
+  casadi_assert_message(oind==INTEGRATOR_XF,"CVodesInternal::jacobian: Not derivative of state");
+  
+  // Type cast to SXMatrix (currently supported)
+  SXFunction f = shared_cast<SXFunction>(f_);
+  casadi_assert(!f.isNull());
+  
+  SXFunction q = shared_cast<SXFunction>(q_);
+  casadi_assert(q_.isNull() == q.isNull());
+    
+  // Generate Jacobians with respect to state, state derivative and parameters
+  SXMatrix df_dy = f.jac(ODE_Y,ODE_RHS);
+  
+  // Number of sensitivities
+  int ns;
+  switch(iind){
+    case INTEGRATOR_P: ns = np_; break;
+    case INTEGRATOR_X0: ns = nx_; break;
+    default: casadi_assert_message(false,"iind must be INTEGRATOR_P or INTEGRATOR_X0");
+  }
+  
+  // Sensitivities and derivatives of sensitivities
+  SXMatrix ysens = symbolic("ysens",ny_,ns);
+  
+  // Sensitivity ODE
+  SXMatrix rhs_s = prod(df_dy,ysens);
+  if(iind==INTEGRATOR_P) rhs_s += f.jac(ODE_P,ODE_RHS);
+
+  // Augmented ODE
+  SXMatrix faug = vec(horzcat(f.outputSX(oind),rhs_s));
+
+  // Input arguments for the augmented DAE
+  vector<SXMatrix> faug_in(ODE_NUM_IN);
+  faug_in[ODE_T] = f.inputSX(ODE_T);
+  faug_in[ODE_Y] = vec(horzcat(f.inputSX(ODE_Y),ysens));
+  faug_in[ODE_P] = f.inputSX(ODE_P);
+  
+  // Create augmented DAE function
+  SXFunction ffcn_aug(faug_in,faug);
+  ffcn_aug.setOption("ad_order",1);
+  
+  // Augmented quadratures
+  SXFunction qfcn_aug;
+  
+  if(!q.isNull()){
+    // Now lets do the same for the quadrature states
+    SXMatrix dq_dy = q.jac(ODE_Y,ODE_RHS);
+    
+    // Sensitivity quadratures
+    SXMatrix q_s = prod(dq_dy,ysens);
+    if(iind==INTEGRATOR_P) q_s += q.jac(ODE_P,ODE_RHS);
+
+    // Augmented quadratures
+    SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
+
+    // Input to the augmented quadratures
+    vector<SXMatrix> qaug_in(ODE_NUM_IN);
+    qaug_in[ODE_T] = q.inputSX(ODE_T);
+    qaug_in[ODE_Y] = vec(horzcat(q.inputSX(ODE_Y),ysens));
+    qaug_in[ODE_P] = q.inputSX(ODE_P);
+
+    // Create augmented DAE function
+    qfcn_aug = SXFunction(qaug_in,qaug);
+    qfcn_aug.setOption("ad_order",1);
+  }
+  
+  // Create integrator instance
+  CVodesIntegrator integrator(ffcn_aug,qfcn_aug);
+
+  // Set options
+  integrator.copyOptions(shared_from_this<CVodesIntegrator>());
+  integrator.setOption("nrhs",1+ns);
+  
+  // Pass linear solver
+  if(!linsol_.isNull()){
+    LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
+    linsol_aug->nrhs_ = 1+ns;
+    integrator.setLinearSolver(linsol_aug,jac_f_);
+  }
+  
+  return integrator;
 }
 
 FX CVodesInternal::getJacobian(){
@@ -1288,7 +1368,16 @@ LinearSolver CVodesInternal::getLinearSolver(){
   return linsol_;
 }
 
-
+vector<int> CVodesInternal::jacmap(int ns){
+  vector<int> jmap(nx_*(1+ns));
+  for(int i=0; i<1+ns; ++i){
+    for(int j=0; j<ny_; ++j)
+      jmap[j+nx_*i] = j+ny_*i;
+    for(int j=0; j<nq_; ++j)
+      jmap[ny_+j+nx_*i] = ny_*(1+ns) + j + nq_*i;
+  }
+  return jmap;
+}
 
 } // namespace Sundials
 } // namespace CasADi

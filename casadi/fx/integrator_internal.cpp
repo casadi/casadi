@@ -153,7 +153,27 @@ void IntegratorInternal::init(){
 FX IntegratorInternal::jacobian(int iind, int oind){
   // Create a new integrator for the forward sensitivity equations
   Integrator fwdint = jac(iind,oind);
-    
+  
+  // Number of sensitivities
+  int ns;
+  switch(iind){
+    case INTEGRATOR_P: ns = np_; break;
+    case INTEGRATOR_X0: ns = nx_; break;
+    case INTEGRATOR_Z0: ns = nz_; break;
+    default: casadi_assert_message(false,"iind must be INTEGRATOR_P, INTEGRATOR_X0 or INTEGRATOR_Z0");
+  }
+  
+  // Initial value for the integrators
+  vector<double> jacinit(nx_*ns,0.0);
+  if(iind==INTEGRATOR_X0){
+    for(int i=0; i<1+ns; ++i)
+      jacinit[i+nx_*i] = 1;
+    fwdint.setOption("jacinit",jacinit);
+  }
+
+  // Mapping between states in the augmented dae and the original dae
+  fwdint.setOption("jacmap",jacmap(ns));
+
   // Generate an jacobian
   IntegratorJacobian intjac(fwdint);
 
