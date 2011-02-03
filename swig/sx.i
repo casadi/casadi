@@ -200,6 +200,13 @@ bool isSX(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__SX);
 }
 
+bool isPyNumber(PyObject *p) {
+  PyObject *r = PyNumber_Float(p);
+  bool ret = !(r==NULL);
+  Py_DECREF(r);
+  return ret;
+}
+
 int getSXMatrix(PyObject * p, CasADi::SXMatrix * & m) {
   void *pd = 0 ;
   int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t, 0 );
@@ -218,6 +225,15 @@ int getSX(PyObject * p, CasADi::SX * & m) {
   }
   m = reinterpret_cast< CasADi::SX * >(pd);
   return true;
+}
+
+int getPyNumber(PyObject * p, double * m) {
+  PyObject *r = PyNumber_Float(p);
+  int ret = !(r==NULL);
+  if (ret)
+    *m = PyFloat_AsDouble(r);
+  Py_DECREF(r);
+  return ret;
 }
 
 bool VSXMatrix(PyObject *p, std::vector<CasADi::SXMatrix> * v) {
@@ -318,6 +334,13 @@ bool typemapSXMatrixHelper(PyObject* p, CasADi::Matrix< CasADi::SX > * & m,  boo
 			return false;
     m = new CasADi::Matrix< CasADi::SX >(*sx);
     freearg=true; // Memory will be freed in typemap(freearg)
+  } else if (isPyNumber (p))  {
+    double res;
+    int result = getPyNumber(p,&res);
+		if (!result)
+			return false;
+    m = new CasADi::Matrix< CasADi::SX >(res);
+    freearg=true; // Memory will be freed in typemap(freearg)
   } else {
     SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -364,10 +387,10 @@ Accepts: sequence(sequence(SX)), sequence(SXMatrix), sequence(numpy.ndarray(SX))
   $1 = m;
 }
 
-
+// numpy.ndarray(SX) , SXMatrix, SX, number
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<SX> & {
   PyObject* p = $input;
-  if ((is_array(p) && array_numdims(p) < 3) && array_type(p)==NPY_OBJECT || isSXMatrix(p) || isSX(p)) {
+  if ((is_array(p) && array_numdims(p) < 3) && array_type(p)==NPY_OBJECT || isSXMatrix(p) || isSX(p) || isPyNumber (p) ) {
     $1=1;
   } else {
     $1=0;
