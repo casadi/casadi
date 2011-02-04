@@ -59,8 +59,9 @@ print y
 #! sqrt sin cos tan arctan arcsin arccos exp log pow fabs floor ceil erf fmin fmax.
 #! Using these functions require numpy to be imported.
 y = sin(x**x)
-t = if_else(y>0,-10,10) #inline if-test - not yet working
-print y
+print type(y>0)
+t = if_else(y>0,-10,10)
+print t
 
 #! Conclusion
 #! -------------------

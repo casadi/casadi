@@ -297,6 +297,12 @@ class SXtests(casadiTestCase):
       self.assertEqual(i.shape[0],shape[0],"shape mismatch")
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
     
+  def test_eval(self):
+    self.message("SXFunction eval")
+    f  = SXFunction([x,y], [x*y])
+    f.eval([x,x])
+
+
     
 if __name__ == '__main__':
     unittest.main()

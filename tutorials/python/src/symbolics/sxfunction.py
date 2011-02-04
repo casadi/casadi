@@ -44,9 +44,10 @@ print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 print f.inputSX(), type(f.inputSX())
 print f.outputSX(), type(f.outputSX())
 f.init()
-f.setInput(2)
+f.input().set(2)
 f.evaluate()
 print f.output()
+print type(f.output())
 #! Reevaluation does not require the init call.
 f.setInput(3)
 f.evaluate()
@@ -54,7 +55,7 @@ print f.output()
 #! We can evaluate symbolically, too:
 print f.eval([[y]])
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
-print f.eval([[SX(2)]])
+print f.eval([[2]])
 #! We can do symbolic derivatives: f' = dz/dx . 
 #$ The result is $2 x \cos(x^2)+2 x$:
 print f.grad()
@@ -65,8 +66,8 @@ y = symbolic("y") # 1 by 1 matrix serves as scalar
 f = SXFunction([x , y ], [x*y, x+y])
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
-f.setInput(2,0)
-f.setInput(3,1)
+f.input(0).set(2)
+f.input(1).set(3)
 f.evaluate()
 print [f.output(i) for i in range(2)]
 print [[f.grad(i,j) for i in range(2)] for j in range(2)]
@@ -119,8 +120,9 @@ x = symbolic("x",2,2)
 y = symbolic("y",2,2)
 print x*y # Not a dot product
 f = SXFunction([x,y], [x*y])
-print f.eval([x,y])
+f.init()
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
+print f.eval([x,y])
 f.init()
 f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
 f.setInput([4,5,6,7],1);

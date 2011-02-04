@@ -77,10 +77,10 @@ public:
   /// evaluate symbolically 
   std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg);
 
+#ifndef SWIG
   /// evaluate symbolically (pass and get non-zero entries) 
   std::vector< std::vector<SX> > eval(const std::vector< std::vector<SX> >& arg);
 
-#ifndef SWIG
   /// evaluate symbolically, single input, single output 
   SXMatrix eval(const SXMatrix& arg);
 
