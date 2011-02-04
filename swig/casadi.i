@@ -192,3 +192,11 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "lapack_interface.i"
 #endif
 
+// LAPACK
+#ifdef WITH_KNITRO
+%{ 
+  #include "interfaces/knitro/knitro_solver.hpp"
+%}
+%include "interfaces/knitro/knitro_solver.hpp"
+#endif
+
