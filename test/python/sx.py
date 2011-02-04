@@ -299,8 +299,10 @@ class SXtests(casadiTestCase):
     
   def test_eval(self):
     self.message("SXFunction eval")
+    x=symbolic("x",2,2)
+    y=symbolic("y",2,2)
     f  = SXFunction([x,y], [x*y])
-    f.eval([x,x])
+    f.eval([x,y])
 
 
     
