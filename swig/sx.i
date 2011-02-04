@@ -196,6 +196,10 @@ bool isSXMatrix(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t);
 }
 
+bool isSXMatrixVector(PyObject * p) {
+  return istype(p,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t);
+}
+
 bool isSX(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__SX);
 }
@@ -330,47 +334,30 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 	return true;
 }
 
-
-bool VSXMatrix(PyObject *p, std::vector<CasADi::SXMatrix> * v) {
-  if (PySequence_Check(p)) {                                                  // Look for a sequence
-     PyObject *ite = PyObject_GetIter(p);
-     PyObject *pe;
-     int i=-1;
-     while (pe = PyIter_Next(ite)) {                                           // Iterate over the sequence
-        i++;
-        if (isSXMatrix(pe)) {
-          void *mp = 0;
-          SWIG_ConvertPtr(pe, &mp, SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t, 0);
-          CasADi::SXMatrix *m=reinterpret_cast< CasADi::SXMatrix * >(mp);
-          v->operator[](i) = *m;
-        } else if (PySequence_Check(pe)) {                                        // Look for a sequence inside the sequence
-            PyObject *itee = PyObject_GetIter(pe);
-            PyObject *pee;
-            std::vector<CasADi::SX> sxv(PySequence_Size(pe));
-            int j=-1;
-            while (pee = PyIter_Next(itee)) {                                // Iterate over the sequence inside the sequence
-              j++;
-              if (!isSX(pee))  {                                                       // Make sure we have SX elements
-                Py_DECREF(pee);Py_DECREF(itee);Py_DECREF(ite);return 0;  
-              } else {
-                void *sp = 0;
-                SWIG_ConvertPtr(pee, &sp, SWIGTYPE_p_CasADi__SX, 0);
-                sxv[j] = *(reinterpret_cast< CasADi::SX * >(sp));
-              }
-              Py_DECREF(pee);
-            }
-            v->operator[](i) = CasADi::SXMatrix(sxv);
-            Py_DECREF(itee);
-        }else {
-          Py_DECREF(pe);Py_DECREF(ite);return 0;
-        }
-        Py_DECREF(pe);
+/**
+\param p   input   sequence(anything that SXMatrix accepts)
+\param s    output SX
+\return true if succesful
+*/
+bool asVSXMatrix(PyObject*p, std::vector<CasADi::SXMatrix> &m ) {
+  if(PySequence_Check(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    m.resize(PySequence_Size(p));
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      bool result=asSXMatrix(pe,m[i++]);
+      if (!result) {
+        Py_DECREF(pe);Py_DECREF(it);
+        return false;
+      }
+      Py_DECREF(pe);
     }
-    Py_DECREF(ite);
-    return 1;
+    Py_DECREF(it);
   } else {
-    return 0;
+    return false;
   }
+  return true;
 }
 
 
@@ -379,20 +366,13 @@ bool VSXMatrix(PyObject *p, std::vector<CasADi::SXMatrix> * v) {
 namespace CasADi{
 /*
 Attempts to form its argument into a std::vector<SXMatrix> form
-Accepts: sequence(sequence(SX)), sequence(sequence(number)) , sequence(SXMatrix), sequence(numpy.ndarray(SX))
+Accepts: sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))
 */
-%typemap(in) const std::vector<SXMatrix> &  {
-  std::vector<CasADi::SXMatrix> *p = new std::vector<CasADi::SXMatrix>(PySequence_Size($input));
-  bool result=VSXMatrix($input,p);
-  if (!result) {
-    delete p;
-    SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(sequence(SX)) or sequence(SXMatrix)");
-  }
-  $1 = p;
-}
-
-%typemap(freearg) const std::vector<SXMatrix> & {
-    if ($1) delete $1;
+%typemap(in) const std::vector<SXMatrix> &  (std::vector<CasADi::SXMatrix> v) {
+  bool result=asVSXMatrix($input,v);
+  if (!result)
+    SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))");
+  $1 = &v;
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector<SXMatrix> & {
@@ -402,6 +382,10 @@ Accepts: sequence(sequence(SX)), sequence(sequence(number)) , sequence(SXMatrix)
       $1=0;
     }
 }
+
+%typemap(freearg) const std::vector<SXMatrix> & {
+}
+
 
 // numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)
 %typemap(in) const Matrix<SX> & (Matrix<SX> m) {
@@ -425,6 +409,9 @@ Accepts: sequence(sequence(SX)), sequence(sequence(number)) , sequence(SXMatrix)
   } else {
     $1=0;
   }
+}
+
+%typemap(freearg) const Matrix<SX>  & {
 }
 
 

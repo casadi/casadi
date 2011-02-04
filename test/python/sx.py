@@ -243,6 +243,60 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
     
+  def test_SXconversion(self):
+    self.message("Conversions from and to SXMatrix")
+    x=symbolic("x",3,3)
+    c.det(x)
+    y=array(x)
+    c.det(y)
+
+  def test_SXineq(self):
+    self.message("Test (in)equality operators")
+    
+    list= {"x>y": lambda x,y: x>y,
+              "x<y": lambda x,y: x<y,
+              "x<=y": lambda x,y: x<=y,
+              "x>=y": lambda x,y: x>=y,
+              "x==y": lambda x,y: x==y,
+              "x!=y": lambda x,y: x!=y
+    }
+    
+    
+    group = { "x SXMatrix, y SXMatrix": (symbolic("x"),symbolic("y")),
+                    "x SX, y SXMatrix": (SX("x"),symbolic("y")),
+                    "x SXMatrix, y SX": (SX("x"),SX("y")),
+                    "x SX, y SX": (SX("x"),SX("y"))
+                  }
+    for gname, e in group.items():
+      self.message(":"+ gname)
+      for name, op in list.items():
+        self.message("::" + name)
+        self.assertTrue(isinstance(op(*e),SXMatrix),gname + "/" + name)
+        
+  def test_SXFunctionc2(self):
+    self.message("SXmatrix typemaps constructors")
+    #simplify(SX("x"))                 
+    
+    dot
+    isEmpty(array([[SX("x")]]))
+    list = [ ("SX" ,SX("x"),(1,1)),
+                ("number",2.3, (1,1)),
+                ("list(SX)", [SX("x"),SX("y")], (2,1)),
+                ("list(SX,number)", [SX("x"),2.3], (2,1) ),
+                ("tuple(SX)", (SX("x"),SX("y")), (2,1)),
+                ("tuple(SX,number)", (SX("x"),2.3), (2,1)),
+                ("SXMatrix", symbolic("x"), (1,1)),
+                ("numpy.ndarray1D(SX)", array([SX("x"),SX("y")]), (2,1)),
+                ("numpy.ndarray(SX)", array([[SX("x"),SX("y")],[SX("w"),SX("z")]]), (2,2)),
+                ("numpy.ndarray(SX,number)", array([[SX("x"),2.3]]), (1,2))
+    ];
+    for name, arg,shape in list:
+      self.message(":" + name)
+      i=trans(trans(arg))
+      self.assertEqual(i.shape[0],shape[0],"shape mismatch")
+      self.assertEqual(i.shape[1],shape[1],"shape mismatch")
+    
+    
 if __name__ == '__main__':
     unittest.main()
 
