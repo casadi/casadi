@@ -1,0 +1,62 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#ifndef KNITRO_INTERNAL_HPP
+#define KNITRO_INTERNAL_HPP
+
+#include "knitro_solver.hpp"
+#include "knitro.h"
+#include "casadi/fx/nlp_solver_internal.hpp"
+
+namespace CasADi{
+    
+class KnitroInternal : public NLPSolverInternal{
+
+public:
+  explicit KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
+  virtual ~KnitroInternal();
+
+  virtual void init();
+  virtual void evaluate(int fsens_order, int asens_order);
+
+  // KNITRO callback functions
+  void evalfc(const double* x, double& obj, double *c);
+  void evalga(const double* x, double* objGrad, double* jac);
+  void evalh(const double* x, const double* lambda, double* hessian);
+  
+  // KNITRO callback wrapper
+  static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double * const x,
+                      const double * const lambda,double * const obj, double * const c, double * const objGrad,
+                      double * const jac, double * const hessian, double * const hessVector, void *userParams);
+  
+
+  
+protected:
+  
+  // KNITRO context pointer
+  KTR_context_ptr kc_handle_;
+  
+};
+
+} // namespace CasADi
+
+#endif //KNITRO_INTERNAL_HPP

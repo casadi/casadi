@@ -23,7 +23,7 @@
 #include <iostream>
 #include <ctime>
 #include "casadi/stl_vector_tools.hpp"
-#include "interfaces/ipopt/ipopt_solver.hpp"
+#include "interfaces/knitro/knitro_solver.hpp"
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
 
@@ -164,11 +164,11 @@ int main(){
   // ----
   
   // Allocate an NLP solver
-  IpoptSolver solver(obj,gfcn);
+  KnitroSolver solver(obj,gfcn);
 
   // Set options
-  solver.setOption("tol",1e-10);
-  solver.setOption("hessian_approximation","limited-memory");
+/*  solver.setOption("tol",1e-10);
+  solver.setOption("hessian_approximation","limited-memory");*/
 //   pass_nonlinear_variables
 
   // initialize the solver

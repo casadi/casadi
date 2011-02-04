@@ -1,4 +1,5 @@
 find_package(IPOPT QUIET)
+find_package(KNITRO QUIET)
 find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
@@ -35,6 +36,15 @@ target_link_libraries(biegler_10_1 ipopt_interface casadi ${IPOPT_LIBRARIES})
 add_executable(biegler_10_2 biegler_10_2.cpp)
 target_link_libraries(biegler_10_2 ipopt_interface casadi ${IPOPT_LIBRARIES})
 ENDIF(IPOPT_FOUND)
+
+
+IF(KNITRO_FOUND)
+
+# Exaple 10.1 from Biegler using KNITRO
+add_executable(biegler_10_1_knitro biegler_10_1_knitro.cpp)
+target_link_libraries(biegler_10_1_knitro knitro_interface casadi ${KNITRO_LIBRARIES} -ldl)
+
+ENDIF(KNITRO_FOUND)
 
 IF(SUNDIALS_FOUND AND IPOPT_FOUND)
 add_executable(convection_diffusion convection_diffusion.cpp)
