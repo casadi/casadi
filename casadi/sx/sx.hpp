@@ -319,14 +319,7 @@ class Element<Matrix<SX>,SX> : public SX{
 
 } // namespace CasADi
 
-#ifdef SWIG
-%template(SXVector)             std::vector<CasADi::SX>;
-%template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
-%template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
-%template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
-%template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
-%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
-#endif // SWIG
+
 
 #ifndef SWIG
 

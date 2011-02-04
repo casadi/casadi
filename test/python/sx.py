@@ -245,7 +245,10 @@ class SXtests(casadiTestCase):
     
   def test_SXconversion(self):
     self.message("Conversions from and to SXMatrix")
+    y=SX("y")
     x=symbolic("x",3,3)
+    SXMatrix(y)
+    SXMatrix(x)
     c.det(x)
     y=array(x)
     c.det(y)
@@ -276,8 +279,6 @@ class SXtests(casadiTestCase):
   def test_SXFunctionc2(self):
     self.message("SXmatrix typemaps constructors")
     #simplify(SX("x"))                 
-    
-    dot
     isEmpty(array([[SX("x")]]))
     list = [ ("SX" ,SX("x"),(1,1)),
                 ("number",2.3, (1,1)),
