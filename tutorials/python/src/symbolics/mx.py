@@ -11,7 +11,7 @@ for i in range(6):
 	print x[i]
 
 for i in range(2):
-	for j in range(4):
+	for j in range(3):
 		print "x[%d,%d]=" % (i,j)
 		print x[i,j]
 print x[1,1]
@@ -24,7 +24,7 @@ print z
 #! Any elementwise logic is postponed until evaluation demands it.
 #! Just like, SXFunction, MXFunction can be single or multi input/output.
 #! The only allowed input/output primitive is MX.
-f = MXFunction([x,y],z)
+f = MXFunction([x,y],[z])
 
 
 #! Evaluation
@@ -34,7 +34,7 @@ f.setInput([1,2,3,4,5,6],0);
 f.setInput([1,3,0,6,0,9],1);
 f.evaluate()
 
-print f.output()# Why not in matrix form
+print f.output()
 #! Note how this result is related to a numpy approach:
 a=matrix(f.input(0)).reshape(3,2)
 b=matrix(f.input(1)).reshape(2,3)
@@ -42,8 +42,8 @@ print a.T*b.T
 #! Jacobian
 #! -------------
 #! BUG error
-print f.jacobian(0)
-type(f.hessian())
+#!print f.jacobian(0)
+#!type(f.hessian())
 
 #! Numerical matrices
 #! ------------------------------

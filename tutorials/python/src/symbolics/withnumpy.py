@@ -1,14 +1,14 @@
-#! CasADi tutorial 1
+#! CasADi tutorial
 #! ==================
 #! This tutorial file explains the use of CasADi's SX in a python context.
 #! Let's start with the import statements to load CasADi.
 from casadi import *
 from numpy import *
 
-X=SXMatrix('X',2,2)
-Y=SXMatrix('Y',2,2)
+X=symbolic('X',2,2)
+Y=symbolic('Y',2,2)
 f=SXFunction ([X], [X])
-print f.eval(Y)
+print f.eval([Y])
 
 a=SX("a")
 b=SX("b")

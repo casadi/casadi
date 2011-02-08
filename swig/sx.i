@@ -340,7 +340,14 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 \return true if succesful
 */
 bool asVSXMatrix(PyObject*p, std::vector<CasADi::SXMatrix> &m ) {
-  if(PySequence_Check(p)) {
+  //if(isSXMatrix(p)) {
+  //  CasADi::SXMatrix *mp;
+  //  int result = getSXMatrix(p,mp);
+  //  if (!result)
+  //    return false;
+  //  m.push_back(*mp);
+  //}
+  if(PySequence_Check(p) &&! isSXMatrix(p)) {
     PyObject *it = PyObject_GetIter(p);
     PyObject *pe;
     m.resize(PySequence_Size(p));
@@ -367,6 +374,8 @@ namespace CasADi{
 /*
 Attempts to form its argument into a std::vector<SXMatrix> form
 Accepts: sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))
+
+matching on SXMqtrix is prohibited as per wish of Joel
 */
 %typemap(in) const std::vector<SXMatrix> &  (std::vector<CasADi::SXMatrix> v) {
   bool result=asVSXMatrix($input,v);
@@ -376,7 +385,7 @@ Accepts: sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/n
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector<SXMatrix> & {
-    if (PySequence_Check($input)) {
+    if (PySequence_Check($input) && !isSXMatrix($input)) {
       $1 = 1;
     } else {
       $1=0;

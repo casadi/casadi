@@ -9,7 +9,7 @@
 #endif 
 
 #ifndef WITH_DOXDOC
-#warning "Not using doxygen. Run /doc/doc2swig.py to include it. A make rebuild-cache may be necessary."
+//#warning "Not using doxygen. Run /doc/doc2swig.sh to include it. A make rebuild-cache may be necessary."
 #endif
 
 %feature("autodoc", "1");
@@ -122,11 +122,11 @@ namespace CasADi{
 };
 
 #ifndef WITH_NUMPY
-#warning "Not using numpy. option(WITH_NUMPY = OFF)"
+//#warning "Not using numpy. option(WITH_NUMPY = OFF)"
 #endif
 
 #ifdef WITH_NUMPY
-#warning "Using numpy. option(WITH_NUMPY = ON)"
+//#warning "Using numpy. option(WITH_NUMPY = ON)"
 %{
 #define SWIG_FILE_WITH_INIT
 %}

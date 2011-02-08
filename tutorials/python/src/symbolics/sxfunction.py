@@ -131,6 +131,8 @@ print f.output()
 print f.grad(0)
 print f.grad(1)
 
+print 12
+
 f = SXFunction([x,y], [x*y,x+y])
 print type(x)
 print f.eval([x,y])
@@ -138,12 +140,13 @@ print type(f.eval([x,y]))
 print type(f.eval([x,y])[0])
 print type(f.eval([x,y])[0][0])
 
+
 f = SXFunction([x], [x+y])
 print type(x)
-print f.eval(x)
-print type(f.eval(x))
-print type(f.eval(x)[0])
-print type(f.eval(x)[0][0])
+print f.eval([x])
+print type(f.eval([x]))
+print type(f.eval([x])[0])
+print type(f.eval([x])[0][0])
 
 #! A current limitation is that matrix valued input/ouput is handled through flattened vectors
 #! Note the peculiar form of the gradient.

@@ -242,7 +242,16 @@ class SXtests(casadiTestCase):
     self.checkarray(f.input(1).shape,(2,1),"SXFunction constructors")
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
-    
+
+    self.assertRaises(NotImplementedError,lambda: SXFunction(y,[y,y]))
+    self.assertRaises(NotImplementedError,lambda: SXFunction(x,[x,x]))
+
+  def test_evalfail(self):
+    self.message("eval fail test")
+    x = symbolic("x",2,2)
+    f = SXFunction([x], [x])
+    self.assertRaises(TypeError,lambda: f.eval(x))
+
   def test_SXconversion(self):
     self.message("Conversions from and to SXMatrix")
     y=SX("y")
