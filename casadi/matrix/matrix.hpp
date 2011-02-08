@@ -525,19 +525,15 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
     // The last non-zero element on the row of the original matrix
     int el_last = rowind(i0+1);
     
-    // Loop over the columns of the return matrix
+    // Loop over the columns of the returb matrix
     for(int j=0; j<jj.size(); ++j){
-
-      // Try to reach colum jj[j] by looping over el
-      for (;el<el_last && col(el) < jj[j];el++) {}
-
-      // Save the non-zero element if column matches
-      if(col(el)==jj[j])
-        ret(i,j) = (*this)[el];
-
-      // Break if no more elements on the row
-      if(el+1>=el_last) break;
       
+      // Break if no more elements on the row
+      if(el>=el_last) break;
+      
+      // Save the non-zero element if column maches
+      if(col(el)==jj[j])
+        ret(i,j) = (*this)[el++];
     }
   }
   return ret;
