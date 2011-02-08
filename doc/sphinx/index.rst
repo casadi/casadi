@@ -6,7 +6,7 @@
 Welcome to CasADi's documentation!
 ==================================
 This is documentation for the python interface to CasADi. It is largely based on the `C++ Doxygen documentation <http://casadi.sourceforge.net/api/html/annotated.html>`_ 
-
+Documentation for CasADi version 1.1
 
 Contents:
 
@@ -21,6 +21,10 @@ Indices and tables
 * :ref:`search`
 
 .. automodule:: casadi
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
    
 .. autoclass:: Simulator
    :members:
