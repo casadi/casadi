@@ -42,7 +42,7 @@ IF(KNITRO_FOUND)
 
 # Exaple 10.1 from Biegler using KNITRO
 add_executable(biegler_10_1_knitro biegler_10_1_knitro.cpp)
-target_link_libraries(biegler_10_1_knitro knitro_interface casadi ${KNITRO_LIBRARIES} -ldl)
+target_link_libraries(biegler_10_1_knitro knitro_interface casadi ${KNITRO_LIBRARIES})
 
 ENDIF(KNITRO_FOUND)
 

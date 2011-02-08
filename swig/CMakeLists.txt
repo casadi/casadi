@@ -60,15 +60,16 @@ set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "modelica" "tinyxml")
 include (${SWIG_USE_FILE})
 
 # Find python library and add include path for python headers
-find_package (PythonLibs)
+find_package (PythonLibs REQUIRED)
+
 include_directories (${PYTHON_INCLUDE_PATH})
 
-if(WITH_NUMPY)
-find_package (Numpy)
+find_package (NUMPY)
+if(NUMPY_FOUND)
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${NUMPY_INCLUDED_DIRS})
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_NUMPY")
-endif(WITH_NUMPY)
+endif(NUMPY_FOUND)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
