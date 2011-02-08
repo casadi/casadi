@@ -27,15 +27,19 @@
 
 namespace CasADi{
 
-  /// Inputs of an NLP Solver
-  enum NLPInput{NLP_X_INIT,NLP_LBX,NLP_UBX,NLP_LBG,NLP_UBG,NLP_LAMBDA_INIT,NLP_NUM_IN};
+/// Input arguments of an NLP Solver
+enum NLPInput{NLP_X_INIT,NLP_LBX,NLP_UBX,NLP_LBG,NLP_UBG,NLP_LAMBDA_INIT,NLP_NUM_IN};
 
-  /// Outputs of an NLP Solver
-  enum NLPOutput{NLP_X_OPT,NLP_COST,NLP_LAMBDA_OPT,NLP_LAMBDA_LBX,NLP_LAMBDA_UBX,NLP_NUM_OUT};
+/// Outputs arguments of an NLP Solver
+enum NLPOutput{NLP_X_OPT,NLP_COST,NLP_LAMBDA_OPT,NLP_LAMBDA_LBX,NLP_LAMBDA_UBX,NLP_NUM_OUT};
 
 class NLPSolverInternal;
 
 /** \brief NLPSolver
+
+Input arguments of an NLP Solver CasADi::NLPInput: NLP_X_INIT,NLP_LBX,NLP_UBX,NLP_LBG,NLP_UBG,NLP_LAMBDA_INIT\n
+Output arguments of an NLP Solver CasADi::NLPOutput: NLP_X_OPT,NLP_COST,NLP_LAMBDA_OPT,NLP_LAMBDA_LBX,NLP_LAMBDA_UBX\n
+
   \author Joel Andersson 
   \date 2010
 */

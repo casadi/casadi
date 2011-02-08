@@ -24,6 +24,20 @@ class SXtests(casadiTestCase):
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
+    self.Jpool=FunctionPool()
+    self.Jpool.append(lambda x: sqrt(x[0]),lambda x:diag(1/(2.0*sqrt(x))),"sqrt")
+    self.Jpool.append(lambda x: sin(x[0]),lambda x:diag(cos(x)),"sin")
+    self.Jpool.append(lambda x: cos(x[0]),lambda x:diag(-sin(x)),"cos")
+    self.Jpool.append(lambda x: tan(x[0]),lambda x:diag(1.0/cos(x)**2),"tan")
+    self.Jpool.append(lambda x: arctan(x[0]),lambda x:diag( 1.0/(x**2+1)),"arctan")
+    self.Jpool.append(lambda x: arcsin(x[0]),lambda x:diag( 1.0/sqrt(1-x**2)),"arcsin")
+    self.Jpool.append(lambda x: arccos(x[0]),lambda x: diag(-1.0/sqrt(1-x**2)),"arccos")
+    self.Jpool.append(lambda x: exp(x[0]),lambda x: diag(exp(x)),"exp")
+    self.Jpool.append(lambda x: log(x[0]),lambda x: diag(1.0/x),"log")
+    self.Jpool.append(lambda x: x[0]**0,lambda x :diag(zeros(x.shape)),"x^0")
+    self.Jpool.append(lambda x: x[0]**1,lambda x : diag(ones(x.shape)),"^1")
+    self.Jpool.append(lambda x: x[0]**(-2),lambda x : diag(-2.0/x**3),"^-2")
+    self.Jpool.append(lambda x: x[0]**(0.3),lambda x :diag( 0.3/x**0.7),"^0.3")
     self.matrixpool=FunctionPool()
     self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
     self.matrixbinarypool=FunctionPool()
@@ -79,6 +93,43 @@ class SXtests(casadiTestCase):
       
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
+  def test_SXMatrixJacobian(self):
+      self.message("SXMatrix(1,1) unary operation, jacobian")
+      x=symbolic("x")
+      x0=array([[0.738]])
+
+      def fmod(f,x):
+        J=f.jacobian()
+        J.init()
+        return J
+      
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
+      
+  def test_SXMatrixJac(self):
+      self.message("SXMatrix(1,1) unary operation, jac")
+      x=symbolic("x")
+      x0=array([[0.738]])
+
+      def fmod(f,x):
+        j=f.jac()
+        J=SXFunction(x,[j])
+        J.init()
+        return J
+      
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jac",fmod=fmod)
+      
+  def test_SXMatrixJacobians(self):
+      self.message("SXMatrix(3,1) unary operation, jacobian")
+      x=symbolic("x",3)
+      x0=array([0.738,0.9,0.3])
+
+      def fmod(f,x):
+        J=f.jacobian()
+        J.init()
+        return J
+      
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
+      
   def test_SXMatrix(self):
       self.message("SXMatrix unary operations")
       x=symbolic("x",3,2)
@@ -101,29 +152,22 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
       self.assertRaises(RuntimeError, lambda : c.dot(x,y))
       
-  #def test_SXMatrixslicing(self):
-      #x=symbolic("x",3,2)
-      #x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
-      
-      #for i in range(3):
-      #  self.numpyEvaluationCheck(lambda x: getRow(x[0],i), lambda x: x[i,:] ,[x],x0,name="getRow(SXMatrix)")
-        
-      #for j in range(2):
-        #self.numpyEvaluationCheck(lambda x: trans(getColumn(x[0],j)), lambda x: x[:,j] ,[x],x0,name="getColumn(SXMatrix)")
-      #self.assertRaises(RuntimeError,lambda : getRow(x,3))
-      #self.assertRaises(RuntimeError,lambda : getColumn(x,2))
+  def test_SXMatrixslicing(self):
+      self.message("SXMatrix slicing")
+      x=symbolic("x",3,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
 
-      #self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
-      #self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
-      #self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
-      #self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
-      #self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
-      #self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
-      #self.numpyEvaluationCheck(lambda x: x[0][0,:], lambda x: matrix(x)[0,:],[x],x0,name="x[0,:]")
-      #self.numpyEvaluationCheck(lambda x: x[0][-1,:], lambda x: matrix(x)[-1,:],[x],x0,name="x[-1,:]")
-      #self.numpyEvaluationCheck(lambda x: x[0][:,-2], lambda x: matrix(x)[:,-2],[x],x0,name="x[:,-2]")
-      #self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
-      #self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
+      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
+      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
+      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
+      self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
+      self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
+      self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
+      self.numpyEvaluationCheck(lambda x: x[0][0,:], lambda x: matrix(x)[0,:],[x],x0,name="x[0,:]")
+      self.numpyEvaluationCheck(lambda x: x[0][-1,:], lambda x: matrix(x)[-1,:],[x],x0,name="x[-1,:]")
+      self.numpyEvaluationCheck(lambda x: x[0][:,-2], lambda x: matrix(x)[:,-2],[x],x0,name="x[:,-2]")
+      self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
+      self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
       
   def test_SXMatrixSparse(self):
       self.message("SXMatrix sparse")

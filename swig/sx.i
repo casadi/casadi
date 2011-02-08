@@ -36,9 +36,11 @@ namespace CasADi {
         s = list(s)
         for k in range(2):
           if isinstance(s[k],slice):
-            J = s[k].indices(self.size1())
+            J = s[k].indices(self.shape[k])
             s[k] = range(J[0],J[1],J[2])
           elif isinstance(s[k],int):
+            if s[k]<0:
+              s[k]=s[k]+self.shape[k]
             s[k] = [s[k]]
       return self.getitem(s)
     %}
@@ -49,9 +51,11 @@ namespace CasADi {
         s = list(s)
         for k in range(2):
           if isinstance(s[k],slice):
-            J = s[k].indices(self.size1())
+            J = s[k].indices(self.shape[k])
             s[k] = range(J[0],J[1],J[2])
           elif isinstance(s[k],int):
+            if s[k]<0:
+              s[k]=s[k]+self.shape[k]
             s[k] = [s[k]]
       self.setitem(s,val)
     %}
@@ -154,9 +158,11 @@ namespace CasADi {
         s = list(s)
         for k in range(2):
           if isinstance(s[k],slice):
-            J = s[k].indices(self.size1())
+            J = s[k].indices(self.shape[k])
             s[k] = range(J[0],J[1],J[2])
           elif isinstance(s[k],int):
+            if s[k]<0:
+              s[k]=s[k]+self.shape[k]
             s[k] = [s[k]]
       return self.getitem(s)
     %}
@@ -167,9 +173,11 @@ namespace CasADi {
         s = list(s)
         for k in range(2):
           if isinstance(s[k],slice):
-            J = s[k].indices(self.size1())
+            J = s[k].indices(self.shape[k])
             s[k] = range(J[0],J[1],J[2])
           elif isinstance(s[k],int):
+            if s[k]<0:
+              s[k]=s[k]+self.shape[k]
             s[k] = [s[k]]
       self.setitem(s,val)
     %}

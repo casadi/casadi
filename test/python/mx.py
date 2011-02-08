@@ -415,31 +415,23 @@ class MXtests(casadiTestCase):
     checkMXoperations3(self,lambda x: horzcat([x]),lambda x: x,'horzcat(snippet)')
     checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(snippet,snippet)')
     
-  #def test_MXslicingnew(self):
-    #x = MX("x",2,3)
-    #xt=trans(x)
-    #self.assertEqual(xt.size1(),3,"trans MX of wrong dimension")
-    #self.assertEqual(xt.size2(),2,"trans MX of wrong dimension")
-    #p1 = horzcat([xt[0,0],xt[1,0],xt[2,0]])
-    #p2 = horzcat([xt[0,1],xt[1,1],xt[2,1]])
-    #z = vertcat([p1,p2])
-    #f = MXFunction([x],[z])
-    #f.init()
-    #L=[1,2,3,4,5,6]
-    #f.setInput(L,0)
-    #f.evaluate()
-    #zt = f.output(0).toArray()
-    #zr = reshape(array(L),(2,3))
-    #checkarray(self,zr,zt,"slicing(trans)")
-    #checkMXoperations(self,lambda x: x[:,0],lambda x: x[:,0],'vertcat[:,0]')
-    #checkMXoperations(self,lambda x: x[:,1],lambda x: x[:,1],'vertcat[:,1]')
-    #checkMXoperations(self,lambda x: x[1,:],lambda x: x[1,:],'vertcat[1,:]')
-    #checkMXoperations(self,lambda x: x[0,:],lambda x: x[0,:],'vertcat[0,:]')
-    #checkMXoperations(self,lambda x: x[:,0:1],lambda x: x[:,0:1],'vertcat[:,0:1]')
-    #checkMXoperations(self,lambda x: x[0:1,:],lambda x: x[0:1,:],'vertcat[0:1,:]')
-    #checkMXoperations(self,lambda x: x[[0,1],0:1],lambda x: x[[0,1],0:1],'vertcat[:,0:1]')
-    #checkMXoperations(self,lambda x: x[0:1,[0,1]],lambda x: x[0:1,[0,1]],'vertcat[0:1,:]')
-    
+  def test_MXslicingnew(self):
+    self.message("MX slicing")
+
+    x = MX("x",3,2)
+    x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+    self.numpyEvaluationCheck(lambda x:x[0][1,0],lambda x: x[1,0],[x],x0,'x[1,0]')
+    self.numpyEvaluationCheck(lambda x:x[0][0,1],lambda x: x[0,1],[x],x0,'x[0,1]')
+    self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
+    self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
+    self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
+    self.numpyEvaluationCheck(lambda x: x[0][0,:], lambda x: matrix(x)[0,:],[x],x0,name="x[0,:]")
+    self.numpyEvaluationCheck(lambda x: x[0][-1,:], lambda x: matrix(x)[-1,:],[x],x0,name="x[-1,:]")
+    self.numpyEvaluationCheck(lambda x: x[0][:,-2], lambda x: matrix(x)[:,-2],[x],x0,name="x[:,-2]")
+    self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
+    self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
+    #self.numpyEvaluationCheck(lambda x: x[[0,1],0:1],lambda x: x[[0,1],0:1],[x],x0,name='x[:,0:1]')
+    #self.numpyEvaluationCheck(lambda x: x[0:1,[0,1]],lambda x: x[0:1,[0,1]],[x],x0,name='x[0:1,:]')
     
   def test_getinputMX(self):
     self.message("outputMX/inputMX")

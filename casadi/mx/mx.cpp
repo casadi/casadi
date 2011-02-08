@@ -89,18 +89,25 @@ MX& MX::setitem(const std::vector< std::vector<int> > &II, const MX&  m){
 }
 
 const MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
-  if(jj.size()==1){
-    vector<MX> v(ii.size());
-    for(int i=0; i<v.size(); ++i)
-      v[i] = (*this)[ii[i]];
-    return vertcat(v);
-  } else {
-    casadi_assert_message(0,"MX::getSub: not implemented");
+  vector<MX> rows(ii.size());
+  for(int i=0; i<ii.size(); ++i) {
+    vector<MX> col(jj.size());
+    for(int j=0; j<jj.size(); ++j) {
+      col[j] = (*this)(ii[i],jj[j]);
+    }
+    rows[i] = horzcat(col);
   }
+  return vertcat(rows);
 }
 
 void MX::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el){
-  throw CasadiException("MX::setSub: not implemented");
+  casadi_assert_message(ii.size()==el.size1(),"right hand size must match dimension of left hand side in assignment");
+  casadi_assert_message(jj.size()==el.size2(),"right hand size must match dimension of left hand side in assignment");
+  for(int i=0; i<ii.size(); ++i) {
+    for(int j=0; j<jj.size(); ++j) {
+      (*this)(ii[i],jj[j])=el(i,j);
+    }
+  }
 }
 
 const MX MX::operator()(int i, int j) const{

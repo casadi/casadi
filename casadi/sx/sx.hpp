@@ -72,7 +72,7 @@ class SX{
     */
     SX(double val);
     /** \brief Symbolic constructor
- 	\param Name of the symbol
+ 	\param name Name of the symbol
 
 	This is the name that wil be used by the "operator<<" and "toSTring" methods.
 	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
