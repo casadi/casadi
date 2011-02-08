@@ -127,6 +127,7 @@ if False:
   solver.setOption("linear_solver","ma57")
 else:
   solver = KnitroSolver(F,G)
+  solver.setIntParam("algorithm",3)
 
 #solver.setOption("verbose",True)
 solver.init()
