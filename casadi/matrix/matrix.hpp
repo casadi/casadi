@@ -527,7 +527,10 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
     
     // Loop over the columns of the returb matrix
     for(int j=0; j<jj.size(); ++j){
-      
+      while(col(el)<jj[j] &&  el<el_last){
+        el++;
+      }
+       
       // Break if no more elements on the row
       if(el>=el_last) break;
       
