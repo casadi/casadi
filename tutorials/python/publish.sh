@@ -1,1 +1,3 @@
-rsync -ave ssh . u0052373@gate.mech.kuleuven.be:/home/users/tme/u0052373/web/casadi/tutorials
+echo "Please enter sf username"
+read username
+rsync -avP -e ssh pdf/ "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/tutorials/"
