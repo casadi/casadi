@@ -85,6 +85,9 @@ class MXNode : public SharedObjectNode{
     /** \brief  Check if constant */
     virtual bool isConstant() const;
 
+    /** \brief  Check if mapping */
+    virtual bool isMapping() const{return false;}
+
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const;
     

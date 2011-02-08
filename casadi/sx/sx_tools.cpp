@@ -258,7 +258,7 @@ void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr){
   fcn->eval(Matrix<SX>(),res,replace,bexpr);
 
   for(int i=0; i<bexpr.size(); ++i)
-    bexpr[i] = bexpr[i]->dependent(0);
+    bexpr[i] = bexpr[i]->dep(0);
 
   ex = res;
 

@@ -197,6 +197,42 @@ int CRSSparsity::getNZ(int i, int j) const{
   return -1;
 }
 
+std::vector<int> CRSSparsity::getNZNew(std::vector<int> i, std::vector<int> j){
+  std::vector<int> ret;
+  ret.reserve(i.size());
+
+    // Quick return if matrix is dense
+  if(numel()==size()){
+    for(int k=0; k<i.size(); ++k)
+      ret.push_back(j[k]+i[k]*size2());
+    return ret;
+  }
+
+  // Very inefficient algorithm
+  for(int k=0; k<i.size(); ++k){
+    ret.push_back(getNZ(i[k],j[k]));
+  }
+  return ret;
+}
+
+std::vector<int> CRSSparsity::getNZNew(std::vector<int> i, std::vector<int> j) const{
+  std::vector<int> ret;
+  ret.reserve(i.size());
+
+    // Quick return if matrix is dense
+  if(numel()==size()){
+    for(int k=0; k<i.size(); ++k)
+      ret.push_back(j[k]+i[k]*size2());
+    return ret;
+  }
+
+  // Very inefficient algorithm
+  for(int k=0; k<i.size(); ++k){
+    ret.push_back(getNZ(i[k],j[k]));
+  }
+  return ret;
+}
+
 std::vector<int> CRSSparsity::getNZ(std::vector<int> ii, std::vector<int> jj) const{
   std::vector<int> ret;
   for(vector<int>::const_iterator it=ii.begin(); it!=ii.end(); ++it){

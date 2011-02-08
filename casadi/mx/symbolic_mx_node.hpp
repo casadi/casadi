@@ -58,7 +58,7 @@ class SymbolicMatrix : public MXNode{
     std::string name_;
     
     // Here, put expansion in terms of SX
-    // Matrix<SX> svar_
+/*    Matrix<SX> sv_;*/
 };
 
 } // namespace CasADi

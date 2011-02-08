@@ -94,6 +94,16 @@ void KnitroInternal::evaluate(int fsens_order, int asens_order){
   // Type of constraints
   vector<int> cType(m_,KTR_CONTYPE_GENERAL);
   
+  // "Correct" upper and lower bounds
+  for(vector<double>::iterator it=input(NLP_LBX).begin(); it!=input(NLP_LBX).end(); ++it)
+    if(isinf(*it)) *it = -KTR_INFBOUND;
+  for(vector<double>::iterator it=input(NLP_UBX).begin(); it!=input(NLP_UBX).end(); ++it)
+    if(isinf(*it)) *it =  KTR_INFBOUND;
+  for(vector<double>::iterator it=input(NLP_LBG).begin(); it!=input(NLP_LBG).end(); ++it)
+    if(isinf(*it)) *it = -KTR_INFBOUND;
+  for(vector<double>::iterator it=input(NLP_UBG).begin(); it!=input(NLP_UBG).end(); ++it)
+    if(isinf(*it)) *it =  KTR_INFBOUND;
+  
   // Initialize KNITRO
   status = KTR_init_problem(kc_handle_, n_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                               &input(NLP_LBX)[0], &input(NLP_UBX)[0],

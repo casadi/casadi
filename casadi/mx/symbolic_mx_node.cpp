@@ -21,6 +21,7 @@
  */
 
 #include "symbolic_mx_node.hpp"
+// #include "../sx/sx_tools.hpp"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ namespace CasADi{
 
 SymbolicMatrix::SymbolicMatrix(const std::string& name, int n, int m) : name_(name) {
   setSparsity(CRSSparsity(n,m,true));
+/*  sv_ = symbolic(name,n,m);*/
 }
 
 SymbolicMatrix* SymbolicMatrix::clone() const{

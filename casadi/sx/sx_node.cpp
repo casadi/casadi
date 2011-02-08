@@ -106,7 +106,7 @@ const std::string& SXNode::getName() const{
   throw CasadiException("SXNode::getName failed, the node must be symbolic");
 }
 
-const SX& SXNode::dependent(int i) const{
+const SX& SXNode::dep(int i) const{
   stringstream ss;
   ss << "child() not defined for class " << typeid(*this).name() << std::endl;
   throw CasadiException(ss.str());

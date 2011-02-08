@@ -31,7 +31,9 @@
 #include "evaluation.hpp"
 #include "symbolic_mx_node.hpp"
 #include "mx_constant.hpp"
+#include "mx_zero.hpp"
 #include "mx_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 namespace CasADi{
 
@@ -55,6 +57,10 @@ MX::MX(const std::vector<double> &x){
 
 MX::MX(const std::string& name, int n, int m){
   assignNode(new SymbolicMatrix(name,n,m));
+}
+
+MX::MX(int nrow, int ncol){
+  assignNode(new MXZero(nrow,ncol));
 }
 
 const MX MX::getitem(const vector<int>& I) const{
@@ -231,7 +237,7 @@ bool MX::empty() const{
 }
 
 MX MX::zeros(int nrow, int ncol){
-  return MX(Matrix<double>(nrow,ncol,0));
+  return MX(nrow,ncol);
 }
 
 MX MX::ones(int nrow, int ncol){

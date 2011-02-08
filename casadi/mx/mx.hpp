@@ -66,6 +66,9 @@ class MX : public SharedObject{
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
 
+    /** \brief  Matrix with all zeros */
+    MX(int nrow, int ncol);
+    
     /** \brief  Destructor */
     ~MX();
 

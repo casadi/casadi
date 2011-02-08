@@ -81,7 +81,7 @@ bool BinarySXNode::isSmooth() const{
     return true;
 }
 
-const SX& BinarySXNode::dependent(int i) const{
+const SX& BinarySXNode::dep(int i) const{
   assert(i==0 || i==1);
   return child[i];
 }

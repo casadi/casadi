@@ -32,6 +32,7 @@ SET(CASADI_SRCS
   mx/mx.cpp                  mx/mx.hpp                  # Public, smart pointer class, 
   mx/mx_node.cpp             mx/mx_node.hpp             # Base class for all the MX nodes
   mx/mx_constant.cpp         mx/mx_constant.hpp         # A constant MX node
+  mx/mx_zero.cpp             mx/mx_zero.hpp             # A constant zero
   mx/symbolic_mx_node.cpp    mx/symbolic_mx_node.hpp    # A symbolic MX variable
   mx/unary_op.cpp            mx/unary_op.hpp            # Unary operation
   mx/scalar_matrix_op.cpp    mx/scalar_matrix_op.hpp    # Scalar-matrix elementwise binary operation
@@ -42,10 +43,12 @@ SET(CASADI_SRCS
   mx/reshape.cpp             mx/reshape.hpp             # Keep the non-zero entries but give the matrix a new shape
   mx/vertcat.cpp             mx/vertcat.hpp             # Vertical concatenation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
+  mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/reordering.cpp          mx/reordering.hpp          # Reordering of the non-zeros (rename to "Mapping")
   mx/transpose.cpp           mx/transpose.hpp           # Matrix transpose, a type of reordering
   mx/matrix_element.cpp      mx/matrix_element.hpp      # Get a submatrix: Make this inherit  from Reordering!
   mx/if_else_node.cpp        mx/if_else_node.hpp        # An if-else branch
+  mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
   mx/mx_tools.cpp            mx/mx_tools.hpp
 
   # A dynamically created function with AD capabilities
@@ -60,6 +63,7 @@ SET(CASADI_SRCS
   fx/integrator.hpp          fx/integrator.cpp          fx/integrator_internal.hpp          fx/integrator_internal.cpp
   fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
   fx/simulator.hpp           fx/simulator.cpp           fx/simulator_internal.hpp           fx/simulator_internal.cpp
+  fx/parallelizer.hpp        fx/parallelizer.cpp        fx/parallelizer_internal.hpp        fx/parallelizer_internal.cpp
   fx/function_io.hpp         fx/function_io.cpp
 )
 

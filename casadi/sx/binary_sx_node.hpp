@@ -55,8 +55,11 @@ virtual bool isSmooth() const;
 
 virtual bool isBinary() const{ return true; }
 
+/** \brief  Number of dependencies */
+virtual int ndep() const{ return 2;}
+
 /** \brief  get the reference of a child */
-virtual const SX& dependent(int i) const;
+virtual const SX& dep(int i) const;
 
 /** \brief  Get the operation */
 virtual int getOp() const{ return op;}

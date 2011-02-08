@@ -114,6 +114,9 @@ void MXFunctionInternal::init(){
     outputv_ind.push_back(nodemap[(MXNode*)it->get()]);
   }
   
+  // Make sure that the output nodes are placed directly after the corresponding multiple output node
+  
+  
   // Create runtime elements for each node
   alg.resize(nodes.size());
   for(int ii=0; ii<alg.size(); ++ii){

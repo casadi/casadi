@@ -77,8 +77,11 @@ bool isEqual(const SXNode& node) const; // comparison
 /// comparison
 bool isEqual(const SX& scalar) const; // comparison
 
+/** \brief  Number of dependencies */
+virtual int ndep() const{ return 0;}
+
 /** \brief  get the reference of a child */
-virtual const SX& dependent(int i) const;
+virtual const SX& dep(int i) const;
 
 /** \brief  Check if smooth */
 virtual bool isSmooth() const;

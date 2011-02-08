@@ -119,6 +119,19 @@ F = MXFunction([V],[XF[2]])
 # Terminal constraints: 0<=[x(T);y(T)]<=0
 G = MXFunction([V],[vertcat(g)])
 
+## Jacobian of a block
+#Jxx = I.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
+#Jxp = I.jacobian(INTEGRATOR_P, INTEGRATOR_XF)
+
+## Build up a graph of integrator calls
+#X0  = MX([0,1,0])
+#for k in range(NS):
+  ## call the integrator
+  #Jk = Jxx.call([T0[k],TF[k],X0,U[k],XP,Z])
+  #X0 = X[k]
+
+## Construct the Jacobian (quickfix)
+
 solver = IpoptSolver(F,G)
 solver.setOption("tol",1e-5)
 solver.setOption("hessian_approximation", "limited-memory")

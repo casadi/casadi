@@ -150,6 +150,8 @@ class CRSSparsity : public SharedObject{
     /** \brief Get a set of non-zero element
          return -1 if the element does not exists */
     std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
+    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j);
+    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j) const;
 
     /// Get the sparsity in CRS format
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;

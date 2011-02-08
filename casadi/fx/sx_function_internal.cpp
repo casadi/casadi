@@ -270,12 +270,19 @@ SXFunctionInternal::~SXFunctionInternal(){
 void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<BinarySXNode*>& algnodes){
 
     while(!s.empty()){
+      // Get the topmost element
+      SXNode* t = s.top();
+      
       // If the last element on the stack has not yet been added
-      if (!s.top()->temp){
-
-        if(s.top()->isBinary()){
+      if (!t->temp){
+        for(int i=0; i<t->ndep(); ++i){
+          
+        }
+        
+        
+        if(t->isBinary()){
           // If the element is a binary node
-          BinarySXNode* bnode = (BinarySXNode*)(s.top());
+          BinarySXNode* bnode = static_cast<BinarySXNode*>(t);
 
 	  if(bnode->child[0]->isBinary() && bnode->child[0].get()->temp == 0) {
             // if the first child has not yet been added
@@ -290,7 +297,7 @@ void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<BinarySXNode
 	    algnodes.push_back(bnode);
 
 	    // Mark the node as found
-	    s.top()->temp = 1;
+	    t->temp = 1;
 
 	    // Remove from stack
             s.pop();
