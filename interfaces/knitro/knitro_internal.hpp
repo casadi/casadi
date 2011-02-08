@@ -49,11 +49,14 @@ public:
                       double * const jac, double * const hessian, double * const hessVector, void *userParams);
   
 
-  
-protected:
-  
   // KNITRO context pointer
   KTR_context_ptr kc_handle_;
+  
+  // KNITRO double parameter
+  std::map<std::string, double> double_param_;
+  
+  // KNITRO int parameter
+  std::map<std::string, int> int_param_;
   
 };
 

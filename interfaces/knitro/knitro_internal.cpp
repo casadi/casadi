@@ -90,7 +90,15 @@ void KnitroInternal::evaluate(int fsens_order, int asens_order){
     status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_LBFGS);
     casadi_assert_message(status==0, "KTR_set_int_param failed");
   }
-  
+
+  // Set user set options
+  for(std::map<std::string, double>::iterator it=double_param_.begin(); it!=double_param_.end(); ++it){
+    status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
+    if(status!=0){
+      throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+    }
+  }
+
   // Type of constraints
   vector<int> cType(m_,KTR_CONTYPE_GENERAL);
   

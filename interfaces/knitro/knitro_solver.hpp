@@ -45,6 +45,12 @@ class KnitroSolver : public NLPSolver {
     /// Access functions of the node
     KnitroInternal* operator->();
     const KnitroInternal* operator->() const;
+    
+    /// Set KNITRO integer parameters
+    void setIntParam(const std::string& name, int val);
+    
+    /// Set KNITRO double parameters
+    void setDoubleParam(const std::string& name, double val);
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

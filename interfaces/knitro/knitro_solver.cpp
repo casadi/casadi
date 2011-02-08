@@ -45,4 +45,13 @@ bool KnitroSolver::checkNode() const{
   return dynamic_cast<const KnitroInternal*>(get());
 }
 
+void KnitroSolver::setIntParam(const std::string& name, int val){
+  (*this)->int_param_[name] = val;
+}
+    
+void KnitroSolver::setDoubleParam(const std::string& name, double val){
+  (*this)->double_param_[name] = val;
+}
+
+
 } // namespace CasADi
