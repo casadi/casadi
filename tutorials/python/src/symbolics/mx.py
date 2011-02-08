@@ -47,24 +47,22 @@ print a.T*b.T
 
 #! Numerical matrices
 #! ------------------------------
-#! A SWIG typemap for numpy arrays is under way.
-#! In the meantime, dense numerical matrices are created as follows:
-X = MX([1,2,3,4,5,6],2,3)
+X = MX(DMatrix(array([[1,2,3],[4,5,6]])))
 print X
 print outer_prod(X,X)
-print MX([1,2,3],1,3)
-print MX([1,2,3],3,1)
+print MX(trans(DMatrix([1,2,3])))
+print MX(DMatrix([1,2,3]))
 #! As before, evaluation is lazy on the matrix level
 Y = MX("Y")
-f = MXFunction(Y,X)
+f = MXFunction([Y],[X])
 f.init()
-f.setInput([2])
+f.input().set([2])
 f.evaluate()
 print f.output()
 
 #! Element assignement
 #! -------------------
-X = MX("x",2,2);
-X[0]=5;
-print X, X[0]
+#X = MX("x",2,2)
+#X[0,0]=5
+#print X, X[0,0]
  

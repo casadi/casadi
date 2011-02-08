@@ -25,9 +25,3 @@ print w.toMatrix()
 print matrix(w)
 print w.toCsr_matrix()
 
-print DMatrix(array([[1,2,3],[4,5,6]])).toArray()
-
-
-print DMatrix(array([1,2,3,6]),2,2).toArray()
-
-print DMatrix(array([1,2,3,6]),2,2).toArray()

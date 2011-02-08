@@ -33,9 +33,9 @@ q = [1,0,0,0,0]
 b = [1,1,1,1,1]
 
 X = MX("x",5,1)
-P = MX(list(P.ravel()),5,5)
-q = MX(q,5,1)
-A = MX(list(A.ravel()),5,5)
+P = MX(DMatrix(P))
+q = MX(DMatrix(q))
+A = MX(DMatrix(A))
 
 # Objective function
 F = 0.5*prod(prod(trans(X),P),X) + prod(trans(q),X)
@@ -48,7 +48,7 @@ f.evaluate()
 print f.output().toArray()
 
 # constraint function
-g = MXFunction([X],[X])
+g = MXFunction([X],[X+X])
 g.init()
 
 solver = IpoptSolver(f,g)
@@ -68,5 +68,5 @@ solver.setInput([-100,-100,-100,-100,-100],NLP_LBG)
 
 
 solver.solve()
-print solver.getOutput(NLP_X_OPT)
+print solver.output(NLP_X_OPT)
 #! Nested optimization
