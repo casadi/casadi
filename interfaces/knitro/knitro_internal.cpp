@@ -32,6 +32,9 @@ namespace CasADi{
 KnitroInternal::KnitroInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_, const FX& GF_) : NLPSolverInternal(F_,G_,H_,J_,GF_){
   casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
   kc_handle_ = 0;
+
+
+  addOption("contype", OT_INTEGERVECTOR);
 }
 
 
@@ -108,6 +111,11 @@ void KnitroInternal::evaluate(int fsens_order, int asens_order){
 
   // Type of constraints
   vector<int> cType(m_,KTR_CONTYPE_GENERAL);
+  if(hasSetOption("contype")){
+    vector<int> contype = getOption("contype").toIntVector();
+    casadi_assert(contype.size()==cType.size());
+    copy(contype.begin(),contype.end(),cType.begin());
+  }
   
   // "Correct" upper and lower bounds
   for(vector<double>::iterator it=input(NLP_LBX).begin(); it!=input(NLP_LBX).end(); ++it)
