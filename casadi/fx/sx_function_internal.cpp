@@ -822,7 +822,7 @@ void SXFunctionInternal::eval(
 
   // copy the function arguments
   for(int i=0; i<input_ind[0].size(); ++i)
-    if(input_ind[0][i]>=0) work[input_ind[0][i]] = x(i);
+    if(input_ind[0][i]>=0) work[input_ind[0][i]] = x[i];
 
   // evaluate the algorithm    
   int i;
@@ -1360,7 +1360,7 @@ void SXFunctionInternal::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>&
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_s.size(); ++ind)
     for(int i=0; i<input_ind[ind].size(); ++i){
-      work_sym[input_ind[ind][i]] = input_s[ind](i);
+      work_sym[input_ind[ind][i]] = input_s[ind][i];
   }
   
   // Evaluate the algorithm
