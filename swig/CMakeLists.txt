@@ -93,21 +93,21 @@ set_source_files_properties (casadi.i PROPERTIES
 # PYTHON interface
 SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
 # add_dependencies(_casadi casadi) #workaround to add dependencies of casadi to _casadi (SWIG_ADD_MODULE does not add dependencies from c++ source files)
-IF(FOUND_NUMPY)
+IF(NUMPY_FOUND)
 cmake_policy(SET CMP0003 NEW)
 SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES} 
  ${SWIG_LINK_LIBRARIES_LIST}
 casadi )
-ELSE(FOUND_NUMPY)
+ELSE(NUMPY_FOUND)
 SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES} 
  ${SWIG_LINK_LIBRARIES_LIST}
 casadi )
-ENDIF(FOUND_NUMPY)
+ENDIF(NUMPY_FOUND)
 # the name used for the shared module for the python interface is determined
 get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
 if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
-endif(CASADI_PYTHON_LIBRARY_SUFFIX)
+endif(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
 set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
 # a python library is built in the build directory inside swig/python 
