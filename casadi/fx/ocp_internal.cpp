@@ -26,7 +26,7 @@ using namespace std;
 
 namespace CasADi{
   
-OCPInternal::OCPInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G){
+OCPInternal::OCPInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
 }
 
 OCPInternal::~OCPInternal(){

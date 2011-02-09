@@ -29,10 +29,21 @@
 
 namespace CasADi{
 
+enum OCPInput{
+  OCP_T,                      // Time grid
+  OCP_X, OCP_LBX, OCP_UBX,    // Differential state with bounds
+  OCP_Z, OCP_LBZ, OCP_UBZ,    // Algebraic state with bounds
+  OCP_XP, OCP_LBXP, OCP_UBXP, // State deriatives with bounds
+  OCP_U, OCP_LBU, OCP_UBU,    // Controls with bounds
+  OCP_P, OCP_LBP, OCP_UBP,    // Parameters with bounds
+  OCP_LBH, OCP_UBH,           // Bounds for the point constraints
+  OCP_LBG, OCP_UBG,           // Bounds for the coupling constraints
+  OCP_NUM_IN};
+  
 // Forward declaration of internal class
 class OCPInternal;
 
-/** \brief OCP execution of functions
+/** \brief Optimal control problem formulation
   \author Joel Andersson
   \date 2011
 */ 

@@ -35,12 +35,11 @@ namespace CasADi{
 */
 class OCPInternal : public FXInternal{
   friend class OCP;
+  public:
   
-  protected:
     /// Constructor
     explicit OCPInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G);
 
-  public:
     /// Destructor
     virtual ~OCPInternal();
     
@@ -50,6 +49,17 @@ class OCPInternal : public FXInternal{
     /// Initialize
     virtual void init();
     
+    /// Cost functions
+    std::vector<FX> L_;
+    
+    /// Dynamic constraint
+    std::vector<FX> F_;
+    
+    /// Point constraints
+    std::vector<FX> H_;
+    
+    /// Coupling constraints
+    std::vector<FX> G_;
 };
 
 
