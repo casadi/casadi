@@ -35,7 +35,9 @@ CVodesInternal* CVodesInternal::clone() const{
   if(is_init) throw CasadiException("CVodesInternal::clone: cannot clone an initialized object");
   
   // Return a deep copy
-  return new CVodesInternal(*this);
+  CVodesInternal* node = new CVodesInternal(*this);
+  node->f_ = shared_cast<FX>(f_.clone());
+  return node;
 }
   
 int CVodesInternal::getNX(const FX& f, const FX& q){
