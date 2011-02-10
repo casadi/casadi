@@ -36,7 +36,7 @@ CVodesInternal* CVodesInternal::clone() const{
   
   // Return a deep copy
   CVodesInternal* node = new CVodesInternal(*this);
-  node->f_ = shared_cast<FX>(f_.clone());
+/*  node->f_ = shared_cast<FX>(f_.clone());*/
   return node;
 }
   

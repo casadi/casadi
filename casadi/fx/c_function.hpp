@@ -59,6 +59,10 @@ public:
   
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
+
+  /** \brief  Set user data structure (to be passed to all functions) */
+  void setUserData(void* user_data);
+  
   
 }; // class CFunction
   

@@ -42,6 +42,7 @@ class Element{
     
     //@{
     /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
+    M& operator=(const Element<M,T> &y);
     M& operator=(const T &y);
     M& operator+=(const T &y);
     M& operator-=(const T &y);
@@ -64,6 +65,12 @@ class Element{
 };
 
 // Implementation
+
+template<typename M, typename T>
+M& Element<M,T>::operator=(const Element<M,T> &y){
+  mat_.setElement(i_,j_, y);
+  return mat_;
+}
 
 template<typename M, typename T>
 M& Element<M,T>::operator=(const T &y){

@@ -92,6 +92,12 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
   int el = 0; // running index
 
   if(use_ad_fwd_){ // forward AD if less inputs than outputs
+    // Clear the forward seeds
+    for(int i=0; i<fcn_.getNumInputs(); ++i)
+      for(int dir=0; dir<nfdir_fcn_; ++dir)
+        fcn_.fwdSeed(i,dir).setZero();
+
+    
     // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
     for(int ofs=0; ofs<n_; ofs += nfdir_fcn_){
         for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){

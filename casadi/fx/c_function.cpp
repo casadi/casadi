@@ -49,6 +49,10 @@ bool CFunction::checkNode() const{
   return dynamic_cast<const CFunctionInternal*>(get());
 }
 
+void CFunction::setUserData(void* user_data){
+  (*this)->setUserData(user_data);
+}
+
 
 } // namespace CasADi
 

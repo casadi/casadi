@@ -43,7 +43,7 @@ void CFunctionInternal::setUserData(void* user_data){
 }
 
 void CFunctionInternal::evaluate(int fsens_order, int asens_order){
-  if(evaluate_==0) throw CasadiException("CFunctionInternal::evaluate: pointer is null");
+  casadi_assert_message(evaluate_!=0, "CFunctionInternal::evaluate: pointer is null");
   ref_.assignNode(this); // make the reference point to this object
   evaluate_(ref_,fsens_order, asens_order,user_data_);  
   ref_.assignNode(0); // make sure to remove the reference, otherwise the object will never be deleted

@@ -53,6 +53,11 @@ target_link_libraries(convection_diffusion ipopt_interface sundials_interface mo
 # rocket example using sundials and ipopt
 add_executable(rocket_ipopt_sundials rocket_ipopt_sundials.cpp)
 target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+
+# Van der pol with multiple shooting
+add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
+target_link_libraries(vdp_multiple_shooting sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # SuperLU via CasADi
