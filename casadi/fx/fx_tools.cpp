@@ -165,13 +165,10 @@ void MultipleShooting::init(){
   XF = X[ns_-1];
 
   //Objective function: L(T)
-  F_ = MXFunction(V,XF[2]);
+  F_ = MXFunction(V,XF[nx_-1]);
 
   //Terminal constraints: 0<=[x(T);y(T)]<=0
   G_ = MXFunction(V,vertcat(g));
-  
-  // BUG: cannot remove
-  Jacobian JJJ(G_); 
 }
     
 void MultipleShooting::jacobian_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
