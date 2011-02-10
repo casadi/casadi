@@ -24,15 +24,75 @@
 #define FX_TOOLS_HPP
 
 #include "fx.hpp"
+#include "parallelizer.hpp"
+#include "c_function.hpp"
+#include "mx_function.hpp"
+#include "sx_function.hpp"
 
 namespace CasADi{
   
-  // Multiple shooting discretization
-//   void multipleShooting(const FX& f, const FX& L, const FX& h, 
-//                         const FX& m,
-//                         int nshoot, bool use_omp,
-//                         FX& G, FX& J);
-// }
+class MultipleShooting{
+  public:
+    // Constructor
+    MultipleShooting(const FX& fcn, int ns, int nx, int nu);
+    
+    // Initialize
+    void init();
+    
+    // Jacobian callback function
+    static void jacobian_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data);
+    
+    // Jacobian of the NLP
+    void jacobian(CFunction &f, int fsens_order, int asens_order);
+
+    // Discrete time dynamics
+    FX fcn_;
+    
+    //Numboer of shooting nodes
+    int ns_;
+    
+    // Number of controls
+    int nu_;
+    
+    // Number of differential states
+    int nx_;
+
+    // Variable bound and initial guess
+    vector<double> V_min_, V_max_, V_init_;
+    
+    // Constraint bounds
+    vector<double> G_min_, G_max_;
+
+    // NLP objective function
+    MXFunction F_;
+    
+    // NLP constraint function
+    MXFunction G_;
+
+    // Jacobian of the NLP constraints
+    CFunction J_;
+
+    // Parallel evaluation of the Jacobian blocks
+    Parallelizer JX_,JP_;
+    
+    // Mapping from the Jacobian blocks to the sparse Jacobian
+    SXFunction J_mapping_;
+    
+    // Control bounds and initial guess
+    vector<double> u_min_, u_max_, u_init_;
+    
+    // State bounds and initial guess
+    vector<double> x_min_, x_max_, x_init_;
+
+    //State bounds at the initial time
+    vector<double> x0_min_, x0_max_;
+
+    //State bounds at the final time
+    vector<double> xf_min_, xf_max_;
+
+    //Final time
+    double tf_;
+};
                         
                         
 } // namespace CasADi
