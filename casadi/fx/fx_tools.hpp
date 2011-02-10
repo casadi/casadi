@@ -39,11 +39,13 @@ class MultipleShooting{
     // Initialize
     void init();
     
+#ifndef SWIG
     // Jacobian callback function
     static void jacobian_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data);
     
     // Jacobian of the NLP
     void jacobian(CFunction &f, int fsens_order, int asens_order);
+#endif // SWIG
 
     // Discrete time dynamics
     FX fcn_;
@@ -58,10 +60,10 @@ class MultipleShooting{
     int nx_;
 
     // Variable bound and initial guess
-    vector<double> V_min_, V_max_, V_init_;
+    std::vector<double> V_min_, V_max_, V_init_;
     
     // Constraint bounds
-    vector<double> G_min_, G_max_;
+    std::vector<double> G_min_, G_max_;
 
     // NLP objective function
     MXFunction F_;
@@ -69,8 +71,10 @@ class MultipleShooting{
     // NLP constraint function
     MXFunction G_;
 
+#ifndef SWIG
     // Jacobian of the NLP constraints
     CFunction J_;
+#endif // SWIG
 
     // Parallel evaluation of the Jacobian blocks
     Parallelizer JX_,JP_;
@@ -79,16 +83,16 @@ class MultipleShooting{
     SXFunction J_mapping_;
     
     // Control bounds and initial guess
-    vector<double> u_min_, u_max_, u_init_;
+    std::vector<double> u_min_, u_max_, u_init_;
     
     // State bounds and initial guess
-    vector<double> x_min_, x_max_, x_init_;
+    std::vector<double> x_min_, x_max_, x_init_;
 
     //State bounds at the initial time
-    vector<double> x0_min_, x0_max_;
+    std::vector<double> x0_min_, x0_max_;
 
     //State bounds at the final time
-    vector<double> xf_min_, xf_max_;
+    std::vector<double> xf_min_, xf_max_;
 
     //Final time
     double tf_;

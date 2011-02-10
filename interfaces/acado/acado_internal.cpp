@@ -153,35 +153,35 @@ void AcadoInternal::init(){
   n_nodes_ = getOption("number_of_shooting_nodes").toInt();
 
   // Input dimensions
-  input_.resize(ACADO_NUM_IN);
-  input(ACADO_X_GUESS).resize(nx_,n_nodes_+1);
-  input(ACADO_U_GUESS).resize(nu_,n_nodes_+1);
-  input(ACADO_P_GUESS).resize(np_,1);
-  input(ACADO_LBX).resize(nx_,1);
-  input(ACADO_UBX).resize(nx_,1);
-  input(ACADO_LBX0).resize(nx_,1);
-  input(ACADO_UBX0).resize(nx_,1);
-  input(ACADO_LBXF).resize(nx_,1);
-  input(ACADO_UBXF).resize(nx_,1);
+  setNumInputs(ACADO_NUM_IN);
+  input(ACADO_X_GUESS) = DMatrix(nx_,n_nodes_+1,0);
+  input(ACADO_U_GUESS) = DMatrix(nu_,n_nodes_+1,0);
+  input(ACADO_P_GUESS) = DMatrix(np_,1,0);
+  input(ACADO_LBX)     = DMatrix(nx_,1,0);
+  input(ACADO_UBX)     = DMatrix(nx_,1,0);
+  input(ACADO_LBX0)    = DMatrix(nx_,1,0);
+  input(ACADO_UBX0)    = DMatrix(nx_,1,0);
+  input(ACADO_LBXF)    = DMatrix(nx_,1,0);
+  input(ACADO_UBXF)    = DMatrix(nx_,1,0);
   
-  input(ACADO_LBU).resize(nu_,1);
-  input(ACADO_UBU).resize(nu_,1);
+  input(ACADO_LBU)     = DMatrix(nu_,1,0);
+  input(ACADO_UBU)     = DMatrix(nu_,1,0);
   
-  input(ACADO_LBP).resize(np_,1);
-  input(ACADO_UBP).resize(np_,1);
+  input(ACADO_LBP)     = DMatrix(np_,1,0);
+  input(ACADO_UBP)     = DMatrix(np_,1,0);
   
-  input(ACADO_LBC).resize(nc_,1);
-  input(ACADO_UBC).resize(nc_,1);
+  input(ACADO_LBC)     = DMatrix(nc_,1,0);
+  input(ACADO_UBC)     = DMatrix(nc_,1,0);
   
-  input(ACADO_LBR).resize(nr_,1);
-  input(ACADO_UBR).resize(nr_,1);
+  input(ACADO_LBR)     = DMatrix(nr_,1,0);
+  input(ACADO_UBR)     = DMatrix(nr_,1,0);
   
   // Output dimensions
-  output_.resize(ACADO_NUM_OUT);
-  output(ACADO_X_OPT).resize(nx_,n_nodes_+1);
-  output(ACADO_U_OPT).resize(nu_,n_nodes_+1);
-  output(ACADO_P_OPT).resize(np_,1);
-  output(ACADO_COST).resize(1,1);
+  setNumOutputs(ACADO_NUM_OUT);
+  output(ACADO_X_OPT)  = DMatrix(nx_,n_nodes_+1,0);
+  output(ACADO_U_OPT)  = DMatrix(nu_,n_nodes_+1,0);
+  output(ACADO_P_OPT)  = DMatrix(np_,1,0);
+  output(ACADO_COST)   = DMatrix(1,1,0);
 
   // Initialize
   FXInternal::init();
