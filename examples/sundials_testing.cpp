@@ -165,11 +165,11 @@ Integrator create_IDAS(){
     ffcn.setNumOutputs(DAE_NUM_OUT);
     
     // Specify dimensions of inputs and outputs
-    ffcn.input(DAE_T).resize(1,1);
-    ffcn.input(DAE_Y).resize(3,1);
-    ffcn.input(DAE_YDOT).resize(3,1);
-    ffcn.input(DAE_P).resize(1,1);
-    ffcn.output(DAE_RES).resize(3,1);
+    ffcn.input(DAE_T)    = DMatrix(1,1,0);
+    ffcn.input(DAE_Y)    = DMatrix(3,1,0);
+    ffcn.input(DAE_YDOT) = DMatrix(3,1,0);
+    ffcn.input(DAE_P)    = DMatrix(1,1,0);
+    ffcn.output(DAE_RES) = DMatrix(3,1,0);
   }
   
   // Quadrature function
@@ -234,10 +234,10 @@ Integrator create_CVODES(){
     ffcn.setNumOutputs(ODE_NUM_OUT);
     
     // Specify dimensions of inputs and outputs
-    ffcn.input(ODE_T).resize(1,1);
-    ffcn.input(ODE_Y).resize(3,1);
-    ffcn.input(ODE_P).resize(1,1);
-    ffcn.input(ODE_RHS).resize(3,1);
+    ffcn.input(ODE_T)    = DMatrix(1,1,0);
+    ffcn.input(ODE_Y)    = DMatrix(3,1,0);
+    ffcn.input(ODE_P)    = DMatrix(1,1,0);
+    ffcn.output(ODE_RHS) = DMatrix(3,1,0);
   }
   
   // Quadrature function

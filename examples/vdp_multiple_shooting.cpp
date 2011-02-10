@@ -9,7 +9,6 @@
 #include "casadi/fx/jacobian.hpp"
 #include "casadi/fx/parallelizer.hpp"
 #include "casadi/fx/c_function.hpp"
-#include "casadi/fx/c_function_internal.hpp"
 
 using namespace CasADi;
 using namespace CasADi::Sundials;
@@ -220,12 +219,10 @@ class Jac{
       J2.setNumInputs(J3.getNumInputs());
       for(int i=0; i<J2.getNumInputs(); ++i){
         J2.input(i) = J3.input(i);
-        J2->inputStruct(i).dense = false;
       }
       J2.setNumOutputs(J3.getNumOutputs());
       for(int i=0; i<J2.getNumOutputs(); ++i){
         J2.output(i) = J3.output(i);
-        J2->outputStruct(i).dense = false;
       }
       
     }

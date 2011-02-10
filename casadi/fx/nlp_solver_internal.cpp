@@ -33,20 +33,20 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
 
   input_.resize(6);
-  input(NLP_X_INIT).resize(n_,1);
-  input(NLP_LBX).resize(n_,1);
-  input(NLP_UBX).resize(n_,1);
-  input(NLP_LBG).resize(m_,1);
-  input(NLP_UBG).resize(m_,1);
-  input(NLP_LAMBDA_INIT).resize(m_,1);
+  input(NLP_X_INIT)      = DMatrix(n_,1,0);
+  input(NLP_LBX)         = DMatrix(n_,1,0);
+  input(NLP_UBX)         = DMatrix(n_,1,0);
+  input(NLP_LBG)         = DMatrix(m_,1,0);
+  input(NLP_UBG)         = DMatrix(m_,1,0);
+  input(NLP_LAMBDA_INIT) = DMatrix(m_,1,0);
   
   // Allocate space for outputs
   output_.resize(5);
-  output(NLP_X_OPT).resize(n_,1);
-  output(NLP_COST).resize(1,1);
-  output(NLP_LAMBDA_OPT).resize(m_,1);
-  output(NLP_LAMBDA_LBX).resize(n_,1);
-  output(NLP_LAMBDA_UBX).resize(n_,1);
+  output(NLP_X_OPT)      = DMatrix(n_,1,0);
+  output(NLP_COST)       = DMatrix(1,1,0);
+  output(NLP_LAMBDA_OPT) = DMatrix(m_,1,0);
+  output(NLP_LAMBDA_LBX) = DMatrix(n_,1,0);
+  output(NLP_LAMBDA_UBX) = DMatrix(n_,1,0);
 
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){

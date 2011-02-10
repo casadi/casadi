@@ -48,7 +48,7 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   input_ = fcn_->input_;
   
   output_.resize(1);
-  output(0).resize(m_,n_);
+  output(0) = DMatrix(m_,n_,0);
 }
 
 

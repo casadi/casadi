@@ -34,13 +34,13 @@ SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& out
       
   // Allocate inputs
   input_.resize(SIMULATOR_NUM_IN);
-  input(SIMULATOR_X0).resize(integrator_->nx_,1);
-  input(SIMULATOR_P).resize(integrator_->np_,1);
+  input(SIMULATOR_X0) = Matrix<double>(integrator_->nx_,1,0);
+  input(SIMULATOR_P) = Matrix<double>(integrator_->np_,1,0);
   
   // Allocate outputs
   output_.resize(output_fcn_->output_.size());
   for(int i=0; i<output_.size(); ++i)
-    output(i).resize(grid_.size(),output_fcn_.output(i).numel());
+    output(i) = Matrix<double>(grid_.size(),output_fcn_.output(i).numel(),0);
 }
   
 SimulatorInternal::~SimulatorInternal(){

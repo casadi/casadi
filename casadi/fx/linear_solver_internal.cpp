@@ -31,13 +31,12 @@ LinearSolverInternal::LinearSolverInternal(int nrow, int ncol, int nrhs) : nrow_
 void LinearSolverInternal::init(){
   // Allocate space for inputs
   input_.resize(2);
-  input(0) = Matrix<double>(nrow_,ncol_,col_,rowind_);
-  input_[0].dense = false;
-  input(1).resize(nrow_*nrhs_,1); // right hand side
+  input(0) = DMatrix(nrow_,ncol_,col_,rowind_);
+  input(1) = DMatrix(nrow_*nrhs_,1,0);
   
   // Allocate space for outputs
   output_.resize(1);
-  output(0).resize(ncol_*nrhs_,1);
+  output(0) = DMatrix(ncol_*nrhs_,1,0);
   
   // Not prepared
   prepared_ = false;

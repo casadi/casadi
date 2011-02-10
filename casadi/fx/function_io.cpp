@@ -30,16 +30,9 @@ using namespace std;
 namespace CasADi{
 
 FunctionIO::FunctionIO(){
-  dense = true;
 }
 
 void FunctionIO::init(){
-  
-  // Make dense if necessary
-  if(dense){
-    data = Matrix<double>(data.size1(),data.size2(),0);
-  }
-
   // Non-zeros
   for(int i=0; i<dataF.size(); ++i)
     dataF[i] = data;

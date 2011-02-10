@@ -37,12 +37,12 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
   // Allocate space for inputs
   input_.resize(inputv.size());
   for(int i=0; i<input_.size(); ++i)
-    input(i).resize(inputv[i].size1(),inputv[i].size2());
+    input(i) = DMatrix(inputv[i].size1(),inputv[i].size2(),0);
 
   // Allocate space for outputs
   output_.resize(outputv.size());
   for(int i=0; i<output_.size(); ++i)
-    output(i).resize(outputv[i].size1(),outputv[i].size2());
+    output(i) = DMatrix(outputv[i].size1(),outputv[i].size2(),0);
 }
 
 
@@ -125,10 +125,7 @@ void MXFunctionInternal::init(){
     
     // Save the node
     it->mx.assignNode(nodes[ii]);
-
-    it->val.dense = false;
     it->val.data = Matrix<double>(m->sparsity());
-
     it->val.dataF.resize(nfdir_);
     it->val.dataA.resize(nadir_);
     it->val.init();

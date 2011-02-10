@@ -48,10 +48,6 @@ class FunctionIO{
     
     /// Adjoint derivative data
     std::vector< Matrix<double> > dataA;
-
-    /// Is dense?
-    bool dense;
-    
 };
 
 } // namespace CasADi
