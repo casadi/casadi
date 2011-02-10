@@ -56,6 +56,10 @@ void SharedObject::assignNode(SharedObjectNode* node_){
   count_up();
 }
 
+void SharedObject::assignNodeNoCount(SharedObjectNode* node_){
+  node = node_;
+}
+
 SharedObject& SharedObject::operator=(const SharedObject& ref){
   // quick return if the old and new pointers point to the same object
   if(node == ref.node) return *this;

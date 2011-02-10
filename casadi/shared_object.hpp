@@ -84,8 +84,11 @@ class SharedObject : public PrintableObject{
     /// Assignment operator
     SharedObject& operator=(const SharedObject& ref);
     
-    /// Assign the node to something
+    /// Assign the node to a node class pointer (or null)
     void assignNode(SharedObjectNode* node);
+    
+    /// Assign the node to a node class pointer without reference counting: inproper use will cause memory leaks!
+    void assignNodeNoCount(SharedObjectNode* node);
     
     /// Get a const pointer to the node
     const SharedObjectNode* get() const;
