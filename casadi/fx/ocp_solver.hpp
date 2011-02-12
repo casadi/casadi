@@ -29,43 +29,51 @@
 
 namespace CasADi{
 
-enum OCPSolverInput{
-  OCP_T,                      // Time grid
-  OCP_X, OCP_LBX, OCP_UBX,    // Differential state with bounds
-  OCP_Z, OCP_LBZ, OCP_UBZ,    // Algebraic state with bounds
-  OCP_XP, OCP_LBXP, OCP_UBXP, // State deriatives with bounds
-  OCP_U, OCP_LBU, OCP_UBU,    // Controls with bounds
-  OCP_P, OCP_LBP, OCP_UBP,    // Parameters with bounds
-  OCP_LBH, OCP_UBH,           // Bounds for the point constraints
-  OCP_LBG, OCP_UBG,           // Bounds for the coupling constraints
-  OCP_NUM_IN};
+  /// Input arguments of an OCP Solver
+  enum OCPInput{
+    OCP_T,                      // Time grid
+    OCP_X, OCP_LBX, OCP_UBX,    // Differential state with bounds
+    OCP_Z, OCP_LBZ, OCP_UBZ,    // Algebraic state with bounds
+    OCP_XP, OCP_LBXP, OCP_UBXP, // State deriatives with bounds
+    OCP_U, OCP_LBU, OCP_UBU,    // Controls with bounds
+    OCP_P, OCP_LBP, OCP_UBP,    // Parameters with bounds
+    OCP_LBH, OCP_UBH,           // Bounds for the point constraints
+    OCP_LBG, OCP_UBG,           // Bounds for the coupling constraints
+    OCP_NUM_IN
+  };
   
-// Forward declaration of internal class
-class OCPSolverInternal;
+  /// Outputs arguments of an OCP Solver
+  enum OCPOutput{
+    OCP_NUM_OUT
+  };
+    
+  // Forward declaration of internal class
+  class OCPSolverInternal;
 
-/** \brief Optimal control problem formulation
-  \author Joel Andersson
-  \date 2011
-*/ 
-class OCPSolver : public FX{
-public:
+  /** \brief Base class for OCP solvers
 
-  /// Default constructor
-  OCPSolver();
+      \author Joel Andersson
+      \date 2011
+  */ 
+  class OCPSolver : public FX{
+  public:
 
-  /// Create a OCPSolver
-  explicit OCPSolver(const std::vector<FX>& L, // Cost functions
-               const std::vector<FX>& F, // Dynamic equation
-               const std::vector<FX>& H=std::vector<FX>(), // Path constraints
-               const std::vector<FX>& G=std::vector<FX>()); // Coupling constraints
+    /// Default constructor
+    OCPSolver();
 
-  /// Access functions of the node
-  OCPSolverInternal* operator->();
+    /// Create a OCPSolver
+    explicit OCPSolver(const std::vector<FX>& L, // Cost functions
+                const std::vector<FX>& F, // Dynamic equation
+                const std::vector<FX>& H=std::vector<FX>(), // Path constraints
+                const std::vector<FX>& G=std::vector<FX>()); // Coupling constraints
 
-  /// Const access functions of the node
-  const OCPSolverInternal* operator->() const;
-  
-};
+    /// Access functions of the node
+    OCPSolverInternal* operator->();
+
+    /// Const access functions of the node
+    const OCPSolverInternal* operator->() const;
+    
+  };
 
 } // namespace CasADi
 

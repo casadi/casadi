@@ -13,6 +13,7 @@
 #include <optimal_control/fmi_parser.hpp>
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
+#include <optimal_control/multiple_shooting.hpp>
 
 using namespace CasADi;
 using namespace CasADi::Sundials;
