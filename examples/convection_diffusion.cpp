@@ -24,14 +24,14 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
-#include "modelica/ocp_tools.hpp"
+#include "optimal_control/ocp_tools.hpp"
 #include "casadi/fx/simulator.hpp"
 #include "casadi/fx/simulator_internal.hpp"
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
 
 using namespace CasADi;
-using namespace CasADi::Modelica;
+using namespace CasADi::OptimalControl;
 using namespace std;
 
 // Symbolc representation of the optimal control problem

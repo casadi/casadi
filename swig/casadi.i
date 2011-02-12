@@ -162,14 +162,12 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 // SX tools
 %include "casadi/sx/sx_tools.hpp"
 
+// Optimal control
+%include "optimal_control.i"
+
 // IPOPT
 #ifdef WITH_IPOPT
 %include "ipopt_interface.i"
-#endif
-
-// Modelica
-#ifdef WITH_MODELICA
-%include "modelica.i"
 #endif
 
 // ACADO

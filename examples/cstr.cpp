@@ -10,13 +10,13 @@
 #include <casadi/matrix/matrix_tools.hpp>
 #include <casadi/fx/jacobian.hpp>
 
-#include <modelica/fmi_parser.hpp>
-#include <modelica/ocp_tools.hpp>
-#include <modelica/variable_tools.hpp>
+#include <optimal_control/fmi_parser.hpp>
+#include <optimal_control/ocp_tools.hpp>
+#include <optimal_control/variable_tools.hpp>
 
 using namespace CasADi;
 using namespace CasADi::Sundials;
-using namespace CasADi::Modelica;
+using namespace CasADi::OptimalControl;
 using namespace std;
 
 double Tc_ref = 280;

@@ -14,26 +14,26 @@ set(CASADI_SWIG_FLAGS -includeall)
 find_package (IPOPT QUIET)
 if(IPOPT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "ipopt_interface" ${IPOPT_LIBRARIES})
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ipopt_interface ${IPOPT_LIBRARIES})
 endif(IPOPT_FOUND)
 
 find_package (SUNDIALS QUIET)
 if(SUNDIALS_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUNDIALS")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "sundials_interface" ${SUNDIALS_LIBRARIES})
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} sundials_interface ${SUNDIALS_LIBRARIES})
 endif(SUNDIALS_FOUND)
 
 find_package (ACADO QUIET)
 if(ACADO_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_ACADO")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "acado_interface" ${ACADO_LIBRARIES})
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} acado_interface ${ACADO_LIBRARIES})
 endif(ACADO_FOUND)
 
 if(WITH_SUPERLU)
 find_package (BLAS QUIET)
 if(BLAS_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUPERLU")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "superlu_interface" "superlu")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} superlu_interface superlu)
 endif(BLAS_FOUND)
 endif(WITH_SUPERLU)
 
@@ -52,9 +52,6 @@ endif(KNITRO_FOUND)
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DOXDOC")
 endif()
-
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_MODELICA")
-set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} "modelica" "tinyxml")
 
 # Find SWIG and include the use swig file
 include (${SWIG_USE_FILE})
@@ -87,21 +84,14 @@ set_source_files_properties (casadi.i PROPERTIES
   CPLUSPLUS ON
 )
 
-
-# failure:  ${NUMPY_LIBS}
-
 # PYTHON interface
 SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
 # add_dependencies(_casadi casadi) #workaround to add dependencies of casadi to _casadi (SWIG_ADD_MODULE does not add dependencies from c++ source files)
 IF(NUMPY_FOUND)
 cmake_policy(SET CMP0003 NEW)
-SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES} 
- ${SWIG_LINK_LIBRARIES_LIST}
-casadi )
+SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
 ELSE(NUMPY_FOUND)
-SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES} 
- ${SWIG_LINK_LIBRARIES_LIST}
-casadi )
+SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
 ENDIF(NUMPY_FOUND)
 # the name used for the shared module for the python interface is determined
 get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
@@ -152,6 +142,4 @@ ENDIF(PYTHONINTERP_FOUND)
 
 # OCTAVE interface
 SWIG_ADD_MODULE (casadi_octave octave casadi.i)
-SWIG_LINK_LIBRARIES (casadi_octave
- ${SWIG_LINK_LIBRARIES_LIST}
-casadi )
+SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )

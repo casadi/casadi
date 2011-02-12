@@ -48,7 +48,7 @@ ENDIF(KNITRO_FOUND)
 
 IF(SUNDIALS_FOUND AND IPOPT_FOUND)
 add_executable(convection_diffusion convection_diffusion.cpp)
-target_link_libraries(convection_diffusion ipopt_interface sundials_interface modelica casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+target_link_libraries(convection_diffusion ipopt_interface sundials_interface optimal_control casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
 
 # rocket example using sundials and ipopt
 add_executable(rocket_ipopt_sundials rocket_ipopt_sundials.cpp)
@@ -60,7 +60,7 @@ target_link_libraries(vdp_multiple_shooting sundials_interface ipopt_interface c
 
 # Van der pol with multiple shooting
 add_executable(cstr cstr.cpp)
-target_link_libraries(cstr sundials_interface ipopt_interface modelica casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml)
+target_link_libraries(cstr sundials_interface ipopt_interface optimal_control casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml)
 
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 

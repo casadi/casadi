@@ -138,42 +138,42 @@ nx = 3
 nu = 1
 
 # Create a multiple shooting discretization
-ms = MultipleShooting(integrator,num_nodes,nx,nu)
+#ms = MultipleShooting(integrator,num_nodes,nx,nu)
 
-# Copy data
-ms.tf_ = ocp.tf
+## Copy data
+#ms.tf_ = ocp.tf
 
-ms.u_init_  = DVector([280]/u_sca)
-ms.u_min_   = DVector([230]/u_sca)
-ms.u_max_   = DVector([370]/u_sca)
+#ms.u_init_  = DVector([280]/u_sca)
+#ms.u_min_   = DVector([230]/u_sca)
+#ms.u_max_   = DVector([370]/u_sca)
 
-ms.x_init_  = DVector(x0)
-ms.x_min_   = DVector([-inf,-inf,-inf]/x_sca)
-ms.x_max_   = DVector([inf, 350, inf]/x_sca)
-ms.xf_min_  = DVector([-inf,-inf,-inf]/x_sca)
-ms.xf_max_  = DVector([inf, 350,  inf]/x_sca)
-ms.x0_min_  = DVector([0,250.052,956.271]/x_sca)
-ms.x0_max_  = DVector([0,250.052,956.271]/x_sca)
+#ms.x_init_  = DVector(x0)
+#ms.x_min_   = DVector([-inf,-inf,-inf]/x_sca)
+#ms.x_max_   = DVector([inf, 350, inf]/x_sca)
+#ms.xf_min_  = DVector([-inf,-inf,-inf]/x_sca)
+#ms.xf_max_  = DVector([inf, 350,  inf]/x_sca)
+#ms.x0_min_  = DVector([0,250.052,956.271]/x_sca)
+#ms.x0_max_  = DVector([0,250.052,956.271]/x_sca)
 
-ms.init()
+#ms.init()
   
-solver = IpoptSolver(ms.F_,ms.G_,FX(),ms.J_)
-solver.setOption("tol",1e-5)
-solver.setOption("hessian_approximation", "limited-memory")
-solver.setOption("max_iter",100)
-solver.setOption("linear_solver","ma57")
-#  solver.setOption("derivative_test","first-order")
+#solver = IpoptSolver(ms.F_,ms.G_,FX(),ms.J_)
+#solver.setOption("tol",1e-5)
+#solver.setOption("hessian_approximation", "limited-memory")
+#solver.setOption("max_iter",100)
+#solver.setOption("linear_solver","ma57")
+##  solver.setOption("derivative_test","first-order")
 
-solver.setOption("verbose",True)
-solver.init()
+#solver.setOption("verbose",True)
+#solver.init()
 
-# Set bounds and initial guess
-solver.setInput(ms.V_min_,  NLP_LBX)
-solver.setInput(ms.V_max_,  NLP_UBX)
-solver.setInput(ms.V_init_,  NLP_X_INIT)
+## Set bounds and initial guess
+#solver.setInput(ms.V_min_,  NLP_LBX)
+#solver.setInput(ms.V_max_,  NLP_UBX)
+#solver.setInput(ms.V_init_,  NLP_X_INIT)
 
-solver.setInput(ms.G_min_,NLP_LBG)
-solver.setInput(ms.G_max_,NLP_UBG)
+#solver.setInput(ms.G_min_,NLP_LBG)
+#solver.setInput(ms.G_max_,NLP_UBG)
 
 # Solve the problem
 #solver.solve()

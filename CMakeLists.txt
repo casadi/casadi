@@ -49,7 +49,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
 add_subdirectory(casadi)
-add_subdirectory(modelica)
+add_subdirectory(optimal_control)
 add_subdirectory(toolboxes)
 add_subdirectory(examples)
 add_subdirectory(external_packages)
