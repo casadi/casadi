@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_OCP2_HPP
-#define CASADI_OCP2_HPP
+#ifndef OCP_SOLVER_HPP
+#define OCP_SOLVER_HPP
 
 #include <vector>
 
@@ -29,46 +29,46 @@
 
 namespace CasADi{
 
-enum OCP2Input{
-  OCP2_T,                      // Time grid
-  OCP2_X, OCP2_LBX, OCP2_UBX,    // Differential state with bounds
-  OCP2_Z, OCP2_LBZ, OCP2_UBZ,    // Algebraic state with bounds
-  OCP2_XP, OCP2_LBXP, OCP2_UBXP, // State deriatives with bounds
-  OCP2_U, OCP2_LBU, OCP2_UBU,    // Controls with bounds
-  OCP2_P, OCP2_LBP, OCP2_UBP,    // Parameters with bounds
-  OCP2_LBH, OCP2_UBH,           // Bounds for the point constraints
-  OCP2_LBG, OCP2_UBG,           // Bounds for the coupling constraints
-  OCP2_NUM_IN};
+enum OCPSolverInput{
+  OCP_T,                      // Time grid
+  OCP_X, OCP_LBX, OCP_UBX,    // Differential state with bounds
+  OCP_Z, OCP_LBZ, OCP_UBZ,    // Algebraic state with bounds
+  OCP_XP, OCP_LBXP, OCP_UBXP, // State deriatives with bounds
+  OCP_U, OCP_LBU, OCP_UBU,    // Controls with bounds
+  OCP_P, OCP_LBP, OCP_UBP,    // Parameters with bounds
+  OCP_LBH, OCP_UBH,           // Bounds for the point constraints
+  OCP_LBG, OCP_UBG,           // Bounds for the coupling constraints
+  OCP_NUM_IN};
   
 // Forward declaration of internal class
-class OCP2Internal;
+class OCPSolverInternal;
 
 /** \brief Optimal control problem formulation
   \author Joel Andersson
   \date 2011
 */ 
-class OCP2 : public FX{
+class OCPSolver : public FX{
 public:
 
   /// Default constructor
-  OCP2();
+  OCPSolver();
 
-  /// Create a OCP2
-  explicit OCP2(const std::vector<FX>& L, // Cost functions
+  /// Create a OCPSolver
+  explicit OCPSolver(const std::vector<FX>& L, // Cost functions
                const std::vector<FX>& F, // Dynamic equation
                const std::vector<FX>& H=std::vector<FX>(), // Path constraints
                const std::vector<FX>& G=std::vector<FX>()); // Coupling constraints
 
   /// Access functions of the node
-  OCP2Internal* operator->();
+  OCPSolverInternal* operator->();
 
   /// Const access functions of the node
-  const OCP2Internal* operator->() const;
+  const OCPSolverInternal* operator->() const;
   
 };
 
 } // namespace CasADi
 
 
-#endif // CASADI_OCP2_HPP
+#endif // OCP_SOLVER_HPP
 

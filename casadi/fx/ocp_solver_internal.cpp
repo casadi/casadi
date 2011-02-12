@@ -20,52 +20,27 @@
  *
  */
 
-#ifndef CASADI_OCP2_INTERNAL_HPP
-#define CASADI_OCP2_INTERNAL_HPP
+#include "ocp_solver_internal.hpp"
 
-#include <vector>
-#include "ocp.hpp"
-#include "fx_internal.hpp"
+using namespace std;
 
 namespace CasADi{
- 
-  /** \brief  Internal node class for OCP2
-  \author Joel Andersson 
-  \date 2010
-*/
-class OCP2Internal : public FXInternal{
-  friend class OCP2;
-  public:
   
-    /// Constructor
-    explicit OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G);
+OCPSolverInternal::OCPSolverInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
+}
 
-    /// Destructor
-    virtual ~OCP2Internal();
-    
-    /// Evaluate the all the tasks
-    virtual void evaluate(int fsens_order, int asens_order);
-
-    /// Initialize
-    virtual void init();
-    
-    /// Cost functions
-    std::vector<FX> L_;
-    
-    /// Dynamic constraint
-    std::vector<FX> F_;
-    
-    /// Point constraints
-    std::vector<FX> H_;
-    
-    /// Coupling constraints
-    std::vector<FX> G_;
-};
+OCPSolverInternal::~OCPSolverInternal(){
+}
 
 
+void OCPSolverInternal::init(){
+  // Call the init function of the base class
+  FXInternal::init();
+
+}
+
+void OCPSolverInternal::evaluate(int fsens_order, int asens_order){
+}
 
 } // namespace CasADi
-
-
-#endif // CASADI_OCP2_INTERNAL_HPP
 

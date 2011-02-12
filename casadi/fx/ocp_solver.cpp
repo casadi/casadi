@@ -20,26 +20,25 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#include "ocp_solver_internal.hpp"
 
 using namespace std;
 
 namespace CasADi{
+
+OCPSolver::OCPSolver(){
+}
+
+OCPSolver::OCPSolver(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G){
+  assignNode(new OCPSolverInternal(L,F,H,G));
+}
   
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
+const OCPSolverInternal* OCPSolver::operator->() const{
+  return (const OCPSolverInternal*)FX::operator->();
 }
 
-OCP2Internal::~OCP2Internal(){
-}
-
-
-void OCP2Internal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
-
-}
-
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
+OCPSolverInternal* OCPSolver::operator->(){
+  return (OCPSolverInternal*)FX::operator->();
 }
 
 } // namespace CasADi

@@ -20,26 +20,52 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#ifndef OCP_SOLVER_INTERNAL_HPP
+#define OCP_SOLVER_INTERNAL_HPP
 
-using namespace std;
+#include <vector>
+#include "ocp_solver.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
-
-OCP2::OCP2(){
-}
-
-OCP2::OCP2(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G){
-  assignNode(new OCP2Internal(L,F,H,G));
-}
+ 
+  /** \brief  Internal node class for OCPSolver
+  \author Joel Andersson 
+  \date 2010
+*/
+class OCPSolverInternal : public FXInternal{
+  friend class OCPSolver;
+  public:
   
-const OCP2Internal* OCP2::operator->() const{
-  return (const OCP2Internal*)FX::operator->();
-}
+    /// Constructor
+    explicit OCPSolverInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G);
 
-OCP2Internal* OCP2::operator->(){
-  return (OCP2Internal*)FX::operator->();
-}
+    /// Destructor
+    virtual ~OCPSolverInternal();
+    
+    /// Evaluate the all the tasks
+    virtual void evaluate(int fsens_order, int asens_order);
+
+    /// Initialize
+    virtual void init();
+    
+    /// Cost functions
+    std::vector<FX> L_;
+    
+    /// Dynamic constraint
+    std::vector<FX> F_;
+    
+    /// Point constraints
+    std::vector<FX> H_;
+    
+    /// Coupling constraints
+    std::vector<FX> G_;
+};
+
+
 
 } // namespace CasADi
+
+
+#endif // OCP_SOLVER_INTERNAL_HPP
 

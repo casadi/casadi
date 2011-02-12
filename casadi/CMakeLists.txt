@@ -65,7 +65,7 @@ SET(CASADI_SRCS
   fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
   fx/simulator.hpp           fx/simulator.cpp           fx/simulator_internal.hpp           fx/simulator_internal.cpp
   fx/parallelizer.hpp        fx/parallelizer.cpp        fx/parallelizer_internal.hpp        fx/parallelizer_internal.cpp
-  fx/ocp.hpp                 fx/ocp.cpp                 fx/ocp_internal.hpp                 fx/ocp_internal.cpp
+  fx/ocp_solver.hpp          fx/ocp_solver.cpp          fx/ocp_solver_internal.hpp          fx/ocp_solver_internal.cpp
   fx/function_io.hpp         fx/function_io.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
 )
