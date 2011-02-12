@@ -29,10 +29,6 @@ namespace CasADi{
 OCPSolver::OCPSolver(){
 }
 
-OCPSolver::OCPSolver(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G){
-  assignNode(new OCPSolverInternal(L,F,H,G));
-}
-  
 const OCPSolverInternal* OCPSolver::operator->() const{
   return (const OCPSolverInternal*)FX::operator->();
 }

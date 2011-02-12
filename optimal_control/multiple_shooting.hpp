@@ -23,81 +23,39 @@
 #ifndef MULTIPLE_SHOOTING_HPP
 #define MULTIPLE_SHOOTING_HPP
 
-#include "../casadi/fx/fx.hpp"
-#include "../casadi/fx/parallelizer.hpp"
-#include "../casadi/fx/c_function.hpp"
-#include "../casadi/fx/mx_function.hpp"
-#include "../casadi/fx/sx_function.hpp"
+#include "../casadi/fx/ocp_solver.hpp"
+#include "../casadi/fx/nlp_solver.hpp"
 
 namespace CasADi{
   namespace OptimalControl{
   
-class MultipleShooting{
+    class MultipleShootingInternal;
+    
+class MultipleShooting : public OCPSolver{
   public:
-    // Constructor
-    MultipleShooting(const FX& fcn, const FX& mfcn, int ns, int nx, int nu);
+    /// Default constructor
+    MultipleShooting();
     
-    // Initialize
-    void init();
-    
-#ifndef SWIG
-    // Jacobian callback function
-    static void jacobian_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data);
-    
-    // Jacobian of the NLP
-    void jacobian(CFunction &f, int fsens_order, int asens_order);
-#endif // SWIG
+    /// Create a multiple shooting OCP solver
+    explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
-    // Discrete time dynamics
-    FX fcn_;
-    
-    // Mayer term
-    FX mfcn_;
-    
-    //Numboer of shooting nodes
-    int ns_;
-    
-    // Number of controls
-    int nu_;
-    
-    // Number of differential states
-    int nx_;
+    /// Access functions of the node
+    MultipleShootingInternal* operator->();
 
-    // Variable bound and initial guess
-    std::vector<double> V_min_, V_max_, V_init_;
+    /// Const access functions of the node
+    const MultipleShootingInternal* operator->() const;
+
+    /// Get the NLP cost function
+    FX getF() const;
     
-    // Constraint bounds
-    std::vector<double> G_min_, G_max_;
-
-    // NLP objective function
-    MXFunction F_;
+    /// Get the NLP constraint function
+    FX getG() const;
     
-    // NLP constraint function
-    MXFunction G_;
-
-    // Jacobian of the NLP constraints
-    CFunction J_;
-
-    // Parallel evaluation of the Jacobian blocks
-    Parallelizer JX_,JP_;
+    /// Get the NLP Jacobian function
+    FX getJ() const;
     
-    // Mapping from the Jacobian blocks to the sparse Jacobian
-    SXFunction J_mapping_;
-    
-    // Control bounds and initial guess
-    std::vector<double> u_min_, u_max_, u_init_;
-    
-    // State bounds and initial guess
-    std::vector<double> x_min_, x_max_, x_init_;
-
-    //State bounds at the initial time
-    std::vector<double> x0_min_, x0_max_;
-
-    //State bounds at the final time
-    std::vector<double> xf_min_, xf_max_;
-
-    //Final time
-    double tf_;
+    /// Set NLP solver
+    void setNLPSolver(const NLPSolver& nlp_solver);
 };
                         
                         

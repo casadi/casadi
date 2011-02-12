@@ -21,12 +21,16 @@
  */
 
 #include "ocp_solver_internal.hpp"
+#include "integrator.hpp"
 
 using namespace std;
 
 namespace CasADi{
-  
-OCPSolverInternal::OCPSolverInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
+
+OCPSolverInternal::OCPSolverInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
+  addOption("number_of_parameters", OT_INTEGER,  0);
+  addOption("number_of_grid_points", OT_INTEGER,  20);
+  addOption("final_time",OT_REAL, 1.0);
 }
 
 OCPSolverInternal::~OCPSolverInternal(){
@@ -34,12 +38,51 @@ OCPSolverInternal::~OCPSolverInternal(){
 
 
 void OCPSolverInternal::init(){
+  // Initialize the functions
+  ffcn_.init();
+  mfcn_.init();
+  if(!cfcn_.isNull()) cfcn_.init();
+  if(!mfcn_.isNull()) mfcn_.init();
+  
+  // Get the number of grid points
+  nk_ = getOption("number_of_grid_points").toInt();
+
+  // Get the number of differential states
+  nx_ = ffcn_.input(INTEGRATOR_X0).size();
+
+  // Get the number of algebraic states
+  nz_ = ffcn_.input(INTEGRATOR_Z0).size();
+
+  // Get the number of parameters
+  np_ = getOption("number_of_parameters").toInt();
+
+  // Get the number of controls
+  nu_ = ffcn_.input(INTEGRATOR_P).size() - np_;
+  
+  // Number of point constraints
+  nh_ = 0;
+    
+  // Number of point coupling constraints
+  ng_ = 0;
+  
+  // Specify the inputs
+  setNumInputs(OCP_NUM_IN);
+  input(OCP_T) = Matrix<double>(nk_,1,0);
+  input(OCP_X) = input(OCP_LBX) = input(OCP_UBX) = input(OCP_X_INIT) = Matrix<double>(nx_,nk_+1,0);
+  input(OCP_Z) = input(OCP_LBZ) = input(OCP_UBZ) = input(OCP_Z_INIT) = Matrix<double>(nz_,nk_+1,0);
+  input(OCP_XP) = input(OCP_LBXP) = input(OCP_UBXP) = Matrix<double>(nx_,nk_+1,0);
+  input(OCP_U) = input(OCP_LBU) = input(OCP_UBU) = input(OCP_U_INIT) = Matrix<double>(nu_,nk_,0);
+  input(OCP_P) = input(OCP_LBP) = input(OCP_UBP) = input(OCP_P_INIT) = Matrix<double>(np_,1,0);
+  input(OCP_LBH) = input(OCP_UBH) = Matrix<double>(nh_,nk_+1,0);
+  input(OCP_LBG) = input(OCP_UBG) = Matrix<double>(ng_,1,0);
+  
+  // Specify the outputs
+  setNumOutputs(OCP_NUM_OUT);
+  
   // Call the init function of the base class
   FXInternal::init();
 
-}
-
-void OCPSolverInternal::evaluate(int fsens_order, int asens_order){
+  
 }
 
 } // namespace CasADi

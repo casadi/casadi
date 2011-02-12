@@ -180,7 +180,11 @@ T sum_all(const Matrix<T> &x);
 /** \brief Return summation of elements along specific axis
     \param axis either 0 or 1 */
 template<class T>
-Matrix<T> sum(const Matrix<T> &x, int axis=0);  
+Matrix<T> sum(const Matrix<T> &x, int axis=0);
+
+/** \brief Repeat matrix A n times vertically and m times horizontally */
+template<class T>
+Matrix<T> repmat(const Matrix<T> &A, int n, int m);
 
 } // namespace CasADi
 
@@ -736,6 +740,14 @@ bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
   return isZero(difference);
 }
 
+template<class T>
+Matrix<T> repmat(const Matrix<T> &A, int n, int m){
+  // First concatenate horizontally
+  Matrix<T> row = horzcat(std::vector<Matrix<T> >(m, A));
+  
+  // Then vertically
+  return vertcat(std::vector<Matrix<T> >(n, row));
+}
 
 
 } // namespace CasADi
@@ -783,6 +795,7 @@ MTT_INST(T,isZero) \
 MTT_INST(T,nnz) \
 MTT_INST(T,nnz_sym) \
 MTT_INST(T,isEqual) \
+MTT_INST(T,repmat) \
 
 
 #endif //SWIG

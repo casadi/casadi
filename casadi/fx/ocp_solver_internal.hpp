@@ -38,19 +38,49 @@ class OCPSolverInternal : public FXInternal{
   public:
   
     /// Constructor
-    explicit OCPSolverInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G);
+    explicit OCPSolverInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
 
     /// Destructor
     virtual ~OCPSolverInternal();
     
-    /// Evaluate the all the tasks
-    virtual void evaluate(int fsens_order, int asens_order);
-
     /// Initialize
     virtual void init();
+
+    // Discrete time dynamics
+    FX ffcn_;
+    
+    // Mayer term
+    FX mfcn_;
+    
+    // Path constraints
+    FX cfcn_;
+    
+    // Initial value constraints
+    FX rfcn_;
+
+    // Number of grid points
+    int nk_;
+
+    // Number of differential states
+    int nx_;
+
+    // Number of algebraic states
+    int nz_;
+
+    // Number of parameters
+    int np_;
+    
+    // Number of controls
+    int nu_;
+    
+    // Number of point constraints
+    int nh_;
+    
+    // Number of point coupling constraints
+    int ng_;
     
     /// Cost functions
-    std::vector<FX> L_;
+/*    std::vector<FX> L_;
     
     /// Dynamic constraint
     std::vector<FX> F_;
@@ -59,7 +89,7 @@ class OCPSolverInternal : public FXInternal{
     std::vector<FX> H_;
     
     /// Coupling constraints
-    std::vector<FX> G_;
+    std::vector<FX> G_;*/
 };
 
 

@@ -14,6 +14,7 @@
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
 #include <optimal_control/multiple_shooting.hpp>
+#include <optimal_control/multiple_shooting_internal.hpp>
 
 using namespace CasADi;
 using namespace CasADi::Sundials;
@@ -179,34 +180,36 @@ int main(){
   SXFunction mterm(xf, xf[0]);
   
   // Create a multiple shooting discretization
-  MultipleShooting ms(integrator2,mterm,num_nodes,nx,nu);
-
-  // Copy data
-  ms.tf_ = ocp.tf;
-
-  ms.u_init_[0] = 280/u_sca[0];
-  ms.u_min_[0] = 230/u_sca[0];
-  ms.u_max_[0] = 370/u_sca[0];
-
-  ms.x_init_  = x0;
-  
-  double inf = numeric_limits<double>::infinity();
-  
-  double x_min[] = {-inf,-inf,-inf};
-  ms.x_min_   = vector<double>(x_min,x_min+3)/x_sca;
-  
-  double x_max[] = {inf, 350, inf};
-  ms.x_max_   = vector<double>(x_max,x_max+3)/x_sca;
-  
-  ms.xf_min_  = ms.x_min_;
-  ms.xf_max_  = ms.x_max_;
-  
-  double x0_min[] = {0,250.052,956.271};
-  ms.x0_min_  = vector<double>(x0_min,x0_min+3)/x_sca;
-  ms.x0_max_  = ms.x0_min_;
+  MultipleShooting ms(integrator2,mterm);
+  ms.setOption("number_of_grid_points",num_nodes);
+  ms.setOption("final_time",ocp.tf);
 
   ms.init();
 
+  for(int k=0; k<num_nodes; ++k){
+    ms.input(OCP_U_INIT)[k] = 280/u_sca[0];
+    ms.input(OCP_LBU)[k] = 230/u_sca[0];
+    ms.input(OCP_UBU)[k] = 370/u_sca[0];
+  }
+
+  for(int k=0; k<=num_nodes; ++k){
+    for(int i=0; i<nx; ++i){
+      ms.input(OCP_X_INIT)[i+k*nx] = x0[i];
+    }
+  }
+  
+  // Bounds on state
+  double inf = numeric_limits<double>::infinity();
+  fill(ms.input(OCP_LBX).begin(),ms.input(OCP_LBX).end(),-inf);
+  fill(ms.input(OCP_UBX).begin(),ms.input(OCP_UBX).end(),inf);
+  for(int k=1; k<=num_nodes; ++k)
+    ms.input(OCP_UBX)[1 + nx*k] = 350/x_sca[1];
+
+  // Initial condition
+  ms.input(OCP_LBX)[0] = ms.input(OCP_UBX)[0] = 0/x_sca[0];
+  ms.input(OCP_LBX)[1] = ms.input(OCP_UBX)[1] = 250.052/x_sca[1];
+  ms.input(OCP_LBX)[2] = ms.input(OCP_UBX)[2] = 956.271/x_sca[2];
+  
   integrator.setInput(ocp.t0, INTEGRATOR_T0);
   integrator.setInput(ocp.tf, INTEGRATOR_TF);
   integrator.setInput(x0, INTEGRATOR_X0);
@@ -227,11 +230,8 @@ int main(){
   
 //  return 0;
   
-
   
-  
-  
-  IpoptSolver solver(ms.F_,ms.G_,FX(),ms.J_);
+  IpoptSolver solver(ms.getF(),ms.getG(),FX(),ms.getJ());
   //IpoptSolver solver(ms.F_,ms.G_,FX(),J);
   solver.setOption("tol",1e-5);
   solver.setOption("hessian_approximation", "limited-memory");
@@ -242,24 +242,12 @@ int main(){
 //  solver.setOption("verbose",true);
   solver.init();
 
-  // Set bounds and initial guess
-  solver.setInput(ms.V_min_,  NLP_LBX);
-  solver.setInput(ms.V_max_,  NLP_UBX);
-  solver.setInput(ms.V_init_,  NLP_X_INIT);
-  solver.setInput(ms.G_min_,NLP_LBG);
-  solver.setInput(ms.G_max_,NLP_UBG);
-
-  
-  Jacobian J(ms.G_);
-  J.init();
-  J.setInput(ms.V_init_);
-  
+  // Pass to ocp solver
+  ms.setNLPSolver(solver);
   
   // Solve the problem
-  solver.solve();
+  ms.evaluate(0,0);
   
-  cout << solver.input(NLP_LBX) << endl;
-  cout << solver.input(NLP_UBX) << endl;
   cout << solver.output() << endl;
   
   

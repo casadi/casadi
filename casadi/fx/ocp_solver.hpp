@@ -31,12 +31,12 @@ namespace CasADi{
 
   /// Input arguments of an OCP Solver
   enum OCPInput{
-    OCP_T,                      // Time grid
-    OCP_X, OCP_LBX, OCP_UBX,    // Differential state with bounds
-    OCP_Z, OCP_LBZ, OCP_UBZ,    // Algebraic state with bounds
+    OCP_T,                                // Time grid
+    OCP_X, OCP_LBX, OCP_UBX, OCP_X_INIT,  // Differential state with bounds and initial guess
+    OCP_Z, OCP_LBZ, OCP_UBZ, OCP_Z_INIT,  // Algebraic state with bounds and initial guess
     OCP_XP, OCP_LBXP, OCP_UBXP, // State deriatives with bounds
-    OCP_U, OCP_LBU, OCP_UBU,    // Controls with bounds
-    OCP_P, OCP_LBP, OCP_UBP,    // Parameters with bounds
+    OCP_U, OCP_LBU, OCP_UBU, OCP_U_INIT,    // Controls with bounds and initial guess
+    OCP_P, OCP_LBP, OCP_UBP, OCP_P_INIT,    // Parameters with bounds and initial guess
     OCP_LBH, OCP_UBH,           // Bounds for the point constraints
     OCP_LBG, OCP_UBG,           // Bounds for the coupling constraints
     OCP_NUM_IN
@@ -60,12 +60,6 @@ namespace CasADi{
 
     /// Default constructor
     OCPSolver();
-
-    /// Create a OCPSolver
-    explicit OCPSolver(const std::vector<FX>& L, // Cost functions
-                const std::vector<FX>& F, // Dynamic equation
-                const std::vector<FX>& H=std::vector<FX>(), // Path constraints
-                const std::vector<FX>& G=std::vector<FX>()); // Coupling constraints
 
     /// Access functions of the node
     OCPSolverInternal* operator->();
