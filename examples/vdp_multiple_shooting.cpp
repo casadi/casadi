@@ -73,8 +73,12 @@ int main(){
   // Number of controls
   int nu = 1;
   
+  // Mayer objective function
+  Matrix<SX> xf = symbolic("xf",nx,1);
+  SXFunction mterm(xf, xf[nx-1]);
+
   // Create a multiple shooting discretization
-  MultipleShooting ms(I,ns,nx,nu);
+  MultipleShooting ms(I,mterm,ns,nx,nu);
   
   // Copy data
   ms.tf_ = tf;

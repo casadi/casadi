@@ -58,6 +58,10 @@ target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface c
 add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
 target_link_libraries(vdp_multiple_shooting sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
 
+# Van der pol with multiple shooting
+add_executable(cstr cstr.cpp)
+target_link_libraries(cstr sundials_interface ipopt_interface modelica casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml)
+
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # SuperLU via CasADi

@@ -49,6 +49,9 @@ class OCP : public PrintableObject{
 
     /// Replace all state derivatives by algebraic variables with the same name
     void makeSemiExplicit();
+    
+    /// Create a new, scaled OCP
+    OCP scale() const;
 
     /// Access the variables in a class hierarchy -- public data member
     Variable variables;

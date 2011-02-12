@@ -129,6 +129,12 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Set the number of function outputs
   void setNumOutputs(int num_out);
 
+  /// Get the number of function inputs
+  int getNumInputs() const;
+
+  /// Get the number of function outputs
+  int getNumOutputs() const;
+
   protected:
 
   /** \brief  Has the function been initialized? */

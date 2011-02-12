@@ -34,7 +34,7 @@ namespace CasADi{
 class MultipleShooting{
   public:
     // Constructor
-    MultipleShooting(const FX& fcn, int ns, int nx, int nu);
+    MultipleShooting(const FX& fcn, const FX& mfcn, int ns, int nx, int nu);
     
     // Initialize
     void init();
@@ -49,6 +49,9 @@ class MultipleShooting{
 
     // Discrete time dynamics
     FX fcn_;
+    
+    // Mayer term
+    FX mfcn_;
     
     //Numboer of shooting nodes
     int ns_;
@@ -71,10 +74,8 @@ class MultipleShooting{
     // NLP constraint function
     MXFunction G_;
 
-#ifndef SWIG
     // Jacobian of the NLP constraints
     CFunction J_;
-#endif // SWIG
 
     // Parallel evaluation of the Jacobian blocks
     Parallelizer JX_,JP_;

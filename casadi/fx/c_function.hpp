@@ -34,8 +34,10 @@ class CFunctionInternal;
 // Forward declaration
 class CFunction;
 
+#ifndef SWIG
 /** \brief  Wrapper around functions */
 typedef void (*CFunctionWrapper)(CFunction &f, int fsens_order, int asens_order, void* user_data);
+#endif // SWIG
 
 /** \brief  Interface to function implemented as plan code 
   \author Joel Andersson 
@@ -48,8 +50,10 @@ public:
 /** \brief  default constructor */
   CFunction();
 
+#ifndef SWIG
   /** \brief  Create a function */
   explicit CFunction(CFunctionWrapper c_fcn);
+#endif // SWIG
 
   /** \brief  Access functions of the node */
   CFunctionInternal* operator->();
@@ -60,8 +64,10 @@ public:
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
 
+#ifndef SWIG
   /** \brief  Set user data structure (to be passed to all functions) */
   void setUserData(void* user_data);
+#endif // SWIG
   
   
 }; // class CFunction

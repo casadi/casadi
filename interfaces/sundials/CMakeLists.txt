@@ -16,6 +16,10 @@ set(SUNDIALS_INTERFACE_SRCS
   idas_internal.cpp
   idas_integrator.hpp
   idas_integrator.cpp
+  kinsol_internal.hpp
+  kinsol_internal.cpp
+  kinsol_solver.hpp
+  kinsol_solver.cpp
 )
 
 add_library(sundials_interface STATIC ${SUNDIALS_INTERFACE_SRCS})

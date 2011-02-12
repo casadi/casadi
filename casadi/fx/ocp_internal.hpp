@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_OCP_INTERNAL_HPP
-#define CASADI_OCP_INTERNAL_HPP
+#ifndef CASADI_OCP2_INTERNAL_HPP
+#define CASADI_OCP2_INTERNAL_HPP
 
 #include <vector>
 #include "ocp.hpp"
@@ -29,19 +29,19 @@
 
 namespace CasADi{
  
-  /** \brief  Internal node class for OCP
+  /** \brief  Internal node class for OCP2
   \author Joel Andersson 
   \date 2010
 */
-class OCPInternal : public FXInternal{
-  friend class OCP;
+class OCP2Internal : public FXInternal{
+  friend class OCP2;
   public:
   
     /// Constructor
-    explicit OCPInternal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G);
+    explicit OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G);
 
     /// Destructor
-    virtual ~OCPInternal();
+    virtual ~OCP2Internal();
     
     /// Evaluate the all the tasks
     virtual void evaluate(int fsens_order, int asens_order);
@@ -67,5 +67,5 @@ class OCPInternal : public FXInternal{
 } // namespace CasADi
 
 
-#endif // CASADI_OCP_INTERNAL_HPP
+#endif // CASADI_OCP2_INTERNAL_HPP
 

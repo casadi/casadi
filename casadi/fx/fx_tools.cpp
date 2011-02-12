@@ -26,10 +26,11 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 namespace CasADi{
     
-MultipleShooting::MultipleShooting(const FX& fcn, int ns, int nx, int nu) : fcn_(fcn), ns_(ns), nx_(nx), nu_(nu){
+MultipleShooting::MultipleShooting(const FX& fcn, const FX& mfcn, int ns, int nx, int nu) : fcn_(fcn), mfcn_(mfcn), ns_(ns), nx_(nx), nu_(nu){
   u_min_.resize(nu);   u_max_.resize(nu);   u_init_.resize(nu);
   x_min_.resize(nx);   x_max_.resize(nx);   x_init_.resize(nx);
   x0_min_.resize(nx);  x0_max_.resize(nx);
@@ -37,13 +38,15 @@ MultipleShooting::MultipleShooting(const FX& fcn, int ns, int nx, int nu) : fcn_
 }
 
 void MultipleShooting::init(){
+  fcn_.init();
+  mfcn_.init();
+  
   Jacobian IjacX(fcn_,INTEGRATOR_X0,INTEGRATOR_XF);
   JX_ = Parallelizer(vector<FX>(ns_,IjacX));
+  JX_.init();
   
   Jacobian IjacP(fcn_,INTEGRATOR_P,INTEGRATOR_XF);
   JP_ = Parallelizer(vector<FX>(ns_,IjacP));
-  
-  JX_.init();
   JP_.init();
 
   //Number of discretized controls
@@ -135,11 +138,11 @@ void MultipleShooting::init(){
     C.push_back(CP);
     for(int ii=0; ii<nx_; ++ii){
       for(int jj=0; jj<nx_; ++jj){
-        JJ(nx_*k+ii, (nx_+nu_)*k+jj) = SX(CX(ii,jj)); // syntax workaround
+        JJ(nx_*k+ii, (nx_+nu_)*k+jj) = CX(ii,jj);
       }
       
       for(int jj=0; jj<nu_; ++jj){
-        JJ(nx_*k+ii, (nx_+nu_)*k+nx_+jj) = SX(CP(ii,jj)); // error!
+        JJ(nx_*k+ii, (nx_+nu_)*k+nx_+jj) = CP(ii,jj);
       }
       
       JJ(nx_*k+ii, (nx_+nu_)*(k+1)+ii) = -1;
@@ -152,20 +155,18 @@ void MultipleShooting::init(){
   // Create Jacobian function
   J_ = CFunction(MultipleShooting::jacobian_wrapper);
   J_.setUserData(this);
-  J_.setNumInputs(J_mapping_.getNumInputs());
-  for(int i=0; i<J_.getNumInputs(); ++i){
-    J_.input(i) = J_mapping_.input(i);
-  }
-  J_.setNumOutputs(J_mapping_.getNumOutputs());
-  for(int i=0; i<J_.getNumOutputs(); ++i){
-    J_.output(i) = J_mapping_.output(i);
-  }
+  
+  J_.setNumInputs(1);
+  J_.input(0) = Matrix<double>(NV,1,0);
+
+  J_.setNumOutputs(1);
+  J_.output(0) = J_mapping_.output(0);
   
   //State at the final time
   XF = X[ns_-1];
 
   //Objective function: L(T)
-  F_ = MXFunction(V,XF[nx_-1]);
+  F_ = MXFunction(V,mfcn_.call(XF));
 
   //Terminal constraints: 0<=[x(T);y(T)]<=0
   G_ = MXFunction(V,vertcat(g));

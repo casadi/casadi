@@ -185,6 +185,13 @@ void FXInternal::setNumOutputs(int num_out){
   return output_.resize(num_out);  
 }
 
+int FXInternal::getNumInputs() const{
+  return input_.size();
+}
+
+int FXInternal::getNumOutputs() const{
+  return output_.size();
+}
 
 
 

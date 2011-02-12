@@ -20,27 +20,38 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#include "kinsol_solver.hpp"
+#include "kinsol_internal.hpp"
 
 using namespace std;
-
 namespace CasADi{
-  
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
+namespace Sundials{
+
+KinsolSolver::KinsolSolver(){ 
 }
 
-OCP2Internal::~OCP2Internal(){
+KinsolSolver::KinsolSolver(const FX& f, int nrhs){
+  assignNode(new KinsolInternal(f,nrhs));
+}
+
+KinsolInternal* KinsolSolver::operator->(){
+  return (KinsolInternal*)(FX::operator->());
+}
+
+const KinsolInternal* KinsolSolver::operator->() const{
+  return (const KinsolInternal*)(FX::operator->());
+}
+
+bool KinsolSolver::checkNode() const{
+  return dynamic_cast<const KinsolInternal*>(get());
+}
+
+KinsolSolver KinsolSolver::jac(int iind, int oind){
+  return (*this)->jac(iind,oind);  
 }
 
 
-void OCP2Internal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
-
-}
-
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
-}
-
+} // namespace Sundials
 } // namespace CasADi
+
 

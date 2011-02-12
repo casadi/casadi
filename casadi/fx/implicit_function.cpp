@@ -20,27 +20,26 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#include "implicit_function_internal.hpp"
 
 using namespace std;
-
 namespace CasADi{
-  
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
+
+ImplicitFunctionInternal* ImplicitFunction::operator->(){
+  return static_cast<ImplicitFunctionInternal*>(FX::operator->());
 }
 
-OCP2Internal::~OCP2Internal(){
+const ImplicitFunctionInternal* ImplicitFunction::operator->() const{
+    return static_cast<const ImplicitFunctionInternal*>(FX::operator->());
+}
+ 
+bool ImplicitFunction::checkNode() const{
+  return dynamic_cast<const ImplicitFunctionInternal*>(get());
 }
 
-
-void OCP2Internal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
-
-}
-
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
-}
 
 } // namespace CasADi
+
+  
+
 

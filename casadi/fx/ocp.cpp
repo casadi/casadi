@@ -26,19 +26,19 @@ using namespace std;
 
 namespace CasADi{
 
-OCP::OCP(){
+OCP2::OCP2(){
 }
 
-OCP::OCP(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G){
-  assignNode(new OCPInternal(L,F,H,G));
+OCP2::OCP2(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G){
+  assignNode(new OCP2Internal(L,F,H,G));
 }
   
-const OCPInternal* OCP::operator->() const{
-  return (const OCPInternal*)FX::operator->();
+const OCP2Internal* OCP2::operator->() const{
+  return (const OCP2Internal*)FX::operator->();
 }
 
-OCPInternal* OCP::operator->(){
-  return (OCPInternal*)FX::operator->();
+OCP2Internal* OCP2::operator->(){
+  return (OCP2Internal*)FX::operator->();
 }
 
 } // namespace CasADi

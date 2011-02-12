@@ -101,8 +101,10 @@ void ParallelizerInternal::evaluateTask(int task, int fsens_order, int asens_ord
   FX& fcn = funcs_[task];
   
   // Copy inputs to functions TODO: add seeds
-  for(int j=inind_[task]; j<inind_[task+1]; ++j)
-    fcn.input(j-inind_[task]).set(input(j));
+  for(int j=inind_[task]; j<inind_[task+1]; ++j){
+    if(j-inind_[task] != 4)
+      fcn.input(j-inind_[task]).set(input(j));
+  }
 
   // Evaluate
   fcn.evaluate(fsens_order,asens_order);

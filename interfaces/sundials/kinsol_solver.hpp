@@ -20,27 +20,43 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#ifndef KINSOL_SOLVER_HPP
+#define KINSOL_SOLVER_HPP
 
-using namespace std;
+#include "casadi/fx/implicit_function.hpp"
 
 namespace CasADi{
+namespace Sundials{
   
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
-}
+// Forward declaration of internal class 
+class KinsolInternal;
 
-OCP2Internal::~OCP2Internal(){
-}
+class KinsolSolver : public ImplicitFunction{
+public:
+
+  /** \brief  Default constructor */
+  KinsolSolver();
+  
+  /** \brief  Create an KINSOL instance */
+  explicit KinsolSolver(const FX& f, int nrhs=1);
+  
+  /** \brief  Access functions of the node */
+  KinsolInternal* operator->();
+
+  /** \brief  Const access functions of the node */
+  const KinsolInternal* operator->() const;
+
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+  
+  /** \brief Generate a linear solver for the sensitivity equations */
+  KinsolSolver jac(int iind=0, int oind=0);
+
+};
 
 
-void OCP2Internal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
-
-}
-
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
-}
-
+} // namespace Sundials
 } // namespace CasADi
+
+#endif //KINSOL_SOLVER_HPP
 

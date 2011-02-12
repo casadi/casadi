@@ -26,6 +26,9 @@
 
 #include "../casadi/casadi_exception.hpp"
 #include "../casadi/stl_vector_tools.hpp"
+#include "variable_tools.hpp"
+#include "../casadi/matrix/matrix_tools.hpp"
+#include "../casadi/sx/sx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -104,6 +107,62 @@ void OCP::print(ostream &stream) const{
   stream << "t0 = " << t0 << endl;
   stream << "tf = " << tf << endl;
   
+}
+
+OCP OCP::scale() const{
+  // Return object
+  OCP ret(*this);
+
+  // Sort the variables according to type
+  OCPVariables var(variables);
+  
+  // Variables
+  Matrix<SX> t = sx(var.t);
+  Matrix<SX> x = sx(var.x);
+  Matrix<SX> xdot = der(var.x);
+  Matrix<SX> z = sx(var.z);
+  Matrix<SX> p = sx(var.p);
+  Matrix<SX> u = sx(var.u);
+  
+  // Get all the variables
+  Matrix<SX> v;
+  append(v,t);
+  append(v,x);
+  append(v,xdot);
+  append(v,z);
+  append(v,p);
+  append(v,u);
+  
+  // Nominal values
+  Matrix<SX> t_n = nominal(var.t);
+  Matrix<SX> x_n = nominal(var.x);
+  Matrix<SX> xdot_n = nominal(var.x);
+  Matrix<SX> z_n = nominal(var.z);
+  Matrix<SX> p_n = nominal(var.p);
+  Matrix<SX> u_n = nominal(var.u);
+  
+  // Get all the old variables in expressed in the nominal ones
+  Matrix<SX> v_old;
+  append(v_old,t*t_n);
+  append(v_old,x*x_n);
+  append(v_old,xdot*xdot_n);
+  append(v_old,z*z_n);
+  append(v_old,p*p_n);
+  append(v_old,u*u_n);
+  
+  // Temporary variable
+  Matrix<SX> temp;
+
+  // Substitute equations
+  temp = dae;     substitute(temp,v,v_old);   ret.dae = temp;
+  temp = initeq;  substitute(temp,v,v_old);   ret.initeq = temp;
+  temp = cfcn;    substitute(temp,v,v_old);   ret.cfcn = temp;
+  temp = cfcn_lb; substitute(temp,v,v_old);   ret.cfcn_lb = temp;
+  temp = cfcn_ub; substitute(temp,v,v_old);   ret.cfcn_ub = temp;
+  temp = mterm;   substitute(temp,v,v_old);   ret.mterm = temp;
+  temp = lterm;   substitute(temp,v,v_old);   ret.lterm = temp;
+  
+  return ret;
 }
 
 void OCP::makeExplicit(){

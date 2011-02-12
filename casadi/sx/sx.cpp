@@ -514,6 +514,11 @@ Element<Matrix<SX>,SX>::Element(Matrix<SX>& mat, int i, int j) : i_(i), j_(j), m
   static_cast<SX&>(*this) = SX(mat_.getElement(i,j)); // cant put this in the parameter list!!!
 }
 
+Matrix<SX>& Element<Matrix<SX>,SX>::operator=(const Element<Matrix<SX>,SX> &y){
+  mat_.setElement(i_,j_,y);
+  return mat_;
+}
+
 Matrix<SX>& Element<Matrix<SX>,SX>::operator=(const SX &y){
   mat_.setElement(i_,j_,y);
   return mat_;

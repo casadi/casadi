@@ -20,27 +20,41 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#ifndef IMPLICIT_FUNCTION_HPP
+#define IMPLICIT_FUNCTION_HPP
 
-using namespace std;
+#include "fx.hpp"
 
 namespace CasADi{
+// Forward declaration of internal class
+class ImplicitFunctionInternal;
+
+/** Abstract base class for the implicit function classes
+  The equation:
   
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
-}
+  F(z, x1, x2, ..., xn) == 0
+  
+  where d_F/dz is invertable, implicitly defines the equation:
+  
+  z := G(x1, x2, ..., xn)
 
-OCP2Internal::~OCP2Internal(){
-}
+\author Joel Andersson
+\date 2011
+*/
+class ImplicitFunction : public FX{
+public:
+  
+  /// Access functions of the node
+  ImplicitFunctionInternal* operator->();
 
+  /// Const access functions of the node
+  const ImplicitFunctionInternal* operator->() const;
 
-void OCP2Internal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
-
-}
-
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
-}
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+};
 
 } // namespace CasADi
+
+#endif //IMPLICIT_FUNCTION_HPP
 

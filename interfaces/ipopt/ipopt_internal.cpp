@@ -262,7 +262,7 @@ void IpoptInternal::init(){
 }
 
 void IpoptInternal::evaluate(int fsens_order, int asens_order){
-  assert(fsens_order==0 && asens_order==0);
+  casadi_assert(fsens_order==0 && asens_order==0);
 
   // Reset the counters
   t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = 0;
@@ -378,7 +378,7 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
   
   // Log time
   double time1 = clock();
-  assert(n == n_);
+  casadi_assert(n == n_);
 
   // Pass the argument to the function
   F_.setInput(x);
@@ -406,8 +406,8 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
   log("eval_g started");
   double time1 = clock();
 
-  assert(n == n_);
-  assert(m == m_);
+  casadi_assert(n == n_);
+  casadi_assert(m == m_);
 
   // Pass the argument to the function
   G_.setInput(x);
@@ -433,7 +433,7 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
 {
   log("eval_grad_f started");
   double time1 = clock();
-  assert(n == n_);
+  casadi_assert(n == n_);
   
   // If no gradient function has been provided, use AD adjoint
   if(GF_.isNull()){
@@ -490,8 +490,8 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
 bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
                                 int m, double* g_l, double* g_u)
 {
-  assert(n == n_);
-  assert(m == m_);
+  casadi_assert(n == n_);
+  casadi_assert(m == m_);
   vector<double> &lbx = input(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
   vector<double> &ubx = input(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
   vector<double> &lbg = input(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
@@ -506,9 +506,9 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
 {
 
   // MISSING: Starting values for the dual variables
-  assert(init_x == true);
-  assert(init_z == false);
-  assert(init_lambda == false);
+  casadi_assert(init_x == true);
+  casadi_assert(init_z == false);
+  casadi_assert(init_lambda == false);
   const vector<double> &xinit = input(NLP_X_INIT);
   copy(xinit.begin(),xinit.end(),x);
   return true;

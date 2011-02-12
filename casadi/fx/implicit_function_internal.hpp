@@ -20,27 +20,44 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#ifndef IMPLICIT_FUNCTION_INTERNAL_HPP
+#define IMPLICIT_FUNCTION_INTERNAL_HPP
 
-using namespace std;
+#include "implicit_function.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
   
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
-}
+// Forward declaration of internal class
+class ImplicitFunctionInternal;
 
-OCP2Internal::~OCP2Internal(){
-}
+/// Internal class
+class ImplicitFunctionInternal : public FXInternal{
+  public:
+    // Constructor
+    ImplicitFunctionInternal(const FX& f, int nrhs);
+        
+    // Destructor
+    virtual ~ImplicitFunctionInternal() = 0;
+    
+    // Initialize
+    virtual void init();
+    
+    // Solve the system of equations
+    virtual void evaluate(int fsens_order, int asens_order) = 0;
+    
+    // Sparsity in CRS format
+    FX f_;
+    
+    // Number of equations
+    int N_;
+    
+    // Number of right hand sides
+    int nrhs_;
+};
 
-
-void OCP2Internal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
-
-}
-
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
-}
 
 } // namespace CasADi
+
+#endif //IMPLICIT_FUNCTION_INTERNAL_HPP
 

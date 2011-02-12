@@ -20,27 +20,41 @@
  *
  */
 
-#include "ocp_internal.hpp"
+#include "implicit_function_internal.hpp"
 
 using namespace std;
-
 namespace CasADi{
+
+ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, int nrhs) : f_(f), nrhs_(nrhs){
+}
+
+void ImplicitFunctionInternal::init(){
+  // Initialize the residual function
+  f_.init();
   
-OCP2Internal::OCP2Internal(const std::vector<FX>& L, const std::vector<FX>& F, const std::vector<FX>& H, const std::vector<FX>& G) : L_(L), F_(F), H_(H), G_(G){
-}
+  // Allocate inputs
+  setNumInputs(f_.getNumInputs()-1);
+  for(int i=0; i<getNumInputs(); ++i)
+    input(i) = f_.input(i+1);
+  
+  // Allocate outputs
+  setNumOutputs(1);
+  output() = f_.input(0);
 
-OCP2Internal::~OCP2Internal(){
-}
-
-
-void OCP2Internal::init(){
-  // Call the init function of the base class
+  // Call the base class initializer
   FXInternal::init();
 
+  // Number of equations
+  N_ = output().size();
+
 }
 
-void OCP2Internal::evaluate(int fsens_order, int asens_order){
+ImplicitFunctionInternal::~ImplicitFunctionInternal(){
 }
-
+ 
+ 
 } // namespace CasADi
+
+  
+
 

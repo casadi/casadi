@@ -83,11 +83,11 @@ void FX::solve(){
 }
 
 int FX::getNumInputs() const{
-  return (*this)->input_.size();
+  return (*this)->getNumInputs();
 }
 
 int FX::getNumOutputs() const{
-  return (*this)->output_.size();  
+  return (*this)->getNumOutputs();  
 }
 
 void FX::setNumInputs(int num_in){
