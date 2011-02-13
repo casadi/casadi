@@ -97,18 +97,18 @@ int main(){
     copy(u_init,u_init+nu,ms.input(OCP_U_INIT).begin()+k*nu);
   }
   
-  fill(ms.input(OCP_LBX).begin(),ms.input(OCP_LBX).end(),-inf);
-  fill(ms.input(OCP_UBX).begin(),ms.input(OCP_UBX).end(),inf);
-  fill(ms.input(OCP_X_INIT).begin(),ms.input(OCP_X_INIT).end(),0);
+  ms.input(OCP_LBX).setAll(-inf);
+  ms.input(OCP_UBX).setAll(inf);
+  ms.input(OCP_X_INIT).setAll(0);
 
   // Initial condition
-  ms.input(OCP_LBX)(0,0) = 0;   ms.input(OCP_UBX)(0,0) = 0;
-  ms.input(OCP_LBX)(1,0) = 1;   ms.input(OCP_UBX)(1,0) = 1;
-  ms.input(OCP_LBX)(2,0) = 0;   ms.input(OCP_UBX)(2,0) = 0;
+  ms.input(OCP_LBX)(0,0) = ms.input(OCP_UBX)(0,0) = 0;
+  ms.input(OCP_LBX)(1,0) = ms.input(OCP_UBX)(1,0) = 1;
+  ms.input(OCP_LBX)(2,0) = ms.input(OCP_UBX)(2,0) = 0;
 
   // Final condition
-  ms.input(OCP_LBX)(0,ns) = 0;  ms.input(OCP_UBX)(0,ns) = 0; 
-  ms.input(OCP_LBX)(1,ns) = 0;  ms.input(OCP_UBX)(1,ns) = 0; 
+  ms.input(OCP_LBX)(0,ns) = ms.input(OCP_UBX)(0,ns) = 0; 
+  ms.input(OCP_LBX)(1,ns) = ms.input(OCP_UBX)(1,ns) = 0; 
 
   IpoptSolver solver(ms.getF(),ms.getG(),FX(),ms.getJ());
   solver.setOption("tol",1e-5);

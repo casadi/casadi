@@ -127,20 +127,19 @@ int main(){
   
   // Create a multiple shooting discretization
   MultipleShooting ms(integrator,mterm);
-  ms->ffcn2_ = integrator2;
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
   ms.init();
 
   for(int k=0; k<num_nodes; ++k){
-    ms.input(OCP_U_INIT)[k] = 280/u_sca[0];
-    ms.input(OCP_LBU)[k] = 230/u_sca[0];
-    ms.input(OCP_UBU)[k] = 370/u_sca[0];
+    ms.input(OCP_U_INIT)(0,k) = 280/u_sca[0];
+    ms.input(OCP_LBU)(0,k) = 230/u_sca[0];
+    ms.input(OCP_UBU)(0,k) = 370/u_sca[0];
   }
 
   for(int k=0; k<=num_nodes; ++k){
     for(int i=0; i<x.size(); ++i){
-      ms.input(OCP_X_INIT)[i+k*x.size()] = x0[i];
+      ms.input(OCP_X_INIT)(i,k) = x0[i];
     }
   }
   
@@ -149,12 +148,12 @@ int main(){
   fill(ms.input(OCP_LBX).begin(),ms.input(OCP_LBX).end(),-inf);
   fill(ms.input(OCP_UBX).begin(),ms.input(OCP_UBX).end(),inf);
   for(int k=1; k<=num_nodes; ++k)
-    ms.input(OCP_UBX)[1 + x.size()*k] = 350/x_sca[1];
+    ms.input(OCP_UBX)(1,k) = 350/x_sca[1];
 
   // Initial condition
-  ms.input(OCP_LBX)[0] = ms.input(OCP_UBX)[0] = 0/x_sca[0];
-  ms.input(OCP_LBX)[1] = ms.input(OCP_UBX)[1] = 250.052/x_sca[1];
-  ms.input(OCP_LBX)[2] = ms.input(OCP_UBX)[2] = 956.271/x_sca[2];
+  ms.input(OCP_LBX)(0,0) = ms.input(OCP_UBX)(0,0) = 0/x_sca[0];
+  ms.input(OCP_LBX)(1,0) = ms.input(OCP_UBX)(1,0) = 250.052/x_sca[1];
+  ms.input(OCP_LBX)(2,0) = ms.input(OCP_UBX)(2,0) = 956.271/x_sca[2];
   
   IpoptSolver solver(ms.getF(),ms.getG(),FX(),ms.getJ());
   solver.setOption("tol",1e-5);

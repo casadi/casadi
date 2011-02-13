@@ -246,6 +246,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Set all elements to zero
     void setZero();
     
+    /// Set all elements to a value
+    void setAll(const T& val);
+    
     /** \brief  Make the matrix an dense n-by-m matrix */
     void makeDense(int n, int m, const T& val);
 
@@ -868,7 +871,12 @@ void Matrix<T>::setitem(int k, const T& el){
 
 template<class T>
 void Matrix<T>::setZero(){
-  std::fill(std::vector<T>::begin(),std::vector<T>::end(),0);
+  setAll(0);
+}
+
+template<class T>
+void Matrix<T>::setAll(const T& val){
+  std::fill(std::vector<T>::begin(),std::vector<T>::end(),val);
 }
 
 template<class T>

@@ -99,9 +99,8 @@ Matrix<SX> infSX(int n=1,int m=1);
 /** \brief  create a matrix with all ones */
 Matrix<SX> onesSX(int n, int m=1);
 
-/** \brief  create a matrix with all ones */
+/** \brief  create a matrix with all zeros */
 Matrix<SX> zerosSX(int n, int m=1);
-
 
 /** \brief Create a piecewise constant function 
   Create a piecewise constant function with n=val.size() intervals

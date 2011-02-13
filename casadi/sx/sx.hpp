@@ -295,12 +295,12 @@ class Element<Matrix<SX>,SX> : public SX{
       
     //@{
     /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
-    Matrix<SX>& operator=(const Element<Matrix<SX>,SX> &y); // to avoid that the default implementation is called
-    Matrix<SX>& operator=(const SX &y);
-    Matrix<SX>& operator+=(const SX &y);
-    Matrix<SX>& operator-=(const SX &y);
-    Matrix<SX>& operator*=(const SX &y);
-    Matrix<SX>& operator/=(const SX &y);
+    SX operator=(const Element<Matrix<SX>,SX> &y); // to avoid that the default implementation is called
+    SX operator=(const SX &y);
+    SX operator+=(const SX &y);
+    SX operator-=(const SX &y);
+    SX operator*=(const SX &y);
+    SX operator/=(const SX &y);
     //@}
   
   private:

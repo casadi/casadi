@@ -186,6 +186,18 @@ Matrix<T> sum(const Matrix<T> &x, int axis=0);
 template<class T>
 Matrix<T> repmat(const Matrix<T> &A, int n, int m);
 
+/** \brief  create an n-by-n identity matrix */
+template<class T>
+Matrix<T> eye(int n);
+
+/** \brief  create a matrix with all ones */
+template<class T>
+Matrix<T> ones(int n, int m=1);
+
+/** \brief  create a matrix with all zeros */
+template<class T>
+Matrix<T> zeros(int n, int m=1);
+
 } // namespace CasADi
 
 #ifndef SWIG
@@ -743,6 +755,23 @@ Matrix<T> repmat(const Matrix<T> &A, int n, int m){
   return vertcat(std::vector<Matrix<T> >(n, row));
 }
 
+template<class T>
+Matrix<T> ones(int n, int m){
+  return Matrix<T>(n,m,1);
+}
+
+template<class T>
+Matrix<T> zeros(int n, int m){
+  return Matrix<T>(n,m);
+}
+
+template<class T>
+Matrix<T> eye(int n){
+  Matrix<T> ret(n,n);
+  for(int i=0; i<n; ++i)
+    ret(i,i) = 1;
+  return ret;
+}
 
 } // namespace CasADi
 

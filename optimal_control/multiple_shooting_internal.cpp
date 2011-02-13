@@ -23,9 +23,7 @@
 #include "multiple_shooting_internal.hpp"
 #include "../casadi/fx/integrator.hpp"
 #include "../casadi/fx/jacobian.hpp"
-#include "../casadi/fx/sx_function.hpp"
 #include "../casadi/matrix/matrix_tools.hpp"
-#include "../casadi/sx/sx_tools.hpp"
 #include "../casadi/mx/mx_tools.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 
@@ -47,17 +45,17 @@ void MultipleShootingInternal::init(){
   for(int k=0; k<=nk_; ++k)
     input(OCP_T).at(k) = (k*tf)/nk_;
 
-  pF_ = Parallelizer(vector<FX>(nk_,ffcn_));
+  Parallelizer pF_ (vector<FX>(nk_,ffcn_));
   pF_.setOption("save_corrected_input",true);
   pF_.init();
   
   Jacobian IjacX(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
-  pJX_ = Parallelizer(vector<FX>(nk_,IjacX));
+  Parallelizer pJX_(vector<FX>(nk_,IjacX));
   pJX_.setOption("save_corrected_input",true);
   pJX_.init();
   
   Jacobian IjacP(ffcn_,INTEGRATOR_P,INTEGRATOR_XF);
-  pJP_ = Parallelizer(vector<FX>(nk_,IjacP));
+  Parallelizer pJP_(vector<FX>(nk_,IjacP));
   pJP_.setOption("save_corrected_input",true);
   pJP_.init();
 
@@ -74,7 +72,7 @@ void MultipleShootingInternal::init(){
   vector<MX> X(nk_+1);
   for(int k=0; k<=nk_; ++k)
     X[k] = V(range(np_+k*(nx_+nu_),np_+k*(nx_+nu_)+nx_),range(1));
-  
+
   // Algebraic state, state derivative
   vector<MX> Z(nk_), XP(nk_);
 
@@ -92,9 +90,9 @@ void MultipleShootingInternal::init(){
     pI_in[INTEGRATOR_XP0+ k*INTEGRATOR_NUM_IN] = XP[k];
   }
 
-  // Evaluate in parallel
+  // Evaluate function in parallel
   vector<MX> pI_out = pF_.call(pI_in);
-
+  
   //Constraint function
   vector<MX> g(nk_);
 
@@ -107,101 +105,61 @@ void MultipleShootingInternal::init(){
     g[k] = XF-X[k+1];
   }
 
-  // df_dx blocks
-  std::vector<Matrix<SX> > Jfx = symbolic("Jfx", nx_, nx_, nk_);
-  
-  // df_dp blocks
-  std::vector<Matrix<SX> > Jfp = symbolic("Jfp", nx_, nu_, nk_);
-  
-  //Jacobian mapping
-  SXMatrix Jgv(nx_*nk_,NV);
-  for(int k=0; k<nk_; ++k){
-    
-    // Jacobian mapping, row by row
-    for(int ii=0; ii<nx_; ++ii){
-      // Row and column offset
-      int i = nx_*k+ii;
-      int j = (nx_+nu_)*k;
-      
-      // Add df/dxk
-      for(int jj=0; jj<nx_; ++jj)
-        Jgv(i, j+jj) = Jfx[k](ii,jj);
-      
-      // Add df_du
-      for(int jj=0; jj<nu_; ++jj)
-        Jgv(i, j+nx_+jj) = Jfp[k](ii,jj);
-      
-      // Add df/dx_{k+1}
-      Jgv(i, j+nx_+nu_+ii) = -1;
-    }
-  }
-  
-  // All blocks
-  vector<SXMatrix> Jall;
-  Jall.insert(Jall.end(),Jfx.begin(),Jfx.end());
-  Jall.insert(Jall.end(),Jfp.begin(),Jfp.end());
-  
-  J_mapping_ = SXFunction(Jall,Jgv);
-  J_mapping_.init();
+  // Terminal constraints
+  G_ = MXFunction(V,vertcat(g));
 
-  // Create Jacobian function
-  J_ = CFunction(MultipleShootingInternal::jacobian_wrapper);
-  J_.setUserData(this);
-  
-  J_.setNumInputs(1);
-  J_.input(0) = Matrix<double>(NV,1,0);
-
-  J_.setNumOutputs(1);
-  J_.output(0) = J_mapping_.output(0);
-  
   // Objective function
   F_ = MXFunction(V,mfcn_.call(X[nk_-1]));
 
-  // Terminal constraints
-  G_ = MXFunction(V,vertcat(g));
-}
+  // Evaluate Jacobian blocks in parallel
+  vector<MX> pJX_out = pJX_.call(pI_in);
+  vector<MX> pJP_out = pJP_.call(pI_in);
 
-void MultipleShootingInternal::constraint_wrapper(CFunction &f, int fsenk_order, int asenk_order, void* user_data){
-  casadi_assert(fsenk_order==0 && asenk_order==0);
-  MultipleShootingInternal* this_ = (MultipleShootingInternal*)user_data;
-  this_->constraint(f,fsenk_order,asenk_order);
-}
-
-void MultipleShootingInternal::constraint(CFunction &f, int fsenk_order, int asenk_order){
+  // Empty matrices with the same size as the Jacobian blocks
+  MX e_JX = MX(IjacX.output().size1(),IjacX.output().size2());
+  MX e_JP = MX(IjacP.output().size1(),IjacP.output().size2());
   
-}
-
-void MultipleShootingInternal::jacobian_wrapper(CFunction &f, int fsenk_order, int asenk_order, void* user_data){
-  casadi_assert(fsenk_order==0 && asenk_order==0);
-  MultipleShootingInternal* this_ = (MultipleShootingInternal*)user_data;
-  this_->jacobian(f,fsenk_order,asenk_order);
-}
-
-void MultipleShootingInternal::jacobian(CFunction &f, int fsenk_order, int asenk_order){
-  // Functions that can be evaluated in parallel
-  Parallelizer J[2] = {pJX_,pJP_};
+  // Identity matrices with the same size as the Jacobian blocks
+  MX i_JX = MX::eye(IjacX.output().size1());
+  MX mi_JX(-eye<double>(IjacX.output().size1()));
   
-  for(int j=0; j<2; ++j){
-    // Pass inputs to parallelizer
-    for(int k=0; k<nk_; ++k){
-      J[j].setInput(input(OCP_T)[0], INTEGRATOR_T0 + k*INTEGRATOR_NUM_IN); // should be k
-      J[j].setInput(input(OCP_T)[1], INTEGRATOR_TF + k*INTEGRATOR_NUM_IN); // should be k+1
-      J[j].setInput(&f.input()[k*(nx_+nu_)], INTEGRATOR_X0 + k*INTEGRATOR_NUM_IN);
-      J[j].setInput(&f.input()[k*(nx_+nu_)+nx_], INTEGRATOR_P  + k*INTEGRATOR_NUM_IN);
+  // Vector of row blocks
+  vector<MX> JJ;
+  JJ.reserve(nk_);
+  
+  // Loop over the row blocks
+  for(int i=0; i<nk_; ++i){
+    
+    // Block row of the Jacobian
+    vector<MX> JJ_row;
+    JJ_row.reserve(2*nk_+1);
+    
+    for(int j=0; j<nk_; ++j){
+      if(j==i){
+        JJ_row.push_back(pJX_out[i]);
+        JJ_row.push_back(pJP_out[i]);
+      } else if(j==i+1) {
+        JJ_row.push_back(mi_JX);
+        JJ_row.push_back(e_JP);
+      } else {
+        JJ_row.push_back(e_JX);
+        JJ_row.push_back(e_JP);
+      }
     }
     
-    // Evaluate function
-    J[j].evaluate();
+    if(i==nk_-1) {
+      JJ_row.push_back(mi_JX);
+    } else {
+      JJ_row.push_back(e_JX);
+    }
     
-    // Save to mapping
-    for(int k=0; k<nk_; ++k)
-      J_mapping_.setInput(J[j].output(k),j*nk_+k);
+    // Add to vector of rows
+    JJ.push_back(horzcat(JJ_row));
   }
   
-  // Construct the full Jacobian
-  J_mapping_.evaluate();
-  for(int i=0; i<f.getNumOutputs(); ++i)
-    J_mapping_.getOutput(f.output(i),i);
+  // Create function
+  J_ = MXFunction(V,vertcat(JJ));
+  J_.init();
 }
 
 void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){

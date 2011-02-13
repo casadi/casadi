@@ -42,12 +42,12 @@ class Element{
     
     //@{
     /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
-    M& operator=(const Element<M,T> &y);
-    M& operator=(const T &y);
-    M& operator+=(const T &y);
-    M& operator-=(const T &y);
-    M& operator*=(const T &y);
-    M& operator/=(const T &y);
+    T operator=(const Element<M,T> &y);
+    T operator=(const T &y);
+    T operator+=(const T &y);
+    T operator-=(const T &y);
+    T operator*=(const T &y);
+    T operator/=(const T &y);
     //@}
 
     /// Get a reference to the element (? = A[i], ? += A[i], etc.)
@@ -67,39 +67,43 @@ class Element{
 // Implementation
 
 template<typename M, typename T>
-M& Element<M,T>::operator=(const Element<M,T> &y){
+T Element<M,T>::operator=(const Element<M,T> &y){
   mat_.setElement(i_,j_, y);
-  return mat_;
+  return y;
 }
 
 template<typename M, typename T>
-M& Element<M,T>::operator=(const T &y){
+T Element<M,T>::operator=(const T &y){
   mat_.setElement(i_,j_, y);
-  return mat_;
+  return y;
 }
 
 template<typename M, typename T>
-M& Element<M,T>::operator+=(const T &y){
-  mat_.setElement(i_,j_,val_+y);
-  return mat_;
+T Element<M,T>::operator+=(const T &y){
+  T s = val_+y;
+  mat_.setElement(i_,j_,s);
+  return s;
 }
 
 template<typename M, typename T>
-M& Element<M,T>::operator-=(const T &y){
-  mat_.setElement(i_,j_,val_-y);
-  return mat_;
+T Element<M,T>::operator-=(const T &y){
+  T s = val_-y;
+  mat_.setElement(i_,j_,s);
+  return s;
 }
 
 template<typename M, typename T>
-M& Element<M,T>::operator*=(const T &y){
-  mat_.setElement(i_,j_,val_*y);
-  return mat_;
+T Element<M,T>::operator*=(const T &y){
+  T s = val_*y;
+  mat_.setElement(i_,j_,s);
+  return s;
 }
 
 template<typename M, typename T>
-M& Element<M,T>::operator/=(const T &y){
-  mat_.setElement(i_,j_,val_/y);
-  return mat_;
+T Element<M,T>::operator/=(const T &y){
+  T s = val_/y;
+  mat_.setElement(i_,j_,s);
+  return s;
 }
 
 template<typename M, typename T>

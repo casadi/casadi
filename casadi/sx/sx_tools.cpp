@@ -115,11 +115,11 @@ Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matr
 }
 
 Matrix<SX> onesSX(int n, int m){
-  return Matrix<SX>(n,m,1);
+  return ones<SX>(n,m);
 }
 
 Matrix<SX> zerosSX(int n, int m){
-  return Matrix<SX>(n,m);
+  return zeros<SX>(n,m);
 }
 
 Matrix<SX> infSX(int n, int m){
@@ -127,10 +127,7 @@ Matrix<SX> infSX(int n, int m){
 }
 
 Matrix<SX> eyeSX(int n){
-  Matrix<SX> ret(n,n);
-  for(int i=0; i<n; ++i)
-    ret(i,i) = 1;
-  return ret;
+  return eye<SX>(n);
 }
 
 Matrix<SX> heaviside(const Matrix<SX>& a){

@@ -43,19 +43,10 @@ class MultipleShootingInternal : public OCPSolverInternal{
     
     // Initialize
     virtual void init();
-    
-    // NLP constraint
-    static void constraint_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data);
-    void constraint(CFunction &f, int fsens_order, int asens_order);
-
-    // Jacobian of the NLP constraint
-    static void jacobian_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data);
-    void jacobian(CFunction &f, int fsens_order, int asens_order);
 
     // Solve the OCP
     virtual void evaluate(int fsens_order, int asens_order);
     
-    FX ffcn2_;
   protected:
         
     // NLP objective function
@@ -65,19 +56,10 @@ class MultipleShootingInternal : public OCPSolverInternal{
     MXFunction G_;
 
     // Jacobian of the NLP constraints
-    CFunction J_;
+    MXFunction J_;
 
     // NLP solver
     NLPSolver nlp_solver_;
-
-    // Parallel constraint function evaluation
-    Parallelizer pF_;
-
-    // Parallel evaluation of the Jacobian blocks
-    Parallelizer pJX_,pJP_;
-    
-    // Mapping from the Jacobian blocks to the sparse Jacobian
-    SXFunction J_mapping_;
 };
                         
                         
