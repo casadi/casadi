@@ -38,7 +38,7 @@ MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_
   if(same_sparsity_){
     setSparsity(x->sparsity());
   } else {
-    CRSSparsity sp = x->sparsity().combine(y->sparsity(),mapping_);
+    CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_);
     setSparsity(sp);
   }
 }

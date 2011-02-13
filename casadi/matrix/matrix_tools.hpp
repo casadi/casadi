@@ -241,90 +241,19 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   std::vector<int> y_trans_map;
   CRSSparsity y_trans_sparsity = y.sparsity().transpose(y_trans_map);
 
+  // Create the sparsity pattern for the matrix-matrix product
+  std::vector< std::vector< std::pair<int,int> > > prod_map;
+  CRSSparsity spres = x.sparsity().patternProduct(y_trans_sparsity, prod_map);
+  
   // Create the return object
-  Matrix<T> ret(x.size1(),y.size2());
-  std::vector<int>& rowind = ret.sparsityRef().rowindRef();
-
-#ifdef LISTS_IN_PROD
-  // ALTERNATIVE 1: GROWING LISTS, THEN COPY: BETTER FOR SYMBOLIC TYPES WHEN COPYING IS EXPENSIVE?
-  std::list<int> col;
-  std::list<T> val;
-  std::vector<int>& ret_col = ret.col();
-  std::vector<T>& ret_val = ret;
-#else // LISTS_IN_PROD
-  // ALTERNATIVE 2: GROWING VECTORS: APPEARS FASTER
-  std::vector<int>& col = ret.sparsityRef().colRef();
-  std::vector<T>& val = ret;
-
-#ifdef ESTIMATE_NNZ_IN_PROD
-  // Sparsity densitity in x and y
-  double x_dens = x.size()/double(x.numel());
-  double y_dens = y.size()/double(y.numel());
+  Matrix<T> ret(spres);
   
-  // Probability that a product of an element of x and an element of y is zero
-  double zero_prob = (1-x_dens)*(1-y_dens);
-  
-  // Probability that all of the products that make up a matrix entry is zero
-  double element_zero_prob = std::pow(zero_prob,x.size2());
-
-  // Make sure between zero and one (you never know how crude pow might be)
-  element_zero_prob = fmin(fmax(element_zero_prob,0.0),1.0);
-
-  // We obtain the estimated number of non-zeros, with 20 % safety margin
-  int nnz_est = int(1.20*ret.numel()*(1-element_zero_prob));
-  
-  // Make sure not larger than the number of elements
-  if(nnz_est>ret.numel())
-    nnz_est = ret.numel();
-    
-  // Pass the guess to the vectors
-  col.reserve(nnz_est);
-  val.reserve(nnz_est);
-#endif // ESTIMATE_NNZ_IN_PROD
-#endif // LISTS_IN_PROD
-
-  // Direct access to the arrays
-  const std::vector<int> &x_col = x.col();
-  const std::vector<int> &y_row = y_trans_sparsity.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
-  
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<x.size1(); ++i){
-    for(int j=0; j<y.size2(); ++j){ // loop over the column of the resulting matrix
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      T d = 0; // the entry of the matrix to be calculated
-      bool added = false;
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          added = true;
-          d += x[el1++] * y[y_trans_map[el2++]];
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-      if(added){
-        col.push_back(j);
-        val.push_back(d);
-      }
-    }
-    rowind[i+1] = col.size();
+  // Carry out the actual multiplication
+  for(int i=0; i<ret.size(); ++i){
+    ret[i] = 0;
+    for(std::vector< std::pair<int,int> >::const_iterator it=prod_map[i].begin(); it!=prod_map[i].end(); ++it)
+      ret[i] += x[it->first] * y[y_trans_map[it->second]];
   }
-  
-#ifdef LISTS_IN_PROD
-  // Save the column indices to the return matrix
-  ret_col.resize(col.size());
-  copy(col.begin(),col.end(),ret_col.begin());
-  
-  // Save the non-zero entries to the return matrix
-  ret_val.resize(val.size());
-  copy(val.begin(),val.end(),ret_val.begin());
-#endif // LISTS_IN_PROD
   
   return ret;
 }

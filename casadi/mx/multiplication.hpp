@@ -45,6 +45,21 @@ class Multiplication : public MXNode{
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
+    /** \brief  Evaluate dense-dense */
+    void evaluateDenseDense(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
+    /** \brief  Evaluate sparse-sparse */
+    void evaluateSparseSparse(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+    
+    // Check if the arguments are dense
+    bool x_dense_, y_dense_;
+
+    // Mapping corresponding to the transpose of y (no need to form the transpose explicitly)
+    std::vector<int> y_trans_map_;
+  
+    // Create the sparsity pattern for the matrix-matrix product
+    std::vector< std::vector< std::pair<int,int> > > prod_map_;
+
 };
 
 } // namespace CasADi

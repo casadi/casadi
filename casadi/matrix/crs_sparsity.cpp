@@ -44,7 +44,7 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
   assignNode(new CRSSparsityNode(nrow, ncol, col, rowind));
 }
 
-CRSSparsity::CRSSparsity(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind){
+CRSSparsity::CRSSparsity(int nrow, int ncol, vector<int> col, vector<int> rowind){
   assignNode(new CRSSparsityNode(nrow, ncol, col, rowind));
 }
     
@@ -77,20 +77,20 @@ int CRSSparsity::size() const{
   return (*this)->col_.size();
 }
     
-const std::vector<int>& CRSSparsity::col() const{
+const vector<int>& CRSSparsity::col() const{
   return (*this)->col_;
 }
     
-const std::vector<int>& CRSSparsity::rowind() const{
+const vector<int>& CRSSparsity::rowind() const{
   return (*this)->rowind_;
 }
     
-std::vector<int>& CRSSparsity::colRef(){
+vector<int>& CRSSparsity::colRef(){
   makeUnique();
   return (*this)->col_;
 }
     
-std::vector<int>& CRSSparsity::rowindRef(){
+vector<int>& CRSSparsity::rowindRef(){
   makeUnique();
   return (*this)->rowind_;
 }
@@ -197,8 +197,8 @@ int CRSSparsity::getNZ(int i, int j) const{
   return -1;
 }
 
-std::vector<int> CRSSparsity::getNZNew(std::vector<int> i, std::vector<int> j){
-  std::vector<int> ret;
+vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j){
+  vector<int> ret;
   ret.reserve(i.size());
 
     // Quick return if matrix is dense
@@ -215,8 +215,8 @@ std::vector<int> CRSSparsity::getNZNew(std::vector<int> i, std::vector<int> j){
   return ret;
 }
 
-std::vector<int> CRSSparsity::getNZNew(std::vector<int> i, std::vector<int> j) const{
-  std::vector<int> ret;
+vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j) const{
+  vector<int> ret;
   ret.reserve(i.size());
 
     // Quick return if matrix is dense
@@ -233,8 +233,8 @@ std::vector<int> CRSSparsity::getNZNew(std::vector<int> i, std::vector<int> j) c
   return ret;
 }
 
-std::vector<int> CRSSparsity::getNZ(std::vector<int> ii, std::vector<int> jj) const{
-  std::vector<int> ret;
+vector<int> CRSSparsity::getNZ(vector<int> ii, vector<int> jj) const{
+  vector<int> ret;
   for(vector<int>::const_iterator it=ii.begin(); it!=ii.end(); ++it){
     int el=rowind(*it);
     for(vector<int>::const_iterator jt=jj.begin(); jt!=jj.end(); ++jt){
@@ -272,11 +272,11 @@ int CRSSparsity::sizeL() const{
 }
 
 
-void CRSSparsityNode::repr(std::ostream &stream) const{
+void CRSSparsityNode::repr(ostream &stream) const{
   stream << "Compressed Row Storage: " << nrow_ << "-by-" << ncol_ << " matrix, " << col_.size() << " structural non-zeros";
 }
 
-void CRSSparsityNode::print(std::ostream &stream) const{
+void CRSSparsityNode::print(ostream &stream) const{
   repr(stream);
   stream << endl;
   stream << "col:    " << col_ << endl;
@@ -293,17 +293,17 @@ vector<int> CRSSparsity::getRow() const{
   return row;
 }
 
-void CRSSparsity::getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const{
+void CRSSparsity::getSparsityCRS(vector<int>& rowind, vector<int> &col) const{
   rowind = this->rowind();
   col = this->col();
 }
 
-void CRSSparsity::getSparsity(std::vector<int>& row, std::vector<int> &col) const{
+void CRSSparsity::getSparsity(vector<int>& row, vector<int> &col) const{
   row = this->getRow();
   col = this->col();
 }
 
-void CRSSparsity::bucketSort(std::vector<std::list<int> >& buckets, std::vector<int>& row) const{
+void CRSSparsity::bucketSort(vector<list<int> >& buckets, vector<int>& row) const{
   // Assert dimensions
   buckets.resize(size2());
 
@@ -311,7 +311,7 @@ void CRSSparsity::bucketSort(std::vector<std::list<int> >& buckets, std::vector<
   row.resize(size());
 
   // Empty the buckets
-  for(std::vector<std::list<int> >::iterator it=buckets.begin(); it!=buckets.end(); ++it)
+  for(vector<list<int> >::iterator it=buckets.begin(); it!=buckets.end(); ++it)
     it->clear();
   
   // Quick access
@@ -333,7 +333,7 @@ void CRSSparsity::bucketSort(std::vector<std::list<int> >& buckets, std::vector<
   }
 }
 
-CRSSparsity CRSSparsity::transpose(std::vector<int>& mapping) const{
+CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
   // Non-zero entries on each column
   vector<list<int> > buckets;
 
@@ -383,13 +383,13 @@ CRSSparsity CRSSparsity::transpose(std::vector<int>& mapping) const{
 
 }
 
-CRSSparsity CRSSparsity::combine(const CRSSparsity& sp, std::vector<int>& mapping) const{
+CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<int>& mapping) const{
   // Assert dimensions
-  casadi_assert_message(size1()==sp.size1(), "The number of rows does not match");
-  casadi_assert_message(size2()==sp.size2(), "The number of columns does not match");
+  casadi_assert_message(size1()==y.size1(), "The number of rows does not match");
+  casadi_assert_message(size2()==y.size2(), "The number of columns does not match");
   
   // Quick return if the patterns are equal
-  if(*this == sp){
+  if(*this == y){
     mapping.resize(size());
     fill(mapping.begin(),mapping.end(),0);
     return *this;
@@ -413,11 +413,11 @@ CRSSparsity CRSSparsity::combine(const CRSSparsity& sp, std::vector<int>& mappin
   for(int i=0; i<size1(); ++i){
     // Non-zero element of the two matrices
     int el1 = rowind(i);
-    int el2 = sp.rowind(i);
+    int el2 = y.rowind(i);
     
     // End of the non-zero elements of the row for the two matrices
     int el1_last = rowind(i+1);
-    int el2_last = sp.rowind(i+1);
+    int el2_last = y.rowind(i+1);
     
     // Loop over the non-zeros of both matrices
     while(el1<el1_last || el2<el2_last){
@@ -454,13 +454,62 @@ CRSSparsity CRSSparsity::combine(const CRSSparsity& sp, std::vector<int>& mappin
   return ret;
 }
 
-bool CRSSparsity::operator==(const CRSSparsity& sp) const{
+CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<int>& mapping) const{
+  throw CasadiException("CRSSparsity::patternUnion not implemented");
+}
+
+CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping) const{
+  // return object
+  CRSSparsity ret(size1(),y_trans.size1());
+  
+  // Get the vectors for the return pattern
+  vector<int>& c = ret.colRef();
+  vector<int>& r = ret.rowindRef();
+  
+  // Direct access to the arrays
+  const vector<int> &x_col = col();
+  const vector<int> &y_row = y_trans.col();
+  const vector<int> &x_rowind = rowind();
+  const vector<int> &y_colind = y_trans.rowind();
+  
+  // Clear the mapping
+  mapping.clear();
+  
+  // loop over the row of the resulting matrix)
+  for(int i=0; i<size1(); ++i){
+    for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
+      int el1 = x_rowind[i];
+      int el2 = y_colind[j];
+      vector< pair<int,int> > d; // the entry of the matrix to be calculated
+      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+        int j1 = x_col[el1];
+        int i2 = y_row[el2];      
+        if(j1==i2){
+          d.push_back(pair<int,int>(el1++,el2++));
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+      if(!d.empty()){
+        c.push_back(j);
+        mapping.push_back(d);
+      }
+    }
+    r[i+1] = c.size();
+  }
+  
+  return ret;
+}
+
+bool CRSSparsity::operator==(const CRSSparsity& y) const{
   // Quick true if the objects are the same
-  if(get() == sp.get())
+  if(get() == y.get())
     return true;
   
   // First check dimensions and number of non-zeros
-  if(size()!=sp.size() || size1()!=sp.size1() || size2()!=sp.size2())
+  if(size()!=y.size() || size1()!=y.size1() || size2()!=y.size2())
     return false;
 
   // Check if dense
@@ -468,11 +517,11 @@ bool CRSSparsity::operator==(const CRSSparsity& sp) const{
     return true;
   
   // Check the number of non-zeros per row
-  if(!equal(rowind().begin(),rowind().end(),sp.rowind().begin()))
+  if(!equal(rowind().begin(),rowind().end(),y.rowind().begin()))
     return false;
   
   // Finally check the column indices
-  if(!equal(col().begin(),col().end(),sp.col().begin()))
+  if(!equal(col().begin(),col().end(),y.col().begin()))
     return false;
   
   // Equal if reached this point

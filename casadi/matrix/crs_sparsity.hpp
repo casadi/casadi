@@ -166,8 +166,18 @@ class CRSSparsity : public SharedObject{
     /** \brief Union of two sparsity patterns
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
     The value is -1 if the non-zero comes from the first (i.e. this) object, 1 if it is from the second and 0 if from both */
-    CRSSparsity combine(const CRSSparsity& sp, std::vector<int>& mapping) const;
-    
+    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<int>& mapping) const;
+
+    /** \brief Intersection of two sparsity patterns
+    Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
+    The value is -1 if the non-zero comes from the first (i.e. this) object, 1 if it is from the second and 0 if from both */
+    CRSSparsity patternIntersection(const CRSSparsity& y, std::vector<int>& mapping) const;
+
+    /** \brief Sparsity pattern for a matrix-matrix product
+    Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
+    The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
+    CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+
     /// Append another sparsity patten vertically
     void append(const CRSSparsity& sp);
 
