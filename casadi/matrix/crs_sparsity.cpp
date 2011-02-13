@@ -383,36 +383,105 @@ CRSSparsity CRSSparsity::transpose(std::vector<int>& mapping) const{
 
 }
 
+CRSSparsity CRSSparsity::combine(const CRSSparsity& sp, std::vector<int>& mapping) const{
+  // Assert dimensions
+  casadi_assert_message(size1()==sp.size1(), "The number of rows does not match");
+  casadi_assert_message(size2()==sp.size2(), "The number of columns does not match");
+  
+  // Quick return if the patterns are equal
+  if(*this == sp){
+    mapping.resize(size());
+    fill(mapping.begin(),mapping.end(),0);
+    return *this;
+  }
+  
+  // Create return object
+  CRSSparsity ret(size1(),size2());
+  
+  // Get refences to the sparsity vectors
+  vector<int>& r = ret.rowindRef();
+  vector<int>& c = ret.colRef();
+  
+  // Prepare the assembly of the rowind vector below
+  r.clear();
+  r.push_back(0);
+  
+  // Clear the mapping
+  mapping.clear();
+  
+  // Loop over rows of both patterns
+  for(int i=0; i<size1(); ++i){
+    // Non-zero element of the two matrices
+    int el1 = rowind(i);
+    int el2 = sp.rowind(i);
+    
+    // End of the non-zero elements of the row for the two matrices
+    int el1_last = rowind(i+1);
+    int el2_last = sp.rowind(i+1);
+    
+    // Loop over the non-zeros of both matrices
+    while(el1<el1_last || el2<el2_last){
+      // Get the columns
+      int col1 = col(el1);
+      int col2 = col(el2);
+      
+      // Add to the return matrix
+      if(col1==col2){
+        c.push_back(col1);
+        mapping.push_back(0);
+        el1++; el2++;
+      } else if(col1<col2){
+        c.push_back(col1);
+        mapping.push_back(-1);
+        el1++;
+      } else {
+        c.push_back(col2);
+        mapping.push_back(1);
+        el2++;
+      }
+    }
+    
+    // Save the index of the last nonzero on the row
+    r.push_back(c.size());
+  }
+  
+  // Make sure that the object was correctly created
+  casadi_assert(r.size()==size1()+1);
+  casadi_assert(mapping.size()==c.size());
+  casadi_assert(c.size()==r.back());
+  
+  // Return 
+  return ret;
+}
+
+bool CRSSparsity::operator==(const CRSSparsity& sp) const{
+  // Quick true if the objects are the same
+  if(get() == sp.get())
+    return true;
+  
+  // First check dimensions and number of non-zeros
+  if(size()!=sp.size() || size1()!=sp.size1() || size2()!=sp.size2())
+    return false;
+
+  // Check if dense
+  if(size()==numel())
+    return true;
+  
+  // Check the number of non-zeros per row
+  if(!equal(rowind().begin(),rowind().end(),sp.rowind().begin()))
+    return false;
+  
+  // Finally check the column indices
+  if(!equal(col().begin(),col().end(),sp.col().begin()))
+    return false;
+  
+  // Equal if reached this point
+  return true;
+}
+
 void CRSSparsity::reserve(int nnz, int nrow){
   colRef().reserve(nnz);
   rowindRef().reserve(nrow+1);
-}
-
-bool CRSSparsity::operator==(const CRSSparsity& y) const{
-  // Quick true if the objects are the same
-  if(get() == y.get())
-    return true;
-  
-  // Quick false if dimensions or number of non-zeros are different
-  if(size1() != y.size1() || size2() != y.size2() || size() != y.size())
-    return false;
-  
-  // Check rowind vectors
-  const std::vector<int>& r1 = rowind();
-  const std::vector<int>& r2 = y.rowind();
-  for(int i=0; i<r1.size(); ++i)
-    if(r1[i]!=r2[i])
-      return false;
-  
-  // Check column vector
-  const std::vector<int>& c1 = col();
-  const std::vector<int>& c2 = y.col();
-  for(int i=0; i<c1.size(); ++i)
-    if(c1[i]!=c2[i])
-      return false;
-
-  // Patterns are identical if we reached this point
-  return true;
 }
 
 void CRSSparsity::append(const CRSSparsity& sp){

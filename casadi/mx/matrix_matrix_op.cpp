@@ -30,10 +30,17 @@ namespace CasADi{
 
 MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
-  casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(), "MatrixMatrixOp: dimension mismatch");
-  same_sparsity_ = x->sparsity() == y->sparsity();
-  casadi_assert_message(same_sparsity_, "different sparsity not implemented");
-  setSparsity(x->sparsity());
+  
+  // Check if the sparsity patterns are the same
+  same_sparsity_ = x.sparsity() == y.sparsity();
+  
+  // Get the sparsity pattern
+  if(same_sparsity_){
+    setSparsity(x->sparsity());
+  } else {
+    CRSSparsity sp = x->sparsity().combine(y->sparsity(),mapping_);
+    setSparsity(sp);
+  }
 }
 
 MatrixMatrixOp* MatrixMatrixOp::clone() const{
@@ -45,16 +52,21 @@ void MatrixMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
 }
 
 void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  // Number of non-zeros
+  int n = size();
+  int nx = dep(0).size();
+  int ny = dep(1).size();
+      
   if(same_sparsity_){
     if(nfwd==0 && nadj==0){
       // No sensitivities
-      for(int i=0; i<size(); ++i)
+      for(int i=0; i<n; ++i)
         nfun0[op](input[0][i],input[1][i],&output[i]);
       
     } else {
       // Sensitivities
       double tmp[3];  // temporary variable to hold value and partial derivatives of the function
-      for(int i=0; i<size(); ++i){
+      for(int i=0; i<n; ++i){
         // Evaluate and get partial derivatives
         nfun1[op](input[0][i],input[1][i],tmp);
         output[i] = tmp[0];
@@ -72,7 +84,48 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       }
     }
   } else {
-    casadi_assert_message(0, "different sparsity not implemented");
+    // Non-zero indices of the arguments
+    int ix=0, iy=0;
+    
+    if(nfwd==0 && nadj==0){
+      // No sensitivities
+      for(int i=0; i<n; ++i){
+        double x = mapping_[i]<=0 ? input[0][ix++] : 0;
+        double y = mapping_[i]>=0 ? input[1][iy++] : 0;
+        nfun0[op](x,y,&output[i]);
+      }
+      
+    } else {
+      // Sensitivities
+      double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+      
+      for(int i=0; i<n; ++i){
+        bool isx = mapping_[i]<=0;
+        bool isy = mapping_[i]>=0;
+
+        double x = isx * input[0][ix];
+        double y = isy * input[0][iy];
+
+        // Evaluate and get partial derivatives
+        nfun1[op](x,y,tmp);
+        output[i] = tmp[0];
+        
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          fwdSens[d][i] = isx*tmp[1]*fwdSeed[0][d][ix] + isy*tmp[2]*fwdSeed[1][d][iy];
+        }
+
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          adjSens[0][d][ix] += isx*adjSeed[d][i]*tmp[1];
+          adjSens[1][d][iy] += isy*adjSeed[d][i]*tmp[2];
+        }
+        
+        // Increase argument indices
+        if(isx && ix+1<nx) ix++;
+        if(isy && iy+1<ny) iy++;
+      }
+    }
   }
 }
 

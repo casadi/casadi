@@ -47,7 +47,7 @@ void MultipleShootingInternal::init(){
 
   Parallelizer pF_ (vector<FX>(nk_,ffcn_));
   pF_.setOption("save_corrected_input",true);
-  pF_.init();
+  pF_ .init();
   
   Jacobian IjacX(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
   Parallelizer pJX_(vector<FX>(nk_,IjacX));
@@ -116,12 +116,11 @@ void MultipleShootingInternal::init(){
   vector<MX> pJP_out = pJP_.call(pI_in);
 
   // Empty matrices with the same size as the Jacobian blocks
-  MX e_JX = MX(IjacX.output().size1(),IjacX.output().size2());
-  MX e_JP = MX(IjacP.output().size1(),IjacP.output().size2());
+  MX e_JX = MX(pJX_out[0].size1(),pJX_out[0].size2());
+  MX e_JP = MX(pJP_out[0].size1(),pJP_out[0].size2());
   
   // Identity matrices with the same size as the Jacobian blocks
-  MX i_JX = MX::eye(IjacX.output().size1());
-  MX mi_JX(-eye<double>(IjacX.output().size1()));
+  MX mi_JX = -eye<double>(IjacX.output().size1());
   
   // Vector of row blocks
   vector<MX> JJ;
@@ -134,21 +133,22 @@ void MultipleShootingInternal::init(){
     vector<MX> JJ_row;
     JJ_row.reserve(2*nk_+1);
     
+    // Add all the blocks
     for(int j=0; j<nk_; ++j){
-      if(j==i){
-        JJ_row.push_back(pJX_out[i]);
-        JJ_row.push_back(pJP_out[i]);
-      } else if(j==i+1) {
-        JJ_row.push_back(mi_JX);
+      if(j==i){                       // Diagonal block
+        JJ_row.push_back(pJX_out[i]); // df_k/dx_k block
+        JJ_row.push_back(pJP_out[i]); // df_k/du_k block
+      } else if(j==i+1) {             // First upper subdiagonal block
+        JJ_row.push_back(mi_JX);      // df_k/dx_{k+1} block
         JJ_row.push_back(e_JP);
-      } else {
+      } else {                        // All other blocks
         JJ_row.push_back(e_JX);
         JJ_row.push_back(e_JP);
       }
     }
     
     if(i==nk_-1) {
-      JJ_row.push_back(mi_JX);
+      JJ_row.push_back(mi_JX);        // df_k/dx_{k+1} block
     } else {
       JJ_row.push_back(e_JX);
     }
@@ -159,7 +159,6 @@ void MultipleShootingInternal::init(){
   
   // Create function
   J_ = MXFunction(V,vertcat(JJ));
-  J_.init();
 }
 
 void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){

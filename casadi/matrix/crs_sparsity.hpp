@@ -163,6 +163,11 @@ class CRSSparsity : public SharedObject{
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
+    /** \brief Union of two sparsity patterns
+    Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
+    The value is -1 if the non-zero comes from the first (i.e. this) object, 1 if it is from the second and 0 if from both */
+    CRSSparsity combine(const CRSSparsity& sp, std::vector<int>& mapping) const;
+    
     /// Append another sparsity patten vertically
     void append(const CRSSparsity& sp);
 

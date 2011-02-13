@@ -48,10 +48,13 @@ class MatrixMatrixOp : public MXNode{
   protected:
     //! \brief Operation
     OPERATION op;
-    
+
     /// Does the two matrices have the same sparsity
     bool same_sparsity_;
-    
+
+    /// Which element belong to which 
+    vector<int> mapping_;
+
 };
 
 } // namespace CasADi
