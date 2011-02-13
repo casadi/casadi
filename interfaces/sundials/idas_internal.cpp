@@ -123,9 +123,10 @@ void IdasInternal::init(){
     jac_.init();
     vector<int> rowind, col;
     jac_.output().sparsity().getSparsityCRS(rowind,col);
-    if(!linsol_.isNull())
+    if(!linsol_.isNull()){
       linsol_.setSparsity(rowind,col);
       linsol_.init();
+    }
     
     log("IdasInternal::init","user defined linear solver initialized");
   }

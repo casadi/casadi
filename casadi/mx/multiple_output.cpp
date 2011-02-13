@@ -28,22 +28,19 @@ using namespace std;
 
 namespace CasADi{
 
-MultipleOutput::MultipleOutput(int n_out){
-  children_.resize(n_out, 0);
+MultipleOutput::MultipleOutput(){
 }
 
 MultipleOutput::~MultipleOutput(){
 }
 
-OutputNode::OutputNode(const MX& parent, int i_out) : parent_(parent), i_out_(i_out){
+OutputNode::OutputNode(const MX& parent) : parent_(parent){
   // Get the node of the parent
   MultipleOutput* p = dynamic_cast<MultipleOutput*>(parent_.get());
   casadi_assert(p!=0);
   
-  // Save a pointer to the object
-  casadi_assert(p->children_.size()>i_out);
-  casadi_assert(p->children_[i_out] == 0);
-  p->children_[i_out] = this;
+  // Save a pointer to the object in the parent class
+  p->children_.insert(this);
 }
 
 OutputNode::~OutputNode(){
@@ -51,8 +48,7 @@ OutputNode::~OutputNode(){
   MultipleOutput* p = static_cast<MultipleOutput*>(parent_.get());
   
   // Remove the parent from the parent
-  casadi_assert(p->children_[i_out_] == this);
-  p->children_[i_out_] = 0;
+  p->children_.erase(this);
 }
   
 

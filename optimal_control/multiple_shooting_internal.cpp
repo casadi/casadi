@@ -41,84 +41,107 @@ void MultipleShootingInternal::init(){
   OCPSolverInternal::init();
 
   // Get final time
-  tf_ = getOption("final_time").toDouble();
+  double tf = getOption("final_time").toDouble();
 
+  // Set time grid
+  for(int k=0; k<=nk_; ++k)
+    input(OCP_T).at(k) = (k*tf)/nk_;
+
+  pF_ = Parallelizer(vector<FX>(nk_,ffcn_));
+  pF_.setOption("save_corrected_input",true);
+  pF_.init();
+  
   Jacobian IjacX(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
-  JX_ = Parallelizer(vector<FX>(nk_,IjacX));
-  JX_.init();
+  pJX_ = Parallelizer(vector<FX>(nk_,IjacX));
+  pJX_.setOption("save_corrected_input",true);
+  pJX_.init();
   
   Jacobian IjacP(ffcn_,INTEGRATOR_P,INTEGRATOR_XF);
-  JP_ = Parallelizer(vector<FX>(nk_,IjacP));
-  JP_.init();
-
-  //Number of discretized controls
-  int NU = nu_*nk_;
-
-  //Number of discretized states
-  int NX = nx_*(nk_+1);
+  pJP_ = Parallelizer(vector<FX>(nk_,IjacP));
+  pJP_.setOption("save_corrected_input",true);
+  pJP_.init();
 
   //Declare variable vector
-  int NV = NU+NX;
+  int NV = np_+nu_*nk_+nx_*(nk_+1);
   MX V("V",NV);
-
+  
   //Disretized control
-  vector<MX> U;
+  vector<MX> U(nk_);
+  for(int k=0; k<nk_; ++k)
+    U[k] = V(range(np_+k*(nx_+nu_)+nx_,np_+k*(nx_+nu_)+nx_+nu_),range(1));
   
   //Disretized state
-  vector<MX> X;
-
-  for(int k=0; k<nk_; ++k){
-    X.push_back(V(range(k*(nx_+nu_),k*(nx_+nu_)+nx_),range(1)));
-    U.push_back(V(range(k*(nx_+nu_)+nx_,k*(nx_+nu_)+nx_+nu_),range(1)));
-  }
-  X.push_back(V(range(nk_*(nx_+nu_),nk_*(nx_+nu_)+nx_),range(1)));
-    
-  //Beginning of each shooting interval (shift time horizon)
-  vector<MX> T0(nk_,MX(0));
-
-  //End of each shooting interval (shift time horizon)
-  vector<MX> TF(nk_,MX(tf_/nk_));
-
-  //The final state
-  MX XF;
+  vector<MX> X(nk_+1);
+  for(int k=0; k<=nk_; ++k)
+    X[k] = V(range(np_+k*(nx_+nu_),np_+k*(nx_+nu_)+nx_),range(1));
   
-  //Constraint function with upper and lower bounds
-  vector<MX> g;
-  vector<SXMatrix> C;
-  SXMatrix JJ(NX,NV);
+  // Algebraic state, state derivative
+  vector<MX> Z(nk_), XP(nk_);
 
-  //Build up a graph of integrator calls
+  // Parameters
+  MX P = V(range(np_),range(1));
+
+  // Input to the parallel evaluation
+  vector<MX> pI_in(nk_*INTEGRATOR_NUM_IN);
   for(int k=0; k<nk_; ++k){
-    MX I_in[] = {T0[k],TF[k],X[k],U[k],MX(),MX()};
-    
-    //call the integrator
-    XF = ffcn_.call(vector<MX>(I_in,I_in+6))[INTEGRATOR_XF];
+    pI_in[INTEGRATOR_T0 + k*INTEGRATOR_NUM_IN] = input(OCP_T)[0]; // should be k
+    pI_in[INTEGRATOR_TF + k*INTEGRATOR_NUM_IN] = input(OCP_T)[1]; // should be k+1
+    pI_in[INTEGRATOR_P + k*INTEGRATOR_NUM_IN] = vertcat(P,U[k]);
+    pI_in[INTEGRATOR_X0 + k*INTEGRATOR_NUM_IN] = X[k];
+    pI_in[INTEGRATOR_Z0 + k*INTEGRATOR_NUM_IN] = Z[k];
+    pI_in[INTEGRATOR_XP0+ k*INTEGRATOR_NUM_IN] = XP[k];
+  }
+
+  // Evaluate in parallel
+  vector<MX> pI_out = pF_.call(pI_in);
+
+  //Constraint function
+  vector<MX> g(nk_);
+
+  // Collect the outputs
+  for(int k=0; k<nk_; ++k){
+    // Get the output
+    MX XF = pI_out[INTEGRATOR_XF + INTEGRATOR_NUM_OUT*k];
     
     //append continuity constraints
-    g.push_back(XF-X[k+1]);
+    g[k] = XF-X[k+1];
+  }
+
+  // df_dx blocks
+  std::vector<Matrix<SX> > Jfx = symbolic("Jfx", nx_, nx_, nk_);
+  
+  // df_dp blocks
+  std::vector<Matrix<SX> > Jfp = symbolic("Jfp", nx_, nu_, nk_);
+  
+  //Jacobian mapping
+  SXMatrix Jgv(nx_*nk_,NV);
+  for(int k=0; k<nk_; ++k){
     
-    // Create a block
-    stringstream ss;
-    ss << k;
-    
-    SXMatrix CX = symbolic(string("X_")+ss.str(),nx_,nx_);
-    SXMatrix CP = symbolic(string("P_")+ss.str(),nx_,nu_);
-    C.push_back(CX);
-    C.push_back(CP);
+    // Jacobian mapping, row by row
     for(int ii=0; ii<nx_; ++ii){
-      for(int jj=0; jj<nx_; ++jj){
-        JJ(nx_*k+ii, (nx_+nu_)*k+jj) = CX(ii,jj);
-      }
+      // Row and column offset
+      int i = nx_*k+ii;
+      int j = (nx_+nu_)*k;
       
-      for(int jj=0; jj<nu_; ++jj){
-        JJ(nx_*k+ii, (nx_+nu_)*k+nx_+jj) = CP(ii,jj);
-      }
+      // Add df/dxk
+      for(int jj=0; jj<nx_; ++jj)
+        Jgv(i, j+jj) = Jfx[k](ii,jj);
       
-      JJ(nx_*k+ii, (nx_+nu_)*(k+1)+ii) = -1;
+      // Add df_du
+      for(int jj=0; jj<nu_; ++jj)
+        Jgv(i, j+nx_+jj) = Jfp[k](ii,jj);
+      
+      // Add df/dx_{k+1}
+      Jgv(i, j+nx_+nu_+ii) = -1;
     }
   }
-        
-  J_mapping_ = SXFunction(C,JJ);
+  
+  // All blocks
+  vector<SXMatrix> Jall;
+  Jall.insert(Jall.end(),Jfx.begin(),Jfx.end());
+  Jall.insert(Jall.end(),Jfp.begin(),Jfp.end());
+  
+  J_mapping_ = SXFunction(Jall,Jgv);
   J_mapping_.init();
 
   // Create Jacobian function
@@ -131,16 +154,23 @@ void MultipleShootingInternal::init(){
   J_.setNumOutputs(1);
   J_.output(0) = J_mapping_.output(0);
   
-  //State at the final time
-  XF = X[nk_-1];
+  // Objective function
+  F_ = MXFunction(V,mfcn_.call(X[nk_-1]));
 
-  //Objective function: L(T)
-  F_ = MXFunction(V,mfcn_.call(XF));
-
-  //Terminal constraints: 0<=[x(T);y(T)]<=0
+  // Terminal constraints
   G_ = MXFunction(V,vertcat(g));
 }
-    
+
+void MultipleShootingInternal::constraint_wrapper(CFunction &f, int fsenk_order, int asenk_order, void* user_data){
+  casadi_assert(fsenk_order==0 && asenk_order==0);
+  MultipleShootingInternal* this_ = (MultipleShootingInternal*)user_data;
+  this_->constraint(f,fsenk_order,asenk_order);
+}
+
+void MultipleShootingInternal::constraint(CFunction &f, int fsenk_order, int asenk_order){
+  
+}
+
 void MultipleShootingInternal::jacobian_wrapper(CFunction &f, int fsenk_order, int asenk_order, void* user_data){
   casadi_assert(fsenk_order==0 && asenk_order==0);
   MultipleShootingInternal* this_ = (MultipleShootingInternal*)user_data;
@@ -148,37 +178,30 @@ void MultipleShootingInternal::jacobian_wrapper(CFunction &f, int fsenk_order, i
 }
 
 void MultipleShootingInternal::jacobian(CFunction &f, int fsenk_order, int asenk_order){
-  for(int i=0; i<nk_; ++i){
-    JX_.input(INTEGRATOR_T0 + i*INTEGRATOR_NUM_IN)[0] = 0; 
-    JX_.input(INTEGRATOR_TF + i*INTEGRATOR_NUM_IN)[0] = tf_/nk_; 
-    for(int j=0; j<nx_; ++j)
-      JX_.input(INTEGRATOR_X0 + i*INTEGRATOR_NUM_IN)[j] = f.input()[i*(nx_+nu_)+j];
-    for(int j=0; j<nu_; ++j)
-      JX_.input(INTEGRATOR_P  + i*INTEGRATOR_NUM_IN)[j] = f.input()[i*(nx_+nu_)+nx_+j];
-  }
-
-  for(int i=0; i<nk_; ++i){
-    JP_.input(INTEGRATOR_T0 + i*INTEGRATOR_NUM_IN)[0] = 0; 
-    JP_.input(INTEGRATOR_TF + i*INTEGRATOR_NUM_IN)[0] = tf_/nk_; 
-    for(int j=0; j<nx_; ++j)
-      JP_.input(INTEGRATOR_X0 + i*INTEGRATOR_NUM_IN)[j] = f.input()[i*(nx_+nu_)+j];
-    for(int j=0; j<nu_; ++j)
-      JP_.input(INTEGRATOR_P  + i*INTEGRATOR_NUM_IN)[j] = f.input()[i*(nx_+nu_)+nx_+j];
-  }
-
-  JX_.evaluate();
-  JP_.evaluate();
+  // Functions that can be evaluated in parallel
+  Parallelizer J[2] = {pJX_,pJP_};
   
-  for(int i=0; i<nk_; ++i){
-    J_mapping_.setInput(JX_.output(i),i*2);
-    J_mapping_.setInput(JP_.output(i),i*2+1);
+  for(int j=0; j<2; ++j){
+    // Pass inputs to parallelizer
+    for(int k=0; k<nk_; ++k){
+      J[j].setInput(input(OCP_T)[0], INTEGRATOR_T0 + k*INTEGRATOR_NUM_IN); // should be k
+      J[j].setInput(input(OCP_T)[1], INTEGRATOR_TF + k*INTEGRATOR_NUM_IN); // should be k+1
+      J[j].setInput(&f.input()[k*(nx_+nu_)], INTEGRATOR_X0 + k*INTEGRATOR_NUM_IN);
+      J[j].setInput(&f.input()[k*(nx_+nu_)+nx_], INTEGRATOR_P  + k*INTEGRATOR_NUM_IN);
+    }
+    
+    // Evaluate function
+    J[j].evaluate();
+    
+    // Save to mapping
+    for(int k=0; k<nk_; ++k)
+      J_mapping_.setInput(J[j].output(k),j*nk_+k);
   }
   
+  // Construct the full Jacobian
   J_mapping_.evaluate();
-  
-  for(int i=0; i<f.getNumOutputs(); ++i){
+  for(int i=0; i<f.getNumOutputs(); ++i)
     J_mapping_.getOutput(f.output(i),i);
-  }
 }
 
 void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
@@ -193,9 +216,9 @@ void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
   const vector<double> &x_init = input(OCP_X_INIT);
   for(int k=0; k<nk_+1; ++k){
     for(int i=0; i<nx_; ++i){
-      V_init[k*(nu_+nx_)+i] = x_init[i+k*nx_];
-      V_min[k*(nu_+nx_)+i] = x_min[i+k*nx_];
-      V_max[k*(nu_+nx_)+i ]= x_max[i+k*nx_];
+      V_init[k*(nu_+nx_)+i] = x_init[k+i*(nk_+1)];
+      V_min[k*(nu_+nx_)+i] = x_min[k+i*(nk_+1)];
+      V_max[k*(nu_+nx_)+i ]= x_max[k+i*(nk_+1)];
     }
   }
   
@@ -205,9 +228,9 @@ void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
   const vector<double> &u_init = input(OCP_U_INIT);
   for(int k=0; k<nk_; ++k){
     for(int i=0; i<nu_; ++i){
-      V_min[k*(nu_+nx_)+nx_+i] = u_min[i+k*nu_];
-      V_max[k*(nu_+nx_)+nx_+i] = u_max[i+k*nu_];
-      V_init[k*(nu_+nx_)+nx_+i] = u_init[i+k*nu_];
+      V_min[k*(nu_+nx_)+nx_+i] = u_min[k+i*nk_];
+      V_max[k*(nu_+nx_)+nx_+i] = u_max[k+i*nk_];
+      V_init[k*(nu_+nx_)+nx_+i] = u_init[k+i*nk_];
     }
   }
   
@@ -217,6 +240,25 @@ void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
 
   //Solve the problem
   nlp_solver_.solve();
+
+  // Optimal solution
+  const vector<double> &V_opt = nlp_solver_.output(NLP_X_OPT);
+  
+  // Pass bounds on state
+  vector<double> &x_opt = output(OCP_X_OPT);
+  for(int k=0; k<nk_+1; ++k){
+    for(int i=0; i<nx_; ++i){
+      x_opt[k+i*(nk_+1)] = V_opt[k*(nu_+nx_)+i];
+    }
+  }
+  
+  // Pass bounds on control
+  vector<double> &u_opt = output(OCP_U_OPT);
+  for(int k=0; k<nk_; ++k){
+    for(int i=0; i<nu_; ++i){
+      u_opt[k+i*nk_] = V_opt[k*(nu_+nx_)+nx_+i];
+    }
+  }
 }
 
 

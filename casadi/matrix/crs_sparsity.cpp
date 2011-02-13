@@ -96,11 +96,11 @@ std::vector<int>& CRSSparsity::rowind(){
 }
     
 int CRSSparsity::col(int el) const{
-  return col()[el];
+  return col().at(el);
 }
     
 int CRSSparsity::rowind(int row) const{
-  return rowind()[row];
+  return rowind().at(row);
 }
 
 void CRSSparsity::resize(int nrow, int ncol){

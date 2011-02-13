@@ -50,10 +50,12 @@ vector<MX> FX::call(const MX &x) const{
 }
 
 vector<MX> FX::call(const vector<MX> &x) const{
+  MX ev;
+  ev.assignNode(new Evaluation(*this,x));
   vector<MX> ret(getNumOutputs());
   for(int i=0; i<ret.size(); ++i){
     if(output(i).numel()>0)
-      ret[i].assignNode(new Evaluation(*this,x,i));
+      ret[i].assignNode(new EvaluationOutput(ev,i));
   }
   return ret;
 }
@@ -61,15 +63,11 @@ vector<MX> FX::call(const vector<MX> &x) const{
 #ifndef USE_FUNCTORS
 MX FX::operator()(const MX &x, int ind) const{
   vector<MX> dep(1,x);
-  MX ret;
-  ret.assignNode(new Evaluation(*this,dep,ind));
-  return ret;
+  return call(dep)[ind];
 }
 
 MX FX::operator()(const vector<MX> &x, int ind) const{
-  MX ret;
-  ret.assignNode(new Evaluation(*this,x,ind));
-  return ret;
+  return call(x)[ind];
 }
 #endif // USE_FUNCTORS
 

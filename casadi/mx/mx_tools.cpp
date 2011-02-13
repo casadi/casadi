@@ -31,13 +31,20 @@
 namespace CasADi{
 
 MX vertcat(const vector<MX>& comp){
-  if(comp.empty()){
+  // Remove nulls
+  vector<MX> c;
+  c.reserve(comp.size());
+  for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it)
+    if(!it->isNull())
+      c.push_back(*it);
+  
+  if(c.empty()){
     return MX();
-  } else if(comp.size()==1){
-    return comp[0];
+  } else if(c.size()==1){
+    return c[0];
   } else {
     MX ret;
-    ret.assignNode(new Vertcat(comp));
+    ret.assignNode(new Vertcat(c));
     return ret;
   }
 }
@@ -96,6 +103,10 @@ MX outer_prod(const MX &x, const MX &y){
 }
 
 MX trans(const MX &x){
+  // Quick return if null or scalar
+  if(x.isNull() || x.numel()==1)
+    return x;
+  
   // Check if the node is already a transpose
   const Transpose* t = dynamic_cast<const Transpose*>(x.get());
 

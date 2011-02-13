@@ -28,10 +28,9 @@ using namespace std;
 
 namespace CasADi{
 
-// Constructor
-Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep, int oind_) : fcn_(fcn), oind(oind_) {
+Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep) : fcn_(fcn) {
   setDependencies(dep);
-  setSparsity(fcn_.output(oind).sparsity());
+  setSparsity(CRSSparsity(1,1,true));
 }
 
 Evaluation* Evaluation::clone() const{
@@ -39,9 +38,7 @@ Evaluation* Evaluation::clone() const{
 }
 
 void Evaluation::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  cout << fcn_ << ".call(" << args << ")[" << oind <<  "]";
-  
-  stream << fcn_ << ".call(" << args << ")[" << oind <<  "]";
+  stream << fcn_ << ".call(" << args << ")";
 }
 
 void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
@@ -55,30 +52,8 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
     }
   }
 
-  // Pass the adjoint seed to the function
-  for(int d=0; d<nadj; ++d)
-    if(adjSeed[d]!=0)
-      fcn_.setAdjSeed(adjSeed[d],oind,d);
-    
-  // Set adjoint seed to zero for all other outputs in all other directions
-  for(int ind=0; ind<fcn_.getNumOutputs(); ++ind){
-    if(ind!=oind){
-      for(int d=0; d<nadj; ++d){
-        fill(fcn_.adjSeed(ind,d).begin(),fcn_.adjSeed(ind,d).end(),0);
-      }
-    }
-  }
-
   // Evaluate
   fcn_.evaluate(nfwd>0, nadj>0);
-  
-  // Get the results
-  fcn_.getOutput(output,oind);
-
-  // Get the fwd sensitivities
-  for(int d=0; d<nfwd; ++d)
-    if(fwdSens[d]!=0)
-      fcn_.getFwdSens(fwdSens[d],oind,d);
   
   // Get the adjoint sensitivities
   for(int i=0; i<ndep(); ++i){
@@ -90,6 +65,42 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
       }
     }
   }
+}
+
+
+EvaluationOutput::EvaluationOutput(const MX& parent, int oind) : OutputNode(parent), oind_(oind){
+  setDependencies(parent);
+  
+  // Get the function
+  const Evaluation* p = dynamic_cast<const Evaluation*>(parent.get());
+  casadi_assert(p!=0);
+  fcn_ = p->fcn_;
+
+  // Save the sparsity pattern
+  setSparsity(fcn_.output(oind).sparsity());
+}
+
+EvaluationOutput* EvaluationOutput::clone() const{
+  return new EvaluationOutput(*this);
+}
+
+void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << args[0] << "[" << oind_ <<  "]";
+}
+
+void EvaluationOutput::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  // Pass the adjoint seed to the function
+  for(int d=0; d<nadj; ++d)
+    if(adjSeed[d]!=0)
+      fcn_.setAdjSeed(adjSeed[d],oind_,d);
+
+    // Get the results
+  fcn_.getOutput(output,oind_);
+
+  // Get the fwd sensitivities
+  for(int d=0; d<nfwd; ++d)
+    if(fwdSens[d]!=0)
+      fcn_.getFwdSens(fwdSens[d],oind_,d);
 }
 
 } // namespace CasADi

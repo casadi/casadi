@@ -78,18 +78,6 @@ class OCPSolverInternal : public FXInternal{
     
     // Number of point coupling constraints
     int ng_;
-    
-    /// Cost functions
-/*    std::vector<FX> L_;
-    
-    /// Dynamic constraint
-    std::vector<FX> F_;
-    
-    /// Point constraints
-    std::vector<FX> H_;
-    
-    /// Coupling constraints
-    std::vector<FX> G_;*/
 };
 
 

@@ -9,11 +9,11 @@
 #include "casadi/fx/integrator.hpp"
 #include "casadi/fx/simulator.hpp"
 #include "casadi/fx/nlp_solver.hpp"
+#include "casadi/fx/ocp_solver.hpp"
 #include "casadi/fx/external_function.hpp"
 #include "casadi/fx/parallelizer.hpp"
 #include "casadi/fx/c_function.hpp"
 #include "casadi/fx/fx_tools.hpp"
-//#include "casadi/fx/ocp.hpp"
 %}
 
 %include "casadi/fx/function_io.hpp"
@@ -27,11 +27,11 @@
 %include "casadi/fx/integrator.hpp"
 %include "casadi/fx/simulator.hpp"
 %include "casadi/fx/nlp_solver.hpp"
+%include "casadi/fx/ocp_solver.hpp"
 %include "casadi/fx/external_function.hpp"
 %include "casadi/fx/parallelizer.hpp"
 %include "casadi/fx/c_function.hpp"
 %include "casadi/fx/fx_tools.hpp"
-//%include "casadi/fx/ocp.hpp"
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
 

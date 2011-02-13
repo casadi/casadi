@@ -28,6 +28,7 @@ namespace CasADi{
   
 ParallelizerInternal::ParallelizerInternal(const std::vector<FX>& funcs) : funcs_(funcs){
   addOption("mode", OT_STRING, "serial"); // serial, openmp or mpi
+  addOption("save_corrected_input", OT_BOOLEAN, false);
 }
 
 ParallelizerInternal::~ParallelizerInternal(){
@@ -71,6 +72,9 @@ void ParallelizerInternal::init(){
     mode_ = MPI;
   else
     throw CasadiException(string("Unknown mode: ")+getOption("mode").toString());
+  
+  // Should corrected input values be saved after evaluation?
+  save_corrected_input_ = getOption("save_corrected_input").toInt();
 }
 
 void ParallelizerInternal::evaluate(int fsens_order, int asens_order){
@@ -97,13 +101,13 @@ void ParallelizerInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void ParallelizerInternal::evaluateTask(int task, int fsens_order, int asens_order){
+  
   // Get a reference to the function
   FX& fcn = funcs_[task];
   
   // Copy inputs to functions TODO: add seeds
   for(int j=inind_[task]; j<inind_[task+1]; ++j){
-    if(j-inind_[task] != 4)
-      fcn.input(j-inind_[task]).set(input(j));
+    fcn.setInput(input(j),j-inind_[task]);
   }
 
   // Evaluate
@@ -112,6 +116,13 @@ void ParallelizerInternal::evaluateTask(int task, int fsens_order, int asens_ord
   // Get the results TODO: add derivatives
   for(int j=outind_[task]; j<outind_[task+1]; ++j)
     fcn.output(j-outind_[task]).get(output(j));
+  
+  // Save corrected input values
+  if(save_corrected_input_){
+    for(int j=inind_[task]; j<inind_[task+1]; ++j){
+      fcn.getInput(input(j),j-inind_[task]);
+    }
+  }
 }
 
 

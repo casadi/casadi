@@ -23,20 +23,20 @@
 #ifndef EVALUATION_HPP
 #define EVALUATION_HPP
 
-#include "mx_node.hpp"
+#include "multiple_output.hpp"
 #include "../fx/fx.hpp"
 
 namespace CasADi{
 
 /** 
   \author Joel Andersson 
-  \date 2010
+  \date 2010-2011
 */
-class Evaluation : public MXNode{
+class Evaluation : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit Evaluation(const FX& fcn, const std::vector<MX> &dep, int oind);
+    explicit Evaluation(const FX& fcn, const std::vector<MX> &dep);
   
     /** \brief  Clone function */
     virtual Evaluation* clone() const;
@@ -47,10 +47,30 @@ class Evaluation : public MXNode{
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
-  protected:
     FX fcn_;
-    int oind;
+};
 
+/** 
+  \author Joel Andersson 
+  \date 2010-2011
+*/
+class EvaluationOutput : public OutputNode{
+  public:
+
+    /** \brief  Constructor */
+    explicit EvaluationOutput (const MX& parent, int oind);
+  
+    /** \brief  Clone function */
+    virtual EvaluationOutput * clone() const;
+
+    /** \brief  Print */
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
+    FX fcn_;
+    int oind_;
 };
 
 } // namespace CasADi

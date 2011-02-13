@@ -6,6 +6,7 @@
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
+#include <interfaces/sundials/idas_integrator.hpp>
 
 #include <optimal_control/multiple_shooting.hpp>
 #include <optimal_control/multiple_shooting_internal.hpp>
@@ -42,13 +43,27 @@ int main(){
   rhs_in[ODE_Y] = xx;
   rhs_in[ODE_P] = u;
   SXFunction rhs(rhs_in,f);
-
+  
+  // DAE residual
+  SXMatrix xxdot = symbolic("xxdot",xx.size());
+  vector<Matrix<SX> > res_in(DAE_NUM_IN);
+  res_in[DAE_T] = t;
+  res_in[DAE_Y] = xx;
+  res_in[DAE_YDOT] = xxdot;
+  res_in[DAE_P] = u;
+  SXFunction res(res_in,f-xxdot);
+  
+  // Number of shooting nodes
+  int num_nodes = 100;
+  
   //Create an integrator (CVodes)
+  //IdasIntegrator I(res); // TODO: MAKE THIS WORK!
   CVodesIntegrator I(rhs);
   I.setOption("abstol",1e-8); //abs. tolerance
   I.setOption("reltol",1e-8); //rel. tolerance
   I.setOption("steps_per_checkpoint",500);
   I.setOption("stop_at_end",true);
+//  I.setOption("calc_ic",true);
   I.init();
   
   //Numboer of shooting nodes
@@ -87,13 +102,13 @@ int main(){
   fill(ms.input(OCP_X_INIT).begin(),ms.input(OCP_X_INIT).end(),0);
 
   // Initial condition
-  ms.input(OCP_LBX)[0] = ms.input(OCP_UBX)[0] = 0;
-  ms.input(OCP_LBX)[1] = ms.input(OCP_UBX)[1] = 1;
-  ms.input(OCP_LBX)[2] = ms.input(OCP_UBX)[2] = 0;
+  ms.input(OCP_LBX)(0,0) = 0;   ms.input(OCP_UBX)(0,0) = 0;
+  ms.input(OCP_LBX)(1,0) = 1;   ms.input(OCP_UBX)(1,0) = 1;
+  ms.input(OCP_LBX)(2,0) = 0;   ms.input(OCP_UBX)(2,0) = 0;
 
   // Final condition
-  ms.input(OCP_LBX)[ns*nx+0] = ms.input(OCP_UBX)[ns*nx+0] = 0;
-  ms.input(OCP_LBX)[ns*nx+1] = ms.input(OCP_UBX)[ns*nx+1] = 0;
+  ms.input(OCP_LBX)(0,ns) = 0;  ms.input(OCP_UBX)(0,ns) = 0; 
+  ms.input(OCP_LBX)(1,ns) = 0;  ms.input(OCP_UBX)(1,ns) = 0; 
 
   IpoptSolver solver(ms.getF(),ms.getG(),FX(),ms.getJ());
   solver.setOption("tol",1e-5);
@@ -109,8 +124,12 @@ int main(){
   ms.setNLPSolver(solver);
   
   // Solve the problem
-  ms.evaluate(0,0);
+  ms.solve();
 
+  cout << ms.output(OCP_X_OPT) << endl;
+  cout << ms.output(OCP_U_OPT) << endl;
+  cout << solver.output(NLP_X_OPT) << endl;
+  
   return 0;
 }
 

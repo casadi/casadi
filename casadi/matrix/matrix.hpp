@@ -525,9 +525,9 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
     // The last non-zero element on the row of the original matrix
     int el_last = rowind(i0+1);
     
-    // Loop over the columns of the returb matrix
+    // Loop over the columns of the return matrix
     for(int j=0; j<jj.size(); ++j){
-      while(col(el)<jj[j] &&  el<el_last){
+      while(el<el_last && col(el)<jj[j]){
         el++;
       }
        

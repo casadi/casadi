@@ -68,6 +68,8 @@ class ParallelizerInternal : public FXInternal{
     /// Mode
     Mode mode_;
     
+    /// Save corrected input values after evaluation
+    bool save_corrected_input_;
 };
 
 

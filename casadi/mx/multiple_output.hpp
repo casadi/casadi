@@ -25,6 +25,7 @@
 
 #include "mx_node.hpp"
 #include "../fx/fx.hpp"
+#include <set>
 
 namespace CasADi{
 
@@ -40,27 +41,26 @@ class MultipleOutput : public MXNode{
   public:
 
     /** \brief  Constructor */
-    explicit MultipleOutput(int n_out);
+    MultipleOutput();
  
     /** \brief  Destructor */
     virtual ~MultipleOutput();
  
   protected:
-    std::vector<OutputNode*> children_;
+    std::set<OutputNode*> children_;
 };
 
 class OutputNode : public MXNode{
   public:
   
     /** \brief  Constructor */
-    OutputNode(const MX& parent, int i_out);
+    OutputNode(const MX& parent);
 
     /** \brief  Destructor */
     virtual ~OutputNode();
     
   protected:
     MX parent_;
-    int i_out_;
 };
 
 
