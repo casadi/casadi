@@ -231,7 +231,7 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
 
   // Create the return object
   Matrix<T> ret(x.size1(),y.size2());
-  std::vector<int>& rowind = ret.sparsityRef().rowind();
+  std::vector<int>& rowind = ret.sparsityRef().rowindRef();
 
 #ifdef LISTS_IN_PROD
   // ALTERNATIVE 1: GROWING LISTS, THEN COPY: BETTER FOR SYMBOLIC TYPES WHEN COPYING IS EXPENSIVE?
@@ -241,7 +241,7 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   std::vector<T>& ret_val = ret;
 #else // LISTS_IN_PROD
   // ALTERNATIVE 2: GROWING VECTORS: APPEARS FASTER
-  std::vector<int>& col = ret.sparsityRef().col();
+  std::vector<int>& col = ret.sparsityRef().colRef();
   std::vector<T>& val = ret;
 
 #ifdef ESTIMATE_NNZ_IN_PROD
@@ -327,18 +327,12 @@ void append(Matrix<T>& expr, const Matrix<T>& add){
     expr=add;
     return;
   }
-
-  // Check dimensions
-  casadi_assert_message(expr.size2() == add.size2(),"append: dimensions do not match");
-
-  // Resize the expression
-  int oldn = expr.size1();
-  int n    = expr.size1() + add.size1();  
-  int m    = expr.size2();
-  expr.resize(n,m);
-
-  // Copy the lower expression to the end
-  expr(range(oldn,n),ALL) = add;
+  
+  // Append the sparsity pattern
+  expr.sparsityRef().append(add.sparsity());
+  
+  // Add the non-zeros
+  expr.insert(expr.end(),add.begin(),add.end());
 }
 
 template<class T>

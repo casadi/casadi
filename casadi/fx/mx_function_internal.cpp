@@ -35,14 +35,14 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
   setOption("name", "unnamed_mx_function");
 
   // Allocate space for inputs
-  input_.resize(inputv.size());
+  setNumInputs(inputv.size());
   for(int i=0; i<input_.size(); ++i)
-    input(i) = DMatrix(inputv[i].size1(),inputv[i].size2(),0);
+    input(i) = DMatrix(inputv[i].sparsity());
 
   // Allocate space for outputs
-  output_.resize(outputv.size());
+  setNumOutputs(outputv.size());
   for(int i=0; i<output_.size(); ++i)
-    output(i) = DMatrix(outputv[i].size1(),outputv[i].size2(),0);
+    output(i) = DMatrix(outputv[i].sparsity());
 }
 
 

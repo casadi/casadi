@@ -31,16 +31,23 @@ namespace CasADi{
 
 // Constructor
 Vertcat::Vertcat(const vector<MX>& d){
+  casadi_assert(d.size()>=2);
   setDependencies(d);
-  if(d.empty())
-    throw CasadiException("Vertcat: empty concatenation not allowed");
   int sz1=0;
-  int sz2=dep(0).size2();
+  int sz2=d[0].size2();
   for(int i=0; i<ndep(); ++i){
-    sz1 += dep(i).size1();
-    if(sz2!=dep(i).size2())
+    sz1 += d[0].size1();
+    if(sz2!=d[i].size2())
       throw CasadiException("Vertcat: dimension mismatch");
   }
+  
+/*  CRSSparsity sp = d[0].sparsity();
+  for(int i=1; i<d.size(); ++i){
+    sp.append(d[i].sparsity());
+  }*/
+  
+  
+  // 
   setSparsity(CRSSparsity(sz1,sz2,true));
 }
 

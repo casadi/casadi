@@ -85,12 +85,12 @@ const std::vector<int>& CRSSparsity::rowind() const{
   return (*this)->rowind_;
 }
     
-std::vector<int>& CRSSparsity::col(){
+std::vector<int>& CRSSparsity::colRef(){
   makeUnique();
   return (*this)->col_;
 }
     
-std::vector<int>& CRSSparsity::rowind(){
+std::vector<int>& CRSSparsity::rowindRef(){
   makeUnique();
   return (*this)->rowind_;
 }
@@ -171,9 +171,9 @@ int CRSSparsity::getNZ(int i, int j){
   makeUnique();
   
   // insert the element
-  col().insert(col().begin()+ind,j);
+  colRef().insert(colRef().begin()+ind,j);
   for(int row=i+1; row<size1()+1; ++row)
-    rowind()[row]++;
+    rowindRef()[row]++;
   
   // Return the location of the new element
   return ind;
@@ -384,8 +384,8 @@ CRSSparsity CRSSparsity::transpose(std::vector<int>& mapping) const{
 }
 
 void CRSSparsity::reserve(int nnz, int nrow){
-  col().reserve(nnz);
-  rowind().reserve(nrow+1);
+  colRef().reserve(nnz);
+  rowindRef().reserve(nrow+1);
 }
 
 bool CRSSparsity::operator==(const CRSSparsity& y) const{
@@ -413,6 +413,31 @@ bool CRSSparsity::operator==(const CRSSparsity& y) const{
 
   // Patterns are identical if we reached this point
   return true;
+}
+
+void CRSSparsity::append(const CRSSparsity& sp){
+  // Assert dimensions
+  casadi_assert_message(size2()==sp.size2(),"Dimension mismatch");
+  
+  // Get current sparsity pattern
+  vector<int>& col_ = colRef();
+  vector<int>& rowind_ = rowindRef();
+
+  // Get current number of non-zeros
+  int sz = size();
+  
+  // Add column indices
+  col_.insert(col_.end(),sp.col().begin(),sp.col().end());
+  
+  // Add row indices
+  rowind_.pop_back();
+  rowind_.insert(rowind_.end(),sp.rowind().begin(),sp.rowind().end());
+  for(int i = size1(); i<rowind_.size(); ++i)
+    rowind_[i] += sz;
+  
+  // Update dimensions
+  (*this)->nrow_ += sp.size1();
+  (*this)->ncol_ += sp.size2();
 }
 
 

@@ -123,13 +123,11 @@ class CRSSparsity : public SharedObject{
     /** \brief  Get a reference to the rowindex of row i (see class description) */
     int rowind(int i) const;
 
-#ifndef SWIG
     /// Get a reference to the columns of all non-zero element (copy if not unique!)
-    std::vector<int>& col();
+    std::vector<int>& colRef();
     
     /// Get a reference to the rowindex of all row element (copy if not unique!)
-    std::vector<int>& rowind();
-#endif // SWIG
+    std::vector<int>& rowindRef();
     
     /** \brief Get the row for each non-zero entry
     Together with the col-vector, this vector gives the sparsity of the matrix in
@@ -164,7 +162,10 @@ class CRSSparsity : public SharedObject{
 
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;
-    
+
+    /// Append another sparsity patten vertically
+    void append(const CRSSparsity& sp);
+
     /// Reserve space
     void reserve(int nnz, int nrow);
 
