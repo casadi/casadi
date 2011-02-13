@@ -437,7 +437,6 @@ void CRSSparsity::append(const CRSSparsity& sp){
   
   // Update dimensions
   (*this)->nrow_ += sp.size1();
-  (*this)->ncol_ += sp.size2();
 }
 
 

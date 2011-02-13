@@ -40,10 +40,13 @@ Vertcat::Vertcat(const vector<MX>& d){
     if(sz2!=d[i].size2())
       throw CasadiException("Vertcat: dimension mismatch");
   }
-  
+
 /*  CRSSparsity sp = d[0].sparsity();
   for(int i=1; i<d.size(); ++i){
+    cout << sp.size2() << endl;
+    cout << d[i].size2() << endl;
     sp.append(d[i].sparsity());
+    cout << sp.size2() << endl;
   }*/
   
   
