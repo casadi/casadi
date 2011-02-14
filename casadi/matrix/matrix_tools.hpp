@@ -242,19 +242,39 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   CRSSparsity y_trans_sparsity = y.sparsity().transpose(y_trans_map);
 
   // Create the sparsity pattern for the matrix-matrix product
-  std::vector< std::vector< std::pair<int,int> > > prod_map;
-  CRSSparsity spres = x.sparsity().patternProduct(y_trans_sparsity, prod_map);
+  CRSSparsity spres = x.sparsity().patternProduct(y_trans_sparsity);
   
   // Create the return object
   Matrix<T> ret(spres);
   
-  // Carry out the actual multiplication
-  for(int i=0; i<ret.size(); ++i){
-    ret[i] = 0;
-    for(std::vector< std::pair<int,int> >::const_iterator it=prod_map[i].begin(); it!=prod_map[i].end(); ++it)
-      ret[i] += x[it->first] * y[y_trans_map[it->second]];
+  // Direct access to the arrays
+  const std::vector<int> &r_col = ret.col();
+  const std::vector<int> &r_rowind = ret.rowind();
+  const std::vector<int> &x_col = x.col();
+  const std::vector<int> &y_row = y_trans_sparsity.col();
+  const std::vector<int> &x_rowind = x.rowind();
+  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
+
+  // loop over the row of the resulting matrix)
+  for(int i=0; i<ret.size1(); ++i){
+    for(int el=r_rowind[i]; el<r_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
+      int j = r_col[el];
+      int el1 = x_rowind[i];
+      int el2 = y_colind[j];
+      ret[el]=0;
+      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+        int j1 = x_col[el1];
+        int i2 = y_row[el2];      
+        if(j1==i2){
+          ret[el] += x[el1++] * y[y_trans_map[el2++]];
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+    }
   }
-  
   return ret;
 }
 

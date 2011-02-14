@@ -176,14 +176,20 @@ class CRSSparsity : public SharedObject{
     /** \brief Sparsity pattern for a matrix-matrix product
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
     The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
-    CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+    CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping, bool with_mapping=true) const;
 
+    /** \brief Sparsity pattern for a matrix-matrix product 
+    No mapping */
+    CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
+    
     /// Append another sparsity patten vertically
     void append(const CRSSparsity& sp);
 
     /// Reserve space
     void reserve(int nnz, int nrow);
 
+
+    
 };
 
 #ifdef SWIG

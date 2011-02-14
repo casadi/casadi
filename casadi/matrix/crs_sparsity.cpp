@@ -458,7 +458,12 @@ CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<int>& 
   throw CasadiException("CRSSparsity::patternUnion not implemented");
 }
 
-CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping) const{
+CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
+  vector< vector< pair<int,int> > > dummy; // dummy argument
+  return patternProduct(y_trans, dummy, false);
+}
+
+CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping, bool with_mapping) const{
   // return object
   CRSSparsity ret(size1(),y_trans.size1());
   
@@ -471,35 +476,62 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vect
   const vector<int> &y_row = y_trans.col();
   const vector<int> &x_rowind = rowind();
   const vector<int> &y_colind = y_trans.rowind();
+
+  if(with_mapping){
   
-  // Clear the mapping
-  mapping.clear();
-  
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<size1(); ++i){
-    for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      vector< pair<int,int> > d; // the entry of the matrix to be calculated
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          d.push_back(pair<int,int>(el1++,el2++));
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
+    // Clear the mapping
+    mapping.clear();
+
+    // the entry of the matrix to be calculated
+    vector< pair<int,int> > d; 
+
+    // loop over the row of the resulting matrix)
+    for(int i=0; i<size1(); ++i){
+      for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
+        int el1 = x_rowind[i];
+        int el2 = y_colind[j];
+        d.clear();
+        while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+          int j1 = x_col[el1];
+          int i2 = y_row[el2];      
+          if(j1==i2){
+            d.push_back(pair<int,int>(el1++,el2++));
+          } else if(j1<i2) {
+            el1++;
+          } else {
+            el2++;
+          }
+        }
+        if(!d.empty()){
+          c.push_back(j);
+          mapping.push_back(d);
         }
       }
-      if(!d.empty()){
-        c.push_back(j);
-        mapping.push_back(d);
-      }
+      r[i+1] = c.size();
     }
-    r[i+1] = c.size();
+  } else {
+    // loop over the row of the resulting matrix)
+    for(int i=0; i<size1(); ++i){
+      for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
+        int el1 = x_rowind[i];
+        int el2 = y_colind[j];
+        while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+          int j1 = x_col[el1];
+          int i2 = y_row[el2];
+          if(j1==i2){
+            c.push_back(j);
+            break;
+          } else if(j1<i2) {
+            el1++;
+          } else {
+            el2++;
+          }
+        }
+      }
+      r[i+1] = c.size();
+    }
   }
-  
+    
   return ret;
 }
 
