@@ -36,9 +36,25 @@ ParallelizerInternal::~ParallelizerInternal(){
 
 
 void ParallelizerInternal::init(){
+  // Get mode
+  if(getOption("mode")=="serial")
+    mode_ = SERIAL;
+  else if(getOption("mode")=="openmp")
+    mode_ = OPENMP;
+  else if(getOption("mode")=="mpi")
+    mode_ = MPI;
+  else
+    throw CasadiException(string("Unknown mode: ")+getOption("mode").toString());
+
   // Initialize the dependend functions
-  for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it)
+  for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
+    // Make sure that the functions are unique if we are using OpenMP
+    if(mode_==OPENMP)
+      it->makeUnique();
+    
+    // Initialize
     it->init();
+  }
   
   // Clear the indices
   inind_.clear();   inind_.push_back(0);
@@ -62,16 +78,6 @@ void ParallelizerInternal::init(){
   
   // Call the init function of the base class
   FXInternal::init();
-
-  // Get mode
-  if(getOption("mode")=="serial")
-    mode_ = SERIAL;
-  else if(getOption("mode")=="openmp")
-    mode_ = OPENMP;
-  else if(getOption("mode")=="mpi")
-    mode_ = MPI;
-  else
-    throw CasadiException(string("Unknown mode: ")+getOption("mode").toString());
   
   // Should corrected input values be saved after evaluation?
   save_corrected_input_ = getOption("save_corrected_input").toInt();
