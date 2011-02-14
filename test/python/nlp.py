@@ -105,6 +105,48 @@ class NLPtests(casadiTestCase):
     solver.solve()
     self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
+
+  def testIPOPTdeg(self):
+    self.message("degenerate optimization IPOP")
+    x=SX("x")
+    y=SX("y")
+    f=SXFunction([[x,y]],[0])
+    g=SXFunction([[x,y]],[[x-y,x]])
+    
+    solver = IpoptSolver(f,g)
+    solver.setOption("tol",1e-5)
+    solver.setOption("hessian_approximation", "limited-memory")
+    solver.setOption("max_iter",100)
+    solver.setOption("print_level",0)
+    solver.init()
+    solver.input(NLP_LBX).set([-10, -10])
+    solver.input(NLP_UBX).set([10, 10])
+    solver.input(NLP_LBG).set([0, 3])
+    solver.input(NLP_UBG).set([0, 3])
+    solver.solve()
+    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
+
+  def testIPOPTdegc(self):
+    self.message("degenerate optimization IPOP, overconstrained")
+    x=SX("x")
+    y=SX("y")
+    f=SXFunction([[x,y]],[0])
+    g=SXFunction([[x,y]],[[x-y,x,x+y]])
+    
+    solver = IpoptSolver(f,g)
+    solver.setOption("tol",1e-5)
+    solver.setOption("hessian_approximation", "limited-memory")
+    solver.setOption("max_iter",100)
+    solver.setOption("print_level",0)
+    solver.init()
+    solver.input(NLP_LBX).set([-10, -10])
+    solver.input(NLP_UBX).set([10, 10])
+    solver.input(NLP_LBG).set([0, 3 , -10])
+    solver.input(NLP_UBG).set([0, 3, 10])
+    solver.solve()
+    # todo: catch error when set([0, 3 , 5]) two times
+    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
+    
     
 if __name__ == '__main__':
     unittest.main()
