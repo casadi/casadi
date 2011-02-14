@@ -129,6 +129,7 @@ int main(){
   MultipleShooting ms(integrator,mterm);
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
+  ms.setOption("parallelization","openmp");
   ms.init();
 
   for(int k=0; k<num_nodes; ++k){

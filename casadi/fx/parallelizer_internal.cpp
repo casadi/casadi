@@ -27,7 +27,7 @@ using namespace std;
 namespace CasADi{
   
 ParallelizerInternal::ParallelizerInternal(const std::vector<FX>& funcs) : funcs_(funcs){
-  addOption("mode", OT_STRING, "serial"); // serial, openmp or mpi
+  addOption("parallelization", OT_STRING, "serial"); // serial, openmp or mpi
   addOption("save_corrected_input", OT_BOOLEAN, false);
 }
 
@@ -37,14 +37,14 @@ ParallelizerInternal::~ParallelizerInternal(){
 
 void ParallelizerInternal::init(){
   // Get mode
-  if(getOption("mode")=="serial")
+  if(getOption("parallelization")=="serial")
     mode_ = SERIAL;
-  else if(getOption("mode")=="openmp")
+  else if(getOption("parallelization")=="openmp")
     mode_ = OPENMP;
-  else if(getOption("mode")=="mpi")
+  else if(getOption("parallelization")=="mpi")
     mode_ = MPI;
   else
-    throw CasadiException(string("Unknown mode: ")+getOption("mode").toString());
+    throw CasadiException(string("Parallelization mode: ")+getOption("parallelization").toString());
 
   // Initialize the dependend functions
   for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){

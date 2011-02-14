@@ -32,6 +32,7 @@ namespace CasADi{
     
     
 MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+  addOption("parallelization", OT_STRING);
 }
 
 void MultipleShootingInternal::init(){
@@ -80,7 +81,10 @@ void MultipleShootingInternal::init(){
   // Options for the parallelizer
   Dictionary paropt;
   paropt["save_corrected_input"] = true;
-  paropt["mode"] = "openmp";
+  
+  // Transmit parallelization mode
+  if(hasSetOption("parallelization"))
+    paropt["parallelization"] = getOption("parallelization");
   
   // Evaluate function in parallel
   vector<vector<MX> > pI_out = ffcn_.call(ffcn_in,paropt);
