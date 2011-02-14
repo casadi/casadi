@@ -45,20 +45,6 @@ void MultipleShootingInternal::init(){
   for(int k=0; k<=nk_; ++k)
     input(OCP_T).at(k) = (k*tf)/nk_;
 
-  Parallelizer pF_ (vector<FX>(nk_,ffcn_));
-  pF_.setOption("save_corrected_input",true);
-  pF_ .init();
-  
-  Jacobian IjacX(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
-  Parallelizer pJX_(vector<FX>(nk_,IjacX));
-  pJX_.setOption("save_corrected_input",true);
-  pJX_.init();
-  
-  Jacobian IjacP(ffcn_,INTEGRATOR_P,INTEGRATOR_XF);
-  Parallelizer pJP_(vector<FX>(nk_,IjacP));
-  pJP_.setOption("save_corrected_input",true);
-  pJP_.init();
-
   //Declare variable vector
   int NV = np_+nu_*nk_+nx_*(nk_+1);
   MX V("V",NV);
@@ -80,18 +66,23 @@ void MultipleShootingInternal::init(){
   MX P = V(range(np_),range(1));
 
   // Input to the parallel evaluation
-  vector<MX> pI_in(nk_*INTEGRATOR_NUM_IN);
+  vector<vector<MX> > ffcn_in(nk_);
   for(int k=0; k<nk_; ++k){
-    pI_in[INTEGRATOR_T0 + k*INTEGRATOR_NUM_IN] = input(OCP_T)[0]; // should be k
-    pI_in[INTEGRATOR_TF + k*INTEGRATOR_NUM_IN] = input(OCP_T)[1]; // should be k+1
-    pI_in[INTEGRATOR_P + k*INTEGRATOR_NUM_IN] = vertcat(P,U[k]);
-    pI_in[INTEGRATOR_X0 + k*INTEGRATOR_NUM_IN] = X[k];
-    pI_in[INTEGRATOR_Z0 + k*INTEGRATOR_NUM_IN] = Z[k];
-    pI_in[INTEGRATOR_XP0+ k*INTEGRATOR_NUM_IN] = XP[k];
+    ffcn_in[k].resize(INTEGRATOR_NUM_IN);
+    ffcn_in[k][INTEGRATOR_T0] = input(OCP_T)[0]; // should be k
+    ffcn_in[k][INTEGRATOR_TF] = input(OCP_T)[1]; // should be k+1
+    ffcn_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
+    ffcn_in[k][INTEGRATOR_X0] = X[k];
+    ffcn_in[k][INTEGRATOR_Z0] = Z[k];
+    ffcn_in[k][INTEGRATOR_XP0] = XP[k];
   }
 
+  // Options for the parallelizer
+  Dictionary paropt;
+  paropt["save_corrected_input"] = true;
+  
   // Evaluate function in parallel
-  vector<MX> pI_out = pF_.call(pI_in);
+  vector<vector<MX> > pI_out = ffcn_.call(ffcn_in,paropt);
   
   //Constraint function
   vector<MX> g(nk_);
@@ -99,7 +90,7 @@ void MultipleShootingInternal::init(){
   // Collect the outputs
   for(int k=0; k<nk_; ++k){
     // Get the output
-    MX XF = pI_out[INTEGRATOR_XF + INTEGRATOR_NUM_OUT*k];
+    MX XF = pI_out[k][INTEGRATOR_XF];
     
     //append continuity constraints
     g[k] = XF-X[k+1];
@@ -112,12 +103,15 @@ void MultipleShootingInternal::init(){
   F_ = MXFunction(V,mfcn_.call(X[nk_-1]));
 
   // Evaluate Jacobian blocks in parallel
-  vector<MX> pJX_out = pJX_.call(pI_in);
-  vector<MX> pJP_out = pJP_.call(pI_in);
+  Jacobian IjacX(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
+  vector<vector<MX> > pJX_out = IjacX.call(ffcn_in,paropt);
+  
+  Jacobian IjacP(ffcn_,INTEGRATOR_P,INTEGRATOR_XF);
+  vector<vector<MX> > pJP_out = IjacP.call(ffcn_in,paropt);
 
   // Empty matrices with the same size as the Jacobian blocks
-  MX e_JX = MX(pJX_out[0].size1(),pJX_out[0].size2());
-  MX e_JP = MX(pJP_out[0].size1(),pJP_out[0].size2());
+  MX e_JX = MX(pJX_out[0][0].size1(),pJX_out[0][0].size2());
+  MX e_JP = MX(pJP_out[0][0].size1(),pJP_out[0][0].size2());
   
   // Identity matrices with the same size as the Jacobian blocks
   MX mi_JX = -eye<double>(IjacX.output().size1());
@@ -136,8 +130,8 @@ void MultipleShootingInternal::init(){
     // Add all the blocks
     for(int j=0; j<nk_; ++j){
       if(j==i){                       // Diagonal block
-        JJ_row.push_back(pJX_out[i]); // df_k/dx_k block
-        JJ_row.push_back(pJP_out[i]); // df_k/du_k block
+        JJ_row.push_back(pJX_out[i][0]); // df_k/dx_k block
+        JJ_row.push_back(pJP_out[i][0]); // df_k/du_k block
       } else if(j==i+1) {             // First upper subdiagonal block
         JJ_row.push_back(mi_JX);      // df_k/dx_{k+1} block
         JJ_row.push_back(e_JP);

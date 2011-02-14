@@ -611,6 +611,20 @@ Matrix<SX> symbolic(const std::string& name, int n, int m){
   return ret;
 }
 
+Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp){
+  // Create a matrix
+  Matrix<SX> ret(sp);
+  
+  // Fill with expressions
+  for(int i=0; i<ret.size(); ++i){
+    stringstream ss;
+    ss << name << "_" << i;
+    ret[i] = SX(ss.str());
+  }
+  
+  return ret;
+}
+
 std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p){
   std::vector<Matrix<SX> > ret(p);
   for(int k=0; k<p; ++k){

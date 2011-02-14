@@ -59,6 +59,9 @@ Matrix<SX> symbolic(const std::string& name, int n=1, int m=1);
 /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
 std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p);
 
+/** \brief Create an matrix with symbolic variables, given a sparsity pattern */
+Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp);
+
 /** \brief Create a one-dimensional stl vector of length n with symbolic variables */
 std::vector<SX> create_symbolic(const std::string& name, int n);
 

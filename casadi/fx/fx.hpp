@@ -119,6 +119,11 @@ class FX : public OptionsFunctionality{
   /** \brief  Create a function call (evaluation mx node) */
   std::vector<MX> call(const std::vector<MX> &x) const;
 
+  /** \brief  Evaluate a function multiple times, possibly in parallel 
+      paropt: Set of options to be passed to the Parallelizer
+  */
+  std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt=Dictionary()) const;
+
   // Legacy code: change for something else, but what??
 #ifndef USE_FUNCTORS
   /** \brief  Create a function call (generate mx node), single input: DEPRECIATED, USE "call" instead */

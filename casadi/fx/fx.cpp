@@ -25,6 +25,7 @@
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
+#include "parallelizer.hpp"
 
 using namespace std;
 
@@ -56,6 +57,36 @@ vector<MX> FX::call(const vector<MX> &x) const{
   for(int i=0; i<ret.size(); ++i){
     if(output(i).numel()>0)
       ret[i].assignNode(new EvaluationOutput(ev,i));
+  }
+  return ret;
+}
+
+std::vector<std::vector<MX> > FX::call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt) const{
+  // Make sure not empty
+  casadi_assert(x.size()>1);
+  
+  // Create parallelizer object and initialize it
+  Parallelizer p(vector<FX>(x.size(),*this));
+  p.setOption(paropt);
+  p.init();
+  
+  // Concatenate the arguments
+  vector<MX> p_in;
+  p_in.reserve(x.size() * getNumInputs());
+  for(int i=0; i<x.size(); ++i){
+    p_in.insert(p_in.end(),x[i].begin(),x[i].end());
+  }
+  
+  // Call the parallelizer
+  vector<MX> p_out = p.call(p_in);
+  casadi_assert(p_out.size() == x.size() * getNumOutputs());
+
+  // Collect the outputs
+  std::vector<std::vector<MX> > ret(x.size());
+  vector<MX>::const_iterator it=p_out.begin();
+  for(int i=0; i<x.size(); ++i){
+    ret[i].insert(ret[i].end(),it,it+getNumOutputs());
+    it += getNumOutputs();
   }
   return ret;
 }

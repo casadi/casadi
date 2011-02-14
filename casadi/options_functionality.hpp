@@ -29,6 +29,9 @@
 
 
 namespace CasADi{
+  
+  /// C++ version of Python's dictionary
+  typedef std::map<std::string, Option> Dictionary;
     
   // Forward declaration
   class OptionsFunctionalityNode;
@@ -60,12 +63,15 @@ class OptionsFunctionality : public SharedObject{
     const OptionsFunctionalityNode* operator->() const;
         
 #ifndef SWIG
-    /** \brief  set option.
+    /** \brief  set an option.
     The setOptions are in general only considered before the init function, if any.
     If properties changes, the init function should be called again.
     (Ticket #54)
     */
     void setOption(const std::string &str, const Option& val);
+
+    /** \brief  set a set of options */
+    void setOption(const Dictionary& dict);
 
     /** \brief  get an option value */
     Option getOption(const std::string &str) const;
@@ -85,6 +91,9 @@ class OptionsFunctionality : public SharedObject{
 
     /** \brief  Copy all options from another object*/
     void copyOptions(const OptionsFunctionality& obj);
+    
+    /** \brief  Get the dictionary */
+    const Dictionary& dictionary() const;
 };
 
 #ifndef SWIG
@@ -94,15 +103,18 @@ class OptionsFunctionality : public SharedObject{
   \date 2010
 */
 class OptionsFunctionalityNode : public SharedObjectNode{
-
-public:
+  friend class OptionsFunctionality;
+  public:
   
 /// Constructor, destructor
 OptionsFunctionalityNode();
 virtual ~OptionsFunctionalityNode();
  
-  /** \brief  set option */
+  /** \brief  set an option */
   void setOption(const std::string &str, const Option& val);
+
+  /** \brief  set a set of options */
+  void setOption(const Dictionary& dict);
 
   /** \brief  check if there is an option str */
   bool hasOption(const std::string &str) const;
@@ -134,7 +146,7 @@ private:
   std::map<std::string, opt_type> allowed_options;
 
 /** \brief  User-set options */
-  std::map<std::string, Option> options;
+  Dictionary dictionary_;
 
 };
 

@@ -41,7 +41,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const Option &op){
   }
 
   // Save the option
-  options[name] = op;
+  dictionary_[name] = op;
 }
 Option OptionsFunctionality::getOption(const string &name) const{
   return (*this)->getOption(name);
@@ -50,10 +50,10 @@ Option OptionsFunctionality::getOption(const string &name) const{
 Option OptionsFunctionalityNode::getOption(const string &name) const{
 
   // Locate the option
-  map<string, Option>::const_iterator it = options.find(name);
+  Dictionary::const_iterator it = dictionary_.find(name);
 
   // Check if found
-  if(it == options.end()){
+  if(it == dictionary_.end()){
     stringstream ss;
     ss << "Option: " << name << " has not been set." << endl;
     throw CasadiException(ss.str());
@@ -67,7 +67,7 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
   allowed_options[name] = type;
 
   if(!def_val.isNull())
-    options[name] = Option(def_val);
+    dictionary_[name] = Option(def_val);
 
 }
 
@@ -78,8 +78,8 @@ void OptionsFunctionalityNode::printOptions(ostream &stream) const{
     stream << "  \"" << it->first << "\" [" << opt_type_name[it->second] << "] ";
     
     // Check if it is has been set
-    map<string, Option>::const_iterator j=options.find(it->first);
-    if(j==options.end())
+    Dictionary::const_iterator j=dictionary_.find(it->first);
+    if(j==dictionary_.end())
       stream << "(not set)";
     else
       stream << "= " << j->second;
@@ -95,8 +95,8 @@ bool OptionsFunctionalityNode::hasOption(const string &str) const{
 
 bool OptionsFunctionalityNode::hasSetOption(const string &str) const{
   if(!hasOption(str)) throw CasadiException("OptionsFunctionalityNode::hasSetOption: no such option");
-  map<string, Option>::const_iterator it = options.find(str);
-  return it != options.end();
+  Dictionary::const_iterator it = dictionary_.find(str);
+  return it != dictionary_.end();
 }
 
 
@@ -125,6 +125,10 @@ void OptionsFunctionality::setOption(const string &str, const Option& op){
   (*this)->setOption(str,op);
 }
 
+void OptionsFunctionality::setOption(const Dictionary& dict){
+  (*this)->setOption(dict);
+}
+
 bool OptionsFunctionality::hasOption(const string &str) const{
   return (*this)->hasOption(str);
 }
@@ -145,9 +149,17 @@ void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj){
   (*this)->copyOptions(obj);
 }
 
-void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){
-  for(map<std::string, Option>::const_iterator it=obj->options.begin(); it!=obj->options.end(); ++it)
+const Dictionary& OptionsFunctionality::dictionary() const{
+  (*this)->dictionary_;
+}
+
+void OptionsFunctionalityNode::setOption(const Dictionary& dict){
+  for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it)
     setOption(it->first,it->second);
+}
+
+void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){
+  setOption(obj.dictionary());
 }
 
 void OptionsFunctionalityNode::repr(std::ostream &stream) const{
