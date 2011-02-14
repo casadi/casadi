@@ -31,12 +31,28 @@ namespace CasADi{
   
     class MultipleShootingInternal;
     
+  /** \brief Multiple Shooting
+   *
+   * Available options, from OCPSolver:
+   * "number_of_parameters", OT_INTEGER,  0
+   * "number_of_grid_points", OT_INTEGER,  20
+   * "final_time",OT_REAL, 1.0
+   *
+   *   \author Joel Andersson
+   *   \date 2011
+  */ 
 class MultipleShooting : public OCPSolver{
   public:
     /// Default constructor
     MultipleShooting();
-    
+  
     /// Create a multiple shooting OCP solver
+    /**
+    * \param ffcn Discrete time dynamics, should have I/O of an integrator
+    * \param mfcn Mayer term, mappping endstate -> cost
+    * \param cfcn Path constraints
+    * \param rfcn Initial value constraints
+    */
     explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
     /// Access functions of the node

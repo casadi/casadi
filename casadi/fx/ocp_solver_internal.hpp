@@ -37,7 +37,24 @@ class OCPSolverInternal : public FXInternal{
   friend class OCPSolver;
   public:
   
-    /// Constructor
+    /** \brief Constructor
+    *  
+    *
+    * \param ffcn Discrete time dynamics
+    * \param mfcn Mayer term
+    * \param cfcn Path constraints
+    * \param rfcn Initial value constraints
+    *
+    * The signatures (number and order of inputs/outputs) of these functions are not restricted at this stage.
+    * 
+    * Only ffcn has a general requirement for input interface: { INTEGRATOR_X0 , INTEGRATOR_P, INTEGRATOR_Z0  } from CasADi::IntegratorInput
+    *
+    * For example:
+    *
+    * When using the ACADO interface, all functions should have the same input interface: CasADi::ACADO_FCN_Input \n
+    * When using MultipleShooting, mfcn_ is a single input -> single output mapping
+    *
+    */
     explicit OCPSolverInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
 
     /// Destructor
@@ -45,38 +62,38 @@ class OCPSolverInternal : public FXInternal{
     
     /// Initialize
     virtual void init();
-
-    // Discrete time dynamics
+  
+    /// Discrete time dynamics
     FX ffcn_;
     
-    // Mayer term
+    /// Mayer term
     FX mfcn_;
     
-    // Path constraints
+    /// Path constraints
     FX cfcn_;
     
-    // Initial value constraints
+    /// Initial value constraints
     FX rfcn_;
-
-    // Number of grid points
+    
+    /// Number of grid points
     int nk_;
 
-    // Number of differential states
+    /// Number of differential states
     int nx_;
 
-    // Number of algebraic states
+    /// Number of algebraic states
     int nz_;
 
-    // Number of parameters
+    /// Number of parameters
     int np_;
     
-    // Number of controls
+    /// Number of controls
     int nu_;
     
-    // Number of point constraints
+    /// Number of point constraints
     int nh_;
     
-    // Number of point coupling constraints
+    /// Number of point coupling constraints
     int ng_;
 };
 

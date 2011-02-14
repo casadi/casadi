@@ -55,7 +55,12 @@ namespace CasADi{
   class OCPSolverInternal;
 
   /** \brief Base class for OCP solvers
-
+   *
+   * Available options:
+   * "number_of_parameters", OT_INTEGER,  0
+   * "number_of_grid_points", OT_INTEGER,  20
+   * "final_time",OT_REAL, 1.0
+   *
       \author Joel Andersson
       \date 2011
   */ 
