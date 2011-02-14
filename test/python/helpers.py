@@ -2,6 +2,7 @@ from casadi import *
 from numpy import *
 import unittest
 import sys
+from math import isnan, isinf
 
 class FunctionPool:
   def __init__(self):
@@ -47,9 +48,13 @@ class casadiTestCase(unittest.TestCase):
       self.assertEqual(zt.shape[1],zr.shape[1],"In %s: %s dimension error. Got %s, expected %s. %s <-> %s" % (name,failmessage,str(zt.shape),str(zr.shape),str(zt),str(zr)))
       for i in range(zr.shape[0]):
         for j in range(zr.shape[1]):
+          if zt[i,j]==zr[i,j]:
+            continue
+          if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
+            continue
           self.assertAlmostEqual(zt[i,j],zr[i,j],10,"In %s: %s evaluation error. %s <-> %s" % (name,failmessage, str(zt),str(zr)))
 
-  def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None):
+  def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
     
         Checks if yr is the same as S/MXFunction(x,yt) , evaluated for x0
@@ -77,18 +82,25 @@ class casadiTestCase(unittest.TestCase):
       f=fmod(f,x)
     if not(type(x0)==list):
       x0=[x0]
+    
+    if setx0 is None:
+      setx0=x0
+      
+    if not(type(setx0)==list):
+      setx0=[setx0]
+      
     for i in range(len(x0)):
       try:
-        f.input(i).set(x0[i])
+        f.input(i).set(setx0[i])
       except Exception as e:
          print f.input(i).shape
-         print e
+         raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
     zt = f.output(0).toArray()
     self.checkarray(yr,zt,name,failmessage)
     
-  def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage="",fmod=None):
+  def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi versus numpy evaluation.
     
         Checks if 'fr(x0)' yields the same as S/MXFunction(x,[ft(x)]) , evaluated for x0
@@ -108,11 +120,11 @@ class casadiTestCase(unittest.TestCase):
     except Exception as e:
       print "Error calling functions in %s" % name
       raise e
-    self.evaluationCheck([fx],frx,x,x0,name,failmessage,fmod=fmod)
+    self.evaluationCheck([fx],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
 
   
-  def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None):
+  def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None,setx0=None):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""
     for i in range(len(pool.numpyoperators)):
-      self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod)
+      self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 

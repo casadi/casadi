@@ -143,6 +143,17 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: SXMatrix([c.det(x[0])]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
       self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
         
+  def test_SXMatrixSparse(self):
+      self.message("SXMatrix unary operations, sparse")
+      from scipy.sparse import csr_matrix
+      x=SX("x")
+      y=SX("y")
+      z=SX("z")
+      x=SXMatrix(3,4,[1,2,1],[0,2,2,3],[x,y,z])
+      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+      
+      self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
+      
   def test_SXMatrixbinary(self):
       self.message("SXMatrix binary operations")
       x=symbolic("x",3,2)
@@ -168,13 +179,6 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: x[0][:,-2], lambda x: matrix(x)[:,-2],[x],x0,name="x[:,-2]")
       self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
       self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
-      
-  def test_SXMatrixSparse(self):
-      self.message("SXMatrix sparse")
-      x=symbolic("x",3,2)
-
-      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
-      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix_sparse")
   
   def test_SX1(self):
     self.message("SXFunction evaluation")
