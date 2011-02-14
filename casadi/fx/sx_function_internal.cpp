@@ -1334,13 +1334,8 @@ void SXFunctionInternal::init(){
 }
 
 FX SXFunctionInternal::jacobian(int iind, int oind){
-  if(getOption("symbolic_jacobian")==true){
-      SXMatrix J = jac(iind,oind); // NOTE: Multiple input, multiple output
-      return SXFunction(inputv,J);
-  } else {
-    // numeric jacobian
-    return FXInternal::jacobian(iind,oind);
-  }
+  SXMatrix J = jac(iind,oind); // NOTE: Multiple input, multiple output
+  return SXFunction(inputv,J);
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){

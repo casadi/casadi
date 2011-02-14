@@ -153,7 +153,7 @@ void IntegratorInternal::init(){
 FX IntegratorInternal::jacobian(int iind, int oind){
   // Create a new integrator for the forward sensitivity equations
   Integrator fwdint = jac(iind,oind);
-  
+
   // Number of sensitivities
   int ns;
   switch(iind){
@@ -164,10 +164,11 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   }
   
   // Initial value for the integrators
+  fwdint.printOptions();
   vector<double> jacinit(nx_*ns,0.0);
   if(iind==INTEGRATOR_X0){
-    for(int i=0; i<1+ns; ++i)
-      jacinit[i+nx_*i] = 1;
+    for(int i=0; i<ns; ++i)
+      jacinit.at(i+nx_*i) = 1;
     fwdint.setOption("jacinit",jacinit);
   }
 
@@ -180,6 +181,7 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   // Derivative with respect to what?
   intjac.setOption("derivative_index",iind);
   
+  fwdint.printOptions();
   return intjac;
 }
 

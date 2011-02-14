@@ -165,8 +165,11 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
 
 IntegratorJacobianInternal* IntegratorJacobianInternal::clone() const{
   // Return a deep copy
-  return new IntegratorJacobianInternal(*this);
+  IntegratorJacobianInternal* node = new IntegratorJacobianInternal(*this);
+  node->integrator_ = shared_cast<Integrator>(integrator_.clone());
+  return node;
 }
+
 
 } // namespace CasADi
 

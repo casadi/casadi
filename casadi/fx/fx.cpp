@@ -51,6 +51,8 @@ vector<MX> FX::call(const MX &x) const{
 }
 
 vector<MX> FX::call(const vector<MX> &x) const{
+  casadi_assert(isInit());
+  
   MX ev;
   ev.assignNode(new Evaluation(*this,x));
   vector<MX> ret(getNumOutputs());
@@ -62,6 +64,8 @@ vector<MX> FX::call(const vector<MX> &x) const{
 }
 
 std::vector<std::vector<MX> > FX::call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt) const{
+  casadi_assert(isInit());
+  
   // Make sure not empty
   casadi_assert(x.size()>1);
   
