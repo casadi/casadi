@@ -162,7 +162,24 @@ class SXtests(casadiTestCase):
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
       self.assertRaises(RuntimeError, lambda : c.dot(x,y))
+
+  def test_SXMatrixbinarySparse(self):
+      self.message("SXMatrix binary operations")
+      x=SX("x")
+      y=SX("y")
+      z=SX("z")
+      x2=SX("x2")
+      y2=SX("y2")
+      z2=SX("z2")
+      xx=SXMatrix(3,4,[1,2,1],[0,2,2,3],[x,y,z])
+      yy=SXMatrix(3,4,[0,2,3],[0,2,2,3],[x2,z2,y2])
+      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+      y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
       
+      self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SXMatrix",setx0=[x0,y0])
+      self.assertRaises(RuntimeError, lambda : c.dot(xx,yy))
+
+
   def test_SXMatrixslicing(self):
       self.message("SXMatrix slicing")
       x=symbolic("x",3,2)
