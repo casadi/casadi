@@ -351,6 +351,14 @@ class SXtests(casadiTestCase):
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
       isEmpty(arg)
     
+  def test_SXFunctionc3(self):
+    self.message("vector(SXmatrix) typemaps constructors")
+    y=SX("y")
+    x=symbolic("x",3,1)
+    vertcat([x,x])
+    vertcat([y,y])
+    #vertcat([x,[y]])
+    
   def test_eval(self):
     self.message("SXFunction eval")
     x=symbolic("x",2,2)

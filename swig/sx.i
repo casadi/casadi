@@ -205,11 +205,15 @@ bool isSXMatrix(PyObject * p) {
 }
 
 bool isSXMatrixVector(PyObject * p) {
-  return istype(p,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t);
+  return istype(p,SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t);
 }
 
 bool isSX(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__SX);
+}
+
+bool isMX(PyObject * p) {
+  return istype(p,SWIGTYPE_p_CasADi__MX);
 }
 
 int getSXMatrix(PyObject * p, CasADi::SXMatrix * & m) {
@@ -232,6 +236,15 @@ int getSX_ptr(PyObject * p, CasADi::SX * & m) {
   return true;
 }
 
+int getSXMatrixVector_ptr(PyObject * p, std::vector< CasADi::Matrix<CasADi::SX> > * & m) {
+  void *pd = 0 ;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t, 0 );
+  if (!SWIG_IsOK(res)) {
+    return false;
+  }
+  m = reinterpret_cast< std::vector< CasADi::Matrix<CasADi::SX> > *  >(pd);
+  return true;
+}
 
 
 
@@ -267,6 +280,10 @@ bool asSX(PyObject* p, CasADi::SX & s) {
     return false;
   }
   return true;
+}
+
+bool couldbeSX(PyObject* p) {
+  return (isSX(p) || PyNumber_Check(p));
 }
 
 /**
@@ -320,7 +337,7 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 		if (!result)
 			return false;
     m = CasADi::Matrix< CasADi::SX >(res);
-  } else if(PySequence_Check(p)) {
+  } else if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
     PyObject *it = PyObject_GetIter(p);
     PyObject *pe;
     std::vector<CasADi::SX> sxv(PySequence_Size(p));
@@ -342,6 +359,27 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 	return true;
 }
 
+
+bool couldbeSXMatrix(PyObject* p) {
+  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
+		if (array_type(p)==NPY_OBJECT)
+			return true;
+	} else if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      if (!couldbeSX(pe)) {
+        Py_DECREF(pe);Py_DECREF(it);return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+  } 
+  return isSXMatrix(p) || couldbeSX(p) ;
+}
+
 /**
 \param p   input   sequence(anything that SXMatrix accepts)
 \param s    output SX
@@ -355,7 +393,7 @@ bool asVSXMatrix(PyObject*p, std::vector<CasADi::SXMatrix> &m ) {
   //    return false;
   //  m.push_back(*mp);
   //}
-  if(PySequence_Check(p) &&! isSXMatrix(p)) {
+  if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
     PyObject *it = PyObject_GetIter(p);
     PyObject *pe;
     m.resize(PySequence_Size(p));
@@ -375,33 +413,59 @@ bool asVSXMatrix(PyObject*p, std::vector<CasADi::SXMatrix> &m ) {
   return true;
 }
 
+bool couldbeSXMatrixVector(PyObject* p) {
+  if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      if (!couldbeSXMatrix(pe)) {
+        Py_DECREF(pe);Py_DECREF(it);return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+  }
+  return isSXMatrixVector(p);
+}
 
 %}
+
+%template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
+%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 
 namespace CasADi{
 /*
 Attempts to form its argument into a std::vector<SXMatrix> form
 Accepts: sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))
 
-matching on SXMqtrix is prohibited as per wish of Joel
+matching on SXMatrix is prohibited as per wish of Joel
 */
-%typemap(in) const std::vector<SXMatrix> &  (std::vector<CasADi::SXMatrix> v) {
-  bool result=asVSXMatrix($input,v);
-  if (!result)
-    SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))");
-  $1 = &v;
+%typemap(in) const std::vector< Matrix<SX> > &  (std::vector<CasADi::SXMatrix> v) {
+  if (isSXMatrixVector($input)) { // SXMatrixVector object get passed on as-is, and fast.
+    int result = getSXMatrixVector_ptr($input,$1);
+		if (!result)
+			SWIG_exception_fail(SWIG_TypeError,"SXMatrix cast failed");
+	} else {  
+    bool result=asVSXMatrix($input,v);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))");
+    $1 = &v;
+  }
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector<SXMatrix> & {
-    if (PySequence_Check($input) && !isSXMatrix($input)) {
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector< Matrix<SX> > & {
+    if (couldbeSXMatrixVector($input)) {
       $1 = 1;
     } else {
       $1=0;
     }
 }
 
-%typemap(freearg) const std::vector<SXMatrix> & {
+%typemap(freearg) const std::vector< Matrix<SX> > & {
 }
+
 
 
 // numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)
@@ -420,8 +484,7 @@ matching on SXMqtrix is prohibited as per wish of Joel
 
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<SX> & {
-  PyObject* p = $input;
-  if ((is_array(p) && array_numdims(p) < 3) && array_type(p)==NPY_OBJECT || isSXMatrix(p) || isSX(p) || PyNumber_Check(p) || PySequence_Check(p)) {
+  if (couldbeSXMatrix($input)) {
     $1=1;
   } else {
     $1=0;
@@ -438,5 +501,6 @@ matching on SXMqtrix is prohibited as per wish of Joel
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
 %template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
 %template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
-%template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
-%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
+
+
+// NOTE: mx.py fails terminate called after throwing an instance of 'std::bad_alloc'
