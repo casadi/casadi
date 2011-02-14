@@ -37,6 +37,8 @@ IdasInternal* IdasInternal::clone() const{
   if(!q_.isNull()) q = shared_cast<FX>(q_.clone());
   IdasInternal* node = new IdasInternal(f,q);
   node->setOption(dictionary());
+  if(isInit())
+    node->init();
   return node;
 }
 

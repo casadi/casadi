@@ -80,10 +80,11 @@ void MultipleShootingInternal::init(){
   // Options for the parallelizer
   Dictionary paropt;
   paropt["save_corrected_input"] = true;
+  paropt["mode"] = "openmp";
   
   // Evaluate function in parallel
   vector<vector<MX> > pI_out = ffcn_.call(ffcn_in,paropt);
-  
+
   //Constraint function
   vector<MX> g(nk_);
 

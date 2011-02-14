@@ -56,6 +56,11 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
 JacobianInternal::~JacobianInternal(){
 }
 
+JacobianInternal* JacobianInternal::clone() const{
+  JacobianInternal* node = new JacobianInternal(*this);
+  node->fcn_ = shared_cast<FX>(fcn_.clone());
+  return node;
+}
 
 void JacobianInternal::init(){
   // Call the init function of the base class

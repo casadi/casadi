@@ -37,6 +37,8 @@ CVodesInternal* CVodesInternal::clone() const{
   if(!q_.isNull()) q = shared_cast<FX>(q_.clone());
   CVodesInternal* node = new CVodesInternal(f,q);
   node->setOption(dictionary());
+  if(isInit())
+    node->init();
   return node;
 }
   

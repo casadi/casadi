@@ -35,21 +35,25 @@ namespace CasADi{
 */
 class JacobianInternal : public FXInternal{
   friend class Jacobian;
-  
-  protected:
+  public:
+    
     /// Constructor
     JacobianInternal(const FX& fcn, int iind, int oind);
 
-    public:
-      /// Destructor
-      virtual ~JacobianInternal();
-      
-      /// Evaluate the jacobian
-      virtual void evaluate(int fsens_order, int asens_order);
+    /// Clone
+    virtual JacobianInternal* clone() const;
 
-      /// Initialize
-      virtual void init();
+    /// Destructor
+    virtual ~JacobianInternal();
+      
+    /// Evaluate the jacobian
+    virtual void evaluate(int fsens_order, int asens_order);
+
+    /// Initialize
+    virtual void init();
   
+      
+      
       /// Compress the number of evaluations using curtis-powel reed seeding
 /*      void compress();*/
       

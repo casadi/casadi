@@ -44,7 +44,14 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
 }
 
 KinsolInternal* KinsolInternal::clone() const{
-  return new KinsolInternal(*this);
+  // Return a deep copy
+  FX f;
+  if(!f_.isNull()) f = shared_cast<FX>(f_.clone());
+  KinsolInternal* node = new KinsolInternal(f,nrhs_);
+  node->setOption(dictionary());
+  if(isInit())
+    node->init();
+  return node;
 }
 
 KinsolInternal::~KinsolInternal(){
