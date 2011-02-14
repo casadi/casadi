@@ -136,7 +136,10 @@ virtual ~OptionsFunctionalityNode();
 
   /** \brief  Copy all options from another object*/
   void copyOptions(const OptionsFunctionality& obj);
-  
+
+  /** \brief  Get the dictionary */
+  const Dictionary& dictionary() const;
+
 protected:
 
   void addOption(const std::string &str, const opt_type& type, const Option &def_val=Option());

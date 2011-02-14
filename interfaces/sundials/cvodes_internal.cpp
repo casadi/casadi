@@ -31,12 +31,12 @@ namespace CasADi{
 namespace Sundials{
 
 CVodesInternal* CVodesInternal::clone() const{
-  // Copying initialized objects are not allowed since they contain pointers
-  if(is_init) throw CasadiException("CVodesInternal::clone: cannot clone an initialized object");
-  
   // Return a deep copy
-  CVodesInternal* node = new CVodesInternal(*this);
-/*  node->f_ = shared_cast<FX>(f_.clone());*/
+  FX f, q;
+  if(!f_.isNull()) f = shared_cast<FX>(f_.clone());
+  if(!q_.isNull()) q = shared_cast<FX>(q_.clone());
+  CVodesInternal* node = new CVodesInternal(f,q);
+  node->setOption(dictionary());
   return node;
 }
   
@@ -1342,7 +1342,7 @@ Integrator CVodesInternal::jac(int iind, int oind){
   CVodesIntegrator integrator(ffcn_aug,qfcn_aug);
 
   // Set options
-  integrator.copyOptions(shared_from_this<CVodesIntegrator>());
+  integrator.setOption(dictionary());
   integrator.setOption("nrhs",1+ns);
   
   // Pass linear solver

@@ -150,12 +150,17 @@ void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj){
 }
 
 const Dictionary& OptionsFunctionality::dictionary() const{
-  (*this)->dictionary_;
+  (*this)->dictionary();
+}
+
+const Dictionary& OptionsFunctionalityNode::dictionary() const{
+  return dictionary_;
 }
 
 void OptionsFunctionalityNode::setOption(const Dictionary& dict){
-  for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it)
+  for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
     setOption(it->first,it->second);
+  }
 }
 
 void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){

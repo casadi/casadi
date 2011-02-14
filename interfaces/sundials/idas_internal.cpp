@@ -31,11 +31,13 @@ namespace CasADi{
 namespace Sundials{
 
 IdasInternal* IdasInternal::clone() const{
-  // Copying initialized objects are not allowed since they contain pointers
-  if(is_init) throw CasadiException("IdasInternal::clone: cannot clone an initialized object");
-  
   // Return a deep copy
-  return new IdasInternal(*this);
+  FX f, q;
+  if(!f_.isNull()) f = shared_cast<FX>(f_.clone());
+  if(!q_.isNull()) q = shared_cast<FX>(q_.clone());
+  IdasInternal* node = new IdasInternal(f,q);
+  node->setOption(dictionary());
+  return node;
 }
 
 // IdasInternal::IdasInternal(const IdasInternal& integrator): IntegratorInternal(integrator){
