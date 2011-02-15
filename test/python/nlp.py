@@ -25,7 +25,22 @@ class NLPtests(casadiTestCase):
     solver.solve()
     self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
-
+    
+  def testIPOPTnoc(self):
+    self.message("trivial IPOP, no constraints")
+    """ There is an assertion error thrown, but still it works"""
+    x=SX("x")
+    f=SXFunction([x],[(x-1)**2])
+    solver = IpoptSolver(f)
+    solver.setOption("tol",1e-10)
+    solver.setOption("print_level",0)
+    solver.init()
+    solver.input(NLP_LBX).set([-10])
+    solver.input(NLP_UBX).set([10])
+    solver.solve()
+    self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
+    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
+    
   def testIPOPTmx(self):
     self.message("trivial IPOP, using MX")
     x=MX("x")
@@ -146,6 +161,7 @@ class NLPtests(casadiTestCase):
     solver.solve()
     # todo: catch error when set([0, 3 , 5]) two times
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
+    
     
     
 if __name__ == '__main__':
