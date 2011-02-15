@@ -32,10 +32,19 @@ namespace CasADi{
 namespace Sundials{
 
 /// Input arguments of an explicit ODE right hand side
-enum ODEInput{ODE_T, ODE_Y, ODE_P, ODE_NUM_IN};
+enum ODEInput{
+ /// Time
+ ODE_T,
+ /// Differential states
+ ODE_Y,
+ /// Parameters
+ ODE_P, ODE_NUM_IN};
 
 /// Output arguments of an explicit ODE right hand side
-enum ODEOutput{ODE_RHS, ODE_NUM_OUT};
+enum ODEOutput{
+  /// Right hand side of ODE
+  ODE_RHS, 
+  ODE_NUM_OUT};
   
 /// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
 enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
@@ -58,6 +67,9 @@ class CVodesInternal;
   
   You can retrieve the entire state trajectory as follows, after the evaluate call: 
   Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
+  
+  CVodesIntegrator is an CasADi::FX mapping from CasADi::IntegratorInput to CasADi::IntegratorOutput.
+  
 
 */
 class CVodesIntegrator : public Integrator{
@@ -66,7 +78,9 @@ public:
   /** \brief  Default constructor */
   CVodesIntegrator();
   
-  /** \brief  Create an integrator for explicit ODEs */
+  /** \brief  Create an integrator for explicit ODEs
+  *   \param f CasADi::FX mapping from CasADi::Sundials::ODEInput to CasADi::Sundials::ODEOutput.
+  */
   explicit CVodesIntegrator(const FX& f, const FX& q=FX());
   
   /** \brief  Access functions of the node */

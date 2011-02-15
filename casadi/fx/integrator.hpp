@@ -30,10 +30,30 @@
 namespace CasADi{
 
 /// Input arguments of an integrator
-enum IntegratorInput{INTEGRATOR_T0, INTEGRATOR_TF, INTEGRATOR_X0, INTEGRATOR_P, INTEGRATOR_XP0, INTEGRATOR_Z0, INTEGRATOR_NUM_IN};
+enum IntegratorInput{
+  /** Initial time t0 (dimension 1-by-1) */
+  INTEGRATOR_T0, 
+  /** Final time tf (dimension 1-by-1) */
+  INTEGRATOR_TF,
+  /** Differential State at t0  (dimension nx-by-1) */
+  INTEGRATOR_X0, 
+  /** Parameters p  (dimension np-by-1) */
+  INTEGRATOR_P,  
+  /** Differential state derivative at t0  (dimension nx-by-1) */
+  INTEGRATOR_XP0, 
+  /** Algebraic state at t0  (dimension nz-by-1) */
+  INTEGRATOR_Z0, 
+  INTEGRATOR_NUM_IN};
 
 /// Output arguments of an integrator
-enum IntegratorOutput{INTEGRATOR_XF, INTEGRATOR_XPF, INTEGRATOR_ZF, INTEGRATOR_NUM_OUT};
+enum IntegratorOutput{
+ /**  Differential state at tf */
+ INTEGRATOR_XF, 
+ /**  Differential state derivative at tf */
+ INTEGRATOR_XPF, 
+  /** Algebraic state at tf*/
+ INTEGRATOR_ZF, 
+ INTEGRATOR_NUM_OUT};
 
 /// Forward declaration of internal class
 class IntegratorInternal;
@@ -155,7 +175,12 @@ public:
   /// Get the Linear solver
   LinearSolver getLinearSolver();
   
-  /// Jacobian of output oind with respect to input iind
+  /** \brief Jacobian of output oind with respect to input iind
+  *
+  *  Jacobian is implemented by augmenting the system with equations for the time evolution of sensitivity.
+  *  The result is a mapping from CasADi::IntegratorInput to CasADi::IntegratorJacobianOutput.
+  *
+  */
   IntegratorJacobian jacobian(int iind=0, int oind=0);
 
   /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE

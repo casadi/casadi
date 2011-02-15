@@ -27,6 +27,19 @@
 
 namespace CasADi{
 
+/// Output arguments of an integratorJacobian
+enum IntegratorJacobianOutput{ 
+  /** Jacobian matrix */
+  INTEGRATORJACOBIAN_J,   
+  /**  Differential state at tf */
+  INTEGRATORJACOBIAN_XF, 
+  /**  Differential state derivative at tf */ 
+  INTEGRATORJACOBIAN_XPF, 
+  /** Algebraic state at tf*/
+  INTEGRATORJACOBIAN_ZF,  
+  INTEGRATORJACOBIAN_NUM_OUT
+};
+
 // Forward declaration of internal class
 class IntegratorJacobianInternal;
 
@@ -37,6 +50,8 @@ class Integrator;
 
   This class maps an integrator which is able to calculate sensitivities as a Jacobian
   This will enable a uniform treatment of all kinds of function, whether SXFunction, MXFunction, etc.
+  
+  IntegratorJacobian is an CasADi::FX mapping from CasADi::IntegratorInput to CasADi::IntegratorJacobianOutput.  
   
   \author Joel Andersson
   \date 2010

@@ -31,9 +31,15 @@ namespace CasADi{
 
   /// Input arguments of an OCP Solver
   enum OCPInput{
-    OCP_T,                                // Time grid
-    OCP_LBX, OCP_UBX, OCP_X_INIT,        // Differential state with bounds and initial guess
-    OCP_LBZ, OCP_UBZ, OCP_Z_INIT,       // Algebraic state with bounds and initial guess
+    /// Time grid
+    OCP_T,   
+    /// Differential state lower bound                             
+    OCP_LBX,
+    /// Differential state upper bound  
+    OCP_UBX, 
+    /// Differential state initial guess  
+    OCP_X_INIT,    
+    OCP_LBZ, OCP_UBZ, OCP_Z_INIT,     
     OCP_LBXP, OCP_UBXP, OCP_XP_INIT,   // State deriatives with bounds
     OCP_LBU, OCP_UBU, OCP_U_INIT,     // Controls with bounds and initial guess
     OCP_LBP, OCP_UBP, OCP_P_INIT,    // Parameters with bounds and initial guess
@@ -60,6 +66,8 @@ namespace CasADi{
    * "number_of_parameters", OT_INTEGER,  0
    * "number_of_grid_points", OT_INTEGER,  20
    * "final_time",OT_REAL, 1.0
+   *
+   * OCPSolver is an CasADi::FX mapping from CasADi::OCPInput to CasADi::OCPOutput
    *
       \author Joel Andersson
       \date 2011

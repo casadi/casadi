@@ -77,7 +77,9 @@ public:
   /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
   virtual Integrator jac(int iind=0, int oind=0);
 
-  /// Get the Jacobian
+  /** \brief Get the Jacobian
+  * The result is an CasADi::FX mapping from CasADi::Sundials::MInput to CasADi::Sundials::MOutput
+  */
   virtual FX getJacobian();
   
   /// Get the Linear solver

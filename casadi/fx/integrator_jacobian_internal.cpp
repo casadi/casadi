@@ -59,10 +59,10 @@ void IntegratorJacobianInternal::init(){
   input(INTEGRATOR_P)      = DMatrix(np,1,0); // parameter
   
   // Allocate space for outputs
-  output_.resize(1+INTEGRATOR_NUM_OUT);
-  output(0)                = DMatrix(nx_,ns_,0);
-  output(1+INTEGRATOR_XF)  = DMatrix(nx_,1,0);
-  output(1+INTEGRATOR_XPF) = DMatrix(nx_,1,0);
+  output_.resize(INTEGRATORJACOBIAN_NUM_OUT);
+  output(INTEGRATORJACOBIAN_J)                = DMatrix(nx_,ns_,0);
+  output(INTEGRATORJACOBIAN_XF)  = DMatrix(nx_,1,0);
+  output(INTEGRATORJACOBIAN_XPF) = DMatrix(nx_,1,0);
 
   // Map Jacobian indices
   if(integrator_.hasSetOption("jacmap")){
