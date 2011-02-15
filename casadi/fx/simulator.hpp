@@ -28,10 +28,21 @@
 namespace CasADi{
 
 /// Indices of the inputs of the output function
-enum OutputInput{OUTPUT_T, OUTPUT_X, OUTPUT_P, OUTPUT_NUM_IN};
+enum OutputInput{
+/// Time grid
+OUTPUT_T,
+/// Flattened differential states for each time in the time grid
+OUTPUT_X,
+OUTPUT_P,
+OUTPUT_NUM_IN};
 
 /// Indices of the inputs of the function
-enum SimulatorInput{SIMULATOR_X0, SIMULATOR_P, SIMULATOR_NUM_IN};
+enum SimulatorInput{
+/// Same as CasADi::INTEGRATOR_X0 
+SIMULATOR_X0,
+/// Same as CasADi::INTEGRATOR_P 
+SIMULATOR_P,
+SIMULATOR_NUM_IN};
 
 /// Indices of the outputs of the function
 //enum SimulatorOutput{SIMULATOR_Y, SIMULATOR_XF, SIMULATOR_NUM_OUT};
@@ -43,6 +54,9 @@ class SimulatorInternal;
   An "simulator" integrates an IVP, stopping at a (fixed) number of grid points and 
   evaluates a set of output functions at these points.
   The internal stepsizes of the integrator need not coincide with the gridpoints.
+  
+  Simulatro is an CasADi::FX mapping from CasADi::SimulatorInput to 1 (flattened differential states for each time in the time grid)
+
 
   inputs:
   0: Vector of output times (dimension ngrid)
@@ -51,6 +65,7 @@ class SimulatorInternal;
 
   outputs:
   Same as the output function with the different times as the second dimension
+  
   
   \author Joel Andersson 
   \date 2010

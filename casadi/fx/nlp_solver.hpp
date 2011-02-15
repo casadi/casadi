@@ -28,17 +28,38 @@
 namespace CasADi{
 
 /// Input arguments of an NLP Solver
-enum NLPInput{NLP_X_INIT,NLP_LBX,NLP_UBX,NLP_LBG,NLP_UBG,NLP_LAMBDA_INIT,NLP_NUM_IN};
+enum NLPInput{
+/// Decision variables initial guess
+NLP_X_INIT,
+/// Decision variables lower bound
+NLP_LBX,
+/// Decision variables upper bound
+NLP_UBX,
+/// Constraints lower bound
+NLP_LBG,
+/// Constraints upper bound
+NLP_UBG,
+/// Lambda multipliers initial guess
+NLP_LAMBDA_INIT,
+NLP_NUM_IN};
 
 /// Outputs arguments of an NLP Solver
-enum NLPOutput{NLP_X_OPT,NLP_COST,NLP_LAMBDA_OPT,NLP_LAMBDA_LBX,NLP_LAMBDA_UBX,NLP_NUM_OUT};
+enum NLPOutput{
+/// Decision variables for optimal solution
+NLP_X_OPT,
+/// Objective/cost function for optimal solution
+NLP_COST,
+///  Lambda multipliers function for optimal solution
+NLP_LAMBDA_OPT,
+NLP_LAMBDA_LBX,
+NLP_LAMBDA_UBX,
+NLP_NUM_OUT};
 
 class NLPSolverInternal;
 
 /** \brief NLPSolver
 
-Input arguments of an NLP Solver CasADi::NLPInput: NLP_X_INIT,NLP_LBX,NLP_UBX,NLP_LBG,NLP_UBG,NLP_LAMBDA_INIT\n
-Output arguments of an NLP Solver CasADi::NLPOutput: NLP_X_OPT,NLP_COST,NLP_LAMBDA_OPT,NLP_LAMBDA_LBX,NLP_LAMBDA_UBX\n
+NLPSolver is an CasADi::FX mappinf from CasADi::NLPInput to CasADi::NLPOutput
 
   \author Joel Andersson 
   \date 2010
