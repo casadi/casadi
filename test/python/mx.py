@@ -279,8 +279,6 @@ class MXtests(casadiTestCase):
     self.assertAlmostEqual(f.output(0)[0,0], 3,10)
 
   def test_identityMX(self):
-    return
-    """ Failing """
     self.message("identity MXFunction")
     x = MX("x")
     f  = MXFunction([x],[x])

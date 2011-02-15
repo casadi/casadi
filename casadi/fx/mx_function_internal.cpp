@@ -85,6 +85,8 @@ void MXFunctionInternal::makeAlgorithm(MXNode* root, vector<MXNode*> &nodes, map
 
         // Remove from stack
         s.pop();
+    } else {
+      break;
     }
   }
 }
