@@ -33,6 +33,7 @@ class IpoptInternal;
 /**
 * \brief interface to IPOPT NLP solver
 *
+*
 * available options:
 \verbatim
   // Output
@@ -201,13 +202,13 @@ class IpoptSolver : public NLPSolver {
   public:
     /// Default constructor
     IpoptSolver();
-    
-    /// Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit IpoptSolver(const FX& F,         /**< F objective function */
-                         const FX& G = FX(),  /**< constraint function (default only bound constraints) */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory) */
-                         const FX& J = FX(),  /**< Jacobian of G (default -> differentiate) */
-                         const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F) */
+
+    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
+    explicit IpoptSolver(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
+                         const FX& G = FX(),  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory): \f$ [\mathbf{R}^n, \mathbf{R}^m, \mathbf{R}] \mapsto [\mathbf{R}^{n x n}]\f$ \n The third input argument for H is \f$ \sigma \f$, a scaling factor for F. */
+                         const FX& J = FX(),  /**< Jacobian of G (default -> differentiate): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^{m x n}]\f$ */
+                         const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^{n x n}]\f$ */
                         );
 
     /// Access functions of the node

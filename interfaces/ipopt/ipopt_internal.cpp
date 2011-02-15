@@ -224,7 +224,37 @@ IpoptInternal::~IpoptInternal(){
 void IpoptInternal::init(){
   // Call the init method of the base class
   NLPSolverInternal::init();
-
+  
+  int n=0;
+  int m=0;
+  // Basic sanity checks
+  if (F_.getNumInputs()!=1 or F_.getNumOutputs()!=1 or F_.output().size()!=1) {
+      throw CasadiException("Objective function should be single input, single output. Output must have exactly one element.");
+  }
+  n=F_.input().numel();
+  if(!G_.isNull()) {
+    if (G_.getNumInputs()!=1 or G_.getNumOutputs()!=1 or G_.input().numel()!=n) {
+      throw CasadiException("Constraint function should be single input, single output. Number of elements in input should match those of the objective function.");
+    }
+    m=G_.output().numel();
+  }
+  
+  if(!H_.isNull()) {
+    if (H_.getNumInputs()!=3 or H_.getNumOutputs()!=1 or H_.input(0).numel()!=n or H_.output(0).size1()!=n or H_.output(0).size2()!=n) {
+      throw CasadiException("Hessian function should be triple input, single output.");
+    }
+  }
+  if(!J_.isNull() and !G_.isNull()) {
+    if (J_.getNumInputs()!=1 or J_.getNumOutputs()!=1 or J_.input(0).numel()!=n or J_.output(0).size1()!=m or J_.output(0).size2()!=n) {
+      throw CasadiException("Jacobian of constraints should be single input, single output.");
+    }
+  }
+  if(!GF_.isNull()) {
+    if (GF_.getNumInputs()!=1 or GF_.getNumOutputs()!=1 or GF_.input(0).numel()!=n or GF_.output(0).size1()!=n or GF_.output(0).size2()!=n) {
+      throw CasadiException("Jacobian of objective should be single input, single output.");
+    }
+  }
+  
   // read options
   exact_hessian_ = !(hasSetOption("hessian_approximation") && getOption("hessian_approximation")=="limited-memory");
   casadi_assert_message(!(exact_hessian_ && H_.isNull()), "No hessian has been provided");
