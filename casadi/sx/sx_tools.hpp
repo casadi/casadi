@@ -219,7 +219,10 @@ bool isSmooth(const Matrix<SX>& ex);
 bool isSymbolic(const Matrix<SX>& ex);
 
 //@{
-/** \brief  Automatic differentiation */
+/** \brief Calculate jacobian via source code transformation
+
+Uses CasADi::SXFunction::jac
+ */
 Matrix<SX> jacobian(const Matrix<SX> &ex, const Matrix<SX> &arg);
 Matrix<SX> gradient(const Matrix<SX> &ex, const Matrix<SX> &arg);
 Matrix<SX> hessian(const Matrix<SX> &ex, const Matrix<SX> &arg);

@@ -88,13 +88,22 @@ public:
   std::vector<SX> eval(const std::vector<SX>& arg);
 #endif // SWIG
   
-  /// Jacobian of output oind with respect to input iind 
+  /** \brief Calculate the jacobian of output oind with respect to input iind 
+  *
+  * This is just the result of CasADi::SXFunction::jac,
+  * wrapped in an SXFunction.
+  *
+  * \see CasADi::Jacobian for an AD approach
+  */
   SXFunction jacobian(int iind=0, int oind=0);
   
   /// Hessian of output oind with respect to input iind 
   SXFunction hessian(int iind=0, int oind=0);
 
-  /// Jacobian via source code transformation
+  /** \brief Jacobian via source code transformation
+  *
+  * \see CasADi::Jacobian for an AD approach
+  */
   SXMatrix jac(int iind=0, int oind=0);
 
   /// Gradient via source code transformation

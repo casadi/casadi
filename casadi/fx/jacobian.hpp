@@ -32,8 +32,15 @@ namespace CasADi{
 // Forward declaration of internal class
 class JacobianInternal;
 
-/** \brief Jacobian class	
-  Universal Jacobian class, calculates the Jacobian of a function based on compression techniques 
+/** \brief Jacobian class
+	
+  Universal Jacobian class, calculates the Jacobian of a function based on AD forward or adjoint.
+  
+  Options:
+  "finite_differences" false
+  "ad_mode"            "forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint
+  "sparse"             false
+  
   \author Joel Andersson 
   \date 2010
 */ 

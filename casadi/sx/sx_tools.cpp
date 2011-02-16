@@ -160,14 +160,14 @@ void compress(Matrix<SX> &ex, int level){
     compress(ex,level-1);
 }
 
-void substitute(Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr){
-  if(var.empty()) return; // quick return if empty
+Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr){
+  if(var.empty()) return ex; // quick return if empty
   casadi_assert_message(isSymbolic(var),"the variable is not symbolic");
   casadi_assert_message(var.size1() == expr.size1() && var.size2() == expr.size2(),"the dimensions do not match");
 
   // evaluate with var == expr
   SXFunction fcn(var,ex);
-  ex = fcn.eval(expr);
+  return fcn.eval(expr);
 }
 
 
