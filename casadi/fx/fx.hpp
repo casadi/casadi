@@ -57,11 +57,15 @@ class FXInternal;
   Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
   Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
   
-  We have the following relationships:
+  We have the following relationships for function mapping from a column vector to a column vector:
   
   \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
   \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
   
+  Some quantities is these formulas must be transposed: \n 
+    input  row: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
+    output row: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
+    
   \section Notes for developers
   
   Each function consists of 4 files:\n
