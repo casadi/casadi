@@ -24,165 +24,77 @@ class ADtests(casadiTestCase):
     inp[4,0]=z
     
     self.inputs = {
-      "dense column vector": [[x,y,z]],
-      "sparse column vector": [inp]
+       "column" : {
+            "dense": [[x,y,z]],
+            "sparse": [inp] }
+        , "row": {
+            "dense":  [SXMatrix([x,y,z]).T],
+            "sparse": [inp.T]
+        }
     }
     
     self.outputs = {
-      "dense column vector": [[x,x+2*y**2,x+2*y**3+3*z**4]],
-      "sparse column vector": [out]
+       "column": {
+        "dense": [[x,x+2*y**2,x+2*y**3+3*z**4]],
+        "sparse": [out]
+        }, "row": {
+          "dense":  [SXMatrix([x,x+2*y**2,x+2*y**3+3*z**4]).T],
+          "sparse": [out.T]
+       }
+    }
+    
+    self.jacobians = {
+      "dense" : {
+        "dense" : lambda x,y,z: array([[1,0,0],[1,4*y,0],[1,6*y**2,12*z**3]]),
+        "sparse" : lambda x,y,z: array([[1,0,0],[0,0,0],[1,4*y,0],[0,0,0],[1,6*y**2,12*z**3]])
+        }
+      ,
+      "sparse" : {
+        "dense" : lambda x,y,z: array([[1,0,0,0,0],[1,0,4*y,0,0],[1,0,6*y**2,0,12*z**3]]),
+        "sparse" : lambda x,y,z:  array([[1,0,0,0,0],[0,0,0,0,0],[1,0,4*y,0,0],[0,0,0,0,0],[1,0,6*y**2,0,12*z**3]])
+      }
     }
   
-  def test_1(self):
-    self.message("fwd AD of dense column vector wrt dense column vector")
+  
+  def test_fwdcol(self):
+    inputshape = "column"
+    outputshape = "column"
     n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0],[1,4*y,0],[1,6*y**2,12*z**3]])
-      
-    f=SXFunction(self.inputs['dense column vector'],self.outputs['dense column vector'])
-    f.init()
-    f.input().set(n)
     
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.fwdSeed().set(d)
-      f.evaluate(1,0)
-      self.checkarray(f.fwdSens(),dot(reference(n),d),"AD")
-    
-  def test_2(self):
-    self.message("adj AD of dense column vector wrt dense column vector")
-    n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0],[1,4*y,0],[1,6*y**2,12*z**3]])
-      
-    f=SXFunction(self.inputs['dense column vector'],self.outputs['dense column vector'])
-    f.init()
-    f.input().set(n)
-    
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.adjSeed().set(d)
-      f.evaluate(0,1)
-      self.checkarray(f.adjSens(),dot(reference(n).T,d),"AD")
+    for inputtype in ["sparse","dense"]:
+      for outputtype in ["sparse","dense"]:
+        self.message("fwd AD. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+        f=SXFunction(self.inputs[inputshape][inputtype],self.outputs[outputshape][outputtype])
+        f.init()
+        f.input().set(n)
+        self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
+        self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
+        for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
+          f.fwdSeed().set(d)
+          f.evaluate(1,0)
+          J = self.jacobians[inputtype][outputtype](*n)
+          self.checkarray(f.fwdSens(),dot(J,array(f.fwdSeed())),"AD")
 
-  def test_3(self):
-    self.message("fwd AD of sparse column vector wrt dense column vector")
+  def test_adjcol(self):
+    inputshape = "column"
+    outputshape = "column"
     n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0],[0,0,0],[1,4*y,0],[0,0,0],[1,6*y**2,12*z**3]])
+    
+    for inputtype in ["sparse","dense"]:
+      for outputtype in ["sparse","dense"]:
+        self.message("adj AD. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+        f=SXFunction(self.inputs[inputshape][inputtype],self.outputs[outputshape][outputtype])
+        f.init()
+        f.input().set(n)
+        self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
+        self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
+        for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
+          f.adjSeed().set(d)
+          f.evaluate(0,1)
+          J = self.jacobians[inputtype][outputtype](*n)
+          self.checkarray(f.adjSens(),dot(J.T,array(f.adjSeed())),"AD")
+ 
       
-    f=SXFunction(self.inputs['dense column vector'],self.outputs['sparse column vector'])
-    f.init()
-    f.input().set(n)
-    
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.fwdSeed().set(d)
-      f.evaluate(1,0)
-      self.checkarray(f.fwdSens(),dot(reference(n),d),"AD")
-
-  def test_4(self):
-    self.message("adj AD of sparse column vector wrt dense column vector")
-    n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0],[0,0,0],[1,4*y,0],[0,0,0],[1,6*y**2,12*z**3]])
-      
-    f=SXFunction(self.inputs['dense column vector'],self.outputs['sparse column vector'])
-    f.init()
-    f.input().set(n)
-    self.assertEqual(f.adjSeed().shape,(5,1),"adjSeed shape")
-    self.assertEqual(f.adjSeed().size(),3,"adjSeed shape")
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.adjSeed().set(d)
-      f.evaluate(0,1)
-      self.checkarray(f.adjSens(),dot(reference(n).T,array(f.adjSeed())),"AD")
-
-  def test_5(self):
-    self.message("fwd AD of dense column vector wrt sparse column vector")
-    n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0,0,0],[1,0,4*y,0,0],[1,0,6*y**2,0,12*z**3]])
-    
-    f=SXFunction(self.inputs['sparse column vector'],self.outputs['dense column vector'])
-    f.init()
-    f.input().set(n)
-    self.assertEqual(f.fwdSeed().shape,(5,1),"adjSeed shape")
-    self.assertEqual(f.fwdSeed().size(),3,"adjSeed shape")
-    
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.fwdSeed().set(d)
-      f.evaluate(1,0)
-      self.checkarray(f.fwdSens(),dot(reference(n),array(f.fwdSeed())),"AD")
-
-  def test6(self):
-    self.message("adj AD of dense column vector wrt sparse column vector")
-    n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0,0,0],[1,0,4*y,0,0],[1,0,6*y**2,0,12*z**3]])
-    
-    f=SXFunction(self.inputs['sparse column vector'],self.outputs['dense column vector'])
-    f.init()
-    f.input().set(n)
-    
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.adjSeed().set(d)
-      f.evaluate(0,1)
-      self.checkarray(f.adjSens(),dot(reference(n).T,array(f.adjSeed())),"AD") 
-
-  def test7(self):
-    self.message("fwd AD of sparse column vector wrt sparse column vector")
-    n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0,0,0],[0,0,0,0,0],[1,0,4*y,0,0],[0,0,0,0,0],[1,0,6*y**2,0,12*z**3]])
-    
-    f=SXFunction(self.inputs['sparse column vector'],self.outputs['sparse column vector'])
-    f.init()
-    f.input().set(n)
-    self.assertEqual(f.fwdSeed().shape,(5,1),"adjSeed shape")
-    self.assertEqual(f.fwdSeed().size(),3,"adjSeed shape")
-    
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.adjSeed().set(d)
-      f.evaluate(1,0)
-      self.checkarray(f.fwdSens(),dot(reference(n),array(f.fwdSeed())),"AD") 
-      
-  def test8(self):
-    self.message("adj AD of sparse column vector wrt sparse column vector")
-    n=array([1.2,2.3,7])
-    def reference(n):
-      x=n[0]
-      y=n[1]
-      z=n[2]
-      return array([[1,0,0,0,0],[0,0,0,0,0],[1,0,4*y,0,0],[0,0,0,0,0],[1,0,6*y**2,0,12*z**3]])
-    
-    f=SXFunction(self.inputs['sparse column vector'],self.outputs['sparse column vector'])
-    f.init()
-    f.input().set(n)
-    self.assertEqual(f.adjSeed().shape,(5,1),"adjSeed shape")
-    self.assertEqual(f.adjSeed().size(),3,"adjSeed shape")
-    for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-      f.adjSeed().set(d)
-      f.evaluate(0,1)
-      self.checkarray(f.adjSens(),dot(reference(n).T,array(f.adjSeed())),"AD") 
-           
 if __name__ == '__main__':
     unittest.main()
 
