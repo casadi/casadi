@@ -109,7 +109,7 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 		if (!(is_array(narray) && array_numdims(narray)==1))
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
 		array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-		int size=array_size(narray,0); // number on non-zeros
+		int size=array_size(array,0); // number on non-zeros
 
 		double* d=(double*) array->data;
 		std::vector<double> v(d,d+size);
@@ -234,18 +234,18 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 	PyObject* p = $input;
 	if (is_array(p)) {
 			array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-			if (array_numdims(p)==2) {
-				if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) )
+			if (array_numdims(array)==2) {
+				if (!(array_size(array,0)==arg1->size1() && array_size(array,1)==arg1->size2()) )
 			    SWIG_exception_fail(SWIG_TypeError, "Array is not of correct shape.");
 			  $3 = CasADi::DENSE;
-			  $2 = array_size(p,0)*array_size(p,1);
-			  $1 = (double*) array_data(p);
-			} else if (array_numdims(p)==1) {
-				if (!(array_size(p,0)==arg1->size()) )
+			  $2 = array_size(array,0)*array_size(array,1);
+			  $1 = (double*) array_data(array);
+			} else if (array_numdims(array)==1) {
+				if (!(array_size(array,0)==arg1->size()) )
 			    SWIG_exception_fail(SWIG_TypeError, "Array is not of correct size. Should match number of non-zero elements.");
 			  $3 = CasADi::SPARSE;
-			  $2 = array_size(p,0);
-			  $1 = (double*) array_data(p);
+			  $2 = array_size(array,0);
+			  $1 = (double*) array_data(array);
 			} else {
 			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
 			}

@@ -112,6 +112,28 @@ class typemaptests(casadiTestCase):
     #print DMatrix(array([1,2,3,6]),2,2).toArray()
 
     #print DMatrix(array([1,2,3,6]),2,2).toArray()
+    
+  def test_set(self):
+    self.message("DMatrix set on dense matrices")
+    
+    # should be integers
+    goallist = [1,2,3]
+    goal = array([goallist]).T
 
+    test={
+      "list" : goallist,
+      "tuple" : tuple(goallist),
+      "array1ddouble" : array(goallist,dtype=double),
+      "array2ddouble" : array([goallist],dtype=double).T,
+      "array1dint" : array(goallist),
+      "array2dint" : array([goallist]).T
+    }
+    w=DMatrix(goal)
+    self.checkarray(w,goal,"Constructor")
+    
+    for name, value in test.items():
+      w.set(value)
+      self.checkarray(w,goal,"name")
+    
 if __name__ == '__main__':
     unittest.main()
