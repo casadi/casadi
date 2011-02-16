@@ -16,6 +16,12 @@ namespace CasADi{
 %}
 
 %pythoncode %{
+    @property
+    def T(self):
+        return trans(self)
+%}
+    
+%pythoncode %{
   def toArray(self):
     import numpy as n
     r = n.zeros((self.size1(),self.size2()))

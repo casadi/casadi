@@ -52,6 +52,12 @@ namespace CasADi{
         def shape(self):
             return (self.size1(),self.size2())
     %}
+    
+    %pythoncode %{
+        @property
+        def T(self):
+            return trans(self)
+    %}
 
   };
 } // namespace CasADi
