@@ -74,10 +74,12 @@ public:
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
 
-  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
+  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations
+  \see CasADi::Jacobian for an AD approach.
+   */
   virtual Integrator jac(int iind=0, int oind=0);
 
-  /** \brief Get the Jacobian
+  /** \brief Get the jacobian in the nonlinear iteration
   * The result is an CasADi::FX mapping from CasADi::Sundials::MInput to CasADi::Sundials::MOutput
   */
   virtual FX getJacobian();
