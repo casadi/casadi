@@ -56,44 +56,55 @@ class ADtests(casadiTestCase):
     }
   
   
-  def test_fwdcol(self):
-    inputshape = "column"
-    outputshape = "column"
+  def test_fwd(self):
     n=array([1.2,2.3,7])
-    
-    for inputtype in ["sparse","dense"]:
-      for outputtype in ["sparse","dense"]:
-        self.message("fwd AD. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-        f=SXFunction(self.inputs[inputshape][inputtype],self.outputs[outputshape][outputtype])
-        f.init()
-        f.input().set(n)
-        self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
-        self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
-        for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-          f.fwdSeed().set(d)
-          f.evaluate(1,0)
-          J = self.jacobians[inputtype][outputtype](*n)
-          self.checkarray(f.fwdSens(),dot(J,array(f.fwdSeed())),"AD")
+    for inputshape in ["column","row"]:
+      for outputshape in ["column","row"]:
+        for inputtype in ["sparse","dense"]:
+          for outputtype in ["sparse","dense"]:
+            self.message("fwd AD. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            f=SXFunction(self.inputs[inputshape][inputtype],self.outputs[outputshape][outputtype])
+            f.init()
+            f.input().set(n)
+            self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
+            self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
+            J = self.jacobians[inputtype][outputtype](*n)
+            for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
+              f.fwdSeed().set(d)
+              f.evaluate(1,0)
+              seed = array(f.fwdSeed())
+              if inputshape == "row":
+                seed = seed.T
+              sens = array(f.fwdSens())
+              if outputshape == "row":
+                sens = sens.T
+              self.checkarray(sens,dot(J,seed),"AD")
 
-  def test_adjcol(self):
-    inputshape = "column"
-    outputshape = "column"
+  def test_adj(self):
     n=array([1.2,2.3,7])
-    
-    for inputtype in ["sparse","dense"]:
-      for outputtype in ["sparse","dense"]:
-        self.message("adj AD. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-        f=SXFunction(self.inputs[inputshape][inputtype],self.outputs[outputshape][outputtype])
-        f.init()
-        f.input().set(n)
-        self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
-        self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
-        for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
-          f.adjSeed().set(d)
-          f.evaluate(0,1)
-          J = self.jacobians[inputtype][outputtype](*n)
-          self.checkarray(f.adjSens(),dot(J.T,array(f.adjSeed())),"AD")
- 
+    for inputshape in ["column","row"]:
+      for outputshape in ["column","row"]:
+        for inputtype in ["sparse","dense"]:
+          for outputtype in ["sparse","dense"]:
+            self.message("adj AD. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            f=SXFunction(self.inputs[inputshape][inputtype],self.outputs[outputshape][outputtype])
+            f.init()
+            f.input().set(n)
+            self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
+            self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
+            J = self.jacobians[inputtype][outputtype](*n)
+            for d in [array([1,0,0]),array([0,2,0]),array([1.2,4.8,7.9])]:
+              f.adjSeed().set(d)
+              f.evaluate(0,1)
+              seed = array(f.adjSeed())
+              if outputshape == "row":
+                seed = seed.T
+              sens = array(f.adjSens())
+              if inputshape == "row":
+                sens = sens.T
+              
+              self.checkarray(sens,dot(J.T,seed),"AD")
+          
       
 if __name__ == '__main__':
     unittest.main()
