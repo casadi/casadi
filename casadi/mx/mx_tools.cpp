@@ -27,6 +27,7 @@
 #include "norm.hpp"
 #include "multiplication.hpp"
 #include "if_else_node.hpp"
+#include "../fx/mx_function.hpp"
 
 namespace CasADi{
 
@@ -154,6 +155,15 @@ MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
   return if_else_zero(cond,if_true) + if_else_zero(1-cond,if_false);
 }
 
-  
+MX substitute(const MX &ex, const MX &var, const MX &expr) {
+  if(var.empty()) return ex; // quick return if empty
+  casadi_assert_message(var->isSymbolic(),"the variable is not symbolic");
+  casadi_assert_message(var.size1() == expr.size1() && var.size2() == expr.size2(),"the dimensions do not match");
+
+  MXFunction fcn(var,ex);
+  fcn.init();
+  return fcn.call(expr).at(0);
+}
+
 } // namespace CasADi
 
