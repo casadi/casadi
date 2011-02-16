@@ -36,7 +36,10 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   addOption("finite_differences", OT_BOOLEAN,   false);    // Using finite differences instead of automatic differentiation
   addOption("ad_mode",            OT_STRING,  "default");  // "forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint
   setOption("sparse", false);
-
+  
+  casadi_assert_message(fcn_.input(iind_).size() == fcn_.input(iind_).numel(),"Jacobian not yet implemented for sparse input");
+  casadi_assert_message(fcn_.output(oind_).size()== fcn_.output(oind_).numel(),"Jacobian not yet implemented for sparse output");
+  
   // make sure that input and output are vectors (not matrices)
   casadi_assert(fcn_.input(iind_).size2() == 1);
   casadi_assert(fcn_.output(oind_).size2() == 1);
