@@ -12,6 +12,8 @@ namespace CasADi{
     def __getitem__(self,s):
       if isinstance(s,slice):
         s = (s,[0])
+      elif isinstance(s,int) and s < 0:
+        s = s + self.size()
       if isinstance(s,tuple) and len(s)==2 and (isinstance(s[1],slice) or isinstance(s[0],slice)):
         s = list(s)
         for k in range(2):
@@ -29,6 +31,8 @@ namespace CasADi{
     def __setitem__(self,s,val):
       if isinstance(s,slice):
         s = (s,[0])
+      elif isinstance(s,int) and s < 0:
+        s = s + self.size()
       if isinstance(s,tuple) and len(s)==2 and (isinstance(s[1],slice) or isinstance(s[0],slice)):
         s = list(s)
         for k in range(2):
