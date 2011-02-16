@@ -98,7 +98,7 @@ MX reshape(const MX &x, const std::vector<int> sz);
     Flattening is a cheap (non-copying) operation
     Same as reshape(x, x.numel(),1)
 */
-MX flatten(const MX &x);
+MX vec(const MX &x);
   
 /** \brief substitute variable var with expression expr
 * This method is not very efficient, as it requires the initialization of an MXFunction.

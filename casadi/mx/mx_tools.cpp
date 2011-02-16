@@ -140,7 +140,7 @@ MX reshape(const MX &x, int n, int m){
   }
 }
 
-MX flatten(const MX &x) {
+MX vec(const MX &x) {
   return reshape(x,x.numel(),1);
 }
 
