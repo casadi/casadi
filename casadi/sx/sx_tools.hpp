@@ -147,7 +147,7 @@ void simplify(Matrix<SX> &ex);
 /// remove identical calculations
 void compress(Matrix<SX> &ex, int level=5); 
 /// substitute variable var with expression expr
-void substitute(Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr); 
+Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr); 
 
 /** \brief  Make the expression smooth by replacing non-smooth nodes with binary variables */
 void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr);

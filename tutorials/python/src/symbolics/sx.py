@@ -51,7 +51,7 @@ x=symbolic("x")
 
 y=x*x
 print y
-substitute(y,x,symbolic("w"))
+print substitute(y,x,symbolic("w"))
 print y
 #! More operators
 #! ------------------------------
