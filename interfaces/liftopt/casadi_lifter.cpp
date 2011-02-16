@@ -20,31 +20,38 @@
  *
  */
 
-#ifndef NLP_SOLVER_INTERNAL_HPP
-#define NLP_SOLVER_INTERNAL_HPP
-
-#include "nlp_solver.hpp"
-#include "fx_internal.hpp"
-
+#include "casadi_lifter.hpp"
+using namespace std;
 namespace CasADi{
-    
-/** \brief NLP solver storage class
-  \author Joel Andersson 
-  \date 2010
-*/
-class NLPSolverInternal : public FXInternal{
+  namespace Interfaces{
 
-public:
-  explicit NLPSolverInternal();
-  virtual ~NLPSolverInternal() = 0;
+void CasadiLifter::liftfun(double *v, int n, void *user_data){
+  static_cast<CasadiLifter*>(user_data)->setNode(v,n);
+}
 
-  virtual void init();
+long CasadiLifter::evalUserFcn ( liftopt::TLifterArgs<double>& args )
+{
+  MXFunction& F = interface_->fcn_;
+  if(m_activeProblemFormulation ==  Problem_Residual ){
+    F.setInput(args.u,LO_U);
+    F.evaluate(0,0);
+    F.getOutput(args.objRes,LO_OBJRES);
+    F.getOutput(args.eq,LO_EQ);
+  }
+  if(m_activeProblemFormulation ==  Problem_LagGrad){
+    F.setInput(args.u,LO_U);
+    F.setInput(args.lambda,LO_LAMBDA);
+    F.adjSeed(LO_OBJRES).setAll(0);
+    F.adjSeed(LO_EQ).setAll(0);
+    F.setAdjSeed(0.0,LO_OBJ);
+    F.setAdjSeed(1.0,LO_LAGFCN);
+    F.evaluate(0,1);
+    F.getOutput(args.eq,LO_EQ);
+    F.getOutput(args.objVal,LO_OBJ);
+    F.getAdjSens(args.laggrad);
+  }
+  return 0;
+}
 
-protected:
-  int n_,m_;
-
-};
-
+  } // namespace Interfaces
 } // namespace CasADi
-
-#endif //NLP_SOLVER_INTERNAL_HPP

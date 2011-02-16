@@ -48,7 +48,18 @@ public:
                       const double * const lambda,double * const obj, double * const c, double * const objGrad,
                       double * const jac, double * const hessian, double * const hessVector, void *userParams);
   
-
+                      
+  /// objective function
+  FX F_;
+  /// constraint function
+  FX G_; 
+  /// Hessian of the Lagrangian function
+  FX H_;
+  /// Jacobian of the constraint function
+  FX J_; 
+  /// Gradient of the objective function
+  FX GF_; 
+                      
   // KNITRO context pointer
   KTR_context_ptr kc_handle_;
   

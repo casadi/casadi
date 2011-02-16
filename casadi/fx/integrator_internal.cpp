@@ -23,6 +23,7 @@
 #include "integrator_internal.hpp"
 #include <cassert>
 #include "../stl_vector_tools.hpp"
+#include "jacobian.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -47,8 +48,6 @@ IntegratorInternal::IntegratorInternal(){
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("stop_at_end",                 OT_BOOLEAN, false); // Stop the integrator at the end of the interval
-  addOption("jacmap",                      OT_INTEGERVECTOR, Option()); // if the integrator is the Jacobian of another integrator, this option will contain the mapping between the states
-  addOption("jacinit",                     OT_REALVECTOR, Option()); // initial values to the forward sensitivities
   addOption("nrhs",                        OT_INTEGER, 1); // number of right hand sides
   addOption("t0",                          OT_REAL, 0.0); // start of the integration (gives an initial value for INTEGRATOR_T0, which will be removed)
   addOption("tf",                          OT_REAL, 1.0); // end of the integration (gives an initial value for INTEGRATOR_TF, which will be removed)
@@ -151,6 +150,8 @@ void IntegratorInternal::init(){
 }
 
 FX IntegratorInternal::jacobian(int iind, int oind){
+  if(symbjac()){
+  
   // Create a new integrator for the forward sensitivity equations
   Integrator fwdint = jac(iind,oind);
 
@@ -163,26 +164,18 @@ FX IntegratorInternal::jacobian(int iind, int oind){
     default: casadi_assert_message(false,"iind must be INTEGRATOR_P, INTEGRATOR_X0 or INTEGRATOR_Z0");
   }
   
-  // Initial value for the integrators
-  fwdint.printOptions();
-  vector<double> jacinit(nx_*ns,0.0);
-  if(iind==INTEGRATOR_X0){
-    for(int i=0; i<ns; ++i)
-      jacinit.at(i+nx_*i) = 1;
-    fwdint.setOption("jacinit",jacinit);
-  }
-
-  // Mapping between states in the augmented dae and the original dae
-  fwdint.setOption("jacmap",jacmap(ns));
-
   // Generate an jacobian
   IntegratorJacobian intjac(fwdint);
 
   // Derivative with respect to what?
   intjac.setOption("derivative_index",iind);
   
-  fwdint.printOptions();
   return intjac;
+  } else { 
+    Integrator I;
+    I.assignNode(this);
+    return Jacobian(I,iind,oind);
+  }
 }
 
 

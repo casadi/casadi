@@ -34,6 +34,9 @@ namespace CasADi{
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std::vector<MX>& outputv_) : inputv(inputv_), outputv(outputv_){
   setOption("name", "unnamed_mx_function");
 
+  liftfun_ = 0;
+  liftfun_ud_ = 0;
+
   // Allocate space for inputs
   setNumInputs(inputv.size());
   for(int i=0; i<input_.size(); ++i)
@@ -53,7 +56,11 @@ void MXFunctionInternal::makeAlgorithm(MXNode* root, vector<MXNode*> &nodes, map
     // Quick return if root is null
     if(root==0)
       return;
-  
+
+    // Quick return if already in algorithm
+    if(nodemap.find(root)!=nodemap.end())
+      return;
+    
     // Stack
     stack<MXNode*> s;
     s.push(root);
@@ -117,7 +124,6 @@ void MXFunctionInternal::init(){
   }
   
   // Make sure that the output nodes are placed directly after the corresponding multiple output node
-  
   
   // Create runtime elements for each node
   alg.resize(nodes.size());
@@ -192,6 +198,11 @@ int MXFunctionInternal::findEl(const MX& mx) const{
   return it->second;
 }
 
+void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_data){
+  liftfun_ = liftfun;
+  liftfun_ud_ = user_data;
+}
+
 void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
   log("MXFunctionInternal::evaluate begin");
   int nfdir = fsens_order ? nfdir_ : 0;
@@ -207,8 +218,13 @@ void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
       alg[inputv_ind[ind]].val.dataF.at(dir).set(fwdSeed(ind,dir));
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++)
+  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
     it->mx->evaluate(it->input, it->output, it->fwdSeed, it->fwdSens, it->adjSeed, it->adjSens, nfdir, 0);
+    // Lifting
+    if(liftfun_ && it->mx->isNonLinear()){
+      liftfun_(it->output,it->mx.size(),liftfun_ud_);
+    }
+  }
   
   log("MXFunctionInternal::evaluate evaluated forward");
 
@@ -267,7 +283,10 @@ void MXFunctionInternal::print(ostream &stream) const{
 }
 
 MXFunctionInternal* MXFunctionInternal::clone() const{
-  return new MXFunctionInternal(*this);
+  MXFunctionInternal* node = new MXFunctionInternal(inputv,outputv);
+  node->setOption(dictionary());
+  if(isInit()) node->init();
+  return node;
 }
 
 

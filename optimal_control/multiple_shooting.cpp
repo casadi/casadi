@@ -56,6 +56,23 @@ MultipleShootingInternal* MultipleShooting::operator->(){
   return (MultipleShootingInternal*)FX::operator->();
 }
 
+void MultipleShooting::getGuess(std::vector<double>& V_init) const{
+  (*this)->getGuess(V_init);
+}
+    
+void MultipleShooting::getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const{
+  (*this)->getVariableBounds(V_min,V_max);
+}
+    
+void MultipleShooting::getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const{
+  (*this)->getConstraintBounds(G_min,G_max);
+}
+
+void MultipleShooting::setOptimalSolution( const std::vector<double> &V_opt ){
+  (*this)->setOptimalSolution(V_opt);
+}
+
+
   } // namespace OptimalControl
 } // namespace CasADi
 

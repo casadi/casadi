@@ -100,6 +100,9 @@ class MXNode : public SharedObjectNode{
     /** \brief Generate all the partial derivatives for the node - needed for symbolic AD algorithm */
     virtual std::vector<MX> partial() const;
 
+    /** \brief Is the node nonlinear */
+    virtual bool isNonLinear(){return false;} 
+    
   protected:
     
     /// Set the sparsity

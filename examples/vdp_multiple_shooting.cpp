@@ -57,8 +57,8 @@ int main(){
   int num_nodes = 100;
   
   //Create an integrator (CVodes)
-  //IdasIntegrator I(res); // TODO: MAKE THIS WORK!
-  CVodesIntegrator I(rhs);
+  IdasIntegrator I(res);
+  //CVodesIntegrator I(rhs);
   I.setOption("abstol",1e-8); //abs. tolerance
   I.setOption("reltol",1e-8); //rel. tolerance
   I.setOption("steps_per_checkpoint",500);
@@ -83,7 +83,7 @@ int main(){
   MultipleShooting ms(I,mterm);
   ms.setOption("number_of_grid_points",ns);
   ms.setOption("final_time",tf);
-  ms.setOption("parallelization","openmp");
+//  ms.setOption("parallelization","openmp");
   
   ms.init();
 

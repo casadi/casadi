@@ -20,31 +20,34 @@
  *
  */
 
-#ifndef NLP_SOLVER_INTERNAL_HPP
-#define NLP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_LIFTER_HPP
+#define CASADI_LIFTER_HPP
 
-#include "nlp_solver.hpp"
-#include "fx_internal.hpp"
+#include "liftopt_internal.hpp"
 
 namespace CasADi{
-    
-/** \brief NLP solver storage class
-  \author Joel Andersson 
-  \date 2010
-*/
-class NLPSolverInternal : public FXInternal{
+  namespace Interfaces{
 
-public:
-  explicit NLPSolverInternal();
-  virtual ~NLPSolverInternal() = 0;
+class CasadiLifter: public liftopt::ILifter{
+  public:
+    CasadiLifter(LiftoptInternal* interface): liftopt::ILifter( "casadi_interface" ), interface_(interface) {
+      m_nObjRes = interface_->m_nObjRes_;
+      m_nCtrls  = interface_->m_nCtrls_;
+      m_nEq     = interface_->m_nEq_;
+      m_nIneq   = interface_->m_nIneq_;
+      m_presentProblemFormulations.set ( Problem_Residual );
+      m_presentProblemFormulations.set ( Problem_LagGrad );
+    };
 
-  virtual void init();
-
-protected:
-  int n_,m_;
-
+    virtual ~CasadiLifter(){};
+    virtual long evalUserFcn ( liftopt::TLifterArgs<double>& args );
+    static void liftfun(double *v, int n, void *user_data);
+    LiftoptInternal* interface_;
 };
 
+  } // namespace Interfaces
 } // namespace CasADi
 
-#endif //NLP_SOLVER_INTERNAL_HPP
+
+#endif // CASADI_LIFTER_HPP
+

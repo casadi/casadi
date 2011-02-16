@@ -34,8 +34,8 @@ int main(){
   FMIParser parser("../examples/python/cstr/modelDescription.xml");
 
   // Dump representation to screen
-  cout << "XML representation:" << endl;
-  parser.print();
+//   cout << "XML representation:" << endl;
+//   parser.print();
 
   // Obtain the symbolic representation of the OCP
   OCP ocp = parser.parse();
@@ -62,46 +62,51 @@ int main(){
   Matrix<double> u_sca = nominal(var.u);
   Matrix<double> p_sca = nominal(var.p);
 
-  cout <<  "x_sca = " << x_sca << endl;
-  cout << "z_sca = " <<  z_sca << endl;
-  cout << "u_sca = " << u_sca << endl;
-  cout << "p_sca = " << p_sca << endl;
-
   // Initial guess for the state
-  double x0d[] = {0.0, T_init, c_init};
-  DMatrix x0 = vector<double>(x0d,x0d+3)/x_sca;
-
-  // Initial guess for the control
-  double u0d[] = {280};
-  DMatrix u0 = vector<double>(u0d,u0d+1)/u_sca;
+  DMatrix x0(3,1,0);
+  x0[0] = 0.0;
+  x0[1] = T_init;
+  x0[2] = c_init;
   
-  // Create an implicit function
+  // Initial guess for the control
+  DMatrix u0 = 280/u_sca;
+  
+  // Integrator instance
+  Integrator integrator;
+
+  // Create an implicit function residual
   vector<Matrix<SX> > impres_in(ODE_NUM_IN+1);
   impres_in[0] = xdot;
   impres_in[1+ODE_T] = t;
   impres_in[1+ODE_Y] = x;
   impres_in[1+ODE_P] = u;
-  SXFunction impres(impres_in,SXMatrix(scaled_ocp.dae));
+  SXFunction impres(impres_in,scaled_ocp.dae);
+  
+  // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
   ode.init();
-    
-  // Create an integrator
+  
+  // DAE residual
   vector<Matrix<SX> > dae_in(DAE_NUM_IN);
   dae_in[DAE_T] = t;
   dae_in[DAE_Y] = x;
   dae_in[DAE_YDOT] = xdot;
   dae_in[DAE_Z] = z;
   dae_in[DAE_P] = u;
+  SXFunction dae(dae_in,scaled_ocp.dae);
 
-  double dae_scad[] = {1e7,1000.,350.};
-  vector<double> dae_sca(dae_scad,dae_scad+3);
-  SXFunction dae(dae_in,SXMatrix(scaled_ocp.dae)/dae_sca);
-  
-  // Number of shooting nodes
-  int num_nodes = 100;
-  
-  //IdasIntegrator integrator(dae); // TODO: MAKE THIS WORK!
-  CVodesIntegrator integrator(ode);
+  bool use_kinsol = true;
+  if(use_kinsol){
+    // Create an ODE integrator (CVodes)
+    integrator = CVodesIntegrator(ode);
+    
+  } else {
+    // Create DAE integrator (IDAS)
+    integrator = IdasIntegrator(dae);
+    
+  }
+
+  // Set integrator options
   integrator.setOption("number_of_fwd_dir",1);
   integrator.setOption("number_of_adj_dir",0);
   integrator.setOption("exact_jacobian",true);
@@ -111,25 +116,18 @@ int main(){
   integrator.setOption("reltol",1e-8);
   integrator.init();
 
-  IdasIntegrator integrator2(dae); // TODO: MAKE THIS WORK!
-  integrator2.setOption("number_of_fwd_dir",1);
-  integrator2.setOption("number_of_adj_dir",0);
-  integrator2.setOption("exact_jacobian",true);
-  integrator2.setOption("fsens_err_con",true);
-  integrator2.setOption("quad_err_con",true);
-  integrator2.setOption("abstol",1e-8);
-  integrator2.setOption("reltol",1e-8);
-  integrator2.init();
-
   // Mayer objective function
   Matrix<SX> xf = symbolic("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
   
+  // Number of shooting nodes
+  int num_nodes = 100;
+
   // Create a multiple shooting discretization
   MultipleShooting ms(integrator,mterm);
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
-  ms.setOption("parallelization","openmp");
+//  ms.setOption("parallelization","openmp");
   ms.init();
 
   for(int k=0; k<num_nodes; ++k){
@@ -140,14 +138,14 @@ int main(){
 
   for(int k=0; k<=num_nodes; ++k){
     for(int i=0; i<x.size(); ++i){
-      ms.input(OCP_X_INIT)(i,k) = x0[i];
+      ms.input(OCP_X_INIT)(i,k) = x0[i]/x_sca[i];
     }
   }
   
   // Bounds on state
   double inf = numeric_limits<double>::infinity();
-  fill(ms.input(OCP_LBX).begin(),ms.input(OCP_LBX).end(),-inf);
-  fill(ms.input(OCP_UBX).begin(),ms.input(OCP_UBX).end(),inf);
+  ms.input(OCP_LBX).setAll(-inf);
+  ms.input(OCP_UBX).setAll(inf);
   for(int k=1; k<=num_nodes; ++k)
     ms.input(OCP_UBX)(1,k) = 350/x_sca[1];
 
@@ -170,7 +168,7 @@ int main(){
   ms.setNLPSolver(solver);
   
   // Solve the problem
-  ms.evaluate(0,0);
+  ms.solve();
   
   cout << solver.output() << endl;
   

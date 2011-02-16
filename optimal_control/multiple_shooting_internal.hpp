@@ -46,7 +46,19 @@ class MultipleShootingInternal : public OCPSolverInternal{
 
     // Solve the OCP
     virtual void evaluate(int fsens_order, int asens_order);
+   
+    // Get the variables
+    void getGuess(std::vector<double>& V_init) const;
     
+    // Get the variables
+    void getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const;
+    
+    // Get the constraints
+    void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
+
+    // Set the optimal solution
+    void setOptimalSolution( const std::vector<double> &V_opt );
+
   protected:
         
     // NLP objective function
@@ -57,6 +69,9 @@ class MultipleShootingInternal : public OCPSolverInternal{
 
     // Jacobian of the NLP constraints
     MXFunction J_;
+
+    // Evaluates F and G as well as the lagrangian: L = sigma*f + lambda'*g
+    MXFunction FG_;
 
     // NLP solver
     NLPSolver nlp_solver_;

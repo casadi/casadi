@@ -3,6 +3,7 @@ find_package(KNITRO QUIET)
 find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
+find_package(LIFTOPT QUIET)
 
 include_directories(../)
 
@@ -91,6 +92,12 @@ target_link_libraries(sundials_testing
 )
 ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
 
+if(LIFTOPT_FOUND)
+include_directories(${LIFTOPT_INCLUDE_DIRS})
+add_executable(test_liftopt test_liftopt.cpp)
+target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES})
+
+endif(LIFTOPT_FOUND)
 
 
 

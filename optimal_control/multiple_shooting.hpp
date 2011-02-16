@@ -69,6 +69,18 @@ class MultipleShooting : public OCPSolver{
     
     /// Get the NLP Jacobian function
     FX getJ() const;
+
+    /// Get the variables
+    void getGuess(std::vector<double>& V_init) const;
+    
+    /// Get the variables
+    void getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const;
+    
+    /// Get the constraints
+    void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
+
+    /// Set the optimal solution
+    void setOptimalSolution( const std::vector<double> &V_opt );
     
     /// Set NLP solver
     void setNLPSolver(const NLPSolver& nlp_solver);

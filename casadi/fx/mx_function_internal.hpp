@@ -67,6 +67,9 @@ class MXFunctionInternal : public FXInternal{
     /** \brief  Initialize */
     virtual void init();
     
+    /** \brief Set the lifting function */
+    void setLiftingFunction(LiftingFunction liftfun, void* user_data);
+
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 
@@ -86,6 +89,10 @@ class MXFunctionInternal : public FXInternal{
   
     /** \brief  Does an element exist in the algorithm */  
     bool hasEl(const MX& mx) const;
+    
+    // Lifting function
+    LiftingFunction liftfun_;
+    void* liftfun_ud_;
 };
 
 } // namespace CasADi

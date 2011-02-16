@@ -69,6 +69,9 @@ class EvaluationOutput : public OutputNode{
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
+    /** \brief Is the node nonlinear */
+    virtual bool isNonLinear(){return true;} 
+
     FX fcn_;
     int oind_;
 };

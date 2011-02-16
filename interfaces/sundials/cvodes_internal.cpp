@@ -1276,6 +1276,14 @@ void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   M_ = jac;
 }
 
+
+bool CVodesInternal::symbjac(){
+  SXFunction f = shared_cast<SXFunction>(f_);
+  SXFunction q = shared_cast<SXFunction>(q_);
+
+  return !f.isNull() && q_.isNull() == q.isNull();
+}
+
 Integrator CVodesInternal::jac(int iind, int oind){
   casadi_assert_message(oind==INTEGRATOR_XF,"CVodesInternal::jacobian: Not derivative of state");
   

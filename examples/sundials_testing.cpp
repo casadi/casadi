@@ -406,7 +406,7 @@ int main(){
     cout << "finite differences, 2nd order   " << fd2 << endl;
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
-    IntegratorJacobian intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
+    FX intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
     Jacobian intjac2(integrator,INTEGRATOR_P,INTEGRATOR_XF);
 
     // Set options

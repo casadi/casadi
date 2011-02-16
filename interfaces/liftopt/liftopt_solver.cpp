@@ -20,31 +20,41 @@
  *
  */
 
-#ifndef NLP_SOLVER_INTERNAL_HPP
-#define NLP_SOLVER_INTERNAL_HPP
-
-#include "nlp_solver.hpp"
-#include "fx_internal.hpp"
+#include "liftopt_internal.hpp"
+using namespace std;
 
 namespace CasADi{
-    
-/** \brief NLP solver storage class
-  \author Joel Andersson 
-  \date 2010
-*/
-class NLPSolverInternal : public FXInternal{
+  namespace Interfaces{
 
-public:
-  explicit NLPSolverInternal();
-  virtual ~NLPSolverInternal() = 0;
+LiftoptSolver::LiftoptSolver(){ 
+}
 
-  virtual void init();
+LiftoptSolver::LiftoptSolver(const MXFunction& fcn){
+  assignNode(new LiftoptInternal(fcn));
+}
 
-protected:
-  int n_,m_;
+LiftoptInternal* LiftoptSolver::operator->(){
+  return (LiftoptInternal*)(FX::operator->());
+}
 
-};
+const LiftoptInternal* LiftoptSolver::operator->() const{
+  return (const LiftoptInternal*)(FX::operator->());
+}
 
+bool LiftoptSolver::checkNode() const{
+  return dynamic_cast<const LiftoptInternal*>(get());
+}
+
+std::vector<double>& LiftoptSolver::nodeInit(){
+  return (*this)->nodeInit;
+}
+
+const std::vector<double>& LiftoptSolver::nodeInit() const{
+  return (*this)->nodeInit;
+}
+
+
+
+  } // namespace Interfaces
 } // namespace CasADi
 
-#endif //NLP_SOLVER_INTERNAL_HPP

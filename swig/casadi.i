@@ -185,16 +185,21 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "superlu.i"
 #endif
 
-// LAPACK
 #ifdef WITH_LAPACK
 %include "lapack_interface.i"
 #endif
 
-// LAPACK
 #ifdef WITH_KNITRO
 %{ 
   #include "interfaces/knitro/knitro_solver.hpp"
 %}
 %include "interfaces/knitro/knitro_solver.hpp"
+#endif
+
+#ifdef WITH_LIFTOPT
+%{ 
+  #include "interfaces/liftopt/liftopt_solver.hpp"
+%}
+%include "interfaces/liftopt/liftopt_solver.hpp"
 #endif
 

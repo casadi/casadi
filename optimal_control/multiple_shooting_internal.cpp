@@ -90,7 +90,7 @@ void MultipleShootingInternal::init(){
   vector<vector<MX> > pI_out = ffcn_.call(ffcn_in,paropt);
 
   //Constraint function
-  vector<MX> g(nk_);
+  vector<MX> gg(nk_);
 
   // Collect the outputs
   for(int k=0; k<nk_; ++k){
@@ -98,20 +98,48 @@ void MultipleShootingInternal::init(){
     MX XF = pI_out[k][INTEGRATOR_XF];
     
     //append continuity constraints
-    g[k] = XF-X[k+1];
+    gg[k] = XF-X[k+1];
   }
 
   // Terminal constraints
-  G_ = MXFunction(V,vertcat(g));
+  MX g = vertcat(gg);
+  G_ = MXFunction(V,g);
 
   // Objective function
-  F_ = MXFunction(V,mfcn_.call(X[nk_-1]));
+  vector<MX> f = mfcn_.call(X[nk_-1]);
+  F_ = MXFunction(V,f);
 
+  // Objective scaling factor
+  MX sigma("sigma");
+  
+  // Lagrange multipliers
+  MX lambda("lambda",g.size1());
+  
+  // Lagrangian
+  MX L = sigma*f[0] + inner_prod(lambda,g);
+  
+  // Input of the function
+  vector<MX> FG_in(3);
+  FG_in[0] = V;
+  FG_in[1] = lambda;
+  FG_in[2] = sigma;
+
+  // Output of the function
+  vector<MX> FG_out(3);
+  FG_out[0] = f[0];
+  FG_out[1] = g;
+  FG_out[2] = L;
+  
+  // Function that evaluates function and constraints that can also be used to get the gradient of the constraint
+  FG_ = MXFunction(FG_in,FG_out);
+  
   // Evaluate Jacobian blocks in parallel
-  Jacobian IjacX(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
+  FX IjacX = ffcn_.jacobian(INTEGRATOR_X0,INTEGRATOR_XF);
+  IjacX.init();
   vector<vector<MX> > pJX_out = IjacX.call(ffcn_in,paropt);
   
-  Jacobian IjacP(ffcn_,INTEGRATOR_P,INTEGRATOR_XF);
+  FX IjacP = ffcn_.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
+  IjacP.init();
   vector<vector<MX> > pJP_out = IjacP.call(ffcn_in,paropt);
 
   // Empty matrices with the same size as the Jacobian blocks
@@ -160,46 +188,53 @@ void MultipleShootingInternal::init(){
   J_ = MXFunction(V,vertcat(JJ));
 }
 
-void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
-  // NLP Variable bounds and initial guess
-  vector<double> &V_min = nlp_solver_.input(NLP_LBX);
-  vector<double> &V_max = nlp_solver_.input(NLP_UBX);
-  vector<double> &V_init = nlp_solver_.input(NLP_X_INIT);
-  
+void MultipleShootingInternal::getGuess(vector<double>& V_init) const{
   // Pass bounds on state
-  const vector<double> &x_min = input(OCP_LBX);
-  const vector<double> &x_max = input(OCP_UBX);
   const vector<double> &x_init = input(OCP_X_INIT);
   for(int k=0; k<nk_+1; ++k){
     for(int i=0; i<nx_; ++i){
       V_init[k*(nu_+nx_)+i] = x_init[k+i*(nk_+1)];
+    }
+  }
+
+  // Pass bounds on control
+  const vector<double> &u_init = input(OCP_U_INIT);
+  for(int k=0; k<nk_; ++k){
+    for(int i=0; i<nu_; ++i){
+      V_init[k*(nu_+nx_)+nx_+i] = u_init[k+i*nk_];
+    }
+  }
+}
+
+void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
+  // Pass bounds on state
+  const vector<double> &x_min = input(OCP_LBX);
+  const vector<double> &x_max = input(OCP_UBX);
+  for(int k=0; k<nk_+1; ++k){
+    for(int i=0; i<nx_; ++i){
       V_min[k*(nu_+nx_)+i] = x_min[k+i*(nk_+1)];
       V_max[k*(nu_+nx_)+i ]= x_max[k+i*(nk_+1)];
     }
   }
-  
+
   // Pass bounds on control
   const vector<double> &u_min = input(OCP_LBU);
   const vector<double> &u_max = input(OCP_UBU);
-  const vector<double> &u_init = input(OCP_U_INIT);
   for(int k=0; k<nk_; ++k){
     for(int i=0; i<nu_; ++i){
       V_min[k*(nu_+nx_)+nx_+i] = u_min[k+i*nk_];
       V_max[k*(nu_+nx_)+nx_+i] = u_max[k+i*nk_];
-      V_init[k*(nu_+nx_)+nx_+i] = u_init[k+i*nk_];
     }
   }
-  
+}
+
+void MultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
   // Set constraint bounds to zero by default
-  nlp_solver_.input(NLP_LBG).setZero();
-  nlp_solver_.input(NLP_UBG).setZero();
+  fill(G_min.begin(),G_min.end(),0);
+  fill(G_max.begin(),G_max.end(),0);
+}
 
-  //Solve the problem
-  nlp_solver_.solve();
-
-  // Optimal solution
-  const vector<double> &V_opt = nlp_solver_.output(NLP_X_OPT);
-  
+void MultipleShootingInternal::setOptimalSolution( const vector<double> &V_opt ){
   // Pass bounds on state
   vector<double> &x_opt = output(OCP_X_OPT);
   for(int k=0; k<nk_+1; ++k){
@@ -215,6 +250,21 @@ void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
       u_opt[k+i*nk_] = V_opt[k*(nu_+nx_)+nx_+i];
     }
   }
+}
+
+void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
+  // get NLP variable bounds and initial guess
+  getGuess(nlp_solver_.input(NLP_X_INIT));
+  getVariableBounds(nlp_solver_.input(NLP_LBX),nlp_solver_.input(NLP_UBX));
+       
+  // get NLP constraint bounds
+  getConstraintBounds(nlp_solver_.input(NLP_LBG), nlp_solver_.input(NLP_UBG));
+       
+  //Solve the problem
+  nlp_solver_.solve();
+  
+  // Save the optimal solution
+  setOptimalSolution(nlp_solver_.output(NLP_X_OPT));
 }
 
 

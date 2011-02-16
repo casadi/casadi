@@ -83,6 +83,10 @@ const std::vector<MXAlgEl>& MXFunction::algorithm() const{
   return (*this)->alg;
 }
 
+void MXFunction::setLiftingFunction(LiftingFunction liftfun, void* user_data){
+  (*this)->setLiftingFunction(liftfun,user_data);
+}
+
 
 } // namespace CasADi
 

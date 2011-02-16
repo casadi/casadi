@@ -65,21 +65,14 @@ void IntegratorJacobianInternal::init(){
   output(INTEGRATORJACOBIAN_XPF) = DMatrix(nx_,1,0);
 
   // Map Jacobian indices
-  if(integrator_.hasSetOption("jacmap")){
-    jacmap_ = integrator_.getOption("jacmap").toIntVector();
-  } else {
-    jacmap_.clear();
-    jacmap_.resize(nx_*nc);
-    for(int i=0; i<nx_*nc; ++i)
-      jacmap_[i] = i;
-  }
+  jacmap_ = integrator_->jacmap(ns_);
 
-  // Initial value to the Jacobian
-  if(integrator_.hasSetOption("jacinit")){
-    jacinit_ = integrator_.getOption("jacinit").toDoubleVector();
-  } else {
-    jacinit_.clear();
-    jacinit_.resize(nx_*ns_,0.0);
+  // Initial value for the integrators
+  int iind = getOption("derivative_index").toInt();
+  jacinit_.resize(nx_*ns_,0.0);
+  if(iind==INTEGRATOR_X0){
+    for(int i=0; i<ns_; ++i)
+      jacinit_.at(i+nx_*i) = 1;
   }
 
   // Call the base class method
@@ -103,7 +96,7 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   // Initial values for the state derivatives
   for(int i=0; i<nx_; ++i)
     for(int j=0; j<ns_; ++j)
-      x0s[jacmap_[nx_+j+i*ns_]] = jacinit_[j+i*ns_];
+      x0s[jacmap_[nx_+i+j*ns_]] = jacinit_[j+i*ns_];
   
   // State derivative
   const vector<double>& xp0 = input(INTEGRATOR_XP0);
@@ -119,7 +112,7 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
       vector<double>& jacseed_s = integrator_.adjSeed(INTEGRATOR_XF,dir);
       for(int i=0; i<nx_; ++i)
         for(int j=0; j<ns_; ++j)
-          jacseed_s[jacmap_[nx_+j+i*ns_]] = jacseed[j+i*ns_];
+          jacseed_s[jacmap_[nx_+i+j*nx_]] = jacseed[j+i*ns_];
     }
   }
   
@@ -134,7 +127,7 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   vector<double>& jac = output(0);
   for(int i=0; i<nx_; ++i)
     for(int j=0; j<ns_; ++j)
-      jac[j+i*ns_] = xfs[jacmap_[nx_+j+i*ns_]];
+      jac[j+i*ns_] = xfs[jacmap_[nx_+i+j*nx_]];
   
   // State
   vector<double>& xf = output(1+INTEGRATOR_XF);
@@ -156,7 +149,7 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
       const vector<double>& jacsens_s = integrator_.adjSens(INTEGRATOR_X0,dir);
       for(int i=0; i<nx_; ++i)
         for(int j=0; j<ns_; ++j)
-          asens[i] += jacsens_s[jacmap_[nx_+j+i*ns_]];
+          asens[i] += jacsens_s[jacmap_[nx_+i+j*nx_]];
         
       adjSens(INTEGRATOR_P,dir).set(integrator_.adjSens(INTEGRATOR_P,dir));
     }

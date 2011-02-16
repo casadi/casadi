@@ -1534,7 +1534,7 @@ Integrator IdasInternal::jac(int iind, int oind){
   IdasIntegrator integrator(ffcn_aug,qfcn_aug);
 
   // Set options
-  integrator.copyOptions(shared_from_this<IdasIntegrator>());
+  integrator.setOption(dictionary());
   integrator.setOption("nrhs",1+ns);
   
   // Transmit information on derivative states
@@ -1567,6 +1567,13 @@ vector<int> IdasInternal::jacmap(int ns){
       jmap[nyz_+j+nx_*i] = nyz_*(1+ns) + j + nq_*i;
   }
   return jmap;
+}
+
+bool IdasInternal::symbjac(){
+  SXFunction f = shared_cast<SXFunction>(f_);
+  SXFunction q = shared_cast<SXFunction>(q_);
+
+  return !f.isNull() && q_.isNull() == q.isNull();
 }
 
 FX IdasInternal::getJacobian(){

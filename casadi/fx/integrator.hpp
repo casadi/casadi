@@ -174,14 +174,6 @@ public:
   
   /// Get the Linear solver
   LinearSolver getLinearSolver();
-  
-  /** \brief Jacobian of output oind with respect to input iind
-  *
-  *  Jacobian is implemented by augmenting the system with equations for the time evolution of sensitivity.
-  *  The result is a mapping from CasADi::IntegratorInput to CasADi::IntegratorJacobianOutput.
-  *
-  */
-  IntegratorJacobian jacobian(int iind=0, int oind=0);
 
   /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
   Integrator jac(int iind=0, int oind=0);

@@ -29,7 +29,7 @@ using namespace std;
 #include <coin/IpIpoptApplication.hpp>
 namespace CasADi{
 
-IpoptInternal::IpoptInternal(const FX& F_, const FX& G_, const FX& H_, const FX& J_, const FX& GF_) : NLPSolverInternal(F_,G_,H_,J_,GF_){
+IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
   addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
   
   // Output
@@ -193,21 +193,11 @@ ops_["wsmp_singularity_threshold"] = OT_REAL;
 for(map<string,opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
   addOption(it->first,it->second);
 
+  // Limited memory hessian by default if no hessian provided
+  if(H_.isNull()) setOption("hessian_approximation","limited-memory");
+
   app = 0;
   userclass = 0;
-
-  // Start the application
-  app = new Ipopt::IpoptApplication();
-
-  // Create an Ipopt user class -- need to use Ipopts spart pointer class
-  Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = new Ipopt::SmartPtr<Ipopt::TNLP>();
-  userclass = (void*)ucptr;
-  Ipopt::SmartPtr<Ipopt::TNLP> &uc = *ucptr;
-  uc = new IpoptUserClass(this);
-  
-  // Limited memory hessian by default if no hessian provided
-  if(H_.isNull())
-    setOption("hessian_approximation","limited-memory");
 }
 
 
@@ -222,6 +212,12 @@ IpoptInternal::~IpoptInternal(){
 }
 
 void IpoptInternal::init(){
+  // Initialize the functions
+  F_.init();
+  if(!G_.isNull()) G_.init();
+  n_ = F_.input(0).numel();
+  m_ = G_.isNull() ? 0 : G_.output(0).numel();
+
   // Call the init method of the base class
   NLPSolverInternal::init();
   
@@ -255,6 +251,23 @@ void IpoptInternal::init(){
     }
   }
   
+  // Create a Jacobian if it does not already exists
+  if(!G_.isNull() && J_.isNull()){
+    J_ = G_.jacobian();
+  }
+  if(!J_.isNull()) J_.init();
+  if(!H_.isNull()) H_.init();
+  if(!GF_.isNull()) GF_.init();
+  
+    // Start the application
+  app = new Ipopt::IpoptApplication();
+
+  // Create an Ipopt user class -- need to use Ipopts spart pointer class
+  Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = new Ipopt::SmartPtr<Ipopt::TNLP>();
+  userclass = (void*)ucptr;
+  Ipopt::SmartPtr<Ipopt::TNLP> &uc = *ucptr;
+  uc = new IpoptUserClass(this);
+    
   // read options
   exact_hessian_ = !(hasSetOption("hessian_approximation") && getOption("hessian_approximation")=="limited-memory");
   casadi_assert_message(!(exact_hessian_ && H_.isNull()), "No hessian has been provided");

@@ -276,6 +276,8 @@ class IdasInternal : public IntegratorInternal{
   // Get the mapping of the states for the augmented DAE
   virtual std::vector<int> jacmap(int ns);
 
+  virtual bool symbjac();
+
 };
 
 

@@ -29,3 +29,8 @@ find_package(KNITRO)
 IF (KNITRO_FOUND)
 add_subdirectory(knitro)
 ENDIF (KNITRO_FOUND)
+
+find_package(LIFTOPT)
+IF (LIFTOPT_FOUND)
+add_subdirectory(liftopt)
+ENDIF (LIFTOPT)

@@ -25,14 +25,19 @@
 using namespace std;
 namespace CasADi{
 
-NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
+NLPSolverInternal::NLPSolverInternal(){
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
-    
-  n_ = F_.input(0).numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).numel();
+  
+  n_ = 0;
+  m_ = 0;
+}
 
-  input_.resize(6);
+NLPSolverInternal::~NLPSolverInternal(){
+}
+
+void NLPSolverInternal::init(){
+  input_.resize(NLP_NUM_IN);
   input(NLP_X_INIT)      = DMatrix(n_,1,0);
   input(NLP_LBX)         = DMatrix(n_,1,0);
   input(NLP_UBX)         = DMatrix(n_,1,0);
@@ -41,34 +46,15 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   input(NLP_LAMBDA_INIT) = DMatrix(m_,1,0);
   
   // Allocate space for outputs
-  output_.resize(5);
+  output_.resize(NLP_NUM_OUT);
   output(NLP_X_OPT)      = DMatrix(n_,1,0);
   output(NLP_COST)       = DMatrix(1,1,0);
   output(NLP_LAMBDA_OPT) = DMatrix(m_,1,0);
   output(NLP_LAMBDA_LBX) = DMatrix(n_,1,0);
   output(NLP_LAMBDA_UBX) = DMatrix(n_,1,0);
 
-  // Create a Jacobian if it does not already exists
-  if(!G_.isNull() && J_.isNull()){
-    J_ = G_.jacobian();
-  }
-}
-
-
-NLPSolverInternal::~NLPSolverInternal(){
-  
-}
-
-void NLPSolverInternal::init(){
   // Call the initialization method of the base class
   FXInternal::init();
-
-  // Initialize the functions
-  F_.init();
-  if(!G_.isNull()) G_.init();
-  if(!J_.isNull()) J_.init();
-  if(!H_.isNull()) H_.init();
-  if(!GF_.isNull()) GF_.init();
 }
 
 

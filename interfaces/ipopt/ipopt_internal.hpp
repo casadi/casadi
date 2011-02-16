@@ -49,6 +49,17 @@ Ipopt::IpoptApplication* app;
 void *userclass;
 std::map<std::string,opt_type> ops_;
 
+  // The NLP functions
+  /// objective function
+  FX F_;
+  /// constraint function
+  FX G_; 
+  /// Hessian of the Lagrangian function
+  FX H_;
+  /// Jacobian of the constraint function
+  FX J_; 
+  /// Gradient of the objective function
+  FX GF_; 
 
 
 /** \brief  options */

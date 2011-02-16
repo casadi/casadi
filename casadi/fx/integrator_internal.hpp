@@ -110,13 +110,15 @@ public:
   bool finite_difference_fsens_;  
   //@}
   
-  protected:
-    // Set dimensions
-    void setDimensions(int nx, int np, int nz);
+  // Set dimensions
+  void setDimensions(int nx, int np, int nz);
     
-    // Get the mapping of the states for the augmented DAE
-    virtual vector<int> jacmap(int ns) = 0;
+  // Get the mapping of the states for the augmented DAE
+  virtual std::vector<int> jacmap(int ns) = 0;
     
+  // workaround: is symbolic jac ok?
+  virtual bool symbjac() = 0;
+  
 };
   
 } // namespace CasADi

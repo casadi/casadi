@@ -47,6 +47,27 @@ vector<double> nominal(const vector<Variable> v){
   return ret;
 }
 
+vector<double> getStart(const vector<Variable> v){
+  vector<double> ret(v.size());
+  for(int i=0; i<v.size(); ++i)
+    ret[i] = v[i].getStart();
+  return ret;
+}
+
+vector<double> getMin(const vector<Variable> v){
+  vector<double> ret(v.size());
+  for(int i=0; i<v.size(); ++i)
+    ret[i] = v[i].getMin();
+  return ret;
+}
+
+vector<double> getMax(const vector<Variable> v){
+  vector<double> ret(v.size());
+  for(int i=0; i<v.size(); ++i)
+    ret[i] = v[i].getMax();
+  return ret;
+}
+
     
 } // namespace OptimalControl
 } // namespace CasADi
