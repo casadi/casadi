@@ -238,7 +238,25 @@ class MXtests(casadiTestCase):
     self.assertEqual(type(z2),float64,"Output of MXFunction is expected to be numpy.ndarray of floats")
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
+    
+  def test_issue83(self):
+    return
+    x=MX("x")
+    y=MX("y")
 
+    z = x + y
+
+    f = MXFunction([x],[z])
+    f.init()
+
+    fc = f.call([MX(3)])[0]
+
+    g = MXFunction([y],[fc])
+    g.init()
+    g.input().set([7])
+    g.evaluate()
+    self.assertAlmostEqual(g.output()[0],10,10,"issue #83")
+  
   #def test_MXslice(self):
     #x = MX("x",1,3)
     #z=x[:]
