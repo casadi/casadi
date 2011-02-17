@@ -33,4 +33,10 @@ ENDIF (KNITRO_FOUND)
 find_package(LIFTOPT)
 IF (LIFTOPT_FOUND)
 add_subdirectory(liftopt)
-ENDIF (LIFTOPT)
+ENDIF (LIFTOPT_FOUND)
+
+find_package(CPLEX)
+IF (CPLEX_FOUND)
+add_subdirectory(cplex)
+ENDIF (CPLEX_FOUND)
+
