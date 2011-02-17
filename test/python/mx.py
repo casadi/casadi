@@ -60,6 +60,91 @@ class MXtests(casadiTestCase):
   def setUp(self):
     pass
 
+  def test_indirection(self):
+    self.message("MXFunction indirection")
+    x=MX("x",2,1)
+    y=MX("y",2,1)
+    z=MX("z",2,1)
+    
+    xn = array([2.3,1.3])
+    yn = array([7.3,4.6])
+    zn = array([12,7.4])
+    
+    f=MXFunction([x,y,z],[x+2*y+3*z])
+    f.init()
+    self.message(":simple indirection")
+    g=MXFunction([x,y,z],f.call([x,y,z]))
+    g.init()
+    g.input(0).set(xn)
+    g.input(1).set(yn)
+    g.input(2).set(zn)
+    g.fwdSeed(0).set(xn) # okay, I'm just lazy comming up with more numbers
+    g.fwdSeed(1).set(yn)
+    g.fwdSeed(2).set(zn)
+    g.evaluate(1,0)
+    self.checkarray(g.output(),xn+2*yn+3*zn,"MXFunction indirection");
+    self.checkarray(g.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
+    
+    g=MXFunction([x,y,z],f.call([vertcat([x[0],x[1]]),y,z]))
+    g.init()
+    g.input(0).set(xn)
+    g.input(1).set(yn)
+    g.input(2).set(zn)
+    g.fwdSeed(0).set(xn)
+    g.fwdSeed(1).set(yn)
+    g.fwdSeed(2).set(zn)
+    g.evaluate(1,0)
+
+    self.checkarray(g.output(),xn+2*yn+3*zn,"MXFunction indirection");
+    self.checkarray(g.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
+    
+    self.message(":double output flipover")
+    h=MXFunction([x,y,z],f.call([vertcat([y[0],x[1]]),vertcat([x[0],y[1]]),z]))
+    h.init()
+    h=MXFunction([x,y,z],h.call([vertcat([y[0],x[1]]),vertcat([x[0],y[1]]),z]))
+    # h should be identical to g now
+    h.init()
+    h.input(0).set(xn)
+    h.input(1).set(yn)
+    h.input(2).set(zn)
+    h.fwdSeed(0).set(xn)
+    h.fwdSeed(1).set(yn)
+    h.fwdSeed(2).set(zn)
+    h.evaluate(1,0)
+    self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
+    self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
+    
+    self.message(":double input flipover")
+    h=MXFunction([x,y,z],f.call([y,x,z]))
+    h.init()
+    h=MXFunction([x,y,z],h.call([y,x,z]))
+    h.init()
+    h.input(0).set(xn)
+    h.input(1).set(yn)
+    h.input(2).set(zn)
+    h.fwdSeed(0).set(xn)
+    h.fwdSeed(1).set(yn)
+    h.fwdSeed(2).set(zn)
+    h.evaluate(1,0)
+    self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
+    self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
+    
+    return # known bug #83
+    self.message(":uncomplete call")
+    h=MXFunction([x,z],f.call([x,y,z]))
+    h.init()
+    h=MXFunction([x,y,z],h.call([x,z]))
+    h.init()
+    h.input(0).set(xn)
+    h.input(1).set(yn)
+    h.input(2).set(zn)
+    h.fwdSeed(0).set(xn)
+    h.fwdSeed(1).set(yn)
+    h.fwdSeed(2).set(zn)
+    h.evaluate(1,0)
+    self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
+    self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
+    
   def test_MX1(self):
     self.message("MX constructor")
     x = MX("x",2,3)
