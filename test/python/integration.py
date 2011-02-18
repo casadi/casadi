@@ -26,8 +26,7 @@ class Integrationtests(casadiTestCase):
     tend = MX("tend")
     q0   = MX("q0")
     par  = MX("p")
-    dq0  = MX("dq0")
-    qend=integrator([t0,tend,q0,par,dq0])
+    qend=integrator([t0,tend,q0,par,MX(),MX()])
     qe=MXFunction([tend,q0,par],[qend])
     qe.init()
     self.integrator = integrator
@@ -52,7 +51,7 @@ class Integrationtests(casadiTestCase):
     self.assertAlmostEqual(qe.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
 
   def test_jac0(self):
-    return
+    return # jacobian wrt end time is not supported
     self.message('IPOPT integration: jacobian to end time')
     num=self.num
     J=self.qe.jacobian(0)
@@ -64,8 +63,8 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    # known bug
-    #self.assertAlmostEqual(J.output()[0],(q0*tend**2*exp(tend**3/(3*p)))/p,9,"Evaluation output mismatch")
+    print J.output()[0]
+    self.assertAlmostEqual(J.output()[0],(q0*tend**2*exp(tend**3/(3*p)))/p,9,"Evaluation output mismatch")
     
   def test_jac1(self):
     self.message('IPOPT integration: jacobian to q0')
@@ -114,6 +113,30 @@ class Integrationtests(casadiTestCase):
     p=num['p']
 
     self.assertAlmostEqual(J.adjSens(INTEGRATOR_P)[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    
+  def test_issue87(self):
+    return # see issue 87
+    self.message('IPOPT integration: hessian to p: fwd-over-adjoint on integrator')
+    num=self.num
+    J=self.qe.jacobian(2)
+    J.init()
+    J.input(0).set([num['tend']])
+    J.input(1).set([num['q0']])
+    J.input(2).set([num['p']])
+    J.adjSeed(0).set([1])
+    J.fwdSeed(0).set([1])
+    J.fwdSeed(1).set([1])
+    J.fwdSeed(2).set([1])
+    # Evaluate
+    J.evaluate(1,1)
+      
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    print (q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3)
+    print J.adjSens()
+    print J.fwdSens()
+    self.assertAlmostEqual(J.adjSens(2)[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
     
 if __name__ == '__main__':
     unittest.main()
