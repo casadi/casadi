@@ -29,7 +29,23 @@ using namespace std;
 namespace CasADi{
 
 Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep) : fcn_(fcn) {
-  casadi_assert_message(dep.size()==fcn.getNumInputs(),"Evaluation: number of passed-in dependencies should match number of inputs of function.");
+  // Argument checking
+  if (dep.size()!=fcn.getNumInputs()) {
+    std::stringstream s;
+    s << "Evaluation::Evaluation: number of passed-in dependencies (" << dep.size() << ") should match number of inputs of function (" << fcn.getNumInputs() << ").";
+    throw CasadiException(s.str());
+  }
+  // Assumes initialised
+  for (int i=0;i<fcn.getNumInputs();i++) {
+     if (dep[i].isNull())
+       continue;
+      if (dep[i].size1()!=fcn.input(i).size1() || dep[i].size2()!=fcn.input(i).size2()) {
+        std::stringstream s;
+        s << "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << std::endl;
+        s << "Input argument " << i << " has shape (" << fcn.input(i).size1() << "," << fcn.input(i).size2() << ") while a shape (" << dep[i].size1() << "," << dep[i].size2() << ") was supplied.";
+        throw CasadiException(s.str());
+      }     
+   }
   setDependencies(dep);
   setSparsity(CRSSparsity(1,1,true));
 }
