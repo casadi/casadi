@@ -104,6 +104,10 @@ void MXNode::print(std::ostream &stream) const{
   vector<string> args(ndep());
   for(int i=0; i<ndep(); ++i){
     stringstream ss;
+    if (dep(i).isNull()) {
+      args[i] = "MX()";
+      continue;
+    } 
     dep(i)->print(ss);
     args[i] = ss.str();
   }
