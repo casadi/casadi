@@ -7,7 +7,14 @@ namespace CasADi{
   
 class CplexInternal;
   
+/** \brief Interface to CPLEX solver.
+  Attention! The interface is not complete yet.
+  Also if a quadratic term can be set with this interface, it is ignored!
+  \author Carlo Savorgnan
+  \date 2011
+*/
 class CplexSolver : public NLPSolver {
+  // TODO comment me!!!!
   public:
     /// Default constructor
     CplexSolver();
@@ -15,7 +22,7 @@ class CplexSolver : public NLPSolver {
     /// Constuct an NLP with non-linear constraints and provided hessian approximation
     explicit CplexSolver(const FX& F,         /**< F objective function */
                          const FX& G = FX(),  /**< constraint function (default only bound constraints) */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory) */
+                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory). NOT USED*/
                          const FX& J = FX(),  /**< Jacobian of G (default -> differentiate) */
                          const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F) */
                         );

@@ -85,3 +85,4 @@ status = CPXaddqconstr(CPXCENVptr env, CPXLPptr lp, int linnzcnt, int quadnzcnt,
           the variable indices of the quadratic term, and quadval[i] the corresponding coefficient.
     lname_str: The name of the constraint to be added. May be NULL, in which case the new constraint is assigned a default name if the quadratic constraints already
           resident in the CPLEX problem object have names; otherwise, no name is associated with the constraint.
+

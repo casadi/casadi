@@ -4,16 +4,91 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 namespace CasADi{
 
+// The following class is just used to make the interfaced code cleaner. 
+// ATTENTION! No checks are implemented!
+enum CplexMatrixType{SYMMETRIC, NON_SYMMETRIC};
+class CplexMatrix{
+    MatType type_;
+    CRSSparsity sparsity_;
+    FX function_;
+    int n_out_;
+    vector<int> matcnt_;
+    vector<double> data_; // used to store data for non symmetric matrices
+    vector<int> mapping_; // used for non symmetric matrices
+  public:
+    /// reads matrix in casadi format
+    void set(const& FX function, int n_out, CplexMatrixType type);
+    /// returns non-zero values
+    double* matval() const;
+    /// returns indices of the beginning of columns
+    int* matbeg() const;
+    /// returns number of entries per column
+    int* matcnt() const;
+    /// returns row numbers
+    int* matind() const;
+};
+
+void CplexMatrix::set(const& FX function, int n_out, CplexMatrixType type){
+  function_ = function;
+  n_out_ = n_out;
+  type_ = type;
+  
+  if(type_ == SYMMETRIC){
+    sparsity_ = function_.output(n_out).sparsity();
+  } else { //type_ == NON_SYMMETRIC
+    sparsity_ = function_.output(n_out).sparsity().transpose(mapping);
+    data_.resize(sparsity_.size());
+  }
+  sparsity_ = mat.sparsity().transpose(mapping);
+  
+  matcnt_.resize(sparsity.size2());
+  for(int ind=0; ind<matcnt_.size(); ++ind){
+    matcnt_[ind] = sparsity.rowind()[ind+1]-sparsity.rowind()[ind];
+  }
+}
+
+double* CplexMatrix::matval(){
+  if(type_ == SYMMETRIC){
+    return &function_.output(n_out_)[0];
+  } else { //type_ == NON_SYMMETRIC
+    for(int ind=0; ind<data_.size(); ++ind){
+      data[ind] = function_.output(n_out_)[mapping_[ind]];
+    }
+    return &data[0];
+  }
+}
+
+int* CplexMatrix::matbeg(){
+  return &sparsity_.rowind()[0];
+}
+
+int* CplexMatrix::matcnt(){
+  return &matcnt_[0];
+}
+
+int* CplexMatrix::matind(){
+  return &sparsity_.col()[0];
+}
+
+
+// CPLEX interface
 
 CplexInternal::CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
   casadi_warning("cplexInternal: the CPLEX interface is still experimental, more tests are needed");
+
   env_ = NULL;
   lp_ = NULL;
-  addOption("contype", OT_INTEGERVECTOR); ~~~~~~~~
+  
+  addOption("objsense",               OT_INTEGER, CPX_MIN); // optimization sense (CPX_MIN or CPX_MAX)
+//   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
+//   addOption("linear_solver",               OT_STRING, "dense"); // "dense", "banded" or "iterative"
+//   addOption("exact_jacobian",              OT_BOOLEAN,  false);
+//   addOption("is_differential",             OT_INTEGERVECTOR,  Option());
 }
 
 
@@ -64,9 +139,12 @@ void CplexInternal::init(){
   if(!H_.isNull()) H_.init();
   if(!GF_.isNull()) GF_.init();
   
+  H_mat_.set(H_, 0, SYMMETRIC);
+  J_mat_.set(J_, 0, NON_SYMMETRIC);
+  
   // creating CPLEX environment and problem
   CPXsetintparam (env, CPX_PARAM_SCRIND, CPX_ON);
-//   CPXsetintparam (env, CPX_PARAM_SCRIND, CPX_OFF);
+  //   CPXsetintparam (env, CPX_PARAM_SCRIND, CPX_OFF);
   env = CPXopenCPLEX (&status);
   if (!env){
     throw CasadiException("CplexInternal::init: Cannot initialize CPLEX environment");
@@ -80,134 +158,109 @@ void CplexInternal::init(){
   if (!lp){
     throw CasadiException("CplexInternal::init: Cannot create CPLEX problem");
   }
-  
-  // TODO: add switch depending on parameter
-  sense_ = CPX_MIN;
 }
 
 void CplexInternal::evaluate(int fsens_order, int asens_order){
-  
-  // setting problem data
-  status = CPXcopylp (env, lp, n_, m_, objsense, obj, rhs, sense_, matbeg, matcnt, matind, matval, lb, ub, NULL);
-  
-  status = CPXcopyquad (env, lp, qmatbeg, qmatcnt, qmatind, qmatval);
-  
-//   status = CPXaddqconstr(env, lp, linnzcnt, quadnzcnt, rhs, sense, linind, linval, quadrow, quadcol, quadval, lname_str)
-  
-  /// cccccc ///
-  casadi_assert(fsens_order==0 && asens_order==0);
-  casadi_assert(kc_handle_!=0);
-  int status;
-  
-  // Jacobian sparsity
-  vector<int> Jcol = J_.output().col();
-  vector<int> Jrow = J_.output().sparsity().getRow();
-
-  // Hessian sparsity
-  int nnzH = H_.isNull() ? 0 : H_.output().sizeL();
-  vector<int> Hcol(nnzH), Hrow(nnzH);
-  if(nnzH>0){
-    const vector<int> &rowind = H_.output().rowind();
-    const vector<int> &col = H_.output().col();
-    int nz=0;
-    for(int r=0; r<rowind.size()-1; ++r){
-      for(int el=rowind[r]; el<rowind[r+1] && col[el]<=r; ++el){
-        Hcol[nz] = r;
-        Hrow[nz] = col[el];
-        nz++;
-      }
-    }
-    casadi_assert(nz==nnzH);
-    
-    status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_EXACT);
-    casadi_assert_message(status==0, "KTR_set_int_param failed");
-  } else {
-    status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_LBFGS);
-    casadi_assert_message(status==0, "KTR_set_int_param failed");
-  }
-
-  // Set user set options
-  for(std::map<std::string, double>::iterator it=double_param_.begin(); it!=double_param_.end(); ++it){
-    status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
-    if(status!=0){
-      throw CasadiException("CplexInternal::evaluate: cannot set " + it->first);
-    }
-  }
-  
-  for(std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it){
-    status = KTR_set_int_param_by_name(kc_handle_, it->first.c_str(), it->second);
-    if(status!=0){
-      throw CasadiException("CplexInternal::evaluate: cannot set " + it->first);
-    }
-  }
-
-  // Type of constraints
-  vector<int> cType(m_,KTR_CONTYPE_GENERAL);
-  if(hasSetOption("contype")){
-    vector<int> contype = getOption("contype").toIntVector();
-    casadi_assert(contype.size()==cType.size());
-    copy(contype.begin(),contype.end(),cType.begin());
-  }
+  vector<double> objGrad, rhs, rngval;
+  vector<char> sense;
+  objGrad.resize(n_);
+  rhs.resize(m_);
+  rngval.resize(m_);
+  sense.resize(m_);
   
   // "Correct" upper and lower bounds
   for(vector<double>::iterator it=input(NLP_LBX).begin(); it!=input(NLP_LBX).end(); ++it)
-    if(isinf(*it)) *it = -KTR_INFBOUND;
+    if(isinf(*it)) *it = -CPX_INFBOUND;
   for(vector<double>::iterator it=input(NLP_UBX).begin(); it!=input(NLP_UBX).end(); ++it)
-    if(isinf(*it)) *it =  KTR_INFBOUND;
-  for(vector<double>::iterator it=input(NLP_LBG).begin(); it!=input(NLP_LBG).end(); ++it)
-    if(isinf(*it)) *it = -KTR_INFBOUND;
-  for(vector<double>::iterator it=input(NLP_UBG).begin(); it!=input(NLP_UBG).end(); ++it)
-    if(isinf(*it)) *it =  KTR_INFBOUND;
-  
-  // Initialize CPLEX
-  status = KTR_init_problem(kc_handle_, n_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
-                              &input(NLP_LBX)[0], &input(NLP_UBX)[0],
-                              m_, &cType[0], &input(NLP_LBG)[0], &input(NLP_UBG)[0],
-                              Jcol.size(), &Jcol[0], &Jrow[0],
-                              nnzH,
-                              nnzH==0 ? 0 : &Hrow[0],
-                              nnzH==0 ? 0 : &Hcol[0],
-                              &input(NLP_X_INIT)[0],
-                              0); // initial lambda
-  casadi_assert_message(status==0, "KTR_init_problem failed");
-  
-  // Register callback functions
-  status = KTR_set_func_callback(kc_handle_, &callback);
-  casadi_assert_message(status==0, "KTR_set_func_callback failed");
-  
-  status = KTR_set_grad_callback(kc_handle_, &callback);
-  casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
-  
-  if(nnzH>0){
-    status = KTR_set_hess_callback(kc_handle_, &callback);
-    casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
+    if(isinf(*it)) *it =  CPX_INFBOUND;
+  // Construct upper end lower bounds in cplex format
+  for(int ind=0; ind<m_; ++ind){
+    double lo = input(NLP_LBG)[ind]; // lower bound
+    double up = input(NLP_UBG)[ind]; // upper bound
+    if ( isinf(lo) && isinf(up)){
+      throw CasadiException("CplexInternal::evaluate: a constraint has no lower or upper bounds");
+    }
+    if ( up > lo ){ // NOTE what should be the behavior here?
+      throw CasadiException("CplexInternal::evaluate: a constraint has a lower bound greater than the upper bound");
+    }
+    if ( lo == up ){
+      // equality
+      rhs[ind] = input(NLP_LBG)[ind];
+      rngval[ind] = 0;
+      sense[ind] = 'E';
+    } else if isinf(lo){
+      // less than
+      rhs[ind] = up;
+      rngval[ind] = 0;
+      sense[ind] = 'L';
+    } else if isinf(up) {
+      // grater than
+      rhs[ind] = lo;
+      rngval[ind] = 0;
+      sense[ind] = 'G';
+    } else {
+      // range
+      rhs[ind] = lo;
+      rngval[ind] = up-lo;
+      sense[ind] = 'R';
+    }
   }
+  
+  // Evaluation of all functions
+  // Pass the argument to the function
+  F_.setInput(x);
+  F_.setAdjSeed(1.0);
+  
+  // Evaluate the function
+  F_.evaluate(0,1);
 
+  // Get the result
+  F_.getOutput(obj);
+  
+  // Pass the argument to the function
+  G_.setInput(x);
+  
+  // Pass the argument to the Jacobian function
+  J_.setInput(x);
+  
+  // Evaluate the Jacobian function
+  J_.evaluate();
+  
+  // The quadratic term is not used yet in the interface
+//   H_.setInput(x);
+//   H_.setInput(lambda,1);
+//   H_.setInput(1.0,2);
+//   // Evaluate
+//   H_.evaluate();
+  
+  // Get the result
+  F_.getAdjSens(objGrad);
+  
+  // setting problem data
+  status = CPXcopylp (env, lp, n_, m_,
+                      getOption("objsense").toInt(), // min or max
+                      &objGrad[0],
+                      &rhs[0],
+                      &sense[0],
+                      J_mat_.matbeg(),
+                      J_mat_.matcnt(),
+                      J_mat_.matind(),
+                      J_mat_.matval(),
+                      &input(NLP_LBX)[0],
+                      &input(NLP_UBX)[0],
+                      &rngval.begin());
+  
+  // This function will be needed to set the quadratic term in the cost
+//   status = CPXcopyquad (env, lp, qmatbeg, qmatcnt, qmatind, qmatval);
+  
+//   status = CPXaddqconstr(env, lp, linnzcnt, quadnzcnt, rhs, sense, linind, linval, quadrow, quadcol, quadval, lname_str)
+
+ 
   // Lagrange multipliers
-  vector<double> lambda(n_+m_);
+//   vector<double> lambda(n_+m_);
+  
 
-  // Solve NLP
-  status = KTR_solve(kc_handle_,
-                   &output(NLP_X_OPT)[0],
-                   &lambda[0],
-                   0,  // not used
-                   &output(NLP_COST)[0],
-                   0,  // not used
-                   0,  // not used
-                   0,  // not used
-                   0,  // not used
-                   0,  // not used
-                   this); // to be retrieved in the callback function
-  casadi_assert(status<=0); // make sure the NLP finished solving
-    
-  // Copy lagrange multipliers
-  output(NLP_LAMBDA_OPT).set(&lambda[0]);
-  output(NLP_LAMBDA_LBX).set(&lambda[m_]);
-  output(NLP_LAMBDA_UBX).set(&lambda[m_]);
 
-  // Free memory (move to destructor!)
-  KTR_free(&kc_handle_);
-  kc_handle_ = 0;
   status = CPXqpopt (env, lp);
   
   
@@ -234,86 +287,6 @@ void CplexInternal::evaluate(int fsens_order, int asens_order){
          printf ("Model is infeasible or unbounded\n");
       }
   }
-}
-
-/// REMOVE ME ///
-int CplexInternal::callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double* const x,
-                             const double* const lambda, double* const obj, double* const c, double* const objGrad,
-                             double* const jac, double* const hessian, double* const hessVector, void *userParams){
-  try{
-    // Get a pointer to the calling object
-    CplexInternal* this_ = static_cast<CplexInternal*>(userParams);
-    
-    // Direct to the correct function
-    switch(evalRequestCode){
-      case KTR_RC_EVALFC: this_->evalfc(x,*obj,c); break;
-      case KTR_RC_EVALGA: this_->evalga(x,objGrad,jac); break;
-      case KTR_RC_EVALH:  this_->evalh(x,lambda,hessian); break;
-      default: casadi_assert_message(0,"CplexInternal::callback: unknown method");
-    }
-    
-    return 0;
-  } catch (exception& ex){
-    cerr << "CplexInternal::callback caugth exception: " << ex.what() << endl;
-    return -1;
-  }
-}
-
-/// REMOVE ME ///
-void CplexInternal::evalfc(const double* x, double& obj, double *c){
-  // Pass the argument to the function
-  F_.setInput(x);
-
-  // Evaluate the function
-  F_.evaluate();
-
-  // Get the result
-  F_.getOutput(obj);
-  
-  // Pass the argument to the function
-  G_.setInput(x);
-
-  // Evaluate the function
-  G_.evaluate();
-
-  // Get the result
-  G_.getOutput(c);
-}
-
-/// REMOVE ME ///
-void CplexInternal::evalga(const double* x, double* objGrad, double* jac){
-  // Pass the argument and adjoint seed to the function
-  F_.setInput(x);
-  F_.setAdjSeed(1.0);
-
-  // Evaluate the function using adjoint mode AD
-  F_.evaluate(0,1);
-
-  // Get the result
-  F_.getAdjSens(objGrad);
-  
-  // Pass the argument to the Jacobian function
-  J_.setInput(x);
-  
-  // Evaluate the Jacobian function
-  J_.evaluate();
-  
-  // Get the result
-  J_.getOutput(jac);
-}
-
-/// REMOVE ME ///
-void CplexInternal::evalh(const double* x, const double* lambda, double* hessian){
-  // Pass input
-  H_.setInput(x);
-  H_.setInput(lambda,1);
-  H_.setInput(1.0,2);
-
-  // Evaluate
-  H_.evaluate();
-
-  // Get results
-  H_.output().get(hessian,SPARSESYM);
 }
 
 } // namespace CasADi

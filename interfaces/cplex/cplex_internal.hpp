@@ -6,9 +6,16 @@
 #include "casadi/fx/nlp_solver_internal.hpp"
 
 namespace CasADi{
-    
-class CplexInternal : public NLPSolverInternal{
 
+/** \brief CplexMatrix is a class used to convert CasADi matrices to CPLEX format (similar to CSC).
+  The class definition can be found in cplex_internal.cpp.
+  \author Carlo Savorgnan
+  \date 2011
+*/
+class CplexMatrix;
+
+class CplexInternal : public NLPSolverInternal{
+  // TODO comment me!!!!
 public:
   explicit CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
   virtual ~CplexInternal();
@@ -25,7 +32,11 @@ public:
   /// Jacobian of the constraint function
   FX J_; 
   /// Gradient of the objective function
-  FX GF_; 
+  FX GF_;
+  /// Hessian of the Lagrangian function (used for format conversion)
+  CplexMatrix H_mat_;
+  /// Jacobian of the constraint function (used for format conversion)
+  CplexMatrix J_mat_; 
   
   // CPLEX environment pointer
   CPXENVptr env_;
