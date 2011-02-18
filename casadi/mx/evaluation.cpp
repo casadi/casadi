@@ -29,6 +29,7 @@ using namespace std;
 namespace CasADi{
 
 Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep) : fcn_(fcn) {
+  casadi_assert_message(dep.size()==fcn.getNumInputs(),"Evaluation: number of passed-in dependencies should match number of inputs of function.");
   setDependencies(dep);
   setSparsity(CRSSparsity(1,1,true));
 }
