@@ -99,14 +99,6 @@ MX reshape(const MX &x, const std::vector<int> sz);
     Same as reshape(x, x.numel(),1)
 */
 MX vec(const MX &x);
-  
-/** \brief substitute variable var with expression expr
-* This method is not very efficient, as it requires the initialization of an MXFunction.
-* If you find yourself doing a substitute in a loop,
-* consider constructing and initializing an MXFunction outside the loop,
-* and using CasADi::MXFunction::call() instead of substitute.
-*/
-MX substitute(const MX &ex, const MX &var, const MX &expr); 
 
 } // namespace CasADi
 
