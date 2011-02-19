@@ -34,16 +34,21 @@ namespace CasADi {
     def __getitem__(self,s):
       if isinstance(s,int) and s < 0:
         s = s + self.size()
-      if isinstance(s,tuple) and len(s)==2 and (isinstance(s[1],slice) or isinstance(s[0],slice)):
+      if isinstance(s,tuple) and len(s)==2:
         s = list(s)
-        for k in range(2):
-          if isinstance(s[k],slice):
-            J = s[k].indices(self.shape[k])
-            s[k] = range(J[0],J[1],J[2])
-          elif isinstance(s[k],int):
+        if (isinstance(s[1],slice) or isinstance(s[0],slice)):
+          for k in range(2):
+            if isinstance(s[k],slice):
+              J = s[k].indices(self.shape[k])
+              s[k] = range(J[0],J[1],J[2])
+            elif isinstance(s[k],int):
+              if s[k]<0:
+                s[k]=s[k]+self.shape[k]
+              s[k] = [s[k]]
+        else:
+          for k in range(2):
             if s[k]<0:
               s[k]=s[k]+self.shape[k]
-            s[k] = [s[k]]
       return self.getitem(s)
     %}
     
@@ -51,16 +56,22 @@ namespace CasADi {
     def __setitem__(self,s,val):
       if isinstance(s,int) and s < 0:
         s = s + self.size()
-      if isinstance(s,tuple) and len(s)==2 and (isinstance(s[1],slice) or isinstance(s[0],slice)):
+      if isinstance(s,tuple) and len(s)==2:
         s = list(s)
-        for k in range(2):
-          if isinstance(s[k],slice):
-            J = s[k].indices(self.shape[k])
-            s[k] = range(J[0],J[1],J[2])
-          elif isinstance(s[k],int):
+        if (isinstance(s[1],slice) or isinstance(s[0],slice)):
+          s = list(s)
+          for k in range(2):
+            if isinstance(s[k],slice):
+              J = s[k].indices(self.shape[k])
+              s[k] = range(J[0],J[1],J[2])
+            elif isinstance(s[k],int):
+              if s[k]<0:
+                s[k]=s[k]+self.shape[k]
+              s[k] = [s[k]]
+        else:
+          for k in range(2):
             if s[k]<0:
               s[k]=s[k]+self.shape[k]
-            s[k] = [s[k]]
       self.setitem(s,val)
     %}
 
@@ -166,16 +177,22 @@ namespace CasADi {
     def __getitem__(self,s):
       if isinstance(s,int) and s < 0:
         s = s + self.size()
-      if isinstance(s,tuple) and len(s)==2 and (isinstance(s[1],slice) or isinstance(s[0],slice)):
+      if isinstance(s,tuple) and len(s)==2:
         s = list(s)
-        for k in range(2):
-          if isinstance(s[k],slice):
-            J = s[k].indices(self.shape[k])
-            s[k] = range(J[0],J[1],J[2])
-          elif isinstance(s[k],int):
+        if (isinstance(s[1],slice) or isinstance(s[0],slice)):
+          s = list(s)
+          for k in range(2):
+            if isinstance(s[k],slice):
+              J = s[k].indices(self.shape[k])
+              s[k] = range(J[0],J[1],J[2])
+            elif isinstance(s[k],int):
+              if s[k]<0:
+                s[k]=s[k]+self.shape[k]
+              s[k] = [s[k]]
+        else:
+          for k in range(2):
             if s[k]<0:
               s[k]=s[k]+self.shape[k]
-            s[k] = [s[k]]
       return self.getitem(s)
     %}
 
@@ -183,16 +200,21 @@ namespace CasADi {
     def __setitem__(self,s,val):
       if isinstance(s,int) and s < 0:
         s = s + self.size()
-      if isinstance(s,tuple) and len(s)==2 and (isinstance(s[1],slice) or isinstance(s[0],slice)):
+      if isinstance(s,tuple) and len(s)==2:
         s = list(s)
-        for k in range(2):
-          if isinstance(s[k],slice):
-            J = s[k].indices(self.shape[k])
-            s[k] = range(J[0],J[1],J[2])
-          elif isinstance(s[k],int):
+        if (isinstance(s[1],slice) or isinstance(s[0],slice)):
+          for k in range(2):
+            if isinstance(s[k],slice):
+              J = s[k].indices(self.shape[k])
+              s[k] = range(J[0],J[1],J[2])
+            elif isinstance(s[k],int):
+              if s[k]<0:
+                s[k]=s[k]+self.shape[k]
+              s[k] = [s[k]]
+        else:
+          for k in range(2):
             if s[k]<0:
               s[k]=s[k]+self.shape[k]
-            s[k] = [s[k]]
       self.setitem(s,val)
     %}
 };
