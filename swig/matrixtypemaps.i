@@ -1,6 +1,7 @@
 %{
 #include "casadi/matrix/crs_sparsity.hpp"
 #include "casadi/matrix/matrix.hpp"
+#include <sstream>
 %}
 
 %include "typemaps.i"
@@ -92,8 +93,15 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
 CasADi::Matrix<double> * typemapDMatrixHelper(PyObject* p, PyArrayObject* &array, int& array_is_new_object, bool& freearg) {
 if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
-		if (array_numdims(p)>2 || array_numdims(p)<1)
+		if (array_numdims(p)>2 || array_numdims(p)<1) {
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: Number of dimensions must be 1 or 2.");
+					std::stringstream s;
+				  s << "asMatrixDouble: Number of dimensions must be 1 or 2.";
+				  s << "Got " << array_numdims(p) << " instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_Error(SWIG_TypeError,  cstr);
+	  }
 		int nrows = array_size(p,0); // 1D array is cast into column vector
 		int ncols  = 1;
 		if (array_numdims(p)==2)
@@ -202,14 +210,26 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			if (!(array_is_contiguous(p) && array_is_native(p) && array_type(p)==NPY_DOUBLE))
 			  SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous, native & of datatype double");
 			if (array_numdims(p)==2) {
-				if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) )
-			    SWIG_exception_fail(SWIG_TypeError, "Array is not of correct shape.");
+				if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) ) {
+				  std::stringstream s;
+				  s << "Array is not of correct shape.";
+				  s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape (" << array_size(p,0) << "," << array_size(p,1) <<") instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_exception_fail(SWIG_TypeError,  cstr);
+			  }
 			  $3 = CasADi::DENSE;
 			  $2 = array_size(p,0)*array_size(p,1);
 			  $1 = (double*) array_data(p);
 			} else if (array_numdims(p)==1) {
-				if (!(array_size(p,0)==arg1->size()) )
-			    SWIG_exception_fail(SWIG_TypeError, "Array is not of correct size. Should match number of non-zero elements.");
+				if (!(array_size(p,0)==arg1->size()) ) {
+				  std::stringstream s;
+				  s << "Array is not of correct size. Should match number of non-zero elements.";
+				  s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->size() <<" instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_exception_fail(SWIG_TypeError,  cstr);
+			  }
 			  $3 = CasADi::SPARSE;
 			  $2 = array_size(p,0);
 			  $1 = (double*) array_data(p);
@@ -222,8 +242,14 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
 			  SWIG_exception_fail(SWIG_TypeError, "csr_matrix should be contiguous, native & of datatype double");
 			$2 = array_size(narray,0);
-			if (!(array_size(narray,0)==arg1->size() ) )
-			  SWIG_exception_fail(SWIG_TypeError, "csr_matrix does not have correct number of non-zero elements");
+			if (!(array_size(narray,0)==arg1->size() ) ) {
+					std::stringstream s;
+				  s << "csr_matrix does not have correct number of non-zero elements.";
+				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_exception_fail(SWIG_TypeError,  cstr);
+			}
 			$1 = (double*) array_data(narray);
 	} else {
 			SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
@@ -241,14 +267,26 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 	if (is_array(p)) {
 			array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
 			if (array_numdims(array)==2) {
-				if (!(array_size(array,0)==arg1->size1() && array_size(array,1)==arg1->size2()) )
-			    SWIG_exception_fail(SWIG_TypeError, "Array is not of correct shape.");
+				if (!(array_size(array,0)==arg1->size1() && array_size(array,1)==arg1->size2()) ) {
+				  std::stringstream s;
+				  s << "Array is not of correct shape.";
+				  s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape (" << array_size(array,0) << "," << array_size(array,1) <<") instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_exception_fail(SWIG_TypeError,  cstr);
+			  }
 			  $3 = CasADi::DENSE;
 			  $2 = array_size(array,0)*array_size(array,1);
 			  $1 = (double*) array_data(array);
 			} else if (array_numdims(array)==1) {
-				if (!(array_size(array,0)==arg1->size()) )
-			    SWIG_exception_fail(SWIG_TypeError, "Array is not of correct size. Should match number of non-zero elements.");
+				if (!(array_size(array,0)==arg1->size()) ) {
+				  std::stringstream s;
+				  s << "Array is not of correct size. Should match number of non-zero elements.";
+				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(array,0) << " instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_exception_fail(SWIG_TypeError,  cstr);
+			  }
 			  $3 = CasADi::SPARSE;
 			  $2 = array_size(array,0);
 			  $1 = (double*) array_data(array);
@@ -259,8 +297,14 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			$3 = CasADi::SPARSE;
 			PyObject * narray=PyObject_GetAttrString( p, "data");
 			$2 = array_size(narray,0);
-			if (!(array_size(narray,0)==arg1->size() ) )
-			  SWIG_exception_fail(SWIG_TypeError, "csr_matrix does not have correct number of non-zero elements");
+			if (!(array_size(narray,0)==arg1->size() ) ) {
+					std::stringstream s;
+				  s << "csr_matrix does not have correct number of non-zero elements.";
+				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
+          const std::string tmp(s.str());
+          const char* cstr = tmp.c_str();
+			    SWIG_exception_fail(SWIG_TypeError,  cstr);
+			}
 			array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
 			$1 = (double*) array_data(array);
 	} else {
