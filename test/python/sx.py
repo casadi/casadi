@@ -121,6 +121,22 @@ class SXtests(casadiTestCase):
   def test_SXMatrixJacobians(self):
       self.message("SXMatrix(3,1) unary operation, jacobian")
       x=symbolic("x",3)
+      print array(jacobian(x,x))
+      x0=array([0.738,0.9,0.3])
+
+      def fmod(f,x):
+        J=f.jacobian()
+        J.init()
+        return J
+      
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
+      
+  def test_SXMatrixJacobians2(self):
+      return # not allowed
+      self.message("SXMatrix(1,3) unary operation, jacobian")
+      x=symbolic("x",1,3)
+      
+      print array(jacobian(x,x))
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
@@ -188,6 +204,7 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
       self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
       self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
+      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,-1]), lambda x: matrix(x)[0,-1],[x],x0,name="x[0,-1]")
       self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
       self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
       self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
@@ -215,7 +232,7 @@ class SXtests(casadiTestCase):
     zr=fun(*L)
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
-    
+    self.message("SXFunction jacobian evaluation")
     J=f.jacobian()
     J.init()
     J.setInput(L)
@@ -290,14 +307,20 @@ class SXtests(casadiTestCase):
     
   def test_SXFunctionc(self):
     self.message("SXFunction constructors")
-    x=SX("x")
+    x0=SX("x")
+    x1=SX("x")
+    x2=SX("x")
+    x3=SX("x")
+    x4=SX("x")
+    x5=SX("x")
+    x6=SX("x")
     y=symbolic("y",2,3)
-    f=SXFunction(([x,x,x],[x,x,x,x]),[[x]])
+    f=SXFunction(([x0,x1,x2],[x3,x4,x5,x6]),[[x1]])
     self.checkarray(f.input(0).shape,(3,1),"SXFunction constructors")
     self.checkarray(f.input(1).shape,(4,1),"SXFunction constructors")
     self.checkarray(f.output(0).shape,(1,1),"SXFunction constructors")
-    
-    f=SXFunction(((x,x),(x,x)),[(x,x)])
+
+    f=SXFunction(((x0,x1),(x2,x3)),[(x0,x3)])
     self.checkarray(f.input(0).shape,(2,1),"SXFunction constructors")
     self.checkarray(f.input(1).shape,(2,1),"SXFunction constructors")
     self.checkarray(f.output(0).shape,(2,1),"SXFunction constructors")
@@ -306,14 +329,14 @@ class SXtests(casadiTestCase):
     self.checkarray(f.input(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     
-    f=SXFunction([y,[x,x]],[y,y])
+    f=SXFunction([y,[x0,x1]],[y,y])
     self.checkarray(f.input(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.input(1).shape,(2,1),"SXFunction constructors")
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
 
     self.assertRaises(NotImplementedError,lambda: SXFunction(y,[y,y]))
-    self.assertRaises(NotImplementedError,lambda: SXFunction(x,[x,x]))
+    self.assertRaises(NotImplementedError,lambda: SXFunction(x0,[x0,x1]))
 
   def test_evalfail(self):
     self.message("eval fail test")

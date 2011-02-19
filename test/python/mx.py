@@ -129,7 +129,7 @@ class MXtests(casadiTestCase):
     self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
     self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
     
-    return # known bug #83
+    return # the following co
     self.message(":uncomplete call")
     h=MXFunction([x,z],f.call([x,y,z]))
     h.init()
@@ -325,21 +325,30 @@ class MXtests(casadiTestCase):
     self.assertAlmostEqual(z1, 10,10)
     
   def test_issue83(self):
-    return
     x=MX("x")
     y=MX("y")
 
     z = x + y
 
-    f = MXFunction([x],[z])
+    f = MXFunction([x,y],[z])
     f.init()
 
-    fc = f.call([MX(3)])[0]
+    [fc] = f.call([MX(3),y])
 
     g = MXFunction([y],[fc])
     g.init()
     g.input().set([7])
     g.evaluate()
+
+    self.assertAlmostEqual(g.output()[0],10,10,"issue #83")
+    
+    [fc] = f.call([x,MX(7)])
+
+    g = MXFunction([x],[fc])
+    g.init()
+    g.input().set([3])
+    g.evaluate()
+
     self.assertAlmostEqual(g.output()[0],10,10,"issue #83")
   
   #def test_MXslice(self):
@@ -523,6 +532,7 @@ class MXtests(casadiTestCase):
     x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
     self.numpyEvaluationCheck(lambda x:x[0][1,0],lambda x: x[1,0],[x],x0,'x[1,0]')
     self.numpyEvaluationCheck(lambda x:x[0][0,1],lambda x: x[0,1],[x],x0,'x[0,1]')
+    self.numpyEvaluationCheck(lambda x:x[0][0,-1],lambda x: x[0,-1],[x],x0,'x[0,-1]')
     self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
     self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
     self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
