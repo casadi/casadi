@@ -96,7 +96,8 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 		if (array_numdims(p)>2 || array_numdims(p)<1) {
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: Number of dimensions must be 1 or 2.");
 					std::stringstream s;
-				  s << "asMatrixDouble: Number of dimensions must be 1 or 2.";
+					s << "SWIG::typemapDMatrixHelper:";
+				  s << "Number of dimensions must be 1 or 2.";
 				  s << "Got " << array_numdims(p) << " instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
@@ -212,6 +213,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			if (array_numdims(p)==2) {
 				if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) ) {
 				  std::stringstream s;
+				  s << "SWIG::typemap(in) (double *val,int len,Sparsity sp) " << std::endl;
 				  s << "Array is not of correct shape.";
 				  s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape (" << array_size(p,0) << "," << array_size(p,1) <<") instead.";
           const std::string tmp(s.str());
@@ -224,6 +226,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			} else if (array_numdims(p)==1) {
 				if (!(array_size(p,0)==arg1->size()) ) {
 				  std::stringstream s;
+				  s << "SWIG::typemap(in) (double *val,int len,Sparsity sp) " << std::endl;
 				  s << "Array is not of correct size. Should match number of non-zero elements.";
 				  s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->size() <<" instead.";
           const std::string tmp(s.str());
@@ -244,6 +247,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			$2 = array_size(narray,0);
 			if (!(array_size(narray,0)==arg1->size() ) ) {
 					std::stringstream s;
+				  s << "SWIG::typemap(in) (double *val,int len,Sparsity sp) " << std::endl;
 				  s << "csr_matrix does not have correct number of non-zero elements.";
 				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
           const std::string tmp(s.str());
@@ -269,6 +273,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			if (array_numdims(array)==2) {
 				if (!(array_size(array,0)==arg1->size1() && array_size(array,1)==arg1->size2()) ) {
 				  std::stringstream s;
+				  s << "SWIG::typemap(in) (const double *val,int len,Sparsity sp) " << std::endl;
 				  s << "Array is not of correct shape.";
 				  s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape (" << array_size(array,0) << "," << array_size(array,1) <<") instead.";
           const std::string tmp(s.str());
@@ -281,6 +286,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			} else if (array_numdims(array)==1) {
 				if (!(array_size(array,0)==arg1->size()) ) {
 				  std::stringstream s;
+				  s << "SWIG::typemap(in) (const double *val,int len,Sparsity sp) " << std::endl;
 				  s << "Array is not of correct size. Should match number of non-zero elements.";
 				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(array,0) << " instead.";
           const std::string tmp(s.str());
@@ -299,6 +305,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			$2 = array_size(narray,0);
 			if (!(array_size(narray,0)==arg1->size() ) ) {
 					std::stringstream s;
+				  s << "SWIG::typemap(in) (const double *val,int len,Sparsity sp) " << std::endl;
 				  s << "csr_matrix does not have correct number of non-zero elements.";
 				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
           const std::string tmp(s.str());

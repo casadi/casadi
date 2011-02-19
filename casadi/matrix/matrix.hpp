@@ -1171,10 +1171,18 @@ template<class T>
 void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
   const std::vector<T> &v = *this;
   if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
-    casadi_assert(len==size());
+    if (len!=size()) {
+			std::stringstream s;
+		  s << "Matrix<T>::setArray: number of non-zero elements is expected to be " << size() << ", but got " << len << " instead.";
+      throw CasadiException(s.str());
+    }
     copy(v.begin(),v.end(),val);
   } else if(sp==DENSE){
-    casadi_assert(len==numel());
+    if (len!=numel()) {
+			std::stringstream s;
+		  s << "Matrix<T>::setArray: number of elements is expected to be " << numel() << ", but got " << len << " instead.";
+      throw CasadiException(s.str());
+    }
     int k=0; // index of the result
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
@@ -1208,10 +1216,18 @@ template<class T>
 void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
   std::vector<T> &v = *this;
   if(sp==SPARSE || (sp==DENSE && numel()==size())){
-    casadi_assert(len==size());
+    if (len!=size()) {
+			std::stringstream s;
+		  s << "Matrix<T>::setArray: number of non-zero elements is expected to be " << size() << ", but got " << len << " instead.";
+      throw CasadiException(s.str());
+    }
     copy(val,val+len,v.begin());
   } else if(sp==DENSE){
-    casadi_assert(len==numel());
+    if (len!=numel()) {
+			std::stringstream s;
+		  s << "Matrix<T>::setArray: number of elements is expected to be " << numel() << ", but got " << len << " instead.";
+      throw CasadiException(s.str());
+    }
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
         // column
