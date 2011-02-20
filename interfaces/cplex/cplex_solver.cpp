@@ -1,3 +1,4 @@
+#include "cplex_solver.hpp"
 #include "cplex_internal.hpp"
 
 using namespace std;

@@ -196,6 +196,13 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "interfaces/knitro/knitro_solver.hpp"
 #endif
 
+#ifdef WITH_CPLEX
+%{ 
+  #include "interfaces/cplex/cplex_solver.hpp"
+%}
+#include "interfaces/cplex/cplex_solver.hpp"
+#endif
+
 #ifdef WITH_LIFTOPT
 %{ 
   #include "interfaces/liftopt/liftopt_solver.hpp"

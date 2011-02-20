@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.0)
 find_package(CPLEX REQUIRED QUIET)
-include_directories(${CPLEX_INCLUDE_DIRS})
+include_directories(${CPLEX_INCLUDE_DIR})
 
 SET(CPLEX_INTERFACE_SRCS
   cplex_solver.hpp
