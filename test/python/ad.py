@@ -173,8 +173,8 @@ class ADtests(casadiTestCase):
               
   def test_Jacobian(self):
     n=array([1.2,2.3,7])
-    for inputshape in ["column"]:
-      for outputshape in ["column"]:
+    for inputshape in ["column","row"]:
+      for outputshape in ["column","row"]:
         for inputtype in ["dense"]:
           for outputtype in ["dense"]:
             for mode in ["forward","adjoint"]:
@@ -192,7 +192,7 @@ class ADtests(casadiTestCase):
   def test_JacobianMX(self):
     n=array([1.2,2.3,7])
     for inputshape in ["column"]:
-      for outputshape in ["column"]:
+      for outputshape in ["column","row"]:
         for inputtype in ["dense"]:
           for outputtype in ["dense"]:
             for mode in ["forward","adjoint"]:

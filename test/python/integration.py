@@ -151,14 +151,8 @@ class Integrationtests(casadiTestCase):
     self.message('IPOPT integration: hessian to p: Jacobian of integrator.jacobian')
     num=self.num
     J=self.integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
-    J.setOption("number_of_fwd_dir",0)
-    J.setOption("number_of_adj_dir",1)
     J.init()
-    m=[MX("d",1,1) for i in range(5)] + [MX("d",0,0)]
-    JT = J.call(m)[0]
-    JT = MXFunction(m,[JT.T])
-    JT.init()
-    H=Jacobian(JT,INTEGRATOR_P)
+    H=Jacobian(J,INTEGRATOR_P)
     H.setOption("ad_mode","adjoint")
     H.init()
     H.input(INTEGRATOR_TF).set([num['tend']])
