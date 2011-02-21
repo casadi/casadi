@@ -36,10 +36,15 @@ class JacobianInternal;
 	
   Universal Jacobian class, calculates the Jacobian of a function based on AD forward or adjoint.
   
-  Options:
-  "finite_differences" false
-  "ad_mode"            "forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint
-  "sparse"             false
+  Options:\n
+  "finite_differences" false\n
+  "ad_mode"            "forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint\n
+  "sparse"             false\n
+  
+  Any CasADi::FX can be used to take the Jacobian of.
+  
+  If the iind'th input argument has shape (m,n) and the oind'th output argument has shape (k,l),
+  the output of this Jacobian will be of shape (k*l) x (m*n) .
   
   \author Joel Andersson 
   \date 2010
