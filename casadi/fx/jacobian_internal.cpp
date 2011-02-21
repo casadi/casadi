@@ -41,8 +41,8 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   casadi_assert_message(fcn_.output(oind_).size()== fcn_.output(oind_).numel(),"Jacobian not yet implemented for sparse output");
   
   // make sure that input and output are vectors (not matrices)
-  casadi_assert(fcn_.input(iind_).size2() == 1 or fcn_.input(iind_).size1() == 1);
-  casadi_assert(fcn_.output(oind_).size2() == 1 or fcn_.output(oind_).size1() == 1);
+  //casadi_assert(fcn_.input(iind_).size2() == 1 or fcn_.input(iind_).size1() == 1);
+  //casadi_assert(fcn_.output(oind_).size2() == 1 or fcn_.output(oind_).size1() == 1);
 
   // get the dimensions
   n_ = fcn_.input(iind_).numel();
