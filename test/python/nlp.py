@@ -38,7 +38,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("tol",1e-8)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",100)
-    #solver.setOption("print_level",0)
+    solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-10]*2)
     solver.input(NLP_UBX).set([10]*2)
@@ -59,7 +59,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("tol",1e-8)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",100)
-    #solver.setOption("print_level",0)
+    solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-10]*2)
     solver.input(NLP_UBX).set([10]*2)
@@ -72,24 +72,21 @@ class NLPtests(casadiTestCase):
     
     
   def testIPOPTrhb2(self):
-    return
-    self.message("IPOPT rosenbrock, exact hessian")
+    self.message("IPOPT rosenbrock, exact hessian, constrained")
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([[x,y]],[(1-x)**2+100*(y-x**2)**2])
+    obj = (1-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y]],[obj])
     g=SXFunction([[x,y]],[x+y])
     solver = IpoptSolver(f,g)
     
-    h=f.hessian()
-    h.init()
-    h.input().set([1,1])
-    h.evaluate()
-    print array(h.output())
-    
+    sigma=SX("sigma")
+    lambd=SX("lambd")
+    h=SXFunction([[x,y],[lambd],[sigma]],[sigma*hessian(obj,[x,y])+lambd*hessian(g.outputSX(0),[x,y])])
     
     solver = IpoptSolver(f,g,h)
-    solver.setOption("tol",1e-8)
+    solver.setOption("tol",1e-10)
     solver.setOption("max_iter",100)
     solver.setOption("hessian_approximation", "exact")
     #solver.setOption("print_level",0)
@@ -119,7 +116,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("tol",1e-10)
     solver.setOption("max_iter",100)
     solver.setOption("hessian_approximation", "exact")
-    #solver.setOption("print_level",0)
+    solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-10]*2)
     solver.input(NLP_UBX).set([10]*2)
@@ -143,7 +140,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("tol",1e-5)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",103)
-    #solver.setOption("print_level",0)
+    solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-10]*N)
     solver.input(NLP_UBX).set([10]*N)
