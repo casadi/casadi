@@ -146,7 +146,7 @@ class ADtests(casadiTestCase):
                 sens = sens.T
               self.checkarray(sens,dot(J,seed),"AD")    
 
-  def test_adj(self):
+  def test_adjMX(self):
     n=array([1.2,2.3,7])
     for inputshape in ["column"]:
       for outputshape in ["column","row"]:
@@ -170,6 +170,114 @@ class ADtests(casadiTestCase):
                 sens = sens.T
               
               self.checkarray(sens,dot(J.T,seed),"AD")
+              
+  def test_Jacobian(self):
+    n=array([1.2,2.3,7])
+    for inputshape in ["column"]:
+      for outputshape in ["column"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense"]:
+            for mode in ["forward","adjoint"]:
+              self.message(" %s Jacobian on SX. Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
+              f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+              f.init()
+              Jf=Jacobian(f,0,0)
+              Jf.setOption("ad_mode",mode)
+              Jf.init()
+              Jf.input().set(n)
+              Jf.evaluate()
+              J = self.jacobians[inputtype][outputtype](*n)
+              self.checkarray(Jf.output(),J,"Jacobian")
+
+  def test_JacobianMX(self):
+    n=array([1.2,2.3,7])
+    for inputshape in ["column"]:
+      for outputshape in ["column"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense"]:
+            for mode in ["forward","adjoint"]:
+              self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+              f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype])
+              f.init()
+              Jf=Jacobian(f,0,0)
+              Jf.setOption("ad_mode",mode)
+              Jf.init()
+              Jf.input().set(n)
+              Jf.evaluate()
+              J = self.jacobians[inputtype][outputtype](*n)
+              self.checkarray(Jf.output(),J,"Jacobian")
+              
+  def test_hessian(self):
+    return # not working
+    self.message("Jacobian chaining")
+    x=SX("x")
+    y=SX("y")
+    z=SX("z")
+    n=array([1.2,2.3,7])
+    f=SXFunction([[x,y,z]],[[x+2*y**3+3*z**4]])
+    f.init()
+    J=Jacobian(f,0,0)
+    J.setOption("ad_mode","forward")
+    J.init()
+    m=MX("m",3,1)
+    [JT] = J.call([m])
+    JT = MXFunction([m],[JT.T])
+    JT.init()
+    JT.input().set(n)
+    JT.evaluate()
+    H = Jacobian(JT,0,0)
+    H.setOption("ad_mode","adjoint")
+    H.init()
+    H.input().set(n)
+    H.evaluate()
+    
+    #print array(JT.output())
+    #print array(H.output())
+    
+  def test_bugshape(self):
+    return
+    x=SX("x")
+    y=SX("y")
+
+    inp=SXMatrix(5,1)
+    inp[0,0]=x
+    inp[3,0]=y
+
+    f=SXFunction([inp],[[x+y,x,y]])
+    f.init()
+    J=Jacobian(f,0,0)
+    J.setOption("ad_mode","forward")
+    J.init()
+    J.input().set([2,7])
+    J.evaluate()
+
+    self.assertEqual(f.output().size1(),3,"Jacobian shape bug")
+    self.assertEqual(f.output().size2(),1,"Jacobian shape bug")
+
+    
+  def test_bugglibc(self):
+    return
+    self.message("Code that used to throw a glibc error")
+    x=SX("x")
+    y=SX("y")
+
+    inp=SXMatrix(5,1)
+    inp[0,0]=x
+    inp[3,0]=y
+
+    f=SXFunction([inp],[[x+y,x,y]])
+    f.init()
+    J=Jacobian(f,0,0)
+    J.setOption("ad_mode","forward")
+    J.init()
+    J.input().set([2,7])
+    J.evaluate()
+
+    f=SXFunction([inp],[[x+y,x,y]])
+    f.init()
+    print f.input().shape
+    J=Jacobian(f,0,0)
+    
 if __name__ == '__main__':
     unittest.main()
 

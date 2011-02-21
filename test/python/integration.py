@@ -114,6 +114,64 @@ class Integrationtests(casadiTestCase):
 
     self.assertAlmostEqual(J.adjSens(INTEGRATOR_P)[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
     
+  def test_hess2(self):
+    return # known issue
+    t=symbolic("t")
+    q=symbolic("q")
+    p=symbolic("p")
+    f = ODE_NUM_IN * [[]]
+    f[ODE_T] = t
+    f[ODE_Y] = q
+    f[ODE_P] = p
+    f=SXFunction(f,[q/p*t**2])
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.init()
+    t0   = MX(0)
+    tend = MX("tend")
+    q0   = MX("q0")
+    par  = MX("p")
+    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qe=MXFunction([tend,q0,par],[qend])
+    qe.init()
+    J=qe.jacobian(2)
+    J.init()
+    J.input(0).set([2.3])
+    J.input(1).set([7.1])
+    J.input(2).set([2])
+    J.adjSeed(0).set([1])
+    J.evaluate(0,1)
+    num=self.num
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    self.assertAlmostEqual(J.adjSens()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+
+  def test_hess3(self):
+    self.message('IPOPT integration: hessian to p: Jacobian of integrator.jacobian')
+    num=self.num
+    J=self.integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
+    J.setOption("number_of_fwd_dir",0)
+    J.setOption("number_of_adj_dir",1)
+    J.init()
+    m=[MX("d",1,1) for i in range(5)] + [MX("d",0,0)]
+    JT = J.call(m)[0]
+    JT = MXFunction(m,[JT.T])
+    JT.init()
+    H=Jacobian(JT,INTEGRATOR_P)
+    H.setOption("ad_mode","adjoint")
+    H.init()
+    H.input(INTEGRATOR_TF).set([num['tend']])
+    H.input(INTEGRATOR_X0).set([num['q0']])
+    H.input(INTEGRATOR_P).set([num['p']])
+    H.evaluate(0,0)
+    num=self.num
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    
+
   def test_issue87(self):
     return # see issue 87
     self.message('IPOPT integration: hessian to p: fwd-over-adjoint on integrator')

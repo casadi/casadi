@@ -4,7 +4,6 @@ from typemaps import *
 from integration import *
 from ocp import *
 from nlp import *
-from jacobian import *
 from ad import *
 
 if __name__ == '__main__':
