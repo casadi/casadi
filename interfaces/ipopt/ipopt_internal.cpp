@@ -577,13 +577,25 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
                                    double* lambda)
 {
   try {
-    // MISSING: Starting values for the dual variables
-    casadi_assert(init_x == true);
-    casadi_assert(init_z == false);
-    casadi_assert(init_lambda == false);
-    const vector<double> &xinit = input(NLP_X_INIT);
-    copy(xinit.begin(),xinit.end(),x);
-    return true;
+    bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
+    if (warmstart) {
+      const vector<double> &z_lbinit = input(NLP_LAMBDA_LBX_INIT);
+      copy(z_lbinit.begin(),z_lbinit.end(),z_L);
+      const vector<double> &z_ubinit = input(NLP_LAMBDA_UBX_INIT);
+      copy(z_ubinit.begin(),z_ubinit.end(),z_U);
+      const vector<double> &xinit = input(NLP_X_INIT);
+      copy(xinit.begin(),xinit.end(),x);
+      const vector<double> &linit = input(NLP_LAMBDA_INIT);
+      copy(linit.begin(),linit.end(),lambda);
+      return true;
+    } else {
+      casadi_assert(init_x == true);
+      casadi_assert(init_z == false);
+      casadi_assert(init_lambda == false);
+      const vector<double> &xinit = input(NLP_X_INIT);
+      copy(xinit.begin(),xinit.end(),x);
+      return true;
+    }
   } catch (exception& ex){
     cerr << "get_starting_point failed: " << ex.what() << endl;
     return false;
