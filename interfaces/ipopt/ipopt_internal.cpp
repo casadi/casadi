@@ -224,30 +224,30 @@ void IpoptInternal::init(){
   int n=0;
   int m=0;
   // Basic sanity checks
-  if (F_.getNumInputs()!=1 or F_.getNumOutputs()!=1 or F_.output().size()!=1) {
-      throw CasadiException("Objective function should be single input, single output. Output must have exactly one element.");
+  if (F_.getNumInputs()<1 or F_.getNumOutputs()<1 or F_.output().size()!=1) {
+      throw CasadiException("Objective function should be (at least) single input, single output. First output must have exactly one element.");
   }
   n=F_.input().numel();
   if(!G_.isNull()) {
-    if (G_.getNumInputs()!=1 or G_.getNumOutputs()!=1 or G_.input().numel()!=n) {
-      throw CasadiException("Constraint function should be single input, single output. Number of elements in input should match those of the objective function.");
+    if (G_.getNumInputs()<1 or G_.getNumOutputs()<1 or G_.input().numel()!=n) {
+      throw CasadiException("Constraint function should be (at least) single input, single output. Number of elements in first input should match those of the objective function.");
     }
     m=G_.output().numel();
   }
   
   if(!H_.isNull()) {
-    if (H_.getNumInputs()!=3 or H_.getNumOutputs()!=1 or H_.input(0).numel()!=n or H_.output(0).size1()!=n or H_.output(0).size2()!=n) {
-      throw CasadiException("Hessian function should be triple input, single output.");
+    if (H_.getNumInputs()<3 or H_.getNumOutputs()<1 or H_.input(0).numel()!=n or H_.output(0).size1()!=n or H_.output(0).size2()!=n) {
+      throw CasadiException("Hessian function should be (at least) triple input, single output.");
     }
   }
   if(!J_.isNull() and !G_.isNull()) {
-    if (J_.getNumInputs()!=1 or J_.getNumOutputs()!=1 or J_.input(0).numel()!=n or J_.output(0).size1()!=m or J_.output(0).size2()!=n) {
-      throw CasadiException("Jacobian of constraints should be single input, single output.");
+    if (J_.getNumInputs()<1 or J_.getNumOutputs()<1 or J_.input(0).numel()!=n or J_.output(0).size1()!=m or J_.output(0).size2()!=n) {
+      throw CasadiException("Jacobian of constraints should be (at least) single input, single output.");
     }
   }
   if(!GF_.isNull()) {
-    if (GF_.getNumInputs()!=1 or GF_.getNumOutputs()!=1 or GF_.input(0).numel()!=n or GF_.output(0).size1()!=n or GF_.output(0).size2()!=n) {
-      throw CasadiException("Jacobian of objective should be single input, single output.");
+    if (GF_.getNumInputs()<1 or GF_.getNumOutputs()<1 or GF_.input(0).numel()!=n or GF_.output(0).size1()!=n or GF_.output(0).size2()!=n) {
+      throw CasadiException("Jacobian of objective should be (at least) single input, single output.");
     }
   }
   
@@ -332,44 +332,53 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
-  copy(x,x+n_,output(NLP_X_OPT).begin());
-  copy(z_L,z_L+n_,output(NLP_LAMBDA_LBX).begin());
-  copy(z_U,z_U+n_,output(NLP_LAMBDA_UBX).begin());
-  copy(lambda,lambda+m_,output(NLP_LAMBDA_OPT).begin());
-  output(NLP_COST).at(0) = obj_value;
+  try {
+    copy(x,x+n_,output(NLP_X_OPT).begin());
+    copy(z_L,z_L+n_,output(NLP_LAMBDA_LBX).begin());
+    copy(z_U,z_U+n_,output(NLP_LAMBDA_UBX).begin());
+    copy(lambda,lambda+m_,output(NLP_LAMBDA_OPT).begin());
+    output(NLP_COST).at(0) = obj_value;
+  } catch (exception& ex){
+    cerr << "finalize_solution failed: " << ex.what() << endl;
+  }
 }
 
 bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
-  log("eval_h started");
-  double time1 = clock();
-  if (values == NULL) {
-    int nz=0;
-    vector<int> rowind,col;
-    H_.output().sparsity().getSparsityCRS(rowind,col);
-    for(int r=0; r<rowind.size()-1; ++r)
-      for(int el=rowind[r]; el<rowind[r+1]; ++el){
-       if(col[el]<=r){
-          iRow[nz] = r;
-          jCol[nz] = col[el];
-          nz++;
-       }
-      }
-  } else {
-    // Pass input
-    H_.setInput(x);
-    H_.setInput(lambda,1);
-    H_.setInput(obj_factor,2);
+  try{
+    log("eval_h started");
+    double time1 = clock();
+    if (values == NULL) {
+      int nz=0;
+      vector<int> rowind,col;
+      H_.output().sparsity().getSparsityCRS(rowind,col);
+      for(int r=0; r<rowind.size()-1; ++r)
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+         if(col[el]<=r){
+            iRow[nz] = r;
+            jCol[nz] = col[el];
+            nz++;
+         }
+        }
+    } else {
+      // Pass input
+      H_.setInput(x);
+      H_.setInput(lambda,1);
+      H_.setInput(obj_factor,2);
 
-    // Evaluate
-    H_.evaluate();
+      // Evaluate
+      H_.evaluate();
 
-    // Get results
-    H_.output().get(values,SPARSESYM);
+      // Get results
+      H_.output().get(values,SPARSESYM);
+    }
+    double time2 = clock();
+    t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
+    log("eval_h ok");
+    return true;
+  } catch (exception& ex){
+    cerr << "eval_h failed: " << ex.what() << endl;
+    return false;
   }
-  double time2 = clock();
-  t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
-  log("eval_h ok");
-  return true;
 }
 
 bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
@@ -417,129 +426,149 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
 
 bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value)
 {
-  log("eval_f started");
-  
-  // Log time
-  double time1 = clock();
-  casadi_assert(n == n_);
+  try {
+    log("eval_f started");
+    
+    // Log time
+    double time1 = clock();
+    casadi_assert(n == n_);
 
-  // Pass the argument to the function
-  F_.setInput(x);
+    // Pass the argument to the function
+    F_.setInput(x);
 
-  // Evaluate the function
-  F_.evaluate();
+    // Evaluate the function
+    F_.evaluate();
 
-  // Get the result
-  F_.getOutput(obj_value);
+    // Get the result
+    F_.getOutput(obj_value);
 
-  // Printing
-  if(monitored("eval_f")){
-    cout << "obj_value = " << obj_value << endl;
+    // Printing
+    if(monitored("eval_f")){
+      cout << "obj_value = " << obj_value << endl;
+    }
+
+    double time2 = clock();
+    t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+
+    log("eval_f ok");
+    return true;
+  } catch (exception& ex){
+    cerr << "eval_f failed: " << ex.what() << endl;
+    return false;
   }
-
-  double time2 = clock();
-  t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
-  log("eval_f ok");
-  return true;
 }
 
 bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 {
-  log("eval_g started");
-  double time1 = clock();
+  try {
+    log("eval_g started");
+    double time1 = clock();
 
-  casadi_assert(n == n_);
-  casadi_assert(m == m_);
+    casadi_assert(n == n_);
+    casadi_assert(m == m_);
 
-  // Pass the argument to the function
-  G_.setInput(x);
+    // Pass the argument to the function
+    G_.setInput(x);
 
-  // Evaluate the function and tape
-  G_.evaluate();
+    // Evaluate the function and tape
+    G_.evaluate();
 
-  // Ge the result
-  G_.getOutput(g);
+    // Ge the result
+    G_.getOutput(g);
 
-  // Printing
-  if(monitored("eval_g"))
-    cout << "g = " << G_.output() << endl;
+    // Printing
+    if(monitored("eval_g"))
+      cout << "g = " << G_.output() << endl;
+      
+    double time2 = clock();
+    t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
     
-  double time2 = clock();
-  t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-  
-  log("eval_g ok");
-  return true;
+    log("eval_g ok");
+    return true;
+  } catch (exception& ex){
+    cerr << "eval_g failed: " << ex.what() << endl;
+    return false;
+  }
 }
 
 bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f)
 {
-  log("eval_grad_f started");
-  double time1 = clock();
-  casadi_assert(n == n_);
-  
-  // If no gradient function has been provided, use AD adjoint
-  if(GF_.isNull()){
-  
-    // Pass the argument to the function
-    F_.setInput(x);
+  try {
+    log("eval_grad_f started");
+    double time1 = clock();
+    casadi_assert(n == n_);
     
-    // Give a seed to the function
-    F_.setAdjSeed(1.0);
+    // If no gradient function has been provided, use AD adjoint
+    if(GF_.isNull()){
+    
+      // Pass the argument to the function
+      F_.setInput(x);
+      
+      // Give a seed to the function
+      F_.setAdjSeed(1.0);
 
-    // Evaluate, adjoint mode
-    F_.evaluate(0,1);
+      // Evaluate, adjoint mode
+      F_.evaluate(0,1);
 
-    // Get the result
-    F_.getAdjSens(grad_f);
+      // Get the result
+      F_.getAdjSens(grad_f);
 
-    // Printing
-    if(monitored("eval_grad_f")){
-      cout << "grad_f = " << F_.adjSens() << endl;
+      // Printing
+      if(monitored("eval_grad_f")){
+        cout << "grad_f = " << F_.adjSens() << endl;
+      }
+      
+    } else {
+      
+      // Pass the argument to the function
+      GF_.setInput(x);
+      
+      // Evaluate, adjoint mode
+      GF_.evaluate();
+
+      // Get the result
+      GF_.getOutput(grad_f);
+      
+      // Printing
+      if(monitored("eval_grad_f")){
+        cout << "grad_f = " << GF_.output() << endl;
+      }
     }
     
-  } else {
-    
-    // Pass the argument to the function
-    GF_.setInput(x);
-    
-    // Evaluate, adjoint mode
-    GF_.evaluate();
+    double time2 = clock();
+    t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
 
-    // Get the result
-    GF_.getOutput(grad_f);
-    
-    // Printing
-    if(monitored("eval_grad_f")){
-      cout << "grad_f = " << GF_.output() << endl;
+    // Check the result for regularity
+    for(int i=0; i<n; ++i){
+        if(isnan(grad_f[i]) || isinf(grad_f[i])){
+          log("eval_grad_f: result not regular");
+          return false;
+      }
     }
+
+    log("eval_grad_f ok");
+    return true;
+  } catch (exception& ex){
+    cerr << "eval_jac_f failed: " << ex.what() << endl;
+    return false;
   }
-  
-  double time2 = clock();
-  t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
-  // Check the result for regularity
-  for(int i=0; i<n; ++i){
-      if(isnan(grad_f[i]) || isinf(grad_f[i])){
-        log("eval_grad_f: result not regular");
-        return false;
-    }
-  }
-
-  log("eval_grad_f ok");
-  return true;
 }
 
 bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
                                 int m, double* g_l, double* g_u)
 {
-  casadi_assert(n == n_);
-  casadi_assert(m == m_);
-  vector<double> &lbx = input(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
-  vector<double> &ubx = input(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
-  vector<double> &lbg = input(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
-  vector<double> &ubg = input(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
-  return true;
+  try {
+    casadi_assert(n == n_);
+    casadi_assert(m == m_);
+    vector<double> &lbx = input(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
+    vector<double> &ubx = input(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
+    vector<double> &lbg = input(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
+    vector<double> &ubg = input(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
+    return true;
+  } catch (exception& ex){
+    cerr << "get_bounds_info failed: " << ex.what() << endl;
+    return false;
+  }
 }
 
 bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
@@ -547,71 +576,87 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
                                    int m, bool init_lambda,
                                    double* lambda)
 {
-
-  // MISSING: Starting values for the dual variables
-  casadi_assert(init_x == true);
-  casadi_assert(init_z == false);
-  casadi_assert(init_lambda == false);
-  const vector<double> &xinit = input(NLP_X_INIT);
-  copy(xinit.begin(),xinit.end(),x);
-  return true;
+  try {
+    // MISSING: Starting values for the dual variables
+    casadi_assert(init_x == true);
+    casadi_assert(init_z == false);
+    casadi_assert(init_lambda == false);
+    const vector<double> &xinit = input(NLP_X_INIT);
+    copy(xinit.begin(),xinit.end(),x);
+    return true;
+  } catch (exception& ex){
+    cerr << "get_starting_point failed: " << ex.what() << endl;
+    return false;
+  }
 }
 
 void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
 {
+  try {
+    n = n_;               // number of variables
+    m = m_;               // number of constraints
 
+    // Get Jacobian sparsity pattern
+    if(G_.isNull())
+      nnz_jac_g = 0;
+    else
+      nnz_jac_g = J_.output().size();
 
-  n = n_;               // number of variables
-  m = m_;               // number of constraints
-
-  // Get Jacobian sparsity pattern
-  if(G_.isNull())
-    nnz_jac_g = 0;
-  else
-    nnz_jac_g = J_.output().size();
-
-  // Get Hessian sparsity pattern
-  if(exact_hessian_)
-    nnz_h_lag = H_.output().sparsity().sizeL();
-  else
-    nnz_h_lag = 0;
+    // Get Hessian sparsity pattern
+    if(exact_hessian_)
+      nnz_h_lag = H_.output().sparsity().sizeL();
+    else
+      nnz_h_lag = 0;
+  } catch (exception& ex){
+    cerr << "get_nlp_info failed: " << ex.what() << endl;
+  }
 }
 
 int IpoptInternal::get_number_of_nonlinear_variables() const{
-  if(H_.isNull() || getOption("pass_nonlinear_variables") == false){
-    // No Hessian has been interfaced
-    return -1;
-  } else {
-    // Number of variables that appear nonlinearily
-    int nv = 0;
-    
-    // Loop over the rows
-    for(int i=0; i<H_.output().size1(); ++i){
-      // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-      if(H_.output().rowind(i)!=H_.output().rowind(i+1))
-        nv++;
+  try {
+    if(H_.isNull() || getOption("pass_nonlinear_variables") == false){
+      // No Hessian has been interfaced
+      return -1;
+    } else {
+      // Number of variables that appear nonlinearily
+      int nv = 0;
+      
+      // Loop over the rows
+      for(int i=0; i<H_.output().size1(); ++i){
+        // If the row contains any non-zeros, the corresponding variable appears nonlinearily
+        if(H_.output().rowind(i)!=H_.output().rowind(i+1))
+          nv++;
+      }
+      
+      // Return the number
+      return nv;
     }
-    
-    // Return the number
-    return nv;
+  } catch (exception& ex){
+    cerr << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+    return -1;
   }
 }
 
 bool IpoptInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const{
-  // Running index
-  int el = 0;
-  
-  // Loop over the rows
-  for(int i=0; i<H_.output().size1(); ++i){
-    // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-    if(H_.output().rowind(i)!=H_.output().rowind(i+1)){
-      pos_nonlin_vars[el++] = i;
+  try {
+    // Running index
+    int el = 0;
+    
+    // Loop over the rows
+    for(int i=0; i<H_.output().size1(); ++i){
+      // If the row contains any non-zeros, the corresponding variable appears nonlinearily
+      if(H_.output().rowind(i)!=H_.output().rowind(i+1)){
+        pos_nonlin_vars[el++] = i;
+      }
     }
+    
+    // Assert number and return
+    casadi_assert(el==num_nonlin_vars);
+    return true;
+  } catch (exception& ex){
+    cerr << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+    return false;
   }
-  
-  // Assert number and return
-  casadi_assert(el==num_nonlin_vars);
-  return true;
 }
 
 } // namespace CasADi
