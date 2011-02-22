@@ -315,5 +315,10 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
 };
 } // namespace CasADi
 
+#ifdef SWIG
+// Template instantiations
+%template(FXVector)             std::vector<CasADi::FX>;
+#endif // SWIG
+
 
 #endif // FX_HPP
