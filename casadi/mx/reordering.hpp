@@ -47,6 +47,9 @@ class Reordering : public MXNode{
     /// Default constructor
     explicit Reordering();
 
+    /// Destructor
+    virtual ~Reordering(){}
+    
     /// Evaluate the function and store the result in the node
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 

@@ -40,8 +40,11 @@ public:
 
   /** \brief  Default constructor */
   LiftoptSolver();
-  
-  /** \brief  Create an KINSOL instance */
+
+  /** \brief  Create an LIFTOPT instance (standard NLP interface) */
+  LiftoptSolver(const FX& F, const FX& G);
+
+  /** \brief  Create an LIFTOPT instance */
   explicit LiftoptSolver(const MXFunction& fcn);
   
   /** \brief  Access functions of the node */

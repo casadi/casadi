@@ -37,6 +37,7 @@ class SymbolicSXNode : public SXNode{
 public:
 
 explicit SymbolicSXNode(const std::string &name) : name(name){}
+virtual ~SymbolicSXNode(){}
 
 virtual bool isSymbolic() const{ 
   return true; 

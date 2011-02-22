@@ -31,7 +31,6 @@ CVodesIntegrator::CVodesIntegrator(){
 }
 
 CVodesIntegrator::CVodesIntegrator(const FX& f,const FX& q){
-  casadi_assert_message(f.getNumInputs()==ODE_NUM_IN && f.getNumOutputs()==ODE_NUM_OUT,"Wrong signature: f must be a CasADi::FX mapping from CasADi::Sundials::ODEInput to CasADi::Sundials::ODEOutput");
   assignNode(new CVodesInternal(f,q));
 }
 

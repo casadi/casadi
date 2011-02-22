@@ -34,7 +34,10 @@ class MatrixMatrixOp : public MXNode{
   public:
 
     /** \brief  Constructor */
-    MatrixMatrixOp (OPERATION op, const MX& x, const MX& y);
+    MatrixMatrixOp(OPERATION op, const MX& x, const MX& y);
+
+    /** \brief  Destructor */
+    virtual ~MatrixMatrixOp(){}
 
     /** \brief  Clone function */
     virtual MatrixMatrixOp * clone() const;

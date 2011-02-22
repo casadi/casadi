@@ -36,6 +36,9 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
   addOption("lower_bandwidth", OT_INTEGER);
   addOption("max_krylov", OT_INTEGER, 0);
   addOption("exact_jacobian", OT_BOOLEAN, true);
+  addOption("iterative_solver",OT_STRING,"gmres");
+  addOption("f_scale",OT_REALVECTOR);
+  addOption("u_scale",OT_REALVECTOR);
 
   mem_ = 0;
   u_ = 0;
@@ -79,9 +82,23 @@ void KinsolInternal::init(){
   u_scale_ = N_VNew_Serial(N_);
   f_scale_ = N_VNew_Serial(N_);
   
-  // Set scaling factors to one
-  N_VConst(1.0,u_scale_);
-  N_VConst(1.0,f_scale_);
+  // Set scaling factors on variables
+  if(hasSetOption("u_scale")){
+    vector<double> u_scale = getOption("u_scale").toDoubleVector();
+    casadi_assert(u_scale.size()==NV_LENGTH_S(u_scale_));
+    copy(u_scale.begin(),u_scale.end(),NV_DATA_S(u_scale_));
+  } else {
+    N_VConst(1.0,u_scale_);
+  }
+  
+  // Set scaling factors on equations
+  if(hasSetOption("f_scale")){
+    vector<double> f_scale = getOption("f_scale").toDoubleVector();
+    casadi_assert(f_scale.size()==NV_LENGTH_S(f_scale_));
+    copy(f_scale.begin(),f_scale.end(),NV_DATA_S(f_scale_));
+  } else {
+    N_VConst(1.0,f_scale_);
+  }
   
   // Create KINSOL memory block
   mem_ = KINCreate();

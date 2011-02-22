@@ -149,7 +149,7 @@ class SharedObjectNode{
   SharedObjectNode& operator=(const SharedObjectNode& node);
   
   /// Destructor
-  virtual ~SharedObjectNode() = 0;  
+  virtual ~SharedObjectNode() = 0;
 
   /// Make a deep copy of the instance  
   virtual SharedObjectNode* clone() const;

@@ -35,6 +35,9 @@ MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfc
   addOption("parallelization", OT_STRING);
 }
 
+MultipleShootingInternal::~MultipleShootingInternal(){
+}
+
 void MultipleShootingInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();

@@ -38,6 +38,9 @@ const double double_nan = std::numeric_limits<double>::quiet_NaN();
 class ConstantSXNode : public SXNode{
 public:
 
+// Destructor
+virtual ~ConstantSXNode(){};
+  
 /** \brief  Get the value must be defined */
 virtual double getValue() const = 0;
 
@@ -62,6 +65,9 @@ virtual void print(std::ostream &stream) const{
 class RealtypeSXNode : public ConstantSXNode{
 public:
 
+// Destructor
+virtual ~RealtypeSXNode(){}
+
 explicit RealtypeSXNode(double value) : value(value){} 
 
 //@{
@@ -83,24 +89,24 @@ double value;
   \date 2010
 */
 class IntegerSXNode : public ConstantSXNode{
-public:
+  public:
 
-explicit IntegerSXNode(int value) : value(value){}
+    virtual ~IntegerSXNode(){}
+    explicit IntegerSXNode(int value) : value(value){}
 
-//@{
-/** \brief  evaluate function */
-virtual double getValue() const{  return value; }
-virtual int getIntValue() const{  return value; }
-//@}
+    //@{
+    /** \brief  evaluate function */
+    virtual double getValue() const{  return value; }
+    virtual int getIntValue() const{  return value; }
+    //@}
 
-/** \brief  Properties */
-virtual bool isInteger() const{ return true; }
+    /** \brief  Properties */
+    virtual bool isInteger() const{ return true; }
+  
+  protected:
 
-protected:
-
-/** \brief  Data members */
-int value;
-
+    /** \brief  Data members */
+    int value;
 };
 
 
@@ -111,19 +117,20 @@ int value;
 class ZeroSXNode : public ConstantSXNode{
 public:
 
-explicit ZeroSXNode(){}
+  virtual ~ZeroSXNode(){}
+  explicit ZeroSXNode(){}
 
-//@{
-/** \brief  Get the value */
-virtual double getValue() const{ return 0;}
-virtual int getIntValue() const{ return 0;}
-//@}
+  //@{
+  /** \brief  Get the value */
+  virtual double getValue() const{ return 0;}
+  virtual int getIntValue() const{ return 0;}
+  //@}
 
-//@{
-/** \brief  Properties */
-virtual bool isInteger() const{ return true; }
-virtual bool isZero() const{ return true; }
-//@}
+  //@{
+  /** \brief  Properties */
+  virtual bool isInteger() const{ return true; }
+  virtual bool isZero() const{ return true; }
+  //@}
 };
 
 
@@ -134,15 +141,16 @@ virtual bool isZero() const{ return true; }
 class OneSXNode : public ConstantSXNode{
 public:
 
-explicit OneSXNode(){}
+  explicit OneSXNode(){}
+  virtual ~OneSXNode(){}
 
-/** \brief  Get the value */
-virtual double getValue() const{ return 1;}
-virtual int getIntValue() const{ return 1;}
+  /** \brief  Get the value */
+  virtual double getValue() const{ return 1;}
+  virtual int getIntValue() const{ return 1;}
 
-/** \brief  Properties */
-virtual bool isInteger() const{ return true; }
-virtual bool isOne() const{ return true; }
+  /** \brief  Properties */
+  virtual bool isInteger() const{ return true; }
+  virtual bool isOne() const{ return true; }
 
 };
 
@@ -154,19 +162,20 @@ virtual bool isOne() const{ return true; }
 class MinusOneSXNode : public ConstantSXNode{
 public:
 
-explicit MinusOneSXNode (){}
+  explicit MinusOneSXNode(){}
+  virtual ~MinusOneSXNode(){}
 
-//@{
-/** \brief  Get the value */
-virtual double getValue() const{ return -1;}
-virtual int getIntValue() const{ return -1;}
-//@}
+  //@{
+  /** \brief  Get the value */
+  virtual double getValue() const{ return -1;}
+  virtual int getIntValue() const{ return -1;}
+  //@}
 
-//@{
-/** \brief  Properties */
-virtual bool isInteger() const{ return true; }
-virtual bool isMinusOne() const{ return true; }
-//@}
+  //@{
+  /** \brief  Properties */
+  virtual bool isInteger() const{ return true; }
+  virtual bool isMinusOne() const{ return true; }
+  //@}
 
 };
 
@@ -178,13 +187,14 @@ virtual bool isMinusOne() const{ return true; }
 class InfSXNode : public ConstantSXNode{
 public:
 
-explicit InfSXNode (){}
+  explicit InfSXNode(){}
+  virtual ~InfSXNode(){}
 
-/** \brief  Get the value */
-virtual double getValue() const{ return double_inf;}
+  /** \brief  Get the value */
+  virtual double getValue() const{ return double_inf;}
 
-/** \brief  Properties */
-virtual bool isInf() const{ return true; }
+  /** \brief  Properties */
+  virtual bool isInf() const{ return true; }
 
 };
 
@@ -195,14 +205,15 @@ virtual bool isInf() const{ return true; }
 */
 class MinusInfSXNode : public ConstantSXNode{
 public:
+  
+  explicit MinusInfSXNode(){}
+  virtual ~MinusInfSXNode(){}
 
-explicit MinusInfSXNode (){}
+  /** \brief  Get the value */
+  virtual double getValue() const{ return -double_inf;}
 
-/** \brief  Get the value */
-virtual double getValue() const{ return -double_inf;}
-
-/** \brief  Properties */
-virtual bool isMinusInf() const{ return true; }
+  /** \brief  Properties */
+  virtual bool isMinusInf() const{ return true; }
 
 };
 
@@ -213,14 +224,15 @@ virtual bool isMinusInf() const{ return true; }
 */
 class NanSXNode : public ConstantSXNode{
 public:
+  
+  explicit NanSXNode(){}
+  virtual ~NanSXNode(){}
 
-explicit NanSXNode (){}
+  /** \brief  Get the value */
+  virtual double getValue() const{ return double_nan;}
 
-/** \brief  Get the value */
-virtual double getValue() const{ return double_nan;}
-
-/** \brief  Properties */
-virtual bool isNan() const{ return true; }
+  /** \brief  Properties */
+  virtual bool isNan() const{ return true; }
 
 };
 

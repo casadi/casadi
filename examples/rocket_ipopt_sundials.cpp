@@ -178,7 +178,6 @@ FX create_integrator_sundials(bool explicit_integrator){
   return integrator;
 }
 
-
 int main(){
   
   // Time length

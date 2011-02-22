@@ -28,6 +28,7 @@ using namespace std;
 namespace CasADi{
 
 BinarySXNode::~BinarySXNode(){
+#if 0
   for(int c=0; c<2; ++c){
     if(child[c]->isBinary()){
       if(--child[c].node->count == 0){
@@ -64,6 +65,7 @@ BinarySXNode::~BinarySXNode(){
       child[c].node->count++;
     }
   }
+#endif  
 }
 
   

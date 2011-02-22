@@ -333,6 +333,10 @@ int SX::getIntValue() const{
   return node->getIntValue();
 }
 
+SX SX::getDep(int ch) const{
+  return node->dep(ch);
+}
+
 const SX casadi_limits<SX>::zero(new ZeroSXNode()); // node corresponding to a constant 0
 const SX casadi_limits<SX>::one(new OneSXNode()); // node corresponding to a constant 1
 const SX casadi_limits<SX>::two(new IntegerSXNode(2)); // node corresponding to a constant 2
@@ -378,7 +382,10 @@ SX SX::log() const{
 }
 
 SX SX::sqrt() const{
-  return SX(new BinarySXNode(SQRT_NODE,*this));
+  if(isOne() || isZero())
+    return *this;
+  else
+    return SX(new BinarySXNode(SQRT_NODE,*this));
 }
 
 SX SX::sin() const{

@@ -36,6 +36,9 @@ public:
   /** \brief  Constructor */
   UnaryOp(OPERATION op, const MX& x);
 
+  /** \brief  Destructor */
+  virtual ~UnaryOp(){}
+
   /** \brief  Clone function */
   virtual UnaryOp * clone() const;
 

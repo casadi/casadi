@@ -14,28 +14,16 @@
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
 #include <optimal_control/multiple_shooting.hpp>
-#include <optimal_control/multiple_shooting_internal.hpp>
 
 using namespace CasADi;
 using namespace CasADi::Sundials;
 using namespace CasADi::OptimalControl;
 using namespace std;
 
-double Tc_ref = 280;
-double c_ref = 338.775766;
-double T_ref = 280.099198;
-
-double c_init = 956.271065;
-double T_init = 250.051971;
-
 int main(){
 
   // Allocate a parser and load the xml
   FMIParser parser("../examples/python/cstr/modelDescription.xml");
-
-  // Dump representation to screen
-//   cout << "XML representation:" << endl;
-//   parser.print();
 
   // Obtain the symbolic representation of the OCP
   OCP ocp = parser.parse();
@@ -49,6 +37,14 @@ int main(){
   // Sort the variables according to type
   OCPVariables var(ocp.variables);
   
+  // Correct the inital guess and bounds on variables
+  var.u[0].setStart(280);
+  var.u[0].setMin(230);
+  var.u[0].setMax(370);
+  
+  // Correct bound on state
+  var.x[1].setMax(350);
+  
   // Variables
   SX t = var.t.sx();
   Matrix<SX> x = sx(var.x);
@@ -57,19 +53,15 @@ int main(){
   Matrix<SX> p = sx(var.p);
   Matrix<SX> u = sx(var.u);
 
-  Matrix<double> x_sca = nominal(var.x);
-  Matrix<double> z_sca = nominal(var.z);
-  Matrix<double> u_sca = nominal(var.u);
-  Matrix<double> p_sca = nominal(var.p);
-
-  // Initial guess for the state
-  DMatrix x0(3,1,0);
-  x0[0] = 0.0;
-  x0[1] = T_init;
-  x0[2] = c_init;
+  // Initial guess and bounds for the state
+  vector<double> x0 = getStart(var.x,true);
+  vector<double> xmin = getMin(var.x,true);
+  vector<double> xmax = getMax(var.x,true);
   
-  // Initial guess for the control
-  DMatrix u0 = 280/u_sca;
+  // Initial guess and bounds for the control
+  vector<double> u0 = getStart(var.u,true);
+  vector<double> umin = getMin(var.u,true);
+  vector<double> umax = getMax(var.u,true);
   
   // Integrator instance
   Integrator integrator;
@@ -95,7 +87,7 @@ int main(){
   dae_in[DAE_P] = u;
   SXFunction dae(dae_in,scaled_ocp.dae);
 
-  bool use_kinsol = true;
+  bool use_kinsol = false;
   if(use_kinsol){
     // Create an ODE integrator (CVodes)
     integrator = CVodesIntegrator(ode);
@@ -127,33 +119,32 @@ int main(){
   MultipleShooting ms(integrator,mterm);
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
-//  ms.setOption("parallelization","openmp");
+  ms.setOption("parallelization","openmp");
   ms.init();
 
-  for(int k=0; k<num_nodes; ++k){
-    ms.input(OCP_U_INIT)(0,k) = 280/u_sca[0];
-    ms.input(OCP_LBU)(0,k) = 230/u_sca[0];
-    ms.input(OCP_UBU)(0,k) = 370/u_sca[0];
+  // Initial condition
+  for(int i=0; i<x.size(); ++i){
+    ms.input(OCP_X_INIT)(i,0) = ms.input(OCP_LBX)(i,0) = ms.input(OCP_UBX)(i,0) = x0[i];
   }
 
-  for(int k=0; k<=num_nodes; ++k){
+  // State bounds
+  for(int k=1; k<=num_nodes; ++k){
     for(int i=0; i<x.size(); ++i){
-      ms.input(OCP_X_INIT)(i,k) = x0[i]/x_sca[i];
+      ms.input(OCP_X_INIT)(i,k) = x0[i];
+      ms.input(OCP_LBX)(i,k) = xmin[i];
+      ms.input(OCP_UBX)(i,k) = xmax[i];
     }
   }
-  
-  // Bounds on state
-  double inf = numeric_limits<double>::infinity();
-  ms.input(OCP_LBX).setAll(-inf);
-  ms.input(OCP_UBX).setAll(inf);
-  for(int k=1; k<=num_nodes; ++k)
-    ms.input(OCP_UBX)(1,k) = 350/x_sca[1];
 
-  // Initial condition
-  ms.input(OCP_LBX)(0,0) = ms.input(OCP_UBX)(0,0) = 0/x_sca[0];
-  ms.input(OCP_LBX)(1,0) = ms.input(OCP_UBX)(1,0) = 250.052/x_sca[1];
-  ms.input(OCP_LBX)(2,0) = ms.input(OCP_UBX)(2,0) = 956.271/x_sca[2];
-  
+  // Control bounds
+  for(int k=0; k<num_nodes; ++k){
+    for(int i=0; i<u.size(); ++i){
+      ms.input(OCP_U_INIT)(i,k) = u0[i];
+      ms.input(OCP_LBU)(i,k) = umin[i];
+      ms.input(OCP_UBU)(i,k) = umax[i];
+    }
+  }
+
   IpoptSolver solver(ms.getF(),ms.getG(),FX(),ms.getJ());
   solver.setOption("tol",1e-5);
   solver.setOption("hessian_approximation", "limited-memory");
@@ -171,7 +162,7 @@ int main(){
   ms.solve();
   
   cout << solver.output() << endl;
-  
+    
   
   return 0;
 }

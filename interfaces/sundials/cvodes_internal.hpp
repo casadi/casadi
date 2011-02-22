@@ -176,10 +176,6 @@ public:
   // Throw error
   static void cvodes_error(const std::string& module, int flag);
 
-  // Auxiliary
-  static int getNX(const FX& f, const FX& q); // count the total number of states
-  static int getNP(const FX& f); // count the number of parameters
-  
   // Ids of backward problem
   std::vector<int> whichB_;
 

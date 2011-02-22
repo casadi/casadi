@@ -37,6 +37,9 @@ class Evaluation : public MultipleOutput{
 
     /** \brief  Constructor */
     explicit Evaluation(const FX& fcn, const std::vector<MX> &dep);
+    
+    /** \brief  Destructor */
+    virtual ~Evaluation(){}
   
     /** \brief  Clone function */
     virtual Evaluation* clone() const;
@@ -60,6 +63,9 @@ class EvaluationOutput : public OutputNode{
     /** \brief  Constructor */
     explicit EvaluationOutput (const MX& parent, int oind);
   
+    /** \brief  Destructor */
+    virtual ~EvaluationOutput(){}
+
     /** \brief  Clone function */
     virtual EvaluationOutput * clone() const;
 

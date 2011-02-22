@@ -169,6 +169,7 @@ class SX{
   bool isEqual(const SX& scalar) const;
   double getValue() const;
   int getIntValue() const;
+  SX getDep(int ch) const;
 
   /** \brief  Negation */
   SX operator-() const;

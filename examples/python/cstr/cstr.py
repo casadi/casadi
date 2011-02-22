@@ -102,7 +102,7 @@ dae_in[DAE_P] = concatenate((p,u))
 dae = SXFunction(dae_in,[scale_exp(ocp.dae)/[[1e7], [1000.], [350.]]])
 
 # Number of shooting nodes
-num_nodes = 20
+num_nodes = 100
 
 # Bounds on states
 cfcn_lb = []

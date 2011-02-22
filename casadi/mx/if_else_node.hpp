@@ -39,6 +39,9 @@ class IfNode : public MXNode{
     /** \brief  Constructors */
     IfNode(const MX& cond, const MX& if_true);
 
+    /// Destructor
+    virtual ~IfNode(){}
+
     /** \brief  Clone function */
     virtual IfNode* clone() const;
 

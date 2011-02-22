@@ -13,7 +13,7 @@ rhs = SXFunction([[t],[x,y,L],[u]],[f])
 I = CVodesIntegrator(rhs)
 I.setOption("abstol",1e-10) # abs. tolerance
 I.setOption("reltol",1e-10) # rel. tolerance
-I.setOption("steps_per_checkpoint",1000)
+I.setOption("steps_per_checkpoint",100)
 I.setOption("stop_at_end",True)
 I.init()
 
@@ -37,18 +37,35 @@ for k in range(NU):
   [X,XP,Z] = I.call([T0,TF,X,U[k],XP,Z])
 
 # Objective function: L(T)
-F = MXFunction([U],[X[2]])
+obj = X[2]
+F = MXFunction([U],[obj])
 
 # Terminal constraints: 0<=[x(T);y(T)]<=0
-G = MXFunction([U],[X[0:2]])
+eq = X[0:2]
+G = MXFunction([U],[eq])
 
-solver = IpoptSolver(F,G)
-solver.setOption("tol",1e-5)
-solver.setOption("hessian_approximation", \
-                "limited-memory")
-solver.setOption("max_iter",1000)
-solver.setOption("linear_solver","ma57")
-#solver.setOption("verbose",True)
+# Use the lifted newton method, transforming the single shooting problem to a multiple shooting problem 
+lifted_newton = False
+
+if lifted_newton:
+  # Create a liftopt solver instance
+  solver = LiftoptSolver(F,G) # TODO: debug! 
+  
+  # Set some options
+  solver.setOption("optimizer","sqp")
+  solver.setOption("lifted",True)
+  
+else:
+  # Single shooting
+  solver = IpoptSolver(F,G)
+  solver.setOption("tol",1e-5)
+  solver.setOption("hessian_approximation", \
+                  "limited-memory")
+  solver.setOption("max_iter",1000)
+  solver.setOption("linear_solver","ma57")
+  #solver.setOption("verbose",True)
+  
+# Initialize the NLP solver
 solver.init()
 
 # Set bounds and initial guess
@@ -64,4 +81,3 @@ solver.solve()
 # Plot the results
 plt.plot(solver.output(NLP_X_OPT))
 plt.show()
-

@@ -40,6 +40,9 @@ public:
 /** \brief  Constructor */
 Transpose(const MX& x);
 
+/// Destructor
+virtual ~Transpose(){}
+
 /** \brief  Clone function */
 virtual Transpose* clone() const;
 

@@ -134,12 +134,12 @@ OCP OCP::scale() const{
   append(v,u);
   
   // Nominal values
-  Matrix<SX> t_n = nominal(var.t);
-  Matrix<SX> x_n = nominal(var.x);
-  Matrix<SX> xdot_n = nominal(var.x);
-  Matrix<SX> z_n = nominal(var.z);
-  Matrix<SX> p_n = nominal(var.p);
-  Matrix<SX> u_n = nominal(var.u);
+  Matrix<SX> t_n = getNominal(var.t);
+  Matrix<SX> x_n = getNominal(var.x);
+  Matrix<SX> xdot_n = getNominal(var.x);
+  Matrix<SX> z_n = getNominal(var.z);
+  Matrix<SX> p_n = getNominal(var.p);
+  Matrix<SX> u_n = getNominal(var.u);
   
   // Get all the old variables in expressed in the nominal ones
   Matrix<SX> v_old;
@@ -154,49 +154,42 @@ OCP OCP::scale() const{
   Matrix<SX> temp;
 
   // Substitute equations
-  temp = dae;     substitute(temp,v,v_old);   ret.dae = temp;
-  temp = initeq;  substitute(temp,v,v_old);   ret.initeq = temp;
-  temp = cfcn;    substitute(temp,v,v_old);   ret.cfcn = temp;
-  temp = cfcn_lb; substitute(temp,v,v_old);   ret.cfcn_lb = temp;
-  temp = cfcn_ub; substitute(temp,v,v_old);   ret.cfcn_ub = temp;
-  temp = mterm;   substitute(temp,v,v_old);   ret.mterm = temp;
-  temp = lterm;   substitute(temp,v,v_old);   ret.lterm = temp;
-  
+  ret.dae     = substitute(dae,v,v_old);
+  ret.initeq  = substitute(initeq,v,v_old);
+  ret.cfcn    = substitute(cfcn,v,v_old);
+  ret.cfcn_lb = substitute(cfcn_lb,v,v_old);
+  ret.cfcn_ub = substitute(cfcn_ub,v,v_old);
+  ret.mterm   = substitute(mterm,v,v_old);
+  ret.lterm   = substitute(lterm,v,v_old);
   return ret;
 }
 
 void OCP::makeExplicit(){
-  throw CasadiException("OCP::makeExplicit: Commented out");
-#if 0  
+  // Sort the variables
+  OCPVariables var(variables);
+
   // Dynamic equation
-  SXMatrix dae(dyneq);
-  SXMatrix xdot1(xdot);
+  SXMatrix dae(this->dae);
+  SXMatrix xdot(der(var.x));
   
   // Take the Jacobian of the ode with respect to xdot
-  SXMatrix J = jacobian(dae,xdot1);
-
+  SXMatrix J = jacobian(dae,xdot);
+  
   // Make sure that J is invertable
-  if(dependsOn(J,xdot1)) throw CasadiException("OCP::makeExplicit:: Dynamic equation not affine in state derivative");
-  if(isZero(det(J))) throw CasadiException("OCP::makeExplicit: Jacobian not invertable");
+  casadi_assert_message(!dependsOn(J,xdot),"OCP::makeExplicit:: Dynamic equation not affine in state derivative");
+  //casadi_assert_message(!det(J).isZero(),"OCP::makeExplicit: Jacobian not invertable");
 
   // Write the differential equation in explicit form
-  SXMatrix rhs = solve(J,prod(J,xdot1-dae));
+  SXMatrix rhs = solve(J,prod(J,xdot)-dae);
 
   // Simplify the expression
   simplify(rhs);
+
+  // Save as explicit derivative
+  for(int i=0; i<var.x.size(); ++i)
+    var.x[i].setDifferentialEquation(rhs(i,0));
   
-  // Save as explicit state
-  xd = x;
-  x.clear();
-  xdot.clear();
-  diffeq.resize(rhs.numel());
-  for(int i=0; i<diffeq.size(); ++i)
-    diffeq[i] = rhs.getElement(i);
-  dyneq.clear();
-
-#endif
 }
-
 
 void OCP::makeSemiExplicit(){
   throw CasadiException("OCP::makeSemiExplicit: Commented out");

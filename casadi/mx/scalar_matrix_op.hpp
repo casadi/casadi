@@ -34,7 +34,10 @@ class ScalarMatrixOp : public MXNode{
   public:
 
     /** \brief  Constructor */
-    ScalarMatrixOp (OPERATION op, const MX& x, const MX& y);
+    ScalarMatrixOp(OPERATION op, const MX& x, const MX& y);
+
+    /** \brief  Destructor */
+    virtual ~ScalarMatrixOp(){}
 
     /** \brief  Clone function */
     virtual ScalarMatrixOp * clone() const;

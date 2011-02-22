@@ -582,9 +582,9 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
       // Get the j-th column of Q
       Matrix<T> qj = QT(j,ALL);
 
-      ri(0,j) = prod(qj,trans(qi))[0]; // Modified Gram-Schmidt
+      ri(0,j) = prod(qj,trans(qi))(0,0); // Modified Gram-Schmidt
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
-
+     
       // Remove projection in direction j
       qi -= ri(0,j) * qj;
     }

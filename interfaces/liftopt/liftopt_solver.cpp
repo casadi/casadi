@@ -29,6 +29,45 @@ namespace CasADi{
 LiftoptSolver::LiftoptSolver(){ 
 }
 
+LiftoptSolver::LiftoptSolver(const FX& F__, const FX& G__){
+  // This only works if the arguments are MXFunctions
+  MXFunction F = shared_cast<MXFunction>(F__);
+  MXFunction G = shared_cast<MXFunction>(G__);
+  casadi_assert_message(F.isNull()==F__.isNull(), "not a MX function");
+  casadi_assert_message(G.isNull()==G__.isNull(), "not a MX function");
+  
+  // Get the variable
+  MX U = F.inputMX();
+  MX U1 = G.inputMX();
+  casadi_assert(U.get()==U1.get());
+  
+  // Get objective and constraints
+  MX f = F.outputMX();
+  MX g = G.outputMX();
+  
+  // Lagrange multipliers
+  MX lam("lambda",g.size());
+  
+  // Lagrangian
+  MX lag = f - inner_prod(lam,g);
+
+  // NLP cost and objective function argument
+  vector<MX> fcn_in(LO_NUM_IN);
+  fcn_in[LO_U] = U;
+  fcn_in[LO_LAMBDA] = lam;
+  
+  // NLP cost and objective function
+  vector<MX> fcn_out(LO_NUM_OUT);
+  fcn_out[LO_OBJRES] = f;
+  fcn_out[LO_EQ] = g;
+  fcn_out[LO_INEQ] = MX(0,0); // FIXME: MX should be a 0-by-0 matrix by default, or?
+  fcn_out[LO_OBJ] = f;
+  fcn_out[LO_LAGFCN] = lag;
+  MXFunction fcn(fcn_in,fcn_out);
+
+  assignNode(new LiftoptInternal(fcn));
+}
+
 LiftoptSolver::LiftoptSolver(const MXFunction& fcn){
   assignNode(new LiftoptInternal(fcn));
 }

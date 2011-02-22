@@ -50,7 +50,7 @@ class MXFunctionInternal : public FXInternal{
     virtual MXFunctionInternal* clone() const;
 
     /** \brief  Destructor */
-    ~MXFunctionInternal();
+    virtual ~MXFunctionInternal();
 
     /** \brief  Order all nodes of a matrix syntax tree in the order of calculation */
     static void makeAlgorithm(MXNode* root, std::vector<MXNode*> &nodes, std::map<const MXNode*,int>  &nodemap);

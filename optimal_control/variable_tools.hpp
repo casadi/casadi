@@ -33,17 +33,22 @@ namespace OptimalControl{
   /// Get a vector of derivative expressions from a vector of variables
   std::vector<SX> der(const std::vector<Variable> v);
 
+#ifndef SWIG
+  /// Call a member function for all members of a vector (note: fcn pointer to member function)
+  std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal=false);
+#endif // SWIG
+  
   /// Get a vector of the nominal values of a vector of variables
-  std::vector<double> nominal(const std::vector<Variable> v);
+  std::vector<double> getNominal(const std::vector<Variable> v);
 
   /// Get a vector of the values at the initial time for a vector of variables
-  std::vector<double> getStart(const std::vector<Variable> v);
+  std::vector<double> getStart(const std::vector<Variable> v, bool nominal=false);
 
   /// Get a upper bounds
-  std::vector<double> getMax(const std::vector<Variable> v);
+  std::vector<double> getMax(const std::vector<Variable> v, bool nominal=false);
 
   /// Get a lower bounds
-  std::vector<double> getMin(const std::vector<Variable> v);
+  std::vector<double> getMin(const std::vector<Variable> v, bool nominal=false);
 
 } // namespace OptimalControl
 } // namespace CasADi

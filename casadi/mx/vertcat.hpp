@@ -36,6 +36,9 @@ public:
 /** \brief  Constructor */
 explicit Vertcat(const std::vector<MX> &comp);
 
+/** \brief  Destructor */
+virtual ~Vertcat(){}
+
 /** \brief  Clone function */
 virtual Vertcat* clone() const;
 

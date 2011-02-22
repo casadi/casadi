@@ -42,28 +42,6 @@ CVodesInternal* CVodesInternal::clone() const{
   return node;
 }
   
-int CVodesInternal::getNX(const FX& f, const FX& q){
-  // Check dimensions
-  if(f.getNumInputs()!=ODE_NUM_IN) throw CasadiException("CVodesInternal: f has wrong number of inputs");
-  if(f.getNumOutputs()!=ODE_NUM_OUT) throw CasadiException("CVodesInternal: f has wrong number of outputs");
-  if(!q.isNull()){
-    if(q.getNumInputs()!=ODE_NUM_IN) throw CasadiException("CVodesInternal: q has wrong number of inputs");
-    if(q.getNumOutputs()!=ODE_NUM_OUT) throw CasadiException("CVodesInternal: q has wrong number of outputs");
-  }
-
-  // Number of states
-  int nx = f.output().numel();
-  
-  // Add quadratures, if any_
-  if(!q.isNull()) nx += q.output().numel();
-  
-  return nx;
-}
-
-int CVodesInternal::getNP(const FX& f){
-  return f.input(ODE_P).numel();
-}
-  
 CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("linear_multistep_method",     OT_STRING,  "bdf"); // "bdf" or "adams"
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton"); // "newton" or "functional"
@@ -77,11 +55,6 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
   is_init = false;
   isInitAdj_ = false;
 
-  // Get dimensions
-  setDimensions(getNX(f,q), getNP(f),0);
-  
-  ny_ = f.output().numel();
-  nq_ = q.isNull() ? 0 : q.output().numel();
 
 }
 
@@ -108,12 +81,33 @@ CVodesInternal::~CVodesInternal(){
 }
 
 void CVodesInternal::init(){
-  IntegratorInternal::init();
-
   // Init ODE rhs function and quadrature functions
   f_.init();
-  if(!q_.isNull()) q_.init();
+  casadi_assert(f_.getNumInputs()==ODE_NUM_IN);
+  casadi_assert(f_.getNumOutputs()==ODE_NUM_OUT);
+  if(!q_.isNull()){
+    q_.init();
+    casadi_assert(q_.getNumInputs()==ODE_NUM_IN);
+    casadi_assert(q_.getNumOutputs()==ODE_NUM_OUT);
+  }
 
+  // Number of states
+  int nx = f_.output(INTEGRATOR_XF).numel();
+
+  // Add quadratures, if any
+  if(!q_.isNull()) nx += q_.output().numel();
+
+  // Number of parameters
+  int np = f_.input(ODE_P).numel();
+  
+  // Set dimensions
+  setDimensions(nx,np,0);
+  
+  ny_ = f_.output().numel();
+  nq_ = q_.isNull() ? 0 : q_.output().numel();
+  
+  IntegratorInternal::init();
+  
   // Try to generate a jacobian of none provided
   if(!linsol_.isNull() && M_.isNull()){
     SXFunction f = shared_cast<SXFunction>(f_);

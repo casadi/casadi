@@ -24,6 +24,7 @@
 #include "casadi_exception.hpp"
 
 #include <typeinfo>
+#include <cassert>
 
 using namespace std;
 namespace CasADi{
@@ -111,7 +112,7 @@ SharedObjectNode::SharedObjectNode(){
 }
 
 SharedObjectNode::~SharedObjectNode(){
-   casadi_assert(count==0);
+   assert(count==0);
 }
 
 void SharedObject::init(){

@@ -362,7 +362,7 @@ int main(){
     // backward seeds
     vector<double> &bseed = integrator.adjSeed(INTEGRATOR_XF);
     fill(bseed.begin(),bseed.end(),0);
-    bseed[0] = 1;
+    bseed[1] = 1;
 
     // evaluate with forward and adjoint sensitivities
     integrator.evaluate(1,1);
@@ -386,11 +386,11 @@ int main(){
   if(second_order){
     // Preturb the forward seeds
     if(perturb_u){
-      double u_seed = 1.01;
+      double u_seed = 1.001;
       integrator.setFwdSeed(u_seed,INTEGRATOR_P);
     } else {
       vector<double> x0_seed(x0.size(),0);
-      x0_seed[1] = 1.01;
+      x0_seed[1] = 1.001;
       integrator.setFwdSeed(x0_seed,INTEGRATOR_X0);
     }
     
@@ -402,12 +402,12 @@ int main(){
 
     vector<double> fd2(fsens.size());
     for(int i=0; i<fd2.size(); ++i)
-      fd2[i] = (fsens_pret[i]-fsens[i])/0.01;
+      fd2[i] = (fsens_pret[i]-fsens[i])/0.001;
     cout << "finite differences, 2nd order   " << fd2 << endl;
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
-    FX intjac = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
-    Jacobian intjac2(integrator,INTEGRATOR_P,INTEGRATOR_XF);
+    FX intjac  = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
+    FX intjac2 = Jacobian(integrator,INTEGRATOR_P,INTEGRATOR_XF);
 
     // Set options
     intjac.setOption("number_of_fwd_dir",0);
@@ -434,9 +434,18 @@ int main(){
     intjac.setAdjSeed(jacseed);
     
     // Evaluate the Jacobian
-    intjac.evaluate(0,1);
+    intjac.evaluate(0,0);
     intjac2.evaluate(0,0);
 
+    
+    cout << "jacobian                  " << intjac.output(0) << endl;
+    cout << "jacobian2                 " << intjac2.output(0) << endl;
+        
+    return 0;
+
+    
+    
+    
     // Get the results
     cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;
     cout << "second order (fwd-over-adj)     " ;

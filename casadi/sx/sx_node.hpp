@@ -46,7 +46,7 @@ public:
 SXNode();
 
 /** \brief  destructor  */
-virtual ~SXNode(); // non-virtual to avoid stack overflow upon destruction!
+virtual ~SXNode();
 //@{
 /** \brief  check properties of a node */
 virtual bool isConstant() const; // check if constant

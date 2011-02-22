@@ -40,32 +40,38 @@ vector<SX> der(const vector<Variable> v){
   return ret;
 }
 
-vector<double> nominal(const vector<Variable> v){
+vector<double> getNominal(const vector<Variable> v){
   vector<double> ret(v.size());
   for(int i=0; i<v.size(); ++i)
     ret[i] = v[i].getNominal();
   return ret;
 }
 
-vector<double> getStart(const vector<Variable> v){
+std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal){
   vector<double> ret(v.size());
   for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].getStart();
+    ret[i] = (v[i].*fcn)();
+
+  if(nominal){
+    vector<double> nominal = getNominal(v);
+    for(int i=0; i<v.size(); ++i)
+      ret[i] /= nominal[i];
+  }
+
   return ret;
 }
 
-vector<double> getMin(const vector<Variable> v){
-  vector<double> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].getMin();
-  return ret;
+
+vector<double> getStart(const vector<Variable> v, bool nominal){
+  return getAll(&Variable::getStart, v, nominal);
 }
 
-vector<double> getMax(const vector<Variable> v){
-  vector<double> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].getMax();
-  return ret;
+vector<double> getMin(const vector<Variable> v, bool nominal){
+  return getAll(&Variable::getMin, v, nominal);
+}
+
+vector<double> getMax(const vector<Variable> v, bool nominal){
+  return getAll(&Variable::getMax, v, nominal);
 }
 
     

@@ -36,6 +36,9 @@ class Multiplication : public MXNode{
     /** \brief  Constructor */
     Multiplication(const MX& x, const MX& y);
 
+    /** \brief  Destructor */
+    virtual ~Multiplication(){}
+
     /** \brief  Clone function */
     virtual Multiplication* clone() const;
 
