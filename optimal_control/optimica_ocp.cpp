@@ -170,7 +170,9 @@ void OCP::makeExplicit(){
 
   // Dynamic equation
   SXMatrix dae(this->dae);
-  SXMatrix xdot(der(var.x));
+  SXMatrix xdot(var.x.size(),1,0);
+  for(int i=0; i<var.x.size(); ++i)
+    xdot[i] = var.x[i].getDerivative();
   
   // Take the Jacobian of the ode with respect to xdot
   SXMatrix J = jacobian(dae,xdot);
@@ -182,9 +184,9 @@ void OCP::makeExplicit(){
   // Write the differential equation in explicit form
   SXMatrix rhs = solve(J,prod(J,xdot)-dae);
 
-  // Simplify the expression
-  simplify(rhs);
-
+  // Remove the xdots
+  rhs = substitute(rhs,xdot,SXMatrix(xdot.sparsity(),0));
+  
   // Save as explicit derivative
   for(int i=0; i<var.x.size(); ++i)
     var.x[i].setDifferentialEquation(rhs(i,0));

@@ -384,6 +384,8 @@ SX SX::log() const{
 SX SX::sqrt() const{
   if(isOne() || isZero())
     return *this;
+  else if(isBinary() && getOp()==MUL_NODE && getDep(0).isEqual(getDep(1)))
+    return getDep().fabs();
   else
     return SX(new BinarySXNode(SQRT_NODE,*this));
 }
@@ -434,7 +436,10 @@ SX SX::erf() const{
 }
 
 SX SX::fabs() const{
-  return sign(*this)**this;
+  if(isConstant() && getValue()>=0)
+    return *this;
+  else
+    return sign(*this)**this;
 }
 
 SX casadi_operators<SX>::add(const SX&x, const SX&y){

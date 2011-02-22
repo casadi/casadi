@@ -85,7 +85,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data=std::vector<T>());
 
     /// sparse matrix with a given sparsity
-    explicit Matrix(const CRSSparsity& sparsity);
+    explicit Matrix(const CRSSparsity& sparsity, const T& val=0);
     
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
@@ -841,9 +841,9 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
 }
 
 template<class T>
-Matrix<T>::Matrix(const CRSSparsity& sparsity){
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
   sparsity_ = sparsity;
-  std::vector<T>::resize(sparsity_.size());
+  std::vector<T>::resize(sparsity_.size(),val);
 }
 
 
