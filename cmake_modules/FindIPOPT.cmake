@@ -13,7 +13,8 @@ ELSE (IPOPT_INCLUDE_DIR)
    MESSAGE(STATUS "Could not find IPOPT include dir")
 ENDIF (IPOPT_INCLUDE_DIR)
 
-FIND_LIBRARY(IPOPT_LIBRARY NAMES ipopt HINTS /usr/local/lib/coin /usr/local/lib/coin/ThirdParty $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/)
+FIND_LIBRARY(IPOPT_LIBRARY 
+ipopt HINTS /usr/local/lib/coin /usr/local/lib/coin/ThirdParty $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/)
 
 MESSAGE(STATUS "${PTHREAD_LIBRARIES}")
 
@@ -28,3 +29,8 @@ ENDIF (IPOPT_LIBRARY)
 IF(IPOPT_FOUND_INCLUDE AND IPOPT_FOUND_LIBS)
   SET(IPOPT_FOUND TRUE)
 ENDIF(IPOPT_FOUND_INCLUDE AND IPOPT_FOUND_LIBS)
+
+
+
+
+
