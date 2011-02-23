@@ -66,6 +66,9 @@ class FXInternal;
     input  row: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
     output row: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
     
+  NOTE: FX's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
+    Futher releases may disallow this.
+    
   \section Notes for developers
   
   Each function consists of 4 files:\n

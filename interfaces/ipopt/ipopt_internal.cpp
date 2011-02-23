@@ -579,9 +579,9 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   try {
     bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
     if (warmstart) {
-      const vector<double> &z_lbinit = input(NLP_LAMBDA_LBX_INIT);
+      const vector<double> &z_lbinit = output(NLP_LAMBDA_LBX);
       copy(z_lbinit.begin(),z_lbinit.end(),z_L);
-      const vector<double> &z_ubinit = input(NLP_LAMBDA_UBX_INIT);
+      const vector<double> &z_ubinit = output(NLP_LAMBDA_UBX);
       copy(z_ubinit.begin(),z_ubinit.end(),z_U);
       const vector<double> &xinit = input(NLP_X_INIT);
       copy(xinit.begin(),xinit.end(),x);

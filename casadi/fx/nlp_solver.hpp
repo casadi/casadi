@@ -41,10 +41,6 @@ NLP_LBG,
 NLP_UBG,
 /// Lambda multipliers initial guess
 NLP_LAMBDA_INIT,
-/// Lower bound multipliers initial guess
-NLP_LAMBDA_LBX_INIT,
-/// Upper bound multipliers initial guess
-NLP_LAMBDA_UBX_INIT,
 NLP_NUM_IN};
 
 /// Outputs arguments of an NLP Solver
@@ -56,8 +52,10 @@ NLP_COST,
 ///  Lambda multipliers function for optimal solution
 NLP_LAMBDA_OPT,
 ///  Lower bound multipliers for optimal solution
+///  When in warm start mode, this output will be used as input
 NLP_LAMBDA_LBX,
 ///  Upper bound multipliers for optimal solution
+///  When in warm start mode, this output will be used as input
 NLP_LAMBDA_UBX,
 NLP_NUM_OUT};
 

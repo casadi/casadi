@@ -39,9 +39,13 @@ enum IntegratorInput{
   INTEGRATOR_X0, 
   /** Parameters p  (dimension np-by-1) */
   INTEGRATOR_P,  
-  /** Differential state derivative at t0  (dimension nx-by-1) */
+  /** Differential state derivative at t0  (dimension nx-by-1)
+  * This input may be changed during an IDASIntegrator::evaluate()
+  */
   INTEGRATOR_XP0, 
-  /** Algebraic state at t0  (dimension nz-by-1) */
+  /** Algebraic state at t0  (dimension nz-by-1) 
+  * This input may be changed during an IDASIntegrator::evaluate()
+  */
   INTEGRATOR_Z0, 
   INTEGRATOR_NUM_IN};
 
