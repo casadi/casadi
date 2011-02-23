@@ -4,6 +4,8 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+from scipy.linalg import expm
+import scipy.special
 
 class Integrationtests(casadiTestCase):
 
@@ -145,6 +147,8 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
+    print J.adjSens()[0]
+    print J.output()
     self.assertAlmostEqual(J.adjSens()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
 
   def test_hess3(self):
@@ -158,6 +162,32 @@ class Integrationtests(casadiTestCase):
     H.input(INTEGRATOR_TF).set([num['tend']])
     H.input(INTEGRATOR_X0).set([num['q0']])
     H.input(INTEGRATOR_P).set([num['p']])
+    H.evaluate(0,0)
+    num=self.num
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+
+  def test_hess4(self):
+    self.message('IPOPT integration: hessian to p: Jacobian of integrator.jacobian indirect')
+    num=self.num
+    J=self.integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
+    J.init()
+    
+    t0=MX("t0")
+    tend=MX("tend")
+    q0=MX("q0")
+    p=MX("p")
+    dq0=MX("dq0")
+    d=MX("d",0,0)
+    Ji = MXFunction([q0,p,dq0,d],[J.call([MX(0),MX(num['tend']),q0,p,dq0,d])[0]])
+    Ji.init()
+    H=Jacobian(Ji,1)
+    H.setOption("ad_mode","adjoint")
+    H.init()
+    H.input(0).set([num['q0']])
+    H.input(1).set([num['p']])
     H.evaluate(0,0)
     num=self.num
     tend=num['tend']
@@ -189,6 +219,249 @@ class Integrationtests(casadiTestCase):
     print J.adjSens()
     print J.fwdSens()
     self.assertAlmostEqual(J.adjSens(2)[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    
+    
+  def test_glibcbug(self):
+    return
+    self.message("former glibc error")
+    A=array([2.3,4.3,7.6])
+    B=array([[1,2.3,4],[-2,1.3,4.7],[-2,6,9]])
+
+    te=0.7
+    t=symbolic("t")
+    q=symbolic("q",3,1)
+    p=symbolic("p",9,1)
+    f=SXFunction([t,q,p],[c.dot(c.reshape(p,3,3),q)])
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("steps_per_checkpoint",1000)
+    integrator.init()
+    t0   = MX(0)
+    tend = MX(te)
+    q0   = MX("q0",3,1)
+    par  = MX("p",9,1)
+    qend=integrator([t0,tend,q0,par,MX(3,1),MX()])
+    qe=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
+    qe.init()
+    qe=qe.call([t0,tend,q0,par,MX(3,1),MX()])[0]
+
+    qef=MXFunction([q0,par],[qe])
+    qef.init()
+
+    qef.input(0).set(A)
+    qef.input(1).set(B.ravel())
+    qef.evaluate()
+    
+  def test_linear_system(self):
+    self.message("Linear ODE")
+    A=array([2.3,4.3,7.6])
+    B=array([[1,2.3,4],[-2,1.3,4.7],[-2,6,9]])
+    te=0.7
+    Be=expm(B*te)
+    t=symbolic("t")
+    q=symbolic("q",3,1)
+    p=symbolic("p",9,1)
+    f = ODE_NUM_IN * [[]]
+    f[ODE_T] = t
+    f[ODE_Y] = q
+    f[ODE_P] = p
+    f=SXFunction(f,[c.dot(c.reshape(p,3,3),q)])
+    f.init()
+
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("verbose",True)
+    integrator.setOption("steps_per_checkpoint",10000)
+
+    integrator.init()
+
+    t0   = MX(0)
+    tend = MX(te)
+    q0   = MX("q0",3,1)
+    par  = MX("p",9,1)
+    qend=integrator([t0,tend,q0,par,MX(3,1),MX()])
+    qe=MXFunction([q0,par],[qend])
+    qe.init()
+    qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
+    qendJ.init()
+    qendJ=qendJ.call([t0,tend,q0,par,MX(3,1),MX()])[0]
+
+    qeJ=MXFunction([q0,par],[qendJ])
+    qeJ.init()
+
+    qendJ2=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
+    qendJ2.init()
+    qendJ2=qendJ2.call([t0,tend,q0,par,MX(3,1),MX()])[0]
+
+    qeJ2=MXFunction([q0,par],[qendJ2])
+    qeJ2.init()
+    
+    qe.input(0).set(A)
+    qe.input(1).set(B.ravel())
+    qe.evaluate()
+    self.checkarray(dot(Be,A)/1e3,qe.output()/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
+    qeJ.input(0).set(A)
+    qeJ.input(1).set(B.ravel())
+    qeJ.evaluate()
+    self.checkarray(qeJ.output()/1e3,Be/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
+    
+    
+    qeJ2.input(0).set(A)
+    qeJ2.input(1).set(B.ravel())
+    qeJ2.evaluate()
+    print array(qeJ2.output())
+    print Be
+    
+    return # this should return identical zero
+    H=Jacobian(qeJ,0,0)
+    H.setOption("ad_mode","adjoint")
+    H.init()
+    H.input(0).set(A)
+    H.input(1).set(B.ravel())
+    H.evaluate()
+    print array(H.output())
+    
+    
+  def test_mathieu_system(self):
+    self.message("Mathieu ODE")
+    A=array([0.3,1.2])
+    B=array([1.3,4.3,2.7])
+    te=0.7
+
+    t=symbolic("t")
+    q=symbolic("q",2,1)
+    p=symbolic("p",3,1)
+
+    f=SXFunction([t,q,p],[vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])])
+    f.init()
+    
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("verbose",True)
+    integrator.setOption("steps_per_checkpoint",10000)
+
+    integrator.init()
+
+    t0   = MX(0)
+    tend = MX(te)
+    q0   = MX("q0",2,1)
+    par  = MX("p",3,1)
+    qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
+    qe=MXFunction([q0,par],[qend])
+    qe.init()
+    qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
+    qendJ.init()
+    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1),MX()])[0]
+    qeJ=MXFunction([q0,par],[qendJ])
+    qeJ.init()
+
+    qe.input(0).set(A)
+    qe.input(1).set(B)
+    qe.evaluate()
+    print array(qe.output())
+    
+    
+  def test_nl_system(self):
+    """
+    y'' = 1 + (y')^2 , y(0)=y0, y'(0)=yc0
+    
+    The solution is:
+    (2*y0-log(yc0^2+1))/2-log(cos(atan(yc0)+t))
+
+    """
+    self.message("Nonlinear ODE sys")
+    A=array([1,0.1])
+    y0=A[0]
+    yc0=A[1]
+    te=0.4
+
+    t=symbolic("t")
+    q=symbolic("y",2,1)
+    p=symbolic("p",0,0)
+    # y
+    # y'
+    f=SXFunction([t,q,p],[vertcat([q[1],1+q[1]**2 ])])
+    f.init()
+    
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("verbose",True)
+    integrator.setOption("steps_per_checkpoint",10000)
+
+    integrator.init()
+
+    t0   = MX(0)
+    tend = MX(te)
+    q0   = MX("q0",2,1)
+    par  = MX("p",0,1)
+    qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
+    qe=MXFunction([q0,par],[qend])
+    qe.init()
+    qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
+    qendJ.init()
+    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1),MX()])[0]
+    qeJ=MXFunction([q0,par],[qendJ])
+    qeJ.init()
+
+    qe.input(0).set(A)
+    qe.evaluate()
+
+    print qe.output()[0]
+    print qe.output()[1]
+    self.assertAlmostEqual(qe.output()[0],(2*y0-log(yc0**2+1))/2-log(cos(arctan(yc0)+te)),11,"Nonlin ODE")
+    self.assertAlmostEqual(qe.output()[1],tan(arctan(yc0)+te),11,"Nonlin ODE")
+    
+    qeJ.input(0).set(A)
+    qeJ.evaluate()
+    
+    Jr = array([[1,tan(arctan(yc0)+te)/(yc0**2+1)-yc0/(yc0**2+1)],[0,tan(arctan(yc0)+te)**2/(yc0**2+1)+1/(yc0**2+1)]])
+    self.checkarray(qeJ.output(),Jr,"jacobian of Nonlin ODE")
+    
+    
+    Jf=Jacobian(qe,0,0)
+    Jf.setOption("ad_mode","adjoint")
+    Jf.init()
+    Jf.input(0).set(A)
+    Jf.evaluate()
+    print array(Jf.output())
+    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    
+    
+    Jf=Jacobian(qe,0,0)
+    Jf.setOption("ad_mode","forward")
+    Jf.init()
+    Jf.input(0).set(A)
+    Jf.evaluate()
+    print array(Jf.output())
+    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    
+    qeJf=MXFunction([q0,par],[vec(qeJ.call([q0,par])[0])])
+    qeJf.init()
+    
+    H=Jacobian(qeJf,0,0)
+    H.setOption("ad_mode","adjoint")
+    H.init()
+    H.input(0).set(A)
+    H.evaluate()
+    def sec(x):
+      return 1.0/cos(x)
+    Hr = array([[0,0],[0,-(2*yc0*tan(arctan(yc0)+te))/(yc0**4+2*yc0**2+1)+sec(arctan(yc0)+te)**2/(yc0**4+2*yc0**2+1)+(2*yc0**2)/(yc0**4+2*yc0**2+1)-1/(yc0**2+1)],[0,0],[0,-(2*yc0*tan(arctan(yc0)+te)**2)/(yc0**4+2*yc0**2+1)+(2*sec(arctan(yc0)+te)**2*tan(arctan(yc0)+te))/(yc0**4+2*yc0**2+1)-(2*yc0)/(yc0**4+2*yc0**2+1)]])
+    print array(H.output())
+    print Hr
+    
+    
+    qeJ=integrator.jac(INTEGRATOR_X0,INTEGRATOR_XF)
+    qeJ.init()
+    qeJ.input(0).set(0)
+    qeJ.input(1).set(te)
+    qeJ.input(2).set(list(A)+[0,1,0,0])
+    qeJ.adjSeed(0).set([0,0]+[0,1,0,0])
+    qeJ.evaluate(0,1)
+    print qeJ.output()
+    print qeJ.adjSens(2)
     
 if __name__ == '__main__':
     unittest.main()

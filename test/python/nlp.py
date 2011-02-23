@@ -59,7 +59,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("tol",1e-8)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",100)
-    solver.setOption("print_level",0)
+    #solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-10]*2)
     solver.input(NLP_UBX).set([10]*2)
@@ -78,8 +78,11 @@ class NLPtests(casadiTestCase):
     
     obj = (1-x)**2+100*(y-x**2)**2
     f=SXFunction([[x,y]],[obj])
-    g=SXFunction([[x,y]],[x+y])
+    g=SXFunction([[x,y]],[x**2+y**2])
     solver = IpoptSolver(f,g)
+    
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
     
     sigma=SX("sigma")
     lambd=SX("lambd")
@@ -93,13 +96,36 @@ class NLPtests(casadiTestCase):
     solver.init()
     solver.input(NLP_LBX).set([-10]*2)
     solver.input(NLP_UBX).set([10]*2)
-    solver.input(NLP_LBG).set([-10])
-    solver.input(NLP_UBG).set([10])
+    solver.input(NLP_LBG).set([0])
+    solver.input(NLP_UBG).set([1])
     solver.solve()
-    self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,"IPOPT")
-     
+    self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,10,"IPOPT")
+    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],10,"IPOPT")
+    self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],x_r[1],10,"IPOPT")
+    self.message(":warmstart")
+    oldsolver=solver
+    solver = IpoptSolver(f,g,h)
+    solver.setOption("tol",1e-10)
+    solver.setOption("max_iter",100)
+    solver.setOption("hessian_approximation", "exact")
+    #solver.setOption("print_level",0)
+    solver.setOption("warm_start_init_point","yes")
+    solver.setOption("warm_start_bound_push",1e-6)
+    solver.setOption("warm_start_slack_bound_push",1e-6)
+    solver.setOption("warm_start_mult_bound_push",1e-6)
+    solver.setOption("mu_init",1e-6)
+    solver.init()
+    solver.input(NLP_LBX).set([-10]*2)
+    solver.input(NLP_UBX).set([10]*2)
+    solver.input(NLP_LBG).set([0])
+    solver.input(NLP_UBG).set([1])
+    solver.input(NLP_X_INIT).set(oldsolver.output(NLP_X_OPT))
+    solver.input(NLP_LAMBDA_INIT).set(oldsolver.output(NLP_LAMBDA_OPT))
+    solver.input(NLP_LAMBDA_LBX_INIT).set(oldsolver.output(NLP_LAMBDA_LBX))
+    solver.input(NLP_LAMBDA_UBX_INIT).set(oldsolver.output(NLP_LAMBDA_UBX))
+    
+    solver.solve()
+    
   def testIPOPTrhb(self):
     self.message("IPOPT rosenbrock, exact hessian")
     x=SX("x")
@@ -116,7 +142,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("tol",1e-10)
     solver.setOption("max_iter",100)
     solver.setOption("hessian_approximation", "exact")
-    solver.setOption("print_level",0)
+    #solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-10]*2)
     solver.input(NLP_UBX).set([10]*2)
@@ -127,9 +153,9 @@ class NLPtests(casadiTestCase):
      
   def testIPOPTnorm(self):
     return 
-    self.message("IPOPT min ||x||_2")
+    self.message("IPOPT min ||x||^2_2")
     def norm_2(mx):
-      return sqrt(inner_prod(mx,mx))
+      return inner_prod(mx,mx)
     N=10
     x=MX("x",N)
     x0=linspace(0,1,N)
@@ -138,7 +164,7 @@ class NLPtests(casadiTestCase):
     g=MXFunction([x],[2*x])
     solver = IpoptSolver(f,g)
     solver.setOption("tol",1e-5)
-    solver.setOption("hessian_approximation", "limited-memory")
+    #solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",103)
     solver.setOption("print_level",0)
     solver.init()
@@ -153,7 +179,7 @@ class NLPtests(casadiTestCase):
     #self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
     
   def testIPOPTnormSX(self):
-    self.message("IPOPT min ||x||_2")
+    self.message("IPOPT min ||x||^2_2")
     def norm_2(mx):
       return inner_prod(mx,mx)
     N=10

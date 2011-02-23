@@ -178,7 +178,24 @@ class ADtests(casadiTestCase):
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jf.output()),J,"Jacobian")
-
+              
+  def test_jacobian(self):
+    n=array([1.2,2.3,7,4.6])
+    for inputshape in ["column"]:
+      for outputshape in ["column"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense"]:
+            for mode in ["forward","adjoint"]:
+              self.message(" %s jacobian on SX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
+              f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+              f.init()
+              Jf=f.jacobian(0,0)
+              Jf.init()
+              Jf.input().set(n)
+              Jf.evaluate()
+              J = self.jacobians[inputtype][outputtype](*n)
+              self.checkarray(array(Jf.output()),J,"Jacobian")
+              
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column"]:
