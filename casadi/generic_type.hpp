@@ -48,30 +48,34 @@ namespace CasADi{
     GenericType(const std::vector<double>& dv);
     GenericType(const std::string& s);
     GenericType(const char s[]);
+
+    /// Implicit typecasting
+    #ifndef SWIG
+  //    operator bool(){ return toBool();}  // FIXME: conflict with operator==
+  //    operator int(){ return toInt();} // FIXME: conflict with operator==
+  //    operator double(){ return toDouble();} // FIXME: conflict with operator==
+  //    operator const std::string& (){ return toString();} // FIXME: conflict with operator==
+    operator const std::vector<int>& (){ return toIntVector();}
+    operator const std::vector<double>& (){ return toDoubleVector();}
+    #endif // SWIG
     
     //! \brief Convert to boolean
     bool toBool() const;
-//    operator bool(){ return toBool();}  // FIXME: conflict with operator==
 
     //! \brief Convert to int
     int toInt() const;
-//    operator int(){ return toInt();} // FIXME: conflict with operator==
     
     //! \brief Convert to double
     double toDouble() const;
-//    operator double(){ return toDouble();} // FIXME: conflict with operator==
     
     //! \brief Convert to string
     const std::string& toString() const;
-//    operator const std::string& (){ return toString();} // FIXME: conflict with operator==
 
     //! \brief Convert to vector of ints
     const std::vector<int>& toIntVector() const;
-    operator const std::vector<int>& (){ return toIntVector();}
     
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
-    operator const std::vector<double>& (){ return toDoubleVector();}
 
     //! \brief Equality
     friend bool operator==(const GenericType& op1, const GenericType& op2); // FIXME: remove as it destroys implicit typecasting
