@@ -23,12 +23,36 @@
 #include "generic_type_internal.hpp"
 #include "stl_vector_tools.hpp"
 #include "casadi_exception.hpp"
+#include <cmath>
 
 using namespace std;
 
 namespace CasADi{
 
+bool GenericType::isBool() const{
+  return isInt() && (toInt()==0 || toInt()==1);
+}
 
+bool GenericType::isInt() const{
+  return is_a<IntType>();
+}
+    
+bool GenericType::isDouble() const{
+  return is_a<DoubleType>();
+}
+    
+bool GenericType::isString() const{
+  return is_a<StringType>();
+}
+
+bool GenericType::isIntVector() const{
+  return is_a<IntVectorType>();
+}
+    
+bool GenericType::isDoubleVector() const{
+  return is_a<DoubleVectorType>();
+}
+  
 GenericType::GenericType(){
 }
 
@@ -84,11 +108,20 @@ bool GenericType::toBool() const{
 }
 
 int GenericType::toInt() const{
-  return (*this)->toInt();  
+  if(isDouble()){
+    double v = toDouble();
+    casadi_assert_message(v == std::floor(v),"The value is not an integer");
+    return int(v);
+  }
+  else
+    return (*this)->toInt();
 }
 
 double GenericType::toDouble() const{
-  return (*this)->toDouble();    
+  if(isInt())
+    return (*this)->toInt();
+  else
+    return (*this)->toDouble();    
 }
 
 const string& GenericType::toString() const{
@@ -109,19 +142,19 @@ bool GenericType::operator==(const GenericType& op2) const{
 }
 
 bool GenericType::operator!=(const GenericType& op2) const{
-  if(is_a<StringType>() && op2.is_a<StringType>()){
+  if(isString() && op2.isString()){
     return toString().compare(op2.toString()) != 0;
   }
 
-  if(is_a<IntType>() && op2.is_a<IntType>()){
+  if(isInt() && op2.isInt()){
     return toInt() != op2.toInt();
   }
 
-  if(is_a<DoubleType>() && op2.is_a<DoubleType>()){
+  if(isDouble() && op2.isDouble()){
     return toDouble() != op2.toDouble();
   }
 
-  if(is_a<DoubleVectorType>() && op2.is_a<DoubleVectorType>()){
+  if(isDoubleVector() && op2.isDoubleVector()){
     const vector<double> &v1 = toDoubleVector();
     const vector<double> &v2 = op2.toDoubleVector();
     if(v1.size() != v2.size()) return true;
@@ -130,7 +163,7 @@ bool GenericType::operator!=(const GenericType& op2) const{
     return false;
   }
 
-  if(is_a<IntVectorType>() && op2.is_a<IntVectorType>()){
+  if(isIntVector() && op2.isIntVector()){
     const vector<int> &v1 = toIntVector();
     const vector<int> &v2 = op2.toIntVector();
     if(v1.size() != v2.size()) return true;

@@ -60,6 +60,24 @@ namespace CasADi{
     operator const std::vector<double>& () const{ return toDoubleVector();}
     #endif // SWIG
     
+    //! \brief Is boolean?
+    bool isBool() const;
+
+    //! \brief Is an integer?
+    bool isInt() const;
+    
+    //! \brief Is a double?
+    bool isDouble() const;
+    
+    //! \brief Is a string?
+    bool isString() const;
+
+    //! \brief Is a vector of ints?
+    bool isIntVector() const;
+    
+    //! \brief Is a vector of doubles?
+    bool isDoubleVector() const;
+
     //! \brief Convert to boolean
     bool toBool() const;
 

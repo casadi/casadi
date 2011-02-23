@@ -32,15 +32,19 @@ namespace CasADi{
     public:
     explicit GenericTypeInternal(){}
     virtual ~GenericTypeInternal(){}
-        
+    
     //! \brief Convert to string
     virtual const std::string& toString() const{ throw CasadiException("not a string"); }
+    
     //! \brief Convert to vector of ints
     virtual const std::vector<int>& toIntVector() const{ throw CasadiException("not an int vector"); };
+    
     //! \brief Convert to vector of doubles
     virtual const std::vector<double>& toDoubleVector() const{ throw CasadiException("not a double vector"); };
+    
     //! \brief Convert to int
     virtual int toInt() const{ throw CasadiException("not an int"); };
+    
     //! \brief Convert to double
     virtual double toDouble() const{ throw CasadiException("not a double"); };
 
