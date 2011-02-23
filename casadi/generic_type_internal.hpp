@@ -24,14 +24,14 @@
 #define GENERIC_TYPE_INTERNAL_HPP
 
 #include "generic_type.hpp"
+#include "stl_vector_tools.hpp"
 
 namespace CasADi{
   
   class GenericTypeInternal : public SharedObjectNode{
     public:
-    explicit GenericTypeInternal(const std::vector<int>& i_vec);
-    explicit GenericTypeInternal(const std::vector<double>& d_vec);
-    explicit GenericTypeInternal(const std::string& s);
+    explicit GenericTypeInternal(){}
+    virtual ~GenericTypeInternal(){}
         
     //! \brief Convert to boolean
     bool toBool() const;
@@ -40,23 +40,43 @@ namespace CasADi{
     //! \brief Convert to double
     double toDouble() const;
     //! \brief Convert to string
-    const std::string& toString() const;
+    virtual const std::string& toString() const{ throw CasadiException("not a string"); }
     //! \brief Convert to vector of ints
-    const std::vector<int>& toIntVector() const;
+    virtual const std::vector<int>& toIntVector() const{ throw CasadiException("not an int vector"); };
     //! \brief Convert to vector of doubles
-    const std::vector<double>& toDoubleVector() const;
-    
-    //! \brief Length
-    int n;
-    
-    //! \brief Boolean denoting if option type is a string
-    bool is_string;
-    
-    std::vector<int> i_vec;
-    std::vector<double> d_vec;
-    std::string str;
+    virtual const std::vector<double>& toDoubleVector() const{ throw CasadiException("not a double vector"); };
+
+    // Printing
+    virtual void print(std::ostream &stream) const = 0;
   };
       
+  class StringType : public GenericTypeInternal{
+    public:
+      explicit StringType(const std::string& d) : d_(d){}
+      virtual ~StringType(){}
+      virtual const std::string& toString() const{ return d_; }
+      virtual void print(std::ostream &stream) const{ stream << d_; }
+      std::string d_;
+  };
+   
+  class DoubleVectorType : public GenericTypeInternal{
+    public:
+      explicit DoubleVectorType(const std::vector<double>& d) : d_(d){}
+      virtual ~DoubleVectorType(){}
+      virtual const std::vector<double>& toDoubleVector() const{ return d_; }
+      virtual void print(std::ostream &stream) const{ stream << d_; }
+      std::vector<double> d_;
+  };
+   
+  class IntVectorType : public GenericTypeInternal{
+    public:
+      explicit IntVectorType(const std::vector<int>& d) : d_(d){}
+      virtual ~IntVectorType(){}
+      virtual const std::vector<int>& toIntVector() const{ return d_; }
+      virtual void print(std::ostream &stream) const{ stream << d_; }
+      std::vector<int> d_;
+  };
+  
 
 } // namespace CasADi
 

@@ -51,20 +51,31 @@ namespace CasADi{
     
     //! \brief Convert to boolean
     bool toBool() const;
+//    operator bool(){ return toBool();}  // FIXME: conflict with operator==
+
     //! \brief Convert to int
     int toInt() const;
+//    operator int(){ return toInt();} // FIXME: conflict with operator==
+    
     //! \brief Convert to double
     double toDouble() const;
+//    operator double(){ return toDouble();} // FIXME: conflict with operator==
+    
     //! \brief Convert to string
-    std::string toString() const;
+    const std::string& toString() const;
+//    operator const std::string& (){ return toString();} // FIXME: conflict with operator==
+
     //! \brief Convert to vector of ints
     const std::vector<int>& toIntVector() const;
+    operator const std::vector<int>& (){ return toIntVector();}
+    
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
+    operator const std::vector<double>& (){ return toDoubleVector();}
 
     //! \brief Equality
-    friend bool operator==(const GenericType& op1, const GenericType& op2);
-    friend bool operator!=(const GenericType& op1, const GenericType& op2);
+    friend bool operator==(const GenericType& op1, const GenericType& op2); // FIXME: remove as it destroys implicit typecasting
+    friend bool operator!=(const GenericType& op1, const GenericType& op2); // FIXME: remove as it destroys implicit typecasting
     
     //! \brief Print
     friend std::ostream& operator<<(std::ostream &stream, const GenericType& ref);
@@ -75,8 +86,17 @@ namespace CasADi{
     //! \brief Access a member function or object
     //! A regular user is not supposed to use this method.
     const GenericTypeInternal* operator->() const;
+    
+    /// Check if it is of a certain type
+    #ifndef SWIG
+    template<typename T>
+    bool is_a() const{
+      return dynamic_cast<const T*>(get()) != 0;
+    }
+    #endif // SWIG
+    
   };
-      
+  
 
 } // namespace CasADi
 

@@ -21,7 +21,6 @@
  */
 
 #include "generic_type_internal.hpp"
-#include "stl_vector_tools.hpp"
 #include "casadi_exception.hpp"
 
 using namespace std;
@@ -40,44 +39,6 @@ double GenericTypeInternal::toDouble() const{
   return toDoubleVector().at(0);
 }
 
-const vector<int>& GenericTypeInternal::toIntVector() const{
-  if(n != i_vec.size()) throw CasadiException("GenericTypeInternal::toIntVector");
-  return i_vec;
-}
-
-const vector<double>& GenericTypeInternal::toDoubleVector() const{
-  if(n != d_vec.size()) throw CasadiException("GenericTypeInternal::toDoubleVector");
-  return d_vec;
-}
-
-const string& GenericTypeInternal::toString() const{
-  return str;
-}
-
-GenericTypeInternal::GenericTypeInternal(const vector<int>& i_vec_) : i_vec(i_vec_){
-  stringstream ss;
-  ss << i_vec;
-  str = ss.str();
-  is_string = true;
-  n = i_vec.size();
-  d_vec.resize(n);
-  copy(i_vec.begin(),i_vec.end(),d_vec.begin());
-}
-
-GenericTypeInternal::GenericTypeInternal(const vector<double>& d_vec_) : d_vec(d_vec_){
-  stringstream ss;
-  ss << i_vec;
-  str = ss.str();
-  is_string = true;
-  n = d_vec.size();
-  i_vec.resize(n);
-  copy(d_vec.begin(),d_vec.end(),i_vec.begin());
-}
-
-GenericTypeInternal::GenericTypeInternal(const string& s) : str(s){
-  is_string = true;
-  n = 1;
-}
 
 
 } // namespace CasADi

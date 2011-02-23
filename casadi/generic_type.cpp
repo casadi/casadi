@@ -33,44 +33,42 @@ GenericType::GenericType(){
 }
 
 ostream& operator<<(ostream &stream, const GenericType& ref){
-  if(!ref->d_vec.empty())
-    return stream << ref->d_vec;
-  else
-    return stream << ref->str;
+  ref->print(stream);
+  return stream;
 }
 
 GenericType::GenericType(int i){
   vector<int> v(1);
   v[0] = i;
-  assignNode(new GenericTypeInternal(v));
+  assignNode(new IntVectorType(v));
 }
 
 GenericType::GenericType(double d){
   vector<double> v(1);
   v[0] = d;
-  assignNode(new GenericTypeInternal(v));
+  assignNode(new DoubleVectorType(v));
 }
 
 GenericType::GenericType(const vector<int>& iv){
-  assignNode(new GenericTypeInternal(iv));
+  assignNode(new IntVectorType(iv));
 }
 
 GenericType::GenericType(const vector<bool>& b_vec){
   vector<int> i_vec(b_vec.size());
   copy(b_vec.begin(),b_vec.end(), i_vec.begin());
-  assignNode(new GenericTypeInternal(i_vec));
+  assignNode(new IntVectorType(i_vec));
 }
 
 GenericType::GenericType(const vector<double>& dv){
-  assignNode(new GenericTypeInternal(dv));
+  assignNode(new DoubleVectorType(dv));
 }
 
 GenericType::GenericType(const string& s){
-  assignNode(new GenericTypeInternal(s));
+  assignNode(new StringType(s));
 }
 
 GenericType::GenericType(const char s[]){ 
-  assignNode(new GenericTypeInternal(s));
+  assignNode(new StringType(s));
 }
 
 
@@ -94,7 +92,7 @@ double GenericType::toDouble() const{
   return (*this)->toDouble();    
 }
 
-string GenericType::toString() const{
+const string& GenericType::toString() const{
   return (*this)->toString();    
 }
 
@@ -112,19 +110,31 @@ bool operator==(const GenericType& op1, const GenericType& op2){
 }
 
 bool operator!=(const GenericType& op1, const GenericType& op2){
-  if(op1->is_string){
-    if(!op2->is_string) return true;
+  if(op1.is_a<StringType>() && op2.is_a<StringType>()){
     return op1.toString().compare(op2.toString()) != 0;
-  } else {
-    if(op2->is_string) return true;
+  }
+
+  if(op1.is_a<DoubleVectorType>() && op2.is_a<DoubleVectorType>()){
     const vector<double> &v1 = op1.toDoubleVector();
     const vector<double> &v2 = op2.toDoubleVector();
     if(v1.size() != v2.size()) return true;
     for(int i=0; i<v1.size(); ++i)
       if(v1[i] != v2[i]) return true;
+    return false;
+  }
+
+
+  if(op1.is_a<IntVectorType>() && op2.is_a<IntVectorType>()){
+    const vector<int> &v1 = op1.toIntVector();
+    const vector<int> &v2 = op2.toIntVector();
+    if(v1.size() != v2.size()) return true;
+    for(int i=0; i<v1.size(); ++i)
+      if(v1[i] != v2[i]) return true;
+    return false;
   }
   
-  return false;
+  // Different types
+  return true;
 }
 
 
