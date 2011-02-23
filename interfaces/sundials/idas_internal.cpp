@@ -269,7 +269,7 @@ void IdasInternal::init(){
     }
     
     // Add a preconditioner
-    if(getOption("use_preconditioner")==true){
+    if(bool(getOption("use_preconditioner"))){
       // Make sure that a Jacobian has been provided
       if(jac_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
 

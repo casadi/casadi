@@ -626,7 +626,7 @@ void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
 
 int IpoptInternal::get_number_of_nonlinear_variables() const{
   try {
-    if(H_.isNull() || getOption("pass_nonlinear_variables") == false){
+    if(H_.isNull() || !bool(getOption("pass_nonlinear_variables"))){
       // No Hessian has been interfaced
       return -1;
     } else {

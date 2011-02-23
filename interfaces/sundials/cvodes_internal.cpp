@@ -240,7 +240,7 @@ void CVodesInternal::init(){
     }
     
     // Add a preconditioner
-    if(getOption("use_preconditioner")==true){
+    if(bool(getOption("use_preconditioner"))){
       // Make sure that a Jacobian has been provided
       if(M_.isNull()) throw CasadiException("CVodesInternal::init(): No Jacobian has been provided.");
 

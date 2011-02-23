@@ -41,6 +41,7 @@ namespace CasADi{
   class GenericType : public SharedObject{
     public:
     GenericType();
+    GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
     GenericType(const std::vector<bool>& iv);
@@ -51,12 +52,12 @@ namespace CasADi{
 
     /// Implicit typecasting
     #ifndef SWIG
-  //    operator bool(){ return toBool();}  // FIXME: conflict with operator==
-  //    operator int(){ return toInt();} // FIXME: conflict with operator==
-  //    operator double(){ return toDouble();} // FIXME: conflict with operator==
-  //    operator const std::string& (){ return toString();} // FIXME: conflict with operator==
-    operator const std::vector<int>& (){ return toIntVector();}
-    operator const std::vector<double>& (){ return toDoubleVector();}
+    operator bool() const{ return toBool();} 
+    operator int() const{ return toInt();} 
+    operator double() const{ return toDouble();}
+    operator const std::string& () const{ return toString();}
+    operator const std::vector<int>& () const{ return toIntVector();}
+    operator const std::vector<double>& () const{ return toDoubleVector();}
     #endif // SWIG
     
     //! \brief Convert to boolean
@@ -78,8 +79,8 @@ namespace CasADi{
     const std::vector<double>& toDoubleVector() const;
 
     //! \brief Equality
-    friend bool operator==(const GenericType& op1, const GenericType& op2); // FIXME: remove as it destroys implicit typecasting
-    friend bool operator!=(const GenericType& op1, const GenericType& op2); // FIXME: remove as it destroys implicit typecasting
+    bool operator==(const GenericType& op2) const;
+    bool operator!=(const GenericType& op2) const;
     
     //! \brief Print
     friend std::ostream& operator<<(std::ostream &stream, const GenericType& ref);
