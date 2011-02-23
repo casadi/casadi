@@ -109,7 +109,7 @@ void SuperLUInternal::init(){
   set_default_options(&options_);
 
   // Read column permutation
-  Option colperm = getOption("colperm");
+  GenericType colperm = getOption("colperm");
   if(colperm=="natural")            options_.ColPerm = ::NATURAL;
   else if(colperm=="mmd_ata")       options_.ColPerm = ::MMD_ATA;
   else if(colperm=="mmd_at_plus_a") options_.ColPerm = ::MMD_AT_PLUS_A;
@@ -121,7 +121,7 @@ void SuperLUInternal::init(){
   options_.Trans = getOption("trans").toInt() ? ::NOTRANS : ::TRANS; // swap due to row-major/col-major
 
   // Iterataive refinement
-  Option iterrefine = getOption("iterrefine");
+  GenericType iterrefine = getOption("iterrefine");
   if(iterrefine=="norefine" || iterrefine=="no")  options_.IterRefine = ::NOREFINE; // user guide is inconsistent, allow both possibilties
   else if(iterrefine=="single")                   options_.IterRefine = ::SINGLE;
   else if(iterrefine=="double")                   options_.IterRefine = ::DOUBLE;
@@ -141,7 +141,7 @@ void SuperLUInternal::init(){
   options_.ConditionNumber = getOption("conditionnumber").toInt() ? YES : NO;
   
   // Specifies whether to permute the rows of the original matrix.
-  Option rowperm = getOption("rowperm");
+  GenericType rowperm = getOption("rowperm");
   if(rowperm=="no" || rowperm=="norowperm")    options_.RowPerm = ::NOROWPERM; 
   else if(rowperm=="largediag")                options_.RowPerm = ::LargeDiag;
   else if(rowperm=="my_permr")                 options_.RowPerm = ::MY_PERMR;

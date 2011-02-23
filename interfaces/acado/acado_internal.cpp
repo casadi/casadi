@@ -308,7 +308,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Set integrator
   if(hasSetOption("integrator")){
-    Option integ = getOption("integrator");
+    GenericType integ = getOption("integrator");
     ACADO::IntegratorType itype;
     if(integ=="rk4")           itype=ACADO::INT_RK4;
     else if(integ=="rk12")     itype=ACADO::INT_RK12;
@@ -353,7 +353,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   if(hasSetOption("hessian_approximation")){
     int hess;
-    Option op = getOption("hessian_approximation");
+    GenericType op = getOption("hessian_approximation");
     if(op=="exact_hessian")                 hess = ACADO::EXACT_HESSIAN;
     else if(op == "constant_hessian")       hess = ACADO::CONSTANT_HESSIAN;
     else if(op == "full_bfgs_update")       hess = ACADO::FULL_BFGS_UPDATE;

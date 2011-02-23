@@ -31,7 +31,7 @@ using namespace std;
 
 namespace CasADi{
 
-void OptionsFunctionalityNode::setOption(const string &name, const Option &op){
+void OptionsFunctionalityNode::setOption(const string &name, const GenericType &op){
   // First check if the option exists
   map<string, opt_type>::const_iterator it = allowed_options.find(name);
   if(it == allowed_options.end()){
@@ -43,11 +43,11 @@ void OptionsFunctionalityNode::setOption(const string &name, const Option &op){
   // Save the option
   dictionary_[name] = op;
 }
-Option OptionsFunctionality::getOption(const string &name) const{
+GenericType OptionsFunctionality::getOption(const string &name) const{
   return (*this)->getOption(name);
 }
  
-Option OptionsFunctionalityNode::getOption(const string &name) const{
+GenericType OptionsFunctionalityNode::getOption(const string &name) const{
 
   // Locate the option
   Dictionary::const_iterator it = dictionary_.find(name);
@@ -60,14 +60,14 @@ Option OptionsFunctionalityNode::getOption(const string &name) const{
   }
   
   // Return the option
-  return Option(it->second);
+  return GenericType(it->second);
 }
 
-void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const Option &def_val){
+void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val){
   allowed_options[name] = type;
 
   if(!def_val.isNull())
-    dictionary_[name] = Option(def_val);
+    dictionary_[name] = GenericType(def_val);
 
 }
 
@@ -121,7 +121,7 @@ OptionsFunctionalityNode::OptionsFunctionalityNode(){
 OptionsFunctionalityNode::~OptionsFunctionalityNode(){
 }
 
-void OptionsFunctionality::setOption(const string &str, const Option& op){
+void OptionsFunctionality::setOption(const string &str, const GenericType& op){
   (*this)->setOption(str,op);
 }
 

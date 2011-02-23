@@ -281,7 +281,7 @@ void IpoptInternal::init(){
   // Pass all the options to ipopt
   for(map<string,opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
     if(hasSetOption(it->first)){
-      Option op = getOption(it->first);
+      GenericType op = getOption(it->first);
       switch(it->second){
         case OT_REAL:
           app->Options()->SetNumericValue(it->first,op.toDouble());

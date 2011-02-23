@@ -1,0 +1,133 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#include "generic_type_internal.hpp"
+#include "stl_vector_tools.hpp"
+#include "casadi_exception.hpp"
+
+using namespace std;
+
+namespace CasADi{
+
+
+GenericType::GenericType(){
+}
+
+ostream& operator<<(ostream &stream, const GenericType& ref){
+  if(!ref->d_vec.empty())
+    return stream << ref->d_vec;
+  else
+    return stream << ref->str;
+}
+
+GenericType::GenericType(int i){
+  vector<int> v(1);
+  v[0] = i;
+  assignNode(new GenericTypeInternal(v));
+}
+
+GenericType::GenericType(double d){
+  vector<double> v(1);
+  v[0] = d;
+  assignNode(new GenericTypeInternal(v));
+}
+
+GenericType::GenericType(const vector<int>& iv){
+  assignNode(new GenericTypeInternal(iv));
+}
+
+GenericType::GenericType(const vector<bool>& b_vec){
+  vector<int> i_vec(b_vec.size());
+  copy(b_vec.begin(),b_vec.end(), i_vec.begin());
+  assignNode(new GenericTypeInternal(i_vec));
+}
+
+GenericType::GenericType(const vector<double>& dv){
+  assignNode(new GenericTypeInternal(dv));
+}
+
+GenericType::GenericType(const string& s){
+  assignNode(new GenericTypeInternal(s));
+}
+
+GenericType::GenericType(const char s[]){ 
+  assignNode(new GenericTypeInternal(s));
+}
+
+
+GenericTypeInternal* GenericType::operator->(){
+  return (GenericTypeInternal*)SharedObject::operator->();
+}
+
+const GenericTypeInternal* GenericType::operator->() const{
+  return (const GenericTypeInternal*)SharedObject::operator->();
+}
+
+bool GenericType::toBool() const{
+  return (*this)->toBool();
+}
+
+int GenericType::toInt() const{
+  return (*this)->toInt();  
+}
+
+double GenericType::toDouble() const{
+  return (*this)->toDouble();    
+}
+
+string GenericType::toString() const{
+  return (*this)->toString();    
+}
+
+const vector<int>& GenericType::toIntVector() const{
+  return (*this)->toIntVector();    
+}
+
+const vector<double>& GenericType::toDoubleVector() const{
+  return (*this)->toDoubleVector();      
+}
+
+
+bool operator==(const GenericType& op1, const GenericType& op2){
+  return !(op1 != op2);
+}
+
+bool operator!=(const GenericType& op1, const GenericType& op2){
+  if(op1->is_string){
+    if(!op2->is_string) return true;
+    return op1.toString().compare(op2.toString()) != 0;
+  } else {
+    if(op2->is_string) return true;
+    const vector<double> &v1 = op1.toDoubleVector();
+    const vector<double> &v2 = op2.toDoubleVector();
+    if(v1.size() != v2.size()) return true;
+    for(int i=0; i<v1.size(); ++i)
+      if(v1[i] != v2[i]) return true;
+  }
+  
+  return false;
+}
+
+
+
+} // namespace CasADi
+

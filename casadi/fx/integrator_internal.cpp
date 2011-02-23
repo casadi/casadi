@@ -36,14 +36,14 @@ IntegratorInternal::IntegratorInternal(){
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
-  addOption("upper_bandwidth",             OT_INTEGER,  Option()); // upper band-width of banded jacobians
-  addOption("lower_bandwidth",             OT_INTEGER,  Option()); // lower band-width of banded jacobians
+  addOption("upper_bandwidth",             OT_INTEGER); // upper band-width of banded jacobians
+  addOption("lower_bandwidth",             OT_INTEGER); // lower band-width of banded jacobians
   addOption("linear_solver",               OT_STRING, "dense"); // "dense", "banded" or "iterative"
   addOption("iterative_solver",            OT_STRING, "gmres"); // "gmres", "bcgstab", "tfqmr"
   addOption("pretype",                     OT_STRING, "none"); // "none", "left", "right", "both"
   addOption("exact_jacobian",              OT_BOOLEAN,  false);
   addOption("max_krylov",                  OT_INTEGER,  10);        // maximum krylov subspace size
-  addOption("is_differential",             OT_INTEGERVECTOR,  Option());
+  addOption("is_differential",             OT_INTEGERVECTOR);
   addOption("sensitivity_method",          OT_STRING,  "simultaneous"); // "simultaneous" or "staggered"
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
@@ -58,22 +58,22 @@ IntegratorInternal::IntegratorInternal(){
   // Forward sensitivity problem
   addOption("fsens_err_con",               OT_INTEGER, false); // include the forward sensitivities in all error controls
   addOption("finite_difference_fsens",     OT_BOOLEAN, false); // use finite differences to approximate the forward sensitivity equations (if AD is not available)
-  addOption("fsens_reltol",                OT_REAL,    Option()); // relative tolerence for the forward sensitivity solution [default: equal to reltol]
-  addOption("fsens_abstol",                OT_REAL,    Option()); // absolute tolerence for the forward sensitivity solution [default: equal to abstol]
-  addOption("fsens_scaling_factors",       OT_REALVECTOR, Option()); // scaling factor for the components if finite differences is used
-  addOption("fsens_sensitiviy_parameters", OT_INTEGERVECTOR, Option()); // specifies which components will be used when estimating the sensitivity equations
+  addOption("fsens_reltol",                OT_REAL); // relative tolerence for the forward sensitivity solution [default: equal to reltol]
+  addOption("fsens_abstol",                OT_REAL); // absolute tolerence for the forward sensitivity solution [default: equal to abstol]
+  addOption("fsens_scaling_factors",       OT_REALVECTOR); // scaling factor for the components if finite differences is used
+  addOption("fsens_sensitiviy_parameters", OT_INTEGERVECTOR); // specifies which components will be used when estimating the sensitivity equations
 
   // Adjoint sensivity problem
   addOption("steps_per_checkpoint",        OT_INTEGER,20); // number of steps between two consecutive checkpoints
   addOption("interpolation_type",          OT_STRING,"hermite"); // type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")
-  addOption("asens_upper_bandwidth",       OT_INTEGER,  Option()); // upper band-width of banded jacobians
-  addOption("asens_lower_bandwidth",       OT_INTEGER,  Option()); // lower band-width of banded jacobians
+  addOption("asens_upper_bandwidth",       OT_INTEGER); // upper band-width of banded jacobians
+  addOption("asens_lower_bandwidth",       OT_INTEGER); // lower band-width of banded jacobians
   addOption("asens_linear_solver",         OT_STRING, "dense"); // "dense", "banded" or "iterative"
   addOption("asens_iterative_solver",      OT_STRING, "gmres"); // "gmres", "bcgstab", "tfqmr"
   addOption("asens_pretype",               OT_STRING, "none"); // "none", "left", "right", "both"
   addOption("asens_max_krylov",            OT_INTEGER,  10);        // maximum krylov subspace size
-  addOption("asens_reltol",                OT_REAL,    Option()); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
-  addOption("asens_abstol",                OT_REAL,    Option()); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
+  addOption("asens_reltol",                OT_REAL); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
+  addOption("asens_abstol",                OT_REAL); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
   
   nx_ = 0;
   np_ = 0;

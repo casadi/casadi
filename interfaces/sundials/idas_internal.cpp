@@ -490,7 +490,7 @@ void IdasInternal::initAdj(){
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse solver  
       int maxl = getOption("asens_max_krylov").toInt();
-      Option is = getOption("asens_iterative_solver");
+      GenericType is = getOption("asens_iterative_solver");
       if(is=="gmres"){
         flag = IDASpgmrB(mem_, whichB_[dir], maxl);
         if(flag != IDA_SUCCESS) idas_error("IDASpgmrB",flag);

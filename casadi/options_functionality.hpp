@@ -23,7 +23,7 @@
 #ifndef OPTIONS_FUNCTIONALITY_HPP
 #define OPTIONS_FUNCTIONALITY_HPP
 
-#include "option.hpp"
+#include "generic_type.hpp"
 #include <map>
 
 
@@ -31,7 +31,7 @@
 namespace CasADi{
   
   /// C++ version of Python's dictionary
-  typedef std::map<std::string, Option> Dictionary;
+  typedef std::map<std::string, GenericType> Dictionary;
     
   // Forward declaration
   class OptionsFunctionalityNode;
@@ -68,13 +68,13 @@ class OptionsFunctionality : public SharedObject{
     If properties changes, the init function should be called again.
     (Ticket #54)
     */
-    void setOption(const std::string &str, const Option& val);
+    void setOption(const std::string &str, const GenericType& val);
 
     /** \brief  set a set of options */
     void setOption(const Dictionary& dict);
 
     /** \brief  get an option value */
-    Option getOption(const std::string &str) const;
+    GenericType getOption(const std::string &str) const;
 #endif // SWIG
     
     /** \brief  check if there is an option str */
@@ -111,7 +111,7 @@ OptionsFunctionalityNode();
 virtual ~OptionsFunctionalityNode();
  
   /** \brief  set an option */
-  void setOption(const std::string &str, const Option& val);
+  void setOption(const std::string &str, const GenericType& val);
 
   /** \brief  set a set of options */
   void setOption(const Dictionary& dict);
@@ -126,7 +126,7 @@ virtual ~OptionsFunctionalityNode();
   void printOptions(std::ostream &stream=std::cout) const;
     
   /** \brief  get an option value */
-  Option getOption(const std::string &str) const;
+  GenericType getOption(const std::string &str) const;
 
   /** \brief  Print description */
   virtual void print(std::ostream &stream) const = 0;
@@ -142,7 +142,7 @@ virtual ~OptionsFunctionalityNode();
 
 protected:
 
-  void addOption(const std::string &str, const opt_type& type, const Option &def_val=Option());
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType());
 
 private:
 /** \brief  Allowed options  */
