@@ -33,18 +33,16 @@ namespace CasADi{
     explicit GenericTypeInternal(){}
     virtual ~GenericTypeInternal(){}
         
-    //! \brief Convert to boolean
-    bool toBool() const;
-    //! \brief Convert to int
-    int toInt() const;
-    //! \brief Convert to double
-    double toDouble() const;
     //! \brief Convert to string
     virtual const std::string& toString() const{ throw CasadiException("not a string"); }
     //! \brief Convert to vector of ints
     virtual const std::vector<int>& toIntVector() const{ throw CasadiException("not an int vector"); };
     //! \brief Convert to vector of doubles
     virtual const std::vector<double>& toDoubleVector() const{ throw CasadiException("not a double vector"); };
+    //! \brief Convert to int
+    virtual int toInt() const{ throw CasadiException("not an int"); };
+    //! \brief Convert to double
+    virtual double toDouble() const{ throw CasadiException("not a double"); };
 
     // Printing
     virtual void print(std::ostream &stream) const = 0;
@@ -59,6 +57,24 @@ namespace CasADi{
       std::string d_;
   };
    
+  class DoubleType : public GenericTypeInternal{
+    public:
+      explicit DoubleType(double d) : d_(d){}
+      virtual ~DoubleType(){}
+      virtual double toDouble() const{ return d_; }
+      virtual void print(std::ostream &stream) const{ stream << d_; }
+      double d_;
+  };
+   
+  class IntType : public GenericTypeInternal{
+    public:
+      explicit IntType(int d) : d_(d){}
+      virtual ~IntType(){}
+      virtual int toInt() const{ return d_; }
+      virtual void print(std::ostream &stream) const{ stream << d_; }
+      int d_;
+  };
+  
   class DoubleVectorType : public GenericTypeInternal{
     public:
       explicit DoubleVectorType(const std::vector<double>& d) : d_(d){}

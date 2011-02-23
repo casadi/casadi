@@ -38,18 +38,15 @@ ostream& operator<<(ostream &stream, const GenericType& ref){
 }
 
 GenericType::GenericType(bool b){
-  vector<int> v(1,b);
-  assignNode(new IntVectorType(v));
+  assignNode(new IntType(b));
 }
 
 GenericType::GenericType(int i){
-  vector<int> v(1,i);
-  assignNode(new IntVectorType(v));
+  assignNode(new IntType(i));
 }
 
 GenericType::GenericType(double d){
-  vector<double> v(1,d);
-  assignNode(new DoubleVectorType(v));
+  assignNode(new DoubleType(d));
 }
 
 GenericType::GenericType(const vector<int>& iv){
@@ -74,7 +71,6 @@ GenericType::GenericType(const char s[]){
   assignNode(new StringType(s));
 }
 
-
 GenericTypeInternal* GenericType::operator->(){
   return (GenericTypeInternal*)SharedObject::operator->();
 }
@@ -84,7 +80,7 @@ const GenericTypeInternal* GenericType::operator->() const{
 }
 
 bool GenericType::toBool() const{
-  return (*this)->toBool();
+  return bool((*this)->toInt());
 }
 
 int GenericType::toInt() const{
@@ -117,6 +113,14 @@ bool GenericType::operator!=(const GenericType& op2) const{
     return toString().compare(op2.toString()) != 0;
   }
 
+  if(is_a<IntType>() && op2.is_a<IntType>()){
+    return toInt() != op2.toInt();
+  }
+
+  if(is_a<DoubleType>() && op2.is_a<DoubleType>()){
+    return toDouble() != op2.toDouble();
+  }
+
   if(is_a<DoubleVectorType>() && op2.is_a<DoubleVectorType>()){
     const vector<double> &v1 = toDoubleVector();
     const vector<double> &v2 = op2.toDoubleVector();
@@ -125,7 +129,6 @@ bool GenericType::operator!=(const GenericType& op2) const{
       if(v1[i] != v2[i]) return true;
     return false;
   }
-
 
   if(is_a<IntVectorType>() && op2.is_a<IntVectorType>()){
     const vector<int> &v1 = toIntVector();

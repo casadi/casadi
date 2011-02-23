@@ -27,19 +27,6 @@ using namespace std;
 
 namespace CasADi{
 
-bool GenericTypeInternal::toBool() const{
-  return bool(toInt());
-}
-
-int GenericTypeInternal::toInt() const{
-  return toIntVector().at(0);
-}
-
-double GenericTypeInternal::toDouble() const{
-  return toDoubleVector().at(0);
-}
-
-
 
 } // namespace CasADi
 
