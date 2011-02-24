@@ -74,7 +74,7 @@ int main(){
   cout << "program started" << endl;
       
   // Dimensions
-  int nu = 1000;  // Number of control segments
+  int nu = 200;  // Number of control segments
   int nj = 1000; // 10000;  // // Number of integration steps per control segment
 
   // optimization variable

@@ -29,28 +29,34 @@ using namespace std;
 
 namespace CasADi{
 
+  typedef GenericTypeInternal<std::string> StringType;
+  typedef GenericTypeInternal<double> DoubleType;
+  typedef GenericTypeInternal<int> IntType;
+  typedef GenericTypeInternal<std::vector<double> > DoubleVectorType;
+  typedef GenericTypeInternal<std::vector<int> > IntVectorType;
+
 bool GenericType::isBool() const{
   return isInt() && (toInt()==0 || toInt()==1);
 }
 
 bool GenericType::isInt() const{
-  return is_a<IntType>();
+  return is_a<int>();
 }
     
 bool GenericType::isDouble() const{
-  return is_a<DoubleType>();
+  return is_a<double>();
 }
     
 bool GenericType::isString() const{
-  return is_a<StringType>();
+  return is_a<string>();
 }
 
 bool GenericType::isIntVector() const{
-  return is_a<IntVectorType>();
+  return is_a<vector<int> >();
 }
     
 bool GenericType::isDoubleVector() const{
-  return is_a<DoubleVectorType>();
+  return is_a<vector<double> >();
 }
   
 GenericType::GenericType(){
@@ -95,16 +101,8 @@ GenericType::GenericType(const char s[]){
   assignNode(new StringType(s));
 }
 
-GenericTypeInternal* GenericType::operator->(){
-  return (GenericTypeInternal*)SharedObject::operator->();
-}
-
-const GenericTypeInternal* GenericType::operator->() const{
-  return (const GenericTypeInternal*)SharedObject::operator->();
-}
-
 bool GenericType::toBool() const{
-  return bool((*this)->toInt());
+  return bool(toInt());
 }
 
 int GenericType::toInt() const{
@@ -112,28 +110,34 @@ int GenericType::toInt() const{
     double v = toDouble();
     casadi_assert_message(v == std::floor(v),"The value is not an integer");
     return int(v);
+  } else {
+    casadi_assert_message(isInt(),"type mismatch");
+    return static_cast<const IntType*>(get())->d_;
   }
-  else
-    return (*this)->toInt();
 }
 
 double GenericType::toDouble() const{
-  if(isInt())
-    return (*this)->toInt();
-  else
-    return (*this)->toDouble();    
+  if(isInt()){
+    return double(toInt());
+  } else {
+    casadi_assert_message(isDouble(),"type mismatch");
+    return static_cast<const DoubleType*>(get())->d_;
+  }
 }
 
 const string& GenericType::toString() const{
-  return (*this)->toString();    
+  casadi_assert_message(isString(),"type mismatch");
+  return static_cast<const StringType*>(get())->d_;
 }
 
 const vector<int>& GenericType::toIntVector() const{
-  return (*this)->toIntVector();    
+  casadi_assert_message(isIntVector(),"type mismatch");
+  return static_cast<const IntVectorType*>(get())->d_;
 }
 
 const vector<double>& GenericType::toDoubleVector() const{
-  return (*this)->toDoubleVector();      
+  casadi_assert_message(isDoubleVector(),"type mismatch");
+  return static_cast<const DoubleVectorType*>(get())->d_;
 }
 
 

@@ -31,8 +31,6 @@ namespace CasADi{
 
   /** \brief  Types of options */
   enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR };
-
-  class GenericTypeInternal;
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -102,20 +100,11 @@ namespace CasADi{
     
     //! \brief Print
     friend std::ostream& operator<<(std::ostream &stream, const GenericType& ref);
-    
-    //! \brief Access a member function or object
-    //! A regular user is not supposed to use this method.
-    GenericTypeInternal* operator->();
-    //! \brief Access a member function or object
-    //! A regular user is not supposed to use this method.
-    const GenericTypeInternal* operator->() const;
-    
-    /// Check if it is of a certain type
+        
+    /// Check if it is of a certain type (implementation in generic_type_internal.hpp)
     #ifndef SWIG
     template<typename T>
-    bool is_a() const{
-      return dynamic_cast<const T*>(get()) != 0;
-    }
+    bool is_a() const;
     #endif // SWIG
     
   };

@@ -28,76 +28,21 @@
 
 namespace CasADi{
   
+  template<typename T>
   class GenericTypeInternal : public SharedObjectNode{
     public:
-    explicit GenericTypeInternal(){}
-    virtual ~GenericTypeInternal(){}
-    
-    //! \brief Convert to string
-    virtual const std::string& toString() const{ throw CasadiException("not a string"); }
-    
-    //! \brief Convert to vector of ints
-    virtual const std::vector<int>& toIntVector() const{ throw CasadiException("not an int vector"); };
-    
-    //! \brief Convert to vector of doubles
-    virtual const std::vector<double>& toDoubleVector() const{ throw CasadiException("not a double vector"); };
-    
-    //! \brief Convert to int
-    virtual int toInt() const{ throw CasadiException("not an int"); };
-    
-    //! \brief Convert to double
-    virtual double toDouble() const{ throw CasadiException("not a double"); };
-
-    // Printing
-    virtual void print(std::ostream &stream) const = 0;
+      explicit GenericTypeInternal(const T& d) : d_(d){}
+      virtual ~GenericTypeInternal(){}
+      virtual void print(std::ostream &stream) const{ stream << d_; }
+      T d_;
   };
       
-  class StringType : public GenericTypeInternal{
-    public:
-      explicit StringType(const std::string& d) : d_(d){}
-      virtual ~StringType(){}
-      virtual const std::string& toString() const{ return d_; }
-      virtual void print(std::ostream &stream) const{ stream << d_; }
-      std::string d_;
-  };
-   
-  class DoubleType : public GenericTypeInternal{
-    public:
-      explicit DoubleType(double d) : d_(d){}
-      virtual ~DoubleType(){}
-      virtual double toDouble() const{ return d_; }
-      virtual void print(std::ostream &stream) const{ stream << d_; }
-      double d_;
-  };
-   
-  class IntType : public GenericTypeInternal{
-    public:
-      explicit IntType(int d) : d_(d){}
-      virtual ~IntType(){}
-      virtual int toInt() const{ return d_; }
-      virtual void print(std::ostream &stream) const{ stream << d_; }
-      int d_;
-  };
+  // Implementations of public functions
+  template<typename T>
+  bool GenericType::is_a() const{
+    return dynamic_cast<const GenericTypeInternal<T>*>(get()) != 0;
+  }
   
-  class DoubleVectorType : public GenericTypeInternal{
-    public:
-      explicit DoubleVectorType(const std::vector<double>& d) : d_(d){}
-      virtual ~DoubleVectorType(){}
-      virtual const std::vector<double>& toDoubleVector() const{ return d_; }
-      virtual void print(std::ostream &stream) const{ stream << d_; }
-      std::vector<double> d_;
-  };
-   
-  class IntVectorType : public GenericTypeInternal{
-    public:
-      explicit IntVectorType(const std::vector<int>& d) : d_(d){}
-      virtual ~IntVectorType(){}
-      virtual const std::vector<int>& toIntVector() const{ return d_; }
-      virtual void print(std::ostream &stream) const{ stream << d_; }
-      std::vector<int> d_;
-  };
-  
-
 } // namespace CasADi
 
 

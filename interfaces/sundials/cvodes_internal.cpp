@@ -109,6 +109,9 @@ void CVodesInternal::init(){
   nq_ = q_.isNull() ? 0 : q_.output().numel();
   
   IntegratorInternal::init();
+ 
+  // Read options
+  monitor_rhsB_ = monitored("CVodesInternal::rhsB");
   
   // Try to generate a jacobian of none provided
   if(!linsol_.isNull() && M_.isNull()){
@@ -886,6 +889,10 @@ try{
 }
 
 void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* yBdot){
+  if(monitor_rhsB_){
+    cout << "CVodesInternal::rhsB: begin" << endl;
+  }
+    
   // Pass input
   f_.setInput(t,ODE_T);
   f_.setInput(y,ODE_Y);
@@ -893,10 +900,21 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,ODE_RHS);
+
+  if(monitor_rhsB_){
+    cout << "t       = " << f_.input(ODE_T) << endl;
+    cout << "y       = " << f_.input(ODE_Y) << endl;
+    cout << "p       = " << f_.input(ODE_P) << endl;
+    cout << "aseed   = " << f_.adjSeed(ODE_RHS) << endl;
+  }
   
   // Evaluate and tape
   f_.evaluate(0,1);
 
+  if(monitor_rhsB_){
+    cout << "f_asens = " << f_.adjSens(ODE_Y) << endl;
+  }
+  
   // Save to output
   const vector<double>& fres = f_.adjSens(ODE_Y);
   for(int i=0; i<ny_; ++i)
@@ -914,6 +932,10 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
 
     // Evaluate
     q_.evaluate(0,1);
+
+    if(monitor_rhsB_){
+      cout << "q_asens = " << q_.adjSens(ODE_Y) << endl;
+    }
     
     // Get the adjoint sensitivities
     const vector<double>& qres = q_.adjSens(ODE_Y);
@@ -922,6 +944,11 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     for(int i=0; i<ny_; ++i)
       yBdot[i] -= qres[i];
   }
+
+  if(monitor_rhsB_){
+    cout << "CVodesInternal::rhsB: end" << endl;
+  }
+
 }
 
 int CVodesInternal::rhsB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector yBdot, void *user_dataB){

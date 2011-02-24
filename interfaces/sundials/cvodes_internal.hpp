@@ -203,6 +203,9 @@ public:
   virtual std::vector<int> jacmap(int ns);
   virtual bool symbjac();
 
+  bool monitor_rhsB_;
+
+  
 };
 
 
