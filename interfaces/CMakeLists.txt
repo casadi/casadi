@@ -40,3 +40,4 @@ if (CPLEX_FOUND)
 add_subdirectory(cplex)
 endif (CPLEX_FOUND)
 
+add_subdirectory(csparse)

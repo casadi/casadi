@@ -73,6 +73,13 @@ target_link_libraries(test_superlu_casadi superlu_interface casadi superlu ${BLA
 ENDIF(BLAS_FOUND)
 endif(WITH_SUPERLU)
 
+include_directories(../external_packages/CSparse/Include)
+
+# CSparse via CasADi
+add_executable(test_csparse_casadi test_csparse_casadi.cpp)
+target_link_libraries(test_csparse_casadi csparse_interface casadi csparse)
+
+
 # Det minor from ADOL-C
 add_executable(det_minor det_minor.cpp)
 target_link_libraries(det_minor casadi)
@@ -84,10 +91,12 @@ target_link_libraries(sundials_testing
   sundials_interface
   superlu_interface 
   lapack_interface
+  csparse_interface
   casadi
   ${SUNDIALS_LIBRARIES}
   ${LAPACK_LIBRARIES}
   superlu
+  csparse
   ${BLAS_LIBRARIES}
 )
 ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)

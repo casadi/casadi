@@ -24,12 +24,13 @@
 
 using namespace std;
 namespace CasADi{
+  namespace Interfaces{
 
 LapackLUDense::LapackLUDense(){
 }
 
-LapackLUDense::LapackLUDense(int nrow, int ncol, int nrhs){
-  assignNode(new LapackLUDenseInternal(nrow,ncol,nrhs));
+LapackLUDense::LapackLUDense(const CRSSparsity& sparsity, int nrhs){
+  assignNode(new LapackLUDenseInternal(sparsity,nrhs));
 }
  
 LapackLUDenseInternal* LapackLUDense::operator->(){
@@ -40,15 +41,10 @@ const LapackLUDenseInternal* LapackLUDense::operator->() const{
   return static_cast<const LapackLUDenseInternal*>(FX::operator->());
 }
 
-LapackLUDenseInternal::LapackLUDenseInternal(int nrow, int ncol, int nrhs) : LinearSolverInternal(nrow,ncol,nrhs){
-    
-  // Currently only square matrices tested
-  if(nrow!=ncol) throw CasadiException("LapackLUDenseInternal::LapackLUDenseInternal: currently only square matrices implemented.");
-  
+LapackLUDenseInternal::LapackLUDenseInternal(const CRSSparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
   // Equilibriate the matrix
   addOption("equilibration",OT_BOOLEAN,true);
   addOption("allow_equilibration_failure",OT_BOOLEAN,false);
-  
 }
 
 LapackLUDenseInternal::~LapackLUDenseInternal(){
@@ -58,6 +54,13 @@ void LapackLUDenseInternal::init(){
   // Call the base class initializer
   LinearSolverInternal::init();
   
+  // Get dimensions
+  nrow_ = nrow();
+  ncol_ = ncol();
+  
+  // Currently only square matrices tested
+  if(nrow_!=ncol_) throw CasadiException("LapackLUDenseInternal::LapackLUDenseInternal: currently only square matrices implemented.");
+
   // Allocate matrix
   mat_.resize(nrow_*nrow_);
   ipiv_.resize(nrow_);
@@ -147,6 +150,7 @@ LapackLUDenseInternal* LapackLUDenseInternal::clone() const{
 }
 
 
+  } // namespace Interfaces
 } // namespace CasADi
 
   

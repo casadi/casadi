@@ -101,7 +101,7 @@ class MXNode : public SharedObjectNode{
     virtual std::vector<MX> partial() const;
 
     /** \brief Is the node nonlinear */
-    virtual bool isNonLinear(){return false;} 
+    virtual bool isNonLinear(){return false;}
     
   protected:
     

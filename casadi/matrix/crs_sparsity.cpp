@@ -145,18 +145,16 @@ int CRSSparsity::getNZ(int i, int j){
   if(numel()==size())
     return j+i*size2();
   
-// TEST THIS  
-#ifdef CRS_QUICK_APPEND
   // Quick return if we are adding an element to the end
-  if(rowind(i)==size() || (rowind(i+1)==size() && col.back()<j)){
-    vector<int>& colv = col();
-    vector<int>& rowindv = rowind();
+  if(rowind(i)==size() || (rowind(i+1)==size() && col().back()<j)){
+    vector<int>& colv = colRef();
+    vector<int>& rowindv = rowindRef();
     colv.push_back(j);
     for(int ii=i; ii<size1(); ++ii){
       rowindv[ii+1]++;
     }
+    return colv.size()-1;
   }
-#endif
 
   // go to the place where the element should be
   int ind;
@@ -185,6 +183,11 @@ int CRSSparsity::getNZ(int i, int j) const{
   // Quick return if matrix is dense
   if(numel()==size())
     return j+i*size2();
+  
+  // Quick return if past the end
+  if(rowind(i)==size() || (rowind(i+1)==size() && col().back()<j)){
+    return -1;
+  }
 
   // Find sparse element
   for(int ind=rowind(i); ind<rowind(i+1); ++ind){
@@ -249,6 +252,86 @@ vector<int> CRSSparsity::getNZ(vector<int> ii, vector<int> jj) const{
     }
   }
   return ret;
+}
+
+bool CRSSparsity::dense() const{
+  return size() == numel();
+}
+
+CRSSparsity CRSSparsity::getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const{
+  if(dense()){
+    CRSSparsity ret(ii.size(),jj.size(),true);
+    mapping.resize(ret.size());
+    for(int i=0; i!=ii.size(); ++i){
+      for(int j=0; j!=jj.size(); ++j){
+        mapping[j+i*ret.size2()] = jj[j] + ii[i]*size2();
+      }
+    }
+    return ret;
+  } else {
+    CRSSparsity ret(ii.size(),jj.size(),false);
+    mapping.resize(0);
+    for(int i=0; i!=ii.size(); ++i){
+      int j=0;
+      for(int el=rowind(ii[i]); el<rowind(ii[i]+1); ++el){
+        while(jj[j]<col(el) && j<jj.size()){
+          ++j;
+        }
+          
+        if(j<jj.size() && jj[j]==col(el)){
+          int ind = ret.getNZ(i,j);
+          casadi_assert(ind==ret.size()-1); // make sure that we are adding to the end
+          mapping.push_back(el);
+        }
+      }
+    }
+    return ret;
+  }
+}
+
+CRSSparsity CRSSparsity::eraseSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const{
+  CRSSparsity ret(size1(),size2(),false);
+  mapping.resize(0);
+  for(int i=0; i!=ii.size(); ++i){
+    int j=0;
+    for(int el=rowind(ii[i]); el<rowind(ii[i]+1); ++el){
+      while(j<jj.size() && jj[j]<col(el)){
+        ++j;
+      }
+        
+      if(!(j<jj.size() && jj[j]==col(el))){
+        int ind = ret.getNZ(ii[i],col(el));
+        casadi_assert(ind==ret.size()-1); // make sure that we are adding to the end
+        mapping.push_back(el);
+      }
+    }
+  }
+  return ret;
+}
+
+void CRSSparsity::setSub(const CRSSparsity& sub, const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping_nz, std::vector<int>& mapping_ind){
+  if(dense() && sub.dense()){
+    mapping_nz.resize(size());
+    for(int k=0; k<size(); ++k) mapping_nz[k] = k;
+    mapping_ind.resize(sub.size());
+    fill(mapping_ind.begin(),mapping_ind.end(),0);
+    for(int i=0; i!=ii.size(); ++i){
+      for(int j=0; j!=jj.size(); ++j){
+        mapping_nz[jj[j] + ii[i]*size2()] = 1;
+        mapping_ind[jj[j] + ii[i]*size2()] = j+i*sub.size2();
+      }
+    }
+  } else {
+    // Find out the non-zeros to be erased
+    vector<int> to_be_erased;
+    getSub(ii,jj,to_be_erased);
+    
+    // Get the sparsity vectors
+    vector<int> &c = colRef();
+    vector<int> &rind = rowindRef();
+    
+    casadi_assert_message(0, "Not implemented");
+  }
 }
 
 int CRSSparsity::sizeU() const{
@@ -455,7 +538,7 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<int>& mapping
 }
 
 CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<int>& mapping) const{
-  throw CasadiException("CRSSparsity::patternUnion not implemented");
+  throw CasadiException("CRSSparsity::patternIntersection not implemented");
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{

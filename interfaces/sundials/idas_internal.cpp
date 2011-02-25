@@ -125,10 +125,8 @@ void IdasInternal::init(){
   
   if(!jac_.isNull()){
     jac_.init();
-    vector<int> rowind, col;
-    jac_.output().sparsity().getSparsityCRS(rowind,col);
     if(!linsol_.isNull()){
-      linsol_.setSparsity(rowind,col);
+      linsol_.setSparsity(jac_.output().sparsity());
       linsol_.init();
     }
     

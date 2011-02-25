@@ -210,3 +210,10 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "interfaces/liftopt/liftopt_solver.hpp"
 #endif
 
+#ifdef WITH_CSPARSE
+%{
+#include "interfaces/csparse/csparse.hpp"
+%}
+%include "interfaces/csparse/csparse.hpp"
+#endif
+

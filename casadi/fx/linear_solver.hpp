@@ -45,7 +45,7 @@ public:
   const LinearSolverInternal* operator->() const;
 
   /// Set sparsity (before initialization)
-  void setSparsity(const std::vector<int>& rowind, const std::vector<int>& col);
+  void setSparsity(const CRSSparsity& sparsity);
   
   /// Factorize the matrix
   void prepare();

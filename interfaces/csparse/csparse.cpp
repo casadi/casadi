@@ -20,26 +20,28 @@
  *
  */
 
-#include "superlu_internal.hpp"
+#include "csparse_internal.hpp"
 
 using namespace std;
 namespace CasADi{
+  namespace Interfaces{
 
-SuperLU::SuperLU(){
+CSparse::CSparse(){
 }
 
-SuperLU::SuperLU(const CRSSparsity& sparsity, int nrhs){
-  assignNode(new SuperLUInternal(sparsity,nrhs));
+CSparse::CSparse(const CRSSparsity& sp, int nrhs){
+  assignNode(new CSparseInternal(sp,nrhs));
 }
  
-SuperLUInternal* SuperLU::operator->(){
-  return static_cast<SuperLUInternal*>(FX::operator->());
+CSparseInternal* CSparse::operator->(){
+  return static_cast<CSparseInternal*>(FX::operator->());
 }
 
-const SuperLUInternal* SuperLU::operator->() const{
-  return static_cast<const SuperLUInternal*>(FX::operator->());
+const CSparseInternal* CSparse::operator->() const{
+  return static_cast<const CSparseInternal*>(FX::operator->());
 }
   
+  } // namespace Interfaces
 } // namespace CasADi
 
   

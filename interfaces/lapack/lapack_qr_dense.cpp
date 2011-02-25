@@ -24,12 +24,13 @@
 
 using namespace std;
 namespace CasADi{
+  namespace Interfaces{
 
 LapackQRDense::LapackQRDense(){
 }
 
-LapackQRDense::LapackQRDense(int nrow, int ncol, int nrhs){
-  assignNode(new LapackQRDenseInternal(nrow,ncol,nrhs));
+LapackQRDense::LapackQRDense(const CRSSparsity& sparsity, int nrhs){
+  assignNode(new LapackQRDenseInternal(sparsity,nrhs));
 }
  
 LapackQRDenseInternal* LapackQRDense::operator->(){
@@ -40,10 +41,7 @@ const LapackQRDenseInternal* LapackQRDense::operator->() const{
   return static_cast<const LapackQRDenseInternal*>(FX::operator->());
 }
 
-LapackQRDenseInternal::LapackQRDenseInternal(int nrow, int ncol, int nrhs) : LinearSolverInternal(nrow,ncol,nrhs){
-    
-  // Currently only square matrices tested
-  if(nrow!=ncol) throw CasadiException("LapackQRDenseInternal::LapackQRDenseInternal: currently only square matrices implemented.");
+LapackQRDenseInternal::LapackQRDenseInternal(const CRSSparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
 }
 
 LapackQRDenseInternal::~LapackQRDenseInternal(){
@@ -52,6 +50,13 @@ LapackQRDenseInternal::~LapackQRDenseInternal(){
 void LapackQRDenseInternal::init(){
   // Call the base class initializer
   LinearSolverInternal::init();
+  
+  // Get dimensions
+  nrow_ = nrow();
+  ncol_ = ncol();
+  
+  // Currently only square matrices tested
+  if(nrow_!=ncol_) throw CasadiException("LapackQRDenseInternal::init: currently only square matrices implemented.");
   
   // Allocate matrix
   mat_.resize(nrow_*nrow_);
@@ -103,6 +108,7 @@ void LapackQRDenseInternal::solve(){
 }
 
 
+  } // namespace Interfaces
 } // namespace CasADi
 
   

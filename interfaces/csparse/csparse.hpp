@@ -20,28 +20,37 @@
  *
  */
 
-#include "superlu_internal.hpp"
+#ifndef CSPARSE_HPP
+#define CSPARSE_HPP
 
-using namespace std;
+#include "casadi/fx/linear_solver.hpp"
+
 namespace CasADi{
+  namespace Interfaces{
 
-SuperLU::SuperLU(){
-}
-
-SuperLU::SuperLU(const CRSSparsity& sparsity, int nrhs){
-  assignNode(new SuperLUInternal(sparsity,nrhs));
-}
- 
-SuperLUInternal* SuperLU::operator->(){
-  return static_cast<SuperLUInternal*>(FX::operator->());
-}
-
-const SuperLUInternal* SuperLU::operator->() const{
-  return static_cast<const SuperLUInternal*>(FX::operator->());
-}
   
+/** \brief  Forward declaration of internal class */
+class CSparseInternal;
+
+/** \brief  Public class */
+class CSparse : public LinearSolver{
+public:
+
+  /// Default (empty) constructor
+  CSparse();
+  
+  /// Create a linear solver given a sparsity pattern
+  CSparse(const CRSSparsity& sp, int nrhs=1);
+  
+  /** \brief  Access internal functions and data members */
+  CSparseInternal* operator->();
+  
+  /** \brief  Access internal functions and data members */
+  const CSparseInternal* operator->() const;
+};
+
+  } // namespace Interface
 } // namespace CasADi
 
-  
-
+#endif //CSPARSE_HPP
 

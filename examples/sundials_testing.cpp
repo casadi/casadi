@@ -24,6 +24,7 @@
 #include <interfaces/sundials/idas_integrator.hpp>
 #include <interfaces/lapack/lapack_lu_dense.hpp>
 #include <interfaces/superlu/superlu.hpp>
+#include <interfaces/csparse/csparse.hpp>
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/simulator.hpp>
 #include <casadi/fx/c_function.hpp>
@@ -40,6 +41,7 @@
 using namespace std;
 using namespace CasADi;
 using namespace CasADi::Sundials;
+using namespace CasADi::Interfaces;
 
 // Use CVodes or IDAS
 const bool implicit_integrator = false;
@@ -65,7 +67,7 @@ const bool perturb_u = true;
 // Use a user_defined linear solver
 const bool user_defined_solver = false;
 
-// Use sparse direct solver (SuperLU)
+// Use sparse direct solver (SuperLU/CSparse)
 const bool sparse_direct = true;
 
 // Second order sensitivities by a symbolic-numeric approach
@@ -273,9 +275,10 @@ int main(){
   // Attach user-defined linear solver
   if(user_defined_solver){
     if(sparse_direct)
-      integrator.setLinearSolver(SuperLU(y0.size(),y0.size()));
+      integrator.setLinearSolver(CSparse(CRSSparsity()));
+//      integrator.setLinearSolver(SuperLU(CRSSparsity()));
     else 
-      integrator.setLinearSolver(LapackLUDense(y0.size(),y0.size()));
+      integrator.setLinearSolver(LapackLUDense(CRSSparsity()));
     integrator.setOption("linear_solver","user_defined");
   }
   

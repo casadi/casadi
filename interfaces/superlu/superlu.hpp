@@ -38,7 +38,7 @@ public:
   SuperLU();
   
   /// Create a linear solver given a sparsity pattern
-  SuperLU(int nrow, int ncol, int nrhs=1);
+  SuperLU(const CRSSparsity& sparsity, int nrhs=1);
     
   /** \brief  Access functions of the node */
   SuperLUInternal* operator->();

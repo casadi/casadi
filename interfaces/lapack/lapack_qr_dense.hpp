@@ -26,6 +26,7 @@
 #include "casadi/fx/linear_solver_internal.hpp"
 
 namespace CasADi{
+  namespace Interfaces{
   
 /** \brief  Forward declaration of internal class */
 class LapackQRDenseInternal;
@@ -38,12 +39,14 @@ public:
   LapackQRDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackQRDense(int nrow, int ncol, int nrhs=1);
+  LapackQRDense(const CRSSparsity& sparsity, int nrhs=1);
     
   /// Access functions of the node
   LapackQRDenseInternal* operator->();
   const LapackQRDenseInternal* operator->() const;
 };
+
+#ifndef SWIG
 
 /// QR-factorize dense matrix (lapack)
 extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
@@ -58,7 +61,7 @@ extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m,
 class LapackQRDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(int nrow, int ncol, int nrhs);
+    LapackQRDenseInternal(const CRSSparsity& sparsity, int nrhs);
 
     // Destructor
     virtual ~LapackQRDenseInternal();
@@ -83,10 +86,15 @@ class LapackQRDenseInternal : public LinearSolverInternal{
     // qr work array
     std::vector<double> work_; 
     
+    // Dimensions
+    int nrow_, ncol_;
+
 };
 
+#endif // SWIG
 
 
+  } // namespace Interfaces
 } // namespace CasADi
 
 #endif //LAPACK_QR_DENSE_HPP

@@ -4,15 +4,15 @@ include_directories(Include)
 
 set(CSPARSE_SRC
         Include/cs.h
-        Source/cs_add Source/cs_amd Source/cs_chol Source/cs_cholsol Source/cs_counts Source/cs_cumsum 
-        Source/cs_droptol Source/cs_dropzeros Source/cs_dupl Source/cs_entry 
-        Source/cs_etree Source/cs_fkeep Source/cs_gaxpy Source/cs_happly Source/cs_house Source/cs_ipvec 
-        Source/cs_lsolve Source/cs_ltsolve Source/cs_lu Source/cs_lusol Source/cs_util Source/cs_multiply 
-        Source/cs_permute Source/cs_pinv Source/cs_post Source/cs_pvec Source/cs_qr Source/cs_qrsol 
-        Source/cs_scatter Source/cs_schol Source/cs_sqr Source/cs_symperm Source/cs_tdfs Source/cs_malloc 
-        Source/cs_transpose Source/cs_compress Source/cs_usolve Source/cs_utsolve Source/cs_scc 
-        Source/cs_maxtrans Source/cs_dmperm Source/cs_updown Source/cs_print Source/cs_norm Source/cs_load 
-        Source/cs_dfs Source/cs_reach Source/cs_spsolve Source/cs_ereach Source/cs_leaf Source/cs_randperm
+        Source/cs_add.c Source/cs_amd.c Source/cs_chol.c Source/cs_cholsol.c Source/cs_counts.c Source/cs_cumsum.c
+        Source/cs_droptol.c Source/cs_dropzeros.c Source/cs_dupl.c Source/cs_entry.c
+        Source/cs_etree.c Source/cs_fkeep.c Source/cs_gaxpy.c Source/cs_happly.c Source/cs_house.c Source/cs_ipvec.c
+        Source/cs_lsolve.c Source/cs_ltsolve.c Source/cs_lu.c Source/cs_lusol.c Source/cs_util.c Source/cs_multiply.c
+        Source/cs_permute.c Source/cs_pinv.c Source/cs_post.c Source/cs_pvec.c Source/cs_qr.c Source/cs_qrsol.c
+        Source/cs_scatter.c Source/cs_schol.c Source/cs_sqr.c Source/cs_symperm.c Source/cs_tdfs.c Source/cs_malloc.c
+        Source/cs_transpose.c Source/cs_compress.c Source/cs_usolve.c Source/cs_utsolve.c Source/cs_scc.c
+        Source/cs_maxtrans.c Source/cs_dmperm.c Source/cs_updown.c Source/cs_print.c Source/cs_norm.c Source/cs_load.c
+        Source/cs_dfs.c Source/cs_reach.c Source/cs_spsolve.c Source/cs_ereach.c Source/cs_leaf.c Source/cs_randperm.c
 )
 
 add_library(csparse STATIC ${CSPARSE_SRC})

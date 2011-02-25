@@ -21,14 +21,16 @@
  */
 
 /** 
-File superlu.c from the SuperLU example collection
+File superlu.c from the CSparse example collection
 Joel Andersson, K.U. Leuven, 2010
 */
 
 #include "casadi/stl_vector_tools.hpp"
-#include "interfaces/superlu/superlu.hpp"
+#include "interfaces/csparse/csparse.hpp"
+#include "interfaces/csparse/csparse_internal.hpp"
 
 using namespace CasADi;
+using namespace CasADi::Interfaces;
 
 main(int argc, char *argv[])
 {
@@ -45,14 +47,10 @@ main(int argc, char *argv[])
   col[4] = 2; col[5] = 4; col[6] = 0; col[7] = 2;
   col[8] = 0; col[9] = 3; col[10]= 3; col[11]= 4;
   rowind[0] = 0; rowind[1] = 3; rowind[2] = 6; rowind[3] = 8; rowind[4] = 10; rowind[5] = 12;
-  
+    
   // Create a solver instance
-  SuperLU linear_solver(CRSSparsity(nrow,ncol,col,rowind));
-  
-  // Set options
-  linear_solver.setOption("colperm", "natural");
-  
-  
+  CSparse linear_solver(CRSSparsity(nrow,ncol,col,rowind));
+    
   // Initialize
   linear_solver.init();
 

@@ -20,25 +20,29 @@
  *
  */
 
-#ifndef SUPERLU_INTERNAL_HPP
-#define SUPERLU_INTERNAL_HPP
+#ifndef CSPARSE_INTERNAL_HPP
+#define CSPARSE_INTERNAL_HPP
 
-#include "superlu.hpp"
+extern "C"{
+#include "external_packages/CSparse/Include/cs.h"
+}
+
+#include "csparse.hpp"
 #include "casadi/fx/linear_solver_internal.hpp"
-#include "external_packages/superlu_4_1/SRC/slu_ddefs.h"
 
 namespace CasADi{
-  
-class SuperLUInternal : public LinearSolverInternal{
+  namespace Interfaces{
+
+class CSparseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    SuperLUInternal(const CRSSparsity& sparsity, int nrhs);
+    CSparseInternal(const CRSSparsity& sp, int nrhs);
 
     // Copy constructor
-    SuperLUInternal(const SuperLUInternal& linsol);
+    CSparseInternal(const CSparseInternal& linsol);
 
     // Destructor
-    virtual ~SuperLUInternal();
+    virtual ~CSparseInternal();
     
     // Initialize the solver
     virtual void init();
@@ -50,42 +54,28 @@ class SuperLUInternal : public LinearSolverInternal{
     virtual void solve();
     
     // Clone
-    virtual SuperLUInternal* clone() const;
-  protected:
-    
-    // Is initialized
-    bool is_init_;
+    virtual CSparseInternal* clone() const;
     
     // Has the solve function been called once
     bool called_once_;
     
-    // SuperLU data structures
-    SuperMatrix A_, L_, U_, B_;
-    superlu_options_t options_;
-    SuperLUStat_t stat_;
+    // The tranpose of linear system in CSparse form (CCS)
+    cs AT_;
 
-    // Data
-    std::vector<double> a_, rhs_;
-    std::vector<int> perm_r_; // row permutations from partial pivoting
-    std::vector<int> perm_c_; // column permutation vector
-    int info_;
+    // The symbolic factorization
+    css *S_;
+    
+    // The numeric factorization
+    csn *N_;
+    
+    // Temporary
+    std::vector<double> temp_;
 
-    std::vector<int> etree_;
     
-    // Work vector
-    void *work_;
-    
-    // Size of work
-    int lwork_;
-    
-    // Free SuperLU memory
-    void unInit();
-
-    // Allocate work vector
-    bool user_work_;
 };
 
+  } // namespace Interfaces
 } // namespace CasADi
 
-#endif //SUPERLU_INTERNAL_HPP
+#endif //CSPARSE_INTERNAL_HPP
 

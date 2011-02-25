@@ -33,9 +33,8 @@ const LinearSolverInternal* LinearSolver::operator->() const{
     return static_cast<const LinearSolverInternal*>(FX::operator->());
 }
 
-void LinearSolver::setSparsity(const std::vector<int>& rowind, const std::vector<int>& col){
-  (*this)->rowind_ = rowind;
-  (*this)->col_ = col;
+void LinearSolver::setSparsity(const CRSSparsity& sparsity){
+  (*this)->sparsity_ = sparsity;
 }
  
 void LinearSolver::prepare(){

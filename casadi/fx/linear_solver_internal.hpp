@@ -35,7 +35,7 @@ class LinearSolverInternal;
 class LinearSolverInternal : public FXInternal{
   public:
     // Constructor
-    LinearSolverInternal(int nrow, int ncol, int nrhs);
+    LinearSolverInternal(const CRSSparsity& sparsity, int nrhs);
         
     // Destructor
     virtual ~LinearSolverInternal() = 0;
@@ -54,11 +54,23 @@ class LinearSolverInternal : public FXInternal{
    
     // Is prepared
     bool prepared_;
-    
-    // Sparsity in CRS format
-    int nrow_, ncol_;
-    std::vector<int> rowind_, col_;
+
+    // Matrix sparsity
+    CRSSparsity sparsity_;
+
+    // Number of right hand sides
     int nrhs_;
+    
+    // Transpose?
+    bool transpose_;
+    
+    // Get sparsity pattern
+    int nrow() const{ return sparsity_.size1();}
+    int ncol() const{ return sparsity_.size2();}
+    int nnz() const{ return sparsity_.size();}
+    const vector<int>& col() const{ return sparsity_.col();}
+    const vector<int>& rowind() const{ return sparsity_.rowind();}
+    
 };
 
 

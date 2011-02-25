@@ -26,6 +26,7 @@
 #include "casadi/fx/linear_solver_internal.hpp"
 
 namespace CasADi{
+  namespace Interfaces{
   
 /** \brief  Forward declaration of internal class */
 class LapackLUDenseInternal;
@@ -38,12 +39,14 @@ public:
   LapackLUDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackLUDense(int nrow, int ncol, int nrhs=1);
+  LapackLUDense(const CRSSparsity& sparsity, int nrhs=1);
     
   /// Access functions of the node
   LapackLUDenseInternal* operator->();
   const LapackLUDenseInternal* operator->() const;
 };
+
+#ifndef SWIG
 
 /// LU-Factorize dense matrix (lapack)
 extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
@@ -61,7 +64,7 @@ extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *
 class LapackLUDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUDenseInternal(int nrow, int ncol, int nrhs);
+    LapackLUDenseInternal(const CRSSparsity& sparsity, int nrhs);
 
     // Clone
     virtual LapackLUDenseInternal* clone() const;
@@ -98,10 +101,14 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     // Allow the equilibration to fail
     bool allow_equilibration_failure_;
         
+    // Dimensions
+    int nrow_, ncol_;
+    
 };
 
+#endif // SWIG
 
-
+  } // namespace Interfaces
 } // namespace CasADi
 
 #endif //LAPACK_LU_DENSE_HPP

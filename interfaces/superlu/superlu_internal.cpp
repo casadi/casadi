@@ -25,12 +25,11 @@
 using namespace std;
 namespace CasADi{
   
-SuperLUInternal::SuperLUInternal(int nrow, int ncol, int nrhs)  : LinearSolverInternal(nrow,ncol,nrhs){
+SuperLUInternal::SuperLUInternal(const CRSSparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
   
   // Add options
   addOption("equil", OT_BOOLEAN, true); // Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).
   addOption("colperm", OT_STRING, "colamd"); // Specifies how to permute the columns of the matrix for sparsity preservation.
-  addOption("trans", OT_BOOLEAN, false); // transpose A
   addOption("iterrefine", OT_STRING, "norefine"); 
   addOption("diagpivotthresh",OT_REAL,1.0);
   addOption("symmetricmode",OT_BOOLEAN,false);
@@ -87,20 +86,18 @@ void SuperLUInternal::init(){
   if(is_init_) throw CasadiException("SuperLU: Already initialized");
 
   // Make sure that the matrix is is square (relax later)
-  if(nrow_!=ncol_) throw CasadiException("SuperLU: Not square");
-  
-  // number of non-zero elements
-  int nnz = col_.size();
+  if(nrow()!=ncol()) throw CasadiException("SuperLU: Not square");
   
   // Allocate SuperLU data structures
-  a_.resize(nnz);
-  rhs_.resize(nrow_ * nrhs_);
-  perm_r_.resize(nrow_);
-  perm_c_.resize(ncol_);
+  a_.resize(nnz());
+  rhs_.resize(nrow() * nrhs_);
+  perm_r_.resize(nrow());
+  perm_c_.resize(ncol());
 
+  
   // Create matrices A and B in the format expected by SuperLU.
-  dCreate_CompCol_Matrix(&A_, ncol_, nrow_, nnz, &a_[0], &col_[0], &rowind_[0], SLU_NC, SLU_D, SLU_GE);
-  dCreate_Dense_Matrix(&B_, nrow_, nrhs_, &rhs_[0], nrow_, SLU_DN, SLU_D, SLU_GE);
+  dCreate_CompCol_Matrix(&A_, ncol(), nrow(), nnz(), &a_[0], const_cast<int*>(&col()[0]), const_cast<int*>(&rowind()[0]), SLU_NC, SLU_D, SLU_GE);
+  dCreate_Dense_Matrix(&B_, nrow(), nrhs_, &rhs_[0], nrow(), SLU_DN, SLU_D, SLU_GE);
 
   // Initialize the statistics variables
   StatInit(&stat_);
@@ -118,7 +115,7 @@ void SuperLUInternal::init(){
   else throw CasadiException("SuperLU: Unknown column permutation: " + colperm.toString());
 
   // Read transpose
-  options_.Trans = getOption("trans").toInt() ? ::NOTRANS : ::TRANS; // swap due to row-major/col-major
+  options_.Trans = transpose_ ? ::NOTRANS : ::TRANS; // swap due to row-major/col-major
 
   // Iterataive refinement
   GenericType iterrefine = getOption("iterrefine");

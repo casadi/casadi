@@ -52,7 +52,7 @@ user_defined_solver = True
 sparse_direct = True
 
 # Second order sensitivities by a symbolic-numeric approach
-second_order = True
+second_order = False
 
 # Create an IDAS instance (fully implicit integrator)
 def create_IDAS():
@@ -174,9 +174,10 @@ else:
 # Attach user-defined linear solver
 if user_defined_solver:
   if sparse_direct:
-    integrator.setLinearSolver(SuperLU(len(y0),len(y0)))
+    #integrator.setLinearSolver(SuperLU(CRSSparsity()))
+    integrator.setLinearSolver(CSparse(CRSSparsity()))
   else:
-    integrator.setLinearSolver(LapackLUDense(len(y0),len(y0)))
+    integrator.setLinearSolver(LapackLUDense(CRSSparsity()))
 
 # Set common integrator options
 integrator.setOption("fsens_err_con",True)

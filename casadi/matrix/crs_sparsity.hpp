@@ -160,6 +160,15 @@ class CRSSparsity : public SharedObject{
     /// Bucket sort the elements by column
     void bucketSort(std::vector<std::list<int> >& buckets, std::vector<int>& row) const;
 
+    /// Get a submatrix
+    CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    
+    /// Set a submatrix
+    void setSub(const CRSSparsity& sub, const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping_nz, std::vector<int>& mapping_ind);
+    
+    /// Remove the structural non-zeros in a submatrix 
+    CRSSparsity eraseSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
@@ -188,6 +197,8 @@ class CRSSparsity : public SharedObject{
     /// Reserve space
     void reserve(int nnz, int nrow);
 
+    /// Is dense?
+    bool dense() const;
 
     
 };
