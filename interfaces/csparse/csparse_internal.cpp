@@ -42,7 +42,6 @@ CSparseInternal::~CSparseInternal(){
 void CSparseInternal::init(){
   // Call the init method of the base class
   LinearSolverInternal::init();
-  casadi_assert(nrhs_==1);
 
   AT_.nzmax = input().size();  // maximum number of entries 
   AT_.m = input().size2(); // number of rows
@@ -73,7 +72,7 @@ void CSparseInternal::prepare(){
   double tol = 1e-8;
   
   if(N_) cs_nfree(N_);
-  N_ = cs_lu (&AT_, S_, tol) ;                 // numeric LU factorization 
+  N_ = cs_lu(&AT_, S_, tol) ;                 // numeric LU factorization 
 
   prepared_ = true;
 }
@@ -84,16 +83,21 @@ void CSparseInternal::solve(){
   double *t = &temp_.front();
   double *x = &output().front();
   
-  if(transpose_){
-    cs_ipvec (N_->pinv, b, t, AT_.n) ;   // t = P1\b
-    cs_lsolve (N_->L, t) ;               // t = L\t 
-    cs_usolve (N_->U, t) ;               // t = U\t 
-    cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
-  } else {
-    cs_pvec (S_->q, b, t, AT_.n) ;       // t = P2*b 
-    cs_utsolve (N_->U, t) ;              // t = U'\t 
-    cs_ltsolve (N_->L, t) ;              // t = L'\t 
-    cs_pvec (N_->pinv, t, x, AT_.n) ;    // x = P1*t 
+  for(int k=0; k<nrhs_; ++k){
+    if(transpose_){
+      cs_ipvec (N_->pinv, b, t, AT_.n) ;   // t = P1\b
+      cs_lsolve (N_->L, t) ;               // t = L\t 
+      cs_usolve (N_->U, t) ;               // t = U\t 
+      cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
+    } else {
+      cs_pvec (S_->q, b, t, AT_.n) ;       // t = P2*b 
+      cs_utsolve (N_->U, t) ;              // t = U'\t 
+      cs_ltsolve (N_->L, t) ;              // t = L'\t 
+      cs_pvec (N_->pinv, t, x, AT_.n) ;    // x = P1*t 
+    }
+    
+      b += nrow();
+      x += nrow();
   }
 }
 

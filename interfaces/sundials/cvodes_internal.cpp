@@ -36,8 +36,9 @@ CVodesInternal* CVodesInternal::clone() const{
   FX q = q_;   q.makeUnique();
   CVodesInternal* node = new CVodesInternal(f,q);
   node->setOption(dictionary());
-  node->setLinearSolver(linsol_,M_);
+  node->linsol_;
   node->linsol_.makeUnique();
+  node->M_ = M_;
   node->M_.makeUnique();
   if(isInit())
     node->init();
@@ -1382,7 +1383,7 @@ Integrator CVodesInternal::jac(int iind, int oind){
   if(!linsol_.isNull()){
     LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
     linsol_aug->nrhs_ = 1+ns;
-    integrator.setLinearSolver(linsol_aug,jac_f_);
+    integrator.setLinearSolver(linsol_aug,M_);
   }
   
   return integrator;

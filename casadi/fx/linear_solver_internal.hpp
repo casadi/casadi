@@ -63,6 +63,7 @@ class LinearSolverInternal : public FXInternal{
     
     // Transpose?
     bool transpose_;
+    bool transpose_rhs_;
     
     // Get sparsity pattern
     int nrow() const{ return sparsity_.size1();}

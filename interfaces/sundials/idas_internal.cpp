@@ -1387,6 +1387,7 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
    this_->lsolve(IDA_mem,b,weight,ycur,ypcur,rescur);
    return 0;
   } catch(int wrn){
+/*    cerr << "warning: " << wrn << endl;;*/
     return wrn;
   } catch(exception& e){
     cerr << "lsolve failed: " << e.what() << endl;;
@@ -1549,8 +1550,9 @@ Integrator IdasInternal::jac(int iind, int oind){
   // Pass linear solver
   if(!linsol_.isNull()){
     LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
-    linsol_aug->nrhs_ = 1+ns;
-    integrator.setLinearSolver(linsol_aug,jac_);
+//    linsol_aug->nrhs_ = 1+ns; // FIXME!!!
+//    integrator.setLinearSolver(linsol_aug,jac_); // FIXME!!!
+    integrator.setLinearSolver(linsol_aug);
   }
   
   return integrator;

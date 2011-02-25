@@ -204,7 +204,7 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 #endif
 
 #ifdef WITH_LIFTOPT
-%{ 
+%{
   #include "interfaces/liftopt/liftopt_solver.hpp"
 %}
 %include "interfaces/liftopt/liftopt_solver.hpp"

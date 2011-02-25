@@ -46,7 +46,6 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
-  protected:
     // Integrator integrating the ODE/DAE augmented with forward sensitivity equations
     Integrator integrator_;
 

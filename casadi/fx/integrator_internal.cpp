@@ -24,6 +24,7 @@
 #include <cassert>
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
+#include "integrator_jacobian_internal.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -166,7 +167,8 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   
   // Generate an jacobian
   IntegratorJacobian intjac(fwdint);
-
+  intjac->jacmap_ = jacmap(ns);
+  
   // Derivative with respect to what?
   intjac.setOption("derivative_index",iind);
   

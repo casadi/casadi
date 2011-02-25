@@ -27,20 +27,27 @@ namespace CasADi{
 
 LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity, int nrhs) : sparsity_(sparsity), nrhs_(nrhs){
   addOption("trans", OT_BOOLEAN, false);
+  addOption("trans_rhs", OT_BOOLEAN, true); // transpose the right hand side
 }
 
 void LinearSolverInternal::init(){
   // Transpose?
   transpose_ = getOption("trans");
+  transpose_rhs_ = getOption("trans_rhs");
+  casadi_assert(transpose_rhs_==true);
   
   // Allocate space for inputs
   input_.resize(2);
   input(0) = DMatrix(sparsity_);
-  input(1) = DMatrix(sparsity_.size1()*nrhs_,1,0);
+  if(transpose_rhs_){
+    input(1) = DMatrix(nrhs_,sparsity_.size1(),0);
+  } else {
+    input(1) = DMatrix(sparsity_.size1(),nrhs_,0);
+  }
   
   // Allocate space for outputs
   output_.resize(1);
-  output(0) = DMatrix(sparsity_.size1()*nrhs_,1,0);
+  output(0) = input(1);
   
   // Not prepared
   prepared_ = false;

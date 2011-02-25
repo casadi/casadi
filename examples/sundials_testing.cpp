@@ -44,7 +44,7 @@ using namespace CasADi::Sundials;
 using namespace CasADi::Interfaces;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = false;
+const bool implicit_integrator = true;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -65,7 +65,7 @@ const bool calc_ic = true;
 const bool perturb_u = true;
 
 // Use a user_defined linear solver
-const bool user_defined_solver = false;
+const bool user_defined_solver = true;
 
 // Use sparse direct solver (SuperLU/CSparse)
 const bool sparse_direct = true;
@@ -274,12 +274,18 @@ int main(){
   
   // Attach user-defined linear solver
   if(user_defined_solver){
-    if(sparse_direct)
+    if(sparse_direct){
       integrator.setLinearSolver(CSparse(CRSSparsity()));
 //      integrator.setLinearSolver(SuperLU(CRSSparsity()));
-    else 
-      integrator.setLinearSolver(LapackLUDense(CRSSparsity()));
+    } else {
+      CRSSparsity aa;
+      LapackLUDense ll(aa);
+      LinearSolver ll2 = ll;
+      cout << ll2.isNull() << endl;
+      
+    integrator.setLinearSolver(ll2);
     integrator.setOption("linear_solver","user_defined");
+    }
   }
   
   // Set common integrator options
@@ -443,11 +449,6 @@ int main(){
     
     cout << "jacobian                  " << intjac.output(0) << endl;
     cout << "jacobian2                 " << intjac2.output(0) << endl;
-        
-    return 0;
-
-    
-    
     
     // Get the results
     cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;

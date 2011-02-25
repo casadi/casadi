@@ -64,9 +64,6 @@ void IntegratorJacobianInternal::init(){
   output(INTEGRATORJACOBIAN_XF)  = DMatrix(nx_,1,0);
   output(INTEGRATORJACOBIAN_XPF) = DMatrix(nx_,1,0);
 
-  // Map Jacobian indices
-  jacmap_ = integrator_->jacmap(ns_);
-
   // Initial value for the integrators
   int iind = getOption("derivative_index").toInt();
   jacinit_.resize(nx_*ns_,0.0);
@@ -74,7 +71,7 @@ void IntegratorJacobianInternal::init(){
     for(int i=0; i<ns_; ++i)
       jacinit_.at(i+nx_*i) = 1;
   }
-
+  
   // Call the base class method
   FXInternal::init();
 }
@@ -112,7 +109,7 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
       vector<double>& jacseed_s = integrator_.adjSeed(INTEGRATOR_XF,dir);
       for(int i=0; i<nx_; ++i)
         for(int j=0; j<ns_; ++j)
-          jacseed_s[jacmap_[nx_+i+j*nx_]] = jacseed[j+i*ns_];
+          jacseed_s.at(jacmap_.at(nx_+i+j*nx_)) = jacseed[j+i*ns_];
     }
   }
   
