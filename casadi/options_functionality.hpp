@@ -73,9 +73,10 @@ class OptionsFunctionality : public SharedObject{
     /** \brief  set a set of options */
     void setOption(const Dictionary& dict);
 
+#endif // SWIG
+
     /** \brief  get an option value */
     GenericType getOption(const std::string &str) const;
-#endif // SWIG
     
     /** \brief  check if there is an option str */
     bool hasOption(const std::string &str) const;

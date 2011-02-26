@@ -97,9 +97,11 @@ namespace CasADi{
     //! \brief Equality
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
-    
+   
+    #ifndef SWIG 
     //! \brief Print
     friend std::ostream& operator<<(std::ostream &stream, const GenericType& ref);
+    #endif
         
     /// Check if it is of a certain type (implementation in generic_type_internal.hpp)
     #ifndef SWIG

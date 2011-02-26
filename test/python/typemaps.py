@@ -134,6 +134,22 @@ class typemaptests(casadiTestCase):
     for name, value in test.items():
       w.set(value)
       self.checkarray(w,goal,"name")
+      
+      
+  def testGenericType(self):
+    self.message("Generic type")
+    x=SX("x")
+    f=SXFunction([x],[2*x])
+    f.setOption("name","foo")
+
+    self.assertEquals(f.getOption("name"),"foo")
+    f.setOption("verbose",True)
+    self.assertTrue(f.getOption("verbose"))
+    f.setOption("verbose",False)
+    self.assertTrue(not(f.getOption("verbose")))
+    f.setOption("number_of_adj_dir",3)
+    #self.assertTrue(isinstance(f.getOption("number_of_adj_dir"),int))
+    self.assertEquals(f.getOption("number_of_adj_dir"),3)
     
 if __name__ == '__main__':
     unittest.main()

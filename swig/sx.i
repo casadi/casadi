@@ -549,6 +549,7 @@ matching on SXMatrix is prohibited as per wish of Joel
 }
 
 
+
 }
 
 %template(SXVector)             std::vector<CasADi::SX>;
