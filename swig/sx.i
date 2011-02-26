@@ -270,6 +270,12 @@ bool isMX(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__MX);
 }
 
+bool isMXVector(PyObject * p) {
+  return istype(p,SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t);
+}
+
+
+
 int getSXMatrix(PyObject * p, CasADi::SXMatrix * & m) {
   void *pd = 0 ;
   int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t, 0 );
@@ -300,7 +306,9 @@ int getSXMatrixVector_ptr(PyObject * p, std::vector< CasADi::Matrix<CasADi::SX> 
   return true;
 }
 
-
+bool couldbePyNumber(PyObject * p) {
+  return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p);
+}
 
 int getPyNumber(PyObject * p, double * m) {
   PyObject *r = PyNumber_Float(p);
@@ -324,7 +332,7 @@ bool asSX(PyObject* p, CasADi::SX & s) {
     if (!result)
       return false;
     s=*sx;
-  } else if (PyNumber_Check(p)) {
+  } else if (couldbePyNumber(p)) {
     double res;
     int result = getPyNumber(p,&res);
     if (!result)
@@ -337,7 +345,7 @@ bool asSX(PyObject* p, CasADi::SX & s) {
 }
 
 bool couldbeSX(PyObject* p) {
-  return (isSX(p) || PyNumber_Check(p));
+  return (isSX(p) || couldbePyNumber(p));
 }
 
 /**
@@ -385,7 +393,7 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 		if (!result)
 			return false;
     m = CasADi::Matrix< CasADi::SX >(*sx);
-  } else if (PyNumber_Check(p))  {
+  } else if (couldbePyNumber(p))  {
     double res;
     int result = getPyNumber(p,&res);
 		if (!result)

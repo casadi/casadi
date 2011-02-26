@@ -4,6 +4,155 @@
 %}
 
 %include "casadi/mx/mx.hpp"
+
+%inline %{
+
+int getMXVector_ptr(PyObject * p, std::vector<CasADi::MX> * & m) {
+  void *pd = 0 ;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t, 0 );
+  if (!SWIG_IsOK(res)) {
+    return false;
+  }
+  m = reinterpret_cast< std::vector<CasADi::MX> * >(pd);
+  return true;
+}
+
+int getMX_ptr(PyObject * p, CasADi::MX * & m) {
+  void *pd = 0 ;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MX, 0 );
+  if (!SWIG_IsOK(res)) {
+    return false;
+  }
+  m = reinterpret_cast< CasADi::MX* >(pd);
+  return true;
+}
+
+bool couldbeMX(PyObject* p) {
+  return (isMX(p) || couldbePyNumber(p));
+}
+
+bool asMX(PyObject*p, CasADi::MX &m ) {
+  if (isMX(p)) {
+    CasADi::MX * mx;
+    int result = getMX_ptr(p,mx);
+    if (!result)
+      return false;
+    m=*mx;
+  } else if (couldbePyNumber(p)) {
+    double res;
+    int result = getPyNumber(p,&res);
+    if (!result)
+      return false;
+    m=CasADi::MX(res);
+  } else {
+    return false;
+  }
+  return true;
+}
+
+bool asMXVector(PyObject*p, std::vector<CasADi::MX> &m ) {
+  if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    m.resize(PySequence_Size(p));
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      bool result=asMX(pe,m[i++]);
+      if (!result) {
+        Py_DECREF(pe);Py_DECREF(it);
+        return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+  } else if (PyDict_Check(p)) {
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    int num=0;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (PyInt_Check(key)) {
+        if (PyInt_AsLong(key)+1>num)
+          num=PyInt_AsLong(key)+1;
+      } else if (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0) {
+        if (PyInt_Check(value))
+          num=PyInt_AsLong(value);
+      } else {
+        return false;
+      }
+    }
+    m.resize(num);
+    pos=0;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (PyInt_Check(key)) {
+        bool result=asMX(value,m[PyInt_AsLong(key)]);
+        if (!result)
+          return false;
+      }
+    }
+    return true;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+
+bool couldbeMXVector(PyObject* p) {
+  if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      if (!couldbeMX(pe)) {
+        Py_DECREF(pe);Py_DECREF(it);return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+  } else if (PyDict_Check(p)) {
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (!((PyInt_Check(key) || (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0)) && couldbeMX(value)))
+        return false;
+    }
+    return true;
+  }
+  return isMXVector(p);
+}
+
+%}
+
+namespace CasADi{
+
+%typemap(in) const std::vector< MX > &  (std::vector<MX> v) {
+  if (isMXVector($input)) { // MXVector object get passed on as-is, and fast.
+    int result = getMXVector_ptr($input,$1);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"MX cast failed");
+  } else {  
+    bool result=asMXVector($input,v);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(MX, number)");
+    $1 = &v;
+  }
+}
+
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector< MX > & {
+    if (couldbeMXVector($input)) {
+      $1 = 1;
+    } else {
+      $1=0;
+    }
+}
+
+%typemap(freearg) const std::vector< MX > & {
+}
+
+}
+
+
 %include "casadi/mx/mx_tools.hpp"
 
 namespace CasADi{
