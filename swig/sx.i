@@ -461,6 +461,31 @@ bool asVSXMatrix(PyObject*p, std::vector<CasADi::SXMatrix> &m ) {
       Py_DECREF(pe);
     }
     Py_DECREF(it);
+  } else if (PyDict_Check(p)) {
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    int num=0;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (PyInt_Check(key)) {
+        if (PyInt_AsLong(key)+1>num)
+          num=PyInt_AsLong(key)+1;
+      } else if (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0) {
+        if (PyInt_Check(value))
+          num=PyInt_AsLong(value);
+      } else {
+        return false;
+      }
+    }
+    m.resize(num);
+    pos=0;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (PyInt_Check(key)) {
+        bool result=asSXMatrix(value,m[PyInt_AsLong(key)]);
+        if (!result)
+          return false;
+      }
+    }
+    return true;
   } else {
     return false;
   }
@@ -479,6 +504,14 @@ bool couldbeSXMatrixVector(PyObject* p) {
       Py_DECREF(pe);
     }
     Py_DECREF(it);
+    return true;
+  } else if (PyDict_Check(p)) {
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (!((PyInt_Check(key) || (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0)) && couldbeSXMatrix(value)))
+        return false;
+    }
     return true;
   }
   return isSXMatrixVector(p);
