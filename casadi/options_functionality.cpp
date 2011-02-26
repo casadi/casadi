@@ -150,7 +150,7 @@ void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj){
 }
 
 const Dictionary& OptionsFunctionality::dictionary() const{
-  (*this)->dictionary();
+  return (*this)->dictionary();
 }
 
 const Dictionary& OptionsFunctionalityNode::dictionary() const{

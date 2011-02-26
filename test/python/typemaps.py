@@ -141,15 +141,22 @@ class typemaptests(casadiTestCase):
     x=SX("x")
     f=SXFunction([x],[2*x])
     f.setOption("name","foo")
-
     self.assertEquals(f.getOption("name"),"foo")
     f.setOption("verbose",True)
+    self.assertTrue(isinstance(f.getOption("verbose"),bool))
     self.assertTrue(f.getOption("verbose"))
     f.setOption("verbose",False)
     self.assertTrue(not(f.getOption("verbose")))
     f.setOption("number_of_adj_dir",3)
-    #self.assertTrue(isinstance(f.getOption("number_of_adj_dir"),int))
+    self.assertTrue(isinstance(f.getOption("number_of_adj_dir"),int))
     self.assertEquals(f.getOption("number_of_adj_dir"),3)
+    d=f.dictionary()
+    self.assertTrue(isinstance(d,dict))
+    d["verbose"]=True
+    d["number_of_adj_dir"]=7
+    f.setOption(d)
+    self.assertTrue(f.getOption("verbose"))
+    self.assertEquals(f.getOption("number_of_adj_dir"),7)
     
 if __name__ == '__main__':
     unittest.main()
