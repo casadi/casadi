@@ -204,11 +204,11 @@ void FX::removeMonitor(const std::string& mon){
 }
 
 const Dictionary & FX::getStats() const{
-  (*this)->getStats();
+  return (*this)->getStats();
 }
 
 GenericType FX::getStat(const std::string& name) const{
-  (*this)->getStat(name);
+  return (*this)->getStat(name);
 }
 
 } // namespace CasADi
