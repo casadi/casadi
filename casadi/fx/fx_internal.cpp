@@ -197,6 +197,21 @@ const Dictionary & FXInternal::getStats() const {
   return stats_;
 }
 
+GenericType FXInternal::getStat(const std::string & name) const {
+  // Locate the statistic
+  Dictionary::const_iterator it = stats_.find(name);
+
+  // Check if found
+  if(it == stats_.end()){
+    stringstream ss;
+    ss << "Statistic: " << name << " has not been set." << endl;
+    ss << "Note: statistcs are only set after an evaluate call" << endl;
+    throw CasadiException(ss.str());
+  }
+
+  return GenericType(it->second);
+}
+
 // void setv(double val, vector<double>& v){
 //   if(v.size() != 1) throw CasadiException("setv(double,vector<double>&): dimension mismatch");
 //   v[0] = val;

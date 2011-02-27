@@ -135,9 +135,12 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Get the number of function outputs
   int getNumOutputs() const;
   
-  /// Get statistics
+  /// Get all statistics obtained at the end of the last evaluate call
   const Dictionary & getStats() const;
 
+  /// Get single statistic obtained at the end of the last evaluate call
+  GenericType getStat(const std::string & name) const;
+  
   protected:
 
   /** \brief  Has the function been initialized? */
@@ -160,7 +163,8 @@ class FXInternal : public OptionsFunctionalityNode{
   
   /** \brief  Dictionary of statistics (resulting from evaluate) */
   Dictionary stats_;
-  
+
+
 };
 
 

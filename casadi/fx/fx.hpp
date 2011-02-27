@@ -314,8 +314,11 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
 /// @}
 #endif
 
-  /// Get statistics
+  /// Get all statistics obtained at the end of the last evaluate call
   const Dictionary & getStats() const;
+
+  /// Get a single statistic obtained at the end of the last evaluate call
+  GenericType getStat(const std::string& name) const;
 
 };
 } // namespace CasADi

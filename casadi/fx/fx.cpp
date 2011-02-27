@@ -207,5 +207,9 @@ const Dictionary & FX::getStats() const{
   (*this)->getStats();
 }
 
+GenericType FX::getStat(const std::string& name) const{
+  (*this)->getStat(name);
+}
+
 } // namespace CasADi
 
