@@ -203,7 +203,9 @@ void FX::removeMonitor(const std::string& mon){
   (*this)->monitors_.erase(mon);
 }
 
-
+const Dictionary & FX::getStats() const{
+  (*this)->getStats();
+}
 
 } // namespace CasADi
 

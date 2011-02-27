@@ -314,6 +314,8 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
 /// @}
 #endif
 
+  /// Get statistics
+  const Dictionary & getStats() const;
 
 };
 } // namespace CasADi

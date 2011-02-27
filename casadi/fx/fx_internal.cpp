@@ -193,7 +193,9 @@ int FXInternal::getNumOutputs() const{
   return output_.size();
 }
 
-
+const Dictionary & FXInternal::getStats() const {
+  return stats_;
+}
 
 // void setv(double val, vector<double>& v){
 //   if(v.size() != 1) throw CasadiException("setv(double,vector<double>&): dimension mismatch");

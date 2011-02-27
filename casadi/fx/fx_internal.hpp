@@ -134,6 +134,9 @@ class FXInternal : public OptionsFunctionalityNode{
 
   /// Get the number of function outputs
   int getNumOutputs() const;
+  
+  /// Get statistics
+  const Dictionary & getStats() const;
 
   protected:
 
@@ -155,7 +158,8 @@ class FXInternal : public OptionsFunctionalityNode{
   /// Set of module names which are extra monitored
   std::set<std::string> monitors_;
   
-  
+  /** \brief  Dictionary of statistics (resulting from evaluate) */
+  Dictionary stats_;
   
 };
 

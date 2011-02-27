@@ -328,7 +328,8 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
     std::cout << "*** The problem solved!" << std::endl;
   else
     std::cout << "*** The problem FAILED" << std::endl;
-
+  
+  stats_["return_code"] = (int) status;
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
