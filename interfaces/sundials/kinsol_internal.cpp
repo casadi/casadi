@@ -39,6 +39,7 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
   addOption("iterative_solver",OT_STRING,"gmres");
   addOption("f_scale",OT_REALVECTOR);
   addOption("u_scale",OT_REALVECTOR);
+  addOption("constraints",OT_INTEGERVECTOR);
 
   mem_ = 0;
   u_ = 0;
@@ -81,6 +82,7 @@ void KinsolInternal::init(){
   u_ = N_VMake_Serial(N_,&output(0)[0]);
   u_scale_ = N_VNew_Serial(N_);
   f_scale_ = N_VNew_Serial(N_);
+  u_c_     = N_VNew_Serial(N_);
   
   // Set scaling factors on variables
   if(hasSetOption("u_scale")){
@@ -108,7 +110,27 @@ void KinsolInternal::init(){
   casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
   
   // Initialize KINSOL
-  KINInit(mem_,func_wrapper, u_);
+  flag = KINInit(mem_,func_wrapper, u_);
+  if(!(flag>=KIN_SUCCESS)){
+    stringstream ss;
+    ss << "KINInit flag was " << flag << endl;
+    throw CasadiException(ss.str());
+  }
+
+  // Set constraints
+  if(hasSetOption("constraints")){
+    vector<int> u_c = getOption("constraints").toIntVector();
+    casadi_assert(u_c.size()==NV_LENGTH_S(u_c_));
+    copy(u_c.begin(),u_c.end(),NV_DATA_S(u_c_));
+    flag = KINSetConstraints(mem_, u_c_);
+    if(!(flag>=KIN_SUCCESS)){
+      stringstream ss;
+      ss << "KINSetConstraints flag was " << flag << endl;
+      throw CasadiException(ss.str());
+    }
+  } else {
+    N_VConst(0,u_c_);
+  }
 
   // Use exact Jacobian
   bool exact_jacobian = getOption("exact_jacobian").toInt();
@@ -172,7 +194,11 @@ void KinsolInternal::evaluate(int fsens_order, int asens_order){
   if(fsens_order==0 && asens_order==0){
     // Solve the nonlinear system of equations
     int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
-    casadi_assert_message(flag>=KIN_SUCCESS, "KINSol");
+    if(!(flag>=KIN_SUCCESS)){
+      stringstream ss;
+      ss << "KINSol flag was " << flag << endl;
+      throw CasadiException(ss.str());
+    }
   } else {
     // Pass inputs to the augmented system solver
     for(int i=0; i<getNumInputs(); ++i)

@@ -73,29 +73,32 @@ public:
   static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
   static int djac_wrapper(int N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
   
-  // KINSOL memory block
+  /// KINSOL memory block
   void* mem_;
   
-  // Jacobian
+  /// Jacobian
   FX J_;
   
-  // Variable
+  /// Variable
   N_Vector u_;
   
   // Scaling
   N_Vector u_scale_, f_scale_;
   
-  // For timings
+  /// Constraints
+  N_Vector u_c_;
+  
+  /// For timings
   clock_t time1_, time2_;
   
-  // Accummulated time since last reset:
+  /// Accummulated time since last reset:
   double t_func_; // time spent in the residual function
   double t_jac_; // time spent in the jacobian function
 
-  // Globalization strategy
+  /// Globalization strategy
   int strategy_;
 
-  // Nonlinear solver for the augmented system
+  /// Nonlinear solver for the augmented system
   KinsolSolver aug_;
 };
 

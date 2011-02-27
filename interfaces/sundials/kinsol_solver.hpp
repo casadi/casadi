@@ -31,13 +31,45 @@ namespace Sundials{
 // Forward declaration of internal class 
 class KinsolInternal;
 
+/** \brief Kinsol solver class
+*
+* You can provide an initial guess by setting output(0).\n
+* A good initial guess may be needed to avoid errors like "The linear solver's setup function failed in an unrecoverable manner."
+*
+* Available options:\n
+* addOption("linear_solver", OT_STRING, "dense");\n
+  addOption("upper_bandwidth", OT_INTEGER);\n
+  addOption("lower_bandwidth", OT_INTEGER);\n
+  addOption("max_krylov", OT_INTEGER, 0);\n
+  addOption("exact_jacobian", OT_BOOLEAN, true);\n
+  addOption("iterative_solver",OT_STRING,"gmres");\n
+  addOption("f_scale",OT_REALVECTOR); Scaling factors on equations\n
+  addOption("u_scale",OT_REALVECTOR); Scaling factors on variables\n
+  addOption("constraints",OT_INTEGERVECTOR);\n
+  
+  The constraints option expects an integer entry for each variable u:\n
+    
+  0 then no constraint is imposed on u. \n
+  1 then ui will be constrained to be u >= 0.0. \n
+ −1 then ui will be constrained to be ui >= 0.0. \n
+  2 then ui will be constrained to be ui > 0.0. \n
+  −2 then ui will be constrained to be ui < 0.0. \n
+
+*
+* \see ImplicitFunction for more information
+* 
+*/
 class KinsolSolver : public ImplicitFunction{
 public:
 
   /** \brief  Default constructor */
   KinsolSolver();
   
-  /** \brief  Create an KINSOL instance */
+  /** \brief  Create an KINSOL instance
+   *  
+   * \param f SXFunction mapping from (n+1) inputs to 1 output
+   *
+   */
   explicit KinsolSolver(const FX& f, int nrhs=1);
   
   /** \brief  Access functions of the node */

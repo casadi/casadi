@@ -342,7 +342,46 @@ class NLPtests(casadiTestCase):
     # todo: catch error when set([0, 3 , 5]) two times
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
     
-    
+  def testKINSol1(self):
+    self.message("Scalar KINSol problem, n=0")
+    x=SX("x")
+    f=SXFunction([x],[sin(x)])
+    f.init()
+    solver=KinsolSolver(f,1)
+    solver.init()
+    solver.output().set(6)
+    solver.solve()
+    self.assertAlmostEqual(solver.output()[0],2*pi,6)
+
+  def testKINSol2(self):
+    self.message("Scalar KINSol problem, n=1")
+    x=SX("x")
+    y=SX("y")
+    n=0.2
+    f=SXFunction([y,x],[sin(x)-y])
+    f.init()
+    solver=KinsolSolver(f,1)
+    solver.init()
+    solver.fwdSeed().set(1)
+    solver.adjSeed().set(1)
+    solver.input().set(n)
+    solver.evaluate(1,1)
+    self.assertAlmostEqual(solver.output()[0],sin(n),6)
+    self.assertAlmostEqual(solver.fwdSens()[0],cos(n),6)
+    self.assertAlmostEqual(solver.adjSens()[0],cos(n),6)
+
+  def testKINSol1c(self):
+    self.message("Scalar KINSol problem, n=0, constraint")
+    x=SX("x")
+    f=SXFunction([x],[sin(x)])
+    f.init()
+    solver=KinsolSolver(f,1)
+    solver.setOption("constraints",[-1])
+    print solver.dictionary()
+    solver.init()
+    solver.output().set(-6)
+    solver.solve()
+    self.assertAlmostEqual(solver.output()[0],-2*pi,6)
     
 if __name__ == '__main__':
     unittest.main()

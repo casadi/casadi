@@ -34,25 +34,28 @@ class ImplicitFunctionInternal;
 /// Internal class
 class ImplicitFunctionInternal : public FXInternal{
   public:
-    // Constructor
+    /** \brief Constructor
+    *
+    * \param f   FX mapping from (n+1) inputs to 1 output.
+    */
     ImplicitFunctionInternal(const FX& f, int nrhs);
         
-    // Destructor
+    /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
     
-    // Initialize
+    /// Initialize
     virtual void init();
     
-    // Solve the system of equations
+    /// Solve the system of equations
     virtual void evaluate(int fsens_order, int asens_order) = 0;
     
-    // Sparsity in CRS format
+    /// Sparsity in CRS format
     FX f_;
     
-    // Number of equations
+    /// Number of equations
     int N_;
     
-    // Number of right hand sides
+    /// Number of right hand sides
     int nrhs_;
 };
 

@@ -37,7 +37,16 @@ class ImplicitFunctionInternal;
   where d_F/dz is invertable, implicitly defines the equation:
   
   z := G(x1, x2, ..., xn)
-
+  
+  
+  
+  F should be an FX mapping from (n+1) inputs to 1 output.
+  ImplicitFunction (G) is an FX mapping from n inputs to 1 output. 
+  
+  n may be zero.
+  
+  You can provide an initial guess for z by setting output(0) of ImplicitFunction.
+  
 \author Joel Andersson
 \date 2011
 */

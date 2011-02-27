@@ -13,6 +13,9 @@
 %include "casadi/generic_type.hpp"
 
 %inline %{
+
+
+
 bool asPyObject(const CasADi::GenericType &a,PyObject * & p) {
   if (a.isBool()) {
     p=PyBool_FromLong(a.toBool());
@@ -22,6 +25,10 @@ bool asPyObject(const CasADi::GenericType &a,PyObject * & p) {
     p=PyFloat_FromDouble(a.toDouble());
   } else if (a.isString()) {
     p=PyString_FromString(a.toString().c_str());
+  } else if (a.isIntVector()) {
+    p = swig::from(a.toIntVector());
+  } else if (a.isDoubleVector()) {
+    p = swig::from( a.toDoubleVector());
   } else {
     return false;
   }
@@ -36,7 +43,7 @@ bool asPyObject(const CasADi::Dictionary &a,PyObject * & p) {
     PyObject * e;
     bool ret=asPyObject(it->second,e);
     if (!ret) {
-      Py_DECREF(e);Py_DECREF(p);
+      Py_DECREF(p);
       return false;
     }
     PyDict_SetItemString(p,(it->first).c_str(),e);
@@ -140,6 +147,7 @@ try {
 namespace CasADi {
   %extend OptionsFunctionality {
     void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
     void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);} 
     void setOption(const std::string &name, double val){$self->setOption(name,val);}
     void setOption(const std::string &name, int val){$self->setOption(name,val);} 
