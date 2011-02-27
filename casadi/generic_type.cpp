@@ -32,11 +32,12 @@ namespace CasADi{
   typedef GenericTypeInternal<std::string> StringType;
   typedef GenericTypeInternal<double> DoubleType;
   typedef GenericTypeInternal<int> IntType;
+  typedef GenericTypeInternal<bool> BoolType;
   typedef GenericTypeInternal<std::vector<double> > DoubleVectorType;
   typedef GenericTypeInternal<std::vector<int> > IntVectorType;
 
 bool GenericType::isBool() const{
-  return isInt() && (toInt()==0 || toInt()==1);
+  return is_a<bool>();
 }
 
 bool GenericType::isInt() const{
@@ -68,7 +69,7 @@ ostream& operator<<(ostream &stream, const GenericType& ref){
 }
 
 GenericType::GenericType(bool b){
-  assignNode(new IntType(b));
+  assignNode(new BoolType(b));
 }
 
 GenericType::GenericType(int i){
@@ -102,7 +103,13 @@ GenericType::GenericType(const char s[]){
 }
 
 bool GenericType::toBool() const{
-  return bool(toInt());
+  if (isBool()) {
+    return static_cast<const BoolType*>(get())->d_;
+  } else if (isInt()) {
+    return bool(toInt());
+  } else {
+  casadi_assert_message(isBool(),"type mismatch");
+  }
 }
 
 int GenericType::toInt() const{
@@ -110,6 +117,8 @@ int GenericType::toInt() const{
     double v = toDouble();
     casadi_assert_message(v == std::floor(v),"The value is not an integer");
     return int(v);
+  } else if (isBool()) {
+    return int(toBool());
   } else {
     casadi_assert_message(isInt(),"type mismatch");
     return static_cast<const IntType*>(get())->d_;
