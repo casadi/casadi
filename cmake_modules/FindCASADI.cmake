@@ -15,12 +15,13 @@ SET(CASADI_LIBS_LIST
   lapack_interface
   sundials_interface
   superlu_interface
-  casadi
-  csparse
+  csparse_interface
   knitro_interface
   optimal_control
   superlu
+  csparse
   tinyxml
+  casadi
 )
 
 FOREACH(LIB in ${CASADI_LIBS_LIST})
