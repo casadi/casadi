@@ -37,7 +37,6 @@
 #include <fstream>
 #include <iostream>
 
-
 using namespace std;
 using namespace CasADi;
 using namespace CasADi::Sundials;
@@ -50,7 +49,7 @@ const bool implicit_integrator = true;
 const bool plain_c = false;
 
 // test adjoint sensitivities
-const bool with_asens = true;
+const bool with_asens = false;
 
 // use exact jacobian
 const bool exact_jacobian = plain_c ? false : true;
@@ -65,13 +64,13 @@ const bool calc_ic = true;
 const bool perturb_u = true;
 
 // Use a user_defined linear solver
-const bool user_defined_solver = true;
+const bool user_defined_solver = false;
 
 // Use sparse direct solver (SuperLU/CSparse)
 const bool sparse_direct = true;
 
 // Second order sensitivities by a symbolic-numeric approach
-const bool second_order = true;
+const bool second_order = false;
 
 
 // The DAE residual in plain c (for IDAS)
@@ -378,6 +377,7 @@ int main(){
   } else {
     // evaluate with only forward sensitivities
     integrator.evaluate(1,0);
+    return 0;
   }
     
   vector<double> fsens = integrator.fwdSens();
@@ -391,7 +391,7 @@ int main(){
     cout << integrator.adjSens(INTEGRATOR_P) << "; ";
     cout << endl;
   }
-  
+
   if(second_order){
     // Preturb the forward seeds
     if(perturb_u){

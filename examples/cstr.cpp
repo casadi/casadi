@@ -3,6 +3,7 @@
 #include <interfaces/sundials/idas_integrator.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/kinsol_solver.hpp>
+#include <interfaces/csparse/csparse.hpp>
 
 #include <casadi/fx/fx_tools.hpp>
 #include <casadi/mx/mx_tools.hpp>
@@ -16,6 +17,7 @@
 #include <optimal_control/multiple_shooting.hpp>
 
 using namespace CasADi;
+using namespace CasADi::Interfaces;
 using namespace CasADi::Sundials;
 using namespace CasADi::OptimalControl;
 using namespace std;
@@ -76,6 +78,8 @@ int main(){
   
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
+  // ode.setLinearSolver(CSparse(CRSSparsity()));
+  // ode.setOption("linear_solver","dense");
   ode.init();
   
   // DAE residual
@@ -87,7 +91,7 @@ int main(){
   dae_in[DAE_P] = u;
   SXFunction dae(dae_in,scaled_ocp.dae);
 
-  bool use_kinsol = false;
+  bool use_kinsol = true;
   if(use_kinsol){
     // Create an ODE integrator (CVodes)
     integrator = CVodesIntegrator(ode);

@@ -61,7 +61,18 @@ target_link_libraries(vdp_multiple_shooting sundials_interface ipopt_interface o
 
 # Van der pol with multiple shooting
 add_executable(cstr cstr.cpp)
-target_link_libraries(cstr sundials_interface ipopt_interface optimal_control casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml)
+target_link_libraries(cstr 
+  sundials_interface 
+  ipopt_interface 
+  optimal_control 
+  csparse_interface
+  casadi 
+  ${IPOPT_LIBRARIES} 
+  ${SUNDIALS_LIBRARIES} 
+  tinyxml
+  csparse
+)
+
 
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 

@@ -57,8 +57,8 @@ int main(){
   int num_nodes = 100;
   
   //Create an integrator (CVodes)
-  IdasIntegrator I(res);
-  //CVodesIntegrator I(rhs);
+  //IdasIntegrator I(res);
+  CVodesIntegrator I(rhs);
   I.setOption("abstol",1e-8); //abs. tolerance
   I.setOption("reltol",1e-8); //rel. tolerance
   I.setOption("steps_per_checkpoint",500);

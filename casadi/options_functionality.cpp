@@ -63,12 +63,13 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
   return GenericType(it->second);
 }
 
-void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val){
+void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val, const string& desc){
   allowed_options[name] = type;
 
   if(!def_val.isNull())
-    dictionary_[name] = GenericType(def_val);
+    dictionary_[name] = def_val;
 
+  description_[name] = desc;
 }
 
 void OptionsFunctionalityNode::printOptions(ostream &stream) const{
@@ -167,7 +168,7 @@ void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){
   setOption(obj.dictionary());
 }
 
-void OptionsFunctionalityNode::repr(std::ostream &stream) const{
+void OptionsFunctionalityNode::repr(ostream &stream) const{
   stream << getOption("name").toString();
 }
 

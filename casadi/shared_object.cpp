@@ -160,9 +160,8 @@ SharedObjectNode* SharedObjectNode::clone() const{
 }
 
 SharedObject SharedObject::clone() const{
-  casadi_assert(!isNull());
   SharedObject ret;
-  ret.assignNode((*this)->clone());
+  if(!isNull()) ret.assignNode((*this)->clone());
   return ret;
 }
 

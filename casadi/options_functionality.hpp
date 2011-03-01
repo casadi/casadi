@@ -143,7 +143,7 @@ virtual ~OptionsFunctionalityNode();
 
 protected:
 
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType());
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a");
 
 private:
 /** \brief  Allowed options  */
@@ -151,6 +151,9 @@ private:
 
 /** \brief  User-set options */
   Dictionary dictionary_;
+
+/** \brief  Description for the options */
+  std::map<std::string, std::string> description_;
 
 };
 

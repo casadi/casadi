@@ -50,6 +50,23 @@ KinsolSolver KinsolSolver::jac(int iind, int oind){
   return (*this)->jac(iind,oind);  
 }
 
+void KinsolSolver::setLinearSolver(const LinearSolver& linsol){
+  (*this)->setLinearSolver(linsol);
+}
+
+void KinsolSolver::setJacobian(const FX& jac){
+  (*this)->setJacobian(jac);
+}
+
+FX KinsolSolver::getJacobian(){
+  return (*this)->getJacobian();  
+}
+  
+LinearSolver KinsolSolver::getLinearSolver(){
+  return (*this)->getLinearSolver();  
+}
+
+
 
 } // namespace Sundials
 } // namespace CasADi

@@ -96,6 +96,9 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Initialize */
   virtual void init();
 
+  /** \brief Initialize the taping */
+  virtual void initTaping();
+  
   /** \brief Initialize the adjoint problem (can only be called after the first integration) */
   virtual void initAdj();
   
@@ -236,6 +239,7 @@ class IdasInternal : public IntegratorInternal{
   
   // Has the adjoint problem been initialized
   bool isInitAdj_;
+  bool isInitTaping_;
   
   // Number of forward and adjoint seeds for the functions f and q
   int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;

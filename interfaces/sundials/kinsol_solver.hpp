@@ -24,6 +24,7 @@
 #define KINSOL_SOLVER_HPP
 
 #include "casadi/fx/implicit_function.hpp"
+#include "casadi/fx/linear_solver.hpp"
 
 namespace CasADi{
 namespace Sundials{
@@ -83,7 +84,19 @@ public:
   
   /** \brief Generate a linear solver for the sensitivity equations */
   KinsolSolver jac(int iind=0, int oind=0);
+ 
+  /** \brief  Set linear solver */
+  void setLinearSolver(const LinearSolver& linsol);
 
+  /** \brief  Get linear solver */
+  LinearSolver getLinearSolver();
+  
+  /** \brief  Set Jacobian */
+  void setJacobian(const FX& jac);
+  
+  /** \brief  Get Jacobian */
+  FX getJacobian();
+  
 };
 
 

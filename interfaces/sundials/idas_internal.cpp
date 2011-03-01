@@ -49,23 +49,15 @@ IdasInternal* IdasInternal::clone() const{
 // }
 
 IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
-  // Check dimensions
-  if(f.getNumInputs()!=DAE_NUM_IN) throw CasadiException("IdasInternal: f has wrong number of inputs");
-  if(f.getNumOutputs()!=DAE_NUM_OUT) throw CasadiException("IdasInternal: f has wrong number of outputs");
-  if(!q.isNull()){
-    if(q.getNumInputs()!=DAE_NUM_IN) throw CasadiException("IdasInternal: q has wrong number of inputs");
-    if(q.getNumOutputs()!=DAE_NUM_OUT) throw CasadiException("IdasInternal: q has wrong number of outputs");
-  }
-
-  addOption("suppress_algebraic",          OT_BOOLEAN, false); // supress algebraic variables in the error testing
-  addOption("calc_ic",                     OT_BOOLEAN, true);  // use IDACalcIC to get consistent initial conditions
-  addOption("calc_icB",                    OT_BOOLEAN, false);  // use IDACalcIC to get consistent initial conditions
+  addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
+  addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions");
+  addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions");
   addOption("abstolv",                     OT_REALVECTOR);
   addOption("fsens_abstolv",               OT_REALVECTOR); 
-  addOption("max_step_size",               OT_REAL, 0); // maximim step size
-  addOption("first_time",                  OT_REAL); // first requested time as a fraction of the time interval
-  addOption("cj_scaling",                  OT_BOOLEAN, false);  // IDAS scaling on cj for the user-defined linear solver module
-  addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false);  // Call calc ic an extra time, with fsens=0
+  addOption("max_step_size",               OT_REAL, 0, "maximim step size");
+  addOption("first_time",                  OT_REAL, GenericType(), "first requested time as a fraction of the time interval");
+  addOption("cj_scaling",                  OT_BOOLEAN, false, "IDAS scaling on cj for the user-defined linear solver module");
+  addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false, "Call calc ic an extra time, with fsens=0");
   
   
   mem_ = 0;
@@ -76,14 +68,9 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
   id_ = 0;
 
   is_init = false;
+  isInitAdj_ = false;
+  isInitTaping_ = false;
 
-  ny_ = f.input(DAE_Y).numel();
-  nq_ = q.isNull() ? 0 : q.output().numel();
-  int np = f.input(DAE_P).numel();
-  int nz = f.input(DAE_Z).numel();
-  setDimensions(ny_+nq_,np,nz);
-  nyz_ = ny_ + nz;
-  ncheck_ = 0;
 }
 
 IdasInternal::~IdasInternal(){ 
@@ -108,10 +95,6 @@ IdasInternal::~IdasInternal(){
 }
 
 void IdasInternal::init(){
-  // Call the base class init
-  IntegratorInternal::init();
-  log("IdasInternal::init","begin");
-  
   // Print
   if(verbose()){
     cout << "Initializing IDAS with ny_ = " << ny_ << ", nq_ = " << nq_ << ", np_ = " << np_ << " and nz_ = " << nz_ << endl;
@@ -122,6 +105,26 @@ void IdasInternal::init(){
   if(!q_.isNull()) q_.init();
   
   log("IdasInternal::init","functions initialized");
+  
+  // Check dimensions
+  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "IdasInternal: f has wrong number of inputs");
+  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: f has wrong number of outputs");
+  if(!q_.isNull()){
+    casadi_assert_message(q_.getNumInputs()==DAE_NUM_IN, "IdasInternal: q has wrong number of inputs");
+    casadi_assert_message(q_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: q has wrong number of outputs");
+  }
+
+  ny_ = f_.input(DAE_Y).numel();
+  nq_ = q_.isNull() ? 0 : q_.output().numel();
+  int np = f_.input(DAE_P).numel();
+  int nz = f_.input(DAE_Z).numel();
+  setDimensions(ny_+nq_,np,nz);
+  nyz_ = ny_ + nz;
+  ncheck_ = 0;
+
+  // Call the base class init
+  IntegratorInternal::init();
+  log("IdasInternal::init","begin");
   
   if(!jac_.isNull()){
     jac_.init();
@@ -423,30 +426,39 @@ void IdasInternal::init(){
           yBB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i)[0]);
         }
       }
-
-      // Get the number of steos per checkpoint
-      int Nd = getOption("steps_per_checkpoint").toInt();
-
-      // Get the interpolation type
-      int interpType;
-      if(getOption("interpolation_type")=="hermite")
-        interpType = IDA_HERMITE;
-      else if(getOption("interpolation_type")=="polynomial")
-        interpType = IDA_POLYNOMIAL;
-      else throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
-      
-      // Initialize adjoint sensitivities
-      flag = IDAAdjInit(mem_, Nd, interpType);
-      if(flag != IDA_SUCCESS) idas_error("IDAAdjInit",flag);
   }
   log("IdasInternal::init","initialized adjoint sensitivities");
  
  is_init = true;
+ isInitTaping_ = false;
  isInitAdj_ = false;
  log("IdasInternal::init","end");
 }
 
+void IdasInternal::initTaping(){
+  casadi_assert(!isInitTaping_);
+  int flag;
+  
+  // Get the number of steos per checkpoint
+  int Nd = getOption("steps_per_checkpoint").toInt();
+
+  // Get the interpolation type
+  int interpType;
+  if(getOption("interpolation_type")=="hermite")
+    interpType = IDA_HERMITE;
+  else if(getOption("interpolation_type")=="polynomial")
+    interpType = IDA_POLYNOMIAL;
+  else throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
+      
+  // Initialize adjoint sensitivities
+  flag = IDAAdjInit(mem_, Nd, interpType);
+  if(flag != IDA_SUCCESS) idas_error("IDAAdjInit",flag);
+  
+  isInitTaping_ = true;
+}
+
 void IdasInternal::initAdj(){
+  casadi_assert(!isInitAdj_);
   int flag;
   
   for(int dir=0; dir<nadir_; ++dir){
@@ -680,6 +692,9 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Vec
 
 void IdasInternal::reset(int fsens_order, int asens_order){
   log("IdasInternal::reset","begin");
+  
+  if(asens_order>0 && !isInitTaping_)
+    initTaping();
   
   // If we have forward sensitivities, rest one extra time without forward sensitivities to get a consistent initial guess
   if(fsens_order>0 && getOption("extra_fsens_calc_ic").toInt())
@@ -1430,10 +1445,10 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
 
 void IdasInternal::initUserDefinedLinearSolver(){
   // Make sure that a Jacobian has been provided
-  if(jac_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
+  casadi_assert(!jac_.isNull());
 
   // Make sure that a linear solver has been providided
-  if(linsol_.isNull()) throw CasadiException("IdasInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
+  casadi_assert(!linsol_.isNull());
 
   //  Set fields in the IDA memory
   IDAMem IDA_mem = IDAMem(mem_);

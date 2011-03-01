@@ -187,7 +187,8 @@ B shared_cast(SharedObject& A){
   ret.assignNode(ptr);
       
   /// Null pointer if not pointing towards the right type of object
-  if(!ret.checkNode()) ret.assignNode(0);
+  if(ptr && !ret.checkNode()) 
+    ret.assignNode(0);
 
   return ret;
 }
