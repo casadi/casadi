@@ -36,7 +36,7 @@ CVodesInternal* CVodesInternal::clone() const{
   FX q = q_;   q.makeUnique();
   CVodesInternal* node = new CVodesInternal(f,q);
   node->setOption(dictionary());
-  node->linsol_;
+  node->linsol_ = linsol_;
   node->linsol_.makeUnique();
   node->M_ = M_;
   node->M_.makeUnique();
