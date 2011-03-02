@@ -235,6 +235,8 @@ void KinsolInternal::init(){
     aug_ = jac(range(getNumInputs()),0);
     aug_.setOption("number_of_fwd_dir",0);
     aug_.setOption("number_of_adj_dir",0);
+    aug_.setOption("linear_solver",getOption("linear_solver"));
+    aug_.setLinearSolver(shared_cast<LinearSolver>(linsol_.clone()));
     aug_.init();
   }
   

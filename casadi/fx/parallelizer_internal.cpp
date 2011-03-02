@@ -107,23 +107,54 @@ void ParallelizerInternal::evaluate(int fsens_order, int asens_order){
 }
 
 void ParallelizerInternal::evaluateTask(int task, int fsens_order, int asens_order){
+  int nfdir = fsens_order ? nfdir_ : 0;
+  int nadir = asens_order ? nadir_ : 0;
   
   // Get a reference to the function
   FX& fcn = funcs_[task];
   
-  // Copy inputs to functions TODO: add seeds
+  // Copy inputs to functions
   for(int j=inind_[task]; j<inind_[task+1]; ++j){
-    fcn.setInput(input(j),j-inind_[task]);
+    fcn.input(j-inind_[task]).set(input(j));
+  }
+  
+  // Copy forward seeds
+  for(int dir=0; dir<nfdir; ++dir){
+    for(int j=inind_[task]; j<inind_[task+1]; ++j){
+      fcn.fwdSeed(j-inind_[task],dir).set(fwdSeed(j,dir));
+    }
+  }
+  
+  // Copy adjoint seeds
+  for(int dir=0; dir<nadir; ++dir){
+    for(int j=outind_[task]; j<outind_[task+1]; ++j){
+      fcn.adjSeed(j-outind_[task],dir).set(adjSeed(j,dir));
+    }
   }
 
   // Evaluate
   fcn.evaluate(fsens_order,asens_order);
     
-  // Get the results TODO: add derivatives
-  for(int j=outind_[task]; j<outind_[task+1]; ++j)
+  // Get the results
+  for(int j=outind_[task]; j<outind_[task+1]; ++j){
     fcn.output(j-outind_[task]).get(output(j));
+  }
   
-  // Save corrected input values
+  // Get the forward sensitivities
+  for(int dir=0; dir<nfdir; ++dir){
+    for(int j=outind_[task]; j<outind_[task+1]; ++j){
+      fcn.fwdSens(j-outind_[task],dir).get(fwdSens(j,dir));
+    }
+  }
+
+  // Get the adjoint sensitivities
+  for(int dir=0; dir<nadir; ++dir){
+    for(int j=inind_[task]; j<inind_[task+1]; ++j){
+      fcn.adjSens(j-inind_[task],dir).get(adjSens(j,dir));
+    }
+  }
+  
+  // Save corrected input values // TODO: REMOVE!
   if(save_corrected_input_){
     for(int j=inind_[task]; j<inind_[task+1]; ++j){
       fcn.getInput(input(j),j-inind_[task]);
