@@ -25,25 +25,18 @@
 using namespace std;
 namespace CasADi{
 
-LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity, int nrhs) : sparsity_(sparsity), nrhs_(nrhs){
+LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity) : sparsity_(sparsity){
   addOption("trans", OT_BOOLEAN, false);
-  addOption("trans_rhs", OT_BOOLEAN, true); // transpose the right hand side
 }
 
 void LinearSolverInternal::init(){
   // Transpose?
   transpose_ = getOption("trans");
-  transpose_rhs_ = getOption("trans_rhs");
-  casadi_assert(transpose_rhs_==true);
   
   // Allocate space for inputs
   input_.resize(2);
   input(0) = DMatrix(sparsity_);
-  if(transpose_rhs_){
-    input(1) = DMatrix(nrhs_,sparsity_.size1(),0);
-  } else {
-    input(1) = DMatrix(sparsity_.size1(),nrhs_,0);
-  }
+  input(1) = DMatrix(sparsity_.size1(),1,0);
   
   // Allocate space for outputs
   output_.resize(1);
@@ -86,9 +79,21 @@ void LinearSolverInternal::evaluate(int fsens_order, int asens_order){
   if(!prepared_) 
     throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
   
+  // Solve the factorized system
   solve();
 }
  
+void LinearSolverInternal::solve(){
+  // Get input and output vector
+  const vector<double>& b = input(1);
+  vector<double>& x = output();
+  
+  // Copy input to output
+  copy(b.begin(),b.end(),x.begin());
+  
+  // Solve the factorized system
+  solve(&x[0],1);
+}
  
 } // namespace CasADi
 

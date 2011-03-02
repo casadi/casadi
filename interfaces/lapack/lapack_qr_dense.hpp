@@ -39,7 +39,7 @@ public:
   LapackQRDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackQRDense(const CRSSparsity& sparsity, int nrhs=1);
+  LapackQRDense(const CRSSparsity& sparsity);
     
   /// Access functions of the node
   LapackQRDenseInternal* operator->();
@@ -61,7 +61,7 @@ extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m,
 class LapackQRDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(const CRSSparsity& sparsity, int nrhs);
+    LapackQRDenseInternal(const CRSSparsity& sparsity);
 
     // Destructor
     virtual ~LapackQRDenseInternal();
@@ -73,7 +73,7 @@ class LapackQRDenseInternal : public LinearSolverInternal{
     virtual void prepare();
     
     // Solve the system of equations
-    virtual void solve();
+    virtual void solve(double* x, int nrhs);
 
   protected:
 

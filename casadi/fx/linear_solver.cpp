@@ -41,6 +41,10 @@ void LinearSolver::prepare(){
   (*this)->prepare();
 }
 
+void LinearSolver::solve(double* x, int nrhs){
+  (*this)->solve(x,nrhs);
+}
+ 
 void LinearSolver::solve(){
   (*this)->solve();
 }

@@ -26,7 +26,7 @@ using namespace std;
 namespace CasADi{
   namespace Interfaces{
 
-CSparseInternal::CSparseInternal(const CRSSparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
+CSparseInternal::CSparseInternal(const CRSSparsity& sparsity)  : LinearSolverInternal(sparsity){
   N_ = 0;
   S_ = 0;
 }
@@ -77,33 +77,28 @@ void CSparseInternal::prepare(){
   prepared_ = true;
 }
   
-void CSparseInternal::solve(){
-  
-  const double *b = &input(1).front();
+void CSparseInternal::solve(double* x, int nrhs){
   double *t = &temp_.front();
-  double *x = &output().front();
   
-  for(int k=0; k<nrhs_; ++k){
+  for(int k=0; k<nrhs; ++k){
     if(transpose_){
-      cs_ipvec (N_->pinv, b, t, AT_.n) ;   // t = P1\b
+      cs_ipvec (N_->pinv, x, t, AT_.n) ;   // t = P1\b
       cs_lsolve (N_->L, t) ;               // t = L\t 
       cs_usolve (N_->U, t) ;               // t = U\t 
       cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
     } else {
-      cs_pvec (S_->q, b, t, AT_.n) ;       // t = P2*b 
+      cs_pvec (S_->q, x, t, AT_.n) ;       // t = P2*b 
       cs_utsolve (N_->U, t) ;              // t = U'\t 
       cs_ltsolve (N_->L, t) ;              // t = L'\t 
       cs_pvec (N_->pinv, t, x, AT_.n) ;    // x = P1*t 
     }
-    
-      b += nrow();
-      x += nrow();
+    x += nrow();
   }
 }
 
 
 CSparseInternal* CSparseInternal::clone() const{
-  return new CSparseInternal(sparsity_,nrhs_);
+  return new CSparseInternal(sparsity_);
 }
 
   } // namespace Interfaces

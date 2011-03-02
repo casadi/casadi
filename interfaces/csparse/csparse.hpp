@@ -40,7 +40,7 @@ public:
   CSparse();
   
   /// Create a linear solver given a sparsity pattern
-  CSparse(const CRSSparsity& sp, int nrhs=1);
+  CSparse(const CRSSparsity& sp);
   
   /** \brief  Access internal functions and data members */
   CSparseInternal* operator->();

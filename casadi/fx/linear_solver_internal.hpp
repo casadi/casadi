@@ -35,7 +35,7 @@ class LinearSolverInternal;
 class LinearSolverInternal : public FXInternal{
   public:
     // Constructor
-    LinearSolverInternal(const CRSSparsity& sparsity, int nrhs);
+    LinearSolverInternal(const CRSSparsity& sparsity);
         
     // Destructor
     virtual ~LinearSolverInternal() = 0;
@@ -48,9 +48,12 @@ class LinearSolverInternal : public FXInternal{
 
     // Prepare the factorization
     virtual void prepare() = 0;
-    
+
+    // Solve the system of equations, using internal vector
+    virtual void solve();
+
     // Solve the system of equations
-    virtual void solve() = 0;
+    virtual void solve(double* x, int nrhs) = 0;
    
     // Is prepared
     bool prepared_;
@@ -58,12 +61,8 @@ class LinearSolverInternal : public FXInternal{
     // Matrix sparsity
     CRSSparsity sparsity_;
 
-    // Number of right hand sides
-    int nrhs_;
-    
     // Transpose?
     bool transpose_;
-    bool transpose_rhs_;
     
     // Get sparsity pattern
     int nrow() const{ return sparsity_.size1();}

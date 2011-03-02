@@ -36,7 +36,7 @@ namespace CasADi{
 class CSparseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseInternal(const CRSSparsity& sp, int nrhs);
+    CSparseInternal(const CRSSparsity& sp);
 
     // Copy constructor
     CSparseInternal(const CSparseInternal& linsol);
@@ -51,7 +51,7 @@ class CSparseInternal : public LinearSolverInternal{
     virtual void prepare();
     
     // Solve the system of equations
-    virtual void solve();
+    virtual void solve(double* x, int nrhs);
     
     // Clone
     virtual CSparseInternal* clone() const;

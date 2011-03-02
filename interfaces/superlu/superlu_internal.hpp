@@ -47,7 +47,7 @@ class SuperLUInternal : public LinearSolverInternal{
     virtual void prepare();
     
     // Solve the system of equations
-    virtual void solve();
+    virtual void solve(double* x, int nrhs);
     
     // Clone
     virtual SuperLUInternal* clone() const;
@@ -58,6 +58,9 @@ class SuperLUInternal : public LinearSolverInternal{
     
     // Has the solve function been called once
     bool called_once_;
+    
+    // Max number of right hand sides
+    int nrhs_;
     
     // SuperLU data structures
     SuperMatrix A_, L_, U_, B_;

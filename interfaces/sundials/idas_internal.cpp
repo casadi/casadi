@@ -1331,20 +1331,14 @@ void IdasInternal::psolve(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vec
   // Get time
   time1 = clock();
 
-  // Number of right-hand-sides
-  int nrhs = nrhs_;
-  
-  // Number of rows of the linear solver
-  int nrow = nyz_/nrhs;
-  
-  // Pass right hand side to the linear solver (transpose necessary)
-  linsol_.setInput(NV_DATA_S(rvec),1);
+  // Copy input to output, if necessary
+  if(rvec!=zvec){
+    N_VScale(1.0, rvec, zvec);
+  }
   
   // Solve the (possibly factorized) system 
-  linsol_.solve();
-  
-  // Get the result (transpose necessary)
-  linsol_.getOutput(NV_DATA_S(zvec));
+  casadi_assert(linsol_.output().size()*nrhs_ == NV_LENGTH_S(zvec));
+  linsol_.solve(NV_DATA_S(zvec),nrhs_);
 
   // Log time duration
   time2 = clock();

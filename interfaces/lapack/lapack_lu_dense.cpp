@@ -29,8 +29,8 @@ namespace CasADi{
 LapackLUDense::LapackLUDense(){
 }
 
-LapackLUDense::LapackLUDense(const CRSSparsity& sparsity, int nrhs){
-  assignNode(new LapackLUDenseInternal(sparsity,nrhs));
+LapackLUDense::LapackLUDense(const CRSSparsity& sparsity){
+  assignNode(new LapackLUDenseInternal(sparsity));
 }
  
 LapackLUDenseInternal* LapackLUDense::operator->(){
@@ -41,7 +41,7 @@ const LapackLUDenseInternal* LapackLUDense::operator->() const{
   return static_cast<const LapackLUDenseInternal*>(FX::operator->());
 }
 
-LapackLUDenseInternal::LapackLUDenseInternal(const CRSSparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
+LapackLUDenseInternal::LapackLUDenseInternal(const CRSSparsity& sparsity) : LinearSolverInternal(sparsity){
   // Equilibriate the matrix
   addOption("equilibration",OT_BOOLEAN,true);
   addOption("allow_equilibration_failure",OT_BOOLEAN,false);
@@ -120,28 +120,21 @@ void LapackLUDenseInternal::prepare(){
   prepared_ = true;
 }
     
-void LapackLUDenseInternal::solve(){
-  // Input and output vectors
-  const vector<double>& b = input(1);
-  vector<double>& x = output();
-  
-  // Copy the right hand side to the solution vector
-  copy(b.begin(),b.end(),x.begin());
-  
+void LapackLUDenseInternal::solve(double* x, int nrhs){
   // Scale right hand side if this was done to the matrix
   if(equed_=='C' || equed_=='B')
-    for(int i=0; i<ncol_; ++i)
+    for(int i=0; i<ncol_; ++i) // FIXME nrhs?
       x[i] *= c_[i];
   
   int info = 100;
   char trans = 'T'; // swap 'T' for 'N' due to c-column major, fortran row major
   // Solve the system of equations
-  dgetrs_(&trans, &nrow_, &nrhs_, &mat_[0], &nrow_, &ipiv_[0], &x[0], &nrow_, &info);
+  dgetrs_(&trans, &nrow_, &nrhs, &mat_[0], &nrow_, &ipiv_[0], x, &nrow_, &info);
   if(info != 0) throw CasadiException("LapackLUDenseInternal::solve: failed to solve the linear system");
   
   // Scale result if this was done to the matrix
   if(equed_=='R' || equed_=='B')
-    for(int i=0; i<nrow_; ++i)
+    for(int i=0; i<nrow_; ++i) // FIXME nrhs?
       x[i] *= r_[i];
 }
 

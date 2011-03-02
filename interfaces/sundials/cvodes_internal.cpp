@@ -1186,15 +1186,15 @@ void CVodesInternal::psolve(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vec
   // Get time
   time1 = clock();
 
-  // Pass right hand side to the linear solver
-  linsol_.setInput(NV_DATA_S(r),1);
-  
-  // Solve the (possibly factorized) system 
-  linsol_.solve();
-  
-  // Get the result
-  linsol_.getOutput(NV_DATA_S(z));
+  // Copy input to output, if necessary
+  if(r!=z){
+    N_VScale(1.0, r, z);
+  }
 
+  // Solve the (possibly factorized) system 
+  casadi_assert(linsol_.output().size()*nrhs_ == NV_LENGTH_S(z));
+  linsol_.solve(NV_DATA_S(z),nrhs_);
+  
   // Log time duration
   time2 = clock();
   t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
@@ -1382,7 +1382,6 @@ Integrator CVodesInternal::jac(int iind, int oind){
   // Pass linear solver
   if(!linsol_.isNull()){
     LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
-    linsol_aug->nrhs_ = 1+ns;
     integrator.setLinearSolver(linsol_aug,M_);
   }
   

@@ -39,7 +39,7 @@ public:
   LapackLUDense();
   
   /// Create a linear solver given a sparsity pattern
-  LapackLUDense(const CRSSparsity& sparsity, int nrhs=1);
+  LapackLUDense(const CRSSparsity& sparsity);
     
   /// Access functions of the node
   LapackLUDenseInternal* operator->();
@@ -64,7 +64,7 @@ extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *
 class LapackLUDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUDenseInternal(const CRSSparsity& sparsity, int nrhs);
+    LapackLUDenseInternal(const CRSSparsity& sparsity);
 
     // Clone
     virtual LapackLUDenseInternal* clone() const;
@@ -79,7 +79,7 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     virtual void prepare();
     
     // Solve the system of equations
-    virtual void solve();
+    virtual void solve(double* x, int nrhs);
 
   protected:
 

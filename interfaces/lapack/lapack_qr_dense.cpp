@@ -29,8 +29,8 @@ namespace CasADi{
 LapackQRDense::LapackQRDense(){
 }
 
-LapackQRDense::LapackQRDense(const CRSSparsity& sparsity, int nrhs){
-  assignNode(new LapackQRDenseInternal(sparsity,nrhs));
+LapackQRDense::LapackQRDense(const CRSSparsity& sparsity){
+  assignNode(new LapackQRDenseInternal(sparsity));
 }
  
 LapackQRDenseInternal* LapackQRDense::operator->(){
@@ -41,7 +41,7 @@ const LapackQRDenseInternal* LapackQRDense::operator->() const{
   return static_cast<const LapackQRDenseInternal*>(FX::operator->());
 }
 
-LapackQRDenseInternal::LapackQRDenseInternal(const CRSSparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
+LapackQRDenseInternal::LapackQRDenseInternal(const CRSSparsity& sparsity) : LinearSolverInternal(sparsity){
 }
 
 LapackQRDenseInternal::~LapackQRDenseInternal(){
@@ -80,14 +80,7 @@ void LapackQRDenseInternal::prepare(){
   prepared_ = true;
 }
     
-void LapackQRDenseInternal::solve(){
-  // Input and output vectors
-  const vector<double>& b = input(1);
-  vector<double>& x = output();
-  
-  // Copy the right hand side to the solution vector
-  copy(b.begin(),b.end(),x.begin());
-
+void LapackQRDenseInternal::solve(double* x, int nrhs){
   int info = 100;
   
   // Solve for transpose(R)
@@ -96,14 +89,14 @@ void LapackQRDenseInternal::solve(){
   char diag = 'N';
   char sideR = 'L';
   double alpha = 1.;
-  dtrsm_(&sideR, &uplo, &transR, &diag, &nrow_, &nrhs_, &alpha, &mat_[0], &nrow_, &x[0], &nrow_);
+  dtrsm_(&sideR, &uplo, &transR, &diag, &nrow_, &nrhs, &alpha, &mat_[0], &nrow_, x, &nrow_);
   
   // Multiply by Q
   char transQ = 'N';
   char sideQ = 'L';
   int k = tau_.size(); // minimum of nrow_ and ncol_
   int lwork = work_.size();
-  dormqr_(&sideQ, &transQ, &nrow_, &nrhs_, &k, &mat_[0], &nrow_, &tau_[0], &x[0], &nrow_, &work_[0], &lwork, &info);
+  dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, &mat_[0], &nrow_, &tau_[0], x, &nrow_, &work_[0], &lwork, &info);
   if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
 }
 

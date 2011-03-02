@@ -25,7 +25,7 @@
 using namespace std;
 namespace CasADi{
   
-SuperLUInternal::SuperLUInternal(const CRSSparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
+SuperLUInternal::SuperLUInternal(const CRSSparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity), nrhs_(nrhs){
   
   // Add options
   addOption("equil", OT_BOOLEAN, true); // Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).
@@ -227,10 +227,11 @@ if (user_work_){
   prepared_ = true;
 }
   
-void SuperLUInternal::solve(){
+void SuperLUInternal::solve(double* x, int nrhs){
+  casadi_assert(nrhs_==nrhs);
+  
   // Copy the right hand side
-  const vector<double>& b = input(1);
-  copy(b.begin(),b.end(),rhs_.begin());
+  copy(x,x+rhs_.size(),rhs_.begin());
     
   // Solve the system A*X=B, overwriting B with X. 
   info_ = 0;
@@ -238,8 +239,7 @@ void SuperLUInternal::solve(){
   if(info_ != 0) throw CasadiException("dgstrs failed");
 
   // Copy the result
-  vector<double>& res = output(0);
-  copy(rhs_.begin(),rhs_.end(),res.begin());
+  copy(rhs_.begin(),rhs_.end(),x);
 }
 
 SuperLUInternal* SuperLUInternal::clone() const{
