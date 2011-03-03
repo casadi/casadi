@@ -8,6 +8,7 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_ACADO "Compile the ACADO interface" ON)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 option(WITH_JIT "Enable just-in-time compilation" OFF)
+option(WITH_DOC "Enable documentation generation" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -71,7 +72,10 @@ endif(SWIG_FOUND)
 add_subdirectory(tutorials EXCLUDE_FROM_ALL)
 add_custom_target(tutor)
 
+if(WITH_DOC)
 set(DOXYFILE_LATEX "NO")
 set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/doc)
 set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
 include(UseDoxygen OPTIONAL)
+endif(WITH_DOC)
+
