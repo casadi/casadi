@@ -121,9 +121,6 @@ public:
   /// Globalization strategy
   int strategy_;
 
-  /// Nonlinear solver for the augmented system
-  KinsolSolver aug_;
-  
   // Linear solver
   LinearSolver linsol_;  
 

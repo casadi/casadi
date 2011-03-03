@@ -229,105 +229,61 @@ void KinsolInternal::init(){
   } else {
     throw CasadiException("Unknown linear solver ");
   }
-  
-  // Sensitivities
-  if(nfdir_>0 || nadir_>0){
-    aug_ = jac(range(getNumInputs()),0);
-    aug_.setOption("number_of_fwd_dir",0);
-    aug_.setOption("number_of_adj_dir",0);
-    aug_.setOption("linear_solver",getOption("linear_solver"));
-    aug_.setLinearSolver(shared_cast<LinearSolver>(linsol_.clone()));
-    aug_.init();
-  }
-  
 }
 
-
 void KinsolInternal::evaluate(int fsens_order, int asens_order){
+  int nfdir = fsens_order ? nfdir_ : 0;
+  int nadir = asens_order ? nadir_ : 0;
+  
   // Reset the counters
   t_func_ = 0;
   t_jac_ = 0;
 
-  if(fsens_order==0 && asens_order==0){
-    // Solve the nonlinear system of equations
-    int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
-    if(!(flag>=KIN_SUCCESS)){
-      stringstream ss;
-      ss << "KINSol flag was " << flag << endl;
-      throw CasadiException(ss.str());
-    }
-  } else {
-    // Pass inputs to the augmented system solver
+  // Solve the nonlinear system of equations
+  int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
+  if(!(flag>=KIN_SUCCESS)){
+    stringstream ss;
+    ss << "KINSol flag was " << flag << endl;
+    throw CasadiException(ss.str());
+  }
+
+  if(nfdir>0){
+    // f(z,x1,x2) = 0 => Jz*dz_dp + Jx1*dx1_dp + Jx2*dx2_dp = 0 <=> dz_dp = -inv(Jz) * (Jx1*dx1_dp + Jx2*dx2_dp)
+    // Pass inputs
+    f_.setInput(NV_DATA_S(u_),0);
     for(int i=0; i<getNumInputs(); ++i)
-      aug_.setInput(input(i),i);
-    
-    // Call the nonlinear equation solver for the augmented system
-    aug_.evaluate();
-    
-    // Pointer to the augmented system data
-    double *augdata = &aug_.output()[0];
+      f_.input(i+1).set(input(i));
 
-    // Number of equations
-    int nz = output().size();
-    
-    // Save the results
-    output().set(augdata);
-
-    // Loop over forward directions
-    if(fsens_order){
-      for(int dir=0; dir<nfdir_; ++dir){
-        // Pointer to jacobian data
-        double *J = augdata + nz;
-
-        // Get the result of the matrix vector multiplication
-        Matrix<double>& r = fwdSens(0,dir);
-        r.setZero();
-        
-        for(int iind=0; iind<getNumInputs(); ++iind){
-          // Get the vector to multiply the matrix with
-          const Matrix<double>& v = fwdSeed(iind,dir);
-        
-          // Number of variables
-          int nx = input(iind).numel();
-
-          // Multiply matrix from the right
-          for(int i=0; i<nz; ++i)
-            for(int j=0; j<nx; ++j)
-              r[i] += J[i+nz*j]*v[j];
-            
-          // Point to the next matrix
-          J += nz*nx;
-        }
+    // Pass input seeds
+    for(int dir=0; dir<nfdir; ++dir){
+      f_.fwdSeed(0,dir).setZero();
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
       }
     }
+    
+    // Evaluate
+    f_.evaluate(1,0);
 
-    // Reset the adjoint sensitivities
-    if(asens_order){
-      for(int dir=0; dir<nadir_; ++dir){
-        // Pointer to jacobian data
-        double *J = augdata + nz;
-        
-        // Get the vector to multiply the matrix with
-        const Matrix<double>& v = adjSeed(0,dir);
-        
-        for(int iind=0; iind<getNumInputs(); ++iind){
-          // Get the result of the matrix vector multiplication
-          Matrix<double>& r = adjSens(iind,dir);
-          r.setZero();
-          
-          // Number of variables
-          int nx = input(iind).numel();
+    // Factorize the linear system
+    psetup(u_, u_scale_, 0, f_scale_, 0, 0);
 
-          // Multiply matrix from the left
-          for(int i=0; i<nz; ++i)
-            for(int j=0; j<nx; ++j)
-              r[j] += J[i+nz*j]*v[i];
-            
-          // Point to the next matrix
-          J += nz*nx;
-        }
-      }
+    // Solve
+    for(int dir=0; dir<nfdir; ++dir){
+      // Negate intermediate result and copy to output
+      const vector<double>& ffsens = f_.fwdSens(dir);
+      vector<double>& fsens = fwdSens(dir);
+      casadi_assert(ffsens.size()==fsens.size());
+      for(int i=0; i<fsens.size(); ++i)
+        fsens[i] = -ffsens[i];
+      
+      // Solve for the sensitivities
+      linsol_.solve(&fsens.front());
     }
+  }
+  
+  if(nadir>0){
+    casadi_assert_message(0,"not implemented");
   }
 }
 
@@ -613,15 +569,9 @@ void KinsolInternal::psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector
   // Get time
   time1_ = clock();
 
-  // Pass right hand side to the linear solver
-  linsol_.setInput(NV_DATA_S(v),1);
+  // Solve the factorized system 
+  linsol_.solve(NV_DATA_S(v));
   
-  // Solve the (possibly factorized) system 
-  linsol_.solve();
-  
-  // Get the result
-  linsol_.getOutput(NV_DATA_S(v));
-
   // Log time duration
   time2_ = clock();
   t_lsolve_ += double(time2_-time1_)/CLOCKS_PER_SEC;
