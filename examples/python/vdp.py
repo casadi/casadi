@@ -13,7 +13,7 @@ rhs = SXFunction([[t],[x,y,L],[u]],[f])
 I = CVodesIntegrator(rhs)
 I.setOption("abstol",1e-10) # abs. tolerance
 I.setOption("reltol",1e-10) # rel. tolerance
-I.setOption("steps_per_checkpoint",100)
+I.setOption("steps_per_checkpoint",1000)
 I.setOption("stop_at_end",True)
 I.init()
 

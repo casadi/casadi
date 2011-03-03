@@ -78,8 +78,8 @@ int main(){
   
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
-  // ode.setLinearSolver(CSparse(CRSSparsity()));
-  // ode.setOption("linear_solver","dense");
+  ode.setLinearSolver(CSparse(CRSSparsity()));
+  ode.setOption("linear_solver","user_defined");
   ode.init();
   
   // DAE residual
@@ -123,7 +123,7 @@ int main(){
   MultipleShooting ms(integrator,mterm);
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
-  ms.setOption("parallelization","openmp");
+//  ms.setOption("parallelization","openmp");
   ms.init();
 
   // Initial condition
