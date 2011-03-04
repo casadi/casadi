@@ -360,6 +360,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void reserve(int nnz);
     void reserve(int nnz, int nrow);
     
+    /// Access the non-zero elements
+    std::vector<T>& data();
+    
+    /// Const access the non-zero elements
+    const std::vector<T>& data() const;
+    
     /// Const access the sparsity
     const CRSSparsity& sparsity() const;
     
@@ -1346,6 +1352,15 @@ Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
   return binary(CasADi::casadi_operators<T>::fmax, y);
 }
 
+template<class T>
+std::vector<T>& Matrix<T>::data(){
+  return *this;  
+}
+    
+template<class T>
+const std::vector<T>& Matrix<T>::data() const{
+  return *this;  
+}
 
 
 
