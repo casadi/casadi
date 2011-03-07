@@ -198,6 +198,17 @@ Matrix<T> ones(int n, int m=1);
 template<class T>
 Matrix<T> zeros(int n, int m=1);
 
+#ifndef SWIG
+/** \brief  Get the sparsity in sparse triplet format */
+template<class T>
+void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int>& col);
+#endif // SWIG
+
+/** \brief  Get the sparsity in sparse triplet format - Python style: [row,col] =  getSparseTriplet(A) */
+template<class T>
+std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A);
+
+
 } // namespace CasADi
 
 #ifndef SWIG
@@ -722,6 +733,21 @@ Matrix<T> eye(int n){
   return ret;
 }
 
+template<class T>
+void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int>& col){
+  col = A.sparsity().col();
+  row = A.sparsity().getRow();
+}
+
+template<class T>
+std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A){
+  std::vector<std::vector<int> > ret(2);
+  getSparseTriplet(A,ret[0],ret[1]);
+  return ret;
+}
+
+
+
 } // namespace CasADi
 
 #endif //SWIG
@@ -768,6 +794,7 @@ MTT_INST(T,nnz) \
 MTT_INST(T,nnz_sym) \
 MTT_INST(T,isEqual) \
 MTT_INST(T,repmat) \
+MTT_INST(T,getSparseTriplet) \
 
 
 #endif //SWIG
