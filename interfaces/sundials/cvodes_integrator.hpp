@@ -30,21 +30,6 @@
 
 namespace CasADi{
 namespace Sundials{
-
-/// Input arguments of an explicit ODE right hand side
-enum ODEInput{
- /// Time
- ODE_T,
- /// Differential states
- ODE_Y,
- /// Parameters
- ODE_P, ODE_NUM_IN};
-
-/// Output arguments of an explicit ODE right hand side
-enum ODEOutput{
-  /// Right hand side of ODE
-  ODE_RHS, 
-  ODE_NUM_OUT};
   
 /// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
 enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};

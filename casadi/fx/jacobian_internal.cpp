@@ -69,9 +69,12 @@ void JacobianInternal::init(){
   // Call the init function of the base class
   FXInternal::init();
 
+  if(!fcn_.isInit()) fcn_.init();
+  
   // Number of directions that we can calculate at a time
   nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
   nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
+  casadi_assert(nadir_fcn_>0 || nfdir_fcn_>0);
   
   // Use finite differences?
   use_fd_ = getOption("finite_differences").toBool();
@@ -85,7 +88,7 @@ void JacobianInternal::init(){
     else if(getOption("ad_mode") == "adjoint")
       use_ad_fwd_ = false;
     else if(getOption("ad_mode") == "default")
-      use_ad_fwd_ = n_<=m_;
+      use_ad_fwd_ = nadir_fcn_==0 || n_<=m_;
     else
       throw CasadiException("unknown ad mode: " +  getOption("ad_mode").toString());
   }

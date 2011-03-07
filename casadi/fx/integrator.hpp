@@ -29,6 +29,18 @@
 
 namespace CasADi{
 
+/// Input arguments of an explicit ODE right hand side
+enum ODEInput{ODE_T, ODE_Y, ODE_P, ODE_NUM_IN};
+
+/// Output arguments of an explicit ODE right hand side
+enum ODEOutput{ODE_RHS, ODE_NUM_OUT};
+
+/// Input arguments of an DAE residual function
+enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
+
+/// Output arguments of an DAE residual function
+enum DAEOutput{DAE_RES, DAE_NUM_OUT};
+
 /// Input arguments of an integrator
 enum IntegratorInput{
   /** Initial time t0 (dimension 1-by-1) */

@@ -239,7 +239,9 @@ void KinsolInternal::evaluate(int fsens_order, int asens_order){
   int nadir = asens_order ? nadir_ : 0;
   int nadir_fcn_ = f_.getOption("number_of_adj_dir");
   casadi_assert(nadir<=nadir_fcn_);
- 
+
+  casadi_assert_message(nadir==0,"not implemented");
+  
   // Reset the counters
   t_func_ = 0;
   t_jac_ = 0;
@@ -287,9 +289,9 @@ void KinsolInternal::evaluate(int fsens_order, int asens_order){
     }
   }
   
-  if(nadir>0){
-    casadi_assert_message(0,"not implemented");
-  }
+//  if(nadir>0){
+//    casadi_assert_message(0,"not implemented");
+//  }
 }
 
 KinsolSolver KinsolInternal::jac(int iind, int oind){
