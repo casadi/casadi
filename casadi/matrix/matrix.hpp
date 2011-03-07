@@ -29,6 +29,7 @@
 #include "../casadi_limits.hpp"
 #include "element.hpp"
 #include "submatrix.hpp"
+#include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
 
 namespace CasADi{
@@ -178,10 +179,16 @@ class Matrix : public std::vector<T>, public PrintableObject{
     T& getElementRef(int i=0, int j=0);
   
     /// Get a submatrix
-    const Matrix<T> getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
+    Matrix<T> getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
     
     /// Set a submatrix
     void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m);
+  
+    /// Get nonzeros
+    Matrix<T> getNZ(const std::vector<int>& kk) const;
+    
+    /// Set nonzeros
+    void setNZ(const std::vector<int>& kk, const Matrix<T>& m);
     
     /// Access an element 
     Element<Matrix<T>,T> operator()(int i, int j=0){ return Element<Matrix<T>,T>(*this,i,j); }
@@ -222,6 +229,21 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Get all columns
     template<class A>
     SubMatrix<Matrix<T> > operator()(A i, const AllRange& j){ return operator()(i,range(size2()));}
+
+    /// Get all rows and columns
+    SubMatrix<Matrix<T> > operator()(const AllRange& i, const AllRange& j){ return operator()(range(size1()),range(size2()));}
+
+    /// Get a non-zero element
+    const T& operator[](int k) const{ return std::vector<T>::operator[](k); }
+
+    /// Access a non-zero element
+    T& operator[](int k){ return std::vector<T>::operator[](k); }
+    
+    /// Get a number of non-zero elements
+    const Matrix<T> operator[](const std::vector<int>& kk) const{ return getNZ(kk);}
+    
+    /// Access a number of non-zero elements
+    NonZeros<Matrix<T> > operator[](const std::vector<int>& kk){ return NonZeros<Matrix<T> >(*this,kk);}
 
 #endif // SWIG
 
@@ -522,7 +544,7 @@ T& Matrix<T>::getElementRef(int i, int j){
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   Matrix<T> ret(ii.size(),jj.size());
   for(int i=0; i<ii.size(); ++i){
     // The row of the original matrix
@@ -579,6 +601,21 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
       }
     }
   }
+}
+
+template<class T>
+Matrix<T> Matrix<T>::getNZ(const std::vector<int>& kk) const{
+  Matrix<T> ret(kk.size(),1,0);
+  for(int k=0; k<kk.size(); ++k)
+    ret[k] = data()[kk[k]];
+  
+  return ret;
+}
+
+template<class T>
+void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
+  for(int k=0; k<kk.size(); ++k)
+    data()[kk[k]] = m[k];
 }
 
 template<class T>

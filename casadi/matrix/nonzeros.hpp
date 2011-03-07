@@ -20,28 +20,28 @@
  *
  */
 
-#ifndef SUBMATRIX_HPP
-#define SUBMATRIX_HPP
+#ifndef NONZEROS_HPP
+#define NONZEROS_HPP
 
 namespace CasADi{
 
 
-/** SubMatrix class for Matrix 
-  SubMatrix is the return type for operator() of the Matrix class, it allows access to the value as well as changing the parent object
+/** NonZeros class for Matrix 
+  NonZeros is the return type for operator[] of the Matrix class, it allows access to the value as well as changing the parent object
   \author Joel Andersson 
   \date 2011
 */
 
 /// submatrix - move to a new file
 template<typename M>
-class SubMatrix : public M{
+class NonZeros : public M{
   public:
     /// Constructor
-    SubMatrix(M& mat, const std::vector<int>& ii, const std::vector<int>& jj) : mat_(mat), ii_(ii), jj_(jj), M(mat.getSub(ii,jj)){}
+    NonZeros(M& mat, const std::vector<int>& kk) : mat_(mat), kk_(kk), M(mat.getNZ(kk)){}
 
     //@{
-    /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)
-    const M& operator=(const SubMatrix<M> &y);
+    /// Methods that modify a part of the parent obejct (A[k] = ?, A[k] += ?, etc.)
+    const M& operator=(const NonZeros<M> &y);
     const M& operator=(const M &y);
     M operator+=(const M &y);
     M operator-=(const M &y);
@@ -54,48 +54,48 @@ class SubMatrix : public M{
     M& mat_;
     
     /// The element of the matrix that is allowed to be modified
-    std::vector<int> ii_, jj_;
+    std::vector<int> kk_;
 };
 
 // Implementation
 template<typename M>
-const M& SubMatrix<M>::operator=(const SubMatrix<M> &y) { 
-  mat_.setSub(ii_,jj_,y); 
+const M& NonZeros<M>::operator=(const NonZeros<M> &y){ 
+  mat_.setNZ(kk_,y); 
   return y;
 }
 
 // Implementation
 template<typename M>
-const M& SubMatrix<M>::operator=(const M &y) { 
-  mat_.setSub(ii_,jj_,y); 
+const M& NonZeros<M>::operator=(const M &y) { 
+  mat_.setNZ(kk_,y); 
   return y;
 }
 
 template<typename M>
-M SubMatrix<M>::operator+=(const M &y){ 
+M NonZeros<M>::operator+=(const M &y){ 
   M s = *this+y;
-  mat_.setSub(ii_,jj_,s); 
+  mat_.setNZ(kk_,s); 
   return s;
 }
 
 template<typename M>
-M SubMatrix<M>::operator-=(const M &y){ 
+M NonZeros<M>::operator-=(const M &y){ 
   M s = *this-y;
-  mat_.setSub(ii_,jj_,s); 
+  mat_.setNZ(kk_,s); 
   return s;
 }
 
 template<typename M>
-M SubMatrix<M>::operator*=(const M &y){ 
+M NonZeros<M>::operator*=(const M &y){ 
    M s = *this*y;
-   mat_.setSub(ii_,jj_,s); 
+   mat_.setNZ(kk_,s); 
    return mat_;
 }
 
 template<typename M>
-M SubMatrix<M>::operator/=(const M &y){ 
-   M s = *this/y;
-  mat_.setSub(ii_,jj_,s); 
+M NonZeros<M>::operator/=(const M &y){ 
+  M s = *this/y;
+  mat_.setNZ(kk_,s); 
   return s;
 }
 
@@ -103,4 +103,4 @@ M SubMatrix<M>::operator/=(const M &y){
 } // namespace CasADi
 
 
-#endif // SUBMATRIX_HPP
+#endif // NONZEROS_HPP

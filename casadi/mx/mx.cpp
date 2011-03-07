@@ -94,7 +94,7 @@ MX& MX::setitem(const std::vector< std::vector<int> > &II, const MX&  m){
   setSub(II[0],II[1],m);
 }
 
-const MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   vector<MX> rows(ii.size());
   for(int i=0; i<ii.size(); ++i) {
     vector<MX> col(jj.size());
@@ -116,6 +116,14 @@ void MX::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX
   }
 }
 
+MX MX::getNZ(const std::vector<int>& kk) const{
+  casadi_assert_message(0,"not implemented");
+}
+
+void MX::setNZ(const std::vector<int>& kk, const MX& el){
+  casadi_assert_message(0,"not implemented");
+}
+
 const MX MX::operator()(int i, int j) const{
   MX ret;
   ret.assignNode(new MatrixElement(*this,i, j));
@@ -135,9 +143,25 @@ SubMatrix<MX > MX::operator()(const std::vector<int>& ii, const std::vector<int>
 }
 
 SubMatrix<MX> MX::operator()(int i, int j){
-  return SubMatrix<MX>(*this,vector<int>(1,i), vector<int>(1,j));
+  return operator()(vector<int>(1,i),vector<int>(1,j));
 }
- 
+
+const MX MX::operator()(const std::vector<int>& ii, int j) const{
+  return operator()(ii,vector<int>(1,j));
+}
+
+const MX MX::operator()(int i, const std::vector<int>& jj) const{
+  return operator()(vector<int>(1,i),jj);
+}
+
+SubMatrix<MX > MX::operator()(const std::vector<int>& ii, int j){
+  return operator()(ii, vector<int>(1,j));
+}
+
+SubMatrix<MX > MX::operator()(int i, const std::vector<int>& jj){
+  return operator()(vector<int>(1,i), jj);
+}
+
 SubMatrix<MX> MX::operator[](int k){
   // change this!!!
   return SubMatrix<MX>(*this,vector<int>(1,k/size2()), vector<int>(1,k%size2()));

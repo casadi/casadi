@@ -70,8 +70,8 @@ void JacobianInternal::init(){
   FXInternal::init();
 
   // Number of directions that we can calculate at a time
-  nadir_fcn_ = getOption("number_of_adj_dir").toInt();
-  nfdir_fcn_ = getOption("number_of_fwd_dir").toInt();
+  nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
+  nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
   
   // Use finite differences?
   use_fd_ = getOption("finite_differences").toBool();

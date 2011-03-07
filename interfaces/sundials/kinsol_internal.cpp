@@ -233,8 +233,13 @@ void KinsolInternal::init(){
 
 void KinsolInternal::evaluate(int fsens_order, int asens_order){
   int nfdir = fsens_order ? nfdir_ : 0;
-  int nadir = asens_order ? nadir_ : 0;
+  int nfdir_fcn_ = f_.getOption("number_of_fwd_dir");
+  casadi_assert(nfdir<=nfdir_fcn_);
   
+  int nadir = asens_order ? nadir_ : 0;
+  int nadir_fcn_ = f_.getOption("number_of_adj_dir");
+  casadi_assert(nadir<=nadir_fcn_);
+ 
   // Reset the counters
   t_func_ = 0;
   t_jac_ = 0;
@@ -271,8 +276,8 @@ void KinsolInternal::evaluate(int fsens_order, int asens_order){
     // Solve
     for(int dir=0; dir<nfdir; ++dir){
       // Negate intermediate result and copy to output
-      const vector<double>& ffsens = f_.fwdSens(dir);
-      vector<double>& fsens = fwdSens(dir);
+      const vector<double>& ffsens = f_.fwdSens(0,dir);
+      vector<double>& fsens = fwdSens(0,dir);
       casadi_assert(ffsens.size()==fsens.size());
       for(int i=0; i<fsens.size(); ++i)
         fsens[i] = -ffsens[i];
