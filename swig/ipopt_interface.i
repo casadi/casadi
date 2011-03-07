@@ -1,7 +1,26 @@
 %{
 #include "interfaces/ipopt/ipopt_solver.hpp"
+#include <coin/IpAlgTypes.hpp>
 %}
 
 %include "interfaces/ipopt/ipopt_solver.hpp"
 
-
+%inline %{
+namespace CasADi {
+  // Needed to expose in SWIG
+  enum IPOT_SolverReturn {
+      IPOPT_SUCCESS = Ipopt::SUCCESS,
+      IPOPT_MAXITER_EXCEEDED =  Ipopt::MAXITER_EXCEEDED,
+      IPOPT_STOP_AT_TINY_STEP =  Ipopt::STOP_AT_TINY_STEP,
+      IPOPT_STOP_AT_ACCEPTABLE_POINT = Ipopt::STOP_AT_ACCEPTABLE_POINT,
+      IPOPT_LOCAL_INFEASIBILITY = Ipopt::LOCAL_INFEASIBILITY,
+      IPOPT_USER_REQUESTED_STOP = Ipopt::USER_REQUESTED_STOP,
+      IPOPT_DIVERGING_ITERATES = Ipopt::DIVERGING_ITERATES,
+      IPOPT_RESTORATION_FAILUR = Ipopt::RESTORATION_FAILURE,
+      IPOPT_ERROR_IN_STEP_COMPUTATION = Ipopt::ERROR_IN_STEP_COMPUTATION,
+      IPOPT_INVALID_NUMBER_DETECTED = Ipopt::INVALID_NUMBER_DETECTED,
+      IPOPT_TOO_FEW_DEGREES_OF_FREEDOM =  Ipopt::TOO_FEW_DEGREES_OF_FREEDOM,
+      IPOPT_INTERNAL_ERROR = Ipopt::INTERNAL_ERROR
+  };
+}
+%}
