@@ -49,7 +49,7 @@ IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   ops_["compl_inf_tol"] = OT_REAL;
   ops_["acceptable_tol"] = OT_REAL;
   ops_["acceptable_iter"] = OT_INTEGER;
-  ops_["acceptable_constr_viol_tol"] = OT_INTEGER;
+  ops_["acceptable_constr_viol_tol"] = OT_REAL;
   ops_["acceptable_dual_inf_tol"] = OT_REAL;
   ops_["acceptable_compl_inf_tol"] = OT_REAL;
   ops_["acceptable_obj_change_tol"] = OT_REAL;
