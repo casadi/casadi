@@ -21,13 +21,12 @@
  */
 
 #include "mx_tools.hpp"
-#include "vertcat.hpp"
-#include "transpose.hpp"
-#include "reshape.hpp"
+#include "mapping.hpp"
 #include "norm.hpp"
 #include "multiplication.hpp"
 #include "if_else_node.hpp"
 #include "../fx/mx_function.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 namespace CasADi{
 
@@ -44,8 +43,24 @@ MX vertcat(const vector<MX>& comp){
   } else if(c.size()==1){
     return c[0];
   } else {
+    // Construct the sparsity pattern
+    CRSSparsity sp = c[0].sparsity();
+    for(int i=1; i<c.size(); ++i){
+      sp.append(c[i].sparsity());
+    }
+
+    // Create a mapping matrix with the corresponding sparsity
     MX ret;
-    ret.assignNode(new Vertcat(c));
+    ret.assignNode(new Mapping(sp));
+    
+    // Map the dependencies
+    int offset=0;
+    for(int i=0; i<c.size(); ++i){
+      int nz = c[i].size();
+      ret->addDependency(c[i],range(nz),range(offset,offset+nz));
+      offset += nz;
+    }
+    
     return ret;
   }
 }
@@ -108,16 +123,14 @@ MX trans(const MX &x){
   if(x.isNull() || x.numel()==1)
     return x;
   
-  // Check if the node is already a transpose
-  const Transpose* t = dynamic_cast<const Transpose*>(x.get());
+  // Get the tranposed matrix and the corresponding mapping
+  vector<int> nzind;
+  CRSSparsity sp = x->sparsity().transpose(nzind);
 
-  if(t) // already a transpose
-    return t->dep(0);
-  else{
-    MX ret;
-    ret.assignNode(new Transpose(x));
-    return ret;
-  }
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(x,nzind);
+  return ret;
 }
 
 MX reshape(const MX &x, const std::vector<int> sz){
@@ -127,20 +140,28 @@ MX reshape(const MX &x, const std::vector<int> sz){
 }
 
 MX reshape(const MX &x, int n, int m){
-  if (n*m!=x.numel()) {
-    throw CasadiException("MX::reshape: size must be same before and after reshaping");
-  }
-  if (n==x.size1() && m==x.size2()) {
-    // allready correct shape
-    return x->dep(0);
-  } else {
-    MX ret;
-    ret.assignNode(new Reshape(x,n,m));
-    return ret;
-  }
+  // only works if dense
+  casadi_assert_message(x.size()==x.numel(),"Sparse reshape not implemented");
+  return reshape(x,CRSSparsity(n,m,true));
+}
+
+MX reshape(const MX &x, const CRSSparsity& sp){
+  // quick return if already the right shape
+  if(sp==x.sparsity())
+    return x;
+  
+  // make sure that the number of zeros agree
+  casadi_assert(x.size()==sp.size());
+  
+  // Create a mapping
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(x,range(x.size()));
+  return ret;
 }
 
 MX vec(const MX &x) {
+  // only works if dense
   return reshape(x,x.numel(),1);
 }
 

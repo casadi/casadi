@@ -76,6 +76,23 @@ void MXNode::setDependencies(const MX& dep1, const MX& dep2, const MX& dep3){
   dep_[2] = dep3;
 }
 
+int MXNode::addDependency(const MX& dep){
+  dep_.push_back(dep);
+  return dep_.size()-1;
+}
+
+void MXNode::addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz){
+  casadi_assert(0);
+}
+
+void MXNode::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
+  casadi_assert(0);
+}
+    
+void MXNode::addDependency(const MX& d, const std::vector<int>& nz_d){
+  casadi_assert(0);
+}
+
 void MXNode::setDependencies(const std::vector<MX>& dep){
   dep_ = dep;
 }

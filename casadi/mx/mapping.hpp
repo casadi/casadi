@@ -24,6 +24,7 @@
 #define MAPPING_HPP
 
 #include "mx_node.hpp"
+#include <map>
 
 namespace CasADi{
   /** \brief Maps non-zero elements
@@ -34,8 +35,11 @@ class Mapping : public MXNode{
   public:
 
     /// Default constructor
-    Mapping();
+    Mapping(const CRSSparsity& sp);
 
+    /// Clone function
+    Mapping* clone() const;
+      
     /// Destructor
     virtual ~Mapping(){}
     
@@ -48,6 +52,15 @@ class Mapping : public MXNode{
     /// Is a mapping matrix
     virtual bool isMapping() const{return true;}
     
+    /// Add a dependency (index given)
+    virtual void addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz);
+    
+    /// Add a dependency
+    virtual void addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz);
+    
+    /// Add a dependency
+    virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
+    
     /// Add a dependency (indices nz to be placed in (i,j))
     void addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j);
     
@@ -59,6 +72,8 @@ class Mapping : public MXNode{
     /// Mapping from the output non-zero index of the dependency index
     std::vector<int> depind_;
 
+    /// Map to locate the dependencies
+    std::map<const MXNode*, int> depmap_;
 };
 
 } // namespace CasADi

@@ -94,6 +94,9 @@ MX reshape(const MX &x, int n, int m);
 //! \brief Returns a reshaped version of the MX, dimensions as a vector
 MX reshape(const MX &x, const std::vector<int> sz);
 
+//! \brief Reshape the MX
+MX reshape(const MX &x, const CRSSparsity& sp);
+
 /** \brief Returns a flattened version of the MX
     Flattening is a cheap (non-copying) operation
     Same as reshape(x, x.numel(),1)

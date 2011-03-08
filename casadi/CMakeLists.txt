@@ -42,13 +42,8 @@ SET(CASADI_SRCS
   mx/matrix_matrix_op.cpp    mx/matrix_matrix_op.hpp    # Matrix-matrix elementwise binary operation
   mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
   mx/evaluation.cpp          mx/evaluation.hpp          # FX function evaluation
-  mx/reshape.cpp             mx/reshape.hpp             # Keep the non-zero entries but give the matrix a new shape
-  mx/vertcat.cpp             mx/vertcat.hpp             # Vertical concatenation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
-  mx/reordering.cpp          mx/reordering.hpp          # Reordering of the non-zeros (rename to "Mapping")
-  mx/transpose.cpp           mx/transpose.hpp           # Matrix transpose, a type of reordering
-  mx/matrix_element.cpp      mx/matrix_element.hpp      # Get a submatrix: Make this inherit  from Reordering!
   mx/if_else_node.cpp        mx/if_else_node.hpp        # An if-else branch
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
   mx/mx_tools.cpp            mx/mx_tools.hpp

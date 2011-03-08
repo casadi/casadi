@@ -103,8 +103,6 @@ class MXNode : public SharedObjectNode{
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return false;}
     
-  protected:
-    
     /// Set the sparsity
     void setSparsity(const CRSSparsity& sparsity);
     
@@ -120,6 +118,19 @@ class MXNode : public SharedObjectNode{
     /// Set multiple dependencies
     void setDependencies(const std::vector<MX>& dep);
         
+    /// Add a dependency
+    int addDependency(const MX& dep);
+
+    /// Add a dependency (index given)
+    virtual void addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz);
+
+    /// Add a dependency (mapping matrix)
+    virtual void addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz);
+    
+    /// Add a dependency (mapping matrix)
+    virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
+
+    
     /// Number of elements
     int numel() const;
     
@@ -131,6 +142,8 @@ class MXNode : public SharedObjectNode{
     
     /// Get size
     int size2() const;
+    
+  protected:
     
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;

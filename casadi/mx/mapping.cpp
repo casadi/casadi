@@ -22,12 +22,20 @@
 
 #include "mapping.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-Mapping::Mapping(){
+Mapping::Mapping(const CRSSparsity& sp){
+  setSparsity(sp);
+  nzind_.resize(sp.size(),-1);
+  depind_.resize(sp.size(),-1);
+}
+
+Mapping* Mapping::clone() const{
+  return new Mapping(*this);
 }
 
 void Mapping::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
@@ -45,6 +53,56 @@ void Mapping::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
 
 void Mapping::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << "mapping(" << args << "," << depind_ << "," << nzind_ << ")" << endl;
+}
+
+void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d){
+  addDependency(d,nz_d,range(nz_d.size()));
+}
+
+void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
+  casadi_assert(nz_d.size()==nz.size());
+  
+  // Quick return if no elements
+  if(nz_d.empty()) return;
+  
+  if(d->isMapping()){
+    // Eliminate if a mapping node
+    const Mapping* dnode = static_cast<const Mapping*>(d.get());
+    vector<MX> d2 = dnode->dep_;
+    vector<vector<int> > nz_d2(d2.size());
+    vector<vector<int> > nz2(d2.size());
+    for(int i=0; i<nz.size(); ++i){
+      int depind_i = dnode->depind_.at(nz_d[i]);
+      nz_d2[depind_i].push_back(dnode->nzind_.at(nz_d[i]));
+      nz2[depind_i].push_back(nz[i]);
+    }
+    
+    // Call the function recursively
+    for(int i=0; i<d2.size(); ++i){
+      addDependency(d2[i],nz_d2[i],nz2[i]);
+    }
+  } else {
+    // Add the node if it is not already a dependency
+    std::map<const MXNode*, int>::const_iterator it = depmap_.find(static_cast<const MXNode*>(d.get()));
+    int depind;
+    if(it==depmap_.end()){
+      depind = MXNode::addDependency(d);
+      depmap_[static_cast<const MXNode*>(d.get())] = depind;
+    } else {
+      depind = it->second;
+    }
+    
+    // Save the mapping
+    addDependency(depind,nz_d,nz);
+  }
+}
+
+void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz){
+  casadi_assert(nz_d.size()==nz.size());
+  for(int k=0; k<nz.size(); ++k){
+    nzind_[nz[k]] = nz_d[k];
+    depind_[nz[k]] = depind;
+  }
 }
 
 void Mapping::addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j){

@@ -26,7 +26,7 @@
 #include "matrix_scalar_op.hpp"
 #include "matrix_matrix_op.hpp"
 #include "unary_op.hpp"
-#include "matrix_element.hpp"
+#include "mapping.hpp"
 #include "../fx/sx_function.hpp"
 #include "evaluation.hpp"
 #include "symbolic_mx_node.hpp"
@@ -125,9 +125,14 @@ void MX::setNZ(const std::vector<int>& kk, const MX& el){
 }
 
 const MX MX::operator()(int i, int j) const{
+  CRSSparsity sp(1,1,true);
+  int ind = sparsity().getNZ(i,j);
+  casadi_assert(ind>=0);
+  
   MX ret;
-  ret.assignNode(new MatrixElement(*this,i, j));
-  return ret;  
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(*this,vector<int>(1,ind));
+  return ret;
 }
 
 const MX MX::operator[](int k) const{
