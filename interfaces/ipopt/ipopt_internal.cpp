@@ -325,11 +325,38 @@ void IpoptInternal::evaluate(int fsens_order, int asens_order){
   cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
 
   if (status == Solve_Succeeded)
-    std::cout << "*** The problem solved!" << std::endl;
-  else
-    std::cout << "*** The problem FAILED" << std::endl;
-  
-  stats_["return_code"] = (int) status;
+    stats_["return_status"] = "Solve_Succeeded";
+  if (status == Solved_To_Acceptable_Level)
+    stats_["return_status"] = "Solved_To_Acceptable_Level";
+  if (status == Infeasible_Problem_Detected)
+    stats_["return_status"] = "Infeasible_Problem_Detected";
+  if (status == Search_Direction_Becomes_Too_Small)
+    stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
+  if (status == Diverging_Iterates)
+    stats_["return_status"] = "Diverging_Iterates";
+  if (status == User_Requested_Stop)
+    stats_["return_status"] = "User_Requested_Stop";
+  if (status == Maximum_Iterations_Exceeded)
+    stats_["return_status"] = "Maximum_Iterations_Exceeded";
+  if (status == Restoration_Failed)
+    stats_["return_status"] = "Restoration_Failed";
+  if (status == Error_In_Step_Computation)
+    stats_["return_status"] = "Error_In_Step_Computation";
+  if (status == Not_Enough_Degrees_Of_Freedom)
+    stats_["return_status"] = "Not_Enough_Degrees_Of_Freedom";
+  if (status == Invalid_Problem_Definition)
+    stats_["return_status"] = "Invalid_Problem_Definition";
+  if (status == Invalid_Option)
+    stats_["return_status"] = "Invalid_Option";
+  if (status == Invalid_Number_Detected)
+    stats_["return_status"] = "Invalid_Number_Detected";
+  if (status == Unrecoverable_Exception)
+    stats_["return_status"] = "Unrecoverable_Exception";
+  if (status == NonIpopt_Exception_Thrown)
+    stats_["return_status"] = "NonIpopt_Exception_Thrown";
+  if (status == Insufficient_Memory)
+    stats_["return_status"] = "Insufficient_Memory";
+
 }
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
