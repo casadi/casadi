@@ -159,15 +159,6 @@ class MXtests(casadiTestCase):
     self.assertEqual(z.size1(),2,"MX fails to indicate its size1")
     self.assertEqual(z.size2(),3,"MX fails to indicate its size2")
 
-  def test_MXindices(self):
-    self.message("MX simple indexing")
-    x = MX("x",2,3)
-    for i in range(2):
-      for j in range(3):
-        a = "x(%d,%d)" % (i,j)
-        b = str(x[i,j])
-        self.assertEqual(a,b,"MX indexing is mixed up")
-
   # Joel: NOTE this does not work properly
   #def test_MX2(self):
     #U = MX("U",10,2)
