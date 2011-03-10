@@ -34,6 +34,7 @@
 #include "mx_zero.hpp"
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 namespace CasADi{
 
@@ -70,7 +71,7 @@ const MX MX::getitem(const vector<int>& I) const{
 
 const MX MX::getitem(int k) const{
   // change this!
-  return (*this)(k/size2(),k%size2());
+  return (*this)[k];
 }
 
 MX& MX::setitem(int k, const MX& el){ 
@@ -95,37 +96,62 @@ MX& MX::setitem(const std::vector< std::vector<int> > &II, const MX&  m){
 }
 
 MX MX::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
-  vector<MX> rows(ii.size());
-  for(int i=0; i<ii.size(); ++i) {
-    vector<MX> col(jj.size());
-    for(int j=0; j<jj.size(); ++j) {
-      col[j] = (*this)(ii[i],jj[j]);
-    }
-    rows[i] = horzcat(col);
-  }
-  return vertcat(rows);
+  // Nonzero mapping from submatrix to full
+  vector<int> mapping;
+  
+  // Get the sparsity pattern
+  CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
+ 
+  // Create return MX
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(*this,mapping);
+  return ret;
 }
 
 void MX::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el){
   casadi_assert_message(ii.size()==el.size1(),"right hand size must match dimension of left hand side in assignment");
   casadi_assert_message(jj.size()==el.size2(),"right hand size must match dimension of left hand side in assignment");
-  for(int i=0; i<ii.size(); ++i) {
-    for(int j=0; j<jj.size(); ++j) {
-      (*this)(ii[i],jj[j])=el(i,j);
+  if(dense() && el.dense()){
+    // Dense mode
+    for(int i=0; i<ii.size(); ++i) {
+      for(int j=0; j<jj.size(); ++j) {
+        (*this)[ii[i]*size2() + jj[j]]=el[i*el.size2()+j];
+      }
     }
+  } else {
+    // Sparse mode
+
+    // Remove submatrix to be replaced
+    erase(ii,jj);
+
+    // Extend el to the same dimension as this
+    MX el_ext = el;
+    el_ext.enlarge(size1(),size2(),ii,jj);
+
+    // Unite the sparsity patterns
+    *this = unite(*this,el_ext);
   }
 }
 
 MX MX::getNZ(const std::vector<int>& kk) const{
-  casadi_assert_message(0,"not implemented");
+  CRSSparsity sp(kk.size(),1,true);
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(*this,kk);
+  return ret;
 }
 
 void MX::setNZ(const std::vector<int>& kk, const MX& el){
-  casadi_assert_message(0,"not implemented");
+  MX ret;
+  ret.assignNode(new Mapping(sparsity()));
+  ret->addDependency(*this,range(size()));
+  ret->addDependency(el,range(kk.size()),kk);
+  *this = ret;
 }
 
 const MX MX::operator()(int i, int j) const{
-  CRSSparsity sp(1,1,true);
+  const CRSSparsity& sp = CRSSparsity::scalarSparsity;
   int ind = sparsity().getNZ(i,j);
   casadi_assert(ind>=0);
   
@@ -136,7 +162,7 @@ const MX MX::operator()(int i, int j) const{
 }
 
 const MX MX::operator[](int k) const{
-  return getitem(k);
+  return getNZ(vector<int>(1,k));
 }
 
 const MX MX::operator()(const std::vector<int>& ii, const std::vector<int>& jj) const{
@@ -167,9 +193,8 @@ SubMatrix<MX > MX::operator()(int i, const std::vector<int>& jj){
   return operator()(vector<int>(1,i), jj);
 }
 
-SubMatrix<MX> MX::operator[](int k){
-  // change this!!!
-  return SubMatrix<MX>(*this,vector<int>(1,k/size2()), vector<int>(1,k%size2()));
+NonZeros<MX> MX::operator[](int k){
+  return NonZeros<MX>(*this,vector<int>(1,k));
 }
 
 int MX::size() const{
@@ -265,6 +290,10 @@ bool MX::empty() const{
   return numel()==0;
 }
 
+bool MX::dense() const{
+  return numel()==size();
+}
+
 MX MX::zeros(int nrow, int ncol){
   return MX(nrow,ncol);
 }
@@ -286,6 +315,43 @@ MX MX::operator-() const{
 
 const CRSSparsity& MX::sparsity() const{
   return (*this)->sparsity();
+}
+
+void MX::erase(const std::vector<int>& ii, const std::vector<int>& jj){
+  // Get sparsity of the new matrix
+  CRSSparsity sp = sparsity();
+  
+  // Erase from sparsity pattern
+  std::vector<int> mapping = sp.erase(ii,jj);
+  
+  // Create new matrix
+  if(mapping.size()!=size()){
+    MX ret;
+    ret.assignNode(new Mapping(sp));
+    ret->addDependency(*this,mapping);
+    *this = ret;
+  }
+}
+
+void MX::enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj){
+  CRSSparsity sp = sparsity();
+  sp.enlarge(nrow,ncol,ii,jj);
+  
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(*this,range(size()));
+  
+  *this = ret;
+}
+
+MX::MX(int nrow, int ncol, const MX& val){
+  // Make sure that val is scalar
+  casadi_assert(val.numel()==1);
+  casadi_assert(val.size()==1);
+  
+  CRSSparsity sp(nrow,ncol,true);
+  assignNode(new Mapping(sp));
+  (*this)->addDependency(val,vector<int>(sp.size(),0));
 }
 
 } // namespace CasADi

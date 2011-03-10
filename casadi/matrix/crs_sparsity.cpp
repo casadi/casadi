@@ -200,41 +200,41 @@ int CRSSparsity::getNZ(int i, int j) const{
   return -1;
 }
 
-vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j){
-  vector<int> ret;
-  ret.reserve(i.size());
-
-    // Quick return if matrix is dense
-  if(numel()==size()){
-    for(int k=0; k<i.size(); ++k)
-      ret.push_back(j[k]+i[k]*size2());
-    return ret;
-  }
-
-  // Very inefficient algorithm
-  for(int k=0; k<i.size(); ++k){
-    ret.push_back(getNZ(i[k],j[k]));
-  }
-  return ret;
-}
-
-vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j) const{
-  vector<int> ret;
-  ret.reserve(i.size());
-
-    // Quick return if matrix is dense
-  if(numel()==size()){
-    for(int k=0; k<i.size(); ++k)
-      ret.push_back(j[k]+i[k]*size2());
-    return ret;
-  }
-
-  // Very inefficient algorithm
-  for(int k=0; k<i.size(); ++k){
-    ret.push_back(getNZ(i[k],j[k]));
-  }
-  return ret;
-}
+// vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j){
+//   vector<int> ret;
+//   ret.reserve(i.size());
+// 
+//     // Quick return if matrix is dense
+//   if(numel()==size()){
+//     for(int k=0; k<i.size(); ++k)
+//       ret.push_back(j[k]+i[k]*size2());
+//     return ret;
+//   }
+// 
+//   // Very inefficient algorithm
+//   for(int k=0; k<i.size(); ++k){
+//     ret.push_back(getNZ(i[k],j[k]));
+//   }
+//   return ret;
+// }
+// 
+// vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j) const{
+//   vector<int> ret;
+//   ret.reserve(i.size());
+// 
+//     // Quick return if matrix is dense
+//   if(numel()==size()){
+//     for(int k=0; k<i.size(); ++k)
+//       ret.push_back(j[k]+i[k]*size2());
+//     return ret;
+//   }
+// 
+//   // Very inefficient algorithm
+//   for(int k=0; k<i.size(); ++k){
+//     ret.push_back(getNZ(i[k],j[k]));
+//   }
+//   return ret;
+// }
 
 vector<int> CRSSparsity::getNZ(vector<int> ii, vector<int> jj) const{
   vector<int> ret;
@@ -258,80 +258,124 @@ bool CRSSparsity::dense() const{
   return size() == numel();
 }
 
-CRSSparsity CRSSparsity::getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const{
-  if(dense()){
-    CRSSparsity ret(ii.size(),jj.size(),true);
-    mapping.resize(ret.size());
-    for(int i=0; i!=ii.size(); ++i){
-      for(int j=0; j!=jj.size(); ++j){
-        mapping[j+i*ret.size2()] = jj[j] + ii[i]*size2();
+
+CRSSparsity CRSSparsity::getSub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  // Get non-zeros
+  vector<int> kk = getNZ(ii,jj);
+
+  // count the number of non-zeros
+  int nnz = 0;
+  for(int k=0; k<kk.size(); ++k)
+    if(kk[k]!=-1)
+      nnz++;
+      
+  // Allocate sparsity vectors
+  vector<int> rowind(ii.size()+1,0);
+  vector<int> col(nnz);
+  mapping.resize(nnz);
+  
+  // Get sparsity
+  int k=0;
+  int el=0;
+  for(int i=0; i<ii.size(); ++i){
+    for(int j=0; j<jj.size(); ++j){
+      if(k<kk.size()){
+        if(kk[k]!=-1){
+          col[el] = j;
+          mapping[el] = kk[k];
+          el++;
+        }
+        k++;
       }
     }
-    return ret;
-  } else {
-    CRSSparsity ret(ii.size(),jj.size(),false);
-    mapping.resize(0);
-    for(int i=0; i!=ii.size(); ++i){
-      int j=0;
-      for(int el=rowind(ii[i]); el<rowind(ii[i]+1); ++el){
-        while(jj[j]<col(el) && j<jj.size()){
-          ++j;
-        }
-          
-        if(j<jj.size() && jj[j]==col(el)){
-          int ind = ret.getNZ(i,j);
-          casadi_assert(ind==ret.size()-1); // make sure that we are adding to the end
-          mapping.push_back(el);
-        }
-      }
-    }
-    return ret;
+    rowind[i+1]=el;
   }
+  
+  // Create sparsity pattern
+  CRSSparsity sp(ii.size(),jj.size(),col,rowind);
+  return sp;
 }
 
-CRSSparsity CRSSparsity::eraseSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const{
-  CRSSparsity ret(size1(),size2(),false);
-  mapping.resize(0);
-  for(int i=0; i!=ii.size(); ++i){
-    int j=0;
-    for(int el=rowind(ii[i]); el<rowind(ii[i]+1); ++el){
-      while(j<jj.size() && jj[j]<col(el)){
-        ++j;
-      }
+vector<int> CRSSparsity::erase(const vector<int>& ii, const vector<int>& jj){
+  // Mapping
+  vector<int> mapping;
+  
+  // Quick return if no elements
+  if(numel()==0)
+    return mapping;
+  
+  // Reserve memory
+  mapping.reserve(size());
+  
+  // References to sparsity pattern
+  vector<int>& c = colRef();
+  vector<int>& r = rowindRef();
+  
+  // Number of non-zeros
+  int nz=0;
+  
+  // Rows to be erased
+  vector<int>::const_iterator ie = ii.begin();
+  
+  // First and last index for the row
+  int el_first=0, el_last=0;
+  
+  // Loop over rows
+  for(int i=0; i<size1(); ++i){
+    // Update beginning and end of non-zero indices
+    el_first = el_last;
+    el_last = r[i+1];
+    
+    // Is it a row that can be deleted
+    bool deletable_row = ie!=ii.end() && *ie==i;
+    if(deletable_row){
+      ie++;
+      
+      // Columns to be erased
+      vector<int>::const_iterator je = jj.begin();
+
+      // Loop over nonzero elements of the row
+      for(int el=el_first; el<el_last; ++el){
+        // Column
+        int j=c[el];
         
-      if(!(j<jj.size() && jj[j]==col(el))){
-        int ind = ret.getNZ(ii[i],col(el));
-        casadi_assert(ind==ret.size()-1); // make sure that we are adding to the end
+        // Continue to the next column to skip
+        for(; je!=jj.end() && *je<j; ++je);
+        
+        // Remove column if necessary
+        if(je!=jj.end() && *je==j){
+          je++;
+          continue;
+        }
+        
+        // Save old nonzero for each new nonzero
         mapping.push_back(el);
+        
+        // Update column and increase nonzero counter
+        c[nz++] = j;
+      }
+    } else {
+      // Loop over nonzero elements of the row
+      for(int el=el_first; el<el_last; ++el){
+        // Column
+        int j=c[el];
+      
+        // Save old nonzero for each new nonzero
+        mapping.push_back(el);
+      
+        // Update column and increase nonzero counter
+        c[nz++] = j;
       }
     }
-  }
-  return ret;
-}
-
-void CRSSparsity::setSub(const CRSSparsity& sub, const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping_nz, std::vector<int>& mapping_ind){
-  if(dense() && sub.dense()){
-    mapping_nz.resize(size());
-    for(int k=0; k<size(); ++k) mapping_nz[k] = k;
-    mapping_ind.resize(sub.size());
-    fill(mapping_ind.begin(),mapping_ind.end(),0);
-    for(int i=0; i!=ii.size(); ++i){
-      for(int j=0; j!=jj.size(); ++j){
-        mapping_nz[jj[j] + ii[i]*size2()] = 1;
-        mapping_ind[jj[j] + ii[i]*size2()] = j+i*sub.size2();
-      }
-    }
-  } else {
-    // Find out the non-zeros to be erased
-    vector<int> to_be_erased;
-    getSub(ii,jj,to_be_erased);
     
-    // Get the sparsity vectors
-    vector<int> &c = colRef();
-    vector<int> &rind = rowindRef();
-    
-    casadi_assert_message(0, "Not implemented");
+    // Register last nonzero of the row
+    r[i+1]=nz;
   }
+  
+  // Truncate column matrix
+  c.resize(nz);
+  
+  return mapping;
 }
 
 int CRSSparsity::sizeU() const{
@@ -505,9 +549,9 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<int>& mapping
     // Loop over the non-zeros of both matrices
     while(el1<el1_last || el2<el2_last){
       // Get the columns
-      int col1 = col(el1);
-      int col2 = col(el2);
-      
+      int col1 = el1<el1_last ? col(el1) : size2();
+      int col2 = el2<el2_last ? y.col(el2) : size2();
+
       // Add to the return matrix
       if(col1==col2){
         c.push_back(col1);
@@ -671,6 +715,50 @@ void CRSSparsity::append(const CRSSparsity& sp){
   // Update dimensions
   (*this)->nrow_ += sp.size1();
 }
+
+CRSSparsity CRSSparsity::scalarSparsity(1,1,true);
+
+CRSSparsity CRSSparsity::emptySparsity(0,0,true);
+
+void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& jj){
+  // Assert dimensions
+  casadi_assert(ii.size() == size1());
+  casadi_assert(jj.size() == size2());
+  
+    // Update dimensions
+  (*this)->nrow_ = nrow;
+  (*this)->ncol_ = ncol;
+
+  // Begin by sparsify the columns
+  vector<int>& c = colRef();
+  for(int j=0; j<jj.size(); ++j){
+    c[j] = jj[c[j]];
+  }
+    
+   // Sparsify the rows
+  vector<int>& r = rowindRef();
+  r.resize(nrow+1,size());
+  int ik=ii.back(); // need only to update from the last new index
+  int nz=size(); // number of nonzeros up till this row
+  for(int i=ii.size()-1; i>=0; --i){
+    // Update rowindex for new rows
+    for(; ik>ii[i]; --ik){
+      r[ik] = nz;
+    }
+    
+    // Update non-zero counter
+    nz = r[i];
+    
+    // Update rowindex for old rows
+    r[ii[i]] = nz;
+  }
+  
+  // Append zeros to the beginning
+  for(; ik>=0; --ik){
+    r[ik] = 0;
+  }
+}
+
 
 
 } // namespace CasADi

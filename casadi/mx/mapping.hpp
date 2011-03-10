@@ -66,6 +66,9 @@ class Mapping : public MXNode{
     
   protected:
     
+    /// Check if the mapping is ready
+    bool isReady() const;
+    
     /// Mapping from the output non-zero to the dependency nonzero index
     std::vector<int> nzind_;
 

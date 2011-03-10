@@ -148,8 +148,8 @@ class CRSSparsity : public SharedObject{
     /** \brief Get a set of non-zero element
          return -1 if the element does not exists */
     std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
-    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j);
-    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j) const;
+//    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j);
+//    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j) const;
 
     /// Get the sparsity in CRS format
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;
@@ -163,12 +163,6 @@ class CRSSparsity : public SharedObject{
     /// Get a submatrix
     CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     
-    /// Set a submatrix
-    void setSub(const CRSSparsity& sub, const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping_nz, std::vector<int>& mapping_ind);
-    
-    /// Remove the structural non-zeros in a submatrix 
-    CRSSparsity eraseSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
-
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
@@ -187,10 +181,18 @@ class CRSSparsity : public SharedObject{
     The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping, bool with_mapping=true) const;
 
-    /** \brief Sparsity pattern for a matrix-matrix product 
+    /** \brief Sparsity pattern for a matrix-matrix product
     No mapping */
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
     
+    /** \brief Enlarge matrix
+    Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+    void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
+
+    /** \brief Erase rows and columns
+    Erase rows and/or columns of a matrix */
+    std::vector<int> erase(const std::vector<int>& ii, const std::vector<int>& jj);
+
     /// Append another sparsity patten vertically
     void append(const CRSSparsity& sp);
 
@@ -200,6 +202,11 @@ class CRSSparsity : public SharedObject{
     /// Is dense?
     bool dense() const;
 
+    /// (Dense) scalar
+    static CRSSparsity scalarSparsity;
+
+    /// Empty zero-by-zero
+    static CRSSparsity emptySparsity;
     
 };
 

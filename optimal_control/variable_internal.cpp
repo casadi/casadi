@@ -164,6 +164,43 @@ void VariableInternal::getAll(vector<Variable>& vars) const{
   }
 }
 
+SX VariableInternal::atTime(double t) const{
+  map<double,SX>::const_iterator it = timed_sx_.find(t);
+  if(it==timed_sx_.end()){
+    stringstream ss;
+    repr(ss);
+    ss << " has no timed variable with t = " << t << ".";
+    throw CasadiException(ss.str());
+  }
+  // Return the expression
+  return it->second;
+}
+
+SX VariableInternal::atTime(double t){
+  // Find an existing element
+  map<double,SX>::const_iterator it = timed_sx_.find(t);
+  
+  // If not found
+  if(it==timed_sx_.end()){
+    // Create a timed variable
+    stringstream ss;
+    ss << sx() << ".atTime(" << t << ")";
+    SX tvar(ss.str());
+    
+    // Save to map
+    timed_sx_[t] = tvar;
+    
+    // Return the expression
+    return tvar;
+    
+  } else {
+    // Return the expression
+    return it->second;
+  }
+}
+
+
+
 } // namespace OptimalControl
 } // namespace CasADi
 

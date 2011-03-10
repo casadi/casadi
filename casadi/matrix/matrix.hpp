@@ -382,6 +382,14 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void reserve(int nnz);
     void reserve(int nnz, int nrow);
     
+    /** \brief Erase a submatrix
+    Erase rows and/or columns of a matrix */
+    void erase(const std::vector<int>& ii, const std::vector<int>& jj);
+    
+    /** \brief Enlarge matrix
+    Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+    void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
+    
     /// Access the non-zero elements
     std::vector<T>& data();
     
@@ -545,61 +553,52 @@ T& Matrix<T>::getElementRef(int i, int j){
 
 template<class T>
 Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
-  Matrix<T> ret(ii.size(),jj.size());
-  for(int i=0; i<ii.size(); ++i){
-    // The row of the original matrix
-    int i0 = ii[i];
-    
-    // The first non-zero element of the row of the original matrix
-    int el = rowind(i0);
-    
-    // The last non-zero element on the row of the original matrix
-    int el_last = rowind(i0+1);
-    
-    // Loop over the columns of the return matrix
-    for(int j=0; j<jj.size(); ++j){
-      while(el<el_last && col(el)<jj[j]){
-        el++;
-      }
-       
-      // Break if no more elements on the row
-      if(el>=el_last) break;
-      
-      // Save the non-zero element if column maches
-      if(col(el)==jj[j])
-        ret(i,j) = (*this)[el++];
-    }
-  }
+  // Nonzero mapping from submatrix to full
+  std::vector<int> mapping;
+  
+  // Get the sparsity pattern
+  CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
+
+  // Create return object
+  Matrix<T> ret(sp);
+  
+  // Copy nonzeros
+  for(int k=0; k<mapping.size(); ++k)
+    ret[k] = (*this)[mapping[k]];
+  
+  // Return (RVO)
   return ret;
 }
 
 template<class T>
-void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m){
-  casadi_assert_message(m.numel()==1 || (ii.size() == m.size1() && jj.size() == m.size2()),"Dimension mismatch.");
+void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& el){
+  casadi_assert_message(el.numel()==1 || (ii.size() == el.size1() && jj.size() == el.size2()),"Dimension mismatch.");
   
   // If m is scalar
-  if(m.numel() !=ii.size() * jj.size()){
-    setSub(ii,jj,Matrix<T>(ii.size(),jj.size(),m(0,0)));
+  if(el.numel() != ii.size() * jj.size()){
+    setSub(ii,jj,Matrix<T>(ii.size(),jj.size(),el(0,0)));
     return;
   }
-  
-  // Loop over the rows of both of the matrices
-  for(int im=0; im<ii.size(); ++im){
-    // Row of the original matrix
-    int i=ii[im];
-    
-    // Loop over the columns of both matrices (inefficient!!!)
-    for(int jm=0; jm<jj.size(); ++jm){
-      // Column of the original matrix
-      int j=jj[jm];
-      
-      // Get the value of m and the original
-      T mval = m(im,jm);
-      T val = (*this)(i,j);
-      if(!casadi_limits<T>::isZero(mval-val)){
-        (*this)(i,j) = mval;
+
+  if(dense() && el.dense()){
+    // Dense mode
+    for(int i=0; i<ii.size(); ++i) {
+      for(int j=0; j<jj.size(); ++j) {
+        (*this)[ii[i]*size2() + jj[j]]=el[i*el.size2()+j];
       }
     }
+  } else {
+    // Sparse mode
+
+    // Remove submatrix to be replaced
+    erase(ii,jj);
+
+    // Extend el to the same dimension as this
+    Matrix<T> el_ext = el;
+    el_ext.enlarge(size1(),size2(),ii,jj);
+
+    // Unite the sparsity patterns
+    *this = unite(*this,el_ext);
   }
 }
 
@@ -1399,7 +1398,23 @@ const std::vector<T>& Matrix<T>::data() const{
   return *this;  
 }
 
+template<class T>
+void Matrix<T>::erase(const std::vector<int>& ii, const std::vector<int>& jj){
+  // Erase from sparsity pattern
+  std::vector<int> mapping = sparsityRef().erase(ii,jj);
+  
+  // Update non-zero entries
+  for(int k=0; k<mapping.size(); ++k)
+    (*this)[k] = (*this)[mapping[k]];
+    
+  // Truncate nonzero vector
+  data().resize(mapping.size());
+}
 
+template<class T>
+void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj){
+  sparsityRef().enlarge(nrow,ncol,ii,jj);
+}
 
 
 } // namespace CasADi

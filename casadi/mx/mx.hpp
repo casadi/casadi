@@ -69,6 +69,9 @@ class MX : public SharedObject{
     /** \brief  Matrix with all zeros */
     MX(int nrow, int ncol);
     
+    /** \brief  Dense matrix filled with value val */
+    MX(int nrow, int ncol, const MX& val);
+    
     /** \brief  Destructor */
     ~MX();
 
@@ -77,7 +80,7 @@ class MX : public SharedObject{
     const MX operator[](int k) const;          
  
     /** \brief  Access matrix non-zero */
-    SubMatrix<MX> operator[](int k);
+    NonZeros<MX> operator[](int k);
     
     /** \brief  Get matrix element */
     const MX operator()(int i, int j) const;
@@ -122,6 +125,14 @@ class MX : public SharedObject{
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
 
+    /** \brief Erase a submatrix */
+    void erase(const std::vector<int>& ii, const std::vector<int>& jj);
+
+    /** \brief Enlarge matrix
+    Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+    void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
+
+    
   //@{
   /** \brief  Operators that changes the object */
     MX& operator+=(const MX &y);
@@ -143,6 +154,9 @@ class MX : public SharedObject{
 
   /** \brief  Check if the matrix expression is empty */
   bool empty() const;
+  
+  /** \brief  Check if the matrix expression is dense */
+  bool dense() const;
   
   //@{
   /** \brief  Access a member of the node */

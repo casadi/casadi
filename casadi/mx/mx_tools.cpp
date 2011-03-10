@@ -27,6 +27,7 @@
 #include "if_else_node.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 namespace CasADi{
 
@@ -175,6 +176,35 @@ MX if_else_zero(const MX &cond, const MX &if_true){
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
   return if_else_zero(cond,if_true) + if_else_zero(1-cond,if_false);
 }
+
+MX unite(const MX& A, const MX& B){
+  // Join the sparsity patterns
+  std::vector<int> mapping;
+  CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
+  
+  // Split up the mapping
+  std::vector<int> nzA,nzB;
+  
+  // Copy sparsity
+  for(int k=0; k<mapping.size(); ++k){
+    if(mapping[k]<0){
+      nzA.push_back(k);
+    } else if(mapping[k]>0){
+      nzB.push_back(k);
+    } else {
+      throw CasadiException("Pattern intersection not empty");
+    }
+  }
+  
+  // Create mapping
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(A,range(nzA.size()),nzA);
+  ret->addDependency(B,range(nzB.size()),nzB);
+  return ret;
+}
+
+
 
 } // namespace CasADi
 

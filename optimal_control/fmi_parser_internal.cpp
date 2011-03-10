@@ -376,6 +376,11 @@ void FMIParserInternal::addConstraints(const XMLNode& onode){
       ocp_.cfcn.push_back(ex);
       ocp_.cfcn_lb.push_back(lb);
       ocp_.cfcn_ub.push_back(numeric_limits<double>::infinity());
+    } else if(constr_i.checkName("opt:ConstraintEq")){
+      SX ex = readExpr_new(constr_i[0]);
+      SX eq = readExpr_new(constr_i[1]);
+      ocp_.cfcn_lb.push_back(eq);
+      ocp_.cfcn_ub.push_back(eq);
     } else {
       cerr << "unknown constraint type" << constr_i.getName() << endl;
       throw "FMIParserInternal::addConstraints";
@@ -424,6 +429,8 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
     throw CasadiException(string(node.getText()));
   } else if(name.compare("Der")==0){
     return readVariable(node[0]).der();
+  } else if(name.compare("TimedVariable")==0){
+    return readVariable(node[0]).atTime(double(node[1].getText()),true);
   } else if(name.compare("Div")==0){
     return readExpr_new(node[0]) / readExpr_new(node[1]);
   } else if(name.compare("Identifier")==0){

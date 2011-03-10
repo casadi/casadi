@@ -54,6 +54,12 @@ namespace CasADi{
     // Derivative/differential equation
     SX der() const;  
     
+    // Timed variable (never allocate)
+    SX atTime(double t) const;
+
+    // Timed variable (allocate if necessary)
+    SX atTime(double t);
+
     // Update the type
     virtual void init();
     
@@ -80,6 +86,7 @@ namespace CasADi{
     // Names of contained collections
     std::map<std::string,int> name_part;
 
+    
     protected:
 
     // Variable type
@@ -114,8 +121,13 @@ namespace CasADi{
     // Differential equation
     SX de_;
     
+    // Timed variables
+    std::map<double, SX> timed_sx_;
+    
     // Numerical value
     double val;
+    
+    
     
   };
   

@@ -252,6 +252,22 @@ bool Variable::checkNode() const{
   return dynamic_cast<const VariableInternal*>(get());
 }
 
+SX Variable::atTime(double t, bool allocate) const{
+  casadi_assert_message(!allocate,"Allocating violates const qualifiers");
+  return (*this)->atTime(t);
+}
+
+SX Variable::atTime(double t, bool allocate){
+  if(allocate){
+    // Non-const version
+    return (*this)->atTime(t);
+  } else {
+    // Const version
+    return static_cast<const Variable&>(*this)->atTime(t);
+  }
+}
+
+
 } // namespace OptimalControl
 } // namespace CasADi
 

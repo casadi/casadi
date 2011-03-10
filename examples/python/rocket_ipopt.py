@@ -190,7 +190,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   TF = MX(DT) # End of time interval (changed from (k+1)*DT due to probable Sundials bug)
   for k in range(nu):
     # build up a graph with function calls
-    X = integrator([T0,TF,X,U[k],xdot])
+    X = integrator([T0,TF,X,U[k],xdot,MX()])
 
   # Objective function
   F = inner_prod(U,U)

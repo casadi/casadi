@@ -103,6 +103,10 @@ MX reshape(const MX &x, const CRSSparsity& sp);
 */
 MX vec(const MX &x);
 
+/** \brief  Unite two matrices no overlapping sparsity */
+MX unite(const MX& A, const MX& B);
+
+
 } // namespace CasADi
 
 #endif // MX_TOOLS_HPP

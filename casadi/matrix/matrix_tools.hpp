@@ -208,6 +208,10 @@ void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int
 template<class T>
 std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A);
 
+/** \brief  Unite two matrices no overlapping sparsity */
+template<class T>
+Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
+
 
 } // namespace CasADi
 
@@ -746,6 +750,33 @@ std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A){
   return ret;
 }
 
+template<class T>
+Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
+  // Join the sparsity patterns
+  std::vector<int> mapping;
+  CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
+  
+  // Create return matrix
+  Matrix<T> ret(sp);
+  
+  // Copy sparsity
+  int elA=0, elB=0;
+  for(int k; k<mapping.size(); ++k){
+    if(mapping[k]<0){
+      ret[k] = A[elA++];
+    } else if(mapping[k]>0){
+      ret[k] = B[elB++];
+    } else {
+      throw CasadiException("Pattern intersection not empty");
+    }
+  }
+  
+  casadi_assert(A.size()==elA);
+  casadi_assert(B.size()==elB);
+  
+  return ret;
+}
+
 
 
 } // namespace CasADi
@@ -795,6 +826,7 @@ MTT_INST(T,nnz_sym) \
 MTT_INST(T,isEqual) \
 MTT_INST(T,repmat) \
 MTT_INST(T,getSparseTriplet) \
+MTT_INST(T,unite) \
 
 
 #endif //SWIG

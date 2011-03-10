@@ -51,8 +51,33 @@ void Mapping::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
   }
 }
 
+bool Mapping::isReady() const{
+  casadi_assert(depind_.size()==size());
+  casadi_assert(nzind_.size()==size());
+  for(int k=0; k<size(); ++k){
+    if(nzind_[k]<0 || depind_[k]<0)
+      return false;
+  }
+  return true;
+}
+    
+
 void Mapping::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "mapping(" << args << "," << depind_ << "," << nzind_ << ")" << endl;
+  casadi_assert(isReady());
+  
+  if(numel()==1 && size()==1 && ndep()==1){
+    stream << args[0];
+    if(dep(0).numel()>1) stream << "[" << nzind_.at(0) << "]";
+  }
+  else{
+    stream << "mapping(" << size1() << "-by-" << size2() << " matrix, nonzeros: [";
+    for(int i=0; i<nzind_.size(); ++i){
+      if(i!=0) stream << ",";
+      stream << args[depind_[i]];
+      if(dep(depind_[i]).numel()>1) stream << "[" << nzind_[i] << "]";
+    }
+    stream << "])";
+  }
 }
 
 void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d){
@@ -65,7 +90,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
   // Quick return if no elements
   if(nz_d.empty()) return;
   
-  if(d->isMapping()){
+  if(true && d->isMapping()){
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;

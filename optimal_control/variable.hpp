@@ -65,8 +65,14 @@ namespace CasADi{
     SX sx() const;
     
     /// Get the time derivative or differential equation
-    SX der() const;  
+    SX der() const;
        
+    /// Timed variable (never allocate)
+    SX atTime(double t, bool allocate=false) const;
+
+    /// Timed variable (allocate if necessary)
+    SX atTime(double t, bool allocate=false);
+    
     /// Access a sub-collection by name
     Variable operator()(const std::string& name) const;
 
