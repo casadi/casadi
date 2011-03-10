@@ -379,6 +379,7 @@ void FMIParserInternal::addConstraints(const XMLNode& onode){
     } else if(constr_i.checkName("opt:ConstraintEq")){
       SX ex = readExpr_new(constr_i[0]);
       SX eq = readExpr_new(constr_i[1]);
+      ocp_.cfcn.push_back(ex);
       ocp_.cfcn_lb.push_back(eq);
       ocp_.cfcn_ub.push_back(eq);
     } else {
