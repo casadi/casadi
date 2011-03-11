@@ -76,7 +76,7 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
   for(int i=0; i<ndep(); ++i){
     for(int d=0; d<nadj; ++d){
       if(adjSens[i][d] != 0){
-        const vector<double>& asens = fcn_.adjSens(i,d);
+        const vector<double>& asens = fcn_.adjSens(i,d).data();
         for(int j=0; j<asens.size(); ++j)
           adjSens[i][d][j] += asens[j];
       }

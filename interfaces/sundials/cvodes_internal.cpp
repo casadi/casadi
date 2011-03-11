@@ -124,9 +124,9 @@ void CVodesInternal::init(){
       
       // Jacobian function
       vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
-      jac_in[M_T] = f->inputv.at(ODE_T);
-      jac_in[M_Y] = f->inputv.at(ODE_Y);
-      jac_in[M_P] = f->inputv.at(ODE_P);
+      jac_in[M_T] = f->inputv.at(ODE_T).data();
+      jac_in[M_Y] = f->inputv.at(ODE_Y).data();
+      jac_in[M_P] = f->inputv.at(ODE_P).data();
       jac_in[M_GAMMA] = vector<SX>(1,gamma);
       SXFunction M(jac_in,jac);
       
@@ -917,7 +917,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   }
   
   // Save to output
-  const vector<double>& fres = f_.adjSens(ODE_Y);
+  const vector<double>& fres = f_.adjSens(ODE_Y).data();
   for(int i=0; i<ny_; ++i)
     yBdot[i] = -fres[i];
 
@@ -939,7 +939,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     }
     
     // Get the adjoint sensitivities
-    const vector<double>& qres = q_.adjSens(ODE_Y);
+    const vector<double>& qres = q_.adjSens(ODE_Y).data();
     
     // Copy to result
     for(int i=0; i<ny_; ++i)
@@ -1005,7 +1005,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     q_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& qres = q_.adjSens(ODE_P);
+    const vector<double>& qres = q_.adjSens(ODE_P).data();
     
     // Copy to result
     for(int i=0; i<np_; ++i){
@@ -1085,7 +1085,7 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jac_f_.output().rowind();
   const vector<int>& col = jac_f_.output().col();
-  const vector<double>& val = jac_f_.output();
+  const vector<double>& val = jac_f_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1132,7 +1132,7 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jac_f_.output().rowind();
   const vector<int>& col = jac_f_.output().col();
-  const vector<double>& val = jac_f_.output();
+  const vector<double>& val = jac_f_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){

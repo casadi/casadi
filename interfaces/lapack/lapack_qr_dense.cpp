@@ -80,24 +80,39 @@ void LapackQRDenseInternal::prepare(){
   prepared_ = true;
 }
     
-void LapackQRDenseInternal::solve(double* x, int nrhs){
-  int info = 100;
-  
-  // Solve for transpose(R)
-  char uplo = 'U';
-  char transR = 'T';
-  char diag = 'N';
+void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose){
+  // Properties of R
+  char uploR = 'U';
+  char diagR = 'N';
   char sideR = 'L';
-  double alpha = 1.;
-  dtrsm_(&sideR, &uplo, &transR, &diag, &nrow_, &nrhs, &alpha, &mat_[0], &nrow_, x, &nrow_);
+  double alphaR = 1.;
+  char transR = transpose ? 'N' : 'T'; // swap transpose due to fortran column major / c row major
   
-  // Multiply by Q
-  char transQ = 'N';
+  // Properties of Q
+  char transQ = transpose ? 'T' : 'N'; // swap transpose due to fortran column major / c row major
   char sideQ = 'L';
   int k = tau_.size(); // minimum of nrow_ and ncol_
   int lwork = work_.size();
-  dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, &mat_[0], &nrow_, &tau_[0], x, &nrow_, &work_[0], &lwork, &info);
-  if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
+  
+  if(transpose){
+    // Multiply by transpose(Q)
+    int info = 100;
+    dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, &mat_[0], &nrow_, &tau_[0], x, &nrow_, &work_[0], &lwork, &info);
+    if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
+
+    // Solve for R
+    dtrsm_(&sideR, &uploR, &transR, &diagR, &nrow_, &nrhs, &alphaR, &mat_[0], &nrow_, x, &nrow_);
+
+  } else {
+  
+    // Solve for transpose(R)
+    dtrsm_(&sideR, &uploR, &transR, &diagR, &nrow_, &nrhs, &alphaR, &mat_[0], &nrow_, x, &nrow_);
+    
+    // Multiply by Q
+    int info = 100;
+    dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, &mat_[0], &nrow_, &tau_[0], x, &nrow_, &work_[0], &lwork, &info);
+    if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
+  }
 }
 
 

@@ -53,7 +53,7 @@ class LinearSolverInternal : public FXInternal{
     virtual void solve();
 
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs) = 0;
+    virtual void solve(double* x, int nrhs, bool transpose) = 0;
    
     // Is prepared
     bool prepared_;

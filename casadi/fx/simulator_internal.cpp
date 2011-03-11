@@ -86,7 +86,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
     
     // Save the output of the function
     for(int i=0; i<output_.size(); ++i){
-      const vector<double> &res = output_fcn_.output(i);
+      const vector<double> &res = output_fcn_.output(i).data();
       copy(res.begin(),res.end(),&output(i)[k*res.size()]);
     }
     
@@ -101,7 +101,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
 
       // Save the output of the function
       for(int i=0; i<output_.size(); ++i){
-        const vector<double> &res = output_fcn_.fwdSens(i);
+        const vector<double> &res = output_fcn_.fwdSens(i).data();
         copy(res.begin(),res.end(),&fwdSens(i)[k*res.size()]);
       }
     }

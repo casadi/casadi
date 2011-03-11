@@ -308,7 +308,7 @@ void append(Matrix<T>& expr, const Matrix<T>& add){
   expr.sparsityRef().append(add.sparsity());
   
   // Add the non-zeros
-  expr.insert(expr.end(),add.begin(),add.end());
+  expr.data().insert(expr.end(),add.begin(),add.end());
 }
 
 template<class T>

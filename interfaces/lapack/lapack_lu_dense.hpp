@@ -79,10 +79,16 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     virtual void prepare();
     
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs);
+    virtual void solve(double* x, int nrhs, bool transpose);
 
   protected:
 
+    // Scale rows
+    void rowScaling(double* x, int nrhs);
+    
+    // Scale columns
+    void columnScaling(double* x, int nrhs);
+    
     // Matrix
     std::vector<double> mat_;
     

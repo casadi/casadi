@@ -47,6 +47,9 @@ public:
   
   /** \brief  Access internal functions and data members */
   const CSparseInternal* operator->() const;
+  
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
 };
 
   } // namespace Interface

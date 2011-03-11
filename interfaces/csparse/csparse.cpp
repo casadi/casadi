@@ -41,6 +41,11 @@ const CSparseInternal* CSparse::operator->() const{
   return static_cast<const CSparseInternal*>(FX::operator->());
 }
   
+bool CSparse::checkNode() const{
+  return dynamic_cast<const CSparseInternal*>(get());
+}
+  
+  
   } // namespace Interfaces
 } // namespace CasADi
 

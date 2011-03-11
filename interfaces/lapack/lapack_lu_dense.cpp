@@ -120,22 +120,42 @@ void LapackLUDenseInternal::prepare(){
   prepared_ = true;
 }
     
-void LapackLUDenseInternal::solve(double* x, int nrhs){
-  // Scale right hand side if this was done to the matrix
-  if(equed_=='C' || equed_=='B')
-    for(int i=0; i<ncol_; ++i) // FIXME nrhs?
-      x[i] *= c_[i];
-  
-  int info = 100;
-  char trans = 'T'; // swap 'T' for 'N' due to c-column major, fortran row major
+void LapackLUDenseInternal::solve(double* x, int nrhs, bool transpose){
+  // Scale the right hand side
+  if(transpose){
+    rowScaling(x,nrhs);
+  } else {
+    columnScaling(x,nrhs);
+  }
+
   // Solve the system of equations
+  int info = 100;
+  char trans = transpose ? 'N' : 'T';  // swap 'T' for 'N' due to c-column major, fortran row major
   dgetrs_(&trans, &nrow_, &nrhs, &mat_[0], &nrow_, &ipiv_[0], x, &nrow_, &info);
   if(info != 0) throw CasadiException("LapackLUDenseInternal::solve: failed to solve the linear system");
-  
+
+  // Scale the solution
+  if(transpose){
+    columnScaling(x,nrhs);
+  } else {
+    rowScaling(x,nrhs);
+  }
+}
+
+void LapackLUDenseInternal::rowScaling(double* x, int nrhs){
   // Scale result if this was done to the matrix
   if(equed_=='R' || equed_=='B')
-    for(int i=0; i<nrow_; ++i) // FIXME nrhs?
-      x[i] *= r_[i];
+    for(int rhs=0; rhs<nrhs; ++rhs)
+      for(int i=0; i<nrow_; ++i)
+        x[i+rhs*ncol_] *= r_[i];
+}
+    
+void LapackLUDenseInternal::columnScaling(double* x, int nrhs){
+  // Scale right hand side if this was done to the matrix
+  if(equed_=='C' || equed_=='B')
+    for(int rhs=0; rhs<nrhs; ++rhs)
+      for(int i=0; i<ncol_; ++i)
+        x[i+rhs*ncol_] *= c_[i];
 }
 
 LapackLUDenseInternal* LapackLUDenseInternal::clone() const{

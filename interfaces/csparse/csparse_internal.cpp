@@ -77,11 +77,11 @@ void CSparseInternal::prepare(){
   prepared_ = true;
 }
   
-void CSparseInternal::solve(double* x, int nrhs){
+void CSparseInternal::solve(double* x, int nrhs, bool transpose){
   double *t = &temp_.front();
   
   for(int k=0; k<nrhs; ++k){
-    if(transpose_){
+    if(transpose){
       cs_ipvec (N_->pinv, x, t, AT_.n) ;   // t = P1\b
       cs_lsolve (N_->L, t) ;               // t = L\t 
       cs_usolve (N_->U, t) ;               // t = U\t 

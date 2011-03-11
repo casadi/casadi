@@ -57,7 +57,14 @@ class ImplicitFunctionInternal : public FXInternal{
     
     /// Number of right hand sides
     int nrhs_;
+    
+    /// Number of forward derivative directions of the function
+    int nfdir_fcn_;
+    
+    /// Number of adjoint derivative directions of the function
+    int nadir_fcn_;
 };
+
 
 
 } // namespace CasADi

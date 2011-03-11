@@ -98,7 +98,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
     fcn_.setInput(input(i),i);
-  vector<double>& res2 = output();
+  vector<double>& res2 = output().data();
   
   int el = 0; // running index
 
@@ -114,7 +114,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
         for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
           // Pass forward seeds
           int i=ofs+dir;
-          vector<double>& fseed = fcn_.fwdSeed(iind_,dir);
+          vector<double>& fseed = fcn_.fwdSeed(iind_,dir).data();
           fill(fseed.begin(),fseed.end(),0);
           fseed[i] = 1;
         }
@@ -126,7 +126,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
       for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
         // Save to the result
         int i=ofs+dir;
-        const vector<double>& fsens = fcn_.fwdSens(oind_,dir);
+        const vector<double>& fsens = fcn_.fwdSens(oind_,dir).data();
         for(int j=0; j<m_; ++j){
           res2[i+j*n_] = fsens[j];
         }
@@ -137,7 +137,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
         for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
           // Pass forward seeds
           int j=ofs+dir;
-          vector<double>& aseed = fcn_.adjSeed(oind_,dir);
+          vector<double>& aseed = fcn_.adjSeed(oind_,dir).data();
           fill(aseed.begin(),aseed.end(),0);
           aseed[j] = 1;
         }
@@ -149,7 +149,7 @@ void JacobianInternal::evaluate(int fsens_order, int asens_order){
       for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
         // Save to the result
         int j=ofs+dir;
-        const vector<double>& asens = fcn_.adjSens(iind_,dir);
+        const vector<double>& asens = fcn_.adjSens(iind_,dir).data();
         for(int i=0; i<n_; ++i){
           res2[i+j*n_] = asens[i];
         }

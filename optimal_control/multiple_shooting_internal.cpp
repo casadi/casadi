@@ -360,17 +360,17 @@ void MultipleShootingInternal::setOptimalSolution( const vector<double> &V_opt )
 
 void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
   // get NLP variable bounds and initial guess
-  getGuess(nlp_solver_.input(NLP_X_INIT));
-  getVariableBounds(nlp_solver_.input(NLP_LBX),nlp_solver_.input(NLP_UBX));
+  getGuess(nlp_solver_.input(NLP_X_INIT).data());
+  getVariableBounds(nlp_solver_.input(NLP_LBX).data(),nlp_solver_.input(NLP_UBX).data());
        
   // get NLP constraint bounds
-  getConstraintBounds(nlp_solver_.input(NLP_LBG), nlp_solver_.input(NLP_UBG));
+  getConstraintBounds(nlp_solver_.input(NLP_LBG).data(), nlp_solver_.input(NLP_UBG).data());
        
   //Solve the problem
   nlp_solver_.solve();
   
   // Save the optimal solution
-  setOptimalSolution(nlp_solver_.output(NLP_X_OPT));
+  setOptimalSolution(nlp_solver_.output(NLP_X_OPT).data());
 }
 
 

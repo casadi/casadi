@@ -233,14 +233,9 @@ void KinsolInternal::init(){
 
 void KinsolInternal::evaluate(int fsens_order, int asens_order){
   int nfdir = fsens_order ? nfdir_ : 0;
-  int nfdir_fcn_ = f_.getOption("number_of_fwd_dir");
-  casadi_assert(nfdir<=nfdir_fcn_);
-  
   int nadir = asens_order ? nadir_ : 0;
-  int nadir_fcn_ = f_.getOption("number_of_adj_dir");
+  casadi_assert(nfdir<=nfdir_fcn_);
   casadi_assert(nadir<=nadir_fcn_);
-
-  casadi_assert_message(nadir==0,"not implemented");
   
   // Reset the counters
   t_func_ = 0;
@@ -254,44 +249,65 @@ void KinsolInternal::evaluate(int fsens_order, int asens_order){
     throw CasadiException(ss.str());
   }
 
-  if(nfdir>0){
-    // f(z,x1,x2) = 0 => Jz*dz_dp + Jx1*dx1_dp + Jx2*dx2_dp = 0 <=> dz_dp = -inv(Jz) * (Jx1*dx1_dp + Jx2*dx2_dp)
-    // Pass inputs
-    f_.setInput(NV_DATA_S(u_),0);
-    for(int i=0; i<getNumInputs(); ++i)
-      f_.input(i+1).set(input(i));
+  // End of function if no sensitivities
+  if(nfdir==0 && nadir==0)
+    return;
+  
+  // Make sure that a linear solver has been provided
+  casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
+  casadi_assert_message(!J_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
 
-    // Pass input seeds
-    for(int dir=0; dir<nfdir; ++dir){
-      f_.fwdSeed(0,dir).setZero();
-      for(int i=0; i<getNumInputs(); ++i){
-        f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
-      }
-    }
-    
-    // Evaluate
-    f_.evaluate(1,0);
+  // Factorize the linear system TODO: make optional
+  psetup(u_, u_scale_, 0, f_scale_, 0, 0);
 
-    // Factorize the linear system
-    psetup(u_, u_scale_, 0, f_scale_, 0, 0);
+  // Pass inputs to function
+  f_.setInput(NV_DATA_S(u_),0);
+  for(int i=0; i<getNumInputs(); ++i)
+    f_.input(i+1).set(input(i));
 
-    // Solve
-    for(int dir=0; dir<nfdir; ++dir){
-      // Negate intermediate result and copy to output
-      const vector<double>& ffsens = f_.fwdSens(0,dir);
-      vector<double>& fsens = fwdSens(0,dir);
-      casadi_assert(ffsens.size()==fsens.size());
-      for(int i=0; i<fsens.size(); ++i)
-        fsens[i] = -ffsens[i];
-      
-      // Solve for the sensitivities
-      linsol_.solve(&fsens.front());
+  // Pass input seeds to function
+  for(int dir=0; dir<nfdir; ++dir){
+    f_.fwdSeed(0,dir).setZero();
+    for(int i=0; i<getNumInputs(); ++i){
+      f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
     }
   }
   
-//  if(nadir>0){
-//    casadi_assert_message(0,"not implemented");
-//  }
+  // Solve for the adjoint seeds
+  for(int dir=0; dir<nadir; ++dir){
+    // Negate adjoint seed and pass to function
+    const Matrix<double>& aseed = adjSeed(0,dir);
+    Matrix<double>& faseed = f_.adjSeed(0,dir);
+    casadi_assert(faseed.size()==aseed.size());
+    for(int i=0; i<aseed.size(); ++i)
+      faseed[i] = -aseed[i];
+    
+    // Solve the transposed linear system
+    linsol_.solve(&faseed.front(),1,true);
+  }
+
+  // Evaluate
+  f_.evaluate(nfdir>0,nadir>0); // FIXME: when evaluate is updated
+
+  // Solve for the forward sensitivities
+  for(int dir=0; dir<nfdir; ++dir){
+    // Negate intermediate result and copy to output
+    const Matrix<double>& ffsens = f_.fwdSens(0,dir);
+    Matrix<double>& fsens = fwdSens(0,dir);
+    casadi_assert(ffsens.size()==fsens.size());
+    for(int i=0; i<fsens.size(); ++i)
+      fsens[i] = -ffsens[i];
+    
+    // Solve the linear system
+    linsol_.solve(&fsens.front());
+  }
+  
+  // Get the adjoint sensitivities
+  for(int dir=0; dir<nadir; ++dir){
+    for(int i=0; i<getNumInputs(); ++i){
+      f_.adjSens(i+1,dir).get(adjSens(i,dir));
+    }
+  }
 }
 
 KinsolSolver KinsolInternal::jac(int iind, int oind){
@@ -418,7 +434,7 @@ void KinsolInternal::djac(int N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp
   // Get sparsity and non-zero elements
   const vector<int>& rowind = J_.output().rowind();
   const vector<int>& col = J_.output().col();
-  const vector<double>& val = J_.output();
+  const vector<double>& val = J_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -464,7 +480,7 @@ void KinsolInternal::bjac(int N, int mupper, int mlower, N_Vector u, N_Vector fu
   // Get sparsity and non-zero elements
   const vector<int>& rowind = J_.output().rowind();
   const vector<int>& col = J_.output().col();
-  const vector<double>& val = J_.output();
+  const vector<double>& val = J_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){

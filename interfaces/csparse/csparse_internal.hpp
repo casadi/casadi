@@ -51,7 +51,7 @@ class CSparseInternal : public LinearSolverInternal{
     virtual void prepare();
     
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs);
+    virtual void solve(double* x, int nrhs, bool transpose);
     
     // Clone
     virtual CSparseInternal* clone() const;

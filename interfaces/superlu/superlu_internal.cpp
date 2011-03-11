@@ -167,7 +167,7 @@ void SuperLUInternal::prepare(){
   prepared_ = false;
 
   // Copy the non-zero entries
-  const vector<double>& val = input(0);
+  const vector<double>& val = input(0).data();
   copy(val.begin(),val.end(),a_.begin());
 
   SuperMatrix AC;
@@ -227,8 +227,9 @@ if (user_work_){
   prepared_ = true;
 }
   
-void SuperLUInternal::solve(double* x, int nrhs){
+void SuperLUInternal::solve(double* x, int nrhs, bool transpose){
   casadi_assert(nrhs_==nrhs);
+  casadi_assert(transpose==transpose_);
   
   // Copy the right hand side
   copy(x,x+rhs_.size(),rhs_.begin());

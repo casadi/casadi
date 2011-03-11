@@ -588,10 +588,10 @@ bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
   try {
     casadi_assert(n == n_);
     casadi_assert(m == m_);
-    vector<double> &lbx = input(NLP_LBX);  copy(lbx.begin(),lbx.end(),x_l);
-    vector<double> &ubx = input(NLP_UBX);  copy(ubx.begin(),ubx.end(),x_u);
-    vector<double> &lbg = input(NLP_LBG);  copy(lbg.begin(),lbg.end(),g_l);
-    vector<double> &ubg = input(NLP_UBG);  copy(ubg.begin(),ubg.end(),g_u);
+    input(NLP_LBX).getArray(x_l,n);
+    input(NLP_UBX).getArray(x_u,n);
+    input(NLP_LBG).getArray(g_l,m);
+    input(NLP_UBG).getArray(g_u,m);
     return true;
   } catch (exception& ex){
     cerr << "get_bounds_info failed: " << ex.what() << endl;
@@ -607,21 +607,16 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   try {
     bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
     if (warmstart) {
-      const vector<double> &z_lbinit = output(NLP_LAMBDA_LBX);
-      copy(z_lbinit.begin(),z_lbinit.end(),z_L);
-      const vector<double> &z_ubinit = output(NLP_LAMBDA_UBX);
-      copy(z_ubinit.begin(),z_ubinit.end(),z_U);
-      const vector<double> &xinit = input(NLP_X_INIT);
-      copy(xinit.begin(),xinit.end(),x);
-      const vector<double> &linit = input(NLP_LAMBDA_INIT);
-      copy(linit.begin(),linit.end(),lambda);
+      output(NLP_LAMBDA_LBX).getArray(z_L,n);
+      output(NLP_LAMBDA_UBX).getArray(z_U,n);
+      input(NLP_X_INIT).getArray(x,n);
+      input(NLP_LAMBDA_INIT).getArray(lambda,m);
       return true;
     } else {
       casadi_assert(init_x == true);
       casadi_assert(init_z == false);
       casadi_assert(init_lambda == false);
-      const vector<double> &xinit = input(NLP_X_INIT);
-      copy(xinit.begin(),xinit.end(),x);
+      input(NLP_X_INIT).getArray(x,n);
       return true;
     }
   } catch (exception& ex){

@@ -154,13 +154,13 @@ OCP OCP::scale() const{
   Matrix<SX> temp;
 
   // Substitute equations
-  ret.dae     = substitute(dae,v,v_old);
-  ret.initeq  = substitute(initeq,v,v_old);
-  ret.cfcn    = substitute(cfcn,v,v_old);
-  ret.cfcn_lb = substitute(cfcn_lb,v,v_old);
-  ret.cfcn_ub = substitute(cfcn_ub,v,v_old);
-  ret.mterm   = substitute(mterm,v,v_old);
-  ret.lterm   = substitute(lterm,v,v_old);
+  ret.dae     = substitute(dae,v,v_old).data();
+  ret.initeq  = substitute(initeq,v,v_old).data();
+  ret.cfcn    = substitute(cfcn,v,v_old).data();
+  ret.cfcn_lb = substitute(cfcn_lb,v,v_old).data();
+  ret.cfcn_ub = substitute(cfcn_ub,v,v_old).data();
+  ret.mterm   = substitute(mterm,v,v_old).data();
+  ret.lterm   = substitute(lterm,v,v_old).data();
   return ret;
 }
 

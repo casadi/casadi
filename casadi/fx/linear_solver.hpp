@@ -53,8 +53,8 @@ public:
   /// Solve the system of equations, internal vector
   void solve();
 
-  /// Solve the system of equations
-  void solve(double* x, int nrhs=1);
+  /// Solve the factorized system of equations
+  void solve(double* x, int nrhs=1, bool transpose=false);
 
   /// Check if prepared
   bool prepared() const;

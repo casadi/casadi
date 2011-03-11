@@ -368,7 +368,7 @@ int main(){
 
   if(with_asens){
     // backward seeds
-    vector<double> &bseed = integrator.adjSeed(INTEGRATOR_XF);
+    vector<double> &bseed = integrator.adjSeed(INTEGRATOR_XF).data();
     fill(bseed.begin(),bseed.end(),0);
     bseed[1] = 1;
 
@@ -380,7 +380,7 @@ int main(){
     return 0;
   }
     
-  vector<double> fsens = integrator.fwdSens();
+  vector<double> fsens = integrator.fwdSens().data();
   cout << "forward sensitivities           " << fsens << endl;
 
   if(with_asens){
@@ -406,7 +406,7 @@ int main(){
     // evaluate again with forward sensitivities
     integrator.evaluate(1,0);
 
-    vector<double> fsens_pret = integrator.fwdSens();
+    vector<double> fsens_pret = integrator.fwdSens().data();
     cout << "forward sensitivities preturbed " << fsens_pret << endl;
 
     vector<double> fd2(fsens.size());

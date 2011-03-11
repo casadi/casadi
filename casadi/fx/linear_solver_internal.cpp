@@ -85,14 +85,14 @@ void LinearSolverInternal::evaluate(int fsens_order, int asens_order){
  
 void LinearSolverInternal::solve(){
   // Get input and output vector
-  const vector<double>& b = input(1);
-  vector<double>& x = output();
+  const vector<double>& b = input(1).data();
+  vector<double>& x = output().data();
   
   // Copy input to output
   copy(b.begin(),b.end(),x.begin());
   
   // Solve the factorized system
-  solve(&x[0],1);
+  solve(&x[0],1,transpose_);
 }
  
 } // namespace CasADi

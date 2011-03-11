@@ -192,11 +192,8 @@ void AcadoInternal::init(){
   
   // Set all bounds except initial constraints to +- infinity by default
   for(int i=ACADO_LBX; i<ACADO_UBC; i = i+2){
-    vector<double> &lb = input(i);
-    fill(lb.begin(),lb.end(),-numeric_limits<double>::infinity());
-    
-    vector<double> &ub = input(i+1);
-    fill(ub.begin(),ub.end(),numeric_limits<double>::infinity());
+    input(i).setAll(-numeric_limits<double>::infinity());
+    input(i+1).setAll(numeric_limits<double>::infinity());
   }
   
   // variables
@@ -234,33 +231,33 @@ void AcadoInternal::init(){
 void AcadoInternal::evaluate(int fsens_order, int asens_order){ 
   // Initial constraint function
   if(!rfcn_.f_.isNull()){
-    const vector<double>& lbr = input(ACADO_LBR);
+    const Matrix<double>& lbr = input(ACADO_LBR);
     ACADO::Vector lb(lbr.size(),&lbr[0]);
-    const vector<double>& ubr = input(ACADO_UBR);
+    const Matrix<double>& ubr = input(ACADO_UBR);
     ACADO::Vector ub(ubr.size(),&ubr[0]);
     ocp_->subjectTo( ACADO::AT_START, lb <= (*rfcn_.fcn_)(*arg_) <= ub);
   }
 
   // Path constraint function
   if(!cfcn_.f_.isNull()){
-    const vector<double>& lbc = input(ACADO_LBC);
+    const Matrix<double>& lbc = input(ACADO_LBC);
     ACADO::Vector lb(lbc.size(),&lbc[0]);
-    const vector<double>& ubc = input(ACADO_UBC);
+    const Matrix<double>& ubc = input(ACADO_UBC);
     ACADO::Vector ub(ubc.size(),&ubc[0]);
     ocp_->subjectTo( lb <= (*cfcn_.fcn_)(*arg_) <=  ub );
   }
 
   // State bounds
-  vector<double> &lbx = input(ACADO_LBX);
-  vector<double> &ubx = input(ACADO_UBX);
+  Matrix<double> &lbx = input(ACADO_LBX);
+  Matrix<double> &ubx = input(ACADO_UBX);
   for(int i=0; i<nxd_; ++i)
     ocp_->subjectTo( lbx[i] <= xd_[i] <=  ubx[i] );
   for(int i=nxd_; i<nx_; ++i)
     ocp_->subjectTo( lbx[i] <= xa_[i-nxd_] <=  ubx[i] );
 
   // Pass bounds on state at initial time
-  vector<double> &lbx0 = input(ACADO_LBX0);
-  vector<double> &ubx0 = input(ACADO_UBX0);
+  Matrix<double> &lbx0 = input(ACADO_LBX0);
+  Matrix<double> &ubx0 = input(ACADO_UBX0);
   for(int i=0; i<nxd_; ++i)
     ocp_->subjectTo( ACADO::AT_START, lbx0[i] <= xd_[i] <=  ubx0[i] );
   for(int i=nxd_; i<nx_; ++i)
@@ -270,14 +267,14 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 //     ocp_->subjectTo( AT_END  , xd_[2] ==  0.0 );
 
   // Control bounds
-  vector<double> &lbu = input(ACADO_LBU);
-  vector<double> &ubu = input(ACADO_UBU);
+  Matrix<double> &lbu = input(ACADO_LBU);
+  Matrix<double> &ubu = input(ACADO_UBU);
   for(int i=0; i<nu_; ++i)
     ocp_->subjectTo( lbu[i] <= u_[i] <= ubu[i] );
 
   // Parameter bounds
-  vector<double> &lbp = input(ACADO_LBP);
-  vector<double> &ubp = input(ACADO_UBP);
+  Matrix<double> &lbp = input(ACADO_LBP);
+  Matrix<double> &ubp = input(ACADO_UBP);
   for(int i=0; i<np_; ++i)
     ocp_->subjectTo( lbp[i] <= p_[i] <= ubp[i] );
 
@@ -371,7 +368,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   // Initialize differential states
   if(nxd_>0){
     // Initial guess
-    vector<double> &x0 = input(ACADO_X_GUESS);
+    Matrix<double> &x0 = input(ACADO_X_GUESS);
     
     // Assemble the variables grid
     ACADO::VariablesGrid xd(nxd_, n_nodes_+1);
@@ -387,7 +384,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   // Initialize algebraic states
   if(nxa_>0){
     // Initial guess
-    vector<double> &x0 = input(ACADO_X_GUESS);
+    Matrix<double> &x0 = input(ACADO_X_GUESS);
     
     // Assemble the variables grid
     ACADO::VariablesGrid xa(nxa_, n_nodes_+1);
@@ -403,7 +400,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   // Initialize controls
   if(nu_>0){
     // Initial guess
-    vector<double> &u0 = input(ACADO_U_GUESS);
+    Matrix<double> &u0 = input(ACADO_U_GUESS);
     
     // Assemble the variables grid
     ACADO::VariablesGrid u(nu_, n_nodes_+1);
@@ -419,7 +416,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
   // Initialize parameters
   if(np_>0){
     // Initial guess
-    vector<double> &p0 = input(ACADO_P_GUESS);
+    Matrix<double> &p0 = input(ACADO_P_GUESS);
     
     // Assemble the variables grid
     ACADO::VariablesGrid p(np_, n_nodes_+1);
@@ -437,7 +434,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the optimal state trajectory
   if(nxd_>0){
-    vector<double> &xopt = output(ACADO_X_OPT);
+    Matrix<double> &xopt = output(ACADO_X_OPT);
     ACADO::VariablesGrid xd;
     algorithm_->getDifferentialStates(xd);
     assert(xd.getNumPoints()==n_nodes_+1);
@@ -448,7 +445,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
     }
   }
   if(nxa_>0){
-    vector<double> &xopt = output(ACADO_X_OPT);
+    Matrix<double> &xopt = output(ACADO_X_OPT);
     ACADO::VariablesGrid xa;
     algorithm_->getAlgebraicStates(xa);
     assert(xa.getNumPoints()==n_nodes_+1);
@@ -461,7 +458,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the optimal control trajectory
   if(nu_>0){
-    vector<double> &uopt = output(ACADO_U_OPT);
+    Matrix<double> &uopt = output(ACADO_U_OPT);
     ACADO::VariablesGrid u;
     algorithm_->getControls(u);
     assert(u.getNumPoints()==n_nodes_+1);
@@ -474,7 +471,7 @@ void AcadoInternal::evaluate(int fsens_order, int asens_order){
 
   // Get the optimal parameters
   if(np_>0){
-    vector<double> &popt = output(ACADO_P_OPT);
+    Matrix<double> &popt = output(ACADO_P_OPT);
     ACADO::Vector p;
     algorithm_->getParameters(p);
     &popt[0] << p;

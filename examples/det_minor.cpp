@@ -192,7 +192,7 @@ for (int i=0; i<n*n; i++)
 // making function
 SXFunction fcn(symA,deter);
 fcn.init();
-vector<double>& inp = fcn.input();
+vector<double>& inp = fcn.input().data();
     for (i=0; i<n; i++) {
         double* ppt = PA[i];
         for (j=0; j<n; j++)

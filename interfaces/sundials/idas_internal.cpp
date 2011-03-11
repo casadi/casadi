@@ -1102,7 +1102,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
   f_.evaluate(0,1);
 
   // Save to output
-  const vector<double>& asens_ydot = f_.adjSens(DAE_YDOT);
+  const vector<double>& asens_ydot = f_.adjSens(DAE_YDOT).data();
   for(int i=0; i<ny_; ++i)
     resvalB[i] -= asens_ydot[i];
   
@@ -1122,11 +1122,11 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     q_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& asens_y = q_.adjSens(DAE_Y);
+    const vector<double>& asens_y = q_.adjSens(DAE_Y).data();
     for(int i=0; i<ny_; ++i)
       resvalB[i] += asens_y[i];
 
-    const vector<double>& asens_z = q_.adjSens(DAE_Z);
+    const vector<double>& asens_z = q_.adjSens(DAE_Z).data();
     for(int i=0; i<nz_; ++i)
       resvalB[i+ny_] += asens_z[i];
   }
@@ -1176,7 +1176,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
     q_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& qres = q_.adjSens(DAE_P);
+    const vector<double>& qres = q_.adjSens(DAE_P).data();
     
     // Copy to result
     for(int i=0; i<np_; ++i){
@@ -1214,7 +1214,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jac_.output().rowind();
   const vector<int>& col = jac_.output().col();
-  const vector<double>& val = jac_.output();
+  const vector<double>& val = jac_.output().data();
 
   // Dimension of the Jacobian
   int jdim = jac_.output().size1();
@@ -1266,7 +1266,7 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jac_.output().rowind();
   const vector<int>& col = jac_.output().col();
-  const vector<double>& val = jac_.output();
+  const vector<double>& val = jac_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){

@@ -41,8 +41,8 @@ void LinearSolver::prepare(){
   (*this)->prepare();
 }
 
-void LinearSolver::solve(double* x, int nrhs){
-  (*this)->solve(x,nrhs);
+void LinearSolver::solve(double* x, int nrhs, bool transpose){
+  (*this)->solve(x,nrhs,transpose);
 }
  
 void LinearSolver::solve(){
@@ -56,7 +56,6 @@ bool LinearSolver::prepared() const{
 bool LinearSolver::checkNode() const{
   return dynamic_cast<const LinearSolverInternal*>(get());
 }
-
 
 } // namespace CasADi
 

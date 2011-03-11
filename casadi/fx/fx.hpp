@@ -257,6 +257,7 @@ SETTERS(double);
 SETTERS(const double*);
 #endif // SWIG
 SETTERS(const std::vector<double>&);
+SETTERS(const Matrix<double>&);
 /// \endcond
 #undef SETTERS
 
@@ -273,6 +274,7 @@ GETTERS(double&);
 GETTERS(double*);
 #endif // SWIG
 GETTERS(std::vector<double>&);
+GETTERS(Matrix<double>&);
 /// \endcond
 #undef GETTERS
 

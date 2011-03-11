@@ -115,7 +115,7 @@ vector< vector<SX> > SXFunction::eval(const vector< vector<SX> >& arg){
   // Convert result
   vector< vector<SX> > res(resv.size());
   for(int i=0; i<res.size(); ++i){
-    res[i] = resv[i];
+    res[i] = resv[i].data();
   }
   
   return res;

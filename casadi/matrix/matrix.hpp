@@ -105,12 +105,38 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// This constructor enables implicit type conversion from a matrix element
     Matrix(const Element<Matrix<T>,T>& val);
 
+    /// Expose iterators
+    typedef typename std::vector<T>::iterator iterator;
+    typedef typename std::vector<T>::const_iterator const_iterator;
+    typedef typename std::vector<T>::reverse_iterator reverse_iterator;
+    typedef typename std::vector<T>::const_reverse_iterator const_reverse_iterator;
+    
+    /// References
+    typedef T& reference;
+    typedef const T& const_reference;
+    
+    /// Get iterators to beginning and end
+    iterator begin(){ return data().begin();}
+    const_iterator begin() const{ return data().begin();}
+    reverse_iterator rbegin(){ return data().rbegin();}
+    const_reverse_iterator rbegin() const{ return data().rbegin();}
+    iterator end(){ return data().end();}
+    const_iterator end() const{ return data().end();}
+    reverse_iterator rend(){ return data().rend();}
+    const_reverse_iterator rend() const{ return data().rend();}
+    
+    /// Get references to beginning and end
+    reference front(){ return data().front();}
+    const_reference front() const { return data().front();}
+    reference back(){ return data().back();}
+    const_reference back() const { return data().back();}
+    
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     Matrix(const std::vector<A>& x){
       sparsity_ = CRSSparsity(x.size(),1,true);
-      std::vector<T>::resize(x.size());
-      copy(x.begin(),x.end(),std::vector<T>::begin());
+      data().resize(x.size());
+      copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
@@ -118,8 +144,8 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(const std::vector<A>& x,  int n, int m){
       if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
       sparsity_ = CRSSparsity(n,m,true);
-      std::vector<T>::resize(x.size());
-      copy(x.begin(),x.end(),std::vector<T>::begin());
+      data().resize(x.size());
+      copy(x.begin(),x.end(),begin());
     }
     
     /** \brief  ublas vector */
@@ -128,14 +154,14 @@ class Matrix : public std::vector<T>, public PrintableObject{
     explicit Matrix<T>(const ublas::vector<A> &x){
       sparsity_ = CRSSparsity(x.size(),1,true);
       std::vector<T>::resize(x.size());
-      copy(x.begin(),x.end(),std::vector<T>::begin());
+      copy(x.begin(),x.end(),begin());
     }
 
     template<typename T, typename A>
     explicit Matrix<T>(const ublas::matrix<A> &x){
       sparsity_ = CRSSparsity(x.size1(),x.size2(),true);
       std::vector<T>::resize(numel());
-      copy(x.begin(),x.end(),std::vector<T>::begin());
+      copy(x.begin(),x.end(),begin());
       return ret;
     }
 #endif // HAVE_UBLAS
@@ -234,10 +260,16 @@ class Matrix : public std::vector<T>, public PrintableObject{
     SubMatrix<Matrix<T> > operator()(const AllRange& i, const AllRange& j){ return operator()(range(size1()),range(size2()));}
 
     /// Get a non-zero element
-    const T& operator[](int k) const{ return std::vector<T>::operator[](k); }
+    const T& at(int k) const{ return data().at(k); }
 
     /// Access a non-zero element
-    T& operator[](int k){ return std::vector<T>::operator[](k); }
+    T& at(int k){ return data().at(k); }
+    
+    /// Get a non-zero element
+    const T& operator[](int k) const{ return data().operator[](k); }
+
+    /// Access a non-zero element
+    T& operator[](int k){ return data().operator[](k); }
     
     /// Get a number of non-zero elements
     const Matrix<T> operator[](const std::vector<int>& kk) const{ return getNZ(kk);}
@@ -414,6 +446,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<T>& val, Sparsity sp=SPARSE) const;
 
+    /** \brief  Set the non-zero elements, Matrix */
+    void set(const Matrix<T>& val, Sparsity sp=SPARSE);
+
+    /** \brief  Get the non-zero elements, Matrix */
+    void get(Matrix<T>& val, Sparsity sp=SPARSE) const;
+
 #ifdef SWIG
     %rename(get) getArray;
     %rename(set) setArray;
@@ -455,6 +493,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
+    
+    /// Nonzero elements
+    // std::vector<T> data_;
 };
 
 } // namespace CasADi
@@ -534,7 +575,7 @@ const T Matrix<T>::getElement(int i, int j) const{
   if(ind==-1)
     return 0;
   else
-    return std::vector<T>::at(ind);
+    return at(ind);
 }
 
 template<class T>
@@ -547,8 +588,8 @@ T& Matrix<T>::getElementRef(int i, int j){
   int oldsize = sparsity().size();
   int ind = sparsityRef().getNZ(i,j);
   if(oldsize != sparsity().size())
-    std::vector<T>::insert(std::vector<T>::begin()+ind,0);
-  return std::vector<T>::at(ind);
+    data().insert(begin()+ind,0);
+  return at(ind);
 }
 
 template<class T>
@@ -652,8 +693,8 @@ template<class T>
 void Matrix<T>::makeDense(int n, int m, const T& val){
   if(n*m != numel()){
     sparsity_ = CRSSparsity(n,m,true);
-    std::vector<T>::clear();
-    std::vector<T>::resize(n*m, val);
+    data().clear();
+    data().resize(n*m, val);
   }
 }
 
@@ -683,7 +724,7 @@ Matrix<T>::Matrix(){
 }
 
 template<class T>
-Matrix<T>::Matrix(const Matrix<T>& m) : std::vector<T>(m){
+Matrix<T>::Matrix(const Matrix<T>& m) : std::vector<T>(m.data()){
   sparsity_ = m.sparsity_;
 }
 
@@ -713,13 +754,13 @@ Matrix<T>::Matrix(int n, int m){
 template<class T>
 Matrix<T>::Matrix(int n, int m, const T& val){
   sparsity_ = CRSSparsity(n,m,true);
-  std::vector<T>::resize(n*m, val);
+  data().resize(n*m, val);
 }
 
 template<class T>
 void Matrix<T>::makeEmpty(int n, int m){
   sparsity_ = CRSSparsity(n,m,false);
-  std::vector<T>::clear();
+  data().clear();
 }
 
 template<class T>
@@ -848,7 +889,7 @@ void Matrix<T>::reserve(int nnz){
 
 template<class T>
 void Matrix<T>::reserve(int nnz, int nrow){
-  std::vector<T>::reserve(nnz);
+  data().reserve(nnz);
   sparsity_.reserve(nnz,nrow);
 }
 
@@ -860,19 +901,19 @@ void Matrix<T>::resize(int n_, int m_){
 template<class T>
 void Matrix<T>::clear(){
   sparsity_ = CRSSparsity(0,0,false);
-  std::vector<T>::clear();
+  data().clear();
 }
 
 template<class T>
 Matrix<T>::Matrix(const Element<Matrix<T>,T>& val){
   sparsity_ = CRSSparsity(1,1,true);
-  std::vector<T>::resize(1,T(val));
+  data().resize(1,T(val));
 }
 
 template<class T>
 Matrix<T>::Matrix(double val){
   sparsity_ = CRSSparsity(1,1,true);
-  std::vector<T>::resize(1,val);
+  data().resize(1,val);
 }
 
 template<class T>
@@ -885,13 +926,13 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
 template<class T>
 Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
   sparsity_ = sparsity;
-  std::vector<T>::resize(sparsity_.size(),val);
+  data().resize(sparsity_.size(),val);
 }
 
 
 template<class T>
 const T Matrix<T>::getitem(int i) const{
-  return std::vector<T>::at(i);
+  return data().at(i);
 }
 
 template<class T>
@@ -908,7 +949,7 @@ const Matrix<T> Matrix<T>::getitem(const std::vector< std::vector<int> > &II) co
 
 template<class T>
 void Matrix<T>::setitem(int k, const T& el){ 
-  std::vector<T>::at(k) = el;
+  data().at(k) = el;
 }
 
 template<class T>
@@ -918,7 +959,7 @@ void Matrix<T>::setZero(){
 
 template<class T>
 void Matrix<T>::setAll(const T& val){
-  std::fill(std::vector<T>::begin(),std::vector<T>::end(),val);
+  std::fill(begin(),end(),val);
 }
 
 template<class T>
@@ -1195,6 +1236,16 @@ void Matrix<T>::set(const std::vector<T>& val, Sparsity sp){
 template<class T>
 void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
   getArray(&val[0],val.size(),sp);
+}
+
+template<class T>
+void Matrix<T>::set(const Matrix<T>& val, Sparsity sp){
+  set(val.data(),sp);
+}
+
+template<class T>
+void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
+  get(val.data(),sp);
 }
 
 template<class T>

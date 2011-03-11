@@ -723,7 +723,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
       
       // Copy the function arguments to the work vector
       for(int ind=0; ind<input_.size(); ++ind){
-        const vector<double> &seed = fwdSeed(ind,dir);
+        const vector<double> &seed = fwdSeed(ind,dir).data();
         for(int i=0; i<input_ind[ind].size(); ++i){
           work[1][input_ind[ind][i]] = seed[i];
         }
@@ -738,7 +738,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
     
       // Get the results
       for(int ind=0; ind<output_.size(); ++ind){
-        vector<double> &sens = fwdSens(ind,dir);
+        vector<double> &sens = fwdSens(ind,dir).data();
         for(int i=0; i<output_ind[ind].size(); ++i){
           sens[i] = work[1][output_ind[ind][i]];
         }
@@ -754,7 +754,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
     // Pass the output seeds
     for(int ind=0; ind<output_.size(); ++ind){
-      const vector<double> &aseed = adjSeed(ind,dir);
+      const vector<double> &aseed = adjSeed(ind,dir).data();
       for(int i=0; i<output_ind[ind].size(); ++i){
         work[1][output_ind[ind][i]] = aseed[i];
       }
@@ -774,7 +774,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
   // Collect the input seeds
   for(int ind=0; ind<input_.size(); ++ind){
-    vector<double> &asens = adjSens(ind,dir);
+    vector<double> &asens = adjSens(ind,dir).data();
     for(int i=0; i<input_ind[ind].size(); ++i){
       asens[i] = work[1][input_ind[ind][i]];
     }
