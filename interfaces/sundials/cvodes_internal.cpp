@@ -142,8 +142,8 @@ void CVodesInternal::init(){
   if(!linsol_.isNull()) linsol_.init();
 
   // Get the number of forward and adjoint directions
-  nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
-  nadir_f_ = f_.getOption("number_of_adj_dir").toInt();
+  nfdir_f_ = f_.getOption("number_of_fwd_dir");
+  nadir_f_ = f_.getOption("number_of_adj_dir");
   nfdir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_fwd_dir").toInt();
   nadir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_adj_dir").toInt();
 
@@ -223,7 +223,7 @@ void CVodesInternal::init(){
     else                                           throw CasadiException("Unknown preconditioning type");
 
     // Max dimension of the Krylov space
-    int maxl = getOption("max_krylov").toInt();
+    int maxl = getOption("max_krylov");
 
     // Attach the sparse solver  
     if(getOption("iterative_solver")=="gmres"){
@@ -305,7 +305,7 @@ void CVodesInternal::init(){
       }
       
     // Calculate all forward sensitivity right hand sides at once?
-    bool all_at_once = getOption("fsens_all_at_once").toInt();
+    bool all_at_once = getOption("fsens_all_at_once");
       
     // Get the sensitivity method
     if(getOption("sensitivity_method")=="simultaneous") ism_ = CV_SIMULTANEOUS;
@@ -347,7 +347,7 @@ void CVodesInternal::init(){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensSStolerances",flag);
     
     // Set optional inputs
-    int errconS = getOption("fsens_err_con").toInt();
+    int errconS = getOption("fsens_err_con");
     flag = CVodeSetSensErrCon(mem_, errconS);
     if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensErrCon",flag);
     
@@ -382,7 +382,7 @@ void CVodesInternal::init(){
   
   if(nadir_>0){
     // Get the number of steos per checkpoint
-    int Nd = getOption("steps_per_checkpoint").toInt();
+    int Nd = getOption("steps_per_checkpoint");
 
     // Get the interpolation type
     int interpType;
@@ -444,7 +444,7 @@ void CVodesInternal::initAdj(){
       else                                            throw CasadiException("Unknown preconditioning type for backward problem");
 
       // Attach the sparse solver  
-      int maxl = getOption("asens_max_krylov").toInt();
+      int maxl = getOption("asens_max_krylov");
       if(getOption("asens_iterative_solver")=="gmres"){
         flag = CVSpgmrB(mem_, whichB_[dir], pretype, maxl);
         if(flag!=CV_SUCCESS) cvodes_error("CVSpgmrB",flag);      
@@ -556,7 +556,7 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
 
 void CVodesInternal::integrate(double t_out){
   int flag;
-  
+    
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
@@ -581,7 +581,7 @@ void CVodesInternal::integrate(double t_out){
   if(nq_>0){
     double tret;
     flag = CVodeGetQuad(mem_, &tret, yQ_);
-    if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad",flag);    
+    if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad",flag);
   }
   
   if(fsens_order_>0){
@@ -631,7 +631,13 @@ void CVodesInternal::integrateAdj(double t_out){
 
     flag = CVodeGetQuadB(mem_, whichB_[dir], &tret, yQB_[dir]);
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
-        
+   
+    // Quadrature sensitivities are trivial
+    if(nq_>0){
+      copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
+           adjSeed(INTEGRATOR_XF,dir).end(),
+           adjSens(INTEGRATOR_X0,dir).begin()+ny_);
+    }
   }
 }
 

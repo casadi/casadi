@@ -333,13 +333,20 @@ void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
   // Add components
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
-
+#ifdef WITH_TIMEDVARIABLE
+    SX v = readExpr_new(var);
+    ocp_.mterm.push_back(v);
+#else // WITH_TIMEDVARIABLE
+    casadi_warning("Using old-style handling of timed variables, to activate the new style, set option WITH_TIMEDVARIABLE to YES. Support of the old-style will cease in the next release");
     if(var.checkName("exp:TimedVariable")){
       SX v = readExpr_new(var[0]);
       SX tp = readExpr_new(var["exp:Instant"]);
       ocp_.mterm.push_back(v);
-      ocp_.mtp.push_back(tp->getValue());  // always a constant???
+      ocp_.mtp.push_back(tp->getValue());
+    } else {
+      throw CasadiException("Not a timed variable, switch to new style and reformulate the problem.");
     }
+#endif // WITH_TIMEDVARIABLE
   }
 }
 

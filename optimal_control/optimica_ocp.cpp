@@ -86,8 +86,13 @@ void OCP::print(ostream &stream) const{
 
   // Mayer terms
   stream << "Mayer objective terms" << endl;
+  #ifdef WITH_TIMEDVARIABLE
+  for(int i=0; i<mterm.size(); ++i)
+    stream << mterm[i] << endl;
+  #else // WITH_TIMEDVARIABLE
   for(int i=0; i<mterm.size(); ++i)
     stream << mterm[i] << " at time == " << mtp[i] << endl;
+  #endif // WITH_TIMEDVARIABLE
   stream << endl;
   
   // Lagrange terms

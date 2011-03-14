@@ -9,6 +9,7 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_SUNDIALS "Compile the Sundials interface" ON)
 option(WITH_JIT "Enable just-in-time compilation" OFF)
 option(WITH_DOC "Enable documentation generation" OFF)
+option(WITH_TIMEDVARIABLE "With timed variable in FMI parser" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)

@@ -49,7 +49,7 @@ const bool implicit_integrator = true;
 const bool plain_c = false;
 
 // test adjoint sensitivities
-const bool with_asens = false;
+const bool with_asens = true;
 
 // use exact jacobian
 const bool exact_jacobian = plain_c ? false : true;

@@ -127,6 +127,11 @@ void KinsolInternal::init(){
   if(mem_) KINFree(&mem_);
   mem_ = KINCreate();
   
+  // KINSOL bugfix
+  KINMem kin_mem = KINMem(mem_);
+  kin_mem->kin_inexact_ls = FALSE;
+  
+  
   // Set optional inputs
   flag = KINSetUserData(mem_, this);
   casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");

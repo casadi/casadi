@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.0)
 
+if(WITH_TIMEDVARIABLE)
+add_definitions(-DWITH_TIMEDVARIABLE)
+endif(WITH_TIMEDVARIABLE)
+
 SET(OPTIMAL_CONTROL
   optimica_ocp.hpp          optimica_ocp.cpp
   ocp_variables.hpp         ocp_variables.cpp

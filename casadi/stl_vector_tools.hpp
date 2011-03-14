@@ -112,9 +112,9 @@ namespace CasADi{
     } else {
       // Print elements, python style
       stream << "[";
-      for(unsigned int i=0; i<v.size()-1; ++i)
-        stream << v[i] << ",";
-      if(!v.empty()) stream << v.back();
+      stream << v.front();
+      for(unsigned int i=1; i<v.size(); ++i)
+        stream << "," << v[i];
       stream << "]";
     }
   }

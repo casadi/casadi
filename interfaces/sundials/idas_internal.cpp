@@ -638,12 +638,12 @@ int IdasInternal::jtimes_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr
   } catch(exception& e){
     cerr << "jtimes failed: " << e.what() << endl;;
     return 1;
-  }  
+  }
 }
 
 void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, const double *resval, N_Vector *yS, N_Vector* ypS, N_Vector *resvalS, double *tmp1, double *tmp2, double *tmp3){
   casadi_assert(Ns==nfdir_);
-
+  
   // Record the current cpu time
   time1 = clock();
   
@@ -939,6 +939,13 @@ void IdasInternal::integrateAdj(double t_out){
 
     flag = IDAGetQuadB(mem_, whichB_[dir], &tret, yBB_[dir]);
     if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
+    
+    // Quadrature sensitivities are trivial
+    if(nq_>0){
+      copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
+           adjSeed(INTEGRATOR_XF,dir).end(),
+           adjSens(INTEGRATOR_X0,dir).begin()+ny_);
+    }
   }
   
   // Save the adjoint sensitivities
@@ -1180,9 +1187,13 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
     
     // Copy to result
     for(int i=0; i<np_; ++i){
-      rhsvalBQ[i] -= qres[i];
+      rhsvalBQ[i] += qres[i];
     }
   }
+  
+  // Negate as we are integrating backwards
+  for(int i=0; i<np_; ++i)
+    rhsvalBQ[i] *= -1;
 }
 
 int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N_Vector ypB, N_Vector rhsvalBQ, void *user_dataB){
