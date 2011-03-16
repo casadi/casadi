@@ -55,7 +55,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
       s.push(itc->get());
 
   // Order the nodes in the order of dependencies using a depth-first topological sorting
-  vector<BinarySXNode*> algnodes;   // All the binary nodes in the order of evaluation
+  vector<SXNode*> algnodes;   // All the binary nodes in the order of evaluation
   sort_depth_first(s,algnodes);
 
   // Resort the nodes in a more cache friendly order (Kahn 1962)
@@ -63,9 +63,9 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
 
   // Find constants and symbolic variables
   vector<SXNode*> cnodes, snodes;
-  for(vector<BinarySXNode*>::iterator it = algnodes.begin(); it != algnodes.end(); ++it){
+  for(vector<SXNode*>::iterator it = algnodes.begin(); it != algnodes.end(); ++it){
     for(int c=0; c<2; ++c){
-      SXNode* child = (*it)->child[c].get();
+      SXNode* child = (*it)->dep(c).get();
       if(!child->isBinary() && child->temp==0){
 	if(child->isConstant())	  cnodes.push_back(child);
 	else                      snodes.push_back(child);
@@ -143,7 +143,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   stack<int> unused;
 
   // Loop over the algorithm elements in reverse order
-  for(vector<BinarySXNode*>::const_reverse_iterator it=algnodes.rbegin(); it!=algnodes.rend(); ++it){
+  for(vector<SXNode*>::const_reverse_iterator it=algnodes.rbegin(); it!=algnodes.rend(); ++it){
 
     // The place of the current element is now unused (i.e. not yet used)
     unused.push(place[(*it)->temp]);
@@ -170,7 +170,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
 #if 0
 	    cout << "added = " << child->temp << " to place " << worksize-1 << ". ";
 	    assert(child->isBinary());
-	    BinarySXNode * bnode = (BinarySXNode *)child;
+	    SXNode * bnode = (SXNode *)child;
 	    cout << "op = " << bnode->op << " ";
 	    print_c[bnode->op](cout,"x","y");
 	    cout << " ch[0] = " << bnode->child[0]->temp << ". ";
@@ -198,17 +198,17 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(int i=0; i<algorithm.size(); ++i){
 
     // Locate the element
-    BinarySXNode* bnode = algnodes[i];
+    SXNode* bnode = algnodes[i];
 
     // Save the node index
     algorithm[i].ind = place[bnode->temp];
     
     // Save the indices of the children
-    algorithm[i].ch[0] = place[bnode->child[0].get()->temp];
-    algorithm[i].ch[1] = place[bnode->child[1].get()->temp];
+    algorithm[i].ch[0] = place[bnode->dep(0).get()->temp];
+    algorithm[i].ch[1] = place[bnode->dep(1).get()->temp];
 
     // Operation
-    algorithm[i].op = bnode->op;
+    algorithm[i].op = bnode->getOp();
   }
 
   // Indices corresponding to the inputs
@@ -266,7 +266,7 @@ SXFunctionInternal::~SXFunctionInternal(){
 }
 
 
-void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<BinarySXNode*>& algnodes){
+void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<SXNode*>& algnodes){
 
     while(!s.empty()){
       // Get the topmost element
@@ -274,26 +274,20 @@ void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<BinarySXNode
       
       // If the last element on the stack has not yet been added
       if (!t->temp){
-        for(int i=0; i<t->ndep(); ++i){
-          
-        }
-        
         
         if(t->isBinary()){
-          // If the element is a binary node
-          BinarySXNode* bnode = static_cast<BinarySXNode*>(t);
-
-	  if(bnode->child[0]->isBinary() && bnode->child[0].get()->temp == 0) {
+          
+	  if(t->dep(0)->isBinary() && t->dep(0).get()->temp == 0) {
             // if the first child has not yet been added
-            s.push(bnode->child[0].get());
+            s.push(t->dep(0).get());
 
-          } else if(bnode->child[1]->isBinary() && bnode->child[1].get()->temp == 0) {
+          } else if(t->dep(1)->isBinary() && t->dep(1).get()->temp == 0) {
             // if the second child has not yet been added
-            s.push(bnode->child[1].get());
+            s.push(t->dep(1).get());
 
           } else {    // if both children have already been added
 	    // Add to algorithm
-	    algnodes.push_back(bnode);
+	    algnodes.push_back(t);
 
 	    // Mark the node as found
 	    t->temp = 1;
@@ -314,12 +308,12 @@ void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<BinarySXNode
     }
 
   // Reset the node counters
-  for(vector<BinarySXNode*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
+  for(vector<SXNode*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
     (*it)->temp = 0;
   }
 }
 
-void SXFunctionInternal::resort_bredth_first(vector<BinarySXNode*>& algnodes){
+void SXFunctionInternal::resort_bredth_first(vector<SXNode*>& algnodes){
 
   // We shall assign a "level" to each element of the algorithm. A node which does not depend on other binary nodes are assigned level 0 and for nodes that depend on other nodes of the algorithm, the level will be the maximum level of any of the children plus 1. Note that all nodes of a level can be evaluated in parallel. The level will be saved in the temporary variable
 
@@ -327,11 +321,11 @@ void SXFunctionInternal::resort_bredth_first(vector<BinarySXNode*>& algnodes){
   int nlevels = 0;  
 
   // Get the earliest posible level
-  for(vector<BinarySXNode*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
+  for(vector<SXNode*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
     // maximum level of any of the children
     int maxlevel = -1;
     for(int c=0; c<2; ++c){    // Loop over the children
-      SXNode* child = (*it)->child[c].get();
+      SXNode* child = (*it)->dep(c).get();
       if(child->isBinary() && child->temp > maxlevel)
 	maxlevel = child->temp;
     }
@@ -364,7 +358,7 @@ void SXFunctionInternal::resort_bredth_first(vector<BinarySXNode*>& algnodes){
     newind[i] = runind[algnodes[i]->temp]++;
 
   // Resort the algorithm accordingly and reset the temporary
-  vector<BinarySXNode*> oldalgnodes = algnodes;
+  vector<SXNode*> oldalgnodes = algnodes;
   for(int i=0; i<algnodes.size(); ++i){
     algnodes[newind[i]] = oldalgnodes[i];
     oldalgnodes[i]->temp = 0;
@@ -395,7 +389,7 @@ int ii = 0;
 
     for(int j=lind[i]; j<lind[i+1]; ++j){
 
-  vector<BinarySXNode*>::const_iterator it = algnodes.begin() + j;
+  vector<SXNode*>::const_iterator it = algnodes.begin() + j;
 
 cout << "  "<< ii++ << ": ";
 
@@ -454,7 +448,7 @@ int ii = 0;
 
     for(int j=lind[i]; j<lind[i+1]; ++j){
 
-  vector<BinarySXNode*>::const_iterator it = algnodes.begin() + j;
+  vector<SXNode*>::const_iterator it = algnodes.begin() + j;
 
 cout << "  "<< ii++ << ": ";
 
@@ -502,7 +496,7 @@ cout << "  "<< ii++ << ": ";
 
 }
 
-void SXFunctionInternal::resort_postpone(vector<BinarySXNode*>& algnodes, vector<int>& lind){
+void SXFunctionInternal::resort_postpone(vector<SXNode*>& algnodes, vector<int>& lind){
 
   // Number of levels
   int nlevels = lind.size()-1;
@@ -521,7 +515,7 @@ void SXFunctionInternal::resort_postpone(vector<BinarySXNode*>& algnodes, vector
   vector<int> numref(algnodes.size(),0);
   for(int i=0; i<algnodes.size(); ++i){
     for(int c=0; c<2; ++c){ // for both children
-      SXNode* child = algnodes[i]->child[c].get();
+      SXNode* child = algnodes[i]->dep(c).get();
       if(child->isBinary())
 	numref[child->temp]++;
     }
@@ -593,7 +587,7 @@ void SXFunctionInternal::resort_postpone(vector<BinarySXNode*>& algnodes, vector
       // for both children
       for(int c=0; c<2; ++c){
 
-	SXNode* child = algnodes[el]->child[c].get();
+	SXNode* child = algnodes[el]->dep(c).get();
 
 
 // 	cout << "child " << c << " (" << child->temp << ")  ";
@@ -643,7 +637,7 @@ void SXFunctionInternal::resort_postpone(vector<BinarySXNode*>& algnodes, vector
     newind[i] = runind[level[algnodes[i]->temp]]++;
 
   // Resort the algorithm and reset the temporary
-  vector<BinarySXNode*> oldalgnodes = algnodes;
+  vector<SXNode*> oldalgnodes = algnodes;
   for(int i=0; i<algnodes.size(); ++i){
     algnodes[newind[i]] = oldalgnodes[i];
     oldalgnodes[i]->temp = 0;
@@ -943,7 +937,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
         jac_row[j] = g[input_ind.at(iind)[j]];
 
    // Loop over rows
-   vector<BinarySXNode*> deps;
+   vector<SXNode*> deps;
    for(int i=0; i<jac_row.size(); ++i){
       // Get dependent nodes
       stack<SXNode*> s;
@@ -953,7 +947,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
       
       // Add the dependent outputs to a new stack
       stack<SXNode*> s2;
-      for(vector<BinarySXNode*>::const_iterator it=deps.begin(); it!=deps.end(); ++it){
+      for(vector<SXNode*>::const_iterator it=deps.begin(); it!=deps.end(); ++it){
         for(int c=0; c<2; ++c){
           int ind = (*it)->child[c]->temp2-1;
           s2.push(outputv[oind].comp[ind].get());
@@ -965,7 +959,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
       sort_depth_first(s2,deps);*/
  
       // Print
-/*      for(vector<BinarySXNode*>::const_iterator it=deps.begin(); it!=deps.end(); ++it)
+/*      for(vector<SXNode*>::const_iterator it=deps.begin(); it!=deps.end(); ++it)
         cout << SX(*it) << ",";
       cout << endl;*/
      
@@ -998,7 +992,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
     bdir[i]->temp = 1;
 
   // Loop over rows
-   vector<BinarySXNode*> deps;
+   vector<SXNode*> deps;
    vector<SXMatrix> bdir_i(jac_row.size());
    for(int i=0; i<jac_row.size(); ++i){
       // Get dependent nodes
@@ -1007,7 +1001,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
       deps.clear();
       sort_depth_first(s,deps);
       
-      for(vector<BinarySXNode*>::iterator ii = deps.begin(); ii!=deps.end(); ++ii){
+      for(vector<SXNode*>::iterator ii = deps.begin(); ii!=deps.end(); ++ii){
         for(int c=0; c<2; ++c)
           if((*ii)->child[c]->temp>0){
             bdir_i[i] << (*ii)->child[c];

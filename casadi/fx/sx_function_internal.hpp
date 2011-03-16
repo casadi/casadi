@@ -126,13 +126,13 @@ class SXFunctionInternal : public FXInternal{
   void generateCode(const std::string& filename) const;
   
 /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
-  static void sort_depth_first(std::stack<SXNode*>& s, std::vector<BinarySXNode*>& algnodes);
+  static void sort_depth_first(std::stack<SXNode*>& s, std::vector<SXNode*>& algnodes);
 
 /** \brief  Topological (re)sorting of the nodes based on Bredth-First Search (BFS) (Kahn 1962) */
-  static void resort_bredth_first(std::vector<BinarySXNode*>& algnodes);
+  static void resort_bredth_first(std::vector<SXNode*>& algnodes);
 
 /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every calculation as much as possible, as long as it does not influence a dependent node */
-  static void resort_postpone(std::vector<BinarySXNode*>& algnodes, std::vector<int>& lind);
+  static void resort_postpone(std::vector<SXNode*>& algnodes, std::vector<int>& lind);
   
 /** \brief  Inputs of the function (needed for symbolic calculations) */
   std::vector<SXMatrix> inputv;
