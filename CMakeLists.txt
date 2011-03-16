@@ -70,7 +70,7 @@ add_custom_target(python DEPENDS _casadi) # the python interface is created with
 add_custom_target(octave DEPENDS casadi_octave) # the octave interface is created with the command "make octave"
 endif(SWIG_FOUND)
 
-add_subdirectory(tutorials EXCLUDE_FROM_ALL)
+add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
 add_custom_target(tutor)
 
 if(WITH_DOC)
