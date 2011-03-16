@@ -75,7 +75,7 @@ add_custom_target(tutor)
 
 if(WITH_DOC)
 set(DOXYFILE_LATEX "NO")
-set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
 set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
 include(UseDoxygen OPTIONAL)
 endif(WITH_DOC)

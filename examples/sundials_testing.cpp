@@ -299,6 +299,7 @@ int main(){
   integrator.setOption("exact_jacobian",exact_jacobian);
   integrator.setOption("finite_difference_fsens",finite_difference_fsens);
   integrator.setOption("max_num_steps",100000);
+//  integrator.setOption("max_multistep_order",4);
 
   // Initialize the integrator
   integrator.init();
@@ -355,7 +356,7 @@ int main(){
     x0_seed[1] = 1;
     integrator.setFwdSeed(x0_seed,INTEGRATOR_X0);
   }
-  
+    
   // Reset parameters
   integrator.setInput(u_init,INTEGRATOR_P);
   
@@ -377,10 +378,9 @@ int main(){
   } else {
     // evaluate with only forward sensitivities
     integrator.evaluate(1,0);
-    return 0;
   }
     
-  vector<double> fsens = integrator.fwdSens().data();
+  Matrix<double> fsens = integrator.fwdSens();
   cout << "forward sensitivities           " << fsens << endl;
 
   if(with_asens){

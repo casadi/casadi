@@ -137,10 +137,10 @@ void IdasInternal::init(){
   }
 
   // Get the number of forward and adjoint directions
-  nfdir_f_ = f_.getOption("number_of_fwd_dir").toInt();
-  nadir_f_ = f_.getOption("number_of_adj_dir").toInt();
-  nfdir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_fwd_dir").toInt();
-  nadir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_adj_dir").toInt();
+  nfdir_f_ = f_.getOption("number_of_fwd_dir");
+  nadir_f_ = f_.getOption("number_of_adj_dir");
+  nfdir_q_ = q_.isNull() ? 0 : int(q_.getOption("number_of_fwd_dir"));
+  nadir_q_ = q_.isNull() ? 0 : int(q_.getOption("number_of_adj_dir"));
 
   // Quick return if already initialized
   if(is_init){
@@ -148,7 +148,7 @@ void IdasInternal::init(){
     return;
   }
 
-  cj_scaling_ = getOption("cj_scaling").toInt();
+  cj_scaling_ = getOption("cj_scaling");
   
   // Sundials return flag
   int flag;
@@ -249,7 +249,7 @@ void IdasInternal::init(){
     }
   } else if(getOption("linear_solver")=="iterative") {
     // Max dimension of the Krylov space
-    int maxl = getOption("max_krylov").toInt();
+    int maxl = getOption("max_krylov");
     
     // Attach an iterative solver
     if(getOption("iterative_solver")=="gmres"){
@@ -372,13 +372,22 @@ void IdasInternal::init(){
       if(flag != IDA_SUCCESS) idas_error("IDASensInit",flag);
     }
 
+    // IDAS bugfix
+    IDAMem IDA_mem = IDAMem(mem_);
+    int max_multistep_order = getOption("max_multistep_order");
+    for(int i=0; i<=max_multistep_order; ++i){
+      for(int iS=0; iS<nfdir_; ++iS){
+        N_VConst(0.0, IDA_mem->ida_phiS[i][iS]);
+      }
+    }
+
     // Vector absolute tolerances
     vector<double> fsens_abstol(nfdir_,fsens_abstol_);
     
     // Set tolerances
     if(hasSetOption("fsens_abstolv")){
       // quick hack
-      vector<double> fsens_abstolv = getOption("fsens_abstolv").toDoubleVector();
+      vector<double> fsens_abstolv = getOption("fsens_abstolv");
       N_Vector nv_abstol = N_VMake_Serial(fsens_abstolv.size(),&fsens_abstolv[0]);
       vector<N_Vector> nv_abstol_all(nfdir_,nv_abstol);
       flag = IDASensSVtolerances(mem_,fsens_reltol_,&nv_abstol_all[0]);
@@ -390,7 +399,7 @@ void IdasInternal::init(){
     }
 
     // Set optional inputs
-    int errconS = getOption("fsens_err_con").toInt();
+    int errconS = getOption("fsens_err_con");
     flag = IDASetSensErrCon(mem_, errconS);
     if(flag != IDA_SUCCESS) idas_error("IDASetSensErrCon",flag);
 
@@ -440,7 +449,7 @@ void IdasInternal::initTaping(){
   int flag;
   
   // Get the number of steos per checkpoint
-  int Nd = getOption("steps_per_checkpoint").toInt();
+  int Nd = getOption("steps_per_checkpoint");
 
   // Get the interpolation type
   int interpType;
@@ -499,7 +508,7 @@ void IdasInternal::initAdj(){
       if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse solver  
-      int maxl = getOption("asens_max_krylov").toInt();
+      int maxl = getOption("asens_max_krylov");
       GenericType is = getOption("asens_iterative_solver");
       if(is=="gmres"){
         flag = IDASpgmrB(mem_, whichB_[dir], maxl);
@@ -753,7 +762,7 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   }
 
   // Correct initial conditions, if necessary
-  int calc_ic = getOption("calc_ic").toInt();
+  int calc_ic = getOption("calc_ic");
   if(calc_ic){
     correctInitialConditions();
   }
@@ -906,7 +915,7 @@ void IdasInternal::resetAdj(){
   }
 
   // Correct initial values for the integration if necessary
-  int calc_icB = getOption("calc_icB").toInt();
+  int calc_icB = getOption("calc_icB");
   if(calc_icB){
     for(int dir=0; dir<nadir_; ++dir){
       flag = IDACalcICB(mem_, whichB_[dir], t0, yzB_[dir], yPB_[dir]);

@@ -32,50 +32,13 @@
 using namespace CasADi;
 using namespace std;
 
-// Define the source code of the function which will be used both for code generation and evaluation
-#define SOURCE_CODE(NAME)                        \
-                                                 \
-void NAME(){                                     \
-  /* This is the hello world program! */         \
-  cout << "hello world!" << endl;                \
-}                                                \
-
-// Create the function
-SOURCE_CODE(hello)
-
-// Convert a macro to a string using the double expansion trick
-#define TOSTRING1(x)  #x
-#define TOSTRING(x)  TOSTRING1(x)
-
-void print_code(const std::string& code){
-  for(string::const_iterator it=code.begin(); it!=code.end(); ++it){
-    cout << *it;
-    
-    // insert line breaks after {, } and ; for readability
-    if(*it=='{' || *it=='}' || *it==';'){
-      cout << endl;
-      
-      // Skip space in the beginning of the next line
-      if(it+1 != code.end() && *(it+1)==' ')
-        it++;
-    }
-  }
-}
-
 int main(){
-  
-  // Run the program
-  hello();
-  
-  // Print the code
-  cout << "The code was : " << endl;
-  print_code(TOSTRING(SOURCE_CODE(hello_modified)));
     
   cout << "program started" << endl;
       
   // Dimensions
   int nu = 200;  // Number of control segments
-  int nj = 1000; // 10000;  // // Number of integration steps per control segment
+  int nj = 200; // Number of integration steps per control segment
 
   // optimization variable
   vector<SX> u = create_symbolic("u",nu); // control
