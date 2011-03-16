@@ -52,7 +52,7 @@ virtual ~SXNode();
 virtual bool isConstant() const; // check if constant
 virtual bool isInteger() const; // check if integer
 virtual bool isSymbolic() const; // check if symbolic
-virtual bool isBinary() const; // check if binary
+virtual bool hasDep() const; // check if binary
 virtual bool isZero() const; // check if zero
 virtual bool isOne() const; // check if one
 virtual bool isMinusOne() const; // check if minus one

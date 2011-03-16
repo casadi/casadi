@@ -53,7 +53,7 @@ virtual ~BinarySXNode();
 
 virtual bool isSmooth() const;
 
-virtual bool isBinary() const{ return true; }
+virtual bool hasDep() const{ return true; }
 
 /** \brief  Number of dependencies */
 virtual int ndep() const{ return 2;}

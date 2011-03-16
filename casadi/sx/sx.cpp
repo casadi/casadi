@@ -105,7 +105,7 @@ SX& operator-=(SX &ex, const SX &el){
 }
 
 SX SX::operator-() const{
-  if(node->isBinary() && node->getOp() == NEG_NODE)
+  if(node->hasDep() && node->getOp() == NEG_NODE)
     return node->dep(0);
   else if(node->isMinusOne())
     return 1;
@@ -286,7 +286,7 @@ bool SX::isSymbolic() const{
 }
 
 bool SX::isBinary() const{
-  return node->isBinary();
+  return node->hasDep();
 }
 
 bool SX::isZero() const{

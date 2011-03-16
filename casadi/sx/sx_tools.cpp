@@ -461,7 +461,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
       f.push_back(to_be_expanded.top());
     } else { // binary node
 
-        casadi_assert(to_be_expanded.top()->isBinary()); // make sure that the node is binary
+        casadi_assert(to_be_expanded.top()->hasDep()); // make sure that the node is binary
 
         // Check if addition, subtracton or multiplication
         BinarySXNode*     binnode = (BinarySXNode*)to_be_expanded.top();

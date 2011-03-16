@@ -89,7 +89,7 @@ bool SXNode::isSymbolic() const{
   return false;
 }
 
-bool SXNode::isBinary() const{
+bool SXNode::hasDep() const{
   return false;
 }
 

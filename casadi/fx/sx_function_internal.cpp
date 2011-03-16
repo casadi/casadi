@@ -66,7 +66,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(vector<SXNode*>::iterator it = algnodes.begin(); it != algnodes.end(); ++it){
     for(int c=0; c<2; ++c){
       SXNode* child = (*it)->dep(c).get();
-      if(!child->isBinary() && child->temp==0){
+      if(!child->hasDep() && child->temp==0){
 	if(child->isConstant())	  cnodes.push_back(child);
 	else                      snodes.push_back(child);
 	child->temp=1;
@@ -92,7 +92,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(vector<SXMatrix>::const_iterator it = outputv.begin(); it != outputv.end(); ++it){
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
       SXNode* node = itc->get();
-      if(!node->isBinary() && node->temp==0){
+      if(!node->hasDep() && node->temp==0){
 	if(node->isConstant())	  cnodes.push_back(node);
 	else                      snodes.push_back(node);
 
@@ -133,7 +133,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   for(vector<SXMatrix>::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
 	SXNode* node = itc->get();
-	if(node->isBinary() && !in_use[node->temp]){
+	if(node->hasDep() && !in_use[node->temp]){
 	  place[node->temp] = worksize++;
 	  in_use[node->temp] = true;
 	}
@@ -169,7 +169,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
 
 #if 0
 	    cout << "added = " << child->temp << " to place " << worksize-1 << ". ";
-	    assert(child->isBinary());
+	    assert(child->hasDep());
 	    SXNode * bnode = (SXNode *)child;
 	    cout << "op = " << bnode->op << " ";
 	    print_c[bnode->op](cout,"x","y");
@@ -275,17 +275,21 @@ void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<SXNode*>& al
       // If the last element on the stack has not yet been added
       if (!t->temp){
         
-        if(t->isBinary()){
+        if(t->hasDep()){
+          // If a dependent node was added to the stack
+          bool added_dep = false;
           
-	  if(t->dep(0)->isBinary() && t->dep(0).get()->temp == 0) {
-            // if the first child has not yet been added
-            s.push(t->dep(0).get());
-
-          } else if(t->dep(1)->isBinary() && t->dep(1).get()->temp == 0) {
-            // if the second child has not yet been added
-            s.push(t->dep(1).get());
-
-          } else {    // if both children have already been added
+          // Add dependent nodes if not already added
+          for(int i=0; i<t->ndep(); ++i){
+            if(t->dep(i)->hasDep() && t->dep(i).get()->temp == 0) {
+              // if the first child has not yet been added
+              s.push(t->dep(i).get());
+              added_dep=true;
+              break;
+            }
+          }
+          
+          if(!added_dep){    // if both children have already been added
 	    // Add to algorithm
 	    algnodes.push_back(t);
 
@@ -294,7 +298,7 @@ void SXFunctionInternal::sort_depth_first(stack<SXNode*>& s, vector<SXNode*>& al
 
 	    // Remove from stack
             s.pop();
-
+            
           }
         } else {  // If the element is a constant or symbolic node
 
@@ -324,9 +328,9 @@ void SXFunctionInternal::resort_bredth_first(vector<SXNode*>& algnodes){
   for(vector<SXNode*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
     // maximum level of any of the children
     int maxlevel = -1;
-    for(int c=0; c<2; ++c){    // Loop over the children
+    for(int c=0; c<(*it)->ndep(); ++c){    // Loop over the children
       SXNode* child = (*it)->dep(c).get();
-      if(child->isBinary() && child->temp > maxlevel)
+      if(child->hasDep() && child->temp > maxlevel)
 	maxlevel = child->temp;
     }
 
@@ -400,9 +404,9 @@ cout << "  "<< ii++ << ": ";
     int i0 = (*it)->child[0].get()->temp;
     int i1 = (*it)->child[1].get()->temp;
 
-    if((*it)->child[0]->isBinary())  s0 << "i_" << i0;
+    if((*it)->child[0]->hasDep())  s0 << "i_" << i0;
     else                             s0 << (*it)->child[0];
-    if((*it)->child[1]->isBinary())  s1 << "i_" << i1;
+    if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
     else                             s1 << (*it)->child[1];
 
     cout << s.str() << " = ";
@@ -459,9 +463,9 @@ cout << "  "<< ii++ << ": ";
     int i0 = (*it)->child[0].get()->temp;
     int i1 = (*it)->child[1].get()->temp;
 
-    if((*it)->child[0]->isBinary())  s0 << "i_" << i0;
+    if((*it)->child[0]->hasDep())  s0 << "i_" << i0;
     else                             s0 << (*it)->child[0];
-    if((*it)->child[1]->isBinary())  s1 << "i_" << i1;
+    if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
     else                             s1 << (*it)->child[1];
 
     cout << s.str() << " = ";
@@ -514,16 +518,12 @@ void SXFunctionInternal::resort_postpone(vector<SXNode*>& algnodes, vector<int>&
   // Count the number of times each node is referenced inside the algorithm
   vector<int> numref(algnodes.size(),0);
   for(int i=0; i<algnodes.size(); ++i){
-    for(int c=0; c<2; ++c){ // for both children
+    for(int c=0; c<algnodes[i]->ndep(); ++c){ // for both children
       SXNode* child = algnodes[i]->dep(c).get();
-      if(child->isBinary())
+      if(child->hasDep())
 	numref[child->temp]++;
     }
   }
-
-//   cout << "numref = " << numref << endl;
-//   cout << "level = " << level << endl;
-
 
   // Stacks of additional nodes at the current and previous level
   stack<int> extra[2];
@@ -531,42 +531,16 @@ void SXFunctionInternal::resort_postpone(vector<SXNode*>& algnodes, vector<int>&
   // Loop over the levels in reverse order
   for(int i=nlevels-1; i>=0; --i){
 
-//     cout << "level " << i << ":" << endl;
-
-
     // The stack for the current level (we are removing elements from this stack)
     stack<int>& extra_this = extra[i%2]; // i odd -> use extra[1]
 
     // The stack for the previous level (we are adding elements to this stack)
     stack<int>& extra_prev = extra[1-i%2]; // i odd -> use extra[0]
 
-
-//   cout << "this stack has " << extra_this.size() << " elements "<< endl;
-
-
-  assert(extra_prev.empty());
-
-
     // Loop over the nodes of the level
     for(int j=lind[i]; j<lind[i+1]; ++j){
       // element to be treated
       int el = j;
-
-
-
-// if(i==6 && algnodes.size()>50){
-// 
-// //  assert(0);
-//   }
-// 
-// if(i==7 && algnodes.size()>50){
-// 
-//   cout << "el = " << el << endl;
-//   cout << "extra_this.size() = " << extra_this.size() << endl;
-//   if(!extra_this.empty())
-//     cout << "extra_this.top() = " << extra_this.top() << endl;
-// 
-// }
 
       // elements in the stack have priority
       if(!extra_this.empty()){
@@ -576,33 +550,17 @@ void SXFunctionInternal::resort_postpone(vector<SXNode*>& algnodes, vector<int>&
 	--j; // redo the loop
       }
 
-
-//   cout << "treating element  " << el << endl;
-// 
-
-
       // Skip the element if belongs to a higher level (i.e. was already treated)
       if(level[el] > i) continue;
 
       // for both children
-      for(int c=0; c<2; ++c){
+      for(int c=0; c<algnodes[el]->ndep(); ++c){
 
 	SXNode* child = algnodes[el]->dep(c).get();
 
-
-// 	cout << "child " << c << " (" << child->temp << ")  ";
-// 	if(child->isBinary())
-// 	  cout << "is binary: " << endl;
-// 	else
-// 	  cout << "is not binary: " << endl;
-
-
-	if(child->isBinary()){
+	if(child->hasDep()){
 	  // Decrease the reference count of the children
 	  numref[child->temp]--;
-
-// 	  cout << "numref is " << numref[child->temp] << endl;
-
 
 	  // If this was the last time the child was referenced ...
 	  // ... and it is not the previous level...
@@ -817,7 +775,7 @@ void SXFunctionInternal::eval(
   // create a vector with the (symbolic) values at each node and save constants and symbolic variables
   vector<SX> work(tree.size());
   for(int i=0; i<tree.size(); ++i)
-    if(!tree[i]->isBinary())
+    if(!tree[i]->hasDep())
       work[i] = SX(tree[i]);
 
   // copy the function arguments
@@ -1176,9 +1134,9 @@ void SXFunctionInternal::print(ostream &stream) const{
 
     int i0 = it->ch[0], i1 = it->ch[1];
 #if 0
-    if(tree[i0]->isBinary())  s0 << "i_" << i0;
+    if(tree[i0]->hasDep())  s0 << "i_" << i0;
     else                      s0 << SX(tree[i0]);
-    if(tree[i1]->isBinary())  s1 << "i_" << i1;
+    if(tree[i1]->hasDep())  s1 << "i_" << i1;
     else                      s1 << SX(tree[i1]);
 #else
     s0 << "i_" << i0;
@@ -1342,7 +1300,7 @@ void SXFunctionInternal::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>&
   if(work_sym.size() != tree.size()){
     work_sym.resize(tree.size());
     for(int i=0; i<tree.size(); ++i)
-      if(!tree[i]->isBinary())
+      if(!tree[i]->hasDep())
         work_sym[i] = SX(tree[i]);
   }
 
