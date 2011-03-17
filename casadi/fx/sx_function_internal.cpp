@@ -419,9 +419,10 @@ void SXFunctionInternal::eval(
   vector<AlgEl>::const_iterator it;
   for(it = algorithm.begin(), i=0; it!=algorithm.end(); ++it, ++i){
      if(replace.empty()){ // nothing needs to be replaced
-        swork[it->ind] = sfcn[it->op](swork[it->ch[0]],swork[it->ch[1]]);
+        symFun[it->op](swork[it->ch[0]],swork[it->ch[1]],swork[it->ind]);
       } else {
-        SX r = sfcn[it->op](swork[it->ch[0]],swork[it->ch[1]]);
+        SX r;
+        symFun[it->op](swork[it->ch[0]],swork[it->ch[1]],r);
         map<int,SX>::const_iterator it2 = replace.find(i); // try to locate the node
         if(it2 != replace.end()){ // replace
           swork[it->ind] = SX(it2->second);
@@ -953,7 +954,7 @@ void SXFunctionInternal::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>&
     // Get the arguments
     SX x = work_sym[it->ch[0]];
     SX y = work_sym[it->ch[1]];
-    work_sym[it->ind] = sfcn[it->op](x,y);
+    symFun[it->op](x,y,work_sym[it->ind]);
   }
 
   // Get the results
