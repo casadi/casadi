@@ -157,6 +157,15 @@ class SXFunctionInternal : public FXInternal{
   template<typename T>
   static std::vector<T(*)(const T&, const T&)> getFun();
   
+  /** \brief  Numerical derivatives */
+  static std::vector<void (*)(const double& x, const double& y, double& f, double* d)> numDer;
+    
+  /** \brief  Symbolic derivatives */
+  static std::vector<void (*)(const SX& x, const SX& y, SX& f, SX* d)> symDer;
+  
+  /** \brief  Get a vector of function derivative pointers to all the built in functions */
+  template<typename T>
+  static std::vector<void (*)(const T& x, const T& y, T& f, T* d)> getDer();
   
 };
 
@@ -544,7 +553,47 @@ std::vector<T(*)(const T&, const T&)> SXFunctionInternal::getFun(){
 }
 
 
+template<typename T>
+std::vector<void (*)(const T& x, const T& y, T& f, T* d)> SXFunctionInternal::getDer(){
+  // Create return object
+  std::vector<void (*)(const T& x, const T& y, T& f, T* d)> ret(NUM_BUILT_IN_OPS,0);
+  
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::der;
+  ret[SUB] = BinaryOperation<SUB>::der;
+  ret[MUL] = BinaryOperation<MUL>::der;
+  ret[DIV] = BinaryOperation<DIV>::der;
+    
+  ret[NEG] = BinaryOperation<NEG>::der;
+  ret[EXP] = BinaryOperation<EXP>::der;
+  ret[LOG] = BinaryOperation<LOG>::der;
+  ret[POW] = BinaryOperation<POW>::der;
 
+  ret[SQRT] = BinaryOperation<SQRT>::der;
+  ret[SIN] = BinaryOperation<SIN>::der;
+  ret[COS] = BinaryOperation<COS>::der;
+  ret[TAN] = BinaryOperation<TAN>::der;
+
+  ret[ASIN] = BinaryOperation<ASIN>::der;
+  ret[ACOS] = BinaryOperation<ACOS>::der;
+  ret[ATAN] = BinaryOperation<ATAN>::der;
+
+  ret[STEP] = BinaryOperation<STEP>::der;
+  ret[FLOOR] = BinaryOperation<FLOOR>::der;
+  ret[CEIL] = BinaryOperation<CEIL>::der;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::der;
+  ret[ERF] = BinaryOperation<ERF>::der;
+  ret[FMIN] = BinaryOperation<FMIN>::der;
+  ret[FMAX] = BinaryOperation<FMAX>::der;
+  
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+}
 
 } // namespace CasADi
 

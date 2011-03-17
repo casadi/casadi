@@ -1015,12 +1015,15 @@ std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintFun(){
   
 }
 
-std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::printFun = getPrintFun();
+std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::printFun = SXFunctionInternal::getPrintFun();
 
-std::vector<double(*)(const double&, const double&)> SXFunctionInternal::numFun = getFun<double>();
+std::vector<double(*)(const double&, const double&)> SXFunctionInternal::numFun = SXFunctionInternal::getFun<double>();
 
-std::vector<SX(*)(const SX&, const SX&)> SXFunctionInternal::symFun = getFun<SX>();
+std::vector<SX(*)(const SX&, const SX&)> SXFunctionInternal::symFun = SXFunctionInternal::getFun<SX>();
 
+std::vector<void (*)(const double& x, const double& y, double& f, double* d)> SXFunctionInternal::numDer = SXFunctionInternal::getDer<double>();
+    
+std::vector<void (*)(const SX& x, const SX& y, SX& f, SX* d)> symDer = SXFunctionInternal::getDer<SX>();
 
 } // namespace CasADi
 

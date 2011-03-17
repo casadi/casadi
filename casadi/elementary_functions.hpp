@@ -52,7 +52,7 @@ class BinaryOperation{
     template<typename T> static T fcn(const T& x, const T& y){ return UnaryOperation<I>::fcn(x);}
     
     /// Partial derivatives - binary function
-    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ UnaryOperation<I>::fcn(x,f,d); d[1]=0; }
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ UnaryOperation<I>::der(x,f,d); d[1]=0; }
 };
 
 /// Enum for quick access to any node
