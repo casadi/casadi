@@ -68,6 +68,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       double tmp[2];  // temporary variable to hold value and partial derivatives of the function
       for(int i=0; i<n; ++i){
         // Evaluate and get partial derivatives
+        casadi_math<double>::fun[op](input[0][i],input[1][i],output[i]);
         casadi_math<double>::der[op](input[0][i],input[1][i],output[i],tmp);
         
         // Propagate forward seeds
@@ -106,6 +107,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         double y = isy * input[0][iy];
 
         // Evaluate and get partial derivatives
+        casadi_math<double>::fun[op](x,y,output[i]);
         casadi_math<double>::der[op](x,y,output[i],tmp);
         
         // Propagate forward seeds

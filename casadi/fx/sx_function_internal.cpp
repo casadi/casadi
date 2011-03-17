@@ -294,6 +294,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
       // Get the arguments
       double x = work[it->ch[0]];
       double y = work[it->ch[1]];
+      casadi_math<double>::fun[it->op](x,y,work[it->ind]);
       casadi_math<double>::der[it->op](x,y,work[it->ind],it1->d);
     }
   }
@@ -476,13 +477,12 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
   der1.reserve(algorithm.size());
   der2.reserve(algorithm.size());
   SX tmp[2];
-  SX tmp_f;
   for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
       SX f = SX(tree[it->ind]);
       SX ch[2];
       ch[0] = SX(tree[it->ch[0]]);
       ch[1] = SX(tree[it->ch[1]]);
-      casadi_math<SX>::der[it->op](ch[0],ch[1],tmp_f,tmp);
+      casadi_math<SX>::der[it->op](ch[0],ch[1],f,tmp);
       if(!ch[0]->isConstant())  der1.push_back(tmp[0]);
       else                    	der1.push_back(0);
 
