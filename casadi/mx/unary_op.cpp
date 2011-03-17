@@ -51,20 +51,19 @@ void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
     
   } else {
     // Sensitivities
-    double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+    double tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      nfun1[op](input[0][0],nan,tmp);
-      output[i] = tmp[0];
+      SXFunctionInternal::numDer[op](input[0][0],nan,output[i],tmp);
       
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-        fwdSens[d][i] = tmp[1]*fwdSeed[0][d][0];
+        fwdSens[d][i] = tmp[0]*fwdSeed[0][d][0];
       }
 
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-        adjSens[0][d][0] += adjSeed[d][i]*tmp[1];
+        adjSens[0][d][0] += adjSeed[d][i]*tmp[0];
       }
     }
   }

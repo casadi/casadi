@@ -66,21 +66,20 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       
     } else {
       // Sensitivities
-      double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+      double tmp[2];  // temporary variable to hold value and partial derivatives of the function
       for(int i=0; i<n; ++i){
         // Evaluate and get partial derivatives
-        nfun1[op](input[0][i],input[1][i],tmp);
-        output[i] = tmp[0];
+        SXFunctionInternal::numDer[op](input[0][i],input[1][i],output[i],tmp);
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = tmp[1]*fwdSeed[0][d][i] + tmp[2]*fwdSeed[1][d][i];
+          fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i] + tmp[1]*fwdSeed[1][d][i];
         }
 
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          adjSens[0][d][i] += adjSeed[d][i]*tmp[1];
-          adjSens[1][d][i] += adjSeed[d][i]*tmp[2];
+          adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
+          adjSens[1][d][i] += adjSeed[d][i]*tmp[1];
         }
       }
     }
@@ -98,7 +97,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       
     } else {
       // Sensitivities
-      double tmp[3];  // temporary variable to hold value and partial derivatives of the function
+      double tmp[2];  // temporary variable to hold value and partial derivatives of the function
       
       for(int i=0; i<n; ++i){
         bool isx = mapping_[i]<=0;
@@ -108,18 +107,17 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         double y = isy * input[0][iy];
 
         // Evaluate and get partial derivatives
-        nfun1[op](x,y,tmp);
-        output[i] = tmp[0];
+        SXFunctionInternal::numDer[op](x,y,output[i],tmp);
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = isx*tmp[1]*fwdSeed[0][d][ix] + isy*tmp[2]*fwdSeed[1][d][iy];
+          fwdSens[d][i] = isx*tmp[0]*fwdSeed[0][d][ix] + isy*tmp[1]*fwdSeed[1][d][iy];
         }
 
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          adjSens[0][d][ix] += isx*adjSeed[d][i]*tmp[1];
-          adjSens[1][d][iy] += isy*adjSeed[d][i]*tmp[2];
+          adjSens[0][d][ix] += isx*adjSeed[d][i]*tmp[0];
+          adjSens[1][d][iy] += isy*adjSeed[d][i]*tmp[1];
         }
         
         // Increase argument indices

@@ -27,6 +27,7 @@
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
+#include "../casadi_operators.hpp"
 #include "element.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"

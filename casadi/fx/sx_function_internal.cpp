@@ -288,18 +288,13 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
     }
   } else {
     // with taping
-    double tmp[3];
     vector<AlgEl>::iterator it = algorithm.begin();
     vector<AlgElData<1> >::iterator it1 = pder1.begin();
     for(; it<algorithm.end(); ++it, ++it1){
       // Get the arguments
       double x = work[it->ch[0]];
       double y = work[it->ch[1]];
-      nfun1[it->op](x,y,tmp);
-
-      work[it->ind] = tmp[0];
-      it1->d[0] = tmp[1];
-      it1->d[1] = tmp[2];
+      numDer[it->op](x,y,work[it->ind],it1->d);
     }
   }
   

@@ -4,6 +4,7 @@ project(casadi)
 SET(CASADI_SRCS
   # MISC
   casadi_limits.hpp
+  casadi_operators.hpp
   casadi_exception.hpp
   printable_object.hpp        printable_object.cpp      # Base class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
