@@ -228,8 +228,6 @@ T __div__(t b){  return *$self / b;} \
 T __rdiv__(t b){ return b / *$self;} \
 T __pow__(t b){  return std::pow(*$self,b);} \
 T __rpow__(t b){ return std::pow(b,*$self);} \
-T fmin(t b){     return std::fmin(*$self,b);} \
-T fmax(t b){     return std::fmax(*$self,b);}
 
 // Binary operations with all right hand sides
 binops(SX, const SX&)
