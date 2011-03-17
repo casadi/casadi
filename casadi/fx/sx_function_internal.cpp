@@ -475,15 +475,18 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
   vector<SX> der1, der2;
   der1.reserve(algorithm.size());
   der2.reserve(algorithm.size());
+  SX tmp[2];
+  SX tmp_f;
   for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
       SX f = SX(tree[it->ind]);
       SX ch[2];
       ch[0] = SX(tree[it->ch[0]]);
       ch[1] = SX(tree[it->ch[1]]);
-      if(!ch[0]->isConstant())  der1.push_back(sder1[it->op](f,ch[0],ch[1]));
+      symDer[it->op](ch[0],ch[1],tmp_f,tmp);
+      if(!ch[0]->isConstant())  der1.push_back(tmp[0]);
       else                    	der1.push_back(0);
 
-      if(!ch[1]->isConstant())  der2.push_back(sder2[it->op](f,ch[0],ch[1]));
+      if(!ch[1]->isConstant())  der2.push_back(tmp[1]);
       else                    	der2.push_back(0);
   }
 
@@ -1019,7 +1022,7 @@ std::vector<void (*)(const SX&, const SX&, SX&)> SXFunctionInternal::symFun = SX
 
 std::vector<void (*)(const double& x, const double& y, double& f, double* d)> SXFunctionInternal::numDer = SXFunctionInternal::getDer<double>();
     
-std::vector<void (*)(const SX& x, const SX& y, SX& f, SX* d)> symDer = SXFunctionInternal::getDer<SX>();
+std::vector<void (*)(const SX& x, const SX& y, SX& f, SX* d)> SXFunctionInternal::symDer = SXFunctionInternal::getDer<SX>();
 
 } // namespace CasADi
 
