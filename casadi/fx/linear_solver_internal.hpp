@@ -68,8 +68,8 @@ class LinearSolverInternal : public FXInternal{
     int nrow() const{ return sparsity_.size1();}
     int ncol() const{ return sparsity_.size2();}
     int nnz() const{ return sparsity_.size();}
-    const vector<int>& col() const{ return sparsity_.col();}
-    const vector<int>& rowind() const{ return sparsity_.rowind();}
+    const std::vector<int>& col() const{ return sparsity_.col();}
+    const std::vector<int>& rowind() const{ return sparsity_.rowind();}
     
 };
 

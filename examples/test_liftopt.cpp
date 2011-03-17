@@ -28,6 +28,7 @@
 
 using namespace CasADi;
 using namespace CasADi::Interfaces;
+using namespace std;
 
 int main(){
   const int timeSteps = 50;

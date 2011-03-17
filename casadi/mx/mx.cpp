@@ -36,6 +36,7 @@
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 
+using namespace std;
 namespace CasADi{
 
 MX::~MX(){

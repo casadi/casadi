@@ -22,7 +22,7 @@
 
 #include "sx_tools.hpp"
 #include "../fx/sx_function_internal.hpp"
-#include "binary_functions.hpp"
+#include "../elementary_functions.hpp"
 #include "../matrix/matrix_tools.hpp"
 using namespace std;
 

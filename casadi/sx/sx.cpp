@@ -25,6 +25,7 @@
 #include <cassert>
 #include "../pre_c99_support.hpp"
 
+using namespace std;
 namespace CasADi{
 
 

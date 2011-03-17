@@ -26,6 +26,7 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 
+using namespace std;
 namespace CasADi{
 
 Simulator::Simulator(){

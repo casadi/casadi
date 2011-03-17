@@ -201,7 +201,7 @@ class IdasInternal : public IntegratorInternal{
   int ism_;
   
   // Calculate the error message map
-  static map<int,std::string> calc_flagmap();
+  static std::map<int,std::string> calc_flagmap();
   
   // Error message map
   static std::map<int,std::string> flagmap;

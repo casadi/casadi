@@ -56,7 +56,7 @@ class MatrixMatrixOp : public MXNode{
     bool same_sparsity_;
 
     /// Which element belong to which 
-    vector<int> mapping_;
+    std::vector<int> mapping_;
 
 };
 

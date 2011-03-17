@@ -27,6 +27,7 @@
 #include "../casadi/mx/mx_tools.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 
+using namespace std;
 namespace CasADi{
   namespace OptimalControl{
     

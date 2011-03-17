@@ -24,6 +24,7 @@
 #include "integrator_internal.hpp"
 #include <cassert>
 
+using namespace std;
 namespace CasADi{
 
 Integrator::Integrator(){

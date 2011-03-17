@@ -29,6 +29,7 @@ Joel Andersson, K.U. Leuven, 2010
 #include "interfaces/superlu/superlu.hpp"
 
 using namespace CasADi;
+using namespace std;
 
 main(int argc, char *argv[])
 {

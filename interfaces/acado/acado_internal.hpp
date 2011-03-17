@@ -110,8 +110,8 @@ class AcadoInternal : public FXInternal{
     int getRef(void *);
     void returnRef(int ref);
     
-    vector<void*> backends_;
-    stack<int> free_backends_;
+    std::vector<void*> backends_;
+    std::stack<int> free_backends_;
     
     
     

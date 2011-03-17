@@ -31,6 +31,7 @@ Joel Andersson, K.U. Leuven, 2010
 
 using namespace CasADi;
 using namespace CasADi::Interfaces;
+using namespace std;
 
 main(int argc, char *argv[])
 {

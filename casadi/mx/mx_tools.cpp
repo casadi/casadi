@@ -29,6 +29,8 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
 
+using namespace std;
+
 namespace CasADi{
 
 MX vertcat(const vector<MX>& comp){
