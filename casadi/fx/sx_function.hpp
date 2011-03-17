@@ -23,9 +23,7 @@
 #ifndef SX_FUNCTION_HPP
 #define SX_FUNCTION_HPP
 
-#include "fx.hpp"
-#include "../sx/sx.hpp"
-#include <vector>
+#include "x_function.hpp"
 
 namespace CasADi{
 
@@ -44,7 +42,7 @@ class SXFunctionInternal;
 \date 2010
 */
 
-class SXFunction : public FX{
+class SXFunction : public XFunction{
 
 public:
   /// Default constructor

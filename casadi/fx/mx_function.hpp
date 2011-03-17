@@ -24,12 +24,10 @@
 #define MX_FUNCTION_HPP
 
 #include <set>
-#include <map>
-#include <vector>
 #include <iostream>
 
 #include "../mx/mx.hpp"
-#include "fx.hpp"
+#include "x_function.hpp"
 
 namespace CasADi{
 
@@ -72,7 +70,7 @@ class MXFunctionInternal;
   \author Joel Andersson 
   \date 2010
 */
-class MXFunction : public FX{
+class MXFunction : public XFunction{
 public:
 
   /** \brief  Ddefault constructor */

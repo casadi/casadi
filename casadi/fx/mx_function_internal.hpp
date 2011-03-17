@@ -29,7 +29,7 @@
 #include <iostream>
 
 #include "mx_function.hpp"
-#include "fx_internal.hpp"
+#include "x_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 
 namespace CasADi{
@@ -38,7 +38,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class MXFunctionInternal : public FXInternal{
+class MXFunctionInternal : public XFunctionInternal{
   friend class MXFunction;
   
   public:

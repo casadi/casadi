@@ -913,7 +913,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
 
 void SXFunctionInternal::init(){
   // Call the init function of the base class
-  FXInternal::init();
+  XFunctionInternal::init();
 
   // allocate a vector with the values at the nodes, the first vector also contains the partial derivatives
   

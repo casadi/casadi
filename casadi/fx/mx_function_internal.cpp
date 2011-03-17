@@ -102,7 +102,7 @@ void MXFunctionInternal::init(){
   log("MXFunctionInternal::init begin");
   
   // Call the init function of the base class
-  FXInternal::init();
+  XFunctionInternal::init();
 
   // Clear the algorithm
   alg.clear();

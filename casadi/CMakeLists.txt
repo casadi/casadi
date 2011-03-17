@@ -51,6 +51,7 @@ SET(CASADI_SRCS
 
   # A dynamically created function with AD capabilities
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
+  fx/x_function.hpp          fx/x_function.cpp          fx/x_function_internal.hpp          fx/x_function_internal.cpp
   fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp
   fx/mx_function.hpp         fx/mx_function.cpp         fx/mx_function_internal.hpp         fx/mx_function_internal.cpp
   fx/c_function.hpp          fx/c_function.cpp          fx/c_function_internal.hpp          fx/c_function_internal.cpp
