@@ -21,7 +21,6 @@
  */
 
 #include "unary_op.hpp"
-#include "../fx/sx_function_internal.hpp"
 #include <vector>
 #include <sstream>
 
@@ -39,7 +38,7 @@ UnaryOp* UnaryOp::clone() const{
 }
 
 void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  SXFunctionInternal::printFun[op](stream,args.at(0),"nan");
+  casadi_math<double>::print[op](stream,args.at(0),"nan");
 }
 
 void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
@@ -47,14 +46,14 @@ void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
   if(nfwd==0 && nadj==0){
     // No sensitivities
     for(int i=0; i<size(); ++i)
-      SXFunctionInternal::numFun[op](input[0][0],nan,output[i]);
+      casadi_math<double>::fun[op](input[0][0],nan,output[i]);
     
   } else {
     // Sensitivities
     double tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      SXFunctionInternal::numDer[op](input[0][0],nan,output[i],tmp);
+      casadi_math<double>::der[op](input[0][0],nan,output[i],tmp);
       
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){

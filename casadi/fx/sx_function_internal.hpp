@@ -137,35 +137,6 @@ class SXFunctionInternal : public FXInternal{
 
   /** \brief  Outputs of the function (needed for symbolic calculations) */
   std::vector<SXMatrix> outputv;
-
-  /** \brief  Printing operation typedef */
-  typedef void (*printFunT)(std::ostream &stream, const std::string& x, const std::string& y);
-  
-  /** \brief  Vector of printing operations */
-  static std::vector<printFunT> printFun;
-
-  /** \brief  Get a vector of function pointers to all the built in printing functions */
-  static std::vector<printFunT> getPrintFun();
-
-  /** \brief  Numerical functions */
-  static std::vector<void (*)(const double&, const double&, double&)> numFun;
-  
-  /** \brief  Symbolic evaluation */
-  static std::vector<void (*)(const SX&, const SX&, SX&)> symFun;
-  
-  /** \brief  Get a vector of function pointers to all the built in functions */
-  template<typename T>
-  static std::vector<void (*)(const T&, const T&, T&)> getFun();
-  
-  /** \brief  Numerical derivatives */
-  static std::vector<void (*)(const double& x, const double& y, double& f, double* d)> numDer;
-    
-  /** \brief  Symbolic derivatives */
-  static std::vector<void (*)(const SX& x, const SX& y, SX& f, SX* d)> symDer;
-  
-  /** \brief  Get a vector of function derivative pointers to all the built in functions */
-  template<typename T>
-  static std::vector<void (*)(const T& x, const T& y, T& f, T* d)> getDer();
   
 };
 
@@ -508,91 +479,6 @@ cout << "  "<< ii++ << ": ";
 /*assert(0);*/
 #endif
 
-}
-
-template<typename T>
-std::vector<void (*)(const T&, const T&, T&)> SXFunctionInternal::getFun(){
-  // Create return object
-  std::vector<void (*)(const T&, const T&, T&)> ret(NUM_BUILT_IN_OPS,0);
-  
-  // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::fcn;
-  ret[SUB] = BinaryOperation<SUB>::fcn;
-  ret[MUL] = BinaryOperation<MUL>::fcn;
-  ret[DIV] = BinaryOperation<DIV>::fcn;
-    
-  ret[NEG] = BinaryOperation<NEG>::fcn;
-  ret[EXP] = BinaryOperation<EXP>::fcn;
-  ret[LOG] = BinaryOperation<LOG>::fcn;
-  ret[POW] = BinaryOperation<POW>::fcn;
-
-  ret[SQRT] = BinaryOperation<SQRT>::fcn;
-  ret[SIN] = BinaryOperation<SIN>::fcn;
-  ret[COS] = BinaryOperation<COS>::fcn;
-  ret[TAN] = BinaryOperation<TAN>::fcn;
-
-  ret[ASIN] = BinaryOperation<ASIN>::fcn;
-  ret[ACOS] = BinaryOperation<ACOS>::fcn;
-  ret[ATAN] = BinaryOperation<ATAN>::fcn;
-
-  ret[STEP] = BinaryOperation<STEP>::fcn;
-  ret[FLOOR] = BinaryOperation<FLOOR>::fcn;
-  ret[CEIL] = BinaryOperation<CEIL>::fcn;
-
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn;
-  ret[ERF] = BinaryOperation<ERF>::fcn;
-  ret[FMIN] = BinaryOperation<FMIN>::fcn;
-  ret[FMAX] = BinaryOperation<FMAX>::fcn;
-  
-  // Make sure that all functions were specified
-  for(int i=0; i<ret.size(); ++i){
-    casadi_assert(ret[i]!=0);
-  }
-  
-  return ret;
-}
-
-
-template<typename T>
-std::vector<void (*)(const T& x, const T& y, T& f, T* d)> SXFunctionInternal::getDer(){
-  // Create return object
-  std::vector<void (*)(const T& x, const T& y, T& f, T* d)> ret(NUM_BUILT_IN_OPS,0);
-  
-  // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::der;
-  ret[SUB] = BinaryOperation<SUB>::der;
-  ret[MUL] = BinaryOperation<MUL>::der;
-  ret[DIV] = BinaryOperation<DIV>::der;
-    
-  ret[NEG] = BinaryOperation<NEG>::der;
-  ret[EXP] = BinaryOperation<EXP>::der;
-  ret[LOG] = BinaryOperation<LOG>::der;
-  ret[POW] = BinaryOperation<POW>::der;
-
-  ret[SQRT] = BinaryOperation<SQRT>::der;
-  ret[SIN] = BinaryOperation<SIN>::der;
-  ret[COS] = BinaryOperation<COS>::der;
-  ret[TAN] = BinaryOperation<TAN>::der;
-
-  ret[ASIN] = BinaryOperation<ASIN>::der;
-  ret[ACOS] = BinaryOperation<ACOS>::der;
-  ret[ATAN] = BinaryOperation<ATAN>::der;
-
-  ret[STEP] = BinaryOperation<STEP>::der;
-  ret[FLOOR] = BinaryOperation<FLOOR>::der;
-  ret[CEIL] = BinaryOperation<CEIL>::der;
-
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::der;
-  ret[ERF] = BinaryOperation<ERF>::der;
-  ret[FMIN] = BinaryOperation<FMIN>::der;
-  ret[FMAX] = BinaryOperation<FMAX>::der;
-  
-  // Make sure that all functions were specified
-  for(int i=0; i<ret.size(); ++i){
-    casadi_assert(ret[i]!=0);
-  }
-  
-  return ret;
 }
 
 } // namespace CasADi

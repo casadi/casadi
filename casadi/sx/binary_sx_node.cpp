@@ -21,7 +21,6 @@
  */
 
 #include "binary_sx_node.hpp"
-#include "../fx/sx_function_internal.hpp"
 #include <cassert>
 #include <stack>
 
@@ -74,7 +73,7 @@ void BinarySXNode::print(ostream &stream) const{
   stringstream s0,s1;
   s0 << child[0];
   s1 << child[1];
-  SXFunctionInternal::printFun[op](stream,s0.str(),s1.str());
+  casadi_math<double>::print[op](stream,s0.str(),s1.str());
 }
 
 bool BinarySXNode::isSmooth() const{

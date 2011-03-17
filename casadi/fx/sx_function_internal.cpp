@@ -284,7 +284,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
       // Get the arguments
       double x = work[it->ch[0]];
       double y = work[it->ch[1]];
-      numFun[it->op](x,y,work[it->ind]);
+      casadi_math<double>::fun[it->op](x,y,work[it->ind]);
     }
   } else {
     // with taping
@@ -294,7 +294,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
       // Get the arguments
       double x = work[it->ch[0]];
       double y = work[it->ch[1]];
-      numDer[it->op](x,y,work[it->ind],it1->d);
+      casadi_math<double>::der[it->op](x,y,work[it->ind],it1->d);
     }
   }
   
@@ -419,10 +419,10 @@ void SXFunctionInternal::eval(
   vector<AlgEl>::const_iterator it;
   for(it = algorithm.begin(), i=0; it!=algorithm.end(); ++it, ++i){
      if(replace.empty()){ // nothing needs to be replaced
-        symFun[it->op](swork[it->ch[0]],swork[it->ch[1]],swork[it->ind]);
+        casadi_math<SX>::fun[it->op](swork[it->ch[0]],swork[it->ch[1]],swork[it->ind]);
       } else {
         SX r;
-        symFun[it->op](swork[it->ch[0]],swork[it->ch[1]],r);
+        casadi_math<SX>::fun[it->op](swork[it->ch[0]],swork[it->ch[1]],r);
         map<int,SX>::const_iterator it2 = replace.find(i); // try to locate the node
         if(it2 != replace.end()){ // replace
           swork[it->ind] = SX(it2->second);
@@ -482,7 +482,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
       SX ch[2];
       ch[0] = SX(tree[it->ch[0]]);
       ch[1] = SX(tree[it->ch[1]]);
-      symDer[it->op](ch[0],ch[1],tmp_f,tmp);
+      casadi_math<SX>::der[it->op](ch[0],ch[1],tmp_f,tmp);
       if(!ch[0]->isConstant())  der1.push_back(tmp[0]);
       else                    	der1.push_back(0);
 
@@ -780,7 +780,7 @@ void SXFunctionInternal::print(ostream &stream) const{
 #endif
 
     stream << s.str() << " = ";
-    printFun[op](stream,s0.str(),s1.str());
+    casadi_math<double>::print[op](stream,s0.str(),s1.str());
     stream << ";" << endl;
   }
 }
@@ -888,7 +888,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
     else                               s0 << "i_" << it->ch[0];
     if(tree[it->ch[1]]->isConstant())  s1 << tree[it->ch[1]]->getValue();
     else                               s1 << "i_" << it->ch[1];
-    printFun[op](cfile ,s0.str(),s1.str());
+    casadi_math<double>::print[op](cfile ,s0.str(),s1.str());
     cfile  << ";" << endl;
   }
   
@@ -957,7 +957,7 @@ void SXFunctionInternal::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>&
     // Get the arguments
     SX x = work_sym[it->ch[0]];
     SX y = work_sym[it->ch[1]];
-    symFun[it->op](x,y,work_sym[it->ind]);
+    casadi_math<SX>::fun[it->op](x,y,work_sym[it->ind]);
   }
 
   // Get the results
@@ -971,58 +971,6 @@ void SXFunctionInternal::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>&
 SXFunctionInternal* SXFunctionInternal::clone() const{
   return new SXFunctionInternal(*this);
 }
-
-std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintFun(){
-  // Create return object
-  std::vector<printFunT> ret(NUM_BUILT_IN_OPS,0);
-  
-  // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::print;
-  ret[SUB] = BinaryOperation<SUB>::print;
-  ret[MUL] = BinaryOperation<MUL>::print;
-  ret[DIV] = BinaryOperation<DIV>::print;
-  
-  ret[NEG] = BinaryOperation<NEG>::print;
-  ret[EXP] = BinaryOperation<EXP>::print;
-  ret[LOG] = BinaryOperation<LOG>::print;
-  ret[POW] = BinaryOperation<POW>::print;
-
-  ret[SQRT] = BinaryOperation<SQRT>::print;
-  ret[SIN] = BinaryOperation<SIN>::print;
-  ret[COS] = BinaryOperation<COS>::print;
-  ret[TAN] = BinaryOperation<TAN>::print;
-
-  ret[ASIN] = BinaryOperation<ASIN>::print;
-  ret[ACOS] = BinaryOperation<ACOS>::print;
-  ret[ATAN] = BinaryOperation<ATAN>::print;
-
-  ret[STEP] = BinaryOperation<STEP>::print;
-  ret[FLOOR] = BinaryOperation<FLOOR>::print;
-  ret[CEIL] = BinaryOperation<CEIL>::print;
-
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::print;
-  ret[ERF] = BinaryOperation<ERF>::print;
-  ret[FMIN] = BinaryOperation<FMIN>::print;
-  ret[FMAX] = BinaryOperation<FMAX>::print;
-  
-  // Make sure that all functions were specified
-  for(int i=0; i<ret.size(); ++i){
-    casadi_assert(ret[i]!=0);
-  }
-  
-  return ret;
-  
-}
-
-std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::printFun = SXFunctionInternal::getPrintFun();
-
-std::vector<void (*)(const double&, const double&, double&)> SXFunctionInternal::numFun = SXFunctionInternal::getFun<double>();
-
-std::vector<void (*)(const SX&, const SX&, SX&)> SXFunctionInternal::symFun = SXFunctionInternal::getFun<SX>();
-
-std::vector<void (*)(const double& x, const double& y, double& f, double* d)> SXFunctionInternal::numDer = SXFunctionInternal::getDer<double>();
-    
-std::vector<void (*)(const SX& x, const SX& y, SX& f, SX* d)> SXFunctionInternal::symDer = SXFunctionInternal::getDer<SX>();
 
 } // namespace CasADi
 

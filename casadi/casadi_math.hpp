@@ -311,10 +311,10 @@ template<typename T>
 std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::print = casadi_math<T>::getPrintFun();
 
 template<typename T>
-std::vector<typename casadi_math<T>::funT> casadi_math<T>::fun = casadi_math<T>::getFunT();
+std::vector<typename casadi_math<T>::funT> casadi_math<T>::fun = casadi_math<T>::getFun();
 
 template<typename T>
-std::vector<typename casadi_math<T>::derT> casadi_math<T>::der = casadi_math<T>::getDerT();
+std::vector<typename casadi_math<T>::derT> casadi_math<T>::der = casadi_math<T>::getDer();
 
 template<typename T>
 std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::getPrintFun(){
