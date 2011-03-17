@@ -20,12 +20,14 @@
  *
  */
 
-#ifndef ELEMENTARY_FUNCTIONS_HPP
-#define ELEMENTARY_FUNCTIONS_HPP
+#ifndef CASADI_MATH_HPP
+#define CASADI_MATH_HPP
 
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <vector>
+#include "casadi_exception.hpp"
 
 namespace CasADi{
   
@@ -265,6 +267,183 @@ class UnaryOperation<ERF>{
     template<typename T> static void der(const T& x, T& f, T* d){ f = erf(x); d[0] = (2/std::sqrt(M_PI))*std::exp(-x*x);}
 };
 
+
+/// Easy access to all the functions for a particular type
+template<typename T>
+class casadi_math{
+  public:
+
+    /** \brief Printing operation typedef */
+    typedef void (*printFunT)(std::ostream &stream, const std::string& x, const std::string& y);
+
+    /** \brief Function typedef */
+    typedef void (*funT)(const T&, const T&, T&);
+    
+    /** \brief Derivative typedef */
+    typedef void (*derT)(const T& x, const T& y, T& f, T* d);
+
+    /** \brief Vector of printing functions */
+    static std::vector<printFunT> print;
+
+    /** \brief Vector of function pointers to all the built in functions */
+    static std::vector<funT> fun;
+    
+    /** \brief Vector of function derivative pointers to all the built in functions */
+    static std::vector<derT> der;
+    
+  protected:
+    
+    /** \brief Create print */
+    static std::vector<printFunT> getPrintFun();
+
+    /** \brief Create fun */
+    static std::vector<funT> getFun();
+  
+    /** \brief Create der */
+    static std::vector<derT> getDer();
+    
+};
+
+
+// Template implementations
+
+template<typename T>
+std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::print = casadi_math<T>::getPrintFun();
+
+template<typename T>
+std::vector<typename casadi_math<T>::funT> casadi_math<T>::fun = casadi_math<T>::getFunT();
+
+template<typename T>
+std::vector<typename casadi_math<T>::derT> casadi_math<T>::der = casadi_math<T>::getDerT();
+
+template<typename T>
+std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::getPrintFun(){
+  // Create return object
+  std::vector<typename casadi_math<T>::printFunT> ret(NUM_BUILT_IN_OPS,0);
+  
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::print;
+  ret[SUB] = BinaryOperation<SUB>::print;
+  ret[MUL] = BinaryOperation<MUL>::print;
+  ret[DIV] = BinaryOperation<DIV>::print;
+  
+  ret[NEG] = BinaryOperation<NEG>::print;
+  ret[EXP] = BinaryOperation<EXP>::print;
+  ret[LOG] = BinaryOperation<LOG>::print;
+  ret[POW] = BinaryOperation<POW>::print;
+
+  ret[SQRT] = BinaryOperation<SQRT>::print;
+  ret[SIN] = BinaryOperation<SIN>::print;
+  ret[COS] = BinaryOperation<COS>::print;
+  ret[TAN] = BinaryOperation<TAN>::print;
+
+  ret[ASIN] = BinaryOperation<ASIN>::print;
+  ret[ACOS] = BinaryOperation<ACOS>::print;
+  ret[ATAN] = BinaryOperation<ATAN>::print;
+
+  ret[STEP] = BinaryOperation<STEP>::print;
+  ret[FLOOR] = BinaryOperation<FLOOR>::print;
+  ret[CEIL] = BinaryOperation<CEIL>::print;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::print;
+  ret[ERF] = BinaryOperation<ERF>::print;
+  ret[FMIN] = BinaryOperation<FMIN>::print;
+  ret[FMAX] = BinaryOperation<FMAX>::print;
+  
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+  
+}
+
+template<typename T>
+std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
+  // Create return object
+  std::vector<typename casadi_math<T>::funT> ret(NUM_BUILT_IN_OPS,0);
+  
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::fcn;
+  ret[SUB] = BinaryOperation<SUB>::fcn;
+  ret[MUL] = BinaryOperation<MUL>::fcn;
+  ret[DIV] = BinaryOperation<DIV>::fcn;
+    
+  ret[NEG] = BinaryOperation<NEG>::fcn;
+  ret[EXP] = BinaryOperation<EXP>::fcn;
+  ret[LOG] = BinaryOperation<LOG>::fcn;
+  ret[POW] = BinaryOperation<POW>::fcn;
+
+  ret[SQRT] = BinaryOperation<SQRT>::fcn;
+  ret[SIN] = BinaryOperation<SIN>::fcn;
+  ret[COS] = BinaryOperation<COS>::fcn;
+  ret[TAN] = BinaryOperation<TAN>::fcn;
+
+  ret[ASIN] = BinaryOperation<ASIN>::fcn;
+  ret[ACOS] = BinaryOperation<ACOS>::fcn;
+  ret[ATAN] = BinaryOperation<ATAN>::fcn;
+
+  ret[STEP] = BinaryOperation<STEP>::fcn;
+  ret[FLOOR] = BinaryOperation<FLOOR>::fcn;
+  ret[CEIL] = BinaryOperation<CEIL>::fcn;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn;
+  ret[ERF] = BinaryOperation<ERF>::fcn;
+  ret[FMIN] = BinaryOperation<FMIN>::fcn;
+  ret[FMAX] = BinaryOperation<FMAX>::fcn;
+  
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+}
+
+template<typename T>
+std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
+  // Create return object
+  std::vector<typename casadi_math<T>::derT> ret(NUM_BUILT_IN_OPS,0);
+  
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::der;
+  ret[SUB] = BinaryOperation<SUB>::der;
+  ret[MUL] = BinaryOperation<MUL>::der;
+  ret[DIV] = BinaryOperation<DIV>::der;
+    
+  ret[NEG] = BinaryOperation<NEG>::der;
+  ret[EXP] = BinaryOperation<EXP>::der;
+  ret[LOG] = BinaryOperation<LOG>::der;
+  ret[POW] = BinaryOperation<POW>::der;
+
+  ret[SQRT] = BinaryOperation<SQRT>::der;
+  ret[SIN] = BinaryOperation<SIN>::der;
+  ret[COS] = BinaryOperation<COS>::der;
+  ret[TAN] = BinaryOperation<TAN>::der;
+
+  ret[ASIN] = BinaryOperation<ASIN>::der;
+  ret[ACOS] = BinaryOperation<ACOS>::der;
+  ret[ATAN] = BinaryOperation<ATAN>::der;
+
+  ret[STEP] = BinaryOperation<STEP>::der;
+  ret[FLOOR] = BinaryOperation<FLOOR>::der;
+  ret[CEIL] = BinaryOperation<CEIL>::der;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::der;
+  ret[ERF] = BinaryOperation<ERF>::der;
+  ret[FMIN] = BinaryOperation<FMIN>::der;
+  ret[FMAX] = BinaryOperation<FMAX>::der;
+  
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+}
+
+
 } // namespace CasADi
 
-#endif //ELEMENTARY_FUNCTIONS_HPP
+#endif //CASADI_MATH_HPP

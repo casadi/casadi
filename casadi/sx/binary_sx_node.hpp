@@ -24,7 +24,7 @@
 #define BINARY_SCALAR_HPP
 
 #include "sx_node.hpp"
-#include "../elementary_functions.hpp"
+#include "../casadi_math.hpp"
 
 namespace CasADi{
 
