@@ -138,7 +138,26 @@ class SXFunctionInternal : public FXInternal{
   /** \brief  Outputs of the function (needed for symbolic calculations) */
   std::vector<SXMatrix> outputv;
 
+  /** \brief  Printing operation typedef */
+  typedef void (*printFunT)(std::ostream &stream, const std::string& x, const std::string& y);
+  
+  /** \brief  Vector of printing operations */
+  static std::vector<printFunT> printOp;
 
+  /** \brief  Get a vector of function pointers to all the built in printing functions */
+  static std::vector<printFunT> getPrintOp();
+
+  /** \brief  Numerical functions */
+  static std::vector<double(*)(const double&, const double&)> numFun;
+  
+  /** \brief  Symbolic evaluation */
+  static std::vector<SX(*)(const SX&, const SX&)> symFun;
+  
+  /** \brief  Get a vector of function pointers to all the built in functions */
+  template<typename T>
+  static std::vector<T(*)(const T&, const T&)> getFun();
+  
+  
 };
 
 // Template implementations
@@ -480,8 +499,51 @@ cout << "  "<< ii++ << ": ";
 /*assert(0);*/
 #endif
 
-
 }
+
+template<typename T>
+std::vector<T(*)(const T&, const T&)> SXFunctionInternal::getFun(){
+  // Create return object
+  std::vector<T(*)(const T&, const T&)> ret(NUM_BUILT_IN_OPS,0);
+  
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::fcn;
+  ret[SUB] = BinaryOperation<SUB>::fcn;
+  ret[MUL] = BinaryOperation<MUL>::fcn;
+  ret[DIV] = BinaryOperation<DIV>::fcn;
+    
+  ret[NEG] = BinaryOperation<NEG>::fcn;
+  ret[EXP] = BinaryOperation<EXP>::fcn;
+  ret[LOG] = BinaryOperation<LOG>::fcn;
+  ret[POW] = BinaryOperation<POW>::fcn;
+
+  ret[SQRT] = BinaryOperation<SQRT>::fcn;
+  ret[SIN] = BinaryOperation<SIN>::fcn;
+  ret[COS] = BinaryOperation<COS>::fcn;
+  ret[TAN] = BinaryOperation<TAN>::fcn;
+
+  ret[ASIN] = BinaryOperation<ASIN>::fcn;
+  ret[ACOS] = BinaryOperation<ACOS>::fcn;
+  ret[ATAN] = BinaryOperation<ATAN>::fcn;
+
+  ret[STEP] = BinaryOperation<STEP>::fcn;
+  ret[FLOOR] = BinaryOperation<FLOOR>::fcn;
+  ret[CEIL] = BinaryOperation<CEIL>::fcn;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn;
+  ret[ERF] = BinaryOperation<ERF>::fcn;
+  ret[FMIN] = BinaryOperation<FMIN>::fcn;
+  ret[FMAX] = BinaryOperation<FMAX>::fcn;
+  
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+}
+
+
 
 
 } // namespace CasADi

@@ -23,9 +23,7 @@
 #ifndef BINARY_FUNCTIONS_HPP
 #define BINARY_FUNCTIONS_HPP
 
-#include <iostream>
-#include <string>
-#include <cmath>
+#include "../elementary_functions.hpp"
 #include "../pre_c99_support.hpp"
 
 #define RES(i,j) res[i*(i+1)/2+j]

@@ -25,89 +25,245 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
 
 namespace CasADi{
+  
+template<int I>
+class UnaryOperation{
+  public:
+    /// Print
+    static void print(std::ostream &stream, const std::string& x);
+
+    /// Function evaluation
+    template<typename T> static T fcn(const T& x);
+    
+    /// Partial derivatives
+    template<typename T> static void der(const T& x, T& f, T* d);
+};
+
+template<int I>
+class BinaryOperation{
+  public:
+    /// Print
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ UnaryOperation<I>::print(stream,x); }
+
+    /// Function evaluation
+    template<typename T> static T fcn(const T& x, const T& y){ return UnaryOperation<I>::fcn(x);}
+    
+    /// Partial derivatives - binary function
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ UnaryOperation<I>::fcn(x,f,d); d[1]=0; }
+};
+
 /// Enum for quick access to any node
-enum OPERATION2{
+enum BUILT_IN_OPS{
   ADD,  SUB,  MUL,  DIV,
   NEG,  EXP,  LOG,  POW,  
   SQRT,  SIN,  COS,  TAN,  
   ASIN,  ACOS,  ATAN,  
   STEP,  
   FLOOR,  CEIL,  
-  EQUALITY,  ERF,  FMIN,  FMAX
+  EQUALITY,  ERF,  FMIN,  FMAX,
+  NUM_BUILT_IN_OPS
 };
 
-/// Unary function
-template<int I>
-class UnFun{
+/// Addition
+template<>
+class BinaryOperation<ADD>{
   public:
-    static void print(std::ostream &stream, const std::string& x);
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "+" << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return x+y;}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x+y; d[0]=d[1]=1;}
 };
 
+/// Subtraction
+template<>
+class BinaryOperation<SUB>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "-" << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return x-y;}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x-y; d[0]=1; d[1]=-1;}
+};
 
-/// Printing unary function
-template<int I>
-void uprint(std::ostream &stream, const std::string& x);
+/// Multiplication
+template<>
+class BinaryOperation<MUL>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "*" << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return x*y;}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x*y; d[0]=y; d[1]=x;}
+};
 
-/// Printing binary function
-template<int I>
-void bprint(std::ostream &stream, const std::string& x, const std::string& y){ uprint<I>(stream,x); }
+/// Division
+template<>
+class BinaryOperation<DIV>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "/" << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return x/y;}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x/y; d[0]=1/y; d[1]=-f/y;}
+};
 
-/// Unary function
-template<typename T, int I>
-T ufcn(const T& x);
+/// Negation
+template<>
+class UnaryOperation<NEG>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "(-" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return -x;}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = -x; d[0]=-1;}
+};
 
-/// Binary function
-template<typename T, int I>
-T bfcn(const T& x, const T& y){ return ufcn<T,I>(x);}
+/// Natural exponent
+template<>
+class UnaryOperation<EXP>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "exp(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::exp(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::exp(x); d[0]=f;}
+};
 
-/// Partial derivatives - unary function
-template<typename T, int I>
-void uder(const T& x, T& f, T* d);
+/// Natural logarithm
+template<>
+class UnaryOperation<LOG>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "log(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::log(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::log(x); d[0]=1/x;}
+};
 
-/// Partial derivatives - binary function
-template<typename T, int I>
-void bder(const T& x, const T& y, T& f, T* d){ uder<T,I>(x,f,d); d[1]=0; } 
+/// Power
+template<>
+class BinaryOperation<POW>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "pow(" << x << "," << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return std::pow(x,y);}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = std::pow(x,y); d[0]=y*f/x; d[1]=std::log(x)*f;}
+};
 
-/// Printing - template specialization
-void bprint<ADD>(std::ostream &stream, const std::string& x, const std::string& y){stream << "(" << x << "+" << y << ")";}
-void bprint<SUB>(std::ostream &stream, const std::string& x, const std::string& y){stream << "(" << x << "-" << y << ")";}
-void bprint<MUL>(std::ostream &stream, const std::string& x, const std::string& y){stream << "(" << x << "*" << y << ")";}
-void bprint<DIV>(std::ostream &stream, const std::string& x, const std::string& y){stream << "(" << x << "/" << y << ")";}
-void uprint<EXP>(std::ostream &stream, const std::string& x){ stream << "exp(" << x << ")";}
-void uprint<LOG>(std::ostream &stream, const std::string& x){ stream << "log(" << x << ")";}
-void bprint<POW>(std::ostream &stream, const std::string& x, const std::string& y){stream << "pow(" << x << "," << y << ")";}
-void uprint<SQRT>(std::ostream &stream, const std::string& x){ stream << "sqrt(" << x << ")";}
-void uprint<SIN>(std::ostream &stream, const std::string& x){ stream << "sin(" << x << ")";}
-void uprint<COS>(std::ostream &stream, const std::string& x){ stream << "cos(" << x << ")";}
-void uprint<TAN>(std::ostream &stream, const std::string& x){ stream << "tan(" << x << ")";}
+/// Square root
+template<>
+class UnaryOperation<SQRT>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "sqrt(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::sqrt(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::sqrt(x); d[0]=1/(2*f);}
+};
 
-/// Elementary functions - partial specialization
-template<typename T> T bfcn<T,ADD>(const T& x, const T& y){ return x+y;}
-template<typename T> T bfcn<T,SUB>(const T& x, const T& y){ return x-y;}
-template<typename T> T bfcn<T,MUL>(const T& x, const T& y){ return x*y;}
-template<typename T> T bfcn<T,DIV>(const T& x, const T& y){ return x/y;}
-template<typename T> T ufcn<T,EXP>(const T& x){ return exp(x);}
-template<typename T> T ufcn<T,LOG>(const T& x){ return log(x);}
-template<typename T> T bfcn<T,POW>(const T& x, const T& y){ return pow(x,y);}
-template<typename T> T ufcn<T,SQRT>(const T& x){ return sqrt(x);}
-template<typename T> T ufcn<T,SIN>(const T& x){ return sin(x);}
-template<typename T> T ufcn<T,COS>(const T& x){ return cos(x);}
-template<typename T> T ufcn<T,TAN>(const T& x){ return tan(x);}
+/// Sine
+template<>
+class UnaryOperation<SIN>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "sin(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::sin(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::sin(x); d[0]=std::cos(x);}
+};
 
-/// Derivatives - partial specialization
-template<typename T> void bder<T,ADD>(const T& x, const T& y, T& f, T* d){f = x+y; d[0]=1; d[1]=1; }
-template<typename T> void bder<T,SUB>(const T& x, const T& y, T& f, T* d){f = x-y; d[0]=1; d[1]=-1; }
-template<typename T> void bder<T,ADD>(const T& x, const T& y, T& f, T* d){f = x*y; d[0]=1; d[1]=y; }
-template<typename T> void bder<T,SUB>(const T& x, const T& y, T& f, T* d){f = x/y; d[0]=1; d[1]=x; }
-template<typename T> void uder<T,EXP>(const T& x, T& f, T* d){f = exp(x); d[0]=f;}
-template<typename T> void uder<T,LOG>(const T& x, T& f, T* d){f = log(x); d[0]=1/x;}
-template<typename T> void bder<T,POW>(const T& x, const T& y, T& f, T* d){f = pow(x,y); d[0]=y*f/x; d[1]=log(x)*f; }
-template<typename T> void uder<T,SQRT>(const T& x, T& f, T* d){f = sqrt(x); d[0]=1/(2*f);}
-template<typename T> void uder<T,SIN>(const T& x, T& f, T* d){f = sin(x); d[0]=cos(x);}
-template<typename T> void uder<T,COS>(const T& x, T& f, T* d){f = cos(x); d[0]=-sin(x);}
-template<typename T> void uder<T,TAN>(const T& x, T& f, T* d){f = cos(x); T cosx = cos(x); d[0] = 1/(cosx*cosx);}
+/// Cosine
+template<>
+class UnaryOperation<COS>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "cos(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::cos(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::cos(x); d[0]=-std::sin(x);}
+};
+
+/// Tangent
+template<>
+class UnaryOperation<TAN>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "tan(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::tan(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::tan(x); T cosx = std::cos(x); d[0] = 1/(cosx*cosx);}
+};
+
+/// Arcus sine
+template<>
+class UnaryOperation<ASIN>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "asin(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::asin(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::asin(x); d[0]=1/std::sqrt(1-x*x);}
+};
+
+/// Arcus cosine
+template<>
+class UnaryOperation<ACOS>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "acos(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::acos(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::acos(x); d[0]=-1/std::sqrt(1-x*x);}
+};
+
+/// Arcus tangent
+template<>
+class UnaryOperation<ATAN>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "atan(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::atan(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::atan(x); d[0] = 1/(1+x*x);}
+};
+
+/// Step function
+template<>
+class UnaryOperation<STEP>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "(" << x << ">=0)"; }
+    template<typename T> static T fcn(const T& x){ return x >= 0;}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = x >= 0; d[0] = 0;}
+};
+
+/// Floor function
+template<>
+class UnaryOperation<FLOOR>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "floor(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::floor(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::floor(x); d[0] = 0;}
+};
+
+/// Ceil function
+template<>
+class UnaryOperation<CEIL>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "ceil(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return std::ceil(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = std::ceil(x); d[0] = 0;}
+};
+
+/// Equality
+template<>
+class BinaryOperation<EQUALITY>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "==" << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return x==y;}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x==y; d[0]=d[1]=0;}
+};
+
+/// Minimum
+template<>
+class BinaryOperation<FMIN>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "fmin(" << x << "," << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return fmin(x,y);}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = fmin(x,y); d[0]=x<=y; d[1]=!d[0];}
+};
+
+/// Maximum
+template<>
+class BinaryOperation<FMAX>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "fmax(" << x << "," << y << ")"; }
+    template<typename T> static T fcn(const T& x, const T& y){ return fmax(x,y);}
+    template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = fmax(x,y); d[0]=x>=y; d[1]=!d[0];}
+};
+
+/// Error function
+template<>
+class UnaryOperation<ERF>{
+  public:
+    static void print(std::ostream &stream, const std::string& x){ stream << "erf(" << x << ")"; }
+    template<typename T> static T fcn(const T& x){ return erf(x);}
+    template<typename T> static void der(const T& x, T& f, T* d){ f = erf(x); d[0] = (2/std::sqrt(M_PI))*std::exp(-x*x);}
+};
 
 } // namespace CasADi
 

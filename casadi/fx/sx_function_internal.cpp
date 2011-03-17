@@ -973,6 +973,51 @@ SXFunctionInternal* SXFunctionInternal::clone() const{
   return new SXFunctionInternal(*this);
 }
 
+std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintOp(){
+  // Create return object
+  std::vector<printFunT> ret(NUM_BUILT_IN_OPS,0);
+  
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::print;
+  ret[SUB] = BinaryOperation<SUB>::print;
+  ret[MUL] = BinaryOperation<MUL>::print;
+  ret[DIV] = BinaryOperation<DIV>::print;
+  
+  ret[NEG] = BinaryOperation<NEG>::print;
+  ret[EXP] = BinaryOperation<EXP>::print;
+  ret[LOG] = BinaryOperation<LOG>::print;
+  ret[POW] = BinaryOperation<POW>::print;
+
+  ret[SQRT] = BinaryOperation<SQRT>::print;
+  ret[SIN] = BinaryOperation<SIN>::print;
+  ret[COS] = BinaryOperation<COS>::print;
+  ret[TAN] = BinaryOperation<TAN>::print;
+
+  ret[ASIN] = BinaryOperation<ASIN>::print;
+  ret[ACOS] = BinaryOperation<ACOS>::print;
+  ret[ATAN] = BinaryOperation<ATAN>::print;
+
+  ret[STEP] = BinaryOperation<STEP>::print;
+  ret[FLOOR] = BinaryOperation<FLOOR>::print;
+  ret[CEIL] = BinaryOperation<CEIL>::print;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::print;
+  ret[ERF] = BinaryOperation<ERF>::print;
+  ret[FMIN] = BinaryOperation<FMIN>::print;
+  ret[FMAX] = BinaryOperation<FMAX>::print;
+  
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+  
+}
+
+std::vector<double(*)(const double&, const double&)> SXFunctionInternal::numFun = getFun<double>();
+
+std::vector<SX(*)(const SX&, const SX&)> SXFunctionInternal::symFun = getFun<SX>();
 
 
 } // namespace CasADi

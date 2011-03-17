@@ -363,29 +363,34 @@ class numeric_limits<CasADi::SX>{
     static const bool tinyness_before = false;
     static const float_round_style round_style = round_toward_zero;
 };
+} //namespace std
 
-
-/** \brief  Global functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
+// Shorthand for out-of-namespace declarations
 #define SX CasADi::SX
-inline SX sqrt(const SX &x){return x.sqrt();}
-inline SX sin(const SX &x){return x.sin();}
-inline SX cos(const SX &x){return x.cos();}
-inline SX tan(const SX &x){return x.tan();}
-inline SX atan(const SX &x){return x.arctan();}
-inline SX asin(const SX &x){return x.arcsin();}
-inline SX acos(const SX &x){return x.arccos();}
-inline SX exp(const SX &x){return x.exp();}
-inline SX log(const SX &x){return x.log();}
-inline SX pow(const SX &x, const SX &n){ return x.pow(n);}
-inline SX abs(const SX &x){return x.fabs();}
-inline SX fabs(const SX &x){return x.fabs();}
-inline SX floor(const SX &x){return x.floor();}
-inline SX ceil(const SX &x){return x.ceil();}
+
+/** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
+namespace std{
+  inline SX sqrt(const SX &x){return x.sqrt();}
+  inline SX sin(const SX &x){return x.sin();}
+  inline SX cos(const SX &x){return x.cos();}
+  inline SX tan(const SX &x){return x.tan();}
+  inline SX atan(const SX &x){return x.arctan();}
+  inline SX asin(const SX &x){return x.arcsin();}
+  inline SX acos(const SX &x){return x.arccos();}
+  inline SX exp(const SX &x){return x.exp();}
+  inline SX log(const SX &x){return x.log();}
+  inline SX pow(const SX &x, const SX &n){ return x.pow(n);}
+  inline SX abs(const SX &x){return x.fabs();}
+  inline SX fabs(const SX &x){return x.fabs();}
+  inline SX floor(const SX &x){return x.floor();}
+  inline SX ceil(const SX &x){return x.ceil();}
+} // namespace std
+
+/** \brief  C99 elementary functions from the math.h header */
 inline SX erf(const SX &x){return x.erf();}
 inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
 inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
 #undef SX
-} // namespace std
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */
 #include "sx_node.hpp"
