@@ -62,7 +62,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
     if(nfwd==0 && nadj==0){
       // No sensitivities
       for(int i=0; i<n; ++i)
-        nfun0[op](input[0][i],input[1][i],&output[i]);
+        SXFunctionInternal::numFun[op](input[0][i],input[1][i],output[i]);
       
     } else {
       // Sensitivities
@@ -92,7 +92,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       for(int i=0; i<n; ++i){
         double x = mapping_[i]<=0 ? input[0][ix++] : 0;
         double y = mapping_[i]>=0 ? input[1][iy++] : 0;
-        nfun0[op](x,y,&output[i]);
+        SXFunctionInternal::numFun[op](x,y,output[i]);
       }
       
     } else {

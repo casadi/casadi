@@ -284,7 +284,7 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
       // Get the arguments
       double x = work[it->ch[0]];
       double y = work[it->ch[1]];
-      nfun0[it->op](x,y,&work[it->ind]);
+      numFun[it->op](x,y,work[it->ind]);
     }
   } else {
     // with taping
@@ -1012,9 +1012,9 @@ std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintFun(){
 
 std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::printFun = SXFunctionInternal::getPrintFun();
 
-std::vector<double(*)(const double&, const double&)> SXFunctionInternal::numFun = SXFunctionInternal::getFun<double>();
+std::vector<void (*)(const double&, const double&, double&)> SXFunctionInternal::numFun = SXFunctionInternal::getFun<double>();
 
-std::vector<SX(*)(const SX&, const SX&)> SXFunctionInternal::symFun = SXFunctionInternal::getFun<SX>();
+std::vector<void (*)(const SX&, const SX&, SX&)> SXFunctionInternal::symFun = SXFunctionInternal::getFun<SX>();
 
 std::vector<void (*)(const double& x, const double& y, double& f, double* d)> SXFunctionInternal::numDer = SXFunctionInternal::getDer<double>();
     

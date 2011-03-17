@@ -36,7 +36,7 @@ class UnaryOperation{
     static void print(std::ostream &stream, const std::string& x);
 
     /// Function evaluation
-    template<typename T> static T fcn(const T& x);
+    template<typename T> static void fcn(const T& x, T& f);
     
     /// Partial derivatives
     template<typename T> static void der(const T& x, T& f, T* d);
@@ -49,7 +49,7 @@ class BinaryOperation{
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ UnaryOperation<I>::print(stream,x); }
 
     /// Function evaluation
-    template<typename T> static T fcn(const T& x, const T& y){ return UnaryOperation<I>::fcn(x);}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ UnaryOperation<I>::fcn(x,f);}
     
     /// Partial derivatives - binary function
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ UnaryOperation<I>::der(x,f,d); d[1]=0; }
@@ -72,7 +72,7 @@ template<>
 class BinaryOperation<ADD>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "+" << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return x+y;}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x+y;}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x+y; d[0]=d[1]=1;}
 };
 
@@ -81,7 +81,7 @@ template<>
 class BinaryOperation<SUB>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "-" << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return x-y;}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x-y;}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x-y; d[0]=1; d[1]=-1;}
 };
 
@@ -90,7 +90,7 @@ template<>
 class BinaryOperation<MUL>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "*" << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return x*y;}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x*y;}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x*y; d[0]=y; d[1]=x;}
 };
 
@@ -99,7 +99,7 @@ template<>
 class BinaryOperation<DIV>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "/" << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return x/y;}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x/y;}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x/y; d[0]=1/y; d[1]=-f/y;}
 };
 
@@ -108,7 +108,7 @@ template<>
 class UnaryOperation<NEG>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "(-" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return -x;}
+    template<typename T> static void fcn(const T& x, T& f){ f = -x;}
     template<typename T> static void der(const T& x, T& f, T* d){ f = -x; d[0]=-1;}
 };
 
@@ -117,7 +117,7 @@ template<>
 class UnaryOperation<EXP>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "exp(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::exp(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::exp(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::exp(x); d[0]=f;}
 };
 
@@ -126,7 +126,7 @@ template<>
 class UnaryOperation<LOG>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "log(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::log(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::log(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::log(x); d[0]=1/x;}
 };
 
@@ -135,7 +135,7 @@ template<>
 class BinaryOperation<POW>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "pow(" << x << "," << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return std::pow(x,y);}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = std::pow(x,y);}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = std::pow(x,y); d[0]=y*f/x; d[1]=std::log(x)*f;}
 };
 
@@ -144,7 +144,7 @@ template<>
 class UnaryOperation<SQRT>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "sqrt(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::sqrt(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::sqrt(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::sqrt(x); d[0]=1/(2*f);}
 };
 
@@ -153,7 +153,7 @@ template<>
 class UnaryOperation<SIN>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "sin(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::sin(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::sin(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::sin(x); d[0]=std::cos(x);}
 };
 
@@ -162,7 +162,7 @@ template<>
 class UnaryOperation<COS>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "cos(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::cos(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::cos(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::cos(x); d[0]=-std::sin(x);}
 };
 
@@ -171,7 +171,7 @@ template<>
 class UnaryOperation<TAN>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "tan(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::tan(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::tan(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::tan(x); T cosx = std::cos(x); d[0] = 1/(cosx*cosx);}
 };
 
@@ -180,7 +180,7 @@ template<>
 class UnaryOperation<ASIN>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "asin(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::asin(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::asin(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::asin(x); d[0]=1/std::sqrt(1-x*x);}
 };
 
@@ -189,7 +189,7 @@ template<>
 class UnaryOperation<ACOS>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "acos(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::acos(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::acos(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::acos(x); d[0]=-1/std::sqrt(1-x*x);}
 };
 
@@ -198,7 +198,7 @@ template<>
 class UnaryOperation<ATAN>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "atan(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::atan(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::atan(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::atan(x); d[0] = 1/(1+x*x);}
 };
 
@@ -207,7 +207,7 @@ template<>
 class UnaryOperation<STEP>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "(" << x << ">=0)"; }
-    template<typename T> static T fcn(const T& x){ return x >= 0;}
+    template<typename T> static void fcn(const T& x, T& f){ f = x >= 0;}
     template<typename T> static void der(const T& x, T& f, T* d){ f = x >= 0; d[0] = 0;}
 };
 
@@ -216,7 +216,7 @@ template<>
 class UnaryOperation<FLOOR>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "floor(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::floor(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::floor(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::floor(x); d[0] = 0;}
 };
 
@@ -225,7 +225,7 @@ template<>
 class UnaryOperation<CEIL>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "ceil(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return std::ceil(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::ceil(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = std::ceil(x); d[0] = 0;}
 };
 
@@ -234,7 +234,7 @@ template<>
 class BinaryOperation<EQUALITY>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "(" << x << "==" << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return x==y;}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x==y;}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = x==y; d[0]=d[1]=0;}
 };
 
@@ -243,7 +243,7 @@ template<>
 class BinaryOperation<FMIN>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "fmin(" << x << "," << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return fmin(x,y);}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = fmin(x,y);}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = fmin(x,y); d[0]=x<=y; d[1]=!d[0];}
 };
 
@@ -252,7 +252,7 @@ template<>
 class BinaryOperation<FMAX>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "fmax(" << x << "," << y << ")"; }
-    template<typename T> static T fcn(const T& x, const T& y){ return fmax(x,y);}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = fmax(x,y);}
     template<typename T> static void der(const T& x, const T& y, T& f, T* d){ f = fmax(x,y); d[0]=x>=y; d[1]=!d[0];}
 };
 
@@ -261,7 +261,7 @@ template<>
 class UnaryOperation<ERF>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "erf(" << x << ")"; }
-    template<typename T> static T fcn(const T& x){ return erf(x);}
+    template<typename T> static void fcn(const T& x, T& f){ f = erf(x);}
     template<typename T> static void der(const T& x, T& f, T* d){ f = erf(x); d[0] = (2/std::sqrt(M_PI))*std::exp(-x*x);}
 };
 

@@ -46,7 +46,7 @@ void MatrixScalarOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
   if(nfwd==0 && nadj==0){
     // No sensitivities
     for(int i=0; i<size(); ++i)
-      nfun0[op](input[0][i],input[1][0],&output[i]);
+      SXFunctionInternal::numFun[op](input[0][i],input[1][0],output[i]);
     
   } else {
     // Sensitivities

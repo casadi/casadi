@@ -38,7 +38,6 @@ using namespace std;
 /** \brief  Prototypes for a binary function */
 typedef SX (*sfun_ptr)(const SX&, const SX&); // symbolic function
 typedef SX (*sder_ptr)(const SX&, const SX&, const SX&); // symbolic partial derivative
-typedef void (*nfun_ptr)(double, double, double*);
 //@}
 	
 /** \brief  Zero derivative */
@@ -49,7 +48,6 @@ static SX zero_sder(const SX &f, const SX& x, const SX& y){ return 0; }
 static SX add_sfcn(const SX& x, const SX& y){ return x+y; }
 static SX add_sder1(const SX &f, const SX& x, const SX& y){ return 1; }
 static SX add_sder2(const SX &f, const SX& x, const SX& y){ return 1; }
-static void add_nfcn0(double x, double y, double *res){ F = x+y;}
 //@}
 
 //@{
@@ -57,7 +55,6 @@ static void add_nfcn0(double x, double y, double *res){ F = x+y;}
 static SX sub_sfcn(const SX& x, const SX& y){ return x-y; }
 static SX sub_sder1(const SX &f, const SX& x, const SX& y){ return 1; }
 static SX sub_sder2(const SX &f, const SX& x, const SX& y){ return -1; }
-static void sub_nfcn0(double x, double y, double *res){ F = x-y;}
 //@}
 
 //@{
@@ -65,14 +62,12 @@ static void sub_nfcn0(double x, double y, double *res){ F = x-y;}
 static SX mul_sfcn(const SX& x, const SX& y){ return x*y; }
 static SX mul_sder1(const SX &f, const SX& x, const SX& y){ return y; }
 static SX mul_sder2(const SX &f, const SX& x, const SX& y){ return x; }
-static void mul_nfcn0(double x, double y, double *res){ F = x*y;}
 //@}
 
 //@{
 /** \brief  Negation */
 static SX neg_sfcn(const SX& x, const SX& y){ return -x; }
 static SX neg_sder1(const SX &f, const SX& x, const SX& y){ return -1; }
-static void neg_nfcn0(double x, double y, double *res){ F = -x;}
 //@}
 
 //@{
@@ -80,21 +75,18 @@ static void neg_nfcn0(double x, double y, double *res){ F = -x;}
 static SX div_sfcn(const SX& x, const SX& y){ return x/y; }
 static SX div_sder1(const SX &f, const SX& x, const SX& y){ return 1/y; }
 static SX div_sder2(const SX &f, const SX& x, const SX& y){ return -f/y; }
-static void div_nfcn0(double x, double y, double *res){ F = x/y;}
 //@}
 
 //@{
 /** \brief  Natural exponential */
 static SX exp_sfcn(const SX& x, const SX& y){ return exp(x); }
 static SX exp_sder1(const SX &f, const SX& x, const SX& y){ return f; }
-static void exp_nfcn0(double x, double y, double *res){ F = exp(x);}
 //@}
 
 //@{
 /** \brief  Natural logarithm */
 static SX log_sfcn(const SX& x, const SX& y){ return log(x); }
 static SX log_sder1(const SX &f, const SX& x, const SX& y){ return 1/x; }
-static void log_nfcn0(double x, double y, double *res){ F = log(x);}
 //@}
 
 //@{
@@ -102,74 +94,63 @@ static void log_nfcn0(double x, double y, double *res){ F = log(x);}
 static SX pow_sfcn(const SX& x, const SX& y){ return pow(x,y); }
 static SX pow_sder1(const SX &f, const SX& x, const SX& y){ return y*f/x; }
 static SX pow_sder2(const SX &f, const SX& x, const SX& y){ return log(x)*f; }
-static void pow_nfcn0(double x, double y, double *res){ F = pow(x,y);}
 //@}
 
 //@{
 /** \brief  Square root */
 static SX sqrt_sfcn(const SX& x, const SX& y){ return sqrt(x); }
 static SX sqrt_sder1(const SX &f, const SX& x, const SX& y){ return 1/(2*f);}
-static void sqrt_nfcn0(double x, double y, double *res){ F = sqrt(x);}
 //@}
 
 //@{
 /** \brief  Sine */
 static SX sin_sfcn(const SX& x, const SX& y){ return sin(x); }
 static SX sin_sder1(const SX &f, const SX& x, const SX& y){ return cos(x); }
-static void sin_nfcn0(double x, double y, double *res){ F = sin(x);}
 //@}
 
 //@{
 /** \brief  Cosine */
 static SX cos_sfcn(const SX& x, const SX& y){ return cos(x); }
 static SX cos_sder1(const SX &f, const SX& x, const SX& y){ return -sin(x); }
-static void cos_nfcn0(double x, double y, double *res){ F = cos(x);}
 //@}
 
 //@{
 /** \brief  Tangens */
 static SX tan_sfcn(const SX& x, const SX& y){ return tan(x); }
 static SX tan_sder1(const SX &f, const SX& x, const SX& y){ SX cosx = cos(x); return 1/(cosx*cosx);}
-static void tan_nfcn0(double x, double y, double *res){ F = tan(x);}
 //@}
 
 //@{
 /** \brief  arcsin */
 static SX asin_sfcn(const SX& x, const SX& y){ return asin(x); }
 static SX asin_sder1(const SX &f, const SX& x, const SX& y){ return 1/sqrt(1-x*x); }
-static void asin_nfcn0(double x, double y, double *res){ F = asin(x);}
 //@}
 
 //@{
 /** \brief  arccos */
 static SX acos_sfcn(const SX& x, const SX& y){ return acos(x); }
 static SX acos_sder1(const SX &f, const SX& x, const SX& y){ return -1/sqrt(1-x*x);}
-static void acos_nfcn0(double x, double y, double *res){ F = acos(x);}
 //@}
 
 //@{
 /** \brief  arctan */
 static SX atan_sfcn(const SX& x, const SX& y){ return atan(x); }
 static SX atan_sder1(const SX &f, const SX& x, const SX& y){ return 1/(1+x*x); }
-static void atan_nfcn0(double x, double y, double *res){ F = atan(x);}
 //@}
 
 //@{
 /** \brief  Step node */
 static SX step_sfcn(const SX& x, const SX& y){ return x >= 0; }
-static void step_nfcn0(double x, double y, double *res){ F = x >= 0;}
 //@}
 
 //@{
 /** \brief  Floor */
 static SX floor_sfcn(const SX& x, const SX& y){ return floor(x); }
-static void floor_nfcn0(double x, double y, double *res){ F = floor(x);}
 //@}
 
 //@{
 /** \brief  Ceil */
 static SX ceil_sfcn(const SX& x, const SX& y){ return ceil(x); }
-static void ceil_nfcn0(double x, double y, double *res){ F = ceil(x);}
 //@}
 
 //@{
@@ -177,7 +158,6 @@ static void ceil_nfcn0(double x, double y, double *res){ F = ceil(x);}
 static SX fmin_sfcn(const SX& x, const SX& y){ return fmin(x,y); }
 static SX fmin_sder1(const SX &f, const SX& x, const SX& y){ return x<=y; }
 static SX fmin_sder2(const SX &f, const SX& x, const SX& y){ return y<=x; }
-static void fmin_nfcn0(double x, double y, double *res){ F = min(x,y);}
 //@}
 
 //@{
@@ -185,20 +165,17 @@ static void fmin_nfcn0(double x, double y, double *res){ F = min(x,y);}
 static SX fmax_sfcn(const SX& x, const SX& y){ return fmax(x,y); }
 static SX fmax_sder1(const SX &f, const SX& x, const SX& y){ return x>=y; }
 static SX fmax_sder2(const SX &f, const SX& x, const SX& y){ return y>=x; }
-static void fmax_nfcn0(double x, double y, double *res){ F = max(x,y);}
 //@}
 
 //@{
 /** \brief  Equality */
 static SX equality_sfcn(const SX& x, const SX& y){ return x == y; }
-static void equality_nfcn0(double x, double y, double *res){ F = x==y;}
 //@}
 
 //@{
 /** \brief  Error function */
 static SX erf_sfcn(const SX& x, const SX& y){ return erf(x); }
 static SX erf_sder1(const SX &f, const SX& x, const SX& y){ return (2/sqrt(M_PI))*exp(-x*x);}
-static void erf_nfcn0(double x, double y, double *res){ F = ERF(x);}
 //@}
 
 /// Vector of symbolic functions
@@ -212,10 +189,6 @@ static sder_ptr sder1[] = { //
 /// Array of symbolic partial derivatives
 static sder_ptr sder2[] = { 
   add_sder2, sub_sder2, mul_sder2, div_sder2, zero_sder, zero_sder, zero_sder, pow_sder2, zero_sder,  zero_sder, zero_sder, zero_sder, zero_sder,  zero_sder,  zero_sder,  zero_sder,  zero_sder,   zero_sder,  zero_sder,      zero_sder, fmin_sder2, fmax_sder2
-};
-/// Partial derivatives up to order 0
-static nfun_ptr nfun0[] = {   
-  add_nfcn0, sub_nfcn0, mul_nfcn0, div_nfcn0, neg_nfcn0, exp_nfcn0, log_nfcn0, pow_nfcn0, sqrt_nfcn0, sin_nfcn0, cos_nfcn0, tan_nfcn0, asin_nfcn0, acos_nfcn0, atan_nfcn0, step_nfcn0, floor_nfcn0, ceil_nfcn0, equality_nfcn0, erf_nfcn0, fmin_nfcn0, fmax_nfcn0
 };
 
 

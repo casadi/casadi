@@ -148,14 +148,14 @@ class SXFunctionInternal : public FXInternal{
   static std::vector<printFunT> getPrintFun();
 
   /** \brief  Numerical functions */
-  static std::vector<double(*)(const double&, const double&)> numFun;
+  static std::vector<void (*)(const double&, const double&, double&)> numFun;
   
   /** \brief  Symbolic evaluation */
-  static std::vector<SX(*)(const SX&, const SX&)> symFun;
+  static std::vector<void (*)(const SX&, const SX&, SX&)> symFun;
   
   /** \brief  Get a vector of function pointers to all the built in functions */
   template<typename T>
-  static std::vector<T(*)(const T&, const T&)> getFun();
+  static std::vector<void (*)(const T&, const T&, T&)> getFun();
   
   /** \brief  Numerical derivatives */
   static std::vector<void (*)(const double& x, const double& y, double& f, double* d)> numDer;
@@ -511,9 +511,9 @@ cout << "  "<< ii++ << ": ";
 }
 
 template<typename T>
-std::vector<T(*)(const T&, const T&)> SXFunctionInternal::getFun(){
+std::vector<void (*)(const T&, const T&, T&)> SXFunctionInternal::getFun(){
   // Create return object
-  std::vector<T(*)(const T&, const T&)> ret(NUM_BUILT_IN_OPS,0);
+  std::vector<void (*)(const T&, const T&, T&)> ret(NUM_BUILT_IN_OPS,0);
   
   // Specify operations
   ret[ADD] = BinaryOperation<ADD>::fcn;
