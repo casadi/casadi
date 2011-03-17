@@ -6,7 +6,7 @@ SET(CASADI_SRCS
   casadi_limits.hpp
   casadi_operators.hpp
   casadi_exception.hpp
-  casadi_functions.hpp
+  casadi_math.hpp
   printable_object.hpp        printable_object.cpp      # Base class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
