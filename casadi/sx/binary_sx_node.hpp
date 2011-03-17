@@ -36,13 +36,13 @@ class BinarySXNode : public SXNode{
 public:
 
 /** \brief  Constructors */
-BinarySXNode(OPERATION op_, const SX& child1_){
+BinarySXNode(Operation op_, const SX& child1_){
  op = op_;
  child[0] = child1_;
  child[1] = 0;
 }
 
-BinarySXNode(OPERATION op_, const SX& child1_, const SX& child2_){
+BinarySXNode(Operation op_, const SX& child1_, const SX& child2_){
  op = op_;
  child[0] = child1_;
  child[1] = child2_;
@@ -65,7 +65,7 @@ virtual const SX& dep(int i) const;
 virtual int getOp() const{ return op;}
 
 /** \brief  Data members */
-OPERATION  op;
+Operation op;
 SX      child[2];
 
 virtual void print(std::ostream &stream) const;

@@ -34,7 +34,7 @@ class UnaryOp : public MXNode{
 public:
 
   /** \brief  Constructor */
-  UnaryOp(OPERATION op, const MX& x);
+  UnaryOp(Operation op, const MX& x);
 
   /** \brief  Destructor */
   virtual ~UnaryOp(){}
@@ -50,7 +50,7 @@ public:
   
 protected:
   //! \brief operation
-  OPERATION op;
+  Operation op;
 };
 
 } // namespace CasADi

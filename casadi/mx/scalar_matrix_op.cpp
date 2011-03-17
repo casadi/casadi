@@ -24,12 +24,13 @@
 #include <vector>
 #include <sstream>
 #include "../stl_vector_tools.hpp"
+#include "../fx/sx_function_internal.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-ScalarMatrixOp::ScalarMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
+ScalarMatrixOp::ScalarMatrixOp(Operation op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
   setSparsity(y.sparsity());
 }
@@ -39,7 +40,7 @@ ScalarMatrixOp* ScalarMatrixOp::clone() const{
 }
 
 void ScalarMatrixOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  print_c[op](stream,args.at(0),args.at(1));
+  SXFunctionInternal::printFun[op](stream,args.at(0),args.at(1));
 }
 
 void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

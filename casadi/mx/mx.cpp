@@ -214,11 +214,11 @@ int MX::size2() const{
 }
 
 MX operator+(const MX &x, const MX &y){
-  return MX::binary(ADD_NODE,x,y);
+  return MX::binary(ADD,x,y);
 }
 
 MX operator-(const MX &x, const MX &y){
-  return MX::binary(SUB_NODE,x,y);
+  return MX::binary(SUB,x,y);
 }
 
 MX MX::binary(int op, const MX &x, const MX &y){
@@ -232,34 +232,34 @@ MX MX::binary(int op, const MX &x, const MX &y){
 
 MX MX::unary(int op, const MX &x){
   MX ret;
-  ret.assignNode(new UnaryOp(OPERATION(op),x));
+  ret.assignNode(new UnaryOp(Operation(op),x));
   return ret;
 }
 
 MX MX::scalar_matrix(int op, const MX &x, const MX &y){
   MX ret;
-  ret.assignNode(new ScalarMatrixOp(OPERATION(op),x,y));  
+  ret.assignNode(new ScalarMatrixOp(Operation(op),x,y));  
   return ret;
 }
 
 MX MX::matrix_scalar(int op, const MX &x, const MX &y){
   MX ret;
-  ret.assignNode(new MatrixScalarOp(OPERATION(op),x,y));  
+  ret.assignNode(new MatrixScalarOp(Operation(op),x,y));  
   return ret;
 }
 
 MX MX::matrix_matrix(int op, const MX &x, const MX &y){
   MX ret;
-  ret.assignNode(new MatrixMatrixOp(OPERATION(op),x,y)); 
+  ret.assignNode(new MatrixMatrixOp(Operation(op),x,y)); 
   return ret;
 }
 
 MX operator*(const MX &x, const MX &y){
-  return MX::binary(MUL_NODE,x,y);
+  return MX::binary(MUL,x,y);
 }
 
 MX operator/(const MX &x, const MX &y){
-  return MX::binary(DIV_NODE,x,y);
+  return MX::binary(DIV,x,y);
 }
 
 MXNode* MX::operator->(){
@@ -310,7 +310,7 @@ MX MX::eye(int n){
 }
 
 MX MX::operator-() const{
-  return unary(NEG_NODE,*this);
+  return unary(NEG,*this);
 }
 
 const CRSSparsity& MX::sparsity() const{
@@ -361,63 +361,63 @@ using namespace CasADi;
 namespace std{
 
 MX exp(const MX& x){
-  return MX::unary(EXP_NODE,x);
+  return MX::unary(EXP,x);
 }
 
 MX log(const MX& x){
-  return MX::unary(LOG_NODE,x);
+  return MX::unary(LOG,x);
 }
 
 MX sqrt(const MX& x){
-  return MX::unary(SQRT_NODE,x);
+  return MX::unary(SQRT,x);
 }
 
 MX sin(const MX& x){
-  return MX::unary(SIN_NODE,x);
+  return MX::unary(SIN,x);
 }
 
 MX cos(const MX& x){;  
-  return MX::unary(COS_NODE,x);
+  return MX::unary(COS,x);
 }
 
 MX tan(const MX& x){
-  return MX::unary(TAN_NODE,x);
+  return MX::unary(TAN,x);
 }
 
 MX atan(const MX& x){
-  return MX::unary(ATAN_NODE,x);
+  return MX::unary(ATAN,x);
 }
 
 MX asin(const MX& x){
-  return MX::unary(ASIN_NODE,x);
+  return MX::unary(ASIN,x);
 }
 
 MX acos(const MX& x){
-  return MX::unary(ACOS_NODE,x);
+  return MX::unary(ACOS,x);
 }
 
 MX pow(const MX& x, const MX& n){
-  return MX::binary(POW_NODE,x,n);
+  return MX::binary(POW,x,n);
 }
 
 MX erf(const MX& x){
-  return MX::unary(ERF_NODE,x);
+  return MX::unary(ERF,x);
 }
 
 MX floor(const MX& x){
-  return MX::unary(FLOOR_NODE,x);
+  return MX::unary(FLOOR,x);
 }
 
 MX ceil(const MX& x){
-  return MX::unary(CEIL_NODE,x);
+  return MX::unary(CEIL,x);
 }
 
 MX fmin(const MX& x, const MX& y){
-  return MX::binary(FMIN_NODE,x,y);
+  return MX::binary(FMIN,x,y);
 }
 
 MX fmax(const MX& x, const MX& y){
-  return MX::binary(FMAX_NODE,x,y);
+  return MX::binary(FMAX,x,y);
 }
 
 

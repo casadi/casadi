@@ -21,6 +21,7 @@
  */
 
 #include "unary_op.hpp"
+#include "../fx/sx_function_internal.hpp"
 #include <vector>
 #include <sstream>
 
@@ -28,7 +29,7 @@ using namespace std;
 
 namespace CasADi{
 
-UnaryOp::UnaryOp(OPERATION op_, const MX& x) : op(op_){
+UnaryOp::UnaryOp(Operation op_, const MX& x) : op(op_){
   setDependencies(x);
   setSparsity(x->sparsity());
 }
@@ -38,7 +39,7 @@ UnaryOp* UnaryOp::clone() const{
 }
 
 void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  print_c[op](stream,args.at(0),"nan");
+  SXFunctionInternal::printFun[op](stream,args.at(0),"nan");
 }
 
 void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

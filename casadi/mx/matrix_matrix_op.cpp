@@ -23,12 +23,13 @@
 #include "matrix_matrix_op.hpp"
 #include <vector>
 #include <sstream>
+#include "../fx/sx_function_internal.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-MatrixMatrixOp::MatrixMatrixOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
+MatrixMatrixOp::MatrixMatrixOp(Operation op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
   
   // Check if the sparsity patterns are the same
@@ -48,7 +49,7 @@ MatrixMatrixOp* MatrixMatrixOp::clone() const{
 }
 
 void MatrixMatrixOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  print_c[op](stream,args.at(0),args.at(1));
+  SXFunctionInternal::printFun[op](stream,args.at(0),args.at(1));
 }
 
 void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){

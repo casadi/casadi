@@ -34,7 +34,7 @@ class ScalarMatrixOp : public MXNode{
   public:
 
     /** \brief  Constructor */
-    ScalarMatrixOp(OPERATION op, const MX& x, const MX& y);
+    ScalarMatrixOp(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor */
     virtual ~ScalarMatrixOp(){}
@@ -49,7 +49,7 @@ class ScalarMatrixOp : public MXNode{
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
     //! \brief Operation
-    OPERATION op;
+    Operation op;
 };
 
 } // namespace CasADi

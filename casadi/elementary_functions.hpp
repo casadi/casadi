@@ -56,7 +56,7 @@ class BinaryOperation{
 };
 
 /// Enum for quick access to any node
-enum BUILT_IN_OPS{
+enum Operation{
   ADD,  SUB,  MUL,  DIV,
   NEG,  EXP,  LOG,  POW,  
   SQRT,  SIN,  COS,  TAN,  

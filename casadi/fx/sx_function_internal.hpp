@@ -142,10 +142,10 @@ class SXFunctionInternal : public FXInternal{
   typedef void (*printFunT)(std::ostream &stream, const std::string& x, const std::string& y);
   
   /** \brief  Vector of printing operations */
-  static std::vector<printFunT> printOp;
+  static std::vector<printFunT> printFun;
 
   /** \brief  Get a vector of function pointers to all the built in printing functions */
-  static std::vector<printFunT> getPrintOp();
+  static std::vector<printFunT> getPrintFun();
 
   /** \brief  Numerical functions */
   static std::vector<double(*)(const double&, const double&)> numFun;

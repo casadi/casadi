@@ -34,7 +34,7 @@ class MatrixScalarOp : public MXNode{
   public:
 
     /** \brief  Constructor */
-    MatrixScalarOp(OPERATION op, const MX& x, const MX& y);
+    MatrixScalarOp(Operation op, const MX& x, const MX& y);
     
     /** \brief  Destructor */
     virtual ~MatrixScalarOp(){}
@@ -50,7 +50,7 @@ class MatrixScalarOp : public MXNode{
   
   protected:
 
-    OPERATION op;
+    Operation op;
 };
 
 } // namespace CasADi

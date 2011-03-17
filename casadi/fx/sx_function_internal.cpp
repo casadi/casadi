@@ -172,7 +172,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
 	    assert(child->hasDep());
 	    SXNode * bnode = (SXNode *)child;
 	    cout << "op = " << bnode->op << " ";
-	    print_c[bnode->op](cout,"x","y");
+	    printFun[bnode->op](cout,"x","y");
 	    cout << " ch[0] = " << bnode->child[0]->temp << ". ";
 	    cout << "ch[1] = " << bnode->child[1]->temp << ". ";
 	    cout << endl;
@@ -757,7 +757,7 @@ return ret;
 bool SXFunctionInternal::isSmooth() const{
     // Go through all nodes and check if any node is non-smooth
     for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
-      if(it->op == STEP_NODE || it->op == FLOOR_NODE )
+      if(it->op == STEP || it->op == FLOOR )
         return false;
     }
     return true;
@@ -781,7 +781,7 @@ void SXFunctionInternal::print(ostream &stream) const{
 #endif
 
     stream << s.str() << " = ";
-    print_c[op](stream,s0.str(),s1.str());
+    printFun[op](stream,s0.str(),s1.str());
     stream << ";" << endl;
   }
 }
@@ -889,7 +889,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
     else                               s0 << "i_" << it->ch[0];
     if(tree[it->ch[1]]->isConstant())  s1 << tree[it->ch[1]]->getValue();
     else                               s1 << "i_" << it->ch[1];
-    print_c[op](cfile ,s0.str(),s1.str());
+    printFun[op](cfile ,s0.str(),s1.str());
     cfile  << ";" << endl;
   }
   
@@ -973,7 +973,7 @@ SXFunctionInternal* SXFunctionInternal::clone() const{
   return new SXFunctionInternal(*this);
 }
 
-std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintOp(){
+std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintFun(){
   // Create return object
   std::vector<printFunT> ret(NUM_BUILT_IN_OPS,0);
   
@@ -1014,6 +1014,8 @@ std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::getPrintOp(){
   return ret;
   
 }
+
+std::vector<SXFunctionInternal::printFunT> SXFunctionInternal::printFun = getPrintFun();
 
 std::vector<double(*)(const double&, const double&)> SXFunctionInternal::numFun = getFun<double>();
 

@@ -186,7 +186,7 @@ void replaceDerivatives(Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> 
 
   // Go through all nodes and check if any node is a derivative
   for(int i=0; i<fcn.algorithm.size(); ++i){
-        if(fcn.algorithm[i].op == DER_NODE){
+        if(fcn.algorithm[i].op == DER){
 
           // find the corresponding derivative
           std::map<int, SX>::iterator r = dermap.find(fcn.algorithm[i].ch0);
@@ -219,7 +219,7 @@ void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr){
   for(int i=0; i<fcn->algorithm.size(); ++i){
 
       // Check if we have a step node
-      if(fcn->algorithm[i].op == STEP_NODE){
+      if(fcn->algorithm[i].op == STEP){
 
         // Get the index of the child
         int ch0 = fcn->algorithm[i].ch[0];
@@ -466,7 +466,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
         // Check if addition, subtracton or multiplication
         BinarySXNode*     binnode = (BinarySXNode*)to_be_expanded.top();
         // If we have a binary node that we can factorize
-        if(binnode->op == ADD_NODE || binnode->op == SUB_NODE || (binnode->op == MUL_NODE  && (binnode->child[0]->isConstant() || binnode->child[1]->isConstant()))){
+        if(binnode->op == ADD || binnode->op == SUB || (binnode->op == MUL  && (binnode->child[0]->isConstant() || binnode->child[1]->isConstant()))){
           // Make sure that both children are factorized, if not - add to stack
           if (indices.find(binnode->child[0].get()) == indices.end()){
             to_be_expanded.push(binnode->child[0].get());
@@ -482,7 +482,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
           int ind2 = indices[binnode->child[1].get()];
   
           // If multiplication
-          if(binnode->op == MUL_NODE){
+          if(binnode->op == MUL){
             double fac;
             if(binnode->child[0]->isConstant()){ // Multiplication where the first factor is a constant
               fac = binnode->child[0]->getValue();
@@ -496,7 +496,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
             for(int i=0; i<w.size(); ++i) w[i] *= fac;
 
           } else { // if addition or subtraction
-            if(binnode->op == ADD_NODE){          // Addition: join both sums
+            if(binnode->op == ADD){          // Addition: join both sums
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
             } else {      // Subtraction: join both sums with negative weights for second term

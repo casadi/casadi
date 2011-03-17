@@ -34,7 +34,7 @@ class MatrixMatrixOp : public MXNode{
   public:
 
     /** \brief  Constructor */
-    MatrixMatrixOp(OPERATION op, const MX& x, const MX& y);
+    MatrixMatrixOp(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor */
     virtual ~MatrixMatrixOp(){}
@@ -50,7 +50,7 @@ class MatrixMatrixOp : public MXNode{
 
   protected:
     //! \brief Operation
-    OPERATION op;
+    Operation op;
 
     /// Does the two matrices have the same sparsity
     bool same_sparsity_;

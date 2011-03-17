@@ -23,12 +23,13 @@
 #include "matrix_scalar_op.hpp"
 #include <vector>
 #include <sstream>
+#include "../fx/sx_function_internal.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-MatrixScalarOp::MatrixScalarOp(OPERATION op_, const MX& x, const MX& y) : op(op_){
+MatrixScalarOp::MatrixScalarOp(Operation op_, const MX& x, const MX& y) : op(op_){
   setDependencies(x,y);
   setSparsity(x.sparsity());
 }
@@ -38,7 +39,7 @@ MatrixScalarOp* MatrixScalarOp::clone() const{
 }
 
 void MatrixScalarOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  print_c[op](stream,args.at(0),args.at(1));
+  SXFunctionInternal::printFun[op](stream,args.at(0),args.at(1));
 }
 
 void MatrixScalarOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
