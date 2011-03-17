@@ -56,9 +56,6 @@ class SXFunctionInternal : public FXInternal{
 /** \brief  Destructor */
   virtual ~SXFunctionInternal();
 
-/** \brief  Clear the memory */
-  virtual void clear(int ord=0);
-
 /** \brief  Evaluate the function with partial derivatives up to order ord */
   virtual void evaluate(int fsens_order, int asens_order);
 
@@ -106,21 +103,19 @@ class SXFunctionInternal : public FXInternal{
   std::vector<AlgElData<1> > pder1;
   std::vector<AlgElData<2> > pder2;
   
-/** \brief  All nodes */
+  /** \brief  All nodes */
   std::vector<SXNode*> tree;
 
   /** \brief  Working vector for numeric calculation */
-  std::vector< std::vector<double> > work;        // work array during the evaluation
+  std::vector<double> work;
+  std::vector<double> dwork;
   int worksize;
 
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SX> work_sym;
   
-/** \brief  Initialize */
+  /** \brief  Initialize */
   virtual void init();
-
-  /** Maximal order of the automatic differentiation*/
-  int maxorder;
 
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename) const;

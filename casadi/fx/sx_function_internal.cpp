@@ -248,12 +248,11 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   }
 
   // Allocate a work vector
-  work.resize(2);
-  work[0].resize(worksize,numeric_limits<double>::quiet_NaN());
+  work.resize(worksize,numeric_limits<double>::quiet_NaN());
 
   // Save the constants to the work vector
   for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it)
-    work[0][(*it)->temp] = (*it)->getValue();
+    work[(**it).temp] = (**it).getValue();
 
   // Reset the temporary variables
   for(int i=0; i<tree.size(); ++i){
@@ -267,111 +266,91 @@ SXFunctionInternal::~SXFunctionInternal(){
 
 
 void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
-  // Copy the function arguments to the work vector
-  for(int ind=0; ind<input_.size(); ++ind)
-    for(int i=0; i<input_ind[ind].size(); ++i){
-      work[0][input_ind[ind][i]] = input(ind)[i];
-    }
+  int nfdir = fsens_order>0 ? nfdir_ : 0;
+  int nadir = asens_order>0 ? nadir_ : 0;
   
-  // Taping order
-  int tape_order = asens_order > fsens_order ? asens_order : fsens_order;
-
+  // Copy the function arguments to the work vector
+  for(int ind=0; ind<getNumInputs(); ++ind){
+    const Matrix<double> &arg = input(ind);
+    for(int i=0; i<arg.size(); ++i){
+      work[input_ind[ind][i]] = arg[i];
+    }
+  }
+  
   // Evaluate the algorithm
-  if(tape_order==0){
+  if(nfdir==0 && nadir==0){
+    // without taping
     for(vector<AlgEl>::iterator it=algorithm.begin(); it<algorithm.end(); ++it){
       // Get the arguments
-      double x = work[0][it->ch[0]];
-      double y = work[0][it->ch[1]];
-      nfun0[it->op](x,y,&work[0][it->ind]);
+      double x = work[it->ch[0]];
+      double y = work[it->ch[1]];
+      nfun0[it->op](x,y,&work[it->ind]);
     }
-  } else if(tape_order==1){
+  } else {
+    // with taping
     double tmp[3];
     vector<AlgEl>::iterator it = algorithm.begin();
     vector<AlgElData<1> >::iterator it1 = pder1.begin();
     for(; it<algorithm.end(); ++it, ++it1){
       // Get the arguments
-      double x = work[0][it->ch[0]];
-      double y = work[0][it->ch[1]];
+      double x = work[it->ch[0]];
+      double y = work[it->ch[1]];
       nfun1[it->op](x,y,tmp);
 
-      work[0][it->ind] = tmp[0];
+      work[it->ind] = tmp[0];
       it1->d[0] = tmp[1];
       it1->d[1] = tmp[2];
     }
-  } else if(tape_order==2){
-    double tmp[6];
-      
-    vector<AlgEl>::iterator it = algorithm.begin();
-    vector<AlgElData<1> >::iterator it1 = pder1.begin();
-    vector<AlgElData<2> >::iterator it2 = pder2.begin();
-    for(; it!=algorithm.end(); ++it, ++it1, ++it2){
-      // Get the arguments
-      double x = work[0][it->ch[0]];
-      double y = work[0][it->ch[1]];
-      nfun2[it->op](x,y,tmp);
-
-      work[0][it->ind] = tmp[0];
-      it1->d[0] = tmp[1];
-      it1->d[1] = tmp[2];
-      it2->d[0] = tmp[3];
-      it2->d[1] = tmp[4];
-      it2->d[2] = tmp[5];
-    } 
-  } else {
-    throw "no";
   }
   
   // Get the results
-  for(int ind=0; ind<output_.size(); ++ind)
-    for(int i=0; i<output_ind[ind].size(); ++i){
-      output(ind)[i] = work[0][output_ind[ind][i]];
+  for(int ind=0; ind<getNumOutputs(); ++ind){
+    Matrix<double> &res = output(ind);
+    for(int i=0; i<res.size(); ++i){
+      res[i] = work[output_ind[ind][i]];
     }
+  }
 
-  if(fsens_order>0){
-    assert(fsens_order==1); // higher orders not implemented
-    
-    // Loop over all forward directions
-    for(int dir=0; dir<nfdir_; ++dir){
+  // Loop over all forward directions
+  for(int dir=0; dir<nfdir; ++dir){
 
-      // Clear the seeds (not necessary if constants and parameters have zero value!)
-      clear(1);
-      
-      // Copy the function arguments to the work vector
-      for(int ind=0; ind<input_.size(); ++ind){
-        const vector<double> &seed = fwdSeed(ind,dir).data();
-        for(int i=0; i<input_ind[ind].size(); ++i){
-          work[1][input_ind[ind][i]] = seed[i];
-        }
-      }
+    // Clear the seeds (not necessary if constants and parameters have zero value!)
+    fill(dwork.begin(),dwork.end(),0);
     
-      // Evaluate the algorithm for the sensitivities
-      vector<AlgEl>::const_iterator it = algorithm.begin();
-      vector<AlgElData<1> >::const_iterator it2 = pder1.begin();
-      for(; it!=algorithm.end(); ++it, ++it2){
-        work[1][it->ind] = it2->d[0] * work[1][it->ch[0]] + it2->d[1] * work[1][it->ch[1]];
+    // Copy the function arguments to the work vector
+    for(int ind=0; ind<input_.size(); ++ind){
+      const Matrix<double> &fseed = fwdSeed(ind,dir);
+      for(int i=0; i<fseed.size(); ++i){
+        dwork[input_ind[ind][i]] = fseed[i];
       }
-    
-      // Get the results
-      for(int ind=0; ind<output_.size(); ++ind){
-        vector<double> &sens = fwdSens(ind,dir).data();
-        for(int i=0; i<output_ind[ind].size(); ++i){
-          sens[i] = work[1][output_ind[ind][i]];
-        }
+    }
+  
+    // Evaluate the algorithm for the sensitivities
+    vector<AlgEl>::const_iterator it = algorithm.begin();
+    vector<AlgElData<1> >::const_iterator it2 = pder1.begin();
+    for(; it!=algorithm.end(); ++it, ++it2){
+      dwork[it->ind] = it2->d[0] * dwork[it->ch[0]] + it2->d[1] * dwork[it->ch[1]];
+    }
+  
+    // Get the forward sensitivities
+    for(int ind=0; ind<output_.size(); ++ind){
+      Matrix<double> &fsens = fwdSens(ind,dir);
+      for(int i=0; i<output_ind[ind].size(); ++i){
+        fsens[i] = dwork[output_ind[ind][i]];
       }
     }
   }
   
-  if(asens_order>0)
-  for(int dir=0; dir<nadir_; ++dir){
+  for(int dir=0; dir<nadir; ++dir){
 
   // Clear the seeds (should not be necessary)
-    clear(1);
+  fill(dwork.begin(),dwork.end(),0);
 
     // Pass the output seeds
     for(int ind=0; ind<output_.size(); ++ind){
-      const vector<double> &aseed = adjSeed(ind,dir).data();
+      const Matrix<double> &aseed = adjSeed(ind,dir);
       for(int i=0; i<output_ind[ind].size(); ++i){
-        work[1][output_ind[ind][i]] = aseed[i];
+        dwork[output_ind[ind][i]] = aseed[i];
       }
     }
 
@@ -380,18 +359,18 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
     const AlgElData<1>& aed = pder1[i];
     
     // copy the seed and clear the cache entry
-    double seed = work[1][ae.ind];
-    work[1][ae.ind] = 0;
+    double seed = dwork[ae.ind];
+    dwork[ae.ind] = 0;
 
-    work[1][ae.ch[0]] += aed.d[0] * seed;
-    work[1][ae.ch[1]] += aed.d[1] * seed;
+    dwork[ae.ch[0]] += aed.d[0] * seed;
+    dwork[ae.ch[1]] += aed.d[1] * seed;
   }
 
-  // Collect the input seeds
-  for(int ind=0; ind<input_.size(); ++ind){
-    vector<double> &asens = adjSens(ind,dir).data();
+  // Collect the adjoint sensitivities
+  for(int ind=0; ind<getNumInputs(); ++ind){
+    Matrix<double> &asens = adjSens(ind,dir);
     for(int i=0; i<input_ind[ind].size(); ++i){
-      asens[i] = work[1][input_ind[ind][i]];
+      asens[i] = dwork[input_ind[ind][i]];
     }
   }
 
@@ -399,11 +378,6 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
 
   }
   
-}
-
-void SXFunctionInternal::clear(int ord){
-  for(vector<double>::iterator it=work[ord].begin(); it!=work[ord].end(); ++it)
-    *it = 0;
 }
 
 void SXFunctionInternal::eval(const SXMatrix &x, SXMatrix &res) const{
@@ -436,30 +410,30 @@ void SXFunctionInternal::eval(
   assert(x.numel() == input_ind[0].size());
 
   // create a vector with the (symbolic) values at each node and save constants and symbolic variables
-  vector<SX> work(tree.size());
+  vector<SX> swork(tree.size());
   for(int i=0; i<tree.size(); ++i)
     if(!tree[i]->hasDep())
-      work[i] = SX(tree[i]);
+      swork[i] = SX(tree[i]);
 
   // copy the function arguments
   for(int i=0; i<input_ind[0].size(); ++i)
-    if(input_ind[0][i]>=0) work[input_ind[0][i]] = x[i];
+    if(input_ind[0][i]>=0) swork[input_ind[0][i]] = x[i];
 
   // evaluate the algorithm    
   int i;
   vector<AlgEl>::const_iterator it;
   for(it = algorithm.begin(), i=0; it!=algorithm.end(); ++it, ++i){
      if(replace.empty()){ // nothing needs to be replaced
-        work[it->ind] = sfcn[it->op](work[it->ch[0]],work[it->ch[1]]);
+        swork[it->ind] = sfcn[it->op](swork[it->ch[0]],swork[it->ch[1]]);
       } else {
-        SX r = sfcn[it->op](work[it->ch[0]],work[it->ch[1]]);
+        SX r = sfcn[it->op](swork[it->ch[0]],swork[it->ch[1]]);
         map<int,SX>::const_iterator it2 = replace.find(i); // try to locate the node
         if(it2 != replace.end()){ // replace
-          work[it->ind] = SX(it2->second);
+          swork[it->ind] = SX(it2->second);
           append(repres,SXMatrix(r));
         }
         else // do not replace
-          work[it->ind] = r;
+          swork[it->ind] = r;
       }
   }
 
@@ -470,7 +444,7 @@ void SXFunctionInternal::eval(
   for(int i=0; i<output(0).size1(); ++i) // loop over rows
     for(int el=output(0).rowind(i); el<output(0).rowind(i+1); ++el){ // loop over the non-zero elements of the original matrix
       int j=output(0).col(el);  // column
-      res(i,j) = work[output_ind[0][el]];
+      res(i,j) = swork[output_ind[0][el]];
   }
 
 }
@@ -866,8 +840,8 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   cfile << "};" << endl;
 
   // Memory
-/*  cfile << "double i0[" << work[0].size() << "];" << endl;
-  cfile << "double i1[" << work[1].size() << "];" << endl;;*/
+/*  cfile << "double i0[" << work.size() << "];" << endl;
+  cfile << "double i1[" << dwork.size() << "];" << endl;;*/
   
   // Initializer
   cfile << "int init(int *n_in_, int *n_out_){" << endl;
@@ -891,7 +865,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   cfile << "int evaluate(const double** x, double** r){" << endl;
 
   // Which variables have been declared
-  vector<bool> declared(work[1].size(),false);
+  vector<bool> declared(dwork.size(),false);
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_.size(); ++ind){
@@ -945,7 +919,7 @@ void SXFunctionInternal::init(){
   // allocate a vector with the values at the nodes, the first vector also contains the partial derivatives
   
   if(nfdir_>0 || nadir_>0)
-    work[1].resize(worksize,numeric_limits<double>::quiet_NaN());
+    dwork.resize(worksize,numeric_limits<double>::quiet_NaN());
 }
 
 FX SXFunctionInternal::jacobian(int iind, int oind){
