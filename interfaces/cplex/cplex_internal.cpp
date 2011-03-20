@@ -103,7 +103,7 @@ void CplexInternal::init(){
   }
 }
 
-void CplexInternal::evaluate_new(int nfdir, int nadir){
+void CplexInternal::evaluate(int nfdir, int nadir){
   int status;
   vector<double> objGrad, rhs, rngval,lambda,slack,dj;
   vector<char> sense;
