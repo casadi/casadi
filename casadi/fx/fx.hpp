@@ -107,10 +107,10 @@ class FX : public OptionsFunctionality{
   void setNumOutputs(int num_out);
   
   /** \brief  Evaluate (old style) */
-  void evaluate(int fsens_order=0, int asens_order=0);
+  void evaluate_old(int fsens_order=0, int asens_order=0);
   
-  /** \brief  Evaluate (new style) */
-  void evaluate_new(int nfdir=0, int nadir=0);
+  /** \brief  Evaluate */
+  void evaluate(int nfdir=0, int nadir=0);
   
   /// the same as evaluate(0,0)
   void solve();

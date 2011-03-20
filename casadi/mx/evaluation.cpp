@@ -70,7 +70,7 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
   }
 
   // Evaluate
-  fcn_.evaluate(nfwd>0, nadj>0);
+  fcn_.evaluate(nfwd, nadj);
   
   // Get the adjoint sensitivities
   for(int i=0; i<ndep(); ++i){

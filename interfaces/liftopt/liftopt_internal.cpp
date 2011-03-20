@@ -93,7 +93,7 @@ void LiftoptInternal::init(){
   fcn_.setLiftingFunction(CasadiLifter::liftfun, problem_);
 }
 
-void LiftoptInternal::evaluate_new(int nfdir, int nadir){
+void LiftoptInternal::evaluate(int nfdir, int nadir){
   // Evaluate
   opt_->setStartControls ( uInit_ );
   opt_->setStartEqMult( lambdaInit_ );

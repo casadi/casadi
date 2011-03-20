@@ -47,7 +47,7 @@ class ImplicitFunctionInternal : public FXInternal{
     virtual void init();
     
     /// Solve the system of equations
-    virtual void evaluate_new(int nfdir, int nadir) = 0;
+    virtual void evaluate(int nfdir, int nadir) = 0;
     
     /// Sparsity in CRS format
     FX f_;

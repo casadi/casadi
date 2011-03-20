@@ -304,7 +304,7 @@ void IpoptInternal::init(){
   }
 }
 
-void IpoptInternal::evaluate_new(int nfdir, int nadir){
+void IpoptInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
 
   // Reset the counters

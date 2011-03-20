@@ -94,7 +94,7 @@ void JacobianInternal::init(){
   }
 }
 
-void JacobianInternal::evaluate_new(int nfdir, int nadir){
+void JacobianInternal::evaluate(int nfdir, int nadir){
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
     fcn_.setInput(input(i),i);
@@ -120,7 +120,7 @@ void JacobianInternal::evaluate_new(int nfdir, int nadir){
         }
       
       // Evaluate the AD forward algorithm
-      fcn_.evaluate(1,0);
+      fcn_.evaluate(nfdir_fcn_,0);
           
       // Get the output seeds
       for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
@@ -143,7 +143,7 @@ void JacobianInternal::evaluate_new(int nfdir, int nadir){
         }
       
       // Evaluate the AD forward algorithm
-      fcn_.evaluate(0,1);
+      fcn_.evaluate(0,nadir_fcn_);
           
       // Get the output seeds
       for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){

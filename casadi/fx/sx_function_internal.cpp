@@ -265,7 +265,7 @@ SXFunctionInternal::~SXFunctionInternal(){
 }
 
 
-void SXFunctionInternal::evaluate_new(int nfdir, int nadir){
+void SXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<getNumInputs(); ++ind){

@@ -52,7 +52,7 @@ void LinearSolverInternal::init(){
 LinearSolverInternal::~LinearSolverInternal(){
 }
  
-void LinearSolverInternal::evaluate_new(int nfdir, int nadir){
+void LinearSolverInternal::evaluate(int nfdir, int nadir){
 /*  Factorization fact;
   if(called_once){
     // Check if any element has changed

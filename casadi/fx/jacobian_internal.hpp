@@ -47,7 +47,7 @@ class JacobianInternal : public FXInternal{
     virtual ~JacobianInternal();
       
     /// Evaluate the jacobian
-    virtual void evaluate_new(int nfdir, int nadir);
+    virtual void evaluate(int nfdir, int nadir);
 
     /// Initialize
     virtual void init();

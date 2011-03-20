@@ -65,7 +65,7 @@ public:
   virtual void setStopTime(double tf) = 0;
   
   /** \brief  evaluate */
-  virtual void evaluate_new(int nfdir, int nadir);
+  virtual void evaluate(int nfdir, int nadir);
 
   /** \brief  Initialize */
   virtual void init();

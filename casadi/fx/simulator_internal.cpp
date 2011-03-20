@@ -55,7 +55,7 @@ void SimulatorInternal::init(){
   output_fcn_.init();
 }
 
-void SimulatorInternal::evaluate_new(int nfdir, int nadir){
+void SimulatorInternal::evaluate(int nfdir, int nadir){
 
   // Pass the parameters and initial state
   integrator_.setInput(input(SIMULATOR_X0),INTEGRATOR_X0);
@@ -97,7 +97,7 @@ void SimulatorInternal::evaluate_new(int nfdir, int nadir){
       output_fcn_.setFwdSeed(fwdSeed(SIMULATOR_P),OUTPUT_P);
       
       // Evaluate output function
-      output_fcn_.evaluate(1,0);
+      output_fcn_.evaluate(nfdir,0);
 
       // Save the output of the function
       for(int i=0; i<output_.size(); ++i){

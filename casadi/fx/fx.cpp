@@ -106,20 +106,20 @@ MX FX::operator()(const vector<MX> &x, int ind) const{
 }
 #endif // USE_FUNCTORS
 
-void FX::evaluate_new(int nfdir, int nadir){
+void FX::evaluate(int nfdir, int nadir){
   casadi_assert(isInit());
   casadi_assert(nfdir<=(*this)->nfdir_);
   casadi_assert(nadir<=(*this)->nadir_);
-  (*this)->evaluate_new(nfdir,nadir);
+  (*this)->evaluate(nfdir,nadir);
 }
 
-void FX::evaluate(int fsens_order, int asens_order){
-  evaluate_new(fsens_order * (*this)->nfdir_, 
-               asens_order * (*this)->nadir_);
+void FX::evaluate_old(int fsens_order, int asens_order){
+  evaluate(fsens_order * (*this)->nfdir_, 
+           asens_order * (*this)->nadir_);
 }
 
 void FX::solve(){
-  evaluate_new(0,0);
+  evaluate(0,0);
 }
 
 int FX::getNumInputs() const{

@@ -203,7 +203,7 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
   liftfun_ud_ = user_data;
 }
 
-void MXFunctionInternal::evaluate_new(int nfdir, int nadir){
+void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
   casadi_assert(nfdir<=nfdir_);
   casadi_assert(nadir<=nadir_);

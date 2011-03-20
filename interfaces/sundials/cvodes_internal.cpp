@@ -774,7 +774,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
      }
 
      // Evaluate the AD forward algorithm
-     f_.evaluate(1,0);
+     f_.evaluate(nfdir_f_,0);
       
      // Get the output seeds
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){

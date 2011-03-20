@@ -42,7 +42,7 @@ class LiftoptInternal : public NLPSolverInternal{
     LiftoptInternal(const MXFunction& fcn);
     virtual ~LiftoptInternal();
     virtual void init();
-    virtual void evaluate_new(int nfdir, int nadir);
+    virtual void evaluate(int nfdir, int nadir);
 
     std::vector<double> nodeInit;
     

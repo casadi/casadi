@@ -34,7 +34,7 @@ long CasadiLifter::evalUserFcn ( liftopt::TLifterArgs<double>& args )
   MXFunction& F = interface_->fcn_;
   if(m_activeProblemFormulation ==  Problem_Residual ){
     F.setInput(args.u,LO_U);
-    F.evaluate(0,0);
+    F.evaluate();
     F.getOutput(args.objRes,LO_OBJRES);
     F.getOutput(args.eq,LO_EQ);
   }

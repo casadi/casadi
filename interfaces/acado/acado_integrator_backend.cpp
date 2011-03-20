@@ -170,7 +170,7 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
     }
   }
   
-  integrator_.evaluate(with_sens,0);
+  integrator_.evaluate(mu+mp,0);
     
   
   Integrator::initializeOptions();

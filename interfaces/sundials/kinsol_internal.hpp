@@ -56,7 +56,7 @@ public:
   virtual void init();
   
   /** \brief  Evaluate */
-  virtual void evaluate_new(int nfdir, int nadir);
+  virtual void evaluate(int nfdir, int nadir);
 
   /** \brief Generate a linear solver for the sensitivity equations */
   KinsolSolver jac(int iind=0, int oind=0);

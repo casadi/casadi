@@ -42,7 +42,7 @@ class ExternalFunctionInternal : public FXInternal{
     virtual ~ExternalFunctionInternal();
 
     /** \brief  Evaluate */
-    virtual void evaluate_new(int nfdir, int nadir);
+    virtual void evaluate(int nfdir, int nadir);
   
     /** \brief  Initialize */
     virtual void init();

@@ -55,7 +55,7 @@ class SXFunctionInternal : public XFunctionInternal{
   virtual ~SXFunctionInternal();
 
 /** \brief  Evaluate the function with partial derivatives up to order ord */
-  virtual void evaluate_new(int nfdir, int nadir);
+  virtual void evaluate(int nfdir, int nadir);
 
 /** \brief  evaluate symbolically */
   void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s);

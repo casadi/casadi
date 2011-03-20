@@ -76,7 +76,7 @@ void IntegratorJacobianInternal::init(){
   FXInternal::init();
 }
 
-void IntegratorJacobianInternal::evaluate_new(int nfdir, int nadir){
+void IntegratorJacobianInternal::evaluate(int nfdir, int nadir){
   
   // Pass arguments to the integrator
   integrator_.setInput(input(INTEGRATOR_T0),INTEGRATOR_T0);

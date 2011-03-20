@@ -675,7 +675,7 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
      }
    
      // Evaluate the AD forward algorithm
-     f_.evaluate(1,0);
+     f_.evaluate(nfdir_f_,0);
       
      // Get the output seeds
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){

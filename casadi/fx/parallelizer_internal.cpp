@@ -83,7 +83,7 @@ void ParallelizerInternal::init(){
   save_corrected_input_ = getOption("save_corrected_input").toInt();
 }
 
-void ParallelizerInternal::evaluate_new(int nfdir, int nadir){
+void ParallelizerInternal::evaluate(int nfdir, int nadir){
   switch(mode_){
     case SERIAL:
     {
@@ -131,7 +131,7 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   }
 
   // Evaluate
-  fcn.evaluate_new(nfdir, nadir);
+  fcn.evaluate(nfdir, nadir);
     
   // Get the results
   for(int j=outind_[task]; j<outind_[task+1]; ++j){

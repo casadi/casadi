@@ -44,7 +44,7 @@ class LinearSolverInternal : public FXInternal{
     virtual void init();
     
     // Solve the system of equations
-    virtual void evaluate_new(int nfdir, int nadir);
+    virtual void evaluate(int nfdir, int nadir);
 
     // Prepare the factorization
     virtual void prepare() = 0;

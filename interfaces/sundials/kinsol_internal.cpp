@@ -236,7 +236,7 @@ void KinsolInternal::init(){
   }
 }
 
-void KinsolInternal::evaluate_new(int nfdir, int nadir){
+void KinsolInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir<=nfdir_fcn_);
   casadi_assert(nadir<=nadir_fcn_);
   
@@ -290,7 +290,7 @@ void KinsolInternal::evaluate_new(int nfdir, int nadir){
   }
 
   // Evaluate
-  f_.evaluate(nfdir>0,nadir>0); // FIXME: when evaluate is updated
+  f_.evaluate(nfdir,nadir);
 
   // Solve for the forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){

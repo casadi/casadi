@@ -59,7 +59,7 @@ class MXFunctionInternal : public XFunctionInternal{
     int findEl(const MX& mx) const;
 
     /** \brief  Evaluate the algorithm */
-    virtual void evaluate_new(int nfdir, int nadir);
+    virtual void evaluate(int nfdir, int nadir);
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
