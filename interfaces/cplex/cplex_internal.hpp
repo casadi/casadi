@@ -41,7 +41,7 @@ class CplexInternal : public NLPSolverInternal{
     void setX(const vector<double>& x);
     vector<double> getSol();
     virtual void init();
-    virtual void evaluate(int fsens_order, int asens_order);
+    virtual void evaluate_new(int nfdir, int nadir);
     
     /// point used for the linearization
     vector<double> x_;

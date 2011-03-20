@@ -45,7 +45,7 @@ public:
   virtual void init();
 
   /** \brief  Integrate */
-  virtual void evaluate(int fsens_order, int asens_order);
+  virtual void evaluate_new(int nfdir, int nadir);
 
   Integrator integrator_;
   FX output_fcn_;

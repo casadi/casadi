@@ -83,19 +83,19 @@ void ParallelizerInternal::init(){
   save_corrected_input_ = getOption("save_corrected_input").toInt();
 }
 
-void ParallelizerInternal::evaluate(int fsens_order, int asens_order){
+void ParallelizerInternal::evaluate_new(int nfdir, int nadir){
   switch(mode_){
     case SERIAL:
     {
       for(int task=0; task<funcs_.size(); ++task)
-        evaluateTask(task,fsens_order,asens_order);
+        evaluateTask(task,nfdir,nadir);
       break;
     }
     case OPENMP:
     {
       #pragma omp parallel for
       for(int task=0; task<funcs_.size(); ++task)
-        evaluateTask(task,fsens_order,asens_order);
+        evaluateTask(task,nfdir,nadir);
       break;
     }
     case MPI:
@@ -106,9 +106,7 @@ void ParallelizerInternal::evaluate(int fsens_order, int asens_order){
   }
 }
 
-void ParallelizerInternal::evaluateTask(int task, int fsens_order, int asens_order){
-  int nfdir = fsens_order ? nfdir_ : 0;
-  int nadir = asens_order ? nadir_ : 0;
+void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   
   // Get a reference to the function
   FX& fcn = funcs_[task];
@@ -133,7 +131,7 @@ void ParallelizerInternal::evaluateTask(int task, int fsens_order, int asens_ord
   }
 
   // Evaluate
-  fcn.evaluate(fsens_order,asens_order);
+  fcn.evaluate_new(nfdir, nadir);
     
   // Get the results
   for(int j=outind_[task]; j<outind_[task+1]; ++j){

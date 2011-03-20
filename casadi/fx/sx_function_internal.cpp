@@ -39,7 +39,7 @@ namespace CasADi{
 using namespace std;
 
 
-SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const vector<SXMatrix>& outputv_) : inputv(inputv_),  outputv(outputv_) {
+SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const vector<Matrix<SX> >& outputv_) : inputv(inputv_),  outputv(outputv_) {
   addOption("ad_mode",OT_STRING,"reverse");
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("name","unnamed_sx_function");
@@ -50,7 +50,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   stack<SXNode*> s;
 
   // Add the outputs to the stack
-  for(vector<SXMatrix>::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
+  for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
       s.push(itc->get());
 
@@ -75,7 +75,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   }
 
   // Make sure that the inputs are added (and added only once)
-  for(vector<SXMatrix>::const_iterator it = inputv.begin(); it != inputv.end(); ++it){
+  for(vector<Matrix<SX> >::const_iterator it = inputv.begin(); it != inputv.end(); ++it){
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
       assert((*itc)->isSymbolic());
       assert((*itc)->temp!=2); // make sure that an input does not appear twice
@@ -89,7 +89,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   }
 
   // Make sure that the outputs are added
-  for(vector<SXMatrix>::const_iterator it = outputv.begin(); it != outputv.end(); ++it){
+  for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it){
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
       SXNode* node = itc->get();
       if(!node->hasDep() && node->temp==0){
@@ -130,7 +130,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   }
 
   // Give a place in the work vector for each of the outputs and mark these nodes as in use, preventing them being overwritten
-  for(vector<SXMatrix>::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
+  for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
 	SXNode* node = itc->get();
 	if(node->hasDep() && !in_use[node->temp]){
@@ -216,7 +216,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   input_ind.resize(inputv.size());
   for(int i=0; i<inputv.size(); ++i){
     // References
-    const SXMatrix& ip = inputv[i];
+    const Matrix<SX>& ip = inputv[i];
     input(i) = Matrix<double>(ip.sparsity());
 
     // Allocate space for the indices
@@ -234,7 +234,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix>& inputv_, const ve
   output_ind.resize(output_.size());
   for(int i=0; i<outputv.size(); ++i){
     // References
-    const SXMatrix& op = outputv[i];
+    const Matrix<SX>& op = outputv[i];
     output(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
     
     // Allocate space for the indices
@@ -265,9 +265,7 @@ SXFunctionInternal::~SXFunctionInternal(){
 }
 
 
-void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
-  int nfdir = fsens_order>0 ? nfdir_ : 0;
-  int nadir = asens_order>0 ? nadir_ : 0;
+void SXFunctionInternal::evaluate_new(int nfdir, int nadir){
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<getNumInputs(); ++ind){
@@ -373,85 +371,14 @@ void SXFunctionInternal::evaluate(int fsens_order, int asens_order){
   // Should clean up any zero added to constants and parameters!
 
   }
-  
 }
 
-void SXFunctionInternal::eval(const SXMatrix &x, SXMatrix &res) const{
-    map<int,SX> replace; // nothing to replace - empty map
-    SXMatrix repres;
-    eval(x,res,replace,repres);
-}
-
-void SXFunctionInternal::eval(
-    const SXMatrix &x, SXMatrix &res, 
-    const map<int,SX>& replace, SXMatrix &repres) const{
-    repres.clear();
-
-  // If the function is scalar, a vector/matrix valued argument means evaluating the function for each element of the argument
-  if(input_ind[0].size() == 1 && x.numel() > 1){
-     // create a return matrix
-     res = SXMatrix(x.size1(),x.size2());
-
-     // Evaluate each element
-     for(int i=0; i<x.size1(); ++i)
-        for(int j=0; j<x.size2(); ++j){
-          SXMatrix mres;
-          eval(x(i,j),mres);
-          res(i,j) = SX(mres(0));
-      }
-      return;
-  }
-
-  // make sure that the length of x matches that of arg
-  assert(x.numel() == input_ind[0].size());
-
-  // create a vector with the (symbolic) values at each node and save constants and symbolic variables
-  vector<SX> swork(tree.size());
-  for(int i=0; i<tree.size(); ++i)
-    if(!tree[i]->hasDep())
-      swork[i] = SX(tree[i]);
-
-  // copy the function arguments
-  for(int i=0; i<input_ind[0].size(); ++i)
-    if(input_ind[0][i]>=0) swork[input_ind[0][i]] = x[i];
-
-  // evaluate the algorithm    
-  int i;
-  vector<AlgEl>::const_iterator it;
-  for(it = algorithm.begin(), i=0; it!=algorithm.end(); ++it, ++i){
-     if(replace.empty()){ // nothing needs to be replaced
-        casadi_math<SX>::fun[it->op](swork[it->ch[0]],swork[it->ch[1]],swork[it->ind]);
-      } else {
-        SX r;
-        casadi_math<SX>::fun[it->op](swork[it->ch[0]],swork[it->ch[1]],r);
-        map<int,SX>::const_iterator it2 = replace.find(i); // try to locate the node
-        if(it2 != replace.end()){ // replace
-          swork[it->ind] = SX(it2->second);
-          append(repres,SXMatrix(r));
-        }
-        else // do not replace
-          swork[it->ind] = r;
-      }
-  }
-
-  // Create a new expression to save to
-  res = SXMatrix(output(0).size1(),output(0).size2());
-
-  // copy the result
-  for(int i=0; i<output(0).size1(); ++i) // loop over rows
-    for(int el=output(0).rowind(i); el<output(0).rowind(i+1); ++el){ // loop over the non-zero elements of the original matrix
-      int j=output(0).col(el);  // column
-      res(i,j) = swork[output_ind[0][el]];
-  }
-
-}
-
-SXMatrix SXFunctionInternal::hess(int iind, int oind){
+Matrix<SX> SXFunctionInternal::hess(int iind, int oind){
   if(output(oind).numel() != 1)
     throw CasadiException("SXFunctionInternal::hess: function must be scalar");
   
   // Reverse mode to calculate gradient
-  SXMatrix g = grad(iind,oind);
+  Matrix<SX> g = grad(iind,oind);
   
   // Create function
   SXFunction gfcn(inputv.at(iind),g);
@@ -463,12 +390,12 @@ SXMatrix SXFunctionInternal::hess(int iind, int oind){
   return gfcn.jac();
 }
 
-SXMatrix SXFunctionInternal::grad(int iind, int oind){
+Matrix<SX> SXFunctionInternal::grad(int iind, int oind){
   return trans(jac(iind,oind));
 }
 
-SXMatrix SXFunctionInternal::jac(int iind, int oind){
-  if(input_ind.at(iind).empty() || output_ind.at(oind).empty()) return SXMatrix(); // quick return
+Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
+  if(input_ind.at(iind).empty() || output_ind.at(oind).empty()) return Matrix<SX>(); // quick return
   assert(input(iind).size2()==1);
   assert(output(oind).size2()==1);
 
@@ -498,12 +425,12 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
   if(1){ // problem with the forward mode!
     
   // Jacobian
-  SXMatrix ret(output(oind).numel(),input_ind.at(iind).size()); 
+  Matrix<SX> ret(output(oind).numel(),input_ind.at(iind).size()); 
   ret.reserve(input_ind.at(iind).size()+output(oind).numel());
 
 #if 0
   // Backward seed (symbolic direction)
-  SXMatrix bdir("bdir",output_.at(oind).col.size());
+  Matrix<SX> bdir("bdir",output_.at(oind).col.size());
   for(int i=0; i<bdir.size(); ++i)
     bdir[i]->temp2 = i+1;
   
@@ -525,7 +452,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
    }
 
    // A row of the Jacobian
-   SXMatrix jac_row(1,input_ind.at(iind).size());
+   Matrix<SX> jac_row(1,input_ind.at(iind).size());
     for(int j=0; j<input_ind[iind].size(); j++)
       if(input_ind.at(iind)[j]>=0 && !g[input_ind.at(iind)[j]]->isZero())
         jac_row[j] = g[input_ind.at(iind)[j]];
@@ -587,7 +514,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
 
   // Loop over rows
    vector<SXNode*> deps;
-   vector<SXMatrix> bdir_i(jac_row.size());
+   vector<Matrix<SX> > bdir_i(jac_row.size());
    for(int i=0; i<jac_row.size(); ++i){
       // Get dependent nodes
       stack<SXNode*> s;
@@ -629,12 +556,12 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind){
     for(int j=0; j<bdir_i[i].size(); ++j){
       
       // input vector
-      vector<SXMatrix> inp(1);
-      inp[0] = SXMatrix(bdir_i[i].size());
+      vector<Matrix<SX> > inp(1);
+      inp[0] = Matrix<SX>(bdir_i[i].size());
       inp[0][j] = SX::one;
       
       // output vector
-      vector<SXMatrix> outp;
+      vector<Matrix<SX> > outp;
       
       // Evaluate
       jac_row_fcn[i]->evaluate(inp,outp);
@@ -706,7 +633,7 @@ return ret;
     return ret;
   } else if(getOption("ad_mode") == "forward"){
     // Gradient
-    SXMatrix ret(input_ind.at(iind).size(),output(oind).numel());
+    Matrix<SX> ret(input_ind.at(iind).size(),output(oind).numel());
     ret.reserve(input_ind.at(iind).size()+output(oind).numel());
     
     for(int i=0; i<input(iind).size1(); ++i) // loop over rows of the gradient
@@ -922,49 +849,47 @@ void SXFunctionInternal::init(){
 }
 
 FX SXFunctionInternal::jacobian(int iind, int oind){
-  SXMatrix J = jac(iind,oind); // NOTE: Multiple input, multiple output
+  Matrix<SX> J = jac(iind,oind); // NOTE: Multiple input, multiple output
   return SXFunction(inputv,J);
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
-  SXMatrix H = hess(iind,oind); // NOTE: Multiple input, multiple output
+  Matrix<SX> H = hess(iind,oind); // NOTE: Multiple input, multiple output
   return SXFunction(inputv,H);
 }
 
-void SXFunctionInternal::eval(const vector<SXMatrix>& input_s, vector<SXMatrix>& output_s){
-  // Create a symbolic work vector if not existing
-  if(work_sym.size() != tree.size()){
-    work_sym.resize(tree.size());
-    for(int i=0; i<tree.size(); ++i)
-      if(!tree[i]->hasDep())
-        work_sym[i] = SX(tree[i]);
-  }
-
-  // Resize output
-  output_s.resize(output_.size());
-  
+void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s){
   // Assert input dimension
   assert(input_.size() == input_s.size());
   
+  // Create a symbolic work vector if not existing
+  if(swork.size() != tree.size()){
+    swork.resize(tree.size());
+    for(int i=0; i<tree.size(); ++i){
+      if(!tree[i]->hasDep())
+        swork[i] = SX(tree[i]);
+    }
+  }
+  
   // Copy the function arguments to the work vector
-  for(int ind=0; ind<input_s.size(); ++ind)
+  for(int ind=0; ind<input_s.size(); ++ind){
     for(int i=0; i<input_ind[ind].size(); ++i){
-      work_sym[input_ind[ind][i]] = input_s[ind][i];
+      swork[input_ind[ind][i]] = input_s[ind][i];
+    }
   }
   
   // Evaluate the algorithm
   for(vector<AlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
     // Get the arguments
-    SX x = work_sym[it->ch[0]];
-    SX y = work_sym[it->ch[1]];
-    casadi_math<SX>::fun[it->op](x,y,work_sym[it->ind]);
+    SX x = swork[it->ch[0]];
+    SX y = swork[it->ch[1]];
+    casadi_math<SX>::fun[it->op](x,y,swork[it->ind]);
   }
 
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
-    output_s[ind] = outputv[ind];
     for(int i=0; i<output_ind[ind].size(); ++i)
-      output_s[ind][i] = work_sym[output_ind[ind][i]];
+      output_s[ind][i] = swork[output_ind[ind][i]];
   }
 }
 

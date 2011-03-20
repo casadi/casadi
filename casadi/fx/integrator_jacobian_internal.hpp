@@ -41,7 +41,7 @@ public:
   virtual IntegratorJacobianInternal* clone() const;
     
   /** \brief  evaluate */
-  virtual void evaluate(int fsens_order, int asens_order);
+  virtual void evaluate_new(int nfdir, int nadir);
 
   /** \brief  Initialize */
   virtual void init();

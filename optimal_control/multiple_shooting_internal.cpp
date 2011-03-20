@@ -359,7 +359,7 @@ void MultipleShootingInternal::setOptimalSolution( const vector<double> &V_opt )
   casadi_assert(el==V_opt.size());
 }
 
-void MultipleShootingInternal::evaluate(int fsenk_order, int asenk_order){
+void MultipleShootingInternal::evaluate_new(int nfdir, int nadir){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_X_INIT).data());
   getVariableBounds(nlp_solver_.input(NLP_LBX).data(),nlp_solver_.input(NLP_UBX).data());

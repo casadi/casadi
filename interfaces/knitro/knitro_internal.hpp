@@ -36,7 +36,7 @@ public:
   virtual ~KnitroInternal();
 
   virtual void init();
-  virtual void evaluate(int fsens_order, int asens_order);
+  virtual void evaluate_new(int nfdir, int nadir);
 
   // KNITRO callback functions
   void evalfc(const double* x, double& obj, double *c);

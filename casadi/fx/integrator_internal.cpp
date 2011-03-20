@@ -105,12 +105,12 @@ void IntegratorInternal::setDimensions(int nx, int np, int nz){
   output(INTEGRATOR_ZF) = DMatrix(nz_,1,0);
 }
 
-void IntegratorInternal::evaluate(int fsens_order, int asens_order){
+void IntegratorInternal::evaluate_new(int nfdir, int nadir){
   double t0 = input(INTEGRATOR_T0)[0];
   double tf = input(INTEGRATOR_TF)[0];
   
   // Reset solver
-  reset(fsens_order, asens_order);
+  reset(nfdir>0, nadir>0);
 
   // Set the stop time of the integration -- don't integrate past this point
   if(stop_at_end_)
@@ -119,7 +119,7 @@ void IntegratorInternal::evaluate(int fsens_order, int asens_order){
   // Advance solution in time
   integrate(tf);
 
-  if(asens_order>0){
+  if(nadir>0){
     // Re-initialize backward problem
     resetAdj();
 

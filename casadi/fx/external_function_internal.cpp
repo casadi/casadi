@@ -101,7 +101,7 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 #endif // WITH_JIT 
 }
 
-void ExternalFunctionInternal::evaluate(int fsens_order, int asens_order){
+void ExternalFunctionInternal::evaluate_new(int nfdir, int nadir){
 #ifdef WITH_JIT 
   int flag = evaluate_(&input_array_[0],&output_array_[0]);
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");

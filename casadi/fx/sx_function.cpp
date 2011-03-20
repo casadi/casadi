@@ -88,8 +88,8 @@ SXFunctionInternal* SXFunction::operator->(){
 }
 
 vector<SXMatrix> SXFunction::eval(const vector<SXMatrix>& arg){
-  vector<SXMatrix> res;
-  (*this)->eval(arg,res);
+  vector<SXMatrix> res = (*this)->outputv;
+  (*this)->evaluateSX(arg,res);
   return res;
 }
 
@@ -109,8 +109,7 @@ vector< vector<SX> > SXFunction::eval(const vector< vector<SX> >& arg){
   }
   
   // Evaluate
-  vector<SXMatrix> resv;
-  (*this)->eval(argv,resv);
+  vector<SXMatrix> resv = eval(argv);
   
   // Convert result
   vector< vector<SX> > res(resv.size());

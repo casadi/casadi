@@ -203,10 +203,10 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
   liftfun_ud_ = user_data;
 }
 
-void MXFunctionInternal::evaluate(int fsens_order, int asens_order){
+void MXFunctionInternal::evaluate_new(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
-  int nfdir = fsens_order ? nfdir_ : 0;
-  int nadir = asens_order ? nadir_ : 0;
+  casadi_assert(nfdir<=nfdir_);
+  casadi_assert(nadir<=nadir_);
   
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind)

@@ -55,20 +55,20 @@ void SimulatorInternal::init(){
   output_fcn_.init();
 }
 
-void SimulatorInternal::evaluate(int fsens_order, int asens_order){
+void SimulatorInternal::evaluate_new(int nfdir, int nadir){
 
   // Pass the parameters and initial state
   integrator_.setInput(input(SIMULATOR_X0),INTEGRATOR_X0);
   integrator_.setInput(input(SIMULATOR_P),INTEGRATOR_P);
 
   // Pass sensitivities if fsens
-  if(fsens_order>0){
+  if(nfdir>0){
     integrator_.setFwdSeed(fwdSeed(SIMULATOR_X0),INTEGRATOR_X0);
     integrator_.setFwdSeed(fwdSeed(SIMULATOR_P),INTEGRATOR_P);
   }
   
   // Reset the integrator_
-  integrator_.reset(fsens_order, asens_order);
+  integrator_.reset(nfdir>0, nadir>0);
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
@@ -90,7 +90,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
       copy(res.begin(),res.end(),&output(i)[k*res.size()]);
     }
     
-    if(fsens_order>0){
+    if(nfdir>0){
       
       // Pass the forward seed to the output function
       output_fcn_.setFwdSeed(integrator_.fwdSens(OUTPUT_X));
@@ -108,7 +108,7 @@ void SimulatorInternal::evaluate(int fsens_order, int asens_order){
   }
   
   // Adjoint sensitivities
-  if(asens_order>0){
+  if(nadir>0){
 
     #if 0
           // Clear the seeds (TODO: change this when XF is included as output of the simulator!)

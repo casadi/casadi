@@ -106,8 +106,11 @@ class FX : public OptionsFunctionality{
   /** \brief  Set number of outputs  (normally invoked internally) */
   void setNumOutputs(int num_out);
   
-  /** \brief  Evaluate */
+  /** \brief  Evaluate (old style) */
   void evaluate(int fsens_order=0, int asens_order=0);
+  
+  /** \brief  Evaluate (new style) */
+  void evaluate_new(int nfdir=0, int nadir=0);
   
   /// the same as evaluate(0,0)
   void solve();

@@ -205,7 +205,7 @@ void replaceDerivatives(Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> 
 }
 #endif
 
-
+#if 0
 void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr){
   // Initialize
   SXFunction fcn(Matrix<SX>(),ex);
@@ -267,6 +267,7 @@ void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr){
   bexpr = b;
 #endif
 }
+#endif
 
 Matrix<SX> spy(const Matrix<SX>& A){
   Matrix<SX> s(A.size1(),A.size2());

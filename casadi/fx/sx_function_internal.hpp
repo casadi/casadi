@@ -44,7 +44,7 @@ class SXFunctionInternal : public XFunctionInternal{
   
   protected:
     /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
-    SXFunctionInternal(const std::vector<SXMatrix>& inputv, const std::vector<SXMatrix>& outputv);
+    SXFunctionInternal(const std::vector<Matrix<SX> >& inputv, const std::vector<Matrix<SX> >& outputv);
 
   public:
 
@@ -55,14 +55,10 @@ class SXFunctionInternal : public XFunctionInternal{
   virtual ~SXFunctionInternal();
 
 /** \brief  Evaluate the function with partial derivatives up to order ord */
-  virtual void evaluate(int fsens_order, int asens_order);
+  virtual void evaluate_new(int nfdir, int nadir);
 
 /** \brief  evaluate symbolically */
-  void eval(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s);
-  void eval(const SXMatrix &x, SXMatrix &res) const; 
-
-/** \brief  evaluate symbolically, replacing nodes */
-  void eval(const SXMatrix &x, SXMatrix &res, const std::map<int,SX>& replace, SXMatrix &repres) const;
+  void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s);
 
 /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -77,13 +73,13 @@ class SXFunctionInternal : public XFunctionInternal{
   virtual FX hessian(int iind=0, int oind=0);
 
   /// Jacobian via source code transformation
-  SXMatrix jac(int iind=0, int oind=0);
+  Matrix<SX> jac(int iind=0, int oind=0);
 
   /// Gradient via source code transformation
-  SXMatrix grad(int iind=0, int oind=0);
+  Matrix<SX> grad(int iind=0, int oind=0);
   
   /// Hessian (forward over adjoint) via source code transformation
-  SXMatrix hess(int iind=0, int oind=0);
+  Matrix<SX> hess(int iind=0, int oind=0);
 
 /** \brief  DATA MEMBERS */
   
@@ -110,7 +106,7 @@ class SXFunctionInternal : public XFunctionInternal{
   int worksize;
 
   /// work vector for symbolic calculations (allocated first time)
-  std::vector<SX> work_sym;
+  std::vector<SX> swork;
   
   /** \brief  Initialize */
   virtual void init();
@@ -119,10 +115,10 @@ class SXFunctionInternal : public XFunctionInternal{
   void generateCode(const std::string& filename) const;
     
   /** \brief  Inputs of the function (needed for symbolic calculations) */
-  std::vector<SXMatrix> inputv;
+  std::vector<Matrix<SX> > inputv;
 
   /** \brief  Outputs of the function (needed for symbolic calculations) */
-  std::vector<SXMatrix> outputv;
+  std::vector<Matrix<SX> > outputv;
   
 };
 

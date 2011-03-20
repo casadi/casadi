@@ -304,8 +304,8 @@ void IpoptInternal::init(){
   }
 }
 
-void IpoptInternal::evaluate(int fsens_order, int asens_order){
-  casadi_assert(fsens_order==0 && asens_order==0);
+void IpoptInternal::evaluate_new(int nfdir, int nadir){
+  casadi_assert(nfdir==0 && nadir==0);
 
   // Reset the counters
   t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = 0;

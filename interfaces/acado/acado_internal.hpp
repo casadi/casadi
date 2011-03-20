@@ -63,7 +63,7 @@ class AcadoInternal : public FXInternal{
     virtual void init();
     
     /** \brief  Solve the problem */
-    virtual void evaluate(int fsens_order=0, int asens_order=0);
+    virtual void evaluate_new(int nfdir, int nadir);
     
     // Dimensions
     int nt_, nxd_, nxa_, nu_, np_, nxdot_;

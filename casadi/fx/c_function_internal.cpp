@@ -46,9 +46,9 @@ void CFunctionInternal::setUserData(void* user_data){
   user_data_ = user_data;
 }
 
-void CFunctionInternal::evaluate(int fsens_order, int asens_order){
+void CFunctionInternal::evaluate_new(int nfdir, int nadir){
   casadi_assert_message(evaluate_!=0, "CFunctionInternal::evaluate: pointer is null");
-  evaluate_(ref_,fsens_order, asens_order,user_data_);  
+  evaluate_(ref_,nfdir,nadir,user_data_);  
 }
 
 void CFunctionInternal::init(){

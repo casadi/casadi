@@ -48,7 +48,7 @@ class MultipleShootingInternal : public OCPSolverInternal{
     virtual void init();
 
     // Solve the OCP
-    virtual void evaluate(int fsens_order, int asens_order);
+    virtual void evaluate_new(int nfdir, int nadir);
    
     // Get the variables
     void getGuess(std::vector<double>& V_init) const;

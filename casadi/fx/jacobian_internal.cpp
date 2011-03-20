@@ -94,7 +94,7 @@ void JacobianInternal::init(){
   }
 }
 
-void JacobianInternal::evaluate(int fsens_order, int asens_order){
+void JacobianInternal::evaluate_new(int nfdir, int nadir){
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
     fcn_.setInput(input(i),i);

@@ -45,10 +45,10 @@ class ParallelizerInternal : public FXInternal{
     virtual ~ParallelizerInternal();
     
     /// Evaluate the all the tasks
-    virtual void evaluate(int fsens_order, int asens_order);
+    virtual void evaluate_new(int nfdir, int nadir);
 
     /// Evaluate a single task
-    virtual void evaluateTask(int task, int fsens_order, int asens_order);
+    virtual void evaluateTask(int task, int nfdir, int nadir);
 
     /// Initialize
     virtual void init();

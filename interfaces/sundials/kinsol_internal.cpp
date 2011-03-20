@@ -236,9 +236,7 @@ void KinsolInternal::init(){
   }
 }
 
-void KinsolInternal::evaluate(int fsens_order, int asens_order){
-  int nfdir = fsens_order ? nfdir_ : 0;
-  int nadir = asens_order ? nadir_ : 0;
+void KinsolInternal::evaluate_new(int nfdir, int nadir){
   casadi_assert(nfdir<=nfdir_fcn_);
   casadi_assert(nadir<=nadir_fcn_);
   

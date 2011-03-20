@@ -76,7 +76,7 @@ void IntegratorJacobianInternal::init(){
   FXInternal::init();
 }
 
-void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
+void IntegratorJacobianInternal::evaluate_new(int nfdir, int nadir){
   
   // Pass arguments to the integrator
   integrator_.setInput(input(INTEGRATOR_T0),INTEGRATOR_T0);
@@ -103,18 +103,16 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
     xp0s[jacmap_[i]] = xp0[i];
   
   // Pass adjoint seeds
-  if(asens_order>0){
-    for(int dir=0; dir<nadir_; ++dir){
-      const vector<double>& jacseed = adjSeed(0,dir).data();
-      vector<double>& jacseed_s = integrator_.adjSeed(INTEGRATOR_XF,dir).data();
-      for(int i=0; i<nx_; ++i)
-        for(int j=0; j<ns_; ++j)
-          jacseed_s.at(jacmap_.at(nx_+i+j*nx_)) = jacseed[j+i*ns_];
-    }
+  for(int dir=0; dir<nadir; ++dir){
+    const vector<double>& jacseed = adjSeed(0,dir).data();
+    vector<double>& jacseed_s = integrator_.adjSeed(INTEGRATOR_XF,dir).data();
+    for(int i=0; i<nx_; ++i)
+      for(int j=0; j<ns_; ++j)
+        jacseed_s.at(jacmap_.at(nx_+i+j*nx_)) = jacseed[j+i*ns_];
   }
   
   // Solve the initial value problem
-  integrator_.evaluate(fsens_order,asens_order);
+  integrator_.evaluate(nfdir,nadir);
   
   // Get the results
   const vector<double>& xfs = integrator_.output(INTEGRATOR_XF).data();
@@ -138,18 +136,16 @@ void IntegratorJacobianInternal::evaluate(int fsens_order, int asens_order){
   
   
   // Get adjoint sensitivities
-  if(asens_order>0){
-    for(int dir=0; dir<nadir_; ++dir){
-      vector<double>& asens = adjSens(INTEGRATOR_X0,dir).data();
-      fill(asens.begin(),asens.end(),0);
+  for(int dir=0; dir<nadir; ++dir){
+    vector<double>& asens = adjSens(INTEGRATOR_X0,dir).data();
+    fill(asens.begin(),asens.end(),0);
+    
+    const vector<double>& jacsens_s = integrator_.adjSens(INTEGRATOR_X0,dir).data();
+    for(int i=0; i<nx_; ++i)
+      for(int j=0; j<ns_; ++j)
+        asens[i] += jacsens_s[jacmap_[nx_+i+j*nx_]];
       
-      const vector<double>& jacsens_s = integrator_.adjSens(INTEGRATOR_X0,dir).data();
-      for(int i=0; i<nx_; ++i)
-        for(int j=0; j<ns_; ++j)
-          asens[i] += jacsens_s[jacmap_[nx_+i+j*nx_]];
-        
-      adjSens(INTEGRATOR_P,dir).set(integrator_.adjSens(INTEGRATOR_P,dir));
-    }
+    adjSens(INTEGRATOR_P,dir).set(integrator_.adjSens(INTEGRATOR_P,dir));
   }
 }
 

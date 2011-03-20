@@ -45,7 +45,7 @@ class FXInternal : public OptionsFunctionalityNode{
   virtual ~FXInternal() = 0;
 
   /** \brief  Evaluate */
-  virtual void evaluate(int fsens_order, int asens_order) = 0;
+  virtual void evaluate_new(int nfdir, int nadir) = 0;
 
   /** Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
       If passed to another class (in the constructor), this class should invoke this function when initialized. */
