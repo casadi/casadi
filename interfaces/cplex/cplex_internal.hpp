@@ -17,9 +17,9 @@ class CplexMatrix{
     CRSSparsity sparsity_;
     FX function_;
     int n_out_;
-    vector<int> matcnt_;
-    vector<double> data_; // used to store data for non symmetric matrices
-    vector<int> mapping_; // used for non symmetric matrices
+    std::vector<int> matcnt_;
+    std::vector<double> data_; // used to store data for non symmetric matrices
+    std::vector<int> mapping_; // used for non symmetric matrices
   public:
     /// reads matrix in casadi format
     void set(const FX& funct, int n_out, bool symm);
@@ -38,15 +38,15 @@ class CplexInternal : public NLPSolverInternal{
   public:
     explicit CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
     virtual ~CplexInternal();
-    void setX(const vector<double>& x);
-    vector<double> getSol();
+    void setX(const std::vector<double>& x);
+    std::vector<double> getSol();
     virtual void init();
     virtual void evaluate(int nfdir, int nadir);
     
     /// point used for the linearization
-    vector<double> x_;
+    std::vector<double> x_;
     /// used to store the solution
-    vector<double> sol_;
+    std::vector<double> sol_;
     /// objective function
     FX F_;
     /// constraint function
