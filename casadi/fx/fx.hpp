@@ -127,24 +127,70 @@ class FX : public OptionsFunctionality{
 
 #ifndef SWIG
   /** \brief  Create a function call (evaluation mx node), single input */
-  std::vector<MX> call(const MX &x) const;
+  std::vector<MX> call(const MX &x);
+  
+  /** \brief  Evaluate numerically (shorthand) */
+  std::vector<DMatrix> call(const std::vector<DMatrix> &x);
+
+  /** \brief  Evaluate symbolically (scalar graph) */
+  std::vector<SXMatrix> call(const std::vector<SXMatrix> &x);
 #endif // SWIG
+  
+  /** \brief  Evaluate symbolically (matrix graph) */
+  std::vector<MX> call(const std::vector<MX> &x);
 
-  /** \brief  Create a function call (evaluation mx node) */
-  std::vector<MX> call(const std::vector<MX> &x) const;
-
-  /** \brief  Evaluate a function multiple times, possibly in parallel 
+  /** \brief  Evaluate symbolically in parallel (matrix graph)
       paropt: Set of options to be passed to the Parallelizer
   */
-  std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt=Dictionary()) const;
+  std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt=Dictionary());
 
+//#ifndef SWIG
+#if 0
+  /** \brief  Get Jacobian numerically (shorthand) */
+  std::vector<DMatrix> jac(const std::vector<DMatrix> &x, int iind=0);
+
+  /** \brief  Get Jacobian symbolically (scalar graph) */
+  std::vector<SXMatrix> jac(const std::vector<SXMatrix> &x, int iind=0);
+
+  /** \brief  Get Jacobian symbolically (matrix graph) */
+  std::vector<MX> jac(const std::vector<MX> &x, int iind=0);
+
+  /** \brief  Get Jacobian-times-vector numerically (shorthand) */
+  std::vector<DMatrix> jac(const std::vector<DMatrix> &x, const std::vector<DMatrix> &v);
+
+  /** \brief  Get Jacobian-times-vector symbolically (scalar graph) */
+  std::vector<SXMatrix> jac(const std::vector<SXMatrix> &x, const std::vector<SXMatrix> &v);
+
+  /** \brief  Get Jacobian-times-vector symbolically (matrix graph) */
+  std::vector<MX> jac(const std::vector<MX> &x, const std::vector<MX> &v);
+    
+  /** \brief  Get Gradient numerically (shorthand) */
+  std::vector<DMatrix> grad(const std::vector<DMatrix> &x, int oind=0);
+
+  /** \brief  Get Gradient symbolically (scalar graph) */
+  std::vector<SXMatrix> grad(const std::vector<SXMatrix> &x, int oind=0);
+
+  /** \brief  Get Gradient symbolically (matrix graph) */
+  std::vector<MX> grad(const std::vector<MX> &x, int oind=0);
+
+  /** \brief  Get Gradient-times-vector numerically (shorthand) */
+  std::vector<DMatrix> grad(const std::vector<DMatrix> &x, const std::vector<DMatrix> &v);
+
+  /** \brief  Get Gradient-times-vector symbolically (scalar graph) */
+  std::vector<SXMatrix> grad(const std::vector<SXMatrix> &x, const std::vector<SXMatrix> &v);
+
+  /** \brief  Get Gradient-times-vector symbolically (matrix graph) */
+  std::vector<MX> grad(const std::vector<MX> &x, const std::vector<MX> &v);
+
+#endif // SWIG
+  
   // Legacy code: change for something else, but what??
 #ifndef USE_FUNCTORS
   /** \brief  Create a function call (generate mx node), single input: DEPRECIATED, USE "call" instead */
-  MX operator()(const MX &x, int ind=0) const;
+  MX operator()(const MX &x, int ind=0);
 
   /** \brief  Create a function call (generate mx node): DEPRECIATED, USE "call" instead. */
-  MX operator()(const std::vector<MX> &x, int ind=0) const;
+  MX operator()(const std::vector<MX> &x, int ind=0);
 #endif // USE_FUNCTORS
   
   /** \brief  Access functions of the node */

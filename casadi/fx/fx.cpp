@@ -45,12 +45,12 @@ FXInternal* FX::operator->(){
   return (FXInternal*)OptionsFunctionality::operator->();
 }
 
-vector<MX> FX::call(const MX &x) const{
+vector<MX> FX::call(const MX &x){
   vector<MX> xvec(1,x);
   return call(xvec);
 }
 
-vector<MX> FX::call(const vector<MX> &x) const{
+vector<MX> FX::call(const vector<MX> &x){
   casadi_assert(isInit());
   
   MX ev;
@@ -63,7 +63,7 @@ vector<MX> FX::call(const vector<MX> &x) const{
   return ret;
 }
 
-std::vector<std::vector<MX> > FX::call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt) const{
+vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
   casadi_assert(isInit());
   
   // Make sure not empty
@@ -86,7 +86,7 @@ std::vector<std::vector<MX> > FX::call(const std::vector<std::vector<MX> > &x, c
   casadi_assert(p_out.size() == x.size() * getNumOutputs());
 
   // Collect the outputs
-  std::vector<std::vector<MX> > ret(x.size());
+  vector<vector<MX> > ret(x.size());
   vector<MX>::const_iterator it=p_out.begin();
   for(int i=0; i<x.size(); ++i){
     ret[i].insert(ret[i].end(),it,it+getNumOutputs());
@@ -96,12 +96,12 @@ std::vector<std::vector<MX> > FX::call(const std::vector<std::vector<MX> > &x, c
 }
 
 #ifndef USE_FUNCTORS
-MX FX::operator()(const MX &x, int ind) const{
+MX FX::operator()(const MX &x, int ind){
   vector<MX> dep(1,x);
   return call(dep)[ind];
 }
 
-MX FX::operator()(const vector<MX> &x, int ind) const{
+MX FX::operator()(const vector<MX> &x, int ind){
   return call(x)[ind];
 }
 #endif // USE_FUNCTORS
@@ -202,11 +202,11 @@ const Matrix<double>& FX::adjSens(int iind, int dir) const{
   return (*this)->adjSens(iind,dir);
 }
 
-void FX::addMonitor(const std::string& mon){
+void FX::addMonitor(const string& mon){
   (*this)->monitors_.insert(mon);
 }
 
-void FX::removeMonitor(const std::string& mon){
+void FX::removeMonitor(const string& mon){
   (*this)->monitors_.erase(mon);
 }
 
@@ -214,9 +214,61 @@ const Dictionary & FX::getStats() const{
   return (*this)->getStats();
 }
 
-GenericType FX::getStat(const std::string& name) const{
+GenericType FX::getStat(const string& name) const{
   return (*this)->getStat(name);
 }
+
+#if 0
+
+vector<DMatrix> FX::jac(const vector<DMatrix> &x, int iind){
+  casadi_assert(0);  
+}
+
+vector<SXMatrix> FX::jac(const vector<SXMatrix> &x, int iind){
+  casadi_assert(0);
+}
+
+vector<MX> FX::jac(const vector<MX> &x, int iind){
+  casadi_assert(0);
+}
+
+vector<DMatrix> FX::jac(const vector<DMatrix> &x, const vector<DMatrix> &v){
+  casadi_assert(0);
+}
+
+vector<SXMatrix> FX::jac(const vector<SXMatrix> &x, const vector<SXMatrix> &v){
+  casadi_assert(0);
+}
+
+vector<MX> FX::jac(const vector<MX> &x, const vector<MX> &v){
+  casadi_assert(0);  
+}
+
+vector<DMatrix> FX::grad(const vector<DMatrix> &x, int oind){
+    casadi_assert(0);
+}
+
+vector<SXMatrix> FX::grad(const vector<SXMatrix> &x, int oind){
+  casadi_assert(0);  
+}
+
+vector<MX> FX::grad(const vector<MX> &x, int oind){
+  casadi_assert(0);  
+}
+
+vector<DMatrix> FX::grad(const vector<DMatrix> &x, const vector<DMatrix> &v){
+  casadi_assert(0);  
+}
+
+vector<SXMatrix> FX::grad(const vector<SXMatrix> &x, const vector<SXMatrix> &v){
+  casadi_assert(0);
+}
+
+vector<MX> FX::grad(const vector<MX> &x, const vector<MX> &v){
+  casadi_assert(0);
+}
+
+#endif
 
 } // namespace CasADi
 
