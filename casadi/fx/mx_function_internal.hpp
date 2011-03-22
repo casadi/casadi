@@ -52,9 +52,6 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  Destructor */
     virtual ~MXFunctionInternal();
 
-    /** \brief  Order all nodes of a matrix syntax tree in the order of calculation */
-    static void makeAlgorithm(MXNode* root, std::vector<MXNode*> &nodes, std::map<const MXNode*,int>  &nodemap);
-
     /** \brief  Evaluate the algorithm */
     virtual void evaluate(int nfdir, int nadir);
 

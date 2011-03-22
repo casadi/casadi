@@ -52,52 +52,6 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
 MXFunctionInternal::~MXFunctionInternal(){
 }
 
-void MXFunctionInternal::makeAlgorithm(MXNode* root, vector<MXNode*> &nodes, map<const MXNode*,int>  &nodemap){
-    // Quick return if root is null
-    if(root==0)
-      return;
-
-    // Quick return if already in algorithm
-    if(nodemap.find(root)!=nodemap.end())
-      return;
-    
-    // Stack
-    stack<MXNode*> s;
-    s.push(root);
-
-    while(!s.empty()){
-
-      // If the last element on the stack has not yet been added
-      if (nodemap.find(s.top()) == nodemap.end()){
-
-        // Loop over the children of the topmost element
-        bool all_dependencies_added = true;
-        for(vector<MX>::iterator it = s.top()->dep_.begin(); it!=s.top()->dep_.end(); ++it){
-          if(!it->isNull() && nodemap.find((MXNode*)it->get()) == nodemap.end()){ // a dependency has not been added
-            // Push the dependency to the top of the stack
-            s.push((MXNode*)it->get());
-            all_dependencies_added = false;
-            break;
-          }
-        }
-  
-        // Continue to the next loop if a dependency has been added
-        if(!all_dependencies_added) continue;
-
-        // Add to the vector of nodes
-        nodes.push_back(s.top());
-
-        // Save the index
-        nodemap[s.top()] = nodes.size()-1;
-
-        // Remove from stack
-        s.pop();
-    } else {
-      break;
-    }
-  }
-}
-
 void MXFunctionInternal::init(){
   log("MXFunctionInternal::init begin");
   
@@ -110,42 +64,34 @@ void MXFunctionInternal::init(){
   // All evaluation nodes in the order of evaluation
   vector<MXNode*> nodes;
 
-  // Not ready
-  if(0){
-    // Add the inputs to the stack
-    for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
-      if(it->get()) s.push(static_cast<MXNode*>(it->get()));
+  // Add the inputs to the stack
+  for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
+    if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
-    // Add the outputs to the stack
-    for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
-      if(it->get()) s.push(static_cast<MXNode*>(it->get()));
+  // Add the outputs to the stack
+  for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
+    if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
-    // Order the nodes in the order of dependencies using a depth-first topological sorting
-    sort_depth_first(s,nodes);
+  // Order the nodes in the order of dependencies using a depth-first topological sorting
+  sort_depth_first(s,nodes);
 
-    // Resort the nodes in a more cache friendly order (Kahn 1962)
-    resort_bredth_first(nodes);
-  }
+  // Resort the nodes in a more cache friendly order (Kahn 1962)
+//  resort_bredth_first(nodes);
   
-  // Clear the algorithm
-  alg.clear();
-  nodes.clear();
-  std::map<const MXNode*,int>  nodemap;
-  outputv_ind.clear();
-  inputv_ind.clear();
+  // Set the temporary variables to be the corresponding place in the sorted graph
+  for(int i=0; i<nodes.size(); ++i)
+    nodes[i]->temp = i;
   
-  // Begin by adding the inputs to the algorithm
-  for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it){
-    makeAlgorithm(static_cast<MXNode*>(it->get()), nodes, nodemap);
-    inputv_ind.push_back(nodemap[(MXNode*)it->get()]);
-  }
+  // Indices corresponding to the inputs
+  inputv_ind.resize(inputv.size());
+  for(int i=0; i<inputv_ind.size(); ++i)
+    inputv_ind[i] = inputv[i]->temp;
 
-  // Order all nodes of a matrix syntax tree in the order of calculation
-  for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it){
-    makeAlgorithm((MXNode*)it->get(), nodes, nodemap);
-    outputv_ind.push_back(nodemap[(MXNode*)it->get()]);
-  } 
-    
+  // Indices corresponding to the outputs
+  outputv_ind.resize(outputv.size());
+  for(int i=0; i<outputv_ind.size(); ++i)
+    outputv_ind[i] = outputv[i]->temp;
+
   // Make sure that the output nodes are placed directly after the corresponding multiple output node
   
   // Create runtime elements for each node
@@ -167,7 +113,7 @@ void MXFunctionInternal::init(){
       if(m->dep(i).isNull())
         it->ch[i] = -1;
       else
-        it->ch[i] = nodemap[(MXNode*)m->dep(i).get()];
+        it->ch[i] = m->dep(i)->temp;
     }
     
     it->input.resize(m->ndep(),0);
@@ -194,6 +140,12 @@ void MXFunctionInternal::init(){
       it->adjSeed[d] = &it->val.dataA[d][0];
     
   }
+  
+  // Reset the temporary variables
+  for(int i=0; i<nodes.size(); ++i){
+    nodes[i]->temp = 0;
+  }
+  
   
   log("MXFunctionInternal::init end");
 }

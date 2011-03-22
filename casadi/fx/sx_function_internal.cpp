@@ -76,7 +76,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
   // Resort the nodes in a more cache friendly order (Kahn 1962)
   resort_bredth_first(bnodes);
 
-  // Set the temporary variables to be the corresponding place in the tree
+  // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes.size(); ++i)
     nodes[i]->temp = i;
 
