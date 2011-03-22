@@ -88,4 +88,9 @@ const SX& BinarySXNode::dep(int i) const{
   return child[i];
 }
 
+SX& BinarySXNode::dep(int i){
+  assert(i==0 || i==1);
+  return child[i];
+}
+
 } // namespace CasADi

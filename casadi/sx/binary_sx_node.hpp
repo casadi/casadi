@@ -60,6 +60,7 @@ virtual int ndep() const{ return 2;}
 
 /** \brief  get the reference of a child */
 virtual const SX& dep(int i) const;
+virtual SX& dep(int i);
 
 /** \brief  Get the operation */
 virtual int getOp() const{ return op;}

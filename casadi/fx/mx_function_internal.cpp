@@ -104,6 +104,27 @@ void MXFunctionInternal::init(){
   // Call the init function of the base class
   XFunctionInternal::init();
 
+  // Stack
+//   stack<MXNode*> s;
+// 
+//   // Add the inputs to the stack
+//   for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
+//     s.push(static_cast<MXNode*>(it->get()));
+// 
+//   // Add the outputs to the stack
+//   for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
+//     s.push(static_cast<MXNode*>(it->get()));
+// 
+//   // Order the nodes in the order of dependencies using a depth-first topological sorting
+//   vector<MXNode*> algnodes;   // All the binary nodes in the order of evaluation
+//   sort_depth_first(s,algnodes);
+// 
+//   // Resort the nodes in a more cache friendly order (Kahn 1962)
+//   resort_bredth_first(algnodes);
+
+  
+  
+  
   // Clear the algorithm
   alg.clear();
   nodemap.clear();
@@ -113,7 +134,7 @@ void MXFunctionInternal::init(){
 
   // Begin by adding the inputs to the algorithm
   for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it){
-    makeAlgorithm((MXNode*)it->get(), nodes, nodemap);
+    makeAlgorithm(static_cast<MXNode*>(it->get()), nodes, nodemap);
     inputv_ind.push_back(nodemap[(MXNode*)it->get()]);
   }
 
@@ -122,7 +143,7 @@ void MXFunctionInternal::init(){
     makeAlgorithm((MXNode*)it->get(), nodes, nodemap);
     outputv_ind.push_back(nodemap[(MXNode*)it->get()]);
   }
-  
+    
   // Make sure that the output nodes are placed directly after the corresponding multiple output node
   
   // Create runtime elements for each node

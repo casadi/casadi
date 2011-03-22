@@ -29,6 +29,7 @@ using namespace std;
 namespace CasADi{
 
 MXNode::MXNode(){
+  temp = 0;
 }
 
 MXNode::~MXNode(){
@@ -47,6 +48,10 @@ bool MXNode::isConstant() const{
 }
 
 const MX& MXNode::dep(int ind) const{
+  return dep_.at(ind);
+}
+  
+MX& MXNode::dep(int ind){
   return dep_.at(ind);
 }
   

@@ -76,9 +76,9 @@ void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*
           
           // Add dependent nodes if not already added
           for(int i=0; i<t->ndep(); ++i){
-            if(t->dep(i)->hasDep() && t->dep(i).get()->temp == 0) {
+            if(t->dep(i)->hasDep() && static_cast<Node*>(t->dep(i).get())->temp == 0) {
               // if the first child has not yet been added
-              s.push(t->dep(i).get());
+              s.push(static_cast<Node*>(t->dep(i).get()));
               added_dep=true;
               break;
             }
@@ -132,7 +132,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
   std::vector<int> numref(algnodes.size(),0);
   for(int i=0; i<algnodes.size(); ++i){
     for(int c=0; c<algnodes[i]->ndep(); ++c){ // for both children
-      Node* child = algnodes[i]->dep(c).get();
+      Node* child = static_cast<Node*>(algnodes[i]->dep(c).get());
       if(child->hasDep())
         numref[child->temp]++;
     }
@@ -169,7 +169,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
       // for both children
       for(int c=0; c<algnodes[el]->ndep(); ++c){
 
-        Node* child = algnodes[el]->dep(c).get();
+        Node* child = static_cast<Node*>(algnodes[el]->dep(c).get());
 
         if(child->hasDep()){
           // Decrease the reference count of the children
@@ -229,7 +229,7 @@ void XFunctionInternal::resort_bredth_first(std::vector<Node*>& algnodes){
     // maximum level of any of the children
     int maxlevel = -1;
     for(int c=0; c<(*it)->ndep(); ++c){    // Loop over the children
-      Node* child = (*it)->dep(c).get();
+      Node* child = static_cast<Node*>((*it)->dep(c).get());
       if(child->hasDep() && child->temp > maxlevel)
         maxlevel = child->temp;
     }

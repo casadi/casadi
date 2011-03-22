@@ -112,6 +112,11 @@ const SX& SXNode::dep(int i) const{
   throw CasadiException(ss.str());
 }
 
+SX& SXNode::dep(int i){
+  stringstream ss;
+  ss << "child() not defined for class " << typeid(*this).name() << std::endl;
+  throw CasadiException(ss.str());
+}
 
 bool SXNode::isSmooth() const{
   return true; // nodes are smooth by default

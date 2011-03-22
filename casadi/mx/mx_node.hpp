@@ -90,9 +90,13 @@ class MXNode : public SharedObjectNode{
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const;
+    MX& dep(int ind=0);
     
     /** \brief  Number of dependencies */
     int ndep() const;
+    
+    /** \brief  Does the node depend on other nodes*/
+    virtual bool hasDep() const{return ndep()>0; }
 
     /// Get the sparsity
     const CRSSparsity& sparsity() const;
@@ -143,6 +147,12 @@ class MXNode : public SharedObjectNode{
     /// Get size
     int size2() const;
     
+    /** Temporary variables to be used in user algorithms like sorting, 
+    the user is resposible of making sure that use is thread-safe
+    The variable is initialized to zero
+    */
+    int temp;
+
   protected:
     
     /** \brief  dependencies - functions that have to be evaluated before this one */

@@ -83,6 +83,9 @@ virtual int ndep() const{ return 0;}
 /** \brief  get the reference of a child */
 virtual const SX& dep(int i) const;
 
+/** \brief  get the reference of a child */
+virtual SX& dep(int i);
+
 /** \brief  Check if smooth */
 virtual bool isSmooth() const;
 
