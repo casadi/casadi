@@ -105,33 +105,35 @@ void MXFunctionInternal::init(){
   XFunctionInternal::init();
 
   // Stack
-//   stack<MXNode*> s;
-// 
-//   // Add the inputs to the stack
-//   for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
-//     s.push(static_cast<MXNode*>(it->get()));
-// 
-//   // Add the outputs to the stack
-//   for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
-//     s.push(static_cast<MXNode*>(it->get()));
-// 
-//   // Order the nodes in the order of dependencies using a depth-first topological sorting
-//   vector<MXNode*> algnodes;   // All the binary nodes in the order of evaluation
-//   sort_depth_first(s,algnodes);
-// 
-//   // Resort the nodes in a more cache friendly order (Kahn 1962)
-//   resort_bredth_first(algnodes);
+  stack<MXNode*> s;
 
-  
-  
+  // All evaluation nodes in the order of evaluation
+  vector<MXNode*> nodes;
+
+  // Not ready
+  if(0){
+    // Add the inputs to the stack
+    for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
+      if(it->get()) s.push(static_cast<MXNode*>(it->get()));
+
+    // Add the outputs to the stack
+    for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
+      if(it->get()) s.push(static_cast<MXNode*>(it->get()));
+
+    // Order the nodes in the order of dependencies using a depth-first topological sorting
+    sort_depth_first(s,nodes);
+
+    // Resort the nodes in a more cache friendly order (Kahn 1962)
+    resort_bredth_first(nodes);
+  }
   
   // Clear the algorithm
   alg.clear();
-  nodemap.clear();
-  std::vector<MXNode*> nodes;
+  nodes.clear();
+  std::map<const MXNode*,int>  nodemap;
   outputv_ind.clear();
   inputv_ind.clear();
-
+  
   // Begin by adding the inputs to the algorithm
   for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it){
     makeAlgorithm(static_cast<MXNode*>(it->get()), nodes, nodemap);
@@ -142,7 +144,7 @@ void MXFunctionInternal::init(){
   for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it){
     makeAlgorithm((MXNode*)it->get(), nodes, nodemap);
     outputv_ind.push_back(nodemap[(MXNode*)it->get()]);
-  }
+  } 
     
   // Make sure that the output nodes are placed directly after the corresponding multiple output node
   
@@ -194,29 +196,6 @@ void MXFunctionInternal::init(){
   }
   
   log("MXFunctionInternal::init end");
-}
-
-bool MXFunctionInternal::hasEl(const MX& mx) const{
-  // Locate the node:
-  map<const MXNode*,int>::const_iterator it = nodemap.find((MXNode*)mx.get());
-
-  // Make sure that the node was indeed found
-  return it != nodemap.end();
-}
-
-
-int MXFunctionInternal::findEl(const MX& mx) const{
-  // Locate the node:
-  map<const MXNode*,int>::const_iterator it = nodemap.find((MXNode*)mx.get());
-
-  // Make sure that the node was indeed found
-  if(it == nodemap.end()){
-    stringstream ss;
-    ss << "MXFunctionInternal::findEl: Node \"" << mx << "\" not in the algorithm.";
-    throw CasadiException(ss.str());
-  }
-  // Return the index
-  return it->second;
 }
 
 void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_data){

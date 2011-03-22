@@ -32,8 +32,6 @@
 #include "../sx/sx_node.hpp"
 #include "../mx/evaluation.hpp"
 
-#define SMALL_WORK_VECTOR 0
-
 namespace CasADi{
 
 using namespace std;
@@ -49,156 +47,56 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
   // Stack
   stack<SXNode*> s;
 
+  // Add the inputs to the stack
+  for(vector<Matrix<SX> >::const_iterator it = inputv.begin(); it != inputv.end(); ++it)
+    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
+      s.push(itc->get());
+
   // Add the outputs to the stack
   for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
       s.push(itc->get());
 
   // Order the nodes in the order of dependencies using a depth-first topological sorting
-  vector<SXNode*> algnodes;   // All the binary nodes in the order of evaluation
-  sort_depth_first(s,algnodes);
+  nodes.clear();
+  sort_depth_first(s,nodes);
 
+  // Sort the nodes by type
+  vector<SXNode*> bnodes, cnodes, snodes;
+  for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
+    SXNode* t = *it;
+    if(t->isConstant())
+      cnodes.push_back(t);
+    else if(t->isSymbolic())
+      snodes.push_back(t);
+    else
+      bnodes.push_back(t);
+  }
+  
   // Resort the nodes in a more cache friendly order (Kahn 1962)
-  resort_bredth_first(algnodes);
-
-  // Find constants and symbolic variables
-  vector<SXNode*> cnodes, snodes;
-  for(vector<SXNode*>::iterator it = algnodes.begin(); it != algnodes.end(); ++it){
-    for(int c=0; c<2; ++c){
-      SXNode* child = (*it)->dep(c).get();
-      if(!child->hasDep() && child->temp==0){
-	if(child->isConstant())	  cnodes.push_back(child);
-	else                      snodes.push_back(child);
-	child->temp=1;
-      }
-    }
-  }
-
-  // Make sure that the inputs are added (and added only once)
-  for(vector<Matrix<SX> >::const_iterator it = inputv.begin(); it != inputv.end(); ++it){
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
-      assert((*itc)->isSymbolic());
-      assert((*itc)->temp!=2); // make sure that an input does not appear twice
-
-      // Add to the list of symbolic nodes
-      if(itc->get()->temp==0) // if not visited
-	snodes.push_back(itc->get());
-
-      itc->get()->temp=2; // mark as visited
-    }
-  }
-
-  // Make sure that the outputs are added
-  for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it){
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
-      SXNode* node = itc->get();
-      if(!node->hasDep() && node->temp==0){
-	if(node->isConstant())	  cnodes.push_back(node);
-	else                      snodes.push_back(node);
-
-	// mark as visited
-	node->temp=1;
-      }
-    }
-  }
-
-  // all the nodes in the order of dependencies
-  tree.clear();
-  tree.insert(tree.end(),snodes.begin(),snodes.end());
-  tree.insert(tree.end(),cnodes.begin(),cnodes.end());
-  tree.insert(tree.end(),algnodes.begin(),algnodes.end());
+  resort_bredth_first(bnodes);
 
   // Set the temporary variables to be the corresponding place in the tree
-  for(int i=0; i<tree.size(); ++i)
-    tree[i]->temp = i;
+  for(int i=0; i<nodes.size(); ++i)
+    nodes[i]->temp = i;
 
   // Place in the work vector for each of the nodes in the tree
-  vector<int> place(tree.size(),-1);
+  vector<int> place(nodes.size(),-1);
 
-#if SMALL_WORK_VECTOR
-
-  // Current size of the work vector
-  worksize = snodes.size() + cnodes.size();
-
-  // Keep track of which elements are in use
-  vector<bool> in_use(tree.size(),false);
-
-  // Give a place in the work vector for each symbolic variable and constant and mark them as in use
-  for(int i=0; i<worksize; ++i){
-    place[i] = i;
-    in_use[i] = true;
-  }
-
-  // Give a place in the work vector for each of the outputs and mark these nodes as in use, preventing them being overwritten
-  for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
-	SXNode* node = itc->get();
-	if(node->hasDep() && !in_use[node->temp]){
-	  place[node->temp] = worksize++;
-	  in_use[node->temp] = true;
-	}
-    }
-
-  // Stack of places in the work vector that are not used
-  stack<int> unused;
-
-  // Loop over the algorithm elements in reverse order
-  for(vector<SXNode*>::const_reverse_iterator it=algnodes.rbegin(); it!=algnodes.rend(); ++it){
-
-    // The place of the current element is now unused (i.e. not yet used)
-    unused.push(place[(*it)->temp]);
-    in_use[(*it)->temp] = false;
-
-    // Loop over the children
-    for(int c=0; c<2; ++c){
-      SXNode* child = (*it)->child[c].get();
-
-      // If not yet in use
-      if(!in_use[child->temp]){
-
-	 // Mark as in use
-	 in_use[child->temp] = true;
-
-	 // Give a new place in the algorithm
-	 if(!unused.empty()){
-	    // Take the place from the stack if possible
-	    place[child->temp] = unused.top();
-	    unused.pop();
-	 } else { // otherwise allocate a new place in the work vector
-	    place[child->temp] = worksize++;
-
-#if 0
-	    cout << "added = " << child->temp << " to place " << worksize-1 << ". ";
-	    assert(child->hasDep());
-	    SXNode * bnode = (SXNode *)child;
-	    cout << "op = " << bnode->op << " ";
-	    printFun[bnode->op](cout,"x","y");
-	    cout << " ch[0] = " << bnode->child[0]->temp << ". ";
-	    cout << "ch[1] = " << bnode->child[1]->temp << ". ";
-	    cout << endl;
-#endif
-	 }
-      } // if is in use
-    } // for c...
-  } // for it...
-
-#else
-  worksize = tree.size();
+  worksize = nodes.size();
   for(int i=0; i<place.size(); ++i)
-    place[i] = i;  
-
-#endif
+    place[i] = i;
 
 
   // Add the binary operations
   algorithm.clear();
-  algorithm.resize(algnodes.size());
+  algorithm.resize(bnodes.size());
   pder1.resize(algorithm.size());
   pder2.resize(algorithm.size());
   for(int i=0; i<algorithm.size(); ++i){
 
     // Locate the element
-    SXNode* bnode = algnodes[i];
+    SXNode* bnode = bnodes[i];
 
     // Save the node index
     algorithm[i].ind = place[bnode->temp];
@@ -255,8 +153,8 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
     work[(**it).temp] = (**it).getValue();
 
   // Reset the temporary variables
-  for(int i=0; i<tree.size(); ++i){
-    tree[i]->temp = 0;
+  for(int i=0; i<nodes.size(); ++i){
+    nodes[i]->temp = 0;
   }
 
 }
@@ -405,10 +303,10 @@ Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
   der2.reserve(algorithm.size());
   SX tmp[2];
   for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
-      SX f = SX(tree[it->ind]);
+      SX f = SX(nodes[it->ind]);
       SX ch[2];
-      ch[0] = SX(tree[it->ch[0]]);
-      ch[1] = SX(tree[it->ch[1]]);
+      ch[0] = SX(nodes[it->ch[0]]);
+      ch[1] = SX(nodes[it->ch[1]]);
       casadi_math<SX>::der[it->op](ch[0],ch[1],f,tmp);
       if(!ch[0]->isConstant())  der1.push_back(tmp[0]);
       else                    	der1.push_back(0);
@@ -418,7 +316,7 @@ Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
   }
 
   // Gradient (this is also the working array)
-  vector<SX> g(tree.size(),casadi_limits<SX>::zero);
+  vector<SX> g(nodes.size(),casadi_limits<SX>::zero);
 
   // if reverse AD
 //  if(getOption("ad_mode") == "reverse"){
@@ -444,11 +342,11 @@ Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
    // backward sweep
    for(int k = algorithm.size()-1; k>=0; --k){
      const AlgEl& ae = algorithm[k];
-     if(!tree[ae.ch[0]]->isConstant()) g[ae.ch[0]] += der1[k] * g[ae.ind];
-     if(!tree[ae.ch[1]]->isConstant()) g[ae.ch[1]] += der2[k] * g[ae.ind];
+     if(!nodes[ae.ch[0]]->isConstant()) g[ae.ch[0]] += der1[k] * g[ae.ind];
+     if(!nodes[ae.ch[1]]->isConstant()) g[ae.ch[1]] += der2[k] * g[ae.ind];
      
      // Mark the place in the algorithm
-     tree[ae.ind]->temp = k;
+     nodes[ae.ind]->temp = k;
    }
 
    // A row of the Jacobian
@@ -501,7 +399,7 @@ Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
       
    // Reset the marks
    for(vector<AlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it)
-     tree[it->ind]->temp = 0;
+     nodes[it->ind]->temp = 0;
   
       cout << "ok, 1" << endl;
 #endif 
@@ -588,8 +486,8 @@ return ret;
 
     // Get symbolic nodes
     vector<int> snodes;
-    for(int i=0; i<tree.size(); ++i){
-      if(tree[i]->isSymbolic())
+    for(int i=0; i<nodes.size(); ++i){
+      if(nodes[i]->isSymbolic())
         snodes.push_back(i);
     }
               
@@ -697,10 +595,10 @@ void SXFunctionInternal::print(ostream &stream) const{
 
     int i0 = it->ch[0], i1 = it->ch[1];
 #if 0
-    if(tree[i0]->hasDep())  s0 << "i_" << i0;
-    else                      s0 << SX(tree[i0]);
-    if(tree[i1]->hasDep())  s1 << "i_" << i1;
-    else                      s1 << SX(tree[i1]);
+    if(nodes[i0]->hasDep())  s0 << "i_" << i0;
+    else                      s0 << SX(nodes[i0]);
+    if(nodes[i1]->hasDep())  s1 << "i_" << i1;
+    else                      s1 << SX(nodes[i1]);
 #else
     s0 << "i_" << i0;
     s1 << "i_" << i1;
@@ -811,9 +709,9 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
       declared[it->ind]=true;
     }
     cfile << "i_" << it->ind << "=";
-    if(tree[it->ch[0]]->isConstant())  s0 << tree[it->ch[0]]->getValue();
+    if(nodes[it->ch[0]]->isConstant())  s0 << nodes[it->ch[0]]->getValue();
     else                               s0 << "i_" << it->ch[0];
-    if(tree[it->ch[1]]->isConstant())  s1 << tree[it->ch[1]]->getValue();
+    if(nodes[it->ch[1]]->isConstant())  s1 << nodes[it->ch[1]]->getValue();
     else                               s1 << "i_" << it->ch[1];
     casadi_math<double>::print[op](cfile ,s0.str(),s1.str());
     cfile  << ";" << endl;
@@ -824,8 +722,8 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
     for(int i=0; i<output_ind[ind].size(); ++i){
       cfile << "r[" << ind << "][" << i << "]=";
       int el = output_ind[ind][i];
-      if(tree[el]->isConstant())
-        cfile << tree[el]->getValue() << ";" << endl;
+      if(nodes[el]->isConstant())
+        cfile << nodes[el]->getValue() << ";" << endl;
       else
         cfile << "i_" << el << ";" << endl;
     }
@@ -863,11 +761,11 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
   assert(input_.size() == input_s.size());
   
   // Create a symbolic work vector if not existing
-  if(swork.size() != tree.size()){
-    swork.resize(tree.size());
-    for(int i=0; i<tree.size(); ++i){
-      if(!tree[i]->hasDep())
-        swork[i] = SX(tree[i]);
+  if(swork.size() != nodes.size()){
+    swork.resize(nodes.size());
+    for(int i=0; i<nodes.size(); ++i){
+      if(!nodes[i]->hasDep())
+        swork[i] = SX(nodes[i]);
     }
   }
   

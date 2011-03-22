@@ -94,116 +94,113 @@ class SX{
     /// Destructor
     ~SX();
 
-  // Assignment
-  SX& operator=(const SX& scalar);
-  SX& operator=(double scalar); // needed since otherwise both a = SX(double) and a = Matrix(double) would be ok
-//   SX& operator=(const SXMatrix& scalar);
-#endif // SWIG
-
-#ifndef SWIG
-  // Convert to a 1-by-1 Matrix
-  operator Matrix<SX>() const;
-
-  //@{
-  /** \brief  Operators that change the object */
-  friend SX& operator+=(SX &ex, const SX &scalar);
-  friend SX& operator-=(SX &ex, const SX &scalar);
-  friend SX& operator*=(SX &ex, const SX &scalar);
-  friend SX& operator/=(SX &ex, const SX &scalar);
-  //@}
+    /// Create an object given a node
+    static SX createFromNode(SXNode* node);
     
-  //@{
-  /** \brief  Operators that create new objects (SX on the left hand side) */
-  friend SX operator+(const SX &x, const SX &y);
-  friend SX operator-(const SX &x, const SX &y);
-  friend SX operator*(const SX &x, const SX &y);
-  friend SX operator/(const SX &x, const SX &y);
-  //@}
-  
-  //@ {
-  /** \brief  Conditional operators */
-  friend SX operator<=(const SX &a, const SX &b);
-  friend SX operator>=(const SX &a, const SX &b);
-  friend SX operator<(const SX &a, const SX &b);
-  friend SX operator>(const SX &a, const SX &b);
-  friend SX operator&&(const SX &a, const SX &b);
-  friend SX operator||(const SX &a, const SX &b);
-  friend SX operator==(const SX &a, const SX &b);
-  friend SX operator!=(const SX &a, const SX &b);
-  friend SX operator!(const SX &a);
-  //@}
-#endif // SWIG
+    // Assignment
+    SX& operator=(const SX& scalar);
+    SX& operator=(double scalar); // needed since otherwise both a = SX(double) and a = Matrix(double) would be ok
 
+    // Convert to a 1-by-1 Matrix
+    operator Matrix<SX>() const;
 
-#ifndef SWIG
-  /** \brief  print to stream */
-  friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
+    //@{
+    /** \brief  Operators that change the object */
+    friend SX& operator+=(SX &ex, const SX &scalar);
+    friend SX& operator-=(SX &ex, const SX &scalar);
+    friend SX& operator*=(SX &ex, const SX &scalar);
+    friend SX& operator/=(SX &ex, const SX &scalar);
+    //@}
+      
+    //@{
+    /** \brief  Operators that create new objects (SX on the left hand side) */
+    friend SX operator+(const SX &x, const SX &y);
+    friend SX operator-(const SX &x, const SX &y);
+    friend SX operator*(const SX &x, const SX &y);
+    friend SX operator/(const SX &x, const SX &y);
+    //@}
+    
+    //@ {
+    /** \brief  Conditional operators */
+    friend SX operator<=(const SX &a, const SX &b);
+    friend SX operator>=(const SX &a, const SX &b);
+    friend SX operator<(const SX &a, const SX &b);
+    friend SX operator>(const SX &a, const SX &b);
+    friend SX operator&&(const SX &a, const SX &b);
+    friend SX operator||(const SX &a, const SX &b);
+    friend SX operator==(const SX &a, const SX &b);
+    friend SX operator!=(const SX &a, const SX &b);
+    friend SX operator!(const SX &a);
+    //@}
+    
+    /** \brief  print to stream */
+    friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
 
-  /** \brief  string representation (SWIG workaround) */
-  std::string toString() const;
-  
-  /** \brief  Get a pointer to the node */
-  SXNode* const get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
+    /** \brief  string representation (SWIG workaround) */
+    std::string toString() const;
+    
+    /** \brief  Get a pointer to the node */
+    SXNode* const get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
 
-  /** \brief  Access functions of the node */
-  const SXNode* operator->() const;
-  SXNode* operator->();
-#endif // SWIG
-  
-  /** \brief  Perform operations by ID */
-  static SX binary(int op, const SX& x, const SX& y);
-  static SX unary(int op, const SX& x);
+    /** \brief  Access functions of the node */
+    const SXNode* operator->() const;
+    SXNode* operator->();
+  #endif // SWIG
+    
+    /** \brief  Perform operations by ID */
+    static SX binary(int op, const SX& x, const SX& y);
+    static SX unary(int op, const SX& x);
 
-  bool isConstant() const;
-  bool isInteger() const;
-  bool isSymbolic() const;
-  bool isBinary() const;
-  bool isZero() const;
-  bool isOne() const;
-  bool isMinusOne() const;
-  bool isNan() const;
-  bool isInf() const;
-  bool isMinusInf() const;
-  const std::string& getName() const;
-  int getOp() const;
-  bool isEqual(const SX& scalar) const;
-  double getValue() const;
-  int getIntValue() const;
-  SX getDep(int ch=0) const;
+    bool isConstant() const;
+    bool isInteger() const;
+    bool isSymbolic() const;
+    bool isBinary() const;
+    bool isZero() const;
+    bool isOne() const;
+    bool isMinusOne() const;
+    bool isNan() const;
+    bool isInf() const;
+    bool isMinusInf() const;
+    const std::string& getName() const;
+    int getOp() const;
+    bool isEqual(const SX& scalar) const;
+    double getValue() const;
+    int getIntValue() const;
+    SX getDep(int ch=0) const;
 
-  /** \brief  Negation */
-  SX operator-() const;
-  
-  /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
-  SX exp() const;
-  SX log() const;
-  SX sqrt() const;
-  SX sin() const;
-  SX cos() const;
-  SX tan() const;
-  SX arcsin() const;
-  SX arccos() const;
-  SX arctan() const;
-  SX floor() const;
-  SX ceil() const;
-  SX erf() const;
-  SX fabs() const;
-  SX add(const SX& y) const;
-  SX sub(const SX& y) const;
-  SX mul(const SX& y) const;
-  SX div(const SX& y) const;
-  SX fmin(const SX &b) const;
-  SX fmax(const SX &b) const;
-  SX pow(const SX& n) const;
+    /** \brief  Negation */
+    SX operator-() const;
+    
+    /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
+    SX exp() const;
+    SX log() const;
+    SX sqrt() const;
+    SX sin() const;
+    SX cos() const;
+    SX tan() const;
+    SX arcsin() const;
+    SX arccos() const;
+    SX arctan() const;
+    SX floor() const;
+    SX ceil() const;
+    SX erf() const;
+    SX fabs() const;
+    SX add(const SX& y) const;
+    SX sub(const SX& y) const;
+    SX mul(const SX& y) const;
+    SX div(const SX& y) const;
+    SX fmin(const SX &b) const;
+    SX fmax(const SX &b) const;
+    SX pow(const SX& n) const;
   
   private:
 #ifndef SWIG
-SXNode* node;
+    SXNode* node;
 
-/** \brief  Function that do not have corresponding c-functions and are therefore not available publically */
-friend SX sign(const SX &x);
-/** \brief inline if-test */
-friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
+    /** \brief  Function that do not have corresponding c-functions and are therefore not available publically */
+    friend SX sign(const SX &x);
+    /** \brief inline if-test */
+    friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
 #endif // SWIG
 
 };

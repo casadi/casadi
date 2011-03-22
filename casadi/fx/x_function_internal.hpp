@@ -46,7 +46,7 @@ class XFunctionInternal : public FXInternal{
   
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     template<typename Node>
-    static void sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& algnodes);
+    static void sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& nodes);
 
     /** \brief  Topological (re)sorting of the nodes based on Bredth-First Search (BFS) (Kahn 1962) */
     template<typename Node>
@@ -61,44 +61,39 @@ class XFunctionInternal : public FXInternal{
 // Template implementations
 
 template<typename Node>
-void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& algnodes){
+void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& nodes){
 
     while(!s.empty()){
+      
       // Get the topmost element
       Node* t = s.top();
       
       // If the last element on the stack has not yet been added
-      if (!t->temp){
+      if (t && !t->temp){
         
-        if(t->hasDep()){
-          // If a dependent node was added to the stack
-          bool added_dep = false;
-          
-          // Add dependent nodes if not already added
-          for(int i=0; i<t->ndep(); ++i){
-            if(t->dep(i)->hasDep() && static_cast<Node*>(t->dep(i).get())->temp == 0) {
-              // if the first child has not yet been added
-              s.push(static_cast<Node*>(t->dep(i).get()));
-              added_dep=true;
-              break;
-            }
+        // If a dependent node was added to the stack
+        bool added_dep = false;
+        
+        // Add dependent nodes if not already added
+        for(int i=0; i<t->ndep(); ++i){
+          if(t->dep(i).get() !=0 && static_cast<Node*>(t->dep(i).get())->temp == 0) {
+            // if the first child has not yet been added
+            s.push(static_cast<Node*>(t->dep(i).get()));
+            added_dep=true;
+            break;
           }
-          
-          if(!added_dep){    // if both children have already been added
-            // Add to algorithm
-            algnodes.push_back(t);
+        }
+        
+        if(!added_dep){  // if no dependencies were added
+          // Add to algorithm
+          nodes.push_back(t);
 
-            // Mark the node as found
-            t->temp = 1;
-
-            // Remove from stack
-            s.pop();
-            
-          }
-        } else {  // If the element is a constant or symbolic node
+          // Mark the node as found
+          t->temp = 1;
 
           // Remove from stack
           s.pop();
+          
         }
       } else {
         // If the last element on the stack has already been added
@@ -107,7 +102,7 @@ void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*
     }
 
   // Reset the node counters
-  for(typename std::vector<Node*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
+  for(typename std::vector<Node*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
     (**it).temp = 0;
   }
 }
@@ -133,7 +128,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
   for(int i=0; i<algnodes.size(); ++i){
     for(int c=0; c<algnodes[i]->ndep(); ++c){ // for both children
       Node* child = static_cast<Node*>(algnodes[i]->dep(c).get());
-      if(child->hasDep())
+      if(child && child->hasDep())
         numref[child->temp]++;
     }
   }
@@ -171,7 +166,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
 
         Node* child = static_cast<Node*>(algnodes[el]->dep(c).get());
 
-        if(child->hasDep()){
+        if(child && child->hasDep()){
           // Decrease the reference count of the children
           numref[child->temp]--;
 

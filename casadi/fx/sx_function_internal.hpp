@@ -98,7 +98,7 @@ class SXFunctionInternal : public XFunctionInternal{
   std::vector<AlgElData<2> > pder2;
   
   /** \brief  All nodes */
-  std::vector<SXNode*> tree;
+  std::vector<SXNode*> nodes;
 
   /** \brief  Working vector for numeric calculation */
   std::vector<double> work;

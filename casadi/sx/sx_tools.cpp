@@ -282,7 +282,7 @@ int numNodes(const Matrix<SX>& A){
   // Create a function
   SXFunction fcn(Matrix<SX>(),A);
 
-  return fcn->tree.size();
+  return fcn->nodes.size();
 }
 
 bool dependsOn(const Matrix<SX>& ex, const Matrix<SX> &arg){

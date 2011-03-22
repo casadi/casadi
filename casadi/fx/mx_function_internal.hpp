@@ -55,9 +55,6 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  Order all nodes of a matrix syntax tree in the order of calculation */
     static void makeAlgorithm(MXNode* root, std::vector<MXNode*> &nodes, std::map<const MXNode*,int>  &nodemap);
 
-    /** \brief  Find a runtime element corresponding to a matrix expression */
-    int findEl(const MX& mx) const;
-
     /** \brief  Evaluate the algorithm */
     virtual void evaluate(int nfdir, int nadir);
 
@@ -76,9 +73,6 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> alg;
   
-    /** \brief  Maps for quickly finding the place in the algorithm of a runtime element */
-    std::map<const MXNode*,int>  nodemap;
-
     /** \brief  Matrix expressions that are to be evaluated */
     std::vector<MX> outputv;
     std::vector<int> outputv_ind;
@@ -86,10 +80,7 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  Dependent expressions */
     std::vector<MX> inputv;
     std::vector<int> inputv_ind;
-  
-    /** \brief  Does an element exist in the algorithm */  
-    bool hasEl(const MX& mx) const;
-    
+      
     // Lifting function
     LiftingFunction liftfun_;
     void* liftfun_ud_;

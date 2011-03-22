@@ -52,7 +52,7 @@ SX::SX(double val){
     else if(intval == -1)       node = casadi_limits<SX>::minus_one.node;
     else                        node = new IntegerSXNode(intval);
     node->count++;
-  } else {	
+  } else {
     if(ISNAN(val))              node = casadi_limits<SX>::nan.node;
     else if(ISINF(val))         node = val > 0 ? casadi_limits<SX>::inf.node : casadi_limits<SX>::minus_inf.node;
     else                        node = new RealtypeSXNode(val);
