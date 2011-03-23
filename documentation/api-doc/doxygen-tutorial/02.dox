@@ -1,0 +1,98 @@
+/*! \page chapter2 Installation
+<table style="width: 100%;">
+   <tr><td style="text-align: left;">Previous chapter: \ref chapter1</td>
+       <td style="text-align: right;">Next chapter: \ref chapter3</td>
+   </tr>
+</table>
+    
+<b>Contents</b>
+\li \ref section2_1
+\li \ref section2_2
+
+In this section we introduce step by step the installation procedure of CasADi. First we detail what software packages need to
+be installed in order to use CasADi.
+\section section2_1 Software requirements
+CasADi consists of a symbolic core, which is strongly used by the interfaces that are shipped with it. Now we summarize
+what the dependencies of each are. As a general rule you will always need a C++ compiler (tested with gcc 4.4.3) and
+CMake (tested with version 2.8.2).
+<center>
+<table border="1" bordercolor="" style="background-color:" width="400" cellpadding="3" cellspacing="3">
+        <tr>
+                <td>Package/interface</td>
+                <td>Dependency</td>
+        </tr>
+        <tr>
+                <td>CasADi core</td>
+                <td>None</td>
+        </tr>
+        <tr>
+                <td>CSparse interface</td>
+                <td>CSparse (comes with CasADi)</td>
+        </tr>
+        <tr>
+                <td>Ipopt interface</td>
+                <td>Ipopt</td>
+        </tr>
+        <tr>
+                <td>KNITRO interface</td>
+                <td>KNITRO</td>
+        </tr>
+        <tr>
+                <td>LAPACK interface </td>
+                <td>library with LAPACK api</td>
+        </tr>
+        <tr>
+                <td>LiftOpt interface</td>
+                <td>LiftOpt</td>
+        </tr>
+        <tr>
+                <td>Sundials interface</td>
+                <td>SUNDIALS</td>
+        </tr>
+        <tr>
+                <td>SuperLU interface</td>
+                <td>SuperLU, library with BLAS api</td>
+        </tr>
+        <tr>
+                <td>CasADi for python</td>
+                <td>SWIG</td>
+        </tr>
+</table>
+</center>
+
+\section section2_2 Compilation
+First, you have to get CasADi from http://www.casadi.org/ or check out the svn repository from SourceForge.
+\code
+$ svn co https://casadi.svn.sourceforge.net/svnroot/casadi/trunk casadi
+\endcode
+Set the environment variable <tt>CMAKE_PREFIX_PATH</tt> to inform CMake where the dependecies are located. 
+For example if Sundials headers and libraries are installed under <tt>\$HOME/local/</tt>, then type
+\code
+export CMAKE_PREFIX_PATH=$HOME/local/
+\endcode
+Go to directory of the source tree, create a directory called e.g. <tt>./build</tt> where all compilation-related files will be created.
+\code
+cd casadi; mkdir build; cd build
+\endcode
+Generate the <tt>Makefile</tt> by typing
+\code
+cmake ..
+\endcode
+Check the output of CMake if the dependencies are correctly located. The interfaces without underlying libraries and headers won't be compiled.
+Now compile the C++ libraries.
+\code
+make
+\endcode
+If you wish to use the python interface you can compile it with the <tt>python</tt> target.
+\code
+make python
+\endcode
+
+<table style="width: 100%;">
+   <tr><td style="text-align: left;">Previous chapter: \ref chapter1</td>
+       <td style="text-align: right;">Next chapter: \ref chapter3</td>
+   </tr>
+</table>
+
+ */
+

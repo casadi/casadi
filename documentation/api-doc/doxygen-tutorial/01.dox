@@ -1,0 +1,19 @@
+/*! \page chapter1 Introduction
+This document gives a brief tutorial on the CasADi software package and on the interfaces that comes with it. We aim at
+introducing the most important capabilities of what CasADi can do. Our fundemental motivation is to provide open-source
+software for people working with symbolic systems, differential equations and dynamic optimization.
+
+Our discussion is mostly program code driven, meaning that
+we do not even try to provide mathematical background knowledge, the authors assume that the reader has already a fair knowledge
+of C++ programming, theory of differential equations and optimization theory. The goal of this document is to make the reader
+ familiar with
+ the syntax of CasADi and provide easily available building blocks to build dynamic optimization sofware.
+
+ After reading this tutorial the reader will be able to represent and derivate mathematical functions in a symbolic system with
+ code generation features, to
+ set up and solve ordinary differential equations with sensitivities.
+
+Next chapter: \ref chapter2
+ */
+
+
