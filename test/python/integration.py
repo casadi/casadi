@@ -361,28 +361,28 @@ class Integrationtests(casadiTestCase):
     qe.input(1).set(B)
     qe.evaluate()
     print array(qe.output())
-    
-    
+
   def test_nl_system(self):
     """
-    y'' = 1 + (y')^2 , y(0)=y0, y'(0)=yc0
+    y'' = a + (y')^2 , y(0)=y0, y'(0)=yc0
     
     The solution is:
-    (2*y0-log(yc0^2+1))/2-log(cos(atan(yc0)+t))
+    y=(2*y0-log(yc0^2/a+1))/2-log(cos(atan(yc0/sqrt(a))+sqrt(a)*t))
 
     """
     self.message("Nonlinear ODE sys")
     A=array([1,0.1])
+    p0 = 1.13
     y0=A[0]
-    yc0=A[1]
+    yc0=dy0=A[1]
     te=0.4
 
     t=symbolic("t")
     q=symbolic("y",2,1)
-    p=symbolic("p",0,0)
+    p=symbolic("p",1,1)
     # y
     # y'
-    f=SXFunction([t,q,p],[vertcat([q[1],1+q[1]**2 ])])
+    f=SXFunction([t,q,p],[vertcat([q[1],p[0]+q[1]**2 ])])
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -396,7 +396,7 @@ class Integrationtests(casadiTestCase):
     t0   = MX(0)
     tend = MX(te)
     q0   = MX("q0",2,1)
-    par  = MX("p",0,1)
+    par  = MX("p",1,1)
     qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
     qe=MXFunction([q0,par],[qend])
     qe.init()
@@ -407,17 +407,20 @@ class Integrationtests(casadiTestCase):
     qeJ.init()
 
     qe.input(0).set(A)
+    qe.input(1).set(p0)
     qe.evaluate()
 
     print qe.output()[0]
     print qe.output()[1]
-    self.assertAlmostEqual(qe.output()[0],(2*y0-log(yc0**2+1))/2-log(cos(arctan(yc0)+te)),11,"Nonlin ODE")
-    self.assertAlmostEqual(qe.output()[1],tan(arctan(yc0)+te),11,"Nonlin ODE")
+    
+    self.assertAlmostEqual(qe.output()[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),11,"Nonlin ODE")
+    self.assertAlmostEqual(qe.output()[1],sqrt(p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te),11,"Nonlin ODE")
     
     qeJ.input(0).set(A)
+    qeJ.input(1).set(p0)
     qeJ.evaluate()
     
-    Jr = array([[1,tan(arctan(yc0)+te)/(yc0**2+1)-yc0/(yc0**2+1)],[0,tan(arctan(yc0)+te)**2/(yc0**2+1)+1/(yc0**2+1)]])
+    Jr = array([[1,(sqrt(p0)*tan(sqrt(p0)*te+arctan(dy0/sqrt(p0)))-dy0)/(dy0**2+p0)],[0,(p0*tan(sqrt(p0)*te+arctan(dy0/sqrt(p0)))**2+p0)/(dy0**2+p0)]])
     self.checkarray(qeJ.output(),Jr,"jacobian of Nonlin ODE")
     
     
@@ -425,6 +428,7 @@ class Integrationtests(casadiTestCase):
     Jf.setOption("ad_mode","adjoint")
     Jf.init()
     Jf.input(0).set(A)
+    Jf.input(1).set(p0)
     Jf.evaluate()
     print array(Jf.output())
     self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
@@ -434,9 +438,54 @@ class Integrationtests(casadiTestCase):
     Jf.setOption("ad_mode","forward")
     Jf.init()
     Jf.input(0).set(A)
+    Jf.input(1).set(p0)
     Jf.evaluate()
     print array(Jf.output())
     self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    
+        
+    qeJ=integrator.jac(INTEGRATOR_X0,INTEGRATOR_XF)
+    qeJ.init()
+    qeJ.input(0).set(0)
+    qeJ.input(1).set(te)
+    qeJ.input(2).set(list(A)+[0,1,0,0])
+    qeJ.adjSeed(0).set([0,0]+[0,1,0,0])
+    qeJ.evaluate(0,1)
+    print qeJ.output()
+    print qeJ.adjSens(2)
+    
+    Jr = matrix([[(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)],[(sqrt(p0)*((te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)**2+te*yc0**2-yc0+p0*te)+(yc0**2+p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te))/(sqrt(p0)*(2*yc0**2+2*p0))]])  
+    
+    Jf=Jacobian(qe,1,0)
+    Jf.setOption("ad_mode","adjoint")
+    Jf.init()
+    Jf.input(0).set(A)
+    Jf.input(1).set(p0)
+    Jf.evaluate()
+    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    
+    Jf=Jacobian(qe,1,0)
+    Jf.setOption("ad_mode","forward")
+    Jf.init()
+    Jf.input(0).set(A)
+    Jf.input(1).set(p0)
+    Jf.evaluate()
+    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    
+    qendJ=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
+    qendJ.init()
+    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1),MX()])[0]
+    qeJ=MXFunction([q0,par],[qendJ])
+    qeJ.init()
+
+    qeJ.input(0).set(A)
+    qeJ.input(1).set(p0)
+    qeJ.evaluate()
+    
+    self.checkarray(qeJ.output(),Jr,"jacobian of Nonlin ODE")
+    
+    
+    
     
     qeJf=MXFunction([q0,par],[vec(qeJ.call([q0,par])[0])])
     qeJf.init()
@@ -445,6 +494,7 @@ class Integrationtests(casadiTestCase):
     H.setOption("ad_mode","adjoint")
     H.init()
     H.input(0).set(A)
+    H.input(1).set(p0)
     H.evaluate()
     def sec(x):
       return 1.0/cos(x)
