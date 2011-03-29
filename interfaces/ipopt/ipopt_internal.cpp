@@ -607,10 +607,13 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
   try {
     bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
     if (warmstart) {
-      output(NLP_LAMBDA_LBX).getArray(z_L,n);
-      output(NLP_LAMBDA_UBX).getArray(z_U,n);
       input(NLP_X_INIT).getArray(x,n);
-      input(NLP_LAMBDA_INIT).getArray(lambda,m);
+      if (init_z) {
+        output(NLP_LAMBDA_LBX).getArray(z_L,n,DENSE);
+        output(NLP_LAMBDA_UBX).getArray(z_U,n);
+      }
+      if (init_lambda)
+        input(NLP_LAMBDA_INIT).getArray(lambda,m);
       return true;
     } else {
       casadi_assert(init_x == true);
