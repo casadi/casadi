@@ -609,7 +609,7 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
     if (warmstart) {
       input(NLP_X_INIT).getArray(x,n);
       if (init_z) {
-        output(NLP_LAMBDA_LBX).getArray(z_L,n,DENSE);
+        output(NLP_LAMBDA_LBX).getArray(z_L,n);
         output(NLP_LAMBDA_UBX).getArray(z_U,n);
       }
       if (init_lambda)
