@@ -242,7 +242,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(int ind=0; ind<output_.size(); ++ind){
       const Matrix<double> &aseed = adjSeed(ind,dir);
       for(int i=0; i<output_ind[ind].size(); ++i){
-        dwork[output_ind[ind][i]] = aseed[i];
+        dwork[output_ind[ind][i]] += aseed[i];
       }
     }
 
