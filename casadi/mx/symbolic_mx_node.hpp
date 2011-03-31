@@ -53,6 +53,12 @@ class SymbolicMatrix : public MXNode{
     /** \brief  Get the name */
     virtual const std::string& getName() const;
     
+    /// Symbolic evaluation (matrix graph)
+    virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
+
+    /// Partial derivatives
+    virtual std::vector<MX> partial(const std::vector<MX>& x);
+
   protected:
     // Name of the varible
     std::string name_;

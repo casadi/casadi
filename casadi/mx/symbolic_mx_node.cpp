@@ -51,5 +51,10 @@ const std::string& SymbolicMatrix::getName() const{
   return name_;
 }
 
+std::vector<MX> SymbolicMatrix::partial(const std::vector<MX>& x){
+  return std::vector<MX>(1,MX::eye(sparsity().numel()));
+}
+
+
 } // namespace CasADi
 

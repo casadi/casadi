@@ -58,11 +58,8 @@ void MXFunctionInternal::init(){
   // Call the init function of the base class
   XFunctionInternal::init();
 
-  // Stack
+  // Stack for nodes to be added to the list of nodes
   stack<MXNode*> s;
-
-  // All evaluation nodes in the order of evaluation
-  vector<MXNode*> nodes;
 
   // Add the inputs to the stack
   for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
@@ -72,11 +69,16 @@ void MXFunctionInternal::init(){
   for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
     if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
+  // All evaluation nodes in the order of evaluation
+  vector<MXNode*> nodes;
+
   // Order the nodes in the order of dependencies using a depth-first topological sorting
   sort_depth_first(s,nodes);
+  
+  // TODO: Make sure that the output nodes are placed directly after the corresponding multiple output node
 
   // Resort the nodes in a more cache friendly order (Kahn 1962)
-//  resort_bredth_first(nodes);
+  //  resort_bredth_first(nodes);
   
   // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes.size(); ++i)
@@ -91,8 +93,6 @@ void MXFunctionInternal::init(){
   outputv_ind.resize(outputv.size());
   for(int i=0; i<outputv_ind.size(); ++i)
     outputv_ind[i] = outputv[i]->temp;
-
-  // Make sure that the output nodes are placed directly after the corresponding multiple output node
   
   // Create runtime elements for each node
   alg.resize(nodes.size());
@@ -157,8 +157,6 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
 
 void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
-  casadi_assert(nfdir<=nfdir_);
-  casadi_assert(nadir<=nadir_);
   
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind)

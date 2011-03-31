@@ -53,6 +53,9 @@ class MXConstant : public MXNode{
     /** \brief  Indicate that the node is constant */
     virtual bool isConstant() const;
     
+    /// Symbolic evaluation (matrix graph)
+    virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
+
   protected:
     
     /** \brief  data member */

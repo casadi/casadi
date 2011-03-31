@@ -152,7 +152,19 @@ class MXNode : public SharedObjectNode{
     The variable is initialized to zero
     */
     int temp;
+    
+    /// Numeric evaluation
+    virtual Matrix<double> eval(const std::vector<Matrix<double> >& x){}
 
+    /// Symbolic evaluation (matrix graph)
+    virtual Matrix<SX> eval(const std::vector<Matrix<SX> >& x){}
+
+    /// Symbolic evaluation (matrix graph)
+    virtual MX eval(const std::vector<MX>& x){};
+    
+    /// Partial derivatives
+    virtual std::vector<MX> partial(const std::vector<MX>& x){};
+    
   protected:
     
     /** \brief  dependencies - functions that have to be evaluated before this one */

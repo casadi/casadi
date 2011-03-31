@@ -35,7 +35,6 @@ SET(CASADI_SRCS
   mx/mx.cpp                  mx/mx.hpp                  # Public, smart pointer class, 
   mx/mx_node.cpp             mx/mx_node.hpp             # Base class for all the MX nodes
   mx/mx_constant.cpp         mx/mx_constant.hpp         # A constant MX node
-  mx/mx_zero.cpp             mx/mx_zero.hpp             # A constant zero
   mx/symbolic_mx_node.cpp    mx/symbolic_mx_node.hpp    # A symbolic MX variable
   mx/unary_op.cpp            mx/unary_op.hpp            # Unary operation
   mx/scalar_matrix_op.cpp    mx/scalar_matrix_op.hpp    # Scalar-matrix elementwise binary operation

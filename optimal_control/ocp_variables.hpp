@@ -35,7 +35,7 @@ class OCPVariables : public PrintableObject{
     /// Constructor (automatic type conversion allowed)
     OCPVariables(const Variable& var);
 
-#ifndef SWIG    
+#ifndef SWIG
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const;
 

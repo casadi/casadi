@@ -72,7 +72,10 @@ enum CollocationPoints{LEGENDRE,RADAU};
   // Collocate a variable (K variables per finite element) // TODO: change to Matrix<SX>
   void collocate_final(const SXMatrix& var, SXMatrix &VARF);
 
+  // Sort the equations in an order which is consistent with the variable sorting and save to the variable structure
+//  void sortEquations(OCP& ocp, const std::vector<SX>& dae);
 
+  
   
   
   

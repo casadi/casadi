@@ -153,4 +153,8 @@ void Mapping::addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, st
   depind_.swap(depind);
 }
 
+// MX Mapping::eval(const std::vector<MX>& x){
+//   
+// }
+
 } // namespace CasADi

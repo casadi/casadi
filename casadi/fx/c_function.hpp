@@ -36,7 +36,7 @@ class CFunction;
 
 #ifndef SWIG
 /** \brief  Wrapper around functions */
-typedef void (*CFunctionWrapper)(CFunction &f, int fsens_order, int asens_order, void* user_data);
+typedef void (*CFunctionWrapper)(CFunction &f, int nfdir, int nadir, void* user_data);
 #endif // SWIG
 
 /** \brief  Interface to function implemented as plan code 

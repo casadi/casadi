@@ -73,9 +73,12 @@ class MX : public SharedObject{
     MX(int nrow, int ncol, const MX& val);
     
     /** \brief  Destructor */
-    ~MX();
+    virtual ~MX();
 
 #ifndef SWIG
+    /** \brief  Create from node */
+    static MX create(MXNode* node);
+
     /** \brief  Get matrix non-zero */
     const MX operator[](int k) const;          
  
@@ -199,6 +202,17 @@ class MX : public SharedObject{
   void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el);
   MX getNZ(const std::vector<int>& kk) const;
   void setNZ(const std::vector<int>& kk, const MX& el);
+
+  /// Numeric evaluation
+  Matrix<double> eval(const std::vector<Matrix<double> >& x);
+  
+  /// Symbolic evaluation (matrix graph)
+  Matrix<SX> eval(const std::vector<Matrix<SX> >& x);
+  
+  /// Symbolic evaluation (matrix graph)
+  MX eval(const std::vector<MX>& x);
+
+  
 };
 
 //@{
