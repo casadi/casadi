@@ -206,6 +206,11 @@ MX unite(const MX& A, const MX& B){
   return ret;
 }
 
+bool isSymbolic(const MX& ex){
+  if (ex.isNull())
+    return false;
+  return ex->isSymbolic();
+}
 
 
 } // namespace CasADi

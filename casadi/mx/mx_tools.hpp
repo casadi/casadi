@@ -106,6 +106,9 @@ MX vec(const MX &x);
 /** \brief  Unite two matrices no overlapping sparsity */
 MX unite(const MX& A, const MX& B);
 
+/** \brief  check if symbolic */
+bool isSymbolic(const MX& ex);
+
 
 } // namespace CasADi
 

@@ -37,6 +37,20 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
   liftfun_ = 0;
   liftfun_ud_ = 0;
 
+  for(int i=0; i<inputv_.size(); ++i) {
+    if (inputv_[i].isNull()) {
+      stringstream ss;
+      ss << "MXFunctionInternal::MXFunctionInternal: MXfunction input arguments cannot be null." << endl;
+      ss << "Argument #" << i << " is null." << endl;
+      throw CasadiException(ss.str());
+    } else if (!inputv_[i]->isSymbolic()) {
+      stringstream ss;
+      ss << "MXFunctionInternal::MXFunctionInternal: MXfunction input arguments must be purely symbolic." << endl;
+      ss << "Argument #" << i << " is not symbolic." << endl;
+      throw CasadiException(ss.str());
+    }
+  }
+  
   // Allocate space for inputs
   setNumInputs(inputv.size());
   for(int i=0; i<input_.size(); ++i)
