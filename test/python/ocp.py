@@ -76,6 +76,7 @@ class OCPtests(casadiTestCase):
 
     var = MX("var",2,1)
     par = MX("par",1,1)
+    parMX= par
     
     t0   = MX(0)
     tend = MX(te)
@@ -85,7 +86,7 @@ class OCPtests(casadiTestCase):
     
     parc = MX(0)
     
-    f = MXFunction([var,par],[qend[0]])
+    f = MXFunction([var,parMX],[qend[0]])
     f.init()
     fc = MXFunction([var],[-f([var,parc])])
     fc.init()
@@ -109,10 +110,10 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[1],0,8,"Constraint is supposed to be unactive")
   
   def test_singleshooting2(self):
-    self.message("Single shooting")
+    self.message("Single shooting 2")
     p0 = 0.2
     y0= 0.2
-    yc0=dy0=0
+    yc0=dy0=0.1
     te=0.4
 
     t=symbolic("t")
@@ -137,10 +138,10 @@ class OCPtests(casadiTestCase):
     t0   = MX(0)
     tend = MX(te)
     q0   = vertcat([var[0],par])
-    par  = var[1]
-    qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
+    parl  = var[1]
+    qend=integrator([t0,tend,q0,parl,MX(2,1),MX()])
     
-    parc = MX(0)
+    parc = MX(dy0)
     
     f = MXFunction([var,par],[qend[0]])
     f.init()
@@ -155,13 +156,14 @@ class OCPtests(casadiTestCase):
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",10)
     solver.setOption("derivative_test","first-order")
-    solver.setOption("print_level",0)
+    #solver.setOption("print_level",0)
     solver.init()
     solver.input(NLP_LBX).set([-1, -1])
     solver.input(NLP_UBX).set([1, 0.2])
     solver.input(NLP_LBG).set([-1])
     solver.input(NLP_UBG).set([0])
     solver.solve()
+
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],0.2,6,"X_opt")
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],0.2,6,"X_opt")
     
