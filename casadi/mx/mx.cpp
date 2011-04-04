@@ -60,6 +60,10 @@ MX::MX(const string& name, int n, int m){
   assignNode(new SymbolicMatrix(name,n,m));
 }
 
+MX::MX(const string& name, const CRSSparsity & sp){
+  assignNode(new SymbolicMatrix(name,sp));
+}
+
 MX::MX(int nrow, int ncol){
   assignNode(new Mapping(CRSSparsity(nrow,ncol)));
 }

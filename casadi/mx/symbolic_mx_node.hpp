@@ -38,6 +38,9 @@ class SymbolicMatrix : public MXNode{
     /** \brief  Constructors */
     explicit SymbolicMatrix(const std::string& name, int n=1, int m=1);
 
+    /** \brief  Constructors */
+    explicit SymbolicMatrix(const std::string& name, const CRSSparsity & sp);
+    
     /** \brief  Clone function */
     virtual SymbolicMatrix* clone() const;
 

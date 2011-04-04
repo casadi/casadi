@@ -32,6 +32,11 @@ SymbolicMatrix::SymbolicMatrix(const std::string& name, int n, int m) : name_(na
 /*  sv_ = symbolic(name,n,m);*/
 }
 
+SymbolicMatrix::SymbolicMatrix(const std::string& name, const CRSSparsity & sp) : name_(name) {
+  setSparsity(sp);
+/*  sv_ = symbolic(name,n,m);*/
+}
+
 SymbolicMatrix* SymbolicMatrix::clone() const{
   return new SymbolicMatrix(*this);
 }
