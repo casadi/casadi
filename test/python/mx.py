@@ -74,6 +74,16 @@ class MXtests(casadiTestCase):
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
+    self.pool2=FunctionPool()
+    self.pool2.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
+    self.pool2.append(lambda x: sin(x[0]),sin,"sin")
+    self.pool2.append(lambda x: tan(x[0]),tan,"tan")
+    self.pool2.append(lambda x: arctan(x[0]),arctan,"arctan")
+    self.pool2.append(lambda x: arcsin(x[0]),arcsin,"arcsin")
+    self.pool2.append(lambda x: x[0]**1,lambda x : x**1,"^1")
+    self.pool2.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
+    self.pool2.append(lambda x: floor(x[0]),floor,"floor")
+    self.pool2.append(lambda x: ceil(x[0]),ceil,"ceil")
     self.Jpool=FunctionPool()
     self.Jpool.append(lambda x: sqrt(x[0]),lambda x:diag(1/(2.0*sqrt(x))),"sqrt")
     self.Jpool.append(lambda x: sin(x[0]),lambda x:diag(cos(x)),"sin")
@@ -95,7 +105,7 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
     #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: c.dot(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: c.prod(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"prod(Matrix,Matrix.T)")
 
   def test_indirection(self):
     self.message("MXFunction indirection")
@@ -654,28 +664,36 @@ class MXtests(casadiTestCase):
 
   def test_MXbinary(self):
       self.message("MX binary operations")
-      x=symbolic("x",3,2)
-      y=symbolic("x",3,2)
+      x=MX("x",3,2)
+      y=MX("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="MX")
 
   def test_MXSparse(self):
-      return # not working
+      #return # not working
       self.message("MX unary operations, sparse")
       from scipy.sparse import csr_matrix
-      x=MX("x")
       
-      x=MX("x")
-      y=MX("y")
-      z=MX("z")
-      X=MX(3,4)
-      X[0,1]=x
-      X[0,2]=y
-      X[2,2]=z
+      sp=CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+      
+      x=MX("x",sp)
+      print x
       x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       
-      self.numpyEvaluationCheckPool(self.pool,[X],array(x0.todense()),name="SXMatrix",setx0=x0)
+      self.numpyEvaluationCheckPool(self.pool2,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
+      
+  def test_MXbinarySparse(self):
+      self.message("SXMatrix binary operations")
+      spx=CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+      spy=CRSSparsity(3,4,[0,2,3],[0,2,2,3])
+      xx=MX("x",spx)
+      yy=MX("y",spy)
+      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+      y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
+      
+      self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SXMatrix",setx0=[x0,y0])
+
 if __name__ == '__main__':
     unittest.main()
 
