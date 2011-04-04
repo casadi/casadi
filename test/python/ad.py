@@ -25,6 +25,9 @@ class ADtests(casadiTestCase):
     inp[4,0]=z
     inp[5,0]=w
     
+    sp = CRSSparsity(6,1,[0, 0, 0, 0],[0, 1, 1, 2, 2, 3, 4])
+    spT = CRSSparsity(1,6,[0, 2, 4, 5],[0, 4])
+    
     self.sxinputs = {
        "column" : {
             "dense": [[x,y,z,w]],
@@ -37,20 +40,46 @@ class ADtests(casadiTestCase):
           "sparse": [c.reshape(inp,3,2)]
         }
     }
-    
-    xyz=MX("xyzw",4,1)
 
     self.mxinputs = {
        "column" : {
-            "dense": [xyz]
-        }
+            "dense": [MX("xyzw",4,1)],
+            "sparse": [MX("xyzw",sp)]
+        },
+        "row" : {
+            "dense": [MX("xyzw",1,4)],
+            "sparse": [MX("xyzw",spT)]
+        } 
+       
     }
     
+    def temp1(xyz):
+      X=MX(6,1)
+      X[0,0]=xyz[0]
+      X[2,0]=xyz[0]+2*xyz[1]**2
+      X[4,0]=xyz[0]+2*xyz[1]**3+3*xyz[2]**4
+      X[5,0]=xyz[3]
+      return [X]
+    
+    def temp2(xyz):
+      X=MX(1,6)
+      X[0,0]=xyz[0]
+      X[0,2]=xyz[0]+2*xyz[1]**2
+      X[0,4]=xyz[0]+2*xyz[1]**3+3*xyz[2]**4
+      X[0,5]=xyz[3]
+      return [X]
+      
     self.mxoutputs = {
        "column": {
-        "dense": [vertcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])]
+        "dense":  lambda xyz: [vertcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])],
+        "sparse": temp1
         }, "row": {
-        "dense": [horzcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])]
+        "dense": lambda xyz: [horzcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])],
+        "sparse": temp2
+       },
+       "matrix": {
+          "dense":  lambda xyz: [c.reshape(vertcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])[0],(2,2))],
+          "sparse": lambda xyz: [c.reshape(temp1(xyz)[0],(3,2))]
        }
     }
 
@@ -123,12 +152,12 @@ class ADtests(casadiTestCase):
 
   def test_fwdMX(self):
     n=array([1.2,2.3,7,1.4])
-    for inputshape in ["column"]:
+    for inputshape in ["column","row"]:
       for outputshape in ["column","row"]:
-        for inputtype in ["dense"]:
-          for outputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
+          for outputtype in ["dense","sparse"]:
             self.message("fwd AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype])
+            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
             f.input().set(n)
             self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
@@ -143,12 +172,12 @@ class ADtests(casadiTestCase):
 
   def test_adjMX(self):
     n=array([1.2,2.3,7,1.4])
-    for inputshape in ["column"]:
+    for inputshape in ["column","row"]:
       for outputshape in ["column","row"]:
-        for inputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
           for outputtype in ["dense"]:
             self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype])
+            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
             f.input().set(n)
             self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
@@ -198,13 +227,13 @@ class ADtests(casadiTestCase):
               
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
-    for inputshape in ["column"]:
+    for inputshape in ["column","row"]:
       for outputshape in ["column","row"]:
         for inputtype in ["dense"]:
           for outputtype in ["dense"]:
             for mode in ["forward","adjoint"]:
               self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-              f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype])
+              f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
               f.init()
               Jf=Jacobian(f,0,0)
               Jf.setOption("ad_mode",mode)
