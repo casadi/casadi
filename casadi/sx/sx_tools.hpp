@@ -254,16 +254,6 @@ Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b);
 /** \brief  Fill the matrix with the value val, make empty sparse if zero */
 void fill(Matrix<SX>& mat, const SX& val);
 
-/**
- Create an upper triangular square sparsity pattern
-**/
-CRSSparsity sp_tril(int n);
-
-/**
- Create diaginal square sparsity pattern
-**/
-CRSSparsity sp_diag(int n);
-
 } // namespace CasADi
 
 #endif // SX_TOOLS_HPP

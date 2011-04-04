@@ -654,41 +654,6 @@ vector< vector< vector<SX> > > create_symbolic(const std::string& name, int n, i
   return ret;
 }
 
-CRSSparsity sp_tril(int n) {
-  int c=0;
-  int t=0;
-  std::vector< int >  	col((n*(n+1))/2,0);
-  for (int i=0;i<(n*(n+1))/2;i++) {
-    col[i]=t++;
-    if (t>c) {
-      t=0;
-      c++;
-    }
-  }
-
-  std::vector< int >  	rowind(n+1,0);
-  c=0;
-  for (int i=1;i<n+1;i++)
-    rowind[i]=rowind[i-1]+1+(c++);
-
-  return CRSSparsity(n,n,col,rowind);
-}
-
-CRSSparsity sp_diag(int n) {
-  int c=0;
-  int t=0;
-  std::vector< int >  	col(n);
-  for (int i=0;i<n;i++) {
-    col[i]=i;
-  }
-
-  std::vector< int >  	rowind(n+1);
-  std::copy(col.begin(),col.end(),rowind.begin());
-  rowind[n]=n;
-
-  return CRSSparsity(n,n,col,rowind);
-}
-
 } // namespace CasADi
 
 

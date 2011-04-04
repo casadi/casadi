@@ -35,7 +35,21 @@ class Sparsitytests(casadiTestCase):
         self.assertEquals(w[k],-1)
       elif (ind in nzb):
         self.assertEquals(w[k],1)
+        
+  def test_getNZDense(self):
+    self.message("getNZDense")
+    nza = set([  (0,0),(0,1),(2,0),(3,1)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
       
+    A = DMatrix(a,1)
+    Ad = DMatrix(array(A))
+    for i in getNZDense(a):
+      self.assertEqual(Ad[i],1)
+
+    
 if __name__ == '__main__':
     unittest.main()
 
