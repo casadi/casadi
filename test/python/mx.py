@@ -58,7 +58,44 @@ def checkMXoperations3(self,ztf,zrf,name):
 class MXtests(casadiTestCase):
 
   def setUp(self):
-    pass
+    self.pool=FunctionPool()
+    self.pool.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
+    self.pool.append(lambda x: sin(x[0]),sin,"sin")
+    self.pool.append(lambda x: cos(x[0]),cos,"cos")
+    self.pool.append(lambda x: tan(x[0]),tan,"tan")
+    self.pool.append(lambda x: arctan(x[0]),arctan,"arctan")
+    self.pool.append(lambda x: arcsin(x[0]),arcsin,"arcsin")
+    self.pool.append(lambda x: arccos(x[0]),arccos,"arccos")
+    self.pool.append(lambda x: exp(x[0]),exp,"exp")
+    self.pool.append(lambda x: log(x[0]),log,"log")
+    self.pool.append(lambda x: x[0]**0,lambda x : x**0,"x^0")
+    self.pool.append(lambda x: x[0]**1,lambda x : x**1,"^1")
+    self.pool.append(lambda x: x[0]**(-2),lambda x : x**(-2),"^-2")
+    self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
+    self.pool.append(lambda x: floor(x[0]),floor,"floor")
+    self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
+    self.Jpool=FunctionPool()
+    self.Jpool.append(lambda x: sqrt(x[0]),lambda x:diag(1/(2.0*sqrt(x))),"sqrt")
+    self.Jpool.append(lambda x: sin(x[0]),lambda x:diag(cos(x)),"sin")
+    self.Jpool.append(lambda x: cos(x[0]),lambda x:diag(-sin(x)),"cos")
+    self.Jpool.append(lambda x: tan(x[0]),lambda x:diag(1.0/cos(x)**2),"tan")
+    self.Jpool.append(lambda x: arctan(x[0]),lambda x:diag( 1.0/(x**2+1)),"arctan")
+    self.Jpool.append(lambda x: arcsin(x[0]),lambda x:diag( 1.0/sqrt(1-x**2)),"arcsin")
+    self.Jpool.append(lambda x: arccos(x[0]),lambda x: diag(-1.0/sqrt(1-x**2)),"arccos")
+    self.Jpool.append(lambda x: exp(x[0]),lambda x: diag(exp(x)),"exp")
+    self.Jpool.append(lambda x: log(x[0]),lambda x: diag(1.0/x),"log")
+    self.Jpool.append(lambda x: x[0]**0,lambda x :diag(zeros(x.shape)),"x^0")
+    self.Jpool.append(lambda x: x[0]**1,lambda x : diag(ones(x.shape)),"^1")
+    self.Jpool.append(lambda x: x[0]**(-2),lambda x : diag(-2.0/x**3),"^-2")
+    self.Jpool.append(lambda x: x[0]**(0.3),lambda x :diag( 0.3/x**0.7),"^0.3")
+    self.matrixpool=FunctionPool()
+    self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
+    self.matrixbinarypool=FunctionPool()
+    self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
+    self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
+    self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
+    #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
+    self.matrixbinarypool.append(lambda a: c.dot(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
   def test_indirection(self):
     self.message("MXFunction indirection")
@@ -565,6 +602,80 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.getNumOutputs(),1)
     self.checkarray(f.outputMX(0).shape,(2,2),"dict")
     
+  def test_scalarMX(self):
+      x=MX("x")
+      x0=0.738
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarMX")
+      
+  def test_MXJacobian(self):
+    self.message("MX(1,1) unary operation, jacobian")
+    self.Jpool=FunctionPool()
+    self.message("SXMatrix(1,1) unary operation, jacobian")
+    x=MX("x")
+    x0=array([[0.738]])
+
+    def fmod(f,x):
+      J=Jacobian(f)
+      J.setOption("ad_mode","forward")
+      J.init()
+      return J
+      
+    self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
+    
+    def fmod(f,x):
+      J=Jacobian(f)
+      J.setOption("ad_mode","adjoint")
+      J.init()
+      return J
+      
+    self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
+    
+  def test_MXJacobians(self):
+      self.message("MX(3,1) unary operation, jacobian")
+      x=MX("x",3,1)
+      
+      x0=array([0.738,0.9,0.3])
+
+      def fmod(f,x):
+        J=Jacobian(f)
+        J.setOption("ad_mode","forward")
+        J.init()
+        return J
+        
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
+      
+      def fmod(f,x):
+        J=Jacobian(f)
+        J.setOption("ad_mode","adjoint")
+        J.init()
+        return J
+        
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
+
+  def test_MXbinary(self):
+      self.message("MX binary operations")
+      x=symbolic("x",3,2)
+      y=symbolic("x",3,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
+      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
+      self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="MX")
+
+  def test_MXSparse(self):
+      return # not working
+      self.message("MX unary operations, sparse")
+      from scipy.sparse import csr_matrix
+      x=MX("x")
+      
+      x=MX("x")
+      y=MX("y")
+      z=MX("z")
+      X=MX(3,4)
+      X[0,1]=x
+      X[0,2]=y
+      X[2,2]=z
+      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+      
+      self.numpyEvaluationCheckPool(self.pool,[X],array(x0.todense()),name="SXMatrix",setx0=x0)
 if __name__ == '__main__':
     unittest.main()
 

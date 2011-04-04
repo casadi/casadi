@@ -46,24 +46,24 @@ void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
   if(nfwd==0 && nadj==0){
     // No sensitivities
     for(int i=0; i<size(); ++i)
-      casadi_math<double>::fun[op](input[0][0],nan,output[i]);
+      casadi_math<double>::fun[op](input[0][i],nan,output[i]);
     
   } else {
     // Sensitivities
     double tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      casadi_math<double>::fun[op](input[0][0],nan,output[i]);
-      casadi_math<double>::der[op](input[0][0],nan,output[i],tmp);
+      casadi_math<double>::fun[op](input[0][i],nan,output[i]);
+      casadi_math<double>::der[op](input[0][i],nan,output[i],tmp);
       
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-        fwdSens[d][i] = tmp[0]*fwdSeed[0][d][0];
+        fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i];
       }
 
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-        adjSens[0][d][0] += adjSeed[d][i]*tmp[0];
+        adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
       }
     }
   }
