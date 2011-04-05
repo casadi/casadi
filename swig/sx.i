@@ -35,6 +35,8 @@ namespace CasADi {
       if isinstance(s,int):
         if s < 0:
           s = s + self.size()
+      elif isinstance(s,list):
+        return self.getNZ(s)
       elif isinstance(s,tuple):
         if len(s)!=2:
           raise Exception("get/setitem can only do 1D or 2D indexing")
@@ -62,6 +64,8 @@ namespace CasADi {
       if isinstance(s,int):
         if s < 0:
           s = s + self.size()
+      elif isinstance(s,list):
+        return self.getNZ(s)
       elif isinstance(s,tuple):
         if len(s)!=2:
           raise Exception("get/setitem can only do 1D or 2D indexing")
@@ -187,6 +191,8 @@ namespace CasADi {
       if isinstance(s,int):
         if s < 0:
           s = s + self.size()
+      elif isinstance(s,list):
+        return self.getNZ(s)
       elif isinstance(s,tuple):
         if len(s)!=2:
           raise Exception("get/setitem can only do 1D or 2D indexing")
@@ -214,6 +220,8 @@ namespace CasADi {
       if isinstance(s,int):
         if s < 0:
           s = s + self.size()
+      elif isinstance(s,list):
+        return self.getNZ(s)
       elif isinstance(s,tuple):
         if len(s)!=2:
           raise Exception("get/setitem can only do 1D or 2D indexing")

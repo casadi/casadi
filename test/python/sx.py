@@ -231,7 +231,7 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
       self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
       self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]")
-      
+      self.numpyEvaluationCheck(lambda x: x[0][[0,2,3]], lambda x: matrix([x[0,0],x[1,0],x[1,1]]).T,[x],x0,name="x[[0,2,3]]")
       #self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x)[0:2,0],[x],x0,name="x[0:2] on dense matrix")
       self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(x.ravel()[1]).T,[x],x0,name="x[1]")
       self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1]")
@@ -255,11 +255,12 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]",setx0=[sx0])
-      
+      self.numpyEvaluationCheck(lambda x: x[0][[2,1]], lambda x: matrix([x[2,1],x[0,2]]).T,[x],x0,name="x[[2,1]]")
       #self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x)[0:2,0],[x],x0,name="x[0:2] on dense matrix")
       self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
-      
+    
+
   def test_SX1(self):
     self.message("SXFunction evaluation")
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
@@ -469,6 +470,15 @@ class SXtests(casadiTestCase):
     for i in range(4):
       self.checkarray(f.outputSX(i).shape,(0,0),"dict")
     self.checkarray(f.outputSX(4).shape,(2,2),"dict")
+    
+  def test_symbolcheck(self):
+    self.message("Check if non-symbolic inputs are caught")
+    self.assertRaises(RuntimeError, lambda : SXFunction([SX(0)],[SX("x")]))
+      
+  def test_sparseconstr(self):
+    self.message("Check sparsity constructors")
+    self.checkarray(DMatrix(sp_tril(3),1).toArray(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
+    self.checkarray(DMatrix(sp_diag(3),1).toArray(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
     
 if __name__ == '__main__':
     unittest.main()

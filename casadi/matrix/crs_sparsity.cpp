@@ -718,6 +718,8 @@ void CRSSparsity::append(const CRSSparsity& sp){
 
 CRSSparsity CRSSparsity::scalarSparsity(1,1,true);
 
+CRSSparsity CRSSparsity::scalarSparsitySparse(1,1,false);
+
 CRSSparsity CRSSparsity::emptySparsity(0,0,true);
 
 void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& jj){

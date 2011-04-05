@@ -210,13 +210,17 @@ class Matrix : public std::vector<T>, public PrintableObject{
     
     /// Set a submatrix
     void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m);
-  
+
+#endif // SWIG
+
     /// Get nonzeros
     Matrix<T> getNZ(const std::vector<int>& kk) const;
     
     /// Set nonzeros
     void setNZ(const std::vector<int>& kk, const Matrix<T>& m);
-    
+
+#ifndef SWIG 
+
     /// Access an element 
     Element<Matrix<T>,T> operator()(int i, int j=0){ return Element<Matrix<T>,T>(*this,i,j); }
 

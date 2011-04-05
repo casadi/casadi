@@ -205,6 +205,9 @@ class CRSSparsity : public SharedObject{
     /// (Dense) scalar
     static CRSSparsity scalarSparsity;
 
+    /// (Sparse) scalar
+    static CRSSparsity scalarSparsitySparse;
+    
     /// Empty zero-by-zero
     static CRSSparsity emptySparsity;
     

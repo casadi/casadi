@@ -161,13 +161,18 @@ void MX::setNZ(const vector<int>& kk, const MX& el){
 }
 
 const MX MX::operator()(int i, int j) const{
-  const CRSSparsity& sp = CRSSparsity::scalarSparsity;
   int ind = sparsity().getNZ(i,j);
-  casadi_assert(ind>=0);
-  
+
   MX ret;
-  ret.assignNode(new Mapping(sp));
-  ret->addDependency(*this,vector<int>(1,ind));
+  if (ind>=0) {
+    const CRSSparsity& sp = CRSSparsity::scalarSparsity;
+    ret.assignNode(new Mapping(sp));
+    ret->addDependency(*this,vector<int>(1,ind));
+  } else {
+    const CRSSparsity& sp = CRSSparsity::scalarSparsitySparse;
+    ret.assignNode(new Mapping(sp));
+    ret->addDependency(*this,vector<int>(0));
+  }
   return ret;
 }
 
