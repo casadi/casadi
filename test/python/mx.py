@@ -704,7 +704,6 @@ class MXtests(casadiTestCase):
       sp=CRSSparsity(3,4,[1,2,1],[0,2,2,3])
       
       x=MX("x",sp)
-      print x
       x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       
       self.numpyEvaluationCheckPool(self.pool2,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
@@ -787,8 +786,6 @@ class MXtests(casadiTestCase):
      fy.init()
      fy.input().set(xn)
      fy.evaluate()
-     print fy.output().toArray()
-     print r
      self.checkarray(fy.output(),r,"subscripted assigment")
   
   def test_erase(self):
@@ -831,15 +828,189 @@ class MXtests(casadiTestCase):
      f.evaluate()
      self.checkarray(f.output(),zr,"prod(mapping.T,mapping)")
      
-     J=Jacobian(f)
-     J.setOption("ad_mode","forward")
-     J.init()
-     J.input().set(xn)
-     J.evaluate()
-     print J.output().toArray(), zr
+     x=MX("X",3,1)
+     numpy.random.seed(42)
+     xn = numpy.random.random((3,1))
+     r = numpy.zeros((7,1))
+     y=MX("Y",7,1)
+     y[1:4,0]=x
+     r[1:4,[0]]=xn
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
      
+     z = c.prod(y.T,y)
+     zr = numpy.dot(r.T,r)
+     
+     f = MXFunction([x],[z])
+     f.init()
+     f.input().set(xn)
+     f.evaluate()
+     self.checkarray(f.output(),zr,"prod(mapping.T,mapping)")
+     
+     J=Jacobian(f)
+     for mode in ["forward","adjoint"]:
+       J.setOption("ad_mode",mode)
+       J.init()
+       J.input().set(xn)
+       J.evaluate()
+       self.checkarray(J.output(),matrix(xn).T*2,"jacobian(prod(mapping.T,mapping))")
+     
+     x=MX("X",3,1)
+     numpy.random.seed(42)
+     xn = numpy.random.random((3,1))
+     r = numpy.zeros((7,1))
+     y=MX("Y",7,1)
+     y[1:4,0]=x
+     r[1:4,[0]]=xn
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
+     
+     z = c.prod(y,y.T)
+     zr = numpy.dot(r,r.T)
+     
+     f = MXFunction([x],[z[1:4,1]])
+     f.init()
+     f.input().set(xn)
+     f.evaluate()
+     
+     J=Jacobian(f)
+     J_ = array([[xn[0,0]*2,0,0],[xn[1,0],xn[0,0],0],[xn[2,0],0,xn[0,0]]])
+     for mode in ["forward","adjoint"]:
+       self.message(":" + mode)
+       J.setOption("ad_mode",mode)
+       J.init()
+       J.input().set(xn)
+       J.evaluate()
+       print J.output().toArray()
+       self.checkarray(J.output(),J_,"jacobian(prod(mapping.T,mapping))")
       
- 
+  def test_MXalgebraDense(self):
+    self.message("Test some dense algebraic properties of matrices")
+    # issue 96
+    n = 3
+    m = 4
+    import numpy
+    numpy.random.seed(42)
+    A_ = numpy.random.random((m,n))
+    A = MX("A",m,n)
+    b_ = numpy.random.random((m,1))
+    b = MX("b",m,1)
+    C_ = numpy.random.random((m,m))
+    C = MX("C",m,m)
+    D_ = numpy.random.random((m,n))
+    D = MX("D",m,n)
+    e_ = numpy.random.random((m,1))
+    e = MX("e",m,1)
+    x_ = numpy.random.random((n,1))
+    x = MX("x",n,1)
+    
+    Axb = casadi.prod(A,x)+b
+    Dxe = casadi.prod(D,x)+e
+    a = casadi.prod(casadi.prod(trans(Axb),C),Dxe)
+    
+    f = MXFunction([x,A,b,C,D,e],[a])
+    f.init()
+    f.input(0).set(x_)
+    f.input(1).set(A_)
+    f.input(2).set(b_)
+    f.input(3).set(C_)
+    f.input(4).set(D_)
+    f.input(5).set(e_)
+    f.evaluate()
+    
+    f_ = dot(dot((dot(A_,x_)+b_).T,C_),(dot(D_,x_)+e_))
+    
+    self.checkarray(f.output(),f_,"evaluation")
+    
+    
+    J_ = dot(dot((dot(D_,x_)+e_).T,C_.T),A_) + dot(dot((dot(A_,x_)+b_).T,C_),D_)
+    
+    for mode in ["forward", "adjoint"]:
+      J = Jacobian(f)
+      J.setOption("ad_mode","forward")
+      J.init()
+      J.input(0).set(x_)
+      J.input(1).set(A_)
+      J.input(2).set(b_)
+      J.input(3).set(C_)
+      J.input(4).set(D_)
+      J.input(5).set(e_)
+      J.evaluate()
+      
+      self.checkarray(J.output(),J_,"evaluation")
+      
+  def test_MXalgebraSparse(self):
+    self.message("Test some sparse algebraic properties of matrices")
+    # issue 97
+    n = 3
+    m = 4
+    import numpy
+    numpy.random.seed(42)
+    
+    def randsparsity(m,n):
+      sp = CRSSparsity(m,n)
+      for i in range((n*m)/2):
+        sp.getNZ(numpy.random.randint(m),numpy.random.randint(n))
+      return sp
+      
+    def gentest(m,n):
+      As = randsparsity(m,n)
+      A_ = DMatrix(As)
+      for k in range(As.size()):
+        A_[k]= numpy.random.rand()
+      A = MX("A",As)
+      return (A_.toCsr_matrix(),A)
+    
+    (A_,A)=gentest(m,n)
+    (b_,b)=gentest(m,1)
+    (C_,C)=gentest(m,m)
+    (D_,D)=gentest(m,n)
+    (e_,e)=gentest(m,1)
+    x_ = numpy.random.random((n,1))
+    x = MX("x",n,1)
+    
+    Axb = casadi.prod(A,x)+b
+    Dxe = casadi.prod(D,x)+e
+    a = casadi.prod(casadi.prod(trans(Axb),C),Dxe)
+    
+    f = MXFunction([x,A,b,C,D,e],[a])
+    f.init()
+    f.input(0).set(x_)
+    f.input(1).set(A_)
+    f.input(2).set(b_)
+    f.input(3).set(C_)
+    f.input(4).set(D_)
+    f.input(5).set(e_)
+    f.evaluate()
+
+
+    Axb_ = A_*x_+b_
+    Dxe_ = D_*x_+e_
+    
+    f_ = Axb_.T*C_*Dxe_
+    
+    self.checkarray(f.output(),f_,"evaluation")
+    
+
+    J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
+    
+    for mode in ["forward", "adjoint"]:
+      J = Jacobian(f)
+      J.setOption("ad_mode","forward")
+      J.init()
+      J.input(0).set(x_)
+      J.input(1).set(A_)
+      J.input(2).set(b_)
+      J.input(3).set(C_)
+      J.input(4).set(D_)
+      J.input(5).set(e_)
+      J.evaluate()
+      
+      self.checkarray(J.output(),J_,"evaluation")
     
 if __name__ == '__main__':
     unittest.main()

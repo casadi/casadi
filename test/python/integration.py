@@ -33,11 +33,102 @@ class Integrationtests(casadiTestCase):
     qe.init()
     self.integrator = integrator
     self.qe=qe
+    self.qend=qend
+    self.tend=tend
+    self.q0=q0
+    self.par=par
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
     
+  def test_eval2(self):
+    self.message('IPOPT integration: evaluation with MXFunction indirection')
+    num=self.num
+    qend=self.qend
     
+    par=self.par
+    tend=self.tend
+    q0=self.q0
+    qe=MXFunction([tend,q0,par],[qend[0]])
+    qe.init()
+    
+    f = MXFunction([tend,q0],[qe([tend,q0,MX(num['p'])])])
+    f.init()
+    f.input(0).set([num['tend']])
+    f.input(1).set([num['q0']])
+    f.evaluate()
+
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    self.assertAlmostEqual(f.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
   
+  def test_issue92c(self):
+    self.message("regression check for issue 92")
+    t=SX("t")
+    x=SX("x")
+    y=SX("y")
+    z=x*exp(t)
+    f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: [x,y]},[[z,z]])
+    f.init()
+    # Pass inputs
+    f.setInput(1.0,ODE_T)
+    f.setInput([1.0,0.0],ODE_Y)
+    # Pass adjoint seeds
+    f.setAdjSeed([1.0,0.0])
+    # Evaluate with adjoint mode AD
+    f.evaluate(0,1)
+    # print result
+    print f.output()
+    print f.adjSens(ODE_Y)
+  
+  def test_issue92b(self):
+    self.message("regression check for issue 92")
+    t=SX("t")
+    x=SX("x")
+    y=SX("y")
+    f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: [x,y]},[[x,(1+1e-9)*x]])
+    integrator = CVodesIntegrator(f)
+    integrator.init()
+    # Pass inputs
+    integrator.setInput(0.0,INTEGRATOR_T0)
+    integrator.setInput(1.0,INTEGRATOR_TF)
+    integrator.setInput([1,0],INTEGRATOR_X0)
+    # Pass adjoint seeds
+    integrator.setAdjSeed([1.0,0.0],INTEGRATOR_XF)
+    ## Integrate and calculate sensitivities
+    integrator.evaluate(0,1)
+    # print result
+    print integrator.output(INTEGRATOR_XF)
+    print integrator.adjSens(INTEGRATOR_X0)
+    
+  def test_issue92(self):
+    self.message("regression check for issue 92")
+    t=SX("t")
+    x=SX("x")
+    var = MX("var",2,1)
+
+    q = [x,SX("problem")]
+
+    dq=[x,x]
+    f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: q},[dq])
+    f.init()
+
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-12)
+    integrator.init()
+
+    qend = integrator([MX(0),MX(1),var,MX(),MX(),MX()])
+
+    f = MXFunction([var],[qend[0]])
+    f.init()
+
+    J=Jacobian(f,0)
+    J.init()
+    J.input().set([1,0])
+    J.evaluate()
+    print "jac=",J.output()[0]-exp(1)
+    self.assertAlmostEqual(J.output()[0],exp(1),5,"Evaluation output mismatch")
+    
   def test_eval(self):
     self.message('IPOPT integration: evaluation')
     num=self.num
@@ -95,6 +186,74 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
     self.assertAlmostEqual(J.output()[0],-(q0*tend**3*exp(tend**3/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
+    
+  def test_bug_repeat(self):
+    num={'tend':2.3,'q0':[0,7.1,7.1],'p':2}
+    self.message("Bug that appears when rhs contains repeats")
+    A=array([1,0.1,1])
+    p0 = 1.13
+    y0=A[0]
+    yc0=dy0=A[1]
+    te=0.4
+
+    t=SX("t")
+    q=symbolic("y",3,1)
+    p=SX("p")
+
+    dh = p+q[0]**2
+    f=SXFunction([t,q,p],[vertcat([dh ,q[0],dh])])
+    f.init()
+    
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("verbose",True)
+    integrator.setOption("steps_per_checkpoint",10000)
+
+    integrator.init()
+
+    t0   = MX(0)
+    tend = MX(te)
+    q0   = MX("q0",3,1)
+    par  = MX("p",1,1)
+    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qe=MXFunction([q0,par],[qend])
+    qe.init()
+
+    #J=self.qe.jacobian(2)
+    J=Jacobian(qe,0)
+    J.init()
+    J.input(0).set(A)
+    J.input(1).set(p0)
+    J.evaluate()
+    outA=J.output().toArray()
+    f=SXFunction([t,q,p],[vertcat([dh ,q[0],(1+1e-9)*dh])])
+    f.init()
+    
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("verbose",True)
+    integrator.setOption("steps_per_checkpoint",10000)
+
+    integrator.init()
+
+    t0   = MX(0)
+    tend = MX(te)
+    q0   = MX("q0",3,1)
+    par  = MX("p",1,1)
+    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qe=MXFunction([q0,par],[qend])
+    qe.init()
+
+    #J=self.qe.jacobian(2)
+    J=Jacobian(qe,0)
+    J.init()
+    J.input(0).set(A)
+    J.input(1).set(p0)
+    J.evaluate()
+    outB=J.output().toArray()
+    print outA-outB
     
   def test_hess(self):
     self.message('IPOPT integration: hessian to p: fwd-over-adjoint on integrator')
