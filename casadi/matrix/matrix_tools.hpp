@@ -761,7 +761,7 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
   
   // Copy sparsity
   int elA=0, elB=0;
-  for(int k; k<mapping.size(); ++k){
+  for(int k=0; k<mapping.size(); ++k){
     if(mapping[k]<0){
       ret[k] = A[elA++];
     } else if(mapping[k]>0){
