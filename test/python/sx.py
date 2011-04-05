@@ -137,7 +137,6 @@ class SXtests(casadiTestCase):
   def test_SXMatrixJacobians(self):
       self.message("SXMatrix(3,1) unary operation, jacobian")
       x=symbolic("x",3)
-      print array(jacobian(x,x))
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
@@ -152,7 +151,6 @@ class SXtests(casadiTestCase):
       self.message("SXMatrix(1,3) unary operation, jacobian")
       x=symbolic("x",1,3)
       
-      print array(jacobian(x,x))
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
@@ -479,6 +477,23 @@ class SXtests(casadiTestCase):
     self.message("Check sparsity constructors")
     self.checkarray(DMatrix(sp_tril(3),1).toArray(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
     self.checkarray(DMatrix(sp_diag(3),1).toArray(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
+    
+  def test_subsassignment(self):
+    self.message("Check subscripted assignment")
+
+    import numpy
+    numpy.random.seed(42)
+    xn = numpy.random.random((3,4))
+
+    x=DMatrix(xn)
+    
+    y=DMatrix(7,8)
+    z = numpy.zeros((7,8))
+    y[0,0]=12; z[0,0] = 12
+    self.checkarray(y,z,"scalar assignment")
+    z[1:4,[2,4,5,6]]=xn
+    y[1:4,[2,4,5,6]]=x
+    self.checkarray(y,z,"scalar assignment")
     
 if __name__ == '__main__':
     unittest.main()

@@ -723,7 +723,123 @@ class MXtests(casadiTestCase):
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
     self.assertRaises(RuntimeError, lambda : SXFunction([MX(0)],[MX("x")]))
-    
+
+
+  def test_unite(self):
+    self.message("unite operation")
+    import numpy
+    numpy.random.seed(42)
+    xn = numpy.random.random((3,4))
+    x=MX(3,4)
+    y=MX("x",3,4)
+    z=unite(x,y)
+    f = MXFunction([y],[z])
+    f.init()
+    f.input().set(xn)
+    f.evaluate()
+    self.checkarray(f.output(),xn,"unite dense")
+ 
+    spx=CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+    spy=CRSSparsity(3,4,[0,2,2],[0,1,2,3])
+
+    nx=DMatrix(spx,0)
+    for k in range(nx.size()):
+      nx[k]= numpy.random.rand()
+    ny=DMatrix(spy,0)
+    for k in range(nx.size()):
+      ny[k]= numpy.random.rand()
+      
+    nxn = nx.toArray()
+    nyn = ny.toArray()
+    x=MX("x",spx)
+    y=MX("y",spy)
+    z=unite(x,y)
+
+    f = MXFunction([x,y],[z])
+    f.init()
+    f.input(0).set(nx)
+    f.input(1).set(ny)
+    f.evaluate()
+    self.checkarray(f.output(),nxn+nyn,"unite sparse")
+     
+  def test_subsass(self):
+     self.message("Check subscripted assignment")
+     x=MX("X",3,4)
+     import numpy
+     numpy.random.seed(42)
+     xn = numpy.random.random((3,4))
+     r = numpy.zeros((7,8))
+     y=MX("Y",7,8)
+     y[1:4,[2,4,6,7]]=x
+     r[1:4,[2,4,6,7]]=xn
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
+     
+     self.checkarray(fy.output(),r,"subscripted assigment")
+     
+     y=MX(7,8)
+     #y[1:4,[2,4,6,7]]=x
+     y.setSub([1,2,3],[2,4,6,7],x)
+     r[1:4,[2,4,6,7]]=xn
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
+     print fy.output().toArray()
+     print r
+     self.checkarray(fy.output(),r,"subscripted assigment")
+  
+  def test_erase(self):
+    self.message("Erase function")
+    self.message(":dense")
+    y=MX("Y",7,8)
+    import numpy
+    r=2*numpy.ones((7,8))
+    r[1:4,[2,4,6,7]]=numpy.zeros((3,4))
+    z = y *2
+    z.erase([1,2,3],[2,4,6,7])
+    f = MXFunction([y],[z])
+    f.init()
+    f.input().set([1]*56)
+    e = f.output()
+    self.checkarray(f.output(),e,"erase")
+    self.message(":sparse")
+
+  def test_mapping(self):
+     self.message("Check mapping")
+     x=MX("X",3,4)
+     import numpy
+     numpy.random.seed(42)
+     xn = numpy.random.random((3,4))
+     r = numpy.zeros((7,8))
+     y=MX("Y",7,8)
+     y[1:4,[2,4,6,7]]=x
+     r[1:4,[2,4,6,7]]=xn
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
+     
+     z = c.prod(y.T,y)
+     zr = numpy.dot(r.T,r)
+     
+     f = MXFunction([x],[z])
+     f.init()
+     f.input().set(xn)
+     f.evaluate()
+     self.checkarray(f.output(),zr,"prod(mapping.T,mapping)")
+     
+     J=Jacobian(f)
+     J.setOption("ad_mode","forward")
+     J.init()
+     J.input().set(xn)
+     J.evaluate()
+     print J.output().toArray(), zr
+     
+      
+ 
     
 if __name__ == '__main__':
     unittest.main()
