@@ -49,6 +49,33 @@ class Sparsitytests(casadiTestCase):
     for i in getNZDense(a):
       self.assertEqual(Ad[i],1)
 
+  def test_enlarge(self):
+    self.message("enlarge")
+    import numpy
+    self.message(":dense")
+    #sp = CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+    sp = CRSSparsity(3,4,True)
+    
+    col = [1,2,4]
+    row = [0,3,4,6]
+    sp.enlarge(7,8,col,row)
+    
+    z = numpy.zeros((7,8))
+    for i in col:
+      for j in row:
+        z[i,j]=1
+
+    self.checkarray(DMatrix(sp,1),z,"enlarge")
+    self.message(":sparse")
+    sp = CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+    n = DMatrix(sp,1)
+    z = numpy.zeros((7,8))
+    for i in range(3):
+      for j in range(4):
+          z[col[i],row[j]]= n[i,j]
+    sp.enlarge(7,8,[1,2,4],[0,3,4,6])
+    
+    self.checkarray(DMatrix(sp,1),z,"enlarge")
     
 if __name__ == '__main__':
     unittest.main()

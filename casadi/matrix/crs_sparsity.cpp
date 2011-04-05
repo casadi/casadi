@@ -733,8 +733,8 @@ void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vecto
 
   // Begin by sparsify the columns
   vector<int>& c = colRef();
-  for(int j=0; j<jj.size(); ++j){
-    c[j] = jj[c[j]];
+  for(int k=0; k<c.size(); ++k){
+    c[k] = jj[c[k]];
   }
     
    // Sparsify the rows
