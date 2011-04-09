@@ -99,7 +99,7 @@ void Multiplication::evaluateDenseDense(const VDptr& input, Dptr& output, const 
     for(int i=0; i<nx1; ++i){
       for(int j=0; j<ny2; ++j){
         for(int k=0; k<nx2; ++k){
-          adjSens[0][d][j+k*ny2] += adjSeed[d][j+i*nz2]*input[1][k+i*nx2];
+          adjSens[0][d][k+i*nx2] += adjSeed[d][j+i*nz2]*input[1][j+k*ny2];
           adjSens[1][d][j+k*ny2] += adjSeed[d][j+i*nz2]*input[0][k+i*nx2];
         }
       }

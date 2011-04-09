@@ -931,7 +931,7 @@ class MXtests(casadiTestCase):
     
     for mode in ["forward", "adjoint"]:
       J = Jacobian(f)
-      J.setOption("ad_mode","forward")
+      J.setOption("ad_mode",mode)
       J.init()
       J.input(0).set(x_)
       J.input(1).set(A_)
