@@ -173,7 +173,63 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(solver.output(NLP_LAMBDA_OPT)[0],1,8)
     self.assertAlmostEqual(-solver.output(NLP_COST)[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
     self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[1],0,8,"Constraint is supposed to be unactive")  
+    self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[1],0,8,"Constraint is supposed to be unactive") 
+    
+  def test_XML(self):
+    self.message("JModelica XML parsing")
+    parser = FMIParser('data/cstr.xml')
+    ocp = parser.parse()
+    var = OCPVariables(ocp.variables)
+    self.assertEqual(ocp.t0,0)
+    self.assertEqual(ocp.tf,150)
+    #self.assertFalse(ocp.t0_free)
+    #self.assertFalse(ocp.tf_free)
+    self.assertTrue(len(ocp.lterm)==0)
+    self.assertTrue(len(ocp.mterm)==1)
+    m = ocp.mterm[0]
+    self.assertTrue(isinstance(m,SX))
+    self.assertEquals(str(m),'cost.atTime(150)')
+    self.assertEquals(len(ocp.dae),3)
+    self.assertEquals(len(ocp.initeq),3)
+    self.assertEquals(len(var.x),3) # there are three states
+    (c,T,cost) = tuple(var.x)
+    self.assertTrue(isinstance(c,Variable))
+    self.assertEquals(c.getName(),"cstr.c")
+    self.assertEquals(T.getName(),"cstr.T")
+    self.assertEquals(cost.getName(),"cost")
+    self.assertEquals(c.getNominal(),1000)
+    
+    w=ocp.variables('cstr')
+    #self.assertEquals(w("T"),T)
+    self.assertEquals(w("T").getName(),"cstr.T")
+   
+    c = c.sx()
+    T = T.sx()
+    cost = cost.sx()
+    
+    self.assertTrue(w("T").sx().isEqual(T)) 
+        
+    u = var.u[0].sx()
+    self.assertEquals(len(ocp.cfcn),3)
+    self.assertEquals(len(ocp.cfcn_lb),3)
+    self.assertEquals(len(ocp.cfcn_ub),3)
+    self.assertTrue(ocp.cfcn[0].isEqual(T)) 
+    self.assertTrue(ocp.cfcn[1].isEqual(u)) 
+    self.assertTrue(ocp.cfcn[2].isEqual(u)) 
+    self.assertTrue(ocp.cfcn_lb[0].isMinusInf()) 
+    self.assertEquals(ocp.cfcn_lb[1].getValue(),230) 
+    self.assertTrue(ocp.cfcn_lb[2].isMinusInf()) 
+    self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
+    self.assertTrue(ocp.cfcn_ub[1].isInf())
+    self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
+    f=SXFunction([[c,T,cost]],[ocp.initeq])
+    f.init()
+    f.evaluate()
+    self.checkarray(f.output(),matrix([-956.271065,-250.051971,0]).T,"initeq")
+
+    
+    mystates = []
+    
 if __name__ == '__main__':
     unittest.main()
 
