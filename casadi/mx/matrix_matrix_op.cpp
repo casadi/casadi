@@ -94,17 +94,16 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         double y = mapping_[i]>=0 ? input[1][iy++] : 0;
         casadi_math<double>::fun[op](x,y,output[i]);
       }
-      
+
     } else {
       // Sensitivities
       double tmp[2];  // temporary variable to hold value and partial derivatives of the function
-      
       for(int i=0; i<n; ++i){
         bool isx = mapping_[i]<=0;
         bool isy = mapping_[i]>=0;
 
         double x = isx * input[0][ix];
-        double y = isy * input[0][iy];
+        double y = isy * input[1][iy];
 
         // Evaluate and get partial derivatives
         casadi_math<double>::fun[op](x,y,output[i]);
@@ -122,9 +121,10 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         }
         
         // Increase argument indices
-        if(isx && ix+1<nx) ix++;
-        if(isy && iy+1<ny) iy++;
+        if(isx) ix++;
+        if(isy) iy++;
       }
+
     }
   }
 }
