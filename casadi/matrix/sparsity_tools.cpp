@@ -21,10 +21,16 @@
  */
 
 #include "sparsity_tools.hpp"
+#include "../casadi_exception.hpp"
+
+using namespace std;
 
 namespace CasADi{
   
 CRSSparsity sp_tril(int n) {
+  if (n<0)
+    throw CasadiException("sp_tril expects a positive integer as argument");
+
   int c=0;
   int t=0;
   std::vector< int >  	col((n*(n+1))/2,0);
@@ -45,6 +51,8 @@ CRSSparsity sp_tril(int n) {
 }
 
 CRSSparsity sp_diag(int n) {
+  if (n<0)
+    throw CasadiException("sp_tril expects a positive integer as argument");
   int c=0;
   int t=0;
   std::vector< int >  	col(n);
@@ -62,34 +70,69 @@ CRSSparsity sp_diag(int n) {
 CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int ncol) {
   std::vector<int> rowind(nrow+1);
   std::vector<int> col_new(row.size()*col.size());
+  
+  // resulting col: the entries of col are repeated row.size() times
   for (int i=0;i<row.size();i++)
     std::copy(col.begin(),col.end(),col_new.begin()+col.size()*i);
+
+  // resulting rowind: first entry is always zero
   int cnt=0;
   int z=0;
   rowind[0]=0;
-  for (int k=0; k < row.size(); k++) {
-    while (z<row[k])
-      rowind[++z]=cnt;
-    rowind[row[k]+1]=(cnt+=col.size());
+  int k=0;
+  try {
+    for (k=0; k < row.size(); k++) {
+      // resulting rowind: fill up rowind entries with copies
+      while (z<row[k])
+        rowind.at(++z)=cnt;
+        
+      // resulting rowind: add col.size() at each row[k]
+      rowind.at(row[k]+1)=(cnt+=col.size());
+    }
+    while (z<nrow)
+      rowind.at(++z)=cnt;                 
   }
-  while (z<nrow)
-    rowind[++z]=cnt;
-
+  catch (out_of_range& oor) {
+    stringstream ss;
+    ss << "sp_rowcol: out-of-range error." << endl;
+    ss << "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")" << endl;
+    throw CasadiException(ss.str());
+  }
   return CRSSparsity(nrow, ncol, col_new, rowind);
 }
 
 CRSSparsity sp_NZ(std::vector<int> row, std::vector<int> col, int nrow, int ncol, bool monotone) {
+  if (row.size()!=col.size()) {
+    stringstream ss;
+    ss << "sp_NZ: row and col vectors must be of same length." << endl;
+    ss << "row is length " << row.size() << " and " << " col has length " << col.size() << endl;
+    throw CasadiException(ss.str());
+  }
+  if (monotone == false)
+    throw CasadiException("sp_NZ: Not implemented for monotone false");
+  // the given col is fine, we just need to calculate rowind.
   std::vector<int> rowind(nrow+1);
-  int cnt=0;
+  int cnt=0;  // cumulative non-zero counter
   int z=0;
   rowind[0]=0;
-  for (int k=0; k < row.size(); k++) {
-    while (z<row[k])
-      rowind[++z]=cnt;
-    rowind[row[k]+1]=cnt++;
+  int k=0;
+  try {
+    for (k=0; k < row.size(); k++) {
+      // fill up rowind entries copies of the increment counter
+      while (z<row[k])
+        rowind.at(++z)=cnt;
+      // fill in the cumulative counter at the next row and increment counter 
+      rowind.at(row[k]+1)=cnt++;
+    }
+    while (z<nrow)
+      rowind.at(++z)=cnt;
   }
-  while (z<nrow)
-    rowind[++z]=cnt;
+  catch (out_of_range& oor) {
+    stringstream ss;
+    ss << "sp_NZ: out-of-range error." << endl;
+    ss << "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")." << endl;
+    throw CasadiException(ss.str());
+  }
   return CRSSparsity(nrow, ncol, col, rowind);
 }
 
@@ -106,7 +149,14 @@ std::vector<int> getNZDense(const CRSSparsity &sp) {
 
 CRSSparsity reshape(const CRSSparsity& a, int n, int m){
   casadi_assert_message(a.numel() == n*m, "resize: number of elements must remain the same");
-  
+  if (a.numel() != n*m) {
+    stringstream ss;
+    ss << "reshape: number of elements must remain the same." << endl;
+    ss << "Input argument has shape " << a.size1() << " x " << a.size2() << " =  " << a.numel() << ", while you request a reshape to ";
+    ss << n << " x " << m << " =  " << n*m << endl;
+    throw CasadiException(ss.str());
+  }
+  // our strategy is: (col,rowind) -> (col,row) -> modulus calculus -> (col_new, row_new) -> sp_NZ
   std::vector<int> row = a.getRow();
   const std::vector<int> &col = a.col();
 
