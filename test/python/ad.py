@@ -175,7 +175,7 @@ class ADtests(casadiTestCase):
     for inputshape in ["column","row"]:
       for outputshape in ["column","row"]:
         for inputtype in ["dense","sparse"]:
-          for outputtype in ["dense"]:
+          for outputtype in ["dense","sparse"]:
             self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
@@ -194,8 +194,8 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense"]:
-          for outputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
+          for outputtype in ["dense","sparse"]:
             for mode in ["forward","adjoint"]:
               self.message(" %s Jacobian on SX. Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
@@ -229,8 +229,8 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row"]:
       for outputshape in ["column","row"]:
-        for inputtype in ["dense"]:
-          for outputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
+          for outputtype in ["dense","sparse"]:
             for mode in ["forward","adjoint"]:
               self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))

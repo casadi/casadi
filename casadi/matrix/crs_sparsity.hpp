@@ -74,7 +74,7 @@ class CRSSparsity : public SharedObject{
 
     /// Construct a sparsity pattern from vectors
     CRSSparsity(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind);
-    
+
     /// Access a member function or object
     CRSSparsityNode* operator->();
 
@@ -186,7 +186,17 @@ class CRSSparsity : public SharedObject{
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
     
     /** \brief Enlarge matrix
-    Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+    Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros 
+    
+    For the matrices A to B
+    A(m,n)
+    length(ii)=m , length(jj)=n
+    B(nrow,ncol)
+    
+    A=enlarge(m,n,ii,jj) makes sure that
+    
+    B[ii,jj] == A 
+    */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
     /** \brief Erase rows and columns

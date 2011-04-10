@@ -121,8 +121,8 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         }
         
         // Increase argument indices
-        if(isx) ix++;
-        if(isy) iy++;
+        if(isx && ix+1<nx) ix++; 
+        if(isy && iy+1<ny) iy++;
       }
 
     }

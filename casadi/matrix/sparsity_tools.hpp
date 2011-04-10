@@ -37,6 +37,20 @@ CRSSparsity sp_tril(int n);
 **/
 CRSSparsity sp_diag(int n);
 
+/** \brief Construct a sparsity pattern from (row,col) vectors
+
+  row and column must be of same length.
+  
+  If you can guarantee that row is montone, pass the extra argument as true.
+*/
+CRSSparsity sp_NZ(std::vector<int> row, std::vector<int> col,int nrow, int ncol, bool monotone=false);
+
+/** \brief Construct a block sparsity pattern from (row,col) vectors
+
+*/
+CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col,int nrow, int ncol);
+
+
 /** \brief Get the indices of all non-zero elements as they would appear in a Dense matrix  
      A : DenseMatrix  4 x 3
      B : SparseMatrix 4 x 3 , 5 structural non-zeros
@@ -46,6 +60,11 @@ CRSSparsity sp_diag(int n);
 */
 std::vector<int> getNZDense(const CRSSparsity& sp);
     
+    
+CRSSparsity reshape(const CRSSparsity& a, int n, int m);
+
+CRSSparsity vec(const CRSSparsity& a);
+
 }
 
 #endif // SPARSITY_TOOLS_HPP

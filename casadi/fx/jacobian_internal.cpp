@@ -23,6 +23,7 @@
 #include "jacobian_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../pre_c99_support.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -37,21 +38,36 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   addOption("ad_mode",            OT_STRING,  "default");  // "forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint
   setOption("sparse", false);
   
-  casadi_assert_message(fcn_.input(iind_).size() == fcn_.input(iind_).numel(),"Jacobian not yet implemented for sparse input");
-  casadi_assert_message(fcn_.output(oind_).size()== fcn_.output(oind_).numel(),"Jacobian not yet implemented for sparse output");
+  //casadi_assert_message(fcn_.input(iind_).size() == fcn_.input(iind_).numel(),"Jacobian not yet implemented for sparse input");
+  //casadi_assert_message(fcn_.output(oind_).size()== fcn_.output(oind_).numel(),"Jacobian not yet implemented for sparse output");
   
   // make sure that input and output are vectors (not matrices)
   //casadi_assert(fcn_.input(iind_).size2() == 1 or fcn_.input(iind_).size1() == 1);
   //casadi_assert(fcn_.output(oind_).size2() == 1 or fcn_.output(oind_).size1() == 1);
 
   // get the dimensions
-  n_ = fcn_.input(iind_).numel();
-  m_ = fcn_.output(oind_).numel();
+  n_ = fcn_.input(iind_).size();
+  m_ = fcn_.output(oind_).size();
 
   input_ = fcn_->input_;
   
   output_.resize(1);
-  output(0) = DMatrix(m_,n_,0);
+  
+  // Input/Output Sparsity 
+  if (fcn_.input(iind_).size() == fcn_.input(iind_).numel() and fcn_.output(oind_).size()== fcn_.output(oind_).numel()) {
+    output(0) = DMatrix(m_,n_,0); // dense
+  } else {
+    // sparse
+    output(0) = DMatrix(
+                  sp_rowcol(
+                    getNZDense(fcn_.output(oind_).sparsity()),
+                    getNZDense(fcn_.input(iind_).sparsity()),
+                    fcn_.output(oind_).numel(), fcn_.input(iind_).numel()
+                  ),
+                  0
+                );
+  }
+  
 }
 
 
