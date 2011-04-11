@@ -671,9 +671,11 @@ vector< vector< vector<SX> > > create_symbolic(const std::string& name, int n, i
 }
 
 Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a, int order) {
-  Matrix<SX> ff = ex;
+  if (ex.size()!=ex.numel())
+   throw CasadiException("taylor: not implemented for sparse matrices");
+  Matrix<SX> ff = vec(ex);
   
-  Matrix<SX> result = substitute(ex,x,a);
+  Matrix<SX> result = substitute(ff,x,a);
   double nf=1; 
   SX dx = (x-a);
   SX dxa = (x-a);
@@ -683,7 +685,7 @@ Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a, int order) {
     result+=1/nf * substitute(ff,x,a) * dxa;
     dxa*=dx;
   }
-  return result;
+  return trans(reshape(result,ex.size2(),ex.size1()));
 }
 
 Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& around,int order) {
@@ -696,7 +698,7 @@ Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Mat
   for (int i=0;i<x.size();i++) {
     if (order_contributions[i]<=order) {
       result += mtaylor_recursive(
-                  reshape(jacobian(ex,x[i]),ex.size1(),ex.size2()),
+                  jacobian(ex,x[i]),
                   x,a,
                   order-order_contributions[i],
                   order_contributions,
@@ -709,12 +711,14 @@ Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Mat
 /// \endcond
 
 Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions) {
+  if (ex.size()!=ex.numel() or x.size()!=x.numel())
+    throw CasadiException("mtaylor: not implemented for sparse matrices");
   if (x.size()!=order_contributions.size()) {
       stringstream ss;
       ss << "mtaylor: number of non-zero elements in x (" <<  x.size() << ") must match size of order_contributions (" << order_contributions.size() << ")";
       throw CasadiException(ss.str());
   }
-  return mtaylor_recursive(ex,x,a,order,order_contributions);
+  return trans(reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()));
 }
 
 

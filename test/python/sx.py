@@ -147,7 +147,7 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
       
   def test_SXMatrixJacobians2(self):
-      return # not allowed
+      return # not implemented
       self.message("SXMatrix(1,3) unary operation, jacobian")
       x=symbolic("x",1,3)
       
@@ -159,7 +159,7 @@ class SXtests(casadiTestCase):
         return J
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
-      
+
   def test_SXMatrix(self):
       self.message("SXMatrix unary operations")
       x=symbolic("x",3,2)
@@ -558,6 +558,17 @@ class SXtests(casadiTestCase):
     test(taylor(sin(x),x,a,2),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0)
     test(taylor(sin(x),x,a,3),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0)
     
+    M=SXMatrix(matrix([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]]))
+    
+    f = SXFunction([x,a],[taylor(M,x)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(a_,1)
+    f.evaluate()
+    self.checkarray(f.output(),matrix([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
+    
+
+    
   def test_mtaylor(self):
     self.message("multivariate taylor expansions")
     x=SX("x")
@@ -598,6 +609,9 @@ class SXtests(casadiTestCase):
     test(mtaylor(sin(x+y),[x,y],[a,b],3,[1,2]),sol(x_,y_,a_,b_))
     
     test(mtaylor(sin(x+y),[x,y],[0,0],4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
+    
+    
+    
     
 if __name__ == '__main__':
     unittest.main()
