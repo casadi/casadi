@@ -495,6 +495,46 @@ class SXtests(casadiTestCase):
     y[1:4,[2,4,5,6]]=x
     self.checkarray(y,z,"scalar assignment")
     
+  def test_substitute(self):
+    self.message("Basic symbolic algebra: substitute")
+    x=SX("x")
+    y=SX("y")
+    z = cos(x)*y
+    self.assertTrue(dependsOn(z,y))
+    self.assertTrue(dependsOn(z,x))
+    w = substitute(z,x,0)
+    self.assertTrue(isSymbolic(w))
+    self.assertTrue(dependsOn(w,y))
+    self.assertFalse(dependsOn(w,x))
+    self.assertTrue(isEqual(w,y))
+    r=w-y
+    self.assertFalse(isSymbolic(r))     
+    self.assertTrue(isZero(r))
+    self.assertEqual(getIntValue(r),0)
+    self.assertEqual(getValue(r),0)
+   
+  def test_primitivefunctions(self):
+    self.message("Primitive functions")
+    x=SX("x")
+    
+    nums = [-2,-1.5,-1,-0.5,-0.25,0,0.25,0.5,1,1.5,2]
+    
+    def test(fun,comment,nums,reference):
+      self.message(":"+comment)
+      f = SXFunction([x],[fun(x)])
+      f.init()
+      for n,r in zip(nums,reference):
+        f.setInput(n)
+        f.evaluate()
+        self.assertEqual(f.output()[0],r)
+    
+    test(casadi.sign,"sign",nums,[-1,-1,-1,-1,-1,0,1,1,1,1,1])
+    test(casadi.heaviside,"heaviside",nums,[0,0,0,0,0,0.5,1,1,1,1,1])
+    test(casadi.ramp,"ramp",nums,[0,0,0,0,0,0,0.25,0.50,1,1.5,2])
+    test(casadi.rectangle,"rectangle",nums,[0,0,0,0.5,1,1,1,0.5,0,0,0])
+    test(casadi.triangle,"triangle",nums,[0,0,0,0.5,0.75,1,0.75,0.5,0,0,0])
+    
+    
 if __name__ == '__main__':
     unittest.main()
 

@@ -134,8 +134,20 @@ Matrix<SX> heaviside(const Matrix<SX>& a){
   return (1+sign(a))/2;
 }
 
+Matrix<SX> ramp(const Matrix<SX>& a){
+  return a*heaviside(a);
+}
+
+Matrix<SX> rectangle(const Matrix<SX>& a){
+  return 0.5*(sign(a+0.5)-sign(a-0.5));
+}
+
+Matrix<SX> triangle(const Matrix<SX>& a){
+  return rectangle(a[0,0]/2)*(1-std::abs(a[0,0]));
+}
+
 Matrix<SX> sign(const Matrix<SX>& a){
-  return ((a>0) + (a>=0))/2;
+  return (a>0) + (a>=0)-1;
 }
 
 bool contains(const Matrix<SX> &list, const SX &e) {
@@ -301,8 +313,12 @@ bool isSmooth(const Matrix<SX>& ex){
 
 
 bool isSymbolic(const Matrix<SX>& ex){
-  if(!isDense(ex)) return false; // Why can't a sparse matrix be symbolic?
+  if(!isDense(ex)) return false;
+  
+  return isSymbolicSparse(ex);
+}
 
+bool isSymbolicSparse(const Matrix<SX>& ex) {
   for(int k=0; k<ex.size(); ++k) // loop over non-zero elements
     if(!ex[k]->isSymbolic()) // if an element is not symbolic
       return false;
