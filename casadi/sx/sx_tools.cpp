@@ -686,9 +686,38 @@ Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a, int order) {
   return result;
 }
 
-Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& around,std::vector<int>) {
-  throw CasadiException("Matrix<SX>::mtaylor: Not implemented");
+Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& around,int order) {
+  return mtaylor(ex,x,around,order,std::vector<int>(x.size(),1));
 }
+
+/// \cond
+Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions, const SX & current_dx=casadi_limits<SX>::one, double current_denom=1, int current_order=1) {
+  Matrix<SX> result = substitute(ex,x,a)*current_dx/current_denom;
+  for (int i=0;i<x.size();i++) {
+    if (order_contributions[i]<=order) {
+      result += mtaylor_recursive(
+                  reshape(jacobian(ex,x[i]),ex.size1(),ex.size2()),
+                  x,a,
+                  order-order_contributions[i],
+                  order_contributions,
+                  current_dx*(x[i]-a[i]),
+                  current_denom*current_order,current_order+1);
+    }
+  }
+  return result;
+}
+/// \endcond
+
+Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions) {
+  if (x.size()!=order_contributions.size()) {
+      stringstream ss;
+      ss << "mtaylor: number of non-zero elements in x (" <<  x.size() << ") must match size of order_contributions (" << order_contributions.size() << ")";
+      throw CasadiException(ss.str());
+  }
+  return mtaylor_recursive(ex,x,a,order,order_contributions);
+}
+
+
 
 } // namespace CasADi
 

@@ -536,7 +536,7 @@ class SXtests(casadiTestCase):
     
     
   def test_taylor(self):
-    self.message("taylor expansions")
+    self.message("univariate taylor expansion")
     x=SX("x")
     
     self.assertTrue(isEqual(taylor(sin(x),x),x))
@@ -544,34 +544,60 @@ class SXtests(casadiTestCase):
     x_=0.15
 
     a = SX("a") 
-    f = SXFunction([x,a],[taylor(sin(x),x,a,0)])
-    f.init()
-    f.setInput(x_,0)
-    f.setInput(a_,1)
-    f.evaluate()
-    self.assertAlmostEqual(f.output()[0],sin(a_),10)
-
-    f = SXFunction([x,a],[taylor(sin(x),x,a,1)])
-    f.init()
-    f.setInput(x_,0)
-    f.setInput(a_,1)
-    f.evaluate()
-    self.assertAlmostEqual(f.output()[0],sin(a_)+cos(a_)*(x_-a_),10)
-
-    f = SXFunction([x,a],[taylor(sin(x),x,a,2)])
-    f.init()
-    f.setInput(x_,0)
-    f.setInput(a_,1)
-    f.evaluate()
-    self.assertAlmostEqual(f.output()[0],sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0,10)
     
-    f = SXFunction([x,a],[taylor(sin(x),x,a,3)])
-    f.init()
-    f.setInput(x_,0)
-    f.setInput(a_,1)
-    f.evaluate()
-    self.assertAlmostEqual(f.output()[0],sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0,10)
+    def test(e,r):
+      f = SXFunction([x,a],[e])
+      f.init()
+      f.setInput(x_,0)
+      f.setInput(a_,1)
+      f.evaluate()
+      self.assertAlmostEqual(f.output()[0],r,10)
     
+    test(taylor(sin(x),x,a,0),sin(a_))
+    test(taylor(sin(x),x,a,1),sin(a_)+cos(a_)*(x_-a_))
+    test(taylor(sin(x),x,a,2),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0)
+    test(taylor(sin(x),x,a,3),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0)
+    
+  def test_mtaylor(self):
+    self.message("multivariate taylor expansions")
+    x=SX("x")
+    y=SX("y")
+    a=SX("a")
+    b=SX("b")
+
+    a_=0.13
+    x_=0.15
+    
+    b_=0.73
+    y_=0.75
+    
+    def test(e,r):
+      f = SXFunction([[x,y],[a,b]],[e])
+      f.init()
+      f.setInput([x_,y_],0)
+      f.setInput([a_,b_],1)
+      f.evaluate()
+      self.assertAlmostEqual(f.output()[0],r,10)
+    
+    test(mtaylor(sin(x+y),[x,y],[a,b],0),sin(a_+b_))
+    test(mtaylor(sin(x+y),[x,y],[a,b],1),sin(a_+b_)+(cos(b_+a_)*(x_-a_)+cos(b_+a_)*(y_-b_)))
+    
+    def sol(x,y,a,b):
+      return sin(b+a)+(cos(b+a)*(x-a)+cos(b+a)*(y-b))-(sin(b+a)*(x-a)**2+2*sin(b+a)*(y-b)*(x-a)+sin(b+a)*(y-b)**2)/2
+      
+    test(mtaylor(sin(x+y),[x,y],[a,b],2),sol(x_,y_,a_,b_))
+    
+    def sol(x,y,a,b):
+      return sin(b+a)+(cos(b+a)*(x-a)+cos(b+a)*(y-b))-(sin(b+a)*(x-a)**2+2*sin(b+a)*(y-b)*(x-a)+sin(b+a)*(y-b)**2)/2-(cos(b+a)*(x-a)**3+3*cos(b+a)*(y-b)*(x-a)**2+3*cos(b+a)*(y-b)**2*(x-a)+cos(b+a)*(y-b)**3)/6
+    
+    test(mtaylor(sin(x+y),[x,y],[a,b],3),sol(x_,y_,a_,b_))
+    
+    def sol(x,y,a,b):
+      return (-2*sin(b+a)*(x-a)*(y-b)-sin(b+a)*(x-a)**2)/2+cos(b+a)*(y-b)-(cos(b+a)*(x-a)**3)/6+cos(b+a)*(x-a)+sin(b+a)
+      
+    test(mtaylor(sin(x+y),[x,y],[a,b],3,[1,2]),sol(x_,y_,a_,b_))
+    
+    test(mtaylor(sin(x+y),[x,y],[0,0],4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
     
 if __name__ == '__main__':
     unittest.main()
