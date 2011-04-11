@@ -670,6 +670,26 @@ vector< vector< vector<SX> > > create_symbolic(const std::string& name, int n, i
   return ret;
 }
 
+Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a, int order) {
+  Matrix<SX> ff = ex;
+  
+  Matrix<SX> result = substitute(ex,x,a);
+  double nf=1; 
+  SX dx = (x-a);
+  SX dxa = (x-a);
+  for (int i=1;i<=order;i++) {
+    ff = jacobian(ff,x);
+    nf*=i;
+    result+=1/nf * substitute(ff,x,a) * dxa;
+    dxa*=dx;
+  }
+  return result;
+}
+
+Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& around,std::vector<int>) {
+  throw CasadiException("Matrix<SX>::mtaylor: Not implemented");
+}
+
 } // namespace CasADi
 
 

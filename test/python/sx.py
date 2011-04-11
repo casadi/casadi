@@ -535,6 +535,44 @@ class SXtests(casadiTestCase):
     test(casadi.triangle,"triangle",nums,[0,0,0,0.5,0.75,1,0.75,0.5,0,0,0])
     
     
+  def test_taylor(self):
+    self.message("taylor expansions")
+    x=SX("x")
+    
+    self.assertTrue(isEqual(taylor(sin(x),x),x))
+    a_=0.13
+    x_=0.15
+
+    a = SX("a") 
+    f = SXFunction([x,a],[taylor(sin(x),x,a,0)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(a_,1)
+    f.evaluate()
+    self.assertAlmostEqual(f.output()[0],sin(a_),10)
+
+    f = SXFunction([x,a],[taylor(sin(x),x,a,1)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(a_,1)
+    f.evaluate()
+    self.assertAlmostEqual(f.output()[0],sin(a_)+cos(a_)*(x_-a_),10)
+
+    f = SXFunction([x,a],[taylor(sin(x),x,a,2)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(a_,1)
+    f.evaluate()
+    self.assertAlmostEqual(f.output()[0],sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0,10)
+    
+    f = SXFunction([x,a],[taylor(sin(x),x,a,3)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(a_,1)
+    f.evaluate()
+    self.assertAlmostEqual(f.output()[0],sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0,10)
+    
+    
 if __name__ == '__main__':
     unittest.main()
 
