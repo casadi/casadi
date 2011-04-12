@@ -827,6 +827,8 @@ MTT_INST(T,isEqual) \
 MTT_INST(T,repmat) \
 MTT_INST(T,getSparseTriplet) \
 MTT_INST(T,unite) \
+MTT_INST(T,sum) \
+MTT_INST(T,sum_all) \
 
 
 #endif //SWIG

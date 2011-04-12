@@ -4,6 +4,7 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+import numpy 
 
 class Sparsitytests(casadiTestCase):
   def test_union(self):
@@ -76,6 +77,79 @@ class Sparsitytests(casadiTestCase):
     sp.enlarge(7,8,[1,2,4],[0,3,4,6])
     
     self.checkarray(DMatrix(sp,1),z,"enlarge")
+    
+  def tomatrix(self,s):
+    d = DMatrix(s,1)
+    for k in range(d.size()):
+      d[k] = k+1
+    return d
+
+  def test_NZ(self):
+    self.message("NZ constructor")
+    nza = [  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (2,4),
+             (3,1)]
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = sp_NZ([i[0] for i in nza],[i[1] for i in nza],4,5,True)
+    self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
+
+  def test_rowcol(self):
+    self.message("rowcol constructor")
+    
+    r = [0,1,3]
+    c = [1,4]
+    a = CRSSparsity(4,5)
+    for i in r:
+      for j in c:
+        a.getNZ(i,j)
+      
+    b = sp_rowcol(r,c,4,5)
+    self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
+     
+  def test_reshape(self):
+    self.message("Reshape")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (2,4),
+             (3,1)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    A=self.tomatrix(a).toArray()
+    B=self.tomatrix(casadi.reshape(a,2,10)).toArray()
+    B_=numpy.reshape(A,(2,10))
+    
+    self.checkarray(B,B_,"reshape")
+    
+  def test_vec(self):
+    self.message("vec")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (2,4),
+             (3,1)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    A=self.tomatrix(a).toArray()
+    B=self.tomatrix(vec(a)).toArray()
+    B_=numpy.reshape(A,(20,1))
+    
+    self.checkarray(B,B_,"reshape")
     
 if __name__ == '__main__':
     unittest.main()

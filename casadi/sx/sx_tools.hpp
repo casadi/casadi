@@ -126,11 +126,74 @@ Matrix<SX> pw_const(const Matrix<SX> &t, const Matrix<SX> &tval, const Matrix<SX
 Matrix<SX> pw_lin(const SX &t, const Matrix<SX> &tval, const Matrix<SX> &val);
 
 Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matrix<SX> &if_false);
-/// Heaviside step function
-Matrix<SX> heaviside(const Matrix<SX> &x); // heaviside step function
+/**  \brief Heaviside function
+*
+* \f[
+* \begin{cases}
+* H(x) = 0 & x<0 \\
+* H(x) = 1/2 & x=0 \\
+* H(x) = 1 & x>0 \\
+* \end{cases}
+* \f]
+*/
+Matrix<SX> heaviside(const Matrix<SX> &x);
 
-/// sign function
-Matrix<SX> sign(const Matrix<SX> &x);     // sign function
+/**  \brief sign function
+*  
+* \f[
+* \begin{cases}
+* \mathrm{sign}(x) = -1 & x<0 \\
+* \mathrm{sign}(x) = 0 & x=0 \\
+* \mathrm{sign}(x) = 1 & x>0 \\
+* \end{cases}
+* \f]
+*
+* Also called: signum
+*/
+Matrix<SX> sign(const Matrix<SX> &x);
+
+/** 
+* \brief rectangle function
+*
+* \f[
+* \begin{cases}
+* \Pi(x) = 1     & |x| < 1/2 \\ 
+* \Pi(x) = 1/2   & |x| = 1/2  \\
+* \Pi(x) = 0     & |x| > 1/2  \\
+* \end{cases}
+* \f]
+*
+* Also called: gate function, block function, band function, pulse function, window function
+*/
+Matrix<SX> rectangle(const Matrix<SX> &x);
+
+/** 
+* \brief triangle function
+*
+* \f[
+* \begin{cases}
+* \Lambda(x) = 0 &    |x| >= 1  \\
+* \Lambda(x) = 1-|x| &  |x| < 1 
+* \end{cases}
+* \f]
+*
+*/
+Matrix<SX> triangle(const Matrix<SX> &x);
+
+/** 
+* \brief ramp function
+*
+* 
+* \f[
+* \begin{cases}
+*  R(x) = 0   & x <= 1 \\
+*  R(x) = x   & x > 1 \\
+* \end{cases}
+* \f]
+*
+* Also called: slope function
+*/
+Matrix<SX> ramp(const Matrix<SX> &x);
 
 /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
 Matrix<SX> gauss_quadrature(Matrix<SX> f, const Matrix<SX> &x, const Matrix<SX> &a, const Matrix<SX> &b, int order=5, const Matrix<SX>& w=Matrix<SX>());
@@ -215,8 +278,17 @@ bool dependsOn(const Matrix<SX>& f, const Matrix<SX> &arg);
 /** \brief  check if smooth */
 bool isSmooth(const Matrix<SX>& ex);
 
-/** \brief  check if symbolic */
+/** \brief  check if symbolic (Dense)
+
+ Sparse matrices invariable return false 
+  */
 bool isSymbolic(const Matrix<SX>& ex);
+
+/** \brief  check if symbolic
+
+ Sparse matrices can return true if all non-zero elements are symbolic
+ */
+bool isSymbolicSparse(const Matrix<SX>& ex);
 
 //@{
 /** \brief Calculate jacobian via source code transformation
@@ -253,6 +325,58 @@ Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b);
 
 /** \brief  Fill the matrix with the value val, make empty sparse if zero */
 void fill(Matrix<SX>& mat, const SX& val);
+
+/** 
+* \brief univariate taylor series expansion
+*
+* Calculate the taylor expansion of expression 'ex' up to order 'order' with repsect to variable 'x' around the point 'a'
+*
+* \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac{(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
+* 
+* Example usage:
+* \code
+* taylor(sin(x),x)
+* \endcode
+* \verbatim >>   x \endverbatim
+*/
+Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a=casadi_limits<SX>::zero,int order=1);
+
+/**
+* \brief multivariate taylor series expansion
+*
+* Do taylor expansions until the aggregated order of a term is equal to 'order'.
+* The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
+*
+*/
+Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order=1);
+/** 
+* \brief multivariate taylor series expansion
+*
+* Do taylor expansions until the aggregated order of a term is equal to 'order'.
+* The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
+* 
+* The argument order_contributions can denote how match each variable contributes to the aggregated order.
+* If x=[x,y] and order_contributions=[1,2], then the aggregated order of \f$x^n y^m\f$ equals \f$1n+2m\f$.
+*
+* Example usage
+*
+* \code
+* taylor(sin(x+y),[x,y],[a,b],1)
+* \endcode
+* \f$ \sin(b+a)+\cos(b+a)(x-a)+\cos(b+a)(y-b) \f$
+* \code
+* taylor(sin(x+y),[x,y],[0,0],4)
+* \endcode
+* \f$  y+x-(x^3+3y x^2+3 y^2 x+y^3)/6  \f$
+* \code
+* taylor(sin(x+y),[x,y],[0,0],4,[1,2])
+* \endcode
+* \f$  (-3 x^2 y-x^3)/6+y+x \f$
+*
+*/
+Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions);
+
+
 
 } // namespace CasADi
 

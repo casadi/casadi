@@ -206,11 +206,6 @@ class MXtests(casadiTestCase):
     self.assertEqual(z.size1(),2,"MX fails to indicate its size1")
     self.assertEqual(z.size2(),3,"MX fails to indicate its size2")
 
-  # Joel: NOTE this does not work properly
-  #def test_MX2(self):
-    #U = MX("U",10,2)
-    #u = U.getRow(1) # NOTE: the correct syntax should be U[1,:], there is a workaround that allow this, but it is not yet supported in C++
-
   def test_MXfunction1(self):
     self.message("MXFunction single input, single output")
     # check if x->2*x
@@ -388,36 +383,6 @@ class MXtests(casadiTestCase):
     g.evaluate()
 
     self.assertAlmostEqual(g.output()[0],10,10,"issue #83")
-  
-  #def test_MXslice(self):
-    #x = MX("x",1,3)
-    #z=x[:]
-    #self.assertEqual(z.size1(),1,"Flatten returns MX of wrong dimension")
-    #self.assertEqual(z.size2(),3,"Flatten returns MX of wrong dimension")
-    #f = MXFunction([x],[z])
-    #f.init()
-    #L=[1,2,3]
-    #f.setInput(L,0)
-    #f.evaluate()
-    #zt = f.output(0).toArray()
-    
-    #for i in range(3):
-      #self.assertAlmostEqual(L[i], zt[i],10)
-      
-  #def test_MXslice(self):
-    #x = MX("x",3,1)
-    #z=x[:]
-    #self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
-    #self.assertEqual(z.size2(),1,"Flatten returns MX of wrong dimension")
-    #f = MXFunction([x],[z])
-    #f.init()
-    #L=[1,2,3]
-    #f.setInput(L,0)
-    #f.evaluate()
-    #zt = f.output(0).toArray()
-    
-    #for i in range(3):
-      #self.assertAlmostEqual(L[i], zt[i],10)
         
   def test_identitySX(self):
     self.message("identity SXFunction")
@@ -1011,7 +976,79 @@ class MXtests(casadiTestCase):
       J.evaluate()
       
       self.checkarray(J.output(),J_,"evaluation")
+
+  def test_MXalgebraSparseSparse(self):
+    self.message("Test some sparse algebraic properties of matrices")
+    n = 8
+    m = 10
+    import numpy
+    numpy.random.seed(42)
     
+    def randsparsity(m,n):
+      sp = CRSSparsity(m,n)
+      for k in range((n*m)/2):
+        i = numpy.random.randint(m)
+        j = numpy.random.randint(n)
+        if not(i == m/2):
+          if n==1 or not(j == n/2):
+            sp.getNZ(i,j)
+      return sp
+      
+    def gentest(m,n):
+      As = randsparsity(m,n)
+      A_ = DMatrix(As)
+      for k in range(As.size()):
+        A_[k]= numpy.random.rand()
+      A = MX("A",As)
+      return (A_.toCsr_matrix(),A)
+    
+    (A_,A)=gentest(m,n)
+    (b_,b)=gentest(m,1)
+    (C_,C)=gentest(m,m)
+    (D_,D)=gentest(m,n)
+    (e_,e)=gentest(m,1)
+    x_ = numpy.random.random((n,1))
+    x = MX("x",n,1)
+    
+    Axb = casadi.prod(A,x)+b
+    Dxe = casadi.prod(D,x)+e
+    a = casadi.prod(casadi.prod(trans(Axb),C),Dxe)
+    
+    f = MXFunction([x,A,b,C,D,e],[a])
+    f.init()
+    f.input(0).set(x_)
+    f.input(1).set(A_)
+    f.input(2).set(b_)
+    f.input(3).set(C_)
+    f.input(4).set(D_)
+    f.input(5).set(e_)
+    f.evaluate()
+
+
+    Axb_ = A_*x_+b_
+    Dxe_ = D_*x_+e_
+    
+    f_ = Axb_.T*C_*Dxe_
+    
+    self.checkarray(f.output(),f_,"evaluation")
+    
+
+    J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
+    
+    for mode in ["forward", "adjoint"]:
+      J = Jacobian(f)
+      J.setOption("ad_mode","forward")
+      J.init()
+      J.input(0).set(x_)
+      J.input(1).set(A_)
+      J.input(2).set(b_)
+      J.input(3).set(C_)
+      J.input(4).set(D_)
+      J.input(5).set(e_)
+      J.evaluate()
+      
+      self.checkarray(J.output(),J_,"evaluation")
+      
 if __name__ == '__main__':
     unittest.main()
 
