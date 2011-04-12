@@ -139,6 +139,18 @@ namespace CasADi {
     Matrix<SX> __div__ (double b) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);}
     Matrix<SX> __rdiv__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
 
+    // These methods must be added since the implicit type cast does not work
+    Matrix<SX> __pow__ (const Matrix<SX>& b) const{ return $self->__pow__(b);}
+    Matrix<SX> __rpow__(const Matrix<SX>& b) const{ return b.__pow__(*$self);}
+    Matrix<SX> __add__ (const Matrix<SX>& b) const{ return *$self + b;}
+    Matrix<SX> __radd__(const Matrix<SX>& b) const{ return b + *$self;}
+    Matrix<SX> __sub__ (const Matrix<SX>& b) const{ return *$self - b;}
+    Matrix<SX> __rsub__(const Matrix<SX>& b) const{ return b - *$self;}
+    Matrix<SX> __mul__ (const Matrix<SX>& b) const{ return *$self * b;}
+    Matrix<SX> __rmul__(const Matrix<SX>& b) const{ return b * *$self;}
+    Matrix<SX> __div__ (const Matrix<SX>& b) const{ return *$self / b;}
+    Matrix<SX> __rdiv__(const Matrix<SX>& b) const{ return b / *$self;}
+    
     %pythoncode %{
         @property
         def shape(self):
@@ -164,11 +176,19 @@ namespace CasADi {
       return r
     %}
     
+  %pythoncode %{
+  __array_priority__ = 1000
+  %}
     
   %pythoncode %{
-  def __array_wrap__(self,*args,**kwargs):
-    fun=getattr(self, args[1][0].__name__)
-    return fun()
+  def __array_wrap__(self,out_arr,context=None):
+      name = context[0].__name__
+      if not(hasattr(self,name)):
+        name = '__' + name + '__'
+      if context[-1]==1:
+        name = '__r' + context[0].__name__ + '__'
+      fun=getattr(self, name)
+      return fun(*context[1][0:-1])
   %}
 
   %pythoncode %{

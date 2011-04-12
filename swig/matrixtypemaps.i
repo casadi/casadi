@@ -13,7 +13,8 @@ namespace CasADi{
 %pythoncode %{
     @property
     def shape(self):
-        return (self.size1(),self.size2())
+        return (self.size1()
+        ,self.size2())
 %}
 
 %pythoncode %{
@@ -21,6 +22,11 @@ namespace CasADi{
     def T(self):
         return trans(self)
 %}
+    
+%pythoncode %{
+  __array_priority__ = 999
+%}
+    
     
 %pythoncode %{
   def toArray(self):
@@ -31,9 +37,14 @@ namespace CasADi{
 %}
 
 %pythoncode %{
-  def __array_wrap__(self,*args,**kwargs):
-    fun=getattr(self, args[1][0].__name__)
-    return fun()
+  def __array_wrap__(self,out_arr,context=None):
+      name = context[0].__name__
+      if not(hasattr(self,name)):
+        name = '__' + name + '__'
+      if context[-1]==1:
+        name = '__r' + context[0].__name__ + '__'
+      fun=getattr(self, name)
+      return fun(*context[1][0:-1])
 %}
 
 // The following code has some trickery to fool numpy ufunc.
@@ -41,7 +52,7 @@ namespace CasADi{
 // will unleash its activity on the output of __array__
 // However, we wish DMatrix to remain a DMatrix
 // So when we receive a call from a functor, we return a dummy empty array
-// and return the real result during the postprocessing of the functor.
+// and return the real result during the postprocessing (__array_wrap__) of the functor.
 %pythoncode %{
   def __array__(self,*args,**kwargs):
     import numpy as n

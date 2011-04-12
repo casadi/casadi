@@ -158,5 +158,55 @@ class typemaptests(casadiTestCase):
     self.assertTrue(f.getOption("verbose"))
     self.assertEquals(f.getOption("number_of_adj_dir"),7)
     
+  def test_operators(self):
+    self.message("Test operators on mixed numpy.array/Matrix")
+    self.message(":SXMatrix")
+    x=SX("x")
+    y=SX("y")
+
+    C=SXMatrix([x,y])
+    N=matrix([x,y]).T
+    
+    self.assertTrue(isinstance(N+C,SXMatrix))
+    self.assertTrue(isinstance(C+N,SXMatrix))
+    
+    f=SXFunction([[x,y]],[C+N])
+    f.init()
+    f.input().set([7,13])
+    f.evaluate()
+    self.checkarray(f.output(),matrix([14,26]).T,"addition")
+    
+    f=SXFunction([[x,y]],[N+C])
+    f.init()
+    f.input().set([7,13])
+    f.evaluate()
+    self.checkarray(f.output(),matrix([14,26]).T,"addition")
+    
+    self.message(":DMatrix")
+    D=DMatrix([7,13])
+    N=matrix([7,13]).T
+    
+    self.assertTrue(isinstance(N+D,DMatrix))
+    self.assertTrue(isinstance(D+N,DMatrix))
+    
+    self.checkarray(N+D,matrix([14,26]).T,"addition")
+    self.checkarray(D+N,matrix([14,26]).T,"addition")
+    
+    self.assertTrue(isinstance(C+D,SXMatrix))
+    self.assertTrue(isinstance(D+C,SXMatrix))
+  
+      
+    f=SXFunction([[x,y]],[C+D])
+    f.init()
+    f.input().set([1,4])
+    f.evaluate()
+    self.checkarray(f.output(),matrix([8,17]).T,"addition")
+    
+    f=SXFunction([[x,y]],[D+C])
+    f.init()
+    f.input().set([1,4])
+    f.evaluate()
+    self.checkarray(f.output(),matrix([8,17]).T,"addition")
+     
 if __name__ == '__main__':
     unittest.main()
