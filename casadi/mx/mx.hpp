@@ -204,6 +204,9 @@ class MX : public SharedObject{
   MX getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
   void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el);
   MX getNZ(const std::vector<int>& kk) const;
+  /** \brief set nonzeros
+  el.size() must equal kk.size() unless m is scalar
+  */
   void setNZ(const std::vector<int>& kk, const MX& el);
 
   /// Numeric evaluation

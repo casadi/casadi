@@ -109,6 +109,10 @@ MX unite(const MX& A, const MX& B);
 /** \brief  check if symbolic */
 bool isSymbolic(const MX& ex);
 
+/** \brief create a clipped view into a matrix
+Create a sparse matrix from a dense matrix A, with sparsity pattern sp
+**/
+//MX clip(const MX& A, const CRSSparsity& sp);
 
 } // namespace CasADi
 

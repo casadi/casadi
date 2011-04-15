@@ -153,10 +153,20 @@ MX MX::getNZ(const vector<int>& kk) const{
 }
 
 void MX::setNZ(const vector<int>& kk, const MX& el){
+  if (kk.size()!=el.size() && el.size()!=1) {
+    std::stringstream ss;
+    ss << "MX::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
+    ss << "must match size of rhs (" << el.size() << ")." << std::endl;
+    throw CasadiException(ss.str());
+  }
   MX ret;
   ret.assignNode(new Mapping(sparsity()));
   ret->addDependency(*this,range(size()));
-  ret->addDependency(el,range(kk.size()),kk);
+  if (el.size()==1) {
+    ret->addDependency(el,std::vector<int>(kk.size(),0),kk);
+  } else {
+    ret->addDependency(el,range(kk.size()),kk);
+  }
   *this = ret;
 }
 

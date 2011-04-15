@@ -192,7 +192,8 @@ namespace CasADi{
         if s < 0:
           s = s + self.size()
       elif isinstance(s,list):
-        return self.getNZ(s)
+        self.setNZ(s,val)
+        return
       elif isinstance(s,slice):
         s = (s,[0])
       if isinstance(s,tuple):

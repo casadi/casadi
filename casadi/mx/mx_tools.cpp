@@ -212,6 +212,35 @@ bool isSymbolic(const MX& ex){
   return ex->isSymbolic();
 }
 
+/**
+MX clip(const MX& A, const CRSSparsity& sp) {
+  // Join the sparsity patterns
+  std::vector<int> mapping;
+  CRSSparsity sp = A.sparsity().patternIntersection(sp,mapping);
+  
+  // Split up the mapping
+  std::vector<int> nzA,nzB;
+  
+  // Copy sparsity
+  for(int k=0; k<mapping.size(); ++k){
+    if(mapping[k]<0){
+      nzA.push_back(k);
+    } else if(mapping[k]>0){
+      nzB.push_back(k);
+    } else {
+      throw CasadiException("Pattern intersection not empty");
+    }
+  }
+  
+  // Create mapping
+  MX ret;
+  ret.assignNode(new Mapping(sp));
+  ret->addDependency(A,range(nzA.size()),nzA);
+  ret->addDependency(B,range(nzB.size()),nzB);
+  return ret;
+  
+}
+*/
 
 } // namespace CasADi
 

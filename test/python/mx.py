@@ -744,9 +744,35 @@ class MXtests(casadiTestCase):
      self.checkarray(fy.output(),r,"subscripted assigment")
      
      y=MX(7,8)
-     #y[1:4,[2,4,6,7]]=x
-     y.setSub([1,2,3],[2,4,6,7],x)
+     y[1:4,[2,4,6,7]]=x
      r[1:4,[2,4,6,7]]=xn
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
+     self.checkarray(fy.output(),r,"subscripted assigment")
+     
+     
+     kl=[2,4,5,8]
+
+     s=y.sparsity()
+     for k in kl:
+       r[s.getRow()[k],s.col()[k]]=1.0
+     
+     y[kl]=MX(1)
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.evaluate()
+     self.checkarray(fy.output(),r,"subscripted assigment")
+     
+     y[kl]=x[[0,1,2,3]]
+     s=y.sparsity()
+     sx=x.sparsity()
+     cnt=0
+     for k in kl:
+       r[s.getRow()[k],s.col()[k]]=xn[sx.getRow()[cnt],sx.col()[cnt]]
+       cnt+=1
      fy = MXFunction([x],[y])
      fy.init()
      fy.input().set(xn)

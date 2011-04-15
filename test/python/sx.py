@@ -493,7 +493,21 @@ class SXtests(casadiTestCase):
     self.checkarray(y,z,"scalar assignment")
     z[1:4,[2,4,5,6]]=xn
     y[1:4,[2,4,5,6]]=x
-    self.checkarray(y,z,"scalar assignment")
+    self.checkarray(y,z,"range assignment")
+    
+    kl=[2,4,5,8]
+    y[kl]=1.0
+    s=y.sparsity()
+    for k in kl:
+      z[s.getRow()[k],s.col()[k]]=1.0
+    self.checkarray(y,z,"nonzero scalar assignment")
+    y[kl]=DMatrix(kl)
+    
+    cnt=0
+    for k in kl:
+      z[s.getRow()[k],s.col()[k]]=kl[cnt]
+      cnt+=1
+    self.checkarray(y,z,"nonzero range assignment")
     
   def test_substitute(self):
     self.message("Basic symbolic algebra: substitute")

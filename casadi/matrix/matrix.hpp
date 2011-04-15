@@ -216,9 +216,13 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// Get nonzeros
     Matrix<T> getNZ(const std::vector<int>& kk) const;
     
-    /// Set nonzeros
+    /** \brief set nonzeros
+    m.size() must equal kk.size() unless m is scalar
+    */
     void setNZ(const std::vector<int>& kk, const Matrix<T>& m);
 
+    void setNZ(const std::vector<int>& kk, const T& m);
+    
 #ifndef SWIG 
 
     /// Access an element 
@@ -658,7 +662,19 @@ Matrix<T> Matrix<T>::getNZ(const std::vector<int>& kk) const{
 }
 
 template<class T>
+void Matrix<T>::setNZ(const std::vector<int>& kk, const T& m){
+  for(int k=0; k<kk.size(); ++k)
+    data()[kk[k]] = m;
+}
+
+template<class T>
 void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
+  if (kk.size()!=m.size()) {
+    std::stringstream ss;
+    ss << "Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
+    ss << "must match size of rhs (" << m.size() << ")." << std::endl;
+    throw CasadiException(ss.str());
+  }
   for(int k=0; k<kk.size(); ++k)
     data()[kk[k]] = m[k];
 }
