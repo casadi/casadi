@@ -138,8 +138,11 @@ class BinaryOperation<POW>{
   public:
     static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "pow(" << x << "," << y << ")"; }
     template<typename T> static void fcn(const T& x, const T& y, T& f){ f = std::pow(x,y);}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*f/x; d[1]=std::log(x)*f;}
+    // See issue #104 why d[0] is no longer y*f/x
+    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*std::pow(x,y-1); d[1]=std::log(x)*f;}
 };
+
+
 
 /// Square root
 template<>
