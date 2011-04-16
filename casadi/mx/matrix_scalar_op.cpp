@@ -55,15 +55,12 @@ void MatrixScalarOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       casadi_math<double>::fun[op](input[0][i],input[1][0],output[i]);
       casadi_math<double>::der[op](input[0][i],input[1][0],output[i],tmp);
       if (op==POW && std::isnan(tmp[1])) { // special case to fix issue #104
-        std::cout << tmp[0] << std::endl;
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
           fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i];
-          std::cout << fwdSeed[1][d][0] << std::endl;
-          if (fwdSeed[1][d][0]!=0) {
-            std::cout <<  "never" << tmp[0] << std::endl;
+
+          if (fwdSeed[1][d][0]!=0)
             fwdSens[d][i]+= tmp[1]*fwdSeed[1][d][0];
-          }
         }
 
         // Propagate adjoint seeds
