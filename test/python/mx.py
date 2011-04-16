@@ -778,7 +778,21 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      self.checkarray(fy.output(),r,"subscripted assigment")
-  
+     
+     self.message(":fwdSeed")
+     
+     x=MX("X",3,1)
+     xn = numpy.random.random((3,1))
+     y=x**3
+     y[1]=x[0]**4
+     fy = MXFunction([x],[y])
+     fy.init()
+     fy.input().set(xn)
+     fy.fwdSeed().set([1,0,0])
+     fy.evaluate(1,0)
+     self.checkarray(fy.output(),matrix([xn[0,0]**3,xn[0,0]**4,xn[2,0]**3]).T,"subscripted assigment")
+     self.checkarray(fy.fwdSens(),matrix([3*xn[0,0]**2,4*xn[0,0]**3,0]).T,"subscripted assigment")
+     
   def test_erase(self):
     self.message("Erase function")
     self.message(":dense")
@@ -1074,6 +1088,46 @@ class MXtests(casadiTestCase):
       J.evaluate()
       
       self.checkarray(J.output(),J_,"evaluation")
+      
+      
+  def test_chaining(self):
+    self.message("Chaining SX and MX together")
+    x=SX("x")
+    y=x**3
+    f=SXFunction([x],[y])
+    f.init()
+    J=f.jacobian()
+    J.init()
+    
+    X=MX("X")
+    F=MXFunction([X],[J.call([X])[0]])
+    F.init()
+    
+    
+    x_=1.7
+    F.input().set([x_])
+    F.fwdSeed().set(1)
+    F.adjSeed().set(1)
+    F.evaluate(1,1)
+    self.checkarray(F.output(),3*x_**2,"Chaining eval")
+    self.checkarray(F.fwdSens(),6*x_,"Chaining fwd")
+    self.checkarray(F.adjSens(),6*x_,"Chaining adj")
+    
+  def test_issue104(self):
+    self.message("regression test #104")
+    x = MX("x")
+
+    F = x**2
+
+    f = MXFunction([x],[F])
+    f.init()
+    f.input().set([-1])
+    f.fwdSeed().set([1])
+    f.adjSeed().set([1])
+    f.evaluate(1,1)
+    self.checkarray(f.fwdSens(),-2,"regression")
+    self.checkarray(f.adjSens(),-2,"regression")
+
       
 if __name__ == '__main__':
     unittest.main()

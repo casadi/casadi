@@ -57,15 +57,33 @@ void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       casadi_math<double>::fun[op](input[0][0],input[1][i],output[i]);
       casadi_math<double>::der[op](input[0][0],input[1][i],output[i],tmp);
       
-      // Propagate forward seeds
-      for(int d=0; d<nfwd; ++d){
-        fwdSens[d][i] = tmp[0]*fwdSeed[0][d][0] + tmp[1]*fwdSeed[1][d][i];
-      }
+      if (op==POW && std::isnan(tmp[1])) { // special case to fix issue #104
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          if (fwdSeed[1][d][i]==0) {
+            fwdSens[d][i] = tmp[0]*fwdSeed[0][d][0];
+          } else {
+            fwdSens[d][i] = tmp[0]*fwdSeed[0][d][0] + tmp[1]*fwdSeed[1][d][i]; 
+          }
+        }
 
-      // Propagate adjoint seeds
-      for(int d=0; d<nadj; ++d){
-        adjSens[0][d][0] += adjSeed[d][i]*tmp[0];
-        adjSens[1][d][i] += adjSeed[d][i]*tmp[1];
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          adjSens[0][d][0] += adjSeed[d][i]*tmp[0];
+          if (adjSeed[d][i]!=0)
+            adjSens[1][d][i] += adjSeed[d][i]*tmp[1];
+        }
+      } else {
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          fwdSens[d][i] = tmp[0]*fwdSeed[0][d][0] + tmp[1]*fwdSeed[1][d][i];
+        }
+
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          adjSens[0][d][0] += adjSeed[d][i]*tmp[0];
+          adjSens[1][d][i] += adjSeed[d][i]*tmp[1];
+        }
       }
     }
   }
