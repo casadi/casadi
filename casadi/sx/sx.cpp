@@ -579,7 +579,7 @@ SX SX::pow(const SX& n) const{
     if(nn == 0)
       return 1;
     else if(nn>100 || nn<-100) // maximum depth
-      return SX(new BinarySXNode(POW,*this,nn));
+      return SX(new BinarySXNode(CONSTPOW,*this,nn));
     else if(nn<0) // negative power
       return 1/pow(-nn);
     else if(nn%2 == 1) // odd power

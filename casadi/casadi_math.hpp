@@ -60,7 +60,7 @@ class BinaryOperation{
 /// Enum for quick access to any node
 enum Operation{
   ADD,  SUB,  MUL,  DIV,
-  NEG,  EXP,  LOG,  POW,  
+  NEG,  EXP,  LOG,  POW, CONSTPOW,
   SQRT,  SIN,  COS,  TAN,  
   ASIN,  ACOS,  ATAN,  
   STEP,  
@@ -132,7 +132,7 @@ class UnaryOperation<LOG>{
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=1/x;}
 };
 
-/// Power
+/// Power, defined only for x>=0
 template<>
 class BinaryOperation<POW>{
   public:
@@ -142,7 +142,14 @@ class BinaryOperation<POW>{
     template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*std::pow(x,y-1); d[1]=std::log(x)*f;}
 };
 
-
+/// Power, defined only for y constant
+template<>
+class BinaryOperation<CONSTPOW>{
+  public:
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "pow(" << x << "," << y << ")"; }
+    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = std::pow(x,y);}
+    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*std::pow(x,y-1); d[1]=0;}
+};
 
 /// Square root
 template<>
@@ -334,6 +341,7 @@ std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::getPrintFun(){
   ret[EXP] = BinaryOperation<EXP>::print;
   ret[LOG] = BinaryOperation<LOG>::print;
   ret[POW] = BinaryOperation<POW>::print;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::print;
 
   ret[SQRT] = BinaryOperation<SQRT>::print;
   ret[SIN] = BinaryOperation<SIN>::print;
@@ -377,6 +385,7 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[EXP] = BinaryOperation<EXP>::fcn;
   ret[LOG] = BinaryOperation<LOG>::fcn;
   ret[POW] = BinaryOperation<POW>::fcn;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::fcn;
 
   ret[SQRT] = BinaryOperation<SQRT>::fcn;
   ret[SIN] = BinaryOperation<SIN>::fcn;
@@ -419,6 +428,7 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[EXP] = BinaryOperation<EXP>::der;
   ret[LOG] = BinaryOperation<LOG>::der;
   ret[POW] = BinaryOperation<POW>::der;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::der;
 
   ret[SQRT] = BinaryOperation<SQRT>::der;
   ret[SIN] = BinaryOperation<SIN>::der;

@@ -437,7 +437,11 @@ MX acos(const MX& x){
 }
 
 MX pow(const MX& x, const MX& n){
-  return MX::binary(POW,x,n);
+  if(n->isConstant()){
+    return MX::binary(CONSTPOW,x,n);
+  } else {
+    return MX::binary(POW,x,n);
+  }
 }
 
 MX erf(const MX& x){
