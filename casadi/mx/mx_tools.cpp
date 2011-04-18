@@ -212,6 +212,14 @@ bool isSymbolic(const MX& ex){
   return ex->isSymbolic();
 }
 
+MX repmat(const MX &A, int n, int m){
+  // First concatenate horizontally
+  MX row = horzcat(std::vector<MX >(m, A));
+  
+  // Then vertically
+  return vertcat(std::vector<MX >(n, row));
+}
+
 /**
 MX clip(const MX& A, const CRSSparsity& sp) {
   // Join the sparsity patterns

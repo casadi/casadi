@@ -109,6 +109,9 @@ MX unite(const MX& A, const MX& B);
 /** \brief  check if symbolic */
 bool isSymbolic(const MX& ex);
 
+/** \brief Repeat matrix A n times vertically and m times horizontally */
+MX repmat(const MX &A, int n, int m); 
+
 /** \brief create a clipped view into a matrix
 Create a sparse matrix from a dense matrix A, with sparsity pattern sp
 **/
