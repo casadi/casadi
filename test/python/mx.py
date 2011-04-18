@@ -1178,7 +1178,7 @@ class MXtests(casadiTestCase):
     f.init()
     f.input(0).set([-1])
     f.input(1).set([2])
-    f.fwdSeed().set([1,0])
+    f.fwdSeed().set([1])
     f.adjSeed().set([1])
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),-2,"regression")

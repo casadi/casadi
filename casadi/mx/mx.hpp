@@ -283,7 +283,7 @@ MX fmax(t b){       return std::fmax(*$self,b);} \
 MX prod(t b){       return prod(*$self,b);} \
 MX inner_prod(t b){ return inner_prod(*$self,b);} \
 MX outer_prod(t b){ return outer_prod(*$self,b);} \
-
+MX constpow(t b){    return std::constpow(*$self,b);} \
 
 // Binary operations with all right hand sides
 binops(const MX&)

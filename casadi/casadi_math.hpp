@@ -146,7 +146,7 @@ class BinaryOperation<POW>{
 template<>
 class BinaryOperation<CONSTPOW>{
   public:
-    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "pow(" << x << "," << y << ")"; }
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "constpow(" << x << "," << y << ")"; }
     template<typename T> static void fcn(const T& x, const T& y, T& f){ f = std::pow(x,y);}
     template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*std::pow(x,y-1); d[1]=0;}
 };

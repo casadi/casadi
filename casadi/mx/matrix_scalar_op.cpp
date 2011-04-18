@@ -54,33 +54,18 @@ void MatrixScalarOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       // Evaluate and get partial derivatives
       casadi_math<double>::fun[op](input[0][i],input[1][0],output[i]);
       casadi_math<double>::der[op](input[0][i],input[1][0],output[i],tmp);
-      if (op==POW && std::isnan(tmp[1])) { // special case to fix issue #104
-        // Propagate forward seeds
-        for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i];
 
-          if (fwdSeed[1][d][0]!=0)
-            fwdSens[d][i]+= tmp[1]*fwdSeed[1][d][0];
-        }
-
-        // Propagate adjoint seeds
-        for(int d=0; d<nadj; ++d){
-          adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
-          if (adjSeed[d][i]!=0)
-            adjSens[1][d][0] += adjSeed[d][i]*tmp[1];
-        }
-      } else {
-        // Propagate forward seeds
-        for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i] + tmp[1]*fwdSeed[1][d][0];
-        }
-
-        // Propagate adjoint seeds
-        for(int d=0; d<nadj; ++d){
-          adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
-          adjSens[1][d][0] += adjSeed[d][i]*tmp[1];
-        }
+      // Propagate forward seeds
+      for(int d=0; d<nfwd; ++d){
+        fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i] + tmp[1]*fwdSeed[1][d][0];
       }
+
+      // Propagate adjoint seeds
+      for(int d=0; d<nadj; ++d){
+        adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
+        adjSens[1][d][0] += adjSeed[d][i]*tmp[1];
+      }
+     
     }
   }
 }

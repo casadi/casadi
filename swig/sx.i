@@ -25,6 +25,14 @@
   std::string __str__(){ return CasADi::getDescription(*$self); }
 };
 
+%pythoncode %{
+try:
+  import numpy
+  constpow=numpy.frompyfunc(lambda x,y: x.constpow(y),2,1)
+except:
+  pass
+%}
+
 namespace CasADi {
   %extend Matrix<double> {
   

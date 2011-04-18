@@ -663,7 +663,7 @@ class SXtests(casadiTestCase):
     f.adjSeed().set([1])
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),-2,"regression")
-    self.checkarray(f.adjSens(),-2,"regression")
+    self.checkarray(f.adjSens()[0],-2,"regression")
     
 if __name__ == '__main__':
     unittest.main()
