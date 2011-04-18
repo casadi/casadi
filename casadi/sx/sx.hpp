@@ -192,7 +192,8 @@ class SX{
     SX fmin(const SX &b) const;
     SX fmax(const SX &b) const;
     SX pow(const SX& n) const;
-  
+    SX constpow(const SX& n) const;
+    
   private:
 #ifndef SWIG
     SXNode* node;
@@ -267,6 +268,7 @@ class casadi_operators<SX>{
     static SX exp(const SX&x);
     static SX log(const SX&x);
     static SX pow(const SX&x, const SX&y);
+    static SX constpow(const SX&x, const SX&y);
     static SX sqrt(const SX&x);
     static SX sin(const SX&x);
     static SX cos(const SX&x);
@@ -375,6 +377,7 @@ namespace std{
   inline SX exp(const SX &x){return x.exp();}
   inline SX log(const SX &x){return x.log();}
   inline SX pow(const SX &x, const SX &n){ return x.pow(n);}
+  inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
   inline SX abs(const SX &x){return x.fabs();}
   inline SX fabs(const SX &x){return x.fabs();}
   inline SX floor(const SX &x){return x.floor();}

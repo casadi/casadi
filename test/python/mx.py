@@ -1156,6 +1156,34 @@ class MXtests(casadiTestCase):
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),matrix([0,0]).T,"regression")
     self.checkarray(f.adjSens(),matrix([0,0]).T,"regression")
+    
+    x = MX("x")
+    y = MX("y")
+
+    F = x**y
+
+    f = MXFunction([x,y],[F])
+    f.init()
+    f.input(0).set([-1])
+    f.input(1).set([2])
+    f.fwdSeed().set([1])
+    f.adjSeed().set([1])
+    f.evaluate(1,1)
+    self.assertTrue(isnan(f.fwdSens()[0]))
+    self.assertTrue(isnan(f.adjSens(1)[0]))
+    
+    F = constpow(x,y)
+
+    f = MXFunction([x,y],[F])
+    f.init()
+    f.input(0).set([-1])
+    f.input(1).set([2])
+    f.fwdSeed().set([1,0])
+    f.adjSeed().set([1])
+    f.evaluate(1,1)
+    self.checkarray(f.fwdSens(),-2,"regression")
+    self.checkarray(f.adjSens(),-2,"regression")
+    
 if __name__ == '__main__':
     unittest.main()
 

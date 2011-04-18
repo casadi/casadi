@@ -471,6 +471,10 @@ SX casadi_operators<SX>::pow(const SX&x, const SX&y){
   return x.pow(y);
 }
 
+SX casadi_operators<SX>::constpow(const SX&x, const SX&y){
+  return x.constpow(y);
+}
+
 SX casadi_operators<SX>::sin(const SX&x){ 
   return x.sin();
 }
@@ -597,6 +601,10 @@ SX SX::pow(const SX& n) const{
   } else {
     return SX(new BinarySXNode(POW,*this,n));
   }
+}
+
+SX SX::constpow(const SX& n) const{
+  return SX(new BinarySXNode(CONSTPOW,*this,n));
 }
 
 } // namespace CasADi

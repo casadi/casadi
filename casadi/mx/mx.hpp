@@ -246,6 +246,7 @@ MX acos(const MX &x);
 MX exp(const MX &x);
 MX log(const MX &x);
 MX pow(const MX &x, const MX &n);
+MX constpow(const MX &x, const MX &n);
 MX abs(const MX &x);
 MX fabs(const MX &x); // same as abs
 MX floor(const MX &x);

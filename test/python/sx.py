@@ -624,8 +624,46 @@ class SXtests(casadiTestCase):
     
     test(mtaylor(sin(x+y),[x,y],[0,0],4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
     
+  def test_issue104(self):
+    self.message("regression test #104")
+    x = SX("x")
+
+    F = x**2
+
+    f = SXFunction([x],[F])
+    f.init()
+    f.input().set([-1])
+    f.fwdSeed().set([1])
+    f.adjSeed().set([1])
+    f.evaluate(1,1)
+    self.checkarray(f.fwdSens(),-2,"regression")
+    self.checkarray(f.adjSens(),-2,"regression")
     
     
+    y=SX("y")
+    
+    F=x**y
+    f = SXFunction([[x,y]],[F])
+    f.init()
+    f.input().set([-1,2])
+    f.fwdSeed().set([1,0])
+    f.adjSeed().set([1])
+    f.evaluate(1,1)
+
+    self.assertTrue(isnan(f.fwdSens()[0]))
+    self.assertTrue(isnan(f.adjSens()[1]))
+
+    y=SX("y")
+    
+    F=constpow(x,y)
+    f = SXFunction([[x,y]],[F])
+    f.init()
+    f.input().set([-1,2])
+    f.fwdSeed().set([1,0])
+    f.adjSeed().set([1])
+    f.evaluate(1,1)
+    self.checkarray(f.fwdSens(),-2,"regression")
+    self.checkarray(f.adjSens(),-2,"regression")
     
 if __name__ == '__main__':
     unittest.main()

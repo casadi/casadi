@@ -444,6 +444,10 @@ MX pow(const MX& x, const MX& n){
   }
 }
 
+MX constpow(const MX& x, const MX& n){
+  return MX::binary(CONSTPOW,x,n);
+}
+
 MX erf(const MX& x){
   return MX::unary(ERF,x);
 }
