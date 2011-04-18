@@ -574,22 +574,26 @@ SX SX::fmax(const SX &b) const{
 }
 
 SX SX::pow(const SX& n) const{
-  if (n->isInteger()){
-    int nn = n->getIntValue();
-    if(nn == 0)
-      return 1;
-    else if(nn>100 || nn<-100) // maximum depth
-      return SX(new BinarySXNode(CONSTPOW,*this,nn));
-    else if(nn<0) // negative power
-      return 1/pow(-nn);
-    else if(nn%2 == 1) // odd power
-      return *this*pow(nn-1);
-    else{ // even power
-      SX rt = pow(nn/2);
-      return rt*rt;
+  if(n->isConstant()) {
+    if (n->isInteger()){
+      int nn = n->getIntValue();
+      if(nn == 0)
+        return 1;
+      else if(nn>100 || nn<-100) // maximum depth
+        return SX(new BinarySXNode(CONSTPOW,*this,nn));
+      else if(nn<0) // negative power
+        return 1/pow(-nn);
+      else if(nn%2 == 1) // odd power
+        return *this*pow(nn-1);
+      else{ // even power
+        SX rt = pow(nn/2);
+        return rt*rt;
+      }
+    } else if(n->getValue()==0.5){
+      return sqrt();
+    } else {
+      return SX(new BinarySXNode(CONSTPOW,*this,n));
     }
-  } if(n->isConstant() && n->getValue()==0.5) {
-    return sqrt();
   } else {
     return SX(new BinarySXNode(POW,*this,n));
   }
