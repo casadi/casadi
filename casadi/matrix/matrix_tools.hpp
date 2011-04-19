@@ -250,7 +250,13 @@ Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y){
 
 template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(x.size2() == y.size1(),"prod: dimension mismatch");
+  if (x.size2() != y.size1()) {
+    std::stringstream ss;
+    ss << "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl;
+    ss << "with (" << y.size1() << " x " << y.size2() << ") matrix." << std::endl;
+    throw CasadiException(ss.str());
+  }
+
   
   // Find the mapping corresponding to the transpose of y (no need to form the transpose explicitly)
   std::vector<int> y_trans_map;
