@@ -109,6 +109,22 @@ void CVodesInternal::init(){
   ny_ = f_.output().numel();
   nq_ = q_.isNull() ? 0 : q_.output().numel();
   
+  // We only allow for 0-D time
+  if (f_.input(ODE_T).numel()!=1) {
+      stringstream ss;
+      ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(ODE_T).size1() << 'x' << f_.input(ODE_T).size2() << ")";
+      throw CasadiException(ss.str());
+  }
+  
+  // States and RHS should match
+  if (f_.output(ODE_RHS).size()!=f_.input(ODE_Y).size()) {
+      stringstream ss;
+      ss << "IntegratorInternal: rhs of ODE is (" <<  f_.output(ODE_RHS).size1() << 'x' << f_.output(ODE_RHS).size2() << ") - " << f_.output(ODE_RHS).size() << " non-zeros" << std::endl;
+      ss << "              ODE state matrix is (" <<  f_.input(ODE_Y).size1() << 'x' << f_.input(ODE_Y).size2() << ") - " << f_.input(ODE_Y).size() << " non-zeros" << std::endl;
+      ss << "Mismatch between number of non-zeros" << std::endl;
+      throw CasadiException(ss.str());
+  }
+  
   IntegratorInternal::init();
  
   // Read options

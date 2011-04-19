@@ -30,10 +30,20 @@
 namespace CasADi{
 
 /// Input arguments of an explicit ODE right hand side
-enum ODEInput{ODE_T, ODE_Y, ODE_P, ODE_NUM_IN};
+enum ODEInput{
+  /** Time. Must be 1-by-1 */
+  ODE_T,
+  /** State vector (matrix). Should have same amount of non-zeros as ODEOutput:ODE_RHS */
+  ODE_Y,
+  /** Parameter vector (matrix). */
+  ODE_P,
+  ODE_NUM_IN};
 
 /// Output arguments of an explicit ODE right hand side
-enum ODEOutput{ODE_RHS, ODE_NUM_OUT};
+enum ODEOutput{
+/** Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y */
+ODE_RHS,
+ODE_NUM_OUT};
 
 /// Input arguments of an DAE residual function
 enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
