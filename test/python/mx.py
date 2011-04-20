@@ -1184,6 +1184,17 @@ class MXtests(casadiTestCase):
     self.checkarray(f.fwdSens(),-2,"regression")
     self.checkarray(f.adjSens(),-2,"regression")
     
+  def test_issue107(self):
+    self.message("Regression test for issue 107: +=")
+    x=MX("x")
+    y=MX("y")
+
+    z=x
+    z+=y
+    
+    self.assertTrue(isSymbolic(x))
+    self.assertFalse(isSymbolic(z))
+    
 if __name__ == '__main__':
     unittest.main()
 

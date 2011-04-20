@@ -211,7 +211,7 @@ class SXtests(casadiTestCase):
 
 
   def test_SXMatrixslicing(self):
-      self.message("SXMatrix slicing")
+      self.message("SXMatrix slicing/indexing")
       x=symbolic("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
 
@@ -230,6 +230,10 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
       self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]")
       self.numpyEvaluationCheck(lambda x: x[0][[0,2,3]], lambda x: matrix([x[0,0],x[1,0],x[1,1]]).T,[x],x0,name="x[[0,2,3]]")
+      
+      myarray=array([0,2,3])
+      mylist=list(myarray)
+      #self.numpyEvaluationCheck(lambda x: x[0][mylist], lambda x: matrix([x[0,0],x[1,0],x[1,1]]).T,[x],x0,name="x[[0,2,3]]")
       #self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x)[0:2,0],[x],x0,name="x[0:2] on dense matrix")
       self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(x.ravel()[1]).T,[x],x0,name="x[1]")
       self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1]")
@@ -664,6 +668,26 @@ class SXtests(casadiTestCase):
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),-2,"regression")
     self.checkarray(f.adjSens()[0],-2,"regression")
+
+  def test_issue107(self):
+    self.message("Regression test for issue 107: +=")
+    x=SX("x")
+    y=SX("y")
+
+    z=x
+    z+=y
+    
+    self.assertTrue(isSymbolic(x))
+    self.assertFalse(isSymbolic(z))
+    
+    x=symbolic("x")
+    y=symbolic("y")
+
+    z=x
+    z+=y
+    
+    self.assertTrue(isSymbolic(x))
+    self.assertFalse(isSymbolic(z))
     
 if __name__ == '__main__':
     unittest.main()
