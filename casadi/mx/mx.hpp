@@ -138,7 +138,7 @@ class MX : public SharedObject{
     Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
-    
+  #ifndef SWIG  
   //@{
   /** \brief  Operators that changes the object */
     MX& operator+=(const MX &y);
@@ -147,7 +147,7 @@ class MX : public SharedObject{
     MX& operator/=(const MX &y);
   //@}
 
-  #ifndef SWIG
+
   //@{
   /** \brief  Operators */
     friend MX operator+(const MX &x, const MX &y);
