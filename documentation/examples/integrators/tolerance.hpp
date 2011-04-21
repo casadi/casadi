@@ -9,7 +9,7 @@
 * \code
 * CasADi::Sundials::CVodesIntegrator();
 * CasADi::Simulator();
-* CasADi::ODEInput;
+* CasADi::ODEInput
 * \endcode
 *
 */

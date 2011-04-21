@@ -2,7 +2,7 @@
 Grabs the pdf-compiled examples and puts them in the API tree.
 """
 
-src = '../examples/python/'
+src = '../examples/'
 xml = 'XML/index.xml'
 
 import re
@@ -28,6 +28,3 @@ for example in examples:
       pass
     shutil.copyfile(src+m.group(1) + '.pdf','html/'+path+m.group(1) + '.pdf')
     print m.group(1) + '.pdf'
-  
-  
-
