@@ -35,7 +35,7 @@ namespace CasADi{
   namespace OptimalControl{
 
 OCP::OCP(){
-  variables = Variable("variables");
+  variables = Variable("variables",false);
 }
 
 void OCP::repr(ostream &stream) const{

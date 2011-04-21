@@ -56,10 +56,10 @@ namespace CasADi{
     Variable();
 
     /// Create a new variable
-    explicit Variable(const std::string& name);
+    explicit Variable(const std::string& name, bool create_expression = true);
     
     /// Destructor
-    ~Variable();
+    virtual ~Variable();
         
     /// Get the scalar expression or binding expression
     SX sx() const;

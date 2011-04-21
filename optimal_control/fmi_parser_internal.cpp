@@ -103,8 +103,7 @@ cout << "vars" << endl;
   map<string,int> catCounter;
   
   // Time
-  Variable time("time");
-  time.setExpression(SX("time"));
+  Variable time("time",true);
   time.setIndependent(true);
   ocp_.variables->add(time);
   
@@ -147,7 +146,7 @@ cout << "vars" << endl;
       if(!var->has(namepart)){
         stringstream fullname;
         fullname << var << "." << namepart;
-        var->add(Variable(fullname.str()),namepart);
+        var->add(Variable(fullname.str(),false),namepart);
       }
       
       var = var(namepart);
@@ -164,7 +163,7 @@ cout << "vars" << endl;
         if(var[ind].isNull()){
           stringstream fullname;
           fullname << var << "[" << ind << "]";
-          var->col.at(ind-1) = Variable(fullname.str());
+          var->col.at(ind-1) = Variable(fullname.str(),false);
         }
 
         // Go to the sub-collection

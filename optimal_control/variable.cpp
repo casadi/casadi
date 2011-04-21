@@ -30,8 +30,11 @@ namespace OptimalControl{
 Variable::Variable(){
 }
 
-Variable::Variable(const string& name){
+Variable::Variable(const string& name, bool create_expression){
   assignNode(new VariableInternal(name));
+  if(create_expression){
+    setExpression(SX(name));
+  }
 }
 
 

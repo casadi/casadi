@@ -75,7 +75,7 @@ enum CollocationPoints{LEGENDRE,RADAU};
   // Sort the equations in an order which is consistent with the variable sorting and save to the variable structure
 //  void sortEquations(OCP& ocp, const std::vector<SX>& dae);
 
-  
+  /// Sort equations in 
   
   
   
