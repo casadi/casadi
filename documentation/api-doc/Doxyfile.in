@@ -586,7 +586,8 @@ INPUT                  = ../../casadi \
                          ../../modelica \
                          ../../optimal_control \
                          ./doxygen-tutorial \
-                         ../examples/python
+                         ../examples/python \
+                         extra
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
