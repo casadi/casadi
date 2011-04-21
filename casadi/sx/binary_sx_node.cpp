@@ -28,46 +28,55 @@ using namespace std;
 namespace CasADi{
 
 BinarySXNode::~BinarySXNode(){
-#if 0
+  // Start destruction method if any of the dependencies has dependencies
   for(int c=0; c<2; ++c){
-    if(child[c]->isBinary()){
-      if(--child[c].node->count == 0){
-        // Do not delete directly, add to a stack instead
-        stack<BinarySXNode*> s;
-        s.push((BinarySXNode*)child[c].node);
+    if(child[c]->hasDep()){
+      // Check if there are other "owners" of the node
+      if(child[c]->count != 1){
+        
+        // Replace with a nan-node
+        child[c] = casadi_limits<SX>::nan;
+      } else {
+      
+        // Create stack of nodes to be deleted
+        stack<SX> s;
 
-        // Process the stack
+        // Add the child
+        s.push(child[c]);
+        child[c] = casadi_limits<SX>::nan;
+        
+        // Process stack
         while(!s.empty()){
-          BinarySXNode* t = s.top();
-          // Delete the nodes of both children
-          for(int cc=0; cc<2; ++cc){
-            if(t->child[cc]->isBinary()){
-              if(--t->child[cc].node->count == 0){ // "delete"
-                // Add to delete stack
-                s.push((BinarySXNode*)t->child[cc].node);
+          // Top element
+          SX t = s.top();
+          
+          // Check if the top element has dependencies with dependencies
+          bool found_dep = false;
+          for(int i=0; i<t->ndep(); ++i){
+            if(t->dep(i)->hasDep()){
+              // Check if this is the only reference to the element
+              if(t->dep(i)->count==1){
+                // Remove and add to stack
+                s.push(t->dep(i));
+                t->dep(i) = casadi_limits<SX>::nan;
+                found_dep = true;
+                break;
+              } else {
+                // Replace with an element without dependencies
+                t->dep(i) = casadi_limits<SX>::nan;
               }
-              // Replace the binary node with a nan-node
-              t->child[cc].node = casadi_limits<SX>::nan.node;
-              t->child[cc].node->count++;
             }
           }
           
-          // If the node is still on the top, delete it
-          if(t==s.top()){
-            delete t;
+          // Pop from stack if no dependencies found
+          if(!found_dep){
             s.pop();
           }
         }
       }
-      
-      // Replace the binary node with a nan-node
-      child[c].node = casadi_limits<SX>::nan.node;
-      child[c].node->count++;
     }
   }
-#endif  
 }
-
   
 void BinarySXNode::print(ostream &stream) const{
   stringstream s0,s1;
