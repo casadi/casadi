@@ -23,7 +23,7 @@ $(PDF): %.pdf : %.py $(CASADI_OBJECT)
 	rm _temp.py
 	mv _temp.pdf $@
 	
-$(EXE): %.run : %.cc $(BUILDDIR)/bin/ctemplate
+$(EXE): %.run : %.cc $(BUILDDIR)/bin/ctemplate ctemplate/compiler.sh ctemplate/linker.sh
 	cp $< _temp.cc
 	ctemplate/compiler.sh _temp
 	ctemplate/linker.sh _temp
@@ -32,3 +32,7 @@ $(EXE): %.run : %.cc $(BUILDDIR)/bin/ctemplate
 	
 $(LOG): %.log : %.run
 	$< > $@ 2>&1
+	
+	
+ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make
+	cd ctemplate && python ctemplate.py && chmod +x compiler.sh linker.sh && cd ..
