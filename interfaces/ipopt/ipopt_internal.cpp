@@ -471,6 +471,10 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
     F_.getOutput(obj_value);
 
     // Printing
+    if(monitored("eval_x"))
+      cout << "x = " << F_.input() << endl;
+      
+    // Printing
     if(monitored("eval_f")){
       cout << "obj_value = " << obj_value << endl;
     }
@@ -484,6 +488,7 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
     cerr << "eval_f failed: " << ex.what() << endl;
     return false;
   }
+    
 }
 
 bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
@@ -504,6 +509,8 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
     // Ge the result
     G_.getOutput(g);
 
+    if(monitored("eval_x"))
+      cout << "x = " << G_.input() << endl;
     // Printing
     if(monitored("eval_g"))
       cout << "g = " << G_.output() << endl;
