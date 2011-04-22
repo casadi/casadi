@@ -3,7 +3,7 @@ Grabs the pdf-compiled examples and puts them in the API tree.
 """
 
 xml = 'XML/'
-out = 'extra/options.hpp'
+out = 'extra/'
 
 import re
 import shutil
@@ -28,6 +28,8 @@ classes = xmlData.findall("//compound[@kind='class']")
 # hasInternal - (optional) the internal class of this class (the relative path to the xml file)
 # InternalFor - the list of classes for which this class is internal
 # options     - a list of dicts denoting the class's options
+# monitors    - a list of dicts denoting the class's monitorables
+# stats       - a list of dicts denoting the class's stats
 metadata=dict()
 
 # Text-parsing to fill in 'parents','file','hasInternal'
@@ -97,6 +99,8 @@ for name,meta in metadata.items():
     continue
   source = re.sub(r'\.hpp$',r'.cpp',meta['file'])
   meta['options']={}
+  meta['stats']={}
+  meta['monitors']={}
   f =file(source,"r")
   for l in f:
     if not(l.find('addOption')==-1):
@@ -108,8 +112,17 @@ for name,meta in metadata.items():
         if not(m.group(5) is None):
           description.append(m.group(5))
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': m.group(3),'description': '\n'.join(description), 'used': name}
-  if len(meta['options'])==0:
-    del meta['options']
+    if not(l.find('stats_')==-1):
+      m = re.search(r'stats_\["(.*?)"\]',l)
+      if m:
+        meta['stats'][m.group(1)]={'name': m.group(1), 'used': name}
+    if not(l.find('monitored')==-1):
+      m = re.search(r'monitored\("(.*?)"\)',l)
+      if m:
+        meta['monitors'][m.group(1)]={'name': m.group(1), 'used': name}
+  for k in ['options','stats','monitors']:
+    if len(meta[k])==0:
+      del meta[k]
   f.close()
   
 
@@ -118,9 +131,15 @@ print metadata['CasADi::Sundials::CVodesInternal']
 def optionsashtml(option):
   return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],option['description'],option['used'])
 
-f = file(out,'w')
+def statsashtml(stat):
+  return "<tr><td>%s</td><td>%s</td></tr>" %(stat['name'],stat['used'])
 
-# Print out doxygen information
+def monitorsashtml(monitor):
+  return "<tr><td>%s</td><td>%s</td></tr>" %(monitor['name'],monitor['used'])
+
+f = file(out+'options.hpp','w')
+
+# Print out doxygen information - options
 for name,meta in metadata.items():
   if not('options' in meta):
     continue
@@ -142,7 +161,67 @@ for name,meta in metadata.items():
     f.write("<table>\n")
     f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
     for k in myoptionskeys :
-      f.write(optionsashtml(meta['options'][k])+"\n")
+      f.write(optionsashtml(alloptions[k])+"\n")
+    f.write( "</table>\n")
+    f.write( "*/\n")
+
+f.close()
+
+f = file(out+'stats.hpp','w')
+
+# Print out doxygen information - stats
+for name,meta in metadata.items():
+  if not('stats' in meta):
+    continue
+
+  allstats = meta['stats']
+  for a in meta['hierarchy']:
+    if 'stats' in metadata[a]:
+      allstats.update(metadata[a]['stats'])
+  
+  mystatskeys = allstats.keys()
+  mystatskeys.sort()
+  
+  targets = [name]
+  if 'InternalFor' in meta:
+    targets+=meta['InternalFor']
+  for t in targets:
+    f.write("/** \class %s\n" % t)
+    f.write("List of available stats\n")
+    f.write("<table>\n")
+    f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
+    for k in mystatskeys :
+      f.write(statsashtml(allstats[k])+"\n")
+    f.write( "</table>\n")
+    f.write( "*/\n")
+
+f.close()
+
+f = file(out+'monitors.hpp','w')
+
+# Print out doxygen information - monitors
+for name,meta in metadata.items():
+  if not('monitors' in meta):
+    continue
+
+  allmonitors = meta['monitors']
+  for a in meta['hierarchy']:
+    if 'monitors' in metadata[a]:
+      allmonitors.update(metadata[a]['monitors'])
+  
+  mymonitorskeys = allmonitors.keys()
+  mymonitorskeys.sort()
+  
+  targets = [name]
+  if 'InternalFor' in meta:
+    targets+=meta['InternalFor']
+  for t in targets:
+    f.write("/** \class %s\n" % t)
+    f.write("List of available monitors\n")
+    f.write("<table>\n")
+    f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
+    for k in mymonitorskeys :
+      f.write(monitorsashtml(allmonitors[k])+"\n")
     f.write( "</table>\n")
     f.write( "*/\n")
 

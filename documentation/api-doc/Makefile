@@ -3,8 +3,8 @@ all:
 
 full:
 	doxygen Doxyfile.in
-	python generate_options_doc.py
-	python fetch_examples_pdf.py
+	python extra/generate_options_doc.py
+	python extra/fetch_examples_pdf.py
 	doxygen Doxyfile.in
 
 publish: 
