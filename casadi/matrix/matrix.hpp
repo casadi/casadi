@@ -346,7 +346,12 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix<T> __sub__(const Matrix<T> &y) const;
     Matrix<T> __mul__(const Matrix<T> &y) const;
     Matrix<T> __div__(const Matrix<T> &y) const;
-    Matrix<T> __pow__(const Matrix<T>& y) const;
+    Matrix<T> __pow__(const Matrix<T> &y) const;
+    Matrix<T> __radd__(const Matrix<T> &y) const {return y.__add__(*this);}
+    Matrix<T> __rsub__(const Matrix<T> &y) const {return y.__sub__(*this);}
+    Matrix<T> __rmul__(const Matrix<T> &y) const {return y.__mul__(*this);}
+    Matrix<T> __rdiv__(const Matrix<T> &y) const {return y.__div__(*this);}
+    Matrix<T> __rpow__(const Matrix<T> &y) const {return y.__pow__(*this);}
     //@}
 
 #ifndef SWIG
@@ -375,6 +380,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix<T>& operator/=(const Matrix<T> &y){return *this = this->__div__(y);}
 #endif // SWIG
     //@{
+    
     /// Python operator overloading
     Matrix<T> __pow__ (const T& b) const{ return __pow__(Matrix<T>(b));}
     Matrix<T> __rpow__(const T& b) const{ return Matrix<T>(b).__pow__(*this);}

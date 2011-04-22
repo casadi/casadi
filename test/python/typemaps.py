@@ -113,6 +113,71 @@ class typemaptests(casadiTestCase):
 
     #print DMatrix(array([1,2,3,6]),2,2).toArray()
     
+  def test_autoconversion(self):
+    self.message("Auto conversion")
+    x=array([2.3])
+    s = DMatrix([[1,2],[3,4]])
+    n = array(s)
+    
+    self.checkarray(x[0]*s,s*x[0],"")
+    self.checkarray(x[0]*s,n*x[0],"")
+    
+    self.checkarray(x[0]/s,1/(s/x[0]),"")
+    self.checkarray(x[0]/s,x[0]/n,"")
+    
+    self.checkarray(x[0]-s,-(s-x[0]),"")
+    self.checkarray(x[0]-s,x[0]-n,"")
+    
+    self.checkarray(x[0]+s,s+x[0],"")
+    self.checkarray(x[0]+s,x[0]+n,"")
+    
+    w=array([2.3])[0]
+    w+=s
+    self.checkarray(w,2.3+n,"")
+
+    w=array([2.3])[0]
+    w-=s
+    self.checkarray(w,2.3-n,"")
+    
+    w=array([2.3])[0]
+    w*=s
+    self.checkarray(w,2.3*n,"")
+    
+    w=array([2.3])[0]
+    w/=s
+    #self.checkarray(w,2.3/n,"")
+    
+    x=[2.3]
+
+    self.checkarray(x[0]*s,s*x[0],"")
+    self.checkarray(x[0]*s,n*x[0],"")
+    
+    self.checkarray(x[0]/s,1/(s/x[0]),"")
+    self.checkarray(x[0]/s,x[0]/n,"")
+    
+    self.checkarray(x[0]-s,-(s-x[0]),"")
+    self.checkarray(x[0]-s,x[0]-n,"")
+    
+    self.checkarray(x[0]+s,s+x[0],"")
+    self.checkarray(x[0]+s,x[0]+n,"")
+    
+    
+    w=2.3
+    w+=s
+    self.checkarray(w,2.3+n,"")
+    
+    w=2.3
+    w-=s
+    self.checkarray(w,2.3-n,"")
+    
+    w=2.3
+    w*=s
+    self.checkarray(w,2.3*n,"")
+    
+    w=2.3
+    w/=s
+    self.checkarray(w,2.3/n,"")
+    
   def test_set(self):
     self.message("DMatrix set on dense matrices")
     
@@ -186,6 +251,7 @@ class typemaptests(casadiTestCase):
     D=DMatrix([7,13])
     N=matrix([7,13]).T
     
+    print "sfds"
     self.assertTrue(isinstance(N+D,DMatrix))
     self.assertTrue(isinstance(D+N,DMatrix))
     

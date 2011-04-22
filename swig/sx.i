@@ -144,31 +144,25 @@ namespace CasADi {
       def __ge__(self,other):
         return _casadi.__ge__(self,other)
     %}
-    
     // These methods must be added since the implicit type cast does not work
-    Matrix<SX> __pow__ (double b) const{ return $self->__pow__(CasADi::Matrix<CasADi::SX>(b));}
-    Matrix<SX> __rpow__(double b) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(*$self);}
-    Matrix<SX> __add__ (double b) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);}
-    Matrix<SX> __radd__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;}
-    Matrix<SX> __sub__ (double b) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);}
-    Matrix<SX> __rsub__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;}
-    Matrix<SX> __mul__ (double b) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);}
-    Matrix<SX> __rmul__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;}
-    Matrix<SX> __div__ (double b) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);}
-    Matrix<SX> __rdiv__(double b) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
+    # define binopsT(T) \
+    Matrix<SX> __pow__ (T) const{ return $self->__pow__(CasADi::Matrix<CasADi::SX>(b));} \
+    Matrix<SX> __rpow__(T) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(*$self);} \
+    Matrix<SX> __add__ (T) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);} \
+    Matrix<SX> __radd__(T) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;} \
+    Matrix<SX> __sub__ (T) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);} \
+    Matrix<SX> __rsub__(T) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;} \
+    Matrix<SX> __mul__ (T) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);} \
+    Matrix<SX> __rmul__(T) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;} \
+    Matrix<SX> __div__ (T) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);} \
+    Matrix<SX> __rdiv__(T) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
 
-    // These methods must be added since the implicit type cast does not work
-    Matrix<SX> __pow__ (const Matrix<SX>& b) const{ return $self->__pow__(b);}
-    Matrix<SX> __rpow__(const Matrix<SX>& b) const{ return b.__pow__(*$self);}
-    Matrix<SX> __add__ (const Matrix<SX>& b) const{ return *$self + b;}
-    Matrix<SX> __radd__(const Matrix<SX>& b) const{ return b + *$self;}
-    Matrix<SX> __sub__ (const Matrix<SX>& b) const{ return *$self - b;}
-    Matrix<SX> __rsub__(const Matrix<SX>& b) const{ return b - *$self;}
-    Matrix<SX> __mul__ (const Matrix<SX>& b) const{ return *$self * b;}
-    Matrix<SX> __rmul__(const Matrix<SX>& b) const{ return b * *$self;}
-    Matrix<SX> __div__ (const Matrix<SX>& b) const{ return *$self / b;}
-    Matrix<SX> __rdiv__(const Matrix<SX>& b) const{ return b / *$self;}
+    binopsT(double b)
+    binopsT(const Matrix<double>& b)
     
+    #undef binopsT
+    
+
     %pythoncode %{
         @property
         def shape(self):
@@ -200,13 +194,16 @@ namespace CasADi {
     
   %pythoncode %{
   def __array_wrap__(self,out_arr,context=None):
-      name = context[0].__name__
-      if not(hasattr(self,name)):
-        name = '__' + name + '__'
-      if context[-1]==1:
-        name = '__r' + context[0].__name__ + '__'
-      fun=getattr(self, name)
-      return fun(*context[1][0:-1])
+        name = context[0].__name__
+        conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
+        if name in conversion:
+          name = conversion[name]
+        if len(context[1])==2 and context[1][1] is self:
+          name = 'r' + name
+        if not(hasattr(self,name)):
+          name = '__' + name + '__'
+        fun=getattr(self, name)
+        return fun(*context[1][0:-1])
   %}
 
   %pythoncode %{

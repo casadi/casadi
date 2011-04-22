@@ -38,13 +38,16 @@ namespace CasADi{
 
 %pythoncode %{
   def __array_wrap__(self,out_arr,context=None):
-      name = context[0].__name__
-      if not(hasattr(self,name)):
-        name = '__' + name + '__'
-      if context[-1]==1:
-        name = '__r' + context[0].__name__ + '__'
-      fun=getattr(self, name)
-      return fun(*context[1][0:-1])
+    name = context[0].__name__
+    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
+    if name in conversion:
+      name = conversion[name]
+    if len(context[1])==2 and context[1][1] is self:
+      name = 'r' + name
+    if not(hasattr(self,name)):
+      name = '__' + name + '__'
+    fun=getattr(self, name)
+    return fun(*context[1][0:-1])
 %}
 
 // The following code has some trickery to fool numpy ufunc.
