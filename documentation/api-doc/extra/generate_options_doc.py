@@ -112,6 +112,15 @@ for name,meta in metadata.items():
         if not(m.group(5) is None):
           description.append(m.group(5))
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': m.group(3),'description': '\n'.join(description), 'used': name}
+    if not(l.find('addOption')==-1):
+      m = re.search(r'addOption\(\s*"(.*?)"\s*,\s*(.*?)\s*\)\s*;(\s*// (.*))',l)
+      if m:
+        description=m.group(4)
+        meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': '','description': description, 'used': name}
+    if not(l.find('ops_')==-1):
+      m = re.search(r'ops_\["(.*?)"\]\s*=\s*(.*?);',l)
+      if m:
+        meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': '','description': '', 'used': name}
     if not(l.find('stats_')==-1):
       m = re.search(r'stats_\["(.*?)"\]',l)
       if m:
