@@ -37,17 +37,6 @@ class KinsolInternal;
 * You can provide an initial guess by setting output(0).\n
 * A good initial guess may be needed to avoid errors like "The linear solver's setup function failed in an unrecoverable manner."
 *
-* Available options:\n
-* addOption("linear_solver", OT_STRING, "dense");\n
-  addOption("upper_bandwidth", OT_INTEGER);\n
-  addOption("lower_bandwidth", OT_INTEGER);\n
-  addOption("max_krylov", OT_INTEGER, 0);\n
-  addOption("exact_jacobian", OT_BOOLEAN, true);\n
-  addOption("iterative_solver",OT_STRING,"gmres");\n
-  addOption("f_scale",OT_REALVECTOR); Scaling factors on equations\n
-  addOption("u_scale",OT_REALVECTOR); Scaling factors on variables\n
-  addOption("constraints",OT_INTEGERVECTOR);\n
-  
   The constraints option expects an integer entry for each variable u:\n
     
   0 then no constraint is imposed on u. \n
