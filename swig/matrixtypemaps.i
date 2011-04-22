@@ -188,7 +188,7 @@ namespace CasADi{
 }
 
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<double> & {
+%typemap(typecheck,precedence=PRECEDENCE_DMatrix) const Matrix<double> & {
     PyObject* p = $input;
     // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
     if ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) {

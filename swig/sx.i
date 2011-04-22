@@ -10,6 +10,15 @@
 %include "casadi/matrix/matrix.hpp"
 %include "casadi/sx/sx.hpp"
 
+
+%extend CasADi::CRSSparsity{
+    %pythoncode %{
+        @property
+        def shape(self):
+            return (self.size1(),self.size2())
+    %}
+};
+
 %extend std::vector<CasADi::SX>{
   std::string __repr__(){ return CasADi::getRepresentation(*$self); }
   std::string __str__(){ return CasADi::getDescription(*$self); }
@@ -588,7 +597,7 @@ matching on SXMatrix is prohibited as per wish of Joel
   }
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector< Matrix<SX> > & {
+%typemap(typecheck,precedence=PRECEDENCE_SXMatrixVector) const std::vector< Matrix<SX> > & {
     if (couldbeSXMatrixVector($input)) {
       $1 = 1;
     } else {
@@ -616,7 +625,7 @@ matching on SXMatrix is prohibited as per wish of Joel
 }
 
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const Matrix<SX> & {
+%typemap(typecheck,precedence=PRECEDENCE_SXMatrix) const Matrix<SX> & {
   if (couldbeSXMatrix($input)) {
     $1=1;
   } else {

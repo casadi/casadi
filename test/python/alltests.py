@@ -6,6 +6,7 @@ from ocp import *
 from nlp import *
 from ad import *
 from sparsity import *
+from matrix import *
 
 if __name__ == '__main__':
     unittest.main()

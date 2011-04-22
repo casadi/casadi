@@ -48,6 +48,13 @@ namespace CasADi{
 
 #endif // SWIG
 
+
+// Lower value means wil be checked first
+#define PRECEDENCE_DMatrix 100
+#define PRECEDENCE_DMatrixVector 101
+#define PRECEDENCE_SXMatrix 102
+#define PRECEDENCE_SXMatrixVector 103
+
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
 %extend std::vector<double>{  
@@ -166,15 +173,15 @@ PyOS_setsig(SIGINT, SigIntHandler);
 // MX class
 %include "mx.i"
 
-// FX
-%include "fx.i"
-
 // Matrix tools
 %include "casadi/matrix/matrix_tools.hpp"
 
 // Instansiate the functions
 MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(CasADi::SX)
+
+// FX
+%include "fx.i"
 
 // Sparsity tools
 %{
