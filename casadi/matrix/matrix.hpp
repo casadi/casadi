@@ -86,8 +86,15 @@ class Matrix : public std::vector<T>, public PrintableObject{
     /// sparse n-by-m matrix filled with given sparsity
     Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data=std::vector<T>());
 
+
+    // dense matrix constructor with data given as vector of vectors
+    explicit Matrix(const std::vector< std::vector<T> >& m);
+    
     /// sparse matrix with a given sparsity
     explicit Matrix(const CRSSparsity& sparsity, const T& val=0);
+    
+    /// sparse matrix with a given sparsity and non-zero elements.
+    Matrix(const CRSSparsity& sparsity, const std::vector<T>& data);
     
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
@@ -510,13 +517,13 @@ class Matrix : public std::vector<T>, public PrintableObject{
 } // namespace CasADi
 
 // Typedefs/template initializations
-#ifndef SWIG
 namespace CasADi{
   typedef Matrix<double> DMatrix;
   typedef std::vector<Matrix<double> > DMatrixVector;
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 } // namespace CasADi
-#else // SWIG
+
+#ifdef SWIG // SWIG
 %template(DMatrix)             CasADi::Matrix<double>;
 %template(DMatrixVector)       std::vector<CasADi::Matrix<double> > ;
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
@@ -945,11 +952,48 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
 }
 
 template<class T>
+Matrix<T>::Matrix(const std::vector< std::vector<T> >& data) : std::vector<T>() {
+  int n=data.size();
+  int m=-1;
+  for (int i=0;i<n;i++) {
+    if (m==-1) {
+      m = data[i].size();
+    } else {
+      if (m!=data[i].size()) {
+        std::stringstream s;
+		    s << "Matrix<T>::Matrix(const std::vector< std::vector<T> >& data): shape mismatch" << std::endl;
+		    s << "Attempting to construct a matrix from a nested list." << std::endl;
+		    s << "I got convinced that the desired size is ("<< n << " x " << m << " ), but now I encounter a vector of size (" << data[i].size() <<  " )" << std::endl;
+		    throw CasadiException(s.str());
+      }
+    }
+  }
+  sparsity_ = CRSSparsity(n,m,true);
+  
+  std::vector<T>::resize(n*m);
+
+  for (int i=0;i<n;i++) {
+    copy(data[i].begin(),data[i].end(),begin()+i*m);
+  }
+  
+}
+
+template<class T>
 Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
   sparsity_ = sparsity;
   data().resize(sparsity_.size(),val);
 }
 
+template<class T>
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& data) : std::vector<T>(data) {
+  if (sparsity.size()!=data.size()) {
+    std::stringstream s;
+		s << "Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& data): size mismatch" << std::endl;
+		s << "Supplied sparsity pattern has size (" << sparsity.size1() << " x " << sparsity.size2() <<  " : " << sparsity.size() << " NZ ) while data has size (" << data.size() << ")." << std::endl;
+    throw CasadiException(s.str());
+  }
+  sparsity_ = sparsity;
+}
 
 template<class T>
 const T Matrix<T>::getitem(int i) const{

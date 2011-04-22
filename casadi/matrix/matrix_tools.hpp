@@ -95,6 +95,13 @@ Matrix<T> inv(const Matrix<T>& a);
 template<class T>
 Matrix<T> reshape(const Matrix<T>& a, int n, int m);
 
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, const std::vector<int> sz);
+
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, const CRSSparsity& sp);
+
+
 /** \brief  make a vector
   Reshapes/flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
   Columns are stacked on top of each other.
@@ -472,7 +479,7 @@ Matrix<T> inv(const Matrix<T>& a){
 
 template<class T>
 Matrix<T> reshape(const Matrix<T>& a, int n, int m){
-  casadi_assert_message(a.numel() == n*m, "resize: number of elements must remain the same");
+  casadi_assert_message(a.numel() == n*m, "reshape: number of elements must remain the same");
 
   Matrix<T> ret(n,m);
   for(int i=0; i<a.size1(); ++i){
@@ -483,6 +490,24 @@ Matrix<T> reshape(const Matrix<T>& a, int n, int m){
     }
   }
   return ret;
+}
+
+template<class T>
+Matrix<T> reshape(const Matrix<T>& a, const std::vector<int> sz){
+  casadi_assert_message(sz.size() == 2, "reshape: must be two dimensional");
+  return reshape(a,sz[0],sz[1]);
+}
+
+template<class T>
+Matrix<T> reshape(const Matrix<T>& x, const CRSSparsity& sp){
+  // quick return if already the right shape
+  if(sp==x.sparsity())
+    return x;
+  
+  // make sure that the number of zeros agree
+  casadi_assert(x.size()==sp.size());
+  
+  return Matrix<T>(sp,x);
 }
 
 template<class T>
