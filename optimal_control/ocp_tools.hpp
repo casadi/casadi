@@ -75,10 +75,10 @@ enum CollocationPoints{LEGENDRE,RADAU};
   // Sort the equations in an order which is consistent with the variable sorting and save to the variable structure
 //  void sortEquations(OCP& ocp, const std::vector<SX>& dae);
 
-  /// Sort equations in 
+  /// Tarjan's algorithm
+  void tarjan(const std::vector<SX>& x, const std::vector<SX>& xdot, const std::vector<SX>& z, const std::vector<SX>& dae);
   
-  
-  
+
   
   
   

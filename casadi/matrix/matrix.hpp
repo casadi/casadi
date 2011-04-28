@@ -851,6 +851,7 @@ void Matrix<T>::printDense(std::ostream &stream) const{
       
       // Print element
       stream << (*this)[el] << ",  ";
+      j++;
     }
     
     // Print trailing zeros

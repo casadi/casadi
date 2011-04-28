@@ -761,6 +761,94 @@ void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vecto
   }
 }
 
+int CRSSparsity::depth_first_search(int j, int top, int *xi, int *pstack, const int *pinv){
+  int i, p, p2, done, jnew, head = 0, *Gp, *Gi;
+  Gp = &rowindRef()[0] ; Gi = &colRef()[0];
+  xi[0] = j;                // initialize the recursion stack
+  while (head >= 0)
+  {
+    j = xi[head] ;         // get j from the top of the recursion stack
+    jnew = pinv ? pinv[j] : j ;
+    if (!marked(Gp, j))
+    {
+        mark(Gp, j) ;       // mark node j as visited
+        pstack[head] = (jnew < 0) ? 0 : unflip(Gp[jnew]) ;
+    }
+    done = 1 ;                  // node j done if no unvisited neighbors
+    p2 = (jnew < 0) ? 0 : unflip(Gp[jnew+1]) ;
+    for (p = pstack[head] ; p < p2 ; p++)  // examine all neighbors of j 
+    {
+        i = Gi[p] ;            // consider neighbor node i 
+        if (marked(Gp, i)) continue ;   // skip visited node i 
+        pstack[head] = p ;     // pause depth-first search of node j 
+        xi[++head] = i ;       // start dfs at node i 
+        done = 0 ;              // node j is not done 
+        break ;                 // break, to start dfs (i) 
+    }
+    if (done)               // depth-first search at node j is done 
+    {
+        head-- ;            // remove j from the recursion stack 
+        xi[--top] = j ;    // and place in the output stack 
+    }
+  }
+  return top;
+}
+
+void CRSSparsity::strongly_connected_components(){
+  int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk;
+    
+  vector<int> AT_mapping;
+  CRSSparsity AT = transpose(AT_mapping);
+  n = size1() ; Ap = &rowindRef().front();
+  
+  vector<int> xi_data(2*n+1);
+  xi = &xi_data.front();
+  
+  vector<int> Dp(n);
+  vector<int> Dq(0);
+  vector<int> Dr(n+6);
+  vector<int> Ds(6);
+  int Dnb;
+  int Drr[5];
+  int Dcc[5];
+  
+  Blk = xi ; rcopy = pstack = xi + n ;
+  p = &Dp.front() ; r = &Dr.front() ; ATp = &AT.rowindRef().front();
+  
+  top = n ;
+  for (i = 0 ; i < n ; i++){
+      if (!marked(Ap, i)) top = depth_first_search(i, top, xi, pstack, NULL);
+  }
+  
+  for (i = 0 ; i < n ; i++) 
+    mark(Ap, i);
+  top = n;
+  nb = n;
+  for (k = 0 ; k < n ; k++){
+    i = xi [k] ;
+    if (marked(ATp, i)) continue ;
+    r [nb--] = top ;
+    top = AT.depth_first_search(i, top, p, pstack, NULL) ;
+  }
+  r[nb] = 0;
+  for (k = nb ; k <= n ; k++) r[k-nb] = r[k];
+  Dnb = nb = n-nb;
+  for (b = 0 ; b < nb ; b++){
+      for (k = r [b] ; k < r [b+1] ; k++) Blk [p [k]] = b ;
+  }
+  for (b = 0 ; b <= nb ; b++) rcopy [b] = r [b] ;
+  for (i = 0 ; i < n ; i++) p [rcopy [Blk [i]]++] = i ;
+  
+  cout << Dp << endl;
+  cout << Dr << endl;
+  cout << Dnb << endl;
+  cout << rowind() << endl;
+  cout << col() << endl;
+  cout << "end" << endl;
+  
+  
+}
+
 
 
 } // namespace CasADi

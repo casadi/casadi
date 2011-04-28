@@ -221,6 +221,18 @@ class CRSSparsity : public SharedObject{
     /// Empty zero-by-zero
     static CRSSparsity emptySparsity;
     
+    /// depth-first-search of the graph of a matrix, starting at node j (from CSparse)
+    int depth_first_search(int j, int top, int *xi, int *pstack, const int *pinv);
+
+    /// find the strongly connected components of a square matrix (from CSparse)
+    void strongly_connected_components();
+
+    int flip(int i){ return -(i)-2;}
+    int unflip(int i){ return (i < 0) ? flip(i) : i;}
+    int marked(int *w, int j){ return w[j] < 0; }
+    void mark(int *w, int j){
+      w[j] = flip(w[j]) ;
+    }
 };
 
 #ifdef SWIG
@@ -255,7 +267,9 @@ class CRSSparsityNode : public SharedObjectNode{
     
     /// vector of length n+1 containing the index of the last non-zero element up till each row 
     std::vector<int> rowind_;
+    
 };
+
 #endif // SWIG
 
 } // namespace CasADi
