@@ -5,6 +5,8 @@ set(CSPARSE_INTERFACE_SRCS
   csparse.cpp
   csparse_internal.hpp
   csparse_internal.cpp
+  csparse_tools.hpp
+  csparse_tools.cpp
 )
 
 add_library(csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})

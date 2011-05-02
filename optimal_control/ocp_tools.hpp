@@ -78,6 +78,7 @@ enum CollocationPoints{LEGENDRE,RADAU};
   /// Tarjan's algorithm
   void tarjan(const std::vector<SX>& x, const std::vector<SX>& xdot, const std::vector<SX>& z, const std::vector<SX>& dae);
   
+  
 
   
   
