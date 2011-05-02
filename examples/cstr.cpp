@@ -35,35 +35,32 @@ int main(){
 
   // Scale the OCP
   OCP scaled_ocp = ocp.scale();
-  
-  // Sort the variables according to type
-  OCPVariables var(ocp.variables);
-  
+    
   // Correct the inital guess and bounds on variables
-  var.u[0].setStart(280);
-  var.u[0].setMin(230);
-  var.u[0].setMax(370);
+  ocp.u_[0].setStart(280);
+  ocp.u_[0].setMin(230);
+  ocp.u_[0].setMax(370);
   
   // Correct bound on state
-  var.x[1].setMax(350);
+  ocp.x_[1].setMax(350);
   
   // Variables
-  SX t = var.t.sx();
-  Matrix<SX> x = sx(var.x);
-  Matrix<SX> xdot = der(var.x);
-  Matrix<SX> z = sx(var.z);
-  Matrix<SX> p = sx(var.p);
-  Matrix<SX> u = sx(var.u);
+  SX t = ocp.t_.sx();
+  Matrix<SX> x = sx(ocp.x_);
+  Matrix<SX> xdot = der(ocp.x_);
+  Matrix<SX> z = sx(ocp.z_);
+  Matrix<SX> p = sx(ocp.p_);
+  Matrix<SX> u = sx(ocp.u_);
 
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(var.x,true);
-  vector<double> xmin = getMin(var.x,true);
-  vector<double> xmax = getMax(var.x,true);
+  vector<double> x0 = getStart(ocp.x_,true);
+  vector<double> xmin = getMin(ocp.x_,true);
+  vector<double> xmax = getMax(ocp.x_,true);
   
   // Initial guess and bounds for the control
-  vector<double> u0 = getStart(var.u,true);
-  vector<double> umin = getMin(var.u,true);
-  vector<double> umax = getMax(var.u,true);
+  vector<double> u0 = getStart(ocp.u_,true);
+  vector<double> umin = getMin(ocp.u_,true);
+  vector<double> umax = getMax(ocp.u_,true);
   
   // Integrator instance
   Integrator integrator;

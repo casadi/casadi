@@ -25,14 +25,13 @@
 
 #include "casadi/printable_object.hpp"
 #include "variable.hpp"
-#include "ocp_variables.hpp"
 
 namespace CasADi{
   namespace OptimalControl{
 
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCP : public PrintableObject{
-  public:    
+  public:
     /// OCP
     OCP();
 
@@ -51,11 +50,35 @@ class OCP : public PrintableObject{
     void makeSemiExplicit();
     
     /// Create a new, scaled OCP
-    OCP scale() const;
+    OCP scale();
 
+    /// Sort variables according to type
+    void sortType();
+    
     /// Access the variables in a class hierarchy -- public data member
     Variable variables;
 
+    /// Time
+    Variable t_;
+    
+    /// Differential states
+    std::vector<Variable> x_;
+
+    /// Algebraic states
+    std::vector<Variable> z_;
+    
+    /// Controls
+    std::vector<Variable> u_;
+    
+    /// Free parameters
+    std::vector<Variable> p_;
+
+    /// Constants
+    std::vector<Variable> c_;
+
+    /// Dependent
+    std::vector<Variable> d_;
+    
     /// Differential algebraic equations
     std::vector<SX> dae;
     

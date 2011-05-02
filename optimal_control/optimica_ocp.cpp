@@ -53,8 +53,22 @@ void OCP::print(ostream &stream) const{
   stream << variables << endl;
 
   // Print the variables
-  OCPVariables var(variables);
-  stream << var << endl;
+/*  stream << "{" << endl;
+  stream << "  t = " << t << endl;
+  stream << "  x =  " << x << endl;
+  stream << "  z =  " << z << endl;
+  stream << "  u =  " << u << endl;
+  stream << "  p =  " << p << endl;
+  stream << "  c =  " << c << endl;
+  stream << "  d =  " << d << endl;
+  stream << "}" << endl;*/
+  stream << "Dimensions: "; 
+  stream << "#x = " << x_.size() << ", ";
+  stream << "#z = " << z_.size() << ", ";
+  stream << "#u = " << u_.size() << ", ";
+  stream << "#p = " << p_.size() << ", ";
+  stream << "#c = " << c_.size() << ", ";
+  stream << "#d = " << d_.size() << ")";
   
   // Print the differential-algebraic equation
   stream << "Differential-Algebraic Equations" << endl;
@@ -71,7 +85,7 @@ void OCP::print(ostream &stream) const{
 
   // Print the explicit differential equations
   stream << "Differential equations (explicit)" << endl;
-  for(vector<Variable>::const_iterator it=var.x.begin(); it!=var.x.end(); it++){
+  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); it++){
     SX de = it->getDifferentialEquation();
     if(!de->isNan())
       stream << "der(" << *it << ") == " << de << endl;
@@ -80,7 +94,7 @@ void OCP::print(ostream &stream) const{
   
   // Dependent equations
   stream << "Dependent equations" << endl;
-  for(vector<Variable>::const_iterator it=var.d.begin(); it!=var.d.end(); it++)
+  for(vector<Variable>::const_iterator it=d_.begin(); it!=d_.end(); it++)
     stream << *it << " == " << it->getBindingEquation() << endl;
   stream << endl;
 
@@ -114,20 +128,48 @@ void OCP::print(ostream &stream) const{
   
 }
 
-OCP OCP::scale() const{
+void OCP::sortType(){
+  // Get all the variables
+  vector<Variable> v = variables;
+  
+  // Empty the vectors
+  x_.clear();
+  z_.clear();
+  u_.clear();
+  p_.clear();
+  c_.clear();
+  d_.clear();
+  
+  // Loop over variables
+  for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
+    // Make sure that the variable is initialized
+    switch(it->getType()){
+      case TYPE_INDEPENDENT:        casadi_assert(t_.isNull());     t_ = *it;  break;
+      case TYPE_STATE:              x_.push_back(*it);  break;
+      case TYPE_ALGEBRAIC:          z_.push_back(*it);  break;
+      case TYPE_CONTROL:            u_.push_back(*it);  break;
+      case TYPE_PARAMETER:          p_.push_back(*it);  break;
+      case TYPE_CONSTANT:           c_.push_back(*it);  break;
+      case TYPE_DEPENDENT:          d_.push_back(*it);  break;
+      default: throw CasadiException("OCP::sortVariables: unknown type for " + it->getName());
+    }
+  }
+}
+
+OCP OCP::scale(){
+  // Sort the variables according to type
+  sortType();
+  
   // Return object
   OCP ret(*this);
 
-  // Sort the variables according to type
-  OCPVariables var(variables);
-  
   // Variables
-  Matrix<SX> t = sx(var.t);
-  Matrix<SX> x = sx(var.x);
-  Matrix<SX> xdot = der(var.x);
-  Matrix<SX> z = sx(var.z);
-  Matrix<SX> p = sx(var.p);
-  Matrix<SX> u = sx(var.u);
+  Matrix<SX> t = sx(t_);
+  Matrix<SX> x = sx(x_);
+  Matrix<SX> xdot = der(x_);
+  Matrix<SX> z = sx(z_);
+  Matrix<SX> p = sx(p_);
+  Matrix<SX> u = sx(u_);
   
   // Get all the variables
   Matrix<SX> v;
@@ -139,12 +181,12 @@ OCP OCP::scale() const{
   append(v,u);
   
   // Nominal values
-  Matrix<SX> t_n = getNominal(var.t);
-  Matrix<SX> x_n = getNominal(var.x);
-  Matrix<SX> xdot_n = getNominal(var.x);
-  Matrix<SX> z_n = getNominal(var.z);
-  Matrix<SX> p_n = getNominal(var.p);
-  Matrix<SX> u_n = getNominal(var.u);
+  Matrix<SX> t_n = getNominal(t_);
+  Matrix<SX> x_n = getNominal(x_);
+  Matrix<SX> xdot_n = getNominal(x_);
+  Matrix<SX> z_n = getNominal(z_);
+  Matrix<SX> p_n = getNominal(p_);
+  Matrix<SX> u_n = getNominal(u_);
   
   // Get all the old variables in expressed in the nominal ones
   Matrix<SX> v_old;
@@ -171,13 +213,13 @@ OCP OCP::scale() const{
 
 void OCP::makeExplicit(){
   // Sort the variables
-  OCPVariables var(variables);
+  sortType();
 
   // Dynamic equation
   SXMatrix dae(this->dae);
-  SXMatrix xdot(var.x.size(),1,0);
-  for(int i=0; i<var.x.size(); ++i)
-    xdot[i] = var.x[i].getDerivative();
+  SXMatrix xdot(x_.size(),1,0);
+  for(int i=0; i<x_.size(); ++i)
+    xdot[i] = x_[i].getDerivative();
   
   // Take the Jacobian of the ode with respect to xdot
   SXMatrix J = jacobian(dae,xdot);
@@ -193,8 +235,8 @@ void OCP::makeExplicit(){
   rhs = substitute(rhs,xdot,SXMatrix(xdot.sparsity(),0));
   
   // Save as explicit derivative
-  for(int i=0; i<var.x.size(); ++i)
-    var.x[i].setDifferentialEquation(rhs(i,0));
+  for(int i=0; i<x_.size(); ++i)
+    x_[i].setDifferentialEquation(rhs(i,0));
   
 }
 
