@@ -36,6 +36,7 @@ namespace CasADi{
 
 OCP::OCP(){
   variables = Variable("variables",false);
+  is_scaled_ = false;
 }
 
 void OCP::repr(ostream &stream) const{
@@ -156,13 +157,13 @@ void OCP::sortType(){
   }
 }
 
-OCP OCP::scale(){
+void OCP::scale(){
+  /// Make sure that the OCP has not already been scaled
+  casadi_assert(!is_scaled_);
+  
   // Sort the variables according to type
   sortType();
   
-  // Return object
-  OCP ret(*this);
-
   // Variables
   Matrix<SX> t = sx(t_);
   Matrix<SX> x = sx(x_);
@@ -201,14 +202,15 @@ OCP OCP::scale(){
   Matrix<SX> temp;
 
   // Substitute equations
-  ret.dae     = substitute(dae,v,v_old).data();
-  ret.initeq  = substitute(initeq,v,v_old).data();
-  ret.cfcn    = substitute(cfcn,v,v_old).data();
-  ret.cfcn_lb = substitute(cfcn_lb,v,v_old).data();
-  ret.cfcn_ub = substitute(cfcn_ub,v,v_old).data();
-  ret.mterm   = substitute(mterm,v,v_old).data();
-  ret.lterm   = substitute(lterm,v,v_old).data();
-  return ret;
+  dae     = substitute(dae,v,v_old).data();
+  initeq  = substitute(initeq,v,v_old).data();
+  cfcn    = substitute(cfcn,v,v_old).data();
+  cfcn_lb = substitute(cfcn_lb,v,v_old).data();
+  cfcn_ub = substitute(cfcn_ub,v,v_old).data();
+  mterm   = substitute(mterm,v,v_old).data();
+  lterm   = substitute(lterm,v,v_old).data();
+  
+  is_scaled_ = true;
 }
 
 void OCP::makeExplicit(){

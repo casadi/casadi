@@ -28,7 +28,7 @@
 
 namespace CasADi{
   namespace OptimalControl{
-
+    
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCP : public PrintableObject{
   public:
@@ -50,7 +50,7 @@ class OCP : public PrintableObject{
     void makeSemiExplicit();
     
     /// Create a new, scaled OCP
-    OCP scale();
+    void scale();
 
     /// Sort variables according to type
     void sortType();
@@ -108,6 +108,9 @@ class OCP : public PrintableObject{
     
     /// Final time is free
     bool tf_free;
+    
+    /// Is scaled?
+    bool is_scaled_;
 
 };
 

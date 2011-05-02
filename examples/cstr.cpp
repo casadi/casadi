@@ -34,7 +34,7 @@ int main(){
   ocp.print();
 
   // Scale the OCP
-  OCP scaled_ocp = ocp.scale();
+  ocp.scale();
     
   // Correct the inital guess and bounds on variables
   ocp.u_[0].setStart(280);
@@ -71,7 +71,7 @@ int main(){
   impres_in[1+ODE_T] = t;
   impres_in[1+ODE_Y] = x;
   impres_in[1+ODE_P] = u;
-  SXFunction impres(impres_in,scaled_ocp.dae);
+  SXFunction impres(impres_in,ocp.dae);
   
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
@@ -86,7 +86,7 @@ int main(){
   dae_in[DAE_YDOT] = xdot;
   dae_in[DAE_Z] = z;
   dae_in[DAE_P] = u;
-  SXFunction dae(dae_in,scaled_ocp.dae);
+  SXFunction dae(dae_in,ocp.dae);
 
   bool use_kinsol = true;
   if(use_kinsol){
