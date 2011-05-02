@@ -133,7 +133,8 @@ void OCP::sortType(){
   // Get all the variables
   vector<Variable> v = variables;
   
-  // Empty the vectors
+  // Clear variables
+  t_ = Variable();
   x_.clear();
   z_.clear();
   u_.clear();
