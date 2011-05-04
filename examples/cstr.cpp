@@ -45,7 +45,7 @@ int main(){
   ocp.x_[1].setMax(350);
   
   // Variables
-  SX t = ocp.t_.var();
+  SX t = ocp.t_;
   Matrix<SX> x = var(ocp.x_);
   Matrix<SX> xdot = der(ocp.x_);
   Matrix<SX> z = var(ocp.z_);

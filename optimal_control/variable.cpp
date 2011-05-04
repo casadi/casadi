@@ -243,15 +243,6 @@ void Variable::setEquation(const SX& l, const SX& r){
   setRHS(r);
 }
 
-void Variable::setIndependent(bool independent){
-  (*this)->independent_ = independent;
-  init();
-}
-    
-bool Variable::getIndependent() const{
-  return (*this)->independent_;
-}
-
 bool Variable::checkNode() const{
   return dynamic_cast<const VariableInternal*>(get());
 }

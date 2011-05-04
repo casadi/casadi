@@ -56,16 +56,12 @@ class OCP : public PrintableObject{
     
     /// Create a new, scaled OCP
     void scale();
-
-    
-    
-    
     
     /// Access the variables in a class hierarchy -- public data member
     Variable variables;
 
     /// Time
-    Variable t_;
+    SX t_;
     
     /// Differential states
     std::vector<Variable> x_;

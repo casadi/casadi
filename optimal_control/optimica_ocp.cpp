@@ -38,6 +38,7 @@ namespace CasADi{
 OCP::OCP(){
   variables = Variable("variables",false);
   is_scaled_ = false;
+  t_ = SX("t");
 }
 
 void OCP::repr(ostream &stream) const{
@@ -135,7 +136,6 @@ void OCP::sortType(){
   vector<Variable> v = variables;
   
   // Clear variables
-  t_ = Variable();
   x_.clear();
   z_.clear();
   u_.clear();
@@ -147,7 +147,6 @@ void OCP::sortType(){
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
     // Make sure that the variable is initialized
     switch(it->getType()){
-      case TYPE_INDEPENDENT:        casadi_assert(t_.isNull());     t_ = *it;  break;
       case TYPE_STATE:              x_.push_back(*it);  break;
       case TYPE_ALGEBRAIC:          z_.push_back(*it);  break;
       case TYPE_CONTROL:            u_.push_back(*it);  break;
@@ -167,7 +166,7 @@ void OCP::scale(){
   sortType();
   
   // Variables
-  Matrix<SX> t = var(t_);
+  Matrix<SX> t = t_;
   Matrix<SX> x = var(x_);
   Matrix<SX> xdot = der(x_);
   Matrix<SX> z = var(z_);
@@ -184,7 +183,7 @@ void OCP::scale(){
   append(v,u);
   
   // Nominal values
-  Matrix<SX> t_n = getNominal(t_);
+  Matrix<SX> t_n = 1.;
   Matrix<SX> x_n = getNominal(x_);
   Matrix<SX> xdot_n = getNominal(x_);
   Matrix<SX> z_n = getNominal(z_);

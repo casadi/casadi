@@ -43,7 +43,7 @@ namespace CasADi{
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
     /// Variable types
-    enum VarType{TYPE_INDEPENDENT, TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
+    enum VarType{TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
     // Forward declaration
     class VariableInternal;
@@ -201,12 +201,6 @@ namespace CasADi{
     /// Set equation
     void setEquation(const SX& l, const SX& r);
             
-    /// Mark the variable as independent/not independent (time)
-    void setIndependent(bool independent);
-    
-    /// Check if variable is independent (time)
-    bool getIndependent() const;
-
     /// Set the variable index
     void setIndex(int ind);
     

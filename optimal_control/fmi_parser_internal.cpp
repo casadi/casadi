@@ -101,12 +101,7 @@ void FMIParserInternal::addModelVariables(){
 cout << "vars" << endl;
 
   map<string,int> catCounter;
-  
-  // Time
-  Variable time("time",true);
-  time.setIndependent(true);
-  ocp_.variables->add(time);
-  
+    
   // Get a reference to the ModelVariables node
   const XMLNode& modvars = document_[0]["ModelVariables"];
 
@@ -472,7 +467,7 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
   } else if(name.compare("Sub")==0){
     return readExpr_new(node[0]) - readExpr_new(node[1]);
   } else if(name.compare("Time")==0){
-    return ocp_.variables("time").var();
+    return ocp_.t_;
   }
 
   // Check if it is a unary function
