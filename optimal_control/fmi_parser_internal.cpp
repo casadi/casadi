@@ -172,7 +172,7 @@ cout << "vars" << endl;
     }
 
     // Set fields if not already added
-    if(var.getExpression()->isNan()){
+    if(var.var()->isNan()){
       
       // Expression
       var.setExpression(SX(name));
@@ -251,7 +251,7 @@ void FMIParserInternal::addBindingEquations(){
     SX bexpr = readExpr_new(beq[1][0]);
 
     // Pass to variable
-    var.setBindingEquation(bexpr);
+    var.setEquation(var.var(),bexpr);
   }
 }
 
@@ -435,13 +435,17 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
   } else if(name.compare("StringLiteral")==0){
     throw CasadiException(string(node.getText()));
   } else if(name.compare("Der")==0){
-    return readVariable(node[0]).der();
+    return readVariable(node[0]).der(true);
   } else if(name.compare("TimedVariable")==0){
     return readVariable(node[0]).atTime(double(node[1].getText()),true);
   } else if(name.compare("Div")==0){
     return readExpr_new(node[0]) / readExpr_new(node[1]);
   } else if(name.compare("Identifier")==0){
-    return readVariable(node);
+    Variable var = readVariable(node);
+    if(var.var().isEqual(var.lhs()))
+      return var.rhs();
+    else
+      return var.var();
   } else if(name.compare("IntegerLiteral")==0){
     return int(node.getText());
   } else if(name.compare("Instant")==0){
@@ -468,7 +472,7 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
   } else if(name.compare("Sub")==0){
     return readExpr_new(node[0]) - readExpr_new(node[1]);
   } else if(name.compare("Time")==0){
-    return ocp_.variables("time");
+    return ocp_.variables("time").var();
   }
 
   // Check if it is a unary function

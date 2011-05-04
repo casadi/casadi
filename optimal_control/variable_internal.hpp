@@ -49,16 +49,19 @@ namespace CasADi{
     const std::string& getName() const;
 
     // Variable/binding equation
-    SX sx() const;  
+    SX var() const;  
 
-    // Derivative/differential equation
-    SX der() const;  
+    // Derivative/differential equation (never allocate)
+    SX der(bool allocate) const;
+    
+    // Derivative/differential equation (allocate if necessary)
+    SX der(bool allocate);
     
     // Timed variable (never allocate)
-    SX atTime(double t) const;
+    SX atTime(double t, bool allocate) const;
 
     // Timed variable (allocate if necessary)
-    SX atTime(double t);
+    SX atTime(double t, bool allocate);
 
     // Update the type
     virtual void init();
@@ -115,18 +118,20 @@ namespace CasADi{
     // Derivative expression
     SX dx_;
 
-    // Binding equation
-    SX be_;
+    // Left hand side of the defining equation
+    SX lhs_;
     
-    // Differential equation
-    SX de_;
-    
+    // Right hand side of the defining equation
+    SX rhs_;
+        
     // Timed variables
     std::map<double, SX> timed_sx_;
     
     // Numerical value
     double val;
     
+    // Index
+    int index_;
     
     
   };

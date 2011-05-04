@@ -49,16 +49,28 @@ const VariableInternal* Variable::operator->() const{
   return (const VariableInternal*)(SharedObject::operator->());
 }
   
-Variable::operator SX() const{
-  return sx();  
+// Variable::operator SX() const{
+//   return var();  
+// }
+
+SX Variable::der(bool allocate) const{
+  return (*this)->der(allocate);  
 }
 
-SX Variable::der() const{
-  return (*this)->der();  
+SX Variable::der(bool allocate){
+  return (*this)->der(allocate);  
 }
 
-SX Variable::sx() const{
-  return (*this)->sx();  
+SX Variable::var() const{
+  return (*this)->var();
+}
+
+SX Variable::lhs() const{
+  return (*this)->lhs_;  
+}
+
+SX Variable::rhs() const{
+  return (*this)->rhs_;  
 }
 
 VarType Variable::getType() const{
@@ -211,35 +223,24 @@ void Variable::setExpression(const SX& sx){
   init();
 }
 
-const SX& Variable::getExpression() const{
-  return (*this)->sx_;
-}
-
 void Variable::setDerivative(const SX& dx){
   (*this)->dx_ = dx;
   init();
 }
 
-const SX& Variable::getDerivative() const{
-  return (*this)->dx_;
+void Variable::setLHS(const SX& ex){
+  (*this)->lhs_ = ex;
+  init();
+}
+    
+void Variable::setRHS(const SX& ex){
+  (*this)->rhs_ = ex;
+  init();
 }
 
-void Variable::setBindingEquation(const SX& be){
-  (*this)->be_ = be;
-  init();
-}
-    
-const SX& Variable::getBindingEquation() const{
-  return (*this)->be_;
-}
-    
-void Variable::setDifferentialEquation(const SX& de){
-  (*this)->de_ = de;
-  init();
-}
-    
-const SX& Variable::getDifferentialEquation() const{
-  return (*this)->de_;
+void Variable::setEquation(const SX& l, const SX& r){
+  setLHS(l);
+  setRHS(r);
 }
 
 void Variable::setIndependent(bool independent){
@@ -256,19 +257,23 @@ bool Variable::checkNode() const{
 }
 
 SX Variable::atTime(double t, bool allocate) const{
-  casadi_assert_message(!allocate,"Allocating violates const qualifiers");
-  return (*this)->atTime(t);
+  return (*this)->atTime(t,allocate);
 }
 
 SX Variable::atTime(double t, bool allocate){
-  if(allocate){
-    // Non-const version
-    return (*this)->atTime(t);
-  } else {
-    // Const version
-    return static_cast<const Variable&>(*this)->atTime(t);
-  }
+  return (*this)->atTime(t,allocate);
 }
+
+int Variable::index() const{
+  return (*this)->index_;
+}
+
+void Variable::setIndex(int ind){
+  (*this)->index_ = ind;
+}
+    
+
+
 
 
 } // namespace OptimalControl

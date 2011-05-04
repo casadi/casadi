@@ -26,10 +26,10 @@ using namespace std;
 namespace CasADi{
 namespace OptimalControl{
 
-vector<SX> sx(const vector<Variable> v){
+vector<SX> var(const vector<Variable> v){
   vector<SX> ret(v.size());
   for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].sx();
+    ret[i] = v[i].var();
   return ret;
 }
     

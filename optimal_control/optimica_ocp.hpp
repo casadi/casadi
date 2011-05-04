@@ -42,7 +42,12 @@ class OCP : public PrintableObject{
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
 #endif
+    /// Sort variables according to type
+    void sortType();
 
+    /// Sort the variables and equations according to BLT
+    void sortBLT();
+    
     /// Try to make explicit by symbolically solving for xdot (experimental, only small systems)
     void makeExplicit();
 
@@ -52,8 +57,9 @@ class OCP : public PrintableObject{
     /// Create a new, scaled OCP
     void scale();
 
-    /// Sort variables according to type
-    void sortType();
+    
+    
+    
     
     /// Access the variables in a class hierarchy -- public data member
     Variable variables;
@@ -78,7 +84,7 @@ class OCP : public PrintableObject{
 
     /// Dependent
     std::vector<Variable> d_;
-    
+        
     /// Differential algebraic equations
     std::vector<SX> dae;
     

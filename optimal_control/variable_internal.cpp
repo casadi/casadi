@@ -34,12 +34,10 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   // Not differentable by default
   dx_ = casadi_limits<SX>::nan;
   
-  // Binding equation undefined by default
-  be_ = casadi_limits<SX>::nan;
+  // Equations undefined by default
+  lhs_ = casadi_limits<SX>::nan;
+  rhs_ = casadi_limits<SX>::nan;
   
-  // Differential equation undefined by default
-  de_ = casadi_limits<SX>::nan;
-
   independent_ = false;
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;
@@ -53,6 +51,8 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   unit_ = "";
   displayUnit_ = "";
 
+  index_ = -1;
+  
   // Update the type
   init();
 }
@@ -66,7 +66,7 @@ void VariableInternal::init(){
     type_ = TYPE_INDEPENDENT;
   } else {
     if(!sx_->isNan()){
-      if(!be_->isNan()){
+      if(lhs_.isEqual(var())){
         type_ = TYPE_DEPENDENT;
       } else {
         if(variability_ == PARAMETER){
@@ -96,18 +96,30 @@ string VariableInternal::getTypeName() const{
   return typenames[type_];
 }
 
-SX VariableInternal::der() const{
-  if(de_->isNan())
-    return dx_;
-  else
-    return de_;
+SX VariableInternal::der(bool allocate) const{
+  casadi_assert(!allocate);
+  return const_cast<VariableInternal*>(this)->der(false);
 }
 
-SX VariableInternal::sx() const{
-  if(be_->isNan())
-    return sx_;
-  else
-    return be_;
+SX VariableInternal::der(bool allocate){
+  if(dx_.isNan()){
+    if(allocate){
+      // Create derivative
+      stringstream varname;
+      varname << "der_" << var();
+      dx_ = SX(varname.str());
+    } else {
+      stringstream msg;
+      repr(msg);
+      msg << " has no derivative expression";
+      throw CasadiException(msg.str());
+    }
+  }
+  return dx_;
+}
+
+SX VariableInternal::var() const{
+  return sx_;
 }
 
 int VariableInternal::add(const Variable& var){
@@ -164,34 +176,34 @@ void VariableInternal::getAll(vector<Variable>& vars) const{
   }
 }
 
-SX VariableInternal::atTime(double t) const{
-  map<double,SX>::const_iterator it = timed_sx_.find(t);
-  if(it==timed_sx_.end()){
-    stringstream ss;
-    repr(ss);
-    ss << " has no timed variable with t = " << t << ".";
-    throw CasadiException(ss.str());
-  }
-  // Return the expression
-  return it->second;
+SX VariableInternal::atTime(double t, bool allocate) const{
+  casadi_assert(!allocate);
+  return const_cast<VariableInternal*>(this)->atTime(t,false);
 }
 
-SX VariableInternal::atTime(double t){
+SX VariableInternal::atTime(double t, bool allocate){
   // Find an existing element
   map<double,SX>::const_iterator it = timed_sx_.find(t);
   
   // If not found
   if(it==timed_sx_.end()){
-    // Create a timed variable
-    stringstream ss;
-    ss << sx() << ".atTime(" << t << ")";
-    SX tvar(ss.str());
-    
-    // Save to map
-    timed_sx_[t] = tvar;
-    
-    // Return the expression
-    return tvar;
+    if(allocate){
+      // Create a timed variable
+      stringstream ss;
+      ss << var() << ".atTime(" << t << ")";
+      SX tvar(ss.str());
+      
+      // Save to map
+      timed_sx_[t] = tvar;
+      
+      // Return the expression
+      return tvar;
+    } else {
+      stringstream ss;
+      repr(ss);
+      ss << " has no timed variable with t = " << t << ".";
+      throw CasadiException(ss.str());
+    }
     
   } else {
     // Return the expression

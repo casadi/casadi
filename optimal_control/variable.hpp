@@ -61,17 +61,29 @@ namespace CasADi{
     /// Destructor
     virtual ~Variable();
         
-    /// Get the scalar expression or binding expression
-    SX sx() const;
+    /// Get the variable expression
+    SX var() const;
     
-    /// Get the time derivative or differential equation
-    SX der() const;
-       
+    /// Get differential expression (never allocate)
+    SX der(bool allocate=false) const;
+    
+    /// Get differential expression (allocate if necessary)
+    SX der(bool allocate=false);
+    
+    /// Left hand side of the defining (differential) equation
+    SX lhs() const;
+    
+    /// Right hand side of the defining (differential) equation
+    SX rhs() const;
+    
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
     SX atTime(double t, bool allocate=false);
+    
+    /// Get the variable index
+    int index() const;
     
     /// Access a sub-collection by name
     Variable operator()(const std::string& name) const;
@@ -81,7 +93,7 @@ namespace CasADi{
     Variable operator[](int ind) const;
 
     /// Type conversion to SX
-    operator SX() const;
+    //operator SX() const;
 
     /// Type conversion to variable vector
     operator std::vector<Variable>() const;
@@ -177,33 +189,27 @@ namespace CasADi{
     /// Set the expression
     void setExpression(const SX& sx);
 
-    /// Get the expression
-    const SX& getExpression() const;
-
     /// Set the derivative expression
     void setDerivative(const SX& dx);
     
-    /// Get the derivative expression
-    const SX& getDerivative() const;
+    /// Set the left hand side of the defining equation
+    void setLHS(const SX& ex);
     
-    /// Set the binding equation
-    void setBindingEquation(const SX& be);
+    /// Set the right hand side of the defining equation
+    void setRHS(const SX& ex);
     
-    /// Get the binding equation
-    const SX& getBindingEquation() const;
-    
-    /// Set the differential equation
-    void setDifferentialEquation(const SX& de);
-    
-    /// Get the differential equation
-    const SX& getDifferentialEquation() const;
-    
+    /// Set equation
+    void setEquation(const SX& l, const SX& r);
+            
     /// Mark the variable as independent/not independent (time)
     void setIndependent(bool independent);
     
     /// Check if variable is independent (time)
     bool getIndependent() const;
 
+    /// Set the variable index
+    void setIndex(int ind);
+    
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   };

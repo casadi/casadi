@@ -28,7 +28,7 @@
 namespace CasADi{
 namespace OptimalControl{
   /// Get a vector of expressions from a vector of variables
-  std::vector<SX> sx(const std::vector<Variable> v);
+  std::vector<SX> var(const std::vector<Variable> v);
 
   /// Get a vector of derivative expressions from a vector of variables
   std::vector<SX> der(const std::vector<Variable> v);

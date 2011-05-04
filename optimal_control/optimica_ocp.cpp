@@ -29,6 +29,7 @@
 #include "variable_tools.hpp"
 #include "../casadi/matrix/matrix_tools.hpp"
 #include "../casadi/sx/sx_tools.hpp"
+#include "../interfaces/csparse/csparse_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -87,7 +88,7 @@ void OCP::print(ostream &stream) const{
   // Print the explicit differential equations
   stream << "Differential equations (explicit)" << endl;
   for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); it++){
-    SX de = it->getDifferentialEquation();
+    SX de = it->rhs();
     if(!de->isNan())
       stream << "der(" << *it << ") == " << de << endl;
   }
@@ -96,7 +97,7 @@ void OCP::print(ostream &stream) const{
   // Dependent equations
   stream << "Dependent equations" << endl;
   for(vector<Variable>::const_iterator it=d_.begin(); it!=d_.end(); it++)
-    stream << *it << " == " << it->getBindingEquation() << endl;
+    stream << *it << " == " << it->rhs() << endl;
   stream << endl;
 
   // Mayer terms
@@ -166,12 +167,12 @@ void OCP::scale(){
   sortType();
   
   // Variables
-  Matrix<SX> t = sx(t_);
-  Matrix<SX> x = sx(x_);
+  Matrix<SX> t = var(t_);
+  Matrix<SX> x = var(x_);
   Matrix<SX> xdot = der(x_);
-  Matrix<SX> z = sx(z_);
-  Matrix<SX> p = sx(p_);
-  Matrix<SX> u = sx(u_);
+  Matrix<SX> z = var(z_);
+  Matrix<SX> p = var(p_);
+  Matrix<SX> u = var(u_);
   
   // Get all the variables
   Matrix<SX> v;
@@ -214,6 +215,36 @@ void OCP::scale(){
   is_scaled_ = true;
 }
 
+void OCP::sortBLT(){
+  // State derivatives and algebraic variables
+  vector<SX> xdot = der(x_);
+  vector<SX> z = var(z_);
+
+  // Create Jacobian in order to find the sparsity
+  vector<SX> v;
+  v.insert(v.end(),xdot.begin(),xdot.end());
+  v.insert(v.end(),z.begin(),z.end());
+  SXFunction fcn(v,dae);
+  Matrix<SX> J = fcn.jac();
+  
+  // BLT transformation
+  Interfaces::BLT blt(J.sparsity());
+
+  // Permute equations
+  vector<SX> dae_old = dae;
+  for(int i=0; i<dae.size(); ++i){
+    dae[i] = dae[blt.rowperm[i]];
+  }
+  
+  // Permute variables
+  for(int i=0; i<v.size(); ++i){
+    int j = blt.colperm[i];
+    Variable& vj = j<xdot.size() ? x_[j] : z_[j-xdot.size()];
+    vj.setIndex(i);
+    vj.setEquation(0, dae[i]);
+  }
+}
+
 void OCP::makeExplicit(){
   // Sort the variables
   sortType();
@@ -222,7 +253,7 @@ void OCP::makeExplicit(){
   SXMatrix dae(this->dae);
   SXMatrix xdot(x_.size(),1,0);
   for(int i=0; i<x_.size(); ++i)
-    xdot[i] = x_[i].getDerivative();
+    xdot[i] = x_[i].der();
   
   // Take the Jacobian of the ode with respect to xdot
   SXMatrix J = jacobian(dae,xdot);
@@ -239,8 +270,7 @@ void OCP::makeExplicit(){
   
   // Save as explicit derivative
   for(int i=0; i<x_.size(); ++i)
-    x_[i].setDifferentialEquation(rhs(i,0));
-  
+    x_[i].setEquation(x_[i].der(),rhs(i,0));
 }
 
 void OCP::makeSemiExplicit(){

@@ -45,12 +45,12 @@ int main(){
   ocp.x_[1].setMax(350);
   
   // Variables
-  SX t = ocp.t_.sx();
-  Matrix<SX> x = sx(ocp.x_);
+  SX t = ocp.t_.var();
+  Matrix<SX> x = var(ocp.x_);
   Matrix<SX> xdot = der(ocp.x_);
-  Matrix<SX> z = sx(ocp.z_);
-  Matrix<SX> p = sx(ocp.p_);
-  Matrix<SX> u = sx(ocp.u_);
+  Matrix<SX> z = var(ocp.z_);
+  Matrix<SX> p = var(ocp.p_);
+  Matrix<SX> u = var(ocp.u_);
 
   // Initial guess and bounds for the state
   vector<double> x0 = getStart(ocp.x_,true);
