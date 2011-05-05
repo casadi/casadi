@@ -69,10 +69,10 @@ class FMIParserInternal : public SharedObjectNode{
     void addDynamicEquations();
 
     /// Read an equation
-    SX readExpr_new(const XMLNode& odenode);
+    SX readExpr(const XMLNode& odenode);
 
     /// Read a variable
-    Variable readVariable(const XMLNode& node) const;
+    Variable& readVariable(const XMLNode& node);
 
     /// Add initial equations
     void addInitialEquations();

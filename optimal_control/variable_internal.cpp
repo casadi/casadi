@@ -117,58 +117,13 @@ SX VariableInternal::var() const{
   return sx_;
 }
 
-int VariableInternal::add(const Variable& var){
-  return add(var,var.getName());
-}
-
-int VariableInternal::add(const Variable& var, const string& namepart){
-  col.push_back(var);
-  int ind = col.size()-1;
-  name_part[namepart] = ind;
-  return ind;
-}
-
-bool VariableInternal::has(const string& name) const{
-  // try to locate the variable
-  map<string, int>::const_iterator it = name_part.find(name);
-
-  // check if the variable exists
-  return it!=name_part.end();
-}
-
 void VariableInternal::repr(ostream &stream) const{
   stream << name_;
 }
 
 
 void VariableInternal::print(ostream &stream) const{
-  print(stream,0);
-}
-
-void VariableInternal::print(ostream &stream, int indent) const{
-  // Add indentation
-  for(int i=0; i<indent; ++i) stream << "  ";
-  
-  // Print name
-  stream << name_ << ": " << getTypeName() << endl;
-
-  if(!col.empty()){
-    for(vector<Variable>::const_iterator it = col.begin(); it!=col.end(); ++it){
-      (*it)->print(stream,indent+2);
-    }
-  }
-}
-
-void VariableInternal::getAll(vector<Variable>& vars) const{
-  if(col.empty()){
-    Variable temp;
-    temp.assignNode(const_cast<VariableInternal*>(this)); // ugly trick
-    vars.push_back(temp);
-  } else {
-    for(vector<Variable>::const_iterator it=col.begin(); it!=col.end(); ++it)
-      if(!it->isNull())
-        (*it)->getAll(vars);
-  }
+  stream << name_;
 }
 
 SX VariableInternal::atTime(double t, bool allocate) const{

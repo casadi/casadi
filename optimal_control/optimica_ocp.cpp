@@ -36,7 +36,6 @@ namespace CasADi{
   namespace OptimalControl{
 
 OCP::OCP(){
-  variables = Variable("variables",false);
   is_scaled_ = false;
   t_ = SX("t");
 }
@@ -53,7 +52,7 @@ void OCP::repr(ostream &stream) const{
 void OCP::print(ostream &stream) const{
   // Variables in the class hierarchy
   stream << "Variables" << endl;
-  stream << variables << endl;
+  variables_.print(stream);
 
   // Print the variables
 /*  stream << "{" << endl;
@@ -133,7 +132,8 @@ void OCP::print(ostream &stream) const{
 
 void OCP::sortType(){
   // Get all the variables
-  vector<Variable> v = variables;
+  vector<Variable> v;
+  variables_.getAll(v);
   
   // Clear variables
   x_.clear();
@@ -300,7 +300,78 @@ void OCP::makeSemiExplicit(){
 #endif
 }
 
+
+VariableTree& VariableTree::subByName(const string& name, bool allocate){
+  // try to locate the variable
+  map<string, int>::iterator it = name_part_.find(name);
+
+  // check if the variable exists
+  if(it==name_part_.end()){
+    // Allocate variable
+    if(!allocate){
+      stringstream ss;
+      ss << "No child \"" << name << "\"";
+      throw CasadiException(ss.str());
+    }
+    children_.push_back(VariableTree());
+    name_part_[name] = children_.size()-1;
+    return children_.back();
+  } else {
+    // Variable exists
+    return children_.at(it->second);  
+  }
+}
+
+VariableTree& VariableTree::subByIndex(int ind, bool allocate){
+  // Modelica is 1-based
+  const int base = 1; 
   
+  casadi_assert(ind-base>=0);
+  if(ind-base<children_.size()){
+    // VariableTree exists
+    return children_[ind-base];
+  } else {
+    // Create VariableTree
+    if(!allocate){
+      stringstream ss;
+      ss << "Index [" << ind << "] out of bounds";
+      throw CasadiException(ss.str());
+    }
+    children_.resize(ind-base+1);
+    return children_.back();
+  }
+}
+
+void VariableTree::getAll(std::vector<Variable>& v) const{
+  /// Add variables
+  for(vector<VariableTree>::const_iterator it=children_.begin(); it!=children_.end(); ++it){
+    it->getAll(v);
+  }
+  
+  /// Add variable, if any
+  if(!var_.isNull())
+    v.push_back(var_);
+}
+
+void VariableTree::print(ostream &stream, int indent) const{
+  // Print variable
+  if(!var_.isNull()){
+    for(int i=0; i<indent; ++i) stream << " ";
+    stream << var_ << endl;
+  }
+ 
+  for(std::map<std::string,int>::const_iterator it=name_part_.begin(); it!=name_part_.end(); ++it){
+    cout << it->first << ", " << it->second << endl;
+  }
+ 
+  
+           ;
+
+  
+  for(vector<VariableTree>::const_iterator it = children_.begin(); it!=children_.end(); ++it){
+    it->print(stream,indent+2);
+  }
+}
 
   } // namespace OptimalControl
 } // namespace CasADi

@@ -69,27 +69,7 @@ namespace CasADi{
     // Print
     virtual void repr(std::ostream &stream) const;
     virtual void print(std::ostream &stream) const;
-    void print(std::ostream &stream, int indent) const;
 
-    // Get all the variables
-    void getAll(std::vector<Variable>& vars) const;
-    
-    // Add a subcollection
-    int add(const Variable& var, const std::string& namepart);
-
-    // Add a subcollection, default name
-    int add(const Variable& var);
-
-    // Check if a subcollection exists
-    bool has(const std::string& name) const;
-
-    // Set of sub-collections in the current collection
-    std::vector<Variable> col;
-  
-    // Names of contained collections
-    std::map<std::string,int> name_part;
-
-    
     protected:
 
     // Variable type

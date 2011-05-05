@@ -85,40 +85,6 @@ void Variable::setValue(double val){
   (*this)->val = val;
 }
   
-Variable Variable::operator()(const string& name) const{
-  // try to locate the variable
-  map<string, int>::const_iterator it = (*this)->name_part.find(name);
-
-  // check if the variable exists
-  if(it==(*this)->name_part.end()){
-    stringstream ss;
-    ss << "Variable::operator(): No such variable: " << name;
-    throw CasadiException(ss.str());
-  }
-
-  // return the variable
-  return (*this)->col.at(it->second);  
-}
-
-Variable Variable::operator[](int ind) const{
-  try{
-    int base = 1;
-    return (*this)->col.at(ind-base);
-  } catch(exception& ex){
-    throw CasadiException(string("Variable::operator[] failed <= ") + ex.what());
-  }
-}
-
-Variable::operator vector<Variable>() const{
-  if(isNull())
-    return vector<Variable>();
-  else{
-    vector<Variable> ret;
-    (*this)->getAll(ret);
-    return ret;
-  }
-}
-
 const string& Variable::getName() const{
   return (*this)->name_;
 }

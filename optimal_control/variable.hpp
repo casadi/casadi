@@ -84,21 +84,7 @@ namespace CasADi{
     
     /// Get the variable index
     int index() const;
-    
-    /// Access a sub-collection by name
-    Variable operator()(const std::string& name) const;
-
-#ifndef SWIG
-    /// Access a sub-collection by index
-    Variable operator[](int ind) const;
-
-    /// Type conversion to SX
-    //operator SX() const;
-
-    /// Type conversion to variable vector
-    operator std::vector<Variable>() const;
-#endif // SWIG
-    
+        
     /// Access functions of the node
     VariableInternal* operator->();
 
@@ -112,7 +98,7 @@ namespace CasADi{
     double getValue() const;
 
     /// Set numerical value
-    void setValue(double val);    
+    void setValue(double val);
 
     /// Get variable name
     const std::string& getName() const;

@@ -98,10 +98,7 @@ OCP& FMIParserInternal::parse(){
 }
 
 void FMIParserInternal::addModelVariables(){
-cout << "vars" << endl;
 
-  map<string,int> catCounter;
-    
   // Get a reference to the ModelVariables node
   const XMLNode& modvars = document_[0]["ModelVariables"];
 
@@ -117,63 +114,39 @@ cout << "vars" << endl;
     string variability = vnode.attribute("variability");
     string causality   = vnode.attribute("causality");
     string alias       = vnode.attribute("alias");
-    
+    //string variableCategory = modvars[i]["VariableCategory"].getText();
+
     // Skip to the next variable if its an alias
     if(alias.compare("alias") == 0 || alias.compare("negatedAlias") == 0)
       continue;
-    
-    if(modvars[i].hasChild("VariableCategory")){
-      string variableCategory = modvars[i]["VariableCategory"].getText();
-      map<string,int>::iterator it=catCounter.find(variableCategory);
-      if(it!=catCounter.end())
-        it->second++;
-      else
-        catCounter[variableCategory] = 1;
-    }
-    
+        
     // Add to ocp
-    Variable var = ocp_.variables;
+    VariableTree *vn = &ocp_.variables_;
     
     const XMLNode& nn = vnode["QualifiedName"];
     for(int i=0; i<nn.size(); ++i){
       string namepart = nn[i].attribute("name");
-      if(!var->has(namepart)){
-        stringstream fullname;
-        fullname << var << "." << namepart;
-        var->add(Variable(fullname.str(),false),namepart);
-      }
-      
-      var = var(namepart);
+      // Go to named child branch
+      vn = &vn->subByName(namepart,true);
 
-      // Add index
+      // Go to indexed child branch
       if(nn[i].size()>0){
+        
         // Find the index
         int ind = nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
-        
-        // Allocate size
-        if(var->col.size()<ind)
-          var->col.resize(ind);
-       
-        if(var[ind].isNull()){
-          stringstream fullname;
-          fullname << var << "[" << ind << "]";
-          var->col.at(ind-1) = Variable(fullname.str(),false);
-        }
-
-        // Go to the sub-collection
-        var = var[ind];
+        vn = &vn->subByIndex(ind,true);
       }
     }
-
-    // Set fields if not already added
-    if(var.var()->isNan()){
+    
+    // Reference to the variable
+    Variable &var = vn->var_;
+    
+    // Add variable, if not already added
+    if(var.isNull()){
       
-      // Expression
-      var.setExpression(SX(name));
-
-      // Symbolic variable
-      var.setName(name);
-
+      // Create variable
+      var = Variable(name);
+      
       // Value reference
       var.setValueReference(valueReference);
       
@@ -215,19 +188,8 @@ cout << "vars" << endl;
       if(props.hasAttribute("max"))          var.setMax(props.attribute("max"));
       if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
       if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
-
-    } else {
-      // Mark the variable differentiated
-      var.setDerivative(SX(name)); // NOTE: assumes that the derivative is added after the variable
-      
     }
   }
-  
-//  ocp_.variables->print(cout,0);
-  
-/*  cout << "VariableCategories:" << endl;
-  for(map<string,int>::const_iterator it=catCounter.begin(); it!=catCounter.end(); ++it)
-    cout << "  " << it->first << ": " << it->second << endl;*/
 }
 
 
@@ -242,7 +204,7 @@ void FMIParserInternal::addBindingEquations(){
     Variable var = readVariable(beq[0]);
 
     // Get the binding equation
-    SX bexpr = readExpr_new(beq[1][0]);
+    SX bexpr = readExpr(beq[1][0]);
 
     // Pass to variable
     var.setEquation(var.var(),bexpr);
@@ -260,7 +222,7 @@ void FMIParserInternal::addDynamicEquations(){
     const XMLNode& dnode = dyneqs[i];
 
     // Add the differential equation
-    SX de_new = readExpr_new(dnode[0]);
+    SX de_new = readExpr(dnode[0]);
     ocp_.dae.push_back(de_new);
   }
 }
@@ -277,7 +239,7 @@ void FMIParserInternal::addInitialEquations(){
 
     // Add the differential equations
     for(int i=0; i<inode.size(); ++i){
-      ocp_.initeq.push_back(readExpr_new(inode[i]));
+      ocp_.initeq.push_back(readExpr(inode[i]));
     }
   }
 }
@@ -327,13 +289,13 @@ void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
 #ifdef WITH_TIMEDVARIABLE
-    SX v = readExpr_new(var);
+    SX v = readExpr(var);
     ocp_.mterm.push_back(v);
 #else // WITH_TIMEDVARIABLE
     casadi_warning("Using old-style handling of timed variables, to activate the new style, set option WITH_TIMEDVARIABLE to YES. Support of the old-style will cease in the next release");
     if(var.checkName("exp:TimedVariable")){
-      SX v = readExpr_new(var[0]);
-      SX tp = readExpr_new(var["exp:Instant"]);
+      SX v = readExpr(var[0]);
+      SX tp = readExpr(var["exp:Instant"]);
       ocp_.mterm.push_back(v);
       ocp_.mtp.push_back(tp->getValue());
     } else {
@@ -346,7 +308,7 @@ void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
 void FMIParserInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
-    SX v = readExpr_new(var);
+    SX v = readExpr(var);
     ocp_.lterm.push_back(v);
   }
 }
@@ -365,20 +327,20 @@ void FMIParserInternal::addConstraints(const XMLNode& onode){
 
     const XMLNode& constr_i = onode[i];
     if(constr_i.checkName("opt:ConstraintLeq")){
-      SX ex = readExpr_new(constr_i[0]);
-      SX ub = readExpr_new(constr_i[1]);
+      SX ex = readExpr(constr_i[0]);
+      SX ub = readExpr(constr_i[1]);
       ocp_.cfcn.push_back(ex);
       ocp_.cfcn_lb.push_back(-numeric_limits<double>::infinity());
       ocp_.cfcn_ub.push_back(ub);
     } else if(constr_i.checkName("opt:ConstraintGeq")){
-      SX ex = readExpr_new(constr_i[0]);
-      SX lb = readExpr_new(constr_i[1]);
+      SX ex = readExpr(constr_i[0]);
+      SX lb = readExpr(constr_i[1]);
       ocp_.cfcn.push_back(ex);
       ocp_.cfcn_lb.push_back(lb);
       ocp_.cfcn_ub.push_back(numeric_limits<double>::infinity());
     } else if(constr_i.checkName("opt:ConstraintEq")){
-      SX ex = readExpr_new(constr_i[0]);
-      SX eq = readExpr_new(constr_i[1]);
+      SX ex = readExpr(constr_i[0]);
+      SX eq = readExpr(constr_i[1]);
       ocp_.cfcn.push_back(ex);
       ocp_.cfcn_lb.push_back(eq);
       ocp_.cfcn_ub.push_back(eq);
@@ -389,30 +351,30 @@ void FMIParserInternal::addConstraints(const XMLNode& onode){
   }
 }
 
-Variable FMIParserInternal::readVariable(const XMLNode& node) const{
+Variable& FMIParserInternal::readVariable(const XMLNode& node){
   // Get a pointer to the variable collection
-  Variable col = ocp_.variables;
+  VariableTree *vn = &ocp_.variables_;
   
   // Find the variable
   for(int i=0; i<node.size(); ++i){
     // Go to the right variable
     string namepart = node[i].attribute("name");
-    col = col(namepart);
+    vn = &vn->subByName(namepart);
     
     // Go to the right index, if there is any
     if(node[i].size()>0){
       // Go to the sub-collection
       int ind = node[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
-      col = col[ind];
+      vn = &vn->subByIndex(ind);
     }
   }
   
-  // Return the variables
-  return col;
+  // Return the variable
+  return vn->var_;
 }
 
 
-SX FMIParserInternal::readExpr_new(const XMLNode& node){
+SX FMIParserInternal::readExpr(const XMLNode& node){
   const string& fullname = node.getName();
   if (fullname.find("exp:")== string::npos) {
     stringstream ss;
@@ -425,7 +387,7 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
 
   // The switch below is alphabetical, and can be thus made more efficient
   if(name.compare("Add")==0){
-    return readExpr_new(node[0]) + readExpr_new(node[1]);
+    return readExpr(node[0]) + readExpr(node[1]);
   } else if(name.compare("StringLiteral")==0){
     throw CasadiException(string(node.getText()));
   } else if(name.compare("Der")==0){
@@ -433,7 +395,7 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
   } else if(name.compare("TimedVariable")==0){
     return readVariable(node[0]).atTime(double(node[1].getText()),true);
   } else if(name.compare("Div")==0){
-    return readExpr_new(node[0]) / readExpr_new(node[1]);
+    return readExpr(node[0]) / readExpr(node[1]);
   } else if(name.compare("Identifier")==0){
     Variable var = readVariable(node);
     if(var.var().isEqual(var.lhs()))
@@ -445,26 +407,26 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
   } else if(name.compare("Instant")==0){
     return node.getText();
   } else if(name.compare("LogLt")==0){ // Logical less than
-    return readExpr_new(node[0]) < readExpr_new(node[1]);
+    return readExpr(node[0]) < readExpr(node[1]);
   } else if(name.compare("Mul")==0){ // Multiplication
-    return readExpr_new(node[0]) * readExpr_new(node[1]);
+    return readExpr(node[0]) * readExpr(node[1]);
   } else if(name.compare("Neg")==0){
-    return -readExpr_new(node[0]);
+    return -readExpr(node[0]);
   } else if(name.compare("NoEvent")==0) {
     // NOTE: This is a workaround, we assume that whenever NoEvent occurs, what is meant is a switch
     int n = node.size();
     
     // Default-expression
-    SX ex = readExpr_new(node[n-1]);
+    SX ex = readExpr(node[n-1]);
     
     // Evaluate ifs
-    for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr_new(node[i]),readExpr_new(node[i+1]),ex);
+    for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i]),readExpr(node[i+1]),ex);
     
     return ex;
   } else if(name.compare("RealLiteral")==0){
     return double(node.getText());
   } else if(name.compare("Sub")==0){
-    return readExpr_new(node[0]) - readExpr_new(node[1]);
+    return readExpr(node[0]) - readExpr(node[1]);
   } else if(name.compare("Time")==0){
     return ocp_.t_;
   }
@@ -478,7 +440,7 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
       throw CasadiException(string("FMIParserInternal::readExpr: Node \"") + fullname + "\" does not have one child");
 
     // Call the function
-    return (*uit->second)(readExpr_new(node[0]));
+    return (*uit->second)(readExpr(node[0]));
   }
 
   // Check if it is a binary function
@@ -490,7 +452,7 @@ SX FMIParserInternal::readExpr_new(const XMLNode& node){
       throw CasadiException(string("FMIParserInternal::readExpr: Node \"") + fullname + "\" does not have two children");
 
     // Call the function
-    return (*bit->second)(readExpr_new(node[0]),readExpr_new(node[1]));
+    return (*bit->second)(readExpr(node[0]),readExpr(node[1]));
   }
 
   // throw error if reached this point

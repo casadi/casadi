@@ -29,6 +29,34 @@
 namespace CasADi{
   namespace OptimalControl{
     
+    /// Tree structure for storing variables
+    #ifndef SWIG
+    class VariableTree{
+      public:
+        /// Access a sub-collection by name
+        VariableTree& subByName(const std::string& name, bool allocate=false);
+
+        /// Access a sub-collection by index
+        VariableTree& subByIndex(int ind, bool allocate=false);
+        
+        /// Get all variables
+        void getAll(std::vector<Variable>& v) const;
+    
+        /// Print node
+        void print(std::ostream &stream, int indent=0) const;
+
+        /// Variable
+        Variable var_;
+        
+        /// Children nodes
+        std::vector<VariableTree> children_;
+        
+        /// Names of children
+        std::map<std::string,int> name_part_;
+    };
+    #endif
+    
+    
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCP : public PrintableObject{
   public:
@@ -58,8 +86,8 @@ class OCP : public PrintableObject{
     void scale();
     
     /// Access the variables in a class hierarchy -- public data member
-    Variable variables;
-
+    VariableTree variables_;
+    
     /// Time
     SX t_;
     
