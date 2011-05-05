@@ -42,9 +42,6 @@ namespace CasADi{
     /// Dynamics of the variable
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    /// Variable types
-    enum VarType{TYPE_STATE,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
-
     // Forward declaration
     class VariableInternal;
 
@@ -91,9 +88,6 @@ namespace CasADi{
     /// Const access functions of the node
     const VariableInternal* operator->() const;
 
-    /// Get type
-    VarType getType() const;
-    
     /// Get numerical value
     double getValue() const;
 

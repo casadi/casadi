@@ -51,44 +51,13 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   displayUnit_ = "";
 
   index_ = -1;
-  
-  // Update the type
-  init();
 }
 
-void VariableInternal::init(){
-  // Set the type to unknown
-  type_ = TYPE_UNKNOWN;
-  
-  // Try to determine the type
-  if(!sx_->isNan()){
-    if(lhs_.isEqual(var())){
-      type_ = TYPE_DEPENDENT;
-    } else {
-      if(variability_ == PARAMETER){
-        type_ = TYPE_PARAMETER;
-      } else if(variability_ == CONTINUOUS) {
-        if(causality_ == INTERNAL){
-          type_ = TYPE_STATE;
-        } else if(causality_ == INPUT){
-          type_ = TYPE_CONTROL;
-        }
-      } else if(variability_ == CONSTANT){
-        type_ = TYPE_CONSTANT;
-      }
-    }
-  }
-}
-  
 VariableInternal::~VariableInternal(){
 }
 
 const string& VariableInternal::getName() const{
   return name_;
-}
-
-string VariableInternal::getTypeName() const{
-  return typenames[type_];
 }
 
 SX VariableInternal::der(bool allocate) const{

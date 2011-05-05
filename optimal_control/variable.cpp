@@ -73,10 +73,6 @@ SX Variable::rhs() const{
   return (*this)->rhs_;  
 }
 
-VarType Variable::getType() const{
-  return (*this)->type_;
-}
-
 double Variable::getValue() const{
   return (*this)->val;
 }
@@ -99,7 +95,6 @@ Variability Variable::getVariability() const{
 
 void Variable::setVariability(Variability variability){
   (*this)->variability_ = variability;
-  init();
 }
 
 Causality Variable::getCausality() const{
@@ -108,7 +103,6 @@ Causality Variable::getCausality() const{
 
 void Variable::setCausality(Causality causality){
   (*this)->causality_ = causality;
-  init();
 }
     
 Alias Variable::getAlias() const{
@@ -117,7 +111,6 @@ Alias Variable::getAlias() const{
 
 void Variable::setAlias(Alias alias){
   (*this)->alias_ = alias;
-  init();
 }
     
 const string& Variable::getDescription() const{
@@ -186,22 +179,18 @@ void Variable::setDisplayUnit(const string& displayUnit){
 
 void Variable::setExpression(const SX& sx){
   (*this)->sx_ = sx;
-  init();
 }
 
 void Variable::setDerivative(const SX& dx){
   (*this)->dx_ = dx;
-  init();
 }
 
 void Variable::setLHS(const SX& ex){
   (*this)->lhs_ = ex;
-  init();
 }
     
 void Variable::setRHS(const SX& ex){
   (*this)->rhs_ = ex;
-  init();
 }
 
 void Variable::setEquation(const SX& l, const SX& r){

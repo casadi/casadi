@@ -28,9 +28,6 @@
 namespace CasADi{
   namespace OptimalControl{
 
-    /// Names of the variable types
-    static const char* typenames[] = {"STATE","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
-    
     /// Internal node class
   class VariableInternal : public SharedObjectNode{
     friend class Variable;
@@ -42,9 +39,6 @@ namespace CasADi{
     // Destructor
     virtual ~VariableInternal();
 
-    // Get type name
-    std::string getTypeName() const;
-        
     // Get name
     const std::string& getName() const;
 
@@ -63,17 +57,11 @@ namespace CasADi{
     // Timed variable (allocate if necessary)
     SX atTime(double t, bool allocate);
 
-    // Update the type
-    virtual void init();
-    
     // Print
     virtual void repr(std::ostream &stream) const;
     virtual void print(std::ostream &stream) const;
 
     protected:
-
-    // Variable type
-    VarType type_;
 
     // Attributes
     std::string name_;

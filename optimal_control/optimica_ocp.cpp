@@ -144,14 +144,22 @@ void OCP::sortType(){
   
   // Loop over variables
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
-    // Make sure that the variable is initialized
-    switch(it->getType()){
-      case TYPE_STATE:              x_.push_back(*it);  break;
-      case TYPE_CONTROL:            u_.push_back(*it);  break;
-      case TYPE_PARAMETER:          p_.push_back(*it);  break;
-      case TYPE_CONSTANT:           c_.push_back(*it);  break;
-      case TYPE_DEPENDENT:          d_.push_back(*it);  break;
-      default: throw CasadiException("OCP::sortVariables: unknown type for " + it->getName());
+    
+    // Try to determine the type
+    if(it->lhs().isEqual(it->var())){
+      d_.push_back(*it);
+    } else {
+      if(it->getVariability() == PARAMETER){
+        p_.push_back(*it);
+      } else if(it->getVariability() == CONTINUOUS) {
+        if(it->getCausality() == INTERNAL){
+          x_.push_back(*it);
+        } else if(it->getCausality() == INPUT){
+          u_.push_back(*it);
+        }
+      } else if(it->getVariability() == CONSTANT){
+        c_.push_back(*it);
+      }
     }
   }
   
