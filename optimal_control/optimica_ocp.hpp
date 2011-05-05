@@ -64,11 +64,14 @@ class OCP : public PrintableObject{
     SX t_;
     
     /// Differential states
-    std::vector<Variable> x_;
+    std::vector<Variable> xd_;
 
     /// Algebraic states
-    std::vector<Variable> z_;
+    std::vector<Variable> xa_;
     
+    /// States
+    std::vector<Variable> xx_;
+
     /// Controls
     std::vector<Variable> u_;
     

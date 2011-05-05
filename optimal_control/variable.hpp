@@ -43,7 +43,7 @@ namespace CasADi{
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
     /// Variable types
-    enum VarType{TYPE_STATE,TYPE_ALGEBRAIC,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
+    enum VarType{TYPE_STATE,TYPE_CONTROL,TYPE_PARAMETER,TYPE_CONSTANT,TYPE_DEPENDENT,TYPE_UNKNOWN};    
 
     // Forward declaration
     class VariableInternal;
@@ -203,6 +203,9 @@ namespace CasADi{
             
     /// Set the variable index
     void setIndex(int ind);
+    
+    /// Is differential?
+    bool isDifferential() const;
     
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

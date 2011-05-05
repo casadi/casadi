@@ -29,7 +29,7 @@ namespace CasADi{
   namespace OptimalControl{
 
     /// Names of the variable types
-    static const char* typenames[] = {"STATE","ALGEBRAIC","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
+    static const char* typenames[] = {"STATE","CONTROL","PARAMETER","CONSTANT","DEPENDENT","UNKNOWN"};
     
     /// Internal node class
   class VariableInternal : public SharedObjectNode{

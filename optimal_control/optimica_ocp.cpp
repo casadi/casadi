@@ -66,8 +66,8 @@ void OCP::print(ostream &stream) const{
   stream << "  d =  " << d << endl;
   stream << "}" << endl;*/
   stream << "Dimensions: "; 
-  stream << "#x = " << x_.size() << ", ";
-  stream << "#z = " << z_.size() << ", ";
+  stream << "#x = " << xd_.size() << ", ";
+  stream << "#z = " << xa_.size() << ", ";
   stream << "#u = " << u_.size() << ", ";
   stream << "#p = " << p_.size() << ", ";
   stream << "#c = " << c_.size() << ", ";
@@ -88,7 +88,7 @@ void OCP::print(ostream &stream) const{
 
   // Print the explicit differential equations
   stream << "Differential equations (explicit)" << endl;
-  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); it++){
+  for(vector<Variable>::const_iterator it=xd_.begin(); it!=xd_.end(); it++){
     SX de = it->rhs();
     if(!de->isNan())
       stream << "der(" << *it << ") == " << de << endl;
@@ -136,8 +136,7 @@ void OCP::sortType(){
   vector<Variable> v = variables;
   
   // Clear variables
-  x_.clear();
-  z_.clear();
+  xx_.clear();
   u_.clear();
   p_.clear();
   c_.clear();
@@ -147,13 +146,22 @@ void OCP::sortType(){
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
     // Make sure that the variable is initialized
     switch(it->getType()){
-      case TYPE_STATE:              x_.push_back(*it);  break;
-      case TYPE_ALGEBRAIC:          z_.push_back(*it);  break;
+      case TYPE_STATE:              xx_.push_back(*it);  break;
       case TYPE_CONTROL:            u_.push_back(*it);  break;
       case TYPE_PARAMETER:          p_.push_back(*it);  break;
       case TYPE_CONSTANT:           c_.push_back(*it);  break;
       case TYPE_DEPENDENT:          d_.push_back(*it);  break;
       default: throw CasadiException("OCP::sortVariables: unknown type for " + it->getName());
+    }
+  }
+  
+  xd_.clear();
+  xa_.clear();
+  for(vector<Variable>::const_iterator it=xx_.begin(); it!=xx_.end(); ++it){
+    if(it->isDifferential()){
+      xd_.push_back(*it);
+    } else {
+      xa_.push_back(*it);
     }
   }
 }
@@ -167,9 +175,9 @@ void OCP::scale(){
   
   // Variables
   Matrix<SX> t = t_;
-  Matrix<SX> x = var(x_);
-  Matrix<SX> xdot = der(x_);
-  Matrix<SX> z = var(z_);
+  Matrix<SX> x = var(xd_);
+  Matrix<SX> xdot = der(xd_);
+  Matrix<SX> z = var(xa_);
   Matrix<SX> p = var(p_);
   Matrix<SX> u = var(u_);
   
@@ -184,9 +192,9 @@ void OCP::scale(){
   
   // Nominal values
   Matrix<SX> t_n = 1.;
-  Matrix<SX> x_n = getNominal(x_);
-  Matrix<SX> xdot_n = getNominal(x_);
-  Matrix<SX> z_n = getNominal(z_);
+  Matrix<SX> x_n = getNominal(xd_);
+  Matrix<SX> xdot_n = getNominal(xd_);
+  Matrix<SX> z_n = getNominal(xa_);
   Matrix<SX> p_n = getNominal(p_);
   Matrix<SX> u_n = getNominal(u_);
   
@@ -216,8 +224,8 @@ void OCP::scale(){
 
 void OCP::sortBLT(){
   // State derivatives and algebraic variables
-  vector<SX> xdot = der(x_);
-  vector<SX> z = var(z_);
+  vector<SX> xdot = der(xd_);
+  vector<SX> z = var(xa_);
 
   // Create Jacobian in order to find the sparsity
   vector<SX> v;
@@ -238,7 +246,7 @@ void OCP::sortBLT(){
   // Permute variables
   for(int i=0; i<v.size(); ++i){
     int j = blt.colperm[i];
-    Variable& vj = j<xdot.size() ? x_[j] : z_[j-xdot.size()];
+    Variable& vj = j<xdot.size() ? xd_[j] : xa_[j-xdot.size()];
     vj.setIndex(i);
     vj.setEquation(0, dae[i]);
   }
@@ -250,9 +258,9 @@ void OCP::makeExplicit(){
 
   // Dynamic equation
   SXMatrix dae(this->dae);
-  SXMatrix xdot(x_.size(),1,0);
-  for(int i=0; i<x_.size(); ++i)
-    xdot[i] = x_[i].der();
+  SXMatrix xdot(xd_.size(),1,0);
+  for(int i=0; i<xd_.size(); ++i)
+    xdot[i] = xd_[i].der();
   
   // Take the Jacobian of the ode with respect to xdot
   SXMatrix J = jacobian(dae,xdot);
@@ -268,8 +276,8 @@ void OCP::makeExplicit(){
   rhs = substitute(rhs,xdot,SXMatrix(xdot.sparsity(),0));
   
   // Save as explicit derivative
-  for(int i=0; i<x_.size(); ++i)
-    x_[i].setEquation(x_[i].der(),rhs(i,0));
+  for(int i=0; i<xd_.size(); ++i)
+    xd_[i].setEquation(xd_[i].der(),rhs(i,0));
 }
 
 void OCP::makeSemiExplicit(){

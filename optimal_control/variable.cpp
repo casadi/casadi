@@ -263,6 +263,9 @@ void Variable::setIndex(int ind){
   (*this)->index_ = ind;
 }
     
+bool Variable::isDifferential() const{
+  return !(*this)->dx_.isNan();
+}
 
 
 

@@ -42,20 +42,20 @@ int main(){
   ocp.u_[0].setMax(370);
   
   // Correct bound on state
-  ocp.x_[1].setMax(350);
+  ocp.xd_[1].setMax(350);
   
   // Variables
   SX t = ocp.t_;
-  Matrix<SX> x = var(ocp.x_);
-  Matrix<SX> xdot = der(ocp.x_);
-  Matrix<SX> z = var(ocp.z_);
+  Matrix<SX> x = var(ocp.xd_);
+  Matrix<SX> xdot = der(ocp.xd_);
+  Matrix<SX> z = var(ocp.xa_);
   Matrix<SX> p = var(ocp.p_);
   Matrix<SX> u = var(ocp.u_);
 
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x_,true);
-  vector<double> xmin = getMin(ocp.x_,true);
-  vector<double> xmax = getMax(ocp.x_,true);
+  vector<double> x0 = getStart(ocp.xd_,true);
+  vector<double> xmin = getMin(ocp.xd_,true);
+  vector<double> xmax = getMax(ocp.xd_,true);
   
   // Initial guess and bounds for the control
   vector<double> u0 = getStart(ocp.u_,true);

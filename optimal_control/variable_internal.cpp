@@ -69,7 +69,7 @@ void VariableInternal::init(){
         type_ = TYPE_PARAMETER;
       } else if(variability_ == CONTINUOUS) {
         if(causality_ == INTERNAL){
-          type_ = !dx_->isNan() ? TYPE_STATE : TYPE_ALGEBRAIC;
+          type_ = TYPE_STATE;
         } else if(causality_ == INPUT){
           type_ = TYPE_CONTROL;
         }

@@ -134,7 +134,6 @@ cout << "vars" << endl;
     // Add to ocp
     Variable var = ocp_.variables;
     
-    //cout << "adding " << var << endl;
     const XMLNode& nn = vnode["QualifiedName"];
     for(int i=0; i<nn.size(); ++i){
       string namepart = nn[i].attribute("name");
