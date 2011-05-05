@@ -136,7 +136,7 @@ void OCP::sortType(){
   vector<Variable> v = variables;
   
   // Clear variables
-  xx_.clear();
+  x_.clear();
   u_.clear();
   p_.clear();
   c_.clear();
@@ -146,7 +146,7 @@ void OCP::sortType(){
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
     // Make sure that the variable is initialized
     switch(it->getType()){
-      case TYPE_STATE:              xx_.push_back(*it);  break;
+      case TYPE_STATE:              x_.push_back(*it);  break;
       case TYPE_CONTROL:            u_.push_back(*it);  break;
       case TYPE_PARAMETER:          p_.push_back(*it);  break;
       case TYPE_CONSTANT:           c_.push_back(*it);  break;
@@ -157,7 +157,7 @@ void OCP::sortType(){
   
   xd_.clear();
   xa_.clear();
-  for(vector<Variable>::const_iterator it=xx_.begin(); it!=xx_.end(); ++it){
+  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it){
     if(it->isDifferential()){
       xd_.push_back(*it);
     } else {

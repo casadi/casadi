@@ -70,7 +70,7 @@ class OCP : public PrintableObject{
     std::vector<Variable> xa_;
     
     /// States
-    std::vector<Variable> xx_;
+    std::vector<Variable> x_;
 
     /// Controls
     std::vector<Variable> u_;
