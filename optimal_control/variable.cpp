@@ -65,22 +65,6 @@ SX Variable::var() const{
   return (*this)->var();
 }
 
-SX Variable::lhs() const{
-  return (*this)->lhs_;  
-}
-
-SX Variable::rhs() const{
-  return (*this)->rhs_;  
-}
-
-double Variable::getValue() const{
-  return (*this)->val;
-}
-
-void Variable::setValue(double val){
-  (*this)->val = val;
-}
-  
 const string& Variable::getName() const{
   return (*this)->name_;
 }
@@ -185,19 +169,6 @@ void Variable::setDerivative(const SX& dx){
   (*this)->dx_ = dx;
 }
 
-void Variable::setLHS(const SX& ex){
-  (*this)->lhs_ = ex;
-}
-    
-void Variable::setRHS(const SX& ex){
-  (*this)->rhs_ = ex;
-}
-
-void Variable::setEquation(const SX& l, const SX& r){
-  setLHS(l);
-  setRHS(r);
-}
-
 bool Variable::checkNode() const{
   return dynamic_cast<const VariableInternal*>(get());
 }
@@ -222,7 +193,21 @@ bool Variable::isDifferential() const{
   return !(*this)->dx_.isNan();
 }
 
+void Variable::setDependent(int dep){
+  (*this)->dependent_ = dep;
+}
+    
+bool Variable::getDependent() const{
+  return (*this)->dependent_;
+}
 
+SX Variable::highest() const{
+  if(isDifferential()){
+    return der();
+  } else {
+    return var();
+  }
+}
 
 
 } // namespace OptimalControl

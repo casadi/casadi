@@ -67,11 +67,8 @@ namespace CasADi{
     /// Get differential expression (allocate if necessary)
     SX der(bool allocate=false);
     
-    /// Left hand side of the defining (differential) equation
-    SX lhs() const;
-    
-    /// Right hand side of the defining (differential) equation
-    SX rhs() const;
+    /// Get the highest order derivative (i.e. der() or var())
+    SX highest() const;
     
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
@@ -87,12 +84,6 @@ namespace CasADi{
 
     /// Const access functions of the node
     const VariableInternal* operator->() const;
-
-    /// Get numerical value
-    double getValue() const;
-
-    /// Set numerical value
-    void setValue(double val);
 
     /// Get variable name
     const std::string& getName() const;
@@ -171,21 +162,19 @@ namespace CasADi{
 
     /// Set the derivative expression
     void setDerivative(const SX& dx);
-    
-    /// Set the left hand side of the defining equation
-    void setLHS(const SX& ex);
-    
-    /// Set the right hand side of the defining equation
-    void setRHS(const SX& ex);
-    
-    /// Set equation
-    void setEquation(const SX& l, const SX& r);
-            
+                
     /// Set the variable index
     void setIndex(int ind);
     
     /// Is differential?
     bool isDifferential() const;
+    
+    /// Set dependent
+    void setDependent(int dep);
+    
+    /// Is dependent?
+    bool getDependent() const;
+    
     
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
@@ -198,13 +187,10 @@ namespace CasADi{
 %extend CasADi::OptimalControl::Variable {
   // Not inherited: Bug?
   std::string __repr__()  { return $self->getRepresentation(); }
-  
-  // Not automatically translated
-  CasADi::OptimalControl::Variable __getitem__(int ind) const { return (*$self)[ind];}
 }
 
 // Template instantiations
-%template(vector_variable) std::vector<CasADi::OptimalControl::Variable>;
+%template(VariableVector) std::vector<CasADi::OptimalControl::Variable>;
 #endif // SWIG  
 
 

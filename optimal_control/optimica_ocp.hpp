@@ -30,7 +30,6 @@ namespace CasADi{
   namespace OptimalControl{
     
     /// Tree structure for storing variables
-    #ifndef SWIG
     class VariableTree{
       public:
         /// Access a sub-collection by name
@@ -40,10 +39,12 @@ namespace CasADi{
         VariableTree& subByIndex(int ind, bool allocate=false);
         
         /// Get all variables
-        void getAll(std::vector<Variable>& v) const;
+        void getAll(std::vector<Variable>& v, bool skip_dependent=false) const;
     
         /// Print node
+        #ifndef SWIG
         void print(std::ostream &stream, int indent=0) const;
+        #endif // SWIG
 
         /// Variable
         Variable var_;
@@ -54,8 +55,6 @@ namespace CasADi{
         /// Names of children
         std::map<std::string,int> name_part_;
     };
-    #endif
-    
     
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCP : public PrintableObject{
@@ -73,6 +72,12 @@ class OCP : public PrintableObject{
     /// Sort variables according to type
     void sortType();
 
+    /// Divide the state into its differential and algebraic components
+    void sortState();
+
+    /// Eliminate dependent equations
+    void eliminateDependent();
+    
     /// Sort the variables and equations according to BLT
     void sortBLT();
     
@@ -81,6 +86,9 @@ class OCP : public PrintableObject{
 
     /// Replace all state derivatives by algebraic variables with the same name
     void makeSemiExplicit();
+    
+    /// Add a binding equation
+    void addExplicitEquation(const SX& var, const SX& bind_eq);
     
     /// Create a new, scaled OCP
     void scale();
@@ -106,19 +114,16 @@ class OCP : public PrintableObject{
     /// Free parameters
     std::vector<Variable> p_;
 
-    /// Constants
-    std::vector<Variable> c_;
-
-    /// Dependent
-    std::vector<Variable> d_;
-        
-    /// Differential algebraic equations
-    std::vector<SX> dae;
+    /// Explicit equations
+    std::vector<SX> explicit_lhs_, explicit_rhs_;
+    
+    /// Dynamic equations
+    std::vector<SX> dynamic_eq_;
     
     /// Initial equations
-    std::vector<SX> initeq;
+    std::vector<SX> initial_eq_;
 
-    /// Path constraint function with upper and lower bounds
+    /// Constraint function with upper and lower bounds
     std::vector<SX> cfcn, cfcn_lb, cfcn_ub;
 
     /// Mayer objective terms
@@ -145,6 +150,13 @@ class OCP : public PrintableObject{
     /// Is scaled?
     bool is_scaled_;
 
+    /// BLT blocks
+    std::vector<int> rowblock_;  // block k is rows r[k] to r[k+1]-1
+    std::vector<int> colblock_;  // block k is cols s[k] to s[k+1]-1
+
+    /// BLT sorted?
+    bool blt_sorted_;
+    
 };
 
 #ifdef SWIG

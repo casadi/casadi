@@ -607,6 +607,16 @@ SX SX::constpow(const SX& n) const{
   return SX(new BinarySXNode(CONSTPOW,*this,n));
 }
 
+int SX::getTemp() const{
+  return (*this)->temp;
+}
+    
+void SX::setTemp(int t){
+  (*this)->temp = t;
+}
+
+
+
 } // namespace CasADi
 
 using namespace CasADi;

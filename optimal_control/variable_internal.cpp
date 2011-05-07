@@ -33,11 +33,7 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   
   // Not differentable by default
   dx_ = casadi_limits<SX>::nan;
-  
-  // Equations undefined by default
-  lhs_ = casadi_limits<SX>::nan;
-  rhs_ = casadi_limits<SX>::nan;
-  
+    
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;
   alias_ = NO_ALIAS;
@@ -49,6 +45,7 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   start_ = 0.0;
   unit_ = "";
   displayUnit_ = "";
+  dependent_ = false;
 
   index_ = -1;
 }

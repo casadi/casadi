@@ -92,6 +92,9 @@ OCP& FMIParserInternal::parse(){
   if(document_[0].hasChild("opt:Optimization"))
     addOptimization();
 
+  // Sort the variables according to type
+  ocp_.sortType();
+  
   // Return a reference to the created ocp
   return ocp_;
 
@@ -206,9 +209,32 @@ void FMIParserInternal::addBindingEquations(){
     // Get the binding equation
     SX bexpr = readExpr(beq[1][0]);
 
-    // Pass to variable
-    var.setEquation(var.var(),bexpr);
+    // Mark variable dependent
+    var.setDependent(true);
+    
+    // Add binding equation
+    ocp_.addExplicitEquation(var.var(),bexpr);
   }
+  
+  // Also add binding equations to all constant variables not yet marked as dependent
+  vector<Variable> v_all;
+  vector<SX> beq_var;
+  vector<SX> beq_exp;
+  ocp_.variables_.getAll(v_all,true);
+  for(vector<Variable>::iterator it=v_all.begin(); it!=v_all.end(); ++it){
+    if(it->getVariability()==CONSTANT){
+      // Save binding equation
+      beq_var.push_back(it->var());
+      beq_exp.push_back(it->getStart());
+      
+      // Mark dependent
+      it->setDependent(true);
+    }
+  }
+  
+  // Add to the beginning of the list of binding equations (in case some binding equations depend on them)
+  ocp_.explicit_lhs_.insert(ocp_.explicit_lhs_.begin(),beq_var.begin(),beq_var.end());
+  ocp_.explicit_rhs_.insert(ocp_.explicit_rhs_.begin(),beq_exp.begin(),beq_exp.end());
 }
 
 void FMIParserInternal::addDynamicEquations(){
@@ -223,7 +249,7 @@ void FMIParserInternal::addDynamicEquations(){
 
     // Add the differential equation
     SX de_new = readExpr(dnode[0]);
-    ocp_.dae.push_back(de_new);
+    ocp_.dynamic_eq_.push_back(de_new);
   }
 }
 
@@ -239,7 +265,7 @@ void FMIParserInternal::addInitialEquations(){
 
     // Add the differential equations
     for(int i=0; i<inode.size(); ++i){
-      ocp_.initeq.push_back(readExpr(inode[i]));
+      ocp_.initial_eq_.push_back(readExpr(inode[i]));
     }
   }
 }
@@ -398,10 +424,7 @@ SX FMIParserInternal::readExpr(const XMLNode& node){
     return readExpr(node[0]) / readExpr(node[1]);
   } else if(name.compare("Identifier")==0){
     Variable var = readVariable(node);
-    if(var.var().isEqual(var.lhs()))
-      return var.rhs();
-    else
-      return var.var();
+    return var.var();
   } else if(name.compare("IntegerLiteral")==0){
     return int(node.getText());
   } else if(name.compare("Instant")==0){

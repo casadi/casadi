@@ -37,13 +37,14 @@ namespace CasADi{
 
 OCP::OCP(){
   is_scaled_ = false;
+  blt_sorted_ = false;
   t_ = SX("t");
 }
 
 void OCP::repr(ostream &stream) const{
   stream << "Optimal control problem (";
-  stream << "#dae = " << dae.size() << ", ";
-  stream << "#initeq = " << initeq.size() << ", ";
+  stream << "#dae = " << dynamic_eq_.size() << ", ";
+  stream << "#initial_eq_ = " << initial_eq_.size() << ", ";
   stream << "#cfcn = " << cfcn.size() << ", ";
   stream << "#mterm = " << mterm.size() << ", ";
   stream << "#lterm = " << lterm.size() << ")";
@@ -69,35 +70,34 @@ void OCP::print(ostream &stream) const{
   stream << "#z = " << xa_.size() << ", ";
   stream << "#u = " << u_.size() << ", ";
   stream << "#p = " << p_.size() << ", ";
-  stream << "#c = " << c_.size() << ", ";
-  stream << "#d = " << d_.size() << ")";
+  stream << endl << endl;
   
   // Print the differential-algebraic equation
-  stream << "Differential-Algebraic Equations" << endl;
-  for(vector<SX>::const_iterator it=dae.begin(); it!=dae.end(); it++){
+  stream << "Dynamic equations" << endl;
+  for(vector<SX>::const_iterator it=dynamic_eq_.begin(); it!=dynamic_eq_.end(); it++){
     stream << "0 == "<< *it << endl;
   }
   stream << endl;
 
   stream << "Initial equations" << endl;
-  for(vector<SX>::const_iterator it=initeq.begin(); it!=initeq.end(); it++){
+  for(vector<SX>::const_iterator it=initial_eq_.begin(); it!=initial_eq_.end(); it++){
     stream << "0 == " << *it << endl;
   }
   stream << endl;
 
   // Print the explicit differential equations
-  stream << "Differential equations (explicit)" << endl;
+/*  stream << "Differential equations (explicit)" << endl;
   for(vector<Variable>::const_iterator it=xd_.begin(); it!=xd_.end(); it++){
     SX de = it->rhs();
     if(!de->isNan())
       stream << "der(" << *it << ") == " << de << endl;
   }
-  stream << endl;
+  stream << endl;*/
   
   // Dependent equations
   stream << "Dependent equations" << endl;
-  for(vector<Variable>::const_iterator it=d_.begin(); it!=d_.end(); it++)
-    stream << *it << " == " << it->rhs() << endl;
+  for(int i=0; i<explicit_lhs_.size(); ++i)
+    stream << explicit_lhs_[i] << " == " << explicit_rhs_[i] << endl;
   stream << endl;
 
   // Mayer terms
@@ -130,25 +130,42 @@ void OCP::print(ostream &stream) const{
   
 }
 
+void OCP::eliminateDependent(){
+  Matrix<SX> v = explicit_lhs_;
+  Matrix<SX> v_old = explicit_rhs_;
+  
+  dynamic_eq_= substitute(dynamic_eq_,v,v_old).data();
+  initial_eq_= substitute(initial_eq_,v,v_old).data();
+  cfcn    = substitute(cfcn,v,v_old).data();
+  cfcn_lb = substitute(cfcn_lb,v,v_old).data();
+  cfcn_ub = substitute(cfcn_ub,v,v_old).data();
+  mterm   = substitute(mterm,v,v_old).data();
+  lterm   = substitute(lterm,v,v_old).data();
+}
+
+void OCP::addExplicitEquation(const SX& var, const SX& bind_eq){
+  // Eliminate previous binding equations from the expression
+  SX bind_eq_eliminated = substitute(bind_eq, explicit_lhs_, explicit_rhs_).data().front();
+  
+  explicit_lhs_.push_back(var);
+  explicit_rhs_.push_back(bind_eq_eliminated);
+}
+
 void OCP::sortType(){
   // Get all the variables
   vector<Variable> v;
-  variables_.getAll(v);
+  variables_.getAll(v,true);
   
   // Clear variables
   x_.clear();
   u_.clear();
   p_.clear();
-  c_.clear();
-  d_.clear();
-  
+    
   // Loop over variables
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
-    
-    // Try to determine the type
-    if(it->lhs().isEqual(it->var())){
-      d_.push_back(*it);
-    } else {
+    // If not dependent
+    if(!it->getDependent()){
+      // Try to determine the type
       if(it->getVariability() == PARAMETER){
         p_.push_back(*it);
       } else if(it->getVariability() == CONTINUOUS) {
@@ -158,11 +175,17 @@ void OCP::sortType(){
           u_.push_back(*it);
         }
       } else if(it->getVariability() == CONSTANT){
-        c_.push_back(*it);
+        cout << *it << endl;
+        casadi_assert(0);
+/*        d_.push_back(*it);*/
       }
     }
   }
   
+  sortState();
+}
+
+void OCP::sortState(){
   xd_.clear();
   xa_.clear();
   for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it){
@@ -178,8 +201,6 @@ void OCP::scale(){
   /// Make sure that the OCP has not already been scaled
   casadi_assert(!is_scaled_);
   
-  // Sort the variables according to type
-  sortType();
   
   // Variables
   Matrix<SX> t = t_;
@@ -219,8 +240,9 @@ void OCP::scale(){
   Matrix<SX> temp;
 
   // Substitute equations
-  dae     = substitute(dae,v,v_old).data();
-  initeq  = substitute(initeq,v,v_old).data();
+  explicit_rhs_= substitute(explicit_rhs_,v,v_old).data();
+  dynamic_eq_= substitute(dynamic_eq_,v,v_old).data();
+  initial_eq_= substitute(initial_eq_,v,v_old).data();
   cfcn    = substitute(cfcn,v,v_old).data();
   cfcn_lb = substitute(cfcn_lb,v,v_old).data();
   cfcn_ub = substitute(cfcn_ub,v,v_old).data();
@@ -231,37 +253,112 @@ void OCP::scale(){
 }
 
 void OCP::sortBLT(){
-  // State derivatives and algebraic variables
-  vector<SX> xdot = der(xd_);
-  vector<SX> z = var(xa_);
+  // Unknown variables in the dynamic equations
+  vector<SX> v;
+  v.reserve(x_.size());
+  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it)
+    v.push_back(it->highest());
 
   // Create Jacobian in order to find the sparsity
-  vector<SX> v;
-  v.insert(v.end(),xdot.begin(),xdot.end());
-  v.insert(v.end(),z.begin(),z.end());
-  SXFunction fcn(v,dae);
+  SXFunction fcn(v,dynamic_eq_);
   Matrix<SX> J = fcn.jac();
   
   // BLT transformation
   Interfaces::BLT blt(J.sparsity());
 
   // Permute equations
-  vector<SX> dae_old = dae;
-  for(int i=0; i<dae.size(); ++i){
-    dae[i] = dae[blt.rowperm[i]];
+  vector<SX> dynamic_eq_old = dynamic_eq_;
+  for(int i=0; i<dynamic_eq_.size(); ++i){
+    dynamic_eq_[i] = dynamic_eq_old[blt.rowperm[i]];
   }
   
   // Permute variables
-  for(int i=0; i<v.size(); ++i){
-    int j = blt.colperm[i];
-    Variable& vj = j<xdot.size() ? xd_[j] : xa_[j-xdot.size()];
-    vj.setIndex(i);
-    vj.setEquation(0, dae[i]);
+  vector<Variable> x_old = x_;
+  for(int i=0; i<x_.size(); ++i){
+    x_[i] = x_old[blt.colperm[i]];
   }
+  sortState();
+  
+  // Save blocks
+  rowblock_ = blt.rowblock;
+  colblock_ = blt.colblock;
+  
+  blt_sorted_ = true;
+
 }
 
 void OCP::makeExplicit(){
-  // Sort the variables
+  casadi_assert_message(blt_sorted_,"OCP has not been BLT sorted, call sortBLT()");
+
+  // Unknown variables in the dynamic equations
+  vector<SX> v;
+  v.reserve(x_.size());
+  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it)
+    v.push_back(it->highest());
+
+  // Create Jacobian
+  SXFunction fcn(v,dynamic_eq_);
+  SXMatrix J = fcn.jac();
+  // J.printDense();
+
+  // Cumulative variables and definitions
+  SXMatrix vb_cum;
+  SXMatrix def_cum;
+
+  // Block variables and equations
+  vector<SX> vb, fb;
+  
+  // Loop over blocks
+  int nb = rowblock_.size();
+  for(int b=0; b<nb; ++b){
+    // Block size
+    int bs = rowblock_[b+1] - rowblock_[b];
+    
+    // Get local variables
+    vb.clear();
+    for(int i=colblock_[b]; i<colblock_[b+1]; ++i)
+      vb.push_back(v[i]);
+
+    // Get local equations
+    fb.clear();
+    for(int i=rowblock_[b]; i<rowblock_[b+1]; ++i)
+      fb.push_back(dynamic_eq_[i]);
+
+    // Get local Jacobian
+    SXMatrix Jb = J[range(rowblock_[b],rowblock_[b+1]),range(colblock_[b],colblock_[b+1])];
+   
+    if(dependsOn(Jb,vb)){
+      // Cannot solve for vb, add to list of implicit equations
+      casadi_assert_message(0,"Not implemented");
+/*      append(vb_cum,SXMatrix(vb));
+      append(def_cum,SXMatrix(vb));*/
+      
+    } else {
+      // Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
+      SXMatrix fb_res = substitute(fb,vb,SXMatrix(vb.size(),1,0));
+      SXMatrix fb_exp;
+      
+      // Solve for vb
+      if (bs <= 3){
+        // Calculate inverse and multiply for very small matrices
+        fb_exp = prod(inv(Jb),-fb_res);
+      } else {
+        // QR factorization
+        fb_exp = solve(Jb,-fb_res);
+      }
+        
+      // Substitute variables that have already been defined
+      if(!def_cum.empty()){
+        fb_exp = substitute(fb_exp,vb_cum,def_cum);
+      }
+      
+      casadi_assert(0);
+      append(vb_cum,SXMatrix(vb));
+      append(def_cum,SXMatrix(fb_exp));
+    }
+  }
+  
+  /*  // Sort the variables
   sortType();
 
   // Dynamic equation
@@ -285,10 +382,76 @@ void OCP::makeExplicit(){
   
   // Save as explicit derivative
   for(int i=0; i<xd_.size(); ++i)
-    xd_[i].setEquation(xd_[i].der(),rhs(i,0));
+    xd_[i].setEquation(xd_[i].der(),rhs(i,0));*/
 }
 
 void OCP::makeSemiExplicit(){
+  
+  
+//     fcn = SXFunction([v_new],[dae_new])
+//   J = fcn.jac()
+//   #J.printDense()
+// 
+//   # Cumulative variables and definitions
+//   vb_cum = SXMatrix()
+//   def_cum = SXMatrix()
+// 
+//   for b in range(blt.nb):
+//     Jb = J[blt.rowblock[b]:blt.rowblock[b+1],blt.colblock[b]:blt.colblock[b+1]]
+//     vb = v_new[blt.colblock[b]:blt.colblock[b+1]]
+//     fb = dae_new[blt.rowblock[b]:blt.rowblock[b+1]]
+//     
+//     # Block size
+//     bs = blt.rowblock[b+1] - blt.rowblock[b]
+// 
+//     #print "block ", b,
+// 
+//     if dependsOn(Jb,vb):
+//       # Cannot solve for vb, add to list of implicit equations
+//       raise Exception("Not implemented")
+//       vb_cum.append(vb)
+//       def_cum.append(vb)
+//       
+//     else:
+//       # Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
+//       fb_res = substitute(fb,vb,SXMatrix(len(vb),1,SX(0)))
+//       
+//       # Solve for vb
+//       if bs <= 3:
+//         # Calculate inverse and multiply for very small matrices
+//         fb_exp = dot(inv(Jb),-fb_res)
+//       else:
+//         # QR factorization
+//         fb_exp = solve(Jb,-fb_res)
+//         
+//       # Substitute variables that have already been defined
+//       if not def_cum.empty():
+//         fb_exp = substitute(fb_exp,vb_cum,def_cum)
+//       
+//       append(vb_cum,vb)
+//       append(def_cum,fb_exp)
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   throw CasadiException("OCP::makeSemiExplicit: Commented out");
 #if 0  
   // Move the fully implicit dynamic equations to the list of algebraic equations
@@ -350,14 +513,14 @@ VariableTree& VariableTree::subByIndex(int ind, bool allocate){
   }
 }
 
-void VariableTree::getAll(std::vector<Variable>& v) const{
+void VariableTree::getAll(std::vector<Variable>& v, bool skip_dependent) const{
   /// Add variables
   for(vector<VariableTree>::const_iterator it=children_.begin(); it!=children_.end(); ++it){
     it->getAll(v);
   }
   
   /// Add variable, if any
-  if(!var_.isNull())
+  if(!var_.isNull() && !(skip_dependent && var_.getDependent()))
     v.push_back(var_);
 }
 

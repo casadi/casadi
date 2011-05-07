@@ -194,6 +194,13 @@ class SX{
     SX pow(const SX& n) const;
     SX constpow(const SX& n) const;
     
+    // Get the temporary variable
+    int getTemp() const;
+    
+    // Set the temporary variable
+    void setTemp(int t);
+    
+    
   private:
 #ifndef SWIG
     SXNode* node;
