@@ -44,6 +44,17 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
   
   if(outputv.empty() || inputv.empty()) return;
 
+  // Check that inputs are symbolic
+  for(int i=0; i<inputv_.size(); ++i) {
+    if (!isSymbolicSparse(inputv_[i])) {
+      stringstream ss;
+      ss << "SXFunctionInternal::SXFunctionInternal: SXfunction input arguments must be purely symbolic." << endl;
+      ss << "Argument #" << i << " is not symbolic." << endl;
+      throw CasadiException(ss.str());
+    }
+  }
+
+
   // Stack
   stack<SXNode*> s;
 
