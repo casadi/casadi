@@ -689,6 +689,20 @@ class SXtests(casadiTestCase):
     self.assertTrue(isSymbolic(x))
     self.assertFalse(isSymbolic(z))
     
+  def test_evalchecking(self):
+    x = symbolic("x",1,5)
+    
+    y = symbolic("y",1,3)
+    z = symbolic("z",5,1)
+    q = symbolic("z",1,6)
+    
+    f = SXFunction([x],[x**2])
+    f.init()
+    
+    self.assertRaises(RuntimeError, lambda : f.eval([y]))
+    self.assertRaises(RuntimeError, lambda : f.eval([q]))
+    f.eval([z])
+    
 if __name__ == '__main__':
     unittest.main()
 
