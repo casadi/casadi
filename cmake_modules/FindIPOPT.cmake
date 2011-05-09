@@ -14,10 +14,10 @@ ELSE (IPOPT_INCLUDE_DIR)
 ENDIF (IPOPT_INCLUDE_DIR)
 
 FIND_LIBRARY(IPOPT_LIBRARY 
-ipopt HINTS /usr/local/lib/coin /usr/local/lib/coin/ThirdParty $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/)
+ipopt HINTS $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/  /usr/local/lib/coin /usr/local/lib/coin/ThirdParty )
 
 FIND_LIBRARY(HSL_LIBRARY 
-coinhsl HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinhsl HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/  /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 
 FIND_LIBRARY(MUMPS_LIBRARY_492 
