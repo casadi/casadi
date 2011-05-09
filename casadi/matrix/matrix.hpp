@@ -425,6 +425,11 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
     void printDense(std::ostream &stream=std::cout) const; // Print dense matrix stype
     //@}
+    
+    /** \brief Get string representation of dimensions.
+    The representation is (nrow x ncol = numel | size)
+    */
+    std::string dimString() const;
 
     // Get the sparsity pattern
     const std::vector<int>& col() const;
@@ -865,6 +870,7 @@ void Matrix<T>::printDense(std::ostream &stream) const{
       stream << "]" << std::endl;
   }
 }
+
 
 template<class T>
 void Matrix<T>::printSparse(std::ostream &stream) const {
@@ -1537,6 +1543,13 @@ void Matrix<T>::erase(const std::vector<int>& ii, const std::vector<int>& jj){
 template<class T>
 void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj){
   sparsityRef().enlarge(nrow,ncol,ii,jj);
+}
+
+template<class T>
+std::string Matrix<T>::dimString() const {
+  std::stringstream ss;
+  ss << "(" << size1() << " x " << size2() << " = " << numel() << " | " << size() << ")";
+  return ss.str();
 }
 
 

@@ -99,7 +99,7 @@ vector<SXMatrix> SXFunction::eval(const vector<SXMatrix>& arg){
     if(arg[i].size() != argv[i].size()) {
       stringstream ss;
       ss << "SXFunction::eval: wrong number of non-zeros for argument number " << i << "."<< endl;
-      ss << "Expecting (" << argv[i].size1() << " x " << argv[i].size2() << " = "  << argv[i].size() << " ), got (" << arg[i].size1() << " x " << arg[i].size2() << " = "  << arg[i].size() <<  " ) instead." << endl;
+      ss << "Expecting " << argv[i].dimString() << ", got " << arg[i].dimString() << " instead." << endl;
       throw CasadiException(ss.str());
     }
   }

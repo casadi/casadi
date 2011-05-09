@@ -394,6 +394,12 @@ MX MX::eval(const vector<MX>& x){
   return (*this)->eval(x);
 }
 
+std::string MX::dimString() const {
+  std::stringstream ss;
+  ss << "(" << size1() << "x" << size2() << "=" << numel() << "|" << size() << ")";
+  return ss.str();
+}
+
 } // namespace CasADi
 
 
@@ -467,6 +473,7 @@ MX fmin(const MX& x, const MX& y){
 MX fmax(const MX& x, const MX& y){
   return MX::binary(FMAX,x,y);
 }
+
 
 
 

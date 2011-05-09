@@ -218,6 +218,10 @@ class MX : public SharedObject{
   /// Symbolic evaluation (matrix graph)
   MX eval(const std::vector<MX>& x);
 
+  /** \brief Get string representation of dimensions.
+  The representation is (nrow x ncol = numel | size)
+  */
+  std::string dimString() const;
   
 };
 
