@@ -1,5 +1,7 @@
 """
-Grabs the pdf-compiled examples and puts them in the API tree.
+This script reads XML doxygen output and reads source-files to harvest Options.
+
+This script generates a header file with option information that doxygen can use.
 """
 
 xml = 'XML/'
@@ -11,8 +13,7 @@ from lxml import etree
 import os
 import re
 
-# We will use an XML parser for the main index file
-# The other files we will parse as text, for speed.
+# We will use an XML parser for the main index XML file
 xmlData = etree.parse(xml+'index.xml')
 
 classes = xmlData.findall("//compound[@kind='class']")
@@ -36,35 +37,33 @@ metadata=dict()
 for c in classes:
   refid = c.attrib['refid']
   name=c.findtext("name")
-  f = file(xml+refid+'.xml',"r")
+  
+  constructor_name = name + "::" + name.split("::")[-1]
+  
+  # Parse the XML file that describes the class
+  f = etree.parse(xml+refid+'.xml')
+  
   meta = dict()
   metadata[name]=meta
   meta['parents']=[]
   meta['xmlsource']=refid
+ 
+  # find parents
+  for e in f.getroot().findall("compounddef/basecompoundref"):
+    if e.text.find("std::")==-1: # Exclude standard library from hierarchy
+      meta['parents'].append(e.text)
+
+  # find the internal class of this class, if any
+  temp = f.find("//memberdef[name='operator->']/type/ref")
+  if not(temp is None):
+    meta['hasInternal']=temp.attrib["refid"]
   
-  hasInternalAttempt=''
-  fileAttemptFlag=False
-  for l in f:
-    if not(l.find('basecompoundref')==-1):
-      m = re.search('>(.*?)<',l)
-      if m:
-        meta['parents'].append(m.group(1))
-    if not(l.find('<location')==-1) and fileAttemptFlag:
-      if not('file' in meta):
-        m = re.search('file="(.*?)"',l)
-        if m:
-          meta['file']=m.group(1)
-    if not(l.find(name)==-1) and not(l.find("<definition")==-1):
-      fileAttemptFlag = True
-    if not(l.find('<type><ref')==-1):
-      if not('hasInternal' in meta):
-        m = re.search('refid="(.*?)"',l)
-        if m:
-          hasInternalAttempt=m.group(1)
-    if not(l.find('<name>operator-&gt;</name>')==-1):
-      if not('hasInternal' in meta):
-        meta['hasInternal']=hasInternalAttempt
-  f.close()
+  # find the file location of this class
+  temp = f.find("//memberdef[definition='%s']/location" % constructor_name)
+  if not(temp is None):
+    meta['file']=temp.attrib["file"]
+
+print metadata
 
 # Get the parents of a class
 def parents(name):
