@@ -9,13 +9,19 @@ import zipfile
 # JModelica
 from jmodelica.jmi import compile_jmu
 from jmodelica.jmi import JMUModel
+import jmodelica
 
 # CasADi
 from casadi import *
 
 curr_dir = os.path.dirname(os.path.abspath(__file__));
-jmu_name = compile_jmu("VDP_pack.VDP_Opt", curr_dir+"/VDP.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_xml':False})
-
+try:
+  # Try the old Jmodelica syntax
+  jmu_name = compile_jmu("VDP_pack.VDP_Opt", curr_dir+"/VDP.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_xml':False})
+except jmodelica.compiler.UnknownOptionError:
+  # Try the new jmodelica syntax
+  jmu_name = compile_jmu("VDP_pack.VDP_Opt", curr_dir+"/VDP.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':False})
+  
 if True:
   vdp = JMUModel(jmu_name)
   res = vdp.optimize()
@@ -71,7 +77,7 @@ var = OCPVariables(ocp.variables)
 acado_in = ACADO_FCN_NUM_IN * [[]]
 
 # Time
-acado_in[ACADO_FCN_T] = [var.t.sx()]
+acado_in[ACADO_FCN_T] = [var.t_]
 
 # Convert stl vector of variables to list of expressions
 def toList(v, der=False):
@@ -80,23 +86,23 @@ def toList(v, der=False):
     if der:
       ret.append(i.der())
     else:
-      ret.append(i.sx())
+      ret.append(i.var())
   return ret
 
 # Differential state
-acado_in[ACADO_FCN_XD]  = toList(var.x)
+acado_in[ACADO_FCN_XD]  = toList(ocp.x_)
 
 # Algebraic state
-acado_in[ACADO_FCN_XA] = toList(var.z)
+acado_in[ACADO_FCN_XA] = toList(ocp.z_)
 
 # Control
-acado_in[ACADO_FCN_U] = toList(var.u)
+acado_in[ACADO_FCN_U] = toList(ocp.u_)
 
 # Parameter
-acado_in[ACADO_FCN_P] = toList(var.p)
+acado_in[ACADO_FCN_P] = toList(ocp.p_)
 
 # State derivative
-acado_in[ACADO_FCN_XDOT] = toList(var.x,True)
+acado_in[ACADO_FCN_XDOT] = toList(ocp.x_,True)
 
 # The DAE function
 ffcn_out = list(ocp.dae) + list(ocp.ae)

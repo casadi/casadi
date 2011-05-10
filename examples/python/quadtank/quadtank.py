@@ -9,13 +9,20 @@ import scipy.integrate as integr
 # JModelica
 from jmodelica.jmi import compile_jmu
 from jmodelica.jmi import JMUModel
+import jmodelica
 
 # CasADi
 from casadi import *
 
 curr_dir = os.path.dirname(os.path.abspath(__file__))
-jmu_name = compile_jmu("QuadTank_pack.QuadTank_Opt", curr_dir+"/QuadTank.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_xml':True})
 
+try:
+  # Try the old Jmodelica syntax
+  jmu_name = compile_jmu("QuadTank_pack.QuadTank_Opt", curr_dir+"/QuadTank.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_xml':True})
+except jmodelica.compiler.UnknownOptionError:
+  # Try the new jmodelica syntax
+  jmu_name = compile_jmu("QuadTank_pack.QuadTank_Opt", curr_dir+"/QuadTank.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':True})
+  
 import zipfile
 sfile = zipfile.ZipFile(curr_dir+'/QuadTank_pack_QuadTank_Opt.jmu','r')
 mfile = sfile.extract('modelDescription.xml','.')
@@ -30,9 +37,9 @@ print parser
 # Obtain the symbolic representation of the OCP
 ocp = parser.parse()
 
-# Sort the variables according to type
-ocp.sortVariables()
- 
+# Sort the variables according to BLT
+ocp.sortBLT()
+
 # Print the ocp to screen
 print ocp
 

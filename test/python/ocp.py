@@ -179,7 +179,7 @@ class OCPtests(casadiTestCase):
     self.message("JModelica XML parsing")
     parser = FMIParser('data/cstr.xml')
     ocp = parser.parse()
-    var = OCPVariables(ocp.variables)
+    
     self.assertEqual(ocp.t0,0)
     self.assertEqual(ocp.tf,150)
     #self.assertFalse(ocp.t0_free)
@@ -188,28 +188,32 @@ class OCPtests(casadiTestCase):
     self.assertTrue(len(ocp.mterm)==1)
     m = ocp.mterm[0]
     self.assertTrue(isinstance(m,SX))
+    self.assertTrue(isinstance(ocp.t_,SX))
     self.assertEquals(str(m),'cost.atTime(150)')
-    self.assertEquals(len(ocp.dae),3)
-    self.assertEquals(len(ocp.initeq),3)
-    self.assertEquals(len(var.x),3) # there are three states
-    (c,T,cost) = tuple(var.x)
+    print dir(ocp)
+    self.assertEquals(len(ocp.dynamic_eq_),3)
+    self.assertEquals(len(ocp.initial_eq_),3)
+    self.assertEquals(len(ocp.x_),3) # there are three states
+    (c,T,cost) = tuple(ocp.x_)
     self.assertTrue(isinstance(c,Variable))
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
     self.assertEquals(cost.getName(),"cost")
     self.assertEquals(c.getNominal(),1000)
     
-    w=ocp.variables('cstr')
+    w=ocp.variables_.subByName('cstr')
     #self.assertEquals(w("T"),T)
-    self.assertEquals(w("T").getName(),"cstr.T")
+    self.assertEquals(w.subByName("T").var_.getName(),"cstr.T")
    
-    c = c.sx()
-    T = T.sx()
-    cost = cost.sx()
+    #print c.atTime(0)
+       
+    c = c.var()
+    T = T.var()
+    cost = cost.var()
     
-    self.assertTrue(w("T").sx().isEqual(T)) 
+    self.assertTrue(w.subByName("T").var_.var().isEqual(T)) 
         
-    u = var.u[0].sx()
+    u = ocp.u_[0].var()
     self.assertEquals(len(ocp.cfcn),3)
     self.assertEquals(len(ocp.cfcn_lb),3)
     self.assertEquals(len(ocp.cfcn_ub),3)
@@ -222,7 +226,10 @@ class OCPtests(casadiTestCase):
     self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
     self.assertTrue(ocp.cfcn_ub[1].isInf())
     self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
-    f=SXFunction([[c,T,cost]],[ocp.initeq])
+    print ocp.initial_eq_
+    print c,T,cost
+    print c.atTime(0)
+    f=SXFunction([[c,T,cost]],[ocp.initial_eq_])
     f.init()
     f.evaluate()
     self.checkarray(f.output(),matrix([-956.271065,-250.051971,0]).T,"initeq")

@@ -10,12 +10,19 @@ import time
 # JModelica
 from jmodelica.jmi import compile_jmu
 from jmodelica.jmi import JMUModel
+import jmodelica
 
 # CasADi
 from casadi import *
 
 curr_dir = os.path.dirname(os.path.abspath(__file__))
-jmu_name = compile_jmu("CSTR.CSTR_Opt", curr_dir+"/CSTR.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_xml':False})
+
+try:
+  # Try the old Jmodelica syntax
+  jmu_name = compile_jmu("CSTR.CSTR_Opt", curr_dir+"/CSTR.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_xml':False})
+except jmodelica.compiler.UnknownOptionError:
+  # Try the new jmodelica syntax
+  jmu_name = compile_jmu("CSTR.CSTR_Opt", curr_dir+"/CSTR.mop",'optimica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':False})
 
 Tc_ref = 280
 c_ref = 338.775766
@@ -40,9 +47,6 @@ ocp = parser.parse()
 # Print the ocp to screen
 print ocp
 
-# Sort the variables according to type
-var = OCPVariables(ocp.variables)
-
 # Convert stl vector of variables to an array of expressions
 def toArray(v, der=False):
   ret = []
@@ -50,16 +54,16 @@ def toArray(v, der=False):
     if der:
       ret.append(i.der())
     else:
-      ret.append(i.sx())
+      ret.append(i.var())
   return array(ret,dtype=SX)
 
 # Variables
-t = var.t.sx()
-x = toArray(var.x)
-xdot = toArray(var.x,True)
-z = toArray(var.z)
-p = toArray(var.p)
-u = toArray(var.u)
+t = ocp.t_
+x = toArray(ocp.xd_)
+xdot = toArray(ocp.xd_,True)
+xa = toArray(ocp.xa_)
+p = toArray(ocp.p_)
+u = toArray(ocp.u_)
 
 # Get scaling factors values
 def getNominal(v):
@@ -68,28 +72,28 @@ def getNominal(v):
     ret.append(i.getNominal())
   return array(ret,dtype=SX)
 
-x_sca = getNominal(var.x)
-z_sca = getNominal(var.z)
-u_sca = getNominal(var.u)
-p_sca = getNominal(var.p)
+x_sca = getNominal(ocp.xd_)
+xa_sca = getNominal(ocp.xa_)
+u_sca = getNominal(ocp.u_)
+p_sca = getNominal(ocp.p_)
 
 print "x_sca = ", repr(x_sca)
-print "z_sca = ", repr(z_sca)
+print "xa_sca = ", repr(xa_sca)
 print "u_sca = ", repr(u_sca)
 print "p_sca = ", repr(p_sca)
 
 # The old variables expressed in the normalized variables
 x_old = x_sca*x
 xdot_old = x_sca*xdot
-z_old = z_sca*z
+xa_old = xa_sca*xa
 u_old = u_sca*u
 p_old = p_sca*p
 
 # scale a function
 def scale_exp(f_old):
-  ffcn_old = SXFunction([x,xdot,z,p,u],[f_old])
+  ffcn_old = SXFunction([x,xdot,xa,p,u],[f_old])
   ffcn_old.init()
-  f_new = ffcn_old.eval([x_old,xdot_old,z_old,p_old,u_old])[0]
+  f_new = ffcn_old.eval([x_old,xdot_old,xa_old,p_old,u_old])[0]
   return array(f_new) # NB! typemap will change
 
 # Create an integrator
@@ -97,9 +101,9 @@ dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = [t]
 dae_in[DAE_Y] = x
 dae_in[DAE_YDOT] = xdot
-dae_in[DAE_Z] = z
+dae_in[DAE_Z] = xa
 dae_in[DAE_P] = concatenate((p,u))
-dae = SXFunction(dae_in,[scale_exp(ocp.dae)/[[1e7], [1000.], [350.]]])
+dae = SXFunction(dae_in,[scale_exp(ocp.dynamic_eq_)/[[1e7], [1000.], [350.]]])
 
 # Number of shooting nodes
 num_nodes = 100
@@ -190,7 +194,7 @@ acado_in[ACADO_FCN_P] = p
 acado_in[ACADO_FCN_XDOT] = xdot
 
 # The DAE function
-ffcn = SXFunction(acado_in,[scale_exp(ocp.dae)/[[1e7], [1000.], [350.]]])
+ffcn = SXFunction(acado_in,[scale_exp(ocp.dynamic_eq_)/[[1e7], [1000.], [350.]]])
 
 # Objective function
 mfcn = SXFunction(acado_in,[scale_exp(ocp.mterm)/1e7])
@@ -199,7 +203,7 @@ mfcn = SXFunction(acado_in,[scale_exp(ocp.mterm)/1e7])
 cfcn = SXFunction(acado_in,[scale_exp(ocp.cfcn)])
   
 # Initial constraint function
-rfcn = SXFunction(acado_in,[scale_exp(ocp.initeq)])
+rfcn = SXFunction(acado_in,[scale_exp(ocp.initial_eq_)])
 
 # Create ACADO solver
 ocp_solver = AcadoInterface(ffcn,mfcn,cfcn,rfcn)
