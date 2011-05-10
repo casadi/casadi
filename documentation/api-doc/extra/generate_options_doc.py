@@ -63,7 +63,6 @@ for c in classes:
   if not(temp is None):
     meta['file']=temp.attrib["file"]
 
-print metadata
 
 # Get the parents of a class
 def parents(name):
@@ -103,7 +102,7 @@ for name,meta in metadata.items():
   f =file(source,"r")
   for l in f:
     if not(l.find('addOption')==-1):
-      m = re.search(r'addOption\(\s*"(.*?)"\s*,\s*(.*?)\s*,\s*(.*?)(,\s*(.*?))?\)\s*;(\s*// (.*))',l)
+      m = re.search(r'addOption\(\s*"([^"]*?)"\s*,\s*([^,]*)\s*,\s*([^,]*)(,\s*(.*?))?\)\s*;(\s*// (.*))?',l)
       if m:
         description=[]
         if not(m.group(7) is None):
@@ -112,7 +111,7 @@ for name,meta in metadata.items():
           description.append(m.group(5))
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': m.group(3),'description': '\n'.join(description), 'used': name}
     if not(l.find('addOption')==-1):
-      m = re.search(r'addOption\(\s*"(.*?)"\s*,\s*(.*?)\s*\)\s*;(\s*// (.*))',l)
+      m = re.search(r'addOption\(\s*"([^"]*)"\s*,\s*([^,]*)\s*\)\s*;(\s*// (.*))?',l)
       if m:
         description=m.group(4)
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': '','description': description, 'used': name}
@@ -134,7 +133,6 @@ for name,meta in metadata.items():
   f.close()
   
 
-print metadata['CasADi::Sundials::CVodesInternal']
   
 def optionsashtml(option):
   return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],option['description'],option['used'])
