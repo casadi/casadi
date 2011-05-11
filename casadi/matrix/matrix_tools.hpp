@@ -219,6 +219,9 @@ std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A);
 template<class T>
 Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 
+/** \brief  Make a matrix dense */
+template<class T>
+void makeDense(Matrix<T>& A);
 
 } // namespace CasADi
 
@@ -808,6 +811,11 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
   return ret;
 }
 
+template<class T>
+void makeDense(Matrix<T>& A){
+  A.makeDense(A.size1(),A.size2(),0);
+}
+
 
 
 } // namespace CasADi
@@ -860,7 +868,7 @@ MTT_INST(T,getSparseTriplet) \
 MTT_INST(T,unite) \
 MTT_INST(T,sum) \
 MTT_INST(T,sum_all) \
-
+MTT_INST(T,makeDense) \
 
 #endif //SWIG
 

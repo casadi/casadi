@@ -376,6 +376,13 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
 */
 Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions);
 
+/**
+  \brief Eliminate constants
+  Eliminate constants from an expression.
+  This will make the graph of the expression smaller, meaning less operations need to be evaluated at runtime. At the same time, 
+  it degrate the cache utilization.
+*/
+Matrix<SX> evaluateConstants(const Matrix<SX>& ex);
 
 
 } // namespace CasADi

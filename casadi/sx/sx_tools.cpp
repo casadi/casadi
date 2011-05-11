@@ -721,7 +721,16 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
   return trans(reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()));
 }
 
-
+Matrix<SX> evaluateConstants(const Matrix<SX>& ex){
+  SXFunction fcn(Matrix<SX>(),ex); // Note: no input argument necessary
+  fcn.init();
+  
+  // Evaluate symbolically, eliminating constants
+  std::vector<Matrix<SX> > input_s;
+  std::vector<Matrix<SX> > output_s = fcn->outputv;
+  fcn->evaluateSX(input_s,output_s,true);
+  return output_s.front();
+}
 
 } // namespace CasADi
 

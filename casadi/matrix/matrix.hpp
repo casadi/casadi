@@ -730,10 +730,36 @@ int Matrix<T>::numel() const{
         
 template<class T>
 void Matrix<T>::makeDense(int n, int m, const T& val){
-  if(n*m != numel()){
+  // Quick return if already dense
+  if(n*m == size())
+    return;
+  
+  if(size1()!=n || size2()!=m){
+    // Also resize
     sparsity_ = CRSSparsity(n,m,true);
-    data().clear();
+    std::fill(data().begin(),data().end(),val);
     data().resize(n*m, val);
+  } else {
+    // Create a new data vector
+    data().resize(n*m,val);
+    
+    // Loop over the rows in reverse order
+    for(int i=n-1; i>=0; --i){
+      // Loop over nonzero elements in reverse order
+      for(int el=rowind(i+1)-1; el>=rowind(i); --el){
+        // Column
+        int j = col(el);
+        
+        // Swap the old position with the new position
+        if(el!=j+i*m){
+          data()[j+i*m] = data()[el];
+          data()[el] = val;
+        }
+      }
+    }
+      
+    // Save the new sparsity pattern
+    sparsity_ = CRSSparsity(n,m,true);
   }
 }
 

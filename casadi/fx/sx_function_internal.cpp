@@ -767,7 +767,7 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   return SXFunction(inputv,H);
 }
 
-void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s){
+void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s, bool eliminate_constants){
   // Assert input dimension
   assert(input_.size() == input_s.size());
   
@@ -789,10 +789,17 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
   
   // Evaluate the algorithm
   for(vector<AlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
-    // Get the arguments
+      // Get the arguments
     SX x = swork[it->ch[0]];
     SX y = swork[it->ch[1]];
-    casadi_math<SX>::fun[it->op](x,y,swork[it->ind]);
+    if(eliminate_constants && x.isConstant() && y.isConstant()){
+      // Check if both arguments are constants
+      double temp;
+      casadi_math<double>::fun[it->op](x.getValue(),y.getValue(),temp);
+      swork[it->ind] = temp;
+    } else {
+      casadi_math<SX>::fun[it->op](x,y,swork[it->ind]);
+    }
   }
 
   // Get the results
