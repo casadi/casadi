@@ -115,6 +115,10 @@ void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose){
   }
 }
 
+LapackQRDenseInternal* LapackQRDenseInternal::clone() const{
+  return new LapackQRDenseInternal(*this);
+}
+
 
   } // namespace Interfaces
 } // namespace CasADi

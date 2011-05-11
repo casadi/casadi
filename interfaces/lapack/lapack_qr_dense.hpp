@@ -63,6 +63,9 @@ class LapackQRDenseInternal : public LinearSolverInternal{
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackQRDenseInternal(const CRSSparsity& sparsity);
 
+    // Clone
+    virtual LapackQRDenseInternal* clone() const;
+
     // Destructor
     virtual ~LapackQRDenseInternal();
     
