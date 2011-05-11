@@ -1601,8 +1601,7 @@ vector<int> IdasInternal::jacmap(int ns){
 bool IdasInternal::symbjac(){
   SXFunction f = shared_cast<SXFunction>(f_);
   SXFunction q = shared_cast<SXFunction>(q_);
-
-  return !f.isNull() && q_.isNull() == q.isNull();
+  return f_.isNull() == f.isNull() && q_.isNull() == q.isNull();
 }
 
 FX IdasInternal::getJacobian(){

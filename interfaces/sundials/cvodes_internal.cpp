@@ -116,7 +116,10 @@ void CVodesInternal::init(){
       throw CasadiException(ss.str());
   }
   
-  // States and RHS should match
+  // ODE right hand side must be a dense matrix
+  casadi_assert_message(f_.output(ODE_RHS).dense(),"ODE right hand side must be dense: reformulate the problem");
+  
+  // States and RHS should match 
   if (f_.output(ODE_RHS).size()!=f_.input(ODE_Y).size()) {
       stringstream ss;
       ss << "IntegratorInternal: rhs of ODE is (" <<  f_.output(ODE_RHS).size1() << 'x' << f_.output(ODE_RHS).size2() << ") - " << f_.output(ODE_RHS).size() << " non-zeros" << std::endl;
@@ -1326,8 +1329,7 @@ void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
 bool CVodesInternal::symbjac(){
   SXFunction f = shared_cast<SXFunction>(f_);
   SXFunction q = shared_cast<SXFunction>(q_);
-
-  return !f.isNull() && q_.isNull() == q.isNull();
+  return f_.isNull() == f.isNull() && q_.isNull() == q.isNull();
 }
 
 Integrator CVodesInternal::jac(int iind, int oind){
@@ -1360,6 +1362,7 @@ Integrator CVodesInternal::jac(int iind, int oind){
 
   // Augmented ODE
   SXMatrix faug = vec(horzcat(f.outputSX(oind),rhs_s));
+  makeDense(faug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
 
   // Input arguments for the augmented DAE
   vector<SXMatrix> faug_in(ODE_NUM_IN);
@@ -1383,6 +1386,7 @@ Integrator CVodesInternal::jac(int iind, int oind){
 
     // Augmented quadratures
     SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
+    makeDense(qaug); // NOTE: se above
 
     // Input to the augmented quadratures
     vector<SXMatrix> qaug_in(ODE_NUM_IN);
