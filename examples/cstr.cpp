@@ -33,32 +33,35 @@ int main(){
   // Print the ocp to screen
   ocp.print();
 
-  // Scale the OCP
-  ocp.scale();
+  // Scale the variables
+  ocp.scaleVariables();
 
   // Eliminate the dependent variables
   ocp.eliminateDependent();
 
+  // Scale the equations
+  ocp.scaleEquations();
+  
   // Correct the inital guess and bounds on variables
   ocp.u_[0].setStart(280);
   ocp.u_[0].setMin(230);
   ocp.u_[0].setMax(370);
   
   // Correct bound on state
-  ocp.xd_[1].setMax(350);
+  ocp.x_[1].setMax(350);
   
   // Variables
   SX t = ocp.t_;
-  Matrix<SX> x = var(ocp.xd_);
-  Matrix<SX> xdot = der(ocp.xd_);
-  Matrix<SX> z = var(ocp.xa_);
+  Matrix<SX> x = var(ocp.x_);
+  Matrix<SX> xdot = der(ocp.x_);
+  Matrix<SX> z = var(ocp.z_);
   Matrix<SX> p = var(ocp.p_);
   Matrix<SX> u = var(ocp.u_);
 
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.xd_,true);
-  vector<double> xmin = getMin(ocp.xd_,true);
-  vector<double> xmax = getMax(ocp.xd_,true);
+  vector<double> x0 = getStart(ocp.x_,true);
+  vector<double> xmin = getMin(ocp.x_,true);
+  vector<double> xmax = getMax(ocp.x_,true);
   
   // Initial guess and bounds for the control
   vector<double> u0 = getStart(ocp.u_,true);
@@ -74,7 +77,7 @@ int main(){
   impres_in[1+ODE_T] = t;
   impres_in[1+ODE_Y] = x;
   impres_in[1+ODE_P] = u;
-  SXFunction impres(impres_in,ocp.dynamic_eq_);
+  SXFunction impres(impres_in,ocp.implicit_fcn_);
   
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
@@ -89,7 +92,7 @@ int main(){
   dae_in[DAE_YDOT] = xdot;
   dae_in[DAE_Z] = z;
   dae_in[DAE_P] = u;
-  SXFunction dae(dae_in,ocp.dynamic_eq_);
+  SXFunction dae(dae_in,ocp.implicit_fcn_);
 
   bool use_kinsol = true;
   if(use_kinsol){
