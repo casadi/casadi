@@ -18,6 +18,8 @@
 %include "std_string.i"
 %include "std_vector.i"
 
+%template(StringVector) std::vector<std::string>;
+
 // Move to C++
 #ifndef SWIG
 namespace CasADi{
@@ -47,7 +49,6 @@ namespace CasADi{
 %template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
 
 #endif // SWIG
-
 
 // Lower value means wil be checked first
 #define PRECEDENCE_DMatrix 100
