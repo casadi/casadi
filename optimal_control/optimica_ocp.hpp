@@ -28,7 +28,7 @@
 
 namespace CasADi{
   namespace OptimalControl{
-    
+
     /// Tree structure for storing variables
     class VariableTree{
       public:
@@ -39,8 +39,11 @@ namespace CasADi{
         VariableTree& subByIndex(int ind, bool allocate=false);
         
         /// Get all variables
-        void getAll(std::vector<Variable>& v, bool skip_dependent=false) const;
+        void getAll(std::vector<Variable>& v) const;
     
+        /// Get all names
+        std::vector<std::string> getNames() const;
+        
         /// Print node
         #ifndef SWIG
         void print(std::ostream &stream, int indent=0) const;
@@ -55,6 +58,11 @@ namespace CasADi{
         /// Names of children
         std::map<std::string,int> name_part_;
     };
+
+#ifdef SWIG
+// Make sure that a copy constructor is created
+%copyctor OCP;
+#endif // SWIG
     
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCP : public PrintableObject{
@@ -72,59 +80,64 @@ class OCP : public PrintableObject{
     /// Sort variables according to type
     void sortType();
 
-    /// Divide the state into its differential and algebraic components
-    void sortState();
-
     /// Eliminate dependent equations
     void eliminateDependent();
     
-    /// Sort the variables and equations according to BLT
-    void sortBLT();
+    /// Sort the variables and equations according to BLT, with or without including the differentiated states in the dependency graph
+    void sortBLT(bool with_x=false);
     
-    /// Try to make explicit by symbolically solving for xdot (experimental, only small systems)
+    /// Symbolically solve for xdot and z
     void makeExplicit();
 
     /// Replace all state derivatives by algebraic variables with the same name
     void makeSemiExplicit();
     
     /// Add a binding equation
-    void addExplicitEquation(const SX& var, const SX& bind_eq);
+    void addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq);
     
-    /// Create a new, scaled OCP
-    void scale();
+    /// Scale the variables
+    void scaleVariables();
+    
+    /// Scale the implicit equations
+    void scaleEquations();
     
     /// Access the variables in a class hierarchy -- public data member
     VariableTree variables_;
+    
+    /// Create the implicit/explict ODE functions and quadrature state functions
+    void createFunctions(bool create_dae=true, bool create_ode=true, bool create_quad=true);
     
     /// Time
     SX t_;
     
     /// Differential states
-    std::vector<Variable> xd_;
-
-    /// Algebraic states
-    std::vector<Variable> xa_;
-    
-    /// States
     std::vector<Variable> x_;
 
+    /// Algebraic states
+    std::vector<Variable> z_;
+    
     /// Controls
     std::vector<Variable> u_;
-    
+        
     /// Free parameters
     std::vector<Variable> p_;
+    
+    /// Dependent variables
+    std::vector<Variable> d_;
 
     /// Explicit equations
-    std::vector<SX> explicit_lhs_, explicit_rhs_;
+    std::vector<SX> explicit_var_, explicit_fcn_;
     
-    /// Dynamic equations
-    std::vector<SX> dynamic_eq_;
+    /// Implicit equations
+    std::vector<SX> implicit_var_, implicit_fcn_;
     
     /// Initial equations
     std::vector<SX> initial_eq_;
 
     /// Constraint function with upper and lower bounds
-    std::vector<SX> cfcn, cfcn_lb, cfcn_ub;
+    std::vector<SX> path_fcn_;
+    std::vector<double> path_min_, path_max_;
+    FX pathfcn_;
 
     /// Mayer objective terms
     std::vector<SX> mterm;
@@ -148,21 +161,41 @@ class OCP : public PrintableObject{
     bool tf_free;
     
     /// Is scaled?
-    bool is_scaled_;
+    bool scaled_variables_, scaled_equations_;
 
+    /// Has the dependents been eliminated
+    bool eliminated_dependents_;
+    
     /// BLT blocks
     std::vector<int> rowblock_;  // block k is rows r[k] to r[k+1]-1
     std::vector<int> colblock_;  // block k is cols s[k] to s[k+1]-1
+    int nb_;
 
     /// BLT sorted?
     bool blt_sorted_;
     
+    /// ODE right hand side function
+    FX oderhs_;
+    
+    /// DAE residual function
+    FX daeres_;
+    
+    /// Quadrature right hand side
+    FX quadrhs_;
+
+    /// Costs function
+    FX costfcn_;
 };
 
 #ifdef SWIG
 %extend OCP{
   // Print (why is this not inherited?)
   std::string __repr__()  { return $self->getRepresentation(); }
+
+  %pythoncode %{
+     def __deepcopy__(self,memo):
+        return OCP(self)
+  %}
 }
 #endif
 

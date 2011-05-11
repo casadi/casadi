@@ -193,14 +193,6 @@ bool Variable::isDifferential() const{
   return !(*this)->dx_.isNan();
 }
 
-void Variable::setDependent(int dep){
-  (*this)->dependent_ = dep;
-}
-    
-bool Variable::getDependent() const{
-  return (*this)->dependent_;
-}
-
 SX Variable::highest() const{
   if(isDifferential()){
     return der();

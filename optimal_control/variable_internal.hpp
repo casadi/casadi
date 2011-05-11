@@ -86,9 +86,6 @@ namespace CasADi{
       // Index
       int index_;
  
-      // Is dependent
-      bool dependent_;
-      
   };
   
   

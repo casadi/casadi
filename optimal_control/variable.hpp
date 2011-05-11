@@ -168,14 +168,7 @@ namespace CasADi{
     
     /// Is differential?
     bool isDifferential() const;
-    
-    /// Set dependent
-    void setDependent(int dep);
-    
-    /// Is dependent?
-    bool getDependent() const;
-    
-    
+        
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   };

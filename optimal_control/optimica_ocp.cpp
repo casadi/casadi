@@ -30,22 +30,25 @@
 #include "../casadi/matrix/matrix_tools.hpp"
 #include "../casadi/sx/sx_tools.hpp"
 #include "../interfaces/csparse/csparse_tools.hpp"
+#include "../casadi/fx/integrator.hpp"
 
 using namespace std;
 namespace CasADi{
   namespace OptimalControl{
 
 OCP::OCP(){
-  is_scaled_ = false;
+  scaled_variables_ = false;
+  scaled_equations_ = false;
+  eliminated_dependents_ = false;
   blt_sorted_ = false;
   t_ = SX("t");
 }
 
 void OCP::repr(ostream &stream) const{
   stream << "Optimal control problem (";
-  stream << "#dae = " << dynamic_eq_.size() << ", ";
+  stream << "#dae = " << implicit_fcn_.size() << ", ";
   stream << "#initial_eq_ = " << initial_eq_.size() << ", ";
-  stream << "#cfcn = " << cfcn.size() << ", ";
+  stream << "#path_fcn_ = " << path_fcn_.size() << ", ";
   stream << "#mterm = " << mterm.size() << ", ";
   stream << "#lterm = " << lterm.size() << ")";
 }
@@ -66,15 +69,15 @@ void OCP::print(ostream &stream) const{
   stream << "  d =  " << d << endl;
   stream << "}" << endl;*/
   stream << "Dimensions: "; 
-  stream << "#x = " << xd_.size() << ", ";
-  stream << "#z = " << xa_.size() << ", ";
+  stream << "#x = " << x_.size() << ", ";
+  stream << "#z = " << z_.size() << ", ";
   stream << "#u = " << u_.size() << ", ";
   stream << "#p = " << p_.size() << ", ";
   stream << endl << endl;
   
   // Print the differential-algebraic equation
   stream << "Dynamic equations" << endl;
-  for(vector<SX>::const_iterator it=dynamic_eq_.begin(); it!=dynamic_eq_.end(); it++){
+  for(vector<SX>::const_iterator it=implicit_fcn_.begin(); it!=implicit_fcn_.end(); it++){
     stream << "0 == "<< *it << endl;
   }
   stream << endl;
@@ -87,7 +90,7 @@ void OCP::print(ostream &stream) const{
 
   // Print the explicit differential equations
 /*  stream << "Differential equations (explicit)" << endl;
-  for(vector<Variable>::const_iterator it=xd_.begin(); it!=xd_.end(); it++){
+  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); it++){
     SX de = it->rhs();
     if(!de->isNan())
       stream << "der(" << *it << ") == " << de << endl;
@@ -96,8 +99,8 @@ void OCP::print(ostream &stream) const{
   
   // Dependent equations
   stream << "Dependent equations" << endl;
-  for(int i=0; i<explicit_lhs_.size(); ++i)
-    stream << explicit_lhs_[i] << " == " << explicit_rhs_[i] << endl;
+  for(int i=0; i<explicit_var_.size(); ++i)
+    stream << explicit_var_[i] << " == " << explicit_fcn_[i] << endl;
   stream << endl;
 
   // Mayer terms
@@ -119,8 +122,8 @@ void OCP::print(ostream &stream) const{
   
   // Constraint functions
   stream << "Constraint functions" << endl;
-  for(int i=0; i<cfcn.size(); ++i)
-    stream << cfcn_lb[i] << " <= " << cfcn[i] << " <= " << cfcn_ub[i] << endl;
+  for(int i=0; i<path_fcn_.size(); ++i)
+    stream << path_min_[i] << " <= " << path_fcn_[i] << " <= " << path_max_[i] << endl;
   stream << endl;
   
   // Constraint functions
@@ -131,86 +134,101 @@ void OCP::print(ostream &stream) const{
 }
 
 void OCP::eliminateDependent(){
-  Matrix<SX> v = explicit_lhs_;
-  Matrix<SX> v_old = explicit_rhs_;
+  Matrix<SX> v = explicit_var_;
+  Matrix<SX> v_old = explicit_fcn_;
   
-  dynamic_eq_= substitute(dynamic_eq_,v,v_old).data();
+  implicit_fcn_= substitute(implicit_fcn_,v,v_old).data();
   initial_eq_= substitute(initial_eq_,v,v_old).data();
-  cfcn    = substitute(cfcn,v,v_old).data();
-  cfcn_lb = substitute(cfcn_lb,v,v_old).data();
-  cfcn_ub = substitute(cfcn_ub,v,v_old).data();
+  path_fcn_    = substitute(path_fcn_,v,v_old).data();
   mterm   = substitute(mterm,v,v_old).data();
   lterm   = substitute(lterm,v,v_old).data();
+  eliminated_dependents_ = true;
 }
 
-void OCP::addExplicitEquation(const SX& var, const SX& bind_eq){
+void OCP::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq){
   // Eliminate previous binding equations from the expression
-  SX bind_eq_eliminated = substitute(bind_eq, explicit_lhs_, explicit_rhs_).data().front();
+  Matrix<SX> bind_eq_eliminated = substitute(bind_eq, explicit_var_, explicit_fcn_);
   
-  explicit_lhs_.push_back(var);
-  explicit_rhs_.push_back(bind_eq_eliminated);
+  explicit_var_.insert(explicit_var_.end(),var.begin(),var.data().end());
+  explicit_fcn_.insert(explicit_fcn_.end(),bind_eq_eliminated.begin(),bind_eq_eliminated.data().end());
 }
 
 void OCP::sortType(){
   // Get all the variables
   vector<Variable> v;
-  variables_.getAll(v,true);
+  variables_.getAll(v);
   
   // Clear variables
   x_.clear();
+  z_.clear();
   u_.clear();
   p_.clear();
-    
+  d_.clear();
+  
+  // Mark all dependent variables
+  for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
+    it->setTemp(1);
+  }
+  
+  // Get implicit variables
+  bool find_implicit = implicit_var_.size() != implicit_fcn_.size();
+  if(find_implicit){
+    implicit_var_.clear();
+    implicit_var_.reserve(implicit_fcn_.size());
+  }
+  
   // Loop over variables
   for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
     // If not dependent
-    if(!it->getDependent()){
+    if(it->highest().getTemp()!=1){
       // Try to determine the type
       if(it->getVariability() == PARAMETER){
         p_.push_back(*it);
       } else if(it->getVariability() == CONTINUOUS) {
         if(it->getCausality() == INTERNAL){
-          x_.push_back(*it);
+          if(it->isDifferential()){
+            x_.push_back(*it);
+          } else {
+            z_.push_back(*it);
+          }
+          
+          // Add to list of implicit variables
+          if(find_implicit) implicit_var_.push_back(it->highest());
+
         } else if(it->getCausality() == INPUT){
           u_.push_back(*it);
         }
       } else if(it->getVariability() == CONSTANT){
-        cout << *it << endl;
         casadi_assert(0);
-/*        d_.push_back(*it);*/
       }
-    }
-  }
-  
-  sortState();
-}
-
-void OCP::sortState(){
-  xd_.clear();
-  xa_.clear();
-  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it){
-    if(it->isDifferential()){
-      xd_.push_back(*it);
     } else {
-      xa_.push_back(*it);
+      d_.push_back(*it);
     }
   }
+
+  // Unmark all dependent variables
+  for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
+    it->setTemp(0);
+  }
+  
+  // Assert consistent number of equations and variables
+  casadi_assert(implicit_var_.size() == implicit_fcn_.size());
 }
 
-void OCP::scale(){
-  /// Make sure that the OCP has not already been scaled
-  casadi_assert(!is_scaled_);
-  
-  
+
+void OCP::scaleVariables(){
+  //Make sure that the variables has not already been scaled
+  casadi_assert(!scaled_variables_);
+
   // Variables
   Matrix<SX> t = t_;
-  Matrix<SX> x = var(xd_);
-  Matrix<SX> xdot = der(xd_);
-  Matrix<SX> z = var(xa_);
+  Matrix<SX> x = var(x_);
+  Matrix<SX> xdot = der(x_);
+  Matrix<SX> z = var(z_);
   Matrix<SX> p = var(p_);
   Matrix<SX> u = var(u_);
   
-  // Get all the variables
+  // Collect all the variables
   Matrix<SX> v;
   append(v,t);
   append(v,x);
@@ -221,9 +239,9 @@ void OCP::scale(){
   
   // Nominal values
   Matrix<SX> t_n = 1.;
-  Matrix<SX> x_n = getNominal(xd_);
-  Matrix<SX> xdot_n = getNominal(xd_);
-  Matrix<SX> z_n = getNominal(xa_);
+  Matrix<SX> x_n = getNominal(x_);
+  Matrix<SX> xdot_n = getNominal(x_);
+  Matrix<SX> z_n = getNominal(z_);
   Matrix<SX> p_n = getNominal(p_);
   Matrix<SX> u_n = getNominal(u_);
   
@@ -240,48 +258,132 @@ void OCP::scale(){
   Matrix<SX> temp;
 
   // Substitute equations
-  explicit_rhs_= substitute(explicit_rhs_,v,v_old).data();
-  dynamic_eq_= substitute(dynamic_eq_,v,v_old).data();
+  explicit_fcn_= substitute(explicit_fcn_,v,v_old).data();
+  implicit_fcn_= substitute(implicit_fcn_,v,v_old).data();
   initial_eq_= substitute(initial_eq_,v,v_old).data();
-  cfcn    = substitute(cfcn,v,v_old).data();
-  cfcn_lb = substitute(cfcn_lb,v,v_old).data();
-  cfcn_ub = substitute(cfcn_ub,v,v_old).data();
+  path_fcn_    = substitute(path_fcn_,v,v_old).data();
   mterm   = substitute(mterm,v,v_old).data();
   lterm   = substitute(lterm,v,v_old).data();
   
-  is_scaled_ = true;
+  scaled_variables_ = true;
+}
+    
+void OCP::scaleEquations(){
+  // Make sure that the equations has not already been scaled
+  casadi_assert(!scaled_equations_);
+  
+  // Make sure that the dependents have been eliminated
+  casadi_assert(eliminated_dependents_);
+  
+  // Make sure that the variables have been scaled
+  casadi_assert(scaled_variables_);
+  
+  // Quick return if no implicit equations
+  if(implicit_fcn_.empty())
+    return;
+  
+  // Variables
+  enum Variables{T,X,XDOT,Z,P,U,NUM_VAR};
+  vector<Matrix<SX> > v(NUM_VAR); // all variables
+  v[T] = t_;
+  v[X] = var(x_);
+  v[XDOT] = der(x_);
+  v[Z] = var(z_);
+  v[P] = var(p_);
+  v[U] = var(u_);
+
+  // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
+  Matrix<SX> xz;
+  append(xz,v[X]);
+  append(xz,v[Z]);
+  append(xz,v[P]);
+  append(xz,v[U]);
+  SXFunction fcn = SXFunction(xz,implicit_fcn_);
+  SXFunction J(v,fcn.jac());
+
+  // Evaluate the Jacobian in the starting point
+  J.init();
+  J.setInput(0.0,T);
+  J.setInput(getStart(x_,true),X);
+  J.input(XDOT).setAll(0.0);
+  J.setInput(getStart(z_,true),Z);
+  J.setInput(getStart(p_,true),P);
+  J.setInput(getStart(u_,true),U);
+  J.evaluate();
+  
+  // Get the maximum of every row
+  Matrix<double> &J0 = J.output();
+  vector<double> scale(J0.size1(),0.0); // scaling factors
+  for(int i=0; i<J0.size1(); ++i){
+    // Loop over non-zero entries of the row
+    for(int el=J0.rowind(i); el<J0.rowind(i+1); ++el){
+      // Column
+      //int j=J0.col(el);
+      
+      // The scaling factor is the maximum norm, ignoring not-a-number entries
+      if(!isnan(J0[el])){
+        scale[i] = max(scale[i],fabs(J0[el]));
+      }
+    }
+    
+    // Make sure 
+    if(scale[i]==0){
+      cout << "Warning: Could not generate a scaling factor for equation " << i << "(0 == " << implicit_fcn_[i] << "), selecting 1." << endl;
+      scale[i]=1.;
+    }
+  }
+  
+  // Scale the equations
+  for(int i=0; i<implicit_fcn_.size(); ++i){
+    implicit_fcn_[i] /= scale[i];
+  }
+  
+  scaled_equations_ = true;
 }
 
-void OCP::sortBLT(){
-  // Unknown variables in the dynamic equations
-  vector<SX> v;
-  v.reserve(x_.size());
-  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it)
-    v.push_back(it->highest());
+void OCP::sortBLT(bool with_x){
+  // Sparsity pattern
+  CRSSparsity sp;
+  
+  if(with_x){
+    // inverse time constant
+    SX invtau("invtau");
 
-  // Create Jacobian in order to find the sparsity
-  SXFunction fcn(v,dynamic_eq_);
-  Matrix<SX> J = fcn.jac();
+    // Replace x with invtau*xdot in order to get a Jacobian which also includes x
+    SXMatrix implicit_fcn_with_x = substitute(implicit_var_,var(x_),invtau*SXMatrix(var(x_)));
+    
+    // Create Jacobian in order to find the sparsity
+    SXFunction fcn(implicit_var_,implicit_fcn_with_x);
+    Matrix<SX> J = fcn.jac();
+    sp = J.sparsity();
+  } else {
+    // Create Jacobian in order to find the sparsity
+    SXFunction fcn(implicit_var_,implicit_fcn_);
+    Matrix<SX> J = fcn.jac();
+    sp = J.sparsity();
+  }
   
   // BLT transformation
-  Interfaces::BLT blt(J.sparsity());
+  Interfaces::BLT blt(sp);
 
   // Permute equations
-  vector<SX> dynamic_eq_old = dynamic_eq_;
-  for(int i=0; i<dynamic_eq_.size(); ++i){
-    dynamic_eq_[i] = dynamic_eq_old[blt.rowperm[i]];
+  vector<SX> implicit_fcn_new(implicit_fcn_.size());
+  for(int i=0; i<implicit_fcn_.size(); ++i){
+    implicit_fcn_new[i] = implicit_fcn_[blt.rowperm[i]];
   }
+  implicit_fcn_new.swap(implicit_fcn_);
   
   // Permute variables
-  vector<Variable> x_old = x_;
-  for(int i=0; i<x_.size(); ++i){
-    x_[i] = x_old[blt.colperm[i]];
+  vector<SX> implicit_var_new(implicit_var_.size());
+  for(int i=0; i<implicit_var_.size(); ++i){
+    implicit_var_new[i]= implicit_var_[blt.colperm[i]];
   }
-  sortState();
+  implicit_var_new.swap(implicit_var_);
   
   // Save blocks
   rowblock_ = blt.rowblock;
   colblock_ = blt.colblock;
+  nb_ = blt.nb;
   
   blt_sorted_ = true;
 
@@ -290,50 +392,44 @@ void OCP::sortBLT(){
 void OCP::makeExplicit(){
   casadi_assert_message(blt_sorted_,"OCP has not been BLT sorted, call sortBLT()");
 
-  // Unknown variables in the dynamic equations
-  vector<SX> v;
-  v.reserve(x_.size());
-  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); ++it)
-    v.push_back(it->highest());
-
   // Create Jacobian
-  SXFunction fcn(v,dynamic_eq_);
+  SXFunction fcn(implicit_var_,implicit_fcn_);
   SXMatrix J = fcn.jac();
-  // J.printDense();
-
-  // Cumulative variables and definitions
-  SXMatrix vb_cum;
-  SXMatrix def_cum;
-
+  
   // Block variables and equations
   vector<SX> vb, fb;
   
+  // Save old number of explicit
+  int old_nexp = explicit_var_.size();
+  
+  // New implicit equation and variables
+  vector<SX> implicit_var_new, implicit_fcn_new;
+    
   // Loop over blocks
-  int nb = rowblock_.size();
-  for(int b=0; b<nb; ++b){
+  for(int b=0; b<nb_; ++b){
+    
     // Block size
     int bs = rowblock_[b+1] - rowblock_[b];
     
     // Get local variables
     vb.clear();
     for(int i=colblock_[b]; i<colblock_[b+1]; ++i)
-      vb.push_back(v[i]);
+      vb.push_back(implicit_var_[i]);
 
     // Get local equations
     fb.clear();
     for(int i=rowblock_[b]; i<rowblock_[b+1]; ++i)
-      fb.push_back(dynamic_eq_[i]);
+      fb.push_back(implicit_fcn_[i]);
 
     // Get local Jacobian
-    SXMatrix Jb = J[range(rowblock_[b],rowblock_[b+1]),range(colblock_[b],colblock_[b+1])];
-   
+    SXMatrix Jb = J(range(rowblock_[b],rowblock_[b+1]),range(colblock_[b],colblock_[b+1]));
     if(dependsOn(Jb,vb)){
       // Cannot solve for vb, add to list of implicit equations
-      casadi_assert_message(0,"Not implemented");
-/*      append(vb_cum,SXMatrix(vb));
-      append(def_cum,SXMatrix(vb));*/
+      implicit_var_new.insert(implicit_var_new.end(),vb.begin(),vb.end());
+      implicit_fcn_new.insert(implicit_fcn_new.end(),fb.begin(),fb.end());
       
     } else {
+      
       // Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
       SXMatrix fb_res = substitute(fb,vb,SXMatrix(vb.size(),1,0));
       SXMatrix fb_exp;
@@ -346,44 +442,200 @@ void OCP::makeExplicit(){
         // QR factorization
         fb_exp = solve(Jb,-fb_res);
       }
-        
-      // Substitute variables that have already been defined
-      if(!def_cum.empty()){
-        fb_exp = substitute(fb_exp,vb_cum,def_cum);
-      }
+
+      // Add explicit equation
+      addExplicitEquation(vb,fb_exp);
+    }
+  }
+
+  // Update implicit equations
+  implicit_var_new.swap(implicit_var_);
+  implicit_fcn_new.swap(implicit_fcn_);
+
+  // Mark the variables made explicit
+  for(vector<SX>::iterator it=explicit_var_.begin()+old_nexp; it!=explicit_var_.end(); ++it){
+    it->setTemp(1);
+  }
+  
+  // New algebraic variables
+  vector<Variable> z_new;
+
+  // Loop over algebraic variables
+  for(vector<Variable>::iterator it=z_.begin(); it!=z_.end(); ++it){
+    // Check if marked
+    if(it->var().getTemp()){
+      // Make dependent
+      d_.push_back(*it);
       
-      casadi_assert(0);
-      append(vb_cum,SXMatrix(vb));
-      append(def_cum,SXMatrix(fb_exp));
+      // If upper or lower bounds are finite, add path constraint
+      if(!isinf(it->getMin()) || !isinf(it->getMax())){
+        path_fcn_.push_back(it->var());
+        path_min_.push_back(it->getMin()/it->getNominal());
+        path_max_.push_back(it->getMax()/it->getNominal());
+      }
+    } else {
+      z_new.push_back(*it);
     }
   }
   
-  /*  // Sort the variables
-  sortType();
+  // Update new z_
+  z_.swap(z_new);
 
-  // Dynamic equation
-  SXMatrix dae(this->dae);
-  SXMatrix xdot(xd_.size(),1,0);
-  for(int i=0; i<xd_.size(); ++i)
-    xdot[i] = xd_[i].der();
+  // Unark the variables made explicit
+  for(vector<SX>::iterator it=explicit_var_.begin()+old_nexp; it!=explicit_var_.end(); ++it){
+    it->setTemp(0);
+  }
   
-  // Take the Jacobian of the ode with respect to xdot
-  SXMatrix J = jacobian(dae,xdot);
-  
-  // Make sure that J is invertable
-  casadi_assert_message(!dependsOn(J,xdot),"OCP::makeExplicit:: Dynamic equation not affine in state derivative");
-  //casadi_assert_message(!det(J).isZero(),"OCP::makeExplicit: Jacobian not invertable");
+  // Eliminate the dependents
+  eliminateDependent();
 
-  // Write the differential equation in explicit form
-  SXMatrix rhs = solve(J,prod(J,xdot)-dae);
-
-  // Remove the xdots
-  rhs = substitute(rhs,xdot,SXMatrix(xdot.sparsity(),0));
-  
-  // Save as explicit derivative
-  for(int i=0; i<xd_.size(); ++i)
-    xd_[i].setEquation(xd_[i].der(),rhs(i,0));*/
 }
+
+void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
+  // no quad if no quadrature states
+  if(lterm.empty()) create_quad=false;
+
+  if(create_ode){
+    // Create an explicit ODE
+    sortBLT(false);
+
+    // Make the OCP explicit by eliminated all the algebraic states
+    makeExplicit();
+    
+    // The equation could be made explicit symbolically
+    if(implicit_fcn_.empty()){
+      
+      casadi_assert(z_.empty());
+      
+      // Sort ode_rhs so that it is consistent with xdot
+      vector<SX> xdot = der(x_);
+      vector<SX> ode(xdot.size());
+      
+      // Mark the variables
+      for(int i=0; i<xdot.size(); ++i){
+        xdot[i].setTemp(i+1);
+      }
+      
+      for(int i=0; i<explicit_var_.size(); ++i){
+        int ind = explicit_var_[i].getTemp()-1;
+        if(ind>=0){
+          ode[ind] = explicit_fcn_[i];
+        }
+      }
+
+      // Unmark the variables
+      for(int i=0; i<xdot.size(); ++i){
+        xdot[i].setTemp(0);
+      }
+      
+      // Evaluate constant expressions
+      Matrix<SX> ode_elim = evaluateConstants(ode);
+      
+      // ODE right hand side function
+      vector<SXMatrix> ode_in(ODE_NUM_IN);
+      ode_in[ODE_T] = t_;
+      ode_in[ODE_Y] = var(x_);
+      ode_in[ODE_P] = var(u_);
+      oderhs_ = SXFunction(ode_in,ode_elim);
+      
+      // ODE quadrature function
+      if(create_quad){
+        quadrhs_ = SXFunction(ode_in,lterm[0]/1e3);
+      }
+      
+    } else {
+    // A Newton algorithm is necessary
+    casadi_assert(0);
+    
+//     # Create an implicit function residual
+//     impres_in = (ODE_NUM_IN+1) * [[]]
+//     impres_in[0] = xdot+z
+//     impres_in[1+ODE_T] = t
+//     impres_in[1+ODE_Y] = x
+//     impres_in[1+ODE_P] = u
+//     impres = SXFunction(impres_in,[ocp.implicit_fcn_])
+//     impres.setOption("number_of_fwd_dir",len(x)+1)
+// 
+//     impres.init()
+//     impres.setInput(xdot0+z0, 0)
+//     impres.setInput(0., 1+ODE_T)
+//     impres.setInput(x0, 1+ODE_Y)
+//     impres.setInput(u0, 1+ODE_P)
+//     impres.evaluate()
+// 
+//     # Create an implicit function (KINSOL)
+//     impsolver = KinsolSolver(impres)
+//     linsol = CSparse(CRSSparsity())
+//     impsolver.setLinearSolver(linsol)
+// 
+//     impsolver.setOption("linear_solver","user_defined")
+//     impsolver.setOption("max_krylov",100)
+//     impsolver.setOption("number_of_fwd_dir",len(x)+1)
+//     impsolver.setOption("number_of_adj_dir",0)
+//     impsolver.init()
+// 
+//     impsolver.setInput(0., ODE_T)
+//     impsolver.setInput(x0, ODE_Y)
+//     impsolver.setInput(u0, ODE_P)
+//     impsolver.output().set(xdot0+z0)
+//     impsolver.evaluate(1,0)
+//     #print "implicit function residual", impsolver.output()
+// 
+//     # Create the ODE residual
+//     ode_in_mx = ODE_NUM_IN * [[]]
+//     ode_in_mx[ODE_T] = MX("T")
+//     ode_in_mx[ODE_Y] = MX("X",len(x))
+//     ode_in_mx[ODE_P] = MX("U",len(u))
+//     [xdot_z] = impsolver.call(ode_in_mx)
+//     ode = MXFunction(ode_in_mx,[xdot_z[0:len(x)]])
+//     ode.setOption("number_of_fwd_dir",len(x)+1)
+// 
+//     # ODE quadrature function
+//     ode_in = ODE_NUM_IN * [[]]
+//     ode_in[ODE_T] = t
+//     ode_in[ODE_Y] = x
+//     ode_in[ODE_P] = u
+//     ode_lterm = SXFunction(ode_in,[[ocp.lterm[0]/1e3]])
+//     ode_lterm.setOption("number_of_fwd_dir",len(x)+1)
+      
+    }
+  } else if(create_dae) {
+    // BLT sorting
+    sortBLT(true);
+
+    // Scale the equations
+    scaleEquations();
+    
+    // DAE residual arguments
+    vector<SXMatrix> dae_in(DAE_NUM_IN);
+    dae_in[DAE_T] = t_;
+    dae_in[DAE_Y] = var(x_);
+    dae_in[DAE_YDOT] = der(x_);
+    dae_in[DAE_Z] = var(z_);
+    dae_in[DAE_P] = var(u_);
+    
+    // DAE residual
+    daeres_ = SXFunction(dae_in,implicit_fcn_);
+
+    // DAE quadrature function
+    if(create_quad){
+      quadrhs_ = SXFunction(dae_in,lterm[0]/1e3);
+    }
+  }
+  
+  // Mayer objective function
+  SXMatrix xf = symbolic("xf",x_.size()+lterm.size(),1);
+  costfcn_ = SXFunction(xf, xf.data().back());
+
+  // Path constraint function
+  vector<SXMatrix> cfcn_in(ODE_NUM_IN);
+  cfcn_in[ODE_T] = t_;
+  cfcn_in[ODE_Y] = var(x_);
+  append(cfcn_in[ODE_Y],symbolic("lterm")); // FIXME
+  cfcn_in[ODE_P] = var(u_);
+  pathfcn_ = SXFunction(cfcn_in,path_fcn_);
+}
+
 
 void OCP::makeSemiExplicit(){
   
@@ -430,26 +682,6 @@ void OCP::makeSemiExplicit(){
 //       
 //       append(vb_cum,vb)
 //       append(def_cum,fb_exp)
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   
   throw CasadiException("OCP::makeSemiExplicit: Commented out");
@@ -513,14 +745,14 @@ VariableTree& VariableTree::subByIndex(int ind, bool allocate){
   }
 }
 
-void VariableTree::getAll(std::vector<Variable>& v, bool skip_dependent) const{
+void VariableTree::getAll(std::vector<Variable>& v) const{
   /// Add variables
   for(vector<VariableTree>::const_iterator it=children_.begin(); it!=children_.end(); ++it){
     it->getAll(v);
   }
   
   /// Add variable, if any
-  if(!var_.isNull() && !(skip_dependent && var_.getDependent()))
+  if(!var_.isNull())
     v.push_back(var_);
 }
 
@@ -543,6 +775,15 @@ void VariableTree::print(ostream &stream, int indent) const{
     it->print(stream,indent+2);
   }
 }
+
+std::vector<std::string> VariableTree::getNames() const{
+  std::vector<std::string> ret(children_.size());
+  for(map<string,int>::const_iterator it=name_part_.begin(); it!=name_part_.end(); ++it){
+    ret[it->second] = it->first;
+  }
+  return ret;
+}
+
 
   } // namespace OptimalControl
 } // namespace CasADi

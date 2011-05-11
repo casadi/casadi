@@ -45,7 +45,6 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   start_ = 0.0;
   unit_ = "";
   displayUnit_ = "";
-  dependent_ = false;
 
   index_ = -1;
 }

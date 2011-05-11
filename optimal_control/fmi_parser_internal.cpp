@@ -208,33 +208,37 @@ void FMIParserInternal::addBindingEquations(){
 
     // Get the binding equation
     SX bexpr = readExpr(beq[1][0]);
-
-    // Mark variable dependent
-    var.setDependent(true);
     
     // Add binding equation
     ocp_.addExplicitEquation(var.var(),bexpr);
   }
   
-  // Also add binding equations to all constant variables not yet marked as dependent
+  // Mark all dependent variables
+  for(vector<SX>::iterator it=ocp_.explicit_var_.begin(); it!=ocp_.explicit_var_.end(); ++it){
+    it->setTemp(1);
+  }
+  
+  // Add binding equations to constant variables lacking this
   vector<Variable> v_all;
   vector<SX> beq_var;
   vector<SX> beq_exp;
-  ocp_.variables_.getAll(v_all,true);
+  ocp_.variables_.getAll(v_all);
   for(vector<Variable>::iterator it=v_all.begin(); it!=v_all.end(); ++it){
-    if(it->getVariability()==CONSTANT){
+    if(it->getVariability()==CONSTANT && it->var().getTemp()!=1){
       // Save binding equation
       beq_var.push_back(it->var());
       beq_exp.push_back(it->getStart());
-      
-      // Mark dependent
-      it->setDependent(true);
     }
   }
   
+  // Unmark all dependent variables
+  for(vector<SX>::iterator it=ocp_.explicit_var_.begin(); it!=ocp_.explicit_var_.end(); ++it){
+    it->setTemp(0);
+  }
+  
   // Add to the beginning of the list of binding equations (in case some binding equations depend on them)
-  ocp_.explicit_lhs_.insert(ocp_.explicit_lhs_.begin(),beq_var.begin(),beq_var.end());
-  ocp_.explicit_rhs_.insert(ocp_.explicit_rhs_.begin(),beq_exp.begin(),beq_exp.end());
+  ocp_.explicit_var_.insert(ocp_.explicit_var_.begin(),beq_var.begin(),beq_var.end());
+  ocp_.explicit_fcn_.insert(ocp_.explicit_fcn_.begin(),beq_exp.begin(),beq_exp.end());
 }
 
 void FMIParserInternal::addDynamicEquations(){
@@ -249,7 +253,7 @@ void FMIParserInternal::addDynamicEquations(){
 
     // Add the differential equation
     SX de_new = readExpr(dnode[0]);
-    ocp_.dynamic_eq_.push_back(de_new);
+    ocp_.implicit_fcn_.push_back(de_new);
   }
 }
 
@@ -355,21 +359,21 @@ void FMIParserInternal::addConstraints(const XMLNode& onode){
     if(constr_i.checkName("opt:ConstraintLeq")){
       SX ex = readExpr(constr_i[0]);
       SX ub = readExpr(constr_i[1]);
-      ocp_.cfcn.push_back(ex);
-      ocp_.cfcn_lb.push_back(-numeric_limits<double>::infinity());
-      ocp_.cfcn_ub.push_back(ub);
+      ocp_.path_fcn_.push_back(ex-ub);
+      ocp_.path_min_.push_back(-numeric_limits<double>::infinity());
+      ocp_.path_max_.push_back(0.);
     } else if(constr_i.checkName("opt:ConstraintGeq")){
       SX ex = readExpr(constr_i[0]);
       SX lb = readExpr(constr_i[1]);
-      ocp_.cfcn.push_back(ex);
-      ocp_.cfcn_lb.push_back(lb);
-      ocp_.cfcn_ub.push_back(numeric_limits<double>::infinity());
+      ocp_.path_fcn_.push_back(ex-lb);
+      ocp_.path_min_.push_back(0.);
+      ocp_.path_max_.push_back(numeric_limits<double>::infinity());
     } else if(constr_i.checkName("opt:ConstraintEq")){
       SX ex = readExpr(constr_i[0]);
       SX eq = readExpr(constr_i[1]);
-      ocp_.cfcn.push_back(ex);
-      ocp_.cfcn_lb.push_back(eq);
-      ocp_.cfcn_ub.push_back(eq);
+      ocp_.path_fcn_.push_back(ex-eq);
+      ocp_.path_min_.push_back(0.);
+      ocp_.path_max_.push_back(0.);
     } else {
       cerr << "unknown constraint type" << constr_i.getName() << endl;
       throw "FMIParserInternal::addConstraints";

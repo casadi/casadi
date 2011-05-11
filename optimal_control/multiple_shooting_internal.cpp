@@ -158,10 +158,12 @@ void MultipleShootingInternal::init(){
   FG_ = MXFunction(FG_in,FG_out);
   
   // Evaluate Jacobian blocks in parallel
+//  FX IjacX = Jacobian(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
   FX IjacX = ffcn_.jacobian(INTEGRATOR_X0,INTEGRATOR_XF);
   IjacX.init();
   vector<vector<MX> > pJX_out = IjacX.call(int_in,paropt);
   
+//  FX IjacP = Jacobian(ffcn_,INTEGRATOR_P,INTEGRATOR_XF);
   FX IjacP = ffcn_.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
   IjacP.init();
   vector<vector<MX> > pJP_out = IjacP.call(int_in,paropt);
