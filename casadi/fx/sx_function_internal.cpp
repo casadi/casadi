@@ -42,7 +42,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("name","unnamed_sx_function");
   
-  if(outputv.empty() || inputv.empty()) return;
+  casadi_assert(!outputv.empty());
 
   // Check that inputs are symbolic
   for(int i=0; i<inputv_.size(); ++i) {
@@ -53,7 +53,6 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
       throw CasadiException(ss.str());
     }
   }
-
 
   // Stack
   stack<SXNode*> s;

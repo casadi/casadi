@@ -33,7 +33,15 @@ struct SXAlgEl{
   int ind; // index of the binary operaton to be evaluated
   int ch[2]; // indices of the arguments
 };
-  
+
+} // namespace CasADi
+
+#ifdef SWIG
+%template(SXAlgElVector) std::vector<CasADi::SXAlgEl>;
+#endif // SWIG
+
+namespace CasADi{
+
 /// Forward declaration of internal class
 class SXFunctionInternal;
 

@@ -186,7 +186,7 @@ void SXFunction::generateCode(const std::string& filename) const{
 }
 
 const std::vector<SXAlgEl>& SXFunction::algorithm() const{
-  (*this)->algorithm;
+  return (*this)->algorithm;
 }
 
 

@@ -384,6 +384,9 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
 */
 Matrix<SX> evaluateConstants(const Matrix<SX>& ex);
 
+/** Count number of nodes */
+int countNodes(const Matrix<SX>& A);
+
 
 } // namespace CasADi
 

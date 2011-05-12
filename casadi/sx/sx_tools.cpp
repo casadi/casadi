@@ -732,6 +732,12 @@ Matrix<SX> evaluateConstants(const Matrix<SX>& ex){
   return output_s.front();
 }
 
+int countNodes(const Matrix<SX>& A){
+  SXFunction f(SXMatrix(),A);
+  f.init();
+  return f.algorithm().size();
+}
+
 } // namespace CasADi
 
 
