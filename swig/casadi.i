@@ -78,7 +78,7 @@ namespace CasADi{
     std::string ret;
     
     // Add dimension
-    snprintf(buffer, 32, "[%d]", $self->size());
+    snprintf(buffer, 32, "[%lu]", (unsigned long) $self->size());
     ret += buffer; 
     ret += "(";
     for(int i=0; i<$self->size(); ++i){
@@ -114,7 +114,7 @@ namespace CasADi{
     std::string ret;
     
     // Add dimension
-    snprintf(buffer, 32, "[%d]", $self->size());
+    snprintf(buffer, 32, "[%lu]", (unsigned long) $self->size());
     ret += buffer; 
     ret += "(";
     for(int i=0; i<$self->size(); ++i){
