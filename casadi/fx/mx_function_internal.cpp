@@ -309,6 +309,7 @@ std::vector<MX> MXFunctionInternal::jac(const std::vector<MX>& fseed){
     
     // Collect the seed matrices
     vector<MX> seed(alg[el].ch.size());
+    casadi_assert(!seed.empty());
     for(int i=0; i<seed.size(); ++i){
       seed[i] = dirder[alg[el].ch[i]];
     }
