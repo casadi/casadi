@@ -32,10 +32,7 @@ namespace Sundials{
 
 IdasInternal* IdasInternal::clone() const{
   // Return a deep copy
-  FX f, q;
-  if(!f_.isNull()) f = shared_cast<FX>(f_.clone());
-  if(!q_.isNull()) q = shared_cast<FX>(q_.clone());
-  IdasInternal* node = new IdasInternal(f,q);
+  IdasInternal* node = new IdasInternal(deepcopy(f_),deepcopy(q_));
   node->setOption(dictionary());
   if(isInit())
     node->init();

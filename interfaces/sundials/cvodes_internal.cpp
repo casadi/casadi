@@ -32,14 +32,12 @@ namespace Sundials{
 
 CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
-  FX f = f_;   f.makeUnique();
-  FX q = q_;   q.makeUnique();
+  FX f = deepcopy(f_);
+  FX q = deepcopy(q_);
   CVodesInternal* node = new CVodesInternal(f,q);
   node->setOption(dictionary());
-  node->linsol_ = linsol_;
-  node->linsol_.makeUnique();
-  node->M_ = M_;
-  node->M_.makeUnique();
+  node->linsol_ = deepcopy(linsol_);
+  node->M_ = deepcopy(M_);
   if(isInit())
     node->init();
   return node;
