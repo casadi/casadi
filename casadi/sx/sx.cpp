@@ -108,6 +108,8 @@ SX& operator-=(SX &ex, const SX &el){
 SX SX::operator-() const{
   if(node->hasDep() && node->getOp() == NEG)
     return node->dep(0);
+  else if(node->isZero())
+    return 0;
   else if(node->isMinusOne())
     return 1;
   else if(node->isOne())
