@@ -142,8 +142,14 @@ namespace CasADi{
     /// Get the value at time 0
     double getStart() const;
 
+    /// Get the derivative at time 0
+    double getDerivativeStart() const;
+
     /// Set the value at time 0
     void setStart(double start);
+    
+    /// Set the derivative at time 0
+    void setDerivativeStart(double start);
     
     /// Get the unit
     const std::string& getUnit() const;

@@ -141,8 +141,16 @@ double Variable::getStart() const{
   return (*this)->start_;
 }
 
+double Variable::getDerivativeStart() const{
+  return (*this)->derivative_start_;
+}
+
 void Variable::setStart(double start){
   (*this)->start_ = start;
+}
+    
+void Variable::setDerivativeStart(double start){
+  (*this)->derivative_start_ = start;
 }
     
 const string& Variable::getUnit() const{

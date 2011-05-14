@@ -44,6 +44,9 @@ namespace OptimalControl{
   /// Get a vector of the values at the initial time for a vector of variables
   std::vector<double> getStart(const std::vector<Variable> v, bool nominal=false);
 
+  /// Get a vector of the values of the derivative at the initial time for a vector of variables
+  std::vector<double> getDerivativeStart(const std::vector<Variable> v, bool nominal=false);
+
   /// Get a upper bounds
   std::vector<double> getMax(const std::vector<Variable> v, bool nominal=false);
 

@@ -71,7 +71,7 @@ namespace CasADi{
       std::string description_;
       int valueReference_;
       
-      double min_, max_, nominal_, start_;
+      double min_, max_, nominal_, start_, derivative_start_;
       std::string unit_, displayUnit_;
       
       // variable expression

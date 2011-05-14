@@ -145,12 +145,26 @@ void OCP::eliminateDependent(){
   eliminated_dependents_ = true;
 }
 
-void OCP::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq){
-  // Eliminate previous binding equations from the expression
-  Matrix<SX> bind_eq_eliminated = substitute(bind_eq, explicit_var_, explicit_fcn_);
-  
-  explicit_var_.insert(explicit_var_.end(),var.begin(),var.data().end());
-  explicit_fcn_.insert(explicit_fcn_.end(),bind_eq_eliminated.begin(),bind_eq_eliminated.data().end());
+void OCP::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front){
+  if(to_front){
+    // Eliminate expression from the current binding equations
+    Matrix<SX> explicit_fcn_eliminated = substitute(explicit_fcn_,var, bind_eq);
+
+    // Save in the old location
+    explicit_fcn_.swap(explicit_fcn_eliminated.data());
+    
+    // Add to list of equations
+    explicit_var_.insert(explicit_var_.end(),var.begin(),var.end());
+    explicit_fcn_.insert(explicit_fcn_.end(),bind_eq.begin(),bind_eq.end());
+    
+  } else {
+    // Eliminate previous binding equations from the expression
+    Matrix<SX> bind_eq_eliminated = substitute(bind_eq, explicit_var_, explicit_fcn_);
+    
+    // Add to list of equations
+    explicit_var_.insert(explicit_var_.end(),var.begin(),var.data().end());
+    explicit_fcn_.insert(explicit_fcn_.end(),bind_eq_eliminated.begin(),bind_eq_eliminated.data().end());
+  }
 }
 
 void OCP::sortType(){
@@ -395,13 +409,32 @@ void OCP::makeExplicit(){
   // Create Jacobian
   SXFunction fcn(implicit_var_,implicit_fcn_);
   SXMatrix J = fcn.jac();
+
+  // Mark the algebraic variables
+  for(int i=0; i<z_.size(); ++i){
+    z_[i].var().setTemp(i+1);
+  }
+  
+  // Get initial values for all implicit variables
+  vector<double> implicit_var_guess(implicit_var_.size(),0);
+  for(int i=0; i<implicit_var_.size(); ++i){
+    int ind = implicit_var_[i].getTemp()-1;
+    if(ind>=0){
+      implicit_var_guess[i] = z_[ind].getStart()/z_[ind].getNominal();
+    }
+  }
+  
+  // Unmark the algebraic variables
+  for(int i=0; i<z_.size(); ++i){
+    z_[i].var().setTemp(0);
+  }
   
   // Block variables and equations
   vector<SX> vb, fb;
-  
-  // Save old number of explicit
+
+  // Save old number of explicit variables
   int old_nexp = explicit_var_.size();
-  
+
   // New implicit equation and variables
   vector<SX> implicit_var_new, implicit_fcn_new;
     
@@ -424,9 +457,84 @@ void OCP::makeExplicit(){
     // Get local Jacobian
     SXMatrix Jb = J(range(rowblock_[b],rowblock_[b+1]),range(colblock_[b],colblock_[b+1]));
     if(dependsOn(Jb,vb)){
+      
+      // Guess for the solution
+      SXMatrix x_k(vb.size(),1,0);
+      int offset = rowblock_[b];
+      for(int i=0; i<x_k.size(); ++i){
+        x_k[i] = implicit_var_guess[offset+i];
+      }
+      
+      // Make Newton iterations
+      bool exact_newton = true;
+      SXFunction newtonIter; // Newton iteration function
+      
+      if(exact_newton){
+        // Use exact Newton (i.e. update Jacobian in every iteration)
+        newtonIter = SXFunction(vb,vb-solve(Jb,SXMatrix(fb)));
+      } else {
+        // Evaluate the Jacobian
+        SXMatrix Jb0 = substitute(Jb,vb,x_k);
+        
+        // Use quasi-Newton
+        newtonIter = SXFunction(vb,vb-solve(Jb0,SXMatrix(fb)));
+      }
+      newtonIter.init();
+      
+      // Make Newton iterations
+      const int n_newton = 3; // NOTE: the number of newton iterations is fixed!
+      for(int k=0; k<n_newton; ++k){
+        x_k = newtonIter.eval(x_k);
+      }
+      
+      cout << "Using " << (exact_newton ? "an exact " : "a quasi-") << "Newton iteration with "<< n_newton << " iterations to solve block " << b << " for the " << vb.size() << " variables " << vb << endl;
+      cout << "the implicit equation has " << countNodes(fb) << " nodes" << endl;
+      cout << "the Newton algorithm has " << newtonIter.algorithm().size() << " nodes" << endl;
+      cout << "the explicit expression has " << countNodes(x_k) << " nodes" << endl;
+
+      // Add binding equations
+      addExplicitEquation(vb,x_k);
+      
+      // TODO: implement tearing
+      if(false){ // not ready (but make sure it compiles)
+      
+        // Find out which dependencies are nonlinear and which are linear
+        Matrix<int> Jb_lin(Jb.sparsity());
+        for(int i=0; i<Jb.size(); ++i){
+          Jb_lin[i] = dependsOn(Jb[i],vb) ? 2 : 1;
+        }
+        
+        // Loop over rows (equations)
+        for(int i=0; i<Jb_lin.size1(); ++i){
+          // Number of variables appearing linearly
+          int n_lin = 0;
+          int j_lin = -1; // index of a variable appearing linearily
+          
+          // Loop over non-zero elements
+          for(int el=Jb_lin.rowind(i); el<Jb_lin.rowind(i+1); ++el){
+            // Column (variable)
+            int j = Jb_lin.col(el);
+            
+            // Count number of variables appearing linearly
+            if(Jb_lin[el]==1){
+              j_lin = j;
+              n_lin ++;
+            }
+          }
+          
+          // Make causal if only one variable appears linearily
+          if(n_lin==1){
+            // 
+            
+          }
+        }
+      }
+                  
       // Cannot solve for vb, add to list of implicit equations
-      implicit_var_new.insert(implicit_var_new.end(),vb.begin(),vb.end());
-      implicit_fcn_new.insert(implicit_fcn_new.end(),fb.begin(),fb.end());
+//      implicit_var_new.insert(implicit_var_new.end(),vb.begin(),vb.end());
+//      implicit_fcn_new.insert(implicit_fcn_new.end(),fb.begin(),fb.end());
+      
+//      cout << "added " << fb << " and " << vb << " to list of implicit equations (" << vb.size() << " equations)" << endl;
       
     } else {
       
@@ -504,30 +612,35 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
     
     // The equation could be made explicit symbolically
     if(implicit_fcn_.empty()){
-      
       casadi_assert(z_.empty());
       
-      // Sort ode_rhs so that it is consistent with xdot
-      vector<SX> xdot = der(x_);
-      vector<SX> ode(xdot.size());
-      
-      // Mark the variables
-      for(int i=0; i<xdot.size(); ++i){
-        xdot[i].setTemp(i+1);
-      }
-      
+      // Mark the explicit variables
       for(int i=0; i<explicit_var_.size(); ++i){
-        int ind = explicit_var_[i].getTemp()-1;
-        if(ind>=0){
-          ode[ind] = explicit_fcn_[i];
-        }
+        explicit_var_[i].setTemp(i+1);
       }
 
-      // Unmark the variables
-      for(int i=0; i<xdot.size(); ++i){
-        xdot[i].setTemp(0);
+      // Find the ODE rhs
+      vector<SX> ode(x_.size());
+      for(int i=0; i<x_.size(); ++i){
+        int ind = x_[i].der().getTemp()-1;
+        casadi_assert(ind>=0);
+        ode[i] = explicit_fcn_[ind];
+      }
+  
+      // Find the dependency equations
+      vector<SX> dep(d_.size());
+      for(int i=0; i<d_.size(); ++i){
+        int ind = d_[i].var().getTemp()-1;
+        casadi_assert(ind>=0);
+        dep[i] = explicit_fcn_[ind];
       }
       
+  
+      // Unmark the explicit variables
+      for(int i=0; i<explicit_var_.size(); ++i){
+        explicit_var_[i].setTemp(0);
+      }
+
       // Evaluate constant expressions
       Matrix<SX> ode_elim = evaluateConstants(ode);
       
@@ -537,13 +650,24 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
       ode_in[ODE_Y] = var(x_);
       ode_in[ODE_P] = var(u_);
       oderhs_ = SXFunction(ode_in,ode_elim);
+
+      // Dependency function
+      output_fcn_ = SXFunction(ode_in,dep);
       
       // ODE quadrature function
       if(create_quad){
-        quadrhs_ = SXFunction(ode_in,lterm[0]/1e3);
+        quadrhs_ = SXFunction(ode_in,lterm[0]);
+        
+        // ODE right hand side with lterm
+        append(ode_in[ODE_Y],symbolic("lterm"));
+        append(ode_elim,SXMatrix(lterm[0]));
+        oderhs_with_lterm_ = SXFunction(ode_in,ode_elim);
       }
       
     } else {
+      cout << implicit_fcn_.size() << " implicit equations" << endl;
+      
+      
     // A Newton algorithm is necessary
     casadi_assert(0);
     
@@ -703,6 +827,35 @@ void OCP::makeSemiExplicit(){
 #endif
 }
 
+void OCP::makeAlgebraic(const Variable& v){
+  // Find variable among the variables
+  for(vector<Variable>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    if(it->get()==v.get()){
+      // Add dependent equation, xdot==0
+      addExplicitEquation(v.der(),0.0,true);
+            
+      // Add to list of algebraic variables
+      z_.push_back(v);
+      
+      // Remove from list of differential variables
+      x_.erase(it);
+
+      // Replace xdot with x (z) in the list of implicitly defined variables
+      for(vector<SX>::iterator jt=implicit_var_.begin(); jt!=implicit_var_.end(); ++jt){
+        if(jt->get()==v.der().get()){
+          *jt = v.var();
+          return;
+        }
+      }
+
+      // Error if this point reached
+      throw CasadiException("variable could not be found in list of implicitly defined variables");
+    }
+  }
+  
+  // Error if this point reached
+  throw CasadiException("v not in list of differential states");
+}
 
 VariableTree& VariableTree::subByName(const string& name, bool allocate){
   // try to locate the variable
@@ -784,6 +937,33 @@ std::vector<std::string> VariableTree::getNames() const{
   return ret;
 }
 
+void OCP::findConsistentIC(){
+  // Evaluate the ODE functions
+  oderhs_.init();
+  oderhs_.setInput(0.0,ODE_T);
+  oderhs_.setInput(getStart(x_,true),ODE_Y);
+  oderhs_.setInput(getStart(u_,true),ODE_P);
+  oderhs_.evaluate();
+  
+  // Save to the variables
+  for(int i=0; i<x_.size(); ++i){
+    double xdot0 = oderhs_.output()[i] * x_[i].getNominal();
+    x_[i].setDerivativeStart(xdot0);
+  }
+  
+  // Evaluate the output functions
+  output_fcn_.init();
+  output_fcn_.setInput(0.0,ODE_T);
+  output_fcn_.setInput(getStart(x_,true),ODE_Y);
+  output_fcn_.setInput(getStart(u_,true),ODE_P);
+  output_fcn_.evaluate();
+  
+  // Save to the variables
+  for(int i=0; i<d_.size(); ++i){
+    double z0 = output_fcn_.output()[i] * d_[i].getNominal();
+    d_[i].setStart(z0);
+  }
+}
 
   } // namespace OptimalControl
 } // namespace CasADi

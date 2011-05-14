@@ -93,7 +93,7 @@ class OCP : public PrintableObject{
     void makeSemiExplicit();
     
     /// Add a binding equation
-    void addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq);
+    void addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front=false);
     
     /// Scale the variables
     void scaleVariables();
@@ -106,6 +106,12 @@ class OCP : public PrintableObject{
     
     /// Create the implicit/explict ODE functions and quadrature state functions
     void createFunctions(bool create_dae=true, bool create_ode=true, bool create_quad=true);
+    
+    /// Make a differential state algebraic by replacing its time derivative by 0
+    void makeAlgebraic(const Variable& v);
+    
+    /// Update the initial values for the dependent variables
+    void findConsistentIC();
     
     /// Time
     SX t_;
@@ -176,6 +182,12 @@ class OCP : public PrintableObject{
     
     /// ODE right hand side function
     FX oderhs_;
+    
+    /// ODE right hand side function with lagrange term
+    FX oderhs_with_lterm_;
+    
+    /// Output function
+    FX output_fcn_;
     
     /// DAE residual function
     FX daeres_;

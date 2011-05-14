@@ -66,6 +66,10 @@ vector<double> getStart(const vector<Variable> v, bool nominal){
   return getAll(&Variable::getStart, v, nominal);
 }
 
+vector<double> getDerivativeStart(const vector<Variable> v, bool nominal){
+  return getAll(&Variable::getDerivativeStart, v, nominal);
+}
+
 vector<double> getMin(const vector<Variable> v, bool nominal){
   return getAll(&Variable::getMin, v, nominal);
 }

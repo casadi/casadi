@@ -43,6 +43,7 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   max_ = numeric_limits<double>::infinity();
   nominal_ = 1.0;
   start_ = 0.0;
+  derivative_start_ = 0.0;
   unit_ = "";
   displayUnit_ = "";
 
