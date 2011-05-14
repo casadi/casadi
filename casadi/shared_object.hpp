@@ -200,6 +200,15 @@ const B shared_cast(const SharedObject& A){
   return shared_cast<B>(A_copy);
 }
 
+/// Make a deep copy of an object (Note: default is a shallow copy!)
+template<class A>
+A deepcopy(const A& a){
+  A ret = a;
+  ret.makeUnique();
+  return ret;
+}
+
+
 // Template function implementations
 template<class B>
 B SharedObjectNode::shared_from_this(){
