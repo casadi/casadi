@@ -189,6 +189,10 @@ const std::vector<SXAlgEl>& SXFunction::algorithm() const{
   return (*this)->algorithm;
 }
 
+void SXFunction::clearSymbolic(){
+  (*this)->clearSymbolic();
+}
+
 
 } // namespace CasADi
 

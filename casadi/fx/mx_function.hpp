@@ -110,6 +110,10 @@ public:
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /** \brief Jacobian via source code transformation (work in progress! */
+  std::vector<MX> jac(int iind=0);
+  
 };
 
 #ifdef SWIG

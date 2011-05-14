@@ -253,6 +253,82 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
   return node;
 }
 
+  
+std::vector<MX> MXFunctionInternal::jac(int iind){
+  // Number of columns in the Jacobian
+  int ncol = alg[inputv_ind[iind]].mx.size1();
+  
+  // Get theseed matrices
+  vector<MX> fseed(input_.size());
+  for(int ind=0; ind<input_.size(); ++ind){
+    // Number of rows in the seed matrix
+    int nrow = alg[inputv_ind[ind]].mx.size1();
+    
+    // Create seed matrix
+    fseed[ind] = ind==iind ? MX::eye(ncol) : MX::zeros(nrow,ncol);
+   }
+  
+  // Call the lower level method
+  return jac(fseed);
+}
+
+std::vector<MX> MXFunctionInternal::jac(const std::vector<MX>& fseed){
+  casadi_warning("MXFunctionInternal::jac: the feature is still experimental");
+  
+  // Get the number of columns
+  const int ncol = fseed.front().size2();
+  
+  // Make sure that the number of columns is consistent
+  for(vector<MX>::const_iterator it=fseed.begin(); it!=fseed.end(); ++it){
+    casadi_assert_message(ncol==it->size2(),"Number of columns in seed matrices not consistent.");
+  }
+  
+  // Directional derivative for each node
+  std::vector<MX> dirder(alg.size());
+  
+  // Pass the seed matrices for the symbolic variables
+  for(int ind=0; ind<input_.size(); ++ind){
+    dirder[inputv_ind[ind]] = fseed[ind];
+   }
+   
+  // Evaluate all the seed matrices of the algorithm sequentially
+  for(int el=0; el<dirder.size(); ++el){
+    // Skip the node if it has already been calculated (i.e. is symbolic or constant)
+    if(!dirder[el].isNull()) continue;
+    
+    // Zero seed matrix if constant
+    if(alg[el].mx->isConstant()){
+      
+      // Number of rows
+      int nrow = alg[el].mx.numel();
+      
+      // Save zero matrix
+      dirder[el] = MX::zeros(nrow,ncol);
+      continue;
+    }
+    
+    // Collect the seed matrices
+    vector<MX> seed(alg[el].ch.size());
+    for(int i=0; i<seed.size(); ++i){
+      seed[i] = dirder[alg[el].ch[i]];
+    }
+    
+    // Get the sensitivity matrix
+    MX sens = alg[el].mx->fwdSens(seed);
+    
+    // Save to the memory vector
+    dirder[el] = sens;
+  }
+
+  // Collect the symbolic forward sensitivities
+  vector<MX> ret(outputv.size());
+  for(int ind=0; ind<outputv.size(); ++ind){
+    ret[ind] = dirder[outputv_ind[ind]];
+  }
+  return ret;
+}
+
+
 
 } // namespace CasADi
 

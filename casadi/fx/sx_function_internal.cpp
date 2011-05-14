@@ -812,5 +812,12 @@ SXFunctionInternal* SXFunctionInternal::clone() const{
   return new SXFunctionInternal(*this);
 }
 
+
+void SXFunctionInternal::clearSymbolic(){
+  inputv.clear();
+  outputv.clear();
+  swork.clear();
+}
+
 } // namespace CasADi
 

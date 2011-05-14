@@ -64,6 +64,10 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);
 
+    /** \brief Jacobian via source code transformation (work in progress! */
+    std::vector<MX> jac(int iind);
+    std::vector<MX> jac(const std::vector<MX>& fseed);
+
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 

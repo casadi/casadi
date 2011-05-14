@@ -132,6 +132,10 @@ public:
   
   /** \brief Access the algorithm */
   const std::vector<SXAlgEl>& algorithm() const;
+  
+  /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
+  void clearSymbolic();
+  
 };
 
 #ifdef SWIG

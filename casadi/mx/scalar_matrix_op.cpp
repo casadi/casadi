@@ -67,10 +67,16 @@ void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         adjSens[0][d][0] += adjSeed[d][i]*tmp[0];
         adjSens[1][d][i] += adjSeed[d][i]*tmp[1];
       }
-      
     }
   }
 }
+
+//       // Derivative functions
+//   casadi_math<MX>::print[SUB](cout,"x","y");
+//   MX x("x"), y("y");
+//   vector<MX> d(2);
+//   casadi_math<MX>::der[SUB](x,y,x-y,&d.front());
+
 
 } // namespace CasADi
 
