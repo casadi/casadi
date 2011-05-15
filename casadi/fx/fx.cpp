@@ -155,7 +155,20 @@ void FX::setNumOutputs(int num_out){
 }
 
 FX FX::jacobian(int iind, int oind){
-  return (*this)->jacobian(iind,oind);  
+  if((*this)->store_jacobians_){
+    // Get a reference to the place the Jacobian is or will be saved
+    FX& J = (*this)->jacs_[iind][oind];
+    
+    // Generate a Jacobian if necessary
+    if(J.isNull())
+      J = (*this)->jacobian(iind,oind);
+    
+    // Return a reference to the stored Jacobian
+    return J;
+    
+  } else {
+    return (*this)->jacobian(iind,oind);
+  }
 }
 
 FX FX::hessian(int iind, int oind){

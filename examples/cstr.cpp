@@ -113,11 +113,13 @@ int main(){
   integrator.setOption("quad_err_con",true);
   integrator.setOption("abstol",1e-8);
   integrator.setOption("reltol",1e-8);
+  integrator.setOption("store_jacobians",true);
   integrator.init();
 
   // Mayer objective function
   Matrix<SX> xf = symbolic("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
+  mterm.setOption("store_jacobians",true);
   
   // Number of shooting nodes
   int num_nodes = 100;

@@ -36,6 +36,7 @@ FXInternal::FXInternal(){
   addOption("number_of_fwd_dir", OT_INTEGER,  1); // number of forward derivatives
   addOption("number_of_adj_dir", OT_INTEGER,  1); // number of adjoint derivatives
   addOption("verbose",           OT_BOOLEAN,   false); // verbose evaluation -- for debugging
+  addOption("store_jacobians",   OT_BOOLEAN,   false); // keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times
   is_init_ = false;
   verbose_ = false;
 }
@@ -44,9 +45,10 @@ FXInternal::~FXInternal(){
 }
 
 void FXInternal::init(){
-  nfdir_ = getOption("number_of_fwd_dir").toInt();
-  nadir_ = getOption("number_of_adj_dir").toInt();
-  verbose_ = getOption("verbose").toInt();
+  nfdir_ = getOption("number_of_fwd_dir");
+  nadir_ = getOption("number_of_adj_dir");
+  verbose_ = getOption("verbose");
+  store_jacobians_ = getOption("verbose");
 
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
     it->dataF.resize(nfdir_);
@@ -59,8 +61,17 @@ void FXInternal::init(){
     it->dataA.resize(nadir_);
     it->init();
   }
+  
+  // Generate storage for generated Jacobians
+  if(store_jacobians_){
+    jacs_.resize(getNumInputs());
+    for(int i=0; i<jacs_.size(); ++i){
+      jacs_[i].resize(getNumOutputs());
+    }
+  }
 
   is_init_ = true;
+  
 }
 
 void FXInternal::print(ostream &stream) const{

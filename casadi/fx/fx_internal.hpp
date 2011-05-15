@@ -164,7 +164,9 @@ class FXInternal : public OptionsFunctionalityNode{
   /** \brief  Dictionary of statistics (resulting from evaluate) */
   Dictionary stats_;
 
-
+  /** \brief  Stored Jacobians */
+  bool store_jacobians_;
+  std::vector<std::vector<FX> > jacs_;
 };
 
 
