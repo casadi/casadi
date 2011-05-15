@@ -68,7 +68,7 @@ class MXFunctionInternal : public XFunctionInternal{
     std::vector<MX> jac(int iind);
     
     /** \brief Jacobian via source code transformation */
-    std::vector<MX> jac(const std::vector<MX>& fseed);
+    std::vector<MX> adFwd(const std::vector<MX>& fseed);
 
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;

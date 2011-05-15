@@ -146,12 +146,56 @@ void Mapping::addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, st
   // Add the dependencies
   vector<int> el = sparsity_.getNZ(i,j);
   
-  
-  
   // Swap the vectors
   nzind_.swap(nzind);
   depind_.swap(depind);
 }
+
+MX Mapping::adFwd(const std::vector<MX>& jx){
+  casadi_assert(isReady());
+  casadi_assert(size()==numel());
+
+  // Number of columns
+  int ncol = jx.front().size2();
+  
+  // Return mapping
+  MX ret(size(),ncol);
+  
+  // Sparsity
+  const CRSSparsity &sp = sparsity();
+
+  // Loop over rows of the matrix
+  for(int i=0; i<size1(); ++i){
+    
+    // Loop over nonzero entries
+    for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
+      
+      // Get the column
+      int j = sp.col(el);
+      
+      // Get the dependency and nonzero to which the nonzero is mapped
+      int dp = depind_[el];
+      int nz = nzind_[el];
+      
+      // Get the sparsity of the seed matrix
+      const CRSSparsity &sp_mat = jx[dp].sparsity();
+      
+      // Loop over the nonzeros of the row of the seed matrix
+      int i_mat = nz;
+      for(int el_mat=sp_mat.rowind(i_mat); el_mat<sp_mat.rowind(i_mat+1); ++el_mat){
+        // Get the column
+        int j_mat = sp_mat.col(el_mat);
+        
+        // Map the Jacobian nonzero
+        ret(el,j_mat) = jx[dp][el_mat];
+      }
+    }
+  }
+    
+  // Return the mapping
+  return ret;
+}
+
 
 // MX Mapping::eval(const std::vector<MX>& x){
 //   

@@ -250,6 +250,12 @@ void MultipleShootingInternal::init(){
   
   // Create function
   J_ = MXFunction(V,vertcat(JJ));
+  
+  
+  // The following completely automates the Jacobian construction above
+  // works only if "parallelization" is set to "expand"
+  // G_.init();
+  // J_ = MXFunction(V,G_.jac());
 }
 
 void MultipleShootingInternal::getGuess(vector<double>& V_init) const{

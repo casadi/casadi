@@ -127,6 +127,7 @@ int main(){
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
 //  ms.setOption("parallelization","openmp");
+//  ms.setOption("parallelization","expand");
   ms.init();
 
   // Initial condition

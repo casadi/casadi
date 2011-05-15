@@ -119,6 +119,8 @@ target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES}
 
 endif(LIFTOPT_FOUND)
 
+add_executable(mx_jacobian mx_jacobian.cpp)
+target_link_libraries(mx_jacobian casadi)
 
 
 

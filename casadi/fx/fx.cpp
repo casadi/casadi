@@ -66,8 +66,25 @@ vector<MX> FX::call(const vector<MX> &x){
 vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
   casadi_assert(isInit());
   
+  // Return object
+  vector<vector<MX> > ret(x.size());
+  
   // Make sure not empty
   casadi_assert(x.size()>1);
+  
+  // Check if we are bypassing the parallelizer
+  Dictionary::const_iterator ii=paropt.find("parallelization");
+  if(ii!=paropt.end() && ii->second=="expand"){
+    for(int i=0; i<x.size(); ++i){
+      ret[i] = call(x[i]);
+    }
+    return ret;
+  }
+    
+//  if(paropt
+    
+//     getOption("parallelization")=="serial")
+
   
   // Create parallelizer object and initialize it
   Parallelizer p(vector<FX>(x.size(),*this));
@@ -86,7 +103,6 @@ vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& par
   casadi_assert(p_out.size() == x.size() * getNumOutputs());
 
   // Collect the outputs
-  vector<vector<MX> > ret(x.size());
   vector<MX>::const_iterator it=p_out.begin();
   for(int i=0; i<x.size(); ++i){
     ret[i].insert(ret[i].end(),it,it+getNumOutputs());

@@ -140,8 +140,8 @@ std::vector<MX> MXNode::partial() const{
   throw CasadiException(string("MXNode::partial() no partial derivatives defined for class ") + typeid(*this).name());
 }
 
-MX MXNode::fwdSens(const std::vector<MX>& jx){
-  throw CasadiException(string("MXNode::fwdSens() not defined for class ") + typeid(*this).name());
+MX MXNode::adFwd(const std::vector<MX>& jx){
+  throw CasadiException(string("MXNode::adFwd() not defined for class ") + typeid(*this).name());
 }
 
 } // namespace CasADi

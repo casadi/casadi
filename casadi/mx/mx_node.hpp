@@ -163,12 +163,10 @@ class MXNode : public SharedObjectNode{
     virtual MX eval(const std::vector<MX>& x){}
     
     /// Symbolic forward sensitivities
-    virtual MX fwdSens(const std::vector<MX>& jx);
+    virtual MX adFwd(const std::vector<MX>& jx);
     
     /// Partial derivatives
     virtual std::vector<MX> partial(const std::vector<MX>& x){};
-    
-  protected:
     
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;

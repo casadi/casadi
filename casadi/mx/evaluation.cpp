@@ -23,6 +23,7 @@
 #include "evaluation.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../mx/mx_tools.hpp"
 
 using namespace std;
 
@@ -119,5 +120,51 @@ void EvaluationOutput::evaluate(const VDptr& input, Dptr& output, const VVDptr& 
     if(fwdSens[d]!=0)
       fcn_.getFwdSens(fwdSens[d],oind_,d);
 }
+
+MX Evaluation::adFwd(const std::vector<MX>& jx){ 
+  // Save the forward derivative
+  x_ = jx;
+  
+  // Return null
+  return MX();
+}
+
+MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
+  // Get a reference the arguments
+  vector<MX>& x = dynamic_cast<Evaluation*>(dep(0).get())->x_;
+  
+  // Find the number of columns
+  int ncol = -1;
+  for(int i=0; i<x.size(); ++i){
+    if(!x[i].isNull())
+      ncol = x[i].size2();
+  }
+  casadi_assert(ncol>=0);
+  
+  // Return matrix
+  MX ret = MX::zeros(size(),ncol);
+  
+  for(int i=0; i<x.size(); ++i){
+/*    if(i!=oind_-1)
+      continue;*/
+    
+    // Get the Jacobian (this is inefficient, unless jacobian gets a bit smarter!)
+    FX J = fcn_.jacobian(i,oind_);
+    J.init();
+
+    // Get a reference to the argument
+    vector<MX> &Jarg = dep(0)->dep_;
+
+    // Create an evaluation node
+    MX Ji = J.call(Jarg).at(0);
+    
+    // Assemble the return matrix
+    if(!x[i].isNull()){
+      ret += prod(Ji,x[i]);
+    }
+  }
+  return ret;
+}
+
 
 } // namespace CasADi

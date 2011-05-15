@@ -129,7 +129,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
   }
 }
 
-MX MatrixMatrixOp::fwdSens(const std::vector<MX>& jx){
+MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
   casadi_assert_message(op==SUB, "only subtraction implemented (quick hack)");
   return jx[0]-jx[1];
 }

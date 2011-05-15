@@ -49,7 +49,11 @@ class Evaluation : public MultipleOutput{
 
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+    
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
 
+    std::vector<MX> x_;
     FX fcn_;
 };
 
@@ -77,6 +81,9 @@ class EvaluationOutput : public OutputNode{
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return true;} 
+
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
 
     FX fcn_;
     int oind_;

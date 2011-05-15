@@ -64,8 +64,8 @@ class Mapping : public MXNode{
     /// Add a dependency (indices nz to be placed in (i,j))
     void addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j);
     
-    /// Symbolic evaluation (matrix graph)
-    //virtual MX eval(const std::vector<MX>& x);
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
 
   protected:
     
