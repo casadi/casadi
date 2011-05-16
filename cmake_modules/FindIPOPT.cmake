@@ -17,8 +17,10 @@ FIND_LIBRARY(IPOPT_LIBRARY
 ipopt HINTS $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/  /usr/local/lib/coin /usr/local/lib/coin/ThirdParty )
 
 FIND_LIBRARY(HSL_LIBRARY 
-coinhsl HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/  /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinhsl HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
+FIND_LIBRARY(METIS_LIBRARY 
+coinmetis HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 FIND_LIBRARY(MUMPS_LIBRARY_492 
 dmumps_seq-4.9.2)
@@ -38,6 +40,11 @@ IF (IPOPT_LIBRARY)
   IF(HSL_LIBRARY)
     SET(IPOPT_LIBRARIES ${IPOPT_LIBRARIES} ${HSL_LIBRARY})
   ENDIF(HSL_LIBRARY)
+  
+  IF(METIS_LIBRARY)
+    SET(IPOPT_LIBRARIES ${IPOPT_LIBRARIES} ${METIS_LIBRARY})
+  ENDIF(METIS_LIBRARY)
+
 
    MESSAGE(STATUS "Found Ipopt libs: ${IPOPT_LIBRARIES}")
 ELSE (IPOPT_LIBRARY)
