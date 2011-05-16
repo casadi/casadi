@@ -191,8 +191,8 @@ class OCPtests(casadiTestCase):
     self.assertTrue(isinstance(ocp.t_,SX))
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
-    self.assertEquals(len(ocp.dynamic_eq_),3)
-    self.assertEquals(len(ocp.initial_eq_),3)
+    self.assertEquals(len(ocp.implicit_fcn_),3)
+    self.assertEquals(len(ocp.implicit_fcn_),3)
     self.assertEquals(len(ocp.x_),3) # there are three states
     (c,T,cost) = tuple(ocp.x_)
     self.assertTrue(isinstance(c,Variable))

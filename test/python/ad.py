@@ -242,6 +242,23 @@ class ADtests(casadiTestCase):
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(Jf.output(),J,"Jacobian")
+
+  def test_jacobianMX(self):
+    n=array([1.2,2.3,7,4.6])
+    for inputshape in ["column"]:
+      for outputshape in ["column"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense"]:
+            for mode in ["forward","adjoint"]:
+              self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
+              f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+              f.init()
+              Jf=MXFunction(self.mxinputs[inputshape][inputtype],[f.jac(0)[0]])
+              Jf.init()
+              Jf.input().set(n)
+              Jf.evaluate()
+              J = self.jacobians[inputtype][outputtype](*n)
+              self.checkarray(array(Jf.output()),J,"jacobian")
               
   def test_hessian(self):
     return # not working

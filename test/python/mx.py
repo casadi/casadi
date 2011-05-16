@@ -1195,6 +1195,64 @@ class MXtests(casadiTestCase):
     self.assertTrue(isSymbolic(x))
     self.assertFalse(isSymbolic(z))
     
+  def test_MXd_trivial(self):
+    self.message("symbolic variables and constants jac")
+    X =  MX("X",10)
+    V =  MX("V")
+    f =  MXFunction([X,V],[X,MX.eye(3)])
+    f.init()
+    self.assertTrue(isinstance(f.jac(0)[0],MX))
+    self.assertEqual(f.jac(0)[0].size(),10)
+    self.assertEqual(f.jac(0)[0].size1(),10)
+    self.assertEqual(f.jac(0)[0].size2(),10)
+    
+    g = MXFunction([],[f.jac(0)[0]]);g.init();g.evaluate()
+    self.checkarray(g.output(),eye(10),"unit matrix")
+    
+    g = MXFunction([],[f.jac(0)[1]]);g.init();g.evaluate()
+    self.checkarray(g.output(),zeros((9,10)),"zero matrix")
+    
+    g = MXFunction([],[f.jac(1)[0]]);g.init();g.evaluate()
+    self.checkarray(g.output(),zeros((10,1)),"zero matrix")
+    
+    g = MXFunction([],[f.jac(1)[1]]);g.init();g.evaluate()
+    self.checkarray(g.output(),zeros((9,1)),"zero matrix")
+    
+  def test_MXd_substractionl(self):
+    self.message("substraction jac")
+    V =  MX("V")
+    X =  MX("X")
+    f =  MXFunction([X,V],[X-V])
+    f.init()
+    
+    g = MXFunction([],[f.jac(0)[0]]);g.init();g.evaluate()
+    self.checkarray(g.output(),ones((1,1)),"one")
+
+    g = MXFunction([],[f.jac(1)[0]]);g.init();g.evaluate()
+    self.checkarray(g.output(),-ones((1,1)),"one")
+    
+    f =  MXFunction([X,V],[V-X])
+    f.init()
+    
+    g = MXFunction([],[f.jac(0)[0]]);g.init();g.evaluate()
+    self.checkarray(g.output(),-ones((1,1)),"one")
+
+    g = MXFunction([],[f.jac(1)[0]]);g.init();g.evaluate()
+    self.checkarray(g.output(),ones((1,1)),"one")
+    
+  def test_MXd_mapping(self):
+    self.message("mapping jac")
+    X = MX("X",3)
+    Y = MX("Y",2)
+    f = MXFunction([X,Y],[vertcat([X,Y])])
+    f.init()
+    J = f.jac(0)[0]
+    JJ = DMatrix(J.sparsity(),1)
+    self.checkarray(JJ,vstack((eye(3),zeros((2,3)))),"diag")
+    J = f.jac(1)[0]
+    JJ = DMatrix(J.sparsity(),1)
+    self.checkarray(JJ,vstack((zeros((3,2)),eye(2))),"diag")
+    
 if __name__ == '__main__':
     unittest.main()
 
