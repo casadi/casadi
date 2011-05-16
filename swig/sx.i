@@ -293,11 +293,6 @@ namespace CasADi {
 
 %inline %{
 
-bool istype(PyObject *p, swig_type_info *type) {
-  int res = SWIG_ConvertPtr(p, 0, type, 0);
-  return SWIG_CheckState(res);
-}
-
 bool isSXMatrix(PyObject * p) {
   return istype(p,SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t);
 }
@@ -443,6 +438,20 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 		if (!result)
 			return false;
     m = CasADi::Matrix< CasADi::SX >(res);
+  } else if(couldbeDMatrix(p)) {
+    if (isDMatrix(p)) { 
+      CasADi::DMatrix * mt;
+      int result = getDMatrix_ptr(p,mt);
+		  if (!result)
+			  return false;
+      m = CasADi::SXMatrix(*mt);
+	  } else {  
+	    CasADi::DMatrix mt;
+      bool result=asDMatrix(p,mt);
+      if (!result)
+        return false;
+      m = CasADi::SXMatrix(mt);
+    }
   } else if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
     PyObject *it = PyObject_GetIter(p);
     PyObject *pe;
@@ -470,6 +479,8 @@ bool couldbeSXMatrix(PyObject* p) {
   if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 		if (array_type(p)==NPY_OBJECT)
 			return true;
+	} else if (couldbeDMatrix(p)) {
+	  return true;
 	} else if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
     PyObject *it = PyObject_GetIter(p);
     PyObject *pe;
@@ -594,18 +605,8 @@ matching on SXMatrix is prohibited as per wish of Joel
   }
 }
 
-%typemap(typecheck,precedence=PRECEDENCE_SXMatrixVector) const std::vector< Matrix<SX> > & {
-    if (couldbeSXMatrixVector($input)) {
-      $1 = 1;
-    } else {
-      $1=0;
-    }
-}
-
-%typemap(freearg) const std::vector< Matrix<SX> > & {
-}
-
-
+%typemap(typecheck,precedence=PRECEDENCE_SXMatrixVector) const std::vector< Matrix<SX> > & { $1 = couldbeSXMatrixVector($input); }
+%typemap(freearg) const std::vector< Matrix<SX> > & {}
 
 // numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)
 %typemap(in) const Matrix<SX> & (Matrix<SX> m) {
@@ -622,17 +623,8 @@ matching on SXMatrix is prohibited as per wish of Joel
 }
 
 
-%typemap(typecheck,precedence=PRECEDENCE_SXMatrix) const Matrix<SX> & {
-  if (couldbeSXMatrix($input)) {
-    $1=1;
-  } else {
-    $1=0;
-  }
-}
-
-%typemap(freearg) const Matrix<SX>  & {
-}
-
+%typemap(typecheck,precedence=PRECEDENCE_SXMatrix) const Matrix<SX> & { $1 = couldbeSXMatrix($input); }
+%typemap(freearg) const Matrix<SX>  & {}
 
 
 }

@@ -273,6 +273,47 @@ class typemaptests(casadiTestCase):
     f.input().set([1,4])
     f.evaluate()
     self.checkarray(f.output(),matrix([8,17]).T,"addition")
-     
+
+  def test_DMatrixSXMatrixcast(self):
+    self.message("Casting DMatrix to SXMatrix")
+    
+    W = SXMatrix(DMatrix([[1,2,3],[4,5,6]]))
+
+    self.assertEqual(W.size1(),2)
+    self.assertEqual(W.size2(),3)
+
+  def test_DMatrixMXcast(self):
+    self.message("Casting DMatrix to MX")
+    W = MX(DMatrix([[1,2,3],[4,5,6]]))
+    
+    self.assertEqual(W.size1(),2)
+    self.assertEqual(W.size2(),3)
+    
+  def test_DMatrixSXMatrix(self):
+    self.message("Casting DMatrix to SXMatrix")
+    
+    w = DMatrix([[1,2,3],[4,5,6]])
+    x = SX("x")
+    
+    f = SXFunction([x],[w])
+    
+    W = f.outputSX()
+    self.assertEqual(W.size1(),2)
+    self.assertEqual(W.size2(),3)
+
+  def test_DMatrixMX(self):
+    self.message("Casting DMatrix to MX")
+    w = DMatrix([[1,2,3],[4,5,6]])
+    x = MX("x")
+    
+    f = MXFunction([x],[w])
+    
+    W = f.outputMX()
+
+    self.assertEqual(W.size1(),2)
+    self.assertEqual(W.size2(),3)
+
+    
+    
 if __name__ == '__main__':
     unittest.main()

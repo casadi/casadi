@@ -28,7 +28,7 @@ int getMX_ptr(PyObject * p, CasADi::MX * & m) {
 }
 
 bool couldbeMX(PyObject* p) {
-  return (isMX(p) || couldbePyNumber(p));
+  return (isMX(p) || couldbePyNumber(p) || couldbeDMatrix(p) );
 }
 
 bool asMX(PyObject*p, CasADi::MX &m ) {
@@ -38,6 +38,20 @@ bool asMX(PyObject*p, CasADi::MX &m ) {
     if (!result)
       return false;
     m=*mx;
+  } else if(couldbeDMatrix(p)) {
+    if (isDMatrix(p)) { 
+      CasADi::DMatrix * mt;
+      int result = getDMatrix_ptr(p,mt);
+		  if (!result)
+			  return false;
+      m = CasADi::MX(*mt);
+	  } else {  
+	    CasADi::DMatrix mt;
+      bool result=asDMatrix(p,mt);
+      if (!result)
+        return false;
+      m = CasADi::MX(mt);
+    }
   } else if (couldbePyNumber(p)) {
     double res;
     int result = getPyNumber(p,&res);
@@ -139,16 +153,8 @@ namespace CasADi{
   }
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector< MX > & {
-    if (couldbeMXVector($input)) {
-      $1 = 1;
-    } else {
-      $1=0;
-    }
-}
-
-%typemap(freearg) const std::vector< MX > & {
-}
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector< MX > & { $1 = couldbeMXVector($input); }
+%typemap(freearg) const std::vector< MX > & {}
 
 }
 
