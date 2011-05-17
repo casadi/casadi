@@ -16,7 +16,12 @@ bool istype(PyObject *p, swig_type_info *type) {
 
 /** Check PyObjects by class name */
 bool PyObjectHasClassName(PyObject* p, const char * name) {
-	return strcmp(PyString_AsString(PyObject_GetAttrString(PyObject_GetAttrString( p, "__class__"),"__name__")),name)==0;
+  PyObject * classo = PyObject_GetAttrString( p, "__class__");
+  PyObject * classname = PyObject_GetAttrString( classo, "__name__");
+  
+  bool ret = strcmp(PyString_AsString(classname),name)==0;
+  Py_DECREF(classo);Py_DECREF(classname);
+	return ret;
 }
 
 %}
@@ -173,7 +178,7 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 		if (array_is_new_object)
 		  Py_DECREF(array); 
 	} else if(PyObjectHasClassName(p,"csr_matrix")) { // scipy's csr_matrix will be cast to sparse Matrix<double>
-		PyObject * narray=PyObject_GetAttrString( p, "data");
+		PyObject * narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
 		if (!(is_array(narray) && array_numdims(narray)==1))
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
 		int array_is_new_object;
@@ -184,25 +189,27 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 		std::vector<double> v(d,d+size);
 
 		// Get the dimensions of the csr_matrix
-		PyObject * shape = PyObject_GetAttrString( p, "shape");
+		PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
 		int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
 		int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
 		
 		// Construct the 'col' vector needed for initialising the correct sparsity
-		PyObject * col = PyObject_GetAttrString(p,"indices");
+		PyObject * col = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
 		if (!(is_array(col) && array_numdims(col)==1 && array_type(col)==NPY_INT))
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
 		int* cold=(int*) array_data(col);
 		std::vector<int> colv(cold,cold+size);
 			
 		// Construct the 'rowind' vector needed for initialising the correct sparsity
-		PyObject * rowind = PyObject_GetAttrString(p,"indptr");
+		PyObject * rowind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
 		if (!(is_array(rowind) && array_numdims(rowind)==1 && array_type(rowind)==NPY_INT))
 			SWIG_Error(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
 		int* rowindd=(int*) array_data(rowind);
 		std::vector<int> rowindv(rowindd,rowindd+(nrows+1));
 			
 		m = CasADi::Matrix<double>(nrows,ncols,colv,rowindv, v);
+		
+		Py_DECREF(narray);Py_DECREF(shape);Py_DECREF(col);Py_DECREF(rowind);
 		
 		if (array_is_new_object)
 		  Py_DECREF(array);
@@ -284,7 +291,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			}
 	} else if (PyObjectHasClassName(p,"csr_matrix")) {
 			$3 = CasADi::SPARSE;
-			PyObject * narray=PyObject_GetAttrString( p, "data");
+			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
 			  SWIG_exception_fail(SWIG_TypeError, "csr_matrix should be contiguous, native & of datatype double");
 			$2 = array_size(narray,0);
@@ -295,9 +302,11 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
+		      Py_DECREF(narray);
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			}
 			$1 = (double*) array_data(narray);
+			Py_DECREF(narray);
 	} else {
 			SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
 	}
@@ -344,7 +353,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			}
 	} else if (PyObjectHasClassName(p,"csr_matrix")) {
 			$3 = CasADi::SPARSE;
-			PyObject * narray=PyObject_GetAttrString( p, "data");
+			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			$2 = array_size(narray,0);
 			if (!(array_size(narray,0)==arg1->size() ) ) {
 					std::stringstream s;
@@ -353,10 +362,12 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
+          Py_DECREF(narray);
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			}
 			array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
 			$1 = (double*) array_data(array);
+			Py_DECREF(narray);
 	} else {
 			SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
 	}
