@@ -25,7 +25,9 @@
 #define array_data(a)          (((PyArrayObject *)a)->data)
 #define array_is_contiguous(a) (PyArray_ISCONTIGUOUS(a))
 #define array_is_native(a)     (PyArray_ISNOTSWAPPED(a))
-
+#define PyArray_CHKFLAGS(m, FLAGS) \
+	((((PyArrayObject *)(m))->flags & (FLAGS)) == (FLAGS))
+	
 /* Support older NumPy data type names
 */
 #if NDARRAY_VERSION < 0x01000000

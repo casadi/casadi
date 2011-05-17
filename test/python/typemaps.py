@@ -313,6 +313,58 @@ class typemaptests(casadiTestCase):
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
+  def test_sharedarray(self):
+    w = DMatrix([[1,2],[3,4]])
+    W = w.toArray(shared=True)
+    self.checkarray(w,W,"shared")
+    
+    w[0,1] = 8
+    self.checkarray(w,W,"shared")
+
+    W[:,0] = 47
+    self.checkarray(w,W,"shared")
+    
+  def test_setgetslicetransp(self):
+    self.message("set/get on DMatrix using tranpose")
+    
+    w = DMatrix([[0,0],[0,0]])
+
+    A = matrix([[1.0,2],[3,4]])
+    B = matrix([[4.0,5],[6,7]])
+    
+    w.set(A)
+    w.get(B.T)
+    
+    self.checkarray(B.T,A,"get")
+    
+  def test_setgetslice(self):
+    self.message("set/get on DMatrix using slices")
+    
+    w = DMatrix([[0,0]])
+
+    A = matrix([[1.0,2],[3,4]])
+    B = matrix([[4.0,5],[6,7]])
+    
+    w.set(A[0,:])
+    self.checkarray(w,A[0,:],"set")
+    w.get(B[0,:])
+    self.checkarray(B[0,:],A[0,:],"get")
+    
+    w = DMatrix([[0],[0]])
+
+
+    w.set(A[:,0])
+    self.checkarray(w,A[:,0],"set")
+    w.get(B[:,0])
+    self.checkarray(B[:,0],A[:,0],"get")
+    
+    w = DMatrix([[1,2],[3,4]])
+    A = zeros((8,7))
+    B = zeros((8,7))
+    w.get(A[2:7:3,:7:4])
+    B[2:7:3,:7:4] = w
+    self.checkarray(A,B,"get")
+    
     
     
 if __name__ == '__main__':
