@@ -87,6 +87,12 @@ class MX : public SharedObject{
  
     /** \brief  Access matrix non-zero */
     NonZeros<MX> operator[](int k);
+
+    /** \brief  Get multiple matrix non-zero */
+    const MX operator[](const std::vector<int>& kk) const;          
+ 
+    /** \brief  Access multiple matrix non-zero */
+    NonZeros<MX> operator[](const std::vector<int>& kk);
     
     /** \brief  Get matrix element */
     const MX operator()(int i, int j) const;
@@ -95,10 +101,10 @@ class MX : public SharedObject{
     SubMatrix<MX> operator()(int i, int j);
 
     /** \brief  Get a column, or parts of a one */
-    const MX operator()(const std::vector<int>& ii, int j) const;
+    const MX operator()(const std::vector<int>& ii, int j=0) const;
     
     /** \brief  Access a column, or parts of a one */
-    SubMatrix<MX > operator()(const std::vector<int>& ii, int j);
+    SubMatrix<MX > operator()(const std::vector<int>& ii, int j=0);
 
     /** \brief  Get a row, or parts of a one */
     const MX operator()(int i, const std::vector<int>& jj) const;

@@ -53,25 +53,37 @@ void MultipleShootingInternal::init(){
   for(int k=0; k<=nk_; ++k)
     input(OCP_T).at(k) = (k*tf)/nk_;
 
-  //Declare variable vector
-  int NV = np_+nu_*nk_+nx_*(nk_+1);
+  // Count the total number of NLP variables
+  int NV = np_ + // global parameters
+           nx_*(nk_+1) + // local state
+           nu_*nk_; // local control
+           
+  // Declare variable vector for the NLP
   MX V("V",NV);
-  
-  //Disretized control
-  vector<MX> U(nk_);
-  for(int k=0; k<nk_; ++k)
-    U[k] = V(range(np_+k*(nx_+nu_)+nx_,np_+k*(nx_+nu_)+nx_+nu_),range(1));
-  
-  //Disretized state
-  vector<MX> X(nk_+1);
-  for(int k=0; k<=nk_; ++k)
-    X[k] = V(range(np_+k*(nx_+nu_),np_+k*(nx_+nu_)+nx_),range(1));
 
-  // Algebraic state, state derivative
-  vector<MX> Z(nk_), XP(nk_);
+  // Global parameters
+  MX P = V(range(np_));
 
-  // Parameters
-  MX P = V(range(np_),range(1));
+  // offset in the variable vector
+  int v_offset=np_; 
+  
+  // Disretized variables for each shooting node
+  vector<MX> X(nk_+1), Z(nk_), U(nk_), XP(nk_);
+  for(int k=0; k<=nk_; ++k){ // interior nodes
+    // Local state
+    X[k] = V[range(v_offset,v_offset+nx_)];
+    v_offset += nx_;
+    
+    // Variables below do not appear at the end point
+    if(k==nk_) break;
+    
+    // Local control
+    U[k] = V[range(v_offset,v_offset+nu_)];
+    v_offset += nu_;
+  }
+  
+  // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
+  casadi_assert(v_offset==NV);
 
   // Input to the parallel integrator evaluation
   vector<vector<MX> > int_in(nk_);

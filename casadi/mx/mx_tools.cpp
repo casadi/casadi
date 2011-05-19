@@ -250,5 +250,10 @@ MX clip(const MX& A, const CRSSparsity& sp) {
 }
 */
 
+MX lift(const MX& x){
+  casadi_warning("Lifting marking not yet functional");
+  return x;
+}
+
 } // namespace CasADi
 

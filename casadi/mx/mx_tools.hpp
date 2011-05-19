@@ -117,6 +117,10 @@ Create a sparse matrix from a dense matrix A, with sparsity pattern sp
 **/
 //MX clip(const MX& A, const CRSSparsity& sp);
 
+/** \brief Lift a node */
+MX lift(const MX& x);
+
+
 } // namespace CasADi
 
 #endif // MX_TOOLS_HPP

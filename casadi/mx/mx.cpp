@@ -190,6 +190,10 @@ const MX MX::operator[](int k) const{
   return getNZ(vector<int>(1,k));
 }
 
+const MX MX::operator[](const std::vector<int>& kk) const{
+  return getNZ(kk);
+}
+ 
 const MX MX::operator()(const vector<int>& ii, const vector<int>& jj) const{
   return getSub(ii,jj);
 }
@@ -220,6 +224,10 @@ SubMatrix<MX > MX::operator()(int i, const vector<int>& jj){
 
 NonZeros<MX> MX::operator[](int k){
   return NonZeros<MX>(*this,vector<int>(1,k));
+}
+
+NonZeros<MX> MX::operator[](const std::vector<int>& kk){
+  return NonZeros<MX>(*this,kk);
 }
 
 int MX::size() const{
