@@ -1,4 +1,4 @@
-/*
+ /*
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
@@ -236,7 +236,9 @@ class FX : public OptionsFunctionality{
   /// Access input argument
   Matrix<double>& input(int iind=0);
     
-  /// Access input argument
+  /** \brief Access output argument
+  Note that copies in Python are shallow by default and fx.output() gives a reference/pointer to an internal data structure. So if you want save fx.output(), you need to make a deep copy using for example DMatrix(fx.output()).
+  */
   Matrix<double>& output(int oind=0);  
 
   /// Access forward seed
