@@ -480,7 +480,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     void get(Matrix<T>& val, Sparsity sp=SPARSE) const;
 
 #ifdef SWIG
-    %rename(get) getArray;
+    %rename(get) getStridedArray;
     %rename(set) setArray;
 #endif
 
@@ -495,6 +495,9 @@ class Matrix : public std::vector<T>, public PrintableObject{
 
     /** \brief  Set the non-zero elements, array, sparse and correct length */
     void setArray(const T* val);
+    
+    /** \brief  Get the non-zero elements, strided array */
+    void getStridedArray(T* val, int len, int stride1, int stride2, Sparsity sp=SPARSE) const;
     
 #ifndef SWIG
     /** \brief  Legacy - use getArray instead */
@@ -1407,6 +1410,33 @@ void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
   } else {
     throw CasadiException("Matrix<T>::getArray: not SPARSE or DENSE");
   }
+}
+
+/**
+Set stride to zero for unstrided acces
+*/
+template<class T>
+void Matrix<T>::getStridedArray(T* val, int len, int stride1, int stride2, Sparsity sp) const{
+  if (stride1==0 || stride2==0 || (stride2==1 && stride1==size2())) 
+    return getArray(val, len, sp);
+    
+  const std::vector<T> &v = *this;
+  if(sp==SPARSE){
+    throw CasadiException("Matrix<T>::getArray: strided SPARSE not implemented");
+  } else if(sp==DENSE && numel()==v.size()) {
+    for (int i=0;i<size1();i++) {
+      for (int j=0;j<size2();j++) {
+        val[i*stride1+j*stride2] = v[i*size2()+j];
+      }
+    }
+  } else if(sp==DENSE){
+    throw CasadiException("Matrix<T>::getArray: strided sparse DMatrix->dense not implemented");
+  } else if(sp==SPARSESYM){
+    throw CasadiException("Matrix<T>::getArray: strided SPARSESYM not implemented");
+  } else {
+    throw CasadiException("Matrix<T>::getArray: not SPARSE or DENSE");
+  }
+
 }
 
 template<class T>
