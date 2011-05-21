@@ -510,7 +510,7 @@ Matrix<T> reshape(const Matrix<T>& x, const CRSSparsity& sp){
   // make sure that the number of zeros agree
   casadi_assert(x.size()==sp.size());
   
-  return Matrix<T>(sp,x);
+  return Matrix<T>(sp,x.data());
 }
 
 template<class T>
@@ -591,7 +591,7 @@ Matrix<T> norm_1(const Matrix<T>& x){
 
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x){
-  return sqrt(inner_prod(x,x));
+  return std::sqrt(inner_prod(x,x));
 }
 
 template<class T>

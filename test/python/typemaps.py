@@ -99,8 +99,8 @@ class typemaptests(casadiTestCase):
     w = DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
-    list(w)
-    tuple(w)
+    list(w.data())
+    tuple(w.data())
     w.toArray()
     array(w)
     w.toMatrix()

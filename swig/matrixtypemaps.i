@@ -61,16 +61,17 @@ PyObject* arrayView() {
   npy_intp dims[2];
   dims[0] = $self->size1();
   dims[1] = $self->size2();
-  std::vector<double> &v = *$self;
+  std::vector<double> &v = $self->data();
   return PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, &v[0]);
 }
 #endif WITH_NUMPY
 
+#define WITH_PYTHONCODE
+#ifdef WITH_PYTHONCODE
 %pythoncode %{
     @property
     def shape(self):
-        return (self.size1()
-        ,self.size2())
+        return (self.size1(),self.size2())
 %}
 
 %pythoncode %{
@@ -137,25 +138,16 @@ PyObject* arrayView() {
     return n.matrix(self.toArray())
 %}
 
-%pythoncode %{
-  def toList(self):
-    return list(self)
-%}
-
-%pythoncode %{
-  def toTuple(self):
-    return tuple(self)
-%}
-
 // Can this be done in C?
 %pythoncode %{
   def toCsr_matrix(self):
     import numpy as n
     from scipy.sparse import csr_matrix
-    return csr_matrix( (list(self),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
+    return csr_matrix( (list(self.data()),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
 %}
-};
-}
+#endif // WITH_PYTHONCODE
+}; // extend Matrix<double>
+} // namespace CasADi
 
 /** If the array is of type double, contiguous and in native byte order, this function is efficient.
 * Other types of numpy array will trigger conversion, requiring temporary allocation of memory.

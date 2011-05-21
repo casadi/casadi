@@ -62,20 +62,20 @@ namespace CasADi{
   \date 2010	
 */
 template<class T>
-class Matrix : public std::vector<T>, public PrintableObject{
+class Matrix : public PrintableObject{
 
   public:
     /** \brief  constructors */
     /// empty 0-by-0 matrix constructor
     Matrix();
     
-    /// Copy constructor (normal)
+    /// Copy constructor
     Matrix(const Matrix<T>& m);
     
-#ifndef SWIG
+    #ifndef SWIG
     /// Assignment (normal)
     Matrix<T>& operator=(const Matrix<T>& m);
-#endif // SWIG
+    #endif // SWIG
     
     /// empty n-by-m matrix constructor
     Matrix(int n, int m);
@@ -84,17 +84,16 @@ class Matrix : public std::vector<T>, public PrintableObject{
     Matrix(int n, int m, const T& val);
 
     /// sparse n-by-m matrix filled with given sparsity
-    Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data=std::vector<T>());
+    Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& d=std::vector<T>());
 
-
-    // dense matrix constructor with data given as vector of vectors
+    /// dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<T> >& m);
     
     /// sparse matrix with a given sparsity
     explicit Matrix(const CRSSparsity& sparsity, const T& val=0);
     
     /// sparse matrix with a given sparsity and non-zero elements.
-    Matrix(const CRSSparsity& sparsity, const std::vector<T>& data);
+    Matrix(const CRSSparsity& sparsity, const std::vector<T>& d);
     
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
@@ -138,7 +137,15 @@ class Matrix : public std::vector<T>, public PrintableObject{
     const_reference front() const { return data().front();}
     reference back(){ return data().back();}
     const_reference back() const { return data().back();}
-    
+
+    /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
+    template<typename A>
+    Matrix(const Matrix<A>& x){
+      sparsity_ = x.sparsity();
+      data().resize(x.size());
+      copy(x.begin(),x.end(),begin());
+    }
+
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     Matrix(const std::vector<A>& x){
@@ -168,7 +175,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     template<typename T, typename A>
     explicit Matrix<T>(const ublas::matrix<A> &x){
       sparsity_ = CRSSparsity(x.size1(),x.size2(),true);
-      std::vector<T>::resize(numel());
+      data().resize(numel());
       copy(x.begin(),x.end(),begin());
       return ret;
     }
@@ -525,7 +532,7 @@ class Matrix : public std::vector<T>, public PrintableObject{
     CRSSparsity sparsity_;
     
     /// Nonzero elements
-    // std::vector<T> data_;
+    std::vector<T> data_;
 };
 
 } // namespace CasADi
@@ -702,7 +709,7 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
 
 template<class T>
 int Matrix<T>::size() const{
-  return std::vector<T>::size();
+  return data().size();
 }
 
 template<class T>
@@ -792,17 +799,18 @@ Matrix<T>::Matrix(){
 }
 
 template<class T>
-Matrix<T>::Matrix(const Matrix<T>& m) : std::vector<T>(m.data()){
+Matrix<T>::Matrix(const Matrix<T>& m){
+  data_ = m.data_;
   sparsity_ = m.sparsity_;
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector<T>& x) : std::vector<T>(x){
+Matrix<T>::Matrix(const std::vector<T>& x) : data_(x){
   sparsity_ = CRSSparsity(x.size(),1,true);
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : std::vector<T>(x){
+Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : data_(x){
   casadi_assert_message(x.size() == n*m, "dimension mismatch");
   sparsity_ = CRSSparsity(n,m,true);
 }
@@ -810,7 +818,7 @@ Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : std::vector<T>(x){
 template<class T>
 Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
   sparsity_ = m.sparsity_;
-  static_cast<std::vector<T>&>(*this) = m;
+  data_ = m.data_;
   return *this;
 }
 
@@ -822,7 +830,7 @@ Matrix<T>::Matrix(int n, int m){
 template<class T>
 Matrix<T>::Matrix(int n, int m, const T& val){
   sparsity_ = CRSSparsity(n,m,true);
-  data().resize(n*m, val);
+  data_.resize(n*m, val);
 }
 
 template<class T>
@@ -987,35 +995,35 @@ Matrix<T>::Matrix(double val){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& data) : std::vector<T>(data){
+Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& d) : data_(d){
   sparsity_ = CRSSparsity(n,m,col,rowind);
-  if(data.size() != sparsity_.size())
-    std::vector<T>::resize(sparsity_.size());
+  if(data_.size() != sparsity_.size())
+    data_.resize(sparsity_.size());
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector< std::vector<T> >& data) : std::vector<T>() {
-  int n=data.size();
+Matrix<T>::Matrix(const std::vector< std::vector<T> >& d){
+  int n=d.size();
   int m=-1;
   for (int i=0;i<n;i++) {
     if (m==-1) {
-      m = data[i].size();
+      m = d[i].size();
     } else {
-      if (m!=data[i].size()) {
+      if (m!=d[i].size()) {
         std::stringstream s;
-		    s << "Matrix<T>::Matrix(const std::vector< std::vector<T> >& data): shape mismatch" << std::endl;
+		    s << "Matrix<T>::Matrix(const std::vector< std::vector<T> >& d): shape mismatch" << std::endl;
 		    s << "Attempting to construct a matrix from a nested list." << std::endl;
-		    s << "I got convinced that the desired size is ("<< n << " x " << m << " ), but now I encounter a vector of size (" << data[i].size() <<  " )" << std::endl;
+		    s << "I got convinced that the desired size is ("<< n << " x " << m << " ), but now I encounter a vector of size (" << d[i].size() <<  " )" << std::endl;
 		    throw CasadiException(s.str());
       }
     }
   }
   sparsity_ = CRSSparsity(n,m,true);
   
-  std::vector<T>::resize(n*m);
+  data().resize(n*m);
 
   for (int i=0;i<n;i++) {
-    copy(data[i].begin(),data[i].end(),begin()+i*m);
+    copy(d[i].begin(),d[i].end(),begin()+i*m);
   }
   
 }
@@ -1027,13 +1035,8 @@ Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
 }
 
 template<class T>
-Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& data) : std::vector<T>(data) {
-  if (sparsity.size()!=data.size()) {
-    std::stringstream s;
-		s << "Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& data): size mismatch" << std::endl;
-		s << "Supplied sparsity pattern has size (" << sparsity.size1() << " x " << sparsity.size2() <<  " : " << sparsity.size() << " NZ ) while data has size (" << data.size() << ")." << std::endl;
-    throw CasadiException(s.str());
-  }
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(d) {
+  casadi_assert_message(sparsity.size()==d.size(),"size mismatch");
   sparsity_ = sparsity;
 }
 
@@ -1369,7 +1372,7 @@ void Matrix<T>::get(T* val, Sparsity sp) const{
 
 template<class T>
 void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
-  const std::vector<T> &v = *this;
+  const std::vector<T> &v = data();
   if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
     if (len!=size()) {
 			std::stringstream s;
@@ -1420,7 +1423,7 @@ void Matrix<T>::getStridedArray(T* val, int len, int stride1, int stride2, Spars
   if (stride1==0 || stride2==0 || (stride2==1 && stride1==size2())) 
     return getArray(val, len, sp);
     
-  const std::vector<T> &v = *this;
+  const std::vector<T> &v = data();
   if(sp==SPARSE){
     throw CasadiException("Matrix<T>::getArray: strided SPARSE not implemented");
   } else if(sp==DENSE && numel()==v.size()) {
@@ -1441,7 +1444,7 @@ void Matrix<T>::getStridedArray(T* val, int len, int stride1, int stride2, Spars
 
 template<class T>
 void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
-  std::vector<T> &v = *this;
+  std::vector<T> &v = data();
   if(sp==SPARSE || (sp==DENSE && numel()==size())){
     if (len!=size()) {
 			std::stringstream s;
@@ -1575,12 +1578,12 @@ Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
 
 template<class T>
 std::vector<T>& Matrix<T>::data(){
-  return *this;  
+  return data_;  
 }
     
 template<class T>
 const std::vector<T>& Matrix<T>::data() const{
-  return *this;  
+  return data_;  
 }
 
 template<class T>

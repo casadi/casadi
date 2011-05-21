@@ -218,7 +218,7 @@ class MXtests(casadiTestCase):
     f.init()
     f.setInput(3,0);
     f.evaluate()
-    yt = tuple(f.output())
+    yt = tuple(f.output().data())
     self.assertEqual(type(yt),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(len(yt),1,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")
     y=yt[0]
@@ -239,8 +239,8 @@ class MXtests(casadiTestCase):
     f.setInput(3,0);
     f.setInput(7,1);
     f.evaluate()
-    zt1 = tuple(f.output(0))
-    zt2 = tuple(f.output(1))
+    zt1 = tuple(f.output(0).data())
+    zt2 = tuple(f.output(1).data())
     self.assertEqual(type(zt1),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(type(zt2),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(len(zt1),1,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")
@@ -266,8 +266,8 @@ class MXtests(casadiTestCase):
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
-    zt1 = tuple(f.output(0))
-    zt2 = tuple(f.output(1))
+    zt1 = tuple(f.output(0).data())
+    zt2 = tuple(f.output(1).data())
     self.assertEqual(type(zt1),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(type(zt2),TupleType,"Output of MXFunction is expected to be tuple of floats")
     self.assertEqual(len(zt1),1,"Output of MXFunction was tuple of floats, as expected, but length is incorrect.")

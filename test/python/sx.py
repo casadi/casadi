@@ -320,11 +320,11 @@ class SXtests(casadiTestCase):
     fcn.evaluate(1,1)
 
     # Get the results
-    res = tuple(fcn.output())
+    res = tuple(fcn.output().data())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
 
-    fsens = tuple(fcn.fwdSens())
+    fsens = tuple(fcn.fwdSens().data())
     e=1e-8
     p=fun((L[0]+e*sF[0]),(L[1]+e*sF[1]))
     fsensn=[(p[0]-res[0])/e,(p[1]-res[1])/e]
@@ -341,7 +341,7 @@ class SXtests(casadiTestCase):
     self.assertAlmostEqual(fsensJ[0], fsens[0],10,'SXfunction forward mode evaluation wrong')
     self.assertAlmostEqual(fsensJ[1], fsens[1],10,'SXfunction forward mode evaluation wrong')
     
-    asens = tuple(fcn.adjSens())
+    asens = tuple(fcn.adjSens().data())
     asensJ=dot(J.T,array(sA))
     self.assertAlmostEqual(asensJ[0], asens[0],10,'SXfunction adjoint mode evaluation wrong')
     self.assertAlmostEqual(asensJ[1], asens[1],10,'SXfunction adjoint mode evaluation wrong')
