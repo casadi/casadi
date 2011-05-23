@@ -20,25 +20,38 @@
  *
  */
 
-#include "matrix_tools.hpp"
+#ifndef SLICE_HPP
+#define SLICE_HPP
+
+#include <vector>
+#include "../casadi_exception.hpp"
+#include <limits>
 
 namespace CasADi{
   
-  std::vector<int> range(int start, int stop, int step, int len){
-    start = std::min(start,len);
-    stop = std::min(stop,len);
-    std::vector<int> ret((stop-start)/step);
-    int ind = start;
-    for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it){
-      *it = ind;
-      ind += step;
-    }
-    return ret;
-  }
-  
-  std::vector<int> range(int stop){
-    return range(0,stop);
-  }
-  
+  /// Dummy class denoting all rows/columns
+  class Slice{
+    public:
+      /// Constructor
+      Slice(int start__=0, int stop__=std::numeric_limits<int>::max(), int step__=1);
+      
+      /// Get a vector of indices
+      std::vector<int> getAll(int len) const;
+      
+      /// Data members (all public)
+      int start;
+      int stop;
+      int step;
+  };
+  static Slice ALL;
 } // namespace CasADi
+
+
+#ifdef SWIG
+%template(Pair_Slice_Int) std::pair<CasADi::Slice,int>;
+%template(Pair_Int_Slice) std::pair<int,CasADi::Slice>;
+%template(Pair_Slice_Slice) std::pair<CasADi::Slice,CasADi::Slice>;
+#endif // SWIG
+
+#endif // SLICE_HPP
 

@@ -33,7 +33,7 @@ Matrix<T> trans(const Matrix<T> &x);
 
 #ifndef SWIG
 /// Python's range function
-std::vector<int> range(int start, int stop, int step=1);
+std::vector<int> range(int start, int stop, int step=1, int len=std::numeric_limits<int>::max());
 
 /// Python's range function, start = 0
 std::vector<int> range(int stop);

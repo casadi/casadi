@@ -20,25 +20,18 @@
  *
  */
 
+#include "slice.hpp"
 #include "matrix_tools.hpp"
 
 namespace CasADi{
-  
-  std::vector<int> range(int start, int stop, int step, int len){
-    start = std::min(start,len);
-    stop = std::min(stop,len);
-    std::vector<int> ret((stop-start)/step);
-    int ind = start;
-    for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it){
-      *it = ind;
-      ind += step;
-    }
-    return ret;
-  }
-  
-  std::vector<int> range(int stop){
-    return range(0,stop);
-  }
+
+Slice::Slice(int start__, int stop__, int step__) : start(start__), stop(stop__), step(step__){
+}
+
+std::vector<int> Slice::getAll(int len) const{
+  return range(start,stop,step,len);
+}
+
   
 } // namespace CasADi
 
