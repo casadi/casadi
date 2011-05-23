@@ -28,6 +28,7 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../casadi_operators.hpp"
+#include "slice.hpp"
 #include "element.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
@@ -37,11 +38,6 @@ namespace CasADi{
   
   /** Sparsity format for getting and setting inputs and outputs */
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
-
-  /// Dummy class denoting all rows/columns
-  class AllRange{
-  };
-  static AllRange ALL;
 
   /** \brief General sparse matrix class
   General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
@@ -265,22 +261,22 @@ class Matrix : public PrintableObject{
 
     /// Access all rows
     template<class A>
-    const Matrix<T> operator()(const AllRange& i, A j) const{ return operator()(range(size1()),j);}
+    const Matrix<T> operator()(const Slice& i, A j) const{ return operator()(range(size1()),j);}
     
     /// Get all rows
     template<class A>
-    SubMatrix<Matrix<T> > operator()(const AllRange& i, A j){ return operator()(range(size1()),j);}
+    SubMatrix<Matrix<T> > operator()(const Slice& i, A j){ return operator()(range(size1()),j);}
   
     /// Access all columns
     template<class A>
-    const Matrix<T> operator()(A i, const AllRange& j) const{ return operator()(i,range(size2()));}
+    const Matrix<T> operator()(A i, const Slice& j) const{ return operator()(i,range(size2()));}
 
     /// Get all columns
     template<class A>
-    SubMatrix<Matrix<T> > operator()(A i, const AllRange& j){ return operator()(i,range(size2()));}
+    SubMatrix<Matrix<T> > operator()(A i, const Slice& j){ return operator()(i,range(size2()));}
 
     /// Get all rows and columns
-    SubMatrix<Matrix<T> > operator()(const AllRange& i, const AllRange& j){ return operator()(range(size1()),range(size2()));}
+    SubMatrix<Matrix<T> > operator()(const Slice& i, const Slice& j){ return operator()(range(size1()),range(size2()));}
 
     /// Get a non-zero element
     const T& at(int k) const{ return data().at(k); }
