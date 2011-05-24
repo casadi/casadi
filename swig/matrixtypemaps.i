@@ -242,6 +242,49 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 
 
 namespace CasADi{
+
+%typemap(in) (const CasADi::Slice& i, const CasADi::Slice &j) (CasADi::Slice temp[2]) {
+  for(int i=0; i<2; ++i){
+    PyObject *q = PyTuple_GetItem($input,i);
+    if(PyInt_Check(q)){
+      temp[i].start = PyInt_AsLong(q);
+      temp[i].stop = temp[i].start+1;
+    } else{
+      PySliceObject *r = (PySliceObject*)(q);
+      if(r->start!=Py_None) temp[i].start = PyInt_AsLong(r->start);
+      if(r->stop !=Py_None) temp[i].stop  = PyInt_AsLong(r->stop);
+      if(r->step !=Py_None) temp[i].step  = PyInt_AsLong(r->step);
+    }
+  }
+    
+  $1 = &temp[0];
+  $2 = &temp[1];
+}
+
+%typemap(typecheck,precedence=PRECEDENCE_PAIR_SLICE_SLICE) (const CasADi::Slice& i, const CasADi::Slice &j) {
+  $1 = PyTuple_Check($input) 
+  && (PySlice_Check(PyTuple_GetItem($input,0)) || PyInt_Check(PyTuple_GetItem($input,0))) 
+  && (PySlice_Check(PyTuple_GetItem($input,1)) || PyInt_Check(PyTuple_GetItem($input,1)));
+}
+
+%typemap(in) const Slice &  (CasADi::Slice temp){
+  PySliceObject *r = (PySliceObject*)($input);
+  if(r->start!=Py_None) temp.start = PyInt_AsLong(r->start);
+  if(r->stop !=Py_None) temp.stop  = PyInt_AsLong(r->stop);
+  if(r->step !=Py_None) temp.step  = PyInt_AsLong(r->step);
+  $1 = &temp;
+}
+
+%typemap(typecheck,precedence=PRECEDENCE_SLICE) const Slice & {
+  $1 = PySlice_Check($input);
+}
+  
+  
+  
+  
+  
+  
+  
 %typemap(in) const Matrix<double> &  (CasADi::DMatrix m){
   if (isDMatrix($input)) { // DMatrix object get passed on as-is, and fast.
     int result = getDMatrix_ptr($input,$1);

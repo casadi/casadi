@@ -261,22 +261,25 @@ class Matrix : public PrintableObject{
 
     /// Access all rows
     template<class A>
-    const Matrix<T> operator()(const Slice& i, A j) const{ return operator()(range(size1()),j);}
+    const Matrix<T> operator()(const Slice& i, A j) const{ return operator()(i.getAll(size1()),j);}
     
     /// Get all rows
     template<class A>
-    SubMatrix<Matrix<T> > operator()(const Slice& i, A j){ return operator()(range(size1()),j);}
+    SubMatrix<Matrix<T> > operator()(const Slice& i, A j){ return operator()(i.getAll(size1()),j);}
   
     /// Access all columns
     template<class A>
-    const Matrix<T> operator()(A i, const Slice& j) const{ return operator()(i,range(size2()));}
+    const Matrix<T> operator()(A i, const Slice& j) const{ return operator()(i,j.getAll(size2()));}
 
     /// Get all columns
     template<class A>
-    SubMatrix<Matrix<T> > operator()(A i, const Slice& j){ return operator()(i,range(size2()));}
+    SubMatrix<Matrix<T> > operator()(A i, const Slice& j){ return operator()(i,j.getAll(size2()));}
 
     /// Get all rows and columns
-    SubMatrix<Matrix<T> > operator()(const Slice& i, const Slice& j){ return operator()(range(size1()),range(size2()));}
+    const Matrix<T> operator()(const Slice& i, const Slice& j) const{ return operator()(i.getAll(size1()),j.getAll(size2()));}
+
+    /// Access all rows and columns
+    SubMatrix<Matrix<T> > operator()(const Slice& i, const Slice& j){ return operator()(i.getAll(size1()),j.getAll(size2()));}
 
     /// Get a non-zero element
     const T& at(int k) const{ return data().at(k); }
@@ -301,11 +304,17 @@ class Matrix : public PrintableObject{
     /// Python: get a non-zero entry
     const T getitem(int i) const;
     
+    /// Get several non-zero entries
+    Matrix<T> getitem(const Slice& k) const;
+
     /// Python: get a matrix entry
-    const T getitem(const std::vector<int> &I) const;
+    const T getitem(const std::pair<int,int> &ij) const;
     
     /// Python: get a submatrix
     const Matrix<T> getitem(const std::vector< std::vector<int> > &II) const;
+    
+    /// Python: get a submatrix
+    Matrix<T> getitem(const Slice& i, const Slice &j) const;
     
     /// Python: set a non-zero entry
     void setitem(int k, const T& el);
@@ -1042,15 +1051,24 @@ const T Matrix<T>::getitem(int i) const{
 }
 
 template<class T>
-const T Matrix<T>::getitem(const std::vector<int> &I) const{
-  casadi_assert_message(I.size()==2,"Index vector must be two-dimensional");
-  return getElement(I[0],I[1]);
+const T Matrix<T>::getitem(const std::pair<int,int> &ij) const{
+  return getElement(ij.first,ij.second);
 }
 
 template<class T>
 const Matrix<T> Matrix<T>::getitem(const std::vector< std::vector<int> > &II) const{
   casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
   return (*this)(II[0],II[1]);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::getitem(const Slice& i, const Slice &j) const{
+  return (*this)(i,j);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::getitem(const Slice& kk) const{
+  return (*this)[kk.getAll(size())];
 }
 
 template<class T>

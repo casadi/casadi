@@ -17,6 +17,7 @@
 // STL
 %include "std_string.i"
 %include "std_vector.i"
+%include "std_pair.i"
 
 %template(StringVector) std::vector<std::string>;
 
@@ -48,6 +49,8 @@ namespace CasADi{
 %template(DVectorVector)       std::vector<std::vector<double> > ;
 %template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
 
+%template(Pair_Int_Int) std::pair<int,int>;
+
 #endif // SWIG
 
 // Lower value means wil be checked first
@@ -55,6 +58,8 @@ namespace CasADi{
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_SXMatrix 102
 #define PRECEDENCE_SXMatrixVector 103
+#define PRECEDENCE_PAIR_SLICE_SLICE 204
+#define PRECEDENCE_SLICE 205
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code

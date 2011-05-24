@@ -1,5 +1,6 @@
 %{
 #include "casadi/matrix/crs_sparsity.hpp"
+#include "casadi/matrix/slice.hpp"
 #include "casadi/matrix/matrix.hpp"
 #include "casadi/sx/sx.hpp"
 #include "casadi/sx/sx_tools.hpp"
@@ -7,6 +8,7 @@
 
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"
+%include "casadi/matrix/slice.hpp"
 %include "casadi/matrix/matrix.hpp"
 %include "casadi/sx/sx.hpp"
 
@@ -49,30 +51,16 @@ namespace CasADi {
     
     %pythoncode %{
     def __getitem__(self,s):
-      if isinstance(s,int):
-        if s < 0:
-          s = s + self.size()
-      elif isinstance(s,list):
-        return self.getNZ(s)
-      elif isinstance(s,tuple):
-        if len(s)!=2:
-          raise Exception("get/setitem can only do 1D or 2D indexing")
-        s = list(s)
+      if isinstance(s,tuple):
         if isinstance(s[0],int) and isinstance(s[1],int):
-          for k in range(2):
-            if s[k]<0:
-              s[k]=s[k]+self.shape[k]
-        else:
-          for k in range(2):
-            if isinstance(s[k],slice):
-              J = s[k].indices(self.shape[k])
-              s[k] = range(J[0],J[1],J[2])
-            elif isinstance(s[k],int):
-              if s[k]<0:
-                s[k]=s[k]+self.shape[k]
-              s[k] = [s[k]]
-      else:
-        raise Exception("get/setitem expecting a tuple or int. Got %s of type %s" % (str(s),str(type(s))))
+          return self.getitem(s)
+        s = list(s)
+        for k in range(2):
+          if isinstance(s[k],slice):
+            J = s[k].indices(self.shape[k])
+            s[k] = range(J[0],J[1],J[2])
+          elif isinstance(s[k],int):
+            s[k] = [s[k]]
       return self.getitem(s)
     %}
     
@@ -81,9 +69,6 @@ namespace CasADi {
       if isinstance(s,int):
         if s < 0:
           s = s + self.size()
-      elif isinstance(s,list):
-        self.setNZ(s,val)
-        return
       elif isinstance(s,tuple):
         if len(s)!=2:
           raise Exception("get/setitem can only do 1D or 2D indexing")
@@ -223,30 +208,16 @@ namespace CasADi {
     
     %pythoncode %{
     def __getitem__(self,s):
-      if isinstance(s,int):
-        if s < 0:
-          s = s + self.size()
-      elif isinstance(s,list):
-        return self.getNZ(s)
-      elif isinstance(s,tuple):
-        if len(s)!=2:
-          raise Exception("get/setitem can only do 1D or 2D indexing")
-        s = list(s)
+      if isinstance(s,tuple):
         if isinstance(s[0],int) and isinstance(s[1],int):
-          for k in range(2):
-            if s[k]<0:
-              s[k]=s[k]+self.shape[k]
-        else:
-          for k in range(2):
-            if isinstance(s[k],slice):
-              J = s[k].indices(self.shape[k])
-              s[k] = range(J[0],J[1],J[2])
-            elif isinstance(s[k],int):
-              if s[k]<0:
-                s[k]=s[k]+self.shape[k]
-              s[k] = [s[k]]
-      else:
-        raise Exception("get/setitem expecting a tuple or int. Got %s of type %s" % (str(s),str(type(s))))
+          return self.getitem(s)
+        s = list(s)
+        for k in range(2):
+          if isinstance(s[k],slice):
+            J = s[k].indices(self.shape[k])
+            s[k] = range(J[0],J[1],J[2])
+          elif isinstance(s[k],int):
+            s[k] = [s[k]]
       return self.getitem(s)
     %}
 
@@ -255,9 +226,6 @@ namespace CasADi {
       if isinstance(s,int):
         if s < 0:
           s = s + self.size()
-      elif isinstance(s,list):
-        self.setNZ(s,val)
-        return
       elif isinstance(s,tuple):
         if len(s)!=2:
           raise Exception("get/setitem can only do 1D or 2D indexing")
