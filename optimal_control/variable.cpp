@@ -209,6 +209,14 @@ SX Variable::highest() const{
   }
 }
 
+bool Variable::getFree() const{
+  return (*this)->free_;
+}
+
+void Variable::setFree(bool free){
+  (*this)->free_ = free;
+}
+
 
 } // namespace OptimalControl
 } // namespace CasADi

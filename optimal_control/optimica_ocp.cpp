@@ -197,7 +197,11 @@ void OCP::sortType(){
     if(it->highest().getTemp()!=1){
       // Try to determine the type
       if(it->getVariability() == PARAMETER){
-        p_.push_back(*it);
+        if(it->getFree()){
+          p_.push_back(*it); 
+        } else {
+          casadi_assert(0);
+        }
       } else if(it->getVariability() == CONTINUOUS) {
         if(it->getCausality() == INTERNAL){
           if(it->isDifferential()){

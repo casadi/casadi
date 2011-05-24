@@ -70,6 +70,7 @@ namespace CasADi{
       Alias alias_;
       std::string description_;
       int valueReference_;
+      bool free_;
       
       double min_, max_, nominal_, start_, derivative_start_;
       std::string unit_, displayUnit_;

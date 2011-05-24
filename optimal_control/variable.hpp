@@ -174,6 +174,12 @@ namespace CasADi{
     
     /// Is differential?
     bool isDifferential() const;
+    
+    /// Get the the free attribute
+    bool getFree() const;
+
+    /// Set the the free attribute
+    void setFree(bool free);
         
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

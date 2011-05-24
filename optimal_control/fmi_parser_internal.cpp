@@ -117,8 +117,7 @@ void FMIParserInternal::addModelVariables(){
     string variability = vnode.attribute("variability");
     string causality   = vnode.attribute("causality");
     string alias       = vnode.attribute("alias");
-    //string variableCategory = modvars[i]["VariableCategory"].getText();
-
+    
     // Skip to the next variable if its an alias
     if(alias.compare("alias") == 0 || alias.compare("negatedAlias") == 0)
       continue;
@@ -182,7 +181,6 @@ void FMIParserInternal::addModelVariables(){
         var.setAlias(NEGATED_ALIAS);
       else throw CasadiException("Unknown alias");
       
-
       // Other properties
       const XMLNode& props = vnode[0];
       if(props.hasAttribute("unit"))         var.setUnit(props.attribute("unit"));
@@ -191,6 +189,7 @@ void FMIParserInternal::addModelVariables(){
       if(props.hasAttribute("max"))          var.setMax(props.attribute("max"));
       if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
       if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
+      if(props.hasAttribute("free"))         var.setFree(string(props.attribute("free")).compare("true") == 0);
     }
   }
 }
