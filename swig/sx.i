@@ -475,8 +475,10 @@ bool couldbeSXMatrixVector(PyObject* p) {
 
 %}
 
+#endif // SWIGPYTHON
 %template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
 %template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
+#ifdef SWIGPYTHON
 
 namespace CasADi{
 /*
