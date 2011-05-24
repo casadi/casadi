@@ -236,21 +236,7 @@ namespace CasADi{
 
 template<class T>
 Matrix<T> trans(const Matrix<T> &x){
-  // quick return if empty or scalar
-  if(x.empty() || x.scalar()) return x;
-
-  // Create the new sparsity pattern and the mapping
-  std::vector<int> mapping;
-  CRSSparsity sparsity = x.sparsity().transpose(mapping);
-
-  // create the return matrix
-  Matrix<T> ret(sparsity);
-  
-  // Copy the content
-  for(int i=0; i<mapping.size(); ++i)
-    ret[i] = x[mapping[i]];
-  
-  return ret;
+  return x.trans();
 }
 
 template<class T>
@@ -260,53 +246,7 @@ Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y){
 
 template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
-  if (x.size2() != y.size1()) {
-    std::stringstream ss;
-    ss << "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl;
-    ss << "with (" << y.size1() << " x " << y.size2() << ") matrix." << std::endl;
-    throw CasadiException(ss.str());
-  }
-
-  
-  // Find the mapping corresponding to the transpose of y (no need to form the transpose explicitly)
-  std::vector<int> y_trans_map;
-  CRSSparsity y_trans_sparsity = y.sparsity().transpose(y_trans_map);
-
-  // Create the sparsity pattern for the matrix-matrix product
-  CRSSparsity spres = x.sparsity().patternProduct(y_trans_sparsity);
-  
-  // Create the return object
-  Matrix<T> ret(spres);
-  
-  // Direct access to the arrays
-  const std::vector<int> &r_col = ret.col();
-  const std::vector<int> &r_rowind = ret.rowind();
-  const std::vector<int> &x_col = x.col();
-  const std::vector<int> &y_row = y_trans_sparsity.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
-
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<ret.size1(); ++i){
-    for(int el=r_rowind[i]; el<r_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
-      int j = r_col[el];
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      ret[el]=0;
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          ret[el] += x[el1++] * y[y_trans_map[el2++]];
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
-  }
-  return ret;
+  return x.prod(y);
 }
 
 template<class T>

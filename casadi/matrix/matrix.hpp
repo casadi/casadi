@@ -325,6 +325,22 @@ class Matrix : public PrintableObject{
     /// Python: set a submatrix
     void __setitem__(const Slice& i, const Slice &j, const Matrix<T>& m);
     
+    #ifdef SWIGOCTAVE
+    
+    /// Octave: get a non-zero
+    Matrix<T> __paren__(int k) const{ return at(k-1);}
+    
+    /// Octave: get a matrix element
+    Matrix<T> __paren__(int i, int j) const{ return (*this)(i-1,j-1);}
+
+    /// Octave: set a non-zero
+    void __paren_asgn__(int k, const Matrix<T>& m){ at(k-1) = m(0,0);}
+    
+    /// Octave: set a matrix element
+    void __paren_asgn__(int i, int j, const Matrix<T>& m){ (*this)(i-1,j-1) = m(0,0);}
+    
+    #endif // SWIGOCTAVE
+    
     /// Set all elements to zero
     void setZero();
     
@@ -353,7 +369,7 @@ class Matrix : public PrintableObject{
 #endif
 
     //@{
-    /// Elementary operations -- Python naming
+    /// Elementwise operations -- Octave/Python naming
     Matrix<T> __add__(const Matrix<T> &y) const;
     Matrix<T> __sub__(const Matrix<T> &y) const;
     Matrix<T> __mul__(const Matrix<T> &y) const;
@@ -365,6 +381,12 @@ class Matrix : public PrintableObject{
     Matrix<T> __rdiv__(const Matrix<T> &y) const {return y.__div__(*this);}
     Matrix<T> __rpow__(const Matrix<T> &y) const {return y.__pow__(*this);}
     //@}
+    
+    /// Matrix product
+    Matrix<T> prod(const Matrix<T> &y) const;
+
+    /// Matrix transpose
+    Matrix<T> trans() const;
 
 #ifndef SWIG
     /// Addition
@@ -1622,6 +1644,78 @@ std::string Matrix<T>::dimString() const {
   return ss.str();
 }
 
+template<class T>
+Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
+  // First factor
+  const Matrix<T>& x = *this;
+  
+  if (x.size2() != y.size1()) {
+    std::stringstream ss;
+    ss << "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl;
+    ss << "with (" << y.size1() << " x " << y.size2() << ") matrix." << std::endl;
+    throw CasadiException(ss.str());
+  }
+
+  
+  // Find the mapping corresponding to the transpose of y (no need to form the transpose explicitly)
+  std::vector<int> y_trans_map;
+  CRSSparsity y_trans_sparsity = y.sparsity().transpose(y_trans_map);
+
+  // Create the sparsity pattern for the matrix-matrix product
+  CRSSparsity spres = x.sparsity().patternProduct(y_trans_sparsity);
+  
+  // Create the return object
+  Matrix<T> ret(spres);
+  
+  // Direct access to the arrays
+  const std::vector<int> &r_col = ret.col();
+  const std::vector<int> &r_rowind = ret.rowind();
+  const std::vector<int> &x_col = x.col();
+  const std::vector<int> &y_row = y_trans_sparsity.col();
+  const std::vector<int> &x_rowind = x.rowind();
+  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
+
+  // loop over the row of the resulting matrix)
+  for(int i=0; i<ret.size1(); ++i){
+    for(int el=r_rowind[i]; el<r_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
+      int j = r_col[el];
+      int el1 = x_rowind[i];
+      int el2 = y_colind[j];
+      ret[el]=0;
+      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+        int j1 = x_col[el1];
+        int i2 = y_row[el2];      
+        if(j1==i2){
+          ret[el] += x[el1++] * y[y_trans_map[el2++]];
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+    }
+  }
+  return ret;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::trans() const{
+  // quick return if empty or scalar
+  if(empty() || scalar()) return *this;
+
+  // Create the new sparsity pattern and the mapping
+  std::vector<int> mapping;
+  CRSSparsity s = sparsity().transpose(mapping);
+
+  // create the return matrix
+  Matrix<T> ret(s);
+  
+  // Copy the content
+  for(int i=0; i<mapping.size(); ++i)
+    ret[i] = (*this)[mapping[i]];
+  
+  return ret;
+}
 
 } // namespace CasADi
 #endif // SWIG

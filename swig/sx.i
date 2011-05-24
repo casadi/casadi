@@ -6,6 +6,14 @@
 #include "casadi/sx/sx_tools.hpp"
 %}
 
+
+#ifdef SWIGOCTAVE
+%rename(__el_mul__) __mul__;
+%rename(__el_div__) __div__;
+%rename(__mul__) prod;
+%rename(__transpose__) trans;
+#endif // SWIGOCTAVE
+
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"
 %include "casadi/matrix/slice.hpp"
@@ -514,6 +522,9 @@ matching on SXMatrix is prohibited as per wish of Joel
 }
 
 #endif // SWIGPYTHON
+
+
+
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
