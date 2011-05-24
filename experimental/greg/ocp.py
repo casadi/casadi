@@ -57,6 +57,7 @@ class MultiStageOcp():
             self.ssOcps[ssOcp.ode.name] = ssOcps
 
         self.bigBigN = sum([ssOcp._getBigN() for ssOcp in self.ssOcps.values()])
-        self.designVariables = C.MX('designVariables', self.bigBigN)
+        self.designVariables = C.symbolic('designVariables', self.bigBigN)
+        #self.designVariables = C.MX('designVariables', self.bigBigN)
 
 

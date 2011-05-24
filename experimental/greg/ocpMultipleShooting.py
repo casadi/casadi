@@ -24,7 +24,8 @@ class OcpMultipleShooting(ocp.Ocp):
     
             xErr = x1 - self.ode.rk4Step( x0, u0, u1, p, t0, t1)
             
-            self.addNonlcon( xErr, "==", C.MX(self.ode._Nx()*[0]))
+            #self.addNonlcon( xErr, "==", C.MX(self.ode._Nx()*[0]))
+            self.addNonlcon( xErr, "==", C.SXMatrix(self.ode._Nx()*[0]))
             #self._addNonlconIneq( xErr )
 
 
@@ -36,7 +37,8 @@ class OcpMultipleShooting(ocp.Ocp):
 
         self.N = N
 
-        self.designVariables = C.MX('designVariables', self._getBigN())
+        #self.designVariables = C.MX('designVariables', self._getBigN())
+        self.designVariables = C.symbolic('designVariables', self._getBigN())
 
         self.lb = [-1e-15 for k in range(self._getBigN())]
         self.ub = [ 1e-15 for k in range(self._getBigN())]

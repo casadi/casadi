@@ -88,8 +88,8 @@ class Ode():
         # concatanate and return appropriate type
         if isinstance(stateList[0], C.MX): # MX
             return C.vertcat(stateList)
-#        elif isinstance(stateList[0], C.SX): # SX
-#            return C.vertcat(stateList)
+        elif isinstance(stateList[0], C.SX): # SX
+           return C.vertcat(stateList)
         else: # numpy array
             return np.concatenate(stateList, axis=0)
 

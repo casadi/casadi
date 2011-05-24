@@ -80,7 +80,7 @@ if __name__ == '__main__':
 #    F = -gliderOcp.getState(gliderOcp.N-1)['x']  # max distance
     F = -gliderOcp.getParams()['tEnd']    # max time
 
-    ffcn = C.MXFunction([gliderOcp.designVariables],[F]) # objective function
+    ffcn = C.SXFunction([gliderOcp.designVariables],[F]) # objective function
 
     
     # run sim
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
 
     # Create the NLP
-    gfcn = C.MXFunction([gliderOcp.designVariables],[C.vertcat(gliderOcp.G)]) # constraint function
+    gfcn = C.SXFunction([gliderOcp.designVariables],[C.vertcat(gliderOcp.G)]) # constraint function
     
     # Allocate an NLP solver
     solver = C.IpoptSolver(ffcn,gfcn)
