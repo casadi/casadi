@@ -12,9 +12,9 @@
 %include "casadi/shared_object.hpp"
 %include "casadi/generic_type.hpp"
 
+#ifdef SWIGPYTHON
+
 %inline %{
-
-
 
 bool asPyObject(const CasADi::GenericType &a,PyObject * & p) {
   if (a.isBool()) {
@@ -128,7 +128,8 @@ if (PyDict_Check($input)) {
 }
 
 
-}
+} // namespace CasADi
+#endif // SWIGPYTHON
 
 %include "casadi/options_functionality.hpp"
 

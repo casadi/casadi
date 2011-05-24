@@ -5,6 +5,8 @@
 
 %include "casadi/mx/mx.hpp"
 
+#ifdef SWIGPYTHON
+
 %inline %{
 
 int getMXVector_ptr(PyObject * p, std::vector<CasADi::MX> * & m) {
@@ -158,9 +160,11 @@ namespace CasADi{
 
 }
 
+#endif // SWIGPYTHON
 
 %include "casadi/mx/mx_tools.hpp"
 
+#ifdef SWIGPYTHON
 namespace CasADi{
   %extend MX{
     %pythoncode %{
@@ -237,3 +241,5 @@ namespace CasADi{
 
   };
 } // namespace CasADi
+#endif // SWIGPYTHON
+

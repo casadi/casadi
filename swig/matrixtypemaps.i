@@ -7,6 +7,8 @@
 
 %include "typemaps.i"
 
+#ifdef SWIGPYTHON
+
 %inline%{
 
 /** Check if python object is of a particular SWIG type */
@@ -66,8 +68,6 @@ PyObject* arrayView() {
 }
 #endif WITH_NUMPY
 
-#define WITH_PYTHONCODE
-#ifdef WITH_PYTHONCODE
 %pythoncode %{
     @property
     def shape(self):
@@ -145,7 +145,6 @@ PyObject* arrayView() {
     from scipy.sparse import csr_matrix
     return csr_matrix( (list(self.data()),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
 %}
-#endif // WITH_PYTHONCODE
 }; // extend Matrix<double>
 } // namespace CasADi
 
@@ -234,7 +233,7 @@ if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
 
 
 %}
-#endif
+#endif // WITH_NUMPY
 
 
 #ifdef WITH_NUMPY
@@ -466,7 +465,8 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 
 
 
-#endif
+#endif // WITH_NUMPY
 
 
+#endif // SWIGPYTHON
 

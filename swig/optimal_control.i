@@ -14,6 +14,7 @@
 %include "optimal_control/ocp_tools.hpp"
 %include "optimal_control/multiple_shooting.hpp"
 
+#ifdef SWIGPYTHON
 %pythoncode %{
   class VariableStruct(object):
     """Structure for browsing through a variable tree."""
@@ -38,5 +39,6 @@
 
     %}
 };
+#endif // SWIGPYTHON
 
 

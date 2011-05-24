@@ -204,10 +204,12 @@ class OCP : public PrintableObject{
   // Print (why is this not inherited?)
   std::string __repr__()  { return $self->getRepresentation(); }
 
+#ifdef SWIGPYTHON
   %pythoncode %{
      def __deepcopy__(self,memo):
         return OCP(self)
   %}
+#endif // SWIGPYTHON
 }
 #endif
 

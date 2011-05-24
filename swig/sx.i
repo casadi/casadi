@@ -12,7 +12,7 @@
 %include "casadi/matrix/matrix.hpp"
 %include "casadi/sx/sx.hpp"
 
-
+#ifdef SWIGPYTHON
 %extend CasADi::CRSSparsity{
     %pythoncode %{
         @property
@@ -20,6 +20,7 @@
             return (self.size1(),self.size2())
     %}
 };
+#endif // SWIGPYTHON
 
 %extend std::vector<CasADi::SX>{
   std::string __repr__(){ return CasADi::getRepresentation(*$self); }
@@ -36,6 +37,7 @@
   std::string __str__(){ return CasADi::getDescription(*$self); }
 };
 
+#ifdef SWIGPYTHON
 %pythoncode %{
 try:
   import numpy
@@ -43,9 +45,11 @@ try:
 except:
   pass
 %}
+#endif // SWIGPYTHON
 
 namespace CasADi {
-  
+
+#ifdef SWIGPYTHON
 %extend SX {
   %pythoncode %{
     def __lt__(self,other):
@@ -158,9 +162,12 @@ namespace CasADi {
       return n.matrix(self.toArray())
     %}
 };
+
+#endif // SWIGPYTHON
+
 } // namespace CasADi
 
-
+#ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
 #include <numpy/arrayobject.h>
 #endif // WITH_NUMPY
@@ -504,8 +511,9 @@ matching on SXMatrix is prohibited as per wish of Joel
 %typemap(typecheck,precedence=PRECEDENCE_SXMatrix) const Matrix<SX> & { $1 = couldbeSXMatrix($input); }
 %typemap(freearg) const Matrix<SX>  & {}
 
-
 }
+
+#endif // SWIGPYTHON
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;

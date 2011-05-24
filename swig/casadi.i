@@ -134,6 +134,7 @@ namespace CasADi{
   }
 };
 
+#ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
 //#warning "Not using numpy. option(WITH_NUMPY = OFF)"
 #endif
@@ -165,7 +166,8 @@ void SigIntHandler(int) {
 %init %{
 PyOS_setsig(SIGINT, SigIntHandler);
 %}
-#endif WITH_PYTHON_INTERRUPTS
+#endif // WITH_PYTHON_INTERRUPTS
+#endif // SWIGPYTHON
 
 // Auxilliary casadi functions
 %include "casadi_aux.i"
