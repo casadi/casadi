@@ -317,7 +317,7 @@ class Matrix : public PrintableObject{
     void setitem(int k, const T& el);
     
     /// Python: set a matrix entry
-    void setitem(const std::vector<int> &I, const T&  el);
+    void setitem(const std::pair<int,int> &ij, const T&  el);
 
     /// Python: set a submatrix
     void setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m);
@@ -1078,9 +1078,8 @@ void Matrix<T>::setAll(const T& val){
 }
 
 template<class T>
-void Matrix<T>::setitem(const std::vector<int> &I, const T&  el){ 
-  casadi_assert_message(I.size()==2,"Index vector must be two-dimensional");
-  getElementRef(I[0],I[1]) = el;
+void Matrix<T>::setitem(const std::pair<int,int> &ij, const T&  el){ 
+  getElementRef(ij.first,ij.second) = el;
 }
 
 template<class T>
