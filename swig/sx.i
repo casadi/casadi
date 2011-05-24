@@ -46,23 +46,6 @@ except:
 
 namespace CasADi {
   %extend Matrix<double> {
-  
-
-    
-    %pythoncode %{
-    def __getitem__(self,s):
-      if isinstance(s,tuple):
-        if isinstance(s[0],int) and isinstance(s[1],int):
-          return self.getitem(s)
-        s = list(s)
-        for k in range(2):
-          if isinstance(s[k],slice):
-            J = s[k].indices(self.shape[k])
-            s[k] = range(J[0],J[1],J[2])
-          elif isinstance(s[k],int):
-            s[k] = [s[k]]
-      return self.getitem(s)
-    %}
     
     %pythoncode %{
     def __setitem__(self,s,val):
@@ -206,21 +189,6 @@ namespace CasADi {
       return n.matrix(self.toArray())
     %}
     
-    %pythoncode %{
-    def __getitem__(self,s):
-      if isinstance(s,tuple):
-        if isinstance(s[0],int) and isinstance(s[1],int):
-          return self.getitem(s)
-        s = list(s)
-        for k in range(2):
-          if isinstance(s[k],slice):
-            J = s[k].indices(self.shape[k])
-            s[k] = range(J[0],J[1],J[2])
-          elif isinstance(s[k],int):
-            s[k] = [s[k]]
-      return self.getitem(s)
-    %}
-
     %pythoncode %{
     def __setitem__(self,s,val):
       if isinstance(s,int):

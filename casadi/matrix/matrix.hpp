@@ -302,19 +302,16 @@ class Matrix : public PrintableObject{
 #endif // SWIG
 
     /// Python: get a non-zero entry
-    const T getitem(int i) const;
+    const T __getitem__(int i) const;
     
     /// Get several non-zero entries
-    Matrix<T> getitem(const Slice& k) const;
+    const Matrix<T> __getitem__(const Slice& k) const;
 
     /// Python: get a matrix entry
-    const T getitem(const std::pair<int,int> &ij) const;
+    const T __getitem__(const std::pair<int,int> &ij) const;
     
     /// Python: get a submatrix
-    const Matrix<T> getitem(const std::vector< std::vector<int> > &II) const;
-    
-    /// Python: get a submatrix
-    Matrix<T> getitem(const Slice& i, const Slice &j) const;
+    const Matrix<T> __getitem__(const Slice& i, const Slice &j) const;
     
     /// Python: set a non-zero entry
     void setitem(int k, const T& el);
@@ -1046,28 +1043,22 @@ Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(
 }
 
 template<class T>
-const T Matrix<T>::getitem(int i) const{
+const T Matrix<T>::__getitem__(int i) const{
   return data().at(i);
 }
 
 template<class T>
-const T Matrix<T>::getitem(const std::pair<int,int> &ij) const{
+const T Matrix<T>::__getitem__(const std::pair<int,int> &ij) const{
   return getElement(ij.first,ij.second);
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getitem(const std::vector< std::vector<int> > &II) const{
-  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
-  return (*this)(II[0],II[1]);
+const Matrix<T> Matrix<T>::__getitem__(const Slice& i, const Slice &j) const{
+  return (*this)(i.getAll(size1()),j.getAll(size2()));
 }
 
 template<class T>
-Matrix<T> Matrix<T>::getitem(const Slice& i, const Slice &j) const{
-  return (*this)(i,j);
-}
-
-template<class T>
-Matrix<T> Matrix<T>::getitem(const Slice& kk) const{
+const Matrix<T> Matrix<T>::__getitem__(const Slice& kk) const{
   return (*this)[kk.getAll(size())];
 }
 
