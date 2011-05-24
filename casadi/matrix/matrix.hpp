@@ -314,13 +314,16 @@ class Matrix : public PrintableObject{
     const Matrix<T> __getitem__(const Slice& i, const Slice &j) const;
     
     /// Python: set a non-zero entry
-    void setitem(int k, const T& el);
+    void __setitem__(int k, const T& el);
+    
+    /// Python: set several non-zero entries
+    void __setitem__(const Slice& k, const Matrix<T>& m);
     
     /// Python: set a matrix entry
-    void setitem(const std::pair<int,int> &ij, const T&  el);
+    void __setitem__(const std::pair<int,int> &ij, const T&  el);
 
     /// Python: set a submatrix
-    void setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m);
+    void __setitem__(const Slice& i, const Slice &j, const Matrix<T>& m);
     
     /// Set all elements to zero
     void setZero();
@@ -1063,7 +1066,7 @@ const Matrix<T> Matrix<T>::__getitem__(const Slice& kk) const{
 }
 
 template<class T>
-void Matrix<T>::setitem(int k, const T& el){ 
+void Matrix<T>::__setitem__(int k, const T& el){ 
   data().at(k) = el;
 }
 
@@ -1078,14 +1081,18 @@ void Matrix<T>::setAll(const T& val){
 }
 
 template<class T>
-void Matrix<T>::setitem(const std::pair<int,int> &ij, const T&  el){ 
+void Matrix<T>::__setitem__(const Slice& k, const Matrix<T>& m){
+  (*this)[k.getAll(size())] = m;
+}
+
+template<class T>
+void Matrix<T>::__setitem__(const std::pair<int,int> &ij, const T&  el){ 
   getElementRef(ij.first,ij.second) = el;
 }
 
 template<class T>
-void Matrix<T>::setitem(const std::vector< std::vector<int> > &II, const Matrix<T>& m){
-  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
-  setSub(II[0],II[1],m);
+void Matrix<T>::__setitem__(const Slice& i, const Slice &j, const Matrix<T>& m){
+  setSub(i.getAll(size1()),j.getAll(size2()),m);
 }
 
 template<class T>

@@ -45,34 +45,7 @@ except:
 %}
 
 namespace CasADi {
-  %extend Matrix<double> {
-    
-    %pythoncode %{
-    def __setitem__(self,s,val):
-      if isinstance(s,int):
-        self.setitem(s,val)
-        return
-      elif isinstance(s,tuple):
-        if len(s)!=2:
-          raise Exception("get/setitem can only do 1D or 2D indexing")
-        if isinstance(s[0],int) and isinstance(s[1],int):
-          self.setitem(s,val)
-          return
-        else:
-          s = list(s)
-          for k in range(2):
-            if isinstance(s[k],slice):
-              J = s[k].indices(self.shape[k])
-              s[k] = range(J[0],J[1],J[2])
-            elif isinstance(s[k],int):
-              s[k] = [s[k]]
-      else:
-        raise Exception("get/setitem expecting a tuple or int. Got %s of type %s" % (str(s),str(type(s))))
-      self.setitem(s,val)
-    %}
-
-  };
-
+  
 %extend SX {
   %pythoncode %{
     def __lt__(self,other):
@@ -93,7 +66,6 @@ namespace CasADi {
 %extend Matrix<SX>{
     // The constructor has to be added since SX::operator Matrix<SX does not work
     // Matrix<SX>(const SX&){ *$self
-    
     
     %pythoncode %{
       def __lt__(self,other):
@@ -184,30 +156,6 @@ namespace CasADi {
     def toMatrix(self):
       import numpy as n
       return n.matrix(self.toArray())
-    %}
-    
-    %pythoncode %{
-    def __setitem__(self,s,val):
-      if isinstance(s,int):
-        self.setitem(s,val)
-        return
-      elif isinstance(s,tuple):
-        if len(s)!=2:
-          raise Exception("get/setitem can only do 1D or 2D indexing")
-        if isinstance(s[0],int) and isinstance(s[1],int):
-          self.setitem(s,val)
-          return
-        else:
-          s = list(s)
-          for k in range(2):
-            if isinstance(s[k],slice):
-              J = s[k].indices(self.shape[k])
-              s[k] = range(J[0],J[1],J[2])
-            elif isinstance(s[k],int):
-              s[k] = [s[k]]
-      else:
-        raise Exception("get/setitem expecting a tuple or int. Got %s of type %s" % (str(s),str(type(s))))
-      self.setitem(s,val)
     %}
 };
 } // namespace CasADi
