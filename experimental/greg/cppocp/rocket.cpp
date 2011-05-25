@@ -43,13 +43,15 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 {
 	SX x = state["x"];
 	SX v = state["v"];
+	SX mass = state["mass"];
 	SX thrust = action["thrust"];
 	SX tEnd = param["tEnd"];
 
-	double mass = 1.0;
+	double massBurnedPerThrustSquared = 1.0;
 
 	xDot["x"] = v;
 	xDot["v"] = thrust/mass;
+	xDot["mass"] = -thrust*thrust*massBurnedPerThrustSquared;
 }
 
 int
@@ -58,6 +60,7 @@ main()
 	Ode ode("rocket");
 	ode.addState("x");
 	ode.addState("v");
+	ode.addState("mass");
 	ode.addAction("thrust");
 	ode.addParam("tEnd");
 
@@ -65,24 +68,34 @@ main()
 
 	OcpMultipleShooting ocp(&ode);
 
-	ocp.discretize(300);
+	ocp.discretize(150);
 
 	SX tEnd = ocp.getParam("tEnd");
 	ocp.setTimeInterval(0.0, tEnd);
 	ocp.f = tEnd;
 
 	// Bounds/initial condition
-	ocp.boundParam("tEnd", 1, 30);
+	double x0 = 0;
+	double xf = 15;
+	double mass0 = 150;
+	double massShip = 100;
+	ocp.boundParam("tEnd", 1, 1000);
 	for (int k=0; k<ocp.N; k++){
-		ocp.boundStateAction("x", -15, 15, k);
+		ocp.boundStateAction("x", x0, xf, k);
 		ocp.boundStateAction("v", -100, 100, k);
-		ocp.boundStateAction("thrust", -1, 1, k);
+		ocp.boundStateAction("mass", massShip, mass0, k);
+		ocp.boundStateAction("thrust", -100, 100, k);
 	}
 
-	ocp.boundStateAction("x", 0, 0, 0);
-	ocp.boundStateAction("v", 0, 0, 0);
+	// initial mass
+	ocp.boundStateAction("mass", mass0, mass0, 0);
 
-	ocp.boundStateAction("x", 10, 10, ocp.N-1);
+	// initial/final position
+	ocp.boundStateAction("x", x0, x0, 0);
+	ocp.boundStateAction("x", xf, xf, ocp.N-1);
+
+	// velocity == 0 at start/finish
+	ocp.boundStateAction("v", 0, 0, 0);
 	ocp.boundStateAction("v", 0, 0, ocp.N-1);
 
 
@@ -97,7 +110,7 @@ main()
 	//IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
 
 	// Set options
-	solver.setOption("tol",1e-10);
+	solver.setOption("tol",1e-8);
 	solver.setOption("hessian_approximation","limited-memory");
 
 	// initialize the solver
@@ -124,7 +137,7 @@ main()
 	// Print the optimal solution
 	vector<double>xopt(ocp.getBigN());
 	solver.getOutput(xopt,NLP_X_OPT);
-	//cout << "optimal solution: " << xopt << endl;
+	cout << "optimal solution: " << xopt << endl;
 
 	return 0;
 }
