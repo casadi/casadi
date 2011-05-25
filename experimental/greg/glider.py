@@ -170,7 +170,8 @@ if __name__ == '__main__':
     plt.figure()
     plt.clf()
 
-    t = np.matrix(timeSim).transpose()
+#    t = np.matrix(timeSim).transpose()
+    t = np.linspace(0, xopt[gliderOcp._getIdx('tEnd')], gliderOcp.N)
     plt.subplot(4,1,1)
     plt.xlabel('x')
     plt.ylabel('altitude')
