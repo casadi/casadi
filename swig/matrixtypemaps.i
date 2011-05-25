@@ -13,8 +13,7 @@
 
 /** Check if python object is of a particular SWIG type */
 bool istype(PyObject *p, swig_type_info *type) {
-  int res = SWIG_ConvertPtr(p, 0, type, 0);
-  return SWIG_CheckState(res);
+  return SWIG_IsOK(SWIG_ConvertPtr(p, 0, type, 0));
 }
 
 /** Check PyObjects by class name */
@@ -26,9 +25,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   Py_DECREF(classo);Py_DECREF(classname);
 	return ret;
 }
-%}
-
-%inline %{
 
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
 bool couldbeDMatrix(PyObject * p) {
@@ -53,22 +49,40 @@ int getDMatrix_ptr(PyObject * p, CasADi::DMatrix * & m) {
 
 #ifdef SWIGOCTAVE
 %inline %{
-bool couldbeDMatrix(const octave_value& arg){
   
-  return false;
+bool istype(const octave_value& p, swig_type_info *type) {
+  return SWIG_IsOK(SWIG_ConvertPtr(p, 0, type, 0));
+}
+  
+bool isDMatrix(const octave_value& p){
+  return istype(p,SWIGTYPE_p_CasADi__MatrixT_double_t);
 }
 
-bool isDMatrix(const octave_value& arg){
-  return false;
+bool couldbeDMatrix(const octave_value& p){
+  return p.is_real_matrix();
 }
-  
-int getDMatrix_ptr(const octave_value& p, CasADi::DMatrix * & m){
-  return 1;
+
+bool getDMatrix_ptr(const octave_value& p, CasADi::DMatrix * & m){
+  void *pd = 0;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_double_t, 0 );
+  m = reinterpret_cast< CasADi::DMatrix * >(pd);
+  return SWIG_IsOK(res);
 }
 
 bool asDMatrix(const octave_value& p, CasADi::DMatrix &m){
-  return false;
+  if(p.is_real_matrix()){
+    Matrix mat = p.matrix_value();
+    m = CasADi::DMatrix(mat.rows(),mat.cols(),0);
+    for(int i=0; i<mat.rows(); ++i){
+      for(int j=0; j<mat.cols(); ++j){
+        m(i,j) = mat(i,j);
+      }
+    }
+  }
+    
+  return true;
 }
+
 %}
 #endif // SWIGOCTAVE
 
@@ -299,13 +313,7 @@ namespace CasADi{
     if (!result) SWIG_exception_fail(SWIG_TypeError,"DMatrix cast failed");
   } else {  
     bool result=asDMatrix($input,m);
-    if (!result) SWIG_exception_fail(SWIG_TypeError,
-      #ifdef SWIGPYTHON
-      "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix"
-      #elif // SWIGPYTHON
-      "Expecting ???"
-      #endif // SWIGPYTHON
-      );
+    if (!result) SWIG_exception_fail(SWIG_TypeError,"Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix");
     $1 = &m;
   }
 }
