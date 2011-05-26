@@ -7,6 +7,11 @@
 
 %include "typemaps.i"
 
+// %fragment("could_be"{CasADi::DMatrix},"header"){
+//   
+// }
+
+
 #ifdef SWIGPYTHON
 
 %inline%{
