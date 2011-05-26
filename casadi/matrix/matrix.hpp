@@ -329,15 +329,33 @@ class Matrix : public PrintableObject{
     
     /// Octave: get a non-zero
     Matrix<T> __paren__(int k) const{ return at(k-1);}
+    Matrix<T> __paren__(std::vector<int> k) const{
+      for(std::vector<int>::iterator it=k.begin(); it!=k.end(); ++it) (*it)--; 
+      return (*this)[k];
+    }
     
     /// Octave: get a matrix element
     Matrix<T> __paren__(int i, int j) const{ return (*this)(i-1,j-1);}
+    Matrix<T> __paren__(std::vector<int> i, std::vector<int> j) const{ 
+      for(std::vector<int>::iterator it=i.begin(); it!=i.end(); ++it) (*it)--; 
+      for(std::vector<int>::iterator it=j.begin(); it!=j.end(); ++it) (*it)--; 
+      return (*this)(i,j);
+    }
 
     /// Octave: set a non-zero
     void __paren_asgn__(int k, const Matrix<T>& m){ at(k-1) = m(0,0);}
+    void __paren_asgn__(std::vector<int> k, const Matrix<T>& m){
+      for(std::vector<int>::iterator it=k.begin(); it!=k.end(); ++it) (*it)--; 
+      (*this)[k] = m;
+    }
     
     /// Octave: set a matrix element
     void __paren_asgn__(int i, int j, const Matrix<T>& m){ (*this)(i-1,j-1) = m(0,0);}
+    void __paren_asgn__(std::vector<int> i, std::vector<int> j, const Matrix<T>& m){
+      for(std::vector<int>::iterator it=i.begin(); it!=i.end(); ++it) (*it)--; 
+      for(std::vector<int>::iterator it=j.begin(); it!=j.end(); ++it) (*it)--; 
+      (*this)(i,j) = m;
+    }
     
     #endif // SWIGOCTAVE
     

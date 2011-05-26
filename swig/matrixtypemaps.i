@@ -490,4 +490,22 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 #endif // WITH_NUMPY
 #endif // SWIGPYTHON
 
+// #ifdef SWIGOCTAVE
+// %typemap(in) const std::vector<int> &  (std::vector<int> temp){
+//   Matrix mat = $input.matrix_value();
+//   temp.resize(mat.rows()*mat.cols());
+//   for(int i=0; i<mat.rows(); ++i){
+//     for(int j=0; j<mat.cols(); ++j){
+//       temp[i+j*mat.rows()] = int(mat(i,j));
+//     }
+//   }
+//   $1 = &temp;
+// }
+// 
+// %typemap(typecheck,precedence=PRECEDENCE_SLICE) const std::vector<int> & {
+//   $1 = $input.is_real_matrix();
+// }
+// #endif // SWIGOCTAVE
+
+
 } // namespace CasADi

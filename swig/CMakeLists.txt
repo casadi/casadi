@@ -162,3 +162,6 @@ ENDIF(PYTHONINTERP_FOUND)
 # OCTAVE interface
 SWIG_ADD_MODULE (casadi_octave octave casadi.i)
 SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
+set_target_properties(casadi_octave PROPERTIES PREFIX "")
+set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
+set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi")
