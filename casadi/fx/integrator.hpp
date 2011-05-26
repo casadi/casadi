@@ -46,7 +46,7 @@ ODE_RHS,
 ODE_NUM_OUT};
 
 /// Input arguments of an DAE residual function
-enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_Z, DAE_P, DAE_NUM_IN};
+enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_P, DAE_NUM_IN};
 
 /// Output arguments of an DAE residual function
 enum DAEOutput{DAE_RES, DAE_NUM_OUT};

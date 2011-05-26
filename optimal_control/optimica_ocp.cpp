@@ -739,7 +739,7 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
     dae_in[DAE_T] = t_;
     dae_in[DAE_Y] = var(x_);
     dae_in[DAE_YDOT] = der(x_);
-    dae_in[DAE_Z] = var(z_);
+    casadi_assert(0); /*    dae_in[DAE_Z] = var(z_);*/
     dae_in[DAE_P] = var(u_);
     
     // DAE residual

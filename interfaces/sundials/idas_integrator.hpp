@@ -40,8 +40,8 @@ namespace Sundials{
 // Forward declaration of internal class
 class IdasInternal;
 
-/// Input arguments of a jacobian function: J = [df/dy + cj*df/dydot, df/dz]
-enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_Z, JAC_P, JAC_CJ, JAC_NUM_IN};
+/// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
+enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
 
 /// Output arguments of an DAE residual function
 enum JACOutput{JAC_J, JAC_NUM_OUT};

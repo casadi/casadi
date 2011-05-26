@@ -54,7 +54,7 @@ int main(){
   SX t = ocp.t_;
   Matrix<SX> x = var(ocp.x_);
   Matrix<SX> xdot = der(ocp.x_);
-  Matrix<SX> z = var(ocp.z_);
+  casadi_assert(ocp.z_.empty());
   Matrix<SX> p = var(ocp.p_);
   Matrix<SX> u = var(ocp.u_);
 
@@ -90,7 +90,6 @@ int main(){
   dae_in[DAE_T] = t;
   dae_in[DAE_Y] = x;
   dae_in[DAE_YDOT] = xdot;
-  dae_in[DAE_Z] = z;
   dae_in[DAE_P] = u;
   SXFunction dae(dae_in,ocp.implicit_fcn_);
 
