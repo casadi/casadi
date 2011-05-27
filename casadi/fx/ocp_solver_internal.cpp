@@ -74,13 +74,12 @@ void OCPSolverInternal::init(){
   
   // Specify the outputs
   setNumOutputs(OCP_NUM_OUT);
-  
-  
-  // Call the init function of the base class
-  FXInternal::init();
   output(OCP_X_OPT) = input(OCP_X_INIT);
   output(OCP_U_OPT) = input(OCP_U_INIT);
   output(OCP_XP_OPT) = input(OCP_XP_INIT);
+  
+  // Call the init function of the base class
+  FXInternal::init();
 }
 
 } // namespace CasADi

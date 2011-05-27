@@ -92,6 +92,10 @@ class OCPSolverInternal : public FXInternal{
     
     /// Number of point coupling constraints
     int ng_;
+    
+    /// Time grid
+    std::vector<double> time_grid_;
+    
 };
 
 

@@ -33,25 +33,31 @@ namespace CasADi{
   enum OCPInput{
     /// Time grid
     OCP_T,   
-    /// State lower bound                             
-    OCP_LBX,
-    /// DState upper bound  
-    OCP_UBX, 
-    /// State initial guess  
-    OCP_X_INIT,    
-    OCP_LBXP, OCP_UBXP, OCP_XP_INIT,   // State deriatives with bounds
-    OCP_LBU, OCP_UBU, OCP_U_INIT,     // Controls with bounds and initial guess
-    OCP_LBP, OCP_UBP, OCP_P_INIT,    // Parameters with bounds and initial guess
-    OCP_LBH, OCP_UBH,               // Bounds for the point constraints
-    OCP_LBG, OCP_UBG,              // Bounds for the coupling constraints
+    /// State bound and initial guess
+    OCP_LBX, OCP_UBX, OCP_X_INIT,
+    /// State deriatives with bounds
+    OCP_LBXP, OCP_UBXP, OCP_XP_INIT,
+    /// Controls with bounds and initial guess
+    OCP_LBU, OCP_UBU, OCP_U_INIT,     
+    /// Parameters with bounds and initial guess
+    OCP_LBP, OCP_UBP, OCP_P_INIT,
+    /// Bounds for the point constraints
+    OCP_LBH, OCP_UBH,
+    /// Bounds for the coupling constraints
+    OCP_LBG, OCP_UBG,
+    /// Number of inputs to an OCP solver
     OCP_NUM_IN
   };
   
   /// Outputs arguments of an OCP Solver
   enum OCPOutput{
+    /// Optimal state trajectory
     OCP_X_OPT, 
+    /// Optimal control trajectory
     OCP_U_OPT, 
+    /// Optimal state derivative trajectory
     OCP_XP_OPT, 
+    /// Number of outputs to an OCP solver
     OCP_NUM_OUT
   };
     

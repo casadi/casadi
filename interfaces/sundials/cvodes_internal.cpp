@@ -127,7 +127,7 @@ void CVodesInternal::init(){
   }
   
   IntegratorInternal::init();
- 
+  
   // Read options
   monitor_rhsB_ = monitored("CVodesInternal::rhsB");
   
@@ -164,6 +164,11 @@ void CVodesInternal::init(){
   nfdir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_fwd_dir").toInt();
   nadir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_adj_dir").toInt();
 
+  // Set state derivative and its derivatives to zero (explicit integrator)
+  f_.input(DAE_YDOT).setAll(0);
+  for(int i=0; i<nfdir_f_; ++i) f_.fwdSeed(DAE_YDOT,i).setAll(0);
+  for(int i=0; i<nadir_f_; ++i) f_.adjSens(DAE_YDOT,i).setAll(0);
+  
   // Quick return if already initialized
   if(is_init){
     log("CVodesInternal::init","end, Idas already initialized");

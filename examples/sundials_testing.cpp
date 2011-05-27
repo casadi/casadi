@@ -43,7 +43,7 @@ using namespace CasADi::Sundials;
 using namespace CasADi::Interfaces;
 
 // Use CVodes or IDAS
-const bool implicit_integrator = true;
+const bool implicit_integrator = false;
 
 // use plain c instead of SX
 const bool plain_c = false;
@@ -92,26 +92,8 @@ void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* use
   dae_res_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_YDOT)[0], &f.input(DAE_P)[0], &f.output(DAE_RES)[0]);
 }
 
-// The ODE right-hand-side in plain c (for CVODES)
-void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
-  // Get the arguments
-  double s = yy[0], v = yy[1], m = yy[2];
-  double u = pp[0];
-
-  // Calculate the DAE residual
-  rhs[0] = v; // sdot
-  rhs[1] = (u-0.02*v*v)/m; // vdot
-  rhs[2] = (-0.01*u*u); // mdot
-}
-
-// Wrap the function to allow creating an CasADi function
-void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  casadi_assert(fsens_order==0 && asens_order==0);
-  ode_rhs_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_P)[0], &f.output(DAE_RES)[0]);
-}
-
 // Create an IDAS instance (fully implicit integrator)
-Integrator create_IDAS(){
+Integrator create_Sundials(){
   
   // Time 
   SX t("t");
@@ -147,11 +129,11 @@ Integrator create_IDAS(){
   res[2] = -0.01*u*u - mdot;
 
   // Input of the DAE residual function
-  vector<vector<SX> > ffcn_in(DAE_NUM_IN);
-  ffcn_in[DAE_T] = vector<SX>(1,t);
+  vector<SXMatrix> ffcn_in(DAE_NUM_IN);
+  ffcn_in[DAE_T] = t;
   ffcn_in[DAE_Y] = y;
   ffcn_in[DAE_YDOT] = ydot;
-  ffcn_in[DAE_P] = vector<SX>(1,u);
+  ffcn_in[DAE_P] = u;
 
   // DAE residual function
   FX ffcn = SXFunction(ffcn_in,res);
@@ -176,79 +158,23 @@ Integrator create_IDAS(){
   // Quadrature function
   SXFunction qfcn(ffcn_in,u_dev);
 
-  // Create an integrator
-  Sundials::IdasIntegrator integrator(ffcn,qfcn);
-
-  // Set IDAS specific options
-  integrator.setOption("calc_ic",calc_ic);
-  integrator.setOption("is_differential",vector<int>(3,1));
-  
-  // Return the integrator
-  return integrator;
-}
-
-// Create an CVODES instance (ODE integrator)
-Integrator create_CVODES(){
-  
-  // Time 
-  SX t("t");
-
-  // Differential states
-  SX s("s"), v("v"), m("m");
-  vector<SX> y(3); 
-  y[0] = s;
-  y[1] = v;
-  y[2] = m;
-  
-  // Control
-  SX u("u");
-  
-  // Reference trajectory
-  SX u_ref = 3-sin(t);
-  
-  // Square deviation from the state trajectory
-  SX u_dev = u-u_ref;
-  u_dev *= u_dev;
-  
-  // Differential equation (fully implicit form)
-  vector<SX> rhs(3);
-  rhs[0] = v;
-  rhs[1] = (u-0.02*v*v)/m;
-  rhs[2] = -0.01*u*u;
-
-  // Input of the DAE residual function
-  vector<vector<SX> > ffcn_in(DAE_NUM_IN);
-  ffcn_in[DAE_T] = vector<SX>(1,t);
-  ffcn_in[DAE_Y] = y;
-  ffcn_in[DAE_P] = vector<SX>(1,u);
-
-  // DAE residual function
-  FX ffcn = SXFunction(ffcn_in,rhs);
-
-  // Overwrite ffcn with a plain c function (avoid this!)
-  if(plain_c){
-    // Use DAE residual defined in a c-function
-    ffcn = CFunction(ode_rhs_c_wrapper);
+  if(implicit_integrator){
+    // Create an IDAS instance
+    Sundials::IdasIntegrator integrator(ffcn,qfcn);
     
-    // Specify the number of inputs and outputs
-    ffcn.setNumInputs(DAE_NUM_IN);
-    ffcn.setNumOutputs(DAE_NUM_OUT);
-    
-    // Specify dimensions of inputs and outputs
-    ffcn.input(DAE_T)    = DMatrix(1,1,0);
-    ffcn.input(DAE_Y)    = DMatrix(3,1,0);
-    ffcn.input(DAE_P)    = DMatrix(1,1,0);
-    ffcn.output(DAE_RES) = DMatrix(3,1,0);
+    // Set IDAS specific options
+    integrator.setOption("calc_ic",calc_ic);
+    integrator.setOption("is_differential",vector<int>(3,1));
+
+    // Return the integrator
+    return integrator;
+  } else {
+    // Create an CVodes instance
+    Sundials::CVodesIntegrator integrator(ffcn,qfcn);
+
+    // Return the integrator
+    return integrator;
   }
-  
-  // Quadrature function
-  SXFunction qfcn(ffcn_in,u_dev);
-
-  // Create an integrator
-  Sundials::CVodesIntegrator integrator(ffcn,qfcn);
-  
-  // Return the integrator
-  return integrator;
 }
 
 int main(){
@@ -269,7 +195,7 @@ int main(){
   x0.push_back(0);
 
   // Integrator
-  Integrator integrator = implicit_integrator ? create_IDAS() : create_CVODES();
+  Integrator integrator = create_Sundials();
   
   // Attach user-defined linear solver
   if(user_defined_solver){
