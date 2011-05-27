@@ -89,8 +89,6 @@ void MultipleShootingInternal::init(){
   vector<vector<MX> > int_in(nk_);
   for(int k=0; k<nk_; ++k){
     int_in[k].resize(INTEGRATOR_NUM_IN);
-    int_in[k][INTEGRATOR_T0] = input(OCP_T)[0]; // should be k
-    int_in[k][INTEGRATOR_TF] = input(OCP_T)[1]; // should be k+1
     int_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
     int_in[k][INTEGRATOR_X0] = X[k];
     int_in[k][INTEGRATOR_XP0] = XP[k];

@@ -300,13 +300,11 @@ int main(){
   integrator.setOption("finite_difference_fsens",finite_difference_fsens);
   integrator.setOption("max_num_steps",100000);
 //  integrator.setOption("max_multistep_order",4);
+  integrator.setOption("t0",t0);
+  integrator.setOption("tf",tf);
 
   // Initialize the integrator
   integrator.init();
-  
-  // Set time horizon
-  integrator.setInput(t0,INTEGRATOR_T0);
-  integrator.setInput(tf,INTEGRATOR_TF);
  
   // Set parameters
   integrator.setInput(u_init,INTEGRATOR_P);
@@ -363,10 +361,6 @@ int main(){
   // Reset initial state
   integrator.setInput(x0,INTEGRATOR_X0);
 
-  // forward seeds
-  integrator.setFwdSeed(0.0,INTEGRATOR_T0);
-  integrator.setFwdSeed(0.0,INTEGRATOR_TF);
-
   if(with_asens){
     // backward seeds
     vector<double> &bseed = integrator.adjSeed(INTEGRATOR_XF).data();
@@ -385,8 +379,6 @@ int main(){
 
   if(with_asens){
     cout << "adjoint sensitivities           ";
-    cout << integrator.adjSens(INTEGRATOR_T0) << "; ";
-    cout << integrator.adjSens(INTEGRATOR_TF) << "; ";
     cout << integrator.adjSens(INTEGRATOR_X0) << "; ";
     cout << integrator.adjSens(INTEGRATOR_P) << "; ";
     cout << endl;
@@ -427,13 +419,9 @@ int main(){
     intjac2.init();
 
     // Set inputs
-    intjac.setInput(t0,INTEGRATOR_T0);
-    intjac.setInput(tf,INTEGRATOR_TF);
     intjac.setInput(u_init,INTEGRATOR_P);
     intjac.setInput(x0,INTEGRATOR_X0);
     
-    intjac2.setInput(t0,INTEGRATOR_T0);
-    intjac2.setInput(tf,INTEGRATOR_TF);
     intjac2.setInput(u_init,INTEGRATOR_P);
     intjac2.setInput(x0,INTEGRATOR_X0);
     

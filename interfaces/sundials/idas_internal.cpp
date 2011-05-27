@@ -471,7 +471,7 @@ void IdasInternal::initAdj(){
     if(flag != IDA_SUCCESS) idas_error("IDACreateB",flag);
   
     // Initialize the backward problem
-    double tB0 = input(INTEGRATOR_TF)[0];
+    double tB0 = tf_;
     flag = IDAInitB(mem_, whichB_[dir], resB_wrapper, tB0, yB_[dir], yPB_[dir]);
     if(flag != IDA_SUCCESS) idas_error("IDAInitB",flag);
 
@@ -704,9 +704,7 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   asens_order_ = asens_order;
   
   // Get the time horizon
-  double t0 = input(INTEGRATOR_T0)[0];
-  double tf = input(INTEGRATOR_TF)[0];
-  t_ = t0;
+  t_ = t0_;
   
   // Return flag
   int flag;
@@ -715,7 +713,7 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   copyNV(input(INTEGRATOR_X0),input(INTEGRATOR_XP0),y_,yP_,yQ_);
   
   // Re-initialize
-  flag = IDAReInit(mem_, t0, y_, yP_);
+  flag = IDAReInit(mem_, t0_, y_, yP_);
   if(flag != IDA_SUCCESS) idas_error("IDAReInit",flag);
   log("IdasInternal::reset","re-initialized IVP solution");
 
@@ -760,8 +758,6 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   
   
 void IdasInternal::correctInitialConditions(){
-  double t0 = input(INTEGRATOR_T0)[0];
-  double tf = input(INTEGRATOR_TF)[0];
   log("IdasInternal::correctInitialConditions","begin");
   if(monitored("IdasInternal::correctInitialConditions")){
     cout << "initial guess: " << endl;
@@ -781,7 +777,7 @@ void IdasInternal::correctInitialConditions(){
   int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
   // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
 
-  double t_first = hasSetOption("first_time") ? getOption("first_time").toDouble() : tf;
+  double t_first = hasSetOption("first_time") ? double(getOption("first_time")) : tf_;
   int flag = IDACalcIC(mem_, icopt , t_first);
   if(flag != IDA_SUCCESS) idas_error("IDACalcIC",flag);
 
@@ -871,8 +867,6 @@ void IdasInternal::integrate(double t_out){
 }
 
 void IdasInternal::resetAdj(){
-  double t0 = input(INTEGRATOR_T0)[0];
-  double tf = input(INTEGRATOR_TF)[0];
   
   int flag;
   // Reset adjoint sensitivities for the parameters
@@ -884,7 +878,7 @@ void IdasInternal::resetAdj(){
     
   if(isInitAdj_){
     for(int dir=0; dir<nadir_; ++dir){
-      flag = IDAReInitB(mem_, whichB_[dir], tf, yB_[dir], yPB_[dir]);
+      flag = IDAReInitB(mem_, whichB_[dir], tf_, yB_[dir], yPB_[dir]);
       if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
       
       if(np_>0){
@@ -902,7 +896,7 @@ void IdasInternal::resetAdj(){
   int calc_icB = getOption("calc_icB");
   if(calc_icB){
     for(int dir=0; dir<nadir_; ++dir){
-      flag = IDACalcICB(mem_, whichB_[dir], t0, yB_[dir], yPB_[dir]);
+      flag = IDACalcICB(mem_, whichB_[dir], t0_, yB_[dir], yPB_[dir]);
       if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
 
       N_VPrint_Serial(yB_[dir]);

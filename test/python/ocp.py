@@ -71,6 +71,8 @@ class OCPtests(casadiTestCase):
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
     integrator.setOption("steps_per_checkpoint",10000)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",te)
 
     integrator.init()
 
@@ -78,11 +80,9 @@ class OCPtests(casadiTestCase):
     par = MX("par",1,1)
     parMX= par
     
-    t0   = MX(0)
-    tend = MX(te)
     q0   = vertcat([var[0],par])
     par  = var[1]
-    qend=integrator([t0,tend,q0,par,MX(2,1)])
+    qend=integrator([q0,par,MX(2,1)])
     
     parc = MX(0)
     
@@ -129,17 +129,17 @@ class OCPtests(casadiTestCase):
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
     integrator.setOption("steps_per_checkpoint",10000)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",te)
 
     integrator.init()
 
     var = MX("var",2,1)
     par = MX("par",1,1)
     
-    t0   = MX(0)
-    tend = MX(te)
     q0   = vertcat([var[0],par])
     parl  = var[1]
-    qend=integrator([t0,tend,q0,parl,MX(2,1)])
+    qend=integrator([q0,parl,MX(2,1)])
     
     parc = MX(dy0)
     

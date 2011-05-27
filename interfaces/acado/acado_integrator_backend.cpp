@@ -141,8 +141,8 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
                                      const Grid   &t_    ){
   
   // Set the time horizon
-  integrator_.setInput(t_.getFirstTime(),CasADi::INTEGRATOR_T0);
-  integrator_.setInput(t_.getLastTime(),CasADi::INTEGRATOR_TF);
+  integrator_.setInitialTime(t_.getFirstTime());
+  integrator_.setFinalTime(t_.getLastTime());
   
   // Set the initial conditions
   Matrix<double>& yy = integrator_.input(CasADi::INTEGRATOR_X0);

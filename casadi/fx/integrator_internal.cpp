@@ -50,8 +50,8 @@ IntegratorInternal::IntegratorInternal(){
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("stop_at_end",                 OT_BOOLEAN, false); // Stop the integrator at the end of the interval
   addOption("nrhs",                        OT_INTEGER, 1); // number of right hand sides
-  addOption("t0",                          OT_REAL, 0.0); // start of the integration (gives an initial value for INTEGRATOR_T0, which will be removed)
-  addOption("tf",                          OT_REAL, 1.0); // end of the integration (gives an initial value for INTEGRATOR_TF, which will be removed)
+  addOption("t0",                          OT_REAL, 0.0); // start of the integration
+  addOption("tf",                          OT_REAL, 1.0); // end of the integration
 
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,false); // should the quadratures affect the step size control
@@ -89,8 +89,6 @@ void IntegratorInternal::setDimensions(int nx, int np){
   
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
-  input(INTEGRATOR_T0)  = DMatrix(1,1,0); // initial time
-  input(INTEGRATOR_TF)  = DMatrix(1,1,0); // final time
   input(INTEGRATOR_X0)  = DMatrix(nx_,1,0); // initial state value
   input(INTEGRATOR_XP0) = DMatrix(nx_,1,0); // initial state derivative value
   input(INTEGRATOR_P)   = DMatrix(np_,1,0); // parameter
@@ -102,25 +100,22 @@ void IntegratorInternal::setDimensions(int nx, int np){
 }
 
 void IntegratorInternal::evaluate(int nfdir, int nadir){
-  double t0 = input(INTEGRATOR_T0)[0];
-  double tf = input(INTEGRATOR_TF)[0];
   
   // Reset solver
   reset(nfdir>0, nadir>0);
 
   // Set the stop time of the integration -- don't integrate past this point
-  if(stop_at_end_)
-    setStopTime(tf);
+  if(stop_at_end_) setStopTime(tf_);
 
   // Advance solution in time
-  integrate(tf);
+  integrate(tf_);
 
   if(nadir>0){
     // Re-initialize backward problem
     resetAdj();
 
     // Integrate backwards to the beginning
-    integrateAdj(t0);
+    integrateAdj(t0_);
   }
 }
 
@@ -129,21 +124,21 @@ void IntegratorInternal::init(){
   FXInternal::init();
 
   // read options
-  exact_jacobian_ = getOption("exact_jacobian").toInt();
-  abstol_ = getOption("abstol").toDouble(); // TODO: change to vector tolerences
-  reltol_ = getOption("reltol").toDouble();
-  max_num_steps_ = getOption("max_num_steps").toInt();
+  exact_jacobian_ = getOption("exact_jacobian");
+  abstol_ = getOption("abstol"); // TODO: change to vector tolerences
+  reltol_ = getOption("reltol");
+  max_num_steps_ = getOption("max_num_steps");
   finite_difference_fsens_ = getOption("finite_difference_fsens").toInt();
-  fsens_abstol_ = hasSetOption("fsens_abstol") ? getOption("fsens_abstol").toDouble() : abstol_;
-  fsens_reltol_ = hasSetOption("fsens_reltol") ? getOption("fsens_reltol").toDouble() : reltol_;
-  asens_abstol_ = hasSetOption("asens_abstol") ? getOption("asens_abstol").toDouble() : abstol_;
-  asens_reltol_ = hasSetOption("asens_reltol") ? getOption("asens_reltol").toDouble() : reltol_;
-  stop_at_end_ = getOption("stop_at_end").toInt();
-  nrhs_ = getOption("nrhs").toInt();
+  fsens_abstol_ = hasSetOption("fsens_abstol") ? double(getOption("fsens_abstol")) : abstol_;
+  fsens_reltol_ = hasSetOption("fsens_reltol") ? double(getOption("fsens_reltol")) : reltol_;
+  asens_abstol_ = hasSetOption("asens_abstol") ? double(getOption("asens_abstol")) : abstol_;
+  asens_reltol_ = hasSetOption("asens_reltol") ? double(getOption("asens_reltol")) : reltol_;
+  stop_at_end_ = getOption("stop_at_end");
+  nrhs_ = getOption("nrhs");
   
   // Give an intial value for the time horizon
-  input(INTEGRATOR_T0).set(getOption("t0").toDouble());
-  input(INTEGRATOR_TF).set(getOption("tf").toDouble());
+  setInitialTime(getOption("t0"));
+  setFinalTime(getOption("tf"));
 }
 
 FX IntegratorInternal::jacobian(int iind, int oind){
@@ -175,6 +170,13 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   }
 }
 
+void IntegratorInternal::setInitialTime(double t0){
+  t0_ = t0;
+}
+
+void IntegratorInternal::setFinalTime(double tf){
+  tf_ = tf;
+}
 
 
 } // namespace CasADi

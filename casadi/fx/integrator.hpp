@@ -53,10 +53,6 @@ enum DAEOutput{
 
 /// Input arguments of an integrator
 enum IntegratorInput{
-  /** Initial time t0 (dimension 1-by-1) */
-  INTEGRATOR_T0, 
-  /** Final time tf (dimension 1-by-1) */
-  INTEGRATOR_TF,
   /** Differential or algebraic state at t0  (dimension nx-by-1) */
   INTEGRATOR_X0, 
   /** Parameters p  (dimension np-by-1) */
@@ -143,6 +139,12 @@ public:
 
   /// Integrate backwards in time until a specified time point
   void integrateAdj(double t_out);
+
+  /// Set initial time
+  void setInitialTime(double t0);
+
+  /// Set final time
+  void setFinalTime(double tf);
 
   /// Set a stop time for the forward integration
   void setStopTime(double tf);

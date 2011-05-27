@@ -35,8 +35,6 @@ enum IntegratorJacobianOutput{
   INTEGRATORJACOBIAN_XF, 
   /**  Differential state derivative at tf */ 
   INTEGRATORJACOBIAN_XPF, 
-  /** Algebraic state at tf*/
-  INTEGRATORJACOBIAN_ZF,  
   INTEGRATORJACOBIAN_NUM_OUT
 };
 

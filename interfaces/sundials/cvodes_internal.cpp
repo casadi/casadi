@@ -429,7 +429,7 @@ void CVodesInternal::initAdj(){
       if(flag != CV_SUCCESS) cvodes_error("CVodeCreateB",flag);
       
       // Initialize the backward problem
-      double tB0 = input(INTEGRATOR_TF)[0];
+      double tB0 = tf_;
       flag = CVodeInitB(mem_, whichB_[dir], rhsB_wrapper, tB0, yB0_[dir]);
       if(flag != CV_SUCCESS) cvodes_error("CVodeInitB",flag);
 
@@ -541,12 +541,10 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
   asens_order_ = asens_order;
   
   // Get the time horizon
-  double t0 = input(INTEGRATOR_T0)[0];
-  double tf = input(INTEGRATOR_TF)[0];
-  t_ = t0;
+  t_ = t0_;
 
   // Re-initialize
-  int flag = CVodeReInit(mem_, t0, y0_);
+  int flag = CVodeReInit(mem_, t0_, y0_);
   if(flag!=CV_SUCCESS) cvodes_error("CVodeReInit",flag);
   
   // Re-initialize quadratures
@@ -615,12 +613,11 @@ void CVodesInternal::integrate(double t_out){
 }
 
 void CVodesInternal::resetAdj(){
-  double tf = input(INTEGRATOR_TF)[0];
   int flag;
   
   if(isInitAdj_){
     for(int dir=0; dir<nadir_; ++dir){
-      flag = CVodeReInitB(mem_, whichB_[dir], tf, yB0_[dir]);
+      flag = CVodeReInitB(mem_, whichB_[dir], tf_, yB0_[dir]);
       if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
 
       N_VConst(0.0,yQB_.at(dir));

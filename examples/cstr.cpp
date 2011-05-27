@@ -104,6 +104,9 @@ int main(){
     
   }
 
+  // Number of shooting nodes
+  int num_nodes = 100;
+
   // Set integrator options
   integrator.setOption("number_of_fwd_dir",1);
   integrator.setOption("number_of_adj_dir",0);
@@ -113,6 +116,7 @@ int main(){
   integrator.setOption("abstol",1e-8);
   integrator.setOption("reltol",1e-8);
   integrator.setOption("store_jacobians",true);
+  integrator.setOption("tf",ocp.tf/num_nodes);
   integrator.init();
 
   // Mayer objective function
@@ -120,8 +124,6 @@ int main(){
   SXFunction mterm(xf, xf[0]);
   mterm.setOption("store_jacobians",true);
   
-  // Number of shooting nodes
-  int num_nodes = 100;
 
   // Create a multiple shooting discretization
   MultipleShooting ms(integrator,mterm);

@@ -35,16 +35,13 @@ using namespace CasADi::Sundials;
 using namespace std;
 
 // CONSTRUCT THE INTEGRATOR
-FX create_integrator_euler(){
+FX create_integrator_euler(double t0, double tf){
   SX u("u"); // control for one segment
 
   // Initial position
   SX s0("s0"); // initial position
   SX v0("v0"); // initial speed
   SX m0("m0"); // initial mass
-
-  SX t0("t0"); // initial time
-  SX tf("tf"); // final time
 
   int nj = 1000; // Number of integration steps per control segment
   SX dt = (tf-t0)/nj; // time step
@@ -68,8 +65,6 @@ FX create_integrator_euler(){
 
   // Integrator
   vector<SXMatrix> input(INTEGRATOR_NUM_IN);
-  input[INTEGRATOR_T0] = t0;
-  input[INTEGRATOR_TF] = tf;
   input[INTEGRATOR_X0] = x0;
   input[INTEGRATOR_P] = u;
 
@@ -86,7 +81,7 @@ FX create_integrator_euler(){
   return integrator;
 }
 
-FX create_integrator_sundials(bool explicit_integrator){
+FX create_integrator_sundials(bool explicit_integrator, double t0, double tf){
   // Time 
   SX t("t");
 
@@ -170,6 +165,8 @@ FX create_integrator_sundials(bool explicit_integrator){
   integrator.setOption("abstol",1e-6);
   integrator.setOption("reltol",1e-6);
   integrator.setOption("stop_at_end",false);
+  integrator.setOption("t0",t0);
+  integrator.setOption("tf",tf);
 //  integrator.setOption("fsens_all_at_once",false);
   integrator.setOption("steps_per_checkpoint",100); // BUG: Too low number causes segfaults
 
@@ -195,9 +192,9 @@ int main(){
 
 
   // Create an integrator
-//  FX integrator = create_integrator_euler();
-//  FX integrator = create_integrator_sundials(true);
-   FX integrator = create_integrator_sundials(false);
+//  FX integrator = create_integrator_euler(0,DT);
+//  FX integrator = create_integrator_sundials(true,0,DT);
+   FX integrator = create_integrator_sundials(false,0,DT);
 
   // control for all segments
   MX U("U",nu); 
@@ -209,8 +206,6 @@ int main(){
   for(int k=0; k<nu; ++k){
     // Assemble the input
     vector<MX> input(INTEGRATOR_NUM_IN);
-    input[INTEGRATOR_T0] = T0; // k*DT
-    input[INTEGRATOR_TF] = TF; // (k+1)*DT
     input[INTEGRATOR_X0] = X;
     input[INTEGRATOR_P] = U[k];
 

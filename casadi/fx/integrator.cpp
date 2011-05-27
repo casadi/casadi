@@ -60,6 +60,14 @@ void Integrator::setStopTime(double tf){
   (*this)->setStopTime(tf);
 }
   
+void Integrator::setInitialTime(double t0){
+  (*this)->setInitialTime(t0);
+}
+
+void Integrator::setFinalTime(double tf){
+  (*this)->setFinalTime(tf);
+}
+  
 bool Integrator::checkNode() const{
   return dynamic_cast<const IntegratorInternal*>(get());
 }

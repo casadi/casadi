@@ -82,6 +82,12 @@ public:
   /// Get the Linear solver
   virtual LinearSolver getLinearSolver() = 0;
 
+  /// Set initial time
+  void setInitialTime(double t0);
+
+  /// Set final time
+  void setFinalTime(double tf);
+
   /// Number of states (including algebraic states and quadrature states)
   int nx_;
   
@@ -94,6 +100,9 @@ public:
   /// Current time
   double t_;
 
+  /// Integration horizon
+  double t0_, tf_;
+  
   // Do not integrate past the end point
   bool stop_at_end_;
   

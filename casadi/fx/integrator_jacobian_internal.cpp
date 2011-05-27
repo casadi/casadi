@@ -52,8 +52,6 @@ void IntegratorJacobianInternal::init(){
 
   // Set the dimensions
   input_.resize(INTEGRATOR_NUM_IN);
-  input(INTEGRATOR_T0)     = DMatrix(1,1,0); // initial time
-  input(INTEGRATOR_TF)     = DMatrix(1,1,0); // final time
   input(INTEGRATOR_X0)     = DMatrix(nx_,1,0); // initial state value
   input(INTEGRATOR_XP0)    = DMatrix(nx_,1,0); // initial state derivative value
   input(INTEGRATOR_P)      = DMatrix(np,1,0); // parameter
@@ -79,8 +77,6 @@ void IntegratorJacobianInternal::init(){
 void IntegratorJacobianInternal::evaluate(int nfdir, int nadir){
   
   // Pass arguments to the integrator
-  integrator_.setInput(input(INTEGRATOR_T0),INTEGRATOR_T0);
-  integrator_.setInput(input(INTEGRATOR_TF),INTEGRATOR_TF);
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
 
   // Initial value for the state
