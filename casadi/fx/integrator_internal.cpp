@@ -78,16 +78,14 @@ IntegratorInternal::IntegratorInternal(){
   
   nx_ = 0;
   np_ = 0;
-  nz_ = 0;
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
 }
 
-void IntegratorInternal::setDimensions(int nx, int np, int nz){
+void IntegratorInternal::setDimensions(int nx, int np){
   nx_ = nx;
   np_ = np;
-  nz_ = nz;
   
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
@@ -96,13 +94,11 @@ void IntegratorInternal::setDimensions(int nx, int np, int nz){
   input(INTEGRATOR_X0)  = DMatrix(nx_,1,0); // initial state value
   input(INTEGRATOR_XP0) = DMatrix(nx_,1,0); // initial state derivative value
   input(INTEGRATOR_P)   = DMatrix(np_,1,0); // parameter
-  input(INTEGRATOR_Z0)  = DMatrix(nz_,1,0); // initial algebraic statee
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
   output(INTEGRATOR_XF) = DMatrix(nx_,1,0);
   output(INTEGRATOR_XPF)= DMatrix(nx_,1,0);
-  output(INTEGRATOR_ZF) = DMatrix(nz_,1,0);
 }
 
 void IntegratorInternal::evaluate(int nfdir, int nadir){
@@ -161,7 +157,6 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   switch(iind){
     case INTEGRATOR_P: ns = np_; break;
     case INTEGRATOR_X0: ns = nx_; break;
-    case INTEGRATOR_Z0: ns = nz_; break;
     default: casadi_assert_message(false,"iind must be INTEGRATOR_P, INTEGRATOR_X0 or INTEGRATOR_Z0");
   }
   

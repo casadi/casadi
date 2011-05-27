@@ -179,13 +179,13 @@ class IdasInternal : public IntegratorInternal{
   FX q_;
 
   // N-vectors for the DAE integration
-  N_Vector  yz_, yP_, yQ_;
+  N_Vector  y_, yP_, yQ_;
 
   // N-vectors for the forward and adjoint sensitivities
-  std::vector<N_Vector> yzS_, yPS_, yQS_;
+  std::vector<N_Vector> yS_, yPS_, yQS_;
 
   // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> yzB_, yPB_, yBB_;
+  std::vector<N_Vector> yB_, yPB_, yBB_;
 
   // Which components are differential
   N_Vector id_;
@@ -193,7 +193,6 @@ class IdasInternal : public IntegratorInternal{
   // dimensions
   int ny_; // number of differential states
   int nq_; // number of quadratures
-  int nyz_; // number of states seen by IDA (differential states and algebraic states)
   
   bool is_init;
   
@@ -254,10 +253,10 @@ class IdasInternal : public IntegratorInternal{
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
   
   // Copy n-vectors to Matrix<double>
-  void copyNV(const Matrix<double>& x, const Matrix<double>& xp, const Matrix<double>& z, N_Vector& yz, N_Vector& yP, N_Vector& yQ);
+  void copyNV(const Matrix<double>& x, const Matrix<double>& xp, N_Vector& yz, N_Vector& yP, N_Vector& yQ);
   
   // Copy Matrix<double> to n-vectors
-  void copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x, Matrix<double>& xp, Matrix<double>& z);
+  void copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x, Matrix<double>& xp);
   
   // Get the initial state
   void getInitialState();

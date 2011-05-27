@@ -28,7 +28,7 @@ class Integrationtests(casadiTestCase):
     tend = MX("tend")
     q0   = MX("q0")
     par  = MX("p")
-    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qend=integrator([t0,tend,q0,par,MX()])
     qe=MXFunction([tend,q0,par],[qend])
     qe.init()
     self.integrator = integrator
@@ -117,7 +117,7 @@ class Integrationtests(casadiTestCase):
     integrator.setOption("reltol",1e-12)
     integrator.init()
 
-    qend = integrator([MX(0),MX(1),var,MX(),MX(),MX()])
+    qend = integrator([MX(0),MX(1),var,MX(),MX()])
 
     f = MXFunction([var],[qend[0]])
     f.init()
@@ -216,7 +216,7 @@ class Integrationtests(casadiTestCase):
     tend = MX(te)
     q0   = MX("q0",3,1)
     par  = MX("p",1,1)
-    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qend=integrator([t0,tend,q0,par,MX()])
     qe=MXFunction([q0,par],[qend])
     qe.init()
 
@@ -242,7 +242,7 @@ class Integrationtests(casadiTestCase):
     tend = MX(te)
     q0   = MX("q0",3,1)
     par  = MX("p",1,1)
-    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qend=integrator([t0,tend,q0,par,MX()])
     qe=MXFunction([q0,par],[qend])
     qe.init()
 
@@ -265,7 +265,7 @@ class Integrationtests(casadiTestCase):
     J.input(INTEGRATOR_TF).set([num['tend']])
     J.input(INTEGRATOR_X0).set([num['q0']])
     J.input(INTEGRATOR_P).set([num['p']])
-    J.adjSeed(0).set([1])
+    J.adjSeed(INTEGRATOR_XF).set([1])
     # Evaluate
     J.evaluate(0,1)
       
@@ -292,7 +292,7 @@ class Integrationtests(casadiTestCase):
     tend = MX("tend")
     q0   = MX("q0")
     par  = MX("p")
-    qend=integrator([t0,tend,q0,par,MX(),MX()])
+    qend=integrator([t0,tend,q0,par,MX()])
     qe=MXFunction([tend,q0,par],[qend])
     qe.init()
     J=qe.jacobian(2)
@@ -339,8 +339,7 @@ class Integrationtests(casadiTestCase):
     q0=MX("q0")
     p=MX("p")
     dq0=MX("dq0")
-    d=MX("d",0,0)
-    Ji = MXFunction([q0,p,dq0,d],[J.call([MX(0),MX(num['tend']),q0,p,dq0,d])[0]])
+    Ji = MXFunction([q0,p,dq0],[J.call([MX(0),MX(num['tend']),q0,p,dq0])[0]])
     Ji.init()
     H=Jacobian(Ji,1)
     H.setOption("ad_mode","adjoint")
@@ -439,19 +438,19 @@ class Integrationtests(casadiTestCase):
     tend = MX(te)
     q0   = MX("q0",3,1)
     par  = MX("p",9,1)
-    qend=integrator([t0,tend,q0,par,MX(3,1),MX()])
+    qend=integrator([t0,tend,q0,par,MX(3,1)])
     qe=MXFunction([q0,par],[qend])
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([t0,tend,q0,par,MX(3,1),MX()])[0]
+    qendJ=qendJ.call([t0,tend,q0,par,MX(3,1)])[0]
 
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
     qendJ2=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ2.init()
-    qendJ2=qendJ2.call([t0,tend,q0,par,MX(3,1),MX()])[0]
+    qendJ2=qendJ2.call([t0,tend,q0,par,MX(3,1)])[0]
 
     qeJ2=MXFunction([q0,par],[qendJ2])
     qeJ2.init()
@@ -507,12 +506,12 @@ class Integrationtests(casadiTestCase):
     tend = MX(te)
     q0   = MX("q0",2,1)
     par  = MX("p",3,1)
-    qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
+    qend=integrator([t0,tend,q0,par,MX(2,1)])
     qe=MXFunction([q0,par],[qend])
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1),MX()])[0]
+    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1)])[0]
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -556,12 +555,12 @@ class Integrationtests(casadiTestCase):
     tend = MX(te)
     q0   = MX("q0",2,1)
     par  = MX("p",1,1)
-    qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
+    qend=integrator([t0,tend,q0,par,MX(2,1)])
     qe=MXFunction([q0,par],[qend])
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1),MX()])[0]
+    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1)])[0]
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -633,7 +632,7 @@ class Integrationtests(casadiTestCase):
     
     qendJ=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1),MX()])[0]
+    qendJ=qendJ.call([t0,tend,q0,par,MX(2,1)])[0]
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 

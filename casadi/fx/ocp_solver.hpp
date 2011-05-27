@@ -33,13 +33,12 @@ namespace CasADi{
   enum OCPInput{
     /// Time grid
     OCP_T,   
-    /// Differential state lower bound                             
+    /// State lower bound                             
     OCP_LBX,
-    /// Differential state upper bound  
+    /// DState upper bound  
     OCP_UBX, 
-    /// Differential state initial guess  
+    /// State initial guess  
     OCP_X_INIT,    
-    OCP_LBZ, OCP_UBZ, OCP_Z_INIT,     
     OCP_LBXP, OCP_UBXP, OCP_XP_INIT,   // State deriatives with bounds
     OCP_LBU, OCP_UBU, OCP_U_INIT,     // Controls with bounds and initial guess
     OCP_LBP, OCP_UBP, OCP_P_INIT,    // Parameters with bounds and initial guess
@@ -52,7 +51,6 @@ namespace CasADi{
   enum OCPOutput{
     OCP_X_OPT, 
     OCP_U_OPT, 
-    OCP_Z_OPT, 
     OCP_XP_OPT, 
     OCP_NUM_OUT
   };

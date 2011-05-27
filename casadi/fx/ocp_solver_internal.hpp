@@ -78,11 +78,8 @@ class OCPSolverInternal : public FXInternal{
     /// Number of grid points
     int nk_;
 
-    /// Number of differential states
+    /// Number of states
     int nx_;
-
-    /// Number of algebraic states
-    int nz_;
 
     /// Number of parameters
     int np_;

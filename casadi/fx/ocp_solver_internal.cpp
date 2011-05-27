@@ -50,9 +50,6 @@ void OCPSolverInternal::init(){
   // Get the number of differential states
   nx_ = ffcn_.input(INTEGRATOR_X0).size();
 
-  // Get the number of algebraic states
-  nz_ = ffcn_.input(INTEGRATOR_Z0).size();
-
   // Get the number of parameters
   np_ = getOption("number_of_parameters");
 
@@ -69,7 +66,6 @@ void OCPSolverInternal::init(){
   setNumInputs(OCP_NUM_IN);
   input(OCP_T) = Matrix<double>(nk_+1,1,0);
   input(OCP_LBX) = input(OCP_UBX) = input(OCP_X_INIT) = Matrix<double>(nx_,nk_+1,0);
-  input(OCP_LBZ) = input(OCP_UBZ) = input(OCP_Z_INIT) = Matrix<double>(nz_,nk_+1,0);
   input(OCP_LBXP) = input(OCP_UBXP) = Matrix<double>(nx_,nk_+1,0);
   input(OCP_LBU) = input(OCP_UBU) = input(OCP_U_INIT) = Matrix<double>(nu_,nk_,0);
   input(OCP_LBP) = input(OCP_UBP) = input(OCP_P_INIT) = Matrix<double>(np_,1,0);
@@ -83,7 +79,6 @@ void OCPSolverInternal::init(){
   // Call the init function of the base class
   FXInternal::init();
   output(OCP_X_OPT) = input(OCP_X_INIT);
-  output(OCP_Z_OPT) = input(OCP_Z_INIT);
   output(OCP_U_OPT) = input(OCP_U_INIT);
   output(OCP_XP_OPT) = input(OCP_XP_INIT);
 }

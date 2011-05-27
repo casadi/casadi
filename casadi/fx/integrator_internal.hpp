@@ -82,14 +82,11 @@ public:
   /// Get the Linear solver
   virtual LinearSolver getLinearSolver() = 0;
 
-  /// Number of differential states (including quadrature states)
+  /// Number of states (including algebraic states and quadrature states)
   int nx_;
   
   /// Number of parameters
   int np_;
-  
-  /// Number of algebraic states
-  int nz_;
   
   /// Number of right hand sides
   int nrhs_;
@@ -111,7 +108,7 @@ public:
   //@}
   
   // Set dimensions
-  void setDimensions(int nx, int np, int nz);
+  void setDimensions(int nx, int np);
     
   // Get the mapping of the states for the augmented DAE
   virtual std::vector<int> jacmap(int ns) = 0;

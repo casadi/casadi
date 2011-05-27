@@ -82,7 +82,7 @@ class OCPtests(casadiTestCase):
     tend = MX(te)
     q0   = vertcat([var[0],par])
     par  = var[1]
-    qend=integrator([t0,tend,q0,par,MX(2,1),MX()])
+    qend=integrator([t0,tend,q0,par,MX(2,1)])
     
     parc = MX(0)
     
@@ -139,7 +139,7 @@ class OCPtests(casadiTestCase):
     tend = MX(te)
     q0   = vertcat([var[0],par])
     parl  = var[1]
-    qend=integrator([t0,tend,q0,parl,MX(2,1),MX()])
+    qend=integrator([t0,tend,q0,parl,MX(2,1)])
     
     parc = MX(dy0)
     

@@ -57,29 +57,26 @@ enum IntegratorInput{
   INTEGRATOR_T0, 
   /** Final time tf (dimension 1-by-1) */
   INTEGRATOR_TF,
-  /** Differential State at t0  (dimension nx-by-1) */
+  /** Differential or algebraic state at t0  (dimension nx-by-1) */
   INTEGRATOR_X0, 
   /** Parameters p  (dimension np-by-1) */
   INTEGRATOR_P,  
-  /** Differential state derivative at t0  (dimension nx-by-1)
+  /** State derivative at t0  (dimension nx-by-1)
   * This input may be changed during an IDASIntegrator::evaluate()
   */
   INTEGRATOR_XP0, 
-  /** Algebraic state at t0  (dimension nz-by-1) 
-  * This input may be changed during an IDASIntegrator::evaluate()
-  */
-  INTEGRATOR_Z0, 
+  /** Number of input arguments of an integrator */
   INTEGRATOR_NUM_IN};
 
 /// Output arguments of an integrator
 enum IntegratorOutput{
- /**  Differential state at tf */
+ /**  State at tf */
  INTEGRATOR_XF, 
- /**  Differential state derivative at tf */
+ /**  State derivative at tf */
  INTEGRATOR_XPF, 
-  /** Algebraic state at tf*/
- INTEGRATOR_ZF, 
- INTEGRATOR_NUM_OUT};
+  /** Number of output arguments of an integrator */
+ INTEGRATOR_NUM_OUT
+};
 
 /// Forward declaration of internal class
 class IntegratorInternal;
@@ -103,15 +100,13 @@ class IntegratorInternal;
   inputs:
   0: Initial time t0 (dimension 1-by-1)
   1: Final time tf (dimension 1-by-1)
-  2: Differential state at t0  (dimension nx-by-1)
-  3: p  (dimension np-by-1)
-  4: Differential state derivative at t0  (dimension nx-by-1)
-  5: Algebraic state at t0  (dimension nz-by-1)
+  2: State at t0  (dimension nx-by-1)
+  3: Parameter  (dimension np-by-1)
+  4: State derivative at t0  (dimension nx-by-1)
   
   outputs:
-  0: Differential state at tf
-  1: Differential state derivative at tf
-  2: Algebraic state at tf
+  0: State at tf
+  1: State derivative at tf
 
 
   \author Joel Andersson

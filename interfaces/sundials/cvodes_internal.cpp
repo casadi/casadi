@@ -102,7 +102,7 @@ void CVodesInternal::init(){
   int np = f_.input(ODE_P).numel();
   
   // Set dimensions
-  setDimensions(nx,np,0);
+  setDimensions(nx,np);
   
   ny_ = f_.output().numel();
   nq_ = q_.isNull() ? 0 : q_.output().numel();

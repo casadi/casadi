@@ -68,7 +68,7 @@ void MultipleShootingInternal::init(){
   int v_offset=np_; 
   
   // Disretized variables for each shooting node
-  vector<MX> X(nk_+1), Z(nk_), U(nk_), XP(nk_);
+  vector<MX> X(nk_+1), U(nk_), XP(nk_);
   for(int k=0; k<=nk_; ++k){ // interior nodes
     // Local state
     X[k] = V[range(v_offset,v_offset+nx_)];
@@ -93,7 +93,6 @@ void MultipleShootingInternal::init(){
     int_in[k][INTEGRATOR_TF] = input(OCP_T)[1]; // should be k+1
     int_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
     int_in[k][INTEGRATOR_X0] = X[k];
-    int_in[k][INTEGRATOR_Z0] = Z[k];
     int_in[k][INTEGRATOR_XP0] = XP[k];
   }
 
