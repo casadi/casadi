@@ -99,10 +99,10 @@ void MultipleShootingInternal::init(){
   // Input to the parallel function evaluation
   vector<vector<MX> > fcn_in(nk_);
   for(int k=0; k<nk_; ++k){
-    fcn_in[k].resize(ODE_NUM_IN);
-    fcn_in[k][ODE_T] = input(OCP_T)[k];
-    fcn_in[k][ODE_P] = vertcat(P,U[k]);
-    fcn_in[k][ODE_Y] = X[k];
+    fcn_in[k].resize(DAE_NUM_IN);
+    fcn_in[k][DAE_T] = input(OCP_T)[k];
+    fcn_in[k][DAE_P] = vertcat(P,U[k]);
+    fcn_in[k][DAE_Y] = X[k];
 /*  fcn_in[k][DAE_Z] = Z[k];
     fcn_in[k][DAE_YDOT] = XP[k];*/
   }
@@ -190,11 +190,11 @@ void MultipleShootingInternal::init(){
   vector<vector<MX> > pJCX_out, pJCP_out;
   MX e_JCX, e_JCP;
   if(path_constraints){
-    FX IjacCX = cfcn_.jacobian(ODE_Y);
+    FX IjacCX = cfcn_.jacobian(DAE_Y);
     IjacCX.init();
     pJCX_out = IjacCX.call(fcn_in,paropt);
     
-    FX IjacCP = cfcn_.jacobian(ODE_P);
+    FX IjacCP = cfcn_.jacobian(DAE_P);
     IjacCP.init();
     pJCP_out = IjacCP.call(fcn_in,paropt);
     

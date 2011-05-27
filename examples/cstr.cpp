@@ -72,11 +72,11 @@ int main(){
   Integrator integrator;
 
   // Create an implicit function residual
-  vector<Matrix<SX> > impres_in(ODE_NUM_IN+1);
+  vector<Matrix<SX> > impres_in(DAE_NUM_IN+1);
   impres_in[0] = xdot;
-  impres_in[1+ODE_T] = t;
-  impres_in[1+ODE_Y] = x;
-  impres_in[1+ODE_P] = u;
+  impres_in[1+DAE_T] = t;
+  impres_in[1+DAE_Y] = x;
+  impres_in[1+DAE_P] = u;
   SXFunction impres(impres_in,ocp.implicit_fcn_);
   
   // Create an implicit function (KINSOL)

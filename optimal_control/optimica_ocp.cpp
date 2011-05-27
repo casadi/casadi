@@ -649,10 +649,10 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
       Matrix<SX> ode_elim = evaluateConstants(ode);
       
       // ODE right hand side function
-      vector<SXMatrix> ode_in(ODE_NUM_IN);
-      ode_in[ODE_T] = t_;
-      ode_in[ODE_Y] = var(x_);
-      ode_in[ODE_P] = var(u_);
+      vector<SXMatrix> ode_in(DAE_NUM_IN);
+      ode_in[DAE_T] = t_;
+      ode_in[DAE_Y] = var(x_);
+      ode_in[DAE_P] = var(u_);
       oderhs_ = SXFunction(ode_in,ode_elim);
 
       // Dependency function
@@ -663,7 +663,7 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
         quadrhs_ = SXFunction(ode_in,lterm[0]);
         
         // ODE right hand side with lterm
-        append(ode_in[ODE_Y],symbolic("lterm"));
+        append(ode_in[DAE_Y],symbolic("lterm"));
         append(ode_elim,SXMatrix(lterm[0]));
         oderhs_with_lterm_ = SXFunction(ode_in,ode_elim);
       }
@@ -676,19 +676,19 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
     casadi_assert(0);
     
 //     # Create an implicit function residual
-//     impres_in = (ODE_NUM_IN+1) * [[]]
+//     impres_in = (DAE_NUM_IN+1) * [[]]
 //     impres_in[0] = xdot+z
-//     impres_in[1+ODE_T] = t
-//     impres_in[1+ODE_Y] = x
-//     impres_in[1+ODE_P] = u
+//     impres_in[1+DAE_T] = t
+//     impres_in[1+DAE_Y] = x
+//     impres_in[1+DAE_P] = u
 //     impres = SXFunction(impres_in,[ocp.implicit_fcn_])
 //     impres.setOption("number_of_fwd_dir",len(x)+1)
 // 
 //     impres.init()
 //     impres.setInput(xdot0+z0, 0)
-//     impres.setInput(0., 1+ODE_T)
-//     impres.setInput(x0, 1+ODE_Y)
-//     impres.setInput(u0, 1+ODE_P)
+//     impres.setInput(0., 1+DAE_T)
+//     impres.setInput(x0, 1+DAE_Y)
+//     impres.setInput(u0, 1+DAE_P)
 //     impres.evaluate()
 // 
 //     # Create an implicit function (KINSOL)
@@ -702,27 +702,27 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
 //     impsolver.setOption("number_of_adj_dir",0)
 //     impsolver.init()
 // 
-//     impsolver.setInput(0., ODE_T)
-//     impsolver.setInput(x0, ODE_Y)
-//     impsolver.setInput(u0, ODE_P)
+//     impsolver.setInput(0., DAE_T)
+//     impsolver.setInput(x0, DAE_Y)
+//     impsolver.setInput(u0, DAE_P)
 //     impsolver.output().set(xdot0+z0)
 //     impsolver.evaluate(1,0)
 //     #print "implicit function residual", impsolver.output()
 // 
 //     # Create the ODE residual
-//     ode_in_mx = ODE_NUM_IN * [[]]
-//     ode_in_mx[ODE_T] = MX("T")
-//     ode_in_mx[ODE_Y] = MX("X",len(x))
-//     ode_in_mx[ODE_P] = MX("U",len(u))
+//     ode_in_mx = DAE_NUM_IN * [[]]
+//     ode_in_mx[DAE_T] = MX("T")
+//     ode_in_mx[DAE_Y] = MX("X",len(x))
+//     ode_in_mx[DAE_P] = MX("U",len(u))
 //     [xdot_z] = impsolver.call(ode_in_mx)
 //     ode = MXFunction(ode_in_mx,[xdot_z[0:len(x)]])
 //     ode.setOption("number_of_fwd_dir",len(x)+1)
 // 
 //     # ODE quadrature function
-//     ode_in = ODE_NUM_IN * [[]]
-//     ode_in[ODE_T] = t
-//     ode_in[ODE_Y] = x
-//     ode_in[ODE_P] = u
+//     ode_in = DAE_NUM_IN * [[]]
+//     ode_in[DAE_T] = t
+//     ode_in[DAE_Y] = x
+//     ode_in[DAE_P] = u
 //     ode_lterm = SXFunction(ode_in,[[ocp.lterm[0]/1e3]])
 //     ode_lterm.setOption("number_of_fwd_dir",len(x)+1)
       
@@ -756,11 +756,11 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
   costfcn_ = SXFunction(xf, xf.data().back());
 
   // Path constraint function
-  vector<SXMatrix> cfcn_in(ODE_NUM_IN);
-  cfcn_in[ODE_T] = t_;
-  cfcn_in[ODE_Y] = var(x_);
-  append(cfcn_in[ODE_Y],symbolic("lterm")); // FIXME
-  cfcn_in[ODE_P] = var(u_);
+  vector<SXMatrix> cfcn_in(DAE_NUM_IN);
+  cfcn_in[DAE_T] = t_;
+  cfcn_in[DAE_Y] = var(x_);
+  append(cfcn_in[DAE_Y],symbolic("lterm")); // FIXME
+  cfcn_in[DAE_P] = var(u_);
   pathfcn_ = SXFunction(cfcn_in,path_fcn_);
 }
 
@@ -944,9 +944,9 @@ std::vector<std::string> VariableTree::getNames() const{
 void OCP::findConsistentIC(){
   // Evaluate the ODE functions
   oderhs_.init();
-  oderhs_.setInput(0.0,ODE_T);
-  oderhs_.setInput(getStart(x_,true),ODE_Y);
-  oderhs_.setInput(getStart(u_,true),ODE_P);
+  oderhs_.setInput(0.0,DAE_T);
+  oderhs_.setInput(getStart(x_,true),DAE_Y);
+  oderhs_.setInput(getStart(u_,true),DAE_P);
   oderhs_.evaluate();
   
   // Save to the variables
@@ -957,9 +957,9 @@ void OCP::findConsistentIC(){
   
   // Evaluate the output functions
   output_fcn_.init();
-  output_fcn_.setInput(0.0,ODE_T);
-  output_fcn_.setInput(getStart(x_,true),ODE_Y);
-  output_fcn_.setInput(getStart(u_,true),ODE_P);
+  output_fcn_.setInput(0.0,DAE_T);
+  output_fcn_.setInput(getStart(x_,true),DAE_Y);
+  output_fcn_.setInput(getStart(u_,true),DAE_P);
   output_fcn_.evaluate();
   
   // Save to the variables

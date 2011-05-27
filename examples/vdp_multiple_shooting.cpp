@@ -38,10 +38,10 @@ int main(){
   f[2] = x*x + y*y + u*u;
   
   //ODE right hand side function
-  vector<SXMatrix> rhs_in(ODE_NUM_IN);
-  rhs_in[ODE_T] = t;
-  rhs_in[ODE_Y] = xx;
-  rhs_in[ODE_P] = u;
+  vector<SXMatrix> rhs_in(DAE_NUM_IN);
+  rhs_in[DAE_T] = t;
+  rhs_in[DAE_Y] = xx;
+  rhs_in[DAE_P] = u;
   SXFunction rhs(rhs_in,f);
   
   // DAE residual

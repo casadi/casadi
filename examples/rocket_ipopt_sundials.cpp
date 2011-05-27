@@ -122,10 +122,10 @@ FX create_integrator_sundials(bool explicit_integrator){
   if(explicit_integrator){
     
     // Input of the ode rhs
-    vector<vector<SX> > ffcn_in(ODE_NUM_IN);
-    ffcn_in[ODE_T].push_back(t);
-    ffcn_in[ODE_Y] = y;
-    ffcn_in[ODE_P].push_back(u);
+    vector<vector<SX> > ffcn_in(DAE_NUM_IN);
+    ffcn_in[DAE_T].push_back(t);
+    ffcn_in[DAE_Y] = y;
+    ffcn_in[DAE_P].push_back(u);
   
     // ODE right hand side
     SXFunction ffcn(ffcn_in,rhs);

@@ -29,27 +29,27 @@
 
 namespace CasADi{
 
-/// Input arguments of an explicit ODE right hand side
-enum ODEInput{
-  /** Time. Must be 1-by-1 */
-  ODE_T,
-  /** State vector (matrix). Should have same amount of non-zeros as ODEOutput:ODE_RHS */
-  ODE_Y,
+/// Input arguments of an ODE/DAE function
+enum DAEInput{
+  /** Time. (1-by-1) */
+  DAE_T,
+  /** State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES */
+  DAE_Y,
   /** Parameter vector (matrix). */
-  ODE_P,
-  ODE_NUM_IN};
+  DAE_P,
+  /** State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES */
+  DAE_YDOT,
+  /** Number of arguments. */
+  DAE_NUM_IN
+};
 
-/// Output arguments of an explicit ODE right hand side
-enum ODEOutput{
-/** Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y */
-ODE_RHS,
-ODE_NUM_OUT};
-
-/// Input arguments of an DAE residual function
-enum DAEInput{DAE_T, DAE_Y, DAE_YDOT, DAE_P, DAE_NUM_IN};
-
-/// Output arguments of an DAE residual function
-enum DAEOutput{DAE_RES, DAE_NUM_OUT};
+/// Output arguments of an ODE/DAE residual function
+enum DAEOutput{
+  /** Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y */
+  DAE_RES,
+  /** Number of arguments. */
+  DAE_NUM_OUT
+};
 
 /// Input arguments of an integrator
 enum IntegratorInput{

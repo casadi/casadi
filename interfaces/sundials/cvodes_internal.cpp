@@ -84,12 +84,12 @@ CVodesInternal::~CVodesInternal(){
 void CVodesInternal::init(){
   // Init ODE rhs function and quadrature functions
   f_.init();
-  casadi_assert(f_.getNumInputs()==ODE_NUM_IN);
-  casadi_assert(f_.getNumOutputs()==ODE_NUM_OUT);
+  casadi_assert(f_.getNumInputs()==DAE_NUM_IN);
+  casadi_assert(f_.getNumOutputs()==DAE_NUM_OUT);
   if(!q_.isNull()){
     q_.init();
-    casadi_assert(q_.getNumInputs()==ODE_NUM_IN);
-    casadi_assert(q_.getNumOutputs()==ODE_NUM_OUT);
+    casadi_assert(q_.getNumInputs()==DAE_NUM_IN);
+    casadi_assert(q_.getNumOutputs()==DAE_NUM_OUT);
   }
 
   // Number of states
@@ -99,7 +99,7 @@ void CVodesInternal::init(){
   if(!q_.isNull()) nx += q_.output().numel();
 
   // Number of parameters
-  int np = f_.input(ODE_P).numel();
+  int np = f_.input(DAE_P).numel();
   
   // Set dimensions
   setDimensions(nx,np);
@@ -108,20 +108,20 @@ void CVodesInternal::init(){
   nq_ = q_.isNull() ? 0 : q_.output().numel();
   
   // We only allow for 0-D time
-  if (f_.input(ODE_T).numel()!=1) {
+  if (f_.input(DAE_T).numel()!=1) {
       stringstream ss;
-      ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(ODE_T).size1() << 'x' << f_.input(ODE_T).size2() << ")";
+      ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")";
       throw CasadiException(ss.str());
   }
   
   // ODE right hand side must be a dense matrix
-  casadi_assert_message(f_.output(ODE_RHS).dense(),"ODE right hand side must be dense: reformulate the problem");
+  casadi_assert_message(f_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
   
   // States and RHS should match 
-  if (f_.output(ODE_RHS).size()!=f_.input(ODE_Y).size()) {
+  if (f_.output(DAE_RES).size()!=f_.input(DAE_Y).size()) {
       stringstream ss;
-      ss << "IntegratorInternal: rhs of ODE is (" <<  f_.output(ODE_RHS).size1() << 'x' << f_.output(ODE_RHS).size2() << ") - " << f_.output(ODE_RHS).size() << " non-zeros" << std::endl;
-      ss << "              ODE state matrix is (" <<  f_.input(ODE_Y).size1() << 'x' << f_.input(ODE_Y).size2() << ") - " << f_.input(ODE_Y).size() << " non-zeros" << std::endl;
+      ss << "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" << std::endl;
+      ss << "              ODE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << std::endl;
       ss << "Mismatch between number of non-zeros" << std::endl;
       throw CasadiException(ss.str());
   }
@@ -137,13 +137,13 @@ void CVodesInternal::init(){
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration
       SX gamma("gamma");
-      SXMatrix jac = eyeSX(ny_) - gamma * f.jac(ODE_Y,ODE_RHS);
+      SXMatrix jac = eyeSX(ny_) - gamma * f.jac(DAE_Y,DAE_RES);
       
       // Jacobian function
       vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
-      jac_in[M_T] = f->inputv.at(ODE_T).data();
-      jac_in[M_Y] = f->inputv.at(ODE_Y).data();
-      jac_in[M_P] = f->inputv.at(ODE_P).data();
+      jac_in[M_T] = f->inputv.at(DAE_T).data();
+      jac_in[M_Y] = f->inputv.at(DAE_Y).data();
+      jac_in[M_P] = f->inputv.at(DAE_P).data();
       jac_in[M_GAMMA] = vector<SX>(1,gamma);
       SXFunction M(jac_in,jac);
       
@@ -213,7 +213,7 @@ void CVodesInternal::init(){
     if(flag!=CV_SUCCESS) cvodes_error("CVDense",flag);
     if(exact_jacobian_){
       // Create jacobian if it does not exist
-      if(jac_f_.isNull()) jac_f_ = f_.jacobian(ODE_Y,ODE_RHS);
+      if(jac_f_.isNull()) jac_f_ = f_.jacobian(DAE_Y,DAE_RES);
       jac_f_.init();
       
       // Pass to CVodes
@@ -500,9 +500,9 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   time1 = clock();
 
   // Pass input
-  f_.setInput(t,ODE_T);
-  f_.setInput(y,ODE_Y);
-  f_.setInput(input(INTEGRATOR_P),ODE_P);
+  f_.setInput(t,DAE_T);
+  f_.setInput(y,DAE_Y);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Evaluate
   f_.evaluate();
@@ -777,17 +777,17 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
   time1 = clock();
   
     // Pass input
-  f_.setInput(t,ODE_T);
-  f_.setInput(NV_DATA_S(y),ODE_Y);
-  f_.setInput(input(INTEGRATOR_P),ODE_P);
+  f_.setInput(t,DAE_T);
+  f_.setInput(NV_DATA_S(y),DAE_Y);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
    // Calculate the forward sensitivities, nfdir_f_ directions at a time
    for(int j=0; j<nfdir_; j += nfdir_f_){
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
        // Pass forward seeds 
-       f_.setFwdSeed(0.0,ODE_T,dir);
-       f_.setFwdSeed(NV_DATA_S(yS[j+dir]),ODE_Y,dir);
-       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),ODE_P,dir);
+       f_.setFwdSeed(0.0,DAE_T,dir);
+       f_.setFwdSeed(NV_DATA_S(yS[j+dir]),DAE_Y,dir);
+       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
      }
 
      // Evaluate the AD forward algorithm
@@ -795,7 +795,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
       
      // Get the output seeds
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       f_.getFwdSens(NV_DATA_S(ySdot[j+dir]),ODE_RHS,dir);
+       f_.getFwdSens(NV_DATA_S(ySdot[j+dir]),DAE_RES,dir);
      }
    }
   
@@ -820,14 +820,14 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, 
   casadi_assert(Ns==nfdir_);
   
     // Pass input
-  f_.setInput(t,ODE_T);
-  f_.setInput(NV_DATA_S(y),ODE_Y);
-  f_.setInput(input(INTEGRATOR_P),ODE_P);
+  f_.setInput(t,DAE_T);
+  f_.setInput(NV_DATA_S(y),DAE_Y);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass forward seeds
-  f_.setFwdSeed(0.0,ODE_T);
-  f_.setFwdSeed(NV_DATA_S(yS),ODE_Y);
-  f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),ODE_P);
+  f_.setFwdSeed(0.0,DAE_T);
+  f_.setFwdSeed(NV_DATA_S(yS),DAE_Y);
+  f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
     
   // Evaluate the AD forward algorithm
   f_.evaluate(1,0);
@@ -862,9 +862,9 @@ try{
 
 void CVodesInternal::rhsQ(double t, const double* yy, double* rhsQ){
 // Pass input
-  q_.setInput(t,ODE_T);
-  q_.setInput(yy,ODE_Y);
-  q_.setInput(input(INTEGRATOR_P),ODE_P);
+  q_.setInput(t,DAE_T);
+  q_.setInput(yy,DAE_Y);
+  q_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Evaluate
   q_.evaluate();
@@ -877,15 +877,15 @@ void CVodesInternal::rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector 
   casadi_assert(Ns==nfdir_);
   
   // Pass input
-  q_.setInput(t,ODE_T);
-  q_.setInput(NV_DATA_S(y),ODE_Y);
-  q_.setInput(input(INTEGRATOR_P),ODE_P);
+  q_.setInput(t,DAE_T);
+  q_.setInput(NV_DATA_S(y),DAE_Y);
+  q_.setInput(input(INTEGRATOR_P),DAE_P);
 
   for(int i=0; i<nfdir_; ++i){
     // Pass forward seeds
-    q_.setFwdSeed(0.0,ODE_T);
-    q_.setFwdSeed(NV_DATA_S(yS[i]),ODE_Y);
-    q_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),ODE_P);
+    q_.setFwdSeed(0.0,DAE_T);
+    q_.setFwdSeed(NV_DATA_S(yS[i]),DAE_Y);
+    q_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
 
     // Evaluate the AD forward algorithm
     q_.evaluate(1,0);
@@ -918,51 +918,51 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   }
     
   // Pass input
-  f_.setInput(t,ODE_T);
-  f_.setInput(y,ODE_Y);
-  f_.setInput(input(INTEGRATOR_P),ODE_P);
+  f_.setInput(t,DAE_T);
+  f_.setInput(y,DAE_Y);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass adjoint seeds
-  f_.setAdjSeed(yB,ODE_RHS);
+  f_.setAdjSeed(yB,DAE_RES);
 
   if(monitor_rhsB_){
-    cout << "t       = " << f_.input(ODE_T) << endl;
-    cout << "y       = " << f_.input(ODE_Y) << endl;
-    cout << "p       = " << f_.input(ODE_P) << endl;
-    cout << "aseed   = " << f_.adjSeed(ODE_RHS) << endl;
+    cout << "t       = " << f_.input(DAE_T) << endl;
+    cout << "y       = " << f_.input(DAE_Y) << endl;
+    cout << "p       = " << f_.input(DAE_P) << endl;
+    cout << "aseed   = " << f_.adjSeed(DAE_RES) << endl;
   }
   
   // Evaluate and tape
   f_.evaluate(0,1);
 
   if(monitor_rhsB_){
-    cout << "f_asens = " << f_.adjSens(ODE_Y) << endl;
+    cout << "f_asens = " << f_.adjSens(DAE_Y) << endl;
   }
   
   // Save to output
-  const vector<double>& fres = f_.adjSens(ODE_Y).data();
+  const vector<double>& fres = f_.adjSens(DAE_Y).data();
   for(int i=0; i<ny_; ++i)
     yBdot[i] = -fres[i];
 
   // If quadratures are included
   if(nq_>0){
     // Pass input to quadratures
-    q_.setInput(t,ODE_T);
-    q_.setInput(y,ODE_Y);
-    q_.setInput(input(INTEGRATOR_P),ODE_P);
+    q_.setInput(t,DAE_T);
+    q_.setInput(y,DAE_Y);
+    q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],ODE_RHS);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
 
     if(monitor_rhsB_){
-      cout << "q_asens = " << q_.adjSens(ODE_Y) << endl;
+      cout << "q_asens = " << q_.adjSens(DAE_Y) << endl;
     }
     
     // Get the adjoint sensitivities
-    const vector<double>& qres = q_.adjSens(ODE_Y).data();
+    const vector<double>& qres = q_.adjSens(DAE_Y).data();
     
     // Copy to result
     for(int i=0; i<ny_; ++i)
@@ -1001,34 +1001,34 @@ int CVodesInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector qB
 
 void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* qBdot){
   // Pass input
-  f_.setInput(t,ODE_T);
-  f_.setInput(y,ODE_Y);
-  f_.setInput(input(INTEGRATOR_P),ODE_P);
+  f_.setInput(t,DAE_T);
+  f_.setInput(y,DAE_Y);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass adjoint seeds
-  f_.setAdjSeed(yB,ODE_RHS);
+  f_.setAdjSeed(yB,DAE_RES);
 
   // Evaluate
   f_.evaluate(0,1);
 
   // Save to output
-  f_.getAdjSens(qBdot,ODE_P);
+  f_.getAdjSens(qBdot,DAE_P);
   
   // If quadratures are included
   if(nq_>0){
     // Pass input to quadratures
-    q_.setInput(t,ODE_T);
-    q_.setInput(y,ODE_Y);
-    q_.setInput(input(INTEGRATOR_P),ODE_P);
+    q_.setInput(t,DAE_T);
+    q_.setInput(y,DAE_Y);
+    q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],ODE_RHS);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& qres = q_.adjSens(ODE_P).data();
+    const vector<double>& qres = q_.adjSens(DAE_P).data();
     
     // Copy to result
     for(int i=0; i<np_; ++i){
@@ -1045,7 +1045,7 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    casadi_assert(this_->f_.fwdSens(ODE_RHS).size() == this_->ny_);
+    casadi_assert(this_->f_.fwdSens(DAE_RES).size() == this_->ny_);
     casadi_assert(NV_LENGTH_S(v) == this_->ny_);
     casadi_assert(NV_LENGTH_S(Jv) == this_->ny_);
     this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(y),NV_DATA_S(fy),NV_DATA_S(tmp));
@@ -1061,20 +1061,20 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   time1 = clock();
 
   // Pass input
-  f_.setInput(t,ODE_T);
-  f_.setInput(y,ODE_Y);
-  f_.setInput(input(INTEGRATOR_P),ODE_P);
+  f_.setInput(t,DAE_T);
+  f_.setInput(y,DAE_Y);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass input seeds
-  f_.setFwdSeed(0.0,ODE_T);
-  f_.setFwdSeed(v,ODE_Y);
-  fill_n(f_.fwdSeed(ODE_P).begin(),np_,0.0);
+  f_.setFwdSeed(0.0,DAE_T);
+  f_.setFwdSeed(v,DAE_Y);
+  fill_n(f_.fwdSeed(DAE_P).begin(),np_,0.0);
   
   // Evaluate
   f_.evaluate(1,0);
 
   // Get the output seeds
-  f_.getFwdSens(Jv,ODE_RHS);
+  f_.getFwdSens(Jv,DAE_RES);
   
   // Log time duration
   time2 = clock();
@@ -1098,9 +1098,9 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,ODE_T);
-  jac_f_.setInput(NV_DATA_S(y),ODE_Y);
-  jac_f_.setInput(f_.input(ODE_P),ODE_P);
+  jac_f_.setInput(t,DAE_T);
+  jac_f_.setInput(NV_DATA_S(y),DAE_Y);
+  jac_f_.setInput(f_.input(DAE_P),DAE_P);
 
   // Evaluate
   jac_f_.evaluate();
@@ -1145,9 +1145,9 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,ODE_T);
-  jac_f_.setInput(NV_DATA_S(y),ODE_Y);
-  jac_f_.setInput(f_.input(ODE_P),ODE_P);
+  jac_f_.setInput(t,DAE_T);
+  jac_f_.setInput(NV_DATA_S(y),DAE_Y);
+  jac_f_.setInput(f_.input(DAE_P),DAE_P);
 
   // Evaluate
   jac_f_.evaluate();
@@ -1341,7 +1341,7 @@ Integrator CVodesInternal::jac(int iind, int oind){
   casadi_assert(q_.isNull() == q.isNull());
     
   // Generate Jacobians with respect to state, state derivative and parameters
-  SXMatrix df_dy = f.jac(ODE_Y,ODE_RHS);
+  SXMatrix df_dy = f.jac(DAE_Y,DAE_RES);
   
   // Number of sensitivities
   int ns;
@@ -1356,17 +1356,17 @@ Integrator CVodesInternal::jac(int iind, int oind){
   
   // Sensitivity ODE
   SXMatrix rhs_s = prod(df_dy,ysens);
-  if(iind==INTEGRATOR_P) rhs_s += f.jac(ODE_P,ODE_RHS);
+  if(iind==INTEGRATOR_P) rhs_s += f.jac(DAE_P,DAE_RES);
 
   // Augmented ODE
   SXMatrix faug = vec(horzcat(f.outputSX(oind),rhs_s));
   makeDense(faug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
 
   // Input arguments for the augmented DAE
-  vector<SXMatrix> faug_in(ODE_NUM_IN);
-  faug_in[ODE_T] = f.inputSX(ODE_T);
-  faug_in[ODE_Y] = vec(horzcat(f.inputSX(ODE_Y),ysens));
-  faug_in[ODE_P] = f.inputSX(ODE_P);
+  vector<SXMatrix> faug_in(DAE_NUM_IN);
+  faug_in[DAE_T] = f.inputSX(DAE_T);
+  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
+  faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
   SXFunction ffcn_aug(faug_in,faug);
@@ -1376,21 +1376,21 @@ Integrator CVodesInternal::jac(int iind, int oind){
   
   if(!q.isNull()){
     // Now lets do the same for the quadrature states
-    SXMatrix dq_dy = q.jac(ODE_Y,ODE_RHS);
+    SXMatrix dq_dy = q.jac(DAE_Y,DAE_RES);
     
     // Sensitivity quadratures
     SXMatrix q_s = prod(dq_dy,ysens);
-    if(iind==INTEGRATOR_P) q_s += q.jac(ODE_P,ODE_RHS);
+    if(iind==INTEGRATOR_P) q_s += q.jac(DAE_P,DAE_RES);
 
     // Augmented quadratures
     SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
     makeDense(qaug); // NOTE: se above
 
     // Input to the augmented quadratures
-    vector<SXMatrix> qaug_in(ODE_NUM_IN);
-    qaug_in[ODE_T] = q.inputSX(ODE_T);
-    qaug_in[ODE_Y] = vec(horzcat(q.inputSX(ODE_Y),ysens));
-    qaug_in[ODE_P] = q.inputSX(ODE_P);
+    vector<SXMatrix> qaug_in(DAE_NUM_IN);
+    qaug_in[DAE_T] = q.inputSX(DAE_T);
+    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
+    qaug_in[DAE_P] = q.inputSX(DAE_P);
 
     // Create augmented DAE function
     qfcn_aug = SXFunction(qaug_in,qaug);

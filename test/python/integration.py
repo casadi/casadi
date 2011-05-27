@@ -13,10 +13,10 @@ class Integrationtests(casadiTestCase):
     t=symbolic("t")
     q=symbolic("q")
     p=symbolic("p")
-    f = ODE_NUM_IN * [[]]
-    f[ODE_T] = t
-    f[ODE_Y] = q
-    f[ODE_P] = p
+    f = DAE_NUM_IN * [[]]
+    f[DAE_T] = t
+    f[DAE_Y] = q
+    f[DAE_P] = p
     f=SXFunction(f,[q/p*t**2])
     f.init()
     integrator = CVodesIntegrator(f)
@@ -68,25 +68,25 @@ class Integrationtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     z=x*exp(t)
-    f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: [x,y]},[[z,z]])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,y]},[[z,z]])
     f.init()
     # Pass inputs
-    f.setInput(1.0,ODE_T)
-    f.setInput([1.0,0.0],ODE_Y)
+    f.setInput(1.0,DAE_T)
+    f.setInput([1.0,0.0],DAE_Y)
     # Pass adjoint seeds
     f.setAdjSeed([1.0,0.0])
     # Evaluate with adjoint mode AD
     f.evaluate(0,1)
     # print result
     print f.output()
-    print f.adjSens(ODE_Y)
+    print f.adjSens(DAE_Y)
   
   def test_issue92b(self):
     self.message("regression check for issue 92")
     t=SX("t")
     x=SX("x")
     y=SX("y")
-    f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: [x,y]},[[x,(1+1e-9)*x]])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,y]},[[x,(1+1e-9)*x]])
     integrator = CVodesIntegrator(f)
     integrator.init()
     # Pass inputs
@@ -110,7 +110,7 @@ class Integrationtests(casadiTestCase):
     q = [x,SX("problem")]
 
     dq=[x,x]
-    f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: q},[dq])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: q},[dq])
     f.init()
 
     integrator = CVodesIntegrator(f)
@@ -201,7 +201,7 @@ class Integrationtests(casadiTestCase):
     p=SX("p")
 
     dh = p+q[0]**2
-    f=SXFunction([t,q,p],[vertcat([dh ,q[0],dh])])
+    f=SXFunction([t,q,p,[]],[vertcat([dh ,q[0],dh])])
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -227,7 +227,7 @@ class Integrationtests(casadiTestCase):
     J.input(1).set(p0)
     J.evaluate()
     outA=J.output().toArray()
-    f=SXFunction([t,q,p],[vertcat([dh ,q[0],(1+1e-9)*dh])])
+    f=SXFunction([t,q,p,[]],[vertcat([dh ,q[0],(1+1e-9)*dh])])
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -280,10 +280,10 @@ class Integrationtests(casadiTestCase):
     t=symbolic("t")
     q=symbolic("q")
     p=symbolic("p")
-    f = ODE_NUM_IN * [[]]
-    f[ODE_T] = t
-    f[ODE_Y] = q
-    f[ODE_P] = p
+    f = DAE_NUM_IN * [[]]
+    f[DAE_T] = t
+    f[DAE_Y] = q
+    f[DAE_P] = p
     f=SXFunction(f,[q/p*t**2])
     f.init()
     integrator = CVodesIntegrator(f)
@@ -389,7 +389,7 @@ class Integrationtests(casadiTestCase):
     t=symbolic("t")
     q=symbolic("q",3,1)
     p=symbolic("p",9,1)
-    f=SXFunction([t,q,p],[c.dot(c.reshape(p,3,3),q)])
+    f=SXFunction([t,q,p,[]],[c.dot(c.reshape(p,3,3),q)])
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("steps_per_checkpoint",1000)
@@ -419,10 +419,10 @@ class Integrationtests(casadiTestCase):
     t=symbolic("t")
     q=symbolic("q",3,1)
     p=symbolic("p",9,1)
-    f = ODE_NUM_IN * [[]]
-    f[ODE_T] = t
-    f[ODE_Y] = q
-    f[ODE_P] = p
+    f = DAE_NUM_IN * [[]]
+    f[DAE_T] = t
+    f[DAE_Y] = q
+    f[DAE_P] = p
     f=SXFunction(f,[c.dot(c.reshape(p,3,3),q)])
     f.init()
 
@@ -491,7 +491,7 @@ class Integrationtests(casadiTestCase):
     q=symbolic("q",2,1)
     p=symbolic("p",3,1)
 
-    f=SXFunction([t,q,p],[vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])])
+    f=SXFunction([t,q,p,[]],[vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])])
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -540,7 +540,7 @@ class Integrationtests(casadiTestCase):
     p=symbolic("p",1,1)
     # y
     # y'
-    f=SXFunction([t,q,p],[vertcat([q[1],p[0]+q[1]**2 ])])
+    f=SXFunction([t,q,p,[]],[vertcat([q[1],p[0]+q[1]**2 ])])
     f.init()
     
     integrator = CVodesIntegrator(f)

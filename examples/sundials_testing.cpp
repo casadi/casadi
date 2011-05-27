@@ -107,7 +107,7 @@ void ode_rhs_c(double tt, const double *yy, const double* pp, double* rhs){
 // Wrap the function to allow creating an CasADi function
 void ode_rhs_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
   casadi_assert(fsens_order==0 && asens_order==0);
-  ode_rhs_c(f.input(ODE_T)[0], &f.input(ODE_Y)[0], &f.input(ODE_P)[0], &f.output(ODE_RHS)[0]);
+  ode_rhs_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_P)[0], &f.output(DAE_RES)[0]);
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -217,10 +217,10 @@ Integrator create_CVODES(){
   rhs[2] = -0.01*u*u;
 
   // Input of the DAE residual function
-  vector<vector<SX> > ffcn_in(ODE_NUM_IN);
-  ffcn_in[ODE_T] = vector<SX>(1,t);
-  ffcn_in[ODE_Y] = y;
-  ffcn_in[ODE_P] = vector<SX>(1,u);
+  vector<vector<SX> > ffcn_in(DAE_NUM_IN);
+  ffcn_in[DAE_T] = vector<SX>(1,t);
+  ffcn_in[DAE_Y] = y;
+  ffcn_in[DAE_P] = vector<SX>(1,u);
 
   // DAE residual function
   FX ffcn = SXFunction(ffcn_in,rhs);
@@ -231,14 +231,14 @@ Integrator create_CVODES(){
     ffcn = CFunction(ode_rhs_c_wrapper);
     
     // Specify the number of inputs and outputs
-    ffcn.setNumInputs(ODE_NUM_IN);
-    ffcn.setNumOutputs(ODE_NUM_OUT);
+    ffcn.setNumInputs(DAE_NUM_IN);
+    ffcn.setNumOutputs(DAE_NUM_OUT);
     
     // Specify dimensions of inputs and outputs
-    ffcn.input(ODE_T)    = DMatrix(1,1,0);
-    ffcn.input(ODE_Y)    = DMatrix(3,1,0);
-    ffcn.input(ODE_P)    = DMatrix(1,1,0);
-    ffcn.output(ODE_RHS) = DMatrix(3,1,0);
+    ffcn.input(DAE_T)    = DMatrix(1,1,0);
+    ffcn.input(DAE_Y)    = DMatrix(3,1,0);
+    ffcn.input(DAE_P)    = DMatrix(1,1,0);
+    ffcn.output(DAE_RES) = DMatrix(3,1,0);
   }
   
   // Quadrature function
