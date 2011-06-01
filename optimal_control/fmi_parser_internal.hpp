@@ -104,7 +104,6 @@ class FMIParserInternal : public SharedObjectNode{
 
     /// Filename
     std::string filename_;
-
 };
 
 } // namespace OptimalControl

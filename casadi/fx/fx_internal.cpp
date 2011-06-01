@@ -25,6 +25,7 @@
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
+#include "mx_function.hpp"
 
 using namespace std;
 
@@ -70,8 +71,11 @@ void FXInternal::init(){
     }
   }
 
+  // Resize the matrix that holds the sparsity of the Jacobian blocks
+  jac_sparsity_.resize(getNumOutputs(),getNumInputs());
+
+  // Mark the function as initialized
   is_init_ = true;
-  
 }
 
 void FXInternal::print(ostream &stream) const{
@@ -120,13 +124,13 @@ const FunctionIO& FXInternal::outputStruct(int i) const{
   return const_cast<FXInternal*>(this)->outputStruct(i);
 }
 
-void FXInternal::log(const std::string& msg) const{
+void FXInternal::log(const string& msg) const{
   if(verbose()){
     cout << "CasADi log message: " << msg << endl;
   }
 }
 
-void FXInternal::log(const std::string& fcn, const std::string& msg) const{
+void FXInternal::log(const string& fcn, const string& msg) const{
   if(verbose()){
     cout << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
   }
@@ -136,7 +140,7 @@ bool FXInternal::verbose() const{
   return verbose_;
 }
 
-bool FXInternal::monitored(const std::string& mod) const{
+bool FXInternal::monitored(const string& mod) const{
   return monitors_.count(mod)>0;
 }
 
@@ -208,7 +212,7 @@ const Dictionary & FXInternal::getStats() const {
   return stats_;
 }
 
-GenericType FXInternal::getStat(const std::string & name) const {
+GenericType FXInternal::getStat(const string & name) const {
   // Locate the statistic
   Dictionary::const_iterator it = stats_.find(name);
 
@@ -222,6 +226,78 @@ GenericType FXInternal::getStat(const std::string & name) const {
 
   return GenericType(it->second);
 }
+
+FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks, bool with_f){
+  casadi_warning("inefficient algorithm: overload this function");
+  
+  // Symbolic input
+  vector<MX> j_in(getNumInputs());
+  for(int i=0; i<j_in.size(); ++i){
+    stringstream name;
+    name << "x_" << i;
+    j_in[i] = MX(name.str(),input(i).sparsity());
+  }
+  
+  // Outputs
+  vector<MX> j_out;
+  for(vector<pair<int,int> >::const_iterator it=jblocks.begin(); it!=jblocks.end(); ++it){
+    // Create jacobian for block
+    FX J = jacobian(it->first,it->second);
+    
+    if(!J.isNull()){
+      J.init();
+    
+      // Evaluate symbolically
+      j_out.push_back(J.call(j_in).at(0));
+    } else {
+      j_out.push_back(MX::zeros(output(it->second).numel(),input(it->first).numel()));
+    }
+  }
+  
+  // Append function call, if requested
+  if(with_f){
+    // Create a shared reference since the call function is implemented in public class (bad design decision)
+    FX temp;
+    temp.assignNode(this);
+    
+    vector<MX> feval = temp.call(j_in);
+    j_out.insert(j_out.end(),feval.begin(),feval.end());
+  }
+
+  // Create function
+  return MXFunction(j_in,j_out);
+}
+
+CRSSparsity FXInternal::getBlockSparsity(){
+  casadi_assert_message(isInit(),"Function not initialized.");
+  
+  // By default, all blocks depends on all variables
+  return CRSSparsity(getNumOutputs(),getNumInputs(),true);
+}
+
+CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
+  casadi_assert_message(isInit(),"Function not initialized.");
+
+  // Dense sparsity by default
+  return CRSSparsity(output(oind).numel(),input(iind).numel(),true);
+}
+
+CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
+  casadi_assert_message(isInit(),"Function not initialized.");
+  
+  // Get a reference to the block
+  CRSSparsity& jsp = jac_sparsity_.getElementRef(oind,iind);
+  
+  // Generate, if null
+  if(jsp.isNull()){
+    jsp = getJacSparsity(iind,oind);
+  }
+  
+  // Return a reference to the block
+  return jsp;
+}
+
+
 
 // void setv(double val, vector<double>& v){
 //   if(v.size() != 1) throw CasadiException("setv(double,vector<double>&): dimension mismatch");

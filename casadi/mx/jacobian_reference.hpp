@@ -20,10 +20,11 @@
  *
  */
 
-#ifndef MAPPING_HPP
-#define MAPPING_HPP
+#ifndef JACOBIAN_REFERENCE_HPP
+#define JACOBIAN_REFERENCE_HPP
 
 #include "mx_node.hpp"
+#include "../fx/fx.hpp"
 #include <map>
 
 namespace CasADi{
@@ -31,57 +32,28 @@ namespace CasADi{
   \author Joel Andersson
   \date 2011
 */
-class Mapping : public MXNode{
+class JacobianReference : public MXNode{
   public:
 
-    /// Constructor
-    Mapping(const CRSSparsity& sp);
+    /// Default constructor
+    JacobianReference(const MX& output, int iind);
 
     /// Clone function
-    Mapping* clone() const;
+    JacobianReference* clone() const;
       
     /// Destructor
-    virtual ~Mapping(){}
+    virtual ~JacobianReference(){}
     
     /// Evaluate the function and store the result in the node
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-    
-    /// Is a mapping matrix
-    virtual bool isMapping() const{return true;}
-    
-    /// Add a dependency (index given)
-    virtual void addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz);
-    
-    /// Add a dependency
-    virtual void addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz);
-    
-    /// Add a dependency
-    virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
-    
-    /// Add a dependency (indices nz to be placed in (i,j))
-    void addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j);
-    
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
 
-  protected:
-    
-    /// Check if the mapping is ready
-    bool isReady() const;
-    
-    /// Mapping from the output non-zero to the dependency nonzero index
-    std::vector<int> nzind_;
-
-    /// Mapping from the output non-zero index of the dependency index
-    std::vector<int> depind_;
-
-    /// Map to locate the dependencies
-    std::map<const MXNode*, int> depmap_;
+    // Input index
+    int iind_;
 };
 
 } // namespace CasADi
 
-#endif // MAPPING_HPP
+#endif // JACOBIAN_REFERENCE_HPP

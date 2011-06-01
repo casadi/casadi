@@ -408,6 +408,11 @@ std::string MX::dimString() const {
   return ss.str();
 }
 
+MX MX::jac(int iind){
+  return (*this)->jac(iind);
+}
+
+
 } // namespace CasADi
 
 

@@ -819,5 +819,27 @@ void SXFunctionInternal::clearSymbolic(){
   swork.clear();
 }
 
+FX SXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f){
+  // Jacobian blocks
+  vector<SXMatrix> jac_out(jblocks.size());
+  for(int el=0; el<jac_out.size(); ++el){
+    jac_out[el] = jac(jblocks[el].first,jblocks[el].second);
+  }
+  
+  // Append function evaluations if desired
+  if(with_f){
+    jac_out.insert(jac_out.end(),outputv.begin(),outputv.end());
+  }
+  
+  // Return function
+  return SXFunction(inputv,jac_out);
+}
+
+
+CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
+  // FIXME: Inefficient algorithm
+  return jac(iind,oind).sparsity();
+}
+
 } // namespace CasADi
 

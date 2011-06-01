@@ -117,8 +117,6 @@ class MX : public SharedObject{
 
     /** \brief  Access a submatrix */
     SubMatrix<MX > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
-
-
     
 #endif // SWIG
 
@@ -196,6 +194,8 @@ class MX : public SharedObject{
   /** \brief  Identity matrix */  
   static MX eye(int n);
 
+  /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
+  MX jac(int iind=0);
   
   //@{
   /// Python stuff

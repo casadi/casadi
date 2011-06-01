@@ -79,12 +79,15 @@ class EvaluationOutput : public OutputNode{
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
+    /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
+    virtual MX jac(int iind);
+    
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return true;} 
 
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
-
+    
     FX fcn_;
     int oind_;
 };

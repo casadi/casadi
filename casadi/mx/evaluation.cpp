@@ -21,6 +21,7 @@
  */
 
 #include "evaluation.hpp"
+#include "jacobian_reference.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
@@ -130,6 +131,9 @@ MX Evaluation::adFwd(const std::vector<MX>& jx){
 }
 
 MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
+  cout << "called EvaluationOutput::adFwd " << endl;
+  
+  
   // Get a reference the arguments
   vector<MX>& x = dynamic_cast<Evaluation*>(dep(0).get())->x_;
   
@@ -145,26 +149,40 @@ MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
   MX ret = MX::zeros(size(),ncol);
   
   for(int i=0; i<x.size(); ++i){
-/*    if(i!=oind_-1)
-      continue;*/
-    
-    // Get the Jacobian (this is inefficient, unless jacobian gets a bit smarter!)
-    FX J = fcn_.jacobian(i,oind_);
-    J.init();
+    if(0){
+      if(!x[i].isNull()){
+        ret += prod(jac(i),x[i]);
+      }
+    } else {
+      
+      // Get the Jacobian (this is inefficient, unless jacobian gets a bit smarter!)
+      FX J = fcn_.jacobian(i,oind_);
+      
+      // If the jacobian is not zero
+      if(!J.isNull()){
+        J.init();
 
-    // Get a reference to the argument
-    vector<MX> &Jarg = dep(0)->dep_;
+        // Get a reference to the argument
+        vector<MX> &Jarg = dep(0)->dep_;
 
-    // Create an evaluation node
-    MX Ji = J.call(Jarg).at(0);
-    
-    // Assemble the return matrix
-    if(!x[i].isNull()){
-      ret += prod(Ji,x[i]);
+        // Create an evaluation node
+        MX Ji = J.call(Jarg).at(0);
+        
+        // Assemble the return matrix
+        if(!x[i].isNull()){
+          ret += prod(Ji,x[i]);
+        }
+      }
     }
   }
   return ret;
 }
+
+
+MX EvaluationOutput::jac(int iind){
+  return MX::create(new JacobianReference(MX::create(this),iind));
+}
+
 
 
 } // namespace CasADi

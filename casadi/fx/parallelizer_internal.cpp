@@ -160,6 +160,25 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   }
 }
 
+FX ParallelizerInternal::jacobian(int iind, int oind){
+  // Number of tasks
+  int ntask = inind_.size()-1;
+  
+  // Find out which task corresponds to the iind
+  int task;
+  for(task=0; task<ntask && iind>=inind_[task+1]; ++task);
+  
+  // Check if the output index is also in this task
+  if(oind>=outind_[task] && oind<outind_[task+1]){
+    // Call the base class
+/*    return funcs_[task].jacobian(iind-inind_[task],oind-outind_[task]);*/
+    return FXInternal::jacobian(iind,oind);
+  } else {
+    // Return a null reference
+    return FX();
+  }
+}
+
 
 } // namespace CasADi
 

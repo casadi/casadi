@@ -48,8 +48,8 @@ SET(CASADI_SRCS
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/if_else_node.cpp        mx/if_else_node.hpp        # An if-else branch
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
+  mx/jacobian_reference.cpp  mx/jacobian_reference.hpp  # A reference to a Jacobian block
   mx/mx_tools.cpp            mx/mx_tools.hpp
-
   # A dynamically created function with AD capabilities
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/x_function.hpp          fx/x_function.cpp          fx/x_function_internal.hpp          fx/x_function_internal.cpp

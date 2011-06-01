@@ -27,7 +27,8 @@ using namespace std;
 
 namespace CasADi{
 
-CRSSparsity::CRSSparsity(){
+CRSSparsity::CRSSparsity(int null){
+  casadi_assert(null==0);
 }
 
 CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){

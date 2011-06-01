@@ -50,6 +50,9 @@ class ParallelizerInternal : public FXInternal{
     /// Evaluate a single task
     virtual void evaluateTask(int task, int nfdir, int nadir);
 
+    /// Jacobian of output oind with respect to input iind
+    virtual FX jacobian(int iind=0, int oind=0);
+
     /// Initialize
     virtual void init();
 

@@ -165,7 +165,8 @@ void MultipleShootingInternal::init(){
   // Function that evaluates function and constraints that can also be used to get the gradient of the constraint
   FG_ = MXFunction(FG_in,FG_out);
   
-  // Evaluate Jacobian blocks in parallel
+#if 1
+// Evaluate Jacobian blocks in parallel
 //  FX IjacX = Jacobian(ffcn_,INTEGRATOR_X0,INTEGRATOR_XF);
   FX IjacX = ffcn_.jacobian(INTEGRATOR_X0,INTEGRATOR_XF);
   IjacX.init();
@@ -258,12 +259,12 @@ void MultipleShootingInternal::init(){
   
   // Create function
   J_ = MXFunction(V,vertcat(JJ));
-  
-  
+#else
   // The following completely automates the Jacobian construction above
   // works only if "parallelization" is set to "expand"
-/*  G_.init();
-  J_ = MXFunction(V,G_.jac());*/
+  G_.init();
+  J_ = MXFunction(V,G_.jac());
+#endif  
 }
 
 void MultipleShootingInternal::getGuess(vector<double>& V_init) const{

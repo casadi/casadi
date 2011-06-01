@@ -66,8 +66,8 @@ class CRSSparsityNode;
 class CRSSparsity : public SharedObject{
   public:
   
-    /// Default constructor, null pointer
-    CRSSparsity();
+    /// Default constructor, optional int argument which must be zero to allows implicit type conversion
+    CRSSparsity(int null=0);
     
     /// Construct a sparsity pattern (sparse/dense)
     CRSSparsity(int nrow, int ncol, bool dense=false);

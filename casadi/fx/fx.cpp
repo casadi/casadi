@@ -171,6 +171,10 @@ FX FX::jacobian(int iind, int oind){
   }
 }
 
+FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f){
+  return (*this)->jacobian(jblocks,with_f);
+}
+
 FX FX::hessian(int iind, int oind){
   return (*this)->hessian(iind,oind);  
 }
@@ -246,6 +250,15 @@ const Dictionary & FX::getStats() const{
 GenericType FX::getStat(const string& name) const{
   return (*this)->getStat(name);
 }
+
+CRSSparsity FX::getBlockSparsity(){
+  return (*this)->getBlockSparsity();
+}
+
+CRSSparsity& FX::jacSparsity(int iind, int oind){
+  return (*this)->jacSparsity(iind,oind);
+}
+
 
 #if 0
 

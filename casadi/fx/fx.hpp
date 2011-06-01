@@ -125,6 +125,12 @@ class FX : public OptionsFunctionality{
   /** \brief Hessian of output oind with respect to input iind */
   FX hessian(int iind=0, int oind=0);
 
+  /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
+  FX jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f=false);
+
+  /** \brief Get the Jacobian block sparsity */
+  CRSSparsity getBlockSparsity();
+  
 #ifndef SWIG
   /** \brief  Create a function call (evaluation mx node), single input */
   std::vector<MX> call(const MX &x);
@@ -143,6 +149,9 @@ class FX : public OptionsFunctionality{
       paropt: Set of options to be passed to the Parallelizer
   */
   std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt=Dictionary());
+
+  /// Get, if necessary generate, the sparsity of a Jacobian block
+  CRSSparsity& jacSparsity(int iind=0, int oind=0);
 
 //#ifndef SWIG
 #if 0
