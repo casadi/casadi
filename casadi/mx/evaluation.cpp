@@ -90,13 +90,8 @@ void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSee
 EvaluationOutput::EvaluationOutput(const MX& parent, int oind) : OutputNode(parent), oind_(oind){
   setDependencies(parent);
   
-  // Get the function
-  const Evaluation* p = dynamic_cast<const Evaluation*>(parent.get());
-  casadi_assert(p!=0);
-  fcn_ = p->fcn_;
-
   // Save the sparsity pattern
-  setSparsity(fcn_.output(oind).sparsity());
+  setSparsity(getFunction().output(oind).sparsity());
 }
 
 EvaluationOutput* EvaluationOutput::clone() const{
@@ -111,15 +106,15 @@ void EvaluationOutput::evaluate(const VDptr& input, Dptr& output, const VVDptr& 
   // Pass the adjoint seed to the function
   for(int d=0; d<nadj; ++d)
     if(adjSeed[d]!=0)
-      fcn_.setAdjSeed(adjSeed[d],oind_,d);
+      getFunction().setAdjSeed(adjSeed[d],oind_,d);
 
     // Get the results
-  fcn_.getOutput(output,oind_);
+  getFunction().getOutput(output,oind_);
 
   // Get the fwd sensitivities
   for(int d=0; d<nfwd; ++d)
     if(fwdSens[d]!=0)
-      fcn_.getFwdSens(fwdSens[d],oind_,d);
+      getFunction().getFwdSens(fwdSens[d],oind_,d);
 }
 
 MX Evaluation::adFwd(const std::vector<MX>& jx){ 
@@ -132,7 +127,6 @@ MX Evaluation::adFwd(const std::vector<MX>& jx){
 
 MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
   cout << "called EvaluationOutput::adFwd " << endl;
-  
   
   // Get a reference the arguments
   vector<MX>& x = dynamic_cast<Evaluation*>(dep(0).get())->x_;
@@ -149,14 +143,14 @@ MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
   MX ret = MX::zeros(size(),ncol);
   
   for(int i=0; i<x.size(); ++i){
-    if(0){
+    if(1){
       if(!x[i].isNull()){
         ret += prod(jac(i),x[i]);
       }
     } else {
       
       // Get the Jacobian (this is inefficient, unless jacobian gets a bit smarter!)
-      FX J = fcn_.jacobian(i,oind_);
+      FX J = getFunction().jacobian(i,oind_);
       
       // If the jacobian is not zero
       if(!J.isNull()){
@@ -183,6 +177,12 @@ MX EvaluationOutput::jac(int iind){
   return MX::create(new JacobianReference(MX::create(this),iind));
 }
 
+FX& Evaluation::getFunction(){ 
+  return fcn_;
+}
 
+FX& EvaluationOutput::getFunction(){ 
+  return dep(0)->getFunction();
+}
 
 } // namespace CasADi

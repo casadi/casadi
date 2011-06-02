@@ -24,28 +24,8 @@
 #define MX_NODE_HPP
 
 #include "mx.hpp"
+#include "../fx/fx.hpp"
 #include <vector>
-
-/* Developer nodes:
-  
-  This MX classes need to get the ability to generate whole Jacobian matrices, not just directional derivatives. There exist two principle ways of
-  doing this:
-  
-  1. The current approach:
-     Generate the Jacobian by seeding in all directions, using curtis powel reed scaling, the number of directions can be reduced.
-     - Problems:
-       * Need a way to calculate the Jacobian sparsity pattern, detecting it completely black box is expensiveunsafe and potentially unsafe.
-       * No easy way to generate second and higher order sensitivities
-       
-  2. The source code approach:
-     Generate a new tree for the derivatives, as for the SXFunction class.
-     - Advantages:
-      * Arbitrary order derivatives
-      * Easier to parallelize efficiently
-     - Problems:
-      * More implementation than approach 1.
-*/
-
 
 namespace CasADi{
 /** \brief Node class for MX objects
@@ -87,6 +67,24 @@ class MXNode : public SharedObjectNode{
 
     /** \brief  Check if mapping */
     virtual bool isMapping() const{return false;}
+
+    /** \brief  Check if evaluation */
+    virtual bool isEvaluation() const{return false;}
+
+    /** \brief  Check if evaluation output */
+    virtual bool isEvaluationOutput() const{return false;}
+    
+    /** \brief  Check if jacobian reference */
+    virtual bool isJacobian() const{return false;}
+
+    /** \brief  Get function reference */
+    virtual FX& getFunction();
+
+    /** \brief  Get function input */
+    virtual int getFunctionInput() const;
+
+    /** \brief  Get function output */
+    virtual int getFunctionOutput() const;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const;

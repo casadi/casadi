@@ -819,16 +819,18 @@ void SXFunctionInternal::clearSymbolic(){
   swork.clear();
 }
 
-FX SXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f){
+FX SXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
   // Jacobian blocks
   vector<SXMatrix> jac_out(jblocks.size());
+  jac_out.reserve(jblocks.size());
   for(int el=0; el<jac_out.size(); ++el){
-    jac_out[el] = jac(jblocks[el].first,jblocks[el].second);
-  }
-  
-  // Append function evaluations if desired
-  if(with_f){
-    jac_out.insert(jac_out.end(),outputv.begin(),outputv.end());
+    if(jblocks[el].second==-1){
+      // Undifferentiated function
+      jac_out[el] = outputv[jblocks[el].first];
+    } else {
+      // Jacobian
+      jac_out[el] = jac(jblocks[el].second,jblocks[el].first);
+    }
   }
   
   // Return function

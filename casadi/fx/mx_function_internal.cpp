@@ -1,24 +1,24 @@
 /*
- *    This file is part of CasADi.
- *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
- *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
- *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- *
- */
+*    This file is part of CasADi.
+*
+*    CasADi -- A symbolic framework for dynamic optimization.
+*    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+*
+*    CasADi is free software; you can redistribute it and/or
+*    modify it under the terms of the GNU Lesser General Public
+*    License as published by the Free Software Foundation; either
+*    version 3 of the License, or (at your option) any later version.
+*
+*    CasADi is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*    Lesser General Public License for more details.
+*
+*    You should have received a copy of the GNU Lesser General Public
+*    License along with CasADi; if not, write to the Free Software
+*    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*
+*/
 
 #include "mx_function_internal.hpp"
 #include "../mx/jacobian_reference.hpp"
@@ -162,13 +162,18 @@ void MXFunctionInternal::init(){
     nodes[i]->temp = 0;
   }
 
-#if 0
- 
-  // An input/output pair corresponding to a jacobian block
-  typedef pair<int,int> iopair;
+  // Eliminate the jacobian nodes from the algorithm
+  eliminateJacobian();
+
+log("MXFunctionInternal::init end");
+}
+
+void MXFunctionInternal::eliminateJacobian(){
+  // An output/input pair corresponding to a jacobian block
+  typedef pair<int,int> oipair;
   
   // The set of jacobian blocks for a single evaluation node
-  typedef set<iopair> jblocks;
+  typedef set<oipair> jblocks;
   
   // The sets of jacobian blocks for each evaluation node
   typedef map<void*,jblocks> jbmap;
@@ -180,143 +185,162 @@ void MXFunctionInternal::init(){
   evmap m;
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
     // Check if the node is a Jacobian reference
+    
     JacobianReference* jref = dynamic_cast<JacobianReference*>(it->mx.get());
-    if(jref){
-      // Get the input index
-      int iind = jref->iind_;
-      
-      // Get the output node
-      EvaluationOutput *evout = dynamic_cast<EvaluationOutput *>(jref->dep(0).get());
-      casadi_assert(evout!=0);
-      
-      // Get the output index
-      int oind = evout->oind_;
-      
-      // Get the evaluation node
-      Evaluation *ev = dynamic_cast<Evaluation *>(evout->dep(0).get());
-      casadi_assert(ev!=0);
-      
-      // Get the function
-      FX& fcn = ev->fcn_;
-      
+    if(it->mx->isJacobian()){
+      // Get a reference to the function
+      FX& fcn = it->mx->getFunction();
+
+      // Get the input and output indices
+      int iind = it->mx->getFunctionInput();
+      int oind = it->mx->getFunctionOutput();
+
       // Save to map
-      m[fcn.get()][ev].insert(iopair(iind,oind));
-      
+      m[fcn.get()][it->mx->dep(0)->dep(0).get()].insert(oipair(oind,iind));
     }
   }
 
- // Jacobian functions for each function and set of jacobians
- map<void*,map<jblocks,FX> > jac;
+  // Quick end if no Jacobian references
+  if(m.empty()) return;
+
+  // Add function output to each of the function outputs
+  for(evmap::iterator i=m.begin(); i!=m.end(); ++i){
+    // Get number of outputs
+    FXInternal* f = reinterpret_cast<FXInternal*>(i->first);
+    int n_out = f->getNumOutputs();
   
- // Loop over undifferentiated functions
- for(evmap::iterator it=m.begin(); it!=m.end(); ++it){
-   
-   // Jacobian functions for each set of jacobians
-   map<jblocks,FX>& jb = jac[it->first];
-   
-   // Loop over function evaluations for the function
-   for(jbmap::iterator it2=it->second.begin(); it2!=it->second.end(); ++it2){
-     
-     // Get a reference to the jacobian function
-     FX& j = jb[it2->second];
-     
-     // If j is null, the Jacobian must be generated
-     if(j.isNull()){
-       
-       // Create input arguments to the jacobian function
-       vector<iopair> jblocks;
-       jblocks.insert(jblocks.end(),it2->second.begin(),it2->second.end());
-       
-       // Generate jacobian functions
-       FXInternal* f = reinterpret_cast<FXInternal*>(it->first);
-       j = f->jacobian(jblocks,true);
-       j.init();
-     }
-   }
- }
- 
- // Loop over the nodes again, replacing nodes
- for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-   // Check if the node is a function evaluation
-   Evaluation* n = dynamic_cast<Evaluation*>(it->mx.get());
-   if(n!=0){
-     // Get a reference to the function
-     FX &fcn = n->fcn_;
-     
-     // Check if the function can be be replaced
-     evmap::const_iterator ii=m.find(fcn.get());
-     if(ii!=m.end()){
-       // Check if the function evaluation is to be replaced
-       jbmap::const_iterator jj=ii->second.find(n);
-       if(jj!=ii->second.end()){
-         
-         // Replace function evaluation node
-         it->mx = MX::create(new Evaluation(jac[fcn.get()].begin()->second,it->mx->dep_));
-       }
-     }
-     
-   } else {
-     // Check if the node is an evaluation output
-     EvaluationOutput* n = dynamic_cast<EvaluationOutput*>(it->mx.get());
-     if(n!=0){
-       FX &fcn = n->fcn_;
-       
-       // Check if the parent node has changed
-       if(it->mx->dep(0).get() != alg[it->ch.at(0)].mx.get()){
-         // New output index
-         int oind = jac[fcn.get()].begin()->first.size() + n->oind_;
-         
-         // Create evaluation output node
-         it->mx = MX::create(new EvaluationOutput(alg[it->ch.at(0)].mx,oind));
-       }
-       
-     } else {
-       // Check if the node is a Jacobian reference
-       JacobianReference* n = dynamic_cast<JacobianReference*>(it->mx.get());
-       if(n!=0){
-          // Get the input index
-          int iind = n->iind_;
+    // For each evaluation node...
+    for(jbmap::iterator j=i->second.begin(); j!=i->second.end(); ++j){
+      // .. add undifferentiated functions to desired output
+    
+      for(int k=0; k<n_out; ++k){
+        j->second.insert(oipair(k,-1));
+      }
+    }
+  }
+
+  cout << "jacobians:" << endl;
+  for(evmap::iterator i=m.begin(); i!=m.end(); ++i){
+    cout << "function " << i->first << endl;
+    for(jbmap::iterator j=i->second.begin(); j!=i->second.end(); ++j){
+      cout << "evaluation nodes " << j->first << ": ";
+      for(jblocks::iterator k=j->second.begin(); k!=j->second.end(); ++k){
+        cout << "(" << k->first << "," << k->second << ") ";
+      }
+      cout << endl;
+    }
+  }
+
+  // Jacobian functions for each function and set of jacobians
+  map<void*,map<jblocks,FX> > jac;
+    
+  // Loop over undifferentiated functions
+  for(evmap::iterator it=m.begin(); it!=m.end(); ++it){
+    
+    // Jacobian functions for each set of jacobians
+    map<jblocks,FX>& jb = jac[it->first];
+    
+    // Loop over function evaluations for the function
+    for(jbmap::iterator it2=it->second.begin(); it2!=it->second.end(); ++it2){
       
-          // Get the output node
-          EvaluationOutput *evout = dynamic_cast<EvaluationOutput *>(n->dep(0).get());
-          casadi_assert(evout!=0);
-
-          // Get the output index
-          int oind = evout->oind_;
-
-          // Get the evaluation node
-          Evaluation *ev = dynamic_cast<Evaluation *>(evout->dep(0).get());
-          casadi_assert(ev!=0);
-
-          // Get the function
-          FX& fcn = ev->fcn_;
+      // Get a reference to the jacobian function
+      FX& j = jb[it2->second];
       
-          // Get the set of input/output indices
-          jblocks &jb = m[fcn.get()][ev];
-          
-          // Find the jacobian function
-          FX &J = jac[fcn.get()][jb];
-          
-//           map<void*,map<jblocks,FX> > ;
+      // If j is null, the Jacobian must be generated
+      if(j.isNull()){
+        
+        // Create input arguments to the jacobian function
+        vector<oipair> jblocks;
+        jblocks.insert(jblocks.end(),it2->second.begin(),it2->second.end());
+        
+        // Generate jacobian functions
+        FXInternal* f = reinterpret_cast<FXInternal*>(it->first);
+        j = f->jacobian(jblocks);
+        j.init();
+      }
+    }
+  }
 
-          // 
+  // Loop over the nodes again, replacing nodes
+  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+    // Get the old references to the function and evaluation node (since they will change)
+    void *fcn_ref=0, *eval_ref=0;
+    if(it->mx->isEvaluation()){
+      fcn_ref = it->mx->getFunction().get();
+      eval_ref = it->mx.get();
+    } else if(it->mx->isEvaluationOutput()){
+      fcn_ref = it->mx->getFunction().get();
+      eval_ref = it->mx->dep(0).get();
+    } else if(it->mx->isJacobian()){
+      fcn_ref = it->mx->getFunction().get();
+      eval_ref = it->mx->dep(0)->dep(0).get();
+    }
+    
+    // Update evaluation/evaluation output/jacobian node
+    if(eval_ref || fcn_ref){
+    
+      // Check if the function should be replaced
+      evmap::const_iterator ii=m.find(fcn_ref);
+      if(ii!=m.end()){
+        
+        // Check if the function evaluation is to be replaced
+        jbmap::const_iterator jj=ii->second.find(eval_ref);
+        if(jj!=ii->second.end()){
           
-          
-          //.insert(iopair(iind,oind));
-
-
-         
-         
-         // Create evaluation output node
-//         it->mx = MX::create(new EvaluationOutput(
-       }
-     }
-   }
- }
- 
-#endif // 0
- 
- log("MXFunctionInternal::init end");
+          // Make the pointer unique so that other expressions won't be affected
+          it->mx.makeUnique();
+            
+          if(it->mx->isEvaluation()){
+            // Replace the function if its an evaluation node
+            it->mx->getFunction() = jac[fcn_ref][jj->second];
+              
+          } else {
+            // Jacobian reference or evaluation output
+            casadi_assert(it->mx->isJacobian() || it->mx->isEvaluationOutput());
+              
+            // Get current input and output indices
+            int iind = it->mx->getFunctionInput();
+            int oind = it->mx->getFunctionOutput();
+              
+            // Update the output index if we have an evaluation node
+            int oind_new = 0;
+            for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
+              // Check if the input and output indices matches
+              if(kk->first == oind && kk->second==iind){
+                // Update the dependency index if its a Jacobian reference
+                if(it->mx->isJacobian()){
+                  it->ch[0] = alg[it->ch[0]].ch[0];
+                }
+                
+                // Create a new evaluation output
+                it->mx = MX::create(new EvaluationOutput(alg[it->ch[0]].mx,oind_new));
+                break;
+              }
+              
+              // Update index
+              oind_new++;
+            }
+            casadi_assert(!it->mx->isJacobian());
+          }
+        }
+      } // if(ii!=m.end()
+    }
+    casadi_assert(!it->mx->isJacobian());
+    
+    // Check if any of the dependencies have changed
+    for(int i=0; i<it->ch.size(); ++i){
+      int ch = it->ch[i];
+      if(ch>=0){
+        if(it->mx->dep(i).get() != alg[ch].mx.get()){
+          // Make sure that the change does not affect other nodes
+          it->mx.makeUnique();
+            
+          // Update dependencies
+          it->mx->dep(i) = alg[ch].mx;
+        }
+      }
+    }
+  }
 }
 
 void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_data){
@@ -423,7 +447,7 @@ std::vector<MX> MXFunctionInternal::jac(int iind){
     
     // Create seed matrix
     fseed[ind] = ind==iind ? MX::eye(ncol) : MX::zeros(nrow,ncol);
-   }
+  }
   
   // Forward mode automatic differentiation, symbolically
   return adFwd(fseed);
@@ -447,8 +471,8 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   // Pass the seed matrices for the symbolic variables
   for(int ind=0; ind<input_.size(); ++ind){
     derwork[inputv_ind[ind]] = fseed[ind];
-   }
-   
+  }
+  
   // Evaluate all the seed matrices of the algorithm sequentially
   for(int el=0; el<derwork.size(); ++el){
     

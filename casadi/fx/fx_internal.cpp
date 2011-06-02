@@ -227,7 +227,7 @@ GenericType FXInternal::getStat(const string & name) const {
   return GenericType(it->second);
 }
 
-FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks, bool with_f){
+FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
   casadi_warning("inefficient algorithm: overload this function");
   
   // Symbolic input
@@ -238,32 +238,35 @@ FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks, bool with_f){
     j_in[i] = MX(name.str(),input(i).sparsity());
   }
   
+  // Nondifferentiated function
+  FX fcn;
+  fcn.assignNode(this);
+  vector<MX> fcn_eval = fcn.call(j_in);
+  
   // Outputs
   vector<MX> j_out;
+  j_out.reserve(jblocks.size());
   for(vector<pair<int,int> >::const_iterator it=jblocks.begin(); it!=jblocks.end(); ++it){
-    // Create jacobian for block
-    FX J = jacobian(it->first,it->second);
-    
-    if(!J.isNull()){
-      J.init();
-    
-      // Evaluate symbolically
-      j_out.push_back(J.call(j_in).at(0));
+    // If variable index is -1, we want nondifferentiated function output
+    if(it->second==-1){
+      // Nondifferentiated function
+      j_out.push_back(fcn_eval[it->first]);
+      
     } else {
-      j_out.push_back(MX::zeros(output(it->second).numel(),input(it->first).numel()));
+      // Create jacobian for block
+      FX J = jacobian(it->second,it->first);
+      
+      if(!J.isNull()){
+        J.init();
+      
+        // Evaluate symbolically
+        j_out.push_back(J.call(j_in).at(0));
+      } else {
+        j_out.push_back(MX::zeros(output(it->first).numel(),input(it->second).numel()));
+      }
     }
   }
   
-  // Append function call, if requested
-  if(with_f){
-    // Create a shared reference since the call function is implemented in public class (bad design decision)
-    FX temp;
-    temp.assignNode(this);
-    
-    vector<MX> feval = temp.call(j_in);
-    j_out.insert(j_out.end(),feval.begin(),feval.end());
-  }
-
   // Create function
   return MXFunction(j_in,j_out);
 }

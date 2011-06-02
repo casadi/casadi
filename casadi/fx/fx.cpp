@@ -171,8 +171,8 @@ FX FX::jacobian(int iind, int oind){
   }
 }
 
-FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f){
-  return (*this)->jacobian(jblocks,with_f);
+FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+  return (*this)->jacobian(jblocks);
 }
 
 FX FX::hessian(int iind, int oind){

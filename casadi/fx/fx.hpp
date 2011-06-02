@@ -126,7 +126,7 @@ class FX : public OptionsFunctionality{
   FX hessian(int iind=0, int oind=0);
 
   /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  FX jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f=false);
+  FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
   /** \brief Get the Jacobian block sparsity */
   CRSSparsity getBlockSparsity();

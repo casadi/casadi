@@ -55,7 +55,7 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual FX jacobian(int iind=0, int oind=0);
 
     /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-    virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks, bool with_f);
+    virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
     /** \brief Hessian of output oind with respect to input iind */
     virtual FX hessian(int iind=0, int oind=0);

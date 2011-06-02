@@ -32,13 +32,8 @@ namespace CasADi{
 JacobianReference::JacobianReference(const MX& x, int iind) : iind_(iind){
   setDependencies(x);
   
-  // Get the function
-  const EvaluationOutput* p = dynamic_cast<const EvaluationOutput*>(x.get());
-  casadi_assert(p!=0);
-  FX fcn = p->fcn_;
-  
   // Pass the sparsity
-  setSparsity(fcn.jacSparsity(iind_,p->oind_));
+  setSparsity(getFunction().jacSparsity(iind_,getFunctionOutput()));
 }
 
 JacobianReference* JacobianReference::clone() const{
@@ -51,6 +46,10 @@ void JacobianReference::print(std::ostream &stream, const std::vector<std::strin
 
 void JacobianReference::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   casadi_assert(0);
+}
+
+FX& JacobianReference::getFunction(){ 
+  return dep(0)->getFunction();
 }
 
 } // namespace CasADi

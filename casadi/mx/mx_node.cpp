@@ -148,5 +148,17 @@ MX MXNode::jac(int iind){
   throw CasadiException(string("MXNode::jac() not defined for class ") + typeid(*this).name());
 }
 
+FX& MXNode::getFunction(){
+  throw CasadiException(string("MXNode::getFunction() not defined for class ") + typeid(*this).name());
+}
+
+int MXNode::getFunctionOutput() const{
+  throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
+}
+
+int MXNode::getFunctionInput() const{
+  throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
+}
+
 
 } // namespace CasADi

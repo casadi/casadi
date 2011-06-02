@@ -50,6 +50,18 @@ class JacobianReference : public MXNode{
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
+    /** \brief  Check if jacobian reference */
+    virtual bool isJacobian() const{return true;}
+
+    /** \brief  Get function input */
+    virtual int getFunctionInput() const{ return iind_;}
+
+    /** \brief  Get function output */
+    virtual int getFunctionOutput() const{ return dep(0)->getFunctionOutput();}
+
+    /** \brief  Get function reference */
+    virtual FX& getFunction();
+
     // Input index
     int iind_;
 };
