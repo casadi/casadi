@@ -138,7 +138,7 @@ void MultipleShootingInternal::init(){
   G_ = MXFunction(V,g);
 
   // Objective function
-  vector<MX> f = mfcn_.call(X[nk_-1]);
+  vector<MX> f = mfcn_.call(X.back());
   F_ = MXFunction(V,f);
 
   // Objective scaling factor
