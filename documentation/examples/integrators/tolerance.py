@@ -9,7 +9,7 @@ t=SX("t")
 x=SX("x") 
 dx=SX("dx")
 
-f=SXFunction({'NUM': ODE_NUM_IN, ODE_T: t, ODE_Y: [x,dx]},[[dx,-x]])
+f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,dx]},[[dx,-x]])
 f.init()
 
 
@@ -31,7 +31,7 @@ for tol in tolerances:
   sim.input(SIMULATOR_X0).set([1,0])
   sim.evaluate()
 
-  plot(ts,sim.output()[:,0],label="tol = 1e%d" % tol)
+  plot(ts,array(sim.output())[:,0],label="tol = 1e%d" % tol)
 
 legend( loc='upper left')
 xlabel("Time [s]")
@@ -46,8 +46,8 @@ for tol in tolerances:
   integrator = CVodesIntegrator(f)
   integrator.setOption("reltol",tol)
   integrator.setOption("abstol",tol)
+  integrator.setOption("tf",tend)
   integrator.init()
-  integrator.input(INTEGRATOR_TF).set(tend)
   integrator.input(INTEGRATOR_X0).set([1,0])
   integrator.evaluate()
   endresult.append(integrator.output()[0])
