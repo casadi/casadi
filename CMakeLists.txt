@@ -59,6 +59,7 @@ add_subdirectory(toolboxes)
 add_subdirectory(examples)
 add_subdirectory(external_packages)
 add_subdirectory(interfaces)
+add_subdirectory(experimental/greg)
 
 if(WITH_MUSCOD)
 add_subdirectory(muscod_interface)

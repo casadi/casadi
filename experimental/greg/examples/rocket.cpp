@@ -99,7 +99,6 @@ main()
 	ocp.boundStateAction("v", 0, 0, ocp.N-1);
 
 
-
 	// Create the NLP solver
 	SXFunction ffcn(ocp.designVariables, ocp.f); // objective function
 	SXFunction gfcn(ocp.designVariables, ocp.g); // constraint
