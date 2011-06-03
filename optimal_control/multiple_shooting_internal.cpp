@@ -101,7 +101,7 @@ void MultipleShootingInternal::init(){
     fcn_in[k][DAE_T] = input(OCP_T)[k];
     fcn_in[k][DAE_P] = vertcat(P,U[k]);
     fcn_in[k][DAE_Y] = X[k];
-/*  fcn_in[k][DAE_YDOT] = XP[k];*/
+    fcn_in[k][DAE_YDOT] = XP[k];
   }
 
   // Options for the parallelizer

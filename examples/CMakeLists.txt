@@ -59,6 +59,10 @@ target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface c
 add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
 target_link_libraries(vdp_multiple_shooting sundials_interface ipopt_interface optimal_control casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
 
+# How to write a multiple shooting code from scratch
+add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
+target_link_libraries(multiple_shooting_from_scratch sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+
 # Van der pol with multiple shooting
 add_executable(cstr cstr.cpp)
 target_link_libraries(cstr 
