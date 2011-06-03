@@ -50,9 +50,6 @@ class ParallelizerInternal : public FXInternal{
     /// Evaluate a single task
     virtual void evaluateTask(int task, int nfdir, int nadir);
 
-    /// Jacobian of output oind with respect to input iind
-    virtual FX jacobian(int iind=0, int oind=0);
-    
     /// Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 

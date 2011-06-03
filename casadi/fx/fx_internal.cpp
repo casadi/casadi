@@ -82,12 +82,6 @@ void FXInternal::print(ostream &stream) const{
   stream << "function(\"" << getOption("name") << "\")";
 }
 
-FX FXInternal::jacobian(int iind, int oind){
-  FX fcn;
-  fcn.assignNode(this);
-  return Jacobian(fcn,iind,oind);
-}
-
 FX FXInternal::hessian(int iind, int oind){
   stringstream ss;
   ss << "FXInternal::hessian: hessian not defined for class " << typeid(*this).name();
@@ -239,8 +233,6 @@ std::vector<MX> FXInternal::symbolicInput() const{
 }
 
 FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
-  cout << "inefficient algorithm: FXInternal::jacobian() not defined for class " << typeid(*this).name() << endl;
-  
   // Symbolic input
   vector<MX> j_in = symbolicInput();
   
@@ -248,6 +240,11 @@ FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
   FX fcn;
   fcn.assignNode(this);
   vector<MX> fcn_eval = fcn.call(j_in);
+  
+  // Less overhead if only jacobian is requested
+  if(jblocks.size()==1 && jblocks.front().second>=0){
+    return Jacobian(fcn,jblocks.front().second,jblocks.front().first);
+  }
   
   // Outputs
   vector<MX> j_out;
@@ -260,7 +257,7 @@ FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
       
     } else {
       // Create jacobian for block
-      FX J = jacobian(it->second,it->first);
+      Jacobian J(fcn,it->second,it->first);
       
       if(!J.isNull()){
         J.init();

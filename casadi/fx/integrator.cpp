@@ -84,10 +84,6 @@ void Integrator::integrateAdj(double t_out){
   (*this)->integrateAdj(t_out);
 }
 
-Integrator Integrator::jac(int iind, int oind){
-  return (*this)->jac(iind,oind);  
-}
-
 FX Integrator::getJacobian(){
   return (*this)->getJacobian();  
 }

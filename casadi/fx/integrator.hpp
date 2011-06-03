@@ -157,9 +157,6 @@ public:
   
   /// Get the Linear solver
   LinearSolver getLinearSolver();
-
-  /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
-  Integrator jac(int iind=0, int oind=0);
 };
 
 

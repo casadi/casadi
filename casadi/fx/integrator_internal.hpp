@@ -74,11 +74,11 @@ public:
   virtual void init();
 
   /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
-  virtual Integrator jac(int iind=0, int oind=0);
+  virtual Integrator jac(bool with_x, bool with_p);
 
-  /** \brief Jacobian of output oind with respect to input iind */
-  virtual FX jacobian(int iind=0, int oind=0);
- 
+  /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
+  virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
+
   /// Generate the sparsity of a Jacobian block
   virtual CRSSparsity getJacSparsity(int iind, int oind);
 
@@ -143,9 +143,6 @@ public:
   // Set dimensions
   void setDimensions(int nx, int np);
     
-  // workaround: is symbolic jac ok?
-  virtual bool symbjac();
-  
 };
   
 } // namespace CasADi

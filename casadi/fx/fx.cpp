@@ -161,19 +161,22 @@ void FX::setNumOutputs(int num_out){
 }
 
 FX FX::jacobian(int iind, int oind){
+  vector<pair<int,int> > jblocks;
+  jblocks.push_back(pair<int,int>(oind,iind));
+  
   if((*this)->store_jacobians_){
     // Get a reference to the place the Jacobian is or will be saved
     FX& J = (*this)->jacs_[iind][oind];
     
     // Generate a Jacobian if necessary
     if(J.isNull())
-      J = (*this)->jacobian(iind,oind);
+      J = (*this)->jacobian(jblocks);
     
     // Return a reference to the stored Jacobian
     return J;
     
   } else {
-    return (*this)->jacobian(iind,oind);
+    return (*this)->jacobian(jblocks);
   }
 }
 
