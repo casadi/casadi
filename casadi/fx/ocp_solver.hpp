@@ -29,20 +29,43 @@
 
 namespace CasADi{
 
-  /// Input arguments of an OCP Solver
+  /// Input arguments of an OCP Solver \n
+  ///   ns: Number of shooting nodes: from option number_of_grid_points\n
+  ///   nx: Number of differential states: from ffcn.input(INTEGRATOR_X0).size() \n
+  ///   nu: Number of controls: from ffcn.input(INTEGRATOR_P).size() - np \n
+  ///   np: Number of parameters: from option number_of_parameters\n
+  ///   nh: Number of point constraints: from cfcn.input(0).size()
   enum OCPInput{
-    /// Time grid
+    /// Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) 
     OCP_T,   
-    /// State bound and initial guess
-    OCP_LBX, OCP_UBX, OCP_X_INIT,
-    /// State deriatives with bounds
-    OCP_LBXP, OCP_UBXP, OCP_XP_INIT,
-    /// Controls with bounds and initial guess
-    OCP_LBU, OCP_UBU, OCP_U_INIT,     
-    /// Parameters with bounds and initial guess
-    OCP_LBP, OCP_UBP, OCP_P_INIT,
-    /// Bounds for the point constraints
-    OCP_LBH, OCP_UBH,
+    /// States lower bounds (nx x (ns+1))
+    OCP_LBX,
+    /// States upper bounds (nx x (ns+1))
+    OCP_UBX,
+    /// States initial guess (nx x (ns+1))
+    OCP_X_INIT,
+    /// States deriatives lower bounds (nx x (ns+1))
+    OCP_LBXP,
+    /// States deriatives upper bounds (nx x (ns+1))
+    OCP_UBXP,
+    /// States deriatives initial guess (nx x (ns+1))
+    OCP_XP_INIT,
+    /// Controls lower bounds (nu x ns)
+    OCP_LBU,
+    /// Controls upper bounds (nu x ns)
+    OCP_UBU,
+    /// Controls initial guess (nu x ns)
+    OCP_U_INIT,     
+    /// Parameters lower bounds (np x 1)
+    OCP_LBP,
+    /// Parameters upper bounds (np x 1)
+    OCP_UBP,
+    /// Parameters initial guess (np x 1)
+    OCP_P_INIT,
+    /// Point constraint lower bound (nh x (ns+1))
+    OCP_LBH,
+    /// Point constraint upper bound (nh x (ns+1))
+    OCP_UBH,
     /// Bounds for the coupling constraints
     OCP_LBG, OCP_UBG,
     /// Number of inputs to an OCP solver
@@ -66,10 +89,6 @@ namespace CasADi{
 
   /** \brief Base class for OCP solvers
    *
-   * Available options:
-   * "number_of_parameters", OT_INTEGER,  0
-   * "number_of_grid_points", OT_INTEGER,  20
-   * "final_time",OT_REAL, 1.0
    *
    * OCPSolver is an CasADi::FX mapping from CasADi::OCPInput to CasADi::OCPOutput
    *

@@ -33,10 +33,13 @@ namespace CasADi{
     
   /** \brief Multiple Shooting
    *
-   * Available options, from OCPSolver:
-   * "number_of_parameters", OT_INTEGER,  0
-   * "number_of_grid_points", OT_INTEGER,  20
-   * "final_time",OT_REAL, 1.0
+   *   ns: Number of shooting nodes: from option number_of_grid_points\n
+   *   nx: Number of differential states: from ffcn.input(INTEGRATOR_X0).size() \n
+   *   nu: Number of controls: from ffcn.input(INTEGRATOR_P).size() - np \n
+   *   np: Number of parameters: from option number_of_parameters\n
+   *   nh: Number of point constraints: from cfcn.input(0).size()
+   *
+   * MultipleShooting is an CasADi::FX mapping from CasADi::OCPInput to CasADi::OCPOutput
    *
    *   \author Joel Andersson
    *   \date 2011
@@ -48,9 +51,9 @@ class MultipleShooting : public OCPSolver{
   
     /// Create a multiple shooting OCP solver
     /**
-    * \param ffcn Discrete time dynamics, should have I/O of an integrator
-    * \param mfcn Mayer term, mappping endstate -> cost
-    * \param cfcn Path constraints
+    * \param ffcn Discrete time dynamics, CasADi::FX mapping from CasADi::IntegratorInput to CasADi::IntegratorOutput
+    * \param mfcn Mayer term, mapping endstate (nx x 1) to cost (1 x 1)
+    * \param cfcn Path constraints, CasADi::FX mapping from CasADi::DAEInput to (nh x 1)
     * \param rfcn Initial value constraints
     */
     explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());

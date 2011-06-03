@@ -214,21 +214,21 @@ class OCPtests(casadiTestCase):
     self.assertTrue(w.subByName("T").var_.var().isEqual(T)) 
         
     u = ocp.u_[0].var()
-    self.assertEquals(len(ocp.cfcn),3)
-    self.assertEquals(len(ocp.cfcn_lb),3)
-    self.assertEquals(len(ocp.cfcn_ub),3)
-    self.assertTrue(ocp.cfcn[0].isEqual(T)) 
-    self.assertTrue(ocp.cfcn[1].isEqual(u)) 
-    self.assertTrue(ocp.cfcn[2].isEqual(u)) 
-    self.assertTrue(ocp.cfcn_lb[0].isMinusInf()) 
-    self.assertEquals(ocp.cfcn_lb[1].getValue(),230) 
-    self.assertTrue(ocp.cfcn_lb[2].isMinusInf()) 
-    self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
-    self.assertTrue(ocp.cfcn_ub[1].isInf())
-    self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
+    self.assertEquals(len(ocp.path_fcn_),3)
+    #self.assertEquals(len(ocp.cfcn_lb),3)
+    #self.assertEquals(len(ocp.cfcn_ub),3)
+    #self.assertTrue(ocp.cfcn[0].isEqual(T)) 
+    #self.assertTrue(ocp.cfcn[1].isEqual(u)) 
+    #self.assertTrue(ocp.cfcn[2].isEqual(u)) 
+    #self.assertTrue(ocp.cfcn_lb[0].isMinusInf()) 
+    #self.assertEquals(ocp.cfcn_lb[1].getValue(),230) 
+    #self.assertTrue(ocp.cfcn_lb[2].isMinusInf()) 
+    #self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
+    #self.assertTrue(ocp.cfcn_ub[1].isInf())
+    #self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
     print ocp.initial_eq_
     print c,T,cost
-    print c.atTime(0)
+    #print c.atTime(0)
     f=SXFunction([[c,T,cost]],[ocp.initial_eq_])
     f.init()
     f.evaluate()
@@ -236,7 +236,88 @@ class OCPtests(casadiTestCase):
 
     
     mystates = []
+
+  def testMSclass_prim(self):
+    self.message("CasADi multiple shooting class")
     
+    ns = 20
+    nx = 3
+    nu = 2
+    np = 0
+    nh = 0
+    tf = 0.2
+    
+    x0 = symbolic("x0",nx)
+    p = symbolic("p",nu)
+    xp0 = symbolic("x0",nx)
+    xf = x0 + p[0]
+    dynamics = SXFunction({INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
+    mayer = SXFunction([x0],[7*x0])
+    ms = MultipleShooting(dynamics,mayer)
+    ms.setOption("number_of_grid_points",ns)
+    ms.setOption("final_time",tf)
+    ms.init()
+    self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
+    
+    for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+      self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
+      
+
+    self.checkarray(ms.input(OCP_LBXP).shape,(nx,ns+1),"shape")
+    self.checkarray(ms.input(OCP_UBXP).shape,(nx,ns+1),"shape")
+    self.checkarray(ms.input(OCP_XP_INIT).shape,(0,0),"shape") # is this a bug?
+    
+    for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+      self.checkarray(ms.input(i).shape,(nu,ns),"shape")
+    
+    for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+      self.checkarray(ms.input(i).shape,(np,1),"shape")
+
+    for i in [OCP_LBH,OCP_UBH]:
+      self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
+      
+    ns = 20
+    nx = 3
+    nu = 2
+    np = 4
+    nh = 2
+    tf = 0.2
+    
+    x0 = symbolic("x0",nx)
+    p = symbolic("p",nu+np)
+    xp0 = symbolic("x0",nx)
+    xf = x0 + p[0]
+    dynamics = SXFunction({INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
+    mayer = SXFunction([x0],[7*x0])
+    
+    t = SX("t")
+    cfcn = SXFunction({DAE_T : t, DAE_Y: x0, DAE_P: p, DAE_YDOT: xp0},[x0[:nh,0]])
+    cfcn.init()
+    
+    ms = MultipleShooting(dynamics,mayer,cfcn)
+    ms.setOption("number_of_grid_points",ns)
+    ms.setOption("number_of_parameters",np)
+    ms.setOption("final_time",tf)
+    ms.init()
+    self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
+    
+    for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+      self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
+      
+
+    self.checkarray(ms.input(OCP_LBXP).shape,(nx,ns+1),"shape")
+    self.checkarray(ms.input(OCP_UBXP).shape,(nx,ns+1),"shape")
+    self.checkarray(ms.input(OCP_XP_INIT).shape,(0,0),"shape") # is this a bug?
+    
+    for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+      self.checkarray(ms.input(i).shape,(nu,ns),"shape")
+    
+    for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+      self.checkarray(ms.input(i).shape,(np,1),"shape")
+
+    for i in [OCP_LBH,OCP_UBH]:
+      self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
+      
 if __name__ == '__main__':
     unittest.main()
 
