@@ -164,6 +164,9 @@ template<class T>
 bool isZero(const Matrix<T>& ex);
 
 template<class T>
+bool isIdentity(const Matrix<T>& ex);
+
+template<class T>
 int nnz(const Matrix<T>& ex);
 
 template<class T>
@@ -659,6 +662,22 @@ bool isZero(const Matrix<T>& ex) {
 }
 
 template<class T>
+bool isIdentity(const Matrix<T>& ex) {
+  
+  // Make sure that the matrix is diagonal
+  if(!ex.sparsity().diagonal())
+    return false;
+  
+  // Make sure that all entries are one
+  for(typename Matrix<T>::const_iterator it=ex.begin(); it!=ex.end(); ++it){
+    if(!casadi_limits<T>::isOne(*it))
+      return false;
+  }
+      
+  return true;
+}
+
+template<class T>
 int nnz(const Matrix<T>& ex) {
   return ex.size();
 }
@@ -800,6 +819,7 @@ MTT_INST(T,qr) \
 MTT_INST(T,solve) \
 MTT_INST(T,linspace) \
 MTT_INST(T,isZero) \
+MTT_INST(T,isIdentity) \
 MTT_INST(T,nnz) \
 MTT_INST(T,nnz_sym) \
 MTT_INST(T,isEqual) \

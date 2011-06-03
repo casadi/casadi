@@ -259,6 +259,29 @@ bool CRSSparsity::dense() const{
   return size() == numel();
 }
 
+bool CRSSparsity::diagonal() const{
+  // Check if matrix is square
+  if(size1() != size2()) return false;
+    
+  // Check if correct number of non-zeros (one per row)
+  if(size() != size1()) return false;
+
+  // Check that the column indices are correct
+  for(int i=0; i<size(); ++i){
+    if(col(i)!=i)
+      return false;
+  }
+   
+  // Make sure that the row indices are correct
+  for(int i=0; i<size1(); ++i){
+    if(rowind(i)!=i)
+      return false;
+  }
+  
+  // Diagonal if reached this point
+  return true;
+}
+
 
 CRSSparsity CRSSparsity::getSub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
   // Get non-zeros

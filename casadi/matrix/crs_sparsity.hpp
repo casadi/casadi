@@ -211,6 +211,10 @@ class CRSSparsity : public SharedObject{
 
     /// Is dense?
     bool dense() const;
+    
+    /// Is diagonal?
+    bool diagonal() const;
+    
 
     /// (Dense) scalar
     static CRSSparsity scalarSparsity;

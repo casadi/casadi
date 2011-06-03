@@ -23,6 +23,7 @@
 #include "mx_tools.hpp"
 #include "mapping.hpp"
 #include "norm.hpp"
+#include "mx_constant.hpp"
 #include "multiplication.hpp"
 #include "if_else_node.hpp"
 #include "../fx/mx_function.hpp"
@@ -108,12 +109,31 @@ MX norm_inf(const MX &x){
 }
 
 MX prod(const MX &x, const MX &y){
-  // Check if zero
-  if(x.size()==0 || y.size()==0){
+  // Check if any of the factors is zero
+  if(isZero(x) || isZero(y)){
     return MX::zeros(x.size1(),y.size2());
   }
   
+  // Check if any of the factors are identity matrices
+  if(isIdentity(x))
+    return y;
+  else if(isIdentity(y))
+    return x;
+  
+  // Else, create a multiplication node
   return MX::create(new Multiplication(x,y));
+}
+
+bool isZero(const MX& ex){
+  return ex.size()==0;
+}
+
+bool isIdentity(const MX& ex){
+  const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+  if(n==0)
+    return false;
+  else
+    return isIdentity(n->x_);
 }
 
 MX inner_prod(const MX &x, const MX &y){

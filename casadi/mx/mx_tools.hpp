@@ -109,6 +109,12 @@ MX unite(const MX& A, const MX& B);
 /** \brief  check if symbolic */
 bool isSymbolic(const MX& ex);
 
+/** \brief  check if identity */
+bool isIdentity(const MX& ex);
+
+/** \brief  check if zero */
+bool isZero(const MX& ex);
+
 /** \brief Repeat matrix A n times vertically and m times horizontally */
 MX repmat(const MX &A, int n, int m); 
 
