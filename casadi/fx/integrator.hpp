@@ -25,7 +25,6 @@
 
 #include "fx.hpp"
 #include "linear_solver.hpp"
-#include "integrator_jacobian.hpp"
 
 namespace CasADi{
 
@@ -94,11 +93,9 @@ class IntegratorInternal;
   (ruling out collocation in particular). The actual form of the ODE/DAE is defined in the derived classes.
     
   inputs:
-  0: Initial time t0 (dimension 1-by-1)
-  1: Final time tf (dimension 1-by-1)
-  2: State at t0  (dimension nx-by-1)
-  3: Parameter  (dimension np-by-1)
-  4: State derivative at t0  (dimension nx-by-1)
+  0: State at t0  (dimension nx-by-1)
+  1: Parameter  (dimension np-by-1)
+  2: State derivative at t0  (dimension nx-by-1)
   
   outputs:
   0: State at tf

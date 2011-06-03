@@ -76,6 +76,9 @@ public:
   /** \brief Jacobian of output oind with respect to input iind */
   virtual FX jacobian(int iind=0, int oind=0);
  
+  /// Generate the sparsity of a Jacobian block
+  virtual CRSSparsity getJacSparsity(int iind, int oind);
+
   /// Get the Jacobian
   virtual FX getJacobian() = 0;
   
@@ -91,6 +94,12 @@ public:
   /// Number of states (including algebraic states and quadrature states)
   int nx_;
   
+  /// number of states, excluding quadrature states
+  int ny_;
+  
+  /// number of quadrature states
+  int nq_; 
+
   /// Number of parameters
   int np_;
   
@@ -118,9 +127,6 @@ public:
   
   // Set dimensions
   void setDimensions(int nx, int np);
-    
-  // Get the mapping of the states for the augmented DAE
-  virtual std::vector<int> jacmap(int ns) = 0;
     
   // workaround: is symbolic jac ok?
   virtual bool symbjac() = 0;

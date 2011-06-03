@@ -213,14 +213,6 @@ CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind){
 
 FX ParallelizerInternal::jacobian(const vector<pair<int,int> >& jblocks){
   
-  // Symbolic input
-  vector<MX> j_in(getNumInputs());
-  for(int i=0; i<j_in.size(); ++i){
-    stringstream name;
-    name << "x_" << i;
-    j_in[i] = MX(name.str(),input(i).sparsity());
-  }
-  
   // Jacobian functions to be evaluated in parallel
   vector<FX> jac_funcs(funcs_.size());
   

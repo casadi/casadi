@@ -1542,17 +1542,6 @@ Integrator IdasInternal::jac(int iind, int oind){
   return integrator;
 }
 
-vector<int> IdasInternal::jacmap(int ns){
-  vector<int> jmap(nx_*(1+ns));
-  for(int i=0; i<1+ns; ++i){
-    for(int j=0; j<ny_; ++j)
-      jmap[j+nx_*i] = j+ny_*i;
-    for(int j=0; j<nq_; ++j)
-      jmap[ny_+j+nx_*i] = ny_*(1+ns) + j + nq_*i;
-  }
-  return jmap;
-}
-
 bool IdasInternal::symbjac(){
   SXFunction f = shared_cast<SXFunction>(f_);
   SXFunction q = shared_cast<SXFunction>(q_);

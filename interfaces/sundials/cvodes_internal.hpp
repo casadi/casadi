@@ -158,9 +158,6 @@ public:
   // N-vectors for the adjoint sensitivities
   std::vector<N_Vector> yB0_, yB_, /*yQB0_, */ yQB_;
   
-  // dimensions
-  int ny_; // number of ode states
-  int nq_; // number of quadratures
   
   bool is_init;
   bool isInitAdj_;
@@ -200,7 +197,6 @@ public:
   int iter_; // nonlinear solver iteration
 
   // Get the mapping of the states for the augmented DAE
-  virtual std::vector<int> jacmap(int ns);
   virtual bool symbjac();
 
   bool monitor_rhsB_;

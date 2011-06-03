@@ -227,16 +227,22 @@ GenericType FXInternal::getStat(const string & name) const {
   return GenericType(it->second);
 }
 
-FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
-  casadi_warning("inefficient algorithm: overload this function");
-  
-  // Symbolic input
-  vector<MX> j_in(getNumInputs());
-  for(int i=0; i<j_in.size(); ++i){
+std::vector<MX> FXInternal::symbolicInput() const{
+  vector<MX> ret(getNumInputs());
+  casadi_assert(isInit());
+  for(int i=0; i<ret.size(); ++i){
     stringstream name;
     name << "x_" << i;
-    j_in[i] = MX(name.str(),input(i).sparsity());
+    ret[i] = MX(name.str(),input(i).sparsity());
   }
+  return ret;
+}
+
+FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
+  cout << "inefficient algorithm: FXInternal::jacobian() not defined for class " << typeid(*this).name() << endl;
+  
+  // Symbolic input
+  vector<MX> j_in = symbolicInput();
   
   // Nondifferentiated function
   FX fcn;

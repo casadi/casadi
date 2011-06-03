@@ -24,7 +24,9 @@
 #include <cassert>
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
-#include "integrator_jacobian_internal.hpp"
+#include "../matrix/matrix_tools.hpp"
+#include "../mx/mx_tools.hpp"
+#include "mx_function.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -146,27 +148,111 @@ FX IntegratorInternal::jacobian(int iind, int oind){
   
   // Create a new integrator for the forward sensitivity equations
   Integrator fwdint = jac(iind,oind);
+  fwdint.init();
 
   // Number of sensitivities
   int ns;
   switch(iind){
     case INTEGRATOR_P: ns = np_; break;
     case INTEGRATOR_X0: ns = nx_; break;
-    default: casadi_assert_message(false,"iind must be INTEGRATOR_P, INTEGRATOR_X0 or INTEGRATOR_Z0");
+    default: casadi_assert_message(false,"iind must be INTEGRATOR_P or INTEGRATOR_X0");
   }
   
-  // Generate an jacobian
-  IntegratorJacobian intjac(fwdint);
-  intjac->jacmap_ = jacmap(ns);
+  // Symbolic input of the Jacobian
+  vector<MX> jac_in = symbolicInput();
   
-  // Derivative with respect to what?
-  intjac.setOption("derivative_index",iind);
+  // Input to the augmented integrator
+  vector<MX> fwdint_in(INTEGRATOR_NUM_IN);
+  
+  // Pass parameters without change
+  fwdint_in[INTEGRATOR_P] = jac_in[INTEGRATOR_P];
+  
+  // Get the state
+  MX x0 = jac_in[INTEGRATOR_X0];
+  MX xp0 = jac_in[INTEGRATOR_XP0];
+  
+  // Separate the quadrature states from the rest of the states
+  MX y0 = x0[range(ny_)];
+  MX q0 = x0[range(ny_,nx_)];
+  MX yp0 = xp0[range(ny_)];
+  MX qp0 = xp0[range(ny_,nx_)];
+  
+  // Initial condition for the sensitivitiy equations
+  DMatrix y0_sens(ns*ny_,1,0);
+  DMatrix q0_sens(ns*nq_,1,0);
+  
+  if(iind == INTEGRATOR_X0){
+    for(int i=0; i<ny_; ++i){
+      y0_sens[i + i*ns] = 1;
+    }
+    
+    for(int i=0; i<nq_; ++i){
+      q0_sens[ny_ + i + i*ns] = 1;
+    }
+  }
+  
+  // Augmented initial condition
+  MX y0_aug = vertcat(y0,MX(y0_sens));
+  MX q0_aug = vertcat(q0,MX(q0_sens));
+  MX yp0_aug = vertcat(yp0,MX::zeros(y0_sens.sparsity()));
+  MX qp0_aug = vertcat(qp0,MX::zeros(q0_sens.sparsity()));
+
+  // Finally, we are ready to pass the initial condition for the state and state derivative
+  fwdint_in[INTEGRATOR_X0] = vertcat(y0_aug,q0_aug);
+  fwdint_in[INTEGRATOR_XP0] = vertcat(yp0_aug,qp0_aug);
+  
+  // Call the integrator with the constructed input (in fact, create a call node)
+  vector<MX> fwdint_out = fwdint.call(fwdint_in);
+  MX xf_aug = fwdint_out[INTEGRATOR_XF];
+  MX xpf_aug = fwdint_out[INTEGRATOR_XPF];
+  
+  // Separate the quadrature states from the rest of the states
+  MX yf_aug = xf_aug[range((ns+1)*ny_)];
+  MX qf_aug = xf_aug[range((ns+1)*ny_,(ns+1)*nx_)];
+  MX ypf_aug = xpf_aug[range((ns+1)*ny_)];
+  MX qpf_aug = xpf_aug[range((ns+1)*ny_,(ns+1)*nx_)];
+  
+  // Get the state and state derivative at the final time
+  MX yf = yf_aug[range(ny_)];
+  MX qf = qf_aug[range(nq_)];
+  MX xf = vertcat(yf,qf);
+  MX ypf = yf_aug[range(ny_)];
+  MX qpf = qf_aug[range(nq_)];
+  MX xpf = vertcat(ypf,qpf);
+  
+  // Get the sensitivitiy equations state at the final time
+  MX yf_sens = yf_aug[range(ny_,(ns+1)*ny_)];
+  MX qf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
+  MX ypf_sens = yf_aug[range(ny_,(ns+1)*ny_)];
+  MX qpf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
+
+  // Reshape the sensitivity state and state derivatives
+  yf_sens = trans(reshape(yf_sens,ns,ny_));
+  ypf_sens = trans(reshape(ypf_sens,ns,ny_));
+  qf_sens = trans(reshape(qf_sens,ns,nq_));
+  qpf_sens = trans(reshape(qpf_sens,ns,nq_));
+  
+  // Finally, we are able to get the Jacobian
+  MX xf_sens = vertcat(yf_sens,qf_sens);
+  MX xpf_sens = vertcat(ypf_sens,qpf_sens);
+
+  MXFunction intjac(jac_in,xf_sens);
   
   return intjac;
   } else { 
     Integrator I;
     I.assignNode(this);
     return Jacobian(I,iind,oind);
+  }
+}
+
+CRSSparsity IntegratorInternal::getJacSparsity(int iind, int oind){
+  if(iind==INTEGRATOR_XP0){
+    // Function value does not depend on the state derivative initial guess
+    return CRSSparsity();
+  } else {
+    // Default (dense) sparsity
+    return FXInternal::getJacSparsity(iind,oind);
   }
 }
 

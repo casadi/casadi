@@ -189,11 +189,7 @@ class IdasInternal : public IntegratorInternal{
 
   // Which components are differential
   N_Vector id_;
-  
-  // dimensions
-  int ny_; // number of differential states
-  int nq_; // number of quadratures
-  
+    
   bool is_init;
   
   // sensitivity method
@@ -276,9 +272,6 @@ class IdasInternal : public IntegratorInternal{
   // Set the adjoint sensitivities
   void setAdjointSensitivities();
   
-  // Get the mapping of the states for the augmented DAE
-  virtual std::vector<int> jacmap(int ns);
-
   virtual bool symbjac();
 
 };

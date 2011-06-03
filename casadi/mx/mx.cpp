@@ -331,6 +331,10 @@ MX MX::zeros(int nrow, int ncol){
   return MX(nrow,ncol);
 }
 
+MX MX::zeros(const CRSSparsity& sparsity){
+  return DMatrix(sparsity,0);
+}
+
 MX MX::ones(int nrow, int ncol){
   return MX(Matrix<double>(nrow,ncol,1));
 }

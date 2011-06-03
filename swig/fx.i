@@ -25,7 +25,6 @@
 %include "casadi/fx/mx_function.hpp"
 %include "casadi/fx/linear_solver.hpp"
 %include "casadi/fx/implicit_function.hpp"
-%include "casadi/fx/integrator_jacobian.hpp"
 %include "casadi/fx/integrator.hpp"
 %include "casadi/fx/simulator.hpp"
 %include "casadi/fx/nlp_solver.hpp"

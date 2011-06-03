@@ -149,6 +149,9 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /// Get, if necessary generate, the sparsity of a Jacobian block
     CRSSparsity& jacSparsity(int iind, int oind);
+    
+    /// Get a vector of symbolic variables with the same dimensions as the inputs
+    std::vector<MX> symbolicInput() const;
   
   protected:
 

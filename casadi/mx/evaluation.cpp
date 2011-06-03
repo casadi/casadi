@@ -126,7 +126,6 @@ MX Evaluation::adFwd(const std::vector<MX>& jx){
 }
 
 MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
-  cout << "called EvaluationOutput::adFwd " << endl;
   
   // Get a reference the arguments
   vector<MX>& x = dynamic_cast<Evaluation*>(dep(0).get())->x_;
