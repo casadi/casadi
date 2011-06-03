@@ -47,10 +47,6 @@ bool IdasIntegrator::checkNode() const{
   return dynamic_cast<const IdasInternal*>(get());
 }
 
-IdasIntegrator IdasIntegrator::jac(int iind, int oind){
-  return shared_cast<IdasIntegrator>(Integrator::jac(iind,oind));  
-}
-
 void IdasIntegrator::correctInitialConditions(){
   (*this)->correctInitialConditions();
 }

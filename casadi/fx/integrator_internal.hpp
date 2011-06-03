@@ -35,13 +35,16 @@ namespace CasADi{
 class IntegratorInternal : public FXInternal{
 public:
   /** \brief  Constructor */
-  IntegratorInternal();
+  IntegratorInternal(const FX& f, const FX& q);
 
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
 
   /** \brief  Clone */
   virtual IntegratorInternal* clone() const=0;
+  
+  /** \brief  Create a new integrator */
+  virtual IntegratorInternal* create(const FX& f, const FX& q) const = 0;
   
   /** \brief  Set linear solver */
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac)=0;
@@ -71,7 +74,7 @@ public:
   virtual void init();
 
   /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
-  virtual Integrator jac(int iind=0, int oind=0) = 0;
+  virtual Integrator jac(int iind=0, int oind=0);
 
   /** \brief Jacobian of output oind with respect to input iind */
   virtual FX jacobian(int iind=0, int oind=0);
@@ -90,6 +93,18 @@ public:
 
   /// Set final time
   void setFinalTime(double tf);
+
+  /// DAE residual function
+  FX f_;
+
+  /// Quadrature function
+  FX q_;
+
+  /// Jacobian of the ODE/DAE with respect to the state and state derivatives
+  FX jac_;
+
+  /// Linear solver
+  LinearSolver linsol_;  
 
   /// Number of states (including algebraic states and quadrature states)
   int nx_;
@@ -129,7 +144,7 @@ public:
   void setDimensions(int nx, int np);
     
   // workaround: is symbolic jac ok?
-  virtual bool symbjac() = 0;
+  virtual bool symbjac();
   
 };
   

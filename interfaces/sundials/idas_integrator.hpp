@@ -81,9 +81,6 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /// Generate a new integrator integrating the forward sensitivity augmented ODE/DAE
-  IdasIntegrator jac(int iind=0, int oind=0);
-  
   /// Correct the initial value for yp and z after resetting the solver
   void correctInitialConditions();
 

@@ -49,6 +49,9 @@ public:
 
   /** \brief  Clone */
   virtual CVodesInternal* clone() const;
+  
+  /** \brief  Create a new integrator */
+  virtual CVodesInternal* create(const FX& f, const FX& q) const{ return new CVodesInternal(f,q);}
 
   /** \brief  Destructor */
   virtual ~CVodesInternal();
@@ -73,11 +76,6 @@ public:
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
-
-  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations
-  \see CasADi::Jacobian for an AD approach.
-   */
-  virtual Integrator jac(int iind=0, int oind=0);
 
   /** \brief Get the jacobian in the nonlinear iteration
   * The result is an CasADi::FX mapping from CasADi::Sundials::MInput to CasADi::Sundials::MOutput
@@ -129,12 +127,6 @@ public:
   // CVodes memory block
   void* mem_;
   
-  // ODE rhs
-  FX f_;
-  
-  // Quadrature function
-  FX q_;
-  
   // The jacobian of the ODE rhs fcn
   FX jac_f_;
   
@@ -181,12 +173,6 @@ public:
   // Number of forward and adjoint seeds for the functions f and q
   int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
 
-  // The jacobian of the nonlinear system
-  FX M_;
-  
-  // Linear solver
-  LinearSolver linsol_;  
-
   // Set the user defined linear solver
   void initUserDefinedLinearSolver();
 
@@ -195,9 +181,6 @@ public:
 
   int lmm_; // linear multistep method
   int iter_; // nonlinear solver iteration
-
-  // Get the mapping of the states for the augmented DAE
-  virtual bool symbjac();
 
   bool monitor_rhsB_;
 

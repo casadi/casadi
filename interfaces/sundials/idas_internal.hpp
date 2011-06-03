@@ -89,6 +89,9 @@ class IdasInternal : public IntegratorInternal{
 
   /** \brief  Clone */
   virtual IdasInternal* clone() const;
+  
+  /** \brief  Create a new integrator */
+  virtual IdasInternal* create(const FX& f, const FX& q) const{ return new IdasInternal(f,q);}
 
   /** \brief  Destructor */
   virtual ~IdasInternal();
@@ -120,9 +123,6 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Print solver statistics */  
   virtual void printStats(std::ostream &stream) const;
   
-  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
-  virtual Integrator jac(int iind=0, int oind=0);
-
   /// Get the Jacobian
   virtual FX getJacobian();
   
@@ -172,12 +172,6 @@ class IdasInternal : public IntegratorInternal{
   // Idas memory block
   void* mem_;
 
-  // ODE rhs
-  FX f_;
-
-  // Quadrature function
-  FX q_;
-
   // N-vectors for the DAE integration
   N_Vector  y_, yP_, yQ_;
 
@@ -212,9 +206,6 @@ class IdasInternal : public IntegratorInternal{
 
   int fsens_order_, asens_order_;
   
-  // Jacobian of the ODE with respect to the state and state derivatives
-  FX jac_;
-
   // Jacobian of the ODE with respect to the parameters
   FX jacp_;
   
@@ -239,9 +230,6 @@ class IdasInternal : public IntegratorInternal{
   // Number of forward and adjoint seeds for the functions f and q
   int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
   
-  // Linear solver
-  LinearSolver linsol_;  
-
   // Scaling of cj
   bool cj_scaling_;
 
@@ -272,8 +260,6 @@ class IdasInternal : public IntegratorInternal{
   // Set the adjoint sensitivities
   void setAdjointSensitivities();
   
-  virtual bool symbjac();
-
 };
 
 

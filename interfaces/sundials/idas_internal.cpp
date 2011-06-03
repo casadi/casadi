@@ -45,7 +45,7 @@ IdasInternal* IdasInternal::clone() const{
 //   
 // }
 
-IdasInternal::IdasInternal(const FX& f, const FX& q) : f_(f), q_(q){
+IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
   addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions");
   addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions");
@@ -1442,110 +1442,6 @@ void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   // Try to generate a jacobian of none provided
   if(jac_.isNull())
     getJacobian();
-}
-
-Integrator IdasInternal::jac(int iind, int oind){
-  casadi_assert_message(oind==INTEGRATOR_XF,"IdasInternal::jacobian: Not derivative of state");
-  
-  // Type cast to SXMatrix (currently supported)
-  SXFunction f = shared_cast<SXFunction>(f_);
-  casadi_assert(!f.isNull());
-  
-  SXFunction q = shared_cast<SXFunction>(q_);
-  casadi_assert(q_.isNull() == q.isNull());
-    
-  // Generate Jacobians with respect to state, state derivative and parameters
-  SXMatrix df_dy = f.jac(DAE_Y,DAE_RES);
-  SXMatrix df_dydot = f.jac(DAE_YDOT,DAE_RES);
-  
-  // Number of sensitivities
-  int ns;
-  switch(iind){
-    case INTEGRATOR_P: ns = np_; break;
-    case INTEGRATOR_X0: ns = nx_; break;
-    default: casadi_assert_message(false,"iind must be INTEGRATOR_P or INTEGRATOR_X0");
-  }
-  
-  // Sensitivities and derivatives of sensitivities
-  SXMatrix ysens = symbolic("ysens",ny_,ns);
-  SXMatrix ypsens = symbolic("ypsens",ny_,ns);
-  
-  // Sensitivity equation
-  SXMatrix res_s = prod(df_dy,ysens) + prod(df_dydot,ypsens);
-  if(iind==INTEGRATOR_P) res_s += f.jac(DAE_P,DAE_RES);
-
-  // Augmented DAE
-  SXMatrix faug = vec(horzcat(f.outputSX(oind),res_s));
-
-  // Input arguments for the augmented DAE
-  vector<SXMatrix> faug_in(DAE_NUM_IN);
-  faug_in[DAE_T] = f.inputSX(DAE_T);
-  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
-  faug_in[DAE_YDOT] = vec(horzcat(f.inputSX(DAE_YDOT),ypsens));
-  faug_in[DAE_P] = f.inputSX(DAE_P);
-  
-  // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,faug);
-  
-  // Augmented quadratures
-  SXFunction qfcn_aug;
-  
-  if(!q.isNull()){
-    // Now lets do the same for the quadrature states
-    SXMatrix dq_dy = q.jac(DAE_Y,DAE_RES);
-    SXMatrix dq_dydot = q.jac(DAE_YDOT,DAE_RES);
-    
-    // Sensitivity quadratures
-    SXMatrix q_s = prod(dq_dy,ysens) + prod(dq_dydot,ypsens);
-    if(iind==INTEGRATOR_P) q_s += q.jac(DAE_P,DAE_RES);
-
-    // Augmented quadratures
-    SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
-
-    // Input to the augmented DAE (start with old)
-    vector<SXMatrix> qaug_in(DAE_NUM_IN);
-    qaug_in[DAE_T] = q.inputSX(DAE_T);
-    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
-    qaug_in[DAE_YDOT] = vec(horzcat(q.inputSX(DAE_YDOT),ypsens));
-    qaug_in[DAE_P] = q.inputSX(DAE_P);
-
-    // Create augmented DAE function
-    qfcn_aug = SXFunction(qaug_in,qaug);
-  }
-  
-  // Create integrator instance
-  IdasIntegrator integrator(ffcn_aug,qfcn_aug);
-
-  // Set options
-  integrator.setOption(dictionary());
-  integrator.setOption("nrhs",1+ns);
-  
-  // Transmit information on derivative states
-  if(hasSetOption("is_differential")){
-    vector<int> is_diff = getOption("is_differential").toIntVector();
-    if(is_diff.size()!=ny_) throw CasadiException("is_differential has incorrect length");
-    vector<int> is_diff_aug(ny_*(1+ns));
-    for(int i=0; i<1+ns; ++i)
-      for(int j=0; j<ny_; ++j)
-        is_diff_aug[j+i*ny_] = is_diff[j];
-    integrator.setOption("is_differential",is_diff_aug);
-  }
-  
-  // Pass linear solver
-  if(!linsol_.isNull()){
-    LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
-//    linsol_aug->nrhs_ = 1+ns; // FIXME!!!
-//    integrator.setLinearSolver(linsol_aug,jac_); // FIXME!!!
-    integrator.setLinearSolver(linsol_aug);
-  }
-  
-  return integrator;
-}
-
-bool IdasInternal::symbjac(){
-  SXFunction f = shared_cast<SXFunction>(f_);
-  SXFunction q = shared_cast<SXFunction>(q_);
-  return f_.isNull() == f.isNull() && q_.isNull() == q.isNull();
 }
 
 FX IdasInternal::getJacobian(){

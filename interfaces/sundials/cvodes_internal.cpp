@@ -37,13 +37,13 @@ CVodesInternal* CVodesInternal::clone() const{
   CVodesInternal* node = new CVodesInternal(f,q);
   node->setOption(dictionary());
   node->linsol_ = deepcopy(linsol_);
-  node->M_ = deepcopy(M_);
+  node->jac_ = deepcopy(jac_);
   if(isInit())
     node->init();
   return node;
 }
   
-CVodesInternal::CVodesInternal(const FX& f, const FX& q) : f_(f), q_(q){
+CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("linear_multistep_method",     OT_STRING,  "bdf"); // "bdf" or "adams"
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton"); // "newton" or "functional"
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
@@ -132,7 +132,7 @@ void CVodesInternal::init(){
   monitor_rhsB_ = monitored("CVodesInternal::rhsB");
   
   // Try to generate a jacobian of none provided
-  if(!linsol_.isNull() && M_.isNull()){
+  if(!linsol_.isNull() && jac_.isNull()){
     SXFunction f = shared_cast<SXFunction>(f_);
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration
@@ -151,11 +151,11 @@ void CVodesInternal::init(){
       linsol_.setSparsity(jac.sparsity());
       
       // Save function
-      M_ = M;
+      jac_ = M;
     }
   }
   
-  if(!M_.isNull()) M_.init();
+  if(!jac_.isNull()) jac_.init();
   if(!linsol_.isNull()) linsol_.init();
 
   // Get the number of forward and adjoint directions
@@ -268,7 +268,7 @@ void CVodesInternal::init(){
     // Add a preconditioner
     if(bool(getOption("use_preconditioner"))){
       // Make sure that a Jacobian has been provided
-      if(M_.isNull()) throw CasadiException("CVodesInternal::init(): No Jacobian has been provided.");
+      if(jac_.isNull()) throw CasadiException("CVodesInternal::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been providided
       if(linsol_.isNull()) throw CasadiException("CVodesInternal::init(): No user defined linear solver has been provided.");
@@ -1230,20 +1230,20 @@ void CVodesInternal::psetup(double t, N_Vector y, N_Vector fy, booleantype jok, 
   time1 = clock();
 
   // Pass input to the jacobian function
-  M_.setInput(t,M_T);
-  M_.setInput(NV_DATA_S(y),M_Y);
-  M_.setInput(input(INTEGRATOR_P),M_P);
-  M_.setInput(gamma,M_GAMMA);
+  jac_.setInput(t,M_T);
+  jac_.setInput(NV_DATA_S(y),M_Y);
+  jac_.setInput(input(INTEGRATOR_P),M_P);
+  jac_.setInput(gamma,M_GAMMA);
 
   // Evaluate jacobian
-  M_.evaluate();
+  jac_.evaluate();
   
   // Log time duration
   time2 = clock();
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
 
   // Pass non-zero elements, scaled by -gamma, to the linear solver
-  linsol_.setInput(M_.output(),0);
+  linsol_.setInput(jac_.output(),0);
 
   // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
   linsol_.prepare();
@@ -1307,7 +1307,7 @@ int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
 
 void CVodesInternal::initUserDefinedLinearSolver(){
   // Make sure that a Jacobian has been provided
-  if(M_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
+  if(jac_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): No Jacobian has been provided.");
 
   // Make sure that a linear solver has been providided
   if(linsol_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
@@ -1322,100 +1322,11 @@ void CVodesInternal::initUserDefinedLinearSolver(){
 
 void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   linsol_ = linsol;
-  M_ = jac;
-}
-
-
-bool CVodesInternal::symbjac(){
-  SXFunction f = shared_cast<SXFunction>(f_);
-  SXFunction q = shared_cast<SXFunction>(q_);
-  return f_.isNull() == f.isNull() && q_.isNull() == q.isNull();
-}
-
-Integrator CVodesInternal::jac(int iind, int oind){
-  casadi_assert_message(oind==INTEGRATOR_XF,"CVodesInternal::jacobian: Not derivative of state");
-  
-  // Type cast to SXMatrix (currently supported)
-  SXFunction f = shared_cast<SXFunction>(f_);
-  casadi_assert(!f.isNull());
-  
-  SXFunction q = shared_cast<SXFunction>(q_);
-  casadi_assert(q_.isNull() == q.isNull());
-    
-  // Generate Jacobians with respect to state, state derivative and parameters
-  SXMatrix df_dy = f.jac(DAE_Y,DAE_RES);
-  
-  // Number of sensitivities
-  int ns;
-  switch(iind){
-    case INTEGRATOR_P: ns = np_; break;
-    case INTEGRATOR_X0: ns = nx_; break;
-    default: casadi_assert_message(false,"iind must be INTEGRATOR_P or INTEGRATOR_X0");
-  }
-  
-  // Sensitivities and derivatives of sensitivities
-  SXMatrix ysens = symbolic("ysens",ny_,ns);
-  
-  // Sensitivity ODE
-  SXMatrix rhs_s = prod(df_dy,ysens);
-  if(iind==INTEGRATOR_P) rhs_s += f.jac(DAE_P,DAE_RES);
-
-  // Augmented ODE
-  SXMatrix faug = vec(horzcat(f.outputSX(oind),rhs_s));
-  makeDense(faug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
-
-  // Input arguments for the augmented DAE
-  vector<SXMatrix> faug_in(DAE_NUM_IN);
-  faug_in[DAE_T] = f.inputSX(DAE_T);
-  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
-  faug_in[DAE_P] = f.inputSX(DAE_P);
-  
-  // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,faug);
-  
-  // Augmented quadratures
-  SXFunction qfcn_aug;
-  
-  if(!q.isNull()){
-    // Now lets do the same for the quadrature states
-    SXMatrix dq_dy = q.jac(DAE_Y,DAE_RES);
-    
-    // Sensitivity quadratures
-    SXMatrix q_s = prod(dq_dy,ysens);
-    if(iind==INTEGRATOR_P) q_s += q.jac(DAE_P,DAE_RES);
-
-    // Augmented quadratures
-    SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
-    makeDense(qaug); // NOTE: se above
-
-    // Input to the augmented quadratures
-    vector<SXMatrix> qaug_in(DAE_NUM_IN);
-    qaug_in[DAE_T] = q.inputSX(DAE_T);
-    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
-    qaug_in[DAE_P] = q.inputSX(DAE_P);
-
-    // Create augmented DAE function
-    qfcn_aug = SXFunction(qaug_in,qaug);
-  }
-  
-  // Create integrator instance
-  CVodesIntegrator integrator(ffcn_aug,qfcn_aug);
-
-  // Set options
-  integrator.setOption(dictionary());
-  integrator.setOption("nrhs",1+ns);
-  
-  // Pass linear solver
-  if(!linsol_.isNull()){
-    LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
-    integrator.setLinearSolver(linsol_aug,M_);
-  }
-  
-  return integrator;
+  jac_ = jac;
 }
 
 FX CVodesInternal::getJacobian(){
-  return M_;
+  return jac_;
 }
   
 LinearSolver CVodesInternal::getLinearSolver(){

@@ -26,12 +26,14 @@
 #include "jacobian.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../mx/mx_tools.hpp"
+#include "../sx/sx_tools.hpp"
 #include "mx_function.hpp"
+#include "sx_function.hpp"
 
 using namespace std;
 namespace CasADi{
 
-IntegratorInternal::IntegratorInternal(){
+IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   // set default options
   setOption("name","unnamed_integrator"); // name of the function
   
@@ -264,6 +266,111 @@ void IntegratorInternal::setFinalTime(double tf){
   tf_ = tf;
 }
 
+bool IntegratorInternal::symbjac(){
+  SXFunction f = shared_cast<SXFunction>(f_);
+  SXFunction q = shared_cast<SXFunction>(q_);
+  return f_.isNull() == f.isNull() && q_.isNull() == q.isNull();
+}
+
+Integrator IntegratorInternal::jac(int iind, int oind){
+  casadi_assert_message(oind==INTEGRATOR_XF,"IntegratorInternal::jacobian: Not derivative of state");
+  
+  // Type cast to SXMatrix (currently supported)
+  SXFunction f = shared_cast<SXFunction>(f_);
+  casadi_assert(!f.isNull());
+  
+  SXFunction q = shared_cast<SXFunction>(q_);
+  casadi_assert(q_.isNull() == q.isNull());
+    
+  // Number of state derivatives
+  int nyp = f_.input(DAE_YDOT).numel();
+  
+  // Number of sensitivities
+  int ns;
+  switch(iind){
+    case INTEGRATOR_P: ns = np_; break;
+    case INTEGRATOR_X0: ns = nx_; break;
+    default: casadi_assert_message(false,"iind must be INTEGRATOR_P or INTEGRATOR_X0");
+  }
+
+  // Sensitivities and derivatives of sensitivities
+  SXMatrix ysens = symbolic("ysens",ny_,ns);
+  SXMatrix ypsens = symbolic("ypsens",nyp,ns);
+    
+  // Sensitivity equation
+  SXMatrix res_s = prod(f.jac(DAE_Y,DAE_RES),ysens);
+  if(nyp>0) res_s += prod(f.jac(DAE_YDOT,DAE_RES),ypsens);
+  if(iind==INTEGRATOR_P) res_s += f.jac(DAE_P,DAE_RES);
+
+  // Augmented DAE
+  SXMatrix faug = vec(horzcat(f.outputSX(oind),res_s));
+  makeDense(faug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
+
+  // Input arguments for the augmented DAE
+  vector<SXMatrix> faug_in(DAE_NUM_IN);
+  faug_in[DAE_T] = f.inputSX(DAE_T);
+  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
+  if(nyp>0) faug_in[DAE_YDOT] = vec(horzcat(f.inputSX(DAE_YDOT),ypsens));
+  faug_in[DAE_P] = f.inputSX(DAE_P);
+  
+  // Create augmented DAE function
+  SXFunction ffcn_aug(faug_in,faug);
+  
+  // Augmented quadratures
+  SXFunction qfcn_aug;
+  
+  // Now lets do the same for the quadrature states
+  if(!q.isNull()){
+    
+    // Sensitivity quadratures
+    SXMatrix q_s = prod(q.jac(DAE_Y,DAE_RES),ysens);
+    if(nyp>0) q_s += prod(q.jac(DAE_YDOT,DAE_RES),ypsens);
+    if(iind==INTEGRATOR_P) q_s += q.jac(DAE_P,DAE_RES);
+
+    // Augmented quadratures
+    SXMatrix qaug = vec(horzcat(q.outputSX(oind),q_s));
+    makeDense(qaug); // NOTE: se above
+
+    // Input to the augmented DAE (start with old)
+    vector<SXMatrix> qaug_in(DAE_NUM_IN);
+    qaug_in[DAE_T] = q.inputSX(DAE_T);
+    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
+    if(nyp>0) qaug_in[DAE_YDOT] = vec(horzcat(q.inputSX(DAE_YDOT),ypsens));
+    qaug_in[DAE_P] = q.inputSX(DAE_P);
+
+    // Create augmented DAE function
+    qfcn_aug = SXFunction(qaug_in,qaug);
+  }
+  
+  // Create integrator instance
+  Integrator integrator;
+  integrator.assignNode(create(ffcn_aug,qfcn_aug));
+
+  // Set options
+  integrator.setOption(dictionary());
+  integrator.setOption("nrhs",1+ns);
+  
+  // Transmit information on derivative states
+  if(hasSetOption("is_differential")){
+    vector<int> is_diff = getOption("is_differential");
+    casadi_assert_message(is_diff.size()==ny_,"is_differential has incorrect length");
+    vector<int> is_diff_aug(ny_*(1+ns));
+    for(int i=0; i<1+ns; ++i)
+      for(int j=0; j<ny_; ++j)
+        is_diff_aug[j+i*ny_] = is_diff[j];
+    integrator.setOption("is_differential",is_diff_aug);
+  }
+  
+  // Pass linear solver
+  if(!linsol_.isNull()){
+    LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
+//    linsol_aug->nrhs_ = 1+ns; // FIXME!!!
+//    integrator.setLinearSolver(linsol_aug,jac_); // FIXME!!!
+    integrator.setLinearSolver(linsol_aug);
+  }
+  
+  return integrator;
+}
 
 } // namespace CasADi
 

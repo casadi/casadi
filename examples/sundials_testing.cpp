@@ -70,8 +70,7 @@ const bool user_defined_solver = false;
 const bool sparse_direct = true;
 
 // Second order sensitivities by a symbolic-numeric approach
-const bool second_order = false;
-
+const bool second_order = true;
 
 // The DAE residual in plain c (for IDAS)
 void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
@@ -365,7 +364,7 @@ int main(){
     cout << "jacobian2                 " << intjac2.output(0) << endl;
     
     // Get the results
-    cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;
+/*    cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;*/
     cout << "second order (fwd-over-adj)     " ;
     cout << intjac.adjSens(INTEGRATOR_X0) << ", ";
     cout << intjac.adjSens(INTEGRATOR_P) << endl;
