@@ -317,7 +317,80 @@ class OCPtests(casadiTestCase):
 
     for i in [OCP_LBH,OCP_UBH]:
       self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
-      
+
+  def testMSclassSimple(self):
+    self.message("CasADi multiple shooting class: simple example")
+    """
+    The problem consists of a harmonic oscilator and a power harvester.
+    
+    max     int_0^T u(t) * x(t)
+     u,x,y
+            s.t    x'(t) = y(t)
+                   y'(t) = -x(t)
+                   -1  <=   u(t) <= 1
+                   x(0) = 1
+                   y(0) = 0
+                   
+    The trivial solution for u(t) is u(t)=sign(x(t))
+    
+    
+    """
+    te = 2*pi
+    N = 20
+    t=SX("t")
+    y=symbolic("y",3,1)
+    yd=symbolic("yd",3,1)
+    p=SX("p")
+    f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_Y: y, DAE_P: p,DAE_YDOT: yd},[[y[1,0],-y[0,0],p*y[0,0]]])
+    f.init()
+    
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-9)
+    integrator.setOption("abstol",1e-9)
+    integrator.setOption("steps_per_checkpoint",10000)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",te/N)
+    integrator.init()
+    
+    mayer = SXFunction([y],[-y[2]])
+    mayer.init()
+    
+    ms = MultipleShooting(integrator,mayer)
+    ms.setOption("number_of_grid_points",N);
+    ms.setOption("final_time",te);
+    ms.init()
+    
+    ms.input(OCP_LBX).setAll(-inf)
+    ms.input(OCP_UBX).setAll(inf)
+    ms.input(OCP_X_INIT).setAll(0)
+    
+    ms.input(OCP_LBU).setAll(-1)
+    ms.input(OCP_UBU).setAll(1)
+    ms.input(OCP_U_INIT).setAll(0)
+    
+    ms.input(OCP_LBX)[0,0] = 1
+    ms.input(OCP_UBX)[0,0] = 1
+   
+    ms.input(OCP_LBX)[1,0] = 0
+    ms.input(OCP_UBX)[1,0] = 0
+ 
+    ms.input(OCP_LBX)[2,0] = 0
+    ms.input(OCP_UBX)[2,0] = 0
+    
+    solver = IpoptSolver(ms.getF(),ms.getG(),FX(),ms.getJ());
+    solver.setOption("tol",1e-10);
+    solver.setOption("hessian_approximation", "limited-memory");
+    solver.setOption("max_iter",100);
+    solver.setOption("linear_solver","ma57");
+    solver.setOption("derivative_test","first-order");
+    solver.init();
+
+
+    ms.setNLPSolver(solver)
+    ms.solve()
+    
+    self.checkarray(sign(matrix(ms.output(OCP_X_OPT))[0,:-1]),ms.output(OCP_U_OPT),"solution")
+  
 if __name__ == '__main__':
     unittest.main()
 
