@@ -108,9 +108,12 @@ MX norm_inf(const MX &x){
 }
 
 MX prod(const MX &x, const MX &y){
-  MX ret;
-  ret.assignNode(new Multiplication(x,y));
-  return ret;
+  // Check if zero
+  if(x.size()==0 || y.size()==0){
+    return MX::zeros(x.size1(),y.size2());
+  }
+  
+  return MX::create(new Multiplication(x,y));
 }
 
 MX inner_prod(const MX &x, const MX &y){

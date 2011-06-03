@@ -52,10 +52,16 @@ class ParallelizerInternal : public FXInternal{
 
     /// Jacobian of output oind with respect to input iind
     virtual FX jacobian(int iind=0, int oind=0);
+    
+    /// Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs
+    virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
     /// Initialize
     virtual void init();
 
+    /// Generate the sparsity of a Jacobian block
+    virtual CRSSparsity getJacSparsity(int iind, int oind);
+    
     /// Functions
     std::vector<FX> funcs_;
     
@@ -64,6 +70,9 @@ class ParallelizerInternal : public FXInternal{
     
     /// Output argument indices
     std::vector<int> outind_;
+    
+    /// Is a function a copy of another
+    std::vector<int> copy_of_;
     
     /// Parallelization modes
     enum Mode{SERIAL,OPENMP,MPI};

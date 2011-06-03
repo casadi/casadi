@@ -271,16 +271,7 @@ FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
   return MXFunction(j_in,j_out);
 }
 
-CRSSparsity FXInternal::getBlockSparsity(){
-  casadi_assert_message(isInit(),"Function not initialized.");
-  
-  // By default, all blocks depends on all variables
-  return CRSSparsity(getNumOutputs(),getNumInputs(),true);
-}
-
 CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
-  casadi_assert_message(isInit(),"Function not initialized.");
-
   // Dense sparsity by default
   return CRSSparsity(output(oind).numel(),input(iind).numel(),true);
 }
@@ -294,6 +285,11 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   // Generate, if null
   if(jsp.isNull()){
     jsp = getJacSparsity(iind,oind);
+  }
+  
+  // If still null, not dependent
+  if(jsp.isNull()){
+    jsp = CRSSparsity(output(oind).numel(),input(iind).numel());
   }
   
   // Return a reference to the block

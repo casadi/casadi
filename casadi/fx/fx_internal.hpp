@@ -60,9 +60,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Hessian of output oind with respect to input iind */
     virtual FX hessian(int iind=0, int oind=0);
 
-    /** \brief Get the Jacobian block sparsity */
-    virtual CRSSparsity getBlockSparsity();
-
     /** \brief  Access an input */
     FunctionIO& inputStruct(int i=0);
 

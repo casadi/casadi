@@ -94,6 +94,11 @@ class FX : public OptionsFunctionality{
   /** \brief  Destructor */
   ~FX();
 
+#ifndef SWIG
+  /** \brief  Create from node */
+  static FX create(FXInternal* node);
+#endif // SWIG
+  
   /** \brief  Get number of inputs */
   int getNumInputs() const;
 
@@ -128,9 +133,6 @@ class FX : public OptionsFunctionality{
   /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
   FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
-  /** \brief Get the Jacobian block sparsity */
-  CRSSparsity getBlockSparsity();
-  
 #ifndef SWIG
   /** \brief  Create a function call (evaluation mx node), single input */
   std::vector<MX> call(const MX &x);

@@ -141,32 +141,9 @@ MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
   
   // Return matrix
   MX ret = MX::zeros(size(),ncol);
-  
   for(int i=0; i<x.size(); ++i){
-    if(1){
-      if(!x[i].isNull()){
-        ret += prod(jac(i),x[i]);
-      }
-    } else {
-      
-      // Get the Jacobian (this is inefficient, unless jacobian gets a bit smarter!)
-      FX J = getFunction().jacobian(i,oind_);
-      
-      // If the jacobian is not zero
-      if(!J.isNull()){
-        J.init();
-
-        // Get a reference to the argument
-        vector<MX> &Jarg = dep(0)->dep_;
-
-        // Create an evaluation node
-        MX Ji = J.call(Jarg).at(0);
-        
-        // Assemble the return matrix
-        if(!x[i].isNull()){
-          ret += prod(Ji,x[i]);
-        }
-      }
+    if(!x[i].isNull()){
+      ret += prod(jac(i),x[i]);
     }
   }
   return ret;

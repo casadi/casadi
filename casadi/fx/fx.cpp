@@ -37,6 +37,12 @@ FX::FX(){
 FX::~FX(){
 }
 
+FX FX::create(FXInternal* node){
+  FX ret;
+  ret.assignNode(node);
+  return ret;
+}
+
 const FXInternal* FX::operator->() const{
   return (const FXInternal*)OptionsFunctionality::operator->();
 }
@@ -249,10 +255,6 @@ const Dictionary & FX::getStats() const{
 
 GenericType FX::getStat(const string& name) const{
   return (*this)->getStat(name);
-}
-
-CRSSparsity FX::getBlockSparsity(){
-  return (*this)->getBlockSparsity();
 }
 
 CRSSparsity& FX::jacSparsity(int iind, int oind){

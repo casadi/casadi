@@ -219,18 +219,6 @@ void MXFunctionInternal::eliminateJacobian(){
     }
   }
 
-  cout << "jacobians:" << endl;
-  for(evmap::iterator i=m.begin(); i!=m.end(); ++i){
-    cout << "function " << i->first << endl;
-    for(jbmap::iterator j=i->second.begin(); j!=i->second.end(); ++j){
-      cout << "evaluation nodes " << j->first << ": ";
-      for(jblocks::iterator k=j->second.begin(); k!=j->second.end(); ++k){
-        cout << "(" << k->first << "," << k->second << ") ";
-      }
-      cout << endl;
-    }
-  }
-
   // Jacobian functions for each function and set of jacobians
   map<void*,map<jblocks,FX> > jac;
     
