@@ -77,6 +77,7 @@ void OCPSolverInternal::init(){
   output(OCP_X_OPT) = input(OCP_X_INIT);
   output(OCP_U_OPT) = input(OCP_U_INIT);
   output(OCP_XP_OPT) = input(OCP_XP_INIT);
+  output(OCP_P_OPT) = input(OCP_P_INIT);
   
   // Call the init function of the base class
   FXInternal::init();
