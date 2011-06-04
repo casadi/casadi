@@ -31,6 +31,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../mx/evaluation.hpp"
+#include <climits>
 
 namespace CasADi{
 
@@ -756,11 +757,6 @@ void SXFunctionInternal::init(){
     dwork.resize(worksize,numeric_limits<double>::quiet_NaN());
 }
 
-FX SXFunctionInternal::jacobian(int iind, int oind){
-  Matrix<SX> J = jac(iind,oind); // NOTE: Multiple input, multiple output
-  return SXFunction(inputv,J);
-}
-
 FX SXFunctionInternal::hessian(int iind, int oind){
   Matrix<SX> H = hess(iind,oind); // NOTE: Multiple input, multiple output
   return SXFunction(inputv,H);
@@ -839,8 +835,176 @@ FX SXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 
 
 CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
-  // FIXME: Inefficient algorithm
-  return jac(iind,oind).sparsity();
+  
+  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
+#if __STDC_VERSION__ >= 199901L
+  typedef unsigned long long int_t;
+#else
+  typedef unsigned long int_t;
+#endif
+  
+  // Number of directions we can deal with at a time
+  int ndir = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+
+  // Number of input variables (columns of the Jacobian)
+  int n_in = input(iind).numel();
+  
+  // Number of output variables (rows of the Jacobian)
+  int n_out = output(oind).numel();
+  
+  // Number of nonzero inputs
+  int nz_in = input_ind[iind].size();
+  
+  // Number of nonzero outputs
+  int nz_out = output_ind[oind].size();
+  
+  // Variable must be dense
+  casadi_assert(n_in==nz_in);
+  
+  // Make sure that dwork, which we will now use, has been allocated
+  if(dwork.size() < worksize) dwork.resize(worksize);
+  
+  // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
+  // we can save overhead by reusing the double array
+  casadi_assert(sizeof(int_t) <= sizeof(double));
+  int_t *iwork = reinterpret_cast<int_t*>(&dwork.front());
+  fill_n(iwork,dwork.size(),0);
+
+  // Number of forward sweeps we must make
+  int nsweep_fwd = nz_in/ndir;
+  if(nz_in%ndir>0) nsweep_fwd++;
+  
+  // Number of adjoint sweeps we must make
+  int nsweep_adj = nz_out/ndir;
+  if(nz_out%ndir>0) nsweep_adj++;
+
+  // Sparsity of the output
+  const CRSSparsity& oind_sp = output(oind).sparsity();
+
+  // Nonzero offset
+  int offset = 0;
+
+  // We choose forward or adjoint based on whichever requires less sweeps
+  if(nsweep_fwd <= nsweep_adj){ // forward mode
+    
+    // Return value (sparsity pattern)
+    CRSSparsity ret_trans(n_in,n_out);
+    
+    // Loop over the variables, ndir variables at a time
+    for(int s=0; s<nsweep_fwd; ++s){
+      
+      // Integer seed for each direction
+      int_t b = 1;
+      
+      // Give seeds to a set of directions
+      for(int i=0; i<ndir && offset+i<nz_in; ++i){
+        iwork[input_ind[iind][offset+i]] = b;
+        b <<= 1;
+      }
+      
+      // Propagate the dependencies
+      for(vector<AlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+        iwork[it->ind] = iwork[it->ch[0]] | iwork[it->ch[1]];
+      }
+
+      // Dependency to be checked
+      b = 1;
+    
+      // Loop over seed directions
+      for(int i=0; i<ndir && offset+i<nz_in; ++i){
+        
+        // Loop over the rows of the output
+        for(int ii=0; ii<oind_sp.size1(); ++ii){
+          
+          // Loop over the nonzeros of the output
+          for(int el=oind_sp.rowind(ii); el<oind_sp.rowind(ii+1); ++el){
+            
+            // If dependents on the variable
+            if(b & iwork[output_ind[oind][el]]){
+              
+              // Column
+              int jj = oind_sp.col(el);
+              
+              // Add to pattern
+              ret_trans.getNZ(offset+i,jj + ii*oind_sp.size2());
+            }
+          }
+        }
+        
+        // Go to next dependency
+        b <<= 1;
+      }
+      
+      // Remove the seeds
+      for(int i=0; i<ndir && offset+i<nz_in; ++i){
+        iwork[input_ind[iind][offset+i]] = 0;
+      }
+
+      // Update offset
+      offset += ndir;
+    }
+    
+    // Return sparsity pattern
+    vector<int> mapping;
+    return ret_trans.transpose(mapping);
+  } else { // Adjoint mode
+    
+    // Return value (sparsity pattern)
+    CRSSparsity ret(n_out,n_in);
+    
+    // Loop over the variables, ndir variables at a time
+    for(int s=0; s<nsweep_adj; ++s){
+      
+      // Integer seed for each direction
+      int_t b = 1;
+     
+      // Remove all seeds
+      fill_n(iwork,dwork.size(),0);
+
+      // Give seeds to a set of directions
+      for(int i=0; i<ndir && offset+i<nz_out; ++i){
+        iwork[output_ind[oind][offset+i]] |= b; // note that we may have several nonzeros using the same entry in the work vector, therefore |=
+        b <<= 1;
+      }
+      
+      // Propagate the dependencies
+      // for(vector<AlgEl>::reverse_iterator it=algorithm.rbegin(); it!=algorithm.rend(); ++it) // commented out due to bug(?) in Mac using old gcc
+      for(int i=algorithm.size()-1; i>=0; --i){
+        AlgEl *it = &algorithm[i];
+        iwork[it->ch[0]] |= iwork[it->ind];
+        iwork[it->ch[1]] |= iwork[it->ind];
+      }
+      
+      // Output dependency to be checked
+      b = 1;
+    
+      // Loop over seed directions
+      for(int i=0; i<ndir && offset+i<nz_out; ++i){
+        
+        // Loop over the nonzeros of the input
+        for(int el=0; el<nz_in; ++el){
+          
+          // If the output is influenced by the variable
+          if(b & iwork[input_ind[iind][el]]){
+            
+            // Add to pattern
+            ret.getNZ(offset+i,el);
+            
+          }
+        }
+        
+        // Go to next dependency
+        b <<= 1;
+      }
+
+      // Update offset
+      offset += ndir;
+
+    }
+    
+    // Return sparsity pattern
+    return ret;
+  }
 }
 
 } // namespace CasADi

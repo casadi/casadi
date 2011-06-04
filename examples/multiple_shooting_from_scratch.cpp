@@ -159,10 +159,10 @@ int main(){
     int_in[INTEGRATOR_P] = U[k];
     int_in[INTEGRATOR_X0] = X[k];
 
-    // Evaluate function in parallel
+    // Create an evaluation node
     vector<MX> I_out = integrator.call(int_in);
 
-    //append continuity constraints
+    // Save continuity constraints
     g[k] = I_out[INTEGRATOR_XF] - X[k+1];
   }
   

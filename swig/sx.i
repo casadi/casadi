@@ -579,6 +579,7 @@ matching on SXMatrix is prohibited as per wish of Joel
 %typemap(typecheck,precedence=PRECEDENCE_SXMatrixVector) const std::vector< Matrix<SX> > & { $1 = couldbeSXMatrixVector($input); }
 %typemap(freearg) const std::vector< Matrix<SX> > & {}
 
+#ifdef SWIGPYTHON
 %fragment("generic_typemap", "header") {
 
 template<class T>
@@ -620,7 +621,6 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {return couldbeSX
 
 }
 
-
 %define %my_generic_const_typemap(Type,Precedence) 
 %typemap(in, fragment="generic_typemap") const Type & (Type m) {
   if (meta< Type >::is($input)) { // Type object get passed on as-is, and fast.
@@ -642,6 +642,8 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {return couldbeSX
 
 
 %my_generic_const_typemap(CasADi::Matrix<CasADi::SX>,PRECEDENCE_SXMatrix);
+
+#endif // SWIGPYTHON
 
 } // namespace CasADi
 
