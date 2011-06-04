@@ -172,11 +172,17 @@ void MultipleShootingInternal::init(){
 
 void MultipleShootingInternal::getGuess(vector<double>& V_init) const{
   // OCP solution guess
+  const Matrix<double> &p_init = input(OCP_P_INIT);
   const Matrix<double> &x_init = input(OCP_X_INIT);
   const Matrix<double> &u_init = input(OCP_U_INIT);
   
   // Running index
   int el=0;
+  
+    // Pass guess for parameters
+    for(int i=0; i<np_; ++i){
+      V_init[el++] = p_init(i);
+    }
   
   for(int k=0; k<nk_; ++k){
     // Pass guess for state
@@ -194,18 +200,28 @@ void MultipleShootingInternal::getGuess(vector<double>& V_init) const{
   for(int i=0; i<nx_; ++i){
     V_init[el++] = x_init(i,nk_);
   }
+  
   casadi_assert(el==V_init.size());
 }
 
 void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
   // OCP variable bounds 
+  const Matrix<double> &p_min = input(OCP_LBP);
+  const Matrix<double> &p_max = input(OCP_UBP);
   const Matrix<double> &x_min = input(OCP_LBX);
   const Matrix<double> &x_max = input(OCP_UBX);
   const Matrix<double> &u_min = input(OCP_LBU);
   const Matrix<double> &u_max = input(OCP_UBU);
 
+
   // Running index
   int min_el=0, max_el=0;
+  
+  // Pass bounds on parameters
+  for(int i=0; i<np_; ++i){
+    V_min[min_el++] = p_min(i);
+    V_max[max_el++] = p_max(i);
+  }
 
   for(int k=0; k<nk_; ++k){
     // Pass bounds on state
@@ -226,6 +242,11 @@ void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<d
     V_min[min_el++] = x_min(i,nk_);
     V_max[max_el++] = x_max(i,nk_);
   }
+  
+  std::cout << "42: " << min_el << std::endl;
+  std::cout << "42: " << max_el << std::endl;
+  std::cout << "42: " << V_min.size() << std::endl;
+  std::cout << "42: " << V_max.size() << std::endl;
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
@@ -253,26 +274,32 @@ void MultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector
 
 void MultipleShootingInternal::setOptimalSolution( const vector<double> &V_opt ){
   // OCP solution
+  Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
   Matrix<double> &u_opt = output(OCP_U_OPT);
   
   // Running index
   int el=0;
-  
+
+  // Pass optimized state
+  for(int i=0; i<np_; ++i){
+    p_opt(i) = V_opt[el++];
+  }
+    
   for(int k=0; k<nk_; ++k){
     
-    // Pass bounds on state
+    // Pass optimized state
     for(int i=0; i<nx_; ++i){
       x_opt(i,k) = V_opt[el++];
     }
     
-    // Pass bounds on control
+    // Pass optimized control
     for(int i=0; i<nu_; ++i){
       u_opt(i,k) = V_opt[el++];
     }
   }
 
-  // Pass bounds on terminal state
+  // Pass optimized terminal state
   for(int i=0; i<nx_; ++i){
     x_opt(i,nk_) = V_opt[el++];
   }

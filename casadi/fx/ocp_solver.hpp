@@ -80,6 +80,8 @@ namespace CasADi{
     OCP_U_OPT, 
     /// Optimal state derivative trajectory
     OCP_XP_OPT, 
+    /// Optimal parameters
+    OCP_P_OPT, 
     /// Number of outputs to an OCP solver
     OCP_NUM_OUT
   };
