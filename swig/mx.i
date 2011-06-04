@@ -138,6 +138,54 @@ bool couldbeMXVector(PyObject* p) {
   return isMXVector(p);
 }
 
+int getDMatrixVector_ptr(PyObject * p, std::vector<CasADi::DMatrix> * & m) {
+  void *pd = 0 ;
+  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t, 0 );
+  if (!SWIG_IsOK(res)) {
+    return false;
+  }
+  m = reinterpret_cast< std::vector<CasADi::DMatrix> * >(pd);
+  return true;
+}
+
+bool couldbeDMatrixVector(PyObject* p) {
+  if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      if (!couldbeDMatrix(pe)) {
+        Py_DECREF(pe);Py_DECREF(it);return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+  }
+  return isDMatrixVector(p);
+}
+
+bool asDMatrixVector(PyObject*p, std::vector<CasADi::Matrix<double> > &m ) {
+  if(PySequence_Check(p) &&! isSXMatrix(p) && !isMX(p)) {
+    PyObject *it = PyObject_GetIter(p);
+    PyObject *pe;
+    m.resize(PySequence_Size(p));
+    int i=0;
+    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      bool result=asDMatrix(pe,m[i++]);
+      if (!result) {
+        Py_DECREF(pe);Py_DECREF(it);
+        return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+  } else {
+    return false;
+  }
+  return true;
+}
+
 %}
 
 namespace CasADi{
@@ -155,8 +203,26 @@ namespace CasADi{
   }
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) const std::vector< MX > & { $1 = couldbeMXVector($input); }
+%typemap(typecheck,precedence=PRECEDENCE_MXVector) const std::vector< MX > & { $1 = couldbeMXVector($input); }
 %typemap(freearg) const std::vector< MX > & {}
+
+
+
+%typemap(in) const std::vector< Matrix<double> > &  (std::vector<CasADi::DMatrix> v) {
+  if (isDMatrixVector($input)) { // DMatrixVector object get passed on as-is, and fast.
+    int result = getDMatrixVector_ptr($input,$1);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"DMatrixVector cast failed");
+  } else {  
+    bool result=asDMatrixVector($input,v);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"Expecting sequence(DMatrix)");
+    $1 = &v;
+  }
+}
+
+%typemap(typecheck,precedence=PRECEDENCE_DMatrixVector) const std::vector< Matrix<double> > &  { $1 = couldbeDMatrixVector($input); }
+%typemap(freearg) const std::vector< Matrix<double> > &  {}
 
 }
 

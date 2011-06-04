@@ -206,7 +206,9 @@ bool isMXVector(PyObject * p) {
   return istype(p,SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t);
 }
 
-
+bool isDMatrixVector(PyObject * p) {
+  return istype(p,SWIGTYPE_p_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t);
+}
 
 int getSXMatrix(PyObject * p, CasADi::SXMatrix * & m) {
   void *pd = 0 ;
@@ -577,24 +579,69 @@ matching on SXMatrix is prohibited as per wish of Joel
 %typemap(typecheck,precedence=PRECEDENCE_SXMatrixVector) const std::vector< Matrix<SX> > & { $1 = couldbeSXMatrixVector($input); }
 %typemap(freearg) const std::vector< Matrix<SX> > & {}
 
+%fragment("generic_typemap", "header") {
 
-// numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)
-%typemap(in) const Matrix<SX> & (Matrix<SX> m) {
-  if (isSXMatrix($input)) { // SXMatrix object get passed on as-is, and fast.
-    int result = getSXMatrix($input,$1);
+template<class T>
+class meta {
+  public:
+    /// Check if Python object is of type T
+    static bool is(PyObject * p) {
+      return istype(p,*meta<T>::name);
+    };
+    /// Convert Python object to pointer of type T
+    static bool get_ptr(PyObject * p,T*& m) {
+      void *pd = 0 ;
+      int res = SWIG_ConvertPtr(p, &pd,*meta<T>::name, 0 );
+      if (!SWIG_IsOK(res)) {
+        return false;
+      }
+      m = reinterpret_cast< T*  >(pd);
+      return true;
+    };
+    /// Convert Python object to type T
+    static int as(PyObject * p,T&);
+    /// Check if Python object could ultimately be converted to type T
+    static bool couldbe(PyObject * p);
+    static swig_type_info** name;
+    static char expected_message[];
+};
+
+// $descriptor is quite useless: it only work in a typemap context.
+template<> swig_type_info** meta< CasADi::Matrix<CasADi::SX> >::name = &SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t;
+
+template<> char meta< CasADi::Matrix<CasADi::SX> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
+
+
+template <>
+int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::SX> &m) {return asSXMatrix(p,m);}
+
+template <>
+bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {return couldbeSXMatrix(p);}
+
+}
+
+
+%define %my_generic_const_typemap(Type,Precedence) 
+%typemap(in, fragment="generic_typemap") const Type & (Type m) {
+  if (meta< Type >::is($input)) { // Type object get passed on as-is, and fast.
+    int result = meta< Type >::get_ptr($input,$1);
     if (!result)
-      SWIG_exception_fail(SWIG_TypeError,"SXMatrix cast failed");
+      SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
   } else {
-    bool result=asSXMatrix($input,m);
+    bool result=meta< Type >::as($input,m);
     if (!result)
-      SWIG_exception_fail(SWIG_TypeError,"Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)");
+      SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
 }
 
+%typemap(typecheck,precedence=Precedence, fragment="generic_typemap") const Type & { $1 = meta< Type >::couldbe($input); }
+%typemap(freearg) const Type  & {}
 
-%typemap(typecheck,precedence=PRECEDENCE_SXMatrix) const Matrix<SX> & { $1 = couldbeSXMatrix($input); }
-%typemap(freearg) const Matrix<SX>  & {}
+%enddef
+
+
+%my_generic_const_typemap(CasADi::Matrix<CasADi::SX>,PRECEDENCE_SXMatrix);
 
 } // namespace CasADi
 

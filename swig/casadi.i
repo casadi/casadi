@@ -58,6 +58,8 @@ namespace CasADi{
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_SXMatrix 102
 #define PRECEDENCE_SXMatrixVector 103
+#define PRECEDENCE_MX 104
+#define PRECEDENCE_MXVector 105
 #define PRECEDENCE_PAIR_SLICE_SLICE 204
 #define PRECEDENCE_SLICE 205
 

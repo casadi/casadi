@@ -36,10 +36,6 @@ bool couldbeDMatrix(PyObject * p) {
   return ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) ;
 }
 
-bool isDMatrix(PyObject * p) {
-  return istype(p,SWIGTYPE_p_CasADi__MatrixT_double_t);
-}
-
 int getDMatrix_ptr(PyObject * p, CasADi::DMatrix * & m) {
   void *pd = 0 ;
   int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_double_t, 0 );
@@ -195,6 +191,12 @@ PyObject* arrayView() {
 #ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
 %inline %{
+
+bool isDMatrix(PyObject * p) {
+  return istype(p,SWIGTYPE_p_CasADi__MatrixT_double_t);
+}
+
+
 bool asDMatrix(PyObject* p, CasADi::DMatrix &m) {
   if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
     if (array_numdims(p)>2 || array_numdims(p)<1) {
@@ -261,6 +263,12 @@ bool asDMatrix(PyObject* p, CasADi::DMatrix &m) {
     
     if (array_is_new_object)
       Py_DECREF(array);
+  } else if (isDMatrix(p)) { // DMatrix object get passed on as-is.
+    CasADi::DMatrix *mp;
+    int result = getDMatrix_ptr(p,mp);
+		if (!result)
+			return false;
+    m=*mp;
   } else {
     SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -274,6 +282,11 @@ bool asDMatrix(PyObject* p, CasADi::DMatrix &m) {
 namespace CasADi{
   
 #ifdef SWIGPYTHON
+
+
+
+
+
 %typemap(in) (const CasADi::Slice& i, const CasADi::Slice &j) (CasADi::Slice temp[2]) {
   for(int i=0; i<2; ++i){
     PyObject *q = PyTuple_GetItem($input,i);
