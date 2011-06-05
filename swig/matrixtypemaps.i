@@ -3,6 +3,13 @@
 #include "casadi/matrix/matrix.hpp"
 #include <sstream>
 #include "casadi/casadi_exception.hpp"
+
+// to allow for typechecking
+#include "casadi/matrix/matrix.hpp"
+#include "casadi/sx/sx.hpp"
+
+// to typecheck for MX
+#include "casadi/mx/mx.hpp"
 %}
 
 %include "typemaps.i"
@@ -47,6 +54,48 @@ class meta {
     static bool couldbe(GUESTOBJECT);
     static swig_type_info** name;
     static char expected_message[];
+    
+    // Vector specific stuff
+    
+    #ifdef SWIGPYTHON
+    static bool couldbe_sequence(PyObject * p) {
+      if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p)) {
+        PyObject *it = PyObject_GetIter(p);
+        PyObject *pe;
+        int i=0;
+        while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+          if (!meta< T >::couldbe(pe)) {
+            Py_DECREF(pe);Py_DECREF(it);return false;
+          }
+          Py_DECREF(pe);
+        }
+        Py_DECREF(it);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    #endif // SWIGPYTHON
+    
+    // Assumes that p is a PYTHON sequence
+    #ifdef SWIGPYTHON
+    static int as_vector(PyObject * p, std::vector<T> &m) {
+      PyObject *it = PyObject_GetIter(p);
+      PyObject *pe;
+      m.resize(PySequence_Size(p));
+      int i=0;
+      while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+        bool result=meta< T >::as(pe,m[i++]);
+        if (!result) {
+          Py_DECREF(pe);Py_DECREF(it);
+          return false;
+        }
+        Py_DECREF(pe);
+      }
+      Py_DECREF(it);
+      return true;
+    }
+    #endif // SWIGPYTHON
 };
 
 %}
@@ -91,6 +140,10 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   bool ret = strcmp(PyString_AsString(classname),name)==0;
   Py_DECREF(classo);Py_DECREF(classname);
 	return ret;
+}
+
+bool PyIsSequence(PyObject* p) {
+  return PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p);
 }
 
 %}

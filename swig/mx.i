@@ -2,9 +2,7 @@
 #include "casadi/mx/mx.hpp"
 #include "casadi/mx/mx_tools.hpp"
 
-// to allow for typechecking
-#include "casadi/matrix/matrix.hpp"
-#include "casadi/sx/sx.hpp"
+
 %}
 
 %include "casadi/mx/mx.hpp"
@@ -23,42 +21,12 @@ template<> char meta< std::vector< CasADi::Matrix<double> > >::expected_message[
 
 template <>
 bool meta< std::vector< CasADi::Matrix<double> > >::couldbe(PyObject * p) {
-  if(PySequence_Check(p) &&! meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p)) {
-    PyObject *it = PyObject_GetIter(p);
-    PyObject *pe;
-    int i=0;
-    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
-      if (!meta< CasADi::Matrix<double> >::couldbe(pe)) {
-        Py_DECREF(pe);Py_DECREF(it);return false;
-      }
-      Py_DECREF(pe);
-    }
-    Py_DECREF(it);
-    return true;
-  }
-  return meta< std::vector<  CasADi::Matrix<double> > >::isa(p);
+  return meta< std::vector<  CasADi::Matrix<double> > >::isa(p) || meta< CasADi::Matrix<double> >::couldbe_sequence(p);
 }
 
 template <>
 int meta< std::vector<  CasADi::Matrix<double> > >::as(PyObject * p,std::vector< CasADi::Matrix<double> > &m) {
-  if(PySequence_Check(p) &&! meta< CasADi::Matrix<CasADi::SX> >::isa(p) && ! meta< CasADi::MX >::isa(p)) {
-    PyObject *it = PyObject_GetIter(p);
-    PyObject *pe;
-    m.resize(PySequence_Size(p));
-    int i=0;
-    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
-      bool result=meta< CasADi::Matrix<double> >::as(pe,m[i++]);
-      if (!result) {
-        Py_DECREF(pe);Py_DECREF(it);
-        return false;
-      }
-      Py_DECREF(pe);
-    }
-    Py_DECREF(it);
-  } else {
-    return false;
-  }
-  return true;
+  return meta< CasADi::Matrix<double> >::as_vector(p,m);
 }
 
 %}
@@ -78,19 +46,11 @@ template <>
 int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
   NATIVERETURN(CasADi::MX,m)
   if(meta< CasADi::Matrix<double> >::couldbe(p)) {
-    if (meta< CasADi::Matrix<double> >::isa(p)) { 
-      CasADi::DMatrix * mt;
-      int result = meta< CasADi::Matrix<double> >::get_ptr(p,mt);
-		  if (!result)
-			  return false;
-      m = CasADi::MX(*mt);
-	  } else {  
-	    CasADi::DMatrix mt;
-      bool result=meta< CasADi::Matrix<double> >::as(p,mt);
-      if (!result)
-        return false;
-      m = CasADi::MX(mt);
-    }
+    CasADi::DMatrix mt;
+    bool result=meta< CasADi::Matrix<double> >::as(p,mt);
+    if (!result)
+      return false;
+    m = CasADi::MX(mt);
   } else if (couldbePyNumber(p)) {
     double res;
     int result = getPyNumber(p,&res);
@@ -114,20 +74,8 @@ template<> char meta< std::vector< CasADi::MX > >::expected_message[] = "Expecti
 template <>
 int meta< std::vector< CasADi::MX > >::as(PyObject * p,std::vector< CasADi::MX > &m) {
   NATIVERETURN(std::vector< CasADi::MX >,m)
-  if(PySequence_Check(p) &&! meta< CasADi::Matrix<CasADi::SX> >::isa(p) && ! meta< CasADi::MX >::isa(p)) {
-    PyObject *it = PyObject_GetIter(p);
-    PyObject *pe;
-    m.resize(PySequence_Size(p));
-    int i=0;
-    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
-      bool result=meta< CasADi::MX >::as(pe,m[i++]);
-      if (!result) {
-        Py_DECREF(pe);Py_DECREF(it);
-        return false;
-      }
-      Py_DECREF(pe);
-    }
-    Py_DECREF(it);
+  if( PyIsSequence(p) ) {
+    return meta< CasADi::MX >::as_vector(p,m);
   } else if (PyDict_Check(p)) {
     PyObject *key, *value;
     Py_ssize_t pos = 0;
@@ -161,17 +109,7 @@ return true;
 
 template <>
 bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
-  if(PySequence_Check(p) &&! meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p)) {
-    PyObject *it = PyObject_GetIter(p);
-    PyObject *pe;
-    int i=0;
-    while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
-      if (!meta< CasADi::MX >::couldbe(pe)) {
-        Py_DECREF(pe);Py_DECREF(it);return false;
-      }
-      Py_DECREF(pe);
-    }
-    Py_DECREF(it);
+  if(meta< CasADi::MX >::couldbe_sequence(p)) {
     return true;
   } else if (PyDict_Check(p)) {
     PyObject *key, *value;
