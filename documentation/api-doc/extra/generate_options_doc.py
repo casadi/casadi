@@ -93,7 +93,7 @@ for name,meta in metadata.items():
 
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
-  if not('CasADi::FXInternal' in meta['hierarchy']):
+  if not('CasADi::FXInternal' in meta['hierarchy']) and not(name=='CasADi::FXInternal'):
     continue
   source = re.sub(r'\.hpp$',r'.cpp',meta['file'])
   meta['options']={}
@@ -131,8 +131,6 @@ for name,meta in metadata.items():
     if len(meta[k])==0:
       del meta[k]
   f.close()
-  
-
   
 def optionsashtml(option):
   return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],option['description'],option['used'])
