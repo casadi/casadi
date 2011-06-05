@@ -443,7 +443,7 @@ int meta< std::vector< CasADi::Matrix<CasADi::SX> > >::as(const octave_value& p,
     // Check if it is an SXMatrix
     if(meta< CasADi::Matrix< CasADi::SX > >::isa(obj_i)){
       CasADi::SXMatrix *m_i;
-      bool ret = getSXMatrix(obj_i, m_i);
+      bool ret = meta< CasADi::Matrix< CasADi::SX > >::get_ptr(obj_i, m_i);
       if(!ret) return false;
       m[i] = *m_i;
     } else if(meta< CasADi::Matrix< CasADi::SX > >::couldbe(obj_i)){
