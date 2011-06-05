@@ -7,20 +7,82 @@
 
 %include "typemaps.i"
 
-// %fragment("could_be"{CasADi::DMatrix},"header"){
-//   
-// }
+/// Generic typemap structure
 
+%inline %{
 
 #ifdef SWIGPYTHON
+#define GUESTOBJECT PyObject * p
+#endif // SWIGPYTHON
 
-%inline%{
+#ifdef  SWIGOCTAVE
+#define GUESTOBJECT const octave_value& p
+#endif // SWIGOCTAVE
 
-/** Check if python object is of a particular SWIG type */
-bool istype(PyObject *p, swig_type_info *type) {
+/** Check if Guest object is of a particular SWIG type */
+bool istype(GUESTOBJECT, swig_type_info *type) {
   return SWIG_IsOK(SWIG_ConvertPtr(p, 0, type, 0));
 }
 
+template<class T>
+class meta {
+  public:
+    /// Check if Python object is of type T
+    static bool isa(GUESTOBJECT) {
+      return istype(p,*meta<T>::name);
+    };
+    /// Convert Python object to pointer of type T
+    static bool get_ptr(GUESTOBJECT,T*& m) {
+      void *pd = 0 ;
+      int res = SWIG_ConvertPtr(p, &pd,*meta<T>::name, 0 );
+      if (!SWIG_IsOK(res)) {
+        return false;
+      }
+      m = reinterpret_cast< T*  >(pd);
+      return true;
+    };
+    /// Convert Guest object to type T
+    static int as(GUESTOBJECT,T&);
+    /// Check if Guest object could ultimately be converted to type T
+    static bool couldbe(GUESTOBJECT);
+    static swig_type_info** name;
+    static char expected_message[];
+};
+
+%}
+
+
+%define %my_generic_const_typemap(Type,Precedence) 
+%typemap(in) const Type & (Type m) {
+  if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
+    int result = meta< Type >::get_ptr($input,$1);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
+  } else {
+    bool result=meta< Type >::as($input,m);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+    $1 = &m;
+  }
+}
+
+%typemap(typecheck,precedence=Precedence) const Type & { $1 = meta< Type >::couldbe($input); }
+%typemap(freearg) const Type  & {}
+
+%enddef
+
+
+
+%inline %{
+#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp; int result = meta<Type>::get_ptr(p,mp); if (!result) return false; m=*mp; return true;}
+%}
+
+%inline %{
+template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
+%}
+
+#ifdef SWIGPYTHON
+%inline%{
 /** Check PyObjects by class name */
 bool PyObjectHasClassName(PyObject* p, const char * name) {
   PyObject * classo = PyObject_GetAttrString( p, "__class__");
@@ -31,46 +93,108 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 	return ret;
 }
 
+%}
+#endif // SWIGOCTAVE
+
+
+
+/// CasADi::Matrix<double>
+#ifdef SWIGPYTHON
+%inline %{
+template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
+
+template <>
+int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
+  NATIVERETURN(CasADi::Matrix<double>,m)
+  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
+    if (array_numdims(p)>2 || array_numdims(p)<1) {
+      SWIG_Error(SWIG_TypeError, "asMatrixDouble: Number of dimensions must be 1 or 2.");
+      std::stringstream s;
+      s << "SWIG::typemapDMatrixHelper:";
+      s << "Number of dimensions must be 1 or 2.";
+      s << "Got " << array_numdims(p) << " instead.";
+      const std::string tmp(s.str());
+      const char* cstr = tmp.c_str();
+      SWIG_Error(SWIG_TypeError,  cstr);
+    }
+    int nrows = array_size(p,0); // 1D array is cast into column vector
+    int ncols  = 1;
+    if (array_numdims(p)==2)
+      ncols=array_size(p,1); 
+    int size=nrows*ncols; // number of elements in the dense matrix
+    if (!array_is_native(p)) 
+      SWIG_Error(SWIG_TypeError, "asMatrixDouble: array byte order should be native.");
+    // Make sure we have a contigous array with double datatype
+    int array_is_new_object;
+    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
+
+    double* d=(double*) array->data;
+    std::vector<double> v(d,d+size);
+    
+    m = CasADi::Matrix<double>(v, nrows, ncols);
+                  
+    // Free memory
+    if (array_is_new_object)
+      Py_DECREF(array); 
+  } else if(PyObjectHasClassName(p,"csr_matrix")) { // scipy's csr_matrix will be cast to sparse Matrix<double>
+    PyObject * narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
+    if (!(is_array(narray) && array_numdims(narray)==1))
+      SWIG_Error(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
+    int array_is_new_object;
+    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
+    int size=array_size(array,0); // number on non-zeros
+    double* d=(double*) array->data;
+    std::vector<double> v(d,d+size);
+
+    // Get the dimensions of the csr_matrix
+    PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
+    int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
+    int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
+		
+    // Construct the 'col' vector needed for initialising the correct sparsity
+    PyObject * col = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
+    if (!(is_array(col) && array_numdims(col)==1 && array_type(col)==NPY_INT))
+      SWIG_Error(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
+    int* cold=(int*) array_data(col);
+    std::vector<int> colv(cold,cold+size);
+    
+    // Construct the 'rowind' vector needed for initialising the correct sparsity
+    PyObject * rowind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
+    if (!(is_array(rowind) && array_numdims(rowind)==1 && array_type(rowind)==NPY_INT))
+      SWIG_Error(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
+    int* rowindd=(int*) array_data(rowind);
+    std::vector<int> rowindv(rowindd,rowindd+(nrows+1));
+    
+    m = CasADi::Matrix<double>(nrows,ncols,colv,rowindv, v);
+    
+    Py_DECREF(narray);Py_DECREF(shape);Py_DECREF(col);Py_DECREF(rowind);
+    
+    if (array_is_new_object)
+      Py_DECREF(array);
+  } else {
+    SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
+    return false;
+  }
+  return true;
+}
+
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
-bool couldbeDMatrix(PyObject * p) {
+template <>
+bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
   return ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) ;
 }
 
-int getDMatrix_ptr(PyObject * p, CasADi::DMatrix * & m) {
-  void *pd = 0 ;
-  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_double_t, 0 );
-  if (!SWIG_IsOK(res)) {
-    return false;
-  }
-  m = reinterpret_cast< CasADi::DMatrix * >(pd);
-  return true;
-}
 %}
-#endif // SWIGPYTHON
+#endif //SWIGPYTHON
 
+
+/// CasADi::Matrix<double>
 #ifdef SWIGOCTAVE
 %inline %{
-  
-bool istype(const octave_value& p, swig_type_info *type) {
-  return SWIG_IsOK(SWIG_ConvertPtr(p, 0, type, 0));
-}
-  
-bool isDMatrix(const octave_value& p){
-  return istype(p,SWIGTYPE_p_CasADi__MatrixT_double_t);
-}
+template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
 
-bool couldbeDMatrix(const octave_value& p){
-  return p.is_real_matrix();
-}
-
-bool getDMatrix_ptr(const octave_value& p, CasADi::DMatrix * & m){
-  void *pd = 0;
-  int res = SWIG_ConvertPtr(p, &pd,SWIGTYPE_p_CasADi__MatrixT_double_t, 0 );
-  m = reinterpret_cast< CasADi::DMatrix * >(pd);
-  return SWIG_IsOK(res);
-}
-
-bool asDMatrix(const octave_value& p, CasADi::DMatrix &m){
+template <>
+int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<double> &m) {
   if(p.is_real_matrix()){
     Matrix mat = p.matrix_value();
     m = CasADi::DMatrix(mat.rows(),mat.cols(),0);
@@ -84,8 +208,12 @@ bool asDMatrix(const octave_value& p, CasADi::DMatrix &m){
   return true;
 }
 
+// Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
+template <>
+bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) {return p.is_real_matrix();}
+
 %}
-#endif // SWIGOCTAVE
+#endif //SWIGOCTAVE
 
 #ifdef SWIGPYTHON
 namespace CasADi{
@@ -188,103 +316,10 @@ PyObject* arrayView() {
 * Other types of numpy array will trigger conversion, requiring temporary allocation of memory.
 */
 
-#ifdef SWIGPYTHON
-#ifdef WITH_NUMPY
-%inline %{
-
-bool isDMatrix(PyObject * p) {
-  return istype(p,SWIGTYPE_p_CasADi__MatrixT_double_t);
-}
-
-
-bool asDMatrix(PyObject* p, CasADi::DMatrix &m) {
-  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
-    if (array_numdims(p)>2 || array_numdims(p)<1) {
-      SWIG_Error(SWIG_TypeError, "asMatrixDouble: Number of dimensions must be 1 or 2.");
-      std::stringstream s;
-      s << "SWIG::typemapDMatrixHelper:";
-      s << "Number of dimensions must be 1 or 2.";
-      s << "Got " << array_numdims(p) << " instead.";
-      const std::string tmp(s.str());
-      const char* cstr = tmp.c_str();
-      SWIG_Error(SWIG_TypeError,  cstr);
-    }
-    int nrows = array_size(p,0); // 1D array is cast into column vector
-    int ncols  = 1;
-    if (array_numdims(p)==2)
-      ncols=array_size(p,1); 
-    int size=nrows*ncols; // number of elements in the dense matrix
-    if (!array_is_native(p)) 
-      SWIG_Error(SWIG_TypeError, "asMatrixDouble: array byte order should be native.");
-    // Make sure we have a contigous array with double datatype
-    int array_is_new_object;
-    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-
-    double* d=(double*) array->data;
-    std::vector<double> v(d,d+size);
-    
-    m = CasADi::Matrix<double>(v, nrows, ncols);
-                  
-    // Free memory
-    if (array_is_new_object)
-      Py_DECREF(array); 
-  } else if(PyObjectHasClassName(p,"csr_matrix")) { // scipy's csr_matrix will be cast to sparse Matrix<double>
-    PyObject * narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
-    if (!(is_array(narray) && array_numdims(narray)==1))
-      SWIG_Error(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
-    int array_is_new_object;
-    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-    int size=array_size(array,0); // number on non-zeros
-    double* d=(double*) array->data;
-    std::vector<double> v(d,d+size);
-
-    // Get the dimensions of the csr_matrix
-    PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
-    int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
-    int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
-		
-    // Construct the 'col' vector needed for initialising the correct sparsity
-    PyObject * col = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
-    if (!(is_array(col) && array_numdims(col)==1 && array_type(col)==NPY_INT))
-      SWIG_Error(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
-    int* cold=(int*) array_data(col);
-    std::vector<int> colv(cold,cold+size);
-    
-    // Construct the 'rowind' vector needed for initialising the correct sparsity
-    PyObject * rowind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
-    if (!(is_array(rowind) && array_numdims(rowind)==1 && array_type(rowind)==NPY_INT))
-      SWIG_Error(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
-    int* rowindd=(int*) array_data(rowind);
-    std::vector<int> rowindv(rowindd,rowindd+(nrows+1));
-    
-    m = CasADi::Matrix<double>(nrows,ncols,colv,rowindv, v);
-    
-    Py_DECREF(narray);Py_DECREF(shape);Py_DECREF(col);Py_DECREF(rowind);
-    
-    if (array_is_new_object)
-      Py_DECREF(array);
-  } else if (isDMatrix(p)) { // DMatrix object get passed on as-is.
-    CasADi::DMatrix *mp;
-    int result = getDMatrix_ptr(p,mp);
-		if (!result)
-			return false;
-    m=*mp;
-  } else {
-    SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
-    return false;
-  }
-  return true;
-}
-%}
-#endif // WITH_NUMPY
-#endif // SWIGPYTHON
 
 namespace CasADi{
   
 #ifdef SWIGPYTHON
-
-
-
 
 
 %typemap(in) (const CasADi::Slice& i, const CasADi::Slice &j) (CasADi::Slice temp[2]) {
@@ -323,21 +358,8 @@ namespace CasADi{
   $1 = PySlice_Check($input);
 }
 #endif // SWIGPYTHON
- 
-// common for all languages
-%typemap(in) const Matrix<double> &  (CasADi::DMatrix m){
-  if (isDMatrix($input)) { // DMatrix object get passed on as-is, and fast.
-    int result = getDMatrix_ptr($input,$1);
-    if (!result) SWIG_exception_fail(SWIG_TypeError,"DMatrix cast failed");
-  } else {  
-    bool result=asDMatrix($input,m);
-    if (!result) SWIG_exception_fail(SWIG_TypeError,"Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix");
-    $1 = &m;
-  }
-}
 
-%typemap(typecheck,precedence=PRECEDENCE_DMatrix) const Matrix<double> & { $1 = couldbeDMatrix($input); }
-%typemap(freearg) const Matrix<double> & {}
+%my_generic_const_typemap(CasADi::Matrix<double>,PRECEDENCE_DMatrix);
 
 #ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
