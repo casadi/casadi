@@ -50,7 +50,7 @@ namespace CasADi{
 %template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
 
 %template(Pair_Int_Int) std::pair<int,int>;
-
+%template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
 #endif // SWIG
 
 // Lower value means wil be checked first

@@ -30,8 +30,7 @@
 #include "../stl_vector_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../mx/evaluation.hpp"
-
-#define SMALL_WORK_VECTOR 0
+#include "../sx/sx_tools.hpp"
 
 namespace CasADi{
 
@@ -67,17 +66,6 @@ SXFunction::SXFunction(const vector< SXMatrix>& arg, const SXMatrix& res){
   vector<SXMatrix> resv(1,res);
   assignNode(new SXFunctionInternal(arg,resv));
 }
-
-
-
-
-
-
-#if 0
-void SXFunction::createNode(const vector<SXMatrix>& ip, const vector<SXMatrix>& op){
-  assignNode(new SXFunctionInternal(ip,op));
-}
-#endif
 
 const SXFunctionInternal* SXFunction::operator->() const{
   return (const SXFunctionInternal*)FX::operator->();
@@ -162,15 +150,31 @@ bool SXFunction::checkNode() const{
 }
 
 SXMatrix SXFunction::jac(int iind, int oind){
-  return (*this)->jac(iind,oind);
+  if(input(iind).empty() || output(oind).empty()) return Matrix<SX>(); // quick return
+  vector<pair<int,int> > jblocks(1,pair<int,int>(oind,iind));
+  if(!isInit()) init();
+  return jac(jblocks).front();
 }
 
 SXMatrix SXFunction::grad(int iind, int oind){
-  return (*this)->grad(iind,oind);
+  return trans(jac(iind,oind));
 }
 
 SXMatrix SXFunction::hess(int iind, int oind){
-  return (*this)->hess(iind,oind);  
+  if(output(oind).numel() != 1)
+    throw CasadiException("SXFunctionInternal::hess: function must be scalar");
+  
+  // Reverse mode to calculate gradient
+  Matrix<SX> g = grad(iind,oind);
+  
+  // Create function
+  SXFunction gfcn(inputSX(iind),g);
+  
+  // Initialize
+  gfcn.init();
+  
+  // Return jacobian of the gradient
+  return gfcn.jac();
 }
 
 const SXMatrix& SXFunction::inputSX(int ind) const{
@@ -181,16 +185,20 @@ const SXMatrix& SXFunction::outputSX(int ind) const{
   return (*this)->outputv[ind];
 }
 
-void SXFunction::generateCode(const std::string& filename) const{
+void SXFunction::generateCode(const string& filename) const{
   (*this)->generateCode(filename);
 }
 
-const std::vector<SXAlgEl>& SXFunction::algorithm() const{
+const vector<SXAlgEl>& SXFunction::algorithm() const{
   return (*this)->algorithm;
 }
 
 void SXFunction::clearSymbolic(){
   (*this)->clearSymbolic();
+}
+
+vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks){
+  return (*this)->jac(jblocks);
 }
 
 

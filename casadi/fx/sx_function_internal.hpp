@@ -51,16 +51,16 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Make a deep copy */
   virtual SXFunctionInternal* clone() const;
     
-/** \brief  Destructor */
+  /** \brief  Destructor */
   virtual ~SXFunctionInternal();
 
-/** \brief  Evaluate the function with partial derivatives up to order ord */
+  /** \brief  Evaluate the function with partial derivatives up to order ord */
   virtual void evaluate(int nfdir, int nadir);
 
-/** \brief  evaluate symbolically */
-  void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
+  /** \brief  evaluate symbolically */
+  virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
 
-/** \brief  Check if smooth */
+  /** \brief  Check if smooth */
   bool isSmooth() const;
 
   /** \brief  Print the algorithm */
@@ -72,21 +72,18 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief Hessian of output oind with respect to input iind */
   virtual FX hessian(int iind=0, int oind=0);
 
-  /// Jacobian via source code transformation
-  Matrix<SX> jac(int iind=0, int oind=0);
-
-  /// Gradient via source code transformation
-  Matrix<SX> grad(int iind=0, int oind=0);
+  /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
+  virtual std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks);
   
-  /// Hessian (forward over adjoint) via source code transformation
-  Matrix<SX> hess(int iind=0, int oind=0);
-
-/** \brief  DATA MEMBERS */
+  /** \brief Get the unidirectional or bidirectional partition */
+  virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2);
   
-/** \brief  Indices of the nodes corresponding to the inputs */
+  /** \brief  DATA MEMBERS */
+  
+  /** \brief  Indices of the nodes corresponding to the inputs */
   std::vector<std::vector<int> > input_ind;
   
-/** \brief  Indices of the nodes corresponding the non-zeros of the outputs */
+  /** \brief  Indices of the nodes corresponding the non-zeros of the outputs */
   std::vector<std::vector<int> > output_ind;
 
   /** \brief  An elemenent of the algorithm, namely a binary operation */

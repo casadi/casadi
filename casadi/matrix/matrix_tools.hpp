@@ -724,10 +724,7 @@ Matrix<T> zeros(int n, int m){
 
 template<class T>
 Matrix<T> eye(int n){
-  Matrix<T> ret(n,n);
-  for(int i=0; i<n; ++i)
-    ret(i,i) = 1;
-  return ret;
+  return Matrix<T>(CRSSparsity::createDiagonal(n),1);
 }
 
 template<class T>

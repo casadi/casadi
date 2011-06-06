@@ -75,6 +75,10 @@ class CRSSparsity : public SharedObject{
     /// Construct a sparsity pattern from vectors
     CRSSparsity(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind);
 
+    /// Create a diagonal matrix
+    static CRSSparsity createDiagonal(int n);
+    static CRSSparsity createDiagonal(int n, int m);
+    
     /// Access a member function or object
     CRSSparsityNode* operator->();
 
@@ -215,7 +219,6 @@ class CRSSparsity : public SharedObject{
     /// Is diagonal?
     bool diagonal() const;
     
-
     /// (Dense) scalar
     static CRSSparsity scalarSparsity;
 

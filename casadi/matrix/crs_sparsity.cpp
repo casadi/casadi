@@ -818,6 +818,31 @@ int CRSSparsity::depth_first_search(int j, int top, int *xi, int *pstack, const 
   return top;
 }
 
+CRSSparsity CRSSparsity::createDiagonal(int n){
+  return createDiagonal(n,n);
+}
+
+CRSSparsity CRSSparsity::createDiagonal(int n, int m){
+  CRSSparsity ret(n,m);
+  
+  // Set columns
+  vector<int> &c = ret.colRef();
+  c.resize(min(n,m));
+  for(int i=0; i<c.size(); ++i)
+    c[i] = i;
+  
+  // Set row indices
+  vector<int> &r = ret.rowindRef();
+  for(int i=0; i<n && i<m; ++i)
+    r[i] = i;
+  
+  for(int i=min(n,m); i<n+1; ++i)
+    r[i] = c.size();
+  
+  return ret;
+}
+
+
 void CRSSparsity::strongly_connected_components(){
   int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk;
     

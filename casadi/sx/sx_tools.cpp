@@ -38,6 +38,7 @@ Matrix<SX> gauss_quadrature(Matrix<SX> f, const Matrix<SX> &x, const Matrix<SX> 
     Matrix<SX> q2 = (b+a)/2;
 
     SXFunction fcn(x,f);
+    fcn.init();
 
     return q1*gauss_quadrature(fcn.eval(q1*x+q2), x, -1, 1);
   }
@@ -332,7 +333,8 @@ Matrix<SX> gradient(const Matrix<SX>& ex, const Matrix<SX> &arg) {
   
 Matrix<SX> jacobian(const Matrix<SX>& ex, const Matrix<SX> &arg) {
   SXFunction temp(arg,ex); // make a runtime
-  return temp->jac();
+  temp.init();
+  return temp.jac();
 }
 
 void hessian(const Matrix<SX>& ex, const Matrix<SX> &arg, Matrix<SX> &H, Matrix<SX> &g) {

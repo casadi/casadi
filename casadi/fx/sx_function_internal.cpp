@@ -39,7 +39,7 @@ using namespace std;
 
 
 SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const vector<Matrix<SX> >& outputv_) : inputv(inputv_),  outputv(outputv_) {
-  addOption("ad_mode",OT_STRING,"reverse");
+  addOption("ad_mode",OT_STRING,"automatic");
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("name","unnamed_sx_function");
   
@@ -282,33 +282,116 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 }
 
-Matrix<SX> SXFunctionInternal::hess(int iind, int oind){
-  if(output(oind).numel() != 1)
-    throw CasadiException("SXFunctionInternal::hess: function must be scalar");
+void SXFunctionInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2){
+  casadi_assert(blocks.size()==1);
+  int oind = blocks.front().first;
+  int iind = blocks.front().second;
+
+  #if 0
+    // Sparsity pattern with transpose
+    vector<int> mapping;
+    CRSSparsity &sp = jacSparsity(iind,oind);
+    CRSSparsity sp_trans = sp.transpose(mapping);
+
+    // A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+    vector<int> forbiddenColors(input(iind).size(),-1);
+    vector<int> color(sp.size1(),-1);
+    for(int i=0; i<sp.size1(); ++i){
+      for(int el_w=sp.rowind(i); el_w<sp.rowind(i+1); ++el_w){
+        int w = sp.col(el_w);
+        for(int el_x=sp_trans.rowind(w); el_x<sp_trans.rowind(w+1); ++el_x){
+          int x = sp_trans.col(el_x);
+          if(color[x] != -1){
+            forbiddenColors[color[x]] = i;
+          }
+        }
+      }
+      for(int c=0; c<forbiddenColors.size(); ++c){
+        if(forbiddenColors[c] != i){
+          color[i] = c;
+          break;
+        }
+      }
+    }
+    
+    // Number of colors used
+    int ncolors=0;
+    for(vector<int>::const_iterator it=color.begin(); it!=color.end(); ++it)
+      ncolors = max(ncolors,*it);
+    ncolors++;
+   
+    // Create sparsity pattern
+    D1[0] = CRSSparsity(ncolors,sp.size1());
+    for(int i=0; i<color.size(); ++i){
+      cout << "1" << endl;
+      D1[0].getNZ(color[i],i);
+      cout << "2" << endl;
+    }
+    
+    return;
+#endif
   
-  // Reverse mode to calculate gradient
-  Matrix<SX> g = grad(iind,oind);
+  // Which AD mode?
+  bool use_ad_fwd;
+  if(getOption("ad_mode") == "forward"){
+    use_ad_fwd = true;
+  } else if(getOption("ad_mode") == "reverse"){
+    use_ad_fwd = false;
+  } else if(getOption("ad_mode") == "automatic"){
+    use_ad_fwd = iind <= oind;
+  } else {
+    throw CasadiException("SXFunctionInternal::jac: Unknown ad_mode");
+  }
   
-  // Create function
-  SXFunction gfcn(inputv.at(iind),g);
-  
-  // Initialize
-  gfcn.init();
-  
-  // Return jacobian of the gradient
-  return gfcn.jac();
+  // Very inefficient selection of seed matrices
+  if(use_ad_fwd){
+    D1[0] = CRSSparsity::createDiagonal(input(iind).size());
+  } else {
+    D2[0] = CRSSparsity::createDiagonal(output(oind).size());
+  }
 }
 
-Matrix<SX> SXFunctionInternal::grad(int iind, int oind){
-  return trans(jac(iind,oind));
-}
+vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks){
+  // Create return object
+  vector<Matrix<SX> > ret(jblocks.size());
+  
+  // Which blocks are involved in the Jacobian
+  vector<pair<int,int> > jblocks_no_f;
+  vector<int> jblock_ind;
+  
+  // Add the information we already know
+  for(int i=0; i<ret.size(); ++i){
+    // Get input/output indices for the block
+    int oind = jblocks[i].first;
+    int iind = jblocks[i].second;
 
-Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
-  if(input_ind.at(iind).empty() || output_ind.at(oind).empty()) return Matrix<SX>(); // quick return
-  assert(input(iind).size2()==1);
-  assert(output(oind).size2()==1);
-
-  // Calculate the partial derivatives     // The loop can be executed in parallel!
+    // Check if nondifferentiated variable
+    if(iind<0){
+      // Save to output
+      ret[i] = outputv.at(oind);
+    } else { // Jacobian block
+      // Mark block for evaluation
+      jblocks_no_f.push_back(jblocks[i]);
+      jblock_ind.push_back(i);
+      
+      // Make sure that the function as well as variables are vectors
+      assert(input(iind).size2()==1);
+      assert(output(oind).size2()==1);
+      
+      // Save sparsity
+      ret[i] = SXMatrix(jacSparsity(iind,oind));
+    }
+  }
+  
+  // Quick return if no jacobians to be calculated
+  if(jblocks_no_f.empty())
+    return ret;
+  
+  // Get a bidirectional partition
+  vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
+  getPartition(jblocks_no_f,D1,D2);
+  
+  // Calculate the partial derivatives
   vector<SX> der1, der2;
   der1.reserve(algorithm.size());
   der2.reserve(algorithm.size());
@@ -320,273 +403,164 @@ Matrix<SX> SXFunctionInternal::jac(int iind, int oind){
       ch[1] = SX(nodes[it->ch[1]]);
       casadi_math<SX>::der[it->op](ch[0],ch[1],f,tmp);
       if(!ch[0]->isConstant())  der1.push_back(tmp[0]);
-      else                    	der1.push_back(0);
+      else                      der1.push_back(0);
 
       if(!ch[1]->isConstant())  der2.push_back(tmp[1]);
-      else                    	der2.push_back(0);
+      else                      der2.push_back(0);
   }
 
   // Gradient (this is also the working array)
   vector<SX> g(nodes.size(),casadi_limits<SX>::zero);
 
-  // if reverse AD
-//  if(getOption("ad_mode") == "reverse"){
-  if(1){ // problem with the forward mode!
-    
-  // Jacobian
-  Matrix<SX> ret(output(oind).numel(),input_ind.at(iind).size()); 
-  ret.reserve(input_ind.at(iind).size()+output(oind).numel());
-
-#if 0
-  // Backward seed (symbolic direction)
-  Matrix<SX> bdir("bdir",output_.at(oind).col.size());
-  for(int i=0; i<bdir.size(); ++i)
-    bdir[i]->temp2 = i+1;
+  // Get the number of forward and adjoint sweeps
+  int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
+  int nadj = D2.front().isNull() ? 0 : D2.front().size1();
   
-  // Pass to work array
-  for(int i=0; i<output_.at(oind).size1(); ++i) // loop over rows
-    for(int el=output_.at(oind).rowind_[i]; el<output_.at(oind).rowind_[i+1]; ++el){ // loop over the non-zero elements
-      // add a seed to the element corresponding to the output of the function
-      g[output_ind.at(oind)[el]] = bdir[el];
+  // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
+  vector<vector<int> > mapping;
+  vector<CRSSparsity> sp_trans;
+  if(nfwd>0){
+    mapping.resize(jblock_ind.size());
+    sp_trans.resize(jblock_ind.size());
+    for(int i=0; i<jblock_ind.size(); ++i){
+      sp_trans[i] = ret[jblock_ind[i]].sparsity().transpose(mapping[i]);
     }
-
-   // backward sweep
-   for(int k = algorithm.size()-1; k>=0; --k){
-     const AlgEl& ae = algorithm[k];
-     if(!nodes[ae.ch[0]]->isConstant()) g[ae.ch[0]] += der1[k] * g[ae.ind];
-     if(!nodes[ae.ch[1]]->isConstant()) g[ae.ch[1]] += der2[k] * g[ae.ind];
-     
-     // Mark the place in the algorithm
-     nodes[ae.ind]->temp = k;
-   }
-
-   // A row of the Jacobian
-   Matrix<SX> jac_row(1,input_ind.at(iind).size());
-    for(int j=0; j<input_ind[iind].size(); j++)
-      if(input_ind.at(iind)[j]>=0 && !g[input_ind.at(iind)[j]]->isZero())
-        jac_row[j] = g[input_ind.at(iind)[j]];
-
-   // Loop over rows
-   vector<SXNode*> deps;
-   for(int i=0; i<jac_row.size(); ++i){
-      // Get dependent nodes
-      stack<SXNode*> s;
-      s.push(jac_row[i].get());
-      deps.clear();
-      sort_depth_first(s,deps);
-      
-      // Add the dependent outputs to a new stack
-      stack<SXNode*> s2;
-      for(vector<SXNode*>::const_iterator it=deps.begin(); it!=deps.end(); ++it){
-        for(int c=0; c<2; ++c){
-          int ind = (*it)->child[c]->temp2-1;
-          s2.push(outputv[oind].comp[ind].get());
-        }
-      }
-      
-      // Get the dependent nodes
-/*      deps.clear();
-      sort_depth_first(s2,deps);*/
- 
-      // Print
-/*      for(vector<SXNode*>::const_iterator it=deps.begin(); it!=deps.end(); ++it)
-        cout << SX(*it) << ",";
-      cout << endl;*/
-     
-          
-          /*      while(!s2.empty()){
-        cout << SX(s2.top()) << ", " << endl;
-        s2.pop();
-      }
-      cout << endl;*/
-      
-      
-
-/*      cout << i << ": " << depind << endl;*/
-   }
-      
-      
-      
-      
-   // Reset the marks
-   for(vector<AlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it)
-     nodes[it->ind]->temp = 0;
+  }
   
-      cout << "ok, 1" << endl;
-#endif 
-#if 0
-      
-      
-      // Mark the variables corresponding to directions
-  for(int i=0; i<bdir.size(); ++i)
-    bdir[i]->temp = 1;
+  // Carry out the forward sweeps
+  for(int sweep=0; sweep<nfwd; ++sweep){
+    
+    // Remove Seeds
+    fill(g.begin(),g.end(),0);
+    
+    // For all the input variables
+    for(int v=0; v<D1.size(); ++v){
 
-  // Loop over rows
-   vector<SXNode*> deps;
-   vector<Matrix<SX> > bdir_i(jac_row.size());
-   for(int i=0; i<jac_row.size(); ++i){
-      // Get dependent nodes
-      stack<SXNode*> s;
-      s.push(jac_row[i].get());
-      deps.clear();
-      sort_depth_first(s,deps);
+      // Get the input index
+      int iind = jblocks_no_f[v].second;
+
+      // For all the directions
+      for(int el = D1[v].rowind(sweep); el<D1[v].rowind(sweep+1); ++el){
+
+        // Get column of the Jacobian (i.e. input non-zero)
+        int c = D1[v].col(el);
+
+        // Give a seed in the direction
+        g[input_ind[iind][c]] = casadi_limits<SX>::one;
+      }
+    }
+    
+    // forward sweep
+    for(int k = 0; k<algorithm.size(); ++k){
+      const AlgEl& ae = algorithm[k];
       
-      for(vector<SXNode*>::iterator ii = deps.begin(); ii!=deps.end(); ++ii){
-        for(int c=0; c<2; ++c)
-          if((*ii)->child[c]->temp>0){
-            bdir_i[i] << (*ii)->child[c];
-            (*ii)->child[c]->temp = -1;
-          }
+      // First argument
+      if(!g[ae.ch[0]]->isZero() &&  !der1[k]->isZero()){
+        g[ae.ind] += der1[k] * g[ae.ch[0]];
       }
       
-      // reset mark
-      for(int j=0; j<bdir_i[i].size(); ++j)
-        bdir_i[i][j]->temp = 1;
-   }
+      // Second argument
+      if(!g[ae.ch[1]]->isZero() &&  !der2[k]->isZero()){
+        g[ae.ind] += der2[k] * g[ae.ch[1]];
+      }
+    }
    
-  // Remove marks
-  for(int i=0; i<bdir.size(); ++i)
-    bdir[i]->temp = 0;
-   
-  // Create functions
-  vector<SXFunction> jac_row_fcn(jac_row.size());
-  for(int i=0; i<jac_row.size(); ++i){
-     jac_row_fcn[i] = SXFunction(bdir_i[i],jac_row[i]);
+    // For all the input variables
+    for(int v=0; v<D1.size(); ++v){
+
+      // Get the output index
+      int oind = jblocks_no_f[v].first;
+
+      // For all the columns of the Jacobian treated in the sweep
+      for(int el = D1[v].rowind(sweep); el<D1[v].rowind(sweep+1); ++el){
+
+        // Get column of the Jacobian
+        int c = D1[v].col(el);
+        
+        // Loop over the nonzero elements in column c
+        for(int el_out = sp_trans[v].rowind(c); el_out<sp_trans[v].rowind(c+1); ++el_out){
+          
+          // Get the row
+          int r_out = sp_trans[v].col(el_out);
+          
+          // The nonzero of the Jacobian now treated
+          int elJ = mapping[v][el_out];
+          
+          // Get the output seed
+          ret[jblock_ind[v]][elJ] = g[output_ind[oind][r_out]];
+        }
+      }
+    }
+  }
+
+  // And now the adjoint sweeps
+  for(int sweep=0; sweep<nadj; ++sweep){
+    
+    // Remove Seeds
+    fill(g.begin(),g.end(),0);
+
+    // For all the output blocks
+    for(int v=0; v<D2.size(); ++v){
+
+      // Get the output index
+      int oind = jblocks_no_f[v].first;
+
+      // For all the directions
+      for(int el = D2[v].rowind(sweep); el<D2[v].rowind(sweep+1); ++el){
+
+        // Get the direction
+        int c = D2[v].col(el);
+
+        // Give a seed in the direction
+        g[output_ind[oind][c]] = casadi_limits<SX>::one;
+      }
+    }
+    
+    // backward sweep
+    for(int k = algorithm.size()-1; k>=0; --k){
+      const AlgEl& ae = algorithm[k];
+        
+      // Skip if the seed is zero
+      if(!g[ae.ind]->isZero()){
+        
+        if(!der1[k]->isZero())
+          g[ae.ch[0]] += der1[k] * g[ae.ind];
+          
+        if(!der2[k]->isZero())
+          g[ae.ch[1]] += der2[k] * g[ae.ind];
+          
+        // Remove the seed
+        g[ae.ind] = casadi_limits<SX>::zero;
+      }
+    }
+    
+    // For all the output blocks
+    for(int v=0; v<D2.size(); ++v){
+
+      // Get the input index
+      int iind = jblocks_no_f[v].second;
+
+      // For all the rows of the Jacobian treated in the sweep
+      for(int el = D2[v].rowind(sweep); el<D2[v].rowind(sweep+1); ++el){
+
+        // Get row of the Jacobian
+        int r = D2[v].col(el);
+
+        // Loop over the nonzero elements in row r
+        for(int elJ = ret[jblock_ind[v]].sparsity().rowind(r); elJ<ret[jblock_ind[v]].sparsity().rowind(r+1); ++elJ){
+          
+          // Get the input variable (i.e. column of the Jacobian)
+          int c = ret[jblock_ind[v]].sparsity().col(elJ);
+          
+          // Get the input seed
+          ret[jblock_ind[v]][elJ] = g[input_ind[iind][c]];
+        }
+      }
+    }
   }
   
-   // Mark where an output goes
-  for(int i=0; i<bdir.size(); ++i)
-    bdir[i]->temp = i;
-     
-  // loop over rows
-  for(int i=0; i<output_.at(oind).size1(); ++i){
-    
-    // Loop over non-zeros in the jacobian
-    for(int j=0; j<bdir_i[i].size(); ++j){
-      
-      // input vector
-      vector<Matrix<SX> > inp(1);
-      inp[0] = Matrix<SX>(bdir_i[i].size());
-      inp[0][j] = SX::one;
-      
-      // output vector
-      vector<Matrix<SX> > outp;
-      
-      // Evaluate
-      jac_row_fcn[i]->evaluate(inp,outp);
-      
-      // Save the result
-      if(!outp[0][0]->isZero())
-        ret(i,bdir_i[i][j]->temp) = outp[0][0];
-    }
-  }
-      
-   // Remove marks
-  for(int i=0; i<bdir.size(); ++i)
-    
-    bdir[i]->temp = 0;
-
-  /*      cout << "i = " << i << endl;
-      cout << bdir_i << endl;*/
-      
-/*      assert(bdir_i.size() < 10);*/
- 
-cout << "ok1" << endl;
-return ret;
-#endif 
-
-    // Get symbolic nodes
-    vector<int> snodes;
-    for(int i=0; i<nodes.size(); ++i){
-      if(nodes[i]->isSymbolic())
-        snodes.push_back(i);
-    }
-              
-    for(int i=0; i<output(oind).size1(); ++i) // loop over rows of the output
-      for(int el=output(oind).rowind(i); el<output(oind).rowind(i+1); ++el){ // loop over the non-zero elements
-        assert(output(oind).col(el) == 0); // column
-
-        // Clear seeds (from symbolic components)
-        for(vector<int>::const_iterator ii=snodes.begin(); ii!=snodes.end(); ++ii)
-          g[*ii] = casadi_limits<SX>::zero;
-                
-        // add a seed to the element corresponding to the output of the function
-        g[output_ind.at(oind)[el]] = casadi_limits<SX>::one;
-        
-        // backward sweep
-        for(int k = algorithm.size()-1; k>=0; --k){
-          const AlgEl& ae = algorithm[k];
-        
-          // Skip if the seed is zero
-          if(!g[ae.ind]->isZero()){
-        
-            if(!der1[k]->isZero())
-              g[ae.ch[0]] += der1[k] * g[ae.ind];
-          
-            if(!der2[k]->isZero())
-              g[ae.ch[1]] += der2[k] * g[ae.ind];
-          
-            // Remove the seed
-            g[ae.ind] = casadi_limits<SX>::zero;
-          }
-        }
-
-        // extract and save the result
-        for(int j=0; j<input_ind[iind].size(); j++){
-          int ind = input_ind.at(iind)[j];
-          if(ind>=0 && !g[ind]->isZero())
-            ret(i,j) = g[ind];
-        }
-    }
-    
-    return ret;
-  } else if(getOption("ad_mode") == "forward"){
-    // Gradient
-    Matrix<SX> ret(input_ind.at(iind).size(),output(oind).numel());
-    ret.reserve(input_ind.at(iind).size()+output(oind).numel());
-    
-    for(int i=0; i<input(iind).size1(); ++i) // loop over rows of the gradient
-      for(int el=input(iind).rowind(i); el<input(iind).rowind(i+1); ++el){ // loop over the non-zero elements
-        assert(input(iind).col(el) == 0); // column
-     
-        // set all components to zero (a bit quicker than to use fill)
-        for(vector<SX>::iterator it=g.begin(); it!=g.end(); ++it)
-          if(!(*it)->isZero())
-            *it = casadi_limits<SX>::zero;
-                
-        // add a seed to the element corresponding to the output of the function
-        g[input_ind.at(iind)[el]] = casadi_limits<SX>::one;
-
-        // forward sweep
-        for(int k = 0; k<algorithm.size(); ++k){
-          const AlgEl& ae = algorithm[k];
-
-          // First argument
-          if(!g[ae.ch[0]]->isZero() &&  !der1[k]->isZero()){
-            g[ae.ind] += der1[k] * g[ae.ch[0]];
-          }
-          
-          // Second argument
-          if(!g[ae.ch[1]]->isZero() &&  !der2[k]->isZero()){
-            g[ae.ind] += der2[k] * g[ae.ch[1]];
-          }
-          
-          k++;
-        }
-
-        // extract and save the result
-        for(int j=0; j<output_ind[oind].size(); j++){
-          int ind = output_ind.at(oind)[j];
-          if(ind>=0 && !g[ind]->isZero()){
-            ret(i,j) = g[ind];
-          }
-        }
-      }    
-    return trans(ret);
-    
-  } else {
-    throw CasadiException("SXFunctionInternal::jac: Unknown ad_mode");
-  }
+  // Return
+  return ret;
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -758,7 +732,9 @@ void SXFunctionInternal::init(){
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
-  Matrix<SX> H = hess(iind,oind); // NOTE: Multiple input, multiple output
+  SXFunction f;
+  f.assignNode(this);
+  Matrix<SX> H = f.hess(iind,oind);
   return SXFunction(inputv,H);
 }
 
@@ -815,7 +791,7 @@ void SXFunctionInternal::clearSymbolic(){
   swork.clear();
 }
 
-FX SXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
   // Jacobian blocks
   vector<SXMatrix> jac_out(jblocks.size());
   jac_out.reserve(jblocks.size());
@@ -825,7 +801,8 @@ FX SXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
       jac_out[el] = outputv[jblocks[el].first];
     } else {
       // Jacobian
-      jac_out[el] = jac(jblocks[el].second,jblocks[el].first);
+      vector<pair<int,int> > jblocks_local(1,jblocks[el]);
+      jac_out[el] = jac(jblocks_local).front();
     }
   }
   
