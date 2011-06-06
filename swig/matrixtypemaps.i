@@ -147,9 +147,37 @@ bool PyIsSequence(PyObject* p) {
 }
 
 %}
-#endif // SWIGOCTAVE
+#endif // SWIGPYTHON
 
 
+#ifdef SWIGPYTHON
+%define %python_matrix_convertors
+%pythoncode %{
+        
+    def toList(self):
+        return list(self.data())
+        
+    def toMatrix(self):
+        import numpy as n
+        return n.matrix(self.toArray())
+%}
+%enddef 
+%define %python_matrix_helpers
+%pythoncode %{
+    @property
+    def shape(self):
+        return (self.size1(),self.size2())
+        
+    def reshape(self,arg):
+        return reshape(self,arg)
+        
+    @property
+    def T(self):
+        return trans(self)
+        
+%}
+%enddef 
+#endif // SWIGPYTHON
 
 /// CasADi::Matrix<double>
 #ifdef SWIGPYTHON
@@ -285,18 +313,10 @@ PyObject* arrayView() {
 }
 #endif WITH_NUMPY
 
-%pythoncode %{
-    @property
-    def shape(self):
-        return (self.size1(),self.size2())
-%}
 
-%pythoncode %{
-    @property
-    def T(self):
-        return trans(self)
-%}
-    
+%python_matrix_convertors
+%python_matrix_helpers
+
 %pythoncode %{
   __array_priority__ = 999
 %}
@@ -349,17 +369,13 @@ PyObject* arrayView() {
 %}
 
 %pythoncode %{
-  def toMatrix(self):
-    import numpy as n
-    return n.matrix(self.toArray())
-%}
-
-%pythoncode %{
   def toCsr_matrix(self):
     import numpy as n
     from scipy.sparse import csr_matrix
     return csr_matrix( (list(self.data()),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
 %}
+
+
 }; // extend Matrix<double>
 } // namespace CasADi
 #endif // SWIGPYTHON

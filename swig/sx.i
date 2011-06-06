@@ -119,18 +119,8 @@ namespace CasADi {
     
     #undef binopsT
     
-
-    %pythoncode %{
-        @property
-        def shape(self):
-            return (self.size1(),self.size2())
-    %}
-
-    %pythoncode %{
-        @property
-        def T(self):
-            return trans(self)
-    %}
+    %python_matrix_convertors
+    %python_matrix_helpers
     
     %pythoncode %{
     def toArray(self):
@@ -172,11 +162,6 @@ namespace CasADi {
         return self.toArray()
   %}
         
-    %pythoncode %{
-    def toMatrix(self):
-      import numpy as n
-      return n.matrix(self.toArray())
-    %}
 };
 
 #endif // SWIGPYTHON

@@ -138,6 +138,9 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
 #ifdef SWIGPYTHON
 namespace CasADi{
   %extend MX{
+  
+    %python_matrix_helpers
+
     %pythoncode %{
     def __getitem__(self,s):
       if isinstance(s,int):
@@ -195,19 +198,6 @@ namespace CasADi{
                 s[k]=s[k]+self.shape[k]
               s[k] = [s[k]]
       self.setitem(s,val)
-    %}
-
-
-    %pythoncode %{
-        @property
-        def shape(self):
-            return (self.size1(),self.size2())
-    %}
-    
-    %pythoncode %{
-        @property
-        def T(self):
-            return trans(self)
     %}
 
   };
