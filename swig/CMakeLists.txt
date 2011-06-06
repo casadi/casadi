@@ -9,6 +9,11 @@ project(casadi_swig C CXX Fortran)
 
 find_package (SWIG REQUIRED QUIET)
 find_package(MPI QUIET)
+if(MPI_FOUND)
+   include_directories (${MPI_INCLUDE_PATH})
+   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${MPI_LIBRARY})
+endif(MPI_FOUND)
+
 set(CASADI_SWIG_FLAGS -includeall)
 
 find_package (IPOPT QUIET)
