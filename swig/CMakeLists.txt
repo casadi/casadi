@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 2.0)
 #endif(COMMAND cmake_policy)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
-project(casadi_swig C CXX Fortran)
+project(casadi_swig C CXX)
 
 find_package (SWIG REQUIRED QUIET)
 find_package(MPI QUIET)

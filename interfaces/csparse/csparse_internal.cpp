@@ -73,11 +73,18 @@ void CSparseInternal::prepare(){
   
   if(N_) cs_nfree(N_);
   N_ = cs_lu(&AT_, S_, tol) ;                 // numeric LU factorization 
+  if(N_==0){
+    throw CasadiException("factorization failed, Jacobian singular?");
+  }
+  casadi_assert(N_!=0);
 
   prepared_ = true;
 }
   
 void CSparseInternal::solve(double* x, int nrhs, bool transpose){
+  casadi_assert(prepared_);
+  casadi_assert(N_);
+  
   double *t = &temp_.front();
   
   for(int k=0; k<nrhs; ++k){
@@ -88,6 +95,7 @@ void CSparseInternal::solve(double* x, int nrhs, bool transpose){
       cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
     } else {
       cs_pvec (S_->q, x, t, AT_.n) ;       // t = P2*b 
+      casadi_assert(N_->U);
       cs_utsolve (N_->U, t) ;              // t = U'\t 
       cs_ltsolve (N_->L, t) ;              // t = L'\t 
       cs_pvec (N_->pinv, t, x, AT_.n) ;    // x = P1*t 

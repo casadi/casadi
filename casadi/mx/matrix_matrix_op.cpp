@@ -130,8 +130,12 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
 }
 
 MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
-  casadi_assert_message(op==SUB, "only subtraction implemented (quick hack)");
-  return jx[0]-jx[1];
+  casadi_assert_message(op==SUB || op==ADD, "only addition and subtraction implemented (quick hack)");
+
+  if(op==SUB)
+    return jx[0]-jx[1];
+  if(op==ADD)
+    return jx[0]+jx[1];
 }
 
 } // namespace CasADi
