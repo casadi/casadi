@@ -28,6 +28,7 @@
 #include <cmath>
 #include <vector>
 #include "casadi_exception.hpp"
+#include "pre_c99_support.hpp"
 
 namespace CasADi{
   

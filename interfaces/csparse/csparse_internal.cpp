@@ -83,7 +83,7 @@ void CSparseInternal::prepare(){
   
 void CSparseInternal::solve(double* x, int nrhs, bool transpose){
   casadi_assert(prepared_);
-  casadi_assert(N_);
+  casadi_assert(N_!=0);
   
   double *t = &temp_.front();
   
@@ -95,7 +95,7 @@ void CSparseInternal::solve(double* x, int nrhs, bool transpose){
       cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
     } else {
       cs_pvec (S_->q, x, t, AT_.n) ;       // t = P2*b 
-      casadi_assert(N_->U);
+      casadi_assert(N_->U!=0);
       cs_utsolve (N_->U, t) ;              // t = U'\t 
       cs_ltsolve (N_->L, t) ;              // t = L'\t 
       cs_pvec (N_->pinv, t, x, AT_.n) ;    // x = P1*t 

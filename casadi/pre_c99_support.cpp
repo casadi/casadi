@@ -22,7 +22,13 @@
 
 #include "pre_c99_support.hpp"
 #include <limits>
+#include <algorithm>
 
-int pre_c99_isnan(double x){return x!=x;}
-int pre_c99_isinf(double x){return pre_c99_isnan(x-x);}
-double pre_c99_erf(double x){return std::numeric_limits<double>::quiet_NaN();}
+#if __STDC_VERSION__ < 199901L
+int isnan(double x){return x!=x;}
+int isinf(double x){return isnan(x-x);}
+double erf(double x){return std::numeric_limits<double>::quiet_NaN();}
+double fmin(double x, double y){ return std::min(x,y);}
+double fmax(double x, double y){ return std::max(x,y);}
+#endif // __STDC_VERSION__ < 199901L
+

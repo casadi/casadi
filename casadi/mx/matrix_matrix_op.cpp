@@ -136,6 +136,8 @@ MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
     return jx[0]-jx[1];
   if(op==ADD)
     return jx[0]+jx[1];
+	
+  return MX();
 }
 
 } // namespace CasADi
