@@ -23,7 +23,6 @@
 #include "sx.hpp"
 #include <stack>
 #include <cassert>
-#include "../pre_c99_support.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -53,8 +52,8 @@ SX::SX(double val){
     else                        node = new IntegerSXNode(intval);
     node->count++;
   } else {
-    if(ISNAN(val))              node = casadi_limits<SX>::nan.node;
-    else if(ISINF(val))         node = val > 0 ? casadi_limits<SX>::inf.node : casadi_limits<SX>::minus_inf.node;
+    if(isnan(val))              node = casadi_limits<SX>::nan.node;
+    else if(isinf(val))         node = val > 0 ? casadi_limits<SX>::inf.node : casadi_limits<SX>::minus_inf.node;
     else                        node = new RealtypeSXNode(val);
     node->count++;
   }
@@ -434,11 +433,9 @@ SX SX::ceil() const{
   return SX(new BinarySXNode(CEIL,*this));
 }
 
-#if __STDC_VERSION__ >= 199901L // C99
 SX SX::erf() const{
   return SX(new BinarySXNode(ERF,*this));
 }
-#endif // C99
 
 SX SX::fabs() const{
   if(isConstant() && getValue()>=0)
@@ -463,7 +460,6 @@ SX casadi_operators<SX>::div(const SX&x, const SX&y){
   return x.div(y);
 }
 
-#if __STDC_VERSION__ >= 199901L // C99
 SX casadi_operators<SX>::fmin(const SX&x, const SX&y){
   return x.fmin(y);
 }
@@ -471,7 +467,6 @@ SX casadi_operators<SX>::fmin(const SX&x, const SX&y){
 SX casadi_operators<SX>::fmax(const SX&x, const SX&y){
   return x.fmax(y);
 }
-#endif // C99
 
 SX casadi_operators<SX>::pow(const SX&x, const SX&y){
   return x.pow(y);
@@ -575,7 +570,6 @@ SX::operator Matrix<SX>() const{
   return Matrix<SX>(1,1,*this);
 }
 
-#if __STDC_VERSION__ >= 199901L // C99
 SX SX::fmin(const SX &b) const{
   return SX(new BinarySXNode(FMIN,*this,b));
 }
@@ -583,7 +577,6 @@ SX SX::fmin(const SX &b) const{
 SX SX::fmax(const SX &b) const{
   return SX(new BinarySXNode(FMAX,*this,b));
 }
-#endif // C99
 
 SX SX::pow(const SX& n) const{
   if(n->isConstant()) {

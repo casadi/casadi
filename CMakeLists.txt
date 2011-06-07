@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.0)
-project(opticon C CXX)
+project(opticon C CXX Fortran)
 
 # Options:
 option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)

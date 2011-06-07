@@ -65,10 +65,7 @@ enum Operation{
   ASIN,  ACOS,  ATAN,  
   STEP,  
   FLOOR,  CEIL,  EQUALITY,  
-#if __STDC_VERSION__ >= 199901L
-// C99
   ERF,  FMIN,  FMAX,
-#endif
   NUM_BUILT_IN_OPS
 };
 
@@ -253,8 +250,6 @@ class BinaryOperation<EQUALITY>{
     template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 
-#if __STDC_VERSION__ >= 199901L // C99
-
 /// Minimum
 template<>
 class BinaryOperation<FMIN>{
@@ -281,8 +276,6 @@ class UnaryOperation<ERF>{
     template<typename T> static void fcn(const T& x, T& f){ f = erf(x);}
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = (2/std::sqrt(M_PI))*std::exp(-x*x);}
 };
-
-#endif // C99
 
 /// Easy access to all the functions for a particular type
 template<typename T>
@@ -364,11 +357,9 @@ std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::getPrintFun(){
 
   ret[EQUALITY] = BinaryOperation<EQUALITY>::print;
 
-#if __STDC_VERSION__ >= 199901L // C99
   ret[ERF] = BinaryOperation<ERF>::print;
   ret[FMIN] = BinaryOperation<FMIN>::print;
   ret[FMAX] = BinaryOperation<FMAX>::print;
-#endif // C99
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -381,9 +372,11 @@ std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::getPrintFun(){
 
 template<typename T>
 std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
+  
   // Create return object
   std::vector<typename casadi_math<T>::funT> ret(NUM_BUILT_IN_OPS,0);
   
+#ifdef _WIN32
   // Specify operations
   ret[ADD] = reinterpret_cast<funT>(BinaryOperation<ADD>::fcn);
   ret[SUB] = reinterpret_cast<funT>(BinaryOperation<SUB>::fcn);
@@ -411,12 +404,44 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
 
   ret[EQUALITY] = reinterpret_cast<funT>(BinaryOperation<EQUALITY>::fcn);
 
-#if __STDC_VERSION__ >= 199901L // C99
   ret[ERF] = reinterpret_cast<funT>(BinaryOperation<ERF>::fcn);
   ret[FMIN] = reinterpret_cast<funT>(BinaryOperation<FMIN>::fcn);
   ret[FMAX] = reinterpret_cast<funT>(BinaryOperation<FMAX>::fcn);
-#endif // C99
+#else // WIN32
   
+  // Specify operations
+  ret[ADD] = BinaryOperation<ADD>::fcn;
+  ret[SUB] = BinaryOperation<SUB>::fcn;
+  ret[MUL] = BinaryOperation<MUL>::fcn;
+  ret[DIV] = BinaryOperation<DIV>::fcn;
+    
+  ret[NEG] = BinaryOperation<NEG>::fcn;
+  ret[EXP] = BinaryOperation<EXP>::fcn;
+  ret[LOG] = BinaryOperation<LOG>::fcn;
+  ret[POW] = BinaryOperation<POW>::fcn;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::fcn;
+
+  ret[SQRT] = BinaryOperation<SQRT>::fcn;
+  ret[SIN] = BinaryOperation<SIN>::fcn;
+  ret[COS] = BinaryOperation<COS>::fcn;
+  ret[TAN] = BinaryOperation<TAN>::fcn;
+
+  ret[ASIN] = BinaryOperation<ASIN>::fcn;
+  ret[ACOS] = BinaryOperation<ACOS>::fcn;
+  ret[ATAN] = BinaryOperation<ATAN>::fcn;
+
+  ret[STEP] = BinaryOperation<STEP>::fcn;
+  ret[FLOOR] = BinaryOperation<FLOOR>::fcn;
+  ret[CEIL] = BinaryOperation<CEIL>::fcn;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn;
+
+  ret[ERF] = BinaryOperation<ERF>::fcn;
+  ret[FMIN] = BinaryOperation<FMIN>::fcn;
+  ret[FMAX] = BinaryOperation<FMAX>::fcn;
+  
+#endif // WIN32
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -431,6 +456,7 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   std::vector<typename casadi_math<T>::derT> ret(NUM_BUILT_IN_OPS,0);
   
   // Specify operations
+#ifdef _WIN32
   ret[ADD] = reinterpret_cast<derT>(BinaryOperation<ADD>::der);
   ret[SUB] = reinterpret_cast<derT>(BinaryOperation<SUB>::der);
   ret[MUL] = reinterpret_cast<derT>(BinaryOperation<MUL>::der);
@@ -457,11 +483,41 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
 
   ret[EQUALITY] = reinterpret_cast<derT>(BinaryOperation<EQUALITY>::der);
 
-#if __STDC_VERSION__ >= 199901L // C99
   ret[ERF] = reinterpret_cast<derT>(BinaryOperation<ERF>::der);
   ret[FMIN] = reinterpret_cast<derT>(BinaryOperation<FMIN>::der);
   ret[FMAX] = reinterpret_cast<derT>(BinaryOperation<FMAX>::der);
-#endif // C99
+
+#else // WIN32
+  ret[ADD] = BinaryOperation<ADD>::der;
+  ret[SUB] = BinaryOperation<SUB>::der;
+  ret[MUL] = BinaryOperation<MUL>::der;
+  ret[DIV] = BinaryOperation<DIV>::der;
+    
+  ret[NEG] = BinaryOperation<NEG>::der;
+  ret[EXP] = BinaryOperation<EXP>::der;
+  ret[LOG] = BinaryOperation<LOG>::der;
+  ret[POW] = BinaryOperation<POW>::der;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::der;
+
+  ret[SQRT] = BinaryOperation<SQRT>::der;
+  ret[SIN] = BinaryOperation<SIN>::der;
+  ret[COS] = BinaryOperation<COS>::der;
+  ret[TAN] = BinaryOperation<TAN>::der;
+
+  ret[ASIN] = BinaryOperation<ASIN>::der;
+  ret[ACOS] = BinaryOperation<ACOS>::der;
+  ret[ATAN] = BinaryOperation<ATAN>::der;
+
+  ret[STEP] = BinaryOperation<STEP>::der;
+  ret[FLOOR] = BinaryOperation<FLOOR>::der;
+  ret[CEIL] = BinaryOperation<CEIL>::der;
+
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::der;
+
+  ret[ERF] = BinaryOperation<ERF>::der;
+  ret[FMIN] = BinaryOperation<FMIN>::der;
+  ret[FMAX] = BinaryOperation<FMAX>::der;
+#endif // WIN32
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){

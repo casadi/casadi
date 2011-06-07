@@ -472,11 +472,9 @@ MX constpow(const MX& x, const MX& n){
   return MX::binary(CONSTPOW,x,n);
 }
 
-#if __STDC_VERSION__ >= 199901L // C99
 MX erf(const MX& x){
   return MX::unary(ERF,x);
 }
-#endif // C99
 
 MX floor(const MX& x){
   return MX::unary(FLOOR,x);
@@ -486,7 +484,6 @@ MX ceil(const MX& x){
   return MX::unary(CEIL,x);
 }
 
-#if __STDC_VERSION__ >= 199901L // C99
 MX fmin(const MX& x, const MX& y){
   return MX::binary(FMIN,x,y);
 }
@@ -494,7 +491,6 @@ MX fmin(const MX& x, const MX& y){
 MX fmax(const MX& x, const MX& y){
   return MX::binary(FMAX,x,y);
 }
-#endif // C99
 
 
 
