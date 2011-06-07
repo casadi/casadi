@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 2.0)
-project(opticon C CXX Fortran)
+project(opticon C CXX)
+
+# Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
+include(CMakeDetermineFortranCompiler)
+if(CMAKE_Fortran_COMPILER)
+  enable_language(Fortran)
+endif(CMAKE_Fortran_COMPILER)
 
 # Options:
 option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)
