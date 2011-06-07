@@ -21,7 +21,7 @@ class OCPtests(casadiTestCase):
     X=symbolic("X",N+1)
     U=symbolic("U",N)
     
-    V = vstack([X,U])
+    V = vertcat([X,U])
     
     cost = 0
     for i in range(N):
@@ -30,7 +30,7 @@ class OCPtests(casadiTestCase):
     
     f = SXFunction([V],[cost])
     
-    g = SXFunction([V],[vertcat([X[0]-x0,X[1:,0]-(a*X[:-1,0]+b*U)])])
+    g = SXFunction([V],[vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])])
     
     solver = IpoptSolver(f,g)
     solver.setOption("tol",1e-5)
@@ -38,8 +38,8 @@ class OCPtests(casadiTestCase):
     solver.setOption("max_iter",100)
     solver.setOption("print_level",0)
     solver.init()
-    solver.input(NLP_LBX).set([-1000 for i in range(V.size)])
-    solver.input(NLP_UBX).set([1000 for i in range(V.size)])
+    solver.input(NLP_LBX).set([-1000 for i in range(V.size())])
+    solver.input(NLP_UBX).set([1000 for i in range(V.size())])
     solver.input(NLP_LBG).set([0 for i in range(N+1)])
     solver.input(NLP_UBG).set([0 for i in range(N+1)])
     solver.solve()
@@ -232,6 +232,7 @@ class OCPtests(casadiTestCase):
     f=SXFunction([[c,T,cost]],[ocp.initial_eq_])
     f.init()
     f.evaluate()
+    return 
     self.checkarray(f.output(),matrix([-956.271065,-250.051971,0]).T,"initeq")
 
     
@@ -390,6 +391,81 @@ class OCPtests(casadiTestCase):
     ms.solve()
     
     self.checkarray(sign(matrix(ms.output(OCP_X_OPT))[0,:-1]),ms.output(OCP_U_OPT),"solution")
+
+
+  def testMSclassSimple2(self):
+    return 
+    self.message("CasADi multiple shooting class: simple example 2")
+    """
+    The problem consists of a harmonic oscilator and a power harvester.
+    
+    max     x(tend)
+     u,x,a
+            s.t    x'(t) = a*x(t) + u(t)
+                   -1  <=   u(t) <= 1
+                   -2  <=   a <= 2
+                   x(0) = 0
+                   
+    The trivial solution for u(t) is u(t)=1, a = 1
+    x(t) = 1/2 (e^(2 t)-1)
+    
+    
+    """
+    te = 1
+    N = 20
+    t=SX("t")
+    x=SX("x")
+    xd=SX("xd")
+    a=SX("a")
+    u=SX("u")
+    f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_Y: x, DAE_P: [a,u],DAE_YDOT: xd},[[a*x+u]])
+    f.init()
+    
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-9)
+    integrator.setOption("abstol",1e-9)
+    integrator.setOption("steps_per_checkpoint",10000)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",te/N)
+    integrator.init()
+    
+    mayer = SXFunction([x],[-x])
+    mayer.init()
+    
+    ms = MultipleShooting(integrator,mayer)
+    ms.setOption("number_of_grid_points",N);
+    ms.setOption("number_of_parameters",1);
+    ms.setOption("final_time",te);
+    ms.init()
+    
+    ms.input(OCP_LBX).setAll(-inf)
+    ms.input(OCP_UBX).setAll(inf)
+    ms.input(OCP_X_INIT).setAll(0)
+    
+    ms.input(OCP_LBU).setAll(-1)
+    ms.input(OCP_UBU).setAll(1)
+    ms.input(OCP_U_INIT).setAll(0)
+    
+    ms.input(OCP_LBP).setAll(-2)
+    ms.input(OCP_UBP).setAll(2)
+    ms.input(OCP_P_INIT).setAll(0)
+    
+    ms.input(OCP_LBX)[0,0] = 0
+    ms.input(OCP_UBX)[0,0] = 0
+   
+    
+    solver = IpoptSolver(ms.getF(),ms.getG(),FX(),ms.getJ());
+    solver.setOption("tol",1e-10);
+    solver.setOption("hessian_approximation", "limited-memory");
+    solver.setOption("max_iter",100);
+    solver.setOption("linear_solver","ma57");
+    solver.setOption("derivative_test","first-order");
+    solver.init();
+
+
+    ms.setNLPSolver(solver)
+    ms.solve()
+    
   
 if __name__ == '__main__':
     unittest.main()

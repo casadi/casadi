@@ -311,24 +311,36 @@ class Matrix : public PrintableObject{
     
     /// Get several non-zero entries
     const Matrix<T> __getitem__(const Slice& k) const;
+    
+    /// Get several non-zero entries
+    const Matrix<T> __getitem__(const std::vector<int>& k) const;
 
     /// Python: get a matrix entry
-    const T __getitem__(const std::pair<int,int> &ij) const;
+    const T __getitem__(int i, int j) const;
     
     /// Python: get a submatrix
-    const Matrix<T> __getitem__(const Slice& i, const Slice &j) const;
+    const Matrix<T> __getitem__(const std::vector<Slice> & ij) const;
     
+    /// Python: get a submatrix
+    const Matrix<T> __getitem__(const std::pair<std::vector<int>,std::vector<int> > & ij) const;
+      
     /// Python: set a non-zero entry
     void __setitem__(int k, const T& el);
     
     /// Python: set several non-zero entries
     void __setitem__(const Slice& k, const Matrix<T>& m);
-    
+ 
+    /// Python: set several non-zero entries
+    void __setitem__(const std::vector<int>& k, const Matrix<T>& m);
+       
     /// Python: set a matrix entry
-    void __setitem__(const std::pair<int,int> &ij, const T&  el);
+    void __setitem__(int i, int j, const T&  el);
 
     /// Python: set a submatrix
-    void __setitem__(const Slice& i, const Slice &j, const Matrix<T>& m);
+    void __setitem__(const std::vector<Slice> & ij, const Matrix<T>& m);
+
+    /// Python: set a submatrix
+    void __setitem__(const std::pair<std::vector<int>, std::vector<int> > &j, const Matrix<T>& m);
     
     #ifdef SWIGOCTAVE
     
@@ -747,6 +759,13 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const T& m){
 
 template<class T>
 void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
+  if (m.size()==1 && m.numel()==1) {
+    // Allow scalar assignment:
+    // m[:2]=3
+    for(int k=0; k<kk.size(); ++k)
+      data()[kk[k]] = m[0];
+    return;
+  }
   if (kk.size()!=m.size()) {
     std::stringstream ss;
     ss << "Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
@@ -1096,18 +1115,30 @@ const T Matrix<T>::__getitem__(int i) const{
 }
 
 template<class T>
-const T Matrix<T>::__getitem__(const std::pair<int,int> &ij) const{
-  return getElement(ij.first,ij.second);
+const T Matrix<T>::__getitem__(int i, int j) const{
+  return getElement(i,j);
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const Slice& i, const Slice &j) const{
-  return (*this)(i.getAll(size1()),j.getAll(size2()));
+const Matrix<T> Matrix<T>::__getitem__(const std::vector<Slice> & ij) const{
+  casadi_assert_message(ij.size()==2,"Can only do up to 2D slices");
+  // Note: we do not use pair, because that is very difficult to typemap (because of the comma in the type description)
+  return (*this)(ij[0].getAll(size1()),ij[1].getAll(size2()));
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::__getitem__(const std::pair<std::vector<int>,std::vector<int> > & ij) const{
+  return (*this)(ij.first,ij.second);
 }
 
 template<class T>
 const Matrix<T> Matrix<T>::__getitem__(const Slice& kk) const{
   return (*this)[kk.getAll(size())];
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::__getitem__(const std::vector<int>& kk) const{
+  return (*this)[kk];
 }
 
 template<class T>
@@ -1131,14 +1162,27 @@ void Matrix<T>::__setitem__(const Slice& k, const Matrix<T>& m){
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const std::pair<int,int> &ij, const T&  el){ 
-  getElementRef(ij.first,ij.second) = el;
+void Matrix<T>::__setitem__(const std::vector<int>& k, const Matrix<T>& m){
+  (*this)[k] = m;
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const Slice& i, const Slice &j, const Matrix<T>& m){
-  setSub(i.getAll(size1()),j.getAll(size2()),m);
+void Matrix<T>::__setitem__(int i, int j, const T&  el){ 
+  getElementRef(i,j) = el;
 }
+
+template<class T>
+void Matrix<T>::__setitem__(const std::vector<Slice> & ij, const Matrix<T>& m){
+  casadi_assert_message(ij.size()==2,"Can only do up to 2D slices");
+  // Note: we do not use pair, because that is very difficult to typemap (because of the comma in the type description)
+  setSub(ij[0].getAll(size1()),ij[1].getAll(size2()),m);
+}
+
+template<class T>
+void Matrix<T>::__setitem__(const std::pair<std::vector<int>, std::vector<int> > & ij, const Matrix<T>& m){
+  setSub(ij.first,ij.second,m);
+}
+
 
 template<class T>
 Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{

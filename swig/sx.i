@@ -8,6 +8,12 @@
 
 %}
 
+%extend CasADi::Matrix<CasADi::SX>{
+  %rename(__Cgetitem__) __getitem__;
+  %rename(__Csetitem__) __setitem__;
+};
+
+
 
 #ifdef SWIGOCTAVE
 %rename(__el_mul__) __mul__;
@@ -15,6 +21,8 @@
 %rename(__mul__) prod;
 %rename(__transpose__) trans;
 #endif // SWIGOCTAVE
+
+
 
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"
@@ -36,6 +44,7 @@ template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SX> > >::n
             return (self.size1(),self.size2())
     %}
 };
+
 #endif // SWIGPYTHON
 
 %extend std::vector<CasADi::SX>{
@@ -177,46 +186,29 @@ namespace CasADi {
 %template(vector_PyObject)    std::vector<PyObject*>;
 
 
-%inline %{
-
-
-
-
-bool couldbePyNumber(PyObject * p) {
-  return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p);
-}
-
-int getPyNumber(PyObject * p, double * m) {
-  PyObject *r = PyNumber_Float(p);
-  int ret = !(r==NULL);
-  if (ret)
-    *m = PyFloat_AsDouble(r);
-  Py_DECREF(r);
-  return ret;
-}
-
-
-%}
-
 #endif // SWIGPYTHON
-
-
 
 
 %template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
 %template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 
 
+
+%inline %{
+template<> char meta< CasADi::SX >::expected_message[] = "Expecting SX or number";
+%}
+
 /// CasADi::SX
 #ifdef SWIGPYTHON
 %inline %{
 
+
 template <>
 int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
   NATIVERETURN(CasADi::SX, s)
-  if (couldbePyNumber(p)) {
+  if (meta< double >::couldbe(p)) {
     double res;
-    int result = getPyNumber(p,&res);
+    int result = meta< double >::as(p,res);
     if (!result)
       return false;
     s=CasADi::SX(res);
@@ -228,7 +220,7 @@ int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
 
 template <>
 bool meta< CasADi::SX >::couldbe(PyObject * p) {
-  return (meta< CasADi::SX >::isa(p) || couldbePyNumber(p));
+  return (meta< CasADi::SX >::isa(p) || meta< double >::couldbe(p));
 }
 
 %}
@@ -295,19 +287,13 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::S
 		}
     Py_DECREF(it);
 		m = CasADi::Matrix< CasADi::SX >(v, nrows, ncols);
-	} else if (couldbePyNumber(p))  {
-    double res;
-    int result = getPyNumber(p,&res);
-		if (!result)
-			return false;
-    m = CasADi::Matrix< CasADi::SX >(res);
-  } else if(meta< CasADi::Matrix<double> >::couldbe(p)) {
+	} else if(meta< CasADi::Matrix<double> >::couldbe(p)) {
     CasADi::DMatrix mt;
     bool result=meta< CasADi::Matrix<double> >::as(p,mt);
     if (!result)
       return false;
     m = CasADi::SXMatrix(mt);
-  } else if(PyIsSequence(p)) {
+  } else if(meta< CasADi::SX >::couldbe_sequence(p)) {
     std::vector<CasADi::SX> sxv;
     int result = meta< CasADi::SX >::as_vector(p,sxv);
     if (result) {
@@ -329,11 +315,9 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
       return true;
   } else if (meta< CasADi::Matrix<double> >::couldbe(p)) {
     return true;
-  } if (meta< CasADi::SX >::couldbe_sequence(p)) {
-    return true;
   }
   
-  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) ;
+  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || meta< CasADi::SX >::couldbe_sequence(p);
 }
 
 %}
@@ -477,6 +461,7 @@ template <> bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(cons
 %}
 #endif //SWIGOCTAVE
 
+%my_generic_const_typemap(CasADi::SX,PRECEDENCE_SX);
 %my_generic_const_typemap(CasADi::Matrix<CasADi::SX>,PRECEDENCE_SXMatrix);
 %my_generic_const_typemap(std::vector< CasADi::Matrix<CasADi::SX> >,PRECEDENCE_SXMatrixVector);
 

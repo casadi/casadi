@@ -222,7 +222,46 @@ class typemaptests(casadiTestCase):
     f.setOption(d)
     self.assertTrue(f.getOption("verbose"))
     self.assertEquals(f.getOption("number_of_adj_dir"),7)
-    
+
+  def testGenericType2(self):
+    self.message("Generic type 2")
+    for i in [0,1,7,-7]:
+	    a=GenericType(i)
+	    self.assertTrue(a.isInt())
+	    self.assertFalse(a.isBool())
+	    self.assertFalse(a.isDouble())
+	    self.assertFalse(a.isString())
+	    self.assertEqual(a.toInt(),i)
+    for i in [True,False]:
+	    a=GenericType(i)
+	    #self.assertFalse(a.isInt())
+	    #self.assertTrue(a.isBool())
+	    #self.assertFalse(a.isDouble())
+	    #self.assertEqual(a.toBool(),i)
+
+    for i in [0.01,-5.7]:
+	    a=GenericType(i)
+	    self.assertFalse(a.isInt())
+	    self.assertFalse(a.isBool())
+	    self.assertTrue(a.isDouble())
+	    self.assertFalse(a.isString())
+	    self.assertEqual(a.toDouble(),i)
+
+    for i in ["","foo"]:
+	    a=GenericType(i)
+	    self.assertFalse(a.isInt())
+	    self.assertFalse(a.isBool())
+	    self.assertFalse(a.isDouble())
+	    self.assertTrue(a.isString())
+	    self.assertEqual(a.toString(),i)
+
+    for i in [(0,1,5)]:
+	    a=GenericType(i)
+	    #print a
+	    #self.assertTrue(a.isIntVector())
+	    #self.assertTrue(a.isDoubleVector())
+	    #self.assertEqual(a.toString(),i)
+
   def test_operators(self):
     self.message("Test operators on mixed numpy.array/Matrix")
     self.message(":SXMatrix")
@@ -365,7 +404,19 @@ class typemaptests(casadiTestCase):
     B[2:7:3,:7:4] = w
     self.checkarray(A,B,"get")
     
+  def test_vertcatprecedence(self):
+    self.message("Argument precedence DMatrix")
+    a = DMatrix([1,2])
+    self.assertTrue(isinstance(vertcat([a,a]),DMatrix))
     
+    a = DMatrix([1,2])
+    #print vertcat([a,[1,2,3]])
+    #self.assertTrue(isinstance(vertcat([a,[1,2,3]]),DMatrix))
+    
+    
+    a = MX([1,2])
+    print vertcat([a,[1,2,3]])
+    self.assertTrue(isinstance(vertcat([a,[1,2,3]]),MX))
     
 if __name__ == '__main__':
     unittest.main()

@@ -57,11 +57,14 @@ namespace CasADi{
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_SXMatrix 102
+#define PRECEDENCE_SX 103
 #define PRECEDENCE_SXMatrixVector 103
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_PAIR_SLICE_SLICE 204
 #define PRECEDENCE_SLICE 205
+#define PRECEDENCE_PAIR_IVector_IVector 206
+
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code

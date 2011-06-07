@@ -39,7 +39,7 @@ template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, number)
 
 template <>
 bool meta< CasADi::MX >::couldbe(PyObject * p) {
-  return (meta< CasADi::MX >::isa(p) || couldbePyNumber(p) || meta< CasADi::Matrix<double> >::couldbe(p) );
+  return (meta< CasADi::MX >::isa(p) || meta< CasADi::Matrix<double> >::couldbe(p) );
 }
 
 template <>
@@ -51,16 +51,9 @@ int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
     if (!result)
       return false;
     m = CasADi::MX(mt);
-  } else if (couldbePyNumber(p)) {
-    double res;
-    int result = getPyNumber(p,&res);
-    if (!result)
-      return false;
-    m=CasADi::MX(res);
-  } else {
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 %}
 #endif //SWIGPYTHON
