@@ -361,12 +361,13 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
     int nrow = p.rows();
     int ncol = p.columns();
     m.resize(nrow,ncol);
+    CasADi::SX temp;
     for(int i=0; i<nrow; ++i){
       for(int j=0; j<ncol; ++j){
-        // Get the octave object
         const octave_value& obj = p.cell_value()(i,j);
-        bool ret = meta< CasADi::SX >::as(obj,m[i,j]);
+        bool ret = meta< CasADi::SX >::as(obj,temp);
         if(!ret) return false;
+        m(i,j)=temp;
       }
     }
     return true;
