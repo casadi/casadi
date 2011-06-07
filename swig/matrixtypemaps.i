@@ -49,8 +49,10 @@ class meta {
       return true;
     };
     /// Convert Guest object to type T
+    /// This function must work when isa(GUESTOBJECT) too
     static int as(GUESTOBJECT,T&);
     /// Check if Guest object could ultimately be converted to type T
+    /// may return true when isa(GUESTOBJECT), but this is not required.
     static bool couldbe(GUESTOBJECT);
     static swig_type_info** name;
     static char expected_message[];
@@ -115,11 +117,10 @@ class meta {
   }
 }
 
-%typemap(typecheck,precedence=Precedence) const Type & { $1 = meta< Type >::couldbe($input); }
+%typemap(typecheck,precedence=Precedence) const Type & { $1 = meta< Type >::isa($input) || meta< Type >::couldbe($input); }
 %typemap(freearg) const Type  & {}
 
 %enddef
-
 
 
 %inline %{
@@ -284,14 +285,18 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
         m(i,j) = mat(i,j);
       }
     }
+    return true;
   }
-    
-  return true;
+  if (p.is_real_scalar()) {
+    m = CasADi::DMatrix(1,1,p.double_value());
+    return true;
+  } 
+  return false;
 }
 
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
 template <>
-bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) {return p.is_real_matrix();}
+bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) {return p.is_real_matrix() || p.is_real_scalar();}
 
 %}
 #endif //SWIGOCTAVE
@@ -433,8 +438,9 @@ namespace CasADi{
 #ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
 /**
+
 Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - DENSE
-         1D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - SPARSE
+         1D numpy.ndarray, numpy.matrix (contiguous, nNATIVEative byte order, datatype double)   - SPARSE
          2D scipy.csr_matrix
 */
 

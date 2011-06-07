@@ -208,9 +208,9 @@ int getPyNumber(PyObject * p, double * m) {
 
 
 /// CasADi::SX
+#ifdef SWIGPYTHON
 %inline %{
 
-#ifdef SWIGPYTHON
 template <>
 int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
   NATIVERETURN(CasADi::SX, s)
@@ -225,16 +225,37 @@ int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
   }
   return true;
 }
-#endif //SWIGPYTHON
 
-#ifdef SWIGPYTHON
 template <>
 bool meta< CasADi::SX >::couldbe(PyObject * p) {
   return (meta< CasADi::SX >::isa(p) || couldbePyNumber(p));
 }
-#endif //SWIGPYTHON
 
 %}
+#endif //SWIGPYTHON
+
+
+/// CasADi::SX
+#ifdef SWIGOCTAVE
+%inline %{
+
+template <>
+int meta< CasADi::SX >::as(const octave_value& p,CasADi::SX &s) {
+  NATIVERETURN(CasADi::SX, s)
+  if (p.is_real_scalar()) {
+    s=CasADi::SX(p.double_value());
+    return true;
+  }
+  return false;
+}
+
+template <>
+bool meta< CasADi::SX >::couldbe(const octave_value& p) {
+  return (meta< CasADi::SX >::isa(p) || p.is_real_scalar());
+}
+
+%}
+#endif //SWIGOCTAVE
 
 %inline %{
 template<> char meta< CasADi::Matrix<CasADi::SX> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
@@ -324,6 +345,8 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
 
 template <>
 int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<CasADi::SX> &m) {
+  NATIVERETURN(CasADi::Matrix<CasADi::SX>, m)
+  NATIVERETURN(CasADi::SX, m)
   if(p.is_real_matrix()){
     Matrix mat = p.matrix_value();
     m = CasADi::SXMatrix(mat.rows(),mat.cols(),0);
@@ -332,12 +355,30 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
         m(i,j) = mat(i,j);
       }
     }
+    return true;
+  } 
+  if (p.is_cell()) {
+    int nrow = p.rows();
+    int ncol = p.columns();
+    m.resize(nrow,ncol);
+    for(int i=0; i<nrow; ++i){
+      for(int j=0; j<ncol; ++j){
+        // Get the octave object
+        const octave_value& obj = p.cell_value()(i,j);
+        bool ret = meta< CasADi::SX >::as(obj,m[i,j]);
+        if(!ret) return false;
+      }
+    }
+    return true;
   }
-    
-  return true;
+  if (p.is_real_scalar()) {
+    m = CasADi::SX(p.double_value());
+    return true;
+  }
+  return false;
 }
 
-template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) {return p.is_real_matrix();}
+template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return p.is_real_matrix() || p.is_cell() || p.is_real_scalar();}
 %}
 #endif //SWIGOCTAVE
 
@@ -424,17 +465,8 @@ int meta< std::vector< CasADi::Matrix<CasADi::SX> > >::as(const octave_value& p,
   for(int i=0; i<ncol; ++i){
     // Get the octave object
     const octave_value& obj_i = p.cell_value()(i);
-    
-    // Check if it is an SXMatrix
-    if(meta< CasADi::Matrix< CasADi::SX > >::isa(obj_i)){
-      CasADi::SXMatrix *m_i;
-      bool ret = meta< CasADi::Matrix< CasADi::SX > >::get_ptr(obj_i, m_i);
-      if(!ret) return false;
-      m[i] = *m_i;
-    } else if(meta< CasADi::Matrix< CasADi::SX > >::couldbe(obj_i)){
-      bool ret = meta< CasADi::Matrix< CasADi::SX > >::as(obj_i,m[i]);
-      if(!ret) return false;
-    }
+    bool ret = meta< CasADi::Matrix< CasADi::SX > >::as(obj_i,m[i]);
+    if(!ret) return false;
   }
   return true;
 }
@@ -453,5 +485,3 @@ template <> bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(cons
 %template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
 %template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
 
-
-// NOTE: mx.py fails terminate called after throwing an instance of 'std::bad_alloc'
