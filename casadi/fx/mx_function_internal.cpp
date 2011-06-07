@@ -68,6 +68,14 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
 MXFunctionInternal::~MXFunctionInternal(){
 }
 
+
+double* getptr(Matrix<double>& x){
+	if(x.size()>0)
+		return &x.front();
+	else
+		return 0;
+}
+
 void MXFunctionInternal::init(){
   log("MXFunctionInternal::init begin");
   
@@ -139,21 +147,21 @@ void MXFunctionInternal::init(){
       it->fwdSeed[i].resize(nfdir_,0);
       it->adjSens[i].resize(nadir_,0);
       if(it->ch[i]>=0){
-        it->input[i] = &alg[it->ch[i]].val.data[0];
+		  it->input[i] = getptr(alg[it->ch[i]].val.data);
         for(int d=0; d<nfdir_; ++d)
-          it->fwdSeed[i][d] = &alg[it->ch[i]].val.dataF[d][0];
+          it->fwdSeed[i][d] = getptr(alg[it->ch[i]].val.dataF[d]);
         for(int d=0; d<nadir_; ++d)
-          it->adjSens[i][d] = &alg[it->ch[i]].val.dataA[d][0];
+          it->adjSens[i][d] = getptr(alg[it->ch[i]].val.dataA[d]);
       }
     }
 
-    it->output = &it->val.data[0];
+    it->output = getptr(it->val.data);
     it->fwdSens.resize(nfdir_);
     for(int d=0; d<nfdir_; ++d)
-      it->fwdSens[d] = &it->val.dataF[d][0];
+      it->fwdSens[d] = getptr(it->val.dataF[d]);
     it->adjSeed.resize(nadir_);
     for(int d=0; d<nadir_; ++d)
-      it->adjSeed[d] = &it->val.dataA[d][0];
+      it->adjSeed[d] = getptr(it->val.dataA[d]);
     
   }
   

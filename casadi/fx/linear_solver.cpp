@@ -54,7 +54,7 @@ bool LinearSolver::prepared() const{
 }
  
 bool LinearSolver::checkNode() const{
-  return dynamic_cast<const LinearSolverInternal*>(get());
+  return dynamic_cast<const LinearSolverInternal*>(get())!=0;
 }
 
 } // namespace CasADi

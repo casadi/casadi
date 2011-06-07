@@ -34,7 +34,7 @@ const ImplicitFunctionInternal* ImplicitFunction::operator->() const{
 }
  
 bool ImplicitFunction::checkNode() const{
-  return dynamic_cast<const ImplicitFunctionInternal*>(get());
+  return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
 }
 
 

@@ -146,7 +146,7 @@ SXFunction SXFunction::hessian(int iind, int oind){
 }
 
 bool SXFunction::checkNode() const{
-  return dynamic_cast<const SXFunctionInternal*>(get());
+  return dynamic_cast<const SXFunctionInternal*>(get())!=0;
 }
 
 SXMatrix SXFunction::jac(int iind, int oind){

@@ -138,7 +138,7 @@ int main(){
 
   // Only symbolic variables
   trivial();
-  
+
   // Subtraction
   subtraction();
     

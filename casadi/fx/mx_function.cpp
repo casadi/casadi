@@ -33,7 +33,7 @@ using namespace std;
 namespace CasADi{
 
 bool MXFunction::checkNode() const{
-  return dynamic_cast<const MXFunctionInternal*>(get());
+  return dynamic_cast<const MXFunctionInternal*>(get())!=0;
 }
 
 MXFunction::MXFunction(){

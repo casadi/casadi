@@ -262,9 +262,11 @@ MX abs(const MX &x);
 MX fabs(const MX &x); // same as abs
 MX floor(const MX &x);
 MX ceil(const MX &x);
+#if __STDC_VERSION__ >= 199901L // C99
 MX erf(const MX &x);
 MX fmin(const MX &a, const MX &b);
 MX fmax(const MX &a, const MX &b);
+#endif // C99
 #undef MX
 //@}
 } // namespace std

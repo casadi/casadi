@@ -46,7 +46,7 @@ const CFunctionInternal* CFunction::operator->() const{
 }
   
 bool CFunction::checkNode() const{
-  return dynamic_cast<const CFunctionInternal*>(get());
+  return dynamic_cast<const CFunctionInternal*>(get())!=0;
 }
 
 void CFunction::setUserData(void* user_data){

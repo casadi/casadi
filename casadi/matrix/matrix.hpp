@@ -34,6 +34,11 @@
 #include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning (disable:4996)
+#pragma warning (disable:4018)
+#endif
+
 namespace CasADi{
   
   /** Sparsity format for getting and setting inputs and outputs */
@@ -460,8 +465,10 @@ class Matrix : public PrintableObject{
     Matrix<T> floor() const;
     Matrix<T> ceil() const;
     Matrix<T> fabs() const;
+#if __STDC_VERSION__ >= 199901L // C99
     Matrix<T> fmin(const Matrix<T>& y) const;
     Matrix<T> fmax(const Matrix<T>& y) const;
+#endif // C99
     //@}
     
     //@{
@@ -635,11 +642,15 @@ namespace std{
   template<class T>
   CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
 
+#if __STDC_VERSION__ >= 199901L // C99
+
   template<class T>
   CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
 
   template<class T>
   CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
+
+#endif // C99
 
   template<class T>
   CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__pow__(y);}
@@ -1617,6 +1628,7 @@ Matrix<T> Matrix<T>::fabs() const{
   return unary(CasADi::casadi_operators<T>::fabs);
 }
 
+#if __STDC_VERSION__ >= 199901L // C99
 template<class T>
 Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
   return binary(CasADi::casadi_operators<T>::fmin, y);
@@ -1626,6 +1638,7 @@ template<class T>
 Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
   return binary(CasADi::casadi_operators<T>::fmax, y);
 }
+#endif // C99
 
 template<class T>
 std::vector<T>& Matrix<T>::data(){

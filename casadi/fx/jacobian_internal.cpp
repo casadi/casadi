@@ -54,7 +54,7 @@ JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn
   output_.resize(1);
   
   // Input/Output Sparsity 
-  if (fcn_.input(iind_).size() == fcn_.input(iind_).numel() and fcn_.output(oind_).size()== fcn_.output(oind_).numel()) {
+  if (fcn_.input(iind_).size() == fcn_.input(iind_).numel() && fcn_.output(oind_).size()== fcn_.output(oind_).numel()) {
     output(0) = DMatrix(m_,n_,0); // dense
   } else {
     // sparse

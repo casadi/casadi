@@ -154,19 +154,19 @@ class MXNode : public SharedObjectNode{
     int temp;
     
     /// Numeric evaluation
-    virtual Matrix<double> eval(const std::vector<Matrix<double> >& x){}
+    virtual Matrix<double> eval(const std::vector<Matrix<double> >& x){return Matrix<double>();}
 
     /// Symbolic evaluation (scalar graph)
-    virtual Matrix<SX> eval(const std::vector<Matrix<SX> >& x){}
+    virtual Matrix<SX> eval(const std::vector<Matrix<SX> >& x){return Matrix<SX>();}
 
     /// Symbolic evaluation (matrix graph)
-    virtual MX eval(const std::vector<MX>& x){}
+    virtual MX eval(const std::vector<MX>& x){return MX();}
     
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
     
     /// Partial derivatives
-    virtual std::vector<MX> partial(const std::vector<MX>& x){};
+    virtual std::vector<MX> partial(const std::vector<MX>& x){return std::vector<MX>();};
     
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;

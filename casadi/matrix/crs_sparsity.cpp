@@ -59,7 +59,7 @@ const CRSSparsityNode* CRSSparsity::operator->() const{
 }
   
 bool CRSSparsity::checkNode() const{
-  return dynamic_cast<const CRSSparsityNode*>(get());
+  return dynamic_cast<const CRSSparsityNode*>(get())!=0;
 }
 
 int CRSSparsity::size1() const{

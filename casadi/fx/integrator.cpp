@@ -69,7 +69,7 @@ void Integrator::setFinalTime(double tf){
 }
   
 bool Integrator::checkNode() const{
-  return dynamic_cast<const IntegratorInternal*>(get());
+  return dynamic_cast<const IntegratorInternal*>(get())!=0;
 }
 
 void Integrator::setLinearSolver(const LinearSolver& linsol, const FX& jac){

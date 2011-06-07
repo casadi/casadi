@@ -48,7 +48,7 @@ const ExternalFunctionInternal* ExternalFunction::operator->() const{
 }
   
 bool ExternalFunction::checkNode() const{
-  return dynamic_cast<const ExternalFunctionInternal*>(get());
+  return dynamic_cast<const ExternalFunctionInternal*>(get())!=0;
 }
 
 

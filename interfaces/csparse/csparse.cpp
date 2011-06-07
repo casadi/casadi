@@ -42,7 +42,7 @@ const CSparseInternal* CSparse::operator->() const{
 }
   
 bool CSparse::checkNode() const{
-  return dynamic_cast<const CSparseInternal*>(get());
+  return dynamic_cast<const CSparseInternal*>(get())!=0;
 }
   
   

@@ -39,7 +39,7 @@ XFunctionInternal* XFunction::operator->(){
 }
 
 bool XFunction::checkNode() const{
-  return dynamic_cast<const XFunctionInternal*>(get());
+  return dynamic_cast<const XFunctionInternal*>(get())!=0;
 }
 
 } // namespace CasADi

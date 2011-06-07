@@ -37,7 +37,7 @@ const NLPSolverInternal* NLPSolver::operator->() const{
 }
     
 bool NLPSolver::checkNode() const{
-  return dynamic_cast<const NLPSolverInternal*>(get());
+  return dynamic_cast<const NLPSolverInternal*>(get())!=0;
 }
 
 

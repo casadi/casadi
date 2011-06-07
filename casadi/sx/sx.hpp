@@ -183,14 +183,18 @@ class SX{
     SX arctan() const;
     SX floor() const;
     SX ceil() const;
+#if __STDC_VERSION__ >= 199901L // C99
     SX erf() const;
+#endif // C99
     SX fabs() const;
     SX add(const SX& y) const;
     SX sub(const SX& y) const;
     SX mul(const SX& y) const;
     SX div(const SX& y) const;
+#if __STDC_VERSION__ >= 199901L // C99
     SX fmin(const SX &b) const;
     SX fmax(const SX &b) const;
+#endif // C99
     SX pow(const SX& n) const;
     SX constpow(const SX& n) const;
     
@@ -286,8 +290,10 @@ class casadi_operators<SX>{
     static SX floor(const SX&x);
     static SX ceil(const SX&x);
     static SX equality(const SX&x, const SX&y);
+#if __STDC_VERSION__ >= 199901L // C99
     static SX fmin(const SX&x, const SX&y);
     static SX fmax(const SX&x, const SX&y);
+#endif // C99
     static SX fabs(const SX&x);
 };
 
@@ -391,10 +397,12 @@ namespace std{
   inline SX ceil(const SX &x){return x.ceil();}
 } // namespace std
 
+#if __STDC_VERSION__ >= 199901L // C99
 /** \brief  C99 elementary functions from the math.h header */
 inline SX erf(const SX &x){return x.erf();}
 inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
 inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
+#endif // C99
 #undef SX
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */

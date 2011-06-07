@@ -25,6 +25,7 @@
 #include <set>
 
 #include "../casadi/casadi_exception.hpp"
+#include "../casadi/pre_c99_support.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 #include "variable_tools.hpp"
 #include "../casadi/matrix/matrix_tools.hpp"
@@ -339,7 +340,7 @@ void OCP::scaleEquations(){
       //int j=J0.col(el);
       
       // The scaling factor is the maximum norm, ignoring not-a-number entries
-      if(!isnan(J0[el])){
+      if(!ISNAN(J0[el])){
         scale[i] = max(scale[i],fabs(J0[el]));
       }
     }
@@ -580,7 +581,7 @@ void OCP::makeExplicit(){
       d_.push_back(*it);
       
       // If upper or lower bounds are finite, add path constraint
-      if(!isinf(it->getMin()) || !isinf(it->getMax())){
+      if(!ISINF(it->getMin()) || !ISINF(it->getMax())){
         path_fcn_.push_back(it->var());
         path_min_.push_back(it->getMin()/it->getNominal());
         path_max_.push_back(it->getMax()/it->getNominal());

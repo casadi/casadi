@@ -193,7 +193,7 @@ bool FX::isInit() const {
 }
 
 bool FX::checkNode() const{
-  return dynamic_cast<const FXInternal*>(get());
+  return dynamic_cast<const FXInternal*>(get())!=0;
 }
 
 Matrix<double>& FX::input(int iind){

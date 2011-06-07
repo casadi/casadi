@@ -33,7 +33,7 @@ using namespace CasADi;
 using namespace CasADi::Interfaces;
 using namespace std;
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 
   /* Initialize matrix A. */

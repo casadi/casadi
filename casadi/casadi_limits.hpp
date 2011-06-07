@@ -47,11 +47,23 @@ class casadi_limits{
     static bool isInf(const T& val){ return std::numeric_limits<T>::has_infinity ? val==std::numeric_limits<T>::infinity() : false;}
     static bool isMinusInf(const T& val){ return std::numeric_limits<T>::has_infinity ? val==-std::numeric_limits<T>::infinity() : false;}
     static bool isNaN(const T& val){ return std::numeric_limits<T>::has_quiet_NaN ? val!=val : false;}
-    static const T zero = 0;
-    static const T one = 1;
-    static const T two = 2;
-    static const T minus_one = -1;
+    static const T zero;
+    static const T one;
+    static const T two;
+    static const T minus_one;
 };
+
+template<class T>
+const T casadi_limits<T>::zero = 0;
+
+template<class T>
+const T casadi_limits<T>::one = 1;
+
+template<class T>
+const T casadi_limits<T>::two = 2;
+
+template<class T>
+const T casadi_limits<T>::minus_one = -1;
 
 } // namespace CasADi
 #endif // CASADI_LIMITS_HPP

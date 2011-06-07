@@ -94,7 +94,7 @@ void ParallelizerInternal::init(){
   FXInternal::init();
   
   // Should corrected input values be saved after evaluation?
-  save_corrected_input_ = getOption("save_corrected_input").toInt();
+  save_corrected_input_ = getOption("save_corrected_input");
 }
 
 void ParallelizerInternal::evaluate(int nfdir, int nadir){

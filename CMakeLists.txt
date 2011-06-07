@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.0)
-project(opticon C CXX Fortran)
+project(opticon C CXX)
 
 # Options:
 option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)
@@ -19,9 +19,10 @@ SET(CMAKE_BUILD_TYPE Release)
 # SET(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
 
-
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
+add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 if(WITH_JIT)
 add_definitions(-DWITH_JIT)

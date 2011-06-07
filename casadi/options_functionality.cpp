@@ -143,7 +143,7 @@ void OptionsFunctionality::printOptions(ostream &stream) const{
 }
   
 bool OptionsFunctionality::checkNode() const{
-  return dynamic_cast<const OptionsFunctionalityNode*>(get());
+  return dynamic_cast<const OptionsFunctionalityNode*>(get())!=0;
 }
 
 void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj){

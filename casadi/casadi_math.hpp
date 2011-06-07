@@ -64,8 +64,11 @@ enum Operation{
   SQRT,  SIN,  COS,  TAN,  
   ASIN,  ACOS,  ATAN,  
   STEP,  
-  FLOOR,  CEIL,  
-  EQUALITY,  ERF,  FMIN,  FMAX,
+  FLOOR,  CEIL,  EQUALITY,  
+#if __STDC_VERSION__ >= 199901L
+// C99
+  ERF,  FMIN,  FMAX,
+#endif
   NUM_BUILT_IN_OPS
 };
 
@@ -250,6 +253,8 @@ class BinaryOperation<EQUALITY>{
     template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 
+#if __STDC_VERSION__ >= 199901L // C99
+
 /// Minimum
 template<>
 class BinaryOperation<FMIN>{
@@ -277,6 +282,7 @@ class UnaryOperation<ERF>{
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = (2/std::sqrt(M_PI))*std::exp(-x*x);}
 };
 
+#endif // C99
 
 /// Easy access to all the functions for a particular type
 template<typename T>
@@ -357,10 +363,13 @@ std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::getPrintFun(){
   ret[CEIL] = BinaryOperation<CEIL>::print;
 
   ret[EQUALITY] = BinaryOperation<EQUALITY>::print;
+
+#if __STDC_VERSION__ >= 199901L // C99
   ret[ERF] = BinaryOperation<ERF>::print;
   ret[FMIN] = BinaryOperation<FMIN>::print;
   ret[FMAX] = BinaryOperation<FMAX>::print;
-  
+#endif // C99
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -376,34 +385,37 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   std::vector<typename casadi_math<T>::funT> ret(NUM_BUILT_IN_OPS,0);
   
   // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::fcn;
-  ret[SUB] = BinaryOperation<SUB>::fcn;
-  ret[MUL] = BinaryOperation<MUL>::fcn;
-  ret[DIV] = BinaryOperation<DIV>::fcn;
+  ret[ADD] = reinterpret_cast<funT>(BinaryOperation<ADD>::fcn);
+  ret[SUB] = reinterpret_cast<funT>(BinaryOperation<SUB>::fcn);
+  ret[MUL] = reinterpret_cast<funT>(BinaryOperation<MUL>::fcn);
+  ret[DIV] = reinterpret_cast<funT>(BinaryOperation<DIV>::fcn);
     
-  ret[NEG] = BinaryOperation<NEG>::fcn;
-  ret[EXP] = BinaryOperation<EXP>::fcn;
-  ret[LOG] = BinaryOperation<LOG>::fcn;
-  ret[POW] = BinaryOperation<POW>::fcn;
-  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::fcn;
+  ret[NEG] = reinterpret_cast<funT>(BinaryOperation<NEG>::fcn);
+  ret[EXP] = reinterpret_cast<funT>(BinaryOperation<EXP>::fcn);
+  ret[LOG] = reinterpret_cast<funT>(BinaryOperation<LOG>::fcn);
+  ret[POW] = reinterpret_cast<funT>(BinaryOperation<POW>::fcn);
+  ret[CONSTPOW] = reinterpret_cast<funT>(BinaryOperation<CONSTPOW>::fcn);
 
-  ret[SQRT] = BinaryOperation<SQRT>::fcn;
-  ret[SIN] = BinaryOperation<SIN>::fcn;
-  ret[COS] = BinaryOperation<COS>::fcn;
-  ret[TAN] = BinaryOperation<TAN>::fcn;
+  ret[SQRT] = reinterpret_cast<funT>(BinaryOperation<SQRT>::fcn);
+  ret[SIN] = reinterpret_cast<funT>(BinaryOperation<SIN>::fcn);
+  ret[COS] = reinterpret_cast<funT>(BinaryOperation<COS>::fcn);
+  ret[TAN] = reinterpret_cast<funT>(BinaryOperation<TAN>::fcn);
 
-  ret[ASIN] = BinaryOperation<ASIN>::fcn;
-  ret[ACOS] = BinaryOperation<ACOS>::fcn;
-  ret[ATAN] = BinaryOperation<ATAN>::fcn;
+  ret[ASIN] = reinterpret_cast<funT>(BinaryOperation<ASIN>::fcn);
+  ret[ACOS] = reinterpret_cast<funT>(BinaryOperation<ACOS>::fcn);
+  ret[ATAN] = reinterpret_cast<funT>(BinaryOperation<ATAN>::fcn);
 
-  ret[STEP] = BinaryOperation<STEP>::fcn;
-  ret[FLOOR] = BinaryOperation<FLOOR>::fcn;
-  ret[CEIL] = BinaryOperation<CEIL>::fcn;
+  ret[STEP] = reinterpret_cast<funT>(BinaryOperation<STEP>::fcn);
+  ret[FLOOR] = reinterpret_cast<funT>(BinaryOperation<FLOOR>::fcn);
+  ret[CEIL] = reinterpret_cast<funT>(BinaryOperation<CEIL>::fcn);
 
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn;
-  ret[ERF] = BinaryOperation<ERF>::fcn;
-  ret[FMIN] = BinaryOperation<FMIN>::fcn;
-  ret[FMAX] = BinaryOperation<FMAX>::fcn;
+  ret[EQUALITY] = reinterpret_cast<funT>(BinaryOperation<EQUALITY>::fcn);
+
+#if __STDC_VERSION__ >= 199901L // C99
+  ret[ERF] = reinterpret_cast<funT>(BinaryOperation<ERF>::fcn);
+  ret[FMIN] = reinterpret_cast<funT>(BinaryOperation<FMIN>::fcn);
+  ret[FMAX] = reinterpret_cast<funT>(BinaryOperation<FMAX>::fcn);
+#endif // C99
   
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -419,35 +431,38 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   std::vector<typename casadi_math<T>::derT> ret(NUM_BUILT_IN_OPS,0);
   
   // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::der;
-  ret[SUB] = BinaryOperation<SUB>::der;
-  ret[MUL] = BinaryOperation<MUL>::der;
-  ret[DIV] = BinaryOperation<DIV>::der;
+  ret[ADD] = reinterpret_cast<derT>(BinaryOperation<ADD>::der);
+  ret[SUB] = reinterpret_cast<derT>(BinaryOperation<SUB>::der);
+  ret[MUL] = reinterpret_cast<derT>(BinaryOperation<MUL>::der);
+  ret[DIV] = reinterpret_cast<derT>(BinaryOperation<DIV>::der);
     
-  ret[NEG] = BinaryOperation<NEG>::der;
-  ret[EXP] = BinaryOperation<EXP>::der;
-  ret[LOG] = BinaryOperation<LOG>::der;
-  ret[POW] = BinaryOperation<POW>::der;
-  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::der;
+  ret[NEG] = reinterpret_cast<derT>(BinaryOperation<NEG>::der);
+  ret[EXP] = reinterpret_cast<derT>(BinaryOperation<EXP>::der);
+  ret[LOG] = reinterpret_cast<derT>(BinaryOperation<LOG>::der);
+  ret[POW] = reinterpret_cast<derT>(BinaryOperation<POW>::der);
+  ret[CONSTPOW] = reinterpret_cast<derT>(BinaryOperation<CONSTPOW>::der);
 
-  ret[SQRT] = BinaryOperation<SQRT>::der;
-  ret[SIN] = BinaryOperation<SIN>::der;
-  ret[COS] = BinaryOperation<COS>::der;
-  ret[TAN] = BinaryOperation<TAN>::der;
+  ret[SQRT] = reinterpret_cast<derT>(BinaryOperation<SQRT>::der);
+  ret[SIN] = reinterpret_cast<derT>(BinaryOperation<SIN>::der);
+  ret[COS] = reinterpret_cast<derT>(BinaryOperation<COS>::der);
+  ret[TAN] = reinterpret_cast<derT>(BinaryOperation<TAN>::der);
 
-  ret[ASIN] = BinaryOperation<ASIN>::der;
-  ret[ACOS] = BinaryOperation<ACOS>::der;
-  ret[ATAN] = BinaryOperation<ATAN>::der;
+  ret[ASIN] = reinterpret_cast<derT>(BinaryOperation<ASIN>::der);
+  ret[ACOS] = reinterpret_cast<derT>(BinaryOperation<ACOS>::der);
+  ret[ATAN] = reinterpret_cast<derT>(BinaryOperation<ATAN>::der);
 
-  ret[STEP] = BinaryOperation<STEP>::der;
-  ret[FLOOR] = BinaryOperation<FLOOR>::der;
-  ret[CEIL] = BinaryOperation<CEIL>::der;
+  ret[STEP] = reinterpret_cast<derT>(BinaryOperation<STEP>::der);
+  ret[FLOOR] = reinterpret_cast<derT>(BinaryOperation<FLOOR>::der);
+  ret[CEIL] = reinterpret_cast<derT>(BinaryOperation<CEIL>::der);
 
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::der;
-  ret[ERF] = BinaryOperation<ERF>::der;
-  ret[FMIN] = BinaryOperation<FMIN>::der;
-  ret[FMAX] = BinaryOperation<FMAX>::der;
-  
+  ret[EQUALITY] = reinterpret_cast<derT>(BinaryOperation<EQUALITY>::der);
+
+#if __STDC_VERSION__ >= 199901L // C99
+  ret[ERF] = reinterpret_cast<derT>(BinaryOperation<ERF>::der);
+  ret[FMIN] = reinterpret_cast<derT>(BinaryOperation<FMIN>::der);
+  ret[FMAX] = reinterpret_cast<derT>(BinaryOperation<FMAX>::der);
+#endif // C99
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);

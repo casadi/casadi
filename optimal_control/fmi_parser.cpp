@@ -54,7 +54,7 @@ const FMIParserInternal* FMIParser::operator->() const{
 }
 
 bool FMIParser::checkNode() const{
-  return dynamic_cast<const FMIParserInternal*>(get());
+  return dynamic_cast<const FMIParserInternal*>(get())!=0;
 }
 
 } // namespace OptimalControl

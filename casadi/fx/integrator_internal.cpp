@@ -132,7 +132,7 @@ void IntegratorInternal::init(){
   abstol_ = getOption("abstol"); // TODO: change to vector tolerences
   reltol_ = getOption("reltol");
   max_num_steps_ = getOption("max_num_steps");
-  finite_difference_fsens_ = getOption("finite_difference_fsens").toInt();
+  finite_difference_fsens_ = getOption("finite_difference_fsens");
   fsens_abstol_ = hasSetOption("fsens_abstol") ? double(getOption("fsens_abstol")) : abstol_;
   fsens_reltol_ = hasSetOption("fsens_reltol") ? double(getOption("fsens_reltol")) : reltol_;
   asens_abstol_ = hasSetOption("asens_abstol") ? double(getOption("asens_abstol")) : abstol_;

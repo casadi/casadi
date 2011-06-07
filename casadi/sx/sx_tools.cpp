@@ -713,7 +713,7 @@ Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Mat
 /// \endcond
 
 Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions) {
-  if (ex.size()!=ex.numel() or x.size()!=x.numel())
+  if (ex.size()!=ex.numel() || x.size()!=x.numel())
     throw CasadiException("mtaylor: not implemented for sparse matrices");
   if (x.size()!=order_contributions.size()) {
       stringstream ss;

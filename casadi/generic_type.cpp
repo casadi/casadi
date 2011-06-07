@@ -108,7 +108,8 @@ bool GenericType::toBool() const{
   } else if (isInt()) {
     return bool(toInt());
   } else {
-  casadi_assert_message(isBool(),"type mismatch");
+	casadi_assert_message(isBool(),"type mismatch");
+	return false;
   }
 }
 

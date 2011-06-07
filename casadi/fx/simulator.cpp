@@ -57,7 +57,7 @@ const SimulatorInternal* Simulator::operator->() const{
 }
 
 bool Simulator::checkNode() const{
-  return dynamic_cast<const SimulatorInternal*>(get());
+  return dynamic_cast<const SimulatorInternal*>(get())!=0;
 }
 
 

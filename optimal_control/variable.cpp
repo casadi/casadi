@@ -178,7 +178,7 @@ void Variable::setDerivative(const SX& dx){
 }
 
 bool Variable::checkNode() const{
-  return dynamic_cast<const VariableInternal*>(get());
+  return dynamic_cast<const VariableInternal*>(get())!=0;
 }
 
 SX Variable::atTime(double t, bool allocate) const{
