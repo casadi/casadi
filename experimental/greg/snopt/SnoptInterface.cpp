@@ -118,13 +118,23 @@ SnoptInterface::init()
 void
 SnoptInterface::run()
 {
-	cout << "Initializing SnoptInterface" << endl;
-	
+	cerr << "Initializing SnoptInterface" << endl;
+
+	fprintf(stderr,"Initializing SnoptInterface...\n");
+	fflush(stderr);
+ #define LENRW 20000
+ #define LENIW 10000
+ #define LENCW 500
+
+//#define LENRW 2000000
+//#define LENIW 100000
+//#define LENCW 5000
+
 	integer    minrw, miniw, mincw;
-	integer    lenrw = 20000, leniw = 10000, lencw = 500;
-	doublereal rw[20000];
-	integer    iw[10000];
-	char       cw[8*500];
+	integer    lenrw = LENRW, leniw = LENIW, lencw = LENCW;
+	doublereal rw[LENRW];
+	integer    iw[LENIW];
+	char       cw[8*LENCW];
 
 	integer    Cold = 0, Basis = 1, Warm = 2;
 
@@ -209,7 +219,7 @@ SnoptInterface::run()
 	/*     ------------------------------------------------------------------ */
 	snopta_
 		( &Cold, &neF, &n, &nxname, &nFname,
-		  &objAdd, &objRow, Prob, toyusrfg_,
+		  &objAdd, &objRow, Prob, (U_fp)toyusrfg_,
 		  iAfun, jAvar, &lenA, &neA, A,
 		  iGfun, jGvar, &lenG, &neG,
 		  xlow, xupp, xnames, Flow, Fupp, Fnames,

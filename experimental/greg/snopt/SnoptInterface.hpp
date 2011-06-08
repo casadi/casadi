@@ -7,19 +7,19 @@
 #include <casadi/sx/sx_tools.hpp>
 #include <casadi/fx/fx_tools.hpp>
 #include <casadi/stl_vector_tools.hpp>
-
 #include <casadi/fx/sx_function.hpp>
 
 
-#include <cppsrc/snopt.hh>
-#include <cppsrc/snfilewrapper.hh>
-#include <cppsrc/snoptProblem.hh>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include <cexamples/snopt.h>
+#include <cexamples/snfilewrapper.h>
 
-// #include "f2c.h"
-// #include "snopt.h"
-// #include "toyfunction.h"
-// #include "snfilewrapper.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define FIRST_FORTRAN_INDEX 1
 #define SNOPT_INFINITY 1e25
