@@ -29,7 +29,11 @@ Slice::Slice(int start__, int stop__, int step__) : start(start__), stop(stop__)
 }
 
 std::vector<int> Slice::getAll(int len) const{
-  return range(start,stop,step,len);
+  int start_ = start;
+  int stop_  = stop;
+  if (start_<0) start_+=len;
+  if (stop_<=0) stop_+=len;
+  return range(start_,stop_,step,len);
 }
 
   

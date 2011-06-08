@@ -113,6 +113,8 @@ Element<M,T>::operator const T() const{
 
 template<typename M, typename T>
 Element<M,T>::Element(M& mat, int i, int j) : mat_(mat), i_(i), j_(j){
+  if (i_< 0) i_ += mat_.size1();
+  if (j_< 0) j_ += mat_.size2();
   val_ = mat_.getElement(i,j);
 }
 

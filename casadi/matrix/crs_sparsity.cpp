@@ -140,8 +140,11 @@ void CRSSparsity::resize(int nrow, int ncol){
 }
 
 int CRSSparsity::getNZ(int i, int j){
-  casadi_assert_message(i>=0 && i<size1() && j>=0 && j<size2(),"Indices out of bounds");
+  casadi_assert_message(i<size1() && j<size2(),"Indices out of bounds");
 
+  if (i<0) i += size1();
+  if (j<0) j += size2();
+  
   // Quick return if matrix is dense
   if(numel()==size())
     return j+i*size2();
@@ -179,7 +182,10 @@ int CRSSparsity::getNZ(int i, int j){
 }
 
 int CRSSparsity::getNZ(int i, int j) const{
-  casadi_assert_message(i>=0 && i<size1() && j>=0 && j<size2(),"Indices out of bounds");
+  casadi_assert_message(i<size1() && j<size2(),"Indices out of bounds");
+  
+  if (i<0) i += size1();
+  if (j<0) j += size2();
   
   // Quick return if matrix is dense
   if(numel()==size())
