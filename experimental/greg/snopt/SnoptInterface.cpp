@@ -50,6 +50,39 @@ SnoptInterface::SnoptInterface(const SXFunction& user_F) : F_(user_F)
 	init();
 }
 
+SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
+{
+	vector<SX> fg;
+	fg.push_back(ocp.f);
+	fg.insert( fg.end(), ocp.g.begin(), ocp.g.end() );
+
+	SXFunction fcn(ocp.designVariables, fg);
+
+	F_ = fcn;
+
+	F_.init();
+
+	G_ = F_.jacobian();
+	G_.init();
+
+	F_.setOption("ad_mode","reverse");
+	F_.setOption("symbolic_jacobian",false);
+	G_.setOption("ad_mode","reverse");
+	G_.setOption("symbolic_jacobian",false);
+
+	si = this;
+
+	init();
+
+	// overwrite default xlow/xupp/x
+	copy( ocp.lb.begin(), ocp.lb.end(), xlow);
+	copy( ocp.ub.begin(), ocp.ub.end(), xupp);
+	copy( ocp.guess.begin(), ocp.guess.end(), x);
+
+    // overwrite Fmin/Fmax/Gmin/Gmax
+	cout << "heyooo\n";
+}
+
 
 void
 SnoptInterface::init()
@@ -122,12 +155,12 @@ SnoptInterface::run()
 
 	fprintf(stderr,"Initializing SnoptInterface...\n");
 	fflush(stderr);
- #define LENRW 20000
- #define LENIW 10000
+// #define LENRW 20000
+// #define LENIW 10000
  #define LENCW 500
 
-//#define LENRW 2000000
-//#define LENIW 100000
+#define LENRW 600000
+#define LENIW 150000
 //#define LENCW 5000
 
 	integer    minrw, miniw, mincw;
@@ -171,7 +204,6 @@ SnoptInterface::run()
 
 	sninit_
 		( &iPrint, &iSumm, cw, &lencw, iw, &leniw, rw, &lenrw, 8*500 );
-
 
 
 	/* Read in specs file (optional) */

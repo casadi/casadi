@@ -9,6 +9,7 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
 
+#include <experimental/greg/cppocp/ocpMultipleShooting.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +30,7 @@ class SnoptInterface
 public:
 	~SnoptInterface(void);
 	SnoptInterface(const CasADi::SXFunction& user_F);
+	SnoptInterface(const OcpMultipleShooting& ocp);
 
 	// The NLP functions
 	// objective/constraint function
