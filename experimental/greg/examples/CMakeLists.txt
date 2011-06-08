@@ -24,3 +24,32 @@ target_link_libraries(rocketCppocp
 
 ENDIF(IPOPT_FOUND)
 
+
+
+find_package(SNOPT QUIET)
+
+IF(SNOPT_FOUND)
+include_directories(../snopt)
+include_directories(${SNOPT_INCLUDE_DIRS})
+
+add_executable(rocketSnopt rocketSnopt.cpp)
+add_executable(my_sntoya my_sntoya.cpp)
+target_link_libraries(rocketSnopt
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+  ${IPOPT_LIBRARIES}
+  ipopt_interface
+)
+target_link_libraries(my_sntoya
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+  ${IPOPT_LIBRARIES}
+  ipopt_interface
+)
+
+
+ENDIF(SNOPT_FOUND)
