@@ -205,3 +205,52 @@ SXMatrix OcpMultipleShooting::getParamMat()
 	return ret;
 }
 
+void OcpMultipleShooting::writeMatlabOutput( double * xOpt)
+{
+	ofstream f("multiple_shooting_output.m");
+
+	if (!f){
+		cerr << "error opening multiple_shooting_output.m" << endl;
+		exit(1);
+	}
+	f.precision(10);
+
+	f << "function [x,u,p] = multiple_shooting_output()" << endl;
+
+	map<string, int>::const_iterator iter;
+
+	// states
+	for (iter = ode->states.begin(); iter != ode->states.end(); iter++){
+		f << "x." << iter->first << " = [" ;
+		for (int k=0; k<N; k++){
+			int idx = getStateActionIdx( iter->first, k );
+			if (k < N-1)
+				f << xOpt[idx] << ", ";
+			else
+				f << xOpt[idx] << "];" << endl;
+		}
+	}
+	f << endl;
+
+	// actions
+	for (iter = ode->actions.begin(); iter != ode->actions.end(); iter++){
+		f << "u." << iter->first << " = [" ;
+		for (int k=0; k<N; k++){
+			int idx = getStateActionIdx( iter->first, k );
+			if (k < N-1)
+				f << xOpt[idx] << ", ";
+			else
+				f << xOpt[idx] << "];" << endl;
+		}
+	}
+	f << endl;
+
+	// params
+	for (iter = ode->params.begin(); iter != ode->params.end(); iter++){
+		int idx = getParamIdx( iter->first );
+		f << "p." << iter->first << " = " << xOpt[idx] << ";" << endl;
+	}
+	f << endl;
+
+	f.close();
+}

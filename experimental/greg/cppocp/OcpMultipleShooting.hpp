@@ -40,6 +40,8 @@ public:
     void setParamGuess(std::string p, double _guess);
 
 
+	void writeMatlabOutput( double * xOpt);
+
 private:
 
 	int getStateActionIdx(std::string xu, int timeStep);
