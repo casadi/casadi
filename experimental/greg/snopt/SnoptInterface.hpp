@@ -86,13 +86,13 @@ static int toyusrfg_
 	doublereal * xlow; // x lower bound
 	doublereal * xupp; // x upper bound
 	doublereal * xmul; // x lagrange multipliers
-	integer * xstate; // initial design variables (how is this different from x?)
+	integer * xstate; // state of initial design variables
 
 	doublereal * F; // initial functions
 	doublereal * Flow; // F lower bound
 	doublereal * Fupp; // F upper bound
 	doublereal * Fmul; // F lagrange multipliers
-	integer * Fstate; // initial functions (how is this different from F?)
+	integer * Fstate; // state of initial functions
 
 	integer n; // number of design variables
 	integer neF; // number of functions (objective plus constraints)

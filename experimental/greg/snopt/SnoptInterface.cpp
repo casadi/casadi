@@ -74,13 +74,16 @@ SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
 
 	init();
 
-	// overwrite default xlow/xupp/x
-	copy( ocp.lb.begin(), ocp.lb.end(), xlow);
-	copy( ocp.ub.begin(), ocp.ub.end(), xupp);
+	// overwrite initial guess
 	copy( ocp.guess.begin(), ocp.guess.end(), x);
 
-    // overwrite Fmin/Fmax/Gmin/Gmax
-	cout << "heyooo\n";
+	// overwrite default xlow/xupp
+	copy( ocp.lb.begin(), ocp.lb.end(), xlow);
+	copy( ocp.ub.begin(), ocp.ub.end(), xupp);
+
+    // overwrite Flow/Fupp
+	copy( ocp.gMin.begin(), ocp.gMin.end(), &Flow[1]);
+	copy( ocp.gMax.begin(), ocp.gMax.end(), &Fupp[1]);
 }
 
 
@@ -151,10 +154,6 @@ SnoptInterface::init()
 void
 SnoptInterface::run()
 {
-	cerr << "Initializing SnoptInterface" << endl;
-
-	fprintf(stderr,"Initializing SnoptInterface...\n");
-	fflush(stderr);
 // #define LENRW 20000
 // #define LENIW 10000
  #define LENCW 500
