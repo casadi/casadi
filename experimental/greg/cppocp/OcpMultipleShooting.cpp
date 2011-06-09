@@ -117,12 +117,49 @@ int OcpMultipleShooting::getParamIdx(string p)
 	return -1;
 }
 
+void OcpMultipleShooting::setStateActionGuess(string xu, double _guess, int timeStep)
+{
+	int idx = getStateActionIdx(xu, timeStep);
+	guess[idx] = _guess;
+	if (guess[idx] < lb[idx] ){
+		cerr << "Requested initial guess " << xu << "[" << timeStep << "] == " << guess[idx];
+		cerr << " is less than lb[" << idx << "] == " << lb[idx] << endl;
+		cerr << "Setting guess " << xu << "[" << timeStep << "] = " << lb[idx] << endl;
+		guess[idx] = lb[idx];
+	}
+	if (guess[idx] > ub[idx] ){
+		cerr << "Requested initial guess " << xu << "[" << timeStep << "] == " << guess[idx];
+		cerr << " is greater than ub[" << idx << "] == " << ub[idx] << endl;
+		cerr << "Setting guess " << xu << "[" << timeStep << "] = " << ub[idx] << endl;
+		guess[idx] = ub[idx];
+	}
+}
+
+void OcpMultipleShooting::setParamGuess(string p, double _guess)
+{
+	int idx = getParamIdx(p);
+	guess[idx] = _guess;
+	if (guess[idx] < lb[idx] ){
+		cerr << "Requested initial guess " << p << " == " << guess[idx];
+		cerr << " is less than lb[" << idx << "] == " << lb[idx] << endl;
+		cerr << "Setting guess " << p << " = " << lb[idx] << endl;
+		guess[idx] = lb[idx];
+	}
+	if (guess[idx] > ub[idx] ){
+		cerr << "Requested initial guess " << p << " == " << guess[idx];
+		cerr << " is greater than ub[" << idx << "] == " << ub[idx] << endl;
+		cerr << "Setting guess " << p << " = " << ub[idx] << endl;
+		guess[idx] = ub[idx];
+	}
+}
 
 void OcpMultipleShooting::boundStateAction(string xu, double _lb, double _ub, int timeStep)
 {
 	int idx = getStateActionIdx(xu, timeStep);
 	lb[idx] = _lb;
 	ub[idx] = _ub;
+	if (guess[idx] < lb[idx]) guess[idx] = lb[idx];
+	if (guess[idx] > ub[idx]) guess[idx] = ub[idx];
 }
 
 
@@ -131,6 +168,8 @@ void OcpMultipleShooting::boundParam(string p, double _lb, double _ub)
 	int idx = getParamIdx(p);
 	lb[idx] = _lb;
 	ub[idx] = _ub;
+	if (guess[idx] < lb[idx]) guess[idx] = lb[idx];
+	if (guess[idx] > ub[idx]) guess[idx] = ub[idx];
 }
 
 SXMatrix OcpMultipleShooting::getStateMat(int timeStep)

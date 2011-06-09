@@ -36,6 +36,9 @@ public:
 
 	void boundStateAction(std::string xu, double _lb, double _ub, int timeStep);
 	void boundParam(std::string p, double _lb, double _ub);
+    void setStateActionGuess(std::string xu, double _guess, int timeStep);
+    void setParamGuess(std::string p, double _guess);
+
 
 private:
 
