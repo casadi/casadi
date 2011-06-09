@@ -22,7 +22,7 @@ public:
 	void addNonlconEq(CasADi::SXMatrix gNew);
 
 
-	CasADi::SX f;
+	CasADi::SX objFun;
 	std::vector<CasADi::SX> g;
 	std::vector<double> gMin;
 	std::vector<double> gMax;

@@ -34,10 +34,11 @@ public:
 
 	// The NLP functions
 	// objective/constraint function
-	CasADi::SXFunction F_; 
 
-	// objective/constraint jacobian
-	CasADi::SXFunction G_; 
+	CasADi::SXFunction Ftotal;
+
+	// objective/constraint jacobian nonlinear part
+	CasADi::SXFunction Gfcn;
 
 
 	void init(void);
@@ -49,67 +50,34 @@ public:
 						integer    iu[],    integer *leniu,
 						doublereal ru[],    integer *lenru );
 
-static void toy0
-( integer *inform, char *Prob, integer *neF, integer *n, doublereal *ObjAdd,
-  integer *ObjRow, doublereal *xlow, doublereal *xupp,
-  doublereal *Flow, doublereal *Fupp, doublereal *x,
-  integer *xstate, doublereal *Fmul );
-
-static int toyusrf_
-( integer    *Status, integer *n,    doublereal x[],
-  integer    *needF,  integer *neF,  doublereal F[],
-  integer    *needG,  integer *neG,  doublereal G[],
-  char       *cu,     integer *lencu,
-  integer    iu[],    integer *leniu,
-  doublereal ru[],    integer *lenru );
-
-static void toy1
-( integer *inform, char *Prob, integer *neF, integer *n,
-  integer *iAfun, integer *jAvar, integer *lenA, integer *neA, doublereal *A,
-  integer *iGfun, integer *jGvar, integer *lenG, integer *neG, doublereal *ObjAdd,
-  integer *ObjRow, doublereal *xlow, doublereal *xupp,
-  doublereal *Flow, doublereal *Fupp, doublereal *x,
-  integer *xstate, doublereal *Fmul);
-
-static int toyusrfg_
-( integer    *Status, integer *n,    doublereal x[],
-  integer    *needF,  integer *neF,  doublereal F[],
-  integer    *needG,  integer *neG,  doublereal G[],
-  char       *cu,     integer *lencu,
-  integer    iu[],    integer *leniu,
-  doublereal ru[],    integer *lenru );
-
-
-
-
-	doublereal * x; // initial design variables
+	doublereal *    x; // initial design variables
 	doublereal * xlow; // x lower bound
 	doublereal * xupp; // x upper bound
 	doublereal * xmul; // x lagrange multipliers
-	integer * xstate; // state of initial design variables
+	integer *  xstate; // state of initial design variables
 
-	doublereal * F; // initial functions
+	doublereal *    F; // initial functions
 	doublereal * Flow; // F lower bound
 	doublereal * Fupp; // F upper bound
 	doublereal * Fmul; // F lagrange multipliers
-	integer * Fstate; // state of initial functions
+	integer *  Fstate; // state of initial functions
 
-	integer n; // number of design variables
+	integer   n; // number of design variables
 	integer neF; // number of functions (objective plus constraints)
 
 	doublereal objAdd; // constant to be added to objective function for printing
-	integer objRow; // row of F which contains objective function
+	integer    objRow; // row of F which contains objective function
 
 	// linear part of jacobian
-	integer    neA;  // number of non-zero elements in A ( must be >= 0 )
+	integer     neA; // number of non-zero elements in A ( must be >= 0 )
 	integer    lenA; // length of iAfun/jAvar/A ( must be >=1 )
 	integer * iAfun; // row indeces of sparse A
 	integer * jAvar; // col indeces of sparse A
-	doublereal * A;  // A
+	doublereal *  A; // A
 
 	// nonlinear part of jacobian
-	integer neG; // number of non-zero elements in G ( >= 0 )
-	integer lenG; // length of iGfun/jGvar ( must be >= 1)
+	integer     neG; // number of non-zero elements in G ( >= 0 )
+	integer    lenG; // length of iGfun/jGvar ( must be >= 1)
 	integer * iGfun; // row indeces of sparse jacobian
 	integer * jGvar; // col indeces of sparse jacobian
 private:

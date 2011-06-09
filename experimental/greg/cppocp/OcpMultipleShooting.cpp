@@ -3,6 +3,7 @@
 // Casadi 2011
 
 #include "OcpMultipleShooting.hpp"
+#include <cstdlib>
 
 using namespace CasADi;
 using namespace std;
@@ -34,7 +35,6 @@ void OcpMultipleShooting::setTimeInterval(CasADi::SX _t0, CasADi::SX _tf)
 		SX tkp1 = (k+1)*dt;
 		
 		SXMatrix xErr = x1 - ode->rk4Step( x0, u0, u1, p, tk, tkp1);
-
 		addNonlconEq( xErr );
 	}
 }

@@ -41,8 +41,8 @@ main()
 
 	SXFunction fgfcn(x, fg); // objective function
 
-	fgfcn.setOption("ad_mode","reverse");
-	fgfcn.setOption("symbolic_jacobian",false);
+	//	fgfcn.setOption("ad_mode","reverse");
+	//	fgfcn.setOption("symbolic_jacobian",false);
 
 	SnoptInterface si(fgfcn);
 

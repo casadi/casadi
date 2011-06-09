@@ -40,6 +40,7 @@ void Ocp::addNonlconIneq( vector<SX> gNew )
 //
 //}
 //
+
 void Ocp::addNonlconEq( SXMatrix gNew )
 {
 	if (gNew.size2() != 1){

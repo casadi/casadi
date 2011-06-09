@@ -102,7 +102,7 @@ main()
 
 	SX tEnd = ocp.getParam("tEnd");
 	ocp.setTimeInterval(0.0, tEnd);
-	ocp.f = -tEnd;
+	ocp.objFun = -tEnd;
 
 	// Bounds/initial condition
 	ocp.boundParam("tEnd", 2, 80);
@@ -124,7 +124,7 @@ main()
 	ocp.boundStateAction("z", 0, 0, ocp.N-1);
 
 	// Create the NLP solver
-	SXFunction ffcn(ocp.designVariables, ocp.f); // objective function
+	SXFunction ffcn(ocp.designVariables, ocp.objFun); // objective function
 	SXFunction gfcn(ocp.designVariables, ocp.g); // constraint
 	gfcn.setOption("ad_mode","reverse");
 	gfcn.setOption("symbolic_jacobian",false);

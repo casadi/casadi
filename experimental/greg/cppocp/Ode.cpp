@@ -141,8 +141,8 @@ SXMatrix Ode::rk4Step( SXMatrix x0Vec, SXMatrix u0Vec, SXMatrix u1Vec, SXMatrix 
 	SXMatrix k3 = dxVectorDt( x0Vec + 0.5*dt*k2, 0.5*(u0Vec+u1Vec), pVec, t0 + 0.5*dt );
 	SXMatrix k4 = dxVectorDt( x0Vec +     dt*k3,             u1Vec, pVec, t0 +     dt );
     
-	//	return x0Vec + dt*k1; // euler
-	return x0Vec + dt*(k1 + 2*k2 + 2*k3 + k4)/6;
+//	return x0Vec + dt*k1; // euler
+	return x0Vec + dt*(k1 + 2*k2 + 2*k3 + k4)/6; // rk4
 }
 
 

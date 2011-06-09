@@ -38,12 +38,9 @@ SnoptInterface::~SnoptInterface()
 	delete []Fstate;
 }
 
-SnoptInterface::SnoptInterface(const SXFunction& user_F) : F_(user_F)
+SnoptInterface::SnoptInterface(const SXFunction& user_F) : Ftotal(user_F)
 {
-	F_.init();
-
-	G_ = F_.jacobian();
-	G_.init();
+	Ftotal.init();
 
 	si = this;
 
@@ -53,22 +50,13 @@ SnoptInterface::SnoptInterface(const SXFunction& user_F) : F_(user_F)
 SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
 {
 	vector<SX> fg;
-	fg.push_back(ocp.f);
+	fg.push_back(ocp.objFun);
 	fg.insert( fg.end(), ocp.g.begin(), ocp.g.end() );
 
-	SXFunction fcn(ocp.designVariables, fg);
+	SXFunction tempFcn(ocp.designVariables, fg);
 
-	F_ = fcn;
-
-	F_.init();
-
-	G_ = F_.jacobian();
-	G_.init();
-
-	F_.setOption("ad_mode","reverse");
-	F_.setOption("symbolic_jacobian",false);
-	G_.setOption("ad_mode","reverse");
-	G_.setOption("symbolic_jacobian",false);
+	Ftotal = tempFcn;
+	Ftotal.init();
 
 	si = this;
 
@@ -84,14 +72,27 @@ SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
     // overwrite Flow/Fupp
 	copy( ocp.gMin.begin(), ocp.gMin.end(), &Flow[1]);
 	copy( ocp.gMax.begin(), ocp.gMax.end(), &Fupp[1]);
+
+	// Ffcn.setOption("ad_mode","reverse");
+	// Ffcn.setOption("symbolic_jacobian",false);
+	// Gfcn.setOption("ad_mode","reverse");
+	// Gfcn.setOption("symbolic_jacobian",false);
+
+	// for (int k=0; k < neA; k++)
+	// 	cout << "A[" << iAfun[k] << "," << jAvar[k] << "]: " << A[k] << endl;
+	
+	// cout << endl;
+	
+	// for (int k=0; k < neG; k++)
+	// 	cout << "G[" << iGfun[k] << "," << jGvar[k] << "]: " << Gfcn.outputSX().getElement(k) << endl;
 }
 
 
 void
 SnoptInterface::init()
 {
-	// design variables
-	n = F_.input().size();
+	/************ design variables ************/
+	n = Ftotal.input().size();
 	x = new doublereal[n];
 	xlow = new doublereal[n];
 	xupp = new doublereal[n];
@@ -105,9 +106,9 @@ SnoptInterface::init()
 		xstate[k] = 0;
 	}
 
-	// objective/constraint functions
-	neF = F_.output().size();
-	objAdd = 0;
+	/*********** objective/constraint functions ***********/
+	neF = Ftotal.output().size();
+	objAdd = 0.0;
 	objRow = FIRST_FORTRAN_INDEX;
 	F = new doublereal[neF];
 	Flow = new doublereal[neF];
@@ -121,34 +122,66 @@ SnoptInterface::init()
 		Fmul[k] = 0;
 		Fstate[k] = 0;
 	}
-	Fupp[0] = SNOPT_INFINITY;
+	Fupp[ objRow - FIRST_FORTRAN_INDEX ] = SNOPT_INFINITY;
 
+	/****************** jacobian *********************/
+	SXFunction gradF(Ftotal.jacobian());
 
-	// linear jacobian
-	lenA = 0; // implement linearity auto-detection
-	if (lenA == 0)
-		lenA = 1;
+	vector<int> rowind,col;
+	gradF.output().sparsity().getSparsityCRS(rowind,col);
+
+	// split jacobian into constant and nonconstant elements (linear and nonlinear parts of F)
+	vector<doublereal> A_;
+	vector<integer> iAfun_;
+	vector<integer> jAvar_;
+
+	vector<SX> G_;
+	vector<integer> iGfun_;
+	vector<integer> jGvar_;
+
+	for(int r=0; r<rowind.size()-1; ++r)
+        for(int el=rowind[r]; el<rowind[r+1]; ++el)
+			if (gradF.outputSX().getElement(r, col[el]).isConstant() && 0){
+				// cout << "LINEAR!    ";
+				// cout << "(" << r << ", " << col[el] << "): " << gradF.outputSX().getElement(r, col[el]) << endl;
+				A_.push_back( gradF.outputSX().getElement(r, col[el]).getValue() );
+				iAfun_.push_back( r + FIRST_FORTRAN_INDEX );
+				jAvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
+			} else {
+				// cout << "NONLINEAR! ";
+				// cout << "(" << r << ", " << col[el] << "): " << gradF.outputSX().getElement(r, col[el]) << endl;
+				G_.push_back( gradF.outputSX().getElement(r, col[el]) );
+				iGfun_.push_back( r + FIRST_FORTRAN_INDEX );
+				jGvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
+			}
+
+	// linear part
+	neA = A_.size();
+	lenA = neA;
+	if (lenA == 0) lenA = 1;
+
+	A = new doublereal[lenA];
 	iAfun = new integer[lenA];
 	jAvar = new integer[lenA];
-	A = new doublereal[lenA];
-	neA = 0;
 
-	// nonlinear jacobian
-	vector<int> rowind,col;
-	G_.output().sparsity().getSparsityCRS(rowind,col);
+	copy( A_.begin(), A_.end(), A);
+	copy( iAfun_.begin(), iAfun_.end(), iAfun);
+	copy( jAvar_.begin(), jAvar_.end(), jAvar);
+	
+	// nonlinear part
+	neG = G_.size();
+	lenG = neG;
+	if (lenG == 0) lenG = 1;
 
-	lenG = col.size();
 	iGfun = new integer[lenG];
 	jGvar = new integer[lenG];
 
-	// populate nonlinear jacobian sparsity pattern
-	neG = 0;
-	for(int r=0; r<rowind.size()-1; ++r)
-        for(int el=rowind[r]; el<rowind[r+1]; ++el){
-			iGfun[neG] = r + FIRST_FORTRAN_INDEX;
-			jGvar[neG] = col[el] + FIRST_FORTRAN_INDEX;
-            neG++;
-        }
+	copy( iGfun_.begin(), iGfun_.end(), iGfun);
+	copy( jGvar_.begin(), jGvar_.end(), jGvar);
+
+	SXFunction tempFcn( Ftotal.inputSX(), G_ );
+	Gfcn = tempFcn;
+	Gfcn.init();
 }
 
 void
@@ -185,7 +218,7 @@ SnoptInterface::run()
 
 	integer    nS, nInf;
 	doublereal sInf;
-	integer    DerOpt, Major, iSum, iPrt, strOpt_len;
+	integer    DerOpt, Major, strOpt_len;
 	char       strOpt[200];
 
 	/* open output files using snfilewrappers.[ch] */
@@ -204,6 +237,9 @@ SnoptInterface::run()
 	sninit_
 		( &iPrint, &iSumm, cw, &lencw, iw, &leniw, rw, &lenrw, 8*500 );
 
+	strcpy(Prob,"snopta");
+	npname = strlen(Prob);
+	INFO = 0;
 
 	/* Read in specs file (optional) */
 	/* snfilewrapper_ will open the specs file, fortran style, */
@@ -219,38 +255,60 @@ SnoptInterface::run()
     // }
 
 
+	// sprintf(strOpt,"%s","Solution yes");
+	// strOpt_len = strlen(strOpt);
+	// snset_
+	// 	( strOpt, &iPrint, &iSumm, &INFO,
+	// 	  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
 
 	/*     ------------------------------------------------------------------ */
 	/*     Tell SnoptA that userfg computes derivatives.                      */
-	/*     The parameters iPrt and iSum may refer to the Print and Summary    */
-	/*     file respectively.  Setting them to 0 suppresses printing.         */
 	/*     ------------------------------------------------------------------ */
 
 	DerOpt = 1;
-	iPrt   = 0;
-	iSum   = 0;
 	sprintf(strOpt,"%s","Derivative option");
 	strOpt_len = strlen(strOpt);
 	snseti_
-		( strOpt, &DerOpt, &iPrt, &iSum, &INFO,
+		( strOpt, &DerOpt, &iPrint, &iSumm, &INFO,
 		  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
 
-	strcpy(Prob,"mysnopta");
-	INFO = 0;
-
-	Major = 250;
-	strcpy( strOpt,"Major Iteration limit");
+	//	Major = 250;
+	Major = 2500;
+	strcpy( strOpt,"Major Iterations limit");
 	strOpt_len = strlen(strOpt);
 	snseti_
 		( strOpt, &Major, &iPrint, &iSumm, &INFO,
 		  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
+
+
+	integer Minor = 1000;
+	strcpy( strOpt,"Minor Iterations limit");
+	strOpt_len = strlen(strOpt);
+	snseti_
+		( strOpt, &Minor, &iPrint, &iSumm, &INFO,
+		  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
+
+	integer Niter = 100000;
+	//integer Niter = 10000;
+	strcpy( strOpt,"Iterations limit");
+	strOpt_len = strlen(strOpt);
+	snseti_
+		( strOpt, &Niter, &iPrint, &iSumm, &INFO,
+		  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
+
+	// integer verifyLevel = 3;
+	// strcpy( strOpt,"Verify level");
+	// strOpt_len = strlen(strOpt);
+	// snseti_
+	// 	( strOpt, &verifyLevel, &iPrint, &iSumm, &INFO,
+	// 	  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
 
 	/*     ------------------------------------------------------------------ */
 	/*     Solve the problem                                                  */
 	/*     ------------------------------------------------------------------ */
 	snopta_
 		( &Cold, &neF, &n, &nxname, &nFname,
-		  &objAdd, &objRow, Prob, (U_fp)toyusrfg_,
+		  &objAdd, &objRow, Prob, (U_fp)userfcn,
 		  iAfun, jAvar, &lenA, &neA, A,
 		  iGfun, jGvar, &lenG, &neG,
 		  xlow, xupp, xnames, Flow, Fupp, Fnames,
@@ -262,12 +320,26 @@ SnoptInterface::run()
 		  npname, 8*nxname, 8*nFname,
 		  8*500, 8*500);
 
+// extern int snopta_
+// ( integer *start, integer *nef, integer *n, integer *nxname, integer *nfname,
+//   doublereal *objadd, integer *objrow, char *prob, U_fp usrfun,
+//   integer *iafun, integer *javar, integer *lena, integer *nea, doublereal *a,
+//   integer *igfun, integer *jgvar, integer *leng, integer *neg,
+//   doublereal *xlow, doublereal *xupp, char *xnames, doublereal *flow, doublereal *fupp, char *fnames,
+//   doublereal *x, integer *xstate, doublereal *xmul, doublereal *f, integer *fstate, doublereal *fmul,
+//   integer *inform, integer *mincw, integer *miniw, integer *minrw,
+//   integer *ns, integer *ninf, doublereal *sinf,
+//   char *cu, integer *lencu, integer *iu, integer *leniu, doublereal *ru, integer *lenru,
+//   char *cw, integer *lencw, integer *iw, integer *leniw, doublereal *rw, integer *lenrw,
+//   ftnlen prob_len, ftnlen xnames_len, ftnlen fnames_len,
+//   ftnlen cu_len, ftnlen cw_len );
+
 	snclose_( &iPrint );
 	snclose_( &iSpecs );
 }
 
 
-int SnoptInterface::toyusrfg_
+int SnoptInterface::userfcn
 ( integer    *Status, integer *n,    doublereal x[],
   integer    *needF,  integer *neF,  doublereal F[],
   integer    *needG,  integer *neG,  doublereal G[],
@@ -276,15 +348,15 @@ int SnoptInterface::toyusrfg_
   doublereal ru[],    integer *lenru )
 {
 	if( *needF > 0 ) {
-		si->F_.setInput(x);
-		si->F_.evaluate();
-		si->F_.getOutput(F);
+		si->Ftotal.setInput(x);
+		si->Ftotal.evaluate();
+		si->Ftotal.getOutput(F);
 	}
 
 	if( *needG > 0 ){
-		si->G_.setInput(x);
-		si->G_.evaluate();
-		si->G_.getOutput(G);
+		si->Gfcn.setInput(x);
+		si->Gfcn.evaluate();
+		si->Gfcn.getOutput(G);
 	}
 	return 0;
 }

@@ -68,11 +68,14 @@ getRocketOcp(void)
 
 	OcpMultipleShooting ocp(&ode);
 
-	ocp.discretize(150);
+	//ocp.discretize(150);
+	//ocp.discretize(80);
+	ocp.discretize(80);
+	//	ocp.discretize(10);
 
 	SX tEnd = ocp.getParam("tEnd");
 	ocp.setTimeInterval(0.0, tEnd);
-	ocp.f = tEnd;
+	ocp.objFun = tEnd;
 
 	// Bounds/initial condition
 	double x0 = 0;
@@ -101,59 +104,18 @@ getRocketOcp(void)
 	return ocp;
 }
 
-//	IpoptSolver solver(ffcn,gfcn);
-//	//IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
-//
-//	// Set options
-//	solver.setOption("tol",1e-8);
-//	solver.setOption("hessian_approximation","limited-memory");
-//
-//	// initialize the solver
-//	solver.init();
-//
-//	solver.setInput(    ocp.lb, NLP_LBX);
-//	solver.setInput(    ocp.ub, NLP_UBX);
-//	solver.setInput( ocp.guess, NLP_X_INIT);
-//
-//	// Bounds on g
-//	solver.setInput( ocp.gMin, NLP_LBG);
-//	solver.setInput( ocp.gMax, NLP_UBG);
-//
-//	// Solve the problem
-//	solver.solve();
-//
-//	
-//
-//	// Print the optimal cost
-//	double cost;
-//	solver.getOutput(cost,NLP_COST);
-//	cout << "optimal time: " << cost << endl;
-//
-//	// Print the optimal solution
-//	vector<double>xopt(ocp.getBigN());
-//	solver.getOutput(xopt,NLP_X_OPT);
-//	cout << "optimal solution: " << xopt << endl;
-//
-//	return 0;
-//}
-
-
 int
 main()
 {
 	OcpMultipleShooting ocp = getRocketOcp();
 
-	// // Create the NLP solver
-	// SXFunction ffcn(ocp.designVariables, ocp.f); // objective function
-	// SXFunction gfcn(ocp.designVariables, ocp.g); // constraint
-
-	// gfcn.setOption("ad_mode","reverse");
-	// gfcn.setOption("symbolic_jacobian",false);
-
 	SnoptInterface si(ocp);
 
-	cout << "about to run\n";
 
 	si.run();
+
+	// cout << endl;
+	// for (int k=0; k<si.n; k++)
+	// 	printf("x[%d]: %f\t", k, si.x[k]);
+	// cout << endl;
 }
-	
