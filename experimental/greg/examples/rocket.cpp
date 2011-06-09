@@ -47,7 +47,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	SX thrust = action["thrust"];
 	SX tEnd = param["tEnd"];
 
-	double massBurnedPerThrustSquared = 1.0;
+	double massBurnedPerThrustSquared = 1e-6;
 
 	xDot["x"] = v;
 	xDot["v"] = thrust/mass;
@@ -68,7 +68,7 @@ main()
 
 	OcpMultipleShooting ocp(&ode);
 
-	ocp.discretize(150);
+	ocp.discretize(60);
 
 	SX tEnd = ocp.getParam("tEnd");
 	ocp.setTimeInterval(0.0, tEnd);
@@ -76,19 +76,19 @@ main()
 
 	// Bounds/initial condition
 	double x0 = 0;
-	double xf = 15;
-	double mass0 = 150;
+	double xf = 1000;
+	double massFuel0 = 50;
 	double massShip = 100;
 	ocp.boundParam("tEnd", 1, 1000);
 	for (int k=0; k<ocp.N; k++){
 		ocp.boundStateAction("x", x0, xf, k);
-		ocp.boundStateAction("v", -100, 100, k);
-		ocp.boundStateAction("mass", massShip, mass0, k);
-		ocp.boundStateAction("thrust", -100, 100, k);
+		ocp.boundStateAction("v", -1000, 1000, k);
+		ocp.boundStateAction("mass", massShip, massShip + massFuel0, k);
+		ocp.boundStateAction("thrust", -3000, 3000, k);
 	}
 
 	// initial mass
-	ocp.boundStateAction("mass", mass0, mass0, 0);
+	ocp.boundStateAction("mass", massShip + massFuel0, massShip + massFuel0, 0);
 
 	// initial/final position
 	ocp.boundStateAction("x", x0, x0, 0);
@@ -133,10 +133,15 @@ main()
 	solver.getOutput(cost,NLP_COST);
 	cout << "optimal time: " << cost << endl;
 
-	// Print the optimal solution
+	// // Print the optimal solution
 	vector<double>xopt(ocp.getBigN());
 	solver.getOutput(xopt,NLP_X_OPT);
-	cout << "optimal solution: " << xopt << endl;
+	// cout << "optimal solution: " << xopt << endl;
 
+	double * xopt_ = new double[ocp.getBigN()];
+	
+	copy( xopt.begin(), xopt.end(), xopt_ );
+	ocp.writeMatlabOutput( xopt_ );
+	delete xopt_;
 	return 0;
 }
