@@ -34,6 +34,7 @@ public:
 
 	// The NLP functions
 	// objective/constraint function
+	CasADi::SXMatrix ftotal;
 
 	CasADi::SXFunction Ftotal;
 

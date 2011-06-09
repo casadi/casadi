@@ -49,13 +49,9 @@ SnoptInterface::SnoptInterface(const SXFunction& user_F) : Ftotal(user_F)
 
 SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
 {
-	vector<SX> fg;
-	fg.push_back(ocp.objFun);
-	fg.insert( fg.end(), ocp.g.begin(), ocp.g.end() );
+	ftotal = vertcat( SXMatrix(ocp.objFun), ocp.g );
 
-	SXFunction tempFcn(ocp.designVariables, fg);
-
-	Ftotal = tempFcn;
+	Ftotal = SXFunction(ocp.designVariables, ftotal);
 	Ftotal.init();
 
 	si = this;
@@ -73,16 +69,9 @@ SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
 	copy( ocp.gMin.begin(), ocp.gMin.end(), &Flow[1]);
 	copy( ocp.gMax.begin(), ocp.gMax.end(), &Fupp[1]);
 
-	// Ffcn.setOption("ad_mode","reverse");
-	// Ffcn.setOption("symbolic_jacobian",false);
-	// Gfcn.setOption("ad_mode","reverse");
-	// Gfcn.setOption("symbolic_jacobian",false);
-
 	// for (int k=0; k < neA; k++)
 	// 	cout << "A[" << iAfun[k] << "," << jAvar[k] << "]: " << A[k] << endl;
-	
 	// cout << endl;
-	
 	// for (int k=0; k < neG; k++)
 	// 	cout << "G[" << iGfun[k] << "," << jGvar[k] << "]: " << Gfcn.outputSX().getElement(k) << endl;
 }
@@ -179,8 +168,7 @@ SnoptInterface::init()
 	copy( iGfun_.begin(), iGfun_.end(), iGfun);
 	copy( jGvar_.begin(), jGvar_.end(), jGvar);
 
-	SXFunction tempFcn( Ftotal.inputSX(), G_ );
-	Gfcn = tempFcn;
+	Gfcn = SXFunction( Ftotal.inputSX(), G_ );
 	Gfcn.init();
 }
 

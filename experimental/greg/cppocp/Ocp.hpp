@@ -17,18 +17,15 @@ public:
 	Ocp(Ode * _ode);
 	~Ocp(void);
 
-	void addNonlconIneq(std::vector<CasADi::SX> gNew);
-	//	void addNonlconEq(std::vector<CasADi::SX> gNew);
+	void addNonlconIneq(CasADi::SXMatrix gNew);
 	void addNonlconEq(CasADi::SXMatrix gNew);
 
-
 	CasADi::SX objFun;
-	std::vector<CasADi::SX> g;
+	CasADi::SXMatrix g;
 	std::vector<double> gMin;
 	std::vector<double> gMax;
 
 	void solve(void);
-	CasADi::IpoptSolver solver;
 
 private:
 

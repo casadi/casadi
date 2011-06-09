@@ -21,7 +21,7 @@ public:
 	int getBigN(void);
 	void discretize(int _N);
 
-	std::vector<CasADi::SX>designVariables;
+	CasADi::SXMatrix designVariables;
 	std::vector<double>lb;
 	std::vector<double>ub;
 	std::vector<double>guess;
