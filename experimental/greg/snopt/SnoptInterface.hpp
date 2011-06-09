@@ -37,10 +37,13 @@ public:
 	CasADi::SXMatrix ftotal;
 
 	CasADi::SXFunction Ftotal;
+	CasADi::SXFunction Fnonlinear;
 
 	// objective/constraint jacobian nonlinear part
 	CasADi::SXFunction Gfcn;
 
+	// design variables
+	const CasADi::SXMatrix * designVariables;
 
 	void init(void);
 	void run(void);

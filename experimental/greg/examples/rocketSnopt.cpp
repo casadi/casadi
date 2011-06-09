@@ -69,7 +69,6 @@ getRocketOcp(void)
 	OcpMultipleShooting ocp(&ode);
 
 	//ocp.discretize(150);
-	//ocp.discretize(80);
 	ocp.discretize(80);
 	//	ocp.discretize(10);
 
@@ -110,7 +109,6 @@ main()
 	OcpMultipleShooting ocp = getRocketOcp();
 
 	SnoptInterface si(ocp);
-
 
 	si.run();
 

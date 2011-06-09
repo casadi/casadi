@@ -41,6 +41,7 @@ SnoptInterface::~SnoptInterface()
 SnoptInterface::SnoptInterface(const SXFunction& user_F) : Ftotal(user_F)
 {
 	Ftotal.init();
+	designVariables = &Ftotal.inputSX();
 
 	si = this;
 
@@ -53,6 +54,8 @@ SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
 
 	Ftotal = SXFunction(ocp.designVariables, ftotal);
 	Ftotal.init();
+
+	designVariables = &ocp.designVariables;
 
 	si = this;
 
@@ -114,6 +117,8 @@ SnoptInterface::init()
 	Fupp[ objRow - FIRST_FORTRAN_INDEX ] = SNOPT_INFINITY;
 
 	/****************** jacobian *********************/
+	SXMatrix fnonlinear = ftotal;
+
 	SXFunction gradF(Ftotal.jacobian());
 
 	vector<int> rowind,col;
@@ -130,19 +135,24 @@ SnoptInterface::init()
 
 	for(int r=0; r<rowind.size()-1; ++r)
         for(int el=rowind[r]; el<rowind[r+1]; ++el)
-			if (gradF.outputSX().getElement(r, col[el]).isConstant() && 0){
-				// cout << "LINEAR!    ";
-				// cout << "(" << r << ", " << col[el] << "): " << gradF.outputSX().getElement(r, col[el]) << endl;
+			if (gradF.outputSX().getElement(r, col[el]).isConstant()){
 				A_.push_back( gradF.outputSX().getElement(r, col[el]).getValue() );
 				iAfun_.push_back( r + FIRST_FORTRAN_INDEX );
 				jAvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
+
+				// subtract out linear part
+				SXMatrix linearpart = gradF.outputSX().getElement(r, col[el])*(*designVariables)[col[el]];
+				fnonlinear[r] -= linearpart[0];
+				simplify(fnonlinear[r]);
 			} else {
-				// cout << "NONLINEAR! ";
-				// cout << "(" << r << ", " << col[el] << "): " << gradF.outputSX().getElement(r, col[el]) << endl;
 				G_.push_back( gradF.outputSX().getElement(r, col[el]) );
 				iGfun_.push_back( r + FIRST_FORTRAN_INDEX );
 				jGvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
 			}
+	
+	// nonlinear function
+	Fnonlinear = SXFunction( *designVariables, fnonlinear );
+	Fnonlinear.init();
 
 	// linear part
 	neA = A_.size();
@@ -336,9 +346,9 @@ int SnoptInterface::userfcn
   doublereal ru[],    integer *lenru )
 {
 	if( *needF > 0 ) {
-		si->Ftotal.setInput(x);
-		si->Ftotal.evaluate();
-		si->Ftotal.getOutput(F);
+		si->Fnonlinear.setInput(x);
+		si->Fnonlinear.evaluate();
+		si->Fnonlinear.getOutput(F);
 	}
 
 	if( *needG > 0 ){
