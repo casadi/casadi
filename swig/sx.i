@@ -342,13 +342,14 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
     return true;
   } 
   if (p.is_cell()) {
-    int nrow = p.rows();
-    int ncol = p.columns();
+    const Cell & c=p.cell_value();
+    int nrow = c.rows();
+    int ncol = c.columns();
     m.resize(nrow,ncol);
     CasADi::SX temp;
     for(int i=0; i<nrow; ++i){
       for(int j=0; j<ncol; ++j){
-        const octave_value& obj = p.cell_value()(i,j);
+        const octave_value& obj = c(i,j);
         bool ret = meta< CasADi::SX >::as(obj,temp);
         if(!ret) return false;
         m(i,j)=temp;
