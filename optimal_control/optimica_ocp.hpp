@@ -148,9 +148,6 @@ class OCP : public PrintableObject{
     /// Mayer objective terms
     std::vector<SX> mterm;
 
-    /// Mayer time time points TODO: Remove this when WITH_TIMEDVARIABLE is default
-    std::vector<double> mtp;
-    
     /// Lagrange objective terms
     std::vector<SX> lterm;
     

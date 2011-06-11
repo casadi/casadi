@@ -31,6 +31,16 @@
 #include "pre_c99_support.hpp"
 
 namespace CasADi{
+
+template<typename T>
+T timesTwo(const T& x){
+  return x+x;
+}
+  
+template<typename T>
+T square(const T& x){
+  return x*x;
+}
   
 template<int I>
 class UnaryOperation{
@@ -158,7 +168,7 @@ class UnaryOperation<SQRT>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "sqrt(" << x << ")"; }
     template<typename T> static void fcn(const T& x, T& f){ f = std::sqrt(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=1/(2*f);}
+    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=1/(timesTwo(f));}
 };
 
 /// Sine
@@ -185,7 +195,7 @@ class UnaryOperation<TAN>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "tan(" << x << ")"; }
     template<typename T> static void fcn(const T& x, T& f){ f = std::tan(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ T cosx = std::cos(x); d[0] = 1/(cosx*cosx);}
+    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 1/square(std::cos(x));}
 };
 
 /// Arcus sine

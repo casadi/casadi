@@ -65,9 +65,19 @@ void MatrixScalarOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
         adjSens[1][d][0] += adjSeed[d][i]*tmp[1];
       }
-     
     }
   }
+}
+
+MX MatrixScalarOp::adFwd(const std::vector<MX>& jx){
+  casadi_assert_message(op==SUB || op==ADD, "only addition and subtraction implemented (quick hack)");
+
+  if(op==SUB)
+    return jx[0]-jx[1];
+  if(op==ADD)
+    return jx[0]+jx[1];
+        
+  return MX();
 }
 
 } // namespace CasADi

@@ -77,6 +77,17 @@ void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
 //   vector<MX> d(2);
 //   casadi_math<MX>::der[SUB](x,y,x-y,&d.front());
 
+MX ScalarMatrixOp::adFwd(const std::vector<MX>& jx){
+  casadi_assert_message(op==SUB || op==ADD, "only addition and subtraction implemented (quick hack)");
+
+  if(op==SUB)
+    return jx[0]-jx[1];
+  if(op==ADD)
+    return jx[0]+jx[1];
+        
+  return MX();
+}
+
 
 } // namespace CasADi
 

@@ -6,7 +6,7 @@ import time
 x = symbolic("x",7,7)
 f = det(x)
 x = vec(x)
-x0 = [random.rand() for xi in x]
+x0 = [random.rand() for xi in x.data()]
 
 fcn = SXFunction([x],[[f]])
 fcn.init()

@@ -47,7 +47,10 @@ class MatrixScalarOp : public MXNode{
 
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
-  
+
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
+
   protected:
 
     Operation op;
