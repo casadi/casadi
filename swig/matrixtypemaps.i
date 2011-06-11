@@ -116,7 +116,7 @@ class meta {
 %}
 
 
-%define %my_generic_const_typemap(Type,Precedence) 
+%define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
   if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
     int result = meta< Type >::get_ptr($input,$1);
@@ -714,19 +714,19 @@ PyObject* arrayView() {
 %template(pair_Ivector_Ivector) std::pair<std::vector<int>,std::vector<int> >;
 
 %meta_vector(CasADi::Slice)
-%my_generic_const_typemap(std::vector<CasADi::Slice>,PRECEDENCE_PAIR_SLICE_SLICE)
+%my_generic_const_typemap(PRECEDENCE_PAIR_SLICE_SLICE,std::vector<CasADi::Slice>)
 
 #endif // SWIGPYTHON
 
 namespace CasADi{
 
-%my_generic_const_typemap(CasADi::Slice,PRECEDENCE_SLICE);
-%my_generic_const_typemap(CasADi::Matrix<double>,PRECEDENCE_DMatrix);
+%my_generic_const_typemap(PRECEDENCE_SLICE,CasADi::Slice);
+%my_generic_const_typemap(PRECEDENCE_DMatrix,CasADi::Matrix<double>);
 
 #ifdef SWIGOCTAVE
-%my_generic_const_typemap(std::vector<double>,PRECEDENCE_DVector);
-%my_generic_const_typemap(std::vector<int>,PRECEDENCE_IVector);
-%my_generic_const_typemap(CasADi::IndexList,PRECEDENCE_IndexVector);
+%my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
+%my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
+%my_generic_const_typemap(PRECEDENCE_IndexVector,CasADi::IndexList);
 #endif //SWIGOCTAVE
 
 #ifdef SWIGPYTHON

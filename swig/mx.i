@@ -121,8 +121,8 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
 
 
 #ifdef SWIGPYTHON
-%my_generic_const_typemap(std::vector< CasADi::MX >,PRECEDENCE_MXVector);
-%my_generic_const_typemap(std::vector< CasADi::Matrix<double> >,PRECEDENCE_DMatrixVector);
+%my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< CasADi::MX >);
+%my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
 #endif //SWIGPYTHON
 
 

@@ -145,7 +145,7 @@ assert(s(1,1)==4)
 
 s(:,1) = 78;
 assert(s(1,1)==78)
-assert(s(1,2)==78)
+assert(s(2,1)==78)
 
 disp('MX indexing')
 

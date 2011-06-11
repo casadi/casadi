@@ -462,9 +462,9 @@ template <> bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(cons
 %}
 #endif //SWIGOCTAVE
 
-%my_generic_const_typemap(CasADi::SX,PRECEDENCE_SX);
-%my_generic_const_typemap(CasADi::Matrix<CasADi::SX>,PRECEDENCE_SXMatrix);
-%my_generic_const_typemap(std::vector< CasADi::Matrix<CasADi::SX> >,PRECEDENCE_SXMatrixVector);
+%my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
+%my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
+%my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
 
 %template(SXVector)             std::vector<CasADi::SX>;
