@@ -60,7 +60,7 @@ namespace CasADi{
 // Lower value means wil be checked first
 #define PRECEDENCE_DVector 98
 #define PRECEDENCE_IVector 99
-#define PRECEDENCE_IndexVector 100
+
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_SXMatrix 102
@@ -70,6 +70,7 @@ namespace CasADi{
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_PAIR_SLICE_SLICE 204
 #define PRECEDENCE_SLICE 205
+#define PRECEDENCE_IndexVector 210
 #define PRECEDENCE_PAIR_IVector_IVector 206
 
 

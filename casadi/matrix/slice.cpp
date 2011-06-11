@@ -42,9 +42,14 @@ IndexList::IndexList(const std::vector<int> &i_) : iv(i_) ,type(IVECTOR) {}
 IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
 
 std::vector<int> IndexList::getAll(int len) const {
-  if (type == INT)   return std::vector<int>(1,i);
-  if (type == IVECTOR)   return iv;
-  if (type == SLICE) return slice.getAll(len);
+  if (type == INT)  {
+        if (i<0) return std::vector<int>(1,i+len);
+        return std::vector<int>(1,i);
+  } else if (type == IVECTOR) {
+        return iv;
+  } else if (type == SLICE) {
+        return slice.getAll(len);
+  }
 }
 
   

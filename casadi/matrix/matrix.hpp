@@ -306,6 +306,8 @@ class Matrix : public PrintableObject{
 
 #endif // SWIG
 
+
+    #ifdef SWIGPYTHON
     /// Python: get a non-zero entry
     const T __getitem__(int i) const;
     
@@ -313,17 +315,17 @@ class Matrix : public PrintableObject{
     const Matrix<T> __getitem__(const Slice& k) const;
     
     /// Get several non-zero entries
-    const Matrix<T> __getitem__(const std::vector<int>& k) const;
+    const Matrix<T> __getitem__(const IndexList& k) const;
 
     /// Python: get a matrix entry
     const T __getitem__(int i, int j) const;
     
     /// Python: get a submatrix
-    const Matrix<T> __getitem__(const std::vector<Slice> & ij) const;
+    const Matrix<T> __getitem__(const Slice &i, const Slice & j) const;
     
     /// Python: get a submatrix
-    const Matrix<T> __getitem__(const std::pair<std::vector<int>,std::vector<int> > & ij) const;
-      
+    const Matrix<T> __getitem__(const IndexList &i , const IndexList &j) const;
+    
     /// Python: set a non-zero entry
     void __setitem__(int k, const T& el);
     
@@ -331,16 +333,18 @@ class Matrix : public PrintableObject{
     void __setitem__(const Slice& k, const Matrix<T>& m);
  
     /// Python: set several non-zero entries
-    void __setitem__(const std::vector<int>& k, const Matrix<T>& m);
+    void __setitem__(const IndexList& k, const Matrix<T>& m);
        
     /// Python: set a matrix entry
     void __setitem__(int i, int j, const T&  el);
 
     /// Python: set a submatrix
-    void __setitem__(const std::vector<Slice> & ij, const Matrix<T>& m);
+    void __setitem__(const Slice &i, const Slice &j, const Matrix<T>& m);
 
     /// Python: set a submatrix
-    void __setitem__(const std::pair<std::vector<int>, std::vector<int> > &j, const Matrix<T>& m);
+    void __setitem__(const IndexList &i, const IndexList &j, const Matrix<T>& m);
+    #endif //SWIGPYTHON
+    
     
     #ifdef SWIGOCTAVE
     
@@ -1116,6 +1120,7 @@ Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(
   sparsity_ = sparsity;
 }
 
+#ifdef SWIGPYTHON
 template<class T>
 const T Matrix<T>::__getitem__(int i) const{
   return data().at(i);
@@ -1127,15 +1132,13 @@ const T Matrix<T>::__getitem__(int i, int j) const{
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const std::vector<Slice> & ij) const{
-  casadi_assert_message(ij.size()==2,"Can only do up to 2D slices");
-  // Note: we do not use pair, because that is very difficult to typemap (because of the comma in the type description)
-  return (*this)(ij[0].getAll(size1()),ij[1].getAll(size2()));
+const Matrix<T> Matrix<T>::__getitem__(const Slice &i, const Slice &j) const{
+  return (*this)(i.getAll(size1()),j.getAll(size2()));
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const std::pair<std::vector<int>,std::vector<int> > & ij) const{
-  return (*this)(ij.first,ij.second);
+const Matrix<T> Matrix<T>::__getitem__(const IndexList &i ,const IndexList &j) const{
+  return (*this)(i.getAll(size1()),j.getAll(size2()));
 }
 
 template<class T>
@@ -1144,14 +1147,16 @@ const Matrix<T> Matrix<T>::__getitem__(const Slice& kk) const{
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const std::vector<int>& kk) const{
-  return (*this)[kk];
+const Matrix<T> Matrix<T>::__getitem__(const IndexList& kk) const{
+  return (*this)[kk.getAll(size())];
 }
 
 template<class T>
 void Matrix<T>::__setitem__(int k, const T& el){ 
   data().at(k) = el;
 }
+
+#endif // SWIGPYTHON
 
 template<class T>
 void Matrix<T>::setZero(){
@@ -1163,14 +1168,16 @@ void Matrix<T>::setAll(const T& val){
   std::fill(begin(),end(),val);
 }
 
+#ifdef SWIGPYTHON
+
 template<class T>
 void Matrix<T>::__setitem__(const Slice& k, const Matrix<T>& m){
   (*this)[k.getAll(size())] = m;
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const std::vector<int>& k, const Matrix<T>& m){
-  (*this)[k] = m;
+void Matrix<T>::__setitem__(const IndexList &k, const Matrix<T>& m){
+  (*this)[k.getAll(size())] = m;
 }
 
 template<class T>
@@ -1179,17 +1186,16 @@ void Matrix<T>::__setitem__(int i, int j, const T&  el){
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const std::vector<Slice> & ij, const Matrix<T>& m){
-  casadi_assert_message(ij.size()==2,"Can only do up to 2D slices");
-  // Note: we do not use pair, because that is very difficult to typemap (because of the comma in the type description)
-  setSub(ij[0].getAll(size1()),ij[1].getAll(size2()),m);
+void Matrix<T>::__setitem__(const Slice &i,  const Slice &j, const Matrix<T>& m){
+  setSub(i.getAll(size1()),j.getAll(size2()),m);
 }
 
 template<class T>
-void Matrix<T>::__setitem__(const std::pair<std::vector<int>, std::vector<int> > & ij, const Matrix<T>& m){
-  setSub(ij.first,ij.second,m);
+void Matrix<T>::__setitem__(const IndexList &i, const IndexList & j, const Matrix<T>& m){
+  setSub(i.getAll(size1()),j.getAll(size2()),m);
 }
 
+#endif // SWIGPYTHON
 
 template<class T>
 Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{

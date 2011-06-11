@@ -157,7 +157,6 @@ bool meta< std::vector< Type > >::couldbe(PyObject * p) {
 #endif //SWIGPYTHON
 
 /// std::pair< TypeA, TypeB >
-/// Rather unusable because std::pair< TypeA, TypeB > contains a comma.
 #ifdef SWIGPYTHON
 %define %meta_pair(TypeA,TypeB) 
 %inline %{
@@ -192,13 +191,14 @@ bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
 
 %inline %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
+template<> swig_type_info** meta< int >::name = &SWIGTYPE_p_int;
 template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_p_std__allocatorT_double_p_t_t;
 template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
 template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi__IndexList;
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
 template<> swig_type_info** meta< std::pair<CasADi::Slice, CasADi::Slice > >::name = &SWIGTYPE_p_std__pairT_CasADi__Slice_CasADi__Slice_t;
-template<> swig_type_info** meta< std::vector<CasADi::Slice> >::name = &SWIGTYPE_p_std__vectorT_CasADi__Slice_std__allocatorT_CasADi__Slice_t_t;
+template<> swig_type_info** meta< std::pair<CasADi::IndexList, CasADi::IndexList > >::name = &SWIGTYPE_p_std__pairT_CasADi__IndexList_CasADi__IndexList_t;
 %}
 
 #ifdef SWIGPYTHON
@@ -230,34 +230,16 @@ bool PyIsSequence(PyObject* p) {
     def toMatrix(self):
         import numpy as n
         return n.matrix(self.toArray())
-        
-    def _slicerhelper_(self,s):
-        if isinstance(s,tuple) and len(s)==2:
-          if isinstance(s[0],list) ^ isinstance(s[1],list):
-            s=list(s)
-            for i in [0,1]:
-              if isinstance(s[i],slice):
-                  s[i]=range(*s[i].indices(self.size1()))
-              elif isinstance(s[i],int):
-                  s[i]=[s[i]]
-          elif isinstance(s[0],slice) ^ isinstance(s[1],slice):
-            s=list(s)
-            for i in [0,1]:
-              if isinstance(s[i],int):
-                  s[i]=slice(s[i],s[i]+1) 
-        return s
-    
+
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:
-          if isinstance(s[0],int) and isinstance(s[1],int):
-            return self.__Cgetitem__(s[0],s[1])  
-        return self.__Cgetitem__(self._slicerhelper_(s))
-        
+          return self.__Cgetitem__(s[0],s[1])  
+        return self.__Cgetitem__(s)
+
     def __setitem__(self,s,val):
         if isinstance(s,tuple) and len(s)==2:
-          if isinstance(s[0],int) and isinstance(s[1],int):
-            return self.__Csetitem__(s[0],s[1],val)  
-        return self.__Csetitem__(self._slicerhelper_(s),val)
+          return self.__Csetitem__(s[0],s[1],val)  
+        return self.__Csetitem__(s,val)
         
 %}
 %enddef 
@@ -278,6 +260,28 @@ bool PyIsSequence(PyObject* p) {
 %enddef 
 #endif // SWIGPYTHON
 
+
+/// int
+#ifdef SWIGPYTHON
+%inline %{
+template<> char meta< int >::expected_message[] = "Expecting number";
+
+template <>
+int meta< int >::as(PyObject * p, int &m) {
+  NATIVERETURN(int,m)
+  NATIVERETURN(double,m)
+  PyObject *r = PyNumber_Float(p);
+  int ret = !(r==NULL);
+  if (ret)
+    m = PyFloat_AsDouble(r);
+  Py_DECREF(r);
+  return ret;
+}
+
+template <> bool meta< int >::couldbe(PyObject * p) { return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;}
+
+%}
+#endif //SWIGPYTHON
 
 /// double
 #ifdef SWIGPYTHON
@@ -558,6 +562,35 @@ bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
 template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 %}
 
+/// CasADi::IndexList
+#ifdef SWIGPYTHON
+%inline %{
+
+template <>
+int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
+  
+  if (meta< int >::couldbe(p)) {
+    m.type = CasADi::IndexList::INT;
+    meta< int >::as(p,m.i);
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    m.type = CasADi::IndexList::IVECTOR;
+    return meta< std::vector<int> >::as(p,m.iv);
+  } else if (meta< CasADi::Slice>::couldbe(p)) {
+    m.type = CasADi::IndexList::SLICE;
+    return meta< CasADi::Slice >::as(p,m.slice);
+  } else {
+    return false;
+  }
+  return true;
+}
+
+
+template <>
+bool meta<  CasADi::IndexList >::couldbe(PyObject * p) {
+  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || meta< int >::couldbe(p);
+}
+%}
+#endif //SWIGPYTHON
 
 /// CasADi::IndexList
 #ifdef SWIGOCTAVE
@@ -710,31 +743,26 @@ PyObject* arrayView() {
   
 #ifdef SWIGPYTHON
 
-%template(SliceVector) std::vector<CasADi::Slice>;
-%template(pair_Ivector_Ivector) std::pair<std::vector<int>,std::vector<int> >;
-
-%meta_vector(CasADi::Slice)
-%my_generic_const_typemap(PRECEDENCE_PAIR_SLICE_SLICE,std::vector<CasADi::Slice>)
-
 #endif // SWIGPYTHON
 
 namespace CasADi{
 
 %my_generic_const_typemap(PRECEDENCE_SLICE,CasADi::Slice);
+%my_generic_const_typemap(PRECEDENCE_IndexVector,CasADi::IndexList);
 %my_generic_const_typemap(PRECEDENCE_DMatrix,CasADi::Matrix<double>);
 
 #ifdef SWIGOCTAVE
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
-%my_generic_const_typemap(PRECEDENCE_IndexVector,CasADi::IndexList);
 #endif //SWIGOCTAVE
 
 #ifdef SWIGPYTHON
+
 #ifdef WITH_NUMPY
 /**
 
 Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - DENSE
-         1D numpy.ndarray, numpy.matrix (contiguous, nNATIVEative byte order, datatype double)   - SPARSE
+         1D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - SPARSE
          2D scipy.csr_matrix
 */
 
