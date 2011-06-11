@@ -377,7 +377,7 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   // Create return object
   std::vector<typename casadi_math<T>::funT> ret(NUM_BUILT_IN_OPS,0);
   
-#ifdef _WIN32
+#ifdef _MSC_VER
   // Specify operations
   ret[ADD] = reinterpret_cast<funT>(BinaryOperation<ADD>::fcn);
   ret[SUB] = reinterpret_cast<funT>(BinaryOperation<SUB>::fcn);
@@ -408,7 +408,7 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[ERF] = reinterpret_cast<funT>(BinaryOperation<ERF>::fcn);
   ret[FMIN] = reinterpret_cast<funT>(BinaryOperation<FMIN>::fcn);
   ret[FMAX] = reinterpret_cast<funT>(BinaryOperation<FMAX>::fcn);
-#else // WIN32
+#else // _MSC_VER
   
   // Specify operations
   ret[ADD] = BinaryOperation<ADD>::fcn;
@@ -441,7 +441,7 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[FMIN] = BinaryOperation<FMIN>::fcn;
   ret[FMAX] = BinaryOperation<FMAX>::fcn;
   
-#endif // WIN32
+#endif // _MSC_VER
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -457,7 +457,7 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   std::vector<typename casadi_math<T>::derT> ret(NUM_BUILT_IN_OPS,0);
   
   // Specify operations
-#ifdef _WIN32
+#ifdef _MSC_VER
   ret[ADD] = reinterpret_cast<derT>(BinaryOperation<ADD>::der);
   ret[SUB] = reinterpret_cast<derT>(BinaryOperation<SUB>::der);
   ret[MUL] = reinterpret_cast<derT>(BinaryOperation<MUL>::der);
@@ -488,7 +488,7 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[FMIN] = reinterpret_cast<derT>(BinaryOperation<FMIN>::der);
   ret[FMAX] = reinterpret_cast<derT>(BinaryOperation<FMAX>::der);
 
-#else // WIN32
+#else // _MSC_VER
   ret[ADD] = BinaryOperation<ADD>::der;
   ret[SUB] = BinaryOperation<SUB>::der;
   ret[MUL] = BinaryOperation<MUL>::der;
@@ -518,7 +518,7 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[ERF] = BinaryOperation<ERF>::der;
   ret[FMIN] = BinaryOperation<FMIN>::der;
   ret[FMAX] = BinaryOperation<FMAX>::der;
-#endif // WIN32
+#endif // _MSC_VER
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
