@@ -1,5 +1,5 @@
 casadi_interface
-casadi = casadi_interface;
+global casadi = casadi_interface;
 
 function [y] = casadi_sqrt(x)
   y = x.sqrt();
@@ -63,3 +63,11 @@ function [y] = casadi_full(x)
   y = full(x.toSparse());
 end
 dispatch("full","casadi_full","swig_ref")
+
+function [y]=casadi_inv(x)
+  global casadi;
+  y = casadi.inv(x);
+end
+
+dispatch('inv','casadi_inv','swig_ref')
+

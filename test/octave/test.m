@@ -152,4 +152,12 @@ disp('MX indexing')
 x = MX("x",7,8)
 q = x(1:3,:)
 
+disp('overloaded methods')
+
+X=DMatrix([2 1; 1 4])
+inv(X)
+result=inv(X)*X;
+assert(all(full(result)==full(eye(2))))
+
+
 
