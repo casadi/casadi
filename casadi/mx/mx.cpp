@@ -74,38 +74,6 @@ MX MX::create(MXNode* node){
   return ret;
 }
 
-const MX MX::getitem(const vector<int>& I) const{
-  if(I.size()!=2) throw CasADi::CasadiException("getitem: not 2D"); 
-  return (*this)(I[0],I[1]);
-}
-
-const MX MX::getitem(int k) const{
-  // change this!
-  return (*this)[k];
-}
-
-MX& MX::setitem(int k, const MX& el){ 
-  (*this)[k] = el;
-  return *this;
-}
-
-MX& MX::setitem(const vector<int> &I, const MX&  el){ 
-  if(I.size()!=2) throw CasADi::CasadiException("setitem: not 2D"); 
-  (*this)(I[0],I[1]) = el;
-  return *this;
-}
-
-const MX MX::getitem(const vector< vector<int> > &II) const{
-  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
-  return (*this)(II[0],II[1]);
-}
-
-MX& MX::setitem(const vector< vector<int> > &II, const MX&  m){
-  casadi_assert_message(II.size()==2,"Index vector must be two-dimensional");
-  setSub(II[0],II[1],m);
-  return *this;
-}
-
 MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
   // Nonzero mapping from submatrix to full
   vector<int> mapping;
@@ -229,6 +197,28 @@ NonZeros<MX> MX::operator[](int k){
 
 NonZeros<MX> MX::operator[](const std::vector<int>& kk){
   return NonZeros<MX>(*this,kk);
+}
+
+
+const MX MX::at(int k) const {
+    if (k<0) k+=size();
+    if (k>=size()) {
+      stringstream ss;
+      ss << "MX::at: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
+      throw CasadiException(ss.str());
+    }
+    return (*this)[k]; 
+}
+
+/// Access a non-zero element
+NonZeros<MX > MX::at(int k) {
+  if (k<0) k+=size();
+  if (k>=size()) {
+    stringstream ss;
+    ss << "MX::at: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
+    throw CasadiException(ss.str());
+  }
+  return (*this)[k]; 
 }
 
 int MX::size() const{

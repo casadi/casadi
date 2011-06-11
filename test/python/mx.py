@@ -529,7 +529,7 @@ class MXtests(casadiTestCase):
     checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(snippet,snippet)')
     
   def test_MXslicingnew(self):
-    self.message("MX slicing")
+    self.message("MX slicing new")
 
     self.message(":dense")
     x = MX("x",3,2)

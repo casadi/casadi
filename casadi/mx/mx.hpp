@@ -117,49 +117,60 @@ class MX : public SharedObject{
 
     /** \brief  Access a submatrix */
     SubMatrix<MX > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
+
+    /// Get a non-zero element, with bounds checking
+    const MX at(int k) const;
+
+    /// Access a non-zero element, with bounds checking
+    NonZeros<MX > at(int k);
     
 #endif // SWIG
     
-    #ifdef SWIGOCTAVE
+    //@{
+    /// Indexing for interfaced languages
     
-    /// Octave: get a non-zero
-    MX __paren__(int k) const{ return (*this)[k];}
-    MX __paren__(const IndexList &k) const{
+    /// get a non-zero
+    const MX indexed_one_based(int k) const{ return at(k-1);}
+    const MX indexed_zero_based(int k) const{ return at(k);}
+    const MX indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
-    MX __paren__(const Slice &k) const{ 
+    const MX indexed(const Slice &k) const{ 
       return (*this)[k.getAll(size())];
     }
     
-    /// Octave: get a matrix element
-    MX __paren__(int i, int j) const{ return (*this)(i-1,j-1);}
-    MX __paren__(const IndexList &i, const IndexList &j) const{ 
+    /// get a matrix element
+    const MX indexed_one_based(int i, int j) const{ return (*this)(i-1,j-1);}
+    const MX indexed_zero_based(int i, int j) const{ return (*this)(i,j);}
+    const MX indexed(const IndexList &i, const IndexList &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
-    MX __paren__(const Slice &i, const Slice &j) const{ 
+    const MX indexed(const Slice &i, const Slice &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
     
-    /// Octave: set a non-zero
-    void __paren_asgn__(int k, const MX& m){ (*this)[k-1] = m(0,0);}
-    void __paren_asgn__(const IndexList &k, const MX& m){
+    /// set a non-zero
+    void indexed_one_based_assignment(int k, const MX& m){ at(k-1) = m(0,0);}
+    void indexed_zero_based_assignment(int k, const MX& m){ at(k) = m(0,0);}
+    void indexed_assignment(const IndexList &k, const MX& m){
       (*this)[k.getAll(size())] = m;
     }
-    void __paren_asgn__(const Slice &k, const MX& m){
+    void indexed_assignment(const Slice &k, const MX& m){
       (*this)[k.getAll(size())] = m;
     }
     
-    /// Octave: set a matrix element
-    void __paren_asgn__(int i, int j, const MX& m){ (*this)(i-1,j-1) = m(0,0);}
-    void __paren_asgn__(const IndexList &i, const IndexList &j, const MX& m){
-      (*this)(i.getAll(size1()),j.getAll(size2())) = m;
+    /// set a matrix element
+    void indexed_one_based_assignment(int i, int j, const MX & m){ (*this)(i-1,j-1) = m;}
+    void indexed_zero_based_assignment(int i, int j, const MX& m){ (*this)(i,j) = m;}
+    void indexed_assignment(const IndexList &i, const IndexList &j, const MX& m){
+      setSub(i.getAll(size1()),j.getAll(size2()),m);
     }
     
-    void __paren_asgn__(const Slice &i, const Slice &j, const MX& m){
+    void indexed_assignment(const Slice &i, const Slice &j, const MX& m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
+    //@}
     
-    #endif // SWIGOCTAVE
 
     /** \brief  Get the number of (structural) non-zero elements */
     int size() const;
@@ -238,16 +249,6 @@ class MX : public SharedObject{
 
   /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
   MX jac(int iind=0);
-  
-  //@{
-  /// Python stuff
-  const MX getitem(int k) const;
-  const MX getitem(const std::vector<int>& I) const;
-  const MX getitem(const std::vector< std::vector<int> > &II) const;
-  MX& setitem(int k, const MX& el);
-  MX& setitem(const std::vector<int> &I, const MX&  el);
-  MX& setitem(const std::vector< std::vector<int> > &II, const MX&  el);
-  //@}
 
   MX getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
   void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el);

@@ -197,8 +197,6 @@ template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__ve
 template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi__IndexList;
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
-template<> swig_type_info** meta< std::pair<CasADi::Slice, CasADi::Slice > >::name = &SWIGTYPE_p_std__pairT_CasADi__Slice_CasADi__Slice_t;
-template<> swig_type_info** meta< std::pair<CasADi::IndexList, CasADi::IndexList > >::name = &SWIGTYPE_p_std__pairT_CasADi__IndexList_CasADi__IndexList_t;
 %}
 
 #ifdef SWIGPYTHON
@@ -230,16 +228,6 @@ bool PyIsSequence(PyObject* p) {
     def toMatrix(self):
         import numpy as n
         return n.matrix(self.toArray())
-
-    def __getitem__(self,s):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Cgetitem__(s[0],s[1])  
-        return self.__Cgetitem__(s)
-
-    def __setitem__(self,s,val):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Csetitem__(s[0],s[1],val)  
-        return self.__Csetitem__(s,val)
         
 %}
 %enddef 
@@ -255,7 +243,16 @@ bool PyIsSequence(PyObject* p) {
     @property
     def T(self):
         return trans(self)
+        
+    def __getitem__(self,s):
+        if isinstance(s,tuple) and len(s)==2:
+          return self.__Cgetitem__(s[0],s[1])  
+        return self.__Cgetitem__(s)
 
+    def __setitem__(self,s,val):
+        if isinstance(s,tuple) and len(s)==2:
+          return self.__Csetitem__(s[0],s[1],val)  
+        return self.__Csetitem__(s,val)
 %}
 %enddef 
 #endif // SWIGPYTHON
@@ -624,6 +621,20 @@ bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
 #endif //SWIGOCTAVE
 
 #ifdef SWIGOCTAVE
+%rename(__paren__) indexed_one_based;
+%rename(__paren__) indexed;
+%rename(__paren_asgn__) indexed_one_based_assignment;
+%rename(__paren_asgn__) indexed_assignment;
+#endif
+#ifdef SWIGPYTHON
+%rename(__Cgetitem__) indexed_zero_based;
+%rename(__Cgetitem__) indexed;
+%rename(__Csetitem__) indexed_zero_based_assignment;
+%rename(__Csetitem__) indexed_assignment;
+#endif
+
+
+#ifdef SWIGOCTAVE
 namespace CasADi{
 %extend Matrix<double> {
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
@@ -657,9 +668,6 @@ octave_value toSparse() {
 namespace CasADi{
 %extend Matrix<double> {
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
-
-%rename(__Cgetitem__) __getitem__;
-%rename(__Csetitem__) __setitem__;
 
 #ifdef WITH_NUMPY
 PyObject* arrayView() {

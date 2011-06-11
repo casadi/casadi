@@ -305,87 +305,51 @@ class Matrix : public PrintableObject{
     NonZeros<Matrix<T> > operator[](const std::vector<int>& kk){ return NonZeros<Matrix<T> >(*this,kk);}
 
 #endif // SWIG
-
-
-    #ifdef SWIGPYTHON
-    /// Python: get a non-zero entry
-    const T __getitem__(int i) const;
     
-    /// Get several non-zero entries
-    const Matrix<T> __getitem__(const Slice& k) const;
+    //@{
+    /// Indexing for interfaced languages
     
-    /// Get several non-zero entries
-    const Matrix<T> __getitem__(const IndexList& k) const;
-
-    /// Python: get a matrix entry
-    const T __getitem__(int i, int j) const;
-    
-    /// Python: get a submatrix
-    const Matrix<T> __getitem__(const Slice &i, const Slice & j) const;
-    
-    /// Python: get a submatrix
-    const Matrix<T> __getitem__(const IndexList &i , const IndexList &j) const;
-    
-    /// Python: set a non-zero entry
-    void __setitem__(int k, const T& el);
-    
-    /// Python: set several non-zero entries
-    void __setitem__(const Slice& k, const Matrix<T>& m);
- 
-    /// Python: set several non-zero entries
-    void __setitem__(const IndexList& k, const Matrix<T>& m);
-       
-    /// Python: set a matrix entry
-    void __setitem__(int i, int j, const T&  el);
-
-    /// Python: set a submatrix
-    void __setitem__(const Slice &i, const Slice &j, const Matrix<T>& m);
-
-    /// Python: set a submatrix
-    void __setitem__(const IndexList &i, const IndexList &j, const Matrix<T>& m);
-    #endif //SWIGPYTHON
-    
-    
-    #ifdef SWIGOCTAVE
-    
-    /// Octave: get a non-zero
-    T __paren__(int k) const{ return at(k-1);}
-    Matrix<T> __paren__(const IndexList &k) const{
+    /// get a non-zero
+    const T indexed_one_based(int k) const{ return at(k-1);}
+    const T indexed_zero_based(int k) const{ return at(k);}
+    const Matrix<T> indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
-    Matrix<T> __paren__(const Slice &k) const{ 
+    const Matrix<T> indexed(const Slice &k) const{ 
       return (*this)[k.getAll(size())];
     }
     
-    /// Octave: get a matrix element
-    T __paren__(int i, int j) const{ return (*this)(i-1,j-1);}
-    Matrix<T> __paren__(const IndexList &i, const IndexList &j) const{ 
+    /// get a matrix element
+    const T indexed_one_based(int i, int j) const{ return (*this)(i-1,j-1);}
+    const T indexed_zero_based(int i, int j) const{ return (*this)(i,j);}
+    const Matrix<T> indexed(const IndexList &i, const IndexList &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
-    Matrix<T> __paren__(const Slice &i, const Slice &j) const{ 
+    const Matrix<T> indexed(const Slice &i, const Slice &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
     
-    /// Octave: set a non-zero
-    void __paren_asgn__(int k, const Matrix<T>& m){ at(k-1) = m(0,0);}
-    void __paren_asgn__(const IndexList &k, const Matrix<T>& m){
+    /// set a non-zero
+    void indexed_one_based_assignment(int k, const T & m){ at(k-1) = m;}
+    void indexed_zero_based_assignment(int k, const T & m){ at(k) = m;}
+    void indexed_assignment(const IndexList &k, const Matrix<T>& m){
       (*this)[k.getAll(size())] = m;
     }
-    void __paren_asgn__(const Slice &k, const Matrix<T>& m){
+    void indexed_assignment(const Slice &k, const Matrix<T>& m){
       (*this)[k.getAll(size())] = m;
     }
     
-    /// Octave: set a matrix element
-    void __paren_asgn__(int i, int j, const Matrix<T>& m){ (*this)(i-1,j-1) = m(0,0);}
-    void __paren_asgn__(const IndexList &i, const IndexList &j, const Matrix<T>& m){
+    /// set a matrix element
+    void indexed_one_based_assignment(int i, int j, const T & m){ (*this)(i-1,j-1) = m;}
+    void indexed_zero_based_assignment(int i, int j, const T & m){ (*this)(i,j) = m;}
+    void indexed_assignment(const IndexList &i, const IndexList &j, const Matrix<T>& m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
     
-    void __paren_asgn__(const Slice &i, const Slice &j, const Matrix<T>& m){
+    void indexed_assignment(const Slice &i, const Slice &j, const Matrix<T>& m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
-    
-    #endif // SWIGOCTAVE
+    //@}
     
     /// Set all elements to zero
     void setZero();
@@ -1120,44 +1084,6 @@ Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(
   sparsity_ = sparsity;
 }
 
-#ifdef SWIGPYTHON
-template<class T>
-const T Matrix<T>::__getitem__(int i) const{
-  return data().at(i);
-}
-
-template<class T>
-const T Matrix<T>::__getitem__(int i, int j) const{
-  return getElement(i,j);
-}
-
-template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const Slice &i, const Slice &j) const{
-  return (*this)(i.getAll(size1()),j.getAll(size2()));
-}
-
-template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const IndexList &i ,const IndexList &j) const{
-  return (*this)(i.getAll(size1()),j.getAll(size2()));
-}
-
-template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const Slice& kk) const{
-  return (*this)[kk.getAll(size())];
-}
-
-template<class T>
-const Matrix<T> Matrix<T>::__getitem__(const IndexList& kk) const{
-  return (*this)[kk.getAll(size())];
-}
-
-template<class T>
-void Matrix<T>::__setitem__(int k, const T& el){ 
-  data().at(k) = el;
-}
-
-#endif // SWIGPYTHON
-
 template<class T>
 void Matrix<T>::setZero(){
   setAll(0);
@@ -1167,35 +1093,6 @@ template<class T>
 void Matrix<T>::setAll(const T& val){
   std::fill(begin(),end(),val);
 }
-
-#ifdef SWIGPYTHON
-
-template<class T>
-void Matrix<T>::__setitem__(const Slice& k, const Matrix<T>& m){
-  (*this)[k.getAll(size())] = m;
-}
-
-template<class T>
-void Matrix<T>::__setitem__(const IndexList &k, const Matrix<T>& m){
-  (*this)[k.getAll(size())] = m;
-}
-
-template<class T>
-void Matrix<T>::__setitem__(int i, int j, const T&  el){ 
-  getElementRef(i,j) = el;
-}
-
-template<class T>
-void Matrix<T>::__setitem__(const Slice &i,  const Slice &j, const Matrix<T>& m){
-  setSub(i.getAll(size1()),j.getAll(size2()),m);
-}
-
-template<class T>
-void Matrix<T>::__setitem__(const IndexList &i, const IndexList & j, const Matrix<T>& m){
-  setSub(i.getAll(size1()),j.getAll(size2()),m);
-}
-
-#endif // SWIGPYTHON
 
 template<class T>
 Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{

@@ -29,7 +29,8 @@
 
 namespace CasADi{
   
-  /// Dummy class denoting all rows/columns
+  /** Class representing a slice
+  */
   class Slice{
     public:
       /// Constructor
@@ -45,7 +46,8 @@ namespace CasADi{
   };
   static Slice ALL;
   
-    /// Dummy class denoting all rows/columns
+   /**  Class representing a non-regular (and thus non-slice) index list 
+   */
   class IndexList{
     private:
 
