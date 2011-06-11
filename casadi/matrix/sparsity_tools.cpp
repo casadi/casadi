@@ -51,10 +51,9 @@ CRSSparsity sp_tril(int n) {
 }
 
 CRSSparsity sp_diag(int n) {
-  if (n<0)
-    throw CasadiException("sp_tril expects a positive integer as argument");
-  int c=0;
-  int t=0;
+  casadi_assert_message(n>=0, "sp_tril expects a positive integer as argument");
+/*  int c=0;
+  int t=0;*/
   std::vector< int >  	col(n);
   for (int i=0;i<n;i++) {
     col[i]=i;
@@ -163,11 +162,11 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m){
   std::vector<int> row_new(a.size());
   std::vector<int> col_new(a.size());
   
-  int i=0;int j=0; int z =0;
+//  int i=0;int j=0; int z =0;
   for(int k=0; k<a.size(); ++k){
     int i = row[k];
     int j = col[k];
-    z = j+i*a.size2();
+    int z = j+i*a.size2();
     row_new[k] = z/m;
     col_new[k] = z%m;
   }

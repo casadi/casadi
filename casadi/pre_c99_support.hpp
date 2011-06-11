@@ -25,11 +25,11 @@
 
 #if __STDC_VERSION__ < 199901L
 // pre-C99
-int isnan(double x);
-int isinf(double x);
-double erf(double x);
-double fmin(double x, double y);
-double fmax(double x, double y);
+int isnan(double x) throw();
+int isinf(double x) throw();
+double erf(double x) throw();
+double fmin(double x, double y) throw();
+double fmax(double x, double y) throw();
 #endif // __STDC_VERSION__ < 199901L
 
 

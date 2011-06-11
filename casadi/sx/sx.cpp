@@ -529,7 +529,7 @@ SX casadi_operators<SX>::fabs(const SX&x){
   return x.fabs();
 }
 
-Element<Matrix<SX>,SX>::Element(Matrix<SX>& mat, int i, int j) : i_(i), j_(j), mat_(mat){
+Element<Matrix<SX>,SX>::Element(Matrix<SX>& mat, int i, int j) : mat_(mat), i_(i), j_(j){
   static_cast<SX&>(*this) = SX(mat_.getElement(i,j)); // cant put this in the parameter list!!!
 }
 

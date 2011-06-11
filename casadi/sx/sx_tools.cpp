@@ -144,7 +144,7 @@ Matrix<SX> rectangle(const Matrix<SX>& a){
 }
 
 Matrix<SX> triangle(const Matrix<SX>& a){
-  return rectangle(a[0,0]/2)*(1-std::abs(a[0,0]));
+  return rectangle(a(0,0)/2)*(1-std::abs(a(0,0)));
 }
 
 Matrix<SX> sign(const Matrix<SX>& a){

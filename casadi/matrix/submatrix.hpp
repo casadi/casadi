@@ -32,12 +32,12 @@ namespace CasADi{
   \date 2011
 */
 
-/// submatrix - move to a new file
+/// submatrix
 template<typename M>
 class SubMatrix : public M{
   public:
     /// Constructor
-    SubMatrix(M& mat, const std::vector<int>& ii, const std::vector<int>& jj) : mat_(mat), ii_(ii), jj_(jj), M(mat.getSub(ii,jj)){}
+    SubMatrix(M& mat, const std::vector<int>& ii, const std::vector<int>& jj) : M(mat.getSub(ii,jj)), mat_(mat), ii_(ii), jj_(jj){}
 
     //@{
     /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)

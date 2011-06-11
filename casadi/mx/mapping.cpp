@@ -171,7 +171,7 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
     for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
       
       // Get the column
-      int j = sp.col(el);
+      //int j = sp.col(el);
       
       // Get the dependency and nonzero to which the nonzero is mapped
       int dp = depind_[el];

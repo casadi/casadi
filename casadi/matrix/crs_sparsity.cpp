@@ -850,6 +850,8 @@ CRSSparsity CRSSparsity::createDiagonal(int n, int m){
 
 
 void CRSSparsity::strongly_connected_components(){
+  // not working
+  #if 0
   int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk;
     
   vector<int> AT_mapping;
@@ -900,7 +902,7 @@ void CRSSparsity::strongly_connected_components(){
   cout << rowind() << endl;
   cout << col() << endl;
   cout << "end" << endl;
-  
+  #endif //0
   
 }
 

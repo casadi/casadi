@@ -64,9 +64,9 @@ void Multiplication::evaluateDenseDense(const VDptr& input, Dptr& output, const 
   // Get dimensions
   int nx1 = dep(0).size1();
   int nx2 = dep(0).size2();
-  int ny1 = dep(1).size1();
+  //int ny1 = dep(1).size1();
   int ny2 = dep(1).size2();
-  int nz1 = nx1;
+  //int nz1 = nx1;
   int nz2 = ny2;
     
   for(int i=0; i<nx1; ++i){

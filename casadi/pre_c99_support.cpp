@@ -25,10 +25,10 @@
 #include <algorithm>
 
 #if __STDC_VERSION__ < 199901L
-int isnan(double x){return x!=x;}
-int isinf(double x){return isnan(x-x);}
-double erf(double x){return std::numeric_limits<double>::quiet_NaN();}
-double fmin(double x, double y){ return std::min(x,y);}
-double fmax(double x, double y){ return std::max(x,y);}
+int isnan(double x) throw(){return x!=x;}
+int isinf(double x) throw(){return isnan(x-x);}
+double erf(double x) throw(){return std::numeric_limits<double>::quiet_NaN();}
+double fmin(double x, double y) throw(){ return std::min(x,y);}
+double fmax(double x, double y) throw(){ return std::max(x,y);}
 #endif // __STDC_VERSION__ < 199901L
 

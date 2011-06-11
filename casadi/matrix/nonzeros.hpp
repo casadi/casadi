@@ -37,7 +37,7 @@ template<typename M>
 class NonZeros : public M{
   public:
     /// Constructor
-    NonZeros(M& mat, const std::vector<int>& kk) : mat_(mat), kk_(kk), M(mat.getNZ(kk)){}
+    NonZeros(M& mat, const std::vector<int>& kk) : M(mat.getNZ(kk)), mat_(mat), kk_(kk){}
 
     //@{
     /// Methods that modify a part of the parent obejct (A[k] = ?, A[k] += ?, etc.)

@@ -37,6 +37,8 @@ include_directories(.)
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wall -Wno-sign-compare")
+
 # the following commands are needed to fix a problem with the libraries
 # for linux 64 bits
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
