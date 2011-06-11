@@ -1,4 +1,8 @@
+#ifdef SWIGOCTAVE
+%module casadi_interface
+#else
 %module casadi
+#endif
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
