@@ -119,6 +119,47 @@ class MX : public SharedObject{
     SubMatrix<MX > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
     
 #endif // SWIG
+    
+    #ifdef SWIGOCTAVE
+    
+    /// Octave: get a non-zero
+    MX __paren__(int k) const{ return (*this)[k];}
+    MX __paren__(const IndexList &k) const{
+      return (*this)[k.getAll(size())];
+    }
+    MX __paren__(const Slice &k) const{ 
+      return (*this)[k.getAll(size())];
+    }
+    
+    /// Octave: get a matrix element
+    MX __paren__(int i, int j) const{ return (*this)(i-1,j-1);}
+    MX __paren__(const IndexList &i, const IndexList &j) const{ 
+      return (*this)(i.getAll(size1()),j.getAll(size2()));
+    }
+    MX __paren__(const Slice &i, const Slice &j) const{ 
+      return (*this)(i.getAll(size1()),j.getAll(size2()));
+    }
+    
+    /// Octave: set a non-zero
+    void __paren_asgn__(int k, const MX& m){ (*this)[k-1] = m(0,0);}
+    void __paren_asgn__(const IndexList &k, const MX& m){
+      (*this)[k.getAll(size())] = m;
+    }
+    void __paren_asgn__(const Slice &k, const MX& m){
+      (*this)[k.getAll(size())] = m;
+    }
+    
+    /// Octave: set a matrix element
+    void __paren_asgn__(int i, int j, const MX& m){ (*this)(i-1,j-1) = m(0,0);}
+    void __paren_asgn__(const IndexList &i, const IndexList &j, const MX& m){
+      (*this)(i.getAll(size1()),j.getAll(size2())) = m;
+    }
+    
+    void __paren_asgn__(const Slice &i, const Slice &j, const MX& m){
+      (*this)(i.getAll(size1()),j.getAll(size2())) = m;
+    }
+    
+    #endif // SWIGOCTAVE
 
     /** \brief  Get the number of (structural) non-zero elements */
     int size() const;

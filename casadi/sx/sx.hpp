@@ -373,6 +373,7 @@ class numeric_limits<CasADi::SX>{
 #define SX CasADi::SX
 
 /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
+
 namespace std{
   inline SX sqrt(const SX &x){return x.sqrt();}
   inline SX sin(const SX &x){return x.sin();}
@@ -390,6 +391,7 @@ namespace std{
   inline SX floor(const SX &x){return x.floor();}
   inline SX ceil(const SX &x){return x.ceil();}
 } // namespace std
+
 
 /** \brief  C99 elementary functions from the math.h header */
 inline SX erf(const SX &x){return x.erf();}

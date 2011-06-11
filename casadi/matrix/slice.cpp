@@ -36,6 +36,17 @@ std::vector<int> Slice::getAll(int len) const{
   return range(start_,stop_,step,len);
 }
 
+IndexList::IndexList() : type(NILL) {}
+IndexList::IndexList(int i_) : i(i_), type(INT) {}
+IndexList::IndexList(const std::vector<int> &i_) : iv(i_) ,type(IVECTOR) {}
+IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
+
+std::vector<int> IndexList::getAll(int len) const {
+  if (type == INT)   return std::vector<int>(1,i);
+  if (type == IVECTOR)   return iv;
+  if (type == SLICE) return slice.getAll(len);
+}
+
   
 } // namespace CasADi
 

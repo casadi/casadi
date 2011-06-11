@@ -44,6 +44,29 @@ namespace CasADi{
       int step;
   };
   static Slice ALL;
+  
+    /// Dummy class denoting all rows/columns
+  class IndexList{
+    private:
+
+    public:
+      enum Type {NILL, INT, SLICE, IVECTOR};
+      /// Constructor
+      IndexList();
+      IndexList(int i);
+      IndexList(const std::vector<int> &i);
+      IndexList(const Slice &i);
+      
+      /// Get a vector of indices
+      std::vector<int> getAll(int len) const;
+      
+      /// Data members (all public)
+      Slice slice;
+      int i;
+      std::vector<int> iv;
+      Type type;
+  };
+  
 } // namespace CasADi
 
 

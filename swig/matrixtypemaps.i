@@ -192,6 +192,9 @@ bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
 
 %inline %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
+template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_p_std__allocatorT_double_p_t_t;
+template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
+template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi__IndexList;
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
 template<> swig_type_info** meta< std::pair<CasADi::Slice, CasADi::Slice > >::name = &SWIGTYPE_p_std__pairT_CasADi__Slice_CasADi__Slice_t;
@@ -296,6 +299,62 @@ template <> bool meta< double >::couldbe(PyObject * p) { return PyInt_Check(p) |
 
 %}
 #endif //SWIGPYTHON
+
+/// std::vector<double>
+#ifdef SWIGOCTAVE
+%inline %{
+template<> char meta< std::vector<double> >::expected_message[] = "Expecting (1xn) array(number)";
+
+template <>
+int meta< std::vector<double> >::as(const octave_value& p, std::vector<double> &m) {
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    if (!(mat.rows()==1)) return false;
+    m.resize(mat.cols());
+    for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    return true;
+  }
+}
+
+template <> bool meta< std::vector<double> >::couldbe(const octave_value& p) { 
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    return (mat.rows()==1 );
+  } else {
+    return false;
+  }
+}
+
+%}
+#endif //SWIGOCTAVE
+
+/// std::vector<int>
+#ifdef SWIGOCTAVE
+%inline %{
+template<> char meta< std::vector<int> >::expected_message[] = "Expecting (1xn) array(number)";
+
+template <>
+int meta< std::vector<int> >::as(const octave_value& p, std::vector<int> &m) {
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    if (!(mat.rows()==1)) return false;
+    m.resize(mat.cols());
+    for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    return true;
+  }
+}
+
+template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) { 
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    return (mat.rows()==1 );
+  } else {
+    return false;
+  }
+}
+
+%}
+#endif //SWIGOCTAVE
 
 
 /// CasADi::Matrix<double>
@@ -430,10 +489,12 @@ bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) {return p.is
 #endif //SWIGOCTAVE
 
 /// CasADi::Slice
-#ifdef SWIGPYTHON
 %inline %{
 template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
+%}
 
+#ifdef SWIGPYTHON
+%inline %{
 template <>
 int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
   NATIVERETURN(CasADi::Slice,m)
@@ -460,6 +521,104 @@ bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
 }
 %}
 #endif //SWIGPYTHON
+
+
+/// CasADi::Slice
+#ifdef SWIGOCTAVE
+%inline %{
+
+template <>
+int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
+  if (p.is_range()) {
+    Range r = p.range_value();
+    m.start = r.base()-1;
+    m.stop = r.limit();
+    m.step = r.inc();
+  } else if (p.is_magic_colon()) {
+    m.start = 0;
+  } else if (p.is_numeric_type()) {
+    m.start = p.int_value()-1;
+    m.stop = m.start+1;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+template <>
+bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
+  return p.is_range() || p.is_magic_colon()|| (p.is_real_scalar() && p.is_numeric_type());
+}
+
+%}
+#endif // SWIGOCTAVE
+
+/// CasADi::IndexList
+%inline %{
+template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
+%}
+
+
+/// CasADi::IndexList
+#ifdef SWIGOCTAVE
+%inline %{
+
+template <>
+int meta< CasADi::IndexList >::as(const octave_value& p,CasADi::IndexList &m) {
+  if ((p.is_real_scalar() && p.is_numeric_type())) {
+    m.type = CasADi::IndexList::INT;
+    m.i = p.int_value()-1;
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    m.type = CasADi::IndexList::IVECTOR;
+    bool result = meta< std::vector<int> >::as(p,m.iv);
+    if (!result) return false;
+    for (int k=0; k < m.iv.size();k++) m.iv[k]--;
+  } else if (meta< CasADi::Slice>::couldbe(p)) {
+    m.type = CasADi::IndexList::SLICE;
+    return meta< CasADi::Slice >::as(p,m.slice);
+  } else {
+    return false;
+  }
+  return true;
+}
+
+
+template <>
+bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
+  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || (p.is_real_scalar() && p.is_numeric_type());
+}
+%}
+#endif //SWIGOCTAVE
+
+#ifdef SWIGOCTAVE
+namespace CasADi{
+%extend Matrix<double> {
+/// Create a 2D contiguous NP_DOUBLE numpy.ndarray
+
+octave_value toSparse() {
+  int nz = (*$self).size(), nr = (*$self).size1(), nc = (*$self).size2();
+  
+  Array<int> Ar(nz);
+  Array<int> Ac(nz);
+  
+  std::vector<int> vr = (*$self).sparsity().getRow();
+  Array<double> mydata(nz);
+  const std::vector<double> &cdata = (*$self).data();
+  
+  for (int k=0;k<nz;k++) {
+    Ar(k)=vr[k];
+    Ac(k)=(*$self).sparsity().col()[k];
+    mydata(k)=cdata[k];
+  }
+  
+  return octave_value (SparseMatrix(mydata,Ar,Ac,nr,nc));
+}
+
+
+}; // extend Matrix<double>
+} // namespace CasADi
+#endif // SWIGOCTAVE
+
 
 #ifdef SWIGPYTHON
 namespace CasADi{
@@ -548,14 +707,8 @@ PyObject* arrayView() {
 } // namespace CasADi
 #endif // SWIGPYTHON
 
-
-/** If the array is of type double, contiguous and in native byte order, this function is efficient.
-* Other types of numpy array will trigger conversion, requiring temporary allocation of memory.
-*/
-
   
 #ifdef SWIGPYTHON
-
 
 %template(SliceVector) std::vector<CasADi::Slice>;
 %template(pair_Ivector_Ivector) std::pair<std::vector<int>,std::vector<int> >;
@@ -567,11 +720,14 @@ PyObject* arrayView() {
 
 namespace CasADi{
 
-#ifdef SWIGPYTHON
 %my_generic_const_typemap(CasADi::Slice,PRECEDENCE_SLICE);
-
 %my_generic_const_typemap(CasADi::Matrix<double>,PRECEDENCE_DMatrix);
-#endif //SWIGPYTHON
+
+#ifdef SWIGOCTAVE
+%my_generic_const_typemap(std::vector<double>,PRECEDENCE_DVector);
+%my_generic_const_typemap(std::vector<int>,PRECEDENCE_IVector);
+%my_generic_const_typemap(CasADi::IndexList,PRECEDENCE_IndexVector);
+#endif //SWIGOCTAVE
 
 #ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
@@ -737,23 +893,6 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 }
 #endif // WITH_NUMPY
 #endif // SWIGPYTHON
-
-// #ifdef SWIGOCTAVE
-// %typemap(in) const std::vector<int> &  (std::vector<int> temp){
-//   Matrix mat = $input.matrix_value();
-//   temp.resize(mat.rows()*mat.cols());
-//   for(int i=0; i<mat.rows(); ++i){
-//     for(int j=0; j<mat.cols(); ++j){
-//       temp[i+j*mat.rows()] = int(mat(i,j));
-//     }
-//   }
-//   $1 = &temp;
-// }
-// 
-// %typemap(typecheck,precedence=PRECEDENCE_SLICE) const std::vector<int> & {
-//   $1 = $input.is_real_matrix();
-// }
-// #endif // SWIGOCTAVE
 
 
 } // namespace CasADi

@@ -58,6 +58,9 @@ namespace CasADi{
 #endif // SWIG
 
 // Lower value means wil be checked first
+#define PRECEDENCE_DVector 98
+#define PRECEDENCE_IVector 99
+#define PRECEDENCE_IndexVector 100
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_SXMatrix 102
