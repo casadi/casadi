@@ -302,7 +302,7 @@ class Matrix : public PrintableObject{
     const Matrix<T> operator[](const std::vector<int>& kk) const{ return getNZ(kk);}
     
     /// Access a number of non-zero elements
-    NonZeros<Matrix<T> > operator[](const std::vector<int>& kk){ return NonZeros<Matrix<T> >(*this,kk);}
+    NonZeros<Matrix<T>,std::vector<int> > operator[](const std::vector<int>& kk){ return NonZeros<Matrix<T>,std::vector<int> >(*this,kk);}
 
 #endif // SWIG
     

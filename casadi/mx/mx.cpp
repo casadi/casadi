@@ -149,18 +149,38 @@ void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
   }
 }
 
-MX MX::getNZ(const vector<int>& kk) const{
-  CRSSparsity sp(kk.size(),1,true);
+MX MX::getNZ(int k) const{
+  if (k<0) k+=size();
+  if (k>=size()) {
+    stringstream ss;
+    ss << "MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
+    throw CasadiException(ss.str());
+  }
+  return getNZ(vector<int>(1,k));
+}
+
+MX MX::getNZ(const vector<int>& k) const{
+  CRSSparsity sp(k.size(),1,true);
   MX ret;
   ret.assignNode(new Mapping(sp));
-  ret->addDependency(*this,kk);
+  ret->addDependency(*this,k);
   return ret;
 }
 
-void MX::setNZ(const vector<int>& kk, const MX& el){
-  if (kk.size()!=el.size() && el.size()!=1) {
+void MX::setNZ(int k, const MX& el){
+  if (k<0) k+=size();
+  if (k>=size()) {
+    stringstream ss;
+    ss << "MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
+    throw CasadiException(ss.str());
+  }
+  setNZ(vector<int>(1,k),el);
+}
+
+void MX::setNZ(const vector<int>& k, const MX& el){
+  if (k.size()!=el.size() && el.size()!=1) {
     std::stringstream ss;
-    ss << "MX::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
+    ss << "MX::setNZ: length of non-zero indices (" << k.size() << ") " << std::endl;
     ss << "must match size of rhs (" << el.size() << ")." << std::endl;
     throw CasadiException(ss.str());
   }
@@ -168,49 +188,20 @@ void MX::setNZ(const vector<int>& kk, const MX& el){
   ret.assignNode(new Mapping(sparsity()));
   ret->addDependency(*this,range(size()));
   if (el.size()==1) {
-    ret->addDependency(el,std::vector<int>(kk.size(),0),kk);
+    ret->addDependency(el,std::vector<int>(k.size(),0),k);
   } else {
-    ret->addDependency(el,range(kk.size()),kk);
+    ret->addDependency(el,range(k.size()),k);
   }
   *this = ret;
 }
 
-const MX MX::operator[](int k) const{
-  return getNZ(vector<int>(1,k));
-}
-
-const MX MX::operator[](const std::vector<int>& kk) const{
-  return getNZ(kk);
-}
- 
-NonZeros<MX> MX::operator[](int k){
-  return NonZeros<MX>(*this,vector<int>(1,k));
-}
-
-NonZeros<MX> MX::operator[](const std::vector<int>& kk){
-  return NonZeros<MX>(*this,kk);
-}
-
-
 const MX MX::at(int k) const {
-    if (k<0) k+=size();
-    if (k>=size()) {
-      stringstream ss;
-      ss << "MX::at: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
-      throw CasadiException(ss.str());
-    }
-    return (*this)[k]; 
+  return getNZ(k); 
 }
 
 /// Access a non-zero element
-NonZeros<MX > MX::at(int k) {
-  if (k<0) k+=size();
-  if (k>=size()) {
-    stringstream ss;
-    ss << "MX::at: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
-    throw CasadiException(ss.str());
-  }
-  return (*this)[k]; 
+NonZeros<MX,int> MX::at(int k) {
+  return NonZeros<MX,int>(*this,k);
 }
 
 int MX::size() const{

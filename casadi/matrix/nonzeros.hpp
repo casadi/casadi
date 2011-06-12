@@ -32,16 +32,16 @@ namespace CasADi{
   \date 2011
 */
 
-/// submatrix - move to a new file
-template<typename M>
+/// Access to a set of nonzeros
+template<typename M, typename K>
 class NonZeros : public M{
   public:
     /// Constructor
-    NonZeros(M& mat, const std::vector<int>& kk) : M(mat.getNZ(kk)), mat_(mat), kk_(kk){}
+    NonZeros(M& mat, const K& k) : M(mat.getNZ(k)), mat_(mat), k_(k){}
 
     //@{
     /// Methods that modify a part of the parent obejct (A[k] = ?, A[k] += ?, etc.)
-    const M& operator=(const NonZeros<M> &y);
+    const M& operator=(const NonZeros<M,K> &y);
     const M& operator=(const M &y);
     M operator+=(const M &y);
     M operator-=(const M &y);
@@ -54,48 +54,48 @@ class NonZeros : public M{
     M& mat_;
     
     /// The element of the matrix that is allowed to be modified
-    std::vector<int> kk_;
+    K k_;
 };
 
 // Implementation
-template<typename M>
-const M& NonZeros<M>::operator=(const NonZeros<M> &y){ 
-  mat_.setNZ(kk_,y); 
+template<typename M, typename K>
+const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y){ 
+  mat_.setNZ(k_,y); 
   return y;
 }
 
 // Implementation
-template<typename M>
-const M& NonZeros<M>::operator=(const M &y) { 
-  mat_.setNZ(kk_,y); 
+template<typename M, typename K>
+const M& NonZeros<M,K>::operator=(const M &y) { 
+  mat_.setNZ(k_,y); 
   return y;
 }
 
-template<typename M>
-M NonZeros<M>::operator+=(const M &y){ 
+template<typename M, typename K>
+M NonZeros<M,K>::operator+=(const M &y){
   M s = *this+y;
-  mat_.setNZ(kk_,s); 
+  mat_.setNZ(k_,s); 
   return s;
 }
 
-template<typename M>
-M NonZeros<M>::operator-=(const M &y){ 
+template<typename M, typename K>
+M NonZeros<M,K>::operator-=(const M &y){ 
   M s = *this-y;
-  mat_.setNZ(kk_,s); 
+  mat_.setNZ(k_,s); 
   return s;
 }
 
-template<typename M>
-M NonZeros<M>::operator*=(const M &y){ 
+template<typename M, typename K>
+M NonZeros<M,K>::operator*=(const M &y){ 
    M s = *this*y;
-   mat_.setNZ(kk_,s); 
+   mat_.setNZ(k_,s); 
    return mat_;
 }
 
-template<typename M>
-M NonZeros<M>::operator/=(const M &y){ 
+template<typename M, typename K>
+M NonZeros<M,K>::operator/=(const M &y){ 
   M s = *this/y;
-  mat_.setNZ(kk_,s); 
+  mat_.setNZ(k_,s); 
   return s;
 }
 

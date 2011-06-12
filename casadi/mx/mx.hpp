@@ -82,17 +82,13 @@ class MX : public SharedObject{
    /** \brief  Create from node */
     static MX create(MXNode* node);
 
-    /** \brief  Get matrix non-zero */
-    const MX operator[](int k) const;          
- 
-    /** \brief  Access matrix non-zero */
-    NonZeros<MX> operator[](int k);
+    /** \brief  Get vector nonzero or slice of nonzeros */
+    template<typename K>
+    const MX operator[](const K& k) const;
 
-    /** \brief  Get multiple matrix non-zero */
-    const MX operator[](const std::vector<int>& kk) const;          
- 
-    /** \brief  Access multiple matrix non-zero */
-    NonZeros<MX> operator[](const std::vector<int>& kk);
+    /** \brief  Access vector nonzero or slice of nonzeros */
+    template<typename K>
+    NonZeros<MX,K> operator[](const K& k);
 
     /** \brief  Get vector element or slice */
     template<typename I>
@@ -114,7 +110,7 @@ class MX : public SharedObject{
     const MX at(int k) const;
 
     /// Access a non-zero element, with bounds checking
-    NonZeros<MX > at(int k);
+    NonZeros<MX,int> at(int k);
     
 #endif // SWIG
     
@@ -252,12 +248,11 @@ class MX : public SharedObject{
   void setSub(const std::vector<int>& i, int j, const MX& el);
   void setSub(const std::vector<int>& i, const std::vector<int>& j, const MX& el);
   
-  MX getNZ(const std::vector<int>& kk) const;
-  /** \brief set nonzeros
-  el.size() must equal kk.size() unless m is scalar
-  */
-  void setNZ(const std::vector<int>& kk, const MX& el);
-
+  MX getNZ(int k) const;
+  MX getNZ(const std::vector<int>& k) const;
+  void setNZ(int k, const MX& el);
+  void setNZ(const std::vector<int>& k, const MX& el);
+  
   /// Numeric evaluation
   Matrix<double> eval(const std::vector<Matrix<double> >& x);
   
@@ -390,6 +385,16 @@ SubMatrix<MX,I,int> MX::operator()(const I& i){
 template<typename I, typename J>
 SubMatrix<MX,I,J> MX::operator()(const I& i, const J& j){
   return SubMatrix<MX,I,J>(*this,i,j);
+}
+
+template<typename K>
+const MX MX::operator[](const K& k) const{
+  return getNZ(k);
+}
+
+template<typename K>
+NonZeros<MX,K> MX::operator[](const K& k){
+  return NonZeros<MX,K>(*this,k);
 }
 
 } // namespace CasADi
