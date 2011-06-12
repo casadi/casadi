@@ -287,10 +287,10 @@ class Matrix : public PrintableObject{
     SubMatrix<Matrix<T> > operator()(const Slice& i, const Slice& j){ return operator()(i.getAll(size1()),j.getAll(size2()));}
 
     /// Get a non-zero element
-    const T& at(int k) const{ return data().at(k); }
+    const T& at(int k) const{ if (k<0) k+=size(); return data().at(k); }
 
     /// Access a non-zero element
-    T& at(int k){ return data().at(k); }
+    T& at(int k){if (k<0) k+=size(); return data().at(k); }
     
     /// Get a non-zero element
     const T& operator[](int k) const{ return data().operator[](k); }

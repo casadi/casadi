@@ -109,6 +109,7 @@ class typemaptests(casadiTestCase):
 
     self.checkarray(DMatrix(d),d,"DMatrix(numpy.ndarray)")
     #self.checkarray(DMatrix(array([1,2,3,4,5,6])),d.ravel(),"DMatrix(numpy.ndarray)")
+    #print DMatrix(array([1,2,3,4,5,6]))
     #print DMatrix(array([1,2,3,6]),2,2).toArray()
 
     #print DMatrix(array([1,2,3,6]),2,2).toArray()
@@ -145,7 +146,7 @@ class typemaptests(casadiTestCase):
     
     w=array([2.3])[0]
     w/=s
-    #self.checkarray(w,2.3/n,"")
+    self.checkarray(w,2.3/n,"")
     
     x=[2.3]
 
@@ -410,8 +411,7 @@ class typemaptests(casadiTestCase):
     self.assertTrue(isinstance(vertcat([a,a]),DMatrix))
     
     a = DMatrix([1,2])
-    #print vertcat([a,[1,2,3]])
-    #self.assertTrue(isinstance(vertcat([a,[1,2,3]]),DMatrix))
+    self.assertTrue(isinstance(vertcat([a,[1,2,3]]),DMatrix))
     
     
     a = MX([1,2])

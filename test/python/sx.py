@@ -147,7 +147,6 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
       
   def test_SXMatrixJacobians2(self):
-      return # not implemented
       self.message("SXMatrix(1,3) unary operation, jacobian")
       x=symbolic("x",1,3)
       
@@ -234,9 +233,9 @@ class SXtests(casadiTestCase):
       myarray=array([0,2,3])
       mylist=list(myarray)
       #self.numpyEvaluationCheck(lambda x: x[0][mylist], lambda x: matrix([x[0,0],x[1,0],x[1,1]]).T,[x],x0,name="x[[0,2,3]]")
-      #self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x)[0:2,0],[x],x0,name="x[0:2] on dense matrix")
+      self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x.ravel()[0:2]).T,[x],x0,name="x[0:2] on dense matrix")
       self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(x.ravel()[1]).T,[x],x0,name="x[1]")
-      #self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1]") # negative 1D indexing is disallowed now
+      self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1]")
 
       self.message(":sparse")
       
@@ -258,9 +257,9 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][[2,1]], lambda x: matrix([x[2,1],x[0,2]]).T,[x],x0,name="x[[2,1]]")
-      #self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x)[0:2,0],[x],x0,name="x[0:2] on dense matrix")
+      self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(sx0[0:2]).T,[x],x0,name="x[0:2] on dense matrix")
       self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
-      #self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0]) # negative 1D indexing is disallowed now
+      self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
     
 
   def test_SX1(self):
@@ -424,7 +423,7 @@ class SXtests(casadiTestCase):
         
   def test_SXFunctionc2(self):
     self.message("SXmatrix typemaps constructors")
-    #simplify(SX("x"))                 
+    simplify(SX("x"))                 
     isEmpty(array([[SX("x")]]))
     list = [ ("SX" ,SX("x"),(1,1)),
                 ("number",2.3, (1,1)),
@@ -450,7 +449,7 @@ class SXtests(casadiTestCase):
     x=symbolic("x",3,1)
     vertcat([x,x])
     vertcat([y,y])
-    #vertcat([x,[y]])
+    vertcat([x,[y]])
     
   def test_eval(self):
     self.message("SXFunction eval")

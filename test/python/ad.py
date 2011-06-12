@@ -260,7 +260,7 @@ class ADtests(casadiTestCase):
               self.checkarray(array(Jf.output()),J,"jacobian")
               
   def test_hessian(self):
-    return # not working
+    #return # not working
     self.message("Jacobian chaining")
     x=SX("x")
     y=SX("y")
@@ -287,7 +287,7 @@ class ADtests(casadiTestCase):
     #print array(H.output())
     
   def test_bugshape(self):
-    return
+    self.message("shape bug")
     x=SX("x")
     y=SX("y")
 
@@ -308,7 +308,6 @@ class ADtests(casadiTestCase):
 
     
   def test_bugglibc(self):
-    return # not implemented
     self.message("Code that used to throw a glibc error")
     x=SX("x")
     y=SX("y")

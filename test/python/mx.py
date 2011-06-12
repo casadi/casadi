@@ -176,7 +176,7 @@ class MXtests(casadiTestCase):
     self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
     self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
     
-    return # the following co
+    return # uncomplete calls are not supported
     self.message(":uncomplete call")
     h=MXFunction([x,z],f.call([x,y,z]))
     h.init()
@@ -550,8 +550,8 @@ class MXtests(casadiTestCase):
 
     self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(x.ravel()[1]).T,[x],x0,name="x[1] on dense matrix")
     self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1] on dense matrix")
-    #self.numpyEvaluationCheck(lambda x: x[[0,1],0:1],lambda x: x[[0,1],0:1],[x],x0,name='x[:,0:1]')
-    #self.numpyEvaluationCheck(lambda x: x[0:1,[0,1]],lambda x: x[0:1,[0,1]],[x],x0,name='x[0:1,:]')
+    self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:1],lambda x: x[[0,1],0:1],[x],x0,name='x[:,0:1]')
+    self.numpyEvaluationCheck(lambda x: x[0][0:1,[0,1]],lambda x: x[0:1,[0,1]],[x],x0,name='x[0:1,:]')
     
     self.message(":sparse")
       
@@ -573,7 +573,7 @@ class MXtests(casadiTestCase):
     self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][[2,1]], lambda x: matrix([x[2,1],x[0,2]]).T,[x],x0,name="x[[2,1]]")
-    #self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(x)[0:2,0],[x],x0,name="x[0:2] on dense matrix")
+    self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(sx0[0:2]).T,[x],x0,name="x[0:2] on dense matrix")
     self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
     
@@ -662,7 +662,6 @@ class MXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="MX")
 
   def test_MXSparse(self):
-      #return # not working
       self.message("MX unary operations, sparse")
       from scipy.sparse import csr_matrix
       
@@ -730,6 +729,7 @@ class MXtests(casadiTestCase):
      self.message("Check subscripted assignment")
      
      X = MX("x",2,2)
+     X[0,0]=MX(5)
      #X[0,0]=5
 
      x=MX("X",3,4)
