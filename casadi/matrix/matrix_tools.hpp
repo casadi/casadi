@@ -463,7 +463,7 @@ T trace(const Matrix<T>& a){
   casadi_assert_message(a.size1() == a.size2(), "trace: must be square");
   T res=0;
   for (int i=0; i< a.size1(); i ++) {
-    res+=a(i,i);
+    res+=a.elem(i,i);
   }
   return res;
 }
