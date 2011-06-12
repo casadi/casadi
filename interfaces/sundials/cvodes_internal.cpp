@@ -25,6 +25,7 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/linear_solver_internal.hpp"
+#include "casadi/fx/mx_function.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -106,6 +107,19 @@ void CVodesInternal::init(){
   
   ny_ = f_.output().numel();
   nq_ = q_.isNull() ? 0 : q_.output().numel();
+
+  // If time was not specified, initialise it.
+  if (f_.input(DAE_T).numel()==0) {
+    std::vector<MX> in1(DAE_NUM_IN);
+    in1[DAE_T] = MX("T");
+    in1[DAE_Y] = MX("Y",f_.input(DAE_Y).size1(),f_.input(DAE_Y).size2());
+    in1[DAE_YDOT] = MX("YDOT",f_.input(DAE_YDOT).size1(),f_.input(DAE_YDOT).size2());
+    in1[DAE_P] = MX("P",f_.input(DAE_P).size1(),f_.input(DAE_P).size2());
+    std::vector<MX> in2(in1);
+    in2[DAE_T] = MX();
+    f_ = MXFunction(in1,f_.call(in2));
+    f_.init();
+  }
   
   // We only allow for 0-D time
   if (f_.input(DAE_T).numel()!=1) {
