@@ -320,6 +320,7 @@ MX MX::eye(int n){
   return MX(I);
 }
 
+
 MX MX::operator-() const{
   return unary(NEG,*this);
 }

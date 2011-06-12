@@ -19,6 +19,12 @@ class Matrixtests(casadiTestCase):
     self.checkarray(c.sum(D,0),array([[12,15,18]]),'sum()')
     self.checkarray(c.sum(D,1),array([[6,15,24]]).T,'sum()')
     
+  def test_inv(self):
+    self.message("Matrix inverse")
+    a = DMatrix([[1,2],[1,3]])
+    self.checkarray(c.dot(c.inv(a),a),eye(2),"DMatrix inverse")
+    
+    
 
     
 if __name__ == '__main__':

@@ -235,6 +235,15 @@ bool isSymbolic(const MX& ex){
   return ex->isSymbolic();
 }
 
+MX trace(const MX& A){
+  casadi_assert_message(A.size1() == A.size2(), "trace: must be square");
+  MX res(0);
+  for (int i=0; i < A.size1(); i ++) {
+    res+=A(i,i);
+  }
+  return res;
+}
+
 MX repmat(const MX &A, int n, int m){
   // First concatenate horizontally
   MX row = horzcat(std::vector<MX >(m, A));

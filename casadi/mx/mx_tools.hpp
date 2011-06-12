@@ -115,6 +115,8 @@ bool isIdentity(const MX& ex);
 /** \brief  check if zero */
 bool isZero(const MX& ex);
 
+MX trace(const MX& A);
+
 /** \brief Repeat matrix A n times vertically and m times horizontally */
 MX repmat(const MX &A, int n, int m); 
 

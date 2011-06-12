@@ -115,7 +115,7 @@ class typemaptests(casadiTestCase):
     #print DMatrix(array([1,2,3,6]),2,2).toArray()
     
   def test_autoconversion(self):
-    self.message("Auto conversion")
+    self.message("Auto conversion DMatrix")
     x=array([2.3])
     s = DMatrix([[1,2],[3,4]])
     n = array(s)
@@ -178,6 +178,17 @@ class typemaptests(casadiTestCase):
     w=2.3
     w/=s
     self.checkarray(w,2.3/n,"")
+
+  def test_autoconversionMX(self):
+    self.message("Auto conversion MX")
+    s = DMatrix([[1,2],[3,4]])
+    x = SX(3)
+    y = MX(3)
+
+    print x*s
+    print s*x
+    print y*s
+    print s*y
     
   def test_set(self):
     self.message("DMatrix set on dense matrices")

@@ -1257,6 +1257,90 @@ class MXtests(casadiTestCase):
     JJ = DMatrix(J.sparsity(),1)
     self.checkarray(JJ,vstack((zeros((3,2)),eye(2))),"diag")
     
+    
+  def test_MatrixAlgebraTableDense(self):
+    self.message("Table of derivatives https://ccrma.stanford.edu/~dattorro/matrixcalc.pdf")
+    
+    n = m = K = L = k = 3
+    t_ = 0.3
+    mu_ = 0.13
+
+    def gentest(m,n):
+      A = MX("A",m,n)
+      return (DMatrix(numpy.random.random((m,n))),A)
+ 
+    (a_,a) = gentest(m,1)
+    (b_,b) = gentest(m,1)
+    (x_,x) = gentest(n,1)
+    (y_,y) = gentest(n,1)
+    (A_,A) = gentest(m,n)
+    (B_,B) = gentest(m,n)
+    (C_,C) = gentest(m,n)
+    (X_,X) = gentest(K,L)
+    (Y_,Y) = gentest(K,L)
+    t = MX(t_)
+    mu = MX(mu_)
+    
+    ins = [a,b,x,y,A,B,X,Y]
+    ins_ = [a_,b_,x_,y_,A_,B_,X_,Y_]
+    
+    def grad(y,x):
+      f = MXFunction(ins,[x])
+      f.init()
+      J = Jacobian(f,ins.index(y))
+      J.init()
+      if x.shape[0]==1 and x.shape[1]==1:
+        return (J.call(ins)[0].T).reshape(y.shape)
+      return J.call(ins)[0].T
+
+    def eye(n):
+      return DMatrix(numpy.eye(n))
+    
+    Axb = c.prod(A,x)-b
+    ab = c.prod(a,b.T)
+    tests = [
+    (grad(x,x),eye(k)),
+    (grad(x,x.T),eye(k)),
+    (grad(x,Axb),A.T),
+    #(grad(x,Axb.T),A)   incorrect?
+    (grad(x,c.prod(Axb.T,Axb)),2*c.prod(A.T,Axb)),
+    #(grad(x,norm_2(Axb)),c.prod(A.T,Axb)/norm_2(Axb))   norm_2 not implemented
+    (grad(x,c.prod(c.prod(x.T,A),x)+2*c.prod(c.prod(x.T,B),y)+c.prod(c.prod(y.T,C),y)),c.prod((A+A.T),x)+2*c.prod(B,y)),
+    #(grad(x,c.prod(a.T,c.prod(x.T,x)*b)),2*c.prod(c.prod(x,a.T),b))
+    (grad(X,X),eye(k**2)),
+    #(grad(X,X.T),eye(k**2))
+    (grad(X,c.prod(a.T,c.prod(X,b))),ab),
+    (grad(X,c.prod(b.T,c.prod(X.T,a))),ab),
+    (grad(X,c.prod(a.T,c.prod(c.prod(X,X),b))),c.prod(X.T,ab)+c.prod(ab,X.T)),
+    (grad(X,c.prod(a.T,c.prod(c.prod(X.T,X),b))),c.prod(X,ab + ab.T)),
+    (grad(x,x*mu),MX(eye(k))*mu),
+    (grad(X,c.trace(X*mu)),MX(eye(k))*mu),
+    (grad(X,c.trace(c.prod(X.T,Y))),Y),
+    (grad(X,c.trace(c.prod(Y,X.T))),Y),
+    (grad(X,c.trace(c.prod(Y.T,X))),Y),
+    (grad(X,c.trace(c.prod(X,Y.T))),Y),
+    (grad(X,c.trace(c.prod(a.T,c.prod(X,b)))),ab)
+    #(grad(X,log(c.det(X))),c.inv(X_)),
+    ]
+
+    cnt = 0
+    for symbol, solution in tests:
+      f = MXFunction(ins,[symbol])
+      f.init()
+      for i in range(len(ins_)):
+        f.input(i).set(ins_[i])
+      f.evaluate()
+      g = MXFunction(ins,[solution])
+      g.init()
+      for i in range(len(ins_)):
+        g.input(i).set(ins_[i])
+      g.evaluate()
+      self.checkarray(f.output(),g.output(),"#%d" % cnt )
+      cnt+=1
+    
+    
+    
+    
 if __name__ == '__main__':
     unittest.main()
 

@@ -101,6 +101,8 @@ Matrix<T> reshape(const Matrix<T>& a, const std::vector<int> sz);
 template<class T>
 Matrix<T> reshape(const Matrix<T>& a, const CRSSparsity& sp);
 
+template<class T>
+T trace(const Matrix<T>& a);
 
 /** \brief  make a vector
   Reshapes/flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
@@ -454,6 +456,16 @@ Matrix<T> reshape(const Matrix<T>& x, const CRSSparsity& sp){
   casadi_assert(x.size()==sp.size());
   
   return Matrix<T>(sp,x.data());
+}
+
+template<class T>
+T trace(const Matrix<T>& a){
+  casadi_assert_message(a.size1() == a.size2(), "trace: must be square");
+  T res=0;
+  for (int i=0; i< a.size1(); i ++) {
+    res+=a(i,i);
+  }
+  return res;
 }
 
 template<class T>
@@ -825,6 +837,7 @@ MTT_INST(T,getSparseTriplet) \
 MTT_INST(T,unite) \
 MTT_INST(T,sum) \
 MTT_INST(T,sum_all) \
+MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 
 #endif //SWIG
