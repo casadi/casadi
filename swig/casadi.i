@@ -185,8 +185,11 @@ PyOS_setsig(SIGINT, SigIntHandler);
 // Auxilliary casadi functions
 %include "casadi_aux.i"
 
+// typemaphelpers
+%include "typemaphelpers.i"
+
 // Matrix typemaps class
-%include "matrixtypemaps.i"
+%include "matrix.i"
 
 // SX class
 %include "sx.i"

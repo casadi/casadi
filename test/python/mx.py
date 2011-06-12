@@ -728,6 +728,10 @@ class MXtests(casadiTestCase):
      
   def test_subsass(self):
      self.message("Check subscripted assignment")
+     
+     X = MX("x",2,2)
+     #X[0,0]=5
+
      x=MX("X",3,4)
      import numpy
      numpy.random.seed(42)

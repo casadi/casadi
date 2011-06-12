@@ -8,13 +8,6 @@
 
 %}
 
-%extend CasADi::Matrix<CasADi::SX>{
-  %rename(__Cgetitem__) __getitem__;
-  %rename(__Csetitem__) __setitem__;
-};
-
-
-
 #ifdef SWIGOCTAVE
 %rename(__el_mul__) __mul__;
 %rename(__el_div__) __div__;

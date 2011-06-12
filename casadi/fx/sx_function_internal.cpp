@@ -375,8 +375,9 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       jblock_ind.push_back(i);
       
       // Make sure that the function as well as variables are vectors
-      assert(input(iind).size2()==1);
-      assert(output(oind).size2()==1);
+      // -> Why? ticket #50   - disabling for now
+      //assert(input(iind).size2()==1);
+      //assert(output(oind).size2()==1);
       
       // Save sparsity
       ret[i] = SXMatrix(jacSparsity(iind,oind));

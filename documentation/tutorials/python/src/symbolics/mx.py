@@ -12,11 +12,10 @@ for i in range(6):
 
 for i in range(2):
 	for j in range(3):
-		print "x[%d,%d]=" % (i,j)
-		print x[i,j]
+		print "x[%d,%d] = %s" % (i,j,str(x[i,j]))
+		
 print x[1,1]
 print x[3] # Note that index is flattened. x[0,0] is illegal.
-# BUG Why is the output x[1]?
 print norm_2(x)
 z= prod(x,y)
 print z
@@ -51,7 +50,7 @@ X = MX(DMatrix(array([[1,2,3],[4,5,6]])))
 print X
 print outer_prod(X,X)
 print MX(trans(DMatrix([1,2,3])))
-print MX(DMatrix([1,2,3]))
+print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
 Y = MX("Y")
 f = MXFunction([Y],[X])
@@ -62,7 +61,7 @@ print f.output()
 
 #! Element assignement
 #! -------------------
-#X = MX("x",2,2)
-#X[0,0]=5
-#print X, X[0,0]
+X = MX("x",2,2)
+X[0,0]=MX(5)
+print X
  

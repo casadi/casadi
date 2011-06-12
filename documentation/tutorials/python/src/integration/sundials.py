@@ -15,12 +15,7 @@ f  = SXFunction([[x,y],[u]], [[(1-y*y)*x-y+u,x]])
 #! input/output signature
 #! f(time;states;parameters)
 t = SX("t")
-fmod = ODE_NUM_IN * [[]]
-fmod[ODE_T] = SXMatrix([t])
-fmod[ODE_Y] = f.inputSX(0)
-fmod[ODE_P] = f.inputSX(1)
-print fmod
-fmod=SXFunction(fmod,[f.outputSX(0)])
+fmod=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: f.inputSX(0), DAE_P: f.inputSX(1)},[f.outputSX(0)])
 fmod.setOption("name","ODE right hand side")
 #! Create the CVodesIntegrator
 integrator = CVodesIntegrator(fmod)
@@ -29,6 +24,8 @@ integrator.setOption("fsens_err_con",True)
 integrator.setOption("quad_err_con",True)
 integrator.setOption("abstol",1e-6)
 integrator.setOption("reltol",1e-6)
+tend=10
+integrator.setOption("tf",tend)
 integrator.init()
 #! The integrator is really just a special kind of FX.
 #$ Quoting the integrator.hpp header documentation:
@@ -57,11 +54,8 @@ print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #!  - method B, using Simulator
 #!
 #! We demonstrate first method A:
-tend=10
 ts=linspace(0,tend,100)
 x0 = 0;y0 = 1
-integrator.input(INTEGRATOR_T0).set(0)
-integrator.input(INTEGRATOR_TF).set(tend)
 integrator.input(INTEGRATOR_X0).set([x0,y0])
 integrator.input(INTEGRATOR_P).set(0)
 integrator.evaluate()
@@ -100,9 +94,6 @@ print linalg.norm(sol-sol2)
 #$ affects the solution at tend $x(tend)=x'(tend)+\delta x(tend)$.
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
 
-integrator.input(INTEGRATOR_T0).set(0)
-integrator.input(INTEGRATOR_TF).set(tend)
-
 def out(dx0):
 	integrator.input(INTEGRATOR_X0).set([x0+dx0,y0])
 	integrator.evaluate()
@@ -135,7 +126,7 @@ show()
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
 def out(t):
-	integrator.input(INTEGRATOR_TF).set(t);
+	integrator.setFinalTime(t)
 	integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
 	integrator.evaluate(1,0)
 	A=integrator.fwdSens().toArray()
@@ -181,7 +172,8 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX("u")
-w=integrator([MX(0),MX(10),MX([1,0]),u])
+integrator.setFinalTime(tend)
+w=integrator({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: MX([1,0]), INTEGRATOR_P: u})
 
 #! We construct an MXfunction and a python help function 'out'
 f=MXFunction([u],[w])

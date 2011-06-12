@@ -150,23 +150,23 @@ class MX : public SharedObject{
     }
     
     /// set a non-zero
-    void indexed_one_based_assignment(int k, const MX& m){ at(k-1) = m(0,0);}
-    void indexed_zero_based_assignment(int k, const MX& m){ at(k) = m(0,0);}
-    void indexed_assignment(const IndexList &k, const MX& m){
+    void indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
+    void indexed_zero_based_assignment(int k, const MX &m){ at(k) = m(0,0);}
+    void indexed_assignment(const IndexList &k, const MX &m){
       (*this)[k.getAll(size())] = m;
     }
-    void indexed_assignment(const Slice &k, const MX& m){
+    void indexed_assignment(const Slice &k, const MX &m){
       (*this)[k.getAll(size())] = m;
     }
     
     /// set a matrix element
-    void indexed_one_based_assignment(int i, int j, const MX & m){ (*this)(i-1,j-1) = m;}
-    void indexed_zero_based_assignment(int i, int j, const MX& m){ (*this)(i,j) = m;}
-    void indexed_assignment(const IndexList &i, const IndexList &j, const MX& m){
+    void indexed_one_based_assignment(int i, int j, const MX &m){ (*this)(i-1,j-1) = m;}
+    void indexed_zero_based_assignment(int i, int j, const MX &m){ (*this)(i,j) = m;}
+    void indexed_assignment(const IndexList &i, const IndexList &j, const MX &m){
       setSub(i.getAll(size1()),j.getAll(size2()),m);
     }
     
-    void indexed_assignment(const Slice &i, const Slice &j, const MX& m){
+    void indexed_assignment(const Slice &i, const Slice &j, const MX &m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
     //@}

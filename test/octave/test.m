@@ -1,6 +1,10 @@
+quit
+
 casadi
 
 disp('operators on SX')
+
+
 
 x = SX("x")
 x**2
