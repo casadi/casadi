@@ -79,7 +79,7 @@ class MX : public SharedObject{
     virtual ~MX();
 
 #ifndef SWIG
-    /** \brief  Create from node */
+   /** \brief  Create from node */
     static MX create(MXNode* node);
 
     /** \brief  Get matrix non-zero */
@@ -98,25 +98,25 @@ class MX : public SharedObject{
     const MX operator()(int i, int j) const;
  
     /** \brief  Access matrix element */
-    SubMatrix<MX> operator()(int i, int j);
+    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(int i, int j);
 
     /** \brief  Get a column, or parts of a one */
     const MX operator()(const std::vector<int>& ii, int j=0) const;
     
     /** \brief  Access a column, or parts of a one */
-    SubMatrix<MX > operator()(const std::vector<int>& ii, int j=0);
+    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, int j=0);
 
     /** \brief  Get a row, or parts of a one */
     const MX operator()(int i, const std::vector<int>& jj) const;
     
     /** \brief  Access a row, or parts of a one */
-    SubMatrix<MX > operator()(int i, const std::vector<int>& jj);
+    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(int i, const std::vector<int>& jj);
     
     /** \brief  Get a submatrix */
     const MX operator()(const std::vector<int>& ii, const std::vector<int>& jj) const;
 
     /** \brief  Access a submatrix */
-    SubMatrix<MX > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
+    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
 
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;

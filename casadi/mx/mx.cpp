@@ -167,11 +167,11 @@ const MX MX::operator()(const vector<int>& ii, const vector<int>& jj) const{
   return getSub(ii,jj);
 }
 
-SubMatrix<MX > MX::operator()(const vector<int>& ii, const vector<int>& jj){
-  return SubMatrix<MX>(*this,ii, jj);
+SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(const vector<int>& ii, const vector<int>& jj){
+  return SubMatrix<MX,std::vector<int>,std::vector<int> >(*this,ii, jj);
 }
 
-SubMatrix<MX> MX::operator()(int i, int j){
+SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(int i, int j){
   return operator()(vector<int>(1,i),vector<int>(1,j));
 }
 
@@ -183,11 +183,11 @@ const MX MX::operator()(int i, const vector<int>& jj) const{
   return operator()(vector<int>(1,i),jj);
 }
 
-SubMatrix<MX > MX::operator()(const vector<int>& ii, int j){
+SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(const vector<int>& ii, int j){
   return operator()(ii, vector<int>(1,j));
 }
 
-SubMatrix<MX > MX::operator()(int i, const vector<int>& jj){
+SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(int i, const vector<int>& jj){
   return operator()(vector<int>(1,i), jj);
 }
 

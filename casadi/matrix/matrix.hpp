@@ -247,19 +247,19 @@ class Matrix : public PrintableObject{
     const T operator()(int i, int j=0) const{ return getElement(i,j); }
 
     /// Access a submatrix
-    SubMatrix<Matrix<T> > operator()(const std::vector<int>& ii, const std::vector<int>& jj){ return SubMatrix<Matrix<T> >(*this,ii,jj);}
+    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, const std::vector<int>& jj){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,ii,jj);}
     
     /// Get a submatrix
     const Matrix<T> operator()(const std::vector<int>& ii, const std::vector<int>& jj) const{ return getSub(ii,jj);}
 
     /// Access a row
-    SubMatrix<Matrix<T> > operator()(int i, const std::vector<int>& jj){ return SubMatrix<Matrix<T> >(*this,std::vector<int>(1,i),jj);}
+    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(int i, const std::vector<int>& jj){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,std::vector<int>(1,i),jj);}
     
     /// Get a row
     const Matrix<T> operator()(int i, const std::vector<int>& jj) const{ return getSub(std::vector<int>(1,i),jj);}
 
     /// Access a column
-    SubMatrix<Matrix<T> > operator()(const std::vector<int>& ii, int j){ return SubMatrix<Matrix<T> >(*this,ii,std::vector<int>(1,j));}
+    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, int j){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,ii,std::vector<int>(1,j));}
     
     /// Get a column
     const Matrix<T> operator()(const std::vector<int>& ii, int j) const{ return getSub(ii,std::vector<int>(1,j));}
@@ -270,7 +270,7 @@ class Matrix : public PrintableObject{
     
     /// Get all rows
     template<class A>
-    SubMatrix<Matrix<T> > operator()(const Slice& i, A j){ return operator()(i.getAll(size1()),j);}
+    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const Slice& i, A j){ return operator()(i.getAll(size1()),j);}
   
     /// Access all columns
     template<class A>
@@ -278,13 +278,13 @@ class Matrix : public PrintableObject{
 
     /// Get all columns
     template<class A>
-    SubMatrix<Matrix<T> > operator()(A i, const Slice& j){ return operator()(i,j.getAll(size2()));}
+    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(A i, const Slice& j){ return operator()(i,j.getAll(size2()));}
 
     /// Get all rows and columns
     const Matrix<T> operator()(const Slice& i, const Slice& j) const{ return operator()(i.getAll(size1()),j.getAll(size2()));}
 
     /// Access all rows and columns
-    SubMatrix<Matrix<T> > operator()(const Slice& i, const Slice& j){ return operator()(i.getAll(size1()),j.getAll(size2()));}
+    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const Slice& i, const Slice& j){ return operator()(i.getAll(size1()),j.getAll(size2()));}
 
     /// Get a non-zero element
     const T& at(int k) const{ if (k<0) k+=size(); return data().at(k); }

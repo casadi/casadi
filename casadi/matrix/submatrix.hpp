@@ -33,15 +33,15 @@ namespace CasADi{
 */
 
 /// submatrix
-template<typename M>
+template<typename M, typename I, typename J>
 class SubMatrix : public M{
   public:
     /// Constructor
-    SubMatrix(M& mat, const std::vector<int>& ii, const std::vector<int>& jj) : M(mat.getSub(ii,jj)), mat_(mat), ii_(ii), jj_(jj){}
+    SubMatrix(M& mat, const I& i, const J& j) : M(mat.getSub(i,j)), mat_(mat), i_(i), j_(j){}
 
     //@{
     /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)
-    const M& operator=(const SubMatrix<M> &y);
+    const M& operator=(const SubMatrix<M,I,J> &y);
     const M& operator=(const M &y);
     M operator+=(const M &y);
     M operator-=(const M &y);
@@ -54,48 +54,49 @@ class SubMatrix : public M{
     M& mat_;
     
     /// The element of the matrix that is allowed to be modified
-    std::vector<int> ii_, jj_;
+    I i_;
+    J j_;
 };
 
 // Implementation
-template<typename M>
-const M& SubMatrix<M>::operator=(const SubMatrix<M> &y) { 
-  mat_.setSub(ii_,jj_,y); 
+template<typename M, typename I, typename J>
+const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) { 
+  mat_.setSub(i_,j_,y); 
   return y;
 }
 
 // Implementation
-template<typename M>
-const M& SubMatrix<M>::operator=(const M &y) { 
-  mat_.setSub(ii_,jj_,y); 
+template<typename M, typename I, typename J>
+const M& SubMatrix<M,I,J>::operator=(const M &y) { 
+  mat_.setSub(i_,j_,y); 
   return y;
 }
 
-template<typename M>
-M SubMatrix<M>::operator+=(const M &y){ 
+template<typename M, typename I, typename J>
+M SubMatrix<M,I,J>::operator+=(const M &y){ 
   M s = *this+y;
-  mat_.setSub(ii_,jj_,s); 
+  mat_.setSub(i_,j_,s); 
   return s;
 }
 
-template<typename M>
-M SubMatrix<M>::operator-=(const M &y){ 
+template<typename M, typename I, typename J>
+M SubMatrix<M,I,J>::operator-=(const M &y){ 
   M s = *this-y;
-  mat_.setSub(ii_,jj_,s); 
+  mat_.setSub(i_,j_,s); 
   return s;
 }
 
-template<typename M>
-M SubMatrix<M>::operator*=(const M &y){ 
+template<typename M, typename I, typename J>
+M SubMatrix<M,I,J>::operator*=(const M &y){ 
    M s = *this*y;
-   mat_.setSub(ii_,jj_,s); 
+   mat_.setSub(i_,j_,s); 
    return mat_;
 }
 
-template<typename M>
-M SubMatrix<M>::operator/=(const M &y){ 
+template<typename M, typename I, typename J>
+M SubMatrix<M,I,J>::operator/=(const M &y){ 
    M s = *this/y;
-  mat_.setSub(ii_,jj_,s); 
+  mat_.setSub(i_,j_,s); 
   return s;
 }
 
