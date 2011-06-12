@@ -102,8 +102,8 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         bool isx = mapping_[i]<=0;
         bool isy = mapping_[i]>=0;
 
-        double x = isx * input[0][ix];
-        double y = isy * input[1][iy];
+        double x = isx ? input[0][ix] : 0;
+        double y = isy ? input[1][iy] : 0;
 
         // Evaluate and get partial derivatives
         casadi_math<double>::fun[op](x,y,output[i]);
@@ -111,13 +111,13 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = isx*tmp[0]*fwdSeed[0][d][ix] + isy*tmp[1]*fwdSeed[1][d][iy];
+          fwdSens[d][i] = (isx ? tmp[0]*fwdSeed[0][d][ix]: 0) + (isy ? tmp[1]*fwdSeed[1][d][iy]: 0);
         }
 
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          adjSens[0][d][ix] += isx*adjSeed[d][i]*tmp[0];
-          adjSens[1][d][iy] += isy*adjSeed[d][i]*tmp[1];
+          adjSens[0][d][ix] += isx ? adjSeed[d][i]*tmp[0] : 0;
+          adjSens[1][d][iy] += isy ? adjSeed[d][i]*tmp[1] : 0;
         }
         
         // Increase argument indices
