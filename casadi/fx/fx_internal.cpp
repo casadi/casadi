@@ -283,7 +283,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   casadi_assert_message(isInit(),"Function not initialized.");
   
   // Get a reference to the block
-  CRSSparsity& jsp = jac_sparsity_.getElementRef(oind,iind);
+  CRSSparsity& jsp = jac_sparsity_.elem(oind,iind);
   
   // Generate, if null
   if(jsp.isNull()){

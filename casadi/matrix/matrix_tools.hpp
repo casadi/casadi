@@ -352,10 +352,10 @@ T det(const Matrix<T>& a){
   casadi_assert_message(n == a.size2(),"matrix must be square");
 
   // Trivial return if scalar
-  if(isScalar(a)) return a(0);
+  if(isScalar(a)) return a.toScalar();
 
   // Return expression
-  T ret = 0;
+  Matrix<T> ret = 0;
 
   // We expand the matrix along the first column
   for(int i=0; i<n; ++i){
@@ -364,7 +364,7 @@ T det(const Matrix<T>& a){
     ret += a(i,0)*cofactor(a,i,0);
 
   }
-  return ret;
+  return ret.toScalar();
 }
 
 template<class T>
@@ -637,8 +637,8 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
 template<class T>
 Matrix<T> linspace(const Matrix<T> &a_, const Matrix<T> &b_, int nsteps){
   casadi_assert_message(isScalar(a_) && isScalar(b_), "linspace: a and b must be scalar");
-  T a = a_(0);
-  T b = b_(0);
+  T a = a_.toScalar();
+  T b = b_.toScalar();
   Matrix<T> ret(nsteps,1);
   ret(0) = a;
   T step = (b-a)/(nsteps-1);

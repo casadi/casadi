@@ -33,7 +33,7 @@ Matrix<SX> gauss_quadrature(Matrix<SX> f, const Matrix<SX> &x, const Matrix<SX> 
   casadi_assert_message(w.empty(),"gauss_quadrature: empty weights");
 
   // Change variables to [-1,1]
-  if(!a(0)->isEqual(-1) || !b(0)->isEqual(1)){
+  if(!a.toScalar().isEqual(-1) || !b.toScalar().isEqual(1)){
     Matrix<SX> q1 = (b-a)/2;
     Matrix<SX> q2 = (b+a)/2;
 
@@ -144,7 +144,7 @@ Matrix<SX> rectangle(const Matrix<SX>& a){
 }
 
 Matrix<SX> triangle(const Matrix<SX>& a){
-  return rectangle(a(0,0)/2)*(1-std::abs(a(0,0)));
+  return rectangle(a.toScalar()/2)*(1-std::abs(a.toScalar()));
 }
 
 Matrix<SX> sign(const Matrix<SX>& a){
@@ -153,7 +153,7 @@ Matrix<SX> sign(const Matrix<SX>& a){
 
 bool contains(const Matrix<SX> &list, const SX &e) {
   for (int i=0;i<nnz(list);i++) {
-    if (list(i)->isEqual(e)) return true;
+    if (list(i).toScalar()->isEqual(e)) return true;
   }
   return false;
 }
@@ -286,7 +286,7 @@ Matrix<SX> spy(const Matrix<SX>& A){
   Matrix<SX> s(A.size1(),A.size2());
   for(int i=0; i<A.size1(); ++i)
     for(int j=0; j<A.size2(); ++j)
-      if(!A(i,j)->isZero())
+      if(!A(i,j).toScalar()->isZero())
         s(i,j) = 1;
   return s;
 }
@@ -351,27 +351,27 @@ Matrix<SX> hessian(const Matrix<SX>& ex, const Matrix<SX> &arg) {
 
 double getValue(const Matrix<SX>& ex, int i, int j) {
   casadi_assert(i<ex.size1() && j<ex.size2());
-  return ex(i,j)->getValue();
+  return ex(i,j).toScalar().getValue();
 }
 
 int getIntValue(const Matrix<SX>& ex, int i, int j) {
   casadi_assert(i<ex.size1() && j<ex.size2());
-  return ex(i,j)->getIntValue();
+  return ex(i,j).toScalar().getIntValue();
 }
 
 void getValue(const Matrix<SX>& ex, double *res) {
   for(int i=0; i<ex.numel(); ++i)
-    res[i] = ex(i)->getValue();
+    res[i] = ex(i).toScalar()->getValue();
 }
 
 void getIntValue(const Matrix<SX>& ex, int *res) {
   for(int i=0; i<ex.numel(); ++i)
-    res[i] = ex(i)->getIntValue();
+    res[i] = ex(i).toScalar().getIntValue();
 }
 
 const string& getName(const Matrix<SX>& ex) {
   casadi_assert_message(isScalar(ex),"the expression must be scalar");
-  return ex(0)->getName();
+  return ex(0).toScalar()->getName();
 }
 
 istream& operator>>(istream &stream, Matrix<SX> &expr){
@@ -398,47 +398,47 @@ istream& operator>>(istream &stream, Matrix<SX> &expr){
 
 Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() <= b.getElement();
+  return a.toScalar() <= b.toScalar();
 }
 
 Matrix<SX> operator>=(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() >= b.getElement();
+  return a.toScalar() >= b.toScalar();
 }
 
 Matrix<SX> operator<(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() < b.getElement();
+  return a.toScalar() < b.toScalar();
 }
 
 Matrix<SX> operator>(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() > b.getElement();
+  return a.toScalar() > b.toScalar();
 }
 
 Matrix<SX> operator&&(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() && b.getElement();
+  return a.toScalar() && b.toScalar();
 }
 
 Matrix<SX> operator||(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() || b.getElement();
+  return a.toScalar() || b.toScalar();
 }
 
 Matrix<SX> operator==(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() == b.getElement();
+  return a.toScalar() == b.toScalar();
 }
 
 Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.getElement() != b.getElement();
+  return a.toScalar() != b.toScalar();
 }
 
 Matrix<SX> operator!(const Matrix<SX> &a){
   casadi_assert_message(a.scalar(), "conditional operators only defined for scalars");
-  return !a.getElement();
+  return !a.toScalar();
 }
 
 Matrix<SX>& operator<<(Matrix<SX>& expr, const Matrix<SX>& add){
@@ -448,7 +448,7 @@ Matrix<SX>& operator<<(Matrix<SX>& expr, const Matrix<SX>& add){
 
 void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
   casadi_assert(ex2.scalar());
-  SX ex = ex2.getElement();
+  SX ex = ex2.toScalar();
   
   // Terms, weights and indices of the nodes that are already expanded
   std::vector<std::vector<SXNode*> > terms;
@@ -577,7 +577,7 @@ void simplify(SX& ex){
 
   // Make a scalar product to get the simplified expression
   Matrix<SX> s = prod(trans(weights),terms);
-  ex = s.getElement();
+  ex = s.toScalar();
 }
 
 void fill(Matrix<SX>& mat, const SX& val){

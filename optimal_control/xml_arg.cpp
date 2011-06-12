@@ -56,7 +56,7 @@ StrArg::operator SXMatrix() const{
 
 StrArg::operator SX() const{
   SXMatrix m = *this;
-  return SX(m.getElement());
+  return m.toScalar();
 }
 
 StrArg::operator MX() const{

@@ -159,6 +159,8 @@ class MX : public SharedObject{
     }
     //@}
     
+    /// Scalar type
+    typedef MX ScalarType;
 
     /** \brief  Get the number of (structural) non-zero elements */
     int size() const;

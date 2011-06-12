@@ -29,7 +29,6 @@
 #include "../casadi_limits.hpp"
 #include "../casadi_operators.hpp"
 #include "slice.hpp"
-#include "element.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
@@ -66,6 +65,7 @@ template<class T>
 class Matrix : public PrintableObject{
 
   public:
+    
     /** \brief  constructors */
     /// empty 0-by-0 matrix constructor
     Matrix();
@@ -109,10 +109,14 @@ class Matrix : public PrintableObject{
     /// Construct dense matrix from a vector with the elements in column major ordering
     Matrix(const std::vector<T>& x, int n, int m);
 
+    /// Convert to scalar type
+    const T toScalar() const;
+//    operator const T() const;
+    
+    /// Scalar type
+    typedef T ScalarType;
+    
 #ifndef SWIG
-    /// This constructor enables implicit type conversion from a matrix element
-    Matrix(const Element<Matrix<T>,T>& val);
-
     /// Expose iterators
     typedef typename std::vector<T>::iterator iterator;
     typedef typename std::vector<T>::const_iterator const_iterator;
@@ -209,42 +213,50 @@ class Matrix : public PrintableObject{
     bool dense() const; // is the matrix dense
     //@}
 
-
-#ifndef SWIG    
     /// get an element
-    const T getElement(int i=0, int j=0) const;
+    const T& elem(int i=0, int j=0) const;
     
-    /// set an element
-    void setElement(int i, int j, const T& el);
-
     /// get a reference to an element
-    T& getElementRef(int i=0, int j=0);
+    T& elem(int i=0, int j=0);
   
     /// Get a submatrix
-    Matrix<T> getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
+    const Matrix<T> getSub(int i, int j) const;
+    const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
     
-    /// Set a submatrix
-    void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& m);
+    /// Get slice of rows
+    template<class A>
+    const Matrix<T> getSub(const Slice& i, A j) const{ return getSub(i.getAll(size1()),j);}
+  
+    /// Get slice of columns
+    template<class A>
+    const Matrix<T> getSub(A i, const Slice& j) const{ return getSub(i,j.getAll(size2()));}
 
-#endif // SWIG
+    /// Set a submatrix
+    void setSub(int i, int j, const Matrix<T>& m);
+    void setSub(const std::vector<int>& i, const std::vector<int>& j, const Matrix<T>& m);
+
+    /// Access slice of rows
+    template<class A>
+    void setSub(const Slice& i, A j){ setSub(i.getAll(size1()),j);}
+
+    /// Access slice of columns
+    template<class A>
+    void setSub(A i, const Slice& j){ setSub(i,j.getAll(size2()));}
 
     /// Get nonzeros
-    Matrix<T> getNZ(const std::vector<int>& kk) const;
+    const Matrix<T> getNZ(int k) const;
+    const Matrix<T> getNZ(const std::vector<int>& k) const;
     
-    /** \brief set nonzeros
-    m.size() must equal kk.size() unless m is scalar
-    */
-    void setNZ(const std::vector<int>& kk, const Matrix<T>& m);
-
-    void setNZ(const std::vector<int>& kk, const T& m);
+    void setNZ(int k, const Matrix<T>& m);
+    void setNZ(const std::vector<int>& k, const Matrix<T>& m);
     
 #ifndef SWIG 
 
-    /// Access an element 
-    Element<Matrix<T>,T> operator()(int i, int j=0){ return Element<Matrix<T>,T>(*this,i,j); }
+    /// Access an element
+    SubMatrix<Matrix<T>,int,int> operator()(int i, int j=0){ return SubMatrix<Matrix<T>,int,int>(*this,i,j); }
 
     /// Get an element 
-    const T operator()(int i, int j=0) const{ return getElement(i,j); }
+    const Matrix<T> operator()(int i, int j=0) const{ return elem(i,j); }
 
     /// Access a submatrix
     SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, const std::vector<int>& jj){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,ii,jj);}
@@ -320,8 +332,8 @@ class Matrix : public PrintableObject{
     }
     
     /// get a matrix element
-    const T indexed_one_based(int i, int j) const{ return (*this)(i-1,j-1);}
-    const T indexed_zero_based(int i, int j) const{ return (*this)(i,j);}
+    const T indexed_one_based(int i, int j) const{ return elem(i-1,j-1);}
+    const T indexed_zero_based(int i, int j) const{ return elem(i,j);}
     const Matrix<T> indexed(const IndexList &i, const IndexList &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
@@ -340,8 +352,8 @@ class Matrix : public PrintableObject{
     }
     
     /// set a matrix element
-    void indexed_one_based_assignment(int i, int j, const T & m){ (*this)(i-1,j-1) = m;}
-    void indexed_zero_based_assignment(int i, int j, const T & m){ (*this)(i,j) = m;}
+    void indexed_one_based_assignment(int i, int j, const T & m){ elem(i-1,j-1) = m;}
+    void indexed_zero_based_assignment(int i, int j, const T & m){ elem(i,j) = m;}
     void indexed_assignment(const IndexList &i, const IndexList &j, const Matrix<T>& m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
@@ -644,21 +656,16 @@ namespace CasADi{
 // Implementations
 
 template<class T>
-const T Matrix<T>::getElement(int i, int j) const{
+const T& Matrix<T>::elem(int i, int j) const{
   int ind = sparsity().getNZ(i,j);
   if(ind==-1)
-    return 0;
+    return casadi_limits<T>::zero;
   else
     return at(ind);
 }
 
 template<class T>
-void Matrix<T>::setElement(int i, int j, const T& el){
-  getElementRef(i,j) = el;
-}
-
-template<class T>
-T& Matrix<T>::getElementRef(int i, int j){
+T& Matrix<T>::elem(int i, int j){
   int oldsize = sparsity().size();
   int ind = sparsityRef().getNZ(i,j);
   if(oldsize != sparsity().size())
@@ -667,7 +674,12 @@ T& Matrix<T>::getElementRef(int i, int j){
 }
 
 template<class T>
-Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+const Matrix<T> Matrix<T>::getSub(int i, int j) const{
+  return getSub(std::vector<int>(1,i),std::vector<int>(1,j));
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   // Nonzero mapping from submatrix to full
   std::vector<int> mapping;
   
@@ -686,12 +698,17 @@ Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& 
 }
 
 template<class T>
+void Matrix<T>::setSub(const int i, int j, const Matrix<T>& el){
+  setSub(std::vector<int>(1,i),std::vector<int>(1,j),el);
+}
+
+template<class T>
 void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& el){
   casadi_assert_message(el.numel()==1 || (ii.size() == el.size1() && jj.size() == el.size2()),"Dimension mismatch.");
   
   // If m is scalar
   if(el.numel() != ii.size() * jj.size()){
-    setSub(ii,jj,Matrix<T>(ii.size(),jj.size(),el(0,0)));
+    setSub(ii,jj,Matrix<T>(ii.size(),jj.size(),el.toScalar()));
     return;
   }
 
@@ -718,18 +735,24 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
 }
 
 template<class T>
-Matrix<T> Matrix<T>::getNZ(const std::vector<int>& kk) const{
-  Matrix<T> ret(kk.size(),1,0);
-  for(int k=0; k<kk.size(); ++k)
-    ret[k] = data()[kk[k]];
+const Matrix<T> Matrix<T>::getNZ(int k) const{
+  if (k<0) k+=size();
+  return getNZ(std::vector<int>(1,k));
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::getNZ(const std::vector<int>& k) const{
+  Matrix<T> ret(k.size(),1,0);
+  for(int el=0; el<k.size(); ++el)
+    ret[el] = data()[k[el]];
   
   return ret;
 }
 
 template<class T>
-void Matrix<T>::setNZ(const std::vector<int>& kk, const T& m){
-  for(int k=0; k<kk.size(); ++k)
-    data()[kk[k]] = m;
+void Matrix<T>::setNZ(int k, const Matrix<T>& m){
+  if (k<0) k+=size();
+  setNZ(std::vector<int>(1,k),m);
 }
 
 template<class T>
@@ -886,44 +909,31 @@ void Matrix<T>::makeEmpty(int n, int m){
 template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {
   casadi_assert_message(numel()==1, "not a scalar");
-  stream << (*this)(0);
+  stream << toScalar();
 }
   
 template<class T>
 void Matrix<T>::printVector(std::ostream &stream) const {
-  // print dimension and first element
+  casadi_assert_message(vector(),"Not a vector");
   stream << "[";
-  stream << (*this)(0);
-  for(int i=1; i<size1(); i++){
-    stream << "," << (*this)(i);
-  }
-  stream << "]";  
-}
-
-template<class T>
-void Matrix<T>::printMatrix(std::ostream &stream) const{ 
- // print the first row
- stream << "[[";
-  stream << (*this)(0,0);
-  for(int j=1; j<size2(); j++){
-    stream << "," << (*this)(0,j);
- }
- stream << "]";
- // print the rest of the rows
- for(int i=1; i<size1(); i++){  
-    stream << ",["; 
-    stream << (*this)(i,0);
-    for(int j=1; j<size2(); j++){
-      stream << "," << (*this)(i,j);
+  
+  // Loop over rows
+  for(int i=0; i<size1(); ++i){
+    // Add delimitor
+    if(i!=0) stream << ",";
+    
+    // Check if nonzero
+    if(rowind(i)==rowind(i+1)){
+      stream << "0";
+    } else {
+      stream << data()[rowind(i)];
     }
-    stream << "]";
   }
   stream << "]";  
 }
 
 template<class T>
-void Matrix<T>::printDense(std::ostream &stream) const{
-  stream << size1() << "-by-" << size2() << " matrix:" << std::endl;
+void Matrix<T>::printMatrix(std::ostream &stream) const{
   for(int i=0; i<size1(); ++i){
     if(i==0)
       stream << "[[";
@@ -950,6 +960,12 @@ void Matrix<T>::printDense(std::ostream &stream) const{
     else
       stream << "]" << std::endl;
   }
+}
+
+template<class T>
+void Matrix<T>::printDense(std::ostream &stream) const{
+  stream << size1() << "-by-" << size2() << " matrix:" << std::endl;
+  printMatrix(stream);
 }
 
 
@@ -1024,12 +1040,6 @@ template<class T>
 void Matrix<T>::clear(){
   sparsity_ = CRSSparsity(0,0,false);
   data().clear();
-}
-
-template<class T>
-Matrix<T>::Matrix(const Element<Matrix<T>,T>& val){
-  sparsity_ = CRSSparsity(1,1,true);
-  data().resize(1,T(val));
 }
 
 template<class T>
@@ -1135,11 +1145,11 @@ template<class T>
 void Matrix<T>::binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y){
   if(x.scalar())
     if(y.scalar())
-      *this = fcn(x(0),y(0));
+      *this = fcn(x.toScalar(),y.toScalar());
     else
-      scalar_matrix(fcn,x(0),y);
+      scalar_matrix(fcn,x.toScalar(),y);
   else if(y.scalar())
-    matrix_scalar(fcn,x,y(0));
+    matrix_scalar(fcn,x,y.toScalar());
   else
     matrix_matrix(fcn,x,y);
 }
@@ -1157,7 +1167,7 @@ void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Ma
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
       int j = y.col(el);
-      getElementRef(i,j) = fcn(x,y[el]);
+      elem(i,j) = fcn(x,y[el]);
     }
   }
 }
@@ -1175,7 +1185,7 @@ void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, 
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
       int j = x.col(el);
-      getElementRef(i,j) = fcn(x[el],y);
+      elem(i,j) = fcn(x[el],y);
     }
   }
 }
@@ -1207,11 +1217,11 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
       int j2 = (el2 < k2) ? y.col(el2) : numel() ;
       
       if(j1==j2)
-        getElementRef(i,j1) = fcn(x[el1++],y[el2++]); 
+        elem(i,j1) = fcn(x[el1++],y[el2++]); 
       else if(j1>j2)
-        getElementRef(i,j2) = fcn(0,y[el2++]);
+        elem(i,j2) = fcn(0,y[el2++]);
       else
-        getElementRef(i,j1) = fcn(x[el1++],0);
+        elem(i,j1) = fcn(x[el1++],0);
       }
     }
 }
@@ -1692,6 +1702,23 @@ Matrix<T> Matrix<T>::trans() const{
     ret[i] = (*this)[mapping[i]];
   
   return ret;
+}
+
+// template<class T>
+// Matrix<T>::operator const T() const{
+//   return toScalar();
+// }
+
+template<class T>
+const T Matrix<T>::toScalar() const{
+  // Make sure that the matrix is 1-by-1
+  casadi_assert_message(scalar(),"Can only convert 1-by-1 matrices to scalars");
+
+  // return zero or the nonzero element
+  if(size()==1)
+    return data()[0];
+  else
+    return casadi_limits<T>::zero;
 }
 
 } // namespace CasADi

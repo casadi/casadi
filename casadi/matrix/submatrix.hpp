@@ -48,7 +48,7 @@ class SubMatrix : public M{
     M operator*=(const M &y);
     M operator/=(const M &y);
     //@}
-
+    
   private:
     /// A reference to the matrix that is allowed to be modified
     M& mat_;

@@ -70,6 +70,15 @@ SX::SX(const char name[]){
   node->count++;
 }
 
+SX::SX(const Matrix<SX>& m){
+  // Assign the node a temporary value
+  node = casadi_limits<SX>::zero.node;
+  node->count++;
+  
+  // Copy the value
+  *this = m.toScalar();
+}
+
 SX::~SX(){
   if(--node->count == 0) delete node;
 }
@@ -529,43 +538,6 @@ SX casadi_operators<SX>::fabs(const SX&x){
   return x.fabs();
 }
 
-Element<Matrix<SX>,SX>::Element(Matrix<SX>& mat, int i, int j) : mat_(mat), i_(i), j_(j){
-  static_cast<SX&>(*this) = SX(mat_.getElement(i,j)); // cant put this in the parameter list!!!
-}
-
-SX Element<Matrix<SX>,SX>::operator=(const Element<Matrix<SX>,SX> &y){
-  mat_.setElement(i_,j_,y);
-  return y;
-}
-
-SX Element<Matrix<SX>,SX>::operator=(const SX &y){
-  mat_.setElement(i_,j_,y);
-  return y;
-}
-  
-SX Element<Matrix<SX>,SX>::operator+=(const SX &y){
-  SX s = *this+y;
-  mat_.setElement(i_,j_,s);
-  return s;
-}
-
-SX Element<Matrix<SX>,SX>::operator-=(const SX &y){
-  SX s = *this-y;
-  mat_.setElement(i_,j_,s);
-  return s;
-}
-
-SX Element<Matrix<SX>,SX>::operator*=(const SX &y){
-  SX s = *this*y;
-  mat_.setElement(i_,j_,s);
-  return s;
-}
-
-SX Element<Matrix<SX>,SX>::operator/=(const SX &y){
-  SX s = *this/y;
-  mat_.setElement(i_,j_,s);
-  return s;
-}
 
 SX::operator Matrix<SX>() const{
   return Matrix<SX>(1,1,*this);

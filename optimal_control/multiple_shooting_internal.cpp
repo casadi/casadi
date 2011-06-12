@@ -181,24 +181,24 @@ void MultipleShootingInternal::getGuess(vector<double>& V_init) const{
   
     // Pass guess for parameters
     for(int i=0; i<np_; ++i){
-      V_init[el++] = p_init(i);
+      V_init[el++] = p_init.elem(i);
     }
   
   for(int k=0; k<nk_; ++k){
     // Pass guess for state
     for(int i=0; i<nx_; ++i){
-      V_init[el++] = x_init(i,k);
+      V_init[el++] = x_init.elem(i,k);
     }
     
     // Pass guess for control
     for(int i=0; i<nu_; ++i){
-      V_init[el++] = u_init(i,k);
+      V_init[el++] = u_init.elem(i,k);
     }
   }
 
   // Pass guess for final state
   for(int i=0; i<nx_; ++i){
-    V_init[el++] = x_init(i,nk_);
+    V_init[el++] = x_init.elem(i,nk_);
   }
   
   casadi_assert(el==V_init.size());
@@ -219,34 +219,34 @@ void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<d
   
   // Pass bounds on parameters
   for(int i=0; i<np_; ++i){
-    V_min[min_el++] = p_min(i);
-    V_max[max_el++] = p_max(i);
+    V_min[min_el++] = p_min.elem(i);
+    V_max[max_el++] = p_max.elem(i);
   }
 
   for(int k=0; k<nk_; ++k){
     // Pass bounds on state
     for(int i=0; i<nx_; ++i){
-      V_min[min_el++] = x_min(i,k);
-      V_max[max_el++] = x_max(i,k);
+      V_min[min_el++] = x_min.elem(i,k);
+      V_max[max_el++] = x_max.elem(i,k);
     }
     
     // Pass bounds on control
     for(int i=0; i<nu_; ++i){
-      V_min[min_el++] = u_min(i,k);
-      V_max[max_el++] = u_max(i,k);
+      V_min[min_el++] = u_min.elem(i,k);
+      V_max[max_el++] = u_max.elem(i,k);
     }
   }
 
   // Pass bounds on final state
   for(int i=0; i<nx_; ++i){
-    V_min[min_el++] = x_min(i,nk_);
-    V_max[max_el++] = x_max(i,nk_);
+    V_min[min_el++] = x_min.elem(i,nk_);
+    V_max[max_el++] = x_max.elem(i,nk_);
   }
   
-  std::cout << "42: " << min_el << std::endl;
+/*  std::cout << "42: " << min_el << std::endl;
   std::cout << "42: " << max_el << std::endl;
   std::cout << "42: " << V_min.size() << std::endl;
-  std::cout << "42: " << V_max.size() << std::endl;
+  std::cout << "42: " << V_max.size() << std::endl;*/
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
@@ -265,8 +265,8 @@ void MultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector
     }
     
     for(int i=0; i<nh_; ++i){
-      G_min[min_el++] = h_min(i,k);
-      G_max[max_el++] = h_max(i,k);
+      G_min[min_el++] = h_min.elem(i,k);
+      G_max[max_el++] = h_max.elem(i,k);
     }
   }
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());

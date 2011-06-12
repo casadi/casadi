@@ -71,6 +71,14 @@ class SX{
 	\param val Numerical value
     */
     SX(double val);
+
+    /** \brief Type conversion from Matrix
+        \param Matrix<SX> object
+        
+        Convert a 1-by-1 Matrix<SX> to an SX
+    */
+    explicit SX(const Matrix<SX>& m);
+    
     /** \brief Symbolic constructor
  	\param name Name of the symbol
 
@@ -290,29 +298,6 @@ class casadi_operators<SX>{
     static SX fmax(const SX&x, const SX&y);
     static SX fabs(const SX&x);
 };
-
-// Template specializations
-template<>
-class Element<Matrix<SX>,SX> : public SX{
-  public:
-    /// Constructor
-    Element(Matrix<SX>& mat, int i, int j);
-      
-    //@{
-    /// Methods that modify a part of the parent obejct (A[i] = ?, A[i] += ?, etc.)
-    SX operator=(const Element<Matrix<SX>,SX> &y); // to avoid that the default implementation is called
-    SX operator=(const SX &y);
-    SX operator+=(const SX &y);
-    SX operator-=(const SX &y);
-    SX operator*=(const SX &y);
-    SX operator/=(const SX &y);
-    //@}
-  
-  private:
-    Matrix<SX>& mat_;
-    int i_, j_;
-};
-
 
 #endif // SWIG
 
