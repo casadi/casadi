@@ -74,7 +74,15 @@ MX MX::create(MXNode* node){
   return ret;
 }
 
-MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
+const MX MX::getSub(int i, const std::vector<int>& j) const{
+  return getSub(vector<int>(1,i),j);
+}
+
+const MX MX::getSub(const std::vector<int>& i, int j) const{
+  return getSub(i,vector<int>(1,j));
+}
+
+const MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
   // Nonzero mapping from submatrix to full
   vector<int> mapping;
   
@@ -86,6 +94,34 @@ MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
   ret.assignNode(new Mapping(sp));
   ret->addDependency(*this,mapping);
   return ret;
+}
+
+const MX MX::getSub(int i, int j) const{
+  int ind = sparsity().getNZ(i,j);
+
+  MX ret;
+  if (ind>=0) {
+    const CRSSparsity& sp = CRSSparsity::scalarSparsity;
+    ret.assignNode(new Mapping(sp));
+    ret->addDependency(*this,vector<int>(1,ind));
+  } else {
+    const CRSSparsity& sp = CRSSparsity::scalarSparsitySparse;
+    ret.assignNode(new Mapping(sp));
+    ret->addDependency(*this,vector<int>(0));
+  }
+  return ret;
+}
+
+void MX::setSub(int i, int j, const MX& el){
+  setSub(vector<int>(1,i),vector<int>(1,j),el);
+}
+
+void MX::setSub(int i, const std::vector<int>& j, const MX& el){
+  setSub(vector<int>(1,i),j,el);
+}
+
+void MX::setSub(const std::vector<int>& i, int j, const MX& el){
+  setSub(i,vector<int>(1,j),el);
 }
 
 void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
@@ -139,22 +175,6 @@ void MX::setNZ(const vector<int>& kk, const MX& el){
   *this = ret;
 }
 
-const MX MX::operator()(int i, int j) const{
-  int ind = sparsity().getNZ(i,j);
-
-  MX ret;
-  if (ind>=0) {
-    const CRSSparsity& sp = CRSSparsity::scalarSparsity;
-    ret.assignNode(new Mapping(sp));
-    ret->addDependency(*this,vector<int>(1,ind));
-  } else {
-    const CRSSparsity& sp = CRSSparsity::scalarSparsitySparse;
-    ret.assignNode(new Mapping(sp));
-    ret->addDependency(*this,vector<int>(0));
-  }
-  return ret;
-}
-
 const MX MX::operator[](int k) const{
   return getNZ(vector<int>(1,k));
 }
@@ -163,34 +183,6 @@ const MX MX::operator[](const std::vector<int>& kk) const{
   return getNZ(kk);
 }
  
-const MX MX::operator()(const vector<int>& ii, const vector<int>& jj) const{
-  return getSub(ii,jj);
-}
-
-SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(const vector<int>& ii, const vector<int>& jj){
-  return SubMatrix<MX,std::vector<int>,std::vector<int> >(*this,ii, jj);
-}
-
-SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(int i, int j){
-  return operator()(vector<int>(1,i),vector<int>(1,j));
-}
-
-const MX MX::operator()(const vector<int>& ii, int j) const{
-  return operator()(ii,vector<int>(1,j));
-}
-
-const MX MX::operator()(int i, const vector<int>& jj) const{
-  return operator()(vector<int>(1,i),jj);
-}
-
-SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(const vector<int>& ii, int j){
-  return operator()(ii, vector<int>(1,j));
-}
-
-SubMatrix<MX,std::vector<int>,std::vector<int> > MX::operator()(int i, const vector<int>& jj){
-  return operator()(vector<int>(1,i), jj);
-}
-
 NonZeros<MX> MX::operator[](int k){
   return NonZeros<MX>(*this,vector<int>(1,k));
 }

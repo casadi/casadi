@@ -93,30 +93,22 @@ class MX : public SharedObject{
  
     /** \brief  Access multiple matrix non-zero */
     NonZeros<MX> operator[](const std::vector<int>& kk);
-    
-    /** \brief  Get matrix element */
-    const MX operator()(int i, int j) const;
- 
-    /** \brief  Access matrix element */
-    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(int i, int j);
 
-    /** \brief  Get a column, or parts of a one */
-    const MX operator()(const std::vector<int>& ii, int j=0) const;
+    /** \brief  Get vector element or slice */
+    template<typename I>
+    const MX operator()(const I& i) const;
     
-    /** \brief  Access a column, or parts of a one */
-    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, int j=0);
+    /** \brief  Get Matrix element or slice */
+    template<typename I, typename J>
+    const MX operator()(const I& i, const J& j) const;
 
-    /** \brief  Get a row, or parts of a one */
-    const MX operator()(int i, const std::vector<int>& jj) const;
+    /** \brief  Access vector element or slice */
+    template<typename I>
+    SubMatrix<MX,I,int> operator()(const I& i);
     
-    /** \brief  Access a row, or parts of a one */
-    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(int i, const std::vector<int>& jj);
-    
-    /** \brief  Get a submatrix */
-    const MX operator()(const std::vector<int>& ii, const std::vector<int>& jj) const;
-
-    /** \brief  Access a submatrix */
-    SubMatrix<MX,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, const std::vector<int>& jj);
+    /** \brief  Access Matrix element or slice */
+    template<typename I, typename J>
+    SubMatrix<MX,I,J> operator()(const I& i, const J& j);
 
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;
@@ -250,8 +242,16 @@ class MX : public SharedObject{
   /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
   MX jac(int iind=0);
 
-  MX getSub(const std::vector<int>& ii, const std::vector<int>& jj) const;
-  void setSub(const std::vector<int>& ii, const std::vector<int>& jj, const MX& el);
+  const MX getSub(int i, int j) const;
+  const MX getSub(int i, const std::vector<int>& j) const;
+  const MX getSub(const std::vector<int>& i, int j) const;
+  const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
+  
+  void setSub(int i, int j, const MX& el);
+  void setSub(int i, const std::vector<int>& j, const MX& el);
+  void setSub(const std::vector<int>& i, int j, const MX& el);
+  void setSub(const std::vector<int>& i, const std::vector<int>& j, const MX& el);
+  
   MX getNZ(const std::vector<int>& kk) const;
   /** \brief set nonzeros
   el.size() must equal kk.size() unless m is scalar
@@ -366,5 +366,40 @@ MX erf(){ return std::erf(*$self);}
 %template(MXVector) std::vector<CasADi::MX>;
 
 #endif // SWIG
+
+
+// Template implementations
+#ifndef SWIG
+namespace CasADi{
+  
+template<typename I>
+const MX MX::operator()(const I& i) const{
+  return getSub(i,0);
+}
+    
+template<typename I, typename J>
+const MX MX::operator()(const I& i, const J& j) const{
+  return getSub(i,j);
+}
+
+template<typename I>
+SubMatrix<MX,I,int> MX::operator()(const I& i){
+  return SubMatrix<MX,I,int>(*this,i,0);
+}
+    
+template<typename I, typename J>
+SubMatrix<MX,I,J> MX::operator()(const I& i, const J& j){
+  return SubMatrix<MX,I,J>(*this,i,j);
+}
+
+} // namespace CasADi
+#endif // SWIG
+
+
+
+
+
+
+
 
 #endif // MX_HPP
