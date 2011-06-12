@@ -116,8 +116,8 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
 
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          adjSens[0][d][ix] += isx ? adjSeed[d][i]*tmp[0] : 0;
-          adjSens[1][d][iy] += isy ? adjSeed[d][i]*tmp[1] : 0;
+          if (isx) adjSens[0][d][ix] += adjSeed[d][i]*tmp[0];
+          if (isy) adjSens[1][d][iy] += adjSeed[d][i]*tmp[1];
         }
         
         // Increase argument indices

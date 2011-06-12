@@ -1338,7 +1338,18 @@ class MXtests(casadiTestCase):
       self.checkarray(f.output(),g.output(),"#%d" % cnt )
       cnt+=1
     
-    
+  def test_issue134(self):
+    self.message("Test issue #134")
+    from casadi import *
+
+    x = MX("x",2,2)
+    y = MX(2,2)
+
+    f = MXFunction([x],[x+y])
+
+    f.init()
+    f.evaluate(1,0) # this should not throw a segfault
+
     
     
 if __name__ == '__main__':
