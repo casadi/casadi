@@ -4,8 +4,8 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
-from scipy.linalg import expm
 import scipy.special
+from scipy.linalg import expm
 
 class Integrationtests(casadiTestCase):
 
@@ -315,7 +315,10 @@ class Integrationtests(casadiTestCase):
     H.input(0).set([num['q0']])
     H.input(1).set([num['p']])
     H.evaluate()
-    print "wsst"*6 , H.output()
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
     
   def test_hess6(self):
     self.message('CVodes integration: hessian to p in an MX tree')
@@ -331,7 +334,11 @@ class Integrationtests(casadiTestCase):
     H.input(0).set([num['q0']])
     H.input(1).set([num['p']])
     H.evaluate()
-    print "woot"*6 , H.output()
+    num=self.num
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
  
   def test_issue87(self):
     return # see issue 87
@@ -443,8 +450,6 @@ class Integrationtests(casadiTestCase):
     qeJ2.input(0).set(A)
     qeJ2.input(1).set(B.ravel())
     qeJ2.evaluate()
-    print array(qeJ2.output())
-    print Be
     
     return # this should return identical zero
     H=Jacobian(qeJ,0,0)
@@ -565,7 +570,6 @@ class Integrationtests(casadiTestCase):
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
     Jf.evaluate()
-    print array(Jf.output())
     self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
     
     
@@ -575,7 +579,6 @@ class Integrationtests(casadiTestCase):
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
     Jf.evaluate()
-    print array(Jf.output())
     self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
     
     # Joel: This is no longer supported: might be a good idea to support again, though
@@ -654,11 +657,7 @@ class Integrationtests(casadiTestCase):
     A = symbolic("A",N,N)
     x = symbolic("x",N)
 
-    t=SX("t")
-
-    print c.dot(A,x)
-
-    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A, DAE_T: t},[c.dot(A,x)])
+    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A},[c.dot(A,x)])
     I = CVodesIntegrator(ode)
     I.init()
     I.setOption('reltol',1e-12)
@@ -666,46 +665,31 @@ class Integrationtests(casadiTestCase):
     I.input(INTEGRATOR_P).set(A_)
     I.evaluate()
 
-    print "Numpy = ", c.dot(expm(A_),x0_)
-
-    print "Integrator= ", I.output()
-
-
-    print c.dot(A_,DMatrix([[1,0],[0,0]])) , "=", c.dot(DMatrix([[1,0],[0,0]]),A_)
-
-    print c.dot(c.dot(expm(A_),DMatrix([[1,0],[0,0]])),x0_)
-    print c.dot(c.dot(expm(A_),DMatrix([[0,1],[0,0]])),x0_)
-
     q0=MX("q0",N)
     p=MX("p",N*N)
     dq0=MX("dq0",N)
     qe = MXFunction([q0,p,dq0],[I.call([q0,p,dq0])[0]])
     qe.init()
-    qe.input(0).set(x0_)
-    qe.input(1).set(vec(A_))
-    qe.fwdSeed(1).set([1,0,0,0])
-    qe.fwdSeed(1).set([0,1,0,0])
-    qe.evaluate(1,0)
-    print "fwdSens", qe.fwdSens()
-    J = MXFunction([q0,p,dq0],qe.jac(1))
-    J.init()
-    J.input(0).set(x0_)
-    J.input(1).set(vec(A_))
-    J.evaluate()
-    print J.output()
 
     JT = MXFunction([q0,p,dq0],[qe.jac(1)[0].T])
     JT.init()
-    JT.input(0).set(x0_)
-    JT.input(1).set(vec(A_))
-    JT.evaluate(1,0)
-    print JT.output()
 
     H  = Jacobian(JT,1)
     H.init()
     H.input(0).set(x0_)
     H.input(1).set(vec(A_))
     H.evaluate()
+
+    H1 = DMatrix(H.output())
+    
+    H = qe.hessian(1)
+    H.init()
+    H.input(0).set(x0_)
+    H.input(1).set(vec(A_))
+    H.evaluate()
+    H2 = DMatrix(H.output())
+    
+    self.checkarray(H1,H2,"hessian")
     print H.output()
 
     

@@ -74,16 +74,6 @@ class MXtests(casadiTestCase):
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
-    self.pool2=FunctionPool()
-    self.pool2.append(lambda x: sqrt(x[0]),sqrt,"sqrt")
-    self.pool2.append(lambda x: sin(x[0]),sin,"sin")
-    self.pool2.append(lambda x: tan(x[0]),tan,"tan")
-    self.pool2.append(lambda x: arctan(x[0]),arctan,"arctan")
-    self.pool2.append(lambda x: arcsin(x[0]),arcsin,"arcsin")
-    self.pool2.append(lambda x: x[0]**1,lambda x : x**1,"^1")
-    self.pool2.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
-    self.pool2.append(lambda x: floor(x[0]),floor,"floor")
-    self.pool2.append(lambda x: ceil(x[0]),ceil,"ceil")
     self.Jpool=FunctionPool()
     self.Jpool.append(lambda x: sqrt(x[0]),lambda x:diag(1/(2.0*sqrt(x))),"sqrt")
     self.Jpool.append(lambda x: sin(x[0]),lambda x:diag(cos(x)),"sin")
@@ -670,7 +660,7 @@ class MXtests(casadiTestCase):
       x=MX("x",sp)
       x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       
-      self.numpyEvaluationCheckPool(self.pool2,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
+      self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="MX",setx0=x0)
       
   def test_MXbinarySparse(self):
       self.message("SXMatrix binary operations")
@@ -681,7 +671,7 @@ class MXtests(casadiTestCase):
       x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
       
-      self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SXMatrix",setx0=[x0,y0])
+      self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="MX",setx0=[x0,y0])
 
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
