@@ -25,7 +25,7 @@
 
 namespace CasADi{
 
-Slice::Slice() : start_(0), stop_(-1), step_(1){ 
+Slice::Slice() : start_(0), stop_(0), step_(1){ 
 }
       
 Slice::Slice(int i) : start_(i), stop_(i+1), step_(1){
