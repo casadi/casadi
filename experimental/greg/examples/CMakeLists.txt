@@ -32,6 +32,7 @@ include_directories(../snopt)
 include_directories(${SNOPT_INCLUDE_DIRS})
 
 add_executable(gliderSnopt gliderSnopt.cpp)
+add_executable(raptors raptors.cpp)
 add_executable(rocketSnopt rocketSnopt.cpp)
 target_link_libraries(rocketSnopt
   cppocp
@@ -40,6 +41,12 @@ target_link_libraries(rocketSnopt
   snopt_interface
 )
 target_link_libraries(gliderSnopt
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+)
+target_link_libraries(raptors
   cppocp
   casadi 
   ${SNOPT_LIBRARIES}
