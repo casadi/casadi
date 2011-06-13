@@ -134,7 +134,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
 
     // save the indices
     for(int j=0; j<ip.size(); ++j){
-      ii[j] = place[ip[j].get()->temp];
+      ii[j] = place[ip.data()[j].get()->temp];
     }
   }
 
@@ -152,7 +152,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
 
     // save the indices
     for(int j=0; j<op.size(); ++j){
-      oi[j] = place[op[j].get()->temp];
+      oi[j] = place[op.data()[j].get()->temp];
     }
   }
 
@@ -180,7 +180,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   for(int ind=0; ind<getNumInputs(); ++ind){
     const Matrix<double> &arg = input(ind);
     for(int i=0; i<arg.size(); ++i){
-      work[input_ind[ind][i]] = arg[i];
+      work[input_ind[ind][i]] = arg.data()[i];
     }
   }
   
@@ -224,7 +224,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(int ind=0; ind<input_.size(); ++ind){
       const Matrix<double> &fseed = fwdSeed(ind,dir);
       for(int i=0; i<fseed.size(); ++i){
-        dwork[input_ind[ind][i]] = fseed[i];
+        dwork[input_ind[ind][i]] = fseed.data()[i];
       }
     }
   
@@ -253,7 +253,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(int ind=0; ind<output_.size(); ++ind){
       const Matrix<double> &aseed = adjSeed(ind,dir);
       for(int i=0; i<output_ind[ind].size(); ++i){
-        dwork[output_ind[ind][i]] += aseed[i];
+        dwork[output_ind[ind][i]] += aseed.data()[i];
       }
     }
 
@@ -488,7 +488,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int elJ = mapping[v][el_out];
           
           // Get the output seed
-          ret[jblock_ind[v]][elJ] = g[output_ind[oind][r_out]];
+          ret[jblock_ind[v]].data()[elJ] = g[output_ind[oind][r_out]];
         }
       }
     }
@@ -554,7 +554,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int c = ret[jblock_ind[v]].sparsity().col(elJ);
           
           // Get the input seed
-          ret[jblock_ind[v]][elJ] = g[input_ind[iind][c]];
+          ret[jblock_ind[v]].data()[elJ] = g[input_ind[iind][c]];
         }
       }
     }
@@ -755,7 +755,7 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_s.size(); ++ind){
     for(int i=0; i<input_ind[ind].size(); ++i){
-      swork[input_ind[ind][i]] = input_s[ind][i];
+      swork[input_ind[ind][i]] = input_s[ind].data()[i];
     }
   }
   

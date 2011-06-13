@@ -305,14 +305,14 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
   NATIVERETURN(CasADi::Slice,m)
 
   if (PyInt_Check(p)) {
-    m.start = PyInt_AsLong(p);
-    m.stop = m.start+1;
+    m.start_ = PyInt_AsLong(p);
+    m.stop_ = m.start_+1;
     return true;
   } else if (PySlice_Check(p)) {
     PySliceObject *r = (PySliceObject*)(p);
-    if(r->start!=Py_None) m.start = PyInt_AsLong(r->start);
-    if(r->stop !=Py_None) m.stop  = PyInt_AsLong(r->stop);
-    if(r->step !=Py_None) m.step  = PyInt_AsLong(r->step);
+    if(r->start!=Py_None) m.start_ = PyInt_AsLong(r->start);
+    if(r->stop !=Py_None) m.stop_  = PyInt_AsLong(r->stop);
+    if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
     return true;
   } else {
     return false;
@@ -336,14 +336,14 @@ template <>
 int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
   if (p.is_range()) {
     Range r = p.range_value();
-    m.start = r.base()-1;
-    m.stop = r.limit();
-    m.step = r.inc();
+    m.start_ = r.base()-1;
+    m.stop_ = r.limit();
+    m.step_ = r.inc();
   } else if (p.is_magic_colon()) {
-    m.start = 0;
+    m.start_ = 0;
   } else if (p.is_numeric_type()) {
-    m.start = p.int_value()-1;
-    m.stop = m.start+1;
+    m.start_ = p.int_value()-1;
+    m.stop_ = m.start_+1;
   } else {
     return false;
   }

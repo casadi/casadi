@@ -84,27 +84,27 @@ class MX : public SharedObject{
 
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
-    const MX operator[](const K& k) const;
+    const MX operator[](const K& k) const{ return getNZ(k); }
 
     /** \brief  Access vector nonzero or slice of nonzeros */
     template<typename K>
-    NonZeros<MX,K> operator[](const K& k);
+    NonZeros<MX,K> operator[](const K& k){ return NonZeros<MX,K>(*this,k); }
 
     /** \brief  Get vector element or slice */
     template<typename I>
-    const MX operator()(const I& i) const;
+    const MX operator()(const I& i) const{ return getSub(i,0);}
     
     /** \brief  Get Matrix element or slice */
     template<typename I, typename J>
-    const MX operator()(const I& i, const J& j) const;
+    const MX operator()(const I& i, const J& j) const{ return getSub(i,j); }
 
     /** \brief  Access vector element or slice */
     template<typename I>
-    SubMatrix<MX,I,int> operator()(const I& i);
+    SubMatrix<MX,I,int> operator()(const I& i){ return SubMatrix<MX,I,int>(*this,i,0); }
     
     /** \brief  Access Matrix element or slice */
     template<typename I, typename J>
-    SubMatrix<MX,I,J> operator()(const I& i, const J& j);
+    SubMatrix<MX,I,J> operator()(const I& i, const J& j){ return SubMatrix<MX,I,J>(*this,i,j); }
 
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;
@@ -363,50 +363,5 @@ MX erf(){ return std::erf(*$self);}
 %template(MXVector) std::vector<CasADi::MX>;
 
 #endif // SWIG
-
-
-// Template implementations
-#ifndef SWIG
-namespace CasADi{
-  
-template<typename I>
-const MX MX::operator()(const I& i) const{
-  return getSub(i,0);
-}
-    
-template<typename I, typename J>
-const MX MX::operator()(const I& i, const J& j) const{
-  return getSub(i,j);
-}
-
-template<typename I>
-SubMatrix<MX,I,int> MX::operator()(const I& i){
-  return SubMatrix<MX,I,int>(*this,i,0);
-}
-    
-template<typename I, typename J>
-SubMatrix<MX,I,J> MX::operator()(const I& i, const J& j){
-  return SubMatrix<MX,I,J>(*this,i,j);
-}
-
-template<typename K>
-const MX MX::operator[](const K& k) const{
-  return getNZ(k);
-}
-
-template<typename K>
-NonZeros<MX,K> MX::operator[](const K& k){
-  return NonZeros<MX,K>(*this,k);
-}
-
-} // namespace CasADi
-#endif // SWIG
-
-
-
-
-
-
-
 
 #endif // MX_HPP

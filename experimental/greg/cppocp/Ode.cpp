@@ -112,11 +112,11 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, SXMatrix p, SX t )
 	// create maps to wrap SXMatrices
 	map<string,SX> xMap, uMap, pMap;
 	for (iter = states.begin(); iter != states.end(); iter++)
-		xMap[iter->first] = x[iter->second];
+		xMap[iter->first] = x.at(iter->second);
 	for (iter = actions.begin(); iter != actions.end(); iter++)
-		uMap[iter->first] = u[iter->second];
+		uMap[iter->first] = u.at(iter->second);
 	for (iter = params.begin(); iter != params.end(); iter++)
-		pMap[iter->first] = p[iter->second];
+		pMap[iter->first] = p.at(iter->second);
 
 	// call dxdt
 	map<string,SX> xDotMap;

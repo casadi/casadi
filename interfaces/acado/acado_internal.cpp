@@ -232,18 +232,18 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
   // Initial constraint function
   if(!rfcn_.f_.isNull()){
     const Matrix<double>& lbr = input(ACADO_LBR);
-    ACADO::Vector lb(lbr.size(),&lbr[0]);
+    ACADO::Vector lb(lbr.size(),&lbr.front());
     const Matrix<double>& ubr = input(ACADO_UBR);
-    ACADO::Vector ub(ubr.size(),&ubr[0]);
+    ACADO::Vector ub(ubr.size(),&ubr.front());
     ocp_->subjectTo( ACADO::AT_START, lb <= (*rfcn_.fcn_)(*arg_) <= ub);
   }
 
   // Path constraint function
   if(!cfcn_.f_.isNull()){
     const Matrix<double>& lbc = input(ACADO_LBC);
-    ACADO::Vector lb(lbc.size(),&lbc[0]);
+    ACADO::Vector lb(lbc.size(),&lbc.front());
     const Matrix<double>& ubc = input(ACADO_UBC);
-    ACADO::Vector ub(ubc.size(),&ubc[0]);
+    ACADO::Vector ub(ubc.size(),&ubc.front());
     ocp_->subjectTo( lb <= (*cfcn_.fcn_)(*arg_) <=  ub );
   }
 
@@ -251,17 +251,17 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
   Matrix<double> &lbx = input(ACADO_LBX);
   Matrix<double> &ubx = input(ACADO_UBX);
   for(int i=0; i<nxd_; ++i)
-    ocp_->subjectTo( lbx[i] <= xd_[i] <=  ubx[i] );
+    ocp_->subjectTo( lbx.at(i) <= xd_[i] <=  ubx.at(i) );
   for(int i=nxd_; i<nx_; ++i)
-    ocp_->subjectTo( lbx[i] <= xa_[i-nxd_] <=  ubx[i] );
+    ocp_->subjectTo( lbx.at(i) <= xa_[i-nxd_] <=  ubx.at(i) );
 
   // Pass bounds on state at initial time
   Matrix<double> &lbx0 = input(ACADO_LBX0);
   Matrix<double> &ubx0 = input(ACADO_UBX0);
   for(int i=0; i<nxd_; ++i)
-    ocp_->subjectTo( ACADO::AT_START, lbx0[i] <= xd_[i] <=  ubx0[i] );
+    ocp_->subjectTo( ACADO::AT_START, lbx0.at(i) <= xd_[i] <=  ubx0.at(i) );
   for(int i=nxd_; i<nx_; ++i)
-    ocp_->subjectTo( ACADO::AT_START, lbx0[i] <= xa_[i-nxd_] <=  ubx0[i] );
+    ocp_->subjectTo( ACADO::AT_START, lbx0.at(i) <= xa_[i-nxd_] <=  ubx0.at(i) );
 
 //     ocp_->subjectTo( AT_END  , xd_[1] ==  0.0 );
 //     ocp_->subjectTo( AT_END  , xd_[2] ==  0.0 );
@@ -270,17 +270,17 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
   Matrix<double> &lbu = input(ACADO_LBU);
   Matrix<double> &ubu = input(ACADO_UBU);
   for(int i=0; i<nu_; ++i)
-    ocp_->subjectTo( lbu[i] <= u_[i] <= ubu[i] );
+    ocp_->subjectTo( lbu.at(i) <= u_[i] <= ubu.at(i) );
 
   // Parameter bounds
   Matrix<double> &lbp = input(ACADO_LBP);
   Matrix<double> &ubp = input(ACADO_UBP);
   for(int i=0; i<np_; ++i)
-    ocp_->subjectTo( lbp[i] <= p_[i] <= ubp[i] );
+    ocp_->subjectTo( lbp.at(i) <= p_[i] <= ubp.at(i) );
 
   // Periodic boundary condition
   if(hasSetOption("periodic_bounds")){
-    const vector<int>& periodic = getOption("periodic_bounds").toIntVector();
+    const vector<int>& periodic = getOption("periodic_bounds");
     if(periodic.size()!=nx_) throw CasadiException("wrong dimension for periodic_bounds");
     for(int i=0; i<nxd_; ++i)
       if(periodic[i])
@@ -373,7 +373,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     // Assemble the variables grid
     ACADO::VariablesGrid xd(nxd_, n_nodes_+1);
     for(int i=0; i<n_nodes_+1; ++i){
-      ACADO::Vector v(nxd_,&x0[i*nx_]);
+      ACADO::Vector v(nxd_,&x0.at(i*nx_));
       xd.setVector(i,v);
     }
     
@@ -389,7 +389,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     // Assemble the variables grid
     ACADO::VariablesGrid xa(nxa_, n_nodes_+1);
     for(int i=0; i<n_nodes_+1; ++i){
-      ACADO::Vector v(nxa_,&x0[i*nx_+nxd_]);
+      ACADO::Vector v(nxa_,&x0.at(i*nx_+nxd_));
       xa.setVector(i,v);
     }
     
@@ -405,7 +405,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     // Assemble the variables grid
     ACADO::VariablesGrid u(nu_, n_nodes_+1);
     for(int i=0; i<n_nodes_+1; ++i){
-      ACADO::Vector v(nu_,&u0[i*nu_]);
+      ACADO::Vector v(nu_,&u0.at(i*nu_));
       u.setVector(i,v);
     }
     
@@ -421,7 +421,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     // Assemble the variables grid
     ACADO::VariablesGrid p(np_, n_nodes_+1);
     for(int i=0; i<n_nodes_+1; ++i){
-      ACADO::Vector v(np_,&p0[0]); // NB!
+      ACADO::Vector v(np_,&p0.front()); // NB!
       p.setVector(i,v);
     }
     
@@ -441,7 +441,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     for(int i=0; i<n_nodes_+1; ++i){
       // Copy to result
       ACADO::Vector v = xd.getVector(i);
-      &xopt[i*nx_] << v;
+      &xopt.at(i*nx_) << v;
     }
   }
   if(nxa_>0){
@@ -452,7 +452,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     for(int i=0; i<n_nodes_+1; ++i){
       // Copy to result
       ACADO::Vector v = xa.getVector(i);
-      &xopt[i*nx_ + nxd_] << v;
+      &xopt.at(i*nx_ + nxd_) << v;
     }
   }
 
@@ -465,7 +465,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     for(int i=0; i<n_nodes_+1; ++i){
       // Copy to result
       ACADO::Vector v = u.getVector(i);
-      &uopt[i*nu_] << v;
+      &uopt.at(i*nu_) << v;
     }
   }
 
@@ -474,7 +474,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     Matrix<double> &popt = output(ACADO_P_OPT);
     ACADO::Vector p;
     algorithm_->getParameters(p);
-    &popt[0] << p;
+    &popt.front() << p;
   }
   
   // Get the optimal cost

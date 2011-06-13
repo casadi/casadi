@@ -146,14 +146,14 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
   
   // Set the initial conditions
   Matrix<double>& yy = integrator_.input(CasADi::INTEGRATOR_X0);
-  &yy[0] << const_cast<Vector &>(x0);
+  &yy.front() << const_cast<Vector &>(x0);
 //  &yy[md] << const_cast<Vector &>(xa);
   
 
   // Parameters and controls
   Matrix<double>& pp = integrator_.input(CasADi::INTEGRATOR_P);
-  &pp[0] << const_cast<Vector &>(p);
-  &pp[mp] << const_cast<Vector &>(u);
+  &pp.at(0) << const_cast<Vector &>(p);
+  &pp.at(mp) << const_cast<Vector &>(u);
   
   // Integrate
   
@@ -242,7 +242,7 @@ ACADO::returnValue AcadoIntegratorBackend::getProtectedX( Vector *xEnd ) const{
     return RET_INPUT_HAS_WRONG_DIMENSION;
 
   for(int i=0; i<xf.size(); ++i)
-    xEnd[0](i) = xf[i];
+    xEnd[0](i) = xf.at(i);
 
   return SUCCESSFUL_RETURN;
 }
@@ -257,7 +257,7 @@ returnValue AcadoIntegratorBackend::getProtectedForwardSensitivities( ACADO::Mat
   
   if( order == 1 && nFDirs2 == 0 ){
     for( int run1 = 0; run1 < m; run1++ ){
-            Dx[0](run1,0) = sens[run1];
+            Dx[0](run1,0) = sens.at(run1);
     }
   }
 

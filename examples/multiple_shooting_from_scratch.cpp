@@ -230,8 +230,8 @@ int main(){
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);
   for(int i=0; i<=ns; ++i){
-    r_opt[i] = V_opt[i*(nx+1)];
-    s_opt[i] = V_opt[1+i*(nx+1)];
+    r_opt[i] = V_opt.at(i*(nx+1));
+    s_opt[i] = V_opt.at(1+i*(nx+1));
   }
   cout << "r_opt = " << endl << r_opt << endl;
   cout << "s_opt = " << endl << s_opt << endl;
@@ -239,7 +239,7 @@ int main(){
   // Get the optimal control
   vector<double> u_opt(ns);
   for(int i=0; i<ns; ++i){
-    u_opt[i] = V_opt[nx + i*(nx+1)];
+    u_opt[i] = V_opt.at(nx + i*(nx+1));
   }
   cout << "u_opt = " << endl << u_opt << endl;
   

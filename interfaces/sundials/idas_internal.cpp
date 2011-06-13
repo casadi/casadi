@@ -354,7 +354,7 @@ void IdasInternal::init(){
       }
 
       // Specify parameters
-      flag = IDASetSensParams(mem_,&input(INTEGRATOR_P)[0],pbar,plist);
+      flag = IDASetSensParams(mem_,&input(INTEGRATOR_P).front(),pbar,plist);
       if(flag != IDA_SUCCESS) idas_error("IDASetSensParams",flag);
 
       //  IDASetSensDQMethod
@@ -362,7 +362,7 @@ void IdasInternal::init(){
 
     } else {
       // Use AD to calculate the residual in the forward sensitivity equations
-      flag = IDASensInit(mem_,nfdir_,ism_,resS_wrapper,&yS_[0],&yPS_[0]);
+      flag = IDASensInit(mem_,nfdir_,ism_,resS_wrapper,&yS_.front(),&yPS_.front());
       if(flag != IDA_SUCCESS) idas_error("IDASensInit",flag);
     }
 
@@ -426,7 +426,7 @@ void IdasInternal::init(){
       if(np_>0){
         yBB_.resize(nadir_);
         for(int i=0; i<nadir_; ++i){
-          yBB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i)[0]);
+          yBB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i).front());
         }
       }
   }
@@ -1104,7 +1104,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1152,7 +1152,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1505,8 +1505,8 @@ void IdasInternal::copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector
 
 void IdasInternal::getAdjointSeeds(){
   for(int i=0; i<nadir_; ++i){
-    const double *x0 = &adjSeed(INTEGRATOR_XF,i)[0];
-    const double *xp0 = &adjSeed(INTEGRATOR_XPF,i)[0];
+    const double *x0 = &adjSeed(INTEGRATOR_XF,i).front();
+    const double *xp0 = &adjSeed(INTEGRATOR_XPF,i).front();
 
     double *yz = NV_DATA_S(yB_[i]);
     double *yp = NV_DATA_S(yPB_[i]);
@@ -1518,8 +1518,8 @@ void IdasInternal::getAdjointSeeds(){
 
 void IdasInternal::setAdjointSensitivities(){
   for(int i=0; i<nadir_; ++i){
-    double *xf = &adjSens(INTEGRATOR_X0,i)[0];
-    double *xpf = &adjSens(INTEGRATOR_XP0,i)[0];
+    double *xf = &adjSens(INTEGRATOR_X0,i).front();
+    double *xpf = &adjSens(INTEGRATOR_XP0,i).front();
     
     const double *yz = NV_DATA_S(yB_[i]);
     const double *yp = NV_DATA_S(yPB_[i]);

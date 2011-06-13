@@ -205,8 +205,8 @@ void CVodesInternal::init(){
   if(mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
   // Allocate n-vectors for ivp
-  y0_ = N_VMake_Serial(ny_,&input(INTEGRATOR_X0)[0]);
-  y_ = N_VMake_Serial(ny_,&output(INTEGRATOR_XF)[0]);
+  y0_ = N_VMake_Serial(ny_,&input(INTEGRATOR_X0).front());
+  y_ = N_VMake_Serial(ny_,&output(INTEGRATOR_XF).front());
 
   // Set error handler function
   flag = CVodeSetErrHandlerFn(mem_, ehfun_wrapper, this);
@@ -302,8 +302,8 @@ void CVodesInternal::init(){
   // Quadrature equations
   if(nq_>0){
     // Allocate n-vectors for quadratures
-    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0)[ny_]);
-    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF)[ny_]);
+    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).data()[ny_]);
+    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).data()[ny_]);
 
     // Initialize quadratures in CVodes
     flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ0_);
@@ -326,8 +326,8 @@ void CVodesInternal::init(){
       yS0_.resize(nfdir_,0);
       yS_.resize(nfdir_,0);
       for(int i=0; i<nfdir_; ++i){
-        yS0_[i] = N_VMake_Serial(ny_,&fwdSeed(INTEGRATOR_X0,i)[0]);
-        yS_[i] = N_VMake_Serial(ny_,&fwdSens(INTEGRATOR_XF,i)[0]);
+        yS0_[i] = N_VMake_Serial(ny_,&fwdSeed(INTEGRATOR_X0,i).data()[0]);
+        yS_[i] = N_VMake_Serial(ny_,&fwdSens(INTEGRATOR_XF,i).data()[0]);
       }
 
       // Allocate n-vectors for quadratures
@@ -335,8 +335,8 @@ void CVodesInternal::init(){
         yQS0_.resize(nfdir_,0);
         yQS_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
-          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i)[ny_]);
-          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i)[ny_]);
+          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i).data()[ny_]);
+          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i).data()[ny_]);
         }
       }
       
@@ -360,7 +360,7 @@ void CVodesInternal::init(){
       }
       
       // Pass pointer to parameters
-      flag = CVodeSetSensParams(mem_,&input(INTEGRATOR_P)[0],0,0);
+      flag = CVodeSetSensParams(mem_,&input(INTEGRATOR_P).data()[0],0,0);
       if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensParams",flag);
 
       //  CVodeSetSensDQMethod
@@ -405,15 +405,15 @@ void CVodesInternal::init(){
   yB0_.resize(nadir_,0);
   yB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
-    yB0_[i] = N_VMake_Serial(ny_,&adjSeed(INTEGRATOR_XF,i)[0]);
-    yB_[i] = N_VMake_Serial(ny_,&adjSens(INTEGRATOR_X0,i)[0]);
+    yB0_[i] = N_VMake_Serial(ny_,&adjSeed(INTEGRATOR_XF,i).data()[0]);
+    yB_[i] = N_VMake_Serial(ny_,&adjSens(INTEGRATOR_X0,i).data()[0]);
   }
 
   // Allocate n-vectors for quadratures
   yQB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
     casadi_assert(adjSens(INTEGRATOR_P,i).size()==np_);
-    yQB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i)[0]);
+    yQB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i).data()[0]);
   }
   
   if(nadir_>0){
@@ -968,7 +968,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);
@@ -1038,7 +1038,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     q_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF)[ny_],DAE_RES);
+    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
 
     // Evaluate
     q_.evaluate(0,1);

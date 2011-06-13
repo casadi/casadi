@@ -286,7 +286,7 @@ template<class T>
 bool isInteger(const Matrix<T>& ex){
   // loop over non-zero elements
   for(int k=0; k<ex.size(); ++k) 
-    if(!casadi_limits<T>::isInteger(ex[k])) // if an element is not integer
+    if(!casadi_limits<T>::isInteger(ex.data()[k])) // if an element is not integer
       return false;
     
   // Integer if reached this point
@@ -297,7 +297,7 @@ template<class T>
 bool isConstant(const Matrix<T>& ex){
   // loop over non-zero elements
   for(int k=0; k<ex.size(); ++k) 
-    if(!casadi_limits<T>::isConstant(ex[k])) // if an element is not constant
+    if(!casadi_limits<T>::isConstant(ex.data()[k])) // if an element is not constant
       return false;
     
   // Constant if we reach this point
@@ -519,7 +519,7 @@ T sum_all(const Matrix<T> &x) {
   // Sum non-zero elements
   T res=0;
   for(int k=0; k<x.size(); k++){
-    res += x[k];
+    res += x.data()[k];
   }
   return res;
 }
@@ -667,7 +667,7 @@ bool isZero(const Matrix<T>& ex) {
 
   // loop over (potentially) non-zero elements
   for(int el=0; el<ex.size(); ++el)
-    if(!casadi_limits<T>::isZero(ex[el]))
+    if(!casadi_limits<T>::isZero(ex.at(el)))
       return false;
   
   return true;

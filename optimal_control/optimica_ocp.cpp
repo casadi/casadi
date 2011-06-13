@@ -335,8 +335,8 @@ void OCP::scaleEquations(){
       //int j=J0.col(el);
       
       // The scaling factor is the maximum norm, ignoring not-a-number entries
-      if(!isnan(J0[el])){
-        scale[i] = max(scale[i],fabs(J0[el]));
+      if(!isnan(J0.at(el))){
+        scale[i] = max(scale[i],fabs(J0.at(el)));
       }
     }
     
@@ -516,7 +516,7 @@ void OCP::makeExplicit(){
             int j = Jb_lin.col(el);
             
             // Count number of variables appearing linearly
-            if(Jb_lin[el]==1){
+            if(Jb_lin.at(el)==1){
               j_lin = j;
               n_lin ++;
             }
@@ -947,7 +947,7 @@ void OCP::findConsistentIC(){
   
   // Save to the variables
   for(int i=0; i<x_.size(); ++i){
-    double xdot0 = oderhs_.output()[i] * x_[i].getNominal();
+    double xdot0 = oderhs_.output().at(i) * x_[i].getNominal();
     x_[i].setDerivativeStart(xdot0);
   }
   
@@ -960,7 +960,7 @@ void OCP::findConsistentIC(){
   
   // Save to the variables
   for(int i=0; i<d_.size(); ++i){
-    double z0 = output_fcn_.output()[i] * d_[i].getNominal();
+    double z0 = output_fcn_.output().at(i) * d_[i].getNominal();
     d_[i].setStart(z0);
   }
 }

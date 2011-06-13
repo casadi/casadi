@@ -88,7 +88,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
   casadi_assert(fsens_order==0 && asens_order==0);
-  dae_res_c(f.input(DAE_T)[0], &f.input(DAE_Y)[0], &f.input(DAE_YDOT)[0], &f.input(DAE_P)[0], &f.output(DAE_RES)[0]);
+  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_Y).front(), &f.input(DAE_YDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_RES).front());
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -328,7 +328,7 @@ int main(){
 
     vector<double> fd2(fsens.size());
     for(int i=0; i<fd2.size(); ++i)
-      fd2[i] = (fsens_pret[i]-fsens[i])/0.001;
+      fd2[i] = (fsens_pret.at(i)-fsens.at(i))/0.001;
     cout << "finite differences, 2nd order   " << fd2 << endl;
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation

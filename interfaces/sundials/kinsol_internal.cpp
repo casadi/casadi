@@ -101,7 +101,7 @@ void KinsolInternal::init(){
   if(u_) N_VDestroy_Serial(u_);
   if(u_scale_) N_VDestroy_Serial(u_scale_);
   if(f_scale_) N_VDestroy_Serial(f_scale_);
-  u_ = N_VMake_Serial(N_,&output(0)[0]);
+  u_ = N_VMake_Serial(N_,&output(0).front());
   u_scale_ = N_VNew_Serial(N_);
   f_scale_ = N_VNew_Serial(N_);
   

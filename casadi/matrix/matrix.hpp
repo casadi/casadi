@@ -213,152 +213,111 @@ class Matrix : public PrintableObject{
     bool dense() const; // is the matrix dense
     //@}
 
-    /// get an element
-    const T& elem(int i=0, int j=0) const;
-    
-    /// get a reference to an element
-    T& elem(int i=0, int j=0);
-  
-    /// Get a submatrix
-    const Matrix<T> getSub(int i, int j) const;
-    const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
-    
-    /// Get slice of rows
-    template<class A>
-    const Matrix<T> getSub(const Slice& i, A j) const{ return getSub(i.getAll(size1()),j);}
-  
-    /// Get slice of columns
-    template<class A>
-    const Matrix<T> getSub(A i, const Slice& j) const{ return getSub(i,j.getAll(size2()));}
-
-    /// Set a submatrix
-    void setSub(int i, int j, const Matrix<T>& m);
-    void setSub(const std::vector<int>& i, const std::vector<int>& j, const Matrix<T>& m);
-
-    /// Access slice of rows
-    template<class A>
-    void setSub(const Slice& i, A j){ setSub(i.getAll(size1()),j);}
-
-    /// Access slice of columns
-    template<class A>
-    void setSub(A i, const Slice& j){ setSub(i,j.getAll(size2()));}
-
-    /// Get nonzeros
-    const Matrix<T> getNZ(int k) const;
-    const Matrix<T> getNZ(const std::vector<int>& k) const;
-    
-    void setNZ(int k, const Matrix<T>& m);
-    void setNZ(const std::vector<int>& k, const Matrix<T>& m);
-    
-#ifndef SWIG 
-
-    /// Access an element
-    SubMatrix<Matrix<T>,int,int> operator()(int i, int j=0){ return SubMatrix<Matrix<T>,int,int>(*this,i,j); }
-
-    /// Get an element 
-    const Matrix<T> operator()(int i, int j=0) const{ return elem(i,j); }
-
-    /// Access a submatrix
-    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, const std::vector<int>& jj){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,ii,jj);}
-    
-    /// Get a submatrix
-    const Matrix<T> operator()(const std::vector<int>& ii, const std::vector<int>& jj) const{ return getSub(ii,jj);}
-
-    /// Access a row
-    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(int i, const std::vector<int>& jj){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,std::vector<int>(1,i),jj);}
-    
-    /// Get a row
-    const Matrix<T> operator()(int i, const std::vector<int>& jj) const{ return getSub(std::vector<int>(1,i),jj);}
-
-    /// Access a column
-    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const std::vector<int>& ii, int j){ return SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> >(*this,ii,std::vector<int>(1,j));}
-    
-    /// Get a column
-    const Matrix<T> operator()(const std::vector<int>& ii, int j) const{ return getSub(ii,std::vector<int>(1,j));}
-
-    /// Access all rows
-    template<class A>
-    const Matrix<T> operator()(const Slice& i, A j) const{ return operator()(i.getAll(size1()),j);}
-    
-    /// Get all rows
-    template<class A>
-    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const Slice& i, A j){ return operator()(i.getAll(size1()),j);}
-  
-    /// Access all columns
-    template<class A>
-    const Matrix<T> operator()(A i, const Slice& j) const{ return operator()(i,j.getAll(size2()));}
-
-    /// Get all columns
-    template<class A>
-    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(A i, const Slice& j){ return operator()(i,j.getAll(size2()));}
-
-    /// Get all rows and columns
-    const Matrix<T> operator()(const Slice& i, const Slice& j) const{ return operator()(i.getAll(size1()),j.getAll(size2()));}
-
-    /// Access all rows and columns
-    SubMatrix<Matrix<T>,std::vector<int>,std::vector<int> > operator()(const Slice& i, const Slice& j){ return operator()(i.getAll(size1()),j.getAll(size2()));}
-
     /// Get a non-zero element
     const T& at(int k) const{ if (k<0) k+=size(); return data().at(k); }
 
     /// Access a non-zero element
     T& at(int k){if (k<0) k+=size(); return data().at(k); }
-    
-    /// Get a non-zero element
-    const T& operator[](int k) const{ return data().operator[](k); }
 
-    /// Access a non-zero element
-    T& operator[](int k){ return data().operator[](k); }
+    /// get an element
+    const T& elem(int i, int j=0) const;
     
-    /// Get a number of non-zero elements
-    const Matrix<T> operator[](const std::vector<int>& kk) const{ return getNZ(kk);}
-    
-    /// Access a number of non-zero elements
-    NonZeros<Matrix<T>,std::vector<int> > operator[](const std::vector<int>& kk){ return NonZeros<Matrix<T>,std::vector<int> >(*this,kk);}
+    /// get a reference to an element
+    T& elem(int i, int j=0);
 
+    /// get an element, do not allocate
+    const T getElement(int i, int j=0) const{ return elem(i,j);}
+
+    //@{
+    /// Get a submatrix
+    const Matrix<T> getSub(int i, int j) const;
+    const Matrix<T> getSub(int i, const std::vector<int>& j) const{ return getSub(std::vector<int>(1,i),j);}
+    const Matrix<T> getSub(const std::vector<int>& i, int j) const{ return getSub(i,std::vector<int>(1,j));}
+    const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
+    const Matrix<T> getSub(const Slice& i, const Slice& j) const{ return getSub(i.getAll(size1()),j.getAll(size2()));}
+    //@}
+
+    //@{
+    /// Set a submatrix
+    void setSub(int i, int j, const Matrix<T>& m);
+    void setSub(int i, const std::vector<int>& j, const Matrix<T>& m){ setSub(std::vector<int>(1,i),j,m);}
+    void setSub(const std::vector<int>& i, int j, const Matrix<T>& m){ setSub(i,std::vector<int>(1,j),m);}
+    void setSub(const std::vector<int>& i, const std::vector<int>& j, const Matrix<T>& m);
+    void setSub(const Slice& i, const Slice& j, const Matrix<T>& m){ setSub(i.getAll(size1()),j.getAll(size2()),m);}
+    //@}
+
+    //@{
+    /// Get a set of nonzeros
+    const Matrix<T> getNZ(int k) const;
+    const Matrix<T> getNZ(const std::vector<int>& k) const;
+    const Matrix<T> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
+    //@}
+    
+    //@{
+    /// Set a set of nonzeros
+    void setNZ(int k, const Matrix<T>& m);
+    void setNZ(const std::vector<int>& k, const Matrix<T>& m);
+    void setNZ(const Slice& k, const Matrix<T>& m){ setNZ(k.getAll(size()),m);}
+    //@}
+    
+#ifndef SWIG 
+    /** \brief  Get vector nonzero or slice of nonzeros */
+    template<typename K>
+    const Matrix<T> operator[](const K& k) const{ return getNZ(k); }
+
+    /** \brief  Access vector nonzero or slice of nonzeros */
+    template<typename K>
+    NonZeros<Matrix<T>,K> operator[](const K& k){ return NonZeros<Matrix<T>,K>(*this,k); }
+
+    /** \brief  Get vector element or slice */
+    template<typename I>
+    const Matrix<T> operator()(const I& i) const{ return getSub(i,0);}
+    
+    /** \brief  Get Matrix element or slice */
+    template<typename I, typename J>
+    const Matrix<T> operator()(const I& i, const J& j) const{ return getSub(i,j); }
+
+    /** \brief  Access vector element or slice */
+    template<typename I>
+    SubMatrix<Matrix<T>,I,int> operator()(const I& i){ return SubMatrix<Matrix<T>,I,int>(*this,i,0); }
+    
+    /** \brief  Access Matrix element or slice */
+    template<typename I, typename J>
+    SubMatrix<Matrix<T>,I,J> operator()(const I& i, const J& j){ return SubMatrix<Matrix<T>,I,J>(*this,i,j); }
+    
 #endif // SWIG
     
     //@{
     /// Indexing for interfaced languages
-    
     /// get a non-zero
     const T indexed_one_based(int k) const{ return at(k-1);}
     const T indexed_zero_based(int k) const{ return at(k);}
+    const Matrix<T> indexed(const Slice &k) const{ return (*this)[k];}
     const Matrix<T> indexed(const IndexList &k) const{
-      return (*this)[k.getAll(size())];
-    }
-    const Matrix<T> indexed(const Slice &k) const{ 
       return (*this)[k.getAll(size())];
     }
     
     /// get a matrix element
     const T indexed_one_based(int i, int j) const{ return elem(i-1,j-1);}
     const T indexed_zero_based(int i, int j) const{ return elem(i,j);}
+    const Matrix<T> indexed(const Slice &i, const Slice &j) const{ return (*this)(i,j); }
     const Matrix<T> indexed(const IndexList &i, const IndexList &j) const{ 
-      return (*this)(i.getAll(size1()),j.getAll(size2()));
-    }
-    const Matrix<T> indexed(const Slice &i, const Slice &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
     
     /// set a non-zero
     void indexed_one_based_assignment(int k, const T & m){ at(k-1) = m;}
     void indexed_zero_based_assignment(int k, const T & m){ at(k) = m;}
+    void indexed_assignment(const Slice &k, const Matrix<T>& m){ (*this)[k] = m;}
     void indexed_assignment(const IndexList &k, const Matrix<T>& m){
-      (*this)[k.getAll(size())] = m;
-    }
-    void indexed_assignment(const Slice &k, const Matrix<T>& m){
       (*this)[k.getAll(size())] = m;
     }
     
     /// set a matrix element
     void indexed_one_based_assignment(int i, int j, const T & m){ elem(i-1,j-1) = m;}
     void indexed_zero_based_assignment(int i, int j, const T & m){ elem(i,j) = m;}
+    void indexed_assignment(const Slice &i, const Slice &j, const Matrix<T>& m){ (*this)(i,j) = m; }
     void indexed_assignment(const IndexList &i, const IndexList &j, const Matrix<T>& m){
-      (*this)(i.getAll(size1()),j.getAll(size2())) = m;
-    }
-    
-    void indexed_assignment(const Slice &i, const Slice &j, const Matrix<T>& m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
     //@}
@@ -675,7 +634,7 @@ T& Matrix<T>::elem(int i, int j){
 
 template<class T>
 const Matrix<T> Matrix<T>::getSub(int i, int j) const{
-  return getSub(std::vector<int>(1,i),std::vector<int>(1,j));
+  return elem(i,j);
 }
 
 template<class T>
@@ -691,7 +650,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
   
   // Copy nonzeros
   for(int k=0; k<mapping.size(); ++k)
-    ret[k] = (*this)[mapping[k]];
+    ret.data()[k] = data()[mapping[k]];
   
   // Return (RVO)
   return ret;
@@ -716,7 +675,7 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
     // Dense mode
     for(int i=0; i<ii.size(); ++i) {
       for(int j=0; j<jj.size(); ++j) {
-        (*this)[ii[i]*size2() + jj[j]]=el[i*el.size2()+j];
+        data()[ii[i]*size2() + jj[j]]=el.data()[i*el.size2()+j];
       }
     }
   } else {
@@ -737,7 +696,7 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
 template<class T>
 const Matrix<T> Matrix<T>::getNZ(int k) const{
   if (k<0) k+=size();
-  return getNZ(std::vector<int>(1,k));
+  return at(k);
 }
 
 template<class T>
@@ -752,7 +711,7 @@ const Matrix<T> Matrix<T>::getNZ(const std::vector<int>& k) const{
 template<class T>
 void Matrix<T>::setNZ(int k, const Matrix<T>& m){
   if (k<0) k+=size();
-  setNZ(std::vector<int>(1,k),m);
+  at(k) = m.toScalar();
 }
 
 template<class T>
@@ -761,7 +720,7 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
     // Allow scalar assignment:
     // m[:2]=3
     for(int k=0; k<kk.size(); ++k)
-      data()[kk[k]] = m[0];
+      data()[kk[k]] = m.data()[0];
     return;
   }
   if (kk.size()!=m.size()) {
@@ -771,7 +730,7 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
     throw CasadiException(ss.str());
   }
   for(int k=0; k<kk.size(); ++k)
-    data()[kk[k]] = m[k];
+    data()[kk[k]] = m.data()[k];
 }
 
 template<class T>
@@ -946,7 +905,7 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
         stream << "0,  ";
       
       // Print element
-      stream << (*this)[el] << ",  ";
+      stream << data()[el] << ",  ";
       j++;
     }
     
@@ -975,7 +934,7 @@ void Matrix<T>::printSparse(std::ostream &stream) const {
   for(int i=0; i<size1(); ++i)
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j=col(el);
-      stream << "(" << i << "," << j << "): " << (*this)[el] << std::endl;
+      stream << "(" << i << "," << j << "): " << data()[el] << std::endl;
     }
 }
 
@@ -1121,14 +1080,14 @@ void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
     
     // Do the operation on all non-zero elements
     for(int el=0; el<size(); ++el)
-      (*this)[el] = fcn(x[el]);
+      data()[el] = fcn(x.data()[el]);
     
   } else {
     makeDense(x.size1(),x.size2(),fcn_0);
     for(int i=0; i<size1(); ++i){ // loop over rows
       for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over non-zero elements
         int j = x.col(el);
-        (*this)[j+i*size2()] = fcn(x[el]);
+        data()[j+i*size2()] = fcn(x.data()[el]);
       }
     }
   }
@@ -1167,7 +1126,7 @@ void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Ma
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
       int j = y.col(el);
-      elem(i,j) = fcn(x,y[el]);
+      elem(i,j) = fcn(x,y.at(el));
     }
   }
 }
@@ -1185,7 +1144,7 @@ void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, 
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
       int j = x.col(el);
-      elem(i,j) = fcn(x[el],y);
+      elem(i,j) = fcn(x.at(el),y);
     }
   }
 }
@@ -1217,11 +1176,11 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
       int j2 = (el2 < k2) ? y.col(el2) : numel() ;
       
       if(j1==j2)
-        elem(i,j1) = fcn(x[el1++],y[el2++]); 
+        elem(i,j1) = fcn(x.data()[el1++],y.data()[el2++]); 
       else if(j1>j2)
-        elem(i,j2) = fcn(0,y[el2++]);
+        elem(i,j2) = fcn(0,y.data()[el2++]);
       else
-        elem(i,j1) = fcn(x[el1++],0);
+        elem(i,j1) = fcn(x.data()[el1++],0);
       }
     }
 }
@@ -1314,7 +1273,7 @@ void Matrix<T>::getTimesVector(const T *v, T *res) const{
       int j=col(el);  // column
 
       // Multiply with the vector
-      res[i] += v[j]*(*this)[el];
+      res[i] += v[j]*data()[el];
     }
   }
 }
@@ -1343,7 +1302,7 @@ void Matrix<T>::getBand(int kl, int ku, int ldres, T *res) const{
       int s = i - j + ku;
 
       // Store the element
-      res[s + ldres*j] = (*this)[el];
+      res[s + ldres*j] = data()[el];
     }
   }
 }
@@ -1613,7 +1572,7 @@ void Matrix<T>::erase(const std::vector<int>& ii, const std::vector<int>& jj){
   
   // Update non-zero entries
   for(int k=0; k<mapping.size(); ++k)
-    (*this)[k] = (*this)[mapping[k]];
+    data()[k] = data()[mapping[k]];
     
   // Truncate nonzero vector
   data().resize(mapping.size());
@@ -1699,7 +1658,7 @@ Matrix<T> Matrix<T>::trans() const{
   
   // Copy the content
   for(int i=0; i<mapping.size(); ++i)
-    ret[i] = (*this)[mapping[i]];
+    ret[i] = data()[mapping[i]];
   
   return ret;
 }

@@ -33,18 +33,42 @@ namespace CasADi{
   */
   class Slice{
     public:
-      /// Constructor
-      Slice(int start__=0, int stop__=std::numeric_limits<int>::max(), int step__=1);
+      /// Defailt constructor - all elements
+      Slice();
+      
+      /// A single element
+      Slice(int i);
+      
+      /// A slice
+      Slice(int start, int stop, int step=1);
       
       /// Get a vector of indices
       std::vector<int> getAll(int len) const;
       
       /// Data members (all public)
-      int start;
-      int stop;
-      int step;
+      int start_;
+      int stop_;
+      int step_;
   };
   static Slice ALL;
+  
+  /** Class representing a set of indices of arbitrary order */
+  class IndexSet{
+    public:
+    
+      /// A single element
+      IndexSet(int i);
+  
+      /// A set of indices
+      IndexSet(const std::vector<int>& v);
+      
+      /// Get a vector of indices
+      const std::vector<int>& getAll(int len) const;
+      
+      /// Data members (all public)
+      std::vector<int> v_;
+  };
+  
   
    /**  Class representing a non-regular (and thus non-slice) index list 
    */
@@ -55,9 +79,9 @@ namespace CasADi{
       enum Type {NILL, INT, SLICE, IVECTOR};
       /// Constructor
       IndexList();
-      IndexList(int i);
-      IndexList(const std::vector<int> &i);
-      IndexList(const Slice &i);
+      explicit IndexList(int i);
+      explicit IndexList(const std::vector<int> &i);
+      explicit IndexList(const Slice &i);
       
       /// Get a vector of indices
       std::vector<int> getAll(int len) const;

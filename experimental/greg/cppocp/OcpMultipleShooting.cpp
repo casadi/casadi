@@ -67,19 +67,19 @@ int OcpMultipleShooting::getBigN()
 // get state at proper timestep
 SX OcpMultipleShooting::getState(string x, int timeStep)
 {
-	return designVariables[getStateActionIdx(x, timeStep)];
+	return designVariables.at(getStateActionIdx(x, timeStep));
 }
 
 // get action at proper timestep
 SX OcpMultipleShooting::getAction(string u, int timeStep)
 {
-	return designVariables[getStateActionIdx(u, timeStep)];
+	return designVariables.at(getStateActionIdx(u, timeStep));
 }
 
 // get param at proper timestep
 SX OcpMultipleShooting::getParam(string p)
 {
-	return designVariables[getParamIdx(p)];
+	return designVariables.at(getParamIdx(p));
 }
 
 // calculate the index of states/actions at proper timestep

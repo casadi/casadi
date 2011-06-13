@@ -25,16 +25,33 @@
 
 namespace CasADi{
 
-Slice::Slice(int start__, int stop__, int step__) : start(start__), stop(stop__), step(step__){
+Slice::Slice() : start_(0), stop_(-1), step_(1){ 
+}
+      
+Slice::Slice(int i) : start_(i), stop_(i+1), step_(1){
+}
+
+Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(step){
 }
 
 std::vector<int> Slice::getAll(int len) const{
-  int start_ = start;
-  int stop_  = stop;
-  if (start_<0) start_+=len;
-  if (stop_<=0) stop_+=len;
-  return range(start_,stop_,step,len);
+  int start = start_;
+  int stop  = stop_;
+  if (start<0) start+=len;
+  if (stop<=0) stop+=len;
+  return range(start,stop,step_,len);
 }
+
+IndexSet::IndexSet(int i) : v_(1,i){
+}
+  
+IndexSet::IndexSet(const std::vector<int>& v) : v_(v){
+}
+      
+const std::vector<int>& IndexSet::getAll(int len) const{
+  return v_;
+}
+
 
 IndexList::IndexList() : type(NILL) {}
 IndexList::IndexList(int i_) : i(i_), type(INT) {}

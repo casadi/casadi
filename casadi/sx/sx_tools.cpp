@@ -63,7 +63,7 @@ Matrix<SX> gauss_quadrature(Matrix<SX> f, const Matrix<SX> &x, const Matrix<SX> 
   SXFunction fcn(x,f);
   vector<SX> f_val(5);
   for(int i=0; i<5; ++i)
-    f_val[i] = fcn.eval(xi[i])[0];
+    f_val[i] = fcn.eval(xi[i]).toScalar();
 
   // Weighted sum
   SX sum;
@@ -162,7 +162,7 @@ bool contains(const Matrix<SX> &list, const SX &e) {
 void simplify(Matrix<SX> &ex){
   // simplify all non-zero elements
   for(int el=0; el<ex.size(); ++el)
-    simplify(ex[el]);
+    simplify(ex.at(el));
 }
 
 void compress(Matrix<SX> &ex, int level){
@@ -321,7 +321,7 @@ bool isSymbolic(const Matrix<SX>& ex){
 
 bool isSymbolicSparse(const Matrix<SX>& ex) {
   for(int k=0; k<ex.size(); ++k) // loop over non-zero elements
-    if(!ex[k]->isSymbolic()) // if an element is not symbolic
+    if(!ex.at(k)->isSymbolic()) // if an element is not symbolic
       return false;
   
   return true;
@@ -704,7 +704,7 @@ Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Mat
                   x,a,
                   order-order_contributions[i],
                   order_contributions,
-                  current_dx*(x[i]-a[i]),
+                  current_dx*(x.at(i)-a.at(i)),
                   current_denom*current_order,current_order+1);
     }
   }
