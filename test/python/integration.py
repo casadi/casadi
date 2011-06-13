@@ -293,8 +293,46 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
     self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
-    
 
+  def test_hess5(self):
+    self.message('CVodes integration: hessian to p in an MX tree')
+    num=self.num
+    q0=MX("q0")
+    p=MX("p")
+    dq0=MX("dq0")
+    qe = MXFunction([q0,p,dq0],[self.integrator.call([q0,p,dq0])[0]])
+    qe.init()
+
+    JT = MXFunction([q0,p,dq0],[qe.jac(1)[0].T])
+    JT.init()
+    JT.input(0).set([num['q0']])
+    JT.input(1).set([num['p']])
+    JT.evaluate(1,0)
+    print JT.output()
+
+    H  = Jacobian(JT,1)
+    H.init()
+    H.input(0).set([num['q0']])
+    H.input(1).set([num['p']])
+    H.evaluate()
+    print "Estimate =", H.output()
+    
+  def test_hess6(self):
+    self.message('CVodes integration: hessian to p in an MX tree')
+    num=self.num
+    q0=MX("q0")
+    p=MX("p")
+    dq0=MX("dq0")
+    qe = MXFunction([q0,p,dq0],[self.integrator.call([q0,p,dq0])[0]])
+    qe.init()
+    
+    H = qe.hessian(1)
+    H.init()
+    H.input(0).set([num['q0']])
+    H.input(1).set([num['p']])
+    H.evaluate()
+    print "woot"*6 , H.output()
+ 
   def test_issue87(self):
     return # see issue 87
     self.message('CVodes integration: hessian to p: fwd-over-adjoint on integrator')

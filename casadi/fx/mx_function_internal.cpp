@@ -23,6 +23,7 @@
 #include "mx_function_internal.hpp"
 #include "../mx/jacobian_reference.hpp"
 #include "../mx/evaluation.hpp"
+#include "../mx/mapping.hpp"
 
 #include "../stl_vector_tools.hpp"
 
@@ -510,6 +511,21 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   return ret;
 }
 
+FX MXFunctionInternal::hessian(int iind, int oind) {
+  // Get the jacobian of this function
+  MX J = jac(iind).at(oind);
+  // Transpose it to get the gradient (better not rely on mx_tools)
+  std::vector<int> nzind;
+  CRSSparsity sp = J->sparsity().transpose(nzind);
+  MX G;
+  G.assignNode(new Mapping(sp));
+  G->addDependency(J,nzind);
+  // Construct a function of it
+  MXFunction temp(inputv,G);
+  temp.init();
+  // And return the jacobian of that gradient function
+  return temp.jacobian(iind,0);
+}
 
 
 } // namespace CasADi

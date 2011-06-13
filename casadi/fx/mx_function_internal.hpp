@@ -90,6 +90,10 @@ class MXFunctionInternal : public XFunctionInternal{
     // Lifting function
     LiftingFunction liftfun_;
     void* liftfun_ud_;
+    
+    /** \brief Hessian of output oind with respect to input iind.  */
+    FX hessian(int iind, int oind);
+    
 };
 
 } // namespace CasADi

@@ -1348,9 +1348,29 @@ class MXtests(casadiTestCase):
     f = MXFunction([x],[x+y])
 
     f.init()
-    f.evaluate(1,0) # this should not throw a segfault
+    f.evaluate(0,0) # this should not throw a segfault
+    f.evaluate(1,1) # this should not throw a segfault
 
+    f = MXFunction([x],[y+x])
+
+    f.init()
+    f.evaluate(0,0) # this should not throw a segfault
+    f.evaluate(1,1) # this should not throw a segfault
     
+    x = MX("x",1,1)
+    y = MX(1,1)
+
+    f = MXFunction([x],[x+y])
+
+    f.init()
+    f.evaluate(0,0) # this should not throw a segfault
+    f.evaluate(1,1) # this should not throw a segfault
+    
+    f = MXFunction([x],[y+x])
+
+    f.init()
+    #f.evaluate(0,0) # this should not throw a segfault
+    #f.evaluate(1,1) # this should not throw a segfault
     
 if __name__ == '__main__':
     unittest.main()

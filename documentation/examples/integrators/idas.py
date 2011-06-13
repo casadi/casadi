@@ -1,5 +1,9 @@
 #! IDAS integrator
 #! =====================
+#!
+#! We solve a system
+#!   $\dot{x}(t)=f(x(t),y(t),t)$ \n
+#!   $0=g(x(t),y(t),t)$ \n
 from casadi import *
 from numpy import *
 from pylab import *
@@ -50,15 +54,13 @@ f.evaluate()
 print f.output() # This should be all zeros
 
 
-#! Let's check our jacobian:
-j = Jacobian(f,DAE_Y,0)
-j.init()
-
-j.input(DAE_P).set(P_)
-j.input(DAE_Y).set(Y_)
-j.input(DAE_YDOT).set(YDOT_)
-j.evaluate()
-print array(j.output())
+#! Let's check our jacobian $\frac{dg}{dy}$:
+j = jacobian(res[-1],lambd)
+print j
+#! Note that the jacobian is not invertible: it is not of DAE-index 1
+#!
+#! This system is not solvable with idas, because it is of DAE-index 3.
+#! It is impossible to lambda from the last element of the residual.
 
 #! We create a DAE system solver
 I = IdasIntegrator(f)
@@ -98,8 +100,8 @@ j.input(DAE_P).set(P_)
 j.input(DAE_Y).set(Y_)
 j.input(DAE_YDOT).set(YDOT_)
 j.evaluate()
-print array(j.output())
-#! The last three columns of the jacobian span a three-space, which allows us to solve. 
+print array(j.output())[2:,2:]
+#! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
 I = IdasIntegrator(f)

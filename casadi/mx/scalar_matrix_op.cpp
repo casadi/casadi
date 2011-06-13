@@ -46,8 +46,9 @@ void ScalarMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
 void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   if(nfwd==0 && nadj==0){
     // No sensitivities
-    for(int i=0; i<size(); ++i)
-      casadi_math<double>::fun[op](input[0][0],input[1][i],output[i]);
+    for(int i=0; i<size(); ++i) {
+        casadi_math<double>::fun[op](input[0][0],input[1][i],output[i]);
+    }
     
   } else {
     // Sensitivities
