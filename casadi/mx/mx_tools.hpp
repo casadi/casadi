@@ -128,6 +128,9 @@ Create a sparse matrix from a dense matrix A, with sparsity pattern sp
 /** \brief Lift a node */
 MX lift(const MX& x);
 
+/** \brief  Make the matrix dense */
+void makeDense(MX& x);
+
 
 } // namespace CasADi
 

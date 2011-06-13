@@ -29,6 +29,7 @@
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
+#include "densification.hpp"
 
 using namespace std;
 
@@ -286,6 +287,15 @@ MX lift(const MX& x){
   casadi_warning("Lifting marking not yet functional");
   return x;
 }
+
+void makeDense(MX& x){
+  // Quick return if already dense
+  if(x.dense()) return;
+  
+  // Densify
+  x = MX::create(new Densification(x));
+}
+
 
 } // namespace CasADi
 

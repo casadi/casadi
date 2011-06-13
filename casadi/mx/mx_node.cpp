@@ -21,6 +21,7 @@
  */
 
 #include "mx_node.hpp"
+#include "../stl_vector_tools.hpp"
 #include <cassert>
 #include <typeinfo> 
 
@@ -159,6 +160,5 @@ int MXNode::getFunctionOutput() const{
 int MXNode::getFunctionInput() const{
   throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
 }
-
 
 } // namespace CasADi

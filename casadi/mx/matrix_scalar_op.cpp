@@ -21,6 +21,7 @@
  */
 
 #include "matrix_scalar_op.hpp"
+#include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
 
@@ -28,7 +29,12 @@ using namespace std;
 
 namespace CasADi{
 
-MatrixScalarOp::MatrixScalarOp(Operation op_, const MX& x, const MX& y) : op(op_){
+MatrixScalarOp::MatrixScalarOp(Operation op_, MX x, const MX& y) : op(op_){
+  // Put densifying node in between if necessary
+  if(!SX::f0x_is_zero_[op]){
+    makeDense(x);
+  }
+  
   if (y.size()==0) {
     setDependencies(x,0);
   } else {

@@ -20,43 +20,42 @@
  *
  */
 
-#ifndef MATRIX_SCALAR_OP_HPP
-#define MATRIX_SCALAR_OP_HPP
+#ifndef DENSIFICATION_HPP
+#define DENSIFICATION_HPP
 
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief Represents a general matrix scalar opertion on MXes
-  \author Joel Andersson 
-  \date 2010
+/** \brief Make an expression dense
+  \author Joel Andersson
+  \date 2011
 */	
-class MatrixScalarOp : public MXNode{
-  public:
+class Densification : public MXNode{
+public:
 
-    /** \brief  Constructor */
-    MatrixScalarOp(Operation op, MX x, const MX& y);
-    
-    /** \brief  Destructor */
-    virtual ~MatrixScalarOp(){}
+  /** \brief  Constructor */
+  Densification(const MX& x);
 
-    /** \brief  Clone function */
-    virtual MatrixScalarOp * clone() const;
+  /** \brief  Destructor */
+  virtual ~Densification(){}
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+  /** \brief  Clone function */
+  virtual Densification * clone() const;
 
-    /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+  /** \brief  Print */
+  virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
+  /** \brief  Evaluate the function and store the result in the node */
+  virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
-  protected:
+  /// Symbolic forward sensitivities
+  virtual MX adFwd(const std::vector<MX>& jx);
 
-    Operation op;
+  /// Nonzero mapping
+  std::vector<int> mapping_;
 };
 
 } // namespace CasADi
 
 
-#endif // MATRIX_SCALAR_OP_HPP
+#endif // DENSIFICATION_HPP

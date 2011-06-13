@@ -906,6 +906,17 @@ void CRSSparsity::strongly_connected_components(){
   
 }
 
+CRSSparsity CRSSparsity::makeDense(std::vector<int>& mapping) const{
+  mapping.resize(size());
+  for(int i=0; i<size1(); ++i){
+    for(int el=rowind(i); el<rowind(i+1); ++el){
+      int j = col(el);
+      mapping[el] = j + i*size2();
+    }
+  }
+  
+  return CRSSparsity(size1(),size2(),true);
+}
 
 
 } // namespace CasADi

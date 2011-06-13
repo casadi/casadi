@@ -34,7 +34,7 @@ class UnaryOp : public MXNode{
 public:
 
   /** \brief  Constructor */
-  UnaryOp(Operation op, const MX& x);
+  UnaryOp(Operation op, MX x);
 
   /** \brief  Destructor */
   virtual ~UnaryOp(){}

@@ -207,7 +207,11 @@ class SX{
     
     // Set the temporary variable
     void setTemp(int t);
-    
+
+    /// Does evaluating the functions with zeros give a zero?
+    static std::vector<bool> f00_is_zero_, f0x_is_zero_, fx0_is_zero_;
+    static std::vector<bool> is_always_zero(bool x_is_zero, bool y_is_zero);
+
     
   private:
 #ifndef SWIG

@@ -238,27 +238,19 @@ MX MX::binary(int op, const MX &x, const MX &y){
 }
 
 MX MX::unary(int op, const MX &x){
-  MX ret;
-  ret.assignNode(new UnaryOp(Operation(op),x));
-  return ret;
+  return create(new UnaryOp(Operation(op),x));
 }
 
 MX MX::scalar_matrix(int op, const MX &x, const MX &y){
-  MX ret;
-  ret.assignNode(new ScalarMatrixOp(Operation(op),x,y));  
-  return ret;
+  return create(new ScalarMatrixOp(Operation(op),x,y)); 
 }
 
 MX MX::matrix_scalar(int op, const MX &x, const MX &y){
-  MX ret;
-  ret.assignNode(new MatrixScalarOp(Operation(op),x,y));  
-  return ret;
+  return create(new MatrixScalarOp(Operation(op),x,y));
 }
 
 MX MX::matrix_matrix(int op, const MX &x, const MX &y){
-  MX ret;
-  ret.assignNode(new MatrixMatrixOp(Operation(op),x,y)); 
-  return ret;
+  return create(new MatrixMatrixOp(Operation(op),x,y)); 
 }
 
 MX operator*(const MX &x, const MX &y){

@@ -21,6 +21,7 @@
  */
 
 #include "matrix_matrix_op.hpp"
+#include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
 
@@ -28,7 +29,15 @@ using namespace std;
 
 namespace CasADi{
 
-MatrixMatrixOp::MatrixMatrixOp(Operation op_, const MX& x, const MX& y) : op(op_){
+MatrixMatrixOp::MatrixMatrixOp(Operation op_, MX x, MX y) : op(op_){
+  // Put densifying nodes in between if necessary
+  if(!SX::f00_is_zero_[op] && !(x.dense() || y.dense())){
+    if(x.size()>y.size()) // enough to make one of them dense
+      makeDense(x);
+    else
+      makeDense(y);
+  }
+  
   setDependencies(x,y);
   
   // Check if the sparsity patterns are the same
@@ -139,6 +148,7 @@ MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
 	
   return MX();
 }
+
 
 } // namespace CasADi
 

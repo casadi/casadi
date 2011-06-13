@@ -235,9 +235,11 @@ SX operator||(const SX &a, const SX &b){
 }
 
 SX operator==(const SX &x, const SX &y){
-    if(x->isConstant())
-    return x==y; // ok since the result will be either 0 or 1, i.e. no new nodes
-  else
+  if(x.isEqual(y))
+    return 1; // this also covers the case when both are constant and equal
+  else if(x.isConstant() && y.isConstant())
+    return 0;
+  else // create a new node
     return SX(new BinarySXNode(EQUALITY,x,y));
 }
 
@@ -589,6 +591,25 @@ void SX::setTemp(int t){
   (*this)->temp = t;
 }
 
+std::vector<bool> SX::is_always_zero(bool x_is_zero, bool y_is_zero){
+  std::vector<bool> ret(NUM_BUILT_IN_OPS);
+  
+  // Variables
+  SX x,y,f;
+  x = x_is_zero ? 0. : SX("x");
+  y = y_is_zero ? 0. : SX("y");
+
+  for(int op=0; op<ret.size(); ++op){
+    casadi_math<SX>::fun[op](x,y,f);
+    ret[op] = casadi_limits<SX>::isZero(f);
+  }
+  
+  return ret;
+}
+
+std::vector<bool> SX::f00_is_zero_ = SX::is_always_zero(true,true);
+std::vector<bool> SX::fx0_is_zero_ = SX::is_always_zero(false,true);
+std::vector<bool> SX::f0x_is_zero_ = SX::is_always_zero(true,false);
 
 
 } // namespace CasADi

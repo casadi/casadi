@@ -203,6 +203,9 @@ class CRSSparsity : public SharedObject{
     */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
+    /** \brief Make a patten dense */
+    CRSSparsity makeDense(std::vector<int>& mapping) const;
+
     /** \brief Erase rows and columns
     Erase rows and/or columns of a matrix */
     std::vector<int> erase(const std::vector<int>& ii, const std::vector<int>& jj);

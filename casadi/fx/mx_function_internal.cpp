@@ -127,7 +127,7 @@ void MXFunctionInternal::init(){
     
     // Save the node
     it->mx.assignNode(nodes[ii]);
-    it->val.data = Matrix<double>(m->sparsity());
+    it->val.data = Matrix<double>(m->sparsity(),0);
     it->val.dataF.resize(nfdir_);
     it->val.dataA.resize(nadir_);
     it->val.init();

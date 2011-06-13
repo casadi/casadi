@@ -21,6 +21,7 @@
  */
 
 #include "unary_op.hpp"
+#include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
 
@@ -28,7 +29,12 @@ using namespace std;
 
 namespace CasADi{
 
-UnaryOp::UnaryOp(Operation op_, const MX& x) : op(op_){
+UnaryOp::UnaryOp(Operation op_, MX x) : op(op_){
+  // Put a densifying node in between if necessary
+  if(!SX::fx0_is_zero_[op]){
+    makeDense(x);
+  }
+  
   setDependencies(x);
   setSparsity(x->sparsity());
 }

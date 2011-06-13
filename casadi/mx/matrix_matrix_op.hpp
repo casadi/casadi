@@ -34,7 +34,7 @@ class MatrixMatrixOp : public MXNode{
   public:
 
     /** \brief  Constructor */
-    MatrixMatrixOp(Operation op, const MX& x, const MX& y);
+    MatrixMatrixOp(Operation op, MX x, MX y);
 
     /** \brief  Destructor */
     virtual ~MatrixMatrixOp(){}
@@ -50,7 +50,7 @@ class MatrixMatrixOp : public MXNode{
 
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
-    
+        
   protected:
     //! \brief Operation
     Operation op;
@@ -60,7 +60,7 @@ class MatrixMatrixOp : public MXNode{
 
     /// Which element belong to which 
     std::vector<int> mapping_;
-
+    
 };
 
 } // namespace CasADi
