@@ -21,16 +21,20 @@
  */
 
 #include <iostream>
+#include <cstdlib>
 
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/sx/sx_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
 //#include <casadi/fx/jacobian.hpp>
 
+#include <interfaces/ipopt/ipopt_solver.hpp>
 
 #include "Ode.hpp"
 #include "Ocp.hpp"
-#include "OcpMultipleShooting.hpp"
+#include "MultipleShooting.hpp"
+
+#include <SnoptInterface.hpp>
 
 #include <string>
 #include <map>
@@ -39,7 +43,7 @@ using namespace CasADi;
 using namespace std;
 
 void
-dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t __attribute__((unused)))
+dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
 	// constants
 	double AR = 6;     // aspect ration
@@ -54,7 +58,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	SX CL = 2.0*3.14159*alpha;
 	SX Cd = Cd0 + 1.1*CL*CL/(3.14159*AR);
 
-	// airspee
+	// airspeed
 	SX vx = state["vx"];
 	SX vz = state["vz"];
 	SX norm_v = sqrt( vx*vx + vz*vz );
@@ -71,53 +75,63 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	xDot["z"] = vz;
 	xDot["vx"] = ax;
 	xDot["vz"] = az;
+
+	//	intermediate["airspeed"] = norm_v;
 }
 
-int
-main()
+Ode
+getGliderOde()
 {
 	Ode ode("glider");
 	ode.addState("x");
 	ode.addState("z");
 	ode.addState("vx");
 	ode.addState("vz");
+
 	ode.addAction("alphaDeg");
-	ode.addParam("tEnd");
 
 	ode.dxdt = &dxdt;
 
-	OcpMultipleShooting ocp(&ode);
+	return ode;
+}
 
-	ocp.discretize(80);
 
-	SX tEnd = ocp.getParam("tEnd");
-	ocp.setTimeInterval(0.0, tEnd);
-	ocp.objFun = -tEnd;
+int
+main()
+{
+	Ode ode = getGliderOde();
+	Ocp ocp;
+	SX tEnd = ocp.addParam("tEnd");
+
+	MultipleShooting & ms = ocp.addMultipleShooting("glider", ode, 0, tEnd, 100);
+	
+	ocp.objFun = -tEnd; // maximum time
 
 	// Bounds/initial condition
 	ocp.boundParam("tEnd", 2, 200);
-	for (int k=0; k<ocp.N; k++){
-		ocp.boundStateAction("x", 0, 1e3, k);
-		ocp.boundStateAction("z", -100, 0, k);
-		ocp.boundStateAction("vx", 0, 100, k);
-		ocp.boundStateAction("vz", -100, 100, k);
 
-		ocp.boundStateAction("alphaDeg", -15, 15, k);
+	for (int k=0; k<ms.N; k++){
+		ms.boundStateAction("x", 0, 1e3, k);
+		ms.boundStateAction("z", -100, 0, k);
+		ms.boundStateAction("vx", 0, 100, k);
+		ms.boundStateAction("vz", -100, 100, k);
+
+		ms.boundStateAction("alphaDeg", -15, 15, k);
 	}
 
 	#define INCLINATION0_DEG 0.0
 	#define V0 20.0
-	ocp.boundStateAction("x", 0, 0, 0);
-	ocp.boundStateAction("z", 0, 0, 0);
-	ocp.boundStateAction("vx",  V0*cos(INCLINATION0_DEG*M_PI/180.0),  V0*cos(INCLINATION0_DEG*M_PI/180.0),  0);
-	ocp.boundStateAction("vz", -V0*sin(INCLINATION0_DEG*M_PI/180.0), -V0*sin(INCLINATION0_DEG*M_PI/180.0),  0);
+	ms.boundStateAction("x", 0, 0, 0);
+	ms.boundStateAction("z", 0, 0, 0);
+	ms.boundStateAction("vx",  V0*cos(INCLINATION0_DEG*M_PI/180.0),  V0*cos(INCLINATION0_DEG*M_PI/180.0),  0);
+	ms.boundStateAction("vz", -V0*sin(INCLINATION0_DEG*M_PI/180.0), -V0*sin(INCLINATION0_DEG*M_PI/180.0),  0);
 
 	// initial guesses
 	ocp.setParamGuess("tEnd", 80);
-	for (int k=0; k<ocp.N; k++){
-		ocp.setStateActionGuess("x", double(k)/double(ocp.N)*20, k);
-		ocp.setStateActionGuess("z", double(k)/double(ocp.N)*0, k);
-		ocp.setStateActionGuess("vx", 4, k);
+	for (int k=0; k<ms.N; k++){
+		ms.setStateActionGuess("x", double(k)/double(ms.N)*20, k);
+		ms.setStateActionGuess("z", double(k)/double(ms.N)*0, k);
+		ms.setStateActionGuess("vx", 4, k);
 	}
 
 	// Create the NLP solver
@@ -146,7 +160,6 @@ main()
 
 	// Solve the problem
 	solver.solve();
-	
 
 	// Print the optimal cost
 	double cost;
@@ -154,14 +167,14 @@ main()
 	cout << "optimal time: " << cost << endl;
 
 	// Print the optimal solution
-	vector<double>xopt(ocp.getBigN());
+	vector<double>xopt(ocp.designVariables.size1());
 	solver.getOutput(xopt,NLP_X_OPT);
-	//cout << "optimal solution: " << xopt << endl;
+	cout << "optimal solution: " << xopt << endl;
 
-	double * xopt_ = new double[ocp.getBigN()];
+	double * xopt_ = new double[ocp.designVariables.size1()];
 	
 	copy( xopt.begin(), xopt.end(), xopt_ );
-	ocp.writeMatlabOutput( xopt_ );
+	ocp.writeMatlabOutput( "glider_out", xopt_ );
 	delete xopt_;
 
 	return 0;

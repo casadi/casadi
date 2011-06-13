@@ -9,7 +9,7 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
 
-#include <experimental/greg/cppocp/ocpMultipleShooting.hpp>
+#include <experimental/greg/cppocp/Ocp.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,21 +29,20 @@ class SnoptInterface
 {
 public:
 	~SnoptInterface(void);
-	SnoptInterface(const CasADi::SXFunction& user_F);
-	SnoptInterface(const OcpMultipleShooting& ocp);
+	// SnoptInterface(const CasADi::SXFunction& user_F);
+	SnoptInterface(const Ocp& ocp);
 
-	// The NLP functions
-	// objective/constraint function
+	// objective/constraints
 	CasADi::SXMatrix ftotal;
 
-	CasADi::SXFunction Ftotal;
+	// function for nonlinear part of ftotal
 	CasADi::SXFunction Fnonlinear;
 
-	// objective/constraint jacobian nonlinear part
+	// function for jacobian of Fnonlinear
 	CasADi::SXFunction Gfcn;
 
-	// design variables
-	const CasADi::SXMatrix * designVariables;
+	// design variables reference
+	const CasADi::SXMatrix & designVariables;
 
 	void init(void);
 	void run(void);

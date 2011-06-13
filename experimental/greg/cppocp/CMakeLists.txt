@@ -3,7 +3,7 @@ project(cppocp)
 
 SET(CPPOCP_SRCS
   Ocp.cpp   Ocp.hpp
-  OcpMultipleShooting.cpp   OcpMultipleShooting.hpp
+  MultipleShooting.cpp   MultipleShooting.hpp
   Ode.cpp   Ode.hpp
 )
 

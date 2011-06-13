@@ -31,7 +31,7 @@
 
 #include "Ode.hpp"
 #include "Ocp.hpp"
-#include "OcpMultipleShooting.hpp"
+#include "MultipleShooting.hpp"
 
 #include <SnoptInterface.hpp>
 
@@ -42,7 +42,7 @@ using namespace CasADi;
 using namespace std;
 
 void
-dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t __attribute__((unused)))
+dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
 	// constants
 	double AR = 6;     // aspect ration
@@ -57,7 +57,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	SX CL = 2.0*3.14159*alpha;
 	SX Cd = Cd0 + 1.1*CL*CL/(3.14159*AR);
 
-	// airspee
+	// airspeed
 	SX vx = state["vx"];
 	SX vz = state["vz"];
 	SX norm_v = sqrt( vx*vx + vz*vz );
@@ -74,57 +74,87 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	xDot["z"] = vz;
 	xDot["vx"] = ax;
 	xDot["vz"] = az;
+
+	//	intermediate["airspeed"] = norm_v;
 }
 
-int
-main()
+Ode
+getGliderOde()
 {
 	Ode ode("glider");
 	ode.addState("x");
 	ode.addState("z");
 	ode.addState("vx");
 	ode.addState("vz");
+
 	ode.addAction("alphaDeg");
-	ode.addParam("tEnd");
 
 	ode.dxdt = &dxdt;
 
-	OcpMultipleShooting ocp(&ode);
+	return ode;
+}
 
-	ocp.discretize(200);
+int
+main()
+{
+	Ode ode = getGliderOde();
+	Ocp ocp;
+	SX tEnd = ocp.addParam("tEnd");
 
-	SX tEnd = ocp.getParam("tEnd");
-	ocp.setTimeInterval(1.0, tEnd);
+	MultipleShooting & msTakeoff = ocp.addMultipleShooting("takeoff", ode, 0.0, 6, 100);
+	MultipleShooting & msGlide = ocp.addMultipleShooting("glide", ode, 6, tEnd, 100);
+	
 	ocp.objFun = -tEnd; // maximum time
-	//ocp.objFun = -ocp.getState("x", ocp.N-1); // maximum distance
 
-	// Bounds/initial condition
+	// tie stages together
+	SXMatrix xTakeoffEnd = msTakeoff.getStateMat(msTakeoff.N-1);
+	SXMatrix uTakeoffEnd = msTakeoff.getActionMat(msTakeoff.N-1);
+	SXMatrix xGlideBegin = msGlide.getStateMat(0);
+	SXMatrix uGlideBegin = msGlide.getActionMat(0);
+
+	ocp.addNonlconEq( xTakeoffEnd - xGlideBegin );
+	ocp.addNonlconEq( uTakeoffEnd - uGlideBegin );
+
+	// bounds
 	ocp.boundParam("tEnd", 2, 200);
-	for (int k=0; k<ocp.N; k++){
-		ocp.boundStateAction("x", 0, 1e3, k);
-		ocp.boundStateAction("z", -100, 0, k);
-		ocp.boundStateAction("vx", 0, 100, k);
-		ocp.boundStateAction("vz", -100, 100, k);
 
-		ocp.boundStateAction("alphaDeg", -15, 15, k);
-	}
+	msTakeoff.boundStateAction("x", 0, 1e3);
+	msTakeoff.boundStateAction("z", -300, 0);
+	msTakeoff.boundStateAction("vx", 0, 100);
+	msTakeoff.boundStateAction("vz", -100, 100);
 
+	msGlide.boundStateAction("x", 0, 1e3);
+	msGlide.boundStateAction("z", -300, 0);
+	msGlide.boundStateAction("vx", 0, 100);
+	msGlide.boundStateAction("vz", -100, 100);
+
+	msTakeoff.boundStateAction("alphaDeg", -15, 15);
+	msGlide.boundStateAction("alphaDeg", -15, 15);
+
+	// initial condition
 	#define INCLINATION0_DEG 0.0
 	#define V0 20.0
-	ocp.boundStateAction("x", 0, 0, 0);
-	ocp.boundStateAction("z", 0, 0, 0);
-	ocp.boundStateAction("vx",  V0*cos(INCLINATION0_DEG*M_PI/180.0),  V0*cos(INCLINATION0_DEG*M_PI/180.0),  0);
-	ocp.boundStateAction("vz", -V0*sin(INCLINATION0_DEG*M_PI/180.0), -V0*sin(INCLINATION0_DEG*M_PI/180.0),  0);
+	msTakeoff.boundStateAction("x", 0.0, 0.0, 0);
+	msTakeoff.boundStateAction("z", 0.0, 0.0, 0);
+	msTakeoff.boundStateAction("vx",  V0*cos(INCLINATION0_DEG*M_PI/180.0),  V0*cos(INCLINATION0_DEG*M_PI/180.0),  0);
+	msTakeoff.boundStateAction("vz", -V0*sin(INCLINATION0_DEG*M_PI/180.0), -V0*sin(INCLINATION0_DEG*M_PI/180.0),  0);
 
-	// initial guesses
-	ocp.setParamGuess("tEnd", 80);
-	for (int k=0; k<ocp.N; k++){
-		ocp.setStateActionGuess("x", double(k)/double(ocp.N)*20, k);
-		ocp.setStateActionGuess("z", double(k)/double(ocp.N)*0, k);
-		ocp.setStateActionGuess("vx", 4, k);
+	// // initial guesses
+	ocp.setParamGuess("tEnd", 80.0);
+
+	for (int k=0; k< msTakeoff.N; k++){
+		msTakeoff.setStateActionGuess("x", double(k)/double(msTakeoff.N)*20, k);
+		msTakeoff.setStateActionGuess("z", -double(k)/double(msTakeoff.N)*15, k);
+		msTakeoff.setStateActionGuess("vx", 4.0, k);
 	}
 
-	// Create the NLP solver
+	for (int k=0; k< msTakeoff.N; k++){
+		msGlide.setStateActionGuess("x", 20 + double(k)/double(msTakeoff.N)*20, k);
+		msGlide.setStateActionGuess("z", -double(msTakeoff.N - k - 1)/double(msTakeoff.N)*15, k);
+		msGlide.setStateActionGuess("vx", 4.0, k);
+	}
+
+	// solve
 	SnoptInterface si(ocp);
 
 	si.run();
@@ -133,11 +163,13 @@ main()
 	cout << "optimal time: " << -si.F[0] << endl;
 	
 	// Print the optimal solution
-	// vector<double>xopt(ocp.getBigN());
+	// vector<double>xopt(ms.getBigN());
 	// solver.getOutput(xopt,NLP_X_OPT);
 	//cout << "optimal solution: " << xopt << endl;
 
-	ocp.writeMatlabOutput( si.x );
-
+	ocp.writeMatlabOutput( "params_out", si.x );
+	msGlide.writeMatlabOutput( "glide_out", si.x );
+	msTakeoff.writeMatlabOutput( "takeoff_out", si.x );
+	
 	return 0;
 }

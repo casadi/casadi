@@ -22,16 +22,9 @@ public:
 	// states/actions/params variables/functions
 	std::map<std::string,int> states;
 	std::map<std::string,int> actions;
-	std::map<std::string,int> params;
 	
 	void addState(std::string _newState);
 	void addAction(std::string _newAction);
-	void addParam(std::string _newParam);
-
-	int nx(void);
-	int nu(void);
-	int np(void);
-	int nxu(void);
 
 	void (*dxdt)(std::map<std::string,CasADi::SX> &xDot,
 				 std::map<std::string,CasADi::SX> state,
@@ -42,21 +35,24 @@ public:
 
 	void assertUnlocked(void);
 
-
-	int isState(std::string stateName);
-	int isAction(std::string actionName);
-	int isParam(std::string paramName);
-
-	CasADi::SXMatrix dxVectorDt( CasADi::SXMatrix x, CasADi::SXMatrix u, CasADi::SXMatrix p, CasADi::SX t );
+	CasADi::SXMatrix dxVectorDt( CasADi::SXMatrix x, CasADi::SXMatrix u, std::map<std::string,CasADi::SX> & p, CasADi::SX t );
 	CasADi::SXMatrix rk4Step( CasADi::SXMatrix x0Vec,
 							  CasADi::SXMatrix u0Vec,
 							  CasADi::SXMatrix u1Vec,
-							  CasADi::SXMatrix pVec,
+							  std::map<std::string,CasADi::SX> & pVec,
 							  CasADi::SX t0,
 							  CasADi::SX t1);
 
-private:
-	void assertUniqueName(std::string newName);
 
+	int nx(void);
+	int nu(void);
+	int nxu(void);
+
+private:
+	int isState(std::string stateName);
+	int isAction(std::string actionName);
+
+protected:
+	void assertUniqueName(std::string newName);
 	
 };

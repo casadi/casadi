@@ -27,10 +27,12 @@
 #include <casadi/fx/sx_function.hpp>
 //#include <casadi/fx/jacobian.hpp>
 
+#include <interfaces/ipopt/ipopt_solver.hpp>
+
 
 #include "Ode.hpp"
 #include "Ocp.hpp"
-#include "OcpMultipleShooting.hpp"
+#include "MultipleShooting.hpp"
 
 #include <string>
 #include <map>
@@ -45,7 +47,6 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	SX v = state["v"];
 	SX mass = state["mass"];
 	SX thrust = action["thrust"];
-	SX tEnd = param["tEnd"];
 
 	double massBurnedPerThrustSquared = 1e-6;
 
@@ -62,16 +63,13 @@ main()
 	ode.addState("v");
 	ode.addState("mass");
 	ode.addAction("thrust");
-	ode.addParam("tEnd");
 
 	ode.dxdt = &dxdt;
 
-	OcpMultipleShooting ocp(&ode);
+	Ocp ocp;
+	SX tEnd = ocp.addParam("tEnd");
+	MultipleShooting & ms = ocp.addMultipleShooting("rocket", ode, 0, tEnd, 60);
 
-	ocp.discretize(60);
-
-	SX tEnd = ocp.getParam("tEnd");
-	ocp.setTimeInterval(0.0, tEnd);
 	ocp.objFun = tEnd;
 
 	// Bounds/initial condition
@@ -80,23 +78,23 @@ main()
 	double massFuel0 = 50;
 	double massShip = 100;
 	ocp.boundParam("tEnd", 1, 1000);
-	for (int k=0; k<ocp.N; k++){
-		ocp.boundStateAction("x", x0, xf, k);
-		ocp.boundStateAction("v", -1000, 1000, k);
-		ocp.boundStateAction("mass", massShip, massShip + massFuel0, k);
-		ocp.boundStateAction("thrust", -3000, 3000, k);
+	for (int k=0; k<ms.N; k++){
+		ms.boundStateAction("x", x0, xf, k);
+		ms.boundStateAction("v", -1000, 1000, k);
+		ms.boundStateAction("mass", massShip, massShip + massFuel0, k);
+		ms.boundStateAction("thrust", -3000, 3000, k);
 	}
 
 	// initial mass
-	ocp.boundStateAction("mass", massShip + massFuel0, massShip + massFuel0, 0);
+	ms.boundStateAction("mass", massShip + massFuel0, massShip + massFuel0, 0);
 
 	// initial/final position
-	ocp.boundStateAction("x", x0, x0, 0);
-	ocp.boundStateAction("x", xf, xf, ocp.N-1);
+	ms.boundStateAction("x", x0, x0, 0);
+	ms.boundStateAction("x", xf, xf, ms.N-1);
 
 	// velocity == 0 at start/finish
-	ocp.boundStateAction("v", 0, 0, 0);
-	ocp.boundStateAction("v", 0, 0, ocp.N-1);
+	ms.boundStateAction("v", 0, 0, 0);
+	ms.boundStateAction("v", 0, 0, ms.N-1);
 
 
 	// Create the NLP solver
@@ -134,14 +132,14 @@ main()
 	cout << "optimal time: " << cost << endl;
 
 	// // Print the optimal solution
-	vector<double>xopt(ocp.getBigN());
+	vector<double>xopt(ocp.designVariables.size1());
 	solver.getOutput(xopt,NLP_X_OPT);
 	// cout << "optimal solution: " << xopt << endl;
 
-	double * xopt_ = new double[ocp.getBigN()];
+	double * xopt_ = new double[ocp.designVariables.size1()];
 	
 	copy( xopt.begin(), xopt.end(), xopt_ );
-	ocp.writeMatlabOutput( xopt_ );
+	ocp.writeMatlabOutput( "rocket_out", xopt_ );
 	delete xopt_;
 	return 0;
 }

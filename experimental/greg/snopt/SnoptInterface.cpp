@@ -38,26 +38,33 @@ SnoptInterface::~SnoptInterface()
 	delete []Fstate;
 }
 
-SnoptInterface::SnoptInterface(const SXFunction& user_F) : Ftotal(user_F)
-{
-	Ftotal.init();
-	designVariables = &Ftotal.inputSX();
+// SnoptInterface::SnoptInterface(const SXFunction& user_F) : Ftotal(user_F)
+// {
+// 	Ftotal.init();
+// 	designVariables = Ftotal.inputSX();
 
+// 	si = this;
+
+// 	init();
+// }
+
+// SnoptInterface::SnoptInterface(const SX& designVariablesconst SX& objFcn)
+// {
+	
+// 	Ftotal 
+// 	Ftotal.init();
+// 	designVariables = &Ftotal.inputSX();
+
+// 	si = this;
+
+// 	init();
+// }
+
+SnoptInterface::SnoptInterface(const Ocp& ocp) : designVariables(ocp.designVariables)
+{
 	si = this;
 
-	init();
-}
-
-SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
-{
 	ftotal = vertcat( SXMatrix(ocp.objFun), ocp.g );
-
-	Ftotal = SXFunction(ocp.designVariables, ftotal);
-	Ftotal.init();
-
-	designVariables = &ocp.designVariables;
-
-	si = this;
 
 	init();
 
@@ -83,6 +90,9 @@ SnoptInterface::SnoptInterface(const OcpMultipleShooting& ocp)
 void
 SnoptInterface::init()
 {
+	SXFunction Ftotal(designVariables, ftotal);
+	Ftotal.init();
+
 	/************ design variables ************/
 	n = Ftotal.input().size();
 	x = new doublereal[n];
@@ -141,9 +151,9 @@ SnoptInterface::init()
 				jAvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
 
 				// subtract out linear part
-				SXMatrix linearpart = gradF.outputSX().getElement(r, col[el])*(*designVariables)[col[el]];
+				SXMatrix linearpart = gradF.outputSX().getElement(r, col[el])*designVariables[col[el]];
 				fnonlinear[r] -= linearpart[0];
-				simplify(fnonlinear[r]);
+				//				simplify(fnonlinear[r]);
 			} else {
 				G_.push_back( gradF.outputSX().getElement(r, col[el]) );
 				iGfun_.push_back( r + FIRST_FORTRAN_INDEX );
@@ -151,7 +161,7 @@ SnoptInterface::init()
 			}
 	
 	// nonlinear function
-	Fnonlinear = SXFunction( *designVariables, fnonlinear );
+	Fnonlinear = SXFunction( designVariables, fnonlinear );
 	Fnonlinear.init();
 
 	// linear part
@@ -356,5 +366,6 @@ int SnoptInterface::userfcn
 		si->Gfcn.evaluate();
 		si->Gfcn.getOutput(G);
 	}
+
 	return 0;
 }
