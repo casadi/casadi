@@ -171,9 +171,16 @@ set_target_properties(casadi_octave PROPERTIES PREFIX "")
 set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
 set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
 
- ADD_CUSTOM_COMMAND(
-   TARGET casadi_octave
-   POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/xcasadi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
- )
+ADD_CUSTOM_COMMAND(
+ TARGET casadi_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/xcasadi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
+)
+ 
+ADD_CUSTOM_COMMAND(
+ TARGET casadi_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E remove ${LIBRARY_OUTPUT_PATH}/casadi.oct
+)
+
 
