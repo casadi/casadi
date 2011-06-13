@@ -41,16 +41,6 @@ using namespace std;
 void
 dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t __attribute__((unused)))
 {
-	SX x = state["x"];
-	SX v = state["v"];
-	SX thrust = action["thrust"];
-	SX tEnd = param["tEnd"];
-
-	double mass = 1.0;
-
-	xDot["x"] = v;
-	xDot["v"] = thrust/mass;
-
 	// constants
 	double AR = 6;     // aspect ration
 	double Cd0 = 0.03; // parasitic drag
@@ -98,14 +88,14 @@ main()
 
 	OcpMultipleShooting ocp(&ode);
 
-	ocp.discretize(100);
+	ocp.discretize(80);
 
 	SX tEnd = ocp.getParam("tEnd");
 	ocp.setTimeInterval(0.0, tEnd);
 	ocp.objFun = -tEnd;
 
 	// Bounds/initial condition
-	ocp.boundParam("tEnd", 2, 80);
+	ocp.boundParam("tEnd", 2, 200);
 	for (int k=0; k<ocp.N; k++){
 		ocp.boundStateAction("x", 0, 1e3, k);
 		ocp.boundStateAction("z", -100, 0, k);
@@ -115,13 +105,20 @@ main()
 		ocp.boundStateAction("alphaDeg", -15, 15, k);
 	}
 
+	#define INCLINATION0_DEG 0.0
+	#define V0 20.0
 	ocp.boundStateAction("x", 0, 0, 0);
 	ocp.boundStateAction("z", 0, 0, 0);
-	ocp.boundStateAction("vx", 15, 15,  0);
-	ocp.boundStateAction("vz", -15, -15,  0);
+	ocp.boundStateAction("vx",  V0*cos(INCLINATION0_DEG*M_PI/180.0),  V0*cos(INCLINATION0_DEG*M_PI/180.0),  0);
+	ocp.boundStateAction("vz", -V0*sin(INCLINATION0_DEG*M_PI/180.0), -V0*sin(INCLINATION0_DEG*M_PI/180.0),  0);
 
-//	ocp.boundStateAction("x", 10, 10, ocp.N-1);
-	ocp.boundStateAction("z", 0, 0, ocp.N-1);
+	// initial guesses
+	ocp.setParamGuess("tEnd", 80);
+	for (int k=0; k<ocp.N; k++){
+		ocp.setStateActionGuess("x", double(k)/double(ocp.N)*20, k);
+		ocp.setStateActionGuess("z", double(k)/double(ocp.N)*0, k);
+		ocp.setStateActionGuess("vx", 4, k);
+	}
 
 	// Create the NLP solver
 	SXFunction ffcn(ocp.designVariables, ocp.objFun); // objective function
@@ -160,6 +157,12 @@ main()
 	vector<double>xopt(ocp.getBigN());
 	solver.getOutput(xopt,NLP_X_OPT);
 	//cout << "optimal solution: " << xopt << endl;
+
+	double * xopt_ = new double[ocp.getBigN()];
+	
+	copy( xopt.begin(), xopt.end(), xopt_ );
+	ocp.writeMatlabOutput( xopt_ );
+	delete xopt_;
 
 	return 0;
 }

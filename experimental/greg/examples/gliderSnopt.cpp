@@ -21,6 +21,7 @@
  */
 
 #include <iostream>
+#include <cstdlib>
 
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/sx/sx_tools.hpp>
@@ -43,16 +44,6 @@ using namespace std;
 void
 dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t __attribute__((unused)))
 {
-	SX x = state["x"];
-	SX v = state["v"];
-	SX thrust = action["thrust"];
-	SX tEnd = param["tEnd"];
-
-	double mass = 1.0;
-
-	xDot["x"] = v;
-	xDot["v"] = thrust/mass;
-
 	// constants
 	double AR = 6;     // aspect ration
 	double Cd0 = 0.03; // parasitic drag
