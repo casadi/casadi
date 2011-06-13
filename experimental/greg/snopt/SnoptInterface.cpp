@@ -152,8 +152,8 @@ SnoptInterface::init()
 
 				// subtract out linear part
 				SXMatrix linearpart = gradF.outputSX().getElement(r, col[el])*designVariables[col[el]];
-				fnonlinear[r] -= linearpart[0];
-				//				simplify(fnonlinear[r]);
+				fnonlinear[r] -= linearpart.at(0);
+				simplify(fnonlinear.at(r));
 			} else {
 				G_.push_back( gradF.outputSX().getElement(r, col[el]) );
 				iGfun_.push_back( r + FIRST_FORTRAN_INDEX );
