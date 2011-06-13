@@ -104,6 +104,7 @@ class SXFunctionInternal : public XFunctionInternal{
 
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SX> swork;
+  std::vector<SX> free_vars;
   
   /** \brief  Initialize */
   virtual void init();

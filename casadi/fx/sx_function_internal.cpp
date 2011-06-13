@@ -168,6 +168,28 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const
     nodes[i]->temp = 0;
   }
 
+
+  // Mark all the variables
+  for(vector<SXMatrix>::iterator i=inputv.begin(); i!=inputv.end(); ++i){
+    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
+      j->setTemp(1);
+    }
+  }
+  
+  // Collect free varables
+  free_vars.clear();
+  for(int el=0; el<snodes.size(); ++el){
+    if(!snodes[el]->temp){
+      free_vars.push_back(SX(snodes[el]));
+    }
+  }
+
+  // Unmark variables
+  for(vector<SXMatrix>::iterator i=inputv.begin(); i!=inputv.end(); ++i){
+    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
+      j->setTemp(0);
+    }
+  }
 }
 
 SXFunctionInternal::~SXFunctionInternal(){
@@ -175,6 +197,13 @@ SXFunctionInternal::~SXFunctionInternal(){
 
 
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
+  if(!free_vars.empty()){
+    stringstream ss;
+    ss << "Cannot evaluate \"";
+    repr(ss);
+    ss << "\" since variables " << free_vars << " are free";
+    throw CasadiException(ss.str());
+  }
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<getNumInputs(); ++ind){

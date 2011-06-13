@@ -505,6 +505,8 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
 
     // Evaluate the function and tape
     G_.evaluate();
+    cout << "x: "<< G_.input() << endl;
+    cout << "G: "<< G_.output() << endl;
 
     // Ge the result
     G_.getOutput(g);

@@ -136,7 +136,7 @@ SX& operator/=(SX &ex, const SX &el){
 }
 
 SX sign(const SX& x){
-  return 2*(x>=0)-1;
+  return timesTwo(x>=0)-1;
 }
 
 
