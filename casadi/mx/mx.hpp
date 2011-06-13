@@ -338,6 +338,7 @@ MX constpow(t b){    return std::constpow(*$self,b);} \
 // Binary operations with all right hand sides
 binops(const MX&)
 binops(double)
+binops(const Matrix<double> &)
 #undef binops
 
 // all unary operations

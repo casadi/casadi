@@ -547,6 +547,18 @@ PyObject* arrayView() {
     return csr_matrix( (list(self.data()),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
 %}
 
+# define binopsT(T) \
+T __pow__ (const T& b) const{ return std::pow(T(*$self),b);} \
+T __rpow__(const T& b) const{ return std::pow(b,T(*$self));}
+
+binopsT(CasADi::Matrix<CasADi::SX>)
+binopsT(CasADi::MX)
+
+CasADi::Matrix<CasADi::SX> __pow__ (const CasADi::SX& b) const{ return CasADi::Matrix<CasADi::SX>(*$self).__pow__(b);}
+CasADi::Matrix<CasADi::SX> __rpow__(const CasADi::SX& b) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(CasADi::Matrix<CasADi::SX>(*$self));}
+
+#undef binopsT
+    
 
 }; // extend Matrix<double>
 } // namespace CasADi

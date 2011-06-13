@@ -184,12 +184,26 @@ class typemaptests(casadiTestCase):
     s = DMatrix([[1,2],[3,4]])
     x = SX(3)
     y = MX(3)
-
-    print x*s
-    print s*x
-    print y*s
-    print s*y
     
+    for (s,x,y) in [
+                  (DMatrix([[1,2],[3,4]]),SX("x"),MX("x",1,1)),
+                  (3,symbolic("x",2,2),MX("x",2,2)),
+                  (DMatrix(3),symbolic("x",2,2),MX("y",2,2))
+                  ]:
+      for z in [x,y]:
+        print "z = %s, s = %s" % (str(z),str(s))
+        print "  z = %s, s = %s" % (type(z),type(s))
+        z+s
+        s+z
+        s*z
+        z*s
+        s-z
+        z-s
+        z/s
+        s/z
+        s**z
+        z**s
+      
   def test_set(self):
     self.message("DMatrix set on dense matrices")
     

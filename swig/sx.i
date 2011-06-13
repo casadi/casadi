@@ -83,6 +83,29 @@ namespace CasADi {
     def __ge__(self,other):
       return _casadi.__ge__(self,other)
   %}
+  
+  
+  %pythoncode %{
+  __array_priority__ = 1000
+  %}
+
+  // These methods must be added since the implicit type cast does not work
+  # define binopsT(T) \
+  Matrix<SX> __pow__ (T) const{ return CasADi::Matrix<CasADi::SX>(*$self).__pow__(CasADi::Matrix<CasADi::SX>(b));} \
+  Matrix<SX> __rpow__(T) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(CasADi::Matrix<CasADi::SX>(*$self));} \
+  Matrix<SX> __add__ (T) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);} \
+  Matrix<SX> __radd__(T) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;} \
+  Matrix<SX> __sub__ (T) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);} \
+  Matrix<SX> __rsub__(T) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;} \
+  Matrix<SX> __mul__ (T) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);} \
+  Matrix<SX> __rmul__(T) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;} \
+  Matrix<SX> __div__ (T) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);} \
+  Matrix<SX> __rdiv__(T) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
+
+  binopsT(const Matrix<double>& b)
+  
+  #undef binopsT
+    
 };
   
 %extend Matrix<SX>{
@@ -138,7 +161,7 @@ namespace CasADi {
     %}
     
   %pythoncode %{
-  __array_priority__ = 1000
+  __array_priority__ = 1001
   %}
     
   %pythoncode %{
