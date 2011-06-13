@@ -1340,36 +1340,43 @@ class MXtests(casadiTestCase):
     
   def test_issue134(self):
     self.message("Test issue #134")
-    from casadi import *
 
     x = MX("x",2,2)
     y = MX(2,2)
+    
+    x_ = DMatrix([[1,2],[3,4]])
 
     f = MXFunction([x],[x+y])
-
     f.init()
+    f.input(0).set(x_)
     f.evaluate(0,0) # this should not throw a segfault
+    self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
 
     f = MXFunction([x],[y+x])
-
     f.init()
+    f.input(0).set(x_)
     f.evaluate(0,0) # this should not throw a segfault
+    self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
     
     x = MX("x",1,1)
     y = MX(1,1)
 
+    x_ = 7.1
+    
     f = MXFunction([x],[x+y])
-
     f.init()
+    f.input(0).set(x_)
     f.evaluate(0,0) # this should not throw a segfault
+    self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
     
     f = MXFunction([x],[y+x])
-
     f.init()
+    f.input(0).set(x_)
     f.evaluate(0,0) # this should not throw a segfault
+    self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
     
 if __name__ == '__main__':

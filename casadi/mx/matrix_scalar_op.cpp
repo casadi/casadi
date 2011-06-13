@@ -29,7 +29,11 @@ using namespace std;
 namespace CasADi{
 
 MatrixScalarOp::MatrixScalarOp(Operation op_, const MX& x, const MX& y) : op(op_){
-  setDependencies(x,y);
+  if (y.size()==0) {
+    setDependencies(x,0);
+  } else {
+    setDependencies(x,y);
+  }
   setSparsity(x.sparsity());
 }
 

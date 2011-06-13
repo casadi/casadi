@@ -498,6 +498,7 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
 
     // Get the sensitivity matrix
     MX sens = alg[el].mx->adFwd(seed);
+    std::cout << "sens" << sens << std::endl;
     
     // Save to the memory vector
     derwork[el] = sens;
@@ -508,6 +509,7 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   for(int ind=0; ind<outputv.size(); ++ind){
     ret[ind] = derwork[outputv_ind[ind]];
   }
+    std::cout << "ret" << ret[0] << std::endl;
   return ret;
 }
 
