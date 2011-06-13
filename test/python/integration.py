@@ -315,7 +315,7 @@ class Integrationtests(casadiTestCase):
     H.input(0).set([num['q0']])
     H.input(1).set([num['p']])
     H.evaluate()
-    print "Estimate =", H.output()
+    print "wsst"*6 , H.output()
     
   def test_hess6(self):
     self.message('CVodes integration: hessian to p in an MX tree')
@@ -643,6 +643,71 @@ class Integrationtests(casadiTestCase):
     #qeJ.evaluate(0,1)
     #print qeJ.output()
     #print qeJ.adjSens(INTEGRATOR_X0)
+    
+  def test_hessian2D(self):
+    self.message("hessian")
+    N=2
+
+    x0_ = DMatrix([1,0.1])
+    A_  = DMatrix([[3,1],[0.74,4]])
+
+    A = symbolic("A",N,N)
+    x = symbolic("x",N)
+
+    t=SX("t")
+
+    print c.dot(A,x)
+
+    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A, DAE_T: t},[c.dot(A,x)])
+    I = CVodesIntegrator(ode)
+    I.init()
+    I.setOption('reltol',1e-12)
+    I.input(INTEGRATOR_X0).set(x0_)
+    I.input(INTEGRATOR_P).set(A_)
+    I.evaluate()
+
+    print "Numpy = ", c.dot(expm(A_),x0_)
+
+    print "Integrator= ", I.output()
+
+
+    print c.dot(A_,DMatrix([[1,0],[0,0]])) , "=", c.dot(DMatrix([[1,0],[0,0]]),A_)
+
+    print c.dot(c.dot(expm(A_),DMatrix([[1,0],[0,0]])),x0_)
+    print c.dot(c.dot(expm(A_),DMatrix([[0,1],[0,0]])),x0_)
+
+    q0=MX("q0",N)
+    p=MX("p",N*N)
+    dq0=MX("dq0",N)
+    qe = MXFunction([q0,p,dq0],[I.call([q0,p,dq0])[0]])
+    qe.init()
+    qe.input(0).set(x0_)
+    qe.input(1).set(vec(A_))
+    qe.fwdSeed(1).set([1,0,0,0])
+    qe.fwdSeed(1).set([0,1,0,0])
+    qe.evaluate(1,0)
+    print "fwdSens", qe.fwdSens()
+    J = MXFunction([q0,p,dq0],qe.jac(1))
+    J.init()
+    J.input(0).set(x0_)
+    J.input(1).set(vec(A_))
+    J.evaluate()
+    print J.output()
+
+    JT = MXFunction([q0,p,dq0],[qe.jac(1)[0].T])
+    JT.init()
+    JT.input(0).set(x0_)
+    JT.input(1).set(vec(A_))
+    JT.evaluate(1,0)
+    print JT.output()
+
+    H  = Jacobian(JT,1)
+    H.init()
+    H.input(0).set(x0_)
+    H.input(1).set(vec(A_))
+    H.evaluate()
+    print H.output()
+
     
 if __name__ == '__main__':
     unittest.main()

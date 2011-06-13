@@ -31,7 +31,11 @@ using namespace std;
 namespace CasADi{
 
 ScalarMatrixOp::ScalarMatrixOp(Operation op_, const MX& x, const MX& y) : op(op_){
-  setDependencies(x,y);
+  if (x.size()==0) {
+    setDependencies(0,y);
+  } else {
+    setDependencies(x,y);
+  }
   setSparsity(y.sparsity());
 }
 
@@ -46,6 +50,7 @@ void ScalarMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
 void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   if(nfwd==0 && nadj==0){
     // No sensitivities
+    
     for(int i=0; i<size(); ++i) {
         casadi_math<double>::fun[op](input[0][0],input[1][i],output[i]);
     }
