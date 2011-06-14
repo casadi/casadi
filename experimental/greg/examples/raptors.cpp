@@ -108,8 +108,8 @@ dxdt1(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<str
 	SX x3 = state["x3"];
 	SX y3 = state["y3"];
 	SX s1 = 10;
-	SX s2 = 4*(t + 2.5);
-	SX s3 = 4*(t + 2.5);
+	SX s2 = 4*t;
+	SX s3 = 4*t;
 	SX theta = state["theta"];
  
 	#define VHUMAN 6.0

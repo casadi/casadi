@@ -48,8 +48,8 @@ SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep, map<string,S
 	SXMatrix u0 = getActionMat(timeStep);
 	SXMatrix u1 = getActionMat(timeStep+1);
 	
-	SX tk   = timeStep*dt;
-	SX tkp1 = (timeStep+1)*dt;
+	SX tk   = t0 + timeStep*dt;
+	SX tkp1 = t0 + (timeStep+1)*dt;
 	
 	SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk, tkp1);
 	return xErr;
@@ -72,7 +72,6 @@ SX MultipleShooting::getAction(string u, int timeStep)
 {
 	return dv.at(getIdx(u, timeStep));
 }
-
 
 // calculate the index of states/actions at proper timestep
 int MultipleShooting::getIdx(string xu, int timeStep)
