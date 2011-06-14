@@ -31,6 +31,11 @@ MultipleShooting::MultipleShooting(string name_,
 	idx0 = idx0_;
 
 	ode.locked = 1;
+
+	// make sure no ocp parameter names conflict with ode states/actions
+	map<string, SX>::const_iterator iter;
+	for (iter = params.begin(); iter != params.end(); iter++)
+		ode.assertUniqueName(iter->first);
 }
 
 MultipleShooting::~MultipleShooting() {}

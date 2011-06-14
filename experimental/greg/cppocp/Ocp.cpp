@@ -16,7 +16,6 @@ Ocp::~Ocp()
 {
 	map<string,MultipleShooting*>::const_iterator msIter;
 	for (msIter = ms.begin(); msIter != ms.end(); msIter++){
-//		cout << "destroying " << ms[msIter->first] << endl;
 		delete msIter->second;
 	}
 }
@@ -52,10 +51,36 @@ void Ocp::addNonlconEq( SXMatrix gNew )
 	}
 }
 
+
+void Ocp::assertUniqueName(string s)
+{
+	if (isMultipleShooting(s) || isParam(s)) {
+		cerr << "Error - new MultipleShooting or param \"" << s << "\" is not unique" << endl;
+		throw "1";
+	}
+
+	// make sure name is not state/action in an ode
+	map<string, MultipleShooting*>::const_iterator msIter;
+	for (msIter = ms.begin(); msIter != ms.end(); msIter++)
+		(msIter->second)->ode.assertUniqueName(s);
+}
+
+
 /****************** multiple shooting stuff ****************/
+int Ocp::isMultipleShooting(string msName)
+{
+	map<string, MultipleShooting*>::const_iterator msIter;
+
+	msIter = ms.find(msName);
+
+	if (msIter != ms.end())
+		return 1;
+	return 0;
+}
+
 MultipleShooting & Ocp::addMultipleShooting(string name, Ode & ode, SX t0, SX tf, int N)
 {
-	cout << "Ocp::addMultipleShooting needs assertUniqueName()\n";
+	assertUniqueName(name);
 
 	int numNew = ode.nxu()*N;
 	designVariables = vertcat( designVariables, SXMatrix(create_symbolic(name, numNew)) );
@@ -85,8 +110,7 @@ SX & Ocp::getParam(string p)
 // add a param
 SX & Ocp::addParam(string _newParam)
 {
-	cout << "Ocp::addParam needs assertUniqueName()\n";
-	//	assertUniqueName(_newParam);
+	assertUniqueName(_newParam);
 
 //	designVariables = vertcat( designVariables, SXMatrix(create_symbolic(_newParam, 1)) );
 	int idx = designVariables.size1();
@@ -131,6 +155,17 @@ void Ocp::setParamGuess(string p, double guess_)
 		cerr << "Setting guess " << p << " = " << ub[idx] << endl;
 		guess[idx] = ub[idx];
 	}
+}
+
+int Ocp::isParam(string paramName)
+{
+	map<string, int>::const_iterator pIter;
+
+	pIter = paramsIdx.find(paramName);
+
+	if (pIter != paramsIdx.end())
+		return 1;
+	return 0;
 }
 
 

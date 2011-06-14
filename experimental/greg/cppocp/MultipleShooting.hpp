@@ -45,10 +45,11 @@ public:
 	
 	CasADi::SXMatrix getDynamicsConstraintError(int timeStep, std::map<std::string,CasADi::SX> params);
 
+	Ode & ode;
+
 private:
 	std::string name;
 
-	Ode & ode;
 	CasADi::SXMatrix & dv;
 	std::vector<double>&lb;
 	std::vector<double>&ub;

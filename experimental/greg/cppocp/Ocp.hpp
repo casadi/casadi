@@ -44,6 +44,10 @@ public:
 
 private:
 
+	void assertUniqueName(std::string s);
+	int isMultipleShooting(std::string msName);
+
+
 	// multiple shooting instances
 	std::map<std::string,MultipleShooting*> ms;
 

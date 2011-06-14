@@ -61,6 +61,8 @@ public:
 	int nxu(void);
 	int no(void);
 
+	void assertUniqueName(std::string newName);
+
 private:
 	int isState(std::string stateName);
 	int isAction(std::string actionName);
@@ -71,6 +73,4 @@ private:
 
 
 protected:
-	void assertUniqueName(std::string newName);
-	
 };
