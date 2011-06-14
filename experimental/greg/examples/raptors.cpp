@@ -44,7 +44,7 @@ using namespace std;
 #define EPS 1e-12
 
 void
-dxdt0(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
+dxdt0(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
     SX xh = state["xh"];
 	SX yh = state["yh"];
@@ -94,10 +94,14 @@ dxdt0(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<str
 	xDot["y3"] = vy3;
 
 	xDot["theta"] = action["dtheta"];
+
+	outputs["d1"] = d1;
+	outputs["d2"] = d2;
+	outputs["d3"] = d3;
 }
 
 void
-dxdt1(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
+dxdt1(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
     SX xh = state["xh"];
 	SX yh = state["yh"];
@@ -147,6 +151,10 @@ dxdt1(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<str
 	xDot["y3"] = vy3;
 
 	xDot["theta"] = action["dtheta"];
+
+	outputs["d1"] = d1;
+	outputs["d2"] = d2;
+	outputs["d3"] = d3;
 }
 
 
@@ -169,6 +177,10 @@ getRaptorOde()
 	ode.addState("theta");
 
 	ode.addAction("dtheta");
+
+	ode.addOutput("d1");
+	ode.addOutput("d2");
+	ode.addOutput("d3");
 
 	return ode;
 }
@@ -207,22 +219,13 @@ main()
 		r0.boundStateAction( "theta", -10, 10.0, k);
 		r0.boundStateAction("dtheta", -DTHETA_MAX_DEG*M_PI/180.0, DTHETA_MAX_DEG*M_PI/180.0, k);
 
-		SX x1 = r0.getState("x1", k);
-		SX y1 = r0.getState("y1", k);
-		SX x2 = r0.getState("x2", k);
-		SX y2 = r0.getState("y2", k);
-		SX x3 = r0.getState("x3", k);
-		SX y3 = r0.getState("y3", k);
-		SX xh = r0.getState("xh", k);
-		SX yh = r0.getState("yh", k);
-		SX d1 = sqrt( (x1-xh)*(x1-xh) + (y1-yh)*(y1-yh) ) + EPS;
-		SX d2 = sqrt( (x2-xh)*(x2-xh) + (y2-yh)*(y2-yh) ) + EPS;
-		SX d3 = sqrt( (x3-xh)*(x3-xh) + (y3-yh)*(y3-yh) ) + EPS;
+		SX d1 = r0.getOutput("d1", k);
+		SX d2 = r0.getOutput("d2", k);
+		SX d3 = r0.getOutput("d3", k);
 
 		ocp.addNonlconIneq( 0.1 - d1 );
 		ocp.addNonlconIneq( 0.1 - d2 );
 		ocp.addNonlconIneq( 0.1 - d3 );
-
 	}
 
 
@@ -239,23 +242,13 @@ main()
 		r1.boundStateAction( "theta", -10, 10.0, k);
 		r1.boundStateAction("dtheta", -DTHETA_MAX_DEG*M_PI/180.0, DTHETA_MAX_DEG*M_PI/180.0, k);
 
-		SX x1 = r1.getState("x1", k);
-		SX y1 = r1.getState("y1", k);
-		SX x2 = r1.getState("x2", k);
-		SX y2 = r1.getState("y2", k);
-		SX x3 = r1.getState("x3", k);
-		SX y3 = r1.getState("y3", k);
-		SX xh = r1.getState("xh", k);
-		SX yh = r1.getState("yh", k);
-		SX d1 = sqrt( (x1-xh)*(x1-xh) + (y1-yh)*(y1-yh) ) + EPS;
-		SX d2 = sqrt( (x2-xh)*(x2-xh) + (y2-yh)*(y2-yh) ) + EPS;
-		SX d3 = sqrt( (x3-xh)*(x3-xh) + (y3-yh)*(y3-yh) ) + EPS;
-
+		SX d1 = r1.getOutput("d1", k);
+		SX d2 = r1.getOutput("d2", k);
+		SX d3 = r1.getOutput("d3", k);
 
 		ocp.addNonlconIneq( 0.1 - d1 );
 		ocp.addNonlconIneq( 0.1 - d2 );
 		ocp.addNonlconIneq( 0.1 - d3 );
-
 	}
 
 

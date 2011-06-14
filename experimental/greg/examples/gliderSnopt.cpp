@@ -42,7 +42,7 @@ using namespace CasADi;
 using namespace std;
 
 void
-dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
+dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
 	// constants
 	double AR = 6;     // aspect ration
@@ -75,7 +75,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<stri
 	xDot["vx"] = ax;
 	xDot["vz"] = az;
 
-	//	intermediate["airspeed"] = norm_v;
+	outputs["airspeed"] = norm_v;
 }
 
 Ode
@@ -88,6 +88,8 @@ getGliderOde()
 	ode.addState("vz");
 
 	ode.addAction("alphaDeg");
+	
+	ode.addOutput("airspeed");
 
 	ode.dxdt = &dxdt;
 

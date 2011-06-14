@@ -43,7 +43,7 @@ using namespace CasADi;
 using namespace std;
 
 void
-dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
+dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
 	// constants
 	double AR = 6;     // aspect ration

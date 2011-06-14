@@ -21,7 +21,7 @@ Ode::~Ode(){}
 // get state/action/param dimensions 
 int Ode::nx(){ return  states.size(); }
 int Ode::nu(){ return actions.size(); }
-//int Ode::np(){ return  params.size(); }
+int Ode::no(){ return outputs.size(); }
 int Ode::nxu(){ return nx()+nu();}
 
 // throw error if ode has already been discretized
@@ -33,12 +33,11 @@ void Ode::assertUnlocked()
 	}
 }
 
-
 // throw error if name is not unique
 void Ode::assertUniqueName(string newName)
 {
-	if (isState(newName) || isAction(newName)) {
-		cerr << "Error - new state/action \"" << newName << "\" is not unique" << endl;
+	if (isState(newName) || isAction(newName) || isOutput(newName)) {
+		cerr << "Error - new state/action/output \"" << newName << "\" is not unique" << endl;
 		throw "1";
 	}
 }
@@ -65,16 +64,16 @@ int Ode::isAction(string actionName)
 	return 0;
 }
 
-// int Ode::isParam(string paramName)
-// {
-// 	map<string, int>::const_iterator pIter;
+int Ode::isOutput(string outputName)
+{
+	map<string, int>::const_iterator oIter;
 
-// 	pIter = params.find(paramName);
+	oIter = outputs.find(outputName);
 
-// 	if (pIter != params.end())
-// 		return 1;
-// 	return 0;
-// }
+	if (oIter != outputs.end())
+		return 1;
+	return 0;
+}
 
 
 // add new states/actions/params
@@ -92,27 +91,70 @@ void Ode::addAction(string _newAction)
 	actions[_newAction] = nu() - 1;
 }
 
-SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
+void Ode::addOutput(string _newOutput)
+{
+	assertUnlocked();
+	assertUniqueName(_newOutput);
+	outputs[_newOutput] = no() - 1;
+}
+
+map<string,SX> Ode::getStateMap( SXMatrix & x )
 {
 	map<string,int>::const_iterator iter;
-
-	// create maps to wrap SXMatrices
-	map<string,SX> xMap, uMap; //, pMap;
+	map<string,SX> xMap;
 	for (iter = states.begin(); iter != states.end(); iter++)
 		xMap[iter->first] = x.at(iter->second);
+
+	return xMap;
+}
+
+map<string,SX> Ode::getActionMap( SXMatrix & u )
+{
+	map<string,int>::const_iterator iter;
+	map<string,SX> uMap;
 	for (iter = actions.begin(); iter != actions.end(); iter++)
 		uMap[iter->first] = u.at(iter->second);
-	// for (iter = params.begin(); iter != params.end(); iter++)
-	// 	pMap[iter->first] = p.at(iter->second);
+
+	return uMap;
+}
+
+map<string,SX> Ode::getOutputFromDxdt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
+{
+	// state/action maps to wrap input SXMatrices
+	map<string,SX> xMap = getStateMap(x);
+	map<string,SX> uMap = getActionMap(u);
+
+	// dummy xDot to be discarded
+	map<string,SX> dummyXDotMap;
+
+	// output map
+	map<string,SX> outputMap;
 
 	// call dxdt
+	dxdt( dummyXDotMap, outputMap, xMap, uMap, p, t );
+
+	return outputMap;
+}
+
+
+SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
+{
+	// state/action maps to wrap input SXMatrices
+	map<string,SX> xMap = getStateMap(x);
+	map<string,SX> uMap = getActionMap(u);
+
+	// xDot will be populated by dxdt()
 	map<string,SX> xDotMap;
-	dxdt( xDotMap, xMap, uMap, p, t );
+
+	// dummy outputs to be discarded
+	map<string,SX> dummyOutputMap;
+
+	// call dxdt
+	dxdt( xDotMap, dummyOutputMap, xMap, uMap, p, t );
 	
 	// make output SXMatrix
 	SXMatrix xDotMat = create_symbolic("an_xDotMat", nx());
-
-	//	SXMatrix xDotMat(nx(), 1);
+	map<string,int>::const_iterator iter;
 	for (iter = states.begin(); iter != states.end(); iter++)
 		xDotMat[iter->second] = xDotMap[iter->first];
 

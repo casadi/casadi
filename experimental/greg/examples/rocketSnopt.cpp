@@ -39,7 +39,7 @@ using namespace CasADi;
 using namespace std;
 
 void
-dxdt(map<string,SX> &xDot, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t __attribute__((unused)))
+dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
 	SX x = state["x"];
 	SX v = state["v"];

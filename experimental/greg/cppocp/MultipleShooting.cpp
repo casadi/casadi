@@ -20,16 +20,44 @@ MultipleShooting::MultipleShooting(string name_,
 								   vector<double>&ub_,
 								   vector<double>&guess_,
 								   SXMatrix & dv_,
-								   int idx0_) : ode(_ode), dv(dv_), lb(lb_), ub(ub_), guess(guess_)
+								   int idx0_,
+								   map<string,SX> & params_) : ode(_ode), dv(dv_), lb(lb_), ub(ub_),
+															   guess(guess_), params(params_)
 {
 	name = name_;
 	t0 = t0_;
 	tf = tf_;
 	N = N_;
 	idx0 = idx0_;
+
+	ode.locked = 1;
 }
 
 MultipleShooting::~MultipleShooting() {}
+
+
+SX MultipleShooting::getOutput(string o, int timeStep)
+{
+	if (timeStep > N-1){
+		cerr << "In SX MultipleShooting::getOutput(string o, int timeStep),\n";
+		cerr << "timeStep " << timeStep << " > N-1\n";
+		exit(1);
+	}
+
+	// dynamics constraint
+	SX dt = (tf - t0)/(N - 1);
+
+	SXMatrix xk = getStateMat(timeStep);
+	SXMatrix uk = getActionMat(timeStep);
+	
+	SX tk = t0 + timeStep*dt;
+	
+	map<string,SX> output = ode.getOutputFromDxdt( xk, uk, params, tk );
+	
+	return output[o];
+}
+
+
 
 SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep, map<string,SX> params)
 {
