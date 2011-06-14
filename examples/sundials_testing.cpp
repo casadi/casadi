@@ -75,7 +75,9 @@ const bool second_order = true;
 // The DAE residual in plain c (for IDAS)
 void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
   // Get the arguments
-  double s = yy[0], v = yy[1], m = yy[2];
+  //double s = yy[0];
+  double v = yy[1];
+  double m = yy[2];
   double u = pp[0];
   double sdot = yydot[0], vdot = yydot[1], mdot = yydot[2];
 
@@ -181,7 +183,7 @@ int main(){
   double t0 = 0,  tf = 10;
   
   // Bounds on the control
-  double u_lb = -0.5, u_ub = 1.3, u_init = 1;
+  double /*u_lb = -0.5, u_ub = 1.3,*/ u_init = 1;
 
   // Initial conditions
   vector<double> y0(3);

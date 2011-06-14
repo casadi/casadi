@@ -25,6 +25,7 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <ctime>
 
 #include "casadi/stl_vector_tools.hpp"
 #include "external_packages/tinyxml/tinyxml.h"
@@ -58,7 +59,9 @@ OCP& FMIParserInternal::ocp(){
   return ocp_;
 }
 
-OCP& FMIParserInternal::parse(){	
+OCP& FMIParserInternal::parse(){
+  cout << "Parsing XML ..." << endl;
+  double time1 = clock();
 
   // Initialize function lookup tables
   unary_["Exp"]  = exp;
@@ -96,8 +99,10 @@ OCP& FMIParserInternal::parse(){
   ocp_.sortType();
   
   // Return a reference to the created ocp
+  double time2 = clock();
+  double tparse = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... parsing complete after " << tparse << " seconds" << endl;
   return ocp_;
-
 }
 
 void FMIParserInternal::addModelVariables(){

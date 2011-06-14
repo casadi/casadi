@@ -78,15 +78,15 @@ class MXFunctionInternal : public XFunctionInternal{
 
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> alg;
-  
-    /** \brief  Matrix expressions that are to be evaluated */
-    std::vector<MX> outputv;
-    std::vector<int> outputv_ind;
 
     /** \brief  Dependent expressions */
     std::vector<MX> inputv;
     std::vector<int> inputv_ind;
-      
+
+    /** \brief  Matrix expressions that are to be evaluated */
+    std::vector<MX> outputv;
+    std::vector<int> outputv_ind;
+
     // Lifting function
     LiftingFunction liftfun_;
     void* liftfun_ud_;

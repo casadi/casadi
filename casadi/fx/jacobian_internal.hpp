@@ -68,7 +68,7 @@ class JacobianInternal : public FXInternal{
       FX fcn_;
   
       // Output and input indices
-      int oind_, iind_;
+      int iind_, oind_;
 
       // Number of forward directions of the function to be differentiated
       int nadir_fcn_;

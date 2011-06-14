@@ -78,6 +78,9 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief Get the unidirectional or bidirectional partition */
   virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2);
   
+  /** \brief Perform a unidirectional coloring */
+  virtual CRSSparsity unidirectionalColoring(const CRSSparsity& A, const CRSSparsity& AT);
+  
   /** \brief  DATA MEMBERS */
   
   /** \brief  Indices of the nodes corresponding to the inputs */

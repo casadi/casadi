@@ -417,7 +417,7 @@ int main(){
   // ----
 
   vector<double> t_opt(N*(K+1));
-  int ind = 0; // index of nlp->x
+  //int ind = 0; // index of nlp->x
   for(int i=0; i<N; ++i){
     for(int j=0; j<=K; ++j){
       int ij = (K+1)*i+j;

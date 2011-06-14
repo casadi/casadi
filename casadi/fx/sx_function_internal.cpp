@@ -311,54 +311,90 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 }
 
+CRSSparsity SXFunctionInternal::unidirectionalColoring(const CRSSparsity& A, const CRSSparsity& AT){
+  // A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+  vector<int> forbiddenColors;
+  forbiddenColors.reserve(A.size1());
+  vector<int> color(A.size1());
+  
+  // Loop over rows
+  for(int i=0; i<A.size1(); ++i){
+    
+    // Loop over nonzero elements
+    for(int el=A.rowind(i); el<A.rowind(i+1); ++el){
+      
+      // Get column
+      int c = A.col(el);
+        
+      // Loop over previous rows that have an element in column c
+      for(int el_prev=AT.rowind(c); el_prev<AT.rowind(c+1); ++el_prev){
+        
+        // Get the row
+        int i_prev = AT.col(el_prev);
+        
+        // Escape loop if we have arrived at the current row
+        if(i_prev>=i)
+          break;
+        
+        // Get the color of the row
+        int color_prev = color[i_prev];
+        
+        // Mark the color as forbidden for the current row
+        forbiddenColors[color_prev] = i;
+      }
+    }
+    
+    // Get the first nonforbidden color
+    int color_i;
+    for(color_i=0; color_i<forbiddenColors.size(); ++color_i){
+      // Break if color is ok
+      if(forbiddenColors[color_i]!=i) break;
+    }
+    color[i] = color_i;
+    
+    // Add color if reached end
+    if(color_i==forbiddenColors.size())
+      forbiddenColors.push_back(0);
+  }
+  
+  // Get the number of columns for each row
+  vector<int> rowind(forbiddenColors.size()+1,0);
+  for(int i=0; i<color.size(); ++i){
+    rowind[color[i]+1]++;
+  }
+  
+  // Cumsum
+  for(int j=0; j<forbiddenColors.size(); ++j){
+    rowind[j+1] += rowind[j];
+  }
+  
+  // Get column for each row
+  vector<int> col(color.size());
+  for(int j=0; j<col.size(); ++j){
+    col[rowind[color[j]]++] = j;
+  }
+  
+  // Swap index back one step
+  for(int j=rowind.size()-2; j>=0; --j){
+    rowind[j+1] = rowind[j];
+  }
+  rowind[0] = 0;
+  
+  // Create return sparsity
+  CRSSparsity ret(forbiddenColors.size(),A.size1(),col,rowind);
+  return ret;
+}
+
 void SXFunctionInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2){
   casadi_assert(blocks.size()==1);
   int oind = blocks.front().first;
   int iind = blocks.front().second;
 
-  #if 0
-    // Sparsity pattern with transpose
-    vector<int> mapping;
-    CRSSparsity &sp = jacSparsity(iind,oind);
-    CRSSparsity sp_trans = sp.transpose(mapping);
-
-    // A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-    vector<int> forbiddenColors(input(iind).size(),-1);
-    vector<int> color(sp.size1(),-1);
-    for(int i=0; i<sp.size1(); ++i){
-      for(int el_w=sp.rowind(i); el_w<sp.rowind(i+1); ++el_w){
-        int w = sp.col(el_w);
-        for(int el_x=sp_trans.rowind(w); el_x<sp_trans.rowind(w+1); ++el_x){
-          int x = sp_trans.col(el_x);
-          if(color[x] != -1){
-            forbiddenColors[color[x]] = i;
-          }
-        }
-      }
-      for(int c=0; c<forbiddenColors.size(); ++c){
-        if(forbiddenColors[c] != i){
-          color[i] = c;
-          break;
-        }
-      }
-    }
-    
-    // Number of colors used
-    int ncolors=0;
-    for(vector<int>::const_iterator it=color.begin(); it!=color.end(); ++it)
-      ncolors = max(ncolors,*it);
-    ncolors++;
-   
-    // Create sparsity pattern
-    D1[0] = CRSSparsity(ncolors,sp.size1());
-    for(int i=0; i<color.size(); ++i){
-      cout << "1" << endl;
-      D1[0].getNZ(color[i],i);
-      cout << "2" << endl;
-    }
-    
-    return;
-#endif
+  // Sparsity pattern with transpose
+  CRSSparsity &A = jacSparsity(iind,oind);
+  vector<int> mapping;
+  CRSSparsity AT = A.transpose(mapping);
+  mapping.clear();
   
   // Which AD mode?
   bool use_ad_fwd;
@@ -367,16 +403,16 @@ void SXFunctionInternal::getPartition(const vector<pair<int,int> >& blocks, vect
   } else if(getOption("ad_mode") == "reverse"){
     use_ad_fwd = false;
   } else if(getOption("ad_mode") == "automatic"){
-    use_ad_fwd = iind <= oind;
+    use_ad_fwd = input(iind).size() <= output(oind).size();
   } else {
     throw CasadiException("SXFunctionInternal::jac: Unknown ad_mode");
   }
   
   // Very inefficient selection of seed matrices
   if(use_ad_fwd){
-    D1[0] = CRSSparsity::createDiagonal(input(iind).size());
+    D1[0] = unidirectionalColoring(AT,A);
   } else {
-    D2[0] = CRSSparsity::createDiagonal(output(oind).size());
+    D2[0] = unidirectionalColoring(A,AT);
   }
 }
 
@@ -456,7 +492,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       sp_trans[i] = ret[jblock_ind[i]].sparsity().transpose(mapping[i]);
     }
   }
-  
+
   // Carry out the forward sweeps
   for(int sweep=0; sweep<nfwd; ++sweep){
     

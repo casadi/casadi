@@ -195,7 +195,7 @@ void MXFunctionInternal::eliminateJacobian(){
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
     // Check if the node is a Jacobian reference
     
-    JacobianReference* jref = dynamic_cast<JacobianReference*>(it->mx.get());
+    //JacobianReference* jref = dynamic_cast<JacobianReference*>(it->mx.get());
     if(it->mx->isJacobian()){
       // Get a reference to the function
       FX& fcn = it->mx->getFunction();

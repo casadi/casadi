@@ -1202,7 +1202,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
   const vector<double>& val = jac_.output().data();
 
   // Dimension of the Jacobian
-  int jdim = jac_.output().size1();
+  //int jdim = jac_.output().size1();
     
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){

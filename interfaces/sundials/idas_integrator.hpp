@@ -62,7 +62,7 @@ enum JACOutput{JAC_J, JAC_NUM_OUT};
    \date 2010
 */
 
-SWIGDOC("Interface to IDAS from the Sundials suite.");
+SWIGDOC("Interface to IDAS from the Sundials suite.")
 class IdasIntegrator : public Integrator{
 public:
 

@@ -133,7 +133,7 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
 void Mapping::addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j){
   // Append the new dependency and save its index
   dep_.push_back(d);
-  int k = dep_.size()-1;
+  //int k = dep_.size()-1;
   
   // New non-zero indices
   std::vector<int> nzind;

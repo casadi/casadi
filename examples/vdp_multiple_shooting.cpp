@@ -54,7 +54,7 @@ int main(){
   SXFunction res(res_in,f-xxdot);
   
   // Number of shooting nodes
-  int num_nodes = 100;
+  //int num_nodes = 100;
   
   //Create an integrator (CVodes)
   //IdasIntegrator I(res);

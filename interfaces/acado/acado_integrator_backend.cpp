@@ -85,6 +85,7 @@ AcadoIntegratorBackend::~AcadoIntegratorBackend( ){
 
 AcadoIntegratorBackend& AcadoIntegratorBackend::operator=( const AcadoIntegratorBackend& arg ){
   assert(0);
+  return *this;
 }
 
 ACADO::returnValue AcadoIntegratorBackend::init( const ACADO::DifferentialEquation &rhs__ ){

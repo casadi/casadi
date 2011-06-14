@@ -23,6 +23,7 @@
 #include "optimica_ocp.hpp"
 #include <algorithm>
 #include <set>
+#include <ctime>
 
 #include "../casadi/casadi_exception.hpp"
 #include "../casadi/pre_c99_support.hpp"
@@ -130,6 +131,9 @@ void OCP::print(ostream &stream) const{
 }
 
 void OCP::eliminateDependent(){
+  cout << "eliminateDependent ..." << endl;
+  double time1 = clock();
+
   Matrix<SX> v = explicit_var_;
   Matrix<SX> v_old = explicit_fcn_;
   
@@ -139,6 +143,10 @@ void OCP::eliminateDependent(){
   mterm   = substitute(mterm,v,v_old).data();
   lterm   = substitute(lterm,v,v_old).data();
   eliminated_dependents_ = true;
+
+  double time2 = clock();
+  double dt = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... eliminateDependent complete after " << dt << " seconds." << endl;
 }
 
 void OCP::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front){
@@ -231,6 +239,9 @@ void OCP::sortType(){
 
 
 void OCP::scaleVariables(){
+  cout << "Scaling variables ..." << endl;
+  double time1 = clock();
+  
   //Make sure that the variables has not already been scaled
   casadi_assert(!scaled_variables_);
 
@@ -280,9 +291,13 @@ void OCP::scaleVariables(){
   lterm   = substitute(lterm,v,v_old).data();
   
   scaled_variables_ = true;
+  double time2 = clock();
+  double dt = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... variable scaling complete after " << dt << " seconds." << endl;
 }
     
 void OCP::scaleEquations(){
+  
   // Make sure that the equations has not already been scaled
   casadi_assert(!scaled_equations_);
   
@@ -295,7 +310,10 @@ void OCP::scaleEquations(){
   // Quick return if no implicit equations
   if(implicit_fcn_.empty())
     return;
-  
+
+  cout << "Scaling equations ..." << endl;
+  double time1 = clock();
+
   // Variables
   enum Variables{T,X,XDOT,Z,P,U,NUM_VAR};
   vector<Matrix<SX> > v(NUM_VAR); // all variables
@@ -352,10 +370,16 @@ void OCP::scaleEquations(){
     implicit_fcn_[i] /= scale[i];
   }
   
+  double time2 = clock();
+  double dt = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... equation scaling complete after " << dt << " seconds." << endl;
   scaled_equations_ = true;
 }
 
 void OCP::sortBLT(bool with_x){
+  cout << "BLT sorting ..." << endl;
+  double time1 = clock();
+  
   // Sparsity pattern
   CRSSparsity sp;
   
@@ -401,11 +425,18 @@ void OCP::sortBLT(bool with_x){
   
   blt_sorted_ = true;
 
+  double time2 = clock();
+  double dt = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... BLT sorting complete after " << dt << " seconds." << endl;
 }
 
 void OCP::makeExplicit(){
   casadi_assert_message(blt_sorted_,"OCP has not been BLT sorted, call sortBLT()");
 
+  cout << "Making explicit..." << endl;
+  double time1 = clock();
+
+  
   // Create Jacobian
   SXFunction fcn(implicit_var_,implicit_fcn_);
   SXMatrix J = fcn.jac();
@@ -597,9 +628,15 @@ void OCP::makeExplicit(){
   // Eliminate the dependents
   eliminateDependent();
 
+  double time2 = clock();
+  double dt = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... makeExplicit complete after " << dt << " seconds." << endl;
 }
 
 void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
+  cout << "createFunctions ..." << endl;
+  double time1 = clock();
+
   // no quad if no quadrature states
   if(lterm.empty()) create_quad=false;
 
@@ -758,6 +795,11 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
   append(cfcn_in[DAE_Y],symbolic("lterm")); // FIXME
   cfcn_in[DAE_P] = var(u_);
   pathfcn_ = SXFunction(cfcn_in,path_fcn_);
+  
+  
+  double time2 = clock();
+  double dt = double(time2-time1)/CLOCKS_PER_SEC;
+  cout << "... createFunctions complete after " << dt << " seconds." << endl;
 }
 
 

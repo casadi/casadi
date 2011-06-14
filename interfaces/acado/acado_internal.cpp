@@ -340,13 +340,14 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
   if(hasSetOption("max_num_integrator_steps")) algorithm_->set( ACADO::MAX_NUM_INTEGRATOR_STEPS, getOption("max_num_integrator_steps").toInt() );
   if(hasSetOption("relaxation_parameter")) algorithm_->set( ACADO::RELAXATION_PARAMETER, getOption("relaxation_parameter").toDouble());
   
-  if(hasSetOption("dynamic_sensitivity"))
+  if(hasSetOption("dynamic_sensitivity")){
     if(getOption("dynamic_sensitivity") == "forward_sensitivities")
       algorithm_->set( ACADO::DYNAMIC_SENSITIVITY,  ACADO::FORWARD_SENSITIVITY );
     else if(getOption("dynamic_sensitivity") == "backward_sensitivities")
       algorithm_->set( ACADO::DYNAMIC_SENSITIVITY,  ACADO::BACKWARD_SENSITIVITY );
     else 
       throw CasadiException("illegal dynamic_sensitivity");
+  }
 
   if(hasSetOption("hessian_approximation")){
     int hess;

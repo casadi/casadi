@@ -116,7 +116,7 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
     fcn_.setInput(input(i),i);
   vector<double>& res2 = output().data();
   
-  int el = 0; // running index
+//  int el = 0; // running index
 
   if(use_ad_fwd_){ // forward AD if less inputs than outputs
     // Clear the forward seeds

@@ -31,7 +31,7 @@ Joel Andersson, K.U. Leuven, 2010
 using namespace CasADi;
 using namespace std;
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 
   /* Initialize matrix A. */
@@ -76,4 +76,5 @@ main(int argc, char *argv[])
   // Print the solution
   cout << "solution = " << linear_solver.output() << endl;
   
+  return 0;
 }
