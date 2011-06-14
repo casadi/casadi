@@ -41,3 +41,15 @@ add_subdirectory(cplex)
 endif (CPLEX_FOUND)
 
 add_subdirectory(csparse)
+
+
+if(WITH_GSL)
+find_package (GSL)
+find_package (BLAS)
+if(GSL_FOUND)
+if(BLAS_FOUND)
+add_subdirectory(gsl)
+endif(BLAS_FOUND)
+endif(GSL_FOUND)
+endif(WITH_GSL)
+
