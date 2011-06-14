@@ -169,7 +169,6 @@ int Ocp::isParam(string paramName)
 }
 
 
-
 void Ocp::writeMatlabOutput( const char * filename, double * xOpt)
 {
 	char filename2[200];

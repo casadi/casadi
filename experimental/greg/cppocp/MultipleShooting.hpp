@@ -9,6 +9,8 @@
 #include <string>
 #include <map>
 
+#include <casadi/sx/sx_tools.hpp>
+
 class MultipleShooting
 {
 public:
@@ -37,6 +39,7 @@ public:
 	CasADi::SX getState(std::string x, int timeStep);
 	CasADi::SX getAction(std::string u, int timeStep);
 	CasADi::SX getOutput(std::string o, int timeStep);
+	CasADi::SXMatrix getOutput(std::string o);
 
 	CasADi::SXMatrix getStateMat(int timeStep);
 	CasADi::SXMatrix getActionMat(int timeStep);

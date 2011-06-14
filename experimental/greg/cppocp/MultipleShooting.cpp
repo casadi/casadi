@@ -8,6 +8,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <casadi/fx/sx_function.hpp>
+
 using namespace CasADi;
 using namespace std;
 
@@ -40,6 +42,14 @@ MultipleShooting::MultipleShooting(string name_,
 
 MultipleShooting::~MultipleShooting() {}
 
+SXMatrix MultipleShooting::getOutput(string o)
+{
+	SXMatrix ret = create_symbolic(o, N);
+	for (int k=0; k<N; k++)
+		ret.at(k) = getOutput(o, k);
+	
+	return ret;
+}
 
 SX MultipleShooting::getOutput(string o, int timeStep)
 {
@@ -199,7 +209,7 @@ void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
 	}
 	f.precision(10);
 
-	f << "function [x,u] = " << filename << "()" << endl;
+	f << "function [x, u, outputs] = " << filename << "()" << endl;
 
 	map<string, int>::const_iterator iter;
 
@@ -229,12 +239,26 @@ void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
 	}
 	f << endl;
 
-	// // params
-	// for (iter = ode.params.begin(); iter != ode.params.end(); iter++){
-	// 	int idx = getParamIdx( iter->first );
-	// 	f << "p." << iter->first << " = " << xOpt[idx] << ";" << endl;
-	// }
-	// f << endl;
+	// outputs
+	for (iter = ode.outputs.begin(); iter != ode.outputs.end(); iter++){
+
+		SXMatrix outSXMatrix = getOutput(iter->first);
+		SXFunction outputFcn(dv, outSXMatrix);
+		outputFcn.init();
+		outputFcn.setInput(xOpt);
+		outputFcn.evaluate();
+		vector<double>outDouble(N);
+		outputFcn.getOutput(outDouble);
+
+		f << "outputs." << iter->first << " = [";
+		for (int k=0; k<N; k++){
+			if (k < N - 1)
+				f << outDouble[k] << ", ";
+			else
+				f << outDouble[k] << "];" << endl;
+		}
+	}
+	f << endl;
 
 	f.close();
 }
