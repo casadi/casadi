@@ -408,7 +408,7 @@ void SXFunctionInternal::getPartition(const vector<pair<int,int> >& blocks, vect
     throw CasadiException("SXFunctionInternal::jac: Unknown ad_mode");
   }
   
-  // Very inefficient selection of seed matrices
+  // Get seed matrices by graph coloring
   if(use_ad_fwd){
     D1[0] = unidirectionalColoring(AT,A);
   } else {
@@ -642,17 +642,17 @@ void SXFunctionInternal::print(ostream &stream) const{
  for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
     int op = it->op;
     stringstream s,s0,s1;
-    s << "i_" << it->ind;
+    s << "a" << it->ind;
 
     int i0 = it->ch[0], i1 = it->ch[1];
 #if 0
-    if(nodes[i0]->hasDep())  s0 << "i_" << i0;
+    if(nodes[i0]->hasDep())  s0 << "a" << i0;
     else                      s0 << SX(nodes[i0]);
-    if(nodes[i1]->hasDep())  s1 << "i_" << i1;
+    if(nodes[i1]->hasDep())  s1 << "a" << i1;
     else                      s1 << SX(nodes[i1]);
 #else
-    s0 << "i_" << i0;
-    s1 << "i_" << i1;
+    s0 << "a" << i0;
+    s1 << "a" << i1;
 #endif
 
     stream << s.str() << " = ";
@@ -661,10 +661,20 @@ void SXFunctionInternal::print(ostream &stream) const{
   }
 }
 
+void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v){
+  cfile << "int " << name << "[] = {";
+  for(int i=0; i<v.size(); ++i){
+    if(i!=0) cfile << ",";
+    cfile << v[i];
+  }
+  cfile << "};" << endl;
+}
+
 
 void SXFunctionInternal::generateCode(const string& src_name) const{
    // Output
   cout << "Generating: "<< src_name << endl;
+  cout << algorithm.size() << " elementary operations" << endl;
   // Create the c source file
   ofstream cfile;
   cfile.open (src_name.c_str());
@@ -673,67 +683,80 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   cfile << "/* Automatically generated function. */" << endl;
 //   cfile << "#include <stdio.h>" << endl << endl;
   cfile << "#include <math.h>" << endl << endl;
+  
+  // Space saving macro
+  cfile << "#define d double" << endl << endl;
+
+  // Number of inputs/outputs
+  int n_i = input_.size();
+  int n_o = output_.size();
+  int n_io = n_i + n_o;
 
   // Dimensions
-  cfile << "int n_in = " << input_.size() << ";" << endl;
-  cfile << "int n_out = " << output_.size() << ";" << endl;
+  cfile << "int n_in_ = " << n_i << ";" << endl;
+  cfile << "int n_out_ = " << n_o << ";" << endl;
 
-  // Input sizes
-  // rows
-  cfile << "int in_nrow[] = {";
-  if(!input_.empty()){
-    cfile << input(0).size1();
-    for(int i=1; i<input_.size(); ++i)
-      cfile << "," << input(i).size1();
+  // Number of rows and columns
+  vector<int> nrow(n_io), ncol(n_io);
+  for(int i=0; i<n_i; ++i){
+    nrow[i] = input(i).size1();
+    ncol[i] = input(i).size2();
   }
-  cfile << "};" << endl;
-  // columns
-  cfile << "int in_ncol_[] = {";
-  if(!input_.empty()){
-    cfile << input(0).size2();
-    for(int i=1; i<input_.size(); ++i)
-      cfile << "," << input(i).size2();
+  for(int i=0; i<n_o; ++i){
+    nrow[i+n_i] = input(i).size1();
+    ncol[i+n_i] = input(i).size2();
   }
-  cfile << "};" << endl;
-
-  // Output sizes
-  // rows
-  cfile << "int out_nrow[] = {";
-  if(!output_.empty()){
-    cfile << output(0).size1();
-    for(int i=1; i<output_.size(); ++i)
-      cfile << "," << output(i).size1();
-  }
-  cfile << "};" << endl;
-  // columns
-  cfile << "int out_ncol_[] = {";
-  if(!output_.empty()){
-    cfile << output(0).size2();
-    for(int i=1; i<output_.size(); ++i)
-      cfile << "," << output(i).size2();
-  }
-  cfile << "};" << endl;
-
-  // Memory
-/*  cfile << "double i0[" << work.size() << "];" << endl;
-  cfile << "double i1[" << dwork.size() << "];" << endl;;*/
   
-  // Initializer
-  cfile << "int init(int *n_in_, int *n_out_){" << endl;
-  cfile << "*n_in_ = n_in, *n_out_ = n_out;" << endl;
-  cfile << "return 0;" << endl;
+  // Print to file
+  printVector(cfile,"nrow_",nrow);
+  printVector(cfile,"ncol_",ncol);
+  
+  // Print row offsets
+  for(int i=0; i<n_io; ++i){
+    stringstream name;
+    name << "rowind_" << i << "_";
+    const vector<int>& rowind = i<n_i ? input(i).rowind() : output(i-n_i).rowind();
+    printVector(cfile,name.str(),rowind);
+  }
+  
+  // Array of pointers to the arrays above
+  cfile << "int *rowind_[] = {";
+  for(int i=0; i<n_io; ++i){
+    if(i!=0) cfile << ",";
+    cfile << "rowind_" << i << "_"; 
+  }
+  cfile << "};" << endl;
+  
+  // Print columns
+  for(int i=0; i<n_io; ++i){
+    stringstream name;
+    name << "col_" << i << "_";
+    const vector<int>& col = i<n_i ? input(i).col() : output(i-n_i).col();
+    printVector(cfile,name.str(),col);
+  }
+  
+  // Array of pointers to the arrays above
+  cfile << "int *col_[] = {";
+  for(int i=0; i<n_io; ++i){
+    if(i!=0) cfile << ",";
+    cfile << "col_" << i << "_"; 
+  }
+  cfile << "};" << endl << endl;
+  
+  // Function to get dimensions
+  cfile << "int init(int *n_in, int *n_out){" << endl;
+  cfile << "  *n_in = n_in_;" << endl;
+  cfile << "  *n_out = n_out_;" << endl;
+  cfile << "  return 0;" << endl;
   cfile << "}" << endl << endl;
 
   // Input sizes
-  cfile << "int getInputSize(int n_in, int *n_row, int *n_col){" << endl;
-  cfile << "*n_row = in_nrow[n_in]; *n_col = in_ncol_[n_in];" << endl;
-  cfile << "return 0;" << endl;
-  cfile << "}" << endl << endl;
-
-  // Output sizes
-  cfile << "int getOutputSize(int n_out, int *n_row, int *n_col){" << endl;
-  cfile << "*n_row = out_nrow[n_out]; *n_col = out_ncol_[n_out];" << endl;
-  cfile << "return 0;" << endl;
+  cfile << "int getSparsity(int i, int *nrow, int *ncol, int **rowind, int **col){" << endl;
+  cfile << "  *nrow = nrow_[i];" << endl;
+  cfile << "  *ncol = ncol_[i];" << endl;
+  cfile << "  *rowind = rowind_[i];" << endl;
+  cfile << "  *col = col_[i];" << endl;
+  cfile << "  return 0;" << endl;
   cfile << "}" << endl << endl;
 
   // Evaluate function
@@ -746,7 +769,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   for(int ind=0; ind<input_.size(); ++ind){
     for(int i=0; i<input_ind[ind].size(); ++i){
       int el = input_ind[ind][i];
-      cfile << "double i_" << el << "=x[" << ind << "][" << i << "];" << endl;
+      cfile << "d a" << el << "=x[" << ind << "][" << i << "];" << endl;
       declared[el] = true;
     }
   }
@@ -756,14 +779,14 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
     stringstream s0,s1;
     int op = it->op;
     if(!declared[it->ind]){
-      cfile << "double ";
+      cfile << "d ";
       declared[it->ind]=true;
     }
-    cfile << "i_" << it->ind << "=";
+    cfile << "a" << it->ind << "=";
     if(nodes[it->ch[0]]->isConstant())  s0 << nodes[it->ch[0]]->getValue();
-    else                               s0 << "i_" << it->ch[0];
+    else                               s0 << "a" << it->ch[0];
     if(nodes[it->ch[1]]->isConstant())  s1 << nodes[it->ch[1]]->getValue();
-    else                               s1 << "i_" << it->ch[1];
+    else                               s1 << "a" << it->ch[1];
     casadi_math<double>::print[op](cfile ,s0.str(),s1.str());
     cfile  << ";" << endl;
   }
@@ -776,7 +799,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
       if(nodes[el]->isConstant())
         cfile << nodes[el]->getValue() << ";" << endl;
       else
-        cfile << "i_" << el << ";" << endl;
+        cfile << "a" << el << ";" << endl;
     }
   }
 

@@ -115,6 +115,9 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename) const;
     
+  /** \brief  Print to a c file */
+  static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
+  
   /** \brief  Inputs of the function (needed for symbolic calculations) */
   std::vector<Matrix<SX> > inputv;
 

@@ -53,8 +53,7 @@ class ExternalFunctionInternal : public FXInternal{
 /** \brief  Function pointer types */
   typedef int (*evaluatePtr)(const double** x, double** r);
   typedef int (*initPtr)(int *n_in_, int *n_out_);
-  typedef int (*getInputSizePtr)(int n_in, int *n_row, int *n_col);
-  typedef int (*getOutputSizePtr)(int n_out, int *n_row, int *n_col);
+  typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **rowind, int **col);
 //@}
 
   /** \brief  Name of binary */

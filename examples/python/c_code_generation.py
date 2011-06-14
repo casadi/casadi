@@ -42,11 +42,12 @@ for f in [gfcn,efcn_no_opt,efcn_O3_opt]:
   for r in range(nrep):
     f.evaluate()
   t2 = time.time()
-  print "result = ", f.output()
+  print "result = ", f.output().data()
   dt = (t2-t1)/nrep
   print "time = ", dt*1e3, " ms"
   
-  num_op = 50000 # about 50000 operations
+  num_op = len(gfcn.algorithm())
+  print "number of elementary operations: ", num_op
   print "time per elementary operations: ", dt/num_op*1e9, " ns"
   
   

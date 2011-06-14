@@ -59,28 +59,37 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   input_.resize(n_in);
   output_.resize(n_out);
 
-  // Get the size of the inputs
-  getInputSizePtr getInputSize = (getInputSizePtr)dlsym(handle_, "getInputSize");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getInputSize\" found");
+  // Get the sparsity pattern
+  getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
+  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
 
-  for(int i=0; i<n_in; ++i){
-    int nrow, ncol;
-    flag = getInputSize(i,&nrow,&ncol);
-    if(flag) throw CasadiException("ExternalFunctionInternal: \"getInputSize\" failed");
-    input(i).resize(nrow,ncol);
-  }
+  for(int i=0; i<n_in+n_out; ++i){
+    // Get sparsity from file
+    int nrow, ncol, *rowind, *col;
+    flag = getSparsity(i,&nrow,&ncol,&rowind,&col);
+    if(flag) throw CasadiException("ExternalFunctionInternal: \"getSparsity\" failed");
 
-  // Get the size of the inputs
-  getOutputSizePtr getOutputSize = (getOutputSizePtr)dlsym(handle_, "getOutputSize");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getOutputSize\" found");
-
-  for(int i=0; i<n_out; ++i){
-    int nrow, ncol;
-    flag = getOutputSize(i,&nrow,&ncol);
-    if(flag) throw CasadiException("ExternalFunctionInternal: \"getOutputSize\" failed");
-    output(i).resize(nrow,ncol);
+    // Row offsets
+    vector<int> rowindv(rowind,rowind+nrow+1);
+    
+    // Number of nonzeros
+    int nnz = rowindv.back();
+    
+    // Columns
+    vector<int> colv(col,col+nnz);
+    
+    // Sparsity
+    CRSSparsity sp(nrow,ncol,colv,rowindv);
+    
+    // Save to inputs/outputs
+    if(i<n_in){
+      input(i) = Matrix<double>(sp,0);
+    } else {
+      output(i-n_in) = Matrix<double>(sp,0);
+    }
   }
   
+  //
   evaluate_ = (evaluatePtr) dlsym(handle_, "evaluate");
   if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluate\" found");
   
