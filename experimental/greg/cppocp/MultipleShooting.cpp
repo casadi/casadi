@@ -95,6 +95,7 @@ SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep, map<string,S
 	SX tkp1 = t0 + (timeStep+1)*dt;
 	
 	SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk, tkp1);
+
 	return xErr;
 }
 

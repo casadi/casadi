@@ -86,7 +86,7 @@ MultipleShooting & Ocp::addMultipleShooting(string name, Ode & ode, SX t0, SX tf
 	designVariables = vertcat( designVariables, SXMatrix(create_symbolic(name, numNew)) );
 	for (int k=0; k<numNew; k++){
 		lb.push_back(-1e50);
-		ub.push_back(-1e50);
+		ub.push_back(1e50);
 		guess.push_back(0);
 	}
 

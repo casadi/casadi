@@ -151,7 +151,7 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
 
 	// call dxdt
 	dxdt( xDotMap, dummyOutputMap, xMap, uMap, p, t );
-	
+
 	// make output SXMatrix
 	SXMatrix xDotMat = create_symbolic("an_xDotMat", nx());
 	map<string,int>::const_iterator iter;
@@ -164,12 +164,11 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
 SXMatrix Ode::rk4Step( SXMatrix x0Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX t1)
 {
 	SX dt = t1-t0;
-	
 	SXMatrix k1 = dxVectorDt( x0Vec            ,             u0Vec, p, t0          );
 	SXMatrix k2 = dxVectorDt( x0Vec + 0.5*dt*k1, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
 	SXMatrix k3 = dxVectorDt( x0Vec + 0.5*dt*k2, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
 	SXMatrix k4 = dxVectorDt( x0Vec +     dt*k3,             u1Vec, p, t0 +     dt );
-    
+	
 	//	return x0Vec + dt*k1; // euler
 	return x0Vec + dt*(k1 + 2*k2 + 2*k3 + k4)/6; // rk4
 }
