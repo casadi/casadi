@@ -785,8 +785,16 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
     }
     cfile << "a" << it->ind << "=";
     for(int c=0; c<2; ++c){
-      if(nodes.at(it->ch[c])->isConstant())  s[c] << nodes.at(it->ch[c])->getValue();
-      else                                   s[c] << "a" << it->ch[c];
+      if(nodes.at(it->ch[c])->isConstant()){
+        double v = nodes.at(it->ch[c])->getValue();
+        if(v>=0){
+          s[c] << v;
+        } else {
+          s[c] << "(" << v << ")";
+        }
+      } else {
+        s[c] << "a" << it->ch[c];
+      }
     }
     casadi_math<double>::print[op](cfile ,s[0].str(),s[1].str());
     cfile  << ";" << endl;
