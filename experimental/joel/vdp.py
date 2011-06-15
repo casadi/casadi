@@ -1,13 +1,16 @@
 from casadi import *
 import matplotlib.pyplot as plt
 
+# Number of shooting nodes
+NS = 20
+
 # Declare variables (use simple, efficient DAG)
 t = SX("t") # time
 x=SX("x"); y=SX("y"); u=SX("u"); L=SX("cost")
 
 # ODE right hand side function
 f = [(1 - y*y)*x - y + u, x, x*x + y*y + u*u]
-rhs = SXFunction([[t],[x,y,L],[u]],[f])
+rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
@@ -15,26 +18,22 @@ I.setOption("abstol",1e-10) # abs. tolerance
 I.setOption("reltol",1e-10) # rel. tolerance
 I.setOption("steps_per_checkpoint",1000)
 I.setOption("stop_at_end",True)
+I.setOption("t0",0.0)
+I.setOption("tf",20.0/NS)
 I.init()
 
 # All controls (use complex, general DAG)
-NU = 20; U = MX("U",NU)
+U = MX("U",NS)
 
 # The initial state (x=0, y=1, L=0)
 X  = MX([0,1,0])
 
-# Time horizon
-T0 = MX(0);  TF = MX(20.0/NU)
-
 # State derivative (not used)
 XP = MX()
 
-# Algebraic state (not used)
-Z = MX()
-
 # Build up a graph of integrator calls
-for k in range(NU):
-  [X,XP,Z] = I.call([T0,TF,X,U[k],XP,Z])
+for k in range(NS):
+  [X,XP] = I.call([X,U[k],XP])
 
 # Objective function: L(T)
 obj = X[2]
@@ -69,9 +68,9 @@ else:
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(NU*[-0.75], NLP_LBX)
-solver.setInput(NU*[1.0],NLP_UBX)
-solver.setInput(NU*[0.0],NLP_X_INIT)
+solver.setInput(NS*[-0.75], NLP_LBX)
+solver.setInput(NS*[1.0],NLP_UBX)
+solver.setInput(NS*[0.0],NLP_X_INIT)
 solver.setInput([0,0],NLP_LBG)
 solver.setInput([0,0],NLP_UBG)
 

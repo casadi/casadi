@@ -8,7 +8,13 @@ x=SX("x"); y=SX("y"); u=SX("u"); L=SX("cost")
 
 # ODE right hand side function
 f = [(1 - y*y)*x - y + u, x, x*x + y*y + u*u]
-rhs = SXFunction([[t],[x,y,L],[u]],[f])
+rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
+
+# Final time (fixed)
+tf = 20.0
+
+# Numboer of shooting nodes
+NS = 50
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
@@ -16,10 +22,8 @@ I.setOption("abstol",1e-8) # abs. tolerance
 I.setOption("reltol",1e-8) # rel. tolerance
 I.setOption("steps_per_checkpoint",50)
 I.setOption("stop_at_end",True)
+I.setOption("tf",tf/NS)
 I.init()
-
-# Final time (fixed)
-tf = 20.0
 
 # Control bounds
 u_min = -0.75
@@ -35,9 +39,6 @@ L_min = -NP.inf;  L_max =  NP.inf;  L_init = 0
 xf_min = 0;        xf_max =  0
 yf_min = 0;        yf_max =  0
 Lf_min = -NP.inf;  Lf_max =  NP.inf
-
-# Numboer of shooting nodes
-NS = 50
 
 # Number of discretized controls
 NU = NS
@@ -77,20 +78,11 @@ for i in range(NS):
     X_min += [x_min, y_min, L_min]
     X_max += [x_max, y_max, L_max]
   
-# Beginning of each shooting interval (shift time horizon)
-T0 = NS*[MX(0)]
-
-# End of each shooting interval (shift time horizon)
-TF = NS*[MX(tf/NU)]
-
 # The initial state (x=0, y=1, L=0)
 X0  = MX([0,1,0])
 
 # State derivative (not used)
 XP = MX()
-
-# Algebraic state (not used)
-Z = MX()
 
 # Constraint function with upper and lower bounds
 g = []
@@ -100,7 +92,7 @@ g_max = []
 # Build up a graph of integrator calls
 for k in range(NS):
   # call the integrator
-  [XF,XP,Z] = I.call([T0[k],TF[k],X0,U[k],XP,Z])
+  [XF,XP] = I.call([X0,U[k],XP])
   
   # append continuity constraints
   g.append(X[k] - XF)
@@ -119,7 +111,7 @@ F = MXFunction([V],[XF[2]])
 # Terminal constraints: 0<=[x(T);y(T)]<=0
 G = MXFunction([V],[vertcat(g)])
 
-if False:
+if True:
   solver = IpoptSolver(F,G)
   solver.setOption("tol",1e-5)
   solver.setOption("hessian_approximation", "limited-memory")

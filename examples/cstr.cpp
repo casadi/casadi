@@ -47,7 +47,7 @@ using namespace std;
 int main(){
 
   // Allocate a parser and load the xml
-  FMIParser parser("../examples/python/cstr/modelDescription.xml");
+  FMIParser parser("../examples/xml_files/cstr.xml");
 
   // Obtain the symbolic representation of the OCP
   OCP ocp = parser.parse();

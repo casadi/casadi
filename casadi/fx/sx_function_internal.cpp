@@ -675,7 +675,7 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
   casadi_assert(isInit());
   
    // Output
-  cout << "Generating: " << src_name << "(" << algorithm.size() << " elementary operations)" << endl;
+  cout << "Generating: " << src_name << " (" << algorithm.size() << " elementary operations)" << endl;
   // Create the c source file
   ofstream cfile;
   cfile.open (src_name.c_str());

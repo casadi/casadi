@@ -132,10 +132,10 @@ def create_CVODES():
   rhs = [v, (u-0.02*v*v)/m, -0.01*u*u]
 
   # Input of the DAE residual function
-  ffcn_in = ODE_NUM_IN * [[]]
-  ffcn_in[ODE_T] = [t]
-  ffcn_in[ODE_Y] = y
-  ffcn_in[ODE_P] = [u]
+  ffcn_in = DAE_NUM_IN * [[]]
+  ffcn_in[DAE_T] = [t]
+  ffcn_in[DAE_Y] = y
+  ffcn_in[DAE_P] = [u]
 
   # DAE residual function
   ffcn = SXFunction(ffcn_in,[rhs])
@@ -191,16 +191,16 @@ integrator.setOption("asens_reltol",1e-6)
 integrator.setOption("exact_jacobian",exact_jacobian)
 integrator.setOption("finite_difference_fsens",finite_difference_fsens)
 integrator.setOption("max_num_steps",100000)
-  
+
+# Set time horizon
+integrator.setOption("t0",t0)
+integrator.setOption("tf",tf)
+
 if(user_defined_solver):
   integrator.setOption("linear_solver","user_defined")
 
 # Initialize the integrator
 integrator.init()
-
-# Set time horizon
-integrator.setInput(t0,INTEGRATOR_T0)
-integrator.setInput(tf,INTEGRATOR_TF)
 
 # Set parameters
 integrator.setInput(u_init,INTEGRATOR_P)
@@ -271,8 +271,6 @@ print "forward sensitivities           ", integrator.fwdSens()
 
 if with_asens:
   print "adjoint sensitivities           ",
-  print integrator.adjSens(INTEGRATOR_T0), " ",
-  print integrator.adjSens(INTEGRATOR_TF), " ",
   print integrator.adjSens(INTEGRATOR_X0), " ",
   print integrator.adjSens(INTEGRATOR_P), " "
   
@@ -288,8 +286,6 @@ if second_order:
   intjac.init()
 
   # Set inputs
-  intjac.setInput(t0,INTEGRATOR_T0)
-  intjac.setInput(tf,INTEGRATOR_TF)
   intjac.setInput(u_init,INTEGRATOR_P)
   intjac.setInput(x0,INTEGRATOR_X0)
     

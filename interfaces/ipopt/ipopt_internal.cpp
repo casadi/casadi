@@ -236,9 +236,6 @@ void IpoptInternal::init(){
     m=G_.output().numel();
   }
   
-  cout << "H_.getNumInputs() "<< H_.getNumInputs() << endl;
-  cout << "H_.getNumOutputs() "<< H_.getNumOutputs() << endl;
-  
   if(!H_.isNull()) {
     casadi_assert_message(H_.getNumInputs()>=3, "Wrong number of input arguments to H");
     casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");

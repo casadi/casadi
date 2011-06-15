@@ -86,22 +86,22 @@ plt.title("ALGEBRAIC STATE  z")
 u_opt = ocp_solver.output(ACADO_U_OPT)
 plt.figure(2)
 plt.clf()
-plt.plot(t_opt,u_opt)
+plt.plot(t_opt,u_opt[:])
 plt.title("CONTROL u")
 
 plt.show()
 
 
-# State derivative
+# State derivatives
 xdot = SX("xdot")
 ldot = SX("ldot")
+zdot = SX("zdot")
 
 # The residual of the IDAS dae
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = [t]     # Time
-dae_in[DAE_Y] = [x,l]   # Differential states
-dae_in[DAE_YDOT] = [xdot,ldot]   # Differential states
-dae_in[DAE_Z] = [z]     # Algebraic state
+dae_in[DAE_Y] = [x,l,z]   # States
+dae_in[DAE_YDOT] = [xdot,ldot,zdot]   # State derivatives
 dae_in[DAE_P] = [u]     # Control
 
 # The DAE residual
@@ -126,26 +126,22 @@ integrator.setOption("stop_at_end",True)
 #integrator.setOption("suppress_algebraic",True)
 #integrator.setOption("linear_solver","dense")
 integrator.setOption("linear_solver","iterative")
+integrator.setOption("is_differential",[True,True,False])
+integrator.setOption("t0",t_opt[0])
+integrator.setOption("tf",t_opt[1])
 
 # Initialize the integrator
 integrator.init()
 
 # Initial state
-xi = (1.0,0.0)
+xi = (1.0,0.0,0.0)
 
 # Simulated trajectory
 x_opt2 = array((num_nodes+1)*[xi])
 
 # Loop over the time points
 for i in range(num_nodes):
-  # Set initial time
-  ti = t_opt[i]
-  integrator.setInput(ti,INTEGRATOR_T0)
   
-  # Set stop time
-  ts = t_opt[i+1]
-  integrator.setInput(ts,INTEGRATOR_TF)
-
   # Set the control
   ui = u_opt[i]
   integrator.setInput(ui,INTEGRATOR_P)
@@ -158,7 +154,7 @@ for i in range(num_nodes):
   
   # Get the state
   xi = integrator.output(INTEGRATOR_XF)
-  x_opt2[i+1] = xi
+  x_opt2[i+1] = xi.data()
 
 plt.figure(3)
 plt.clf()

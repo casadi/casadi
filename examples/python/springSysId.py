@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as N
 import casadi as C
 
+raise Exception("This example does not work, INTEGRATOR_T0 and INTEGRATOR_TF must be eliminated")
+
+
 # Construct an explicit rk4 integrator
 def create_integrator_rk4():
     u = C.SX("u") # control for one segment
