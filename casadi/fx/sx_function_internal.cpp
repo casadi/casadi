@@ -672,9 +672,10 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
 
 
 void SXFunctionInternal::generateCode(const string& src_name) const{
+  casadi_assert(isInit());
+  
    // Output
-  cout << "Generating: "<< src_name << endl;
-  cout << algorithm.size() << " elementary operations" << endl;
+  cout << "Generating: " << src_name << "(" << algorithm.size() << " elementary operations)" << endl;
   // Create the c source file
   ofstream cfile;
   cfile.open (src_name.c_str());
@@ -703,8 +704,8 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
     ncol[i] = input(i).size2();
   }
   for(int i=0; i<n_o; ++i){
-    nrow[i+n_i] = input(i).size1();
-    ncol[i+n_i] = input(i).size2();
+    nrow[i+n_i] = output(i).size1();
+    ncol[i+n_i] = output(i).size2();
   }
   
   // Print to file
@@ -776,18 +777,18 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
 
  // Run the algorithm
  for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
-    stringstream s0,s1;
+    stringstream s[2];
     int op = it->op;
     if(!declared[it->ind]){
       cfile << "d ";
       declared[it->ind]=true;
     }
     cfile << "a" << it->ind << "=";
-    if(nodes[it->ch[0]]->isConstant())  s0 << nodes[it->ch[0]]->getValue();
-    else                               s0 << "a" << it->ch[0];
-    if(nodes[it->ch[1]]->isConstant())  s1 << nodes[it->ch[1]]->getValue();
-    else                               s1 << "a" << it->ch[1];
-    casadi_math<double>::print[op](cfile ,s0.str(),s1.str());
+    for(int c=0; c<2; ++c){
+      if(nodes.at(it->ch[c])->isConstant())  s[c] << nodes.at(it->ch[c])->getValue();
+      else                                   s[c] << "a" << it->ch[c];
+    }
+    casadi_math<double>::print[op](cfile ,s[0].str(),s[1].str());
     cfile  << ";" << endl;
   }
   

@@ -51,14 +51,14 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   // Initialize and get the number of inputs and outputs
   initPtr init = (initPtr)dlsym(handle_, "init");
   if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
-  int n_in, n_out;
+  int n_in=-1, n_out=-1;
   int flag = init(&n_in, &n_out);
   if(flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
   
   // Pass to casadi
   input_.resize(n_in);
   output_.resize(n_out);
-
+  
   // Get the sparsity pattern
   getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
   if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");

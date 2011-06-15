@@ -224,31 +224,40 @@ void IpoptInternal::init(){
   int n=0;
   int m=0;
   // Basic sanity checks
-  if (F_.getNumInputs()<1 or F_.getNumOutputs()<1 or F_.output().size()!=1) {
-      throw CasadiException("Objective function should be (at least) single input, single output. First output must have exactly one element.");
-  }
+  casadi_assert_message(F_.getNumInputs()>=1, "Wrong number of input arguments to F");
+  casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
+  casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
+  
   n=F_.input().numel();
   if(!G_.isNull()) {
-    if (G_.getNumInputs()<1 or G_.getNumOutputs()<1 or G_.input().numel()!=n) {
-      throw CasadiException("Constraint function should be (at least) single input, single output. Number of elements in first input should match those of the objective function.");
-    }
+    casadi_assert_message(G_.getNumInputs()>=1, "Wrong number of input arguments to G");
+    casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
+    casadi_assert_message(G_.input().numel()==n, "Inconsistent dimensions");
     m=G_.output().numel();
   }
   
+  cout << "H_.getNumInputs() "<< H_.getNumInputs() << endl;
+  cout << "H_.getNumOutputs() "<< H_.getNumOutputs() << endl;
+  
   if(!H_.isNull()) {
-    if (H_.getNumInputs()<3 or H_.getNumOutputs()<1 or H_.input(0).numel()!=n or H_.output(0).size1()!=n or H_.output(0).size2()!=n) {
-      throw CasadiException("Hessian function should be (at least) triple input, single output.");
-    }
+    casadi_assert_message(H_.getNumInputs()>=3, "Wrong number of input arguments to H");
+    casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
+    casadi_assert_message(H_.input(0).numel()==n,"Inconsistent dimensions");
+    casadi_assert_message(H_.output().size1()==n,"Inconsistent dimensions");
+    casadi_assert_message(H_.output().size2()==n,"Inconsistent dimensions");
   }
-  if(!J_.isNull() and !G_.isNull()) {
-    if (J_.getNumInputs()<1 or J_.getNumOutputs()<1 or J_.input(0).numel()!=n or J_.output(0).size1()!=m or J_.output(0).size2()!=n) {
-      throw CasadiException("Jacobian of constraints should be (at least) single input, single output.");
-    }
+  if(!J_.isNull() && !G_.isNull()) {
+    casadi_assert_message(J_.getNumInputs()>=1, "Wrong number of input arguments to J");
+    casadi_assert_message(J_.getNumOutputs()>=1, "Wrong number of output arguments to J");
+    casadi_assert_message(J_.input().numel()==n,"Inconsistent dimensions");
+    casadi_assert_message(J_.output().size2()==n,"Inconsistent dimensions");
   }
   if(!GF_.isNull()) {
-    if (GF_.getNumInputs()<1 or GF_.getNumOutputs()<1 or GF_.input(0).numel()!=n or GF_.output(0).size1()!=n or GF_.output(0).size2()!=n) {
-      throw CasadiException("Jacobian of objective should be (at least) single input, single output.");
-    }
+    casadi_assert_message(GF_.getNumInputs()>=1, "Wrong number of input arguments to GF");
+    casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
+    casadi_assert_message(GF_.input().numel()==n,"Inconsistent dimensions");
+    casadi_assert_message(GF_.output().size1()==n,"Inconsistent dimensions");
+    casadi_assert_message(GF_.output().size2()==n,"Inconsistent dimensions");
   }
   
   // Create a Jacobian if it does not already exists
