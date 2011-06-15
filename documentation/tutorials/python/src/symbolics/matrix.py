@@ -14,11 +14,17 @@ print a
 #! Let's make a DMatrix with some structural non-zero entries.
 w = DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
 print w
+#! Internally, the Matrix<> class uses a Compressed Row Format which containts the offset to the first nonzero on each row ...
+print "row offsets: ", w.rowind()
+#! ... the columns for each nonzero ...
+print "columns: ", w.col()
+#! ... and the nonzero data entries:
+print "nonzeros: ", w.data()
 #! Conversion
 #! --------------
 #! DMatrix can easily be converted into other data formats
-print list(w)
-print tuple(w)
+print list(w.data())
+print tuple(w.data())
 print w.toArray()
 print array(w)
 print w.toMatrix()
