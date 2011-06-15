@@ -34,7 +34,7 @@
 #include "Ocp.hpp"
 #include "MultipleShooting.hpp"
 
-#include <SnoptInterface.hpp>
+// #include <SnoptInterface.hpp>
 
 #include <string>
 #include <map>
