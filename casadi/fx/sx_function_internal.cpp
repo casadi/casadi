@@ -457,6 +457,25 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
   getPartition(jblocks_no_f,D1,D2);
   
+  // Bugfix for dealing with sparse jacobians
+  vector<int> nz;
+  if(!D2[0].isNull()){
+    casadi_assert(jblocks_no_f.size()==1);
+    int oind = jblocks_no_f.front().first;
+    
+    // Output sparsity
+    const CRSSparsity& sp = output(oind).sparsity();
+    
+    // The nonzero element for each element
+    nz.resize(sp.numel(),-1);
+    for(int i=0; i<sp.size1(); ++i){
+      for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
+        int c = sp.col(el);
+        nz[c + i*sp.size2()] = el;
+      }
+    }
+  }
+  
   // Calculate the partial derivatives
   vector<SX> der1, der2;
   der1.reserve(algorithm.size());
@@ -578,7 +597,8 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
         int c = D2[v].col(el);
 
         // Give a seed in the direction
-        g[output_ind[oind][c]] = casadi_limits<SX>::one;
+        if(nz[c]>=0) // FIXME: ugly trick
+          g[output_ind[oind][nz[c]]] = casadi_limits<SX>::one;
       }
     }
     
@@ -611,6 +631,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
 
         // Get row of the Jacobian
         int r = D2[v].col(el);
+        if(nz[r]<0) continue; // FIXME: ugly trick
 
         // Loop over the nonzero elements in row r
         for(int elJ = ret[jblock_ind[v]].sparsity().rowind(r); elJ<ret[jblock_ind[v]].sparsity().rowind(r+1); ++elJ){
@@ -942,7 +963,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
   // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
   // we can save overhead by reusing the double array
   casadi_assert(sizeof(int_t) <= sizeof(double));
-  int_t *iwork = reinterpret_cast<int_t*>(&dwork.front());
+  int_t *iwork = dwork.empty() ? 0 : reinterpret_cast<int_t*>(&dwork.front());
   fill_n(iwork,dwork.size(),0);
 
   // Number of forward sweeps we must make
