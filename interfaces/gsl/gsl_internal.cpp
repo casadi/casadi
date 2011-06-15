@@ -57,15 +57,17 @@ GslInternal::~GslInternal(){
 }
 
 
-void GslInternal::resetAdj() {};
+void GslInternal::resetAdj() { return;}
 
-void GslInternal::integrateAdj(double t_out) {};
+void GslInternal::integrateAdj(double t_out) {return;}
 
-FX getJacobian() {return FX();};
+FX GslInternal::getJacobian() {return FX();}
   
-LinearSolver getLinearSolver() { return LinearSolver();};
-  
-void setLinearSolver(const LinearSolver& linsol, const FX& jac) {};
+LinearSolver GslInternal::getLinearSolver() { return LinearSolver();}
+
+void GslInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac) {
+  return;
+}
   
 void GslInternal::init(){
   // Init ODE rhs function and quadrature functions
@@ -86,6 +88,8 @@ void GslInternal::init(){
 
   // Number of parameters
   int np = f_.input(DAE_P).numel();
+
+  setDimensions(nx,np);
 
   // If time was not specified, initialise it.
   if (f_.input(DAE_T).numel()==0) {
@@ -139,7 +143,7 @@ void GslInternal::init(){
   //   = gsl_odeiv_step_gear2;
   
   step_ptr = gsl_odeiv_step_alloc (type_ptr, nx);
-  control_ptr = gsl_odeiv_control_y_new (getOption("abs_tol"), getOption("rel_tol"));
+  control_ptr = gsl_odeiv_control_y_new (abstol_, reltol_);
   evolve_ptr = gsl_odeiv_evolve_alloc (nx);
   
   my_system.function = rhs_wrapper;	// the right-hand-side functions dy[i]/dt 
@@ -148,8 +152,6 @@ void GslInternal::init(){
   my_system.params = this;	// parameters to pass to rhs and jacobian
   
   is_init = true;
-  
-  state = input(INTEGRATOR_X0);
   
 }
   
@@ -166,13 +168,19 @@ void GslInternal::reset(int fsens_order, int asens_order){
   // Get the time horizon
   t_ = t0_;
   
-  state.set(input(INTEGRATOR_X0));
+  int flag = gsl_odeiv_evolve_reset(evolve_ptr);
+	if(flag!=GSL_SUCCESS) gsl_error("Reset",flag);
+	
+  output(INTEGRATOR_XF).set(input(INTEGRATOR_X0));
 
 }
 
 void GslInternal::integrate(double t_out){
   double h = 1e-6;		// starting step size for ode solver 
-	gsl_odeiv_evolve_apply (evolve_ptr, control_ptr, step_ptr, &my_system, &t_, t_out, &h, &state.data()[0]);
+  std::cout << "I wanna integrate from " << t_ << " to " << t_out << std::endl;
+	int flag = gsl_odeiv_evolve_apply (evolve_ptr, control_ptr, step_ptr, &my_system, &t_, t_out, &h, &output(INTEGRATOR_XF).data()[0]);
+	if(flag!=GSL_SUCCESS) gsl_error("Integrate",flag);
+	std::cout << "GSL returned succes: " << flag << std::endl;
 }
 
 void GslInternal::printStats(std::ostream &stream) const{
@@ -285,6 +293,8 @@ void GslInternal::rhs(double t, const double y[], double f[]) {
   
   f_.evaluate();
   
+  std::cout << "rhs @ " << t << ": " << f_.input(DAE_Y) << " -> " << f_.output() << std::endl;
+  
   std::copy(f_.output().data().begin(),f_.output().data().end(),f);
   
   // Log time duration
@@ -327,6 +337,8 @@ void GslInternal::jac(double t, const double y[], double *dfdy, double dfdt[]){
   std::copy(jac_f_.output().data().begin(),jac_f_.output().data().end(),dfdy);
   std::copy(dt_f_.output().data().begin(),dt_f_.output().data().end(),dfdt);
   
+  std::cout << "jac @ " << t << ": " << jac_f_.output() << " , " << dt_f_.output() << std::endl;
+    
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;

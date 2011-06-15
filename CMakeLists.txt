@@ -16,7 +16,7 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 option(WITH_JIT "Enable just-in-time compilation" OFF)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
-option(WITH_GSL "Compile the GSL interface" OFF)
+option(WITH_GSL "Compile the GSL interface" ON)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)

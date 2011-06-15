@@ -273,3 +273,9 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "interfaces/csparse/csparse_tools.hpp"
 #endif
 
+#ifdef WITH_GSL
+%{
+#include "interfaces/gsl/gsl_integrator.hpp"
+%}
+%include "interfaces/gsl/gsl_integrator.hpp"
+#endif

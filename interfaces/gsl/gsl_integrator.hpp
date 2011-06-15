@@ -73,8 +73,8 @@ public:
 };
 
 
-} // namespace Sundials
 } // namespace GSL
+} // namespace CasADi
 
-#endif //CVODES_INTEGRATOR_HPP
+#endif //GSL_INTEGRATOR_HPP
 
