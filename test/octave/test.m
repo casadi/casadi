@@ -160,4 +160,29 @@ result=inv(X)*X;
 assert(all(full(result)==full(eye(2))))
 
 
+disp('Operator overloading')
+
+S =               { {DMatrix([1 2; 3 4]),SX("x"),MX("x",1,1)},
+                  {3,symbolic("x",2,2),MX("x",2,2)},
+                  {DMatrix(3),symbolic("x",2,2),MX("y",2,2)}
+                  };
+                  
+for i=1:numel(S)
+  sc = S{i};
+  for j = 1:1
+    disp("Here we go")
+    s = sc{1}
+    z = sc{1+j}
+    z+s;
+    s+z;
+    s.*z;
+    z.*s;
+    s-z;
+    z-s;
+    z./s;
+    s./z;
+    s^z;
+    z^s;
+  end
+end
 

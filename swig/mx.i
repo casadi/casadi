@@ -100,6 +100,9 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
 #ifdef SWIGPYTHON
 %extend CasADi::MX{
   %python_matrix_helpers
+  
+  #binopsFull(double b,CasADi::MX,,CasADi::MX)
+  #binopsFull(const CasADi::Matrix<double>& b,CasADi::MX,,CasADi::MX)
 };
 #endif // SWIGPYTHON
 

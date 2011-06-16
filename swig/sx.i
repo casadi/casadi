@@ -8,14 +8,6 @@
 
 %}
 
-#ifdef SWIGOCTAVE
-%rename(__el_mul__) __mul__;
-%rename(__el_div__) __div__;
-%rename(__mul__) prod;
-%rename(__transpose__) trans;
-#endif // SWIGOCTAVE
-
-
 
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"
@@ -72,8 +64,9 @@ except:
 
 namespace CasADi {
 
-#ifdef SWIGPYTHON
+
 %extend SX {
+#ifdef SWIGPYTHON
   %pythoncode %{
     def __lt__(self,other):
       return _casadi.__lt__(self,other)
@@ -94,29 +87,19 @@ namespace CasADi {
   __array_priority__ = 1000
   %}
 
-  // These methods must be added since the implicit type cast does not work
-  # define binopsT(T) \
-  Matrix<SX> __pow__ (T) const{ return CasADi::Matrix<CasADi::SX>(*$self).__pow__(CasADi::Matrix<CasADi::SX>(b));} \
-  Matrix<SX> __rpow__(T) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(CasADi::Matrix<CasADi::SX>(*$self));} \
-  Matrix<SX> __add__ (T) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);} \
-  Matrix<SX> __radd__(T) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;} \
-  Matrix<SX> __sub__ (T) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);} \
-  Matrix<SX> __rsub__(T) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;} \
-  Matrix<SX> __mul__ (T) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);} \
-  Matrix<SX> __rmul__(T) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;} \
-  Matrix<SX> __div__ (T) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);} \
-  Matrix<SX> __rdiv__(T) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
-
-  binopsT(const Matrix<double>& b)
+  #endif // SWIGPYTHON
   
-  #undef binopsT
+ 
+  
+  binopsFull(const Matrix<double>& b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+  binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
     
 };
   
 %extend Matrix<SX>{
     // The constructor has to be added since SX::operator Matrix<SX does not work
     // Matrix<SX>(const SX&){ *$self
-    
+    #ifdef SWIGPYTHON
     %pythoncode %{
       def __lt__(self,other):
         return _casadi.__lt__(self,other)
@@ -131,24 +114,13 @@ namespace CasADi {
       def __ge__(self,other):
         return _casadi.__ge__(self,other)
     %}
-    // These methods must be added since the implicit type cast does not work
-    # define binopsT(T) \
-    Matrix<SX> __pow__ (T) const{ return $self->__pow__(CasADi::Matrix<CasADi::SX>(b));} \
-    Matrix<SX> __rpow__(T) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(*$self);} \
-    Matrix<SX> __add__ (T) const{ return *$self + CasADi::Matrix<CasADi::SX>(b);} \
-    Matrix<SX> __radd__(T) const{ return CasADi::Matrix<CasADi::SX>(b) + *$self;} \
-    Matrix<SX> __sub__ (T) const{ return *$self - CasADi::Matrix<CasADi::SX>(b);} \
-    Matrix<SX> __rsub__(T) const{ return CasADi::Matrix<CasADi::SX>(b) - *$self;} \
-    Matrix<SX> __mul__ (T) const{ return *$self * CasADi::Matrix<CasADi::SX>(b);} \
-    Matrix<SX> __rmul__(T) const{ return CasADi::Matrix<CasADi::SX>(b) * *$self;} \
-    Matrix<SX> __div__ (T) const{ return *$self / CasADi::Matrix<CasADi::SX>(b);} \
-    Matrix<SX> __rdiv__(T) const{ return CasADi::Matrix<CasADi::SX>(b) / *$self;}
+    #endif
 
-    binopsT(double b)
-    binopsT(const Matrix<double>& b)
-    
-    #undef binopsT
-    
+    binopsFull(double b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
+    binopsFull(const CasADi::Matrix<double>& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
+    #binopsFull(const CasADi::SX& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
+     
+    #ifdef SWIGPYTHON
     %python_matrix_convertors
     %python_matrix_helpers
     
@@ -191,10 +163,10 @@ namespace CasADi {
       else:
         return self.toArray()
   %}
-        
+  #endif // SWIGPYTHON    
 };
 
-#endif // SWIGPYTHON
+
 
 } // namespace CasADi
 
@@ -495,7 +467,9 @@ template <> bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(cons
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
+#ifdef SWIGPYTHON
 %meta_vector(std::vector<CasADi::SX>);
+#endif // SWIGPYTHON
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;

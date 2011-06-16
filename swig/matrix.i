@@ -1,3 +1,10 @@
+#ifdef SWIGOCTAVE
+%rename(__el_mul__) __mul__;
+%rename(__el_div__) __div__;
+%rename(__mul__) prod;
+%rename(__transpose__) trans;
+#endif // SWIGOCTAVE
+
 %{
 #include "casadi/matrix/crs_sparsity.hpp"
 #include "casadi/matrix/matrix.hpp"
@@ -21,6 +28,8 @@ template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_C
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<double> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t;
 template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
 %}
+
+
 
 #ifdef SWIGPYTHON
 %define %python_matrix_convertors
@@ -461,6 +470,10 @@ octave_value toSparse() {
   
   return octave_value(SparseMatrix(mydata,Ar,Ac,nr,nc));
 }
+
+binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+binopsFull(const CasADi::SX & b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+#binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 
 }; // extend Matrix<double>
