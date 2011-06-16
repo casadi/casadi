@@ -108,16 +108,20 @@ class SXFunctionInternal : public XFunctionInternal{
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SX> swork;
   std::vector<SX> free_vars;
+  std::vector<int> refcount;
   
   /** \brief  Initialize */
   virtual void init();
 
   /** \brief  Print to a c file */
-  void generateCode(const std::string& filename) const;
-    
-  /** \brief  Print to a c file */
   static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
+
+  /** \brief  Print an operation to a stream */
+  std::string printOperation(int i);
   
+  /** \brief  Print to a c file */
+  void generateCode(const std::string& filename);
+      
   /** \brief  Inputs of the function (needed for symbolic calculations) */
   std::vector<Matrix<SX> > inputv;
 

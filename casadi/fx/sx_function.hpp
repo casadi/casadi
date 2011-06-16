@@ -134,7 +134,7 @@ public:
   const SXMatrix& outputSX(int ind=0) const;
   
   /** \brief Generate C code for the function */
-  void generateCode(const std::string& filename) const;
+  void generateCode(const std::string& filename);
   
   /** \brief Access the algorithm */
   const std::vector<SXAlgEl>& algorithm() const;

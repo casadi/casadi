@@ -691,8 +691,31 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
   cfile << "};" << endl;
 }
 
+std::string SXFunctionInternal::printOperation(int i){
+  stringstream s;
+  if(nodes.at(i)->isConstant()){
+    double v = nodes.at(i)->getValue();
+    if(v>=0){
+      s << v;
+    } else {
+      s << "(" << v << ")";
+    }
+  } else if(refcount[i]==1){
+    // Call can be inlined
+    int j = nodes[i]->temp;
+    string ss[2];
+    for(int c=0; c<2; ++c){
+      ss[c] = printOperation(algorithm[j].ch[c]);
+    }
+    int op = algorithm[j].op;
+    casadi_math<double>::print[op](s,ss[0],ss[1]);
+  } else {
+    s << "a" << i;
+  }
+  return s.str();
+}
 
-void SXFunctionInternal::generateCode(const string& src_name) const{
+void SXFunctionInternal::generateCode(const string& src_name){
   casadi_assert(isInit());
   
    // Output
@@ -795,32 +818,62 @@ void SXFunctionInternal::generateCode(const string& src_name) const{
       declared[el] = true;
     }
   }
+  
+ // Count how many times a node is referenced in the algorithm
+ refcount.clear();
+ refcount.resize(nodes.size(),0);
+ for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
+   for(int c=0; c<2; ++c) refcount[it->ch[c]]++;
+ }
+  
+ // Inputs get value two in order to prevent them from being inlined
+ for(int ind=0; ind<input_.size(); ++ind){
+   for(int i=0; i<input_ind[ind].size(); ++i){
+     int el = input_ind[ind][i];
+     refcount[el] = 2;
+   }
+ }
 
+ // Outputs get value two in order to prevent them from being inlined
+ for(int ind=0; ind<output_.size(); ++ind){
+   for(int i=0; i<output_ind[ind].size(); ++i){
+     int el = output_ind[ind][i];
+     refcount[el] = 2;
+   }
+ }
+ 
+ // Mark the node its place in the algorithm
+ for(int i=0; i<algorithm.size(); ++i){
+   nodes[algorithm[i].ind]->temp = i;
+ }
+ 
  // Run the algorithm
  for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
-    stringstream s[2];
-    int op = it->op;
+   // Skip printing variables that can be inlined
+   if(refcount[it->ind]<2) continue;
+   
     if(!declared[it->ind]){
       cfile << "d ";
       declared[it->ind]=true;
     }
     cfile << "a" << it->ind << "=";
+    string s[2];
     for(int c=0; c<2; ++c){
-      if(nodes.at(it->ch[c])->isConstant()){
-        double v = nodes.at(it->ch[c])->getValue();
-        if(v>=0){
-          s[c] << v;
-        } else {
-          s[c] << "(" << v << ")";
-        }
-      } else {
-        s[c] << "a" << it->ch[c];
-      }
+      s[c] = printOperation(it->ch[c]);
     }
-    casadi_math<double>::print[op](cfile ,s[0].str(),s[1].str());
+    int op = it->op;
+    casadi_math<double>::print[op](cfile,s[0],s[1]);
     cfile  << ";" << endl;
   }
-  
+
+ // Unmark the nodes
+ for(int i=0; i<algorithm.size(); ++i){
+   nodes[algorithm[i].ind]->temp = 0;
+ }
+
+ // Clear the reference counter
+ refcount.clear();
+
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
     for(int i=0; i<output_ind[ind].size(); ++i){

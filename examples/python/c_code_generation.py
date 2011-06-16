@@ -22,20 +22,34 @@ gfcn.generateCode(srcname)
 
 objname_no_opt = "grad_det_no_opt.so"
 print "Compiling without optimization: ", objname_no_opt
+t1 = time.time()
 system("gcc -shared " + srcname + " -o " + objname_no_opt)
+t2 = time.time()
+print "time = ", (t2-t1)*1e3, " ms"
 
 objname_O3_opt = "grad_det_O3_opt.so"
 print "Compiling with O3 optimization: ", objname_O3_opt
+t1 = time.time()
 system("gcc -shared -O3 " + srcname + " -o " + objname_O3_opt)
+t2 = time.time()
+print "time = ", (t2-t1)*1e3, " ms"
+
+objname_Os_opt = "grad_det_Os_opt.so"
+print "Compiling with Os optimization: ", objname_Os_opt
+t1 = time.time()
+system("gcc -shared -Os " + srcname + " -o " + objname_Os_opt)
+t2 = time.time()
+print "time = ", (t2-t1)*1e3, " ms"
 
 # Read function
 efcn_no_opt = ExternalFunction(objname_no_opt)
 efcn_O3_opt = ExternalFunction(objname_O3_opt)
+efcn_Os_opt = ExternalFunction(objname_O3_opt)
 efcn_no_opt.init()
 efcn_O3_opt.init()
+efcn_Os_opt.init()
 
-for f in [gfcn,efcn_no_opt,efcn_O3_opt]:
-  print "f.__class__ = ", f.__class__
+for f in [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]:
   f.setInput(x0)
   t1 = time.time()
   nrep = 10000

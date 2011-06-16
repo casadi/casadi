@@ -185,7 +185,7 @@ const SXMatrix& SXFunction::outputSX(int ind) const{
   return (*this)->outputv[ind];
 }
 
-void SXFunction::generateCode(const string& filename) const{
+void SXFunction::generateCode(const string& filename){
   (*this)->generateCode(filename);
 }
 
