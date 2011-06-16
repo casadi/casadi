@@ -223,6 +223,18 @@ class ADtests(casadiTestCase):
             Jf.evaluate()
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(Jf.output()),J,"Jacobian")
+            
+  def test_jacsparsity(self):
+    n=array([1.2,2.3,7,4.6])
+    for inputshape in ["column","row","matrix"]:
+      for outputshape in ["column","row","matrix"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense"]:
+            self.message("jacsparsity on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+            f.init()
+            J = self.jacobians[inputtype][outputtype](*n)
+            self.checkarray(DMatrix(f.jacSparsity(),1),array(J!=0,int),"jacsparsity")
               
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
@@ -275,6 +287,27 @@ class ADtests(casadiTestCase):
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jf.output()),J,"jacobian")
+     
+  def test_jacsparsityMX(self):
+    return "No jacsparsity for MX"
+    n=array([1.2,2.3,7,4.6])
+    for inputshape in ["column"]:
+      for outputshape in ["column"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense"]:
+            for mode in ["forward","adjoint"]:
+              self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
+              f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+              f.init()
+              Jf=f.jacobian(0,0)
+              Jf.init()
+              Jf.input().set(n)
+              Jf.evaluate()
+              J = self.jacobians[inputtype][outputtype](*n)
+              self.checkarray(array(Jf.output()),J,"jacobian")
+              self.checkarray(array(DMatrix(f.jacSparsity(),1)),array(J!=0,int),"jacsparsity")
+              
+     
               
   def test_hessian(self):
     #return # not working
