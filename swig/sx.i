@@ -27,6 +27,8 @@
 template<> swig_type_info** meta< CasADi::SX >::name = &SWIGTYPE_p_CasADi__SX;
 template<> swig_type_info** meta< CasADi::Matrix<CasADi::SX> >::name = &SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t;
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SX> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t;
+template<> swig_type_info** meta< std::vector< CasADi::SX > >::name = &SWIGTYPE_p_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t;
+template<> swig_type_info** meta< std::vector< std::vector< CasADi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_std__allocatorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_t_t;
 %}
 
 #ifdef SWIGPYTHON
@@ -320,6 +322,14 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::S
     } else {
       return false;
     }
+  } else if(meta< std::vector<CasADi::SX> >::couldbe_sequence(p)) {
+    std::vector< std::vector<CasADi::SX> > sxv;
+    int result = meta< std::vector<CasADi::SX> >::as_vector(p,sxv);
+    if (result) {
+      m = CasADi::SXMatrix(sxv);
+    } else {
+      return false;
+    }
   } else {
     SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -336,7 +346,7 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
     return true;
   }
   
-  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || meta< CasADi::SX >::couldbe_sequence(p);
+  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || meta< CasADi::SX >::couldbe_sequence(p) || meta< std::vector< CasADi::SX > >::couldbe_sequence(p);
 }
 
 %}
@@ -485,6 +495,7 @@ template <> bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(cons
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
+%meta_vector(std::vector<CasADi::SX>);
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;

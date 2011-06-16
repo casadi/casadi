@@ -19,3 +19,5 @@ f.init()
 #! And we visualize the sparsity of the jacobian
 spy(f.jacSparsity())
 
+show()
+

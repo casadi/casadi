@@ -69,6 +69,7 @@ f.init()
 f.input(0).set(2)
 f.input(1).set(3)
 f.evaluate()
+
 print [f.output(i) for i in range(2)]
 print [[f.grad(i,j) for i in range(2)] for j in range(2)]
 
@@ -95,6 +96,7 @@ print f.eval([[x],[SX("c"),SX("d")]])
 #! ----------------------------------
 #! The following code creates and evaluates a single input (vector valued), single output (vector valued) function.
 #$ f : $\mathbb{R}^2 \mapsto \mathbb{R}^2$
+
 x = SX("x")
 y = SX("y")
 f = SXFunction([[x , y ]], [[x*y, x+y]])

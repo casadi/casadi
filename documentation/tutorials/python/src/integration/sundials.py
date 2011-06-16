@@ -125,10 +125,12 @@ show()
 #$ A common approach to visualise sensitivity for initial conditions is to overlay the phase space solution with ellipses defined by the local jacobian $\frac{\partial x(t)}{\partial x(0)} = [\frac{dx_1(t)}{dx_1(0)}\quad\frac{dx_1(t)}{dx_2(0)};\frac{dx_2(t)}{dx_1(0)}\quad\frac{dx_2(t)}{dx_2(0)}]$
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
+integrator.reset() # start integration from time zero again
+
 def out(t):
 	integrator.setFinalTime(t)
 	integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
-	integrator.evaluate(1,0)
+	integrator.integrate(t)
 	A=integrator.fwdSens().toArray()
 	integrator.fwdSeed(INTEGRATOR_X0).set([0,1])
 	integrator.evaluate(1,0)

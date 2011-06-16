@@ -379,6 +379,12 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(0).shape,(2,3),"SXFunction constructors")
     self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
 
+    f=SXFunction([y,[[x0,x1],[x3,x4]]],[0,y])
+    self.checkarray(f.input(0).shape,(2,3),"SXFunction constructors")
+    self.checkarray(f.input(1).shape,(2,2),"SXFunction constructors")
+    self.checkarray(f.output(0).shape,(1,1),"SXFunction constructors")
+    self.checkarray(f.output(1).shape,(2,3),"SXFunction constructors")
+    
     self.assertRaises(NotImplementedError,lambda: SXFunction(y,[y,y]))
     self.assertRaises(NotImplementedError,lambda: SXFunction(x0,[x0,x1]))
 
