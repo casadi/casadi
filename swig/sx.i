@@ -35,6 +35,9 @@ template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SX> > >::n
         @property
         def shape(self):
             return (self.size1(),self.size2())
+            
+        def __array__(self,*args,**kwargs):
+            return DMatrix(self,1).toArray()
     %}
 };
 
