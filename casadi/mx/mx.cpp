@@ -306,9 +306,7 @@ MX MX::ones(int nrow, int ncol){
 }
 
 MX MX::eye(int n){
-  Matrix<double> I(n,n);
-  for(int i=0; i<n; ++i)
-    I(i,i) = 1;
+  Matrix<double> I(CRSSparsity::createDiagonal(n),1);
   return MX(I);
 }
 
