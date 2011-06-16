@@ -86,6 +86,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d){
 
 void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
   casadi_assert(nz_d.size()==nz.size());
+  casadi_assert(!d.isNull());
   
   // Quick return if no elements
   if(nz_d.empty()) return;
@@ -157,12 +158,12 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
 
   // Number of columns
   int ncol = jx.front().size2();
-  
-  // Return mapping
-  MX ret(size(),ncol);
-  
+    
   // Sparsity
   const CRSSparsity &sp = sparsity();
+
+  // Nonzero elements of the new matrix
+  vector<int> i_ret, j_ret, el_ret, dp_ret;
 
   // Loop over rows of the matrix
   for(int i=0; i<size1(); ++i){
@@ -187,14 +188,55 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
         int j_mat = sp_mat.col(el_mat);
         
         // Map the Jacobian nonzero
-        ret(el,j_mat) = jx[dp][el_mat];
+        i_ret.push_back(el);
+        j_ret.push_back(j_mat);
+        el_ret.push_back(el_mat);
+        dp_ret.push_back(dp);
       }
     }
+  }
+  
+  // Row offsets for the return matrix
+  vector<int> rowind(1,0);
+  rowind.reserve(size()+1);
+  int i=0;
+  for(int k=0; k<i_ret.size(); ++k){
+    casadi_assert(i_ret[k]>=i);
+    for(; i<i_ret[k]; ++i){
+      rowind.push_back(k);
+    }
+  }
+  rowind.resize(size()+1,i_ret.size());
+  
+  // Sparsity of the return matrix
+  CRSSparsity sp_ret(size(),ncol,j_ret,rowind);
+  
+  // Return matrix
+  MX ret = MX::create(new Mapping(sp_ret));
+  
+  // Add the dependencies
+  for(int dp=0; dp<jx.size(); ++dp){
+    
+    // Get the local nonzeros
+    vector<int> nz, nzd;
+    for(int k=0; k<el_ret.size(); ++k){
+      
+      // If dependency matches
+      if(dp_ret[k]==dp){
+        nz.push_back(k);
+        nzd.push_back(el_ret[k]);
+      }
+    }
+    
+    // Save to return matrix
+    ret->addDependency(jx[dp],nzd,nz);
   }
     
   // Return the mapping
   return ret;
 }
+
+
 
 
 // MX Mapping::eval(const std::vector<MX>& x){
