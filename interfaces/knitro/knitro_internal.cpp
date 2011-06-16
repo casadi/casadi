@@ -124,7 +124,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   // Type of constraints
   vector<int> cType(m_,KTR_CONTYPE_GENERAL);
   if(hasSetOption("contype")){
-    vector<int> contype = getOption("contype").toIntVector();
+    vector<int> contype = getOption("contype");
     casadi_assert(contype.size()==cType.size());
     copy(contype.begin(),contype.end(),cType.begin());
   }
@@ -141,13 +141,13 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   
   // Initialize KNITRO
   status = KTR_init_problem(kc_handle_, n_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
-                              &input(NLP_LBX)[0], &input(NLP_UBX)[0],
-                              m_, &cType[0], &input(NLP_LBG)[0], &input(NLP_UBG)[0],
-                              Jcol.size(), &Jcol[0], &Jrow[0],
+                              &input(NLP_LBX).front(), &input(NLP_UBX).front(),
+                              m_, &cType.front(), &input(NLP_LBG).front(), &input(NLP_UBG).front(),
+                              Jcol.size(), &Jcol.front(), &Jrow.front(),
                               nnzH,
                               nnzH==0 ? 0 : &Hrow[0],
                               nnzH==0 ? 0 : &Hcol[0],
-                              &input(NLP_X_INIT)[0],
+                              &input(NLP_X_INIT).front(),
                               0); // initial lambda
   casadi_assert_message(status==0, "KTR_init_problem failed");
   
@@ -168,10 +168,10 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
 
   // Solve NLP
   status = KTR_solve(kc_handle_,
-                   &output(NLP_X_OPT)[0],
+                   &output(NLP_X_OPT).front(),
                    &lambda[0],
                    0,  // not used
-                   &output(NLP_COST)[0],
+                   &output(NLP_COST).front(),
                    0,  // not used
                    0,  // not used
                    0,  // not used
