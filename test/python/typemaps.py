@@ -188,7 +188,8 @@ class typemaptests(casadiTestCase):
     for (s,x,y) in [
                   (DMatrix([[1,2],[3,4]]),SX("x"),MX("x",1,1)),
                   (3,symbolic("x",2,2),MX("x",2,2)),
-                  (DMatrix(3),symbolic("x",2,2),MX("y",2,2))
+                  (DMatrix(3),symbolic("x",2,2),MX("y",2,2)),
+                  (array([[1,2],[3,4]]),SX("x"),MX("x",1,1))
                   ]:
       for z in [x,y]:
         print "z = %s, s = %s" % (str(z),str(s))
