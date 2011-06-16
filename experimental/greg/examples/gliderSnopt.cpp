@@ -45,12 +45,12 @@ void
 dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
 {
 	// constants
-	double AR = 6;     // aspect ration
-	double Cd0 = 0.03; // parasitic drag
-	double m = 2.0;    // mass
-	double rho = 1.22; // air density
-	double A = 1.0;    // area
-	double g = 9.8;    // acceleration due to gravity
+	double AR  =     6; // aspect ratio
+	double Cd0 =  0.03; // parasitic drag
+	double m   =   0.4; // mass
+	double rho =  1.22; // air density
+	double A   = 0.625; // area
+	double g   =   9.8; // acceleration due to gravity
 	
 	// eom
 	SX alpha = action["alphaDeg"]*3.14159/180.0;
