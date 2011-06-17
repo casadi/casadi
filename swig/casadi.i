@@ -189,6 +189,7 @@ PyOS_setsig(SIGINT, SigIntHandler);
 # define binopsFull(argtype,argCast,selfCast,returntype) \
 returntype __pow__ (argtype) const{ return selfCast(*$self).__pow__(argCast(b));} \
 returntype __rpow__(argtype) const{ return argCast(b).__pow__(selfCast(*$self));} \
+returntype __rpow__(argtype) const{ return argCast(b).__pow__(selfCast(*$self));} \
 returntype __add__ (argtype) const{ return selfCast(*$self) + argCast(b);} \
 returntype __radd__(argtype) const{ return argCast(b) + selfCast(*$self);} \
 returntype __sub__ (argtype) const{ return selfCast(*$self) - argCast(b);} \
@@ -196,8 +197,10 @@ returntype __rsub__(argtype) const{ return argCast(b) - selfCast(*$self);} \
 returntype __mul__ (argtype) const{ return selfCast(*$self) * argCast(b);} \
 returntype __rmul__(argtype) const{ return argCast(b) * selfCast(*$self);} \
 returntype __div__ (argtype) const{ return selfCast(*$self) / argCast(b);} \
-returntype __rdiv__(argtype) const{ return argCast(b) / selfCast(*$self);}
-    
+returntype __rdiv__(argtype) const{ return argCast(b) / selfCast(*$self);} \
+returntype prod (argtype) const{ return prod(selfCast(*$self) , argCast(b));} \
+returntype rprod (argtype) const{ return prod(argCast(b) , selfCast(*$self));}
+
 // typemaphelpers
 %include "typemaphelpers.i"
 

@@ -366,6 +366,11 @@ class Matrix : public PrintableObject{
     /// Matrix product
     Matrix<T> prod(const Matrix<T> &y) const;
 
+    /** Matrix product, from the right
+    * x.rprod(y) = y.prod(x)
+    */
+    Matrix<T> rprod(const Matrix<T> &y) const {return y.prod(*this);}
+    
     /// Matrix transpose
     Matrix<T> trans() const;
 
@@ -1595,6 +1600,10 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
   // First factor
   const Matrix<T>& x = *this;
   
+  // Quickly return when aither this or y is a scalar
+  if (numel()==1 || y.numel()==1)
+    return (*this)*y;
+    
   if (x.size2() != y.size1()) {
     std::stringstream ss;
     ss << "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl;

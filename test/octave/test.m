@@ -198,7 +198,9 @@ S = {DMatrix(3),symbolic("x",2,2),SX("x"),MX("x",1,1)};
 
 for i=1:numel(S)
   sc = S{i};
+  sc
   sc/6;
+  6/sc;
   sc*6;
   6*sc;
   sc^6;
@@ -214,6 +216,8 @@ for i=1:2
     n = num{i};
     s = sym{i};
     n*s;
+    s*n;
   end
 end
+
 

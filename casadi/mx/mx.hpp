@@ -350,6 +350,7 @@ std::string __repr__() { return $self->getRepresentation();
  // all binary operations with a particular right argument
   #define binops(t) \
   MX prod(t b){       return prod(*$self,b);} \
+  MX rprod(t b){       return prod(b,*$self);} \
   MX inner_prod(t b){ return inner_prod(*$self,b);} \
   MX outer_prod(t b){ return outer_prod(*$self,b);} \
   MX constpow(t b){    return std::constpow(*$self,b);} \

@@ -4,6 +4,7 @@
 %rename(__rel_mul__) __rmul__;
 %rename(__rel_div__) __rdiv__;
 %rename(__mul__) prod;
+%rename(__rmul__) rprod;
 %rename(__transpose__) trans;
 #endif // SWIGOCTAVE
 
@@ -18,6 +19,8 @@
 
 // to typecheck for MX
 #include "casadi/mx/mx.hpp"
+// to have prod available
+#include "casadi/mx/mx_tools.hpp"
 %}
 
 %inline %{
