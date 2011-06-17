@@ -164,7 +164,8 @@ disp('Operator overloading')
 
 S =               { {DMatrix([1 2; 3 4]),SX("x"),MX("x",1,1)},
                   {3,symbolic("x",2,2),MX("x",2,2)},
-                  {DMatrix(3),symbolic("x",2,2),MX("y",2,2)}
+                  {DMatrix(3),symbolic("x",2,2),MX("y",2,2)},
+		  {[1 2; 3 4],SX("x"),MX("x",1,1)}
                   };
                   
 for i=1:numel(S)

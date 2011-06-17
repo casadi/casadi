@@ -8,6 +8,9 @@
 
 %}
 
+// http://www.gnu.org/software/octave/doc/interpreter/Operator-Overloading.html#Operator-Overloading
+// http://mentat.za.net/DaCodaAlFine.pdf
+// "dispatch binary operator" can be found in octrun.swg: look for dispatch_binary_op in swig generated
 
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"

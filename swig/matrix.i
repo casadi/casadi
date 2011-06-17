@@ -1,6 +1,8 @@
 #ifdef SWIGOCTAVE
 %rename(__el_mul__) __mul__;
 %rename(__el_div__) __div__;
+%rename(__rel_mul__) __rmul__;
+%rename(__rel_div__) __rdiv__;
 %rename(__mul__) prod;
 %rename(__transpose__) trans;
 #endif // SWIGOCTAVE

@@ -68,6 +68,25 @@ function [y]=casadi_inv(x)
   global casadi;
   y = casadi.inv(x);
 end
-
 dispatch('inv','casadi_inv','swig_ref')
 
+function [y]=op_scalar_add_any(a,b)
+  disp('hello there')
+  y = b.__radd__(a)
+end
+
+global op_scalar_add_any = @(a,b) b.__radd__(a)
+global op_scalar_sub_any = @(a,b) b.__rsub__(a)
+global op_scalar_mul_any = @(a,b) b.__rmul__(a)
+global op_scalar_el_mul_any = @(a,b) b.__rel_mul__(a)
+global op_scalar_el_div_any = @(a,b) b.__rel_div__(a)
+global op_scalar_pow_any = @(a,b) b.__rpow__(a)
+global op_scalar_el_pow_any = @(a,b) b.__rel_pow__(a)
+
+global op_matrix_add_any = @(a,b) b.__radd__(a)
+global op_matrix_sub_any = @(a,b) b.__rsub__(a)
+global op_matrix_mul_any = @(a,b) b.__rmul__(a)
+global op_matrix_el_mul_any = @(a,b) b.__rel_mul__(a)
+global op_matrix_el_div_any = @(a,b) b.__rel_div__(a)
+global op_matrix_pow_any = @(a,b) b.__rpow__(a)
+global op_matrix_el_pow_any = @(a,b) b.__rel_pow__(a)
