@@ -20,7 +20,9 @@ public:
 	~Ocp(void);
 
 	void addNonlconIneq(CasADi::SXMatrix gNew);
+	void addNonlconIneq(CasADi::SXMatrix gNew, std::string name);	
 	void addNonlconEq(CasADi::SXMatrix gNew);
+	void addNonlconEq(CasADi::SXMatrix gNew, std::string name);
 
 	CasADi::SXMatrix designVariables;
 	std::vector<double>lb;
@@ -29,6 +31,8 @@ public:
 
 	CasADi::SX objFun;
 	CasADi::SXMatrix g;
+	std::vector<int> gSizes;
+  std::vector<std::string> gLabels;
 	std::vector<double> gMin;
 	std::vector<double> gMax;
 
@@ -42,14 +46,15 @@ public:
 
 	void writeMatlabOutput( const char * filename, double * xOpt);
 
+	// multiple shooting instances
+	std::map<std::string,MultipleShooting*> ms;
+
 private:
 
 	void assertUniqueName(std::string s);
 	int isMultipleShooting(std::string msName);
 
 
-	// multiple shooting instances
-	std::map<std::string,MultipleShooting*> ms;
 
 	// params
 	std::map<std::string,int> paramsIdx;

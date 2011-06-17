@@ -49,7 +49,8 @@ public:
 	CasADi::SXMatrix getDynamicsConstraintError(int timeStep, std::map<std::string,CasADi::SX> params);
 
 	Ode & ode;
-
+	int getIdx(std::string xu, int timeStep);
+  
 private:
 	std::string name;
 
@@ -63,6 +64,4 @@ private:
 	CasADi::SX t0;
 	CasADi::SX tf;
 
-	int getIdx(std::string xu, int timeStep);
-	
 };

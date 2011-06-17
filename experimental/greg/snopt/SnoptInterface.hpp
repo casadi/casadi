@@ -52,6 +52,8 @@ public:
 						char       *cu,     integer *lencu,
 						integer    iu[],    integer *leniu,
 						doublereal ru[],    integer *lenru );
+  
+	void writeMatlabOutput(const char *);
 
 	doublereal *    x; // initial design variables
 	doublereal * xlow; // x lower bound
@@ -84,4 +86,5 @@ public:
 	integer * iGfun; // row indeces of sparse jacobian
 	integer * jGvar; // col indeces of sparse jacobian
 private:
+  const Ocp & ocp;
 };

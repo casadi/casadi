@@ -29,7 +29,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	double g = 9.8;    // acceleration due to gravity
 	double l = 2.2;
 	double mc = 10;
-	double mp = 2;
+	double mp = 5;
 	
 
 	SX x = state["x"];
@@ -71,18 +71,20 @@ getOde()
 int
 main()
 {
-  double trackLength = 8;
+  double trackLength = 4;
   
   Ode ode = getOde();
   Ocp ocp;
   SX tEnd = ocp.addParam("tEnd");
   
   MultipleShooting & ms = ocp.addMultipleShooting("cartpole", ode, 0.0, tEnd, 60);
+
+	int N = ms.N;
   
   // cost function
   SX xf = ms.getState("x", ms.N-1);
-  SX thetaf = ms.getState("theta", ms.N-1);
-  SX vthetaf = ms.getState("vtheta", ms.N-1);
+  SX thetaf = ms.getState("theta", N-1);
+  SX vthetaf = ms.getState("vtheta", N-1);
 
   
   ocp.objFun = tEnd+50*cos(thetaf)+5*(vthetaf)*vthetaf; // minimum time
@@ -95,20 +97,23 @@ main()
   ms.boundStateAction("x", -trackLength/2, trackLength/2);
   ms.boundStateAction("vx", -22, 22);
   ms.boundStateAction("theta", -50, 50);
-  ms.boundStateAction("vtheta", -100, 100);
+  ms.boundStateAction("vtheta", -50, 50);
 
-  ms.boundStateAction("u",-50,50);
+  ms.boundStateAction("u",-20,20);
 
   /// initial conditions
   ms.boundStateAction("x",0,0,0);
-  ms.boundStateAction("theta",0,0,0);
+  ms.boundStateAction("theta",0.1,0.1,0);
   ms.boundStateAction("vx",0,0,0);
   ms.boundStateAction("vtheta",0,0,0);
 
-  for(int k = 0; k < ms.N; k++) {
-    ms.setStateActionGuess("theta", double(k)*3.1415/ms.N, k);
-    ms.setStateActionGuess("vtheta", 3.1415/ms.N, k);
-  }
+	ocp.addNonlconIneq(ms.getState("x",0), "startx");
+	ocp.addNonlconEq(ms.getState("vx",N/2), "xstall");	
+
+//   for(int k = 0; k < ms.N; k++) {
+//     ms.setStateActionGuess("theta", double(k)*3.1415/ms.N, k);
+//     ms.setStateActionGuess("vtheta", 3.1415/ms.N, k);
+//   }
 
 //   ms.boundStateAction("theta",3.1415,3.1415,ms.N-1);
 //   ms.boundStateAction("x",0, 0, ms.N-1);
@@ -133,6 +138,7 @@ main()
   
   ocp.writeMatlabOutput("params_out", si.x);
   ms.writeMatlabOutput("cartpole_out", si.x);
+	si.writeMatlabOutput("multipliers_out");
   
   return 0;
 }

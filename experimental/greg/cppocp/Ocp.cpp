@@ -20,7 +20,7 @@ Ocp::~Ocp()
 	}
 }
 
-void Ocp::addNonlconIneq( SXMatrix gNew )
+void Ocp::addNonlconIneq( SXMatrix gNew, string name)
 {
 	if (gNew.size2() != 1){
 		cerr << "gNew.size2() != 1" << endl;
@@ -28,6 +28,8 @@ void Ocp::addNonlconIneq( SXMatrix gNew )
 	}
 
 	g = vertcat(g, gNew);
+	gSizes.push_back(gNew.size1());
+	gLabels.push_back(name);
 
 	for (int k=0; k<gNew.size1(); k++){
 		gMin.push_back(-1.0e50);
@@ -35,8 +37,12 @@ void Ocp::addNonlconIneq( SXMatrix gNew )
 		//	-numeric_limits<double>::infinity()
 	}
 }
+void Ocp::addNonlconIneq( SXMatrix gNew )
+{
+	addNonlconIneq(gNew, "");
+}
 
-void Ocp::addNonlconEq( SXMatrix gNew )
+void Ocp::addNonlconEq( SXMatrix gNew, string name)
 {
 	if (gNew.size2() != 1){
 		cerr << "gNew.size2() != 1" << endl;
@@ -44,13 +50,18 @@ void Ocp::addNonlconEq( SXMatrix gNew )
 	}
 
 	g = vertcat(g, gNew);
+	gSizes.push_back(gNew.size1());
+	gLabels.push_back(name);
 
 	for (int k=0; k<gNew.size1(); k++){
 		gMin.push_back(0);
 		gMax.push_back(0);
 	}
 }
-
+void Ocp::addNonlconEq( SXMatrix gNew )
+{
+	addNonlconEq(gNew, "");
+}
 
 void Ocp::assertUniqueName(string s)
 {

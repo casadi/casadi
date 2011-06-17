@@ -60,24 +60,26 @@ SnoptInterface::~SnoptInterface()
 // 	init();
 // }
 
-SnoptInterface::SnoptInterface(const Ocp& ocp) : designVariables(ocp.designVariables)
+SnoptInterface::SnoptInterface(const Ocp& _ocp) : designVariables(_ocp.designVariables), ocp(_ocp)
 {
 	si = this;
 
-	ftotal = vertcat( SXMatrix(ocp.objFun), ocp.g );
+	//	ocp = _ocp;
+
+	ftotal = vertcat( SXMatrix(_ocp.objFun), _ocp.g );
 
 	init();
 
 	// overwrite initial guess
-	copy( ocp.guess.begin(), ocp.guess.end(), x);
+	copy( _ocp.guess.begin(), _ocp.guess.end(), x);
 
 	// overwrite default xlow/xupp
-	copy( ocp.lb.begin(), ocp.lb.end(), xlow);
-	copy( ocp.ub.begin(), ocp.ub.end(), xupp);
+	copy( _ocp.lb.begin(), _ocp.lb.end(), xlow);
+	copy( _ocp.ub.begin(), _ocp.ub.end(), xupp);
 
     // overwrite Flow/Fupp
-	copy( ocp.gMin.begin(), ocp.gMin.end(), &Flow[1]);
-	copy( ocp.gMax.begin(), ocp.gMax.end(), &Fupp[1]);
+	copy( _ocp.gMin.begin(), _ocp.gMin.end(), &Flow[1]);
+	copy( _ocp.gMax.begin(), _ocp.gMax.end(), &Fupp[1]);
 
 	// for (int k=0; k < neA; k++)
 	// 	cout << "A[" << iAfun[k] << "," << jAvar[k] << "]: " << A[k] << endl;
@@ -368,4 +370,64 @@ int SnoptInterface::userfcn
 	}
 
 	return 0;
+}
+
+void SnoptInterface::writeMatlabOutput(const char * filename)
+{
+  char filename2[200];
+  sprintf(filename2, "%s.m", filename);
+  ofstream f(filename2);
+
+  if (!f){
+    cerr << "error opening " << filename2 << endl;
+    exit(1);
+  }
+  f.precision(10);
+  f << "function [statemults, conmults] = " << filename << "()" << endl;
+
+  // output state lagrange multipliers
+	map<string, MultipleShooting*>::const_iterator msIter;
+  for (msIter = ocp.ms.begin(); msIter != ocp.ms.end(); msIter++) {
+    map<string, int>::const_iterator stateIter;
+		MultipleShooting * ms = msIter->second;
+    Ode ode = ms->ode;
+		for (stateIter = ode.states.begin(); stateIter != ode.states.end(); stateIter++) {
+			f << "statemults." << msIter->first << "." << stateIter->first << " = [";
+			for (int k=0; k < ms->N; k++) { // for each timestep
+				int idx = ms->getIdx(stateIter->first, k);
+				if (k< ms->N-1)
+					f << xmul[idx] << ", ";
+				else
+					f << xmul[idx] << "];" << endl;
+			}
+		}
+	}
+
+	// output constraint lagrange multipliers
+	vector<string>::const_iterator labIter;
+	vector<int>::const_iterator    lenIter;
+	int pos = 1; // position in Fmul; 1 skips the objective function
+	for (labIter  = ocp.gLabels.begin(), lenIter = ocp.gSizes.begin();
+			 labIter != ocp.gLabels.end(); labIter++, lenIter++) {
+		if (!(*labIter).empty()) { // only print out labeled multipliers
+			f << "conmults." << *labIter << " = [";
+			for (int r=0; r < *lenIter; r++) {
+				f << Fmul[pos++];
+				if (r == *lenIter - 1)
+					f << "];" << endl;
+				else
+					f << "; ";
+			}
+		} else // account for skipped indices
+			pos += *lenIter;
+	}
+
+			
+			
+			
+	
+	
+		
+	f << endl;
+	f.close();
 }

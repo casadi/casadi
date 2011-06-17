@@ -55,6 +55,13 @@ target_link_libraries(cartpoleSnopt
   snopt_interface
 )
 
+add_executable(kite kite.cpp Xyz.hpp Xyz.cpp)
+target_link_libraries(kite
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+)
 add_executable(raptors raptors.cpp)
 target_link_libraries(raptors
   cppocp
