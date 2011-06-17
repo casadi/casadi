@@ -356,11 +356,17 @@ class Matrix : public PrintableObject{
     Matrix<T> __mul__(const Matrix<T> &y) const;
     Matrix<T> __div__(const Matrix<T> &y) const;
     Matrix<T> __pow__(const Matrix<T> &y) const;
+    Matrix<T> __mpower__(const Matrix<T> &y) const;
+    Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
+    Matrix<T> __mldivide__   (const Matrix<T> &y) const;
     Matrix<T> __radd__(const Matrix<T> &y) const {return y.__add__(*this);}
     Matrix<T> __rsub__(const Matrix<T> &y) const {return y.__sub__(*this);}
     Matrix<T> __rmul__(const Matrix<T> &y) const {return y.__mul__(*this);}
     Matrix<T> __rdiv__(const Matrix<T> &y) const {return y.__div__(*this);}
     Matrix<T> __rpow__(const Matrix<T> &y) const {return y.__pow__(*this);}
+    Matrix<T> __rmpower__(const Matrix<T> &y) const {return y.__rmpower__(*this);}
+    Matrix<T> __rmrdivide__ (const Matrix<T> &y) const {return y.__mrdivide__(*this);}
+    Matrix<T> __rmldivide__ (const Matrix<T> &y) const {return y.__mldivide__(*this);}
     //@}
     
     /// Matrix product
@@ -1257,6 +1263,14 @@ Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
 //   binary(casadi_operators<T>::div,x,y);
 //   return *this;
 // }
+template<class T>
+Matrix<T> Matrix<T>::__mrdivide__(const Matrix<T>& b) const { if (b.numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+
+template<class T>
+Matrix<T> Matrix<T>::__mldivide__(const Matrix<T>& b) const { if (b.numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
+
+template<class T>
+Matrix<T> Matrix<T>::__mpower__(const Matrix<T>& b) const { if (b.numel()==1) return (*this).__pow__(b); throw CasadiException("mpower: Not implemented");}
 
 template<class T>
 const CRSSparsity& Matrix<T>::sparsity() const{

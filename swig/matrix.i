@@ -3,9 +3,15 @@
 %rename(__el_div__) __div__;
 %rename(__rel_mul__) __rmul__;
 %rename(__rel_div__) __rdiv__;
+%rename(__el_pow__) __pow__;
+%rename(__rel_pow__) __rpow__;
 %rename(__mul__) prod;
 %rename(__rmul__) rprod;
 %rename(__transpose__) trans;
+%rename(__div__) __mrdivide__;
+%rename(__rdiv__) __rmrdivide__;
+%rename(__pow__) __mpower__;
+%rename(__rpow__) __rmpower__;
 #endif // SWIGOCTAVE
 
 %{

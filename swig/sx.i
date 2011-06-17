@@ -24,6 +24,7 @@ template<> swig_type_info** meta< CasADi::Matrix<CasADi::SX> >::name = &SWIGTYPE
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SX> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t;
 template<> swig_type_info** meta< std::vector< CasADi::SX > >::name = &SWIGTYPE_p_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< CasADi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_std__allocatorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_t_t;
+
 %}
 
 #ifdef SWIGPYTHON
@@ -192,6 +193,11 @@ namespace CasADi {
 
 %inline %{
 template<> char meta< CasADi::SX >::expected_message[] = "Expecting SX or number";
+
+// Explicit intialization of these two member functions, so we can use them in meta< CasADi::SX >
+template<> int meta< CasADi::Matrix<CasADi::SX> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SX> &);
+template<> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(GUESTOBJECT);
+
 %}
 
 /// CasADi::SX
@@ -208,6 +214,13 @@ int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
     if (!result)
       return false;
     s=CasADi::SX(res);
+  } else if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
+    CasADi::Matrix< CasADi::SX > m;
+    meta< CasADi::Matrix< CasADi::SX > >::as(p,m);
+    if (m.numel()==1 && m.size()==1) {
+      s = m.at(0);
+      return true;
+    }
   } else {
     return false;
   }
@@ -216,6 +229,12 @@ int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
 
 template <>
 bool meta< CasADi::SX >::couldbe(PyObject * p) {
+  if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
+    CasADi::Matrix< CasADi::SX > m;
+    meta< CasADi::Matrix< CasADi::SX > >::as(p,m);
+    if (m.numel()==1 && m.size()==1)
+      return true;
+  }
   return (meta< CasADi::SX >::isa(p) || meta< double >::couldbe(p));
 }
 
@@ -233,13 +252,26 @@ int meta< CasADi::SX >::as(const octave_value& p,CasADi::SX &s) {
   if (p.is_real_scalar()) {
     s=CasADi::SX(p.double_value());
     return true;
+  } else if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
+    CasADi::Matrix< CasADi::SX > m;
+    meta< CasADi::Matrix< CasADi::SX > >::as(p,m);
+    if (m.numel()==1 && m.size()==1) {
+      s = m.at(0);
+      return true;
+    }
   }
   return false;
 }
 
 template <>
 bool meta< CasADi::SX >::couldbe(const octave_value& p) {
-  return (meta< CasADi::SX >::isa(p) || p.is_real_scalar());
+  if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
+    CasADi::Matrix< CasADi::SX > m;
+    meta<CasADi::Matrix< CasADi::SX > >::as(p,m);
+    if (m.numel()==1 && m.size()==1)
+      return true;
+  }
+  return (meta< CasADi::SX >::isa(p) || p.is_real_scalar() );
 }
 
 %}

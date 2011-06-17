@@ -319,8 +319,14 @@ class MX : public SharedObject{
   MX __div__(t b){    return *this / b;} \
   MX __rdiv__(t b){   return b / *this;} \
   MX __pow__(t b) const {    return std::pow(*this,b);} \
-  MX __rpow__(t b) const {   return std::pow(b,*this);}
-
+  MX __rpow__(t b) const {   return std::pow(b,*this);} \
+  MX __mrdivide__  (t b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");} \
+  MX __rmrdivide__ (t b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmrdivide: Not implemented");} \
+  MX __ldivide__   (t b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");} \
+  MX __rmldivide__ (t b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmldivide: Not implemented");} \
+  MX __mpower__(t b) const  {   return std::pow(*this,b); throw CasadiException("mpower: Not implemented");} \
+  MX __rmpower__(t b) const {   return std::pow(b,*this); throw CasadiException("rmpower: Not implemented");}
+  
   // Binary operations with all right hand sides
   binops(const MX&)
   binops(double)

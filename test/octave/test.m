@@ -1,5 +1,11 @@
 casadi
 
+
+
+function [y]=value(x)
+  
+end
+
 disp('operators on SX')
 
 x = SX("x")
@@ -47,21 +53,34 @@ SXFunction({y},{y})
 
 SXFunction({y x},{y x})
 
+disp('MX typemaps')
+
+x=MX("x",1,1)
+
+
+MXFunction({x},{x x})
+
+MXFunction({x},{x 0})
+
 disp('function usage')
 x=SX("x")
-f = SXFunction({x},{x**2 sin(x)})
+f = SXFunction({x},{x^2 sin(x)})
 f.init()
 f.input(0)
+x^2
 assert(f.getNumInputs()==1)
 assert(f.getNumOutputs()==2)
 
 f.input(0).set([2.3])
 f.evaluate()
+f.output(0)
 f.output(1)
-assert(f.output(0)(1)==2.3**2)
+assert(f.output(0)(1)==2.3^2)
 assert(f.output(1)(1)==sin(2.3))
 
-f = SXFunction({x},{{x**2 sin(x)}})
+disp(x^2)
+
+f = SXFunction({x},{{x^2 sin(x)}})
 f.init()
 f.input(0)
 assert(f.getNumInputs()==1)
@@ -187,22 +206,26 @@ for i=1:numel(S)
     z-s;
     z./s;
     s./z;
-    s^z;
-    z^s;
+    s.^z;
+    z.^s;
   end
 end
 
 S = {DMatrix(3),symbolic("x",2,2),SX("x"),MX("x",1,1)};
-
+num = {6,DMatrix(6),MX("x",1,1)}
 "right"
 
 for i=1:numel(S)
   sc = S{i};
-  sc
-  sc/6;
-  sc*6;
-  6*sc;
-  sc^6;
+  for j=1:2
+    rhs = num{j};
+    sc
+    rhs
+    sc/rhs;
+    sc*rhs;
+    rhs*sc;
+    sc^rhs;
+  end
 end
 
 "fine"

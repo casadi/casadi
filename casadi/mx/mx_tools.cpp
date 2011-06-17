@@ -121,6 +121,10 @@ MX prod(const MX &x, const MX &y){
   else if(isIdentity(y))
     return x;
   
+  // Check if any of the factors is scalar
+  if (x.numel()==1 || y.numel()==1)
+    return x*y;
+    
   // Else, create a multiplication node
   return MX::create(new Multiplication(x,y));
 }
