@@ -57,8 +57,7 @@ class meta {
     }
     /// Check if Guest object could ultimately be converted to type T
     /// may return true when isa(GUESTOBJECT), but this is not required.
-    static bool couldbe(GUESTOBJECT) {
-        std::cout << "This is a special question" << std::endl;
+    static bool couldbe(GUESTOBJECT) { 
         int res = swig::asptr(p, (T**)(0));
         return SWIG_CheckState(res);
     }
