@@ -335,9 +335,7 @@ main()
 	// solver.getOutput(xopt,NLP_X_OPT);
 	//cout << "optimal solution: " << xopt << endl;
 
-	ocp.writeMatlabOutput( "raptor_param_out", si.x );
-	r0.writeMatlabOutput( "r0_out", si.x );
-	r1.writeMatlabOutput( "r1_out", si.x );
+	ocp.writeOctaveOutput( "raptor_out", si.x );
 
 	return 0;
 }

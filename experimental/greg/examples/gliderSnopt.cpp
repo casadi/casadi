@@ -163,15 +163,9 @@ main()
 
 	// Print the optimal cost
 	cout << "optimal time: " << -si.F[0] << endl;
-	
-	// Print the optimal solution
-	// vector<double>xopt(ms.getBigN());
-	// solver.getOutput(xopt,NLP_X_OPT);
-	//cout << "optimal solution: " << xopt << endl;
 
-	ocp.writeMatlabOutput( "params_out", si.x );
-	msGlide.writeMatlabOutput( "glide_out", si.x );
-	msTakeoff.writeMatlabOutput( "takeoff_out", si.x );
+	// write output
+	ocp.writeOctaveOutput( "glider_out", si.x );
 	
 	return 0;
 }

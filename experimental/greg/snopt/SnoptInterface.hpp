@@ -53,7 +53,7 @@ public:
 						integer    iu[],    integer *leniu,
 						doublereal ru[],    integer *lenru );
   
-	void writeMatlabOutput(const char *);
+	void writeOctaveOutput(const char *);
 
 	doublereal *    x; // initial design variables
 	doublereal * xlow; // x lower bound

@@ -136,9 +136,8 @@ main()
   // solver.getOutput(xopt,NLP_X_OPT);
   //cout << "optimal solution: " << xopt << endl;
   
-  ocp.writeMatlabOutput("params_out", si.x);
-  ms.writeMatlabOutput("cartpole_out", si.x);
-	si.writeMatlabOutput("multipliers_out");
+  ocp.writeOctaveOutput("cartpole_out", si.x);
+  si.writeOctaveOutput("multipliers_out");
   
   return 0;
 }

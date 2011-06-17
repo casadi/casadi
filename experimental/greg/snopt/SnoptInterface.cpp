@@ -372,7 +372,7 @@ int SnoptInterface::userfcn
 	return 0;
 }
 
-void SnoptInterface::writeMatlabOutput(const char * filename)
+void SnoptInterface::writeOctaveOutput(const char * filename)
 {
   char filename2[200];
   sprintf(filename2, "%s.m", filename);

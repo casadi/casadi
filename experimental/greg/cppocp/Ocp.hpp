@@ -32,7 +32,7 @@ public:
 	CasADi::SX objFun;
 	CasADi::SXMatrix g;
 	std::vector<int> gSizes;
-  std::vector<std::string> gLabels;
+	std::vector<std::string> gLabels;
 	std::vector<double> gMin;
 	std::vector<double> gMax;
 
@@ -42,9 +42,8 @@ public:
 	CasADi::SX & getParam(std::string p);
 	void boundParam(std::string p, double lb_, double ub_);
 	void setParamGuess(std::string p, double guess_);
-
-
-	void writeMatlabOutput( const char * filename, double * xOpt);
+	
+	void writeOctaveOutput( std::string name, double * xOpt);
 	void writeSolution( const char * filename, double * xOpt );
 	void loadGuess( const char * filename );
 

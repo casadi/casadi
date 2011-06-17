@@ -174,7 +174,7 @@ main()
 	double * xopt_ = new double[ocp.designVariables.size1()];
 	
 	copy( xopt.begin(), xopt.end(), xopt_ );
-	ocp.writeMatlabOutput( "glider_out", xopt_ );
+	ocp.writeOctaveOutput( "glider_out", xopt_ );
 	delete xopt_;
 
 	return 0;

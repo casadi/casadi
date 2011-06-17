@@ -8,6 +8,7 @@
 
 #include <string>
 #include <map>
+#include <fstream>
 
 #include <casadi/sx/sx_tools.hpp>
 
@@ -34,7 +35,7 @@ public:
    void setStateActionGuess(std::string xu, double guess_, int timeStep);
     void setStateActionGuess(std::string xu, double guess_);
 
-	void writeMatlabOutput( const char * filename, double * xOpt);
+	void writeOctaveOutput( std::ofstream & f, double * xOpt);
 
 	CasADi::SX getState(std::string x, int timeStep);
 	CasADi::SX getAction(std::string u, int timeStep);
@@ -51,9 +52,9 @@ public:
 	Ode & ode;
 	int getIdx(std::string xu, int timeStep);
   
-private:
 	std::string name;
 
+private:
 	CasADi::SXMatrix & dv;
 	std::vector<double>&lb;
 	std::vector<double>&ub;

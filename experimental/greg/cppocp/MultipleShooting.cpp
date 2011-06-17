@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
-#include <fstream>
 
 #include <casadi/fx/sx_function.hpp>
 
@@ -195,25 +194,19 @@ SXMatrix MultipleShooting::getActionMat(int timeStep)
 	return ret;
 }
 
-void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
+void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
 {
-	char filename2[200];
-	sprintf(filename2, "%s.m", filename);
-	ofstream f(filename2);
-
-	if (!f){
-		cerr << "error opening " << filename2 << endl;
-		exit(1);
-	}
 	f.precision(10);
 
-	f << "function [x, u, outputs] = " << filename << "()" << endl;
+	f << "function multipleShooting = " << name << "_out()" << endl;
 
 	map<string, int>::const_iterator iter;
 
 	// states
+	f << "% states\n";
+	f << "multipleShooting.states = struct();\n";
 	for (iter = ode.states.begin(); iter != ode.states.end(); iter++){
-		f << "x." << iter->first << " = [" ;
+		f << "multipleShooting.states." << iter->first << " = [" ;
 		for (int k=0; k<N; k++){
 			int idx = getIdx( iter->first, k );
 			if (k < N-1)
@@ -223,10 +216,13 @@ void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
 		}
 	}
 	f << endl;
+
 
 	// actions
+	f << "% actions\n";
+	f << "multipleShooting.actions = struct();\n";
 	for (iter = ode.actions.begin(); iter != ode.actions.end(); iter++){
-		f << "u." << iter->first << " = [" ;
+		f << "multipleShooting.actions." << iter->first << " = [" ;
 		for (int k=0; k<N; k++){
 			int idx = getIdx( iter->first, k );
 			if (k < N-1)
@@ -237,7 +233,10 @@ void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
 	}
 	f << endl;
 
+
 	// outputs
+	f << "% outputs\n";
+	f << "multipleShooting.outputs = struct();\n";
 	for (iter = ode.outputs.begin(); iter != ode.outputs.end(); iter++){
 
 		SXMatrix outSXMatrix = getOutput(iter->first);
@@ -248,7 +247,7 @@ void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
 		vector<double>outDouble(N);
 		outputFcn.getOutput(outDouble);
 
-		f << "outputs." << iter->first << " = [";
+		f << "multipleShooting.outputs." << iter->first << " = [";
 		for (int k=0; k<N; k++){
 			if (k < N - 1)
 				f << outDouble[k] << ", ";
@@ -258,5 +257,15 @@ void MultipleShooting::writeMatlabOutput( const char * filename, double * xOpt)
 	}
 	f << endl;
 
-	f.close();
+
+	// start/end times
+	f << "% time\n";
+	SXFunction timeFcn( dv, vertcat( SXMatrix(t0), SXMatrix(tf) ) );
+	timeFcn.init();
+	timeFcn.setInput( xOpt );
+	timeFcn.evaluate();
+	double timeNum[2];
+	timeFcn.getOutput( timeNum );
+
+	f << "multipleShooting.time = linspace(" << timeNum[0] << ", " << timeNum[1] << ", " << N << ");\n\n";
 }
