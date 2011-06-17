@@ -200,7 +200,6 @@ for i=1:numel(S)
   sc = S{i};
   sc
   sc/6;
-  6/sc;
   sc*6;
   6*sc;
   sc^6;
