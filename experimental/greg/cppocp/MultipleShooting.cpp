@@ -72,13 +72,11 @@ SX MultipleShooting::getOutput(string o, int timeStep)
 	return output[o];
 }
 
-
-
-SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep, map<string,SX> params)
+SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep)
 {
-	if (timeStep >= N-1){
+	if (timeStep > N-2){
 		cerr << "In SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep),\n";
-		cerr << "timeStep " << timeStep << " >= N-1\n";
+		cerr << "timeStep: " << timeStep << " > N-2   (N==" << N << ")\n";
 		exit(1);
 	}
 
@@ -86,15 +84,14 @@ SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep, map<string,S
 	SX dt = (tf - t0)/(N - 1);
 
 	SXMatrix x0 = getStateMat(timeStep);
-	SXMatrix x1 = getStateMat(timeStep+1);
+	SXMatrix x1 = getStateMat(timeStep + 1);
 	
 	SXMatrix u0 = getActionMat(timeStep);
-	SXMatrix u1 = getActionMat(timeStep+1);
+	SXMatrix u1 = getActionMat(timeStep + 1);
 	
-	SX tk   = t0 + timeStep*dt;
-	SX tkp1 = t0 + (timeStep+1)*dt;
+	SX tk0 = t0 + timeStep*dt;
 	
-	SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk, tkp1);
+	SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk0, dt);
 
 	return xErr;
 }

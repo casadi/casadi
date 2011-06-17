@@ -31,7 +31,7 @@ public:
 
 	void boundStateAction(std::string xu, double lb_, double ub_, int timeStep);
 	void boundStateAction(std::string xu, double lb_, double ub_);
-    void setStateActionGuess(std::string xu, double guess_, int timeStep);
+   void setStateActionGuess(std::string xu, double guess_, int timeStep);
     void setStateActionGuess(std::string xu, double guess_);
 
 	void writeMatlabOutput( const char * filename, double * xOpt);
@@ -46,7 +46,7 @@ public:
 
 	int N;
 	
-	CasADi::SXMatrix getDynamicsConstraintError(int timeStep, std::map<std::string,CasADi::SX> params);
+	CasADi::SXMatrix getDynamicsConstraintError(int timeStep);
 
 	Ode & ode;
 	int getIdx(std::string xu, int timeStep);

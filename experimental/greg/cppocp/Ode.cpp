@@ -161,9 +161,8 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
 	return xDotMat;
 }
 
-SXMatrix Ode::rk4Step( SXMatrix x0Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX t1)
+SXMatrix Ode::rk4Step( SXMatrix x0Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX dt)
 {
-	SX dt = t1-t0;
 	SXMatrix k1 = dxVectorDt( x0Vec            ,             u0Vec, p, t0          );
 	SXMatrix k2 = dxVectorDt( x0Vec + 0.5*dt*k1, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
 	SXMatrix k3 = dxVectorDt( x0Vec + 0.5*dt*k2, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );

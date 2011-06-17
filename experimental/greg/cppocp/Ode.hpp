@@ -53,7 +53,7 @@ public:
 							  CasADi::SXMatrix u1Vec,
 							  std::map<std::string,CasADi::SX> & p,
 							  CasADi::SX t0,
-							  CasADi::SX t1);
+							  CasADi::SX dt);
 
 
 	int nx(void);

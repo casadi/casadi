@@ -105,7 +105,7 @@ MultipleShooting & Ocp::addMultipleShooting(string name, Ode & ode, SX t0, SX tf
 
 	// dynamics constraint
 	for (int k=0; k<N-1; k++)
-		addNonlconEq( ms[name]->getDynamicsConstraintError(k, params) );
+		addNonlconEq( ms[name]->getDynamicsConstraintError(k) );
 
 	return *(ms[name]);
 }
