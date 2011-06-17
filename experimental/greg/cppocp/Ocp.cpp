@@ -149,6 +149,10 @@ SX & Ocp::addParam(string _newParam)
 
 void Ocp::boundParam(string p, double lb_, double ub_)
 {
+	if (!isParam(p)){
+		cerr << "Error in Ocp::boundParam - \"" << p << "\" is not a known parameter\n";
+		throw 1;
+	}
 	int idx = paramsIdx[p];
 	lb[idx] = lb_;
 	ub[idx] = ub_;
