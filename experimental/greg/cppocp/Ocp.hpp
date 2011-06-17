@@ -45,6 +45,8 @@ public:
 
 
 	void writeMatlabOutput( const char * filename, double * xOpt);
+	void writeSolution( const char * filename, double * xOpt );
+	void loadGuess( const char * filename );
 
 	// multiple shooting instances
 	std::map<std::string,MultipleShooting*> ms;

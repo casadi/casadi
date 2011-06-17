@@ -191,6 +191,51 @@ int Ocp::isParam(string paramName)
 	return 0;
 }
 
+void Ocp::writeSolution( const char * filename, double * xOpt )
+{
+	ofstream f(filename);
+
+	if (!f){
+		cerr << "error opening " << filename << endl;
+		exit(1);
+	}
+	f.precision(15);
+	for (int k=0; k<guess.size(); k++)
+		f << xOpt[k] << endl;
+
+	f.close();
+}
+
+void Ocp::loadGuess( const char * filename )
+{
+	ifstream f(filename);
+
+	if (!f){
+		cerr << "error opening " << filename << endl;
+		exit(1);
+	}
+
+#define MAXLINE 200
+	char oneline[MAXLINE];
+	int k=0;
+	while(f.getline(oneline, MAXLINE)){
+
+		double value;
+		if (1 == sscanf( oneline, "%lf", &value)){
+			if (k >= guess.size()){
+				cerr << "Too many design variables in \"" << filename << endl;
+				f.close();
+				throw -1;
+			}
+
+			guess[k] = value;
+			//cout << "file[" << k << "]: " << value << ", guess.size: " << guess.size() << endl;
+			k++;
+		}
+	}
+
+	f.close();
+}
 
 void Ocp::writeMatlabOutput( const char * filename, double * xOpt)
 {
