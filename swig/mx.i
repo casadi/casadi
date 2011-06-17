@@ -3,6 +3,8 @@
 #include "casadi/mx/mx_tools.hpp"
 %}
 
+%my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);
+
 %include "casadi/mx/mx.hpp"
 
 %inline %{
@@ -10,10 +12,13 @@ template<> swig_type_info** meta< CasADi::MX >::name = &SWIGTYPE_p_CasADi__MX;
 template<> swig_type_info** meta< std::vector< CasADi::MX> >::name = &SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t;
 %}
 
+%inline %{
+template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
+%}
+
 /// CasADi::MX
 #ifdef SWIGPYTHON
 %inline %{
-template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, number)";
 
 template <>
 bool meta< CasADi::MX >::couldbe(PyObject * p) {
@@ -36,6 +41,30 @@ int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
 %}
 #endif //SWIGPYTHON
 
+/// CasADi::MX
+#ifdef SWIGOCTAVE
+%inline %{
+
+template <>
+bool meta< CasADi::MX >::couldbe(const octave_value& p) {
+  return (meta< CasADi::MX >::isa(p) || meta< CasADi::Matrix<double> >::couldbe(p) );
+}
+
+template <>
+int meta< CasADi::MX >::as(const octave_value& p,CasADi::MX &m) {
+  NATIVERETURN(CasADi::MX,m)
+  if(meta< CasADi::Matrix<double> >::couldbe(p)) {
+    CasADi::DMatrix mt;
+    bool result=meta< CasADi::Matrix<double> >::as(p,mt);
+    if (!result)
+      return false;
+    m = CasADi::MX(mt);
+    return true;
+  }
+  return false;
+}
+%}
+#endif //SWIGPOCTAVE
 
 /// std::vector< CasADi::MX >
 #ifdef SWIGPYTHON
@@ -107,10 +136,9 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
 #endif // SWIGPYTHON
 
 #ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);
 %my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< CasADi::MX >);
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
-#endif //SWIGPYTHON
+#endif // SWIGPYTHON
 
 %include "casadi/mx/mx_tools.hpp"
 

@@ -75,6 +75,8 @@ function [y]=op_scalar_add_any(a,b)
   y = b.__radd__(a)
 end
 
+global op_any_div_scalar = @(a,b) a.__el_div__(b)
+
 global op_scalar_add_any = @(a,b) b.__radd__(a)
 global op_scalar_sub_any = @(a,b) b.__rsub__(a)
 global op_scalar_mul_any = @(a,b) b.__rmul__(a)

@@ -152,6 +152,9 @@ disp('MX indexing')
 x = MX("x",7,8)
 q = x(1:3,:)
 
+x(1,1) = 6;
+x(:,1) = 3;
+
 disp('overloaded methods')
 
 X=DMatrix([2 1; 1 4])
@@ -186,6 +189,31 @@ for i=1:numel(S)
     s./z;
     s^z;
     z^s;
+  end
+end
+
+S = {DMatrix(3),symbolic("x",2,2),SX("x"),MX("x",1,1)};
+
+"right"
+
+for i=1:numel(S)
+  sc = S{i};
+  sc/6;
+  sc*6;
+  6*sc;
+  sc^6;
+end
+
+"fine"
+
+num = {DMatrix([1 2; 3 4]),[1 2; 3 4]};
+sym = {symbolic("x",2,2),MX("x",2,2)};
+
+for i=1:2
+  for j=1:2
+    n = num{i};
+    s = sym{i};
+    n*s;
   end
 end
 

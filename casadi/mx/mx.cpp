@@ -125,6 +125,13 @@ void MX::setSub(const std::vector<int>& i, int j, const MX& el){
 }
 
 void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
+  // Allow el to be a 1x1
+  if (el.size()==1 && el.numel()==1) {
+    if (ii.size()>1 or jj.size()>1) {
+      setSub(ii,jj,MX(ii.size(),jj.size(),el));
+      return;
+    }
+  }
   casadi_assert_message(ii.size()==el.size1(),"right hand size must match dimension of left hand side in assignment");
   casadi_assert_message(jj.size()==el.size2(),"right hand size must match dimension of left hand side in assignment");
   if(dense() && el.dense()){

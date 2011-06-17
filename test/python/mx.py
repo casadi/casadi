@@ -720,7 +720,8 @@ class MXtests(casadiTestCase):
      
      X = MX("x",2,2)
      X[0,0]=MX(5)
-     #X[0,0]=5
+     X[0,0]=5
+     X[:,0]=8
 
      x=MX("X",3,4)
      import numpy
