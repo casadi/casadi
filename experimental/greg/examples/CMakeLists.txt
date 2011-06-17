@@ -24,7 +24,6 @@ target_link_libraries(rocketCppocp
 
 ENDIF(IPOPT_FOUND)
 
-
 find_package(SNOPT QUIET)
 
 IF(SNOPT_FOUND)
@@ -63,6 +62,7 @@ target_link_libraries(raptors
   snopt_interface
 )
 
+
 #add_executable(my_sntoya my_sntoya.cpp)
 #target_link_libraries(my_sntoya
 #  cppocp
@@ -73,3 +73,19 @@ target_link_libraries(raptors
 
 
 ENDIF(SNOPT_FOUND)
+
+find_package(MATLAB)
+
+IF(MATLAB_FOUND)
+
+include_directories(../cppocp)
+include_directories(../matlab)
+include_directories(${MATLAB_INCLUDE_DIRS})
+
+add_executable(testmatlab testmatlab.cpp)
+target_link_libraries(testmatlab
+	matlab
+)
+
+
+ENDIF(MATLAB_FOUND)
