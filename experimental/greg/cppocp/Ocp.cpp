@@ -94,7 +94,11 @@ MultipleShooting & Ocp::addMultipleShooting(string name, Ode & ode, SX t0, SX tf
 	assertUniqueName(name);
 
 	int numNew = ode.nxu()*N;
-	designVariables = vertcat( designVariables, SXMatrix(create_symbolic(name, numNew)) );
+	if (designVariables.size1() == 0)
+		designVariables = SXMatrix(create_symbolic(name, numNew));
+	else
+		designVariables = vertcat( designVariables, SXMatrix(create_symbolic(name, numNew)) );
+
 	for (int k=0; k<numNew; k++){
 		lb.push_back(-1e50);
 		ub.push_back(1e50);
@@ -123,11 +127,15 @@ SX & Ocp::addParam(string _newParam)
 {
 	assertUniqueName(_newParam);
 
-//	designVariables = vertcat( designVariables, SXMatrix(create_symbolic(_newParam, 1)) );
 	int idx = designVariables.size1();
 
 	SXMatrix newDv = create_symbolic(_newParam, 1);
-	designVariables = vertcat( designVariables, newDv );
+//	designVariables = vertcat( designVariables, SXMatrix(create_symbolic(_newParam, 1)) );
+	if (designVariables.size1() == 0)
+		designVariables = newDv;
+	else
+		designVariables = vertcat( designVariables, newDv );
+
 	guess.push_back(0);
 	lb.push_back(-1e50);
 	ub.push_back(1e50);
