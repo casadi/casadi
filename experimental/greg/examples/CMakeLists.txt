@@ -47,6 +47,14 @@ target_link_libraries(gliderSnopt
   snopt_interface
 )
 
+add_executable(cartpoleSnopt cartpoleSnopt.cpp)
+target_link_libraries(cartpoleSnopt
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+)
+
 add_executable(raptors raptors.cpp)
 target_link_libraries(raptors
   cppocp
