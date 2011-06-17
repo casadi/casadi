@@ -141,6 +141,9 @@ class CRSSparsity : public SharedObject{
     /// Resize
     void resize(int nrow, int ncol);
     
+    /// Reshape a sparsity, order of nonzeros remains the same
+    CRSSparsity reshape(int n, int m) const;
+    
     /** \brief Get the index of a non-zero element
          Add the element if it does not exist and copy object if it's not unique */
     int getNZ(int i, int j);

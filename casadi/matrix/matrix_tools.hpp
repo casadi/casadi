@@ -427,17 +427,8 @@ Matrix<T> inv(const Matrix<T>& a){
 
 template<class T>
 Matrix<T> reshape(const Matrix<T>& a, int n, int m){
-  casadi_assert_message(a.numel() == n*m, "reshape: number of elements must remain the same");
-
-  Matrix<T> ret(n,m);
-  for(int i=0; i<a.size1(); ++i){
-    for(int el=a.rowind(i); el<a.rowind(i+1); ++el){
-      int j = a.col(el);
-      int k = j+i*a.size2();
-      ret.elem(k/m,k%m) = a.at(el);
-    }
-  }
-  return ret;
+  CRSSparsity sp = a.sparsity().reshape(n,m);
+  return Matrix<T>(sp,a.data());
 }
 
 template<class T>

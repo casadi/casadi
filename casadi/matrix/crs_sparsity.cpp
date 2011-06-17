@@ -207,6 +207,25 @@ int CRSSparsity::getNZ(int i, int j) const{
   return -1;
 }
 
+CRSSparsity CRSSparsity::reshape(int n, int m) const{
+  casadi_assert_message(numel() == n*m, "reshape: number of elements must remain the same");
+  CRSSparsity ret(n,m);
+  for(int i=0; i<size1(); ++i){
+    for(int el=rowind(i); el<rowind(i+1); ++el){
+      int j = col(el);
+      
+      // Element number
+      int k_ret = j+i*size2();
+      
+      // Row and column in the new matrix
+      int i_ret = k_ret/m;
+      int j_ret = k_ret%m;
+      ret.getNZ(i_ret,j_ret);
+    }
+  }
+  return ret;
+}
+
 // vector<int> CRSSparsity::getNZNew(vector<int> i, vector<int> j){
 //   vector<int> ret;
 //   ret.reserve(i.size());
