@@ -210,6 +210,7 @@ int CRSSparsity::getNZ(int i, int j) const{
 CRSSparsity CRSSparsity::reshape(int n, int m) const{
   casadi_assert_message(numel() == n*m, "reshape: number of elements must remain the same");
   CRSSparsity ret(n,m);
+  ret.reserve(size(), n);
   for(int i=0; i<size1(); ++i){
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j = col(el);
