@@ -475,7 +475,7 @@ octave_value toSparse() {
 
 binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
 binopsFull(const CasADi::SX & b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
-#binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
+binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 
 }; // extend Matrix<double>

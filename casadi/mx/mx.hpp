@@ -28,10 +28,47 @@
 #include "../sx/sx.hpp"
 #include <vector>
 
+
+namespace CasADi{
+  
+/** \brief  Forward declaration */
+class MX;
+
+}
+
+#ifndef SWIG  
+namespace std{
+//@{
+/** \brief  Functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
+#define MX CasADi::MX
+MX sqrt(const MX &x);
+MX sin(const MX &x);
+MX cos(const MX &x);
+MX tan(const MX &x);
+MX atan(const MX &x);
+MX asin(const MX &x);
+MX acos(const MX &x);
+MX exp(const MX &x);
+MX log(const MX &x);
+MX pow(const MX &x, const MX &n);
+MX constpow(const MX &x, const MX &n);
+MX abs(const MX &x);
+MX fabs(const MX &x); // same as abs
+MX floor(const MX &x);
+MX ceil(const MX &x);
+MX erf(const MX &x);
+MX fmin(const MX &a, const MX &b);
+MX fmax(const MX &a, const MX &b);
+#undef MX
+//@}
+} // namespace std
+#endif // SWIG  
+
 namespace CasADi{
   
 /** \brief  Forward declaration */
 class MXNode;
+
 
 /** \brief MX - Matrix expression
   The MX class is used to build up trees made up from MXNodes. It is a more general graph representation than the scalar expression,
@@ -200,9 +237,11 @@ class MX : public SharedObject{
     friend MX operator-(const MX &x, const MX &y);
     friend MX operator*(const MX &x, const MX &y);
     friend MX operator/(const MX &x, const MX &y);
-    MX operator-() const;
+
   //@}
   #endif // SWIG
+  
+  MX operator-() const;
 
   /** \brief  Check if the matrix expression is empty */
   bool empty() const;
@@ -269,6 +308,25 @@ class MX : public SharedObject{
   */
   std::string dimString() const;
   
+  // all binary operations with a particular right argument
+  #define binops(t) \
+  MX __add__(t b){    return *this + b;} \
+  MX __radd__(t b){   return b + *this;} \
+  MX __sub__(t b){    return *this - b;} \
+  MX __rsub__(t b){   return b - *this;} \
+  MX __mul__(t b){    return *this * b;} \
+  MX __rmul__(t b){   return b * *this;} \
+  MX __div__(t b){    return *this / b;} \
+  MX __rdiv__(t b){   return b / *this;} \
+  MX __pow__(t b) const {    return std::pow(*this,b);} \
+  MX __rpow__(t b) const {   return std::pow(b,*this);}
+
+  // Binary operations with all right hand sides
+  binops(const MX&)
+  binops(double)
+  binops(const Matrix<double> &)
+  #undef binops
+
 };
 
 //@{
@@ -281,34 +339,7 @@ typedef std::vector<std::vector<double* > > VVDptr;
 
 } // namespace CasADi
 
-#ifndef SWIG  
-namespace std{
-//@{
-/** \brief  Functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
-#define MX CasADi::MX
-MX sqrt(const MX &x);
-MX sin(const MX &x);
-MX cos(const MX &x);
-MX tan(const MX &x);
-MX atan(const MX &x);
-MX asin(const MX &x);
-MX acos(const MX &x);
-MX exp(const MX &x);
-MX log(const MX &x);
-MX pow(const MX &x, const MX &n);
-MX constpow(const MX &x, const MX &n);
-MX abs(const MX &x);
-MX fabs(const MX &x); // same as abs
-MX floor(const MX &x);
-MX ceil(const MX &x);
-MX erf(const MX &x);
-MX fmin(const MX &a, const MX &b);
-MX fmax(const MX &a, const MX &b);
-#undef MX
-//@}
-} // namespace std
-
-#else // SWIG
+#ifdef SWIG 
 
 namespace CasADi {
 
@@ -316,30 +347,20 @@ namespace CasADi {
 std::string __repr__() { return $self->getRepresentation();
 }
 
-// all binary operations with a particular right argument
-#define binops(t) \
-MX __add__(t b){    return *$self + b;} \
-MX __radd__(t b){   return b + *$self;} \
-MX __sub__(t b){    return *$self - b;} \
-MX __rsub__(t b){   return b - *$self;} \
-MX __mul__(t b){    return *$self * b;} \
-MX __rmul__(t b){   return b * *$self;} \
-MX __div__(t b){    return *$self / b;} \
-MX __rdiv__(t b){   return b / *$self;} \
-MX __pow__(t b){    return std::pow(*$self,b);} \
-MX __rpow__(t b){   return std::pow(b,*$self);} \
-MX fmin(t b){       return std::fmin(*$self,b);} \
-MX fmax(t b){       return std::fmax(*$self,b);} \
-MX prod(t b){       return prod(*$self,b);} \
-MX inner_prod(t b){ return inner_prod(*$self,b);} \
-MX outer_prod(t b){ return outer_prod(*$self,b);} \
-MX constpow(t b){    return std::constpow(*$self,b);} \
-
-// Binary operations with all right hand sides
-binops(const MX&)
-binops(double)
-binops(const Matrix<double> &)
-#undef binops
+ // all binary operations with a particular right argument
+  #define binops(t) \
+  MX prod(t b){       return prod(*$self,b);} \
+  MX inner_prod(t b){ return inner_prod(*$self,b);} \
+  MX outer_prod(t b){ return outer_prod(*$self,b);} \
+  MX constpow(t b){    return std::constpow(*$self,b);} \
+  MX fmin(t b){       return std::fmin(*$self,b);} \
+  MX fmax(t b){       return std::fmax(*$self,b);}
+  
+  // Binary operations with all right hand sides
+  binops(const MX&)
+  binops(double)
+  binops(const Matrix<double> &)
+  #undef binops
 
 // all unary operations
 MX __neg__(){ return - *$self;}

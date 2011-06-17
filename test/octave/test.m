@@ -170,10 +170,12 @@ S =               { {DMatrix([1 2; 3 4]),SX("x"),MX("x",1,1)},
                   
 for i=1:numel(S)
   sc = S{i};
-  for j = 1:1
+  for j = 1:2
     disp("Here we go")
     s = sc{1}
     z = sc{1+j}
+    -s;
+    -z;
     z+s;
     s+z;
     s.*z;

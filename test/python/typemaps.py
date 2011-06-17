@@ -194,6 +194,8 @@ class typemaptests(casadiTestCase):
       for z in [x,y]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
+        -z
+        -s
         z+s
         s+z
         s*z
