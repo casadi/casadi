@@ -77,6 +77,7 @@ template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Sl
         if isinstance(s,tuple) and len(s)==2:
           return self.__Csetitem__(s[0],s[1],val)  
         return self.__Csetitem__(s,val)
+     
 %}
 %enddef 
 #endif // SWIGPYTHON
@@ -509,7 +510,11 @@ PyObject* arrayView() {
 }
 #endif WITH_NUMPY
 
-
+%pythoncode %{
+  def __eq__(self,other):
+    return _casadi.__eq__(self,other)
+%}
+  
 %python_matrix_convertors
 %python_matrix_helpers
 
@@ -570,6 +575,39 @@ PyObject* arrayView() {
     from scipy.sparse import csr_matrix
     return csr_matrix( (list(self.data()),self.sparsity().col(),self.sparsity().rowind()), shape = (self.size1(),self.size2()), dtype=n.double )
 %}
+
+%pythoncode %{
+  def __float__(self):
+    if self.numel()!=1:
+      raise Exception("Only a scalar can be cast to a float")
+    if self.size()==0:
+      return 0.0
+    return self.toScalar()
+%}
+
+%pythoncode %{
+  def __int__(self):
+    if self.numel()!=1:
+      raise Exception("Only a scalar can be cast to a float")
+    if self.size()==0:
+      return 0
+    return int(self.toScalar())
+%}
+
+%pythoncode %{
+  def __nonzero__(self):
+    if self.numel()!=1:
+      raise Exception("Only a scalar can be cast to a float")
+    if self.size()==0:
+      return 0
+    return self.toScalar()!=0
+%}
+
+%pythoncode %{
+  def __abs__(self):
+    return abs(self.__float__())
+%}
+
 
 # define binopsT(T) \
 T __pow__ (const T& b) const{ return std::pow(T(*$self),b);} \

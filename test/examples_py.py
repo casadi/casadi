@@ -1,6 +1,9 @@
-src = '../documentation/examples'
+import sys
+
+src = sys.argv[1]
 
 import os
+import sys
 from subprocess import *
 
 def setdummybackend(dir):
@@ -23,7 +26,7 @@ def test(dir,fn):
   stdoutdata, stderrdata = p.communicate()
   if not(p.returncode==0):
     stats['numfails']+=1
-    print "In %s, %S failed:" % (dir,fn)
+    print "In %s, %s failed:" % (dir,fn)
     print "="*30
     print p.returncode
     print stdoutdata

@@ -290,16 +290,16 @@ class Matrix : public PrintableObject{
     //@{
     /// Indexing for interfaced languages
     /// get a non-zero
-    const T indexed_one_based(int k) const{ return at(k-1);}
-    const T indexed_zero_based(int k) const{ return at(k);}
+    const Matrix<T> indexed_one_based(int k) const{ return operator[](k-1);}
+    const Matrix<T> indexed_zero_based(int k) const{ return operator[](k);}
     const Matrix<T> indexed(const Slice &k) const{ return (*this)[k];}
     const Matrix<T> indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
     
     /// get a matrix element
-    const T indexed_one_based(int i, int j) const{ return elem(i-1,j-1);}
-    const T indexed_zero_based(int i, int j) const{ return elem(i,j);}
+    const Matrix<T> indexed_one_based(int i, int j) const{ return operator()(i-1,j-1);}
+    const Matrix<T> indexed_zero_based(int i, int j) const{ return operator()(i,j);}
     const Matrix<T> indexed(const Slice &i, const Slice &j) const{ return (*this)(i,j); }
     const Matrix<T> indexed(const IndexList &i, const IndexList &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));

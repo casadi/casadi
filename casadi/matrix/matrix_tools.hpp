@@ -228,6 +228,9 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 template<class T>
 void makeDense(Matrix<T>& A);
 
+/** \brief Check if two DMatrices have identical numerical content */
+Matrix<double> operator==(Matrix<double>& a, Matrix<double>& b);
+
 } // namespace CasADi
 
 #ifndef SWIG
@@ -774,8 +777,6 @@ template<class T>
 void makeDense(Matrix<T>& A){
   A.makeDense(A.size1(),A.size2(),0);
 }
-
-
 
 } // namespace CasADi
 
