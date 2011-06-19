@@ -283,7 +283,7 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
     Matrix<double>& faseed = f_.adjSeed(0,dir);
     casadi_assert(faseed.size()==aseed.size());
     for(int i=0; i<aseed.size(); ++i)
-      faseed[i] = -aseed[i];
+      faseed.data()[i] = -aseed.data()[i];
     
     // Solve the transposed linear system
     linsol_.solve(&faseed.front(),1,true);
@@ -299,7 +299,7 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
     Matrix<double>& fsens = fwdSens(0,dir);
     casadi_assert(ffsens.size()==fsens.size());
     for(int i=0; i<fsens.size(); ++i)
-      fsens[i] = -ffsens[i];
+      fsens.data()[i] = -ffsens.data()[i];
     
     // Solve the linear system
     linsol_.solve(&fsens.front());

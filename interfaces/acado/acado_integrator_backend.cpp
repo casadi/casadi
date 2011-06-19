@@ -163,11 +163,11 @@ ACADO::returnValue AcadoIntegratorBackend::evaluate( const Vector &x0  ,
   if(with_sens){
     for(int i=0; i<md; ++i){
       Matrix<double> &xsens = integrator_.fwdSeed(CasADi::INTEGRATOR_X0,i);
-      xsens[i] = 1;
+      xsens.at(i) = 1;
     }
     for(int i=0; i<mu+mp; ++i){
       Matrix<double> &usens = integrator_.fwdSeed(CasADi::INTEGRATOR_P,i+md);
-      usens[i] = 1;
+      usens.at(i) = 1;
     }
   }
   
