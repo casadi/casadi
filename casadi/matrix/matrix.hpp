@@ -670,8 +670,12 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
 }
 
 template<class T>
-void Matrix<T>::setSub(const int i, int j, const Matrix<T>& el){
-  setSub(std::vector<int>(1,i),std::vector<int>(1,j),el);
+void Matrix<T>::setSub(int i, int j, const Matrix<T>& el){
+  if(el.dense()){
+    elem(i,j) = el.toScalar();
+  } else {
+    setSub(std::vector<int>(1,i),std::vector<int>(1,j),el);
+  }
 }
 
 template<class T>
