@@ -194,10 +194,10 @@ FX IntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
     
     if(with_x){
         for(int i=0; i<ny_; ++i)
-          y0_sens[i + i*ns_x] = 1;
+          y0_sens.data()[i + i*ns_x] = 1;
       
       for(int i=0; i<nq_; ++i)
-        q0_sens[ny_ + i + i*ns_x] = 1;
+        q0_sens.data()[ny_ + i + i*ns_x] = 1;
     }
     
     // Augmented initial condition

@@ -527,7 +527,7 @@ Matrix<T> sum(const Matrix<T> &x, int axis) {
     Matrix<T> res(1,x.size2());
     const std::vector<int> &col = x.col();
     for(int k=0; k<col.size(); k++){
-      res(0,col[k]) += x[k];
+      res(0,col[k]) += x.data()[k];
     }
     return res;
   }
@@ -588,7 +588,7 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
     }
 
     // Normalize qi
-    ri(0,i) = norm_2(trans(qi))[0];
+    ri(0,i) = norm_2(trans(qi)).at(0);
     qi /= ri(0,i);
 
     // Update RT and QT
@@ -759,9 +759,9 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
   int elA=0, elB=0;
   for(int k=0; k<mapping.size(); ++k){
     if(mapping[k]<0){
-      ret[k] = A[elA++];
+      ret.data()[k] = A.data()[elA++];
     } else if(mapping[k]>0){
-      ret[k] = B[elB++];
+      ret.data()[k] = B.data()[elB++];
     } else {
       throw CasadiException("Pattern intersection not empty");
     }

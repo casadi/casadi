@@ -239,7 +239,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   for(int ind=0; ind<getNumOutputs(); ++ind){
     Matrix<double> &res = output(ind);
     for(int i=0; i<res.size(); ++i){
-      res[i] = work[output_ind[ind][i]];
+      res.data()[i] = work[output_ind[ind][i]];
     }
   }
 
@@ -268,7 +268,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(int ind=0; ind<output_.size(); ++ind){
       Matrix<double> &fsens = fwdSens(ind,dir);
       for(int i=0; i<output_ind[ind].size(); ++i){
-        fsens[i] = dwork[output_ind[ind][i]];
+        fsens.data()[i] = dwork[output_ind[ind][i]];
       }
     }
   }
@@ -302,7 +302,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   for(int ind=0; ind<getNumInputs(); ++ind){
     Matrix<double> &asens = adjSens(ind,dir);
     for(int i=0; i<input_ind[ind].size(); ++i){
-      asens[i] = dwork[input_ind[ind][i]];
+      asens.data()[i] = dwork[input_ind[ind][i]];
     }
   }
 
@@ -948,7 +948,7 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
     for(int i=0; i<output_ind[ind].size(); ++i)
-      output_s[ind][i] = swork[output_ind[ind][i]];
+      output_s[ind].data()[i] = swork[output_ind[ind][i]];
   }
 }
 

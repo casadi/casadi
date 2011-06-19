@@ -622,7 +622,7 @@ Matrix<SX> symbolic(const std::string& name, int n, int m){
     for(int j=0; j<m; ++j){
       stringstream ss;
       ss << name << "_" << i << "_" << j;
-      ret[j+i*m] = SX(ss.str());
+      ret.data()[j+i*m] = SX(ss.str());
     }
   }
       
@@ -638,7 +638,7 @@ Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp){
   for(int i=0; i<ret.size(); ++i){
     stringstream ss;
     ss << name << "_" << i;
-    ret[i] = SX(ss.str());
+    ret.data()[i] = SX(ss.str());
   }
   
   return ret;
@@ -700,7 +700,7 @@ Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Mat
   for (int i=0;i<x.size();i++) {
     if (order_contributions[i]<=order) {
       result += mtaylor_recursive(
-                  jacobian(ex,x[i]),
+                  jacobian(ex,x.at(i)),
                   x,a,
                   order-order_contributions[i],
                   order_contributions,

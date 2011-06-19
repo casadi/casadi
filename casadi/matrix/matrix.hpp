@@ -714,7 +714,7 @@ template<class T>
 const Matrix<T> Matrix<T>::getNZ(const std::vector<int>& k) const{
   Matrix<T> ret(k.size(),1,0);
   for(int el=0; el<k.size(); ++el)
-    ret[el] = data()[k[el]];
+    ret.data()[el] = data()[k[el]];
   
   return ret;
 }
@@ -1650,12 +1650,12 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
       int j = r_col[el];
       int el1 = x_rowind[i];
       int el2 = y_colind[j];
-      ret[el]=0;
+      ret.data()[el]=0;
       while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
-          ret[el] += x[el1++] * y[y_trans_map[el2++]];
+          ret.data()[el] += x.data()[el1++] * y.data()[y_trans_map[el2++]];
         } else if(j1<i2) {
           el1++;
         } else {
