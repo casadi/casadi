@@ -424,7 +424,7 @@ void EquationSorter::tarjan(){
   fcn.init();
   SXMatrix jac = fcn.jac();
   for(int k=0; k<jac.size(); ++k)
-    jac[k] = 1;
+    jac.at(k) = 1;
   jac.printDense();
 
   
@@ -562,7 +562,7 @@ void EquationSorter::tarjanCellier(){
     fcn.init();
     SXMatrix jac = fcn.jac();
     for(int k=0; k<jac.size(); ++k)
-      jac[k] = 1;
+      jac.at(k) = 1;
     
     jac.printDense();
   }

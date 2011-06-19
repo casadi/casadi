@@ -98,8 +98,8 @@ void MultipleShootingInternal::init(){
   vector<vector<MX> > fcn_in(nk_);
   for(int k=0; k<nk_; ++k){
     fcn_in[k].resize(DAE_NUM_IN);
-    fcn_in[k][DAE_T] = input(OCP_T)[k];
-    fcn_in[k][DAE_P] = vertcat(P,U[k]);
+    fcn_in[k][DAE_T] = input(OCP_T).at(k);
+    fcn_in[k][DAE_P] = vertcat(P,U.at(k));
     fcn_in[k][DAE_Y] = X[k];
     fcn_in[k][DAE_YDOT] = XP[k];
   }

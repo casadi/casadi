@@ -493,7 +493,7 @@ void OCP::makeExplicit(){
       SXMatrix x_k(vb.size(),1,0);
       int offset = rowblock_[b];
       for(int i=0; i<x_k.size(); ++i){
-        x_k[i] = implicit_var_guess[offset+i];
+        x_k.at(i) = implicit_var_guess[offset+i];
       }
       
       // Make Newton iterations
@@ -532,7 +532,7 @@ void OCP::makeExplicit(){
         // Find out which dependencies are nonlinear and which are linear
         Matrix<int> Jb_lin(Jb.sparsity());
         for(int i=0; i<Jb.size(); ++i){
-          Jb_lin[i] = dependsOn(Jb[i],vb) ? 2 : 1;
+          Jb_lin.at(i) = dependsOn(Jb.at(i),vb) ? 2 : 1;
         }
         
         // Loop over rows (equations)
@@ -675,7 +675,7 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
   
       // Unmark the explicit variables
       for(int i=0; i<explicit_var_.size(); ++i){
-        explicit_var_[i].setTemp(0);
+        explicit_var_.at(i).setTemp(0);
       }
 
       // Evaluate constant expressions
