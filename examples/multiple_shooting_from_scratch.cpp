@@ -200,9 +200,9 @@ int main(){
   for(int k=0; k<=ns; ++k){
     // Pass bounds and guess for state
     for(int i=0; i<nx; ++i){
-      V_init[el] = x_init[i];
-      V_min[el] = k == 0 ? x0_min[i] : k==ns ? xf_min[i] : x_min[i];
-      V_max[el] = k == 0 ? x0_max[i] : k==ns ? xf_max[i] : x_max[i];
+      V_init.at(el) = x_init[i];
+      V_min.at(el) = k == 0 ? x0_min[i] : k==ns ? xf_min[i] : x_min[i];
+      V_max.at(el) = k == 0 ? x0_max[i] : k==ns ? xf_max[i] : x_max[i];
       el++;
     }
     
@@ -211,9 +211,9 @@ int main(){
 
     // Pass bounds and guess for control
     for(int i=0; i<nu; ++i){
-      V_init[el] = u_init[i];
-      V_min[el] = u_min[i];
-      V_max[el] = u_max[i];
+      V_init.at(el) = u_init[i];
+      V_min.at(el) = u_min[i];
+      V_max.at(el) = u_max[i];
       el++;
     }
   }
