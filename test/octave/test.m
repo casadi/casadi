@@ -212,8 +212,7 @@ for i=1:numel(S)
 end
 
 S = {DMatrix(3),symbolic("x",2,2),SX("x"),MX("x",1,1)};
-num = {6,DMatrix(6),MX("x",1,1)}
-"right"
+num = {6,DMatrix(6)}
 
 for i=1:numel(S)
   sc = S{i};
@@ -228,7 +227,11 @@ for i=1:numel(S)
   end
 end
 
-"fine"
+x = SX("x");
+y = symbolic("y",2,1);
+
+x*y
+y*x
 
 num = {DMatrix([1 2; 3 4]),[1 2; 3 4]};
 sym = {symbolic("x",2,2),MX("x",2,2)};

@@ -231,8 +231,8 @@ class OCPtests(casadiTestCase):
     #print c.atTime(0)
     f=SXFunction([[c,T,cost]],[ocp.initial_eq_])
     f.init()
-    f.evaluate()
     return 
+    f.evaluate()
     self.checkarray(f.output(),matrix([-956.271065,-250.051971,0]).T,"initeq")
 
     

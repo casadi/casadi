@@ -122,7 +122,9 @@ namespace CasADi {
 
     binopsFull(double b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
     binopsFull(const CasADi::Matrix<double>& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
-    #binopsFull(const CasADi::SX& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
+    #ifdef SWIGOCTAVE
+    binopsFull(const CasADi::SX& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
+    #endif SWIGPYTHON
      
     #ifdef SWIGPYTHON
     %python_matrix_convertors

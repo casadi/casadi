@@ -1,16 +1,35 @@
-all: python
+all: unittests
 
-python:
-	cd python && python alltests.py && cd..
+full: unittests examples tutorials
 
-octave:
+unittests: unittests_py unittests_oct
+	
+unittests_py:
+	cd python && python alltests.py && cd ..
+
+unittests_oct:
 	cd octave && octave test.m && cd ..
 
-full: python octave examples tutorials
+examples: examples_indoc examples_code
+
+examples_indoc: examples_indoc_py examples_indoc_cpp examples_indoc_oct
+
+examples_code: examples_code_py examples_code_cpp
+
+examples_indoc_py:
+	python internal/test_py.py '../documentation/examples'
 	
-examples:
-	python examples_py.py '../documentation/examples'
-	python examples_cpp.py
+examples_code_py:
+	python internal/test_py.py '../examples/python'
+	
+examples_indoc_cpp:
+	python internal/test_cpp.py '../documentation/examples'
+	
+examples_code_cpp:
+	python internal/test_bin.py '../build/bin'
+
+examples_indoc_oct:
+	python internal/test_oct.py '../documentation/examples'
 
 tutorials:
-	python examples_py.py '../documentation/tutorials/python/src'
+	python internal/test_py.py '../documentation/tutorials/python/src'

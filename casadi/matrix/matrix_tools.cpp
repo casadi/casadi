@@ -42,7 +42,6 @@ namespace CasADi{
   
   
   Matrix<double> operator==(Matrix<double>& a, Matrix<double>& b) {
-    std::cout << "Welcome, stranger" << std::endl;
     
     if (a.numel()==1) {
       double a_ = (a.size()==1) ? a.at(0) : 0;

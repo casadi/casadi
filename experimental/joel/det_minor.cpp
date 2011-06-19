@@ -235,6 +235,10 @@ for(int k=0; k<100; ++k)
 //    deter >>= detout;
 //    trace_off();
     fprintf(stdout,"\n %f =? %f should be the same \n",detout,diag);
+
+if (abs(detout-diag)>1e-8)
+  return -1;    
+
 //ld " << t1-t0 << endl;
 cout << "time for constructing graph " << t1-t0 << endl;
 cout << "time for making function " << t2-t1 << endl;
@@ -323,7 +327,7 @@ cout << "1 forward " << (t6-t5)/100 << endl;
     fprintf(stdout," units \t%E    seconds\n",(t31-t30)/itu);
 
 #endif
-    return 1;
+    return 0;
 }
 
 
@@ -479,7 +483,7 @@ return 0;
     }
     cout << "\n";
 
-    return 1;
+    return 0;
 
 }
 

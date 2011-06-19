@@ -23,21 +23,21 @@ gfcn.generateCode(srcname)
 objname_no_opt = "grad_det_no_opt.so"
 print "Compiling without optimization: ", objname_no_opt
 t1 = time.time()
-system("gcc -shared " + srcname + " -o " + objname_no_opt)
+system("gcc -fPIC -shared " + srcname + " -o " + objname_no_opt)
 t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 
 objname_O3_opt = "grad_det_O3_opt.so"
 print "Compiling with O3 optimization: ", objname_O3_opt
 t1 = time.time()
-system("gcc -shared -O3 " + srcname + " -o " + objname_O3_opt)
+system("gcc -fPIC -shared -O3 " + srcname + " -o " + objname_O3_opt)
 t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 
 objname_Os_opt = "grad_det_Os_opt.so"
 print "Compiling with Os optimization: ", objname_Os_opt
 t1 = time.time()
-system("gcc -shared -Os " + srcname + " -o " + objname_Os_opt)
+system("gcc -fPIC -shared -Os " + srcname + " -o " + objname_Os_opt)
 t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 

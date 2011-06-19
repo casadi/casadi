@@ -407,6 +407,7 @@ class Matrix : public PrintableObject{
 #endif // SWIG
     //@{
     
+    #ifdef SWIGPYTHON
     /// Python operator overloading
     Matrix<T> __pow__ (const T& b) const{ return __pow__(Matrix<T>(b));}
     Matrix<T> __rpow__(const T& b) const{ return Matrix<T>(b).__pow__(*this);}
@@ -419,6 +420,7 @@ class Matrix : public PrintableObject{
     Matrix<T> __div__ (const T& b) const{ return *this / b;}
     Matrix<T> __rdiv__(const T& b) const{ return b / *this;}
     //@}
+    #endif // SWIGPYTHON
     
     //@{
     /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
