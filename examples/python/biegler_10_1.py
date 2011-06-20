@@ -24,14 +24,14 @@ for N in range(1,11):
   
   # Differential equation
   z = SX("z")
-  F = SXFunction([[z]],[[z*z - 2*z + 1]]);
+  F = SXFunction([[z]],[[z*z - 2*z + 1]])
   F.setOption("name","dz/dt")
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SXFunction([[t]], [[(4*t-3)/(3*t+1)]]);
-  z_analytic.setOption("name","analytic solution");
+  z_analytic = SXFunction([[t]], [[(4*t-3)/(3*t+1)]])
+  z_analytic.setOption("name","analytic solution")
   
   # Collocation point
   tau = SX("tau")
@@ -61,8 +61,7 @@ for N in range(1,11):
   for j in range(K+1):
     l[j].setInput(1.)
     l[j].evaluate()
-    res = tuple(l[j].output())
-    D.append(res[0])
+    D.append(float(l[j].output()))
 
   print "D = ", D
 
@@ -74,8 +73,7 @@ for N in range(1,11):
       l[j].setInput(tau_root[k])
       l[j].setFwdSeed(1.0)
       l[j].evaluate(1,0)
-      sens = tuple(l[j].fwdSens())
-      Cj.append(sens[0])
+      Cj.append(float(l[j].fwdSens()))
     C.append(Cj)
   
   print "C = ", C
@@ -168,10 +166,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", tuple(solver.output(NLP_COST))
+  print "optimal cost: ", float(solver.output(NLP_COST))
 
   # Print the optimal solution
-  xopt = tuple(solver.output(NLP_X_OPT))
+  xopt = solver.output(NLP_X_OPT).data()
   print "optimal solution: ", xopt
  
   # plot to screen
