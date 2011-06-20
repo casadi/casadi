@@ -198,7 +198,7 @@ void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
 {
 	f.precision(10);
 
-	f << "function multipleShooting = " << name << "_out()" << endl;
+	f << "function multipleShooting = ms_stage_" << name << "_out()" << endl;
 
 	map<string, int>::const_iterator iter;
 

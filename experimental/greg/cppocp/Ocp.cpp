@@ -270,7 +270,7 @@ void Ocp::writeOctaveOutput( string name, double * xOpt)
 	f << "% multiple shooting stages\n";
 	f << "opt.multipleShootingStages = struct();\n";
 	for (msIter = ms.begin(); msIter != ms.end(); msIter++){
-		f << "opt.multipleShootingStages." << (msIter->second)->name << " = " << (msIter->second)->name << "_out();\n";
+		f << "opt.multipleShootingStages." << (msIter->second)->name << " = ms_stage_" << (msIter->second)->name << "_out();\n";
 	}
 	f << endl << endl;
 
