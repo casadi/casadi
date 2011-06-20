@@ -57,6 +57,7 @@ namespace CasADi{
         
         /// Names of children
         std::map<std::string,int> name_part_;
+                
     };
 
 #ifdef SWIG
@@ -194,6 +195,9 @@ class OCP : public PrintableObject{
 
     /// Costs function
     FX costfcn_;
+    
+    /// Get the explicit expression for a variable
+    SX getExplicit(const SX& v) const;
 };
 
 #ifdef SWIG

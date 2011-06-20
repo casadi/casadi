@@ -91,6 +91,10 @@ FX Integrator::getJacobian(){
 LinearSolver Integrator::getLinearSolver(){
   return (*this)->getLinearSolver();  
 }
+
+FX Integrator::getDAE(){
+  return (*this)->f_;
+}
   
  
 } // namespace CasADi

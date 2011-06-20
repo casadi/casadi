@@ -157,6 +157,9 @@ public:
   
   /// Get the Linear solver
   LinearSolver getLinearSolver();
+  
+  /// Get the DAE
+  FX getDAE();
 };
 
 

@@ -44,6 +44,8 @@ OCP::OCP(){
   eliminated_dependents_ = false;
   blt_sorted_ = false;
   t_ = SX("t");
+  t0 = numeric_limits<double>::quiet_NaN();
+  tf = numeric_limits<double>::quiet_NaN();
 }
 
 void OCP::repr(ostream &stream) const{
@@ -1006,6 +1008,14 @@ void OCP::findConsistentIC(){
     d_[i].setStart(z0);
   }
 }
+
+SX OCP::getExplicit(const SX& v) const{
+  SXMatrix x = v;
+  x = substitute(x,explicit_var_,explicit_fcn_);
+  return x.toScalar();
+}
+
+
 
   } // namespace OptimalControl
 } // namespace CasADi

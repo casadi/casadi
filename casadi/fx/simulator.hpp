@@ -27,26 +27,6 @@
 
 namespace CasADi{
 
-/// Indices of the inputs of the output function
-enum OutputInput{
-/// Time grid
-OUTPUT_T,
-/// Flattened differential states for each time in the time grid
-OUTPUT_X,
-OUTPUT_P,
-OUTPUT_NUM_IN};
-
-/// Indices of the inputs of the function
-enum SimulatorInput{
-/// Same as CasADi::INTEGRATOR_X0 
-SIMULATOR_X0,
-/// Same as CasADi::INTEGRATOR_P 
-SIMULATOR_P,
-SIMULATOR_NUM_IN};
-
-/// Indices of the outputs of the function
-//enum SimulatorOutput{SIMULATOR_Y, SIMULATOR_XF, SIMULATOR_NUM_OUT};
-
 // Forward declaration of internal class
 class SimulatorInternal;
 

@@ -199,10 +199,10 @@ int main(){
   simulator.init();
   
   // Initial condition
-  simulator.setInput(ocp.x_init,SIMULATOR_X0);
+  simulator.setInput(ocp.x_init,INTEGRATOR_X0);
 
   // Pass parameters
-  simulator.setInput(ocp.u_init,SIMULATOR_P);
+  simulator.setInput(ocp.u_init,INTEGRATOR_P);
   
   // Simulate
   simulator.evaluate();
