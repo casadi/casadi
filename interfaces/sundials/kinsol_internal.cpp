@@ -390,7 +390,11 @@ void KinsolInternal::func(N_Vector u, N_Vector fval){
   // Evaluate
   f_.evaluate();
     
-    // Get results
+  if(monitored("eval_f")){
+      cout << "f = " << f_.output() << endl;
+  }
+    
+  // Get results
   f_.getOutput(NV_DATA_S(fval));
 
   // Log time
@@ -427,12 +431,16 @@ void KinsolInternal::djac(int N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp
   time1_ = clock();
 
   // Pass inputs to the jacobian function
-  f_.setInput(NV_DATA_S(u),0);
+  J_.setInput(NV_DATA_S(u),0);
   for(int i=0; i<getNumInputs(); ++i)
-    f_.setInput(input(i),i+1);
+    J_.setInput(input(i),i+1);
 
   // Evaluate
   J_.evaluate();
+
+  if(monitored("eval_djac")){
+      cout << "djac = " << J_.output() << endl;
+  }
   
   // Get sparsity and non-zero elements
   const vector<int>& rowind = J_.output().rowind();
@@ -449,6 +457,11 @@ void KinsolInternal::djac(int N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp
       // Set the element
       DENSE_ELEM(J,i,j) = val[el];
     }
+  }
+  
+  if(monitored("eval_djac")){
+      cout << "djac = ";
+      PrintMat(J);
   }
   
   // Log time duration
@@ -473,9 +486,9 @@ void KinsolInternal::bjac(int N, int mupper, int mlower, N_Vector u, N_Vector fu
   time1_ = clock();
 
   // Pass inputs to the jacobian function
-  f_.setInput(NV_DATA_S(u),0);
+  J_.setInput(NV_DATA_S(u),0);
   for(int i=0; i<getNumInputs(); ++i)
-    f_.setInput(input(i),i+1);
+    J_.setInput(input(i),i+1);
 
   // Evaluate
   J_.evaluate();
