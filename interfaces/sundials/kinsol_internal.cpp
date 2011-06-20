@@ -43,7 +43,7 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("constraints",                 OT_INTEGERVECTOR);
   addOption("strategy",                    OT_STRING, "none", "Globalization strategy (\"none\" or \"linesearch\")");
-  
+
   mem_ = 0;
   u_ = 0;
   u_scale_ = 0;
@@ -233,6 +233,12 @@ void KinsolInternal::init(){
     
   } else {
     throw CasadiException("Unknown linear solver ");
+  }
+  
+  // Set stop criterion
+  if(hasSetOption("abstol")){
+    flag = KINSetFuncNormTol(mem_,getOption("abstol"));
+    casadi_assert(flag==KIN_SUCCESS);
   }
 }
 

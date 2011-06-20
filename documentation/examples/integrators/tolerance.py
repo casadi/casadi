@@ -28,7 +28,7 @@ for tol in tolerances:
 
   sim=Simulator(integrator,ts)
   sim.init()
-  sim.input(SIMULATOR_X0).set([1,0])
+  sim.input(INTEGRATOR_X0).set([1,0])
   sim.evaluate()
 
   plot(ts,array(sim.output())[:,0],label="tol = 1e%d" % tol)

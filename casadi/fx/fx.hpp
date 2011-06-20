@@ -313,14 +313,15 @@ void setAdjSens(T val, int ind=0, int dir=0) const ;
   void setAdjSeed(T val, int ind=0, int dir=0){ casadi_assert(isInit()); adjSeed(ind,dir).set(val); } \
   void setAdjSens(T val, int ind=0, int dir=0){ casadi_assert(isInit()); adjSens(ind,dir).set(val); }
 
-/// \cond
+#ifndef DOXYGENPROC
 SETTERS(double);
 #ifndef SWIG
 SETTERS(const double*);
 #endif // SWIG
 SETTERS(const std::vector<double>&);
 SETTERS(const Matrix<double>&);
-/// \endcond
+#endif // DOXYGENPROC
+
 #undef SETTERS
 
 #define GETTERS(T)\
@@ -330,14 +331,15 @@ SETTERS(const Matrix<double>&);
     void getFwdSens(T val, int ind=0, int dir=0) const{ casadi_assert(isInit()); fwdSens(ind,dir).get(val);} \
     void getAdjSeed(T val, int ind=0, int dir=0) const{ casadi_assert(isInit()); adjSeed(ind,dir).get(val);} \
     void getAdjSens(T val, int ind=0, int dir=0) const{ casadi_assert(isInit()); adjSens(ind,dir).get(val);}
-/// \cond
+
+#ifndef DOXYGENPROC
 GETTERS(double&);
 #ifndef SWIG
 GETTERS(double*);
 #endif // SWIG
 GETTERS(std::vector<double>&);
 GETTERS(Matrix<double>&);
-/// \endcond
+#endif // DOXYGENPROC
 #undef GETTERS
 
 #ifdef DOXYGENPROC

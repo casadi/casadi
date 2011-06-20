@@ -26,6 +26,7 @@ using namespace std;
 namespace CasADi{
 
 ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, int nrhs) : f_(f), nrhs_(nrhs){
+  addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
 }
 
 void ImplicitFunctionInternal::init(){

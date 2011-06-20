@@ -61,7 +61,10 @@ class OptionsFunctionality : public SharedObject{
     
     /// Const access a member function or object
     const OptionsFunctionalityNode* operator->() const;
-        
+
+/// \name Option Functionality
+/// @{
+   
 #ifndef SWIG
     /** \brief  set an option.
     The setOptions are in general only considered before the init function, if any.
@@ -87,14 +90,18 @@ class OptionsFunctionality : public SharedObject{
     /** \brief  Print options to a stream */
     void printOptions(std::ostream &stream=std::cout) const;
 
-    /// Assert that the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
     /** \brief  Copy all options from another object*/
     void copyOptions(const OptionsFunctionality& obj);
     
     /** \brief  Get the dictionary */
     const Dictionary& dictionary() const;
+        
+/// @}
+
+    /// Assert that the node is pointing to the right type of object
+    virtual bool checkNode() const;
+
+
 };
 
 #ifndef SWIG
