@@ -31,6 +31,7 @@
 #include "../sx/sx_node.hpp"
 #include "../mx/evaluation.hpp"
 #include "../sx/sx_tools.hpp"
+#include "mx_function.hpp"
 
 namespace CasADi{
 
@@ -138,6 +139,13 @@ void SXFunction::clearSymbolic(){
 vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks){
   return (*this)->jac(jblocks);
 }
+
+SXFunction::SXFunction(const MXFunction& f){
+  MXFunction f2 = f;
+  SXFunction t = f2.expand();
+  assignNode(t.get());
+}
+
 
 
 } // namespace CasADi

@@ -48,6 +48,9 @@ namespace CasADi{
 /// Forward declaration of internal class
 class SXFunctionInternal;
 
+/// Forward declaration of MXFunction
+class MXFunction;
+
 /**   \brief Dynamically created function that can be expanded into a series of scalar operations.
 \author Joel Andersson 
 \date 2010
@@ -58,6 +61,9 @@ class SXFunction : public XFunction{
 public:
   /// Default constructor
   SXFunction();
+  
+  /// Expand an MXFunction
+  explicit SXFunction(const MXFunction &f);
 
   /// Multiple (matrix valued) input, multiple (matrix valued) output 
   SXFunction(const std::vector< SXMatrix>& arg, const std::vector<SXMatrix>& res);
