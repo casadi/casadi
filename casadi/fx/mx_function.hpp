@@ -27,7 +27,7 @@
 #include <iostream>
 
 #include "../mx/mx.hpp"
-#include "x_function.hpp"
+#include "sx_function.hpp"
 
 namespace CasADi{
 
@@ -111,8 +111,11 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /** \brief Jacobian via source code transformation (work in progress! */
+  /** \brief Jacobian via source code transformation */
   std::vector<MX> jac(int iind=0);
+
+  /** \brief Expand the matrix valued graph into a scalar valued graph */
+  SXFunction expand();
   
 };
 

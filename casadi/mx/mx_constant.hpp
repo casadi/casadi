@@ -56,6 +56,9 @@ class MXConstant : public MXNode{
     /// Symbolic evaluation (matrix graph)
     virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
     
+    /** \brief  Evaluate symbolically (SX) */
+    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+
     /** \brief  data member */
     Matrix<double> x_;
 

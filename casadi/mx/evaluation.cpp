@@ -25,6 +25,7 @@
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
+#include "../fx/x_function.hpp"
 
 using namespace std;
 
@@ -160,5 +161,25 @@ FX& Evaluation::getFunction(){
 FX& EvaluationOutput::getFunction(){ 
   return dep(0)->getFunction();
 }
+
+void Evaluation::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  // Make sure that the function is an X-function
+  XFunction fcn = shared_cast<XFunction>(fcn_);
+  casadi_assert_message(!fcn.isNull(),"Function not an SXFunction or MXFunction");
+  vector<SXMatrix> arg(input.size());
+  for(int i=0; i<arg.size(); ++i){
+    arg[i] = *input[i];
+  }
+  xs_ = fcn.eval(arg);
+}
+
+void EvaluationOutput::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  // Get a reference the arguments
+  const vector<SXMatrix>& xs = dynamic_cast<Evaluation*>(dep(0).get())->xs_;
+  
+  // Copy to output
+  output.set(xs[oind_]);
+}
+
 
 } // namespace CasADi

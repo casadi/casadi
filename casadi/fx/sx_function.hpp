@@ -82,21 +82,7 @@ public:
 
   /// Const access functions of the node 
   const SXFunctionInternal* operator->() const;
-  
-  /// evaluate symbolically 
-  std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg);
-
-#ifndef SWIG
-  /// evaluate symbolically (pass and get non-zero entries) 
-  std::vector< std::vector<SX> > eval(const std::vector< std::vector<SX> >& arg);
-
-  /// evaluate symbolically, single input, single output 
-  SXMatrix eval(const SXMatrix& arg);
-
-  /// evaluate symbolically, single input, single output (pass and get non-zero entries) 
-  std::vector<SX> eval(const std::vector<SX>& arg);
-#endif // SWIG
-  
+    
   /** \brief Calculate the jacobian of output oind with respect to input iind 
   *
   * This is just the result of CasADi::SXFunction::jac,

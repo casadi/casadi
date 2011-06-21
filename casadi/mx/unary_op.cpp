@@ -75,6 +75,14 @@ void UnaryOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
   }
 }
 
-
+void UnaryOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  // Do the operation on all non-zero elements
+  const vector<SX> &xd = input[0]->data();
+  vector<SX> &od = output.data();
+  
+  for(int el=0; el<size(); ++el){
+    casadi_math<SX>::fun[op](xd[el],0,od[el]);
+  }
+}
 } // namespace CasADi
 

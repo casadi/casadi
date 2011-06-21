@@ -24,6 +24,7 @@
 #include "../mx/jacobian_reference.hpp"
 #include "../mx/evaluation.hpp"
 #include "../mx/mapping.hpp"
+#include "../sx/sx_tools.hpp"
 
 #include "../stl_vector_tools.hpp"
 
@@ -527,6 +528,56 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   // And return the jacobian of that gradient function
   return temp.jacobian(iind,0);
 }
+
+void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants){
+  // Create a work array
+  vector<SXMatrix> work(alg.size());
+  for(int i=0; i<work.size(); ++i){
+    work[i] = SXMatrix(alg[i].mx.sparsity());
+  }
+  
+  // Pass the inputs
+  for(int ind=0; ind<input_.size(); ++ind)
+    work[inputv_ind[ind]].set(input_s[ind]);
+
+  // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
+  vector<SXMatrix*> d;
+  for(int i=0; i<alg.size(); ++i){
+    d.resize((alg[i].ch.size()));
+    for(int c=0; c<d.size(); ++c){
+      d[c] = &work[alg[i].ch[c]];
+    }
+    alg[i].mx->evaluateSX(d,work[i]);
+  }
+  
+  // Get the outputs
+  for(int ind=0; ind<outputv.size(); ++ind)
+    work[outputv_ind[ind]].get(output_s[ind]);
+}
+
+SXFunction MXFunctionInternal::expand(){
+  casadi_assert(isInit());
+  
+  // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
+  vector<SXMatrix> arg(inputv.size());
+  for(int i=0; i<arg.size(); ++i){
+    arg[i] = symbolic(inputv[i]->getName(),inputv[i].sparsity());
+  }
+
+  // Create output vector with correct sparsity
+  vector<SXMatrix> res(outputv.size());
+  for(int i=0; i<res.size(); ++i){
+    res[i] = SXMatrix(outputv[i].sparsity());
+  }
+  
+  // Evaluate symbolically
+  evaluateSX(arg,res);
+  
+  // Create function
+  SXFunction f(arg,res);
+  return f;
+}
+
 
 
 } // namespace CasADi

@@ -236,6 +236,11 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
   return ret;
 }
 
+void Mapping::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  for(int k=0; k<size(); ++k){
+    output[k] = (*input[depind_[k]])[nzind_[k]];
+  }
+}
 
 
 

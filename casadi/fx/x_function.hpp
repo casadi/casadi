@@ -52,6 +52,20 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// evaluate symbolically 
+  std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg);
+
+#ifndef SWIG
+  /// evaluate symbolically (pass and get non-zero entries) 
+  std::vector< std::vector<SX> > eval(const std::vector< std::vector<SX> >& arg);
+
+  /// evaluate symbolically, single input, single output 
+  SXMatrix eval(const SXMatrix& arg);
+
+  /// evaluate symbolically, single input, single output (pass and get non-zero entries) 
+  std::vector<SX> eval(const std::vector<SX>& arg);
+#endif // SWIG
+  
 };
 
 #ifdef SWIG

@@ -161,4 +161,11 @@ int MXNode::getFunctionInput() const{
   throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
 }
 
+void MXNode::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  throw CasadiException(string("MXNode::evaluateSX() not defined for class ") + typeid(*this).name());
+}
+
+  
+
+
 } // namespace CasADi

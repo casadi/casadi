@@ -65,7 +65,11 @@ class Evaluation : public MultipleOutput{
     /** \brief  Get function output */
     virtual int getFunctionOutput() const{ return -1;}
 
+    /** \brief  Evaluate symbolically (SX) */
+    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+
     std::vector<MX> x_;
+    std::vector<SXMatrix> xs_;
     FX fcn_;
 };
 
@@ -111,6 +115,9 @@ class EvaluationOutput : public OutputNode{
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const{ return oind_;}
+    
+    /** \brief  Evaluate symbolically (SX) */
+    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
     
     int oind_;
 };

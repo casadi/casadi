@@ -48,6 +48,9 @@ void SymbolicMatrix::print(std::ostream &stream, const std::vector<std::string>&
 void SymbolicMatrix::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
 }
 
+void SymbolicMatrix::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+}
+
 bool SymbolicMatrix::isSymbolic() const{
   return true;
 }

@@ -50,6 +50,9 @@ class MatrixScalarOp : public MXNode{
 
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
+    
+    /** \brief  Evaluate symbolically (SX) */
+    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
 
   protected:
 

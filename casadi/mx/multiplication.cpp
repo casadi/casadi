@@ -146,6 +146,13 @@ void Multiplication::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
   }
 }
 
+void Multiplication::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  SXMatrix r = prod(*input[0],*input[1]);
+  casadi_assert(output.sparsity()==r.sparsity());
+  output.set(r);
+}
+
+
 
 } // namespace CasADi
 

@@ -23,7 +23,7 @@ mfile = sfile.extract('modelDescription.xml','.')
 os.remove('BasicVolume.jmu')
 os.rename('modelDescription.xml','BasicVolume.xml')
 
-## Allocate a parser and load the xml
+# Allocate a parser and load the xml
 parser = FMIParser('BasicVolume.xml')
 
 # Obtain the symbolic representation of the OCP
@@ -71,4 +71,13 @@ plt.xlabel("t")
 plt.ylabel("P(t)")
 
 plt.show()
+
+
+
+
+
+
+
+
+
 

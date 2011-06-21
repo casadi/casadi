@@ -337,6 +337,9 @@ class Matrix : public PrintableObject{
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;
 
+    /** \brief  Create nodes by their ID */
+/*    static Matrix<T> unary(int op, const Matrix<T> &x);*/
+    
     /** \brief  Unary function */
 #ifndef SWIG
     Matrix<T> unary(T (*fcn)(const T&)) const;
@@ -1086,6 +1089,28 @@ Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{
   temp.unary(fcn,*this);
   return temp;
 }
+
+// template<class T>
+// Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
+//   // Return value
+//   Matrix<T> ret(x.sparsity());
+//   
+//   // Do the operation on all non-zero elements
+//   for(int el=0; el<size(); ++el)
+//     casadi_math<T>::fun[op](x.data()[el],0,ret.data()[el]);
+// 
+//   // Check the value of the structural zero-entries, if there are any
+//   if(!x.dense()){
+//     // Get the value for the structural zeros
+//     T fcn_0;
+//     casadi_math<T>::fun[op](0,0,fcn_0);
+//     if(!casadi_limits<T>::isZero(fcn_0)){
+//       ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+//     }
+//   }
+//     
+//   return ret;
+// }
 
 template<class T>
 void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){

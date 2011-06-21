@@ -94,6 +94,12 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Hessian of output oind with respect to input iind.  */
     FX hessian(int iind, int oind);
     
+    /** \brief  evaluate symbolically, inlining */
+    virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
+
+    /** \brief Expand the matrix valued graph into a scalar valued graph */
+    SXFunction expand();
+
 };
 
 } // namespace CasADi

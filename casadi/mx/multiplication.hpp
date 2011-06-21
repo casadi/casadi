@@ -53,7 +53,10 @@ class Multiplication : public MXNode{
 
     /** \brief  Evaluate sparse-sparse */
     void evaluateSparseSparse(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
-    
+
+    /** \brief  Evaluate symbolically (SX) */
+    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+
     // Check if the arguments are dense
     bool x_dense_, y_dense_;
 
@@ -62,6 +65,8 @@ class Multiplication : public MXNode{
   
     // Create the sparsity pattern for the matrix-matrix product
     std::vector< std::vector< std::pair<int,int> > > prod_map_;
+    
+
 
 };
 

@@ -42,5 +42,49 @@ bool XFunction::checkNode() const{
   return dynamic_cast<const XFunctionInternal*>(get())!=0;
 }
 
+vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
+  // Create result vector with correct sparsity for the result
+  vector<SXMatrix> res(getNumOutputs());
+  for(int i=0; i<res.size(); ++i){
+    res[i] = SXMatrix(output(i).sparsity());
+  }
+  
+  // Evaluate the algorithm
+  (*this)->evaluateSX(arg,res);
+  
+  // Return the result
+  return res;
+}
+
+SXMatrix XFunction::eval(const SXMatrix& arg){
+  return eval(vector<SXMatrix>(1,arg)).at(0);
+}
+
+vector< vector<SX> > XFunction::eval(const vector< vector<SX> >& arg){
+  // Convert input
+  casadi_assert(getNumInputs()==arg.size());
+  vector<SXMatrix> argv(getNumInputs());
+  for(int i=0; i<arg.size(); ++i){
+    casadi_assert(arg[i].size()==input(i).size());
+    argv[i] = SXMatrix(input(i).sparsity(),arg[i]);
+  }
+  
+  // Call the normal eval function
+  vector<SXMatrix> resv = eval(argv);
+  
+  // Convert result to a vector of vectors
+  vector< vector<SX> > res(resv.size());
+  for(int i=0; i<res.size(); ++i){
+    res[i] = resv[i].data();
+  }
+  
+  return res;
+}
+
+vector<SX> XFunction::eval(const vector<SX>& arg){
+  return eval(vector< vector<SX> >(1,arg)).at(0);
+}
+
+
 } // namespace CasADi
 

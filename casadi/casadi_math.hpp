@@ -68,6 +68,17 @@ class BinaryOperation{
     template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ UnaryOperation<I>::der(x,f,d); d[1]=0; }
 };
 
+template<int I>
+class BinaryOperationE{
+  public:
+    /// Function evaluation
+    template<typename T> static T fcn(const T& x, const T& y){ 
+      T ret;
+      BinaryOperation<I>::fcn(x,y,ret);
+      return ret;
+    }
+};
+
 /// Enum for quick access to any node
 enum Operation{
   ADD,  SUB,  MUL,  DIV,
@@ -298,7 +309,8 @@ class casadi_math{
 
     /** \brief Function typedef */
     typedef void (*funT)(const T&, const T&, T&);
-    
+    typedef T (*funTE)(const T&, const T&);
+        
     /** \brief Derivative typedef */
     typedef void (*derT)(const T& x, const T& y, const T& f, T* d);
 
@@ -307,6 +319,7 @@ class casadi_math{
 
     /** \brief Vector of function pointers to all the built in functions */
     static std::vector<funT> fun;
+    static std::vector<funTE> funE;
     
     /** \brief Vector of function derivative pointers to all the built in functions */
     static std::vector<derT> der;
@@ -318,10 +331,10 @@ class casadi_math{
 
     /** \brief Create fun */
     static std::vector<funT> getFun();
+    static std::vector<funTE> getFunE();
   
     /** \brief Create der */
     static std::vector<derT> getDer();
-    
 };
 
 
@@ -332,6 +345,9 @@ std::vector<typename casadi_math<T>::printFunT> casadi_math<T>::print = casadi_m
 
 template<typename T>
 std::vector<typename casadi_math<T>::funT> casadi_math<T>::fun = casadi_math<T>::getFun();
+
+template<typename T>
+std::vector<typename casadi_math<T>::funTE> casadi_math<T>::funE = casadi_math<T>::getFunE();
 
 template<typename T>
 std::vector<typename casadi_math<T>::derT> casadi_math<T>::der = casadi_math<T>::getDer();
@@ -450,6 +466,86 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[ERF] = BinaryOperation<ERF>::fcn;
   ret[FMIN] = BinaryOperation<FMIN>::fcn;
   ret[FMAX] = BinaryOperation<FMAX>::fcn;
+  
+#endif // _MSC_VER
+
+  // Make sure that all functions were specified
+  for(int i=0; i<ret.size(); ++i){
+    casadi_assert(ret[i]!=0);
+  }
+  
+  return ret;
+}
+
+template<typename T>
+std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
+  
+  // Create return object
+  std::vector<typename casadi_math<T>::funTE> ret(NUM_BUILT_IN_OPS,0);
+  
+#ifdef _MSC_VER
+  // Specify operations
+  ret[ADD] = reinterpret_cast<funT>(BinaryOperationE<ADD>::fcn);
+  ret[SUB] = reinterpret_cast<funT>(BinaryOperationE<SUB>::fcn);
+  ret[MUL] = reinterpret_cast<funT>(BinaryOperationE<MUL>::fcn);
+  ret[DIV] = reinterpret_cast<funT>(BinaryOperationE<DIV>::fcn);
+    
+  ret[NEG] = reinterpret_cast<funT>(BinaryOperationE<NEG>::fcn);
+  ret[EXP] = reinterpret_cast<funT>(BinaryOperationE<EXP>::fcn);
+  ret[LOG] = reinterpret_cast<funT>(BinaryOperationE<LOG>::fcn);
+  ret[POW] = reinterpret_cast<funT>(BinaryOperationE<POW>::fcn);
+  ret[CONSTPOW] = reinterpret_cast<funT>(BinaryOperationE<CONSTPOW>::fcn);
+
+  ret[SQRT] = reinterpret_cast<funT>(BinaryOperationE<SQRT>::fcn);
+  ret[SIN] = reinterpret_cast<funT>(BinaryOperationE<SIN>::fcn);
+  ret[COS] = reinterpret_cast<funT>(BinaryOperationE<COS>::fcn);
+  ret[TAN] = reinterpret_cast<funT>(BinaryOperationE<TAN>::fcn);
+
+  ret[ASIN] = reinterpret_cast<funT>(BinaryOperationE<ASIN>::fcn);
+  ret[ACOS] = reinterpret_cast<funT>(BinaryOperationE<ACOS>::fcn);
+  ret[ATAN] = reinterpret_cast<funT>(BinaryOperationE<ATAN>::fcn);
+
+  ret[STEP] = reinterpret_cast<funT>(BinaryOperationE<STEP>::fcn);
+  ret[FLOOR] = reinterpret_cast<funT>(BinaryOperationE<FLOOR>::fcn);
+  ret[CEIL] = reinterpret_cast<funT>(BinaryOperationE<CEIL>::fcn);
+
+  ret[EQUALITY] = reinterpret_cast<funT>(BinaryOperationE<EQUALITY>::fcn);
+
+  ret[ERF] = reinterpret_cast<funT>(BinaryOperationE<ERF>::fcn);
+  ret[FMIN] = reinterpret_cast<funT>(BinaryOperationE<FMIN>::fcn);
+  ret[FMAX] = reinterpret_cast<funT>(BinaryOperationE<FMAX>::fcn);
+#else // _MSC_VER
+  
+  // Specify operations
+  ret[ADD] = BinaryOperationE<ADD>::fcn;
+  ret[SUB] = BinaryOperationE<SUB>::fcn;
+  ret[MUL] = BinaryOperationE<MUL>::fcn;
+  ret[DIV] = BinaryOperationE<DIV>::fcn;
+    
+  ret[NEG] = BinaryOperationE<NEG>::fcn;
+  ret[EXP] = BinaryOperationE<EXP>::fcn;
+  ret[LOG] = BinaryOperationE<LOG>::fcn;
+  ret[POW] = BinaryOperationE<POW>::fcn;
+  ret[CONSTPOW] = BinaryOperationE<CONSTPOW>::fcn;
+
+  ret[SQRT] = BinaryOperationE<SQRT>::fcn;
+  ret[SIN] = BinaryOperationE<SIN>::fcn;
+  ret[COS] = BinaryOperationE<COS>::fcn;
+  ret[TAN] = BinaryOperationE<TAN>::fcn;
+
+  ret[ASIN] = BinaryOperationE<ASIN>::fcn;
+  ret[ACOS] = BinaryOperationE<ACOS>::fcn;
+  ret[ATAN] = BinaryOperationE<ATAN>::fcn;
+
+  ret[STEP] = BinaryOperationE<STEP>::fcn;
+  ret[FLOOR] = BinaryOperationE<FLOOR>::fcn;
+  ret[CEIL] = BinaryOperationE<CEIL>::fcn;
+
+  ret[EQUALITY] = BinaryOperationE<EQUALITY>::fcn;
+
+  ret[ERF] = BinaryOperationE<ERF>::fcn;
+  ret[FMIN] = BinaryOperationE<FMIN>::fcn;
+  ret[FMAX] = BinaryOperationE<FMAX>::fcn;
   
 #endif // _MSC_VER
 

@@ -56,6 +56,8 @@ class XFunctionInternal : public FXInternal{
     template<typename Node>
     static void resort_postpone(std::vector<Node*>& algnodes, std::vector<int>& lind);
   
+    /** \brief  evaluate symbolically */
+    virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false)=0;
 };
 
 // Template implementations

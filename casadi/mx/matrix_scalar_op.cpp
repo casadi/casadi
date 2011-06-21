@@ -90,5 +90,13 @@ MX MatrixScalarOp::adFwd(const std::vector<MX>& jx){
   return MX();
 }
 
+void MatrixScalarOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  SXMatrix r;
+  r.binary(casadi_math<SX>::funE[op],*input[0],*input[1]);
+  casadi_assert(output.sparsity()==r.sparsity());
+  output.set(r);
+}
+
+
 } // namespace CasADi
 

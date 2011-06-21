@@ -53,6 +53,12 @@ bool MXConstant::isConstant() const{
   return true;
 }
 
+void MXConstant::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  SXMatrix r(x_);
+  casadi_assert(output.sparsity()==r.sparsity());
+  output.set(r);
+}
+
 
 } // namespace CasADi
 

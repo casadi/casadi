@@ -67,6 +67,9 @@ class Mapping : public MXNode{
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
 
+    /** \brief  Evaluate symbolically (SX) */
+    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+
   protected:
     
     /// Check if the mapping is ready

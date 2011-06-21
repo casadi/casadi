@@ -75,68 +75,6 @@ SXFunctionInternal* SXFunction::operator->(){
   return (SXFunctionInternal*)FX::operator->();
 }
 
-vector<SXMatrix> SXFunction::eval(const vector<SXMatrix>& arg){
-  vector<SXMatrix> argv = (*this)->inputv;
-  if(arg.size() != argv.size()) {
-      stringstream ss;
-      ss << "SXFunction::eval: wrong number of inputs." << endl;
-      ss << "Expecting (" << argv.size() << " ), got (" << arg.size() << " ) instead." << endl;
-      throw CasadiException(ss.str());
-  }
-  for(int i=0; i<arg.size(); ++i){
-    if(arg[i].size() != argv[i].size()) {
-      stringstream ss;
-      ss << "SXFunction::eval: wrong number of non-zeros for argument number " << i << "."<< endl;
-      ss << "Expecting " << argv[i].dimString() << ", got " << arg[i].dimString() << " instead." << endl;
-      throw CasadiException(ss.str());
-    }
-  }
-  vector<SXMatrix> res = (*this)->outputv;
-  (*this)->evaluateSX(arg,res);
-  return res;
-}
-
-SXMatrix SXFunction::eval(const SXMatrix& arg){
-  return eval(vector<SXMatrix>(1,arg)).at(0);
-}
-
-vector< vector<SX> > SXFunction::eval(const vector< vector<SX> >& arg){
-  // Convert input
-  vector<SXMatrix> argv = (*this)->inputv;
-  if(arg.size() != argv.size()) {
-      stringstream ss;
-      ss << "SXFunction::eval: wrong number of inputs." << endl;
-      ss << "Expecting (" << argv.size() << " ), got (" << arg.size() << " ) instead." << endl;
-      throw CasadiException(ss.str());
-  }
-  for(int i=0; i<arg.size(); ++i){
-    if(arg[i].size() != argv[i].size()) {
-      stringstream ss;
-      ss << "SXFunction::eval: wrong number of non-zeros for argument number " << i << "."<< endl;
-      ss << "Expecting ("  << argv[i].size() << " ), got (" << arg[i].size() <<  " ) instead." << endl;
-      throw CasadiException(ss.str());
-    }
-    
-    // Copy the non-zeros
-    copy(arg[i].begin(),arg[i].end(),argv[i].begin());
-  }
-  
-  // Evaluate
-  vector<SXMatrix> resv = eval(argv);
-  
-  // Convert result
-  vector< vector<SX> > res(resv.size());
-  for(int i=0; i<res.size(); ++i){
-    res[i] = resv[i].data();
-  }
-  
-  return res;
-}
-
-vector<SX> SXFunction::eval(const vector<SX>& arg){
-  return eval(vector< vector<SX> >(1,arg)).at(0);
-}
-
 SXFunction SXFunction::jacobian(int iind, int oind){
   return shared_cast<SXFunction>(FX::jacobian(iind,oind));  
 }

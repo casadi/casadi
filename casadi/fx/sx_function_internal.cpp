@@ -911,6 +911,12 @@ FX SXFunctionInternal::hessian(int iind, int oind){
 }
 
 void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s, bool eliminate_constants){
+  casadi_assert_message(inputv.size() == input_s.size(),"SXFunctionInternal::evaluateSX: wrong number of inputs");
+  for(int i=0; i<inputv.size(); ++i){
+    casadi_assert_message(input_s[i].size()==inputv[i].size(), "SXFunctionInternal::evaluateSX: argument nonzero number does not match");
+    // casadi_assert_message(input_s[i].sparsity()==inputv[i].sparsity(), "SXFunctionInternal::evaluateSX: argument sparsity does not match");
+  }
+  
   // Assert input dimension
   assert(input_.size() == input_s.size());
   
