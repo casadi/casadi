@@ -2,7 +2,6 @@
 * This example looks at symbolic substitution is SX graphs
 *
 * <a href="SX/generateCode.pdf">View output (PDF)</a>
-* \include 
 *
 * \example SX/generateCode.py
 * \include SX/generateCode.txt

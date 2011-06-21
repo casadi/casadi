@@ -91,6 +91,24 @@ MX horzcat(const MX& a, const MX& b){
   return horzcat(ab);
 }
 
+MX veccat(const vector<MX>& comp) {
+  return vertcat(applymap(vecNZ,comp));
+}
+
+vector<MX> applymap(MX (*f)(const MX&) ,const vector<MX>& comp) {
+  vector<MX> ret(comp.size());
+  for (int k=0;k<comp.size();k++) {
+    ret[k] = f(comp[k]);
+  }
+  return ret;
+}
+
+void applymap(void (*f)(MX&), vector<MX>& comp) {
+  for (int k=0;k<comp.size();k++) {
+    f(comp[k]);
+  }
+}
+
 MX norm_2(const MX &x){
   MX ret;
   ret.assignNode(new Norm2(x));
@@ -196,6 +214,14 @@ MX vec(const MX &x) {
   return reshape(x,x.numel(),1);
 }
 
+MX vecNZ(const MX &x) {
+  // Create a mapping
+  MX ret;
+  ret.assignNode(new Mapping(CRSSparsity(x.size(),1,true)));
+  ret->addDependency(x,range(x.size()));
+  return ret;
+}
+
 MX if_else_zero(const MX &cond, const MX &if_true){
   MX ret;
   ret.assignNode(new IfNode(cond,if_true));
@@ -298,6 +324,55 @@ void makeDense(MX& x){
   
   // Densify
   x = MX::create(new Densification(x));
+}
+
+MX createParent(std::vector<MX> &deps) {
+  // First check if arguments are symbolic
+  for (int k=0;k<deps.size();k++) {
+    if (!isSymbolic(deps[k])) throw CasadiException("createParent: the argumenst must be pure symbolic");
+  }
+  
+  // Collect the sizes of the depenencies
+  std::vector<int> index(deps.size()+1,0);
+  for (int k=0;k<deps.size();k++) {
+    index[k+1] =  index[k] + deps[k].size();
+  }
+  
+  // Create the parent
+  MX P("P",index[deps.size()],1);
+  
+  // Make the arguments dependent on the parent
+  for (int k=0;k<deps.size();k++) {
+    deps[k] = reshape(P(range(index[k],index[k+1])),deps[k].sparsity());
+  }
+  
+  return P;
+}
+
+std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps) {
+  // Collect the sizes of the depenencies
+  std::vector<int> index(deps.size()+1,0);
+  for (int k=0;k<deps.size();k++) {
+    index[k+1] =  index[k] + deps[k].size();
+  }
+  
+  // Create the parent
+  MX P("P",index[deps.size()],1);
+  
+  std::vector<MX> ret(deps.size());
+  
+  // Make the arguments dependent on the parent
+  for (int k=0;k<deps.size();k++) {
+    ret[k] =  reshape(P(range(index[k],index[k+1])),deps[k]);
+  }
+  
+  return std::pair< MX, std::vector<MX> > (P,ret);
+}
+
+std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
+  std::vector<MX> ret(deps);
+  MX P = createParent(ret);
+  return std::pair< MX, std::vector<MX> > (P,ret);
 }
 
 

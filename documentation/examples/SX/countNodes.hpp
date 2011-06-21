@@ -2,7 +2,6 @@
 * This example looks at the countNodes method
 *
 * <a href="SX/countNodes.pdf">View output (PDF)</a>
-* \include 
 *
 * \example SX/countNodes.py
 *

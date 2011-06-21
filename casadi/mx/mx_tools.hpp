@@ -33,12 +33,27 @@ MX vertcat(const std::vector<MX>& comp);
 /** \brief  concatenate horizontally */
 MX horzcat(const std::vector<MX>& comp);
 
+/** \brief  concatenate vertically while vectorizing all arguments with getNZ */
+MX veccat(const std::vector<MX>& comp);
+
 #ifndef SWIG
 /** \brief  concatenate vertically, two matrices */
 MX vertcat(const MX& a, const MX& b);
 
 /** \brief  concatenate horizontally, two matrices */
 MX horzcat(const MX& a, const MX& b);
+#endif // SWIG
+
+#ifndef SWIG
+/**
+Apply a function f to each element in a vector
+*/
+std::vector<MX> applymap(MX (*f)(const MX& ),const std::vector<MX>&);
+
+/**
+Apply a function f to each element in a vector
+*/
+void applymap(void (*f)(MX&), std::vector<MX>&);
 #endif // SWIG
 
 /** \brief  Take the 2-norm of a MX
@@ -103,6 +118,10 @@ MX reshape(const MX &x, const CRSSparsity& sp);
 */
 MX vec(const MX &x);
 
+/** \brief Returns a flattened version of the MX, preserving only nonzeros
+*/
+MX vecNZ(const MX &x);
+
 /** \brief  Unite two matrices no overlapping sparsity */
 MX unite(const MX& A, const MX& B);
 
@@ -131,7 +150,29 @@ MX lift(const MX& x);
 /** \brief  Make the matrix dense */
 void makeDense(MX& x);
 
+/** \brief  Create a parent MX on which all given MX's will depend.
+
+ In some sense, this function is the inverse of 
+ 
+ \param deps  Must all be symbolic matrices.
+ */
+MX createParent(std::vector<MX> &deps);
+
+/** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
+ */
+std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps);
+
+
+/** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
+ */
+std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps);
 
 } // namespace CasADi
+
+#ifdef SWIG
+// Template instantiations
+%template(Pair_MX_MXVector) std::pair<CasADi::MX, std::vector<CasADi::MX> >;
+#endif // SWIG
+
 
 #endif // MX_TOOLS_HPP

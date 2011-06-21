@@ -1,8 +1,7 @@
 /** 
 * This example looks at the jacSparsity method
 *
-* <a href="SX/jacSparsity.pdf">View output (PDF)</a>
-* \include 
+* <a href="SX/jacSparsity.pdf">View output (PDF)</a> 
 *
 * \example SX/jacSparsity.py
 *
