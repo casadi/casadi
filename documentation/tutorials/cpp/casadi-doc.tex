@@ -463,7 +463,7 @@ In the following piece of code we show how easy it is to solve ODEs with quadrat
 \par
 \codebegin
 \begin{verbatim}
-     1  SX t; SX u; SX s; SX v; SX m;
+     1  SX t("t"); SX u("u"); SX s("s"); SX v("v"); SX m("m");
      2  vector<SX> ode(3);
      3  ode[0] = v;
      4  ode[1] = (u - 0.02 * v * v) / m;
