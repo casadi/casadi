@@ -1,7 +1,6 @@
 #! expand
 #!======================
 from casadi import *
-from numpy import *
 import casadi as c
 
 #! We construct a simple MX expression

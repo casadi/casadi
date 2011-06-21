@@ -60,6 +60,10 @@ MX::MX(const string& name, int n, int m){
   assignNode(new SymbolicMatrix(name,n,m));
 }
 
+MX::MX(const std::string& name,const std::pair<int,int> &nm) {
+  assignNode(new SymbolicMatrix(name,nm.first,nm.second));
+}
+
 MX::MX(const string& name, const CRSSparsity & sp){
   assignNode(new SymbolicMatrix(name,sp));
 }

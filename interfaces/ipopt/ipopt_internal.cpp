@@ -217,14 +217,18 @@ void IpoptInternal::init(){
   if(!G_.isNull()) G_.init();
   n_ = F_.input(0).numel();
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
-
-  // Call the init method of the base class
-  NLPSolverInternal::init();
   
   int n=0;
   int m=0;
+  
+  pn_=0;
+  pm_=0;
+  
+  int pn=0;
+  int pm=0;
+  
   // Basic sanity checks
-  casadi_assert_message(F_.getNumInputs()>=1, "Wrong number of input arguments to F");
+  casadi_assert_message(F_.getNumInputs()==1 or F_.getNumInputs()==2, "Wrong number of input arguments to F. Must ");
   casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
   casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
   
@@ -257,6 +261,8 @@ void IpoptInternal::init(){
     casadi_assert_message(GF_.output().size2()==n,"Inconsistent dimensions");
   }
   
+
+  
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){
     J_ = G_.jacobian();
@@ -264,6 +270,39 @@ void IpoptInternal::init(){
   if(!J_.isNull()) J_.init();
   if(!H_.isNull()) H_.init();
   if(!GF_.isNull()) GF_.init();
+  
+  // Check if any of the functions have a second argument (i.e. to pass parameters)
+  std::vector<FX> functions;
+  functions.push_back(F_);
+  functions.push_back(G_);
+  functions.push_back(H_);
+  functions.push_back(J_);
+  functions.push_back(GF_);
+  
+  for (int k=0;k<functions.size();k++) {
+    const FX &f = functions[k];
+    if (f.isNull()) continue;
+    if (f.getNumInputs()!=2) continue;
+    pn = f.input(1).size1();
+    pm = f.input(1).size1();
+    
+    if (pn==0 or pm==0)
+     continue;
+    
+    if ((pn!=pn_ || pm!=pm_) && pn_!=0 && pm_!=0) {
+      stringstream s;
+      s << "One of your supplied functions had a second input argument, which was interpreted as a parameter of shape (" << pn_ << "x" << pm_ << ")." << std::endl;
+      s << "However, another function had a second input argument of shape (" << pn << "x" << pm << ")." << std::endl;
+      s << "This is inconsistent." << std::endl;
+      throw CasadiException(s.str());
+    }
+    pn_ = pn;
+    pm_ = pm;
+
+  }
+  
+  // Call the init method of the base class
+  NLPSolverInternal::init();
   
     // Start the application
   app = new Ipopt::IpoptApplication();
@@ -312,6 +351,24 @@ void IpoptInternal::init(){
 
 void IpoptInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
+
+
+  // Set the static parameter
+  if (!F_.isNull()) {
+    if (F_.getNumInputs()==2) F_.setInput(input(NLP_P),1);
+  }
+  if (!G_.isNull()) {
+    if (G_.getNumInputs()==2) G_.setInput(input(NLP_P),1);
+  }
+  if (!H_.isNull()) {
+    if (H_.getNumInputs()==4) H_.setInput(input(NLP_P),1);
+  }
+  if (!J_.isNull()) {
+    if (J_.getNumInputs()==2) J_.setInput(input(NLP_P),1);
+  }
+  if (!GF_.isNull()) {
+    if (GF_.getNumInputs()==2) GF_.setInput(input(NLP_P),1);
+  }
 
   // Reset the counters
   t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = 0;
@@ -396,8 +453,8 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     } else {
       // Pass input
       H_.setInput(x);
-      H_.setInput(lambda,1);
-      H_.setInput(obj_factor,2);
+      H_.setInput(lambda,H_.getNumInputs()==4? 2 : 1);
+      H_.setInput(obj_factor,H_.getNumInputs()==4? 3 : 2);
 
       // Evaluate
       H_.evaluate();
@@ -469,7 +526,7 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
 
     // Pass the argument to the function
     F_.setInput(x);
-
+      
     // Evaluate the function
     F_.evaluate();
 

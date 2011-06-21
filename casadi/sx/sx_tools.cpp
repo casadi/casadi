@@ -630,6 +630,10 @@ Matrix<SX> symbolic(const std::string& name, int n, int m){
   return ret;
 }
 
+Matrix<SX> symbolic(const std::string& name, const std::pair<int,int> & nm) {
+  return symbolic(name,nm.first,nm.second);
+}
+
 Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp){
   // Create a matrix
   Matrix<SX> ret(sp);

@@ -26,6 +26,7 @@ examples_indoc_cpp:
 	python internal/test_cpp.py '../documentation/examples'
 	
 examples_code_cpp:
+	cd ../build && make && cd ../test
 	python internal/test_bin.py '../build/bin'
 
 examples_indoc_oct:

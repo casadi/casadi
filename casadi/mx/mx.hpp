@@ -95,6 +95,9 @@ class MX : public SharedObject{
     explicit MX(const std::string& name, int n=1, int m=1);
 
     /** \brief  Construct a symbolic matrix (matrix variable) */
+    explicit MX(const std::string& name, const std::pair<int,int> &nm);
+
+    /** \brief  Construct a symbolic matrix (matrix variable) */
     explicit MX(const std::string& name, const CRSSparsity & sp);
     
     /** \brief  Create scalar constant (also implicit type conversion) */

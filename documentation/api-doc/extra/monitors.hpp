@@ -1,3 +1,19 @@
+/** \class CasADi::Sundials::KinsolInternal
+List of available monitors
+<table>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_djac</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+</table>
+*/
+/** \class CasADi::Sundials::KinsolSolver
+List of available monitors
+<table>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_djac</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IpoptInternal
 List of available monitors
 <table>
@@ -50,5 +66,19 @@ List of available monitors
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>IdasInternal::correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>IdasInternal::res</td><td>CasADi::Sundials::IdasInternal</td></tr>
+</table>
+*/
+/** \class CasADi::GSL::GslInternal
+List of available monitors
+<table>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>GslInternal::reset</td><td>CasADi::GSL::GslInternal</td></tr>
+</table>
+*/
+/** \class CasADi::GSL::GslIntegrator
+List of available monitors
+<table>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>GslInternal::reset</td><td>CasADi::GSL::GslInternal</td></tr>
 </table>
 */

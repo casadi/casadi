@@ -31,6 +31,8 @@ NLPSolverInternal::NLPSolverInternal(){
   
   n_ = 0;
   m_ = 0;
+  pn_ = 0;
+  pm_ = 0;
 }
 
 NLPSolverInternal::~NLPSolverInternal(){
@@ -44,6 +46,7 @@ void NLPSolverInternal::init(){
   input(NLP_LBG)         = DMatrix(m_,1,0);
   input(NLP_UBG)         = DMatrix(m_,1,0);
   input(NLP_LAMBDA_INIT) = DMatrix(m_,1,0);
+  input(NLP_P)           = DMatrix(pn_,pm_,0);
   
   // Allocate space for outputs
   output_.resize(NLP_NUM_OUT);

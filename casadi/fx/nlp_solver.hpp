@@ -41,6 +41,8 @@ NLP_LBG,
 NLP_UBG,
 /// Lambda multipliers initial guess
 NLP_LAMBDA_INIT,
+/// Static parameters on which the objective and constraints might depend
+NLP_P,
 NLP_NUM_IN};
 
 /// Outputs arguments of an NLP Solver

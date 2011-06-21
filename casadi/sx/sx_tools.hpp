@@ -56,6 +56,9 @@ void make_symbolic(std::vector< A >& v, const std::string& name){
 /** \brief Create an n-by-m matrix with symbolic variables */
 Matrix<SX> symbolic(const std::string& name, int n=1, int m=1);
 
+/** \brief Create an n-by-m matrix with symbolic variables */
+Matrix<SX> symbolic(const std::string& name, const std::pair<int,int> & nm); 
+
 /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
 std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p);
 

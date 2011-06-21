@@ -42,7 +42,9 @@ public:
 
 protected:
   int n_,m_;
-
+  
+  int pn_,pm_; // (n x m) parameterspace
+  
 };
 
 } // namespace CasADi

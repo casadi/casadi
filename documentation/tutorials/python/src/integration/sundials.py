@@ -80,8 +80,8 @@ show()
 #! We demonstrate method B:
 sim=Simulator(integrator,ts)
 sim.init()
-sim.input(SIMULATOR_X0).set([x0,y0])
-sim.input(SIMULATOR_P).set(0)
+sim.input(INTEGRATOR_X0).set([x0,y0])
+sim.input(INTEGRATOR_P).set(0)
 sim.evaluate()
 
 sol2 = sim.output().toArray()
