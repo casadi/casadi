@@ -70,6 +70,9 @@ class Mapping : public MXNode{
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
 
+    /** \brief access the nzind_ data member */
+    const std::vector<int> & getNZind() const;
+    
   protected:
     
     /// Check if the mapping is ready

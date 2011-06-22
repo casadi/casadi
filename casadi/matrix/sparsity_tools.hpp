@@ -28,6 +28,16 @@
 namespace CasADi{
 
 /**
+ Create a dense rectangular sparsity pattern
+**/
+CRSSparsity sp_dense(int n, int m=1);
+
+/**
+ Create a sparse rectangular sparsity pattern
+**/
+CRSSparsity sp_sparse(int n, int m=1);
+
+/**
  Create an upper triangular square sparsity pattern
 **/
 CRSSparsity sp_tril(int n);

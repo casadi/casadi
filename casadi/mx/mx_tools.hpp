@@ -167,6 +167,13 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps);
  */
 std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps);
 
+/** \brief  Creates an IMatrix that represents the mapping of a Mapping node
+*
+*
+*/
+Matrix<int> mapping(const MX& x);
+
+
 } // namespace CasADi
 
 #ifdef SWIG

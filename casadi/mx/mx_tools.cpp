@@ -375,6 +375,15 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
   return std::pair< MX, std::vector<MX> > (P,ret);
 }
 
+Matrix<int> mapping(const MX& x) {
+  if (!x->isMapping()) throw CasadiException("mapping: argument MX should point to a Mapping node");
+  if (!x->ndep()==1) throw CasadiException("mapping: argument MX should be a Mapping with one depency only");
+
+  const Mapping * const m = dynamic_cast<const Mapping* const>(x.get());
+  
+  return Matrix<int>(m->sparsity(),m->getNZind());
+}
+
 
 } // namespace CasADi
 

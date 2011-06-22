@@ -251,6 +251,7 @@ class Matrix : public PrintableObject{
     const Matrix<T> getNZ(int k) const;
     const Matrix<T> getNZ(const std::vector<int>& k) const;
     const Matrix<T> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
+    const Matrix<T> getNZ(const Matrix<int>& k) const;
     //@}
     
     //@{
@@ -258,6 +259,7 @@ class Matrix : public PrintableObject{
     void setNZ(int k, const Matrix<T>& m);
     void setNZ(const std::vector<int>& k, const Matrix<T>& m);
     void setNZ(const Slice& k, const Matrix<T>& m){ setNZ(k.getAll(size()),m);}
+    void setNZ(const Matrix<int>& k, const Matrix<T>& m);
     //@}
     
 #ifndef SWIG 
@@ -292,6 +294,8 @@ class Matrix : public PrintableObject{
     /// get a non-zero
     const Matrix<T> indexed_one_based(int k) const{ return operator[](k-1);}
     const Matrix<T> indexed_zero_based(int k) const{ return operator[](k);}
+    const Matrix<T> indexed_one_based(const Matrix<int>& k) const{ return operator[](k-1);}
+    const Matrix<T> indexed_zero_based(const Matrix<int>& k) const{ return operator[](k);}
     const Matrix<T> indexed(const Slice &k) const{ return (*this)[k];}
     const Matrix<T> indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
@@ -309,6 +313,8 @@ class Matrix : public PrintableObject{
     void indexed_one_based_assignment(int k, const T & m){ at(k-1) = m;}
     void indexed_zero_based_assignment(int k, const T & m){ at(k) = m;}
     void indexed_assignment(const Slice &k, const Matrix<T>& m){ (*this)[k] = m;}
+    void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<T>& m){ (*this)[k-1] = m;}
+    void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<T>& m){ (*this)[k] = m;}
     void indexed_assignment(const IndexList &k, const Matrix<T>& m){
       (*this)[k.getAll(size())] = m;
     }
@@ -563,12 +569,14 @@ class Matrix : public PrintableObject{
 
 // Typedefs/template initializations
 namespace CasADi{
+  typedef Matrix<int> IMatrix;
   typedef Matrix<double> DMatrix;
   typedef std::vector<Matrix<double> > DMatrixVector;
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 } // namespace CasADi
 
 #ifdef SWIG // SWIG
+%template(IMatrix)             CasADi::Matrix<int>;
 %template(DMatrix)             CasADi::Matrix<double>;
 %template(DMatrixVector)       std::vector<CasADi::Matrix<double> > ;
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
@@ -729,6 +737,15 @@ const Matrix<T> Matrix<T>::getNZ(const std::vector<int>& k) const{
 }
 
 template<class T>
+const Matrix<T> Matrix<T>::getNZ(const Matrix<int>& k) const{
+  Matrix<T> ret(k.sparsity(),0);
+  for(int el=0; el<k.size(); ++el)
+    ret.data()[el] = data()[k.at(el)];
+  
+  return ret;
+}
+
+template<class T>
 void Matrix<T>::setNZ(int k, const Matrix<T>& m){
   if (k<0) k+=size();
   at(k) = m.toScalar();
@@ -751,6 +768,25 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
   }
   for(int k=0; k<kk.size(); ++k)
     data()[kk[k]] = m.data()[k];
+}
+
+template<class T>
+void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
+  if (m.size()==1 && m.numel()==1) {
+    // Allow scalar assignment:
+    // m[:2]=3
+    for(int k=0; k<kk.size(); ++k)
+      data()[kk.at(k)] = m.data()[0];
+    return;
+  }
+  if (kk.size()!=m.size()) {
+    std::stringstream ss;
+    ss << "Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
+    ss << "must match size of rhs (" << m.size() << ")." << std::endl;
+    throw CasadiException(ss.str());
+  }
+  for(int k=0; k<kk.size(); ++k)
+    data()[kk.at(k)] = m.data()[k];
 }
 
 template<class T>

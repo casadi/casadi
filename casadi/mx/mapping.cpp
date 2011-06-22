@@ -242,6 +242,9 @@ void Mapping::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
   }
 }
 
+const std::vector<int> & Mapping::getNZind() const {
+  return nzind_;
+}
 
 
 // MX Mapping::eval(const std::vector<MX>& x){

@@ -27,6 +27,14 @@ using namespace std;
 
 namespace CasADi{
   
+CRSSparsity sp_dense(int n, int m) {
+  return CRSSparsity(n,m,true);
+}
+
+CRSSparsity sp_sparse(int n, int m) {
+  return CRSSparsity(n,m,false);
+}
+
 CRSSparsity sp_tril(int n) {
   if (n<0)
     throw CasadiException("sp_tril expects a positive integer as argument");
