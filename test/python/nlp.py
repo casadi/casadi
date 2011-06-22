@@ -383,7 +383,7 @@ class NLPtests(casadiTestCase):
     solver.init()
     solver.output().set(6)
     solver.solve()
-    self.assertAlmostEqual(solver.output()[0],2*pi,6)
+    self.assertAlmostEqual(solver.output()[0],2*pi,5)
 
   def testKINSol2(self):
     self.message("Scalar KINSol problem, n=1")
@@ -414,7 +414,7 @@ class NLPtests(casadiTestCase):
     solver.init()
     solver.output().set(-6)
     solver.solve()
-    self.assertAlmostEqual(solver.output()[0],-2*pi,6)
+    self.assertAlmostEqual(solver.output()[0],-2*pi,5)
     
 if __name__ == '__main__':
     unittest.main()
