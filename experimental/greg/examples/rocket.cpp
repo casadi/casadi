@@ -25,7 +25,7 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/sx/sx_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
-//#include <casadi/fx/jacobian.hpp>
+#include <casadi/fx/jacobian.hpp>
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 
@@ -68,7 +68,7 @@ main()
 
 	Ocp ocp;
 	SX tEnd = ocp.addParam("tEnd");
-	MultipleShooting & ms = ocp.addMultipleShooting("rocket", ode, 0, tEnd, 60);
+	MultipleShooting & ms = ocp.addMultipleShooting("rocket", ode, 0, tEnd, 80);
 
 	ocp.objFun = tEnd;
 
@@ -96,19 +96,36 @@ main()
 	ms.boundStateAction("v", 0, 0, 0);
 	ms.boundStateAction("v", 0, 0, ms.N-1);
 
+	// hessian
+	SXMatrix sigma = create_symbolic("sigma", 1);
+	SXMatrix lambda = create_symbolic("lambda", ocp.g.size1());
+	SX lagrangian = sigma.at(0)*ocp.objFun;
+	for (int k=0; k<ocp.g.size1(); k++)
+		lagrangian += lambda.at(k)*ocp.g.at(k);
+
+	SXMatrix h = hessian(lagrangian, ocp.designVariables);
+
+	vector<SXMatrix> inputs(3);
+	inputs[0] = ocp.designVariables;
+	inputs[1] = lambda;
+	inputs[2] = sigma;
 
 	// Create the NLP solver
 	SXFunction ffcn(ocp.designVariables, ocp.objFun); // objective function
 	SXFunction gfcn(ocp.designVariables, ocp.g); // constraint
+	SXFunction hfcn(inputs, h); // hessian
+
 	gfcn.setOption("ad_mode","reverse");
 	gfcn.setOption("symbolic_jacobian",false);
 
-	IpoptSolver solver(ffcn,gfcn);
+	//IpoptSolver solver(ffcn,gfcn);
 	//IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
+	IpoptSolver solver( ffcn, gfcn, hfcn,  FX());
 
 	// Set options
 	solver.setOption("tol",1e-8);
-	solver.setOption("hessian_approximation","limited-memory");
+	//solver.setOption("hessian_approximation","limited-memory");
+	solver.setOption("hessian_approximation","exact");
 
 	// initialize the solver
 	solver.init();
