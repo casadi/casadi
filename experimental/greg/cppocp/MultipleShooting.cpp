@@ -67,6 +67,14 @@ SX MultipleShooting::getOutput(string o, int timeStep)
 	SX tk = t0 + timeStep*dt;
 	
 	map<string,SX> output = ode.getOutputFromDxdt( xk, uk, params, tk );
+
+	// make sure output exists
+	map<string, SX>::const_iterator oIter;
+	oIter = output.find(o);
+	if (oIter == output.end()){
+		cerr << "Error - SX MultipleShooting::getOutput(string o, int timeStep) could not find output \"" << o << "\"\n";
+		throw 1;
+	}
 	
 	return output[o];
 }
