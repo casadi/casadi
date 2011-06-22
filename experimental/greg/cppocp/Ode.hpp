@@ -55,6 +55,19 @@ public:
 							  CasADi::SX t0,
 							  CasADi::SX dt);
 
+	CasADi::SXMatrix eulerStep( CasADi::SXMatrix x0Vec,
+								CasADi::SXMatrix u0Vec,
+								std::map<std::string,CasADi::SX> & p,
+								CasADi::SX t0,
+								CasADi::SX dt);
+	
+	CasADi::SXMatrix simpsonsRuleError( CasADi::SXMatrix x0Vec,
+										CasADi::SXMatrix x1Vec,
+										CasADi::SXMatrix u0Vec,
+										CasADi::SXMatrix u1Vec,
+										std::map<std::string,CasADi::SX> & p,
+										CasADi::SX t0,
+										CasADi::SX dt);
 
 	int nx(void);
 	int nu(void);

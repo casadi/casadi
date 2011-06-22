@@ -168,6 +168,25 @@ SXMatrix Ode::rk4Step( SXMatrix x0Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<strin
 	SXMatrix k3 = dxVectorDt( x0Vec + 0.5*dt*k2, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
 	SXMatrix k4 = dxVectorDt( x0Vec +     dt*k3,             u1Vec, p, t0 +     dt );
 	
-	//	return x0Vec + dt*k1; // euler
 	return x0Vec + dt*(k1 + 2*k2 + 2*k3 + k4)/6; // rk4
+}
+
+SXMatrix Ode::eulerStep( SXMatrix x0Vec, SXMatrix u0Vec, map<string,SX> & p, SX t0, SX dt)
+{
+	return x0Vec + dt*dxVectorDt( x0Vec, u0Vec, p, t0 );
+}
+
+
+
+SXMatrix Ode::simpsonsRuleError( SXMatrix x0Vec, SXMatrix x1Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX dt)
+{
+	SXMatrix f0 = dxVectorDt( x0Vec, u0Vec, p, t0          );
+	SXMatrix f1 = dxVectorDt( x1Vec, u1Vec, p, t0 +     dt );
+
+	SXMatrix um = 0.5*( u0Vec + u1Vec );
+	SXMatrix xm = 0.5*( x0Vec + x1Vec ) - 0.125*(f1-f0)*dt;
+
+	SXMatrix fm = dxVectorDt( xm, um, p, t0 + 0.5*dt );
+
+	return x1Vec - x0Vec - dt/6.0*(f0 + 4*fm + f1);
 }

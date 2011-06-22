@@ -90,7 +90,9 @@ SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep)
 	
 	SX tk0 = t0 + timeStep*dt;
 	
-	SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk0, dt);
+	//SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk0, dt);
+	//SXMatrix xErr = x1 - ode.eulerStep( x0, u0, params, tk0, dt);
+	SXMatrix xErr = ode.simpsonsRuleError( x0, x1, u0, u1, params, tk0, dt);
 
 	return xErr;
 }
