@@ -306,12 +306,12 @@ SnoptInterface::run()
 		( strOpt, &Niter, &iPrint, &iSumm, &INFO,
 		  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
 
-        doublereal major_opt_tol = 1e-9;
-        strcpy(strOpt,"Major optimality tolerance");
-        strOpt_len = strlen(strOpt);
-        snsetr_
-                ( strOpt, &major_opt_tol, &iPrint, &iSumm, &INFO,
-                  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
+	doublereal major_opt_tol = 1e-9;
+	strcpy(strOpt,"Major optimality tolerance");
+	strOpt_len = strlen(strOpt);
+	snsetr_
+		( strOpt, &major_opt_tol, &iPrint, &iSumm, &INFO,
+		  cw, &lencw, iw, &leniw, rw, &lenrw, strOpt_len, 8*500 );
                      
 	// integer verifyLevel = 3;
 	// strcpy( strOpt,"Verify level");
