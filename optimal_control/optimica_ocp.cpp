@@ -236,6 +236,8 @@ void OCP::sortType(){
   }
   
   // Assert consistent number of equations and variables
+/*  cout << implicit_var_ << endl;
+  cout << implicit_fcn_ << endl;*/
   casadi_assert(implicit_var_.size() == implicit_fcn_.size());
 }
 

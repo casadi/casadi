@@ -427,6 +427,8 @@ SX FMIParserInternal::readExpr(const XMLNode& node){
     return node.getText();
   } else if(name.compare("LogLt")==0){ // Logical less than
     return readExpr(node[0]) < readExpr(node[1]);
+  } else if(name.compare("LogGt")==0){ // Logical less than
+    return readExpr(node[0]) > readExpr(node[1]);
   } else if(name.compare("Mul")==0){ // Multiplication
     return readExpr(node[0]) * readExpr(node[1]);
   } else if(name.compare("Neg")==0){
