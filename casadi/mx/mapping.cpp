@@ -28,9 +28,8 @@ using namespace std;
 
 namespace CasADi{
 
-Mapping::Mapping(const CRSSparsity& sp){
+Mapping::Mapping(const CRSSparsity& sp) : nzmap_(sp,-1){
   setSparsity(sp);
-  nzind_.resize(sp.size(),-1);
   depind_.resize(sp.size(),-1);
 }
 
@@ -39,6 +38,7 @@ Mapping* Mapping::clone() const{
 }
 
 void Mapping::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  const std::vector<int>& nzind_ = nzmap_.data();
   
   for(int k=0; k<size(); ++k){
     output[k] = input[depind_[k]][nzind_[k]];
@@ -52,6 +52,7 @@ void Mapping::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
 }
 
 bool Mapping::isReady() const{
+  const std::vector<int>& nzind_ = nzmap_.data();
   casadi_assert(depind_.size()==size());
   casadi_assert(nzind_.size()==size());
   for(int k=0; k<size(); ++k){
@@ -64,6 +65,7 @@ bool Mapping::isReady() const{
 
 void Mapping::print(std::ostream &stream, const std::vector<std::string>& args) const{
   casadi_assert(isReady());
+  const std::vector<int>& nzind_ = nzmap_.data();
   
   if(numel()==1 && size()==1 && ndep()==1){
     stream << args[0];
@@ -87,6 +89,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d){
 void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
   casadi_assert(nz_d.size()==nz.size());
   casadi_assert(!d.isNull());
+  const std::vector<int>& nzind_ = nzmap_.data();
   
   // Quick return if no elements
   if(nz_d.empty()) return;
@@ -99,7 +102,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
     vector<vector<int> > nz2(d2.size());
     for(int i=0; i<nz.size(); ++i){
       int depind_i = dnode->depind_.at(nz_d[i]);
-      nz_d2[depind_i].push_back(dnode->nzind_.at(nz_d[i]));
+      nz_d2[depind_i].push_back(dnode->nzmap_.at(nz_d[i]));
       nz2[depind_i].push_back(nz[i]);
     }
     
@@ -125,36 +128,17 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
 
 void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz){
   casadi_assert(nz_d.size()==nz.size());
+  std::vector<int>& nzind_ = nzmap_.data();
   for(int k=0; k<nz.size(); ++k){
     nzind_[nz[k]] = nz_d[k];
     depind_[nz[k]] = depind;
   }
 }
 
-void Mapping::addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j){
-  // Append the new dependency and save its index
-  dep_.push_back(d);
-  //int k = dep_.size()-1;
-  
-  // New non-zero indices
-  std::vector<int> nzind;
-  nzind.reserve(nzind_.size());
-
-  // New dependency index mapping
-  std::vector<int> depind;
-  depind.reserve(depind_.size());
- 
-  // Add the dependencies
-  vector<int> el = sparsity_.getNZ(i,j);
-  
-  // Swap the vectors
-  nzind_.swap(nzind);
-  depind_.swap(depind);
-}
-
 MX Mapping::adFwd(const std::vector<MX>& jx){
   casadi_assert(isReady());
   casadi_assert(size()==numel());
+  const std::vector<int> &nzind_ = nzmap_.data();
 
   // Number of columns
   int ncol = jx.front().size2();
@@ -237,15 +221,11 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
 }
 
 void Mapping::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  const std::vector<int> &nzind_ = nzmap_.data();
   for(int k=0; k<size(); ++k){
     output[k] = (*input[depind_[k]])[nzind_[k]];
   }
 }
-
-const std::vector<int> & Mapping::getNZind() const {
-  return nzind_;
-}
-
 
 // MX Mapping::eval(const std::vector<MX>& x){
 //   

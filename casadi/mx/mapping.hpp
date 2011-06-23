@@ -61,25 +61,17 @@ class Mapping : public MXNode{
     /// Add a dependency
     virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
     
-    /// Add a dependency (indices nz to be placed in (i,j))
-    void addDepend(const MX& d, std::vector<int> nz, std::vector<int> i, std::vector<int> j);
-    
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
-
-    /** \brief access the nzind_ data member */
-    const std::vector<int> & getNZind() const;
-    
-  protected:
     
     /// Check if the mapping is ready
     bool isReady() const;
     
     /// Mapping from the output non-zero to the dependency nonzero index
-    std::vector<int> nzind_;
+    Matrix<int> nzmap_;
 
     /// Mapping from the output non-zero index of the dependency index
     std::vector<int> depind_;
