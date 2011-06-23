@@ -184,6 +184,8 @@ SX SX::div(const SX& y) const{
     return *this;
   else if(node->isEqual(y)) // terms are equal
     return 1;
+  else if(y.isEqual(2) && node->hasDep() && node->getOp()==ADD && node->dep(0).isEqual(node->dep(1)))
+    return node->dep(0);
   else // create a new branch
     return SX(new BinarySXNode(DIV,*this,y));
 }
