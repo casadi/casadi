@@ -139,24 +139,15 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
 }
 
 MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
-  casadi_assert_message(op==SUB || op==ADD, "only addition and subtraction implemented (quick hack)");
-
-/*  std::pow(MX(3),MX(4));
-  std::log(MX(3));*/
-  
-/*  casadi_math<MX>::fun[op];*/
-    
-//   MX res;
-//   BinaryOperation<POW>::fcn(MX(3),MX(4),res);
-
-//   SX res2;
-//   BinaryOperation<POW>::fcn(SX(3),SX(4),res2);
+  casadi_assert_message(op==SUB || op==ADD || op==MUL, "only addition, subtraction and multiplication implemented (quick hack)");
 
   if(op==SUB)
     return jx[0]-jx[1];
-  if(op==ADD)
+  else if(op==ADD)
     return jx[0]+jx[1];
-	
+  else if(op==MUL)
+    return dep(0)*jx[1] + jx[0]*dep(1);
+        
   return MX();
 }
 

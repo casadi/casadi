@@ -55,24 +55,14 @@ F = MXFunction([U],[obj])
 eq = X[0:2]
 G = MXFunction([U],[eq])
 
-# Use the lifted newton method, transforming the single shooting problem to a multiple shooting problem 
-lifted_newton = False
-
 # Allocate NLP solver
 solver = IpoptSolver(F,G)
 solver.setOption("tol",1e-3)
-solver.setOption("constr_viol_tol",1e-3)
-solver.setOption("compl_inf_tol",1e-3)
-solver.setOption("acceptable_tol",1e-3)
-solver.setOption("acceptable_constr_viol_tol",1e-3)
-solver.setOption("acceptable_dual_inf_tol",1e-3)
-solver.setOption("acceptable_dual_inf_tol",1e-3)
-solver.setOption("acceptable_compl_inf_tol",1e-3)
 solver.setOption("hessian_approximation", \
                 "limited-memory")
 solver.setOption("max_iter",1000)
 solver.setOption("linear_solver","ma27")
-solver.setOption("derivative_test","first-order")
+#solver.setOption("derivative_test","first-order")
 #solver.setOption("verbose",True)
   
 # Initialize the NLP solver
