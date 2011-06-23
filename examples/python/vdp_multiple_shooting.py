@@ -161,5 +161,5 @@ plt.plot(l_opt)
 plt.title("l_opt")
 
 
-#plt.show()
+plt.show()
 
