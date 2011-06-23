@@ -16,7 +16,10 @@ rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
 I = CVodesIntegrator(rhs)
 I.setOption("abstol",1e-10) # abs. tolerance
 I.setOption("reltol",1e-10) # rel. tolerance
+I.setOption("fsens_abstol",1e-8) # abs. tolerance
+I.setOption("fsens_reltol",1e-8) # rel. tolerance
 I.setOption("steps_per_checkpoint",1000)
+I.setOption("fsens_err_con",True)
 I.setOption("stop_at_end",True)
 I.setOption("t0",0.0)
 I.setOption("tf",20.0/NS)
@@ -31,12 +34,21 @@ X  = MX([0,1,0])
 # State derivative (not used)
 XP = MX()
 
+# Cost function
+obj = MX(0)
+
 # Build up a graph of integrator calls
 for k in range(NS):
+  # Call the integrator
   [X,XP] = I.call([X,U[k],XP])
-
+  
+  # Add lagrange cost
+  obj += X[2]
+  
+  # Set lagrange cost to zero for the next shooting interval
+  X[2] = 0
+  
 # Objective function: L(T)
-obj = X[2]
 F = MXFunction([U],[obj])
 
 # Terminal constraints: 0<=[x(T);y(T)]<=0
@@ -46,23 +58,22 @@ G = MXFunction([U],[eq])
 # Use the lifted newton method, transforming the single shooting problem to a multiple shooting problem 
 lifted_newton = False
 
-if lifted_newton:
-  # Create a liftopt solver instance
-  solver = LiftoptSolver(F,G) # TODO: debug! 
-  
-  # Set some options
-  solver.setOption("optimizer","sqp")
-  solver.setOption("lifted",True)
-  
-else:
-  # Single shooting
-  solver = IpoptSolver(F,G)
-  solver.setOption("tol",1e-5)
-  solver.setOption("hessian_approximation", \
-                  "limited-memory")
-  solver.setOption("max_iter",1000)
-  solver.setOption("linear_solver","ma57")
-  #solver.setOption("verbose",True)
+# Allocate NLP solver
+solver = IpoptSolver(F,G)
+solver.setOption("tol",1e-3)
+solver.setOption("constr_viol_tol",1e-3)
+solver.setOption("compl_inf_tol",1e-3)
+solver.setOption("acceptable_tol",1e-3)
+solver.setOption("acceptable_constr_viol_tol",1e-3)
+solver.setOption("acceptable_dual_inf_tol",1e-3)
+solver.setOption("acceptable_dual_inf_tol",1e-3)
+solver.setOption("acceptable_compl_inf_tol",1e-3)
+solver.setOption("hessian_approximation", \
+                "limited-memory")
+solver.setOption("max_iter",1000)
+solver.setOption("linear_solver","ma27")
+solver.setOption("derivative_test","first-order")
+#solver.setOption("verbose",True)
   
 # Initialize the NLP solver
 solver.init()
