@@ -61,6 +61,16 @@ public:
   /// Access functions of the node
   LapackLUDenseInternal* operator->();
   const LapackLUDenseInternal* operator->() const;
+  
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static LinearSolver creator(const CRSSparsity& sp){ return LapackLUDense(sp);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
 
 #ifndef SWIG

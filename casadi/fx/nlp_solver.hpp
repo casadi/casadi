@@ -84,6 +84,9 @@ class NLPSolver : public FX{
   virtual bool checkNode() const;
 };
 
+/// Function pointer to a linear solver constructor
+typedef NLPSolver (*NLPSolverCreator)(const FX& F, const FX& G, const FX& H, const FX& J);
+
 } // namespace CasADi
 
 #endif // NLP_SOLVER_HPP

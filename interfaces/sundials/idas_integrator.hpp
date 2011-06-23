@@ -84,6 +84,14 @@ public:
   /// Correct the initial value for yp and z after resetting the solver
   void correctInitialConditions();
 
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static Integrator creator(const FX& f, const FX& q){ return IdasIntegrator(f,q);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
 };
 
 

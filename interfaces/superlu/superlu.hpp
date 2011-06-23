@@ -60,6 +60,16 @@ public:
   /** \brief  Access functions of the node */
   SuperLUInternal* operator->();
   const SuperLUInternal* operator->() const;
+  
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static LinearSolver creator(const CRSSparsity& sp){ return SuperLU(sp);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
 
 } // namespace CasADi

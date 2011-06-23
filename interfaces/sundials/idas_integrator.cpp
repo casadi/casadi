@@ -51,7 +51,6 @@ void IdasIntegrator::correctInitialConditions(){
   (*this)->correctInitialConditions();
 }
 
-
 } // namespace Sundials
 } // namespace CasADi
 

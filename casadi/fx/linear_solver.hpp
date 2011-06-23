@@ -63,6 +63,9 @@ public:
   virtual bool checkNode() const;
 };
 
+/// Function pointer to a linear solver constructor
+typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
+
 } // namespace CasADi
 
 #endif //LINEAR_SOLVER_HPP

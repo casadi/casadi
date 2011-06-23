@@ -64,6 +64,16 @@ public:
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static LinearSolver creator(const CRSSparsity& sp){ return CSparse(sp);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+  
 };
 
   } // namespace Interface
