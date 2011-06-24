@@ -326,6 +326,9 @@ MX MX::operator-() const{
   return unary(NEG,*this);
 }
 
+MX::MX(const MX& x) : SharedObject(x){
+}
+
 const CRSSparsity& MX::sparsity() const{
   return (*this)->sparsity();
 }

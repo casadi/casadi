@@ -1,12 +1,124 @@
 # -*- coding: utf-8 -*-
 from casadi import *
 from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 
 # Excercise 2, chapter 10 from Larry Biegler's book 
 # Joel Andersson, K.U. Leuven 2010
 
 print "program started"
+
+# Time 
+t = SX("t")
+  
+# Differential states
+Ls = SX("Ls")    # mean crystal size
+Nc = SX("Nc")    # number of nuclei per liter of solvent
+L = SX("L")      # total length of crystals per liter of solvent
+Ac = SX("Ac")    # total surface area of the crystals per liter of solvent
+Vc = SX("Vc")    # total volume of the crysals per liter of solvent
+Mc = SX("Mc")    # total mass of the crystals
+Cc = SX("Cc")    # solute concentration
+Tc = SX("Tc")    # cystillizer temperature
+
+# State vector
+x = [Ls, Nc, L, Ac, Vc, Mc, Cc, Tc]
+  
+# Bounds on the states
+x_lb = NP.repeat(-inf,len(x))
+x_ub = NP.repeat( inf,len(x))
+
+# Initial values
+Ls_init = 0.0005
+Nc_init = 0
+L_init = 0
+Ac_init = 0
+Vc_init = 0
+Mc_init = 2.0
+Cc_init = 5.4
+Tc_init = 75
+x_init = NP.array([Ls_init,Nc_init,L_init,Ac_init,Vc_init,Mc_init,Cc_init,Tc_init])
+
+# Controls
+Tj = SX("Tj") # jacket temperature
+Tj_lb = 10;  Tj_ub = 60;  Tj_init = 50
+
+# Constants
+Vs = 300. # volume of the solvent
+W = 2025. # the total mass in the crysallizer
+a = [-66.4309, 2.8604, -0.022579, 6.7117e-5]
+b = [16.08852, -2.708263, 0.0670694, -3.5685e-4]
+Kg = 0.00418
+Bn = 385.
+Cp = 0.4
+Kc = 35.
+Ke = 377.
+eta1 = 1.1
+eta2 = 5.72
+Ls0 = 5e-4 # initial crystal size
+L0 = 5e-5 # nucleate crystal size
+Ws0 = 2. # weight of the seed crystals
+rho = 1.58 # specific gravity of crystals
+alpha = 0.2 # shape factor for area of crystals
+beta = 1.2 # shape factor for volume of crystals
+
+# Time horizon
+tf = 25.
+
+# Dependent variables
+C_bar = 100.*Cc/(1.35+Cc)
+Tequ = a[0] + a[1]*C_bar + a[2]*C_bar*C_bar + a[3]*C_bar*C_bar*C_bar # equilibrium temperature
+Ta = b[0] + b[1]*C_bar + b[2]*C_bar*C_bar + b[3]*C_bar*C_bar*C_bar # lower bound of Tj
+
+# degree of supercooling:
+# DeltaT = fmax(0,Tequ-Tc)   # Original formulation
+# DeltaT = fmax(1e-8,Tequ-Tc) # "epsilon" to avoid divide by zero
+# DeltaT = log(exp(1e-8)+exp(Tequ-Tc))   # Log sum exp
+epsilon = 1e-3
+DD = Tequ-Tc
+DeltaT = (sqrt( DD*DD + epsilon*epsilon )  + DD ) / 2
+
+# Differential equations
+Ls_dot = Kg * sqrt(Ls) * DeltaT**eta1
+Nc_dot = Bn * DeltaT**eta2
+L_dot = Nc * Ls_dot + L0 * Nc_dot
+Ac_dot = 2 * alpha * Nc * Ls_dot + L0**2 * Nc_dot
+Vc_dot = 3 * beta * Ac * Ls_dot + L0**3 * Nc_dot
+Mc_dot = 3 * Ws0/Ls0**3 * Ls**2 * Ls_dot + rho*Vs*Vc_dot
+Cc_dot = -1 / Vs * Mc_dot
+Tc_dot = (Kc*Mc_dot - Ke*(Tc-Tj))/(W*Cp)
+
+# Control vector
+u = [Tj]
+u_init = NP.array([Tj_init])
+u_lb = NP.array([Tj_init])
+u_ub = NP.array([Tj_init])
+#u_lb = [Tj_lb]
+#u_ub = [Tj_ub]
+
+# ODE
+xdot = [Ls_dot, Nc_dot, L_dot, Ac_dot, Vc_dot, Mc_dot, Cc_dot, Tc_dot]
+
+# Right hand side of the ODE
+ffcn = SXFunction([[t],x,u],[xdot])
+ffcn.init()
+  
+# Objective function (meyer term)
+mfcn = SXFunction([[t],x,u],[[-Ls]])
+mfcn.init()
+
+# Nonlinear constraint function
+cfcn = SXFunction([[t],x,u],[[Tj-Ta]])
+cfcn.init()
+
+# Dimensions
+nx = len(x)
+nu = len(u)
+
+
+print "modelling done"
+
 
 # Legendre collocation points
 legendre_points1 = [0,0.500000]
@@ -29,317 +141,241 @@ LEGENDRE = 0
 RADAU = 1
 collocation_points = [legendre_points,radau_points]
 
-# Time 
-t = SX("t")
+# Degree of interpolating polynomial
+K = 3
   
-# Differential states
-Ls = SX("Ls")    # mean crystal size
-Nc = SX("Nc")    # number of nuclei per liter of solvent
-L = SX("L")      # total length of crystals per liter of solvent
-Ac = SX("Ac")    # total surface area of the crystals per liter of solvent
-Vc = SX("Vc")    # total volume of the crysals per liter of solvent
-Mc = SX("Mc")    # total mass of the crystals
-Cc = SX("Cc")    # solute concentration
-Tc = SX("Tc")    # cystillizer temperature
+# Number of finite elements
+N = 30
 
-# State vector
-x = [Ls, Nc, L, Ac, Vc, Mc, Cc, Tc]
+# Radau collocation points
+cp = RADAU
+
+# Size of the finite elements
+h = tf/N
+
+# Coefficients of the collocation equation
+C = (K+1) * [[]]
+
+# Coefficients of the continuity equation
+D = (K+1) * [[]]
+
+# Collocation point
+tau = SX("tau")
   
-# Bounds on the states
-x_lb = len(x) * [-inf]
-x_ub = len(x) * [inf]
+# Roots
+tau_root = collocation_points[cp][K]
 
-# Initial values
-Ls_init = 0.0005
-Nc_init = 0
-L_init = 0
-Ac_init = 0
-Vc_init = 0
-Mc_init = 2.0
-Cc_init = 5.4
-Tc_init = 75
-x_init = [Ls_init,Nc_init,L_init,Ac_init,Vc_init,Mc_init,Cc_init,Tc_init]
+for j in range(K+1):
+  # Lagrange polynomials
+  L = SX(1)
+  for k in range(K+1):
+    if k != j:
+      L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
+  
+    # Lagrange polynomial function
+    lfcn = SXFunction([[tau]],[[L]])
+    lfcn.init()
+    
+    # Get the coefficients of the continuity equation
+    lfcn.setInput(1.0)
+    lfcn.evaluate()
+    D[j] = lfcn.output()[0]
 
-# Controls
-Tj = SX("Tj") # jacket temperature
-Tj_lb = 10;  Tj_ub = 60;  Tj_init = 50
+    # Get the coefficients of the collocation equation
+    C[j] = (K+1) * [[]]
+    for k in range(K+1):
+      lfcn.setInput(tau_root[k])
+      lfcn.setFwdSeed(1.0)
+      lfcn.evaluate(1,0)
+      C[j][k] = lfcn.fwdSens()[0]
 
-for it in range(1):
+# Collocated times
+T = N * [[]]
+for i in range(N):
+  T[i] = (K+1) * [[]]
+  for j in range(K+1):
+    T[i][j] = h*(i + collocation_points[cp][K][j])
 
-    # Control vector
-    u = [Tj]
-    u_init = [Tj_init]
-    if it==0:
-      u_lb = [Tj_init]
-      u_ub = [Tj_init]
+# Total number of variables
+NX = N*(K+1)*nx
+NU = N*nu
+NXF = nx
+NV = NX+NU+NXF
+
+# NLP variable vector
+V = symbolic("V",NV)
+V2 = MX("V",NV)
+
+# Collocated states
+X = []
+X2 = []
+
+# Collocated control (piecewice constant)
+U = []
+U2 = []
+  
+# All variables with bounds and initial guess
+vars_lb = NP.zeros(NV)
+vars_ub = NP.zeros(NV)
+vars_init = NP.zeros(NV)
+vi = 0
+
+# Loop over the finite elements
+for i in range(N):
+  # Parametrized controls
+  U.append(V[vi:vi+nu])
+  U2.append(V2[vi:vi+nu])
+  vars_lb[vi:vi+nu] = u_lb
+  vars_ub[vi:vi+nu] = u_ub
+  vars_init[vi:vi+nu] = u_init
+  vi += nu
+  
+  # Collocated states
+  Xi = []
+  Xi2 = []
+  for j in range(K+1):
+    Xi.append(V[vi:vi+nx])
+    Xi2.append(V2[vi:vi+nx])
+    vars_init[vi:vi+nx] = x_init
+    if i==0 and j==0:
+      vars_lb[vi:vi+nx] = x_init
+      vars_ub[vi:vi+nx] = x_init
     else:
-      u_lb = [Tj_lb]
-      u_ub = [Tj_ub]
-
-    # Constants
-    Vs = 300. # volume of the solvent
-    W = 2025. # the total mass in the crysallizer
-    a = [-66.4309, 2.8604, -0.022579, 6.7117e-5]
-    b = [16.08852, -2.708263, 0.0670694, -3.5685e-4]
-    Kg = 0.00418
-    Bn = 385.
-    Cp = 0.4
-    Kc = 35.
-    Ke = 377.
-    eta1 = 1.1
-    eta2 = 5.72
-    Ls0 = 5e-4 # initial crystal size
-    L0 = 5e-5 # nucleate crystal size
-    Ws0 = 2. # weight of the seed crystals
-    rho = 1.58 # specific gravity of crystals
-    alpha = 0.2 # shape factor for area of crystals
-    beta = 1.2 # shape factor for volume of crystals
-
-    # Time horizon
-    tf = 25.
-
-    # Dependent variables
-    C_bar = 100.*Cc/(1.35+Cc)
-    Tequ = a[0] + a[1]*C_bar + a[2]*C_bar*C_bar + a[3]*C_bar*C_bar*C_bar # equilibrium temperature
-    Ta = b[0] + b[1]*C_bar + b[2]*C_bar*C_bar + b[3]*C_bar*C_bar*C_bar # lower bound of Tj
-
-    # degree of supercooling:
-    # DeltaT = fmax(0,Tequ-Tc)   # Original formulation
-    # DeltaT = fmax(1e-8,Tequ-Tc) # "epsilon" to avoid divide by zero
-    # DeltaT = log(exp(1e-8)+exp(Tequ-Tc))   # Log sum exp
-    epsilon = 1e-3
-    DD = Tequ-Tc
-    DeltaT = (sqrt( DD*DD + epsilon*epsilon )  + DD ) / 2
-
-    # Differential equations
-    Ls_dot = Kg * sqrt(Ls) * DeltaT**eta1
-    Nc_dot = Bn * DeltaT**eta2
-    L_dot = Nc * Ls_dot + L0 * Nc_dot
-    Ac_dot = 2 * alpha * Nc * Ls_dot + L0**2 * Nc_dot
-    Vc_dot = 3 * beta * Ac * Ls_dot + L0**3 * Nc_dot
-    Mc_dot = 3 * Ws0/Ls0**3 * Ls**2 * Ls_dot + rho*Vs*Vc_dot
-    Cc_dot = -1 / Vs * Mc_dot
-    Tc_dot = (Kc*Mc_dot - Ke*(Tc-Tj))/(W*Cp)
-
-    # ODE
-    xdot = [Ls_dot, Nc_dot, L_dot, Ac_dot, Vc_dot, Mc_dot, Cc_dot, Tc_dot]
-
-    # Right hand side of the ODE
-    ffcn = SXFunction([[t],x,u],[xdot])
-      
-    # Objective function (meyer term)
-    mfcn = SXFunction([[t],x,u],[[-Ls]])
-
-    # Nonlinear constraint function
-    cfcn = SXFunction([[t],x,u],[[Tj-Ta]])
-      
-    # Degree of interpolating polynomial
-    K = 3
-      
-    # Number of finite elements
-    N = 30
-
-    # Radau collocation points
-    cp = RADAU
-
-    # Size of the finite elements
-    h = tf/N
-
-    # Coefficients of the collocation equation
-    C = (K+1) * [[]]
-
-    # Coefficients of the continuity equation
-    D = (K+1) * [[]]
-
-    # Collocation point
-    tau = SX("tau")
-      
-    # Roots
-    tau_root = collocation_points[cp][K]
-
-    for j in range(K+1):
-      # Lagrange polynomials
-      L = SX(1)
-      for k in range(K+1):
-        if k != j:
-          L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
-      
-        # Lagrange polynomial function
-        lfcn = SXFunction([[tau]],[[L]])
-        lfcn.init()
+      vars_lb[vi:vi+nx] = x_lb
+      vars_ub[vi:vi+nx] = x_ub
+    vi += nx
         
-        # Get the coefficients of the continuity equation
-        lfcn.setInput(1.0)
-        lfcn.evaluate()
-        D[j] = lfcn.output()[0]
+  X.append(Xi)
+  X2.append(Xi2)
+  
+# State at end time
+XF = V[vi:vi+nx]
+XF2 = V2[vi:vi+nx]
+vars_lb[vi:vi+nx] = x_lb
+vars_ub[vi:vi+nx] = x_ub
+vars_init[vi:vi+nx] = x_init
+vi += nx
+  
+# Constraint function for the NLP
+g = []
+g2 = []
+lbg = []
+ubg = []
 
-        # Get the coefficients of the collocation equation
-        C[j] = (K+1) * [[]]
-        for k in range(K+1):
-          lfcn.setInput(tau_root[k])
-          lfcn.setFwdSeed(1.0)
-          lfcn.evaluate(1,0)
-          C[j][k] = lfcn.fwdSens()[0]
-
-    # Collocated times
-    T = N * [[]]
-    for i in range(N):
-      T[i] = (K+1) * [[]]
-      for j in range(K+1):
-        T[i][j] = h*(i + collocation_points[cp][K][j])
+for i in range(N):
+  for k in range(1,K+1):
+    # augmented state vector
+    y_ik = [[SX(T[i][k])], X[i][k],  U[i]]
+    y_ik2 = [MX(T[i][k]), X2[i][k], U2[i]]
+    
+    # Add collocation equations to NLP
+    [temp] = ffcn.eval(y_ik)
+    [temp2] = ffcn.call(y_ik2)
+    for j in range(temp.size()):
+      temp[j] *= h
+      temp2[j] *= h
+    for j in range (K+1):
+      for l in range(temp.size()):
+        temp[l] -= X[i][j][l]*C[j][k]
+        temp2[l] -= X2[i][j][l]*C[j][k]
       
-    # Collocated states
-    X = create_symbolic("X",N,K+1,len(x))
+    g += [temp]
+    g2 += [temp2]
+    lbg += nx * [0.] # equality constraints
+    ubg += nx * [0.] # equality constraints
       
-    # Collocated control (piecewice constant)
-    U = create_symbolic("U", N, len(u))
-      
-    # State at end time
-    XF = create_symbolic("XF",len(x))
-        
-    # All variables with bounds and initial guess
-    vars = []
-    vars_lb = []
-    vars_ub = []
-    vars_init = []
+    # Add nonlinear constraints
+    [temp] = cfcn.eval(y_ik)
+    [temp2] = cfcn.call(y_ik2)
+    g += [temp]
+    g2 += [temp2]
+    lbg += [0.] # correct!
+    ubg += [inf]
 
-    # Loop over the finite elements
-    for i in range(N):
-      # collocated controls
-      for r in range(len(u)):
-        # Add to list of NLP variables
-        vars.append(U[i][r])
-        vars_lb.append(u_lb[r])
-        vars_ub.append(u_ub[r])
-        vars_init.append(u_init[r])
+  # Add continuity equation to NLP
+  if i<N-1:
+    temp = SXMatrix(X[i+1][0])
+    temp2 = MX(X2[i+1][0])
+  else:
+    temp = SXMatrix(XF)
+    temp2 = MX(XF2)
+    
+  for j in range(K+1):
+    for l in range(nx):
+      temp[l] -= D[j]*X[i][j][l]
+      temp2[l] -= D[j]*X2[i][j][l]
 
-        # Collocated states
-        for j in range(K+1):
-          for r in range(len(x)):
-            # Add to list of NLP variables
-            vars.append(X[i][j][r])
-            vars_init.append(x_init[r])
-            if i==0 and j==0:
-              # Initial constraints
-              vars_lb.append(x_init[r])
-              vars_ub.append(x_init[r])
-            else:
-              # Variable bounds
-              vars_lb.append(x_lb[r])
-              vars_ub.append(x_ub[r])
-      
-    # Add states at end time
-    for r in range(len(x)):
-      vars.append(XF[r])
-      vars_init.append(x_init[r])
-      vars_lb.append(x_lb[r])
-      vars_ub.append(x_ub[r])
-      
-    # Constraint function for the NLP
-    g = []
-    lbg = []
-    ubg = []
+  g += [temp]
+  g2 += [temp2]
+  lbg += nx*[0.]
+  ubg += nx*[0.]
+  
+# Nonlinear constraint function
+g_all = vertcat(g)
+g_all2 = vertcat(g2)
 
-    for i in range(N):
-      for k in range(1,K+1):
-        # augmented state vector
-        y_ik = [[SX(T[i][k])],X[i][k],U[i]]
-        
-        # Add collocation equations to NLP
-        temp = list(ffcn.eval(y_ik)[0])
-        for j in range(len(temp)):
-          temp[j] *= h
-        for j in range (K+1):
-          for l in range(len(temp)):
-            temp[l] -= X[i][j][l]*C[j][k]
-          
-        g += temp
-        lbg += len(x) * [0.] # equality constraints
-        ubg += len(x) * [0.] # equality constraints
-          
-        # Add nonlinear constraints
-        temp = list(cfcn.eval(y_ik)[0])
-        g += temp
-        lbg += [0.] # correct!
-        ubg += [inf]
+gfcn_nlp = SXFunction([V],[g_all])
+gfcn_nlp2 = MXFunction([V2],[g_all2])
+gfcn_nlp2.init()
+gfcn_nlp3 = SXFunction(gfcn_nlp2)
+  
+# Objective function of the NLP
+y_f = [[SX(T[N-1][K])],XF,U[N-1]]
+f = mfcn.eval(y_f)[0][0]
+ffcn_nlp = SXFunction([V], [[f]])
+  
+# Hessian of the Lagrangian:
+# Lagrange multipliers
+lam = create_symbolic("lambda",g_all.size1())
 
-      # Add continuity equation to NLP
-      if i<N-1:
-        temp = list(X[i+1][0])
-      else:
-        temp = list(XF)
-        
-      for j in range(K+1):
-        for l in range(len(x)):
-          temp[l] -= D[j]*X[i][j][l]
+# Objective function scaling
+sigma = SX("sigma")
 
-      g += temp
-      lbg += len(x)*[0.]
-      ubg += len(x)*[0.]
-      
-    # Nonlinear constraint function
-    gfcn_nlp = SXFunction([vars],[g])
-      
-    # Objective function of the NLP
-    y_f = [[SX(T[N-1][K])],XF,U[N-1]]
-    f = mfcn.eval(y_f)[0][0]
-    ffcn_nlp = SXFunction([vars], [[f]])
-      
-    # Hessian of the Lagrangian:
-    # Lagrange multipliers
-    lam = create_symbolic("lambda",len(g))
+# Lagrangian function
+lfcn_input = [V,lam,[sigma]]
+lfcn_output = sigma*f
+for j in range(len(g)):
+  lfcn_output += lam[j]*g_all.at(j)
+lfcn = SXFunction(lfcn_input, [[lfcn_output]])
+  
+# Hessian of the Lagrangian
+HL = lfcn.hessian()
 
-    # Objective function scaling
-    sigma = SX("sigma")
+## ----
+## SOLVE THE NLP
+## ----
+  
+# Allocate an NLP solver
+solver = IpoptSolver(ffcn_nlp,gfcn_nlp3,HL)
 
-    # Lagrangian function
-    lfcn_input = [vars,lam,[sigma]]
-    lfcn_output = sigma*f
-    for j in range(len(g)):
-      lfcn_output += lam[j]*g[j]
-    lfcn = SXFunction(lfcn_input, [[lfcn_output]])
-      
-    # Hessian of the Lagrangian
-    HL = lfcn.hessian()
+# Set options
+solver.setOption("tol",1e-6)
+#solver.setOption("hessian_approximation","limited-memory")
+#solver.setOption("derivative_test","first-order")
+solver.setOption("max_iter",50)
 
-    ## ----
-    ## SOLVE THE NLP
-    ## ----
-      
-    # Allocate an NLP solver
-    solver = IpoptSolver(ffcn_nlp,gfcn_nlp,HL)
+# initialize the solver
+solver.init()
+  
+# Initial condition
+solver.setInput(vars_init,NLP_X_INIT)
 
-    # Set options
-    solver.setOption("tol",1e-6)
-    #solver.setOption("hessian_approximation","limited-memory")
-    #solver.setOption("derivative_test","first-order")
-    solver.setOption("max_iter",50)
+# Bounds on x
+solver.setInput(vars_lb,NLP_LBX)
+solver.setInput(vars_ub,NLP_UBX)
 
-    # initialize the solver
-    solver.init()
-      
-    # Initial condition
-    if it==0:
-      solver.setInput(vars_init,NLP_X_INIT)
-    else:
-      solver.setInput(vars_sol,NLP_X_INIT)
+# Bounds on g
+solver.setInput(lbg,NLP_LBG)
+solver.setInput(ubg,NLP_UBG)
 
-    # Bounds on x
-    solver.setInput(vars_lb,NLP_LBX)
-    solver.setInput(vars_ub,NLP_UBX)
+# Solve the problem
+solver.solve()
 
-    # Bounds on g
-    solver.setInput(lbg,NLP_LBG)
-    solver.setInput(ubg,NLP_UBG)
+# Print the optimal cost
+print "optimal cost: ", solver.output(NLP_COST)[0]
 
-    # Solve the problem
-    solver.solve()
-
-    # Print the optimal cost
-    print "optimal cost: ", solver.output(NLP_COST)[0]
-
-    # Get the solution
-    vars_sol = solver.output(NLP_X_OPT)
+# Get the solution
+vars_sol = solver.output(NLP_X_OPT)
 
 ## ----
 ## SAVE SOLUTION TO DISK

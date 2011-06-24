@@ -102,7 +102,10 @@ class MX : public SharedObject{
     
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
-    
+
+    /** \brief  Copy constructor */
+    MX(const MX& x);
+
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
     
