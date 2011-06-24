@@ -154,6 +154,7 @@ template <> bool meta< std::vector< CasADi::MX > >::couldbe(const octave_value& 
 %}
 #endif //SWIGOCTAVE
 
+%template(sparsity_vector) std::vector<CasADi::CRSSparsity>;
 
 #ifdef SWIGPYTHON
 %meta_pair(CasADi::MX, std::vector< CasADi::MX >)
