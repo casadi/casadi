@@ -392,6 +392,14 @@ MX MX::jac(int iind){
   return (*this)->jac(iind);
 }
 
+const Matrix<int>& MX::mapping() {
+  const Mapping * m = dynamic_cast<const Mapping*>(get());
+  casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
+  casadi_assert_message(m->ndep()==1, "mapping: argument MX should be a Mapping with one depency only");
+  return m->nzmap_;
+}
+
+
 
 } // namespace CasADi
 

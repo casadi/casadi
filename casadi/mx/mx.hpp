@@ -336,6 +336,10 @@ class MX : public SharedObject{
   binops(const Matrix<double> &)
   #undef binops
 
+
+  /** \brief  Returns the IMatrix that represents the mapping of a Mapping node */
+  const Matrix<int>& mapping();
+
 };
 
 //@{
