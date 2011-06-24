@@ -10,6 +10,8 @@
 %inline %{
 template<> swig_type_info** meta< CasADi::MX >::name = &SWIGTYPE_p_CasADi__MX;
 template<> swig_type_info** meta< std::vector< CasADi::MX> >::name = &SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t;
+
+template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX> > >::name = &SWIGTYPE_p_std__pairT_CasADi__MX_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t_t;
 %}
 
 %inline %{
@@ -151,6 +153,15 @@ template <> bool meta< std::vector< CasADi::MX > >::couldbe(const octave_value& 
 
 %}
 #endif //SWIGOCTAVE
+
+
+#ifdef SWIGPYTHON
+%meta_pair(CasADi::MX, std::vector< CasADi::MX >)
+%typemap(out) std::pair< CasADi::MX, std::vector< CasADi::MX >  > {
+    bool ret = meta< std::pair< CasADi::MX, std::vector< CasADi::MX >  > >::toPython($1,$result);
+    if (!ret) SWIG_exception_fail(SWIG_TypeError,"Could not convert to (MX,std::vector<MX>)");
+}
+#endif //SWIGPYTHON
 
 #ifdef SWIGPYTHON
 %extend CasADi::MX{
