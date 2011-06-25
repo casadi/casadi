@@ -284,7 +284,7 @@ void IpoptInternal::init(){
     if (f.isNull()) continue;
     if (f.getNumInputs()!=2) continue;
     pn = f.input(1).size1();
-    pm = f.input(1).size1();
+    pm = f.input(1).size2();
     
     if (pn==0 or pm==0)
      continue;
