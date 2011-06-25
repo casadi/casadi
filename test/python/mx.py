@@ -90,6 +90,8 @@ class MXtests(casadiTestCase):
     self.Jpool.append(lambda x: x[0]**(0.3),lambda x :diag( 0.3/x**0.7),"^0.3")
     self.matrixpool=FunctionPool()
     self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
+    self.matrixpool.append(lambda x: norm_1(x[0]),lambda x: sum(sum(abs(x))),"norm_1")
+    self.matrixpool.append(lambda x: norm_inf(x[0]),lambda x: max(max(abs(x))),"norm_inf")
     self.matrixbinarypool=FunctionPool()
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
@@ -598,6 +600,8 @@ class MXtests(casadiTestCase):
       x0=0.738
       self.numpyEvaluationCheckPool(self.pool,[x],x0,name="scalarMX")
       
+      self.numpyEvaluationCheckPool(self.matrixpool,[x],x0,name="scalarMX")
+      
   def test_MXJacobian(self):
     self.message("MX(1,1) unary operation, jacobian")
     self.Jpool=FunctionPool()
@@ -661,6 +665,8 @@ class MXtests(casadiTestCase):
       x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       
       self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="MX",setx0=x0)
+      
+      self.numpyEvaluationCheckPool(self.matrixpool,[x],array(x0.todense()),name="MX",setx0=x0)
       
   def test_MXbinarySparse(self):
       self.message("SXMatrix binary operations")

@@ -37,12 +37,13 @@ public:
 /** \brief  Constructor */
 Norm(const MX& x);
 
-/** \brief  Constructor */
+/** \brief  Evaluate */
 virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
 };
 
 /** \brief Represents a 2-norm operation on a MX
+  Frobenius norm
   \author Joel Andersson 
   \date 2010
 */
@@ -57,9 +58,14 @@ virtual Norm2* clone() const;
 
 /** \brief  Print */
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+
+/** \brief  Evaluate */
+virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
 };
 
 /** \brief Represents a 1-norm operation on a MX
+  Entrywise Norm
   \author Joel Andersson 
   \date 2010
 */
@@ -74,6 +80,10 @@ virtual Norm1* clone() const;
 
 /** \brief  Print */
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+
+/** \brief  Evaluate */
+virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
 };
 
 /** \brief Represents an infinity-norm operation on a MX
@@ -91,6 +101,10 @@ virtual NormInf* clone() const;
 
 /** \brief  Print */
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+
+/** \brief  Evaluate */
+virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
 };
 
 } // namespace CasADi

@@ -40,6 +40,20 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
+void Norm2::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  if(nfwd==0 && nadj==0){
+   double temp=0;
+   for (int k=0;k<dep(0).size();k++) {
+    temp+=input[0][k]*input[0][k];
+   }
+   output[0]=sqrt(temp);
+   return; 
+  }
+
+  throw CasadiException("Norm2::evaluate not implemented");
+}
+
+
 void Norm2::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << "||" << args.at(0) << "||_2"; 
 }
@@ -55,6 +69,17 @@ void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) co
   stream << "||" << args.at(0) << "||_1"; 
 }
 
+void Norm1::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  if(nfwd==0 && nadj==0){
+   double temp=0;
+   for (int k=0;k<dep(0).size();k++) temp+=std::abs(input[0][k]);
+   output[0]=temp;
+   return; 
+  }
+
+  throw CasadiException("Norm2::evaluate not implemented");
+}
+
 NormInf::NormInf(const MX& x) : Norm(x){
 }
 
@@ -64,6 +89,21 @@ NormInf* NormInf::clone() const{
 
 void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << "||" << args.at(0) << "||_inf"; 
+}
+
+void NormInf::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  if(nfwd==0 && nadj==0){
+   double temp=std::numeric_limits<double>::infinity();
+   double a;
+   for (int k=0;k<dep(0).size();k++) {
+    a = std::abs(input[0][k]);
+    if (a>temp) temp=a;
+   }
+   output[0]=temp;
+   return; 
+  }
+
+  throw CasadiException("NormInf::evaluate not implemented");
 }
 
 } // namespace CasADi
