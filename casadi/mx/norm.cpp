@@ -41,16 +41,29 @@ Norm2* Norm2::clone() const{
 }
 
 void Norm2::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
-  if(nfwd==0 && nadj==0){
-   double temp=0;
-   for (int k=0;k<dep(0).size();k++) {
+
+  double temp=0;
+  for (int k=0;k<dep(0).size();k++) {
     temp+=input[0][k]*input[0][k];
-   }
-   output[0]=sqrt(temp);
-   return; 
+  }
+  output[0]=sqrt(temp);
+  // Propagate forward seeds
+  for(int d=0; d<nfwd; ++d){
+    fwdSens[d][0]=0;
+    for(int k=0; k<dep(0).size(); k++){
+      fwdSens[d][0] += input[0][k]/output[0] * fwdSeed[0][d][k];
+    }
   }
 
-  throw CasadiException("Norm2::evaluate not implemented");
+  // Propagate adjoint seeds
+  for(int d=0; d<nadj; ++d){
+    if (adjSeed[d][0]==0) continue;
+    for(int k=0; k<dep(0).size(); k++){
+      adjSens[0][d][k] += input[0][k]/output[0] * adjSeed[d][0];
+    }
+  }
+  
+
 }
 
 
@@ -77,7 +90,35 @@ void Norm1::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VD
    return; 
   }
 
-  throw CasadiException("Norm2::evaluate not implemented");
+  // Propagate forward seeds
+  for(int d=0; d<nfwd; ++d){
+    fwdSens[d][0]=0;
+    for(int k=0; k<dep(0).size(); k++){
+      if (fwdSeed[0][d][k]==0) continue;
+      if (input[0][k] < 0) {
+        fwdSens[d][0] -= fwdSeed[0][d][k];
+      } else if (input[0][k] > 0) {
+        fwdSens[d][0] += fwdSeed[0][d][k];
+      } else {
+        fwdSens[d][0] += std::numeric_limits<double>::quiet_NaN();
+      }
+    }
+  }
+
+  // Propagate adjoint seeds
+  for(int d=0; d<nadj; ++d){
+    if (adjSeed[d][0]==0) continue;
+    for(int k=0; k<dep(0).size(); k++){
+      if (input[0][k] < 0) {
+        adjSens[0][d][k] -=  adjSeed[d][0];
+      } else if (input[0][k] > 0) {
+        adjSens[0][d][k] +=  adjSeed[d][0];
+      } else {
+        adjSens[0][d][k] += std::numeric_limits<double>::quiet_NaN();
+      }
+    }
+  }
+
 }
 
 NormInf::NormInf(const MX& x) : Norm(x){
@@ -92,18 +133,17 @@ void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) 
 }
 
 void NormInf::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
-  if(nfwd==0 && nadj==0){
-   double temp=std::numeric_limits<double>::infinity();
-   double a;
-   for (int k=0;k<dep(0).size();k++) {
+
+  double temp=std::numeric_limits<double>::infinity();
+  double a;
+  for (int k=0;k<dep(0).size();k++) {
     a = std::abs(input[0][k]);
     if (a>temp) temp=a;
-   }
-   output[0]=temp;
-   return; 
   }
+  output[0]=temp;
+  
 
-  throw CasadiException("NormInf::evaluate not implemented");
+  if (nadj!=0) throw CasadiException("NormInf::evaluate not implemented");
 }
 
 } // namespace CasADi

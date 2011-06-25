@@ -91,7 +91,7 @@ class MXtests(casadiTestCase):
     self.matrixpool=FunctionPool()
     self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
     self.matrixpool.append(lambda x: norm_1(x[0]),lambda x: sum(sum(abs(x))),"norm_1")
-    self.matrixpool.append(lambda x: norm_inf(x[0]),lambda x: max(max(abs(x))),"norm_inf")
+    self.matrixpool.append(lambda x: norm_inf(x[0]),lambda x: abs(matrix(x)).max(),"norm_inf")
     self.matrixbinarypool=FunctionPool()
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
@@ -1301,7 +1301,7 @@ class MXtests(casadiTestCase):
     (grad(x,Axb),A.T),
     #(grad(x,Axb.T),A)   incorrect?
     (grad(x,c.prod(Axb.T,Axb)),2*c.prod(A.T,Axb)),
-    #(grad(x,norm_2(Axb)),c.prod(A.T,Axb)/norm_2(Axb))   norm_2 not implemented
+    (grad(x,norm_2(Axb)),c.prod(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
     (grad(x,c.prod(c.prod(x.T,A),x)+2*c.prod(c.prod(x.T,B),y)+c.prod(c.prod(y.T,C),y)),c.prod((A+A.T),x)+2*c.prod(B,y)),
     #(grad(x,c.prod(a.T,c.prod(x.T,x)*b)),2*c.prod(c.prod(x,a.T),b))
     (grad(X,X),eye(k**2)),
@@ -1375,6 +1375,56 @@ class MXtests(casadiTestCase):
     f.evaluate(0,0) # this should not throw a segfault
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
+    
+  def test_Norm2(self):
+    self.message("Norm_2")
+    X=MX("x",5,1)
+    
+    nums = matrix([1,2,3,0,-1]).T
+
+    F =MXFunction([X],[norm_2(X)])
+
+    J = Jacobian(F,0,0)
+    J.setOption("ad_mode","forward")
+    J.init()
+
+    J.input().set(nums)
+    J.evaluate()
+    self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
+
+    J = Jacobian(F,0,0)
+    J.setOption("ad_mode","adjoint")
+    J.init()
+
+    J.input().set(nums)
+    J.evaluate()
+    
+    self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
+
+  def test_Norm1(self):
+    self.message("Norm_1")
+    X=MX("x",3,1)
+    
+    nums = matrix([6,-3,0]).T
+
+    F =MXFunction([X],[norm_1(X)])
+
+    J = Jacobian(F,0,0)
+    J.setOption("ad_mode","forward")
+    J.init()
+
+    J.input().set(nums)
+    J.evaluate()
+    self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
+
+    J = Jacobian(F,0,0)
+    J.setOption("ad_mode","adjoint")
+    J.init()
+
+    J.input().set(nums)
+    J.evaluate()
+    
+    self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
     
 if __name__ == '__main__':
     unittest.main()
