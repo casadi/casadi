@@ -555,13 +555,26 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
     work[outputv_ind[ind]].get(output_s[ind]);
 }
 
-SXFunction MXFunctionInternal::expand(){
+SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
   casadi_assert(isInit());
   
   // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
   vector<SXMatrix> arg(inputv.size());
-  for(int i=0; i<arg.size(); ++i){
-    arg[i] = symbolic(inputv[i]->getName(),inputv[i].sparsity());
+  if(inputv_sx.empty()){ // No symbolic input provided
+    for(int i=0; i<arg.size(); ++i){
+      arg[i] = symbolic(inputv[i]->getName(),inputv[i].sparsity());
+    }
+  } else { // Use provided symbolic input
+    // Make sure number of inputs matches
+    casadi_assert(inputv_sx.size()==inputv.size());
+    
+    // Make sure that sparsity matches
+    for(int i=0; i<inputv_sx.size(); ++i){
+      casadi_assert(inputv_sx[i].sparsity() == inputv[i].sparsity());
+    }
+
+    // Copy to argument vector
+    copy(inputv_sx.begin(),inputv_sx.end(),arg.begin());
   }
 
   // Create output vector with correct sparsity

@@ -112,10 +112,14 @@ mfcn.init()
 cfcn = SXFunction([[t],x,u],[[Tj-Ta]])
 cfcn.init()
 
+# Bounds on nonlinear constraints
+nc = 1
+c_lb = NP.repeat(0,  nc)
+c_ub = NP.repeat(inf,nc)
+
 # Dimensions
 nx = len(x)
 nu = len(u)
-
 
 print "modelling done"
 
@@ -203,16 +207,13 @@ NXF = nx
 NV = NX+NU+NXF
 
 # NLP variable vector
-V = symbolic("V",NV)
-V2 = MX("V",NV)
+V = MX("V",NV)
 
 # Collocated states
 X = []
-X2 = []
 
 # Collocated control (piecewice constant)
 U = []
-U2 = []
   
 # All variables with bounds and initial guess
 vars_lb = NP.zeros(NV)
@@ -224,7 +225,6 @@ vi = 0
 for i in range(N):
   # Parametrized controls
   U.append(V[vi:vi+nu])
-  U2.append(V2[vi:vi+nu])
   vars_lb[vi:vi+nu] = u_lb
   vars_ub[vi:vi+nu] = u_ub
   vars_init[vi:vi+nu] = u_init
@@ -232,10 +232,8 @@ for i in range(N):
   
   # Collocated states
   Xi = []
-  Xi2 = []
   for j in range(K+1):
     Xi.append(V[vi:vi+nx])
-    Xi2.append(V2[vi:vi+nx])
     vars_init[vi:vi+nx] = x_init
     if i==0 and j==0:
       vars_lb[vi:vi+nx] = x_init
@@ -246,11 +244,9 @@ for i in range(N):
     vi += nx
         
   X.append(Xi)
-  X2.append(Xi2)
   
 # State at end time
 XF = V[vi:vi+nx]
-XF2 = V2[vi:vi+nx]
 vars_lb[vi:vi+nx] = x_lb
 vars_ub[vi:vi+nx] = x_ub
 vars_init[vi:vi+nx] = x_init
@@ -258,85 +254,72 @@ vi += nx
   
 # Constraint function for the NLP
 g = []
-g2 = []
 lbg = []
 ubg = []
 
 for i in range(N):
   for k in range(1,K+1):
     # augmented state vector
-    y_ik = [[SX(T[i][k])], X[i][k],  U[i]]
-    y_ik2 = [MX(T[i][k]), X2[i][k], U2[i]]
+    y_ik = [MX(T[i][k]), X[i][k], U[i]]
     
     # Add collocation equations to NLP
-    [temp] = ffcn.eval(y_ik)
-    [temp2] = ffcn.call(y_ik2)
+    [temp] = ffcn.call(y_ik)
     for j in range(temp.size()):
       temp[j] *= h
-      temp2[j] *= h
     for j in range (K+1):
       for l in range(temp.size()):
         temp[l] -= X[i][j][l]*C[j][k]
-        temp2[l] -= X2[i][j][l]*C[j][k]
       
     g += [temp]
-    g2 += [temp2]
-    lbg += nx * [0.] # equality constraints
-    ubg += nx * [0.] # equality constraints
+    lbg.append(NP.zeros(nx)) # equality constraints
+    ubg.append(NP.zeros(nx)) # equality constraints
       
-    # Add nonlinear constraints
-    [temp] = cfcn.eval(y_ik)
-    [temp2] = cfcn.call(y_ik2)
-    g += [temp]
-    g2 += [temp2]
-    lbg += [0.] # correct!
-    ubg += [inf]
+    # Add nonlinear constraints, if any
+    if nc>0:
+      g += cfcn.call(y_ik)
+      lbg.append(c_lb)
+      ubg.append(c_ub)
 
   # Add continuity equation to NLP
   if i<N-1:
-    temp = SXMatrix(X[i+1][0])
-    temp2 = MX(X2[i+1][0])
+    temp = MX(X[i+1][0])
   else:
-    temp = SXMatrix(XF)
-    temp2 = MX(XF2)
+    temp = MX(XF)
     
   for j in range(K+1):
     for l in range(nx):
       temp[l] -= D[j]*X[i][j][l]
-      temp2[l] -= D[j]*X2[i][j][l]
 
   g += [temp]
-  g2 += [temp2]
-  lbg += nx*[0.]
-  ubg += nx*[0.]
+  lbg.append(NP.zeros(nx))
+  ubg.append(NP.zeros(nx))
+  
+# Variable vector (SX)
+V_sx = symbolic("V",NV)
   
 # Nonlinear constraint function
-g_all = vertcat(g)
-g_all2 = vertcat(g2)
-
-gfcn_nlp = SXFunction([V],[g_all])
-gfcn_nlp2 = MXFunction([V2],[g_all2])
-gfcn_nlp2.init()
-gfcn_nlp3 = SXFunction(gfcn_nlp2)
+gfcn_nlp_mx = MXFunction([V],[vertcat(g)])
+gfcn_nlp_mx.init()
+gfcn_nlp = gfcn_nlp_mx.expand([V_sx])
+g_sx = gfcn_nlp.outputSX()
   
 # Objective function of the NLP
-y_f = [[SX(T[N-1][K])],XF,U[N-1]]
-f = mfcn.eval(y_f)[0][0]
-ffcn_nlp = SXFunction([V], [[f]])
+y_f = [MX(T[N-1][K]),XF,U[N-1]]
+[f] = mfcn.call(y_f)
+ffcn_nlp_mx = MXFunction([V], [f])
+ffcn_nlp_mx.init()
+ffcn_nlp = ffcn_nlp_mx.expand([V_sx])
+f_sx = ffcn_nlp.outputSX()
   
 # Hessian of the Lagrangian:
 # Lagrange multipliers
-lam = create_symbolic("lambda",g_all.size1())
+lam = symbolic("lambda",g_sx.size1())
 
 # Objective function scaling
-sigma = SX("sigma")
+sigma = symbolic("sigma")
 
 # Lagrangian function
-lfcn_input = [V,lam,[sigma]]
-lfcn_output = sigma*f
-for j in range(len(g)):
-  lfcn_output += lam[j]*g_all.at(j)
-lfcn = SXFunction(lfcn_input, [[lfcn_output]])
+lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])
   
 # Hessian of the Lagrangian
 HL = lfcn.hessian()
@@ -346,7 +329,7 @@ HL = lfcn.hessian()
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(ffcn_nlp,gfcn_nlp3,HL)
+solver = IpoptSolver(ffcn_nlp,gfcn_nlp,HL)
 
 # Set options
 solver.setOption("tol",1e-6)
@@ -365,8 +348,8 @@ solver.setInput(vars_lb,NLP_LBX)
 solver.setInput(vars_ub,NLP_UBX)
 
 # Bounds on g
-solver.setInput(lbg,NLP_LBG)
-solver.setInput(ubg,NLP_UBG)
+solver.setInput(NP.concatenate(lbg),NLP_LBG)
+solver.setInput(NP.concatenate(ubg),NLP_UBG)
 
 # Solve the problem
 solver.solve()

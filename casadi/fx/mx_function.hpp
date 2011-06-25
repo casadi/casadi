@@ -115,7 +115,7 @@ public:
   std::vector<MX> jac(int iind=0);
 
   /** \brief Expand the matrix valued graph into a scalar valued graph */
-  SXFunction expand();
+  SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());
   
 };
 

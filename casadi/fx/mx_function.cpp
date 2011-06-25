@@ -91,8 +91,8 @@ std::vector<MX> MXFunction::jac(int iind){
   return (*this)->jac(iind);
 }
 
-SXFunction MXFunction::expand(){
-  return (*this)->expand();
+SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
+  return (*this)->expand(inputv);
 }
 
 

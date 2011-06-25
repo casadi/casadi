@@ -98,7 +98,7 @@ class MXFunctionInternal : public XFunctionInternal{
     virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
-    SXFunction expand();
+    SXFunction expand(const std::vector<SXMatrix>& inputv );
 
 };
 
