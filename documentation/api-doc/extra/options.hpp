@@ -30,7 +30,7 @@ List of available options
 List of available options
 <table>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>"Stopping criterion tolerance"</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -43,7 +43,7 @@ List of available options
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>"none", "left", "right", "both"</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>"Globalization strategy (\"none\" or \"linesearch\")"</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>Globalization strategy (\"none\" or \"linesearch\")</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -54,7 +54,7 @@ List of available options
 List of available options
 <table>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>"Stopping criterion tolerance"</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -67,7 +67,7 @@ List of available options
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>"none", "left", "right", "both"</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>"Globalization strategy (\"none\" or \"linesearch\")"</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>Globalization strategy (\"none\" or \"linesearch\")</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -232,7 +232,7 @@ List of available options
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>"print information about execution time"</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>print_user_options</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>recalc_y</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -365,7 +365,7 @@ List of available options
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>"print information about execution time"</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>print_user_options</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>recalc_y</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -830,13 +830,13 @@ List of available options
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>"none", "left", "right", "both"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>"use IDACalcIC to get consistent initial conditions"</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>"use IDACalcIC to get consistent initial conditions"</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>"IDAS scaling on cj for the user-defined linear solver module"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>use IDACalcIC to get consistent initial conditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>use IDACalcIC to get consistent initial conditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>"Call calc ic an extra time, with fsens=0"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>Call calc ic an extra time, with fsens=0</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>"first requested time as a fraction of the time interval"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>first requested time as a fraction of the time interval</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fsens_abstolv</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>fsens_err_con</td><td>OT_INTEGER</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
@@ -851,7 +851,7 @@ List of available options
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>"maximim step size"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>maximim step size</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -863,7 +863,7 @@ List of available options
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>"supress algebraic variables in the error testing"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>supress algebraic variables in the error testing</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
@@ -885,13 +885,13 @@ List of available options
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>"none", "left", "right", "both"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>"use IDACalcIC to get consistent initial conditions"</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>"use IDACalcIC to get consistent initial conditions"</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>"IDAS scaling on cj for the user-defined linear solver module"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>use IDACalcIC to get consistent initial conditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>use IDACalcIC to get consistent initial conditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>"Call calc ic an extra time, with fsens=0"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>Call calc ic an extra time, with fsens=0</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>"first requested time as a fraction of the time interval"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>first requested time as a fraction of the time interval</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fsens_abstolv</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>fsens_err_con</td><td>OT_INTEGER</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
@@ -906,7 +906,7 @@ List of available options
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>"maximim step size"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>maximim step size</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -918,7 +918,7 @@ List of available options
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>"supress algebraic variables in the error testing"</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>supress algebraic variables in the error testing</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
@@ -984,7 +984,7 @@ List of available options
 List of available options
 <table>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>"Stopping criterion tolerance"</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
@@ -996,7 +996,7 @@ List of available options
 List of available options
 <table>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>"Stopping criterion tolerance"</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>

@@ -108,7 +108,7 @@ for name,meta in metadata.items():
         if not(m.group(7) is None):
           description.append(m.group(7))
         if not(m.group(5) is None):
-          description.append(m.group(5))
+          description.append(m.group(5)[1:-1])
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': m.group(3),'description': '\n'.join(description), 'used': name}
     if not(l.find('addOption')==-1):
       m = re.search(r'addOption\(\s*"([^"]*)"\s*,\s*([^,]*)\s*\)\s*;(\s*// (.*))?',l)
