@@ -90,7 +90,7 @@ class CRSSparsity : public SharedObject{
 
     /// Check if two sparsity patterns are the same
     bool operator==(const CRSSparsity& y) const;
-    
+
     /// \name Size and element counting
     /// @{
     

@@ -779,10 +779,10 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
       data()[kk.at(k)] = m.data()[0];
     return;
   }
-  if (kk.size()!=m.size()) {
+  if (!(kk.sparsity()==m.sparsity())) {
     std::stringstream ss;
-    ss << "Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
-    ss << "must match size of rhs (" << m.size() << ")." << std::endl;
+    ss << "Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl;
+    ss << "must match sparsity of rhs " << m.dimString() << "." << std::endl;
     throw CasadiException(ss.str());
   }
   for(int k=0; k<kk.size(); ++k)
