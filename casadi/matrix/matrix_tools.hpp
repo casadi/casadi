@@ -185,6 +185,10 @@ Matrix<T> norm_1(const Matrix<T>& x);
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x);
 
+/// Make the vector 2-norm (Frobenius Norm) squared of an Matrix<T>
+template<class T>
+Matrix<T> norm_22(const Matrix<T>& x);
+
 /// Return summation of all elements
 template<class T>
 T sum_all(const Matrix<T> &x); 

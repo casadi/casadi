@@ -22,6 +22,9 @@
 
 #include "norm.hpp"
 
+
+#include "mx_tools.hpp"
+
 namespace CasADi{
 
 Norm::Norm(const MX& x){
@@ -66,9 +69,56 @@ void Norm2::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VD
 
 }
 
+MX Norm2::adFwd(const std::vector< MX > & jx	) {
+  MX ret;
+  ret.assignNode(this);
+  return trans(prod(jx.at(0),dep(0)))/ret;
+}
 
 void Norm2::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << "||" << args.at(0) << "||_2"; 
+}
+
+
+Norm22::Norm22(const MX& x) : Norm(x){
+}
+
+Norm22* Norm22::clone() const{
+  return new Norm22(*this);
+}
+
+void Norm22::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+
+  double temp=0;
+  for (int k=0;k<dep(0).size();k++) {
+    temp+=input[0][k]*input[0][k];
+  }
+  output[0]=temp;
+  // Propagate forward seeds
+  for(int d=0; d<nfwd; ++d){
+    fwdSens[d][0]=0;
+    for(int k=0; k<dep(0).size(); k++){
+      fwdSens[d][0] += 2*input[0][k] * fwdSeed[0][d][k];
+    }
+  }
+
+  // Propagate adjoint seeds
+  for(int d=0; d<nadj; ++d){
+    if (adjSeed[d][0]==0) continue;
+    for(int k=0; k<dep(0).size(); k++){
+      adjSens[0][d][k] += 2*input[0][k] * adjSeed[d][0];
+    }
+  }
+  
+
+}
+
+MX Norm22::adFwd(const std::vector< MX > & jx	) {
+  return 2*trans(prod(jx.at(0),dep(0)));
+}
+
+void Norm22::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << "||" << args.at(0) << "||_2^2"; 
 }
 
 Norm1::Norm1(const MX& x) : Norm(x){

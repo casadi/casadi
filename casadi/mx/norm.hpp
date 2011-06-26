@@ -62,6 +62,34 @@ virtual void print(std::ostream &stream, const std::vector<std::string>& args) c
 /** \brief  Evaluate */
 virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
+/** \brief Symbolic forward sensitivities.  */
+virtual MX adFwd(const std::vector< MX > & jx	);
+
+};
+
+/** \brief Represents a 2-norm squared operation on a MX
+  Frobenius norm
+  \author Joel Andersson 
+  \date 2010
+*/
+class Norm22 : public Norm{
+public:
+
+/** \brief  Constructor */
+Norm22(const MX& x);
+
+/** \brief  Clone function */
+virtual Norm22* clone() const;
+
+/** \brief  Print */
+virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+
+/** \brief  Evaluate */
+virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
+/** \brief Symbolic forward sensitivities. */
+virtual MX adFwd(const std::vector< MX > & jx	);
+
 };
 
 /** \brief Represents a 1-norm operation on a MX
@@ -104,6 +132,7 @@ virtual void print(std::ostream &stream, const std::vector<std::string>& args) c
 
 /** \brief  Evaluate */
 virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+
 
 };
 
