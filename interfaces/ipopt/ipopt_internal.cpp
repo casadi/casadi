@@ -31,6 +31,7 @@ namespace CasADi{
 
 IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
   addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
+  addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
   
   // Output
   ops_["print_level"] = OT_INTEGER;
@@ -380,12 +381,14 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   // Ask Ipopt to solve the problem
   Ipopt::ApplicationReturnStatus status = app->OptimizeTNLP(uc);
   
-  // Write timings
-  cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
-  cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
-  cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
-  cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
-  cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+  if (hasOption("print_time") && bool(getOption("print_time"))) {
+    // Write timings
+    cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
+    cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
+    cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
+    cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
+    cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+  }
 
   if (status == Solve_Succeeded)
     stats_["return_status"] = "Solve_Succeeded";
