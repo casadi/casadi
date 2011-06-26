@@ -181,7 +181,7 @@ bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 template<class T>
 Matrix<T> norm_1(const Matrix<T>& x);
   
-/// Make the vector 2-norm of an Matrix<T>
+/// Make the vector 2-norm (Frobenius Norm) of an Matrix<T>
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x);
 
@@ -540,7 +540,7 @@ Matrix<T> norm_1(const Matrix<T>& x){
 
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x){
-  return std::sqrt(inner_prod(x,x));
+  return std::sqrt(sum_all(x*x));
 }
 
 template<class T>
