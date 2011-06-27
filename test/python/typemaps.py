@@ -291,6 +291,17 @@ class typemaptests(casadiTestCase):
 	    #self.assertTrue(a.isDoubleVector())
 	    #self.assertEqual(a.toString(),i)
 
+  def testGenericType3(self):
+    self.message("Generic type 3")
+    
+    is_differential_ivec = IVector(2)
+    is_differential_ivec[0] = 4
+
+    is_differential_gentype = GenericType(is_differential_ivec)
+    
+    self.assertTrue(is_differential_gentype.isIntVector())
+
+	    
   def test_operators(self):
     self.message("Test operators on mixed numpy.array/Matrix")
     self.message(":SXMatrix")

@@ -72,6 +72,8 @@ namespace CasADi{
 #define PRECEDENCE_SLICE 205
 #define PRECEDENCE_IndexVector 210
 #define PRECEDENCE_PAIR_IVector_IVector 206
+#define PRECEDENCE_GENERICTYPE 300
+#define PRECEDENCE_DICTIONARY 301
 
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
@@ -182,6 +184,9 @@ PyOS_setsig(SIGINT, SigIntHandler);
 #endif // WITH_PYTHON_INTERRUPTS
 #endif // SWIGPYTHON
 
+// typemaphelpers
+%include "typemaphelpers.i"
+
 // Auxilliary casadi functions
 %include "casadi_aux.i"
 
@@ -205,9 +210,6 @@ returntype __ldivide__   (argtype) const { return selfCast(*$self).__mrdivide__(
 returntype __rmldivide__ (argtype) const { return argCast(b).__mrdivide__(selfCast(*$self));} \
 returntype __mpower__    (argtype) const{ return selfCast(*$self).__mpower__(argCast(b));} \
 returntype __rmpower__   (argtype) const{ return argCast(b).__mpower__(selfCast(*$self));}
-  
-// typemaphelpers
-%include "typemaphelpers.i"
 
 // Matrix typemaps class
 %include "matrix.i"

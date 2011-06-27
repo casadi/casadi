@@ -226,3 +226,111 @@ bool PyIsSequence(PyObject* p) {
 
 %}
 #endif // SWIGPYTHON
+
+%{
+template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
+template<> swig_type_info** meta< int >::name = &SWIGTYPE_p_int;
+template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_p_std__allocatorT_double_p_t_t;
+template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
+%}
+
+/// int
+#ifdef SWIGPYTHON
+%inline %{
+template<> char meta< int >::expected_message[] = "Expecting number";
+
+template <>
+int meta< int >::as(PyObject * p, int &m) {
+  NATIVERETURN(int,m)
+  NATIVERETURN(double,m)
+  PyObject *r = PyNumber_Float(p);
+  int ret = !(r==NULL);
+  if (ret)
+    m = PyFloat_AsDouble(r);
+  Py_DECREF(r);
+  return ret;
+}
+
+template <> bool meta< int >::couldbe(PyObject * p) { return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;}
+
+%}
+#endif //SWIGPYTHON
+
+/// double
+#ifdef SWIGPYTHON
+%inline %{
+template<> char meta< double >::expected_message[] = "Expecting number";
+
+template <>
+int meta< double >::as(PyObject * p, double &m) {
+  NATIVERETURN(double,m)
+  PyObject *r = PyNumber_Float(p);
+  int ret = !(r==NULL);
+  if (ret)
+    m = PyFloat_AsDouble(r);
+  Py_DECREF(r);
+  return ret;
+}
+
+template <> bool meta< double >::couldbe(PyObject * p) { return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;}
+
+%}
+#endif //SWIGPYTHON
+
+/// std::vector<double>
+#ifdef SWIGOCTAVE
+%inline %{
+template<> char meta< std::vector<double> >::expected_message[] = "Expecting (1xn) array(number)";
+
+template <>
+int meta< std::vector<double> >::as(const octave_value& p, std::vector<double> &m) {
+  NATIVERETURN(std::vector<double>, m);
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    if (!(mat.rows()==1)) return false;
+    m.resize(mat.cols());
+    for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    return true;
+  }
+}
+
+template <> bool meta< std::vector<double> >::couldbe(const octave_value& p) { 
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    return (mat.rows()==1 );
+  } else {
+    return false;
+  }
+}
+
+%}
+#endif //SWIGOCTAVE
+
+/// std::vector<int>
+#ifdef SWIGOCTAVE
+%inline %{
+template<> char meta< std::vector<int> >::expected_message[] = "Expecting (1xn) array(number)";
+
+template <>
+int meta< std::vector<int> >::as(const octave_value& p, std::vector<int> &m) {
+  NATIVERETURN(std::vector<int>, m);
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    if (!(mat.rows()==1)) return false;
+    m.resize(mat.cols());
+    for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    return true;
+  }
+}
+
+template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) { 
+  if(p.is_real_matrix()){
+    const Matrix &mat = p.matrix_value();
+    return (mat.rows()==1 );
+  } else {
+    return false;
+  }
+}
+
+%}
+#endif //SWIGOCTAVE

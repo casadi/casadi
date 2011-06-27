@@ -10,13 +10,56 @@
 
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
-%include "casadi/generic_type.hpp"
 
-#ifdef SWIGPYTHON
 
 %inline %{
+template<> swig_type_info** meta< CasADi::GenericType >::name = &SWIGTYPE_p_CasADi__GenericType;
+template<> swig_type_info** meta< CasADi::Dictionary >::name = &SWIGTYPE_p_std__mapT_std__string_CasADi__GenericType_t;
+%}
 
-bool asPyObject(const CasADi::GenericType &a,PyObject * & p) {
+%{
+template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting number, string, vector(number)";
+%}
+
+/// CasADi::GenericType
+#ifdef SWIGPYTHON
+%inline %{
+
+template <>
+int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
+  NATIVERETURN(CasADi::GenericType, s)
+  if (PyBool_Check(p)) {
+    std::cout << "I am supposed to be a bool" << std::endl;
+    s=CasADi::GenericType((bool) PyInt_AsLong(p));
+  } else if (PyInt_Check(p)) {
+    s=CasADi::GenericType((int) PyInt_AsLong(p));
+  } else if (PyFloat_Check(p)) {
+    s=CasADi::GenericType(PyFloat_AsDouble(p));
+  } else if (PyString_Check(p)) {
+    s=CasADi::GenericType(std::string(PyString_AsString(p)));
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    std::vector<int> temp;
+    int ret = meta< std::vector<int> >::as(p,temp); 
+    if (!ret) return false;
+    s = CasADi::GenericType(temp);
+  } else if (meta< std::vector<double> >::couldbe(p)) {
+    std::vector<double> temp;
+    int ret = meta< std::vector<double> >::as(p,temp); 
+    if (!ret) return false;
+    s = CasADi::GenericType(temp);
+  } else {
+    return false;
+  }
+  return true;
+}
+
+template <>
+bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
+  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p);
+}
+
+template <>
+bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p) {
   if (a.isBool()) {
     p=PyBool_FromLong(a.toBool());
   } else if (a.isInt()) {
@@ -34,14 +77,87 @@ bool asPyObject(const CasADi::GenericType &a,PyObject * & p) {
   }
   return true;
 }
+%}
+#endif //SWIGPYTHON
 
-bool asPyObject(const CasADi::Dictionary &a,PyObject * & p) {
+/// CasADi::GenericType
+#ifdef SWIGOCTAVE
+%inline %{
+
+template <>
+int meta< CasADi::GenericType >::as(const octave_value& p,CasADi::GenericType &s) {
+  std::cout << "I am in a typemap" << std::endl;
+  NATIVERETURN(CasADi::GenericType, s)
+  if (p.is_real_scalar()) {
+    s=CasADi::GenericType(p.double_value());
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    std::vector<int> temp;
+    int ret = meta< std::vector<int> >::as(p,temp); 
+    if (!ret) return false;
+    s = CasADi::GenericType(temp);
+  } else if (meta< std::vector<double> >::couldbe(p)) {
+    std::vector<double> temp;
+    int ret = meta< std::vector<double> >::as(p,temp); 
+    if (!ret) return false;
+    s = CasADi::GenericType(temp);
+  } else if (p.is_string()) {
+    s = CasADi::GenericType(p.string_value());
+  } else {
+    return false;
+  }
+  return true;
+}
+
+template <>
+bool meta< CasADi::GenericType >::couldbe(const octave_value& p) {
+  return p.is_real_scalar() || meta< std::vector<int> >::couldbe(p) || meta< std::vector<double> >::couldbe(p) || p.is_string() ;
+}
+
+%}
+#endif //SWIGOCTAVE
+
+%{
+template<> char meta< CasADi::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
+%}
+
+/// CasADi::Dictionary
+#ifdef SWIGPYTHON
+%inline %{
+
+template <>
+int meta< CasADi::Dictionary >::as(PyObject * p,CasADi::Dictionary &s) {
+  NATIVERETURN(CasADi::Dictionary, s)
+  if (!PyDict_Check(p))
+    return false;
+  PyObject *key, *value;
+  Py_ssize_t pos = 0;
+  CasADi::GenericType gt;
+  while (PyDict_Next(p, &pos, &key, &value)) {
+    if (!PyString_Check(key))
+      return false;
+    bool ret=meta< CasADi::GenericType >::as(value,gt);
+    if (!ret)
+      return false;
+    s[std::string(PyString_AsString(key))] = gt;
+  }
+
+  return true;
+}
+
+template <>
+bool meta< CasADi::Dictionary >::couldbe(PyObject * p) {
+  return PyDict_Check(p);
+}
+
+template <>
+bool meta< CasADi::Dictionary >::toPython(CasADi::Dictionary &a, PyObject *&p) {
   p = PyDict_New();
-  CasADi::Dictionary::const_iterator end = a.end(); 
-  for (CasADi::Dictionary::const_iterator it = a.begin(); it != end; ++it)
+  //CasADi::Dictionary::const_iterator end = a.end(); 
+  CasADi::Dictionary::iterator end = a.end();
+  for (CasADi::Dictionary::iterator it = a.begin(); it != end; ++it)
   {
     PyObject * e;
-    bool ret=asPyObject(it->second,e);
+    bool ret=meta< CasADi::GenericType >::toPython(it->second,e);
     if (!ret) {
       Py_DECREF(p);
       return false;
@@ -51,86 +167,41 @@ bool asPyObject(const CasADi::Dictionary &a,PyObject * & p) {
   }
   return true;
 }
-
-bool asGenericType(PyObject *p, CasADi::GenericType &a) {
-  if (PyBool_Check(p)) {
-    a=CasADi::GenericType((bool) PyInt_AsLong(p));
-  } else if (PyInt_Check(p)) {
-    a=CasADi::GenericType((int) PyInt_AsLong(p));
-  } else if (PyFloat_Check(p)) {
-    a=CasADi::GenericType(PyFloat_AsDouble(p));
-  } else if (PyString_Check(p)) {
-    a=CasADi::GenericType(std::string(PyString_AsString(p)));
-  } else {
-    return false;
-  }
-  return true;
-}
-
-bool asDictionary(PyObject *p, CasADi::Dictionary &a) {
-  if (!PyDict_Check(p))
-    return false;
-  PyObject *key, *value;
-  Py_ssize_t pos = 0;
-  CasADi::GenericType gt;
-  while (PyDict_Next(p, &pos, &key, &value)) {
-    if (!PyString_Check(key))
-      return false;
-    bool ret=asGenericType(value,gt);
-    if (!ret)
-      return false;
-    a[std::string(PyString_AsString(key))] = gt;
-  }
-
-  return true;
-}
-
 %}
+#endif //SWIGPYTHON
+
+
+#ifdef SWIGPYTHON
 
 namespace CasADi {
 %typemap(out) GenericType {
-bool ret=asPyObject($1,$result);
+bool ret=meta<  CasADi::GenericType >::toPython($1,$result);
 if (!ret) {
   SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 }
 
 %typemap(out) const Dictionary&  {
-bool ret=asPyObject(*$1,$result);
+bool ret=meta<  CasADi::Dictionary >::toPython(*$1,$result);
 if (!ret) {
   SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 }
-
-%typemap(in) const Dictionary& (Dictionary d)  {
-bool ret=asDictionary($input,d);
-$1 = &d;
-if (!ret) {
-  SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
-}
-
-%typemap(in) const GenericType& (GenericType d)  {
-bool ret=asGenericType($input,d);
-$1 = &d;
-if (!ret) {
-  SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
-}
-
-
-%typemap(typecheck) const Dictionary& {
-if (PyDict_Check($input)) {
-  $1=1;
-} else {
-  $1=0;
-}
-}
-
 
 } // namespace CasADi
 #endif // SWIGPYTHON
 
+%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,CasADi::GenericType)
+#ifdef SWIGPYTHON
+%my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::Dictionary)
+#endif
+
+#ifdef SWIGOCTAVE
+%my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
+%my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
+#endif //SWIGOCTAVE
+
+%include "casadi/generic_type.hpp"
 %include "casadi/options_functionality.hpp"
 
 // Exceptions handling
