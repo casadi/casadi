@@ -21,6 +21,7 @@
 using namespace CasADi;
 using namespace std;
 
+#define SQR(sqr_me) ((sqr_me)*(sqr_me))
 
 void
 dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
@@ -28,9 +29,8 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	// constants
 	double g = 9.8;    // acceleration due to gravity
 	double l = 2.2;
-	double mc = 10;
-	double mp = 5;
-	
+	double mc = 2;
+	double mp = 1;
 
 	SX x = state["x"];
 	SX theta = state["theta"];
@@ -45,6 +45,11 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	xDot["theta"] = vtheta;
 	xDot["vx"] = ax;
 	xDot["vtheta"] = atheta;
+
+	outputs["cart_x"] = x;
+	outputs["cart_y"] = 0;
+	outputs["bob_x"]  = x + l*sin(theta);
+	outputs["bob_y"]  = x - l*cos(theta);
 }
 
 Ode
@@ -55,9 +60,14 @@ getOde()
 	ode.addState("theta");
 	ode.addState("vx");
 	ode.addState("vtheta");
+	// ode.addState("u");
+
+	ode.addOutput( "cart_x" );
+	ode.addOutput( "cart_y" );
+	ode.addOutput( "bob_x" );
+	ode.addOutput( "bob_y" );
 
 	ode.addAction("u");
-	ode.addAction("uDummy");
 
 	ode.dxdt = &dxdt;
 
@@ -65,16 +75,18 @@ getOde()
 }
 
 SX
-cost(map<string,SX> state, map<string,SX> action)
+cost(map<string,SX> state, map<string,SX> action, int timestep, int N)
 {
 
-#define SQR(sqr_me) ((sqr_me)*(sqr_me))
+	SX cost;
+	if (timestep == N-1){
+		cost = SQR(state["x"]) + SQR(state["theta"]) + SQR(state["vx"]) + SQR(state["vtheta"]);
+		return cost;
+	}
 
-	SX cost = 2*SQR(state["x"]) + 3*SQR(state["theta"]) + 4*SQR(state["vx"]) + 5*SQR(state["vtheta"]) + 6*SQR(action["u"]);
-	cost += 7*state["x"]*action["u"];
-
-	cost += SQR(action["uDummy"]);
-
+	//	cost = 2*SQR(state["x"]) + 3*SQR(state["theta"]) + 4*SQR(state["vx"]) + 5*SQR(state["vtheta"]) + 6*SQR(action["u"]);
+	cost = 0.1*SQR(action["u"]);
+	
 	return cost;
 }
 
@@ -91,48 +103,50 @@ main()
   
 	MultipleShooting & ms = ocp.addMultipleShooting("cartpole", ode, 0.0, tEnd, 60);
 
-	int N = ms.N;
-  
 	// cost function
-	SX xf = ms.getState("x", ms.N-1);
-	SX thetaf = ms.getState("theta", N-1);
-	SX vthetaf = ms.getState("vtheta", N-1);
+	SX xf      = ms.getState(      "x", ms.N-1);
+	SX thetaf  = ms.getState(  "theta", ms.N-1);
+	SX vthetaf = ms.getState( "vtheta", ms.N-1);
 
-  
-	ocp.objFun = tEnd+50*cos(thetaf)+5*(vthetaf)*vthetaf; // minimum time
-	//ocp.objFun = tEnd;
-  
-  
+	//	ocp.objFun = tEnd  + 50*cos(thetaf) + 5*vthetaf*vthetaf;
+	ocp.objFun = 50*cos(thetaf) + 5*vthetaf*vthetaf;
+	for (int k=0; k<ms.N-1; k++){
+		SX u_k   = ms.getAction( "u", k );
+		SX u_kp1 = ms.getAction( "u", k+1 );
+		// ocp.objFun += 3*SQR( u_k - u_kp1 );
+		ocp.objFun += 3*SQR( u_k );
+	}
+
 	// bounds
-	ocp.boundParam("tEnd", 4, 50);
+	ocp.boundParam("tEnd", 6, 6);
 	
 	ms.boundStateAction("x", -trackLength/2, trackLength/2);
 	ms.boundStateAction("vx", -22, 22);
 	ms.boundStateAction("theta", -50, 50);
 	ms.boundStateAction("vtheta", -50, 50);
 
-	ms.boundStateAction("u",-20,20);
+	// ms.boundStateAction("u",-20,20);
 
 	/// initial conditions
-	ms.boundStateAction("x",0,0,0);
-	ms.boundStateAction("theta",0.1,0.1,0);
-	ms.boundStateAction("vx",0,0,0);
-	ms.boundStateAction("vtheta",0,0,0);
+	ms.boundStateAction(      "x", 0.0, 0.0, 0);
+	ms.boundStateAction(  "theta", 0.1, 0.1, 0);
+	ms.boundStateAction(     "vx", 0.0, 0.0, 0);
+	ms.boundStateAction( "vtheta", 0.0, 0.0, 0);
+	ms.boundStateAction(      "u", 0.0, 0.0, 0);
 
-	ocp.addNonlconIneq(ms.getState("x",0), "startx");
-	ocp.addNonlconEq(ms.getState("vx",N/2), "xstall");	
+	// final conditions
+	ms.boundStateAction(      "x", 0.0, 0.0, ms.N-1);
+	ms.boundStateAction(     "vx", 0.0, 0.0, ms.N-1);
+	ms.boundStateAction( "vtheta", 0.0, 0.0, ms.N-1);
+	ms.boundStateAction(  "theta", 3.14159, 3.14159, ms.N-1);
+	ms.boundStateAction(      "u", 0.0, 0.0, ms.N-1);
 
-	//   for(int k = 0; k < ms.N; k++) {
-	//     ms.setStateActionGuess("theta", double(k)*3.1415/ms.N, k);
-	//     ms.setStateActionGuess("vtheta", 3.1415/ms.N, k);
-	//   }
+	// initial gues
+	for (int k=0; k<ms.N; k++){
+		double zero_to_one = k/(ms.N - 1.0);
+		ms.setStateActionGuess( "u", sin(2*M_PI*zero_to_one), k);
+	}
 
-	//   ms.boundStateAction("theta",3.1415,3.1415,ms.N-1);
-	//   ms.boundStateAction("x",0, 0, ms.N-1);
-	//   ms.boundStateAction("vx",0, 0, ms.N-1);
-	//   ms.boundStateAction("vtheta",0, 0, ms.N-1);
-
-	
 	// solve
 	SnoptInterface si(ocp);
 	
@@ -140,17 +154,17 @@ main()
 	ocp.writeOctaveOutput("cartpole_out");
 	
 	// Print the optimal cost
-	cout << "optimal time: " << si.F[0] << endl;
+	cout << "optimal objFcn: " << si.F[0] << endl;
 	
 	
 	/************** run lqr ****************/
 	double t0 = 0;
 	double tf = ocp.getParamSolution("tEnd");
- 	Lqr lqr(ode, t0, tf, N, &cost);
+ 	Lqr lqr(ode, t0, tf, ms.N, &cost);
 
-	for (int k=0; k<N; k++)
+	for (int k=0; k<ms.N; k++)
 		lqr.x_trajectory.at(k) = ocp.getStateSolution(k);
-	for (int k=0; k<N-1; k++)
+	for (int k=0; k<ms.N-1; k++)
 		lqr.u_trajectory.at(k) = ocp.getActionSolution(k);
 
 
