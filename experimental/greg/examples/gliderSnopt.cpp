@@ -165,7 +165,7 @@ main()
 	cout << "optimal time: " << -si.F[0] << endl;
 
 	// write output
-	ocp.writeOctaveOutput( "glider_out", si.x );
+	ocp.writeOctaveOutput( "glider_out" );
 	
 	return 0;
 }

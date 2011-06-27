@@ -101,5 +101,5 @@ main()
 
 	cout << endl << "optimal time: " << si.F[0] << endl;
 
-	ocp.writeOctaveOutput( "rocket_out", si.x );
+	ocp.writeOctaveOutput( "rocket_out" );
 }

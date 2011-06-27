@@ -330,12 +330,7 @@ main()
 	// Print the optimal cost
 	cout << "optimal time: " << -si.F[0] << endl;
 	
-	// Print the optimal solution
-	// vector<double>xopt(ocp.getBigN());
-	// solver.getOutput(xopt,NLP_X_OPT);
-	//cout << "optimal solution: " << xopt << endl;
-
-	ocp.writeOctaveOutput( "raptor_out", si.x );
+	ocp.writeOctaveOutput( "raptor_out" );
 
 	return 0;
 }

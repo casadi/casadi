@@ -153,10 +153,6 @@ main()
 	solver.getOutput(xopt,NLP_X_OPT);
 	// cout << "optimal solution: " << xopt << endl;
 
-	double * xopt_ = new double[ocp.designVariables.size1()];
-	
-	copy( xopt.begin(), xopt.end(), xopt_ );
-	ocp.writeOctaveOutput( "rocket_out", xopt_ );
-	delete xopt_;
+	ocp.writeOctaveOutput( "rocket_out" );
 	return 0;
 }
