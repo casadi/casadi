@@ -86,7 +86,6 @@ bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p)
 
 template <>
 int meta< CasADi::GenericType >::as(const octave_value& p,CasADi::GenericType &s) {
-  std::cout << "I am in a typemap" << std::endl;
   NATIVERETURN(CasADi::GenericType, s)
   if (p.is_real_scalar()) {
     s=CasADi::GenericType(p.double_value());

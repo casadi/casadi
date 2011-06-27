@@ -248,19 +248,15 @@ end
 disp("Generic_type")
 m=2
 
-disp("ready")
 
 is_differential_ivec = IVector(2*m);
 is_differential_gentype = GenericType(is_differential_ivec)
 assert(is_differential_gentype.isIntVector())
 
-disp("okay")
 is_differential_ivec = [3,4];
 is_differential_gentype = GenericType(is_differential_ivec)
 is_differential_gentype.isString()
 assert(is_differential_gentype.isDoubleVector())
-
-disp("sure")
 
 x=SX("x")
 f = SXFunction({x},{x})
@@ -270,3 +266,24 @@ integrator = CVodesIntegrator(f)
 integrator.setOption('is_differential',[1,3]);
 
 
+x=symbolic("x",3,4)
+size(x)
+
+disp("Issue 145")
+t = SX("t")
+T = SX("T")
+T_dot = SX("T_dot")
+
+
+ffcn_in = cell(1,DAE_NUM_IN);
+ffcn_in{1+DAE_T} = t;
+ffcn_in{1+DAE_Y} = T;
+ffcn_in{1+DAE_YDOT} = T_dot;
+
+ffcn_in
+
+SXFunction(ffcn_in,{t})
+
+
+x=symbolic("x",3,4)
+size(x)

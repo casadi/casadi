@@ -78,7 +78,24 @@ template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Sl
 %enddef 
 #endif // SWIGPYTHON
 
+#ifdef SWIGOCTAVE
+%define %python_matrix_convertors
+%enddef 
+%define %python_matrix_helpers
 
+  int ndims() const {
+    return 2;
+  }
+  
+  dim_vector dims() const {
+    dim_vector d;
+    d.resize(2);
+    d.elem(0) = $self->size1();
+    d.elem(1) = $self->size2();
+    return d;
+  }
+%enddef 
+#endif // SWIGOCTAVE
 
 /// CasADi::Matrix<double>
 #ifdef SWIGPYTHON
@@ -390,6 +407,16 @@ binopsFull(double b,CasADi::Matrix<double>,,CasADi::Matrix<double>)
 #endif // SWIGOCTAVE
 
 
+namespace CasADi{
+%extend Matrix<double> {
+
+%python_matrix_convertors
+%python_matrix_helpers
+
+}
+}
+
+
 #ifdef SWIGPYTHON
 namespace CasADi{
 %extend Matrix<double> {
@@ -412,8 +439,7 @@ PyObject* arrayView() {
     return _casadi.__eq__(self,other)
 %}
   
-%python_matrix_convertors
-%python_matrix_helpers
+
 
 %pythoncode %{
   __array_priority__ = 999

@@ -149,6 +149,12 @@ namespace CasADi{
   }
 };
 
+#ifdef SWIGOCTAVE
+%inline %{
+#include <octave/dim-vector.h>
+%}
+#endif
+
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
 //#warning "Not using numpy. option(WITH_NUMPY = OFF)"

@@ -143,8 +143,10 @@ int meta< std::vector< CasADi::MX > >::as(const octave_value& p,std::vector< Cas
   for(int i=0; i<ncol; ++i){
     // Get the octave object
     const octave_value& obj_i = p.cell_value()(i);
-    bool ret = meta< CasADi::MX >::as(obj_i,m[i]);
-    if(!ret) return false;
+    if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
+      bool ret = meta< CasADi::MX >::as(obj_i,m[i]);
+      if(!ret) return false;
+    }
   }
   return true;
 }
@@ -164,10 +166,12 @@ template <> bool meta< std::vector< CasADi::MX > >::couldbe(const octave_value& 
 }
 #endif //SWIGPYTHON
 
-#ifdef SWIGPYTHON
 %extend CasADi::MX{
   %python_matrix_helpers
-  
+};
+
+#ifdef SWIGPYTHON
+%extend CasADi::MX{ 
   #binopsFull(double b,CasADi::MX,,CasADi::MX)
   #binopsFull(const CasADi::Matrix<double>& b,CasADi::MX,,CasADi::MX)
 };
