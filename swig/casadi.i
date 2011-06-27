@@ -72,8 +72,8 @@ namespace CasADi{
 #define PRECEDENCE_SLICE 205
 #define PRECEDENCE_IndexVector 210
 #define PRECEDENCE_PAIR_IVector_IVector 206
-#define PRECEDENCE_GENERICTYPE 300
-#define PRECEDENCE_DICTIONARY 301
+#define PRECEDENCE_GENERICTYPE 20
+#define PRECEDENCE_DICTIONARY 21
 
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,

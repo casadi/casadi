@@ -264,7 +264,9 @@ f = SXFunction({x},{x})
 integrator = CVodesIntegrator(f)
 
 integrator.setOption('is_differential',[1,3]);
-
+integrator.setOption('is_differential',is_differential_gentype);
+disp("hier brandt de lamp")
+assert(integrator.getOption('is_differential').isDoubleVector())
 
 x=symbolic("x",3,4)
 size(x)
@@ -287,3 +289,5 @@ SXFunction(ffcn_in,{t})
 
 x=symbolic("x",3,4)
 size(x)
+
+[x x]

@@ -65,15 +65,12 @@ class OptionsFunctionality : public SharedObject{
 /// \name Option Functionality
 /// @{
    
-#ifndef SWIG
     /** \brief  set an option.
     The setOptions are in general only considered before the init function, if any.
     If properties changes, the init function should be called again.
     (Ticket #54)
     */
     void setOption(const std::string &str, const GenericType& val);
-
-#endif // SWIG
     
     /** \brief  set a set of options */
     void setOption(const Dictionary& dict);

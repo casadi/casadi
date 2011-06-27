@@ -94,6 +94,10 @@ template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Sl
     d.elem(1) = $self->size2();
     return d;
   }
+  
+  octave_value resize(const dim_vector& d, bool t) const {
+    std::cout << "You called resize" << t << std::endl;
+  }
 %enddef 
 #endif // SWIGOCTAVE
 
