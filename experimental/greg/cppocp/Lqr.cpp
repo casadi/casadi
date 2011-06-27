@@ -10,7 +10,7 @@
 using namespace CasADi;
 using namespace std;
 
-Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> state, map<string,SX> action)) : ode(_ode)
+Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> state, map<string,SX> action)) : ode(_ode) , V_0(N_) , V_x(N_) , V_xx(N_) , u_feedforward(N_-1) , u_feedback_gain(N_-1) , x_trajectory(N_) , u_trajectory(N_-1)
 {
 	ode.locked = 1;
 	t0 = t0_;
@@ -18,7 +18,22 @@ Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> 
 	N = N_;
 
 	costFcnExt = cost_;
-	
+
+	// initialize trajectory
+	for (int k=0; k<N; k++){
+		V_0.at(k) =              DMatrix(        1,        1, 1.0);
+		V_x.at(k) =              DMatrix( ode.nx(),        1, 2.0);
+		V_xx.at(k) =             DMatrix( ode.nx(), ode.nx(), 3.0);
+		x_trajectory.at(k) =     DMatrix( ode.nx(),        1, 4.0);
+
+		if (k < N - 1){
+			u_trajectory.at(k) =     DMatrix( ode.nu(),        1, 5.0);
+			u_feedforward.at(k) =    DMatrix( ode.nu(),        1, 6.0);
+			u_feedback_gain.at(k) =  DMatrix( ode.nu(), ode.nx(), 7.0);
+		}
+
+	}
+
 	setupFunctions();
 }
 
@@ -31,301 +46,189 @@ void Lqr::setupFunctions()
 	SXMatrix uk = create_symbolic("uk", ode.nu());
 
 	vector<SXMatrix> inputs_xu(2);
-	inputs_xu[0] = xk;
-	inputs_xu[1] = uk;
+	inputs_xu.at(0) = xk;
+	inputs_xu.at(1) = uk;
 
 	map<string,SX> xkMap = ode.getStateMap(xk);
 	map<string,SX> ukMap = ode.getActionMap(uk);
 
-
-	/**************** cost function *********************/
-	SXMatrix c(costFcnExt( xkMap, ukMap ));
-
+	/**************** cost *********************/
 	// function
-	cost = SXFunction( inputs_xu, c );
-	cost.init();
+	SXMatrix cost(costFcnExt( xkMap, ukMap ));
 
 	// jacobian
-	cost_x = cost.jacobian(0);
-	cost_u = cost.jacobian(1);
-	cost_x.init();
-	cost_u.init();
+	SXMatrix cost_x = gradient( cost, xk );
+	SXMatrix cost_u = gradient( cost, uk );
 
 	// hessian
-	cost_xx = cost_x.jacobian(0);
-	cost_xu = cost_x.jacobian(1); // == cost_u.jacobian(0).trans()
-	cost_uu = cost_u.jacobian(1);
-	cost_xx.init();
-	cost_xu.init();
-	cost_uu.init();
+	SXMatrix cost_xx = jacobian( cost_x, xk );
+	SXMatrix cost_xu = jacobian( cost_x, uk ); // == jacobian( cost_u, x ).trans()
+	SXMatrix cost_uu = jacobian( cost_u, uk );
 
-	// cout << "cost.outputSX():\n" << cost.outputSX() << endl;
-	// cout << "cost_x.outputSX():\n" << cost_x.outputSX() << endl;
-	// cout << "cost_u.outputSX():\n" << cost_u.outputSX() << endl;
-	// cout << "cost_xx.outputSX():\n" << cost_xx.outputSX() << endl;
-	// cout << "cost_xu.outputSX():\n" << cost_xu.outputSX() << endl;
-	// cout << "cost_uu.outputSX():\n" << cost_uu.outputSX() << endl;
-
-
-	/**************** dynamics function *********************/
+	/**************** dynamics *********************/
 	// dummy params for now
 	map<string,SX> dummyParams;
 	double dt = (tf - t0)/(N - 1);
-	//SXMatrix xkp1 = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // different one for each time step for f(x,u,__t__) - same w cost
-	SXMatrix xkp1 = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // different one for each time step for f(x,u,__t__) - same w cost
+	cout << "SWITCH BACK TO RK4 WHEN YOU GET IT WORKING\n";
+	//SXMatrix f = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same w cost
+	SXMatrix f = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same w cost
+	SXMatrix f_x = jacobian( f, xk );
+	SXMatrix f_u = jacobian( f, uk );
 
-	f = SXFunction( inputs_xu, xkp1 );
-	f.init();
 
-	f_x = f.jacobian(0);
-	f_u = f.jacobian(1);
-	f_x.init();
-	f_u.init();
+	/**************** Q function *********************/
+	SXMatrix V_0_kp1( create_symbolic("V_0_kp1", 1, 1) );
+	SXMatrix V_x_kp1( create_symbolic("V_x_kp1", ode.nx(), 1) );
+	SXMatrix V_xx_kp1( create_symbolic("V_xx_kp1", ode.nx(), ode.nx()) );
+
+	// Q_0 = 1/2*f'*V_xx*f + V_x_kp1'*f + cost + V_0_kp1
+	SXMatrix Q_0 = prod( f.trans(), prod(V_xx_kp1, f) )/2 // 1/2*f'*V_xx*f (quadratic term)
+		+ prod(V_x_kp1.trans(), f) // V_x_kp1'*f (linear term)
+		+ cost + V_0_kp1; // cost + V_0_kp1 (constant term)
+
+	// Q_x = cost_x + f_x'*( V_x_kp1 + V_xx_kp1*f )
+	SXMatrix Q_x = cost_x + prod(f_x.trans(), V_x_kp1 + prod( V_xx_kp1, f ) );
+	
+	// Q_u = cost_u + f_u'*( V_x_kp1 + V_xx_kp1*f )
+	SXMatrix Q_u = cost_u + prod(f_u.trans(), V_x_kp1 + prod( V_xx_kp1, f ) );
+	
+	// Q_xx = cost_xx + f_x'*V_xx_kp1*f_x
+	SXMatrix Q_xx = cost_xx + prod( f_x.trans(), prod( V_xx_kp1, f_x ) );
+
+	// Q_xu = cost_xu + f_x'*V_xx_kp1*f_u
+	SXMatrix Q_xu = cost_xu + prod( f_x.trans(), prod( V_xx_kp1, f_u ) );
+
+	// Q_uu = cost_uu + f_u'*V_xx_kp1*f_u
+	SXMatrix Q_uu = cost_uu + prod( f_u.trans(), prod( V_xx_kp1, f_u ) );
+
+
+	/************** optimal control *******************/
+	SXMatrix Q_uu_inv = inv( Q_uu );
+	SXMatrix u_feedforward_k   = -prod( Q_uu_inv, Q_u );
+	SXMatrix u_feedback_gain_k = -prod( Q_uu_inv, Q_xu.trans() );
+
+
+	/************** value function propogation ********/
+	SXMatrix V_0_k  = Q_0  - prod( Q_u.trans(), prod( Q_uu_inv, Q_u ) );
+	SXMatrix V_x_k  = Q_x  - prod( Q_xu, prod( Q_uu_inv.trans(), Q_u ) );
+	SXMatrix V_xx_k = Q_xx - prod( Q_xu, prod( Q_uu_inv, Q_xu.trans() ) );
+
+
+	/*************** functions ****************/
+	vector<SXMatrix> inputs(LQR_NUM_INPUTS);
+	inputs.at(IDX_INPUTS_X_K)      = xk;
+	inputs.at(IDX_INPUTS_U_K)      = uk;
+	inputs.at(IDX_INPUTS_V_0_KP1)  = V_0_kp1;
+	inputs.at(IDX_INPUTS_V_X_KP1)  = V_x_kp1;
+	inputs.at(IDX_INPUTS_V_XX_KP1) = V_xx_kp1;
+
+	vector<SXMatrix> ilqr_outputs(LQR_NUM_OUTPUTS);
+	ilqr_outputs.at(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K)   = u_feedforward_k;
+	ilqr_outputs.at(IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K) = u_feedback_gain_k;
+	ilqr_outputs.at(IDX_LQR_OUTPUTS_V_0_K)             = V_0_k;
+	ilqr_outputs.at(IDX_LQR_OUTPUTS_V_X_K)             = V_x_k;
+	ilqr_outputs.at(IDX_LQR_OUTPUTS_V_XX_K)            = V_xx_k;
+
+	ilqr_fcn = SXFunction( inputs, ilqr_outputs );
+	ilqr_fcn.init();
+
+	// vector<SXMatrix> cost_outputs(6);
+	// cost_outputs.at(0) = cost;
+	// cost_outputs.at(1) = cost_x;
+	// cost_outputs.at(2) = cost_u;
+	// cost_outputs.at(3) = cost_xx;
+	// cost_outputs.at(4) = cost_xu;
+	// cost_outputs.at(5) = cost_uu;
+
+	// cost_fcn = SXFunction( inputs, cost_outputs );
+	// cost_fcn.init();
+
+	// vector<SXMatrix> dynamics_outputs(3);
+	// dynamics_outputs.at(0) = f;
+	// dynamics_outputs.at(1) = f_x;
+	// dynamics_outputs.at(2) = f_u;
+
+	// dynamics_fcn = SXFunction( inputs, dynamics_outputs );
+	// dynamics_fcn.init();
+
+	// vector<SXMatrix> Q_outputs(6);
+	// Q_outputs.at(0) = Q_0;
+	// Q_outputs.at(1) = Q_x;
+	// Q_outputs.at(2) = Q_u;
+	// Q_outputs.at(3) = Q_xx;
+	// Q_outputs.at(4) = Q_xu;
+	// Q_outputs.at(5) = Q_uu;
+
+	// Q_fcn = SXFunction( inputs, Q_outputs );
+	// Q_fcn.init();
+
+	// cout << "cost:\n" << cost << endl;
+	// cout << "cost_x:\n" << cost_x << endl;
+	// cout << "cost_u:\n" << cost_u << endl;
+	// cout << "cost_xx:\n" << cost_xx << endl;
+	// cout << "cost_xu:\n" << cost_xu << endl;
+	// cout << "cost_uu:\n" << cost_uu << endl;
+
+
+	// cout << "ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size1():   " << ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size1() << endl;
+	// cout << "ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size2():   " << ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size2() << endl;
+	// cout << "ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K).size1(): " << ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K).size1() << endl;
+	// cout << "ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K).size2(): " << ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K).size2() << endl;
+
+
+	// cout << "u_feedback_gain_k:\n";
+	// cout << u_feedback_gain_k << endl << endl;
+	// cout << "u_feedback_gain_k.size1(): " << u_feedback_gain_k.size1() << endl;
+	// cout << "u_feedback_gain_k.size2(): " << u_feedback_gain_k.size2() << endl;
 }
 
-SXMatrix Lqr::takeBackwardsStep(SXMatrix Vxx_kp1, SXMatrix Vx_kp1, SXMatrix V0_kp1)
+void Lqr::runBackwardSweep()
 {
-	
-	
+	/*********** fill in random values for V(N-1) ************/
+	V_0.at(N-1)[0,0] = 1.5;
+
+	for (int k=0; k<ode.nx(); k++)
+		V_x.at(N-1)[0,k] = 1.7*k+0.3;
+
+	int counter = 0;
+	for (int k=0; k<ode.nx(); k++)
+		for (int j=0; j<ode.nx(); j++){
+			V_xx.at(N-1).at(counter) = 0.5 + (j+1)*(k+1)*0.7;
+			counter++;
+		}
+
+	// cout << endl;
+	// cout << "V_0.at(N-1):\n" << V_0.at(N-1) << endl << endl;
+	// cout << "V_x.at(N-1):\n" << V_x.at(N-1) << endl << endl;
+	// cout << "V_xx.at(N-1):\n" << V_xx.at(N-1) << endl << endl;
+
+	/*********** run backward sweep ************/
+	for (int k = N-2; k >= 0; k--)
+		takeBackwardStep(k);
 }
 
+void Lqr::runForwardSweep()
+{
+	// for (int k = 0; k < N-1; k++)
+	// 	takeForwardStep(k);
+}
 
+void Lqr::takeBackwardStep(int timestep)
+{
+	// set inputs
+	ilqr_fcn.setInput( x_trajectory.at( timestep     ), IDX_INPUTS_X_K      );
+	ilqr_fcn.setInput( u_trajectory.at( timestep     ), IDX_INPUTS_U_K      );
+	ilqr_fcn.setInput(          V_0.at( timestep + 1 ), IDX_INPUTS_V_0_KP1  );
+	ilqr_fcn.setInput(          V_x.at( timestep + 1 ), IDX_INPUTS_V_X_KP1  );
+	ilqr_fcn.setInput(         V_xx.at( timestep + 1 ), IDX_INPUTS_V_XX_KP1 );
 
-// SXMatrix Lqr::getOutput(string o)
-// {
-// 	SXMatrix ret = create_symbolic(o, N);
-// 	for (int k=0; k<N; k++)
-// 		ret.at(k) = getOutput(o, k);
-	
-// 	return ret;
-// }
+	// set outputs
+	ilqr_fcn.setOutput(   u_feedforward.at(timestep), IDX_LQR_OUTPUTS_U_FEEDFORWARD_K   );
+	ilqr_fcn.setOutput( u_feedback_gain.at(timestep), IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K );
+	ilqr_fcn.setOutput(             V_0.at(timestep), IDX_LQR_OUTPUTS_V_0_K             );
+	ilqr_fcn.setOutput(             V_x.at(timestep), IDX_LQR_OUTPUTS_V_X_K             );
+	ilqr_fcn.setOutput(            V_xx.at(timestep), IDX_LQR_OUTPUTS_V_XX_K            );
 
-// SX Lqr::getOutput(string o, int timeStep)
-// {
-// 	if (timeStep > N-1){
-// 		cerr << "In SX Lqr::getOutput(string o, int timeStep),\n";
-// 		cerr << "timeStep " << timeStep << " > N-1\n";
-// 		exit(1);
-// 	}
-
-// 	// dynamics constraint
-// 	SX dt = (tf - t0)/(N - 1);
-
-// 	SXMatrix xk = getStateMat(timeStep);
-// 	SXMatrix uk = getActionMat(timeStep);
-	
-// 	SX tk = t0 + timeStep*dt;
-	
-// 	map<string,SX> output = ode.getOutputFromDxdt( xk, uk, params, tk );
-
-// 	// make sure output exists
-// 	map<string, SX>::const_iterator oIter;
-// 	oIter = output.find(o);
-// 	if (oIter == output.end()){
-// 		cerr << "Error - SX Lqr::getOutput(string o, int timeStep) could not find output \"" << o << "\"\n";
-// 		throw 1;
-// 	}
-	
-// 	return output[o];
-// }
-
-// SXMatrix Lqr::getDynamicsConstraintError(int timeStep)
-// {
-// 	if (timeStep > N-2){
-// 		cerr << "In SXMatrix Lqr::getDynamicsConstraintError(int timeStep),\n";
-// 		cerr << "timeStep: " << timeStep << " > N-2   (N==" << N << ")\n";
-// 		exit(1);
-// 	}
-
-// 	// dynamics constraint
-// 	SX dt = (tf - t0)/(N - 1);
-
-// 	SXMatrix x0 = getStateMat(timeStep);
-// 	SXMatrix x1 = getStateMat(timeStep + 1);
-	
-// 	SXMatrix u0 = getActionMat(timeStep);
-// 	SXMatrix u1 = getActionMat(timeStep + 1);
-	
-// 	SX tk0 = t0 + timeStep*dt;
-	
-// 	//SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk0, dt);
-// 	//SXMatrix xErr = x1 - ode.eulerStep( x0, u0, params, tk0, dt);
-// 	SXMatrix xErr = ode.simpsonsRuleError( x0, x1, u0, u1, params, tk0, dt);
-
-// 	return xErr;
-// }
-
-// // total number of discretized states/actions/params
-// int Lqr::getBigN()
-// {
-// 	return N*ode.nxu();
-// }
-
-// // get state at proper timestep
-// SX Lqr::getState(string x, int timeStep)
-// {
-// 	return dv.at(getIdx(x, timeStep));
-// }
-
-// // get action at proper timestep
-// SX Lqr::getAction(string u, int timeStep)
-// {
-// 	return dv.at(getIdx(u, timeStep));
-// }
-
-// // calculate the index of states/actions at proper timestep
-// int Lqr::getIdx(string xu, int timeStep)
-// {
-// 	map<string, int>::const_iterator xIter, uIter;
-
-// 	xIter = ode.states.find(xu);
-// 	uIter = ode.actions.find(xu);
-
-// 	if (xIter != ode.states.end()) // state
-// 		return idx0 + timeStep*ode.nxu() + xIter->second;
-// 	else if (uIter != ode.actions.end()) // action
-// 		return idx0 + timeStep*ode.nxu() + ode.nx() + uIter->second;
-// 	else {
-// 		cerr << "Error - \"" << xu << "\" not found in states/actions" << endl;
-// 		throw -1;
-// 	}
-// 	return -1;
-// }
-
-// void Lqr::setStateActionGuess(string xu, double guess_)
-// {
-// 	for (int k=0; k<N; k++)
-// 		setStateActionGuess(xu, guess_, k);
-// }
-
-// void Lqr::setStateActionGuess(string xu, double guess_, int timeStep)
-// {
-// 	int idx = getIdx(xu, timeStep);
-// 	guess[idx] = guess_;
-// 	if (guess[idx] < lb[idx] ){
-// 		cerr << "Requested initial guess " << xu << "[" << timeStep << "] == " << guess[idx];
-// 		cerr << " is less than lb[" << idx << "] == " << lb[idx] << endl;
-// 		cerr << "Setting guess " << xu << "[" << timeStep << "] = " << lb[idx] << endl;
-// 		guess[idx] = lb[idx];
-// 	}
-// 	if (guess[idx] > ub[idx] ){
-// 		cerr << "Requested initial guess " << xu << "[" << timeStep << "] == " << guess[idx];
-// 		cerr << " is greater than ub[" << idx << "] == " << ub[idx] << endl;
-// 		cerr << "Setting guess " << xu << "[" << timeStep << "] = " << ub[idx] << endl;
-// 		guess[idx] = ub[idx];
-// 	}
-// }
-
-// void Lqr::boundStateAction(string xu, double lb_, double ub_, int timeStep)
-// {
-// 	int idx = getIdx(xu, timeStep);
-// 	lb[idx] = lb_;
-// 	ub[idx] = ub_;
-// 	if (guess[idx] < lb[idx]) guess[idx] = lb[idx];
-// 	if (guess[idx] > ub[idx]) guess[idx] = ub[idx];
-// }
-
-// void Lqr::boundStateAction(string xu, double lb_, double ub_)
-// {
-// 	for (int k=0; k<N; k++)
-// 		boundStateAction(xu, lb_, ub_, k);
-// }
-
-
-// SXMatrix Lqr::getStateMat(int timeStep)
-// {
-// 	SXMatrix ret = create_symbolic("a_state", ode.nx());
-// 	// SXMatrix ret(ode.nx(), 1);
-// 	map<string,int>::const_iterator xIter;
-// 	for (xIter = ode.states.begin(); xIter != ode.states.end(); xIter++)
-// 		ret[xIter->second] = getState(xIter->first, timeStep);
-
-// 	return ret;
-// }
-
-// SXMatrix Lqr::getActionMat(int timeStep)
-// {
-// 	SXMatrix ret = create_symbolic("an_action", ode.nu());
-// 	//	SXMatrix ret(ode.nu(),1);
-// 	map<string,int>::const_iterator uIter;
-// 	for (uIter = ode.actions.begin(); uIter != ode.actions.end(); uIter++)
-// 		ret[uIter->second] = getAction(uIter->first, timeStep);
-
-// 	return ret;
-// }
-
-// void Lqr::writeOctaveOutput( ofstream & f, double * xOpt )
-// {
-// 	f.precision(10);
-
-// 	f << "function multipleShooting = ms_stage_" << name << "_out()" << endl;
-
-// 	map<string, int>::const_iterator iter;
-
-// 	// states
-// 	f << "% states\n";
-// 	f << "multipleShooting.states = struct();\n";
-// 	for (iter = ode.states.begin(); iter != ode.states.end(); iter++){
-// 		f << "multipleShooting.states." << iter->first << " = [" ;
-// 		for (int k=0; k<N; k++){
-// 			int idx = getIdx( iter->first, k );
-// 			if (k < N-1)
-// 				f << xOpt[idx] << ", ";
-// 			else
-// 				f << xOpt[idx] << "];" << endl;
-// 		}
-// 	}
-// 	f << endl;
-
-
-// 	// actions
-// 	f << "% actions\n";
-// 	f << "multipleShooting.actions = struct();\n";
-// 	for (iter = ode.actions.begin(); iter != ode.actions.end(); iter++){
-// 		f << "multipleShooting.actions." << iter->first << " = [" ;
-// 		for (int k=0; k<N; k++){
-// 			int idx = getIdx( iter->first, k );
-// 			if (k < N-1)
-// 				f << xOpt[idx] << ", ";
-// 			else
-// 				f << xOpt[idx] << "];" << endl;
-// 		}
-// 	}
-// 	f << endl;
-
-
-// 	// outputs
-// 	f << "% outputs\n";
-// 	f << "multipleShooting.outputs = struct();\n";
-// 	for (iter = ode.outputs.begin(); iter != ode.outputs.end(); iter++){
-
-// 		SXMatrix outSXMatrix = getOutput(iter->first);
-// 		SXFunction outputFcn(dv, outSXMatrix);
-// 		outputFcn.init();
-// 		outputFcn.setInput(xOpt);
-// 		outputFcn.evaluate();
-// 		vector<double>outDouble(N);
-// 		outputFcn.getOutput(outDouble);
-
-// 		f << "multipleShooting.outputs." << iter->first << " = [";
-// 		for (int k=0; k<N; k++){
-// 			if (k < N - 1)
-// 				f << outDouble[k] << ", ";
-// 			else
-// 				f << outDouble[k] << "];" << endl;
-// 		}
-// 	}
-// 	f << endl;
-
-
-// 	// start/end times
-// 	f << "% time\n";
-// 	SXFunction timeFcn( dv, vertcat( SXMatrix(t0), SXMatrix(tf) ) );
-// 	timeFcn.init();
-// 	timeFcn.setInput( xOpt );
-// 	timeFcn.evaluate();
-// 	double timeNum[2];
-// 	timeFcn.getOutput( timeNum );
-
-// 	f << "multipleShooting.time = linspace(" << timeNum[0] << ", " << timeNum[1] << ", " << N << ");\n\n";
-// }
+	// evaluate
+	ilqr_fcn.evaluate();
+}

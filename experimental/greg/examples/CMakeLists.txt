@@ -60,9 +60,14 @@ target_link_libraries(rocketmex
     casadi
 )
     
-
 add_executable(raptors raptors.cpp)
 target_link_libraries(raptors
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+)
+
 add_executable(lqrTest lqrTest.cpp)
 target_link_libraries(lqrTest
   cppocp

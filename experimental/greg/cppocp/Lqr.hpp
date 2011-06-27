@@ -13,6 +13,19 @@
 #include <casadi/sx/sx_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
 
+#define IDX_INPUTS_X_K      0
+#define IDX_INPUTS_U_K      1
+#define IDX_INPUTS_V_0_KP1  2
+#define IDX_INPUTS_V_X_KP1  3
+#define IDX_INPUTS_V_XX_KP1 4
+#define LQR_NUM_INPUTS      5
+
+#define IDX_LQR_OUTPUTS_U_FEEDFORWARD_K   0
+#define IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K 1
+#define IDX_LQR_OUTPUTS_V_0_K             2
+#define IDX_LQR_OUTPUTS_V_X_K             3
+#define IDX_LQR_OUTPUTS_V_XX_K            4
+#define LQR_NUM_OUTPUTS                   5
 
 class Lqr
 {
@@ -22,9 +35,8 @@ public:
 							std::map<std::string,CasADi::SX> action));
 	~Lqr();
 
-	CasADi::SXMatrix takeBackwardsStep(CasADi::SXMatrix Vxx_kp1, CasADi::SXMatrix Vx_kp1, CasADi::SXMatrix V0_kp1);
-	
-	// void writeOctaveOutput( std::ofstream & f, double * xOpt);
+	void runBackwardSweep(void);
+	void runForwardSweep(void);
 	
 private:
 	double t0;
@@ -32,34 +44,25 @@ private:
 	int N;
 
 	Ode & ode;
-	
-	// cost function/gradients/hessians
-	CasADi::SXFunction cost;
-	CasADi::SXFunction cost_x;
-	CasADi::SXFunction cost_u;
-	CasADi::SXFunction cost_xx;
-	CasADi::SXFunction cost_xu;
-	CasADi::SXFunction cost_uu;
 
-	// dynamics function/gradients
-	CasADi::SXFunction f;
-	CasADi::SXFunction f_x; // A matrix
-	CasADi::SXFunction f_u; // B matrix
-	// CasADi::SXFunction f_xx;
-	// CasADi::SXFunction f_xu;
-	// CasADi::SXFunction f_uu;
+	// trajectory
+	std::vector<CasADi::DMatrix> V_0;
+	std::vector<CasADi::DMatrix> V_x;
+	std::vector<CasADi::DMatrix> V_xx;
+	std::vector<CasADi::DMatrix> u_feedforward;
+	std::vector<CasADi::DMatrix> u_feedback_gain;
+	std::vector<CasADi::DMatrix> x_trajectory;
+	std::vector<CasADi::DMatrix> u_trajectory;
 
-	// Q functions, gradients, hessians
-	CasADi::SXFunction Q_0_fcn;
-	CasADi::SXFunction Q_x_fcn;
-	CasADi::SXFunction Q_u_fcn;
-	CasADi::SXFunction Q_xx_fcn;
-	CasADi::SXFunction Q_xu_fcn;
-	CasADi::SXFunction Q_uu_fcn;
+	// SXFunctions
+	CasADi::SXFunction ilqr_fcn;
+	// CasADi::SXFunction cost_fcn;
+	// CasADi::SXFunction dynamics_fcn;
+	// CasADi::SXFunction Q_fcn;
 
 	void setupFunctions(void);
-
-
+	void takeBackwardStep(int timestep);
+	void takeForwardStep(int timestep);
 
 	CasADi::SX (*costFcnExt)(std::map<std::string,CasADi::SX> state,
 							 std::map<std::string,CasADi::SX> action);

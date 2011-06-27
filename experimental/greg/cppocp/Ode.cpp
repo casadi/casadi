@@ -176,8 +176,6 @@ SXMatrix Ode::eulerStep( SXMatrix x0Vec, SXMatrix u0Vec, map<string,SX> & p, SX 
 	return x0Vec + dt*dxVectorDt( x0Vec, u0Vec, p, t0 );
 }
 
-
-
 SXMatrix Ode::simpsonsRuleError( SXMatrix x0Vec, SXMatrix x1Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX dt)
 {
 	SXMatrix f0 = dxVectorDt( x0Vec, u0Vec, p, t0          );
