@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.0)
 project(cppocp)
 
 SET(CPPOCP_SRCS
+  Lqr.cpp   Lqr.hpp
   Ocp.cpp   Ocp.hpp
   MultipleShooting.cpp   MultipleShooting.hpp
   Ode.cpp   Ode.hpp

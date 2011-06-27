@@ -63,6 +63,8 @@ target_link_libraries(rocketmex
 
 add_executable(raptors raptors.cpp)
 target_link_libraries(raptors
+add_executable(lqrTest lqrTest.cpp)
+target_link_libraries(lqrTest
   cppocp
   casadi 
   ${SNOPT_LIBRARIES}

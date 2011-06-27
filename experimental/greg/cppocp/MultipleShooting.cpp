@@ -1,4 +1,4 @@
-// MultipleShooting.hpp
+// MultipleShooting.cpp
 // Greg Horn
 // Casadi 2011
 

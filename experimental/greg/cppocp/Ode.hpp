@@ -76,13 +76,13 @@ public:
 
 	void assertUniqueName(std::string newName);
 
+	std::map<std::string,CasADi::SX> getStateMap( CasADi::SXMatrix & x);
+	std::map<std::string,CasADi::SX> getActionMap( CasADi::SXMatrix & u);
+
 private:
 	int isState(std::string stateName);
 	int isAction(std::string actionName);
 	int isOutput(std::string outputName);
-
-	std::map<std::string,CasADi::SX> getStateMap( CasADi::SXMatrix & x);
-	std::map<std::string,CasADi::SX> getActionMap( CasADi::SXMatrix & u);
 
 
 protected:
