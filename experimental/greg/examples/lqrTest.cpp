@@ -21,8 +21,6 @@
 using namespace CasADi;
 using namespace std;
 
-static SnoptInterface solve_cartpole(void);
-
 
 void
 dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<string,SX> action, map<string,SX> param, SX t)
@@ -84,91 +82,86 @@ cost(map<string,SX> state, map<string,SX> action)
 int
 main()
 {
-	// SnoptInterface si = solve_cartpole();
-	// si.run();
-	// vector<double>xopt(ms.getBigN());
-	// solver.getOutput(xopt,NLP_X_OPT);
-	// ocp.writeOctaveOutput("cartpole_out", si.x);
-	// si.writeOctaveOutput("multipliers_out");
-	
-	// // Print the optimal cost
-	// cout << "optimal time: " << si.F[0] << endl;
-	//cout << "optimal solution: " << xopt << endl;
-	
-	
+	/************* get solution **************/
+	double trackLength = 4;
+  
 	Ode ode = getOde();
+	Ocp ocp;
+	SX tEnd = ocp.addParam("tEnd");
+  
+	MultipleShooting & ms = ocp.addMultipleShooting("cartpole", ode, 0.0, tEnd, 60);
+
+	int N = ms.N;
+  
+	// cost function
+	SX xf = ms.getState("x", ms.N-1);
+	SX thetaf = ms.getState("theta", N-1);
+	SX vthetaf = ms.getState("vtheta", N-1);
+
+  
+	ocp.objFun = tEnd+50*cos(thetaf)+5*(vthetaf)*vthetaf; // minimum time
+	//ocp.objFun = tEnd;
+  
+  
+	// bounds
+	ocp.boundParam("tEnd", 4, 50);
+	
+	ms.boundStateAction("x", -trackLength/2, trackLength/2);
+	ms.boundStateAction("vx", -22, 22);
+	ms.boundStateAction("theta", -50, 50);
+	ms.boundStateAction("vtheta", -50, 50);
+
+	ms.boundStateAction("u",-20,20);
+
+	/// initial conditions
+	ms.boundStateAction("x",0,0,0);
+	ms.boundStateAction("theta",0.1,0.1,0);
+	ms.boundStateAction("vx",0,0,0);
+	ms.boundStateAction("vtheta",0,0,0);
+
+	ocp.addNonlconIneq(ms.getState("x",0), "startx");
+	ocp.addNonlconEq(ms.getState("vx",N/2), "xstall");	
+
+	//   for(int k = 0; k < ms.N; k++) {
+	//     ms.setStateActionGuess("theta", double(k)*3.1415/ms.N, k);
+	//     ms.setStateActionGuess("vtheta", 3.1415/ms.N, k);
+	//   }
+
+	//   ms.boundStateAction("theta",3.1415,3.1415,ms.N-1);
+	//   ms.boundStateAction("x",0, 0, ms.N-1);
+	//   ms.boundStateAction("vx",0, 0, ms.N-1);
+	//   ms.boundStateAction("vtheta",0, 0, ms.N-1);
+
+	
+	// solve
+	SnoptInterface si(ocp);
+	
+	si.run();
+	ocp.writeOctaveOutput("cartpole_out");
+	
+	// Print the optimal cost
+	cout << "optimal time: " << si.F[0] << endl;
+	
+	
+	/************** run lqr ****************/
 	double t0 = 0;
-	double tf = 6;
-	int N = 2;
-	Lqr lqr(ode, t0, tf, N, &cost);
+	double tf = ocp.getParamSolution("tEnd");
+ 	Lqr lqr(ode, t0, tf, N, &cost);
+
+	for (int k=0; k<N; k++)
+		lqr.x_trajectory.at(k) = ocp.getStateSolution(k);
+	for (int k=0; k<N-1; k++)
+		lqr.u_trajectory.at(k) = ocp.getActionSolution(k);
+
+
+	// for (int k=0; k<N; k++)
+	// 	cout << "lqr.x_trajectory.at(" << k << "):\n" << lqr.x_trajectory.at(k) << endl;
+	// for (int k=0; k<N-1; k++)
+	// 	cout << "lqr.u_trajectory.at(" << k << "):\n" << lqr.u_trajectory.at(k) << endl;
+
 
 	lqr.runBackwardSweep();
 	
 	cout << "successful finish\n";
 	return 0;
-}
-
-
-
-
-
-SnoptInterface
-solve_cartpole()
-{
-  double trackLength = 4;
-  
-  Ode ode = getOde();
-  Ocp ocp;
-  SX tEnd = ocp.addParam("tEnd");
-  
-  MultipleShooting & ms = ocp.addMultipleShooting("cartpole", ode, 0.0, tEnd, 60);
-
-	int N = ms.N;
-  
-  // cost function
-  SX xf = ms.getState("x", ms.N-1);
-  SX thetaf = ms.getState("theta", N-1);
-  SX vthetaf = ms.getState("vtheta", N-1);
-
-  
-  ocp.objFun = tEnd+50*cos(thetaf)+5*(vthetaf)*vthetaf; // minimum time
-  //ocp.objFun = tEnd;
-  
-  
-  // bounds
-  ocp.boundParam("tEnd", 4, 50);
-	
-  ms.boundStateAction("x", -trackLength/2, trackLength/2);
-  ms.boundStateAction("vx", -22, 22);
-  ms.boundStateAction("theta", -50, 50);
-  ms.boundStateAction("vtheta", -50, 50);
-
-  ms.boundStateAction("u",-20,20);
-
-  /// initial conditions
-  ms.boundStateAction("x",0,0,0);
-  ms.boundStateAction("theta",0.1,0.1,0);
-  ms.boundStateAction("vx",0,0,0);
-  ms.boundStateAction("vtheta",0,0,0);
-
-	ocp.addNonlconIneq(ms.getState("x",0), "startx");
-	ocp.addNonlconEq(ms.getState("vx",N/2), "xstall");	
-
-//   for(int k = 0; k < ms.N; k++) {
-//     ms.setStateActionGuess("theta", double(k)*3.1415/ms.N, k);
-//     ms.setStateActionGuess("vtheta", 3.1415/ms.N, k);
-//   }
-
-//   ms.boundStateAction("theta",3.1415,3.1415,ms.N-1);
-//   ms.boundStateAction("x",0, 0, ms.N-1);
-//   ms.boundStateAction("vx",0, 0, ms.N-1);
-//   ms.boundStateAction("vtheta",0, 0, ms.N-1);
-
-
-
-
-  // solve
-  SnoptInterface si(ocp);
-
-  return si;
 }

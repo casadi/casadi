@@ -37,13 +37,6 @@ public:
 
 	void runBackwardSweep(void);
 	void runForwardSweep(void);
-	
-private:
-	double t0;
-	double tf;
-	int N;
-
-	Ode & ode;
 
 	// trajectory
 	std::vector<CasADi::DMatrix> V_0;
@@ -54,11 +47,19 @@ private:
 	std::vector<CasADi::DMatrix> x_trajectory;
 	std::vector<CasADi::DMatrix> u_trajectory;
 
+	
+private:
+	double t0;
+	double tf;
+	int N;
+
+	Ode & ode;
+
 	// SXFunctions
 	CasADi::SXFunction ilqr_fcn;
-	// CasADi::SXFunction cost_fcn;
-	// CasADi::SXFunction dynamics_fcn;
-	// CasADi::SXFunction Q_fcn;
+	CasADi::SXFunction cost_fcn;
+	CasADi::SXFunction dynamics_fcn;
+	CasADi::SXFunction Q_fcn;
 
 	void setupFunctions(void);
 	void takeBackwardStep(int timestep);

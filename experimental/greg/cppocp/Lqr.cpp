@@ -132,35 +132,35 @@ void Lqr::setupFunctions()
 	ilqr_fcn = SXFunction( inputs, ilqr_outputs );
 	ilqr_fcn.init();
 
-	// vector<SXMatrix> cost_outputs(6);
-	// cost_outputs.at(0) = cost;
-	// cost_outputs.at(1) = cost_x;
-	// cost_outputs.at(2) = cost_u;
-	// cost_outputs.at(3) = cost_xx;
-	// cost_outputs.at(4) = cost_xu;
-	// cost_outputs.at(5) = cost_uu;
+	vector<SXMatrix> cost_outputs(6);
+	cost_outputs.at(0) = cost;
+	cost_outputs.at(1) = cost_x;
+	cost_outputs.at(2) = cost_u;
+	cost_outputs.at(3) = cost_xx;
+	cost_outputs.at(4) = cost_xu;
+	cost_outputs.at(5) = cost_uu;
 
-	// cost_fcn = SXFunction( inputs, cost_outputs );
-	// cost_fcn.init();
+	cost_fcn = SXFunction( inputs, cost_outputs );
+	cost_fcn.init();
 
-	// vector<SXMatrix> dynamics_outputs(3);
-	// dynamics_outputs.at(0) = f;
-	// dynamics_outputs.at(1) = f_x;
-	// dynamics_outputs.at(2) = f_u;
+	vector<SXMatrix> dynamics_outputs(3);
+	dynamics_outputs.at(0) = f;
+	dynamics_outputs.at(1) = f_x;
+	dynamics_outputs.at(2) = f_u;
 
-	// dynamics_fcn = SXFunction( inputs, dynamics_outputs );
-	// dynamics_fcn.init();
+	dynamics_fcn = SXFunction( inputs, dynamics_outputs );
+	dynamics_fcn.init();
 
-	// vector<SXMatrix> Q_outputs(6);
-	// Q_outputs.at(0) = Q_0;
-	// Q_outputs.at(1) = Q_x;
-	// Q_outputs.at(2) = Q_u;
-	// Q_outputs.at(3) = Q_xx;
-	// Q_outputs.at(4) = Q_xu;
-	// Q_outputs.at(5) = Q_uu;
+	vector<SXMatrix> Q_outputs(6);
+	Q_outputs.at(0) = Q_0;
+	Q_outputs.at(1) = Q_x;
+	Q_outputs.at(2) = Q_u;
+	Q_outputs.at(3) = Q_xx;
+	Q_outputs.at(4) = Q_xu;
+	Q_outputs.at(5) = Q_uu;
 
-	// Q_fcn = SXFunction( inputs, Q_outputs );
-	// Q_fcn.init();
+	Q_fcn = SXFunction( inputs, Q_outputs );
+	Q_fcn.init();
 
 	// cout << "cost:\n" << cost << endl;
 	// cout << "cost_x:\n" << cost_x << endl;
@@ -168,7 +168,6 @@ void Lqr::setupFunctions()
 	// cout << "cost_xx:\n" << cost_xx << endl;
 	// cout << "cost_xu:\n" << cost_xu << endl;
 	// cout << "cost_uu:\n" << cost_uu << endl;
-
 
 	// cout << "ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size1():   " << ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size1() << endl;
 	// cout << "ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size2():   " << ilqr_fcn.outputSX(IDX_LQR_OUTPUTS_U_FEEDFORWARD_K).size2() << endl;
@@ -197,14 +196,17 @@ void Lqr::runBackwardSweep()
 			counter++;
 		}
 
-	// cout << endl;
-	// cout << "V_0.at(N-1):\n" << V_0.at(N-1) << endl << endl;
-	// cout << "V_x.at(N-1):\n" << V_x.at(N-1) << endl << endl;
-	// cout << "V_xx.at(N-1):\n" << V_xx.at(N-1) << endl << endl;
-
 	/*********** run backward sweep ************/
 	for (int k = N-2; k >= 0; k--)
 		takeBackwardStep(k);
+
+	// print
+	for (int k = N-1; k >= 0; k--){
+		cout << endl;
+		cout << "V_0.at("  << k << "):\n" << V_0.at(k)  << endl << endl;
+		cout << "V_x.at("  << k << "):\n" << V_x.at(k)  << endl << endl;
+		cout << "V_xx.at(" << k << "):\n" << V_xx.at(k) << endl << endl;
+	}
 }
 
 void Lqr::runForwardSweep()
@@ -223,12 +225,20 @@ void Lqr::takeBackwardStep(int timestep)
 	ilqr_fcn.setInput(         V_xx.at( timestep + 1 ), IDX_INPUTS_V_XX_KP1 );
 
 	// set outputs
-	ilqr_fcn.setOutput(   u_feedforward.at(timestep), IDX_LQR_OUTPUTS_U_FEEDFORWARD_K   );
-	ilqr_fcn.setOutput( u_feedback_gain.at(timestep), IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K );
-	ilqr_fcn.setOutput(             V_0.at(timestep), IDX_LQR_OUTPUTS_V_0_K             );
-	ilqr_fcn.setOutput(             V_x.at(timestep), IDX_LQR_OUTPUTS_V_X_K             );
-	ilqr_fcn.setOutput(            V_xx.at(timestep), IDX_LQR_OUTPUTS_V_XX_K            );
+	// ilqr_fcn.setOutput(   u_feedforward.at(timestep), IDX_LQR_OUTPUTS_U_FEEDFORWARD_K   );
+	// ilqr_fcn.setOutput( u_feedback_gain.at(timestep), IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K );
+	// ilqr_fcn.setOutput(             V_0.at(timestep), IDX_LQR_OUTPUTS_V_0_K             );
+	// ilqr_fcn.setOutput(             V_x.at(timestep), IDX_LQR_OUTPUTS_V_X_K             );
+	// ilqr_fcn.setOutput(            V_xx.at(timestep), IDX_LQR_OUTPUTS_V_XX_K            );
 
 	// evaluate
 	ilqr_fcn.evaluate();
+
+	// get outputs
+	ilqr_fcn.getOutput(   u_feedforward.at(timestep), IDX_LQR_OUTPUTS_U_FEEDFORWARD_K   );
+	ilqr_fcn.getOutput( u_feedback_gain.at(timestep), IDX_LQR_OUTPUTS_U_FEEDBACK_GAIN_K );
+	ilqr_fcn.getOutput(             V_0.at(timestep), IDX_LQR_OUTPUTS_V_0_K             );
+	ilqr_fcn.getOutput(             V_x.at(timestep), IDX_LQR_OUTPUTS_V_X_K             );
+	ilqr_fcn.getOutput(            V_xx.at(timestep), IDX_LQR_OUTPUTS_V_XX_K            );
+
 }
