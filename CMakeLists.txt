@@ -17,6 +17,7 @@ option(WITH_JIT "Enable just-in-time compilation" OFF)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 option(WITH_GSL "Compile the GSL interface" ON)
+option(WITH_OPENMP "Compile with parallelization support" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -48,14 +49,14 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 
-# enabling openmp if supperted (with cmake 2.8.0 or newer)
-if(CMAKE_MAJOR_VERSION GREATER 2 OR CMAKE_MINOR_VERSION GREATER 7)
+# enabling openmp support if requesed
+if(WITH_OPENMP)
 find_package (OpenMP)
 if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 endif(OPENMP_FOUND)
-endif(CMAKE_MAJOR_VERSION GREATER 2 OR CMAKE_MINOR_VERSION GREATER 7)
+endif(WITH_OPENMP)
 
 #SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)

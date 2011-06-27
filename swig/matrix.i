@@ -432,7 +432,7 @@ PyObject* arrayView() {
   std::vector<double> &v = $self->data();
   return PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, &v[0]);
 }
-#endif WITH_NUMPY
+#endif // WITH_NUMPY
 
 %pythoncode %{
   def __eq__(self,other):
