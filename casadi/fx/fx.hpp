@@ -307,9 +307,9 @@ void setAdjSens(T val, int ind=0, int dir=0) const ;
 
 #define SETTERS(T)\
   void setInput(T val, int ind=0)             { casadi_assert(isInit()); input(ind).set(val);  } \
-  void setOutput(T val, int ind=0)            { casadi_assert(isInit()); input(ind).set(val); } \
+  void setOutput(T val, int ind=0)            { casadi_assert(isInit()); output(ind).set(val); } \
   void setFwdSeed(T val, int ind=0, int dir=0){ casadi_assert(isInit()); fwdSeed(ind,dir).set(val); } \
-  void setFwdSens(T val, int ind=0, int dir=0){ casadi_assert(isInit()); fwdSeed(ind,dir).set(val); } \
+  void setFwdSens(T val, int ind=0, int dir=0){ casadi_assert(isInit()); fwdSens(ind,dir).set(val); } \
   void setAdjSeed(T val, int ind=0, int dir=0){ casadi_assert(isInit()); adjSeed(ind,dir).set(val); } \
   void setAdjSens(T val, int ind=0, int dir=0){ casadi_assert(isInit()); adjSens(ind,dir).set(val); }
 
