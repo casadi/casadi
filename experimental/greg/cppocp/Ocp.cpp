@@ -119,7 +119,21 @@ MultipleShooting & Ocp::addMultipleShooting(string name, Ode & ode, SX t0, SX tf
 // get param
 SX & Ocp::getParam(string p)
 {
+	if (!isParam(p)){
+		cerr << "Error in Ocp::getParam - \"" << p << "\" is not a known parameter\n";
+		throw 1;
+	}
+
 	return params[p];
+}
+
+double Ocp::getParamSolution(string p)
+{
+	if (!isParam(p)){
+		cerr << "Error in Ocp::getParamSolution - \"" << p << "\" is not a known parameter\n";
+		throw 1;
+	}
+	return xopt.at(paramsIdx[p]);
 }
 
 // add a param
@@ -191,7 +205,33 @@ int Ocp::isParam(string paramName)
 	return 0;
 }
 
-void Ocp::writeSolution( const char * filename, double * xOpt )
+// get states/actions (only for single-stage ocp now)
+DMatrix Ocp::getStateSolution(int timestep)
+{
+	if (ms.size() != 1){
+		cerr << "Error in Ocp::getStateSolution - ms.size != 1\n";
+		throw 1;
+	}
+
+	MultipleShooting * firstMs = ms.begin()->second;
+
+	return firstMs->getState( timestep, xopt );
+}
+
+DMatrix Ocp::getActionSolution(int timestep)
+{
+	if (ms.size() != 1){
+		cerr << "Error in Ocp::getActionSolution - ms.size != 1\n";
+		throw 1;
+	}
+
+	MultipleShooting * firstMs = ms.begin()->second;
+
+	return firstMs->getAction( timestep, xopt );
+}
+
+
+void Ocp::writeSolution( const char * filename )
 {
 	ofstream f(filename);
 
@@ -201,7 +241,7 @@ void Ocp::writeSolution( const char * filename, double * xOpt )
 	}
 	f.precision(15);
 	for (int k=0; k<guess.size(); k++)
-		f << xOpt[k] << endl;
+		f << xopt.at(k) << endl;
 
 	f.close();
 }
@@ -237,7 +277,7 @@ void Ocp::loadGuess( const char * filename )
 	f.close();
 }
 
-void Ocp::writeOctaveOutput( string name, double * xOpt)
+void Ocp::writeOctaveOutput( string name )
 {
 	string filename(name);
 	filename.append(".m");
@@ -261,7 +301,7 @@ void Ocp::writeOctaveOutput( string name, double * xOpt)
 	f << "opt.params = struct();\n";
 	for (siIter = paramsIdx.begin(); siIter != paramsIdx.end(); siIter++){
 		int idx = paramsIdx[ siIter->first ];
-		f << "opt.params." << siIter->first << " = " << xOpt[idx] << ";" << endl;
+		f << "opt.params." << siIter->first << " = " << xopt.at(idx) << ";" << endl;
 	}
 	f << endl;
 
@@ -306,6 +346,7 @@ void Ocp::writeOctaveOutput( string name, double * xOpt)
 		f << endl << endl;
 	}
 
+
 	// actions
 	f << "% actions\n";
 	f << "opt.actions = struct();\n";
@@ -349,9 +390,9 @@ void Ocp::writeOctaveOutput( string name, double * xOpt)
 	
 	/************** write all the multiple shooting outputs *********/
 	f << "%%%%%%%%%% each stage's individual output %%%%%%%%%%%\n";
-	for (msIter = ms.begin(); msIter != ms.end(); msIter++){
-		(msIter->second)->writeOctaveOutput( f, xOpt );
-	}
+	for (msIter = ms.begin(); msIter != ms.end(); msIter++)
+		(msIter->second)->writeOctaveOutput( f, xopt );
 
 	f.close();
+
 }

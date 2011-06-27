@@ -193,6 +193,26 @@ SXMatrix MultipleShooting::getStateMat(int timeStep)
 	return ret;
 }
 
+DMatrix MultipleShooting::getState(int timeStep, vector<double> & xopt)
+{
+	DMatrix ret(ode.nx(), 1, 0.0);
+	map<string,int>::const_iterator xIter;
+	for (xIter = ode.states.begin(); xIter != ode.states.end(); xIter++)
+		ret.at(xIter->second) = xopt.at(getIdx( xIter->first, timeStep ));
+
+	return ret;
+}
+
+DMatrix MultipleShooting::getAction(int timeStep, vector<double> & xopt)
+{
+	DMatrix ret(ode.nu(), 1, 0.0);
+	map<string,int>::const_iterator uIter;
+	for (uIter = ode.actions.begin(); uIter != ode.actions.end(); uIter++)
+		ret.at(uIter->second) = xopt.at(getIdx( uIter->first, timeStep ));
+
+	return ret;
+}
+
 SXMatrix MultipleShooting::getActionMat(int timeStep)
 {
 	SXMatrix ret = create_symbolic("an_action", ode.nu());
@@ -204,7 +224,7 @@ SXMatrix MultipleShooting::getActionMat(int timeStep)
 	return ret;
 }
 
-void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
+void MultipleShooting::writeOctaveOutput( ofstream & f, vector<double> & xopt )
 {
 	f.precision(10);
 
@@ -220,9 +240,9 @@ void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
 		for (int k=0; k<N; k++){
 			int idx = getIdx( iter->first, k );
 			if (k < N-1)
-				f << xOpt[idx] << ", ";
+				f << xopt.at(idx) << ", ";
 			else
-				f << xOpt[idx] << "];" << endl;
+				f << xopt.at(idx) << "];" << endl;
 		}
 	}
 	f << endl;
@@ -236,9 +256,9 @@ void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
 		for (int k=0; k<N; k++){
 			int idx = getIdx( iter->first, k );
 			if (k < N-1)
-				f << xOpt[idx] << ", ";
+				f << xopt.at(idx) << ", ";
 			else
-				f << xOpt[idx] << "];" << endl;
+				f << xopt.at(idx) << "];" << endl;
 		}
 	}
 	f << endl;
@@ -252,7 +272,7 @@ void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
 		SXMatrix outSXMatrix = getOutput(iter->first);
 		SXFunction outputFcn(dv, outSXMatrix);
 		outputFcn.init();
-		outputFcn.setInput(xOpt);
+		outputFcn.setInput(xopt);
 		outputFcn.evaluate();
 		vector<double>outDouble(N);
 		outputFcn.getOutput(outDouble);
@@ -272,7 +292,7 @@ void MultipleShooting::writeOctaveOutput( ofstream & f, double * xOpt )
 	f << "% time\n";
 	SXFunction timeFcn( dv, vertcat( SXMatrix(t0), SXMatrix(tf) ) );
 	timeFcn.init();
-	timeFcn.setInput( xOpt );
+	timeFcn.setInput( xopt );
 	timeFcn.evaluate();
 	double timeNum[2];
 	timeFcn.getOutput( timeNum );

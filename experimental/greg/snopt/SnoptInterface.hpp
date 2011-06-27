@@ -30,7 +30,7 @@ class SnoptInterface
 public:
 	~SnoptInterface(void);
 	// SnoptInterface(const CasADi::SXFunction& user_F);
-	SnoptInterface(const Ocp& ocp);
+	SnoptInterface( Ocp& ocp );
 
 	// objective/constraints
 	CasADi::SXMatrix ftotal;
@@ -86,5 +86,5 @@ public:
 	integer * iGfun; // row indeces of sparse jacobian
 	integer * jGvar; // col indeces of sparse jacobian
 private:
-  const Ocp & ocp;
+	Ocp & ocp;
 };

@@ -40,15 +40,22 @@ public:
 
 	CasADi::SX & addParam(std::string _newParam);
 	CasADi::SX & getParam(std::string p);
+	double getParamSolution(std::string p);
 	void boundParam(std::string p, double lb_, double ub_);
 	void setParamGuess(std::string p, double guess_);
 	
-	void writeOctaveOutput( std::string name, double * xOpt);
-	void writeSolution( const char * filename, double * xOpt );
+	CasADi::DMatrix getStateSolution(int timestep);
+	CasADi::DMatrix getActionSolution(int timestep);
+
+
+	void writeOctaveOutput( std::string name );
+	void writeSolution( const char * filename );
 	void loadGuess( const char * filename );
 
 	// multiple shooting instances
 	std::map<std::string,MultipleShooting*> ms;
+
+	std::vector<double> xopt;
 
 private:
 

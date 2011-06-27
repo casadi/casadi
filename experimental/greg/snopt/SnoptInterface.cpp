@@ -60,11 +60,9 @@ SnoptInterface::~SnoptInterface()
 // 	init();
 // }
 
-SnoptInterface::SnoptInterface(const Ocp& _ocp) : designVariables(_ocp.designVariables), ocp(_ocp)
+SnoptInterface::SnoptInterface( Ocp& _ocp ) : designVariables(_ocp.designVariables), ocp(_ocp)
 {
 	si = this;
-
-	//	ocp = _ocp;
 
 	ftotal = vertcat( SXMatrix(_ocp.objFun), _ocp.g );
 
@@ -353,6 +351,11 @@ SnoptInterface::run()
 
 	snclose_( &iPrint );
 	snclose_( &iSpecs );
+
+	// write solution to ocp
+	ocp.xopt.clear();
+	for (int k=0; k<n; k++)
+		ocp.xopt.push_back(x[k]);
 }
 
 

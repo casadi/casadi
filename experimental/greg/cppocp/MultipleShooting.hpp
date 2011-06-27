@@ -32,10 +32,10 @@ public:
 
 	void boundStateAction(std::string xu, double lb_, double ub_, int timeStep);
 	void boundStateAction(std::string xu, double lb_, double ub_);
-   void setStateActionGuess(std::string xu, double guess_, int timeStep);
+	void setStateActionGuess(std::string xu, double guess_, int timeStep);
     void setStateActionGuess(std::string xu, double guess_);
 
-	void writeOctaveOutput( std::ofstream & f, double * xOpt);
+	void writeOctaveOutput( std::ofstream & f, std::vector<double> & xopt);
 
 	CasADi::SX getState(std::string x, int timeStep);
 	CasADi::SX getAction(std::string u, int timeStep);
@@ -44,6 +44,10 @@ public:
 
 	CasADi::SXMatrix getStateMat(int timeStep);
 	CasADi::SXMatrix getActionMat(int timeStep);
+
+	CasADi::DMatrix getState(int timeStep, std::vector<double> & xopt);
+	CasADi::DMatrix getAction(int timeStep, std::vector<double> & xopt);
+
 
 	int N;
 	
