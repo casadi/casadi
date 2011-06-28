@@ -308,3 +308,12 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %}
 %include "interfaces/gsl/gsl_integrator.hpp"
 #endif
+
+#ifdef WITH_OOQP
+%{
+#include "casadi/fx/qp_solver.hpp"
+#include "interfaces/ooqp/ooqp_solver.hpp"
+%}
+%include "casadi/fx/qp_solver.hpp"
+%include "interfaces/ooqp/ooqp_solver.hpp"
+#endif

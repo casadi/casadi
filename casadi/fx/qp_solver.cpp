@@ -26,6 +26,10 @@ using namespace std;
 namespace CasADi{
 
 
+QPSolver::QPSolver() {
+
+}
+  
 
 QPSolver::QPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) {
 

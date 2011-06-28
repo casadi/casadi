@@ -42,6 +42,7 @@ enum QPInput{QP_H,QP_G,QP_A,QP_X_INIT,QP_LAMBDA_INIT,QP_NUM_IN};
 /// Outputs arguments of an QP Solver
 enum QPOutput{QP_X_OPT,QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};
 
+// Forward declaration of internal class
 class QPSolverInternal;
 
 /** \brief QPSolver
@@ -57,6 +58,9 @@ class QPSolver : public FX{
 
   /// Default constructor
   QPSolver();
+  
+  /// Constructor with sparsity patterns
+  QPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
 
   /// Access functions of the node
   QPSolverInternal* operator->();

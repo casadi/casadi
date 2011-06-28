@@ -48,6 +48,7 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  
 };
 
 
