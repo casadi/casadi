@@ -22,12 +22,7 @@
 
 #include "ooqp_internal.hpp"
 
-#include "QpGenData.h"
-#include "QpGenVars.h"
-#include "QpGenResiduals.h"
-#include "GondzioSolver.h"
-#include "QpGenSparseMa27.h"
-//#include "QpGenSparseMa57.h"
+#include "casadi/matrix/sparsity_tools.hpp"
 
 using namespace std;
 namespace CasADi {
@@ -42,72 +37,119 @@ OOQPInternal* OOQPInternal::clone() const{
 }
   
 OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
+  addOption("constraints",OT_INTEGERVECTOR,std::vector<int>(nc,1),"Boolean vector indicating equality with 0 and inequality with 1");
+  
   std::cout << "Warning: OOQP is highly experimental" << std::endl;
 }
 
 OOQPInternal::~OOQPInternal(){ 
 }
 
+void OOQPInternal::sort_constraints() {
+
+}
+
+
+void OOQPInternal::allocate() {
+  // TODO: check if pointers are undefined
   
-void OOQPInternal::init(){
   
-const int nx   = 2;
-double    c[]  = { 1.5,  -2 };
-
-double  xupp[] = { 20,   0 };
-char   ixupp[] = {  1,   0 };
-
-double  xlow[] = {  0,   0 };
-char   ixlow[] = {  1,   1 };
-
-const int nnzQ = 3;
-int    irowQ[] = {  0,   1,   1 }; 
-int    jcolQ[] = {  0,   0,   1 };
-double    dQ[] = {  8,   2,  10 };
-
-
-int my         = 0;
-double * b     = 0;
-int nnzA       = 0;
-int * irowA    = 0;
-int * jcolA    = 0;
-double * dA    = 0;
-
-const int mz   = 2;
-double clow[]  = { 2,   0 };
-char  iclow[]  = { 1,   0 };
-
-double cupp[]  = { 0,   6 };
-char  icupp[]  = { 0,   1 };
-
-const int nnzC = 4;
-int   irowC[]  = { 0,   0,   1,   1};
-int   jcolC[]  = { 0,   1,   0,   1};
-double   dC[]  = { 2,   1,  -1,   2};
-   int usage_ok = 1, quiet = 0;
-    
-  QpGenSparseMa27 * qp 
-    = new QpGenSparseMa27( nx, my, mz, nnzQ, nnzA, nnzC );
   
-  QpGenData      * prob = (QpGenData * ) qp->copyDataFromSparseTriple(
-        c,      irowQ,  nnzQ,   jcolQ,  dQ,
-        xlow,   ixlow,  xupp,   ixupp,
-        irowA,  nnzA,   jcolA,  dA,     b,
-        irowC,  nnzC,   jcolC,  dC,
-        clow,   iclow,  cupp,   icupp );
+  if (hasOption("constraints")) {
+    // Get constraints from Option
+    constraints = getOption("constraints").toIntVector();
+  } else {
+    // Guess constraints
+    for (int k=0; k<input(QP_LBX).size();k++) constraints[k] = !(input(QP_LBX).at(k)==input(QP_UBX).at(k));
+  }
+  
+  
+  // Find the number of inequalities
+  n_ineq=0;
+  for (int k=0;k<constraints.size();k++) n_ineq += constraints[k];
+  
+  // Find the number of equalities
+  n_eq = constraints.size()-n_ineq;
+  
+  // Populate ineq
+  ineq.resize(n_ineq);
+  int cntineq=0;
+  for (int k=0;k<constraints.size();k++) {
+    if (constraints[k]) ineq[cntineq++]=k;
+  }
+  
+  // Populate eq
+  eq.resize(n_eq);
+  int cnteq=0;
+  for (int k=0;k<constraints.size();k++) {
+    if (!constraints[k]) eq[cntineq++]=k;
+  }
+  
+  qp = new QpGenSparseMa27( nx, n_eq, n_ineq, input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
+  
 
-  QpGenVars      * vars 
-    = (QpGenVars *) qp->makeVariables( prob );
-  QpGenResiduals * resid 
-    = (QpGenResiduals *) qp->makeResiduals( prob );
+  // Split A in equalities and inequalities
+  A_eq   = input(QP_A)(eq,ALL);
+  A_ineq = input(QP_A)(ineq,ALL);
   
-  GondzioSolver  * s     = new GondzioSolver( qp, prob );
+  BA_eq  = input(QP_LBA)(eq,ALL);
   
-  if( !quiet ) s->monitorSelf();
+  LBA_ineq = input(QP_LBA)(ineq,ALL);
+  UBA_ineq = input(QP_UBA)(ineq,ALL);
+  
+  for (int k=0; k<input(QP_LBX).size();k++) ixlow[k]=!(input(QP_LBX).at(k)==-numeric_limits<double>::infinity());
+  for (int k=0; k<input(QP_UBX).size();k++) ixupp[k]= !(input(QP_UBX).at(k)==numeric_limits<double>::infinity());
+  
+  iclow.resize(n_ineq,0);
+  icupp.resize(n_ineq,0);
+  
+  for (int k=0; k<LBA_ineq.size();k++) iclow[k]=!(LBA_ineq.at(k)==-numeric_limits<double>::infinity());
+  for (int k=0; k<UBA_ineq.size();k++) icupp[k]=!(UBA_ineq.at(k)==numeric_limits<double>::infinity());
+  
+
+
+  // TODO: makeData expects data pointers without a const modifier. So &Hl.sparsity().rowind()[0] is not allowed
+  //       we have to make separate std::vector<int>
+  
+  //prob = (QpGenData * )qp->makeData( &input(QP_G).data()[0],
+  //                       &Hl.sparsity().rowind()[0],  &Hl.sparsity().col()[0],  &Hl.data()[0],
+  //                        &xlow[0],  &ixlow[0],
+ //                        &xupp[0],  &ixupp[0],
+  //                      &A_eq.sparsity().rowind()[0], &A_eq.sparsity().col()[0],  &A_eq.data()[0],
+  //                     &BA_eq.data()[0],
+  //                      &A_ineq.sparsity().rowind()[0], &A_ineq.sparsity().col()[0],  &A_ineq.data()[0],
+  //                       &LBA_ineq.data()[0],  &iclow[0],
+   //                      &UBA_ineq.data()[0],  &icupp[0]);
+
+  vars = (QpGenVars *) qp->makeVariables( prob );
+  resid = (QpGenResiduals *) qp->makeResiduals( prob );
+  
+  s     = new GondzioSolver( qp, prob );
+  
+  s->monitorSelf();
   int ierr = s->solve(prob,vars, resid);
   
-  QPSolverInternal::init();
+}
 
+void OOQPInternal::evaluate(int nfdir, int nadir) {
+
+}
+
+void OOQPInternal::init(){
+  
+  QPSolverInternal::init();
+  
+  if (hasSetOption("constraints")) {
+    allocate();
+  }
+  
+  Hl = DMatrix(lowerSparsity(H));
+  
+  xlow.resize(nx,0);
+  ixlow.resize(nx,0);
+  
+  xupp.resize(nx,0);
+  ixupp.resize(nx,0);
   
 }
 

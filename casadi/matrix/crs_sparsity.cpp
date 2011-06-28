@@ -938,6 +938,13 @@ CRSSparsity CRSSparsity::makeDense(std::vector<int>& mapping) const{
   return CRSSparsity(size1(),size2(),true);
 }
 
+std::string CRSSparsity::dimString() 	const { 
+  std::stringstream ss;
+  ss << "(" << size1() << "x" << size2() << "=" << numel() << "|" << size() << ")";
+  return ss.str();
+}
+
+
 
 } // namespace CasADi
 

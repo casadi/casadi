@@ -37,7 +37,7 @@ namespace CasADi{
   */
 
 /// Input arguments of an QP Solver
-enum QPInput{QP_H,QP_G,QP_A,QP_X_INIT,QP_LAMBDA_INIT,QP_NUM_IN};
+enum QPInput{QP_H,QP_G,QP_A,QP_LBA,QP_UBA,QP_LBX,QP_UBX,QP_X_INIT,QP_LAMBDA_INIT,QP_NUM_IN};
 
 /// Outputs arguments of an QP Solver
 enum QPOutput{QP_X_OPT,QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};

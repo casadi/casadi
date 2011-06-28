@@ -185,6 +185,55 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m){
 CRSSparsity vec(const CRSSparsity& a){
   return reshape(a,a.numel(),1);
 }
+
+
+CRSSparsity lowerSparsity(const CRSSparsity& a) {
+  const std::vector<int> & col= a.col();
+  std::vector<int> row = a.getRow();
+  
+
+  std::vector<int> new_col;   // new col
+  std::vector<int> new_row;   // new row
+  
+  // Find size
+  int n=0;
+  for (int k=0;k<row.size();k++) n+= row[k] >= col[k];
+  new_col.resize(n);
+  new_row.resize(n);
+  
+  // populate return vector
+  int cnt=0;
+  for (int k=0;k<row.size();k++) {
+    if (row[k] >= col[k]) {
+      new_col[cnt]=col[k];
+      new_row[cnt]=row[k];
+      cnt++;
+    }
+  }
+  return sp_NZ(new_row, new_col,a.size1(), a.size2(), true);
+  
+}
+
+std::vector<int> lowerNZ(const CRSSparsity& a) {
+  const std::vector<int> & col= a.col();
+  std::vector<int> row = a.getRow();
+  
+  // Return vector
+  std::vector<int> ret;
+  
+  // Find size of return vector
+  int n=0;
+  for (int k=0;k<row.size();k++) n+= (row[k] >= col[k]);
+  ret.resize(n);
+  
+  // populate return vector
+  int cnt=0;
+  for (int k=0;k<row.size();k++) {
+    if (row[k] >= col[k]) ret[cnt++]=k;
+  }
+  
+  return ret;
+}
   
 } // namespace CasADi
 

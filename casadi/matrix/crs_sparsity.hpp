@@ -246,6 +246,9 @@ class CRSSparsity : public SharedObject{
     void mark(int *w, int j){
       w[j] = flip(w[j]) ;
     }
+    
+    std::string dimString() 	const;
+
 };
 
 #ifdef SWIG

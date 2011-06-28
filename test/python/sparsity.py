@@ -151,6 +151,20 @@ class Sparsitytests(casadiTestCase):
     
     self.checkarray(B,B_,"reshape")
     
+    
+  def test_refcount(self):
+      return #Ticket 147
+      x = DMatrix(sp_tril(4),5)
+      s = c.prod(x,x).sparsity()
+      self.assertEqual(s.numel(),10)
+      
+  def test_splower(self):
+    sp = CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+    print array(sp)
+    print array(lowerSparsity(sp))
+    print lowerNZ(sp)
+    
+      
 if __name__ == '__main__':
     unittest.main()
 

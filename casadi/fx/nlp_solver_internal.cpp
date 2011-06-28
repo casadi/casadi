@@ -39,6 +39,8 @@ NLPSolverInternal::~NLPSolverInternal(){
 }
 
 void NLPSolverInternal::init(){
+
+ 
   input_.resize(NLP_NUM_IN);
   input(NLP_X_INIT)      = DMatrix(n_,1,0);
   input(NLP_LBX)         = DMatrix(n_,1,0);

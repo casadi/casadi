@@ -75,6 +75,16 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m);
 
 CRSSparsity vec(const CRSSparsity& a);
 
+/**
+* Return the lower part of the sparsity pattern
+*/
+CRSSparsity lowerSparsity(const CRSSparsity& a);
+
+/**
+* Return the non-zero entries that make up the lower part of the provided matrix
+*/
+std::vector<int> lowerNZ(const CRSSparsity& a);
+
 }
 
 #endif // SPARSITY_TOOLS_HPP
