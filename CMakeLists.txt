@@ -18,6 +18,7 @@ option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
+option(WITH_OOQP "Enable OOQP interface" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
