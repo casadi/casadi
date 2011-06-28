@@ -20,48 +20,36 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#include "ooqp_internal.hpp"
 
-#include "qp_solver.hpp"
-#include "fx_internal.hpp"
+using namespace std;
+namespace CasADi {
+namespace Interfaces {
 
-namespace CasADi{
+OOQPInternal* OOQPInternal::clone() const{
+  // Return a deep copy
+  OOQPInternal* node = new OOQPInternal(H,G,A);
+  if(!node->is_init)
+    node->init();
+  return node;
+}
   
-// Forward declaration of internal class
-class QPSolverInternal;
+OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
+  std::cout << "Warning: GslIntegrator is highly experimental" << std::endl;
+}
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &G, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-  protected:
-    CRSSparsity H;
-    CRSSparsity G;
-    CRSSparsity A;
-    
-    bool is_init;
-};
+OOQPInternal::~OOQPInternal(){ 
+}
 
+  
+void OOQPInternal::init(){
+  
+  
+  QPSolverInternal::init();
 
+  
+}
+
+} // namespace Interfaces
 } // namespace CasADi
-
-#endif //QP_SOLVER_INTERNAL_HPP
 

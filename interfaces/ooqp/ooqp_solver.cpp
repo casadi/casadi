@@ -20,48 +20,35 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#include "ooqp_internal.hpp"
+#include "ooqp_solver.hpp"
 
-#include "qp_solver.hpp"
-#include "fx_internal.hpp"
-
+using namespace std;
 namespace CasADi{
-  
-// Forward declaration of internal class
-class QPSolverInternal;
+namespace Interfaces {
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &G, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-  protected:
-    CRSSparsity H;
-    CRSSparsity G;
-    CRSSparsity A;
-    
-    bool is_init;
-};
+OOQPSolver::OOQPSolver(){ 
+}
 
 
-} // namespace CasADi
+OOQPSolver::OOQPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A)  {
+  assignNode(new OOQPInternal(H,G,A));
+}
 
-#endif //QP_SOLVER_INTERNAL_HPP
+OOQPInternal* OOQPSolver::operator->(){
+  return (OOQPInternal*)(FX::operator->());
+}
+
+const OOQPInternal* OOQPSolver::operator->() const{
+  return (const OOQPInternal*)(FX::operator->());
+
+}
+
+bool OOQPSolver::checkNode() const{
+  return dynamic_cast<const OOQPInternal*>(get());
+}
+
+} 
+} // namespace Gsl
+
 

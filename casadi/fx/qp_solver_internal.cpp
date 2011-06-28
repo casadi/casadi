@@ -29,6 +29,11 @@ QPSolverInternal::QPSolverInternal() {
   //addOption("trans", OT_BOOLEAN, false);
 }
 
+// Constructor
+QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &G_, const CRSSparsity &A_) : H(H_), G(G_), A(A_) {
+
+}
+    
 void QPSolverInternal::init(){
 
 }

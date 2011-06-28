@@ -20,48 +20,39 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#ifndef OOQP_SOLVER_HPP
+#define OOQP_SOLVER_HPP
 
-#include "qp_solver.hpp"
-#include "fx_internal.hpp"
+#include "casadi/fx/qp_solver.hpp"
 
-namespace CasADi{
+namespace CasADi {
+namespace Interfaces {
   
-// Forward declaration of internal class
-class QPSolverInternal;
+  
+// Forward declaration of internal class 
+class OOQPInternal;
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &G, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-  protected:
-    CRSSparsity H;
-    CRSSparsity G;
-    CRSSparsity A;
-    
-    bool is_init;
+
+class OOQPSolver : public QPSolver {
+public:
+
+  /** \brief  Default constructor */
+  OOQPSolver();
+  
+  explicit OOQPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  
+  /** \brief  Access functions of the node */
+  OOQPInternal* operator->();
+  const OOQPInternal* operator->() const;
+
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+  
 };
 
 
+} // namespace Interfaces
 } // namespace CasADi
 
-#endif //QP_SOLVER_INTERNAL_HPP
+#endif //OOQP_SOLVER_HPP
 
