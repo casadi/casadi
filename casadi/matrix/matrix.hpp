@@ -492,8 +492,13 @@ class Matrix : public PrintableObject{
     /// Const access the non-zero elements
     const std::vector<T>& data() const;
     
-    /// Const access the sparsity
-    const CRSSparsity& sparsity() const;
+    #ifndef SWIG
+    /// Const access the sparsity - reference to data member
+    const CRSSparsity& sparsity() const{ return sparsity_; }
+    #else // SWIG
+    /// Const access the sparsity - copy the smart pointer in Python/Octave
+    CRSSparsity sparsity() const{ return sparsity_; }
+    #endif // SWIG
     
     /// Access the sparsity, make a copy if there are multiple references to it
     CRSSparsity& sparsityRef();
@@ -1338,11 +1343,6 @@ Matrix<T> Matrix<T>::__mldivide__(const Matrix<T>& b) const { if (b.numel()==1) 
 
 template<class T>
 Matrix<T> Matrix<T>::__mpower__(const Matrix<T>& b) const { if (b.numel()==1) return (*this).__pow__(b); throw CasadiException("mpower: Not implemented");}
-
-template<class T>
-const CRSSparsity& Matrix<T>::sparsity() const{
-  return sparsity_;
-}
 
 template<class T>
 CRSSparsity& Matrix<T>::sparsityRef(){

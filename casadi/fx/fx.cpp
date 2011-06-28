@@ -170,18 +170,18 @@ FX FX::jacobian(int iind, int oind){
     
     // Generate a Jacobian if necessary
     if(J.isNull())
-      J = (*this)->jacobian(jblocks);
+      J = (*this)->jacobian_switch(jblocks);
     
     // Return a reference to the stored Jacobian
     return J;
     
   } else {
-    return (*this)->jacobian(jblocks);
+    return (*this)->jacobian_switch(jblocks);
   }
 }
 
 FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks){
-  return (*this)->jacobian(jblocks);
+  return (*this)->jacobian_switch(jblocks);
 }
 
 FX FX::hessian(int iind, int oind){

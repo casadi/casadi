@@ -38,8 +38,10 @@ FXInternal::FXInternal(){
   addOption("number_of_adj_dir", OT_INTEGER,  1); // number of adjoint derivatives
   addOption("verbose",           OT_BOOLEAN,   false); // verbose evaluation -- for debugging
   addOption("store_jacobians",   OT_BOOLEAN,   false); // keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times
+  addOption("numeric_jacobian",  OT_BOOLEAN,   false); // verbose evaluation -- for debugging
   is_init_ = false;
   verbose_ = false;
+  numeric_jacobian_ = false;
 }
 
 FXInternal::~FXInternal(){
@@ -50,6 +52,7 @@ void FXInternal::init(){
   nadir_ = getOption("number_of_adj_dir");
   verbose_ = getOption("verbose");
   store_jacobians_ = getOption("verbose");
+  numeric_jacobian_ = getOption("numeric_jacobian");
 
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
     it->dataF.resize(nfdir_);
@@ -232,7 +235,19 @@ std::vector<MX> FXInternal::symbolicInput() const{
   return ret;
 }
 
+FX FXInternal::jacobian_switch(const std::vector<std::pair<int,int> >& jblocks){
+  if(numeric_jacobian_){
+    return numeric_jacobian(jblocks);
+  } else {
+    return jacobian(jblocks);
+  }
+}
+
 FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
+  return numeric_jacobian(jblocks);
+}
+
+FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
   // Symbolic input
   vector<MX> j_in = symbolicInput();
   

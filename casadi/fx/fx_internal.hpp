@@ -54,6 +54,12 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
+    /** \brief Switch between numeric and symbolic jacobian */
+    FX jacobian_switch(const std::vector<std::pair<int,int> >& jblocks);
+
+    /** \brief Numeric Jacobian */
+    FX numeric_jacobian(const std::vector<std::pair<int,int> >& jblocks);
+
     /** \brief Hessian of output oind with respect to input iind */
     virtual FX hessian(int iind=0, int oind=0);
 
@@ -180,6 +186,8 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Sparsity of the Jacobian blocks
     Matrix<CRSSparsity> jac_sparsity_;
 
+    /// Use numeric jacobian instead of symbolic
+    bool numeric_jacobian_;
 };
 
 
