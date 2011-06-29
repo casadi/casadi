@@ -32,7 +32,21 @@ namespace Interfaces {
 // Forward declaration of internal class 
 class OOQPInternal;
 
+  /** OOQP Solver for quadratic programing:
 
+  min          x'Hx + G'x 
+  
+  subject to
+              LBA <= Ax <= UBA
+              LBX <= x  <= UBX
+              
+      nx: number of decision variables (x)
+      nc: number of constraints (A)
+      
+      The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
+      
+      NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
+  */
 class OOQPSolver : public QPSolver {
 public:
 
@@ -48,6 +62,15 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /**
+   * \brief Reinitialize the problem 
+   * This method needs to be called before evaluate() whenever the nature of any constraint has changed. This occurs when: \n
+   *  - Any of LBA, UBA, LBX, UBX changes to/from (+-)infinity  \n
+   *  - An entry of LBA becomes equal/unequal to UBA: this indicates that an inequality becomes an equality or visa versa. \n
+   * 
+   * You do not need to call this method before doing the very first evaluate() run
+   */
+  void reInit();
   
 };
 

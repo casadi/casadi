@@ -61,7 +61,6 @@ void QPSolverInternal::init() {
   
   setNumOutputs(QP_NUM_OUT);
   
-  // See http://pages.cs.wisc.edu/~swright/ooqp/reference-manual/QpGenVars_8h-source.html
   output(QP_X_OPT) = DMatrix(input(QP_X_INIT).sparsity());
   
   FXInternal::init();

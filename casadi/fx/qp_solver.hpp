@@ -34,13 +34,42 @@ namespace CasADi{
               LBA <= Ax <= UBA
               LBX <= x  <= UBX
               
+      nx: number of decision variables (x)
+      nc: number of constraints (A)
   */
 
-/// Input arguments of an QP Solver
-enum QPInput{QP_H,QP_G,QP_A,QP_LBA,QP_UBA,QP_LBX,QP_UBX,QP_X_INIT,QP_LAMBDA_INIT,QP_NUM_IN};
+/** \brief Input arguments of an QP Solver
+  min          x'Hx + G'x 
+  
+  subject to
+              LBA <= Ax <= UBA
+              LBX <= x  <= UBX
+*/
+enum QPInput{
+  /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.
+  QP_H,
+  /// The column vector G: dense,  (nx x 1)
+  QP_G,
+  /// The matrix A: sparse, (nc x nx) - product with x must be dense.
+  QP_A,
+  /// dense, (nc x 1)
+  QP_LBA,
+  /// dense, (nc x 1)
+  QP_UBA,
+  /// dense, (nx x 1)
+  QP_LBX,
+  /// dense, (nx x 1)
+  QP_UBX,
+  /// dense, (nx x 1)
+  QP_X_INIT,
+  QP_LAMBDA_INIT,QP_NUM_IN};
 
 /// Outputs arguments of an QP Solver
-enum QPOutput{QP_X_OPT,QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};
+enum QPOutput{
+  /// The optimal value of x as calculated with evaluate()
+  QP_X_OPT,
+  /// The value of the cost function as calculated with evaluate()
+  QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};
 
 // Forward declaration of internal class
 class QPSolverInternal;

@@ -52,7 +52,6 @@ public:
   virtual void init();
   
   /** \brief  Allocate
-  *
   *  Because constraints after initialization, we cannot allocate a Solver during init
   */
   virtual void allocate();
@@ -60,11 +59,16 @@ public:
   virtual void evaluate(int nfdir, int nadir);
   
   protected:
+    /** 
+     * OOQP specific pointers.
+     * @ {
+     * */
     QpGenSparseMa27 * qp;
     QpGenData      * prob;
     QpGenVars      * vars; 
     QpGenResiduals * resid;
     GondzioSolver  * s;
+    /* @} */
     
     /// Boolean vector indicating equality with 0 and inequality with 1
     std::vector<int> constraints;
@@ -105,28 +109,31 @@ public:
     /// The inequality part of UBA
     DMatrix UBA_ineq;
     
-    
-    /// The LBX with inf substituted
+    /// The LBX with -inf substituted by 0 (needed for OOQP)
     DMatrix LBX;
     
-    /// The UBX with inf substituted
+    /// The UBX with inf substituted by 0 (needed for OOQP)
     DMatrix UBX;
     
+    
+    /// A vector to do slicing operations on A. 
     std::vector<int> all_A;
     
-    //xlow, ixlow are the lower bounds on x. These contain the information in the
-    //lower bounding vector l in the formulation given above. 
-    //If there is a bound on element k of x (that is, lk > -1), then xlow[k] should
-    //be set to the value of lk and ixlow[k] should be set to one. 
+    /** 
+     *  In OOQP, infinite bounds need a special treatment. They must be deactivated by setting the i-something std::vector<char>.
+     *  they have to be zero for infinite bounds and 1 otherwise
+     * @{
+     */
     std::vector<char> ixlow;
-    //std::vector<double> xlow;
-
     std::vector<char> ixupp;
-    //std::vector<double> xupp;
-    
+
     std::vector<char> iclow;
     std::vector<char> icupp;
     
+    /**
+     * Because OOQP does not do const correctness properly, and because we cannot trust it, we copy all(rowind,col) data
+     * @{
+     * */
     std::vector<int> Hl_rowind;
     std::vector<int> Hl_col;
     
@@ -135,15 +142,16 @@ public:
     
     std::vector<int> ineq_rowind;
     std::vector<int> ineq_col;
+    /** @} */
     
     
-    // Throw error
+    /// Throw error
     static void ooqp_error(const std::string& module, int flag);
     
-    // Calculate the error message map
+    /// Calculate the error message map
     static std::map<int,std::string> calc_flagmap();
     
-    // Error message map
+    /// Error message map
     static std::map<int,std::string> flagmap;
 };
 
