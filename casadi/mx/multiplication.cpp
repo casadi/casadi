@@ -60,7 +60,9 @@ void Multiplication::print(std::ostream &stream, const std::vector<std::string>&
   stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
-void Multiplication::evaluateDenseDense(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Multiplication::evaluateDenseDense(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double>& outputd = output.data();
+
   // Get dimensions
   int nx1 = dep(0).size1();
   int nx2 = dep(0).size2();
@@ -76,7 +78,7 @@ void Multiplication::evaluateDenseDense(const VDptr& input, Dptr& output, const 
       for(int k=0; k<nx2; ++k){
         sum += input[0][k+i*nx2] * input[1][j+k*ny2];
       }
-      output[j+i*nz2] = sum;
+      outputd[j+i*nz2] = sum;
     }
   }
   
@@ -107,12 +109,14 @@ void Multiplication::evaluateDenseDense(const VDptr& input, Dptr& output, const 
   }
 }
 
-void Multiplication::evaluateSparseSparse(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Multiplication::evaluateSparseSparse(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double>& outputd = output.data();
+  
   // Carry out the actual multiplication
   for(int i=0; i<prod_map_.size(); ++i){
-    output[i] = 0;
+    outputd[i] = 0;
     for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it)
-      output[i] += input[0][it->first] * input[1][y_trans_map_[it->second]];
+      outputd[i] += input[0][it->first] * input[1][y_trans_map_[it->second]];
   }
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
@@ -138,7 +142,7 @@ void Multiplication::evaluateSparseSparse(const VDptr& input, Dptr& output, cons
   }
 }
 
-void Multiplication::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Multiplication::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   if(x_dense_ && y_dense_){
     evaluateDenseDense(input, output, fwdSeed, fwdSens, adjSeed, adjSens, nfwd, nadj);
   } else {

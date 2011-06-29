@@ -61,7 +61,8 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << fcn_ << ".call(" << args << ")";
 }
 
-void Evaluation::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Evaluation::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  
   // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
     if(input[i] != 0){
@@ -103,14 +104,16 @@ void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string
   stream << args[0] << "[" << oind_ <<  "]";
 }
 
-void EvaluationOutput::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void EvaluationOutput::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output.data();
+
   // Pass the adjoint seed to the function
   for(int d=0; d<nadj; ++d)
     if(adjSeed[d]!=0)
       getFunction().setAdjSeed(adjSeed[d],oind_,d);
 
     // Get the results
-  getFunction().getOutput(output,oind_);
+  getFunction().getOutput(outputd,oind_);
 
   // Get the fwd sensitivities
   for(int d=0; d<nfwd; ++d)

@@ -41,7 +41,6 @@ struct MXAlgEl{
 
   // Pointers to be passed to evaluate
   VDptr input;
-  Dptr output;
   VVDptr fwdSeed;
   VDptr  fwdSens;
   VDptr adjSeed;

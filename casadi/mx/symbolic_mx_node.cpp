@@ -45,7 +45,7 @@ void SymbolicMatrix::print(std::ostream &stream, const std::vector<std::string>&
   stream << name_;
 }
 
-void SymbolicMatrix::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void SymbolicMatrix::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
 }
 
 void SymbolicMatrix::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){

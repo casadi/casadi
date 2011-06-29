@@ -53,12 +53,14 @@ void ScalarMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
   casadi_math<double>::print[op](stream,args.at(0),args.at(1));
 }
 
-void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void ScalarMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double>& outputd = output.data();
+  
   if(nfwd==0 && nadj==0){
     // No sensitivities
     
     for(int i=0; i<size(); ++i) {
-        casadi_math<double>::fun[op](input[0][0],input[1][i],output[i]);
+        casadi_math<double>::fun[op](input[0][0],input[1][i],outputd[i]);
     }
     
   } else {
@@ -66,8 +68,8 @@ void ScalarMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
     double tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      casadi_math<double>::fun[op](input[0][0],input[1][i],output[i]);
-      casadi_math<double>::der[op](input[0][0],input[1][i],output[i],tmp);
+      casadi_math<double>::fun[op](input[0][0],input[1][i],outputd[i]);
+      casadi_math<double>::der[op](input[0][0],input[1][i],outputd[i],tmp);
 
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){

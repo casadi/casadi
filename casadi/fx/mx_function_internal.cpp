@@ -157,7 +157,6 @@ void MXFunctionInternal::init(){
       }
     }
 
-    it->output = getptr(it->val.data);
     it->fwdSens.resize(nfdir_);
     for(int d=0; d<nfdir_; ++d)
       it->fwdSens[d] = getptr(it->val.dataF[d]);
@@ -360,10 +359,10 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    it->mx->evaluate(it->input, it->output, it->fwdSeed, it->fwdSens, it->adjSeed, it->adjSens, nfdir, 0);
+    it->mx->evaluate(it->input, it->val.data, it->fwdSeed, it->fwdSens, it->adjSeed, it->adjSens, nfdir, 0);
     // Lifting
     if(liftfun_ && it->mx->isNonLinear()){
-      liftfun_(it->output,it->mx.size(),liftfun_ud_);
+      liftfun_(&it->val.data.front(),it->mx.size(),liftfun_ud_);
     }
   }
   
@@ -392,7 +391,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
-      it->mx->evaluate(it->input, it->output, it->fwdSeed, it->fwdSens, it->adjSeed, it->adjSens, 0, nadir);
+      it->mx->evaluate(it->input, it->val.data, it->fwdSeed, it->fwdSens, it->adjSeed, it->adjSens, 0, nadir);
     }
 
     // Get the adjoint sensitivities

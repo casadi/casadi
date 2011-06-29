@@ -44,9 +44,11 @@ void Densification::print(std::ostream &stream, const std::vector<std::string>& 
   stream << "dense(" << args.at(0) << ")";
 }
 
-void Densification::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Densification::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output.data();
+
   for(int el=0; el<mapping_.size(); ++el)
-    output[mapping_[el]] = input[0][el];
+    outputd[mapping_[el]] = input[0][el];
   
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){

@@ -45,12 +45,13 @@ void IfNode::print(std::ostream &stream, const std::vector<std::string>& args) c
   stream << "(" << args.at(0) << "?" <<  args.at(1) << ":" << args.at(2) << ")";
 }
 
-void IfNode::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void IfNode::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   bool c = fabs(input[0][0])<tol;
+  vector<double> &outputd = output.data();
   if(c){
     for(int i=0; i<size(); ++i){
       // Function
-      output[i] = input[0][i];
+      outputd[i] = input[0][i];
       
       // Forward seeds
       for(int d=0; d<nfwd; ++d)
@@ -63,7 +64,7 @@ void IfNode::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, V
   } else {
     // Zero if false
     for(int i=0; i<size(); ++i){
-      output[i] = 0;
+      outputd[i] = 0;
       for(int d=0; d<nfwd; ++d) 
         fwdSens[d][i] = 0;
     }

@@ -60,7 +60,9 @@ void MatrixMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
   casadi_math<double>::print[op](stream,args.at(0),args.at(1));
 }
 
-void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void MatrixMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double>& outputd = output.data();
+  
   // Number of non-zeros
   int n = size();
   int nx = dep(0).size();
@@ -70,15 +72,15 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
     if(nfwd==0 && nadj==0){
       // No sensitivities
       for(int i=0; i<n; ++i)
-        casadi_math<double>::fun[op](input[0][i],input[1][i],output[i]);
+        casadi_math<double>::fun[op](input[0][i],input[1][i],outputd[i]);
       
     } else {
       // Sensitivities
       double tmp[2];  // temporary variable to hold value and partial derivatives of the function
       for(int i=0; i<n; ++i){
         // Evaluate and get partial derivatives
-        casadi_math<double>::fun[op](input[0][i],input[1][i],output[i]);
-        casadi_math<double>::der[op](input[0][i],input[1][i],output[i],tmp);
+        casadi_math<double>::fun[op](input[0][i],input[1][i],outputd[i]);
+        casadi_math<double>::der[op](input[0][i],input[1][i],outputd[i],tmp);
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
@@ -101,7 +103,7 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
       for(int i=0; i<n; ++i){
         double x = mapping_[i]<=0 ? input[0][ix++] : 0;
         double y = mapping_[i]>=0 ? input[1][iy++] : 0;
-        casadi_math<double>::fun[op](x,y,output[i]);
+        casadi_math<double>::fun[op](x,y,outputd[i]);
       }
 
     } else {
@@ -115,8 +117,8 @@ void MatrixMatrixOp::evaluate(const VDptr& input, Dptr& output, const VVDptr& fw
         double y = isy ? input[1][iy] : 0;
 
         // Evaluate and get partial derivatives
-        casadi_math<double>::fun[op](x,y,output[i]);
-        casadi_math<double>::der[op](x,y,output[i],tmp);
+        casadi_math<double>::fun[op](x,y,outputd[i]);
+        casadi_math<double>::der[op](x,y,outputd[i],tmp);
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){

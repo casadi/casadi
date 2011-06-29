@@ -46,7 +46,7 @@ public:
   virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
   /** \brief  Evaluate the function and store the result in the node */
-  virtual void evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+  virtual void evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
 
   /** \brief  Evaluate symbolically (SX) */
   virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);

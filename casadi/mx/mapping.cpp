@@ -37,11 +37,12 @@ Mapping* Mapping::clone() const{
   return new Mapping(*this);
 }
 
-void Mapping::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Mapping::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   const std::vector<int>& nzind_ = nzmap_.data();
+  vector<double> &outputd = output.data();
   
   for(int k=0; k<size(); ++k){
-    output[k] = input[depind_[k]][nzind_[k]];
+    outputd[k] = input[depind_[k]][nzind_[k]];
     
     for(int d=0; d<nfwd; ++d)
       fwdSens[d][k] = fwdSeed[depind_[k]][d][nzind_[k]];

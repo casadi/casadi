@@ -25,6 +25,7 @@
 
 #include "mx_tools.hpp"
 
+using namespace std;
 namespace CasADi{
 
 Norm::Norm(const MX& x){
@@ -32,7 +33,7 @@ Norm::Norm(const MX& x){
   setSparsity(CRSSparsity(1,1,true));
 }
 
-void Norm::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   throw CasadiException("Norm::evaluate not implemented");
 }
 
@@ -43,18 +44,19 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
-void Norm2::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm2::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output.data();
 
   double temp=0;
   for (int k=0;k<dep(0).size();k++) {
     temp+=input[0][k]*input[0][k];
   }
-  output[0]=sqrt(temp);
+  outputd[0]=sqrt(temp);
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
     fwdSens[d][0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d][0] += input[0][k]/output[0] * fwdSeed[0][d][k];
+      fwdSens[d][0] += input[0][k]/outputd[0] * fwdSeed[0][d][k];
     }
   }
 
@@ -62,7 +64,7 @@ void Norm2::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VD
   for(int d=0; d<nadj; ++d){
     if (adjSeed[d][0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
-      adjSens[0][d][k] += input[0][k]/output[0] * adjSeed[d][0];
+      adjSens[0][d][k] += input[0][k]/outputd[0] * adjSeed[d][0];
     }
   }
   
@@ -87,13 +89,14 @@ Norm22* Norm22::clone() const{
   return new Norm22(*this);
 }
 
-void Norm22::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm22::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output.data();
 
   double temp=0;
   for (int k=0;k<dep(0).size();k++) {
     temp+=input[0][k]*input[0][k];
   }
-  output[0]=temp;
+  outputd[0]=temp;
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
     fwdSens[d][0]=0;
@@ -132,11 +135,13 @@ void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) co
   stream << "||" << args.at(0) << "||_1"; 
 }
 
-void Norm1::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm1::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output.data();
+  
   if(nfwd==0 && nadj==0){
    double temp=0;
    for (int k=0;k<dep(0).size();k++) temp+=std::abs(input[0][k]);
-   output[0]=temp;
+   outputd[0]=temp;
    return; 
   }
 
@@ -182,7 +187,8 @@ void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) 
   stream << "||" << args.at(0) << "||_inf"; 
 }
 
-void NormInf::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void NormInf::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output.data();
 
   double temp=std::numeric_limits<double>::infinity();
   double a;
@@ -190,7 +196,7 @@ void NormInf::evaluate(const VDptr& input, Dptr& output, const VVDptr& fwdSeed, 
     a = std::abs(input[0][k]);
     if (a>temp) temp=a;
   }
-  output[0]=temp;
+  outputd[0]=temp;
   
 
   if (nadj!=0) throw CasadiException("NormInf::evaluate not implemented");
