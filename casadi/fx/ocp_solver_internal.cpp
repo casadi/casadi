@@ -23,6 +23,10 @@
 #include "ocp_solver_internal.hpp"
 #include "integrator.hpp"
 
+
+INPUTSCHEME(OCPInput)
+INPUTSCHEME(OCPOutput)
+
 using namespace std;
 
 namespace CasADi{

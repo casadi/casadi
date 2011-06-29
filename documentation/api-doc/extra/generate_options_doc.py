@@ -31,6 +31,8 @@ classes = xmlData.findall("//compound[@kind='class']")
 # options     - a list of dicts denoting the class's options
 # monitors    - a list of dicts denoting the class's monitorables
 # stats       - a list of dicts denoting the class's stats
+# inputscheme  - the input scheme of the function
+# outputscheme - the output scheme of the function
 metadata=dict()
 
 # Text-parsing to fill in 'parents','file','hasInternal'
@@ -127,6 +129,15 @@ for name,meta in metadata.items():
       m = re.search(r'monitored\("(.*?)"\)',l)
       if m:
         meta['monitors'][m.group(1)]={'name': m.group(1), 'used': name}
+    if not(l.find('INPUTSCHEME')==-1):
+      m = re.search(r'INPUTSCHEME\((.*?)\)',l)
+      if m:
+        meta['inputscheme']=m.group(1)
+    if not(l.find('OUTPUTSCHEME')==-1):
+      m = re.search(r'OUTPUTSCHEME\((.*?)\)',l)
+      if m:
+        meta['outputscheme']=m.group(1)
+
   for k in ['options','stats','monitors']:
     if len(meta[k])==0:
       del meta[k]
@@ -228,5 +239,43 @@ for name,meta in metadata.items():
       f.write(monitorsashtml(allmonitors[k])+"\n")
     f.write( "</table>\n")
     f.write( "*/\n")
+
+f.close()
+
+f = file(out+'schemes.hpp','w')
+
+# Print out doxygen information - schemes
+for name,meta in metadata.items():
+
+  inputscheme = None
+  outputscheme = None
+  if not('inputscheme' in meta):
+    for a in meta['hierarchy']:
+      if 'inputscheme' in metadata[a]:
+        inputscheme = metadata[a]['inputscheme']
+  else:
+    inputscheme = meta['inputscheme']
+
+  if not('outputscheme' in meta):
+    for a in meta['hierarchy']:
+      if 'outputscheme' in metadata[a]:
+        outputscheme = metadata[a]['outputscheme']
+  else:
+    outputscheme = meta['outputscheme']
+  
+  targets = [name]
+  if 'InternalFor' in meta:
+    targets+=meta['InternalFor']
+  for t in targets:
+    if not(inputscheme is None) or not(outputscheme is None):
+      f.write("/** \class %s\n" % t)
+      f.write(" Input/output scheme:\n")
+      if not(inputscheme is None) and not(outputscheme is None):
+        f.write(" %s is an FX mapping from CasADi::%s to CasADi::%s\n" % (t,inputscheme,outputscheme) )
+      elif outputscheme is None:
+        f.write(" %s is an FX mapping from CasADi::%s\n" % (t,inputscheme) )
+      elif inputscheme is None:
+        f.write(" %s is an FX mapping to CasADi::%s\n" % (t,outputscheme) )
+      f.write( "*/\n")
 
 f.close()

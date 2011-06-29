@@ -26,8 +26,11 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 
+INPUTSCHEME(SimulatorInput)
+
 using namespace std;
 namespace CasADi{
+
   
 SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), grid_(grid){
   setOption("name","unnamed simulator");
