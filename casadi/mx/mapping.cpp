@@ -37,7 +37,7 @@ Mapping* Mapping::clone() const{
   return new Mapping(*this);
 }
 
-void Mapping::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Mapping::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   const std::vector<int>& nzind_ = nzmap_.data();
   vector<double> &outputd = output.data();
   
@@ -45,10 +45,10 @@ void Mapping::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, cons
     outputd[k] = input[depind_[k]]->data()[nzind_[k]];
     
     for(int d=0; d<nfwd; ++d)
-      fwdSens[d]->data()[k] = fwdSeed[depind_[k]][d][nzind_[k]];
+      fwdSens[d]->data()[k] = fwdSeed[depind_[k]][d]->data()[nzind_[k]];
     
     for(int d=0; d<nadj; ++d)
-      adjSens[depind_[k]][d][nzind_[k]] += adjSeed[d]->data()[k];
+      adjSens[depind_[k]][d]->data()[nzind_[k]] += adjSeed[d]->data()[k];
   }
 }
 

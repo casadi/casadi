@@ -47,7 +47,7 @@ void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) 
   casadi_math<double>::print[op](stream,args.at(0),"nan");
 }
 
-void UnaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void UnaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   double nan = numeric_limits<double>::quiet_NaN();
   vector<double> &outputd = output.data();
   const vector<double> &inputd = input[0]->data();
@@ -67,12 +67,12 @@ void UnaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, cons
       
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-        fwdSens[d]->data()[i] = tmp[0]*fwdSeed[0][d][i];
+        fwdSens[d]->data()[i] = tmp[0]*fwdSeed[0][d]->data()[i];
       }
 
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-        adjSens[0][d][i] += adjSeed[d]->data()[i]*tmp[0];
+        adjSens[0][d]->data()[i] += adjSeed[d]->data()[i]*tmp[0];
       }
     }
   }

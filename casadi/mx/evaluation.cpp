@@ -61,14 +61,14 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << fcn_ << ".call(" << args << ")";
 }
 
-void Evaluation::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Evaluation::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   
   // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
     if(input[i] != 0 && input[i]->size() !=0 ){
       fcn_.setInput(input[i]->data(),i);
       for(int d=0; d<nfwd; ++d){
-        fcn_.setFwdSeed(fwdSeed[i][d],i,d);
+        fcn_.setFwdSeed(fwdSeed[i][d]->data(),i,d);
       }
     }
   }
@@ -79,10 +79,10 @@ void Evaluation::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, c
   // Get the adjoint sensitivities
   for(int i=0; i<ndep(); ++i){
     for(int d=0; d<nadj; ++d){
-      if(adjSens[i][d] != 0){
+      if(adjSens[i][d] != 0 && adjSens[i][d]->size() != 0){
         const vector<double>& asens = fcn_.adjSens(i,d).data();
         for(int j=0; j<asens.size(); ++j)
-          adjSens[i][d][j] += asens[j];
+          adjSens[i][d]->data()[j] += asens[j];
       }
     }
   }
@@ -104,7 +104,7 @@ void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string
   stream << args[0] << "[" << oind_ <<  "]";
 }
 
-void EvaluationOutput::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void EvaluationOutput::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
 
   // Pass the adjoint seed to the function

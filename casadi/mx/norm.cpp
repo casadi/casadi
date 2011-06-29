@@ -33,7 +33,7 @@ Norm::Norm(const MX& x){
   setSparsity(CRSSparsity(1,1,true));
 }
 
-void Norm::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   throw CasadiException("Norm::evaluate not implemented");
 }
 
@@ -44,7 +44,7 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
-void Norm2::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm2::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
   const vector<double> &inputd = input[0]->data();
 
@@ -57,7 +57,7 @@ void Norm2::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const 
   for(int d=0; d<nfwd; ++d){
     fwdSens[d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d]->data()[0] += inputd[k]/outputd[0] * fwdSeed[0][d][k];
+      fwdSens[d]->data()[0] += inputd[k]/outputd[0] * fwdSeed[0][d]->data()[k];
     }
   }
 
@@ -65,7 +65,7 @@ void Norm2::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const 
   for(int d=0; d<nadj; ++d){
     if (adjSeed[d]->data()[0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
-      adjSens[0][d][k] += inputd[k]/outputd[0] * adjSeed[d]->data()[0];
+      adjSens[0][d]->data()[k] += inputd[k]/outputd[0] * adjSeed[d]->data()[0];
     }
   }
   
@@ -90,7 +90,7 @@ Norm22* Norm22::clone() const{
   return new Norm22(*this);
 }
 
-void Norm22::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm22::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
   const vector<double> &inputd = input[0]->data();
 
@@ -103,7 +103,7 @@ void Norm22::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const
   for(int d=0; d<nfwd; ++d){
     fwdSens[d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d]->data()[0] += 2*inputd[k] * fwdSeed[0][d][k];
+      fwdSens[d]->data()[0] += 2*inputd[k] * fwdSeed[0][d]->data()[k];
     }
   }
 
@@ -111,7 +111,7 @@ void Norm22::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const
   for(int d=0; d<nadj; ++d){
     if (adjSeed[d]->data()[0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
-      adjSens[0][d][k] += 2*inputd[k] * adjSeed[d]->data()[0];
+      adjSens[0][d]->data()[k] += 2*inputd[k] * adjSeed[d]->data()[0];
     }
   }
   
@@ -137,7 +137,7 @@ void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) co
   stream << "||" << args.at(0) << "||_1"; 
 }
 
-void Norm1::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm1::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
     const vector<double> &inputd = input[0]->data();
 
@@ -152,11 +152,11 @@ void Norm1::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const 
   for(int d=0; d<nfwd; ++d){
     fwdSens[d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      if (fwdSeed[0][d][k]==0) continue;
+      if (fwdSeed[0][d]->data()[k]==0) continue;
       if (inputd[k] < 0) {
-        fwdSens[d]->data()[0] -= fwdSeed[0][d][k];
+        fwdSens[d]->data()[0] -= fwdSeed[0][d]->data()[k];
       } else if (inputd[k] > 0) {
-        fwdSens[d]->data()[0] += fwdSeed[0][d][k];
+        fwdSens[d]->data()[0] += fwdSeed[0][d]->data()[k];
       } else {
         fwdSens[d]->data()[0] += std::numeric_limits<double>::quiet_NaN();
       }
@@ -168,11 +168,11 @@ void Norm1::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const 
     if (adjSeed[d]->data()[0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
       if (inputd[k] < 0) {
-        adjSens[0][d][k] -=  adjSeed[d]->data()[0];
+        adjSens[0][d]->data()[k] -=  adjSeed[d]->data()[0];
       } else if (inputd[k] > 0) {
-        adjSens[0][d][k] +=  adjSeed[d]->data()[0];
+        adjSens[0][d]->data()[k] +=  adjSeed[d]->data()[0];
       } else {
-        adjSens[0][d][k] += std::numeric_limits<double>::quiet_NaN();
+        adjSens[0][d]->data()[k] += std::numeric_limits<double>::quiet_NaN();
       }
     }
   }
@@ -190,7 +190,7 @@ void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) 
   stream << "||" << args.at(0) << "||_inf"; 
 }
 
-void NormInf::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void NormInf::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
   const vector<double> &inputd = input[0]->data();
 

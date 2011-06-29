@@ -151,9 +151,9 @@ void MXFunctionInternal::init(){
       if(it->ch[i]>=0){
 		  it->input[i] = &alg[it->ch[i]].val.data;
         for(int d=0; d<nfdir_; ++d)
-          it->fwdSeed[i][d] = getptr(alg[it->ch[i]].val.dataF[d]);
+          it->fwdSeed[i][d] = &alg[it->ch[i]].val.dataF[d];
         for(int d=0; d<nadir_; ++d)
-          it->adjSens[i][d] = getptr(alg[it->ch[i]].val.dataA[d]);
+          it->adjSens[i][d] = &alg[it->ch[i]].val.dataA[d];
       }
     }
 

@@ -40,11 +40,11 @@ struct MXAlgEl{
   FunctionIO val;
 
   // Pointers to be passed to evaluate
-  std::vector<DMatrix*> input;
-  VVDptr fwdSeed;
-  std::vector<DMatrix*> fwdSens;
-  std::vector<DMatrix*> adjSeed;
-  VVDptr adjSens;
+  vDMatrixP input;
+  vvDMatrixP fwdSeed;
+  vDMatrixP fwdSens;
+  vDMatrixP adjSeed;
+  vvDMatrixP adjSens;
   
   // Indices of the children nodes
   std::vector<int> ch;

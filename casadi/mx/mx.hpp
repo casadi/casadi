@@ -349,9 +349,9 @@ class MX : public SharedObject{
 
 //@{
 /// Some typedefs
-/*typedef double* Dptr;*/
-/*typedef std::vector<double*> VDptr;*/
-typedef std::vector<std::vector<double* > > VVDptr;
+typedef DMatrix* DMatrixP;
+typedef std::vector<DMatrixP> vDMatrixP;
+typedef std::vector<vDMatrixP> vvDMatrixP;
 //@}
 
 

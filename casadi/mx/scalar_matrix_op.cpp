@@ -53,7 +53,7 @@ void ScalarMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
   casadi_math<double>::print[op](stream,args.at(0),args.at(1));
 }
 
-void ScalarMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void ScalarMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   vector<double>& outputd = output.data();
   const vector<double> &input0 = input[0]->data();
   const vector<double> &input1 = input[1]->data();
@@ -75,13 +75,13 @@ void ScalarMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& outpu
 
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-        fwdSens[d]->data()[i] = tmp[0]*fwdSeed[0][d][0] + tmp[1]*fwdSeed[1][d][i];
+        fwdSens[d]->data()[i] = tmp[0]*fwdSeed[0][d]->data()[0] + tmp[1]*fwdSeed[1][d]->data()[i];
       }
 
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-        adjSens[0][d][0] += adjSeed[d]->data()[i]*tmp[0];
-        adjSens[1][d][i] += adjSeed[d]->data()[i]*tmp[1];
+        adjSens[0][d]->data()[0] += adjSeed[d]->data()[i]*tmp[0];
+        adjSens[1][d]->data()[i] += adjSeed[d]->data()[i]*tmp[1];
       }
     }
   }

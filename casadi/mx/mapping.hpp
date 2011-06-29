@@ -44,7 +44,7 @@ class Mapping : public MXNode{
     virtual ~Mapping(){}
     
     /// Evaluate the function and store the result in the node
-    virtual void evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj);
+    virtual void evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj);
 
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
