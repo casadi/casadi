@@ -161,7 +161,7 @@ class OCP : public PrintableObject{
     
     /// Final time
     double tf;
-    double getEndTime() const{ return tf;}
+    double getFinalTime() const{ return tf;}
     
     /// Final time is free
     bool tf_free;
