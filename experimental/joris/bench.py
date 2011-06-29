@@ -32,4 +32,26 @@ t = time()
 f.evaluate()
 print "CasADi MX wrapped = %.4f s" % (time()-t)
 
+t = time()
+y = x.T
+print "CasADi taking transpose = %.4f s" % (time()-t)
 
+t = time()
+y_trans_map = c.IVector()
+y_trans_sparsity = y.sparsity().transpose(y_trans_map)
+print "CasADi generating transpose sparsity pattern = %.4f s" % (time()-t)
+
+t = time()
+# Create the sparsity pattern for the matrix-matrix product
+spres = x.sparsity().patternProduct(y_trans_sparsity)
+print "CasADi generating procuct sparsity pattern = %.4f s" % (time()-t)
+
+t = time()
+# Create the return object with correct sparsity
+ret = c.DMatrix(spres)
+print "CasADi allocating resulting = %.4f s" % (time()-t)
+
+t = time()
+# Carry out the matrix product
+c.DMatrix.prod_no_alloc(x,y,ret,y_trans_sparsity,y_trans_map)
+print "CasADi actual multiplication = %.4f s" % (time()-t)
