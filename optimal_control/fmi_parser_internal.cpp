@@ -283,10 +283,14 @@ void FMIParserInternal::addOptimization(){
   const XMLNode& opts = document_[0]["opt:Optimization"];
   
   // Start time
+  cout << "starttime (string) = " << string(opts["opt:IntervalStartTime"]["opt:Value"].getText()) << endl;
   ocp_.t0  = opts["opt:IntervalStartTime"]["opt:Value"].getText();
+  cout << "starttime (double) = " << ocp_.t0 << endl;
 
   // Terminal time
+  cout << "endtime (string) = " << string(opts["opt:IntervalFinalTime"]["opt:Value"].getText()) << endl;
   ocp_.tf = opts["opt:IntervalFinalTime"]["opt:Value"].getText();
+  cout << "endtime (double) = " << ocp_.tf << endl;
 
   for(int i=0; i<opts.size(); ++i){
     
