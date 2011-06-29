@@ -636,8 +636,12 @@ CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<int>& 
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
+  // Dimensions
+  int x_nrow = size1();
+  int y_ncol = y_trans.size1();
+
   // return object
-  CRSSparsity ret(size1(),y_trans.size1());
+  CRSSparsity ret(x_nrow,y_ncol);
   
   // Get the vectors for the return pattern
   vector<int>& c = ret.colRef();
@@ -649,23 +653,31 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
   const vector<int> &x_rowind = rowind();
   const vector<int> &y_colind = y_trans.rowind();
   
+  // Which columns exist in a row of the first factor
+  vector<bool> in_x_row(size2());
+  
   // loop over the row of the resulting matrix)
-  for(int i=0; i<size1(); ++i){
+  for(int i=0; i<x_nrow; ++i){
     
+    // Mark the elements in the x row
+    fill(in_x_row.begin(),in_x_row.end(),false);
+    for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
+      in_x_row[x_col[el1]] = true;
+    }
     
-    for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];
-        if(j1==i2){
+    // loop over the columns of second factor
+    for(int j=0; j<y_ncol; ++j){
+      
+      // Loop over the nonzeros of the column of the second factor
+      for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
+        
+        // Get the row
+        int i_y = y_row[el2];
+        
+        // Add nonzero if the element matches an element in the x row
+        if(in_x_row[i_y]){
           c.push_back(j);
           break;
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
         }
       }
     }
