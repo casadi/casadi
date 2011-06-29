@@ -381,6 +381,9 @@ class Matrix : public PrintableObject{
     /// Matrix product
     Matrix<T> prod(const Matrix<T> &y) const;
 
+    /// Matrix product (no memory allocation)
+    static void prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& ret, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map);
+
     /** Matrix product, from the right
     * x.rprod(y) = y.prod(x)
     */
@@ -1681,7 +1684,7 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
   // First factor
   const Matrix<T>& x = *this;
   
-  // Quickly return when aither this or y is a scalar
+  // Quickly return when either this or y is a scalar
   if (numel()==1 || y.numel()==1)
     return (*this)*y;
     
@@ -1703,10 +1706,21 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
   // Create the return object
   Matrix<T> ret(spres);
   
+  // Carry out the matrix product
+  prod_no_alloc(x,y,ret,y_trans_sparsity,y_trans_map);
+  
+  return ret;
+}
+
+template<class T>
+void Matrix<T>::prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& ret, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map){
   // Direct access to the arrays
+  std::vector<T> &r_data = ret.data();
   const std::vector<int> &r_col = ret.col();
   const std::vector<int> &r_rowind = ret.rowind();
+  const std::vector<T> &x_data = x.data();
   const std::vector<int> &x_col = x.col();
+  const std::vector<T> &y_data = y.data();
   const std::vector<int> &y_row = y_trans_sparsity.col();
   const std::vector<int> &x_rowind = x.rowind();
   const std::vector<int> &y_colind = y_trans_sparsity.rowind();
@@ -1717,12 +1731,12 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
       int j = r_col[el];
       int el1 = x_rowind[i];
       int el2 = y_colind[j];
-      ret.data()[el]=0;
+      r_data[el]=0;
       while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
-          ret.data()[el] += x.data()[el1++] * y.data()[y_trans_map[el2++]];
+          r_data[el] += x_data[el1++] * y_data[y_trans_map[el2++]];
         } else if(j1<i2) {
           el1++;
         } else {
@@ -1731,7 +1745,6 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
       }
     }
   }
-  return ret;
 }
 
 template<class T>
