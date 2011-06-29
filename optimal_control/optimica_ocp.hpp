@@ -154,12 +154,14 @@ class OCP : public PrintableObject{
     
     /// Initial time
     double t0;
+    double getStartTime() const{ return t0;}
     
     /// Initial time is free
     bool t0_free;
     
     /// Final time
     double tf;
+    double getEndTime() const{ return tf;}
     
     /// Final time is free
     bool tf_free;
