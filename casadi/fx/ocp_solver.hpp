@@ -92,8 +92,6 @@ namespace CasADi{
   /** \brief Base class for OCP solvers
    *
    *
-   * OCPSolver is an CasADi::FX mapping from CasADi::OCPInput to CasADi::OCPOutput
-   *
       \author Joel Andersson
       \date 2011
   */ 

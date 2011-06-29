@@ -1,6 +1,6 @@
 /** \class CasADi::Interfaces::OOQPInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
@@ -15,8 +15,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Interfaces::OOQPSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
@@ -31,8 +31,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Interfaces::LapackLUDenseInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
@@ -46,8 +46,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Interfaces::LapackLUDense
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
@@ -61,8 +61,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Sundials::KinsolInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -86,8 +86,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Sundials::KinsolSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -111,8 +111,8 @@ List of available options
 </table>
 */
 /** \class CasADi::OptimalControl::MultipleShootingInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -127,8 +127,8 @@ List of available options
 </table>
 */
 /** \class CasADi::OptimalControl::MultipleShooting
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -143,8 +143,8 @@ List of available options
 </table>
 */
 /** \class CasADi::QPSolverInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -156,8 +156,8 @@ List of available options
 </table>
 */
 /** \class CasADi::QPSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -169,8 +169,8 @@ List of available options
 </table>
 */
 /** \class CasADi::SXFunctionInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td></td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -183,8 +183,8 @@ List of available options
 </table>
 */
 /** \class CasADi::SXFunction
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td></td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -197,8 +197,8 @@ List of available options
 </table>
 */
 /** \class CasADi::IpoptInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>accept_every_trial_step</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>acceptable_compl_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -331,8 +331,8 @@ List of available options
 </table>
 */
 /** \class CasADi::IpoptSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>accept_every_trial_step</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>acceptable_compl_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -465,8 +465,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Sundials::CVodesInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
@@ -515,8 +515,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
@@ -565,8 +565,8 @@ List of available options
 </table>
 */
 /** \class CasADi::JacobianInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"default"</td><td>"forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint</td><td>CasADi::JacobianInternal</td></tr>
 <tr><td>finite_differences</td><td>OT_BOOLEAN</td><td>false</td><td>Using finite differences instead of automatic differentiation</td><td>CasADi::JacobianInternal</td></tr>
@@ -579,8 +579,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Jacobian
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"default"</td><td>"forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint</td><td>CasADi::JacobianInternal</td></tr>
 <tr><td>finite_differences</td><td>OT_BOOLEAN</td><td>false</td><td>Using finite differences instead of automatic differentiation</td><td>CasADi::JacobianInternal</td></tr>
@@ -593,8 +593,8 @@ List of available options
 </table>
 */
 /** \class CasADi::CplexInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>Option()</td><td></td><td>CasADi::CplexInternal</td></tr>
@@ -611,8 +611,8 @@ List of available options
 </table>
 */
 /** \class CasADi::CplexSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>Option()</td><td></td><td>CasADi::CplexInternal</td></tr>
@@ -629,8 +629,8 @@ List of available options
 </table>
 */
 /** \class CasADi::AcadoInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>absolute_tolerance</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>auto_init</td><td>OT_BOOLEAN</td><td>false</td><td>initialize differential and angebraic states by a forward integration</td><td>CasADi::AcadoInternal</td></tr>
@@ -657,8 +657,8 @@ List of available options
 </table>
 */
 /** \class CasADi::AcadoInterface
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>absolute_tolerance</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>auto_init</td><td>OT_BOOLEAN</td><td>false</td><td>initialize differential and angebraic states by a forward integration</td><td>CasADi::AcadoInternal</td></tr>
@@ -685,8 +685,8 @@ List of available options
 </table>
 */
 /** \class CasADi::KnitroInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -698,8 +698,8 @@ List of available options
 </table>
 */
 /** \class CasADi::KnitroSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -711,8 +711,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Interfaces::LiftoptInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -725,8 +725,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Interfaces::LiftoptSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -739,8 +739,8 @@ List of available options
 </table>
 */
 /** \class CasADi::IntegratorInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
@@ -786,8 +786,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Integrator
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
@@ -833,8 +833,8 @@ List of available options
 </table>
 */
 /** \class CasADi::SuperLUInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>colperm</td><td>OT_STRING</td><td>"colamd"</td><td>Specifies how to permute the columns of the matrix for sparsity preservation.</td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>conditionnumber</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::SuperLUInternal</td></tr>
@@ -856,8 +856,8 @@ List of available options
 </table>
 */
 /** \class CasADi::SuperLU
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>colperm</td><td>OT_STRING</td><td>"colamd"</td><td>Specifies how to permute the columns of the matrix for sparsity preservation.</td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>conditionnumber</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::SuperLUInternal</td></tr>
@@ -879,8 +879,8 @@ List of available options
 </table>
 */
 /** \class CasADi::FXInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -891,8 +891,8 @@ List of available options
 </table>
 */
 /** \class CasADi::FX
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -903,8 +903,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Sundials::IdasInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::IdasInternal</td></tr>
@@ -959,8 +959,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::IdasInternal</td></tr>
@@ -1015,8 +1015,8 @@ List of available options
 </table>
 */
 /** \class CasADi::ParallelizerInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1029,8 +1029,8 @@ List of available options
 </table>
 */
 /** \class CasADi::Parallelizer
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1043,8 +1043,8 @@ List of available options
 </table>
 */
 /** \class CasADi::OCPSolverInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1058,8 +1058,8 @@ List of available options
 </table>
 */
 /** \class CasADi::OCPSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1073,8 +1073,8 @@ List of available options
 </table>
 */
 /** \class CasADi::ImplicitFunctionInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1086,8 +1086,8 @@ List of available options
 </table>
 */
 /** \class CasADi::ImplicitFunction
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1099,8 +1099,8 @@ List of available options
 </table>
 */
 /** \class CasADi::LinearSolverInternal
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>
@@ -1112,8 +1112,8 @@ List of available options
 </table>
 */
 /** \class CasADi::LinearSolver
-List of available options
 <table>
+<caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives</td><td>CasADi::FXInternal</td></tr>

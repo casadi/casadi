@@ -4,6 +4,7 @@ This script reads XML doxygen output and reads source-files to harvest Options.
 This script generates a header file with option information that doxygen can use.
 """
 
+
 xml = 'XML/'
 out = 'extra/'
 
@@ -12,6 +13,7 @@ import shutil
 from lxml import etree
 import os
 import re
+import fnmatch
 
 # We will use an XML parser for the main index XML file
 xmlData = etree.parse(xml+'index.xml')
@@ -93,6 +95,32 @@ for name,meta in metadata.items():
     else:
       internalfor['InternalFor']=[name]
 
+# http://code.activestate.com/recipes/499305/
+def locate(pattern, root=os.curdir):
+    '''Locate all files matching supplied filename pattern in and below
+    supplied root directory.'''
+    for path, dirs, files in os.walk(os.path.abspath(root)):
+        for filename in fnmatch.filter(files, pattern):
+            yield os.path.join(path, filename)
+            
+# locate the namespaceCasADi.xml
+xmlNS = etree.parse(list(locate('namespaceCasADi.xml',root=xml))[0])
+
+# construct a table with enum info
+enums = {}
+
+for enum in xmlNS.findall("//memberdef[@kind='enum']"):
+  name=enum.findtext("name")
+  enums[name]=[]
+  for enumvalue in enum.findall("enumvalue"):
+    name_=enumvalue.findtext("name")
+    description = ""
+    if enumvalue.findtext("briefdescription/para"):
+      description += enumvalue.findtext("briefdescription/para").strip()
+    if enumvalue.findtext("detaileddescription/para"):
+      description += "\n" + enumvalue.findtext("detaileddescription/para").strip()
+    enums[name].append({'name': name_, 'description': description.strip()})
+    
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
   if not('CasADi::FXInternal' in meta['hierarchy']) and not(name=='CasADi::FXInternal'):
@@ -152,7 +180,7 @@ def statsashtml(stat):
 def monitorsashtml(monitor):
   return "<tr><td>%s</td><td>%s</td></tr>" %(monitor['name'],monitor['used'])
 
-f = file(out+'options.hpp','w')
+f = file(out+'b0_options.hpp','w')
 
 # Print out doxygen information - options
 for name,meta in metadata.items():
@@ -172,8 +200,8 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     f.write("/** \class %s\n" % t)
-    f.write("List of available options\n")
     f.write("<table>\n")
+    f.write("<caption>List of available options</caption>\n")
     f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
     for k in myoptionskeys :
       f.write(optionsashtml(alloptions[k])+"\n")
@@ -182,7 +210,7 @@ for name,meta in metadata.items():
 
 f.close()
 
-f = file(out+'stats.hpp','w')
+f = file(out+'d0_stats.hpp','w')
 
 # Print out doxygen information - stats
 for name,meta in metadata.items():
@@ -202,8 +230,8 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     f.write("/** \class %s\n" % t)
-    f.write("List of available stats\n")
     f.write("<table>\n")
+    f.write("<caption>List of available stats</caption>\n")
     f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
     for k in mystatskeys :
       f.write(statsashtml(allstats[k])+"\n")
@@ -212,7 +240,7 @@ for name,meta in metadata.items():
 
 f.close()
 
-f = file(out+'monitors.hpp','w')
+f = file(out+'c0_monitors.hpp','w')
 
 # Print out doxygen information - monitors
 for name,meta in metadata.items():
@@ -232,8 +260,8 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     f.write("/** \class %s\n" % t)
-    f.write("List of available monitors\n")
     f.write("<table>\n")
+    f.write("<caption>List of available monitors</caption>\n")
     f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
     for k in mymonitorskeys :
       f.write(monitorsashtml(allmonitors[k])+"\n")
@@ -242,7 +270,31 @@ for name,meta in metadata.items():
 
 f.close()
 
-f = file(out+'schemes.hpp','w')
+f = file(out+'a0_schemes.hpp','w')
+
+def enumsashtml(n,title):
+  s=""
+  if (n in enums):
+    s+= "<table>\n"
+    
+    num = ""
+    for i in range(len(enums[n])):
+      m = enums[n][i]
+      if re.search(r'_NUM_IN$',m['name']):
+        num = m['name']
+      if re.search(r'_NUM_OUT$',m['name']):
+        num = m['name']
+    s+= "<caption>%s  (%s = %d) </caption>\n" % (title,num,len(enums[n])-1)
+    s+= "<tr><th>Name</th><th>Description</th></tr>\n"
+    for i in range(len(enums[n])):
+      m = enums[n][i]
+      if re.search(r'_NUM_IN$',m['name']):
+        continue
+      if re.search(r'_NUM_OUT$',m['name']):
+        continue
+      s+="<tr><td>%s</td><td>%s</td></tr>\n" % (m['name'],m['description'])
+    s+="</table>\n"
+  return s
 
 # Print out doxygen information - schemes
 for name,meta in metadata.items():
@@ -269,13 +321,14 @@ for name,meta in metadata.items():
   for t in targets:
     if not(inputscheme is None) or not(outputscheme is None):
       f.write("/** \class %s\n" % t)
-      f.write(" Input/output scheme:\n")
       if not(inputscheme is None) and not(outputscheme is None):
-        f.write(" %s is an FX mapping from CasADi::%s to CasADi::%s\n" % (t,inputscheme,outputscheme) )
+        f.write(enumsashtml(inputscheme,"Input scheme: CasADi::%s" % inputscheme))
+        f.write("<br/>")
+        f.write(enumsashtml(outputscheme,"Output scheme: CasADi::%s" % outputscheme))
       elif outputscheme is None:
-        f.write(" %s is an FX mapping from CasADi::%s\n" % (t,inputscheme) )
+        f.write(enumsashtml(inputscheme,"Input scheme: CasADi::%s" % inputscheme))
       elif inputscheme is None:
-        f.write(" %s is an FX mapping to CasADi::%s\n" % (t,outputscheme) )
+        f.write(enumsashtml(outputscheme,"Output scheme: CasADi::%s" % outputscheme))
       f.write( "*/\n")
 
 f.close()

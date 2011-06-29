@@ -48,8 +48,6 @@ class GslInternal;
   You can retrieve the entire state trajectory as follows, after the evaluate call: 
   Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
   
-  GslIntegrator is an CasADi::FX mapping from CasADi::IntegratorInput to CasADi::IntegratorOutput.
-  
 
 */
 class GslIntegrator : public Integrator{

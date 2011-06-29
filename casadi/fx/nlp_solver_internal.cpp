@@ -23,7 +23,7 @@
 #include "nlp_solver_internal.hpp"
 
 INPUTSCHEME(NLPInput)
-INPUTSCHEME(NLPOutput)
+OUTPUTSCHEME(NLPOutput)
 
 using namespace std;
 namespace CasADi{

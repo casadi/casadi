@@ -33,12 +33,7 @@ class IpoptInternal;
 /**
 * \brief interface to IPOPT NLP solver
 *
-* IpoptSolver is an CasADi::FX mapping from CasADi::NLPInput to CasADi::NLPOutput
-*
 
-Input arguments:  CasADi::NLPInput\n
-  
-Output arguments: CasADi::NLPOutput\n
 */
 class IpoptSolver : public NLPSolver {
   public:

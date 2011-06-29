@@ -50,6 +50,7 @@ p.endtd {
 
 caption {
 	font-weight: bold;
+	caption-side: top;
 }
 
 span.legend {
