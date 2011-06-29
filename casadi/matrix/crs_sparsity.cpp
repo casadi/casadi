@@ -649,9 +649,10 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
   const vector<int> &x_rowind = rowind();
   const vector<int> &y_colind = y_trans.rowind();
   
-  // Construct the rowind vector
-  int el=0;
+  // loop over the row of the resulting matrix)
   for(int i=0; i<size1(); ++i){
+    
+    
     for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
       int el1 = x_rowind[i];
       int el2 = y_colind[j];
@@ -659,7 +660,7 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
         int j1 = x_col[el1];
         int i2 = y_row[el2];
         if(j1==i2){
-          el++;
+          c.push_back(j);
           break;
         } else if(j1<i2) {
           el1++;
@@ -668,29 +669,7 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
         }
       }
     }
-    r[i+1] = el;
-  }
-  
-  // Construct the col vector
-  c.resize(el);
-  el=0;
-  for(int i=0; i<size1(); ++i){
-    for(int j=0; j<y_trans.size1() && el<r[i+1]; ++j){ // loop over the column of the resulting matrix
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];
-        if(j1==i2){
-          c[el++] = j;
-          break;
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
+    r[i+1] = c.size();
   }
   
   return ret;
