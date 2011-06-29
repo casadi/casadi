@@ -30,10 +30,7 @@ namespace CasADi{
 
 Densification::Densification(const MX& x){
   setDependencies(x);
-  
-  // Calculate the mapping of the nonzeros
-  CRSSparsity sp = x->sparsity().makeDense(mapping_);
-  setSparsity(sp);
+  setSparsity(CRSSparsity(x.size1(),x.size2(),true));
 }
 
 Densification* Densification::clone() const{
@@ -45,38 +42,17 @@ void Densification::print(std::ostream &stream, const std::vector<std::string>& 
 }
 
 void Densification::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
-  if(0){
-    input[0]->get(output.data(),DENSE);
-    
-    // Propagate forward seeds
-    for(int d=0; d<nfwd; ++d){
-      fwdSeed[0][d]->get(fwdSens[d]->data(),DENSE);
-    }
-
-    // Propagate adjoint seeds
-    for(int d=0; d<nadj; ++d){
-      adjSeed[d]->get(adjSens[0][d]->data(),DENSE);
-    }
-  }
-    
-  
-  vector<double> &outputd = output.data();
-
-  for(int el=0; el<mapping_.size(); ++el)
-    outputd[mapping_[el]] = input[0]->data()[el];
+  // Propate values
+  input[0]->get(output.data(),DENSE);
   
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    for(int el=0; el<mapping_.size(); ++el){
-      fwdSens[d]->data()[mapping_[el]] = fwdSeed[0][d]->data()[el];
-    }
+    fwdSeed[0][d]->get(fwdSens[d]->data(),DENSE);
   }
-      
+
   // Propagate adjoint seeds
   for(int d=0; d<nadj; ++d){
-    for(int el=0; el<mapping_.size(); ++el){
-      adjSens[0][d]->data()[el] = adjSeed[d]->data()[mapping_[el]];
-    }
+    adjSens[0][d]->set(adjSeed[d]->data(),DENSE);
   }
 }
 
@@ -85,7 +61,7 @@ MX Densification::adFwd(const std::vector<MX>& jx){
 }
 
 void Densification::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  (*input[0]).get(output.data(),DENSE);
+  input[0]->get(output.data(),DENSE);
 }
 
 

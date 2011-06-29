@@ -53,9 +53,6 @@ public:
 
   /** \brief  Evaluate symbolically (SX) */
   virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
-
-  /// Nonzero mapping
-  std::vector<int> mapping_;
 };
 
 } // namespace CasADi
