@@ -23,6 +23,10 @@
 #include "qp_solver_internal.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
 
+
+INPUTSCHEME(QPInput)
+OUTPUTSCHEME(QPOutput)
+
 using namespace std;
 namespace CasADi{
 

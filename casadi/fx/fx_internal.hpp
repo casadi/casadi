@@ -26,6 +26,12 @@
 #include "fx.hpp"
 #include <set>
 
+// This macro is for documentation purposes
+#define INPUTSCHEME(name)
+
+// This macro is for documentation purposes
+#define OUTPUTSCHEME(name)
+
 namespace CasADi{
   
 /** \brief Internal class for FX
