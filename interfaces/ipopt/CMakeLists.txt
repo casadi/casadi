@@ -9,6 +9,10 @@ SET(IPOPT_INTERFACE_SRCS
   ipopt_internal.cpp
   ipopt_nlp.hpp
   ipopt_nlp.cpp
+  ipopt_qp_internal.hpp
+  ipopt_qp_internal.cpp
+  ipopt_qp_solver.hpp
+  ipopt_qp_solver.cpp
 )
 
 

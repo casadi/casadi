@@ -52,7 +52,6 @@ OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const C
   vars=0; 
   resid=0;
   s=0;
-  std::cout << "Warning: OOQP is highly experimental" << std::endl;
 }
 
 OOQPInternal::~OOQPInternal(){ 
@@ -65,11 +64,9 @@ OOQPInternal::~OOQPInternal(){
 void OOQPInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("OOQPSolve::evaluate() not implemented for forward or backward mode");
   if (s==0) {
-    std::cout << "Evaluate thinks we need to allocate" << std::endl;
     allocate();
     assert(s!=0);
   } else {  
-    std::cout << "Reevaluation" << std::endl;
     // Split A in equalities and inequalities
     A_eq.set(input(QP_A)(eq,all_A));
     A_ineq.set(input(QP_A)(ineq,all_A));
@@ -106,7 +103,6 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
 }
 
 void OOQPInternal::allocate() {
-  std::cout << "This is the allocate routine" << std::endl;
   if (s!=0) {
     delete s;
     delete prob;
@@ -223,8 +219,6 @@ void OOQPInternal::allocate() {
   
   s->setMuTol(getOption("mutol").toDouble());
   s->setArTol(getOption("mutol").toDouble());
-  
-  s->monitorSelf();
   
 }
 

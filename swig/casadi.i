@@ -248,6 +248,15 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 // Optimal control
 %include "optimal_control.i"
 
+#ifdef WITH_OOQP
+%{
+#include "casadi/fx/qp_solver.hpp"
+#include "interfaces/ooqp/ooqp_solver.hpp"
+%}
+%include "casadi/fx/qp_solver.hpp"
+%include "interfaces/ooqp/ooqp_solver.hpp"
+#endif
+
 // IPOPT
 #ifdef WITH_IPOPT
 %include "ipopt_interface.i"
@@ -309,11 +318,3 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "interfaces/gsl/gsl_integrator.hpp"
 #endif
 
-#ifdef WITH_OOQP
-%{
-#include "casadi/fx/qp_solver.hpp"
-#include "interfaces/ooqp/ooqp_solver.hpp"
-%}
-%include "casadi/fx/qp_solver.hpp"
-%include "interfaces/ooqp/ooqp_solver.hpp"
-#endif
