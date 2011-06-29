@@ -44,23 +44,23 @@ void Densification::print(std::ostream &stream, const std::vector<std::string>& 
   stream << "dense(" << args.at(0) << ")";
 }
 
-void Densification::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Densification::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
 
   for(int el=0; el<mapping_.size(); ++el)
-    outputd[mapping_[el]] = input[0][el];
+    outputd[mapping_[el]] = input[0]->data()[el];
   
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
     for(int el=0; el<mapping_.size(); ++el){
-      fwdSens[d][mapping_[el]] = fwdSeed[0][d][el];
+      fwdSens[d]->data()[mapping_[el]] = fwdSeed[0][d][el];
     }
   }
       
   // Propagate adjoint seeds
   for(int d=0; d<nadj; ++d){
     for(int el=0; el<mapping_.size(); ++el){
-      adjSens[0][d][el] = adjSeed[d][mapping_[el]];
+      adjSens[0][d][el] = adjSeed[d]->data()[mapping_[el]];
     }
   }
 }

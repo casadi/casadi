@@ -230,7 +230,7 @@ bool PyIsSequence(PyObject* p) {
 %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
 template<> swig_type_info** meta< int >::name = &SWIGTYPE_p_int;
-template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_p_std__allocatorT_double_p_t_t;
+// template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_p_std__allocatorT_double_p_t_t; BUG: Since it was no longer used anywhere, it caused an undeclared type error!
 template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
 %}
 

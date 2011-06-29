@@ -47,31 +47,32 @@ void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) 
   casadi_math<double>::print[op](stream,args.at(0),"nan");
 }
 
-void UnaryOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void UnaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   double nan = numeric_limits<double>::quiet_NaN();
   vector<double> &outputd = output.data();
+  const vector<double> &inputd = input[0]->data();
   
   if(nfwd==0 && nadj==0){
     // No sensitivities
     for(int i=0; i<size(); ++i)
-      casadi_math<double>::fun[op](input[0][i],nan,outputd[i]);
+      casadi_math<double>::fun[op](inputd[i],nan,outputd[i]);
     
   } else {
     // Sensitivities
     double tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      casadi_math<double>::fun[op](input[0][i],nan,outputd[i]);
-      casadi_math<double>::der[op](input[0][i],nan,outputd[i],tmp);
+      casadi_math<double>::fun[op](inputd[i],nan,outputd[i]);
+      casadi_math<double>::der[op](inputd[i],nan,outputd[i],tmp);
       
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-        fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i];
+        fwdSens[d]->data()[i] = tmp[0]*fwdSeed[0][d][i];
       }
 
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-        adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
+        adjSens[0][d][i] += adjSeed[d]->data()[i]*tmp[0];
       }
     }
   }

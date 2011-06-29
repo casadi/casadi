@@ -371,7 +371,12 @@ class Integrationtests(casadiTestCase):
     t=symbolic("t")
     q=symbolic("q",3,1)
     p=symbolic("p",9,1)
-    f=SXFunction([t,q,p,[]],[c.dot(c.reshape(p,3,3),q)])
+    f_in = SXMatrixVector(DAE_NUM_IN)
+    f_in[DAE_T] = t
+    f_in[DAE_Y] = q
+    f_in[DAE_P] = p
+    f_out = [c.dot(c.reshape(p,3,3),q)]
+    f=SXFunction(f_in,f_out)
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("steps_per_checkpoint",1000)

@@ -60,8 +60,10 @@ void Multiplication::print(std::ostream &stream, const std::vector<std::string>&
   stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
-void Multiplication::evaluateDenseDense(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Multiplication::evaluateDenseDense(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double>& outputd = output.data();
+  const vector<double> &input0 = input[0]->data();
+  const vector<double> &input1 = input[1]->data();
 
   // Get dimensions
   int nx1 = dep(0).size1();
@@ -76,7 +78,7 @@ void Multiplication::evaluateDenseDense(const VDptr& input, DMatrix& output, con
       // Add scalar product
       double sum = 0;
       for(int k=0; k<nx2; ++k){
-        sum += input[0][k+i*nx2] * input[1][j+k*ny2];
+        sum += input0[k+i*nx2] * input1[j+k*ny2];
       }
       outputd[j+i*nz2] = sum;
     }
@@ -89,9 +91,9 @@ void Multiplication::evaluateDenseDense(const VDptr& input, DMatrix& output, con
         // Add scalar product
         double sum = 0;
         for(int k=0; k<nx2; ++k){
-          sum += fwdSeed[0][d][k+i*nx2] * input[1][j+k*ny2] + input[0][k+i*nx2] * fwdSeed[1][d][j+k*ny2];
+          sum += fwdSeed[0][d][k+i*nx2] * input1[j+k*ny2] + input0[k+i*nx2] * fwdSeed[1][d][j+k*ny2];
         }
-        fwdSens[d][j+i*nz2] = sum;
+        fwdSens[d]->data()[j+i*nz2] = sum;
       }
     }
   }
@@ -101,32 +103,34 @@ void Multiplication::evaluateDenseDense(const VDptr& input, DMatrix& output, con
     for(int i=0; i<nx1; ++i){
       for(int j=0; j<ny2; ++j){
         for(int k=0; k<nx2; ++k){
-          adjSens[0][d][k+i*nx2] += adjSeed[d][j+i*nz2]*input[1][j+k*ny2];
-          adjSens[1][d][j+k*ny2] += adjSeed[d][j+i*nz2]*input[0][k+i*nx2];
+          adjSens[0][d][k+i*nx2] += adjSeed[d]->data()[j+i*nz2]*input1[j+k*ny2];
+          adjSens[1][d][j+k*ny2] += adjSeed[d]->data()[j+i*nz2]*input0[k+i*nx2];
         }
       }
     }
   }
 }
 
-void Multiplication::evaluateSparseSparse(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Multiplication::evaluateSparseSparse(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double>& outputd = output.data();
-  
+  const vector<double> &input0 = input[0]->data();
+  const vector<double> &input1 = input[1]->data();
+
   // Carry out the actual multiplication
   for(int i=0; i<prod_map_.size(); ++i){
     outputd[i] = 0;
     for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it)
-      outputd[i] += input[0][it->first] * input[1][y_trans_map_[it->second]];
+      outputd[i] += input0[it->first] * input1[y_trans_map_[it->second]];
   }
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){
     for(int i=0; i<prod_map_.size(); ++i){
-      fwdSens[d][i] = 0;
+      fwdSens[d]->data()[i] = 0;
       for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it){
-        fwdSens[d][i] += 
-            fwdSeed[0][d][it->first] * input[1][y_trans_map_[it->second]] + 
-            input[0][it->first] * fwdSeed[1][d][y_trans_map_[it->second]];
+        fwdSens[d]->data()[i] += 
+            fwdSeed[0][d][it->first] * input1[y_trans_map_[it->second]] + 
+            input0[it->first] * fwdSeed[1][d][y_trans_map_[it->second]];
       }
     }
   }
@@ -135,14 +139,14 @@ void Multiplication::evaluateSparseSparse(const VDptr& input, DMatrix& output, c
   for(int d=0; d<nadj; ++d){
     for(int i=0; i<prod_map_.size(); ++i){
       for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it){
-        adjSens[0][d][it->first] += adjSeed[d][i]*input[1][y_trans_map_[it->second]];
-        adjSens[1][d][y_trans_map_[it->second]] += adjSeed[d][i]*input[0][it->first];
+        adjSens[0][d][it->first] += adjSeed[d]->data()[i]*input1[y_trans_map_[it->second]];
+        adjSens[1][d][y_trans_map_[it->second]] += adjSeed[d]->data()[i]*input0[it->first];
       }
     }
   }
 }
 
-void Multiplication::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Multiplication::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   if(x_dense_ && y_dense_){
     evaluateDenseDense(input, output, fwdSeed, fwdSens, adjSeed, adjSens, nfwd, nadj);
   } else {

@@ -60,9 +60,11 @@ void MatrixMatrixOp::print(std::ostream &stream, const std::vector<std::string>&
   casadi_math<double>::print[op](stream,args.at(0),args.at(1));
 }
 
-void MatrixMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void MatrixMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double>& outputd = output.data();
-  
+  const vector<double> &input0 = input[0]->data();
+  const vector<double> &input1 = input[1]->data();
+
   // Number of non-zeros
   int n = size();
   int nx = dep(0).size();
@@ -72,25 +74,25 @@ void MatrixMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr&
     if(nfwd==0 && nadj==0){
       // No sensitivities
       for(int i=0; i<n; ++i)
-        casadi_math<double>::fun[op](input[0][i],input[1][i],outputd[i]);
+        casadi_math<double>::fun[op](input0[i],input1[i],outputd[i]);
       
     } else {
       // Sensitivities
       double tmp[2];  // temporary variable to hold value and partial derivatives of the function
       for(int i=0; i<n; ++i){
         // Evaluate and get partial derivatives
-        casadi_math<double>::fun[op](input[0][i],input[1][i],outputd[i]);
-        casadi_math<double>::der[op](input[0][i],input[1][i],outputd[i],tmp);
+        casadi_math<double>::fun[op](input0[i],input1[i],outputd[i]);
+        casadi_math<double>::der[op](input0[i],input1[i],outputd[i],tmp);
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = tmp[0]*fwdSeed[0][d][i] + tmp[1]*fwdSeed[1][d][i];
+          fwdSens[d]->data()[i] = tmp[0]*fwdSeed[0][d][i] + tmp[1]*fwdSeed[1][d][i];
         }
 
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          adjSens[0][d][i] += adjSeed[d][i]*tmp[0];
-          adjSens[1][d][i] += adjSeed[d][i]*tmp[1];
+          adjSens[0][d][i] += adjSeed[d]->data()[i]*tmp[0];
+          adjSens[1][d][i] += adjSeed[d]->data()[i]*tmp[1];
         }
       }
     }
@@ -101,8 +103,8 @@ void MatrixMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr&
     if(nfwd==0 && nadj==0){
       // No sensitivities
       for(int i=0; i<n; ++i){
-        double x = mapping_[i]<=0 ? input[0][ix++] : 0;
-        double y = mapping_[i]>=0 ? input[1][iy++] : 0;
+        double x = mapping_[i]<=0 ? input0[ix++] : 0;
+        double y = mapping_[i]>=0 ? input1[iy++] : 0;
         casadi_math<double>::fun[op](x,y,outputd[i]);
       }
 
@@ -113,8 +115,8 @@ void MatrixMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr&
         bool isx = mapping_[i]<=0;
         bool isy = mapping_[i]>=0;
 
-        double x = isx ? input[0][ix] : 0;
-        double y = isy ? input[1][iy] : 0;
+        double x = isx ? input0[ix] : 0;
+        double y = isy ? input1[iy] : 0;
 
         // Evaluate and get partial derivatives
         casadi_math<double>::fun[op](x,y,outputd[i]);
@@ -122,13 +124,13 @@ void MatrixMatrixOp::evaluate(const VDptr& input, DMatrix& output, const VVDptr&
         
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
-          fwdSens[d][i] = (isx ? tmp[0]*fwdSeed[0][d][ix]: 0) + (isy ? tmp[1]*fwdSeed[1][d][iy]: 0);
+          fwdSens[d]->data()[i] = (isx ? tmp[0]*fwdSeed[0][d][ix]: 0) + (isy ? tmp[1]*fwdSeed[1][d][iy]: 0);
         }
 
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          if (isx) adjSens[0][d][ix] += adjSeed[d][i]*tmp[0];
-          if (isy) adjSens[1][d][iy] += adjSeed[d][i]*tmp[1];
+          if (isx) adjSens[0][d][ix] += adjSeed[d]->data()[i]*tmp[0];
+          if (isy) adjSens[1][d][iy] += adjSeed[d]->data()[i]*tmp[1];
         }
         
         // Increase argument indices

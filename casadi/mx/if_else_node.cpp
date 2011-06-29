@@ -45,28 +45,28 @@ void IfNode::print(std::ostream &stream, const std::vector<std::string>& args) c
   stream << "(" << args.at(0) << "?" <<  args.at(1) << ":" << args.at(2) << ")";
 }
 
-void IfNode::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
-  bool c = fabs(input[0][0])<tol;
+void IfNode::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+  bool c = fabs(input[0]->data()[0])<tol;
   vector<double> &outputd = output.data();
   if(c){
     for(int i=0; i<size(); ++i){
       // Function
-      outputd[i] = input[0][i];
+      outputd[i] = input[0]->data()[i];
       
       // Forward seeds
       for(int d=0; d<nfwd; ++d)
-        fwdSens[d][i] = fwdSeed[0][d][i];
+        fwdSens[d]->data()[i] = fwdSeed[0][d][i];
       
       // Adjoint seeds
       for(int d=0; d<nadj; ++d)
-        adjSens[0][d][i] += adjSeed[d][i];
+        adjSens[0][d][i] += adjSeed[d]->data()[i];
     }
   } else {
     // Zero if false
     for(int i=0; i<size(); ++i){
       outputd[i] = 0;
       for(int d=0; d<nfwd; ++d) 
-        fwdSens[d][i] = 0;
+        fwdSens[d]->data()[i] = 0;
     }
   }
 }

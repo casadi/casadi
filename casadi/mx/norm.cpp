@@ -33,7 +33,7 @@ Norm::Norm(const MX& x){
   setSparsity(CRSSparsity(1,1,true));
 }
 
-void Norm::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   throw CasadiException("Norm::evaluate not implemented");
 }
 
@@ -44,27 +44,28 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
-void Norm2::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm2::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
+  const vector<double> &inputd = input[0]->data();
 
   double temp=0;
   for (int k=0;k<dep(0).size();k++) {
-    temp+=input[0][k]*input[0][k];
+    temp+=inputd[k]*inputd[k];
   }
   outputd[0]=sqrt(temp);
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSens[d][0]=0;
+    fwdSens[d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d][0] += input[0][k]/outputd[0] * fwdSeed[0][d][k];
+      fwdSens[d]->data()[0] += inputd[k]/outputd[0] * fwdSeed[0][d][k];
     }
   }
 
   // Propagate adjoint seeds
   for(int d=0; d<nadj; ++d){
-    if (adjSeed[d][0]==0) continue;
+    if (adjSeed[d]->data()[0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
-      adjSens[0][d][k] += input[0][k]/outputd[0] * adjSeed[d][0];
+      adjSens[0][d][k] += inputd[k]/outputd[0] * adjSeed[d]->data()[0];
     }
   }
   
@@ -89,27 +90,28 @@ Norm22* Norm22::clone() const{
   return new Norm22(*this);
 }
 
-void Norm22::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm22::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
+  const vector<double> &inputd = input[0]->data();
 
   double temp=0;
   for (int k=0;k<dep(0).size();k++) {
-    temp+=input[0][k]*input[0][k];
+    temp+=inputd[k]*inputd[k];
   }
   outputd[0]=temp;
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSens[d][0]=0;
+    fwdSens[d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d][0] += 2*input[0][k] * fwdSeed[0][d][k];
+      fwdSens[d]->data()[0] += 2*inputd[k] * fwdSeed[0][d][k];
     }
   }
 
   // Propagate adjoint seeds
   for(int d=0; d<nadj; ++d){
-    if (adjSeed[d][0]==0) continue;
+    if (adjSeed[d]->data()[0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
-      adjSens[0][d][k] += 2*input[0][k] * adjSeed[d][0];
+      adjSens[0][d][k] += 2*inputd[k] * adjSeed[d]->data()[0];
     }
   }
   
@@ -135,39 +137,40 @@ void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) co
   stream << "||" << args.at(0) << "||_1"; 
 }
 
-void Norm1::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Norm1::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
-  
+    const vector<double> &inputd = input[0]->data();
+
   if(nfwd==0 && nadj==0){
    double temp=0;
-   for (int k=0;k<dep(0).size();k++) temp+=std::abs(input[0][k]);
+   for (int k=0;k<dep(0).size();k++) temp+=std::abs(inputd[k]);
    outputd[0]=temp;
    return; 
   }
 
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSens[d][0]=0;
+    fwdSens[d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
       if (fwdSeed[0][d][k]==0) continue;
-      if (input[0][k] < 0) {
-        fwdSens[d][0] -= fwdSeed[0][d][k];
-      } else if (input[0][k] > 0) {
-        fwdSens[d][0] += fwdSeed[0][d][k];
+      if (inputd[k] < 0) {
+        fwdSens[d]->data()[0] -= fwdSeed[0][d][k];
+      } else if (inputd[k] > 0) {
+        fwdSens[d]->data()[0] += fwdSeed[0][d][k];
       } else {
-        fwdSens[d][0] += std::numeric_limits<double>::quiet_NaN();
+        fwdSens[d]->data()[0] += std::numeric_limits<double>::quiet_NaN();
       }
     }
   }
 
   // Propagate adjoint seeds
   for(int d=0; d<nadj; ++d){
-    if (adjSeed[d][0]==0) continue;
+    if (adjSeed[d]->data()[0]==0) continue;
     for(int k=0; k<dep(0).size(); k++){
-      if (input[0][k] < 0) {
-        adjSens[0][d][k] -=  adjSeed[d][0];
-      } else if (input[0][k] > 0) {
-        adjSens[0][d][k] +=  adjSeed[d][0];
+      if (inputd[k] < 0) {
+        adjSens[0][d][k] -=  adjSeed[d]->data()[0];
+      } else if (inputd[k] > 0) {
+        adjSens[0][d][k] +=  adjSeed[d]->data()[0];
       } else {
         adjSens[0][d][k] += std::numeric_limits<double>::quiet_NaN();
       }
@@ -187,13 +190,14 @@ void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) 
   stream << "||" << args.at(0) << "||_inf"; 
 }
 
-void NormInf::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void NormInf::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
+  const vector<double> &inputd = input[0]->data();
 
   double temp=std::numeric_limits<double>::infinity();
   double a;
   for (int k=0;k<dep(0).size();k++) {
-    a = std::abs(input[0][k]);
+    a = std::abs(inputd[k]);
     if (a>temp) temp=a;
   }
   outputd[0]=temp;

@@ -61,12 +61,12 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << fcn_ << ".call(" << args << ")";
 }
 
-void Evaluation::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void Evaluation::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   
   // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
-    if(input[i] != 0){
-      fcn_.setInput(input[i],i);
+    if(input[i] != 0 && input[i]->size() !=0 ){
+      fcn_.setInput(input[i]->data(),i);
       for(int d=0; d<nfwd; ++d){
         fcn_.setFwdSeed(fwdSeed[i][d],i,d);
       }
@@ -104,21 +104,21 @@ void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string
   stream << args[0] << "[" << oind_ <<  "]";
 }
 
-void EvaluationOutput::evaluate(const VDptr& input, DMatrix& output, const VVDptr& fwdSeed, VDptr& fwdSens, const VDptr& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
+void EvaluationOutput::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const VVDptr& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, VVDptr& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
 
   // Pass the adjoint seed to the function
   for(int d=0; d<nadj; ++d)
-    if(adjSeed[d]!=0)
-      getFunction().setAdjSeed(adjSeed[d],oind_,d);
+    if(adjSeed[d]!=0 && adjSeed[d]->size() != 0)
+      getFunction().setAdjSeed(adjSeed[d]->data(),oind_,d);
 
     // Get the results
   getFunction().getOutput(outputd,oind_);
 
   // Get the fwd sensitivities
   for(int d=0; d<nfwd; ++d)
-    if(fwdSens[d]!=0)
-      getFunction().getFwdSens(fwdSens[d],oind_,d);
+    if(fwdSens[d]!=0 && fwdSens[d]->size() != 0)
+      getFunction().getFwdSens(fwdSens[d]->data(),oind_,d);
 }
 
 MX Evaluation::adFwd(const std::vector<MX>& jx){ 
