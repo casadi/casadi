@@ -22,6 +22,7 @@
 
 #include "crs_sparsity.hpp"
 #include "../stl_vector_tools.hpp"
+#include <climits>
 
 using namespace std;
 
@@ -652,20 +653,40 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
   const vector<int> &y_row = y_trans.col();
   const vector<int> &x_rowind = rowind();
   const vector<int> &y_colind = y_trans.rowind();
+
+  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
+#if __STDC_VERSION__ >= 199901L
+  typedef unsigned long long int_t;
+#else
+  typedef unsigned long int_t;
+#endif
+  
+  // Number of directions we can deal with at a time
+  int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+
+  // Number of such groups needed
+  int ng = x_nrow/nr;
+  if(ng*nr != x_nrow) ng++;
   
   // Which columns exist in a row of the first factor
-  vector<bool> in_x_row(size2());
-  
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<x_nrow; ++i){
-    
+  vector<int_t> in_x_row(size2());
+  vector<int_t> in_res_col(y_ncol);
+
+  // Loop over the rows of the resulting matrix, nr rows at a time
+  for(int rr=0; rr<ng; ++rr){
+
     // Mark the elements in the x row
-    fill(in_x_row.begin(),in_x_row.end(),false);
-    for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
-      in_x_row[x_col[el1]] = true;
+    fill(in_x_row.begin(),in_x_row.end(),0);
+    int_t b=1;
+    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+      for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
+        in_x_row[x_col[el1]] |= b;
+      }
+      b >>= 1;
     }
-    
-    // loop over the columns of second factor
+
+    // Get the sparsity pattern for the set of rows
+    fill(in_res_col.begin(),in_res_col.end(),0);
     for(int j=0; j<y_ncol; ++j){
       
       // Loop over the nonzeros of the column of the second factor
@@ -675,13 +696,24 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
         int i_y = y_row[el2];
         
         // Add nonzero if the element matches an element in the x row
-        if(in_x_row[i_y]){
-          c.push_back(j);
-          break;
-        }
+        in_res_col[j] |= in_x_row[i_y];
       }
     }
-    r[i+1] = c.size();
+
+    b = 1;
+    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+      
+      // loop over the columns of the resulting matrix
+      for(int j=0; j<y_ncol; ++j){
+        
+        // Save nonzero, if any
+        if(in_res_col[j] | b){
+          c.push_back(j);
+        }
+      }
+      r[i+1] = c.size();
+      b >>=1;
+    }
   }
   
   return ret;
@@ -689,11 +721,11 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping) const{
   // return object
-  CRSSparsity ret(size1(),y_trans.size1());
+  CRSSparsity ret = patternProduct(y_trans);
   
   // Get the vectors for the return pattern
-  vector<int>& c = ret.colRef();
-  vector<int>& r = ret.rowindRef();
+  const vector<int>& c = ret.col();
+  const vector<int>& r = ret.rowind();
   
   // Direct access to the arrays
   const vector<int> &x_col = col();
@@ -702,14 +734,16 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vect
   const vector<int> &y_colind = y_trans.rowind();
 
   // Clear the mapping
-  mapping.clear();
+  mapping.resize(ret.size());
 
   // the entry of the matrix to be calculated
-  vector< pair<int,int> > d; 
+  vector< pair<int,int> > d;
 
   // loop over the row of the resulting matrix)
   for(int i=0; i<size1(); ++i){
-    for(int j=0; j<y_trans.size1(); ++j){ // loop over the column of the resulting matrix
+    // Loop over nonzeros
+    for(int el=r[i]; el<r[i+1]; ++el){
+      int j = c[el];
       int el1 = x_rowind[i];
       int el2 = y_colind[j];
       d.clear();
@@ -724,12 +758,8 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vect
           el2++;
         }
       }
-      if(!d.empty()){
-        c.push_back(j);
-        mapping.push_back(d);
-      }
+      mapping[el] = d;
     }
-    r[i+1] = c.size();
   }
   
   return ret;
