@@ -81,26 +81,14 @@ public:
     /// Number of inequality constraints
     int n_ineq;
     
-    /** \brief Sorts the constraints
-    * \pre
-    *   constraints member is set
-    * \post 
-    *   eq, ineq, n_eq, n_ineq  are set
-    *   ineq.size()==n_ineq,  eq.size()==n_eq
-    */
-    void sort_constraints();
-    
-    /** \brief Guess the constraints from QP_LBA and QP_UBA if 'constraint' option is not set
-    * \post 
-    *   constraints member is set
-    */
-    void guess_constraints();
-    
     /// NZ indices of H elements  on the lower triangular side
     std::vector<int> nz;
     
     /// The lower triangular part of H
     DMatrix Hl;
+    
+    /// The non-zero indices into H that make up Hl 
+    std::vector<int> Hl_nz;
     
     /// The equality part of A
     DMatrix A_eq;
@@ -117,19 +105,29 @@ public:
     /// The inequality part of UBA
     DMatrix UBA_ineq;
     
+    std::vector<int> all_A;
+    
     //xlow, ixlow are the lower bounds on x. These contain the information in the
     //lower bounding vector l in the formulation given above. 
     //If there is a bound on element k of x (that is, lk > -1), then xlow[k] should
     //be set to the value of lk and ixlow[k] should be set to one. 
-    std::vector<int> ixlow;
-    std::vector<int> xlow;
+    std::vector<char> ixlow;
+    //std::vector<double> xlow;
 
-    std::vector<int> ixupp;
-    std::vector<int> xupp;
+    std::vector<char> ixupp;
+    //std::vector<double> xupp;
     
-    std::vector<int> iclow;
-    std::vector<int> icupp;
+    std::vector<char> iclow;
+    std::vector<char> icupp;
     
+    std::vector<int> Hl_rowind;
+    std::vector<int> Hl_col;
+    
+    std::vector<int> eq_rowind;
+    std::vector<int> eq_col;
+    
+    std::vector<int> ineq_rowind;
+    std::vector<int> ineq_col;
 };
 
 
