@@ -32,7 +32,7 @@ namespace Interfaces {
 // Forward declaration of internal class 
 class IpoptQPInternal;
 
-  /** OOQP Solver for quadratic programing:
+  /** \brief IPOPT QP Solver for quadratic programming
 
   min          x'Hx + G'x 
   
@@ -43,9 +43,8 @@ class IpoptQPInternal;
       nx: number of decision variables (x)
       nc: number of constraints (A)
       
-      The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
       
-      NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
+
   */
 class IpoptQPSolver : public QPSolver {
 public:

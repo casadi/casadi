@@ -32,7 +32,7 @@ namespace Interfaces {
 // Forward declaration of internal class 
 class OOQPInternal;
 
-  /** OOQP Solver for quadratic programing:
+  /** OOQP Solver for quadratic programming:
 
   min          x'Hx + G'x 
   

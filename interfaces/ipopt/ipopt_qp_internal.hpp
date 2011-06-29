@@ -28,7 +28,10 @@
 
 namespace CasADi{
 namespace Interfaces {
-  
+
+  /** \brief Internal class for IpoptQPSolver
+   * 
+   * */
 class IpoptQPInternal : public QPSolverInternal {
   friend class IpoptQPSolver;
 public:
@@ -52,8 +55,11 @@ public:
   protected:
     IpoptSolver solver;
     
+    // an MX that represents H, but dependant on a common MX.
     MX H_;
+    // an MX that represents G, but dependant on a common MX.
     MX G_;
+    // an MX that represents A, but dependant on a common MX.
     MX A_;
 };
 

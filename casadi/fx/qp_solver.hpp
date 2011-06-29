@@ -36,14 +36,7 @@ namespace CasADi{
               
       nx: number of decision variables (x)
       nc: number of constraints (A)
-  */
 
-/** \brief Input arguments of an QP Solver
-  min          x'Hx + G'x 
-  
-  subject to
-              LBA <= Ax <= UBA
-              LBX <= x  <= UBX
 */
 enum QPInput{
   /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.

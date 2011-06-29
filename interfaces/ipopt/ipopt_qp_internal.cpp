@@ -45,10 +45,12 @@ IpoptQPInternal::~IpoptQPInternal(){
 }
 
 void IpoptQPInternal::evaluate(int nfdir, int nadir) {
+  if (nfdir!=0 || nadir!=0) throw CasadiException("IpoptQPInternal::evaluate() not implemented for forward or backward mode");
   
-  solver.input(NLP_P)[H_.mapping()] = input(QP_H);
-  solver.input(NLP_P)[G_.mapping()] = input(QP_G);
-  solver.input(NLP_P)[A_.mapping()] = input(QP_A);
+  // Pass inputs of QPInternal to IpoptInternal form 
+  solver.input(NLP_P)[H_.mapping()].set(input(QP_H));
+  solver.input(NLP_P)[G_.mapping()].set(input(QP_G));
+  solver.input(NLP_P)[A_.mapping()].set(input(QP_A));
   
   solver.input(NLP_LBX).set(input(QP_LBX));
   solver.input(NLP_UBX).set(input(QP_UBX));
@@ -56,8 +58,10 @@ void IpoptQPInternal::evaluate(int nfdir, int nadir) {
   solver.input(NLP_LBG).set(input(QP_LBA));
   solver.input(NLP_UBG).set(input(QP_UBA));
   
+  // Delegate computation to Ipopt
   solver.evaluate();
   
+  // Read the outputs from Ipopt
   output(NLP_X_OPT).set(solver.output(NLP_X_OPT));
   output(NLP_COST).set(solver.output(NLP_COST));
 }
@@ -66,30 +70,38 @@ void IpoptQPInternal::init(){
   
   QPSolverInternal::init();
   
+  // Create an MX for the decision variables
   MX X("X",nx,1);
     
+  // Put H, G, A sparsities in a vector...
   std::vector< CRSSparsity > sps;
   sps.push_back(H);
   sps.push_back(G);
   sps.push_back(A);
   
+  // So that we can pass it on to createParent
   std::pair< MX, std::vector< MX > > mypair = createParent(sps);
   
+  // V groups all parameters in an MX
   MX V(mypair.first);
   std::vector< MX > variables(mypair.second);
   
+  // H_, G_, A_ depend on V
   H_=variables[0];
   G_=variables[1];
   A_=variables[2];
   
-  
+  // We're going to use two-argument objective and constraints to allow the use of parameters
   std::vector< MX > args;
   args.push_back(X);
   args.push_back(V);
   
+  // The objective function looks exactly like a mathematical description of the NLP
   MXFunction QP_f(args, prod(trans(G_),X) + 0.5*prod(prod(trans(X),H_),X));
+  // So does the constraint function
   MXFunction QP_g(args, prod(A_,X));
   
+  // Generate an IpoptSolver that uses this objective and constraint
   solver = IpoptSolver(QP_f,QP_g);
 
   solver.init();
