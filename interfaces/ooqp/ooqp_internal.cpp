@@ -25,6 +25,8 @@
 #include "casadi/matrix/sparsity_tools.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
 
+#include "Status.h"
+
 using namespace std;
 namespace CasADi {
 namespace Interfaces {
@@ -64,11 +66,21 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     LBA_ineq.set(input(QP_LBA)(ineq,all_A));
     UBA_ineq.set(input(QP_UBA)(ineq,all_A));
     
+    LBX.set(input(QP_LBX));
+    UBX.set(input(QP_UBX));
+
+  
     Hl.set(input(QP_H)[Hl_nz]);
   }
 
   
-  int ierr = s->solve(prob,vars, resid);
+  int flag = s->solve(prob,vars, resid);
+  
+  if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);
+  
+  vars->x->copyIntoArray(&output(QP_X_OPT).data()[0]);
+  
+  std::cout << output(QP_X_OPT) << std::endl;
 }
 
 void OOQPInternal::allocate() {
@@ -117,14 +129,35 @@ void OOQPInternal::allocate() {
   LBA_ineq = input(QP_LBA)(ineq,0);
   UBA_ineq = input(QP_UBA)(ineq,0);
   
+  LBX = input(QP_LBX);
+  UBX = input(QP_UBX);
+
+  
+  for (int k=0; k<input(QP_LBX).size();k++) {
+    if (input(QP_LBX).at(k)==-numeric_limits<double>::infinity()) LBX.at(k)=0;
+  }
+  for (int k=0; k<input(QP_UBX).size();k++) {
+    if (input(QP_UBX).at(k)==numeric_limits<double>::infinity()) UBX.at(k)=0;
+  }
+  
+  
   for (int k=0; k<input(QP_LBX).size();k++) ixlow[k]=!(input(QP_LBX).at(k)==-numeric_limits<double>::infinity());
   for (int k=0; k<input(QP_UBX).size();k++) ixupp[k]= !(input(QP_UBX).at(k)==numeric_limits<double>::infinity());
   
+
   iclow.resize(n_ineq,0);
   icupp.resize(n_ineq,0);
   
   for (int k=0; k<LBA_ineq.size();k++) iclow[k]=!(LBA_ineq.at(k)==-numeric_limits<double>::infinity());
   for (int k=0; k<UBA_ineq.size();k++) icupp[k]=!(UBA_ineq.at(k)==numeric_limits<double>::infinity());
+
+  for (int k=0; k<LBA_ineq.size();k++) {
+    if (LBA_ineq.at(k)==-numeric_limits<double>::infinity()) LBA_ineq.at(k)=0;
+  } 
+  
+  for (int k=0; k<UBA_ineq.size();k++) {
+    if (UBA_ineq.at(k)==numeric_limits<double>::infinity()) UBA_ineq.at(k)=0;
+  } 
   
   Hl.set(input(QP_H)[Hl_nz]);
   
@@ -143,36 +176,38 @@ void OOQPInternal::allocate() {
   
   std::cout << "Here comes the sun" << std::endl;
   
+  //ixupp[0]=1;
+  //ixupp[1]=1;
+  
+  //iclow[0]=1;
+  //iclow[1]=1;
+  //iclow[2]=1;
+  
   std::cout << "G" << input(QP_G) << std::endl;
   std::cout << "Hl" << Hl << std::endl;
   std::cout << "A_eq" << A_eq << DMatrix(eq_rowind) << DMatrix(eq_col) << std::endl;
   std::cout << "A_ineq" << A_ineq << std::endl;
   
-  std::cout << "LBX" << input(QP_LBX) << DMatrix(ixlow) << std::endl;
-  std::cout << "UBX" << input(QP_UBX) << DMatrix(ixupp) << std::endl;
+  std::cout << "LBX" << LBX << DMatrix(ixlow) << std::endl;
+  std::cout << "UBX" << UBX << DMatrix(ixupp) << std::endl;
   
   std::cout << "LBA" << LBA_ineq << DMatrix(iclow) << std::endl;
   std::cout << "UBA" << UBA_ineq << DMatrix(icupp) << std::endl;
   
   std::cout << "BA" << BA_eq << std::endl;
   
-  ixupp[0]=1;
-  ixupp[1]=1;
-  
-  iclow[0]=1;
-  iclow[1]=1;
-  iclow[2]=1;
+
   std::cout << "Here comes the sun" << std::endl;
   
   
   
   prob = (QpGenData * )qp->makeData( &input(QP_G).data()[0],
                          &Hl_rowind[0],  &Hl_col[0],  &Hl.data()[0],
-                          &input(QP_LBX).data()[0],  &ixlow[0],
-                         &input(QP_UBX).data()[0],  &ixupp[0],
+                          &LBX.data()[0],  &ixlow[0],
+                         &UBX.data()[0],  &ixupp[0],
                        &eq_rowind[0], &eq_col[0],  &A_eq.data()[0],
                       &BA_eq.data()[0],
-                       &ineq_rowind[0], &eq_rowind[0],  &A_ineq.data()[0],
+                       &ineq_rowind[0], &ineq_col[0],  &A_ineq.data()[0],
                         &LBA_ineq.data()[0],  &iclow[0],
                        &UBA_ineq.data()[0],  &icupp[0]);
 
@@ -202,6 +237,32 @@ void OOQPInternal::init(){
   all_A = range(0,input(QP_A).size2());
   
   constraints.resize(input(QP_A).size1(),0);
+}
+
+map<int,string> OOQPInternal::calc_flagmap(){
+  map<int,string> f;
+
+  f[SUCCESSFUL_TERMINATION] = "SUCCESSFUL_TERMINATION";
+  f[NOT_FINISHED] = "NOT_FINISHED";
+  f[MAX_ITS_EXCEEDED] = "MAX_ITS_EXCEEDED";
+  f[INFEASIBLE] = "INFEASIBLE";
+  return f;
+}
+  
+map<int,string> OOQPInternal::flagmap = OOQPInternal::calc_flagmap();
+
+void OOQPInternal::ooqp_error(const string& module, int flag){
+  // Find the error
+  map<int,string>::const_iterator it = flagmap.find(flag);
+  
+  stringstream ss;
+  if(it == flagmap.end()){
+    ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
+  } else {
+    ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
+  }
+  ss << " Consult OOQP documentation.";
+  throw CasadiException(ss.str());
 }
 
 } // namespace Interfaces

@@ -7,6 +7,7 @@ from nlp import *
 from ad import *
 from sparsity import *
 from matrix import *
+from qpsolver import *
 
 if __name__ == '__main__':
     unittest.main()

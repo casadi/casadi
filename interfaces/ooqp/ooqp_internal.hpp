@@ -105,6 +105,13 @@ public:
     /// The inequality part of UBA
     DMatrix UBA_ineq;
     
+    
+    /// The LBX with inf substituted
+    DMatrix LBX;
+    
+    /// The UBX with inf substituted
+    DMatrix UBX;
+    
     std::vector<int> all_A;
     
     //xlow, ixlow are the lower bounds on x. These contain the information in the
@@ -128,6 +135,16 @@ public:
     
     std::vector<int> ineq_rowind;
     std::vector<int> ineq_col;
+    
+    
+    // Throw error
+    static void ooqp_error(const std::string& module, int flag);
+    
+    // Calculate the error message map
+    static std::map<int,std::string> calc_flagmap();
+    
+    // Error message map
+    static std::map<int,std::string> flagmap;
 };
 
 
