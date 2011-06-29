@@ -25,6 +25,8 @@ class QPSolverTests(casadiTestCase):
 
 
     solver = OOQPSolver(H.sparsity(),G.sparsity(),A.sparsity())
+    solver.setOption("mutol",1e-12)
+    solver.setOption("artol",1e-12)
     solver.init()
 
     solver.input(QP_H).set(H)
@@ -39,5 +41,20 @@ class QPSolverTests(casadiTestCase):
 
     self.checkarray(solver.output(),DMatrix([2.0/3,4.0/3]),"OOQP")
     
+    print solver.output(QP_COST)
+    
+    self.checkarray(solver.output(QP_COST),DMatrix(-8-2.0/9),"OOQP")
+    
+    solver.input(QP_H).set(H*4)
+
+    solver.evaluate()
+    self.assertAlmostEqual(solver.output()[0],1,1e-8)
+    self.assertAlmostEqual(solver.output()[1],1,1e-8)
+    self.checkarray(solver.output(QP_COST),DMatrix(-6),"OOQP")
+    
+    solver.input(QP_UBA).set([-inf]*3)
+    
+    self.assertRaises(Exception,lambda : solver.evaluate())
+
 if __name__ == '__main__':
     unittest.main()

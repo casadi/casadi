@@ -25,6 +25,8 @@
 #include "casadi/matrix/sparsity_tools.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
 
+#include "casadi/pre_c99_support.hpp"
+
 #include "Status.h"
 
 using namespace std;
@@ -41,6 +43,10 @@ OOQPInternal* OOQPInternal::clone() const{
   
 OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
   addOption("print_level",OT_INTEGER,0,"Print level. OOQP listends to print_level 0, 10 and 100");
+  addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
+  addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
+  
+  
   qp=0;
   prob=0;
   vars=0; 
@@ -50,15 +56,20 @@ OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const C
 }
 
 OOQPInternal::~OOQPInternal(){ 
-  // TODO: deallocate memory
+    delete s;
+    delete prob;
+    delete vars;
+    delete resid;
 }
 
 void OOQPInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("OOQPSolve::evaluate() not implemented for forward or backward mode");
   if (s==0) {
+    std::cout << "Evaluate thinks we need to allocate" << std::endl;
     allocate();
     assert(s!=0);
   } else {  
+    std::cout << "Reevaluation" << std::endl;
     // Split A in equalities and inequalities
     A_eq.set(input(QP_A)(eq,all_A));
     A_ineq.set(input(QP_A)(ineq,all_A));
@@ -70,23 +81,38 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     
     LBX.set(input(QP_LBX));
     UBX.set(input(QP_UBX));
-
-  
+    
+    for (int k=0; k<LBA_ineq.size();k++) LBA_ineq.data()[k] = iclow[k]? LBA_ineq.data()[k] : 0;
+    for (int k=0; k<UBA_ineq.size();k++) UBA_ineq.data()[k] = icupp[k]? UBA_ineq.data()[k] : 0;
+    
+    for (int k=0; k<LBX.size();k++) LBX.data()[k] = ixlow[k]? LBX.data()[k] : 0;
+    for (int k=0; k<UBX.size();k++) UBX.data()[k] = ixupp[k]? UBX.data()[k] : 0;
+    
     Hl.set(input(QP_H)[Hl_nz]);
   }
-
   
   int flag = s->solve(prob,vars, resid);
   
-  if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);
-  
   vars->x->copyIntoArray(&output(QP_X_OPT).data()[0]);
   
-  std::cout << output(QP_X_OPT) << std::endl;
+  if (isnan(output(QP_X_OPT).at(0))) {
+     std::cerr << "WARNING: nan in decision variables. You probably need to do a solver.reInit() call before evaluate()." << std::endl;
+  }
+  
+  if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);
+
+  
+  output(QP_COST)[0] = prob->objectiveValue(vars);
 }
 
 void OOQPInternal::allocate() {
-  // TODO: deallocate memory if necessary
+  std::cout << "This is the allocate routine" << std::endl;
+  if (s!=0) {
+    delete s;
+    delete prob;
+    delete vars;
+    delete resid;
+  }
   
   
   // Decide if constraints are equality or inequality
@@ -176,8 +202,7 @@ void OOQPInternal::allocate() {
   
   ineq_rowind = A_ineq.sparsity().rowind();
   ineq_col = A_ineq.sparsity().col();
-  
-  
+
   // Set all pointers to problem data
   prob = (QpGenData * )qp->makeData( &input(QP_G).data()[0],
                          &Hl_rowind[0],  &Hl_col[0],  &Hl.data()[0],
@@ -195,6 +220,9 @@ void OOQPInternal::allocate() {
   resid = (QpGenResiduals *) qp->makeResiduals( prob );
   
   s     = new GondzioSolver( qp, prob );
+  
+  s->setMuTol(getOption("mutol").toDouble());
+  s->setArTol(getOption("mutol").toDouble());
   
   s->monitorSelf();
   

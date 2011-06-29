@@ -63,6 +63,7 @@ void QPSolverInternal::init() {
   
   output(QP_X_OPT) = DMatrix(input(QP_X_INIT).sparsity());
   
+  output(QP_COST) = DMatrix(1,1,0);
   FXInternal::init();
 }
 

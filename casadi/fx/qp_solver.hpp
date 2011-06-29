@@ -69,7 +69,8 @@ enum QPOutput{
   /// The optimal value of x as calculated with evaluate()
   QP_X_OPT,
   /// The value of the cost function as calculated with evaluate()
-  QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};
+  QP_COST,
+  QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};
 
 // Forward declaration of internal class
 class QPSolverInternal;
