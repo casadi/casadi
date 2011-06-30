@@ -637,91 +637,144 @@ CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<int>& 
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
-  // Dimensions
-  int x_nrow = size1();
-  int y_ncol = y_trans.size1();
+  if(true){
+    
+    // Dimensions
+    int x_nrow = size1();
+    int y_ncol = y_trans.size1();
 
-  // Quick return if both are dense
-  if(dense() && y_trans.dense()){
-    return CRSSparsity(x_nrow,y_ncol,true);
-  }
-  
-  // return object
-  CRSSparsity ret(x_nrow,y_ncol);
-  
-  // Get the vectors for the return pattern
-  vector<int>& c = ret.colRef();
-  vector<int>& r = ret.rowindRef();
-  
-  // Direct access to the arrays
-  const vector<int> &x_col = col();
-  const vector<int> &y_row = y_trans.col();
-  const vector<int> &x_rowind = rowind();
-  const vector<int> &y_colind = y_trans.rowind();
-
-  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
-#if __STDC_VERSION__ >= 199901L
-  typedef unsigned long long int_t;
-#else
-  typedef unsigned long int_t;
-#endif
-  
-  // Number of directions we can deal with at a time
-  int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
-
-  // Number of such groups needed
-  int ng = x_nrow/nr;
-  if(ng*nr != x_nrow) ng++;
-  
-  // Which columns exist in a row of the first factor
-  vector<int_t> in_x_row(size2());
-  vector<int_t> in_res_col(y_ncol);
-
-  // Loop over the rows of the resulting matrix, nr rows at a time
-  for(int rr=0; rr<ng; ++rr){
-
-    // Mark the elements in the x row
-    fill(in_x_row.begin(),in_x_row.end(),0);
-    int_t b=1;
-    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+    // return object
+    CRSSparsity ret(x_nrow,y_ncol);
+    
+    // Get the vectors for the return pattern
+    vector<int>& c = ret.colRef();
+    vector<int>& r = ret.rowindRef();
+    
+    // Direct access to the arrays
+    const vector<int> &x_col = col();
+    const vector<int> &y_row = y_trans.col();
+    const vector<int> &x_rowind = rowind();
+    const vector<int> &y_colind = y_trans.rowind();
+    
+    // Which columns exist in a row of the first factor
+    vector<bool> in_x_row(size2());
+    
+    // loop over the row of the resulting matrix)
+    for(int i=0; i<x_nrow; ++i){
+      
+      // Mark the elements in the x row
+      fill(in_x_row.begin(),in_x_row.end(),false);
       for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
-        in_x_row[x_col[el1]] |= b;
+        in_x_row[x_col[el1]] = true;
       }
-      b >>= 1;
-    }
-
-    // Get the sparsity pattern for the set of rows
-    fill(in_res_col.begin(),in_res_col.end(),0);
-    for(int j=0; j<y_ncol; ++j){
       
-      // Loop over the nonzeros of the column of the second factor
-      for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
-        
-        // Get the row
-        int i_y = y_row[el2];
-        
-        // Add nonzero if the element matches an element in the x row
-        in_res_col[j] |= in_x_row[i_y];
-      }
-    }
-
-    b = 1;
-    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
-      
-      // loop over the columns of the resulting matrix
+      // loop over the columns of second factor
       for(int j=0; j<y_ncol; ++j){
         
-        // Save nonzero, if any
-        if(in_res_col[j] | b){
-          c.push_back(j);
+        // Loop over the nonzeros of the column of the second factor
+        for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
+          
+          // Get the row
+          int i_y = y_row[el2];
+          
+          // Add nonzero if the element matches an element in the x row
+          if(in_x_row[i_y]){
+            c.push_back(j);
+            break;
+          }
         }
       }
       r[i+1] = c.size();
-      b >>=1;
     }
+    
+    return ret;
+  } else {
+
+    // Dimensions
+    int x_nrow = size1();
+    int y_ncol = y_trans.size1();
+
+    // Quick return if both are dense
+    if(dense() && y_trans.dense()){
+      return CRSSparsity(x_nrow,y_ncol,true);
+    }
+    
+    // return object
+    CRSSparsity ret(x_nrow,y_ncol);
+    
+    // Get the vectors for the return pattern
+    vector<int>& c = ret.colRef();
+    vector<int>& r = ret.rowindRef();
+    
+    // Direct access to the arrays
+    const vector<int> &x_col = col();
+    const vector<int> &y_row = y_trans.col();
+    const vector<int> &x_rowind = rowind();
+    const vector<int> &y_colind = y_trans.rowind();
+
+    // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
+  #if __STDC_VERSION__ >= 199901L
+    typedef unsigned long long int_t;
+  #else
+    typedef unsigned long int_t;
+  #endif
+    
+    // Number of directions we can deal with at a time
+    int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+
+    // Number of such groups needed
+    int ng = x_nrow/nr;
+    if(ng*nr != x_nrow) ng++;
+    
+    // Which columns exist in a row of the first factor
+    vector<int_t> in_x_row(size2());
+    vector<int_t> in_res_col(y_ncol);
+
+    // Loop over the rows of the resulting matrix, nr rows at a time
+    for(int rr=0; rr<ng; ++rr){
+
+      // Mark the elements in the x row
+      fill(in_x_row.begin(),in_x_row.end(),0);
+      int_t b=1;
+      for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+        for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
+          in_x_row[x_col[el1]] |= b;
+        }
+        b >>= 1;
+      }
+
+      // Get the sparsity pattern for the set of rows
+      fill(in_res_col.begin(),in_res_col.end(),0);
+      for(int j=0; j<y_ncol; ++j){
+        
+        // Loop over the nonzeros of the column of the second factor
+        for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
+          
+          // Get the row
+          int i_y = y_row[el2];
+          
+          // Add nonzero if the element matches an element in the x row
+          in_res_col[j] |= in_x_row[i_y];
+        }
+      }
+
+      b = 1;
+      for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+        
+        // loop over the columns of the resulting matrix
+        for(int j=0; j<y_ncol; ++j){
+          
+          // Save nonzero, if any
+          if(in_res_col[j] | b){
+            c.push_back(j);
+          }
+        }
+        r[i+1] = c.size();
+        b >>=1;
+      }
+    }
+    return ret;
   }
-  
-  return ret;
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping) const{

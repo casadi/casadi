@@ -74,7 +74,7 @@ for sol in solvers:
 
     # convert casadi matrix to csr
     if sol=="casadi":
-      M = csr_matrix((tuple(M),M.col(),M.rowind()),(M.size1(),M.size2()),dtype=float)
+      M = csr_matrix((M.data(),M.col(),M.rowind()),(M.size1(),M.size2()),dtype=float)
     
     # Save the matrix
     SM.append(M)
@@ -90,7 +90,7 @@ for sol in solvers:
 
     # convert back again
     if sol!="casadi":
-      M = csr_matrix((tuple(M),M.col(),M.rowind()),(M.size1(),M.size2()),dtype=float)
+      M = csr_matrix((M.data(),M.col(),M.rowind()),(M.size1(),M.size2()),dtype=float)
 
     t_convert = time.time()
     dur_convert.append(t_convert-t_build)
@@ -130,6 +130,6 @@ for sol in solvers:
     print M.getnnz()
 
 
-M2_C_S = csr_matrix((tuple(M2_C),M2_C.col(),M2_C.rowind()),(M2_C.size1(),M2_C.size2()),dtype=float)
+M2_C_S = csr_matrix((M2_C.data(),M2_C.col(),M2_C.rowind()),(M2_C.size1(),M2_C.size2()),dtype=float)
 M2_DIFF = M2_C_S-M2_S
 print "difference is ", repr(M2_DIFF)
