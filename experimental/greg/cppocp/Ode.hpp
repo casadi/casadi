@@ -8,6 +8,13 @@
 #include <map>
 
 #include <casadi/sx/sx_tools.hpp>
+#include <casadi/fx/sx_function.hpp>
+
+#define IDX_ODE_STEP_STATE  0
+#define IDX_ODE_STEP_ACTION 1
+#define IDX_ODE_STEP_T0     2
+#define IDX_ODE_STEP_DT     3
+#define NUM_ODE_STEP_INPUTS 4
 
 class Ode
 {
@@ -17,7 +24,6 @@ public:
 	Ode(std::string _name);
 
 	std::string name;
-	int locked;
 
 	// states/actions/outputs
 	std::map<std::string,int> states;
@@ -35,8 +41,8 @@ public:
 				 std::map<std::string,CasADi::SX> param,
 				 CasADi::SX t);
 
-
 	void assertUnlocked(void);
+	void init(void);
 
 	std::map<std::string,CasADi::SX> getOutputFromDxdt( CasADi::SXMatrix x,
 														CasADi::SXMatrix u,
@@ -47,6 +53,18 @@ public:
 								 CasADi::SXMatrix u,
 								 std::map<std::string,CasADi::SX> & p,
 								 CasADi::SX t );
+
+	CasADi::DMatrix rk4Step( CasADi::DMatrix & xk,
+							 CasADi::DMatrix & uk,
+							 CasADi::DMatrix & p,
+							 double t0,
+							 double dt);
+
+	CasADi::DMatrix eulerStep( CasADi::DMatrix & xk,
+							   CasADi::DMatrix & uk,
+							   CasADi::DMatrix & p,
+							   double t0,
+							   double dt);
 
 	CasADi::SXMatrix rk4Step( CasADi::SXMatrix x0Vec,
 							  CasADi::SXMatrix u0Vec,
@@ -83,7 +101,10 @@ private:
 	int isState(std::string stateName);
 	int isAction(std::string actionName);
 	int isOutput(std::string outputName);
+	int locked;
 
+	CasADi::SXFunction rk4StepFcn;
+	CasADi::SXFunction eulerStepFcn;
 
 protected:
 };

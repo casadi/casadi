@@ -12,7 +12,8 @@ using namespace std;
 
 Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> state, map<string,SX> action, int timestep, int _N)) : ode(_ode) , V_0(N_) , V_x(N_) , V_xx(N_) , u_feedforward(N_) , u_feedback_gain(N_) , x_trajectory(N_) , u_trajectory(N_), cost_0(N_), cost_x(N_), cost_u(N_), cost_xx(N_), cost_xu(N_), cost_uu(N_)
 {
-	ode.locked = 1;
+	ode.init();
+
 	t0 = t0_;
 	tf = tf_;
 	N = N_;

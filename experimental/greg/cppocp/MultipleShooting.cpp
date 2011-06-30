@@ -31,7 +31,7 @@ MultipleShooting::MultipleShooting(string name_,
 	N = N_;
 	idx0 = idx0_;
 
-	ode.locked = 1;
+	ode.init();
 
 	// make sure no ocp parameter names conflict with ode states/actions
 	map<string, SX>::const_iterator iter;
@@ -147,6 +147,7 @@ void MultipleShooting::setStateActionGuess(string xu, double guess_)
 	for (int k=0; k<N; k++)
 		setStateActionGuess(xu, guess_, k);
 }
+
 
 void MultipleShooting::setStateActionGuess(string xu, double guess_, int timeStep)
 {

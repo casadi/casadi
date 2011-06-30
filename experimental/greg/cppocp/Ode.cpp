@@ -28,9 +28,43 @@ int Ode::nxu(){ return nx()+nu();}
 void Ode::assertUnlocked()
 {
 	if (locked){
-		cerr << "Error - Ode \"" << name << "\" has already been discretized" << endl;
+		cerr << "Error - Ode \"" << name << "\" has already been initialized" << endl;
 		throw 1;
 	}
+}
+
+void Ode::init()
+{
+	if (locked)
+		return;
+
+	/*********** set up rk4Step and eulerStep SXFunctions **********/
+	// inputs
+	SXMatrix xk = create_symbolic("xk", nx());
+	SXMatrix uk = create_symbolic("uk", nu());
+	SXMatrix t0 = create_symbolic("t0",    1);
+	SXMatrix dt = create_symbolic("dt",    1);
+
+	vector<SXMatrix> stepInputs(NUM_ODE_STEP_INPUTS);
+	stepInputs.at(IDX_ODE_STEP_STATE)  = xk;
+	stepInputs.at(IDX_ODE_STEP_ACTION) = uk;
+	stepInputs.at(IDX_ODE_STEP_T0)     = t0;
+	stepInputs.at(IDX_ODE_STEP_DT)     = dt;
+
+	// dummy params for now
+	map<string,SX> dummyParams;
+
+	// call fcns
+	SXMatrix xNextRK4   = rk4Step(   xk, uk, uk, dummyParams, t0.at(0), dt.at(0) );
+	SXMatrix xNextEuler = eulerStep( xk, uk,     dummyParams, t0.at(0), dt.at(0) );
+
+	// outputs
+	rk4StepFcn   = SXFunction( stepInputs, xNextRK4 );
+	eulerStepFcn = SXFunction( stepInputs, xNextEuler );
+	rk4StepFcn.init();
+	eulerStepFcn.init();
+
+	locked = 1;
 }
 
 // throw error if name is not unique
@@ -187,4 +221,51 @@ SXMatrix Ode::simpsonsRuleError( SXMatrix x0Vec, SXMatrix x1Vec, SXMatrix u0Vec,
 	SXMatrix fm = dxVectorDt( xm, um, p, t0 + 0.5*dt );
 
 	return x1Vec - x0Vec - dt/6.0*(f0 + 4*fm + f1);
+}
+
+
+DMatrix Ode::rk4Step( DMatrix & xk, DMatrix & uk, DMatrix & p, double t0_, double dt_)
+{
+	if (!locked)
+		init();
+
+	DMatrix t0(t0_);
+	DMatrix dt(dt_);
+
+	// inputs
+	rk4StepFcn.setInput( xk, IDX_ODE_STEP_STATE  );
+	rk4StepFcn.setInput( uk, IDX_ODE_STEP_ACTION );
+	rk4StepFcn.setInput( t0, IDX_ODE_STEP_T0     );
+	rk4StepFcn.setInput( dt, IDX_ODE_STEP_DT     );
+
+	// evaluate
+	rk4StepFcn.evaluate();
+	
+	// output
+	DMatrix out( nx(), 1, 0.0 );
+	rk4StepFcn.getOutput(out);
+	return out;
+}
+
+DMatrix Ode::eulerStep( DMatrix & xk, DMatrix & uk, DMatrix & p, double t0_, double dt_)
+{
+	if (!locked)
+		init();
+
+	DMatrix t0(t0_);
+	DMatrix dt(dt_);
+
+	// inputs
+	eulerStepFcn.setInput( xk, IDX_ODE_STEP_STATE  );
+	eulerStepFcn.setInput( uk, IDX_ODE_STEP_ACTION );
+	eulerStepFcn.setInput( t0, IDX_ODE_STEP_T0     );
+	eulerStepFcn.setInput( dt, IDX_ODE_STEP_DT     );
+
+	// evaluate
+	eulerStepFcn.evaluate();
+
+	// output
+	DMatrix out( nx(), 1, 0.0 );
+	eulerStepFcn.getOutput(out);
+	return out;
 }
