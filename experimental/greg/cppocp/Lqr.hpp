@@ -13,11 +13,8 @@
 #include <casadi/sx/sx_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
 
-
 // #define EVAL_DYNAMICS_FUNCTION
 // #define EVAL_Q_FUNCTION
-
-
 
 #define IDX_BACKWARD_SWEEP_INPUTS_X_K       0
 #define IDX_BACKWARD_SWEEP_INPUTS_U_K       1
@@ -79,6 +76,10 @@ public:
 	std::vector<CasADi::DMatrix> uTrajectory;
 	std::vector<CasADi::DMatrix> uOpenLoop;
 	std::vector<CasADi::DMatrix> feedbackGain;
+
+	// regularization
+	CasADi::DMatrix stateRegularization;
+	CasADi::DMatrix actionRegularization;
 
 	// for debugging:
 	std::vector<CasADi::DMatrix> Q0Trajectory;

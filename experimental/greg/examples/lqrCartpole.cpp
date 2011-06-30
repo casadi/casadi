@@ -74,9 +74,11 @@ getOde()
 }
 
 SX
-cost(map<string,SX> state, map<string,SX> action, int timestep, int N)
+cost(map<string,SX> state,
+	 map<string,SX> action,
+	 int timestep,
+	 int N)
 {
-
 	SX costRet;
 	if (timestep == N-1){
 		costRet = N*(SQR(state["x"]) + SQR(state["theta"] - M_PI) + SQR(state["vx"]) + SQR(state["vtheta"]));
@@ -85,7 +87,7 @@ cost(map<string,SX> state, map<string,SX> action, int timestep, int N)
 
 	//	costRet = 2*SQR(state["x"]) + 3*SQR(state["theta"]) + 4*SQR(state["vx"]) + 5*SQR(state["vtheta"]) + 6*SQR(action["u"]);
 	costRet = 0.01*SQR(action["u"]);
-	
+
 	return costRet;
 }
 
@@ -161,6 +163,11 @@ main()
 	double t0 = 0;
 	double tf = ocp.getParamSolution("tEnd");
  	Lqr lqr(ode, t0, tf, ms.N, &cost);
+
+	// regularization
+	lqr.stateRegularization[0,0] = 1.0;
+	lqr.stateRegularization[1,1] = 1.0;
+	lqr.actionRegularization[0,0] = 1.0;
 
 	for (int k=0; k<ms.N; k++)
 		lqr.xTrajectory.at(k) = ocp.getStateSolution(k);

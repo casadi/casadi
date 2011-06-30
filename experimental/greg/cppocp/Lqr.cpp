@@ -51,6 +51,9 @@ Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> 
 		fuTrajectory.push_back(  DMatrix( ode.nx(), ode.nu(), 0.0) );
 	}
 
+	stateRegularization  = DMatrix( ode.nx(), ode.nx(), 0.0 );
+	actionRegularization = DMatrix( ode.nu(), ode.nu(), 0.0 );
+
 	setupBackwardSweepFunction();
 	setupCostFunctions();
 }
@@ -316,6 +319,9 @@ void Lqr::takeBackwardStep(int timestep)
 	costFunctions.at(timestep).getOutput( cost_xx.at(timestep), IDX_COST_OUTPUTS_COST_XX_K );
 	costFunctions.at(timestep).getOutput( cost_xu.at(timestep), IDX_COST_OUTPUTS_COST_XU_K );
 	costFunctions.at(timestep).getOutput( cost_uu.at(timestep), IDX_COST_OUTPUTS_COST_UU_K );
+
+	cost_xx.at(timestep) += stateRegularization;
+	cost_uu.at(timestep) += actionRegularization;
 
 #ifdef EVAL_DYNAMICS_FUNCTION
 	{

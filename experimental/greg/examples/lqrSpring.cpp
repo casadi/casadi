@@ -54,7 +54,10 @@ getOde()
 }
 
 SX
-cost(map<string,SX> state, map<string,SX> action, int timestep, int N)
+cost(map<string,SX> state,
+	 map<string,SX> action,
+	 int timestep,
+	 int N)
 {
 	SX cost;
 	if (timestep == N-1){
