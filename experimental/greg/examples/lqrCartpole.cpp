@@ -81,7 +81,7 @@ cost(map<string,SX> state,
 {
 	SX costRet;
 	if (timestep == N-1){
-		costRet = N*(SQR(state["x"]) + SQR(state["theta"] - M_PI) + SQR(state["vx"]) + SQR(state["vtheta"]));
+		costRet = N*(10*SQR(state["x"]) + 10*SQR(state["theta"] - M_PI) + SQR(state["vx"]) + SQR(state["vtheta"]));
 		return costRet;
 	}
 
@@ -110,12 +110,12 @@ main()
 	SX vthetaf = ms.getState( "vtheta", ms.N-1);
 
 	//	ocp.objFun = tEnd  + 50*cos(thetaf) + 5*vthetaf*vthetaf;
-	ocp.objFun = 50*cos(thetaf) + 5*vthetaf*vthetaf;
+	ocp.objFun = ms.N*cos(thetaf) + 5*vthetaf*vthetaf;
 	for (int k=0; k<ms.N-1; k++){
 		SX u_k   = ms.getAction( "u", k );
 		SX u_kp1 = ms.getAction( "u", k+1 );
 		// ocp.objFun += 3*SQR( u_k - u_kp1 );
-		ocp.objFun += 3*SQR( u_k );
+		ocp.objFun += 0.01*SQR( u_k );
 	}
 
 	// bounds
@@ -165,25 +165,34 @@ main()
  	Lqr lqr(ode, t0, tf, ms.N, &cost);
 
 	// regularization
-	lqr.stateRegularization[0,0] = 1.0;
-	lqr.stateRegularization[1,1] = 1.0;
-	lqr.actionRegularization[0,0] = 1.0;
+	lqr.stateRegularization[0,0]  = 0.01;
+	lqr.stateRegularization[1,1]  = 0.01;
+	lqr.actionRegularization[0,0] = 0.1;
 
 	// action bounding
 	vector<double> ub(1);
 	vector<double> lb(1);
 	ub.at(0) = 20;
-	lb.at(0) = -20;
+	lb.at(0) = -30;
 	lqr.boundAction( lb, ub );
+
+	// load ms solution into lqr
 	for (int k=0; k<ms.N; k++)
 		lqr.xTrajectory.at(k) = ocp.getStateSolution(k);
 	for (int k=0; k<ms.N-1; k++)
 		lqr.uTrajectory.at(k) = ocp.getActionSolution(k);
 
-	for (int k=0; k<10; k++){
-		cout << "ilqr iter: " << k << endl;
+	// run lqr
+	for (int k=0; k<1000; k++){
 		lqr.runBackwardSweep();
 		lqr.runForwardSweep();
+
+		// manually calculate value function
+		double value = 0;
+		for (int j=0; j<lqr.N - 1; j++)
+			value += lqr.cost_0.at(j).at(0);
+		value += lqr.V_0.at(lqr.N-1).at(0);
+		cout << "ilqr iter: " << k << ", value: " << lqr.V_0.at(lqr.V_0.size() - 1) << ", my value: " << value << endl;
 	}
 
 	ocp.setStates(  lqr.xTrajectory );
