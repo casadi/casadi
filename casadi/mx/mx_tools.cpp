@@ -150,7 +150,7 @@ MX prod(const MX &x, const MX &y){
     return x*y;
     
   // Else, create a multiplication node
-  return MX::create(new Multiplication(x,y));
+  return MX::create(new Multiplication(x,trans(y)));
 }
 
 bool isZero(const MX& ex){

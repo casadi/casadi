@@ -28,28 +28,15 @@ using namespace std;
 
 namespace CasADi{
 
-Multiplication::Multiplication(const MX& x, const MX& y){
-  casadi_assert_message(x.size2() == y.size1(),"Multiplication::Multiplication: dimension mismatch");
-  setDependencies(x,y);
+Multiplication::Multiplication(const MX& x, const MX& y_trans){
+  casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch");
+  setDependencies(x,y_trans);
 
-  // Check if the arguments are dense
-  x_dense_ = x.size()==x.numel();
-  y_dense_ = y.size()==y.numel();
-  
-  if(x_dense_ && y_dense_){
-    // Dense matrix
-    setSparsity(CRSSparsity(x.size1(),y.size2(),true));
-    
-  } else {
-    // Find the mapping corresponding to the transpose of y (no need to form the transpose explicitly)
-    y_trans_sparsity_ = y->sparsity().transpose(y_trans_map_);
+  // Create the sparsity pattern for the matrix-matrix product
+  CRSSparsity spres = x->sparsity().patternProduct(y_trans.sparsity());
 
-    // Create the sparsity pattern for the matrix-matrix product
-    CRSSparsity spres = x->sparsity().patternProduct(y_trans_sparsity_);
-  
-    // Save sparsity
-    setSparsity(spres);
-  }
+  // Save sparsity
+  setSparsity(spres);
 }
 
 Multiplication* Multiplication::clone() const{
@@ -60,87 +47,27 @@ void Multiplication::print(std::ostream &stream, const std::vector<std::string>&
   stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
-void Multiplication::evaluateDenseDense(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
-  vector<double>& outputd = output.data();
-  const vector<double> &input0 = input[0]->data();
-  const vector<double> &input1 = input[1]->data();
-
-  // Get dimensions
-  int nx1 = dep(0).size1();
-  int nx2 = dep(0).size2();
-  //int ny1 = dep(1).size1();
-  int ny2 = dep(1).size2();
-  //int nz1 = nx1;
-  int nz2 = ny2;
-    
-  for(int i=0; i<nx1; ++i){
-    for(int j=0; j<ny2; ++j){
-      // Add scalar product
-      double sum = 0;
-      for(int k=0; k<nx2; ++k){
-        sum += input0[k+i*nx2] * input1[j+k*ny2];
-      }
-      outputd[j+i*nz2] = sum;
-    }
-  }
-  
-  // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
-  for(int d=0; d<nfwd; ++d){
-    for(int i=0; i<nx1; ++i){
-      for(int j=0; j<ny2; ++j){
-        // Add scalar product
-        double sum = 0;
-        for(int k=0; k<nx2; ++k){
-          sum += fwdSeed[0][d]->data()[k+i*nx2] * input1[j+k*ny2] + input0[k+i*nx2] * fwdSeed[1][d]->data()[j+k*ny2];
-        }
-        fwdSens[d]->data()[j+i*nz2] = sum;
-      }
-    }
-  }
-  
-  // Adjoint sensitivities
-  for(int d=0; d<nadj; ++d){
-    for(int i=0; i<nx1; ++i){
-      for(int j=0; j<ny2; ++j){
-        for(int k=0; k<nx2; ++k){
-          adjSens[0][d]->data()[k+i*nx2] += adjSeed[d]->data()[j+i*nz2]*input1[j+k*ny2];
-          adjSens[1][d]->data()[j+k*ny2] += adjSeed[d]->data()[j+i*nz2]*input0[k+i*nx2];
-        }
-      }
-    }
-  }
-}
-
-void Multiplication::evaluateSparseSparse(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
+void Multiplication::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
   fill(output.begin(),output.end(),0);
-  DMatrix::prod_no_alloc(*input[0],*input[1],output,y_trans_sparsity_,y_trans_map_);
+  DMatrix::prod_no_alloc(*input[0],*input[1],output);
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){
     fill(fwdSens[d]->begin(),fwdSens[d]->end(),0);
-    DMatrix::prod_no_alloc(*fwdSeed[0][d],*input[1],*fwdSens[d],y_trans_sparsity_,y_trans_map_);
-    DMatrix::prod_no_alloc(*input[0],*fwdSeed[1][d],*fwdSens[d],y_trans_sparsity_,y_trans_map_);
+    DMatrix::prod_no_alloc(*fwdSeed[0][d],*input[1],*fwdSens[d]);
+    DMatrix::prod_no_alloc(*input[0],*fwdSeed[1][d],*fwdSens[d]);
   }
 
   // Adjoint sensitivities
   for(int d=0; d<nadj; ++d){
-    DMatrix::prod_no_alloc1(*adjSens[0][d],*input[0],*adjSeed[d],y_trans_sparsity_,y_trans_map_);
-    DMatrix::prod_no_alloc2(*input[0],*adjSens[1][d],*adjSeed[d],y_trans_sparsity_,y_trans_map_);
-  }
-}
-
-void Multiplication::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
-  if(x_dense_ && y_dense_){
-    evaluateDenseDense(input, output, fwdSeed, fwdSens, adjSeed, adjSens, nfwd, nadj);
-  } else {
-    evaluateSparseSparse(input, output, fwdSeed, fwdSens, adjSeed, adjSens, nfwd, nadj);
+    DMatrix::prod_no_alloc1(*adjSens[0][d],*input[1],*adjSeed[d]);
+    DMatrix::prod_no_alloc2(*input[0],*adjSens[1][d],*adjSeed[d]);
   }
 }
 
 void Multiplication::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  SXMatrix r = prod(*input[0],*input[1]);
-  casadi_assert(output.sparsity()==r.sparsity());
-  output.set(r);
+  fill(output.begin(),output.end(),0);
+  SXMatrix::prod_no_alloc(*input[0],*input[1],output);
 }
 
 

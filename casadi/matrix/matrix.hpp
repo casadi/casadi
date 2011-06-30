@@ -382,16 +382,13 @@ class Matrix : public PrintableObject{
     Matrix<T> prod(const Matrix<T> &y) const;
 
     /// Matrix product, no memory allocation: z += prod(x,y)
-    static void prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& z, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map);
+    static void prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& r);
 
     /// Matrix product, no memory allocation: x += prod(z,trans(y))
-    static void prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y, const Matrix<T>& z, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map);
+    static void prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z);
 
     /// Matrix product, no memory allocation: y += prod(trans(x),z)
-    static void prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y, const Matrix<T>& z, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map);
-
-    /// Matrix product, no memory allocation: z += prod(x,trans(y))
-    static void prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& r);
+    static void prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
 
     /** Matrix product, from the right
     * x.rprod(y) = y.prod(x)
@@ -1726,41 +1723,7 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
 }
 
 template<class T>
-void Matrix<T>::prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& z, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map){
-  // Direct access to the arrays
-  std::vector<T> &z_data = z.data();
-  const std::vector<int> &z_col = z.col();
-  const std::vector<int> &z_rowind = z.rowind();
-  const std::vector<T> &x_data = x.data();
-  const std::vector<int> &x_col = x.col();
-  const std::vector<T> &y_data = y.data();
-  const std::vector<int> &y_row = y_trans_sparsity.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
-
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<z.size1(); ++i){
-    for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
-      int j = z_col[el];
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          z_data[el] += x_data[el1++] * y_data[y_trans_map[el2++]];
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
-  }
-}
-
-template<class T>
-void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y, const Matrix<T>& z, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map){
+void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z){
 
   // Direct access to the arrays
   const std::vector<T> &z_data = z.data();
@@ -1768,10 +1731,10 @@ void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y, const Matrix<T>
   const std::vector<int> &z_rowind = z.rowind();
   std::vector<T> &x_data = x.data();
   const std::vector<int> &x_col = x.col();
-  const std::vector<T> &y_data = y.data();
-  const std::vector<int> &y_row = y_trans_sparsity.col();
+  const std::vector<T> &y_trans_data = y_trans.data();
+  const std::vector<int> &y_row = y_trans.col();
   const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
+  const std::vector<int> &y_colind = y_trans.rowind();
 
   // loop over the row of the resulting matrix)
   for(int i=0; i<z.size1(); ++i){
@@ -1783,7 +1746,7 @@ void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y, const Matrix<T>
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
-          x_data[el1++] += z_data[el]*y_data[y_trans_map[el2++]];
+          x_data[el1++] += z_data[el]*y_trans_data[el2++];
         } else if(j1<i2) {
           el1++;
         } else {
@@ -1796,7 +1759,7 @@ void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y, const Matrix<T>
 
 
 template<class T>
-void Matrix<T>::prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y, const Matrix<T>& z, const CRSSparsity& y_trans_sparsity, const std::vector<int>& y_trans_map){
+void Matrix<T>::prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z){
 
   // Direct access to the arrays
   const std::vector<T> &z_data = z.data();
@@ -1804,10 +1767,10 @@ void Matrix<T>::prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y, const Matrix<T>
   const std::vector<int> &z_rowind = z.rowind();
   const std::vector<T> &x_data = x.data();
   const std::vector<int> &x_col = x.col();
-  std::vector<T> &y_data = y.data();
-  const std::vector<int> &y_row = y_trans_sparsity.col();
+  std::vector<T> &y_trans_data = y_trans.data();
+  const std::vector<int> &y_row = y_trans.col();
   const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans_sparsity.rowind();
+  const std::vector<int> &y_colind = y_trans.rowind();
 
   // loop over the row of the resulting matrix)
   for(int i=0; i<z.size1(); ++i){
@@ -1819,7 +1782,7 @@ void Matrix<T>::prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y, const Matrix<T>
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
-          y_data[y_trans_map[el2++]] += z_data[el] * x_data[el1++];
+          y_trans_data[el2++] += z_data[el] * x_data[el1++];
         } else if(j1<i2) {
           el1++;
         } else {

@@ -26,7 +26,7 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief Represents matrix products
+/** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
   \author Joel Andersson 
   \date 2010
   */
@@ -34,7 +34,7 @@ class Multiplication : public MXNode{
   public:
     
     /** \brief  Constructor */
-    Multiplication(const MX& x, const MX& y);
+    Multiplication(const MX& x, const MX& y_trans);
 
     /** \brief  Destructor */
     virtual ~Multiplication(){}
@@ -48,23 +48,8 @@ class Multiplication : public MXNode{
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj);
 
-    /** \brief  Evaluate dense-dense */
-    void evaluateDenseDense(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj);
-
-    /** \brief  Evaluate sparse-sparse */
-    void evaluateSparseSparse(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj);
-
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
-
-    // Check if the arguments are dense
-    bool x_dense_, y_dense_;
-
-    // Sparsity of the transpose of the second factor
-    CRSSparsity y_trans_sparsity_;
-    
-    // Nonzero mapping corresponding to the transpose of the second factor (no need to form the transpose explicitly)
-    std::vector<int> y_trans_map_;
 
 };
 
