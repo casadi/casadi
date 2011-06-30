@@ -60,13 +60,11 @@ class Multiplication : public MXNode{
     // Check if the arguments are dense
     bool x_dense_, y_dense_;
 
-    // Mapping corresponding to the transpose of y (no need to form the transpose explicitly)
-    std::vector<int> y_trans_map_;
-  
-    // Create the sparsity pattern for the matrix-matrix product
-    std::vector< std::vector< std::pair<int,int> > > prod_map_;
+    // Sparsity of the transpose of the second factor
+    CRSSparsity y_trans_sparsity_;
     
-
+    // Nonzero mapping corresponding to the transpose of the second factor (no need to form the transpose explicitly)
+    std::vector<int> y_trans_map_;
 
 };
 

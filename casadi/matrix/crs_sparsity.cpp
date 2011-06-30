@@ -641,6 +641,11 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
   int x_nrow = size1();
   int y_ncol = y_trans.size1();
 
+  // Quick return if both are dense
+  if(dense() && y_trans.dense()){
+    return CRSSparsity(x_nrow,y_ncol,true);
+  }
+  
   // return object
   CRSSparsity ret(x_nrow,y_ncol);
   

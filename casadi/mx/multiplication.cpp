@@ -42,10 +42,10 @@ Multiplication::Multiplication(const MX& x, const MX& y){
     
   } else {
     // Find the mapping corresponding to the transpose of y (no need to form the transpose explicitly)
-    CRSSparsity y_trans_sparsity = y->sparsity().transpose(y_trans_map_);
+    y_trans_sparsity_ = y->sparsity().transpose(y_trans_map_);
 
     // Create the sparsity pattern for the matrix-matrix product
-    CRSSparsity spres = x->sparsity().patternProduct(y_trans_sparsity, prod_map_);
+    CRSSparsity spres = x->sparsity().patternProduct(y_trans_sparsity_);
   
     // Save sparsity
     setSparsity(spres);
@@ -112,37 +112,20 @@ void Multiplication::evaluateDenseDense(const std::vector<DMatrix*>& input, DMat
 }
 
 void Multiplication::evaluateSparseSparse(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
-  vector<double>& outputd = output.data();
-  const vector<double> &input0 = input[0]->data();
-  const vector<double> &input1 = input[1]->data();
-
-  // Carry out the actual multiplication
-  for(int i=0; i<prod_map_.size(); ++i){
-    outputd[i] = 0;
-    for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it)
-      outputd[i] += input0[it->first] * input1[y_trans_map_[it->second]];
-  }
+  fill(output.begin(),output.end(),0);
+  DMatrix::prod_no_alloc(*input[0],*input[1],output,y_trans_sparsity_,y_trans_map_);
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){
-    for(int i=0; i<prod_map_.size(); ++i){
-      fwdSens[d]->data()[i] = 0;
-      for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it){
-        fwdSens[d]->data()[i] += 
-            fwdSeed[0][d]->data()[it->first] * input1[y_trans_map_[it->second]] + 
-            input0[it->first] * fwdSeed[1][d]->data()[y_trans_map_[it->second]];
-      }
-    }
+    fill(fwdSens[d]->begin(),fwdSens[d]->end(),0);
+    DMatrix::prod_no_alloc(*fwdSeed[0][d],*input[1],*fwdSens[d],y_trans_sparsity_,y_trans_map_);
+    DMatrix::prod_no_alloc(*input[0],*fwdSeed[1][d],*fwdSens[d],y_trans_sparsity_,y_trans_map_);
   }
 
   // Adjoint sensitivities
   for(int d=0; d<nadj; ++d){
-    for(int i=0; i<prod_map_.size(); ++i){
-      for(std::vector< std::pair<int,int> >::const_iterator it=prod_map_[i].begin(); it!=prod_map_[i].end(); ++it){
-        adjSens[0][d]->data()[it->first] += adjSeed[d]->data()[i]*input1[y_trans_map_[it->second]];
-        adjSens[1][d]->data()[y_trans_map_[it->second]] += adjSeed[d]->data()[i]*input0[it->first];
-      }
-    }
+    DMatrix::prod_no_alloc1(*adjSens[0][d],*input[0],*adjSeed[d],y_trans_sparsity_,y_trans_map_);
+    DMatrix::prod_no_alloc2(*input[0],*adjSens[1][d],*adjSeed[d],y_trans_sparsity_,y_trans_map_);
   }
 }
 
