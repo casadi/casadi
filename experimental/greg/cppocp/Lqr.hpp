@@ -92,11 +92,18 @@ public:
 	std::vector<CasADi::DMatrix> f0Trajectory;
 	std::vector<CasADi::DMatrix> fxTrajectory;
 	std::vector<CasADi::DMatrix> fuTrajectory;
-	
+
+	// set actions bounds
+	void boundAction( std::vector<double> lb_, std::vector<double> ub_ );
+	void boundAction( std::vector<double> lb_, std::vector<double> ub_, int timestep );
+
 private:
 	double t0;
 	double tf;
 	int N;
+
+	std::vector< std::vector<double> > ubAction;
+	std::vector< std::vector<double> > lbAction;
 
 	Ode & ode;
 

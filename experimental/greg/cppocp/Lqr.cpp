@@ -49,7 +49,18 @@ Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> 
 		f0Trajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
 		fxTrajectory.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
 		fuTrajectory.push_back(  DMatrix( ode.nx(), ode.nu(), 0.0) );
+
+		// initialize action bounds
+		vector<double> ubAction_;
+		vector<double> lbAction_;
+		for (int j=0; j<ode.nu(); j++){
+			ubAction_.push_back(1e30);
+			lbAction_.push_back(-1e30);
+		}
+		ubAction.push_back( ubAction_ );
+		lbAction.push_back( lbAction_ );
 	}
+
 
 	stateRegularization  = DMatrix( ode.nx(), ode.nx(), 0.0 );
 	actionRegularization = DMatrix( ode.nu(), ode.nu(), 0.0 );
@@ -424,15 +435,16 @@ void Lqr::takeForwardStep(int timestep)
 	// add feedback
 	uTrajectory.at(timestep) += prod( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
 
-
+	// bound actions
 #define BOUND( var, lb, ub ){											\
 		if ( var > ub )													\
 			var = ub;													\
 		if ( var < lb )													\
 			var = lb;													\
 	}
-	BOUND( uTrajectory.at(timestep).at(0), -20, 20 );
-	
+	for (int k=0; k<ode.nu(); k++)
+		BOUND( uTrajectory.at(timestep).at(k), lbAction.at(timestep).at(k), ubAction.at(timestep).at(k) );
+
 	double dt = (tf - t0)/(N - 1.0);
 	xTrajectory.at(timestep + 1) = ode.rk4Step( xTrajectory.at(timestep),
 												uTrajectory.at(timestep),
@@ -445,4 +457,18 @@ void Lqr::takeForwardStep(int timestep)
 	// 											  dummyParams,
 	// 											  t0 + timestep*dt,
 	// 											  dt);
+}
+
+
+void Lqr::boundAction( vector<double> lb_, vector<double> ub_ )
+{
+	for (int k=0; k<N; k++)
+		boundAction( lb_, ub_, k );
+
+}
+
+void Lqr::boundAction( vector<double> lb_, vector<double> ub_, int timestep )
+{
+	lbAction.at(timestep) = lb_;
+	ubAction.at(timestep) = ub_;
 }

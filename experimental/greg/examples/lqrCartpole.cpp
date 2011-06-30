@@ -169,6 +169,12 @@ main()
 	lqr.stateRegularization[1,1] = 1.0;
 	lqr.actionRegularization[0,0] = 1.0;
 
+	// action bounding
+	vector<double> ub(1);
+	vector<double> lb(1);
+	ub.at(0) = 20;
+	lb.at(0) = -20;
+	lqr.boundAction( lb, ub );
 	for (int k=0; k<ms.N; k++)
 		lqr.xTrajectory.at(k) = ocp.getStateSolution(k);
 	for (int k=0; k<ms.N-1; k++)
