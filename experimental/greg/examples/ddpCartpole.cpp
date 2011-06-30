@@ -1,4 +1,4 @@
-// lqrCartpole.cpp
+// ddpCartpole.cpp
 
 #include <iostream>
 #include <cstdlib>
@@ -10,7 +10,7 @@
 #include "Ode.hpp"
 #include "Ocp.hpp"
 #include "MultipleShooting.hpp"
-#include "Lqr.hpp"
+#include "Ddp.hpp"
 
 #include <SnoptInterface.hpp>
 
@@ -59,7 +59,6 @@ getOde()
 	ode.addState("theta");
 	ode.addState("vx");
 	ode.addState("vtheta");
-	// ode.addState("u");
 
 	ode.addOutput( "cart_x" );
 	ode.addOutput( "cart_y" );
@@ -158,49 +157,45 @@ main()
 	cout << "optimal objFcn: " << si.F[0] << endl;
 	
 	
-	/************** run lqr ****************/
-	cout << "\nrunning ILQR\n";
+	/************** run ddp ****************/
+	cout << "\nrunning DDP\n";
 	double t0 = 0;
 	double tf = ocp.getParamSolution("tEnd");
- 	Lqr lqr(ode, t0, tf, ms.N, &cost);
+ 	Ddp ddp(ode, t0, tf, ms.N, &cost);
 
 	// regularization
-	lqr.stateRegularization[0,0]  = 0.01;
-	lqr.stateRegularization[1,1]  = 0.01;
-	lqr.stateRegularization[2,2]  = 0.01;
-	lqr.stateRegularization[3,3]  = 0.01;
-	lqr.actionRegularization[0,0] = 0.1;
+	ddp.stateRegularization[0,0]  = 0.01;
+	ddp.stateRegularization[1,1]  = 0.01;
+	ddp.stateRegularization[2,2]  = 0.01;
+	ddp.stateRegularization[3,3]  = 0.01;
+	ddp.actionRegularization[0,0] = 0.1;
 
 	// action bounding
 	vector<double> ub(1);
 	vector<double> lb(1);
 	ub.at(0) = 20;
 	lb.at(0) = -30;
-	lqr.boundAction( lb, ub );
+	ddp.boundAction( lb, ub );
 
-	// load ms solution into lqr
+	// load ms solution into ddp
 	for (int k=0; k<ms.N; k++)
-		lqr.xTrajectory.at(k) = ocp.getStateSolution(k);
+		ddp.xTrajectory.at(k) = ocp.getStateSolution(k);
 	for (int k=0; k<ms.N-1; k++)
-		lqr.uTrajectory.at(k) = ocp.getActionSolution(k);
+		ddp.uTrajectory.at(k) = ocp.getActionSolution(k);
+	for (int k=0; k<ms.N-1; k++)
+		ddp.uTrajectory.at(k).at(0) += 2.2;
 
-	// run lqr
-	for (int k=0; k<1000; k++){
-		lqr.runBackwardSweep();
-		lqr.runForwardSweep();
-
-		// manually calculate value function
-		double value = 0;
-		for (int j=0; j<lqr.N - 1; j++)
-			value += lqr.cost_0.at(j).at(0);
-		value += lqr.V_0.at(lqr.N-1).at(0);
-		cout << "ilqr iter: " << k << ", value: " << lqr.V_0.at(0) << ", my value: " << value << endl;
+	// run ddp
+	for (int k=0; k<200; k++){
+		ddp.runBackwardSweep();
+		ddp.runForwardSweep();
+		cout << "ddp iter: " << k << ", value: " << ddp.V_0.at(0) << endl;
 	}
 
-	ocp.setStates(  lqr.xTrajectory );
-	ocp.setActions( lqr.uTrajectory );
+	ocp.setStates(  ddp.xTrajectory );
+	ocp.setActions( ddp.uTrajectory );
 
-	ocp.writeOctaveOutput("cartpole_lqr_out");
+	ocp.writeOctaveOutput("cartpole_ddp_out");
 	
 	cout << "successful finish\n";
 	return 0;

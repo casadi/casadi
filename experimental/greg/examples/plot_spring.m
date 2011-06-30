@@ -1,7 +1,8 @@
 addpath('../../../build/experimental/greg');
 
 opt_ms  = spring_multiple_shooting_out();
-opt_lqr = spring_lqr_out();
+% opt_lqr = spring_lqr_out();
+opt_lqr = spring_ddp_out();
 
 figure(1)
 subplot(221)

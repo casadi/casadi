@@ -1,7 +1,8 @@
 addpath('../../../build/experimental/greg');
 
 opt_ms = cartpole_multiple_shooting_out();
-opt_lqr = cartpole_lqr_out();
+% opt_lqr = cartpole_lqr_out();
+opt_lqr = cartpole_ddp_out();
 
 figure(1)
 subplot(231)
