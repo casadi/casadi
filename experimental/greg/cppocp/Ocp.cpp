@@ -205,6 +205,56 @@ int Ocp::isParam(string paramName)
 	return 0;
 }
 
+
+
+void Ocp::setStates( vector<DMatrix> & x)
+{
+	for (int timestep=0; timestep < x.size(); timestep++)
+		setState( x.at(timestep), timestep);
+}
+
+void Ocp::setActions( vector<DMatrix> & u)
+{
+	for (int timestep=0; timestep < u.size(); timestep++)
+		setAction( u.at(timestep), timestep);
+}
+
+
+void Ocp::setState( DMatrix x, int timestep )
+{
+	if (ms.size() != 1){
+		cerr << "Error in Ocp::setState - ms.size != 1\n";
+		throw 1;
+	}
+
+	MultipleShooting * firstMs = ms.begin()->second;
+
+	map<string, int>::const_iterator iter;
+
+	for (iter = firstMs->ode.states.begin(); iter != firstMs->ode.states.end(); iter++)
+		xopt.at( firstMs->getIdx( iter->first, timestep ) ) = x.at( iter->second );
+}
+
+
+void Ocp::setAction( DMatrix u, int timestep )
+{
+	if (ms.size() != 1){
+		cerr << "Error in Ocp::setAction - ms.size != 1\n";
+		throw 1;
+	}
+
+	MultipleShooting * firstMs = ms.begin()->second;
+
+	map<string, int>::const_iterator iter;
+
+	for (iter = firstMs->ode.actions.begin(); iter != firstMs->ode.actions.end(); iter++)
+		xopt.at( firstMs->getIdx( iter->first, timestep ) ) = u.at( iter->second );
+}
+
+
+
+
+
 // get states/actions (only for single-stage ocp now)
 DMatrix Ocp::getStateSolution(int timestep)
 {
@@ -330,7 +380,6 @@ void Ocp::writeOctaveOutput( string name )
 	f << "% states\n";
 	f << "opt.states = struct();\n";
 	if (ms.size() > 0){
-
 		// loop through states in first multiple shooting
 		for (siIter = firstMs->second->ode.states.begin(); siIter != firstMs->second->ode.states.end(); siIter++){
 

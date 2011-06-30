@@ -47,6 +47,10 @@ public:
 	CasADi::DMatrix getStateSolution(int timestep);
 	CasADi::DMatrix getActionSolution(int timestep);
 
+	void setState(  CasADi::DMatrix x, int timestep );
+	void setAction( CasADi::DMatrix u, int timestep );
+	void setStates(  std::vector<CasADi::DMatrix> & x);
+	void setActions( std::vector<CasADi::DMatrix> & u);
 
 	void writeOctaveOutput( std::string name );
 	void writeSolution( const char * filename );
