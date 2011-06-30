@@ -1,4 +1,4 @@
-// lqrTest.cpp
+// lqrCartpole.cpp
 
 #include <iostream>
 #include <cstdlib>
@@ -6,7 +6,6 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/sx/sx_tools.hpp>
 #include <casadi/fx/sx_function.hpp>
-//#include <casadi/fx/jacobian.hpp>
 
 #include "Ode.hpp"
 #include "Ocp.hpp"
@@ -78,16 +77,16 @@ SX
 cost(map<string,SX> state, map<string,SX> action, int timestep, int N)
 {
 
-	SX cost;
+	SX costRet;
 	if (timestep == N-1){
-		cost = SQR(state["x"]) + SQR(state["theta"]) + SQR(state["vx"]) + SQR(state["vtheta"]);
-		return cost;
+		costRet = N*(SQR(state["x"]) + SQR(state["theta"] - M_PI) + SQR(state["vx"]) + SQR(state["vtheta"]));
+		return costRet;
 	}
 
-	//	cost = 2*SQR(state["x"]) + 3*SQR(state["theta"]) + 4*SQR(state["vx"]) + 5*SQR(state["vtheta"]) + 6*SQR(action["u"]);
-	cost = 0.1*SQR(action["u"]);
+	//	costRet = 2*SQR(state["x"]) + 3*SQR(state["theta"]) + 4*SQR(state["vx"]) + 5*SQR(state["vtheta"]) + 6*SQR(action["u"]);
+	costRet = 0.01*SQR(action["u"]);
 	
-	return cost;
+	return costRet;
 }
 
 
@@ -120,10 +119,10 @@ main()
 	// bounds
 	ocp.boundParam("tEnd", 6, 6);
 	
-	ms.boundStateAction("x", -trackLength/2, trackLength/2);
-	ms.boundStateAction("vx", -22, 22);
-	ms.boundStateAction("theta", -50, 50);
-	ms.boundStateAction("vtheta", -50, 50);
+	ms.boundStateAction(      "x", -trackLength/2, trackLength/2);
+	ms.boundStateAction(     "vx", -22, 22);
+	ms.boundStateAction(  "theta", -50, 50);
+	ms.boundStateAction( "vtheta", -50, 50);
 
 	// ms.boundStateAction("u",-20,20);
 
@@ -141,7 +140,7 @@ main()
 	ms.boundStateAction(  "theta", 3.14159, 3.14159, ms.N-1);
 	ms.boundStateAction(      "u", 0.0, 0.0, ms.N-1);
 
-	// initial gues
+	// initial guess
 	for (int k=0; k<ms.N; k++){
 		double zero_to_one = k/(ms.N - 1.0);
 		ms.setStateActionGuess( "u", sin(2*M_PI*zero_to_one), k);
@@ -151,30 +150,33 @@ main()
 	SnoptInterface si(ocp);
 	
 	si.run();
-	ocp.writeOctaveOutput("cartpole_out");
+	ocp.writeOctaveOutput("cartpole_multiple_shooting_out");
 	
 	// Print the optimal cost
 	cout << "optimal objFcn: " << si.F[0] << endl;
 	
 	
 	/************** run lqr ****************/
+	cout << "\nrunning ILQR\n";
 	double t0 = 0;
 	double tf = ocp.getParamSolution("tEnd");
  	Lqr lqr(ode, t0, tf, ms.N, &cost);
 
 	for (int k=0; k<ms.N; k++)
-		lqr.x_trajectory.at(k) = ocp.getStateSolution(k);
+		lqr.xTrajectory.at(k) = ocp.getStateSolution(k);
 	for (int k=0; k<ms.N-1; k++)
-		lqr.u_trajectory.at(k) = ocp.getActionSolution(k);
+		lqr.uTrajectory.at(k) = ocp.getActionSolution(k);
 
+	for (int k=0; k<10; k++){
+		cout << "ilqr iter: " << k << endl;
+		lqr.runBackwardSweep();
+		lqr.runForwardSweep();
+	}
 
-	// for (int k=0; k<N; k++)
-	// 	cout << "lqr.x_trajectory.at(" << k << "):\n" << lqr.x_trajectory.at(k) << endl;
-	// for (int k=0; k<N-1; k++)
-	// 	cout << "lqr.u_trajectory.at(" << k << "):\n" << lqr.u_trajectory.at(k) << endl;
+	ocp.setStates(  lqr.xTrajectory );
+	ocp.setActions( lqr.uTrajectory );
 
-
-	lqr.runBackwardSweep();
+	ocp.writeOctaveOutput("cartpole_lqr_out");
 	
 	cout << "successful finish\n";
 	return 0;

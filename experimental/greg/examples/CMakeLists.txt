@@ -68,22 +68,21 @@ target_link_libraries(raptors
   snopt_interface
 )
 
-add_executable(lqrTest lqrTest.cpp)
-target_link_libraries(lqrTest
+add_executable(lqrCartpole lqrCartpole.cpp)
+target_link_libraries(lqrCartpole
   cppocp
   casadi 
   ${SNOPT_LIBRARIES}
   snopt_interface
 )
 
-
-#add_executable(my_sntoya my_sntoya.cpp)
-#target_link_libraries(my_sntoya
-#  cppocp
-#  casadi 
-#  ${SNOPT_LIBRARIES}
-#  snopt_interface
-#)
+add_executable(lqrSpring lqrSpring.cpp)
+target_link_libraries(lqrSpring
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+)
 
 
 ENDIF(SNOPT_FOUND)
