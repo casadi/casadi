@@ -252,7 +252,7 @@ void MXFunctionInternal::eliminateJacobian(){
         
         // Generate jacobian functions
         FXInternal* f = reinterpret_cast<FXInternal*>(it->first);
-        j = f->jacobian(jblocks);
+        j = f->jacobian_switch(jblocks);
         j.init();
       }
     }
