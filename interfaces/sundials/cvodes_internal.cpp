@@ -589,6 +589,7 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
 }
 
 void CVodesInternal::integrate(double t_out){
+   log("CVODES::integrate begin");
   int flag;
     
   // tolerance
@@ -629,6 +630,11 @@ void CVodesInternal::integrate(double t_out){
       if(flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens",flag);
     }
   }
+
+   if(monitored("integrate")){
+      this->printStats(cout);
+   }
+  log("CVODES::integrate end");
 }
 
 void CVodesInternal::resetAdj(){
