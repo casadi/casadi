@@ -173,6 +173,10 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps);
  */
 std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps);
 
+// Equality
+MX operator==(const MX& a, const MX& b);
+
+
 } // namespace CasADi
 
 #ifdef SWIG

@@ -22,6 +22,7 @@
 
 #include "mx.hpp"
 #include "mx_node.hpp"
+#include "mx_tools.hpp"
 #include "scalar_matrix_op.hpp"
 #include "matrix_scalar_op.hpp"
 #include "matrix_matrix_op.hpp"
@@ -34,6 +35,7 @@
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
+#include "multiplication.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -402,6 +404,123 @@ const Matrix<int>& MX::mapping() {
   return m->nzmap_;
 }
 
+MX MX::prod(const MX& y) const{
+  const MX& x = *this;
+  
+  // Check if any of the factors is zero
+  if(isZero(x) || isZero(y)){
+    return MX::zeros(x.size1(),y.size2());
+  }
+  
+  // Check if any of the factors are identity matrices
+  if(isIdentity(x))
+    return y;
+  else if(isIdentity(y))
+    return x;
+  
+  // Check if any of the factors is scalar
+  if (x.numel()==1 || y.numel()==1)
+    return x*y;
+    
+  // Else, create a multiplication node
+  return MX::create(new Multiplication(x,trans(y)));
+}
+
+MX MX::rprod(const MX& y) const{
+  return y.prod(*this);
+}
+
+MX MX::inner_prod(const MX& y) const{
+  const MX& x = *this;
+  casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
+  casadi_assert_message(y.size2()==1, "inner_prod: second factor not a vector");
+  casadi_assert_message(x.size1()==y.size1(),"inner_prod: dimension mismatch");
+  MX sum = 0;
+  for(int i=0; i<x.size1(); ++i)
+    sum += x(i)*y(i);
+  return sum;
+}
+
+MX MX::outer_prod(const MX& y) const{
+  return prod(trans(y));
+}
+
+MX MX::constpow(const MX& b) const{    
+  return std::constpow(*this,b);
+}
+
+MX MX::fmin(const MX& b) const{       
+  return std::fmin(*this,b);
+}
+
+MX MX::fmax(const MX& b) const{       
+  return std::fmax(*this,b);
+}
+
+MX MX::exp() const{ 
+  return std::exp(*this);
+}
+
+MX MX::log() const{ 
+  return std::log(*this);
+}
+
+MX MX::sqrt() const{ 
+  return std::sqrt(*this);
+}
+
+MX MX::sin() const{ 
+  return unary(SIN,*this);
+}
+
+MX MX::cos() const{ 
+  return std::cos(*this);
+}
+
+MX MX::tan() const{ 
+  return std::tan(*this);
+}
+
+MX MX::arcsin() const{ 
+  return std::asin(*this);
+}
+
+MX MX::arccos() const{ 
+  return std::acos(*this);
+}
+
+MX MX::arctan() const{ 
+  return std::atan(*this);
+}
+
+MX MX::floor() const{ 
+  return std::floor(*this);
+}
+
+MX MX::ceil() const{ 
+  return std::ceil(*this);
+}
+
+MX MX::erf() const{ 
+  return std::erf(*this);
+}
+
+MX MX::__add__(const MX& b) const{    return *this + b;}
+MX MX::__radd__(const MX& b) const{   return b + *this;}
+MX MX::__sub__(const MX& b) const{    return *this - b;}
+MX MX::__rsub__(const MX& b) const{   return b - *this;}
+MX MX::__mul__(const MX& b) const{    return *this * b;}
+MX MX::__rmul__(const MX& b) const{   return b * *this;}
+MX MX::__div__(const MX& b) const{    return *this / b;}
+MX MX::__rdiv__(const MX& b) const{   return b / *this;}
+MX MX::__pow__(const MX& b) const {    return std::pow(*this,b);}
+MX MX::__rpow__(const MX& b) const {   return std::pow(b,*this);}
+MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+MX MX::__rmrdivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmrdivide: Not implemented");}
+MX MX::__ldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
+MX MX::__rmldivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmldivide: Not implemented");}
+MX MX::__mpower__(const MX& b) const  {   return std::pow(*this,b); throw CasadiException("mpower: Not implemented");}
+MX MX::__rmpower__(const MX& b) const {   return std::pow(b,*this); throw CasadiException("rmpower: Not implemented");}
 
 
 } // namespace CasADi
@@ -423,7 +542,7 @@ MX sqrt(const MX& x){
 }
 
 MX sin(const MX& x){
-  return MX::unary(SIN,x);
+  return x.sin();
 }
 
 MX cos(const MX& x){;  

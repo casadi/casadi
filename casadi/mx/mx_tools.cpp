@@ -24,7 +24,6 @@
 #include "mapping.hpp"
 #include "norm.hpp"
 #include "mx_constant.hpp"
-#include "multiplication.hpp"
 #include "if_else_node.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
@@ -134,23 +133,7 @@ MX norm_inf(const MX &x){
 }
 
 MX prod(const MX &x, const MX &y){
-  // Check if any of the factors is zero
-  if(isZero(x) || isZero(y)){
-    return MX::zeros(x.size1(),y.size2());
-  }
-  
-  // Check if any of the factors are identity matrices
-  if(isIdentity(x))
-    return y;
-  else if(isIdentity(y))
-    return x;
-  
-  // Check if any of the factors is scalar
-  if (x.numel()==1 || y.numel()==1)
-    return x*y;
-    
-  // Else, create a multiplication node
-  return MX::create(new Multiplication(x,trans(y)));
+  return x.prod(y);
 }
 
 bool isZero(const MX& ex){
@@ -166,17 +149,11 @@ bool isIdentity(const MX& ex){
 }
 
 MX inner_prod(const MX &x, const MX &y){
-  casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
-  casadi_assert_message(y.size2()==1, "inner_prod: second factor not a vector");
-  casadi_assert_message(x.size1()==y.size1(),"inner_prod: dimension mismatch");
-  MX sum = 0;
-  for(int i=0; i<x.size1(); ++i)
-    sum += x(i)*y(i);
-  return sum;
+  return x.inner_prod(y);
 }
 
 MX outer_prod(const MX &x, const MX &y){
-  return prod(x,trans(y));
+  x.outer_prod(y);
 }
 
 MX trans(const MX &x){
@@ -385,6 +362,11 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
   std::vector<MX> ret(deps);
   MX P = createParent(ret);
   return std::pair< MX, std::vector<MX> > (P,ret);
+}
+
+MX operator==(const MX& a, const MX& b){
+  casadi_assert_message(0,"Not implemented");
+  return MX();
 }
 
 } // namespace CasADi

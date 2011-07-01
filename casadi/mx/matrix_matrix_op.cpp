@@ -164,7 +164,7 @@ void MatrixMatrixOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& o
   
   // casadi_math<DMatrix>::funE; // works
   // casadi_math<SXMatrix>::funE; // works
-  // casadi_math<MX>::funE; // FIXME
+//  casadi_math<MX>::funE; // FIXME
   
   
 }

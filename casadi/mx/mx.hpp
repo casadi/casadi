@@ -28,42 +28,6 @@
 #include "../sx/sx.hpp"
 #include <vector>
 
-
-namespace CasADi{
-  
-/** \brief  Forward declaration */
-class MX;
-
-}
-
-#ifndef SWIG  
-namespace std{
-//@{
-/** \brief  Functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
-#define MX CasADi::MX
-MX sqrt(const MX &x);
-MX sin(const MX &x);
-MX cos(const MX &x);
-MX tan(const MX &x);
-MX atan(const MX &x);
-MX asin(const MX &x);
-MX acos(const MX &x);
-MX exp(const MX &x);
-MX log(const MX &x);
-MX pow(const MX &x, const MX &n);
-MX constpow(const MX &x, const MX &n);
-MX abs(const MX &x);
-MX fabs(const MX &x); // same as abs
-MX floor(const MX &x);
-MX ceil(const MX &x);
-MX erf(const MX &x);
-MX fmin(const MX &a, const MX &b);
-MX fmax(const MX &a, const MX &b);
-#undef MX
-//@}
-} // namespace std
-#endif // SWIG  
-
 namespace CasADi{
   
 /** \brief  Forward declaration */
@@ -314,37 +278,51 @@ class MX : public SharedObject{
   */
   std::string dimString() const;
   
-  // all binary operations with a particular right argument
-  #define binops(t) \
-  MX __add__(t b){    return *this + b;} \
-  MX __radd__(t b){   return b + *this;} \
-  MX __sub__(t b){    return *this - b;} \
-  MX __rsub__(t b){   return b - *this;} \
-  MX __mul__(t b){    return *this * b;} \
-  MX __rmul__(t b){   return b * *this;} \
-  MX __div__(t b){    return *this / b;} \
-  MX __rdiv__(t b){   return b / *this;} \
-  MX __pow__(t b) const {    return std::pow(*this,b);} \
-  MX __rpow__(t b) const {   return std::pow(b,*this);} \
-  MX __mrdivide__  (t b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");} \
-  MX __rmrdivide__ (t b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmrdivide: Not implemented");} \
-  MX __ldivide__   (t b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");} \
-  MX __rmldivide__ (t b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmldivide: Not implemented");} \
-  MX __mpower__(t b) const  {   return std::pow(*this,b); throw CasadiException("mpower: Not implemented");} \
-  MX __rmpower__(t b) const {   return std::pow(b,*this); throw CasadiException("rmpower: Not implemented");}
-  
-  // Binary operations with all right hand sides
-  binops(const MX&)
-  binops(double)
-  binops(const Matrix<double> &)
-  #undef binops
+  // all binary operations
+  MX __add__(const MX& b) const;
+  MX __radd__(const MX& b) const;
+  MX __sub__(const MX& b) const;
+  MX __rsub__(const MX& b) const;
+  MX __mul__(const MX& b) const;
+  MX __rmul__(const MX& b) const;
+  MX __div__(const MX& b) const;
+  MX __rdiv__(const MX& b) const;
+  MX __pow__(const MX& b) const;
+  MX __rpow__(const MX& b) const;
+  MX __mrdivide__  (const MX& b) const;
+  MX __rmrdivide__ (const MX& b) const;
+  MX __ldivide__   (const MX& b) const;
+  MX __rmldivide__ (const MX& b) const;
+  MX __mpower__(const MX& b) const;
+  MX __rmpower__(const MX& b) const;
+  MX prod(const MX& y) const;
+  MX rprod(const MX& y) const;
+  MX inner_prod(const MX& y) const;
+  MX outer_prod(const MX& y) const;
+  MX constpow(const MX& y) const;
+  MX fmin(const MX& y) const;
+  MX fmax(const MX& y) const;
 
+  // all unary operations
+  MX exp() const;
+  MX log() const;
+  MX sqrt() const;
+  MX sin() const;
+  MX cos() const;
+  MX tan() const;
+  MX arcsin() const;
+  MX arccos() const;
+  MX arctan() const;
+  MX floor() const;
+  MX ceil() const;
+  MX erf() const;
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *
   */
   const Matrix<int>& mapping();
 
+  
 };
 
 //@{
@@ -354,55 +332,44 @@ typedef std::vector<DMatrixP> vDMatrixP;
 typedef std::vector<vDMatrixP> vvDMatrixP;
 //@}
 
-
+#ifdef SWIG 
+%extend MX {
+  std::string __repr__() { return $self->getRepresentation();}
+}
+#endif // SWIG
 } // namespace CasADi
+
+#ifndef SWIG  
+namespace std{
+//@{
+/** \brief  Functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
+#define MX CasADi::MX
+MX sqrt(const MX &x);
+MX sin(const MX &x);
+MX cos(const MX &x);
+MX tan(const MX &x);
+MX atan(const MX &x);
+MX asin(const MX &x);
+MX acos(const MX &x);
+MX exp(const MX &x);
+MX log(const MX &x);
+MX pow(const MX &x, const MX &n);
+MX constpow(const MX &x, const MX &n);
+MX abs(const MX &x);
+MX fabs(const MX &x); // same as abs
+MX floor(const MX &x);
+MX ceil(const MX &x);
+MX erf(const MX &x);
+MX fmin(const MX &a, const MX &b);
+MX fmax(const MX &a, const MX &b);
+#undef MX
+//@}
+} // namespace std
+#endif // SWIG  
 
 #ifdef SWIG 
-
-namespace CasADi {
-
-%extend MX {
-std::string __repr__() { return $self->getRepresentation();
-}
-
- // all binary operations with a particular right argument
-  #define binops(t) \
-  MX prod(t b){       return prod(*$self,b);} \
-  MX rprod(t b){       return prod(b,*$self);} \
-  MX inner_prod(t b){ return inner_prod(*$self,b);} \
-  MX outer_prod(t b){ return outer_prod(*$self,b);} \
-  MX constpow(t b){    return std::constpow(*$self,b);} \
-  MX fmin(t b){       return std::fmin(*$self,b);} \
-  MX fmax(t b){       return std::fmax(*$self,b);}
-  
-  // Binary operations with all right hand sides
-  binops(const MX&)
-  binops(double)
-  binops(const Matrix<double> &)
-  #undef binops
-
-// all unary operations
-MX __neg__(){ return - *$self;}
-MX exp(){ return std::exp(*$self);}
-MX log(){ return std::log(*$self);}
-MX sqrt(){ return std::sqrt(*$self);}
-MX sin(){ return std::sin(*$self);}
-MX cos(){ return std::cos(*$self);}
-MX tan(){ return std::tan(*$self);}
-MX arcsin(){ return std::asin(*$self);}
-MX arccos(){ return std::acos(*$self);}
-MX arctan(){ return std::atan(*$self);}
-MX floor(){ return std::floor(*$self);}
-MX ceil(){ return std::ceil(*$self);}
-MX erf(){ return std::erf(*$self);}
-
-}
-
-} // namespace CasADi
-
 // Template instantiations
 %template(MXVector) std::vector<CasADi::MX>;
-
 #endif // SWIG
 
 #endif // MX_HPP
