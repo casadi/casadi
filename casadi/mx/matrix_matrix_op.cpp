@@ -24,6 +24,7 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
+#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
@@ -160,6 +161,12 @@ void MatrixMatrixOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& o
   r.binary_old(casadi_math<SX>::funE[op],*input[0],*input[1]);
   casadi_assert(output.sparsity()==r.sparsity());
   output.set(r);
+  
+  // casadi_math<DMatrix>::funE; // works
+  // casadi_math<SXMatrix>::funE; // works
+  // casadi_math<MX>::funE; // FIXME
+  
+  
 }
 
 

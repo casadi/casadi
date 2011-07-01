@@ -1214,12 +1214,16 @@ void Matrix<T>::binary_old(T (*fcn)(const T&, const T&), const Matrix<T> &x, con
 template<class T>
 void Matrix<T>::scalar_matrix_old(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y){
   T fcn_x_0 = fcn(x,0);
-  if(casadi_limits<T>::isZero(fcn_x_0))
+  if(casadi_limits<T>::isZero(fcn_x_0)){
     // Start with an empty matrix: all elements are added to the end!
     makeEmpty(y.size1(),y.size2());
-  else
+    
+    // Reserve space for the nonzeros
+    reserve(y.size());
+  } else {
     // Start with an dense matrix: element access in constant time
     makeDense(y.size1(),y.size2(),fcn_x_0);
+  }
   
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
@@ -1232,12 +1236,17 @@ void Matrix<T>::scalar_matrix_old(T (*fcn)(const T&, const T&), const T& x, cons
 template<class T>
 void Matrix<T>::matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y){
   T fcn_0_y = fcn(0,y);
-  if(casadi_limits<T>::isZero(fcn_0_y))
+  if(casadi_limits<T>::isZero(fcn_0_y)){
     // Start with an empty matrix: all elements are added to the end!
     makeEmpty(x.size1(),x.size2());
-  else
+    
+    // Reserve space for the nonzeros
+    reserve(x.size());
+    
+  } else {
     // Start with an dense matrix: element access in constant time
     makeDense(x.size1(),x.size2(),fcn_0_y);
+  }
   
   for(int i=0; i<size1(); ++i){ // loop over rows
     for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
@@ -1257,14 +1266,40 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
     *this = y;
 
   T fcn_0_0 = fcn(0,0);
-  if(casadi_limits<T>::isZero(fcn_0_0))
+  if(casadi_limits<T>::isZero(fcn_0_0)){
     // Start with an empty matrix: all elements are added to the end!
-    makeEmpty(x.size1(),x.size2());
-  else
+    makeEmpty(0,x.size2());
+  
+    // Reserve space for the nonzeros
+    reserve(std::max(x.size(),y.size()),x.size1());
+  
+    for(int i=0; i<x.size1(); ++i){ // loop over rows
+      // Resize matrix
+      resize(i+1,x.size2());
+      
+      int el1 = x.rowind(i);
+      int el2 = y.rowind(i);
+      int k1 = x.rowind(i+1);
+      int k2 = y.rowind(i+1);
+      while(el1 < k1 || el2 < k2){
+        int j1 = (el1 < k1) ? x.col(el1) : numel() ;
+        int j2 = (el2 < k2) ? y.col(el2) : numel() ;
+        
+        if(j1==j2)
+          elem(i,j1) = fcn(x.data()[el1++],y.data()[el2++]); 
+        else if(j1>j2)
+          elem(i,j2) = fcn(0,y.data()[el2++]);
+        else
+          elem(i,j1) = fcn(x.data()[el1++],0);
+        }
+    }
+  
+  } else {
+    
     // Start with an dense matrix: element access in constant time
     makeDense(x.size1(),x.size2(),fcn_0_0);
- 
-  for(int i=0; i<size1(); ++i){ // loop over rows
+
+    for(int i=0; i<size1(); ++i){ // loop over rows
     int el1 = x.rowind(i);
     int el2 = y.rowind(i);
     int k1 = x.rowind(i+1);
@@ -1281,6 +1316,7 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
         elem(i,j1) = fcn(x.data()[el1++],0);
       }
     }
+  }
 }
 
 template<class T>

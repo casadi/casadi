@@ -232,8 +232,24 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 template<class T>
 void makeDense(Matrix<T>& A);
 
-/** \brief Check if two DMatrices have identical numerical content */
-Matrix<double> operator==(Matrix<double>& a, Matrix<double>& b);
+//template<class T>
+//Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b);
+
+Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b);
+
+template<class T>
+Matrix<T> fmin(const Matrix<T>& a, const Matrix<T>& b);
+
+template<class T>
+Matrix<T> fmax(const Matrix<T>& a, const Matrix<T>& b);
+
+template<class T>
+Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
+
+template<class T>
+Matrix<T> erf(const Matrix<T>& a);
+
+
 
 } // namespace CasADi
 
@@ -782,6 +798,40 @@ void makeDense(Matrix<T>& A){
   A.makeDense(A.size1(),A.size2(),0);
 }
 
+template<class T>
+Matrix<T> fmin(const Matrix<T>& a, const Matrix<T>& b){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+Matrix<T> fmax(const Matrix<T>& a, const Matrix<T>& b){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+Matrix<T> erf(const Matrix<T>& a){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+// template<class T>
+// Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b){
+//   return a.binary_old(CasADi::casadi_operators<T>::equality, b);
+// }
+
+
 } // namespace CasADi
 
 #endif //SWIG
@@ -835,6 +885,8 @@ MTT_INST(T,sum) \
 MTT_INST(T,sum_all) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
+
+
 
 #endif //SWIG
 

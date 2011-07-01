@@ -241,7 +241,7 @@ template<>
 class UnaryOperation<STEP>{
   public:
     static void print(std::ostream &stream, const std::string& x){ stream << "(" << x << ">=0)"; }
-    template<typename T> static void fcn(const T& x, T& f){ f = x >= 0;}
+    template<typename T> static void fcn(const T& x, T& f){ f = x >= T(0.);}
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 0;}
 };
 
