@@ -258,8 +258,7 @@ void IpoptInternal::init(){
     casadi_assert_message(GF_.getNumInputs()>=1, "Wrong number of input arguments to GF");
     casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
     casadi_assert_message(GF_.input().numel()==n,"Inconsistent dimensions");
-    casadi_assert_message(GF_.output().size1()==n,"Inconsistent dimensions");
-    casadi_assert_message(GF_.output().size2()==n,"Inconsistent dimensions");
+    casadi_assert_message((GF_.output().size1()==n && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n),"Inconsistent dimensions");
   }
   
 

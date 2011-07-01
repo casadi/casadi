@@ -42,6 +42,7 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>CVodesInternal::reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>CVodesInternal::rhsB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>integrate</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
@@ -50,6 +51,7 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>CVodesInternal::reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>CVodesInternal::rhsB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>integrate</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::IdasInternal

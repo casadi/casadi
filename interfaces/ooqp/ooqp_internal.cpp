@@ -245,6 +245,7 @@ map<int,string> OOQPInternal::calc_flagmap(){
   f[NOT_FINISHED] = "NOT_FINISHED";
   f[MAX_ITS_EXCEEDED] = "MAX_ITS_EXCEEDED";
   f[INFEASIBLE] = "INFEASIBLE";
+  f[UNKNOWN] = "UNKNOWN";
   return f;
 }
   

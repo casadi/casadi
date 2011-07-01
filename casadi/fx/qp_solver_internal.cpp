@@ -35,12 +35,14 @@ QPSolverInternal::QPSolverInternal() {
 
 // Constructor
 QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &G_, const CRSSparsity &A_) : H(H_), G(G_), A(A_) {
+  addOption("convex", OT_BOOLEAN, false, "Specify true if you can guarantee that H will always be positive definite");
+
   nx = H.size2();
-  if (G.size1()!=nx || A.size2()!=nx || H.size1()!=H.size2() || G.numel() != G.size()) {
+  if (G.size1()!=nx || A.size2()!=nx || H.size1()!=H.size2() || G.numel() != G.size() || G.size2()!=1 ) {
     stringstream ss;
     ss << "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl;
     ss << "H: " << H.dimString() << " - G: " << G.dimString() << " - A: " << A.dimString() << std::endl;
-    ss << "We need: H.size2()==G.size1()==A.size2(), G Dense, H square & symmetric" << std::endl;
+    ss << "We need: H.size2()==G.size1()==A.size2(), G Dense Column vector, H square & symmetric" << std::endl;
     throw CasadiException(ss.str());
   }
 

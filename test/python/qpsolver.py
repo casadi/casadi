@@ -47,8 +47,8 @@ class QPSolverTests(casadiTestCase):
     solver.input(QP_H).set(H*4)
 
     solver.evaluate()
-    self.assertAlmostEqual(solver.output()[0],1,1e-8)
-    self.assertAlmostEqual(solver.output()[1],1,1e-8)
+    self.assertAlmostEqual(solver.output()[0],1,6)
+    self.assertAlmostEqual(solver.output()[1],1,6)
     self.checkarray(solver.output(QP_COST),DMatrix(-6),"OOQP")
     
     solver.input(QP_UBA).set([-inf]*3)
@@ -72,6 +72,7 @@ class QPSolverTests(casadiTestCase):
     UBX = DMatrix([inf]*2)
 
     solver = IpoptQPSolver(H.sparsity(),G.sparsity(),A.sparsity())
+    solver.setOption("convex",True)
     solver.init()
 
     solver.input(QP_H).set(H)
@@ -84,18 +85,19 @@ class QPSolverTests(casadiTestCase):
 
     solver.solve()
 
-    self.assertAlmostEqual(solver.output()[0],2.0/3,1e-8)
-    self.assertAlmostEqual(solver.output()[1],4.0/3,1e-8)
+    print solver.output()
+    self.assertAlmostEqual(solver.output()[0],2.0/3,6)
+    self.assertAlmostEqual(solver.output()[1],4.0/3,6)
     
     
-    self.assertAlmostEqual(solver.output(QP_COST)[0],-8-2.0/9,1e-8)
+    self.assertAlmostEqual(solver.output(QP_COST)[0],-8-2.0/9,6)
     
     solver.input(QP_H).set(H*4)
 
     solver.evaluate()
-    self.assertAlmostEqual(solver.output()[0],1,1e-8)
-    self.assertAlmostEqual(solver.output()[1],1,1e-8)
-    self.assertAlmostEqual(solver.output(QP_COST),-6,1e-8)
+    self.assertAlmostEqual(solver.output()[0],1,4)
+    self.assertAlmostEqual(solver.output()[1],1,4)
+    self.assertAlmostEqual(solver.output(QP_COST),-6,6)
     
 if __name__ == '__main__':
     unittest.main()
