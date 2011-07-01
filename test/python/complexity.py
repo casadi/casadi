@@ -52,11 +52,18 @@ class ComplexityTests(casadiTestCase):
     # Estimate for b
     b = sigmaT/sigmaN * rho
     
+    a = mean(ts) - b * mean(Ns)
+    
     # Standard error on estimate for b
     sigmab = s/sqrt(m*sigmaN**2)
     
-    print "Estimated order = %.3f +- %.3f." % (b,sigmab)
+    # Standard deviation
+    sigmaa = s * sqrt(1/m + mean(ts)**2/(m*sigmaT**2))
     
+    conf = 0.05
+    
+    print "O(f) = %.3e N^(%.3f) [s]" % (exp(a),b)
+     
     results = []
     for order in orders:
       # Null hypothesis: the slope of the regression is equal to order
@@ -67,7 +74,14 @@ class ComplexityTests(casadiTestCase):
       print "If the order were really %d, then the measurements have a p-score of %.8f" % (order,p)
       if p >= rejectat:
         results.append(order)
-      
+
+    
+    if len(results)==1:
+      order = results[0]
+      a = mean(ts - order*Ns)
+      sigmaa = std(ts - order*Ns)/sqrt(m)
+      print "O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (exp(a),order,exp(student.ppf(conf, m, loc=a, scale=sigmaa)),exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order)
+    
     
     for i, order in zip(range(len(orders))[1:],orders[1:]):
       if b < order and b > order-1 and not(order in results) and not(order -1 in results):
@@ -117,7 +131,7 @@ class ComplexityTests(casadiTestCase):
     
     self.complexity(setupfun,fun, 1)
     
-    self.message("DMatrix add column vectors")
+    self.message("DMatrix add rows vectors")
     def setupfun(self,N):
       return {'A': DMatrix(1,N,0), 'B': DMatrix(1,N,0)}
     
