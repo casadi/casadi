@@ -35,7 +35,16 @@ ENDIF(KNITRO_FOUND)
 
 IF(SUNDIALS_FOUND AND IPOPT_FOUND)
 add_executable(convection_diffusion convection_diffusion.cpp)
-target_link_libraries(convection_diffusion ipopt_interface sundials_interface optimal_control casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+target_link_libraries(convection_diffusion
+  ipopt_interface
+  sundials_interface
+  csparse_interface
+  optimal_control
+  casadi
+  ${IPOPT_LIBRARIES}
+  ${SUNDIALS_LIBRARIES}
+  tinyxml
+  csparse )
 
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
