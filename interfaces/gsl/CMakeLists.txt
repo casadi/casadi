@@ -11,8 +11,10 @@ set(GSL_INTERFACE_SRCS
   gsl_integrator.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(gsl_interface STATIC ${GSL_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(gsl_interface_shared SHARED ${GSL_INTERFACE_SRCS})
+add_library(gsl_interface SHARED ${GSL_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 

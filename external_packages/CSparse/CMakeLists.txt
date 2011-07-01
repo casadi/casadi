@@ -15,7 +15,9 @@ set(CSPARSE_SRC
         Source/cs_dfs.c Source/cs_reach.c Source/cs_spsolve.c Source/cs_ereach.c Source/cs_leaf.c Source/cs_randperm.c
 )
 
+if(ENABLE_STATIC)
 add_library(csparse STATIC ${CSPARSE_SRC})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(csparse_shared SHARED ${CSPARSE_SRC})
+add_library(csparse SHARED ${CSPARSE_SRC})
 endif(ENABLE_SHARED)

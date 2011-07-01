@@ -9,7 +9,9 @@ set(CSPARSE_INTERFACE_SRCS
   csparse_tools.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(csparse_interface_shared SHARED ${CSPARSE_INTERFACE_SRCS})
+add_library(csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
 endif(ENABLE_SHARED)

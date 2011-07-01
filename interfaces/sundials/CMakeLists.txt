@@ -22,8 +22,10 @@ set(SUNDIALS_INTERFACE_SRCS
   kinsol_solver.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(sundials_interface STATIC ${SUNDIALS_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(sundials_interface_shared SHARED ${SUNDIALS_INTERFACE_SRCS})
+add_library(sundials_interface SHARED ${SUNDIALS_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 

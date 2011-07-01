@@ -8,6 +8,8 @@ if(CMAKE_Fortran_COMPILER)
 endif(CMAKE_Fortran_COMPILER)
 
 # Options:
+option(ENABLE_STATIC "Compile static libraries (.a)" ON)
+option(ENABLE_SHARED "Compile shared libraries (.so)" OFF)
 option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)
 option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_IPOPT "Compile the Ipopt interface" ON)

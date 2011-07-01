@@ -11,8 +11,10 @@ set(OOQP_INTERFACE_SRCS
   ooqp_solver.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(ooqp_interface STATIC ${OOQP_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(ooqp_interface_shared SHARED ${OOQP_INTERFACE_SRCS})
+add_library(ooqp_interface SHARED ${OOQP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 

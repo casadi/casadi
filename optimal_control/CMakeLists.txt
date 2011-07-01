@@ -11,8 +11,9 @@ SET(OPTIMAL_CONTROL
   multiple_shooting.hpp     multiple_shooting.cpp   multiple_shooting_internal.hpp   multiple_shooting_internal.cpp
 )
 
-
+if(ENABLE_STATIC)
 add_library(optimal_control STATIC ${OPTIMAL_CONTROL})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(optimal_control_shared SHARED ${OPTIMAL_CONTROL})
+add_library(optimal_control SHARED ${OPTIMAL_CONTROL})
 endif(ENABLE_SHARED)

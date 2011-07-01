@@ -16,7 +16,9 @@ SET(IPOPT_INTERFACE_SRCS
 )
 
 
+if(ENABLE_STATIC)
 add_library(ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(ipopt_interface_shared SHARED ${IPOPT_INTERFACE_SRCS})
+add_library(ipopt_interface SHARED ${IPOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)

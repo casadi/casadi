@@ -9,7 +9,9 @@ SET(CPPOCP_SRCS
   Ode.cpp   Ode.hpp
 )
 
+if(ENABLE_STATIC)
 add_library(cppocp STATIC ${CPPOCP_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(cppocp_shared SHARED ${CPPOCP_SRCS})
+add_library(cppocp SHARED ${CPPOCP_SRCS})
 endif(ENABLE_SHARED)

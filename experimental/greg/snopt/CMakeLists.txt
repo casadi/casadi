@@ -9,7 +9,9 @@ SET(SNOPT_INTERFACE_SRCS
   SnoptInterface.hpp
 )
 
+if(ENABLE_STATIC)
 add_library(snopt_interface STATIC ${SNOPT_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(snopt_interface_shared SHARED ${SNOPT_INTERFACE_SRCS})
+add_library(snopt_interface SHARED ${SNOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)

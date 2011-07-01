@@ -13,8 +13,10 @@ set(ACADO_INTERFACE_SRCS
   acado_integrator_backend.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(acado_interface STATIC ${ACADO_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(acado_interface_shared SHARED ${ACADO_INTERFACE_SRCS})
+add_library(acado_interface SHARED ${ACADO_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 

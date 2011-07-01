@@ -7,9 +7,11 @@ SET(TINYXML_SRC
   dump.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(tinyxml STATIC ${TINYXML_SRC})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(tinyxml_shared SHARED ${TINYXML_SRC})
+add_library(tinyxml SHARED ${TINYXML_SRC})
 endif(ENABLE_SHARED)
 
 add_executable(xmltest xmltest.cpp)

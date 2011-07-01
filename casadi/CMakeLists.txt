@@ -69,8 +69,9 @@ SET(CASADI_SRCS
   fx/function_io.hpp         fx/function_io.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
 )
-
+if(ENABLE_STATIC)
 add_library(casadi STATIC ${CASADI_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(casadi_shared SHARED ${CASADI_SRCS})
+add_library(casadi SHARED ${CASADI_SRCS})
 endif(ENABLE_SHARED)

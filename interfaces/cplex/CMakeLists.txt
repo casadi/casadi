@@ -9,7 +9,9 @@ SET(CPLEX_INTERFACE_SRCS
   cplex_internal.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(cplex_interface STATIC ${CPLEX_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(cplex_interface_shared SHARED ${CPLEX_INTERFACE_SRCS})
+add_library(cplex_interface SHARED ${CPLEX_INTERFACE_SRCS})
 endif(ENABLE_SHARED)

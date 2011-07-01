@@ -8,7 +8,9 @@ set(LAPACK_INTERFACE_SRCS
   lapack_qr_dense.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(lapack_interface STATIC ${LAPACK_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(lapack_interface_shared SHARED ${LAPACK_INTERFACE_SRCS})
+add_library(lapack_interface SHARED ${LAPACK_INTERFACE_SRCS})
 endif(ENABLE_SHARED)

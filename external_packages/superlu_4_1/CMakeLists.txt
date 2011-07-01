@@ -199,7 +199,9 @@ SET(SUPERLU_SRC
      SRC/ccolumn_dfs.c
 )
 
+IF(ENABLE_STATIC)
 add_library(superlu STATIC ${SUPERLU_SRC})
+ENDIF(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(superlu_shared SHARED ${SUPERLU_SRC})
+add_library(superlu SHARED ${SUPERLU_SRC})
 endif(ENABLE_SHARED)

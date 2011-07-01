@@ -11,7 +11,9 @@ SET(LIFTOPT_INTERFACE_SRCS
   casadi_lifter.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(liftopt_interface STATIC ${LIFTOPT_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(liftopt_interface_shared SHARED ${LIFTOPT_INTERFACE_SRCS})
+add_library(liftopt_interface SHARED ${LIFTOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
