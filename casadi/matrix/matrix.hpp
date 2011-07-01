@@ -343,19 +343,25 @@ class Matrix : public PrintableObject{
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;
 
+  //@{
     /** \brief  Create nodes by their ID */
-/*    static Matrix<T> unary(int op, const Matrix<T> &x);*/
-    
+    static Matrix<T> binary(int op, const Matrix<T> &x, const Matrix<T> &y);
+    static Matrix<T> unary(int op, const Matrix<T> &x);
+    static Matrix<T> scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
+    static Matrix<T> matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y);
+    static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
+  //@}
+
     /** \brief  Unary function */
 #ifndef SWIG
-    Matrix<T> unary(T (*fcn)(const T&)) const;
-    Matrix<T> binary(T (*fcn)(const T&, const T&), const Matrix<T>& y) const;
+    Matrix<T> unary_old(T (*fcn)(const T&)) const;
+    Matrix<T> binary_old(T (*fcn)(const T&, const T&), const Matrix<T>& y) const;
         
-    void unary(T (*fcn)(const T&), const Matrix<T>& x);
-    void binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y);
-    void matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y);
-    void matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y);
-    void scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y);
+    void unary_old(T (*fcn)(const T&), const Matrix<T>& x);
+    void binary_old(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y);
+    void matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y);
+    void matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y);
+    void scalar_matrix_old(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y);
 #endif
 
     //@{
@@ -1134,14 +1140,14 @@ void Matrix<T>::setAll(const T& val){
 }
 
 template<class T>
-Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{
+Matrix<T> Matrix<T>::unary_old(T (*fcn)(const T&)) const{
   Matrix<T> temp;
-  temp.unary(fcn,*this);
+  temp.unary_old(fcn,*this);
   return temp;
 }
 
 // template<class T>
-// Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
+// Matrix<T> Matrix<T>::unary_old(int op, const Matrix<T> &x){
 //   // Return value
 //   Matrix<T> ret(x.sparsity());
 //   
@@ -1163,7 +1169,7 @@ Matrix<T> Matrix<T>::unary(T (*fcn)(const T&)) const{
 // }
 
 template<class T>
-void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
+void Matrix<T>::unary_old(T (*fcn)(const T&), const Matrix<T>& x){
   // First check the value of the zero-entries
   T fcn_0 = fcn(0);
   if(casadi_limits<T>::isZero(fcn_0)){
@@ -1186,27 +1192,27 @@ void Matrix<T>::unary(T (*fcn)(const T&), const Matrix<T>& x){
 }
 
 template<class T>
-Matrix<T> Matrix<T>::binary(T (*fcn)(const T&, const T&), const Matrix<T>& y) const{
+Matrix<T> Matrix<T>::binary_old(T (*fcn)(const T&, const T&), const Matrix<T>& y) const{
   Matrix<T> temp;
-  temp.binary(fcn,*this,y);
+  temp.binary_old(fcn,*this,y);
   return temp;
 }
 
 template<class T>
-void Matrix<T>::binary(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y){
+void Matrix<T>::binary_old(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y){
   if(x.scalar())
     if(y.scalar())
       *this = fcn(x.toScalar(),y.toScalar());
     else
-      scalar_matrix(fcn,x.toScalar(),y);
+      scalar_matrix_old(fcn,x.toScalar(),y);
   else if(y.scalar())
-    matrix_scalar(fcn,x,y.toScalar());
+    matrix_scalar_old(fcn,x,y.toScalar());
   else
-    matrix_matrix(fcn,x,y);
+    matrix_matrix_old(fcn,x,y);
 }
 
 template<class T>
-void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y){
+void Matrix<T>::scalar_matrix_old(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y){
   T fcn_x_0 = fcn(x,0);
   if(casadi_limits<T>::isZero(fcn_x_0))
     // Start with an empty matrix: all elements are added to the end!
@@ -1224,7 +1230,7 @@ void Matrix<T>::scalar_matrix(T (*fcn)(const T&, const T&), const T& x, const Ma
 }
 
 template<class T>
-void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y){
+void Matrix<T>::matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y){
   T fcn_0_y = fcn(0,y);
   if(casadi_limits<T>::isZero(fcn_0_y))
     // Start with an empty matrix: all elements are added to the end!
@@ -1242,7 +1248,7 @@ void Matrix<T>::matrix_scalar(T (*fcn)(const T&, const T&), const Matrix<T>& x, 
 }
 
 template<class T>
-void Matrix<T>::matrix_matrix(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
+void Matrix<T>::matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
 if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matrix_matrix: dimension mismatch");
   // Make a deep copy if *this and x or y is the same object
   if(this == &x)
@@ -1280,7 +1286,7 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
 template<class T>
 Matrix<T> Matrix<T>::operator-() const{
   Matrix<T> temp;
-  temp.unary(casadi_operators<T>::neg,*this);
+  temp.unary_old(casadi_operators<T>::neg,*this);
   return temp;
 }
 
@@ -1292,56 +1298,56 @@ Matrix<T> Matrix<T>::operator+() const{
 template<class T>
 Matrix<T> Matrix<T>::__add__(const Matrix<T> &y) const{
   Matrix<T> r;
-  r.binary(casadi_operators<T>::add,*this,y);
+  r.binary_old(casadi_operators<T>::add,*this,y);
   return r;
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__sub__(const Matrix<T> &y) const{
   Matrix<T> r;
-  r.binary(casadi_operators<T>::sub,*this,y);
+  r.binary_old(casadi_operators<T>::sub,*this,y);
   return r;
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__mul__(const Matrix<T> &y) const{
   Matrix<T> r;
-  r.binary(casadi_operators<T>::mul,*this,y);
+  r.binary_old(casadi_operators<T>::mul,*this,y);
   return r;
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
   Matrix<T> r;
-  r.binary(casadi_operators<T>::div,*this,y);
+  r.binary_old(casadi_operators<T>::div,*this,y);
   return r;
 }
 
 // template<class T>
 // Matrix<T>& Matrix<T>::operator+=(const double &y){
 //   Matrix<T> x = *this;
-//   binary(casadi_operators<T>::add,x,y);
+//   binary_old(casadi_operators<T>::add,x,y);
 //   return *this;
 // }
 // 
 // template<class T>
 // Matrix<T>& Matrix<T>::operator-=(const double &y){
 //   Matrix<T> x = *this;
-//   binary(casadi_operators<T>::sub,x,y);
+//   binary_old(casadi_operators<T>::sub,x,y);
 //   return *this;
 // }
 // 
 // template<class T>
 // Matrix<T>& Matrix<T>::operator*=(const double &y){
 //   Matrix<T> x = *this;
-//   binary(casadi_operators<T>::mul,x,y);
+//   binary_old(casadi_operators<T>::mul,x,y);
 //   return *this;
 // }
 // 
 // template<class T>
 // Matrix<T>& Matrix<T>::operator/=(const double &y){
 //   Matrix<T> x = *this;
-//   binary(casadi_operators<T>::div,x,y);
+//   binary_old(casadi_operators<T>::div,x,y);
 //   return *this;
 // }
 template<class T>
@@ -1577,77 +1583,77 @@ int Matrix<T>::size(Sparsity sp) const{
 
 template<class T>
 Matrix<T> Matrix<T>::__pow__(const Matrix<T>& y) const{
-  return binary(CasADi::casadi_operators<T>::pow,y);
+  return binary_old(CasADi::casadi_operators<T>::pow,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sin() const{
-  return unary(CasADi::casadi_operators<T>::sin);
+  return unary_old(CasADi::casadi_operators<T>::sin);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::cos() const{
-  return unary(CasADi::casadi_operators<T>::cos);
+  return unary_old(CasADi::casadi_operators<T>::cos);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::tan() const{
-  return unary(CasADi::casadi_operators<T>::tan);
+  return unary_old(CasADi::casadi_operators<T>::tan);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arcsin() const{
-  return unary(CasADi::casadi_operators<T>::asin);
+  return unary_old(CasADi::casadi_operators<T>::asin);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arccos() const{
-  return unary(CasADi::casadi_operators<T>::acos);
+  return unary_old(CasADi::casadi_operators<T>::acos);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arctan() const{
-  return unary(CasADi::casadi_operators<T>::atan);
+  return unary_old(CasADi::casadi_operators<T>::atan);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::exp() const{
-  return unary(CasADi::casadi_operators<T>::exp);
+  return unary_old(CasADi::casadi_operators<T>::exp);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::log() const{
-  return unary(CasADi::casadi_operators<T>::log);
+  return unary_old(CasADi::casadi_operators<T>::log);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sqrt() const{
-  return unary(CasADi::casadi_operators<T>::sqrt);
+  return unary_old(CasADi::casadi_operators<T>::sqrt);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::floor() const{
-  return unary(CasADi::casadi_operators<T>::floor);
+  return unary_old(CasADi::casadi_operators<T>::floor);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::ceil() const{
-  return unary(CasADi::casadi_operators<T>::ceil);
+  return unary_old(CasADi::casadi_operators<T>::ceil);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fabs() const{
-  return unary(CasADi::casadi_operators<T>::fabs);
+  return unary_old(CasADi::casadi_operators<T>::fabs);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
-  return binary(CasADi::casadi_operators<T>::fmin, y);
+  return binary_old(CasADi::casadi_operators<T>::fmin, y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
-  return binary(CasADi::casadi_operators<T>::fmax, y);
+  return binary_old(CasADi::casadi_operators<T>::fmax, y);
 }
 
 template<class T>
@@ -1863,6 +1869,47 @@ const T Matrix<T>::toScalar() const{
   else
     return casadi_limits<T>::zero;
 }
+
+template<class T>
+Matrix<T> Matrix<T>::binary(int op, const Matrix<T> &x, const Matrix<T> &y){
+  if(x.numel()==1)
+    return scalar_matrix(op,x,y);
+  else if(y.numel()==1)  
+    return matrix_scalar(op,x,y);
+  else
+    return matrix_matrix(op,x,y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
+  casadi_assert_message(0,"not implemented");
+  Matrix<T> ret;
+  return ret;
+}
+
+
+
 
 } // namespace CasADi
 #endif // SWIG
