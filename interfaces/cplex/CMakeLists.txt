@@ -15,3 +15,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(cplex_interface SHARED ${CPLEX_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS cplex_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

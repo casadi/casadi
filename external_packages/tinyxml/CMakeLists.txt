@@ -13,6 +13,10 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(tinyxml SHARED ${TINYXML_SRC})
 endif(ENABLE_SHARED)
+install(TARGETS tinyxml
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 add_executable(xmltest xmltest.cpp)
 target_link_libraries(xmltest tinyxml)

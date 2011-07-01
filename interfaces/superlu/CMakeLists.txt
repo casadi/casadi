@@ -14,3 +14,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(superlu_interface SHARED ${SUPERLU_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS superlu_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

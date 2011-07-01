@@ -22,3 +22,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(ipopt_interface SHARED ${IPOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS ipopt_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

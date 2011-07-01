@@ -17,4 +17,8 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(ooqp_interface SHARED ${OOQP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS ooqp_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 

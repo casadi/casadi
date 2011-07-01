@@ -39,8 +39,14 @@ set(MUSCOD_INTERFACE_SRCS
   muscod_aux.cpp
 )
 
+if(ENABLE_STATIC)
 add_library(muscod_interface STATIC ${MUSCOD_INTERFACE_SRCS})
+endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(muscod_interface_shared SHARED ${MUSCOD_INTERFACE_SRCS})
+add_library(muscod_interface SHARED ${MUSCOD_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS muscod_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 

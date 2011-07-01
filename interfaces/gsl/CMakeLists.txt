@@ -17,4 +17,8 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(gsl_interface SHARED ${GSL_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS gsl_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 

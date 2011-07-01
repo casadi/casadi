@@ -75,3 +75,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi SHARED ${CASADI_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS casadi
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

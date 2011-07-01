@@ -15,3 +15,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS csparse_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

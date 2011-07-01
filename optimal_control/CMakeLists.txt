@@ -17,3 +17,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(optimal_control SHARED ${OPTIMAL_CONTROL})
 endif(ENABLE_SHARED)
+install(TARGETS optimal_control
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

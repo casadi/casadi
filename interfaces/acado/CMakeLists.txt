@@ -19,4 +19,8 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(acado_interface SHARED ${ACADO_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS acado_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 

@@ -17,3 +17,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(liftopt_interface SHARED ${LIFTOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS liftopt_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

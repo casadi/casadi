@@ -28,4 +28,8 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(sundials_interface SHARED ${SUNDIALS_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS sundials_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 

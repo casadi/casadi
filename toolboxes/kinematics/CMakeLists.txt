@@ -27,6 +27,11 @@ IF(ENABLE_SHARED)
      kinetics.cpp
    )
 ENDIF(ENABLE_SHARED)
+
+install(TARGETS kinematics
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
      
 
 add_subdirectory(test)

@@ -16,3 +16,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(knitro_interface SHARED ${KNITRO_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+install(TARGETS knitro_interface
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
