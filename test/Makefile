@@ -1,6 +1,9 @@
 all: unittests
 
-full: unittests examples tutorials
+full: unittests examples tutorials benchmarks
+
+benchmarks:
+	cd python && python complexity.py && cd ..
 
 unittests: unittests_py unittests_oct
 	
