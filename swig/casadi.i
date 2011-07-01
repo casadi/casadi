@@ -248,12 +248,12 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 // Optimal control
 %include "optimal_control.i"
 
+%include "casadi/fx/qp_solver.hpp"
+
 #ifdef WITH_OOQP
 %{
-#include "casadi/fx/qp_solver.hpp"
 #include "interfaces/ooqp/ooqp_solver.hpp"
 %}
-%include "casadi/fx/qp_solver.hpp"
 %include "interfaces/ooqp/ooqp_solver.hpp"
 #endif
 
