@@ -1,5 +1,4 @@
-all:
-	doxygen Doxyfile.in
+all: dox
 
 options:
 	python extra/generate_options_doc.py
@@ -7,8 +6,11 @@ options:
 examples:
 	python extra/fetch_examples_pdf.py
 
-full:
+dox:
 	doxygen Doxyfile.in
+	cp style/casadi.png html/casadi.png
+
+full: dox
 	python extra/generate_options_doc.py
 	python extra/fetch_examples_pdf.py
 	doxygen Doxyfile.in
