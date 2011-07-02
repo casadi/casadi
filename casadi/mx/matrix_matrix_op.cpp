@@ -33,7 +33,7 @@ namespace CasADi{
 
 MatrixMatrixOp::MatrixMatrixOp(Operation op_, MX x, MX y) : op(op_){
   // Put densifying nodes in between if necessary
-  if(!SX::f00_is_zero_[op] && !(x.dense() || y.dense())){
+  if(!casadi_math<double>::f00_is_zero[op] && !(x.dense() || y.dense())){
     if(x.size()>y.size()) // enough to make one of them dense
       makeDense(x);
     else

@@ -593,25 +593,6 @@ void SX::setTemp(int t){
   (*this)->temp = t;
 }
 
-std::vector<bool> SX::is_always_zero(bool x_is_zero, bool y_is_zero){
-  std::vector<bool> ret(NUM_BUILT_IN_OPS);
-  
-  // Variables
-  SX x,y,f;
-  x = x_is_zero ? 0. : SX("x");
-  y = y_is_zero ? 0. : SX("y");
-
-  for(int op=0; op<ret.size(); ++op){
-    casadi_math<SX>::fun[op](x,y,f);
-    ret[op] = casadi_limits<SX>::isZero(f);
-  }
-  
-  return ret;
-}
-
-std::vector<bool> SX::f00_is_zero_ = SX::is_always_zero(true,true);
-std::vector<bool> SX::fx0_is_zero_ = SX::is_always_zero(false,true);
-std::vector<bool> SX::f0x_is_zero_ = SX::is_always_zero(true,false);
 
 
 } // namespace CasADi

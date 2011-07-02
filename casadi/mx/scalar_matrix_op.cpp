@@ -33,7 +33,7 @@ namespace CasADi{
 
 ScalarMatrixOp::ScalarMatrixOp(Operation op_, const MX& x, MX y) : op(op_){
   // Put densifying node in between if necessary
-  if(!SX::fx0_is_zero_[op]){
+  if(!casadi_math<double>::fx0_is_zero[op]){
     makeDense(y);
   }
   

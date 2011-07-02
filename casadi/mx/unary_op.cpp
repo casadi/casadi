@@ -31,7 +31,7 @@ namespace CasADi{
 
 UnaryOp::UnaryOp(Operation op_, MX x) : op(op_){
   // Put a densifying node in between if necessary
-  if(!SX::f00_is_zero_[op]){
+  if(!casadi_math<double>::f00_is_zero[op]){
     makeDense(x);
   }
   
