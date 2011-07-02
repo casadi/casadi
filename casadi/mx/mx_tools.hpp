@@ -181,6 +181,8 @@ MX operator<=(const MX& a, const MX& b);
 MX operator!(const MX& a);
 #endif // SWIG
 
+/** \brief  Get the diagonal */
+MX diag(const MX& x);
 
 } // namespace CasADi
 

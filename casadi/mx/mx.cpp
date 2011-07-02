@@ -406,24 +406,23 @@ const Matrix<int>& MX::mapping() {
 
 MX MX::prod(const MX& y) const{
   const MX& x = *this;
-  
-  // Check if any of the factors is zero
-  if(isZero(x) || isZero(y)){
-    return MX::zeros(x.size1(),y.size2());
-  }
-  
-  // Check if any of the factors are identity matrices
-  if(isIdentity(x))
+
+  // Check if we can simplify the product
+  if(isIdentity(x)){
     return y;
-  else if(isIdentity(y))
+  } else if(isIdentity(y)){
     return x;
-  
-  // Check if any of the factors is scalar
-  if (x.numel()==1 || y.numel()==1)
+  } else if(isZero(x) || isZero(y)){
+    return MX::zeros(x.size1(),y.size2());
+  } else if(x.numel()==1 || y.numel()==1){
     return x*y;
-    
-  // Else, create a multiplication node
-  return MX::create(new Multiplication(x,trans(y)));
+  } else if(x.sparsity().diagonal() && y.size2()==1){
+    return diag(x)*y;
+  } else if(y.sparsity().diagonal() && x.size1()==1){
+    return x*trans(diag(y));
+  } else {
+    return MX::create(new Multiplication(x,trans(y)));
+  }
 }
 
 MX MX::rprod(const MX& y) const{

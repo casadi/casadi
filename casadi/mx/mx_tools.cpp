@@ -382,5 +382,19 @@ MX operator!(const MX& a){
   return MX();
 }
 
+MX diag(const MX& x){
+  // Nonzero mapping
+  std::vector<int> mapping;
+  
+  // Get the sparsity
+  CRSSparsity sp = x.sparsity().diag(mapping);
+  
+  // Create a mapping
+  MX ret = MX::create(new Mapping(sp));
+  ret->addDependency(x,mapping);
+  return ret;
+}
+
+
 } // namespace CasADi
 

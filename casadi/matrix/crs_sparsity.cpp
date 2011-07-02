@@ -1055,6 +1055,40 @@ std::string CRSSparsity::dimString() 	const {
   return ss.str();
 }
 
+CRSSparsity CRSSparsity::diag(std::vector<int>& mapping) const{
+  // Make sure that the matrix is square
+  casadi_assert_message(size1()==size2(),"Diag only for square matrice");
+  
+  // Return object
+  CRSSparsity ret(0,1);
+  ret.reserve(std::min(size(),size1()),size1());
+  
+  // Mapping
+  mapping.clear();
+  
+  // Loop over nonzero
+  for(int i=0; i<size1(); ++i){
+    
+    // Enlarge the return matrix
+    ret.resize(i+1,1);
+  
+    // Get to the right nonzero of the row
+    int el = rowind(i);
+    while(el<rowind(i+1) && col(el)<i){
+      el++;
+    }
+    
+    // Add element if nonzero on diagonal
+    if(col(el)==i){
+      ret.getNZ(i,0);
+      mapping.push_back(el);
+    }
+  }
+
+  return ret;
+}
+
+
 
 
 } // namespace CasADi
