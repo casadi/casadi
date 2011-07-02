@@ -824,14 +824,14 @@ CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b){
 
 template<class T>
 CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b){
-  CasADi::casadi_assert_message(0,"not implemented");
+  casadi_assert_message(0,"not implemented");
   CasADi::Matrix<T> ret;
   return ret;
 }
 
 template<class T>
 CasADi::Matrix<T> erf(const CasADi::Matrix<T>& a){
-  CasADi::casadi_assert_message(0,"not implemented");
+  casadi_assert_message(0,"not implemented");
   CasADi::Matrix<T> ret;
   return ret;
 }
