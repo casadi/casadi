@@ -54,12 +54,9 @@ target_link_libraries(cartpoleSnopt
   snopt_interface
 )
 
-add_library(rocketmex STATIC rocketMexLib.cpp)
-target_link_libraries(rocketmex
-    cppocp
-    casadi
+add_library(rocketmex STATIC
+    rocketMexLib.cpp
 )
-    
 add_executable(raptors raptors.cpp)
 target_link_libraries(raptors
   cppocp

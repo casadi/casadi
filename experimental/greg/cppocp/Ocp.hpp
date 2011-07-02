@@ -54,6 +54,11 @@ public:
 
 	void writeOctaveOutput( std::string name );
 	void writeSolution( const char * filename );
+//=======
+	void writeOctaveOutput( std::string name, std::string add);
+	//void writeOctaveOutput( std::string name, double * xOpt);
+	//void writeOctaveOutput( std::string name, std::string add, double * xOpt);
+	//void writeSolution( const char * filename, double * xOpt );
 	void loadGuess( const char * filename );
 
 	// multiple shooting instances
