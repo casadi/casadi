@@ -285,7 +285,7 @@ void IpoptQPInternal::init(){
   solver = IpoptSolver(QP_f,QP_g,QP_h,QP_j,QP_gf);
 
   if (getOption("convex").toBool()) {
-    setOption("mehrotra_algorithm","true");
+    setOption("mehrotra_algorithm","yes");
     setOption("mu_oracle","probing");
   }
   
