@@ -255,10 +255,9 @@ class ADtests(casadiTestCase):
               self.checkarray(Jf.output(),J,"Jacobian")
 
   def test_jacMX(self):
-    return # Not yet implemented
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column"]:
-      for outputshape in ["column"]:
+      for outputshape in ["column","row"]:
         for inputtype in ["dense"]:
           for outputtype in ["dense"]:
             for mode in ["forward","adjoint"]:
