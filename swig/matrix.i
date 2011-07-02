@@ -264,7 +264,7 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
 
 template <>
 bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
-  return CasADi::Slice::isa(p) || PyInt_Check(p) || PySlice_Check(p);
+  return meta< CasADi::Slice >::isa(p) || PyInt_Check(p) || PySlice_Check(p);
 }
 %}
 #endif //SWIGPYTHON
