@@ -38,6 +38,7 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &G_,
   addOption("convex", OT_BOOLEAN, false, "Specify true if you can guarantee that H will always be positive definite");
 
   nx = H.size2();
+  nc = G.size1();
   if (G.size1()!=nx || A.size2()!=nx || H.size1()!=H.size2() || G.numel() != G.size() || G.size2()!=1 ) {
     stringstream ss;
     ss << "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl;
