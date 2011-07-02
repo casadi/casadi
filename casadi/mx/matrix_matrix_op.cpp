@@ -25,6 +25,7 @@
 #include <vector>
 #include <sstream>
 #include "../matrix/matrix_tools.hpp"
+#include "../sx/sx_tools.hpp"
 
 using namespace std;
 
@@ -144,16 +145,16 @@ void MatrixMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& outpu
 }
 
 MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
-  casadi_assert_message(op==SUB || op==ADD || op==MUL, "only addition, subtraction and multiplication implemented (quick hack)");
-
-  if(op==SUB)
+  if(op==SUB){
     return jx[0]-jx[1];
-  else if(op==ADD)
+  } else if(op==ADD){
     return jx[0]+jx[1];
-  else if(op==MUL)
-    return dep(0)*jx[1] + jx[0]*dep(1);
-        
-  return MX();
+  } else {
+    MX f = MX::create(this);
+    MX pd[2];
+    casadi_math<MX>::der[op](dep(0),dep(1),f,pd);
+    return pd[0]*jx[0] + pd[1]*jx[1];
+  }
 }
 
 void MatrixMatrixOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
@@ -161,12 +162,6 @@ void MatrixMatrixOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& o
   r.binary_old(casadi_math<SX>::funE[op],*input[0],*input[1]);
   casadi_assert(output.sparsity()==r.sparsity());
   output.set(r);
-  
-  // casadi_math<DMatrix>::funE; // works
-  // casadi_math<SXMatrix>::funE; // works
-//  casadi_math<MX>::funE; // FIXME
-  
-  
 }
 
 

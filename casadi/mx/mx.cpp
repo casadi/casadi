@@ -445,28 +445,36 @@ MX MX::outer_prod(const MX& y) const{
   return prod(trans(y));
 }
 
+MX MX::__pow__(const MX& n) const{
+  if(n->isConstant()){
+    return MX::binary(CONSTPOW,*this,n);
+  } else {
+    return MX::binary(POW,*this,n);
+  }
+}
+
 MX MX::constpow(const MX& b) const{    
-  return std::constpow(*this,b);
+  return binary(CONSTPOW,*this,b);
 }
 
 MX MX::fmin(const MX& b) const{       
-  return std::fmin(*this,b);
+  return binary(FMIN,*this,b);
 }
 
 MX MX::fmax(const MX& b) const{       
-  return std::fmax(*this,b);
+  return binary(FMAX,*this,b);
 }
 
 MX MX::exp() const{ 
-  return std::exp(*this);
+  return unary(EXP,*this);
 }
 
 MX MX::log() const{ 
-  return std::log(*this);
+  return unary(LOG,*this);
 }
 
 MX MX::sqrt() const{ 
-  return std::sqrt(*this);
+  return unary(SQRT,*this);
 }
 
 MX MX::sin() const{ 
@@ -474,35 +482,35 @@ MX MX::sin() const{
 }
 
 MX MX::cos() const{ 
-  return std::cos(*this);
+  return unary(COS,*this);
 }
 
 MX MX::tan() const{ 
-  return std::tan(*this);
+  return unary(TAN,*this);
 }
 
 MX MX::arcsin() const{ 
-  return std::asin(*this);
+  return unary(ASIN,*this);
 }
 
 MX MX::arccos() const{ 
-  return std::acos(*this);
+  return unary(ACOS,*this);
 }
 
 MX MX::arctan() const{ 
-  return std::atan(*this);
+  return unary(ATAN,*this);
 }
 
 MX MX::floor() const{ 
-  return std::floor(*this);
+  return unary(FLOOR,*this);
 }
 
 MX MX::ceil() const{ 
-  return std::ceil(*this);
+  return unary(CEIL,*this);
 }
 
 MX MX::erf() const{ 
-  return std::erf(*this);
+  return unary(ERF,*this);
 }
 
 MX MX::__add__(const MX& b) const{    return *this + b;}
@@ -513,7 +521,6 @@ MX MX::__mul__(const MX& b) const{    return *this * b;}
 MX MX::__rmul__(const MX& b) const{   return b * *this;}
 MX MX::__div__(const MX& b) const{    return *this / b;}
 MX MX::__rdiv__(const MX& b) const{   return b / *this;}
-MX MX::__pow__(const MX& b) const {    return std::pow(*this,b);}
 MX MX::__rpow__(const MX& b) const {   return std::pow(b,*this);}
 MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__rmrdivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmrdivide: Not implemented");}
@@ -522,82 +529,75 @@ MX MX::__rmldivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*th
 MX MX::__mpower__(const MX& b) const  {   return std::pow(*this,b); throw CasadiException("mpower: Not implemented");}
 MX MX::__rmpower__(const MX& b) const {   return std::pow(b,*this); throw CasadiException("rmpower: Not implemented");}
 
-
 } // namespace CasADi
-
 
 using namespace CasADi;
 namespace std{
 
 MX exp(const MX& x){
-  return MX::unary(EXP,x);
+  return x.exp();
 }
 
 MX log(const MX& x){
-  return MX::unary(LOG,x);
+  return x.log();
 }
 
 MX sqrt(const MX& x){
-  return MX::unary(SQRT,x);
+  return x.sqrt();
 }
 
 MX sin(const MX& x){
   return x.sin();
 }
 
-MX cos(const MX& x){;  
-  return MX::unary(COS,x);
+MX cos(const MX& x){
+  return x.cos();
 }
 
 MX tan(const MX& x){
-  return MX::unary(TAN,x);
+  return x.tan();
 }
 
 MX atan(const MX& x){
-  return MX::unary(ATAN,x);
+  return x.arctan();
 }
 
 MX asin(const MX& x){
-  return MX::unary(ASIN,x);
+  return x.arcsin();
 }
 
 MX acos(const MX& x){
-  return MX::unary(ACOS,x);
+  return x.arccos();
 }
 
 MX pow(const MX& x, const MX& n){
-  if(n->isConstant()){
-    return MX::binary(CONSTPOW,x,n);
-  } else {
-    return MX::binary(POW,x,n);
-  }
+  return x.__pow__(n);
 }
 
 MX constpow(const MX& x, const MX& n){
-  return MX::binary(CONSTPOW,x,n);
+  return x.constpow(n);
 }
 
-MX erf(const MX& x){
-  return MX::unary(ERF,x);
-}
 
 MX floor(const MX& x){
-  return MX::unary(FLOOR,x);
+  return x.floor();
 }
 
 MX ceil(const MX& x){
-  return MX::unary(CEIL,x);
+  return x.ceil();
+}
+
+} // namespace std
+
+// GLobal namespace
+MX erf(const MX& x){
+  return x.erf();
 }
 
 MX fmin(const MX& x, const MX& y){
-  return MX::binary(FMIN,x,y);
+  return x.fmin(y);
 }
 
 MX fmax(const MX& x, const MX& y){
-  return MX::binary(FMAX,x,y);
+  return x.fmax(y);
 }
-
-
-
-
-} // namespace std

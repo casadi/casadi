@@ -178,9 +178,7 @@ MX reshape(const MX &x, const std::vector<int> sz){
 }
 
 MX reshape(const MX &x, int n, int m){
-  // only works if dense
-  casadi_assert_message(x.size()==x.numel(),"Sparse reshape not implemented");
-  return reshape(x,CRSSparsity(n,m,true));
+  return reshape(x,x.sparsity().reshape(n,m));
 }
 
 MX reshape(const MX &x, const CRSSparsity& sp){
@@ -365,6 +363,21 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
 }
 
 MX operator==(const MX& a, const MX& b){
+  casadi_assert_message(0,"Not implemented");
+  return MX();
+}
+
+MX operator>=(const MX& a, const MX& b){
+  casadi_assert_message(0,"Not implemented");
+  return MX();
+}
+
+MX operator<=(const MX& a, const MX& b){
+  casadi_assert_message(0,"Not implemented");
+  return MX();
+}
+
+MX operator!(const MX& a){
   casadi_assert_message(0,"Not implemented");
   return MX();
 }

@@ -483,7 +483,7 @@ SX casadi_operators<SX>::fmax(const SX&x, const SX&y){
 }
 
 SX casadi_operators<SX>::pow(const SX&x, const SX&y){
-  return x.pow(y);
+  return x.__pow__(y);
 }
 
 SX casadi_operators<SX>::constpow(const SX&x, const SX&y){
@@ -555,7 +555,7 @@ SX SX::fmax(const SX &b) const{
   return SX(new BinarySXNode(FMAX,*this,b));
 }
 
-SX SX::pow(const SX& n) const{
+SX SX::__pow__(const SX& n) const{
   if(n->isConstant()) {
     if (n->isInteger()){
       int nn = n->getIntValue();
@@ -564,11 +564,11 @@ SX SX::pow(const SX& n) const{
       else if(nn>100 || nn<-100) // maximum depth
         return SX(new BinarySXNode(CONSTPOW,*this,nn));
       else if(nn<0) // negative power
-        return 1/pow(-nn);
+        return 1/pow(*this,-nn);
       else if(nn%2 == 1) // odd power
-        return *this*pow(nn-1);
+        return *this*pow(*this,nn-1);
       else{ // even power
-        SX rt = pow(nn/2);
+        SX rt = pow(*this,nn/2);
         return rt*rt;
       }
     } else if(n->getValue()==0.5){

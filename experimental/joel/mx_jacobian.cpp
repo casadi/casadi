@@ -134,6 +134,44 @@ void mapping(){
   
 }
 
+void multiplication(){
+  MX X("X",4);
+  MX Y("Y",4);
+  vector<MX> XY(2); XY[0] = X; XY[1] = Y;
+  
+  MX F = prod(reshape(X,2,2),reshape(Y,2,2));
+  cout << "F = " << F << endl;
+  
+  MXFunction Fcn(XY,F);
+  Fcn.init();
+  
+  // Generate Jacobian
+  MX J1 = Fcn.jac()[0];
+  cout << "J1 = " << J1 << endl;
+  MXFunction Jfcn1(XY,J1);
+  Jfcn1.init();
+  SXFunction Jfcn2(Jfcn1);
+  cout << "J (mx) = " << endl << Jfcn2.outputSX() << endl;
+  cout << "nnz(J) = " << Jfcn2.outputSX().size() << endl;
+  
+  SXMatrix x = symbolic("x",4);
+  SXMatrix y = symbolic("y",4);
+  SXMatrix f = prod(reshape(x,2,2),reshape(y,2,2));
+  vector<SXMatrix> xy(2); xy[0] = x; xy[1] = y;
+  SXFunction fcn(xy,f);
+  fcn.init();
+  SXMatrix Jfcn3 = fcn.jac();
+  
+  cout << "J (sx) = " << endl << Jfcn3 << endl;
+  cout << "nnz(J) = " << Jfcn3.size() << endl;
+  
+/*  cout << */
+  
+  
+/*  cout << "f = "*/
+  
+}
+
 int main(){
 
   // Only symbolic variables
@@ -147,6 +185,9 @@ int main(){
     
   // Nonzero mappings
   mapping();
-  
+
+  // Matrix multiplication
+  multiplication();
+
   return 0;
 }

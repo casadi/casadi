@@ -87,23 +87,17 @@ void ScalarMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& outpu
   }
 }
 
-//       // Derivative functions
-//   casadi_math<MX>::print[SUB](cout,"x","y");
-//   MX x("x"), y("y");
-//   vector<MX> d(2);
-//   casadi_math<MX>::der[SUB](x,y,x-y,&d.front());
-
 MX ScalarMatrixOp::adFwd(const std::vector<MX>& jx){
-  casadi_assert_message(op==SUB || op==ADD || op==MUL, "only addition, subtraction and multiplication implemented (quick hack)");
-
-  if(op==SUB)
+  if(op==SUB){
     return jx[0]-jx[1];
-  else if(op==ADD)
+  } else if(op==ADD){
     return jx[0]+jx[1];
-  else if(op==MUL)
-    return dep(0)*jx[1] + jx[0]*dep(1);
-        
-  return MX();
+  } else {
+    MX f = MX::create(this);
+    MX pd[2];
+    casadi_math<MX>::der[op](dep(0),dep(1),f,pd);
+    return pd[0]*jx[0] + pd[1]*jx[1];
+  }
 }
 
 void ScalarMatrixOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){

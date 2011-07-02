@@ -178,6 +178,18 @@ class SX{
 
     /** \brief  Negation */
     SX operator-() const;
+
+    //  all binary operations
+    SX __add__(const SX& b) const{  return *this + b;}
+    SX __radd__(const SX& b) const{ return b + *this;}
+    SX __sub__(const SX& b) const{  return *this - b;}
+    SX __rsub__(const SX& b) const{ return b - *this;}
+    SX __mul__(const SX& b) const{  return *this * b;}
+    SX __rmul__(const SX& b) const{ return b * *this;}
+    SX __div__(const SX& b) const{  return *this / b;}
+    SX __rdiv__(const SX& b) const{ return b / *this;}
+    SX __pow__(const SX& b) const;
+    SX __rpow__(const SX& b) const{ return b.__pow__(*this);}
     
     /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
     SX exp() const;
@@ -199,7 +211,6 @@ class SX{
     SX div(const SX& y) const;
     SX fmin(const SX &b) const;
     SX fmax(const SX &b) const;
-    SX pow(const SX& n) const;
     SX constpow(const SX& n) const;
     
     // Get the temporary variable
@@ -232,25 +243,6 @@ std::string __str__()  { return $self->toString(); }
 std::string __repr__() { return $self->toString(); }
 double __float__() { return $self->getValue();}
 int __int__() { return $self->getIntValue();}
-
-//  all binary operations with a particular right argument
-#define binops(T,t) \
-T __add__(t b){  return *$self + b;} \
-T __radd__(t b){ return b + *$self;} \
-T __sub__(t b){  return *$self - b;} \
-T __rsub__(t b){ return b - *$self;} \
-T __mul__(t b){  return *$self * b;} \
-T __rmul__(t b){ return b * *$self;} \
-T __div__(t b){  return *$self / b;} \
-T __rdiv__(t b){ return b / *$self;} \
-T __pow__(t b){  return std::pow(*$self,b);} \
-T __rpow__(t b){ return std::pow(b,*$self);} \
-
-// Binary operations with all right hand sides
-binops(SX, const SX&)
-binops(SX, double)
-
-#undef binops
 }
 #endif // SWIG
 
@@ -373,7 +365,7 @@ namespace std{
   inline SX acos(const SX &x){return x.arccos();}
   inline SX exp(const SX &x){return x.exp();}
   inline SX log(const SX &x){return x.log();}
-  inline SX pow(const SX &x, const SX &n){ return x.pow(n);}
+  inline SX pow(const SX &x, const SX &n){ return x.__pow__(n);}
   inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
   inline SX abs(const SX &x){return x.fabs();}
   inline SX fabs(const SX &x){return x.fabs();}

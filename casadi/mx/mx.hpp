@@ -27,7 +27,6 @@
 #include "../matrix/matrix.hpp"
 #include "../sx/sx.hpp"
 #include <vector>
-
 namespace CasADi{
   
 /** \brief  Forward declaration */
@@ -338,34 +337,6 @@ typedef std::vector<vDMatrixP> vvDMatrixP;
 }
 #endif // SWIG
 } // namespace CasADi
-
-#ifndef SWIG  
-namespace std{
-//@{
-/** \brief  Functions with c equivalents: The implementation and syntax mirrors the standard c functions in math.h */
-#define MX CasADi::MX
-MX sqrt(const MX &x);
-MX sin(const MX &x);
-MX cos(const MX &x);
-MX tan(const MX &x);
-MX atan(const MX &x);
-MX asin(const MX &x);
-MX acos(const MX &x);
-MX exp(const MX &x);
-MX log(const MX &x);
-MX pow(const MX &x, const MX &n);
-MX constpow(const MX &x, const MX &n);
-MX abs(const MX &x);
-MX fabs(const MX &x); // same as abs
-MX floor(const MX &x);
-MX ceil(const MX &x);
-MX erf(const MX &x);
-MX fmin(const MX &a, const MX &b);
-MX fmax(const MX &a, const MX &b);
-#undef MX
-//@}
-} // namespace std
-#endif // SWIG  
 
 #ifdef SWIG 
 // Template instantiations

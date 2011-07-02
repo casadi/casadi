@@ -50,6 +50,9 @@ class Multiplication : public MXNode{
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+    
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
 
 };
 

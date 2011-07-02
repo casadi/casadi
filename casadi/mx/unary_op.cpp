@@ -87,5 +87,14 @@ void UnaryOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
     casadi_math<SX>::fun[op](xd[el],0,od[el]);
   }
 }
+
+MX UnaryOp::adFwd(const std::vector<MX>& jx){
+  MX f = MX::create(this);
+  MX dummy;
+  MX pd[2];
+  casadi_math<MX>::der[op](dep(0),dummy,f,pd);
+  return pd[0]*jx[0];
+}
+
 } // namespace CasADi
 
