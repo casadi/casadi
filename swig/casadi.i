@@ -248,6 +248,10 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 // ACADO
 #ifdef WITH_ACADO
 %include "acado_interface.i"
+%{
+#include "interfaces/qpoases/qpoases_solver.hpp"
+%}
+%include "interfaces/qpoases/qpoases_solver.hpp"
 #endif
 
 // Sundials

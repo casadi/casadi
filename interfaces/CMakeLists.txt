@@ -23,6 +23,7 @@ ENDIF (IPOPT_FOUND)
 find_package(ACADO)
 if(ACADO_FOUND)
 add_subdirectory(acado)
+add_subdirectory(qpoases)
 endif(ACADO_FOUND)
 
 find_package(KNITRO)

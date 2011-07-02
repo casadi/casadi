@@ -228,7 +228,7 @@ void IpoptQPInternal::evaluate(int nfdir, int nadir) {
 }
 
 void IpoptQPInternal::init(){
-  
+  std::cout << "okay" << std::endl;
   QPSolverInternal::init();
 
   // Create an MX for the decision variables
@@ -251,19 +251,19 @@ void IpoptQPInternal::init(){
   H_=variables[0];
   G_=variables[1];
   A_=variables[2];
-
+  std::cout << "okay" << std::endl;
   // We're going to use two-argument objective and constraints to allow the use of parameters
   std::vector< MX > args;
   args.push_back(X);
   args.push_back(V);
-  
+    std::cout << "okay there" << std::endl;
   // The objective function looks exactly like a mathematical description of the NLP
   MXFunction QP_f(args, prod(trans(G_),X) + 0.5*prod(prod(trans(X),H_),X));
   QP_f.init();
 
   // So does the constraint function
   MXFunction QP_g(args, prod(A_,X));
-  
+  std::cout << "okay here" << std::endl;
   // Jacobian of the constraints
   MXFunction QP_j(args,A_);
   
@@ -271,16 +271,17 @@ void IpoptQPInternal::init(){
   // Gradient of the objective
   MXFunction QP_gf(args,G_+prod(H_,X));
   
-  
+  std::cout << "okay everyzhere" << std::endl;
   MX sigma("sigma");
+    std::cout << "okay 12" << nc << std::endl;
   MX lambda("lambda",nc,1);
-  
+    std::cout << "okay 4" << std::endl;
   args.push_back(lambda);
   args.push_back(sigma);
-  
+    std::cout << "okay 5" << std::endl;
   // Hessian of the Lagrangian
   MXFunction QP_h(args,H_*sigma);
-  
+    std::cout << "okay" << std::endl;
   // Generate an IpoptSolver that uses this objective and constraint
   solver = IpoptSolver(QP_f,QP_g,QP_h,QP_j,QP_gf);
 
@@ -295,7 +296,7 @@ void IpoptQPInternal::init(){
      if (hasSetOption(it->first)) solver.setOption(it->first,it->second);
     }
   }
-
+  std::cout << "okay" << std::endl;
   solver.setOption("jac_c_constant","yes");
   solver.setOption("jac_d_constant","yes");
   solver.setOption("hessian_constant","yes");

@@ -198,8 +198,11 @@ for i=1:numel(S)
     z = sc{1+j}
     -s;
     -z;
+    disp("no")
     z+s;
+    disp("yes")
     s+z;
+    disp("yes")
     s.*z;
     z.*s;
     s-z;
@@ -290,4 +293,13 @@ SXFunction(ffcn_in,{t})
 x=symbolic("x",3,4)
 size(x)
 
-[x x]
+%[x x]
+
+disp("sparsity ref #147") 
+
+
+X = DMatrix(sp_tril(4),5)
+s = casadi.dot(X,X).sparsity()
+
+
+

@@ -184,6 +184,7 @@ class ComplexityTests(casadiTestCase):
     
     self.complexity(setupfun,fun, 1)
 
+
   def test_MXFunctionprodvec(self):
     self.message("MXFunction prod")
     def setupfun(self,N):
@@ -195,6 +196,7 @@ class ComplexityTests(casadiTestCase):
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 1)
+
   def test_MXFunctionprodsparse(self):
     self.message("MXFunction sparse product")
     def setupfun(self,N):
@@ -206,7 +208,14 @@ class ComplexityTests(casadiTestCase):
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 2)  # 1
-
+    self.message("MXFunction sparse sparse product")
+    def setupfun(self,N):
+      H = MX("H",sp_diag(N))
+      X = MX("X",sp_diag(N))
+      f = MXFunction([H,X],[c.prod(H,X)])
+      f.init()
+      return {'f':f}
+    self.complexity(setupfun,fun, 2)  # 1
 
   def test_DMatrixdot(self):
     self.message("DMatrix inner dot vectors")
