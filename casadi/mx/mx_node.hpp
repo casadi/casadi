@@ -137,6 +137,9 @@ class MXNode : public SharedObjectNode{
     /// Add a dependency (mapping matrix)
     virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
 
+    /// Is it a certain operation
+    virtual bool isOperation(int op) const{ return false;}
+    
     /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
     virtual MX jac(int iind);
     

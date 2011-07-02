@@ -137,7 +137,34 @@ MX prod(const MX &x, const MX &y){
 }
 
 bool isZero(const MX& ex){
-  return ex.size()==0;
+  if(ex.size()==0){
+    return true;
+  } else {
+    const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+    if(n==0){
+      return false;
+    } else {
+      return isZero(n->x_);
+    }
+  }
+}
+
+bool isOne(const MX& ex){
+  const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+  if(n==0){
+    return false;
+  } else {
+    return isOne(n->x_);
+  }
+}
+
+bool isMinusOne(const MX& ex){
+  const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+  if(n==0){
+    return false;
+  } else {
+    return isMinusOne(n->x_);
+  }
 }
 
 bool isIdentity(const MX& ex){

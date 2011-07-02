@@ -42,6 +42,7 @@ class casadi_limits{
   public:
     static bool isZero(const T& val){ return val==0; }
     static bool isOne(const T& val){ return val==1;}
+    static bool isMinusOne(const T& val){ return val==-1;}
     static bool isConstant(const T& val){ return true;}
     static bool isInteger(const T& val){ return val==int(val);}
     static bool isInf(const T& val){ return std::numeric_limits<T>::has_infinity ? val==std::numeric_limits<T>::infinity() : false;}

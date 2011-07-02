@@ -166,6 +166,12 @@ template<class T>
 bool isZero(const Matrix<T>& ex);
 
 template<class T>
+bool isOne(const Matrix<T>& ex);
+
+template<class T>
+bool isMinusOne(const Matrix<T>& ex);
+
+template<class T>
 bool isIdentity(const Matrix<T>& ex);
 
 template<class T>
@@ -677,6 +683,34 @@ Matrix<T> linspace(const Matrix<T> &a_, const Matrix<T> &b_, int nsteps){
 }
 
 template<class T>
+bool isOne(const Matrix<T>& ex){  
+  if(!ex.dense()){
+    return false;
+  }
+  
+  // loop over non-zero elements
+  for(int el=0; el<ex.size(); ++el)
+    if(!casadi_limits<T>::isOne(ex.at(el)))
+      return false;
+  
+  return true;
+}
+
+template<class T>
+bool isMinusOne(const Matrix<T>& ex){  
+  if(!ex.dense()){
+    return false;
+  }
+  
+  // loop over non-zero elements
+  for(int el=0; el<ex.size(); ++el)
+    if(!casadi_limits<T>::isMinusOne(ex.at(el)))
+      return false;
+  
+  return true;
+}
+
+template<class T>
 bool isZero(const Matrix<T>& ex) {  
 
   // loop over (potentially) non-zero elements
@@ -879,6 +913,8 @@ MTT_INST(T,qr) \
 MTT_INST(T,solve) \
 MTT_INST(T,linspace) \
 MTT_INST(T,isZero) \
+MTT_INST(T,isOne) \
+MTT_INST(T,isMinusOne) \
 MTT_INST(T,isIdentity) \
 MTT_INST(T,nnz) \
 MTT_INST(T,nnz_sym) \

@@ -140,6 +140,12 @@ bool isIdentity(const MX& ex);
 /** \brief  check if zero */
 bool isZero(const MX& ex);
 
+/** \brief  check if zero */
+bool isOne(const MX& ex);
+
+/** \brief  check if zero */
+bool isMinusOne(const MX& ex);
+
 MX trace(const MX& A);
 
 /** \brief Repeat matrix A n times vertically and m times horizontally */

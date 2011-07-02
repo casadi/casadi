@@ -145,16 +145,10 @@ void MatrixMatrixOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& outpu
 }
 
 MX MatrixMatrixOp::adFwd(const std::vector<MX>& jx){
-  if(op==SUB){
-    return jx[0]-jx[1];
-  } else if(op==ADD){
-    return jx[0]+jx[1];
-  } else {
-    MX f = MX::create(this);
-    MX pd[2];
-    casadi_math<MX>::der[op](dep(0),dep(1),f,pd);
-    return pd[0]*jx[0] + pd[1]*jx[1];
-  }
+  MX f = MX::create(this);
+  MX pd[2];
+  casadi_math<MX>::der[op](dep(0),dep(1),f,pd);
+  return pd[0]*jx[0] + pd[1]*jx[1];
 }
 
 void MatrixMatrixOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){

@@ -234,14 +234,46 @@ int MX::size2() const{
 }
 
 MX operator+(const MX &x, const MX &y){
-  return MX::binary(ADD,x,y);
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.numel()==1) && isZero(x)){
+    return y;
+  } else if((samedim || y.numel()==1) && isZero(y)){
+    return x;
+  } else if(y->isOperation(NEG)){
+    return x - y->dep(0);
+  } else if(x->isOperation(NEG)){
+    return y - x->dep(0);
+  } else {
+    return MX::binary(ADD,x,y);
+  }
 }
 
 MX operator-(const MX &x, const MX &y){
-  return MX::binary(SUB,x,y);
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.numel()==1) && isZero(x)){
+    return -y;
+  } else if((samedim || y.numel()==1) && isZero(y)){
+    return x;
+  } else if(y->isOperation(NEG)){
+    return x+y->dep(0);
+  } else if(y.get()==x.get()){
+    return MX::zeros(x.size1(),x.size2());
+  } else {
+    return MX::binary(SUB,x,y);
+  }
 }
 
 MX MX::binary(int op, const MX &x, const MX &y){
+  // Make sure that dimensions match
+  casadi_assert_message((x.numel()==1 || y.numel()==1 || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch");
+  
+  // Quick return if zero
+  if((casadi_math<double>::f0x_is_zero[op] && isZero(x)) || 
+    (casadi_math<double>::fx0_is_zero[op] && isZero(y))){
+    return zeros(std::max(x.size1(),y.size1()),std::max(x.size2(),y.size2()));
+  }
+  
+  // Create binary node
   if(x.numel()==1)
     return scalar_matrix(op,x,y);
   else if(y.numel()==1)  
@@ -251,7 +283,12 @@ MX MX::binary(int op, const MX &x, const MX &y){
 }
 
 MX MX::unary(int op, const MX &x){
-  return create(new UnaryOp(Operation(op),x));
+  // Quick return if zero
+  if(casadi_math<double>::f0x_is_zero[op] && isZero(x)){
+    return zeros(x.size1(),x.size2());
+  } else {
+    return create(new UnaryOp(Operation(op),x));
+  }
 }
 
 MX MX::scalar_matrix(int op, const MX &x, const MX &y){
@@ -267,11 +304,27 @@ MX MX::matrix_matrix(int op, const MX &x, const MX &y){
 }
 
 MX operator*(const MX &x, const MX &y){
-  return MX::binary(MUL,x,y);
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.numel()==1) && isOne(x)){
+    return y;
+  } else if((samedim || x.numel()==1) && isMinusOne(x)){
+    return -y;
+  } else if((samedim || y.numel()==1) && isOne(y)){
+    return x;
+  } else if((samedim || y.numel()==1) && isMinusOne(y)){
+    return -x;
+  } else {
+    return MX::binary(MUL,x,y);
+  }
 }
 
 MX operator/(const MX &x, const MX &y){
-  return MX::binary(DIV,x,y);
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || y.numel()==1) && isOne(y)){
+    return x;
+  } else {
+    return MX::binary(DIV,x,y);
+  }
 }
 
 MXNode* MX::operator->(){
@@ -325,7 +378,11 @@ MX MX::eye(int n){
 
 
 MX MX::operator-() const{
-  return unary(NEG,*this);
+  if((*this)->isOperation(NEG)){
+    return (*this)->dep(0);
+  } else {
+    return unary(NEG,*this);
+  }
 }
 
 MX::MX(const MX& x) : SharedObject(x){

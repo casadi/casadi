@@ -54,7 +54,9 @@ public:
   /// Symbolic forward sensitivities
   virtual MX adFwd(const std::vector<MX>& jx);
 
-protected:
+  /// Is it a certain operation
+  virtual bool isOperation(int op__) const{ return op__==op;};
+
   //! \brief operation
   Operation op;
 };

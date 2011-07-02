@@ -248,6 +248,7 @@ class casadi_limits<SX>{
   public:
     static bool isZero(const SX& val);
     static bool isOne(const SX& val);
+    static bool isMinusOne(const SX& val);
     static bool isConstant(const SX& val);
     static bool isInteger(const SX& val);
     static bool isInf(const SX& val);

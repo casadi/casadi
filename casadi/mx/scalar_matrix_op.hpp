@@ -54,6 +54,9 @@ class ScalarMatrixOp : public MXNode{
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
 
+    /// Is it a certain operation
+    virtual bool isOperation(int op__) const{ return op__==op;};
+
     //! \brief Operation
     Operation op;
 };

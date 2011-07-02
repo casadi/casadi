@@ -369,6 +369,10 @@ bool casadi_limits<SX>::isOne(const SX& val){
   return val.isOne();
 }
 
+bool casadi_limits<SX>::isMinusOne(const SX& val){ 
+  return val.isMinusOne();
+}
+
 bool casadi_limits<SX>::isConstant(const SX& val){
   return val.isConstant();
 }
