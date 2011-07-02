@@ -153,7 +153,7 @@ MX inner_prod(const MX &x, const MX &y){
 }
 
 MX outer_prod(const MX &x, const MX &y){
-  x.outer_prod(y);
+  return x.outer_prod(y);
 }
 
 MX trans(const MX &x){

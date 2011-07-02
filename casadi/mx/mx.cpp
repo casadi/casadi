@@ -133,7 +133,7 @@ void MX::setSub(const std::vector<int>& i, int j, const MX& el){
 void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
   // Allow el to be a 1x1
   if (el.size()==1 && el.numel()==1) {
-    if (ii.size()>1 or jj.size()>1) {
+    if (ii.size()>1 || jj.size()>1) {
       setSub(ii,jj,MX(ii.size(),jj.size(),el));
       return;
     }

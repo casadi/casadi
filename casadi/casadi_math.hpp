@@ -559,35 +559,35 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
   
 #ifdef _MSC_VER
   // Specify operations
-  ret[ADD] = reinterpret_cast<funT>(BinaryOperationE<ADD>::fcn);
-  ret[SUB] = reinterpret_cast<funT>(BinaryOperationE<SUB>::fcn);
-  ret[MUL] = reinterpret_cast<funT>(BinaryOperationE<MUL>::fcn);
-  ret[DIV] = reinterpret_cast<funT>(BinaryOperationE<DIV>::fcn);
+  ret[ADD] = reinterpret_cast<funTE>(BinaryOperationE<ADD>::fcn);
+  ret[SUB] = reinterpret_cast<funTE>(BinaryOperationE<SUB>::fcn);
+  ret[MUL] = reinterpret_cast<funTE>(BinaryOperationE<MUL>::fcn);
+  ret[DIV] = reinterpret_cast<funTE>(BinaryOperationE<DIV>::fcn);
     
-  ret[NEG] = reinterpret_cast<funT>(BinaryOperationE<NEG>::fcn);
-  ret[EXP] = reinterpret_cast<funT>(BinaryOperationE<EXP>::fcn);
-  ret[LOG] = reinterpret_cast<funT>(BinaryOperationE<LOG>::fcn);
-  ret[POW] = reinterpret_cast<funT>(BinaryOperationE<POW>::fcn);
-  ret[CONSTPOW] = reinterpret_cast<funT>(BinaryOperationE<CONSTPOW>::fcn);
+  ret[NEG] = reinterpret_cast<funTE>(BinaryOperationE<NEG>::fcn);
+  ret[EXP] = reinterpret_cast<funTE>(BinaryOperationE<EXP>::fcn);
+  ret[LOG] = reinterpret_cast<funTE>(BinaryOperationE<LOG>::fcn);
+  ret[POW] = reinterpret_cast<funTE>(BinaryOperationE<POW>::fcn);
+  ret[CONSTPOW] = reinterpret_cast<funTE>(BinaryOperationE<CONSTPOW>::fcn);
 
-  ret[SQRT] = reinterpret_cast<funT>(BinaryOperationE<SQRT>::fcn);
-  ret[SIN] = reinterpret_cast<funT>(BinaryOperationE<SIN>::fcn);
-  ret[COS] = reinterpret_cast<funT>(BinaryOperationE<COS>::fcn);
-  ret[TAN] = reinterpret_cast<funT>(BinaryOperationE<TAN>::fcn);
+  ret[SQRT] = reinterpret_cast<funTE>(BinaryOperationE<SQRT>::fcn);
+  ret[SIN] = reinterpret_cast<funTE>(BinaryOperationE<SIN>::fcn);
+  ret[COS] = reinterpret_cast<funTE>(BinaryOperationE<COS>::fcn);
+  ret[TAN] = reinterpret_cast<funTE>(BinaryOperationE<TAN>::fcn);
 
-  ret[ASIN] = reinterpret_cast<funT>(BinaryOperationE<ASIN>::fcn);
-  ret[ACOS] = reinterpret_cast<funT>(BinaryOperationE<ACOS>::fcn);
-  ret[ATAN] = reinterpret_cast<funT>(BinaryOperationE<ATAN>::fcn);
+  ret[ASIN] = reinterpret_cast<funTE>(BinaryOperationE<ASIN>::fcn);
+  ret[ACOS] = reinterpret_cast<funTE>(BinaryOperationE<ACOS>::fcn);
+  ret[ATAN] = reinterpret_cast<funTE>(BinaryOperationE<ATAN>::fcn);
 
-  ret[STEP] = reinterpret_cast<funT>(BinaryOperationE<STEP>::fcn);
-  ret[FLOOR] = reinterpret_cast<funT>(BinaryOperationE<FLOOR>::fcn);
-  ret[CEIL] = reinterpret_cast<funT>(BinaryOperationE<CEIL>::fcn);
+  ret[STEP] = reinterpret_cast<funTE>(BinaryOperationE<STEP>::fcn);
+  ret[FLOOR] = reinterpret_cast<funTE>(BinaryOperationE<FLOOR>::fcn);
+  ret[CEIL] = reinterpret_cast<funTE>(BinaryOperationE<CEIL>::fcn);
 
-  ret[EQUALITY] = reinterpret_cast<funT>(BinaryOperationE<EQUALITY>::fcn);
+  ret[EQUALITY] = reinterpret_cast<funTE>(BinaryOperationE<EQUALITY>::fcn);
 
-  ret[ERF] = reinterpret_cast<funT>(BinaryOperationE<ERF>::fcn);
-  ret[FMIN] = reinterpret_cast<funT>(BinaryOperationE<FMIN>::fcn);
-  ret[FMAX] = reinterpret_cast<funT>(BinaryOperationE<FMAX>::fcn);
+  ret[ERF] = reinterpret_cast<funTE>(BinaryOperationE<ERF>::fcn);
+  ret[FMIN] = reinterpret_cast<funTE>(BinaryOperationE<FMIN>::fcn);
+  ret[FMAX] = reinterpret_cast<funTE>(BinaryOperationE<FMAX>::fcn);
 #else // _MSC_VER
   
   // Specify operations

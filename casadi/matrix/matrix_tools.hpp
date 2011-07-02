@@ -238,20 +238,20 @@ void makeDense(Matrix<T>& A);
 Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b);
 
 template<class T>
-Matrix<T> fmin(const Matrix<T>& a, const Matrix<T>& b);
-
-template<class T>
-Matrix<T> fmax(const Matrix<T>& a, const Matrix<T>& b);
-
-template<class T>
 Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
 
-template<class T>
-Matrix<T> erf(const Matrix<T>& a);
-
-
-
 } // namespace CasADi
+
+// Global namespace
+template<class T>
+CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b);
+
+template<class T>
+CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b);
+
+template<class T>
+CasADi::Matrix<T> erf(const CasADi::Matrix<T>& a);
+
 
 #ifndef SWIG
 
@@ -798,19 +798,6 @@ void makeDense(Matrix<T>& A){
   A.makeDense(A.size1(),A.size2(),0);
 }
 
-template<class T>
-Matrix<T> fmin(const Matrix<T>& a, const Matrix<T>& b){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
-  return ret;
-}
-
-template<class T>
-Matrix<T> fmax(const Matrix<T>& a, const Matrix<T>& b){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
-  return ret;
-}
 
 template<class T>
 Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
@@ -819,12 +806,6 @@ Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
   return ret;
 }
 
-template<class T>
-Matrix<T> erf(const Matrix<T>& a){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
-  return ret;
-}
 
 // template<class T>
 // Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b){
@@ -833,6 +814,30 @@ Matrix<T> erf(const Matrix<T>& a){
 
 
 } // namespace CasADi
+
+template<class T>
+CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b){
+  casadi_assert_message(0,"not implemented");
+  CasADi::Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b){
+  CasADi::casadi_assert_message(0,"not implemented");
+  CasADi::Matrix<T> ret;
+  return ret;
+}
+
+template<class T>
+CasADi::Matrix<T> erf(const CasADi::Matrix<T>& a){
+  CasADi::casadi_assert_message(0,"not implemented");
+  CasADi::Matrix<T> ret;
+  return ret;
+}
+
+
+
 
 #endif //SWIG
 
