@@ -25,22 +25,6 @@
 
 %template(StringVector) std::vector<std::string>;
 
-// Move to C++
-#ifndef SWIG
-namespace CasADi{
-  typedef std::vector<bool> BVector;
-  typedef std::vector<std::vector<bool> > BVectorVector;
-  typedef std::vector< std::vector<std::vector<bool> > > BVectorVectorVector;
-  
-  typedef std::vector<int> IVector;
-  typedef std::vector<std::vector<int> > IVectorVector;
-  typedef std::vector< std::vector<std::vector<int> > > IVectorVectorVector;
-  
-  typedef std::vector<double> DVector;
-  typedef std::vector<std::vector<double> > DVectorVector;
-  typedef std::vector< std::vector<std::vector<double> > > DVectorVectorVector;
-} // namespace CasADi
-#else // SWIG
 %template(BVector)             std::vector<bool>;
 %template(BVectorVector)       std::vector<std::vector<bool> > ;
 %template(BVectorVectorVector) std::vector< std::vector<std::vector<bool> > > ;
@@ -55,7 +39,6 @@ namespace CasADi{
 
 %template(Pair_Int_Int) std::pair<int,int>;
 %template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
-#endif // SWIG
 
 // Lower value means wil be checked first
 #define PRECEDENCE_DVector 98
