@@ -32,5 +32,24 @@ double fmin(double x, double y) throw();
 double fmax(double x, double y) throw();
 #endif // __STDC_VERSION__ < 199901L
 
+// Visual Studio workarounds
+#ifdef _MSC_VER
+namespace std{
+  double exp(int x) throw();
+  double log(int x) throw();
+  double sqrt(int x) throw();
+  double pow(int x, int y) throw();
+  double sin(int x) throw();
+  double cos(int x) throw();
+  double tan(int x) throw();
+  double asin(int x) throw();
+  double acos(int x) throw();
+  double atan(int x) throw();
+  int floor(int x) throw();
+  int ceil(int x) throw();
+} // namespace std
+#endif // _MSC_VER
+
+
 
 #endif // PRE_C99_SUPPORT_HPP

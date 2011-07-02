@@ -1,15 +1,9 @@
 cmake_minimum_required(VERSION 2.0)
 project(opticon C CXX)
 
-# Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
-include(CMakeDetermineFortranCompiler)
-if(CMAKE_Fortran_COMPILER)
-  enable_language(Fortran)
-endif(CMAKE_Fortran_COMPILER)
-
 # Options:
-option(ENABLE_STATIC "Compile static libraries (.a)" ON)
-option(ENABLE_SHARED "Compile shared libraries (.so)" OFF)
+option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
+option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
 option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)
 option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 # option(WITH_IPOPT "Compile the Ipopt interface" ON)
@@ -21,6 +15,15 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" OFF)
+option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran linking will be invoked (should not be needed, CMakeDetermineFortranCompiler should do the job)" ON)
+
+if(WITH_FORTRAN)
+  # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
+  include(CMakeDetermineFortranCompiler)
+  if(CMAKE_Fortran_COMPILER)
+    enable_language(Fortran)
+  endif(CMAKE_Fortran_COMPILER)
+endif(WITH_FORTRAN)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
