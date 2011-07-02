@@ -210,6 +210,7 @@ template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting 
 
 template <>
 int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<double> &m) {
+  NATIVERETURN(CasADi::Matrix<double>,m)
   if(p.is_real_matrix()){
     Matrix mat = p.matrix_value();
     m = CasADi::DMatrix(mat.rows(),mat.cols(),0);
@@ -229,7 +230,7 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
 
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
 template <>
-bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) {return p.is_real_matrix() || p.is_real_scalar();}
+bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<double> >::isa(p) || p.is_real_matrix() || p.is_real_scalar();}
 
 %}
 #endif //SWIGOCTAVE
@@ -263,7 +264,7 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
 
 template <>
 bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
-  return PyInt_Check(p) || PySlice_Check(p);
+  return CasADi::Slice::isa(p) || PyInt_Check(p) || PySlice_Check(p);
 }
 %}
 #endif //SWIGPYTHON
