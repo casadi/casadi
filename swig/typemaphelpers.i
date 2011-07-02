@@ -138,6 +138,12 @@ class meta {
 
 %enddef
 
+// Create an output typemap for a const ref such that a copy is made
+%define %outputConstRefCopy(Type)
+%typemap(out) const Type & {
+   $result = SWIG_NewPointerObj((new Type(*$1)), *meta< Type >::name, SWIG_POINTER_OWN |  0 );
+}
+%enddef
 
 /// std::vector< Type >
 #ifdef SWIGPYTHON

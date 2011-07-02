@@ -507,13 +507,8 @@ class Matrix : public PrintableObject{
     /// Const access the non-zero elements
     const std::vector<T>& data() const;
     
-    #ifndef SWIG
     /// Const access the sparsity - reference to data member
     const CRSSparsity& sparsity() const{ return sparsity_; }
-    #else // SWIG
-    /// Const access the sparsity - copy the smart pointer in Python/Octave
-    CRSSparsity sparsity() const{ return sparsity_; }
-    #endif // SWIG
     
     /// Access the sparsity, make a copy if there are multiple references to it
     CRSSparsity& sparsityRef();

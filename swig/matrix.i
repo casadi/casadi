@@ -34,8 +34,10 @@ template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<double> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t;
 template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
+template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasADi__CRSSparsity;
 %}
 
+%outputConstRefCopy(CasADi::CRSSparsity)
 
 
 #ifdef SWIGPYTHON
