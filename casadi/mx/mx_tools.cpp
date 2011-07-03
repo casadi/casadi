@@ -242,9 +242,12 @@ MX reshape(const MX &x, const CRSSparsity& sp){
   casadi_assert(x.size()==sp.size());
   
   // Create a mapping
-  MX ret;
-  ret.assignNode(new Mapping(sp));
+  MX ret = MX::create(new Mapping(sp));
   ret->addDependency(x,range(x.size()));
+  
+  // Simplify mapping if possible
+  simplifyMapping(ret);
+  
   return ret;
 }
 
