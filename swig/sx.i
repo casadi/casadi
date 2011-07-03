@@ -369,19 +369,8 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
 
 template <>
 int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<CasADi::SX> &m) {
-    std::cout << "some cell" <<std::endl;
-  if (p.is_cell()) {
-    std::cout << p.is_empty() <<std::endl;
-    std::cout << p.ndims() <<std::endl;
-    std::cout << p.dims().elem(0) <<std::endl;
-    std::cout << p.dims().elem(1) <<std::endl;
-  }
-  std::cout << "I live" << std::endl;
-  
   NATIVERETURN(CasADi::Matrix<CasADi::SX>, m)
-    std::cout << "I live more" << std::endl;
   NATIVERETURN(CasADi::SX, m)
-    std::cout << "I live yet" << std::endl;
   if(p.is_real_matrix()){
     Matrix mat = p.matrix_value();
     m = CasADi::SXMatrix(mat.rows(),mat.cols(),0);
@@ -400,9 +389,7 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
     CasADi::SX temp;
     for(int i=0; i<nrow; ++i){
       for(int j=0; j<ncol; ++j){
-        std::cout << "Is this here allowed?" << std::endl;
         const octave_value& obj = c(i,j);
-        std::cout << "Sure" << obj.is_defined() << std::endl;
         bool ret = meta< CasADi::SX >::as(obj,temp);
         if(!ret) return false;
         m(i,j)=temp;
@@ -505,7 +492,6 @@ int meta< std::vector< CasADi::Matrix<CasADi::SX> > >::as(const octave_value& p,
     // Get the octave object
     const octave_value& obj_i = p.cell_value()(i);
     
-    std::cout << "Omens" << obj_i.is_real_matrix() << ":" << obj_i.is_empty() <<  std::endl;
     if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
       bool ret = meta< CasADi::Matrix< CasADi::SX > >::as(obj_i,m[i]);
       if(!ret) return false;

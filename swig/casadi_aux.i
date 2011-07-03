@@ -29,7 +29,6 @@ template <>
 int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
   NATIVERETURN(CasADi::GenericType, s)
   if (PyBool_Check(p)) {
-    std::cout << "I am supposed to be a bool" << std::endl;
     s=CasADi::GenericType((bool) PyInt_AsLong(p));
   } else if (PyInt_Check(p)) {
     s=CasADi::GenericType((int) PyInt_AsLong(p));

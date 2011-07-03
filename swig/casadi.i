@@ -150,6 +150,9 @@
 %}
 // Get the NumPy typemaps
 %include "numpy.i"
+%{
+#define SWIG_PYTHON_CAST_MODE 1
+%}
 
 %init %{
 import_array();

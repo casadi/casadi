@@ -248,16 +248,33 @@ template<> char meta< int >::expected_message[] = "Expecting number";
 template <>
 int meta< int >::as(PyObject * p, int &m) {
   NATIVERETURN(int,m)
-  NATIVERETURN(double,m)
-  PyObject *r = PyNumber_Float(p);
-  int ret = !(r==NULL);
-  if (ret)
-    m = PyFloat_AsDouble(r);
-  Py_DECREF(r);
-  return ret;
+  if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p)) {
+    PyObject *r = PyNumber_Long(p);
+    int ret = !(r==NULL);
+    if (ret)
+      m = PyLong_AsLong(r);
+    return ret;
+  } else if (PyObject_HasAttrString(p,"__int__")) {
+    char name[] = "__int__";
+    PyObject *r = PyObject_CallMethod(p, name,0);
+    int ret = !(r==NULL);
+    if (ret)
+      m = PyLong_AsLong(r);
+    return ret;
+  }
 }
 
-template <> bool meta< int >::couldbe(PyObject * p) { return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;}
+
+template <> bool meta< int >::couldbe(PyObject * p) {
+ if (PyObject_HasAttrString(p,"dtype")) {
+   PyObject *r = PyObject_GetAttrString(p,"dtype");
+   PyObject *k = PyObject_GetAttrString(r,"kind");
+   char *kk = PyString_AsString(k);
+   std::cout << kk << std::endl;
+   return kk[0]=='i';
+ }
+ return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) ;
+}
 
 %}
 #endif //SWIGPYTHON
@@ -340,3 +357,16 @@ template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) {
 
 %}
 #endif //SWIGOCTAVE
+
+#ifdef SWIGPYTHON
+%typemap(in) int (int m) {
+  bool result=meta< int >::as($input,m);
+  if (!result)
+    SWIG_exception_fail(SWIG_TypeError,meta< int >::expected_message);
+  $1 = m;
+}
+
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int { $1 = meta< int >::isa($input) || meta< int >::couldbe($input); }
+%typemap(freearg) int {}
+
+#endif //SWIGPYTHON
