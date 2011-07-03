@@ -183,6 +183,29 @@ MX outer_prod(const MX &x, const MX &y){
   return x.outer_prod(y);
 }
 
+void simplifyMapping(MX& ex){
+  // Make sure that we have a mapping with one dependency
+  if(!(ex->isMapping() && ex->ndep()==1))
+    return;
+  
+  // Check sparsity
+  if(!(ex.sparsity() == ex->dep(0).sparsity()))
+    return;
+      
+  // Get the mapping matrix nonzeros
+  const vector<int>& nzmap = ex.mapping().data();
+    
+  // Check if the nonzeros follow in increasing order
+  for(int el=0; el<nzmap.size(); ++el){
+    if(el != nzmap[el]){
+      return;
+    }
+  }
+    
+  // Identity transformation if we reached this point
+  ex = ex->dep(0);
+}
+
 MX trans(const MX &x){
   // Quick return if null or scalar
   if(x.isNull() || x.numel()==1)
@@ -191,10 +214,12 @@ MX trans(const MX &x){
   // Get the tranposed matrix and the corresponding mapping
   vector<int> nzind;
   CRSSparsity sp = x->sparsity().transpose(nzind);
-
-  MX ret;
-  ret.assignNode(new Mapping(sp));
+  MX ret = MX::create(new Mapping(sp));
   ret->addDependency(x,nzind);
+  
+  // Check if the matrix is in fact an identity mapping (this will make sure that trans(trans(x)) -> x
+  simplifyMapping(ret);
+  
   return ret;
 }
 

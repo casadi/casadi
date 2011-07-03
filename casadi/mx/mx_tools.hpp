@@ -143,6 +143,9 @@ bool isZero(const MX& ex);
 /** \brief  check if zero */
 bool isOne(const MX& ex);
 
+/** \brief  Simplify a mapping, if possible */
+void simplifyMapping(MX& ex);
+
 /** \brief  check if zero */
 bool isMinusOne(const MX& ex);
 
