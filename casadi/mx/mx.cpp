@@ -96,9 +96,9 @@ const MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
   CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
  
   // Create return MX
-  MX ret;
-  ret.assignNode(new Mapping(sp));
+  MX ret = MX::create(new Mapping(sp));
   ret->addDependency(*this,mapping);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -115,6 +115,7 @@ const MX MX::getSub(int i, int j) const{
     ret.assignNode(new Mapping(sp));
     ret->addDependency(*this,vector<int>(0));
   }
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -177,6 +178,7 @@ MX MX::getNZ(const vector<int>& k) const{
   MX ret;
   ret.assignNode(new Mapping(sp));
   ret->addDependency(*this,k);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -205,6 +207,7 @@ void MX::setNZ(const vector<int>& k, const MX& el){
   } else {
     ret->addDependency(el,range(k.size()),k);
   }
+  simplifyMapping(ret);
   *this = ret;
 }
 
@@ -404,6 +407,7 @@ void MX::erase(const vector<int>& ii, const vector<int>& jj){
     MX ret;
     ret.assignNode(new Mapping(sp));
     ret->addDependency(*this,mapping);
+    simplifyMapping(ret);
     *this = ret;
   }
 }
@@ -415,7 +419,8 @@ void MX::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& j
   MX ret;
   ret.assignNode(new Mapping(sp));
   ret->addDependency(*this,range(size()));
-  
+  simplifyMapping(ret);
+
   *this = ret;
 }
 

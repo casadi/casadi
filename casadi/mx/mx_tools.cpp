@@ -65,6 +65,7 @@ MX vertcat(const vector<MX>& comp){
       offset += nz;
     }
     
+    simplifyMapping(ret);
     return ret;
   }
 }
@@ -258,9 +259,9 @@ MX vec(const MX &x) {
 
 MX vecNZ(const MX &x) {
   // Create a mapping
-  MX ret;
-  ret.assignNode(new Mapping(CRSSparsity(x.size(),1,true)));
+  MX ret = MX::create(new Mapping(CRSSparsity(x.size(),1,true)));
   ret->addDependency(x,range(x.size()));
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -299,6 +300,7 @@ MX unite(const MX& A, const MX& B){
   ret.assignNode(new Mapping(sp));
   ret->addDependency(A,range(nzA.size()),nzA);
   ret->addDependency(B,range(nzB.size()),nzB);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -447,6 +449,7 @@ MX diag(const MX& x){
   // Create a mapping
   MX ret = MX::create(new Mapping(sp));
   ret->addDependency(x,mapping);
+  simplifyMapping(ret);
   return ret;
 }
 
