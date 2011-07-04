@@ -194,7 +194,7 @@ class BinaryOperation<POW>{
 template<>
 class BinaryOperation<CONSTPOW>{
   public:
-    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "constpow(" << x << "," << y << ")"; }
+    static void print(std::ostream &stream, const std::string& x, const std::string& y){ stream << "pow(" << x << "," << y << ")"; }
     static bool f00_is_zero(){return false;}
     static bool f0x_is_zero(){return false;}
     static bool fx0_is_zero(){return false;}
