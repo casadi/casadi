@@ -206,7 +206,7 @@ FX ParallelizerInternal::jacobian(const vector<pair<int,int> >& jblocks){
     vector<pair<int,int> > jblocks_local;
 
     // Loop over jacobian blocks
-    while(jit->first >= outind_[i] && jit->first < outind_[i+1] && jit->second < inind_[i+1] && (jit->second == -1 || jit->second >= inind_[i])){
+    while(jit != jblocks.end() && jit->first >= outind_[i] && jit->first < outind_[i+1] && jit->second < inind_[i+1] && (jit->second == -1 || jit->second >= inind_[i])){
       jblocks_local.push_back(pair<int,int>(jit->first - outind_[i], jit->second == -1 ? -1 : jit->second - inind_[i]));
       jit++;
     }

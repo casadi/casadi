@@ -185,6 +185,8 @@ MX outer_prod(const MX &x, const MX &y){
 }
 
 void simplifyMapping(MX& ex){
+  return;
+  
   // Make sure that we have a mapping with one dependency
   if(!(ex->isMapping() && ex->ndep()==1))
     return;
