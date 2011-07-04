@@ -151,7 +151,7 @@ class CRSSparsity : public SharedObject{
          Add the element if it does not exist and copy object if it's not unique */
     int getNZ(int i, int j);
     
-    /** \brief Get the index of an existing non-zero element
+    /** \brief Get the index of an exstd::vector<unsigned short>isting non-zero element
          return -1 if the element does not exists */
     int getNZ(int i, int j) const;
 
@@ -178,13 +178,14 @@ class CRSSparsity : public SharedObject{
 
     /** \brief Union of two sparsity patterns
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-    The value is -1 if the non-zero comes from the first (i.e. this) object, 1 if it is from the second and 0 if from both */
-    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<int>& mapping) const;
-
+    The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
+    the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
+    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    
     /** \brief Intersection of two sparsity patterns
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-    The value is -1 if the non-zero comes from the first (i.e. this) object, 1 if it is from the second and 0 if from both */
-    CRSSparsity patternIntersection(const CRSSparsity& y, std::vector<int>& mapping) const;
+    The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
+    CRSSparsity patternIntersection(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
 
     /** \brief Sparsity pattern for a matrix-matrix product
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements

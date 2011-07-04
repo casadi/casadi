@@ -561,21 +561,59 @@ CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
 
 }
 
-CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<int>& mapping) const{
+#if 0
+CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping) const{
+  // Shorthand
+  const CRSSparsity& x = *this;
+
   // Assert dimensions
-  casadi_assert_message(size1()==y.size1(), "The number of rows does not match");
-  casadi_assert_message(size2()==y.size2(), "The number of columns does not match");
+  casadi_assert_message(x.numel()==1 || y.numel()==1 || x==y, "Dimensions does not match");
   
-  // Quick return if the patterns are equal
-  if(*this == y){
-    mapping.resize(size());
-    fill(mapping.begin(),mapping.end(),0);
-    return *this;
+  // Return sparsity
+  CRSSparsity ret;
+  
+  // Treat simple cases first
+  if(x==y){
+    ret = x;
+    mapping.resize(x.size(),1 | 2 | 4 | 8 );
+    mapping.back() ^=  4 | 8;
+  } else if(x.size()==0){
+    ret = y;
+    mapping.resize(y.size(),2 | 8 );
+    mapping.back() ^= 8;
+  } else if(y.size()==0){
+    ret = x;
+    mapping.resize(x.size(),1 | 4);
+    mapping.back() ^= 4;
+/*  } else if(x.numel()==1){
+    ret = 
+    
+    
+    
+    
+    
+    
+    ret = y;
+    if(x.size()==1){
+      mapping.resize(y.size(),1 | 2 | 8);
+    } else {
+      mapping.resize(y.size(),2 | 
+    */
+    
   }
+
+  
+  
+  
+  
+  
+  
   
   // Create return object
-  CRSSparsity ret(size1(),size2());
-  
+  int sz1 = std::max(x.size1(),y.size1());
+  int sz2 = std::max(x.size2(),y.size2());
+  ret = CRSSparsity(sz1,sz2);
+
   // Get refences to the sparsity vectors
   vector<int>& r = ret.rowindRef();
   vector<int>& c = ret.colRef();
@@ -585,7 +623,43 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<int>& mapping
   r.push_back(0);
   
   // Clear the mapping
-  mapping.clear();
+/*  mapping.clear();
+  
+  // If the first argument is a scalar
+  if(x.numel()==1){
+    if(y.dense()){
+      ret = y;
+      mapping.resize(y.size(), 1 | 2 | 8);
+    } else if(f00_is_zero)
+      
+    
+    
+  }*/
+  
+  
+//   // Quick return if the patterns are equal and f00_is_zero
+//   if(x == y && (x.dense() || f00_is_zero)){
+//     mapping.resize(x.size());
+//     fill(mapping.begin(),mapping.end(), 1 | 2 | 4 | 8 );
+//     mapping.back() ^= 4 | 8; // do not increase pointer when already at the end
+//     return x;
+//   }
+//   
+//   // Quick return if the first argument is a scalar and f00_is_zero
+//   if(x.numel()==1 && (y.dense() || f00_is_zero)){
+//     mapping.resize(y.size());
+//     fill(mapping.begin(),mapping.end(), 1 | 2 | 8 );
+//     mapping.back() ^= 8; // do not increase pointer when already at the end
+//     return x;
+//   }
+//   
+//   // Quick return if the second argument is a scalar and f00_is_zero
+//   if(y.numel()==1 && (x.dense() || f00_is_zero)){
+//     mapping.resize(y.size());
+//     fill(mapping.begin(),mapping.end(), 1 | 2 | 4 );
+//     mapping.back() ^= 4; // do not increase pointer when already at the end
+//     return x;
+//   }
   
   // Loop over rows of both patterns
   for(int i=0; i<size1(); ++i){
@@ -630,14 +704,89 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<int>& mapping
   
   // Return 
   return ret;
+
+
+
+}
+#endif
+
+CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping) const{
+  // Assert dimensions
+  casadi_assert_message(size1()==y.size1(), "The number of rows does not match");
+  casadi_assert_message(size2()==y.size2(), "The number of columns does not match");
+  
+  // Quick return if the patterns are equal
+  if(*this == y){
+    mapping.resize(size());
+    fill(mapping.begin(),mapping.end(),0);
+    return *this;
+  }
+  
+  // Create return object
+  CRSSparsity ret(size1(),size2());
+  
+  // Get refences to the sparsity vectors
+  vector<int>& r = ret.rowindRef();
+  vector<int>& c = ret.colRef();
+  
+  // Prepare the assembly of the rowind vector below
+  r.clear();
+  r.push_back(0);
+  
+  // Clear the mapping
+  mapping.clear();
+  
+  // Loop over rows of both patterns
+  for(int i=0; i<size1(); ++i){
+    // Non-zero element of the two matrices
+    int el1 = rowind(i);
+    int el2 = y.rowind(i);
+    
+    // End of the non-zero elements of the row for the two matrices
+    int el1_last = rowind(i+1);
+    int el2_last = y.rowind(i+1);
+    
+    // Loop over the non-zeros of both matrices
+    while(el1<el1_last || el2<el2_last){
+      // Get the columns
+      int col1 = el1<el1_last ? col(el1) : size2();
+      int col2 = el2<el2_last ? y.col(el2) : size2();
+
+      // Add to the return matrix
+      if(col1==col2){
+        c.push_back(col1);
+        mapping.push_back( 1 | 2);
+        el1++; el2++;
+      } else if(col1<col2){
+        c.push_back(col1);
+        mapping.push_back(1);
+        el1++;
+      } else {
+        c.push_back(col2);
+        mapping.push_back(2);
+        el2++;
+      }
+    }
+    
+    // Save the index of the last nonzero on the row
+    r.push_back(c.size());
+  }
+  
+  // Make sure that the object was correctly created
+  casadi_assert(r.size()==size1()+1);
+  casadi_assert(mapping.size()==c.size());
+  casadi_assert(c.size()==r.back());
+  
+  // Return 
+  return ret;
 }
 
-CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<int>& mapping) const{
-  throw CasadiException("CRSSparsity::patternIntersection not implemented");
+CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsigned char>& mapping) const{
+  
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
-  if(true){
+  if(true){ // the code below should be ok now, the switch can probably be removed
     
     // Dimensions
     int x_nrow = size1();
@@ -740,7 +889,7 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
         for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
           in_x_row[x_col[el1]] |= b;
         }
-        b >>= 1;
+        b <<= 1;
       }
 
       // Get the sparsity pattern for the set of rows
@@ -765,12 +914,12 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
         for(int j=0; j<y_ncol; ++j){
           
           // Save nonzero, if any
-          if(in_res_col[j] | b){
+          if(in_res_col[j] & b){
             c.push_back(j);
           }
         }
         r[i+1] = c.size();
-        b >>=1;
+        b <<=1;
       }
     }
     return ret;

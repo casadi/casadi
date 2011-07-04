@@ -351,6 +351,7 @@ class Matrix : public PrintableObject{
     static Matrix<T> matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y);
     static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
   //@}
+    static void binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping);
 
     /** \brief  Unary function */
 #ifndef SWIG
@@ -1910,6 +1911,38 @@ Matrix<T> Matrix<T>::binary(int op, const Matrix<T> &x, const Matrix<T> &y){
   else
     return matrix_matrix(op,x,y);
 }
+
+template<class T>
+void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
+  std::vector<T>& rd = r.data();
+  const std::vector<T> &xd = x.data();
+  const std::vector<T> &yd = y.data();
+
+  // Argument values
+  T a[2][2] = {{0,0},{0,0}};
+  if(!xd.empty()) a[0][1] = xd.front();
+  if(!yd.empty()) a[1][1] = yd.front();
+
+  // Nonzero counters
+  int el0=0, el1=0;
+  
+  // Loop over nonzero elements
+  for(int i=0; i<mapping.size(); ++i){
+    // Check which elements are nonzero
+    unsigned char m = mapping[i];
+    bool nz0 = m & 1;
+    bool nz1 = m & 2;
+    
+    // Evaluate
+    rd[i] = fcn(a[0][nz0],a[1][nz1]);
+    
+    // Go to next nonzero
+    if(m & 4) a[0][1] = xd[++el0];
+    if(m & 8) a[1][1] = yd[++el1];
+  }
+}
+
+
 
 template<class T>
 Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){

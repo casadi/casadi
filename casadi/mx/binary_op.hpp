@@ -20,49 +20,50 @@
  *
  */
 
-#ifndef MATRIX_SCALAR_OP_HPP
-#define MATRIX_SCALAR_OP_HPP
+#ifndef MATRIX_MATRIX_OP_HPP
+#define MATRIX_MATRIX_OP_HPP
 
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief Represents a general matrix scalar opertion on MXes
+/** \brief Represents any binary operation that involves two matrices 
   \author Joel Andersson 
-  \date 2010
-*/	
-class MatrixScalarOp : public MXNode{
+  \date 2010	
+*/
+class BinaryOp : public MXNode{
   public:
-
     /** \brief  Constructor */
-    MatrixScalarOp(Operation op, MX x, const MX& y);
+    BinaryOp(Operation op, MX x, MX y);
     
     /** \brief  Destructor */
-    virtual ~MatrixScalarOp(){}
+    virtual ~BinaryOp(){}
 
     /** \brief  Clone function */
-    virtual MatrixScalarOp * clone() const;
+    virtual BinaryOp * clone() const;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
+
+    /// Is it a certain operation
+    virtual bool isOperation(int op) const{ return op==op_;};
+
     /** \brief  Evaluate the function and store the result in the node */
     virtual void evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj);
 
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
-    
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
 
-    /// Is it a certain operation
-    virtual bool isOperation(int op__) const{ return op__==op;};
-
-  protected:
-
-    Operation op;
+    //! \brief Operation
+    Operation op_;
+    
+    //! \brief Which argument for each nonzero
+    std::vector<unsigned char> mapping_;
 };
 
 } // namespace CasADi
 
 
-#endif // MATRIX_SCALAR_OP_HPP
+#endif // MATRIX_MATRIX_OP_HPP

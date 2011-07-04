@@ -38,9 +38,7 @@ SET(CASADI_SRCS
   mx/mx_constant.cpp         mx/mx_constant.hpp         # A constant MX node
   mx/symbolic_mx_node.cpp    mx/symbolic_mx_node.hpp    # A symbolic MX variable
   mx/unary_op.cpp            mx/unary_op.hpp            # Unary operation
-  mx/scalar_matrix_op.cpp    mx/scalar_matrix_op.hpp    # Scalar-matrix elementwise binary operation
-  mx/matrix_scalar_op.cpp    mx/matrix_scalar_op.hpp    # Matrix-scalar elementwise binary operation
-  mx/matrix_matrix_op.cpp    mx/matrix_matrix_op.hpp    # Matrix-matrix elementwise binary operation
+  mx/binary_op.cpp           mx/binary_op.hpp           # Binary operation
   mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
   mx/evaluation.cpp          mx/evaluation.hpp          # FX function evaluation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm

@@ -185,6 +185,8 @@ MX outer_prod(const MX &x, const MX &y){
 }
 
 void simplifyMapping(MX& ex){
+  return;
+  
   // Make sure that we have a mapping with one dependency
   if(!(ex->isMapping() && ex->ndep()==1))
     return;
@@ -278,7 +280,7 @@ MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
 
 MX unite(const MX& A, const MX& B){
   // Join the sparsity patterns
-  std::vector<int> mapping;
+  std::vector<unsigned char> mapping;
   CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
   
   // Split up the mapping
@@ -286,9 +288,9 @@ MX unite(const MX& A, const MX& B){
   
   // Copy sparsity
   for(int k=0; k<mapping.size(); ++k){
-    if(mapping[k]<0){
+    if(mapping[k]==1){
       nzA.push_back(k);
-    } else if(mapping[k]>0){
+    } else if(mapping[k]==2){
       nzB.push_back(k);
     } else {
       throw CasadiException("Pattern intersection not empty");
