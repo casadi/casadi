@@ -452,7 +452,6 @@ std::vector<MX> MXFunctionInternal::jac(int iind){
 
 std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   casadi_assert(isInit());
-  casadi_warning("MXFunctionInternal::jac: the feature is still experimental");
   
   // Get the number of columns
   const int ncol = fseed.front().size2();

@@ -81,32 +81,9 @@ MX Multiplication::adFwd(const std::vector<MX>& jx){
   // Loop over the derivative directions
   for(int d=0; d<nd; ++d){
     
-    MX s = jx[0](range(jx[0].size1()),d);
-    cout << "s" << s << endl;
-    cout << "s.size1() = "<< s.size1() << endl;
-    cout << "s.size2() = "<< s.size2() << endl;
-    cout << "s.size() = "<< s.size() << endl;
-    cout << dep(0).size1() << endl;
-    cout << dep(0).size2() << endl;
-    
-    
     // Get a forward seed matrices for direction d
     MX seed0 = reshape(jx[0](range(jx[0].size1()),d),dep(0).size1(),dep(0).size2());
-    cout << "ok" << endl;
-
-    s = jx[1](range(jx[1].size1()),d);
-    cout << "s" << s << endl;
-    cout << "s.size1() = "<< s.size1() << endl;
-    cout << "s.size2() = "<< s.size2() << endl;
-    cout << "s.size() = "<< s.size() << endl;
-    cout << dep(1).size1() << endl;
-    cout << dep(1).size2() << endl;
-    
-    reshape(s,2,2);
-    cout << "ok 1/2" << endl;
-    
     MX seed1 = reshape(jx[1](range(jx[1].size1()),d),dep(1).size1(),dep(1).size2());
-    cout << "ok2" << endl;
 
     // Calculate the forward sensitivity
     MX sens = prod(seed0,trans(dep(1))) + prod(dep(0),trans(seed1));
