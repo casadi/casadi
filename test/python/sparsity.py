@@ -25,17 +25,17 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.getNZ(i[0],i[1])
       
-    w = IVector()
-    c=a.patternUnion(b,w)
-    self.assertEquals(w.size(),len(nza.union(nzb)))
-    for k in range(w.size()):
-      ind = (c.getRow()[k],c.col(k))
-      if (ind in nza and ind in nzb):
-        self.assertEquals(w[k],0)
-      elif (ind in nza):
-        self.assertEquals(w[k],-1)
-      elif (ind in nzb):
-        self.assertEquals(w[k],1)
+    #w = IVector()
+    #c=a.patternUnion(b,w)
+    #self.assertEquals(w.size(),len(nza.union(nzb)))
+    #for k in range(w.size()):
+      #ind = (c.getRow()[k],c.col(k))
+      #if (ind in nza and ind in nzb):
+        #self.assertEquals(w[k],1 | 2)
+      #elif (ind in nza):
+        #self.assertEquals(w[k],1)
+      #elif (ind in nzb):
+        #self.assertEquals(w[k],2)
         
   def test_getNZDense(self):
     self.message("getNZDense")

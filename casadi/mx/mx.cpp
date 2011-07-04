@@ -23,10 +23,8 @@
 #include "mx.hpp"
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
-#include "scalar_matrix_op.hpp"
-#include "matrix_scalar_op.hpp"
-#include "matrix_matrix_op.hpp"
 #include "unary_op.hpp"
+#include "binary_op.hpp"
 #include "mapping.hpp"
 #include "../fx/sx_function.hpp"
 #include "evaluation.hpp"
@@ -115,7 +113,7 @@ const MX MX::getSub(int i, int j) const{
     ret.assignNode(new Mapping(sp));
     ret->addDependency(*this,vector<int>(0));
   }
-  simplifyMapping(ret);
+//  simplifyMapping(ret);
   return ret;
 }
 
@@ -178,7 +176,7 @@ MX MX::getNZ(const vector<int>& k) const{
   MX ret;
   ret.assignNode(new Mapping(sp));
   ret->addDependency(*this,k);
-  simplifyMapping(ret);
+  //simplifyMapping(ret);
   return ret;
 }
 
@@ -295,15 +293,15 @@ MX MX::unary(int op, const MX &x){
 }
 
 MX MX::scalar_matrix(int op, const MX &x, const MX &y){
-  return create(new ScalarMatrixOp(Operation(op),x,y)); 
+  return create(new BinaryOp(Operation(op),x,y)); 
 }
 
 MX MX::matrix_scalar(int op, const MX &x, const MX &y){
-  return create(new MatrixScalarOp(Operation(op),x,y));
+  return create(new BinaryOp(Operation(op),x,y));
 }
 
 MX MX::matrix_matrix(int op, const MX &x, const MX &y){
-  return create(new MatrixMatrixOp(Operation(op),x,y)); 
+  return create(new BinaryOp(Operation(op),x,y)); 
 }
 
 MX operator*(const MX &x, const MX &y){

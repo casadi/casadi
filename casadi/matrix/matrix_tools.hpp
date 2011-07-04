@@ -803,7 +803,7 @@ std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A){
 template<class T>
 Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
   // Join the sparsity patterns
-  std::vector<int> mapping;
+  std::vector<unsigned char> mapping;
   CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
   
   // Create return matrix
@@ -812,9 +812,9 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
   // Copy sparsity
   int elA=0, elB=0;
   for(int k=0; k<mapping.size(); ++k){
-    if(mapping[k]<0){
+    if(mapping[k]==1){
       ret.data()[k] = A.data()[elA++];
-    } else if(mapping[k]>0){
+    } else if(mapping[k]==2){
       ret.data()[k] = B.data()[elB++];
     } else {
       throw CasadiException("Pattern intersection not empty");
