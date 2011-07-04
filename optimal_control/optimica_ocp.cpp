@@ -676,14 +676,14 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
         dep[i] = explicit_fcn_[ind];
       }
       
-  
       // Unmark the explicit variables
       for(int i=0; i<explicit_var_.size(); ++i){
         explicit_var_.at(i).setTemp(0);
       }
 
       // Evaluate constant expressions
-      Matrix<SX> ode_elim = evaluateConstants(ode);
+/*      Matrix<SX> ode_elim = evaluateConstants(ode);*/
+      Matrix<SX> ode_elim = ode;
       
       // ODE right hand side function
       vector<SXMatrix> ode_in(DAE_NUM_IN);
@@ -691,7 +691,7 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
       ode_in[DAE_Y] = var(x_);
       ode_in[DAE_P] = var(u_);
       oderhs_ = SXFunction(ode_in,ode_elim);
-
+      
       // Dependency function
       output_fcn_ = SXFunction(ode_in,dep);
       

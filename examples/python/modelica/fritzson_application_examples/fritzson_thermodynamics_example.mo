@@ -1,4 +1,4 @@
-model BasicVolume "Conservation of Mass"
+model BasicVolumeMassConservation "Conservation of Mass"
   import Modelica.SIunits.*;
   parameter SpecificHeatCapacity R = 287;
   Pressure P;
@@ -21,9 +21,9 @@ equation
   // Equation of state (ideal gas)
   P*V=m*R*T;
 
-end BasicVolume;
+end BasicVolumeMassConservation;
 
-model BasicVolume2
+model BasicVolumeEnergyConservation
   import Modelica.SIunits.*;
   parameter SpecificInternalEnergy u_0 = 209058;
   parameter SpecificHeatCapacity c_v = 717;
@@ -45,7 +45,6 @@ equation
 
   // Boundary equations
   V=1e-3;
-  T=293;
   mdot_in=0.1e-3;
   mdot_out=0.01e-3;
   h_in = 300190;
@@ -67,5 +66,5 @@ equation
 
   // Equation of state (ideal gas)
   P*V=m*R*T;
-end BasicVolume2;
+end BasicVolumeEnergyConservation;
 
