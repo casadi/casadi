@@ -52,10 +52,6 @@ ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 add_executable(det_minor det_minor.cpp)
 target_link_libraries(det_minor casadi)
 
-# Determinant by minor expansion using MX
-#add_executable(det_minor_mx det_minor_mx.cpp)
-#target_link_libraries(det_minor_mx casadi)
-
 
 if(LIFTOPT_FOUND)
 include_directories(${LIFTOPT_INCLUDE_DIRS})
