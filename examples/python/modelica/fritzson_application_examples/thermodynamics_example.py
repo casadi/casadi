@@ -21,7 +21,7 @@ from casadi import *
 # Compile Modelica code to XML
 def comp(name):
   curr_dir = os.path.dirname(os.path.abspath(__file__))
-  jmu_name = compile_jmu(name, curr_dir+"/fritzson_thermodynamics_example.mo",'modelica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':False})
+  jmu_name = compile_jmu(name, curr_dir+"/thermodynamics_example.mo",'modelica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':False})
   modname = name.replace('.','_')
   sfile = zipfile.ZipFile(curr_dir+'/'+modname+'.jmu','r')
   mfile = sfile.extract('modelDescription.xml','.')
@@ -129,6 +129,25 @@ plt.plot(grid,simulator.output())
 plt.xlabel("t")
 plt.ylabel("T(t)")
 plt.title("c.f. Fritzson figure 15-9")
+plt.draw()
+
+# Compile the next example (Heat transfer and work)
+#comp("BasicVolumeTest")
+
+# Allocate a parser and load the xml
+#parser = FMIParser('BasicVolumeTest.xml')
+
+# Obtain the symbolic representation of the OCP
+#ocp = parser.parse()
+
+## Create functions
+#ocp.createFunctions()
+
+## Create an integrator
+#integrator = CVodesIntegrator(ocp.oderhs_)
+
+## Get the variables
+#vv = ocp.getVariables()
 
 plt.show()
 
