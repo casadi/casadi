@@ -132,22 +132,78 @@ plt.title("c.f. Fritzson figure 15-9")
 plt.draw()
 
 # Compile the next example (Heat transfer and work)
-#comp("BasicVolumeTest")
+comp("BasicVolumeTest")
 
 # Allocate a parser and load the xml
-#parser = FMIParser('BasicVolumeTest.xml')
+parser = FMIParser('BasicVolumeTest.xml')
 
 # Obtain the symbolic representation of the OCP
-#ocp = parser.parse()
+ocp = parser.parse()
 
-## Create functions
-#ocp.createFunctions()
+# Create functions
+ocp.createFunctions()
 
-## Create an integrator
-#integrator = CVodesIntegrator(ocp.oderhs_)
+# Create an integrator
+integrator = CVodesIntegrator(ocp.oderhs_)
 
-## Get the variables
-#vv = ocp.getVariables()
+# Get the variables
+vv = ocp.getVariables()
+
+# Output function
+output_expression = [[ocp.getExplicit(vv.T.var())],[ocp.getExplicit(vv.U.var())],[ocp.getExplicit(vv.V.var())]]
+output_fcn_in = DAE_NUM_IN * [[]]
+output_fcn_in[DAE_T] = [ocp.t_]
+output_fcn_in[DAE_Y] = var(ocp.x_)
+output_fcn_in[DAE_YDOT] = der(ocp.x_)
+output_fcn_in[DAE_P] = var(ocp.p_)
+output_fcn = SXFunction(output_fcn_in,output_expression)
+
+# Create a simulator
+grid = NP.linspace(0,2,100)
+simulator = Simulator(integrator,output_fcn,grid)
+simulator.init()
+
+# Pass initial conditions
+x0 = getStart(ocp.x_)
+simulator.setInput(x0,INTEGRATOR_X0)
+
+# Simulate
+simulator.evaluate()
+integrator.printStats()
+
+# Plot
+plt.figure(3)
+p1, = plt.plot(grid,simulator.output(0))
+p2, = plt.plot(grid,simulator.output(1))
+plt.xlabel("t")
+plt.ylabel("T(t)")
+plt.legend([p2, p1], ["T", "U"])
+plt.title("c.f. Fritzson figure 15-14")
+
+plt.figure(4)
+plt.plot(grid,simulator.output(2))
+plt.xlabel("t")
+plt.ylabel("V(t)")
+plt.title("Approximation of V")
+plt.draw()
+
+# Compile the next example (conservation of energy in control volume)
+comp("CtrlFlowSystem")
+
+# Allocate a parser and load the xml
+parser = FMIParser('CtrlFlowSystem.xml')
+
+# Obtain the symbolic representation of the OCP
+ocp = parser.parse()
+
+# Elimiate dependent variables
+ocp.eliminateDependent()
+
+# Print the ocp
+print ocp
+
+# The problem has no differential states, so we stop here
+
 
 plt.show()
 

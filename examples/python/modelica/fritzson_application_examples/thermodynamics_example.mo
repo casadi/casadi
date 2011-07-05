@@ -166,7 +166,8 @@ equation
   der(m) = mdot_in-mdot_out;
   // Conservation of energy
   der(U) = h_in*mdot_in-h_out*mdot_out+Qdot-Wdot_e;
-  Wdot_e=P*der(V)+Wdot_s;
+  /* Wdot_e=P*der(V)+Wdot_s; */ // Original formulation
+  Wdot_e=P*(0.0001*((1/(1+exp((-200*(time-0.5)))))+(((-((time-0.5)/(1+exp((-200*(time-0.5))))))/(1+exp((-200*(time-0.5)))))*(exp((-200*(time-0.5)))*-200))))+Wdot_s; // Workaround
   H = U+P*V;
   u = U/m; // Specific internal energy (ideal gas)
   v = V/m; // Specific volume
@@ -180,14 +181,104 @@ equation
   inlet.h = 300190;
   // Specifying the remaining 3 degrees of freedom
   /*  V= 1e-3 + 0.1*(if time > 0.5 then time - 0.5 else 0);*/ // Original formulation
-  V= 1e-3 + 0.1*((time-0.5)/(1+exp(-2*100*(time-0.5)))); // Smooth approximation
+  V= 1e-3 + 0.1e-3*((time-0.5)/(1+exp(-2*100*(time-0.5)))); // Smooth approximation
   Qdot = 0.0;
   Wdot_s = 0.0;
 end BasicVolumeTest;
+
+model PressureEnthalpySource "Constant pressure and enthalpy source"
+  import Modelica.SIunits.*;
+  FlowConnector outlet;
+  parameter Pressure P_0=1.0e5;
+  parameter SpecificEnthalpy h_0 = 300190;
+equation
+  outlet.P=P_0;
+  outlet.h=h_0;
+end PressureEnthalpySource;
+
+model PressureSink "Pressure sink, constant pressure"
+  FlowConnector inlet;
+  parameter Modelica.SIunits.Pressure P_0=1.0e5;
+equation
+  inlet.P=P_0;
+end PressureSink;
+
+model SimpleValveFlow
+  import Modelica.SIunits;
+  parameter SIunits.Area A=1e-4;
+  parameter Real beta = 5.0e-5;
+  SIunits.Pressure P_in, P_out;
+  SIunits.MassFlowRate mdot;
+equation // Boundary conditions
+  P_in = 1.2e5;
+  P_out = 1.0e5;
+  // Constitutive relation
+  beta*A^2*(P_in-P_out) = mdot^2;
+end SimpleValveFlow;
+
+model ValveFlow
+  import Modelica.SIunits;
+  FlowConnector inlet, outlet;
+  parameter SIunits.Area A = 1e-4;
+  parameter Real beta = 5.0e-5;
+  SIunits.Pressure P_in, P_out;
+  SIunits.MassFlowRate mdot;
+equation // Interface relations
+  P_in = inlet.P;
+  P_out = outlet.P;
+  mdot = inlet.mdot;
+  0 = inlet.mdot + outlet.mdot; // Conservation of mass (no storage)
+  // Conservation of energy (no storage)
+  0 = inlet.mdot*inlet.h + outlet.mdot*outlet.h;
+  beta*A^2*(P_in-P_out) = mdot^2; // Constitutive relation
+  assert(P_in-P_out>0, "Error: model not valid for backflow");
+end ValveFlow;
+
+
+model ControlledValveFlow
+  import Modelica.SIunits;
+  import Modelica.Blocks.Interfaces;
+  FlowConnector inlet, outlet;
+  Interfaces.RealInput u;
+  parameter SIunits.Area A = 1e-4;
+  parameter Real beta = 5.0e-5;
+  SIunits.Pressure P_in, P_out;
+  SIunits.MassFlowRate mdot;
+equation // Interface relations
+  P_in = inlet.P;
+  P_out = outlet.P;
+  mdot = inlet.mdot;
+  0 = inlet.mdot + outlet.mdot; // Conservation of mass (no storage)
+  // Conservation of energy (no storage)
+  0 = inlet.mdot*inlet.h + outlet.mdot*outlet.h;
+  beta*(A*u)^2*(P_in-P_out) = mdot^2; // Constitutive relation
+  assert(P_in-P_out>0, "Error: model not valid for backflow");
+end ControlledValveFlow;
+
+model SmoothStep "A smooth version of Modelica.Blocks.Sources.Step"
+  parameter Real offset=0;
+  parameter Real startTime=0;
+  parameter Real height=1;
+  parameter Real K = 100;
+  Real y;
+equation
+  y = offset + height/(1+exp(-2*K*(time-startTime)));
+end SmoothStep;
+
+model CtrlFlowSystem
+  import Modelica.Blocks.Sources;
+  PressureEnthalpySource pressureEnthalpySource(P_0=1.2e5);
+  SmoothStep step(offset=1,startTime=0.5,height=-0.5);
+  ControlledValveFlow ctrlFlowModel; // negative step signal
+  PressureSink pressureSink;
+equation 
+  connect(pressureEnthalpySource.outlet,ctrlFlowModel.inlet);
+  connect(ctrlFlowModel.outlet,pressureSink.inlet);
+  connect(step.y, ctrlFlowModel.u);
+end CtrlFlowSystem;
+
+
   
   
 
-  
-
-  
 
