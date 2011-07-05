@@ -33,6 +33,10 @@ using namespace std;
 
 namespace CasADi{
   
+JacobianInternal::JacobianInternal(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks) : fcn_(fcn), jblocks_(jblocks){
+  addOption("ad_mode",            OT_STRING,  "default");  // "forward", "adjoint" or "default" (default meaning checking both)
+}
+  
 JacobianInternal::JacobianInternal(const FX& fcn, int iind, int oind) : fcn_(fcn), iind_(iind), oind_(oind){
   addOption("finite_differences", OT_BOOLEAN,   false);    // Using finite differences instead of automatic differentiation
   addOption("ad_mode",            OT_STRING,  "default");  // "forward", "adjoint" or "default", i.e. forward if n_<=m_, otherwise adjoint
@@ -82,31 +86,96 @@ JacobianInternal* JacobianInternal::clone() const{
 }
 
 void JacobianInternal::init(){
-  // Call the init function of the base class
-  FXInternal::init();
+  // Use old or new (sparse) Jacobian calculation algorithm
+  if(jblocks_.empty()){     // Old (to be depreciated) algorithm
+    // Call the init function of the base class
+    FXInternal::init();
 
-  if(!fcn_.isInit()) fcn_.init();
+    if(!fcn_.isInit()) fcn_.init();
+    
+    // Number of directions that we can calculate at a time
+    nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
+    nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
+    casadi_assert(nadir_fcn_>0 || nfdir_fcn_>0);
+    
   
-  // Number of directions that we can calculate at a time
-  nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
-  nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
-  casadi_assert(nadir_fcn_>0 || nfdir_fcn_>0);
-  
-  // Use finite differences?
-  use_fd_ = getOption("finite_differences").toBool();
-  
-  // Use forward or adjoint ad?
-  if(use_fd_){
-    use_ad_fwd_ = true;
-  } else {
-    if(getOption("ad_mode") == "forward")
+    // Use finite differences?
+    use_fd_ = getOption("finite_differences").toBool();
+    
+    // Use forward or adjoint ad?
+    if(use_fd_){
       use_ad_fwd_ = true;
-    else if(getOption("ad_mode") == "adjoint")
-      use_ad_fwd_ = false;
-    else if(getOption("ad_mode") == "default")
-      use_ad_fwd_ = nadir_fcn_==0 || n_<=m_;
-    else
-      throw CasadiException("unknown ad mode: " +  getOption("ad_mode").toString());
+    } else {
+      if(getOption("ad_mode") == "forward")
+        use_ad_fwd_ = true;
+      else if(getOption("ad_mode") == "adjoint")
+        use_ad_fwd_ = false;
+      else if(getOption("ad_mode") == "default")
+        use_ad_fwd_ = nadir_fcn_==0 || n_<=m_;
+      else
+        throw CasadiException("unknown ad mode: " +  getOption("ad_mode").toString());
+    }
+  } else { // New (sparse) algorithm
+    casadi_warning("Sparse numeric Jacobian still experimental");
+
+    // Initialize the function if not already initialized
+    if(!fcn_.isInit()) fcn_.init();
+
+    // Same input dimensions as function
+    setNumInputs(fcn_.getNumInputs());
+    for(int i=0; i<getNumInputs(); ++i){
+      input(i) = fcn_.input(i);
+    }
+
+    // Get the output dimensions (specified by jblocks)
+    setNumOutputs(jblocks_.size());
+    for(int i=0; i<jblocks_.size(); ++i){
+      
+      // Get input and output indices
+      int oind = jblocks_[i].first;
+      int iind = jblocks_[i].second;
+      
+      // Jacobian block or nondifferentiated function output
+      if(iind<0){
+        // Nondifferentiated function
+        output(i) = fcn_.output(oind);
+      } else {
+        // Jacobian of input iind with respect to output oind
+        output(i) = DMatrix(fcn_.jacSparsity(iind,oind),0);
+      }
+    }
+    
+    // Only now, when we know the sparsity of the inputs and outputs, we are anle to call the init function of the base class
+    FXInternal::init();
+
+    // Number of directions that we can calculate at a time
+    nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
+    nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
+    casadi_assert_message(nadir_fcn_>0 || nfdir_fcn_>0, "Function does not support directional derivatives, neither \"number_of_fwd_dir\" nor \"number_of_adj_dir\" is positive");
+    
+    
+    
+    // 
+    iind_ = -1;
+    oind_ = -1;
+    CRSSparsity sp;
+    for(int i=0; i<jblocks_.size(); ++i){
+      if(jblocks_[i].second){
+        casadi_assert_message(sp.isNull(), "Maximum one Jacobian block currently supported");
+        sp = output(i).sparsity();
+        oind_ = jblocks_[i].first;
+        iind_ = jblocks_[i].second;
+      }
+    }
+    
+    // Get the transpose
+    vector<int> mapping;
+    CRSSparsity sp_trans = sp.transpose(mapping);
+    mapping.clear();
+    
+    // Graph coloring algorithm
+    CRSSparsity compressed = unidirectionalColoring(sp,sp_trans);
+    
   }
 }
 
@@ -114,63 +183,70 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
     fcn_.setInput(input(i),i);
-  vector<double>& res2 = output().data();
-  
-//  int el = 0; // running index
 
-  if(use_ad_fwd_){ // forward AD if less inputs than outputs
-    // Clear the forward seeds
-    for(int i=0; i<fcn_.getNumInputs(); ++i)
-      for(int dir=0; dir<nfdir_fcn_; ++dir)
-        fcn_.fwdSeed(i,dir).setZero();
+    // Use old or new (sparse) Jacobian calculation algorithm
+  if(jblocks_.empty()){     // Old (to be depreciated) algorithm
 
+    vector<double>& res2 = output().data();
     
-    // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
-    for(int ofs=0; ofs<n_; ofs += nfdir_fcn_){
+  //  int el = 0; // running index
+
+    if(use_ad_fwd_){ // forward AD if less inputs than outputs
+      // Clear the forward seeds
+      for(int i=0; i<fcn_.getNumInputs(); ++i)
+        for(int dir=0; dir<nfdir_fcn_; ++dir)
+          fcn_.fwdSeed(i,dir).setZero();
+
+      
+      // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
+      for(int ofs=0; ofs<n_; ofs += nfdir_fcn_){
+          for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
+            // Pass forward seeds
+            int i=ofs+dir;
+            vector<double>& fseed = fcn_.fwdSeed(iind_,dir).data();
+            fill(fseed.begin(),fseed.end(),0);
+            fseed[i] = 1;
+          }
+        
+        // Evaluate the AD forward algorithm
+        fcn_.evaluate(nfdir_fcn_,0);
+            
+        // Get the output seeds
         for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
-          // Pass forward seeds
+          // Save to the result
           int i=ofs+dir;
-          vector<double>& fseed = fcn_.fwdSeed(iind_,dir).data();
-          fill(fseed.begin(),fseed.end(),0);
-          fseed[i] = 1;
-        }
-      
-      // Evaluate the AD forward algorithm
-      fcn_.evaluate(nfdir_fcn_,0);
-          
-      // Get the output seeds
-      for(int dir=0; dir<nfdir_fcn_ && ofs+dir<n_; ++dir){
-        // Save to the result
-        int i=ofs+dir;
-        const vector<double>& fsens = fcn_.fwdSens(oind_,dir).data();
-        for(int j=0; j<m_; ++j){
-          res2[i+j*n_] = fsens[j];
+          const vector<double>& fsens = fcn_.fwdSens(oind_,dir).data();
+          for(int j=0; j<m_; ++j){
+            res2[i+j*n_] = fsens[j];
+          }
         }
       }
-    }
-  } else { // adjoint AD
-    for(int ofs=0; ofs<m_; ofs += nadir_fcn_){
+    } else { // adjoint AD
+      for(int ofs=0; ofs<m_; ofs += nadir_fcn_){
+          for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
+            // Pass forward seeds
+            int j=ofs+dir;
+            vector<double>& aseed = fcn_.adjSeed(oind_,dir).data();
+            fill(aseed.begin(),aseed.end(),0);
+            aseed[j] = 1;
+          }
+        
+        // Evaluate the AD forward algorithm
+        fcn_.evaluate(0,nadir_fcn_);
+            
+        // Get the output seeds
         for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
-          // Pass forward seeds
+          // Save to the result
           int j=ofs+dir;
-          vector<double>& aseed = fcn_.adjSeed(oind_,dir).data();
-          fill(aseed.begin(),aseed.end(),0);
-          aseed[j] = 1;
-        }
-      
-      // Evaluate the AD forward algorithm
-      fcn_.evaluate(0,nadir_fcn_);
-          
-      // Get the output seeds
-      for(int dir=0; dir<nadir_fcn_ && ofs+dir<m_; ++dir){
-        // Save to the result
-        int j=ofs+dir;
-        const vector<double>& asens = fcn_.adjSens(iind_,dir).data();
-        for(int i=0; i<n_; ++i){
-          res2[i+j*n_] = asens[i];
+          const vector<double>& asens = fcn_.adjSens(iind_,dir).data();
+          for(int i=0; i<n_; ++i){
+            res2[i+j*n_] = asens[i];
+          }
         }
       }
     }
+  } else { // New (sparse) algorithm
+    casadi_assert(0);
   }
 }
 

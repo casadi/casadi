@@ -37,8 +37,11 @@ class JacobianInternal : public FXInternal{
   friend class Jacobian;
   public:
     
-    /// Constructor
+    /// Constructor (will be depreciated)
     JacobianInternal(const FX& fcn, int iind, int oind);
+
+    /// New constructor (not yet working)
+    JacobianInternal(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks);
 
     /// Clone
     virtual JacobianInternal* clone() const;
@@ -52,8 +55,13 @@ class JacobianInternal : public FXInternal{
     /// Initialize
     virtual void init();
   
-      
-      
+    // Function to be differentiated
+    FX fcn_;
+  
+    // Jacobian blocks requested
+    std::vector<std::pair<int,int> > jblocks_;
+
+    
       /// Compress the number of evaluations using curtis-powel reed seeding
 /*      void compress();*/
       
@@ -64,9 +72,7 @@ class JacobianInternal : public FXInternal{
       // Dimensions
       int n_,m_;
   
-      // Function to be differentiated
-      FX fcn_;
-  
+      
       // Output and input indices
       int iind_, oind_;
 

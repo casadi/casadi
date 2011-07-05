@@ -202,7 +202,7 @@ ocp.eliminateDependent()
 # Print the ocp
 print ocp
 
-# The problem has no differential states, so we stop here
+# The problem has no differential states, so instead of integrating, we just solve for mdot...
 
 
 plt.show()

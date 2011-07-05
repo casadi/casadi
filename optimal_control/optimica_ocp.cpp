@@ -773,12 +773,20 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
     // Scale the equations
     scaleEquations();
     
+    // Time deriative of the algebraic variables
+    SXMatrix zdot = symbolic("zdot",z_.size());
+    
+    // State
+    SXMatrix xz = vertcat(SXMatrix(var(x_)),SXMatrix(var(z_)));
+    
+    // State derivative
+    SXMatrix xzdot = vertcat(SXMatrix(der(x_)),zdot);
+    
     // DAE residual arguments
     vector<SXMatrix> dae_in(DAE_NUM_IN);
     dae_in[DAE_T] = t_;
-    dae_in[DAE_Y] = var(x_);
-    dae_in[DAE_YDOT] = der(x_);
-    casadi_assert(0); /*    dae_in[DAE_Z] = var(z_);*/
+    dae_in[DAE_Y] = xz;
+    dae_in[DAE_YDOT] = xzdot;
     dae_in[DAE_P] = var(u_);
     
     // DAE residual
@@ -789,6 +797,15 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
       quadrhs_ = SXFunction(dae_in,lterm[0]/1e3);
     }
   }
+
+  // Time deriative of the algebraic variables
+  SXMatrix zdot = symbolic("zdot",z_.size());
+    
+  // State
+  SXMatrix xz = vertcat(SXMatrix(var(x_)),SXMatrix(var(z_)));
+    
+  // State derivative
+  SXMatrix xzdot = vertcat(SXMatrix(der(x_)),zdot);
   
   // Mayer objective function
   SXMatrix xf = symbolic("xf",x_.size()+lterm.size(),1);
@@ -797,12 +814,12 @@ void OCP::createFunctions(bool create_dae, bool create_ode, bool create_quad){
   // Path constraint function
   vector<SXMatrix> cfcn_in(DAE_NUM_IN);
   cfcn_in[DAE_T] = t_;
-  cfcn_in[DAE_Y] = var(x_);
+  cfcn_in[DAE_Y] = xz;
+  cfcn_in[DAE_YDOT] = xzdot;
   append(cfcn_in[DAE_Y],symbolic("lterm")); // FIXME
   cfcn_in[DAE_P] = var(u_);
   pathfcn_ = SXFunction(cfcn_in,path_fcn_);
-  
-  
+    
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... createFunctions complete after " << dt << " seconds." << endl;

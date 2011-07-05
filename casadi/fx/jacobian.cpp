@@ -29,10 +29,14 @@ namespace CasADi{
 Jacobian::Jacobian(){
 }
 
-Jacobian::Jacobian(const FX& fcn_, int iind_, int oind_){
-  assignNode(new JacobianInternal(fcn_,iind_,oind_));
+Jacobian::Jacobian(const FX& fcn, int iind, int oind){
+  assignNode(new JacobianInternal(fcn,iind,oind));
 }
-  
+
+Jacobian::Jacobian(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks){
+  assignNode(new JacobianInternal(fcn,jblocks));
+}
+
 const JacobianInternal* Jacobian::operator->() const{
   return (const JacobianInternal*)FX::operator->();
 }
