@@ -90,6 +90,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Output of the function */
     std::vector<FunctionIO> output_;
 
+    /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
+    virtual CRSSparsity unidirectionalColoring(const CRSSparsity& A, const CRSSparsity& AT);
+
     /// Assert that the function has been initialized
     bool isInit() const;
 

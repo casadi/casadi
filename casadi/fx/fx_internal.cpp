@@ -314,6 +314,80 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   return jsp;
 }
 
+CRSSparsity FXInternal::unidirectionalColoring(const CRSSparsity& A, const CRSSparsity& AT){
+  // A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+  vector<int> forbiddenColors;
+  forbiddenColors.reserve(A.size1());
+  vector<int> color(A.size1());
+  
+  // Loop over rows
+  for(int i=0; i<A.size1(); ++i){
+    
+    // Loop over nonzero elements
+    for(int el=A.rowind(i); el<A.rowind(i+1); ++el){
+      
+      // Get column
+      int c = A.col(el);
+        
+      // Loop over previous rows that have an element in column c
+      for(int el_prev=AT.rowind(c); el_prev<AT.rowind(c+1); ++el_prev){
+        
+        // Get the row
+        int i_prev = AT.col(el_prev);
+        
+        // Escape loop if we have arrived at the current row
+        if(i_prev>=i)
+          break;
+        
+        // Get the color of the row
+        int color_prev = color[i_prev];
+        
+        // Mark the color as forbidden for the current row
+        forbiddenColors[color_prev] = i;
+      }
+    }
+    
+    // Get the first nonforbidden color
+    int color_i;
+    for(color_i=0; color_i<forbiddenColors.size(); ++color_i){
+      // Break if color is ok
+      if(forbiddenColors[color_i]!=i) break;
+    }
+    color[i] = color_i;
+    
+    // Add color if reached end
+    if(color_i==forbiddenColors.size())
+      forbiddenColors.push_back(0);
+  }
+  
+  // Get the number of columns for each row
+  vector<int> rowind(forbiddenColors.size()+1,0);
+  for(int i=0; i<color.size(); ++i){
+    rowind[color[i]+1]++;
+  }
+  
+  // Cumsum
+  for(int j=0; j<forbiddenColors.size(); ++j){
+    rowind[j+1] += rowind[j];
+  }
+  
+  // Get column for each row
+  vector<int> col(color.size());
+  for(int j=0; j<col.size(); ++j){
+    col[rowind[color[j]]++] = j;
+  }
+  
+  // Swap index back one step
+  for(int j=rowind.size()-2; j>=0; --j){
+    rowind[j+1] = rowind[j];
+  }
+  rowind[0] = 0;
+  
+  // Create return sparsity
+  CRSSparsity ret(forbiddenColors.size(),A.size1(),col,rowind);
+  return ret;
+}
+
 
 
 // void setv(double val, vector<double>& v){
