@@ -30,10 +30,9 @@ Jacobian::Jacobian(){
 }
 
 Jacobian::Jacobian(const FX& fcn, int iind, int oind){
-/*  vector<pair<int,int> > jblocks;
+  vector<pair<int,int> > jblocks;
   jblocks.push_back(pair<int,int>(oind,iind));
-  assignNode(new JacobianInternal(fcn,jblocks));*/
-  assignNode(new JacobianInternal(fcn,iind,oind));
+  assignNode(new JacobianInternal(fcn,jblocks));
 }
 
 Jacobian::Jacobian(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks){

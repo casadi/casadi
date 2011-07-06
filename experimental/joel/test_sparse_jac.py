@@ -34,8 +34,7 @@ print "J1.output().numel() = ", J1.output().numel()
 print "J1(x0)", array(J1.output())
 
 # create the jacobian using compression techniques
-v2 = VectorPair_Int_Int(1,(oind,iind)) # vector with a set of Jacobian blocks that we request
-J2 = Jacobian(fcn,v2) # create a "Jacobian" function instance explicitly
+J2 = Jacobian(fcn,iind,oind) # create a "Jacobian" function instance explicitly
 J2.setOption("verbose",True) # so that it prints the number of directions
 J2.init()
 J2.setInput(x0)
@@ -46,5 +45,5 @@ print "J2(x0)", array(J2.output())
 
 # Print difference
 print "Difference: ", J2.output()-J1.output()
-
+assert isEqual(J1.output(),J2.output())
 

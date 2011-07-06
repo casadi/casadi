@@ -37,9 +37,6 @@ class JacobianInternal : public FXInternal{
   friend class Jacobian;
   public:
     
-    /// Constructor (will be depreciated)
-    JacobianInternal(const FX& fcn, int iind, int oind);
-
     /// New constructor (not yet working)
     JacobianInternal(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks);
 
@@ -64,38 +61,18 @@ class JacobianInternal : public FXInternal{
     // Seeding matrices
     std::vector<CRSSparsity> D1_, D2_;
 
-    
-    
-    
-    
+    // Number of simultaineous forward or adjoint directions of the function to be differentiated
+    int nadir_fcn_;
+    int nfdir_fcn_;
+
     // Transpose of the Jacobian sparsity
     CRSSparsity js_;
     CRSSparsity js_trans_;
     std::vector<int> js_trans_mapping_;
     
-      /// Compress the number of evaluations using curtis-powel reed seeding
-/*      void compress();*/
-      
-      bool use_fd_, use_ad_fwd_;
-  
-      std::vector<double> epsilon_; // perturbations
-  
-      // Dimensions
-      int n_,m_;
-  
-      
-      // Output and input indices
-      int iind_, oind_;
-
-      // Number of forward directions of the function to be differentiated
-      int nadir_fcn_;
-      int nfdir_fcn_;
-      
-      // Seeding, contains which jacobian row/column is calculated by which component seeding vector
-      std::vector<std::vector<int> > seeding_;
+    // Output and input indices
+    int iind_, oind_;
 };
-
-
 
 } // namespace CasADi
 
