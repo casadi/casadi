@@ -1,11 +1,6 @@
 casadi_interface
 global casadi = casadi_interface;
 
-function [y] = casadi_size(x)
-  y = [x.size1() x.size2()];
-end
-dispatch("size","casadi_size","swig_ref")
-
 function [y] = casadi_sqrt(x)
   y = x.sqrt();
 end

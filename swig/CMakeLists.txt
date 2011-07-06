@@ -71,8 +71,8 @@ if(LIFTOPT_FOUND)
 endif(LIFTOPT_FOUND)
 
 if(WITH_GSL)
-find_package (GSL)
-find_package (BLAS)
+find_package (GSL QUIET)
+find_package (BLAS QUIET)
 if(GSL_FOUND)
 if(BLAS_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_GSL")
@@ -198,6 +198,13 @@ ADD_CUSTOM_COMMAND(
  POST_BUILD
  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/xcasadi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
 )
+ 
+ADD_CUSTOM_COMMAND(
+ TARGET casadi_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave ${LIBRARY_OUTPUT_PATH}/@swig_ref
+)
+ 
  
 ADD_CUSTOM_COMMAND(
  TARGET casadi_octave
