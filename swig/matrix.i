@@ -53,7 +53,7 @@ template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasA
         
 %}
 %enddef 
-%define %python_matrix_helpers
+%define %python_matrix_helpers(Type)
 %pythoncode %{
     @property
     def shape(self):
@@ -80,26 +80,45 @@ template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasA
 %enddef 
 #endif // SWIGPYTHON
 
+
 #ifdef SWIGOCTAVE
+%define concat_operator(ReturnType,LType,RType)
+  // __concat__ should fill in the rhs into the lhs with offset (offsetx,offsety)
+  // lhs is assumed to be equal in size or larger than rhs
+  ReturnType __concat__(const LType &lhs,const RType &rhs, int offsetx, int offsety) const {
+    ReturnType ret = lhs;
+    ret(CasADi::range(offsetx,offsetx+rhs.size1()),CasADi::range(offsety,offsety+rhs.size2())) = rhs;
+    return ret;
+  }
+%enddef
 %define %python_matrix_convertors
 %enddef 
-%define %python_matrix_helpers
+%define %python_matrix_helpers(Type)
 
   int ndims() const {
     return 2;
   }
   
-  dim_vector dims() const {
-    dim_vector d;
-    d.resize(2);
-    d.elem(0) = $self->size1();
-    d.elem(1) = $self->size2();
-    return d;
+  int length() const {
+    return $self->size1()>$self->size2() ? $self->size1(): $self->size2() ;
   }
   
-  octave_value resize(const dim_vector& d, bool t) const {
-    std::cout << "You called resize" << t << std::endl;
+  Type __hermitian__() const { return trans((*$self)); }
+  
+  
+  Type __resize__(int nrows, int ncols) const {
+    return Type(nrows,ncols);
   }
+  
+  concat_operator(Type,Type,Type)
+  
+  std::vector<int> __dims__() const {
+    std::vector<int> ret(2);
+    ret[0] = $self->size1();
+    ret[1] = $self->size2();
+    return ret;
+  }
+  
 %enddef 
 #endif // SWIGOCTAVE
 
@@ -371,6 +390,8 @@ bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
 %rename(__paren__) indexed;
 %rename(__paren_asgn__) indexed_one_based_assignment;
 %rename(__paren_asgn__) indexed_assignment;
+%rename(__vertcat__) vertcat;
+%rename(__horzcat__) horzcat;
 #endif
 #ifdef SWIGPYTHON
 %rename(__Cgetitem__) indexed_zero_based;
@@ -409,6 +430,9 @@ binopsFull(const CasADi::SX & b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 binopsFull(double b,CasADi::Matrix<double>,,CasADi::Matrix<double>)
 
+concat_operator(CasADi::Matrix<CasADi::SX>,CasADi::Matrix<double>,CasADi::Matrix<CasADi::SX>)
+concat_operator(CasADi::MX,CasADi::Matrix<double>,CasADi::MX)
+
 }; // extend Matrix<double>
 } // namespace CasADi
 #endif // SWIGOCTAVE
@@ -418,7 +442,7 @@ namespace CasADi{
 %extend Matrix<double> {
 
 %python_matrix_convertors
-%python_matrix_helpers
+%python_matrix_helpers(CasADi::Matrix<double>)
 
 }
 }

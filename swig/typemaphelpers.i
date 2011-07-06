@@ -243,24 +243,24 @@ template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__ve
 /// int
 #ifdef SWIGPYTHON
 %inline %{
-template<> char meta< int >::expected_message[] = "Expecting number";
+template<> char meta< int >::expected_message[] = "Expecting integer";
 
 template <>
 int meta< int >::as(PyObject * p, int &m) {
   NATIVERETURN(int,m)
   if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p)) {
     PyObject *r = PyNumber_Long(p);
-    int ret = !(r==NULL);
-    if (ret)
-      m = PyLong_AsLong(r);
-    return ret;
+    if (!r) return false;
+    m = PyLong_AsLong(r);
+    Py_DECREF(r);
+    return true;
   } else if (PyObject_HasAttrString(p,"__int__")) {
     char name[] = "__int__";
     PyObject *r = PyObject_CallMethod(p, name,0);
-    int ret = !(r==NULL);
-    if (ret)
-      m = PyLong_AsLong(r);
-    return ret;
+    if (!r) { Py_DECREF(r); return false;}
+    m = PyLong_AsLong(r);
+    Py_DECREF(r);
+    return true;
   }
 }
 
@@ -268,10 +268,17 @@ int meta< int >::as(PyObject * p, int &m) {
 template <> bool meta< int >::couldbe(PyObject * p) {
  if (PyObject_HasAttrString(p,"dtype")) {
    PyObject *r = PyObject_GetAttrString(p,"dtype");
+   if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
    PyObject *k = PyObject_GetAttrString(r,"kind");
+   if (!PyObject_HasAttrString(p,"__int__")) { Py_DECREF(k);Py_DECREF(r); return false;}
+   char name[] = "__int__";
+   PyObject *m = PyObject_CallMethod(p, name,0);
+   if (!m) { PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
    char *kk = PyString_AsString(k);
-   std::cout << kk << std::endl;
-   return kk[0]=='i';
+   bool result =  kk[0]=='i';
+   Py_DECREF(k); Py_DECREF(r); Py_DECREF(m);
+   return result;
+   
  }
  return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) ;
 }
@@ -282,20 +289,44 @@ template <> bool meta< int >::couldbe(PyObject * p) {
 /// double
 #ifdef SWIGPYTHON
 %inline %{
-template<> char meta< double >::expected_message[] = "Expecting number";
+template<> char meta< double >::expected_message[] = "Expecting double";
 
 template <>
 int meta< double >::as(PyObject * p, double &m) {
   NATIVERETURN(double,m)
-  PyObject *r = PyNumber_Float(p);
-  int ret = !(r==NULL);
-  if (ret)
+  if (PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) {
+    PyObject *r = PyNumber_Float(p);
+    if (!r) return false;
     m = PyFloat_AsDouble(r);
-  Py_DECREF(r);
-  return ret;
+    Py_DECREF(r);
+    return true;
+  } else if (PyObject_HasAttrString(p,"__float__")) {
+    char name[] = "__float__";
+    PyObject *r = PyObject_CallMethod(p, name,0);
+    if (!r) { PyErr_Clear();return false;}
+    m = PyFloat_AsDouble(r);
+    Py_DECREF(r);
+    return true;
+  }
 }
+   
+template <> bool meta< double >::couldbe(PyObject * p) {
+ if (PyObject_HasAttrString(p,"dtype")) {
+   PyObject *r = PyObject_GetAttrString(p,"dtype");
+   if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
+   PyObject *k = PyObject_GetAttrString(r,"kind");
+   if (!PyObject_HasAttrString(p,"__float__")) { Py_DECREF(k);Py_DECREF(r); return false;}
+   char name[] = "__float__";
+   PyObject *m = PyObject_CallMethod(p, name,NULL);
+   if (!m) {   PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
+   char *kk = PyString_AsString(k);
+   bool result = kk[0]=='f';
+   Py_DECREF(k); Py_DECREF(r); Py_DECREF(m);
+   return result;
+ }
 
-template <> bool meta< double >::couldbe(PyObject * p) { return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;}
+  return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;
+}
 
 %}
 #endif //SWIGPYTHON
@@ -368,5 +399,18 @@ template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) {
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int { $1 = meta< int >::isa($input) || meta< int >::couldbe($input); }
 %typemap(freearg) int {}
+
+#endif //SWIGPYTHON
+
+#ifdef SWIGPYTHON
+%typemap(in) double (double m) {
+  bool result=meta< double >::as($input,m);
+  if (!result)
+    SWIG_exception_fail(SWIG_TypeError,meta< double >::expected_message);
+  $1 = m;
+}
+
+%typemap(typecheck,precedence=SWIG_TYPECHECK_DOUBLE) double { $1 = meta< double >::isa($input) || meta< double >::couldbe($input); }
+%typemap(freearg) double {}
 
 #endif //SWIGPYTHON

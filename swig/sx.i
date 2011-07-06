@@ -2,6 +2,7 @@
 #include "casadi/matrix/crs_sparsity.hpp"
 #include "casadi/matrix/slice.hpp"
 #include "casadi/matrix/matrix.hpp"
+#include "casadi/matrix/matrix_tools.hpp"
 #include "casadi/sx/sx.hpp"
 #include "casadi/sx/sx_tools.hpp"
 
@@ -93,7 +94,23 @@ namespace CasADi {
 
   #endif // SWIGPYTHON
   
- 
+  #ifdef SWIGOCTAVE
+  std::vector<int> __dims__() const {
+    std::cout << "you called __dims__" << std::endl;
+    std::vector<int> ret(2);
+    ret[0] = 1;
+    ret[1] = 1;
+    return ret;
+  }
+  
+  CasADi::Matrix<CasADi::SX> __resize__(int nrows, int ncols) const {
+    std::cout << "you called __resize__" << nrows << "," << ncols  << std::endl;
+    return CasADi::Matrix<CasADi::SX>(nrows,ncols);
+  }
+  
+  concat_operator(CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+  
+  #endif // SWIGOCTAVE
   
   binopsFull(const Matrix<double>& b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
   binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
@@ -127,7 +144,7 @@ namespace CasADi {
     #endif // SWIGOCTAVE
   
     %python_matrix_convertors
-    %python_matrix_helpers
+    %python_matrix_helpers(CasADi::Matrix<CasADi::SX>)
        
     #ifdef SWIGPYTHON
 
@@ -370,6 +387,7 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
 template <>
 int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<CasADi::SX> &m) {
   NATIVERETURN(CasADi::Matrix<CasADi::SX>, m)
+  NATIVERETURN(CasADi::Matrix<double>, m)
   NATIVERETURN(CasADi::SX, m)
   if(p.is_real_matrix()){
     Matrix mat = p.matrix_value();
@@ -404,7 +422,7 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
   return false;
 }
 
-template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return p.is_real_matrix() || p.is_cell() || p.is_real_scalar();}
+template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || p.is_real_matrix() || p.is_cell() || p.is_real_scalar();}
 %}
 #endif //SWIGOCTAVE
 

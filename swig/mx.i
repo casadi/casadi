@@ -55,6 +55,7 @@ bool meta< CasADi::MX >::couldbe(const octave_value& p) {
 template <>
 int meta< CasADi::MX >::as(const octave_value& p,CasADi::MX &m) {
   NATIVERETURN(CasADi::MX,m)
+  NATIVERETURN(CasADi::Matrix<double>,m)
   if(meta< CasADi::Matrix<double> >::couldbe(p)) {
     CasADi::DMatrix mt;
     bool result=meta< CasADi::Matrix<double> >::as(p,mt);
@@ -167,7 +168,7 @@ template <> bool meta< std::vector< CasADi::MX > >::couldbe(const octave_value& 
 #endif //SWIGPYTHON
 
 %extend CasADi::MX{
-  %python_matrix_helpers
+  %python_matrix_helpers(CasADi::MX)
 };
 
 #ifdef SWIGPYTHON
