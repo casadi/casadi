@@ -1,6 +1,11 @@
 --- /home/jg/programs/swig-1.3.40/Lib/octave/octrun.swg	2009-08-15 03:19:28.000000000 +0200
-+++ /usr/share/swig1.3/octave/octrun.swg	2011-07-06 02:06:06.525965299 +0200
-@@ -327,6 +327,22 @@
++++ /usr/share/swig1.3/octave/octrun.swg	2011-07-06 22:49:42.185582983 +0200
+@@ -1,3 +1,4 @@
++#include <iostream>
+ 
+ #if OCTAVE_API_VERSION_OPTION>0
+ #define USE_OCTAVE_API_VERSION OCTAVE_API_VERSION_OPTION
+@@ -327,6 +328,22 @@
        return true;
      }
  
@@ -23,7 +28,7 @@
      bool dispatch_binary_op(const std::string &symbol, const octave_base_value &rhs, octave_value &ret) {
        member_value_pair *m = find_member(symbol, false);
        if (!m || m->first->is_static() || m->first->is_global())
-@@ -701,6 +717,68 @@
+@@ -701,6 +718,71 @@
        return as_value();
      }
  
@@ -70,6 +75,9 @@
 +     return d;
 +    
 +    }
++    
++    // The following method is needed to get concatenation working
++    virtual bool is_object() const {  std::cout << "Call me" << std::endl; return true; }
 +
 +    virtual octave_value resize (const dim_vector& d, bool fill = false) const {
 +      octave_swig_type *nc_this = const_cast < octave_swig_type *>(this);
@@ -92,7 +100,7 @@
      virtual bool is_string() const {
        octave_swig_type *nc_this = const_cast < octave_swig_type *>(this);
        return !!nc_this->find_member("__str__", false);
-@@ -802,6 +880,33 @@
+@@ -802,6 +884,33 @@
        return octave_value();
      }
  
@@ -126,28 +134,25 @@
      static octave_value dispatch_binary_op(const octave_base_value &lhs, const octave_base_value &rhs, const char *op_name) {
        octave_swig_type *lhs_ost = Swig::swig_value_deref(lhs);
        octave_swig_type *rhs_ost = Swig::swig_value_deref(rhs);
-@@ -926,6 +1031,12 @@
+@@ -926,6 +1035,14 @@
      virtual bool is_string() const 
        { return ptr->is_string(); }
  
-+    virtual dim_vector dims (void) const 
-+      { return ptr->dims(); }
++    virtual bool is_object() const { return ptr->is_object(); }
 +      
++    // The following methods are needed to get size/columns/rows working
++    virtual dim_vector dims (void) const { return ptr->dims(); }
++
 +    virtual octave_value resize (const dim_vector& d, bool fill = false) const
 +      { return ptr->resize(d,fill); };
 +
      virtual std::string string_value(bool force = false) const 
        { return ptr->string_value(force); }
  
-@@ -1247,12 +1358,21 @@
+@@ -1247,12 +1364,14 @@
  SWIGRUNTIME octave_value swig_binary_op_##name(const octave_base_value&lhs,const octave_base_value &rhs) { \
    return octave_swig_type::dispatch_binary_op(lhs,rhs,#name); \
  }
-+
-+#define swig_cat_op() \
-+SWIGRUNTIME octave_value swig_cat_op(octave_base_value &lhs,const octave_base_value &rhs,const Array<octave_idx_type>& x) { \
-+  return octave_swig_type::dispatch_cat_op(lhs,rhs,x); \
-+}
 +
  #define swigreg_unary_op(name) \
  if (!octave_value_typeinfo::lookup_unary_op(octave_value::op_##name,tid)) \
@@ -156,40 +161,14 @@
  if (!octave_value_typeinfo::lookup_binary_op(octave_value::op_##name,tid1,tid2)) \
  octave_value_typeinfo::register_binary_op(octave_value::op_##name,tid1,tid2,swig_binary_op_##name);
 +#define swigreg_cat_op() \
-+if (!octave_value_typeinfo::lookup_cat_op(tid1,tid2)) \
-+octave_value_typeinfo::register_cat_op(tid1,tid2,swig_cat_op);  \
  
    swig_unary_op(not);
    swig_unary_op(uplus);
-@@ -1283,6 +1403,8 @@
-   swig_binary_op(el_and);
-   swig_binary_op(el_or);
- 
-+  swig_cat_op();
-+
-   SWIGRUNTIME void SWIG_InstallUnaryOps(int tid) {
-     swigreg_unary_op(not);
-     swigreg_unary_op(uplus);
-@@ -1314,6 +1436,9 @@
+@@ -1314,6 +1433,7 @@
      swigreg_binary_op(el_and);
      swigreg_binary_op(el_or);
    }
-+  SWIGRUNTIME void SWIG_InstallCatOps(int tid1, int tid2) {
-+    swigreg_cat_op();
-+  }
++
    SWIGRUNTIME void SWIG_InstallOps(int tid) {
      // here we assume that tid are conseq integers increasing from zero, and 
      // that our tid is the last one. might be better to have explicit string 
-@@ -1321,9 +1446,12 @@
- 
-     SWIG_InstallUnaryOps(tid);
-     SWIG_InstallBinaryOps(tid, tid);
-+    SWIG_InstallCatOps(tid, tid);
-     for (int j = 0; j < tid; ++j) {
-       SWIG_InstallBinaryOps(j, tid);
-       SWIG_InstallBinaryOps(tid, j);
-+      SWIG_InstallCatOps(j, tid);
-+      SWIG_InstallCatOps(tid, j);
-     }
-   }
- 
