@@ -40,7 +40,7 @@ FXInternal::FXInternal(){
   addOption("store_jacobians",   OT_BOOLEAN,   false,   "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
   addOption("numeric_jacobian",  OT_BOOLEAN,   false,   "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
   addOption("numeric_hessian",   OT_BOOLEAN,   false,   "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
-  addOption("ad_mode",           OT_STRING,    "automatic", "How to calculate the Jacobians: \"forward\" (only forward mode) \"adjoint\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
+  addOption("ad_mode",           OT_STRING,    "automatic", "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
   is_init_ = false;
   verbose_ = false;
   numeric_jacobian_ = false;
@@ -410,7 +410,9 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSp
   } else if(getOption("ad_mode") == "automatic"){
     use_ad_fwd = input(iind).size() <= output(oind).size();
   } else {
-    throw CasadiException("FXInternal::jac: Unknown ad_mode");
+    stringstream ss;
+    ss << "FXInternal::jac: Unknown ad_mode \"" << getOption("ad_mode") << "\". Possible values are \"forward\", \"reverse\" and \"automatic\".";
+    throw CasadiException(ss.str());
   }
   
   // Get seed matrices by graph coloring

@@ -170,6 +170,13 @@ void JacobianInternal::init(){
         D1_.resize(1);
         D2_.resize(1);
         fcn_->getPartition(jblocks_no_f,D1_,D2_);
+
+      
+        if(verbose()){
+          int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
+          int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
+          cout << "JacobianInternal::init: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian" << endl;
+        }
       }
     }
   }
@@ -258,62 +265,106 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
       casadi_assert(nfwd || nadj);
       casadi_assert(!(nfwd && nadj));
-
-      if(verbose()){
-        cout << "JacobianInternal::evaluate: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian" << endl;
-      }
-      
-      // Forward directions
-      if(nfwd>0){
-        
-        // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
-        for(int ofs=0; ofs<nfwd; ofs += nfdir_fcn_){
-          
-          // Clear the forward seeds
-          for(int i=0; i<fcn_.getNumInputs(); ++i)
-            for(int dir=0; dir<nfdir_fcn_; ++dir)
-              fcn_.fwdSeed(i,dir).setZero();
-          
-          for(int dir=0; dir<nfdir_fcn_ && ofs+dir<nfwd; ++dir){
-            int d = ofs+dir;
-            for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
-              // Get the direction
-              int j=D1_[0].col(el);
               
-              // Pass forward seeds
-              vector<double>& fseed = fcn_.fwdSeed(iind,dir).data();
-              fseed[j] = 1;
-            }
-          }
+      // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
+      for(int ofs=0; ofs<nfwd; ofs += nfdir_fcn_){
+        // Number of directions
+        int ndir = std::min(nfdir_fcn_,nfwd-ofs);
         
-          // Evaluate the AD forward algorithm
-          fcn_.evaluate(std::min(nfdir_fcn_,nfwd-ofs),0);
-          called_once = true;
+        // Clear the forward seeds
+        for(int i=0; i<fcn_.getNumInputs(); ++i)
+          for(int dir=0; dir<ndir; ++dir)
+            fcn_.fwdSeed(i,dir).setZero();
+        
+        // Pass forward seeds
+        for(int dir=0; dir<ndir; ++dir){
+          int d = ofs+dir;
+          for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
+            // Get the direction
+            int j=D1_[0].col(el);
             
-          // Get the output seeds
-          for(int dir=0; dir<nfdir_fcn_ && ofs+dir<nfwd; ++dir){
-            int d = ofs+dir;
-            for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
-              // Get the direction
-              int j=D1_[0].col(el);
+            // Set the seed
+            fcn_.fwdSeed(iind,dir).data()[j] = 1;
+          }
+        }
+      
+        // Evaluate the AD forward algorithm
+        fcn_.evaluate(ndir,0);
+        called_once = true;
+          
+        // Get the output seeds
+        for(int dir=0; dir<ndir; ++dir){
+          int d = ofs+dir;
+          for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
+            // Get the direction
+            int j=D1_[0].col(el);
 
-              // Save to the result
-              const Matrix<double>& fsens = fcn_.fwdSens(oind,dir).data();
+            // Save to the result
+            const Matrix<double>& fsens = fcn_.fwdSens(oind,dir);
+            
+            // Loop over the rows using this variable
+            for(int el2=js_trans_.rowind(j); el2<js_trans_.rowind(j+1); ++el2){
               
-              // Loop over the rows using this variable
-              for(int el2=js_trans_.rowind(j); el2<js_trans_.rowind(j+1); ++el2){
-                
-                // Get the row
-                int i = js_trans_.col(el2);
-                
-                // Store the value
-                output(ind).data()[js_trans_mapping_[el2]] = fsens.elem(i); // quick hack!
-              }
+              // Get the row
+              int i = js_trans_.col(el2);
+              
+              // Store the value
+              output(ind).data()[js_trans_mapping_[el2]] = fsens.elem(i); // quick hack!
             }
           }
         }
-      } else { // adjoint AD
-        casadi_assert(0);
+      }
+
+      // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
+      for(int ofs=0; ofs<nadj; ofs += nadir_fcn_){
+        // Number of directions
+        int ndir = std::min(nadir_fcn_,nadj-ofs);
+        
+        // Clear the adjoint seeds
+        for(int i=0; i<fcn_.getNumOutputs(); ++i)
+          for(int dir=0; dir<ndir; ++dir)
+            fcn_.adjSeed(i,dir).setZero();
+          
+        // Set the adjoint seeds
+        for(int dir=0; dir<ndir; ++dir){
+          int d = ofs+dir;
+          for(int el=D2_[0].rowind(d); el<D2_[0].rowind(d+1); ++el){
+            // Get the output
+            int i=D2_[0].col(el);
+
+            // Save to the result
+            Matrix<double>& aseed = fcn_.adjSeed(oind,dir);
+            
+            // Store the value
+            aseed.elem(i) += 1;
+          }
+        }
+        
+        // Evaluate the AD adjoint algorithm
+        fcn_.evaluate(0,ndir);
+        called_once = true;
+
+        // Set the adjoint sensitivities
+        for(int dir=0; dir<ndir; ++dir){
+          int d = ofs+dir;
+          for(int el=D2_[0].rowind(d); el<D2_[0].rowind(d+1); ++el){
+            // Get the direction
+            int i=D2_[0].col(el);
+
+            // Save to the result
+            const Matrix<double>& asens = fcn_.adjSens(iind,dir);
+            
+            // Loop over the rows using this variable
+            for(int el2=js_.rowind(i); el2<js_.rowind(i+1); ++el2){
+              
+              // Get the column
+              int j = js_.col(el2);
+              
+              // Store the value
+              output(ind).data()[el2] = asens.elem(j); // quick hack!
+            }
+          }
+        }
       }
     }
     

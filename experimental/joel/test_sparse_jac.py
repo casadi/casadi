@@ -7,9 +7,12 @@ f = x+5
 f[2] = 44
 f[3] = 55
 f[4:7] += inner_prod(x[1:4],x[1:4])
-
 fcn = SXFunction([x],[f])
-fcn.setOption("ad_mode","forward")
+
+# Use forward or adjoint mode ad to calculate directional derivatives (uncomment one to force a mode)
+#fcn.setOption("ad_mode","forward")
+#fcn.setOption("ad_mode","reverse")
+
 fcn.init()
 
 # some point to evaluate the jacobian
