@@ -183,7 +183,8 @@ int CRSSparsity::getNZ(int i, int j){
 }
 
 int CRSSparsity::getNZ(int i, int j) const{
-  casadi_assert_message(i<size1() && j<size2(),"Indices out of bounds");
+  casadi_assert_message(i<size1(),"First index out of bounds");
+  casadi_assert_message(j<size2(),"Second index out of bounds");
   
   if (i<0) i += size1();
   if (j<0) j += size2();

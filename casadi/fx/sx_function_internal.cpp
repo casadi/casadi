@@ -906,10 +906,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
   
   // Number of nonzero outputs
   int nz_out = output_ind[oind].size();
-  
-  // Variable must be dense
-  casadi_assert(n_in==nz_in);
-  
+    
   // Make sure that dwork, which we will now use, has been allocated
   if(dwork.size() < worksize) dwork.resize(worksize);
   
@@ -933,11 +930,14 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
   // Nonzero offset
   int offset = 0;
 
+  // Return sparsity
+  CRSSparsity ret;
+  
   // We choose forward or adjoint based on whichever requires less sweeps
   if(nsweep_fwd <= nsweep_adj){ // forward mode
     
     // Return value (sparsity pattern)
-    CRSSparsity ret_trans(n_in,n_out);
+    CRSSparsity ret_trans(nz_in,n_out);
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_fwd; ++s){
@@ -995,11 +995,11 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
     
     // Return sparsity pattern
     vector<int> mapping;
-    return ret_trans.transpose(mapping);
+    ret = ret_trans.transpose(mapping);
   } else { // Adjoint mode
     
     // Return value (sparsity pattern)
-    CRSSparsity ret(n_out,n_in);
+    ret = CRSSparsity(n_out,nz_in);
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_adj; ++s){
@@ -1048,12 +1048,41 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
 
       // Update offset
       offset += ndir;
-
+    }
+  }
+  
+  // Enlarge if sparse input
+  if(n_in!=nz_in){
+    
+    // New column for each old column
+    vector<int> col_map(input(iind).size());
+    
+    // Loop over rows of the input
+    for(int i=0; i<input(iind).size1(); ++i){
+      
+      // Loop over the nonzeros
+      for(int el=input(iind).rowind(i); el<input(iind).rowind(i+1); ++el){
+        
+        // Get column
+        int j = input(iind).col(el);
+        
+        // Get the column of the jacobian
+        col_map[el] = j+i*input(iind).size2();
+      }
     }
     
-    // Return sparsity pattern
-    return ret;
+    // Enlarge matrix
+    ret.resize(ret.size1(),n_in);
+    
+    // Swap columns
+    vector<int>& col = ret.colRef();
+    for(vector<int>::iterator it=col.begin(); it!=col.end(); ++it){
+      *it = col_map[*it];
+    }
   }
+  
+  // Return sparsity pattern
+  return ret;
 }
 
 } // namespace CasADi

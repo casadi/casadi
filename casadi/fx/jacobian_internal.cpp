@@ -97,7 +97,6 @@ void JacobianInternal::init(){
     nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
     nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
     casadi_assert(nadir_fcn_>0 || nfdir_fcn_>0);
-    
   
     // Use finite differences?
     use_fd_ = getOption("finite_differences").toBool();
@@ -116,8 +115,7 @@ void JacobianInternal::init(){
         throw CasadiException("unknown ad mode: " +  getOption("ad_mode").toString());
     }
   } else { // New (sparse) algorithm
-    casadi_warning("Sparse numeric Jacobian still experimental");
-
+    
     // Initialize the function if not already initialized
     if(!fcn_.isInit()) fcn_.init();
 
@@ -158,6 +156,7 @@ void JacobianInternal::init(){
     // Quick hack!
     iind_ = -1;
     oind_ = -1;
+    js_trans_ = CRSSparsity();
     for(int i=0; i<jblocks_.size(); ++i){
       if(jblocks_[i].second>=0){
         casadi_assert_message(js_trans_.isNull(), "Maximum one Jacobian block currently supported");
@@ -183,6 +182,7 @@ void JacobianInternal::init(){
 }
 
 void JacobianInternal::evaluate(int nfdir, int nadir){
+  
   // Pass the argument to the function
   for(int i=0; i<input_.size(); ++i)
     fcn_.setInput(input(i),i);
@@ -247,6 +247,7 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       }
     }
   } else { // New (sparse) algorithm
+    
     // Has the function been called at least once?
     bool called_once = false;
     
@@ -265,9 +266,10 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
       casadi_assert(nfwd || nadj);
       casadi_assert(!(nfwd && nadj));
-              
+      
       // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
       for(int ofs=0; ofs<nfwd; ofs += nfdir_fcn_){
+        
         // Number of directions
         int ndir = std::min(nfdir_fcn_,nfwd-ofs);
         
@@ -284,14 +286,21 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
             int j=D1_[0].col(el);
             
             // Set the seed
-            fcn_.fwdSeed(iind,dir).data()[j] = 1;
+            Matrix<double>& fseed = fcn_.fwdSeed(iind,dir);
+            casadi_assert(j<fseed.numel());
+            int i_fseed = j/fseed.size2();
+            int j_fseed = j - i_fseed*fseed.size2();
+            int nzind = fcn_.fwdSeed(iind,dir).sparsity().getNZ(i_fseed,j_fseed);
+            if(nzind>=0){
+              fcn_.fwdSeed(iind,dir).elem(i_fseed,j_fseed) = 1;
+            }
           }
         }
       
         // Evaluate the AD forward algorithm
         fcn_.evaluate(ndir,0);
         called_once = true;
-          
+
         // Get the output seeds
         for(int dir=0; dir<ndir; ++dir){
           int d = ofs+dir;
@@ -309,7 +318,14 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
               int i = js_trans_.col(el2);
               
               // Store the value
-              output(ind).data()[js_trans_mapping_[el2]] = fsens.elem(i); // quick hack!
+              casadi_assert(i<fsens.numel());
+              int i_fsens = i/fsens.size2();
+              int j_fsens = i - i_fsens*fsens.size2();
+              int nzind = fsens.sparsity().getNZ(i_fsens,j_fsens);
+              //casadi_assert(nzind>=0);
+              if(nzind>=0){
+                output(ind).data()[js_trans_mapping_[el2]] = fsens.elem(i_fsens,j_fsens); // quick hack!
+              }
             }
           }
         }
@@ -336,7 +352,13 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
             Matrix<double>& aseed = fcn_.adjSeed(oind,dir);
             
             // Store the value
-            aseed.elem(i) += 1;
+            int i_aseed = i/aseed.size2();
+            int j_aseed = i - i_aseed*aseed.size2();
+            int nzind = aseed.sparsity().getNZ(i_aseed,j_aseed);
+            casadi_assert(nzind>=0);
+            if(nzind>=0){
+              aseed.elem(i_aseed,j_aseed) += 1;
+            }
           }
         }
         
@@ -361,7 +383,11 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
               int j = js_.col(el2);
               
               // Store the value
-              output(ind).data()[el2] = asens.elem(j); // quick hack!
+              int i_asens = j/asens.size2();
+              int j_asens = j - i_asens*asens.size2();
+              int nzind = asens.sparsity().getNZ(i_asens,j_asens);
+              casadi_assert(nzind>=0);
+              output(ind).data()[el2] = asens.elem(i_asens,j_asens); // quick hack!
             }
           }
         }
