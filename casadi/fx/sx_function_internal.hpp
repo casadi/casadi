@@ -75,9 +75,6 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
   virtual std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks);
   
-  /** \brief Get the unidirectional or bidirectional partition */
-  virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2);
-  
   /** \brief  DATA MEMBERS */
   
   /** \brief  Indices of the nodes corresponding to the inputs */

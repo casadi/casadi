@@ -32,13 +32,15 @@ using namespace std;
 namespace CasADi{
   
 FXInternal::FXInternal(){
-  setOption("name",            "unnamed_function"); // name of the function
-  addOption("sparse",            OT_BOOLEAN,   true); // function is sparse
-  addOption("number_of_fwd_dir", OT_INTEGER,  1); // number of forward derivatives
-  addOption("number_of_adj_dir", OT_INTEGER,  1); // number of adjoint derivatives
-  addOption("verbose",           OT_BOOLEAN,   false); // verbose evaluation -- for debugging
-  addOption("store_jacobians",   OT_BOOLEAN,   false); // keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times
-  addOption("numeric_jacobian",  OT_BOOLEAN,   false); // verbose evaluation -- for debugging
+  setOption("name","unnamed_function"); // name of the function
+  addOption("sparse",            OT_BOOLEAN,   true,    "function is sparse");
+  addOption("number_of_fwd_dir", OT_INTEGER,   1,       "number of forward derivatives to be calculated simultanously");
+  addOption("number_of_adj_dir", OT_INTEGER,   1,       "number of adjoint derivatives to be calculated simultanously");
+  addOption("verbose",           OT_BOOLEAN,   false,   "verbose evaluation -- for debugging");
+  addOption("store_jacobians",   OT_BOOLEAN,   false,   "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
+  addOption("numeric_jacobian",  OT_BOOLEAN,   false,   "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
+  addOption("numeric_hessian",   OT_BOOLEAN,   false,   "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
+  addOption("ad_mode",           OT_STRING,    "automatic", "How to calculate the Jacobians: \"forward\" (only forward mode) \"adjoint\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
   is_init_ = false;
   verbose_ = false;
   numeric_jacobian_ = false;
@@ -386,6 +388,37 @@ CRSSparsity FXInternal::unidirectionalColoring(const CRSSparsity& A, const CRSSp
   // Create return sparsity
   CRSSparsity ret(forbiddenColors.size(),A.size1(),col,rowind);
   return ret;
+}
+
+void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2){
+  casadi_assert(blocks.size()==1);
+  int oind = blocks.front().first;
+  int iind = blocks.front().second;
+
+  // Sparsity pattern with transpose
+  CRSSparsity &A = jacSparsity(iind,oind);
+  vector<int> mapping;
+  CRSSparsity AT = A.transpose(mapping);
+  mapping.clear();
+  
+  // Which AD mode?
+  bool use_ad_fwd;
+  if(getOption("ad_mode") == "forward"){
+    use_ad_fwd = true;
+  } else if(getOption("ad_mode") == "reverse"){
+    use_ad_fwd = false;
+  } else if(getOption("ad_mode") == "automatic"){
+    use_ad_fwd = input(iind).size() <= output(oind).size();
+  } else {
+    throw CasadiException("FXInternal::jac: Unknown ad_mode");
+  }
+  
+  // Get seed matrices by graph coloring
+  if(use_ad_fwd){
+    D1[0] = unidirectionalColoring(AT,A);
+  } else {
+    D2[0] = unidirectionalColoring(A,AT);
+  }
 }
 
 

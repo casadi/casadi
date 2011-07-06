@@ -39,7 +39,6 @@ using namespace std;
 
 
 SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const vector<Matrix<SX> >& outputv_) : inputv(inputv_),  outputv(outputv_) {
-  addOption("ad_mode",OT_STRING,"automatic");
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("name","unnamed_sx_function");
   
@@ -308,37 +307,6 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Should clean up any zero added to constants and parameters!
 
-  }
-}
-
-void SXFunctionInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2){
-  casadi_assert(blocks.size()==1);
-  int oind = blocks.front().first;
-  int iind = blocks.front().second;
-
-  // Sparsity pattern with transpose
-  CRSSparsity &A = jacSparsity(iind,oind);
-  vector<int> mapping;
-  CRSSparsity AT = A.transpose(mapping);
-  mapping.clear();
-  
-  // Which AD mode?
-  bool use_ad_fwd;
-  if(getOption("ad_mode") == "forward"){
-    use_ad_fwd = true;
-  } else if(getOption("ad_mode") == "reverse"){
-    use_ad_fwd = false;
-  } else if(getOption("ad_mode") == "automatic"){
-    use_ad_fwd = input(iind).size() <= output(oind).size();
-  } else {
-    throw CasadiException("SXFunctionInternal::jac: Unknown ad_mode");
-  }
-  
-  // Get seed matrices by graph coloring
-  if(use_ad_fwd){
-    D1[0] = unidirectionalColoring(AT,A);
-  } else {
-    D2[0] = unidirectionalColoring(A,AT);
   }
 }
 

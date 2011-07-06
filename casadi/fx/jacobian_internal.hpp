@@ -61,6 +61,17 @@ class JacobianInternal : public FXInternal{
     // Jacobian blocks requested
     std::vector<std::pair<int,int> > jblocks_;
 
+    // Seeding matrices
+    std::vector<CRSSparsity> D1_, D2_;
+
+    
+    
+    
+    
+    // Transpose of the Jacobian sparsity
+    CRSSparsity js_;
+    CRSSparsity js_trans_;
+    std::vector<int> js_trans_mapping_;
     
       /// Compress the number of evaluations using curtis-powel reed seeding
 /*      void compress();*/

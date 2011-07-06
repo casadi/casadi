@@ -155,27 +155,23 @@ void JacobianInternal::init(){
     
     
     
-    // 
+    // Quick hack!
     iind_ = -1;
     oind_ = -1;
-    CRSSparsity sp;
     for(int i=0; i<jblocks_.size(); ++i){
-      if(jblocks_[i].second){
-        casadi_assert_message(sp.isNull(), "Maximum one Jacobian block currently supported");
-        sp = output(i).sparsity();
+      if(jblocks_[i].second>=0){
+        casadi_assert_message(js_trans_.isNull(), "Maximum one Jacobian block currently supported");
+        js_ = output(i).sparsity();
+        js_trans_ = js_.transpose(js_trans_mapping_);
+        
         oind_ = jblocks_[i].first;
         iind_ = jblocks_[i].second;
+        vector<pair<int,int> > jblocks_no_f(1,jblocks_[i]);
+        D1_.resize(1);
+        D2_.resize(1);
+        fcn_->getPartition(jblocks_no_f,D1_,D2_);
       }
     }
-    
-    // Get the transpose
-    vector<int> mapping;
-    CRSSparsity sp_trans = sp.transpose(mapping);
-    mapping.clear();
-    
-    // Graph coloring algorithm
-    CRSSparsity compressed = unidirectionalColoring(sp,sp_trans);
-    
   }
 }
 
@@ -189,8 +185,6 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
 
     vector<double>& res2 = output().data();
     
-  //  int el = 0; // running index
-
     if(use_ad_fwd_){ // forward AD if less inputs than outputs
       // Clear the forward seeds
       for(int i=0; i<fcn_.getNumInputs(); ++i)
@@ -246,7 +240,96 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       }
     }
   } else { // New (sparse) algorithm
-    casadi_assert(0);
+    // Has the function been called at least once?
+    bool called_once = false;
+    
+    // Loop over outputs
+    for(int ind=0; ind<jblocks_.size(); ++ind){
+      
+      // Get input and output indices
+      int oind = jblocks_[ind].first;
+      int iind = jblocks_[ind].second;
+      
+      // Skip if nondifferentiated function output
+      if(iind<0) continue;
+      
+      // Get the number of forward and adjoint sweeps
+      int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
+      int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
+      casadi_assert(nfwd || nadj);
+      casadi_assert(!(nfwd && nadj));
+
+      if(verbose()){
+        cout << "JacobianInternal::evaluate: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian" << endl;
+      }
+      
+      // Forward directions
+      if(nfwd>0){
+        
+        // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
+        for(int ofs=0; ofs<nfwd; ofs += nfdir_fcn_){
+          
+          // Clear the forward seeds
+          for(int i=0; i<fcn_.getNumInputs(); ++i)
+            for(int dir=0; dir<nfdir_fcn_; ++dir)
+              fcn_.fwdSeed(i,dir).setZero();
+          
+          for(int dir=0; dir<nfdir_fcn_ && ofs+dir<nfwd; ++dir){
+            int d = ofs+dir;
+            for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
+              // Get the direction
+              int j=D1_[0].col(el);
+              
+              // Pass forward seeds
+              vector<double>& fseed = fcn_.fwdSeed(iind,dir).data();
+              fseed[j] = 1;
+            }
+          }
+        
+          // Evaluate the AD forward algorithm
+          fcn_.evaluate(std::min(nfdir_fcn_,nfwd-ofs),0);
+          called_once = true;
+            
+          // Get the output seeds
+          for(int dir=0; dir<nfdir_fcn_ && ofs+dir<nfwd; ++dir){
+            int d = ofs+dir;
+            for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
+              // Get the direction
+              int j=D1_[0].col(el);
+
+              // Save to the result
+              const Matrix<double>& fsens = fcn_.fwdSens(oind,dir).data();
+              
+              // Loop over the rows using this variable
+              for(int el2=js_trans_.rowind(j); el2<js_trans_.rowind(j+1); ++el2){
+                
+                // Get the row
+                int i = js_trans_.col(el2);
+                
+                // Store the value
+                output(ind).data()[js_trans_mapping_[el2]] = fsens.elem(i); // quick hack!
+              }
+            }
+          }
+        }
+      } else { // adjoint AD
+        casadi_assert(0);
+      }
+    }
+    
+    // Evaluate if necessary
+    if(!called_once) fcn_.evaluate();
+    
+    // Loop over outputs
+    for(int ind=0; ind<jblocks_.size(); ++ind){
+      // Get input and output indices
+      int oind = jblocks_[ind].first;
+      int iind = jblocks_[ind].second;
+      if(iind<0){ 
+        // Nondifferentiated function
+        fcn_.output(oind).get(output(ind));
+      }
+    }
   }
 }
 
