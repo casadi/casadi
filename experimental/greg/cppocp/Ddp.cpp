@@ -71,7 +71,7 @@ void Ddp::setupQFunctions()
 	SXMatrix V_x_kp1(  create_symbolic(  "V_x_kp1", ode.nx(),        1) );
 	SXMatrix V_xx_kp1( create_symbolic( "V_xx_kp1", ode.nx(), ode.nx()) );
 
-	vector<SXMatrix> qInputs(NUM_BACKWARD_SWEEP_INPUTS);
+	vector<SXMatrix> qInputs(NUM_Q_INPUTS);
 	qInputs.at(IDX_Q_INPUTS_X_K)      = xk;
 	qInputs.at(IDX_Q_INPUTS_U_K)      = uk;
 	qInputs.at(IDX_Q_INPUTS_V_0_KP1)  = V_0_kp1;
