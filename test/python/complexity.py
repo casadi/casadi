@@ -17,7 +17,7 @@ class ComplexityTests(casadiTestCase):
   rejectat = 0.01  # [-] Reject the null hypothesis if p-score is smaller than rejectat
   testorders = [0,1,2,3] # Test these orders
   debug = False
-  check = False # Don't benchmark, just check for code errors
+  check = True # Don't benchmark, just check for code errors
   def checkOrders(self,Ns,ts):
     """
     Test the hypothesis that the slope of Ns is order.
@@ -172,9 +172,10 @@ class ComplexityTests(casadiTestCase):
     self.complexity(setupfun,fun, 1)
 
   def test_SXFunctionprodsparse(self):
-    self.message("SXFunction prod diagonal")
+    self.message("SXFunction prod sparse")
     def setupfun(self,N):
       A = symbolic("A",sp_diag(N))
+      A[-1,0]=SX("off") # Have one of-diagonal element
       B = symbolic("B",N,1)
       f = SXFunction([A,B],[c.dot(A,B)])
       f.init()
@@ -200,7 +201,9 @@ class ComplexityTests(casadiTestCase):
   def test_MXFunctionprodsparse(self):
     self.message("MXFunction sparse product")
     def setupfun(self,N):
-      H = MX("H",sp_diag(N))
+      s = sp_diag(N)
+      s[-1,0]=1
+      H = MX("H",s)
       X = MX("X",N,1)
       f = MXFunction([H,X],[c.prod(H,X)])
       f.init()
@@ -210,8 +213,12 @@ class ComplexityTests(casadiTestCase):
     self.complexity(setupfun,fun, 2)  # 1
     self.message("MXFunction sparse sparse product")
     def setupfun(self,N):
-      H = MX("H",sp_diag(N))
-      X = MX("X",sp_diag(N))
+      s = sp_diag(N)
+      s[-1,0]=1
+      H = MX("H",s)
+      s = sp_diag(N)
+      s[-1,0]=1
+      X = MX("X",s)
       f = MXFunction([H,X],[c.prod(H,X)])
       f.init()
       return {'f':f}

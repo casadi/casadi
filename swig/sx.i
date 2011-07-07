@@ -103,13 +103,6 @@ namespace CasADi {
     return ret;
   }
   
-  CasADi::Matrix<CasADi::SX> __resize__(int nrows, int ncols) const {
-    std::cout << "you called __resize__" << nrows << "," << ncols  << std::endl;
-    return CasADi::Matrix<CasADi::SX>(nrows,ncols);
-  }
-  
-  concat_operator(CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
-  
   #endif // SWIGOCTAVE
   
   binopsFull(const Matrix<double>& b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
@@ -426,13 +419,11 @@ template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value&
 %}
 #endif //SWIGOCTAVE
 
-%inline %{
-template<> char meta< std::vector< CasADi::Matrix<CasADi::SX> > >::expected_message[] = "Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))";
-%}
-
 /// std::vector< CasADi::Matrix<CasADi::SX> >
 #ifdef SWIGPYTHON
 %inline %{
+template<> char meta< std::vector< CasADi::Matrix<CasADi::SX> > >::expected_message[] = "Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))";
+
 template <>
 int meta< std::vector< CasADi::Matrix<CasADi::SX> > >::as(PyObject * p,std::vector< CasADi::Matrix<CasADi::SX> > &m) {
   NATIVERETURN(std::vector< CasADi::Matrix<CasADi::SX> >,m)
@@ -496,40 +487,15 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
 #endif //SWIGPYTHON
 
 
-/// std::vector< CasADi::Matrix<CasADi::SX> >
-#ifdef SWIGOCTAVE
-%inline %{
-template <>
-int meta< std::vector< CasADi::Matrix<CasADi::SX> > >::as(const octave_value& p,std::vector< CasADi::Matrix<CasADi::SX> > &m) {
-  int nrow = p.rows();
-  int ncol = p.columns();
-  if(nrow != 1) return false;
-  m.resize(ncol);
-  
-  for(int i=0; i<ncol; ++i){
-    // Get the octave object
-    const octave_value& obj_i = p.cell_value()(i);
-    
-    if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
-      bool ret = meta< CasADi::Matrix< CasADi::SX > >::as(obj_i,m[i]);
-      if(!ret) return false;
-    }
-  }
-  return true;
-}
-
-template <> bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(const octave_value& p) {return p.is_cell();}
-
-%}
-#endif //SWIGOCTAVE
-
 %my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
-#ifdef SWIGPYTHON
+#ifdef SWIGOCTAVE
+%meta_vector(CasADi::Matrix<CasADi::SX>);
+#endif //SWIGOCTAVE
 %meta_vector(std::vector<CasADi::SX>);
-#endif // SWIGPYTHON
+
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;

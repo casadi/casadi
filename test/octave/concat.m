@@ -11,6 +11,7 @@ syms = {c,d};
 
 for i=1:2
   for j=1:2
+    [i j]
     n = nums{i}
     s = syms{j}
     [n s]

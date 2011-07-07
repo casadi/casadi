@@ -1,34 +1,6 @@
 --- /home/jg/programs/swig-1.3.40/Lib/octave/octrun.swg	2009-08-15 03:19:28.000000000 +0200
-+++ /usr/share/swig1.3/octave/octrun.swg	2011-07-06 22:49:42.185582983 +0200
-@@ -1,3 +1,4 @@
-+#include <iostream>
- 
- #if OCTAVE_API_VERSION_OPTION>0
- #define USE_OCTAVE_API_VERSION OCTAVE_API_VERSION_OPTION
-@@ -327,6 +328,22 @@
-       return true;
-     }
- 
-+    bool dispatch_cat_op(const octave_base_value &lhs,const octave_base_value &rhs, int offsetx, int offsety, octave_value &ret) {
-+      member_value_pair *m = find_member("__concat__", false);
-+      if (!m || m->first->is_static() || m->first->is_global()) return false;
-+      octave_value_list args;
-+      args.append(as_value());
-+      args.append(make_value_hack(lhs));
-+      args.append(make_value_hack(rhs));
-+      args.append(octave_value(offsetx));
-+      args.append(octave_value(offsety));
-+      octave_value_list argout(member_invoke(m, args, 1));
-+      if (argout.length() < 1)
-+	return false;
-+      ret = argout(0);
-+      return true;
-+    }
-+
-     bool dispatch_binary_op(const std::string &symbol, const octave_base_value &rhs, octave_value &ret) {
-       member_value_pair *m = find_member(symbol, false);
-       if (!m || m->first->is_static() || m->first->is_global())
-@@ -701,6 +718,71 @@
++++ /usr/share/swig1.3/octave/octrun.swg	2011-07-07 15:49:11.014373272 +0200
+@@ -701,6 +701,53 @@
        return as_value();
      }
  
@@ -77,64 +49,12 @@
 +    }
 +    
 +    // The following method is needed to get concatenation working
-+    virtual bool is_object() const {  std::cout << "Call me" << std::endl; return true; }
-+
-+    virtual octave_value resize (const dim_vector& d, bool fill = false) const {
-+      octave_swig_type *nc_this = const_cast < octave_swig_type *>(this);
-+      member_value_pair *m = nc_this->find_member("__resize__", false);
-+      if (!m) {
-+	      error("resize method not defined for swig_type");
-+      }
-+      octave_value_list inarg;
-+      inarg.append(nc_this->as_value());
-+      inarg.append(octave_value(d.elem(0)));
-+      inarg.append(octave_value(d.elem(1)));
-+      octave_value_list outarg = nc_this->member_invoke(m, inarg, 1);
-+      if (outarg.length() < 1) {
-+	      error("__resize__ method did not return an instance");
-+      }
-+      return outarg(0);
-+    }
-+      
++    virtual bool is_object() const { return true; } 
 +      
      virtual bool is_string() const {
        octave_swig_type *nc_this = const_cast < octave_swig_type *>(this);
        return !!nc_this->find_member("__str__", false);
-@@ -802,6 +884,33 @@
-       return octave_value();
-     }
- 
-+    static octave_value dispatch_cat_op(octave_base_value &lhs,const octave_base_value &rhs,const Array<octave_idx_type>&x) {
-+      octave_swig_type *ost = Swig::swig_value_deref(lhs);
-+
-+      if (ost==0) {
-+        ost = Swig::swig_value_deref(rhs);
-+      }
-+      if (ost==0) {
-+        error("dispatch_cat_op method of swig_ref was called without swig-like arguments");
-+      }
-+
-+      octave_value ret;
-+      if (ost->dispatch_cat_op(lhs, rhs, x.elem(0,0), x.elem(1,0) , ret))
-+        return ret;
-+        
-+      octave_value_list args;
-+      args.append(make_value_hack(lhs));
-+      args.append(make_value_hack(rhs));
-+      args.append(octave_value(true));
-+
-+      if (dispatch_global_op("__concat__", args, ret))
-+	      return ret;
-+
-+      error("could not dispatch cat operator");
-+      return octave_value();
-+    }
-+
-+
-     static octave_value dispatch_binary_op(const octave_base_value &lhs, const octave_base_value &rhs, const char *op_name) {
-       octave_swig_type *lhs_ost = Swig::swig_value_deref(lhs);
-       octave_swig_type *rhs_ost = Swig::swig_value_deref(rhs);
-@@ -926,6 +1035,14 @@
+@@ -926,6 +973,11 @@
      virtual bool is_string() const 
        { return ptr->is_string(); }
  
@@ -143,32 +63,6 @@
 +    // The following methods are needed to get size/columns/rows working
 +    virtual dim_vector dims (void) const { return ptr->dims(); }
 +
-+    virtual octave_value resize (const dim_vector& d, bool fill = false) const
-+      { return ptr->resize(d,fill); };
-+
      virtual std::string string_value(bool force = false) const 
        { return ptr->string_value(force); }
  
-@@ -1247,12 +1364,14 @@
- SWIGRUNTIME octave_value swig_binary_op_##name(const octave_base_value&lhs,const octave_base_value &rhs) { \
-   return octave_swig_type::dispatch_binary_op(lhs,rhs,#name); \
- }
-+
- #define swigreg_unary_op(name) \
- if (!octave_value_typeinfo::lookup_unary_op(octave_value::op_##name,tid)) \
- octave_value_typeinfo::register_unary_op(octave_value::op_##name,tid,swig_unary_op_##name);
- #define swigreg_binary_op(name) \
- if (!octave_value_typeinfo::lookup_binary_op(octave_value::op_##name,tid1,tid2)) \
- octave_value_typeinfo::register_binary_op(octave_value::op_##name,tid1,tid2,swig_binary_op_##name);
-+#define swigreg_cat_op() \
- 
-   swig_unary_op(not);
-   swig_unary_op(uplus);
-@@ -1314,6 +1433,7 @@
-     swigreg_binary_op(el_and);
-     swigreg_binary_op(el_or);
-   }
-+
-   SWIGRUNTIME void SWIG_InstallOps(int tid) {
-     // here we assume that tid are conseq integers increasing from zero, and 
-     // that our tid is the last one. might be better to have explicit string 

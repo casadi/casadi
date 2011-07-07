@@ -69,13 +69,10 @@ int meta< CasADi::MX >::as(const octave_value& p,CasADi::MX &m) {
 %}
 #endif //SWIGPOCTAVE
 
-%inline %{
-template<> char meta< std::vector< CasADi::MX > >::expected_message[] = "Expecting sequence(MX, number)";
-%}
-
 /// std::vector< CasADi::MX >
 #ifdef SWIGPYTHON
 %inline %{
+template<> char meta< std::vector< CasADi::MX > >::expected_message[] = "Expecting sequence(MX, number)";
 template <>
 int meta< std::vector< CasADi::MX > >::as(PyObject * p,std::vector< CasADi::MX > &m) {
   NATIVERETURN(std::vector< CasADi::MX >,m)
@@ -131,30 +128,8 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
 %}
 #endif //SWIGPYTHON
 
-/// std::vector< CasADi::MX >
 #ifdef SWIGOCTAVE
-%inline %{
-template <>
-int meta< std::vector< CasADi::MX > >::as(const octave_value& p,std::vector< CasADi::MX > &m) {
-  int nrow = p.rows();
-  int ncol = p.columns();
-  if(nrow != 1) return false;
-  m.resize(ncol);
-  
-  for(int i=0; i<ncol; ++i){
-    // Get the octave object
-    const octave_value& obj_i = p.cell_value()(i);
-    if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
-      bool ret = meta< CasADi::MX >::as(obj_i,m[i]);
-      if(!ret) return false;
-    }
-  }
-  return true;
-}
-
-template <> bool meta< std::vector< CasADi::MX > >::couldbe(const octave_value& p) {return p.is_cell();}
-
-%}
+%meta_vector(CasADi::MX);
 #endif //SWIGOCTAVE
 
 %template(sparsity_vector) std::vector<CasADi::CRSSparsity>;

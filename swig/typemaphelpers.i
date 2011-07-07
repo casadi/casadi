@@ -86,6 +86,19 @@ class meta {
     }
     #endif // SWIGPYTHON
     
+   #ifdef SWIGOCTAVE
+    static bool couldbe_sequence(const octave_value& p) {
+      if (!p.is_cell()) return false;
+      int nrow = p.rows();
+      int ncol = p.columns();
+      if (nrow!=1 && ncol!=1) return false;
+      for(int i=0; i<p.length(); ++i){
+        if (!meta< T >::couldbe(p.cell_value()(i))) return false;
+      }
+      return true;
+    }
+    #endif // SWIGOCTAVE
+    
     // Assumes that p is a PYTHON sequence
     #ifdef SWIGPYTHON
     static int as_vector(PyObject * p, std::vector<T> &m) {
@@ -105,6 +118,28 @@ class meta {
       return true;
     }
     #endif // SWIGPYTHON
+    
+    // Assumes that p is an octave cell
+    #ifdef SWIGOCTAVE
+    static int as_vector(const octave_value& p , std::vector<T> &m) {
+      int nrow = p.rows();
+      int ncol = p.columns();
+      if (nrow!=1 && ncol!=1) return false;
+      m.resize(p.length());
+      
+      for(int i=0; i<p.length(); ++i){
+        // Get the octave object
+        const octave_value& obj_i = p.cell_value()(i);
+        
+        if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
+          bool ret = meta< T >::as(obj_i,m[i]);
+          if(!ret) return false;
+        }
+      }
+      return true;
+    }
+    #endif // SWIGOCTAVE
+    
     
     #ifdef SWIGPYTHON
     // Would love to make this const T&, but looks like not allowed
@@ -146,24 +181,22 @@ class meta {
 %enddef
 
 /// std::vector< Type >
-#ifdef SWIGPYTHON
-%define %meta_vector(Type) 
+%define %meta_vector(Type)
 %inline %{
 template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)";
 
 template <>
-int meta< std::vector< Type > >::as(PyObject * p,std::vector< Type > &m) {
+int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) {
   NATIVERETURN(std::vector< Type >,m)
   return meta< Type >::as_vector(p,m);
 }
 
 template <>
-bool meta< std::vector< Type > >::couldbe(PyObject * p) {
+bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) {
   return meta< std::vector< Type > >::isa(p) ||  meta< Type >::couldbe_sequence(p);
 }
 %}
 %enddef
-#endif //SWIGPYTHON
 
 /// std::pair< TypeA, TypeB >
 #ifdef SWIGPYTHON
