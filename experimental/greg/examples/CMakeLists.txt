@@ -81,6 +81,14 @@ target_link_libraries(lqrSpring
   snopt_interface
 )
 
+add_executable(ddpDoubleCartpole ddpDoubleCartpole.cpp)
+target_link_libraries(ddpDoubleCartpole
+  cppocp
+  casadi 
+  ${SNOPT_LIBRARIES}
+  snopt_interface
+)
+
 add_executable(ddpCartpole ddpCartpole.cpp)
 target_link_libraries(ddpCartpole
   cppocp
