@@ -87,6 +87,14 @@ cost(map<string,SX> state,
 	//	costRet = 2*SQR(state["x"]) + 3*SQR(state["theta"]) + 4*SQR(state["vx"]) + 5*SQR(state["vtheta"]) + 6*SQR(action["u"]);
 	costRet = 0.01*SQR(action["u"]);
 
+	// add barrier function
+	double uUb =  10.1;
+	double uLb = -10.1;
+	double mu = 1.0;
+	SX uBarrierUb = -mu*log(  uUb - action["u"] );
+	SX uBarrierLb = -mu*log( -uLb + action["u"] );
+	costRet += uBarrierUb + uBarrierLb;
+
 	return costRet;
 }
 
@@ -125,7 +133,7 @@ main()
 	ms.boundStateAction(  "theta", -50, 50);
 	ms.boundStateAction( "vtheta", -50, 50);
 
-	// ms.boundStateAction("u",-20,20);
+	ms.boundStateAction("u",-10,10);
 
 	/// initial conditions
 	ms.boundStateAction(      "x", 0.0, 0.0, 0);
@@ -164,17 +172,17 @@ main()
  	Ddp ddp(ode, t0, tf, ms.N, &cost);
 
 	// regularization
-	ddp.stateRegularization[0,0]  = 0.01;
-	ddp.stateRegularization[1,1]  = 0.01;
-	ddp.stateRegularization[2,2]  = 0.01;
-	ddp.stateRegularization[3,3]  = 0.01;
-	ddp.actionRegularization[0,0] = 0.1;
+	ddp.stateRegularization[0,0]  = 1;
+	ddp.stateRegularization[1,1]  = 1;
+	ddp.stateRegularization[2,2]  = 1;
+	ddp.stateRegularization[3,3]  = 1;
+	ddp.actionRegularization[0,0] = 1;
 
 	// action bounding
 	vector<double> ub(1);
 	vector<double> lb(1);
-	ub.at(0) = 20;
-	lb.at(0) = -30;
+	ub.at(0) = 10;
+	lb.at(0) = -10;
 	ddp.boundAction( lb, ub );
 
 	// load ms solution into ddp
