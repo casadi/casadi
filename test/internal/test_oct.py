@@ -7,7 +7,8 @@ from testsuite import TestSuite
 t = TestSuite(dirname=src,
   suffix="m",
   command = lambda dir,fn:  ["octave", fn],
-  skipdirs=[".svn","ctemplate"]
+  skipdirs=[".svn","ctemplate"],
+  allowable_returncodes=[127]
   )
   
 t.run()

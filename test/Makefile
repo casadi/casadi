@@ -11,7 +11,7 @@ unittests_py:
 	cd python && python alltests.py && cd ..
 
 unittests_oct:
-	cd octave && octave test.m && cd ..
+	python internal/test_oct.py octave
 
 examples: examples_indoc examples_code
 

@@ -8,7 +8,7 @@ def is_exe(root,name):
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
     
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],inputs={},workingdir = lambda x: x):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[]):
     """
     
     dirname: The directory that should be crawled for test problems.
@@ -34,6 +34,7 @@ class TestSuite:
     self.command = command
     self.skipdirs = skipdirs
     self.inputs = inputs
+    self.allowable_returncodes = allowable_returncodes 
     self.workingdir = workingdir
 
   def run(self):
@@ -66,7 +67,7 @@ class TestSuite:
       inp = self.inputs[fn]
     stdoutdata, stderrdata = p.communicate(inp)
     t = time.clock() - t0
-    if (p.returncode==0):
+    if (p.returncode==0 or p.returncode in self.allowable_returncodes):
       pass
       #print "  > Succes: %0.2f [ms]" % (t*1000)
     else :
