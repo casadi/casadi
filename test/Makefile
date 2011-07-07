@@ -29,8 +29,7 @@ examples_indoc_cpp:
 	python internal/test_cpp.py '../documentation/examples'
 	
 examples_code_cpp:
-	cd ../build && make && cd ../test
-	python internal/test_bin.py '../build/bin'
+	python internal/test_cppcmake.py '../examples' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp"
 
 examples_indoc_oct:
 	python internal/test_oct.py '../documentation/examples'

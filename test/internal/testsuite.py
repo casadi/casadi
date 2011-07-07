@@ -2,13 +2,14 @@ import os
 import sys
 from subprocess import *
 import time
+import re
 
 def is_exe(root,name):
   fpath = os.path.join(root,name)
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
     
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[]):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[]):
     """
     
     dirname: The directory that should be crawled for test problems.
@@ -18,12 +19,18 @@ class TestSuite:
              
     skipdirs: A list of directories that should be skipped during recursive traversal of dirname.
     
+    skipfiles: A list of matched files that should be skipped during recursive traversal of dirname.
+    
     suffix:  Only the files that end with this suffix will be tested.
              Omit argument or set to None to test any file.
              
     inputs:  Can be a dictionary of filename -> string to pass numbers to STDIN of the process
     
-    workingdir: Specify the working directory for the process 
+    workingdir: Specify the working directory for the process. The path may be relative to the /trunk/test path
+    
+    args: a list of command line options:
+       -skipfiles="file1 file2"   get's added to skipfiles
+       
     
     """
     self.stats={'numtests':0,'numfails':0}
@@ -33,9 +40,20 @@ class TestSuite:
     self.postRun = postRun
     self.command = command
     self.skipdirs = skipdirs
+    self.skipfiles = skipfiles
     self.inputs = inputs
     self.allowable_returncodes = allowable_returncodes 
     self.workingdir = workingdir
+    self.args=args
+    for arg in args:
+      okay = False
+      m = re.search('-skipfiles=(.*)', arg)
+      if m:
+        self.skipfiles+=m.group(1).split(' ')
+        okay = True
+        
+      if not(okay):
+        print "Unknown argument: ", arg
 
   def run(self):
     print "Running test in " + self.dirname
@@ -47,7 +65,8 @@ class TestSuite:
           if skip in dirs:
             dirs.remove(skip)
         if (self.suffix is None and is_exe(root,name)) or (not(self.suffix is None) and name.endswith('.'+self.suffix)):
-          self.test(root,name,self.command)
+          if not(name in self.skipfiles):
+            self.test(root,name,self.command)
       if not(self.postRun is None):
         self.postRun(root)
         
