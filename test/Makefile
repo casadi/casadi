@@ -23,7 +23,7 @@ examples_indoc_py:
 	python internal/test_py.py '../documentation/examples'
 	
 examples_code_py:
-	python internal/test_py.py '../examples/python'
+	python internal/test_py.py '../examples/python' -skipfiles="c_code_generation.py"
 	
 examples_indoc_cpp:
 	python internal/test_cpp.py '../documentation/examples'
