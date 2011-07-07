@@ -113,6 +113,8 @@ endif(WITH_PYTHON_INTERRUPTS)
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
+set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
+  
 # set the global swig flags to empty
 # set(CMAKE_SWIG_FLAGS "-outdir ${PROJECT_BINARY_DIR}")
 # SEPARATE_ARGUMENTS(CMAKE_SWIG_FLAGS)
