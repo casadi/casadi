@@ -2,7 +2,16 @@ from casadi import *
 from numpy import *
 from os import system
 import time
+import sys
 
+
+compileme = True  # Flag wether compiling should take place or not
+
+if len(sys.argv)>1 and sys.arg[0]=='nc':
+  compileme = False
+else:
+  print "Info: Use 'python c_code_generation.py nc' to omit compiling"
+  
 x = symbolic("x",7,7)
 f = det(x)
 x = vec(x)
@@ -23,21 +32,24 @@ gfcn.generateCode(srcname)
 objname_no_opt = "grad_det_no_opt.so"
 print "Compiling without optimization: ", objname_no_opt
 t1 = time.time()
-#system("gcc -fPIC -shared " + srcname + " -o " + objname_no_opt)
+if compileme:
+  system("gcc -fPIC -shared " + srcname + " -o " + objname_no_opt)
 t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 
 objname_O3_opt = "grad_det_O3_opt.so"
 print "Compiling with O3 optimization: ", objname_O3_opt
 t1 = time.time()
-#system("gcc -fPIC -shared -O3 " + srcname + " -o " + objname_O3_opt)
+if compileme:
+  system("gcc -fPIC -shared -O3 " + srcname + " -o " + objname_O3_opt)
 t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 
 objname_Os_opt = "grad_det_Os_opt.so"
 print "Compiling with Os optimization: ", objname_Os_opt
 t1 = time.time()
-#system("gcc -fPIC -shared -Os " + srcname + " -o " + objname_Os_opt)
+if compileme:
+  system("gcc -fPIC -shared -Os " + srcname + " -o " + objname_Os_opt)
 t2 = time.time()
 print "time = ", (t2-t1)*1e3, " ms"
 
