@@ -214,6 +214,12 @@ ADD_CUSTOM_COMMAND(
    COMMAND ${OCTAVE_EXECUTABLE} -q octrun_patch.m
    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/swig_lib/octrun_patch.m ${ORIG_SWIGDIR}/octave/octrun.swg
 )
+ELSE(OCTAVE_FOUND)
+#Don't do anything
+ADD_CUSTOM_COMMAND(
+   OUTPUT octrun.swg
+   COMMENT "No octave patch will be applied (octave executable not found)"
+)
 ENDIF(OCTAVE_FOUND)
 # end patch
  
