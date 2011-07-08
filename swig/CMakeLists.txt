@@ -189,7 +189,7 @@ IF(PYTHONINTERP_FOUND)
 ENDIF(PYTHONINTERP_FOUND)
 
 # OCTAVE interface
-SWIG_ADD_MODULE (casadi_octave octave casadi.i)
+SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
 SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
 set_target_properties(casadi_octave PROPERTIES PREFIX "")
 set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
@@ -200,6 +200,22 @@ ADD_CUSTOM_COMMAND(
  POST_BUILD
  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/xcasadi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
 )
+
+# begin Patch swig to get concat functionality
+find_package(OCTAVE)
+IF(OCTAVE_FOUND)
+EXECUTE_PROCESS(COMMAND ${SWIG_EXECUTABLE} -swiglib OUTPUT_VARIABLE ORIG_SWIGDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+ADD_CUSTOM_COMMAND(
+   OUTPUT octrun.swg
+   COMMAND ${CMAKE_COMMAND} -E remove octrunORIG.swg octrun.swg
+   COMMAND ${SWIG_EXECUTABLE} -octave -o octrunORIG.swg -co octrun.swg
+   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/swig_lib .
+   COMMAND ${OCTAVE_EXECUTABLE} -q octrun_patch.m
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/swig_lib/octrun_patch.m ${ORIG_SWIGDIR}/octave/octrun.swg
+)
+ENDIF(OCTAVE_FOUND)
+# end patch
  
 ADD_CUSTOM_COMMAND(
  TARGET casadi_octave
