@@ -52,13 +52,10 @@ public:
 	void setStates(  std::vector<CasADi::DMatrix> & x);
 	void setActions( std::vector<CasADi::DMatrix> & u);
 
-	void writeOctaveOutput( std::string name );
 	void writeSolution( const char * filename );
-//=======
-	void writeOctaveOutput( std::string name, std::string add);
-	//void writeOctaveOutput( std::string name, double * xOpt);
-	//void writeOctaveOutput( std::string name, std::string add, double * xOpt);
-	//void writeSolution( const char * filename, double * xOpt );
+  void writeOctaveOutput( std::string name );
+  void writeOctaveOutput( std::string name, std::string add );
+  void writeOctaveOutput( std::string name, std::string add, std::string filename );
 	void loadGuess( const char * filename );
 
 	// multiple shooting instances

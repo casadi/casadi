@@ -331,10 +331,15 @@ void Ocp::writeOctaveOutput( string name )
 {
 	writeOctaveOutput(name, "");
 }
+
 void Ocp::writeOctaveOutput( string name, string add )
 {
-	string filename(name);
-	filename.append(".m");
+  string filename(name + ".m");
+  writeOctaveOutput(name, add, filename);
+}
+
+void Ocp::writeOctaveOutput( string name, string add, string filename )
+{
 	ofstream f((char*)filename.c_str());
 
 	if (!f){
