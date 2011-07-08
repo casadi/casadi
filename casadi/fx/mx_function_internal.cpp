@@ -24,6 +24,7 @@
 #include "../mx/jacobian_reference.hpp"
 #include "../mx/evaluation.hpp"
 #include "../mx/mapping.hpp"
+#include "../mx/mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 
 #include "../stl_vector_tools.hpp"
@@ -429,6 +430,10 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
   return node;
 }
 
+/*CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
+  std::vector<MX> ret = jac(iind);
+  return ret.at(oind).sparsity();
+}*/
   
 std::vector<MX> MXFunctionInternal::jac(int iind){
   casadi_assert(isInit());
@@ -512,19 +517,21 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
 }
 
 FX MXFunctionInternal::hessian(int iind, int oind) {
-  // Get the jacobian of this function
+  // Assert initialized
+  casadi_assert_message(isInit(),"Function not initialized.");
+  
+  // Make sure that the function is scalar valued
+  //casadi_assert_message(output(oind).numel()==1,"Can only create hessians for scalar valued functions");
+  
+  // Get the Jacobian of the function
   MX J = jac(iind).at(oind);
-  // Transpose it to get the gradient (better not rely on mx_tools)
-  std::vector<int> nzind;
-  CRSSparsity sp = J->sparsity().transpose(nzind);
-  MX G;
-  G.assignNode(new Mapping(sp));
-  G->addDependency(J,nzind);
-  // Construct a function of it
-  MXFunction temp(inputv,G);
-  temp.init();
+
+  // Construct the gradient function
+  MXFunction gfcn(inputv,trans(J));
+  gfcn.init();
+  
   // And return the jacobian of that gradient function
-  return temp.jacobian(iind,0);
+  return gfcn.jacobian(iind,0);
 }
 
 void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants){

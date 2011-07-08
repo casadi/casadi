@@ -138,7 +138,7 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
 
 MX Mapping::adFwd(const std::vector<MX>& jx){
   casadi_assert(isReady());
-  casadi_assert(size()==numel());
+  casadi_assert(size()==numel()); // TODO: relax this!!!
   const std::vector<int> &nzind_ = nzmap_.data();
 
   // Number of columns

@@ -100,6 +100,9 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SXMatrix>& inputv );
 
+    /// Generate the sparsity of a Jacobian block
+    //virtual CRSSparsity getJacSparsity(int iind, int oind);
+
 };
 
 } // namespace CasADi

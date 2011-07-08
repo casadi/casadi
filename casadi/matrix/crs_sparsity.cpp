@@ -787,7 +787,7 @@ CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsign
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
-  if(true){ // the code below should be ok now, the switch can probably be removed
+  if(false){ // the code below should be ok now, the switch can probably be removed
     
     // Dimensions
     int x_nrow = size1();
