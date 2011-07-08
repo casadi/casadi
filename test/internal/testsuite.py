@@ -4,6 +4,8 @@ from subprocess import *
 import time
 import re
 
+
+
 def is_exe(root,name):
   fpath = os.path.join(root,name)
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
@@ -33,6 +35,11 @@ class TestSuite:
        
     
     """
+    
+    # Don't buffer
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
+
     self.stats={'numtests':0,'numfails':0}
     self.suffix = suffix
     self.dirname = dirname
@@ -49,6 +56,7 @@ class TestSuite:
       okay = False
       m = re.search('-skipfiles=(.*)', arg)
       if m:
+        print "foo:", m.group(1)
         self.skipfiles+=m.group(1).split(' ')
         okay = True
         

@@ -21,7 +21,8 @@ t = TestSuite(dirname=src,
   preRun=setdummybackend,
   postRun=removedummybackend,
   command = lambda dir,fn:  ["python", fn],
-  skipdirs=[".svn","ctemplate"]
+  skipdirs=[".svn","ctemplate"],
+    args=sys.argv[2:]
   )
   
 t.run()

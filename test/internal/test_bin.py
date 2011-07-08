@@ -9,7 +9,8 @@ from subprocess import *
 t = TestSuite(dirname=src,
   workingdir = lambda dir : os.path.join(dir,'..'),
   command = lambda dir,fn:  ['bin/'+fn],
-  inputs = {'det_minor': "5"}
+  inputs = {'det_minor': "5"},
+    args=sys.argv[2:]
   )
   
 t.run()
