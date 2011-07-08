@@ -1,5 +1,9 @@
 all: unittests
 
+# Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
+# These targets must all go on one line
+trunktesterbot: unittests_py unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp
+
 full: unittests examples tutorials benchmarks
 
 benchmarks:
