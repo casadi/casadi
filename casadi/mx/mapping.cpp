@@ -78,6 +78,7 @@ void Mapping::print(std::ostream &stream, const std::vector<std::string>& args) 
       if(i!=0) stream << ",";
       stream << args[depind_[i]];
       if(dep(depind_[i]).numel()>1) stream << "[" << nzind_[i] << "]";
+      STREAMLIMITTEST
     }
     stream << "])";
   }
