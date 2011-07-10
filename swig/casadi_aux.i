@@ -7,6 +7,17 @@
 #include "casadi/options_functionality.hpp"
 %}
 
+// Exceptions handling
+%include "exception.i"
+%exception {
+try {
+  $action
+  } catch (const std::exception& e) {
+  SWIG_exception(SWIG_RuntimeError, e.what());
+  } catch (const char* e) { // depreciated!!
+    SWIG_exception(SWIG_RuntimeError, e);
+  }
+}
 
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
@@ -201,18 +212,6 @@ if (!ret) {
 
 %include "casadi/generic_type.hpp"
 %include "casadi/options_functionality.hpp"
-
-// Exceptions handling
-%include "exception.i"
-%exception {
-try {
-  $action
-  } catch (const std::exception& e) {
-  SWIG_exception(SWIG_RuntimeError, e.what());
-  } catch (const char* e) { // depreciated!!
-    SWIG_exception(SWIG_RuntimeError, e);
-  }
-}
 
 namespace CasADi {
   %extend OptionsFunctionality {
