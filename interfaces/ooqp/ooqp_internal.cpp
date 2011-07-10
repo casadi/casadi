@@ -55,17 +55,22 @@ OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const C
 }
 
 OOQPInternal::~OOQPInternal(){ 
-    delete s;
+
+  if (s) delete s;
+  
+  if (qp) {
+    delete qp;
     delete prob;
     delete vars;
     delete resid;
+  }
 }
 
 void OOQPInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("OOQPSolve::evaluate() not implemented for forward or backward mode");
-  if (s==0) {
+  if (!qp) {
     allocate();
-    assert(s!=0);
+    assert(qp);
   } else {  
     // Split A in equalities and inequalities
     A_eq.set(input(QP_A)(eq,all_A));
@@ -88,9 +93,19 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     Hl.set(input(QP_H)[Hl_nz]);
   }
   
-  int flag = s->solve(prob,vars, resid);
+  // Just calling s->solve repeatedly on a GondzioSolver is a memory leak
+  // So we must always allocate a fresh solver
+  if (s) delete s;
+  s = new GondzioSolver( qp, prob );
   
+  s->setMuTol(getOption("mutol").toDouble());
+  s->setArTol(getOption("artol").toDouble());
+  
+  int flag = s->solve(prob,vars, resid);
+    
   vars->x->copyIntoArray(&output(QP_X_OPT).data()[0]);
+  
+
   
   if (isnan(output(QP_X_OPT).at(0))) {
      std::cerr << "WARNING: nan in decision variables. You probably need to do a solver.reInit() call before evaluate()." << std::endl;
@@ -103,8 +118,8 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
 }
 
 void OOQPInternal::allocate() {
-  if (s!=0) {
-    delete s;
+  if (qp) {
+    delete qp;
     delete prob;
     delete vars;
     delete resid;
@@ -214,11 +229,7 @@ void OOQPInternal::allocate() {
   // Further setup of the QP problem
   vars = (QpGenVars *) qp->makeVariables( prob );
   resid = (QpGenResiduals *) qp->makeResiduals( prob );
-  
-  s     = new GondzioSolver( qp, prob );
-  
-  s->setMuTol(getOption("mutol").toDouble());
-  s->setArTol(getOption("mutol").toDouble());
+ 
   
 }
 
