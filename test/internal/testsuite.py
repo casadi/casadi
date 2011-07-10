@@ -32,6 +32,8 @@ class TestSuite:
     
     args: a list of command line options:
        -skipfiles="file1 file2"   get's added to skipfiles
+       -memcheck           Include a check for memory leaks
+       
        
     
     """
@@ -51,13 +53,17 @@ class TestSuite:
     self.inputs = inputs
     self.allowable_returncodes = allowable_returncodes 
     self.workingdir = workingdir
+    self.memcheck = False
     self.args=args
     for arg in args:
       okay = False
       m = re.search('-skipfiles=(.*)', arg)
       if m:
-        print "foo:", m.group(1)
         self.skipfiles+=m.group(1).split(' ')
+        okay = True
+      m = re.search('-memcheck', arg)
+      if m:
+        self.memcheck = True
         okay = True
         
       if not(okay):
@@ -94,15 +100,33 @@ class TestSuite:
       inp = self.inputs[fn]
     stdoutdata, stderrdata = p.communicate(inp)
     t = time.clock() - t0
+    succes = True
     if (p.returncode==0 or p.returncode in self.allowable_returncodes):
-      pass
+      succes = True
       #print "  > Succes: %0.2f [ms]" % (t*1000)
     else :
-      self.stats['numfails']+=1
+      succces = False
       print "In %s, %s failed:" % (dir,fn)
       print "="*30
-      print p.returncode
+      print "returncode: ", p.returncode
       print stdoutdata
       print stderrdata
       print "="*30
-  
+      
+    if self.memcheck:
+      p=Popen(['valgrind']+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+      f=Popen(['grep', "definitely lost"],stdin=p.stderr,stdout=PIPE)
+      p.stderr.close()
+      stdoutdata, stderrdata = f.communicate(inp)
+      m = re.search('definitely lost: (.*) bytes', stdoutdata)
+      lost = "0"
+      if m:
+        lost = m.group(1)
+      else:
+        raise Exception("valgrind output is not like expected.")
+      if not(lost=="0"):
+        print "Memory leak: lost %s bytes" % (dir,fn, lost)
+        succces = False
+      
+    if not(succes):
+      self.stats['numfails']+=1

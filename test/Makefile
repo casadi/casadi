@@ -1,8 +1,15 @@
 all: unittests
 
+
+
+
+
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
 trunktesterbot: unittests_py unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp
+
+# Set to -memcheck if you want to include a check for memory leaks
+MEMCHECK = 
 
 full: unittests examples tutorials benchmarks
 
@@ -12,7 +19,7 @@ benchmarks:
 unittests: unittests_py unittests_oct
 	
 unittests_py:
-	cd python && python alltests.py && cd ..
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK)
 
 unittests_oct:
 	python internal/test_oct.py octave
@@ -24,19 +31,19 @@ examples_indoc: examples_indoc_py examples_indoc_cpp examples_indoc_oct
 examples_code: examples_code_py examples_code_cpp
 
 examples_indoc_py:
-	python internal/test_py.py '../documentation/examples'
+	python internal/test_py.py '../documentation/examples' $(MEMCHECK)
 	
 examples_code_py:
-	python internal/test_py.py '../examples/python' -skipfiles="c_code_generation.py"
+	python internal/test_py.py '../examples/python' -skipfiles="c_code_generation.py" $(MEMCHECK)
 	
 examples_indoc_cpp:
-	python internal/test_cpp.py '../documentation/examples'
+	python internal/test_cpp.py '../documentation/examples' $(MEMCHECK)
 	
 examples_code_cpp:
-	python internal/test_cppcmake.py '../examples' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp"
+	python internal/test_cppcmake.py '../examples' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp" $(MEMCHECK)
 
 examples_indoc_oct:
 	python internal/test_oct.py '../documentation/examples'
 
 tutorials:
-	python internal/test_py.py '../documentation/tutorials/python/src'
+	python internal/test_py.py '../documentation/tutorials/python/src' $(MEMCHECK)
