@@ -34,30 +34,35 @@
 #define LIMIT_PRINTING
 
 /// Maximum amount of characters that gets printed
-#define printLimit 5000
+#define printLimit 20000
 
 /// The symbol that is appended to a stream that reaches the printLimit
 #define ellipsis "..."
 
 /// If print limit is reached, return void
 #define STREAMLIMITTEST  \
+{ \
       Lostream* lostream = dynamic_cast<Lostream*>(&stream); \
       if (lostream) { \
            Lbuffer *s = dynamic_cast<Lbuffer*>(stream.rdbuf()); \
            if (s) { \
              if (s->isfull()) return; \
            } \
-      }
+      } \
+}
 
 
 #ifdef LIMIT_PRINTING
 #ifndef SWIG
 #define limited(stream) Lostream(stream).getStream()
+#define limitedTo(stream,limit) Lostream(stream,limit).getStream()
 #else
 #define limited(stream) stream
+#define limitedTo(stream,limit) stream
 #endif // SWIG
 #else
 #define limited(stream) stream
+#define limitedTo(stream,limit) stream
 #endif // LIMIT_PRINTING
 
 #ifndef SWIG
@@ -99,7 +104,7 @@ class Lbuffer : public std::streambuf
 */
 class Lostream : public std::ostream {
   public:
-    Lostream(std::ostream &stream_) : buffer(stream_) {
+    Lostream(std::ostream &stream_,int limit = printLimit) : buffer(stream_, limit) {
        rdbuf(&buffer);
     };
     

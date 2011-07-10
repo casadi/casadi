@@ -162,6 +162,54 @@
 <tr><td>QP_LAMBDA_UBX</td><td></td></tr>
 </table>
 */
+/** \class CasADi::Interfaces::QPOasesInternal
+<table>
+<caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1)</td></tr>
+<tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense.</td></tr>
+<tr><td>QP_LBA</td><td>dense, (nc x 1)</td></tr>
+<tr><td>QP_UBA</td><td>dense, (nc x 1)</td></tr>
+<tr><td>QP_LBX</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_UBX</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_X_INIT</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_LAMBDA_INIT</td><td></td></tr>
+</table>
+<br/><table>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
+<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
+<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
+<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
+<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+</table>
+*/
+/** \class CasADi::Interfaces::QPOasesSolver
+<table>
+<caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1)</td></tr>
+<tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense.</td></tr>
+<tr><td>QP_LBA</td><td>dense, (nc x 1)</td></tr>
+<tr><td>QP_UBA</td><td>dense, (nc x 1)</td></tr>
+<tr><td>QP_LBX</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_UBX</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_X_INIT</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_LAMBDA_INIT</td><td></td></tr>
+</table>
+<br/><table>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
+<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
+<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
+<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
+<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+</table>
+*/
 /** \class CasADi::IpoptInternal
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
