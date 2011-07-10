@@ -51,9 +51,10 @@ class meta {
     /// This function must work when isa(GUESTOBJECT) too
     static int as(GUESTOBJECT,T& m) {
         T *t = (T *)(0);
-        int res = SWIG_CheckState(swig::asptr(p, &t));
-        if (res) m=*t;
-        return res;
+        int res = swig::asptr(p, &t);
+        if (SWIG_CheckState(res)) m=*t;
+        if (SWIG_IsNewObj(res)) delete t;
+        return SWIG_CheckState(res);
     }
     /// Check if Guest object could ultimately be converted to type T
     /// may return true when isa(GUESTOBJECT), but this is not required.
