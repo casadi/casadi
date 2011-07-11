@@ -105,7 +105,7 @@ class TestSuite:
       succes = True
       #print "  > Succes: %0.2f [ms]" % (t*1000)
     else :
-      succces = False
+      succes = False
       print "In %s, %s failed:" % (dir,fn)
       print "="*30
       print "returncode: ", p.returncode
@@ -115,7 +115,7 @@ class TestSuite:
       
     if self.memcheck:
       p=Popen(['valgrind']+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
-      f=Popen(['grep', "definitely lost"],stdin=p.stderr,stdout=PIPE)
+      f=Popen(['grep','-E', "lost|leaks"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       stdoutdata, stderrdata = f.communicate(inp)
       m = re.search('definitely lost: (.*) bytes', stdoutdata)
@@ -123,10 +123,13 @@ class TestSuite:
       if m:
         lost = m.group(1)
       else:
-        raise Exception("valgrind output is not like expected.")
+        m = re.search("no leaks are possible",stdoutdata)
+        if not(m):
+          print stdoutdata
+          raise Exception("valgrind output is not like expected.")
       if not(lost=="0"):
-        print "Memory leak: lost %s bytes" % (dir,fn, lost)
-        succces = False
+        print "Memory leak: lost %s bytes" % (lost)
+        succes = False
       
     if not(succes):
       self.stats['numfails']+=1
