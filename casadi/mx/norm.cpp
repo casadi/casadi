@@ -37,6 +37,15 @@ void Norm::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const v
   throw CasadiException("Norm::evaluate not implemented");
 }
 
+MX Norm::adFwd(const std::vector< MX > & jx) {
+  // Number of derivative directions
+  int ndir = jx[0].size2();
+
+  // Return a not a number
+  return MX(1,ndir,numeric_limits<double>::quiet_NaN());
+}
+
+
 Norm2::Norm2(const MX& x) : Norm(x){
 }
 

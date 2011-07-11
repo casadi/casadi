@@ -711,7 +711,8 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, std::vector<unsigned
 }
 #endif
 
-CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping) const{
+CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
+
   // Assert dimensions
   casadi_assert_message(size1()==y.size1(), "The number of rows does not match");
   casadi_assert_message(size2()==y.size2(), "The number of columns does not match");
@@ -754,17 +755,25 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char
       int col2 = el2<el2_last ? y.col(el2) : size2();
 
       // Add to the return matrix
-      if(col1==col2){
+      if(col1==col2){ //  both nonzero
         c.push_back(col1);
         mapping.push_back( 1 | 2);
         el1++; el2++;
-      } else if(col1<col2){
-        c.push_back(col1);
-        mapping.push_back(1);
+      } else if(col1<col2){ //  only first argument is nonzero
+        if(!fx0_is_zero){
+          c.push_back(col1);
+          mapping.push_back(1);
+        } else {
+          mapping.push_back(1 | 4);
+        }
         el1++;
-      } else {
-        c.push_back(col2);
-        mapping.push_back(2);
+      } else { //  only second argument is nonzero
+        if(!f0x_is_zero){
+          c.push_back(col2);
+          mapping.push_back(2);
+        } else {
+          mapping.push_back(2 | 4);
+        }
         el2++;
       }
     }
@@ -773,13 +782,37 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char
     r.push_back(c.size());
   }
   
-  // Make sure that the object was correctly created
-  casadi_assert(r.size()==size1()+1);
-  casadi_assert(mapping.size()==c.size());
-  casadi_assert(c.size()==r.back());
-  
-  // Return 
-  return ret;
+  // Create a new sparsity pattern with the remaining nonzeros added
+  if(!f00_is_zero && !ret.dense()){
+    vector<unsigned char> mapping_dense(ret.numel(),0); // FIXME: this allocation can be avoided, just iterate in reverse order instead
+    
+    // Loop over rows
+    for(int i=0; i<ret.size1(); ++i){
+      // Loop over nonzeros
+      for(int el=ret.rowind(i); el<ret.rowind(i+1); ++el){
+        // Get column
+        int j=ret.col(el);
+        
+        // Get the nonzero of the dense matrix
+        int el_dense = j+i*ret.size2();
+        
+        // Save to mapping
+        mapping_dense[el_dense] = mapping[el];
+      }
+    }
+    
+    // Use the dense mapping instead and return a dense sparsity
+    mapping_dense.swap(mapping);
+    return CRSSparsity(ret.size1(),ret.size2(),true);
+  } else {
+    // Make sure that the object was correctly created
+    casadi_assert(r.size()==size1()+1);
+    casadi_assert(mapping.size()==c.size());
+    casadi_assert(c.size()==r.back());
+    
+    // Return 
+    return ret;
+  }
 }
 
 CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsigned char>& mapping) const{
@@ -787,144 +820,90 @@ CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsign
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
-  if(false){ // the code below should be ok now, the switch can probably be removed
-    
-    // Dimensions
-    int x_nrow = size1();
-    int y_ncol = y_trans.size1();
+  // Dimensions
+  int x_nrow = size1();
+  int y_ncol = y_trans.size1();
 
-    // return object
-    CRSSparsity ret(x_nrow,y_ncol);
-    
-    // Get the vectors for the return pattern
-    vector<int>& c = ret.colRef();
-    vector<int>& r = ret.rowindRef();
-    
-    // Direct access to the arrays
-    const vector<int> &x_col = col();
-    const vector<int> &y_row = y_trans.col();
-    const vector<int> &x_rowind = rowind();
-    const vector<int> &y_colind = y_trans.rowind();
-    
-    // Which columns exist in a row of the first factor
-    vector<bool> in_x_row(size2());
-    
-    // loop over the row of the resulting matrix)
-    for(int i=0; i<x_nrow; ++i){
-      
-      // Mark the elements in the x row
-      fill(in_x_row.begin(),in_x_row.end(),false);
+  // Quick return if both are dense
+  if(dense() && y_trans.dense()){
+    return CRSSparsity(x_nrow,y_ncol,true);
+  }
+  
+  // return object
+  CRSSparsity ret(x_nrow,y_ncol);
+  
+  // Get the vectors for the return pattern
+  vector<int>& c = ret.colRef();
+  vector<int>& r = ret.rowindRef();
+  
+  // Direct access to the arrays
+  const vector<int> &x_col = col();
+  const vector<int> &y_row = y_trans.col();
+  const vector<int> &x_rowind = rowind();
+  const vector<int> &y_colind = y_trans.rowind();
+
+  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
+#if __STDC_VERSION__ >= 199901L
+  typedef unsigned long long int_t;
+#else
+  typedef unsigned long int_t;
+#endif
+  
+  // Number of directions we can deal with at a time
+  int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+
+  // Number of such groups needed
+  int ng = x_nrow/nr;
+  if(ng*nr != x_nrow) ng++;
+  
+  // Which columns exist in a row of the first factor
+  vector<int_t> in_x_row(size2());
+  vector<int_t> in_res_col(y_ncol);
+
+  // Loop over the rows of the resulting matrix, nr rows at a time
+  for(int rr=0; rr<ng; ++rr){
+
+    // Mark the elements in the x row
+    fill(in_x_row.begin(),in_x_row.end(),0);
+    int_t b=1;
+    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
       for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
-        in_x_row[x_col[el1]] = true;
+        in_x_row[x_col[el1]] |= b;
       }
+      b <<= 1;
+    }
+
+    // Get the sparsity pattern for the set of rows
+    fill(in_res_col.begin(),in_res_col.end(),0);
+    for(int j=0; j<y_ncol; ++j){
       
-      // loop over the columns of second factor
+      // Loop over the nonzeros of the column of the second factor
+      for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
+        
+        // Get the row
+        int i_y = y_row[el2];
+        
+        // Add nonzero if the element matches an element in the x row
+        in_res_col[j] |= in_x_row[i_y];
+      }
+    }
+
+    b = 1;
+    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+      
+      // loop over the columns of the resulting matrix
       for(int j=0; j<y_ncol; ++j){
         
-        // Loop over the nonzeros of the column of the second factor
-        for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
-          
-          // Get the row
-          int i_y = y_row[el2];
-          
-          // Add nonzero if the element matches an element in the x row
-          if(in_x_row[i_y]){
-            c.push_back(j);
-            break;
-          }
+        // Save nonzero, if any
+        if(in_res_col[j] & b){
+          c.push_back(j);
         }
       }
       r[i+1] = c.size();
+      b <<=1;
     }
-    
-    return ret;
-  } else {
-
-    // Dimensions
-    int x_nrow = size1();
-    int y_ncol = y_trans.size1();
-
-    // Quick return if both are dense
-    if(dense() && y_trans.dense()){
-      return CRSSparsity(x_nrow,y_ncol,true);
-    }
-    
-    // return object
-    CRSSparsity ret(x_nrow,y_ncol);
-    
-    // Get the vectors for the return pattern
-    vector<int>& c = ret.colRef();
-    vector<int>& r = ret.rowindRef();
-    
-    // Direct access to the arrays
-    const vector<int> &x_col = col();
-    const vector<int> &y_row = y_trans.col();
-    const vector<int> &x_rowind = rowind();
-    const vector<int> &y_colind = y_trans.rowind();
-
-    // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
-  #if __STDC_VERSION__ >= 199901L
-    typedef unsigned long long int_t;
-  #else
-    typedef unsigned long int_t;
-  #endif
-    
-    // Number of directions we can deal with at a time
-    int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
-
-    // Number of such groups needed
-    int ng = x_nrow/nr;
-    if(ng*nr != x_nrow) ng++;
-    
-    // Which columns exist in a row of the first factor
-    vector<int_t> in_x_row(size2());
-    vector<int_t> in_res_col(y_ncol);
-
-    // Loop over the rows of the resulting matrix, nr rows at a time
-    for(int rr=0; rr<ng; ++rr){
-
-      // Mark the elements in the x row
-      fill(in_x_row.begin(),in_x_row.end(),0);
-      int_t b=1;
-      for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
-        for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
-          in_x_row[x_col[el1]] |= b;
-        }
-        b <<= 1;
-      }
-
-      // Get the sparsity pattern for the set of rows
-      fill(in_res_col.begin(),in_res_col.end(),0);
-      for(int j=0; j<y_ncol; ++j){
-        
-        // Loop over the nonzeros of the column of the second factor
-        for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
-          
-          // Get the row
-          int i_y = y_row[el2];
-          
-          // Add nonzero if the element matches an element in the x row
-          in_res_col[j] |= in_x_row[i_y];
-        }
-      }
-
-      b = 1;
-      for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
-        
-        // loop over the columns of the resulting matrix
-        for(int j=0; j<y_ncol; ++j){
-          
-          // Save nonzero, if any
-          if(in_res_col[j] & b){
-            c.push_back(j);
-          }
-        }
-        r[i+1] = c.size();
-        b <<=1;
-      }
-    }
-    return ret;
   }
+  return ret;
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping) const{
@@ -1034,21 +1013,18 @@ CRSSparsity CRSSparsity::scalarSparsitySparse(1,1,false);
 CRSSparsity CRSSparsity::emptySparsity(0,0,true);
 
 void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& jj){
+  enlargeRows(nrow,ii);
+  enlargeColumns(ncol,jj);
+}
+
+void CRSSparsity::enlargeRows(int nrow, const std::vector<int>& ii){
   // Assert dimensions
   casadi_assert(ii.size() == size1());
-  casadi_assert(jj.size() == size2());
-  
-    // Update dimensions
-  (*this)->nrow_ = nrow;
-  (*this)->ncol_ = ncol;
 
-  // Begin by sparsify the columns
-  vector<int>& c = colRef();
-  for(int k=0; k<c.size(); ++k){
-    c[k] = jj[c[k]];
-  }
-    
-   // Sparsify the rows
+  // Update dimensions
+  (*this)->nrow_ = nrow;
+
+  // Sparsify the rows
   vector<int>& r = rowindRef();
   r.resize(nrow+1,size());
   int ik=ii.back(); // need only to update from the last new index
@@ -1069,6 +1045,20 @@ void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vecto
   // Append zeros to the beginning
   for(; ik>=0; --ik){
     r[ik] = 0;
+  }
+}
+
+void CRSSparsity::enlargeColumns(int ncol, const std::vector<int>& jj){
+  // Assert dimensions
+  casadi_assert(jj.size() == size2());
+  
+    // Update dimensions
+  (*this)->ncol_ = ncol;
+
+  // Begin by sparsify the columns
+  vector<int>& c = colRef();
+  for(int k=0; k<c.size(); ++k){
+    c[k] = jj[c[k]];
   }
 }
 

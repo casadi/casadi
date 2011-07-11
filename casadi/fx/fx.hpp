@@ -155,6 +155,9 @@ class FX : public OptionsFunctionality{
   /// Get, if necessary generate, the sparsity of a Jacobian block
   CRSSparsity& jacSparsity(int iind=0, int oind=0);
 
+  /// Generate the sparsity of a Jacobian block
+  void setJacSparsity(const CRSSparsity& sp, int iind, int oind);
+
 //#ifndef SWIG
 #if 0
   /** \brief  Get Jacobian numerically (shorthand) */

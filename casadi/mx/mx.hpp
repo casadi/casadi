@@ -62,6 +62,9 @@ class MX : public SharedObject{
 
     /** \brief  Construct a symbolic matrix (matrix variable) */
     explicit MX(const std::string& name, const CRSSparsity & sp);
+
+    /** \brief  Construct MX with a given sparsity */
+    explicit MX(const CRSSparsity& sp, const MX& val);
     
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
@@ -182,6 +185,9 @@ class MX : public SharedObject{
 
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
+
+    /// Access the sparsity, make a copy if there are multiple references to it
+    CRSSparsity& sparsityRef();
 
     /** \brief Erase a submatrix */
     void erase(const std::vector<int>& ii, const std::vector<int>& jj);

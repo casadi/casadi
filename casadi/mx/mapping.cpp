@@ -139,7 +139,6 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
 
 MX Mapping::adFwd(const std::vector<MX>& jx){
   casadi_assert(isReady());
-  casadi_assert(size()==numel()); // TODO: relax this!!!
   const std::vector<int> &nzind_ = nzmap_.data();
 
   // Number of columns
@@ -184,7 +183,7 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
   
   // Row offsets for the return matrix
   vector<int> rowind(1,0);
-  rowind.reserve(size()+1);
+  rowind.reserve(numel()+1);
   int i=0;
   for(int k=0; k<i_ret.size(); ++k){
     casadi_assert(i_ret[k]>=i);
@@ -216,6 +215,27 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
     
     // Save to return matrix
     ret->addDependency(jx[dp],nzd,nz);
+  }
+  
+  // If input is sparse, inset rows
+  if(size()!=numel()){
+    // Row mapping
+    vector<int> ii(size());
+    
+    // Loop over nonzeros
+    for(int i=0; i<size1(); ++i){
+      // Loop over nonzeros
+      for(int el=sparsity().rowind(i); el<sparsity().rowind(i+1); ++el){
+        // Get column
+        int j=sparsity().col(el);
+        
+        // Save mapping
+        ii[el] = j+i*size2();
+      }
+    }
+    
+    // Enlarge matrix
+    ret.sparsityRef().enlargeRows(numel(),ii);
   }
     
   // Return the mapping

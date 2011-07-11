@@ -72,6 +72,20 @@ MX::MX(int nrow, int ncol){
   assignNode(new Mapping(CRSSparsity(nrow,ncol)));
 }
 
+MX::MX(const CRSSparsity& sp, const MX& val){
+  // Make sure that val is dense and scalar
+  casadi_assert(val.numel()==1);
+  
+  // Make dense
+  MX val_dense = val;
+  makeDense(val_dense);
+  
+  // Create mapping
+  assignNode(new Mapping(sp));
+  (*this)->addDependency(val_dense,vector<int>(sp.size(),0));
+  simplifyMapping(*this);
+}
+
 MX MX::create(MXNode* node){
   MX ret;
   ret.assignNode(node);
@@ -293,11 +307,11 @@ MX MX::unary(int op, const MX &x){
 }
 
 MX MX::scalar_matrix(int op, const MX &x, const MX &y){
-  return create(new BinaryOp(Operation(op),x,y)); 
+  return matrix_matrix(op,x,y);
 }
 
 MX MX::matrix_scalar(int op, const MX &x, const MX &y){
-  return create(new BinaryOp(Operation(op),x,y));
+  return matrix_matrix(op,x,y);
 }
 
 MX MX::matrix_matrix(int op, const MX &x, const MX &y){
@@ -391,6 +405,15 @@ MX::MX(const MX& x) : SharedObject(x){
 
 const CRSSparsity& MX::sparsity() const{
   return (*this)->sparsity();
+}
+
+CRSSparsity& MX::sparsityRef(){
+  // Since we can potentially change the behavior of the MX node, we must make a deep copy if there are other references
+  makeUnique();
+  
+  // Return the reference, again, deep copy if multiple references
+  (*this)->sparsity_.makeUnique();
+  return (*this)->sparsity_;
 }
 
 void MX::erase(const vector<int>& ii, const vector<int>& jj){

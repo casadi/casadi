@@ -180,7 +180,7 @@ class CRSSparsity : public SharedObject{
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
     The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
     the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
-    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
     
     /** \brief Intersection of two sparsity patterns
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
@@ -211,6 +211,12 @@ class CRSSparsity : public SharedObject{
     */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
+    /** \brief Enlarge the matrix along the first dimension (i.e. insert rows) */
+    void enlargeRows(int nrow, const std::vector<int>& ii);
+
+    /** \brief Enlarge the matrix along the second dimension (i.e. insert columns) */
+    void enlargeColumns(int ncol, const std::vector<int>& jj);
+    
     /** \brief Make a patten dense */
     CRSSparsity makeDense(std::vector<int>& mapping) const;
 

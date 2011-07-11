@@ -72,6 +72,7 @@ void Multiplication::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& o
 }
 
 MX Multiplication::adFwd(const std::vector<MX>& jx){
+  
   // Get the number of derivative directions
   int nd = jx[0].size2();
   

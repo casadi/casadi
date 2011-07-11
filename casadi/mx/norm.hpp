@@ -40,6 +40,9 @@ Norm(const MX& x);
 /** \brief  Evaluate */
 virtual void evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj);
 
+/// Symbolic forward sensitivities
+virtual MX adFwd(const std::vector<MX>& jx);
+
 };
 
 /** \brief Represents a 2-norm operation on a MX

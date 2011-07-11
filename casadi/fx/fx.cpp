@@ -264,6 +264,11 @@ CRSSparsity& FX::jacSparsity(int iind, int oind){
   return (*this)->jacSparsity(iind,oind);
 }
 
+void FX::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
+  (*this)->setJacSparsity(sp,iind,oind);
+}
+
+
 
 #if 0
 

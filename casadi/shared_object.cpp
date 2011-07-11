@@ -171,6 +171,15 @@ void SharedObject::swap(SharedObject& other){
   other = temp;
 }
 
+int SharedObject::getCount() const{
+  return (*this)->getCount();
+}
+
+int SharedObjectNode::getCount() const{
+  return count;
+}
+
+
 } // namespace CasADi
     
     

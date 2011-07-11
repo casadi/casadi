@@ -296,6 +296,10 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
   return CRSSparsity(output(oind).numel(),input(iind).numel(),true);
 }
 
+void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
+  jac_sparsity_.elem(oind,iind) = sp;
+}
+
 CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   casadi_assert_message(isInit(),"Function not initialized.");
   

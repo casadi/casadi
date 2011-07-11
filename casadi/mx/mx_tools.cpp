@@ -322,6 +322,10 @@ MX trace(const MX& A){
 }
 
 MX repmat(const MX &A, int n, int m){
+  // Quick return if possible
+  if(n==1 &&  m==1)
+    return A;
+  
   // First concatenate horizontally
   MX row = horzcat(std::vector<MX >(m, A));
   

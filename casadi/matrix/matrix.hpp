@@ -1921,12 +1921,10 @@ void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x
   const std::vector<T> &yd = y.data();
 
   // Argument values
-  T a[2][2] = {{0,0},{0,0}};
-  if(!xd.empty()) a[0][1] = xd.front();
-  if(!yd.empty()) a[1][1] = yd.front();
+  T zero = 0;
 
   // Nonzero counters
-  int el0=0, el1=0;
+  int el0=0, el1=0, el=0;
   
   // Loop over nonzero elements
   for(int i=0; i<mapping.size(); ++i){
@@ -1934,16 +1932,45 @@ void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x
     unsigned char m = mapping[i];
     bool nz0 = m & 1;
     bool nz1 = m & 2;
+    bool skip_nz = m & 4;
     
     // Evaluate
-    rd[i] = fcn(a[0][nz0],a[1][nz1]);
+    if(!skip_nz) rd[el++] = fcn(nz0 ? xd[el0] : zero, nz1 ? yd[el1] : zero);
     
     // Go to next nonzero
-    if(m & 4) a[0][1] = xd[++el0];
-    if(m & 8) a[1][1] = yd[++el1];
+    el0 += nz0;
+    el1 += nz1;
   }
 }
 
+// template<class T>
+// void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
+//   std::vector<T>& rd = r.data();
+//   const std::vector<T> &xd = x.data();
+//   const std::vector<T> &yd = y.data();
+// 
+//   // Argument values
+//   T z = 0;
+// 
+//   // Nonzero counters
+//   int el0=0, el1=0, el=0;
+//   
+//   // Loop over nonzero elements
+//   for(int i=0; i<mapping.size(); ++i){
+//     // Check which elements are nonzero
+//     unsigned char m = mapping[i];
+//     bool nz0 = m & 1;
+//     bool nz1 = m & 2;
+//     bool skip_nz = m & 4;
+//     
+//     // Evaluate
+//     if(!skip_nz) rd[el++] = fcn(nz0 ? xd[el0] : z, nz1 ? yd[el1] : z);
+//     
+//     // Go to next nonzero
+//     el0 += nz0;
+//     el1 += nz1;
+//   }
+// }
 
 
 template<class T>

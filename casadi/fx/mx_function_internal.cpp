@@ -430,25 +430,55 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
   return node;
 }
 
-/*CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
-  std::vector<MX> ret = jac(iind);
-  return ret.at(oind).sparsity();
-}*/
+CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
+  return FXInternal::getJacSparsity(iind,oind);
+  
+  
+  if(inputv.at(iind).dense()){
+    // Normal, nonsparse input
+    std::vector<MX> ret = jac(iind);
+    return ret.at(oind).sparsity();
+  } else {
+    // Sparse input doesn't work, don't use it
+    return FXInternal::getJacSparsity(iind,oind);
+  }
+}
   
 std::vector<MX> MXFunctionInternal::jac(int iind){
   casadi_assert(isInit());
   
   // Number of columns in the Jacobian
-  int ncol = alg[inputv_ind[iind]].mx.size1();
+  int ncol = alg[inputv_ind[iind]].mx.numel();
   
   // Get theseed matrices
   vector<MX> fseed(input_.size());
   for(int ind=0; ind<input_.size(); ++ind){
-    // Number of rows in the seed matrix
-    int nrow = alg[inputv_ind[ind]].mx.size1();
+    // Access the input expression
+    const MX& s = alg[inputv_ind[ind]].mx;
     
-    // Create seed matrix
-    fseed[ind] = ind==iind ? MX::eye(ncol) : MX::zeros(nrow,ncol);
+    if(ind==iind){
+      // Create seed matrix
+      fseed[ind] = MX::eye(s.numel());
+      
+      // Fill up with empty rows/columns if input sparse
+      if(!s.dense()){
+        // Map the nonzeros of the matrix
+        vector<int> mapping(s.size(),0);
+        for(int i=0; i<s.size1(); ++i){
+          for(int el=s.sparsity().rowind(i); el<s.sparsity().rowind(i+1); ++el){
+            int j=s.sparsity().col(el);
+            mapping[el] = j+i*s.size2();
+          }
+        }
+      
+        // Enlarge the seed matrix
+        fseed[ind].enlarge(s.numel(),s.numel(),mapping,mapping);
+      }
+    
+    } else {
+      // Create seed matrix
+      fseed[ind] = MX::zeros(s.numel(),ncol);
+    }
   }
   
   // Forward mode automatic differentiation, symbolically
@@ -476,9 +506,10 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   
   // Evaluate all the seed matrices of the algorithm sequentially
   for(int el=0; el<derwork.size(); ++el){
-    
     // Skip the node if it has already been calculated (i.e. is symbolic or constant)
-    if(!derwork[el].isNull()) continue;
+    if(!derwork[el].isNull()){
+      continue;
+    }
     
     // Zero seed matrix if constant
     if(alg[el].mx->isConstant()){
@@ -493,13 +524,17 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
     
     // Collect the seed matrices
     vector<MX> seed(alg[el].ch.size());
-    casadi_assert(!seed.empty());
+    if(seed.empty()){
+      derwork[el] = MX::zeros(alg[el].mx.numel(),ncol);
+      continue;
+    }
     for(int i=0; i<seed.size(); ++i){
       int ind = alg[el].ch[i];
-      if(ind>=0)
+      if(ind>=0){
         seed[i] = derwork[ind];
+      }
     }
-
+    
     // Get the sensitivity matrix
     MX sens = alg[el].mx->adFwd(seed);
     

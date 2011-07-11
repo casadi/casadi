@@ -89,10 +89,21 @@ void UnaryOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
 }
 
 MX UnaryOp::adFwd(const std::vector<MX>& jx){
+  // Number of derivative directions
+  int ndir = jx[0].size2();
+  
+  // Get partial derivatives
   MX f = MX::create(this);
   MX dummy;
   MX pd[2];
   casadi_math<MX>::der[op](dep(0),dummy,f,pd);
+  
+  // Same partial derivatives for every derivative direction
+  if(ndir > 1){
+    pd[0] = repmat(pd[0],1,ndir);
+  }
+  
+  // Chain rule
   return pd[0]*jx[0];
 }
 

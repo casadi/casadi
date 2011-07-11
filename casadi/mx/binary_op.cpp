@@ -32,81 +32,66 @@ using namespace std;
 namespace CasADi{
 
 BinaryOp::BinaryOp(Operation op, MX x, MX y) : op_(op){
-  if(x.numel()==1){
-    // Put densifying node in between if necessary
-    if(!casadi_math<double>::fx0_is_zero[op_]){
-      makeDense(y); // REMOVE
-    }
-    
-    if (x.size()==0) {
-      setDependencies(0,y);
-    } else {
-      setDependencies(x,y);
-    }
-    setSparsity(y.sparsity());
-    mapping_.resize(y.size(), 1 | 2 | 8);
-    if(!mapping_.empty()) mapping_.back() = 1 | 2;
-    
-  } else if(y.numel()==1){
-    // Put densifying node in between if necessary
-    if(!casadi_math<double>::f0x_is_zero[op_]){
-      makeDense(x); // REMOVE
-    }
-    
-    if (y.size()==0) {
-      setDependencies(x,0);
-    } else {
-      setDependencies(x,y);
-    }
-    setSparsity(x.sparsity());
-    mapping_.resize(x.size(), 1 | 2 | 4);
-    if(!mapping_.empty()) mapping_.back() = 1 | 2;
-  } else { 
-    // Put densifying nodes in between if necessary
-    if(!casadi_math<double>::f00_is_zero[op_] && !(x.dense() || y.dense())){
-      if(x.size()>y.size()) // enough to make one of them dense
-        makeDense(x); // REMOVE
-      else
-        makeDense(y); // REMOVE
-    }
-    
-    setDependencies(x,y);
-    
-    // Check if the sparsity patterns are the same
-    bool same_sparsity_ = x.sparsity() == y.sparsity();
-    
-    // Get the sparsity pattern
-    if(same_sparsity_){
-      setSparsity(x->sparsity());
-      mapping_.resize(x.size(), 1 | 2 | 4 | 8);
-      if(!mapping_.empty()) mapping_.back() = 1 | 2;
-    } else {
-      CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_);
-      setSparsity(sp);
-      for(int el=0; el<mapping_.size(); ++el){
-        if(mapping_[el] & 1) mapping_[el] |= 4;
-        if(mapping_[el] & 2) mapping_[el] |= 8;
-      }
-      for(int el=mapping_.size()-1; el>=0; --el){
-        if(mapping_[el] & 1){
-          mapping_[el] &= ~4;
-          break;
-        }
-      }
-      for(int el=mapping_.size()-1; el>=0; --el){
-        if(mapping_[el] & 2){
-          mapping_[el] &= ~8;
-          break;
-        }
-      }
-    }
+  // If scalar-matrix operation
+  if(x.numel()==1 && y.numel()>1){
+    x = MX(y.size1(),y.size2(),x);
+  }
+  
+  // If matrix-scalar operation
+  if(y.numel()==1 && x.numel()>1){
+    y = MX(x.size1(),x.size2(),y);
+  }
+  
+  // Put densifying node in between if necessary
+  if(!casadi_math<double>::f00_is_zero[op_] && !x.dense() && !y.dense()){
+    makeDense(x);
+    makeDense(y);
+  }
+  
+  setDependencies(x,y);
+  
+  // Check if the sparsity patterns are the same
+  bool same_sparsity_ = x.sparsity() == y.sparsity();
+  
+  // Get the sparsity pattern
+  if(same_sparsity_){
+    setSparsity(x->sparsity());
+    mapping_.resize(x.size(), 1 | 2 );
+  } else {
+    bool f00_is_zero = casadi_math<double>::f00_is_zero[op_];
+    bool f0x_is_zero = casadi_math<double>::f0x_is_zero[op_];
+    bool fx0_is_zero = casadi_math<double>::fx0_is_zero[op_];
+    CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_);
+    setSparsity(sp);
   }
 }
 
 MX BinaryOp::adFwd(const std::vector<MX>& jx){
+  // Number of derivative directions
+  int ndir = jx[0].size2();
+  
+  // Get partial derivatives
   MX f = MX::create(this);
   MX pd[2];
   casadi_math<MX>::der[op_](dep(0),dep(1),f,pd);
+
+  // Same partial derivatives for every derivative direction
+  if(ndir>1){
+    for(int d=0; d<2; ++d){
+      // Flatten out partial derivatives
+      pd[d] = reshape(pd[d],pd[d].numel(),1);
+      
+      // Same partial derivatives for each direction
+      int nv = jx[d].size1();
+      if(pd[d].size1()==1 && nv>1){
+        pd[d] = repmat(pd[d],nv,ndir);
+      } else {
+        pd[d] = repmat(pd[d],1,ndir);
+      }
+    }
+  }
+
+  // Chain rule 
   return pd[0]*jx[0] + pd[1]*jx[1];
 }
 
@@ -128,14 +113,12 @@ void BinaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, con
 
     // Argument values
     double a[2][2] = {{0,0},{0,0}};
-    if(!input0.empty()) a[0][1] = input0.front();
-    if(!input1.empty()) a[1][1] = input1.front();
 
     // Nonzero counters
-    int el0=0, el1=0;
+    int el0=0, el1=0, el=0;
 
     // Partial derivatives
-      double pd[2][2] = {{0,0},{0,0}};
+    double pd[2][2] = {{0,0},{0,0}};
     
     // With sensitivities
     for(int i=0; i<mapping_.size(); ++i){
@@ -143,29 +126,40 @@ void BinaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, con
       unsigned char m = mapping_[i];
       bool nz0 = m & 1;
       bool nz1 = m & 2;
+      bool skip_nz = m & 4;
       
-      // Evaluate and get partial derivatives
-      casadi_math<double>::fun[op_](a[0][nz0], a[1][nz1],output0[i]);
-      casadi_math<double>::der[op_](a[0][nz0], a[1][nz1],output0[i],pd[1]);
+      if(!skip_nz){
       
-      // Propagate forward seeds
-      for(int d=0; d<nfwd; ++d){
-        double s = 0;
-        s += pd[nz0][0]*fwdSeed[0][d]->data()[el0];
-        s += pd[nz1][1]*fwdSeed[1][d]->data()[el1];
-        fwdSens[d]->data()[i] = s;
+        // Read the next nonzero 
+        if(nz0) a[0][1] = input0[el0];
+        if(nz1) a[1][1] = input1[el1];
+        
+        // Evaluate and get partial derivatives
+        casadi_math<double>::fun[op_](a[0][nz0], a[1][nz1],output0[el]);
+        casadi_math<double>::der[op_](a[0][nz0], a[1][nz1],output0[el],pd[1]);
+        
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          double s = 0;
+          s += pd[nz0][0]*fwdSeed[0][d]->data()[el0];
+          s += pd[nz1][1]*fwdSeed[1][d]->data()[el1];
+          fwdSens[d]->data()[el] = s;
+        }
+        
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          double s = adjSeed[d]->data()[i];
+          if(nz0) adjSens[0][d]->data()[el0] += s*pd[nz0][0];
+          if(nz1) adjSens[1][d]->data()[el1] += s*pd[nz1][1];
+        }
+        
+        // Next nonzero for the output
+        el++;
       }
       
-      // Propagate adjoint seeds
-      for(int d=0; d<nadj; ++d){
-        double s = adjSeed[d]->data()[i];
-        if(nz0) adjSens[0][d]->data()[el0] += s*pd[nz0][0];
-        if(nz1) adjSens[1][d]->data()[el1] += s*pd[nz1][1];
-      }
-      
-      // Go to next nonzero (and copy already now the next input to cache)
-      if(m & 4) a[0][1] = input0[++el0];
-      if(m & 8) a[1][1] = input1[++el1];
+      // Go to next nonzero for the arguments
+      el0 += nz0;
+      el1 += nz1;
     }
   }
 }

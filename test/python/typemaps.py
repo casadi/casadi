@@ -330,16 +330,12 @@ class typemaptests(casadiTestCase):
     D=DMatrix([7,13])
     N=matrix([7,13]).T
     
-    print "sfds"
     self.assertTrue(isinstance(N+D,DMatrix))
-    print "12"
     self.assertTrue(isinstance(D+N,DMatrix))
     
-    print "12"
     self.checkarray(N+D,matrix([14,26]).T,"addition")
     self.checkarray(D+N,matrix([14,26]).T,"addition")
     
-    print "145"
     self.assertTrue(isinstance(C+D,SXMatrix))
     self.assertTrue(isinstance(D+C,SXMatrix))
   

@@ -96,6 +96,9 @@ class SharedObject : public PrintableObject{
     /// Get a pointer to the node
     SharedObjectNode* get();
 
+    /// Get the reference count
+    int getCount() const;
+    
     /// Swap content with another instance
     void swap(SharedObject& other);
 
@@ -153,6 +156,9 @@ class SharedObjectNode{
 
   /// Make a deep copy of the instance  
   virtual SharedObjectNode* clone() const;
+
+  /// Get the reference count
+  int getCount() const;
 
   /// Initialize the object
   virtual void init();
