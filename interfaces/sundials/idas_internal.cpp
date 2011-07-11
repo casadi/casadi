@@ -1002,6 +1002,7 @@ void IdasInternal::idas_error(const string& module, int flag){
   stringstream ss;
   ss << "Module \"" << module << "\" returned flag " << flag << " (\"" << flagname << "\").";
   ss << " Consult Idas documentation.";
+  delete flagname;
   throw CasadiException(ss.str());
 }
 

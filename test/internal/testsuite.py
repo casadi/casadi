@@ -100,22 +100,22 @@ class TestSuite:
       inp = self.inputs[fn]
     stdoutdata, stderrdata = p.communicate(inp)
     t = time.clock() - t0
-    succes = True
     if (p.returncode==0 or p.returncode in self.allowable_returncodes):
-      succes = True
+      pass
       #print "  > Succes: %0.2f [ms]" % (t*1000)
     else :
-      succes = False
+      self.stats['numfails']+=1
       print "In %s, %s failed:" % (dir,fn)
       print "="*30
       print "returncode: ", p.returncode
       print stdoutdata
       print stderrdata
       print "="*30
+      return
       
     if self.memcheck:
-      p=Popen(['valgrind']+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
-      f=Popen(['grep','-E', "lost|leaks"],stdin=p.stderr,stdout=PIPE)
+      p=Popen(['valgrind','--leak-check=full']+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+      f=Popen(['grep','-E','-A','10', "definitely lost|leaks"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       stdoutdata, stderrdata = f.communicate(inp)
       m = re.search('definitely lost: (.*) bytes', stdoutdata)
@@ -129,7 +129,8 @@ class TestSuite:
           raise Exception("valgrind output is not like expected.")
       if not(lost=="0"):
         print "Memory leak: lost %s bytes" % (lost)
-        succes = False
+        print "="*30
+        print stdoutdata
+        print "="*30
+        self.stats['numfails']+=1
       
-    if not(succes):
-      self.stats['numfails']+=1

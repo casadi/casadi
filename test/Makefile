@@ -30,17 +30,20 @@ examples_indoc: examples_indoc_py examples_indoc_cpp examples_indoc_oct
 
 examples_code: examples_code_py examples_code_cpp
 
+# No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
-	python internal/test_py.py '../documentation/examples' $(MEMCHECK)
+	python internal/test_py.py '../documentation/examples'
 	
+# No memchecks because it leaks like hell, and is slow
 examples_code_py:
-	python internal/test_py.py '../examples/python' -skipfiles="c_code_generation.py" $(MEMCHECK)
+	python internal/test_py.py '../examples/python' -skipfiles="c_code_generation.py"
 	
 examples_indoc_cpp:
 	python internal/test_cpp.py '../documentation/examples' $(MEMCHECK)
 	
+# No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../examples' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp" $(MEMCHECK)
+	python internal/test_cppcmake.py '../examples' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp"
 
 examples_indoc_oct:
 	python internal/test_oct.py '../documentation/examples'

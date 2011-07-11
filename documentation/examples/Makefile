@@ -21,7 +21,7 @@ clean:
 	rm -f _temp.* $(PDF) $(EXE)
 
 $(PDF): %.pdf : %.py $(CASADI_OBJECT)
-  rm -rf pylab.py pylab.pyc
+	rm -rf pylab.py pylab.pyc matplotlibrc
 	cp $< _temp.py
 	pyreport -d -l _temp.py -o _temp.pdf
 	rm _temp.py

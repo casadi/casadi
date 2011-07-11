@@ -65,6 +65,8 @@ void SuperLUInternal::unInit(){
   if(is_init_){
 //    Destroy_CompCol_Matrix(&A_); // Not allowed since we allocate all data in stl arrays and pass as pointers
 //    Destroy_SuperMatrix_Store(&B_); // Not allowed since we allocate all data in stl arrays and pass as pointers
+    SUPERLU_FREE(A_.Store);
+    SUPERLU_FREE(B_.Store);
     Destroy_SuperNode_Matrix(&L_);
     Destroy_CompCol_Matrix(&U_);
     StatFree(&stat_);

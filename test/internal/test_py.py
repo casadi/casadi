@@ -8,15 +8,20 @@ from testsuite import TestSuite
 def setdummybackend(dir):
   """
   Set the matplotlib backend to a dummy value, so that no graphs are generated.
-  
-  Was originally using 'backend : Template' in matplotlibrc, but this leaked memory
   """
   shutil.copy('internal/pylab.py',dir)
-  
+  f=file(dir+'/matplotlibrc','w')
+  f.write('backend : Template')
+  f.close()
+
 def removedummybackend(dir):
-  os.remove(dir+'/pylab.py')
-
-
+  if os.path.exists(dir+'/matplotlibrc'):
+    os.remove(dir+'/matplotlibrc')
+  if os.path.exists(dir+'/pylab.pyc'):
+    os.remove(dir+'/pylab.pyc')
+  if os.path.exists(dir+'/pylab.py'):
+    os.remove(dir+'/pylab.py')
+    
 t = TestSuite(dirname=src,
   suffix="py",
   preRun=setdummybackend,

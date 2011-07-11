@@ -419,6 +419,7 @@ dgstrf (superlu_options_t *options, SuperMatrix *A,
 	((NCformat *)U->Store)->rowind = Glu.usub;
 	((NCformat *)U->Store)->colptr = Glu.xusub;
     } else {
+        // Memory is leaking here. L->Store will be malloced
         dCreate_SuperNode_Matrix(L, A->nrow, min_mn, nnzL, Glu.lusup, 
 	                         Glu.xlusup, Glu.lsub, Glu.xlsub, Glu.supno,
 			         Glu.xsup, SLU_SC, SLU_D, SLU_TRLU);

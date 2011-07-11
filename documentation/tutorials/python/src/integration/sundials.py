@@ -1,8 +1,8 @@
 #! CasADi tutorial
 #! ==================
 from numpy import *
+import numpy
 from casadi import *
-#from matplotlib.pylab import *
 from pylab import *
 #! ODE integration
 #! -----------------
@@ -54,7 +54,7 @@ print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #!  - method B, using Simulator
 #!
 #! We demonstrate first method A:
-ts=linspace(0,tend,100)
+ts=numpy.linspace(0,tend,100)
 x0 = 0;y0 = 1
 integrator.input(INTEGRATOR_X0).set([x0,y0])
 integrator.input(INTEGRATOR_P).set(0)
@@ -65,7 +65,6 @@ integrator.reset(0)
 def out(t):
 	integrator.integrate(t)
 	return integrator.output().toArray()
-	
 
 sol = array([out(t) for t in ts]).squeeze()
 	
@@ -98,7 +97,7 @@ def out(dx0):
 	integrator.input(INTEGRATOR_X0).set([x0+dx0,y0])
 	integrator.evaluate()
 	return integrator.output().toArray()
-dx0=linspace(-2,2,100)
+dx0=numpy.linspace(-2,2,100)
 
 out = array([out(dx) for dx in dx0]).squeeze()
 	
@@ -137,14 +136,14 @@ def out(t):
 	B=integrator.fwdSens().toArray()
 	return array([A,B]).squeeze().T
 
-circle = array([[sin(x),cos(x)] for x in linspace(0,2*pi,100)]).T
+circle = array([[sin(x),cos(x)] for x in numpy.linspace(0,2*pi,100)]).T
 
 figure()
 plot(sol[:,0],sol[:,1])
 grid()
 for i in range(10):
 	J=out(ts[10*i])
-	e=0.1*dot(J,circle).T+sol[10*i,:]
+	e=0.1*numpy.dot(J,circle).T+sol[10*i,:]
 	plot(e[:,0],e[:,1],color='red')
 	
 show()
@@ -190,7 +189,7 @@ print out(0)
 print out(1)
 
 #! Let's plot the results
-uv=linspace(-1,1,100)
+uv=numpy.linspace(-1,1,100)
 
 out = array([out(i) for i in uv]).squeeze()
 figure()
