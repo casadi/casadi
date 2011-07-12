@@ -716,74 +716,82 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char
   // Assert dimensions
   casadi_assert_message(size1()==y.size1(), "The number of rows does not match");
   casadi_assert_message(size2()==y.size2(), "The number of columns does not match");
-  
-  // Quick return if the patterns are equal
-  if(*this == y){
-    mapping.resize(size());
-    fill(mapping.begin(),mapping.end(),0);
-    return *this;
-  }
-  
-  // Create return object
-  CRSSparsity ret(size1(),size2());
-  
-  // Get refences to the sparsity vectors
-  vector<int>& r = ret.rowindRef();
-  vector<int>& c = ret.colRef();
-  
-  // Prepare the assembly of the rowind vector below
-  r.clear();
-  r.push_back(0);
-  
-  // Clear the mapping
-  mapping.clear();
-  
-  // Loop over rows of both patterns
-  for(int i=0; i<size1(); ++i){
-    // Non-zero element of the two matrices
-    int el1 = rowind(i);
-    int el2 = y.rowind(i);
-    
-    // End of the non-zero elements of the row for the two matrices
-    int el1_last = rowind(i+1);
-    int el2_last = y.rowind(i+1);
-    
-    // Loop over the non-zeros of both matrices
-    while(el1<el1_last || el2<el2_last){
-      // Get the columns
-      int col1 = el1<el1_last ? col(el1) : size2();
-      int col2 = el2<el2_last ? y.col(el2) : size2();
 
-      // Add to the return matrix
-      if(col1==col2){ //  both nonzero
-        c.push_back(col1);
-        mapping.push_back( 1 | 2);
-        el1++; el2++;
-      } else if(col1<col2){ //  only first argument is nonzero
-        if(!fx0_is_zero){
-          c.push_back(col1);
-          mapping.push_back(1);
-        } else {
-          mapping.push_back(1 | 4);
-        }
-        el1++;
-      } else { //  only second argument is nonzero
-        if(!f0x_is_zero){
-          c.push_back(col2);
-          mapping.push_back(2);
-        } else {
-          mapping.push_back(2 | 4);
-        }
-        el2++;
-      }
-    }
+  // Return object
+  CRSSparsity ret;
+
+  // Quick intersection if the patterns are equal
+  if(*this == y){
+    ret = *this;
+    mapping.resize(size());
+    fill(mapping.begin(),mapping.end(), 1 | 2);
+  } else {
+  
+    // Create return object
+    ret = CRSSparsity(size1(),size2());
     
-    // Save the index of the last nonzero on the row
-    r.push_back(c.size());
+    // Get refences to the sparsity vectors
+    vector<int>& r = ret.rowindRef();
+    vector<int>& c = ret.colRef();
+    
+    // Prepare the assembly of the rowind vector below
+    r.clear();
+    r.push_back(0);
+    
+    // Clear the mapping
+    mapping.clear();
+    
+    // Loop over rows of both patterns
+    for(int i=0; i<size1(); ++i){
+      // Non-zero element of the two matrices
+      int el1 = rowind(i);
+      int el2 = y.rowind(i);
+      
+      // End of the non-zero elements of the row for the two matrices
+      int el1_last = rowind(i+1);
+      int el2_last = y.rowind(i+1);
+      
+      // Loop over the non-zeros of both matrices
+      while(el1<el1_last || el2<el2_last){
+        // Get the columns
+        int col1 = el1<el1_last ? col(el1) : size2();
+        int col2 = el2<el2_last ? y.col(el2) : size2();
+
+        // Add to the return matrix
+        if(col1==col2){ //  both nonzero
+          c.push_back(col1);
+          mapping.push_back( 1 | 2);
+          el1++; el2++;
+        } else if(col1<col2){ //  only first argument is nonzero
+          if(!fx0_is_zero){
+            c.push_back(col1);
+            mapping.push_back(1);
+          } else {
+            mapping.push_back(1 | 4);
+          }
+          el1++;
+        } else { //  only second argument is nonzero
+          if(!f0x_is_zero){
+            c.push_back(col2);
+            mapping.push_back(2);
+          } else {
+            mapping.push_back(2 | 4);
+          }
+          el2++;
+        }
+      }
+      
+      // Save the index of the last nonzero on the row
+      r.push_back(c.size());
+    }
   }
   
-  // Create a new sparsity pattern with the remaining nonzeros added
-  if(!f00_is_zero && !ret.dense()){
+  // Check if we need to add extra nonzeros
+  if(f00_is_zero || ret.dense()){
+    // No nonzero elements in the return object or sparse entries evaluating to 0
+    return ret;
+  } else {
+    // Create a new sparsity pattern with the remaining nonzeros added
     vector<unsigned char> mapping_dense(ret.numel(),0); // FIXME: this allocation can be avoided, just iterate in reverse order instead
     
     // Loop over rows
@@ -804,14 +812,6 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char
     // Use the dense mapping instead and return a dense sparsity
     mapping_dense.swap(mapping);
     return CRSSparsity(ret.size1(),ret.size2(),true);
-  } else {
-    // Make sure that the object was correctly created
-    casadi_assert(r.size()==size1()+1);
-    casadi_assert(mapping.size()==c.size());
-    casadi_assert(c.size()==r.back());
-    
-    // Return 
-    return ret;
   }
 }
 

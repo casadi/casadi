@@ -24,8 +24,10 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
+#include <cassert>
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 
@@ -42,28 +44,14 @@ BinaryOp::BinaryOp(Operation op, MX x, MX y) : op_(op){
     y = MX(x.size1(),x.size2(),y);
   }
   
-  // Put densifying node in between if necessary
-  if(!casadi_math<double>::f00_is_zero[op_] && !x.dense() && !y.dense()){
-    makeDense(x);
-    makeDense(y);
-  }
-  
   setDependencies(x,y);
   
-  // Check if the sparsity patterns are the same
-  bool same_sparsity_ = x.sparsity() == y.sparsity();
-  
   // Get the sparsity pattern
-  if(same_sparsity_){
-    setSparsity(x->sparsity());
-    mapping_.resize(x.size(), 1 | 2 );
-  } else {
-    bool f00_is_zero = casadi_math<double>::f00_is_zero[op_];
-    bool f0x_is_zero = casadi_math<double>::f0x_is_zero[op_];
-    bool fx0_is_zero = casadi_math<double>::fx0_is_zero[op_];
-    CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_);
-    setSparsity(sp);
-  }
+  bool f00_is_zero = casadi_math<double>::f00_is_zero[op_];
+  bool f0x_is_zero = casadi_math<double>::f0x_is_zero[op_];
+  bool fx0_is_zero = casadi_math<double>::fx0_is_zero[op_];
+  CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_,f00_is_zero,f0x_is_zero,fx0_is_zero);
+  setSparsity(sp);
 }
 
 MX BinaryOp::adFwd(const std::vector<MX>& jx){
@@ -141,14 +129,14 @@ void BinaryOp::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, con
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
           double s = 0;
-          s += pd[nz0][0]*fwdSeed[0][d]->data()[el0];
-          s += pd[nz1][1]*fwdSeed[1][d]->data()[el1];
+          if(nz0) s += pd[nz0][0]*fwdSeed[0][d]->data()[el0];
+          if(nz1) s += pd[nz1][1]*fwdSeed[1][d]->data()[el1];
           fwdSens[d]->data()[el] = s;
         }
         
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
-          double s = adjSeed[d]->data()[i];
+          double s = adjSeed[d]->data()[el];
           if(nz0) adjSens[0][d]->data()[el0] += s*pd[nz0][0];
           if(nz1) adjSens[1][d]->data()[el1] += s*pd[nz1][1];
         }

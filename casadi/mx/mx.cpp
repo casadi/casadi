@@ -76,14 +76,16 @@ MX::MX(const CRSSparsity& sp, const MX& val){
   // Make sure that val is dense and scalar
   casadi_assert(val.numel()==1);
   
-  // Make dense
-  MX val_dense = val;
-  makeDense(val_dense);
-  
-  // Create mapping
-  assignNode(new Mapping(sp));
-  (*this)->addDependency(val_dense,vector<int>(sp.size(),0));
-  simplifyMapping(*this);
+  // Dense matrix if val dense
+  if(val.dense()){
+    // Create mapping
+    assignNode(new Mapping(sp));
+    (*this)->addDependency(val,vector<int>(sp.size(),0));
+    simplifyMapping(*this);
+  } else {
+    // Empty matrix
+    *this = zeros(sp.size1(),sp.size2());
+  }
 }
 
 MX MX::create(MXNode* node){
