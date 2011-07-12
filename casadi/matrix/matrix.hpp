@@ -1943,36 +1943,6 @@ void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x
   }
 }
 
-// template<class T>
-// void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
-//   std::vector<T>& rd = r.data();
-//   const std::vector<T> &xd = x.data();
-//   const std::vector<T> &yd = y.data();
-// 
-//   // Argument values
-//   T z = 0;
-// 
-//   // Nonzero counters
-//   int el0=0, el1=0, el=0;
-//   
-//   // Loop over nonzero elements
-//   for(int i=0; i<mapping.size(); ++i){
-//     // Check which elements are nonzero
-//     unsigned char m = mapping[i];
-//     bool nz0 = m & 1;
-//     bool nz1 = m & 2;
-//     bool skip_nz = m & 4;
-//     
-//     // Evaluate
-//     if(!skip_nz) rd[el++] = fcn(nz0 ? xd[el0] : z, nz1 ? yd[el1] : z);
-//     
-//     // Go to next nonzero
-//     el0 += nz0;
-//     el1 += nz1;
-//   }
-// }
-
-
 template<class T>
 Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
   casadi_assert_message(0,"not implemented");

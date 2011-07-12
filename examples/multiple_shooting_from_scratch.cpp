@@ -120,6 +120,8 @@ int main(){
   integrator.setOption("stop_at_end",true);
   integrator.setOption("t0",0);
   integrator.setOption("tf",tf/ns);
+/*  integrator.setOption("number_of_fwd_dir",20);
+  integrator.setOption("number_of_adj_dir",20);*/
   integrator.init();
   
   // Total number of NLP variables
@@ -171,6 +173,8 @@ int main(){
 
   // NLP constraint function
   MXFunction G(V,vertcat(g));
+/*  G.setOption("number_of_fwd_dir",20);
+  G.setOption("number_of_adj_dir",20);*/
   G.init();
 
   // Generate the Jacobian of the NLP constraint function

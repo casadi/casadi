@@ -431,14 +431,12 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
 }
 
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
-  return FXInternal::getJacSparsity(iind,oind);
-  
-  
   if(inputv.at(iind).dense()){
     // Normal, nonsparse input
     std::vector<MX> ret = jac(iind);
     return ret.at(oind).sparsity();
   } else {
+    // BUG: sparsity pattern recognition not working when input is sparse!
     // Sparse input doesn't work, don't use it
     return FXInternal::getJacSparsity(iind,oind);
   }
