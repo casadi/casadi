@@ -373,7 +373,7 @@ template<> char meta< std::vector<double> >::expected_message[] = "Expecting (1x
 template <>
 int meta< std::vector<double> >::as(const octave_value& p, std::vector<double> &m) {
   NATIVERETURN(std::vector<double>, m);
-  if(p.is_real_matrix()){
+  if(p.is_real_matrix() && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
     if (!(mat.rows()==1)) return false;
     m.resize(mat.cols());
@@ -383,7 +383,7 @@ int meta< std::vector<double> >::as(const octave_value& p, std::vector<double> &
 }
 
 template <> bool meta< std::vector<double> >::couldbe(const octave_value& p) { 
-  if(p.is_real_matrix()){
+  if(p.is_real_matrix() && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
     return (mat.rows()==1 );
   } else {
@@ -402,7 +402,7 @@ template<> char meta< std::vector<int> >::expected_message[] = "Expecting (1xn) 
 template <>
 int meta< std::vector<int> >::as(const octave_value& p, std::vector<int> &m) {
   NATIVERETURN(std::vector<int>, m);
-  if(p.is_real_matrix()){
+  if(p.is_real_matrix()  && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
     if (!(mat.rows()==1)) return false;
     m.resize(mat.cols());
@@ -412,7 +412,7 @@ int meta< std::vector<int> >::as(const octave_value& p, std::vector<int> &m) {
 }
 
 template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) { 
-  if(p.is_real_matrix()){
+  if(p.is_real_matrix() && p.is_numeric_type()) {
     const Matrix &mat = p.matrix_value();
     return (mat.rows()==1 );
   } else {

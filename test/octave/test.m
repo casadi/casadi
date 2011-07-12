@@ -302,4 +302,6 @@ X = DMatrix(sp_tril(4),5)
 s = casadi.dot(X,X).sparsity()
 
 
+disp("string confusion")
 
+x = MX("x")

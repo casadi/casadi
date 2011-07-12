@@ -263,7 +263,7 @@ bool meta< CasADi::SX >::couldbe(PyObject * p) {
 template <>
 int meta< CasADi::SX >::as(const octave_value& p,CasADi::SX &s) {
   NATIVERETURN(CasADi::SX, s)
-  if (p.is_real_scalar()) {
+  if ((p.is_real_scalar() && p.is_numeric_type())) {
     s=CasADi::SX(p.double_value());
     return true;
   } else if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
@@ -285,7 +285,7 @@ bool meta< CasADi::SX >::couldbe(const octave_value& p) {
     if (m.numel()==1 && m.size()==1)
       return true;
   }
-  return (meta< CasADi::SX >::isa(p) || p.is_real_scalar() );
+  return (meta< CasADi::SX >::isa(p) || (p.is_real_scalar() && p.is_numeric_type()) );
 }
 
 %}
@@ -382,7 +382,7 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
   NATIVERETURN(CasADi::Matrix<CasADi::SX>, m)
   NATIVERETURN(CasADi::Matrix<double>, m)
   NATIVERETURN(CasADi::SX, m)
-  if(p.is_real_matrix()){
+  if((p.is_real_matrix() && p.is_numeric_type())){
     Matrix mat = p.matrix_value();
     m = CasADi::SXMatrix(mat.rows(),mat.cols(),0);
     for(int i=0; i<mat.rows(); ++i){
@@ -408,14 +408,14 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
     }
     return true;
   }
-  if (p.is_real_scalar()) {
+  if ((p.is_real_scalar() && p.is_numeric_type())) {
     m = CasADi::SX(p.double_value());
     return true;
   }
   return false;
 }
 
-template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || p.is_real_matrix() || p.is_cell() || p.is_real_scalar();}
+template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || (p.is_real_matrix() && p.is_numeric_type()) || p.is_cell() || (p.is_real_scalar() && p.is_numeric_type());}
 %}
 #endif //SWIGOCTAVE
 
