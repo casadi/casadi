@@ -182,6 +182,9 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps);
  */
 std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps);
 
+/** Count number of nodes */
+int countNodes(const MX& A);
+
 // Equality
 MX operator==(const MX& a, const MX& b);
 MX operator>=(const MX& a, const MX& b);

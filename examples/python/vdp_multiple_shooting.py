@@ -14,7 +14,7 @@ rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
 tf = 20.0
 
 # Numboer of shooting nodes
-NS = 20
+NS = 50
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)

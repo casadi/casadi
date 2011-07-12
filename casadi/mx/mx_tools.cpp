@@ -459,6 +459,11 @@ MX diag(const MX& x){
   return ret;
 }
 
+int countNodes(const MX& A){
+  MXFunction f(vector<MX>(),A);
+  f.init();
+  return f.algorithm().size();
+}
 
 } // namespace CasADi
 
