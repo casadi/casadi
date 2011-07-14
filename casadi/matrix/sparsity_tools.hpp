@@ -28,24 +28,41 @@
 namespace CasADi{
 
 /**
- Create a dense rectangular sparsity pattern
+ \brief Create a dense rectangular sparsity pattern
 **/
 CRSSparsity sp_dense(int n, int m=1);
 
 /**
- Create a sparse rectangular sparsity pattern
+ \brief Create a sparse rectangular sparsity pattern
 **/
 CRSSparsity sp_sparse(int n, int m=1);
 
 /**
- Create an upper triangular square sparsity pattern
+ \brief Create an upper triangular square sparsity pattern
 **/
 CRSSparsity sp_tril(int n);
 
 /**
- Create diagonal square sparsity pattern
+ \brief Create diagonal square sparsity pattern
 **/
 CRSSparsity sp_diag(int n);
+
+/**
+ \brief Create a single band in a square sparsity pattern
+ *
+ * sp_band(n,0) is equivalent to sp_diag(n) \n
+ * sp_band(n,-1) has a band below the diagonal \n
+ * \param p indicate
+**/
+CRSSparsity sp_band(int n, int p);
+
+/**
+ \brief Create banded square sparsity pattern
+ *
+ * sp_band(n,0) is equivalent to sp_diag(n) \n
+ * sp_band(n,1) is tri-diagonal matrix \n
+**/
+CRSSparsity sp_banded(int n, int p);
 
 /** \brief Construct a sparsity pattern from (row,col) vectors
 
@@ -76,12 +93,12 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m);
 CRSSparsity vec(const CRSSparsity& a);
 
 /**
-* Return the lower part of the sparsity pattern
+* \brief Return the lower part of the sparsity pattern
 */
 CRSSparsity lowerSparsity(const CRSSparsity& a);
 
 /**
-* Return the non-zero entries that make up the lower part of the provided matrix
+* \brief Return the non-zero entries that make up the lower part of the provided matrix
 */
 std::vector<int> lowerNZ(const CRSSparsity& a);
 

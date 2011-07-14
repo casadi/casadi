@@ -59,7 +59,7 @@ CRSSparsity sp_tril(int n) {
 }
 
 CRSSparsity sp_diag(int n) {
-  casadi_assert_message(n>=0, "sp_tril expects a positive integer as argument");
+  casadi_assert_message(n>=0, "sp_diag expects a positive integer as argument");
 /*  int c=0;
   int t=0;*/
   std::vector< int >  	col(n);
@@ -73,6 +73,35 @@ CRSSparsity sp_diag(int n) {
 
   return CRSSparsity(n,n,col,rowind);
 }
+
+CRSSparsity sp_band(int n, int p) {
+  casadi_assert_message(n>=0, "sp_band expects a positive integer as argument");
+  casadi_assert_message((p<0? -p : p)<n, "sp_band: position of band schould be smaller then size argument");
+  
+  int nc = n-(p<0? -p : p);
+  
+  std::vector< int >  	col(nc);
+  
+  int offset = max(p,0);
+  for (int i=0;i<nc;i++) {
+    col[i]=i+offset;
+  }
+  
+  std::vector< int >  	rowind(n+1);
+  
+  offset = min(p,0);
+  for (int i=0;i<n+1;i++) {
+    rowind[i]=max(min(i+offset,nc),0);
+  }
+  
+  return CRSSparsity(n,n,col,rowind);
+  
+}
+
+CRSSparsity sp_banded(int n, int p) {
+  throw CasadiException("sp_banded: Not implemented yet");
+}
+
 
 CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int ncol) {
   std::vector<int> rowind(nrow+1);
