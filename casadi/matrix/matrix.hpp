@@ -1280,8 +1280,8 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
       int k1 = x.rowind(i+1);
       int k2 = y.rowind(i+1);
       while(el1 < k1 || el2 < k2){
-        int j1 = (el1 < k1) ? x.col(el1) : numel() ;
-        int j2 = (el2 < k2) ? y.col(el2) : numel() ;
+        int j1 = (el1 < k1) ? x.col(el1) : size2() ;
+        int j2 = (el2 < k2) ? y.col(el2) : size2() ;
         
         if(j1==j2)
           elem(i,j1) = fcn(x.data()[el1++],y.data()[el2++]); 
@@ -1303,8 +1303,8 @@ if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matr
     int k1 = x.rowind(i+1);
     int k2 = y.rowind(i+1);
     while(el1 < k1 || el2 < k2){
-      int j1 = (el1 < k1) ? x.col(el1) : numel() ;
-      int j2 = (el2 < k2) ? y.col(el2) : numel() ;
+      int j1 = (el1 < k1) ? x.col(el1) : size2() ;
+      int j2 = (el2 < k2) ? y.col(el2) : size2() ;
       
       if(j1==j2)
         elem(i,j1) = fcn(x.data()[el1++],y.data()[el2++]); 
