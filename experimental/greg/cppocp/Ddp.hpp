@@ -48,67 +48,67 @@
 class Ddp
 {
 public:
-	Ddp(Ode & _ode, double t0_, double tf_, int N_,
-		CasADi::SX (*cost_)(std::map<std::string,CasADi::SX> state,
-							std::map<std::string,CasADi::SX> action,
-							int timestep,
-							int N_));
-	~Ddp();
+     Ddp(Ode & _ode, double t0_, double tf_, int N_,
+	 CasADi::SX (*cost_)(std::map<std::string,CasADi::SX> state,
+			     std::map<std::string,CasADi::SX> action,
+			     int timestep,
+			     int N_));
+     ~Ddp();
 
-	void runBackwardSweep(void);
-	void runForwardSweep(void);
+     void runBackwardSweep(void);
+     void runForwardSweep(void);
 
-	// trajectory
-	std::vector<CasADi::DMatrix> V_0;
-	std::vector<CasADi::DMatrix> V_x;
-	std::vector<CasADi::DMatrix> V_xx;
-	std::vector<CasADi::DMatrix> xTrajectory;
-	std::vector<CasADi::DMatrix> xNominalTrajectory;
-	std::vector<CasADi::DMatrix> uTrajectory;
-	std::vector<CasADi::DMatrix> uOpenLoop;
-	std::vector<CasADi::DMatrix> feedbackGain;
+     // trajectory
+     std::vector<CasADi::DMatrix> V_0;
+     std::vector<CasADi::DMatrix> V_x;
+     std::vector<CasADi::DMatrix> V_xx;
+     std::vector<CasADi::DMatrix> xTrajectory;
+     std::vector<CasADi::DMatrix> xNominalTrajectory;
+     std::vector<CasADi::DMatrix> uTrajectory;
+     std::vector<CasADi::DMatrix> uOpenLoop;
+     std::vector<CasADi::DMatrix> feedbackGain;
 
-	// regularization
-	CasADi::DMatrix stateRegularization;
-	CasADi::DMatrix actionRegularization;
+     // regularization
+     CasADi::DMatrix stateRegularization;
+     CasADi::DMatrix actionRegularization;
 
-	// for debugging:
-	std::vector<CasADi::DMatrix> Q0Trajectory;
-	std::vector<CasADi::DMatrix> QxTrajectory;
-	std::vector<CasADi::DMatrix> QuTrajectory;
-	std::vector<CasADi::DMatrix> QxxTrajectory;
-	std::vector<CasADi::DMatrix> QxuTrajectory;
-	std::vector<CasADi::DMatrix> QuuTrajectory;
+     // for debugging:
+     std::vector<CasADi::DMatrix> Q0Trajectory;
+     std::vector<CasADi::DMatrix> QxTrajectory;
+     std::vector<CasADi::DMatrix> QuTrajectory;
+     std::vector<CasADi::DMatrix> QxxTrajectory;
+     std::vector<CasADi::DMatrix> QxuTrajectory;
+     std::vector<CasADi::DMatrix> QuuTrajectory;
 
-	// set actions bounds
-	void boundAction( std::vector<double> lb_, std::vector<double> ub_ );
-	void boundAction( std::vector<double> lb_, std::vector<double> ub_, int timestep );
+     // set actions bounds
+     void boundAction( std::vector<double> lb_, std::vector<double> ub_ );
+     void boundAction( std::vector<double> lb_, std::vector<double> ub_, int timestep );
 
-	int N;
+     int N;
 
 private:
-	double t0;
-	double tf;
+     double t0;
+     double tf;
 
-	std::vector< std::vector<double> > ubAction;
-	std::vector< std::vector<double> > lbAction;
+     std::vector< std::vector<double> > ubAction;
+     std::vector< std::vector<double> > lbAction;
 
-	Ode & ode;
+     Ode & ode;
 
-	// SXFunctions
-	std::vector<CasADi::SXFunction> qFunctions;
-	CasADi::SXFunction backwardSweepFcn;
-	CasADi::SXFunction dynamicsFcn;
-	CasADi::SXFunction qFcn;
+     // SXFunctions
+     std::vector<CasADi::SXFunction> qFunctions;
+     CasADi::SXFunction backwardSweepFcn;
+     CasADi::SXFunction dynamicsFcn;
+     CasADi::SXFunction qFcn;
 
-	void setupBackwardSweepFunction(void);
-	void setupQFunctions(void);
-	void takeBackwardStep(int timestep);
-	void takeForwardStep(int timestep);
+     void setupBackwardSweepFunction(void);
+     void setupQFunctions(void);
+     void takeBackwardStep(int timestep);
+     void takeForwardStep(int timestep);
 
-	CasADi::SX (*costFcnExt)(std::map<std::string,CasADi::SX> state,
-							 std::map<std::string,CasADi::SX> action,
-							 int timestep,
-							 int N_);
+     CasADi::SX (*costFcnExt)(std::map<std::string,CasADi::SX> state,
+			      std::map<std::string,CasADi::SX> action,
+			      int timestep,
+			      int N_);
 
 };

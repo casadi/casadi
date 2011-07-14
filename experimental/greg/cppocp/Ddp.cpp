@@ -12,50 +12,50 @@ using namespace std;
 
 Ddp::Ddp(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> state, map<string,SX> action, int timestep, int _N)) : ode(_ode)
 {
-	ode.init();
+     ode.init();
 
-	t0 = t0_;
-	tf = tf_;
-	N = N_;
+     t0 = t0_;
+     tf = tf_;
+     N = N_;
 
-	costFcnExt = cost_;
+     costFcnExt = cost_;
 
-	// initialize trajectory
-	for (int k=0; k<N; k++){
-		V_0.push_back(   DMatrix(        1,        1, 0.0) );
-		V_x.push_back(   DMatrix( ode.nx(),        1, 0.0) );
-		V_xx.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
+     // initialize trajectory
+     for (int k=0; k<N; k++){
+	  V_0.push_back(   DMatrix(        1,        1, 0.0) );
+	  V_x.push_back(   DMatrix( ode.nx(),        1, 0.0) );
+	  V_xx.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
 
-		Q0Trajectory.push_back(  DMatrix(        1,        1, 0.0) );
-		QxTrajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-		QuTrajectory.push_back(  DMatrix( ode.nu(),        1, 0.0) );
-		QxxTrajectory.push_back( DMatrix( ode.nx(), ode.nx(), 0.0) );
-		QxuTrajectory.push_back( DMatrix( ode.nx(), ode.nu(), 0.0) );
-		QuuTrajectory.push_back( DMatrix( ode.nu(), ode.nu(), 0.0) );
+	  Q0Trajectory.push_back(  DMatrix(        1,        1, 0.0) );
+	  QxTrajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
+	  QuTrajectory.push_back(  DMatrix( ode.nu(),        1, 0.0) );
+	  QxxTrajectory.push_back( DMatrix( ode.nx(), ode.nx(), 0.0) );
+	  QxuTrajectory.push_back( DMatrix( ode.nx(), ode.nu(), 0.0) );
+	  QuuTrajectory.push_back( DMatrix( ode.nu(), ode.nu(), 0.0) );
 
-		xTrajectory.push_back(         DMatrix( ode.nx(),        1, 0.0) );
-		xNominalTrajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-		uTrajectory.push_back(         DMatrix( ode.nu(),        1, 0.0) );
-		uOpenLoop.push_back(           DMatrix( ode.nu(),        1, 0.0) );
-		feedbackGain.push_back(        DMatrix( ode.nu(), ode.nx(), 0.0) );
+	  xTrajectory.push_back(         DMatrix( ode.nx(),        1, 0.0) );
+	  xNominalTrajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
+	  uTrajectory.push_back(         DMatrix( ode.nu(),        1, 0.0) );
+	  uOpenLoop.push_back(           DMatrix( ode.nu(),        1, 0.0) );
+	  feedbackGain.push_back(        DMatrix( ode.nu(), ode.nx(), 0.0) );
 
-		// initialize action bounds
-		vector<double> ubAction_;
-		vector<double> lbAction_;
-		for (int j=0; j<ode.nu(); j++){
-			ubAction_.push_back(1e30);
-			lbAction_.push_back(-1e30);
-		}
-		ubAction.push_back( ubAction_ );
-		lbAction.push_back( lbAction_ );
-	}
+	  // initialize action bounds
+	  vector<double> ubAction_;
+	  vector<double> lbAction_;
+	  for (int j=0; j<ode.nu(); j++){
+	       ubAction_.push_back(1e30);
+	       lbAction_.push_back(-1e30);
+	  }
+	  ubAction.push_back( ubAction_ );
+	  lbAction.push_back( lbAction_ );
+     }
 
 
-	stateRegularization  = DMatrix( ode.nx(), ode.nx(), 0.0 );
-	actionRegularization = DMatrix( ode.nu(), ode.nu(), 0.0 );
+     stateRegularization  = DMatrix( ode.nx(), ode.nx(), 0.0 );
+     actionRegularization = DMatrix( ode.nu(), ode.nu(), 0.0 );
 
-	setupBackwardSweepFunction();
-	setupQFunctions();
+     setupBackwardSweepFunction();
+     setupQFunctions();
 }
 
 Ddp::~Ddp() {}
@@ -63,290 +63,290 @@ Ddp::~Ddp() {}
 
 void Ddp::setupQFunctions()
 {
-	/*************** inputs **************/
-	SXMatrix xk = create_symbolic("xk", ode.nx());
-	SXMatrix uk = create_symbolic("uk", ode.nu());
+     /*************** inputs **************/
+     SXMatrix xk = create_symbolic("xk", ode.nx());
+     SXMatrix uk = create_symbolic("uk", ode.nu());
 
-	SXMatrix V_0_kp1(  create_symbolic(  "V_0_kp1",        1,        1) );
-	SXMatrix V_x_kp1(  create_symbolic(  "V_x_kp1", ode.nx(),        1) );
-	SXMatrix V_xx_kp1( create_symbolic( "V_xx_kp1", ode.nx(), ode.nx()) );
+     SXMatrix V_0_kp1(  create_symbolic(  "V_0_kp1",        1,        1) );
+     SXMatrix V_x_kp1(  create_symbolic(  "V_x_kp1", ode.nx(),        1) );
+     SXMatrix V_xx_kp1( create_symbolic( "V_xx_kp1", ode.nx(), ode.nx()) );
 
-	vector<SXMatrix> qInputs(NUM_Q_INPUTS);
-	qInputs.at(IDX_Q_INPUTS_X_K)      = xk;
-	qInputs.at(IDX_Q_INPUTS_U_K)      = uk;
-	qInputs.at(IDX_Q_INPUTS_V_0_KP1)  = V_0_kp1;
-	qInputs.at(IDX_Q_INPUTS_V_X_KP1)  = V_x_kp1;
-	qInputs.at(IDX_Q_INPUTS_V_XX_KP1) = V_xx_kp1;
+     vector<SXMatrix> qInputs(NUM_Q_INPUTS);
+     qInputs.at(IDX_Q_INPUTS_X_K)      = xk;
+     qInputs.at(IDX_Q_INPUTS_U_K)      = uk;
+     qInputs.at(IDX_Q_INPUTS_V_0_KP1)  = V_0_kp1;
+     qInputs.at(IDX_Q_INPUTS_V_X_KP1)  = V_x_kp1;
+     qInputs.at(IDX_Q_INPUTS_V_XX_KP1) = V_xx_kp1;
 
-	SXMatrix dx = create_symbolic("dx", ode.nx());
-	SXMatrix du = create_symbolic("du", ode.nu());
+     SXMatrix dx = create_symbolic("dx", ode.nx());
+     SXMatrix du = create_symbolic("du", ode.nu());
 
-	/**************** dynamics *********************/
-	// dummy params for now
-	map<string,SX> dummyParams;
-	double dt = (tf - t0)/(N - 1);
-	SXMatrix f = ode.rk4Step( xk + dx, uk + du, uk + du, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
-	SXMatrix f0 = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
-	// SXMatrix f = ode.eulerStep( xk + dx, uk + du, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
-	// SXMatrix f0 = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
+     /**************** dynamics *********************/
+     // dummy params for now
+     map<string,SX> dummyParams;
+     double dt = (tf - t0)/(N - 1);
+     SXMatrix f = ode.rk4Step( xk + dx, uk + du, uk + du, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
+     SXMatrix f0 = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
+     // SXMatrix f = ode.eulerStep( xk + dx, uk + du, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
+     // SXMatrix f0 = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
 
-	/**************** Q function *********************/
-	SXMatrix xk_p_dx( xk + dx );
-	SXMatrix uk_p_du( uk + du );
+     /**************** Q function *********************/
+     SXMatrix xk_p_dx( xk + dx );
+     SXMatrix uk_p_du( uk + du );
 
-	map<string,SX> xkMap = ode.getStateMap(  xk_p_dx );
-	map<string,SX> ukMap = ode.getActionMap( uk_p_du );
+     map<string,SX> xkMap = ode.getStateMap(  xk_p_dx );
+     map<string,SX> ukMap = ode.getActionMap( uk_p_du );
 
-	// map<string,SX> xkMap = ode.getStateMap(  xk );
-	// map<string,SX> ukMap = ode.getActionMap( uk );
+     // map<string,SX> xkMap = ode.getStateMap(  xk );
+     // map<string,SX> ukMap = ode.getActionMap( uk );
 
-	SXMatrix df = f - f0;
+     SXMatrix df = f - f0;
 
-	SXMatrix dxZeros( zerosSX( ode.nx(), 1 ) );
-	SXMatrix duZeros( zerosSX( ode.nu(), 1 ) );
+     SXMatrix dxZeros( zerosSX( ode.nx(), 1 ) );
+     SXMatrix duZeros( zerosSX( ode.nu(), 1 ) );
 
-	makeDense( dxZeros );
-	makeDense( duZeros );
+     makeDense( dxZeros );
+     makeDense( duZeros );
 
-	for (int k=0; k<N; k++){
+     for (int k=0; k<N; k++){
 
-		// function
-		SXMatrix Q_0_k(costFcnExt( xkMap, ukMap, k, N ) + V_0_kp1 + prod( V_x_kp1.trans(), df )
-					   + prod( df.trans(), prod( V_xx_kp1, df ) )/2 );
+	  // function
+	  SXMatrix Q_0_k(costFcnExt( xkMap, ukMap, k, N ) + V_0_kp1 + prod( V_x_kp1.trans(), df )
+			 + prod( df.trans(), prod( V_xx_kp1, df ) )/2 );
 
-		// jacobian
-		SXMatrix Q_x_k =  gradient( Q_0_k, dx );
-		SXMatrix Q_u_k =  gradient( Q_0_k, du );
+	  // jacobian
+	  SXMatrix Q_x_k =  gradient( Q_0_k, dx );
+	  SXMatrix Q_u_k =  gradient( Q_0_k, du );
 
-		// hessian
-		SXMatrix Q_xx_k = jacobian( Q_x_k, dx );
-		SXMatrix Q_xu_k = jacobian( Q_x_k, du ); // == jacobian( Q_u, x ).trans()
-		SXMatrix Q_uu_k = jacobian( Q_u_k, du );
+	  // hessian
+	  SXMatrix Q_xx_k = jacobian( Q_x_k, dx );
+	  SXMatrix Q_xu_k = jacobian( Q_x_k, du ); // == jacobian( Q_u, x ).trans()
+	  SXMatrix Q_uu_k = jacobian( Q_u_k, du );
 
-		Q_0_k  = substitute(  Q_0_k, dx, dxZeros );
-		Q_x_k  = substitute(  Q_x_k, dx, dxZeros );
-		Q_u_k  = substitute(  Q_u_k, dx, dxZeros );
-		Q_xx_k = substitute( Q_xx_k, dx, dxZeros );
-		Q_xu_k = substitute( Q_xu_k, dx, dxZeros );
-		Q_uu_k = substitute( Q_uu_k, dx, dxZeros );
+	  Q_0_k  = substitute(  Q_0_k, dx, dxZeros );
+	  Q_x_k  = substitute(  Q_x_k, dx, dxZeros );
+	  Q_u_k  = substitute(  Q_u_k, dx, dxZeros );
+	  Q_xx_k = substitute( Q_xx_k, dx, dxZeros );
+	  Q_xu_k = substitute( Q_xu_k, dx, dxZeros );
+	  Q_uu_k = substitute( Q_uu_k, dx, dxZeros );
 
-		Q_0_k  = substitute(  Q_0_k, du, duZeros );
-		Q_x_k  = substitute(  Q_x_k, du, duZeros );
-		Q_u_k  = substitute(  Q_u_k, du, duZeros );
-		Q_xx_k = substitute( Q_xx_k, du, duZeros );
-		Q_xu_k = substitute( Q_xu_k, du, duZeros );
-		Q_uu_k = substitute( Q_uu_k, du, duZeros );
+	  Q_0_k  = substitute(  Q_0_k, du, duZeros );
+	  Q_x_k  = substitute(  Q_x_k, du, duZeros );
+	  Q_u_k  = substitute(  Q_u_k, du, duZeros );
+	  Q_xx_k = substitute( Q_xx_k, du, duZeros );
+	  Q_xu_k = substitute( Q_xu_k, du, duZeros );
+	  Q_uu_k = substitute( Q_uu_k, du, duZeros );
 
-		simplify(Q_0_k);
-		simplify(Q_x_k);
-		simplify(Q_u_k);
-		simplify(Q_xx_k);
-		simplify(Q_xu_k);
-		simplify(Q_uu_k);
+	  simplify(Q_0_k);
+	  simplify(Q_x_k);
+	  simplify(Q_u_k);
+	  simplify(Q_xx_k);
+	  simplify(Q_xu_k);
+	  simplify(Q_uu_k);
 
-		// workaround bug where size() != size1()*size2()
-		makeDense(Q_0_k);
-		makeDense(Q_x_k);
-		makeDense(Q_u_k);
-		makeDense(Q_xx_k);
-		makeDense(Q_xu_k);
-		makeDense(Q_uu_k);
+	  // workaround bug where size() != size1()*size2()
+	  makeDense(Q_0_k);
+	  makeDense(Q_x_k);
+	  makeDense(Q_u_k);
+	  makeDense(Q_xx_k);
+	  makeDense(Q_xu_k);
+	  makeDense(Q_uu_k);
 
-		// outputs
-		vector<SXMatrix> qOutputs(NUM_Q_OUTPUTS);
-		qOutputs.at(IDX_Q_OUTPUTS_Q_0_K)  = Q_0_k;
-		qOutputs.at(IDX_Q_OUTPUTS_Q_X_K)  = Q_x_k;
-		qOutputs.at(IDX_Q_OUTPUTS_Q_U_K)  = Q_u_k;
-		qOutputs.at(IDX_Q_OUTPUTS_Q_XX_K) = Q_xx_k;
-		qOutputs.at(IDX_Q_OUTPUTS_Q_XU_K) = Q_xu_k;
-		qOutputs.at(IDX_Q_OUTPUTS_Q_UU_K) = Q_uu_k;
+	  // outputs
+	  vector<SXMatrix> qOutputs(NUM_Q_OUTPUTS);
+	  qOutputs.at(IDX_Q_OUTPUTS_Q_0_K)  = Q_0_k;
+	  qOutputs.at(IDX_Q_OUTPUTS_Q_X_K)  = Q_x_k;
+	  qOutputs.at(IDX_Q_OUTPUTS_Q_U_K)  = Q_u_k;
+	  qOutputs.at(IDX_Q_OUTPUTS_Q_XX_K) = Q_xx_k;
+	  qOutputs.at(IDX_Q_OUTPUTS_Q_XU_K) = Q_xu_k;
+	  qOutputs.at(IDX_Q_OUTPUTS_Q_UU_K) = Q_uu_k;
 		
-		// sx function
-		qFunctions.push_back( SXFunction( qInputs, qOutputs ) );
-		qFunctions.at(k).init();
-	}
+	  // sx function
+	  qFunctions.push_back( SXFunction( qInputs, qOutputs ) );
+	  qFunctions.at(k).init();
+     }
 }
 
 void Ddp::setupBackwardSweepFunction()
 {
-	/************ inputs ************/
-	SXMatrix uk(   create_symbolic(   "uk", ode.nu(),        1 ) );
+     /************ inputs ************/
+     SXMatrix uk(   create_symbolic(   "uk", ode.nu(),        1 ) );
 
-	SXMatrix Q_0(  create_symbolic(  "Q_0",        1,        1 ) );
-	SXMatrix Q_x(  create_symbolic(  "Q_x", ode.nx(),        1 ) );
-	SXMatrix Q_u(  create_symbolic(  "Q_u", ode.nu(),        1 ) );
-	SXMatrix Q_xx( create_symbolic( "Q_xx", ode.nx(), ode.nx() ) );
-	SXMatrix Q_xu( create_symbolic( "Q_xu", ode.nx(), ode.nu() ) );
-	SXMatrix Q_uu( create_symbolic( "Q_uu", ode.nu(), ode.nu() ) );
-
-
-	vector<SXMatrix> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_U_K)    = uk;
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_0_K)  = Q_0;
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_X_K)  = Q_x;
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_U_K)  = Q_u;
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_XX_K) = Q_xx;
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_XU_K) = Q_xu;
-	backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_UU_K) = Q_uu;
-
-	/************** optimal control *******************/
-	SXMatrix Q_uu_inv = inv( Q_uu );
-	SXMatrix u_feedforward_k = -prod( Q_uu_inv, Q_u );
-	SXMatrix feedbackGain_k  = -prod( Q_uu_inv, Q_xu.trans() );
+     SXMatrix Q_0(  create_symbolic(  "Q_0",        1,        1 ) );
+     SXMatrix Q_x(  create_symbolic(  "Q_x", ode.nx(),        1 ) );
+     SXMatrix Q_u(  create_symbolic(  "Q_u", ode.nu(),        1 ) );
+     SXMatrix Q_xx( create_symbolic( "Q_xx", ode.nx(), ode.nx() ) );
+     SXMatrix Q_xu( create_symbolic( "Q_xu", ode.nx(), ode.nu() ) );
+     SXMatrix Q_uu( create_symbolic( "Q_uu", ode.nu(), ode.nu() ) );
 
 
-	/************** value function propogation ********/
-	SXMatrix V_0_k  = Q_0  - prod( Q_u.trans(), prod( Q_uu_inv, Q_u ) );
-	SXMatrix V_x_k  = Q_x  - prod( Q_xu, prod( Q_uu_inv.trans(), Q_u ) );
-	SXMatrix V_xx_k = Q_xx - prod( Q_xu, prod( Q_uu_inv, Q_xu.trans() ) );
+     vector<SXMatrix> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_U_K)    = uk;
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_0_K)  = Q_0;
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_X_K)  = Q_x;
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_U_K)  = Q_u;
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_XX_K) = Q_xx;
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_XU_K) = Q_xu;
+     backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_UU_K) = Q_uu;
 
-	/*************** backwardSweepFcn ****************/
-	// workaround bug where size() != size1()*size2()
-	makeDense( u_feedforward_k );
-	makeDense( feedbackGain_k );
-	makeDense( V_0_k );
-	makeDense( V_x_k );
-	makeDense( V_xx_k );
+     /************** optimal control *******************/
+     SXMatrix Q_uu_inv = inv( Q_uu );
+     SXMatrix u_feedforward_k = -prod( Q_uu_inv, Q_u );
+     SXMatrix feedbackGain_k  = -prod( Q_uu_inv, Q_xu.trans() );
 
-	vector<SXMatrix> backwardSweepOutputs(NUM_BACKWARD_SWEEP_OUTPUTS);
-	backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_U_OPEN_LOOP_K)   = u_feedforward_k + uk;
-	backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_FEEDBACK_GAIN_K) = feedbackGain_k;
-	backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_0_K)           = V_0_k;
-	backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_X_K)           = V_x_k;
-	backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_XX_K)          = V_xx_k;
 
-	backwardSweepFcn = SXFunction( backwardSweepInputs, backwardSweepOutputs );
-	backwardSweepFcn.init();
+     /************** value function propogation ********/
+     SXMatrix V_0_k  = Q_0  - prod( Q_u.trans(), prod( Q_uu_inv, Q_u ) );
+     SXMatrix V_x_k  = Q_x  - prod( Q_xu, prod( Q_uu_inv.trans(), Q_u ) );
+     SXMatrix V_xx_k = Q_xx - prod( Q_xu, prod( Q_uu_inv, Q_xu.trans() ) );
+
+     /*************** backwardSweepFcn ****************/
+     // workaround bug where size() != size1()*size2()
+     makeDense( u_feedforward_k );
+     makeDense( feedbackGain_k );
+     makeDense( V_0_k );
+     makeDense( V_x_k );
+     makeDense( V_xx_k );
+
+     vector<SXMatrix> backwardSweepOutputs(NUM_BACKWARD_SWEEP_OUTPUTS);
+     backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_U_OPEN_LOOP_K)   = u_feedforward_k + uk;
+     backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_FEEDBACK_GAIN_K) = feedbackGain_k;
+     backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_0_K)           = V_0_k;
+     backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_X_K)           = V_x_k;
+     backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_XX_K)          = V_xx_k;
+
+     backwardSweepFcn = SXFunction( backwardSweepInputs, backwardSweepOutputs );
+     backwardSweepFcn.init();
 }
 
 void Ddp::runBackwardSweep()
 {
-	xNominalTrajectory.at(N-1) = xTrajectory.at(N-1);
+     xNominalTrajectory.at(N-1) = xTrajectory.at(N-1);
 
-	/******************* V(N-1) == Cost(N-1) ******************/
-	// set inputs
-	DMatrix V_0_zero(         1,        1, 0.0 );
-	DMatrix V_x_zero(  ode.nx(),        1, 0.0 );
-	DMatrix V_xx_zero( ode.nx(), ode.nx(), 0.0 );
+     /******************* V(N-1) == Cost(N-1) ******************/
+     // set inputs
+     DMatrix V_0_zero(         1,        1, 0.0 );
+     DMatrix V_x_zero(  ode.nx(),        1, 0.0 );
+     DMatrix V_xx_zero( ode.nx(), ode.nx(), 0.0 );
 
-	qFunctions.at( N-1 ).setInput( xTrajectory.at(N-1), IDX_Q_INPUTS_X_K      );
-	qFunctions.at( N-1 ).setInput( uTrajectory.at(N-1), IDX_Q_INPUTS_U_K      );
-	qFunctions.at( N-1 ).setInput(            V_0_zero, IDX_Q_INPUTS_V_0_KP1  );
-	qFunctions.at( N-1 ).setInput(            V_x_zero, IDX_Q_INPUTS_V_X_KP1  );
-	qFunctions.at( N-1 ).setInput(           V_xx_zero, IDX_Q_INPUTS_V_XX_KP1 );
+     qFunctions.at( N-1 ).setInput( xTrajectory.at(N-1), IDX_Q_INPUTS_X_K      );
+     qFunctions.at( N-1 ).setInput( uTrajectory.at(N-1), IDX_Q_INPUTS_U_K      );
+     qFunctions.at( N-1 ).setInput(            V_0_zero, IDX_Q_INPUTS_V_0_KP1  );
+     qFunctions.at( N-1 ).setInput(            V_x_zero, IDX_Q_INPUTS_V_X_KP1  );
+     qFunctions.at( N-1 ).setInput(           V_xx_zero, IDX_Q_INPUTS_V_XX_KP1 );
 
-	// evaluate
-	qFunctions.at( N-1 ).evaluate();
+     // evaluate
+     qFunctions.at( N-1 ).evaluate();
 
-	// get outputs
-	qFunctions.at( N-1 ).getOutput(  V_0.at( N-1 ), IDX_Q_OUTPUTS_Q_0_K  );
-	qFunctions.at( N-1 ).getOutput(  V_x.at( N-1 ), IDX_Q_OUTPUTS_Q_X_K  );
-	qFunctions.at( N-1 ).getOutput( V_xx.at( N-1 ), IDX_Q_OUTPUTS_Q_XX_K );
+     // get outputs
+     qFunctions.at( N-1 ).getOutput(  V_0.at( N-1 ), IDX_Q_OUTPUTS_Q_0_K  );
+     qFunctions.at( N-1 ).getOutput(  V_x.at( N-1 ), IDX_Q_OUTPUTS_Q_X_K  );
+     qFunctions.at( N-1 ).getOutput( V_xx.at( N-1 ), IDX_Q_OUTPUTS_Q_XX_K );
 
-	/*********** run backward sweep ************/
-	for (int k = N-2; k >= 0; k--)
-		takeBackwardStep(k);
+     /*********** run backward sweep ************/
+     for (int k = N-2; k >= 0; k--)
+	  takeBackwardStep(k);
 }
 
 void Ddp::takeBackwardStep(int timestep)
 {
-	/******************* evaluate Q function ******************/
-	// set inputs
-	qFunctions.at(timestep).setInput( xTrajectory.at( timestep     ), IDX_Q_INPUTS_X_K      );
-	qFunctions.at(timestep).setInput( uTrajectory.at( timestep     ), IDX_Q_INPUTS_U_K      );
-	qFunctions.at(timestep).setInput(         V_0.at( timestep + 1 ), IDX_Q_INPUTS_V_0_KP1  );
-	qFunctions.at(timestep).setInput(         V_x.at( timestep + 1 ), IDX_Q_INPUTS_V_X_KP1  );
-	qFunctions.at(timestep).setInput(        V_xx.at( timestep + 1 ), IDX_Q_INPUTS_V_XX_KP1 );
+     /******************* evaluate Q function ******************/
+     // set inputs
+     qFunctions.at(timestep).setInput( xTrajectory.at( timestep     ), IDX_Q_INPUTS_X_K      );
+     qFunctions.at(timestep).setInput( uTrajectory.at( timestep     ), IDX_Q_INPUTS_U_K      );
+     qFunctions.at(timestep).setInput(         V_0.at( timestep + 1 ), IDX_Q_INPUTS_V_0_KP1  );
+     qFunctions.at(timestep).setInput(         V_x.at( timestep + 1 ), IDX_Q_INPUTS_V_X_KP1  );
+     qFunctions.at(timestep).setInput(        V_xx.at( timestep + 1 ), IDX_Q_INPUTS_V_XX_KP1 );
 
-	// evaluate
-	qFunctions.at(timestep).evaluate();
+     // evaluate
+     qFunctions.at(timestep).evaluate();
 
-	// get outputs
-	qFunctions.at(timestep).getOutput(  Q0Trajectory.at(timestep), IDX_Q_OUTPUTS_Q_0_K  );
-	qFunctions.at(timestep).getOutput(  QxTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_X_K  );
-	qFunctions.at(timestep).getOutput(  QuTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_U_K  );
-	qFunctions.at(timestep).getOutput( QxxTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_XX_K );
-	qFunctions.at(timestep).getOutput( QxuTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_XU_K );
-	qFunctions.at(timestep).getOutput( QuuTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_UU_K );
+     // get outputs
+     qFunctions.at(timestep).getOutput(  Q0Trajectory.at(timestep), IDX_Q_OUTPUTS_Q_0_K  );
+     qFunctions.at(timestep).getOutput(  QxTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_X_K  );
+     qFunctions.at(timestep).getOutput(  QuTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_U_K  );
+     qFunctions.at(timestep).getOutput( QxxTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_XX_K );
+     qFunctions.at(timestep).getOutput( QxuTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_XU_K );
+     qFunctions.at(timestep).getOutput( QuuTrajectory.at(timestep), IDX_Q_OUTPUTS_Q_UU_K );
 
-	QxxTrajectory.at(timestep) += stateRegularization;
-	QuuTrajectory.at(timestep) += actionRegularization;
+     QxxTrajectory.at(timestep) += stateRegularization;
+     QuuTrajectory.at(timestep) += actionRegularization;
 
-	/*************** evaluate backward sweep function ************/
-	// set inputs
-	backwardSweepFcn.setInput(   uTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_U_K    );
-	backwardSweepFcn.setInput(  Q0Trajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_0_K  );
-	backwardSweepFcn.setInput(  QxTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_X_K  );
-	backwardSweepFcn.setInput(  QuTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_U_K  );
-	backwardSweepFcn.setInput( QxxTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_XX_K );
-	backwardSweepFcn.setInput( QxuTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_XU_K );
-	backwardSweepFcn.setInput( QuuTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_UU_K );
+     /*************** evaluate backward sweep function ************/
+     // set inputs
+     backwardSweepFcn.setInput(   uTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_U_K    );
+     backwardSweepFcn.setInput(  Q0Trajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_0_K  );
+     backwardSweepFcn.setInput(  QxTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_X_K  );
+     backwardSweepFcn.setInput(  QuTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_U_K  );
+     backwardSweepFcn.setInput( QxxTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_XX_K );
+     backwardSweepFcn.setInput( QxuTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_XU_K );
+     backwardSweepFcn.setInput( QuuTrajectory.at( timestep ), IDX_BACKWARD_SWEEP_INPUTS_Q_UU_K );
 
-	// evaluate
-	backwardSweepFcn.evaluate();
+     // evaluate
+     backwardSweepFcn.evaluate();
 
-	// get outputs
-	backwardSweepFcn.getOutput(    uOpenLoop.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_U_OPEN_LOOP_K   );
-	backwardSweepFcn.getOutput( feedbackGain.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_FEEDBACK_GAIN_K );
-	backwardSweepFcn.getOutput(          V_0.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_V_0_K           );
-	backwardSweepFcn.getOutput(          V_x.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_V_X_K           );
-	backwardSweepFcn.getOutput(         V_xx.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_V_XX_K          );
+     // get outputs
+     backwardSweepFcn.getOutput(    uOpenLoop.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_U_OPEN_LOOP_K   );
+     backwardSweepFcn.getOutput( feedbackGain.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_FEEDBACK_GAIN_K );
+     backwardSweepFcn.getOutput(          V_0.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_V_0_K           );
+     backwardSweepFcn.getOutput(          V_x.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_V_X_K           );
+     backwardSweepFcn.getOutput(         V_xx.at(timestep), IDX_BACKWARD_SWEEP_OUTPUTS_V_XX_K          );
 
-	// nominal trajectory (for feedback purposes)
-	xNominalTrajectory.at( timestep ) = xTrajectory.at( timestep );
+     // nominal trajectory (for feedback purposes)
+     xNominalTrajectory.at( timestep ) = xTrajectory.at( timestep );
 }
 
 
 void Ddp::runForwardSweep()
 {
-	for (int k = 0; k < N-1; k++)
-		takeForwardStep(k);
+     for (int k = 0; k < N-1; k++)
+	  takeForwardStep(k);
 }
 
 void Ddp::takeForwardStep(int timestep)
 {
-	xNominalTrajectory.at( timestep + 1 ) = xTrajectory.at( timestep + 1 );
+     xNominalTrajectory.at( timestep + 1 ) = xTrajectory.at( timestep + 1 );
 	
-	DMatrix dummyParams;
-	// open loop
-	uTrajectory.at(timestep) = uOpenLoop.at(timestep);
-	// add feedback
-	uTrajectory.at(timestep) += prod( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
+     DMatrix dummyParams;
+     // open loop
+     uTrajectory.at(timestep) = uOpenLoop.at(timestep);
+     // add feedback
+     uTrajectory.at(timestep) += prod( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
 
-	// bound actions
-#define BOUND( var, lb, ub ){											\
-		if ( var > ub )													\
-			var = ub;													\
-		if ( var < lb )													\
-			var = lb;													\
-	}
-	for (int k=0; k<ode.nu(); k++)
-		BOUND( uTrajectory.at(timestep).at(k), lbAction.at(timestep).at(k), ubAction.at(timestep).at(k) );
+     // bound actions
+#define BOUND( var, lb, ub ){			\
+	  if ( var > ub )			\
+	       var = ub;			\
+	  if ( var < lb )			\
+	       var = lb;			\
+     }
+     for (int k=0; k<ode.nu(); k++)
+	  BOUND( uTrajectory.at(timestep).at(k), lbAction.at(timestep).at(k), ubAction.at(timestep).at(k) );
 
-	double dt = (tf - t0)/(N - 1.0);
-	xTrajectory.at(timestep + 1) = ode.rk4Step( xTrajectory.at(timestep),
-												uTrajectory.at(timestep),
-												dummyParams,
-												t0 + timestep*dt,
-												dt);
+     double dt = (tf - t0)/(N - 1.0);
+     xTrajectory.at(timestep + 1) = ode.rk4Step( xTrajectory.at(timestep),
+						 uTrajectory.at(timestep),
+						 dummyParams,
+						 t0 + timestep*dt,
+						 dt);
 
-	// xTrajectory.at(timestep + 1) = ode.eulerStep( xTrajectory.at(timestep),
-	// 											  uTrajectory.at(timestep),
-	// 											  dummyParams,
-	// 											  t0 + timestep*dt,
-	// 											  dt);
+     // xTrajectory.at(timestep + 1) = ode.eulerStep( xTrajectory.at(timestep),
+     // 											  uTrajectory.at(timestep),
+     // 											  dummyParams,
+     // 											  t0 + timestep*dt,
+     // 											  dt);
 }
 
 
 void Ddp::boundAction( vector<double> lb_, vector<double> ub_ )
 {
-	for (int k=0; k<N; k++)
-		boundAction( lb_, ub_, k );
+     for (int k=0; k<N; k++)
+	  boundAction( lb_, ub_, k );
 
 }
 
 void Ddp::boundAction( vector<double> lb_, vector<double> ub_, int timestep )
 {
-	lbAction.at(timestep) = lb_;
-	ubAction.at(timestep) = ub_;
+     lbAction.at(timestep) = lb_;
+     ubAction.at(timestep) = ub_;
 }
