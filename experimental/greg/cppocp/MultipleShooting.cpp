@@ -225,9 +225,9 @@ SXMatrix MultipleShooting::getActionMat(int timeStep)
      return ret;
 }
 
-void MultipleShooting::writeOctaveOutput( ofstream & f, vector<double> & xopt )
+void MultipleShooting::writeOctaveOutput( ostream & f, vector<double> & xopt )
 {
-     f.precision(10);
+     f.precision(12);
 
      f << "function multipleShooting = ms_stage_" << name << "_out()" << endl;
 

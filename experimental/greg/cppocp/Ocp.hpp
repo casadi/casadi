@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <map>
 
@@ -52,10 +53,13 @@ public:
      void setStates(  std::vector<CasADi::DMatrix> & x);
      void setActions( std::vector<CasADi::DMatrix> & u);
 
+     void writeSolution( std::ostream & f );
      void writeSolution( const char * filename );
      void writeOctaveOutput( std::string name );
      void writeOctaveOutput( std::string name, std::string add );
      void writeOctaveOutput( std::string name, std::string add, std::string filename );
+     void writeOctaveOutput( std::string name, std::string add, std::ostream & f );
+     void loadGuess( std::istream & f );
      void loadGuess( const char * filename );
 
      // multiple shooting instances

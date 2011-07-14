@@ -35,7 +35,7 @@ public:
      void setStateActionGuess(std::string xu, double guess_, int timeStep);
      void setStateActionGuess(std::string xu, double guess_);
 
-     void writeOctaveOutput( std::ofstream & f, std::vector<double> & xopt);
+     void writeOctaveOutput( std::ostream & f, std::vector<double> & xopt);
 
      CasADi::SX getState(std::string x, int timeStep);
      CasADi::SX getAction(std::string u, int timeStep);
