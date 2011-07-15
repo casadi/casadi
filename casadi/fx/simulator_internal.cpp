@@ -26,7 +26,7 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 
-INPUTSCHEME(DAEInput)
+INPUTSCHEME(IntegratorInput)
 
 using namespace std;
 namespace CasADi{

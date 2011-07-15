@@ -36,9 +36,9 @@ class SimulatorInternal;
   The internal stepsizes of the integrator need not coincide with the gridpoints.
   
   
-  Simulator is an CasADi::FX mapping from CasADi::DaeInput to ntimesteps x n. \\
+  Simulator is an CasADi::FX mapping from CasADi::IntegratorInput to n. \\
   
-  The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (flattened) differential state.
+  The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (flattened) differential state for each time step.
   
   
   \author Joel Andersson 
