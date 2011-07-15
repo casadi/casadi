@@ -111,8 +111,24 @@
 </table>
 */
 /** \class CasADi::SimulatorInternal
+<table>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
+<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
+<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+</table>
 */
 /** \class CasADi::Simulator
+<table>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
+<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
+<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+</table>
 */
 /** \class CasADi::QPSolverInternal
 <table>

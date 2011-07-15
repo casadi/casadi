@@ -35,7 +35,11 @@ class SimulatorInternal;
   evaluates a set of output functions at these points.
   The internal stepsizes of the integrator need not coincide with the gridpoints.
   
-  Simulator is an CasADi::FX mapping from CasADi::SimulatorInput to 1 (flattened differential states for each time in the time grid)
+  
+  Simulator is an CasADi::FX mapping from CasADi::DaeInput to ntimesteps x n. \\
+  
+  The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (flattened) differential state.
+  
   
   \author Joel Andersson 
   \date 2010

@@ -185,7 +185,7 @@ f = file(out+'b0_options.hpp','w')
 # Print out doxygen information - options
 for name,meta in metadata.items():
   if not('options' in meta):
-    continue
+    meta['options'] = {}
 
   alloptions = meta['options']
   for a in meta['hierarchy']:
