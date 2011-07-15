@@ -106,10 +106,10 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     integrator_.integrate(grid_[k]);
     
     // Pass integrator_ output to the output function
-    output_fcn_.setInput(grid_[k],DAE_T);
-    output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
-    output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
-    output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
+    if (output_fcn_.input(DAE_T).numel()!=0)    output_fcn_.setInput(grid_[k],DAE_T);
+    if (output_fcn_.input(DAE_Y).numel()!=0)    output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
+    if (output_fcn_.input(DAE_YDOT).numel()!=0) output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
+    if (output_fcn_.input(DAE_P).numel()!=0)    output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Evaluate output function
     output_fcn_.evaluate();
