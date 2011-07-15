@@ -435,6 +435,7 @@ class SXtests(casadiTestCase):
                 ("number",2.3, (1,1)),
                 ("list(SX)", [SX("x"),SX("y")], (2,1)),
                 ("list(SX,number)", [SX("x"),2.3], (2,1) ),
+                ("list(list(SX,number))", [[SX("x"),2.3],[1,SX("y")]], (2,2) ),
                 ("tuple(SX)", (SX("x"),SX("y")), (2,1)),
                 ("tuple(SX,number)", (SX("x"),2.3), (2,1)),
                 ("SXMatrix", symbolic("x"), (1,1)),
@@ -445,6 +446,27 @@ class SXtests(casadiTestCase):
     for name, arg,shape in list:
       self.message(":" + name)
       i=trans(trans(arg))
+      self.assertEqual(i.shape[0],shape[0],"shape mismatch")
+      self.assertEqual(i.shape[1],shape[1],"shape mismatch")
+      isEmpty(arg)
+      
+  def test_SXMatrixconstr(self):
+    self.message("SXmatrix constructors")
+    list = [ ("SX" ,SX("x"),(1,1)),
+                ("number",2.3, (1,1)),
+                ("list(SX)", [SX("x"),SX("y")], (2,1)),
+                ("list(SX,number)", [SX("x"),2.3], (2,1) ),
+                ("list(list(SX,number))", [[SX("x"),2.3],[1,SX("y")]], (2,2) ),
+                ("tuple(SX)", (SX("x"),SX("y")), (2,1)),
+                ("tuple(SX,number)", (SX("x"),2.3), (2,1)),
+                ("SXMatrix", symbolic("x"), (1,1)),
+                ("numpy.ndarray1D(SX)", array([SX("x"),SX("y")]), (2,1)),
+                ("numpy.ndarray(SX)", array([[SX("x"),SX("y")],[SX("w"),SX("z")]]), (2,2)),
+                ("numpy.ndarray(SX,number)", array([[SX("x"),2.3]]), (1,2))
+    ];
+    for name, arg,shape in list:
+      self.message(":" + name)
+      i=SXMatrix(arg)
       self.assertEqual(i.shape[0],shape[0],"shape mismatch")
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
       isEmpty(arg)

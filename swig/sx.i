@@ -495,7 +495,7 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
 %meta_vector(CasADi::Matrix<CasADi::SX>);
 #endif //SWIGOCTAVE
 %meta_vector(std::vector<CasADi::SX>);
-
+%meta_vector(CasADi::SX);
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
