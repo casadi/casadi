@@ -180,6 +180,7 @@ Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<
 
   // evaluate with var == expr
   SXFunction fcn(var,ex);
+  fcn.init();
   return fcn.eval(expr);
 }
 

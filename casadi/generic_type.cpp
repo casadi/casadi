@@ -35,6 +35,7 @@ namespace CasADi{
   typedef GenericTypeInternal<bool> BoolType;
   typedef GenericTypeInternal<std::vector<double> > DoubleVectorType;
   typedef GenericTypeInternal<std::vector<int> > IntVectorType;
+  typedef GenericTypeInternal<SharedObject> SharedObjectType;
 
 bool GenericType::isBool() const{
   return is_a<bool>();
@@ -58,6 +59,10 @@ bool GenericType::isIntVector() const{
     
 bool GenericType::isDoubleVector() const{
   return is_a<vector<double> >();
+}
+  
+bool GenericType::isSharedObject() const{
+  return is_a<SharedObject>();
 }
   
 GenericType::GenericType(){
@@ -101,6 +106,11 @@ GenericType::GenericType(const string& s){
 GenericType::GenericType(const char s[]){ 
   assignNode(new StringType(s));
 }
+
+GenericType::GenericType(const SharedObject& obj){
+  assignNode(new SharedObjectType(obj));
+}
+
 
 bool GenericType::toBool() const{
   if (isBool()) {
@@ -150,6 +160,10 @@ const vector<double>& GenericType::toDoubleVector() const{
   return static_cast<const DoubleVectorType*>(get())->d_;
 }
 
+const SharedObject& GenericType::toSharedObject() const{
+  casadi_assert_message(isSharedObject(),"type mismatch");
+  return static_cast<const SharedObjectType*>(get())->d_;
+}
 
 bool GenericType::operator==(const GenericType& op2) const{
   return !(*this != op2);

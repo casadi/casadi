@@ -426,7 +426,16 @@ void MXFunctionInternal::print(ostream &stream) const{
 MXFunctionInternal* MXFunctionInternal::clone() const{
   MXFunctionInternal* node = new MXFunctionInternal(inputv,outputv);
   node->setOption(dictionary());
-  if(isInit()) node->init();
+  if(isInit()){
+    node->init();
+    
+    // FIXME: Quick fix for #183
+/*    for(vector<MXAlgEl>::iterator it=node->alg.begin(); it!=node->alg.end(); ++it){
+      if(it->mx->isEvaluation()){
+        it->mx->getFunction().makeUnique();
+      }
+    }*/
+  }
   return node;
 }
 
@@ -568,6 +577,7 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
 }
 
 void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants){
+  
   // Create a work array
   vector<SXMatrix> work(alg.size());
   for(int i=0; i<work.size(); ++i){

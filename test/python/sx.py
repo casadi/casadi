@@ -392,6 +392,7 @@ class SXtests(casadiTestCase):
     self.message("eval fail test")
     x = symbolic("x",2,2)
     f = SXFunction([x], [x])
+    f.init()
     self.assertRaises(TypeError,lambda: f.eval(x))
 
   def test_SXconversion(self):
@@ -484,6 +485,7 @@ class SXtests(casadiTestCase):
     x=symbolic("x",2,2)
     y=symbolic("y",2,2)
     f  = SXFunction([x,y], [x*y])
+    f.init()
     f.eval([x,y])
 
   def test_dict(self):

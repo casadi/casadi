@@ -47,6 +47,7 @@ namespace CasADi{
     GenericType(const std::vector<double>& dv);
     GenericType(const std::string& s);
     GenericType(const char s[]);
+    GenericType(const SharedObject& obj);
 
     /// Implicit typecasting
     #ifndef SWIG
@@ -56,6 +57,7 @@ namespace CasADi{
     operator const std::string& () const{ return toString();}
     operator const std::vector<int>& () const{ return toIntVector();}
     operator const std::vector<double>& () const{ return toDoubleVector();}
+    operator const SharedObject& () const{ return toSharedObject();}
     #endif // SWIG
     
     //! \brief Is boolean?
@@ -76,6 +78,9 @@ namespace CasADi{
     //! \brief Is a vector of doubles?
     bool isDoubleVector() const;
 
+    //! \brief Is a shared object?
+    bool isSharedObject() const;
+
     //! \brief Convert to boolean
     bool toBool() const;
 
@@ -93,6 +98,9 @@ namespace CasADi{
     
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
+
+    //! \brief Convert to shared object
+    const SharedObject& toSharedObject() const;
 
     //! \brief Equality
     bool operator==(const GenericType& op2) const;

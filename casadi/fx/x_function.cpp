@@ -43,6 +43,8 @@ bool XFunction::checkNode() const{
 }
 
 vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
+  casadi_assert_message(isInit(),"Function has not been initialized");
+
   // Create result vector with correct sparsity for the result
   vector<SXMatrix> res(getNumOutputs());
   for(int i=0; i<res.size(); ++i){
