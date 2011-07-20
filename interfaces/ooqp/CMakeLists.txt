@@ -21,4 +21,9 @@ install(TARGETS ooqp_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./ 
+   DESTINATION include/casadi/interfaces/ooqp
+   FILES_MATCHING PATTERN "*.hpp"
+   PATTERN ".svn" EXCLUDE
+)
 

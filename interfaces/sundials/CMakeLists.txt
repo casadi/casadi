@@ -32,4 +32,9 @@ install(TARGETS sundials_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./
+   DESTINATION include/casadi/interfaces/sundials
+   FILES_MATCHING PATTERN "*.hpp"
+   PATTERN ".svn" EXCLUDE
+)
 

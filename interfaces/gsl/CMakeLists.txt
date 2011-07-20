@@ -21,4 +21,9 @@ install(TARGETS gsl_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./ 
+   DESTINATION include/casadi/interfaces/gsl
+   FILES_MATCHING PATTERN "*.hpp"
+   PATTERN ".svn" EXCLUDE
+)
 

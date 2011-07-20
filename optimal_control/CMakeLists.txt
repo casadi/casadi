@@ -21,3 +21,8 @@ install(TARGETS optimal_control
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./ 
+   DESTINATION include/casadi/optimal_control
+   FILES_MATCHING PATTERN "*.hpp"
+   PATTERN ".svn" EXCLUDE
+)

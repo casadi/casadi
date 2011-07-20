@@ -17,6 +17,11 @@ install(TARGETS tinyxml
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./ 
+   DESTINATION include/casadi/external_packages/tinyxml
+   FILES_MATCHING PATTERN "*.h"
+   PATTERN ".svn" EXCLUDE
+)
 
 add_executable(xmltest xmltest.cpp)
 target_link_libraries(xmltest tinyxml)
