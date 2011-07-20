@@ -209,3 +209,8 @@ install(TARGETS superlu
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./                                                                                                                                                                                          
+   DESTINATION include/casadi/external_packages/superlu_4_1                                                                                                                                                   
+   FILES_MATCHING PATTERN "*.h"                                                                                                                                                                               
+   PATTERN ".svn" EXCLUDE                                                                                                                                                                                     
+)           

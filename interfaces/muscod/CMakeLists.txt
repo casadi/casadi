@@ -50,7 +50,7 @@ install(TARGETS muscod_interface
   ARCHIVE DESTINATION lib
 )
 install(DIRECTORY ./
-   DESTINATION include/casadi/interfaces/lapack
+   DESTINATION include/casadi/interfaces/muscod
    FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )

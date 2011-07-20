@@ -77,3 +77,9 @@ install(TARGETS casadi
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+install(DIRECTORY ./                                                                                                                                                                                          
+   DESTINATION include/casadi/casadi                                                                                                                                                                          
+   FILES_MATCHING PATTERN "*.hpp"                                                                                                                                                                             
+   PATTERN ".svn" EXCLUDE                                                                                                                                                                                     
+)                                                                                                                                                                                                             
+                 
