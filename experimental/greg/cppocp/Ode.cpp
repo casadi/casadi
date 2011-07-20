@@ -40,6 +40,12 @@ void Ode::init()
      locked = 1;
 }
 
+void Ode::setupIntegrators()
+{
+     map<string,double> dummyParams;
+     setupIntegrators(dummyParams);
+}
+
 void Ode::setupIntegrators(map<string,double> & params)
 {
      /*********** set up rk4Step and eulerStep SXFunctions **********/
