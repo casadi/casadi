@@ -58,13 +58,11 @@ public:
 
      CasADi::DMatrix rk4Step( CasADi::DMatrix & xk,
 			      CasADi::DMatrix & uk,
-			      CasADi::DMatrix & p,
 			      double t0,
 			      double dt);
 
      CasADi::DMatrix eulerStep( CasADi::DMatrix & xk,
 				CasADi::DMatrix & uk,
-				CasADi::DMatrix & p,
 				double t0,
 				double dt);
 

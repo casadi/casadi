@@ -236,7 +236,7 @@ SXMatrix Ode::simpsonsRuleError( SXMatrix x0Vec, SXMatrix x1Vec, SXMatrix u0Vec,
 }
 
 
-DMatrix Ode::rk4Step( DMatrix & xk, DMatrix & uk, DMatrix & p, double t0_, double dt_)
+DMatrix Ode::rk4Step( DMatrix & xk, DMatrix & uk, double t0_, double dt_)
 {
      if (!locked)
 	  init();
@@ -259,7 +259,7 @@ DMatrix Ode::rk4Step( DMatrix & xk, DMatrix & uk, DMatrix & p, double t0_, doubl
      return out;
 }
 
-DMatrix Ode::eulerStep( DMatrix & xk, DMatrix & uk, DMatrix & p, double t0_, double dt_)
+DMatrix Ode::eulerStep( DMatrix & xk, DMatrix & uk, double t0_, double dt_)
 {
      if (!locked)
 	  init();

@@ -308,7 +308,6 @@ void Ddp::takeForwardStep(int timestep)
 {
      xNominalTrajectory.at( timestep + 1 ) = xTrajectory.at( timestep + 1 );
 	
-     DMatrix dummyParams;
      // open loop
      uTrajectory.at(timestep) = uOpenLoop.at(timestep);
      // add feedback
@@ -327,7 +326,6 @@ void Ddp::takeForwardStep(int timestep)
      double dt = (tf - t0)/(N - 1.0);
      xTrajectory.at(timestep + 1) = ode.rk4Step( xTrajectory.at(timestep),
 						 uTrajectory.at(timestep),
-						 dummyParams,
 						 t0 + timestep*dt,
 						 dt);
 
