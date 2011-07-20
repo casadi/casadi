@@ -43,6 +43,7 @@ public:
 
      void assertUnlocked(void);
      void init(void);
+  void setupIntegrators(std::map<std::string,double> & params);
 
      std::map<std::string,CasADi::SX> getOutputFromDxdt( CasADi::SXMatrix x,
 							 CasADi::SXMatrix u,

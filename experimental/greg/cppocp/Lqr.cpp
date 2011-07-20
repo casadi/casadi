@@ -13,6 +13,8 @@ using namespace std;
 Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> state, map<string,SX> action, int timestep, int _N)) : ode(_ode)
 {
      ode.init();
+     map<string,double> dummyParams;
+     ode.setupIntegrators(dummyParams);
 
      t0 = t0_;
      tf = tf_;

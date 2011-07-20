@@ -37,7 +37,11 @@ void Ode::init()
 {
      if (locked)
 	  return;
+     locked = 1;
+}
 
+void Ode::setupIntegrators(map<string,double> & params)
+{
      /*********** set up rk4Step and eulerStep SXFunctions **********/
      // inputs
      SXMatrix xk = create_symbolic("xk", nx());
@@ -51,20 +55,22 @@ void Ode::init()
      stepInputs.at(IDX_ODE_STEP_T0)     = t0;
      stepInputs.at(IDX_ODE_STEP_DT)     = dt;
 
-     // dummy params for now
-     map<string,SX> dummyParams;
+     // "cast" map<string,double> to map<string,SX>
+     map<string,SX> sxParams;
+     map<string,double>::const_iterator iter;
+     for (iter = params.begin(); iter != params.end(); iter++){
+       sxParams[iter->first] = SX(iter->second);
+     }
 
      // call fcns
-     SXMatrix xNextRK4   = rk4Step(   xk, uk, uk, dummyParams, t0.at(0), dt.at(0) );
-     SXMatrix xNextEuler = eulerStep( xk, uk,     dummyParams, t0.at(0), dt.at(0) );
+     SXMatrix xNextRK4   = rk4Step(   xk, uk, uk, sxParams, t0.at(0), dt.at(0) );
+     SXMatrix xNextEuler = eulerStep( xk, uk,     sxParams, t0.at(0), dt.at(0) );
 
      // outputs
      rk4StepFcn   = SXFunction( stepInputs, xNextRK4 );
      eulerStepFcn = SXFunction( stepInputs, xNextEuler );
      rk4StepFcn.init();
      eulerStepFcn.init();
-
-     locked = 1;
 }
 
 // throw error if name is not unique
