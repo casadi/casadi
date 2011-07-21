@@ -77,7 +77,7 @@ class MXNode : public SharedObjectNode{
     virtual void print(std::ostream &stream) const;
 
     /** \brief  Evaluate the function */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrix& output, 
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, 
                           const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, 
                           const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj) = 0;
 
@@ -188,8 +188,9 @@ class MXNode : public SharedObjectNode{
     
     /// Numeric evaluation
     virtual Matrix<double> eval(const std::vector<DMatrix>& x){
-      Matrix<double> ret(sparsity_);
-      const DMatrixPtrV xptr = ptrVec(x);
+      std::vector<DMatrix> ret(1,DMatrix(sparsity_));
+      const DMatrixPtrV mx_input = ptrVec(x);
+      DMatrixPtrV mx_output = ptrVec(ret);
 
       // Dummy arguments
       DMatrixPtrVV fwdSeed;
@@ -197,8 +198,8 @@ class MXNode : public SharedObjectNode{
       DMatrixPtrV adjSeed;
       DMatrixPtrVV adjSens;
       int nfwd=0, nadj = 0;
-      evaluate(xptr,ret,fwdSeed,fwdSens,adjSeed,adjSens,nfwd,nadj);
-      return ret;
+      evaluate(mx_input,mx_output,fwdSeed,fwdSens,adjSeed,adjSens,nfwd,nadj);
+      return ret[0];
     }
 
     /// Symbolic evaluation (scalar graph)

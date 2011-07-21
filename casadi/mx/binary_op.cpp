@@ -91,11 +91,11 @@ void BinaryOp::print(std::ostream &stream, const std::vector<std::string>& args)
   casadi_math<double>::print[op_](stream,args.at(0),args.at(1));
 }
 
-void BinaryOp::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   if(nfwd==0 && nadj==0){
-    DMatrix::binary_no_alloc(casadi_math<double>::funE[op_],*input[0],*input[1],output,mapping_);
+    DMatrix::binary_no_alloc(casadi_math<double>::funE[op_],*input[0],*input[1],*output[0],mapping_);
   } else {
-    vector<double>& output0 = output.data();
+    vector<double>& output0 = output[0]->data();
     const vector<double> &input0 = input[0]->data();
     const vector<double> &input1 = input[1]->data();
 

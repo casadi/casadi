@@ -37,9 +37,9 @@ Mapping* Mapping::clone() const{
   return new Mapping(*this);
 }
 
-void Mapping::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   const std::vector<int>& nzind_ = nzmap_.data();
-  vector<double> &outputd = output.data();
+  vector<double> &outputd = output[0]->data();
   
   for(int k=0; k<size(); ++k){
     outputd[k] = input[depind_[k]]->data()[nzind_[k]];

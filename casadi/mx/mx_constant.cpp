@@ -42,8 +42,8 @@ void MXConstant::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << x_;
 }
 
-void MXConstant::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  copy(x_.begin(),x_.end(),&output.front());
+void MXConstant::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+  copy(x_.begin(),x_.end(),&output[0]->front());
   for(int d=0; d<nfwd; ++d){
     fill_n(&fwdSens[d]->front(),size(),0);
   }

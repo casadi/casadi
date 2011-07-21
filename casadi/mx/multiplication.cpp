@@ -48,9 +48,9 @@ void Multiplication::print(std::ostream &stream, const std::vector<std::string>&
   stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
-void Multiplication::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  fill(output.begin(),output.end(),0);
-  DMatrix::prod_no_alloc(*input[0],*input[1],output);
+void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+  fill(output[0]->begin(),output[0]->end(),0);
+  DMatrix::prod_no_alloc(*input[0],*input[1],*output[0]);
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){

@@ -33,7 +33,7 @@ Norm::Norm(const MX& x){
   setSparsity(CRSSparsity(1,1,true));
 }
 
-void Norm::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Norm::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   throw CasadiException("Norm::evaluate not implemented");
 }
 
@@ -53,8 +53,8 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
-void Norm2::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  vector<double> &outputd = output.data();
+void Norm2::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
 
   double temp=0;
@@ -99,8 +99,8 @@ Norm22* Norm22::clone() const{
   return new Norm22(*this);
 }
 
-void Norm22::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  vector<double> &outputd = output.data();
+void Norm22::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
 
   double temp=0;
@@ -146,8 +146,8 @@ void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) co
   stream << "||" << args.at(0) << "||_1"; 
 }
 
-void Norm1::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  vector<double> &outputd = output.data();
+void Norm1::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output[0]->data();
     const vector<double> &inputd = input[0]->data();
 
   if(nfwd==0 && nadj==0){
@@ -199,8 +199,8 @@ void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) 
   stream << "||" << args.at(0) << "||_inf"; 
 }
 
-void NormInf::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  vector<double> &outputd = output.data();
+void NormInf::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+  vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
 
   double temp=std::numeric_limits<double>::infinity();

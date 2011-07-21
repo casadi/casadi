@@ -44,7 +44,7 @@ void JacobianReference::print(std::ostream &stream, const std::vector<std::strin
   stream << args[0] << ".jac(" << iind_ <<  ")";
 }
 
-void JacobianReference::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void JacobianReference::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   casadi_assert(0);
 }
 

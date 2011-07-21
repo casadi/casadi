@@ -47,9 +47,9 @@ void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) 
   casadi_math<double>::print[op](stream,args.at(0),"nan");
 }
 
-void UnaryOp::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void UnaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   double nan = numeric_limits<double>::quiet_NaN();
-  vector<double> &outputd = output.data();
+  vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
   
   if(nfwd==0 && nadj==0){

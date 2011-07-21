@@ -330,6 +330,39 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
   liftfun_ud_ = user_data;
 }
 
+void MXFunctionInternal::updatePointers(const AlgEl& el){
+  int wind = el.i_res.front();
+    
+  mx_input_.resize(el.i_arg.size());
+  mx_fwdSeed_.resize(mx_input_.size());
+  mx_adjSens_.resize(mx_input_.size());
+  for(int i=0; i<mx_input_.size(); ++i){
+    mx_fwdSeed_[i].resize(nfdir_);
+    mx_adjSens_[i].resize(nadir_);
+    if(el.i_arg[i]>=0){
+      mx_input_[i] = &work[el.i_arg[i]].data;
+      for(int d=0; d<nfdir_; ++d)
+        mx_fwdSeed_[i][d] = &work[el.i_arg[i]].dataF[d];
+      for(int d=0; d<nadir_; ++d)
+        mx_adjSens_[i][d] = &work[el.i_arg[i]].dataA[d];
+    } else {
+      mx_input_[i] = 0;
+    }
+  }
+
+  mx_output_.resize(el.i_res.size());
+  for(int i=0; i<mx_output_.size(); ++i){
+    mx_output_[i] = &work[el.i_res[i]].data;
+  }
+
+  mx_fwdSens_.resize(nfdir_);
+  for(int d=0; d<nfdir_; ++d)
+    mx_fwdSens_[d] = &work[wind].dataF[d];
+  mx_adjSeed_.resize(nadir_);
+  for(int d=0; d<nadir_; ++d)
+    mx_adjSeed_[d] = &work[wind].dataA[d];
+}
+
 void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
 
@@ -348,36 +381,16 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    int wind = it->i_res.front();
-    
-    mx_input_.resize(it->i_arg.size());
-    mx_fwdSeed_.resize(mx_input_.size());
-    mx_adjSens_.resize(mx_input_.size());
-    for(int i=0; i<mx_input_.size(); ++i){
-      mx_fwdSeed_[i].resize(nfdir_);
-      mx_adjSens_[i].resize(nadir_);
-      if(it->i_arg[i]>=0){
-        mx_input_[i] = &work[it->i_arg[i]].data;
-        for(int d=0; d<nfdir_; ++d)
-          mx_fwdSeed_[i][d] = &work[it->i_arg[i]].dataF[d];
-        for(int d=0; d<nadir_; ++d)
-          mx_adjSens_[i][d] = &work[it->i_arg[i]].dataA[d];
-      } else {
-        mx_input_[i] = 0;
-      }
-    }
-    
-    mx_fwdSens_.resize(nfdir_);
-    for(int d=0; d<nfdir_; ++d)
-      mx_fwdSens_[d] = &work[wind].dataF[d];
-    mx_adjSeed_.resize(nadir_);
-    for(int d=0; d<nadir_; ++d)
-      mx_adjSeed_[d] = &work[wind].dataA[d];
+    // Point pointers to the data corresponding to the element
+    updatePointers(*it);
 
-    it->mx->evaluate(mx_input_, work[wind].data, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, nfdir, 0);
+    // Evaluate
+    it->mx->evaluate(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, nfdir, 0);
     // Lifting
     if(liftfun_ && it->mx->isNonLinear()){
-      liftfun_(&work[wind].data.front(),it->mx.size(),liftfun_ud_);
+      for(int i=0; i<it->i_res.size(); ++i){
+        liftfun_(&mx_output_[i]->front(),it->mx.size(),liftfun_ud_);
+      }
     }
   }
   
@@ -414,34 +427,11 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
-      int wind = it->i_res.front();
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it);
       
-      // Collect arguments
-      mx_input_.resize(it->i_arg.size());
-      mx_fwdSeed_.resize(mx_input_.size());
-      mx_adjSens_.resize(mx_input_.size());
-      for(int i=0; i<mx_input_.size(); ++i){
-        mx_fwdSeed_[i].resize(nfdir_);
-        mx_adjSens_[i].resize(nadir_);
-        if(it->i_arg[i]>=0){
-          mx_input_[i] = &work[it->i_arg[i]].data;
-          for(int d=0; d<nfdir_; ++d)
-            mx_fwdSeed_[i][d] = &work[it->i_arg[i]].dataF[d];
-          for(int d=0; d<nadir_; ++d)
-            mx_adjSens_[i][d] = &work[it->i_arg[i]].dataA[d];
-        } else {
-          mx_input_[i] = 0;
-        }
-      }
-      
-      mx_fwdSens_.resize(nfdir_);
-      for(int d=0; d<nfdir_; ++d)
-        mx_fwdSens_[d] = &work[wind].dataF[d];
-      mx_adjSeed_.resize(nadir_);
-      for(int d=0; d<nadir_; ++d)
-        mx_adjSeed_[d] = &work[wind].dataA[d];
-
-      it->mx->evaluate(mx_input_, work[wind].data, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, 0, nadir);
+      // Evaluate
+      it->mx->evaluate(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, 0, nadir);
     }
 
     // Get the adjoint sensitivities
