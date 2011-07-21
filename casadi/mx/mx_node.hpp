@@ -28,7 +28,27 @@
 #include <vector>
 
 namespace CasADi{
-/** \brief Node class for MX objects
+  //@{
+  /** \brief Convenience function, convert vectors to vectors of pointers */
+  template<class T>
+  std::vector<T*> ptrVec(std::vector<T>& v){
+    std::vector<T*> ret(v.size());
+    for(int i=0; i<v.size(); ++i) 
+      ret[i] = &v[i];
+    return ret;
+  }
+
+  template<class T>
+  const std::vector<T*> ptrVec(const std::vector<T>& v){
+    std::vector<T*> ret(v.size());
+    for(int i=0; i<v.size(); ++i) 
+      ret[i] = const_cast<T*>(&v[i]);
+    return ret;
+  }
+  //@}
+
+  
+  /** \brief Node class for MX objects
     \author Joel Andersson 
     \date 2010
     Internal class.
@@ -57,12 +77,17 @@ class MXNode : public SharedObjectNode{
     virtual void print(std::ostream &stream) const;
 
     /** \brief  Evaluate the function */
-    virtual void evaluate(const vDMatrixP& input, DMatrix& output, 
-                          const vvDMatrixP& fwdSeed, vDMatrixP& fwdSens, 
-                          const vDMatrixP& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj) = 0;
+    virtual void evaluate(const DMatrixPtrV& input, DMatrix& output, 
+                          const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, 
+                          const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj) = 0;
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+    virtual void evaluateSX(const SXMatrixPtrV &input, SXMatrix& output);
+    
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evaluateMX(const MXPtrV& input, MX& output,
+                            const MXPtrVV& fwdSeed, MXPtrV& fwdSens, 
+                            const MXPtrV& adjSeed, MXPtrVV& adjSens, int nfwd, int nadj);
     
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -107,9 +132,6 @@ class MXNode : public SharedObjectNode{
     /// Get the sparsity
     const CRSSparsity& sparsity() const;
     
-    /** \brief Generate all the partial derivatives for the node - needed for symbolic AD algorithm */
-    virtual std::vector<MX> partial() const;
-
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return false;}
     
@@ -165,7 +187,19 @@ class MXNode : public SharedObjectNode{
     int temp;
     
     /// Numeric evaluation
-    virtual Matrix<double> eval(const std::vector<Matrix<double> >& x){return Matrix<double>();}
+    virtual Matrix<double> eval(const std::vector<DMatrix>& x){
+      Matrix<double> ret(sparsity_);
+      const DMatrixPtrV xptr = ptrVec(x);
+
+      // Dummy arguments
+      DMatrixPtrVV fwdSeed;
+      DMatrixPtrV fwdSens; 
+      DMatrixPtrV adjSeed;
+      DMatrixPtrVV adjSens;
+      int nfwd=0, nadj = 0;
+      evaluate(xptr,ret,fwdSeed,fwdSens,adjSeed,adjSens,nfwd,nadj);
+      return ret;
+    }
 
     /// Symbolic evaluation (scalar graph)
     virtual Matrix<SX> eval(const std::vector<Matrix<SX> >& x){return Matrix<SX>();}
@@ -175,16 +209,14 @@ class MXNode : public SharedObjectNode{
     
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
-    
-    /// Partial derivatives
-    virtual std::vector<MX> partial(const std::vector<MX>& x){return std::vector<MX>();};
-    
+        
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;
     
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
 };
+
 
 } // namespace CasADi
 

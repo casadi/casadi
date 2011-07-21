@@ -45,7 +45,7 @@ void IfNode::print(std::ostream &stream, const std::vector<std::string>& args) c
   stream << "(" << args.at(0) << "?" <<  args.at(1) << ":" << args.at(2) << ")";
 }
 
-void IfNode::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
+void IfNode::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   bool c = fabs(input[0]->data()[0])<tol;
   vector<double> &outputd = output.data();
   if(c){

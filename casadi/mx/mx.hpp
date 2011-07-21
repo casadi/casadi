@@ -332,9 +332,17 @@ class MX : public SharedObject{
 
 //@{
 /// Some typedefs
-typedef DMatrix* DMatrixP;
-typedef std::vector<DMatrixP> vDMatrixP;
-typedef std::vector<vDMatrixP> vvDMatrixP;
+typedef DMatrix* DMatrixPtr;
+typedef std::vector<DMatrixPtr> DMatrixPtrV;
+typedef std::vector<DMatrixPtrV> DMatrixPtrVV;
+
+typedef SXMatrix* SXMatrixPtr;
+typedef std::vector<SXMatrixPtr> SXMatrixPtrV;
+typedef std::vector<SXMatrixPtrV> SXMatrixPtrVV;
+
+typedef MX* MXPtr;
+typedef std::vector<MXPtr> MXPtrV;
+typedef std::vector<MXPtrV> MXPtrVV;
 //@}
 
 #ifdef SWIG 

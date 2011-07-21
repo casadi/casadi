@@ -137,11 +137,20 @@ void MXNode::print(std::ostream &stream) const{
   print(stream,args);
 }
 
-std::vector<MX> MXNode::partial() const{
-  throw CasadiException(string("MXNode::partial() no partial derivatives defined for class ") + typeid(*this).name());
-}
-
 MX MXNode::adFwd(const std::vector<MX>& jx){
+  // Arguments
+  const MXPtrV input = ptrVec(dep_);
+  MX output;
+
+  
+//         // Dummy arguments
+//       DMatrixPtrVV fwdSeed;
+//       DMatrixPtrV fwdSens; 
+//       DMatrixPtrV adjSeed;
+//       DMatrixPtrVV adjSens;
+//       int nfwd=0, nadj = 0;
+
+  
   throw CasadiException(string("MXNode::adFwd() not defined for class ") + typeid(*this).name());
 }
 
@@ -161,13 +170,20 @@ int MXNode::getFunctionInput() const{
   throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
 }
 
-void MXNode::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrix& output){
   throw CasadiException(string("MXNode::evaluateSX() not defined for class ") + typeid(*this).name());
+}
+
+void MXNode::evaluateMX(const MXPtrV& input, MX& output, const MXPtrVV& fwdSeed, MXPtrV& fwdSens,const MXPtrV& adjSeed, MXPtrVV& adjSens, int nfwd, int nadj){
+  throw CasadiException(string("MXNode::evaluateMX() not defined for class ") + typeid(*this).name());
 }
 
 void MXNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   SharedObjectNode::deepCopyMembers(already_copied);
   dep_ = deepcopy(dep_,already_copied);
 }
+
+
+
 
 } // namespace CasADi

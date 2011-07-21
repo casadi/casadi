@@ -41,7 +41,7 @@ void Densification::print(std::ostream &stream, const std::vector<std::string>& 
   stream << "dense(" << args.at(0) << ")";
 }
 
-void Densification::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
+void Densification::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   // Propate values
   input[0]->get(output.data(),DENSE);
   

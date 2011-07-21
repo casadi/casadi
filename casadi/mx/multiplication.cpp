@@ -48,7 +48,7 @@ void Multiplication::print(std::ostream &stream, const std::vector<std::string>&
   stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
-void Multiplication::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
+void Multiplication::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   fill(output.begin(),output.end(),0);
   DMatrix::prod_no_alloc(*input[0],*input[1],output);
 

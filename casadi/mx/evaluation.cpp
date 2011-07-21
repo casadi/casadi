@@ -61,7 +61,7 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << fcn_ << ".call(" << args << ")";
 }
 
-void Evaluation::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
+void Evaluation::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   
   // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
@@ -104,7 +104,7 @@ void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string
   stream << args[0] << "[" << oind_ <<  "]";
 }
 
-void EvaluationOutput::evaluate(const std::vector<DMatrix*>& input, DMatrix& output, const vvDMatrixP& fwdSeed, std::vector<DMatrix*>& fwdSens, const std::vector<DMatrix*>& adjSeed, vvDMatrixP& adjSens, int nfwd, int nadj){
+void EvaluationOutput::evaluate(const DMatrixPtrV & input, DMatrix& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output.data();
 
   // Pass the adjoint seed to the function
