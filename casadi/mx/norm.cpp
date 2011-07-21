@@ -33,7 +33,7 @@ Norm::Norm(const MX& x){
   setSparsity(CRSSparsity(1,1,true));
 }
 
-void Norm::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Norm::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   throw CasadiException("Norm::evaluate not implemented");
 }
 
@@ -53,7 +53,7 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
-void Norm2::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Norm2::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
 
@@ -64,9 +64,9 @@ void Norm2::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatri
   outputd[0]=sqrt(temp);
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSens[d]->data()[0]=0;
+    fwdSens[0][d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d]->data()[0] += inputd[k]/outputd[0] * fwdSeed[0][d]->data()[k];
+      fwdSens[0][d]->data()[0] += inputd[k]/outputd[0] * fwdSeed[0][d]->data()[k];
     }
   }
 
@@ -99,7 +99,7 @@ Norm22* Norm22::clone() const{
   return new Norm22(*this);
 }
 
-void Norm22::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Norm22::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
 
@@ -110,9 +110,9 @@ void Norm22::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatr
   outputd[0]=temp;
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSens[d]->data()[0]=0;
+    fwdSens[0][d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
-      fwdSens[d]->data()[0] += 2*inputd[k] * fwdSeed[0][d]->data()[k];
+      fwdSens[0][d]->data()[0] += 2*inputd[k] * fwdSeed[0][d]->data()[k];
     }
   }
 
@@ -146,7 +146,7 @@ void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) co
   stream << "||" << args.at(0) << "||_1"; 
 }
 
-void Norm1::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Norm1::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output[0]->data();
     const vector<double> &inputd = input[0]->data();
 
@@ -159,15 +159,15 @@ void Norm1::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatri
 
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSens[d]->data()[0]=0;
+    fwdSens[0][d]->data()[0]=0;
     for(int k=0; k<dep(0).size(); k++){
       if (fwdSeed[0][d]->data()[k]==0) continue;
       if (inputd[k] < 0) {
-        fwdSens[d]->data()[0] -= fwdSeed[0][d]->data()[k];
+        fwdSens[0][d]->data()[0] -= fwdSeed[0][d]->data()[k];
       } else if (inputd[k] > 0) {
-        fwdSens[d]->data()[0] += fwdSeed[0][d]->data()[k];
+        fwdSens[0][d]->data()[0] += fwdSeed[0][d]->data()[k];
       } else {
-        fwdSens[d]->data()[0] += std::numeric_limits<double>::quiet_NaN();
+        fwdSens[0][d]->data()[0] += std::numeric_limits<double>::quiet_NaN();
       }
     }
   }
@@ -199,7 +199,7 @@ void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) 
   stream << "||" << args.at(0) << "||_inf"; 
 }
 
-void NormInf::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void NormInf::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
 

@@ -351,13 +351,14 @@ void MXFunctionInternal::updatePointers(const AlgEl& el){
   }
 
   mx_output_.resize(el.i_res.size());
+  mx_fwdSens_.resize(mx_output_.size());
   for(int i=0; i<mx_output_.size(); ++i){
     mx_output_[i] = &work[el.i_res[i]].data;
+    mx_fwdSens_[i].resize(nfdir_);
+    for(int d=0; d<nfdir_; ++d)
+      mx_fwdSens_[i][d] = &work[el.i_res[i]].dataF[d];
   }
 
-  mx_fwdSens_.resize(nfdir_);
-  for(int d=0; d<nfdir_; ++d)
-    mx_fwdSens_[d] = &work[wind].dataF[d];
   mx_adjSeed_.resize(nadir_);
   for(int d=0; d<nadir_; ++d)
     mx_adjSeed_[d] = &work[wind].dataA[d];
