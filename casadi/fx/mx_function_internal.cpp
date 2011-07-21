@@ -339,10 +339,15 @@ void MXFunctionInternal::updatePointers(const AlgEl& el){
   for(int i=0; i<mx_input_.size(); ++i){
     mx_fwdSeed_[i].resize(nfdir_);
     mx_adjSens_[i].resize(nadir_);
+    std::fill(mx_fwdSeed_[i].begin(),mx_fwdSeed_[i].end(),(DMatrix*)0);
+    std::fill(mx_adjSens_[i].begin(),mx_adjSens_[i].end(),(DMatrix*)0);
+    
     if(el.i_arg[i]>=0){
       mx_input_[i] = &work[el.i_arg[i]].data;
+      
       for(int d=0; d<nfdir_; ++d)
         mx_fwdSeed_[i][d] = &work[el.i_arg[i]].dataF[d];
+
       for(int d=0; d<nadir_; ++d)
         mx_adjSens_[i][d] = &work[el.i_arg[i]].dataA[d];
     } else {
@@ -352,16 +357,20 @@ void MXFunctionInternal::updatePointers(const AlgEl& el){
 
   mx_output_.resize(el.i_res.size());
   mx_fwdSens_.resize(mx_output_.size());
+  mx_adjSeed_.resize(mx_output_.size());
   for(int i=0; i<mx_output_.size(); ++i){
     mx_output_[i] = &work[el.i_res[i]].data;
+    
     mx_fwdSens_[i].resize(nfdir_);
     for(int d=0; d<nfdir_; ++d)
       mx_fwdSens_[i][d] = &work[el.i_res[i]].dataF[d];
+    
+    mx_adjSeed_[i].resize(nadir_);
+    for(int d=0; d<nadir_; ++d)
+      mx_adjSeed_[i][d] = &work[el.i_res[i]].dataA[d];
   }
 
   mx_adjSeed_.resize(nadir_);
-  for(int d=0; d<nadir_; ++d)
-    mx_adjSeed_[d] = &work[wind].dataA[d];
 }
 
 void MXFunctionInternal::evaluate(int nfdir, int nadir){

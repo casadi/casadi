@@ -79,7 +79,7 @@ class MXNode : public SharedObjectNode{
     /** \brief  Evaluate the function */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, 
                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                          const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj) = 0;
+                          const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj) = 0;
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV &input, SXMatrix& output);
@@ -195,7 +195,7 @@ class MXNode : public SharedObjectNode{
       // Dummy arguments
       DMatrixPtrVV fwdSeed;
       DMatrixPtrVV fwdSens; 
-      DMatrixPtrV adjSeed;
+      DMatrixPtrVV adjSeed;
       DMatrixPtrVV adjSens;
       int nfwd=0, nadj = 0;
       evaluate(mx_input,mx_output,fwdSeed,fwdSens,adjSeed,adjSens,nfwd,nadj);

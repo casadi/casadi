@@ -117,7 +117,7 @@ class MXFunctionInternal : public XFunctionInternal{
     DMatrixPtrV mx_output_;
     DMatrixPtrVV mx_fwdSeed_;
     DMatrixPtrVV mx_fwdSens_;
-    DMatrixPtrV mx_adjSeed_;
+    DMatrixPtrVV mx_adjSeed_;
     DMatrixPtrVV mx_adjSens_;
 
 };

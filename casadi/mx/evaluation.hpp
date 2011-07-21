@@ -48,7 +48,7 @@ class Evaluation : public MultipleOutput{
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
     
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
@@ -96,7 +96,7 @@ class EvaluationOutput : public OutputNode{
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
 
     /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
     virtual MX jac(int iind);

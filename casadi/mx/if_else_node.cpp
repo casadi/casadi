@@ -45,7 +45,7 @@ void IfNode::print(std::ostream &stream, const std::vector<std::string>& args) c
   stream << "(" << args.at(0) << "?" <<  args.at(1) << ":" << args.at(2) << ")";
 }
 
-void IfNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void IfNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
   bool c = fabs(input[0]->data()[0])<tol;
   vector<double> &outputd = output[0]->data();
   if(c){
@@ -59,7 +59,7 @@ void IfNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatr
       
       // Adjoint seeds
       for(int d=0; d<nadj; ++d)
-        adjSens[0][d]->data()[i] += adjSeed[d]->data()[i];
+        adjSens[0][d]->data()[i] += adjSeed[0][d]->data()[i];
     }
   } else {
     // Zero if false

@@ -48,7 +48,7 @@ class MXConstant : public MXNode{
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
 
     /** \brief  Indicate that the node is constant */
     virtual bool isConstant() const;
