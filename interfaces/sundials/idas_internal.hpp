@@ -93,6 +93,9 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Create a new integrator */
   virtual IdasInternal* create(const FX& f, const FX& q) const{ return new IdasInternal(f,q);}
 
+  /** \brief  Deep copy data members */
+  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
   /** \brief  Destructor */
   virtual ~IdasInternal();
 
@@ -207,7 +210,7 @@ class IdasInternal : public IntegratorInternal{
   int fsens_order_, asens_order_;
   
   // Jacobian of the ODE with respect to the parameters
-  FX jacp_;
+/*  FX jacp_;*/
   
   // For timings
   clock_t time1, time2;

@@ -47,6 +47,9 @@ public:
   /** \brief  Constructor */
   explicit CVodesInternal(const FX& f, const FX& q);
 
+  /** \brief  Deep copy data members */
+  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
   /** \brief  Clone */
   virtual CVodesInternal* clone() const;
   

@@ -33,17 +33,11 @@ namespace Sundials{
 
 CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
-  FX f = deepcopy(f_);
-  FX q = deepcopy(q_);
-  CVodesInternal* node = new CVodesInternal(f,q);
+  CVodesInternal* node = new CVodesInternal(f_,q_);
   node->setOption(dictionary());
-  node->linsol_ = deepcopy(linsol_);
-  node->jac_ = deepcopy(jac_);
-  if(isInit())
-    node->init();
   return node;
 }
-  
+
 CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("linear_multistep_method",     OT_STRING,  "bdf"); // "bdf" or "adams"
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton"); // "newton" or "functional"
@@ -1352,6 +1346,13 @@ FX CVodesInternal::getJacobian(){
 LinearSolver CVodesInternal::getLinearSolver(){
   return linsol_;
 }
+
+
+void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  IntegratorInternal::deepCopyMembers(already_copied);
+  jac_f_ = deepcopy(jac_f_,already_copied);
+}
+
 
 } // namespace Sundials
 } // namespace CasADi

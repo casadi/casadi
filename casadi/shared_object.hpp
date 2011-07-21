@@ -25,6 +25,8 @@
 
 #include "printable_object.hpp"
 #include "casadi_exception.hpp"
+#include <map>
+#include <vector>
 
 namespace CasADi{
 
@@ -113,10 +115,14 @@ class SharedObject : public PrintableObject{
 
     /// Print a destription of the object
     virtual void print(std::ostream &stream=limited(std::cout)) const;
-#endif // SWIG
+    
+    #endif // SWIG
     
     /// Initialize the object: more documentation in the node class (SharedObjectNode and derived classes)
     void init();
+
+    /// Is initialized?
+    bool isInit() const;
     
     /// Is a null pointer?
     bool isNull() const;
@@ -124,11 +130,14 @@ class SharedObject : public PrintableObject{
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
     
+#ifndef SWIG
+    //@{
     /// If there are other references to the object, then make a deep copy of it and point to this new object
-    void makeUnique();
+    void makeUnique(bool clone_members=true);
+    void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members=true);
+    //@}
     
   private:
-#ifndef SWIG
     SharedObjectNode *node;
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
@@ -155,7 +164,10 @@ class SharedObjectNode{
   virtual ~SharedObjectNode() = 0;
 
   /// Make a deep copy of the instance  
-  virtual SharedObjectNode* clone() const;
+  virtual SharedObjectNode* clone() const=0;
+
+  /// Deep copy data members
+  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
   /// Get the reference count
   int getCount() const;
@@ -173,7 +185,10 @@ class SharedObjectNode{
     /// Get a shared object from the current internal object
     template<class B>
     B shared_from_this();
-  
+
+    /// Has the function been initialized?
+    bool is_init_;
+
   private:
     /// Number of references pointing to the object
     unsigned int count;
@@ -206,6 +221,7 @@ const B shared_cast(const SharedObject& A){
   return shared_cast<B>(A_copy);
 }
 
+//@{
 /// Make a deep copy of an object (Note: default is a shallow copy!)
 template<class A>
 A deepcopy(const A& a){
@@ -214,6 +230,22 @@ A deepcopy(const A& a){
   return ret;
 }
 
+template<class A>
+A deepcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
+  A ret = a;
+  ret.makeUnique(already_copied);
+  return ret;
+}
+
+template<class A>
+std::vector<A> deepcopy(const std::vector<A>& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
+  std::vector<A> ret = a;
+  for(typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it){
+    it->makeUnique(already_copied);
+  }
+  return ret;
+}
+//@}
 
 // Template function implementations
 template<class B>

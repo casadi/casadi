@@ -44,6 +44,9 @@ class CFunctionInternal : public FXInternal{
     /** \brief  Destructor */
     virtual ~CFunctionInternal();
 
+    /** \brief  Cloning */
+    virtual CFunctionInternal* clone() const{ return new CFunctionInternal(evaluate_);}
+
     /** \brief  Set user data structure (to be passed to all functions) */
     void setUserData(void* user_data);
   

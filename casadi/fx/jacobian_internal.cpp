@@ -41,9 +41,12 @@ JacobianInternal::~JacobianInternal(){
 }
 
 JacobianInternal* JacobianInternal::clone() const{
-  JacobianInternal* node = new JacobianInternal(*this);
-  node->fcn_ = shared_cast<FX>(fcn_.clone());
-  return node;
+  return new JacobianInternal(*this);
+}
+
+void JacobianInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  FXInternal::deepCopyMembers(already_copied);
+  fcn_ = deepcopy(fcn_,already_copied);
 }
 
 void JacobianInternal::init(){

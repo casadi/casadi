@@ -58,6 +58,9 @@ class AcadoInternal : public FXInternal{
     
     /** \brief  Destructor */
     virtual ~AcadoInternal();
+
+    // clone
+    virtual AcadoInternal* clone() const{ return new AcadoInternal(*this);}
     
     /** \brief  Initialize the solver */
     virtual void init();

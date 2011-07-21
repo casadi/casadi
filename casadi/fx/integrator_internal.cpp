@@ -394,6 +394,14 @@ Integrator IntegratorInternal::jac(bool with_x, bool with_p){
   
   return integrator;
 }
+  
+void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  FXInternal::deepCopyMembers(already_copied);
+  f_ = deepcopy(f_,already_copied);
+  q_ = deepcopy(q_,already_copied);
+  jac_ = deepcopy(jac_,already_copied);
+  linsol_ = deepcopy(linsol_,already_copied);
+}
 
 } // namespace CasADi
 

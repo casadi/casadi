@@ -43,6 +43,9 @@ class JacobianInternal : public FXInternal{
     /// Clone
     virtual JacobianInternal* clone() const;
 
+    /// Deep copy data members
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    
     /// Destructor
     virtual ~JacobianInternal();
       

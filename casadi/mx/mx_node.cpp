@@ -165,5 +165,9 @@ void MXNode::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
   throw CasadiException(string("MXNode::evaluateSX() not defined for class ") + typeid(*this).name());
 }
 
+void MXNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  SharedObjectNode::deepCopyMembers(already_copied);
+  dep_ = deepcopy(dep_,already_copied);
+}
 
 } // namespace CasADi

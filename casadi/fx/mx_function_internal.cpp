@@ -101,7 +101,7 @@ void MXFunctionInternal::init(){
 
   // Order the nodes in the order of dependencies using a depth-first topological sorting
   sort_depth_first(s,nodes);
-  
+
   // TODO: Make sure that the output nodes are placed directly after the corresponding multiple output node
 
   // Resort the nodes in a more cache friendly order (Kahn 1962)
@@ -229,6 +229,7 @@ void MXFunctionInternal::eliminateJacobian(){
     }
   }
 
+
   // Jacobian functions for each function and set of jacobians
   map<void*,map<jblocks,FX> > jac;
     
@@ -286,7 +287,7 @@ void MXFunctionInternal::eliminateJacobian(){
         if(jj!=ii->second.end()){
           
           // Make the pointer unique so that other expressions won't be affected
-          it->mx.makeUnique();
+          it->mx.makeUnique(false);
             
           if(it->mx->isEvaluation()){
             // Replace the function if its an evaluation node
@@ -331,7 +332,7 @@ void MXFunctionInternal::eliminateJacobian(){
       if(ch>=0){
         if(it->mx->dep(i).get() != alg[ch].mx.get()){
           // Make sure that the change does not affect other nodes
-          it->mx.makeUnique();
+          it->mx.makeUnique(false);
             
           // Update dependencies
           it->mx->dep(i) = alg[ch].mx;
@@ -348,7 +349,7 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
 
 void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
-  
+
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind)
     alg[inputv_ind[ind]].val.data.set(input(ind));
@@ -424,19 +425,20 @@ void MXFunctionInternal::print(ostream &stream) const{
 }
 
 MXFunctionInternal* MXFunctionInternal::clone() const{
-  MXFunctionInternal* node = new MXFunctionInternal(inputv,outputv);
-  node->setOption(dictionary());
-  if(isInit()){
-    node->init();
-    
-    // FIXME: Quick fix for #183
-/*    for(vector<MXAlgEl>::iterator it=node->alg.begin(); it!=node->alg.end(); ++it){
-      if(it->mx->isEvaluation()){
-        it->mx->getFunction().makeUnique();
-      }
-    }*/
+  return new MXFunctionInternal(*this);
+}
+
+void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  XFunctionInternal::deepCopyMembers(already_copied);
+  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
+    if(it->mx->isEvaluation()){
+      it->mx.makeUnique(already_copied,false);
+      it->mx->getFunction() = deepcopy(it->mx->getFunction(),already_copied);
+    }
   }
-  return node;
+  
+  /*  inputv = deepcopy(inputv,already_copied);*/
+//  outputv = deepcopy(outputv,already_copied);
 }
 
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
@@ -638,7 +640,6 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
   SXFunction f(arg,res);
   return f;
 }
-
 
 
 } // namespace CasADi

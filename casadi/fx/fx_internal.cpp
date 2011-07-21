@@ -41,7 +41,6 @@ FXInternal::FXInternal(){
   addOption("numeric_jacobian",  OT_BOOLEAN,   false,   "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
   addOption("numeric_hessian",   OT_BOOLEAN,   false,   "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
   addOption("ad_mode",           OT_STRING,    "automatic", "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
-  is_init_ = false;
   verbose_ = false;
   numeric_jacobian_ = false;
 }

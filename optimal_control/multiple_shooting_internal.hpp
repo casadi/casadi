@@ -40,7 +40,10 @@ class MultipleShootingInternal : public OCPSolverInternal{
   public:
     // Constructor
     MultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
-    
+
+    // clone
+    virtual MultipleShootingInternal* clone() const{ return new MultipleShootingInternal(*this);}
+
     // Destructor
     virtual ~MultipleShootingInternal();
     

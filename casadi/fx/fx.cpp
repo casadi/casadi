@@ -188,10 +188,6 @@ FX FX::hessian(int iind, int oind){
   return (*this)->hessian(iind,oind);  
 }
 
-bool FX::isInit() const {
-  return (*this)->is_init_;
-}
-
 bool FX::checkNode() const{
   return dynamic_cast<const FXInternal*>(get())!=0;
 }

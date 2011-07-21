@@ -42,6 +42,9 @@ class FMIParserInternal : public SharedObjectNode{
     /// destructor
     virtual ~FMIParserInternal(); 
 
+    /// clone
+    virtual FMIParserInternal* clone() const{ return new FMIParserInternal(*this);}
+
     /// Parse from XML to C++ format
     OCP& parse();
 

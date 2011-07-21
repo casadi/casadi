@@ -41,6 +41,15 @@ class ParallelizerInternal : public FXInternal{
     explicit ParallelizerInternal(const std::vector<FX>& funcs);
 
   public:
+    /// clone
+    virtual ParallelizerInternal* clone() const{ 
+      ParallelizerInternal* ret = new ParallelizerInternal(*this);
+      for(std::vector<FX>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it){
+        it->makeUnique();
+      }
+      return ret;
+    }
+    
     /// Destructor
     virtual ~ParallelizerInternal();
     
@@ -58,6 +67,9 @@ class ParallelizerInternal : public FXInternal{
 
     /// Generate the sparsity of a Jacobian block
     virtual CRSSparsity getJacSparsity(int iind, int oind);
+
+    /// Deep copy data members
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
     
     /// Functions
     std::vector<FX> funcs_;

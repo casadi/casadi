@@ -34,10 +34,12 @@ SharedObject::SharedObject(){
 }
 
 SharedObjectNode::SharedObjectNode(const SharedObjectNode& node){
+  is_init_ = node.is_init_;
   count = 0; // reference counter is _not_ copied
 }
 
 SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node){
+  is_init_ = node.is_init_;
   // do _not_ copy the reference counter
   return *this;
 }
@@ -108,6 +110,7 @@ SharedObjectNode* SharedObject::operator->(){
 }
     
 SharedObjectNode::SharedObjectNode(){
+  is_init_ = false;
   count = 0;
 }
 
@@ -148,20 +151,42 @@ void SharedObjectNode::print(std::ostream &stream) const{
   stream << typeid(this).name();
 }
 
-void SharedObject::makeUnique(){
-  if(node && node->count>1){
-    SharedObjectNode *newnode = node->clone();
-    assignNode(newnode);
-  }
+void SharedObject::makeUnique(bool clone_members){
+  std::map<SharedObjectNode*,SharedObject> already_copied;
+  makeUnique(already_copied,clone_members);
 }
 
-SharedObjectNode* SharedObjectNode::clone() const{
-  throw CasadiException(string("clone() has not defined for class") + typeid(this).name());
+void SharedObject::makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members){
+  if(node && node->count>1){
+    // First find out if the expression has already been copied
+    std::map<SharedObjectNode*,SharedObject>::iterator it = already_copied.find(node);
+    
+    if(it==already_copied.end()){
+      // If the expression has not yet been copied
+      SharedObjectNode *newnode = node->clone();
+      
+      // Copy the data members
+      if(clone_members) newnode->deepCopyMembers(already_copied);
+      
+      // Initialize object if parent was initialized
+      if(isInit() && !newnode->is_init_){
+        newnode->init();
+      }
+      
+      // Assign cloned node to object
+      assignNode(newnode);
+    } else {
+      // Use an existing copy
+      assignNode(it->second.get());
+    }
+  }
 }
 
 SharedObject SharedObject::clone() const{
   SharedObject ret;
-  if(!isNull()) ret.assignNode((*this)->clone());
+  if(!isNull()){
+    ret.assignNode((*this)->clone());
+  }
   return ret;
 }
 
@@ -178,6 +203,14 @@ int SharedObject::getCount() const{
 int SharedObjectNode::getCount() const{
   return count;
 }
+
+void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+}
+
+bool SharedObject::isInit() const{
+  return (*this)->is_init_;
+}
+
 
 
 } // namespace CasADi

@@ -41,6 +41,9 @@ public:
   /** \brief  Destructor */
   virtual ~SimulatorInternal();
   
+  /** \brief  Clone */
+  virtual SimulatorInternal* clone() const{ return new SimulatorInternal(deepcopy(integrator_),deepcopy(output_fcn_),grid_);}
+
   /** \brief  initialize */
   virtual void init();
 

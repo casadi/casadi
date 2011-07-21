@@ -64,6 +64,7 @@ int main(){
   I.setOption("steps_per_checkpoint",500);
   I.setOption("stop_at_end",true);
 //  I.setOption("calc_ic",true);
+//  I.setOption("numeric_jacobian",true);
   I.init();
   
   //Numboer of shooting nodes
@@ -84,7 +85,6 @@ int main(){
   ms.setOption("number_of_grid_points",ns);
   ms.setOption("final_time",tf);
 //  ms.setOption("parallelization","openmp");
-  
   ms.init();
 
   //Control bounds
@@ -118,7 +118,7 @@ int main(){
   solver.setOption("linear_solver","ma57");
   //  solver.setOption("derivative_test","first-order");
 
-  //solver.setOption("verbose",true);
+/*  solver.setOption("verbose",true);*/
   solver.init();
 
   // Pass NLP solver

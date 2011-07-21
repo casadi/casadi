@@ -63,7 +63,7 @@ void ParallelizerInternal::init(){
   // Initialize the dependend functions
   for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
     // Make sure that the functions are unique if we are using OpenMP
-    if(mode_==OPENMP)
+    if(mode_==OPENMP && it!=funcs_.begin())
       it->makeUnique();
     
     // Initialize
@@ -231,6 +231,10 @@ FX ParallelizerInternal::jacobian(const vector<pair<int,int> >& jblocks){
   return parjac;
 }
 
+void ParallelizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  FXInternal::deepCopyMembers(already_copied);
+  funcs_ = deepcopy(funcs_,already_copied);
+}
 
 } // namespace CasADi
 

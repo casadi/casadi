@@ -173,9 +173,6 @@ class FXInternal : public OptionsFunctionalityNode{
   
   protected:
 
-    /** \brief  Has the function been initialized? */
-    bool is_init_;
-      
     /** \brief  Number of forward and adjoint derivatives */
     int nfdir_, nadir_;
 

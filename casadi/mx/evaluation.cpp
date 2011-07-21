@@ -184,5 +184,9 @@ void EvaluationOutput::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix&
   output.set(xs[oind_]);
 }
 
+void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  MXNode::deepCopyMembers(already_copied);
+  fcn_ = deepcopy(fcn_,already_copied);
+}
 
 } // namespace CasADi

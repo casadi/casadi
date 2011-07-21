@@ -57,7 +57,7 @@ namespace CasADi{
     
     /// Destructor
     virtual ~Variable();
-        
+    
     /// Get the variable expression
     SX var() const;
     

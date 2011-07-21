@@ -47,6 +47,9 @@ class MXNode : public SharedObjectNode{
     /** \brief  Clone function */
     virtual MXNode* clone() const = 0;
 
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    
     /** \brief  Print expression */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const=0;
     

@@ -39,7 +39,8 @@ friend class IpoptUserClass;
 public:
   explicit IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
   virtual ~IpoptInternal();
-
+  virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
+  
 virtual void init();
 virtual void evaluate(int nfdir, int nadir);
 

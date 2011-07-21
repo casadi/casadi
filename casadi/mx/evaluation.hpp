@@ -68,6 +68,9 @@ class Evaluation : public MultipleOutput{
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
 
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
     std::vector<MX> x_;
     std::vector<SXMatrix> xs_;
     FX fcn_;

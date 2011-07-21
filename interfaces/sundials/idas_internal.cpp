@@ -32,18 +32,14 @@ namespace Sundials{
 
 IdasInternal* IdasInternal::clone() const{
   // Return a deep copy
-  IdasInternal* node = new IdasInternal(deepcopy(f_),deepcopy(q_));
+  IdasInternal* node = new IdasInternal(f_,q_);
   node->setOption(dictionary());
-  if(isInit())
-    node->init();
   return node;
 }
 
-// IdasInternal::IdasInternal(const IdasInternal& integrator): IntegratorInternal(integrator){
-//   f_ = integrator_.f_;
-//   q_ = integrator_.q_;
-//   
-// }
+void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  IntegratorInternal::deepCopyMembers(already_copied);
+}
 
 IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");

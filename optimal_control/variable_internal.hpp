@@ -39,6 +39,9 @@ namespace CasADi{
       // Destructor
       virtual ~VariableInternal();
 
+      // Clone
+      virtual VariableInternal* clone() const{ return new VariableInternal(*this);}
+
       // Get name
       const std::string& getName() const;
 

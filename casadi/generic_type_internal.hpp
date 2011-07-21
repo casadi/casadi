@@ -33,6 +33,7 @@ namespace CasADi{
     public:
       explicit GenericTypeInternal(const T& d) : d_(d){}
       virtual ~GenericTypeInternal(){}
+      virtual GenericTypeInternal<T>* clone() const{ return new GenericTypeInternal(d_);}
       virtual void print(std::ostream &stream) const{ stream << d_; }
       T d_;
   };

@@ -215,9 +215,6 @@ class FX : public OptionsFunctionality{
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-
-  /// Is initialized?
-  bool isInit() const;
   
   /// Const access input argument
   const Matrix<double>& input(int iind=0) const;

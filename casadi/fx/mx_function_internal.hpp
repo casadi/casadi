@@ -49,6 +49,9 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  Make a deep copy */
     virtual MXFunctionInternal* clone() const;
 
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    
     /** \brief  Destructor */
     virtual ~MXFunctionInternal();
 
