@@ -82,6 +82,9 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> alg;
 
+    /** \brief  Working vector for numeric calculation */
+    std::vector<FunctionIO> work;
+    
     /** \brief  Dependent expressions */
     std::vector<MX> inputv;
     std::vector<int> inputv_ind;

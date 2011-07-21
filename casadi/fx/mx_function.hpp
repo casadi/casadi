@@ -36,18 +36,18 @@ struct MXAlgEl{
   // Function to be evaluated
   MX mx;
   
-  // Numerical value of the node
-  FunctionIO val;
-
   // Pointers to be passed to evaluate
   DMatrixPtrV input;
   DMatrixPtrVV fwdSeed;
   DMatrixPtrV fwdSens;
   DMatrixPtrV adjSeed;
   DMatrixPtrVV adjSens;
-  
+
   // Indices of the children nodes
-  std::vector<int> ch;
+  std::vector<int> i_arg;
+
+  // Indices of the children nodes
+  std::vector<int> i_res;
 };
 
 } // namespace CasADi
