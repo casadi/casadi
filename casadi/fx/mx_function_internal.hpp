@@ -108,6 +108,13 @@ class MXFunctionInternal : public XFunctionInternal{
 
     /// Generate the sparsity of a Jacobian block
     virtual CRSSparsity getJacSparsity(int iind, int oind);
+    
+    // Vectors to hold pointers during evaluation
+    DMatrixPtrV mx_input_;
+    DMatrixPtrVV mx_fwdSeed_;
+    DMatrixPtrV mx_fwdSens_;
+    DMatrixPtrV mx_adjSeed_;
+    DMatrixPtrVV mx_adjSens_;
 
 };
 

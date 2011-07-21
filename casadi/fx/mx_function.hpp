@@ -36,13 +36,6 @@ struct MXAlgEl{
   // Function to be evaluated
   MX mx;
   
-  // Pointers to be passed to evaluate
-  DMatrixPtrV input;
-  DMatrixPtrVV fwdSeed;
-  DMatrixPtrV fwdSens;
-  DMatrixPtrV adjSeed;
-  DMatrixPtrVV adjSens;
-
   // Indices of the children nodes
   std::vector<int> i_arg;
 
