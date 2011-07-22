@@ -48,9 +48,6 @@ class MultipleOutput : public MXNode{
  
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const=0;
-    
-  protected:
-    std::set<OutputNode*> children_;
 };
 
 class OutputNode : public MXNode{
