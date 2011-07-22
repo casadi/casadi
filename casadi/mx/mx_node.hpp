@@ -45,6 +45,22 @@ namespace CasADi{
       ret[i] = const_cast<T*>(&v[i]);
     return ret;
   }
+  
+  template<class T>
+  std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v){
+    std::vector<std::vector<T*> > ret(v.size());
+    for(int i=0; i<v.size(); ++i) 
+      ret[i] = ptrVec(v[i]);
+    return ret;
+  }
+  
+  template<class T>
+  const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v){
+    std::vector<std::vector<T*> > ret(v.size());
+    for(int i=0; i<v.size(); ++i) 
+      ret[i] = ptrVec(v[i]);
+    return ret;
+  }
   //@}
 
   

@@ -21,9 +21,11 @@
  */
 
 #include "mx_node.hpp"
+#include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include <cassert>
 #include <typeinfo> 
+#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
@@ -138,10 +140,44 @@ void MXNode::print(std::ostream &stream) const{
 }
 
 MX MXNode::adFwd(const std::vector<MX>& jx){
-  // Arguments
-  const MXPtrV input = ptrVec(dep_);
-  MX output;
-  throw CasadiException(string("MXNode::adFwd() not defined for class ") + typeid(*this).name());
+  casadi_assert(!jx.empty());
+  
+  // Number of forward direction
+  int nfwd = jx.front().size2();
+
+  // Forward seeds
+  vector<vector<MX> > fseed(nfwd);
+  for(int d=0; d<nfwd; ++d){
+    fseed[d].resize(jx.size());
+    for(int i=0; i<fseed[d].size(); ++i){
+      fseed[d][i] = reshape(jx[i](range(jx[i].size1()),d),dep(i).size1(),dep(i).size2());
+    }
+  }
+  // Result of the evaluation
+  vector<MX> res(1);
+
+  // Forward sensitivities
+  vector<vector<MX> > fsens(nfwd,vector<MX>(1));
+  
+  // Vectors to hold pointers
+  const MXPtrV input_p = ptrVec(dep_);
+  MXPtrV output_p = ptrVec(res);
+  const MXPtrVV fseed_p = ptrVec(fseed);
+  MXPtrVV fsens_p = ptrVec(fsens);
+  
+  // Dummy arguments for the adjoint sensitivities
+  MXPtrVV aseed_p, asens_p;
+  
+  // Call the evaluation function
+  evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p);
+  
+  // Collect columns of the return
+  vector<MX> cols(nfwd);
+  for(int d=0; d<nfwd; ++d){
+    cols[d] = vec(fsens.at(d).at(0));
+  }
+  
+  return horzcat(cols);
 }
 
 MX MXNode::jac(int iind){

@@ -74,30 +74,12 @@ void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
   SXMatrix::prod_no_alloc(*input[0],*input[1],*output[0]);
 }
 
-MX Multiplication::adFwd(const std::vector<MX>& jx){
-  
-  // Get the number of derivative directions
-  int nd = jx[0].size2();
-  
-  // The columns of the jacobian
-  vector<MX> jac_cols;
-  
-  // Loop over the derivative directions
-  for(int d=0; d<nd; ++d){
-    
-    // Get a forward seed matrices for direction d
-    MX seed0 = reshape(jx[0](range(jx[0].size1()),d),dep(0).size1(),dep(0).size2());
-    MX seed1 = reshape(jx[1](range(jx[1].size1()),d),dep(1).size1(),dep(1).size2());
-
-    // Calculate the forward sensitivity
-    MX sens = prod(seed0,trans(dep(1))) + prod(dep(0),trans(seed1));
-   
-    // Save the column of the Jacobian
-    jac_cols.push_back(vec(sens));
+void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  *output[0] = prod(*input[0],trans(*input[1]));
+  int nfwd = fwdSens.size();
+  for(int d=0; d<nfwd; ++d){
+    *fwdSens[d][0] = prod(*fwdSeed[d][0],trans(*input[1])) + prod(*input[0],trans(*fwdSeed[d][1]));
   }
-  
-  // Assemble all the directions and return
-  return horzcat(jac_cols);
 }
 
 
