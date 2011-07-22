@@ -61,7 +61,9 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << fcn_ << ".call(" << args << ")";
 }
 
-void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd){
+  int nadj = adjSeed.size();
+  
   // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
     if(input[i] != 0 && input[i]->size() !=0 ){
@@ -75,8 +77,8 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   // Pass the adjoint seed to the function
   for(int i=0; i<getNumOutputs(); ++i){
     for(int d=0; d<nadj; ++d){
-      if(adjSeed[0][d]!=0 && adjSeed[0][d]->size() != 0){
-        fcn_.setAdjSeed(adjSeed[0][d]->data(),i,d);
+      if(adjSeed[d][0]!=0 && adjSeed[d][0]->size() != 0){
+        fcn_.setAdjSeed(adjSeed[d][0]->data(),i,d);
       }
     }
   }
@@ -97,10 +99,10 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   // Get the adjoint sensitivities
   for(int i=0; i<ndep(); ++i){
     for(int d=0; d<nadj; ++d){
-      if(adjSens[i][d] != 0 && adjSens[i][d]->size() != 0){
+      if(adjSens[d][i] != 0 && adjSens[d][i]->size() != 0){
         const vector<double>& asens = fcn_.adjSens(i,d).data();
         for(int j=0; j<asens.size(); ++j)
-          adjSens[i][d]->data()[j] += asens[j];
+          adjSens[d][i]->data()[j] += asens[j];
       }
     }
   }

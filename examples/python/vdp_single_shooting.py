@@ -2,7 +2,7 @@ from casadi import *
 import matplotlib.pyplot as plt
 
 # Number of shooting nodes
-NS = 20
+NS = 3
 
 # Declare variables (use simple, efficient DAG)
 t = SX("t") # time
