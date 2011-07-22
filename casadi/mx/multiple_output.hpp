@@ -46,6 +46,9 @@ class MultipleOutput : public MXNode{
     /** \brief  Destructor */
     virtual ~MultipleOutput();
  
+    /** \brief  Number of outputs */
+    virtual int getNumOutputs() const=0;
+    
   protected:
     std::set<OutputNode*> children_;
 };
@@ -54,13 +57,28 @@ class OutputNode : public MXNode{
   public:
   
     /** \brief  Constructor */
-    OutputNode(const MX& parent);
+    OutputNode(const MX& parent, int oind);
 
     /** \brief  Destructor */
     virtual ~OutputNode();
+
+    /** \brief  Evaluate the function and store the result in the node */
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
+
+    /** \brief Is the node nonlinear */
+    virtual bool isNonLinear(){return true;} 
+
+    /** \brief  Check if evaluation output */
+    virtual bool isOutputNode() const{return true;}
     
-  protected:
-    MX parent_;
+    /** \brief  Get function input */
+    virtual int getFunctionInput() const{ return -1;}
+
+    /** \brief  Get function output */
+    virtual int getFunctionOutput() const{ return oind_;}
+    
+    /** \brief  Output index */
+    int oind_;
 };
 
 

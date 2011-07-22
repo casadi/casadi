@@ -71,6 +71,9 @@ class Evaluation : public MultipleOutput{
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
+    /** \brief  Number of outputs */
+    virtual int getNumOutputs() const{ return fcn_.getNumOutputs();}
+
     std::vector<MX> x_;
     std::vector<SXMatrix> xs_;
     FX fcn_;
@@ -95,34 +98,18 @@ class EvaluationOutput : public OutputNode{
     /** \brief  Print */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
-    /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj);
-
     /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
     virtual MX jac(int iind);
-    
-    /** \brief Is the node nonlinear */
-    virtual bool isNonLinear(){return true;} 
-
-    /** \brief  Check if evaluation output */
-    virtual bool isEvaluationOutput() const{return true;}
     
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
     
     /** \brief  Get function reference */
     virtual FX& getFunction();
-    
-    /** \brief  Get function input */
-    virtual int getFunctionInput() const{ return -1;}
-
-    /** \brief  Get function output */
-    virtual int getFunctionOutput() const{ return oind_;}
-    
+        
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
     
-    int oind_;
 };
 
 } // namespace CasADi

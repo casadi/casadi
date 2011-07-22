@@ -105,7 +105,7 @@ class MXNode : public SharedObjectNode{
     virtual bool isEvaluation() const{return false;}
 
     /** \brief  Check if evaluation output */
-    virtual bool isEvaluationOutput() const{return false;}
+    virtual bool isOutputNode() const{return false;}
     
     /** \brief  Check if jacobian reference */
     virtual bool isJacobian() const{return false;}
@@ -128,6 +128,9 @@ class MXNode : public SharedObjectNode{
     
     /** \brief  Does the node depend on other nodes*/
     virtual bool hasDep() const{return ndep()>0; }
+    
+    /** \brief  Number of outputs */
+    virtual int getNumOutputs() const{ return 1;}
 
     /// Get the sparsity
     const CRSSparsity& sparsity() const;

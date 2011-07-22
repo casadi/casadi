@@ -34,22 +34,31 @@ MultipleOutput::MultipleOutput(){
 MultipleOutput::~MultipleOutput(){
 }
 
-OutputNode::OutputNode(const MX& parent) : parent_(parent){
+OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
+  setDependencies(parent);
+
   // Get the node of the parent
-  MultipleOutput* p = dynamic_cast<MultipleOutput*>(parent_.get());
+  MultipleOutput* p = dynamic_cast<MultipleOutput*>(dep(0).get());
   casadi_assert(p!=0);
   
   // Save a pointer to the object in the parent class
   p->children_.insert(this);
+  
+  // Save the sparsity pattern
+  //setSparsity(sp);
 }
 
 OutputNode::~OutputNode(){
   // Get the node of the parent
-  MultipleOutput* p = static_cast<MultipleOutput*>(parent_.get());
+  MultipleOutput* p = static_cast<MultipleOutput*>(dep(0).get());
   
   // Remove the parent from the parent
   p->children_.erase(this);
 }
+
+void OutputNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
+}
+
   
 
 } // namespace CasADi

@@ -62,7 +62,6 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
 }
 
 void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  
   // Pass the input and forward seeds to the function
   for(int i=0; i<ndep(); ++i){
     if(input[i] != 0 && input[i]->size() !=0 ){
@@ -72,9 +71,28 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
       }
     }
   }
+  
+  // Pass the adjoint seed to the function
+  for(int i=0; i<getNumOutputs(); ++i){
+    for(int d=0; d<nadj; ++d){
+      if(adjSeed[0][d]!=0 && adjSeed[0][d]->size() != 0){
+        fcn_.setAdjSeed(adjSeed[0][d]->data(),i,d);
+      }
+    }
+  }
 
   // Evaluate
   fcn_.evaluate(nfwd, nadj);
+  
+  // Get the outputs and forward sensitivities
+  for(int i=0; i<getNumOutputs(); ++i){
+    if(output[i] != 0 && output[i]->size() !=0 ){
+      fcn_.getOutput(output[i]->data(),i);
+      for(int d=0; d<nfwd; ++d){
+        fcn_.getFwdSens(fwdSens[i][d]->data(),i,d);
+      }
+    }
+  }
   
   // Get the adjoint sensitivities
   for(int i=0; i<ndep(); ++i){
@@ -89,9 +107,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
 }
 
 
-EvaluationOutput::EvaluationOutput(const MX& parent, int oind) : OutputNode(parent), oind_(oind){
-  setDependencies(parent);
-  
+EvaluationOutput::EvaluationOutput(const MX& parent, int oind) : OutputNode(parent,oind){  
   // Save the sparsity pattern
   setSparsity(getFunction().output(oind).sparsity());
 }
@@ -102,23 +118,6 @@ EvaluationOutput* EvaluationOutput::clone() const{
 
 void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string>& args) const{
   stream << args[0] << "[" << oind_ <<  "]";
-}
-
-void EvaluationOutput::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd, int nadj){
-  vector<double> &outputd = output[0]->data();
-
-  // Pass the adjoint seed to the function
-  for(int d=0; d<nadj; ++d)
-    if(adjSeed[0][d]!=0 && adjSeed[0][d]->size() != 0)
-      getFunction().setAdjSeed(adjSeed[0][d]->data(),oind_,d);
-
-    // Get the results
-  getFunction().getOutput(outputd,oind_);
-
-  // Get the fwd sensitivities
-  for(int d=0; d<nfwd; ++d)
-    if(fwdSens[0][d]!=0 && fwdSens[0][d]->size() != 0)
-      getFunction().getFwdSens(fwdSens[0][d]->data(),oind_,d);
 }
 
 MX Evaluation::adFwd(const std::vector<MX>& jx){ 

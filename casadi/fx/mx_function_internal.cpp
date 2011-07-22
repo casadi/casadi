@@ -120,34 +120,57 @@ void MXFunctionInternal::init(){
   outputv_ind.resize(outputv.size());
   for(int i=0; i<outputv_ind.size(); ++i)
     outputv_ind[i] = outputv[i]->temp;
+
   
   // Create runtime elements for each node
-  work.resize(nodes.size());
-  alg.resize(nodes.size());
-  for(int ii=0; ii<alg.size(); ++ii){
-    MX &m = alg[ii].mx;
-    AlgEl& el = alg[ii];
-    FunctionIO &val = work[ii];
+  work.resize(0);
+  work.reserve(nodes.size());
+  alg.resize(0);
+  alg.reserve(nodes.size());
+  for(vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
+    // Add an element to the algorithm
+    alg.resize(alg.size()+1);
+    AlgEl& el = alg.back();
     
     // Save the node
-    el.mx.assignNode(nodes[ii]);
-    val.data = Matrix<double>(m->sparsity(),0);
+    el.mx.assignNode(*it);
+
+    // Save the indices of the arguments
+    el.i_arg.resize(el.mx->ndep());
+    for(int i=0; i<el.mx->ndep(); ++i){
+      if(el.mx->dep(i).isNull())
+        el.i_arg[i] = -1;
+      else
+        el.i_arg[i] = el.mx->dep(i)->temp;
+    }
+    
+    // If multiple output, do not add any element to the work vector
+    if(dynamic_cast<MultipleOutput*>(*it)!=0){
+      el.i_res.resize((*it)->getNumOutputs(),-1);
+    } else if(dynamic_cast<OutputNode*>(*it)!=0){
+      // Get the output index
+      int oind = static_cast<OutputNode*>(*it)->oind_;
+
+      // Get the index of the parent node
+      int pind = el.mx->dep(0)->temp;
+      
+      // Save output to the parent node
+      alg[pind].i_res.at(oind) = work.size();
+      
+     // Save the indices of the results // TODO: remove
+      el.i_res.resize(1,work.size());
+    } else {
+     // Save the indices of the results
+      el.i_res.resize(1,work.size());
+    }
+
+    // Allocate memory
+    work.resize(work.size()+1);
+    FunctionIO &val = work.back();
+    val.data = Matrix<double>(el.mx->sparsity(),0);
     val.dataF.resize(nfdir_);
     val.dataA.resize(nadir_);
     val.init();
-
-    // Save the indices of the arguments
-    el.i_arg.resize(m->ndep());
-    for(int i=0; i<m->ndep(); ++i){
-      if(m->dep(i).isNull())
-        el.i_arg[i] = -1;
-      else
-        el.i_arg[i] = m->dep(i)->temp;
-    }
-
-    // Save the indices of the results
-    el.i_res.resize(1);
-    el.i_res[0] = ii;
   }
   
   // Reset the temporary variables
@@ -250,7 +273,7 @@ void MXFunctionInternal::eliminateJacobian(){
     if(it->mx->isEvaluation()){
       fcn_ref = it->mx->getFunction().get();
       eval_ref = it->mx.get();
-    } else if(it->mx->isEvaluationOutput()){
+    } else if(it->mx->isOutputNode()){
       fcn_ref = it->mx->getFunction().get();
       eval_ref = it->mx->dep(0).get();
     } else if(it->mx->isJacobian()){
@@ -275,10 +298,13 @@ void MXFunctionInternal::eliminateJacobian(){
           if(it->mx->isEvaluation()){
             // Replace the function if its an evaluation node
             it->mx->getFunction() = jac[fcn_ref][jj->second];
-              
+            
+            // Resize the result index vector to accommodate the new indices
+            it->i_res.resize(it->mx->getFunction().getNumOutputs(),-1);
+            
           } else {
             // Jacobian reference or evaluation output
-            casadi_assert(it->mx->isJacobian() || it->mx->isEvaluationOutput());
+            casadi_assert(it->mx->isJacobian() || it->mx->isOutputNode());
               
             // Get current input and output indices
             int iind = it->mx->getFunctionInput();
@@ -296,6 +322,10 @@ void MXFunctionInternal::eliminateJacobian(){
                 
                 // Create a new evaluation output
                 it->mx = MX::create(new EvaluationOutput(alg[it->i_arg[0]].mx,oind_new));
+                
+                // Update dependencies for the evaluation node
+                alg[it->i_arg[0]].i_res[oind_new] = it->i_res[0];
+                
                 break;
               }
               
@@ -331,27 +361,21 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
 }
 
 void MXFunctionInternal::updatePointers(const AlgEl& el){
-  int wind = el.i_res.front();
-    
   mx_input_.resize(el.i_arg.size());
   mx_fwdSeed_.resize(mx_input_.size());
   mx_adjSens_.resize(mx_input_.size());
   for(int i=0; i<mx_input_.size(); ++i){
     mx_fwdSeed_[i].resize(nfdir_);
     mx_adjSens_[i].resize(nadir_);
-    std::fill(mx_fwdSeed_[i].begin(),mx_fwdSeed_[i].end(),(DMatrix*)0);
-    std::fill(mx_adjSens_[i].begin(),mx_adjSens_[i].end(),(DMatrix*)0);
     
     if(el.i_arg[i]>=0){
       mx_input_[i] = &work[el.i_arg[i]].data;
-      
-      for(int d=0; d<nfdir_; ++d)
-        mx_fwdSeed_[i][d] = &work[el.i_arg[i]].dataF[d];
-
-      for(int d=0; d<nadir_; ++d)
-        mx_adjSens_[i][d] = &work[el.i_arg[i]].dataA[d];
+      for(int d=0; d<nfdir_; ++d) mx_fwdSeed_[i][d] = &work[el.i_arg[i]].dataF[d];
+      for(int d=0; d<nadir_; ++d) mx_adjSens_[i][d] = &work[el.i_arg[i]].dataA[d];
     } else {
       mx_input_[i] = 0;
+      for(int d=0; d<nfdir_; ++d) mx_fwdSeed_[i][d] = 0;
+      for(int d=0; d<nadir_; ++d) mx_adjSens_[i][d] = 0;
     }
   }
 
@@ -359,15 +383,18 @@ void MXFunctionInternal::updatePointers(const AlgEl& el){
   mx_fwdSens_.resize(mx_output_.size());
   mx_adjSeed_.resize(mx_output_.size());
   for(int i=0; i<mx_output_.size(); ++i){
-    mx_output_[i] = &work[el.i_res[i]].data;
-    
     mx_fwdSens_[i].resize(nfdir_);
-    for(int d=0; d<nfdir_; ++d)
-      mx_fwdSens_[i][d] = &work[el.i_res[i]].dataF[d];
-    
     mx_adjSeed_[i].resize(nadir_);
-    for(int d=0; d<nadir_; ++d)
-      mx_adjSeed_[i][d] = &work[el.i_res[i]].dataA[d];
+    
+    if(el.i_res[i]>=0){
+      mx_output_[i] = &work[el.i_res[i]].data;
+      for(int d=0; d<nfdir_; ++d) mx_fwdSens_[i][d] = &work[el.i_res[i]].dataF[d];
+      for(int d=0; d<nadir_; ++d) mx_adjSeed_[i][d] = &work[el.i_res[i]].dataA[d];
+    } else {
+      mx_output_[i] = 0;
+      for(int d=0; d<nfdir_; ++d) mx_fwdSens_[i][d] = 0;
+      for(int d=0; d<nadir_; ++d) mx_adjSeed_[i][d] = 0;
+    }
   }
 
   mx_adjSeed_.resize(nadir_);
@@ -422,10 +449,9 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   if(nadir>0){
 
     // Clear the adjoint seeds
-    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++)
+    for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); it++)
       for(int dir=0; dir<nadir; ++dir){
-        int wind = it->i_res.front();
-        fill(work[wind].dataA.at(dir).begin(),work[wind].dataA.at(dir).end(),0.0);
+        fill(it->dataA.at(dir).begin(),it->dataA.at(dir).end(),0.0);
       }
 
     // Pass the adjoint seeds
