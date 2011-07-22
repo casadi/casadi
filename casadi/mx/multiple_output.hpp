@@ -59,8 +59,11 @@ class OutputNode : public MXNode{
     /** \brief  Destructor */
     virtual ~OutputNode();
 
-    /** \brief  Evaluate the function and store the result in the node */
+    /** \brief  Evaluate the function numerically */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return true;} 

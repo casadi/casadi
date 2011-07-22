@@ -43,8 +43,11 @@ class Mapping : public MXNode{
     /// Destructor
     virtual ~Mapping(){}
     
-    /// Evaluate the function and store the result in the node
+    /// Evaluate the function numerically
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
@@ -63,9 +66,6 @@ class Mapping : public MXNode{
     
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
-
-    /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
     
     /// Check if the mapping is ready
     bool isReady() const;

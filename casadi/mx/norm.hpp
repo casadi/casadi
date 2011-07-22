@@ -32,16 +32,19 @@ namespace CasADi{
   \date 2010
 */
 class Norm : public MXNode{
-public:
+  public:
 
-/** \brief  Constructor */
-Norm(const MX& x);
+    /** \brief  Constructor */
+    Norm(const MX& x);
 
-/** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
-/// Symbolic forward sensitivities
-virtual MX adFwd(const std::vector<MX>& jx);
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
 
 };
 

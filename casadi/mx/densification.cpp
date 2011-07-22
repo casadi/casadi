@@ -63,8 +63,8 @@ MX Densification::adFwd(const std::vector<MX>& jx){
   return jx.at(0);
 }
 
-void Densification::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  input[0]->get(output.data(),DENSE);
+void Densification::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  input[0]->get(output[0]->data(),DENSE);
 }
 
 

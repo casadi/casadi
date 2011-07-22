@@ -83,8 +83,8 @@ MX BinaryOp::adFwd(const std::vector<MX>& jx){
   return pd[0]*jx[0] + pd[1]*jx[1];
 }
 
-void BinaryOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],output,mapping_);
+void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],*output[0],mapping_);
 }
 
 void BinaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{

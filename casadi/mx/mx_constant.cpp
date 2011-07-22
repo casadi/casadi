@@ -54,10 +54,10 @@ bool MXConstant::isConstant() const{
   return true;
 }
 
-void MXConstant::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+void MXConstant::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   SXMatrix r(x_);
-  casadi_assert(output.sparsity()==r.sparsity());
-  output.set(r);
+  casadi_assert(output[0]->sparsity()==r.sparsity());
+  output[0]->set(r);
 }
 
 

@@ -81,13 +81,24 @@ class MXNode : public SharedObjectNode{
                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens) = 0;
 
+    /** \brief  Evaluate the function, no derivatives*/
+    void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output);
+
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV &input, SXMatrix& output);
-    
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
+                            const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
+                            const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens) = 0;
+
+    /** \brief  Evaluate symbolically (SX), no derivatives */
+    void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output);
+
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MX& output,
-                            const MXPtrVV& fwdSeed, MXPtrV& fwdSens, 
-                            const MXPtrV& adjSeed, MXPtrVV& adjSens, int nfwd, int nadj);
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
+                            const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, 
+                            const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
+    /** \brief  Evaluate symbolically (MX), no derivatives */
+    void evaluateMX(const MXPtrV& input, MXPtrV& output);
     
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -194,14 +205,7 @@ class MXNode : public SharedObjectNode{
       std::vector<DMatrix> ret(1,DMatrix(sparsity_));
       const DMatrixPtrV mx_input = ptrVec(x);
       DMatrixPtrV mx_output = ptrVec(ret);
-
-      // Dummy arguments
-      DMatrixPtrVV fwdSeed;
-      DMatrixPtrVV fwdSens; 
-      DMatrixPtrVV adjSeed;
-      DMatrixPtrVV adjSens;
-      int nfwd=0;
-      evaluate(mx_input,mx_output,fwdSeed,fwdSens,adjSeed,adjSens);
+      evaluate(mx_input,mx_output);
       return ret[0];
     }
 

@@ -69,9 +69,9 @@ void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, con
   }
 }
 
-void Multiplication::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  fill(output.begin(),output.end(),0);
-  SXMatrix::prod_no_alloc(*input[0],*input[1],output);
+void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  fill(output[0]->begin(),output[0]->end(),0);
+  SXMatrix::prod_no_alloc(*input[0],*input[1],*output[0]);
 }
 
 MX Multiplication::adFwd(const std::vector<MX>& jx){

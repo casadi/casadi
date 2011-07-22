@@ -244,10 +244,10 @@ MX Mapping::adFwd(const std::vector<MX>& jx){
   return ret;
 }
 
-void Mapping::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   const std::vector<int> &nzind_ = nzmap_.data();
   for(int k=0; k<size(); ++k){
-    output[k] = (*input[depind_[k]])[nzind_[k]];
+    (*output[0])[k] = (*input[depind_[k]])[nzind_[k]];
   }
 }
 

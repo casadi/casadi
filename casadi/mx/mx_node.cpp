@@ -141,16 +141,6 @@ MX MXNode::adFwd(const std::vector<MX>& jx){
   // Arguments
   const MXPtrV input = ptrVec(dep_);
   MX output;
-
-  
-//         // Dummy arguments
-//       DMatrixPtrVV fwdSeed;
-//       DMatrixPtrV fwdSens; 
-//       DMatrixPtrV adjSeed;
-//       DMatrixPtrVV adjSens;
-//       int nfwd=0, nadj = 0;
-
-  
   throw CasadiException(string("MXNode::adFwd() not defined for class ") + typeid(*this).name());
 }
 
@@ -170,11 +160,22 @@ int MXNode::getFunctionInput() const{
   throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
 }
 
-void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrix& output){
-  throw CasadiException(string("MXNode::evaluateSX() not defined for class ") + typeid(*this).name());
+void MXNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output){
+  DMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
+  evaluate(input,output,fwdSeed, fwdSens, adjSeed, adjSens);
 }
 
-void MXNode::evaluateMX(const MXPtrV& input, MX& output, const MXPtrVV& fwdSeed, MXPtrV& fwdSens,const MXPtrV& adjSeed, MXPtrVV& adjSens, int nfwd, int nadj){
+void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output){
+  SXMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
+  evaluateSX(input,output,fwdSeed, fwdSens, adjSeed, adjSens);
+}
+
+void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output){
+  MXPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
+  evaluateMX(input,output,fwdSeed, fwdSens, adjSeed, adjSens);
+}
+
+void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
   throw CasadiException(string("MXNode::evaluateMX() not defined for class ") + typeid(*this).name());
 }
 

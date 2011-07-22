@@ -670,13 +670,18 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
     work[inputv_ind[ind]].set(input_s[ind]);
 
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-  vector<SXMatrix*> d;
+  vector<SXMatrix*> sxarg;
+  vector<SXMatrix*> sxres;
   for(int i=0; i<alg.size(); ++i){
-    d.resize((alg[i].i_arg.size()));
-    for(int c=0; c<d.size(); ++c){
-      d[c] = &work[alg[i].i_arg[c]];
+    sxarg.resize((alg[i].i_arg.size()));
+    for(int c=0; c<sxarg.size(); ++c){
+      sxarg[c] = &work[alg[i].i_arg[c]];
     }
-    alg[i].mx->evaluateSX(d,work[i]);
+    sxres.resize((alg[i].i_res.size()));
+    for(int c=0; c<sxres.size(); ++c){
+      sxres[c] = &work[alg[i].i_res[c]];
+    }
+    alg[i].mx->evaluateSX(sxarg,sxres);
   }
   
   // Get the outputs

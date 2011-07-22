@@ -47,11 +47,11 @@ class SymbolicMatrix : public MXNode{
     /** \brief  Print */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
-    /** \brief  Evaluate the function and store the result in the node */
+    /** \brief  Evaluate the function numerically */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-    
-    /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Is symbolic */
     virtual bool isSymbolic() const;

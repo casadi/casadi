@@ -80,10 +80,10 @@ void UnaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
   }
 }
 
-void UnaryOp::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+void UnaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   // Do the operation on all non-zero elements
   const vector<SX> &xd = input[0]->data();
-  vector<SX> &od = output.data();
+  vector<SX> &od = output[0]->data();
   
   for(int el=0; el<size(); ++el){
     casadi_math<SX>::fun[op](xd[el],0,od[el]);

@@ -48,6 +48,10 @@ void JacobianReference::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, 
   casadi_assert(0);
 }
 
+void JacobianReference::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  casadi_assert(0);
+}
+
 FX& JacobianReference::getFunction(){ 
   return dep(0)->getFunction();
 }

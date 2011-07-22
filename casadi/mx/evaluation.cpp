@@ -167,7 +167,7 @@ FX& EvaluationOutput::getFunction(){
   return dep(0)->getFunction();
 }
 
-void Evaluation::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   // Make sure that the function is an X-function
   XFunction fcn = shared_cast<XFunction>(fcn_);
   casadi_assert_message(!fcn.isNull(),"Function not an SXFunction or MXFunction");

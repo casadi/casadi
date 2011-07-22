@@ -37,6 +37,10 @@ void Norm::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrix
   throw CasadiException("Norm::evaluate not implemented");
 }
 
+void Norm::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  throw CasadiException("Norm::evaluateSX not implemented");
+}
+
 MX Norm::adFwd(const std::vector< MX > & jx) {
   // Number of derivative directions
   int ndir = jx[0].size2();
