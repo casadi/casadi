@@ -41,7 +41,8 @@ void Densification::print(std::ostream &stream, const std::vector<std::string>& 
   stream << "dense(" << args.at(0) << ")";
 }
 
-void Densification::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd){
+void Densification::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
 
   // Propate values
@@ -49,7 +50,7 @@ void Densification::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, cons
   
   // Propagate forward seeds
   for(int d=0; d<nfwd; ++d){
-    fwdSeed[0][d]->get(fwdSens[0][d]->data(),DENSE);
+    fwdSeed[d][0]->get(fwdSens[d][0]->data(),DENSE);
   }
 
   // Propagate adjoint seeds

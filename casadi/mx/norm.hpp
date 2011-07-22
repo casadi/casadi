@@ -38,7 +38,7 @@ public:
 Norm(const MX& x);
 
 /** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd);
+virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
 /// Symbolic forward sensitivities
 virtual MX adFwd(const std::vector<MX>& jx);
@@ -63,7 +63,7 @@ virtual Norm2* clone() const;
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 /** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd);
+virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
 /** \brief Symbolic forward sensitivities.  */
 virtual MX adFwd(const std::vector< MX > & jx	);
@@ -88,7 +88,7 @@ virtual Norm22* clone() const;
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 /** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd);
+virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
 /** \brief Symbolic forward sensitivities. */
 virtual MX adFwd(const std::vector< MX > & jx	);
@@ -113,7 +113,7 @@ virtual Norm1* clone() const;
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 /** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd);
+virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
 };
 
@@ -134,7 +134,7 @@ virtual NormInf* clone() const;
 virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 /** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd);
+virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
 
 };

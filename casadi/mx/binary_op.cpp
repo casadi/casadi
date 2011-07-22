@@ -91,7 +91,8 @@ void BinaryOp::print(std::ostream &stream, const std::vector<std::string>& args)
   casadi_math<double>::print[op_](stream,args.at(0),args.at(1));
 }
 
-void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd){
+void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   if(nfwd==0 && nadj==0){
     DMatrix::binary_no_alloc(casadi_math<double>::funE[op_],*input[0],*input[1],*output[0],mapping_);
@@ -130,9 +131,9 @@ void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMa
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
           double s = 0;
-          if(nz0) s += pd[nz0][0]*fwdSeed[0][d]->data()[el0];
-          if(nz1) s += pd[nz1][1]*fwdSeed[1][d]->data()[el1];
-          fwdSens[0][d]->data()[el] = s;
+          if(nz0) s += pd[nz0][0]*fwdSeed[d][0]->data()[el0];
+          if(nz1) s += pd[nz1][1]*fwdSeed[d][1]->data()[el1];
+          fwdSens[d][0]->data()[el] = s;
         }
         
         // Propagate adjoint seeds

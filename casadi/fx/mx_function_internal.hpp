@@ -110,7 +110,7 @@ class MXFunctionInternal : public XFunctionInternal{
     virtual CRSSparsity getJacSparsity(int iind, int oind);
     
     // Update pointers to a particular element
-    void updatePointers(const AlgEl& el, int nadj);
+    void updatePointers(const AlgEl& el, int nfwd, int nadj);
     
     // Vectors to hold pointers during evaluation
     DMatrixPtrV mx_input_;

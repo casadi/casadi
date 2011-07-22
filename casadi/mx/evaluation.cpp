@@ -61,7 +61,8 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
   stream << fcn_ << ".call(" << args << ")";
 }
 
-void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd){
+void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   
   // Pass the input and forward seeds to the function
@@ -69,7 +70,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
     if(input[i] != 0 && input[i]->size() !=0 ){
       fcn_.setInput(input[i]->data(),i);
       for(int d=0; d<nfwd; ++d){
-        fcn_.setFwdSeed(fwdSeed[i][d]->data(),i,d);
+        fcn_.setFwdSeed(fwdSeed[d][i]->data(),i,d);
       }
     }
   }
@@ -91,7 +92,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
     if(output[i] != 0 && output[i]->size() !=0 ){
       fcn_.getOutput(output[i]->data(),i);
       for(int d=0; d<nfwd; ++d){
-        fcn_.getFwdSens(fwdSens[i][d]->data(),i,d);
+        fcn_.getFwdSens(fwdSens[d][i]->data(),i,d);
       }
     }
   }

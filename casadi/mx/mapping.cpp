@@ -37,8 +37,9 @@ Mapping* Mapping::clone() const{
   return new Mapping(*this);
 }
 
-void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd){
+void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nadj = adjSeed.size();
+  int nfwd = fwdSens.size();
   const std::vector<int>& nzind_ = nzmap_.data();
   vector<double> &outputd = output[0]->data();
   
@@ -46,7 +47,7 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
     outputd[k] = input[depind_[k]]->data()[nzind_[k]];
     
     for(int d=0; d<nfwd; ++d)
-      fwdSens[0][d]->data()[k] = fwdSeed[depind_[k]][d]->data()[nzind_[k]];
+      fwdSens[d][0]->data()[k] = fwdSeed[d][depind_[k]]->data()[nzind_[k]];
     
     for(int d=0; d<nadj; ++d)
       adjSens[d][depind_[k]]->data()[nzind_[k]] += adjSeed[d][0]->data()[k];

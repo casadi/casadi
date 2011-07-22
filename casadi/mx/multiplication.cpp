@@ -48,7 +48,8 @@ void Multiplication::print(std::ostream &stream, const std::vector<std::string>&
   stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
 }
 
-void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd){
+void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
 
   fill(output[0]->begin(),output[0]->end(),0);
@@ -56,9 +57,9 @@ void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, con
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){
-    fill(fwdSens[0][d]->begin(),fwdSens[0][d]->end(),0);
-    DMatrix::prod_no_alloc(*fwdSeed[0][d],*input[1],*fwdSens[0][d]);
-    DMatrix::prod_no_alloc(*input[0],*fwdSeed[1][d],*fwdSens[0][d]);
+    fill(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),0);
+    DMatrix::prod_no_alloc(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
+    DMatrix::prod_no_alloc(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
   }
 
   // Adjoint sensitivities

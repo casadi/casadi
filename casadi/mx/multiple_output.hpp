@@ -60,7 +60,7 @@ class OutputNode : public MXNode{
     virtual ~OutputNode();
 
     /** \brief  Evaluate the function and store the result in the node */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, int nfwd);
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return true;} 
