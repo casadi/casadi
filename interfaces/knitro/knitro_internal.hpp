@@ -34,6 +34,7 @@ class KnitroInternal : public NLPSolverInternal{
 public:
   explicit KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
   virtual ~KnitroInternal();
+  virtual KnitroInternal* clone() const{ return new KnitroInternal(*this);}
 
   virtual void init();
   virtual void evaluate(int nfdir, int nadir);

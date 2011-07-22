@@ -15,6 +15,10 @@ class MuscodInternal : public OptionsFunctionalityNode{
     
     /** \brief  Destructor */
     virtual ~MuscodInternal();
+
+    /** \brief  Clone function */
+    virtual MuscodInternal* clone() const{ return new MuscodInternal(*this);}
+
     
     /** \brief  Solve the problem  */
     void solve();

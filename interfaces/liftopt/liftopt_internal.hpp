@@ -41,6 +41,7 @@ class LiftoptInternal : public NLPSolverInternal{
   public:
     LiftoptInternal(const MXFunction& fcn);
     virtual ~LiftoptInternal();
+    virtual LiftoptInternal* clone() const{ return new LiftoptInternal(*this);}
     virtual void init();
     virtual void evaluate(int nfdir, int nadir);
 

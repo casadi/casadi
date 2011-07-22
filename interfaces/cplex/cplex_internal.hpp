@@ -38,6 +38,7 @@ class CplexInternal : public NLPSolverInternal{
   public:
     explicit CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
     virtual ~CplexInternal();
+    virtual CplexInternal* clone() const{ return new CplexInternal(*this);}
     void setX(const std::vector<double>& x);
     std::vector<double> getSol();
     virtual void init();
