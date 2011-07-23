@@ -49,6 +49,9 @@ class Mapping : public MXNode{
     /// Evaluate the function symbolically (SX)
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    /// Evaluate the function symbolically (MX)
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
     
@@ -63,9 +66,6 @@ class Mapping : public MXNode{
     
     /// Add a dependency
     virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
-    
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
     
     /// Check if the mapping is ready
     bool isReady() const;

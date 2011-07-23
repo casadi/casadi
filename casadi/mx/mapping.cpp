@@ -23,6 +23,7 @@
 #include "mapping.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
+#include "mx_tools.hpp"
 
 using namespace std;
 
@@ -139,109 +140,121 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
   }
 }
 
-MX Mapping::adFwd(const std::vector<MX>& jx){
+void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  // TODO: does not evaluate the function, only derivative
+  
   casadi_assert(isReady());
   const std::vector<int> &nzind_ = nzmap_.data();
 
-  // Number of columns
-  int ncol = jx.front().size2();
-    
+  // Number of derivative directions
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+
   // Sparsity
   const CRSSparsity &sp = sparsity();
+  
+  // For all forward directions
+  for(int d=0; d<nfwd; ++d){
+    // Old implementation
+    std::vector<MX> jx(fwdSeed[d].size());
+    for(int i=0; i<jx.size(); ++i){
+      jx[i] = vec(*fwdSeed[d][i]);
+    }
+    
+    // Nonzero elements of the new matrix
+    vector<int> i_ret, j_ret, el_ret, dp_ret;
 
-  // Nonzero elements of the new matrix
-  vector<int> i_ret, j_ret, el_ret, dp_ret;
-
-  // Loop over rows of the matrix
-  for(int i=0; i<size1(); ++i){
-    
-    // Loop over nonzero entries
-    for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
-      
-      // Get the column
-      //int j = sp.col(el);
-      
-      // Get the dependency and nonzero to which the nonzero is mapped
-      int dp = depind_[el];
-      int nz = nzind_[el];
-      
-      // Get the sparsity of the seed matrix
-      const CRSSparsity &sp_mat = jx[dp].sparsity();
-      
-      // Loop over the nonzeros of the row of the seed matrix
-      int i_mat = nz;
-      for(int el_mat=sp_mat.rowind(i_mat); el_mat<sp_mat.rowind(i_mat+1); ++el_mat){
-        // Get the column
-        int j_mat = sp_mat.col(el_mat);
-        
-        // Map the Jacobian nonzero
-        i_ret.push_back(el);
-        j_ret.push_back(j_mat);
-        el_ret.push_back(el_mat);
-        dp_ret.push_back(dp);
-      }
-    }
-  }
-  
-  // Row offsets for the return matrix
-  vector<int> rowind(1,0);
-  rowind.reserve(numel()+1);
-  int i=0;
-  for(int k=0; k<i_ret.size(); ++k){
-    casadi_assert(i_ret[k]>=i);
-    for(; i<i_ret[k]; ++i){
-      rowind.push_back(k);
-    }
-  }
-  rowind.resize(size()+1,i_ret.size());
-  
-  // Sparsity of the return matrix
-  CRSSparsity sp_ret(size(),ncol,j_ret,rowind);
-  
-  // Return matrix
-  MX ret = MX::create(new Mapping(sp_ret));
-  
-  // Add the dependencies
-  for(int dp=0; dp<jx.size(); ++dp){
-    
-    // Get the local nonzeros
-    vector<int> nz, nzd;
-    for(int k=0; k<el_ret.size(); ++k){
-      
-      // If dependency matches
-      if(dp_ret[k]==dp){
-        nz.push_back(k);
-        nzd.push_back(el_ret[k]);
-      }
-    }
-    
-    // Save to return matrix
-    ret->addDependency(jx[dp],nzd,nz);
-  }
-  
-  // If input is sparse, inset rows
-  if(size()!=numel()){
-    // Row mapping
-    vector<int> ii(size());
-    
-    // Loop over nonzeros
+    // Loop over rows of the matrix
     for(int i=0; i<size1(); ++i){
-      // Loop over nonzeros
-      for(int el=sparsity().rowind(i); el<sparsity().rowind(i+1); ++el){
-        // Get column
-        int j=sparsity().col(el);
+      
+      // Loop over nonzero entries
+      for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
         
-        // Save mapping
-        ii[el] = j+i*size2();
+        // Get the column
+        //int j = sp.col(el);
+        
+        // Get the dependency and nonzero to which the nonzero is mapped
+        int dp = depind_[el];
+        int nz = nzind_[el];
+        
+        // Get the sparsity of the seed matrix
+        const CRSSparsity &sp_mat = jx[dp]->sparsity();
+        
+        // Loop over the nonzeros of the row of the seed matrix
+        int i_mat = nz;
+        for(int el_mat=sp_mat.rowind(i_mat); el_mat<sp_mat.rowind(i_mat+1); ++el_mat){
+          // Get the column
+          int j_mat = sp_mat.col(el_mat);
+          
+          // Map the Jacobian nonzero
+          i_ret.push_back(el);
+          j_ret.push_back(j_mat);
+          el_ret.push_back(el_mat);
+          dp_ret.push_back(dp);
+        }
       }
     }
     
-    // Enlarge matrix
-    ret.sparsityRef().enlargeRows(numel(),ii);
-  }
+    // Row offsets for the return matrix
+    vector<int> rowind(1,0);
+    rowind.reserve(numel()+1);
+    int i=0;
+    for(int k=0; k<i_ret.size(); ++k){
+      casadi_assert(i_ret[k]>=i);
+      for(; i<i_ret[k]; ++i){
+        rowind.push_back(k);
+      }
+    }
+    rowind.resize(size()+1,i_ret.size());
     
-  // Return the mapping
-  return ret;
+    // Sparsity of the return matrix
+    CRSSparsity sp_ret(size(),1,j_ret,rowind);
+    
+    // Return matrix
+    MX ret = MX::create(new Mapping(sp_ret));
+    
+    // Add the dependencies
+    for(int dp=0; dp<jx.size(); ++dp){
+      
+      // Get the local nonzeros
+      vector<int> nz, nzd;
+      for(int k=0; k<el_ret.size(); ++k){
+        
+        // If dependency matches
+        if(dp_ret[k]==dp){
+          nz.push_back(k);
+          nzd.push_back(el_ret[k]);
+        }
+      }
+      
+      // Save to return matrix
+      ret->addDependency(jx[dp],nzd,nz);
+    }
+    
+    // If input is sparse, inset rows
+    if(size()!=numel()){
+      // Row mapping
+      vector<int> ii(size());
+      
+      // Loop over nonzeros
+      for(int i=0; i<size1(); ++i){
+        // Loop over nonzeros
+        for(int el=sparsity().rowind(i); el<sparsity().rowind(i+1); ++el){
+          // Get column
+          int j=sparsity().col(el);
+          
+          // Save mapping
+          ii[el] = j+i*size2();
+        }
+      }
+      
+      // Enlarge matrix
+      ret.sparsityRef().enlargeRows(numel(),ii);
+    }
+
+    // Save
+    *fwdSens[d][0] = reshape(ret,sp.size1(),sp.size2());
+  }
 }
 
 void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
