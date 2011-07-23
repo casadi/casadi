@@ -74,8 +74,9 @@ void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
   SXMatrix::prod_no_alloc(*input[0],*input[1],*output[0]);
 }
 
-void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
-  *output[0] = prod(*input[0],trans(*input[1]));
+void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  if(!output_given)
+    *output[0] = prod(*input[0],trans(*input[1]));
   int nfwd = fwdSens.size();
   for(int d=0; d<nfwd; ++d){
     *fwdSens[d][0] = prod(*fwdSeed[d][0],trans(*input[1])) + prod(*input[0],trans(*fwdSeed[d][1]));

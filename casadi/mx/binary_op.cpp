@@ -125,9 +125,11 @@ void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const
   Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],*output[0],mapping_);
 }
 
-void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
-  casadi_math<MX>::fun[op_](*input[0],*input[1],*output[0]);
+  if(!output_given){
+    casadi_math<MX>::fun[op_](*input[0],*input[1],*output[0]);
+  }
 
   // Number of forward directions
   int nfwd = fwdSens.size();

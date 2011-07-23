@@ -41,7 +41,7 @@ void Norm::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXM
   throw CasadiException("Norm::evaluateSX not implemented");
 }
 
-void Norm::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void Norm::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   throw CasadiException("Norm::evaluateMX not implemented");
 }
 

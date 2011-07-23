@@ -90,10 +90,12 @@ void UnaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const 
   }
 }
 
-void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
   MX dummy;   // Dummy second argument
-  casadi_math<MX>::fun[op_](*input[0],dummy,*output[0]);
+  if(!output_given){
+    casadi_math<MX>::fun[op_](*input[0],dummy,*output[0]);
+  }
 
   // Number of forward directions
   int nfwd = fwdSens.size();

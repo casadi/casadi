@@ -64,7 +64,7 @@ void Densification::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
   input[0]->get(output[0]->data(),DENSE);
 }
 
-void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   *output[0] = *input[0];
   makeDense(*output[0]);
   int nfwd = fwdSens.size();

@@ -60,7 +60,7 @@ void MXConstant::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
   output[0]->set(r);
 }
 
-void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 }
 
 } // namespace CasADi

@@ -146,7 +146,7 @@ void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
   xs_ = fcn.eval(arg);
 }
 
-void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   
@@ -185,7 +185,7 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
   }
 }
 
-void EvaluationOutput::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+void EvaluationOutput::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   const vector<vector<MX> >& fwdSeed_ = dynamic_cast<Evaluation*>(dep(0).get())->fwdSeed_;

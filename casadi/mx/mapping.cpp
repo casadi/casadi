@@ -140,8 +140,8 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
   }
 }
 
-void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
-  // TODO: does not evaluate the function, only derivative
+void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  casadi_assert_message(output_given,"not implemented");
   
   casadi_assert(isReady());
   const std::vector<int> &nzind_ = nzmap_.data();

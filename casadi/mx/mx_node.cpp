@@ -161,7 +161,7 @@ MX MXNode::adFwd(const std::vector<MX>& jx){
     }
   }
   // Result of the evaluation
-  vector<MX> res(1);
+  vector<MX> res(1,MX::create(this));
 
   // Forward sensitivities
   vector<vector<MX> > fsens(nfwd,vector<MX>(1));
@@ -176,7 +176,7 @@ MX MXNode::adFwd(const std::vector<MX>& jx){
   MXPtrVV aseed_p, asens_p;
   
   // Call the evaluation function
-  evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p);
+  evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
   
   // Collect columns of the return
   vector<MX> cols(nfwd);
@@ -217,11 +217,7 @@ void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output){
 
 void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output){
   MXPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-  evaluateMX(input,output,fwdSeed, fwdSens, adjSeed, adjSens);
-}
-
-void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
-  throw CasadiException(string("MXNode::evaluateMX() not defined for class ") + typeid(*this).name());
+  evaluateMX(input,output,fwdSeed, fwdSens, adjSeed, adjSens,false);
 }
 
 void MXNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
