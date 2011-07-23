@@ -21,6 +21,7 @@
  */
 
 #include "densification.hpp"
+#include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
 
@@ -59,12 +60,18 @@ void Densification::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, cons
   }
 }
 
-MX Densification::adFwd(const std::vector<MX>& jx){
-  return jx.at(0);
-}
-
 void Densification::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   input[0]->get(output[0]->data(),DENSE);
+}
+
+void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  *output[0] = *input[0];
+  makeDense(*output[0]);
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  for(int d=0; d<nfwd; ++d){
+    *fwdSens[d][0] = *fwdSeed[d][0];
+  }
 }
 
 
