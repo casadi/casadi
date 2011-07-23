@@ -90,24 +90,25 @@ void UnaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const 
   }
 }
 
-MX UnaryOp::adFwd(const std::vector<MX>& jx){
-  // Number of derivative directions
-  int ndir = jx[0].size2();
-  
-  // Get partial derivatives
-  MX f = MX::create(this);
-  MX dummy;
-  MX pd[2];
-  casadi_math<MX>::der[op](dep(0),dummy,f,pd);
-  
-  // Same partial derivatives for every derivative direction
-  if(ndir > 1){
-    pd[0] = repmat(pd[0],1,ndir);
+void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  // Evaluate function
+  MX dummy;   // Dummy second argument
+  casadi_math<MX>::fun[op](*input[0],dummy,*output[0]);
+
+  // Number of forward directions
+  int nfwd = fwdSens.size();
+  if(nfwd>0){
+    // Get partial derivatives
+    MX pd[2];
+    casadi_math<MX>::der[op](*input[0],dummy,*output[0],pd);
+    
+    // Chain rule
+    for(int d=0; d<nfwd; ++d){
+      *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
+    }
   }
-  
-  // Chain rule
-  return pd[0]*jx[0];
 }
+
 
 } // namespace CasADi
 
