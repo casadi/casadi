@@ -67,6 +67,9 @@ class Mapping : public MXNode{
     /// Add a dependency
     virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
     
+    /// Symbolic forward sensitivities
+    virtual MX adFwd(const std::vector<MX>& jx);
+    
     /// Check if the mapping is ready
     bool isReady() const;
     

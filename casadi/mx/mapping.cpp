@@ -264,8 +264,109 @@ void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const 
   }
 }
 
-// MX Mapping::eval(const std::vector<MX>& x){
-//   
-// }
+MX Mapping::adFwd(const std::vector<MX>& jx){
+  casadi_assert(isReady());
+  const std::vector<int> &nzind_ = nzmap_.data();
+
+  // Number of columns
+  int ncol = jx.front().size2();
+    
+  // Sparsity
+  const CRSSparsity &sp = sparsity();
+
+  // Nonzero elements of the new matrix
+  vector<int> i_ret, j_ret, el_ret, dp_ret;
+
+  // Loop over rows of the matrix
+  for(int i=0; i<size1(); ++i){
+    
+    // Loop over nonzero entries
+    for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
+      
+      // Get the column
+      //int j = sp.col(el);
+      
+      // Get the dependency and nonzero to which the nonzero is mapped
+      int dp = depind_[el];
+      int nz = nzind_[el];
+      
+      // Get the sparsity of the seed matrix
+      const CRSSparsity &sp_mat = jx[dp].sparsity();
+      
+      // Loop over the nonzeros of the row of the seed matrix
+      int i_mat = nz;
+      for(int el_mat=sp_mat.rowind(i_mat); el_mat<sp_mat.rowind(i_mat+1); ++el_mat){
+        // Get the column
+        int j_mat = sp_mat.col(el_mat);
+        
+        // Map the Jacobian nonzero
+        i_ret.push_back(el);
+        j_ret.push_back(j_mat);
+        el_ret.push_back(el_mat);
+        dp_ret.push_back(dp);
+      }
+    }
+  }
+  
+  // Row offsets for the return matrix
+  vector<int> rowind(1,0);
+  rowind.reserve(numel()+1);
+  int i=0;
+  for(int k=0; k<i_ret.size(); ++k){
+    casadi_assert(i_ret[k]>=i);
+    for(; i<i_ret[k]; ++i){
+      rowind.push_back(k);
+    }
+  }
+  rowind.resize(size()+1,i_ret.size());
+  
+  // Sparsity of the return matrix
+  CRSSparsity sp_ret(size(),ncol,j_ret,rowind);
+  
+  // Return matrix
+  MX ret = MX::create(new Mapping(sp_ret));
+  
+  // Add the dependencies
+  for(int dp=0; dp<jx.size(); ++dp){
+    
+    // Get the local nonzeros
+    vector<int> nz, nzd;
+    for(int k=0; k<el_ret.size(); ++k){
+      
+      // If dependency matches
+      if(dp_ret[k]==dp){
+        nz.push_back(k);
+        nzd.push_back(el_ret[k]);
+      }
+    }
+    
+    // Save to return matrix
+    ret->addDependency(jx[dp],nzd,nz);
+  }
+  
+  // If input is sparse, inset rows
+  if(size()!=numel()){
+    // Row mapping
+    vector<int> ii(size());
+    
+    // Loop over nonzeros
+    for(int i=0; i<size1(); ++i){
+      // Loop over nonzeros
+      for(int el=sparsity().rowind(i); el<sparsity().rowind(i+1); ++el){
+        // Get column
+        int j=sparsity().col(el);
+        
+        // Save mapping
+        ii[el] = j+i*size2();
+      }
+    }
+    
+    // Enlarge matrix
+    ret.sparsityRef().enlargeRows(numel(),ii);
+  }
+    
+  // Return the mapping
+  return ret;
+}
 
 } // namespace CasADi
