@@ -115,12 +115,6 @@ MX norm_2(const MX &x){
   return ret;
 }
 
-MX norm_22(const MX &x){
-  MX ret;
-  ret.assignNode(new Norm22(x));
-  return ret;
-}
-
 MX norm_1(const MX &x){
   MX ret;
   ret.assignNode(new Norm1(x));

@@ -90,7 +90,6 @@ class MXtests(casadiTestCase):
     self.Jpool.append(lambda x: x[0]**(0.3),lambda x :diag( 0.3/x**0.7),"^0.3")
     self.matrixpool=FunctionPool()
     self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
-    self.matrixpool.append(lambda x: norm_22(x[0]),lambda x: linalg.norm(x)**2,"norm_22")
     self.matrixpool.append(lambda x: norm_1(x[0]),lambda x: sum(sum(abs(x))),"norm_1")
     self.matrixpool.append(lambda x: norm_inf(x[0]),lambda x: abs(matrix(x)).max(),"norm_inf")
     self.matrixbinarypool=FunctionPool()
@@ -1411,38 +1410,39 @@ class MXtests(casadiTestCase):
     
     self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
     
-  def test_Norm22(self):
-    self.message("Norm_22")
-    X=MX("x",5,1)
+  # Removed since a normed squared is not a norm
+  #def test_Norm22(self):
+    #self.message("Norm_22")
+    #X=MX("x",5,1)
     
-    nums = matrix([1,2,3,0,-1]).T
+    #nums = matrix([1,2,3,0,-1]).T
 
-    F =MXFunction([X],[norm_22(X)])
+    #F =MXFunction([X],[norm_22(X)])
 
-    J = Jacobian(F,0,0)
-    J.setOption("ad_mode","forward")
-    J.init()
+    #J = Jacobian(F,0,0)
+    #J.setOption("ad_mode","forward")
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
-    self.checkarray(J.output(),2*nums.T,"Norm_22 fwd")
+    #J.input().set(nums)
+    #J.evaluate()
+    #self.checkarray(J.output(),2*nums.T,"Norm_22 fwd")
 
-    J = Jacobian(F,0,0)
-    J.setOption("ad_mode","adjoint")
-    J.init()
+    #J = Jacobian(F,0,0)
+    #J.setOption("ad_mode","adjoint")
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
+    #J.input().set(nums)
+    #J.evaluate()
     
-    self.checkarray(J.output(),2*nums.T,"Norm_22 adj")
+    #self.checkarray(J.output(),2*nums.T,"Norm_22 adj")
         
-    J = MXFunction([X],[F.jac(0)[0]])
-    J.init()
+    #J = MXFunction([X],[F.jac(0)[0]])
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
+    #J.input().set(nums)
+    #J.evaluate()
     
-    self.checkarray(J.output(),2*nums.T,"Norm_22 jac")
+    #self.checkarray(J.output(),2*nums.T,"Norm_22 jac")
 
 
   def test_Norm1(self):

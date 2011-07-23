@@ -79,31 +79,6 @@ virtual MX adFwd(const std::vector< MX > & jx	);
 
 };
 
-/** \brief Represents a 2-norm squared operation on a MX
-  Frobenius norm
-  \author Joel Andersson 
-  \date 2010
-*/
-class Norm22 : public Norm{
-public:
-
-/** \brief  Constructor */
-Norm22(const MX& x);
-
-/** \brief  Clone function */
-virtual Norm22* clone() const;
-
-/** \brief  Print */
-virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-
-/** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-
-/** \brief Symbolic forward sensitivities. */
-virtual MX adFwd(const std::vector< MX > & jx	);
-
-};
-
 /** \brief Represents a 1-norm operation on a MX
   Entrywise Norm
   \author Joel Andersson 

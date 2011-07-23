@@ -61,11 +61,6 @@ Internally represented by Norm2
 */
 MX norm_2(const MX &x);
 
-/** \brief  Take the 2-norm squared of a MX
-Internally represented by Norm2
-*/
-MX norm_22(const MX &x);
-
 /** \brief  Take the 1-norm of a MX
 Internally represented by Norm1
 */
