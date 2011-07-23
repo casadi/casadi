@@ -577,25 +577,24 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   casadi_assert(isInit());
   
   // Get the number of columns
-  const int ncol = fseed.front().size2();
-  
-  // Make sure that the number of columns is consistent
-  for(vector<MX>::const_iterator it=fseed.begin(); it!=fseed.end(); ++it){
-    casadi_assert_message(ncol==it->size2(),"Number of columns in seed matrices not consistent.");
-  }
+  const int nfwd = fseed.front().size2();
   
   // Directional derivative for each node
-  std::vector<MX> derwork(alg.size());
+  std::vector<std::vector<MX> > dwork(alg.size(),std::vector<MX>(nfwd));
   
   // Pass the seed matrices for the symbolic variables
   for(int ind=0; ind<input_.size(); ++ind){
-    derwork[inputv_ind[ind]] = fseed[ind];
+    int el = inputv_ind[ind];
+    for(int d=0; d<nfwd; ++d){
+      dwork[el][d] = fseed[ind](range(fseed[ind].size1()),d);
+      dwork[el][d] = reshape(dwork[el][d],alg[el].mx.size1(),alg[el].mx.size2());
+    }
   }
   
   // Evaluate all the seed matrices of the algorithm sequentially
-  for(int el=0; el<derwork.size(); ++el){
+  for(int el=0; el<alg.size(); ++el){
     // Skip the node if it has already been calculated (i.e. is symbolic or constant)
-    if(!derwork[el].isNull()){
+    if(!dwork[el].front().isNull()){
       continue;
     }
     
@@ -606,34 +605,83 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
       int nrow = alg[el].mx.numel();
       
       // Save zero matrix
-      derwork[el] = MX::zeros(nrow,ncol);
+      for(int d=0; d<nfwd; ++d){
+        dwork[el][d] = MX::zeros(alg[el].mx.size1(),alg[el].mx.size2());
+      }
       continue;
     }
     
     // Collect the seed matrices
-    vector<MX> seed(alg[el].i_arg.size());
-    if(seed.empty()){
-      derwork[el] = MX::zeros(alg[el].mx.numel(),ncol);
+    if(alg[el].i_arg.empty()){
+      for(int d=0; d<nfwd; ++d){
+        dwork[el][d] = MX::zeros(alg[el].mx.size1(),alg[el].mx.size2());
+      }
       continue;
     }
-    for(int i=0; i<seed.size(); ++i){
-      int ind = alg[el].i_arg[i];
-      if(ind>=0){
-        seed[i] = derwork[ind];
+    
+    if(alg[el].mx->isEvaluation() || alg[el].mx->isOutputNode() || alg[el].mx->isNorm()){
+      vector<MX> seed(alg[el].i_arg.size());
+      for(int i=0; i<seed.size(); ++i){
+        int ind = alg[el].i_arg[i];
+        if(ind>=0){
+          vector<MX> tmp;
+          for(int iind=0; iind<dwork[ind].size(); ++iind){
+            if(!dwork[ind][iind].isNull()){
+              tmp.push_back(vec(dwork[ind][iind]));
+            }
+          }
+          seed[i] = horzcat(tmp);
+        }
       }
+      
+      // Save to the memory vector
+      MX tmp2 = alg[el].mx->adFwd(seed);
+      
+      for(int d=0; d<nfwd; ++d){
+        if(tmp2.isNull()) continue;
+        dwork[el][d] = tmp2(range(tmp2.size1()),d);
+        dwork[el][d] = reshape(dwork[el][d],alg[el].mx.size1(),alg[el].mx.size2());
+      }
+      
+    } else {
+      // Result of the evaluation
+      vector<MX> res(1,alg[el].mx);
+      MXPtrV output_p = ptrVec(res);
+      const MXPtrV input_p = ptrVec(alg[el].mx->dep_);
+      
+      // Forward seeds and sensitivities
+      MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
+      for(int d=0; d<nfwd; ++d){
+        fseed_p[d].resize(alg[el].i_arg.size());
+        for(int iind=0; iind<alg[el].i_arg.size(); ++iind){
+          int ind = alg[el].i_arg[iind];
+          fseed_p[d][iind] = &dwork[ind][d];
+        }
+
+        fsens_p[d].resize(alg[el].i_res.size());
+        for(int oind=0; oind<alg[el].i_res.size(); ++oind){
+          int ind = alg[el].i_res[oind];
+          fsens_p[d][oind] = &dwork[ind][d];
+        }
+      }
+      
+      // Dummy arguments for the adjoint sensitivities
+      MXPtrVV aseed_p, asens_p;
+      
+      // Call the evaluation function
+      alg[el].mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
     }
-    
-    // Get the sensitivity matrix
-    MX sens = alg[el].mx->adFwd(seed);
-    
-    // Save to the memory vector
-    derwork[el] = sens;
   }
 
   // Collect the symbolic forward sensitivities
   vector<MX> ret(outputv.size());
   for(int ind=0; ind<outputv.size(); ++ind){
-    ret[ind] = derwork[outputv_ind[ind]];
+    vector<MX> tmp = dwork[outputv_ind[ind]];
+    vector<MX> tmp1;
+    for(int d=0; d<nfwd; ++d){
+      tmp1.push_back(vec(tmp[d]));
+    }
+    ret[ind] = horzcat(tmp1);
   }
   
   return ret;

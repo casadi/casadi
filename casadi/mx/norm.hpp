@@ -46,6 +46,9 @@ class Norm : public MXNode{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
+    /** \brief  Is a norm */
+    virtual bool isNorm() const{ return true;}
+    
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
 

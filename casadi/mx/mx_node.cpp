@@ -140,53 +140,7 @@ void MXNode::print(std::ostream &stream) const{
 }
 
 MX MXNode::adFwd(const std::vector<MX>& jx){
-  casadi_assert(!jx.empty());
-
-  // Number of forward direction
-  int nfwd = -1;
-  for(int i=0; i<jx.size(); ++i){
-    if(!jx[i].isNull())
-      nfwd = jx[i].size2();
-  }
-  if(nfwd<0) return MX();
-
-  // Forward seeds
-  vector<vector<MX> > fseed(nfwd);
-  for(int d=0; d<nfwd; ++d){
-    fseed[d].resize(jx.size());
-    for(int i=0; i<jx.size(); ++i){
-      if(!jx[i].isNull()){
-        fseed[d][i] = reshape(jx[i](range(jx[i].size1()),d),dep(i).size1(),dep(i).size2());
-      }
-    }
-  }
-  // Result of the evaluation
-  vector<MX> res(1,MX::create(this));
-
-  // Forward sensitivities
-  vector<vector<MX> > fsens(nfwd,vector<MX>(1));
-  
-  // Vectors to hold pointers
-  const MXPtrV input_p = ptrVec(dep_);
-  MXPtrV output_p = ptrVec(res);
-  const MXPtrVV fseed_p = ptrVec(fseed);
-  MXPtrVV fsens_p = ptrVec(fsens);
-  
-  // Dummy arguments for the adjoint sensitivities
-  MXPtrVV aseed_p, asens_p;
-  
-  // Call the evaluation function
-  evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
-  
-  // Collect columns of the return
-  vector<MX> cols(nfwd);
-  for(int d=0; d<nfwd; ++d){
-    if(!fsens[d][0].isNull()){
-      cols[d] = vec(fsens.at(d).at(0));
-    }
-  }
-  
-  return horzcat(cols);
+  throw CasadiException(string("MXNode::adFwd not defined for class ") + typeid(*this).name());
 }
 
 MX MXNode::jac(int iind){
