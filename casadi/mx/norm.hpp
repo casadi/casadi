@@ -27,9 +27,13 @@
 
 namespace CasADi{
 
-/** \brief Represents any type of general norm
+/** \brief Matrix and vector norms
+  This base class and the derived classes represent matrix and vector norms that are intended to be used when formulating convex 
+  optimization problems. Note that they are not intended to be evaluated numerically or differentiated, instead the idea is that
+  they should be eliminated from the computational graph during a reformulation (cf. CVX software).
+
   \author Joel Andersson 
-  \date 2010
+  \date 2010-2011
 */
 class Norm : public MXNode{
   public:
@@ -46,58 +50,57 @@ class Norm : public MXNode{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
-    /** \brief  Is a norm */
-    virtual bool isNorm() const{ return true;}
-    
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
-
 };
 
-/** \brief Represents a 2-norm operation on a MX
-  Frobenius norm
+/** \brief Represents a 2-norm
   \author Joel Andersson 
   \date 2010
 */
 class Norm2 : public Norm{
-public:
+  public:
 
-/** \brief  Constructor */
-Norm2(const MX& x);
+    /** \brief  Constructor */
+    Norm2(const MX& x);
 
-/** \brief  Clone function */
-virtual Norm2* clone() const;
+    /** \brief  Clone function */
+    virtual Norm2* clone() const;
 
-/** \brief  Print */
-virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-
-/** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-
-/** \brief Symbolic forward sensitivities.  */
-virtual MX adFwd(const std::vector< MX > & jx	);
-
+    /** \brief  Print */
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 };
 
-/** \brief Represents a 1-norm operation on a MX
-  Entrywise Norm
+/** \brief Represents a Frobenius norm
+  \author Joel Andersson 
+  \date 2010
+*/
+class NormF : public Norm{
+  public:
+
+    /** \brief  Constructor */
+    NormF(const MX& x);
+
+    /** \brief  Clone function */
+    virtual NormF* clone() const;
+
+    /** \brief  Print */
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+};
+
+/** \brief 1-norm
   \author Joel Andersson 
   \date 2010
 */
 class Norm1 : public Norm{
-public:
+  public:
 
-/** \brief  Constructor */
-Norm1(const MX& x);
+  /** \brief  Constructor */
+  Norm1(const MX& x);
 
-/** \brief  Clone function */
-virtual Norm1* clone() const;
+  /** \brief  Clone function */
+  virtual Norm1* clone() const;
 
-/** \brief  Print */
-virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-
-/** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+  /** \brief  Print */
+  virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 };
 
@@ -106,20 +109,16 @@ virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatr
   \date 2010
 */
 class NormInf : public Norm{
-public:
+  public:
 
-/** \brief  Constructor */
-NormInf(const MX& x);
+    /** \brief  Constructor */
+    NormInf(const MX& x);
 
-/** \brief  Clone function */
-virtual NormInf* clone() const;
+    /** \brief  Clone function */
+    virtual NormInf* clone() const;
 
-/** \brief  Print */
-virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-
-/** \brief  Evaluate */
-virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-
+    /** \brief  Print */
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
 };
 

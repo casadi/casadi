@@ -619,7 +619,7 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
       continue;
     }
     
-    if(alg[el].mx->isEvaluation() || alg[el].mx->isOutputNode() || alg[el].mx->isNorm()){
+    if(alg[el].mx->isEvaluation() || alg[el].mx->isOutputNode()){
       vector<MX> seed(alg[el].i_arg.size());
       for(int i=0; i<seed.size(); ++i){
         int ind = alg[el].i_arg[i];

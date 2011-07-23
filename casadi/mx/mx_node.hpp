@@ -134,9 +134,6 @@ class MXNode : public SharedObjectNode{
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const{return false;}
 
-    /** \brief  Is a norm */
-    virtual bool isNorm() const{ return false;}
-
     /** \brief  Check if jacobian reference */
     virtual bool isJacobian() const{return false;}
 

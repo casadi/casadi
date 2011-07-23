@@ -89,9 +89,9 @@ class MXtests(casadiTestCase):
     self.Jpool.append(lambda x: x[0]**(-2),lambda x : diag(-2.0/x**3),"^-2")
     self.Jpool.append(lambda x: x[0]**(0.3),lambda x :diag( 0.3/x**0.7),"^0.3")
     self.matrixpool=FunctionPool()
-    self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
-    self.matrixpool.append(lambda x: norm_1(x[0]),lambda x: sum(sum(abs(x))),"norm_1")
-    self.matrixpool.append(lambda x: norm_inf(x[0]),lambda x: abs(matrix(x)).max(),"norm_inf")
+    #self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
+    #self.matrixpool.append(lambda x: norm_1(x[0]),lambda x: sum(sum(abs(x))),"norm_1")
+    #self.matrixpool.append(lambda x: norm_inf(x[0]),lambda x: abs(matrix(x)).max(),"norm_inf")
     self.matrixbinarypool=FunctionPool()
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
@@ -1301,7 +1301,7 @@ class MXtests(casadiTestCase):
     (grad(x,Axb),A.T),
     #(grad(x,Axb.T),A)   incorrect?
     (grad(x,c.prod(Axb.T,Axb)),2*c.prod(A.T,Axb)),
-    (grad(x,norm_2(Axb)),c.prod(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
+    #(grad(x,norm_2(Axb)),c.prod(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
     (grad(x,c.prod(c.prod(x.T,A),x)+2*c.prod(c.prod(x.T,B),y)+c.prod(c.prod(y.T,C),y)),c.prod((A+A.T),x)+2*c.prod(B,y)),
     #(grad(x,c.prod(a.T,c.prod(x.T,x)*b)),2*c.prod(c.prod(x,a.T),b))
     (grad(X,X),eye(k**2)),
@@ -1376,39 +1376,40 @@ class MXtests(casadiTestCase):
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
     
-  def test_Norm2(self):
-    self.message("Norm_2")
-    X=MX("x",5,1)
+  # 2-norms currently not supported
+  #def test_Norm2(self):
+    #self.message("Norm_2")
+    #X=MX("x",5,1)
     
-    nums = matrix([1,2,3,0,-1]).T
+    #nums = matrix([1,2,3,0,-1]).T
 
-    F =MXFunction([X],[norm_2(X)])
+    #F =MXFunction([X],[norm_2(X)])
 
-    J = Jacobian(F,0,0)
-    J.setOption("ad_mode","forward")
-    J.init()
+    #J = Jacobian(F,0,0)
+    #J.setOption("ad_mode","forward")
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
-    self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
+    #J.input().set(nums)
+    #J.evaluate()
+    #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
 
-    J = Jacobian(F,0,0)
-    J.setOption("ad_mode","adjoint")
-    J.init()
+    #J = Jacobian(F,0,0)
+    #J.setOption("ad_mode","adjoint")
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
+    #J.input().set(nums)
+    #J.evaluate()
     
-    self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
+    #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
 
 
-    J = MXFunction([X],[F.jac(0)[0]])
-    J.init()
+    #J = MXFunction([X],[F.jac(0)[0]])
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
+    #J.input().set(nums)
+    #J.evaluate()
     
-    self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
+    #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
     
   # Removed since a normed squared is not a norm
   #def test_Norm22(self):
@@ -1444,31 +1445,31 @@ class MXtests(casadiTestCase):
     
     #self.checkarray(J.output(),2*nums.T,"Norm_22 jac")
 
-
-  def test_Norm1(self):
-    self.message("Norm_1")
-    X=MX("x",3,1)
+  # 1-norms currently not supported
+  #def test_Norm1(self):
+    #self.message("Norm_1")
+    #X=MX("x",3,1)
     
-    nums = matrix([6,-3,0]).T
+    #nums = matrix([6,-3,0]).T
 
-    F =MXFunction([X],[norm_1(X)])
+    #F =MXFunction([X],[norm_1(X)])
 
-    J = Jacobian(F,0,0)
-    J.setOption("ad_mode","forward")
-    J.init()
+    #J = Jacobian(F,0,0)
+    #J.setOption("ad_mode","forward")
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
-    self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
+    #J.input().set(nums)
+    #J.evaluate()
+    #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
 
-    J = Jacobian(F,0,0)
-    J.setOption("ad_mode","adjoint")
-    J.init()
+    #J = Jacobian(F,0,0)
+    #J.setOption("ad_mode","adjoint")
+    #J.init()
 
-    J.input().set(nums)
-    J.evaluate()
+    #J.input().set(nums)
+    #J.evaluate()
     
-    self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
+    #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
     
 if __name__ == '__main__':
     unittest.main()
