@@ -52,7 +52,10 @@ class Evaluation : public MultipleOutput{
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
-    
+
+    /** \brief  Evaluate the function symbolically (MX) */
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
     /// Symbolic forward sensitivities
     virtual MX adFwd(const std::vector<MX>& jx);
 
@@ -76,6 +79,9 @@ class Evaluation : public MultipleOutput{
 
     std::vector<MX> x_;
     std::vector<SXMatrix> xs_;
+    
+    std::vector<std::vector<MX> > fwdSeed_;
+    
     FX fcn_;
 };
 
@@ -109,7 +115,10 @@ class EvaluationOutput : public OutputNode{
         
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
-    
+
+    /** \brief  Evaluate the function symbolically (MX) */
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
 };
 
 } // namespace CasADi

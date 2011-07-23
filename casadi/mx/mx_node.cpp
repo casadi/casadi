@@ -141,16 +141,23 @@ void MXNode::print(std::ostream &stream) const{
 
 MX MXNode::adFwd(const std::vector<MX>& jx){
   casadi_assert(!jx.empty());
-  
+
   // Number of forward direction
-  int nfwd = jx.front().size2();
+  int nfwd = -1;
+  for(int i=0; i<jx.size(); ++i){
+    if(!jx[i].isNull())
+      nfwd = jx[i].size2();
+  }
+  if(nfwd<0) return MX();
 
   // Forward seeds
   vector<vector<MX> > fseed(nfwd);
   for(int d=0; d<nfwd; ++d){
     fseed[d].resize(jx.size());
-    for(int i=0; i<fseed[d].size(); ++i){
-      fseed[d][i] = reshape(jx[i](range(jx[i].size1()),d),dep(i).size1(),dep(i).size2());
+    for(int i=0; i<jx.size(); ++i){
+      if(!jx[i].isNull()){
+        fseed[d][i] = reshape(jx[i](range(jx[i].size1()),d),dep(i).size1(),dep(i).size2());
+      }
     }
   }
   // Result of the evaluation
@@ -174,7 +181,9 @@ MX MXNode::adFwd(const std::vector<MX>& jx){
   // Collect columns of the return
   vector<MX> cols(nfwd);
   for(int d=0; d<nfwd; ++d){
-    cols[d] = vec(fsens.at(d).at(0));
+    if(!fsens[d][0].isNull()){
+      cols[d] = vec(fsens.at(d).at(0));
+    }
   }
   
   return horzcat(cols);

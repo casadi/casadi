@@ -111,7 +111,7 @@ class MXNode : public SharedObjectNode{
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
                             const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, 
-                            const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+                            const MXPtrVV& adjSeed, MXPtrVV& adjSens)=0;
 
     /** \brief  Evaluate symbolically (MX), no derivatives */
     void evaluateMX(const MXPtrV& input, MXPtrV& output);

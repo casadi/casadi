@@ -123,6 +123,99 @@ void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string
   stream << args[0] << "[" << oind_ <<  "]";
 }
 
+MX EvaluationOutput::jac(int iind){
+  return MX::create(new JacobianReference(MX::create(this),iind));
+}
+
+FX& Evaluation::getFunction(){ 
+  return fcn_;
+}
+
+FX& EvaluationOutput::getFunction(){ 
+  return dep(0)->getFunction();
+}
+
+void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  // Make sure that the function is an X-function
+  XFunction fcn = shared_cast<XFunction>(fcn_);
+  casadi_assert_message(!fcn.isNull(),"Function not an SXFunction or MXFunction");
+  vector<SXMatrix> arg(input.size());
+  for(int i=0; i<arg.size(); ++i){
+    arg[i] = *input[i];
+  }
+  xs_ = fcn.eval(arg);
+}
+
+void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  
+  fwdSeed_.resize(nfwd);
+  for(int d=0; d<nfwd; ++d){
+    fwdSeed_[d].resize(input.size());
+    for(int iind=0; iind<input.size(); ++iind){
+      if(fwdSeed[d][iind]!=0){
+        fwdSeed_[d][iind] = *fwdSeed[d][iind];
+      }
+    }
+  }
+  return;
+  
+  
+  // Evaluate the function symbolically
+  vector<MX> arg(input.size());
+  for(int iind=0; iind<arg.size(); ++iind){
+    if(input[iind])
+      arg[iind] = *input[iind];
+  }
+  vector<MX> res = fcn_.call(arg);
+  
+  for(int d=0; d<nfwd; ++d){
+    for(int oind=0; oind<output.size(); ++oind){
+      if(fwdSens[d][oind]!=0){
+        *fwdSens[d][oind] = MX::zeros(size1(),size2());
+        for(int iind=0; iind<input.size(); ++iind){
+          if(fwdSeed[d][iind]!=0){
+            MX J = MX::create(new JacobianReference(res[oind],iind));
+            *fwdSens[d][oind] += prod(J,*fwdSeed[d][iind]);
+          }
+        }
+      }
+    }
+  }
+}
+
+void EvaluationOutput::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  const vector<vector<MX> >& fwdSeed_ = dynamic_cast<Evaluation*>(dep(0).get())->fwdSeed_;
+
+  for(int d=0; d<nfwd; ++d){
+    if(fwdSens[d][0]!=0){
+      *fwdSens[d][0] = MX::zeros(size1(),size2());
+      for(int iind=0; iind<input.size(); ++iind){
+        if(fwdSeed[d][iind]!=0){
+          MX J = jac(iind);
+          *fwdSens[d][0] += prod(J,fwdSeed_[d][iind]);
+        }
+      }
+    }
+  }
+}
+
+void EvaluationOutput::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
+  // Get a reference the arguments
+  const vector<SXMatrix>& xs = dynamic_cast<Evaluation*>(dep(0).get())->xs_;
+  
+  // Copy to output
+  output.set(xs[oind_]);
+}
+
+void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  MXNode::deepCopyMembers(already_copied);
+  fcn_ = deepcopy(fcn_,already_copied);
+}
+
 MX Evaluation::adFwd(const std::vector<MX>& jx){ 
   // Save the forward derivative
   x_ = jx;
@@ -154,41 +247,5 @@ MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
   return ret;
 }
 
-
-MX EvaluationOutput::jac(int iind){
-  return MX::create(new JacobianReference(MX::create(this),iind));
-}
-
-FX& Evaluation::getFunction(){ 
-  return fcn_;
-}
-
-FX& EvaluationOutput::getFunction(){ 
-  return dep(0)->getFunction();
-}
-
-void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  // Make sure that the function is an X-function
-  XFunction fcn = shared_cast<XFunction>(fcn_);
-  casadi_assert_message(!fcn.isNull(),"Function not an SXFunction or MXFunction");
-  vector<SXMatrix> arg(input.size());
-  for(int i=0; i<arg.size(); ++i){
-    arg[i] = *input[i];
-  }
-  xs_ = fcn.eval(arg);
-}
-
-void EvaluationOutput::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  // Get a reference the arguments
-  const vector<SXMatrix>& xs = dynamic_cast<Evaluation*>(dep(0).get())->xs_;
-  
-  // Copy to output
-  output.set(xs[oind_]);
-}
-
-void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-  MXNode::deepCopyMembers(already_copied);
-  fcn_ = deepcopy(fcn_,already_copied);
-}
 
 } // namespace CasADi

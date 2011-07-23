@@ -50,6 +50,9 @@ class JacobianReference : public MXNode{
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    /** \brief  Evaluate the function symbolically (MX) */
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 

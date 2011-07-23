@@ -74,9 +74,10 @@ void IfNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatr
 }
 
 void IfNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  
 }
 
+void IfNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+}
 
 
 } // namespace CasADi
