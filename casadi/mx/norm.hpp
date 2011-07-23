@@ -62,6 +62,9 @@ class Norm2 : public Norm{
     /** \brief  Constructor */
     Norm2(const MX& x);
 
+    /** \brief  Destructor */
+    virtual ~Norm2(){}
+
     /** \brief  Clone function */
     virtual Norm2* clone() const;
 
@@ -78,6 +81,9 @@ class NormF : public Norm{
 
     /** \brief  Constructor */
     NormF(const MX& x);
+
+    /** \brief  Destructor */
+    virtual ~NormF(){}
 
     /** \brief  Clone function */
     virtual NormF* clone() const;
@@ -96,6 +102,9 @@ class Norm1 : public Norm{
   /** \brief  Constructor */
   Norm1(const MX& x);
 
+  /** \brief  Destructor */
+  virtual ~Norm1(){}
+
   /** \brief  Clone function */
   virtual Norm1* clone() const;
 
@@ -113,6 +122,9 @@ class NormInf : public Norm{
 
     /** \brief  Constructor */
     NormInf(const MX& x);
+
+    /** \brief  Destructor */
+    virtual ~NormInf(){}
 
     /** \brief  Clone function */
     virtual NormInf* clone() const;

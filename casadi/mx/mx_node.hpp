@@ -77,8 +77,8 @@ class MXNode : public SharedObjectNode{
     /// Constructor
     MXNode();
   
-    /** \brief  Destructor: better _not_ to make this destructor virtual? In the SX class, a virtual destructor leads to stack overflow due to recursive calling */
-    virtual ~MXNode();
+    /** \brief  Destructor */
+    virtual ~MXNode()=0;
 
     /** \brief  Clone function */
     virtual MXNode* clone() const = 0;
