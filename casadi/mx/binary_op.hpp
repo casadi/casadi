@@ -44,9 +44,6 @@ class BinaryOp : public MXNode{
     /** \brief  Print */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
-
     /// Is it a certain operation
     virtual bool isOperation(int op) const{ return op==op_;};
 
@@ -55,6 +52,9 @@ class BinaryOp : public MXNode{
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function symbolically (MX) */
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     //! \brief Operation
     Operation op_;

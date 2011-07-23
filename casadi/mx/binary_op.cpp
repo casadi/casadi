@@ -54,39 +54,6 @@ BinaryOp::BinaryOp(Operation op, MX x, MX y) : op_(op){
   setSparsity(sp);
 }
 
-MX BinaryOp::adFwd(const std::vector<MX>& jx){
-  // Number of derivative directions
-  int ndir = jx[0].size2();
-  
-  // Get partial derivatives
-  MX f = MX::create(this);
-  MX pd[2];
-  casadi_math<MX>::der[op_](dep(0),dep(1),f,pd);
-
-  // Same partial derivatives for every derivative direction
-  if(ndir>1){
-    for(int d=0; d<2; ++d){
-      // Flatten out partial derivatives
-      pd[d] = reshape(pd[d],pd[d].numel(),1);
-      
-      // Same partial derivatives for each direction
-      int nv = jx[d].size1();
-      if(pd[d].size1()==1 && nv>1){
-        pd[d] = repmat(pd[d],nv,ndir);
-      } else {
-        pd[d] = repmat(pd[d],1,ndir);
-      }
-    }
-  }
-
-  // Chain rule 
-  return pd[0]*jx[0] + pd[1]*jx[1];
-}
-
-void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],*output[0],mapping_);
-}
-
 void BinaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
   casadi_math<double>::print[op_](stream,args.at(0),args.at(1));
 }
@@ -150,6 +117,29 @@ void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMa
       // Go to next nonzero for the arguments
       el0 += nz0;
       el1 += nz1;
+    }
+  }
+}
+
+void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],*output[0],mapping_);
+}
+
+void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens){
+  // Evaluate function
+  casadi_math<MX>::fun[op_](*input[0],*input[1],*output[0]);
+
+  // Number of forward directions
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  if(nfwd>0 || nadj>0){
+    // Get partial derivatives
+    MX pd[2];
+    casadi_math<MX>::der[op_](*input[0],*input[1],*output[0],pd);
+    
+    // Chain rule
+    for(int d=0; d<nfwd; ++d){
+      *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
     }
   }
 }

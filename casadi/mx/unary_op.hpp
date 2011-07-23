@@ -55,10 +55,10 @@ public:
   virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
   /// Is it a certain operation
-  virtual bool isOperation(int op__) const{ return op__==op;};
+  virtual bool isOperation(int op) const{ return op==op_;};
 
   //! \brief operation
-  Operation op;
+  Operation op_;
 };
 
 } // namespace CasADi
