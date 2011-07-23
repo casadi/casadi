@@ -29,6 +29,7 @@ using namespace std;
 namespace CasADi{
 
 Norm::Norm(const MX& x){
+  casadi_warning("Norms currently _not_ supported by the virtual machine, they are not intended to be evaluated");
   setDependencies(x);
   setSparsity(CRSSparsity(1,1,true));
 }
