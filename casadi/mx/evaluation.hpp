@@ -56,9 +56,6 @@ class Evaluation : public MultipleOutput{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
-
     /** \brief  Check if evaluation */
     virtual bool isEvaluation() const{return true;}
 
@@ -77,10 +74,7 @@ class Evaluation : public MultipleOutput{
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return fcn_.getNumOutputs();}
 
-    std::vector<MX> x_;
     std::vector<SXMatrix> xs_;
-    
-    std::vector<std::vector<MX> > fwdSeed_;
     
     FX fcn_;
 };
@@ -104,20 +98,11 @@ class EvaluationOutput : public OutputNode{
     /** \brief  Print */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
-    /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
-    virtual MX jac(int iind);
-    
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
-    
     /** \brief  Get function reference */
     virtual FX& getFunction();
         
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
-
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
 };
 

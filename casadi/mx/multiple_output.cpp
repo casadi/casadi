@@ -23,6 +23,7 @@
 #include "multiple_output.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
+#include "jacobian_reference.hpp"
 
 using namespace std;
 
@@ -52,6 +53,10 @@ void OutputNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
 
 void OutputNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 }
- 
+
+MX OutputNode::jac(int iind){
+  return MX::create(new JacobianReference(MX::create(this),iind));
+}
+
 
 } // namespace CasADi

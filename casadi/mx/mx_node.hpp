@@ -231,9 +231,6 @@ class MXNode : public SharedObjectNode{
     /// Symbolic evaluation (matrix graph)
     virtual MX eval(const std::vector<MX>& x){return MX();}
     
-    /// Symbolic forward sensitivities
-    virtual MX adFwd(const std::vector<MX>& jx);
-        
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;
     

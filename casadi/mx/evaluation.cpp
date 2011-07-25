@@ -21,11 +21,11 @@
  */
 
 #include "evaluation.hpp"
-#include "jacobian_reference.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../fx/x_function.hpp"
+#include "jacobian_reference.hpp"
 
 using namespace std;
 
@@ -123,10 +123,6 @@ void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string
   stream << args[0] << "[" << oind_ <<  "]";
 }
 
-MX EvaluationOutput::jac(int iind){
-  return MX::create(new JacobianReference(MX::create(this),iind));
-}
-
 FX& Evaluation::getFunction(){ 
   return fcn_;
 }
@@ -150,57 +146,58 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   
-  fwdSeed_.resize(nfwd);
-  for(int d=0; d<nfwd; ++d){
-    fwdSeed_[d].resize(input.size());
-    for(int iind=0; iind<input.size(); ++iind){
-      if(fwdSeed[d][iind]!=0){
-        fwdSeed_[d][iind] = *fwdSeed[d][iind];
+  if(!output_given){
+    // Evaluate the function symbolically
+    vector<MX> arg(input.size());
+    for(int i=0; i<arg.size(); ++i){
+      if(input[i])
+        arg[i] = *input[i];
+    }
+    vector<MX> res = fcn_.call(arg);
+    for(int i=0; i<res.size(); ++i){
+      if(output[i])
+        *output[i] = res[i];
+    }
+  }
+  
+  if(nfwd>0){
+    for(int oind=0; oind<output.size(); ++oind){
+      // Skip of not used
+      if(output[oind]==0) continue;
+          
+      // Return matrix
+      MX ret2 = MX::zeros(output[oind]->numel(),1);
+      vector<MX> ret3(nfwd,ret2);
+      
+      for(int iind=0; iind<fwdSeed.front().size(); ++iind){
+        if(fwdSeed[0][iind]!=0){
+          MX J = MX::create(new JacobianReference(*output[oind],iind));
+          for(int d=0; d<nfwd; ++d){
+            ret3[d] += prod(J,vec(*fwdSeed[d][iind]));
+          }
+        }
+      }
+      
+      for(int d=0; d<nfwd; ++d){
+        *fwdSens[d][oind] = reshape(ret3[d],output[oind]->size1(),output[oind]->size2());
       }
     }
   }
-  return;
   
-  
-  // Evaluate the function symbolically
-  vector<MX> arg(input.size());
-  for(int iind=0; iind<arg.size(); ++iind){
-    if(input[iind])
-      arg[iind] = *input[iind];
-  }
-  vector<MX> res = fcn_.call(arg);
-  
-  for(int d=0; d<nfwd; ++d){
+/*  for(int d=0; d<nfwd; ++d){
     for(int oind=0; oind<output.size(); ++oind){
-      if(fwdSens[d][oind]!=0){
-        *fwdSens[d][oind] = MX::zeros(size1(),size2());
+      if(fwdSens[d][oind]!=0 && !output[oind]->isNull()){
+        continue;
+        *fwdSens[d][oind] = MX::zeros(output[oind]->size1(),output[oind]->size2());
         for(int iind=0; iind<input.size(); ++iind){
           if(fwdSeed[d][iind]!=0){
-            MX J = MX::create(new JacobianReference(res[oind],iind));
+            MX J = MX::create(new JacobianReference(*output[oind],iind));
             *fwdSens[d][oind] += prod(J,*fwdSeed[d][iind]);
           }
         }
       }
     }
-  }
-}
-
-void EvaluationOutput::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
-  const vector<vector<MX> >& fwdSeed_ = dynamic_cast<Evaluation*>(dep(0).get())->fwdSeed_;
-
-  for(int d=0; d<nfwd; ++d){
-    if(fwdSens[d][0]!=0){
-      *fwdSens[d][0] = MX::zeros(size1(),size2());
-      for(int iind=0; iind<input.size(); ++iind){
-        if(fwdSeed[d][iind]!=0){
-          MX J = jac(iind);
-          *fwdSens[d][0] += prod(J,fwdSeed_[d][iind]);
-        }
-      }
-    }
-  }
+  }*/
 }
 
 void EvaluationOutput::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
@@ -215,37 +212,5 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
   MXNode::deepCopyMembers(already_copied);
   fcn_ = deepcopy(fcn_,already_copied);
 }
-
-MX Evaluation::adFwd(const std::vector<MX>& jx){ 
-  // Save the forward derivative
-  x_ = jx;
-  
-  // Return null
-  return MX();
-}
-
-MX EvaluationOutput::adFwd(const std::vector<MX>& jx){
-  
-  // Get a reference the arguments
-  vector<MX>& x = dynamic_cast<Evaluation*>(dep(0).get())->x_;
-  
-  // Find the number of columns
-  int ncol = -1;
-  for(int i=0; i<x.size(); ++i){
-    if(!x[i].isNull())
-      ncol = x[i].size2();
-  }
-  casadi_assert(ncol>=0);
-  
-  // Return matrix
-  MX ret = MX::zeros(size(),ncol);
-  for(int i=0; i<x.size(); ++i){
-    if(!x[i].isNull()){
-      ret += prod(jac(i),x[i]);
-    }
-  }
-  return ret;
-}
-
 
 } // namespace CasADi

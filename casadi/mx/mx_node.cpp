@@ -139,10 +139,6 @@ void MXNode::print(std::ostream &stream) const{
   print(stream,args);
 }
 
-MX MXNode::adFwd(const std::vector<MX>& jx){
-  throw CasadiException(string("MXNode::adFwd not defined for class ") + typeid(*this).name());
-}
-
 MX MXNode::jac(int iind){
   throw CasadiException(string("MXNode::jac() not defined for class ") + typeid(*this).name());
 }

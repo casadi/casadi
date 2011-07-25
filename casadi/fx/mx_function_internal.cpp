@@ -592,85 +592,53 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   }
   
   // Evaluate all the seed matrices of the algorithm sequentially
-  for(int el=0; el<alg.size(); ++el){
-    // Skip the node if it has already been calculated (i.e. is symbolic or constant)
-    if(!dwork[el].front().isNull()){
-      continue;
+  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
+    // Skip the node if it is a seed matrix
+    if(it->mx->isSymbolic()){
+      // Get index in work vector
+      int wind = it->i_res.front();
+      
+      // Skip if already calculated
+      if(!dwork[wind].front().isNull()){
+        continue;
+      }
     }
-    
-    // Zero seed matrix if constant
-    if(alg[el].mx->isConstant()){
-      
-      // Number of rows
-      int nrow = alg[el].mx.numel();
-      
-      // Save zero matrix
-      for(int d=0; d<nfwd; ++d){
-        dwork[el][d] = MX::zeros(alg[el].mx.size1(),alg[el].mx.size2());
-      }
-      continue;
-    }
-    
-    // Collect the seed matrices
-    if(alg[el].i_arg.empty()){
-      for(int d=0; d<nfwd; ++d){
-        dwork[el][d] = MX::zeros(alg[el].mx.size1(),alg[el].mx.size2());
-      }
-      continue;
-    }
-    
-    if(alg[el].mx->isEvaluation() || alg[el].mx->isOutputNode()){
-      vector<MX> seed(alg[el].i_arg.size());
-      for(int i=0; i<seed.size(); ++i){
-        int ind = alg[el].i_arg[i];
-        if(ind>=0){
-          vector<MX> tmp;
-          for(int iind=0; iind<dwork[ind].size(); ++iind){
-            if(!dwork[ind][iind].isNull()){
-              tmp.push_back(vec(dwork[ind][iind]));
-            }
-          }
-          seed[i] = horzcat(tmp);
-        }
-      }
-      
-      // Save to the memory vector
-      MX tmp2 = alg[el].mx->adFwd(seed);
-      
-      for(int d=0; d<nfwd; ++d){
-        if(tmp2.isNull()) continue;
-        dwork[el][d] = tmp2(range(tmp2.size1()),d);
-        dwork[el][d] = reshape(dwork[el][d],alg[el].mx.size1(),alg[el].mx.size2());
-      }
-      
-    } else {
-      // Result of the evaluation
-      vector<MX> res(1,alg[el].mx);
-      MXPtrV output_p = ptrVec(res);
-      const MXPtrV input_p = ptrVec(alg[el].mx->dep_);
-      
-      // Forward seeds and sensitivities
-      MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
-      for(int d=0; d<nfwd; ++d){
-        fseed_p[d].resize(alg[el].i_arg.size());
-        for(int iind=0; iind<alg[el].i_arg.size(); ++iind){
-          int ind = alg[el].i_arg[iind];
-          fseed_p[d][iind] = &dwork[ind][d];
-        }
 
-        fsens_p[d].resize(alg[el].i_res.size());
-        for(int oind=0; oind<alg[el].i_res.size(); ++oind){
-          int ind = alg[el].i_res[oind];
-          fsens_p[d][oind] = &dwork[ind][d];
-        }
-      }
-      
-      // Dummy arguments for the adjoint sensitivities
-      MXPtrVV aseed_p, asens_p;
-      
-      // Call the evaluation function
-      alg[el].mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
+    // Get the arguments of the evaluation
+    MXPtrV input_p(it->i_arg.size());
+    for(int i=0; i<input_p.size(); ++i){
+      int ind = it->i_arg[i]; // index of the argument
+      input_p[i] = ind<0 ? 0 : &alg[ind].mx;
     }
+        
+    // Result of the evaluation
+    MXPtrV output_p(it->i_res.size());
+    for(int i=0; i<output_p.size(); ++i){
+      int ind = it->i_res[i]; // index of the output
+      output_p[i] = ind<0 ? 0 : &alg[ind].mx;
+    }
+
+    // Forward seeds and sensitivities
+    MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
+    for(int d=0; d<nfwd; ++d){
+      fseed_p[d].resize(it->i_arg.size());
+      for(int iind=0; iind<it->i_arg.size(); ++iind){
+        int ind = it->i_arg[iind];
+        fseed_p[d][iind] = ind<0 ? 0 : &dwork[ind][d];
+      }
+
+      fsens_p[d].resize(it->i_res.size());
+      for(int oind=0; oind<it->i_res.size(); ++oind){
+        int ind = it->i_res[oind];
+        fsens_p[d][oind] = ind<0 ? 0 : &dwork[ind][d];
+      }
+    }
+
+    // Dummy arguments for the adjoint sensitivities
+    MXPtrVV aseed_p, asens_p;
+
+    // Call the evaluation function
+    it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
   }
 
   // Collect the symbolic forward sensitivities
