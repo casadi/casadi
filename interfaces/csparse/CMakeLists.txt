@@ -20,8 +20,8 @@ install(TARGETS csparse_interface
   ARCHIVE DESTINATION lib
 )
 install(DIRECTORY ./ 
-   DESTINATION include/external_packages/CSparse
-   FILES_MATCHING PATTERN "*.h"
+   DESTINATION include/casadi/interfaces/csparse
+   FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )
 
