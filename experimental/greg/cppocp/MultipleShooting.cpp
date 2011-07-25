@@ -235,6 +235,7 @@ void MultipleShooting::writeOctaveOutput( ostream & f, vector<double> & xopt )
 
      // states
      f << "% states\n";
+     f << "multipleShooting = struct();\n";
      f << "multipleShooting.states = struct();\n";
      for (iter = ode.states.begin(); iter != ode.states.end(); iter++){
 	  f << "multipleShooting.states." << iter->first << " = [" ;
