@@ -73,37 +73,11 @@ class Evaluation : public MultipleOutput{
 
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return fcn_.getNumOutputs();}
-
-    std::vector<SXMatrix> xs_;
-    
-    FX fcn_;
-};
-
-/** 
-  \author Joel Andersson 
-  \date 2010-2011
-*/
-class EvaluationOutput : public OutputNode{
-  public:
-
-    /** \brief  Constructor */
-    explicit EvaluationOutput (const MX& parent, int oind);
-  
-    /** \brief  Destructor */
-    virtual ~EvaluationOutput(){}
-
-    /** \brief  Clone function */
-    virtual EvaluationOutput * clone() const;
-
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-
-    /** \brief  Get function reference */
-    virtual FX& getFunction();
         
-    /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output);
+    /** \brief  Get the sparsity of output oind */
+    virtual const CRSSparsity& sparsity(int oind);
 
+    FX fcn_;
 };
 
 } // namespace CasADi

@@ -125,6 +125,11 @@ const CRSSparsity& MXNode::sparsity() const{
   return sparsity_;
 }
 
+const CRSSparsity& MXNode::sparsity(int oind){
+  casadi_assert_message(oind==0, "Index out of bounds");
+  return sparsity_;
+}
+
 void MXNode::print(std::ostream &stream) const{
   vector<string> args(ndep());
   for(int i=0; i<ndep(); ++i){

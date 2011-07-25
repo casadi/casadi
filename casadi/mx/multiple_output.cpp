@@ -39,7 +39,7 @@ OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
   setDependencies(parent);
   
   // Save the sparsity pattern
-  //setSparsity(sp);
+  setSparsity(dep(0)->sparsity(oind));
 }
 
 OutputNode::~OutputNode(){
@@ -57,6 +57,11 @@ void OutputNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
 MX OutputNode::jac(int iind){
   return MX::create(new JacobianReference(MX::create(this),iind));
 }
+
+void OutputNode::print(std::ostream &stream, const std::vector<std::string>& args) const{
+  stream << args[0] << "[" << oind_ <<  "]";
+}
+
 
 
 } // namespace CasADi

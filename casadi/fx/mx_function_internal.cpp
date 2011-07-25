@@ -205,7 +205,7 @@ void MXFunctionInternal::eliminateJacobian(){
     //JacobianReference* jref = dynamic_cast<JacobianReference*>(it->mx.get());
     if(it->mx->isJacobian()){
       // Get a reference to the function
-      FX& fcn = it->mx->getFunction();
+      FX& fcn = it->mx->dep(0)->dep(0)->getFunction();
 
       // Get the input and output indices
       int iind = it->mx->getFunctionInput();
@@ -274,10 +274,10 @@ void MXFunctionInternal::eliminateJacobian(){
       fcn_ref = it->mx->getFunction().get();
       eval_ref = it->mx.get();
     } else if(it->mx->isOutputNode()){
-      fcn_ref = it->mx->getFunction().get();
+      fcn_ref = it->mx->dep(0)->getFunction().get();
       eval_ref = it->mx->dep(0).get();
     } else if(it->mx->isJacobian()){
-      fcn_ref = it->mx->getFunction().get();
+      fcn_ref = it->mx->dep(0)->dep(0)->getFunction().get();
       eval_ref = it->mx->dep(0)->dep(0).get();
     }
     
@@ -321,7 +321,7 @@ void MXFunctionInternal::eliminateJacobian(){
                 }
                 
                 // Create a new evaluation output
-                it->mx = MX::create(new EvaluationOutput(alg[it->i_arg[0]].mx,oind_new));
+                it->mx = MX::create(new OutputNode(alg[it->i_arg[0]].mx,oind_new));
                 
                 // Update dependencies for the evaluation node
                 alg[it->i_arg[0]].i_res[oind_new] = it->i_res[0];
@@ -688,16 +688,18 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   vector<SXMatrix*> sxarg;
   vector<SXMatrix*> sxres;
-  for(int i=0; i<alg.size(); ++i){
-    sxarg.resize((alg[i].i_arg.size()));
+  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+    sxarg.resize(it->i_arg.size());
     for(int c=0; c<sxarg.size(); ++c){
-      sxarg[c] = &work[alg[i].i_arg[c]];
+      int ind = it->i_arg[c];
+      sxarg[c] = ind<0 ? 0 : &work[ind];
     }
-    sxres.resize((alg[i].i_res.size()));
+    sxres.resize(it->i_res.size());
     for(int c=0; c<sxres.size(); ++c){
-      sxres[c] = &work[alg[i].i_res[c]];
+      int ind = it->i_res[c];
+      sxres[c] = ind<0 ? 0 : &work[ind];
     }
-    alg[i].mx->evaluateSX(sxarg,sxres);
+    it->mx->evaluateSX(sxarg,sxres);
   }
   
   // Get the outputs

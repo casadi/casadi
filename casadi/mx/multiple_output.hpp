@@ -48,6 +48,10 @@ class MultipleOutput : public MXNode{
  
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const=0;
+    
+    /** \brief  Get the sparsity of output oind */
+    virtual const CRSSparsity& sparsity(int oind)=0;
+    
 };
 
 class OutputNode : public MXNode{
@@ -59,6 +63,9 @@ class OutputNode : public MXNode{
     /** \brief  Destructor */
     virtual ~OutputNode();
 
+    /** \brief  Clone function */
+    virtual OutputNode* clone() const{ return new OutputNode(*this);}
+
     /** \brief  Evaluate the function numerically */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
@@ -67,6 +74,9 @@ class OutputNode : public MXNode{
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
+
+    /** \brief  Print */
+    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return true;} 

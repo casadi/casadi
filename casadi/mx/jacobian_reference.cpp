@@ -57,7 +57,7 @@ void JacobianReference::evaluateMX(const MXPtrV& input, MXPtrV& output, const MX
 }
 
 FX& JacobianReference::getFunction(){ 
-  return dep(0)->getFunction();
+  return dep(0)->dep(0)->getFunction();
 }
 
 } // namespace CasADi

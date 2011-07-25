@@ -109,26 +109,13 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   }
 }
 
-
-EvaluationOutput::EvaluationOutput(const MX& parent, int oind) : OutputNode(parent,oind){  
-  // Save the sparsity pattern
-  setSparsity(getFunction().output(oind).sparsity());
-}
-
-EvaluationOutput* EvaluationOutput::clone() const{
-  return new EvaluationOutput(*this);
-}
-
-void EvaluationOutput::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << args[0] << "[" << oind_ <<  "]";
+    
+const CRSSparsity& Evaluation::sparsity(int oind){
+  return fcn_.output(oind).sparsity();
 }
 
 FX& Evaluation::getFunction(){ 
   return fcn_;
-}
-
-FX& EvaluationOutput::getFunction(){ 
-  return dep(0)->getFunction();
 }
 
 void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
@@ -137,9 +124,16 @@ void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
   casadi_assert_message(!fcn.isNull(),"Function not an SXFunction or MXFunction");
   vector<SXMatrix> arg(input.size());
   for(int i=0; i<arg.size(); ++i){
-    arg[i] = *input[i];
+    if(input[i]!=0)
+      arg[i] = *input[i];
   }
-  xs_ = fcn.eval(arg);
+  
+  std::vector<SXMatrix> res = fcn.eval(arg);
+  
+  for(int i=0; i<res.size(); ++i){
+    if(output[i]!=0)
+      *output[i] = res[i];
+  }
 }
 
 void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
@@ -198,14 +192,6 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
       }
     }
   }*/
-}
-
-void EvaluationOutput::evaluateSX(const std::vector<SXMatrix*> &input, SXMatrix& output){
-  // Get a reference the arguments
-  const vector<SXMatrix>& xs = dynamic_cast<Evaluation*>(dep(0).get())->xs_;
-  
-  // Copy to output
-  output.set(xs[oind_]);
 }
 
 void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){

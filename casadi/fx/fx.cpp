@@ -64,7 +64,7 @@ vector<MX> FX::call(const vector<MX> &x){
   vector<MX> ret(getNumOutputs());
   for(int i=0; i<ret.size(); ++i){
     if(output(i).numel()>0)
-      ret[i].assignNode(new EvaluationOutput(ev,i));
+      ret[i].assignNode(new OutputNode(ev,i));
   }
   return ret;
 }
