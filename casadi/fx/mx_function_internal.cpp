@@ -79,7 +79,7 @@ double* getptr(Matrix<double>& x){
 		return 0;
 }
 
-void MXFunctionInternal::init(){
+void MXFunctionInternal::init(){  
   log("MXFunctionInternal::init begin");
   
   // Call the init function of the base class
@@ -130,6 +130,10 @@ void MXFunctionInternal::init(){
   vector<int> place_in_work;
   place_in_work.reserve(nodes.size());
   
+  // Place in the algorithm for each node
+  vector<int> place_in_alg;
+  place_in_alg.reserve(nodes.size());
+  
   // Work vector for the virtual machine
   work.resize(0);
   work.reserve(nodes.size());
@@ -150,7 +154,7 @@ void MXFunctionInternal::init(){
       int oind = n->getFunctionOutput();
 
       // Get the index of the parent node
-      int pind = n->dep(0)->temp;
+      int pind = place_in_alg[n->dep(0)->temp];
       
       // Save output to the parent node
       alg[pind].i_res.at(oind) = work.size();
@@ -158,9 +162,8 @@ void MXFunctionInternal::init(){
       // Save place in work vector
       place_in_work.push_back(work.size());
 
-      // Add an element to the algorithm TODO: REMOVE
-      alg.resize(alg.size()+1);
-      alg.back().mx.assignNode(n);
+      // Not in algorithm
+      place_in_alg.push_back(-1);
 
     } else if(n->isJacobian()){
       
@@ -184,7 +187,7 @@ void MXFunctionInternal::init(){
       
       // Save jacobian to map
       pair<jblocks::iterator,bool> jb_loc = jb.insert(oipair(oind,iind));
-      casadi_assert(jb_loc.second==true); // make sure that the jacobian is new
+      casadi_assert_message(jb_loc.second==true,"Multiple identical Jacobian references currently not supported, easy to fix with a test case available"); 
       
       // Get the index of the parent node
       int pind = n->dep(0)->dep(0)->temp;
@@ -195,13 +198,13 @@ void MXFunctionInternal::init(){
       // Save place in work vector
       place_in_work.push_back(work.size());
 
-      // Add an element to the algorithm TODO: REMOVE
-      alg.resize(alg.size()+1);
-      alg.back().mx.assignNode(n);
-
+      // Not in algorithm
+      place_in_alg.push_back(-1);
+      
     } else {
       
       // Add an element to the algorithm
+      place_in_alg.push_back(alg.size());
       alg.resize(alg.size()+1);
       alg.back().mx.assignNode(n);
 
@@ -293,21 +296,11 @@ void MXFunctionInternal::init(){
 
   // Loop over the nodes again, replacing nodes
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+
     // Get the old references to the function and evaluation node (since they will change)
-    void *fcn_ref=0, *eval_ref=0;
     if(it->mx->isEvaluation()){
-      fcn_ref = it->mx->getFunction().get();
-      eval_ref = it->mx.get();
-    } else if(it->mx->isOutputNode()){
-      fcn_ref = it->mx->dep(0)->getFunction().get();
-      eval_ref = it->mx->dep(0).get();
-    } else if(it->mx->isJacobian()){
-      fcn_ref = it->mx->dep(0)->dep(0)->getFunction().get();
-      eval_ref = it->mx->dep(0)->dep(0).get();
-    }
-    
-    // Update evaluation/evaluation output/jacobian node
-    if(eval_ref || fcn_ref){
+      void *fcn_ref = it->mx->getFunction().get();
+      void *eval_ref = it->mx.get();
     
       // Check if the function should be replaced
       evmap::const_iterator ii=m.find(fcn_ref);
@@ -319,50 +312,33 @@ void MXFunctionInternal::init(){
           
           // Make the pointer unique so that other expressions won't be affected
           it->mx.makeUnique(false);
-            
-          if(it->mx->isEvaluation()){
-            
-            // Replace the function if its an evaluation node
-            it->mx->getFunction() = jac[fcn_ref][jj->second];
-            
-            // Make a copy of the result indices
-            vector<int> i_res = it->i_res;
-            
-            // Update the index of the undifferentiated outputs
-            int oind_old=0, oind_new=0;
-            for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
-              if(kk->second<0){
-                i_res[oind_new] = it->i_res[oind_old++];
-              }
-              oind_new++;
+          
+          // Replace the function if its an evaluation node
+          it->mx->getFunction() = jac[fcn_ref][jj->second];
+          
+          // Make a copy of the result indices
+          vector<int> i_res = it->i_res;
+          
+          // Update the index of the undifferentiated outputs
+          int oind_old=0, oind_new=0;
+          for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
+            if(kk->second<0){
+              i_res[oind_new] = it->i_res[oind_old++];
             }
-
-            // Update the index of the jacobian blocks outputs
-            oind_new=0;
-            for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
-              if(kk->second>=0){
-                i_res[oind_new] = it->i_res[oind_old++];
-              }
-              oind_new++;
-            }
-            
-            // Update i_res
-            i_res.swap(it->i_res);
+            oind_new++;
           }
-        }
-      } // if(ii!=m.end()
-    }
-    
-    // Check if any of the dependencies have changed
-    for(int i=0; i<it->i_arg.size(); ++i){
-      int ch = it->i_arg[i];
-      if(ch>=0){
-        if(it->mx->dep(i).get() != alg[ch].mx.get()){
-          // Make sure that the change does not affect other nodes
-          it->mx.makeUnique(false);
-            
-          // Update dependencies
-          it->mx->dep(i) = alg[ch].mx;
+
+          // Update the index of the jacobian blocks outputs
+          oind_new=0;
+          for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
+            if(kk->second>=0){
+              i_res[oind_new] = it->i_res[oind_old++];
+            }
+            oind_new++;
+          }
+          
+          // Update i_res
+          i_res.swap(it->i_res);
         }
       }
     }
@@ -435,8 +411,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    // Skip output nodes (should be removed from the algorithm!)
-    if(it->mx->isOutputNode() || it->mx->isJacobian()) continue;
     
     // Point pointers to the data corresponding to the element
     updatePointers(*it,nfdir,0);
@@ -480,8 +454,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
-      // Skip output nodes (should be removed from the algorithm!)
-      if(it->mx->isOutputNode() || it->mx->isJacobian()) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,nadir);
@@ -609,8 +581,6 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   
   // Evaluate all the seed matrices of the algorithm sequentially
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
-    // Skip output nodes (should be removed from the algorithm!)
-    if(it->mx->isOutputNode() || it->mx->isJacobian()) continue;
     
     // Copy the results of the evaluation, which is known, to the work vector
     if(it->mx->isMultipleOutput()){
@@ -709,7 +679,6 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
   // Create a work array
   vector<SXMatrix> swork(work.size());
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    if(it->mx->isOutputNode() || it->mx->isJacobian()) continue;
     for(int i=0; i<it->i_res.size(); ++i){
       swork[it->i_res[i]] = SXMatrix(it->mx->sparsity(i));
     }
@@ -724,9 +693,6 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
   vector<SXMatrix*> sxarg;
   vector<SXMatrix*> sxres;
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    // Skip output nodes (should be removed from the algorithm!)
-    if(it->mx->isOutputNode() || it->mx->isJacobian()) continue;
-    
     sxarg.resize(it->i_arg.size());
     for(int c=0; c<sxarg.size(); ++c){
       int ind = it->i_arg[c];
