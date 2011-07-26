@@ -59,7 +59,7 @@ MX OutputNode::jac(int iind){
 }
 
 void OutputNode::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << args[0] << "[" << oind_ <<  "]";
+  stream << args[0] << "{" << oind_ <<  "}";
 }
 
 

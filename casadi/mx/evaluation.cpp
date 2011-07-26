@@ -66,7 +66,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   int nadj = adjSeed.size();
   
   // Pass the input and forward seeds to the function
-  for(int i=0; i<ndep(); ++i){
+  for(int i=0; i<input.size(); ++i){
     if(input[i] != 0 && input[i]->size() !=0 ){
       fcn_.setInput(input[i]->data(),i);
       for(int d=0; d<nfwd; ++d){
@@ -76,7 +76,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   }
   
   // Pass the adjoint seed to the function
-  for(int i=0; i<getNumOutputs(); ++i){
+  for(int i=0; i<output.size(); ++i){
     for(int d=0; d<nadj; ++d){
       if(adjSeed[d][0]!=0 && adjSeed[d][0]->size() != 0){
         fcn_.setAdjSeed(adjSeed[d][0]->data(),i,d);
@@ -88,7 +88,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   fcn_.evaluate(nfwd, nadj);
   
   // Get the outputs and forward sensitivities
-  for(int i=0; i<getNumOutputs(); ++i){
+  for(int i=0; i<output.size(); ++i){
     if(output[i] != 0 && output[i]->size() !=0 ){
       fcn_.getOutput(output[i]->data(),i);
       for(int d=0; d<nfwd; ++d){
@@ -98,7 +98,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
   }
   
   // Get the adjoint sensitivities
-  for(int i=0; i<ndep(); ++i){
+  for(int i=0; i<input.size(); ++i){
     for(int d=0; d<nadj; ++d){
       if(adjSens[d][i] != 0 && adjSens[d][i]->size() != 0){
         const vector<double>& asens = fcn_.adjSens(i,d).data();

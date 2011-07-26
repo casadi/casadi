@@ -73,9 +73,6 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Jacobian via source code transformation */
     std::vector<MX> adFwd(const std::vector<MX>& fseed);
 
-    /** \brief Eliminate Jacobian nodes */
-    void eliminateJacobian();
-    
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 

@@ -51,7 +51,10 @@ class MultipleOutput : public MXNode{
     
     /** \brief  Get the sparsity of output oind */
     virtual const CRSSparsity& sparsity(int oind)=0;
-    
+
+    /** \brief  Check if a multiple output node */
+    virtual bool isMultipleOutput() const{return true;}
+
 };
 
 class OutputNode : public MXNode{
