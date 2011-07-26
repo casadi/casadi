@@ -34,6 +34,8 @@ IdasInternal* IdasInternal::clone() const{
   // Return a deep copy
   IdasInternal* node = new IdasInternal(f_,q_);
   node->setOption(dictionary());
+  node->jac_ = jac_;
+  node->linsol_ = linsol_;
   return node;
 }
 
