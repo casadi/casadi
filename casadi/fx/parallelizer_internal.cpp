@@ -62,12 +62,14 @@ void ParallelizerInternal::init(){
   
   // Initialize the dependend functions
   for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
+    // Initialize
+    if(!it->isInit())
+      it->init();
+    
     // Make sure that the functions are unique if we are using OpenMP
     if(mode_==OPENMP && it!=funcs_.begin())
       it->makeUnique();
     
-    // Initialize
-    it->init();
   }
   
   // Clear the indices
