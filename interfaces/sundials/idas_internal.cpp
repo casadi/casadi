@@ -1166,8 +1166,8 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
   }
   
   // Negate as we are integrating backwards
-  for(int i=0; i<np_; ++i)
-    rhsvalBQ[i] *= -1;
+/*  for(int i=0; i<np_; ++i)
+    rhsvalBQ[i] *= -1;*/
 }
 
 int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N_Vector ypB, N_Vector rhsvalBQ, void *user_dataB){
