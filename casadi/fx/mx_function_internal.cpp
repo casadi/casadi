@@ -190,7 +190,7 @@ void MXFunctionInternal::init(){
       casadi_assert_message(jb_loc.second==true,"Multiple identical Jacobian references currently not supported, easy to fix with a test case available"); 
       
       // Get the index of the parent node
-      int pind = n->dep(0)->dep(0)->temp;
+      int pind = place_in_alg[n->dep(0)->dep(0)->temp];
       
       // Save output to the parent node (note that we add to the end, which is not the ultimate position, therefore a sorting takes place later in the code
       alg[pind].i_res.push_back(work.size());
