@@ -227,7 +227,10 @@ MX reshape(const MX &x, const std::vector<int> sz){
 }
 
 MX reshape(const MX &x, int n, int m){
-  return reshape(x,x.sparsity().reshape(n,m));
+  if(n==x.size1() && m==x.size2())
+    return x;
+  else
+    return reshape(x,x.sparsity().reshape(n,m));
 }
 
 MX reshape(const MX &x, const CRSSparsity& sp){
@@ -249,8 +252,11 @@ MX reshape(const MX &x, const CRSSparsity& sp){
 }
 
 MX vec(const MX &x) {
-  // only works if dense
-  return reshape(x,x.numel(),1);
+  if(x.size2()==1){
+    return x;
+  } else {
+    return reshape(x,x.numel(),1);
+  }
 }
 
 MX vecNZ(const MX &x) {
