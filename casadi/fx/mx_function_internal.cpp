@@ -162,12 +162,6 @@ void MXFunctionInternal::init(){
       alg.resize(alg.size()+1);
       alg.back().mx.assignNode(n);
 
-      // Save the indices of the arguments TODO: REMOVE
-      alg.back().i_arg.resize(n->ndep());
-      for(int i=0; i<n->ndep(); ++i){
-        alg.back().i_arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
-      }
-
     } else if(n->isJacobian()){
       
       // Get a reference to the function
@@ -205,60 +199,46 @@ void MXFunctionInternal::init(){
       alg.resize(alg.size()+1);
       alg.back().mx.assignNode(n);
 
-      // Save the indices of the arguments TODO: REMOVE
-      alg.back().i_arg.resize(n->ndep()); 
-      for(int i=0; i<n->ndep(); ++i){
-        alg.back().i_arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
-      }
-
-    } else if(n->isMultipleOutput()){
-
-      // Not in work vector
-      place_in_work.push_back(work.size());
-
+    } else {
+      
       // Add an element to the algorithm
       alg.resize(alg.size()+1);
       alg.back().mx.assignNode(n);
-      
-      // Allocate space for outputs indices (TODO move down)
-      alg.back().i_res.resize(n->getNumOutputs(),-1);
 
-      // Save the indices of the arguments (TODO move down)
+      // Save the indices of the arguments
       alg.back().i_arg.resize(n->ndep());
       for(int i=0; i<n->ndep(); ++i){
         alg.back().i_arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
       }
       
-    } else {
-      
-      // Save place in work vector
-      place_in_work.push_back(work.size());
+      if(n->isMultipleOutput()){
 
-      // Allocate space for outputs indices
-      alg.resize(alg.size()+1);
-      alg.back().mx.assignNode(n);
+        // Not in work vector
+        place_in_work.push_back(-1);
+       
+        // Allocate space for outputs indices
+        alg.back().i_res.resize(n->getNumOutputs(),-1);
+        
+        // No element in the work vector needed, thus continue
+        continue;
+      } else {
+        
+        // Save place in work vector
+        place_in_work.push_back(work.size());
 
-      // Allocate space for the outputs index (TODO move down)
-      alg.back().i_res.resize(1,work.size());
-
-      // Save the indices of the arguments (TODO move down)
-      alg.back().i_arg.resize(n->ndep());
-      for(int i=0; i<n->ndep(); ++i){
-        alg.back().i_arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
+        // Allocate space for the outputs index
+        alg.back().i_res.resize(1,work.size());
       }
     }
     
-//     if(!n->isMultipleOutput()){
-
-      // Allocate memory
-      work.resize(work.size()+1);
-      FunctionIO &val = work.back();
-      val.data = Matrix<double>(n->sparsity(),0);
-      val.dataF.resize(nfdir_);
-      val.dataA.resize(nadir_);
-      val.init();
-
-//    }
+    
+    // Allocate memory for an element in the work vector
+    work.resize(work.size()+1);
+    FunctionIO &val = work.back();
+    val.data = Matrix<double>(n->sparsity(),0);
+    val.dataF.resize(nfdir_);
+    val.dataA.resize(nadir_);
+    val.init();
   }
 
   // Indices corresponding to the inputs
