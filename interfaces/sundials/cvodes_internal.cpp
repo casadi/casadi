@@ -35,6 +35,9 @@ CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
   CVodesInternal* node = new CVodesInternal(f_,q_);
   node->setOption(dictionary());
+  node->jac_f_ = jac_f_;
+  node->jac_ = jac_;
+  node->linsol_ = linsol_;
   return node;
 }
 
