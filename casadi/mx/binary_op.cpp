@@ -33,7 +33,15 @@ using namespace std;
 
 namespace CasADi{
 
-BinaryOp::BinaryOp(Operation op, MX x, MX y) : op_(op){
+BinaryOp::BinaryOp(Operation op, const MX& x, const MX& y) : op_(op){
+  
+}
+
+BinaryOp::~BinaryOp(){
+}
+
+
+SparseSparseOp::SparseSparseOp(Operation op, MX x, MX y) : BinaryOp(op,x,y){
   // If scalar-matrix operation
   if(x.numel()==1 && y.numel()>1){
     x = MX(y.size1(),y.size2(),x);
@@ -58,7 +66,7 @@ void BinaryOp::print(std::ostream &stream, const std::vector<std::string>& args)
   casadi_math<double>::print[op_](stream,args.at(0),args.at(1));
 }
 
-void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void SparseSparseOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   if(nfwd==0 && nadj==0){
@@ -121,7 +129,7 @@ void BinaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMa
   }
 }
 
-void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+void SparseSparseOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],*output[0],mapping_);
 }
 
@@ -146,8 +154,8 @@ void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
   }
 }
 
-BinaryOp* BinaryOp::clone() const{
-  return new BinaryOp(*this);
+SparseSparseOp* SparseSparseOp::clone() const{
+  return new SparseSparseOp(*this);
 }
 
 } // namespace CasADi

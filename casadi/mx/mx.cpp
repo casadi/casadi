@@ -317,7 +317,7 @@ MX MX::matrix_scalar(int op, const MX &x, const MX &y){
 }
 
 MX MX::matrix_matrix(int op, const MX &x, const MX &y){
-  return create(new BinaryOp(Operation(op),x,y)); 
+  return create(new SparseSparseOp(Operation(op),x,y)); 
 }
 
 MX operator*(const MX &x, const MX &y){

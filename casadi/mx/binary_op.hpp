@@ -33,13 +33,10 @@ namespace CasADi{
 class BinaryOp : public MXNode{
   public:
     /** \brief  Constructor */
-    BinaryOp(Operation op, MX x, MX y);
+    BinaryOp(Operation op, const MX& x, const MX& y);
     
     /** \brief  Destructor */
-    virtual ~BinaryOp(){}
-
-    /** \brief  Clone function */
-    virtual BinaryOp * clone() const;
+    virtual ~BinaryOp()=0;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
@@ -47,21 +44,39 @@ class BinaryOp : public MXNode{
     /// Is it a certain operation
     virtual bool isOperation(int op) const{ return op==op_;};
 
-    /** \brief  Evaluate the function numerically */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-
-    /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
-
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     //! \brief Operation
     Operation op_;
     
+};
+
+/// A sparse matrix-matrix operation
+class SparseSparseOp : public BinaryOp{
+  public:
+    
+    /** \brief  Constructor */
+    SparseSparseOp(Operation op, MX x, MX y);
+
+    /** \brief  Destructor */
+    virtual ~SparseSparseOp(){};
+
+    /** \brief  Clone function */
+    virtual SparseSparseOp * clone() const;
+
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
+
 };
+
+
 
 } // namespace CasADi
 
