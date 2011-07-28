@@ -25,6 +25,7 @@
 #include <vector>
 #include <sstream>
 #include <cassert>
+#include "../matrix/sparsity_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -34,26 +35,14 @@ using namespace std;
 namespace CasADi{
 
 BinaryOp::BinaryOp(Operation op, const MX& x, const MX& y) : op_(op){
-  
+  setDependencies(x,y);
 }
 
 BinaryOp::~BinaryOp(){
 }
 
 
-SparseSparseOp::SparseSparseOp(Operation op, MX x, MX y) : BinaryOp(op,x,y){
-  // If scalar-matrix operation
-  if(x.numel()==1 && y.numel()>1){
-    x = MX(y.size1(),y.size2(),x);
-  }
-  
-  // If matrix-scalar operation
-  if(y.numel()==1 && x.numel()>1){
-    y = MX(x.size1(),x.size2(),y);
-  }
-  
-  setDependencies(x,y);
-  
+SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
   // Get the sparsity pattern
   bool f00_is_zero = casadi_math<double>::f00_is_zero[op_];
   bool f0x_is_zero = casadi_math<double>::f0x_is_zero[op_];
@@ -133,6 +122,27 @@ void SparseSparseOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
   Matrix<SX>::binary_no_alloc(casadi_math<SX>::funE[op_],*input[0],*input[1],*output[0],mapping_);
 }
 
+// void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+//   // Evaluate function
+// //  if(!output_given){
+//     casadi_math<SXMatrix>::fun[op_](*input[0],*input[1],*output[0]);
+//  // }
+// 
+//   // Number of forward directions
+//   int nfwd = fwdSens.size();
+//   int nadj = adjSeed.size();
+//   if(nfwd>0 || nadj>0){
+//     // Get partial derivatives
+//     SXMatrix pd[2];
+//     casadi_math<SXMatrix>::der[op_](*input[0],*input[1],*output[0],pd);
+//     
+//     // Chain rule
+//     for(int d=0; d<nfwd; ++d){
+//       *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
+//     }
+//   }
+// }
+
 void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
   if(!output_given){
@@ -154,9 +164,159 @@ void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
   }
 }
 
-SparseSparseOp* SparseSparseOp::clone() const{
-  return new SparseSparseOp(*this);
+NonzerosScalarOp::NonzerosScalarOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+  setSparsity(x.sparsity());
 }
+
+template<typename T, typename MatV, typename MatVV> 
+void NonzerosScalarOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+
+  // Get data
+  vector<T>& output0 = output[0]->data();
+  const vector<T> &input0 = input[0]->data();
+  const vector<T> &input1 = input[1]->data();
+  
+  if(nfwd==0 && nadj==0){
+    for(int el=0; el<input0.size(); ++el){
+      casadi_math<T>::fun[op_](input0[el],input1[0],output0[el]);
+    }
+  } else {
+
+    // Partial derivatives
+    T pd[2];
+
+    for(int el=0; el<input0.size(); ++el){
+      casadi_math<T>::fun[op_](input0[el],input1[0],output0[el]);
+      casadi_math<T>::der[op_](input0[el],input1[0],output0[el],pd);
+      // Propagate forward seeds
+      for(int d=0; d<nfwd; ++d){
+        fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[el] + pd[1]*fwdSeed[d][1]->data()[0];
+      }
+    
+      // Propagate adjoint seeds
+      for(int d=0; d<nadj; ++d){
+        T s = adjSeed[d][0]->data()[el];
+        adjSens[d][0]->data()[el] += s*pd[0];
+        adjSens[d][1]->data()[0]  += s*pd[1];
+      }
+    }
+  }
+}
+
+void NonzerosScalarOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+void NonzerosScalarOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+ScalarNonzerosOp::ScalarNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+  setSparsity(y.sparsity());
+}
+
+template<typename T, typename MatV, typename MatVV> 
+void ScalarNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+
+  // Get data
+  vector<T>& output0 = output[0]->data();
+  const vector<T> &input0 = input[0]->data();
+  const vector<T> &input1 = input[1]->data();
+  
+  if(nfwd==0 && nadj==0){
+    for(int el=0; el<input1.size(); ++el){
+      casadi_math<T>::fun[op_](input0[0],input1[el],output0[el]);
+    }
+  } else {
+
+    // Partial derivatives
+    T pd[2];
+
+    for(int el=0; el<input1.size(); ++el){
+      casadi_math<T>::fun[op_](input0[0],input1[el],output0[el]);
+      casadi_math<T>::der[op_](input0[0],input1[el],output0[el],pd);
+      // Propagate forward seeds
+      for(int d=0; d<nfwd; ++d){
+        fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[0] + pd[1]*fwdSeed[d][1]->data()[el];
+      }
+    
+      // Propagate adjoint seeds
+      for(int d=0; d<nadj; ++d){
+        T s = adjSeed[d][0]->data()[el];
+        adjSens[d][0]->data()[0]  += s*pd[0];
+        adjSens[d][1]->data()[el] += s*pd[1];
+      }
+    }
+  }
+}
+
+void ScalarNonzerosOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+void ScalarNonzerosOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+
+NonzerosNonzerosOp::NonzerosNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+  setSparsity(x.sparsity());
+}
+
+template<typename T, typename MatV, typename MatVV> 
+void NonzerosNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+
+  // Get data
+  vector<T>& output0 = output[0]->data();
+  const vector<T> &input0 = input[0]->data();
+  const vector<T> &input1 = input[1]->data();
+  
+  if(nfwd==0 && nadj==0){
+    for(int el=0; el<input0.size(); ++el){
+      casadi_math<T>::fun[op_](input0[el],input1[el],output0[el]);
+    }
+  } else {
+
+    // Partial derivatives
+    T pd[2];
+
+    for(int el=0; el<input0.size(); ++el){
+      casadi_math<T>::fun[op_](input0[el],input1[el],output0[el]);
+      casadi_math<T>::der[op_](input0[el],input1[el],output0[el],pd);
+      // Propagate forward seeds
+      for(int d=0; d<nfwd; ++d){
+        fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[el] + pd[1]*fwdSeed[d][1]->data()[el];
+      }
+    
+      // Propagate adjoint seeds
+      for(int d=0; d<nadj; ++d){
+        T s = adjSeed[d][0]->data()[el];
+        adjSens[d][0]->data()[el] += s*pd[0];
+        adjSens[d][1]->data()[el] += s*pd[1];
+      }
+    }
+  }
+}
+
+void NonzerosNonzerosOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+void NonzerosNonzerosOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+
+
+
+//    setSparsity(sp_dense(x.size1(),x.size2()));
+
 
 } // namespace CasADi
 

@@ -368,6 +368,12 @@ MX lift(const MX& x){
   return x;
 }
 
+MX densify(const MX& x){
+  MX ret = x;
+  makeDense(ret);
+  return ret;
+}
+
 void makeDense(MX& x){
   // Quick return if already dense
   if(x.dense()) return;

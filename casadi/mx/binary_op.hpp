@@ -47,23 +47,26 @@ class BinaryOp : public MXNode{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
+    /** \brief  Evaluate the function symbolically (SX) */
+    //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
     //! \brief Operation
     Operation op_;
     
 };
 
-/// A sparse matrix-matrix operation
+/// A sparse matrix-matrix binary operation
 class SparseSparseOp : public BinaryOp{
   public:
     
     /** \brief  Constructor */
-    SparseSparseOp(Operation op, MX x, MX y);
+    SparseSparseOp(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor */
     virtual ~SparseSparseOp(){};
 
     /** \brief  Clone function */
-    virtual SparseSparseOp * clone() const;
+    virtual SparseSparseOp * clone() const{ return new SparseSparseOp(*this);}
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -73,8 +76,80 @@ class SparseSparseOp : public BinaryOp{
 
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
-
 };
+
+/// A matrix-scalar binary operation where one loops only over nonzeros of the matrix
+class NonzerosScalarOp : public BinaryOp{
+  public:
+    
+    /** \brief  Constructor */
+    NonzerosScalarOp(Operation op, const MX& x, const MX& y);
+
+    /** \brief  Destructor */
+    virtual ~NonzerosScalarOp(){};
+
+    /** \brief  Clone function */
+    virtual NonzerosScalarOp * clone() const{ return new NonzerosScalarOp(*this);}
+
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function (template) */
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+};
+
+/// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
+class ScalarNonzerosOp : public BinaryOp{
+  public:
+    
+    /** \brief  Constructor */
+    ScalarNonzerosOp(Operation op, const MX& x, const MX& y);
+
+    /** \brief  Destructor */
+    virtual ~ScalarNonzerosOp(){};
+
+    /** \brief  Clone function */
+    virtual ScalarNonzerosOp * clone() const{ return new ScalarNonzerosOp(*this);}
+
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function (template) */
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+};
+
+/// A matrix-matrix binary operation with matching nonzeros
+class NonzerosNonzerosOp : public BinaryOp{
+  public:
+    
+    /** \brief  Constructor */
+    NonzerosNonzerosOp(Operation op, const MX& x, const MX& y);
+
+    /** \brief  Destructor */
+    virtual ~NonzerosNonzerosOp(){};
+
+    /** \brief  Clone function */
+    virtual NonzerosNonzerosOp * clone() const{ return new NonzerosNonzerosOp(*this);}
+
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /** \brief  Evaluate the function (template) */
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+};
+
 
 
 

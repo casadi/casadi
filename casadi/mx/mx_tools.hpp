@@ -160,6 +160,9 @@ MX lift(const MX& x);
 /** \brief  Make the matrix dense */
 void makeDense(MX& x);
 
+/** \brief  Make the matrix dense */
+MX densify(const MX& x);
+
 /** \brief  Create a parent MX on which all given MX's will depend.
 
  In some sense, this function is the inverse of 

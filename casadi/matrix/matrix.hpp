@@ -463,6 +463,7 @@ class Matrix : public PrintableObject{
     Matrix<T> fabs() const;
     Matrix<T> fmin(const Matrix<T>& y) const;
     Matrix<T> fmax(const Matrix<T>& y) const;
+    Matrix<T> erf() const;
     //@}
     
     //@{
@@ -637,12 +638,6 @@ namespace std{
 
   template<class T>
   CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
-
-  template<class T>
-  CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
-
-  template<class T>
-  CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
 
   template<class T>
   CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__pow__(y);}
@@ -1633,6 +1628,11 @@ Matrix<T> Matrix<T>::cos() const{
 template<class T>
 Matrix<T> Matrix<T>::tan() const{
   return unary_old(CasADi::casadi_operators<T>::tan);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::erf() const{
+  return unary_old(CasADi::casadi_operators<T>::erf);
 }
 
 template<class T>

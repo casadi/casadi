@@ -250,14 +250,13 @@ Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
 
 // Global namespace
 template<class T>
-CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b);
+CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
 
 template<class T>
-CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b);
+CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
 
 template<class T>
-CasADi::Matrix<T> erf(const CasADi::Matrix<T>& a);
-
+CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
 
 #ifndef SWIG
 
@@ -848,29 +847,6 @@ Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
 
 
 } // namespace CasADi
-
-template<class T>
-CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b){
-  casadi_assert_message(0,"not implemented");
-  CasADi::Matrix<T> ret;
-  return ret;
-}
-
-template<class T>
-CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& a, const CasADi::Matrix<T>& b){
-  casadi_assert_message(0,"not implemented");
-  CasADi::Matrix<T> ret;
-  return ret;
-}
-
-template<class T>
-CasADi::Matrix<T> erf(const CasADi::Matrix<T>& a){
-  casadi_assert_message(0,"not implemented");
-  CasADi::Matrix<T> ret;
-  return ret;
-}
-
-
 
 
 #endif //SWIG
