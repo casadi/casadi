@@ -289,6 +289,7 @@ class casadi_operators<SX>{
     static SX fmin(const SX&x, const SX&y);
     static SX fmax(const SX&x, const SX&y);
     static SX fabs(const SX&x);
+    static SX erf(const SX&x);
 };
 
 #endif // SWIG

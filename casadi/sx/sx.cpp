@@ -546,6 +546,9 @@ SX casadi_operators<SX>::fabs(const SX&x){
   return x.fabs();
 }
 
+SX casadi_operators<SX>::erf(const SX&x){ 
+  return x.erf();
+}
 
 SX::operator Matrix<SX>() const{
   return Matrix<SX>(1,1,*this);
