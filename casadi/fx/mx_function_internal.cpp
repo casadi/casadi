@@ -554,15 +554,42 @@ std::vector<MX> MXFunctionInternal::jac(int iind){
     }
   }
   
-  // Forward mode automatic differentiation, symbolically
-  return adFwd(fseed);
-}
-
-std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
-  casadi_assert(isInit());
-  
   // Get the number of columns
   const int nfwd = fseed.front().size2();
+
+  // Fseed vector
+  vector<vector<MX> > fseedv(nfwd);
+  for(int d=0; d<nfwd; ++d){
+    fseedv[d].resize(input_.size());
+    for(int iind=0; iind<input_.size(); ++iind){
+      fseedv[d][iind] = fseed[iind](range(fseed[iind].size1()),d);
+      if(inputv[iind].size2()>1)
+        fseedv[d][iind] = reshape(fseedv[d][iind],inputv[iind].size1(),inputv[iind].size2());
+    }
+  }
+  
+  // Forward mode automatic differentiation, symbolically
+  vector<vector<MX> > retv = adFwd(fseedv);
+
+  // Collect the directions
+  vector<MX> ret(outputv.size());
+  for(int oind=0; oind<outputv.size(); ++oind){
+    int el = outputv_ind[oind];
+    vector<MX> tmp(nfwd);
+    for(int d=0; d<nfwd; ++d){
+      tmp[d] = vec(retv[d][oind]);
+    }
+    ret[oind] = horzcat(tmp);
+  }
+  
+  return ret;
+}
+
+std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
+  casadi_assert(isInit());
+
+    // Get the number of directions
+  const int nfwd = fseed.size();
 
   // Symbolic work
   std::vector<MX> swork(work.size());
@@ -574,8 +601,7 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   for(int ind=0; ind<input_.size(); ++ind){
     int el = inputv_ind[ind];
     for(int d=0; d<nfwd; ++d){
-      dwork[el][d] = fseed[ind](range(fseed[ind].size1()),d);
-      dwork[el][d] = reshape(dwork[el][d],inputv[ind].size1(),inputv[ind].size2());
+      dwork[el][d] = fseed[d][ind];
     }
   }
   
@@ -597,8 +623,6 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
     if(it->mx->isSymbolic()){
       // Get index in work vector
       int wind = it->i_res.front();
-      
-      // Skip if already calculated
       if(!dwork[wind].front().isNull()){
         continue;
       }
@@ -642,17 +666,14 @@ std::vector<MX> MXFunctionInternal::adFwd(const std::vector<MX>& fseed){
   }
 
   // Collect the symbolic forward sensitivities
-  vector<MX> ret(outputv.size());
-  for(int ind=0; ind<outputv.size(); ++ind){
-    int el = outputv_ind[ind];
-    vector<MX> tmp = dwork[el];
-    vector<MX> tmp1;
-    for(int d=0; d<nfwd; ++d){
-      tmp1.push_back(vec(tmp[d]));
+  vector<vector<MX> > ret(nfwd);
+  for(int d=0; d<nfwd; ++d){
+    ret[d].resize(outputv.size());
+    for(int oind=0; oind<outputv.size(); ++oind){
+      int el = outputv_ind[oind];
+      ret[d][oind] = dwork[el][d];
     }
-    ret[ind] = horzcat(tmp1);
   }
-  
   return ret;
 }
 
