@@ -157,9 +157,10 @@ void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
   casadi_assert_message(jj.size()==el.size2(),"right hand size must match dimension of left hand side in assignment");
   if(dense() && el.dense()){
     // Dense mode
+    int ld = size2(), ld_el = el.size2(); // leading dimensions
     for(int i=0; i<ii.size(); ++i) {
       for(int j=0; j<jj.size(); ++j) {
-        (*this)[ii[i]*size2() + jj[j]]=el[i*el.size2()+j];
+        (*this)[ii[i]*ld + jj[j]]=el[i*ld_el+j];
       }
     }
   } else {

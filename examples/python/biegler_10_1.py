@@ -26,6 +26,7 @@ for N in range(1,11):
   z = SX("z")
   F = SXFunction([[z]],[[z*z - 2*z + 1]])
   F.setOption("name","dz/dt")
+  F.init()
   
   z0 = -3
   

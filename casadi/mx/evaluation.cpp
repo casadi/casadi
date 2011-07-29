@@ -24,6 +24,7 @@
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
+#include "../matrix/matrix_tools.hpp"
 #include "../fx/x_function.hpp"
 #include "jacobian_reference.hpp"
 
@@ -159,21 +160,29 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
       // Skip of not used
       if(output[oind]==0) continue;
           
-      // Return matrix
-      MX ret2 = MX::zeros(output[oind]->numel(),1);
-      vector<MX> ret3(nfwd,ret2);
+      // Forward sensitivities (start with zero)
+      *fwdSens[0][oind] = MX::zeros(output[oind]->numel(),1);
+      for(int d=1; d<nfwd; ++d){
+        *fwdSens[d][oind] = *fwdSens[0][oind];
+      }
       
       for(int iind=0; iind<fwdSeed.front().size(); ++iind){
         if(fwdSeed[0][iind]!=0){
+          
           MX J = MX::create(new JacobianReference(*output[oind],iind));
+          if(isZero(J)) continue;
+          
+          // Products separately
           for(int d=0; d<nfwd; ++d){
-            ret3[d] += prod(J,vec(*fwdSeed[d][iind]));
+            *fwdSens[d][oind] += prod(J,vec(*fwdSeed[d][iind]));
           }
         }
       }
       
-      for(int d=0; d<nfwd; ++d){
-        *fwdSens[d][oind] = reshape(ret3[d],output[oind]->size1(),output[oind]->size2());
+      if(output[oind]->size2()>1){
+        for(int d=0; d<nfwd; ++d){
+          *fwdSens[d][oind] = reshape(*fwdSens[d][oind],output[oind]->size1(),output[oind]->size2());
+        }
       }
     }
   }
