@@ -161,6 +161,11 @@ void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
     for(int d=0; d<nfwd; ++d){
       *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
     }
+    
+    for(int d=0; d<nadj; ++d){
+      *adjSens[d][0] += pd[0]*(*adjSeed[d][0]);
+      *adjSens[d][1] += pd[1]*(*adjSeed[d][0]);
+    }
   }
 }
 

@@ -23,10 +23,21 @@ void trivial(){
   f_out[1] = MX::eye(3);
   MXFunction f(f_in,f_out);
   f.init();
+  
+  // Jacobians
   vector<MX> jacX = f.jac(0);
   vector<MX> jacV = f.jac(1);
   cout << "jacX = " << jacX << endl;
   cout << "jacV = " << jacV << endl;
+  
+  // Gradients
+  vector<MX> grad0 = f.grad(0);
+  vector<MX> grad1 = f.grad(1);
+  cout << "grad0 = " << grad0 << endl;
+  cout << "grad1 = " << grad1 << endl;
+  
+  
+  
 }
 
 void subtraction(){
@@ -42,6 +53,9 @@ void subtraction(){
   vector<MX> jacV = f.jac(1);
   cout << "jacX = " << jacX << endl;
   cout << "jacV = " << jacV << endl;
+
+  vector<MX> g = f.grad(0);
+  cout << "g = " << g << endl;
   
   MXFunction f2(f_in,V-X);
   f2.init();
@@ -49,6 +63,9 @@ void subtraction(){
   vector<MX> jacV2 = f2.jac(1);
   cout << "jacX2 = " << jacX2 << endl;
   cout << "jacV2 = " << jacV2 << endl;
+  
+  vector<MX> g2 = f2.grad(0);
+  cout << "g2 = " << g2 << endl;
   
 }
 
@@ -179,6 +196,7 @@ int main(){
 
   // Subtraction
   subtraction();
+  return 0;
     
   // Function evaluation
   evaluation();

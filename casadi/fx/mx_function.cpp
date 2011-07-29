@@ -91,6 +91,10 @@ std::vector<MX> MXFunction::jac(int iind){
   return (*this)->jac(iind);
 }
 
+std::vector<MX> MXFunction::grad(int oind){
+  return (*this)->grad(oind);
+}
+
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
   return (*this)->expand(inputv);
 }

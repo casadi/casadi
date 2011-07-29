@@ -70,6 +70,9 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Jacobian via source code transformation (identity matrix seed in a particular direction) */
     std::vector<MX> jac(int iind);
     
+    /** \brief Gradient via source code transformation (identity matrix seed in a particular direction) */
+    std::vector<MX> grad(int oind);
+    
     /** \brief Forward mode AD using source code transformation */
     std::vector<std::vector<MX> > adFwd(const std::vector<std::vector<MX> > & fseed);
 

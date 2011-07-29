@@ -519,6 +519,7 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   
 std::vector<MX> MXFunctionInternal::jac(int ider){
   casadi_assert(isInit());
+  casadi_assert_message(ider<input_.size(),"Index out of bounds");
 
   // Variable with respect to which we differentiate
   const MX& sder = inputv[ider];
@@ -568,6 +569,63 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
       tmp[d] = vec(fsens[d][oind]);
     }
     ret[oind] = horzcat(tmp);
+  }
+  
+  return ret;
+}
+
+std::vector<MX> MXFunctionInternal::grad(int igrad){
+  casadi_assert(isInit());
+  casadi_assert_message(igrad<output_.size(),"Index out of bounds");
+
+  // Variable with respect to which we differentiate
+  const MX& sgrad = outputv[igrad];
+
+  // Number of adjoint directions
+  int nadj = sgrad.size();
+  
+  // Get the seed matrices
+  vector<vector<MX> > aseed(nadj);
+  
+  // Give zero seeds in all directions
+  for(int d=0; d<nadj; ++d){
+    aseed[d].resize(output_.size());
+    for(int oind=0; oind<output_.size(); ++oind){
+      
+      // Access the input expression
+      const MX& s = outputv[oind];
+      if(d==0){
+        aseed[d][oind] = MX::zeros(s.size1(),s.size2());
+      } else {
+        aseed[d][oind] = aseed[0][oind];
+      }
+    }
+  }
+  
+  // Loop over the rows of the output
+  for(int i=0; i<sgrad.size1(); ++i){
+    // loop over the nonzeros of the output (i.e. derivative directions)
+    for(int d=sgrad.sparsity().rowind(i); d<sgrad.sparsity().rowind(i+1); ++d){
+      // get the column in the input matrix
+      int j=sgrad.sparsity().col(d); 
+  
+      // Give a seed in the (i,j) direction
+      aseed[d][igrad](i,j) = 1;
+    }
+  }
+  
+  // Forward mode automatic differentiation, symbolically
+  vector<vector<MX> > asens = adAdj(aseed);
+
+  // Collect the sensitivities
+  vector<MX> ret(inputv.size());
+  vector<MX> tmp(nadj);
+  for(int iind=0; iind<inputv.size(); ++iind){
+    int el = inputv_ind[iind];
+    for(int d=0; d<nadj; ++d){
+      tmp[d] = trans(vec(asens[d][iind]));
+    }
+    ret[iind] = vertcat(tmp);
   }
   
   return ret;
@@ -688,8 +746,8 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
     }
   }
   
-  // Loop over computational nodes in reverse order
-  for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); ++it){
+  // Loop over computational nodes
+  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
     
     // Copy the results of the evaluation, which is known, to the work vector
     if(it->mx->isMultipleOutput()){
@@ -701,6 +759,10 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
     } else {
       swork[it->i_res[0]] = it->mx;
     }
+  }
+  
+  // Loop over computational nodes in reverse order
+  for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); ++it){
     
     // Get the arguments of the evaluation
     MXPtrV input_p(it->i_arg.size());
@@ -727,7 +789,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
         int el = it->i_res[oind];
         aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
         
-        // Provide a seed if no seed exists
+        // Provide a zero seed if no seed exists
         if(el>=0 && dwork[el][d].isNull()){
           dwork[el][d] = MX::zeros(swork[el].size1(),swork[el].size2());
         }
@@ -737,6 +799,11 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
       for(int iind=0; iind<it->i_arg.size(); ++iind){
         int el = it->i_arg[iind];
         asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
+        
+        // Set sensitivities to zero if not yet used
+        if(el>=0 && dwork[el][d].isNull()){
+          dwork[el][d] = MX::zeros(swork[el].size1(),swork[el].size2());
+        }
       }
     }
 

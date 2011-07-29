@@ -106,6 +106,9 @@ public:
   /** \brief Jacobian via source code transformation */
   std::vector<MX> jac(int iind=0);
 
+  /** \brief Gradient via source code transformation */
+  std::vector<MX> grad(int oind=0);
+
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());
   
