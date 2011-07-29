@@ -70,8 +70,11 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Jacobian via source code transformation (identity matrix seed in a particular direction) */
     std::vector<MX> jac(int iind);
     
-    /** \brief Jacobian via source code transformation */
+    /** \brief Forward mode AD using source code transformation */
     std::vector<std::vector<MX> > adFwd(const std::vector<std::vector<MX> > & fseed);
+
+    /** \brief Adjoint mode AD using source code transformation */
+    std::vector<std::vector<MX> > adAdj(const std::vector<std::vector<MX> > & aseed);
 
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
