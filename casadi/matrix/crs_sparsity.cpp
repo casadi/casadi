@@ -537,7 +537,8 @@ CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
   mapping.reserve(size());
 
   // loop over the rows of the resulting object
-  for(int i=0; i<size2(); ++i){
+  int nrow = size2();
+  for(int i=0; i<nrow; ++i){
     
     // Loop over the non-zero entries of the row
     for(list<int>::const_iterator it=buckets[i].begin(); it!=buckets[i].end(); ++it){

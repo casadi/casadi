@@ -531,7 +531,13 @@ MX MX::prod(const MX& y) const{
   } else if(isIdentity(y)){
     return x;
   } else if(isZero(x) || isZero(y)){
-    return MX::zeros(x.size1(),y.size2());
+    // See if one of the arguments can be used as result
+    if(x.size()==0 && y.size1()==y.size2())
+      return x;
+    else if(y.size()==0 && x.size1()==x.size2())
+      return y;
+    else
+      return MX::zeros(x.size1(),y.size2());
   } else if(x.numel()==1 || y.numel()==1){
     return x*y;
   } else if(x.sparsity().diagonal() && y.size2()==1){

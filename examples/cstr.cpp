@@ -115,7 +115,7 @@ int main(){
   dae_in[DAE_P] = u;
   SXFunction dae(dae_in,ocp.implicit_fcn_);
 
-  bool use_kinsol = true;
+  bool use_kinsol = false;
   if(use_kinsol){
     // Create an ODE integrator (CVodes)
     integrator = CVodesIntegrator(ode);
@@ -151,7 +151,7 @@ int main(){
   MultipleShooting ms(integrator,mterm);
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf);
-//  ms.setOption("parallelization","openmp");
+  ms.setOption("parallelization","openmp");
 //  ms.setOption("parallelization","expand");
   ms.init();
 
