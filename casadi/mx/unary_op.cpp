@@ -105,9 +105,14 @@ void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
     MX pd[2];
     casadi_math<MX>::der[op_](*input[0],dummy,*output[0],pd);
     
-    // Chain rule
+    // Propagate forward seeds
     for(int d=0; d<nfwd; ++d){
       *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
+    }
+    
+    // Propagate adjoint seeds
+    for(int d=0; d<nadj; ++d){
+      *adjSens[d][0] += pd[0]*(*adjSeed[d][0]);
     }
   }
 }

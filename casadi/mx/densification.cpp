@@ -65,12 +65,22 @@ void Densification::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
 }
 
 void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  *output[0] = *input[0];
-  makeDense(*output[0]);
+  // Evaluate function
+  if(!output_given){
+    *output[0] = *input[0];
+    makeDense(*output[0]);
+  }
+  
+  // Propagate forward seeds
   int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
   for(int d=0; d<nfwd; ++d){
     *fwdSens[d][0] = *fwdSeed[d][0];
+  }
+
+  // Propagate adjoint seeds
+  int nadj = adjSeed.size();
+  for(int d=0; d<nadj; ++d){
+    *adjSens[d][0] += *adjSeed[d][0];
   }
 }
 
