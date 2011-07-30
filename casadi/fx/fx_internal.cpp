@@ -76,7 +76,7 @@ void FXInternal::init(){
   }
 
   // Resize the matrix that holds the sparsity of the Jacobian blocks
-  jac_sparsity_.resize(getNumOutputs(),getNumInputs());
+  jac_sparsity_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
 
   // Mark the function as initialized
   is_init_ = true;
@@ -296,14 +296,14 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
 }
 
 void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
-  jac_sparsity_.elem(oind,iind) = sp;
+  jac_sparsity_[iind][oind] = sp;
 }
 
 CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   casadi_assert_message(isInit(),"Function not initialized.");
   
   // Get a reference to the block
-  CRSSparsity& jsp = jac_sparsity_.elem(oind,iind);
+  CRSSparsity& jsp = jac_sparsity_[iind][oind];
   
   // Generate, if null
   if(jsp.isNull()){

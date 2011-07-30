@@ -24,6 +24,8 @@
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
+#include "../sx/sx_tools.hpp"
+#include "../fx/sx_function.hpp"
 
 using namespace std;
 
@@ -152,6 +154,35 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   
   // Sparsity
   const CRSSparsity &sp = sparsity();
+
+/*  // Quick hack implementation
+  if(nadj>0){
+    // Symbolic input
+    vector<SXMatrix> input_sx(input.size());
+    SXMatrixPtrV inputp(input.size(),0);
+    for(int i=0; i<input.size(); ++i){
+      input_sx[i] = symbolic("x",input[i]->sparsity());
+      inputp[i] = &input_sx[i];
+    }
+    
+    // Symbolic output
+    vector<SXMatrix> output_sx(output.size());
+    SXMatrixPtrV outputp(output.size(),0);
+    for(int i=0; i<output.size(); ++i){
+      outputp[i] = &output_sx[i];
+    }
+
+    // Evaluate symbolically
+    MXNode::evaluateSX(inputp, outputp);
+
+    // Evaluate
+    SXFunction F(input_sx,output_sx);
+    F.init();
+    
+    
+    
+  }*/
+  
   
   // Quick return if no inputs
   if(nfwd>0 && input.empty()){
@@ -169,7 +200,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   // For all forward directions
   for(int d=0; d<nfwd; ++d){
     // Old implementation
-    std::vector<MX> jx(fwdSeed[d].size());
+    std::vector<MX> jx(input.size());
     for(int i=0; i<jx.size(); ++i){
       jx[i] = vec(*fwdSeed[d][i]);
     }

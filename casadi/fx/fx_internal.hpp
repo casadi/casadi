@@ -196,7 +196,7 @@ class FXInternal : public OptionsFunctionalityNode{
     std::vector<std::vector<FX> > jacs_;
     
     /// Sparsity of the Jacobian blocks
-    Matrix<CRSSparsity> jac_sparsity_;
+    std::vector<std::vector<CRSSparsity> > jac_sparsity_;
 
     /// Use numeric jacobian instead of symbolic
     bool numeric_jacobian_;
