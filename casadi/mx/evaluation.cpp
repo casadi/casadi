@@ -138,9 +138,7 @@ void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
 }
 
 void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
-  
+  // Evaluate function
   if(!output_given){
     // Evaluate the function symbolically
     vector<MX> arg(input.size());
@@ -154,53 +152,68 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
         *output[i] = res[i];
     }
   }
-  
-  if(nfwd>0){
+
+  // Sensitivities
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  if(nfwd>0 || nadj>0){
+    // Loop over outputs
     for(int oind=0; oind<output.size(); ++oind){
       // Skip of not used
       if(output[oind]==0) continue;
           
-      // Forward sensitivities (start with zero)
-      *fwdSens[0][oind] = MX::zeros(output[oind]->numel(),1);
-      for(int d=1; d<nfwd; ++d){
-        *fwdSens[d][oind] = *fwdSens[0][oind];
-      }
+      // Output dimensions
+      int od1 = output[oind]->size1();
+      int od2 = output[oind]->size2();
       
-      for(int iind=0; iind<fwdSeed.front().size(); ++iind){
-        if(fwdSeed[0][iind]!=0){
+      // Loop over inputs
+      for(int iind=0; iind<input.size(); ++iind){
+        // Skip of not used
+        if(input[iind]==0) continue;
+
+        // Input dimensions
+        int id1 = input[iind]->size1();
+        int id2 = input[iind]->size2();
+
+        // Create a Jacobian node
+        MX J = MX::create(new JacobianReference(*output[oind],iind));
+        if(isZero(J)) continue;
+        
+        // Forward sensitivities
+        for(int d=0; d<nfwd; ++d){
+          MX fsens_d = prod(J,vec(*fwdSeed[d][iind]));
+          if(!isZero(fsens_d)){
+            // Reshape sensitivity contribution if necessary
+            if(od2>1) fsens_d = reshape(fsens_d,od1,od2);
+            
+            // Save or add to vector
+            if(fwdSens[d][oind]->isNull()){
+              *fwdSens[d][oind] = fsens_d;
+            } else {
+              *fwdSens[d][oind] += fsens_d;
+            }
+          }
           
-          MX J = MX::create(new JacobianReference(*output[oind],iind));
-          if(isZero(J)) continue;
-          
-          // Products separately
-          for(int d=0; d<nfwd; ++d){
-            *fwdSens[d][oind] += prod(J,vec(*fwdSeed[d][iind]));
+          // If no contribution added, set to zero
+          if(fwdSens[d][oind]->isNull()){
+            *fwdSens[d][oind] = MX::zeros(od1,od2);
           }
         }
-      }
-      
-      if(output[oind]->size2()>1){
-        for(int d=0; d<nfwd; ++d){
-          *fwdSens[d][oind] = reshape(*fwdSens[d][oind],output[oind]->size1(),output[oind]->size2());
+        
+        // Adjoint sensitivities
+        for(int d=0; d<nadj; ++d){
+          MX asens_d = prod(trans(J),vec(*adjSeed[d][oind]));
+          if(!isZero(asens_d)){
+            // Reshape sensitivity contribution if necessary
+            if(id2>1) asens_d = reshape(asens_d,id1,id2);
+            
+            // Add to vector
+            *adjSens[d][iind] += asens_d;
+          }
         }
       }
     }
   }
-  
-/*  for(int d=0; d<nfwd; ++d){
-    for(int oind=0; oind<output.size(); ++oind){
-      if(fwdSens[d][oind]!=0 && !output[oind]->isNull()){
-        continue;
-        *fwdSens[d][oind] = MX::zeros(output[oind]->size1(),output[oind]->size2());
-        for(int iind=0; iind<input.size(); ++iind){
-          if(fwdSeed[d][iind]!=0){
-            MX J = MX::create(new JacobianReference(*output[oind],iind));
-            *fwdSens[d][oind] += prod(J,*fwdSeed[d][iind]);
-          }
-        }
-      }
-    }
-  }*/
 }
 
 void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){

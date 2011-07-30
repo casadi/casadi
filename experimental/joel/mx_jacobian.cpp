@@ -101,9 +101,16 @@ void evaluation(){
   FX Jac_old = Jacobian(Fcn);
   Jac_old.init();
   
-  // Finally, create the symbolic jacobian function
+  // Create the symbolic jacobian function
   FX Jac_sx = fcn.jacobian();
   Jac_sx.init();
+
+  // Calculate the gradient via adjoint mode AD, source code transformation
+  MX G = Fcn.grad().at(0);
+
+  // Create a symbolic Jacobian function using the gradient
+  MXFunction Jac_adj(XY,trans(G));
+  Jac_adj.init();
   
   // Give arguments to x and y
   vector<double> x0(x.size());
@@ -129,6 +136,13 @@ void evaluation(){
   Jac_old.evaluate();
   cout << "Using Jacobian function, nnz = " << Jac_old.output().size() << endl;
   cout << Jac_old.output() << endl;
+
+  Jac_adj.setInput(x0,0);
+  Jac_adj.setInput(y0,1);
+  Jac_adj.evaluate();
+  cout << "Using MXFunction::grad function, nnz = " << Jac_adj.output().size() << endl;
+  cout << Jac_adj.output() << endl;
+
 
 }
 
@@ -196,7 +210,6 @@ int main(){
 
   // Subtraction
   subtraction();
-  return 0;
     
   // Function evaluation
   evaluation();
