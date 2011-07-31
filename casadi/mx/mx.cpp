@@ -191,6 +191,15 @@ MX MX::getNZ(int k) const{
 MX MX::getNZ(const vector<int>& k) const{
   CRSSparsity sp(k.size(),1,true);
   MX ret;
+  
+  for (int i=0;i<k.size();i++) {
+    if (k[i] >= size() ) {
+      std::stringstream ss;
+      ss << "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size() << std::endl;
+      throw CasadiException(ss.str());
+    }
+  }
+  
   ret.assignNode(new Mapping(sp));
   ret->addDependency(*this,k);
   //simplifyMapping(ret);
@@ -215,6 +224,15 @@ void MX::setNZ(const vector<int>& k, const MX& el){
     throw CasadiException(ss.str());
   }
   MX ret;
+  
+  
+  for (int i=0;i<k.size();i++) {
+    if (k[i] >= size() ) {
+      std::stringstream ss;
+      ss << "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size() << std::endl;
+      throw CasadiException(ss.str());
+    }
+  }
   ret.assignNode(new Mapping(sparsity()));
   ret->addDependency(*this,range(size()));
   if (el.size()==1) {

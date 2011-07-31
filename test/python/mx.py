@@ -1477,6 +1477,19 @@ class MXtests(casadiTestCase):
     y = x[0:0]
     self.assertEqual(y.size(),0)
 
+  def test_indexinglimits(self):
+    return
+    self.message("Limits of indexing")
+    y = casadi.MX("y", 3) 
+    self.assertRaises(RuntimeError,lambda : y[[0, 5]] )
+    try:
+      y[[0, 5]] = MX("a")
+      self.assertTrue(False)
+    except RuntimeError:
+      pass
+    y[[0, 2]]
+    y[[0, 2]] = MX("a")
+    
 if __name__ == '__main__':
     unittest.main()
 

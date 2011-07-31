@@ -732,6 +732,18 @@ class SXtests(casadiTestCase):
     self.assertRaises(RuntimeError, lambda : f.eval([q]))
     f.eval([z])
     
+  def test_indexinglimits(self):
+    self.message("Limits of indexing")
+    y = casadi.symbolic("y", 3) 
+    self.assertRaises(RuntimeError,lambda : y[[0, 5]] )
+    try:
+      y[[0, 5]] = SX("a")
+      self.assertTrue(False)
+    except RuntimeError:
+      pass
+    y[[0, 2]]
+    y[[0, 2]] = SX("a")
+      
 if __name__ == '__main__':
     unittest.main()
 

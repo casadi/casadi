@@ -742,7 +742,7 @@ template<class T>
 const Matrix<T> Matrix<T>::getNZ(const std::vector<int>& k) const{
   Matrix<T> ret(k.size(),1,0);
   for(int el=0; el<k.size(); ++el)
-    ret.data()[el] = data()[k[el]];
+    ret.data()[el] = data().at(k[el]);
   
   return ret;
 }
@@ -751,7 +751,7 @@ template<class T>
 const Matrix<T> Matrix<T>::getNZ(const Matrix<int>& k) const{
   Matrix<T> ret(k.sparsity(),0);
   for(int el=0; el<k.size(); ++el)
-    ret.data()[el] = data()[k.at(el)];
+    ret.data()[el] = data().at(k.at(el));
   
   return ret;
 }
@@ -768,7 +768,7 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
     // Allow scalar assignment:
     // m[:2]=3
     for(int k=0; k<kk.size(); ++k)
-      data()[kk[k]] = m.data()[0];
+      data().at(kk[k]) = m.data()[0];
     return;
   }
   if (kk.size()!=m.size()) {
@@ -778,7 +778,7 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
     throw CasadiException(ss.str());
   }
   for(int k=0; k<kk.size(); ++k)
-    data()[kk[k]] = m.data()[k];
+    data().at(kk[k]) = m.data()[k];
 }
 
 template<class T>
@@ -787,7 +787,7 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
     // Allow scalar assignment:
     // m[:2]=3
     for(int k=0; k<kk.size(); ++k)
-      data()[kk.at(k)] = m.data()[0];
+      data().at(kk.at(k)) = m.data()[0];
     return;
   }
   if (!(kk.sparsity()==m.sparsity())) {
@@ -797,7 +797,7 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
     throw CasadiException(ss.str());
   }
   for(int k=0; k<kk.size(); ++k)
-    data()[kk.at(k)] = m.data()[k];
+    data().at(kk.at(k)) = m.data()[k];
 }
 
 template<class T>
