@@ -143,6 +143,172 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
 }
 
 void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  if(0){
+    
+  casadi_assert_message(output_given,"not implemented");
+  casadi_assert(isReady());
+
+  // Nonzero indices
+  const std::vector<int> &nzind = nzmap_.data();
+
+  // Number of derivative directions
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  
+  // Sparsity
+  const CRSSparsity &sp = sparsity();
+  const vector<int>& rowind = sp.rowind();
+  const vector<int>& col = sp.col();
+
+  // Dimensions
+  int d1=sp.size1(), d2=sp.size2();
+  
+  // Quick return if no inputs
+  if(nfwd>0 && input.empty()){
+    for(int oind=0; oind<output.size(); ++oind){
+      if(fwdSens[0][oind]!=0){
+        *fwdSens[0][oind] = MX::zeros(d1,d2);
+        for(int d=0; d<nfwd; ++d){
+          *fwdSens[d][oind] = *fwdSens[0][oind];
+        }
+      }
+    }
+    return;
+  }
+  
+  // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
+  vector<int> nzind_f(nzind.size());
+  
+  // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
+  vector<int> fsens_ind;
+
+  // Mapping for a specific input
+  vector<int> &nz = fsens_ind; // reuse memory
+  vector<int> nzd;
+
+  // For all forward directions
+  for(int d=0; d<nfwd; ++d){
+
+    // Number of nonzeros of the output
+    int nnz=0;
+    
+    // For all inputs
+    for(int iind=0; iind<input.size(); ++iind){
+      // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
+      fsens_ind.resize(input[iind]->size());
+      fill(fsens_ind.begin(),fsens_ind.end(),-1);
+      
+      // Get sparsity of the input and forward sensitivity
+      int id1=input[iind]->size1(), id2=input[iind]->size2();
+      const vector<int>& rowind_i = input[iind]->sparsity().rowind();
+      const vector<int>& rowind_f = fwdSeed[d][iind]->sparsity().rowind();
+      const vector<int>& col_i = input[iind]->sparsity().col();
+      const vector<int>& col_f = fwdSeed[d][iind]->sparsity().col();
+      
+      // Loop over rows of input and forward sensitivities
+      for(int i=0; i<id1; ++i){
+        
+        // Nonzero of the forward sensitivity
+        int el_f = rowind_f[i];
+
+        // Column of the forward sensitivity (-1 if no element)
+        int j_f = el_f==rowind_f[i+1] ? -1 : col_f[el_f];
+        
+        // Loop over nonzeros of the input
+        for(int el=rowind_i[i]; el<rowind_i[i+1]; ++el){
+          
+          // Column of the input
+          int j=col_i[el];
+          
+          // Continue to the same entry in the forward sensitivity matrix
+          while(el_f < rowind_f[i+1] && j_f<j){
+            el_f++;
+            j_f = col_f[el_f];
+          }
+          
+          // Add element to temp vector or -1 of no corresponding entry
+          fsens_ind[el] = j==j_f ? el_f : -1;
+        }
+      }
+
+      // Update nonzero vector
+      for(int el=0; el<nzind_f.size(); ++el){
+        // Check if dependency index match
+        if(depind_[el]==iind){
+          
+          // Point nzind_f to the nonzero index of the sensitivity
+          nzind_f[el] = fsens_ind[nzind[el]];
+          
+          // Count the number of nonzeros
+          nnz += int(nzind_f[el]>=0);
+        }
+      }
+    }
+    
+    // Sparsity of the return matrix
+    CRSSparsity sp_fsens(d1,d2);
+    sp_fsens.reserve(nnz,d1);
+    
+    // Get references to the vectors
+    vector<int>& col_fsens = sp_fsens.colRef();
+    vector<int>& rowind_fsens = sp_fsens.rowindRef();
+    
+    // Loop over rows of the resulting matrix
+    for(int i=0; i<d1; ++i){
+      
+      // Loop over the nonzero elements of the resulting matrix
+      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      
+        // If the corresponding entry exists in the sensitivity matrix
+        if(nzind_f[el]>=0){
+          
+          // Get column
+          int j=col[el];
+          
+          // Add nonzero
+          col_fsens.push_back(j);
+        }
+      }
+      
+      // Save upper bound on nonzero index of the row
+      rowind_fsens[i+1] = col_fsens.size();
+    }
+    
+    // Return matrix
+    *fwdSens[d][0] = MX::create(new Mapping(sp_fsens));
+    
+    // Add the dependencies
+    for(int dp=0; dp<input.size(); ++dp){
+      
+      // Get the local nonzeros
+      nz.clear();
+      nzd.clear();
+      int el=0;
+      for(int k=0; k<nzind_f.size(); ++k){
+        // If a nonzero
+        if(nzind_f[k]>=0){
+        
+          // If dependency matches
+          if(depind_[k]==dp){
+            nz.push_back(el);
+            nzd.push_back(nzind_f[k]);
+          }
+          
+          // Next nonzero
+          el++;
+        }
+      }
+      
+      // Save to return matrix
+      (*fwdSens[d][0])->addDependency(*fwdSeed[d][dp],nzd,nz);
+    }
+  }
+    
+    return;
+  }
+
+  
+  
   casadi_assert_message(output_given,"not implemented");
 
   casadi_assert(isReady());
