@@ -236,6 +236,12 @@ y = symbolic("y",2,1);
 x*y
 y*x
 
+x = SX("x");
+y = SX("y");
+
+x*y
+x/y
+
 num = {DMatrix([1 2; 3 4]),[1 2; 3 4]};
 sym = {symbolic("x",2,2),MX("x",2,2)};
 
@@ -250,6 +256,7 @@ end
 
 disp("Generic_type")
 m=2
+
 
 
 is_differential_ivec = IVector(2*m);

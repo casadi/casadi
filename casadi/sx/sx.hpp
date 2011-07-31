@@ -191,6 +191,14 @@ class SX{
     SX __pow__(const SX& b) const;
     SX __rpow__(const SX& b) const{ return b.__pow__(*this);}
     
+    SX prod(const SX &b) const { return *this * b;}
+    SX rprod(const SX &b) const { return b * *this;}
+    SX __mrdivide__(const SX& b) const{  return *this / b;}
+    SX __rmrdivide__(const SX& b) const{ return b / *this;}
+    SX __mpower__(const SX& b) const {return (*this).__pow__(b);}
+    SX __rmpower__(const SX& b) const{ return b.__pow__(*this);}
+    SX trans() const{ return *this;}
+    
     /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
     SX exp() const;
     SX log() const;
