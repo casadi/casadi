@@ -71,6 +71,7 @@ class meta {
     static bool couldbe_sequence(PyObject * p) {
       if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p)) {
         PyObject *it = PyObject_GetIter(p);
+        if (!it) return false;
         PyObject *pe;
         int i=0;
         while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
@@ -448,3 +449,7 @@ template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) {
 %typemap(freearg) double {}
 
 #endif //SWIGPYTHON
+
+%{
+#define SWIG_Error_return(code, msg)  { SWIG_Error(code, msg); return 0; }
+%}

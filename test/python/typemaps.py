@@ -456,5 +456,14 @@ class typemaptests(casadiTestCase):
     print vertcat([a,[1,2,3]])
     self.assertTrue(isinstance(vertcat([a,[1,2,3]]),MX))
     
+  def test_issue190(self):
+    self.message("regression test issue #190")
+    x=SX("x")
+    x * numpy.array(1)
+    x * numpy.array(1.2)
+
+    symbolic("x") * numpy.array(1.0) 
+    MX("x") * numpy.array(1.0)
+    
 if __name__ == '__main__':
     unittest.main()
