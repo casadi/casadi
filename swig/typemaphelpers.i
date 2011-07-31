@@ -35,6 +35,9 @@ class meta {
   public:
     /// Check if Python object is of type T
     static bool isa(GUESTOBJECT) {
+      #ifdef SWIGPYTHON
+      if (p == Py_None) return false;
+      #endif // SWIGPYTHON
       return istype(p,*meta<T>::name);
     };
     /// Convert Python object to pointer of type T

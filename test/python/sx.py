@@ -743,6 +743,12 @@ class SXtests(casadiTestCase):
       pass
     y[[0, 2]]
     y[[0, 2]] = SX("a")
+    
+  def test_issue181(self):
+    self.message("Regression test #181")
+    x = SX("x")
+    self.assertRaises(TypeError,lambda : SXMatrix([x,None]))
+    self.assertRaises(NotImplementedError,lambda: SXFunction([[x], [None]], [[2 * x]]))
       
 if __name__ == '__main__':
     unittest.main()
