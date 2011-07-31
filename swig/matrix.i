@@ -250,11 +250,12 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
   if (PyInt_Check(p)) {
     m.start_ = PyInt_AsLong(p);
     m.stop_ = m.start_+1;
+    if (m.stop_==0) m.stop_ = std::numeric_limits<int>::max();
     return true;
   } else if (PySlice_Check(p)) {
     PySliceObject *r = (PySliceObject*)(p);
     if(r->start!=Py_None) m.start_ = PyInt_AsLong(r->start);
-    if(r->stop !=Py_None) m.stop_  = PyInt_AsLong(r->stop);
+    m.stop_  = (r->stop ==Py_None) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
     if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
     return true;
   } else {
@@ -284,6 +285,7 @@ int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
     m.step_ = r.inc();
   } else if (p.is_magic_colon()) {
     m.start_ = 0;
+    m.stop_ = std::numeric_limits<int>::max();
   } else if (p.is_numeric_type()) {
     m.start_ = p.int_value()-1;
     m.stop_ = m.start_+1;

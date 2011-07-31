@@ -1471,6 +1471,12 @@ class MXtests(casadiTestCase):
     
     #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
     
+  def test_issue184(self):
+    self.message("Regression test issue #184")
+    x = MX("x", 3)
+    y = x[0:0]
+    self.assertEqual(y.size(),0)
+
 if __name__ == '__main__':
     unittest.main()
 

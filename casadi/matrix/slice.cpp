@@ -25,7 +25,7 @@
 
 namespace CasADi{
 
-Slice::Slice() : start_(0), stop_(0), step_(1){ 
+Slice::Slice() : start_(0), stop_(std::numeric_limits<int>::max()), step_(1){ 
 }
       
 Slice::Slice(int i) : start_(i), stop_(i+1), step_(1){
@@ -37,8 +37,11 @@ Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(
 std::vector<int> Slice::getAll(int len) const{
   int start = start_;
   int stop  = stop_;
+  std::cout << "start:" << start << "- stop: " << stop << std::endl;
   if (start<0) start+=len;
-  if (stop<=0) stop+=len;
+  if (stop<0) stop+=len;
+  if (stop==std::numeric_limits<int>::max()) stop = len;
+  std::cout << "start:" << start << "- stop: " << stop << std::endl;
   return range(start,stop,step_,len);
 }
 

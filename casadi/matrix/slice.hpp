@@ -45,9 +45,10 @@ namespace CasADi{
       /// Get a vector of indices
       std::vector<int> getAll(int len) const;
       
-      /// Data members (all public)
+      /// start value: negative values will get added to length
       int start_;
-      int stop_;
+      /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
+      int stop_; 
       int step_;
   };
   static Slice ALL;
