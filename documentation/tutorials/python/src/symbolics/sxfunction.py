@@ -80,6 +80,7 @@ x=SX("x")
 a=SX("a")
 b=SX("b")
 f = SXFunction([[x],[a,b]],[[a*x + b]]) 
+f.init()
 
 print f.eval([[x],[a,b]])
 print f.eval([[SX(1.0)],[a,b]])
@@ -136,6 +137,7 @@ print f.grad(1)
 print 12
 
 f = SXFunction([x,y], [x*y,x+y])
+f.init()
 print type(x)
 print f.eval([x,y])
 print type(f.eval([x,y]))
@@ -144,6 +146,7 @@ print type(f.eval([x,y])[0][0])
 
 
 f = SXFunction([x], [x+y])
+f.init()
 print type(x)
 print f.eval([x])
 print type(f.eval([x]))

@@ -8,6 +8,7 @@ from numpy import *
 X=symbolic('X',2,2)
 Y=symbolic('Y',2,2)
 f=SXFunction ([X], [X])
+f.init()
 print f.eval([Y])
 
 a=SX("a")

@@ -11,6 +11,7 @@ print type(z), z
 
 #! We need SXFuncion to manipulate the SX graph
 f = SXFunction([[x,y]],[z])
+f.init()
 
 #! We can substitute a leaf in the graph
 w = SX("w")
