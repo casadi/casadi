@@ -57,7 +57,7 @@ class casadi_operators{
     static T fmin(const T&x, const T&y){ return std::min(x,y);}
     static T fmax(const T&x, const T&y){ return std::max(x,y);}
     static T fabs(const T&x){ return std::abs(x);}
-    static T erf(const T&x){ return erf(x);}
+    static T erf(const T&x){ return ::erf(x);}
 };
 
 //@{

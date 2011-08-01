@@ -380,7 +380,7 @@ class Matrix : public PrintableObject{
     Matrix<T> __rmul__(const Matrix<T> &y) const {return y.__mul__(*this);}
     Matrix<T> __rdiv__(const Matrix<T> &y) const {return y.__div__(*this);}
     Matrix<T> __rpow__(const Matrix<T> &y) const {return y.__pow__(*this);}
-    Matrix<T> __rmpower__(const Matrix<T> &y) const {return y.__rmpower__(*this);}
+    Matrix<T> __rmpower__(const Matrix<T> &y) const {return y.__mpower__(*this);}
     Matrix<T> __rmrdivide__ (const Matrix<T> &y) const {return y.__mrdivide__(*this);}
     Matrix<T> __rmldivide__ (const Matrix<T> &y) const {return y.__mldivide__(*this);}
     //@}
@@ -1928,9 +1928,9 @@ void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x
   for(int i=0; i<mapping.size(); ++i){
     // Check which elements are nonzero
     unsigned char m = mapping[i];
-    bool nz0 = m & 1;
-    bool nz1 = m & 2;
-    bool skip_nz = m & 4;
+    bool nz0(m & 1);
+    bool nz1(m & 2);
+    bool skip_nz(m & 4);
     
     // Evaluate
     if(!skip_nz) rd[el++] = fcn(nz0 ? xd[el0] : zero, nz1 ? yd[el1] : zero);
