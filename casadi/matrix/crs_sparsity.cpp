@@ -817,7 +817,7 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char
 }
 
 CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsigned char>& mapping) const{
-  
+  return CRSSparsity();
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{

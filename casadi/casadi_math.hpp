@@ -572,39 +572,6 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   // Create return object
   std::vector<typename casadi_math<T>::funT> ret(NUM_BUILT_IN_OPS,0);
   
-#ifdef _MSC_VER
-  // Specify operations
-  ret[ADD] = reinterpret_cast<funT>(BinaryOperation<ADD>::fcn);
-  ret[SUB] = reinterpret_cast<funT>(BinaryOperation<SUB>::fcn);
-  ret[MUL] = reinterpret_cast<funT>(BinaryOperation<MUL>::fcn);
-  ret[DIV] = reinterpret_cast<funT>(BinaryOperation<DIV>::fcn);
-    
-  ret[NEG] = reinterpret_cast<funT>(BinaryOperation<NEG>::fcn);
-  ret[EXP] = reinterpret_cast<funT>(BinaryOperation<EXP>::fcn);
-  ret[LOG] = reinterpret_cast<funT>(BinaryOperation<LOG>::fcn);
-  ret[POW] = reinterpret_cast<funT>(BinaryOperation<POW>::fcn);
-  ret[CONSTPOW] = reinterpret_cast<funT>(BinaryOperation<CONSTPOW>::fcn);
-
-  ret[SQRT] = reinterpret_cast<funT>(BinaryOperation<SQRT>::fcn);
-  ret[SIN] = reinterpret_cast<funT>(BinaryOperation<SIN>::fcn);
-  ret[COS] = reinterpret_cast<funT>(BinaryOperation<COS>::fcn);
-  ret[TAN] = reinterpret_cast<funT>(BinaryOperation<TAN>::fcn);
-
-  ret[ASIN] = reinterpret_cast<funT>(BinaryOperation<ASIN>::fcn);
-  ret[ACOS] = reinterpret_cast<funT>(BinaryOperation<ACOS>::fcn);
-  ret[ATAN] = reinterpret_cast<funT>(BinaryOperation<ATAN>::fcn);
-
-  ret[STEP] = reinterpret_cast<funT>(BinaryOperation<STEP>::fcn);
-  ret[FLOOR] = reinterpret_cast<funT>(BinaryOperation<FLOOR>::fcn);
-  ret[CEIL] = reinterpret_cast<funT>(BinaryOperation<CEIL>::fcn);
-
-  ret[EQUALITY] = reinterpret_cast<funT>(BinaryOperation<EQUALITY>::fcn);
-
-  ret[ERF] = reinterpret_cast<funT>(BinaryOperation<ERF>::fcn);
-  ret[FMIN] = reinterpret_cast<funT>(BinaryOperation<FMIN>::fcn);
-  ret[FMAX] = reinterpret_cast<funT>(BinaryOperation<FMAX>::fcn);
-#else // _MSC_VER
-  
   // Specify operations
   ret[ADD] = BinaryOperation<ADD>::fcn<T>;
   ret[SUB] = BinaryOperation<SUB>::fcn<T>;
@@ -635,8 +602,6 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[ERF] = BinaryOperation<ERF>::fcn<T>;
   ret[FMIN] = BinaryOperation<FMIN>::fcn<T>;
   ret[FMAX] = BinaryOperation<FMAX>::fcn<T>;
-  
-#endif // _MSC_VER
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -651,39 +616,6 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
   
   // Create return object
   std::vector<typename casadi_math<T>::funTE> ret(NUM_BUILT_IN_OPS,0);
-  
-#ifdef _MSC_VER
-  // Specify operations
-  ret[ADD] = reinterpret_cast<funTE>(BinaryOperationE<ADD>::fcn);
-  ret[SUB] = reinterpret_cast<funTE>(BinaryOperationE<SUB>::fcn);
-  ret[MUL] = reinterpret_cast<funTE>(BinaryOperationE<MUL>::fcn);
-  ret[DIV] = reinterpret_cast<funTE>(BinaryOperationE<DIV>::fcn);
-    
-  ret[NEG] = reinterpret_cast<funTE>(BinaryOperationE<NEG>::fcn);
-  ret[EXP] = reinterpret_cast<funTE>(BinaryOperationE<EXP>::fcn);
-  ret[LOG] = reinterpret_cast<funTE>(BinaryOperationE<LOG>::fcn);
-  ret[POW] = reinterpret_cast<funTE>(BinaryOperationE<POW>::fcn);
-  ret[CONSTPOW] = reinterpret_cast<funTE>(BinaryOperationE<CONSTPOW>::fcn);
-
-  ret[SQRT] = reinterpret_cast<funTE>(BinaryOperationE<SQRT>::fcn);
-  ret[SIN] = reinterpret_cast<funTE>(BinaryOperationE<SIN>::fcn);
-  ret[COS] = reinterpret_cast<funTE>(BinaryOperationE<COS>::fcn);
-  ret[TAN] = reinterpret_cast<funTE>(BinaryOperationE<TAN>::fcn);
-
-  ret[ASIN] = reinterpret_cast<funTE>(BinaryOperationE<ASIN>::fcn);
-  ret[ACOS] = reinterpret_cast<funTE>(BinaryOperationE<ACOS>::fcn);
-  ret[ATAN] = reinterpret_cast<funTE>(BinaryOperationE<ATAN>::fcn);
-
-  ret[STEP] = reinterpret_cast<funTE>(BinaryOperationE<STEP>::fcn);
-  ret[FLOOR] = reinterpret_cast<funTE>(BinaryOperationE<FLOOR>::fcn);
-  ret[CEIL] = reinterpret_cast<funTE>(BinaryOperationE<CEIL>::fcn);
-
-  ret[EQUALITY] = reinterpret_cast<funTE>(BinaryOperationE<EQUALITY>::fcn);
-
-  ret[ERF] = reinterpret_cast<funTE>(BinaryOperationE<ERF>::fcn);
-  ret[FMIN] = reinterpret_cast<funTE>(BinaryOperationE<FMIN>::fcn);
-  ret[FMAX] = reinterpret_cast<funTE>(BinaryOperationE<FMAX>::fcn);
-#else // _MSC_VER
   
   // Specify operations
   ret[ADD] = BinaryOperationE<ADD>::fcn<T>;
@@ -715,8 +647,6 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
   ret[ERF] = BinaryOperationE<ERF>::fcn<T>;
   ret[FMIN] = BinaryOperationE<FMIN>::fcn<T>;
   ret[FMAX] = BinaryOperationE<FMAX>::fcn<T>;
-  
-#endif // _MSC_VER
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -732,38 +662,6 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   std::vector<typename casadi_math<T>::derT> ret(NUM_BUILT_IN_OPS,0);
   
   // Specify operations
-#ifdef _MSC_VER
-  ret[ADD] = reinterpret_cast<derT>(BinaryOperation<ADD>::der);
-  ret[SUB] = reinterpret_cast<derT>(BinaryOperation<SUB>::der);
-  ret[MUL] = reinterpret_cast<derT>(BinaryOperation<MUL>::der);
-  ret[DIV] = reinterpret_cast<derT>(BinaryOperation<DIV>::der);
-    
-  ret[NEG] = reinterpret_cast<derT>(BinaryOperation<NEG>::der);
-  ret[EXP] = reinterpret_cast<derT>(BinaryOperation<EXP>::der);
-  ret[LOG] = reinterpret_cast<derT>(BinaryOperation<LOG>::der);
-  ret[POW] = reinterpret_cast<derT>(BinaryOperation<POW>::der);
-  ret[CONSTPOW] = reinterpret_cast<derT>(BinaryOperation<CONSTPOW>::der);
-
-  ret[SQRT] = reinterpret_cast<derT>(BinaryOperation<SQRT>::der);
-  ret[SIN] = reinterpret_cast<derT>(BinaryOperation<SIN>::der);
-  ret[COS] = reinterpret_cast<derT>(BinaryOperation<COS>::der);
-  ret[TAN] = reinterpret_cast<derT>(BinaryOperation<TAN>::der);
-
-  ret[ASIN] = reinterpret_cast<derT>(BinaryOperation<ASIN>::der);
-  ret[ACOS] = reinterpret_cast<derT>(BinaryOperation<ACOS>::der);
-  ret[ATAN] = reinterpret_cast<derT>(BinaryOperation<ATAN>::der);
-
-  ret[STEP] = reinterpret_cast<derT>(BinaryOperation<STEP>::der);
-  ret[FLOOR] = reinterpret_cast<derT>(BinaryOperation<FLOOR>::der);
-  ret[CEIL] = reinterpret_cast<derT>(BinaryOperation<CEIL>::der);
-
-  ret[EQUALITY] = reinterpret_cast<derT>(BinaryOperation<EQUALITY>::der);
-
-  ret[ERF] = reinterpret_cast<derT>(BinaryOperation<ERF>::der);
-  ret[FMIN] = reinterpret_cast<derT>(BinaryOperation<FMIN>::der);
-  ret[FMAX] = reinterpret_cast<derT>(BinaryOperation<FMAX>::der);
-
-#else // _MSC_VER
   ret[ADD] = BinaryOperation<ADD>::der<T>;
   ret[SUB] = BinaryOperation<SUB>::der<T>;
   ret[MUL] = BinaryOperation<MUL>::der<T>;
@@ -793,7 +691,6 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[ERF] = BinaryOperation<ERF>::der<T>;
   ret[FMIN] = BinaryOperation<FMIN>::der<T>;
   ret[FMAX] = BinaryOperation<FMAX>::der<T>;
-#endif // _MSC_VER
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
