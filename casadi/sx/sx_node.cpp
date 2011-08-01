@@ -123,7 +123,7 @@ bool SXNode::isSmooth() const{
 }
 
 void SXNode::print(std::ostream &stream) const{
-  long remaining_calls = 10000;
+  long remaining_calls = SX::max_num_calls_in_print;
   print(stream,remaining_calls);
 }
 

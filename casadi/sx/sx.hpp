@@ -231,6 +231,9 @@ class SX{
     
     // Set the temporary variable
     void setTemp(int t);
+    
+    // Maximum number of calls
+    static long max_num_calls_in_print;
 
   private:
 #ifndef SWIG

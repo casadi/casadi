@@ -609,6 +609,7 @@ void SX::setTemp(int t){
   (*this)->temp = t;
 }
 
+long SX::max_num_calls_in_print = 10000;
 
 
 } // namespace CasADi
