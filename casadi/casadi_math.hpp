@@ -606,35 +606,35 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
 #else // _MSC_VER
   
   // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::fcn;
-  ret[SUB] = BinaryOperation<SUB>::fcn;
-  ret[MUL] = BinaryOperation<MUL>::fcn;
-  ret[DIV] = BinaryOperation<DIV>::fcn;
+  ret[ADD] = BinaryOperation<ADD>::fcn<T>;
+  ret[SUB] = BinaryOperation<SUB>::fcn<T>;
+  ret[MUL] = BinaryOperation<MUL>::fcn<T>;
+  ret[DIV] = BinaryOperation<DIV>::fcn<T>;
     
-  ret[NEG] = BinaryOperation<NEG>::fcn;
-  ret[EXP] = BinaryOperation<EXP>::fcn;
-  ret[LOG] = BinaryOperation<LOG>::fcn;
-  ret[POW] = BinaryOperation<POW>::fcn;
-  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::fcn;
+  ret[NEG] = BinaryOperation<NEG>::fcn<T>;
+  ret[EXP] = BinaryOperation<EXP>::fcn<T>;
+  ret[LOG] = BinaryOperation<LOG>::fcn<T>;
+  ret[POW] = BinaryOperation<POW>::fcn<T>;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::fcn<T>;
 
-  ret[SQRT] = BinaryOperation<SQRT>::fcn;
-  ret[SIN] = BinaryOperation<SIN>::fcn;
-  ret[COS] = BinaryOperation<COS>::fcn;
-  ret[TAN] = BinaryOperation<TAN>::fcn;
+  ret[SQRT] = BinaryOperation<SQRT>::fcn<T>;
+  ret[SIN] = BinaryOperation<SIN>::fcn<T>;
+  ret[COS] = BinaryOperation<COS>::fcn<T>;
+  ret[TAN] = BinaryOperation<TAN>::fcn<T>;
 
-  ret[ASIN] = BinaryOperation<ASIN>::fcn;
-  ret[ACOS] = BinaryOperation<ACOS>::fcn;
-  ret[ATAN] = BinaryOperation<ATAN>::fcn;
+  ret[ASIN] = BinaryOperation<ASIN>::fcn<T>;
+  ret[ACOS] = BinaryOperation<ACOS>::fcn<T>;
+  ret[ATAN] = BinaryOperation<ATAN>::fcn<T>;
 
-  ret[STEP] = BinaryOperation<STEP>::fcn;
-  ret[FLOOR] = BinaryOperation<FLOOR>::fcn;
-  ret[CEIL] = BinaryOperation<CEIL>::fcn;
+  ret[STEP] = BinaryOperation<STEP>::fcn<T>;
+  ret[FLOOR] = BinaryOperation<FLOOR>::fcn<T>;
+  ret[CEIL] = BinaryOperation<CEIL>::fcn<T>;
 
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn;
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn<T>;
 
-  ret[ERF] = BinaryOperation<ERF>::fcn;
-  ret[FMIN] = BinaryOperation<FMIN>::fcn;
-  ret[FMAX] = BinaryOperation<FMAX>::fcn;
+  ret[ERF] = BinaryOperation<ERF>::fcn<T>;
+  ret[FMIN] = BinaryOperation<FMIN>::fcn<T>;
+  ret[FMAX] = BinaryOperation<FMAX>::fcn<T>;
   
 #endif // _MSC_VER
 
@@ -686,35 +686,35 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
 #else // _MSC_VER
   
   // Specify operations
-  ret[ADD] = BinaryOperationE<ADD>::fcn;
-  ret[SUB] = BinaryOperationE<SUB>::fcn;
-  ret[MUL] = BinaryOperationE<MUL>::fcn;
-  ret[DIV] = BinaryOperationE<DIV>::fcn;
+  ret[ADD] = BinaryOperationE<ADD>::fcn<T>;
+  ret[SUB] = BinaryOperationE<SUB>::fcn<T>;
+  ret[MUL] = BinaryOperationE<MUL>::fcn<T>;
+  ret[DIV] = BinaryOperationE<DIV>::fcn<T>;
     
-  ret[NEG] = BinaryOperationE<NEG>::fcn;
-  ret[EXP] = BinaryOperationE<EXP>::fcn;
-  ret[LOG] = BinaryOperationE<LOG>::fcn;
-  ret[POW] = BinaryOperationE<POW>::fcn;
-  ret[CONSTPOW] = BinaryOperationE<CONSTPOW>::fcn;
+  ret[NEG] = BinaryOperationE<NEG>::fcn<T>;
+  ret[EXP] = BinaryOperationE<EXP>::fcn<T>;
+  ret[LOG] = BinaryOperationE<LOG>::fcn<T>;
+  ret[POW] = BinaryOperationE<POW>::fcn<T>;
+  ret[CONSTPOW] = BinaryOperationE<CONSTPOW>::fcn<T>;
 
-  ret[SQRT] = BinaryOperationE<SQRT>::fcn;
-  ret[SIN] = BinaryOperationE<SIN>::fcn;
-  ret[COS] = BinaryOperationE<COS>::fcn;
-  ret[TAN] = BinaryOperationE<TAN>::fcn;
+  ret[SQRT] = BinaryOperationE<SQRT>::fcn<T>;
+  ret[SIN] = BinaryOperationE<SIN>::fcn<T>;
+  ret[COS] = BinaryOperationE<COS>::fcn<T>;
+  ret[TAN] = BinaryOperationE<TAN>::fcn<T>;
 
-  ret[ASIN] = BinaryOperationE<ASIN>::fcn;
-  ret[ACOS] = BinaryOperationE<ACOS>::fcn;
-  ret[ATAN] = BinaryOperationE<ATAN>::fcn;
+  ret[ASIN] = BinaryOperationE<ASIN>::fcn<T>;
+  ret[ACOS] = BinaryOperationE<ACOS>::fcn<T>;
+  ret[ATAN] = BinaryOperationE<ATAN>::fcn<T>;
 
-  ret[STEP] = BinaryOperationE<STEP>::fcn;
-  ret[FLOOR] = BinaryOperationE<FLOOR>::fcn;
-  ret[CEIL] = BinaryOperationE<CEIL>::fcn;
+  ret[STEP] = BinaryOperationE<STEP>::fcn<T>;
+  ret[FLOOR] = BinaryOperationE<FLOOR>::fcn<T>;
+  ret[CEIL] = BinaryOperationE<CEIL>::fcn<T>;
 
-  ret[EQUALITY] = BinaryOperationE<EQUALITY>::fcn;
+  ret[EQUALITY] = BinaryOperationE<EQUALITY>::fcn<T>;
 
-  ret[ERF] = BinaryOperationE<ERF>::fcn;
-  ret[FMIN] = BinaryOperationE<FMIN>::fcn;
-  ret[FMAX] = BinaryOperationE<FMAX>::fcn;
+  ret[ERF] = BinaryOperationE<ERF>::fcn<T>;
+  ret[FMIN] = BinaryOperationE<FMIN>::fcn<T>;
+  ret[FMAX] = BinaryOperationE<FMAX>::fcn<T>;
   
 #endif // _MSC_VER
 
@@ -764,35 +764,35 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[FMAX] = reinterpret_cast<derT>(BinaryOperation<FMAX>::der);
 
 #else // _MSC_VER
-  ret[ADD] = BinaryOperation<ADD>::der;
-  ret[SUB] = BinaryOperation<SUB>::der;
-  ret[MUL] = BinaryOperation<MUL>::der;
-  ret[DIV] = BinaryOperation<DIV>::der;
+  ret[ADD] = BinaryOperation<ADD>::der<T>;
+  ret[SUB] = BinaryOperation<SUB>::der<T>;
+  ret[MUL] = BinaryOperation<MUL>::der<T>;
+  ret[DIV] = BinaryOperation<DIV>::der<T>;
     
-  ret[NEG] = BinaryOperation<NEG>::der;
-  ret[EXP] = BinaryOperation<EXP>::der;
-  ret[LOG] = BinaryOperation<LOG>::der;
-  ret[POW] = BinaryOperation<POW>::der;
-  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::der;
+  ret[NEG] = BinaryOperation<NEG>::der<T>;
+  ret[EXP] = BinaryOperation<EXP>::der<T>;
+  ret[LOG] = BinaryOperation<LOG>::der<T>;
+  ret[POW] = BinaryOperation<POW>::der<T>;
+  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::der<T>;
 
-  ret[SQRT] = BinaryOperation<SQRT>::der;
-  ret[SIN] = BinaryOperation<SIN>::der;
-  ret[COS] = BinaryOperation<COS>::der;
-  ret[TAN] = BinaryOperation<TAN>::der;
+  ret[SQRT] = BinaryOperation<SQRT>::der<T>;
+  ret[SIN] = BinaryOperation<SIN>::der<T>;
+  ret[COS] = BinaryOperation<COS>::der<T>;
+  ret[TAN] = BinaryOperation<TAN>::der<T>;
 
-  ret[ASIN] = BinaryOperation<ASIN>::der;
-  ret[ACOS] = BinaryOperation<ACOS>::der;
-  ret[ATAN] = BinaryOperation<ATAN>::der;
+  ret[ASIN] = BinaryOperation<ASIN>::der<T>;
+  ret[ACOS] = BinaryOperation<ACOS>::der<T>;
+  ret[ATAN] = BinaryOperation<ATAN>::der<T>;
 
-  ret[STEP] = BinaryOperation<STEP>::der;
-  ret[FLOOR] = BinaryOperation<FLOOR>::der;
-  ret[CEIL] = BinaryOperation<CEIL>::der;
+  ret[STEP] = BinaryOperation<STEP>::der<T>;
+  ret[FLOOR] = BinaryOperation<FLOOR>::der<T>;
+  ret[CEIL] = BinaryOperation<CEIL>::der<T>;
 
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::der;
+  ret[EQUALITY] = BinaryOperation<EQUALITY>::der<T>;
 
-  ret[ERF] = BinaryOperation<ERF>::der;
-  ret[FMIN] = BinaryOperation<FMIN>::der;
-  ret[FMAX] = BinaryOperation<FMAX>::der;
+  ret[ERF] = BinaryOperation<ERF>::der<T>;
+  ret[FMIN] = BinaryOperation<FMIN>::der<T>;
+  ret[FMAX] = BinaryOperation<FMAX>::der<T>;
 #endif // _MSC_VER
 
   // Make sure that all functions were specified
