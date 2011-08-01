@@ -174,6 +174,10 @@ IF(PYTHONINTERP_FOUND)
     ARGS "${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py"
     OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
   )
+
+  # Replace backslashes with normal slashes
+  string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
+
   #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
   install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
     DESTINATION ${PYTHON_INSTALLATION_PATH}
