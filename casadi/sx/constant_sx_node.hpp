@@ -50,7 +50,7 @@ virtual bool isConstant() const{ return true; }
 protected:
 
 /** \brief  print */
-virtual void print(std::ostream &stream) const{
+virtual void print(std::ostream &stream, long& remaining_calls) const{
   stream << getValue();
 }
 

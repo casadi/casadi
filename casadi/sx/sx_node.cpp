@@ -122,4 +122,10 @@ bool SXNode::isSmooth() const{
   return true; // nodes are smooth by default
 }
 
+void SXNode::print(std::ostream &stream) const{
+  long remaining_calls = 10000;
+  print(stream,remaining_calls);
+}
+
+
 } // namespace CasADi

@@ -144,6 +144,11 @@ class SX{
     /** \brief  print to stream */
     friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
 
+    /** \brief  print to stream, limited */
+    #ifndef SWIG
+    void print(std::ostream &stream, long& remaining_calls) const;
+    #endif // SWIG
+    
     /** \brief  string representation (SWIG workaround) */
     std::string toString() const;
     

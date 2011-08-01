@@ -69,7 +69,7 @@ virtual int getOp() const{ return op;}
 Operation op;
 SX      child[2];
 
-virtual void print(std::ostream &stream) const;
+virtual void print(std::ostream &stream, long& remaining_calls) const;
 
 
 };

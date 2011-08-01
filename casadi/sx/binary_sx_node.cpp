@@ -78,12 +78,12 @@ BinarySXNode::~BinarySXNode(){
   }
 }
   
-void BinarySXNode::print(ostream &stream) const{
+void BinarySXNode::print(ostream &stream, long& remaining_calls) const{
   casadi_math<double>::printPre[op](stream);
-  stream << child[0];
+  child[0].print(stream,remaining_calls);
   if (casadi_math<double>::ndeps[op]>1) {
     casadi_math<double>::printSep[op](stream);
-    stream << child[1];
+    child[1].print(stream,remaining_calls);
   }
   casadi_math<double>::printPost[op](stream);
 }

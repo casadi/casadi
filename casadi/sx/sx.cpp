@@ -106,6 +106,15 @@ std::ostream &operator<<(std::ostream &stream, const SX &scalar)
   return stream;
 }
 
+void SX::print(std::ostream &stream, long& remaining_calls) const{
+  if(remaining_calls>0){
+    remaining_calls--;
+    node->print(stream,remaining_calls);
+  } else {
+    stream << "...";
+  }
+}
+
 SX& operator+=(SX &ex, const SX &el){
   return ex = ex + el;
 }

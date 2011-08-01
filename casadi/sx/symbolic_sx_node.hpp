@@ -53,7 +53,7 @@ std::string name;
 protected:
 
 /** \brief  print */
-virtual void print(std::ostream &stream) const{
+virtual void print(std::ostream &stream, long& remaining_calls) const{
   stream << name;
 }
 

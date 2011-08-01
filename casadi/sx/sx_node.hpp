@@ -90,7 +90,10 @@ virtual SX& dep(int i);
 virtual bool isSmooth() const;
 
 /** \brief  print */
-virtual void print(std::ostream &stream) const = 0;
+virtual void print(std::ostream &stream) const;
+
+/** \brief  print */
+virtual void print(std::ostream &stream, long& remaining_calls) const = 0;
 
 /** Temporary variables to be used in user algorithms like sorting, 
  the user is resposible of making sure that use is thread-safe
