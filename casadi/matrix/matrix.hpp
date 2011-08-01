@@ -469,15 +469,15 @@ class Matrix : public PrintableObject{
     //@{
     /// Printing
 #ifndef SWIG
-    virtual void print(std::ostream &stream=limited(std::cout)) const; // print print description
-    virtual void repr(std::ostream &stream=limited(std::cout)) const; // print representation
+    virtual void print(std::ostream &stream=std::cout) const; // print print description
+    virtual void repr(std::ostream &stream=std::cout) const; // print representation
 #endif
     std::string __repr__() { return getRepresentation(); } // python default print
-    void printScalar(std::ostream &stream=limited(std::cout)) const; // print scalar
-    void printVector(std::ostream &stream=limited(std::cout)) const; // print one row vector-style
-    void printMatrix(std::ostream &stream=limited(std::cout)) const; // print one row, matrix-style
-    void printSparse(std::ostream &stream=limited(std::cout)) const; // print sparse matrix style
-    void printDense(std::ostream &stream=limited(std::cout)) const; // Print dense matrix stype
+    void printScalar(std::ostream &stream=std::cout) const; // print scalar
+    void printVector(std::ostream &stream=std::cout) const; // print one row vector-style
+    void printMatrix(std::ostream &stream=std::cout) const; // print one row, matrix-style
+    void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
+    void printDense(std::ostream &stream=std::cout) const; // Print dense matrix stype
     //@}
     
     /** \brief Get string representation of dimensions.
@@ -974,7 +974,6 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
       // Print element
       stream << data()[el] << ",  ";
       j++;
-      STREAMLIMITTEST
     }
     
     // Print trailing zeros
@@ -1003,7 +1002,6 @@ void Matrix<T>::printSparse(std::ostream &stream) const {
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j=col(el);
       stream << "(" << i << "," << j << "): " << data()[el] << std::endl;
-      STREAMLIMITTEST
     }
 }
 

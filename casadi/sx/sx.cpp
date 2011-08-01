@@ -285,7 +285,7 @@ SX SX::unary(int op, const SX& x){
 
 string SX::toString() const{
   stringstream ss;
-  limited(ss) << *this;
+  ss << *this;
   return ss.str();
 }
 

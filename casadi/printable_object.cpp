@@ -25,56 +25,6 @@
 #include <sstream>
 
 
-Lbuffer::Lbuffer(std::ostream &sink, int limit_, std::size_t buff_sz) :
-    sink_(sink),  buffer_(buff_sz + 1),
-    counter(0), limit(limit_)
-{
-    sink_.clear();
-    char *base = &buffer_.front();
-    setp(base, base + buffer_.size() - 1);
-}
-
-Lbuffer::int_type Lbuffer::overflow(int_type ch)
-{
-    if (isfull()) return traits_type::eof();
-    
-    if (sink_ && ch != traits_type::eof())
-    {
-        counter++;
-        if (isfull()) {
-          char p[] = ellipsis;
-          sink_.write(p, 3);
-          if (!dynamic_cast<std::stringstream*>(&sink_)) {
-            char p2[] = "\n";
-            sink_.write(p2,1);
-          }
-          return traits_type::eof();
-        }
-        *pptr() = char(ch);
-        pbump(1);
-        if (do_process()) return ch;
-    }
-
-    return traits_type::eof();
-}
-
-
-int Lbuffer::sync()
-{
-	return do_process() ? 0 : -1;
-}
-
-
-bool Lbuffer::do_process()
-{
-    char *p = pbase();
-    std::ptrdiff_t n = pptr() - pbase();
-    pbump(-n);
-
-    return sink_.write(pbase(), n);
-}
-
-
 using namespace std;
 namespace CasADi{
 
@@ -95,13 +45,13 @@ void PrintableObject::print(std::ostream &stream) const{
 
 string PrintableObject::getRepresentation() const{
   stringstream ss;
-  repr(limited(ss));
+  repr(ss);
   return ss.str();
 }
 
 string PrintableObject::getDescription() const{
   stringstream ss;
-  print(limited(ss));
+  print(ss);
   return ss.str();  
 }
 

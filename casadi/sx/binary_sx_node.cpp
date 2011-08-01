@@ -79,14 +79,11 @@ BinarySXNode::~BinarySXNode(){
 }
   
 void BinarySXNode::print(ostream &stream) const{
-  STREAMLIMITTEST
   casadi_math<double>::printPre[op](stream);
   stream << child[0];
-  STREAMLIMITTEST
   if (casadi_math<double>::ndeps[op]>1) {
     casadi_math<double>::printSep[op](stream);
     stream << child[1];
-    STREAMLIMITTEST
   }
   casadi_math<double>::printPost[op](stream);
 }

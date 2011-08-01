@@ -114,7 +114,7 @@ class SharedObject : public PrintableObject{
     virtual void repr(std::ostream &stream) const;
 
     /// Print a destription of the object
-    virtual void print(std::ostream &stream=limited(std::cout)) const;
+    virtual void print(std::ostream &stream=std::cout) const;
     
     #endif // SWIG
     
