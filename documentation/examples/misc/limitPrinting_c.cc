@@ -1,4 +1,5 @@
 #include "casadi/sx/sx_tools.hpp"
+#include <limits>
 
 using namespace CasADi;
 
@@ -12,7 +13,8 @@ int main(int argc, char *argv[])
   std::cout << s << std::endl;
   
   std::cout << "Unlimited printing" << std::endl;
-  SX::max_num_calls_in_print = numeric_limits<long>::max();
+  SX::max_num_calls_in_print = std::numeric_limits<long>::max();
+
   std::cout << s << std::endl;
   
   std::cout << "Limit to 10 calls" << std::endl;
