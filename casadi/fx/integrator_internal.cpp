@@ -85,6 +85,7 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   
   nx_ = 0;
   np_ = 0;
+  
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
@@ -146,6 +147,27 @@ void IntegratorInternal::init(){
   // Give an intial value for the time horizon
   setInitialTime(getOption("t0"));
   setFinalTime(getOption("tf"));
+  
+  
+  // If time was not specified, initialise it.
+  if (f_.input(DAE_T).numel()==0) {
+    std::vector<MX> in1(DAE_NUM_IN);
+    in1[DAE_T] = MX("T");
+    in1[DAE_Y] = MX("Y",f_.input(DAE_Y).size1(),f_.input(DAE_Y).size2());
+    in1[DAE_YDOT] = MX("YDOT",f_.input(DAE_YDOT).size1(),f_.input(DAE_YDOT).size2());
+    in1[DAE_P] = MX("P",f_.input(DAE_P).size1(),f_.input(DAE_P).size2());
+    std::vector<MX> in2(in1);
+    in2[DAE_T] = MX();
+    f_ = MXFunction(in1,f_.call(in2));
+    f_.init();
+  }
+  
+  // We only allow for 0-D time
+  if (f_.input(DAE_T).numel()!=1) {
+      stringstream ss;
+      ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")";
+      throw CasadiException(ss.str());
+  }
 }
 
 FX IntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
