@@ -574,6 +574,12 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 </table>
 */
+/** \class CasADi::ScalarNonzerosOp
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
 /** \class CasADi::Parallelizer
 <table>
 <caption>List of available options</caption>
@@ -1171,6 +1177,12 @@
 </table>
 */
 /** \class CasADi::casadi_operators< SX >
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
+/** \class CasADi::SparseSparseOp
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
@@ -2176,6 +2188,12 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 </table>
 */
+/** \class CasADi::NonzerosScalarOp
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
 /** \class CasADi::UnaryOperation< EXP >
 <table>
 <caption>List of available options</caption>
@@ -2242,7 +2260,19 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 </table>
 */
+/** \class CasADi::NormF
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
 /** \class CasADi::OptimalControl::VariableTree
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
+/** \class CasADi::NonzerosNonzerosOp
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
