@@ -659,6 +659,19 @@ std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p){
   return ret;
 }
 
+vector<SX> create_symbolic(const string& name) {
+  vector<SX> ret;
+  istringstream iss(name);
+  while (iss) {
+    string varname;
+    iss >> varname;
+    if (varname.find_first_not_of(' ') != std::string::npos) // If the string isn't whitespace only
+      ret.push_back(SX(varname));
+  }
+  return ret;
+}
+
+
 vector<SX> create_symbolic(const string& name, int n){
   vector<SX> ret(n);
   make_symbolic(ret,name);

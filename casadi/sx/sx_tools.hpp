@@ -68,6 +68,14 @@ Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp);
 /** \brief Create a one-dimensional stl vector of length n with symbolic variables */
 std::vector<SX> create_symbolic(const std::string& name, int n);
 
+/** \brief Create a one-dimensional stl vector of symbolic variables, whose names are given in space-separated form 
+* Python example:
+* \code
+* (a,b,c) = create_symbolic("a b c")
+* \endcode
+*/
+std::vector<SX> create_symbolic(const std::string& name);
+
 /** \brief Create a two-dimensional stl vector of length n-by-m with symbolic variables */
 std::vector< std::vector<SX> > create_symbolic(const std::string& name, int n, int m);
 
