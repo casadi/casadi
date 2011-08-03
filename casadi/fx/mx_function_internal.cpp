@@ -564,7 +564,6 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
   vector<MX> ret(outputv.size());
   vector<MX> tmp(nfwd);
   for(int oind=0; oind<outputv.size(); ++oind){
-    int el = outputv_ind[oind];
     for(int d=0; d<nfwd; ++d){
       tmp[d] = vec(fsens[d][oind]);
     }
@@ -621,7 +620,6 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   vector<MX> ret(inputv.size());
   vector<MX> tmp(nadj);
   for(int iind=0; iind<inputv.size(); ++iind){
-    int el = inputv_ind[iind];
     for(int d=0; d<nadj; ++d){
       tmp[d] = trans(vec(asens[d][iind]));
     }

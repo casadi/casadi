@@ -29,7 +29,7 @@
 using namespace std;
 
 namespace CasADi{
-
+// 
 MXConstant::MXConstant(const Matrix<double> &x) : x_(x){
   setSparsity(x.sparsity());
 }
@@ -65,7 +65,7 @@ void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
 
   // Number of derivative directions
   int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
+  //int nadj = adjSeed.size();
   
   if(nfwd>0){
     for(int i=0; i<output.size(); ++i){

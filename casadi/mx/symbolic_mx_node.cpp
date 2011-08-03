@@ -56,7 +56,7 @@ void SymbolicMatrix::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtr
 
   // Number of derivative directions
   int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
+  //int nadj = adjSeed.size();
   
   if(nfwd>0){
     for(int i=0; i<output.size(); ++i){

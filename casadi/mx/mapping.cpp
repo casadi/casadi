@@ -95,7 +95,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d){
 void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
   casadi_assert(nz_d.size()==nz.size());
   casadi_assert(!d.isNull());
-  const std::vector<int>& nzind_ = nzmap_.data();
+  //const std::vector<int>& nzind_ = nzmap_.data();
   
   // Quick return if no elements
   if(nz_d.empty()) return;
@@ -152,7 +152,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
 
   // Number of derivative directions
   int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
+  //int nadj = adjSeed.size();
   
   // Sparsity
   const CRSSparsity &sp = sparsity();
@@ -198,7 +198,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       fill(fsens_ind.begin(),fsens_ind.end(),-1);
       
       // Get sparsity of the input and forward sensitivity
-      int id1=input[iind]->size1(), id2=input[iind]->size2();
+      int /*id1=input[iind]->size1(),*/ id2=input[iind]->size2();
       const vector<int>& rowind_i = input[iind]->sparsity().rowind();
       const vector<int>& rowind_f = fwdSeed[d][iind]->sparsity().rowind();
       const vector<int>& col_i = input[iind]->sparsity().col();
@@ -315,7 +315,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
 
   // Number of derivative directions
   int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
+  //int nadj = adjSeed.size();
   
   // Sparsity
   const CRSSparsity &sp = sparsity();
