@@ -198,7 +198,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       fill(fsens_ind.begin(),fsens_ind.end(),-1);
       
       // Get sparsity of the input and forward sensitivity
-      int /*id1=input[iind]->size1(),*/ id2=input[iind]->size2();
+      int id1=input[iind]->size1(), id2=input[iind]->size2();
       const vector<int>& rowind_i = input[iind]->sparsity().rowind();
       const vector<int>& rowind_f = fwdSeed[d][iind]->sparsity().rowind();
       const vector<int>& col_i = input[iind]->sparsity().col();
