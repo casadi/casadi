@@ -966,19 +966,21 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     else
       stream << " [";
     int j=0;
+    int maxj=size2()-1;
+    
     for(int el=rowind(i); el<rowind(i+1); ++el){
       // Print leading zeros
       for(;j<col(el); ++j)
-        stream << "0,  ";
+        stream << "0" << (j==maxj? " " : ",  ");
       
       // Print element
-      stream << data()[el] << ",  ";
+      stream << data()[el] << (j==maxj? " " : ",  ");
       j++;
     }
     
     // Print trailing zeros
     for(;j<size2(); ++j)
-      stream << "0,  ";
+      stream << "0" << (j==maxj? " " : ",  ");
     
     // New row
     if(i==size1()-1)
