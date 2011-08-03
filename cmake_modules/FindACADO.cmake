@@ -1,3 +1,6 @@
+# DEPRECATED: This file will be removed when a public release of ACADO appears that has a cmake installer
+#             ACADO trunk already has this feature.
+#
 # TRY TO FIND THE INCLUDE DIRECTORY
 FIND_PATH(ACADO_INCLUDE_DIR 
 acado_toolkit.hpp
