@@ -52,22 +52,6 @@ void SymbolicMatrix::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
 }
 
 void SymbolicMatrix::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  casadi_assert_message(output_given,"not implemented");
-
-  // Number of derivative directions
-  int nfwd = fwdSens.size();
-  //int nadj = adjSeed.size();
-  
-  if(nfwd>0){
-    for(int i=0; i<output.size(); ++i){
-      if(fwdSens[0][i]!=0){
-        *fwdSens[0][i] = MX::zeros(size1(),size2());
-        for(int d=1; d<nfwd; ++d){
-          *fwdSens[d][i] = *fwdSens[0][i];
-        }
-      }
-    }
-  }
 }
 
 bool SymbolicMatrix::isSymbolic() const{

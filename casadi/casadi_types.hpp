@@ -30,8 +30,8 @@
 namespace CasADi{
   
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans
-  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
-  #if __STDC_VERSION__ >= 199901L
+  // If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__, we shall use the long long datatype, which is 64 bit, otherwise long
+  #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))
   typedef unsigned long long bvec_t;
   #else
   typedef unsigned long bvec_t;

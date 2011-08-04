@@ -95,7 +95,7 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief  Matrix expressions that are to be evaluated */
     std::vector<MX> outputv;
     std::vector<int> output_ind;
-
+    
     // Lifting function
     LiftingFunction liftfun_;
     void* liftfun_ud_;

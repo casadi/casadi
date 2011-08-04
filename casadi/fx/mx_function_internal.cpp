@@ -202,6 +202,14 @@ void MXFunctionInternal::init(){
       // Not in algorithm
       place_in_alg.push_back(-1);
       
+/*    } else if(n->isSymbolic()){
+      
+      // Save place in work vector
+      place_in_work.push_back(work.size());
+
+      // Not in algorithm
+      place_in_alg.push_back(-1);*/
+      
     } else {
       
       // Add an element to the algorithm
@@ -808,7 +816,6 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
   
   // Loop over computational nodes
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
-    
     // Copy the results of the evaluation, which is known, to the work vector
     if(it->mx->isMultipleOutput()){
       for(int oind=0; oind<it->i_res.size(); ++oind){
@@ -820,14 +827,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
       swork[it->i_res[0]] = it->mx;
     }
     
-    // Skip the node if it is a seed matrix
-    if(it->mx->isSymbolic()){
-      // Get index in work vector
-      int wind = it->i_res.front();
-      if(!dwork[wind].front().isNull()){
-        continue;
-      }
-    }
+    if(it->mx->isSymbolic()) continue;
 
     // Get the arguments of the evaluation
     MXPtrV input_p(it->i_arg.size());
@@ -850,6 +850,15 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
       for(int iind=0; iind<it->i_arg.size(); ++iind){
         int el = it->i_arg[iind];
         fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
+        
+        // Give zero seed if null
+        if(el>=0 && dwork[el][d].isNull()){
+          if(d==0){
+            dwork[el][d] = MX::zeros(input_p[iind]->size1(),input_p[iind]->size2());
+          } else {
+            dwork[el][d] = dwork[el][0];
+          }
+        }
       }
 
       fsens_p[d].resize(it->i_res.size());

@@ -58,7 +58,12 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
 }
 
 void Mapping::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  MXNode::evaluate(input,output);
+  const std::vector<int>& nzind_ = nzmap_.data();
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  for(int k=0; k<size(); ++k){
+    const bvec_t *inputd = get_bvec_t(input[depind_[k]]->data());
+    outputd[k] = inputd[nzind_[k]];
+  }
 }
 
 bool Mapping::isReady() const{
