@@ -2,8 +2,12 @@ all: dox
 
 options:
 	python extra/generate_options_doc.py
-	
+
+tutorials:
+	cd ../tutorials/python && make
+
 examples:
+	cd ../examples && make
 	python extra/fetch_examples_pdf.py
 
 dox:
@@ -11,6 +15,7 @@ dox:
 	cp style/casadi.png html/casadi.png
 
 full: dox
+	cd ../examples && make
 	python extra/generate_options_doc.py
 	python extra/fetch_examples_pdf.py
 	doxygen Doxyfile.in
