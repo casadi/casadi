@@ -59,11 +59,6 @@ namespace CasADi{
         std::map<std::string,int> name_part_;
                 
     };
-
-#ifdef SWIG
-// Make sure that a copy constructor is created
-%copyctor OCP;
-#endif // SWIG
     
 /** Symbolic, object oriented representation of an optimal control problem (OCP) */
 class OCP : public PrintableObject{

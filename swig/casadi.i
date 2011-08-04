@@ -18,6 +18,9 @@
 
 %feature("autodoc", "1");
 
+// Make sure that a copy constructor is created
+%copyctor;
+
 // STL
 %include "std_string.i"
 %include "std_vector.i"
