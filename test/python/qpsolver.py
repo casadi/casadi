@@ -59,9 +59,9 @@ class QPSolverTests(casadiTestCase):
     try:
       QPOasesSolver()
     except:
-      self.message("OOQP not tested")
+      self.message("QPOases not tested")
       return
-    self.message("OOQP")
+    self.message("QPOases")
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
