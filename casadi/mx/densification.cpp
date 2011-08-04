@@ -24,6 +24,7 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 
@@ -82,6 +83,34 @@ void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrV
   for(int d=0; d<nadj; ++d){
     *adjSens[d][0] += *adjSeed[d][0];
   }
+}
+
+void Densification::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  const bvec_t *inputd = get_bvec_t(input[0]->data());
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  
+  int d1 = input[0]->size1();
+  int d2 = input[0]->size2();
+  const vector<int>& rowind = input[0]->rowind();
+  const vector<int>& col = input[0]->col();
+  
+  int k=0; // index of the result
+  for(int i=0; i<d1; ++i){ // loop over rows
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){ // loop over the non-zero elements
+      int j=col[el];  // column
+      for(; k<i*d2+j; ++k){
+        outputd[k] = 0; // add zeros before the non-zero element
+      }
+      
+      // add the non-zero element
+      outputd[k] = inputd[el];
+      k++;
+    }
+  }
+  
+  // add sparse zeros at the end of the matrix
+  for(; k<d1*d2; ++k)
+    outputd[k] = 0;
 }
 
 

@@ -56,6 +56,11 @@ void JacobianReference::evaluateMX(const MXPtrV& input, MXPtrV& output, const MX
   casadi_assert(0);
 }
 
+void JacobianReference::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  casadi_assert(0);
+}
+
+
 FX& JacobianReference::getFunction(){ 
   return dep(0)->dep(0)->getFunction();
 }

@@ -4,6 +4,7 @@ project(casadi)
 SET(CASADI_SRCS
   # MISC
   casadi_limits.hpp
+  casadi_types.hpp
   casadi_operators.hpp
   casadi_exception.hpp
   casadi_math.hpp
@@ -13,7 +14,7 @@ SET(CASADI_SRCS
   generic_type_internal.hpp   generic_type_internal.cpp # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
   pre_c99_support.hpp         pre_c99_support.cpp       # Some functions that ensures compatibility with C++ compilers not supporting the C99 standard
-  stl_vector_tools.hpp                                  # Set of useful functions for the vector template class in STL
+  stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
 
   # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
   matrix/matrix.hpp                                     # The Matrix template class

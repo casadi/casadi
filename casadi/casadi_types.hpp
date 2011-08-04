@@ -1,0 +1,49 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#ifndef CASADI_TYPES_HPP
+#define CASADI_TYPES_HPP
+
+#include <climits>
+#include <cassert>
+#include <vector>
+
+namespace CasADi{
+  
+  // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans
+  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
+  #if __STDC_VERSION__ >= 199901L
+  typedef unsigned long long bvec_t;
+  #else
+  typedef unsigned long bvec_t;
+  #endif
+
+  // Number of directions we can deal with at a time
+  const int bvec_size = CHAR_BIT*sizeof(bvec_t); // the size of bvec_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+
+  // Make sure that the integer datatype is indeed smaller or equal to the double
+  //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
+  
+  
+} // namespace CasADi
+#endif // CASADI_TYPES_HPP
+

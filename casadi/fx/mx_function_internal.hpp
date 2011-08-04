@@ -90,11 +90,11 @@ class MXFunctionInternal : public XFunctionInternal{
     
     /** \brief  Dependent expressions */
     std::vector<MX> inputv;
-    std::vector<int> inputv_ind;
+    std::vector<int> input_ind;
 
     /** \brief  Matrix expressions that are to be evaluated */
     std::vector<MX> outputv;
-    std::vector<int> outputv_ind;
+    std::vector<int> output_ind;
 
     // Lifting function
     LiftingFunction liftfun_;

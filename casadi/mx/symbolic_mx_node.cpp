@@ -21,7 +21,7 @@
  */
 
 #include "symbolic_mx_node.hpp"
-// #include "../sx/sx_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 
@@ -80,6 +80,11 @@ const std::string& SymbolicMatrix::getName() const{
 
 std::vector<MX> SymbolicMatrix::partial(const std::vector<MX>& x){
   return std::vector<MX>(1,MX::eye(sparsity().numel()));
+}
+
+void SymbolicMatrix::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  fill_n(outputd,output[0]->size(),0);
 }
 
 

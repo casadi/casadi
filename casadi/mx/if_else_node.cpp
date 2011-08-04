@@ -79,6 +79,10 @@ void IfNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const S
 void IfNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 }
 
+void IfNode::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){ 
+}
+
+
 
 } // namespace CasADi
 

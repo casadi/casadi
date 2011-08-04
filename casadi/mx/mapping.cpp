@@ -57,6 +57,10 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
   }
 }
 
+void Mapping::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  MXNode::evaluate(input,output);
+}
+
 bool Mapping::isReady() const{
   const std::vector<int>& nzind_ = nzmap_.data();
   casadi_assert(depind_.size()==size());

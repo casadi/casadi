@@ -46,6 +46,11 @@ void Norm::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSee
   throw CasadiException("Norm::evaluateMX not implemented (by design, norms should be replaced in the syntax tree)");
 }
 
+void Norm::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  throw CasadiException("Norm::propagateSparsity not implemented (by design, norms should be replaced in the syntax tree)");
+}
+
+
 Norm2::Norm2(const MX& x) : Norm(x){
 }
 

@@ -33,6 +33,7 @@
 #include <string>
 #include <limits>
 #include "casadi_exception.hpp"
+#include "casadi_types.hpp"
 
 /** \brief Convenience tools for STL vectors
     \author Joel Andersson 
@@ -85,6 +86,12 @@ namespace CasADi{
   template<typename T, typename F, typename L>
   void linspace(std::vector<T> &v, const F& first, const L& last);
 
+  /// Get an pointer of sets of booleans from a double vector
+  bvec_t* get_bvec_t(std::vector<double>& v);
+
+  /// Get an pointer of sets of booleans from a double vector
+  const bvec_t* get_bvec_t(const std::vector<double>& v);
+  
 } // namespace CasADi
   
 // Implementations  

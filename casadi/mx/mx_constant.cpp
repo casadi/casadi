@@ -79,5 +79,10 @@ void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
   }
 }
 
+void MXConstant::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  fill_n(outputd,output[0]->size(),0);
+}
+
 } // namespace CasADi
 

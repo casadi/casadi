@@ -50,6 +50,9 @@ class BinaryOp : public MXNode{
     /** \brief  Evaluate the function symbolically (SX) */
     //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    template<typename int_t>
+    int_t sp_fun(int_t x, int_t y);
+    
     //! \brief Operation
     Operation op_;
     
@@ -74,6 +77,9 @@ class SparseSparseOp : public BinaryOp{
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    /** \brief  Propagate sparsity */
+    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
 };
@@ -96,6 +102,9 @@ class NonzerosScalarOp : public BinaryOp{
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /** \brief  Propagate sparsity */
+    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
 
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
@@ -121,6 +130,9 @@ class ScalarNonzerosOp : public BinaryOp{
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    /** \brief  Propagate sparsity */
+    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
@@ -144,6 +156,9 @@ class NonzerosNonzerosOp : public BinaryOp{
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
+    /** \brief  Propagate sparsity */
+    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
 
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 

@@ -116,6 +116,9 @@ class MXNode : public SharedObjectNode{
     /** \brief  Evaluate symbolically (MX), no derivatives */
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
     
+    /** \brief  Propagate sparsity */
+    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output) = 0;
+
     /** \brief  Get the name */
     virtual const std::string& getName() const;
     

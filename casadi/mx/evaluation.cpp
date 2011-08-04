@@ -221,4 +221,35 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
   fcn_ = deepcopy(fcn_,already_copied);
 }
 
+void Evaluation::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  // Loop over outputs
+/*  for(int oind=0; oind<output.size(); ++oind){
+    // Skip of not used
+    if(output[oind]==0) continue;
+        
+    // Output dimensions
+    int od1 = output[oind]->size1();
+    int od2 = output[oind]->size2();
+    
+    // Get data array for output
+    bvec_t *outputd = get_bvec_t(output[oind]->data());
+    
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
+      // Skip of not used
+      if(input[iind]==0) continue;
+
+      // Input dimensions
+      int id1 = input[iind]->size1();
+      int id2 = input[iind]->size2();
+    }
+  }
+  */
+  
+  // still TODO
+  casadi_assert_message(0,"not implemented");
+}
+
+
+
 } // namespace CasADi

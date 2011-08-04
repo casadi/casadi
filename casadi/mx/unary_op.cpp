@@ -24,6 +24,7 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 
@@ -117,6 +118,11 @@ void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
 }
 
+void UnaryOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+  const bvec_t *inputd = get_bvec_t(input[0]->data());
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  copy(inputd,inputd+size(),outputd);
+}
 
 } // namespace CasADi
 

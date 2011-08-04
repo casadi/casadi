@@ -54,6 +54,9 @@ public:
   /** \brief  Evaluate the function symbolically (MX) */
   virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
+  /** \brief  Propagate sparsity */
+  virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+
   /// Is it a certain operation
   virtual bool isOperation(int op) const{ return op==op_;};
 

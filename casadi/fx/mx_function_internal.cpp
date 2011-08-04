@@ -28,6 +28,7 @@
 #include "../sx/sx_tools.hpp"
 
 #include "../stl_vector_tools.hpp"
+#include "../casadi_types.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -245,15 +246,15 @@ void MXFunctionInternal::init(){
   }
 
   // Indices corresponding to the inputs
-  inputv_ind.resize(inputv.size());
-  for(int i=0; i<inputv_ind.size(); ++i){
-    inputv_ind[i] = place_in_work[inputv[i]->temp];
+  input_ind.resize(inputv.size());
+  for(int i=0; i<input_ind.size(); ++i){
+    input_ind[i] = place_in_work[inputv[i]->temp];
   }
 
   // Indices corresponding to the outputs
-  outputv_ind.resize(outputv.size());
-  for(int i=0; i<outputv_ind.size(); ++i){
-    outputv_ind[i] = place_in_work[outputv[i]->temp];
+  output_ind.resize(outputv.size());
+  for(int i=0; i<output_ind.size(); ++i){
+    output_ind[i] = place_in_work[outputv[i]->temp];
   }
 
   // Reset the temporary variables
@@ -400,13 +401,13 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind){
-    work[inputv_ind[ind]].data.set(input(ind));
+    work[input_ind[ind]].data.set(input(ind));
   }
 
   // Pass the forward seeds
   for(int dir=0; dir<nfdir; ++dir)
     for(int ind=0; ind<input_.size(); ++ind){
-      work[inputv_ind[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
+      work[input_ind[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
     }
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
@@ -429,13 +430,13 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Get the outputs
   for(int ind=0; ind<outputv.size(); ++ind){
-    work[outputv_ind[ind]].data.get(output(ind));
+    work[output_ind[ind]].data.get(output(ind));
   }
 
   // Get the forward sensitivities
   for(int dir=0; dir<nfdir; ++dir)
     for(int ind=0; ind<outputv.size(); ++ind){
-      work[outputv_ind[ind]].dataF.at(dir).get(fwdSens(ind,dir));
+      work[output_ind[ind]].dataF.at(dir).get(fwdSens(ind,dir));
     }
           
   if(nadir>0){
@@ -449,7 +450,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Pass the adjoint seeds
     for(int ind=0; ind<outputv.size(); ++ind)
       for(int dir=0; dir<nadir; ++dir){
-        work[outputv_ind[ind]].dataA.at(dir).set(adjSeed(ind,dir));
+        work[output_ind[ind]].dataA.at(dir).set(adjSeed(ind,dir));
       }
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
@@ -465,7 +466,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Get the adjoint sensitivities
     for(int ind=0; ind<input_.size(); ++ind)
       for(int dir=0; dir<nadir; ++dir){
-        work[inputv_ind[ind]].dataA.at(dir).get(adjSens(ind,dir));
+        work[input_ind[ind]].dataA.at(dir).get(adjSens(ind,dir));
       }
     
     log("MXFunctionInternal::evaluate evaluated adjoint");
@@ -505,6 +506,7 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
   }
 }
 
+#if 1
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   if(inputv.at(iind).dense()){
     // Normal, nonsparse input
@@ -516,7 +518,162 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
     return FXInternal::getJacSparsity(iind,oind);
   }
 }
+
+#else
+CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   
+  // Number of input variables (columns of the Jacobian)
+  int n_in = input(iind).numel();
+  
+  // Number of output variables (rows of the Jacobian)
+  int n_out = output(oind).numel();
+  
+  // Number of nonzero inputs
+  int nz_in = input(iind).size();
+  
+  // Number of nonzero outputs
+  int nz_out = output(oind).size();
+
+  // Number of forward sweeps we must make
+  int nsweep_fwd = nz_in/bvec_size;
+  if(nz_in%bvec_size>0) nsweep_fwd++;
+  
+  // Number of adjoint sweeps we must make
+  int nsweep_adj = nz_out/bvec_size;
+  if(nz_out%bvec_size>0) nsweep_adj++;
+
+  // Sparsity of the output
+  const CRSSparsity& oind_sp = output(oind).sparsity();
+
+  // Nonzero offset
+  int offset = 0;
+
+  // Return sparsity
+  CRSSparsity ret;
+  
+  // Start by setting all elements of the work vector to zero
+  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
+    //Get a pointer to the int array
+    bvec_t *iwork = get_bvec_t(it->data.data());
+    fill_n(iwork,it->data.size(),0);
+  }
+  
+  // Pointer to the data vector for the input
+  int el_in = input_ind[iind];
+  bvec_t *iwork_in = get_bvec_t(work[el_in].data.data());
+  
+  // Pointer to the data vector for the output
+  int el_out = output_ind[oind];
+  bvec_t *iwork_out = get_bvec_t(work[el_out].data.data());
+  
+  // We choose forward or adjoint based on whichever requires less sweeps
+  if(true || nsweep_fwd <= nsweep_adj){ // forward mode
+
+    // Return value (sparsity pattern)
+    CRSSparsity ret_trans(nz_in,n_out);
+    
+    // Loop over the variables, ndir variables at a time
+    for(int s=0; s<nsweep_fwd; ++s){
+      
+      // Integer seed for each direction
+      bvec_t b = 1;
+      
+      // Give seeds to a set of directions
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        iwork_in[offset+i] = b;
+        b <<= 1;
+      }
+      
+      // Propagate the dependencies
+      for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+      
+        // Point pointers to the data corresponding to the element
+        updatePointers(*it,0,0);
+
+        // Evaluate
+        it->mx->propagateSparsity(mx_input_, mx_output_);
+      }
+
+      // Dependency to be checked
+      b = 1;
+
+      // Loop over seed directions
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        
+        // Loop over the rows of the output
+        for(int ii=0; ii<oind_sp.size1(); ++ii){
+          
+          // Loop over the nonzeros of the output
+          for(int el=oind_sp.rowind(ii); el<oind_sp.rowind(ii+1); ++el){
+            
+            // If dependents on the variable
+            if(b & iwork_out[el]){
+              
+              // Column
+              int jj = oind_sp.col(el);
+              
+              // Add to pattern
+              ret_trans.getNZ(offset+i,jj + ii*oind_sp.size2());
+            }
+          }
+        }
+        
+        // Go to next dependency
+        b <<= 1;
+      }
+    
+      // Remove the seeds
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        iwork_in[offset+i] = 0;
+      }
+
+      // Update offset
+      offset += bvec_size;
+    }
+  
+    // Return sparsity pattern
+    vector<int> mapping;
+    ret = ret_trans.transpose(mapping);
+  } else { // Adjoint mode
+    casadi_assert_message(0,"not implemented");
+  }
+
+  // Enlarge if sparse input
+  if(n_in!=nz_in){
+    
+    // New column for each old column
+    vector<int> col_map(input(iind).size());
+    
+    // Loop over rows of the input
+    for(int i=0; i<input(iind).size1(); ++i){
+      
+      // Loop over the nonzeros
+      for(int el=input(iind).rowind(i); el<input(iind).rowind(i+1); ++el){
+        
+        // Get column
+        int j = input(iind).col(el);
+        
+        // Get the column of the jacobian
+        col_map[el] = j+i*input(iind).size2();
+      }
+    }
+    
+    // Enlarge matrix
+    ret.resize(ret.size1(),n_in);
+    
+    // Swap columns
+    vector<int>& col = ret.colRef();
+    for(vector<int>::iterator it=col.begin(); it!=col.end(); ++it){
+      *it = col_map[*it];
+    }
+  }
+  
+  // Return sparsity pattern
+  return ret;
+}
+#endif
+
+
 std::vector<MX> MXFunctionInternal::jac(int ider){
   casadi_assert(isInit());
   casadi_assert_message(ider<input_.size(),"Index out of bounds");
@@ -643,7 +800,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
   
   // Pass the seed matrices for the symbolic variables
   for(int iind=0; iind<input_.size(); ++iind){
-    int el = inputv_ind[iind];
+    int el = input_ind[iind];
     for(int d=0; d<nfwd; ++d){
       dwork[el][d] = fseed[d][iind];
     }
@@ -714,7 +871,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
   for(int d=0; d<nfwd; ++d){
     ret[d].resize(outputv.size());
     for(int oind=0; oind<outputv.size(); ++oind){
-      int el = outputv_ind[oind];
+      int el = output_ind[oind];
       ret[d][oind] = dwork[el][d];
     }
   }
@@ -735,7 +892,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
 
   // Pass the seed matrices
   for(int oind=0; oind<output_.size(); ++oind){
-    int el = outputv_ind[oind];
+    int el = output_ind[oind];
     for(int d=0; d<nadj; ++d){
       if(dwork[el][d].isNull())
         dwork[el][d] = aseed[d][oind];
@@ -814,7 +971,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
   for(int d=0; d<nadj; ++d){
     ret[d].resize(inputv.size());
     for(int iind=0; iind<inputv.size(); ++iind){
-      int el = inputv_ind[iind];
+      int el = input_ind[iind];
       ret[d][iind] = dwork[el][d];
     }
   }
@@ -851,7 +1008,7 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
   
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind){
-    swork[inputv_ind[ind]].set(input_s[ind]);
+    swork[input_ind[ind]].set(input_s[ind]);
   }
 
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
@@ -873,7 +1030,7 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
   
   // Get the outputs
   for(int ind=0; ind<outputv.size(); ++ind)
-    swork[outputv_ind[ind]].get(output_s[ind]);
+    swork[output_ind[ind]].get(output_s[ind]);
 }
 
 SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
