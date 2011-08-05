@@ -21,6 +21,7 @@
  */
 
 #include "mapping.hpp"
+#include "inverse_mapping.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"

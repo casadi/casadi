@@ -20,10 +20,11 @@
  *
  */
 
-#ifndef MAPPING_HPP
-#define MAPPING_HPP
+#ifndef INVERSE_MAPPING_HPP
+#define INVERSE_MAPPING_HPP
 
 #include "mx_node.hpp"
+#include "multiple_output.hpp"
 #include <map>
 
 namespace CasADi{
@@ -31,17 +32,17 @@ namespace CasADi{
   \author Joel Andersson
   \date 2011
 */
-class Mapping : public MXNode{
+class InverseMapping : public MultipleOutput{
   public:
 
     /// Constructor
-    Mapping(const CRSSparsity& sp);
+    InverseMapping(const MX& dep, const std::vector<CRSSparsity>& sp, const Matrix<int>& nzmap, const std::vector<int>& depind);
 
     /// Clone function
-    virtual Mapping* clone() const;
+    virtual InverseMapping* clone() const;
       
     /// Destructor
-    virtual ~Mapping(){}
+    virtual ~InverseMapping(){}
     
     /// Evaluate the function numerically
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -55,34 +56,26 @@ class Mapping : public MXNode{
     /// Propagate sparsity
     virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
 
+    /** \brief  Number of outputs */
+    virtual int getNumOutputs() const;
+    
+    /** \brief  Get the sparsity of output oind */
+    virtual const CRSSparsity& sparsity(int oind);
+
     /// Print
     virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
-    
-    /// Is a mapping matrix
-    virtual bool isMapping() const{return true;}
-    
-    /// Add a dependency (index given)
-    virtual void addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz);
-    
-    /// Add a dependency
-    virtual void addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz);
-    
-    /// Add a dependency
-    virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
-    
-    /// Check if the mapping is ready
-    bool isReady() const;
+
+    /// Sparsity of the outputs
+    std::vector<CRSSparsity> sp_;
     
     /// Mapping from the output non-zero to the dependency nonzero index
     Matrix<int> nzmap_;
 
     /// Mapping from the output non-zero index of the dependency index
     std::vector<int> depind_;
-
-    /// Map to locate the dependencies
-    std::map<const MXNode*, int> depmap_;
+    
 };
 
 } // namespace CasADi
 
-#endif // MAPPING_HPP
+#endif // INVERSE_MAPPING_HPP
