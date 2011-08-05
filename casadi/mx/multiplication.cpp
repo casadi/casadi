@@ -108,7 +108,7 @@ void Multiplication::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& ou
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
-          z_data[el] |= x_data[el1++] & y_trans_data[el2++];
+          z_data[el] |= x_data[el1++] | y_trans_data[el2++];
         } else if(j1<i2) {
           el1++;
         } else {

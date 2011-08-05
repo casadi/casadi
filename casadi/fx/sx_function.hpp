@@ -30,7 +30,7 @@ namespace CasADi{
 /** \brief  An elemenent of the algorithm, namely a binary operation */
 struct SXAlgEl{
   /// operator
-  unsigned short op; 
+  unsigned char op; 
   /// index of the binary operaton to be evaluated
   int ind; 
   /// indices of the arguments

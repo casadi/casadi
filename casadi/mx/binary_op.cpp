@@ -41,23 +41,6 @@ BinaryOp::BinaryOp(Operation op, const MX& x, const MX& y) : op_(op){
 BinaryOp::~BinaryOp(){
 }
 
-template<typename int_t>
-int_t BinaryOp::sp_fun(int_t x, int_t y){
-  bool f0x_is_zero = casadi_math<double>::f0x_is_zero[op_];
-  bool fx0_is_zero = casadi_math<double>::fx0_is_zero[op_];
-  
-  // Start with the union of both patterns
-  int_t ret = x | y;
-  
-  // If f0x is zero, the second term must be nonzero
-  if(f0x_is_zero) ret &= y;
-  
-  // If fx0 is zero, the first term must be nonzero
-  if(f0x_is_zero) ret &= x;
-  
-  return ret;
-}
-
 SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
   // Get the sparsity pattern
   bool f00_is_zero = casadi_math<double>::f00_is_zero[op_];
@@ -341,7 +324,7 @@ void NonzerosNonzerosOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV
   const bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int el=0; el<output[0]->size(); ++el){
-    outputd[el] = sp_fun(input0[el],input1[el]);
+    outputd[el] = input0[el] | input1[el];
   }
 }
 
@@ -350,7 +333,7 @@ void NonzerosScalarOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& 
   const bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int el=0; el<output[0]->size(); ++el){
-    outputd[el] = sp_fun(input0[el],input1[0]);
+    outputd[el] = input0[el] | input1[0];
   }
 }
 
@@ -359,7 +342,7 @@ void ScalarNonzerosOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& 
   const bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int el=0; el<output[0]->size(); ++el){
-    outputd[el] = sp_fun(input0[0],input1[el]);
+    outputd[el] = input0[0] | input1[el];
   }
 }
 
@@ -383,7 +366,7 @@ void SparseSparseOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& ou
     bool skip_nz(m & 4);
     
     // Evaluate
-    if(!skip_nz) outputd[el++] = sp_fun(nz0 ? input0[el0] : zero, nz1 ? input1[el1] : zero);
+    if(!skip_nz) outputd[el++] = (nz0 ? input0[el0] : zero) | (nz1 ? input1[el1] : zero);
     
     // Go to next nonzero
     el0 += nz0;

@@ -594,7 +594,8 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
       
       // Propagate the dependencies
       for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-      
+        if(it->mx->isSymbolic()) continue;
+
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,0);
 

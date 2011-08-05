@@ -50,9 +50,6 @@ class BinaryOp : public MXNode{
     /** \brief  Evaluate the function symbolically (SX) */
     //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
-    template<typename int_t>
-    int_t sp_fun(int_t x, int_t y);
-    
     //! \brief Operation
     Operation op_;
     
