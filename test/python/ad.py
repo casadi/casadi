@@ -298,7 +298,7 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             for mode in ["forward","adjoint"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
