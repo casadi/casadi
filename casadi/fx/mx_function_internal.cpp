@@ -514,20 +514,6 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
   }
 }
 
-#if 1
-CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
-  if(inputv.at(iind).dense()){
-    // Normal, nonsparse input
-    std::vector<MX> ret = jac(iind);
-    return ret.at(oind).sparsity();
-  } else {
-    // BUG: sparsity pattern recognition not working when input is sparse!
-    // Sparse input doesn't work, don't use it
-    return FXInternal::getJacSparsity(iind,oind);
-  }
-}
-
-#else
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   
   // Number of input variables (columns of the Jacobian)
@@ -680,8 +666,6 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   // Return sparsity pattern
   return ret;
 }
-#endif
-
 
 std::vector<MX> MXFunctionInternal::jac(int ider){
   casadi_assert(isInit());

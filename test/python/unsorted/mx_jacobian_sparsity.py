@@ -15,3 +15,7 @@ fcn2.init()
 js2 = IMatrix(fcn2.jacSparsity(),1)
 js2.printDense()
 
+fcn3 = MXFunction([x,y],fcn2.call([x,y]))
+fcn3.init()
+js3 = IMatrix(fcn3.jacSparsity(),1)
+js3.printDense()
