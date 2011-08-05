@@ -89,7 +89,7 @@ namespace CasADi {
   
   
   %pythoncode %{
-  __array_priority__ = 1000
+  __array_priority__ = 1000.0
   %}
 
   #endif // SWIGPYTHON
@@ -156,7 +156,7 @@ namespace CasADi {
     %}
     
   %pythoncode %{
-  __array_priority__ = 1001
+  __array_priority__ = 1001.0
   %}
     
   %pythoncode %{
@@ -177,7 +177,7 @@ namespace CasADi {
     def __array__(self,*args,**kwargs):
       import numpy as n
       if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
-        return n.array([])
+        return n.array([0])
       else:
         return self.toArray()
   %}

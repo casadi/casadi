@@ -144,6 +144,11 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
 
 %extend CasADi::MX{
   %python_matrix_helpers(CasADi::MX)
+  #ifdef SWIGPYTHON
+  %pythoncode %{
+  __array_priority__ = 1002.0
+  %}
+  #endif //SWIGPYTHON
 };
 
 #ifdef SWIGPYTHON

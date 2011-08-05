@@ -454,7 +454,7 @@ PyObject* arrayView() {
 
 
 %pythoncode %{
-  __array_priority__ = 999
+  __array_priority__ = 999.0
 %}
     
     
@@ -495,7 +495,7 @@ PyObject* arrayView() {
   def __array__(self,*args,**kwargs):
     import numpy as n
     if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
-      return n.array([])
+      return n.array([0])
     else:
       if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
         return n.array(self.toArray(),dtype=kwargs["dtype"])
