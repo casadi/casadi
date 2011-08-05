@@ -189,24 +189,42 @@ class typemaptests(casadiTestCase):
                   (DMatrix([[1,2],[3,4]]),SX("x"),MX("x",1,1)),
                   (3,symbolic("x",2,2),MX("x",2,2)),
                   (DMatrix(3),symbolic("x",2,2),MX("y",2,2)),
-                  (array([[1,2],[3,4]]),SX("x"),MX("x",1,1))
+                  (array([[1,2],[3,4]]),SX("x"),MX("x",1,1)),
+                  (array([[1,2],[3,4]]),symbolic("x",2,2),MX("x",2,2)), 
                   ]:
-      for z in [x,y]:
+      for z,ztype in zip([x,y],[[type(SXMatrix()),type(SX())],[type(MX())]]):
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
-        -z
+        self.assertTrue(type(-z) in ztype)
         -s
-        z+s
-        s+z
-        s*z
-        z*s
-        s-z
-        z-s
-        z/s
-        s/z
-        s**z
-        z**s
-      
+        self.assertTrue(type(z+s) in ztype)
+        self.assertTrue(type(s+z) in ztype)
+        self.assertTrue(type(s*z) in ztype)
+        self.assertTrue(type(z*s) in ztype)
+        self.assertTrue(type(s-z) in ztype)
+        self.assertTrue(type(z-s) in ztype)
+        self.assertTrue(type(z/s) in ztype)
+        self.assertTrue(type(s/z) in ztype)
+        self.assertTrue(type(s**z) in ztype)
+        self.assertTrue(type(z**s) in ztype)
+        
+    for (s,x,y) in [
+                  (matrix([[1,2],[3,4]]),symbolic("x",2,2),MX("x",2,2))    
+                  ]:
+      for z,ztype in zip([x,y],[[type(SXMatrix()),type(SX())],[type(MX())]]):
+        print "z = %s, s = %s" % (str(z),str(s))
+        print "  z = %s, s = %s" % (type(z),type(s))
+        self.assertTrue(type(-z) in ztype)
+        -s
+        self.assertTrue(type(z+s) in ztype)
+        self.assertTrue(type(s+z) in ztype)
+        self.assertTrue(type(s*z) in ztype)
+        self.assertTrue(type(z*s) in ztype)
+        self.assertTrue(type(s-z) in ztype)
+        self.assertTrue(type(z-s) in ztype)
+        self.assertTrue(type(z/s) in ztype)
+        self.assertTrue(type(s/z) in ztype)
+        
   def test_set(self):
     self.message("DMatrix set on dense matrices")
     

@@ -1490,16 +1490,6 @@ class MXtests(casadiTestCase):
     y[[0, 2]]
     y[[0, 2]] = MX("a")
     
-  def test_issue203(self):
-    self.message("Regression test issue #203")
-
-    B = numpy.eye(2)
-    A = casadi.MX(B)
-    self.assertTrue(isinstance(B+A,MX))
-    
-    B = numpy.matrix(numpy.eye(2))
-    self.assertTrue(isinstance(B+A,MX))
-    
     
 if __name__ == '__main__':
     unittest.main()
