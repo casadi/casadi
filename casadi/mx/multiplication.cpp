@@ -78,9 +78,18 @@ void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
 void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   if(!output_given)
     *output[0] = prod(*input[0],trans(*input[1]));
+
+  // Forward sensitivities
   int nfwd = fwdSens.size();
   for(int d=0; d<nfwd; ++d){
     *fwdSens[d][0] = prod(*fwdSeed[d][0],trans(*input[1])) + prod(*input[0],trans(*fwdSeed[d][1]));
+  }
+  
+  // Adjoint sensitivities
+  int nadj = adjSeed.size();
+  for(int d=0; d<nadj; ++d){
+    *adjSens[d][0] += prod(*adjSeed[d][0],*input[1]);
+    *adjSens[d][1] += prod(trans(*adjSeed[d][0]),*input[0]);
   }
 }
 

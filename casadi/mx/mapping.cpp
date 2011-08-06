@@ -110,7 +110,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
   // Quick return if no elements
   if(nz_d.empty()) return;
   
-  if(true && d->isMapping()){
+  if(d->isMapping()){
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
@@ -152,25 +152,178 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
 }
 
 void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  if(0){
-    
   casadi_assert_message(output_given,"not implemented");
   casadi_assert(isReady());
 
-  // Nonzero indices
-  const std::vector<int> &nzind = nzmap_.data();
-
-  // Number of derivative directions
-  int nfwd = fwdSens.size();
-  //int nadj = adjSeed.size();
-  
-  // Sparsity
+    // Sparsity
   const CRSSparsity &sp = sparsity();
   const vector<int>& rowind = sp.rowind();
   const vector<int>& col = sp.col();
 
   // Dimensions
   int d1=sp.size1(), d2=sp.size2();
+  
+  // Nonzero indices
+  const std::vector<int> &nzind = nzmap_.data();
+
+  // Number of derivative directions
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+
+  if(nadj>0){
+    // Number of inputs
+    int n = input.size();
+    
+    // All the input and output nonzeros and indices
+    vector<vector<int> > input_el(n), input_el_sorted(n);
+    vector<vector<int> > output_el(n), output_el_sorted(n);
+    vector<int> input_nz;
+    
+    // Temporary vector
+    vector<int> temp;
+    
+    // For all inputs
+    for(int iind=0; iind<n; ++iind){
+      
+      // Find input/output pairs
+      input_nz.clear();
+      output_el.clear();
+      
+      // Loop over rows
+      for(int i=0; i<d1; ++i){
+        // Loop over nonzeros
+        for(int k=rowind[i]; k<rowind[i+1]; ++k){
+          // Get column
+          int j=col[k];
+          
+          // Add if index matches
+          if(depind_[k]==iind){
+            input_nz.push_back(nzind[k]);
+            output_el[iind].push_back(j + i*d2);
+          }
+        }
+      }
+      
+      // At this point we shall construct input_el and at the same time sort according to it
+      input_el[iind].resize(input_nz.size());
+      input_el_sorted[iind].resize(input_nz.size());
+      output_el_sorted[iind].resize(input_nz.size());
+      
+      // Get input sparsity
+      const CRSSparsity& sp_in = input[iind]->sparsity();
+      const vector<int>& c_in = sp_in.col();
+      const vector<int>& r_in = sp_in.rowind();
+      int d1_in = sp_in.size1();
+      int d2_in = sp_in.size2();
+      
+      // Add extra temporary elements if necessary
+      temp.resize(max(temp.size(),c_in.size()),-1);
+      
+      // Mark inputs
+      for(int k=0; k<input_nz.size(); ++k){
+        temp[input_nz[k]] = k;
+      }
+      
+      // Loop over rows
+      int el = 0;
+      for(int i=0; i<d1_in; ++i){
+        // Loop over nonzeros
+        for(int k=r_in[i]; k<r_in[i+1]; ++k){
+          // Get column
+          int j=c_in[k];
+          
+          // Save to vector if nonzero requested
+          if(temp[k]>=0){
+            input_el[iind][temp[k]] = input_el_sorted[iind][el] = j + i*d2_in;
+            output_el_sorted[iind][temp[k]] = output_el[iind][el];
+            el++;
+          }
+        }
+      }
+      casadi_assert(el==output_el[iind].size());
+      
+      // Unmark inputs
+      for(int k=0; k<input_nz.size(); ++k){
+        temp[input_nz[k]] = -1;
+      }
+      
+      // At this point we have two vector pairs, output_el and input_el containing the elements of the mapping matrix
+      // sorted according to output and output_el_sorted and input_el_sorted containing the same information but 
+      // sorted according to input
+  /*    cout << "output_el = " << output_el << endl;
+      cout << "input_el = " << input_el << endl;
+      cout << "output_el_sorted = " << output_el_sorted << endl;
+      cout << "input_el_sorted = " << input_el_sorted << endl;
+      cout << endl;*/
+    }
+    
+    // Now for all forward directions
+    for(int d=0; d<nfwd; ++d){
+      
+    }
+    
+    // Now for all adjoint directions NOTE: This is a quick-hack and need to be fixed for larger systems
+    for(int d=0; d<nadj; ++d){
+      for(int iind=0; iind<n; ++iind){
+        for(int k=0; k<input_el[iind].size(); ++k){
+          // Which element to get
+          int el = output_el[iind][k];
+          int o1 = el / adjSeed[d][0]->size2();
+          int o2 = el % adjSeed[d][0]->size2();
+          
+          // Get the seed
+          MX seed = (*adjSeed[d][0])(o1,o2);
+          if(!isZero(seed)){
+            int el = input_el[iind][k];
+            int i1 = el / adjSens[d][iind]->size2();
+            int i2 = el % adjSens[d][iind]->size2();
+            (*adjSens[d][iind])(i1,i2) += seed;
+          }
+        }
+      }
+      
+/*      // Sparsity of the adjoint sensitivities
+      vector<CRSSparsity> sp_adjsens(n);
+      for(int iind=0; iind<n; ++iind){
+        sp_adjsens[iind] = CRSSparsity(0,input[iind]->size1());
+      }
+      
+      // Loop over the rows of the adjoint seed
+      for(int i=0; i<d1; ++i){
+        
+        
+        
+      }*/
+      
+      
+        
+// /*        // Sparsity of the adjoint seed
+//         const CRSSparsity& sp_a = adjSeed[d][iind]->sparsity();
+//         const vector<int>& c_a = sp_a.col();
+//         const vector<int>& r_a = sp_a.rowind();
+//         int d1_a = sp_a.size1();
+//         int d2_a = sp_a.size2();*/
+
+        
+        
+        
+        
+//        sp_dep
+//      }
+      
+    }
+    return;
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   // Quick return if no inputs
   if(nfwd>0 && input.empty()){
@@ -186,7 +339,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
   
   // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
-  vector<int> nzind_f(nzind.size());
+  vector<int> nzind_sens(nzind.size());
   
   // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
   vector<int> fsens_ind;
@@ -241,15 +394,15 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       }
 
       // Update nonzero vector
-      for(int el=0; el<nzind_f.size(); ++el){
+      for(int el=0; el<nzind_sens.size(); ++el){
         // Check if dependency index match
         if(depind_[el]==iind){
           
-          // Point nzind_f to the nonzero index of the sensitivity
-          nzind_f[el] = fsens_ind[nzind[el]];
+          // Point nzind_sens to the nonzero index of the sensitivity
+          nzind_sens[el] = fsens_ind[nzind[el]];
           
           // Count the number of nonzeros
-          nnz += int(nzind_f[el]>=0);
+          nnz += int(nzind_sens[el]>=0);
         }
       }
     }
@@ -269,7 +422,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       for(int el=rowind[i]; el<rowind[i+1]; ++el){
       
         // If the corresponding entry exists in the sensitivity matrix
-        if(nzind_f[el]>=0){
+        if(nzind_sens[el]>=0){
           
           // Get column
           int j=col[el];
@@ -293,14 +446,14 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       nz.clear();
       nzd.clear();
       int el=0;
-      for(int k=0; k<nzind_f.size(); ++k){
+      for(int k=0; k<nzind_sens.size(); ++k){
         // If a nonzero
-        if(nzind_f[k]>=0){
+        if(nzind_sens[k]>=0){
         
           // If dependency matches
           if(depind_[k]==dp){
             nz.push_back(el);
-            nzd.push_back(nzind_f[k]);
+            nzd.push_back(nzind_sens[k]);
           }
           
           // Next nonzero
@@ -311,168 +464,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       // Save to return matrix
       (*fwdSens[d][0])->addDependency(*fwdSeed[d][dp],nzd,nz);
     }
-  }
-    
-    return;
-  }
-
-  
-  
-  casadi_assert_message(output_given,"not implemented");
-
-  casadi_assert(isReady());
-  const std::vector<int> &nzind_ = nzmap_.data();
-
-  // Number of derivative directions
-  int nfwd = fwdSens.size();
-  //int nadj = adjSeed.size();
-  
-  // Sparsity
-  const CRSSparsity &sp = sparsity();
-
-/*  // Quick hack implementation
-  if(nadj>0){
-    // Symbolic input
-    vector<SXMatrix> input_sx(input.size());
-    SXMatrixPtrV inputp(input.size(),0);
-    for(int i=0; i<input.size(); ++i){
-      input_sx[i] = symbolic("x",input[i]->sparsity());
-      inputp[i] = &input_sx[i];
-    }
-    
-    // Symbolic output
-    vector<SXMatrix> output_sx(output.size());
-    SXMatrixPtrV outputp(output.size(),0);
-    for(int i=0; i<output.size(); ++i){
-      outputp[i] = &output_sx[i];
-    }
-
-    // Evaluate symbolically
-    MXNode::evaluateSX(inputp, outputp);
-
-    // Evaluate
-    SXFunction F(input_sx,output_sx);
-    F.init();
-    
-    
-    
-  }*/
-  
-  
-  // Quick return if no inputs
-  if(nfwd>0 && input.empty()){
-    for(int i=0; i<output.size(); ++i){
-      if(fwdSens[0][i]!=0){
-        *fwdSens[0][i] = MX::zeros(size1(),size2());
-        for(int d=0; d<nfwd; ++d){
-          *fwdSens[d][i] = *fwdSens[0][i];
-        }
-      }
-    }
-    return;
-  }
-  
-  // For all forward directions
-  for(int d=0; d<nfwd; ++d){
-    // Old implementation
-    std::vector<MX> jx(input.size());
-    for(int i=0; i<jx.size(); ++i){
-      jx[i] = vec(*fwdSeed[d][i]);
-    }
-    
-    // Nonzero elements of the new matrix
-    vector<int> i_ret, j_ret, el_ret, dp_ret;
-
-    // Loop over rows of the matrix
-    for(int i=0; i<size1(); ++i){
-      
-      // Loop over nonzero entries
-      for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
-        
-        // Get the column
-        //int j = sp.col(el);
-        
-        // Get the dependency and nonzero to which the nonzero is mapped
-        int dp = depind_[el];
-        int nz = nzind_[el];
-        
-        // Get the sparsity of the seed matrix
-        const CRSSparsity &sp_mat = jx[dp]->sparsity();
-        
-        // Loop over the nonzeros of the row of the seed matrix
-        int i_mat = nz;
-        for(int el_mat=sp_mat.rowind(i_mat); el_mat<sp_mat.rowind(i_mat+1); ++el_mat){
-          // Get the column
-          int j_mat = sp_mat.col(el_mat);
-          
-          // Map the Jacobian nonzero
-          i_ret.push_back(el);
-          j_ret.push_back(j_mat);
-          el_ret.push_back(el_mat);
-          dp_ret.push_back(dp);
-        }
-      }
-    }
-    
-    // Row offsets for the return matrix
-    vector<int> rowind(1,0);
-    rowind.reserve(numel()+1);
-    int i=0;
-    for(int k=0; k<i_ret.size(); ++k){
-      casadi_assert(i_ret[k]>=i);
-      for(; i<i_ret[k]; ++i){
-        rowind.push_back(k);
-      }
-    }
-    rowind.resize(size()+1,i_ret.size());
-    
-    // Sparsity of the return matrix
-    CRSSparsity sp_ret(size(),1,j_ret,rowind);
-    
-    // Return matrix
-    MX ret = MX::create(new Mapping(sp_ret));
-    
-    // Add the dependencies
-    for(int dp=0; dp<jx.size(); ++dp){
-      
-      // Get the local nonzeros
-      vector<int> nz, nzd;
-      for(int k=0; k<el_ret.size(); ++k){
-        
-        // If dependency matches
-        if(dp_ret[k]==dp){
-          nz.push_back(k);
-          nzd.push_back(el_ret[k]);
-        }
-      }
-      
-      // Save to return matrix
-      ret->addDependency(jx[dp],nzd,nz);
-    }
-    
-    // If input is sparse, inset rows
-    if(size()!=numel()){
-      // Row mapping
-      vector<int> ii(size());
-      
-      // Loop over nonzeros
-      for(int i=0; i<size1(); ++i){
-        // Loop over nonzeros
-        for(int el=sparsity().rowind(i); el<sparsity().rowind(i+1); ++el){
-          // Get column
-          int j=sparsity().col(el);
-          
-          // Save mapping
-          ii[el] = j+i*size2();
-        }
-      }
-      
-      // Enlarge matrix
-      ret.sparsityRef().enlargeRows(numel(),ii);
-    }
-
-    // Save
-    *fwdSens[d][0] = reshape(ret,sp.size1(),sp.size2());
   }
 }
 

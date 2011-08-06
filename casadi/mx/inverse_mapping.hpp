@@ -36,7 +36,7 @@ class InverseMapping : public MultipleOutput{
   public:
 
     /// Constructor
-    InverseMapping(const MX& dep, const std::vector<CRSSparsity>& sp, const Matrix<int>& nzmap, const std::vector<int>& depind);
+    InverseMapping(const MX& dep, const std::vector<CRSSparsity>& sp, const std::vector<int>& nzind, const std::vector<int>& depind);
 
     /// Clone function
     virtual InverseMapping* clone() const;
@@ -69,7 +69,7 @@ class InverseMapping : public MultipleOutput{
     std::vector<CRSSparsity> sp_;
     
     /// Mapping from the output non-zero to the dependency nonzero index
-    Matrix<int> nzmap_;
+    std::vector<int> nzind_;
 
     /// Mapping from the output non-zero index of the dependency index
     std::vector<int> depind_;

@@ -32,7 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
-InverseMapping::InverseMapping(const MX& dep, const std::vector<CRSSparsity>& sp, const Matrix<int>& nzmap, const std::vector<int>& depind) : sp_(sp), nzmap_(nzmap), depind_(depind){
+InverseMapping::InverseMapping(const MX& dep, const std::vector<CRSSparsity>& sp, const std::vector<int>& nzind, const std::vector<int>& depind) : sp_(sp), nzind_(nzind), depind_(depind){
   setDependencies(dep);
 }
 
@@ -43,7 +43,6 @@ InverseMapping* InverseMapping::clone() const{
 void InverseMapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nadj = adjSeed.size();
   int nfwd = fwdSens.size();
-  const std::vector<int>& nzind_ = nzmap_.data();
   const vector<double> &inputd = input[0]->data();
   
   // Set outputs and forward sensitivities to zero

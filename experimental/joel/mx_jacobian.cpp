@@ -160,9 +160,14 @@ void mapping(){
   // Get the symbolic Jacobian
   MX J = Fcn.jac()[0];
   cout << J << endl;
-  DMatrix JJ(J.sparsity(),1);
+  IMatrix JJ(J.sparsity(),1);
   JJ.printDense();
   
+  // Get the symbolic Jacobian
+  MX G = Fcn.grad()[0];
+  cout << G << endl;
+  IMatrix GG(G.sparsity(),1);
+  GG.printDense();
 }
 
 void multiplication(){
@@ -184,6 +189,15 @@ void multiplication(){
   SXFunction Jfcn2(Jfcn1);
   cout << "J (mx) = " << endl << Jfcn2.outputSX() << endl;
   cout << "nnz(J) = " << Jfcn2.outputSX().size() << endl;
+  
+  // Via adjoint mode
+  MX G1 = Fcn.grad()[0];
+  cout << "G1 = " << G1 << endl;
+  MXFunction Gfcn1(XY,G1);
+  Gfcn1.init();
+  SXFunction Gfcn2(Gfcn1);
+  cout << "G (mx) = " << endl << Gfcn2.outputSX() << endl;
+  cout << "nnz(G) = " << Gfcn2.outputSX().size() << endl;
   
   SXMatrix x = symbolic("x",4);
   SXMatrix y = symbolic("y",4);
