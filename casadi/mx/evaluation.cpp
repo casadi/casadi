@@ -244,6 +244,8 @@ void Evaluation::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output
     const CRSSparsity& sp_in = input[iind]->sparsity();
     int id1 = sp_in.size1();
     int id2 = sp_in.size2();
+    casadi_assert(id1==fcn_.input(iind).size1());
+    casadi_assert(id2==fcn_.input(iind).size2());
     const vector<int>& irowind = sp_in.rowind();
     const vector<int>& icol = sp_in.col();
 
@@ -285,8 +287,16 @@ void Evaluation::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output
       const CRSSparsity& sp_out = output[oind]->sparsity();
       int od1 = sp_out.size1();
       int od2 = sp_out.size2();
+      casadi_assert(od1==fcn_.output(oind).size1());
+      if(od2!=fcn_.output(oind).size2())
+        cout << fcn_.get() << ": iind = " << iind << ", oind = " << oind << endl;
+      casadi_assert(od2==fcn_.output(oind).size2());
       const vector<int>& orowind = sp_out.rowind();
       const vector<int>& ocol = sp_out.col();
+
+      // Make sure that the Jacobian dimensions are consistent with the inputs and outputs
+      casadi_assert(d1==sp_out.numel());
+      casadi_assert(d2==sp_in.numel());
 
       // Get data array for output
       bvec_t *outputd = get_bvec_t(output[oind]->data());

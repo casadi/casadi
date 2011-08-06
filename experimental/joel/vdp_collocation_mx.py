@@ -84,7 +84,7 @@ collocation_points = [legendre_points,radau_points]
 K = 3
 
 # Number of finite elements
-N = 10
+N = 50
 
 # Radau collocation points
 cp = RADAU
@@ -263,8 +263,6 @@ lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])
 # Hessian of the Lagrangian
 HL = lfcn.hessian()
 
-
-
 # Lagrange multipliers
 lam_mx = MX("lambda",g_sx.size1())
 
@@ -291,7 +289,7 @@ HL_mx.init()
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(ffcn_nlp_mx,gfcn_nlp_mx,HL)
+solver = IpoptSolver(ffcn_nlp_mx,gfcn_nlp_mx,HL_mx)
 
 # Set options
 solver.setOption("tol",1e-10)

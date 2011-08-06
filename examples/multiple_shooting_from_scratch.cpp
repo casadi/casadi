@@ -59,6 +59,9 @@ using namespace std;
 // Infinity
 double inf = numeric_limits<double>::infinity();
 
+// Exact hessian?
+bool exact_hessian = false;
+
 int main(){
 
   // Declare variables
@@ -169,21 +172,51 @@ int main(){
   }
   
   // NLP objective function
-  MXFunction F(V,mterm.call(X.back()));
+  MX ff = mterm.call(X.back()).front();
+  MXFunction F(V,ff);
 
   // NLP constraint function
-  MXFunction G(V,vertcat(g));
+  MX gg = vertcat(g);
+  MXFunction G(V,gg);
 /*  G.setOption("number_of_fwd_dir",20);
   G.setOption("number_of_adj_dir",20);*/
   G.init();
 
   // Generate the Jacobian of the NLP constraint function
   MXFunction J(V,G.jac());
+  J.init();
+  
+  FX h_jac;
+  if(exact_hessian){
+    // Lagrange multiplier
+    MX lag("lag",gg.size1());
 
+    // Objective function scaling factor
+    MX sigma("sigma");
+    
+    // Lagrangian function
+    vector<MX> lfcn_in(3);
+    lfcn_in[0] = V;
+    lfcn_in[1] = lag;
+    lfcn_in[2] = sigma;
+    MXFunction lfcn(lfcn_in,sigma*ff + inner_prod(lag,gg));
+    lfcn.init();
+    
+    // Gradient of the lagrangian
+    vector<MX> lgrad = lfcn.grad();
+    MXFunction lgfcn(lfcn_in,trans(lgrad[0]));
+    lgfcn.init();
+
+    // Hessian of the lagrangian
+    h_jac = lgfcn.jacobian();
+    h_jac.init();
+  }
+  
   // Create an NLP solver instance
-  IpoptSolver nlp_solver(F,G,FX(),J);
+  IpoptSolver nlp_solver(F,G,h_jac,J);
   nlp_solver.setOption("tol",1e-5);
-  nlp_solver.setOption("hessian_approximation", "limited-memory");
+  if(!exact_hessian)
+    nlp_solver.setOption("hessian_approximation", "limited-memory");
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");
   //  nlp_solver.setOption("derivative_test","first-order");

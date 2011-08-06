@@ -185,16 +185,25 @@ void MXFunctionInternal::init(){
           jb.insert(oipair(k,-1));
         }
       }
-      
+
       // Save jacobian to map
       pair<jblocks::iterator,bool> jb_loc = jb.insert(oipair(oind,iind));
       casadi_assert_message(jb_loc.second==true,"Multiple identical Jacobian references currently not supported, easy to fix with a test case available"); 
+
+      // Get the place where the jacobian was inserted
+      int place = fcn.getNumOutputs();
+      for(jblocks::iterator it=jb.begin(); it!=jb.end(); ++it){
+        if(it->second>=0){
+          if(iind==it->second && oind==it->first) break;
+          place++;
+        }
+      }
       
       // Get the index of the parent node
       int pind = place_in_alg[n->dep(0)->dep(0)->temp];
       
       // Save output to the parent node (note that we add to the end, which is not the ultimate position, therefore a sorting takes place later in the code
-      alg[pind].i_res.push_back(work.size());
+      alg[pind].i_res.insert(alg[pind].i_res.begin()+place,work.size());
       
       // Save place in work vector
       place_in_work.push_back(work.size());
@@ -390,7 +399,7 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
       for(int d=0; d<nadj; ++d) mx_adjSens_[d][i] = 0;
     }
   }
-
+  
   for(int i=0; i<mx_output_.size(); ++i){
     if(el.i_res[i]>=0){
       mx_output_[i] = &work[el.i_res[i]].data;
