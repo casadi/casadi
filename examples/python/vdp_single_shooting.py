@@ -55,6 +55,25 @@ F = MXFunction([U],[obj])
 eq = X[0:2]
 G = MXFunction([U],[eq])
 
+## Lagrange multipliers
+#lam = MX("lam",eq.size1())
+
+## Objective scaling factor
+#sigma = MX("sigma")
+
+## Lagrange function
+#ll = sigma*obj + inner_prod(lam,eq)
+#L = MXFunction([U,lam,sigma],[ll])
+#L.init()
+
+## Gradient of the Lagrangian
+#lg = trans(L.grad()[0])
+#GL = MXFunction([U,lam,sigma],[lg])
+#GL.init()
+
+## Hessian of the Lagrangian
+#H = GL.jacobian()
+
 # Allocate NLP solver
 solver = IpoptSolver(F,G)
 solver.setOption("tol",1e-3)

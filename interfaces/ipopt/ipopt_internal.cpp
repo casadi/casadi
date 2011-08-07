@@ -215,7 +215,8 @@ IpoptInternal::~IpoptInternal(){
 void IpoptInternal::init(){
   // Initialize the functions
   F_.init();
-  if(!G_.isNull()) G_.init();
+  if(!G_.isNull() && !G_.isInit()) G_.init();
+  if(!H_.isNull() && !H_.isInit()) H_.init();
   n_ = F_.input(0).numel();
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
   

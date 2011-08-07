@@ -219,7 +219,37 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       // Get the arguments
       double x = work[it->ch[0]];
       double y = work[it->ch[1]];
+      
+      //#define NO_SWITCH_IN_VM
+      #ifndef NO_SWITCH_IN_VM
+      switch(it->op){
+        case ADD:       BinaryOperation<ADD>::fcn(x,y,work[it->ind]);           break;
+        case SUB:       BinaryOperation<SUB>::fcn(x,y,work[it->ind]);           break;
+        case MUL:       BinaryOperation<MUL>::fcn(x,y,work[it->ind]);           break;
+        case DIV:       BinaryOperation<DIV>::fcn(x,y,work[it->ind]);           break;
+        case NEG:       BinaryOperation<NEG>::fcn(x,y,work[it->ind]);           break;
+        case EXP:       BinaryOperation<EXP>::fcn(x,y,work[it->ind]);           break;
+        case LOG:       BinaryOperation<LOG>::fcn(x,y,work[it->ind]);           break;
+        case POW:       BinaryOperation<POW>::fcn(x,y,work[it->ind]);           break;
+        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,work[it->ind]);      break;
+        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,work[it->ind]);          break;
+        case SIN:       BinaryOperation<SIN>::fcn(x,y,work[it->ind]);           break;
+        case COS:       BinaryOperation<COS>::fcn(x,y,work[it->ind]);           break;
+        case TAN:       BinaryOperation<TAN>::fcn(x,y,work[it->ind]);           break;
+        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,work[it->ind]);          break;
+        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,work[it->ind]);          break;
+        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,work[it->ind]);          break;
+        case STEP:      BinaryOperation<STEP>::fcn(x,y,work[it->ind]);          break;
+        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,work[it->ind]);         break;
+        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,work[it->ind]);          break;
+        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,work[it->ind]);      break;
+        case ERF:       BinaryOperation<ERF>::fcn(x,y,work[it->ind]);           break;
+        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,work[it->ind]);          break;
+        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,work[it->ind]);          break;
+      }
+      #else
       casadi_math<double>::fun[it->op](x,y,work[it->ind]);
+      #endif
     }
   } else {
     // with taping
