@@ -104,16 +104,36 @@ SXMatrix SXFunction::hess(int iind, int oind){
     throw CasadiException("SXFunctionInternal::hess: function must be scalar");
   
   // Reverse mode to calculate gradient
+  if((*this)->verbose()){
+    cout << "SXFunction::hess: calculating gradient " << endl;
+  }
   Matrix<SX> g = grad(iind,oind);
+  if((*this)->verbose()){
+    cout << "SXFunction::hess: calculating gradient done " << endl;
+  }
   
   // Create function
   SXFunction gfcn(inputSX(iind),g);
+
+  // Make gradient verbose
+  if((*this)->verbose()){
+    gfcn.setOption("verbose",true);
+  }
   
   // Initialize
   gfcn.init();
   
+  // Calculate jacobian of gradient
+  if((*this)->verbose()){
+    cout << "SXFunction::hess: calculating Jacobian " << endl;
+  }
+  SXMatrix ret = gfcn.jac();
+  if((*this)->verbose()){
+    cout << "SXFunction::hess: calculating Jacobian done" << endl;
+  }
+  
   // Return jacobian of the gradient
-  return gfcn.jac();
+  return ret;
 }
 
 const SXMatrix& SXFunction::inputSX(int ind) const{

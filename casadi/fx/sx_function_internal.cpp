@@ -341,6 +341,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 }
 
 vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks){
+  if(verbose()) cout << "SXFunctionInternal::jac begin" << endl;
+  
   // Create return object
   vector<Matrix<SX> > ret(jblocks.size());
   
@@ -373,9 +375,13 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
     }
   }
   
+  if(verbose()) cout << "SXFunctionInternal::jac allocated return value" << endl;
+  
   // Quick return if no jacobians to be calculated
-  if(jblocks_no_f.empty())
+  if(jblocks_no_f.empty()){
+    if(verbose()) cout << "SXFunctionInternal::jac end 1" << endl;
     return ret;
+  }
   
   // Get a bidirectional partition
   vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
@@ -571,6 +577,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   }
   
   // Return
+  if(verbose()) cout << "SXFunctionInternal::jac end" << endl;
   return ret;
 }
 
@@ -914,6 +921,7 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
 
 
 CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
+  if(verbose()) cout << "SXFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << endl;
 
   // Number of input variables (columns of the Jacobian)
   int n_in = input(iind).numel();
@@ -945,21 +953,45 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
 
   // Sparsity of the output
   const CRSSparsity& oind_sp = output(oind).sparsity();
-
+  int oind_d1 = oind_sp.size1();
+  int oind_d2 = oind_sp.size2();
+  const vector<int>& oind_rowind = oind_sp.rowind();
+  const vector<int>& oind_col = oind_sp.col();
+  
   // Nonzero offset
   int offset = 0;
 
   // Return sparsity
   CRSSparsity ret;
   
+  // Progress
+  int progress = -10;
+
+  // Temporary vectors
+  vector<int> detected_row, detected_col;
+  vector<int> temp(bvec_size+1); // needed in a binsort of the rows
+  
   // We choose forward or adjoint based on whichever requires less sweeps
   if(nsweep_fwd <= nsweep_adj){ // forward mode
+    if(verbose()) cout << "SXFunctionInternal::getJacSparsity: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
     
     // Return value (sparsity pattern)
-    CRSSparsity ret_trans(nz_in,n_out);
+    CRSSparsity ret_trans(0,n_out);
+    ret_trans.reserve(std::max(nz_in,nz_out),n_in);
+    vector<int>& ret_trans_rowind = ret_trans.rowindRef();
+    vector<int>& ret_trans_col = ret_trans.colRef();
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_fwd; ++s){
+      // Print progress
+      if(verbose()){
+        int progress_new = (s*100)/nsweep_fwd;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          cout << progress << " \%"  << endl;
+        }
+      }
       
       // Integer seed for each direction
       bvec_t b = 1;
@@ -969,39 +1001,87 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         iwork[input_ind[iind][offset+i]] = b;
         b <<= 1;
       }
-      
+
       // Propagate the dependencies
       for(vector<AlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
         iwork[it->ind] = iwork[it->ch[0]] | iwork[it->ch[1]];
       }
+      
+      // Get the number of nonzeros before adding the new ones
+      int nz_offset = ret_trans_col.size();
+      
+      // Reset the vectors holding the nonzero elements
+      detected_row.clear();
+      detected_col.clear();
 
-      // Dependency to be checked
-      b = 1;
-    
-      // Loop over seed directions
-      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        
-        // Loop over the rows of the output
-        for(int ii=0; ii<oind_sp.size1(); ++ii){
+      // Number of local seed directions
+      int ndir_local = std::min(bvec_size,nz_in-offset);
+      
+      // Loop over the rows of the output
+      for(int ii=0; ii<oind_d1; ++ii){
           
-          // Loop over the nonzeros of the output
-          for(int el=oind_sp.rowind(ii); el<oind_sp.rowind(ii+1); ++el){
-            
-            // If dependents on the variable
-            if(b & iwork[output_ind[oind][el]]){
+        // Loop over the nonzeros of the output
+        for(int el=oind_rowind[ii]; el<oind_rowind[ii+1]; ++el){
+          
+          // If there is a dependency in any of the directions
+          if(0 != iwork[output_ind[oind][el]]){
+          
+            // Dependency to be checked
+            b = 1;
+      
+            // Loop over seed directions
+            for(int i=0; i<ndir_local; ++i){
               
-              // Column
-              int jj = oind_sp.col(el);
+              // If dependents on the variable
+              if(b & iwork[output_ind[oind][el]]){
+                
+                // Column
+                int jj = oind_col[el];
+                
+                // Add to pattern
+                detected_row.push_back(i);
+                detected_col.push_back(jj + ii*oind_d2);
+              }
               
-              // Add to pattern
-              ret_trans.getNZ(offset+i,jj + ii*oind_sp.size2());
+              // Go to next dependency
+              b <<= 1;
             }
           }
         }
-        
-        // Go to next dependency
-        b <<= 1;
       }
+      
+      // Now check how many elements there are in each row
+      fill_n(temp.begin(),ndir_local+1,0);
+      for(int i=0; i<detected_row.size(); ++i){
+        temp[1+detected_row[i]]++;
+      }
+      
+      // Now make a cumsum to get offset for each row
+      for(int i=0; i<ndir_local; ++i){
+        temp[i+1] += temp[i];
+      }
+      
+      // Loop over the elements again, sorting the nodes
+      ret_trans_col.resize(nz_offset+detected_col.size());
+      for(int i=0; i<detected_row.size(); ++i){
+        // Get the place to put the element
+        int el = temp[detected_row[i]]++;
+        
+        // Get the column
+        int j = detected_col[i];
+        
+        // Save to sparsity pattern
+        ret_trans_col[nz_offset+el] = j;
+      }
+      
+      // Now add the offset to the rows
+      for(int i=0; i<ndir_local; ++i){
+        temp[i] += nz_offset;
+      }
+      
+      // And finally add to the rowind vector and update dimension
+      ret_trans_rowind.insert(ret_trans_rowind.end(),temp.begin(),temp.begin()+ndir_local);
+      ret_trans->nrow_ = ret_trans_rowind.size()-1;
       
       // Remove the seeds
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
@@ -1016,12 +1096,26 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
     vector<int> mapping;
     ret = ret_trans.transpose(mapping);
   } else { // Adjoint mode
+    if(verbose()) cout << "SXFunctionInternal::getJacSparsity: using adjoint mode: " << nsweep_adj << " sweeps needed for " << nz_out << " directions" << endl;
     
     // Return value (sparsity pattern)
-    ret = CRSSparsity(n_out,nz_in);
+    ret = CRSSparsity(0,nz_in);
+    ret.reserve(std::max(nz_in,nz_out),n_out);
+    vector<int>& ret_rowind = ret.rowindRef();
+    vector<int>& ret_col = ret.colRef();
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_adj; ++s){
+      
+      // Print progress
+      if(verbose()){
+        int progress_new = (s*100)/nsweep_adj;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          cout << progress << " \%"  << endl;
+        }
+      }
       
       // Integer seed for each direction
       bvec_t b = 1;
@@ -1043,27 +1137,101 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         iwork[it->ch[1]] |= iwork[it->ind];
       }
       
-      // Output dependency to be checked
-      b = 1;
-    
-      // Loop over seed directions
-      for(int i=0; i<bvec_size && offset+i<nz_out; ++i){
-        
-        // Loop over the nonzeros of the input
-        for(int el=0; el<nz_in; ++el){
+      
+      
+      
+      // Get the number of nonzeros before adding the new ones
+      int nz_offset = ret_col.size();
+      
+      // Reset the vectors holding the nonzero elements
+      detected_row.clear();
+      detected_col.clear();
+
+      // Number of local seed directions
+      int ndir_local = std::min(bvec_size,nz_out-offset);
+      
+      // Loop over the nonzeros of the input
+      for(int el=0; el<nz_in; ++el){
+
+        // If there is a dependency in any of the directions
+        if(0 != iwork[input_ind[iind][el]]){
           
-          // If the output is influenced by the variable
-          if(b & iwork[input_ind[iind][el]]){
+          // Output dependency to be checked
+          b = 1;
+          
+          // Loop over seed directions
+          for(int i=0; i<ndir_local ; ++i){
+              
+            // If the output is influenced by the variable
+            if(b & iwork[input_ind[iind][el]]){
             
-            // Add to pattern
-            ret.getNZ(offset+i,el);
-            
+              // Add to pattern
+              detected_row.push_back(i);
+              detected_col.push_back(el);
+            }
+
+            // Go to next dependency
+            b <<= 1;
           }
         }
-        
-        // Go to next dependency
-        b <<= 1;
       }
+          
+      // Now check how many elements there are in each row
+      fill_n(temp.begin(),ndir_local+1,0);
+      for(int i=0; i<detected_row.size(); ++i){
+        temp[1+detected_row[i]]++;
+      }
+      
+      // Now make a cumsum to get offset for each row
+      for(int i=0; i<ndir_local; ++i){
+        temp[i+1] += temp[i];
+      }
+      
+      // Loop over the elements again, sorting the nodes
+      ret_col.resize(nz_offset+detected_col.size());
+      for(int i=0; i<detected_row.size(); ++i){
+        // Get the place to put the element
+        int el = temp[detected_row[i]]++;
+        
+        // Get the column
+        int j = detected_col[i];
+        
+        // Save to sparsity pattern
+        ret_col[nz_offset+el] = j;
+      }
+      
+      // Now add the offset to the rows
+      for(int i=0; i<ndir_local; ++i){
+        temp[i] += nz_offset;
+      }
+      
+      // And finally add to the rowind vector and update dimension
+      ret_rowind.insert(ret_rowind.end(),temp.begin(),temp.begin()+ndir_local);
+      ret->nrow_ = ret_rowind.size()-1;
+      
+//       // Output dependency to be checked
+//       b = 1;
+//     
+//       // Loop over seed directions
+//       for(int i=0; i<bvec_size && offset+i<nz_out; ++i){
+//         // Resize return
+//         ret.resize(offset+i+1,nz_in);
+//         
+//         // Loop over the nonzeros of the input
+//         for(int el=0; el<nz_in; ++el){
+//           
+//           // If the output is influenced by the variable
+//           if(b & iwork[input_ind[iind][el]]){
+//             
+//             // Add to pattern
+//             ret_col.push_back(el);
+//             ret_rowind.back()++;
+//           }
+//         }
+//         
+//         // Go to next dependency
+//         b <<= 1;
+//       }
 
       // Update offset
       offset += bvec_size;
@@ -1101,6 +1269,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
   }
   
   // Return sparsity pattern
+  if(verbose()) cout << "SXFunctionInternal::getJacSparsity end " << endl;
   return ret;
 }
 
