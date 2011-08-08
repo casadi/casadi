@@ -38,156 +38,36 @@ namespace CasADi{
 using namespace std;
 
 
-SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv_, const vector<Matrix<SX> >& outputv_) : inputv(inputv_),  outputv(outputv_) {
+SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : inputv_(inputv),  outputv_(outputv) {
   addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("name","unnamed_sx_function");
   
-  casadi_assert(!outputv.empty());
+  casadi_assert(!outputv_.empty());
 
   // Check that inputs are symbolic
-  for(int i=0; i<inputv_.size(); ++i) {
-    if (!isSymbolicSparse(inputv_[i])) {
+  for(int i=0; i<inputv.size(); ++i) {
+    if (!isSymbolicSparse(inputv[i])) {
       stringstream ss;
       ss << "SXFunctionInternal::SXFunctionInternal: SXfunction input arguments must be purely symbolic." << endl;
       ss << "Argument #" << i << " is not symbolic." << endl;
       throw CasadiException(ss.str());
     }
   }
-
-  // Stack
-  stack<SXNode*> s;
-
-  // Add the inputs to the stack
-  for(vector<Matrix<SX> >::const_iterator it = inputv.begin(); it != inputv.end(); ++it)
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
-      s.push(itc->get());
-
-  // Add the outputs to the stack
-  for(vector<Matrix<SX> >::const_iterator it = outputv.begin(); it != outputv.end(); ++it)
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
-      s.push(itc->get());
-
-  // Order the nodes in the order of dependencies using a depth-first topological sorting
-  nodes.clear();
-  sort_depth_first(s,nodes);
-
-  // Sort the nodes by type
-  vector<SXNode*> bnodes, cnodes, snodes;
-  for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
-    SXNode* t = *it;
-    if(t->isConstant())
-      cnodes.push_back(t);
-    else if(t->isSymbolic())
-      snodes.push_back(t);
-    else
-      bnodes.push_back(t);
-  }
   
-  // Resort the nodes in a more cache friendly order (Kahn 1962)
-  resort_bredth_first(bnodes);
-
-  // Set the temporary variables to be the corresponding place in the sorted graph
-  for(int i=0; i<nodes.size(); ++i)
-    nodes[i]->temp = i;
-
-  // Place in the work vector for each of the nodes in the tree
-  vector<int> place(nodes.size(),-1);
-
-  worksize = nodes.size();
-  for(int i=0; i<place.size(); ++i)
-    place[i] = i;
-
-
-  // Add the binary operations
-  algorithm.clear();
-  algorithm.resize(bnodes.size());
-  pder1.resize(algorithm.size());
-  pder2.resize(algorithm.size());
-  for(int i=0; i<algorithm.size(); ++i){
-
-    // Locate the element
-    SXNode* bnode = bnodes[i];
-
-    // Save the node index
-    algorithm[i].ind = place[bnode->temp];
-    
-    // Save the indices of the children
-    algorithm[i].ch[0] = place[bnode->dep(0).get()->temp];
-    algorithm[i].ch[1] = place[bnode->dep(1).get()->temp];
-
-    // Operation
-    algorithm[i].op = bnode->getOp();
-  }
-
-  // Indices corresponding to the inputs
-  input_.resize(inputv.size());
-  input_ind.resize(inputv.size());
-  for(int i=0; i<inputv.size(); ++i){
+  // Input dimensions
+  input_.resize(inputv_.size());
+  for(int i=0; i<inputv_.size(); ++i){
     // References
-    const Matrix<SX>& ip = inputv[i];
+    const Matrix<SX>& ip = inputv_[i];
     input(i) = Matrix<double>(ip.sparsity());
-
-    // Allocate space for the indices
-    vector<int>& ii = input_ind[i];
-    ii.resize(ip.size());
-
-    // save the indices
-    for(int j=0; j<ip.size(); ++j){
-      ii[j] = place[ip.data()[j].get()->temp];
-    }
   }
 
-  // Indices corresponding to each non-zero outputs
-  output_.resize(outputv.size());
-  output_ind.resize(output_.size());
-  for(int i=0; i<outputv.size(); ++i){
+  // Output dimensions
+  output_.resize(outputv_.size());
+  for(int i=0; i<outputv_.size(); ++i){
     // References
-    const Matrix<SX>& op = outputv[i];
+    const Matrix<SX>& op = outputv_[i];
     output(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
-    
-    // Allocate space for the indices
-    vector<int>& oi = output_ind[i];  
-    oi.resize(op.size());
-
-    // save the indices
-    for(int j=0; j<op.size(); ++j){
-      oi[j] = place[op.data()[j].get()->temp];
-    }
-  }
-
-  // Allocate a work vector
-  work.resize(worksize,numeric_limits<double>::quiet_NaN());
-
-  // Save the constants to the work vector
-  for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it)
-    work[(**it).temp] = (**it).getValue();
-
-  // Reset the temporary variables
-  for(int i=0; i<nodes.size(); ++i){
-    nodes[i]->temp = 0;
-  }
-
-
-  // Mark all the variables
-  for(vector<SXMatrix>::iterator i=inputv.begin(); i!=inputv.end(); ++i){
-    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
-      j->setTemp(1);
-    }
-  }
-  
-  // Collect free varables
-  free_vars.clear();
-  for(int el=0; el<snodes.size(); ++el){
-    if(!snodes[el]->temp){
-      free_vars.push_back(SX(snodes[el]));
-    }
-  }
-
-  // Unmark variables
-  for(vector<SXMatrix>::iterator i=inputv.begin(); i!=inputv.end(); ++i){
-    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
-      j->setTemp(0);
-    }
   }
 }
 
@@ -196,11 +76,11 @@ SXFunctionInternal::~SXFunctionInternal(){
 
 
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
-  if(!free_vars.empty()){
+  if(!free_vars_.empty()){
     stringstream ss;
     ss << "Cannot evaluate \"";
     repr(ss);
-    ss << "\" since variables " << free_vars << " are free";
+    ss << "\" since variables " << free_vars_ << " are free";
     throw CasadiException(ss.str());
   }
   
@@ -208,60 +88,60 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   for(int ind=0; ind<getNumInputs(); ++ind){
     const Matrix<double> &arg = input(ind);
     for(int i=0; i<arg.size(); ++i){
-      work[input_ind[ind][i]] = arg.data()[i];
+      work_[input_ind_[ind][i]] = arg.data()[i];
     }
   }
   
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){
     // without taping
-    for(vector<AlgEl>::iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
       // Get the arguments
-      double x = work[it->ch[0]];
-      double y = work[it->ch[1]];
+      double x = work_[it->ch[0]];
+      double y = work_[it->ch[1]];
       
       //#define NO_SWITCH_IN_VM
       #ifndef NO_SWITCH_IN_VM
       switch(it->op){
-        case ADD:       BinaryOperation<ADD>::fcn(x,y,work[it->ind]);           break;
-        case SUB:       BinaryOperation<SUB>::fcn(x,y,work[it->ind]);           break;
-        case MUL:       BinaryOperation<MUL>::fcn(x,y,work[it->ind]);           break;
-        case DIV:       BinaryOperation<DIV>::fcn(x,y,work[it->ind]);           break;
-        case NEG:       BinaryOperation<NEG>::fcn(x,y,work[it->ind]);           break;
-        case EXP:       BinaryOperation<EXP>::fcn(x,y,work[it->ind]);           break;
-        case LOG:       BinaryOperation<LOG>::fcn(x,y,work[it->ind]);           break;
-        case POW:       BinaryOperation<POW>::fcn(x,y,work[it->ind]);           break;
-        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,work[it->ind]);      break;
-        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,work[it->ind]);          break;
-        case SIN:       BinaryOperation<SIN>::fcn(x,y,work[it->ind]);           break;
-        case COS:       BinaryOperation<COS>::fcn(x,y,work[it->ind]);           break;
-        case TAN:       BinaryOperation<TAN>::fcn(x,y,work[it->ind]);           break;
-        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,work[it->ind]);          break;
-        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,work[it->ind]);          break;
-        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,work[it->ind]);          break;
-        case STEP:      BinaryOperation<STEP>::fcn(x,y,work[it->ind]);          break;
-        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,work[it->ind]);         break;
-        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,work[it->ind]);          break;
-        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,work[it->ind]);      break;
-        case ERF:       BinaryOperation<ERF>::fcn(x,y,work[it->ind]);           break;
-        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,work[it->ind]);          break;
-        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,work[it->ind]);          break;
-        case INV:      BinaryOperation<INV>::fcn(x,y,work[it->ind]);          break;
+        case ADD:       BinaryOperation<ADD>::fcn(x,y,work_[it->ind]);           break;
+        case SUB:       BinaryOperation<SUB>::fcn(x,y,work_[it->ind]);           break;
+        case MUL:       BinaryOperation<MUL>::fcn(x,y,work_[it->ind]);           break;
+        case DIV:       BinaryOperation<DIV>::fcn(x,y,work_[it->ind]);           break;
+        case NEG:       BinaryOperation<NEG>::fcn(x,y,work_[it->ind]);           break;
+        case EXP:       BinaryOperation<EXP>::fcn(x,y,work_[it->ind]);           break;
+        case LOG:       BinaryOperation<LOG>::fcn(x,y,work_[it->ind]);           break;
+        case POW:       BinaryOperation<POW>::fcn(x,y,work_[it->ind]);           break;
+        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,work_[it->ind]);      break;
+        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,work_[it->ind]);          break;
+        case SIN:       BinaryOperation<SIN>::fcn(x,y,work_[it->ind]);           break;
+        case COS:       BinaryOperation<COS>::fcn(x,y,work_[it->ind]);           break;
+        case TAN:       BinaryOperation<TAN>::fcn(x,y,work_[it->ind]);           break;
+        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,work_[it->ind]);          break;
+        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,work_[it->ind]);          break;
+        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,work_[it->ind]);          break;
+        case STEP:      BinaryOperation<STEP>::fcn(x,y,work_[it->ind]);          break;
+        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,work_[it->ind]);         break;
+        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,work_[it->ind]);          break;
+        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,work_[it->ind]);      break;
+        case ERF:       BinaryOperation<ERF>::fcn(x,y,work_[it->ind]);           break;
+        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,work_[it->ind]);          break;
+        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,work_[it->ind]);          break;
+        case INV:      BinaryOperation<INV>::fcn(x,y,work_[it->ind]);          break;
       }
       #else
-      casadi_math<double>::fun[it->op](x,y,work[it->ind]);
+      casadi_math<double>::fun[it->op](x,y,work_[it->ind]);
       #endif
     }
   } else {
     // with taping
-    vector<AlgEl>::iterator it = algorithm.begin();
-    vector<AlgElData<1> >::iterator it1 = pder1.begin();
-    for(; it<algorithm.end(); ++it, ++it1){
+    vector<AlgEl>::iterator it = algorithm_.begin();
+    vector<AlgElData>::iterator it1 = pder_.begin();
+    for(; it<algorithm_.end(); ++it, ++it1){
       // Get the arguments
-      double x = work[it->ch[0]];
-      double y = work[it->ch[1]];
-      casadi_math<double>::fun[it->op](x,y,work[it->ind]);
-      casadi_math<double>::der[it->op](x,y,work[it->ind],it1->d);
+      double x = work_[it->ch[0]];
+      double y = work_[it->ch[1]];
+      casadi_math<double>::fun[it->op](x,y,work_[it->ind]);
+      casadi_math<double>::der[it->op](x,y,work_[it->ind],it1->d);
     }
   }
   
@@ -269,7 +149,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   for(int ind=0; ind<getNumOutputs(); ++ind){
     Matrix<double> &res = output(ind);
     for(int i=0; i<res.size(); ++i){
-      res.data()[i] = work[output_ind[ind][i]];
+      res.data()[i] = work_[output_ind_[ind][i]];
     }
   }
 
@@ -277,67 +157,68 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   for(int dir=0; dir<nfdir; ++dir){
 
     // Clear the seeds (not necessary if constants and parameters have zero value!)
-    fill(dwork.begin(),dwork.end(),0);
+    fill(dwork_.begin(),dwork_.end(),0);
     
     // Copy the function arguments to the work vector
     for(int ind=0; ind<input_.size(); ++ind){
       const Matrix<double> &fseed = fwdSeed(ind,dir);
       for(int i=0; i<fseed.size(); ++i){
-        dwork[input_ind[ind][i]] = fseed.data()[i];
+        dwork_[input_ind_[ind][i]] = fseed.data()[i];
       }
     }
   
-    // Evaluate the algorithm for the sensitivities
-    vector<AlgEl>::const_iterator it = algorithm.begin();
-    vector<AlgElData<1> >::const_iterator it2 = pder1.begin();
-    for(; it!=algorithm.end(); ++it, ++it2){
-      dwork[it->ind] = it2->d[0] * dwork[it->ch[0]] + it2->d[1] * dwork[it->ch[1]];
+    // Evaluate the algorithm_ for the sensitivities
+    vector<AlgEl>::const_iterator it = algorithm_.begin();
+    vector<AlgElData>::const_iterator it2 = pder_.begin();
+    for(; it!=algorithm_.end(); ++it, ++it2){
+      dwork_[it->ind] = it2->d[0] * dwork_[it->ch[0]] + it2->d[1] * dwork_[it->ch[1]];
     }
   
     // Get the forward sensitivities
     for(int ind=0; ind<output_.size(); ++ind){
       Matrix<double> &fsens = fwdSens(ind,dir);
-      for(int i=0; i<output_ind[ind].size(); ++i){
-        fsens.data()[i] = dwork[output_ind[ind][i]];
+      for(int i=0; i<output_ind_[ind].size(); ++i){
+        fsens.data()[i] = dwork_[output_ind_[ind][i]];
       }
     }
   }
   
+  // Clear the seeds since it might have been set during forward sensitivity calculations
+  if(nadir>0)
+    fill(dwork_.begin(),dwork_.end(),0);
+  
   for(int dir=0; dir<nadir; ++dir){
-
-  // Clear the seeds (should not be necessary)
-  fill(dwork.begin(),dwork.end(),0);
 
     // Pass the output seeds
     for(int ind=0; ind<output_.size(); ++ind){
       const Matrix<double> &aseed = adjSeed(ind,dir);
-      for(int i=0; i<output_ind[ind].size(); ++i){
-        dwork[output_ind[ind][i]] += aseed.data()[i];
+      
+      // Add seed to each entry, note that multiple outputs may point to the same variable
+      for(int i=0; i<output_ind_[ind].size(); ++i){
+        dwork_[output_ind_[ind][i]] += aseed.data()[i];
       }
     }
 
-  for(int i=algorithm.size()-1; i>=0; --i){
-    const AlgEl& ae = algorithm[i];
-    const AlgElData<1>& aed = pder1[i];
-    
-    // copy the seed and clear the cache entry
-    double seed = dwork[ae.ind];
-    dwork[ae.ind] = 0;
+    for(int i=algorithm_.size()-1; i>=0; --i){
+      const AlgEl& ae = algorithm_[i];
+      const AlgElData& aed = pder_[i];
+      
+      // copy the seed and clear the cache entry
+      double seed = dwork_[ae.ind];
+      dwork_[ae.ind] = 0;
 
-    dwork[ae.ch[0]] += aed.d[0] * seed;
-    dwork[ae.ch[1]] += aed.d[1] * seed;
-  }
-
-  // Collect the adjoint sensitivities
-  for(int ind=0; ind<getNumInputs(); ++ind){
-    Matrix<double> &asens = adjSens(ind,dir);
-    for(int i=0; i<input_ind[ind].size(); ++i){
-      asens.data()[i] = dwork[input_ind[ind][i]];
+      dwork_[ae.ch[0]] += aed.d[0] * seed;
+      dwork_[ae.ch[1]] += aed.d[1] * seed;
     }
-  }
 
-  // Should clean up any zero added to constants and parameters!
-
+    // Collect the adjoint sensitivities
+    for(int ind=0; ind<getNumInputs(); ++ind){
+      Matrix<double> &asens = adjSens(ind,dir);
+      for(int i=0; i<input_ind_[ind].size(); ++i){
+        asens.data()[i] = dwork_[input_ind_[ind][i]];
+        dwork_[input_ind_[ind][i]] = 0;
+      }
+    }
   }
 }
 
@@ -360,7 +241,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
     // Check if nondifferentiated variable
     if(iind<0){
       // Save to output
-      ret[i] = outputv.at(oind);
+      ret[i] = outputv_.at(oind);
     } else { // Jacobian block
       // Mark block for evaluation
       jblocks_no_f.push_back(jblocks[i]);
@@ -409,24 +290,23 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   
   // Calculate the partial derivatives
   vector<SX> der1, der2;
-  der1.reserve(algorithm.size());
-  der2.reserve(algorithm.size());
+  der1.reserve(algorithm_.size());
+  der2.reserve(algorithm_.size());
   SX tmp[2];
-  for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
-      SX f = SX(nodes[it->ind]);
-      SX ch[2];
-      ch[0] = SX(nodes[it->ch[0]]);
-      ch[1] = SX(nodes[it->ch[1]]);
-      casadi_math<SX>::der[it->op](ch[0],ch[1],f,tmp);
-      if(!ch[0]->isConstant())  der1.push_back(tmp[0]);
-      else                      der1.push_back(0);
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+      SX f = SX(nodes_[it->ind]);
+      const SX& x = f->dep(0);
+      const SX& y = f->dep(1);
+      casadi_math<SX>::der[it->op](x,y,f,tmp);
+      if(!x->isConstant())  der1.push_back(tmp[0]);
+      else                  der1.push_back(0);
 
-      if(!ch[1]->isConstant())  der2.push_back(tmp[1]);
-      else                      der2.push_back(0);
+      if(!y->isConstant())  der2.push_back(tmp[1]);
+      else                  der2.push_back(0);
   }
 
   // Gradient (this is also the working array)
-  vector<SX> g(nodes.size(),casadi_limits<SX>::zero);
+  vector<SX> g(nodes_.size(),casadi_limits<SX>::zero);
 
   // Get the number of forward and adjoint sweeps
   int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
@@ -462,13 +342,13 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
         int c = D1[v].col(el);
 
         // Give a seed in the direction
-        g[input_ind[iind][c]] = casadi_limits<SX>::one;
+        g[input_ind_[iind][c]] = casadi_limits<SX>::one;
       }
     }
     
     // forward sweep
-    for(int k = 0; k<algorithm.size(); ++k){
-      const AlgEl& ae = algorithm[k];
+    for(int k = 0; k<algorithm_.size(); ++k){
+      const AlgEl& ae = algorithm_[k];
       
       // First argument
       if(!g[ae.ch[0]]->isZero() &&  !der1[k]->isZero()){
@@ -503,7 +383,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int elJ = mapping[v][el_out];
           
           // Get the output seed
-          ret[jblock_ind[v]].data()[elJ] = g[output_ind[oind][r_out]];
+          ret[jblock_ind[v]].data()[elJ] = g[output_ind_[oind][r_out]];
         }
       }
     }
@@ -529,13 +409,13 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
 
         // Give a seed in the direction
         if(nz[c]>=0) // FIXME: ugly trick
-          g[output_ind[oind][nz[c]]] = casadi_limits<SX>::one;
+          g[output_ind_[oind][nz[c]]] = casadi_limits<SX>::one;
       }
     }
     
     // backward sweep
-    for(int k = algorithm.size()-1; k>=0; --k){
-      const AlgEl& ae = algorithm[k];
+    for(int k = algorithm_.size()-1; k>=0; --k){
+      const AlgEl& ae = algorithm_[k];
         
       // Skip if the seed is zero
       if(!g[ae.ind]->isZero()){
@@ -571,7 +451,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int c = ret[jblock_ind[v]].sparsity().col(elJ);
           
           // Get the input seed
-          ret[jblock_ind[v]].data()[elJ] = g[input_ind[iind][c]];
+          ret[jblock_ind[v]].data()[elJ] = g[input_ind_[iind][c]];
         }
       }
     }
@@ -583,8 +463,8 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
 }
 
 bool SXFunctionInternal::isSmooth() const{
-    // Go through all nodes and check if any node is non-smooth
-    for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
+    // Go through all nodes_ and check if any node is non-smooth
+    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op == STEP || it->op == FLOOR )
         return false;
     }
@@ -592,17 +472,17 @@ bool SXFunctionInternal::isSmooth() const{
 }
 
 void SXFunctionInternal::print(ostream &stream) const{
- for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
+ for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     int op = it->op;
     stringstream s,s0,s1;
     s << "a" << it->ind;
 
     int i0 = it->ch[0], i1 = it->ch[1];
 #if 0
-    if(nodes[i0]->hasDep())  s0 << "a" << i0;
-    else                      s0 << SX(nodes[i0]);
-    if(nodes[i1]->hasDep())  s1 << "a" << i1;
-    else                      s1 << SX(nodes[i1]);
+    if(nodes_[i0]->hasDep())  s0 << "a" << i0;
+    else                      s0 << SX(nodes_[i0]);
+    if(nodes_[i1]->hasDep())  s1 << "a" << i1;
+    else                      s1 << SX(nodes_[i1]);
 #else
     s0 << "a" << i0;
     s1 << "a" << i1;
@@ -625,21 +505,21 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
 
 std::string SXFunctionInternal::printOperation(int i){
   stringstream s;
-  if(nodes.at(i)->isConstant()){
-    double v = nodes.at(i)->getValue();
+  if(nodes_.at(i)->isConstant()){
+    double v = nodes_.at(i)->getValue();
     if(v>=0){
       s << v;
     } else {
       s << "(" << v << ")";
     }
-  } else if(refcount[i]==1){
+  } else if(refcount_[i]==1){
     // Call can be inlined
-    int j = nodes[i]->temp;
+    int j = nodes_[i]->temp;
     string ss[2];
     for(int c=0; c<2; ++c){
-      ss[c] = printOperation(algorithm[j].ch[c]);
+      ss[c] = printOperation(algorithm_[j].ch[c]);
     }
-    int op = algorithm[j].op;
+    int op = algorithm_[j].op;
     casadi_math<double>::print[op](s,ss[0],ss[1]);
   } else {
     s << "a" << i;
@@ -651,7 +531,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
   casadi_assert(isInit());
   
    // Output
-  cout << "Generating: " << src_name << " (" << algorithm.size() << " elementary operations)" << endl;
+  cout << "Generating: " << src_name << " (" << algorithm_.size() << " elementary operations)" << endl;
   // Create the c source file
   ofstream cfile;
   cfile.open (src_name.c_str());
@@ -740,49 +620,49 @@ void SXFunctionInternal::generateCode(const string& src_name){
   cfile << "int evaluate(const double** x, double** r){" << endl;
 
   // Which variables have been declared
-  vector<bool> declared(dwork.size(),false);
+  vector<bool> declared(dwork_.size(),false);
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_.size(); ++ind){
-    for(int i=0; i<input_ind[ind].size(); ++i){
-      int el = input_ind[ind][i];
+    for(int i=0; i<input_ind_[ind].size(); ++i){
+      int el = input_ind_[ind][i];
       cfile << "d a" << el << "=x[" << ind << "][" << i << "];" << endl;
       declared[el] = true;
     }
   }
   
- // Count how many times a node is referenced in the algorithm
- refcount.clear();
- refcount.resize(nodes.size(),0);
- for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
-   for(int c=0; c<2; ++c) refcount[it->ch[c]]++;
+ // Count how many times a node is referenced in the algorithm_
+ refcount_.clear();
+ refcount_.resize(nodes_.size(),0);
+ for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+   for(int c=0; c<2; ++c) refcount_[it->ch[c]]++;
  }
   
  // Inputs get value two in order to prevent them from being inlined
  for(int ind=0; ind<input_.size(); ++ind){
-   for(int i=0; i<input_ind[ind].size(); ++i){
-     int el = input_ind[ind][i];
-     refcount[el] = 2;
+   for(int i=0; i<input_ind_[ind].size(); ++i){
+     int el = input_ind_[ind][i];
+     refcount_[el] = 2;
    }
  }
 
  // Outputs get value two in order to prevent them from being inlined
  for(int ind=0; ind<output_.size(); ++ind){
-   for(int i=0; i<output_ind[ind].size(); ++i){
-     int el = output_ind[ind][i];
-     refcount[el] = 2;
+   for(int i=0; i<output_ind_[ind].size(); ++i){
+     int el = output_ind_[ind][i];
+     refcount_[el] = 2;
    }
  }
  
- // Mark the node its place in the algorithm
- for(int i=0; i<algorithm.size(); ++i){
-   nodes[algorithm[i].ind]->temp = i;
+ // Mark the node its place in the algorithm_
+ for(int i=0; i<algorithm_.size(); ++i){
+   nodes_[algorithm_[i].ind]->temp = i;
  }
  
- // Run the algorithm
- for(vector<AlgEl>::const_iterator it = algorithm.begin(); it!=algorithm.end(); ++it){
+ // Run the algorithm_
+ for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
    // Skip printing variables that can be inlined
-   if(refcount[it->ind]<2) continue;
+   if(refcount_[it->ind]<2) continue;
    
     if(!declared[it->ind]){
       cfile << "d ";
@@ -798,21 +678,21 @@ void SXFunctionInternal::generateCode(const string& src_name){
     cfile  << ";" << endl;
   }
 
- // Unmark the nodes
- for(int i=0; i<algorithm.size(); ++i){
-   nodes[algorithm[i].ind]->temp = 0;
+ // Unmark the nodes_
+ for(int i=0; i<algorithm_.size(); ++i){
+   nodes_[algorithm_[i].ind]->temp = 0;
  }
 
  // Clear the reference counter
- refcount.clear();
+ refcount_.clear();
 
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
-    for(int i=0; i<output_ind[ind].size(); ++i){
+    for(int i=0; i<output_ind_[ind].size(); ++i){
       cfile << "r[" << ind << "][" << i << "]=";
-      int el = output_ind[ind][i];
-      if(nodes[el]->isConstant())
-        cfile << nodes[el]->getValue() << ";" << endl;
+      int el = output_ind_[ind][i];
+      if(nodes_[el]->isConstant())
+        cfile << nodes_[el]->getValue() << ";" << endl;
       else
         cfile << "a" << el << ";" << endl;
     }
@@ -829,64 +709,193 @@ void SXFunctionInternal::init(){
   // Call the init function of the base class
   XFunctionInternal::init();
 
-  // allocate a vector with the values at the nodes, the first vector also contains the partial derivatives
+    // Stack
+  stack<SXNode*> s;
+
+  // Add the inputs to the stack
+  for(vector<Matrix<SX> >::const_iterator it = inputv_.begin(); it != inputv_.end(); ++it)
+    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
+      s.push(itc->get());
+
+  // Add the outputs to the stack
+  for(vector<Matrix<SX> >::const_iterator it = outputv_.begin(); it != outputv_.end(); ++it)
+    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
+      s.push(itc->get());
+
+  // Order the nodes_ in the order of dependencies using a depth-first topological sorting
+  nodes_.clear();
+  sort_depth_first(s,nodes_);
+
+  // Sort the nodes_ by type
+  vector<SXNode*> bnodes_, cnodes_, snodes_;
+  for(vector<SXNode*>::iterator it = nodes_.begin(); it != nodes_.end(); ++it){
+    SXNode* t = *it;
+    if(t->isConstant())
+      cnodes_.push_back(t);
+    else if(t->isSymbolic())
+      snodes_.push_back(t);
+    else
+      bnodes_.push_back(t);
+  }
   
+  // Resort the nodes_ in a more cache friendly order (Kahn 1962)
+  resort_bredth_first(bnodes_);
+
+  // Set the temporary variables to be the corresponding place in the sorted graph
+  for(int i=0; i<nodes_.size(); ++i)
+    nodes_[i]->temp = i;
+
+  // Place in the work vector for each of the nodes_ in the tree
+  vector<int> place(nodes_.size(),-1);
+
+  worksize_ = nodes_.size();
+  for(int i=0; i<place.size(); ++i)
+    place[i] = i;
+
+  // Add the binary operations
+  algorithm_.clear();
+  algorithm_.resize(bnodes_.size());
+  pder_.resize(algorithm_.size());
+  //pder2.resize(algorithm_.size());
+  for(int i=0; i<algorithm_.size(); ++i){
+
+    // Locate the element
+    SXNode* bnode = bnodes_[i];
+
+    // Save the node index
+    algorithm_[i].ind = place[bnode->temp];
+    
+    // Save the indices of the children
+    algorithm_[i].ch[0] = place[bnode->dep(0).get()->temp];
+    algorithm_[i].ch[1] = place[bnode->dep(1).get()->temp];
+
+    // Operation
+    algorithm_[i].op = bnode->getOp();
+  }
+
+  // Indices corresponding to the inputs
+  input_ind_.resize(inputv_.size());
+  for(int i=0; i<inputv_.size(); ++i){
+    // References
+    const Matrix<SX>& ip = inputv_[i];
+
+    // Allocate space for the indices
+    vector<int>& ii = input_ind_[i];
+    ii.resize(ip.size());
+
+    // save the indices
+    for(int j=0; j<ip.size(); ++j){
+      ii[j] = place[ip.data()[j].get()->temp];
+    }
+  }
+
+  // Indices corresponding to each non-zero outputs
+  output_ind_.resize(output_.size());
+  for(int i=0; i<outputv_.size(); ++i){
+    // References
+    const Matrix<SX>& op = outputv_[i];
+    
+    // Allocate space for the indices
+    vector<int>& oi = output_ind_[i];  
+    oi.resize(op.size());
+
+    // save the indices
+    for(int j=0; j<op.size(); ++j){
+      oi[j] = place[op.data()[j].get()->temp];
+    }
+  }
+
+  // Allocate a work vector
+  work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
+
+  // Save the constants to the work vector
+  for(vector<SXNode*>::iterator it=cnodes_.begin(); it!=cnodes_.end(); ++it)
+    work_[(**it).temp] = (**it).getValue();
+
+  // Reset the temporary variables
+  for(int i=0; i<nodes_.size(); ++i){
+    nodes_[i]->temp = 0;
+  }
+
+
+  // Mark all the variables
+  for(vector<SXMatrix>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
+      j->setTemp(1);
+    }
+  }
+  
+  // Collect free varables
+  free_vars_.clear();
+  for(int el=0; el<snodes_.size(); ++el){
+    if(!snodes_[el]->temp){
+      free_vars_.push_back(SX(snodes_[el]));
+    }
+  }
+
+  // Unmark variables
+  for(vector<SXMatrix>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
+      j->setTemp(0);
+    }
+  }
+
   if(nfdir_>0 || nadir_>0)
-    dwork.resize(worksize,numeric_limits<double>::quiet_NaN());
+    dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
   SXFunction f;
   f.assignNode(this);
   Matrix<SX> H = f.hess(iind,oind);
-  return SXFunction(inputv,H);
+  return SXFunction(inputv_,H);
 }
 
 void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s, bool eliminate_constants){
-  casadi_assert_message(inputv.size() == input_s.size(),"SXFunctionInternal::evaluateSX: wrong number of inputs");
-  for(int i=0; i<inputv.size(); ++i){
-    casadi_assert_message(input_s[i].size()==inputv[i].size(), "SXFunctionInternal::evaluateSX: argument nonzero number does not match");
-    // casadi_assert_message(input_s[i].sparsity()==inputv[i].sparsity(), "SXFunctionInternal::evaluateSX: argument sparsity does not match");
+  casadi_assert_message(inputv_.size() == input_s.size(),"SXFunctionInternal::evaluateSX: wrong number of inputs");
+  for(int i=0; i<inputv_.size(); ++i){
+    casadi_assert_message(input_s[i].size()==inputv_[i].size(), "SXFunctionInternal::evaluateSX: argument nonzero number does not match");
+    // casadi_assert_message(input_s[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::evaluateSX: argument sparsity does not match");
   }
   
   // Assert input dimension
   assert(input_.size() == input_s.size());
   
   // Create a symbolic work vector if not existing
-  if(swork.size() != nodes.size()){
-    swork.resize(nodes.size());
-    for(int i=0; i<nodes.size(); ++i){
-      if(!nodes[i]->hasDep())
-        swork[i] = SX(nodes[i]);
+  if(swork_.size() != nodes_.size()){
+    swork_.resize(nodes_.size());
+    for(int i=0; i<nodes_.size(); ++i){
+      if(!nodes_[i]->hasDep())
+        swork_[i] = SX(nodes_[i]);
     }
   }
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_s.size(); ++ind){
-    for(int i=0; i<input_ind[ind].size(); ++i){
-      swork[input_ind[ind][i]] = input_s[ind].data()[i];
+    for(int i=0; i<input_ind_[ind].size(); ++i){
+      swork_[input_ind_[ind][i]] = input_s[ind].data()[i];
     }
   }
   
-  // Evaluate the algorithm
-  for(vector<AlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+  // Evaluate the algorithm_
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
       // Get the arguments
-    SX x = swork[it->ch[0]];
-    SX y = swork[it->ch[1]];
+    SX x = swork_[it->ch[0]];
+    SX y = swork_[it->ch[1]];
     if(eliminate_constants && x.isConstant() && y.isConstant()){
       // Check if both arguments are constants
       double temp;
       casadi_math<double>::fun[it->op](x.getValue(),y.getValue(),temp);
-      swork[it->ind] = temp;
+      swork_[it->ind] = temp;
     } else {
-      casadi_math<SX>::fun[it->op](x,y,swork[it->ind]);
+      casadi_math<SX>::fun[it->op](x,y,swork_[it->ind]);
     }
   }
 
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
-    for(int i=0; i<output_ind[ind].size(); ++i)
-      output_s[ind].data()[i] = swork[output_ind[ind][i]];
+    for(int i=0; i<output_ind_[ind].size(); ++i)
+      output_s[ind].data()[i] = swork_[output_ind_[ind][i]];
   }
 }
 
@@ -896,9 +905,9 @@ SXFunctionInternal* SXFunctionInternal::clone() const{
 
 
 void SXFunctionInternal::clearSymbolic(){
-  inputv.clear();
-  outputv.clear();
-  swork.clear();
+  inputv_.clear();
+  outputv_.clear();
+  swork_.clear();
 }
 
 FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
@@ -908,7 +917,7 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
   for(int el=0; el<jac_out.size(); ++el){
     if(jblocks[el].second==-1){
       // Undifferentiated function
-      jac_out[el] = outputv[jblocks[el].first];
+      jac_out[el] = outputv_[jblocks[el].first];
     } else {
       // Jacobian
       vector<pair<int,int> > jblocks_local(1,jblocks[el]);
@@ -917,7 +926,7 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
   }
   
   // Return function
-  return SXFunction(inputv,jac_out);
+  return SXFunction(inputv_,jac_out);
 }
 
 
@@ -936,13 +945,13 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
   // Number of nonzero outputs
   int nz_out = output(oind).size();
     
-  // Make sure that dwork, which we will now use, has been allocated
-  if(dwork.size() < worksize) dwork.resize(worksize);
+  // Make sure that dwork_, which we will now use, has been allocated
+  if(dwork_.size() < worksize_) dwork_.resize(worksize_);
   
   // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
   // we can save overhead by reusing the double array
-  bvec_t *iwork = get_bvec_t(dwork);
-  fill_n(iwork,dwork.size(),0);
+  bvec_t *iwork = get_bvec_t(dwork_);
+  fill_n(iwork,dwork_.size(),0);
 
   // Number of forward sweeps we must make
   int nsweep_fwd = nz_in/bvec_size;
@@ -999,12 +1008,12 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
       
       // Give seeds to a set of directions
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork[input_ind[iind][offset+i]] = b;
+        iwork[input_ind_[iind][offset+i]] = b;
         b <<= 1;
       }
 
       // Propagate the dependencies
-      for(vector<AlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
         iwork[it->ind] = iwork[it->ch[0]] | iwork[it->ch[1]];
       }
       
@@ -1025,7 +1034,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         for(int el=oind_rowind[ii]; el<oind_rowind[ii+1]; ++el){
           
           // If there is a dependency in any of the directions
-          if(0 != iwork[output_ind[oind][el]]){
+          if(0 != iwork[output_ind_[oind][el]]){
           
             // Dependency to be checked
             b = 1;
@@ -1034,7 +1043,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
             for(int i=0; i<ndir_local; ++i){
               
               // If dependents on the variable
-              if(b & iwork[output_ind[oind][el]]){
+              if(b & iwork[output_ind_[oind][el]]){
                 
                 // Column
                 int jj = oind_col[el];
@@ -1062,7 +1071,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         temp[i+1] += temp[i];
       }
       
-      // Loop over the elements again, sorting the nodes
+      // Loop over the elements again, sorting the nodes_
       ret_trans_col.resize(nz_offset+detected_col.size());
       for(int i=0; i<detected_row.size(); ++i){
         // Get the place to put the element
@@ -1086,7 +1095,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
       
       // Remove the seeds
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork[input_ind[iind][offset+i]] = 0;
+        iwork[input_ind_[iind][offset+i]] = 0;
       }
 
       // Update offset
@@ -1122,18 +1131,18 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
       bvec_t b = 1;
      
       // Remove all seeds
-      fill_n(iwork,dwork.size(),0);
+      fill_n(iwork,dwork_.size(),0);
 
       // Give seeds to a set of directions
       for(int i=0; i<bvec_size && offset+i<nz_out; ++i){
-        iwork[output_ind[oind][offset+i]] |= b; // note that we may have several nonzeros using the same entry in the work vector, therefore |=
+        iwork[output_ind_[oind][offset+i]] |= b; // note that we may have several nonzeros using the same entry in the work vector, therefore |=
         b <<= 1;
       }
       
       // Propagate the dependencies
-      // for(vector<AlgEl>::reverse_iterator it=algorithm.rbegin(); it!=algorithm.rend(); ++it) // commented out due to bug(?) in Mac using old gcc
-      for(int i=algorithm.size()-1; i>=0; --i){
-        AlgEl *it = &algorithm[i];
+      // for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) // commented out due to bug(?) in Mac using old gcc
+      for(int i=algorithm_.size()-1; i>=0; --i){
+        AlgEl *it = &algorithm_[i];
         iwork[it->ch[0]] |= iwork[it->ind];
         iwork[it->ch[1]] |= iwork[it->ind];
       }
@@ -1155,7 +1164,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
       for(int el=0; el<nz_in; ++el){
 
         // If there is a dependency in any of the directions
-        if(0 != iwork[input_ind[iind][el]]){
+        if(0 != iwork[input_ind_[iind][el]]){
           
           // Output dependency to be checked
           b = 1;
@@ -1164,7 +1173,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
           for(int i=0; i<ndir_local ; ++i){
               
             // If the output is influenced by the variable
-            if(b & iwork[input_ind[iind][el]]){
+            if(b & iwork[input_ind_[iind][el]]){
             
               // Add to pattern
               detected_row.push_back(i);
@@ -1188,7 +1197,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         temp[i+1] += temp[i];
       }
       
-      // Loop over the elements again, sorting the nodes
+      // Loop over the elements again, sorting the nodes_
       ret_col.resize(nz_offset+detected_col.size());
       for(int i=0; i<detected_row.size(); ++i){
         // Get the place to put the element
@@ -1222,7 +1231,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
 //         for(int el=0; el<nz_in; ++el){
 //           
 //           // If the output is influenced by the variable
-//           if(b & iwork[input_ind[iind][el]]){
+//           if(b & iwork[input_ind_[iind][el]]){
 //             
 //             // Add to pattern
 //             ret_col.push_back(el);

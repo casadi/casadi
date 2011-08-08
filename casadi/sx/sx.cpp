@@ -154,6 +154,10 @@ SX SX::add(const SX& y) const{
     return y;
   else if(y->isZero()) // term2 is zero
     return *this;
+  else if(y.isBinary() && y.getOp()==NEG) // x + (-y) -> x - y
+    return sub(-y);
+  else if(isBinary() && getOp()==NEG) // (-x) + y -> y - x
+    return y.sub(getDep());
   else // create a new branch
     return SX(new BinarySXNode(ADD, *this, y));
 }
@@ -165,6 +169,8 @@ SX SX::sub(const SX& y) const{
     return -y;
   if(node->isEqual(y)) // the terms are equal
     return 0;
+  else if(y.isBinary() && y.getOp()==NEG) // x - (-y) -> x + y
+    return add(-y);
   else // create a new branch
     return SX(new BinarySXNode(SUB, *this, y));
 }

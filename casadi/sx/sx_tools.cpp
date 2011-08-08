@@ -296,7 +296,7 @@ int numNodes(const Matrix<SX>& A){
   // Create a function
   SXFunction fcn(Matrix<SX>(),A);
 
-  return fcn->nodes.size();
+  return fcn->nodes_.size();
 }
 
 bool dependsOn(const Matrix<SX>& ex, const Matrix<SX> &arg){
@@ -747,7 +747,7 @@ Matrix<SX> evaluateConstants(const Matrix<SX>& ex){
   
   // Evaluate symbolically, eliminating constants
   std::vector<Matrix<SX> > input_s;
-  std::vector<Matrix<SX> > output_s = fcn->outputv;
+  std::vector<Matrix<SX> > output_s = fcn->outputv_;
   fcn->evaluateSX(input_s,output_s,true);
   return output_s.front();
 }

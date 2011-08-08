@@ -132,9 +132,9 @@ void CVodesInternal::init(){
       
       // Jacobian function
       vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
-      jac_in[M_T] = f->inputv.at(DAE_T).data();
-      jac_in[M_Y] = f->inputv.at(DAE_Y).data();
-      jac_in[M_P] = f->inputv.at(DAE_P).data();
+      jac_in[M_T] = f.inputSX(DAE_T).data();
+      jac_in[M_Y] = f.inputSX(DAE_Y).data();
+      jac_in[M_P] = f.inputSX(DAE_P).data();
       jac_in[M_GAMMA] = vector<SX>(1,gamma);
       SXFunction M(jac_in,jac);
       

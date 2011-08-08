@@ -28,10 +28,9 @@
 
 namespace CasADi{
 
-  template<int n>
   struct AlgElData{
     // Partial derivatives
-    double d[n+1];
+    double d[2];
 };
 
 /** \brief  Internal node class for SXFunction
@@ -78,31 +77,30 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  DATA MEMBERS */
   
   /** \brief  Indices of the nodes corresponding to the inputs */
-  std::vector<std::vector<int> > input_ind;
+  std::vector<std::vector<int> > input_ind_;
   
   /** \brief  Indices of the nodes corresponding the non-zeros of the outputs */
-  std::vector<std::vector<int> > output_ind;
+  std::vector<std::vector<int> > output_ind_;
 
   /** \brief  An elemenent of the algorithm, namely a binary operation */
   typedef SXAlgEl AlgEl;
   
-/** \brief  all binary nodes of the tree in the order of execution */
-  std::vector<AlgEl> algorithm;
-  std::vector<AlgElData<1> > pder1;
-  std::vector<AlgElData<2> > pder2;
+  /** \brief  all binary nodes of the tree in the order of execution */
+  std::vector<AlgEl> algorithm_;
+  std::vector<AlgElData> pder_;
   
   /** \brief  All nodes */
-  std::vector<SXNode*> nodes;
+  std::vector<SXNode*> nodes_;
 
   /** \brief  Working vector for numeric calculation */
-  std::vector<double> work;
-  std::vector<double> dwork;
-  int worksize;
+  std::vector<double> work_;
+  std::vector<double> dwork_;
+  int worksize_;
 
   /// work vector for symbolic calculations (allocated first time)
-  std::vector<SX> swork;
-  std::vector<SX> free_vars;
-  std::vector<int> refcount;
+  std::vector<SX> swork_;
+  std::vector<SX> free_vars_;
+  std::vector<int> refcount_;
   
   /** \brief  Initialize */
   virtual void init();
@@ -117,10 +115,10 @@ class SXFunctionInternal : public XFunctionInternal{
   void generateCode(const std::string& filename);
       
   /** \brief  Inputs of the function (needed for symbolic calculations) */
-  std::vector<Matrix<SX> > inputv;
+  std::vector<Matrix<SX> > inputv_;
 
   /** \brief  Outputs of the function (needed for symbolic calculations) */
-  std::vector<Matrix<SX> > outputv;
+  std::vector<Matrix<SX> > outputv_;
   
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
