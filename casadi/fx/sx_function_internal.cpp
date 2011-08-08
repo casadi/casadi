@@ -39,7 +39,6 @@ using namespace std;
 
 
 SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : inputv_(inputv),  outputv_(outputv) {
-  addOption("symbolic_jacobian",OT_BOOLEAN,true); // generate jacobian symbolically by source code transformation
   setOption("name","unnamed_sx_function");
   
   casadi_assert(!outputv_.empty());
@@ -738,8 +737,22 @@ void SXFunctionInternal::init(){
       bnodes_.push_back(t);
   }
   
-  // Resort the nodes_ in a more cache friendly order (Kahn 1962)
-  resort_bredth_first(bnodes_);
+  // Get the sortign algorithm
+  bool breadth_first_search;
+  if(getOption("topological_sorting")=="breadth-first"){
+    breadth_first_search = true;
+  } else if(getOption("topological_sorting")=="depth-first"){
+    breadth_first_search = false;
+  } else {
+    stringstream ss;
+    ss << "Unrecongnized topological_sorting: " << getOption("topological_sorting") << endl;
+    throw CasadiException(ss.str());
+  }
+  
+  // Resort the nodes in a more cache friendly order (Kahn 1962)
+  if(breadth_first_search){
+    resort_breadth_first(bnodes_);
+  }
 
   // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes_.size(); ++i)

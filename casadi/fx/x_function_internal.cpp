@@ -28,6 +28,7 @@ using namespace std;
 
 
 XFunctionInternal::XFunctionInternal(){
+  addOption("topological_sorting",OT_STRING,"breadth-first","Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search");
 }
 
 XFunctionInternal::~XFunctionInternal(){

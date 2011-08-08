@@ -24,6 +24,7 @@ fcn.init()
 gf = fcn.grad()
 
 gfcn = SXFunction([x],[gf])
+#gfcn.setOption("topological_sorting","depth-first")
 gfcn.init()
 
 srcname = "grad_det.c"

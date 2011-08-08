@@ -39,6 +39,7 @@ namespace CasADi{
 
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std::vector<MX>& outputv_) : inputv(inputv_), outputv(outputv_){
   setOption("name", "unnamed_mx_function");
+  setOption("topological_sorting","depth-first"); // breadth-first not working
 
   liftfun_ = 0;
   liftfun_ud_ = 0;
@@ -105,8 +106,21 @@ void MXFunctionInternal::init(){
 
   // TODO: Make sure that the output nodes are placed directly after the corresponding multiple output node
 
+  // Get the sorting algorithm
+  bool breadth_first_search;
+  if(getOption("topological_sorting")=="breadth-first"){
+    breadth_first_search = true;
+  } else if(getOption("topological_sorting")=="depth-first"){
+    breadth_first_search = false;
+  } else {
+    stringstream ss;
+    ss << "Unrecongnized topological_sorting: " << getOption("topological_sorting") << endl;
+    throw CasadiException(ss.str());
+  }
+
   // Resort the nodes in a more cache friendly order (Kahn 1962)
-  //  resort_bredth_first(nodes);
+  casadi_assert_message(breadth_first_search==false,"Breadth-first search currently not working for MX");
+  // resort_breadth_first(nodes); // FIXME
   
   // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes.size(); ++i)

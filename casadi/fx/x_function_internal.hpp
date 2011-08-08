@@ -48,9 +48,9 @@ class XFunctionInternal : public FXInternal{
     template<typename Node>
     static void sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& nodes);
 
-    /** \brief  Topological (re)sorting of the nodes based on Bredth-First Search (BFS) (Kahn 1962) */
+    /** \brief  Topological (re)sorting of the nodes based on Breadth-First Search (BFS) (Kahn 1962) */
     template<typename Node>
-    static void resort_bredth_first(std::vector<Node*>& algnodes);
+    static void resort_breadth_first(std::vector<Node*>& algnodes);
 
     /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every calculation as much as possible, as long as it does not influence a dependent node */
     template<typename Node>
@@ -214,7 +214,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
 }
 
 template<typename Node>
-void XFunctionInternal::resort_bredth_first(std::vector<Node*>& algnodes){
+void XFunctionInternal::resort_breadth_first(std::vector<Node*>& algnodes){
 
   // We shall assign a "level" to each element of the algorithm. A node which does not depend on other binary nodes are assigned level 0 and for nodes that depend on other nodes of the algorithm, the level will be the maximum level of any of the children plus 1. Note that all nodes of a level can be evaluated in parallel. The level will be saved in the temporary variable
 
