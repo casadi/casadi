@@ -261,9 +261,6 @@ lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])
   
 # Hessian of the Lagrangian
 HL = lfcn.hessian()
-HL.init()
-HL.generateCode("vdp_colloc.c")
-
 
 ## ----
 ## SOLVE THE NLP
