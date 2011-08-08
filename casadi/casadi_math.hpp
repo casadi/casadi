@@ -135,6 +135,7 @@ enum Operation{
   STEP,  
   FLOOR,  CEIL,  EQUALITY,  
   ERF,  FMIN,  FMAX,
+  INV,
   NUM_BUILT_IN_OPS
 };
 
@@ -410,6 +411,17 @@ class UnaryOperation<ERF>{
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = (2/std::sqrt(M_PI))*std::exp(-x*x);}
 };
 
+/// Elementwise inverse
+template<>
+class UnaryOperation<INV>{
+  public:
+    printRoutinesUnary("(1/",")")
+    static bool f0_is_zero(){return false;}
+    static int ndeps() { return 1;}
+    template<typename T> static void fcn(const T& x, T& f){ f = 1./x;}
+    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = -f*f; }
+};
+
 /// Easy access to all the functions for a particular type
 template<typename T>
 class casadi_math{
@@ -550,6 +562,7 @@ std::vector<Type> casadi_math<T>::getPrintFunName(){ \
   ret[ERF] = BinaryOperation<ERF>::printFunName; \
   ret[FMIN] = BinaryOperation<FMIN>::printFunName; \
   ret[FMAX] = BinaryOperation<FMAX>::printFunName; \
+  ret[INV] = BinaryOperation<INV>::printFunName; \
  \
   for(int i=0; i<ret.size(); ++i){ \
     casadi_assert(ret[i]!=0); \
@@ -603,6 +616,8 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[FMIN] = BinaryOperation<FMIN>::fcn<T>;
   ret[FMAX] = BinaryOperation<FMAX>::fcn<T>;
 
+  ret[INV] = BinaryOperation<INV>::fcn<T>;
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -648,6 +663,8 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
   ret[FMIN] = BinaryOperationE<FMIN>::fcn<T>;
   ret[FMAX] = BinaryOperationE<FMAX>::fcn<T>;
 
+  ret[INV] = BinaryOperationE<INV>::fcn<T>;
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -691,6 +708,8 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[ERF] = BinaryOperation<ERF>::der<T>;
   ret[FMIN] = BinaryOperation<FMIN>::der<T>;
   ret[FMAX] = BinaryOperation<FMAX>::der<T>;
+
+  ret[INV] = BinaryOperation<INV>::der<T>;
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -736,6 +755,8 @@ std::vector<bool> casadi_math<T>::getF00_is_zero(){
   ret[FMIN] = BinaryOperation<FMIN>::f00_is_zero();
   ret[FMAX] = BinaryOperation<FMAX>::f00_is_zero();
 
+  ret[INV] = BinaryOperation<INV>::f00_is_zero();
+
   return ret;
 }
 
@@ -775,6 +796,8 @@ std::vector<bool> casadi_math<T>::getF0x_is_zero(){
   ret[FMIN] = BinaryOperation<FMIN>::f0x_is_zero();
   ret[FMAX] = BinaryOperation<FMAX>::f0x_is_zero();
 
+  ret[INV] = BinaryOperation<INV>::f0x_is_zero();
+
   return ret;
 }
 
@@ -813,6 +836,8 @@ std::vector<bool> casadi_math<T>::getFx0_is_zero(){
   ret[ERF] = BinaryOperation<ERF>::fx0_is_zero();
   ret[FMIN] = BinaryOperation<FMIN>::fx0_is_zero();
   ret[FMAX] = BinaryOperation<FMAX>::fx0_is_zero();
+
+  ret[INV] = BinaryOperation<INV>::fx0_is_zero();
 
   return ret;
 }

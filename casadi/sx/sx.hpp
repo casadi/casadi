@@ -224,6 +224,7 @@ class SX{
     SX div(const SX& y) const;
     SX fmin(const SX &b) const;
     SX fmax(const SX &b) const;
+    SX inv() const;
     SX constpow(const SX& n) const;
     
     // Get the temporary variable

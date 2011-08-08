@@ -246,6 +246,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case ERF:       BinaryOperation<ERF>::fcn(x,y,work[it->ind]);           break;
         case FMIN:      BinaryOperation<FMIN>::fcn(x,y,work[it->ind]);          break;
         case FMAX:      BinaryOperation<FMAX>::fcn(x,y,work[it->ind]);          break;
+        case INV:      BinaryOperation<INV>::fcn(x,y,work[it->ind]);          break;
       }
       #else
       casadi_math<double>::fun[it->op](x,y,work[it->ind]);

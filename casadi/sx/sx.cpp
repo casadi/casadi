@@ -171,17 +171,21 @@ SX SX::sub(const SX& y) const{
 
 SX SX::mul(const SX& y) const{
   if(node->isZero() || y->isZero()) // one of the terms is zero
-      return 0;
-    else if(node->isOne()) // term1 is one
-      return y;
-    else if(y->isOne()) // term2 is one
-      return *this;
-    else if(y->isMinusOne())
-      return -(*this);
-    else if(node->isMinusOne())
-      return -y;
-    else     // create a new branch
-      return SX(new BinarySXNode(MUL,*this,y));
+    return 0;
+  else if(node->isOne()) // term1 is one
+    return y;
+  else if(y->isOne()) // term2 is one
+    return *this;
+  else if(y->isMinusOne())
+    return -(*this);
+  else if(node->isMinusOne())
+    return -y;
+  else if(y.isBinary() && y.getOp()==INV)
+    return (*this)/y.inv();
+  else if(isBinary() && getOp()==INV)
+    return y/inv();
+  else     // create a new branch
+    return SX(new BinarySXNode(MUL,*this,y));
 }
 
 SX SX::div(const SX& y) const{
@@ -195,8 +199,20 @@ SX SX::div(const SX& y) const{
     return 1;
   else if(y.isEqual(2) && node->hasDep() && node->getOp()==ADD && node->dep(0).isEqual(node->dep(1)))
     return node->dep(0);
+  else if(node->isOne())
+    return y.inv();
+  else if(y.isBinary() && y.getOp()==INV)
+    return (*this)*y.inv();
   else // create a new branch
     return SX(new BinarySXNode(DIV,*this,y));
+}
+
+SX SX::inv() const{
+  if(node->hasDep() && node->getOp()==INV){
+    return node->dep(0);
+  } else {
+    return SX(new BinarySXNode(INV,*this));
+  }
 }
 
 SX operator+(const SX &x, const SX &y){
