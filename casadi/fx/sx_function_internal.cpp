@@ -778,6 +778,7 @@ void SXFunctionInternal::init(){
   // Use live variables?
   bool live_variables = getOption("live_variables");
   if(live_variables){
+    casadi_warning("Live variables is currently not compatible with symbolic calculations");
     
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(),0);
