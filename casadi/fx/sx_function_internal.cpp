@@ -40,7 +40,8 @@ using namespace std;
 
 SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : inputv_(inputv),  outputv_(outputv) {
   setOption("name","unnamed_sx_function");
-  
+  addOption("live_variables",OT_BOOLEAN,false,"Reuse variables in the work vector");
+
   casadi_assert(!outputv_.empty());
 
   // Check that inputs are symbolic
@@ -774,9 +775,103 @@ void SXFunctionInternal::init(){
   // Place in the work vector for each of the nodes in the tree
   vector<int> place(nodes.size(),-1);
 
-  worksize_ = nodes.size();
-  for(int i=0; i<place.size(); ++i)
-    place[i] = i;
+  // Use live variables?
+  bool live_variables = getOption("live_variables");
+  if(live_variables){
+    
+    // Count the number of times each node is used
+    vector<int> refcount(nodes.size(),0);
+    for(int i=0; i<bnodes.size(); ++i){
+      for(int c=0; c<2; ++c){
+        refcount[bnodes[i]->dep(c)->temp]++;
+      }
+    }
+    
+    // Add artificial count to the outputs to avoid them being overwritten
+    for(int ind=0; ind<output_.size(); ++ind){
+      for(int el=0; el<outputv_[ind].size(); ++el){
+        refcount[outputv_[ind].at(el)->temp]++;
+      }
+    }
+
+    // Stack with unused elements in the work vector
+    stack<int> unused;
+
+    // Place the work vector
+    int p=0;
+
+    #if 1 // sort by type, then by location in node vector
+    // Place the constants in the work vector
+    for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
+      place[(**it).temp] = p++;
+      refcount[(**it).temp]++; // make sure constants are not overwritten
+    }
+    
+    // Then all symbolic variables
+    for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
+      place[(**it).temp] = p++;
+    }
+   
+     
+    for(vector<SXNode*>::iterator it=bnodes.begin(); it!=bnodes.end(); ++it){
+      int i = (**it).temp;
+      
+      // decrease reference count of children
+      for(int c=0; c<2; ++c){
+        int ch_ind = (*it)->dep(c)->temp;
+        int remaining = --refcount[ch_ind];
+        if(remaining==0) unused.push(place[ch_ind]);
+      }
+      
+      // Try to reuse a variable from the stack if possible
+      if(!unused.empty()){
+        place[i] = unused.top();
+        unused.pop();
+      } else {
+        place[i] = p++;
+      }
+    }
+    
+    #else
+    // Use the same sorting as the node vector, but with live variables
+    // FIXME:2011-08-09:Joel:Doesn't work, c_code_generation.py example fails.
+    
+    // Loop over the nodes
+    for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
+      if((*it)->isConstant()){
+        place[(**it).temp] = p++;
+      } else if((*it)->isSymbolic()) {
+        place[(**it).temp] = p++;
+      } else {
+        int i = (**it).temp;
+        
+        // decrease reference count of children
+        for(int c=0; c<2; ++c){
+          int ch_ind = (*it)->dep(c)->temp;
+          int remaining = --refcount[ch_ind];
+          if(remaining==0) unused.push(place[ch_ind]);
+        }
+        
+        // Try to reuse a variable from the stack if possible
+        if(!unused.empty()){
+          place[i] = unused.top();
+          unused.pop();
+        } else {
+          place[i] = p++;
+        }
+      }
+    }
+    #endif
+    
+    cout << "Using live variables. Worksize is " << p << " instead of " << nodes.size() << "(" << bnodes.size() << " elementary operations)" << endl;
+    worksize_ = p;
+  } else {
+    worksize_ = nodes.size();
+    for(int i=0; i<place.size(); ++i)
+      place[i] = i;
+  }
+
+//  casadi_assert(0);
 
   // Allocate a vector containing expression corresponding to each binary operation
   binops_.resize(bnodes.size());
@@ -834,12 +929,20 @@ void SXFunctionInternal::init(){
     }
   }
 
-  // Allocate a work vector
+  // Allocate work vectors (symbolic/numeric)
   work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
+  swork_.resize(worksize_);
 
   // Save the constants to the work vector
-  for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it)
-    work_[(**it).temp] = (**it).getValue();
+  for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
+    work_[place[(**it).temp]] = (**it).getValue();
+    swork_[place[(**it).temp]] = SX(*it);
+  }
+
+  // Save the symbolic variables to the symbolic work vector
+  for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
+    swork_[place[(**it).temp]] = SX(*it);
+  }
 
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
@@ -871,13 +974,6 @@ void SXFunctionInternal::init(){
 
   if(nfdir_>0 || nadir_>0){
     dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  }
-  
-  // Create a symbolic work vector if not existing
-  swork_.resize(nodes.size());
-  for(int i=0; i<nodes.size(); ++i){
-    if(!nodes[i]->hasDep())
-      swork_[i] = SX(nodes[i]);
   }
 }
 
