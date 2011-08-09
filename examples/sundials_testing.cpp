@@ -88,8 +88,8 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 }
 
 // Wrap the function to allow creating an CasADi function
-void dae_res_c_wrapper(CFunction &f, int fsens_order, int asens_order, void* user_data){
-  casadi_assert(fsens_order==0 && asens_order==0);
+void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
+  casadi_assert(nfwd==0 && nadj==0);
   dae_res_c(f.input(DAE_T).front(), &f.input(DAE_Y).front(), &f.input(DAE_YDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_RES).front());
 }
 

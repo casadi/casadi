@@ -83,6 +83,11 @@ const std::vector<MXAlgEl>& MXFunction::algorithm() const{
   return (*this)->alg;
 }
 
+int MXFunction::countNodes() const{
+  casadi_assert(isInit());
+  return algorithm().size();
+}
+
 void MXFunction::setLiftingFunction(LiftingFunction liftfun, void* user_data){
   (*this)->setLiftingFunction(liftfun,user_data);
 }

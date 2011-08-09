@@ -262,8 +262,6 @@ void IpoptInternal::init(){
     casadi_assert_message((GF_.output().size1()==n && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n),"Inconsistent dimensions");
   }
   
-
-  
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){
     J_ = G_.jacobian();

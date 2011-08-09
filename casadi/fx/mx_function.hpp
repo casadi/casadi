@@ -97,6 +97,9 @@ public:
   /** \brief Access the algorithm */
   const std::vector<MXAlgEl>& algorithm() const;
   
+  /** \brief Number of nodes in the algorithm */
+  int countNodes() const;
+  
   /** \brief Set the lifting function */
   void setLiftingFunction(LiftingFunction liftfun, void* user_data=0);
   

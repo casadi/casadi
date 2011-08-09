@@ -40,6 +40,7 @@ namespace CasADi{
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std::vector<MX>& outputv_) : inputv(inputv_), outputv(outputv_){
   setOption("name", "unnamed_mx_function");
   setOption("topological_sorting","depth-first"); // breadth-first not working
+  setOption("numeric_jacobian", true);
 
   liftfun_ = 0;
   liftfun_ud_ = 0;
@@ -688,6 +689,39 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   
   // Return sparsity pattern
   return ret;
+}
+
+FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+  // Make sure initialized
+  casadi_assert(isInit());
+  
+  // Outputs of the Jacobian function
+  vector<MX> j_out;
+  j_out.reserve(jblocks.size());
+
+  // The jacobians for each input
+  vector<vector<MX> > jacs(getNumInputs());
+  
+  for(vector<pair<int,int> >::const_iterator it=jblocks.begin(); it!=jblocks.end(); ++it){
+    // If variable index is -1, we want nondifferentiated function output
+    if(it->second==-1){
+      // Nondifferentiated function
+      j_out.push_back(outputv.at(it->first));
+      
+    } else {
+      
+      // Create a Jacobian symbolically, if not already created
+      if(jacs[it->first].empty()){
+        jacs[it->first] = jac(it->first);
+      }
+      
+      // Add to outputs
+      j_out.push_back(jacs[it->first][it->second]);
+    }
+  }
+  
+  // Create function
+  return MXFunction(inputv,j_out);
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){

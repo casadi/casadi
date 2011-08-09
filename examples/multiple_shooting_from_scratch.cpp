@@ -123,8 +123,8 @@ int main(){
   integrator.setOption("stop_at_end",true);
   integrator.setOption("t0",0);
   integrator.setOption("tf",tf/ns);
-/*  integrator.setOption("number_of_fwd_dir",20);
-  integrator.setOption("number_of_adj_dir",20);*/
+  integrator.setOption("number_of_fwd_dir",7);
+  //integrator.setOption("verbose",true);
   integrator.init();
   
   // Total number of NLP variables
@@ -178,13 +178,11 @@ int main(){
   // NLP constraint function
   MX gg = vertcat(g);
   MXFunction G(V,gg);
-/*  G.setOption("number_of_fwd_dir",20);
-  G.setOption("number_of_adj_dir",20);*/
+  G.setOption("number_of_fwd_dir",7);
+  G.setOption("ad_mode","forward");
+  G.setOption("numeric_jacobian",false);
+  G.setOption("name","NLP constraint function");
   G.init();
-
-  // Generate the Jacobian of the NLP constraint function
-  MXFunction J(V,G.jac());
-  J.init();
   
   FX h_jac;
   if(exact_hessian){
@@ -213,13 +211,14 @@ int main(){
   }
   
   // Create an NLP solver instance
-  IpoptSolver nlp_solver(F,G,h_jac,J);
+  IpoptSolver nlp_solver(F,G,h_jac);
   nlp_solver.setOption("tol",1e-5);
   if(!exact_hessian)
     nlp_solver.setOption("hessian_approximation", "limited-memory");
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");
-  //  nlp_solver.setOption("derivative_test","first-order");
+  // nlp_solver.setOption("verbose",true);
+  // nlp_solver.setOption("derivative_test","first-order");
   nlp_solver.init();
     
   // Initial guess and bounds on variables

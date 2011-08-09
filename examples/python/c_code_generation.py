@@ -24,7 +24,7 @@ fcn.init()
 gf = fcn.grad()
 
 gfcn = SXFunction([x],[gf])
-#gfcn.setOption("live_variables",True)
+#gfcn.setOption("live_variables",True) # NOTE: leads to less efficient code for smaller problems but required for 8-by-8 or larger since gcc otherwise crashes with "add_stack_var_conflict"
 #gfcn.setOption("topological_sorting","depth-first")
 gfcn.init()
 

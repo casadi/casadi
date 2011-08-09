@@ -152,6 +152,11 @@ const vector<SXAlgEl>& SXFunction::algorithm() const{
   return (*this)->algorithm_;
 }
 
+int SXFunction::countNodes() const{
+  casadi_assert(isInit());
+  return algorithm().size();
+}
+
 void SXFunction::clearSymbolic(){
   (*this)->clearSymbolic();
 }

@@ -131,6 +131,9 @@ public:
   /** \brief Access the algorithm */
   const std::vector<SXAlgEl>& algorithm() const;
   
+  /** \brief Number of nodes in the algorithm */
+  int countNodes() const;
+  
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
   
