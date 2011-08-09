@@ -95,10 +95,11 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){
     // without taping
+    //for(int i=0; i<algorithm_.size(); ++i){
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
       // Get the arguments
-      double x = work_[it->ch[0]];
-      double y = work_[it->ch[1]];
+      #define x work_[it->ch[0]]
+      #define y work_[it->ch[1]]
       
       //#define NO_SWITCH_IN_VM
       #ifndef NO_SWITCH_IN_VM
@@ -131,6 +132,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       #else
       casadi_math<double>::fun[it->op](x,y,work_[it->ind]);
       #endif
+      #undef x
+      #undef y
+      
     }
   } else {
     // with taping
@@ -511,7 +515,7 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
       } else {
         stream << "(" << v << ")";
       }
-    } else if(f->dep(c)->hasDep() && refcount_[f->dep(c)->temp-1]==1) {
+    } else if(refcount_[f->dep(c)->temp-1]==1) {
       printOperation(stream,f->dep(c)->temp-1);
     } else {
       stream << "a" << ae.ch[c];
@@ -624,7 +628,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
     }
   }
 
- // In each node, mark its place in the algorithm
+ // For each node, mark its place in the algorithm
  for(int i=0; i<binops_.size(); ++i){
    binops_[i]->temp = i+1;
  }
@@ -635,7 +639,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
  for(int i=0; i<algorithm_.size(); ++i){
    for(int c=0; c<2; ++c){
      // Get the place in the algorithm of the child
-     int i_ch = binops_[i]->temp-1;
+     int i_ch = binops_[i]->dep(c)->temp-1;
      if(i_ch>=0){
        // If the child is a binary operation
        refcount_[i_ch]++;
@@ -650,12 +654,12 @@ void SXFunctionInternal::generateCode(const string& src_name){
    }
  }
 
- // Outputs get value two in order to prevent them from being inlined
+ // Outputs get extra reference in order to prevent them from being inlined
  for(int ind=0; ind<output_.size(); ++ind){
    for(int el=0; el<outputv_[ind].size(); ++el){
      int i = outputv_[ind].at(el)->temp-1;
      if(i>=0){
-       refcount_[i] = 2;
+       refcount_[i] += 2;
      }
    }
  }
@@ -818,7 +822,7 @@ void SXFunctionInternal::init(){
       int i = (**it).temp;
       
       // decrease reference count of children
-      for(int c=0; c<2; ++c){
+      for(int c=1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
         int ch_ind = (*it)->dep(c)->temp;
         int remaining = --refcount[ch_ind];
         if(remaining==0) unused.push(place[ch_ind]);
