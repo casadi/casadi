@@ -64,6 +64,7 @@ int main(){
   SX z("z");
   SXFunction F(z,z*z - 2*z + 1);
   F.setOption("name","dz/dt");
+  F.init();
   cout << F << endl;
   
   double z0 = -3;
@@ -71,6 +72,7 @@ int main(){
   // Analytic solution
   SXFunction z_analytic(t, (4*t-3)/(3*t+1));
   z_analytic.setOption("name","analytic solution");
+  z_analytic.init();
   cout << z_analytic << endl;
   
   // Collocation point

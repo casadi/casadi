@@ -292,13 +292,6 @@ Matrix<SX> spy(const Matrix<SX>& A){
   return s;
 }
 
-int numNodes(const Matrix<SX>& A){
-  // Create a function
-  SXFunction fcn(Matrix<SX>(),A);
-
-  return fcn->nodes_.size();
-}
-
 bool dependsOn(const Matrix<SX>& ex, const Matrix<SX> &arg){
   Matrix<SX> g = gradient(vec(ex),arg);
   return !isZero(g);
@@ -308,6 +301,7 @@ bool dependsOn(const Matrix<SX>& ex, const Matrix<SX> &arg){
 bool isSmooth(const Matrix<SX>& ex){
  // Make a function
  SXFunction temp(Matrix<SX>(),ex);
+ temp.init();
   
  // Run the function on the temporary variable
  return temp->isSmooth();

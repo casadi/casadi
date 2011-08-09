@@ -280,9 +280,6 @@ Matrix<SX> blockmatrix(Matrix<SX> array[n]){
 }
 #endif
 
-/** \brief  Get the number of nodes of the tree of a Matrix<SX> */
-int numNodes(const Matrix<SX>& A);
-
 /// Check dependency: very inefficient algorithm
 bool dependsOn(const Matrix<SX>& f, const Matrix<SX> &arg);
 

@@ -201,13 +201,15 @@ int main(){
   y[1] = x;
   y[2] = u;
   SXFunction ffcn(y,xdot);
+  ffcn.init();
   
   // Objective function (meyer term)
   SXFunction mfcn(y,-Ls);
+  mfcn.init();
 
   // Nonlinear constraint function
   SXFunction cfcn(y,Tj-Ta);
-  
+  cfcn.init();
   
   // Degree of interpolating polynomial
   int K = 3;

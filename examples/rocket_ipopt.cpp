@@ -81,7 +81,6 @@ int main(){
   SXFunction ffcn(u,f); // objective function
   SXFunction gfcn(u,g); // constraint
   gfcn.setOption("ad_mode","reverse");
-  gfcn.setOption("symbolic_jacobian",false);
   
   // Allocate an NLP solver
   IpoptSolver solver(ffcn,gfcn);

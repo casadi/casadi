@@ -292,8 +292,9 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   der1.reserve(algorithm_.size());
   der2.reserve(algorithm_.size());
   SX tmp[2];
-  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-      SX f = SX(nodes_[it->ind]);
+  vector<SX>::const_iterator f_it=binops_.begin();
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it){
+      const SX& f = *f_it;
       const SX& x = f->dep(0);
       const SX& y = f->dep(1);
       casadi_math<SX>::der[it->op](x,y,f,tmp);
@@ -305,7 +306,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   }
 
   // Gradient (this is also the working array)
-  vector<SX> g(nodes_.size(),casadi_limits<SX>::zero);
+  vector<SX> g(swork_.size(),casadi_limits<SX>::zero);
 
   // Get the number of forward and adjoint sweeps
   int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
@@ -462,7 +463,8 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
 }
 
 bool SXFunctionInternal::isSmooth() const{
-    // Go through all nodes_ and check if any node is non-smooth
+  casadi_assert(isInit());
+    // Go through all nodes and check if any node is non-smooth
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op == STEP || it->op == FLOOR )
         return false;
@@ -477,16 +479,8 @@ void SXFunctionInternal::print(ostream &stream) const{
     s << "a" << it->ind;
 
     int i0 = it->ch[0], i1 = it->ch[1];
-#if 0
-    if(nodes_[i0]->hasDep())  s0 << "a" << i0;
-    else                      s0 << SX(nodes_[i0]);
-    if(nodes_[i1]->hasDep())  s1 << "a" << i1;
-    else                      s1 << SX(nodes_[i1]);
-#else
     s0 << "a" << i0;
     s1 << "a" << i1;
-#endif
-
     stream << s.str() << " = ";
     casadi_math<double>::print[op](stream,s0.str(),s1.str());
     stream << ";" << endl;
@@ -502,28 +496,27 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
   cfile << "};" << endl;
 }
 
-std::string SXFunctionInternal::printOperation(int i){
-  stringstream s;
-  if(nodes_.at(i)->isConstant()){
-    double v = nodes_.at(i)->getValue();
-    if(v>=0){
-      s << v;
+void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
+  const AlgEl& ae = algorithm_[i];
+  const SX& f = binops_[i];
+  casadi_math<double>::printPre[ae.op](stream);
+  for(int c=0; c<casadi_math<double>::ndeps[ae.op]; ++c){
+    if(c==1) casadi_math<double>::printSep[ae.op](stream);
+
+    if(f->dep(c)->isConstant()){
+      double v = f->dep(c)->getValue();
+      if(v>=0){
+        stream << v;
+      } else {
+        stream << "(" << v << ")";
+      }
+    } else if(f->dep(c)->hasDep() && refcount_[f->dep(c)->temp-1]==1) {
+      printOperation(stream,f->dep(c)->temp-1);
     } else {
-      s << "(" << v << ")";
+      stream << "a" << ae.ch[c];
     }
-  } else if(refcount_[i]==1){
-    // Call can be inlined
-    int j = nodes_[i]->temp;
-    string ss[2];
-    for(int c=0; c<2; ++c){
-      ss[c] = printOperation(algorithm_[j].ch[c]);
-    }
-    int op = algorithm_[j].op;
-    casadi_math<double>::print[op](s,ss[0],ss[1]);
-  } else {
-    s << "a" << i;
   }
-  return s.str();
+  casadi_math<double>::printPost[ae.op](stream);
 }
 
 void SXFunctionInternal::generateCode(const string& src_name){
@@ -629,73 +622,93 @@ void SXFunctionInternal::generateCode(const string& src_name){
       declared[el] = true;
     }
   }
-  
+
+ // In each node, mark its place in the algorithm
+ for(int i=0; i<binops_.size(); ++i){
+   binops_[i]->temp = i+1;
+ }
+
  // Count how many times a node is referenced in the algorithm_
- refcount_.clear();
- refcount_.resize(nodes_.size(),0);
- for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-   for(int c=0; c<2; ++c) refcount_[it->ch[c]]++;
+ refcount_.resize(binops_.size());
+ fill(refcount_.begin(),refcount_.end(),0);
+ for(int i=0; i<algorithm_.size(); ++i){
+   for(int c=0; c<2; ++c){
+     // Get the place in the algorithm of the child
+     int i_ch = binops_[i]->temp-1;
+     if(i_ch>=0){
+       // If the child is a binary operation
+       refcount_[i_ch]++;
+     }
+   }
  }
   
- // Inputs get value two in order to prevent them from being inlined
+ // Mark the inputs with negative numbers indicating where they are stored in the work vector
  for(int ind=0; ind<input_.size(); ++ind){
-   for(int i=0; i<input_ind_[ind].size(); ++i){
-     int el = input_ind_[ind][i];
-     refcount_[el] = 2;
+   for(int el=0; el<inputv_[ind].size(); ++el){
+     inputv_[ind].at(el)->temp = -1-input_ind_[ind][el];
    }
  }
 
  // Outputs get value two in order to prevent them from being inlined
  for(int ind=0; ind<output_.size(); ++ind){
-   for(int i=0; i<output_ind_[ind].size(); ++i){
-     int el = output_ind_[ind][i];
-     refcount_[el] = 2;
+   for(int el=0; el<outputv_[ind].size(); ++el){
+     int i = outputv_[ind].at(el)->temp-1;
+     if(i>=0){
+       refcount_[i] = 2;
+     }
    }
  }
  
- // Mark the node its place in the algorithm_
- for(int i=0; i<algorithm_.size(); ++i){
-   nodes_[algorithm_[i].ind]->temp = i;
- }
- 
  // Run the algorithm_
- for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+ vector<SX>::const_iterator f_it=binops_.begin();
+ int ii=0;
+ for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it, ++ii){
    // Skip printing variables that can be inlined
-   if(refcount_[it->ind]<2) continue;
+   if(refcount_[ii]<2) continue;
+   
+   // Get a pointer to the expression
+   const SX& f = *f_it;
    
     if(!declared[it->ind]){
       cfile << "d ";
       declared[it->ind]=true;
     }
     cfile << "a" << it->ind << "=";
-    string s[2];
-    for(int c=0; c<2; ++c){
-      s[c] = printOperation(it->ch[c]);
-    }
-    int op = it->op;
-    casadi_math<double>::print[op](cfile,s[0],s[1]);
+    printOperation(cfile,ii);
     cfile  << ";" << endl;
   }
-
- // Unmark the nodes_
- for(int i=0; i<algorithm_.size(); ++i){
-   nodes_[algorithm_[i].ind]->temp = 0;
- }
 
  // Clear the reference counter
  refcount_.clear();
 
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
-    for(int i=0; i<output_ind_[ind].size(); ++i){
-      cfile << "r[" << ind << "][" << i << "]=";
-      int el = output_ind_[ind][i];
-      if(nodes_[el]->isConstant())
-        cfile << nodes_[el]->getValue() << ";" << endl;
-      else
-        cfile << "a" << el << ";" << endl;
+    for(int el=0; el<outputv_[ind].size(); ++el){
+      cfile << "r[" << ind << "][" << el << "]=";
+      const SX& f = outputv_[ind].at(el);
+      int i=f->temp;
+      if(i==0){ // constant
+        cfile << f->getValue();
+      } else if(i>0){ // binary node
+        cfile << "a" << algorithm_[i-1].ind;
+      } else { // input feedthrough
+        cfile << "a" << (-i-1);
+      }
+      cfile << ";" << endl;
     }
   }
+
+ // Unmark the binary operations
+ for(int i=0; i<binops_.size(); ++i){
+   binops_[i]->temp = 0;
+ }
+ 
+  // Unmark the inputs 
+ for(int ind=0; ind<input_.size(); ++ind){
+   for(int el=0; el<inputv_[ind].size(); ++el){
+     inputv_[ind].at(el)->temp = 0;
+   }
+ }
 
   cfile << "return 0;" << endl;
   cfile << "}" << endl << endl;
@@ -721,20 +734,20 @@ void SXFunctionInternal::init(){
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
       s.push(itc->get());
 
-  // Order the nodes_ in the order of dependencies using a depth-first topological sorting
-  nodes_.clear();
-  sort_depth_first(s,nodes_);
+  // Order the nodes in the order of dependencies using a depth-first topological sorting
+  std::vector<SXNode*> nodes;
+  sort_depth_first(s,nodes);
 
-  // Sort the nodes_ by type
-  vector<SXNode*> bnodes_, cnodes_, snodes_;
-  for(vector<SXNode*>::iterator it = nodes_.begin(); it != nodes_.end(); ++it){
+  // Sort the nodes by type
+  vector<SXNode*> bnodes, cnodes, snodes;
+  for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
     SXNode* t = *it;
     if(t->isConstant())
-      cnodes_.push_back(t);
+      cnodes.push_back(t);
     else if(t->isSymbolic())
-      snodes_.push_back(t);
+      snodes.push_back(t);
     else
-      bnodes_.push_back(t);
+      bnodes.push_back(t);
   }
   
   // Get the sortign algorithm
@@ -751,39 +764,42 @@ void SXFunctionInternal::init(){
   
   // Resort the nodes in a more cache friendly order (Kahn 1962)
   if(breadth_first_search){
-    resort_breadth_first(bnodes_);
+    resort_breadth_first(bnodes);
   }
 
   // Set the temporary variables to be the corresponding place in the sorted graph
-  for(int i=0; i<nodes_.size(); ++i)
-    nodes_[i]->temp = i;
+  for(int i=0; i<nodes.size(); ++i)
+    nodes[i]->temp = i;
 
-  // Place in the work vector for each of the nodes_ in the tree
-  vector<int> place(nodes_.size(),-1);
+  // Place in the work vector for each of the nodes in the tree
+  vector<int> place(nodes.size(),-1);
 
-  worksize_ = nodes_.size();
+  worksize_ = nodes.size();
   for(int i=0; i<place.size(); ++i)
     place[i] = i;
 
+  // Allocate a vector containing expression corresponding to each binary operation
+  binops_.resize(bnodes.size());
+  for(int i=0; i<bnodes.size(); ++i){
+    binops_[i] = SX(bnodes[i]);
+  }
+  bnodes.clear();
+  
   // Add the binary operations
   algorithm_.clear();
-  algorithm_.resize(bnodes_.size());
+  algorithm_.resize(binops_.size());
   pder_.resize(algorithm_.size());
-  //pder2.resize(algorithm_.size());
   for(int i=0; i<algorithm_.size(); ++i){
 
-    // Locate the element
-    SXNode* bnode = bnodes_[i];
-
     // Save the node index
-    algorithm_[i].ind = place[bnode->temp];
+    algorithm_[i].ind = place[binops_[i]->temp];
     
     // Save the indices of the children
-    algorithm_[i].ch[0] = place[bnode->dep(0).get()->temp];
-    algorithm_[i].ch[1] = place[bnode->dep(1).get()->temp];
+    algorithm_[i].ch[0] = place[binops_[i]->dep(0).get()->temp];
+    algorithm_[i].ch[1] = place[binops_[i]->dep(1).get()->temp];
 
     // Operation
-    algorithm_[i].op = bnode->getOp();
+    algorithm_[i].op = binops_[i]->getOp();
   }
 
   // Indices corresponding to the inputs
@@ -822,12 +838,12 @@ void SXFunctionInternal::init(){
   work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
 
   // Save the constants to the work vector
-  for(vector<SXNode*>::iterator it=cnodes_.begin(); it!=cnodes_.end(); ++it)
+  for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it)
     work_[(**it).temp] = (**it).getValue();
 
   // Reset the temporary variables
-  for(int i=0; i<nodes_.size(); ++i){
-    nodes_[i]->temp = 0;
+  for(int i=0; i<nodes.size(); ++i){
+    nodes[i]->temp = 0;
   }
 
 
@@ -840,9 +856,9 @@ void SXFunctionInternal::init(){
   
   // Collect free varables
   free_vars_.clear();
-  for(int el=0; el<snodes_.size(); ++el){
-    if(!snodes_[el]->temp){
-      free_vars_.push_back(SX(snodes_[el]));
+  for(int el=0; el<snodes.size(); ++el){
+    if(!snodes[el]->temp){
+      free_vars_.push_back(SX(snodes[el]));
     }
   }
 
@@ -853,8 +869,16 @@ void SXFunctionInternal::init(){
     }
   }
 
-  if(nfdir_>0 || nadir_>0)
+  if(nfdir_>0 || nadir_>0){
     dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
+  }
+  
+  // Create a symbolic work vector if not existing
+  swork_.resize(nodes.size());
+  for(int i=0; i<nodes.size(); ++i){
+    if(!nodes[i]->hasDep())
+      swork_[i] = SX(nodes[i]);
+  }
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
@@ -873,15 +897,6 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
   
   // Assert input dimension
   assert(input_.size() == input_s.size());
-  
-  // Create a symbolic work vector if not existing
-  if(swork_.size() != nodes_.size()){
-    swork_.resize(nodes_.size());
-    for(int i=0; i<nodes_.size(); ++i){
-      if(!nodes_[i]->hasDep())
-        swork_[i] = SX(nodes_[i]);
-    }
-  }
   
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_s.size(); ++ind){
@@ -1084,7 +1099,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         temp[i+1] += temp[i];
       }
       
-      // Loop over the elements again, sorting the nodes_
+      // Loop over the elements again, sorting the nodes
       ret_trans_col.resize(nz_offset+detected_col.size());
       for(int i=0; i<detected_row.size(); ++i){
         // Get the place to put the element
@@ -1160,9 +1175,6 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         iwork[it->ch[1]] |= iwork[it->ind];
       }
       
-      
-      
-      
       // Get the number of nonzeros before adding the new ones
       int nz_offset = ret_col.size();
       
@@ -1210,7 +1222,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         temp[i+1] += temp[i];
       }
       
-      // Loop over the elements again, sorting the nodes_
+      // Loop over the elements again, sorting the nodes
       ret_col.resize(nz_offset+detected_col.size());
       for(int i=0; i<detected_row.size(); ++i){
         // Get the place to put the element
@@ -1232,30 +1244,6 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
       ret_rowind.insert(ret_rowind.end(),temp.begin(),temp.begin()+ndir_local);
       ret->nrow_ = ret_rowind.size()-1;
       
-//       // Output dependency to be checked
-//       b = 1;
-//     
-//       // Loop over seed directions
-//       for(int i=0; i<bvec_size && offset+i<nz_out; ++i){
-//         // Resize return
-//         ret.resize(offset+i+1,nz_in);
-//         
-//         // Loop over the nonzeros of the input
-//         for(int el=0; el<nz_in; ++el){
-//           
-//           // If the output is influenced by the variable
-//           if(b & iwork[input_ind_[iind][el]]){
-//             
-//             // Add to pattern
-//             ret_col.push_back(el);
-//             ret_rowind.back()++;
-//           }
-//         }
-//         
-//         // Go to next dependency
-//         b <<= 1;
-//       }
-
       // Update offset
       offset += bvec_size;
     }

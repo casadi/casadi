@@ -88,9 +88,6 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm_;
   std::vector<AlgElData> pder_;
-  
-  /** \brief  All nodes */
-  std::vector<SXNode*> nodes_;
 
   /** \brief  Working vector for numeric calculation */
   std::vector<double> work_;
@@ -102,14 +99,17 @@ class SXFunctionInternal : public XFunctionInternal{
   std::vector<SX> free_vars_;
   std::vector<int> refcount_;
   
+  /// The expressions corresponding to each binary operation
+  std::vector<SX> binops_;
+  
   /** \brief  Initialize */
   virtual void init();
 
   /** \brief  Print to a c file */
   static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
 
-  /** \brief  Print an operation to a stream */
-  std::string printOperation(int i);
+  /** \brief  Print operation i to a stream */
+  void printOperation(std::ostream &stream, int i) const;
   
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);
