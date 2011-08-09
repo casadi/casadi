@@ -210,6 +210,7 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 #endif //SWIGOCTAVE
 
+%include "casadi/casadi_types.hpp"
 %include "casadi/generic_type.hpp"
 %include "casadi/options_functionality.hpp"
 

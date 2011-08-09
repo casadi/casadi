@@ -257,6 +257,7 @@ class OCPtests(casadiTestCase):
     ms = MultipleShooting(dynamics,mayer)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
+    ms.setOption("nlp_solver",IpoptSolver.creator)
     ms.init()
     self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
@@ -299,6 +300,7 @@ class OCPtests(casadiTestCase):
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("number_of_parameters",np)
     ms.setOption("final_time",tf)
+    ms.setOption("nlp_solver",IpoptSolver.creator)
     ms.init()
     self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
@@ -359,6 +361,16 @@ class OCPtests(casadiTestCase):
     ms = MultipleShooting(integrator,mayer)
     ms.setOption("number_of_grid_points",N);
     ms.setOption("final_time",te);
+    
+    ms.setOption("nlp_solver",IpoptSolver.creator)
+    nlp_solver_options = {}
+    nlp_solver_options["tol"] = 1e-10
+    nlp_solver_options["hessian_approximation"] = "limited-memory"
+    nlp_solver_options["max_iter"] = 100
+    nlp_solver_options["linear_solver"] = "ma57"
+    nlp_solver_options["derivative_test"] = "first-order"
+    ms.setOption("nlp_solver_options",nlp_solver_options)
+    
     ms.init()
     
     ms.input(OCP_LBX).setAll(-inf)
@@ -378,16 +390,6 @@ class OCPtests(casadiTestCase):
     ms.input(OCP_LBX)[2,0] = 0
     ms.input(OCP_UBX)[2,0] = 0
     
-    solver = IpoptSolver(ms.getF(),ms.getG(),FX(),ms.getJ());
-    solver.setOption("tol",1e-10);
-    solver.setOption("hessian_approximation", "limited-memory");
-    solver.setOption("max_iter",100);
-    solver.setOption("linear_solver","ma57");
-    solver.setOption("derivative_test","first-order");
-    solver.init();
-
-
-    ms.setNLPSolver(solver)
     ms.solve()
     
     self.checkarray(sign(matrix(ms.output(OCP_X_OPT))[0,:-1]),ms.output(OCP_U_OPT),"solution")
@@ -436,6 +438,16 @@ class OCPtests(casadiTestCase):
     ms.setOption("number_of_grid_points",N);
     ms.setOption("number_of_parameters",1);
     ms.setOption("final_time",te);
+
+    ms.setOption("nlp_solver",IpoptSolver.creator)
+    nlp_solver_options = {}
+    nlp_solver_options["tol"] = 1e-10
+    nlp_solver_options["hessian_approximation"] = "limited-memory"
+    nlp_solver_options["max_iter"] = 100
+    nlp_solver_options["linear_solver"] = "ma57"
+    nlp_solver_options["derivative_test"] = "first-order"
+    ms.setOption("nlp_solver_options",nlp_solver_options)
+
     ms.init()
     
     ms.input(OCP_LBX).setAll(-inf)
@@ -453,17 +465,6 @@ class OCPtests(casadiTestCase):
     ms.input(OCP_LBX)[0,0] = 0
     ms.input(OCP_UBX)[0,0] = 0
    
-    
-    solver = IpoptSolver(ms.getF(),ms.getG(),FX(),ms.getJ());
-    solver.setOption("tol",1e-10);
-    solver.setOption("hessian_approximation", "limited-memory");
-    solver.setOption("max_iter",100);
-    solver.setOption("linear_solver","ma57");
-    solver.setOption("derivative_test","first-order");
-    solver.init();
-
-
-    ms.setNLPSolver(solver)
     ms.solve()
     
   

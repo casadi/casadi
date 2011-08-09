@@ -31,7 +31,7 @@
 namespace CasADi{
   
   /// C++ version of Python's dictionary
-  typedef std::map<std::string, GenericType> Dictionary;
+  typedef GenericType::Dictionary Dictionary;
     
   // Forward declaration
   class OptionsFunctionalityNode;

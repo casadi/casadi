@@ -162,9 +162,6 @@ public:
   FX getDAE();
 };
 
-/// Function pointer to an integrator constructor
-typedef Integrator (*integratorCreator)(const FX& f, const FX& q);
-
 } // namespace CasADi
 
 #endif //INTEGRATOR_HPP

@@ -32,22 +32,6 @@ MultipleShooting::MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfc
   assignNode(new MultipleShootingInternal(ffcn,mfcn,cfcn,rfcn));
 }
 
-FX MultipleShooting::getF() const{
-  return (*this)->F_;
-}
-    
-FX MultipleShooting::getG() const{
-  return (*this)->G_;
-}
-    
-FX MultipleShooting::getJ() const{
-  return (*this)->J_;
-}
-
-void MultipleShooting::setNLPSolver(const NLPSolver& nlp_solver){
-  (*this)->nlp_solver_ = nlp_solver;
-}
-
 const MultipleShootingInternal* MultipleShooting::operator->() const{
   return (const MultipleShootingInternal*)FX::operator->();
 }

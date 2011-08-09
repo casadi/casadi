@@ -82,6 +82,8 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("asens_max_krylov",            OT_INTEGER,  10);        // maximum krylov subspace size
   addOption("asens_reltol",                OT_REAL); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
   addOption("asens_abstol",                OT_REAL); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
+  addOption("linear_solver",               OT_LINEARSOLVER, GenericType(), "An linear solver creator function");
+  addOption("linear_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
   
   nx_ = 0;
   np_ = 0;

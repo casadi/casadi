@@ -83,7 +83,7 @@ class QPSolver : public FX{
   QPSolver();
   
   /// Constructor with sparsity patterns
-  QPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  QPSolver(const CRSSparsity& H, const CRSSparsity& G, const CRSSparsity& A);
 
   /// Access functions of the node
   QPSolverInternal* operator->();
