@@ -95,7 +95,6 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){
     // without taping
-    //for(int i=0; i<algorithm_.size(); ++i){
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
       // Get the arguments
       #define x work_[it->ch[0]]
@@ -515,7 +514,7 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
       } else {
         stream << "(" << v << ")";
       }
-    } else if(refcount_[f->dep(c)->temp-1]==1) {
+    } else if(f->dep(c)->hasDep() && refcount_[f->dep(c)->temp-1]==1) {
       printOperation(stream,f->dep(c)->temp-1);
     } else {
       stream << "a" << ae.ch[c];
