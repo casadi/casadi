@@ -69,34 +69,23 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     if (!ret) return false;
     s = CasADi::GenericType(temp);
   } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
-    std::cout << "check" << std::endl;
     PyObject *c = PyObject_GetAttrString(p,"creator");
     int result = meta< CasADi::GenericType >::as(c,s);
     Py_DECREF(c);
     return result;
   } else {
-    // See if creating a new GenericType from the argument would work
-    
-    std::cout << "foo" << std::endl;
-    
-    std::cout << "foo" << std::endl;
     PyObject* pPyObjectModuleName = PyString_FromString("casadi");
     if (!pPyObjectModuleName) { PyErr_Clear(); return false; }
-    std::cout << "foo2" << std::endl;
     PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
-    if (!pObjectModule) { std::cout << "test" << std::endl; PyErr_Clear(); Py_DECREF(pPyObjectModuleName); return false; }
-    std::cout << "foo3" << std::endl;
+    if (!pObjectModule) { PyErr_Clear(); Py_DECREF(pPyObjectModuleName); return false; }
     PyObject* pObjectDict = PyModule_GetDict(pObjectModule);
     if (!pObjectDict) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
-    std::cout << "foo4" << std::endl;
     PyObject* pClass = PyDict_GetItemString(pObjectDict,  "GenericType");
     if (!pClass) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
-    std::cout << "foo5" << std::endl;
     
     PyObject* args = PyTuple_New(1);
     PyTuple_SetItem(args,0,p);
     
-    std::cout << "foo6" << std::endl;
     PyObject* g = PyObject_CallObject(pClass,args);
     
     Py_DECREF(args);

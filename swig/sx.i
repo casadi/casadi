@@ -96,7 +96,6 @@ namespace CasADi {
   
   #ifdef SWIGOCTAVE
   std::vector<int> __dims__() const {
-    std::cout << "you called __dims__" << std::endl;
     std::vector<int> ret(2);
     ret[0] = 1;
     ret[1] = 1;
