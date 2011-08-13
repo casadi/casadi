@@ -253,7 +253,7 @@ class OCPtests(casadiTestCase):
     xp0 = symbolic("x0",nx)
     xf = x0 + p[0]
     dynamics = SXFunction({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{'NUM': INTEGRATOR_NUM_OUT, INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
-    mayer = SXFunction([x0],[7*x0])
+    mayer = SXFunction([x0],[7*x0[0]])
     ms = MultipleShooting(dynamics,mayer)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
@@ -290,7 +290,7 @@ class OCPtests(casadiTestCase):
     xp0 = symbolic("x0",nx)
     xf = x0 + p[0]
     dynamics = SXFunction({INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
-    mayer = SXFunction([x0],[7*x0])
+    mayer = SXFunction([x0],[7*x0[0]])
     
     t = SX("t")
     cfcn = SXFunction({DAE_T : t, DAE_Y: x0, DAE_P: p, DAE_YDOT: xp0},[x0[:nh,0]])
