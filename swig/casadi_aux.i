@@ -25,12 +25,23 @@ try {
 
 %inline %{
 template<> swig_type_info** meta< CasADi::GenericType >::name = &SWIGTYPE_p_CasADi__GenericType;
-template<> swig_type_info** meta< CasADi::Dictionary >::name = &SWIGTYPE_p_std__mapT_std__string_CasADi__GenericType_t;
+template<> swig_type_info** meta< CasADi::GenericType::Dictionary >::name = &SWIGTYPE_p_std__mapT_std__string_CasADi__GenericType_t;
 %}
 
 %{
 template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting number, string, vector(number)";
+template<> char meta< CasADi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
 %}
+
+#ifdef SWIGPYTHON
+%{
+template<> int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s);
+template<> bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p);
+template<> bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dictionary &a, PyObject *&p);
+%}
+#endif //SWIGPYTHON
+
+
 
 /// CasADi::GenericType
 #ifdef SWIGPYTHON
@@ -57,16 +68,59 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     int ret = meta< std::vector<double> >::as(p,temp); 
     if (!ret) return false;
     s = CasADi::GenericType(temp);
+  } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
+    std::cout << "check" << std::endl;
+    PyObject *c = PyObject_GetAttrString(p,"creator");
+    int result = meta< CasADi::GenericType >::as(c,s);
+    Py_DECREF(c);
+    return result;
   } else {
-    return false;
-  }
-  return true;
+    // See if creating a new GenericType from the argument would work
+    
+    std::cout << "foo" << std::endl;
+    
+    std::cout << "foo" << std::endl;
+    PyObject* pPyObjectModuleName = PyString_FromString("casadi");
+    if (!pPyObjectModuleName) { PyErr_Clear(); return false; }
+    std::cout << "foo2" << std::endl;
+    PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
+    if (!pObjectModule) { std::cout << "test" << std::endl; PyErr_Clear(); Py_DECREF(pPyObjectModuleName); return false; }
+    std::cout << "foo3" << std::endl;
+    PyObject* pObjectDict = PyModule_GetDict(pObjectModule);
+    if (!pObjectDict) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
+    std::cout << "foo4" << std::endl;
+    PyObject* pClass = PyDict_GetItemString(pObjectDict,  "GenericType");
+    if (!pClass) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
+    std::cout << "foo5" << std::endl;
+    
+    PyObject* args = PyTuple_New(1);
+    PyTuple_SetItem(args,0,p);
+    
+    std::cout << "foo6" << std::endl;
+    PyObject* g = PyObject_CallObject(pClass,args);
+    
+    Py_DECREF(args);
+    Py_DECREF(pObjectModule);
+    Py_DECREF(pPyObjectModuleName);
+    
+    if (g) {
+      int result = meta< CasADi::GenericType >::as(g,s);
+      Py_DECREF(g);
+      return result;
+    }
+    if (!g) { PyErr_Clear();  return false;}
+
+    
+    }
+    return true;
 }
 
 template <>
 bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
-  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p);
-}
+  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || ( PyType_Check(p) && PyObject_HasAttrString(p,"creator")) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
+
+  
+  }
 
 template <>
 bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p) {
@@ -125,17 +179,14 @@ bool meta< CasADi::GenericType >::couldbe(const octave_value& p) {
 %}
 #endif //SWIGOCTAVE
 
-%{
-template<> char meta< CasADi::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
-%}
 
-/// CasADi::Dictionary
+/// CasADi::GenericType::Dictionary
 #ifdef SWIGPYTHON
 %inline %{
 
 template <>
-int meta< CasADi::Dictionary >::as(PyObject * p,CasADi::Dictionary &s) {
-  NATIVERETURN(CasADi::Dictionary, s)
+int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s) {
+  NATIVERETURN(CasADi::GenericType::Dictionary, s)
   if (!PyDict_Check(p))
     return false;
   PyObject *key, *value;
@@ -154,16 +205,16 @@ int meta< CasADi::Dictionary >::as(PyObject * p,CasADi::Dictionary &s) {
 }
 
 template <>
-bool meta< CasADi::Dictionary >::couldbe(PyObject * p) {
+bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p) {
   return PyDict_Check(p);
 }
 
 template <>
-bool meta< CasADi::Dictionary >::toPython(CasADi::Dictionary &a, PyObject *&p) {
+bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dictionary &a, PyObject *&p) {
   p = PyDict_New();
   //CasADi::Dictionary::const_iterator end = a.end(); 
-  CasADi::Dictionary::iterator end = a.end();
-  for (CasADi::Dictionary::iterator it = a.begin(); it != end; ++it)
+  CasADi::GenericType::Dictionary::iterator end = a.end();
+  for (CasADi::GenericType::Dictionary::iterator it = a.begin(); it != end; ++it)
   {
     PyObject * e;
     bool ret=meta< CasADi::GenericType >::toPython(it->second,e);
@@ -190,8 +241,8 @@ if (!ret) {
 }
 }
 
-%typemap(out) const Dictionary&  {
-bool ret=meta<  CasADi::Dictionary >::toPython(*$1,$result);
+%typemap(out) const GenericType::Dictionary&  {
+bool ret=meta<  CasADi::GenericType::Dictionary >::toPython(*$1,$result);
 if (!ret) {
   SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
@@ -202,7 +253,7 @@ if (!ret) {
 
 %my_generic_const_typemap(PRECEDENCE_GENERICTYPE,CasADi::GenericType)
 #ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::Dictionary)
+%my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::GenericType::Dictionary)
 #endif
 
 #ifdef SWIGOCTAVE

@@ -252,12 +252,12 @@ class OCPtests(casadiTestCase):
     p = symbolic("p",nu)
     xp0 = symbolic("x0",nx)
     xf = x0 + p[0]
-    dynamics = SXFunction({INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
+    dynamics = SXFunction({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{'NUM': INTEGRATOR_NUM_OUT, INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
     mayer = SXFunction([x0],[7*x0])
     ms = MultipleShooting(dynamics,mayer)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
-    ms.setOption("nlp_solver",IpoptSolver.creator)
+    ms.setOption("nlp_solver",IpoptSolver)
     ms.init()
     self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
@@ -300,7 +300,7 @@ class OCPtests(casadiTestCase):
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("number_of_parameters",np)
     ms.setOption("final_time",tf)
-    ms.setOption("nlp_solver",IpoptSolver.creator)
+    ms.setOption("nlp_solver",IpoptSolver)
     ms.init()
     self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
@@ -362,7 +362,7 @@ class OCPtests(casadiTestCase):
     ms.setOption("number_of_grid_points",N);
     ms.setOption("final_time",te);
     
-    ms.setOption("nlp_solver",IpoptSolver.creator)
+    ms.setOption("nlp_solver",IpoptSolver)
     nlp_solver_options = {}
     nlp_solver_options["tol"] = 1e-10
     nlp_solver_options["hessian_approximation"] = "limited-memory"
@@ -439,7 +439,7 @@ class OCPtests(casadiTestCase):
     ms.setOption("number_of_parameters",1);
     ms.setOption("final_time",te);
 
-    ms.setOption("nlp_solver",IpoptSolver.creator)
+    ms.setOption("nlp_solver",IpoptSolver)
     nlp_solver_options = {}
     nlp_solver_options["tol"] = 1e-10
     nlp_solver_options["hessian_approximation"] = "limited-memory"

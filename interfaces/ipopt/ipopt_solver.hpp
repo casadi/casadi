@@ -57,7 +57,7 @@ class IpoptSolver : public NLPSolver {
 
     /// Static creator function (@Joris: can we get this to work in SWIG?)
     #ifdef SWIG
-    %callback("%s_cb");
+    %callback("%s_cbfoobar");
     #endif
     static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return IpoptSolver(F,G,H,J);}
     #ifdef SWIG
