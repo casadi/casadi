@@ -25,7 +25,7 @@
 #include "stl_vector_tools.hpp"
 #include "casadi_exception.hpp"
 
-const char *opt_type_name[] =  { "boolean", "integer", "real", "string", "integervector", "realvector" };
+const char *opt_type_name[] =  { "boolean", "integer", "real", "string", "integervector", "realvector", "Dictionary", "NLPSolver", "LinearSolver", "Integrator", "QPSolver", "ImplicitSolver"};
 
 using namespace std;
 

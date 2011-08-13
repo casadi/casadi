@@ -370,7 +370,6 @@ class OCPtests(casadiTestCase):
     nlp_solver_options["linear_solver"] = "ma57"
     nlp_solver_options["derivative_test"] = "first-order"
     ms.setOption("nlp_solver_options",nlp_solver_options)
-    
     ms.init()
     
     ms.input(OCP_LBX).setAll(-inf)
@@ -447,7 +446,6 @@ class OCPtests(casadiTestCase):
     nlp_solver_options["linear_solver"] = "ma57"
     nlp_solver_options["derivative_test"] = "first-order"
     ms.setOption("nlp_solver_options",nlp_solver_options)
-
     ms.init()
     
     ms.input(OCP_LBX).setAll(-inf)

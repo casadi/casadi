@@ -29,6 +29,31 @@
 
 namespace CasADi{
   
+  /// Forward declarations
+  class FX;
+  class CRSSparsity;
+  class NLPSolver;
+  class LinearSolver;
+  class Integrator;
+  class QPSolver;
+  class ImplicitFunction;
+  
+  /// Function pointer to a nonlinear solver creator function
+  typedef NLPSolver (*NLPSolverCreator)(const FX& F, const FX& G, const FX& H, const FX& J);
+
+  /// Function pointer to a linear solver creator function
+  typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
+
+  /// Function pointer to an integrator creator function
+  typedef Integrator (*integratorCreator)(const FX& f, const FX& q);
+
+  /// Function pointer to a QP solver creator function
+  typedef QPSolver (*QPSolverCreator)(const CRSSparsity& H, const CRSSparsity& G, const CRSSparsity& A);
+
+  /// Function pointer to an implicit function creator
+  typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f);
+  
+#ifndef SWIG
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans
   // If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__, we shall use the long long datatype, which is 64 bit, otherwise long
   #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))
@@ -42,7 +67,7 @@ namespace CasADi{
 
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
-  
+#endif // SWIG  
   
 } // namespace CasADi
 #endif // CASADI_TYPES_HPP

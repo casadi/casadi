@@ -85,6 +85,18 @@ int main(){
   ms.setOption("number_of_grid_points",ns);
   ms.setOption("final_time",tf);
   ms.setOption("parallelization","openmp");
+  
+  // NLP solver
+  ms.setOption("nlp_solver",IpoptSolver::creator);
+  Dictionary nlp_solver_dict;
+  nlp_solver_dict["tol"] = 1e-5;
+  nlp_solver_dict["hessian_approximation"] = "limited-memory";
+  nlp_solver_dict["max_iter"] = 100;
+  nlp_solver_dict["linear_solver"] = "ma57";
+  //  nlp_solver_dict["derivative_test"] = "first-order";
+  //  nlp_solver_dict["verbose"] = true;
+  ms.setOption("nlp_solver_options",nlp_solver_dict);
+  
   ms.init();
 
   //Control bounds
@@ -110,26 +122,12 @@ int main(){
   // Final condition
   ms.input(OCP_LBX)(0,ns) = ms.input(OCP_UBX)(0,ns) = 0; 
   ms.input(OCP_LBX)(1,ns) = ms.input(OCP_UBX)(1,ns) = 0; 
-
-  IpoptSolver solver(ms.getF(),ms.getG(),FX(),ms.getJ());
-  solver.setOption("tol",1e-5);
-  solver.setOption("hessian_approximation", "limited-memory");
-  solver.setOption("max_iter",100);
-  solver.setOption("linear_solver","ma57");
-  //  solver.setOption("derivative_test","first-order");
-
-/*  solver.setOption("verbose",true);*/
-  solver.init();
-
-  // Pass NLP solver
-  ms.setNLPSolver(solver);
   
   // Solve the problem
   ms.solve();
 
   cout << ms.output(OCP_X_OPT) << endl;
   cout << ms.output(OCP_U_OPT) << endl;
-  cout << solver.output(NLP_X_OPT) << endl;
   
   return 0;
 }

@@ -24,13 +24,14 @@
 #define GENERIC_TYPE_HPP
 
 #include "shared_object.hpp"
+#include "casadi_types.hpp"
 #include <string>
 #include <vector>
 
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR };
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION };
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -49,6 +50,16 @@ namespace CasADi{
     GenericType(const char s[]);
     GenericType(const SharedObject& obj);
 
+    typedef std::map<std::string, GenericType> Dictionary;
+    GenericType(const Dictionary& dict);
+
+    /// Creator functions
+    GenericType(NLPSolverCreator ptr);
+    GenericType(linearSolverCreator ptr);
+    GenericType(integratorCreator ptr);
+    GenericType(QPSolverCreator ptr);
+    GenericType(implicitFunctionCreator ptr);
+    
     /// Implicit typecasting
     #ifndef SWIG
     operator bool() const{ return toBool();} 
@@ -58,6 +69,14 @@ namespace CasADi{
     operator const std::vector<int>& () const{ return toIntVector();}
     operator const std::vector<double>& () const{ return toDoubleVector();}
     operator const SharedObject& () const{ return toSharedObject();}
+
+    operator const std::map<std::string, GenericType>& () const;
+    
+    operator NLPSolverCreator() const;
+    operator linearSolverCreator() const;
+    operator integratorCreator() const;
+    operator QPSolverCreator() const;
+    operator implicitFunctionCreator() const;
     #endif // SWIG
     
     //! \brief Is boolean?

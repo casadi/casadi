@@ -34,6 +34,8 @@ namespace CasADi{
     
 MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("parallelization", OT_STRING);
+  addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
+  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
 }
 
 MultipleShootingInternal::~MultipleShootingInternal(){
@@ -136,6 +138,7 @@ void MultipleShootingInternal::init(){
   // Terminal constraints
   MX g = vertcat(gg);
   G_ = MXFunction(V,g);
+  G_.setOption("numeric_jacobian",false);
 
   // Objective function
   vector<MX> f = mfcn_.call(X.back());
@@ -165,9 +168,20 @@ void MultipleShootingInternal::init(){
   // Function that evaluates function and constraints that can also be used to get the gradient of the constraint
   FG_ = MXFunction(FG_in,FG_out);
   
-  // Generate the Jacobian of the constraints
-  G_.init();
-  J_ = MXFunction(V,G_.jac());
+  // Get the NLP creator function
+  NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
+  
+  // Allocate an NLP solver
+  nlp_solver_ = nlp_solver_creator(F_,G_,FX(),FX());
+  
+  // Pass options
+  if(hasSetOption("nlp_solver_options")){
+    const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
+    nlp_solver_.setOption(nlp_solver_options);
+  }
+  
+  // Initialize the solver
+  nlp_solver_.init();
 }
 
 void MultipleShootingInternal::getGuess(vector<double>& V_init) const{

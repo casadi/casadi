@@ -4,7 +4,7 @@ project(casadi)
 SET(CASADI_SRCS
   # MISC
   casadi_limits.hpp
-  casadi_types.hpp
+  casadi_types.hpp            casadi_types.cpp
   casadi_operators.hpp
   casadi_exception.hpp
   casadi_math.hpp

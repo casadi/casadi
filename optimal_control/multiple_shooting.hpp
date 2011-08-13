@@ -63,16 +63,7 @@ class MultipleShooting : public OCPSolver{
 
     /// Const access functions of the node
     const MultipleShootingInternal* operator->() const;
-
-    /// Get the NLP cost function
-    FX getF() const;
     
-    /// Get the NLP constraint function
-    FX getG() const;
-    
-    /// Get the NLP Jacobian function
-    FX getJ() const;
-
     /// Get the variables
     void getGuess(std::vector<double>& V_init) const;
     
@@ -85,8 +76,6 @@ class MultipleShooting : public OCPSolver{
     /// Set the optimal solution
     void setOptimalSolution( const std::vector<double> &V_opt );
     
-    /// Set NLP solver
-    void setNLPSolver(const NLPSolver& nlp_solver);
 };
                         
                         

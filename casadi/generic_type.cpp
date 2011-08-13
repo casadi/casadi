@@ -204,6 +204,58 @@ bool GenericType::operator!=(const GenericType& op2) const{
   return true;
 }
 
+GenericType::GenericType(NLPSolverCreator ptr){
+  assignNode(new GenericTypeInternal<NLPSolverCreator>(ptr));
+}
+
+GenericType::GenericType(linearSolverCreator ptr){
+  assignNode(new GenericTypeInternal<linearSolverCreator >(ptr));
+}
+
+GenericType::GenericType(integratorCreator ptr){
+  assignNode(new GenericTypeInternal<integratorCreator>(ptr));
+}
+
+GenericType::GenericType(QPSolverCreator ptr){
+  assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
+}
+
+GenericType::GenericType(implicitFunctionCreator ptr){
+  assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
+}
+
+GenericType::operator NLPSolverCreator() const{
+  casadi_assert_message(is_a<NLPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<NLPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator linearSolverCreator() const{
+  casadi_assert_message(is_a<linearSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<linearSolverCreator>*>(get())->d_;
+}
+GenericType::operator integratorCreator() const{
+  casadi_assert_message(is_a<integratorCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<integratorCreator>*>(get())->d_;
+}
+
+GenericType::operator QPSolverCreator() const{
+  casadi_assert_message(is_a<QPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<QPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator implicitFunctionCreator() const{
+  casadi_assert_message(is_a<implicitFunctionCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
+}
+
+GenericType::GenericType(const Dictionary& dict){
+  assignNode(new GenericTypeInternal<Dictionary>(dict));
+}
+
+GenericType::operator const Dictionary& () const{
+  casadi_assert_message(is_a<Dictionary>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
+}
 
 
 } // namespace CasADi
