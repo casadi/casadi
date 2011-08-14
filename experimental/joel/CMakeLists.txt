@@ -52,6 +52,10 @@ ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 add_executable(det_minor det_minor.cpp)
 target_link_libraries(det_minor casadi)
 
+# Det minor example from CasADi papper
+add_executable(det_minor_paper det_minor_paper.cpp)
+target_link_libraries(det_minor_paper casadi)
+
 
 if(LIFTOPT_FOUND)
 include_directories(${LIFTOPT_INCLUDE_DIRS})
