@@ -19,7 +19,7 @@ using namespace std;
 
 int main(){
   //Final time (fixed)
-  double tf = 20.0;
+  double tf = 10.0;
 
   // Infinity
   double inf = numeric_limits<double>::infinity();

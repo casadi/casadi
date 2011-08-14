@@ -11,7 +11,7 @@ f = [(1 - y*y)*x - y + u, x, x*x + y*y + u*u]
 rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
 
 # Final time (fixed)
-tf = 20.0
+tf = 10.0
 
 # Numboer of shooting nodes
 NS = 50

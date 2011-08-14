@@ -21,7 +21,7 @@ mfcn = SXFunction([[t],x,u],[[ll]])
 cfcn = FX() # Not used in this example
 
 # Final time (fixed)
-tf = 20.0
+tf = 10.0
 
 # Control bounds
 uu_min = -0.75
@@ -303,27 +303,18 @@ xx_opt = v_opt[0::(K+1)*nx+nu]
 yy_opt = v_opt[1::(K+1)*nx+nu]
 ll_opt = v_opt[2::(K+1)*nx+nu]
 uu_opt = v_opt[(K+1)*nx::(K+1)*nx+nu]
+tgrid = NP.linspace(0,10,N+1)
+tgrid_u = NP.linspace(0,10,N)
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(uu_opt)
-plt.title("u_opt")
-
-plt.figure(2)
-plt.clf()
-plt.plot(xx_opt)
-plt.title("x_opt")
-
-plt.figure(3)
-plt.clf()
-plt.plot(yy_opt)
-plt.title("y_opt")
-
-plt.figure(4)
-plt.clf()
-plt.plot(ll_opt)
-plt.title("l_opt")
-
+plt.plot(tgrid,xx_opt,'--')
+plt.plot(tgrid,yy_opt,'-')
+plt.plot(tgrid_u,uu_opt,'-.')
+plt.title("Van der Pol optimization")
+plt.xlabel('time')
+plt.legend(['x trajectory','y trajectory','u trajectory'])
+plt.grid()
 plt.show()
 

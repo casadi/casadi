@@ -22,7 +22,7 @@ I.setOption("steps_per_checkpoint",1000)
 I.setOption("fsens_err_con",True)
 I.setOption("stop_at_end",True)
 I.setOption("t0",0.0)
-I.setOption("tf",20.0/NS)
+I.setOption("tf",10.0/NS)
 I.init()
 
 # All controls (use complex, general DAG)
@@ -35,7 +35,7 @@ X  = MX([0,1,0])
 XP = MX()
 
 # Cost function
-obj = MX(0)
+obj = 0
 
 # Build up a graph of integrator calls
 for k in range(NS):
@@ -44,8 +44,6 @@ for k in range(NS):
   
   # Add lagrange cost
   obj += X[2]
-  
-  # Set lagrange cost to zero for the next shooting interval
   X[2] = 0
   
 # Objective function: L(T)
@@ -79,8 +77,6 @@ solver = IpoptSolver(F,G)
 solver.setOption("tol",1e-3)
 solver.setOption("hessian_approximation", \
                 "limited-memory")
-solver.setOption("max_iter",1000)
-solver.setOption("linear_solver","ma27")
 #solver.setOption("derivative_test","first-order")
 #solver.setOption("verbose",True)
   
