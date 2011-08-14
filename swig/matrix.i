@@ -39,6 +39,11 @@ template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasA
 
 %outputConstRefCopy(CasADi::CRSSparsity)
 
+#ifdef SWIGPYTHON
+%outputRefOwn(std::vector< CasADi::SX >)
+%outputRefOwn(std::vector< int >)
+%outputRefOwn(std::vector< double >)
+#endif // SWIGPYTHON
 
 #ifdef SWIGPYTHON
 %define %python_matrix_convertors
