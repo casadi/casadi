@@ -41,29 +41,22 @@ vector<FX> detFuncs;
 const int N_EXPAND_LIMIT = 9;
 
 MX det(const MX& a){
-  int n = a.size1();
-  casadi_assert_message(n == a.size2(),"matrix must be square");
-
-  // Trivial return if scalar
-  if(a.numel()==1) return a;
+  int n = a.size1(); // Dimension
+  if(n==1) return a;
 
   // Return expression
   MX ret = 0;
 
   // We expand the matrix along the first column
   for(int i=0; i<n; ++i){
-
     // Sum up the cofactors
     ret += a(i,0)*cofactor(a,i,0);
-
   }
   return ret;
 }
 
 MX getMinor(const MX &x, int i, int j){
   int n = x.size1();
-  casadi_assert(n>0);
-  casadi_assert_message(n == x.size2(), "getMinor: matrix must be square");
 
   // Trivial return if scalar
   if(n==1) return 1;
