@@ -188,32 +188,30 @@ class meta {
 #ifdef SWIGPYTHON
 %inline%{
 // Indicates that self is derived from parent.
-// When self is destroyed, parent will be DECREF'ed
+// by setting a special attribute __swigref_parent__
 void PySetParent(PyObject* self, PyObject* parent) {
   Py_INCREF(parent);
   PyObject_SetAttrString(self,"__swigref_parent__",parent);
 }
 
-// Returns true if self may be destroyed
-bool PyDECREFParent(PyObject* self) {
-  if (!PyObject_HasAttrString(self,"__swigref_parent__")) return false;
+// Look for the __swigref_parent__ attribute and DECREF the parent if there is one
+void PyDECREFParent(PyObject* self) {
+  if (!PyObject_HasAttrString(self,"__swigref_parent__")) return;
   
   PyObject* parent = PyObject_GetAttrString(self,"__swigref_parent__");
-  if (!parent) return false;
+  if (!parent) return;
   Py_DECREF(parent); // Once for PyObject_GetAttrString
-  if (!parent) return true;
+  if (!parent) return;
   if (parent!=Py_None) {
     Py_DECREF(parent); // Once for the actual DECREF
   }
-  return !parent;
 }
 
 %}
 #endif // SWIGPYTHON
 
 // Create an output typemap for a ref such that ownership is implied
-// The folmlowing text is obsolete:
-// %unrefobject
+// The following text is obsolete:
 // We make use of SWIG_POINTER_OWN to ensure that the "delete_*" routine is called, where we have put another hook via %unrefobject.
 // We do not really imply that this SWIG objects owns the pointer
 // We are actually abusing the term SWIG_POINTER_OWN: a non-const ref is usually created with SWIG_NewPointerObj(..., 0 |  0 )
