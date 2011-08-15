@@ -37,9 +37,8 @@ template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Sl
 template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasADi__CRSSparsity;
 %}
 
-%outputConstRefCopy(CasADi::CRSSparsity)
-
 #ifdef SWIGPYTHON
+%outputRefOwn(CasADi::CRSSparsity)
 %outputRefOwn(std::vector< CasADi::SX >)
 %outputRefOwn(std::vector< int >)
 %outputRefOwn(std::vector< double >)

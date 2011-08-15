@@ -8,6 +8,7 @@ from ad import *
 from sparsity import *
 from matrix import *
 from qpsolver import *
+from misc import *
 
 if __name__ == '__main__':
     unittest.main()

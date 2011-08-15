@@ -222,6 +222,10 @@ bool PyDECREFParent(PyObject* self) {
    $result = SWIG_NewPointerObj($1, *meta< Type >::name, 0 |  0 );
    PySetParent($result, obj0);
 }
+%typemap(out) const Type & {
+   $result = swig::from(static_cast< Type * >($1));
+   PySetParent($result, obj0);
+}
 %extend Type {
 %pythoncode%{
     def __del__(self):
