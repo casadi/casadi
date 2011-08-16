@@ -31,18 +31,20 @@ namespace CasADi{
 namespace Sundials{
 
 KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs){
-  addOption("linear_solver", OT_STRING, "dense");
-  addOption("upper_bandwidth", OT_INTEGER);
-  addOption("lower_bandwidth", OT_INTEGER);
-  addOption("max_krylov", OT_INTEGER, 0);
-  addOption("exact_jacobian", OT_BOOLEAN, true);
-  addOption("iterative_solver",OT_STRING,"gmres");
-  addOption("f_scale",                     OT_REALVECTOR);
-  addOption("u_scale",                     OT_REALVECTOR);
-  addOption("pretype",                     OT_STRING, "none"); // "none", "left", "right", "both"
-  addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
-  addOption("constraints",                 OT_INTEGERVECTOR);
-  addOption("strategy",                    OT_STRING, "none", "Globalization strategy (\"none\" or \"linesearch\")");
+  addOption("linear_solver",            OT_STRING, "dense");
+  addOption("upper_bandwidth",          OT_INTEGER);
+  addOption("lower_bandwidth",          OT_INTEGER);
+  addOption("max_krylov",               OT_INTEGER, 0);
+  addOption("exact_jacobian",           OT_BOOLEAN, true);
+  addOption("iterative_solver",         OT_STRING,"gmres");
+  addOption("f_scale",                  OT_REALVECTOR);
+  addOption("u_scale",                  OT_REALVECTOR);
+  addOption("pretype",                  OT_STRING, "none"); // "none", "left", "right", "both"
+  addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
+  addOption("constraints",              OT_INTEGERVECTOR);
+  addOption("strategy",                 OT_STRING, "none", "Globalization strategy (\"none\" or \"linesearch\")");
+  addOption("linear_solver_creator",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class");
+  addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
 
   mem_ = 0;
   u_ = 0;
@@ -80,7 +82,21 @@ void KinsolInternal::init(){
     casadi_assert(getOption("strategy")=="none");
     strategy_ = KIN_NONE;
   }
+
+  // Get the linear solver creator function
+  if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
+    linearSolverCreator linear_solver_creator = getOption("linear_solver_creator");
   
+    // Allocate an NLP solver
+    linsol_ = linear_solver_creator(CRSSparsity());
+  
+    // Pass options
+    if(hasSetOption("linear_solver_options")){
+      const Dictionary& linear_solver_options = getOption("linear_solver_options");
+      linsol_.setOption(linear_solver_options);
+    }
+  }
+
   // Return flag
   int flag;
   

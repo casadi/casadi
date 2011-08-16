@@ -201,17 +201,13 @@ int main(){
   // Attach user-defined linear solver
   if(user_defined_solver){
     if(sparse_direct){
-      integrator.setLinearSolver(CSparse(CRSSparsity()));
-//      integrator.setLinearSolver(SuperLU(CRSSparsity()));
+      integrator.setOption("linear_solver_creator",CSparse::creator);
+      // integrator.setOption("linear_solver_creator",SuperLU::creator);
     } else {
-      CRSSparsity aa;
-      LapackLUDense ll(aa);
-      LinearSolver ll2 = ll;
-      cout << ll2.isNull() << endl;
-      
-    integrator.setLinearSolver(ll2);
-    integrator.setOption("linear_solver","user_defined");
+      integrator.setOption("linear_solver_creator",LapackLUDense::creator);
+      integrator.setOption("linear_solver","user_defined");
     }
+    // integrator.setOption("linear_solver","user_defined"); // FIXME: bug for second order
   }
   
   // Set common integrator options
@@ -310,7 +306,7 @@ int main(){
     cout << integrator.adjSens(INTEGRATOR_P) << "; ";
     cout << endl;
   }
-
+  
   if(second_order){
     // Preturb the forward seeds
     if(perturb_u){

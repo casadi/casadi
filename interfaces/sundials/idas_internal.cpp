@@ -274,7 +274,11 @@ void IdasInternal::init(){
       if(flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditioner",flag);
     }
   } else if(getOption("linear_solver")=="user_defined") {
+    cout << "initializeing user def sol" << endl;
+    cout << linsol_.isNull() << endl;
+    cout << jac_.isNull() << endl;
     initUserDefinedLinearSolver();
+    cout << "initialized user def sol" << endl;
   } else throw CasadiException("IDAS: Unknown linear solver");
 
   // Quadrature equations

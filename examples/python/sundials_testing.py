@@ -174,10 +174,10 @@ else:
 # Attach user-defined linear solver
 if user_defined_solver:
   if sparse_direct:
-    #integrator.setLinearSolver(SuperLU(CRSSparsity()))
-    integrator.setLinearSolver(CSparse(CRSSparsity()))
+    #integrator.setOption("linear_solver_creator",SuperLU)
+    integrator.setOption("linear_solver_creator",CSparse)
   else:
-    integrator.setLinearSolver(LapackLUDense(CRSSparsity()))
+    integrator.setOption("linear_solver_creator",LapackLUDense)
 
 # Set common integrator options
 integrator.setOption("fsens_err_con",True)

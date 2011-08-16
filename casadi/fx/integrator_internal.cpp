@@ -82,7 +82,7 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("asens_max_krylov",            OT_INTEGER,  10);        // maximum krylov subspace size
   addOption("asens_reltol",                OT_REAL); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
   addOption("asens_abstol",                OT_REAL); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]
-  addOption("linear_solver",               OT_LINEARSOLVER, GenericType(), "An linear solver creator function");
+  addOption("linear_solver_creator",       OT_LINEARSOLVER, GenericType(), "An linear solver creator function");
   addOption("linear_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
   
   nx_ = 0;
@@ -170,6 +170,23 @@ void IntegratorInternal::init(){
       ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")";
       throw CasadiException(ss.str());
   }
+  
+  // Get the linear solver creator function
+  if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
+    linearSolverCreator linear_solver_creator = getOption("linear_solver_creator");
+  
+    // Allocate an NLP solver
+    linsol_ = linear_solver_creator(CRSSparsity());
+  
+    // Pass options
+    if(hasSetOption("linear_solver_options")){
+      const Dictionary& linear_solver_options = getOption("linear_solver_options");
+      linsol_.setOption(linear_solver_options);
+    }
+  }
+
+  
+  
 }
 
 FX IntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
