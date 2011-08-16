@@ -321,6 +321,9 @@ class MX : public SharedObject{
   MX floor() const;
   MX ceil() const;
   MX erf() const;
+  MX sinh() const;
+  MX cosh() const;
+  MX tanh() const;
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *

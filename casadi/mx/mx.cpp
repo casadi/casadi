@@ -642,6 +642,18 @@ MX MX::arctan() const{
   return unary(ATAN,*this);
 }
 
+MX MX::sinh() const{ 
+  return unary(SINH,*this);
+}
+
+MX MX::cosh() const{ 
+  return unary(COSH,*this);
+}
+
+MX MX::tanh() const{ 
+  return unary(TANH,*this);
+}
+
 MX MX::floor() const{ 
   return unary(FLOOR,*this);
 }
@@ -709,6 +721,18 @@ MX asin(const MX& x){
 
 MX acos(const MX& x){
   return x.arccos();
+}
+
+MX sinh(const MX& x){
+  return x.sinh();
+}
+
+MX cosh(const MX& x){
+  return x.cosh();
+}
+
+MX tanh(const MX& x){
+  return x.tanh();
 }
 
 MX pow(const MX& x, const MX& n){

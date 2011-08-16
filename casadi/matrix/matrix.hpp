@@ -464,6 +464,9 @@ class Matrix : public PrintableObject{
     Matrix<T> fmin(const Matrix<T>& y) const;
     Matrix<T> fmax(const Matrix<T>& y) const;
     Matrix<T> erf() const;
+    Matrix<T> sinh() const;
+    Matrix<T> cosh() const;
+    Matrix<T> tanh() const;
     //@}
     
     //@{
@@ -620,6 +623,15 @@ namespace std{
 
   template<class T>
   CasADi::Matrix<T> atan(const CasADi::Matrix<T>& x){ return x.arctan(); }
+
+  template<class T>
+  CasADi::Matrix<T> sinh(const CasADi::Matrix<T>& x){ return x.sinh(); }
+
+  template<class T>
+  CasADi::Matrix<T> cosh(const CasADi::Matrix<T>& x){ return x.cosh(); }
+
+  template<class T>
+  CasADi::Matrix<T> tanh(const CasADi::Matrix<T>& x){ return x.tanh(); }
 
   template<class T>
   CasADi::Matrix<T> exp(const CasADi::Matrix<T>& x){ return x.exp();}
@@ -1648,6 +1660,21 @@ Matrix<T> Matrix<T>::arccos() const{
 template<class T>
 Matrix<T> Matrix<T>::arctan() const{
   return unary_old(CasADi::casadi_operators<T>::atan);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sinh() const{
+  return unary_old(CasADi::casadi_operators<T>::sinh);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::cosh() const{
+  return unary_old(CasADi::casadi_operators<T>::cosh);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::tanh() const{
+  return unary_old(CasADi::casadi_operators<T>::tanh);
 }
 
 template<class T>

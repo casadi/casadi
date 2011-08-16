@@ -474,6 +474,27 @@ SX SX::arctan() const{
   return SX(new BinarySXNode(ATAN,*this));
 }
 
+SX SX::sinh() const{
+  if(node->isZero())
+    return 0;
+  else
+    return SX(new BinarySXNode(SINH,*this));
+}
+
+SX SX::cosh() const{
+  if(node->isZero())
+    return 1;
+  else
+    return SX(new BinarySXNode(COSH,*this));
+}
+
+SX SX::tanh() const{
+  if(node->isZero())
+    return 0;
+  else
+    return SX(new BinarySXNode(TANH,*this));
+}
+
 SX SX::floor() const{
   return SX(new BinarySXNode(FLOOR,*this));
 }
@@ -547,6 +568,18 @@ SX casadi_operators<SX>::acos(const SX&x){
 
 SX casadi_operators<SX>::atan(const SX&x){ 
   return x.arctan();
+}
+
+SX casadi_operators<SX>::sinh(const SX&x){ 
+  return x.sinh();
+}
+
+SX casadi_operators<SX>::cosh(const SX&x){ 
+  return x.cosh();
+}
+
+SX casadi_operators<SX>::tanh(const SX&x){ 
+  return x.tanh();
 }
 
 SX casadi_operators<SX>::neg(const SX&x){

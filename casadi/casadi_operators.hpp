@@ -58,6 +58,9 @@ class casadi_operators{
     static T fmax(const T&x, const T&y){ return std::max(x,y);}
     static T fabs(const T&x){ return std::abs(x);}
     static T erf(const T&x){ return ::erf(x);}
+    static T sinh(const T&x){ return std::sinh(x);}
+    static T cosh(const T&x){ return std::cosh(x);}
+    static T tanh(const T&x){ return std::tanh(x);}
 };
 
 //@{
@@ -85,6 +88,9 @@ MX abs(const MX &x);
 MX fabs(const MX &x); // same as abs
 MX floor(const MX &x);
 MX ceil(const MX &x);
+MX sinh(const MX &x);
+MX cosh(const MX &x);
+MX tanh(const MX &x);
 //@}
 } // namespace std
 

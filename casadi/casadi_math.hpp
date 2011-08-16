@@ -136,6 +136,7 @@ enum Operation{
   FLOOR,  CEIL,  EQUALITY,  
   ERF,  FMIN,  FMAX,
   INV,
+  SINH,  COSH,  TANH,
   NUM_BUILT_IN_OPS
 };
 
@@ -422,6 +423,39 @@ class UnaryOperation<INV>{
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = -f*f; }
 };
 
+/// Hyperbolic sine
+template<>
+class UnaryOperation<SINH>{
+  public:
+    printRoutinesUnary("sinh(",")")
+    static bool f0_is_zero(){return true;}
+    static int ndeps() { return 1;}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::sinh(x);}
+    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = std::cosh(x); }
+};
+
+/// Hyperbolic cosine
+template<>
+class UnaryOperation<COSH>{
+  public:
+    printRoutinesUnary("cosh(",")")
+    static bool f0_is_zero(){return false;}
+    static int ndeps() { return 1;}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::cosh(x);}
+    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = -std::sinh(x); }
+};
+
+/// Hyperbolic tangent
+template<>
+class UnaryOperation<TANH>{
+  public:
+    printRoutinesUnary("tanh(",")")
+    static bool f0_is_zero(){return true;}
+    static int ndeps() { return 1;}
+    template<typename T> static void fcn(const T& x, T& f){ f = std::tanh(x);}
+    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
+};
+
 /// Easy access to all the functions for a particular type
 template<typename T>
 class casadi_math{
@@ -564,6 +598,10 @@ std::vector<Type> casadi_math<T>::getPrintFunName(){ \
   ret[FMAX] = BinaryOperation<FMAX>::printFunName; \
   ret[INV] = BinaryOperation<INV>::printFunName; \
  \
+  ret[SINH] = BinaryOperation<SINH>::printFunName; \
+  ret[COSH] = BinaryOperation<COSH>::printFunName; \
+  ret[TANH] = BinaryOperation<TANH>::printFunName; \
+ \
   for(int i=0; i<ret.size(); ++i){ \
     casadi_assert(ret[i]!=0); \
   } \
@@ -618,6 +656,10 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
 
   ret[INV] = BinaryOperation<INV>::fcn<T>;
 
+  ret[SINH] = BinaryOperation<SINH>::fcn<T>;
+  ret[COSH] = BinaryOperation<COSH>::fcn<T>;
+  ret[TANH] = BinaryOperation<TANH>::fcn<T>;
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -665,6 +707,11 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
 
   ret[INV] = BinaryOperationE<INV>::fcn<T>;
 
+  ret[SINH] = BinaryOperationE<SINH>::fcn<T>;
+  ret[COSH] = BinaryOperationE<COSH>::fcn<T>;
+  ret[TANH] = BinaryOperationE<TANH>::fcn<T>;
+
+
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -710,6 +757,11 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[FMAX] = BinaryOperation<FMAX>::der<T>;
 
   ret[INV] = BinaryOperation<INV>::der<T>;
+
+  ret[SINH] = BinaryOperation<SINH>::der<T>;
+  ret[COSH] = BinaryOperation<COSH>::der<T>;
+  ret[TANH] = BinaryOperation<TANH>::der<T>;
+
 
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
@@ -757,6 +809,11 @@ std::vector<bool> casadi_math<T>::getF00_is_zero(){
 
   ret[INV] = BinaryOperation<INV>::f00_is_zero();
 
+  ret[SINH] = BinaryOperation<SINH>::f00_is_zero();
+  ret[COSH] = BinaryOperation<COSH>::f00_is_zero();
+  ret[TANH] = BinaryOperation<TANH>::f00_is_zero();
+
+
   return ret;
 }
 
@@ -798,6 +855,11 @@ std::vector<bool> casadi_math<T>::getF0x_is_zero(){
 
   ret[INV] = BinaryOperation<INV>::f0x_is_zero();
 
+  ret[SINH] = BinaryOperation<SINH>::f0x_is_zero();
+  ret[COSH] = BinaryOperation<COSH>::f0x_is_zero();
+  ret[TANH] = BinaryOperation<TANH>::f0x_is_zero();
+
+
   return ret;
 }
 
@@ -838,6 +900,11 @@ std::vector<bool> casadi_math<T>::getFx0_is_zero(){
   ret[FMAX] = BinaryOperation<FMAX>::fx0_is_zero();
 
   ret[INV] = BinaryOperation<INV>::fx0_is_zero();
+
+  ret[SINH] = BinaryOperation<SINH>::fx0_is_zero();
+  ret[COSH] = BinaryOperation<COSH>::fx0_is_zero();
+  ret[TANH] = BinaryOperation<TANH>::fx0_is_zero();
+
 
   return ret;
 }

@@ -127,6 +127,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case FMIN:      BinaryOperation<FMIN>::fcn(x,y,r);          break;
         case FMAX:      BinaryOperation<FMAX>::fcn(x,y,r);          break;
         case INV:      BinaryOperation<INV>::fcn(x,y,r);          break;
+        case SINH:       BinaryOperation<SINH>::fcn(x,y,r);           break;
+        case COSH:       BinaryOperation<COSH>::fcn(x,y,r);           break;
+        case TANH:       BinaryOperation<TANH>::fcn(x,y,r);           break;
       }
       #else
       casadi_math<double>::fun[it->op](x,y,r);
@@ -164,6 +167,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);   BinaryOperation<FMIN>::der(x,y,f,it1->d);       break;
         case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);   BinaryOperation<FMAX>::der(x,y,f,it1->d);       break;
         case INV:      BinaryOperation<INV>::fcn(x,y,f);   BinaryOperation<INV>::der(x,y,f,it1->d);         break;
+        case SINH:       BinaryOperation<SINH>::fcn(x,y,f);   BinaryOperation<SINH>::der(x,y,f,it1->d);        break;
+        case COSH:       BinaryOperation<COSH>::fcn(x,y,f);   BinaryOperation<COSH>::der(x,y,f,it1->d);        break;
+        case TANH:       BinaryOperation<TANH>::fcn(x,y,f);   BinaryOperation<TANH>::der(x,y,f,it1->d);        break;
       }
       r = f;
     }

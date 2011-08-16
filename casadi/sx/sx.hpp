@@ -226,6 +226,9 @@ class SX{
     SX fmax(const SX &b) const;
     SX inv() const;
     SX constpow(const SX& n) const;
+    SX sinh() const;
+    SX cosh() const;
+    SX tanh() const;
     
     // Get the temporary variable
     int getTemp() const;
@@ -307,6 +310,9 @@ class casadi_operators<SX>{
     static SX fmax(const SX&x, const SX&y);
     static SX fabs(const SX&x);
     static SX erf(const SX&x);
+    static SX sinh(const SX&x);
+    static SX cosh(const SX&x);
+    static SX tanh(const SX&x);
 };
 
 #endif // SWIG
@@ -377,6 +383,9 @@ namespace std{
   inline SX atan(const SX &x){return x.arctan();}
   inline SX asin(const SX &x){return x.arcsin();}
   inline SX acos(const SX &x){return x.arccos();}
+  inline SX sinh(const SX &x){return x.sinh();}
+  inline SX cosh(const SX &x){return x.cosh();}
+  inline SX tanh(const SX &x){return x.tanh();}
   inline SX exp(const SX &x){return x.exp();}
   inline SX log(const SX &x){return x.log();}
   inline SX pow(const SX &x, const SX &n){ return x.__pow__(n);}
