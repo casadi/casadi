@@ -27,7 +27,8 @@
 
 /** Check if Guest object is of a particular SWIG type */
 bool istype(GUESTOBJECT, swig_type_info *type) {
-  return SWIG_IsOK(SWIG_ConvertPtr(p, 0, type, 0));
+  void *dummy = 0 ;
+  return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0));
 }
 
 template<class T>
@@ -38,6 +39,9 @@ class meta {
       #ifdef SWIGPYTHON
       if (p == Py_None) return false;
       #endif // SWIGPYTHON
+      #ifdef SWIGOCTAVE
+      if (p.is_null_value()) return false;
+      #endif // SWIGOCTAVE
       return istype(p,*meta<T>::name);
     };
     /// Convert Python object to pointer of type T
@@ -127,6 +131,7 @@ class meta {
     // Assumes that p is an octave cell
     #ifdef SWIGOCTAVE
     static int as_vector(const octave_value& p , std::vector<T> &m) {
+      if (!p.is_cell()) return false;
       int nrow = p.rows();
       int ncol = p.columns();
       if (nrow!=1 && ncol!=1) return false;

@@ -38,15 +38,15 @@ jacobian(y**5,y)
 SXFunction({x},{x})
 #SXFunction({x;x},{x}) deliberate fail
 
-SXFunction({{x}},{{x}})
+SXFunction({x},{x})
 
-SXFunction({{x}},{{x x}})
+SXFunction({x},{[x x]})
 
-SXFunction({{x}},{{x;2}})
+SXFunction({x},{[x;2]})
 
-SXFunction({x},{{x,2}})
+SXFunction({x},{[x,2]})
 
-SXFunction({x},{{x 2; x x}})
+SXFunction({x},{[x 2; x x]})
 
 
 SXFunction({y},{y})
@@ -80,7 +80,7 @@ assert(f.output(1)(1).toScalar()==sin(2.3))
 
 disp(x^2)
 
-f = SXFunction({x},{{x^2 sin(x)}})
+f = SXFunction({x},{[x^2;sin(x)]})
 f.init()
 f.input(0)
 assert(f.getNumInputs()==1)

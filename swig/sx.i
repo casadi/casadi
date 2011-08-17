@@ -391,22 +391,6 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
     }
     return true;
   } 
-  if (p.is_cell()) {
-    const Cell & c=p.cell_value();
-    int nrow = c.rows();
-    int ncol = c.columns();
-    m.resize(nrow,ncol);
-    CasADi::SX temp;
-    for(int i=0; i<nrow; ++i){
-      for(int j=0; j<ncol; ++j){
-        const octave_value& obj = c(i,j);
-        bool ret = meta< CasADi::SX >::as(obj,temp);
-        if(!ret) return false;
-        m(i,j)=temp;
-      }
-    }
-    return true;
-  }
   if ((p.is_real_scalar() && p.is_numeric_type())) {
     m = CasADi::SX(p.double_value());
     return true;
@@ -414,7 +398,7 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
   return false;
 }
 
-template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || (p.is_real_matrix() && p.is_numeric_type()) || p.is_cell() || (p.is_real_scalar() && p.is_numeric_type());}
+template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || (p.is_real_matrix() && p.is_numeric_type()) || (p.is_real_scalar() && p.is_numeric_type());}
 %}
 #endif //SWIGOCTAVE
 
