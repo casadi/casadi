@@ -137,11 +137,11 @@ SXMatrix SXFunction::hess(int iind, int oind){
 }
 
 const SXMatrix& SXFunction::inputSX(int ind) const{
-  return (*this)->inputv_[ind];
+  return (*this)->inputv_.at(ind);
 }
 
 const SXMatrix& SXFunction::outputSX(int ind) const{
-  return (*this)->outputv_[ind];
+  return (*this)->outputv_.at(ind);
 }
 
 void SXFunction::generateCode(const string& filename){
