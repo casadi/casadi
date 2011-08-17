@@ -11,7 +11,7 @@ def is_exe(root,name):
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
     
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[]):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[]):
     """
     
     dirname: The directory that should be crawled for test problems.
@@ -30,11 +30,15 @@ class TestSuite:
     
     workingdir: Specify the working directory for the process. The path may be relative to the /trunk/test path
     
+    
+    stderr_trigger: list of strings/regexes. If any string is found in std_err, it is considered an error, regardless of the return_code.
+    
+    
     args: a list of command line options:
        -skipfiles="file1 file2"   get's added to skipfiles
        -memcheck           Include a check for memory leaks
        
-       
+     
     
     """
     
@@ -54,6 +58,7 @@ class TestSuite:
     self.allowable_returncodes = allowable_returncodes 
     self.workingdir = workingdir
     self.memcheck = False
+    self.stderr_trigger = stderr_trigger
     self.args=args
     for arg in args:
       okay = False
@@ -100,7 +105,11 @@ class TestSuite:
       inp = self.inputs[fn]
     stdoutdata, stderrdata = p.communicate(inp)
     t = time.clock() - t0
-    if (p.returncode==0 or p.returncode in self.allowable_returncodes):
+    
+    stderr_trigger = False
+    for trigger in self.stderr_trigger:
+      stderr_trigger = stderr_trigger or re.search(trigger, stderrdata)
+    if (not(stderr_trigger) and (p.returncode==0 or (p.returncode in self.allowable_returncodes))):
       pass
       #print "  > Succes: %0.2f [ms]" % (t*1000)
     else :

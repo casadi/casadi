@@ -9,6 +9,7 @@ t = TestSuite(dirname=src,
   command = lambda dir,fn:  ["octave",'--no-init-file','-p', os.getcwd() + '/../build/lib', fn],
   skipdirs=[".svn","ctemplate"],
   allowable_returncodes=[127],
+  stderr_trigger = ["error"],
     args=sys.argv[2:]
   )
   
