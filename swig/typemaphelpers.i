@@ -158,6 +158,9 @@ class meta {
 #define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp; int result = meta<Type>::get_ptr(p,mp); if (!result) return false; m=*mp; return true;}
 %}
 
+%inline %{
+#define NATIVECOULDBE(Type...) if (meta<Type>::isa(p)) return true;
+%}
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
@@ -269,6 +272,7 @@ int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB >
 
 template <>
 bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
+  NATIVECOULDBE(std::pair< TypeA, TypeB >)
   if (meta< std::pair< TypeA, TypeB > >::isa(p)) return true; 
   if(!PySequence_Check(p)) return false;
   if(PySequence_Size(p)!=2) return false;
@@ -427,17 +431,24 @@ int meta< std::vector<double> >::as(const octave_value& p, std::vector<double> &
   NATIVERETURN(std::vector<double>, m);
   if(p.is_real_matrix() && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
-    if (!(mat.rows()==1)) return false;
-    m.resize(mat.cols());
-    for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    if (mat.cols()==1) {
+      m.resize(mat.rows());
+      for(int i=0; i<mat.cols(); ++i) m[i] = mat(i,0);
+    } else if (mat.rows()==1) {
+      m.resize(mat.cols());
+      for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    } else {
+      return false;
+    }
     return true;
   }
 }
 
 template <> bool meta< std::vector<double> >::couldbe(const octave_value& p) { 
+  NATIVECOULDBE(std::vector<double>)
   if(p.is_real_matrix() && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
-    return (mat.rows()==1 );
+    return (mat.rows()==1 || mat.cols()==1);
   } else {
     return false;
   }
@@ -456,17 +467,24 @@ int meta< std::vector<int> >::as(const octave_value& p, std::vector<int> &m) {
   NATIVERETURN(std::vector<int>, m);
   if(p.is_real_matrix()  && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
-    if (!(mat.rows()==1)) return false;
-    m.resize(mat.cols());
-    for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    if (mat.cols()==1) {
+      m.resize(mat.rows());
+      for(int i=0; i<mat.cols(); ++i) m[i] = mat(i,0);
+    } else if (mat.rows()==1) {
+      m.resize(mat.cols());
+      for(int j=0; j<mat.cols(); ++j) m[j] = mat(0,j);
+    } else {
+      return false;
+    }
     return true;
   }
 }
 
 template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) { 
+  NATIVECOULDBE(std::vector<int>)
   if(p.is_real_matrix() && p.is_numeric_type()) {
     const Matrix &mat = p.matrix_value();
-    return (mat.rows()==1 );
+    return (mat.rows()==1 || mat.cols()==1);
   } else {
     return false;
   }

@@ -142,14 +142,14 @@ int meta< CasADi::GenericType >::as(const octave_value& p,CasADi::GenericType &s
   NATIVERETURN(CasADi::GenericType, s)
   if (p.is_real_scalar()) {
     s=CasADi::GenericType(p.double_value());
-  } else if (meta< std::vector<int> >::couldbe(p)) {
-    std::vector<int> temp;
-    int ret = meta< std::vector<int> >::as(p,temp); 
-    if (!ret) return false;
-    s = CasADi::GenericType(temp);
   } else if (meta< std::vector<double> >::couldbe(p)) {
     std::vector<double> temp;
     int ret = meta< std::vector<double> >::as(p,temp); 
+    if (!ret) return false;
+    s = CasADi::GenericType(temp);
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    std::vector<int> temp;
+    int ret = meta< std::vector<int> >::as(p,temp); 
     if (!ret) return false;
     s = CasADi::GenericType(temp);
   } else if (p.is_string()) {

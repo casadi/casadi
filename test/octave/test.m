@@ -255,6 +255,16 @@ for i=1:2
 end
 
 disp("Generic_type")
+
+is_differential_ivec = 5;
+is_differential_gentype = GenericType(is_differential_ivec)
+is_differential_gentype.isInt()
+
+
+is_differential_ivec = 5.4;
+is_differential_gentype = GenericType(is_differential_ivec)
+is_differential_gentype.isDouble()
+
 m=2
 
 
@@ -265,7 +275,12 @@ assert(is_differential_gentype.isIntVector())
 
 is_differential_ivec = [3,4];
 is_differential_gentype = GenericType(is_differential_ivec)
-is_differential_gentype.isString()
+assert(is_differential_gentype.isDoubleVector())
+
+is_differential_ivec = [3.2,4];
+is_differential_gentype = GenericType(is_differential_ivec)
+is_differential_ivec
+is_differential_gentype
 assert(is_differential_gentype.isDoubleVector())
 
 x=SX("x")
