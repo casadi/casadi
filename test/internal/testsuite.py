@@ -123,8 +123,11 @@ class TestSuite:
       return
       
     if self.memcheck:
-      p=Popen(['valgrind','--leak-check=full']+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
-      f=Popen(['grep','-E','-A','10', "definitely lost|leaks"],stdin=p.stderr,stdout=PIPE)
+      # --suppressions=../internal/valgrind-python.supp
+      suppressions = ["internal/valgrind-python.supp"]
+      supps = ":".join([os.path.join(os.getcwd(),s) for s in suppressions])
+      p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+      f=Popen(['grep','-E','-A','10', "definitely lost|leaks|ERROR SUMMARY|Invalid read"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       stdoutdata, stderrdata = f.communicate(inp)
       m = re.search('definitely lost: (.*) bytes', stdoutdata)
@@ -135,9 +138,22 @@ class TestSuite:
         m = re.search("no leaks are possible",stdoutdata)
         if not(m):
           print stdoutdata
-          raise Exception("valgrind output is not like expected.")
-      if not(lost=="0"):
-        print "Memory leak: lost %s bytes" % (lost)
+          raise Exception("valgrind output is not like expected: %s")
+          
+      m = re.search('ERROR SUMMARY: (.*) errors', stdoutdata)
+      errors = "0"
+      if m:
+        errors = m.group(1)
+      else:
+        print stdoutdata
+        raise Exception("valgrind output is not like expected: %s")
+        
+      errors = "0"  # disabling valgrind error-checking for now: samples are flooded with errors
+      if not(lost=="0" and errors=="0"):
+        if not(lost=="0"):
+          print "Memory leak: lost %s bytes" % (lost)
+        if not(errors=="0"):
+          print "Valgrind errors: %s" % (errors)
         print "="*30
         print stdoutdata
         print "="*30
