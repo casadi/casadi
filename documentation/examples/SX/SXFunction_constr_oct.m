@@ -7,7 +7,7 @@ y = symbolic("y",2,1); % A matrix symbolic
 
 in = {x y}; % function inputs
 disp('Function outputs are:')
-out = {x,y,{x x; x x},y*x,0}
+out = {x,y,[x x; x x],y*x,0}
 
 f = SXFunction(in,out);
 f.init();
