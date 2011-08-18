@@ -82,6 +82,7 @@ MX asin(const MX &x);
 MX acos(const MX &x);
 MX exp(const MX &x);
 MX log(const MX &x);
+MX log10(const MX &x);
 MX constpow(const MX &x, const MX &n);
 MX pow(const MX &x, const MX &n);
 MX abs(const MX &x);

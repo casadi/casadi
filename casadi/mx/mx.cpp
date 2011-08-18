@@ -614,6 +614,10 @@ MX MX::log() const{
   return unary(LOG,*this);
 }
 
+MX MX::log10() const{ 
+  return log()*(1/std::log(10.));
+}
+
 MX MX::sqrt() const{ 
   return unary(SQRT,*this);
 }
@@ -693,6 +697,10 @@ MX exp(const MX& x){
 
 MX log(const MX& x){
   return x.log();
+}
+
+MX log10(const MX& x){
+  return x.log10();
 }
 
 MX sqrt(const MX& x){

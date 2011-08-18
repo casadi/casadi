@@ -467,6 +467,7 @@ class Matrix : public PrintableObject{
     Matrix<T> sinh() const;
     Matrix<T> cosh() const;
     Matrix<T> tanh() const;
+    Matrix<T> log10() const;
     //@}
     
     //@{
@@ -647,6 +648,9 @@ namespace std{
 
   template<class T>
   CasADi::Matrix<T> log(const CasADi::Matrix<T>& x){ return x.log(); }
+
+  template<class T>
+  CasADi::Matrix<T> log10(const CasADi::Matrix<T>& x){ return x.log10(); }
 
   template<class T>
   CasADi::Matrix<T> sqrt(const CasADi::Matrix<T>& x){ return x.sqrt();}
@@ -1694,6 +1698,11 @@ Matrix<T> Matrix<T>::exp() const{
 template<class T>
 Matrix<T> Matrix<T>::log() const{
   return unary_old(CasADi::casadi_operators<T>::log);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::log10() const{
+  return log()*(1/std::log(10.));
 }
 
 template<class T>

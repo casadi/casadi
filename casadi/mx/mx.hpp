@@ -311,6 +311,7 @@ class MX : public SharedObject{
   // all unary operations
   MX exp() const;
   MX log() const;
+  MX log10() const;
   MX sqrt() const;
   MX sin() const;
   MX cos() const;

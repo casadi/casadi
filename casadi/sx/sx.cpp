@@ -432,6 +432,10 @@ SX SX::log() const{
   return SX(new BinarySXNode(LOG,*this));
 }
 
+SX SX::log10() const{
+  return log()*(1/std::log(10.));
+}
+
 SX SX::sqrt() const{
   if(isOne() || isZero())
     return *this;

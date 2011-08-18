@@ -229,6 +229,7 @@ class SX{
     SX sinh() const;
     SX cosh() const;
     SX tanh() const;
+    SX log10() const;
     
     // Get the temporary variable
     int getTemp() const;
