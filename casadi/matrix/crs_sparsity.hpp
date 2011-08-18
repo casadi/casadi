@@ -79,7 +79,10 @@ class CRSSparsity : public SharedObject{
     static CRSSparsity createDiagonal(int n);
     static CRSSparsity createDiagonal(int n, int m);
     
-    /// Get the diagonal of the matrix (mapping will contain the nonzero mapping)
+    /** Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
+    When the input is square, the diagonal elements are returned.
+    If the input is vector-like, a diagonal matrix is constructed with it.
+    */
     CRSSparsity diag(std::vector<int>& mapping) const;
     
     /// Access a member function or object

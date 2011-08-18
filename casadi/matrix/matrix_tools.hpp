@@ -220,6 +220,13 @@ Matrix<T> ones(int n, int m=1){ return Matrix<T>::ones(n,m); }
 template<class T>
 Matrix<T> zeros(int n, int m=1){ return Matrix<T>::zeros(n,m);}
 
+/** \brief   Get the diagonal of a matrix or construct a diagonal
+
+When the input is square, the diagonal elements are returned.
+If the input is vector-like, a diagonal matrix is constructed with it. */
+template<class T>
+Matrix<T> diag(const Matrix<T> &A);
+
 #ifndef SWIG
 /** \brief  Get the sparsity in sparse triplet format */
 template<class T>
@@ -767,6 +774,19 @@ Matrix<T> repmat(const Matrix<T> &A, int n, int m){
 }
 
 template<class T>
+Matrix<T> diag(const Matrix<T>&A){
+  // Nonzero mapping
+  std::vector<int> mapping;
+  // Get the sparsity
+  CRSSparsity sp = A.sparsity().diag(mapping);
+  
+  Matrix<T> ret = Matrix<T>(sp);
+  
+  for (int k=0;k<mapping.size();k++) ret[k] = A[mapping[k]];
+  return ret;
+}
+
+template<class T>
 void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int>& col){
   col = A.sparsity().col();
   row = A.sparsity().getRow();
@@ -882,7 +902,7 @@ MTT_INST(T,sum) \
 MTT_INST(T,sum_all) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
-
+MTT_INST(T,diag) \
 
 
 #endif //SWIG

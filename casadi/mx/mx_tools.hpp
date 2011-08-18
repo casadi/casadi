@@ -191,7 +191,11 @@ MX operator<=(const MX& a, const MX& b);
 MX operator!(const MX& a);
 #endif // SWIG
 
-/** \brief  Get the diagonal */
+/** \brief  Get the diagonal of a matrix or construct a diagonal
+
+When the input is square, the diagonal elements are returned.
+If the input is vector-like, a diagonal matrix is constructed with it.
+ */
 MX diag(const MX& x);
 
 /** \brief Return summation of elements along specific axis

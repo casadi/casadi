@@ -1197,36 +1197,66 @@ std::string CRSSparsity::dimString() 	const {
 }
 
 CRSSparsity CRSSparsity::diag(std::vector<int>& mapping) const{
-  // Make sure that the matrix is square
-  casadi_assert_message(size1()==size2(),"Diag only for square matrice");
-  
-  // Return object
-  CRSSparsity ret(0,1);
-  ret.reserve(std::min(size(),size1()),size1());
-  
-  // Mapping
-  mapping.clear();
-  
-  // Loop over nonzero
-  for(int i=0; i<size1(); ++i){
+  if (size1()==size2()) {
+    // Return object
+    CRSSparsity ret(0,1);
+    ret.reserve(std::min(size(),size1()),size1());
     
-    // Enlarge the return matrix
-    ret.resize(i+1,1);
-  
-    // Get to the right nonzero of the row
-    int el = rowind(i);
-    while(el<rowind(i+1) && col(el)<i){
-      el++;
+    // Mapping
+    mapping.clear();
+    
+    // Loop over nonzero
+    for(int i=0; i<size1(); ++i){
+      
+      // Enlarge the return matrix
+      ret.resize(i+1,1);
+    
+      // Get to the right nonzero of the row
+      int el = rowind(i);
+      while(el<rowind(i+1) && col(el)<i){
+        el++;
+      }
+      
+      if (el>=size()) return ret;
+      
+      // Add element if nonzero on diagonal
+      if(col(el)==i){
+        ret.getNZ(i,0);
+        mapping.push_back(el);
+      }
     }
     
-    // Add element if nonzero on diagonal
-    if(col(el)==i){
-      ret.getNZ(i,0);
-      mapping.push_back(el);
+    return ret;
+    
+  } else if (size1()==1 || size2()==1) {
+    std::vector<int> dummy;
+    
+    // Have a row vector
+    const CRSSparsity &sp = (size1() == 1) ? (*this) : (*this).transpose(dummy);
+    
+    // Return object
+    CRSSparsity ret(sp.size2(),sp.size2());
+    ret.reserve(size(),sp.size2());
+    
+    mapping.clear();
+    mapping.resize(size());
+        
+    // Loop over nonzero
+    for(int k=0;k<size();k++) {
+      mapping[k]=k; // mapping will just be a range(size())
+      
+      int i = sp.col()[k];
+      
+      ret.getNZ(i,i); // Create a nonzero into the ret sparsity pattern
     }
+    
+    return ret;
+  } else {
+    stringstream s;
+    s << "diag: wrong argument shape. Expecting square matrix or vector-like, but got " << dimString() << " instead." <<  std::endl;
+    throw CasadiException(s.str());
   }
-
-  return ret;
+  
 }
 
 
