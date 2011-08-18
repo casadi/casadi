@@ -480,6 +480,24 @@ MX sum(const MX &x, int axis) {
   }
 }
 
+MX polyval(const MX& p, const MX& x){
+  casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
+  casadi_assert_message(isVector(p) && p.size()>0,"polynomial coefficients must be a vector");
+  MX ret = p[0];
+  for(int i=1; i<p.size(); ++i){
+    ret = ret*x + p[i];
+  }
+  return ret;
+}
+
+bool isVector(const MX& ex){
+  return ex.size2()==1;
+}
+
+bool isDense(const MX& ex){
+  return ex.size() == ex.numel();
+}
+
 
 } // namespace CasADi
 

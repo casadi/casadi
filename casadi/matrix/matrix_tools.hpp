@@ -220,8 +220,11 @@ Matrix<T> ones(int n, int m=1){ return Matrix<T>::ones(n,m); }
 template<class T>
 Matrix<T> zeros(int n, int m=1){ return Matrix<T>::zeros(n,m);}
 
-/** \brief   Get the diagonal of a matrix or construct a diagonal
+/** \brief  Evaluate a polynomial with coefficeints p in x */
+template<class T>
+Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x);
 
+/** \brief   Get the diagonal of a matrix or construct a diagonal
 When the input is square, the diagonal elements are returned.
 If the input is vector-like, a diagonal matrix is constructed with it. */
 template<class T>
@@ -264,6 +267,14 @@ CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ 
 
 template<class T>
 CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
+
+
+
+
+
+
+
+
 
 #ifndef SWIG
 
@@ -839,6 +850,16 @@ Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
   return ret;
 }
 
+template<class T>
+Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
+  casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
+  casadi_assert_message(isVector(p) && p.size()>0,"polynomial coefficients must be a vector");
+  Matrix<T> ret = p[0];
+  for(int i=1; i<p.size(); ++i){
+    ret = ret*x + p[i];
+  }
+  return ret;
+}
 
 // template<class T>
 // Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b){
@@ -903,6 +924,7 @@ MTT_INST(T,sum_all) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 MTT_INST(T,diag) \
+MTT_INST(T,polyval) \
 
 
 #endif //SWIG

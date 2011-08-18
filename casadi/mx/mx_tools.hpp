@@ -144,6 +144,12 @@ void simplifyMapping(MX& ex);
 /** \brief  check if zero */
 bool isMinusOne(const MX& ex);
 
+/** \brief  check if vector */
+bool isVector(const MX& ex);
+
+/** \brief  check if vector */
+bool isDense(const MX& ex);
+
 MX trace(const MX& A);
 
 /** \brief Repeat matrix A n times vertically and m times horizontally */
@@ -201,6 +207,9 @@ MX diag(const MX& x);
 /** \brief Return summation of elements along specific axis
     \param axis either 0 or 1 */
 MX sum(const MX &x, int axis=0);
+
+/** \brief  Evaluate a polynomial with coefficeints p in x */
+MX polyval(const MX& p, const MX& x);
 
 } // namespace CasADi
 
