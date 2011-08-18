@@ -242,14 +242,14 @@ class MX : public SharedObject{
   //@}
 
   /** \brief  Matrix of all zeros */  
-  static MX zeros(int nrow, int ncol);
+  static MX zeros(int nrow, int ncol=1);
   static MX zeros(const CRSSparsity& sparsity);
   
   /** \brief  Matrix of all ones */  
-  static MX ones(int nrow, int ncol);
+  static MX ones(int nrow, int ncol=1);
   
   /** \brief  Identity matrix */  
-  static MX eye(int n);
+  static MX eye(int nrow);
 
   /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
   MX jac(int iind=0);

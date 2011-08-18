@@ -577,6 +577,15 @@ class Matrix : public PrintableObject{
     // get the number if non-zeros for a given sparsity pattern
     int size(Sparsity sp) const;
     
+    /** \brief  create an n-by-n identity matrix */
+    static Matrix<T> eye(int nrow);
+
+    /** \brief  create a matrix with all ones */
+    static Matrix<T> ones(int nrow, int ncol=1);
+
+    /** \brief  create a matrix with all zeros */
+    static Matrix<T> zeros(int nrow, int ncol=1);
+    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
@@ -1997,6 +2006,23 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
   Matrix<T> ret;
   return ret;
 }
+
+template<class T>
+Matrix<T> Matrix<T>::ones(int n, int m){
+  return Matrix<T>(n,m,1);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::zeros(int n, int m){
+  return Matrix<T>(n,m);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::eye(int n){
+  return Matrix<T>(CRSSparsity::createDiagonal(n),1);
+}
+
+
 
 
 

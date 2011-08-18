@@ -194,6 +194,10 @@ MX operator!(const MX& a);
 /** \brief  Get the diagonal */
 MX diag(const MX& x);
 
+/** \brief Return summation of elements along specific axis
+    \param axis either 0 or 1 */
+MX sum(const MX &x, int axis=0);
+
 } // namespace CasADi
 
 #ifdef SWIG

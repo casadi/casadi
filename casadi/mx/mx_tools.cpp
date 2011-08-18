@@ -471,5 +471,15 @@ int countNodes(const MX& A){
   return f.countNodes();
 }
 
+MX sum(const MX &x, int axis) {
+  casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
+  if (axis==1){
+    return prod(x,MX::ones(x.size2(),1));
+  } else {
+    return prod(MX::ones(1,x.size1()),x);
+  }
+}
+
+
 } // namespace CasADi
 

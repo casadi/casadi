@@ -210,15 +210,15 @@ Matrix<T> repmat(const Matrix<T> &A, int n, int m);
 
 /** \brief  create an n-by-n identity matrix */
 template<class T>
-Matrix<T> eye(int n);
+Matrix<T> eye(int n){ return Matrix<T>::eye(n);}
 
 /** \brief  create a matrix with all ones */
 template<class T>
-Matrix<T> ones(int n, int m=1);
+Matrix<T> ones(int n, int m=1){ return Matrix<T>::ones(n,m); }
 
 /** \brief  create a matrix with all zeros */
 template<class T>
-Matrix<T> zeros(int n, int m=1);
+Matrix<T> zeros(int n, int m=1){ return Matrix<T>::zeros(n,m);}
 
 #ifndef SWIG
 /** \brief  Get the sparsity in sparse triplet format */
@@ -547,14 +547,9 @@ template<class T>
 Matrix<T> sum(const Matrix<T> &x, int axis) {
   casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
   if (axis==1){
-    return trans(sum(trans(x),0));
+    return prod(x,Matrix<T>::ones(x.size2(),1));
   } else {
-    Matrix<T> res(1,x.size2());
-    const std::vector<int> &col = x.col();
-    for(int k=0; k<col.size(); k++){
-      res(0,col[k]) += x.data()[k];
-    }
-    return res;
+    return prod(Matrix<T>::ones(1,x.size1()),x);
   }
 }
 
@@ -769,21 +764,6 @@ Matrix<T> repmat(const Matrix<T> &A, int n, int m){
   
   // Then vertically
   return vertcat(std::vector<Matrix<T> >(n, row));
-}
-
-template<class T>
-Matrix<T> ones(int n, int m){
-  return Matrix<T>(n,m,1);
-}
-
-template<class T>
-Matrix<T> zeros(int n, int m){
-  return Matrix<T>(n,m);
-}
-
-template<class T>
-Matrix<T> eye(int n){
-  return Matrix<T>(CRSSparsity::createDiagonal(n),1);
 }
 
 template<class T>
