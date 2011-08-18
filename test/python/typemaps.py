@@ -483,5 +483,8 @@ class typemaptests(casadiTestCase):
     symbolic("x") * numpy.array(1.0) 
     MX("x") * numpy.array(1.0)
     
+  def test_array_cat(self):
+    horzcat((symbolic("x",4,3),ones((4,3))))
+    
 if __name__ == '__main__':
     unittest.main()

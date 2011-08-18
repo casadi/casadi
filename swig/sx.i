@@ -301,7 +301,13 @@ template <>
 int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::SX> &m) {
   NATIVERETURN(CasADi::Matrix<CasADi::SX>, m)
   NATIVERETURN(CasADi::SX, m)
-  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
+  if(meta< CasADi::Matrix<double> >::couldbe(p)) {
+    CasADi::DMatrix mt;
+    bool result=meta< CasADi::Matrix<double> >::as(p,mt);
+    if (!result)
+      return false;
+    m = CasADi::SXMatrix(mt);
+  } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SX>
 		if (array_type(p)!=NPY_OBJECT) {
 			SWIG_Error(SWIG_TypeError, "asSXMatrix: numpy.ndarray must be of dtype object");
 			return false;
@@ -328,13 +334,7 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::S
 		}
     Py_DECREF(it);
 		m = CasADi::Matrix< CasADi::SX >(v, nrows, ncols);
-	} else if(meta< CasADi::Matrix<double> >::couldbe(p)) {
-    CasADi::DMatrix mt;
-    bool result=meta< CasADi::Matrix<double> >::as(p,mt);
-    if (!result)
-      return false;
-    m = CasADi::SXMatrix(mt);
-  } else if(meta< CasADi::SX >::couldbe_sequence(p)) {
+	} else if(meta< CasADi::SX >::couldbe_sequence(p)) {
     std::vector<CasADi::SX> sxv;
     int result = meta< CasADi::SX >::as_vector(p,sxv);
     if (result) {
