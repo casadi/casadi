@@ -61,7 +61,10 @@ template<> swig_type_info** meta< std::vector< std::vector< CasADi::SX > > >::na
 %pythoncode %{
 try:
   import numpy
-  constpow=numpy.frompyfunc(lambda x,y: x.constpow(y),2,1)
+  def constpow(x,y):
+    if hasattr(x,'__constpow__'):
+      return x.__constpow__(y)
+  constpow=numpy.frompyfunc(constpow,2,1)
 except:
   pass
 %}
@@ -90,7 +93,44 @@ namespace CasADi {
   
   %pythoncode %{
   __array_priority__ = 1000.0
+  
+  def __array_wrap__(self,out_arr,context=None):
+    if context is None:
+      return out_arr
+    name = context[0].__name__
+    args = list(context[1])
+    
+    selfM = SXMatrix(self)
+    if "vectorized" in name:
+      name = name[:-len(" (vectorized)")]
+
+    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
+    if name in conversion:
+      name = conversion[name]
+    if len(context[1])==2 and context[1][1] is self:
+      name = 'r' + name
+      args.reverse()
+    if not(hasattr(selfM,name)):
+      name = '__' + name + '__'
+    fun=getattr(selfM, name)
+    return fun(*args[1:])
+
+  def toArray(self):
+    import numpy as n
+    r = n.array((),dtype=object)
+    r.resize(1,1)
+    r[0,0] = self
+    return r
+      
+  def __array__(self,*args,**kwargs):
+    import numpy as n
+    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
+      return n.array([1])
+    else:
+      return self.toArray()
   %}
+  
+  
 
   #endif // SWIGPYTHON
   
@@ -160,16 +200,19 @@ namespace CasADi {
     
   %pythoncode %{
   def __array_wrap__(self,out_arr,context=None):
-        name = context[0].__name__
-        conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
-        if name in conversion:
-          name = conversion[name]
-        if len(context[1])==2 and context[1][1] is self:
-          name = 'r' + name
-        if not(hasattr(self,name)):
-          name = '__' + name + '__'
-        fun=getattr(self, name)
-        return fun(*context[1][0:-1])
+    name = context[0].__name__
+    args = list(context[1])
+
+    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
+    if name in conversion:
+      name = conversion[name]
+    if len(context[1])==2 and context[1][1] is self:
+      name = 'r' + name
+      args.reverse()
+    if not(hasattr(self,name)):
+      name = '__' + name + '__'
+    fun=getattr(self, name)
+    return fun(*args[1:])
   %}
 
   %pythoncode %{

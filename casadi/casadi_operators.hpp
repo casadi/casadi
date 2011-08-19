@@ -44,6 +44,7 @@ class casadi_operators{
     static T exp(const T&x){ return std::exp(x);}
     static T log(const T&x){ return std::log(x);}
     static T pow(const T&x, const T&y){ return std::pow(x,y);}
+    static T constpow(const T&x, const T&y){ return std::pow(x,y);}
     static T sqrt(const T&x){ return std::sqrt(x);}
     static T sin(const T&x){ return std::sin(x);}
     static T cos(const T&x){ return std::cos(x);}

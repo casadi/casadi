@@ -547,7 +547,7 @@ SX casadi_operators<SX>::pow(const SX&x, const SX&y){
 }
 
 SX casadi_operators<SX>::constpow(const SX&x, const SX&y){
-  return x.constpow(y);
+  return x.__constpow__(y);
 }
 
 SX casadi_operators<SX>::sin(const SX&x){ 
@@ -654,6 +654,10 @@ SX SX::__pow__(const SX& n) const{
   } else {
     return SX(new BinarySXNode(POW,*this,n));
   }
+}
+
+SX SX::__constpow__(const SX& n) const{
+  return SX(new BinarySXNode(CONSTPOW,*this,n));
 }
 
 SX SX::constpow(const SX& n) const{

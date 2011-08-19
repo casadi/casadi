@@ -415,7 +415,7 @@ template <> bool meta< double >::couldbe(PyObject * p) {
    PyObject *m = PyObject_CallMethod(p, name,NULL);
    if (!m) {   PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
    char *kk = PyString_AsString(k);
-   bool result = kk[0]=='f';
+   bool result = kk[0]=='f' || kk[0]=='i';
    Py_DECREF(k); Py_DECREF(r); Py_DECREF(m);
    return result;
  }

@@ -372,6 +372,7 @@ class Matrix : public PrintableObject{
     Matrix<T> __mul__(const Matrix<T> &y) const;
     Matrix<T> __div__(const Matrix<T> &y) const;
     Matrix<T> __pow__(const Matrix<T> &y) const;
+    Matrix<T> __constpow__(const Matrix<T> &y) const;
     Matrix<T> __mpower__(const Matrix<T> &y) const;
     Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
     Matrix<T> __mldivide__   (const Matrix<T> &y) const;
@@ -380,6 +381,9 @@ class Matrix : public PrintableObject{
     Matrix<T> __rmul__(const Matrix<T> &y) const {return y.__mul__(*this);}
     Matrix<T> __rdiv__(const Matrix<T> &y) const {return y.__div__(*this);}
     Matrix<T> __rpow__(const Matrix<T> &y) const {return y.__pow__(*this);}
+    Matrix<T> __rconstpow__(const Matrix<T> &y) const {return y.__constpow__(*this);}
+    Matrix<T> __rfmin__(const Matrix<T> &y) const {return y.fmin(*this);}
+    Matrix<T> __rfmax__(const Matrix<T> &y) const {return y.fmax(*this);}
     Matrix<T> __rmpower__(const Matrix<T> &y) const {return y.__mpower__(*this);}
     Matrix<T> __rmrdivide__ (const Matrix<T> &y) const {return y.__mrdivide__(*this);}
     Matrix<T> __rmldivide__ (const Matrix<T> &y) const {return y.__mldivide__(*this);}
@@ -436,6 +440,8 @@ class Matrix : public PrintableObject{
     /// Python operator overloading
     Matrix<T> __pow__ (const T& b) const{ return __pow__(Matrix<T>(b));}
     Matrix<T> __rpow__(const T& b) const{ return Matrix<T>(b).__pow__(*this);}
+    Matrix<T> __constpow__ (const T& b) const{ return (*this).__constpow__(Matrix<T>(b));}
+    Matrix<T> __rconstpow__(const T& b) const{ return Matrix<T>(b).__constpow__(*this);}
     Matrix<T> __add__ (const T& b) const{ return *this + b;}
     Matrix<T> __radd__(const T& b) const{ return b + *this;}
     Matrix<T> __sub__ (const T& b) const{ return *this - b;}
@@ -444,6 +450,9 @@ class Matrix : public PrintableObject{
     Matrix<T> __rmul__(const T& b) const{ return b * *this;}
     Matrix<T> __div__ (const T& b) const{ return *this / b;}
     Matrix<T> __rdiv__(const T& b) const{ return b / *this;}
+    Matrix<T> __rfmin__(const T& b) const{ return Matrix<T>(b).fmin(*this);}
+    Matrix<T> __rfmax__(const T& b) const{ return Matrix<T>(b).fmax(*this);}
+
     //@}
     #endif // SWIGPYTHON
     
@@ -665,7 +674,10 @@ namespace std{
   CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
 
   template<class T>
-  CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__pow__(y);}
+  CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y) { return x.__pow__(y);}
+  
+  template<class T>
+  CasADi::Matrix<T> constpow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__constpow__(y);}
   
 } // namespace std
 #endif // SWIG
@@ -1638,6 +1650,11 @@ int Matrix<T>::size(Sparsity sp) const{
 template<class T>
 Matrix<T> Matrix<T>::__pow__(const Matrix<T>& y) const{
   return binary_old(CasADi::casadi_operators<T>::pow,y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::__constpow__(const Matrix<T>& y) const{
+  return binary_old(CasADi::casadi_operators<T>::constpow,y);
 }
 
 template<class T>

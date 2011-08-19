@@ -480,15 +480,18 @@ PyObject* arrayView() {
 %pythoncode %{
   def __array_wrap__(self,out_arr,context=None):
     name = context[0].__name__
+    args = list(context[1])
+
     conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
     if name in conversion:
       name = conversion[name]
     if len(context[1])==2 and context[1][1] is self:
       name = 'r' + name
+      args.reverse()
     if not(hasattr(self,name)):
       name = '__' + name + '__'
     fun=getattr(self, name)
-    return fun(*context[1][0:-1])
+    return fun(*args[1:])
 %}
 
 // The following code has some trickery to fool numpy ufunc.
@@ -552,7 +555,13 @@ PyObject* arrayView() {
 
 # define binopsT(T) \
 T __pow__ (const T& b) const{ return std::pow(T(*$self),b);} \
-T __rpow__(const T& b) const{ return std::pow(b,T(*$self));}
+T __rpow__(const T& b) const{ return std::pow(b,T(*$self));} \
+T __constpow__(const T& b) const{ return T(*$self).__constpow__(b);} \
+T __rconstpow__(const T& b) const{ return b.__constpow__(*$self);} \
+T __rfmin__(const T& b) const{ return fmin(T(*$self),b);} \
+T __rfmax__(const T& b) const{ return fmax(T(*$self),b);} \
+T fmin(const T& b) const{ return fmin(b,T(*$self));} \
+T fmax(const T& b) const{ return fmax(b,T(*$self));}
 
 binopsT(CasADi::Matrix<CasADi::SX>)
 binopsT(CasADi::MX)

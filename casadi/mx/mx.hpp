@@ -294,6 +294,10 @@ class MX : public SharedObject{
   MX __rdiv__(const MX& b) const;
   MX __pow__(const MX& b) const;
   MX __rpow__(const MX& b) const;
+  MX __constpow__(const MX& b) const;
+  MX __rconstpow__(const MX& b) const;
+  MX __rfmin__(const MX& b) const;
+  MX __rfmax__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;
   MX __rmrdivide__ (const MX& b) const;
   MX __ldivide__   (const MX& b) const;

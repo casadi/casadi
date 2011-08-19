@@ -195,6 +195,10 @@ class SX{
     SX __rdiv__(const SX& b) const{ return b / *this;}
     SX __pow__(const SX& b) const;
     SX __rpow__(const SX& b) const{ return b.__pow__(*this);}
+    SX __constpow__(const SX& b) const;
+    SX __rconstpow__(const SX& b) const{ return b.__constpow__(*this);}
+    SX __rfmin__(const SX& b) const{ return b.fmin(*this);}
+    SX __rfmax__(const SX& b) const{ return b.fmax(*this);}
     
     SX prod(const SX &b) const { return *this * b;}
     SX rprod(const SX &b) const { return b * *this;}

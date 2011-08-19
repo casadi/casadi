@@ -679,6 +679,10 @@ MX MX::__rmul__(const MX& b) const{   return b * *this;}
 MX MX::__div__(const MX& b) const{    return *this / b;}
 MX MX::__rdiv__(const MX& b) const{   return b / *this;}
 MX MX::__rpow__(const MX& b) const {   return std::pow(b,*this);}
+MX MX::__constpow__(const MX& b) const {   return (*this).constpow(b);}
+MX MX::__rconstpow__(const MX& b) const {   return b.constpow(*this);}
+MX MX::__rfmin__(const MX& b) const {   return b.fmin(*this);}
+MX MX::__rfmax__(const MX& b) const {   return b.fmax(*this);}
 MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__rmrdivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmrdivide: Not implemented");}
 MX MX::__ldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
