@@ -503,6 +503,9 @@ PyObject* arrayView() {
     name = context[0].__name__
     args = list(context[1])
 
+    if "vectorized" in name:
+        name = name[:-len(" (vectorized)")]
+        
     conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
     if name in conversion:
       name = conversion[name]

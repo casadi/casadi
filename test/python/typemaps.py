@@ -251,7 +251,11 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s**z)
       doit(z,s,lambda z,s: fmin(s,z))
       doit(z,s,lambda z,s: fmax(s,z))
-    
+      doit(z,s,lambda z,s: min(s,z))
+      doit(z,s,lambda z,s: max(s,z))
+      doit(z,s,lambda z,s: constpow(s,z))
+      doit(z,s,lambda z,s: constpow(z,s))
+      
     nums = [3,3.0,array(3),array(3.0),array([[3]]),array([[1,2],[3,4]]),DMatrix(3),DMatrix([[1,2],[3,4]])]
     
     # numeric & SX
