@@ -218,6 +218,27 @@ template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting 
 template <>
 int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<double> &m) {
   NATIVERETURN(CasADi::Matrix<double>,m)
+  if((p.is_real_matrix() && p.is_numeric_type() && p.is_sparse_type())){
+    // Note: octave uses column-major storage
+    SparseMatrix mat = p.sparse_matrix_value();
+    
+    int size = mat.nnz();
+    
+    std::vector<double> data(size);
+    for (int k=0;k<data.size();k++) data[k]=mat.data(k);
+
+    std::vector<int> cidx(mat.cols()+1);
+    std::vector<int> ridx(size);
+    for (int k=0;k<cidx.size();k++) cidx[k]=mat.cidx(k);
+    for (int k=0;k<ridx.size();k++) ridx[k]=mat.ridx(k);
+    
+    CasADi::CRSSparsity A = CasADi::CRSSparsity(mat.cols(),mat.rows(),ridx,cidx);
+    CasADi::Matrix<double> ret = CasADi::Matrix<double>(A,data);
+    
+    m = ret.trans();
+    
+    return true;
+  }
   if((p.is_real_matrix() && p.is_numeric_type())){
     Matrix mat = p.matrix_value();
     m = CasADi::DMatrix(mat.rows(),mat.cols(),0);

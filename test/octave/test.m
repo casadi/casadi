@@ -327,3 +327,12 @@ s = casadi.dot(X,X).sparsity()
 disp("string confusion")
 
 x = MX("x")
+
+disp("sparse array input typemap")
+A=speye(5)
+A(1,2)=5
+A(3,4)=5
+B= [A A]
+C=DMatrix(B)
+
+assert(C.size(),2*7)
