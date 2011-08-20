@@ -187,7 +187,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       
       // Find input/output pairs
       input_nz.clear();
-      output_el.clear();
       
       // Loop over rows
       for(int i=0; i<d1; ++i){
