@@ -449,6 +449,7 @@ binopsFull(double b,CasADi::Matrix<double>,,CasADi::Matrix<double>)
 namespace CasADi{
 %extend Matrix<double> {
 
+void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
 %python_matrix_convertors
 %python_matrix_helpers(CasADi::Matrix<double>)
 

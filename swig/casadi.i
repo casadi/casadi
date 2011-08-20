@@ -311,3 +311,9 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "interfaces/gsl/gsl_integrator.hpp"
 #endif
 
+
+#ifdef SWIGPYTHON
+%include "python_function.i"
+#endif
+
+

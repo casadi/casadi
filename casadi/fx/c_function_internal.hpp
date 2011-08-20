@@ -39,13 +39,16 @@ class CFunctionInternal : public FXInternal{
   public:
     
     /** \brief  Create a function */
+    explicit CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
+    
+    /** \brief  Create a function */
     explicit CFunctionInternal(CFunctionWrapper c_fcn);
     
     /** \brief  Destructor */
     virtual ~CFunctionInternal();
 
     /** \brief  Cloning */
-    virtual CFunctionInternal* clone() const{ return new CFunctionInternal(evaluate_);}
+    virtual CFunctionInternal* clone() const{ return new CFunctionInternal(evaluate_, inputscheme_,outputscheme_);}
 
     /** \brief  Set user data structure (to be passed to all functions) */
     void setUserData(void* user_data);
@@ -63,6 +66,12 @@ class CFunctionInternal : public FXInternal{
   
     /// A reference to this object to be passed to the user functions
     CFunction ref_;
+    
+    /// Input scheme
+    std::vector<CasADi::CRSSparsity> inputscheme_;
+    
+    /// Output scheme
+    std::vector<CasADi::CRSSparsity> outputscheme_;
     
 }; // class CFunctionInternal 
   

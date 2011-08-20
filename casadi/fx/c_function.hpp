@@ -34,12 +34,15 @@ class CFunctionInternal;
 // Forward declaration
 class CFunction;
 
-#ifndef SWIG
-/** \brief  Wrapper around functions */
+//#ifndef SWIG
+/** \brief  Wrapper around functions
+ *
+ * For wrappers around Python functions, see the PyFunction example at the bottom.
+ */
 typedef void (*CFunctionWrapper)(CFunction &f, int nfdir, int nadir, void* user_data);
-#endif // SWIG
+//#endif // SWIG
 
-/** \brief  Interface to function implemented as plan code 
+/** \brief  Interface to function implemented as plain code 
   \author Joel Andersson 
   \date 2010
 */
@@ -50,10 +53,12 @@ public:
 /** \brief  default constructor */
   CFunction();
 
-#ifndef SWIG
+//#ifndef SWIG
   /** \brief  Create a function */
+  explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
+  
   explicit CFunction(CFunctionWrapper c_fcn);
-#endif // SWIG
+//#endif // SWIG
 
   /** \brief  Access functions of the node */
   CFunctionInternal* operator->();
