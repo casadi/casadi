@@ -13,11 +13,16 @@
 // http://mentat.za.net/DaCodaAlFine.pdf
 // "dispatch binary operator" can be found in octrun.swg: look for dispatch_binary_op in swig generated
 
+
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"
 %include "casadi/matrix/slice.hpp"
+
+
 %include "casadi/matrix/matrix.hpp"
+%my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
 %include "casadi/sx/sx.hpp"
+
 
 
 #ifdef SWIGPYTHON
@@ -301,13 +306,16 @@ namespace CasADi {
 #endif // SWIGPYTHON
 
 
+
+
+
+
+
 %template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
 %template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 
 
 
-
-%my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
