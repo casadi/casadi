@@ -276,8 +276,8 @@ PyObject* arrayView() {
     return abs(self.__float__())
 %}
 
-binopsNoPriority(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
-binopsNoPriority(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
+binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 }; // extend Matrix<double>
 } // namespace CasADi

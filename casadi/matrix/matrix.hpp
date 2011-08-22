@@ -436,26 +436,6 @@ class Matrix : public PrintableObject{
 #endif // SWIG
     //@{
     
-    #ifdef SWIGPYTHON
-    /// Python operator overloading
-    Matrix<T> __pow__ (const T& b) const{ return __pow__(Matrix<T>(b));}
-    Matrix<T> __rpow__(const T& b) const{ return Matrix<T>(b).__pow__(*this);}
-    Matrix<T> __constpow__ (const T& b) const{ return (*this).__constpow__(Matrix<T>(b));}
-    Matrix<T> __rconstpow__(const T& b) const{ return Matrix<T>(b).__constpow__(*this);}
-    Matrix<T> __add__ (const T& b) const{ return *this + b;}
-    Matrix<T> __radd__(const T& b) const{ return b + *this;}
-    Matrix<T> __sub__ (const T& b) const{ return *this - b;}
-    Matrix<T> __rsub__(const T& b) const{ return b - *this;}
-    Matrix<T> __mul__ (const T& b) const{ return *this * b;}
-    Matrix<T> __rmul__(const T& b) const{ return b * *this;}
-    Matrix<T> __div__ (const T& b) const{ return *this / b;}
-    Matrix<T> __rdiv__(const T& b) const{ return b / *this;}
-    Matrix<T> __rfmin__(const T& b) const{ return Matrix<T>(b).fmin(*this);}
-    Matrix<T> __rfmax__(const T& b) const{ return Matrix<T>(b).fmax(*this);}
-
-    //@}
-    #endif // SWIGPYTHON
-    
     //@{
     /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
     Matrix<T> sin() const;
