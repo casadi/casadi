@@ -334,7 +334,3 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 #endif
 
 
-#ifdef SWIGOCTAVE
-%include "octave_function.i"
-#endif
-
