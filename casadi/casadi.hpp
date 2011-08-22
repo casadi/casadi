@@ -26,15 +26,16 @@
 // Matrices
 #include "matrix/matrix.hpp"
 #include "matrix/matrix_tools.hpp"
+#include "matrix/sparsity_tools.hpp"
 
 // Scalar expressions
 #include "sx/sx.hpp"
 #include "sx/sx_tools.hpp"
-#include "fx/sx_matrix.hpp"
+#include "fx/sx_function.hpp"
 
 // Matrix expressions
 #include "mx/mx.hpp"
 #include "mx/mx_tools.hpp"
-#include "fx/mx_matrix.hpp"
+#include "fx/mx_function.hpp"
 
 #endif //CASADI_HPP
