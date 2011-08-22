@@ -596,6 +596,12 @@ class Matrix : public PrintableObject{
     /** \brief  create a matrix with all zeros */
     static Matrix<T> zeros(int nrow, int ncol=1);
     
+    /** \brief  create a matrix with all ones */
+    static Matrix<T> ones(const std::pair<int,int>& nm);
+
+    /** \brief  create a matrix with all zeros */
+    static Matrix<T> zeros(const std::pair<int,int>& nm);
+    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
@@ -2041,6 +2047,16 @@ Matrix<T> Matrix<T>::ones(int n, int m){
 template<class T>
 Matrix<T> Matrix<T>::zeros(int n, int m){
   return Matrix<T>(n,m);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::ones(const std::pair<int,int> &nm){
+  return Matrix<T>(nm.first,nm.second,1);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &nm){
+  return Matrix<T>(nm.first,nm.second);
 }
 
 template<class T>

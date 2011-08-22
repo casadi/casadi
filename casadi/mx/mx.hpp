@@ -241,12 +241,20 @@ class MX : public SharedObject{
     static MX matrix_matrix(int op, const MX &x, const MX &y);
   //@}
 
+  //@{
   /** \brief  Matrix of all zeros */  
   static MX zeros(int nrow, int ncol=1);
   static MX zeros(const CRSSparsity& sparsity);
+  static MX zeros(const std::pair<int, int> &nm);
+  //@}
   
+  //@{
   /** \brief  Matrix of all ones */  
-  static MX ones(int nrow, int ncol=1);
+  static MX ones(int nrow, int ncol=1); 
+  static MX ones(const std::pair<int, int> &nm);
+  //@}
+  
+  
   
   /** \brief  Identity matrix */  
   static MX eye(int nrow);

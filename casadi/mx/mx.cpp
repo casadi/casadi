@@ -435,8 +435,16 @@ MX MX::zeros(const CRSSparsity& sparsity){
   return DMatrix(sparsity,0);
 }
 
+MX MX::zeros(const std::pair<int, int> &nm){
+  return MX(nm.first,nm.second);
+}
+
 MX MX::ones(int nrow, int ncol){
   return MX(Matrix<double>(nrow,ncol,1));
+}
+
+MX MX::ones(const std::pair<int, int> &nm){
+  return MX(Matrix<double>(nm.first,nm.second,1));
 }
 
 MX MX::eye(int n){
