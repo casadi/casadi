@@ -319,11 +319,6 @@ namespace CasADi {
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
-#ifdef SWIGOCTAVE
-%meta_vector(CasADi::Matrix<CasADi::SX>);
-#endif //SWIGOCTAVE
-%meta_vector(std::vector<CasADi::SX>);
-%meta_vector(CasADi::SX);
 
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;

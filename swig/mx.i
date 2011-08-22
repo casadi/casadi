@@ -8,9 +8,7 @@
 %include "casadi/mx/mx.hpp"
 
 
-#ifdef SWIGOCTAVE
-%meta_vector(CasADi::MX);
-#endif //SWIGOCTAVE
+
 
 %template(sparsity_vector) std::vector<CasADi::CRSSparsity>;
 

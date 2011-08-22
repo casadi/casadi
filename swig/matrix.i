@@ -303,9 +303,7 @@ CasADi::Matrix<CasADi::SX> __rpow__(const CasADi::SX& b) const{ return CasADi::M
 #endif // SWIGPYTHON
 
   
-#ifdef SWIGPYTHON
-%meta_vector(CasADi::Matrix<double>)
-#endif // SWIGPYTHON
+
 
 namespace CasADi{
 

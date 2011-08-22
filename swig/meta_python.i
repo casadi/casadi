@@ -389,6 +389,7 @@ bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
 
 %}
 
+%meta_vector(CasADi::Matrix<double>)
 
 /// CasADi::Matrix<CasADi::SX>
 %inline %{
@@ -537,6 +538,9 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
 %}
 #endif //SWIGPYTHON
 
+
+%meta_vector(std::vector<CasADi::SX>);
+%meta_vector(CasADi::SX);
 
 /// CasADi::Slice
 %inline %{
