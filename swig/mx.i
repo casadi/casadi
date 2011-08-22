@@ -57,13 +57,6 @@
   #endif //SWIGPYTHON
 };
 
-#ifdef SWIGPYTHON
-%extend CasADi::MX{ 
-  #binopsFull(double b,CasADi::MX,,CasADi::MX)
-  #binopsFull(const CasADi::Matrix<double>& b,CasADi::MX,,CasADi::MX)
-};
-#endif // SWIGPYTHON
-
 %my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< CasADi::MX >);
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);

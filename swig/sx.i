@@ -18,9 +18,10 @@
 %include "casadi/matrix/crs_sparsity.hpp"
 %include "casadi/matrix/slice.hpp"
 
-
+%my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %include "casadi/matrix/matrix.hpp"
 %my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
+
 %include "casadi/sx/sx.hpp"
 
 
@@ -207,7 +208,7 @@ namespace CasADi {
   
   #endif // SWIGOCTAVE
   
-  binopsFull(const Matrix<double>& b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+  // a+b when a is SX, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting
   binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
     
 };
@@ -231,12 +232,6 @@ namespace CasADi {
         return _casadi.__ge__(self,other)
     %}
     #endif
-
-    binopsFull(double b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
-    binopsFull(const CasADi::Matrix<double>& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
-    #ifdef SWIGOCTAVE
-    binopsFull(const CasADi::SX& b,CasADi::Matrix<CasADi::SX>,,CasADi::Matrix<CasADi::SX>)
-    #endif // SWIGOCTAVE
   
     %python_matrix_convertors
     %python_matrix_helpers(CasADi::Matrix<CasADi::SX>)
@@ -305,18 +300,9 @@ namespace CasADi {
 
 #endif // SWIGPYTHON
 
-
-
-
-
-
-
 %template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
 %template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 
-
-
-%my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
 

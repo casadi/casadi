@@ -138,9 +138,7 @@ octave_value toSparse() {
 }
 
 binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
-binopsFull(const CasADi::SX & b,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
-binopsFull(double b,CasADi::Matrix<double>,,CasADi::Matrix<double>)
 
 }; // extend Matrix<double>
 } // namespace CasADi
@@ -278,25 +276,8 @@ PyObject* arrayView() {
     return abs(self.__float__())
 %}
 
-
-# define binopsT(T) \
-T __pow__ (const T& b) const{ return std::pow(T(*$self),b);} \
-T __rpow__(const T& b) const{ return std::pow(b,T(*$self));} \
-T __constpow__(const T& b) const{ return T(*$self).__constpow__(b);} \
-T __rconstpow__(const T& b) const{ return b.__constpow__(*$self);} \
-T __rfmin__(const T& b) const{ return fmin(T(*$self),b);} \
-T __rfmax__(const T& b) const{ return fmax(T(*$self),b);} \
-T fmin(const T& b) const{ return fmin(b,T(*$self));} \
-T fmax(const T& b) const{ return fmax(b,T(*$self));}
-
-binopsT(CasADi::Matrix<CasADi::SX>)
-binopsT(CasADi::MX)
-
-CasADi::Matrix<CasADi::SX> __pow__ (const CasADi::SX& b) const{ return CasADi::Matrix<CasADi::SX>(*$self).__pow__(b);}
-CasADi::Matrix<CasADi::SX> __rpow__(const CasADi::SX& b) const{ return CasADi::Matrix<CasADi::SX>(b).__pow__(CasADi::Matrix<CasADi::SX>(*$self));}
-
-#undef binopsT
-    
+binopsNoPriority(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+binopsNoPriority(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 }; // extend Matrix<double>
 } // namespace CasADi
