@@ -182,8 +182,13 @@ PyOS_setsig(SIGINT, SigIntHandler);
 // typemaphelpers
 %include "typemaphelpers.i"
 
+// typemap meta implementations
+%include "meta.i"
+
 // Auxilliary casadi functions
 %include "casadi_aux.i"
+
+
 
 // These methods must be added since the implicit type cast does not work
 # define binopsFull(argtype,argCast,selfCast,returntype) \
@@ -218,7 +223,7 @@ returntype __rmpower__   (argtype) const{ return argCast(b).__mpower__(selfCast(
 // Matrix tools
 %include "casadi/matrix/matrix_tools.hpp"
 
-// Instansiate the functions
+// Instsantiate the functions
 MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 
@@ -316,4 +321,8 @@ MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 %include "python_function.i"
 #endif
 
+
+#ifdef SWIGOCTAVE
+%include "octave_function.i"
+#endif
 
