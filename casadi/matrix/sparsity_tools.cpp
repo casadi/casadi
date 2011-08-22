@@ -22,6 +22,7 @@
 
 #include "sparsity_tools.hpp"
 #include "../casadi_exception.hpp"
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 
@@ -263,6 +264,45 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
   
   return ret;
 }
+
+  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping){
+    // This is a quick hack implementation, does not set mapping and only works when the nonzeros are already correctly ordered
+
+    // Vector of row offsets
+    vector<int> rowind(n+1,0);
+    
+    // Loop over rows
+    int k=0; // nonzero
+    for(int i=0; i<n; ++i){
+      while(k<row.size() && row[k]==i){
+        // Do something...
+
+        // Continue to the next nonzero
+        k++;
+      }
+
+      if(k!=row.size() && row[k]<=i){
+        cout << "row indices: " << row << ", column indices: " << col << endl;
+      }
+
+      // Make sure that the nonzeros are given row-wise
+      casadi_assert_message(k==row.size() || row[k]>i, "Only sparse triplet formats with nonzeros given row-wise currently supported (quick-hack)");
+      
+      // Save the nonzero offset of the row
+      rowind[i+1] = k;
+    }
+
+    // Return the sparsity pattern
+    return CRSSparsity(n,m,col,rowind);
+  }
+
+
+  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col){
+    std::vector<int> mapping;
+    return sp_triplet(n,m,row,col,mapping);
+  }
+
+
   
 } // namespace CasADi
 
