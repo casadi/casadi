@@ -62,6 +62,7 @@ class casadi_operators{
     static T sinh(const T&x){ return std::sinh(x);}
     static T cosh(const T&x){ return std::cosh(x);}
     static T tanh(const T&x){ return std::tanh(x);}
+    static T printme(const T&x, const T&y){ return printme(x,y);}
 };
 
 //@{
@@ -93,6 +94,7 @@ MX ceil(const MX &x);
 MX sinh(const MX &x);
 MX cosh(const MX &x);
 MX tanh(const MX &x);
+MX printme(const MX &x, const MX &y);
 //@}
 } // namespace std
 

@@ -477,6 +477,7 @@ class Matrix : public PrintableObject{
     Matrix<T> cosh() const;
     Matrix<T> tanh() const;
     Matrix<T> log10() const;
+    Matrix<T> printme(const Matrix<T>& y) const;
     //@}
     
     //@{
@@ -684,6 +685,9 @@ namespace std{
   
   template<class T>
   CasADi::Matrix<T> constpow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__constpow__(y);}
+  
+  template<class T>
+  CasADi::Matrix<T> printme(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.printme(y); }
   
 } // namespace std
 #endif // SWIG
@@ -1756,6 +1760,11 @@ Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
 template<class T>
 Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
   return binary_old(CasADi::casadi_operators<T>::fmax, y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::printme(const Matrix<T>& y) const{
+  return binary_old(CasADi::casadi_operators<T>::printme, y);
 }
 
 template<class T>

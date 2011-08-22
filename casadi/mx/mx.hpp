@@ -319,6 +319,7 @@ class MX : public SharedObject{
   MX constpow(const MX& y) const;
   MX fmin(const MX& y) const;
   MX fmax(const MX& y) const;
+  MX printme(const MX& y) const;
 
   // all unary operations
   MX exp() const;

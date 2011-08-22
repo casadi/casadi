@@ -614,6 +614,10 @@ MX MX::fmax(const MX& b) const{
   return binary(FMAX,*this,b);
 }
 
+MX MX::printme(const MX& b) const{ 
+  return binary(PRINTME,*this,b);
+}
+
 MX MX::exp() const{ 
   return unary(EXP,*this);
 }
@@ -785,4 +789,8 @@ MX fmin(const MX& x, const MX& y){
 
 MX fmax(const MX& x, const MX& y){
   return x.fmax(y);
+}
+
+MX printme(const MX& x, const MX& y){
+  return x.printme(y);
 }

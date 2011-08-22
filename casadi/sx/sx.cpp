@@ -550,6 +550,10 @@ SX casadi_operators<SX>::constpow(const SX&x, const SX&y){
   return x.__constpow__(y);
 }
 
+SX casadi_operators<SX>::printme(const SX&x, const SX&y){
+  return x.printme(y);
+}
+
 SX casadi_operators<SX>::sin(const SX&x){ 
   return x.sin();
 }
@@ -628,6 +632,10 @@ SX SX::fmin(const SX &b) const{
 
 SX SX::fmax(const SX &b) const{
   return SX(new BinarySXNode(FMAX,*this,b));
+}
+
+SX SX::printme(const SX &b) const{
+  return SX(new BinarySXNode(PRINTME,*this,b));
 }
 
 SX SX::__pow__(const SX& n) const{

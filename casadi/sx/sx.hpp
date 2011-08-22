@@ -234,6 +234,7 @@ class SX{
     SX cosh() const;
     SX tanh() const;
     SX log10() const;
+    SX printme(const SX &b) const;
     
     // Get the temporary variable
     int getTemp() const;
@@ -318,6 +319,7 @@ class casadi_operators<SX>{
     static SX sinh(const SX&x);
     static SX cosh(const SX&x);
     static SX tanh(const SX&x);
+    static SX printme(const SX&x, const SX&y);
 };
 
 #endif // SWIG
@@ -406,6 +408,7 @@ namespace std{
 inline SX erf(const SX &x){return x.erf();}
 inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
 inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
+inline SX printme(const SX &x, const SX &y){ return x.printme(y);}
 #undef SX
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */

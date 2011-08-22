@@ -137,6 +137,7 @@ enum Operation{
   ERF,  FMIN,  FMAX,
   INV,
   SINH,  COSH,  TANH,
+  PRINTME,
   NUM_BUILT_IN_OPS
 };
 
@@ -456,6 +457,29 @@ class UnaryOperation<TANH>{
     template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
 };
 
+/// Identity operator with the side effect of printing
+template<>
+class BinaryOperation<PRINTME>{
+  public:
+    printRoutines("printme(",",",")")
+    static bool f00_is_zero(){return false;}
+    static bool f0x_is_zero(){return false;}
+    static bool fx0_is_zero(){return false;}
+    static int ndeps() { return 2;}
+    template<typename T> static void fcn(const T& x, const T& y, T& f){f = x; }
+    
+    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
+};
+
+
+#ifdef WITH_PRINTME 
+template<> inline
+void BinaryOperation<PRINTME>::fcn<double>(const double& x, const double& y, double& f) {
+       f = x; 
+       std::cout << "|> " << y << " : " << x << std::endl;
+}
+#endif //WITH_PRINTME 
+
 /// Easy access to all the functions for a particular type
 template<typename T>
 class casadi_math{
@@ -602,6 +626,8 @@ std::vector<Type> casadi_math<T>::getPrintFunName(){ \
   ret[COSH] = BinaryOperation<COSH>::printFunName; \
   ret[TANH] = BinaryOperation<TANH>::printFunName; \
  \
+   ret[PRINTME] = BinaryOperation<PRINTME>::printFunName; \
+ \
   for(int i=0; i<ret.size(); ++i){ \
     casadi_assert(ret[i]!=0); \
   } \
@@ -660,6 +686,7 @@ std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
   ret[COSH] = BinaryOperation<COSH>::fcn<T>;
   ret[TANH] = BinaryOperation<TANH>::fcn<T>;
 
+  ret[PRINTME] = BinaryOperation<PRINTME>::fcn<T>;
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -711,7 +738,8 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
   ret[COSH] = BinaryOperationE<COSH>::fcn<T>;
   ret[TANH] = BinaryOperationE<TANH>::fcn<T>;
 
-
+  ret[PRINTME] = BinaryOperationE<PRINTME>::fcn<T>;
+  
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -761,6 +789,9 @@ std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
   ret[SINH] = BinaryOperation<SINH>::der<T>;
   ret[COSH] = BinaryOperation<COSH>::der<T>;
   ret[TANH] = BinaryOperation<TANH>::der<T>;
+
+  ret[PRINTME] = BinaryOperation<PRINTME>::der<T>;
+
 
 
   // Make sure that all functions were specified
@@ -813,6 +844,7 @@ std::vector<bool> casadi_math<T>::getF00_is_zero(){
   ret[COSH] = BinaryOperation<COSH>::f00_is_zero();
   ret[TANH] = BinaryOperation<TANH>::f00_is_zero();
 
+  ret[PRINTME] = BinaryOperation<PRINTME>::f00_is_zero();
 
   return ret;
 }
@@ -859,7 +891,8 @@ std::vector<bool> casadi_math<T>::getF0x_is_zero(){
   ret[COSH] = BinaryOperation<COSH>::f0x_is_zero();
   ret[TANH] = BinaryOperation<TANH>::f0x_is_zero();
 
-
+  ret[PRINTME] = BinaryOperation<PRINTME>::f0x_is_zero();
+  
   return ret;
 }
 
@@ -905,6 +938,7 @@ std::vector<bool> casadi_math<T>::getFx0_is_zero(){
   ret[COSH] = BinaryOperation<COSH>::fx0_is_zero();
   ret[TANH] = BinaryOperation<TANH>::fx0_is_zero();
 
+  ret[PRINTME] = BinaryOperation<PRINTME>::fx0_is_zero();
 
   return ret;
 }

@@ -12,6 +12,7 @@ option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 option(WITH_JIT "Enable just-in-time compilation" OFF)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
+option(WITH_PRINTME "With support for printme operator (might slow things down)" OFF)
 option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" OFF)
@@ -40,6 +41,10 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if(WITH_JIT)
 add_definitions(-DWITH_JIT)
 endif(WITH_JIT)
+
+if(WITH_PRINTME)
+add_definitions(-DWITH_PRINTME)
+endif(WITH_PRINTME)
 
 include_directories(.)
 
