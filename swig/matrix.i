@@ -76,6 +76,53 @@
      
 %}
 %enddef 
+    
+%define %python_array_wrappers(arraypriority)
+%pythoncode %{
+
+  __array_priority__ = arraypriority
+
+  def __array_wrap__(self,out_arr,context=None):
+    name = context[0].__name__
+    args = list(context[1])
+    
+    if len(context[1])==3:
+      raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
+
+    if "vectorized" in name:
+        name = name[:-len(" (vectorized)")]
+    
+    selfM = self
+    
+    if isinstance(self,SX):  # SX get's promoted to SXMatrix first
+      selfM = SXMatrix(self)
+    
+    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
+    if name in conversion:
+      name = conversion[name]
+    if len(context[1])==2 and context[1][1] is self:
+      name = 'r' + name
+      args.reverse()
+    if not(hasattr(selfM,name)):
+      name = '__' + name + '__'
+    fun=getattr(selfM, name)
+    return fun(*args[1:])
+     
+     
+  def __array__(self,*args,**kwargs):
+    import numpy as n
+    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
+      if len(args[1][1])==3:
+        raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
+      return n.array([1])
+    else:
+      if hasattr(self,'__array_custom__'):
+        return self.__array_custom__(*args,**kwargs)
+      else:
+        return self.toArray()
+      
+%}
+%enddef
 #endif // SWIGPYTHON
 
 
@@ -177,13 +224,6 @@ PyObject* arrayView() {
   def __eq__(self,other):
     return _casadi.__eq__(self,other)
 %}
-  
-
-
-%pythoncode %{
-  __array_priority__ = 999.0
-%}
-    
     
 %pythoncode %{
   def toArray(self,shared=False):
@@ -198,25 +238,7 @@ PyObject* arrayView() {
     return r
 %}
 
-%pythoncode %{
-  def __array_wrap__(self,out_arr,context=None):
-    name = context[0].__name__
-    args = list(context[1])
-
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-        
-    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self:
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(self,name)):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*args[1:])
-%}
+%python_array_wrappers(999.0)
 
 // The following code has some trickery to fool numpy ufunc.
 // Normally, because of the presence of __array__, an ufunctor like nump.sqrt
@@ -225,16 +247,11 @@ PyObject* arrayView() {
 // So when we receive a call from a functor, we return a dummy empty array
 // and return the real result during the postprocessing (__array_wrap__) of the functor.
 %pythoncode %{
-  def __array__(self,*args,**kwargs):
-    import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
-      return n.array([1])
+  def __array_custom__(self,*args,**kwargs):
+    if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
+      return n.array(self.toArray(),dtype=kwargs["dtype"])
     else:
-      if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
-        return n.array(self.toArray(),dtype=kwargs["dtype"])
-      else:
-        return self.toArray()
-
+      return self.toArray()
 %}
 
 %pythoncode %{

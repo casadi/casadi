@@ -154,30 +154,10 @@ namespace CasADi {
       return _casadi.__ge__(self,other)
   %}
   
+  %python_array_wrappers(1000.0)
+  
   
   %pythoncode %{
-  __array_priority__ = 1000.0
-  
-  def __array_wrap__(self,out_arr,context=None):
-    if context is None:
-      return out_arr
-    name = context[0].__name__
-    args = list(context[1])
-    
-    selfM = SXMatrix(self)
-    if "vectorized" in name:
-      name = name[:-len(" (vectorized)")]
-
-    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self:
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(selfM,name)):
-      name = '__' + name + '__'
-    fun=getattr(selfM, name)
-    return fun(*args[1:])
 
   def toArray(self):
     import numpy as n
@@ -185,13 +165,6 @@ namespace CasADi {
     r.resize(1,1)
     r[0,0] = self
     return r
-      
-  def __array__(self,*args,**kwargs):
-    import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
-      return n.array([1])
-    else:
-      return self.toArray()
   %}
   
   
@@ -252,36 +225,8 @@ namespace CasADi {
       return r
     %}
     
-  %pythoncode %{
-  __array_priority__ = 1001.0
-  %}
-    
-  %pythoncode %{
-  def __array_wrap__(self,out_arr,context=None):
-    name = context[0].__name__
-    args = list(context[1])
-    if "vectorized" in name:
-      name = name[:-len(" (vectorized)")]
-    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self:
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(self,name)):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*args[1:])
-  %}
-
-  %pythoncode %{
-    def __array__(self,*args,**kwargs):
-      import numpy as n
-      if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
-        return n.array([1])
-      else:
-        return self.toArray()
-  %}
+  %python_array_wrappers(1001.0)
+  
   #endif // SWIGPYTHON    
 };
 
