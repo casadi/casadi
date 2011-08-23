@@ -264,7 +264,9 @@ void FX::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
   (*this)->setJacSparsity(sp,iind,oind);
 }
 
-
+std::vector<MX> FX::symbolicInput() const{
+  return (*this)->symbolicInput();
+}
 
 #if 0
 

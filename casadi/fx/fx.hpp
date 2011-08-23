@@ -386,6 +386,9 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   /// Get a single statistic obtained at the end of the last evaluate call
   GenericType getStat(const std::string& name) const;
 
+  /// Get a vector of symbolic variables with the same dimensions as the inputs
+  std::vector<MX> symbolicInput() const;
+  
 };
 } // namespace CasADi
 

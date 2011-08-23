@@ -46,6 +46,10 @@ namespace std{
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v);
   
+  /// Enables flushing an STL pair to a stream (prints representation)
+  template<typename T1, typename T2>
+  ostream& operator<<(ostream &stream, const pair<T1,T2> &p);
+  
 } // namespace std
 
 namespace CasADi{
@@ -107,6 +111,13 @@ namespace std{
     CasADi::repr(v,stream);
     return stream;
   }
+  
+  template<typename T1, typename T2>
+  ostream& operator<<(ostream &stream, const pair<T1,T2> &p){
+    stream << "(" << p.first << "," << p.second << ")";
+    return stream;
+  }
+
   
 } // namespace std
 
