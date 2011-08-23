@@ -31,7 +31,7 @@
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYDETECTOR};
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR};
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -60,7 +60,7 @@ namespace CasADi{
     GenericType(QPSolverCreator ptr);
     GenericType(implicitFunctionCreator ptr);
     GenericType(JacobianGenerator ptr);
-    GenericType(SparsityDetector ptr);
+    GenericType(SparsityGenerator ptr);
     
     /// Implicit typecasting
     #ifndef SWIG
@@ -80,7 +80,7 @@ namespace CasADi{
     operator QPSolverCreator() const;
     operator implicitFunctionCreator() const;
     operator JacobianGenerator() const;
-    operator SparsityDetector() const;
+    operator SparsityGenerator() const;
     #endif // SWIG
     
     //! \brief Is boolean?

@@ -228,8 +228,8 @@ GenericType::GenericType(JacobianGenerator ptr){
   assignNode(new GenericTypeInternal<JacobianGenerator>(ptr));
 }
 
-GenericType::GenericType(SparsityDetector ptr){
-  assignNode(new GenericTypeInternal<SparsityDetector>(ptr));
+GenericType::GenericType(SparsityGenerator ptr){
+  assignNode(new GenericTypeInternal<SparsityGenerator>(ptr));
 }
 
 GenericType::operator NLPSolverCreator() const{
@@ -261,9 +261,9 @@ GenericType::operator JacobianGenerator() const{
   return static_cast<const GenericTypeInternal<JacobianGenerator>*>(get())->d_;
 }
 
-GenericType::operator SparsityDetector() const{
-  casadi_assert_message(is_a<SparsityDetector>(),"type mismatch");
-  return static_cast<const GenericTypeInternal<SparsityDetector>*>(get())->d_;
+GenericType::operator SparsityGenerator() const{
+  casadi_assert_message(is_a<SparsityGenerator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SparsityGenerator>*>(get())->d_;
 }
 
 GenericType::GenericType(const Dictionary& dict){

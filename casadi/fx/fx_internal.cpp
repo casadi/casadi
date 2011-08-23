@@ -42,11 +42,11 @@ FXInternal::FXInternal(){
   addOption("numeric_hessian",          OT_BOOLEAN,             false,          "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
   addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
   addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
-  addOption("sparsity_detector",        OT_SPARSITYDETECTOR,    GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
+  addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   verbose_ = false;
   numeric_jacobian_ = false;
   jacgen_ = 0;
-  sp_detect_ = 0;
+  spgen_ = 0;
 }
 
 FXInternal::~FXInternal(){
@@ -88,8 +88,8 @@ void FXInternal::init(){
   }
   
   // Get the sparsity detector function, if any
-  if(hasSetOption("sparsity_detector")){
-    sp_detect_ = getOption("sparsity_detector");
+  if(hasSetOption("sparsity_generator")){
+    spgen_ = getOption("sparsity_generator");
   }
   
   // Mark the function as initialized
@@ -331,7 +331,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   
   // Generate, if null
   if(jsp.isNull()){
-    if(sp_detect_==0){
+    if(spgen_==0){
       // Use internal routine to determine sparsity
       jsp = getJacSparsity(iind,oind);
     } else {
@@ -340,7 +340,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
       tmp.assignNode(this);
 
       // Use user-provided routine to determine sparsity
-      jsp = sp_detect_(tmp,iind,oind);
+      jsp = spgen_(tmp,iind,oind);
     }
   }
   
