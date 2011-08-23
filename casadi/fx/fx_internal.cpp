@@ -33,16 +33,20 @@ namespace CasADi{
   
 FXInternal::FXInternal(){
   setOption("name","unnamed_function"); // name of the function
-  addOption("sparse",            OT_BOOLEAN,   true,    "function is sparse");
-  addOption("number_of_fwd_dir", OT_INTEGER,   1,       "number of forward derivatives to be calculated simultanously");
-  addOption("number_of_adj_dir", OT_INTEGER,   1,       "number of adjoint derivatives to be calculated simultanously");
-  addOption("verbose",           OT_BOOLEAN,   false,   "verbose evaluation -- for debugging");
-  addOption("store_jacobians",   OT_BOOLEAN,   false,   "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
-  addOption("numeric_jacobian",  OT_BOOLEAN,   false,   "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
-  addOption("numeric_hessian",   OT_BOOLEAN,   false,   "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
-  addOption("ad_mode",           OT_STRING,    "automatic", "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
+  addOption("sparse",                   OT_BOOLEAN,             true,           "function is sparse");
+  addOption("number_of_fwd_dir",        OT_INTEGER,             1,              "number of forward derivatives to be calculated simultanously");
+  addOption("number_of_adj_dir",        OT_INTEGER,             1,              "number of adjoint derivatives to be calculated simultanously");
+  addOption("verbose",                  OT_BOOLEAN,             false,          "verbose evaluation -- for debugging");
+  addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
+  addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
+  addOption("numeric_hessian",          OT_BOOLEAN,             false,          "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
+  addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
+  addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
+  addOption("sparsity_detector",        OT_SPARSITYDETECTOR,    GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   verbose_ = false;
   numeric_jacobian_ = false;
+  jacgen_ = 0;
+  sp_detect_ = 0;
 }
 
 FXInternal::~FXInternal(){
@@ -78,6 +82,16 @@ void FXInternal::init(){
   // Resize the matrix that holds the sparsity of the Jacobian blocks
   jac_sparsity_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
 
+  // Get the Jacobian generator function, if any
+  if(hasSetOption("jacobian_generator")){
+    jacgen_ = getOption("jacobian_generator");
+  }
+  
+  // Get the sparsity detector function, if any
+  if(hasSetOption("sparsity_detector")){
+    sp_detect_ = getOption("sparsity_detector");
+  }
+  
   // Mark the function as initialized
   is_init_ = true;
 }
@@ -240,7 +254,13 @@ FX FXInternal::jacobian_switch(const std::vector<std::pair<int,int> >& jblocks){
   if(numeric_jacobian_){
     return numeric_jacobian(jblocks);
   } else {
-    return jacobian(jblocks);
+    if(jacgen_==0){
+      // Use internal routine to calculate Jacobian
+      return jacobian(jblocks);
+    } else {
+      // Use user-provided routine to calculate Jacobian
+      return jacgen_(jblocks);
+    }
   }
 }
 
@@ -307,7 +327,13 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
   
   // Generate, if null
   if(jsp.isNull()){
-    jsp = getJacSparsity(iind,oind);
+    if(sp_detect_==0){
+      // Use internal routine to determine sparsity
+      jsp = getJacSparsity(iind,oind);
+    } else {
+      // Use user-provided routine to determine sparsity
+      jsp = sp_detect_(iind,oind);
+    }
   }
   
   // If still null, not dependent

@@ -33,12 +33,12 @@ using namespace std;
 CFunction::CFunction(){
 }
 
-CFunction::CFunction(CFunctionWrapper c_fcn,const std::vector<CasADi::CRSSparsity> &inputscheme,const  std::vector<CasADi::CRSSparsity> &outputscheme) {
+CFunction::CFunction(CFunctionWrapper c_fcn,const vector<CRSSparsity> &inputscheme,const  vector<CRSSparsity> &outputscheme) {
   assignNode(new CFunctionInternal(c_fcn,inputscheme,outputscheme));
 }
 
 CFunction::CFunction(CFunctionWrapper c_fcn) {
-  assignNode(new CFunctionInternal(c_fcn));
+  assignNode(new CFunctionInternal(c_fcn,vector<CRSSparsity>(),vector<CRSSparsity>()));
 }
 
 CFunctionInternal* CFunction::operator->(){

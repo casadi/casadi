@@ -200,6 +200,12 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /// Use numeric jacobian instead of symbolic
     bool numeric_jacobian_;
+    
+    /// Jacobian generator function
+    JacobianGenerator jacgen_;
+
+    /// Sparsity detector function
+    SparsityDetector sp_detect_;
 };
 
 

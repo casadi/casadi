@@ -224,6 +224,14 @@ GenericType::GenericType(implicitFunctionCreator ptr){
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
 }
 
+GenericType::GenericType(JacobianGenerator ptr){
+  assignNode(new GenericTypeInternal<JacobianGenerator>(ptr));
+}
+
+GenericType::GenericType(SparsityDetector ptr){
+  assignNode(new GenericTypeInternal<SparsityDetector>(ptr));
+}
+
 GenericType::operator NLPSolverCreator() const{
   casadi_assert_message(is_a<NLPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<NLPSolverCreator>*>(get())->d_;
@@ -248,6 +256,16 @@ GenericType::operator implicitFunctionCreator() const{
   return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
 }
 
+GenericType::operator JacobianGenerator() const{
+  casadi_assert_message(is_a<JacobianGenerator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<JacobianGenerator>*>(get())->d_;
+}
+
+GenericType::operator SparsityDetector() const{
+  casadi_assert_message(is_a<SparsityDetector>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SparsityDetector>*>(get())->d_;
+}
+
 GenericType::GenericType(const Dictionary& dict){
   assignNode(new GenericTypeInternal<Dictionary>(dict));
 }
@@ -256,6 +274,7 @@ GenericType::operator const Dictionary& () const{
   casadi_assert_message(is_a<Dictionary>(),"type mismatch");
   return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
 }
+
 
 
 } // namespace CasADi

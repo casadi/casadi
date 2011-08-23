@@ -41,9 +41,6 @@ class CFunctionInternal : public FXInternal{
     /** \brief  Create a function */
     explicit CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
     
-    /** \brief  Create a function */
-    explicit CFunctionInternal(CFunctionWrapper c_fcn);
-    
     /** \brief  Destructor */
     virtual ~CFunctionInternal();
 

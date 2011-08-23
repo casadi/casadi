@@ -53,12 +53,11 @@ public:
 /** \brief  default constructor */
   CFunction();
 
-//#ifndef SWIG
-  /** \brief  Create a function */
-  explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
-  
+  /** \brief  Create a function with input/output schemes given */
+  explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CRSSparsity> &inputscheme, const std::vector<CRSSparsity> &outputscheme);
+
+  /** \brief  Create a function, user sets inputs outputs manually */
   explicit CFunction(CFunctionWrapper c_fcn);
-//#endif // SWIG
 
   /** \brief  Access functions of the node */
   CFunctionInternal* operator->();
