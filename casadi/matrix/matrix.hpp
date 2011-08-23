@@ -1278,7 +1278,12 @@ void Matrix<T>::matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>&
 
 template<class T>
 void Matrix<T>::matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
-if(x.size1() != y.size1() || x.size2() != y.size2()) throw CasadiException("matrix_matrix: dimension mismatch");
+if(x.size1() != y.size1() || x.size2() != y.size2()) {
+  std::stringstream s;
+  s << "matrix_matrix: dimension mismatch." << std::endl;
+  s << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString() << std::endl;
+  throw CasadiException(s.str());
+}
   // Make a deep copy if *this and x or y is the same object
   if(this == &x)
     *this = x;
