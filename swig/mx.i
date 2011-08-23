@@ -3,8 +3,6 @@
 #include "casadi/mx/mx_tools.hpp"
 %}
 
-%my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);
-
 %include "casadi/mx/mx.hpp"
 
 
@@ -35,10 +33,7 @@
   binopsrFull(CasADi::MX)
 };
 
-%my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< CasADi::MX >);
-#ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
-#endif // SWIGPYTHON
+
 
 %include "casadi/mx/mx_tools.hpp"
 

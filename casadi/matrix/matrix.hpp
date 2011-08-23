@@ -585,12 +585,7 @@ namespace CasADi{
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 } // namespace CasADi
 
-#ifdef SWIG // SWIG
-%template(IMatrix)             CasADi::Matrix<int>;
-%template(DMatrix)             CasADi::Matrix<double>;
-%template(DMatrixVector)       std::vector<CasADi::Matrix<double> > ;
-%template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
-#endif // SWIG
+
 
 // The following functions must be placed in the standard namespace so that the old ones are not shadowed when CasADi namespace is used
 #ifndef SWIG

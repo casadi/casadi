@@ -357,9 +357,4 @@ typedef std::vector<MXPtrV> MXPtrVV;
 #endif // SWIG
 } // namespace CasADi
 
-#ifdef SWIG 
-// Template instantiations
-%template(MXVector) std::vector<CasADi::MX>;
-#endif // SWIG
-
 #endif // MX_HPP

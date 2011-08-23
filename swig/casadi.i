@@ -43,23 +43,7 @@
 %template(Pair_Int_Int) std::pair<int,int>;
 %template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
 
-// Lower value means wil be checked first
-#define PRECEDENCE_DVector 98
-#define PRECEDENCE_IVector 99
 
-#define PRECEDENCE_DMatrix 100
-#define PRECEDENCE_DMatrixVector 101
-#define PRECEDENCE_SXMatrix 102
-#define PRECEDENCE_SX 103
-#define PRECEDENCE_SXMatrixVector 103
-#define PRECEDENCE_MX 104
-#define PRECEDENCE_MXVector 105
-#define PRECEDENCE_PAIR_SLICE_SLICE 204
-#define PRECEDENCE_SLICE 205
-#define PRECEDENCE_IndexVector 210
-#define PRECEDENCE_PAIR_IVector_IVector 206
-#define PRECEDENCE_GENERICTYPE 22
-#define PRECEDENCE_DICTIONARY 21
 
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
@@ -184,6 +168,9 @@ PyOS_setsig(SIGINT, SigIntHandler);
 
 // typemap meta implementations
 %include "meta.i"
+
+// common typemaps
+%include "commontypemaps.i"
 
 // Auxilliary casadi functions
 %include "casadi_aux.i"

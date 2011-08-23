@@ -18,9 +18,9 @@
 %include "casadi/matrix/crs_sparsity.hpp"
 %include "casadi/matrix/slice.hpp"
 
-%my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %include "casadi/matrix/matrix.hpp"
-%my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
+%template(IMatrix)             CasADi::Matrix<int>;
+%template(DMatrix)             CasADi::Matrix<double>;
 
 %include "casadi/sx/sx.hpp"
 
@@ -247,10 +247,7 @@ namespace CasADi {
 
 #endif // SWIGPYTHON
 
-%template(SXMatrixVector)       std::vector<CasADi::Matrix<CasADi::SX> > ;
-%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 
-%my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 
 
 %template(SXVector)             std::vector<CasADi::SX>;

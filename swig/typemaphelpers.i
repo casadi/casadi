@@ -328,33 +328,6 @@ bool PyIsSequence(PyObject* p) {
 %}
 #endif // SWIGPYTHON
 
-
-#ifdef SWIGPYTHON
-%typemap(in) int (int m) {
-  bool result=meta< int >::as($input,m);
-  if (!result)
-    SWIG_exception_fail(SWIG_TypeError,meta< int >::expected_message);
-  $1 = m;
-}
-
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int { $1 = meta< int >::isa($input) || meta< int >::couldbe($input); }
-%typemap(freearg) int {}
-
-#endif //SWIGPYTHON
-
-#ifdef SWIGPYTHON
-%typemap(in) double (double m) {
-  bool result=meta< double >::as($input,m);
-  if (!result)
-    SWIG_exception_fail(SWIG_TypeError,meta< double >::expected_message);
-  $1 = m;
-}
-
-%typemap(typecheck,precedence=SWIG_TYPECHECK_DOUBLE) double { $1 = meta< double >::isa($input) || meta< double >::couldbe($input); }
-%typemap(freearg) double {}
-
-#endif //SWIGPYTHON
-
 %{
 #define SWIG_Error_return(code, msg)  { SWIG_Error(code, msg); return 0; }
 %}

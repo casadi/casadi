@@ -21,38 +21,6 @@ try {
 
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
-
-
-#ifdef SWIGPYTHON
-
-namespace CasADi {
-%typemap(out) GenericType {
-bool ret=meta<  CasADi::GenericType >::toPython($1,$result);
-if (!ret) {
-  SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
-}
-
-%typemap(out) const GenericType::Dictionary&  {
-bool ret=meta<  CasADi::GenericType::Dictionary >::toPython(*$1,$result);
-if (!ret) {
-  SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
-}
-
-} // namespace CasADi
-#endif // SWIGPYTHON
-
-%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,CasADi::GenericType)
-#ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::GenericType::Dictionary)
-#endif
-
-#ifdef SWIGOCTAVE
-%my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
-%my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
-#endif //SWIGOCTAVE
-
 %include "casadi/casadi_types.hpp"
 %include "casadi/generic_type.hpp"
 %include "casadi/options_functionality.hpp"
@@ -67,10 +35,6 @@ namespace CasADi {
     void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
   }
 } // namespace CasADi
-
-
-
-
 
 #define memberbinopsr(Type,uname) \
 Type __r##uname##__(const Type& b) const{ return b.__##uname##__(*$self);}

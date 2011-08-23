@@ -30,15 +30,6 @@
 %}
 
 #ifdef SWIGPYTHON
-%outputRefOwn(CasADi::CRSSparsity)
-%outputRefOwn(std::vector< CasADi::SX >)
-%outputRefOwn(std::vector< int >)
-%outputRefOwn(std::vector< double >)
-%outputRefOwn(CasADi::Matrix< double >)
-%outputRefOwn(CasADi::Matrix< CasADi::SX >)
-#endif // SWIGPYTHON
-
-#ifdef SWIGPYTHON
 %define %python_matrix_convertors
 %pythoncode %{
         
@@ -309,7 +300,7 @@ namespace CasADi{
 
 %my_generic_const_typemap(PRECEDENCE_SLICE,CasADi::Slice);
 %my_generic_const_typemap(PRECEDENCE_IndexVector,CasADi::IndexList);
-%my_generic_const_typemap(PRECEDENCE_DMatrix,CasADi::Matrix<double>);
+
 
 #ifdef SWIGPYTHON
 
