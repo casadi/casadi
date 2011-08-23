@@ -258,8 +258,12 @@ FX FXInternal::jacobian_switch(const std::vector<std::pair<int,int> >& jblocks){
       // Use internal routine to calculate Jacobian
       return jacobian(jblocks);
     } else {
+      // Create a temporary FX instance
+      FX tmp;
+      tmp.assignNode(this);
+
       // Use user-provided routine to calculate Jacobian
-      return jacgen_(jblocks);
+      return jacgen_(tmp,jblocks);
     }
   }
 }
@@ -331,8 +335,12 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
       // Use internal routine to determine sparsity
       jsp = getJacSparsity(iind,oind);
     } else {
+      // Create a temporary FX instance
+      FX tmp;
+      tmp.assignNode(this);
+
       // Use user-provided routine to determine sparsity
-      jsp = sp_detect_(iind,oind);
+      jsp = sp_detect_(tmp,iind,oind);
     }
   }
   
