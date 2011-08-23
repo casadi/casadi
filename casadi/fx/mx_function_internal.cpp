@@ -703,20 +703,24 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
   vector<vector<MX> > jacs(getNumInputs());
   
   for(vector<pair<int,int> >::const_iterator it=jblocks.begin(); it!=jblocks.end(); ++it){
+    // Get the block
+    int iind = it->second;
+    int oind = it->first;
+    
     // If variable index is -1, we want nondifferentiated function output
-    if(it->second==-1){
+    if(iind==-1){
       // Nondifferentiated function
-      j_out.push_back(outputv.at(it->first));
+      j_out.push_back(outputv.at(oind));
       
     } else {
       
       // Create a Jacobian symbolically, if not already created
-      if(jacs[it->first].empty()){
-        jacs[it->first] = jac(it->first);
+      if(jacs.at(iind).empty()){
+        jacs.at(iind) = jac(iind);
       }
       
       // Add to outputs
-      j_out.push_back(jacs[it->first][it->second]);
+      j_out.push_back(jacs.at(iind).at(oind));
     }
   }
   
