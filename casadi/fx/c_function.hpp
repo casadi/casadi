@@ -71,7 +71,11 @@ public:
 #ifndef SWIG
   /** \brief  Set user data structure (to be passed to all functions) */
   void setUserData(void* user_data);
-#endif // SWIG
+
+  /** \brief  Get user data structure (to be passed to all functions) */
+  void* getUserData() const;
+
+  #endif // SWIG
   
   
 }; // class CFunction

@@ -57,6 +57,11 @@ void CFunction::setUserData(void* user_data){
   (*this)->setUserData(user_data);
 }
 
+void* CFunction::getUserData() const{
+  return (*this)->getUserData();
+}
+
+
 
 } // namespace CasADi
 

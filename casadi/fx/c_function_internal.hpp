@@ -50,6 +50,9 @@ class CFunctionInternal : public FXInternal{
     /** \brief  Set user data structure (to be passed to all functions) */
     void setUserData(void* user_data);
   
+    /** \brief  Get user data structure (to be passed to all functions) */
+    void* getUserData() const;
+  
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir);
   
