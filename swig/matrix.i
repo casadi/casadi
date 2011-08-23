@@ -290,7 +290,7 @@ PyObject* arrayView() {
 
 %pythoncode %{
   def __abs__(self):
-    return abs(self.__float__())
+    return fabs(self.__float__())
 %}
 
 binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
