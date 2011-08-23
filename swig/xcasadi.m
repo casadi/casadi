@@ -70,11 +70,6 @@ function [y]=casadi_inv(x)
 end
 dispatch('inv','casadi_inv','swig_ref')
 
-function [y]=op_scalar_add_any(a,b)
-  disp('hello there')
-  y = b.__radd__(a)
-end
-
 global op_any_div_scalar = @(a,b) a.__el_div__(b)
 
 global op_scalar_add_any = @(a,b) b.__radd__(a)

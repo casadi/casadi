@@ -100,7 +100,7 @@
     conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
     if name in conversion:
       name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self:
+    if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
       name = 'r' + name
       args.reverse()
     if not(hasattr(selfM,name)):
@@ -184,6 +184,7 @@ octave_value toSparse() {
   return octave_value(SparseMatrix(mydata,Ar,Ac,nr,nc));
 }
 
+binopsrFull(CasADi::Matrix<double>)
 binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
@@ -290,9 +291,10 @@ PyObject* arrayView() {
 
 %pythoncode %{
   def __abs__(self):
-    return fabs(self.__float__())
+    return abs(self.__float__())
 %}
 
+binopsrFull(CasADi::Matrix<double>)
 binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 

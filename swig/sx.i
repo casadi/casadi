@@ -181,9 +181,10 @@ namespace CasADi {
   
   #endif // SWIGOCTAVE
   
+  binopsrFull(CasADi::SX)
   // a+b when a is SX, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting
   binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
-    
+
 };
   
 %extend Matrix<SX>{
@@ -227,7 +228,8 @@ namespace CasADi {
     
   %python_array_wrappers(1001.0)
   
-  #endif // SWIGPYTHON    
+  #endif // SWIGPYTHON  
+  binopsrFull(CasADi::Matrix<CasADi::SX>)  
 };
 
 

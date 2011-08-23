@@ -186,26 +186,16 @@ class SX{
 
     //  all binary operations
     SX __add__(const SX& b) const{  return *this + b;}
-    SX __radd__(const SX& b) const{ return b + *this;}
     SX __sub__(const SX& b) const{  return *this - b;}
-    SX __rsub__(const SX& b) const{ return b - *this;}
     SX __mul__(const SX& b) const{  return *this * b;}
-    SX __rmul__(const SX& b) const{ return b * *this;}
     SX __div__(const SX& b) const{  return *this / b;}
-    SX __rdiv__(const SX& b) const{ return b / *this;}
     SX __pow__(const SX& b) const;
-    SX __rpow__(const SX& b) const{ return b.__pow__(*this);}
     SX __constpow__(const SX& b) const;
-    SX __rconstpow__(const SX& b) const{ return b.__constpow__(*this);}
-    SX __rfmin__(const SX& b) const{ return b.fmin(*this);}
-    SX __rfmax__(const SX& b) const{ return b.fmax(*this);}
     
     SX prod(const SX &b) const { return *this * b;}
-    SX rprod(const SX &b) const { return b * *this;}
+    SX __mldivide__(const SX& b) const{  throw *this / b;}
     SX __mrdivide__(const SX& b) const{  return *this / b;}
-    SX __rmrdivide__(const SX& b) const{ return b / *this;}
     SX __mpower__(const SX& b) const {return (*this).__pow__(b);}
-    SX __rmpower__(const SX& b) const{ return b.__pow__(*this);}
     SX trans() const{ return *this;}
     
     /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access

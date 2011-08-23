@@ -575,10 +575,6 @@ MX MX::prod(const MX& y) const{
   }
 }
 
-MX MX::rprod(const MX& y) const{
-  return y.prod(*this);
-}
-
 MX MX::inner_prod(const MX& y) const{
   const MX& x = *this;
   casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
@@ -683,24 +679,13 @@ MX MX::erf() const{
 }
 
 MX MX::__add__(const MX& b) const{    return *this + b;}
-MX MX::__radd__(const MX& b) const{   return b + *this;}
 MX MX::__sub__(const MX& b) const{    return *this - b;}
-MX MX::__rsub__(const MX& b) const{   return b - *this;}
 MX MX::__mul__(const MX& b) const{    return *this * b;}
-MX MX::__rmul__(const MX& b) const{   return b * *this;}
 MX MX::__div__(const MX& b) const{    return *this / b;}
-MX MX::__rdiv__(const MX& b) const{   return b / *this;}
-MX MX::__rpow__(const MX& b) const {   return std::pow(b,*this);}
 MX MX::__constpow__(const MX& b) const {   return (*this).constpow(b);}
-MX MX::__rconstpow__(const MX& b) const {   return b.constpow(*this);}
-MX MX::__rfmin__(const MX& b) const {   return b.fmin(*this);}
-MX MX::__rfmax__(const MX& b) const {   return b.fmax(*this);}
 MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-MX MX::__rmrdivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmrdivide: Not implemented");}
-MX MX::__ldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
-MX MX::__rmldivide__ (const MX& b) const { if ((*this).numel()==1) return b/(*this); throw CasadiException("rmldivide: Not implemented");}
+MX MX::__mldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
 MX MX::__mpower__(const MX& b) const  {   return std::pow(*this,b); throw CasadiException("mpower: Not implemented");}
-MX MX::__rmpower__(const MX& b) const {   return std::pow(b,*this); throw CasadiException("rmpower: Not implemented");}
 
 } // namespace CasADi
 

@@ -188,41 +188,6 @@ PyOS_setsig(SIGINT, SigIntHandler);
 // Auxilliary casadi functions
 %include "casadi_aux.i"
 
-
-
-// These methods must be added since the implicit type cast does not work.
-// Consider a+b  with a DMatrix and b SXMatrix
-// In C++, operator+(SXMatrix,SXMatrix) will be called (implicit cast)
-// In octave, a.__add__(b) will be called   (no implicit cast)
-// In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
-
-
-// This is a list of all operators:
-# define binopsFull(argtype,argCast,selfCast,returntype) \
-returntype __pow__ (argtype) const{ return selfCast(*$self).__pow__(argCast(b));} \
-returntype __rpow__(argtype) const{ return argCast(b).__pow__(selfCast(*$self));} \
-returntype __add__ (argtype) const{ return selfCast(*$self) + argCast(b);} \
-returntype __radd__(argtype) const{ return argCast(b) + selfCast(*$self);} \
-returntype __sub__ (argtype) const{ return selfCast(*$self) - argCast(b);} \
-returntype __rsub__(argtype) const{ return argCast(b) - selfCast(*$self);} \
-returntype __mul__ (argtype) const{ return selfCast(*$self) * argCast(b);} \
-returntype __rmul__(argtype) const{ return argCast(b) * selfCast(*$self);} \
-returntype __div__ (argtype) const{ return selfCast(*$self) / argCast(b);} \
-returntype __rdiv__(argtype) const{ return argCast(b) / selfCast(*$self);} \
-returntype prod (argtype) const{ return prod(selfCast(*$self) , argCast(b));} \
-returntype rprod (argtype) const{ return prod(argCast(b) , selfCast(*$self));} \
-returntype __mrdivide__  (argtype) const { return selfCast(*$self).__mrdivide__(argCast(b));} \
-returntype __rmrdivide__ (argtype) const { return argCast(b).__mrdivide__(selfCast(*$self));} \
-returntype __ldivide__   (argtype) const { return selfCast(*$self).__mrdivide__(argCast(b));} \
-returntype __rmldivide__ (argtype) const { return argCast(b).__mrdivide__(selfCast(*$self));} \
-returntype __mpower__    (argtype) const{ return selfCast(*$self).__mpower__(argCast(b));} \
-returntype __rmpower__   (argtype) const{ return argCast(b).__mpower__(selfCast(*$self));}
-
-// This is a list of operators that do not check __array_priority__ in python
-# define binopsNoPriority(argtype,argCast,selfCast,returntype) \
-returntype __pow__ (argtype) const{ return selfCast(*$self).__pow__(argCast(b));} \
-returntype __rpow__(argtype) const{ return argCast(b).__pow__(selfCast(*$self));} 
-
 // Matrix typemaps class
 %include "matrix.i"
 

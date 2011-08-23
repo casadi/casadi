@@ -376,17 +376,6 @@ class Matrix : public PrintableObject{
     Matrix<T> __mpower__(const Matrix<T> &y) const;
     Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
     Matrix<T> __mldivide__   (const Matrix<T> &y) const;
-    Matrix<T> __radd__(const Matrix<T> &y) const {return y.__add__(*this);}
-    Matrix<T> __rsub__(const Matrix<T> &y) const {return y.__sub__(*this);}
-    Matrix<T> __rmul__(const Matrix<T> &y) const {return y.__mul__(*this);}
-    Matrix<T> __rdiv__(const Matrix<T> &y) const {return y.__div__(*this);}
-    Matrix<T> __rpow__(const Matrix<T> &y) const {return y.__pow__(*this);}
-    Matrix<T> __rconstpow__(const Matrix<T> &y) const {return y.__constpow__(*this);}
-    Matrix<T> __rfmin__(const Matrix<T> &y) const {return y.fmin(*this);}
-    Matrix<T> __rfmax__(const Matrix<T> &y) const {return y.fmax(*this);}
-    Matrix<T> __rmpower__(const Matrix<T> &y) const {return y.__mpower__(*this);}
-    Matrix<T> __rmrdivide__ (const Matrix<T> &y) const {return y.__mrdivide__(*this);}
-    Matrix<T> __rmldivide__ (const Matrix<T> &y) const {return y.__mldivide__(*this);}
     //@}
     
     /// Matrix product
@@ -400,11 +389,6 @@ class Matrix : public PrintableObject{
 
     /// Matrix product, no memory allocation: y += prod(trans(x),z)
     static void prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
-
-    /** Matrix product, from the right
-    * x.rprod(y) = y.prod(x)
-    */
-    Matrix<T> rprod(const Matrix<T> &y) const {return y.prod(*this);}
     
     /// Matrix transpose
     Matrix<T> trans() const;

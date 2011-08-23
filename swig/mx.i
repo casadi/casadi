@@ -31,6 +31,8 @@
     raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
   %}
   #endif //SWIGPYTHON
+  
+  binopsrFull(CasADi::MX)
 };
 
 %my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< CasADi::MX >);

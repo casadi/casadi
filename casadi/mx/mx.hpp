@@ -293,27 +293,15 @@ class MX : public SharedObject{
   
   // all binary operations
   MX __add__(const MX& b) const;
-  MX __radd__(const MX& b) const;
   MX __sub__(const MX& b) const;
-  MX __rsub__(const MX& b) const;
   MX __mul__(const MX& b) const;
-  MX __rmul__(const MX& b) const;
   MX __div__(const MX& b) const;
-  MX __rdiv__(const MX& b) const;
   MX __pow__(const MX& b) const;
-  MX __rpow__(const MX& b) const;
   MX __constpow__(const MX& b) const;
-  MX __rconstpow__(const MX& b) const;
-  MX __rfmin__(const MX& b) const;
-  MX __rfmax__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;
-  MX __rmrdivide__ (const MX& b) const;
-  MX __ldivide__   (const MX& b) const;
-  MX __rmldivide__ (const MX& b) const;
+  MX __mldivide__   (const MX& b) const;
   MX __mpower__(const MX& b) const;
-  MX __rmpower__(const MX& b) const;
   MX prod(const MX& y) const;
-  MX rprod(const MX& y) const;
   MX inner_prod(const MX& y) const;
   MX outer_prod(const MX& y) const;
   MX constpow(const MX& y) const;
