@@ -132,12 +132,17 @@ set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_l
 
 # SEPARATE_ARGUMENTS(CASADI_SWIG_FLAGS)
 
+set(CASADI_SWIG_MAIN_MODULE casadi_core)
+set(CASADI_SWIG_SEPARATE_MODULES casadi_core casadi_noncore)
+
 if(WITH_SWIG_SPLIT)
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SWIG_SPLIT")
-set_source_files_properties (casadi_core.i casadi_noncore.i  PROPERTIES
-  SWIG_FLAGS "-DPy_USING_UNICODE ${CASADI_SWIG_FLAGS} -DSWIG_TYPE_TABLE=casadi_core -noproxydel"
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+set_source_files_properties (${my_module}.i  PROPERTIES
+  SWIG_FLAGS "-DPy_USING_UNICODE ${CASADI_SWIG_FLAGS} -DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE} -noproxydel"
   CPLUSPLUS ON
 )
+endforeach()
 else(WITH_SWIG_SPLIT)
 set_source_files_properties (casadi.i PROPERTIES
   SWIG_FLAGS "-DPy_USING_UNICODE ${CASADI_SWIG_FLAGS} -noproxydel"
@@ -147,8 +152,9 @@ endif(WITH_SWIG_SPLIT)
 
 # PYTHON interface
 if(WITH_SWIG_SPLIT)
-SWIG_ADD_MODULE (casadi_core python casadi_core.i) #the target corresponding this module is called "_casadi_core"
-SWIG_ADD_MODULE (casadi_noncore python casadi_noncore.i) #the target corresponding this module is called "_casadi_noncore"
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+SWIG_ADD_MODULE (${my_module} python ${my_module}.i)
+endforeach()
 else(WITH_SWIG_SPLIT)
 SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
 endif(WITH_SWIG_SPLIT)
@@ -159,15 +165,16 @@ cmake_policy(SET CMP0003 NEW)
 ENDIF(NUMPY_FOUND)
 
 if(WITH_SWIG_SPLIT)
-SWIG_LINK_LIBRARIES (casadi_core ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
-SWIG_LINK_LIBRARIES (casadi_noncore ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
+endforeach()
 else(WITH_SWIG_SPLIT)
 SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
 endif(WITH_SWIG_SPLIT)
 
 # the name used for the shared module for the python interface is determined
 if(WITH_SWIG_SPLIT)
-get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_core_REAL_NAME} SUFFIX)
+get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_${CASADI_SWIG_MAIN_MODULE}_REAL_NAME} SUFFIX)
 else(WITH_SWIG_SPLIT)
 get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
 endif(WITH_SWIG_SPLIT)
@@ -179,12 +186,11 @@ ELSE( WIN32 )
   set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
 ENDIF( WIN32 )
 endif(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
-set(CASADI_PYTHON_LIBRARY_core ${SWIG_MODULE_casadi_core_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-set(CASADI_PYTHON_LIBRARY_interfaces ${SWIG_MODULE_casadi_noncore_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
 if(WITH_SWIG_SPLIT)
-set(CASADI_PYTHON_LIBRARY_core ${SWIG_MODULE_casadi_core_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-set(CASADI_PYTHON_LIBRARY_interfaces ${SWIG_MODULE_casadi_noncore_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+endforeach()
 else(WITH_SWIG_SPLIT)
 set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 endif(WITH_SWIG_SPLIT)
@@ -195,13 +201,13 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 
 if(WITH_SWIG_SPLIT)
 add_custom_command(
-  TARGET _casadi_core
+  TARGET _${CASADI_SWIG_MAIN_MODULE}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
 )
 add_custom_command(
-  TARGET _casadi_core
+  TARGET _${CASADI_SWIG_MAIN_MODULE}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
@@ -216,17 +222,13 @@ add_custom_command(
 endif(WITH_SWIG_SPLIT)
 
 if(WITH_SWIG_SPLIT)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 add_custom_command(
-  TARGET _casadi_core
+  TARGET _${my_module}
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/casadi_core.py ${PROJECT_BINARY_DIR}/python/casadi/casadi_core.py
+  ARGS -E copy ${PROJECT_BINARY_DIR}/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
 )
-
-add_custom_command(
-  TARGET _casadi_noncore
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/casadi_noncore.py ${PROJECT_BINARY_DIR}/python/casadi/casadi_noncore.py
-)
+endforeach()
 else(WITH_SWIG_SPLIT)
 add_custom_command(
   TARGET _casadi
@@ -238,31 +240,30 @@ endif(WITH_SWIG_SPLIT)
 # workaround for Visual Studio! The default way is not general enough and should be changed!
 if(MSVC)
   if(WITH_SWIG_SPLIT)
-  SET(PYTHONLIBPATH_core ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_core})
-  SET(PYTHONLIBPATH_interfaces ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_interfaces})
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  SET(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_${my_module}})
+  endforeach()
   else(WITH_SWIG_SPLIT)
   SET(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY})
   endif(WITH_SWIG_SPLIT)
 else(MSVC)
   if(WITH_SWIG_SPLIT)
-  SET(PYTHONLIBPATH_core ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_core})
-  SET(PYTHONLIBPATH_interfaces ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_interfaces})
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  SET(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_${my_module}})
+  endforeach()
   else(WITH_SWIG_SPLIT)
   SET(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY})
   endif(WITH_SWIG_SPLIT)
 endif(MSVC)
 
 if(WITH_SWIG_SPLIT)
-add_custom_command(
-  TARGET _casadi_core
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PYTHONLIBPATH_core} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_core}
-)
-add_custom_command(
-  TARGET _casadi_noncore
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PYTHONLIBPATH_interfaces} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_interfaces}
-)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  add_custom_command(
+    TARGET _${my_module}
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -E copy ${PYTHONLIBPATH_${my_module}} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_${my_module}}
+  )
+  endforeach()
 else(WITH_SWIG_SPLIT)
 add_custom_command(
   TARGET _casadi
@@ -292,12 +293,15 @@ IF(PYTHONINTERP_FOUND)
   )
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
-  add_custom_target(install_python
-    DEPENDS _casadi_core _casadi_noncore
+    add_custom_target(install_python
     COMMAND ${CMAKE_COMMAND}
       -D COMPONENT=install_python
       -P cmake_install.cmake
-  )
+    )
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  add_dependencies(install_python DEPENDS _${my_module})
+  endforeach()
+
   else(WITH_SWIG_SPLIT)
   add_custom_target(install_python
     DEPENDS _casadi
