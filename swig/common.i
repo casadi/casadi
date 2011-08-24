@@ -216,6 +216,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 // common typemaps
 %include "commontypemaps.i"
 
+{%
 #include "casadi/matrix/matrix.hpp" 
 #include "casadi/matrix/matrix_tools.hpp" 
 #include "casadi/matrix/sparsity_tools.hpp" 
