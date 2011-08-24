@@ -26,6 +26,7 @@
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
 #include "mx_function.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
@@ -94,7 +95,7 @@ void FXInternal::init(){
   if(hasSetOption("sparsity_generator")){
     spgen_ = getOption("sparsity_generator");
   }
-  
+
   // Mark the function as initialized
   is_init_ = true;
 }
@@ -463,11 +464,86 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSp
   }
 }
 
+void FXInternal::getFullJacobian(){
+  // Quick return if it has been calculated
+  if(!full_jacobian_.isNull()) return;
+
+  // We want all the jacobian blocks
+  vector<pair<int,int> > jblocks;
+  jblocks.reserve((1+getNumInputs())+getNumOutputs());
+  for(int oind=0; oind<getNumOutputs(); ++oind){
+    for(int iind=-1; iind<getNumInputs(); ++iind){
+      if(iind>=0) jacSparsity(iind,oind);
+      jblocks.push_back(pair<int,int>(oind,iind));
+    }
+  }
+  full_jacobian_ = jacobian_switch(jblocks);
+  full_jacobian_.init();
+}
+
 void FXInternal::evaluate_switch(int nfdir, int nadir){
-  if(!jac_for_sens_){
+  if(!jac_for_sens_){     // Default, directional derivatives
     evaluate(nfdir,nadir);
-  } else {
-    casadi_assert_message(0,"not implemented");
+  } else { // Calculate complete Jacobian and multiply
+    // Generate the Jacobian if it does not exist
+    if(full_jacobian_.isNull()){
+      getFullJacobian();
+    }
+    
+    // Make sure inputs and outputs dense
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      casadi_assert_message(isDense(input(iind)),"sparse input currently not supported");
+    }
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      casadi_assert_message(isDense(output(oind)),"sparse output currently not supported");
+    }
+    
+    // Pass inputs to the Jacobian function
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      full_jacobian_.setInput(input(iind),iind);
+    }
+    
+    // Evaluate Jacobian function
+    full_jacobian_.evaluate();
+
+    // Reset forward sensitivities
+    for(int dir=0; dir<nfdir; ++dir){
+      for(int oind=0; oind<getNumOutputs(); ++oind){
+        fwdSens(oind,dir).setAll(0.0);
+      }
+    }
+    
+    // Reset adjoint sensitivities
+    for(int dir=0; dir<nadir; ++dir){
+      for(int iind=0; iind<getNumInputs(); ++iind){
+        adjSens(iind,dir).setAll(0.0);
+      }
+    }
+    
+    // Jacobian output index
+    int oind_jac = 0;
+
+    // Loop over outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      // Get undifferentiated result
+      full_jacobian_.getOutput(output(oind),oind_jac++);
+      
+      // Get get contribution from Jacobian block
+      for(int iind=0; iind<getNumInputs(); ++iind){
+        // Get Jacobian block
+        const Matrix<double>& Jblock = full_jacobian_.output(oind_jac++);
+        
+        // Forward sensitivities
+        for(int dir=0; dir<nfdir; ++dir){
+          addMultiple(Jblock,fwdSeed(iind).data(),fwdSens(oind).data(),false);
+        }
+        
+        // Adjoint sensitivities
+        for(int dir=0; dir<nadir; ++dir){
+          addMultiple(Jblock,adjSeed(oind).data(),adjSens(iind).data(),true);
+        }
+      }
+    }
   }
 }
 

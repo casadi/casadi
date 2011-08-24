@@ -376,6 +376,11 @@ void MXFunctionInternal::init(){
       }
     }
   }
+  
+  // Get the full Jacobian already now
+  if(jac_for_sens_){
+    getFullJacobian();
+  }
 
 log("MXFunctionInternal::init end");
 }

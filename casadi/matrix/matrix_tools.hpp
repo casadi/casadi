@@ -859,19 +859,20 @@ Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
 
 template<typename T>
 void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A){
-  if(trans_A){
-    casadi_assert(v.size()==A.size2());
-    casadi_assert(res.size()==A.size1());
-  } else {
-    casadi_assert(v.size()==A.size1());
-    casadi_assert(res.size()==A.size2());
-  }
-
   // Get dimension and sparsity
   int d1=A.size1(), d2=A.size2();
   const std::vector<int> &rowind=A.rowind();
   const std::vector<int> &col=A.col();
   const std::vector<T>& data = A.data();
+
+  // Assert consistent dimensions
+  if(trans_A){
+    casadi_assert(v.size()==d1);
+    casadi_assert(res.size()==d2);
+  } else {
+    casadi_assert(v.size()==d2);
+    casadi_assert(res.size()==d1);
+  }
 
   // Carry out multiplication
   for(int i=0; i<d1; ++i){ // loop over rows

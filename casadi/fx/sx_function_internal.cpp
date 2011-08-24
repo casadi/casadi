@@ -1024,6 +1024,11 @@ void SXFunctionInternal::init(){
   if(nfdir_>0 || nadir_>0){
     dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
   }
+  
+  // Get the full Jacobian already now
+  if(jac_for_sens_){
+    getFullJacobian();
+  }
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
@@ -1088,11 +1093,14 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
   vector<SXMatrix> jac_out(jblocks.size());
   jac_out.reserve(jblocks.size());
   for(int el=0; el<jac_out.size(); ++el){
-    if(jblocks[el].second==-1){
+    int oind = jblocks[el].first;
+    int iind = jblocks[el].second;
+    
+    if(iind==-1){
       // Undifferentiated function
-      jac_out[el] = outputv_[jblocks[el].first];
+      jac_out[el] = outputv_.at(oind);
     } else {
-      // Jacobian
+      // Jacobian (workaround)
       vector<pair<int,int> > jblocks_local(1,jblocks[el]);
       jac_out[el] = jac(jblocks_local).front();
     }

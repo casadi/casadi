@@ -174,6 +174,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     std::vector<MX> symbolicInput() const;
   
+    /// Get the Jacobian of all outputs with respect to all inputs
+    void getFullJacobian();
+
   protected:
 
     /** \brief  Number of forward and adjoint derivatives */
