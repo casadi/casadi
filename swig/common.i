@@ -216,5 +216,43 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 // common typemaps
 %include "commontypemaps.i"
 
+#include "casadi/matrix/matrix.hpp" 
+#include "casadi/matrix/matrix_tools.hpp" 
+#include "casadi/matrix/sparsity_tools.hpp" 
+	 
+// Scalar expressions 
+#include "casadi/sx/sx.hpp" 
+#include "casadi/sx/sx_tools.hpp" 
+#include "casadi/fx/sx_function.hpp" 
+	 
+// Matrix expressions 
+#include "casadi/mx/mx.hpp" 
+#include "casadi/mx/mx_tools.hpp" 
 
+#include "casadi/fx/mx_function.hpp" 
+ 	
+#include "casadi/fx/mx_function.hpp"
+#include "casadi/fx/c_function.hpp"
+#include "casadi/fx/jacobian.hpp"
+#include "casadi/fx/ocp_solver.hpp"
+#include "casadi/fx/simulator.hpp"
+#include "casadi/fx/parallelizer.hpp"
+#include "casadi/fx/external_function.hpp"
+
+
+#include "optimal_control/ocp_tools.hpp"
+#include "optimal_control/multiple_shooting.hpp"
+#include "optimal_control/fmi_parser.hpp"
+
+%}
+
+%{
+namespace std {
+void dummy(CasADi::SX foo, int &bar, double &baz) {}
+};
+%}
+
+namespace std {
+void dummy(CasADi::SX foo, int &bar, double &baz);
+};
 

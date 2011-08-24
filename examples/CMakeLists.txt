@@ -7,6 +7,7 @@ find_package(LIFTOPT QUIET)
 
 include_directories(../)
 
+
 IF(IPOPT_FOUND)
 include_directories(${IPOPT_INCLUDE_DIR})
 ENDIF(IPOPT_FOUND)
@@ -15,23 +16,29 @@ IF(SUNDIALS_FOUND)
 INCLUDE_DIRECTORIES(${SUNDIALS_INCLUDE_DIR})
 ENDIF(SUNDIALS_FOUND)
 
+IF(ENABLE_SHARED AND NOT( WIN32 ))
+SET(EXTRA_LIBS "dl")
+ELSE(ENABLE_SHARED AND NOT( WIN32 ))
+SET(EXTRA_LIBS "")
+ENDIF(ENABLE_SHARED AND NOT( WIN32 ))
+
 # Error handling
 add_executable(casadi_error_handling casadi_error_handling.cpp)
-target_link_libraries(casadi_error_handling casadi)
+target_link_libraries(casadi_error_handling casadi ${EXTRA_LIBS})
 
 # Determinant by minor expansion using MX
 add_executable(det_minor_mx det_minor_mx.cpp)
-target_link_libraries(det_minor_mx casadi)
+target_link_libraries(det_minor_mx casadi ${EXTRA_LIBS})
 
 IF(IPOPT_FOUND)
 
 # Rocket using Ipopt
 add_executable(rocket_ipopt rocket_ipopt.cpp)
-target_link_libraries(rocket_ipopt ipopt_interface casadi ${IPOPT_LIBRARIES})
+target_link_libraries(rocket_ipopt ipopt_interface casadi ${IPOPT_LIBRARIES}  ${EXTRA_LIBS})
 
 # Rocket solved with MX + SX
 add_executable(rocket_mx_and_sx rocket_mx_and_sx.cpp)
-target_link_libraries(rocket_mx_and_sx ipopt_interface casadi ${IPOPT_LIBRARIES})
+target_link_libraries(rocket_mx_and_sx ipopt_interface casadi ${IPOPT_LIBRARIES} ${EXTRA_LIBS})
 
 ENDIF(IPOPT_FOUND)
 
@@ -40,7 +47,7 @@ IF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # rocket example using sundials and ipopt
 add_executable(rocket_ipopt_sundials rocket_ipopt_sundials.cpp)
-target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${EXTRA_LIBS})
 
 # Van der pol with multiple shooting
 add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
@@ -58,7 +65,7 @@ target_link_libraries(vdp_multiple_shooting
 
 # How to write a multiple shooting code from scratch
 add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
-target_link_libraries(multiple_shooting_from_scratch sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES})
+target_link_libraries(multiple_shooting_from_scratch sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${EXTRA_LIBS})
 
 # Van der pol with multiple shooting
 add_executable(cstr cstr.cpp)
@@ -72,6 +79,7 @@ target_link_libraries(cstr
   ${SUNDIALS_LIBRARIES} 
   tinyxml
   csparse
+  ${EXTRA_LIBS}
 )
 
 
@@ -81,7 +89,7 @@ ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 if(WITH_SUPERLU)
 IF(BLAS_FOUND)
 add_executable(test_superlu_casadi test_superlu_casadi.cpp)
-target_link_libraries(test_superlu_casadi superlu_interface casadi superlu ${BLAS_LIBRARIES})
+target_link_libraries(test_superlu_casadi superlu_interface casadi superlu ${BLAS_LIBRARIES}  ${EXTRA_LIBS})
 ENDIF(BLAS_FOUND)
 endif(WITH_SUPERLU)
 
@@ -89,7 +97,7 @@ include_directories(../external_packages/CSparse/Include)
 
 # CSparse via CasADi
 add_executable(test_csparse_casadi test_csparse_casadi.cpp)
-target_link_libraries(test_csparse_casadi csparse_interface casadi csparse)
+target_link_libraries(test_csparse_casadi csparse_interface casadi csparse  ${EXTRA_LIBS})
 
 # Sundials - just integrate
 IF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
@@ -105,13 +113,14 @@ target_link_libraries(sundials_testing
   superlu
   csparse
   ${BLAS_LIBRARIES}
+  ${EXTRA_LIBS}
 )
 ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
 
 if(LIFTOPT_FOUND)
 include_directories(${LIFTOPT_INCLUDE_DIRS})
 add_executable(test_liftopt test_liftopt.cpp)
-target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES})
+target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES}  ${EXTRA_LIBS})
 
 endif(LIFTOPT_FOUND)
 

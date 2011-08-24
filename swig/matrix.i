@@ -212,10 +212,42 @@ PyObject* arrayView() {
 }
 #endif // WITH_NUMPY
 
-%pythoncode %{
-  def __eq__(self,other):
-    return _casadi.__eq__(self,other)
-%}
+
+    #ifdef SWIGPYTHON
+    #ifdef WITH_SWIG_SPLIT
+
+    %pythoncode %{
+      def __lt__(self,other):
+        return _casadi_core.__lt__(self,other)
+      def __le__(self,other):
+        return _casadi_core.__le__(self,other)
+      def __eq__(self,other):
+        return _casadi_core.__eq__(self,other)
+      def __ne__(self,other):
+        return _casadi_core.__ne__(self,other)
+      def __gt__(self,other):
+        return _casadi_core.__gt__(self,other)
+      def __ge__(self,other):
+        return _casadi_core.__ge__(self,other)
+    %}
+    #endif // WITH_SWIG_SPLIT
+    #ifndef WITH_SWIG_SPLIT
+    %pythoncode %{
+      def __lt__(self,other):
+        return _casadi.__lt__(self,other)
+      def __le__(self,other):
+        return _casadi.__le__(self,other)
+      def __eq__(self,other):
+        return _casadi.__eq__(self,other)
+      def __ne__(self,other):
+        return _casadi.__ne__(self,other)
+      def __gt__(self,other):
+        return _casadi.__gt__(self,other)
+      def __ge__(self,other):
+        return _casadi.__ge__(self,other)
+    %}
+    #endif // WITH_SWIG_SPLIT
+    #endif // SWIGPYTHON
     
 %pythoncode %{
   def toArray(self,shared=False):
@@ -297,6 +329,127 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 
 namespace CasADi{
+
+%{
+#ifdef SWIGPYTHON
+/// CasADi::Slice
+template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
+template <>
+int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
+  NATIVERETURN(CasADi::Slice,m)
+
+  if (PyInt_Check(p)) {
+    m.start_ = PyInt_AsLong(p);
+    m.stop_ = m.start_+1;
+    if (m.stop_==0) m.stop_ = std::numeric_limits<int>::max();
+    return true;
+  } else if (PySlice_Check(p)) {
+    PySliceObject *r = (PySliceObject*)(p);
+    if(r->start!=Py_None) m.start_ = PyInt_AsLong(r->start);
+    m.stop_  = (r->stop ==Py_None) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
+    if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
+    return true;
+  } else {
+    return false;
+  }
+
+}
+
+template <>
+bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
+  return meta< CasADi::Slice >::isa(p) || PyInt_Check(p) || PySlice_Check(p);
+}
+
+/// CasADi::IndexList
+template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
+template <>
+int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
+  
+  if (meta< int >::couldbe(p)) {
+    m.type = CasADi::IndexList::INT;
+    meta< int >::as(p,m.i);
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    m.type = CasADi::IndexList::IVECTOR;
+    return meta< std::vector<int> >::as(p,m.iv);
+  } else if (meta< CasADi::Slice>::couldbe(p)) {
+    m.type = CasADi::IndexList::SLICE;
+    return meta< CasADi::Slice >::as(p,m.slice);
+  } else {
+    return false;
+  }
+  return true;
+}
+
+
+template <>
+bool meta<  CasADi::IndexList >::couldbe(PyObject * p) {
+  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || meta< int >::couldbe(p);
+}
+#endif //SWIGPYTHON
+
+#ifdef SWIGOCTAVE
+/// CasADi::Slice
+template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
+
+template <>
+int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
+  if (p.is_range()) {
+    Range r = p.range_value();
+    m.start_ = r.base()-1;
+    m.stop_ = r.limit();
+    m.step_ = r.inc();
+  } else if (p.is_magic_colon()) {
+    m.start_ = 0;
+    m.stop_ = std::numeric_limits<int>::max();
+  } else if (p.is_numeric_type()) {
+    m.start_ = p.int_value()-1;
+    m.stop_ = m.start_+1;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+template <>
+bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
+  return p.is_range() || p.is_magic_colon()|| (p.is_real_scalar() && p.is_numeric_type());
+}
+
+
+/// CasADi::IndexList
+template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
+
+template <>
+int meta< CasADi::IndexList >::as(const octave_value& p,CasADi::IndexList &m) {
+  if ((p.is_real_scalar() && p.is_numeric_type())) {
+    m.type = CasADi::IndexList::INT;
+    m.i = p.int_value()-1;
+  } else if (meta< std::vector<int> >::couldbe(p)) {
+    m.type = CasADi::IndexList::IVECTOR;
+    bool result = meta< std::vector<int> >::as(p,m.iv);
+    if (!result) return false;
+    for (int k=0; k < m.iv.size();k++) m.iv[k]--;
+  } else if (meta< CasADi::Slice>::couldbe(p)) {
+    m.type = CasADi::IndexList::SLICE;
+    return meta< CasADi::Slice >::as(p,m.slice);
+  } else {
+    return false;
+  }
+  return true;
+}
+
+
+template <>
+bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
+  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || (p.is_real_scalar() && p.is_numeric_type());
+}
+#endif // SWIGOCTAVE
+%}
+
+%{
+template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
+template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi__IndexList;
+%}
 
 %my_generic_const_typemap(PRECEDENCE_SLICE,CasADi::Slice);
 %my_generic_const_typemap(PRECEDENCE_IndexVector,CasADi::IndexList);

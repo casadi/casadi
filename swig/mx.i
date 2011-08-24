@@ -11,6 +11,10 @@
 %template(sparsity_vector) std::vector<CasADi::CRSSparsity>;
 
 #ifdef SWIGPYTHON
+%{
+template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX> > >::name = &SWIGTYPE_p_std__pairT_CasADi__MX_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t_t;
+%}
+
 %meta_pair(CasADi::MX, std::vector< CasADi::MX >)
 %typemap(out) std::pair< CasADi::MX, std::vector< CasADi::MX >  > {
     bool ret = meta< std::pair< CasADi::MX, std::vector< CasADi::MX >  > >::toPython($1,$result);

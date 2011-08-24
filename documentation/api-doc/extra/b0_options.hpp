@@ -21,11 +21,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -35,11 +37,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -63,6 +67,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -70,6 +75,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>0</td><td>Print level. OOQP listends to print_level 0, 10 and 100</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -82,6 +88,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -89,6 +96,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>0</td><td>Print level. OOQP listends to print_level 0, 10 and 100</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -129,11 +137,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -144,11 +154,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -167,11 +179,13 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -184,11 +198,13 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -222,7 +238,10 @@
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -231,6 +250,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>"none", "left", "right", "both"</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>Globalization strategy (\"none\" or \"linesearch\")</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -249,7 +269,10 @@
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -258,6 +281,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>"none", "left", "right", "both"</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>Globalization strategy (\"none\" or \"linesearch\")</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td>None</td><td>CasADi::Sundials::KinsolInternal</td></tr>
@@ -308,6 +332,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>An NLPSolver creator function</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -318,6 +343,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td></td><td>None</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -328,6 +354,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>An NLPSolver creator function</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -338,6 +365,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td></td><td>None</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -372,16 +400,24 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 </table>
 */
+/** \class CasADi::UnaryOperation< SINH >
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
 /** \class CasADi::SimulatorInternal
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -391,11 +427,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -436,11 +474,13 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -452,11 +492,13 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -476,12 +518,14 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>false</td><td>Set to true if you need to solve several QP's in a row that are similar</td><td>CasADi::Interfaces::QPOasesInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>nWSR</td><td>OT_INTEGER</td><td>-1</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default (-1) leads to 5(nx + nc)</td><td>CasADi::Interfaces::QPOasesInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -495,18 +539,26 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>false</td><td>Set to true if you need to solve several QP's in a row that are similar</td><td>CasADi::Interfaces::QPOasesInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>nWSR</td><td>OT_INTEGER</td><td>-1</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default (-1) leads to 5(nx + nc)</td><td>CasADi::Interfaces::QPOasesInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::CasadiLifter
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
+/** \class CasADi::BinaryOperation< PRINTME >
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
@@ -529,12 +581,14 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -545,12 +599,14 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -644,6 +700,7 @@
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -713,6 +770,7 @@
 <tr><td>slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -780,6 +838,7 @@
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -849,6 +908,7 @@
 <tr><td>slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
@@ -984,6 +1044,12 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 </table>
 */
+/** \class CasADi::UnaryOperation< TANH >
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
 /** \class CasADi::Sundials::CVodesInternal
 <table>
 <caption>List of available options</caption>
@@ -1009,8 +1075,10 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>"bdf" or "adams"</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -1027,6 +1095,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -1062,8 +1131,10 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>"bdf" or "adams"</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -1080,6 +1151,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -1167,11 +1239,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1181,11 +1255,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1282,6 +1358,7 @@
 <tr><td>fixed_variable_treatment</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
@@ -1349,6 +1426,7 @@
 <tr><td>slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
@@ -1415,6 +1493,7 @@
 <tr><td>fixed_variable_treatment</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
@@ -1482,6 +1561,7 @@
 <tr><td>slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
@@ -1577,6 +1657,7 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>integrator_tolerance</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>kkt_tolerance</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>max_num_integrator_steps</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>max_num_iterations</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
@@ -1589,6 +1670,7 @@
 <tr><td>print_level</td><td>OT_STRING</td><td>"low"</td><td>"none", "low", "medium", "high", "debug"</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>relaxation_parameter</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>start_time</td><td>OT_REAL</td><td>0.0</td><td></td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -1607,6 +1689,7 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>integrator</td><td>OT_STRING</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>integrator_tolerance</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>kkt_tolerance</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>max_num_integrator_steps</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>max_num_iterations</td><td>OT_INTEGER</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
@@ -1619,6 +1702,7 @@
 <tr><td>print_level</td><td>OT_STRING</td><td>"low"</td><td>"none", "low", "medium", "high", "debug"</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>relaxation_parameter</td><td>OT_REAL</td><td></td><td>None</td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>start_time</td><td>OT_REAL</td><td>0.0</td><td></td><td>CasADi::AcadoInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -1666,11 +1750,13 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1681,11 +1767,13 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1697,6 +1785,12 @@
 </table>
 */
 /** \class CasADi::GSL::GslIntegrator
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+</table>
+*/
+/** \class CasADi::UnaryOperation< COSH >
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
@@ -1719,6 +1813,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1726,6 +1821,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>optimizer</td><td>OT_STRING</td><td>"sqp"</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1735,6 +1831,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1742,6 +1839,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>optimizer</td><td>OT_STRING</td><td>"sqp"</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1782,7 +1880,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -1798,6 +1898,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -1832,7 +1933,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -1848,6 +1951,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -1865,6 +1969,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>Option()</td><td></td><td>CasADi::CplexInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_cplex_problem"</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1874,6 +1979,7 @@
 <tr><td>objsense</td><td>OT_INTEGER</td><td>CPX_MIN</td><td>optimization sense (CPX_MIN or CPX_MAX)</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1885,6 +1991,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>Option()</td><td></td><td>CasADi::CplexInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_cplex_problem"</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1894,6 +2001,7 @@
 <tr><td>objsense</td><td>OT_INTEGER</td><td>CPX_MIN</td><td>optimization sense (CPX_MIN or CPX_MAX)</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1909,11 +2017,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -1924,11 +2034,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -1944,6 +2056,7 @@
 <tr><td>diagpivotthresh</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>equil</td><td>OT_BOOLEAN</td><td>true</td><td>Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).</td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>iterrefine</td><td>OT_STRING</td><td>"norefine"</td><td></td><td>CasADi::SuperLUInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
@@ -1952,6 +2065,7 @@
 <tr><td>printstat</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>rowperm</td><td>OT_STRING</td><td>"largediag"</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>symmetricmode</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
@@ -1969,6 +2083,7 @@
 <tr><td>diagpivotthresh</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>equil</td><td>OT_BOOLEAN</td><td>true</td><td>Specifies whether to equilibrate the system (scale A’s rows and columns to have unit norm).</td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>iterrefine</td><td>OT_STRING</td><td>"norefine"</td><td></td><td>CasADi::SuperLUInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
@@ -1977,6 +2092,7 @@
 <tr><td>printstat</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>rowperm</td><td>OT_STRING</td><td>"largediag"</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>symmetricmode</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
@@ -1995,11 +2111,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2009,11 +2127,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2023,11 +2143,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2037,11 +2159,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2089,7 +2213,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -2106,6 +2232,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2148,7 +2275,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -2165,6 +2294,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2181,6 +2311,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
@@ -2188,6 +2319,7 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>serial, openmp or mpi</td><td>CasADi::ParallelizerInternal</td></tr>
 <tr><td>save_corrected_input</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::ParallelizerInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2197,6 +2329,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
@@ -2204,6 +2337,7 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>serial, openmp or mpi</td><td>CasADi::ParallelizerInternal</td></tr>
 <tr><td>save_corrected_input</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::ParallelizerInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2339,11 +2473,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -2354,11 +2490,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm: \"depth-first\" or \"breadth-first\" search</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -2382,6 +2520,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
@@ -2389,6 +2528,7 @@
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2399,6 +2539,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
@@ -2406,6 +2547,7 @@
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2434,11 +2576,13 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2449,11 +2593,13 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2481,11 +2627,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2495,11 +2643,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2563,11 +2713,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -2578,11 +2730,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -2624,7 +2778,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -2640,6 +2796,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2674,7 +2831,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td></td><td>None</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>"gmres", "bcgstab", "tfqmr"</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>"dense", "banded" or "iterative"</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
@@ -2690,6 +2849,7 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>"simultaneous" or "staggered"</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2759,11 +2919,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
@@ -2774,11 +2936,13 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>

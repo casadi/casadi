@@ -212,64 +212,6 @@ meta_vector(std::vector<CasADi::SX>);
 meta_vector(CasADi::SX);
 
 
-
-/// CasADi::Slice
-template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
-
-template <>
-int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
-  if (p.is_range()) {
-    Range r = p.range_value();
-    m.start_ = r.base()-1;
-    m.stop_ = r.limit();
-    m.step_ = r.inc();
-  } else if (p.is_magic_colon()) {
-    m.start_ = 0;
-    m.stop_ = std::numeric_limits<int>::max();
-  } else if (p.is_numeric_type()) {
-    m.start_ = p.int_value()-1;
-    m.stop_ = m.start_+1;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-template <>
-bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
-  return p.is_range() || p.is_magic_colon()|| (p.is_real_scalar() && p.is_numeric_type());
-}
-
-
-/// CasADi::IndexList
-template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
-
-template <>
-int meta< CasADi::IndexList >::as(const octave_value& p,CasADi::IndexList &m) {
-  if ((p.is_real_scalar() && p.is_numeric_type())) {
-    m.type = CasADi::IndexList::INT;
-    m.i = p.int_value()-1;
-  } else if (meta< std::vector<int> >::couldbe(p)) {
-    m.type = CasADi::IndexList::IVECTOR;
-    bool result = meta< std::vector<int> >::as(p,m.iv);
-    if (!result) return false;
-    for (int k=0; k < m.iv.size();k++) m.iv[k]--;
-  } else if (meta< CasADi::Slice>::couldbe(p)) {
-    m.type = CasADi::IndexList::SLICE;
-    return meta< CasADi::Slice >::as(p,m.slice);
-  } else {
-    return false;
-  }
-  return true;
-}
-
-
-template <>
-bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
-  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || (p.is_real_scalar() && p.is_numeric_type());
-}
-
-
 /// CasADi::MX
 template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
 

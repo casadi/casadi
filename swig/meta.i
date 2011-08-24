@@ -16,7 +16,6 @@
 %}
 
 
-
 %inline %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
 template<> swig_type_info** meta< int >::name = &SWIGTYPE_p_int;
@@ -29,14 +28,13 @@ template<> swig_type_info** meta< CasADi::Matrix<CasADi::SX> >::name = &SWIGTYPE
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SX> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t;
 template<> swig_type_info** meta< std::vector< CasADi::SX > >::name = &SWIGTYPE_p_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< CasADi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_std__allocatorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_t_t;
-template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi__IndexList;
+
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<double> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t;
-template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
 template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasADi__CRSSparsity;
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< CasADi::MX >::name = &SWIGTYPE_p_CasADi__MX;
 template<> swig_type_info** meta< std::vector< CasADi::MX> >::name = &SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t;
-template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX> > >::name = &SWIGTYPE_p_std__pairT_CasADi__MX_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t_t;
+
 %}
 
 

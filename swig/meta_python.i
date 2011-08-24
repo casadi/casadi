@@ -505,60 +505,6 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
 meta_vector(std::vector<CasADi::SX>);
 meta_vector(CasADi::SX);
 
-/// CasADi::Slice
-template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
-template <>
-int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
-  NATIVERETURN(CasADi::Slice,m)
-
-  if (PyInt_Check(p)) {
-    m.start_ = PyInt_AsLong(p);
-    m.stop_ = m.start_+1;
-    if (m.stop_==0) m.stop_ = std::numeric_limits<int>::max();
-    return true;
-  } else if (PySlice_Check(p)) {
-    PySliceObject *r = (PySliceObject*)(p);
-    if(r->start!=Py_None) m.start_ = PyInt_AsLong(r->start);
-    m.stop_  = (r->stop ==Py_None) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
-    if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
-    return true;
-  } else {
-    return false;
-  }
-
-}
-
-template <>
-bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
-  return meta< CasADi::Slice >::isa(p) || PyInt_Check(p) || PySlice_Check(p);
-}
-
-/// CasADi::IndexList
-template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
-template <>
-int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
-  
-  if (meta< int >::couldbe(p)) {
-    m.type = CasADi::IndexList::INT;
-    meta< int >::as(p,m.i);
-  } else if (meta< std::vector<int> >::couldbe(p)) {
-    m.type = CasADi::IndexList::IVECTOR;
-    return meta< std::vector<int> >::as(p,m.iv);
-  } else if (meta< CasADi::Slice>::couldbe(p)) {
-    m.type = CasADi::IndexList::SLICE;
-    return meta< CasADi::Slice >::as(p,m.slice);
-  } else {
-    return false;
-  }
-  return true;
-}
-
-
-template <>
-bool meta<  CasADi::IndexList >::couldbe(PyObject * p) {
-  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || meta< int >::couldbe(p);
-}
-
 /// CasADi::MX
 template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
 
