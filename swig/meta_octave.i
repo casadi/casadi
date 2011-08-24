@@ -1,5 +1,6 @@
-/// std::vector<double>
 %inline %{
+
+/// std::vector<double>
 template<> char meta< std::vector<double> >::expected_message[] = "Expecting (1xn) array(number)";
 
 template <>
@@ -30,10 +31,7 @@ template <> bool meta< std::vector<double> >::couldbe(const octave_value& p) {
   }
 }
 
-%}
-
 /// std::vector<int>
-%inline %{
 template<> char meta< std::vector<int> >::expected_message[] = "Expecting (1xn) array(number)";
 
 template <>
@@ -64,12 +62,8 @@ template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) {
   }
 }
 
-%}
-
 
 /// CasADi::GenericType
-%inline %{
-
 template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting number, string, vector(number)";
 
 template <>
@@ -100,10 +94,7 @@ bool meta< CasADi::GenericType >::couldbe(const octave_value& p) {
   return p.is_real_scalar() || meta< std::vector<int> >::couldbe(p) || meta< std::vector<double> >::couldbe(p) || p.is_string() ;
 }
 
-%}
-
 /// CasADi::Matrix<double>
-%inline %{
 template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
 
 template <>
@@ -151,16 +142,12 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
 template <>
 bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<double> >::isa(p) || (p.is_real_matrix() && p.is_numeric_type()) || (p.is_real_scalar() && p.is_numeric_type());}
 
-%}
 
-%inline %{
 // Explicit intialization of these two member functions, so we can use them in meta< CasADi::SX >
 template<> int meta< CasADi::Matrix<CasADi::SX> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SX> &);
 template<> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(GUESTOBJECT);
-%}
 
 /// CasADi::SX
-%inline %{
 template<> char meta< CasADi::SX >::expected_message[] = "Expecting SX or number";
 
 template <>
@@ -191,11 +178,8 @@ bool meta< CasADi::SX >::couldbe(const octave_value& p) {
   return (meta< CasADi::SX >::isa(p) || (p.is_real_scalar() && p.is_numeric_type()) );
 }
 
-%}
-
 
 /// CasADi::Matrix<CasADi::SX>
-%inline %{
 template<> char meta< CasADi::Matrix<CasADi::SX> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
 
 template <>
@@ -221,17 +205,15 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
 }
 
 template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || (p.is_real_matrix() && p.is_numeric_type()) || (p.is_real_scalar() && p.is_numeric_type());}
-%}
 
 
-%meta_vector(CasADi::Matrix<CasADi::SX>);
-%meta_vector(std::vector<CasADi::SX>);
-%meta_vector(CasADi::SX);
+meta_vector(CasADi::Matrix<CasADi::SX>);
+meta_vector(std::vector<CasADi::SX>);
+meta_vector(CasADi::SX);
 
 
 
 /// CasADi::Slice
-%inline %{
 template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
 
 template <>
@@ -258,11 +240,8 @@ bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
   return p.is_range() || p.is_magic_colon()|| (p.is_real_scalar() && p.is_numeric_type());
 }
 
-%}
-
 
 /// CasADi::IndexList
-%inline %{
 template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 
 template <>
@@ -289,11 +268,9 @@ template <>
 bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
   return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || (p.is_real_scalar() && p.is_numeric_type());
 }
-%}
 
 
 /// CasADi::MX
-%inline %{
 template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
 
 template <>
@@ -315,8 +292,7 @@ int meta< CasADi::MX >::as(const octave_value& p,CasADi::MX &m) {
   }
   return false;
 }
+
+meta_vector(CasADi::MX);
 %}
-
-%meta_vector(CasADi::MX);
-
 

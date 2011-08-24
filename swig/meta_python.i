@@ -1,5 +1,5 @@
-/// int
 %inline %{
+/// int
 template<> char meta< int >::expected_message[] = "Expecting integer";
 
 template <>
@@ -40,10 +40,7 @@ template <> bool meta< int >::couldbe(PyObject * p) {
  return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) ;
 }
 
-%}
-
 /// double
-%inline %{
 template<> char meta< double >::expected_message[] = "Expecting double";
 
 template <>
@@ -83,18 +80,14 @@ template <> bool meta< double >::couldbe(PyObject * p) {
   return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;
 }
 
-%}
 
 // Forward declarations
-%{
 template<> int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s);
 template<> bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p);
 template<> bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dictionary &a, PyObject *&p);
-%}
 
 
 /// CasADi::GenericType
-%inline %{
 template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting number, string, vector(number)";
 
 template <>
@@ -180,14 +173,9 @@ bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p)
   }
   return true;
 }
-%}
-
-
-
 
 
 /// CasADi::GenericType::Dictionary
-%inline %{
 template<> char meta< CasADi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
 
 template <>
@@ -233,20 +221,16 @@ bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dict
   }
   return true;
 }
-%}
 
 
-%inline %{
 // Explicit intialization of these two member functions, so we can use them in meta< CasADi::SX >
 template<> int meta< CasADi::Matrix<CasADi::SX> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SX> &);
 template<> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(GUESTOBJECT);
 
-%}
+
 
 
 /// CasADi::SX
-%inline %{
-
 template<> char meta< CasADi::SX >::expected_message[] = "Expecting SX or number";
 
 template <>
@@ -282,12 +266,8 @@ bool meta< CasADi::SX >::couldbe(PyObject * p) {
   return (meta< CasADi::SX >::isa(p) || meta< double >::couldbe(p));
 }
 
-%}
-
-
 
 /// CasADi::Matrix<double>
-%inline %{
 template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
 
 template <>
@@ -387,12 +367,9 @@ bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
   return meta< double >::couldbe(p) || ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) || meta< double >::couldbe_sequence(p);
 }
 
-%}
-
-%meta_vector(CasADi::Matrix<double>)
+meta_vector(CasADi::Matrix<double>)
 
 /// CasADi::Matrix<CasADi::SX>
-%inline %{
 template<> char meta< CasADi::Matrix<CasADi::SX> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
 
 template <>
@@ -467,13 +444,8 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
   return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || meta< CasADi::SX >::couldbe_sequence(p) || meta< std::vector< CasADi::SX > >::couldbe_sequence(p);
 }
 
-%}
-
-
-
 /// std::vector< CasADi::Matrix<CasADi::SX> >
 #ifdef SWIGPYTHON
-%inline %{
 template<> char meta< std::vector< CasADi::Matrix<CasADi::SX> > >::expected_message[] = "Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))";
 
 template <>
@@ -535,15 +507,13 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
   return meta< std::vector< CasADi::Matrix< CasADi::SX > > >::isa(p);
 }
 
-%}
 #endif //SWIGPYTHON
 
 
-%meta_vector(std::vector<CasADi::SX>);
-%meta_vector(CasADi::SX);
+meta_vector(std::vector<CasADi::SX>);
+meta_vector(CasADi::SX);
 
 /// CasADi::Slice
-%inline %{
 template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
 int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
@@ -570,10 +540,8 @@ template <>
 bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
   return meta< CasADi::Slice >::isa(p) || PyInt_Check(p) || PySlice_Check(p);
 }
-%}
 
 /// CasADi::IndexList
-%inline %{
 template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
 int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
@@ -598,11 +566,8 @@ template <>
 bool meta<  CasADi::IndexList >::couldbe(PyObject * p) {
   return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || meta< int >::couldbe(p);
 }
-%}
-
 
 /// CasADi::MX
-%inline %{
 template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
 
 template <>
@@ -623,11 +588,8 @@ int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
   }
   return false;
 }
-%}
-
 
 /// std::vector< CasADi::MX >
-%inline %{
 template<> char meta< std::vector< CasADi::MX > >::expected_message[] = "Expecting sequence(MX, number)";
 template <>
 int meta< std::vector< CasADi::MX > >::as(PyObject * p,std::vector< CasADi::MX > &m) {
@@ -680,5 +642,5 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
   }
   return meta< std::vector<CasADi::MX> >::isa(p);
 }
-
 %}
+

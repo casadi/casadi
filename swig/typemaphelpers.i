@@ -240,24 +240,22 @@ void PyDECREFParent(PyObject* self) {
 }
 %enddef
 
-
-/// std::vector< Type >
-%define %meta_vector(Type)
 %inline %{
-template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)";
-
-template <>
-int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) {
-  NATIVERETURN(std::vector< Type >,m)
-  return meta< Type >::as_vector(p,m);
-}
-
-template <>
-bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) {
-  return meta< std::vector< Type > >::isa(p) ||  meta< Type >::couldbe_sequence(p);
+/// std::vector< Type >
+#define meta_vector(Type) \
+template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)"; \
+ \
+template <> \
+int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) { \
+  NATIVERETURN(std::vector< Type >,m) \
+  return meta< Type >::as_vector(p,m); \
+} \
+ \
+template <> \
+bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) { \
+  return meta< std::vector< Type > >::isa(p) ||  meta< Type >::couldbe_sequence(p); \
 }
 %}
-%enddef
 
 /// std::pair< TypeA, TypeB >
 #ifdef SWIGPYTHON
