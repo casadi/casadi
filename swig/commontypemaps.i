@@ -17,7 +17,6 @@
 #define PRECEDENCE_DICTIONARY 21
 
 
-
 #ifdef SWIGPYTHON
 %typemap(in) int (int m) {
   bool result=meta< int >::as($input,m);

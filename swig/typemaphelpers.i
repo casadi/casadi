@@ -257,6 +257,7 @@ bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) { \
 }
 %}
 
+
 /// std::pair< TypeA, TypeB >
 #ifdef SWIGPYTHON
 %define %meta_pair(TypeA,TypeB) 

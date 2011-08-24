@@ -174,7 +174,6 @@ bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p)
   return true;
 }
 
-
 /// CasADi::GenericType::Dictionary
 template<> char meta< CasADi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
 
@@ -227,9 +226,6 @@ bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dict
 template<> int meta< CasADi::Matrix<CasADi::SX> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SX> &);
 template<> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(GUESTOBJECT);
 
-
-
-
 /// CasADi::SX
 template<> char meta< CasADi::SX >::expected_message[] = "Expecting SX or number";
 
@@ -265,7 +261,6 @@ bool meta< CasADi::SX >::couldbe(PyObject * p) {
   }
   return (meta< CasADi::SX >::isa(p) || meta< double >::couldbe(p));
 }
-
 
 /// CasADi::Matrix<double>
 template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
@@ -445,7 +440,6 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
 }
 
 /// std::vector< CasADi::Matrix<CasADi::SX> >
-#ifdef SWIGPYTHON
 template<> char meta< std::vector< CasADi::Matrix<CasADi::SX> > >::expected_message[] = "Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))";
 
 template <>
@@ -506,8 +500,6 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
   }
   return meta< std::vector< CasADi::Matrix< CasADi::SX > > >::isa(p);
 }
-
-#endif //SWIGPYTHON
 
 
 meta_vector(std::vector<CasADi::SX>);
