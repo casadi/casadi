@@ -24,6 +24,7 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/fx/linear_solver_internal.hpp"
 #include "casadi/fx/sx_function_internal.hpp"
+#include "casadi/fx/mx_function.hpp"
 #include "casadi/sx/sx_tools.hpp"
 
 using namespace std;
@@ -1452,27 +1453,49 @@ FX IdasInternal::getJacobian(){
   if(!jac_.isNull())
     return jac_;
 
-  SXFunction f = shared_cast<SXFunction>(f_);
-  if(f.isNull())
-    throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction");
-  
-  // Get the Jacobian in the Newton iteration
-  SX cj("cj");
-  SXMatrix jac = f.jac(DAE_Y,DAE_RES) + cj*f.jac(DAE_YDOT,DAE_RES);
+  // If SXFunction
+  SXFunction f_sx = shared_cast<SXFunction>(f_);
+  if(!f_sx.isNull()){
+    // Get the Jacobian in the Newton iteration
+    SX cj("cj");
+    SXMatrix jac = f_sx.jac(DAE_Y,DAE_RES) + cj*f_sx.jac(DAE_YDOT,DAE_RES);
 
-  // Jacobian function
-  vector<Matrix<SX> > jac_in(JAC_NUM_IN);
-  jac_in[JAC_T] = f.inputSX(DAE_T);
-  jac_in[JAC_Y] = f.inputSX(DAE_Y);
-  jac_in[JAC_YDOT] = f.inputSX(DAE_YDOT);
-  jac_in[JAC_P] = f.inputSX(DAE_P);
-  jac_in[JAC_CJ] = cj;
-  SXFunction J(jac_in,jac);
-      
-  // Save function
-  jac_ = J;
+    // Jacobian function
+    vector<Matrix<SX> > jac_in(JAC_NUM_IN);
+    jac_in[JAC_T] = f_sx.inputSX(DAE_T);
+    jac_in[JAC_Y] = f_sx.inputSX(DAE_Y);
+    jac_in[JAC_YDOT] = f_sx.inputSX(DAE_YDOT);
+    jac_in[JAC_P] = f_sx.inputSX(DAE_P);
+    jac_in[JAC_CJ] = cj;
+    SXFunction J(jac_in,jac);
+    
+    // Save function
+    jac_ = J;
+    return J;
+  }
+
+  // If SXFunction
+  MXFunction f_mx = shared_cast<MXFunction>(f_);
+  if(!f_mx.isNull()){
+    // Get the Jacobian in the Newton iteration
+    MX cj("cj");
+    MX jac = f_mx.jac(DAE_Y).at(DAE_RES) + cj*f_mx.jac(DAE_YDOT).at(DAE_RES);
+
+    // Jacobian function
+    vector<MX> jac_in(JAC_NUM_IN);
+    jac_in[JAC_T] = f_mx.inputMX(DAE_T);
+    jac_in[JAC_Y] = f_mx.inputMX(DAE_Y);
+    jac_in[JAC_YDOT] = f_mx.inputMX(DAE_YDOT);
+    jac_in[JAC_P] = f_mx.inputMX(DAE_P);
+    jac_in[JAC_CJ] = cj;
+    MXFunction J(jac_in,jac);
+    
+    // Save function
+    jac_ = J;
+    return J;
+  }
   
-  return J;
+  throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
 }
 
   
