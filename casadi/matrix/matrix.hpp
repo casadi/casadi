@@ -539,9 +539,6 @@ class Matrix : public PrintableObject{
     void set(const T* val, Sparsity sp=SPARSE);
 #endif
 
-    /** \brief  Get the result times a vector */
-    void getTimesVector(const T *v, T *res) const;
-
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
     kl:    The number of subdiagonals in res 
     ku:    The number of superdiagonals in res 
@@ -1403,20 +1400,6 @@ template<class T>
 CRSSparsity& Matrix<T>::sparsityRef(){
   sparsity_.makeUnique();
   return sparsity_;
-}
-
-template<class T>
-void Matrix<T>::getTimesVector(const T *v, T *res) const{
-  // copy the result
-  for(int i=0; i<size1(); ++i){ // loop over rows
-    res[i] = 0;
-    for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
-      int j=col(el);  // column
-
-      // Multiply with the vector
-      res[i] += v[j]*data()[el];
-    }
-  }
 }
 
 template<class T>

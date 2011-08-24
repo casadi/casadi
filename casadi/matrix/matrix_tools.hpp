@@ -256,6 +256,10 @@ Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b);
 template<class T>
 Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
 
+/// same as: res += prod(A,v)
+template<typename T>
+void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A=false);
+
 } // namespace CasADi
 
 // Global namespace
@@ -267,14 +271,6 @@ CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ 
 
 template<class T>
 CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
-
-
-
-
-
-
-
-
 
 #ifndef SWIG
 
@@ -861,6 +857,37 @@ Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
   return ret;
 }
 
+template<typename T>
+void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A){
+  if(trans_A){
+    casadi_assert(v.size()==A.size2());
+    casadi_assert(res.size()==A.size1());
+  } else {
+    casadi_assert(v.size()==A.size1());
+    casadi_assert(res.size()==A.size2());
+  }
+
+  // Get dimension and sparsity
+  int d1=A.size1(), d2=A.size2();
+  const std::vector<int> &rowind=A.rowind();
+  const std::vector<int> &col=A.col();
+  const std::vector<T>& data = A.data();
+
+  // Carry out multiplication
+  for(int i=0; i<d1; ++i){ // loop over rows
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){ // loop over the non-zero elements
+      int j=col[el];  // column
+      // Add scalar product
+      if(trans_A){
+        res[j] += v[i]*data[el];
+      } else {
+        res[i] += v[j]*data[el];
+      }
+    }
+  }
+}
+
+
 // template<class T>
 // Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b){
 //   return a.binary_old(CasADi::casadi_operators<T>::equality, b);
@@ -925,6 +952,7 @@ MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 MTT_INST(T,diag) \
 MTT_INST(T,polyval) \
+MTT_INST(T,addMultiple) \
 
 
 #endif //SWIG

@@ -30,18 +30,18 @@ namespace CasADi{
 
 using namespace std;
 
-CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme) : evaluate_(c_fcn), inputscheme_(inputscheme), outputscheme_(outputscheme){
+CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme) : evaluate_(c_fcn){
   user_data_ = 0;
   
-  setNumInputs(inputscheme_.size());
-  setNumOutputs(outputscheme_.size());
+  setNumInputs(inputscheme.size());
+  setNumOutputs(outputscheme.size());
   
-  for (int k=0;k<inputscheme_.size();k++) {
-    input(k) = DMatrix(inputscheme_[k],0);
+  for (int k=0;k<inputscheme.size();k++) {
+    input(k) = DMatrix(inputscheme[k],0);
   }
   
-  for (int k=0;k<outputscheme_.size();k++) {
-    output(k) = DMatrix(outputscheme_[k],0);
+  for (int k=0;k<outputscheme.size();k++) {
+    output(k) = DMatrix(outputscheme[k],0);
   }
   
   // Make the ref object a non-refence counted pointer to this (as reference counting would prevent deletion of the object)

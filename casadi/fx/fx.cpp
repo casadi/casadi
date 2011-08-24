@@ -132,7 +132,7 @@ void FX::evaluate(int nfdir, int nadir){
   casadi_assert(isInit());
   casadi_assert(nfdir<=(*this)->nfdir_);
   casadi_assert(nadir<=(*this)->nadir_);
-  (*this)->evaluate(nfdir,nadir);
+  (*this)->evaluate_switch(nfdir,nadir);
 }
 
 void FX::evaluate_old(int fsens_order, int asens_order){

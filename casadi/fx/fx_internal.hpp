@@ -50,6 +50,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Destructor */
     virtual ~FXInternal() = 0;
 
+    /** \brief  Evaluate switch*/
+    void evaluate_switch(int nfdir, int nadir);
+
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
 
@@ -206,6 +209,10 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /// User-provided sparsity generator function
     SparsityGenerator spgen_;
+    
+    /// Full jacobian function used to calculate directional derivatives instead of the using directional derivatives
+    bool jac_for_sens_;
+    FX full_jacobian_;
 };
 
 

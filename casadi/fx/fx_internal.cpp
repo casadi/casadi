@@ -43,10 +43,12 @@ FXInternal::FXInternal(){
   addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)");
   addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
+  addOption("jac_for_sens",             OT_BOOLEAN,             false,          "Create the a Jacobian function and use this to calculate forward sensitivities");
   verbose_ = false;
   numeric_jacobian_ = false;
   jacgen_ = 0;
   spgen_ = 0;
+  jac_for_sens_ = false;
 }
 
 FXInternal::~FXInternal(){
@@ -58,6 +60,7 @@ void FXInternal::init(){
   verbose_ = getOption("verbose");
   store_jacobians_ = getOption("verbose");
   numeric_jacobian_ = getOption("numeric_jacobian");
+  jac_for_sens_ = getOption("jac_for_sens");
 
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
     it->dataF.resize(nfdir_);
@@ -460,6 +463,13 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSp
   }
 }
 
+void FXInternal::evaluate_switch(int nfdir, int nadir){
+  if(!jac_for_sens_){
+    evaluate(nfdir,nadir);
+  } else {
+    casadi_assert_message(0,"not implemented");
+  }
+}
 
 
 // void setv(double val, vector<double>& v){
