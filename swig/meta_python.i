@@ -86,7 +86,6 @@ int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
     if (!array_is_native(p))
       SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array byte order should be native.");
       
-    int* d;
     // Make sure we have a contigous array with int datatype
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
@@ -94,12 +93,11 @@ int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
       array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
       if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "std::vector<int>: no luck converting numpy array to int. Better don't use unsigned datatypes."); }
       long* temp=(long*) array_data(array);
-      d = new int[size];
       m.resize(size);
       for (int k=0;k<size;k++) m[k]=temp[k];
       return true;
     }
-    d=(int*) array_data(array);
+    int *d=(int*) array_data(array);
 
     m.assign( d, d+size );
 
