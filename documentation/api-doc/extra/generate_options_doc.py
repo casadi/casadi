@@ -123,7 +123,7 @@ for enum in xmlNS.findall("//memberdef[@kind='enum']"):
     
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
-  if not('CasADi::FXInternal' in meta['hierarchy']) and not(name=='CasADi::FXInternal'):
+  if not('CasADi::OptionsFunctionalityNode' in meta['hierarchy']) and not(name=='CasADi::OptionsFunctionalityNode'):
     continue
   source = re.sub(r'\.hpp$',r'.cpp',meta['file'])
   meta['options']={}
@@ -132,19 +132,23 @@ for name,meta in metadata.items():
   f =file(source,"r")
   for l in f:
     if not(l.find('addOption')==-1):
+      matched = False
       m = re.search(r'addOption\(\s*"([^"]*?)"\s*,\s*([^,]*)\s*,\s*([^,]*)(,\s*(.*?))?\)\s*;(\s*// (.*))?',l)
       if m:
+        matched = True
         description=[]
         if not(m.group(7) is None):
           description.append(m.group(7))
         if not(m.group(5) is None):
           description.append(m.group(5)[1:-1])
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': m.group(3),'description': '\n'.join(description), 'used': name}
-    if not(l.find('addOption')==-1):
       m = re.search(r'addOption\(\s*"([^"]*)"\s*,\s*([^,]*)\s*\)\s*;(\s*// (.*))?',l)
       if m:
+        matched = True
         description=m.group(4)
         meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': '','description': description, 'used': name}
+      if not(matched):
+        print l
     if not(l.find('ops_')==-1):
       m = re.search(r'ops_\["(.*?)"\]\s*=\s*(.*?);',l)
       if m:
@@ -180,6 +184,13 @@ def statsashtml(stat):
 def monitorsashtml(monitor):
   return "<tr><td>%s</td><td>%s</td></tr>" %(monitor['name'],monitor['used'])
 
+
+
+def update_no_overwrite(orig,new):
+  for (k,v) in new.iteritems():
+    if not(k in orig):
+      orig[k] = v
+
 f = file(out+'b0_options.hpp','w')
 
 # Print out doxygen information - options
@@ -190,9 +201,11 @@ for name,meta in metadata.items():
   alloptions = meta['options']
   for a in meta['hierarchy']:
     if 'options' in metadata[a]:
-      alloptions.update(metadata[a]['options'])
+      update_no_overwrite(alloptions,metadata[a]['options'])
   
   myoptionskeys = alloptions.keys()
+  if len(myoptionskeys)==0:
+    next
   myoptionskeys.sort()
   
   targets = [name]
@@ -220,11 +233,13 @@ for name,meta in metadata.items():
   allstats = meta['stats']
   for a in meta['hierarchy']:
     if 'stats' in metadata[a]:
-      allstats.update(metadata[a]['stats'])
+      update_no_overwrite(allstats,metadata[a]['stats'])
   
   mystatskeys = allstats.keys()
   mystatskeys.sort()
-  
+  if len(mystatskeys)==0:
+    next
+    
   targets = [name]
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
@@ -250,11 +265,14 @@ for name,meta in metadata.items():
   allmonitors = meta['monitors']
   for a in meta['hierarchy']:
     if 'monitors' in metadata[a]:
-      allmonitors.update(metadata[a]['monitors'])
+      update_no_overwrite(allmonitors,metadata[a]['monitors'])
   
   mymonitorskeys = allmonitors.keys()
   mymonitorskeys.sort()
   
+  if len(mymonitorskeys)==0:
+    next
+    
   targets = [name]
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
