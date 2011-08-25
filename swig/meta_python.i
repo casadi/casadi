@@ -40,6 +40,84 @@ template <> bool meta< int >::couldbe(PyObject * p) {
  return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) ;
 }
 
+
+/// std::vector<double>
+template<> char meta< std::vector< double > >::expected_message[] = "Expecting sequence(double)"; 
+template <>
+int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
+  NATIVERETURN(std::vector< double >,m)
+  if (is_array(p)) {
+    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT))
+      SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+    int size = array_size(p,0);
+    if (!array_is_native(p))
+      SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
+    // Make sure we have a contigous array with double datatype
+    int array_is_new_object;
+    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
+    if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
+    double* d=(double*) array->data;
+    
+    m.assign( d, d+size );
+    
+                  
+    // Free memory
+    if (array_is_new_object)
+      Py_DECREF(array); 
+    return true;
+  }
+  return meta< double >::as_vector(p,m);
+}
+
+template <> 
+bool meta< std::vector< double > >::couldbe(PyObject * p) {
+  return meta< std::vector< double > >::isa(p) || (is_array(p) && array_numdims(p)==1 && array_type(p)!=NPY_OBJECT) || (meta< double >::couldbe_sequence(p) && !is_array(p));
+}
+
+/// std::vector<int>
+template<> char meta< std::vector< int > >::expected_message[] = "Expecting sequence(integer) or 1D numpy.array of ints"; 
+template <>
+int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
+  NATIVERETURN(std::vector< int >,m)
+  if (is_array(p)) {
+    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT))
+      SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+    int size = array_size(p,0);
+    if (!array_is_native(p))
+      SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array byte order should be native.");
+      
+    int* d;
+    // Make sure we have a contigous array with int datatype
+    int array_is_new_object;
+    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
+    if (!array) { // Trying LONG
+      array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
+      if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "std::vector<int>: no luck converting numpy array to int. Better don't use unsigned datatypes."); }
+      long* temp=(long*) array_data(array);
+      d = new int[size];
+      m.resize(size);
+      for (int k=0;k<size;k++) m[k]=temp[k];
+      return true;
+    }
+    d=(int*) array_data(array);
+
+    m.assign( d, d+size );
+
+                  
+    // Free memory
+    if (array_is_new_object)
+      Py_DECREF(array); 
+    return true;
+  }
+  return meta< int >::as_vector(p,m);
+}
+
+template <> 
+bool meta< std::vector< int > >::couldbe(PyObject * p) {
+  return meta< std::vector< int > >::isa(p) || (is_array(p) && array_numdims(p)==1) || (meta< int >::couldbe_sequence(p) && !is_array(p));
+}
+
+
 /// double
 template<> char meta< double >::expected_message[] = "Expecting double";
 
@@ -295,7 +373,8 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     // Make sure we have a contigous array with double datatype
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-
+    if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
+    
     double* d=(double*) array->data;
     std::vector<double> v(d,d+size);
     
@@ -310,6 +389,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
+    if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
     int size=array_size(array,0); // number on non-zeros
     double* d=(double*) array->data;
     std::vector<double> v(d,d+size);
@@ -321,15 +401,14 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
 		
     // Construct the 'col' vector needed for initialising the correct sparsity
     PyObject * col = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
-    if (!(is_array(col) && array_numdims(col)==1 && array_type(col)==NPY_INT))
-      SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
+    if (!(is_array(col) && array_numdims(col)==1 && array_type(col)==NPY_INT)) { PyErr_Print(); SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");}
+    
     int* cold=(int*) array_data(col);
     std::vector<int> colv(cold,cold+size);
     
     // Construct the 'rowind' vector needed for initialising the correct sparsity
     PyObject * rowind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
-    if (!(is_array(rowind) && array_numdims(rowind)==1 && array_type(rowind)==NPY_INT))
-      SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
+    if (!(is_array(rowind) && array_numdims(rowind)==1 && array_type(rowind)==NPY_INT)) { PyErr_Print();   SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");}
     int* rowindd=(int*) array_data(rowind);
     std::vector<int> rowindv(rowindd,rowindd+(nrows+1));
     

@@ -64,10 +64,8 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::GenericType::Dictionary)
 #endif
 
-#ifdef SWIGOCTAVE
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
-#endif //SWIGOCTAVE
 
 %my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
 

@@ -328,5 +328,5 @@ bool PyIsSequence(PyObject* p) {
 #endif // SWIGPYTHON
 
 %{
-#define SWIG_Error_return(code, msg)  { SWIG_Error(code, msg); return 0; }
+#define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}

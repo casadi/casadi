@@ -564,5 +564,18 @@ class typemaptests(casadiTestCase):
   def test_array_cat(self):
     horzcat((symbolic("x",4,3),ones((4,3))))
     
+    
+  def test_issue(self):
+    self.message("std::vector<double> typemap.")
+    a = array([0,2,2,3])
+    b = array([0.738,0.39,0.99])
+    DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99])
+    DMatrix(3,4,[1,2,1],(0,2,2,3),[0.738,0.39,0.99])
+    DMatrix(3,4,[1,2,1],list(a),[0.738,0.39,0.99])
+    DMatrix(3,4,[1,2,1],a,[0.738,0.39,0.99])
+    DMatrix(3,4,[1,2,1],[0,2,2,3],(0.738,0.39,0.99))
+    DMatrix(3,4,[1,2,1],[0,2,2,3],list(b))
+    DMatrix(3,4,[1,2,1],[0,2,2,3],b)
+    
 if __name__ == '__main__':
     unittest.main()
