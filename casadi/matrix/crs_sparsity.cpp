@@ -105,6 +105,10 @@ int CRSSparsity::rowind(int row) const{
   return rowind().at(row);
 }
 
+void CRSSparsity::sanityCheck(bool complete) const { 
+  (*this)->sanityCheck(complete);
+}
+    
 void CRSSparsity::resize(int nrow, int ncol){
   if(nrow != size1() || ncol != size2()){
     if(nrow < size1() || ncol < size2()){
@@ -454,6 +458,55 @@ int CRSSparsity::sizeL() const{
 void CRSSparsityNode::repr(ostream &stream) const{
   stream << "Compressed Row Storage: " << nrow_ << "-by-" << ncol_ << " matrix, " << col_.size() << " structural non-zeros";
 }
+
+void CRSSparsityNode::sanityCheck(bool complete) const{
+  if (rowind_.size() != nrow_+1) {
+    std::stringstream s;
+    s << "CRSSparsityNode:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+    s << "  rowind.size() = nrow + 1, but got   rowind.size() = " << rowind_.size() << "   and   nrow = "  << nrow_ << std::endl;
+    s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+    throw CasadiException(s.str());
+  }
+  if (complete) {
+  
+    if (rowind_.size()>0) {
+      for (int k=1;k<rowind_.size();k++) {
+        if (rowind_[k]<rowind_[k-1]) {
+          throw CasadiException("CRSSparsityNode:Compressed Row Storage is not sane. rowind must be monotone. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
+        }
+      }
+      
+      if (rowind_[0]!=0) {
+        throw CasadiException("CRSSparsityNode:Compressed Row Storage is not sane. First element of rowind must be zero. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
+      }
+      if (rowind_[(rowind_.size()-1)]!=col_.size()) {
+        std::stringstream s;
+        s << "CRSSparsityNode:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+        s << "  rowind[lastElement] = col.size(), but got   rowind[lastElement] = " << rowind_[(rowind_.size()-1)] << "   and   col.size() = "  << col_.size() << std::endl;
+        s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+        throw CasadiException(s.str());
+      }
+      if (col_.size()>nrow_*ncol_) {
+        std::stringstream s;
+        s << "CRSSparsityNode:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+        s << "  col.size() <= nrow * ncol, but got   col.size()  = " << col_.size() << "   and   nrow * ncol = "  << nrow_*ncol_ << std::endl;
+        s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+        throw CasadiException(s.str());
+      }
+    }
+    for (int k=0;k<col_.size();k++) {
+      if (col_[k]>=ncol_ || col_[k] < 0) {
+        std::stringstream s;
+        s << "CRSSparsityNode:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+        s << "  0 <= col[i] < ncol for each i, but got   col[i] = " << col_[k] << "   and   ncol = "  << ncol_ << std::endl;
+        s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+        throw CasadiException(s.str());
+      }
+    }
+  
+  }
+}
+
 
 void CRSSparsityNode::print(ostream &stream) const{
   repr(stream);

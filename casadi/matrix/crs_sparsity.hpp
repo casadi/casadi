@@ -75,6 +75,12 @@ class CRSSparsity : public SharedObject{
     /// Construct a sparsity pattern from vectors
     CRSSparsity(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind);
 
+    /** \brief Check if the dimensions and rowind,col vectors are compatible.
+    * \param complete  set to true to also check elementwise
+    * throws an error as possible result
+    */
+    void sanityCheck(bool complete=false) const;
+    
     /// Create a diagonal matrix
     static CRSSparsity createDiagonal(int n);
     static CRSSparsity createDiagonal(int n, int m);
@@ -275,7 +281,13 @@ std::string __repr__() { return $self->getRepresentation(); }
 class CRSSparsityNode : public SharedObjectNode{
   public:
     /// Construct a sparsity pattern from vectors
-    CRSSparsityNode(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind){}
+    CRSSparsityNode(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
+    
+    /** \brief Check if the dimensions and rowind,col vectors are compatible.
+    * \param complete  set to true to also check elementwise
+    * throws an error as possible result
+    */
+    void sanityCheck(bool complete=false) const;
 
     /// Clone
     virtual CRSSparsityNode* clone() const{ return new CRSSparsityNode(*this); }

@@ -96,6 +96,12 @@ class Matrix : public PrintableObject{
     /// sparse matrix with a given sparsity and non-zero elements.
     Matrix(const CRSSparsity& sparsity, const std::vector<T>& d);
     
+    /** \brief Check if the dimensions and rowind,col vectors are compatible.
+    * \param complete  set to true to also check elementwise
+    * throws an error as possible result
+    */
+    void sanityCheck(bool complete=false) const;
+    
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
 
@@ -1084,6 +1090,7 @@ Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<i
   sparsity_ = CRSSparsity(n,m,col,rowind);
   if(data_.size() != sparsity_.size())
     data_.resize(sparsity_.size());
+  sanityCheck(true);
 }
 
 template<class T>
@@ -1747,6 +1754,18 @@ std::string Matrix<T>::dimString() const {
   std::stringstream ss;
   ss << "(" << size1() << " x " << size2() << " = " << numel() << " | " << size() << ")";
   return ss.str();
+}
+
+template<class T>
+void Matrix<T>::sanityCheck(bool complete) const {
+  sparsity_.sanityCheck(complete);
+  if (data_.size()!=sparsity_.col().size()) {
+      std::stringstream s;
+      s << "Matrix:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+      s << "  data.size() = ncol, but got   col.size()  = " << data_.size() << "   and   ncol = "  << sparsity_.col().size() << std::endl;
+      s << "  Note that the signature is as follows: DMatrix (nrow, ncol, col, rowind, data)." << std::endl;
+      throw CasadiException(s.str());
+  }
 }
 
 template<class T>
