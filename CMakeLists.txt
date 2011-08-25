@@ -92,11 +92,11 @@ if(SWIG_FOUND)
 add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
 if(WITH_SWIG_SPLIT)
 add_custom_target(python DEPENDS _casadi_core _casadi_noncore) # the python interface is created with the command "make python"
-#add_custom_target(octave DEPENDS _casadi_core _casadi_noncore) # the octave interface is created with the command "make octave"
-add_custom_target(octave DEPENDS casadi_octave) # the octave interface is created with the command "make octave"
+add_custom_target(octave DEPENDS casadi_core_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
+#add_custom_target(octave DEPENDS casadi_octave) # the octave interface is created with the command "make octave"
 else(WITH_SWIG_SPLIT)
 add_custom_target(python DEPENDS _casadi) # the python interface is created with the command "make python"
-add_custom_target(octave DEPENDS casadi_octave) # the octave interface is created with the command "make octave"
+add_custom_target(octave DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
 endif(WITH_SWIG_SPLIT)
 endif(SWIG_FOUND)
 

@@ -1,5 +1,4 @@
-casadi_interface
-global casadi = casadi_interface;
+1; % This is a script file
 
 function [y] = casadi_sqrt(x)
   y = x.sqrt();

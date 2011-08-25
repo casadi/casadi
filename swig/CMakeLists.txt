@@ -313,17 +313,21 @@ IF(PYTHONINTERP_FOUND)
 ENDIF(PYTHONINTERP_FOUND)
 
 # OCTAVE interface
+if(WITH_SWIG_SPLIT)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  SWIG_ADD_MODULE (${my_module}_octave octave ${my_module}.i octrun.swg)
+  SWIG_LINK_LIBRARIES (${my_module}_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
+  set_target_properties(${my_module}_octave PROPERTIES PREFIX "")
+  set_target_properties(${my_module}_octave PROPERTIES SUFFIX ".oct")
+  set_target_properties(${my_module}_octave PROPERTIES OUTPUT_NAME "${my_module}")
+endforeach()
+else(WITH_SWIG_SPLIT)
 SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
 SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml casadi )
 set_target_properties(casadi_octave PROPERTIES PREFIX "")
 set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
 set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
-
-ADD_CUSTOM_COMMAND(
- TARGET casadi_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/xcasadi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
-)
+endif(WITH_SWIG_SPLIT)
 
 # begin Patch swig to get concat functionality
 find_package(OCTAVE)
@@ -334,9 +338,9 @@ ADD_CUSTOM_COMMAND(
    OUTPUT octrun.swg
    COMMAND ${CMAKE_COMMAND} -E remove octrunORIG.swg octrun.swg
    COMMAND ${SWIG_EXECUTABLE} -octave -o octrunORIG.swg -co octrun.swg
-   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/swig_lib .
+   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/swig_lib .
    COMMAND ${OCTAVE_EXECUTABLE} -q octrun_patch.m
-   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/swig_lib/octrun_patch.m ${ORIG_SWIGDIR}/octave/octrun.swg
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/octave/swig_lib/octrun_patch.m ${ORIG_SWIGDIR}/octave/octrun.swg
 )
 ELSE(OCTAVE_FOUND)
 #Don't do anything
@@ -346,18 +350,49 @@ ADD_CUSTOM_COMMAND(
 )
 ENDIF(OCTAVE_FOUND)
 # end patch
- 
+
+if(WITH_SWIG_SPLIT)
+ADD_CUSTOM_COMMAND(
+ TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/@swig_ref ${LIBRARY_OUTPUT_PATH}/@swig_ref
+)
+ADD_CUSTOM_COMMAND(
+ TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E remove ${LIBRARY_OUTPUT_PATH}/casadi.oct
+)
+ADD_CUSTOM_COMMAND(
+ TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_multi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
+)
+ADD_CUSTOM_COMMAND(
+ TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
+)
+else(WITH_SWIG_SPLIT)
 ADD_CUSTOM_COMMAND(
  TARGET casadi_octave
  POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave ${LIBRARY_OUTPUT_PATH}/@swig_ref
+ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/@swig_ref ${LIBRARY_OUTPUT_PATH}/@swig_ref
 )
- 
- 
 ADD_CUSTOM_COMMAND(
  TARGET casadi_octave
  POST_BUILD
  COMMAND ${CMAKE_COMMAND} -E remove ${LIBRARY_OUTPUT_PATH}/casadi.oct
 )
+ADD_CUSTOM_COMMAND(
+ TARGET casadi_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_single.m ${LIBRARY_OUTPUT_PATH}/casadi.m
+)
+ADD_CUSTOM_COMMAND(
+ TARGET casadi_octave
+ POST_BUILD
+ COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
+)
+endif(WITH_SWIG_SPLIT)
 
 
