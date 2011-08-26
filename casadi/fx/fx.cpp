@@ -161,6 +161,7 @@ void FX::setNumOutputs(int num_out){
 }
 
 FX FX::jacobian(int iind, int oind){
+  casadi_assert(isInit());
   vector<pair<int,int> > jblocks;
   jblocks.push_back(pair<int,int>(oind,iind));
   
@@ -181,10 +182,12 @@ FX FX::jacobian(int iind, int oind){
 }
 
 FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+  casadi_assert(isInit());
   return (*this)->jacobian_switch(jblocks);
 }
 
 FX FX::hessian(int iind, int oind){
+  casadi_assert(isInit());
   return (*this)->hessian(iind,oind);  
 }
 
