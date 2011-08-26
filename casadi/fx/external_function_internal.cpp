@@ -112,7 +112,7 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 
 void ExternalFunctionInternal::evaluate(int nfdir, int nadir){
 #ifdef WITH_JIT 
-  int flag = evaluate_(&input_array_[0],&output_array_[0]);
+  int flag = evaluate_(vecptr(input_array_),vecptr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
 #endif // WITH_JIT 
 }

@@ -92,7 +92,7 @@ void LinearSolverInternal::solve(){
   copy(b.begin(),b.end(),x.begin());
   
   // Solve the factorized system
-  solve(&x[0],1,transpose_);
+  solve(vecptr(x),1,transpose_);
 }
  
 } // namespace CasADi

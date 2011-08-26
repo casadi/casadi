@@ -23,6 +23,8 @@
 #ifndef PRINTABLE_OBJECT_HPP
 #define PRINTABLE_OBJECT_HPP
 
+#include "casadi_common.hpp"
+
 #include <iostream>
 #include <string>
 #include <sstream>

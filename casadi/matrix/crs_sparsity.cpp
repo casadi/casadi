@@ -1118,7 +1118,7 @@ void CRSSparsity::enlargeColumns(int ncol, const std::vector<int>& jj){
 
 int CRSSparsity::depth_first_search(int j, int top, int *xi, int *pstack, const int *pinv){
   int i, p, p2, done, jnew, head = 0, *Gp, *Gi;
-  Gp = &rowindRef()[0] ; Gi = &colRef()[0];
+  Gp = vecptr(rowindRef()) ; Gi = vecptr(colRef());
   xi[0] = j;                // initialize the recursion stack
   while (head >= 0)
   {

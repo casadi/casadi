@@ -950,13 +950,13 @@ void eventIteration(OCP_old &ocp, bool forward){
   for(int iter=0; iter<maxiter; ++iter){
 
     // Save the old value
-    ocp.getArg(ocp.findVars(VAR_VD),&old_v[0]);
+    ocp.getArg(ocp.findVars(VAR_VD),vecptr(old_v));
 
     // solve for the new v
-    ocp.function(SWITCH).eval(&new_v[0]);
+    ocp.function(SWITCH).eval(vecptr(new_v));
     for(int i=0; i<nv_; ++i)
       new_v[i] = new_v[i]>=0;
-    ocp.setArg(ocp.findVars(VAR_V),&new_v[0]);
+    ocp.setArg(ocp.findVars(VAR_V),vecptr(new_v));
 
         // Return if all variables are equal
     bool all_equal = true;

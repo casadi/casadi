@@ -216,14 +216,14 @@ void OOQPInternal::allocate() {
 
   // Set all pointers to problem data
   prob = (QpGenData * )qp->makeData( &input(QP_G).data()[0],
-                         &Hl_rowind[0],  &Hl_col[0],  &Hl.data()[0],
-                          &LBX.data()[0],  &ixlow[0],
-                         &UBX.data()[0],  &ixupp[0],
-                       &eq_rowind[0], &eq_col[0],  &A_eq.data()[0],
+                         vecptr(Hl_rowind),  vecptr(Hl_col),  &Hl.data()[0],
+                          &LBX.data()[0],  vecptr(ixlow),
+                         &UBX.data()[0],  vecptr(ixupp),
+                       vecptr(eq_rowind), vecptr(eq_col),  &A_eq.data()[0],
                       &BA_eq.data()[0],
-                       &ineq_rowind[0], &ineq_col[0],  &A_ineq.data()[0],
-                        &LBA_ineq.data()[0],  &iclow[0],
-                       &UBA_ineq.data()[0],  &icupp[0]);
+                       vecptr(ineq_rowind), vecptr(ineq_col),  &A_ineq.data()[0],
+                        &LBA_ineq.data()[0],  vecptr(iclow),
+                       &UBA_ineq.data()[0],  vecptr(icupp));
 
     
   // Further setup of the QP problem

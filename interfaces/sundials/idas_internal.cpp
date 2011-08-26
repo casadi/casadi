@@ -186,7 +186,7 @@ void IdasInternal::init(){
   if(hasSetOption("abstolv")){
     // Vector absolute tolerances
     vector<double> abstolv = getOption("abstolv").toDoubleVector();
-    N_Vector nv_abstol = N_VMake_Serial(abstolv.size(),&abstolv[0]);
+    N_Vector nv_abstol = N_VMake_Serial(abstolv.size(),vecptr(abstolv));
     flag = IDASVtolerances(mem_, reltol_, nv_abstol);
     casadi_assert_message(flag == IDA_SUCCESS,"IDASVtolerances");
     N_VDestroy_Serial(nv_abstol);
@@ -337,7 +337,7 @@ void IdasInternal::init(){
     if(finite_difference_fsens_){
       
       // Use finite differences to calculate the residual in the forward sensitivity equations
-      flag = IDASensInit(mem_,nfdir_,ism_,0,&yS_[0],&yPS_[0]);
+      flag = IDASensInit(mem_,nfdir_,ism_,0,vecptr(yS_),vecptr(yPS_));
       if(flag != IDA_SUCCESS) idas_error("IDASensInit",flag);
 
       // Scaling factors
@@ -345,7 +345,7 @@ void IdasInternal::init(){
       vector<double> pbar_vec;
       if(hasSetOption("fsens_scaling_factors")){
         pbar_vec = getOption("fsens_scaling_factors").toDoubleVector();
-        pbar = &pbar_vec[0];
+        pbar = vecptr(pbar_vec);
       }
       
       // Which parameters should be used to estimate the sensitivity equations
@@ -353,7 +353,7 @@ void IdasInternal::init(){
       vector<int> plist_vec;
       if(hasSetOption("fsens_sensitiviy_parameters")){
         plist_vec = getOption("fsens_sensitiviy_parameters").toIntVector();
-        plist = &plist_vec[0];
+        plist = vecptr(plist_vec);
       }
 
       // Specify parameters
@@ -385,13 +385,13 @@ void IdasInternal::init(){
     if(hasSetOption("fsens_abstolv")){
       // quick hack
       vector<double> fsens_abstolv = getOption("fsens_abstolv");
-      N_Vector nv_abstol = N_VMake_Serial(fsens_abstolv.size(),&fsens_abstolv[0]);
+      N_Vector nv_abstol = N_VMake_Serial(fsens_abstolv.size(),vecptr(fsens_abstolv));
       vector<N_Vector> nv_abstol_all(nfdir_,nv_abstol);
-      flag = IDASensSVtolerances(mem_,fsens_reltol_,&nv_abstol_all[0]);
+      flag = IDASensSVtolerances(mem_,fsens_reltol_,vecptr(nv_abstol_all));
       if(flag != IDA_SUCCESS) idas_error("IDASensSVtolerances",flag);
       N_VDestroy_Serial(nv_abstol);
     } else {
-      flag = IDASensSStolerances(mem_,fsens_reltol_,&fsens_abstol[0]);
+      flag = IDASensSStolerances(mem_,fsens_reltol_,vecptr(fsens_abstol));
       if(flag != IDA_SUCCESS) idas_error("IDASensSStolerances",flag);
     }
 
@@ -402,11 +402,11 @@ void IdasInternal::init(){
 
     // Quadrature equations
     if(nq_>0){
-      flag = IDAQuadSensInit(mem_, rhsQS_wrapper, &yQS_[0]);
+      flag = IDAQuadSensInit(mem_, rhsQS_wrapper, vecptr(yQS_));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensInit",flag);
       
       // Set tolerances
-      flag = IDAQuadSensSStolerances(mem_,fsens_reltol_,&fsens_abstol[0]);
+      flag = IDAQuadSensSStolerances(mem_,fsens_reltol_,vecptr(fsens_abstol));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensSStolerances",flag);
     }
     
@@ -735,12 +735,12 @@ void IdasInternal::reset(int fsens_order, int asens_order){
     }
     
     // Re-initialize sensitivities
-    flag = IDASensReInit(mem_,ism_,&yS_[0],&yPS_[0]);
+    flag = IDASensReInit(mem_,ism_,vecptr(yS_),vecptr(yPS_));
     if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
     log("IdasInternal::reset","re-initialized forward sensitivity solution");
 
     if(nq_>0){
-      flag = IDAQuadSensReInit(mem_, &yQS_[0]);
+      flag = IDAQuadSensReInit(mem_, vecptr(yQS_));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
       log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
     }
@@ -848,12 +848,12 @@ void IdasInternal::integrate(double t_out){
     
     if(fsens_order_>0){
       // Get the sensitivities
-      flag = IDAGetSens(mem_,&t_, &yS_[0]);
+      flag = IDAGetSens(mem_,&t_, vecptr(yS_));
       if(flag != IDA_SUCCESS) idas_error("IDAGetSens",flag);
     
       if(nq_>0){
         double tret;
-        flag = IDAGetQuadSens(mem_, &tret, &yQS_[0]);
+        flag = IDAGetQuadSens(mem_, &tret, vecptr(yQS_));
         if(flag != IDA_SUCCESS) idas_error("IDAGetQuadSens",flag);
       }
     }

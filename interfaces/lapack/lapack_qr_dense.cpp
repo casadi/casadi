@@ -73,7 +73,7 @@ void LapackQRDenseInternal::prepare(){
   // Factorize the matrix
   int info = -100;
   int lwork = work_.size();
-  dgeqrf_(&nrow_, &nrow_, &mat_[0], &nrow_, &tau_[0], &work_[0], &lwork, &info);
+  dgeqrf_(&nrow_, &nrow_, vecptr(mat_), &nrow_, vecptr(tau_), vecptr(work_), &lwork, &info);
   if(info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ failed to factorize the jacobian");
 
   // Success if reached this point
@@ -97,20 +97,20 @@ void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose){
   if(transpose){
     // Multiply by transpose(Q)
     int info = 100;
-    dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, &mat_[0], &nrow_, &tau_[0], x, &nrow_, &work_[0], &lwork, &info);
+    dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, vecptr(mat_), &nrow_, vecptr(tau_), x, &nrow_, vecptr(work_), &lwork, &info);
     if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
 
     // Solve for R
-    dtrsm_(&sideR, &uploR, &transR, &diagR, &nrow_, &nrhs, &alphaR, &mat_[0], &nrow_, x, &nrow_);
+    dtrsm_(&sideR, &uploR, &transR, &diagR, &nrow_, &nrhs, &alphaR, vecptr(mat_), &nrow_, x, &nrow_);
 
   } else {
   
     // Solve for transpose(R)
-    dtrsm_(&sideR, &uploR, &transR, &diagR, &nrow_, &nrhs, &alphaR, &mat_[0], &nrow_, x, &nrow_);
+    dtrsm_(&sideR, &uploR, &transR, &diagR, &nrow_, &nrhs, &alphaR, vecptr(mat_), &nrow_, x, &nrow_);
     
     // Multiply by Q
     int info = 100;
-    dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, &mat_[0], &nrow_, &tau_[0], x, &nrow_, &work_[0], &lwork, &info);
+    dormqr_(&sideQ, &transQ, &nrow_, &nrhs, &k, vecptr(mat_), &nrow_, vecptr(tau_), x, &nrow_, vecptr(work_), &lwork, &info);
     if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
   }
 }

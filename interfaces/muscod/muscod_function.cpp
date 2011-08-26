@@ -26,7 +26,7 @@ void getFunctionPtrs<0>(muscodFunctionPtr* v){
 vector<muscodFunctionPtr> MuscodFunction::generate_functions(){
   // Generate list of pointers
   vector<muscodFunctionPtr> v(MAX_NUM_INSTANCES);
-  getFunctionPtrs<MAX_NUM_INSTANCES>(&v[0]);
+  getFunctionPtrs<MAX_NUM_INSTANCES>(vecptr(v));
   return v;
 }
 
