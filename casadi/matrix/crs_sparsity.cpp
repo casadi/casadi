@@ -22,6 +22,7 @@
 
 #include "crs_sparsity.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../pre_c99_support.hpp"
 #include <climits>
 
 using namespace std;

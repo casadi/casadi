@@ -1180,7 +1180,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         // Print when entering a new decade
         if(progress_new / 10 > progress / 10){
           progress = progress_new;
-          cout << progress << " \%"  << endl;
+          cout << progress << " %%"  << endl;
         }
       }
       
@@ -1304,7 +1304,7 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         // Print when entering a new decade
         if(progress_new / 10 > progress / 10){
           progress = progress_new;
-          cout << progress << " \%"  << endl;
+          cout << progress << " %%"  << endl;
         }
       }
       

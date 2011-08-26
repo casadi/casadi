@@ -25,6 +25,7 @@
 
 #include "shared_object.hpp"
 #include "casadi_types.hpp"
+#include "pre_c99_support.hpp"
 #include <string>
 #include <vector>
 

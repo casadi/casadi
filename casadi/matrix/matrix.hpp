@@ -28,15 +28,11 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../casadi_operators.hpp"
+#include "../pre_c99_support.hpp"
 #include "slice.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
-
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning (disable:4996)
-#pragma warning (disable:4018)
-#endif
 
 namespace CasADi{
   

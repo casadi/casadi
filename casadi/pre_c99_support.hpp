@@ -23,6 +23,18 @@
 #ifndef PRE_C99_SUPPORT_HPP
 #define PRE_C99_SUPPORT_HPP
 
+// Disable some Visual studio warnings
+#ifdef _MSC_VER
+
+#pragma warning (disable:4996)
+
+// warning C4018: '<' : signed/unsigned mismatch
+#pragma warning (disable:4018)
+
+// warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
+#pragma warning (disable:4800)
+#endif
+
 #if __STDC_VERSION__ < 199901L
 // pre-C99
 int isnan(double x) throw();

@@ -270,7 +270,7 @@ GenericType::GenericType(const Dictionary& dict){
   assignNode(new GenericTypeInternal<Dictionary>(dict));
 }
 
-GenericType::operator const Dictionary& () const{
+GenericType::operator const GenericType::Dictionary& () const{
   casadi_assert_message(is_a<Dictionary>(),"type mismatch");
   return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
 }
