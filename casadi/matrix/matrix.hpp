@@ -28,7 +28,6 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../casadi_operators.hpp"
-#include "../pre_c99_support.hpp"
 #include "slice.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
