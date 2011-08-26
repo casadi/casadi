@@ -2,13 +2,7 @@
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509
 
-#ifdef WITH_DOXDOC
-%include "../doc/doc.i"
-#endif 
-
-#ifndef WITH_DOXDOC
-//#warning "Not using doxygen. Run /doc/doc2swig.sh to include it. A make rebuild-cache may be necessary."
-#endif
+%include "doc.i"
 
 %feature("autodoc", "1");
 
