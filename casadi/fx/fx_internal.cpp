@@ -59,7 +59,7 @@ void FXInternal::init(){
   nfdir_ = getOption("number_of_fwd_dir");
   nadir_ = getOption("number_of_adj_dir");
   verbose_ = getOption("verbose");
-  store_jacobians_ = getOption("verbose");
+  store_jacobians_ = getOption("store_jacobians");
   numeric_jacobian_ = getOption("numeric_jacobian");
   jac_for_sens_ = getOption("jac_for_sens");
 
