@@ -205,7 +205,7 @@ for name,meta in metadata.items():
   
   myoptionskeys = alloptions.keys()
   if len(myoptionskeys)==0:
-    next
+    continue
   myoptionskeys.sort()
   
   targets = [name]
@@ -238,7 +238,7 @@ for name,meta in metadata.items():
   mystatskeys = allstats.keys()
   mystatskeys.sort()
   if len(mystatskeys)==0:
-    next
+    continue
     
   targets = [name]
   if 'InternalFor' in meta:
@@ -271,7 +271,7 @@ for name,meta in metadata.items():
   mymonitorskeys.sort()
   
   if len(mymonitorskeys)==0:
-    next
+    continue
     
   targets = [name]
   if 'InternalFor' in meta:

@@ -270,32 +270,34 @@
 */
 /** \class CasADi::Sundials::CVodesInternal
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::IpoptQPInternal
@@ -436,32 +438,34 @@
 */
 /** \class CasADi::IntegratorInternal
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::Integrator
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::CplexInternal
@@ -510,32 +514,34 @@
 */
 /** \class CasADi::Sundials::IdasInternal
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::OCPSolverInternal
@@ -560,31 +566,33 @@
 */
 /** \class CasADi::GSL::GslInternal
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::GSL::GslIntegrator
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */

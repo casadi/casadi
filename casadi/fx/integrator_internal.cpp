@@ -30,8 +30,8 @@
 #include "mx_function.hpp"
 #include "sx_function.hpp"
 
-INPUTSCHEME(DAEInput)
-OUTPUTSCHEME(DAEOutput)
+INPUTSCHEME(IntegratorInput)
+OUTPUTSCHEME(IntegratorInput)
 
 using namespace std;
 namespace CasADi{
