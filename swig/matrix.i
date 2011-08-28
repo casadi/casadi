@@ -49,11 +49,11 @@
         return (self.size1(),self.size2())
         
     def reshape(self,arg):
-        return reshape(self,arg)
+        return _casadi_global.reshape(self,arg)
         
     @property
     def T(self):
-        return trans(self)
+        return _casadi_global.trans(self)
         
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:
@@ -194,7 +194,6 @@ void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
 }
 }
 
-
 #ifdef SWIGPYTHON
 namespace CasADi{
 %extend Matrix<double> {
@@ -214,39 +213,21 @@ PyObject* arrayView() {
 
 
     #ifdef SWIGPYTHON
-    #ifdef WITH_SWIG_SPLIT
 
     %pythoncode %{
       def __lt__(self,other):
-        return _casadi_core.__lt__(self,other)
+        return _casadi_global.__lt__(self,other)
       def __le__(self,other):
-        return _casadi_core.__le__(self,other)
+        return _casadi_global.__le__(self,other)
       def __eq__(self,other):
-        return _casadi_core.__eq__(self,other)
+        return _casadi_global.__eq__(self,other)
       def __ne__(self,other):
-        return _casadi_core.__ne__(self,other)
+        return _casadi_global.__ne__(self,other)
       def __gt__(self,other):
-        return _casadi_core.__gt__(self,other)
+        return _casadi_global.__gt__(self,other)
       def __ge__(self,other):
-        return _casadi_core.__ge__(self,other)
+        return _casadi_global.__ge__(self,other)
     %}
-    #endif // WITH_SWIG_SPLIT
-    #ifndef WITH_SWIG_SPLIT
-    %pythoncode %{
-      def __lt__(self,other):
-        return _casadi.__lt__(self,other)
-      def __le__(self,other):
-        return _casadi.__le__(self,other)
-      def __eq__(self,other):
-        return _casadi.__eq__(self,other)
-      def __ne__(self,other):
-        return _casadi.__ne__(self,other)
-      def __gt__(self,other):
-        return _casadi.__gt__(self,other)
-      def __ge__(self,other):
-        return _casadi.__ge__(self,other)
-    %}
-    #endif // WITH_SWIG_SPLIT
     #endif // SWIGPYTHON
     
 %pythoncode %{

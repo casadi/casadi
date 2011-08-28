@@ -143,39 +143,20 @@ namespace CasADi {
 %extend SX {
 #ifdef SWIGPYTHON
 
-    #ifdef WITH_SWIG_SPLIT
-
     %pythoncode %{
       def __lt__(self,other):
-        return _casadi_core.__lt__(self,other)
+        return _casadi_global.__lt__(self,other)
       def __le__(self,other):
-        return _casadi_core.__le__(self,other)
+        return _casadi_global.__le__(self,other)
       def __eq__(self,other):
-        return _casadi_core.__eq__(self,other)
+        return _casadi_global.__eq__(self,other)
       def __ne__(self,other):
-        return _casadi_core.__ne__(self,other)
+        return _casadi_global.__ne__(self,other)
       def __gt__(self,other):
-        return _casadi_core.__gt__(self,other)
+        return _casadi_global.__gt__(self,other)
       def __ge__(self,other):
-        return _casadi_core.__ge__(self,other)
+        return _casadi_global.__ge__(self,other)
     %}
-    #endif // WITH_SWIG_SPLIT
-    #ifndef WITH_SWIG_SPLIT
-    %pythoncode %{
-      def __lt__(self,other):
-        return _casadi.__lt__(self,other)
-      def __le__(self,other):
-        return _casadi.__le__(self,other)
-      def __eq__(self,other):
-        return _casadi.__eq__(self,other)
-      def __ne__(self,other):
-        return _casadi.__ne__(self,other)
-      def __gt__(self,other):
-        return _casadi.__gt__(self,other)
-      def __ge__(self,other):
-        return _casadi.__ge__(self,other)
-    %}
-    #endif // WITH_SWIG_SPLIT
   
   %python_array_wrappers(1000.0)
   
@@ -209,45 +190,26 @@ namespace CasADi {
   binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
 
 };
-  
+
 %extend Matrix<SX>{
     // The constructor has to be added since SX::operator Matrix<SX does not work
     // Matrix<SX>(const SX&){ 
    
     #ifdef SWIGPYTHON
-    #ifdef WITH_SWIG_SPLIT
-
     %pythoncode %{
       def __lt__(self,other):
-        return _casadi_core.__lt__(self,other)
+        return _casadi_global.__lt__(self,other)
       def __le__(self,other):
-        return _casadi_core.__le__(self,other)
+        return _casadi_global.__le__(self,other)
       def __eq__(self,other):
-        return _casadi_core.__eq__(self,other)
+        return _casadi_global.__eq__(self,other)
       def __ne__(self,other):
-        return _casadi_core.__ne__(self,other)
+        return _casadi_global.__ne__(self,other)
       def __gt__(self,other):
-        return _casadi_core.__gt__(self,other)
+        return _casadi_global.__gt__(self,other)
       def __ge__(self,other):
-        return _casadi_core.__ge__(self,other)
+        return _casadi_global.__ge__(self,other)
     %}
-    #endif // WITH_SWIG_SPLIT
-    #ifndef WITH_SWIG_SPLIT
-    %pythoncode %{
-      def __lt__(self,other):
-        return _casadi.__lt__(self,other)
-      def __le__(self,other):
-        return _casadi.__le__(self,other)
-      def __eq__(self,other):
-        return _casadi.__eq__(self,other)
-      def __ne__(self,other):
-        return _casadi.__ne__(self,other)
-      def __gt__(self,other):
-        return _casadi.__gt__(self,other)
-      def __ge__(self,other):
-        return _casadi.__ge__(self,other)
-    %}
-    #endif // WITH_SWIG_SPLIT
     #endif // SWIGPYTHON
     
     %python_matrix_convertors

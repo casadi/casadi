@@ -272,6 +272,7 @@ void dummy(CasADi::SX foo,
 	std::vector<CasADi::SX> foo7,
 	std::vector< std::vector<CasADi::SX> > foo8,
 	CasADi::Matrix<CasADi::SX> foo9,
+	CasADi::GenericType foo10,
 	int &bar,
 	double &baz) {}
 };
@@ -288,6 +289,7 @@ void dummy(CasADi::SX foo,
 	std::vector<CasADi::SX> foo7,
 	std::vector< std::vector<CasADi::SX> > foo8,
 	CasADi::Matrix<CasADi::SX> foo9,
+  CasADi::GenericType foo10,
 	int &bar,
 	double &baz);
 };

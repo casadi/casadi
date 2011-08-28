@@ -1,9 +1,11 @@
-casadi_core
+casadi_main
+casadi_primitive
+casadi_primitive_tools
 casadi_noncore
 
 global casadi = struct();
-names = {'casadi_core', 'casadi_noncore'};
-interfaces = { casadi_core casadi_noncore};
+names = {'casadi_main','casadi_primitive','casadi_primitive_tools', 'casadi_noncore'};
+interfaces = { casadi_main casadi_primitive casadi_primitive_tools casadi_noncore};
 
 for i=1:numel(names)
   name = names{i};

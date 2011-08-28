@@ -10,18 +10,6 @@
 
 %template(sparsity_vector) std::vector<CasADi::CRSSparsity>;
 
-#ifdef SWIGPYTHON
-%{
-template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX> > >::name = &SWIGTYPE_p_std__pairT_CasADi__MX_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t_t;
-%}
-
-%meta_pair(CasADi::MX, std::vector< CasADi::MX >)
-%typemap(out) std::pair< CasADi::MX, std::vector< CasADi::MX >  > {
-    bool ret = meta< std::pair< CasADi::MX, std::vector< CasADi::MX >  > >::toPython($1,$result);
-    if (!ret) SWIG_exception_fail(SWIG_TypeError,"Could not convert to (MX,std::vector<MX>)");
-}
-#endif //SWIGPYTHON
-
 %extend CasADi::MX{
   %python_matrix_helpers(CasADi::MX)
   #ifdef SWIGPYTHON
@@ -37,7 +25,4 @@ template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX
   binopsrFull(CasADi::MX)
 };
 
-
-
-%include "casadi/mx/mx_tools.hpp"
 

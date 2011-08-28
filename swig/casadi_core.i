@@ -9,6 +9,3 @@
 // SX, Matrix, MX
 %include "casadi_primitive.i"
 
-// tools for SX, matrix, MX
-%include "casadi_primitive_tools.i"
-

@@ -3,8 +3,9 @@
 
 %include "common.i"
 
-%import "casadi_core.i"
+%import "casadi_primitive_tools.i"
 #endif //WITH_SWIG_SPLIT
+
 
 // FX
 %include "casadi_fx.i"
