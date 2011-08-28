@@ -14,9 +14,12 @@
 %include "std_vector.i"
 %include "std_pair.i"
 
+
+
+#ifdef SWIG_MAIN_MODULE
 %template(StringVector) std::vector<std::string>;
 
-%template(BVector)             std::vector<bool>;
+%template(BVector)             std::vector<bool> ;
 %template(BVectorVector)       std::vector<std::vector<bool> > ;
 %template(BVectorVectorVector) std::vector< std::vector<std::vector<bool> > > ;
 
@@ -30,8 +33,24 @@
 
 %template(Pair_Int_Int) std::pair<int,int>;
 %template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
+#endif //SWIG_MAIN_MODULE
+#ifndef SWIG_MAIN_MODULE
+%template() std::vector<std::string>;
 
+%template() std::vector<std::vector<bool> > ;
+%template() std::vector< std::vector<std::vector<bool> > > ;
 
+%template() std::vector<int>;
+%template() std::vector<std::vector<int> > ;
+%template() std::vector< std::vector<std::vector<int> > > ;
+
+%template() std::vector<double>;
+%template() std::vector<std::vector<double> > ;
+%template() std::vector< std::vector<std::vector<double> > > ;
+
+%template() std::pair<int,int>;
+%template() std::vector< std::pair<int,int> >;
+#endif //SWIG_MAIN_MODULE
 
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
@@ -243,11 +262,11 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 %{
 namespace std {
-void dummy(CasADi::SX foo, int &bar, double &baz) {}
+void dummy(CasADi::SX foo, std::vector< std::vector<double> > foo1, std::vector<double> &foo2, std::vector<CasADi::MX> &foo3, int &bar, double &baz) {}
 };
 %}
 
 namespace std {
-void dummy(CasADi::SX foo, int &bar, double &baz);
+void dummy(CasADi::SX foo, std::vector< std::vector<double> > foo1, std::vector<double> &foo2, std::vector<CasADi::MX> &foo3, int &bar, double &baz);
 };
 

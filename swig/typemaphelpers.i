@@ -218,6 +218,8 @@ void PyDECREFParent(PyObject* self) {
 %}
 #endif // SWIGPYTHON
 
+
+#ifndef WITH_SWIG_SPLIT
 // Create an output typemap for a ref such that ownership is implied
 // The following text is obsolete:
 // We make use of SWIG_POINTER_OWN to ensure that the "delete_*" routine is called, where we have put another hook via %unrefobject.
@@ -236,9 +238,38 @@ void PyDECREFParent(PyObject* self) {
 %pythoncode%{
     def __del__(self):
       _casadi.PyDECREFParent(self)
+
 %}
+
 }
 %enddef
+#endif //WITH_SWIG_SPLIT
+
+#ifdef WITH_SWIG_SPLIT
+// Create an output typemap for a ref such that ownership is implied
+// The following text is obsolete:
+// We make use of SWIG_POINTER_OWN to ensure that the "delete_*" routine is called, where we have put another hook via %unrefobject.
+// We do not really imply that this SWIG objects owns the pointer
+// We are actually abusing the term SWIG_POINTER_OWN: a non-const ref is usually created with SWIG_NewPointerObj(..., 0 |  0 )
+%define %outputRefOwn(Type)
+%typemap(out) Type & {
+   $result = SWIG_NewPointerObj($1, *meta< Type >::name, 0 |  0 );
+   PySetParent($result, obj0);
+}
+%typemap(out) const Type & {
+   $result = swig::from(static_cast< Type * >($1));
+   PySetParent($result, obj0);
+}
+%extend Type {
+%pythoncode%{
+    def __del__(self):
+      _casadi_core.PyDECREFParent(self)
+
+%}
+
+}
+%enddef
+#endif //WITH_SWIG_SPLIT
 
 %inline %{
 /// std::vector< Type >

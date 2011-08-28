@@ -15,9 +15,3 @@
 // tools for SX, matrix, MX
 %include "casadi_primitive_tools.i"
 
-// FX
-%include "casadi_fx.i"
-
-// optimal_control
-%include "casadi_optimal_control.i"
-

@@ -19,8 +19,14 @@
 %include "casadi/matrix/slice.hpp"
 
 %include "casadi/matrix/matrix.hpp"
+#ifdef SWIG_MAIN_MODULE
 %template(IMatrix)             CasADi::Matrix<int>;
 %template(DMatrix)             CasADi::Matrix<double>;
+#endif //SWIG_MAIN_MODULE
+#ifndef SWIG_MAIN_MODULE
+%template()             CasADi::Matrix<int>;
+%template()             CasADi::Matrix<double>;
+#endif //SWIG_MAIN_MODULE
 
 %include "casadi/sx/sx.hpp"
 
@@ -289,9 +295,16 @@ namespace CasADi {
 
 
 
-
+#ifdef SWIG_MAIN_MODULE
 %template(SXVector)             std::vector<CasADi::SX>;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
 %template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
 %template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
+#endif //SWIG_MAIN_MODULE
+#ifndef SWIG_MAIN_MODULE
+%template() std::vector<CasADi::SX>;
+%template() std::vector<std::vector<CasADi::SX> > ;
+%template() std::vector< std::vector<std::vector<CasADi::SX> > > ;
+%template() CasADi::Matrix<CasADi::SX>;
+#endif //SWIG_MAIN_MODULE
 

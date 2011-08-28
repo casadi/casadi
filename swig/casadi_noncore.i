@@ -1,14 +1,18 @@
+#ifdef WITH_SWIG_SPLIT
 %module casadi_noncore
 
 %include "common.i"
 
 %import "casadi_core.i"
+#endif //WITH_SWIG_SPLIT
 
-//%import(module="casadi_core.i") "casadi/sx/sx.hpp"
+// FX
+%include "casadi_fx.i"
 
-//namespace CasADi {
-//  class SX;
-//};
+// optimal_control
+%include "casadi_optimal_control.i"
 
 // interfaces
 %include "casadi_interfaces.i"
+
+
