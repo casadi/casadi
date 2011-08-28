@@ -258,7 +258,8 @@ sigma = symbolic("sigma")
 
 # Lagrangian function (move to NLP solver!)
 lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])
-  
+lfcn.init()
+
 # Hessian of the Lagrangian
 HL = lfcn.hessian()
 
