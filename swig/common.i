@@ -278,6 +278,19 @@ void dummy(CasADi::SX foo,
 };
 %}
 
+#ifdef SWIGPYTHON
+#ifdef WITH_SWIG_SPLIT
+%pythoncode %{
+import _casadi_main as _casadi_main_module
+%}
+#endif // WITH_SWIG_SPLIT
+#ifndef WITH_SWIG_SPLIT
+%pythoncode %{
+_casadi_main_module = _casadi
+%}
+#endif // WITH_SWIG_SPLIT
+#endif // SWIGPYTHON
+
 namespace std {
 void dummy(CasADi::SX foo,
 	std::vector< std::vector<double> > foo1,

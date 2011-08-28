@@ -16,6 +16,9 @@ endif(MPI_FOUND)
 
 set(CASADI_SWIG_FLAGS "")
 
+# Find SWIG and include the use swig file
+include (../cmake_modules/UseSWIGMOD.cmake)
+
 if(WITH_PRINTME)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_PRINTME")
 endif(WITH_PRINTME)
@@ -100,8 +103,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DOXDOC")
 endif()
 
-# Find SWIG and include the use swig file
-include (${SWIG_USE_FILE})
+
 
 # Find python library and add include path for python headers
 find_package (PythonLibs REQUIRED)
@@ -138,28 +140,25 @@ set(CASADI_SWIG_SEPARATE_MODULES casadi_main casadi_primitive casadi_primitive_t
 
 #set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-noproxydel") # This should be active during python, and nonactive during octave. How?
 
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DPy_USING_UNICODE")
+set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
+set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
+
 
 if(WITH_SWIG_SPLIT)
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SWIG_SPLIT")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE}")
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-set_source_files_properties (${my_module}.i  PROPERTIES
-  SWIG_FLAGS "${CASADI_SWIG_FLAGS}"
-  CPLUSPLUS ON
-)
+set_source_files_properties (${my_module}.i  PROPERTIES  CPLUSPLUS ON)
 endforeach()
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_MAIN_MODULE")
-set_source_files_properties (${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES
- SWIG_FLAGS "${CASADI_SWIG_FLAGS}"
-)
+set_source_files_properties (${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
 else(WITH_SWIG_SPLIT)
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_MAIN_MODULE")
 set_source_files_properties (casadi.i PROPERTIES
-  SWIG_FLAGS "${CASADI_SWIG_FLAGS}"
+  SWIG_FLAGS "-DSWIG_MAIN_MODULE"
   CPLUSPLUS ON
 )
 endif(WITH_SWIG_SPLIT)
+
+set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 
 # PYTHON interface
 if(WITH_SWIG_SPLIT)
