@@ -1,6 +1,6 @@
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
-#pragma SWIG nowarn=509
+#pragma SWIG nowarn=509,303
 
 %include "doc.i"
 
@@ -262,11 +262,33 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 %{
 namespace std {
-void dummy(CasADi::SX foo, std::vector< std::vector<double> > foo1, std::vector<double> &foo2, std::vector<CasADi::MX> &foo3, int &bar, double &baz) {}
+void dummy(CasADi::SX foo,
+	std::vector< std::vector<double> > foo1,
+	std::vector<double> &foo2,
+	std::vector<CasADi::MX> &foo3,
+	CasADi::MX foo4,
+	CasADi::Matrix<double> foo5,
+	CasADi::CRSSparsity foo6,
+	std::vector<CasADi::SX> foo7,
+	std::vector< std::vector<CasADi::SX> > foo8,
+	CasADi::Matrix<CasADi::SX> foo9,
+	int &bar,
+	double &baz) {}
 };
 %}
 
 namespace std {
-void dummy(CasADi::SX foo, std::vector< std::vector<double> > foo1, std::vector<double> &foo2, std::vector<CasADi::MX> &foo3, int &bar, double &baz);
+void dummy(CasADi::SX foo,
+	std::vector< std::vector<double> > foo1,
+	std::vector<double> &foo2,
+	std::vector<CasADi::MX> &foo3,
+	CasADi::MX foo4,
+	CasADi::Matrix<double> foo5,
+	CasADi::CRSSparsity foo6,
+	std::vector<CasADi::SX> foo7,
+	std::vector< std::vector<CasADi::SX> > foo8,
+	CasADi::Matrix<CasADi::SX> foo9,
+	int &bar,
+	double &baz);
 };
 

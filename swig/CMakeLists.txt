@@ -132,8 +132,8 @@ set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_l
 
 # SEPARATE_ARGUMENTS(CASADI_SWIG_FLAGS)
 
-set(CASADI_SWIG_MAIN_MODULE casadi_core)
-set(CASADI_SWIG_SEPARATE_MODULES casadi_core casadi_noncore)
+set(CASADI_SWIG_MAIN_MODULE casadi_main)
+set(CASADI_SWIG_SEPARATE_MODULES casadi_main casadi_core casadi_noncore)
 
 #set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-noproxydel") # This should be active during python, and nonactive during octave. How?
 
