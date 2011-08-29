@@ -28,6 +28,6 @@ class PyFunction(CFunction):
 %}
 
 %{
-#include "python_function.h"
+#include "swig/python_function.h"
 %}
-%include "python_function.h"
+%include "swig/python_function.h"

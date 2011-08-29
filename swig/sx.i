@@ -243,7 +243,7 @@ namespace CasADi {
 
 #ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
-#include <numpy/arrayobject.h>
+#include <arrayobject.h>
 #endif // WITH_NUMPY
 
 // Template instantiations

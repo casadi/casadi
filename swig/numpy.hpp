@@ -1,5 +1,5 @@
 #include "stdio.h"
-#include <numpy/arrayobject.h>
+#include <arrayobject.h>
 
 /* The following code originally appeared in
  * enthought/kiva/agg/src/numeric.i written by Eric Jones.  It was
