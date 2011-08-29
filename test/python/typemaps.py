@@ -5,8 +5,13 @@ import numpy as n
 import unittest
 from types import *
 from helpers import *
-from scipy.sparse import *
-from scipy import *
+
+scipy_available = True
+try:
+	from scipy.sparse import *
+	from scipy import *
+except:
+	scipy_available = False
 import warnings
 
 class typemaptests(casadiTestCase):
@@ -23,7 +28,8 @@ class typemaptests(casadiTestCase):
       self.assertTrue(isinstance(zt,DMatrix),"DMatrix expected")
       self.checkarray(m,zt,"DMatrix(numpy.ndarray)")
       self.checkarray(m,zt.toArray(),"DMatrix(numpy.ndarray).toArray()")
-      self.checkarray(m,zt.toCsr_matrix(),"DMatrix(numpy.ndarray).toCsr_matrix()")
+      if scipy_available:
+        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(numpy.ndarray).toCsr_matrix()")
       
   def test_1(self):
     self.message("DMatrix -> DMatrix")
@@ -34,10 +40,13 @@ class typemaptests(casadiTestCase):
       self.assertTrue(isinstance(zt,DMatrix),"DMatrix expected")
       self.checkarray(m,zt,"DMatrix(DMatrix)")
       self.checkarray(m,zt.toArray(),"DMatrix(DMatrix).toArray()")
-      self.checkarray(m,zt.toCsr_matrix(),"DMatrix(DMatrix).toCsr_matrix()")
+      if scipy_available:
+        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(DMatrix).toCsr_matrix()")
    
   def test_2(self):
     self.message("crs_matrix -> DMatrix")
+    if not(scipy_available):
+      return
     arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),
               csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=int )
               ]
@@ -47,7 +56,8 @@ class typemaptests(casadiTestCase):
       self.assertTrue(isinstance(zt,DMatrix),"DMatrix expected")
       self.checkarray(m,zt,"DMatrix(crs_matrix)")
       self.checkarray(m,zt.toArray(),"DMatrix(crs_matrix).toArray()")
-      self.checkarray(m,zt.toCsr_matrix(),"DMatrix(crs_matrix).toCsr_matrix()")
+      if scipy_available:
+        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(crs_matrix).toCsr_matrix()")
       
       
   def test_setget(self):
@@ -55,7 +65,8 @@ class typemaptests(casadiTestCase):
     data = n.array([3,2.3,8])
     dm=DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
     
-    c=dm.toCsr_matrix()
+    if scipy_available:
+      c=dm.toCsr_matrix()
     z=n.zeros((3,4))
     dm.get(z)
     self.checkarray(z,dm,"get(2Dndarray)")
@@ -73,26 +84,28 @@ class typemaptests(casadiTestCase):
     z=n.zeros((12,5))
     self.assertRaises(TypeError,lambda : dm.set(z))
     
-    dm.set(c)
-    self.checkarray(c,dm,"set(csr_matrix)")
+    if scipy_available:
+      dm.set(c)
+      self.checkarray(c,dm,"set(csr_matrix)")
     
-    z=n.zeros(3)
-    dm.get(z)
-    self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
-    dm.set(z)
-    self.checkarray(c,dm,"set(1Dndarray)")
+      z=n.zeros(3)
+      dm.get(z)
+      self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
+      dm.set(z)
 
-    dm = dm * 2
-    dm.get(c)
-    dm.shape = (dm.size1(),dm.size2())
+      self.checkarray(c,dm,"set(1Dndarray)")
 
-    self.checkarray(c,dm,"get(csr_matrix)")
-    
-    with warnings.catch_warnings():
-      warnings.simplefilter("ignore")
-      c[0,0]=1
-    self.assertRaises(TypeError,lambda :  dm.set(c))
-    self.assertRaises(TypeError,lambda :  dm.get(c))
+      dm = dm * 2
+      dm.get(c)
+      dm.shape = (dm.size1(),dm.size2())
+
+      self.checkarray(c,dm,"get(csr_matrix)")
+      
+      with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        c[0,0]=1
+      self.assertRaises(TypeError,lambda :  dm.set(c))
+      self.assertRaises(TypeError,lambda :  dm.get(c))
 
   def test_conversion(self):
     self.message("DMatrix conversions")
@@ -105,7 +118,8 @@ class typemaptests(casadiTestCase):
     array(w)
     w.toMatrix()
     matrix(w)
-    w.toCsr_matrix()
+    if scipy_available:
+      w.toCsr_matrix()
 
     self.checkarray(DMatrix(d),d,"DMatrix(numpy.ndarray)")
     #self.checkarray(DMatrix(array([1,2,3,4,5,6])),d.ravel(),"DMatrix(numpy.ndarray)")

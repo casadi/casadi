@@ -4,8 +4,13 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
-import scipy.special
-from scipy.linalg import expm
+
+scipy_available = True
+try:
+	import scipy.special
+	from scipy.linalg import expm
+except:
+	scipy_available = False
 
 class Integrationtests(casadiTestCase):
 
@@ -399,6 +404,8 @@ class Integrationtests(casadiTestCase):
     
   def test_linear_system(self):
     self.message("Linear ODE")
+    if not(scipy_available):
+        return
     A=array([2.3,4.3,7.6])
     B=array([[1,2.3,4],[-2,1.3,4.7],[-2,6,9]])
     te=0.7

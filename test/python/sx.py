@@ -5,6 +5,12 @@ import unittest
 from types import *
 from helpers import *
 
+scipy_available = True
+try:
+	from scipy.sparse import csr_matrix
+except:
+	scipy_available = False
+	
 class SXtests(casadiTestCase):
 
   def setUp(self):
@@ -174,14 +180,18 @@ class SXtests(casadiTestCase):
         
   def test_SXMatrixSparse(self):
       self.message("SXMatrix unary operations, sparse")
-      from scipy.sparse import csr_matrix
       x=SX("x")
       y=SX("y")
       z=SX("z")
       x=SXMatrix(3,4,[1,2,1],[0,2,2,3],[x,y,z])
-      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+      if scipy_available:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       
-      self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
+        self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
+      else:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toArray()
+      
+        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix",setx0=x0)
       
   def test_SXMatrixbinary(self):
       self.message("SXMatrix binary operations")
@@ -202,10 +212,17 @@ class SXtests(casadiTestCase):
       z2=SX("z2")
       xx=SXMatrix(3,4,[1,2,1],[0,2,2,3],[x,y,z])
       yy=SXMatrix(3,4,[0,2,3],[0,2,2,3],[x2,z2,y2])
-      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
-      y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
       
-      self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SXMatrix",setx0=[x0,y0])
+      if scipy_available:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+        y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
+        
+        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SXMatrix",setx0=[x0,y0])
+      else:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toArray()
+        y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toArray()
+        
+        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SXMatrix",setx0=[x0,y0])
       self.assertRaises(RuntimeError, lambda : c.dot(xx,yy))
 
 

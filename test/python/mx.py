@@ -5,6 +5,12 @@ import unittest
 from types import *
 from helpers import *
 
+scipy_available = True
+try:
+	from scipy.sparse import csr_matrix
+except:
+	scipy_available = False
+
 def checkarray(self,zr,zt,name):
     if len(zr.shape)==1 and (zt.shape[0]==1 or zt.shape[1]==1) and zr.shape[0]==zt.shape[1]*zt.shape[0]:
       zr=reshape(zr,(zt.shape));
@@ -657,16 +663,19 @@ class MXtests(casadiTestCase):
 
   def test_MXSparse(self):
       self.message("MX unary operations, sparse")
-      from scipy.sparse import csr_matrix
-      
       sp=CRSSparsity(3,4,[1,2,1],[0,2,2,3])
       
       x=MX("x",sp)
-      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
-      
-      self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="MX",setx0=x0)
-      
-      self.numpyEvaluationCheckPool(self.matrixpool,[x],array(x0.todense()),name="MX",setx0=x0)
+      if scipy_available:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+        
+        self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="MX",setx0=x0)
+        self.numpyEvaluationCheckPool(self.matrixpool,[x],array(x0.todense()),name="MX",setx0=x0)
+      else:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toArray()
+        
+        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="MX",setx0=x0)
+        self.numpyEvaluationCheckPool(self.matrixpool,[x],x0,name="MX",setx0=x0)
       
   def test_MXbinarySparse(self):
       self.message("SXMatrix binary operations")
@@ -674,10 +683,16 @@ class MXtests(casadiTestCase):
       spy=CRSSparsity(3,4,[0,2,3],[0,2,2,3])
       xx=MX("x",spx)
       yy=MX("y",spy)
-      x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
-      y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
-      
-      self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="MX",setx0=[x0,y0])
+      if scipy_available:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
+        y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toCsr_matrix()
+        
+        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="MX",setx0=[x0,y0])
+      else:
+        x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toArray()
+        y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toArray()
+        
+        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="MX",setx0=[x0,y0])
 
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
@@ -951,6 +966,8 @@ class MXtests(casadiTestCase):
       
   def test_MXalgebraSparse(self):
     self.message("Test some sparse algebraic properties of matrices")
+    if not(scipy_available):
+      return
     # issue 97
     n = 3
     m = 4
