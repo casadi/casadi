@@ -300,6 +300,7 @@ IF(PYTHONINTERP_FOUND)
   install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
     DESTINATION ${PYTHON_INSTALLATION_PATH}
     COMPONENT install_python
+    USE_SOURCE_PERMISSIONS
   )
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
