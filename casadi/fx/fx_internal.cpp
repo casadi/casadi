@@ -177,35 +177,79 @@ const Matrix<double>& FXInternal::output(int oind) const{
 }
 
 Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
-  return inputStruct(iind).dataF.at(dir);
+  try{
+    return inputStruct(iind).dataF.at(dir);
+  } catch(out_of_range&){
+    stringstream ss;
+    if(inputStruct(iind).dataF.empty()){
+      ss << "No forward directions ";
+    } else {
+      ss << "Forward direction " << dir << " is out of range [0," << inputStruct(iind).dataF.size() << ") ";
+    }
+    ss << "for function " << getOption("name");
+    throw CasadiException(ss.str());
+  }
 }
     
 const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
-  return inputStruct(iind).dataF.at(dir);
+  return const_cast<FXInternal*>(this)->fwdSeed(iind,dir);
 }
 
 Matrix<double>& FXInternal::fwdSens(int oind, int dir){
-  return outputStruct(oind).dataF.at(dir);
+  try{
+    return outputStruct(oind).dataF.at(dir);
+  } catch(out_of_range&){
+    stringstream ss;
+    if(outputStruct(oind).dataF.empty()){
+      ss << "No forward directions ";
+    } else {
+      ss << "Forward direction " << dir << " is out of range [0," << outputStruct(oind).dataF.size() << ") ";
+    }
+    ss << "for function " << getOption("name");
+    throw CasadiException(ss.str());
+  }
 }
     
 const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
-  return outputStruct(oind).dataF.at(dir);
+  return const_cast<FXInternal*>(this)->fwdSens(oind,dir);
 }
 
 Matrix<double>& FXInternal::adjSeed(int oind, int dir){
-  return outputStruct(oind).dataA.at(dir);
+  try{
+    return outputStruct(oind).dataA.at(dir);
+  } catch(out_of_range&){
+    stringstream ss;
+    if(outputStruct(oind).dataA.empty()){
+      ss << "No adjoint directions ";
+    } else {
+      ss << "Adjoint direction " << dir << " is out of range [0," << outputStruct(oind).dataA.size() << ") ";
+    }
+    ss << "for function " << getOption("name");
+    throw CasadiException(ss.str());
+  }
 }
     
 const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
-  return outputStruct(oind).dataA.at(dir);
+  return const_cast<FXInternal*>(this)->adjSeed(oind,dir);
 }
 
 Matrix<double>& FXInternal::adjSens(int iind, int dir){
-  return inputStruct(iind).dataA.at(dir);
+  try{
+    return inputStruct(iind).dataA.at(dir);
+  } catch(out_of_range&){
+    stringstream ss;
+    if(inputStruct(iind).dataA.empty()){
+      ss << "No adjoint directions ";
+    } else {
+      ss << "Adjoint direction " << dir << " is out of range [0," << inputStruct(iind).dataA.size() << ") ";
+    }
+    ss << "for function " << getOption("name");
+    throw CasadiException(ss.str());
+  }
 }
     
 const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
-  return inputStruct(iind).dataA.at(dir);
+  return const_cast<FXInternal*>(this)->adjSens(iind,dir);
 }
 
 void FXInternal::setNumInputs(int num_in){
@@ -482,7 +526,7 @@ void FXInternal::getFullJacobian(){
 }
 
 void FXInternal::evaluate_switch(int nfdir, int nadir){
-  if(!jac_for_sens_){     // Default, directional derivatives
+  if(!jac_for_sens_ || (nfdir==0 && nadir==0)){     // Default, directional derivatives
     evaluate(nfdir,nadir);
   } else { // Calculate complete Jacobian and multiply
     // Generate the Jacobian if it does not exist

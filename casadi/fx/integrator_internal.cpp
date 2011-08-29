@@ -127,6 +127,9 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
     // Integrate backwards to the beginning
     integrateAdj(t0_);
   }
+  
+  // Print statistics
+  if(verbose()) printStats(std::cout);
 }
 
 void IntegratorInternal::init(){
