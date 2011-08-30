@@ -8,9 +8,20 @@ double test(double aa){
   return aa*aa;
 }
 
-int test_mex(const mxArray *array_ptr){
+void* convert_to_swig(const mxArray *array_ptr){
   cout << mxGetM(array_ptr) << " x " << mxGetN(array_ptr) << endl;
   
-  
-  return 5;
+  return const_cast<mxArray *>(array_ptr);
 }
+
+mxArray* convert_from_swig(void* proxy_ptr){
+  mxArray* ret = mxCreateDoubleMatrix(4, 2, mxREAL);
+  return ret;
+}
+
+
+
+
+// void* convert_input2(const mxArray *array_ptr){
+//   return const_cast<mxArray *>(array_ptr);
+// }

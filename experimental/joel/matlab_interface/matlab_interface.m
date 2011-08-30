@@ -11,8 +11,19 @@ end
 calllib(libname,'test',4)
 
 a = 5;
-calllib(libname,'test_mex',2)
-calllib(libname,'test_mex',ones(2,3))
-calllib(libname,'test_mex',2.3)
-calllib(libname,'test_mex',[1,2,4])
+b = calllib(libname,'convert_to_swig',2)
+c = calllib(libname,'convert_from_swig',b)
+
+b = calllib(libname,'convert_to_swig',ones(2,3))
+c = calllib(libname,'convert_from_swig',b)
+
+b = calllib(libname,'convert_to_swig',2.3)
+c = calllib(libname,'convert_from_swig',b)
+
+b = calllib(libname,'convert_to_swig',[1,2,4])
+c = calllib(libname,'convert_from_swig',b)
+
+
+
+
 libfunctions(libname)

@@ -9,7 +9,11 @@ extern "C" {
 
 double test(double aa);
 
-int test_mex(const mxArray *array_ptr);
+void* convert_to_swig(const mxArray *array_ptr);
+
+mxArray* convert_from_swig(void* proxy_ptr);
+
+// void* convert_input2(void *array_ptr);
 
 #ifdef __cplusplus
 }
