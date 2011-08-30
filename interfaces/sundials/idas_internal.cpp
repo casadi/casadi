@@ -120,14 +120,24 @@ void IdasInternal::init(){
   IntegratorInternal::init();
   log("IdasInternal::init","begin");
   
-  if(!jac_.isNull()){
-    jac_.init();
-    if(!linsol_.isNull()){
-      linsol_.setSparsity(jac_.output().sparsity());
-      linsol_.init();
-    }
+  if(hasSetOption("linear_solver_creator")){
+    // Make sure that a Jacobian has been provided
+    if(jac_.isNull()) getJacobian();
+    if(!jac_.isInit()) jac_.init();
     
-    log("IdasInternal::init","user defined linear solver initialized");
+    // Create a linear solver
+    linearSolverCreator creator = getOption("linear_solver_creator");
+    linsol_ = creator(jac_.output().sparsity());
+    linsol_.setSparsity(jac_.output().sparsity());
+    linsol_.init();
+  } else {
+    if(!jac_.isNull()){
+      jac_.init();
+      if(!linsol_.isNull()){
+        linsol_.setSparsity(jac_.output().sparsity());
+        linsol_.init();
+      }
+    }
   }
 
   // Get the number of forward and adjoint directions
@@ -275,11 +285,7 @@ void IdasInternal::init(){
       if(flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditioner",flag);
     }
   } else if(getOption("linear_solver")=="user_defined") {
-    cout << "initializeing user def sol" << endl;
-    cout << linsol_.isNull() << endl;
-    cout << jac_.isNull() << endl;
     initUserDefinedLinearSolver();
-    cout << "initialized user def sol" << endl;
   } else throw CasadiException("IDAS: Unknown linear solver");
 
   // Quadrature equations
@@ -645,38 +651,41 @@ int IdasInternal::jtimes_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr
 
 void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, const double *resval, N_Vector *yS, N_Vector* ypS, N_Vector *resvalS, double *tmp1, double *tmp2, double *tmp3){
   casadi_assert(Ns==nfdir_);
-  
+
   // Record the current cpu time
   time1 = clock();
   
-   // Pass input
-   f_.setInput(t,DAE_T);
-   f_.setInput(yz,DAE_Y);
-   f_.setInput(yp,DAE_YDOT);
-   f_.setInput(input(INTEGRATOR_P),DAE_P);
-
-   // Calculate the forward sensitivities, nfdir_f_ directions at a time
-   for(int j=0; j<nfdir_; j += nfdir_f_){
-     for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       // Pass forward seeds 
-       f_.setFwdSeed(0.0,DAE_T,dir);
-       f_.setFwdSeed(NV_DATA_S(yS[j+dir]),DAE_Y,dir);
-       f_.setFwdSeed(NV_DATA_S(ypS[j+dir]),DAE_YDOT,dir);
-       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
-     }
-   
-     // Evaluate the AD forward algorithm
-     f_.evaluate(nfdir_f_,0);
-      
-     // Get the output seeds
-     for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       f_.getFwdSens(NV_DATA_S(resvalS[j+dir]),DAE_RES,dir);
-     }
-   }
-   
-   // Record timings
-   time2 = clock();
-   t_fres += double(time2-time1)/CLOCKS_PER_SEC;
+  // Pass input
+  f_.setInput(t,DAE_T);
+  f_.setInput(yz,DAE_Y);
+  f_.setInput(yp,DAE_YDOT);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  
+  // Calculate the forward sensitivities, nfdir_f_ directions at a time
+  for(int offset=0; offset<nfdir_; offset += nfdir_f_){
+    // Number of directions in this batch
+    int nfdir_batch = std::min(nfdir_-offset, nfdir_f_);
+    
+    for(int dir=0; dir<nfdir_batch; ++dir){
+      // Pass forward seeds 
+      f_.setFwdSeed(0.0,DAE_T,dir);
+      f_.setFwdSeed(NV_DATA_S(yS[offset+dir]),DAE_Y,dir);
+      f_.setFwdSeed(NV_DATA_S(ypS[offset+dir]),DAE_YDOT,dir);
+      f_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
+    }
+    
+    // Evaluate the AD forward algorithm
+    f_.evaluate(nfdir_batch,0);
+    
+    // Get the output seeds
+    for(int dir=0; dir<nfdir_batch; ++dir){
+      f_.getFwdSens(NV_DATA_S(resvalS[offset+dir]),DAE_RES,dir);
+    }
+  }
+  
+  // Record timings
+  time2 = clock();
+  t_fres += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 int IdasInternal::resS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector resval, N_Vector *yS, N_Vector *ypS, N_Vector *resvalS, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
