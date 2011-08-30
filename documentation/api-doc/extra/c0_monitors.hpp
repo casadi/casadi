@@ -1,4 +1,6 @@
 /** \class CasADi::Sundials::KinsolInternal
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -7,6 +9,8 @@
 </table>
 */
 /** \class CasADi::Sundials::KinsolSolver
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -15,6 +19,8 @@
 </table>
 */
 /** \class CasADi::IpoptInternal
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -26,6 +32,8 @@
 </table>
 */
 /** \class CasADi::IpoptSolver
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -37,6 +45,8 @@
 </table>
 */
 /** \class CasADi::Sundials::CVodesInternal
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -46,6 +56,8 @@
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -55,6 +67,8 @@
 </table>
 */
 /** \class CasADi::Sundials::IdasInternal
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -63,6 +77,8 @@
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -71,6 +87,8 @@
 </table>
 */
 /** \class CasADi::GSL::GslInternal
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -78,6 +96,8 @@
 </table>
 */
 /** \class CasADi::GSL::GslIntegrator
+\n
+\par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>

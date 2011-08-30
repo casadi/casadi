@@ -1,4 +1,6 @@
 /** \class CasADi::NLPSolverInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -21,6 +23,8 @@
 </table>
 */
 /** \class CasADi::NLPSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -43,6 +47,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::OOQPInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -67,6 +73,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::OOQPSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -91,6 +99,8 @@
 </table>
 */
 /** \class CasADi::OptimalControl::MultipleShootingInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -101,6 +111,8 @@
 </table>
 */
 /** \class CasADi::OptimalControl::MultipleShooting
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -111,6 +123,8 @@
 </table>
 */
 /** \class CasADi::SimulatorInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -120,6 +134,8 @@
 </table>
 */
 /** \class CasADi::Simulator
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -129,6 +145,8 @@
 </table>
 */
 /** \class CasADi::QPSolverInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -153,6 +171,8 @@
 </table>
 */
 /** \class CasADi::QPSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -177,6 +197,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::QPOasesInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -201,6 +223,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::QPOasesSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -225,6 +249,8 @@
 </table>
 */
 /** \class CasADi::IpoptInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -247,6 +273,8 @@
 </table>
 */
 /** \class CasADi::IpoptSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -269,6 +297,8 @@
 </table>
 */
 /** \class CasADi::Sundials::CVodesInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -285,6 +315,8 @@
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -301,6 +333,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::IpoptQPInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -325,6 +359,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::IpoptQPSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -349,6 +385,8 @@
 </table>
 */
 /** \class CasADi::KnitroInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -371,6 +409,8 @@
 </table>
 */
 /** \class CasADi::KnitroSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -393,6 +433,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::LiftoptInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -415,6 +457,8 @@
 </table>
 */
 /** \class CasADi::Interfaces::LiftoptSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -437,6 +481,8 @@
 </table>
 */
 /** \class CasADi::IntegratorInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -453,6 +499,8 @@
 </table>
 */
 /** \class CasADi::Integrator
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -469,6 +517,8 @@
 </table>
 */
 /** \class CasADi::CplexInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -491,6 +541,8 @@
 </table>
 */
 /** \class CasADi::CplexSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -513,6 +565,8 @@
 </table>
 */
 /** \class CasADi::Sundials::IdasInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -529,6 +583,8 @@
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -545,6 +601,8 @@
 </table>
 */
 /** \class CasADi::OCPSolverInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -555,6 +613,8 @@
 </table>
 */
 /** \class CasADi::OCPSolver
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -565,6 +625,8 @@
 </table>
 */
 /** \class CasADi::GSL::GslInternal
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
@@ -581,6 +643,8 @@
 </table>
 */
 /** \class CasADi::GSL::GslIntegrator
+\n
+\par
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>

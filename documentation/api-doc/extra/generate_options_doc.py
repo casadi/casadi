@@ -212,7 +212,7 @@ for name,meta in metadata.items():
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
   for t in targets:
-    f.write("/** \class %s\n" % t)
+    f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<table>\n")
     f.write("<caption>List of available options</caption>\n")
     f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
@@ -244,7 +244,7 @@ for name,meta in metadata.items():
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
   for t in targets:
-    f.write("/** \class %s\n" % t)
+    f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<table>\n")
     f.write("<caption>List of available stats</caption>\n")
     f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
@@ -277,7 +277,7 @@ for name,meta in metadata.items():
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
   for t in targets:
-    f.write("/** \class %s\n" % t)
+    f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<table>\n")
     f.write("<caption>List of available monitors</caption>\n")
     f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
@@ -338,7 +338,7 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     if not(inputscheme is None) or not(outputscheme is None):
-      f.write("/** \class %s\n" % t)
+      f.write("/** \class %s\n\\n\n\\par\n" % t)
       if not(inputscheme is None) and not(outputscheme is None):
         f.write(enumsashtml(inputscheme,"Input scheme: CasADi::%s" % inputscheme))
         f.write("<br/>")

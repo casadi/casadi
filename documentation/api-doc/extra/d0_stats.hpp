@@ -1,4 +1,6 @@
 /** \class CasADi::IpoptInternal
+\n
+\par
 <table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
@@ -6,6 +8,8 @@
 </table>
 */
 /** \class CasADi::IpoptSolver
+\n
+\par
 <table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>

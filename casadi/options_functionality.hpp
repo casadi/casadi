@@ -72,7 +72,11 @@ class OptionsFunctionality : public SharedObject{
     */
     void setOption(const std::string &str, const GenericType& val);
     
-    /** \brief  set a set of options */
+    /** \brief  set a set of options.
+    The setOptions are in general only considered before the init function, if any.
+    If properties changes, the init function should be called again.
+    (Ticket #54)
+    */
     void setOption(const Dictionary& dict);
 
     /** \brief  get an option value */
@@ -115,10 +119,18 @@ class OptionsFunctionalityNode : public SharedObjectNode{
 OptionsFunctionalityNode();
 virtual ~OptionsFunctionalityNode();
  
-  /** \brief  set an option */
+  /** \brief  set an option.
+  The setOptions are in general only considered before the init function, if any.
+  If properties changes, the init function should be called again.
+  (Ticket #54)
+  */
   void setOption(const std::string &str, const GenericType& val);
 
-  /** \brief  set a set of options */
+  /** \brief  set a set of options.
+  The setOptions are in general only considered before the init function, if any.
+  If properties changes, the init function should be called again.
+  (Ticket #54)
+  */
   void setOption(const Dictionary& dict);
 
   /** \brief  check if there is an option str */
