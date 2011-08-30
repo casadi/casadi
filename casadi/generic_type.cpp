@@ -275,6 +275,14 @@ GenericType::operator const GenericType::Dictionary& () const{
   return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
 }
 
+GenericType::operator void*() const{
+  casadi_assert_message(is_a<void*>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<void*>*>(get())->d_;
+}
+
+GenericType::GenericType(void* ptr){
+  assignNode(new GenericTypeInternal<void*>(ptr));
+}
 
 
 } // namespace CasADi

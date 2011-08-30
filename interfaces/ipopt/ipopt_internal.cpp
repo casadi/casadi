@@ -500,6 +500,7 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
       J_.getOutput(values);
       
       if(monitored("eval_jac_g")){
+        cout << "x = " << J_.input().data() << endl;
         cout << "J = " << endl;
         J_.output().printSparse();
       }

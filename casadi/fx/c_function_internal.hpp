@@ -47,21 +47,12 @@ class CFunctionInternal : public FXInternal{
     /** \brief  Cloning */
     virtual CFunctionInternal* clone() const{ return new CFunctionInternal(*this);}
 
-    /** \brief  Set user data structure (to be passed to all functions) */
-    void setUserData(void* user_data);
-  
-    /** \brief  Get user data structure (to be passed to all functions) */
-    void* getUserData() const;
-  
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir);
   
     /** \brief  Initialize */
     virtual void init();
   
-  
-  protected:
-    void* user_data_;
     CFunctionWrapper evaluate_;
   
     /// A reference to this object to be passed to the user functions

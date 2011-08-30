@@ -45,10 +45,12 @@ FXInternal::FXInternal(){
   addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   addOption("jac_for_sens",             OT_BOOLEAN,             false,          "Create the a Jacobian function and use this to calculate forward sensitivities");
+  addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
   verbose_ = false;
   numeric_jacobian_ = false;
   jacgen_ = 0;
   spgen_ = 0;
+  user_data_ = 0;
   jac_for_sens_ = false;
 }
 
@@ -94,6 +96,10 @@ void FXInternal::init(){
   // Get the sparsity detector function, if any
   if(hasSetOption("sparsity_generator")){
     spgen_ = getOption("sparsity_generator");
+  }
+
+  if(hasSetOption("user_data")){
+    user_data_ = getOption("user_data");
   }
 
   // Mark the function as initialized
@@ -311,7 +317,7 @@ FX FXInternal::jacobian_switch(const std::vector<std::pair<int,int> >& jblocks){
       tmp.assignNode(this);
 
       // Use user-provided routine to calculate Jacobian
-      return jacgen_(tmp,jblocks);
+      return jacgen_(tmp,jblocks,user_data_);
     }
   }
 }
@@ -388,7 +394,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
       tmp.assignNode(this);
 
       // Use user-provided routine to determine sparsity
-      jsp = spgen_(tmp,iind,oind);
+      jsp = spgen_(tmp,iind,oind,user_data_);
     }
   }
   

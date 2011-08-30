@@ -31,8 +31,6 @@ namespace CasADi{
 using namespace std;
 
 CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme) : evaluate_(c_fcn){
-  user_data_ = 0;
-  
   setNumInputs(inputscheme.size());
   setNumOutputs(outputscheme.size());
   
@@ -51,14 +49,6 @@ CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<C
 CFunctionInternal::~CFunctionInternal(){
   // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
   ref_.assignNodeNoCount(0);
-}
-
-void CFunctionInternal::setUserData(void* user_data){
-  user_data_ = user_data;
-}
-
-void* CFunctionInternal::getUserData() const{
-  return user_data_;
 }
 
 void CFunctionInternal::evaluate(int nfdir, int nadir){

@@ -55,10 +55,10 @@ namespace CasADi{
   typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f);
   
   /// Function pointer to a Jacobian generator function
-  typedef FX (*JacobianGenerator)(FX& fcn, const std::vector<std::pair<int,int> >& jblocks);
+  typedef FX (*JacobianGenerator)(FX& fcn, const std::vector<std::pair<int,int> >& jblocks, void* user_data);
   
   /// Function pointer to a sparsity generator function
-  typedef CRSSparsity (*SparsityGenerator)(FX& fcn, int iind, int oind);
+  typedef CRSSparsity (*SparsityGenerator)(FX& fcn, int iind, int oind, void* user_data);
   
 #ifndef SWIG
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans

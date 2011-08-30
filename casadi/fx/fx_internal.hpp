@@ -210,6 +210,9 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /// User-provided sparsity generator function
     SparsityGenerator spgen_;
+
+    /// User-set field
+    void* user_data_;
     
     /// Full jacobian function used to calculate directional derivatives instead of the using directional derivatives
     bool jac_for_sens_;

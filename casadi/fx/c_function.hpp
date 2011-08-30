@@ -68,16 +68,6 @@ public:
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
 
-#ifndef SWIG
-  /** \brief  Set user data structure (to be passed to all functions) */
-  void setUserData(void* user_data);
-
-  /** \brief  Get user data structure (to be passed to all functions) */
-  void* getUserData() const;
-
-  #endif // SWIG
-  
-  
 }; // class CFunction
   
 

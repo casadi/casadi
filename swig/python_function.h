@@ -39,7 +39,7 @@ CFunction PyFunction_helper(PyObject * fun) {
   }
   CFunctionWrapper cfunctionwrapper = py_c_wrapper;
   CFunction cfunction(cfunctionwrapper);
-  cfunction.setUserData(fun);
+  cfunction.setOption("user_data",static_cast<void*>(fun));
   
   return cfunction;
 }

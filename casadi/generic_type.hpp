@@ -31,7 +31,7 @@
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR};
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_VOIDPTR};
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -49,6 +49,9 @@ namespace CasADi{
     GenericType(const std::string& s);
     GenericType(const char s[]);
     GenericType(const SharedObject& obj);
+    #ifndef SWIG
+    GenericType(void* ptr);
+    #endif // SWIG
 
     typedef std::map<std::string, GenericType> Dictionary;
     GenericType(const Dictionary& dict);
@@ -71,7 +74,7 @@ namespace CasADi{
     operator const std::vector<int>& () const{ return toIntVector();}
     operator const std::vector<double>& () const{ return toDoubleVector();}
     operator const SharedObject& () const{ return toSharedObject();}
-
+    operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
     
     operator NLPSolverCreator() const;

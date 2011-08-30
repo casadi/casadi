@@ -2,7 +2,7 @@
 namespace CasADi{
 %extend CFunction {
   void __setUserData__(PyObject * obj) {
-    $self->setUserData(obj);
+    $self->setOption("user_data",static_cast<void*>(obj));
   }
 }
 }
