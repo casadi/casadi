@@ -50,11 +50,11 @@ ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # Det minor from ADOL-C
 add_executable(det_minor det_minor.cpp)
-target_link_libraries(det_minor casadi)
+target_link_libraries(det_minor casadi ${CMAKE_DL_LIBS})
 
 # Det minor example from CasADi papper
-add_executable(det_minor_paper det_minor_paper.cpp)
-target_link_libraries(det_minor_paper casadi)
+add_executable(det_minor_paper det_minor_paper.cpp )
+target_link_libraries(det_minor_paper casadi ${CMAKE_DL_LIBS})
 
 
 if(LIFTOPT_FOUND)
@@ -65,7 +65,7 @@ target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES}
 endif(LIFTOPT_FOUND)
 
 add_executable(mx_jacobian mx_jacobian.cpp)
-target_link_libraries(mx_jacobian casadi)
+target_link_libraries(mx_jacobian casadi ${CMAKE_DL_LIBS})
 
 
 
