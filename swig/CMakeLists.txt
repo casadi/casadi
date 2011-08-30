@@ -104,6 +104,9 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
 endif()
 
 
+IF(ENABLE_SHARED)
+set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${CMAKE_DL_LIBS})
+ENDIF(ENABLE_SHARED)
 
 # Find python library and add include path for python headers
 find_package (PythonLibs REQUIRED)
