@@ -533,7 +533,7 @@ void FXInternal::evaluate_switch(int nfdir, int nadir){
     if(full_jacobian_.isNull()){
       getFullJacobian();
     }
-    
+        
     // Make sure inputs and outputs dense
     for(int iind=0; iind<getNumInputs(); ++iind){
       casadi_assert_message(isDense(input(iind)),"sparse input currently not supported");
@@ -579,12 +579,12 @@ void FXInternal::evaluate_switch(int nfdir, int nadir){
         
         // Forward sensitivities
         for(int dir=0; dir<nfdir; ++dir){
-          addMultiple(Jblock,fwdSeed(iind).data(),fwdSens(oind).data(),false);
+          addMultiple(Jblock,fwdSeed(iind,dir).data(),fwdSens(oind,dir).data(),false);
         }
         
         // Adjoint sensitivities
         for(int dir=0; dir<nadir; ++dir){
-          addMultiple(Jblock,adjSeed(oind).data(),adjSens(iind).data(),true);
+          addMultiple(Jblock,adjSeed(oind,dir).data(),adjSens(iind,dir).data(),true);
         }
       }
     }

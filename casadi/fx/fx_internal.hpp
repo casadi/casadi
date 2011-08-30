@@ -177,8 +177,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Get the Jacobian of all outputs with respect to all inputs
     void getFullJacobian();
 
-  protected:
-
     /** \brief  Number of forward and adjoint derivatives */
     int nfdir_, nadir_;
 

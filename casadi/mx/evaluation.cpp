@@ -63,50 +63,90 @@ void Evaluation::print(std::ostream &stream, const std::vector<std::string>& arg
 }
 
 void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  // Number of derivative directions to calculate
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
-  
-  // Pass the input and forward seeds to the function
+
+  // Number of derivative directions supported by the function
+  int nfwd_f = fcn_->nfdir_;
+  int nadj_f = fcn_->nadir_;
+    
+  // Current forward and adjoint direction
+  int offset_fwd=0, offset_adj=0;
+
+  // Has the function been evaluated once
+  bool fcn_evaluated = false;
+
+  // Pass the inputs to the function
   for(int i=0; i<input.size(); ++i){
     if(input[i] != 0 && input[i]->size() !=0 ){
       fcn_.setInput(input[i]->data(),i);
-      for(int d=0; d<nfwd; ++d){
-        fcn_.setFwdSeed(fwdSeed[d][i]->data(),i,d);
-      }
-    }
-  }
-  
-  // Pass the adjoint seed to the function
-  for(int i=0; i<output.size(); ++i){
-    for(int d=0; d<nadj; ++d){
-      if(adjSeed[d][0]!=0 && adjSeed[d][0]->size() != 0){
-        fcn_.setAdjSeed(adjSeed[d][0]->data(),i,d);
-      }
     }
   }
 
-  // Evaluate
-  fcn_.evaluate(nfwd, nadj);
-  
-  // Get the outputs and forward sensitivities
-  for(int i=0; i<output.size(); ++i){
-    if(output[i] != 0 && output[i]->size() !=0 ){
-      fcn_.getOutput(output[i]->data(),i);
-      for(int d=0; d<nfwd; ++d){
-        fcn_.getFwdSens(fwdSens[d][i]->data(),i,d);
+  // Evaluate until everything has been determinated
+  while(!fcn_evaluated || offset_fwd<nfwd || offset_adj<nadj){
+
+    // Number of forward and adjoint directions in the current "batch"
+    int nfwd_batch = std::min(nfwd-offset_fwd, nfwd_f);
+    int nadj_batch = std::min(nadj-offset_adj, nadj_f);
+
+    // Pass the forward seeds to the function
+    for(int d=0; d<nfwd_batch; ++d){
+      for(int i=0; i<input.size(); ++i){
+	if(input[i] != 0 && input[i]->size() !=0 ){
+	  fcn_.setFwdSeed(fwdSeed[offset_fwd+d][i]->data(),i,d);
+	}
       }
     }
-  }
   
-  // Get the adjoint sensitivities
-  for(int i=0; i<input.size(); ++i){
-    for(int d=0; d<nadj; ++d){
-      if(adjSens[d][i] != 0 && adjSens[d][i]->size() != 0){
-        const vector<double>& asens = fcn_.adjSens(i,d).data();
-        for(int j=0; j<asens.size(); ++j)
-          adjSens[d][i]->data()[j] += asens[j];
+    // Pass the adjoint seed to the function
+    for(int d=0; d<nadj_batch; ++d){
+      for(int i=0; i<output.size(); ++i){	
+	if(adjSeed[offset_adj+d][0]!=0 && adjSeed[offset_adj+d][0]->size() != 0){
+	  fcn_.setAdjSeed(adjSeed[offset_adj+d][0]->data(),i,d);
+	}
       }
     }
+
+    // Evaluate
+    fcn_.evaluate(nfwd_batch,nadj_batch);
+
+    // Get the outputs if first evaluation
+    if(!fcn_evaluated){
+      for(int i=0; i<output.size(); ++i){
+	if(output[i] != 0 && output[i]->size() !=0 ){
+	  fcn_.getOutput(output[i]->data(),i);
+	}
+      }
+    }
+    
+    // Marked as evaluated
+    fcn_evaluated = true;
+    
+    // Get the forward sensitivities
+    for(int d=0; d<nfwd_batch; ++d){
+      for(int i=0; i<output.size(); ++i){
+	if(output[i] != 0 && output[i]->size() !=0 ){
+	  fcn_.getFwdSens(fwdSens[offset_fwd+d][i]->data(),i,d);
+	}
+      }
+    }
+  
+    // Get the adjoint sensitivities
+    for(int d=0; d<nadj_batch; ++d){
+      for(int i=0; i<input.size(); ++i){	
+	if(adjSens[offset_adj+d][i] != 0 && adjSens[offset_adj+d][i]->size() != 0){
+	  const vector<double>& asens = fcn_.adjSens(i,d).data();
+	  for(int j=0; j<asens.size(); ++j)
+	    adjSens[offset_adj+d][i]->data()[j] += asens[j];
+	}
+      }
+    }
+
+    // Update direction offsets
+    offset_fwd += nfwd_batch;
+    offset_adj += nadj_batch;
   }
 }
 
