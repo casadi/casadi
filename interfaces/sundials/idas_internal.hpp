@@ -263,6 +263,9 @@ class IdasInternal : public IntegratorInternal{
   // Set the adjoint sensitivities
   void setAdjointSensitivities();
   
+  // Disable IDAS internal warning messages
+  bool disable_internal_warnings_;
+  
 };
 
 

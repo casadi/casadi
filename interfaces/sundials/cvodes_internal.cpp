@@ -45,6 +45,7 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,
   addOption("linear_multistep_method",     OT_STRING,  "bdf"); // "bdf" or "adams"
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton"); // "newton" or "functional"
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
+  addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable CVodes internal warning messages");
 
   mem_ = 0;
 
@@ -53,8 +54,7 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,
 
   is_init = false;
   isInitAdj_ = false;
-
-
+  disable_internal_warnings_ = false;
 }
 
 CVodesInternal::~CVodesInternal(){ 
@@ -184,6 +184,9 @@ void CVodesInternal::init(){
   // Allocate n-vectors for ivp
   y0_ = N_VMake_Serial(ny_,&input(INTEGRATOR_X0).front());
   y_ = N_VMake_Serial(ny_,&output(INTEGRATOR_XF).front());
+
+  // Disable internal warning messages?
+  disable_internal_warnings_ = getOption("disable_internal_warnings");
 
   // Set error handler function
   flag = CVodeSetErrHandlerFn(mem_, ehfun_wrapper, this);
@@ -766,7 +769,9 @@ try{
 }
   
 void CVodesInternal::ehfun(int error_code, const char *module, const char *function, char *msg){
-  cerr << msg << endl;
+  if(!disable_internal_warnings_){
+    cerr << msg << endl;
+  }
 }
 
 void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, N_Vector tmp1, N_Vector tmp2){

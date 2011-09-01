@@ -187,6 +187,7 @@ public:
 
   bool monitor_rhsB_;
 
+  bool disable_internal_warnings_;
   
 };
 

@@ -54,7 +54,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("first_time",                  OT_REAL, GenericType(), "first requested time as a fraction of the time interval");
   addOption("cj_scaling",                  OT_BOOLEAN, false, "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false, "Call calc ic an extra time, with fsens=0");
-  
+  addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable IDAS internal warning messages");
   
   mem_ = 0;
   
@@ -66,7 +66,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   is_init = false;
   isInitAdj_ = false;
   isInitTaping_ = false;
-
+  disable_internal_warnings_ = false;
 }
 
 IdasInternal::~IdasInternal(){ 
@@ -173,6 +173,9 @@ void IdasInternal::init(){
   IDAInit(mem_, res_wrapper, t0, y_, yP_);
   log("IdasInternal::init","IDA initialized");
 
+  // Disable internal warning messages?
+  disable_internal_warnings_ = getOption("disable_internal_warnings");
+  
   // Set error handler function
   flag = IDASetErrHandlerFn(mem_, ehfun_wrapper, this);
   casadi_assert_message(flag == IDA_SUCCESS,"IDASetErrHandlerFn");
