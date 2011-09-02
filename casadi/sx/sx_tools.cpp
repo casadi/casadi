@@ -736,11 +736,13 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
 }
 
 Matrix<SX> evaluateConstants(const Matrix<SX>& ex){
-  SXFunction fcn(Matrix<SX>(),ex); // Note: no input argument necessary
+  // An empty input argument
+  std::vector<Matrix<SX> > input_s;
+
+  SXFunction fcn(input_s,ex); // Note: no input argument necessary
   fcn.init();
   
   // Evaluate symbolically, eliminating constants
-  std::vector<Matrix<SX> > input_s;
   std::vector<Matrix<SX> > output_s = fcn->outputv_;
   fcn->evaluateSX(input_s,output_s,true);
   return output_s.front();
