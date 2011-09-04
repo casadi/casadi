@@ -27,8 +27,6 @@
 
 #include <SQProblem.hpp>
 
-using namespace qpOASES;
-	
 namespace CasADi{
 namespace Interfaces {
 
@@ -58,7 +56,7 @@ public:
   protected:
     
     /// QP Solver
-    SQProblem *qp_;
+    qpOASES::SQProblem *qp_;
     	
     /// Number of working set recalculations
     int max_nWSR_;

@@ -38,8 +38,10 @@ QPOasesInternal* QPOasesInternal::clone() const{
 }
   
 QPOasesInternal::QPOasesInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
-  addOption("nWSR",     OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
-  addOption("CPUtime",  OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
+  addOption("nWSR",       OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
+  addOption("CPUtime",    OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
+  addOption("printLevel", OT_STRING,      GenericType(), "Defines the amount of text output during QP solution, see Section 5.7.: \"none\", \"low\", \"medium\" or \"high\"");
+  
   called_once_ = false;
   qp_ = 0;
 }
@@ -75,9 +77,30 @@ void QPOasesInternal::init(){
   // Dual solution vector
   dual_.resize(nx+nc);
   
+  // Create qpOASES instance
   if(qp_) delete qp_;
-  qp_ = new SQProblem(nx,nc);
+  qp_ = new qpOASES::SQProblem(nx,nc);
   called_once_ = false;
+
+/*  // Set options
+  qpOASES::Options myoptions;
+  myoptions.setToDefault();
+  
+  // Get print level
+  if(hasSetOption("printLevel")){
+    if(getOption("printLevel")=="none"){
+      myoptions.printLevel = PL_NONE;
+    } else if(getOption("printLevel")=="low"){
+      myoptions.printLevel = PL_LOW;
+    } else if(getOption("printLevel")=="medium"){
+      myoptions.printLevel = PL_MEDIUM;
+    } else if(getOption("printLevel")=="high"){
+      myoptions.printLevel = PL_HIGH;
+    }
+  }
+  
+  // Pass to qpOASES
+  qp_->setOption(myoptions);*/
 }
 
 void QPOasesInternal::evaluate(int nfdir, int nadir) {
@@ -121,10 +144,10 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   if(!called_once_){
     flag = qp_->init(h,g,a,lb,ub,lbA,ubA,nWSR,cputime_ptr);
     called_once_ = true;
-    casadi_assert(flag==SUCCESSFUL_RETURN || flag==RET_MAX_NWSR_REACHED);
+    casadi_assert(flag==qpOASES::SUCCESSFUL_RETURN || flag==qpOASES::RET_MAX_NWSR_REACHED);
   } else {
     flag = qp_->hotstart(h,g,a,lb,ub,lbA,ubA,nWSR, cputime_ptr);
-    casadi_assert(flag==SUCCESSFUL_RETURN || flag==RET_MAX_NWSR_REACHED);
+    casadi_assert(flag==qpOASES::SUCCESSFUL_RETURN || flag==qpOASES::RET_MAX_NWSR_REACHED);
   }
 
   // Get optimal cost
@@ -144,11 +167,11 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
 map<int,string> QPOasesInternal::calc_flagmap(){
   map<int,string> f;
 
-  f[SUCCESSFUL_RETURN] = "SUCCESSFUL_RETURN";
+  f[qpOASES::SUCCESSFUL_RETURN] = "SUCCESSFUL_RETURN";
   //f[NOT_FINISHED] = "NOT_FINISHED";
-  f[RET_MAX_NWSR_REACHED] = "RET_MAX_NWSR_REACHED";
-  f[RET_INIT_FAILED] = "RET INIT FAILED";
-  f[RET_HOTSTART_FAILED] = "RET_HOTSTART_FAILED";
+  f[qpOASES::RET_MAX_NWSR_REACHED] = "RET_MAX_NWSR_REACHED";
+  f[qpOASES::RET_INIT_FAILED] = "RET INIT FAILED";
+  f[qpOASES::RET_HOTSTART_FAILED] = "RET_HOTSTART_FAILED";
   return f;
 }
   
