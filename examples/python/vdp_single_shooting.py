@@ -1,4 +1,5 @@
 from casadi import *
+from numpy import *
 import matplotlib.pyplot as plt
 
 # Number of shooting nodes
@@ -14,13 +15,11 @@ rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
-I.setOption("abstol",1e-10) # abs. tolerance
-I.setOption("reltol",1e-10) # rel. tolerance
-I.setOption("fsens_abstol",1e-8) # abs. tolerance
-I.setOption("fsens_reltol",1e-8) # rel. tolerance
+I.setOption("abstol",1e-8) # abs. tolerance
+I.setOption("reltol",1e-8) # rel. tolerance
 I.setOption("steps_per_checkpoint",1000)
-I.setOption("fsens_err_con",True)
-I.setOption("stop_at_end",True)
+I.setOption("fsens_err_con",False)
+I.setOption("stop_at_end",False)
 I.setOption("t0",0.0)
 I.setOption("tf",10.0/NS)
 I.init()
@@ -34,20 +33,14 @@ X  = MX([0,1,0])
 # State derivative (not used)
 XP = MX()
 
-# Cost function
-obj = 0
-
 # Build up a graph of integrator calls
 for k in range(NS):
   # Call the integrator
   [X,XP] = I.call([X,U[k],XP])
   
-  # Add lagrange cost
-  obj += X[2]
-  X[2] = 0
-  
 # Objective function: L(T)
-F = MXFunction([U],[obj])
+cost = X[2]
+F = MXFunction([U],[cost])
 
 # Terminal constraints: 0<=[x(T);y(T)]<=0
 eq = X[0:2]
@@ -74,11 +67,8 @@ G = MXFunction([U],[eq])
 
 # Allocate NLP solver
 solver = IpoptSolver(F,G)
-solver.setOption("tol",1e-3)
 solver.setOption("hessian_approximation", \
                 "limited-memory")
-#solver.setOption("derivative_test","first-order")
-#solver.setOption("verbose",True)
   
 # Initialize the NLP solver
 solver.init()
@@ -93,6 +83,22 @@ solver.setInput([0,0],NLP_UBG)
 # Solve the problem
 solver.solve()
 
+# Retrieve the solution
+u_opt = array(solver.output(NLP_X_OPT))
+
+# Get values at the beginning of each finite element
+tgrid = linspace(0,10,NS+1)
+tgrid_u = linspace(0,10,NS)
+
 # Plot the results
-plt.plot(solver.output(NLP_X_OPT))
+plt.figure(1)
+plt.clf()
+#plt.plot(tgrid,x_opt,'--')
+#plt.plot(tgrid,y_opt,'-')
+plt.plot(tgrid_u,u_opt,'-.')
+plt.title("Van der Pol optimization - single shooting")
+plt.xlabel('time')
+#plt.legend(['x trajectory','y trajectory','u trajectory'])
+plt.legend(['u trajectory'])
+plt.grid()
 plt.show()

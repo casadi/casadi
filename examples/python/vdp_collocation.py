@@ -272,7 +272,7 @@ solver = IpoptSolver(ffcn_nlp,gfcn_nlp,HL)
 
 # Set options
 solver.setOption("tol",1e-10)
-#solver.setOption("hessian_approximation","limited-memory")
+solver.setOption("hessian_approximation","limited-memory")
 #solver.setOption("derivative_test","first-order")
 solver.setOption("max_iter",1000)
 

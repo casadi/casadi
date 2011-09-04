@@ -14,7 +14,7 @@ rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
 tf = 10.0
 
 # Numboer of shooting nodes
-NS = 50
+NS = 20
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
@@ -22,6 +22,7 @@ I.setOption("abstol",1e-8) # abs. tolerance
 I.setOption("reltol",1e-8) # rel. tolerance
 I.setOption("steps_per_checkpoint",100) # bug in CVodes?
 I.setOption("stop_at_end",True)
+I.setOption("fsens_err_con",False)
 I.setOption("tf",tf/NS)
 I.init()
 
@@ -113,10 +114,7 @@ G = MXFunction([V],[vertcat(g)])
 
 # Create NLP solver instance
 solver = IpoptSolver(F,G)
-solver.setOption("tol",1e-5)
 solver.setOption("hessian_approximation", "limited-memory")
-solver.setOption("max_iter",100)
-solver.setOption("linear_solver","ma57")
 
 #solver.setOption("verbose",True)
 solver.init()
@@ -134,32 +132,27 @@ solver.solve()
 # Retrieve the solution
 v_opt = solver.output(NLP_X_OPT)
 u_opt = v_opt[0:NU]
-X_opt = v_opt[NU:]
-x_opt = [X_opt[k] for k in range(0,3*NS,3)]
-y_opt = [X_opt[k] for k in range(1,3*NS,3)]
-l_opt = [X_opt[k] for k in range(2,3*NS,3)]
+X_opt = vertcat((DMatrix([0,1,0]),v_opt[NU:]))
+x_opt = [X_opt[k] for k in range(0,3*(NS+1),3)]
+y_opt = [X_opt[k] for k in range(1,3*(NS+1),3)]
+l_opt = [X_opt[k] for k in range(2,3*(NS+1),3)]
+
+# Retrieve the solution
+v_opt = NP.array(solver.output(NLP_X_OPT))
+
+# Get values at the beginning of each finite element
+tgrid = NP.linspace(0,10,NS+1)
+tgrid_u = NP.linspace(0,10,NS)
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(u_opt)
-plt.title("u_opt")
-
-plt.figure(2)
-plt.clf()
-plt.plot(x_opt)
-plt.title("x_opt")
-
-plt.figure(3)
-plt.clf()
-plt.plot(y_opt)
-plt.title("y_opt")
-
-plt.figure(4)
-plt.clf()
-plt.plot(l_opt)
-plt.title("l_opt")
-
-
+plt.plot(tgrid,x_opt,'--')
+plt.plot(tgrid,y_opt,'-')
+plt.plot(tgrid_u,u_opt,'-.')
+plt.title("Van der Pol optimization - multiple shooting")
+plt.xlabel('time')
+plt.legend(['x trajectory','y trajectory','u trajectory'])
+plt.grid()
 plt.show()
 
