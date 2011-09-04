@@ -337,7 +337,7 @@ void OCP::scaleEquations(){
   append(xz,v[P]);
   append(xz,v[U]);
   SXFunction fcn = SXFunction(xz,implicit_fcn_);
-  SXFunction J(v,fcn.jac());
+  SXFunction J(v,fcn.jac(0,0));
 
   // Evaluate the Jacobian in the starting point
   J.init();
@@ -398,12 +398,12 @@ void OCP::sortBLT(bool with_x){
     
     // Create Jacobian in order to find the sparsity
     SXFunction fcn(implicit_var_,implicit_fcn_with_x);
-    Matrix<SX> J = fcn.jac();
+    Matrix<SX> J = fcn.jac(0,0);
     sp = J.sparsity();
   } else {
     // Create Jacobian in order to find the sparsity
     SXFunction fcn(implicit_var_,implicit_fcn_);
-    Matrix<SX> J = fcn.jac();
+    Matrix<SX> J = fcn.jac(0,0);
     sp = J.sparsity();
   }
   
@@ -445,7 +445,7 @@ void OCP::makeExplicit(){
   
   // Create Jacobian
   SXFunction fcn(implicit_var_,implicit_fcn_);
-  SXMatrix J = fcn.jac();
+  SXMatrix J = fcn.jac(0,0);
 
   // Mark the algebraic variables
   for(int i=0; i<z_.size(); ++i){

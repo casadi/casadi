@@ -329,7 +329,7 @@ Matrix<SX> gradient(const Matrix<SX>& ex, const Matrix<SX> &arg) {
 Matrix<SX> jacobian(const Matrix<SX>& ex, const Matrix<SX> &arg) {
   SXFunction temp(arg,ex); // make a runtime
   temp.init();
-  return temp.jac();
+  return temp.jac(0,0);
 }
 
 void hessian(const Matrix<SX>& ex, const Matrix<SX> &arg, Matrix<SX> &H, Matrix<SX> &g) {

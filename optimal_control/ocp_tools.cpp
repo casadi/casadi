@@ -216,7 +216,7 @@ EquationSorter::EquationSorter(const std::vector<SX>& x, const std::vector<SX>& 
   
   SXFunction fcn(v,dae_);
   fcn.init();
-  SXMatrix jac = fcn.jac();
+  SXMatrix jac = fcn.jac(0,0);
   
   jac.sparsityRef().strongly_connected_components();
   
@@ -422,7 +422,7 @@ void EquationSorter::tarjan(){
   
   SXFunction fcn(v_sorted,dae_sorted);
   fcn.init();
-  SXMatrix jac = fcn.jac();
+  SXMatrix jac = fcn.jac(0,0);
   for(int k=0; k<jac.size(); ++k)
     jac.at(k) = 1;
   jac.printDense();
@@ -560,7 +560,7 @@ void EquationSorter::tarjanCellier(){
     
     SXFunction fcn(v_sorted,dae_sorted);
     fcn.init();
-    SXMatrix jac = fcn.jac();
+    SXMatrix jac = fcn.jac(0,0);
     for(int k=0; k<jac.size(); ++k)
       jac.at(k) = 1;
     
