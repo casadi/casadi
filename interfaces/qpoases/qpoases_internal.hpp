@@ -24,7 +24,6 @@
 #define QPOASES_INTERNAL_HPP
 
 #include "casadi/fx/qp_solver_internal.hpp"
-#include "casadi/fx/mx_function.hpp"
 
 #include <SQProblem.hpp>
 
@@ -59,19 +58,13 @@ public:
   protected:
     
     /// QP Solver
-    QProblem QP;
+    SQProblem *qp_;
     	
-    /// an MXFunction that performs the densification of H
-    MXFunction H_;
-
-    /// an MXFunction that performs the densification of H
-    MXFunction A_;
-    
     /// Number of working set recalculations
-    int nWSR;
+    int max_nWSR_;
     
     /// CPUtime for initialisation
-    double CPUtime;
+    double max_cputime_;
     
     /// Throw error
     static void qpoases_error(const std::string& module, int flag);
@@ -82,9 +75,12 @@ public:
     /// Error message map
     static std::map<int,std::string> flagmap;
     
-    // Has qpOASES been called once?
+    /// Has qpOASES been called once?
     bool called_once_;
     
+    /// Dense data for H and A
+    std::vector<double> h_data_;
+    std::vector<double> a_data_;
 };
 
 
