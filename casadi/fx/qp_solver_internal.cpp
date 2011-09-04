@@ -22,6 +22,7 @@
 
 #include "qp_solver_internal.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
+#include "casadi/matrix/sparsity_tools.hpp"
 
 INPUTSCHEME(QPInput)
 OUTPUTSCHEME(QPOutput)
@@ -51,26 +52,29 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &G_,
 }
     
 void QPSolverInternal::init() {
+  // Sparsity
+  CRSSparsity x_sparsity = sp_dense(nx,1);
+  CRSSparsity bounds_sparsity = sp_dense(nc,1);
+  
+  // Input arguments
   setNumInputs(QP_NUM_IN);
-  
-  input(QP_X_INIT) = DMatrix(nx,1,0);
-  
+  input(QP_X_INIT) = DMatrix(x_sparsity,0);
   input(QP_H) = DMatrix(H);
   input(QP_G) = DMatrix(G);
   input(QP_A) = DMatrix(A);
-
-  input(QP_LBA) = DMatrix(input(QP_A).size1(),1,0);
-  input(QP_UBA) = DMatrix(input(QP_LBA).sparsity());
+  input(QP_LBA) = DMatrix(bounds_sparsity, -std::numeric_limits<double>::infinity());
+  input(QP_UBA) = DMatrix(bounds_sparsity,  std::numeric_limits<double>::infinity());
+  input(QP_LBX) = DMatrix(x_sparsity,      -std::numeric_limits<double>::infinity());
+  input(QP_UBX) = DMatrix(x_sparsity,       std::numeric_limits<double>::infinity());
   
-  input(QP_LBX) = DMatrix(input(QP_X_INIT).sparsity());
-  input(QP_UBX) = DMatrix(input(QP_X_INIT).sparsity());
-  
-  
+  // Output arguments
   setNumOutputs(QP_NUM_OUT);
+  output(QP_PRIMAL) = DMatrix(x_sparsity);
+  output(QP_COST) = 0.0;
+  output(QP_DUAL_X) = DMatrix(x_sparsity);
+  output(QP_DUAL_A) = DMatrix(bounds_sparsity);
   
-  output(QP_X_OPT) = DMatrix(input(QP_X_INIT).sparsity());
-  
-  output(QP_COST) = DMatrix(1,1,0);
+  // Call the init method of the base class
   FXInternal::init();
 }
 

@@ -81,6 +81,9 @@ public:
     /// Dense data for H and A
     std::vector<double> h_data_;
     std::vector<double> a_data_;
+    
+    /// Temporary vector holding the dual solution
+    std::vector<double> dual_;
 };
 
 

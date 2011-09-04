@@ -104,11 +104,11 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   
   int flag = s->solve(prob,vars, resid);
     
-  vars->x->copyIntoArray(&output(QP_X_OPT).data()[0]);
+  vars->x->copyIntoArray(&output(QP_PRIMAL).data()[0]);
   
 
   
-  if (isnan(output(QP_X_OPT).at(0))) {
+  if (isnan(output(QP_PRIMAL).at(0))) {
      std::cerr << "WARNING: nan in decision variables. You probably need to do a solver.reInit() call before evaluate()." << std::endl;
   }
   

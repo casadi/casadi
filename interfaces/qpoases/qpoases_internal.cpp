@@ -22,9 +22,6 @@
 
 #include "qpoases_internal.hpp"
 
-#include "casadi/mx/mx_tools.hpp"
-#include "casadi/fx/mx_function.hpp"
-#include "casadi/mx/densification.hpp"
 #include "../../casadi/stl_vector_tools.hpp"
 #include "../../casadi/matrix/matrix_tools.hpp"
 
@@ -70,10 +67,13 @@ void QPOasesInternal::init(){
   }
   
   // Create data for H if not dense
-  if(!H.dense()) h_data_.resize(H.numel());
+  if(!H.dense()) h_data_.resize(nx*nx);
   
   // Create data for A if not dense
-  if(!A.dense()) a_data_.resize(A.numel());
+  if(!A.dense()) a_data_.resize(nx*nc);
+  
+  // Dual solution vector
+  dual_.resize(nx+nc);
   
   if(qp_) delete qp_;
   qp_ = new SQProblem(nx,nc);
@@ -126,9 +126,19 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
     flag = qp_->hotstart(h,g,a,lb,ub,lbA,ubA,nWSR, cputime_ptr);
     casadi_assert(flag==SUCCESSFUL_RETURN || flag==RET_MAX_NWSR_REACHED);
   }
-  
-  qp_->getPrimalSolution( getPtr(output(QP_X_OPT)));
+
+  // Get optimal cost
   output(QP_COST).set(qp_->getObjVal());
+
+  // Get the primal solution
+  qp_->getPrimalSolution(&output(QP_PRIMAL).front());
+  
+  // Get the dual solution
+  qp_->getDualSolution(&dual_.front());
+  
+  // Split up the dual solution in multipliers for the simple bounds and the linear bounds
+  copy(dual_.begin(),   dual_.begin()+nx,output(QP_DUAL_X).begin());
+  copy(dual_.begin()+nx,dual_.end(),     output(QP_DUAL_A).begin());
 }
 
 map<int,string> QPOasesInternal::calc_flagmap(){

@@ -59,11 +59,16 @@ enum QPInput{
 
 /// Outputs arguments of an QP Solver
 enum QPOutput{
-  /// The optimal value of x as calculated with evaluate()
-  QP_X_OPT,
-  /// The value of the cost function as calculated with evaluate()
+  /// The primal solution
+  QP_PRIMAL,
+  /// The optimal cost
   QP_COST,
-  QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX,QP_NUM_OUT};
+  /// The dual solution corresponding to linear bounds
+  QP_DUAL_A,
+  /// The dual solution corresponding to simple bounds
+  QP_DUAL_X,
+  
+  QP_NUM_OUT};
 
 // Forward declaration of internal class
 class QPSolverInternal;
