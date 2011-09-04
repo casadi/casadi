@@ -21,6 +21,7 @@
  */
 
 #include "external_function_internal.hpp"
+#include "../stl_vector_tools.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -112,7 +113,7 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 
 void ExternalFunctionInternal::evaluate(int nfdir, int nadir){
 #ifdef WITH_JIT 
-  int flag = evaluate_(vecptr(input_array_),vecptr(output_array_));
+  int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
 #endif // WITH_JIT 
 }

@@ -96,6 +96,14 @@ namespace CasADi{
   /// Get an pointer of sets of booleans from a double vector
   const bvec_t* get_bvec_t(const std::vector<double>& v);
   
+  /// Get a pointer to the data contained in the vector
+  template<typename T>
+  T* getPtr(std::vector<T> &v);
+  
+  /// Get a pointer to the data contained in the vector
+  template<typename T>
+  const T* getPtr(const std::vector<T> &v);
+  
 } // namespace CasADi
   
 // Implementations  
@@ -239,6 +247,22 @@ namespace CasADi{
     for(unsigned i=1; i<v.size()-1; ++i)
       v[i] = v[i-1] + increment;
     v[v.size()-1] = last;
+  }
+
+  template<typename T>
+  T* getPtr(std::vector<T> &v){
+    if(v.empty())
+      return 0;
+    else
+      return &v.front();
+  }
+  
+  template<typename T>
+  const T* getPtr(const std::vector<T> &v){
+    if(v.empty())
+      return 0;
+    else
+      return &v.front();
   }
 
 } // namespace CasADi

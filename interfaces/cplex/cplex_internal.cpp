@@ -189,9 +189,9 @@ void CplexInternal::evaluate(int nfdir, int nadir){
      // setting problem data
      status = CPXcopylp (env_, lp_, n_, m_,
                          getOption("objsense").toInt(), // min or max
-                         vecptr(objGrad),
-                         vecptr(rhs),
-                         vecptr(sense),
+                         getPtr(objGrad),
+                         getPtr(rhs),
+                         getPtr(sense),
                          J_mat_.matbeg(),
                          J_mat_.matcnt(),
                          J_mat_.matind(),

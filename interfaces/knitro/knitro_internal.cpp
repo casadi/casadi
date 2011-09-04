@@ -22,6 +22,7 @@
 
 #include "knitro_internal.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include "casadi/matrix/matrix_tools.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -145,8 +146,8 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
                               m_, &cType.front(), &input(NLP_LBG).front(), &input(NLP_UBG).front(),
                               Jcol.size(), &Jcol.front(), &Jrow.front(),
                               nnzH,
-                              vecptr(Hrow),
-                              vecptr(Hcol),
+                              getPtr(Hrow),
+                              getPtr(Hcol),
                               &input(NLP_X_INIT).front(),
                               0); // initial lambda
   casadi_assert_message(status==0, "KTR_init_problem failed");
@@ -169,7 +170,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   // Solve NLP
   status = KTR_solve(kc_handle_,
                    &output(NLP_X_OPT).front(),
-                   vecptr(lambda),
+                   getPtr(lambda),
                    0,  // not used
                    &output(NLP_COST).front(),
                    0,  // not used
@@ -181,7 +182,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   casadi_assert(status<=0); // make sure the NLP finished solving
     
   // Copy lagrange multipliers
-  output(NLP_LAMBDA_OPT).set(vecptr(lambda));
+  output(NLP_LAMBDA_OPT).set(getPtr(lambda));
   output(NLP_LAMBDA_LBX).set(&lambda[m_]);
   output(NLP_LAMBDA_UBX).set(&lambda[m_]);
 

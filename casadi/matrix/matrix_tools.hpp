@@ -260,6 +260,14 @@ Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
 template<typename T>
 void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A=false);
 
+/// Get a pointer to the data contained in the vector
+template<typename T>
+T* getPtr(Matrix<T> &v);
+  
+/// Get a pointer to the data contained in the vector
+template<typename T>
+const T* getPtr(const Matrix<T> &v);
+
 } // namespace CasADi
 
 // Global namespace
@@ -887,6 +895,22 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
     }
   }
 }
+
+  template<typename T>
+  T* getPtr(Matrix<T> &v){
+    if(v.empty())
+      return 0;
+    else
+      return &v.front();
+  }
+  
+  template<typename T>
+  const T* getPtr(const Matrix<T> &v){
+    if(v.empty())
+      return 0;
+    else
+      return &v.front();
+  }
 
 
 // template<class T>

@@ -21,6 +21,7 @@
  */
 
 #include "linear_solver_internal.hpp"
+#include "../stl_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -92,7 +93,7 @@ void LinearSolverInternal::solve(){
   copy(b.begin(),b.end(),x.begin());
   
   // Solve the factorized system
-  solve(vecptr(x),1,transpose_);
+  solve(getPtr(x),1,transpose_);
 }
  
 } // namespace CasADi

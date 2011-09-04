@@ -332,10 +332,10 @@ void CVodesInternal::init(){
     if(finite_difference_fsens_){
       // Use finite differences to calculate the residual in the forward sensitivity equations
       if(all_at_once){
-        flag = CVodeSensInit(mem_,nfdir_,ism_,0,vecptr(yS0_));
+        flag = CVodeSensInit(mem_,nfdir_,ism_,0,getPtr(yS0_));
         if(flag != CV_SUCCESS) cvodes_error("CVodeSensInit",flag);
       } else {
-        flag = CVodeSensInit1(mem_,nfdir_,ism_,0,vecptr(yS0_));
+        flag = CVodeSensInit1(mem_,nfdir_,ism_,0,getPtr(yS0_));
         if(flag != CV_SUCCESS) cvodes_error("CVodeSensInit1",flag);
       }
       
@@ -348,10 +348,10 @@ void CVodesInternal::init(){
     } else {
       if(all_at_once){
         // Use AD to calculate the residual in the forward sensitivity equations
-        flag = CVodeSensInit(mem_,nfdir_,ism_,rhsS_wrapper,vecptr(yS0_));
+        flag = CVodeSensInit(mem_,nfdir_,ism_,rhsS_wrapper,getPtr(yS0_));
         if(flag != CV_SUCCESS) cvodes_error("CVodeSensInit",flag);
       } else {
-        flag = CVodeSensInit1(mem_,nfdir_,ism_,rhsS1_wrapper,vecptr(yS0_));
+        flag = CVodeSensInit1(mem_,nfdir_,ism_,rhsS1_wrapper,getPtr(yS0_));
         if(flag != CV_SUCCESS) cvodes_error("CVodeSensInit",flag);
       }
     }
@@ -359,7 +359,7 @@ void CVodesInternal::init(){
     // Set tolerances
     vector<double> fsens_abstol(nfdir_,fsens_abstol_);
     
-    flag = CVodeSensSStolerances(mem_,fsens_reltol_,vecptr(fsens_abstol));
+    flag = CVodeSensSStolerances(mem_,fsens_reltol_,getPtr(fsens_abstol));
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensSStolerances",flag);
     
     // Set optional inputs
@@ -369,11 +369,11 @@ void CVodesInternal::init(){
     
     // Quadrature equations
     if(nq_>0){
-      flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, vecptr(yQS0_));
+      flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS0_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInit",flag);
 
       // Set tolerances
-      flag = CVodeQuadSensSStolerances(mem_,fsens_reltol_,vecptr(fsens_abstol));
+      flag = CVodeQuadSensSStolerances(mem_,fsens_reltol_,getPtr(fsens_abstol));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensSStolerances",flag);
     }
   } // enable fsens
@@ -554,11 +554,11 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
   
   // Re-initialize sensitivities
   if(fsens_order_>0){
-    flag = CVodeSensReInit(mem_,ism_,vecptr(yS0_));
+    flag = CVodeSensReInit(mem_,ism_,getPtr(yS0_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
     
     if(nq_>0){
-      flag = CVodeQuadSensReInit(mem_, vecptr(yQS0_));
+      flag = CVodeQuadSensReInit(mem_, getPtr(yQS0_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit",flag);
     }
   } else {
@@ -601,12 +601,12 @@ void CVodesInternal::integrate(double t_out){
   
   if(fsens_order_>0){
     // Get the sensitivities
-    flag = CVodeGetSens(mem_, &t_, vecptr(yS_));
+    flag = CVodeGetSens(mem_, &t_, getPtr(yS_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeGetSens",flag);
     
     if(nq_>0){
       double tret;
-      flag = CVodeGetQuadSens(mem_, &tret, vecptr(yQS_));
+      flag = CVodeGetQuadSens(mem_, &tret, getPtr(yQS_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens",flag);
     }
   }

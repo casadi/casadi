@@ -21,6 +21,7 @@
  */
 
 #include "lapack_lu_dense.hpp"
+#include "../../casadi/stl_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -88,7 +89,7 @@ void LapackLUDenseInternal::prepare(){
     double rowcnd, colcnd; // ratio of smallest to largest row/column scaling factor
     double amax; // absolute value of the largest matrix element
     int info = -100;
-    dgeequ_(&nrow_,&ncol_,vecptr(mat_),&nrow_,vecptr(r_),vecptr(c_),&rowcnd, &colcnd, &amax, &info);
+    dgeequ_(&nrow_,&ncol_,getPtr(mat_),&nrow_,getPtr(r_),getPtr(c_),&rowcnd, &colcnd, &amax, &info);
     if(info < 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeequ_ failed to calculate the scaling factors");
     if(info>0){
       stringstream ss;
@@ -106,14 +107,14 @@ void LapackLUDenseInternal::prepare(){
   
     // Equilibriate the matrix if scaling was successful
     if(info!=0)
-      dlaqge_(&nrow_,&ncol_,vecptr(mat_),&nrow_,vecptr(r_),vecptr(c_),&rowcnd, &colcnd, &amax, &equed_);
+      dlaqge_(&nrow_,&ncol_,getPtr(mat_),&nrow_,getPtr(r_),getPtr(c_),&rowcnd, &colcnd, &amax, &equed_);
     else
       equed_ = 'N';
   }
   
   // Factorize the matrix
   int info = -100;
-  dgetrf_(&nrow_, &nrow_, vecptr(mat_), &nrow_, vecptr(ipiv_), &info);
+  dgetrf_(&nrow_, &nrow_, getPtr(mat_), &nrow_, getPtr(ipiv_), &info);
   if(info != 0) throw CasadiException("LapackLUDenseInternal::prepare: dgetrf_ failed to factorize the jacobian");
   
   // Sucess if reached this point
@@ -131,7 +132,7 @@ void LapackLUDenseInternal::solve(double* x, int nrhs, bool transpose){
   // Solve the system of equations
   int info = 100;
   char trans = transpose ? 'N' : 'T';  // swap 'T' for 'N' due to c-column major, fortran row major
-  dgetrs_(&trans, &nrow_, &nrhs, vecptr(mat_), &nrow_, vecptr(ipiv_), x, &nrow_, &info);
+  dgetrs_(&trans, &nrow_, &nrhs, getPtr(mat_), &nrow_, getPtr(ipiv_), x, &nrow_, &info);
   if(info != 0) throw CasadiException("LapackLUDenseInternal::solve: failed to solve the linear system");
 
   // Scale the solution

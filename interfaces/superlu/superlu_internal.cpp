@@ -21,6 +21,7 @@
  */
 
 #include "superlu_internal.hpp"
+#include "../../casadi/stl_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -98,8 +99,8 @@ void SuperLUInternal::init(){
 
   
   // Create matrices A and B in the format expected by SuperLU.
-  dCreate_CompCol_Matrix(&A_, ncol(), nrow(), nnz(), vecptr(a_), const_cast<int*>(vecptr(col())), const_cast<int*>(vecptr(rowind())), SLU_NC, SLU_D, SLU_GE);
-  dCreate_Dense_Matrix(&B_, nrow(), nrhs_, vecptr(rhs_), nrow(), SLU_DN, SLU_D, SLU_GE);
+  dCreate_CompCol_Matrix(&A_, ncol(), nrow(), nnz(), getPtr(a_), const_cast<int*>(getPtr(col())), const_cast<int*>(getPtr(rowind())), SLU_NC, SLU_D, SLU_GE);
+  dCreate_Dense_Matrix(&B_, nrow(), nrhs_, getPtr(rhs_), nrow(), SLU_DN, SLU_D, SLU_GE);
 
   // Initialize the statistics variables
   StatInit(&stat_);
@@ -173,8 +174,8 @@ void SuperLUInternal::prepare(){
   copy(val.begin(),val.end(),a_.begin());
 
   SuperMatrix AC;
-  get_perm_c(options_.ColPerm, &A_, vecptr(perm_c_));
-  sp_preorder(&options_, &A_, vecptr(perm_c_), vecptr(etree_), &AC);
+  get_perm_c(options_.ColPerm, &A_, getPtr(perm_c_));
+  sp_preorder(&options_, &A_, getPtr(perm_c_), getPtr(etree_), &AC);
 
   int panel_size = sp_ienv(1);
   int relax = sp_ienv(2); // no of columns in a relaxed snodes
@@ -184,7 +185,7 @@ if (user_work_){
   if(!lwork_){
     int sz = 0;
     lwork_ = -1;
-    dgstrf(&options_, &AC, relax, panel_size, vecptr(etree_), work_, lwork_, vecptr(perm_c_), vecptr(perm_r_), &L_, &U_, &stat_, &sz);
+    dgstrf(&options_, &AC, relax, panel_size, getPtr(etree_), work_, lwork_, getPtr(perm_c_), getPtr(perm_r_), &L_, &U_, &stat_, &sz);
     lwork_ = sz; // - A->ncol;
     if(work_) free(work_);
     work_ = malloc(lwork_);
@@ -194,7 +195,7 @@ if (user_work_){
   // Compute the LU factorization of A
   do{
     info_ = 0;
-    dgstrf(&options_, &AC, relax, panel_size, vecptr(etree_), work_, lwork_, vecptr(perm_c_), vecptr(perm_r_), &L_, &U_, &stat_, &info_);
+    dgstrf(&options_, &AC, relax, panel_size, getPtr(etree_), work_, lwork_, getPtr(perm_c_), getPtr(perm_r_), &L_, &U_, &stat_, &info_);
 
     if(info_<0){
       stringstream ss;
@@ -238,7 +239,7 @@ void SuperLUInternal::solve(double* x, int nrhs, bool transpose){
     
   // Solve the system A*X=B, overwriting B with X. 
   info_ = 0;
-  dgstrs(options_.Trans, &L_, &U_, vecptr(perm_c_), vecptr(perm_r_), &B_, &stat_, &info_);
+  dgstrs(options_.Trans, &L_, &U_, getPtr(perm_c_), getPtr(perm_r_), &B_, &stat_, &info_);
   if(info_ != 0) throw CasadiException("dgstrs failed");
 
   // Copy the result

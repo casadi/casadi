@@ -74,6 +74,11 @@ while true
     if ~isempty(hfun) mu_hat :     Jhk*p + hk >= 0; end
     cvx_end
     
+    p
+    lambda_hat
+    mu_hat
+    error('as')
+    
     % Get the gradient of the Lagrangian
     gradL = Jfk';
     if ~isempty(gfun) gradL = gradL - Jgk'*lambda_hat; end

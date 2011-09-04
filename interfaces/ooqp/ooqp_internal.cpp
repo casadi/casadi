@@ -24,6 +24,7 @@
 
 #include "casadi/matrix/sparsity_tools.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
+#include "casadi/stl_vector_tools.hpp"
 
 #include "casadi/pre_c99_support.hpp"
 
@@ -216,14 +217,14 @@ void OOQPInternal::allocate() {
 
   // Set all pointers to problem data
   prob = (QpGenData * )qp->makeData( &input(QP_G).data()[0],
-                         vecptr(Hl_rowind),  vecptr(Hl_col),  &Hl.data()[0],
-                          &LBX.data()[0],  vecptr(ixlow),
-                         &UBX.data()[0],  vecptr(ixupp),
-                       vecptr(eq_rowind), vecptr(eq_col),  &A_eq.data()[0],
+                         getPtr(Hl_rowind),  getPtr(Hl_col),  &Hl.data()[0],
+                          &LBX.data()[0],  getPtr(ixlow),
+                         &UBX.data()[0],  getPtr(ixupp),
+                       getPtr(eq_rowind), getPtr(eq_col),  &A_eq.data()[0],
                       &BA_eq.data()[0],
-                       vecptr(ineq_rowind), vecptr(ineq_col),  &A_ineq.data()[0],
-                        &LBA_ineq.data()[0],  vecptr(iclow),
-                       &UBA_ineq.data()[0],  vecptr(icupp));
+                       getPtr(ineq_rowind), getPtr(ineq_col),  &A_ineq.data()[0],
+                        &LBA_ineq.data()[0],  getPtr(iclow),
+                       &UBA_ineq.data()[0],  getPtr(icupp));
 
     
   // Further setup of the QP problem

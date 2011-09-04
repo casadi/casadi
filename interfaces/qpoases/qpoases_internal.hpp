@@ -81,6 +81,10 @@ public:
     
     /// Error message map
     static std::map<int,std::string> flagmap;
+    
+    // Has qpOASES been called once?
+    bool called_once_;
+    
 };
 
 

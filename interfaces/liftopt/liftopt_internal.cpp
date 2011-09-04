@@ -22,6 +22,8 @@
 
 #include "liftopt_internal.hpp"
 #include "casadi_lifter.hpp"
+#include "../../casadi/stl_vector_tools.hpp"
+#include "../../casadi/matrix/matrix_tools.hpp"
 using namespace std;
 
 namespace CasADi{
@@ -58,11 +60,11 @@ void LiftoptInternal::init(){
   // Call the init function for the base class
   NLPSolverInternal::init();
   
-  uInit_ = liftopt::DVec(vecptr(input(NLP_X_INIT)),n_,1);
-  loCtrlBounds_ = liftopt::DVec(vecptr(input(NLP_LBX)),n_,1);
-  upCtrlBounds_ = liftopt::DVec(vecptr(input(NLP_UBX)),n_,1);
-  lambdaInit_ = liftopt::DVec(vecptr(input(NLP_LAMBDA_INIT)),m_,1);
-  nodeInit_ = liftopt::DVec(vecptr(nodeInit),nodeInit.size(),1);
+  uInit_ = liftopt::DVec(getPtr(input(NLP_X_INIT)),n_,1);
+  loCtrlBounds_ = liftopt::DVec(getPtr(input(NLP_LBX)),n_,1);
+  upCtrlBounds_ = liftopt::DVec(getPtr(input(NLP_UBX)),n_,1);
+  lambdaInit_ = liftopt::DVec(getPtr(input(NLP_LAMBDA_INIT)),m_,1);
+  nodeInit_ = liftopt::DVec(getPtr(nodeInit),nodeInit.size(),1);
   problem_ = new CasadiLifter(this);
   
   if(getOption("optimizer")=="newton"){

@@ -1445,12 +1445,12 @@ void Matrix<T>::get(T& val, Sparsity sp) const{
 
 template<class T>
 void Matrix<T>::set(const std::vector<T>& val, Sparsity sp){
-  setArray(vecptr(val),val.size(),sp);
+  setArray(val.empty() ? 0 : &val.front(),val.size(),sp);
 }
 
 template<class T>
 void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
-  getArray(vecptr(val),val.size(),sp);
+  getArray(val.empty() ? 0 : &val.front(),val.size(),sp);
 }
 
 template<class T>
