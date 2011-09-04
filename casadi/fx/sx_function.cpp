@@ -127,7 +127,7 @@ SXMatrix SXFunction::hess(int iind, int oind){
   if((*this)->verbose()){
     cout << "SXFunction::hess: calculating Jacobian " << endl;
   }
-  SXMatrix ret = gfcn.jac(0,0);
+  SXMatrix ret = gfcn.jac();
   if((*this)->verbose()){
     cout << "SXFunction::hess: calculating Jacobian done" << endl;
   }

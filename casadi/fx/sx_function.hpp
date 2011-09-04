@@ -105,10 +105,10 @@ public:
   *
   * \see CasADi::Jacobian for an AD approach
   */
-  SXMatrix jac(int iind, int oind);
+  SXMatrix jac(int iind=0, int oind=0);
 
   /// Gradient via source code transformation
-  SXMatrix grad(int iind, int oind);
+  SXMatrix grad(int iind=0, int oind=0);
   
   /// Hessian (forward over adjoint) via source code transformation
   SXMatrix hess(int iind=0, int oind=0);
