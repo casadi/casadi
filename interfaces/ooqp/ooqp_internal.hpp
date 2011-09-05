@@ -63,85 +63,84 @@ public:
      * OOQP specific pointers.
      * @ {
      * */
-    QpGenSparseMa27 * qp;
-    QpGenData      * prob;
-    QpGenVars      * vars; 
-    QpGenResiduals * resid;
-    GondzioSolver  * s;
+    QpGenSparseMa27 * qp_;
+    QpGenData      * prob_;
+    QpGenVars      * vars_; 
+    QpGenResiduals * resid_;
+    GondzioSolver  * s_;
     /* @} */
     
     /// Boolean vector indicating equality with 0 and inequality with 1
-    std::vector<int> constraints;
+    std::vector<int> constraints_;
     
     /// The non-zero indices of the equality constraints (vector of size n_eq)
-    std::vector<int> eq;
+    std::vector<int> eq_;
 
     /// The non-zero indices of the inequality constraints (vector of size n_eq)
-    std::vector<int> ineq;
+    std::vector<int> ineq_;
     
     /// Number of equality constraints
-    int n_eq;
+    int n_eq_;
     
     /// Number of inequality constraints
-    int n_ineq;
+    int n_ineq_;
     
     /// NZ indices of H elements  on the lower triangular side
-    std::vector<int> nz;
+    std::vector<int> nz_;
     
     /// The lower triangular part of H
-    DMatrix Hl;
+    DMatrix Hl_;
     
     /// The non-zero indices into H that make up Hl 
-    std::vector<int> Hl_nz;
+    std::vector<int> Hl_nz_;
     
     /// The equality part of A
-    DMatrix A_eq;
+    DMatrix A_eq_;
     
     /// The inequality part of A
-    DMatrix A_ineq;
+    DMatrix A_ineq_;
     
     /// The equality part of LBA
-    DMatrix BA_eq;
+    DMatrix BA_eq_;
     
     /// The inequality part of LBA
-    DMatrix LBA_ineq;
+    DMatrix LBA_ineq_;
     
     /// The inequality part of UBA
-    DMatrix UBA_ineq;
+    DMatrix UBA_ineq_;
     
     /// The LBX with -inf substituted by 0 (needed for OOQP)
-    DMatrix LBX;
+    DMatrix LBX_;
     
     /// The UBX with inf substituted by 0 (needed for OOQP)
-    DMatrix UBX;
-    
+    DMatrix UBX_;
     
     /// A vector to do slicing operations on A. 
-    std::vector<int> all_A;
+    std::vector<int> all_A_;
     
     /** 
      *  In OOQP, infinite bounds need a special treatment. They must be deactivated by setting the i-something std::vector<char>.
      *  they have to be zero for infinite bounds and 1 otherwise
      * @{
      */
-    std::vector<char> ixlow;
-    std::vector<char> ixupp;
+    std::vector<char> ixlow_;
+    std::vector<char> ixupp_;
 
-    std::vector<char> iclow;
-    std::vector<char> icupp;
+    std::vector<char> iclow_;
+    std::vector<char> icupp_;
     
     /**
      * Because OOQP does not do const correctness properly, and because we cannot trust it, we copy all(rowind,col) data
      * @{
      * */
-    std::vector<int> Hl_rowind;
-    std::vector<int> Hl_col;
+    std::vector<int> Hl_rowind_;
+    std::vector<int> Hl_col_;
     
-    std::vector<int> eq_rowind;
-    std::vector<int> eq_col;
+    std::vector<int> eq_rowind_;
+    std::vector<int> eq_col_;
     
-    std::vector<int> ineq_rowind;
-    std::vector<int> ineq_col;
+    std::vector<int> ineq_rowind_;
+    std::vector<int> ineq_col_;
     /** @} */
     
     
