@@ -102,8 +102,23 @@ def dotgraph(s,direction="BT"):
   return graph
 
 
-def dotdraw(s,direction):
+def dotdraw(s,direction="RL"):
   """
   direction   one of "BT", "LR", "TB", "RL"
   """
-  dotgraph(s,direction=direction).write_ps("test.ps")
+
+  from pylab import imread, imshow,show,figure, axes
+  if hasattr(show,'__class__') and show.__class__.__name__=='PylabShow':  # catch pyreport
+    figure_name = '%s%d.%s' % ( show.basename, len(show.figure_list), show.figure_extension )
+    show.figure_list += (figure_name, )
+    dotgraph(s,direction=direction).write_pdf(figure_name)
+    print "Here goes figure %s (dotdraw)" % figure_name
+  else:
+    temp="_temp.png"
+    dotgraph(s,direction=direction).write_png(temp)
+    im = imread(temp)
+    figure()
+    ax = axes([0,0,1,1], frameon=False)
+    ax.set_axis_off()
+    imshow(im)
+    show()
