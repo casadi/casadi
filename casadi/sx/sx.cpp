@@ -320,6 +320,16 @@ string SX::toString() const{
   return ss.str();
 }
 
+bool SX::isLeaf() const {
+  if (!node) return true;
+  return node->isConstant() || node->isSymbolic();
+}
+
+bool SX::isCommutative() const{
+  if (!isBinary()) throw CasadiException("SX::isCommutative: must be binary");
+  return casadi_math<double>::isCommutative[getOp()];
+}
+
 bool SX::isConstant() const{
   return node->isConstant();
 }
@@ -382,6 +392,16 @@ int SX::getIntValue() const{
 
 SX SX::getDep(int ch) const{
   return node->dep(ch);
+}
+
+int SX::getNdeps() const {
+  if (!isBinary()) throw CasadiException("SX::getNdeps: must be binary");
+  return casadi_math<double>::ndeps[getOp()];
+}
+
+long SX::__hash__() const {
+   if (!node) return 0;
+   return (long) node;
 }
 
 const SX casadi_limits<SX>::zero(new ZeroSXNode()); // node corresponding to a constant 0

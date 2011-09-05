@@ -27,6 +27,11 @@
 #include <vector>
 #include <list>
 
+
+#ifdef SWIG
+  %rename(getNZ_const) getNZ(int, int) const;
+#endif
+
 namespace CasADi{
 
 // Forward declaration
@@ -160,9 +165,10 @@ class CRSSparsity : public SharedObject{
          Add the element if it does not exist and copy object if it's not unique */
     int getNZ(int i, int j);
     
-    /** \brief Get the index of an exstd::vector<unsigned short>isting non-zero element
+    /** \brief Get the index of an existing non-zero element
          return -1 if the element does not exists */
     int getNZ(int i, int j) const;
+
 
     /** \brief Get a set of non-zero element
          return -1 if the element does not exists */

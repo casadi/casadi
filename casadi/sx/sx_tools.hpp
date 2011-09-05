@@ -392,8 +392,11 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
 */
 Matrix<SX> evaluateConstants(const Matrix<SX>& ex);
 
-/** Count number of nodes */
+/** \brief Count number of nodes */
 int countNodes(const Matrix<SX>& A);
+
+/** \brief Get a string representation for a binary SX, using custom arguments */
+std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
 
 
 } // namespace CasADi

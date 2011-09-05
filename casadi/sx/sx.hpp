@@ -164,10 +164,17 @@ class SX{
     static SX binary(int op, const SX& x, const SX& y);
     static SX unary(int op, const SX& x);
 
+    /** \brief check if this SX is a leaf of the SX graph
+    *
+    * An SX qualifies as leaf when it has no dependencies.
+    */
+    bool isLeaf() const;
     bool isConstant() const;
     bool isInteger() const;
     bool isSymbolic() const;
     bool isBinary() const;
+    /** \brief Check wether a binary SX is commutative*/
+    bool isCommutative() const;
     bool isZero() const;
     bool isOne() const;
     bool isMinusOne() const;
@@ -180,6 +187,14 @@ class SX{
     double getValue() const;
     int getIntValue() const;
     SX getDep(int ch=0) const;
+    
+    /** \brief Get the number of dependencies of a binary SX */
+    int getNdeps() const;
+
+    /** \brief Returns a number that is uniaue for a given SXNode. 
+    * If the SX does not point to qny node, 0 is returned.
+    */
+    long __hash__() const;
 
     /** \brief  Negation */
     SX operator-() const;

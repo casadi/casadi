@@ -225,12 +225,24 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
 )
+add_custom_command(
+  TARGET _${CASADI_SWIG_MAIN_MODULE}
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
+)
 else(WITH_SWIG_SPLIT)
 add_custom_command(
   TARGET _casadi
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
+)
+add_custom_command(
+  TARGET _casadi
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
 )
 endif(WITH_SWIG_SPLIT)
 
