@@ -70,49 +70,30 @@ public:
     GondzioSolver  * s_;
     /* @} */
     
-    /// The non-zero indices of the equality constraints
-    std::vector<int> eq_;
-
-    /// The non-zero indices of the inequality constraints
-    std::vector<int> ineq_;
+    /// The non-zero indices of the equality and inequality constraints
+    std::vector<int> eq_, ineq_;
         
-    /// NZ indices of H elements  on the lower triangular side
-    std::vector<int> nz_;
-    
     /// The lower triangular part of H
     DMatrix Hl_;
     
-    /// The equality part of A
-    DMatrix A_eq_;
+    /// The equality and inequality parts of A
+    DMatrix A_eq_, A_ineq_;
     
-    /// The inequality part of A
-    DMatrix A_ineq_;
-    
-    /// The equality part of LBA
+    /// The equality part of LBA/UBA
     std::vector<double> bA_eq_;
     
-    /// The inequality part of LBA
-    std::vector<double> lbA_ineq_;
+    /// The inequality part of LBA and UBA
+    std::vector<double> lbA_ineq_, ubA_ineq_;
     
-    /// The inequality part of UBA
-    std::vector<double> ubA_ineq_;
-    
-    /// The LBX with -inf substituted by 0 (needed for OOQP)
-    std::vector<double> lbX_;
-    
-    /// The UBX with inf substituted by 0 (needed for OOQP)
-    std::vector<double> ubX_;
+    /// The LBX/UBX with infinities substituted by 0 (needed for OOQP)
+    std::vector<double> lbX_, ubX_;
     
     /** 
      *  In OOQP, infinite bounds need a special treatment. They must be deactivated by setting the i-something std::vector<char>.
      *  they have to be zero for infinite bounds and 1 otherwise
      * @{
      */
-    std::vector<char> ixlow_;
-    std::vector<char> ixupp_;
-
-    std::vector<char> iclow_;
-    std::vector<char> icupp_;
+    std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
     
     /// Throw error
     static void ooqp_error(const std::string& module, int flag);
