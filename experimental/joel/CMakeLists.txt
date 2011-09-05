@@ -4,6 +4,7 @@ find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
 find_package(LIFTOPT QUIET)
+find_package(OOQP QUIET)
 
 IF(IPOPT_FOUND)
 include_directories(${IPOPT_INCLUDE_DIR})
@@ -67,5 +68,11 @@ endif(LIFTOPT_FOUND)
 add_executable(mx_jacobian mx_jacobian.cpp)
 target_link_libraries(mx_jacobian casadi ${CMAKE_DL_LIBS})
 
+IF(IPOPT_FOUND)
+if(OOQP_FOUND)
+add_executable(test_ooqp test_ooqp.cpp )
+target_link_libraries(test_ooqp ooqp_interface casadi ${OOQP_LIBRARIES} ${IPOPT_LIBRARIES} ${CMAKE_DL_LIBS})
+endif(OOQP_FOUND)
+endif(IPOPT_FOUND)
 
 

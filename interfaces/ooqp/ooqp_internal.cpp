@@ -43,10 +43,11 @@ OOQPInternal* OOQPInternal::clone() const{
 }
   
 OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
+  casadi_warning("OOQP interface still expermental");
+
   addOption("print_level",OT_INTEGER,0,"Print level. OOQP listends to print_level 0, 10 and 100");
   addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
   addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
-  
   
   qp_=0;
   prob_=0;
@@ -70,8 +71,8 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   casadi_assert_message(nfdir==0 && nadir==0, "OOQPSolve::evaluate() not implemented for forward or backward mode");
   if (qp_==0) {
     allocate();
-    assert(qp_);
-  } else {  
+    casadi_assert(qp_!=0);
+  } else {
     // Split A in equalities and inequalities
     A_eq_.set(input(QP_A)(eq_,all_A_));
     A_ineq_.set(input(QP_A)(ineq_,all_A_));
@@ -128,39 +129,22 @@ void OOQPInternal::allocate() {
     delete vars_;
     delete resid_;
   }
-  
-  
+
   // Decide if constraints are equality or inequality
-  for (int k=0; k<input(QP_LBA).size();++k) 
-    constraints_[k] = !(input(QP_LBA).at(k)==input(QP_UBA).at(k));
-  
-  // Find the number of inequalities
-  n_ineq_=0;
-  for (int k=0;k<constraints_.size();k++) 
-    n_ineq_ += constraints_[k];
-  
-  // Find the number of equalities
-  n_eq_ = constraints_.size()-n_ineq_;
-  
-  // Populate ineq
-  ineq_.resize(n_ineq_);
-  int cntineq=0;
-  for (int k=0;k<constraints_.size();k++) {
-    if (constraints_[k]) 
-      ineq_[cntineq++]=k;
+  ineq_.clear();
+  eq_.clear();
+  const vector<double>& uba = input(QP_UBA).data();
+  const vector<double>& lba = input(QP_LBA).data();
+  for(int k=0; k<uba.size(); ++k){
+    if(uba[k]==lba[k]){
+      eq_.push_back(k);
+    } else {
+      ineq_.push_back(k);
+    }
   }
-  
-  // Populate eq
-  eq_.resize(n_eq_);
-  int cnteq=0;
-  for (int k=0;k<constraints_.size();k++) {
-    if (!constraints_[k])
-      eq_[cntineq++]=k;
-  }
-  
   
   // Set up a Sparse solver
-  qp_ = new QpGenSparseMa27( nx, n_eq_, n_ineq_, input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
+  qp_ = new QpGenSparseMa27( nx, eq_.size(), ineq_.size(), input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
   
 
   // Split A in equalities and inequalities
@@ -193,8 +177,8 @@ void OOQPInternal::allocate() {
     ixupp_[k]= !(input(QP_UBX).at(k)==numeric_limits<double>::infinity());
   
   // Set iclow & icupp: they have to be zero for infinite bounds and 1 otherwise
-  iclow_.resize(n_ineq_,0);
-  icupp_.resize(n_ineq_,0);
+  iclow_.resize(ineq_.size(),0);
+  icupp_.resize(ineq_.size(),0);
   
   for (int k=0; k<LBA_ineq_.size();++k) 
     iclow_[k]=!(LBA_ineq_.at(k)==-numeric_limits<double>::infinity());
@@ -215,7 +199,7 @@ void OOQPInternal::allocate() {
   // Set Hl (the lower triangular part of H)
   Hl_.set(input(QP_H)[Hl_nz_]);
   
-  // Because OOQP does not do const correctness properly, and because we cannot trust it, we copy all (rowind,col) data
+  // Because OOQP does not do const correctness properly, and because we cannot trust it, we copy all (rowind,col) data // NOTE: Joel: this appears unnecessary
   Hl_rowind_ = Hl_.sparsity().rowind();
   Hl_col_    = Hl_.sparsity().col();
   
@@ -226,15 +210,15 @@ void OOQPInternal::allocate() {
   ineq_col_ = A_ineq_.sparsity().col();
 
   // Set all pointers to problem data
-  prob_ = (QpGenData * )qp_->makeData( &input(QP_G).data()[0],
-                                     getPtr(Hl_rowind_),  getPtr(Hl_col_),  &Hl_.data()[0],
-                                     &LBX_.data()[0],  getPtr(ixlow_),
-                                     &UBX_.data()[0],  getPtr(ixupp_),
-                                     getPtr(eq_rowind_), getPtr(eq_col_),  &A_eq_.data()[0],
-                                     &BA_eq_.data()[0],
-                                     getPtr(ineq_rowind_), getPtr(ineq_col_),  &A_ineq_.data()[0],
-                                     &LBA_ineq_.data()[0],  getPtr(iclow_),
-                                     &UBA_ineq_.data()[0],  getPtr(icupp_));
+  prob_ = (QpGenData * )qp_->makeData( getPtr(input(QP_G)),
+                                       getPtr(Hl_rowind_),  getPtr(Hl_col_),  getPtr(Hl_),
+                                       getPtr(LBX_),  getPtr(ixlow_),
+                                       getPtr(UBX_),  getPtr(ixupp_),
+                                       getPtr(eq_rowind_), getPtr(eq_col_),  getPtr(A_eq_),
+                                       getPtr(BA_eq_),
+                                       getPtr(ineq_rowind_), getPtr(ineq_col_),  getPtr(A_ineq_),
+                                       getPtr(LBA_ineq_),  getPtr(iclow_),
+                                       getPtr(UBA_ineq_),  getPtr(icupp_));
 
   // Further setup of the QP problem
   vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
@@ -255,8 +239,6 @@ void OOQPInternal::init(){
   ixupp_.resize(nx,0);
   
   all_A_ = range(0,input(QP_A).size2());
-  
-  constraints_.resize(input(QP_A).size1(),0);
 }
 
 map<int,string> OOQPInternal::calc_flagmap(){

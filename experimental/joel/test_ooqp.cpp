@@ -1,0 +1,74 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#include "casadi/casadi.hpp"
+#include "interfaces/ooqp/ooqp_solver.hpp"
+#include <ctime>
+
+using namespace std;
+using namespace CasADi;
+using namespace Interfaces;
+
+int main() {
+  DMatrix H(2,2,0);
+  H(0,0) = 1.0;
+  H(1,1) = 0.5;
+  
+  DMatrix A(1,2,0);
+  A(0,0) = 1.0;
+  A(0,1) = 1.0;
+  
+  DMatrix g(2,1,0);
+  g(0) = 1.5;
+  g(1) = 1.0;
+  
+  DMatrix lb(2,1,0);
+  lb(0) = 0.5;
+  lb(1) = -2.0;
+  
+  DMatrix ub(2,1,0);
+  ub(0) = 5.0;
+  ub(1) = 2.0;
+  
+  DMatrix lbA(1,1,0);
+  lbA(0) = -1.0;
+  
+  DMatrix ubA(1,1,0);
+  ubA(0) = 2.0;
+  
+  for(int rep=0; rep<2; ++rep){
+    OOQPSolver qp_solver(H.sparsity(), g.sparsity(), A.sparsity());
+    qp_solver.init();
+    qp_solver.setInput(A,QP_A);
+    qp_solver.setInput(H,QP_H);
+    qp_solver.setInput(g,QP_G);
+    qp_solver.setInput(lb,QP_LBX);
+    qp_solver.setInput(ub,QP_UBX);
+    qp_solver.setInput(lbA,QP_LBA);
+    qp_solver.setInput(ubA,QP_UBA);
+    qp_solver.evaluate();
+    qp_solver.evaluate();
+    qp_solver.evaluate();
+  }
+    
+  return 0;
+}

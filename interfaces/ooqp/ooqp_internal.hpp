@@ -70,21 +70,12 @@ public:
     GondzioSolver  * s_;
     /* @} */
     
-    /// Boolean vector indicating equality with 0 and inequality with 1
-    std::vector<int> constraints_;
-    
-    /// The non-zero indices of the equality constraints (vector of size n_eq)
+    /// The non-zero indices of the equality constraints
     std::vector<int> eq_;
 
-    /// The non-zero indices of the inequality constraints (vector of size n_eq)
+    /// The non-zero indices of the inequality constraints
     std::vector<int> ineq_;
-    
-    /// Number of equality constraints
-    int n_eq_;
-    
-    /// Number of inequality constraints
-    int n_ineq_;
-    
+        
     /// NZ indices of H elements  on the lower triangular side
     std::vector<int> nz_;
     
