@@ -82,9 +82,6 @@ public:
     /// The lower triangular part of H
     DMatrix Hl_;
     
-    /// The non-zero indices into H that make up Hl 
-    std::vector<int> Hl_nz_;
-    
     /// The equality part of A
     DMatrix A_eq_;
     
@@ -92,19 +89,19 @@ public:
     DMatrix A_ineq_;
     
     /// The equality part of LBA
-    DMatrix BA_eq_;
+    std::vector<double> bA_eq_;
     
     /// The inequality part of LBA
-    DMatrix LBA_ineq_;
+    std::vector<double> lbA_ineq_;
     
     /// The inequality part of UBA
-    DMatrix UBA_ineq_;
+    std::vector<double> ubA_ineq_;
     
     /// The LBX with -inf substituted by 0 (needed for OOQP)
-    DMatrix LBX_;
+    std::vector<double> lbX_;
     
     /// The UBX with inf substituted by 0 (needed for OOQP)
-    DMatrix UBX_;
+    std::vector<double> ubX_;
     
     /// A vector to do slicing operations on A. 
     std::vector<int> all_A_;
