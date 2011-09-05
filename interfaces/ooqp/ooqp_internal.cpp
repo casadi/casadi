@@ -114,22 +114,23 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
       }
       
       // Copy bounds
-      lbA_ineq_[i] = lba[iA];
-      ubA_ineq_[i] = uba[iA];
+      lbA_ineq_[i] = iclow_[i] ? lba[iA] : 0;
+      ubA_ineq_[i] = icupp_[i] ? uba[iA] : 0;
     }
-
-    for (int k=0; k<lbA_ineq_.size();++k) 
-      lbA_ineq_[k] = iclow_[k]? lbA_ineq_[k] : 0;
-    for (int k=0; k<ubA_ineq_.size();++k) 
-      ubA_ineq_[k] = icupp_[k]? ubA_ineq_[k] : 0;
     
+    // Lower variable bounds, 0 if infinity
     input(QP_LBX).get(lbX_);
+    for(int k=0; k<lbX_.size();++k)
+      if(ixlow_[k]==0)
+        lbX_[k] = 0;
+
+    // Upper variable bounds, 0 if infinity
     input(QP_UBX).get(ubX_);
-    for (int k=0; k<lbX_.size();++k) 
-      lbX_[k] = ixlow_[k] ? lbX_[k] : 0;
-    for (int k=0; k<ubX_.size();++k) 
-      ubX_[k] = ixupp_[k] ? ubX_[k] : 0;
+    for(int k=0; k<ubX_.size();++k)
+      if(ixupp_[k]==0)
+        ubX_[k] = 0;
     
+    // Hessian data
     input(QP_H).get(Hl_.data(),SPARSESYM);
   }
   
@@ -183,8 +184,9 @@ void OOQPInternal::allocate() {
   
 
   // Split A in equalities and inequalities
-  A_eq_   = input(QP_A)(eq_,all_A_);
-  A_ineq_ = input(QP_A)(ineq_,all_A_);
+  vector<int> all_A = range(0,input(QP_A).size2());
+  A_eq_   = input(QP_A)(eq_,all_A);
+  A_ineq_ = input(QP_A)(ineq_,all_A);
   
   // Split up LBA & UBA in equalities and inequalities
   bA_eq_.resize(eq_.size());
@@ -206,11 +208,10 @@ void OOQPInternal::allocate() {
       ubX_[k]=0;
   }
   
-  
   // Set ixlow & ixupp: they have to be zero for infinite bounds and 1 otherwise
-  for (int k=0; k<input(QP_LBX).size(); ++k) 
-    ixlow_[k]=!(input(QP_LBX).at(k)==-numeric_limits<double>::infinity());
-  for (int k=0; k<input(QP_UBX).size(); ++k) 
+  for (int k=0; k<input(QP_LBX).size(); ++k)
+    ixlow_[k]= !(input(QP_LBX).at(k)==-numeric_limits<double>::infinity());
+  for (int k=0; k<input(QP_UBX).size(); ++k)
     ixupp_[k]= !(input(QP_UBX).at(k)==numeric_limits<double>::infinity());
   
   // Set iclow & icupp: they have to be zero for infinite bounds and 1 otherwise
@@ -223,18 +224,14 @@ void OOQPInternal::allocate() {
   for (int k=0; k<ubA_ineq_.size();++k)
     icupp_[k]=!(ubA_ineq_[k]==numeric_limits<double>::infinity());
 
-  // Infinities on LBA & UBA are set to zero (required for OOQp)
-  for (int k=0; k<lbA_ineq_.size();k++) {
-    if (lbA_ineq_[k]==-numeric_limits<double>::infinity()) 
-      lbA_ineq_[k]=0;
-  } 
-  
-  for (int k=0; k<ubA_ineq_.size();k++) {
-    if (ubA_ineq_[k]==numeric_limits<double>::infinity()) 
-      ubA_ineq_[k]=0;
+  // Infinities on LBA & UBA are set to zero (required for OOQP)
+  for(vector<double>::iterator it=lbA_ineq_.begin(); it!=lbA_ineq_.end(); ++it){
+    if(*it==-numeric_limits<double>::infinity()) *it=0;
   }
-  
-  
+  for(vector<double>::iterator it=ubA_ineq_.begin(); it!=ubA_ineq_.end(); ++it){
+    if(*it==numeric_limits<double>::infinity()) *it=0;
+  }
+
   // Set Hl (the lower triangular part of H)
   input(QP_H).get(Hl_.data(),SPARSESYM);
   
@@ -263,7 +260,6 @@ void OOQPInternal::allocate() {
   vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
   resid_ = (QpGenResiduals *) qp_->makeResiduals( prob_ );
  
-  
 }
 
 void OOQPInternal::init(){
@@ -274,10 +270,7 @@ void OOQPInternal::init(){
   Hl_ = DMatrix(lowerSparsity(H));
   
   ixlow_.resize(nx,0);
-  
   ixupp_.resize(nx,0);
-  
-  all_A_ = range(0,input(QP_A).size2());
 }
 
 map<int,string> OOQPInternal::calc_flagmap(){

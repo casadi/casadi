@@ -103,9 +103,6 @@ public:
     /// The UBX with inf substituted by 0 (needed for OOQP)
     std::vector<double> ubX_;
     
-    /// A vector to do slicing operations on A. 
-    std::vector<int> all_A_;
-    
     /** 
      *  In OOQP, infinite bounds need a special treatment. They must be deactivated by setting the i-something std::vector<char>.
      *  they have to be zero for infinite bounds and 1 otherwise
