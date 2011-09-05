@@ -103,7 +103,7 @@ x = u0
 maxiter = 100 # maximum number of sqp iterations
 toldx = 1e-12 # stopping criterion for the stepsize
 tolgL = 1e-12 # stopping criterion for the lagrangian gradient
-merit_mu = 0  # current 'mu' in the T1 merit function
+merit_mu = 0.  # current 'mu' in the T1 merit function
 
 # Get dimensions
 m = gfcn.output().size() # Number of equality constraints
@@ -127,6 +127,7 @@ G_sparsity = sp_dense(n)
 A_sparsity = jfcn.output().sparsity()
 qp_solver = QPOasesSolver(H_sparsity,G_sparsity,A_sparsity)
 #qp_solver = IpoptQPSolver(H_sparsity,G_sparsity,A_sparsity)
+qp_solver.setOption("printLevel","low");
 qp_solver.init()
 
 # No bounds on the control
@@ -137,30 +138,30 @@ qp_solver.input(QP_UBX).setAll( inf)
 print ' k  nls | dx         gradL      eq viol    ineq viol'
 k = 0
 
-# Evaluate the functions
-#[Jfk,fk] = itrick(ffun,x);
-#[Jgk,gk] = itrick(gfun,x);
-
 while True:
   # Evaluate the constraint function
   gfcn.setInput(x)
   gfcn.evaluate()
+  gk = gfcn.output()
   
   # Evaluate the Jacobian
   jfcn.setInput(x)
   jfcn.evaluate()
+  Jgk = jfcn.output()
   
   # Evaluate the gradient of the objective function
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
+  fk = DMatrix(ffcn.output())
+  gfk = ffcn.adjSens()
   
   # Pass data to QP solver
   qp_solver.setInput(Bk,QP_H)
-  qp_solver.setInput(jfcn.output(),QP_A)
-  qp_solver.setInput(ffcn.adjSens(),QP_G)
-  qp_solver.setInput(-gfcn.output(),QP_LBA)
-  qp_solver.setInput(-gfcn.output(),QP_UBA)
+  qp_solver.setInput(Jgk,QP_A)
+  qp_solver.setInput(gfk,QP_G)
+  qp_solver.setInput(-gk,QP_LBA)
+  qp_solver.setInput(-gk,QP_UBA)
 
   # Solve the QP subproblem
   qp_solver.evaluate()
@@ -169,221 +170,133 @@ while True:
   p = qp_solver.output(QP_PRIMAL)
   
   # Get the dual solution
+  lambda_hat = qp_solver.output(QP_DUAL_A)
   
-
-
-
-
-  break
+  # Get the gradient of the Lagrangian
+  gradL = ffcn.adjSens() - dot(trans(jfcn.output()),lambda_hat)
   
-    #% Get the gradient of the Lagrangian
-          ##gradL = Jfk';
-          #if ~isempty(gfun) gradL = gradL - Jgk'*lambda_hat; end
-          #if ~isempty(hfun) gradL = gradL - Jhk'*mu_hat;     end
-          
-          #% Do a line search along p
-          #[tk,merit_mu,nlinsearch] = linesearch(ffun,gfun,hfun,x,...
-              #p,fk,gk,hk,Jfk,Jgk,Jhk,Bk,merit_mu);
+  ## Pass adjoint seeds to g
+  #gfcn.setAdjSeed(lambda_hat)
+  #gfcn.evaluate(0,1)
 
-          #% Calculate the new step
-          #dx = p*tk;
-          #x = x + dx;
-          #if ~isempty(gfun) lambda_k = tk*lambda_hat + (1-tk)*lambda_k; end
-          #if ~isempty(hfun) mu_k     = tk*mu_hat + (1-tk)*mu_k;         end
-          #k = k+1;
+  # Do a line search along p
+  #[tk,merit_mu,nlinsearch] = linesearch(ffun,gfun,hfun,x,p,fk,gk,hk,Jfk,Jgk,Jhk,Bk,merit_mu)
+  mu = merit_mu
+  
+  # parameters in the algorithm
+  sigma = 1.  # Bk in BDGS is always pos.def.
+  rho = 0.5
+  mu_safety = 1.1 # safety factor for mu (see below)
+  eta = 0.0001 # text to Noc 3.4
+  tau = 0.2
+  maxiter = 100
 
-          #% Gather and print iteration information
-          #normdx = norm(dx); % step size
-          #normgradL = norm(gradL); % size of the Lagrangian gradient
-          #eq_viol = sum(abs(gk)); % equality constraint violation
-          #ineq_viol = sum(max(0,-hk)); % inequality constraint violation
+  # 1-norm of the feasability violations
+  feasviol = casadi.sum(fabs(gk))
 
-          #disp(sprintf('%3d %3d |%0.4e %0.4e %0.4e %0.4e',...
-              #k,nlinsearch,normdx,normgradL,eq_viol,ineq_viol));
+  # Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
+  mu_lb = (inner_prod(gfk,p) + sigma/2.0*dot(trans(p),dot(Bk,p)))/(1.-rho)/feasviol
 
-          #% Check convergence on dx
-          #if normdx < toldx
-              #disp('Convergence (small dx)');
-              #break;
-          #elseif normgradL < tolgL
-              #disp('Convergence (small gradL)');
-              #break
-          #end
+  # Increase mu if it is below the lower bound
+  if float(mu) < float(mu_lb):
+    mu = mu_lb*mu_safety
 
-          #% Evaluate the functions
-          #[Jfk,fk] = itrick(ffun,x);
-          #[Jgk,gk] = itrick(gfun,x);
-          #[Jhk,hk] = itrick(hfun,x);
-          
-          #% Check if maximum number of iterations reached
-          #if k >= maxiter
-              #disp('Maximum number of SQP iterations reached!');
-              #break;
-          #end
+  # Calculate T1 at x (18.27 in Nocedal)
+  T1 = fk + mu*feasviol
 
-          #% Complete the damped BFGS update (Procedure 18.2 in Nocedal)
-          #gradL_new = Jfk';
-          #if ~isempty(gfun) % Equality constraints
-              #gradL_new = gradL_new - Jgk'*lambda_k;
-          #end
-          #if ~isempty(hfun) % Inequality constraints
-              #gradL_new = gradL_new - Jhk'*mu_k;
-          #end
-          
-          #yk = gradL_new - gradL;
-          #Bdx = Bk*dx;
-          #dxBdx = dx'*Bdx;
-          #ydx = dx'*yk;
-          #if ydx >= 0.2*dxBdx
-              #thetak = 1;
-          #else
-              #thetak = 0.8*dxBdx/(dxBdx - ydx);
-          #end
-          #rk = thetak*dx + (1-thetak)*Bdx; % rk replaces yk to assure Bk pos.def.
-          #Bk = Bk - Bdx*Bdx'/dxBdx + (rk*rk')/ (rk'*dx);
+  # Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
+  DT1 = inner_prod(gfk,p) - mu*casadi.sum(fabs(gk))
+  
+  lsiter = 0
+  alpha = 1
+  while True:
+    # Evaluate prospective x
+    x_new = x+alpha*p
+    ffcn.setInput(x_new)
+    ffcn.evaluate()
+    fk_new = DMatrix(ffcn.output())
 
-      #end
-      #disp(sprintf('\nSQP algorithm terminated after %d iterations',k-1));
+    # Evaluate gk, hk and get 1-norm of the feasability violations
+    gfcn.setInput(x_new)
+    gfcn.evaluate()
+    gk_new = gfcn.output()
+    feasviol_new = casadi.sum(fabs(gk_new))
 
-      #end % end of sqpmethod
+    # New T1 function
+    T1_new = fk_new + mu*feasviol_new
 
+    # Check Armijo condition, SQP version (18.28 in Nocedal)
+    if float(T1_new) <= float(T1 + eta*alpha*DT1):
+      break;
 
-      #% Line search
-      #function [alpha,mu,iter] = linesearch(ffun,gfun,hfun,x,p,fk,gk,hk,Jfk,Jgk,Jhk,Bk,mu)
-      #% parameters in the algorithm
-      #sigma = 1; % Bk in BDGS is always pos.def.
-      #rho = 0.5; % 
-      #mu_safety = 1.1; % safety factor for mu (see below)
-      #eta = 0.0001; % text to Noc 3.4
-      #tau = 0.2; % 
-      #maxiter = 100;
+    # Backtrace
+    alpha = alpha*tau
+    
+    # Go to next iteration
+    lsiter = lsiter+1
+    if lsiter >= maxiter:
+      raise Exception("linesearch failed!")
 
-      #% 1-norm of the feasability violations
-      #feasviol = sum(abs(gk)) + sum(max(0,-hk));
+  # Step size
+  tk = alpha
 
-      #% Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36
-      #% in Nocedal)
-      #mu_lb = (Jfk*p + sigma/2*p'*Bk*p)/(1-rho)/feasviol;
+  # Calculate the new step
+  dx = p*tk
+  x = x + dx
+  lambda_k = tk*lambda_hat + (1-tk)*lambda_k
+  k = k+1
 
-      #% Increase mu if it is below the lower bound
-      #if mu < mu_lb
-          #mu = mu_lb*mu_safety;
-      #end
+  # Gather and print iteration information
+  normdx = norm_2(dx) # step size
+  normgradL = norm_2(gradL) # size of the Lagrangian gradient
+  eq_viol = casadi.sum(fabs(gk)) # constraint violation
+  ineq_viol = nan # sum(max(0,-hk)); % inequality constraint violation
 
-      #% Calculate T1 at x (18.27 in Nocedal)
-      #T1 = fk + mu*feasviol;
+  print "%3d %3d |%0.4e %0.4e %0.4e %0.4e" % (k,lsiter,normdx,normgradL,eq_viol,ineq_viol)
 
-      #% Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
-      #DT1 = Jfk*p;
-      #if ~isempty(gfun)
-          #DT1 = DT1 - mu*sum(abs(gk));
-      #end
-      #if ~isempty(hfun)
-          #DT1 = DT1  + mu*(hk < 0)'*Jhk*p;
-      #end
-          
-      #iter = 0;
-      #alpha = 1;
-      #while true
-          #% Evaluate prospective x
-          #x_new = x+alpha*p;
-          #fk_new = feval(ffun,x_new);
+  # Check convergence on dx
+  if float(normdx) < float(toldx):
+    print "Convergence (small dx)"
+    break
+  elif float(normgradL) < float(tolgL):
+    print "Convergence (small gradL)"
+    break
+    
+  # Evaluate the constraint function
+  gfcn.setInput(x)
+  gfcn.evaluate()
+  gk = gfcn.output()
+  
+  # Evaluate the Jacobian
+  jfcn.setInput(x)
+  jfcn.evaluate()
+  Jgk = jfcn.output()
+    
+  # Evaluate the gradient of the objective function
+  ffcn.setInput(x)
+  ffcn.setAdjSeed(1.0)
+  ffcn.evaluate(0,1)
+  fk = DMatrix(ffcn.output())
+  gfk = ffcn.adjSens()
 
-          #% Evaluate gk, hk and get 1-norm of the feasability violations
-          #feasviol_new = 0;
-          #if ~isempty(gfun)
-              #gk_new = feval(gfun,x_new);
-              #feasviol_new = feasviol_new + sum(abs(gk_new));
-          #end
-          #if ~isempty(hfun)
-              #hk_new = feval(hfun,x_new);
-              #feasviol_new = feasviol_new + sum(max(0,-hk_new));
-          #end
+  # Check if maximum number of iterations reached
+  if k >= maxiter:
+    print "Maximum number of SQP iterations reached!"
+    break
 
-          #% New T1 function
-          #T1_new = fk_new + mu*feasviol_new;
-
-          #% Check Armijo condition, SQP version (18.28 in Nocedal)
-          #if T1_new <= T1 + eta*alpha*DT1
-              #break;
-          #end
-
-          #% Backtrace
-          #alpha = alpha*tau;
-
-          #% Go to next iteration
-          #iter = iter+1;
-          #if iter >= maxiter
-              #error('linesearch failed!');
-          #end
-      #end
-
-      #end
-
-      #% Derivative calculation with the i-trick
-      #function [J,f] = itrick(fun,x)
-      #% This program computes the Jacobian J(x) of a function
-      #% f(x) based on the i-trick.
-      #% written by Joel Andersson, 31/10-2008, joel.andersson@esat.kuleuven.be
-
-      #% quick return if empty
-      #if isempty(fun)
-          #J = [];
-          #f = [];
-          #return;
-      #end
-
-      #f = feval(fun,x);
-
-      #% Discretization step size
-      #e = eps; % Mashine-epsilon
-
-      #% Dimensions
-      #n = length(x);
-      #m = length(f);
-
-      #% Jacobian
-      #J = nan(m,n);
-
-      #% Calculate the entries of the Jacobian
-      #for j=1:n
-          #% Make a small perturbation in direction j
-          #x_pert = x;
-          #x_pert(j) = x_pert(j) + i*e;
-
-          #% Calculate the perturbed function value
-          #f_pert = feval(fun,x_pert);
-
-          #% Calculate row j of the Jacobian
-          #J(:,j) = imag(f_pert) / e;
-      #end
-
-      #end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  # Complete the damped BFGS update (Procedure 18.2 in Nocedal)
+  gradL_new = gfk - dot(trans(Jgk),lambda_k)
+  yk = gradL_new - gradL
+  Bdx = dot(Bk,dx)
+  dxBdx = dot(trans(dx),Bdx)
+  ydx = inner_prod(dx,yk)
+  if float(ydx) >= 0.2*float(dxBdx):
+    thetak = 1.
+  else:
+    thetak = 0.8*dxBdx/(dxBdx - ydx)
+  rk = thetak*dx + (1-thetak)*Bdx # rk replaces yk to assure Bk pos.def.
+  Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx)
+print "SQP algorithm terminated after %d iterations" % (k-1)
 
 plt.show()
 

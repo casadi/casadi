@@ -82,25 +82,29 @@ void QPOasesInternal::init(){
   qp_ = new qpOASES::SQProblem(nx,nc);
   called_once_ = false;
 
-/*  // Set options
-  qpOASES::Options myoptions;
-  myoptions.setToDefault();
+  // Set options
+  //qpOASES::Options myoptions;
+  //myoptions.setToDefault(); 
   
   // Get print level
   if(hasSetOption("printLevel")){
     if(getOption("printLevel")=="none"){
-      myoptions.printLevel = PL_NONE;
+      qp_->setPrintLevel(qpOASES::PL_NONE);
+      //myoptions.printLevel = qpOASES::PL_NONE;
     } else if(getOption("printLevel")=="low"){
-      myoptions.printLevel = PL_LOW;
+      qp_->setPrintLevel(qpOASES::PL_LOW);
+      //myoptions.printLevel = qpOASES::PL_LOW;
     } else if(getOption("printLevel")=="medium"){
-      myoptions.printLevel = PL_MEDIUM;
+      qp_->setPrintLevel(qpOASES::PL_MEDIUM);
+      //myoptions.printLevel = qpOASES::PL_MEDIUM;
     } else if(getOption("printLevel")=="high"){
-      myoptions.printLevel = PL_HIGH;
+      qp_->setPrintLevel(qpOASES::PL_HIGH);
+      //myoptions.printLevel = qpOASES::PL_HIGH;
     }
   }
   
   // Pass to qpOASES
-  qp_->setOption(myoptions);*/
+  //qp_->setOption(myoptions);
 }
 
 void QPOasesInternal::evaluate(int nfdir, int nadir) {

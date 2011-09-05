@@ -73,21 +73,16 @@ while true
     if ~isempty(gfun) lambda_hat : Jgk*p + gk == 0; end
     if ~isempty(hfun) mu_hat :     Jhk*p + hk >= 0; end
     cvx_end
-    
-    p
-    lambda_hat
-    mu_hat
-    error('as')
-    
+        
     % Get the gradient of the Lagrangian
     gradL = Jfk';
     if ~isempty(gfun) gradL = gradL - Jgk'*lambda_hat; end
     if ~isempty(hfun) gradL = gradL - Jhk'*mu_hat;     end
-    
+
     % Do a line search along p
     [tk,merit_mu,nlinsearch] = linesearch(ffun,gfun,hfun,x,...
         p,fk,gk,hk,Jfk,Jgk,Jhk,Bk,merit_mu);
-
+    
     % Calculate the new step
     dx = p*tk;
     x = x + dx;
@@ -103,7 +98,7 @@ while true
 
     disp(sprintf('%3d %3d |%0.4e %0.4e %0.4e %0.4e',...
         k,nlinsearch,normdx,normgradL,eq_viol,ineq_viol));
-
+    
     % Check convergence on dx
     if normdx < toldx
         disp('Convergence (small dx)');
@@ -132,7 +127,7 @@ while true
     if ~isempty(hfun) % Inequality constraints
         gradL_new = gradL_new - Jhk'*mu_k;
     end
-    
+
     yk = gradL_new - gradL;
     Bdx = Bk*dx;
     dxBdx = dx'*Bdx;
@@ -184,7 +179,7 @@ end
 if ~isempty(hfun)
     DT1 = DT1  + mu*(hk < 0)'*Jhk*p;
 end
-    
+
 iter = 0;
 alpha = 1;
 while true
