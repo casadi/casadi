@@ -199,24 +199,24 @@ void OOQPInternal::allocate() {
   // Set Hl (the lower triangular part of H)
   Hl_.set(input(QP_H)[Hl_nz_]);
   
-  // Because OOQP does not do const correctness properly, and because we cannot trust it, we copy all (rowind,col) data // NOTE: Joel: this appears unnecessary
-  Hl_rowind_ = Hl_.sparsity().rowind();
-  Hl_col_    = Hl_.sparsity().col();
+  // Get references to sparsity (NOTE: OOQP does not appear do be const correct)
+  int *Hl_rowind = const_cast<int*>(getPtr(Hl_.sparsity().rowind()));
+  int *Hl_col = const_cast<int*>(getPtr(Hl_.sparsity().col()));
   
-  eq_rowind_ = A_eq_.sparsity().rowind();
-  eq_col_ = A_eq_.sparsity().col();
+  int *eq_rowind = const_cast<int*>(getPtr(A_eq_.sparsity().rowind()));
+  int *eq_col = const_cast<int*>(getPtr(A_eq_.sparsity().col()));
   
-  ineq_rowind_ = A_ineq_.sparsity().rowind();
-  ineq_col_ = A_ineq_.sparsity().col();
+  int *ineq_rowind = const_cast<int*>(getPtr(A_ineq_.sparsity().rowind()));
+  int *ineq_col = const_cast<int*>(getPtr(A_ineq_.sparsity().col()));
 
   // Set all pointers to problem data
   prob_ = (QpGenData * )qp_->makeData( getPtr(input(QP_G)),
-                                       getPtr(Hl_rowind_),  getPtr(Hl_col_),  getPtr(Hl_),
+                                       Hl_rowind,  Hl_col,  getPtr(Hl_),
                                        getPtr(LBX_),  getPtr(ixlow_),
                                        getPtr(UBX_),  getPtr(ixupp_),
-                                       getPtr(eq_rowind_), getPtr(eq_col_),  getPtr(A_eq_),
+                                       eq_rowind, eq_col,  getPtr(A_eq_),
                                        getPtr(BA_eq_),
-                                       getPtr(ineq_rowind_), getPtr(ineq_col_),  getPtr(A_ineq_),
+                                       ineq_rowind, ineq_col,  getPtr(A_ineq_),
                                        getPtr(LBA_ineq_),  getPtr(iclow_),
                                        getPtr(UBA_ineq_),  getPtr(icupp_));
 

@@ -120,21 +120,6 @@ public:
     std::vector<char> iclow_;
     std::vector<char> icupp_;
     
-    /**
-     * Because OOQP does not do const correctness properly, and because we cannot trust it, we copy all(rowind,col) data
-     * @{
-     * */
-    std::vector<int> Hl_rowind_;
-    std::vector<int> Hl_col_;
-    
-    std::vector<int> eq_rowind_;
-    std::vector<int> eq_col_;
-    
-    std::vector<int> ineq_rowind_;
-    std::vector<int> ineq_col_;
-    /** @} */
-    
-    
     /// Throw error
     static void ooqp_error(const std::string& module, int flag);
     
