@@ -72,31 +72,31 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   if (qp_==0) {
     allocate();
     casadi_assert(qp_!=0);
-  } else {
-    // Split A in equalities and inequalities
-    A_eq_.set(input(QP_A)(eq_,all_A_));
-    A_ineq_.set(input(QP_A)(ineq_,all_A_));
-    
-    BA_eq_.set(input(QP_LBA)(eq_,all_A_));
-    
-    LBA_ineq_.set(input(QP_LBA)(ineq_,all_A_));
-    UBA_ineq_.set(input(QP_UBA)(ineq_,all_A_));
-    
-    LBX_.set(input(QP_LBX));
-    UBX_.set(input(QP_UBX));
-    
-    for (int k=0; k<LBA_ineq_.size();++k) 
-      LBA_ineq_.data()[k] = iclow_[k]? LBA_ineq_.data()[k] : 0;
-    for (int k=0; k<UBA_ineq_.size();++k) 
-      UBA_ineq_.data()[k] = icupp_[k]? UBA_ineq_.data()[k] : 0;
-    
-    for (int k=0; k<LBX_.size();++k) 
-      LBX_.data()[k] = ixlow_[k]? LBX_.data()[k] : 0;
-    for (int k=0; k<UBX_.size();++k) 
-      UBX_.data()[k] = ixupp_[k]? UBX_.data()[k] : 0;
-    
-    Hl_.set(input(QP_H)[Hl_nz_]);
-  }
+  } 
+  
+  // Split A in equalities and inequalities
+  A_eq_.set(input(QP_A)(eq_,all_A_));
+  A_ineq_.set(input(QP_A)(ineq_,all_A_));
+  
+  BA_eq_.set(input(QP_LBA)(eq_,all_A_));
+  
+  LBA_ineq_.set(input(QP_LBA)(ineq_,all_A_));
+  UBA_ineq_.set(input(QP_UBA)(ineq_,all_A_));
+  
+  LBX_.set(input(QP_LBX));
+  UBX_.set(input(QP_UBX));
+  
+  for (int k=0; k<LBA_ineq_.size();++k) 
+    LBA_ineq_.data()[k] = iclow_[k]? LBA_ineq_.data()[k] : 0;
+  for (int k=0; k<UBA_ineq_.size();++k) 
+    UBA_ineq_.data()[k] = icupp_[k]? UBA_ineq_.data()[k] : 0;
+  
+  for (int k=0; k<LBX_.size();++k) 
+    LBX_.data()[k] = ixlow_[k]? LBX_.data()[k] : 0;
+  for (int k=0; k<UBX_.size();++k) 
+    UBX_.data()[k] = ixupp_[k]? UBX_.data()[k] : 0;
+  
+  Hl_.set(input(QP_H)[Hl_nz_]);
   
   // Just calling s_->solve repeatedly on a GondzioSolver is a memory leak
   // So we must always allocate a fresh solver
