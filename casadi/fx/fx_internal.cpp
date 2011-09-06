@@ -99,7 +99,7 @@ void FXInternal::init(){
   }
 
   if(hasSetOption("user_data")){
-    user_data_ = getOption("user_data");
+    user_data_ = getOption("user_data").toVoidPointer();
   }
 
   // Mark the function as initialized

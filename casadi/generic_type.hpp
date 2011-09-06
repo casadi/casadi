@@ -74,7 +74,7 @@ namespace CasADi{
     operator const std::vector<int>& () const{ return toIntVector();}
     operator const std::vector<double>& () const{ return toDoubleVector();}
     operator const SharedObject& () const{ return toSharedObject();}
-    operator void*() const;
+    //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
     
     operator NLPSolverCreator() const;
@@ -127,6 +127,9 @@ namespace CasADi{
 
     //! \brief Convert to shared object
     const SharedObject& toSharedObject() const;
+    
+    //! \brief Convert to void pointer
+    void * toVoidPointer() const;
 
     //! \brief Equality
     bool operator==(const GenericType& op2) const;
