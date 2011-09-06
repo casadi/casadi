@@ -118,6 +118,13 @@ def dotsave(s,format='ps',filename="temp",direction="RL"):
   """
   Make a drawing of an SX or SXMatrix and save it.
   
+  format can be one of:
+    dot canon cmap cmapx cmapx_np dia dot fig gd gd2 gif hpgl imap imap_np
+    ismap jpe jpeg jpg mif mp pcl pdf pic plain plain-ext png ps ps2 raw
+    svg svgz vml vmlz vrml vtx wbmp xdot xlib
+    
+  direction   one of "BT", "LR", "TB", "RL"
+  
   """
   g = dotgraph(s,direction=direction)
   if hasattr(g,'write_'+format):
