@@ -153,6 +153,7 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   // Get multipliers for the bounds
   vector<double> &dual_x = output(QP_DUAL_X).data();
 
+  // BUG?
   #if 0
   // Lower bounds
   casadi_assert(dual_x.size()==vars_->gamma->length());
@@ -164,7 +165,32 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     for(int k=0; k<dual_x.size(); ++k){
       dual_x[k] -= temp_[k];
     }
+  #else
+  // Workaround not counting the infinite values?
+  
+  // Lower bounds
+  int k_gamma=0;
+  vars_->gamma->copyIntoArray(getPtr(temp_));
+  for(int k=0; k<dual_x.size(); ++k){
+    if(ixlow_[k]){
+      dual_x[k] = temp_[k_gamma++];
+    } else {
+      dual_x[k] = 0;
+    }
+  }
+  casadi_assert(k_gamma==vars_->gamma->length());
+  
+  // Upper bounds
+  int k_phi=0;
+  vars_->phi->copyIntoArray(getPtr(temp_));
+  for(int k=0; k<dual_x.size(); ++k){
+    if(ixupp_[k]){
+      dual_x[k] -= temp_[k_phi++];
+    }
+  }
+  casadi_assert(k_phi==vars_->phi->length());
   #endif
+
   
   // Get multipliers for the equality constraints
   vector<double> &dual_a = output(QP_DUAL_A).data();
@@ -264,10 +290,6 @@ void OOQPInternal::allocate() {
     if (ubA_ineq_.at(k) == numeric_limits<double>::infinity()) 
       ubA_ineq_.at(k)=0;
   }
-/*  makeDense(Hl_);
-  makeDense(A_eq_);
-  makeDense(A_ineq_);
-  makeDense(input(QP_G));*/
   
   // Get references to sparsity (NOTE: OOQP does not appear do be const correct)
   int *Hl_rowind = const_cast<int*>(getPtr(Hl_.sparsity().rowind()));
@@ -278,29 +300,6 @@ void OOQPInternal::allocate() {
   
   int *ineq_rowind = const_cast<int*>(getPtr(A_ineq_.sparsity().rowind()));
   int *ineq_col = const_cast<int*>(getPtr(A_ineq_.sparsity().col()));
-
-//   vector<int> tmp = Hl_.sparsity().rowind();
-//   vector<int> tmp1 = Hl_.sparsity().col();
-//   vector<int> tmp2 = A_eq_.sparsity().rowind();
-//   vector<int> tmp3 = A_eq_.sparsity().col();
-//   vector<int> tmp4 = A_ineq_.sparsity().rowind();
-//   vector<int> tmp5 = A_ineq_.sparsity().col();
-
-//   cout << tmp << endl;
-//   cout << tmp1 << endl;
-//   cout << tmp2 << endl;
-//   cout << tmp3 << endl;
-//   cout << tmp4 << endl;
-//   cout << tmp5 << endl;
-  
-//   Hl_rowind = &tmp.front();
-//   Hl_col = &tmp1.front();
-//   eq_rowind = &tmp2.front();
-//   eq_col = &tmp3.front();
-//   ineq_rowind = &tmp4.front();
-//   ineq_col = &tmp5.front();
-  
-//   cout << getPtr(A_ineq_) << endl;
   
   // Set all pointers to problem data
   prob_ = (QpGenData * )qp_->makeData( getPtr(input(QP_G)),
@@ -316,13 +315,6 @@ void OOQPInternal::allocate() {
   // Further setup of the QP problem
   vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
   resid_ = (QpGenResiduals *) qp_->makeResiduals( prob_ );
-  casadi_assert_warning(vars_->phi->length()==nx, "Inconsistent length of phi vector");
-  casadi_assert_warning(vars_->gamma->length()==nx, "Inconsistent length of gamma vector");
- 
-/*  cout << "vars_->phi->length() = " << vars_->phi->length() << endl;
-  cout << "vars_->gamma->length() = " << vars_->gamma->length() << endl;*/
-/*  casadi_assert(vars_->phi->length()==nx);
-  casadi_assert(vars_->gamma->length()==nx);*/
 }
 
 void OOQPInternal::init(){
