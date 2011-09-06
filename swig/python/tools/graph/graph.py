@@ -1,19 +1,24 @@
 from casadi import SX, SXMatrix, getOperatorRepresentation
 
-import pydot
+try:
+  import pydot
+except:
+  raise Exception("To use the functionality of casadi.tools.graph, you need to have pydot Installed. Try `easy_install pydot`.")  
       
 def adjSXDot(graph,adj):
   """
-  Given an adjacency dict structure and a graph, add nodes an edges to the graph to represent an SX tree
+  Given an adjacency dict structure and a pydot graph, adds nodes an edges to the graph to represent an SX tree
   """
   for k,v in adj.iteritems():
     if k.isLeaf():
-      style = "solid"
+      style = "solid" # Symbolic nodes are represented box'es
       if k.isConstant():
-        style = "bold"
+        style = "bold" # Constants are represented by bold box'es
       graph.add_node(pydot.Node(str(k.__hash__()),label=str(k),shape="box",style=style))
     else:
       if not(k.isCommutative()):
+        # Non-commutative operators are represented by 'record' shapes.
+        # The dependencies have different 'ports' where arrows should arrive.
         s = getOperatorRepresentation(k,["| <f0> | ", " | <f1> |"])
         if s.startswith("(|") and s.endswith("|)"):
           s=s[2:-2]
@@ -21,7 +26,8 @@ def adjSXDot(graph,adj):
         graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='Mrecord'))
         for i,n in enumerate(v):
           graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
-      else:
+      else: 
+       # Commutative operators can be represented more compactly as 'oval' shapes.
         s = getOperatorRepresentation(k,[".", "."])
         if s.startswith("(.") and s.endswith(".)"):
           s=s[2:-2]
@@ -58,6 +64,8 @@ def invAdj(adj):
       
 def dotgraph(s,direction="BT"):
   """
+  Creates and returns a pydot graph structure that represents an SX or SXMatrix.
+  
   direction   one of "BT", "LR", "TB", "RL"
   """
       
@@ -76,6 +84,7 @@ def dotgraph(s,direction="BT"):
     invadj = invAdj(adj)
     adjSXDot(graph,adj)
     
+    # The Matrix grid is represented by a html table with 'ports'
     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
     for i in range(s.size1()):
       label+="<TR>"
@@ -85,6 +94,9 @@ def dotgraph(s,direction="BT"):
           label+="<TD>.</TD>"
         else:
           if not(s.at(k) in invadj) and s.at(k).isLeaf():
+            # Compaction rule: if a leaf node points to matrix entry port,
+            # and does not point anywhere else, then we remove node and edge
+            # and display the leaf's reprentation directly into the matrix.
             graph.del_node(str(s.at(k).__hash__()))
             graph.del_edge(str(s.at(k).__hash__()),dst="Matrix:f%d%d" % (i,j))
             label+="<TD>%s</TD>" % str(s.at(k))
@@ -102,18 +114,47 @@ def dotgraph(s,direction="BT"):
   return graph
 
 
+def dotsave(s,format='ps',filename="temp",direction="RL"):
+  """
+  Make a drawing of an SX or SXMatrix and save it.
+  
+  """
+  g = dotgraph(s,direction=direction)
+  if hasattr(g,'write_'+format):
+    getattr(g,'write_'+format)(filename)
+  else:
+    s = "Unknown format '%s'. Please pick one of the following:\n" % format
+    l = ['dot']
+    for n in dir(g):
+      if n.startswith("write_"):
+        l.append(n[6:])
+    s+= " ".join(l)
+    raise Exception(s)
+  
 def dotdraw(s,direction="RL"):
   """
+  Make a drawing of an SX or SXMatrix and display it.
+  
   direction   one of "BT", "LR", "TB", "RL"
   """
-
-  from pylab import imread, imshow,show,figure, axes
-  if hasattr(show,'__class__') and show.__class__.__name__=='PylabShow':  # catch pyreport
+  
+  try:  # Check if we have pylab
+    from pylab import imread, imshow,show,figure, axes
+  except:
+    # We don't have pylab, so just write out to file
+    print "casadi.tools.graph.dotdraw: no pylab detected, will not show drawing on screen."
+    dotgraph(s,direction=direction).write_ps("temp.ps")
+    return
+   
+  if hasattr(show,'__class__') and show.__class__.__name__=='PylabShow':  
+    # catch pyreport case, so we have true vector graphics
     figure_name = '%s%d.%s' % ( show.basename, len(show.figure_list), show.figure_extension )
     show.figure_list += (figure_name, )
     dotgraph(s,direction=direction).write_pdf(figure_name)
     print "Here goes figure %s (dotdraw)" % figure_name
   else:
+    # Matplotlib does not allow to display vector graphics on screen, 
+    # so we fall back to png
     temp="_temp.png"
     dotgraph(s,direction=direction).write_png(temp)
     im = imread(temp)

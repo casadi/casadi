@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
+
+success = False
 try:
   import pydot
-  from graph import dotgraph, dotdraw
+  success = True
 except:
   pass
+
+if success:
+  from graph import dotgraph, dotdraw, dotsave
