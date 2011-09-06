@@ -43,8 +43,6 @@ OOQPInternal* OOQPInternal::clone() const{
 }
   
 OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
-  casadi_warning("OOQP interface still expermental");
-
   addOption("print_level",OT_INTEGER,0,"Print level. OOQP listends to print_level 0, 10 and 100");
   addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
   addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
@@ -144,12 +142,45 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   
   int flag = s_->solve(prob_,vars_, resid_);
     
-  vars_->x->copyIntoArray(&output(QP_PRIMAL).data()[0]);
-  
-
-  
+  // Get primal solution
+  casadi_assert(vars_->x->length()==output(QP_PRIMAL).size());
+  vars_->x->copyIntoArray(getPtr(output(QP_PRIMAL)));
   if (isnan(output(QP_PRIMAL).at(0))) {
     casadi_warning("nan in decision variables. You probably need to do a solver.reInit() call before evaluate().");
+  }
+  
+  // Get multipliers for the bounds
+  vector<double> &dual_x = output(QP_DUAL_X).data();
+
+  #if 0
+  // Lower bounds
+  casadi_assert(dual_x.size()==vars_->gamma->length());
+  vars_->gamma->copyIntoArray(getPtr(dual_x));
+  
+  // Upper bounds
+  cout << "dual_x.size() = " << dual_x.size() << endl;
+  cout << "vars_->phi->length() = " << vars_->phi->length() << endl;
+  cout << "vars_->gamma->length() = " << vars_->gamma->length() << endl;
+  casadi_assert(dual_x.size()==vars_->phi->length()); // BUG: this doesn't work
+  vars_->phi->copyIntoArray(getPtr(temp_));
+    for(int k=0; k<dual_x.size(); ++k){
+      dual_x[k] -= temp_[k];
+    }
+  #endif
+  
+  // Get multipliers for the equality constraints
+  vector<double> &dual_a = output(QP_DUAL_A).data();
+  casadi_assert(vars_->y->length()==eq_.size());
+  vars_->y->copyIntoArray(getPtr(temp_));
+  for(int k=0; k<eq_.size(); ++k){
+    dual_a[eq_[k]] = temp_[k];
+  }
+  
+  // Get multipliers for the inequality constraints
+  casadi_assert(vars_->z->length()==ineq_.size());
+  vars_->z->copyIntoArray(getPtr(temp_));
+  for(int k=0; k<ineq_.size(); ++k){
+    dual_a[ineq_[k]] = temp_[k];
   }
   
   if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);
@@ -270,6 +301,9 @@ void OOQPInternal::init(){
   // Allocate vectors to hold indicators of infinite variable bounds
   ixlow_.resize(nx,0);
   ixupp_.resize(nx,0);
+
+  // Temporary vector
+  temp_.resize(std::max(nx,nc));
 }
 
 map<int,string> OOQPInternal::calc_flagmap(){

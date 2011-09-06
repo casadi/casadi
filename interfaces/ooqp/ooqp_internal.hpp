@@ -96,6 +96,9 @@ public:
     std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
 
     
+    /// Temporary vector
+    std::vector<double> temp_;
+    
     /// Throw error
     static void ooqp_error(const std::string& module, int flag);
     
