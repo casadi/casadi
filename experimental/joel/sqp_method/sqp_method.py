@@ -99,6 +99,17 @@ plt.grid()
 # Initial guess
 x = u0
 
+# Create SQP method
+#sqp_solver = SQPMethod(ffcn,gfcn)
+##sqp_solver.setOption("qp_solver",QPOasesSolver) # THIS IS NOT WORKING!
+#sqp_solver.init()
+#sqp_solver.setInput(u0,NLP_X_INIT)
+#sqp_solver.evaluate()
+
+
+
+
+
 # Parameters in the algorithm
 maxiter = 100 # maximum number of sqp iterations
 toldx = 1e-12 # stopping criterion for the stepsize

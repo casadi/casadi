@@ -35,10 +35,20 @@ public:
   virtual ~SQPInternal();
   virtual SQPInternal* clone() const{ return new SQPInternal(*this);}
   
-virtual void init();
-virtual void evaluate(int nfdir, int nadir);
+  virtual void init();
+  virtual void evaluate(int nfdir, int nadir);
 
-protected:
+  /// objective function
+  FX F_;
+  /// constraint function
+  FX G_; 
+  /// Hessian of the Lagrangian function
+  FX H_;
+  /// Jacobian of the constraint function
+  FX J_; 
+
+
+
 };
 
 } // namespace CasADi

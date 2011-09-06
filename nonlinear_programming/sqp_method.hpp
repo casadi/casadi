@@ -29,11 +29,17 @@ namespace CasADi{
   
 class SQPInternal;
   
-// List from ipopt_internal.cpp
 /**
-* \brief ss
-*
-
+  \brief Sequential Quadratic Programming method
+  The algorithm is a Quasi-Newton method with damped BFGS updating to that
+  assures positive definitenes of the Hessian approximation. Line search is
+  carried out via backtracking until with the Armijo condition applied to
+  the T1 (in Nocedal phi1) merit function is satisfied.
+  
+  The method is still under development
+  
+  \author Joel Andersson
+  \date 2011
 */
 class SQPMethod : public NLPSolver {
   public:

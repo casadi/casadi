@@ -33,7 +33,7 @@ namespace Interfaces {
 // Forward declaration of internal class 
 class QPOasesInternal;
 
-  /** \brief QPOases Solver for quadratic programming
+  /** \brief Interface to QPOases Solver for quadratic programming
 
   min          x'Hx + G'x 
   
@@ -44,7 +44,8 @@ class QPOasesInternal;
       nx: number of decision variables (x)
       nc: number of constraints (A)
       
-      
+   \author Joris Gillis, Joel Andersson
+   \date 2011
 
   */
 class QPOasesSolver : public QPSolver {
@@ -62,6 +63,15 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static QPSolver creator(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A){ return QPOasesSolver(H,G,A);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
 
 

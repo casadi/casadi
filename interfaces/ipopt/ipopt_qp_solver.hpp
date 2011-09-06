@@ -43,8 +43,8 @@ class IpoptQPInternal;
       nx: number of decision variables (x)
       nc: number of constraints (A)
       
-      
-
+   \author Joris Gillis
+   \date 2011
   */
 class IpoptQPSolver : public QPSolver {
 public:
@@ -61,6 +61,15 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static QPSolver creator(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A){ return IpoptQPSolver(H,G,A);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
 
 
