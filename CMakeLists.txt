@@ -77,6 +77,7 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
 add_subdirectory(casadi)
 add_subdirectory(optimal_control)
+add_subdirectory(nonlinear_programming)
 add_subdirectory(toolboxes)
 add_subdirectory(examples)
 add_subdirectory(external_packages)

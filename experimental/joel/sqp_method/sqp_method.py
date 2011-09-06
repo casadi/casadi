@@ -112,7 +112,7 @@ q = 0 # Number of inequality constraints
 
 # Initial guess for the lagrange multipliers
 lambda_k = zeros(m)
-mu_k = zeros(q)
+lambda_x_k = zeros(n)
 
 # Initial guess for the Hessian
 Bk = eye(n)
@@ -177,11 +177,14 @@ while True:
   # Get the optimal solution
   p = qp_solver.output(QP_PRIMAL)
   
-  # Get the dual solution
+  # Get the dual solution for the inequalities
   lambda_hat = qp_solver.output(QP_DUAL_A)
   
+  # Get the dual solution for the bounds
+  lambda_x_hat = qp_solver.output(QP_DUAL_X)
+  
   # Get the gradient of the Lagrangian
-  gradL = ffcn.adjSens() - dot(trans(jfcn.output()),lambda_hat)
+  gradL = ffcn.adjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat
   
   ## Pass adjoint seeds to g
   #gfcn.setAdjSeed(lambda_hat)
@@ -252,6 +255,7 @@ while True:
   dx = p*tk
   x = x + dx
   lambda_k = tk*lambda_hat + (1-tk)*lambda_k
+  lambda_x_k = tk*lambda_x_hat + (1-tk)*lambda_x_k
   k = k+1
 
   # Gather and print iteration information
@@ -293,7 +297,7 @@ while True:
     break
 
   # Complete the damped BFGS update (Procedure 18.2 in Nocedal)
-  gradL_new = gfk - dot(trans(Jgk),lambda_k)
+  gradL_new = gfk - dot(trans(Jgk),lambda_k) - lambda_x_k
   yk = gradL_new - gradL
   Bdx = dot(Bk,dx)
   dxBdx = dot(trans(dx),Bdx)

@@ -13,6 +13,9 @@
 // optimal_control
 %include "casadi_optimal_control.i"
 
+// nonlinear programming
+%include "casadi_nonlinear_programming.i"
+
 // interfaces
 %include "casadi_interfaces.i"
 
