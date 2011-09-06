@@ -100,11 +100,18 @@ plt.grid()
 x = u0
 
 # Create SQP method
-#sqp_solver = SQPMethod(ffcn,gfcn)
-##sqp_solver.setOption("qp_solver",QPOasesSolver) # THIS IS NOT WORKING!
-#sqp_solver.init()
-#sqp_solver.setInput(u0,NLP_X_INIT)
-#sqp_solver.evaluate()
+sqp_solver = SQPMethod(ffcn,gfcn)
+
+# qpOASES
+sqp_solver.setOption("qp_solver",QPOasesSolver)
+sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
+
+# OOQP
+#sqp_solver.setOption("qp_solver",OOQPSolver)
+
+sqp_solver.init()
+sqp_solver.setInput(u0,NLP_X_INIT)
+sqp_solver.evaluate()
 
 
 
@@ -138,14 +145,14 @@ G_sparsity = sp_dense(n)
 A_sparsity = jfcn.output().sparsity()
 
 # qpOASES
-#qp_solver = QPOasesSolver(H_sparsity,G_sparsity,A_sparsity)
-#qp_solver.setOption("printLevel","low")
+qp_solver = QPOasesSolver(H_sparsity,G_sparsity,A_sparsity)
+qp_solver.setOption("printLevel","low")
 
 # IPOPT
 #qp_solver = IpoptQPSolver(H_sparsity,G_sparsity,A_sparsity)
 
 # OOQP
-qp_solver = OOQPSolver(H_sparsity,G_sparsity,A_sparsity)
+#qp_solver = OOQPSolver(H_sparsity,G_sparsity,A_sparsity)
 
 qp_solver.init()
 
@@ -161,19 +168,19 @@ while True:
   # Evaluate the constraint function
   gfcn.setInput(x)
   gfcn.evaluate()
-  gk = gfcn.output()
+  gk = DMatrix(gfcn.output())
   
   # Evaluate the Jacobian
   jfcn.setInput(x)
   jfcn.evaluate()
-  Jgk = jfcn.output()
+  Jgk = DMatrix(jfcn.output())
   
   # Evaluate the gradient of the objective function
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
   fk = DMatrix(ffcn.output())
-  gfk = ffcn.adjSens()
+  gfk = DMatrix(ffcn.adjSens())
   
   # Pass data to QP solver
   qp_solver.setInput(Bk,QP_H)

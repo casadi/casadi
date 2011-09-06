@@ -34,7 +34,7 @@ namespace CasADi{
 SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
   casadi_warning("The SQP method is under development");
   addOption("qp_solver", OT_QPSOLVER, GenericType(), "The QP solver to be used by the SQP method");
-  
+  addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
 }
 
 
@@ -90,15 +90,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   QPSolver qp_solver = qp_solver_creator(H_sparsity,G_sparsity,A_sparsity);
   
-  // qpOASES
-//   QPSolver qp_solver = Interfaces::QPOasesSolver(H_sparsity,G_sparsity,A_sparsity);
-//   qp_solver.setOption("printLevel","low");
-
-  // IPOPT
-  //qp_solver = IpoptQPSolver(H_sparsity,G_sparsity,A_sparsity)
-
-  // OOQP
-  //qp_solver = OOQPSolver(H_sparsity,G_sparsity,A_sparsity);
+  // Set options if provided
+  if(hasSetOption("qp_solver_options")){
+    Dictionary qp_solver_options = getOption("qp_solver_options");
+    qp_solver.setOption(qp_solver_options);
+  }
 
   qp_solver.init();
 
