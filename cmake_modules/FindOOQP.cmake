@@ -4,7 +4,7 @@ QpGenData.h
 HINTS /usr/local/include/ooqp/
 )
 
-find_package (BLAS REQUIRED)
+find_package (BLAS)
 SET(OOQP_LIBRARIES ${BLAS_LIBRARIES})
 
 find_package (MA57)
@@ -12,7 +12,7 @@ IF (MA57_FOUND)
 SET(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${MA57_LIBRARIES})
 ELSE (MA57_FOUND)
 MESSAGE(STATUS "MA57 libraries not found. Falling back to MA27")
-find_package (MA27 REQUIRED)
+find_package (MA27)
 SET(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${MA27_LIBRARIES})
 ENDIF (MA57_FOUND)
 
