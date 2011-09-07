@@ -25,6 +25,7 @@
 
 #include "sqp_method.hpp"
 #include "casadi/fx/nlp_solver_internal.hpp"
+#include "casadi/fx/qp_solver.hpp"
 
 namespace CasADi{
     
@@ -46,9 +47,28 @@ public:
   FX H_;
   /// Jacobian of the constraint function
   FX J_; 
+  
+  /// QP solver for the subproblems
+  QPSolver qp_solver_;
 
+  /// maximum number of sqp iterations
+  int maxiter_; 
 
+  /// stopping criterion for the stepsize
+  double toldx_;
+  
+  /// stopping criterion for the lagrangian gradient
+  double tolgl_;
 
+  /// Linesearch parameters
+  //@{
+  double sigma_;
+  double rho_;
+  double mu_safety_;
+  double eta_;
+  double tau_;
+  int maxiter_ls_;
+  //@}
 };
 
 } // namespace CasADi

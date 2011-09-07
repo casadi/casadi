@@ -85,17 +85,6 @@ u_opt = array(solver.output(NLP_X_OPT))
 # Get values at the beginning of each finite element
 tgrid = linspace(0,10,10)
 
-# Plot the results
-plt.figure(1)
-plt.clf()
-#plt.plot(tgrid,x_opt,'--')
-#plt.plot(tgrid,y_opt,'-')
-plt.plot(tgrid,u_opt,'-.')
-plt.title("Rocket trajectory optimization")
-plt.xlabel('time')
-#plt.legend(['x trajectory','y trajectory','u trajectory'])
-plt.grid()
-
 # Initial guess
 x = u0
 
@@ -110,8 +99,29 @@ sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
 #sqp_solver.setOption("qp_solver",OOQPSolver)
 
 sqp_solver.init()
-sqp_solver.setInput(u0,NLP_X_INIT)
+sqp_solver.setInput(umin,     NLP_LBX)
+sqp_solver.setInput(umax,     NLP_UBX)
+sqp_solver.setInput(u0,       NLP_X_INIT)
+sqp_solver.setInput(zeros(2), NLP_LBG)
+sqp_solver.setInput(zeros(2), NLP_UBG)
 sqp_solver.evaluate()
+
+# Retrieve the solution
+u_opt2 = array(sqp_solver.output(NLP_X_OPT))
+
+# Plot the results
+plt.figure(1)
+plt.clf()
+#plt.plot(tgrid,x_opt,'--')
+#plt.plot(tgrid,y_opt,'-')
+plt.plot(tgrid,u_opt,'-.')
+plt.plot(tgrid,u_opt2,'-')
+plt.title("Rocket trajectory optimization")
+plt.xlabel('time')
+plt.legend(['IPOPT','SQPMethod'])
+plt.grid()
+
+
 
 
 
