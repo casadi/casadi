@@ -32,7 +32,10 @@ namespace Ipopt{
 }
 
 namespace CasADi{
-    
+
+/**
+@copydoc NLPSolver_doc
+*/
 class IpoptInternal : public NLPSolverInternal{
 friend class IpoptUserClass;
 

@@ -25,13 +25,19 @@
 
 #include "fx.hpp"
 
+/** \defgroup LinearSolver_doc 
+* 
+* Solves the linear system A.x = b for x
+*
+*/
+
 namespace CasADi{
   
 // Forward declaration of internal class
 class LinearSolverInternal;
 
 /** Abstract base class for the linear solver classes
-
+*  @copydoc LinearSolver_doc
 \author Joel Andersson
 \date 2010
 */

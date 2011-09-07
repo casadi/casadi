@@ -35,14 +35,7 @@ class QPOasesInternal;
 
   /** \brief Interface to QPOases Solver for quadratic programming
 
-  min          x'Hx + G'x 
-  
-  subject to
-              LBA <= Ax <= UBA
-              LBX <= x  <= UBX
-              
-      nx: number of decision variables (x)
-      nc: number of constraints (A)
+   @copydoc QPSolver_doc
       
    \author Joris Gillis, Joel Andersson
    \date 2011

@@ -28,10 +28,10 @@
 
 namespace CasADi{
   
-// Forward declaration of internal class
-class LinearSolverInternal;
 
-/// Internal class
+/** Internal class
+ @copydoc LinearSolver_doc
+*/
 class LinearSolverInternal : public FXInternal{
   public:
     // Constructor

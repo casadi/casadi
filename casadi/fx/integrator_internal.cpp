@@ -31,7 +31,7 @@
 #include "sx_function.hpp"
 
 INPUTSCHEME(IntegratorInput)
-OUTPUTSCHEME(IntegratorInput)
+OUTPUTSCHEME(IntegratorOutput)
 
 using namespace std;
 namespace CasADi{

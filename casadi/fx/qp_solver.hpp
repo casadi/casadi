@@ -25,19 +25,26 @@
 
 #include "fx.hpp"
 
-namespace CasADi{
+
+/** \defgroup QPSolver_doc
+
+  Solves the following problem:
   
-  /** Quadratic programming solver in the following form
-  min          x'Hx + G'x 
+  \verbatim
+  min          x'.H.x + G'.x 
+   x
   
   subject to
-              LBA <= Ax <= UBA
-              LBX <= x  <= UBX
+              LBA <= A.x <= UBA
+              LBX <= x   <= UBX
               
       nx: number of decision variables (x)
       nc: number of constraints (A)
-
+  \endverbatim
 */
+      
+namespace CasADi{
+  
 enum QPInput{
   /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.
   QP_H,
@@ -75,8 +82,8 @@ class QPSolverInternal;
 
 /** \brief QPSolver
 
-Input arguments of an QP Solver CasADi::QPInput: QP_X_INIT,QP_LBX,QP_UBX,QP_LBG,QP_UBG,QP_LAMBDA_INIT\n
-Output arguments of an QP Solver CasADi::QPOutput: QP_X_OPT,QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX\n
+
+@copydoc QPSolver_doc
 
   \author Joel Andersson 
   \date 2010

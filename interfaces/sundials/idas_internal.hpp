@@ -76,6 +76,9 @@ TODO:
 namespace CasADi{
 namespace Sundials{
   
+/**
+@copydoc IdasIntegrator_doc
+*/
 class IdasInternal : public IntegratorInternal{
   friend class IdasIntegrator;
 

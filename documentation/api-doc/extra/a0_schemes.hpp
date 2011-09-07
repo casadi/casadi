@@ -63,13 +63,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::OOQPSolver
@@ -89,13 +88,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::OptimalControl::MultipleShootingInternal
@@ -130,7 +128,7 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::Simulator
@@ -141,7 +139,7 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
 /** \class CasADi::QPSolverInternal
@@ -161,13 +159,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::QPSolver
@@ -187,13 +184,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::QPOasesInternal
@@ -213,13 +209,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::QPOasesSolver
@@ -239,13 +234,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::IpoptInternal
@@ -304,14 +298,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
@@ -322,14 +315,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::IpoptQPInternal
@@ -349,13 +341,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::Interfaces::IpoptQPSolver
@@ -375,13 +366,12 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_X_OPT</td><td>The optimal value of x as calculated with evaluate()</td></tr>
-<tr><td>QP_COST</td><td>The value of the cost function as calculated with evaluate()</td></tr>
-<tr><td>QP_LAMBDA_OPT</td><td></td></tr>
-<tr><td>QP_LAMBDA_LBX</td><td></td></tr>
-<tr><td>QP_LAMBDA_UBX</td><td></td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
+<tr><td>QP_DUAL_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>QP_DUAL_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \class CasADi::KnitroInternal
@@ -488,14 +478,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::Integrator
@@ -506,14 +495,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::CplexInternal
@@ -572,14 +560,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
@@ -590,14 +577,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::OCPSolverInternal
@@ -632,14 +618,13 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
 /** \class CasADi::GSL::GslIntegrator
@@ -650,13 +635,12 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 <br/><table>
-<caption>Output scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
+<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */

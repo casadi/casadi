@@ -8,6 +8,8 @@ namespace CasADi{
 
 /** \brief CplexMatrix is a class used to convert CasADi matrices to CPLEX format (similar to CSC).
   The class definition can be found in cplex_internal.cpp.
+  
+  @copydoc NLPSolver_doc
   \author Carlo Savorgnan
   \date 2011
 */

@@ -28,10 +28,14 @@
 namespace CasADi{
   namespace Interfaces{
   
-/** \brief  Forward declaration of internal class */
+/** \brief  Forward declaration of internal class
+ @copydoc LinearSolver_doc
+ */
 class LapackQRDenseInternal;
 
 /** \brief  QR LinearSolver with Lapack Interface
+*
+ @copydoc LinearSolver_doc
 *
 * This class solves the linear system A.x=b by making an QR factorization of A: \n
 * A = Q.R, with Q orthogonal and R upper triangular

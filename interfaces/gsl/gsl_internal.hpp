@@ -35,6 +35,9 @@
 namespace CasADi{
 namespace GSL {
   
+/**
+@copydoc ODE_doc
+*/
 class GslInternal : public IntegratorInternal{
   friend class GslIntegrator;
 public:

@@ -29,6 +29,8 @@
 namespace CasADi{
     
 /** \brief NLP solver storage class
+
+  @copydoc NLPSolver_doc
   \author Joel Andersson 
   \date 2010
 */

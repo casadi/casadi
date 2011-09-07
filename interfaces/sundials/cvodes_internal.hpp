@@ -41,6 +41,9 @@
 namespace CasADi{
 namespace Sundials{
   
+/**
+  @copydoc ODE_doc
+*/
 class CVodesInternal : public IntegratorInternal{
   friend class CVodesIntegrator;
 public:

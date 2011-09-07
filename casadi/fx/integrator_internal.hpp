@@ -29,6 +29,8 @@
 namespace CasADi{
 
 /** \brief Internal storage for integrator related data
+
+  @copydoc DAE_doc
   \author Joel Andersson 
   \date 2010
 */

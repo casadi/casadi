@@ -26,6 +26,29 @@
 #include "fx.hpp"
 #include "linear_solver.hpp"
 
+
+/** \defgroup DAE_doc
+  Solves the following initial value problem (IVP):
+  
+  \verbatim
+  F(t,x,der(x),z,p) == 0
+  x(t0) = x0
+  over a time interval [t0, tf].
+  \endverbatim 
+*/
+
+/** \defgroup ODE_doc
+  Solves the following initial value problem (IVP):
+  
+  \verbatim
+  xdot == f(t,x,p)
+  from t0 to tf
+  
+  given the initial condition
+  x(t0) == x0;
+  \endverbatim 
+*/
+
 namespace CasADi{
 
 /// Input arguments of an ODE/DAE function
@@ -57,6 +80,7 @@ enum IntegratorInput{
   /** Parameters p  (dimension np-by-1) */
   INTEGRATOR_P,  
   /** State derivative at t0  (dimension nx-by-1)
+  * Only relevant for implicit intergators.
   * This input may be changed during an IDASIntegrator::evaluate()
   */
   INTEGRATOR_XP0, 
@@ -77,29 +101,13 @@ enum IntegratorOutput{
 class IntegratorInternal;
 
 /** Integrator abstract base class
-  An "integrator" is a function that solves an initial value problem (IVP) of the generic form:
+  @copydoc DAE_doc
   
-  F(t,x,der(x),z,p) == 0
-  x(t0) = x0
-  over a time interval [t0, tf].
-
-  It has (currently) 6 inputs, initial time, final time, initial state (vector-valued), parameter (vector-valued), as well as guesses for the initial 
-  state derivative and algebraic variables. The latter two are only relevant for implicit integrators.
-  
-  In addition to this, the integrator provides some additional functionality, such as getting the value of the state and/or sensitivities at certain time points.
+  The Integrator class provides some additional functionality, such as getting the value of the state and/or sensitivities at certain time points.
   Controls are assumed to be parametrized at this point. 
     
   The class does not specify how the function F above should be represented, nor the method used for the integration, but assumes that it steps forward in time 
   (ruling out collocation in particular). The actual form of the ODE/DAE is defined in the derived classes.
-    
-  inputs:
-  0: State at t0  (dimension nx-by-1)
-  1: Parameter  (dimension np-by-1)
-  2: State derivative at t0  (dimension nx-by-1)
-  
-  outputs:
-  0: State at tf
-  1: State derivative at tf
 
 
   \author Joel Andersson

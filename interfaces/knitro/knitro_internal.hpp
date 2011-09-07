@@ -28,7 +28,10 @@
 #include "casadi/fx/nlp_solver_internal.hpp"
 
 namespace CasADi{
-    
+
+/**
+@copydoc NLPSolver_doc
+*/
 class KnitroInternal : public NLPSolverInternal{
 
 public:

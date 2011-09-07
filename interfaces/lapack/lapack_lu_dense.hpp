@@ -28,10 +28,14 @@
 namespace CasADi{
   namespace Interfaces{
   
-/** \brief  Forward declaration of internal class */
+/** \brief  Forward declaration of internal class
+
+ @copydoc LinearSolver_doc
+  */
 class LapackLUDenseInternal;
 
 /** \brief  LU LinearSolver with Lapack Interface
+* @copydoc LinearSolver_doc
 *
 * This class solves the linear system A.x=b by making an LU factorization of A: \n
 * A = L.U, with L lower and U upper triangular

@@ -32,21 +32,14 @@ namespace Interfaces {
 // Forward declaration of internal class 
 class OOQPInternal;
 
-  /** OOQP Solver for quadratic programming:
+/** OOQP Solver for quadratic programming:
 
-  min          x'Hx + G'x 
-  
-  subject to
-              LBA <= Ax <= UBA
-              LBX <= x  <= UBX
-              
-      nx: number of decision variables (x)
-      nc: number of constraints (A)
-      
+      @copydoc QPSolver_doc
+
       The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
       
       NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
-  */
+*/
 class OOQPSolver : public QPSolver {
 public:
 

@@ -29,6 +29,9 @@ namespace CasADi{
   
 class KnitroInternal;
   
+/**
+@copydoc NLPSolver_doc
+*/
 class KnitroSolver : public NLPSolver {
   public:
     /// Default constructor

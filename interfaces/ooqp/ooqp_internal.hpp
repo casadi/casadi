@@ -32,7 +32,11 @@
 
 namespace CasADi{
 namespace Interfaces {
-  
+
+/** \brief Internal class for OOQPSolver
+ * 
+    @copydoc QPSolver_doc
+ * */
 class OOQPInternal : public QPSolverInternal {
   friend class OOQPSolver;
 public:

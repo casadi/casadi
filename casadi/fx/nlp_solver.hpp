@@ -25,6 +25,24 @@
 
 #include "fx.hpp"
 
+
+/** \defgroup NLPSolver_doc
+
+  Solves the following nonlinear optimization problem:
+  \verbatim
+  min          F(x)
+   x
+  
+  subject to
+              LBG <= G(x) <= UBG
+              LBX <= x    <= UBX
+              
+      n: number of decision variables (x)
+      m: number of constraints (A)
+  \endverbatim
+
+*/
+
 namespace CasADi{
 
 /// Input arguments of an NLP Solver
@@ -65,7 +83,7 @@ class NLPSolverInternal;
 
 /** \brief NLPSolver
 
-NLPSolver is an CasADi::FX mappinf from CasADi::NLPInput to CasADi::NLPOutput
+  @copydoc NLPSolver_doc
 
   \author Joel Andersson 
   \date 2010

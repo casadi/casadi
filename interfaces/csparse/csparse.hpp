@@ -33,7 +33,9 @@ namespace CasADi{
 class CSparseInternal;
 
 /** \brief  LinearSolver with CSparse Interface
-* 
+*
+ @copydoc LinearSolver_doc
+*  
 * CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
 *
 * The usual procedure to use CSparse is: \n

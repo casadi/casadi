@@ -31,6 +31,7 @@ namespace Interfaces {
 
   /** \brief Internal class for IpoptQPSolver
    * 
+      @copydoc QPSolver_doc
    * */
 class IpoptQPInternal : public QPSolverInternal {
   friend class IpoptQPSolver;

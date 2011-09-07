@@ -33,6 +33,9 @@ extern "C"{
 namespace CasADi{
   namespace Interfaces{
 
+/**
+ @copydoc LinearSolver_doc
+*/
 class CSparseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides

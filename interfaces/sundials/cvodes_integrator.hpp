@@ -42,11 +42,7 @@ class CVodesInternal;
 
 /** Function that integrates the ODE:
 
-  ydot == f(t,y,p)
-  from t0 to tf
-  
-  given the initial condition
-  y(t0) == y0;
+  @copydoc ODE_doc
   
   A call to evaluate will integrate to the end.
   

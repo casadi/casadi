@@ -32,6 +32,7 @@ namespace Interfaces {
 
   /** \brief Internal class for QPOasesSolver
    * 
+      @copydoc QPSolver_doc
    * */
 class QPOasesInternal : public QPSolverInternal {
   friend class QPOasesSolver;

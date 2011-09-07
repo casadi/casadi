@@ -35,6 +35,9 @@ namespace CasADi{
 // Forward declaration of internal class 
 class LiftoptInternal;
 
+/**
+@copydoc NLPSolver_doc
+*/
 class LiftoptSolver : public NLPSolver{
 public:
 

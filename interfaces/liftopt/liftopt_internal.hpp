@@ -37,6 +37,10 @@
 namespace CasADi{
   namespace Interfaces{
 
+/**
+
+@copydoc NLPSolver_doc
+*/
 class LiftoptInternal : public NLPSolverInternal{
   public:
     LiftoptInternal(const MXFunction& fcn);

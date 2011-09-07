@@ -32,7 +32,7 @@ class IpoptInternal;
 // List from ipopt_internal.cpp
 /**
 * \brief interface to IPOPT NLP solver
-*
+* @copydoc NLPSolver_doc
 
 */
 class IpoptSolver : public NLPSolver {

@@ -8,6 +8,7 @@ namespace CasADi{
 class CplexInternal;
   
 /** \brief Interface to CPLEX solver.
+  @copydoc NLPSolver_doc
   Attention! The interface is not complete yet.
   Also if a quadratic term can be set with this interface, it is ignored!
   \author Carlo Savorgnan

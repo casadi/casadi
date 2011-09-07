@@ -25,14 +25,23 @@
 
 #include "casadi/fx/integrator.hpp"
 
-// To be able to maintain both Python and Doxygen documentation
-#ifdef SWIG
-#define SWIGDOC(x) \
-%feature("autodoc", x " Consult the C++ doxygen information for details.");
-#else
-#define SWIGDOC(x)
-#endif
-
+/**
+* \defgroup IdasIntegrator_doc
+  Solves an initial value problem in differential-algebraic equations of the form:
+  
+  
+  Creates an integrator instance which solves initial value problems in differential-algebraic equations
+  of the form:
+  
+  \verbatim
+  f(t,y,der(y),z,p) == 0
+  der(q) = g(t,y,z,p)
+  \endverbatim
+  
+  The DAE thus consists of a fully implicit part (f) and an explicit quadrature part (g). In the same way,
+  the state vector is also composed of two parts, the differential states and the quadrature states,
+  i.e. x = [y,q]
+*/
 
 namespace CasADi{
 namespace Sundials{
@@ -48,21 +57,12 @@ enum JACOutput{JAC_J, JAC_NUM_OUT};
 
 /** Interface to IDAS from the Sundials suite.
 
-  Creates an integrator instance which solves initial value problems in differential-algebraic equations
-  of the form:
-  
-  f(t,y,der(y),z,p) == 0
-  der(q) = g(t,y,z,p)
-
-  The DAE thus consists of a fully implicit part (f) and an explicit quadrature part (g). In the same way,
-  the state vector is also composed of two parts, the differential states and the quadrature states,
-  i.e. x = [y,q]
+   @copydoc IdasIntegrator_doc
   
    \author Joel Andersson
    \date 2010
 */
 
-SWIGDOC("Interface to IDAS from the Sundials suite.")
 class IdasIntegrator : public Integrator{
 public:
 

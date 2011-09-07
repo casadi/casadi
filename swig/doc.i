@@ -2853,6 +2853,11 @@ Get the reference count. ";
 CplexMatrix is a class used to convert CasADi matrices to CPLEX format
 (similar to CSC). The class definition can be found in cplex_internal.cpp.
 
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
+
 Carlo Savorgnan
 
 C++ includes: cplex_internal.hpp ";
@@ -2881,9 +2886,13 @@ returns row numbers ";
 // File: classCasADi_1_1CplexSolver.xml
 %feature("docstring") CasADi::CplexSolver "
 
-Interface to CPLEX solver. Attention! The interface is not complete yet.
-Also if a quadratic term can be set with this interface, it is ignored!
+Interface to CPLEX solver.
 
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)   Attention! The interface is not complete yet.
+Also if a quadratic term can be set with this interface, it is ignored!
 Carlo Savorgnan
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
@@ -3575,8 +3584,8 @@ copy object if it's not unique. ";
 
 %feature("docstring")  CasADi::CRSSparsity::getNZ "
 
-Get the index of an exstd::vector<unsigned short>isting non-zero element
-return -1 if the element does not exists. ";
+Get the index of an existing non-zero element return -1 if the element does
+not exists. ";
 
 %feature("docstring")  CasADi::CRSSparsity::getNZ "
 
@@ -3798,6 +3807,8 @@ Initialize the object. ";
 %feature("docstring") CasADi::Interfaces::CSparse "
 
 LinearSolver with CSparse Interface.
+
+Solves the linear system A.x = b for x
 
 CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to
 one output [x (vector)].
@@ -4295,6 +4306,8 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1Interfaces_1_1CSparseInternal.xml
 %feature("docstring") CasADi::Interfaces::CSparseInternal "
 
+Solves the linear system A.x = b for x
+
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
@@ -4690,9 +4703,10 @@ Get the reference count. ";
 
 Function that integrates the ODE:
 
-ydot == f(t,y,p) from t0 to tf
+Solves the following initial value problem (IVP):
 
-given the initial condition y(t0) == y0;
+xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
+x0;
 
 A call to evaluate will integrate to the end.
 
@@ -4710,24 +4724,19 @@ times t_i.
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -4804,6 +4813,12 @@ times t_i.
 | bandwidth    |              |              | width of     | gratorIntern |
 |              |              |              | banded       | al           |
 |              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable      | CasADi::Sund |
+| rnal_warning |              |              | CVodes       | ials::CVodes |
+| s            |              |              | internal     | Internal     |
+|              |              |              | warning      |              |
+|              |              |              | messages     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
 | an           |              |              |              | gratorIntern |
@@ -5485,6 +5500,11 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1Sundials_1_1CVodesInternal.xml
 %feature("docstring") CasADi::Sundials::CVodesInternal "
 
+Solves the following initial value problem (IVP):
+
+xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
+x0;
+
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -5495,24 +5515,19 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -5589,6 +5604,12 @@ Return a string with a destription (for SWIG) ";
 | bandwidth    |              |              | width of     | gratorIntern |
 |              |              |              | banded       | al           |
 |              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable      | CasADi::Sund |
+| rnal_warning |              |              | CVodes       | ials::CVodes |
+| s            |              |              | internal     | Internal     |
+|              |              |              | warning      |              |
+|              |              |              | messages     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
 | an           |              |              |              | gratorIntern |
@@ -8775,6 +8796,10 @@ Convert to vector of doubles. ";
 
 Convert to shared object. ";
 
+%feature("docstring")  CasADi::GenericType::toVoidPointer "
+
+Convert to void pointer. ";
+
 %feature("docstring")  CasADi::GenericType::is_a "
 
 Check if it is of a certain type (implementation in
@@ -8879,11 +8904,10 @@ Print a representation of the object. ";
 // File: classCasADi_1_1GSL_1_1GslIntegrator.xml
 %feature("docstring") CasADi::GSL::GslIntegrator "
 
-Function that integrates the ODE:
+Solves the following initial value problem (IVP):
 
-ydot == f(t,y,p) from t0 to tf
-
-given the initial condition y(t0) == y0;
+xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
+x0;
 
 A call to evaluate will integrate to the end.
 
@@ -8901,24 +8925,19 @@ times t_i.
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -9653,6 +9672,11 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1GSL_1_1GslInternal.xml
 %feature("docstring") CasADi::GSL::GslInternal "
 
+Solves the following initial value problem (IVP):
+
+xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
+x0;
+
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -9663,24 +9687,19 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -10319,10 +10338,13 @@ Get the reference count. ";
 
 Interface to IDAS from the Sundials suite.
 
+Solves an initial value problem in differential-algebraic equations of the
+form:
+
 Creates an integrator instance which solves initial value problems in
 differential-algebraic equations of the form:
 
-f(t,y,der(y),z,p) == 0 der(q) = g(t,y,z,p)
+f(t,y,der(y),z,p) == 0   der(q) = g(t,y,z,p)
 
 The DAE thus consists of a fully implicit part (f) and an explicit
 quadrature part (g). In the same way, the state vector is also composed of
@@ -10340,24 +10362,19 @@ Joel Andersson
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -10460,6 +10477,11 @@ Joel Andersson
 |              |              |              | linear       |              |
 |              |              |              | solver       |              |
 |              |              |              | module       |              |
++--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable IDAS | CasADi::Sund |
+| rnal_warning |              |              | internal     | ials::IdasIn |
+| s            |              |              | warning      | ternal       |
+|              |              |              | messages     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
 | an           |              |              |              | gratorIntern |
@@ -11146,6 +11168,18 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1Sundials_1_1IdasInternal.xml
 %feature("docstring") CasADi::Sundials::IdasInternal "
 
+Solves an initial value problem in differential-algebraic equations of the
+form:
+
+Creates an integrator instance which solves initial value problems in
+differential-algebraic equations of the form:
+
+f(t,y,der(y),z,p) == 0   der(q) = g(t,y,z,p)
+
+The DAE thus consists of a fully implicit part (f) and an explicit
+quadrature part (g). In the same way, the state vector is also composed of
+two parts, the differential states and the quadrature states, i.e. x = [y,q]
+
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -11156,24 +11190,19 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -11276,6 +11305,11 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | linear       |              |
 |              |              |              | solver       |              |
 |              |              |              | module       |              |
++--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable IDAS | CasADi::Sund |
+| rnal_warning |              |              | internal     | ials::IdasIn |
+| s            |              |              | warning      | ternal       |
+|              |              |              | messages     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
 | an           |              |              |              | gratorIntern |
@@ -13174,29 +13208,19 @@ Check if smooth. ";
 // File: classCasADi_1_1Integrator.xml
 %feature("docstring") CasADi::Integrator "
 
-Integrator abstract base class An \"integrator\" is a function that solves
-an initial value problem (IVP) of the generic form:
+Integrator abstract base class Solves the following initial value problem
+(IVP):
 
-F(t,x,der(x),z,p) == 0 x(t0) = x0 over a time interval [t0, tf].
+F(t,x,der(x),z,p) == 0   x(t0) = x0   over a time interval [t0, tf].
 
-It has (currently) 6 inputs, initial time, final time, initial state
-(vector-valued), parameter (vector-valued), as well as guesses for the
-initial state derivative and algebraic variables. The latter two are only
-relevant for implicit integrators.
-
-In addition to this, the integrator provides some additional functionality,
-such as getting the value of the state and/or sensitivities at certain time
-points. Controls are assumed to be parametrized at this point.
+The Integrator class provides some additional functionality, such as getting
+the value of the state and/or sensitivities at certain time points. Controls
+are assumed to be parametrized at this point.
 
 The class does not specify how the function F above should be represented,
 nor the method used for the integration, but assumes that it steps forward
 in time (ruling out collocation in particular). The actual form of the
 ODE/DAE is defined in the derived classes.
-
-inputs: 0: State at t0 (dimension nx-by-1) 1: Parameter (dimension np- by-1)
-2: State derivative at t0 (dimension nx-by-1)
-
-outputs: 0: State at tf 1: State derivative at tf
 
 Joel Andersson
 
@@ -13210,24 +13234,19 @@ Joel Andersson
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -13947,6 +13966,10 @@ Return a string with a destription (for SWIG) ";
 
 Internal storage for integrator related data.
 
+Solves the following initial value problem (IVP):
+
+F(t,x,der(x),z,p) == 0   x(t0) = x0   over a time interval [t0, tf].
+
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
@@ -13959,24 +13982,19 @@ Joel Andersson
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -14831,6 +14849,11 @@ Print a representation of the object. ";
 // File: classCasADi_1_1IpoptInternal.xml
 %feature("docstring") CasADi::IpoptInternal "
 
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
+
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -15659,6 +15682,12 @@ Get the reference count. ";
 
 Internal class for IpoptQPSolver.
 
+Solves the following problem:
+
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
+
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -15686,22 +15715,18 @@ Internal class for IpoptQPSolver.
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -16562,11 +16587,13 @@ Get the reference count. ";
 
 IPOPT QP Solver for quadratic programming.
 
-min x'Hx + G'x
+Solves the following problem:
 
-subject to LBA <= Ax <= UBA LBX <= x <= UBX
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
 
-nx: number of decision variables (x) nc: number of constraints (A)
+Joris Gillis
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -16595,22 +16622,18 @@ nx: number of decision variables (x) nc: number of constraints (A)
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -17550,6 +17573,11 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::IpoptSolver "
 
 interface to IPOPT NLP solver
+
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -20747,6 +20775,11 @@ ddqn=[0 0 0 0]; ";
 // File: classCasADi_1_1KnitroInternal.xml
 %feature("docstring") CasADi::KnitroInternal "
 
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
+
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -21161,6 +21194,11 @@ Get the reference count. ";
 
 // File: classCasADi_1_1KnitroSolver.xml
 %feature("docstring") CasADi::KnitroSolver "
+
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -21677,6 +21715,8 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::Interfaces::LapackLUDense "
 
 LU LinearSolver with Lapack Interface.
+
+Solves the linear system A.x = b for x
 
 This class solves the linear system A.x=b by making an LU factorization of
 A:  A = L.U, with L lower and U upper triangular
@@ -22615,6 +22655,8 @@ Get the reference count. ";
 
 QR LinearSolver with Lapack Interface.
 
+Solves the linear system A.x = b for x
+
 This class solves the linear system A.x=b by making an QR factorization of
 A:  A = Q.R, with Q orthogonal and R upper triangular
 
@@ -23530,6 +23572,11 @@ Get the reference count. ";
 // File: classCasADi_1_1Interfaces_1_1LiftoptInternal.xml
 %feature("docstring") CasADi::Interfaces::LiftoptInternal "
 
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
+
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -23951,6 +23998,11 @@ Get the reference count. ";
 
 // File: classCasADi_1_1Interfaces_1_1LiftoptSolver.xml
 %feature("docstring") CasADi::Interfaces::LiftoptSolver "
+
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -24474,7 +24526,8 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1LinearSolver.xml
 %feature("docstring") CasADi::LinearSolver "
 
-Abstract base class for the linear solver classes
+Abstract base class for the linear solver classes Solves the linear system
+A.x = b for x
 
 Joel Andersson
 
@@ -24948,7 +25001,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1LinearSolverInternal.xml
 %feature("docstring") CasADi::LinearSolverInternal "
 
-Internal class.
+Internal class Solves the linear system A.x = b for x
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -30012,8 +30065,10 @@ Check if smooth. ";
 
 NLPSolver.
 
-NLPSolver is an CasADi::FX mappinf from CasADi::NLPInput to
-CasADi::NLPOutput
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
 
 Joel Andersson
 
@@ -30516,6 +30571,11 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::NLPSolverInternal "
 
 NLP solver storage class.
+
+Solves the following nonlinear optimization problem:   min          F(x)
+x      subject to               LBG <= G(x) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
 
 Joel Andersson
 
@@ -33558,6 +33618,14 @@ Check if smooth. ";
 // File: classCasADi_1_1Interfaces_1_1OOQPInternal.xml
 %feature("docstring") CasADi::Interfaces::OOQPInternal "
 
+Internal class for OOQPSolver.
+
+Solves the following problem:
+
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
+
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -33585,22 +33653,18 @@ Check if smooth. ";
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -34009,11 +34073,11 @@ Get the reference count. ";
 
 OOQP Solver for quadratic programming:
 
-min x'Hx + G'x
+Solves the following problem:
 
-subject to LBA <= Ax <= UBA LBX <= x <= UBX
-
-nx: number of decision variables (x) nc: number of constraints (A)
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
 
 The current implementation assumes that OOQP is configured with the MA27
 sparse linear solver.
@@ -34048,22 +34112,18 @@ reInit();
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -35880,6 +35940,12 @@ Return a string with a destription (for SWIG) ";
 
 Internal class for QPOasesSolver.
 
+Solves the following problem:
+
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
+
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -35907,29 +35973,25 @@ Internal class for QPOasesSolver.
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| CPUtime      | OT_REAL      | 0            | The maximum  | CasADi::Inte |
-|              |              |              | allowed CPU  | rfaces::QPOa |
+| CPUtime      | OT_REAL      | GenericType( | The maximum  | CasADi::Inte |
+|              |              | )            | allowed CPU  | rfaces::QPOa |
 |              |              |              | time in      | sesInternal  |
 |              |              |              | seconds for  |              |
 |              |              |              | the whole in |              |
@@ -35938,8 +36000,8 @@ Internal class for QPOasesSolver.
 |              |              |              | actually     |              |
 |              |              |              | required one |              |
 |              |              |              | on output).  |              |
-|              |              |              | Set to zero  |              |
-|              |              |              | to disable.  |              |
+|              |              |              | Disabled if  |              |
+|              |              |              | unset.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
@@ -35968,14 +36030,6 @@ Internal class for QPOasesSolver.
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hotstart     | OT_BOOLEAN   | false        | Set to true  | CasADi::Inte |
-|              |              |              | if you need  | rfaces::QPOa |
-|              |              |              | to solve     | sesInternal  |
-|              |              |              | several QP's |              |
-|              |              |              | in a row     |              |
-|              |              |              | that are     |              |
-|              |              |              | similar      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -35997,8 +36051,8 @@ Internal class for QPOasesSolver.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nWSR         | OT_INTEGER   | -1           | The maximum  | CasADi::Inte |
-|              |              |              | number of    | rfaces::QPOa |
+| nWSR         | OT_INTEGER   | GenericType( | The maximum  | CasADi::Inte |
+|              |              | )            | number of    | rfaces::QPOa |
 |              |              |              | working set  | sesInternal  |
 |              |              |              | recalculatio |              |
 |              |              |              | ns to be     |              |
@@ -36006,8 +36060,7 @@ Internal class for QPOasesSolver.
 |              |              |              | during the   |              |
 |              |              |              | initial      |              |
 |              |              |              | homotopy.    |              |
-|              |              |              | Default (-1) |              |
-|              |              |              | leads to     |              |
+|              |              |              | Default is   |              |
 |              |              |              | 5(nx + nc)   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -36049,6 +36102,18 @@ Internal class for QPOasesSolver.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| printLevel   | OT_STRING    | GenericType( | Defines the  | CasADi::Inte |
+|              |              | )            | amount of    | rfaces::QPOa |
+|              |              |              | text output  | sesInternal  |
+|              |              |              | during QP    |              |
+|              |              |              | solution,    |              |
+|              |              |              | see Section  |              |
+|              |              |              | 5.7.:        |              |
+|              |              |              | \"none\",      |              |
+|              |              |              | \"low\",       |              |
+|              |              |              | \"medium\" or  |              |
+|              |              |              | \"high\"       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -36347,13 +36412,15 @@ Get the reference count. ";
 // File: classCasADi_1_1Interfaces_1_1QPOasesSolver.xml
 %feature("docstring") CasADi::Interfaces::QPOasesSolver "
 
-QPOases Solver for quadratic programming.
+Interface to QPOases Solver for quadratic programming.
 
-min x'Hx + G'x
+Solves the following problem:
 
-subject to LBA <= Ax <= UBA LBX <= x <= UBX
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
 
-nx: number of decision variables (x) nc: number of constraints (A)
+Joris Gillis, Joel Andersson
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -36382,29 +36449,25 @@ nx: number of decision variables (x) nc: number of constraints (A)
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| CPUtime      | OT_REAL      | 0            | The maximum  | CasADi::Inte |
-|              |              |              | allowed CPU  | rfaces::QPOa |
+| CPUtime      | OT_REAL      | GenericType( | The maximum  | CasADi::Inte |
+|              |              | )            | allowed CPU  | rfaces::QPOa |
 |              |              |              | time in      | sesInternal  |
 |              |              |              | seconds for  |              |
 |              |              |              | the whole in |              |
@@ -36413,8 +36476,8 @@ nx: number of decision variables (x) nc: number of constraints (A)
 |              |              |              | actually     |              |
 |              |              |              | required one |              |
 |              |              |              | on output).  |              |
-|              |              |              | Set to zero  |              |
-|              |              |              | to disable.  |              |
+|              |              |              | Disabled if  |              |
+|              |              |              | unset.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
@@ -36443,14 +36506,6 @@ nx: number of decision variables (x) nc: number of constraints (A)
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hotstart     | OT_BOOLEAN   | false        | Set to true  | CasADi::Inte |
-|              |              |              | if you need  | rfaces::QPOa |
-|              |              |              | to solve     | sesInternal  |
-|              |              |              | several QP's |              |
-|              |              |              | in a row     |              |
-|              |              |              | that are     |              |
-|              |              |              | similar      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -36472,8 +36527,8 @@ nx: number of decision variables (x) nc: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nWSR         | OT_INTEGER   | -1           | The maximum  | CasADi::Inte |
-|              |              |              | number of    | rfaces::QPOa |
+| nWSR         | OT_INTEGER   | GenericType( | The maximum  | CasADi::Inte |
+|              |              | )            | number of    | rfaces::QPOa |
 |              |              |              | working set  | sesInternal  |
 |              |              |              | recalculatio |              |
 |              |              |              | ns to be     |              |
@@ -36481,8 +36536,7 @@ nx: number of decision variables (x) nc: number of constraints (A)
 |              |              |              | during the   |              |
 |              |              |              | initial      |              |
 |              |              |              | homotopy.    |              |
-|              |              |              | Default (-1) |              |
-|              |              |              | leads to     |              |
+|              |              |              | Default is   |              |
 |              |              |              | 5(nx + nc)   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -36524,6 +36578,18 @@ nx: number of decision variables (x) nc: number of constraints (A)
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| printLevel   | OT_STRING    | GenericType( | Defines the  | CasADi::Inte |
+|              |              | )            | amount of    | rfaces::QPOa |
+|              |              |              | text output  | sesInternal  |
+|              |              |              | during QP    |              |
+|              |              |              | solution,    |              |
+|              |              |              | see Section  |              |
+|              |              |              | 5.7.:        |              |
+|              |              |              | \"none\",      |              |
+|              |              |              | \"low\",       |              |
+|              |              |              | \"medium\" or  |              |
+|              |              |              | \"high\"       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -36904,10 +36970,11 @@ Return a string with a destription (for SWIG) ";
 
 QPSolver.
 
-Input arguments of an QP Solver CasADi::QPInput:
-QP_X_INIT,QP_LBX,QP_UBX,QP_LBG,QP_UBG,QP_LAMBDA_INIT  Output arguments of an
-QP Solver CasADi::QPOutput:
-QP_X_OPT,QP_COST,QP_LAMBDA_OPT,QP_LAMBDA_LBX,QP_LAMBDA_UBX
+Solves the following problem:
+
+min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
+UBA               LBX <= x   <= UBX                      nx: number of
+decision variables (x)       nc: number of constraints (A)
 
 Joel Andersson
 
@@ -36938,22 +37005,18 @@ Joel Andersson
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -37208,10 +37271,6 @@ point to this new object. ";
 
 Default constructor. ";
 
-%feature("docstring")  CasADi::QPSolver::QPSolver "
-
-Constructor with sparsity patterns. ";
-
 %feature("docstring")  CasADi::QPSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
@@ -37453,22 +37512,18 @@ Internal class.
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
->Output scheme: CasADi::QPOutput (QP_NUM_OUT = 5)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| QP_X_OPT                           | The optimal value of x as          |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_COST                            | The value of the cost function as  |
-|                                    | calculated with evaluate()         |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_OPT                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_LBX                      |                                    |
-+------------------------------------+------------------------------------+
-| QP_LAMBDA_UBX                      |                                    |
-+------------------------------------+------------------------------------+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-----------+---------------------------------------------------+
+|   Name    |                    Description                    |
++===========+===================================================+
+| QP_PRIMAL | The primal solution.                              |
++-----------+---------------------------------------------------+
+| QP_COST   | The optimal cost.                                 |
++-----------+---------------------------------------------------+
+| QP_DUAL_A | The dual solution corresponding to linear bounds. |
++-----------+---------------------------------------------------+
+| QP_DUAL_X | The dual solution corresponding to simple bounds. |
++-----------+---------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -38345,8 +38400,9 @@ Joel Andersson
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
 
@@ -38826,8 +38882,9 @@ Joel Andersson
 | INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
 +------------------------------------+------------------------------------+
 | INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) This input may be changed |
-|                                    | during an                          |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
 
@@ -39462,6 +39519,8 @@ Constructor. ";
 
 LU LinearSolver with SuperLU Interface.
 
+Solves the linear system A.x = b for x
+
 This class solves the linear system A.x=b by making an LU factorization of
 A:  A = L.U, with L lower and U upper triangular
 
@@ -40004,6 +40063,8 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1SuperLUInternal.xml
 %feature("docstring") CasADi::SuperLUInternal "
 
+Solves the linear system A.x = b for x
+
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
@@ -40513,6 +40574,12 @@ string representation (SWIG workaround) ";
 
 Get a pointer to the node. ";
 
+%feature("docstring")  CasADi::SX::isLeaf "
+
+check if this SX is a leaf of the SX graph
+
+An SX qualifies as leaf when it has no dependencies. ";
+
 %feature("docstring")  CasADi::SX::isConstant "";
 
 %feature("docstring")  CasADi::SX::isInteger "";
@@ -40520,6 +40587,10 @@ Get a pointer to the node. ";
 %feature("docstring")  CasADi::SX::isSymbolic "";
 
 %feature("docstring")  CasADi::SX::isBinary "";
+
+%feature("docstring")  CasADi::SX::isCommutative "
+
+Check wether a binary SX is commutative. ";
 
 %feature("docstring")  CasADi::SX::isZero "";
 
@@ -40544,6 +40615,15 @@ Get a pointer to the node. ";
 %feature("docstring")  CasADi::SX::getIntValue "";
 
 %feature("docstring")  CasADi::SX::getDep "";
+
+%feature("docstring")  CasADi::SX::getNdeps "
+
+Get the number of dependencies of a binary SX. ";
+
+%feature("docstring")  CasADi::SX::__hash__ "
+
+Returns a number that is uniaue for a given SXNode. If the SX does not point
+to qny node, 0 is returned. ";
 
 %feature("docstring")  CasADi::SX::__add__ "";
 
@@ -43783,6 +43863,8 @@ Uses CasADi::SXFunction::jac ";
 
 %feature("docstring")  CasADi::GSL::populatePrintFun "";
 
+%feature("docstring")  CasADi::GSL::isCommutative "";
+
 %feature("docstring")  CasADi::GSL::getptr "";
 
 %feature("docstring")  CasADi::GSL::range "
@@ -43975,6 +44057,14 @@ Make a matrix dense. ";
 %feature("docstring")  CasADi::GSL::addMultiple "
 
 same as: res += prod(A,v) ";
+
+%feature("docstring")  CasADi::GSL::getPtr "
+
+Get a pointer to the data contained in the vector. ";
+
+%feature("docstring")  CasADi::GSL::getPtr "
+
+Get a pointer to the data contained in the vector. ";
 
 %feature("docstring")  CasADi::GSL::sp_dense "
 
@@ -44334,6 +44424,14 @@ Read matrix, matlab style. ";
 
 Matlab's linspace. ";
 
+%feature("docstring")  CasADi::GSL::getPtr "
+
+Get a pointer to the data contained in the vector. ";
+
+%feature("docstring")  CasADi::GSL::getPtr "
+
+Get a pointer to the data contained in the vector. ";
+
 %feature("docstring")  CasADi::GSL::sign "";
 
 %feature("docstring")  CasADi::GSL::if_else "";
@@ -44626,7 +44724,11 @@ evaluated at runtime. At the same time, it degrate the cache utilization. ";
 
 %feature("docstring")  CasADi::GSL::countNodes "
 
-Count number of nodes ";
+Count number of nodes. ";
+
+%feature("docstring")  CasADi::GSL::getOperatorRepresentation "
+
+Get a string representation for a binary SX, using custom arguments. ";
 
 %feature("docstring")  CasADi::GSL::print_dat "
 
@@ -45144,9 +45246,6 @@ h:  internal expressions which the user may wish to inspect ";
 // File: namespaceOPTICON.xml
 
 
-// File: namespaceqpOASES.xml
-
-
 // File: namespacestd.xml
 %feature("docstring")  std::sqrt "
 
@@ -45383,9 +45482,6 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 
 // File: casadi_8hpp.xml
-
-
-// File: casadi__common_8hpp.xml
 
 
 // File: casadi__exception_8hpp.xml
@@ -46170,6 +46266,8 @@ C99 elementary functions from the math.h header. ";
 
 %feature("docstring")  CasADi::countNodes "";
 
+%feature("docstring")  CasADi::getOperatorRepresentation "";
+
 
 // File: sx__tools_8hpp.xml
 
@@ -46261,6 +46359,24 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: xml__node_8hpp.xml
+
+
+// File: group__DAE__doc.xml
+
+
+// File: group__ODE__doc.xml
+
+
+// File: group__LinearSolver__doc.xml
+
+
+// File: group__NLPSolver__doc.xml
+
+
+// File: group__QPSolver__doc.xml
+
+
+// File: group__IdasIntegrator__doc.xml
 
 
 // File: chapter1.xml
