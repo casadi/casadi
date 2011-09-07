@@ -56,7 +56,7 @@ int main() {
   ubA(0) = 2.0;
   
   for(int rep=0; rep<2; ++rep){
-    OOQPSolver qp_solver(H.sparsity(), g.sparsity(), A.sparsity());
+    OOQPSolver qp_solver(H.sparsity(), A.sparsity());
     qp_solver.init();
     qp_solver.setInput(A,QP_A);
     qp_solver.setInput(H,QP_H);

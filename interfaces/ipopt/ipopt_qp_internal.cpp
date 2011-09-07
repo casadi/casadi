@@ -31,13 +31,13 @@ namespace Interfaces {
 
 IpoptQPInternal* IpoptQPInternal::clone() const{
   // Return a deep copy
-  IpoptQPInternal* node = new IpoptQPInternal(H,G,A);
+  IpoptQPInternal* node = new IpoptQPInternal(H,A);
   if(!node->is_init)
     node->init();
   return node;
 }
   
-IpoptQPInternal::IpoptQPInternal(const CRSSparsity & H_, const CRSSparsity & G_, const CRSSparsity & A_) : QPSolverInternal(H_,G_,A_){
+IpoptQPInternal::IpoptQPInternal(const CRSSparsity& H_, const CRSSparsity &A_) : QPSolverInternal(H_,A_){
   std::cout << "Warning: IPOPT QP is highly experimental" << std::endl;
 
   std::map<std::string,opt_type> ops_;
@@ -236,9 +236,9 @@ void IpoptQPInternal::init(){
     
   // Put H, G, A sparsities in a vector...
   std::vector< CRSSparsity > sps;
-  sps.push_back(H);
-  sps.push_back(G);
-  sps.push_back(A);
+  sps.push_back(input(QP_H).sparsity());
+  sps.push_back(input(QP_G).sparsity());
+  sps.push_back(input(QP_A).sparsity());
   
   // So that we can pass it on to createParent
   std::pair< MX, std::vector< MX > > mypair = createParent(sps);

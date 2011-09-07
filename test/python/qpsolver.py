@@ -24,7 +24,7 @@ class QPSolverTests(casadiTestCase):
     UBX = DMatrix([inf]*2)
 
 
-    solver = OOQPSolver(H.sparsity(),G.sparsity(),A.sparsity())
+    solver = OOQPSolver(H.sparsity(),A.sparsity())
     solver.setOption("mutol",1e-12)
     solver.setOption("artol",1e-12)
     solver.init()
@@ -72,7 +72,7 @@ class QPSolverTests(casadiTestCase):
     UBX = DMatrix([inf]*2)
 
 
-    solver = QPOasesSolver(H.sparsity(),G.sparsity(),A.sparsity())
+    solver = QPOasesSolver(H.sparsity(),A.sparsity())
     solver.init()
 
     solver.input(QP_H).set(H)
@@ -116,7 +116,7 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    solver = IpoptQPSolver(H.sparsity(),G.sparsity(),A.sparsity())
+    solver = IpoptQPSolver(H.sparsity(),A.sparsity())
     solver.setOption("convex",True)
     solver.init()
 

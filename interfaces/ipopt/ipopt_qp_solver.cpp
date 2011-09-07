@@ -31,8 +31,8 @@ IpoptQPSolver::IpoptQPSolver(){
 }
 
 
-IpoptQPSolver::IpoptQPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A)  {
-  assignNode(new IpoptQPInternal(H,G,A));
+IpoptQPSolver::IpoptQPSolver(const CRSSparsity & H, const CRSSparsity & A)  {
+  assignNode(new IpoptQPInternal(H,A));
 }
 
 IpoptQPInternal* IpoptQPSolver::operator->(){

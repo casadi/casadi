@@ -84,11 +84,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
   // Allocate a QP solver
   CRSSparsity H_sparsity = sp_dense(n,n);
-  CRSSparsity G_sparsity = sp_dense(n);
   CRSSparsity A_sparsity = jfcn.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
-  QPSolver qp_solver = qp_solver_creator(H_sparsity,G_sparsity,A_sparsity);
+  QPSolver qp_solver = qp_solver_creator(H_sparsity,A_sparsity);
   
   // Set options if provided
   if(hasSetOption("qp_solver_options")){

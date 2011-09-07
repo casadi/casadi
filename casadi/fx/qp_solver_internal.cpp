@@ -35,20 +35,19 @@ QPSolverInternal::QPSolverInternal() {
 }
 
 // Constructor
-QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &G_, const CRSSparsity &A_) : H(H_), G(G_), A(A_) {
+QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &A_) : H(H_), A(A_) {
   addOption("convex", OT_BOOLEAN, false, "Specify true if you can guarantee that H will always be positive definite");
 
   nx = H.size2();
   nc = A.size1();
   
-  if (G.size1()!=nx || A.size2()!=nx || H.size1()!=H.size2() || G.numel() != G.size() || G.size2()!=1 ) {
+  if (A.size2()!=nx || H.size1()!=H.size2()) {
     stringstream ss;
     ss << "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl;
-    ss << "H: " << H.dimString() << " - G: " << G.dimString() << " - A: " << A.dimString() << std::endl;
-    ss << "We need: H.size2()==G.size1()==A.size2(), G Dense Column vector, H square & symmetric" << std::endl;
+    ss << "H: " << H.dimString() << " - A: " << A.dimString() << std::endl;
+    ss << "We need: H.size2()==A.size2(), H square & symmetric" << std::endl;
     throw CasadiException(ss.str());
   }
-
 }
     
 void QPSolverInternal::init() {
@@ -60,7 +59,7 @@ void QPSolverInternal::init() {
   setNumInputs(QP_NUM_IN);
   input(QP_X_INIT) = DMatrix(x_sparsity,0);
   input(QP_H) = DMatrix(H);
-  input(QP_G) = DMatrix(G);
+  input(QP_G) = DMatrix(x_sparsity);
   input(QP_A) = DMatrix(A);
   input(QP_LBA) = DMatrix(bounds_sparsity, -std::numeric_limits<double>::infinity());
   input(QP_UBA) = DMatrix(bounds_sparsity,  std::numeric_limits<double>::infinity());

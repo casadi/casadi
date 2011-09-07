@@ -52,7 +52,7 @@ public:
   /** \brief  Default constructor */
   IpoptQPSolver();
   
-  explicit IpoptQPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  explicit IpoptQPSolver(const CRSSparsity & H, const CRSSparsity & A);
   
   /** \brief  Access functions of the node */
   IpoptQPInternal* operator->();
@@ -65,7 +65,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A){ return IpoptQPSolver(H,G,A);}
+  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return IpoptQPSolver(H,A);}
   #ifdef SWIG
   %nocallback;
   #endif

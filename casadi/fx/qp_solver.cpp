@@ -27,14 +27,8 @@ namespace CasADi{
 
 
 QPSolver::QPSolver() {
-
 }
-  
 
-QPSolver::QPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) {
-
-}
-  
 QPSolverInternal* QPSolver::operator->(){
   return static_cast<QPSolverInternal*>(FX::operator->());
 }

@@ -87,9 +87,6 @@ class QPSolver : public FX{
   /// Default constructor
   QPSolver();
   
-  /// Constructor with sparsity patterns
-  QPSolver(const CRSSparsity& H, const CRSSparsity& G, const CRSSparsity& A);
-
   /// Access functions of the node
   QPSolverInternal* operator->();
   const QPSolverInternal* operator->() const;

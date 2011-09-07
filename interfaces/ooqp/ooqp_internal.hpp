@@ -43,7 +43,7 @@ public:
   virtual OOQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  explicit OOQPInternal(const CRSSparsity& H, const CRSSparsity& A);
 
   /** \brief  Destructor */
   virtual ~OOQPInternal();

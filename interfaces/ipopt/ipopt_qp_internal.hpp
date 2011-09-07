@@ -42,7 +42,7 @@ public:
   virtual IpoptQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit IpoptQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  explicit IpoptQPInternal(const CRSSparsity& H, const CRSSparsity &A);
 
   /** \brief  Destructor */
   virtual ~IpoptQPInternal();

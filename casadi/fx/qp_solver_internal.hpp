@@ -38,7 +38,7 @@ class QPSolverInternal : public FXInternal{
     QPSolverInternal();
         
     // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &G, const CRSSparsity &A);
+    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
     
     // Destructor
     virtual ~QPSolverInternal() = 0;
@@ -55,8 +55,6 @@ class QPSolverInternal : public FXInternal{
   protected:
     /// Sparsity of the H matrix
     CRSSparsity H;
-    /// Sparsity of the G matrix
-    CRSSparsity G;
     /// Sparsity of the A matrix
     CRSSparsity A;
     

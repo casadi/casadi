@@ -37,13 +37,13 @@ namespace Interfaces {
 
 OOQPInternal* OOQPInternal::clone() const{
   // Return a deep copy
-  OOQPInternal* node = new OOQPInternal(H,G,A);
+  OOQPInternal* node = new OOQPInternal(H,A);
   if(!node->is_init)
     node->init();
   return node;
 }
   
-OOQPInternal::OOQPInternal(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A) : QPSolverInternal(H,G,A){
+OOQPInternal::OOQPInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H,A){
   addOption("print_level",OT_INTEGER,0,"Print level. OOQP listends to print_level 0, 10 and 100");
   addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
   addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");

@@ -53,7 +53,7 @@ public:
   /** \brief  Default constructor */
   OOQPSolver();
   
-  explicit OOQPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  OOQPSolver(const CRSSparsity& H, const CRSSparsity& A);
   
   /** \brief  Access functions of the node */
   OOQPInternal* operator->();
@@ -76,7 +76,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A){ return OOQPSolver(H,G,A);}
+  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return OOQPSolver(H,A);}
   #ifdef SWIG
   %nocallback;
   #endif

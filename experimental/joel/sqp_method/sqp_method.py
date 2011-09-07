@@ -145,14 +145,14 @@ G_sparsity = sp_dense(n)
 A_sparsity = jfcn.output().sparsity()
 
 # qpOASES
-qp_solver = QPOasesSolver(H_sparsity,G_sparsity,A_sparsity)
+qp_solver = QPOasesSolver(H_sparsity,A_sparsity)
 qp_solver.setOption("printLevel","low")
 
 # IPOPT
-#qp_solver = IpoptQPSolver(H_sparsity,G_sparsity,A_sparsity)
+#qp_solver = IpoptQPSolver(H_sparsity,A_sparsity)
 
 # OOQP
-#qp_solver = OOQPSolver(H_sparsity,G_sparsity,A_sparsity)
+#qp_solver = OOQPSolver(H_sparsity,A_sparsity)
 
 qp_solver.init()
 

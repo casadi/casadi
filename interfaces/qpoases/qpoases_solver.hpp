@@ -54,7 +54,7 @@ public:
   /** \brief  Default constructor */
   QPOasesSolver();
   
-  explicit QPOasesSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A);
+  explicit QPOasesSolver(const CRSSparsity& H, const CRSSparsity& A);
   
   /** \brief  Access functions of the node */
   QPOasesInternal* operator->();
@@ -67,7 +67,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A){ return QPOasesSolver(H,G,A);}
+  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return QPOasesSolver(H,A);}
   #ifdef SWIG
   %nocallback;
   #endif

@@ -31,8 +31,8 @@ OOQPSolver::OOQPSolver(){
 }
 
 
-OOQPSolver::OOQPSolver(const CRSSparsity & H, const CRSSparsity & G, const CRSSparsity & A)  {
-  assignNode(new OOQPInternal(H,G,A));
+OOQPSolver::OOQPSolver(const CRSSparsity& H, const CRSSparsity& A)  {
+  assignNode(new OOQPInternal(H,A));
 }
 
 OOQPInternal* OOQPSolver::operator->(){
