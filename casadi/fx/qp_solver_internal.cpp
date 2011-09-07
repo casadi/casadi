@@ -35,25 +35,23 @@ QPSolverInternal::QPSolverInternal() {
 }
 
 // Constructor
-QPSolverInternal::QPSolverInternal(const CRSSparsity &H_, const CRSSparsity &A_) : H(H_), A(A_) {
+QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   addOption("convex", OT_BOOLEAN, false, "Specify true if you can guarantee that H will always be positive definite");
 
-  nx = H.size2();
-  nc = A.size1();
+  nx_ = H.size2();
+  nc_ = A.size1();
   
-  if (A.size2()!=nx || H.size1()!=H.size2()) {
+  if (A.size2()!=nx_ || H.size1()!=H.size2()) {
     stringstream ss;
     ss << "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl;
     ss << "H: " << H.dimString() << " - A: " << A.dimString() << std::endl;
     ss << "We need: H.size2()==A.size2(), H square & symmetric" << std::endl;
     throw CasadiException(ss.str());
   }
-}
-    
-void QPSolverInternal::init() {
+
   // Sparsity
-  CRSSparsity x_sparsity = sp_dense(nx,1);
-  CRSSparsity bounds_sparsity = sp_dense(nc,1);
+  CRSSparsity x_sparsity = sp_dense(nx_,1);
+  CRSSparsity bounds_sparsity = sp_dense(nc_,1);
   
   // Input arguments
   setNumInputs(QP_NUM_IN);
@@ -72,7 +70,9 @@ void QPSolverInternal::init() {
   output(QP_COST) = 0.0;
   output(QP_DUAL_X) = DMatrix(x_sparsity);
   output(QP_DUAL_A) = DMatrix(bounds_sparsity);
-  
+}
+    
+void QPSolverInternal::init() {
   // Call the init method of the base class
   FXInternal::init();
 }

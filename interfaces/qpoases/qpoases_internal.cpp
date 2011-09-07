@@ -31,8 +31,8 @@ namespace Interfaces {
 
 QPOasesInternal* QPOasesInternal::clone() const{
   // Return a deep copy
-  QPOasesInternal* node = new QPOasesInternal(H,A);
-  if(!node->is_init)
+  QPOasesInternal* node = new QPOasesInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
+  if(!node->is_init_)
     node->init();
   return node;
 }
@@ -58,7 +58,7 @@ void QPOasesInternal::init(){
     max_nWSR_ = getOption("nWSR");
     casadi_assert(max_nWSR_>=0);
   } else {
-    max_nWSR_ = 5 *(nx + nc);
+    max_nWSR_ = 5 *(nx_ + nc_);
   }
 
   if(hasSetOption("CPUtime")){
@@ -69,17 +69,17 @@ void QPOasesInternal::init(){
   }
   
   // Create data for H if not dense
-  if(!H.dense()) h_data_.resize(nx*nx);
+  if(!input(QP_H).sparsity().dense()) h_data_.resize(nx_*nx_);
   
   // Create data for A if not dense
-  if(!A.dense()) a_data_.resize(nx*nc);
+  if(!input(QP_A).sparsity().dense()) a_data_.resize(nx_*nc_);
   
   // Dual solution vector
-  dual_.resize(nx+nc);
+  dual_.resize(nx_+nc_);
   
   // Create qpOASES instance
   if(qp_) delete qp_;
-  qp_ = new qpOASES::SQProblem(nx,nc);
+  qp_ = new qpOASES::SQProblem(nx_,nc_);
   called_once_ = false;
 
   // Set options
@@ -164,8 +164,8 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   qp_->getDualSolution(&dual_.front());
   
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-  copy(dual_.begin(),   dual_.begin()+nx,output(QP_DUAL_X).begin());
-  copy(dual_.begin()+nx,dual_.end(),     output(QP_DUAL_A).begin());
+  copy(dual_.begin(),   dual_.begin()+nx_,output(QP_DUAL_X).begin());
+  copy(dual_.begin()+nx_,dual_.end(),     output(QP_DUAL_A).begin());
 }
 
 map<int,string> QPOasesInternal::calc_flagmap(){

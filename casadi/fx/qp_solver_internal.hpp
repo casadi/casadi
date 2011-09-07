@@ -53,18 +53,12 @@ class QPSolverInternal : public FXInternal{
     virtual void solve();
     
   protected:
-    /// Sparsity of the H matrix
-    CRSSparsity H;
-    /// Sparsity of the A matrix
-    CRSSparsity A;
     
     /// Number of decision variables
-    int nx;
+    int nx_;
     
     /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc; 
-    
-    bool is_init;
+    int nc_; 
 };
 
 

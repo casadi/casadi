@@ -31,8 +31,8 @@ namespace Interfaces {
 
 IpoptQPInternal* IpoptQPInternal::clone() const{
   // Return a deep copy
-  IpoptQPInternal* node = new IpoptQPInternal(H,A);
-  if(!node->is_init)
+  IpoptQPInternal* node = new IpoptQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
+  if(!node->is_init_)
     node->init();
   return node;
 }
@@ -232,7 +232,7 @@ void IpoptQPInternal::init(){
   QPSolverInternal::init();
 
   // Create an MX for the decision variables
-  MX X("X",nx,1);
+  MX X("X",nx_,1);
     
   // Put H, G, A sparsities in a vector...
   std::vector< CRSSparsity > sps;
@@ -273,8 +273,8 @@ void IpoptQPInternal::init(){
   
   std::cout << "okay everyzhere" << std::endl;
   MX sigma("sigma");
-    std::cout << "okay 12" << nc << std::endl;
-  MX lambda("lambda",nc,1);
+    std::cout << "okay 12" << nc_ << std::endl;
+  MX lambda("lambda",nc_,1);
     std::cout << "okay 4" << std::endl;
   args.push_back(lambda);
   args.push_back(sigma);

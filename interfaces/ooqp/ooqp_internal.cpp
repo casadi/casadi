@@ -37,8 +37,8 @@ namespace Interfaces {
 
 OOQPInternal* OOQPInternal::clone() const{
   // Return a deep copy
-  OOQPInternal* node = new OOQPInternal(H,A);
-  if(!node->is_init)
+  OOQPInternal* node = new OOQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
+  if(!node->is_init_)
     node->init();
   return node;
 }
@@ -235,7 +235,7 @@ void OOQPInternal::allocate() {
   }
   
   // Set up a Sparse solver
-  qp_ = new QpGenSparseMa27( nx, eq_.size(), ineq_.size(), input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
+  qp_ = new QpGenSparseMa27( nx_, eq_.size(), ineq_.size(), input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
   
 
   // Split A in equalities and inequalities
@@ -250,8 +250,8 @@ void OOQPInternal::allocate() {
   ubA_ineq_ = input(QP_UBA)(ineq_,0).data();
   
   // Copy the decision variables bounds
-  lbX_.resize(nx);
-  ubX_.resize(nx);
+  lbX_.resize(nx_);
+  ubX_.resize(nx_);
   
   // Infinities on LBX & UBX are set to zero (required for OOQp)
   for (int k=0; k<input(QP_LBX).size(); ++k) {
@@ -322,14 +322,14 @@ void OOQPInternal::init(){
   QPSolverInternal::init();
   
   // Structure to hold the sparsity and data of the lower triangular part of the Hessian
-  Hl_ = DMatrix(lowerSparsity(H));
+  Hl_ = DMatrix(lowerSparsity(input(QP_H).sparsity()));
   
   // Allocate vectors to hold indicators of infinite variable bounds
-  ixlow_.resize(nx,0);
-  ixupp_.resize(nx,0);
+  ixlow_.resize(nx_,0);
+  ixupp_.resize(nx_,0);
 
   // Temporary vector
-  temp_.resize(std::max(nx,nc));
+  temp_.resize(std::max(nx_,nc_));
 }
 
 map<int,string> OOQPInternal::calc_flagmap(){
