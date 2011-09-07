@@ -40,7 +40,6 @@ class SimulatorInternal;
   
   The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (flattened) differential state for each time step.
   
-  
   \author Joel Andersson 
   \date 2010
 */
@@ -51,7 +50,11 @@ public:
   /// Default constructor 
   Simulator();
   
-  /// Constructor
+  /** \brief Constructor
+  * \param output_fcn output function which maps to n outputs.
+  * \copydoc scheme_DAEInput
+  * 
+  */
   Simulator(const Integrator& integrator, const FX& output_fcn, const std::vector<double>& grid);
   
   /// Output function equal to the state

@@ -314,6 +314,15 @@ def enumsashtml(n,title):
     s+="</table>\n"
   return s
 
+# Write out all input/output information
+for scheme in enums:
+  types = ["input","output"]
+  for t in types:
+    if re.search(t,scheme,re.IGNORECASE):
+      f.write("/** \defgroup scheme_%s\n" % scheme)
+      f.write(enumsashtml(scheme,"%s scheme: CasADi::%s" % (t.capitalize(),scheme)))
+      f.write( "*/\n")
+
 # Print out doxygen information - schemes
 for name,meta in metadata.items():
 
@@ -336,17 +345,18 @@ for name,meta in metadata.items():
   targets = [name]
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
+    
   for t in targets:
     if not(inputscheme is None) or not(outputscheme is None):
       f.write("/** \class %s\n\\n\n\\par\n" % t)
       if not(inputscheme is None) and not(outputscheme is None):
-        f.write(enumsashtml(inputscheme,"Input scheme: CasADi::%s" % inputscheme))
-        f.write("<br/>")
-        f.write(enumsashtml(outputscheme,"Output scheme: CasADi::%s" % outputscheme))
+        f.write("@copydoc scheme_%s\n" % inputscheme)
+        f.write("<br/>\n")
+        f.write("@copydoc scheme_%s\n" % outputscheme)
       elif outputscheme is None:
-        f.write(enumsashtml(inputscheme,"Input scheme: CasADi::%s" % inputscheme))
+        f.write("@copydoc scheme_%s\n" % inputscheme)
       elif inputscheme is None:
-        f.write(enumsashtml(outputscheme,"Output scheme: CasADi::%s" % outputscheme))
+        f.write("@copydoc scheme_%s\n" % outputscheme)
       f.write( "*/\n")
 
 f.close()

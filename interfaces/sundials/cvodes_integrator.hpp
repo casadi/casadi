@@ -58,7 +58,10 @@ public:
   CVodesIntegrator();
   
   /** \brief  Create an integrator for explicit ODEs
-  *   \param f CasADi::FX mapping from CasADi::DAEInput to CasADi::DAEInput
+  *   \param f dynamical system
+  * \copydoc scheme_DAEInput
+  * \copydoc scheme_DAEOutput
+  *
   */
   explicit CVodesIntegrator(const FX& f, const FX& q=FX());
   

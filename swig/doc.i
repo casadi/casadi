@@ -327,15 +327,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::AcadoInterface::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::AcadoInterface::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::AcadoInterface::getOption "
 
@@ -1715,15 +1719,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::CFunction::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::CFunction::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::CFunction::getOption "
 
@@ -2441,6 +2449,7 @@ print ";
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -2853,8 +2862,8 @@ Get the reference count. ";
 CplexMatrix is a class used to convert CasADi matrices to CPLEX format
 (similar to CSC). The class definition can be found in cplex_internal.cpp.
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -2888,8 +2897,8 @@ returns row numbers ";
 
 Interface to CPLEX solver.
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)   Attention! The interface is not complete yet.
 Also if a quadratic term can be set with this interface, it is ignored!
@@ -2915,6 +2924,7 @@ Carlo Savorgnan
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -3155,15 +3165,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::CplexSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::CplexSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::CplexSolver::getOption "
 
@@ -4029,15 +4043,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::getOption "
 
@@ -4729,6 +4747,7 @@ times t_i.
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -5182,15 +5201,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOption "
 
@@ -5236,7 +5259,32 @@ Create an integrator for explicit ODEs.
 Parameters:
 -----------
 
-f:   CasADi::FX mapping from CasADi::DAEInput to CasADi::DAEInput ";
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
+";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::checkNode "
 
@@ -5520,6 +5568,7 @@ x0;
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -6858,15 +6907,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::ExternalFunction::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::ExternalFunction::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::ExternalFunction::getOption "
 
@@ -8060,15 +8113,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::FX::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::FX::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::FX::getOption "
 
@@ -8930,6 +8987,7 @@ times t_i.
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -9357,15 +9415,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::GSL::GslIntegrator::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::GSL::GslIntegrator::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::GSL::GslIntegrator::getOption "
 
@@ -9692,6 +9754,7 @@ x0;
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -10367,6 +10430,7 @@ Joel Andersson
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -10853,15 +10917,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::getOption "
 
@@ -11195,6 +11263,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -12380,15 +12449,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::getOption "
 
@@ -13239,6 +13312,7 @@ Joel Andersson
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -13659,15 +13733,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Integrator::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Integrator::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Integrator::getOption "
 
@@ -13987,6 +14065,7 @@ Joel Andersson
 |                                    | may be changed during an           |
 |                                    | IDASIntegrator::evaluate()         |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
 +----------------+------------------------+
 |      Name      |      Description       |
@@ -14849,8 +14928,8 @@ Print a representation of the object. ";
 // File: classCasADi_1_1IpoptInternal.xml
 %feature("docstring") CasADi::IpoptInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -14874,6 +14953,7 @@ number of constraints (A)
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -15715,6 +15795,7 @@ decision variables (x)       nc: number of constraints (A)
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -16622,6 +16703,7 @@ Joris Gillis
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -17311,15 +17393,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOption "
 
@@ -17574,8 +17660,8 @@ Return a string with a destription (for SWIG) ";
 
 interface to IPOPT NLP solver
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -17599,6 +17685,7 @@ number of constraints (A)
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -18240,15 +18327,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::IpoptSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::IpoptSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::IpoptSolver::getOption "
 
@@ -18763,15 +18854,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Jacobian::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Jacobian::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Jacobian::getOption "
 
@@ -20366,15 +20461,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::getOption "
 
@@ -20775,8 +20874,8 @@ ddqn=[0 0 0 0]; ";
 // File: classCasADi_1_1KnitroInternal.xml
 %feature("docstring") CasADi::KnitroInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -20800,6 +20899,7 @@ number of constraints (A)
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -21195,8 +21295,8 @@ Get the reference count. ";
 // File: classCasADi_1_1KnitroSolver.xml
 %feature("docstring") CasADi::KnitroSolver "
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -21220,6 +21320,7 @@ number of constraints (A)
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -21444,15 +21545,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::KnitroSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::KnitroSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::KnitroSolver::getOption "
 
@@ -21950,15 +22055,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::getOption "
 
@@ -22879,15 +22988,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::getOption "
 
@@ -23572,8 +23685,8 @@ Get the reference count. ";
 // File: classCasADi_1_1Interfaces_1_1LiftoptInternal.xml
 %feature("docstring") CasADi::Interfaces::LiftoptInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -23597,6 +23710,7 @@ number of constraints (A)
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -23999,8 +24113,8 @@ Get the reference count. ";
 // File: classCasADi_1_1Interfaces_1_1LiftoptSolver.xml
 %feature("docstring") CasADi::Interfaces::LiftoptSolver "
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -24024,6 +24138,7 @@ number of constraints (A)
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -24253,15 +24368,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOption "
 
@@ -24732,15 +24851,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::LinearSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::LinearSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::LinearSolver::getOption "
 
@@ -26569,7 +26692,7 @@ CasADi::OCPOutput
 
 Joel Andersson
 
->Input scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
+>Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
 |    Name    |             Description              |
 +============+======================================+
@@ -26814,15 +26937,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::getOption "
 
@@ -27129,7 +27256,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1OptimalControl_1_1MultipleShootingInternal.xml
 %feature("docstring") CasADi::OptimalControl::MultipleShootingInternal "
 
->Input scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
+>Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
 |    Name    |             Description              |
 +============+======================================+
@@ -27943,15 +28070,19 @@ C++ includes: muscod_interface.hpp ";
 
 %feature("docstring")  CasADi::MuscodInterface::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::MuscodInterface::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::MuscodInterface::getOption "
 
@@ -29034,15 +29165,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::MXFunction::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::MXFunction::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::MXFunction::getOption "
 
@@ -30065,8 +30200,8 @@ Check if smooth. ";
 
 NLPSolver.
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -30092,6 +30227,7 @@ Joel Andersson
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -30313,15 +30449,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::NLPSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::NLPSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::NLPSolver::getOption "
 
@@ -30572,8 +30712,8 @@ Return a string with a destription (for SWIG) ";
 
 NLP solver storage class.
 
-Solves the following nonlinear optimization problem:   min          F(x)
-x      subject to               LBG <= G(x) <= UBG               LBX <= x
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
@@ -30599,6 +30739,7 @@ Joel Andersson
 |                                    | objective and constraints might    |
 |                                    | depend.                            |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -32646,7 +32787,7 @@ Base class for OCP solvers.
 
 Joel Andersson
 
->Input scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
+>Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
 |    Name    |             Description              |
 +============+======================================+
@@ -32868,15 +33009,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::OCPSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::OCPSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::OCPSolver::getOption "
 
@@ -33129,7 +33274,7 @@ Internal node class for OCPSolver.
 
 Joel Andersson
 
->Input scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
+>Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
 |    Name    |             Description              |
 +============+======================================+
@@ -33653,6 +33798,7 @@ decision variables (x)       nc: number of constraints (A)
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -34112,6 +34258,7 @@ reInit();
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -34352,15 +34499,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::getOption "
 
@@ -34623,7 +34774,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1OptionsFunctionality.xml
 %feature("docstring") CasADi::OptionsFunctionality "
 
-Prvides options setting/getting functionality Gives a derived class the
+Provides options setting/getting functionality Gives a derived class the
 ability to set and retrieve options in a convenient way. It also contains
 error checking, making sure that the option exists and that the value type
 is correct.
@@ -34648,15 +34799,19 @@ C++ includes: options_functionality.hpp ";
 
 %feature("docstring")  CasADi::OptionsFunctionality::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::OptionsFunctionality::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::OptionsFunctionality::getOption "
 
@@ -35275,15 +35430,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Parallelizer::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Parallelizer::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Parallelizer::getOption "
 
@@ -35973,6 +36132,7 @@ decision variables (x)       nc: number of constraints (A)
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -36449,6 +36609,7 @@ Joris Gillis, Joel Andersson
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -36707,15 +36868,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOption "
 
@@ -37005,6 +37170,7 @@ Joel Andersson
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -37226,15 +37392,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::QPSolver::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::QPSolver::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::QPSolver::getOption "
 
@@ -37512,6 +37682,7 @@ Internal class.
 +------------------------------------+------------------------------------+
 | QP_LAMBDA_INIT                     |                                    |
 +------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +-----------+---------------------------------------------------+
 |   Name    |                    Description                    |
@@ -38603,15 +38774,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::Simulator::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Simulator::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::Simulator::getOption "
 
@@ -38650,7 +38825,29 @@ Default constructor. ";
 
 %feature("docstring")  CasADi::Simulator::Simulator "
 
-Constructor. ";
+Constructor.
+
+Parameters:
+-----------
+
+output_fcn:  output function which maps to n outputs. >Input scheme:
+CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+";
 
 %feature("docstring")  CasADi::Simulator::Simulator "
 
@@ -39786,15 +39983,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::SuperLU::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::SuperLU::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::SuperLU::getOption "
 
@@ -40934,15 +41135,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::SXFunction::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::SXFunction::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::SXFunction::getOption "
 
@@ -43029,15 +43234,19 @@ Writes out the adjoint sensitivity into val. ";
 
 %feature("docstring")  CasADi::XFunction::setOption "
 
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::XFunction::setOption "
 
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
 
 %feature("docstring")  CasADi::XFunction::getOption "
 
@@ -46377,6 +46586,51 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: group__IdasIntegrator__doc.xml
+
+
+// File: group__scheme__IntegratorOutput.xml
+
+
+// File: group__scheme__QPInput.xml
+
+
+// File: group__scheme__MUSCOD__FCN__Input.xml
+
+
+// File: group__scheme__DAEInput.xml
+
+
+// File: group__scheme__NLPInput.xml
+
+
+// File: group__scheme__NLPOutput.xml
+
+
+// File: group__scheme__IntegratorInput.xml
+
+
+// File: group__scheme__ACADO__Output.xml
+
+
+// File: group__scheme__ACADO__Input.xml
+
+
+// File: group__scheme__OCPOutput.xml
+
+
+// File: group__scheme__MUSCOD__FCN__Output.xml
+
+
+// File: group__scheme__QPOutput.xml
+
+
+// File: group__scheme__ACADO__FCN__Input.xml
+
+
+// File: group__scheme__DAEOutput.xml
+
+
+// File: group__scheme__OCPInput.xml
 
 
 // File: chapter1.xml

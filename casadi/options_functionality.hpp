@@ -36,7 +36,7 @@ namespace CasADi{
   // Forward declaration
   class OptionsFunctionalityNode;
   
-/** \brief Prvides options setting/getting functionality
+/** \brief Provides options setting/getting functionality
   Gives a derived class the ability to set and retrieve options in a convenient way.
   It also contains error checking, making sure that the option exists and that the value type is correct.
   
@@ -66,16 +66,18 @@ class OptionsFunctionality : public SharedObject{
 /// @{
    
     /** \brief  set an option.
-    The setOptions are in general only considered before the init function, if any.
+    For a list of options, check the class documentation of this class.
+    
+    The setOptions are only considered before the init function.
     If properties changes, the init function should be called again.
-    (Ticket #54)
     */
     void setOption(const std::string &str, const GenericType& val);
     
     /** \brief  set a set of options.
-    The setOptions are in general only considered before the init function, if any.
+    For a list of options, check the class documentation of this class.
+    
+    The setOptions are only considered before the init function.
     If properties changes, the init function should be called again.
-    (Ticket #54)
     */
     void setOption(const Dictionary& dict);
 

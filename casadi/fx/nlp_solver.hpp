@@ -30,11 +30,11 @@
 
   Solves the following nonlinear optimization problem:
   \verbatim
-  min          F(x)
+  min          F(x,p)
    x
   
   subject to
-              LBG <= G(x) <= UBG
+              LBG <= G(x,p) <= UBG
               LBX <= x    <= UBX
               
       n: number of decision variables (x)

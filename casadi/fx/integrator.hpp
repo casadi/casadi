@@ -55,11 +55,11 @@ namespace CasADi{
 enum DAEInput{
   /** Time. (1-by-1) */
   DAE_T,
-  /** State vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES */
+  /** State vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES */
   DAE_Y,
   /** Parameter vector (matrix). */
   DAE_P,
-  /** State derivative vector (matrix). Should have same amount of non-zeros as ODEOutput:DAE_RES */
+  /** State derivative vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES */
   DAE_YDOT,
   /** Number of arguments. */
   DAE_NUM_IN
@@ -67,7 +67,7 @@ enum DAEInput{
 
 /// Output arguments of an ODE/DAE residual function
 enum DAEOutput{
-  /** Right hand side of ODE. Should have same amount of non-zeros as ODEInput:ODE_Y */
+  /** Right hand side of ODE. Should have same amount of non-zeros as DAEInput:DAE_Y */
   DAE_RES,
   /** Number of arguments. */
   DAE_NUM_OUT
