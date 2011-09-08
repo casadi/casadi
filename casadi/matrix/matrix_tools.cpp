@@ -27,7 +27,8 @@ namespace CasADi{
   std::vector<int> range(int start, int stop, int step, int len){
     start = std::min(start,len);
     stop = std::min(stop,len);
-    std::vector<int> ret((stop-start)/step);
+    int nret = (stop-start)/step + ((stop-start)%step>0);
+    std::vector<int> ret(nret);
     int ind = start;
     for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it){
       *it = ind;
