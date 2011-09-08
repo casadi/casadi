@@ -1,158 +1,127 @@
 from casadi import *
-import numpy as NP
+from numpy import *
 import matplotlib.pyplot as plt
 
-# Declare variables (use simple, efficient DAG)
-t = SX("t") # time
-x=SX("x"); y=SX("y"); u=SX("u"); L=SX("cost")
+nk = 20    # Control discretization
+tf = 10.0  # End time
 
-# ODE right hand side function
-f = [(1 - y*y)*x - y + u, x, x*x + y*y + u*u]
-rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
+# Declare variables (use scalar graph)
+t  = ssym("t")    # time
+u  = ssym("u")    # control
+x  = ssym("x",3)  # state
+xp = ssym("xd",3) # state derivative
 
-# Final time (fixed)
-tf = 10.0
+# ODE/DAE residual function
+res = [(1 - x[1]*x[1])*x[0] - x[1] + u, \
+       x[0], \
+       x[0]*x[0] + x[1]*x[1] + u*u] - xp
+f = SXFunction([t,x,u,xp],[res])
 
-# Numboer of shooting nodes
-NS = 20
+# Create an integrator
+f_d = CVodesIntegrator(f)
+f_d.setOption("abstol",1e-8) # tolerance
+f_d.setOption("reltol",1e-8) # tolerance
+f_d.setOption("steps_per_checkpoint",1000)
+f_d.setOption("tf",tf/nk) # final time
+f_d.init()
 
-# Create an integrator (CVodes)
-I = CVodesIntegrator(rhs)
-I.setOption("abstol",1e-8) # abs. tolerance
-I.setOption("reltol",1e-8) # rel. tolerance
-I.setOption("steps_per_checkpoint",100) # bug in CVodes?
-I.setOption("stop_at_end",True)
-I.setOption("fsens_err_con",False)
-I.setOption("tf",tf/NS)
-I.init()
-
-# Control bounds
-u_min = -0.75
-u_max = 1.0
-u_init = 0.0
-
-# State bounds and initial guess
-x_min = -NP.inf;  x_max =  NP.inf;  x_init = 0
-y_min = -NP.inf;  y_max =  NP.inf;  y_init = 0
-L_min = -NP.inf;  L_max =  NP.inf;  L_init = 0
-
-# State bounds at the final time
-xf_min = 0;        xf_max =  0
-yf_min = 0;        yf_max =  0
-Lf_min = -NP.inf;  Lf_max =  NP.inf
-
-# Number of discretized controls
-NU = NS
-
-# Number of discretized states
-NX = 3*NS
+# Total number of variables
+nv = 1*nk + 3*(nk+1)
 
 # Declare variable vector
-NV = NU+NX
-V = MX("V",NV)
+V = msym("V", nv)
 
-# Disretized control
-U = []
-U_min = []
-U_max = []
-U_init = []
-for i in range(NS):
-  U.append(V[i])
-  U_min.append(u_min)
-  U_max.append(u_max)
-  U_init.append(u_init)
+# Get the expressions for local variables
+U = V[0:nk]
+X0 = V[nk+0:nv:3]
+X1 = V[nk+1:nv:3]
+X2 = V[nk+2:nv:3]
 
-# Disretized state
-X = []
-X_min = []
-X_max = []
-X_init = []
-for i in range(NS):
-  X += [V[NU+i*3 : NU+(i+1)*3]]
-  X_init += [x_init, y_init, L_init]
-  if i==NS-1:
-    # final time
-    X_min += [xf_min, yf_min, Lf_min]
-    X_max += [xf_max, yf_max, Lf_max]
-  else:
-    # interor time
-    X_min += [x_min, y_min, L_min]
-    X_max += [x_max, y_max, L_max]
-  
-# The initial state (x=0, y=1, L=0)
-X0  = MX([0,1,0])
+# Variable bounds initialized to +/- inf
+VMIN = -inf*ones(nv)
+VMAX = inf*ones(nv)
 
-# State derivative (not used)
-XP = MX()
+# Control bounds
+VMIN[0:nk] = -0.75
+VMAX[0:nk] = 1.0
 
-# Constraint function with upper and lower bounds
-g = []
-g_min = []
-g_max = []
+# Initial condition
+VMIN[nk+0] = VMAX[nk+0] = 0
+VMIN[nk+1] = VMAX[nk+1] = 1
+VMIN[nk+2] = VMAX[nk+2] = 0
+
+# Terminal constraint
+VMIN[nv-3] = VMAX[nv-3] = 0
+VMIN[nv-2] = VMAX[nv-2] = 0
+
+# Initial solution guess
+VINIT = zeros(nv)
+
+# State derivative (only relevant for DAEs)
+Xp = msym([0,0,0])
+
+# Constraint function with bounds
+g = [];  g_min = []; g_max = []
 
 # Build up a graph of integrator calls
-for k in range(NS):
-  # call the integrator
-  [XF,XP] = I.call([X0,U[k],XP])
+for k in range(nk):
+  # Local state vector
+  Xk = vertcat((X0[k],X1[k],X2[k]))
+  Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
+  
+  # Call the integrator
+  [Xk_end,Xp] = f_d.call([Xk,U[k],Xp])
   
   # append continuity constraints
-  g.append(X[k] - XF)
-  g_min.append(NP.zeros(XF.numel()))
-  g_max.append(NP.zeros(XF.numel()))
-  
-  # Update initial state for next interval
-  X0 = X[k]
-
-# State at the final time
-XF = X[NS-1]
+  g.append(Xk_next - Xk_end)
+  g_min.append(zeros(Xk.size()))
+  g_max.append(zeros(Xk.size()))
 
 # Objective function: L(T)
-F = MXFunction([V],[XF[2]])
+F = MXFunction([V],[X2[nk]])
 
 # Terminal constraints: 0<=[x(T);y(T)]<=0
 G = MXFunction([V],[vertcat(g)])
 
 # Create NLP solver instance
 solver = IpoptSolver(F,G)
-solver.setOption("hessian_approximation", "limited-memory")
 
 #solver.setOption("verbose",True)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(U_min  + X_min,  NLP_LBX)
-solver.setInput(U_max  + X_max,  NLP_UBX)
-solver.setInput(U_init + X_init, NLP_X_INIT)
-solver.setInput(NP.concatenate(g_min),NLP_LBG)
-solver.setInput(NP.concatenate(g_max),NLP_UBG)
+solver.setInput(VMIN,  NLP_LBX)
+solver.setInput(VMAX,  NLP_UBX)
+solver.setInput(VINIT, NLP_X_INIT)
+solver.setInput(concatenate(g_min),NLP_LBG)
+solver.setInput(concatenate(g_max),NLP_UBG)
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
 v_opt = solver.output(NLP_X_OPT)
-u_opt = v_opt[0:NU]
-X_opt = vertcat((DMatrix([0,1,0]),v_opt[NU:]))
-x_opt = [X_opt[k] for k in range(0,3*(NS+1),3)]
-y_opt = [X_opt[k] for k in range(1,3*(NS+1),3)]
-l_opt = [X_opt[k] for k in range(2,3*(NS+1),3)]
+u_opt = v_opt[0:nk]
+x0_opt = v_opt[nk+0::3]
+x1_opt = v_opt[nk+1::3]
+x2_opt = v_opt[nk+2::3]
 
 # Retrieve the solution
-v_opt = NP.array(solver.output(NLP_X_OPT))
+v_opt = array(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-tgrid = NP.linspace(0,10,NS+1)
-tgrid_u = NP.linspace(0,10,NS)
+tgrid_x = linspace(0,10,nk+1)
+tgrid_u = linspace(0,10,nk)
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid,x_opt,'--')
-plt.plot(tgrid,y_opt,'-')
+plt.plot(tgrid_x,x0_opt,'--')
+plt.plot(tgrid_x,x1_opt,'-')
 plt.plot(tgrid_u,u_opt,'-.')
 plt.title("Van der Pol optimization - multiple shooting")
 plt.xlabel('time')
-plt.legend(['x trajectory','y trajectory','u trajectory'])
+plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()
 plt.show()
 

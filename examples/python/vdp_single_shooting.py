@@ -2,83 +2,59 @@ from casadi import *
 from numpy import *
 import matplotlib.pyplot as plt
 
-# Number of shooting nodes
-NS = 20
+nk = 20    # Control discretization
+tf = 10.0  # End time
 
-# Declare variables (use simple, efficient DAG)
-t = SX("t") # time
-x=SX("x"); y=SX("y"); u=SX("u"); L=SX("cost")
+# Declare variables (use scalar graph)
+t  = ssym("t")    # time
+u  = ssym("u")    # control
+x  = ssym("x",3)  # state
+xp = ssym("xd",3) # state derivative
 
-# ODE right hand side function
-f = [(1 - y*y)*x - y + u, x, x*x + y*y + u*u]
-rhs = SXFunction([[t],[x,y,L],[u],[]],[f])
+# ODE/DAE residual function
+res = [(1 - x[1]*x[1])*x[0] - x[1] + u, \
+       x[0], \
+       x[0]*x[0] + x[1]*x[1] + u*u] - xp
+f = SXFunction([t,x,u,xp],[res])
 
-# Create an integrator (CVodes)
-I = CVodesIntegrator(rhs)
-I.setOption("abstol",1e-8) # abs. tolerance
-I.setOption("reltol",1e-8) # rel. tolerance
-I.setOption("steps_per_checkpoint",1000)
-I.setOption("fsens_err_con",False)
-I.setOption("stop_at_end",False)
-I.setOption("t0",0.0)
-I.setOption("tf",10.0/NS)
-I.init()
+# Create an integrator
+f_d = CVodesIntegrator(f)
+f_d.setOption("abstol",1e-8) # tolerance
+f_d.setOption("reltol",1e-8) # tolerance
+f_d.setOption("steps_per_checkpoint",1000)
+f_d.setOption("tf",tf/nk) # final time
+f_d.init()
 
-# All controls (use complex, general DAG)
-U = MX("U",NS)
+# All controls (use matrix graph)
+U = msym("U",nk) # nk-by-1 symbolic variable
 
-# The initial state (x=0, y=1, L=0)
-X  = MX([0,1,0])
+# The initial state (x_0=0, x_1=1, x_2=0)
+X  = msym([0,1,0])
 
-# State derivative (not used)
-XP = MX()
+# State derivative (only relevant for DAEs)
+Xp = msym([0,0,0])
 
-# Build up a graph of integrator calls
-for k in range(NS):
-  # Call the integrator
-  [X,XP] = I.call([X,U[k],XP])
+# Build a graph of integrator calls
+for k in range(nk):
+  [X,Xp] = f_d.call([X,U[k],Xp])
   
-# Objective function: L(T)
-cost = X[2]
-F = MXFunction([U],[cost])
+# Objective function: x_2(T)
+F = MXFunction([U],[X[2]])
 
-# Terminal constraints: 0<=[x(T);y(T)]<=0
-eq = X[0:2]
-G = MXFunction([U],[eq])
+# Terminal constraints: x_0(T)=x_1(T)=0
+X_01 = X[0:2] # first two components of X
+G = MXFunction([U],[X_01])
 
-## Lagrange multipliers
-#lam = MX("lam",eq.size1())
-
-## Objective scaling factor
-#sigma = MX("sigma")
-
-## Lagrange function
-#ll = sigma*obj + inner_prod(lam,eq)
-#L = MXFunction([U,lam,sigma],[ll])
-#L.init()
-
-## Gradient of the Lagrangian
-#lg = trans(L.grad()[0])
-#GL = MXFunction([U,lam,sigma],[lg])
-#GL.init()
-
-## Hessian of the Lagrangian
-#H = GL.jacobian()
-
-# Allocate NLP solver
+# Allocate an NLP solver
 solver = IpoptSolver(F,G)
-solver.setOption("hessian_approximation", \
-                "limited-memory")
-  
-# Initialize the NLP solver
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(NS*[-0.75], NLP_LBX)
-solver.setInput(NS*[1.0],NLP_UBX)
-solver.setInput(NS*[0.0],NLP_X_INIT)
-solver.setInput([0,0],NLP_LBG)
-solver.setInput([0,0],NLP_UBG)
+solver.setInput(-0.75*ones(nk), NLP_LBX)
+solver.setInput(1.0*ones(nk), NLP_UBX)
+solver.setInput(zeros(nk),NLP_X_INIT)
+solver.setInput(zeros(2),NLP_LBG)
+solver.setInput(zeros(2),NLP_UBG)
 
 # Solve the problem
 solver.solve()
@@ -87,8 +63,8 @@ solver.solve()
 u_opt = array(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-tgrid = linspace(0,10,NS+1)
-tgrid_u = linspace(0,10,NS)
+tgrid = linspace(0,10,nk+1)
+tgrid_u = linspace(0,10,nk)
 
 # Plot the results
 plt.figure(1)

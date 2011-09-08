@@ -1,63 +1,50 @@
 # -*- coding: utf-8 -*-
 from casadi import *
 from numpy import *
-import numpy as NP
 import matplotlib.pyplot as plt
 
-# Declare variables (use simple, efficient DAG)
-t = SX("t") # time
-xx=SX("x"); yy=SX("y"); uu=SX("u"); ll=SX("cost")
-x = [xx,yy,ll]
-u = [uu]
+nk = 20    # Control discretization
+tf = 10.0  # End time
 
-# Right hand side of the ODE
-xdot = [(1 - yy*yy)*xx - yy + uu, xx, xx*xx + yy*yy + uu*uu]
-ffcn = SXFunction([[t],x,u],[xdot])
+# Declare variables (use scalar graph)
+t  = ssym("t")    # time
+u  = ssym("u")    # control
+x  = ssym("x",3)  # state
+
+# ODE right hand side function
+rhs = [(1 - x[1]*x[1])*x[0] - x[1] + u, \
+       x[0], \
+       x[0]*x[0] + x[1]*x[1] + u*u]
+f = SXFunction([t,x,u],[rhs])
 
 # Objective function (meyer term)
-mfcn = SXFunction([[t],x,u],[[ll]])
-
-# Nonlinear constraint function
-cfcn = FX() # Not used in this example
-
-# Final time (fixed)
-tf = 10.0
+m = SXFunction([t,x,u],[x[2]])
 
 # Control bounds
-uu_min = -0.75
-uu_max = 1.0
-uu_init = 0.0
+u_min = -0.75
+u_max = 1.0
+u_init = 0.0
 
-u_lb = NP.array([uu_min])
-u_ub = NP.array([uu_max])
-u_init = NP.array([uu_init])
+u_lb = array([u_min])
+u_ub = array([u_max])
+u_init = array([u_init])
 
 # State bounds and initial guess
-xx_min = -NP.inf;  xx_max =  NP.inf;  xx_init = 0
-yy_min = -NP.inf;  yy_max =  NP.inf;  yy_init = 0
-ll_min = -NP.inf;  ll_max =  NP.inf;  ll_init = 0
-
-# State bounds at the final time
-xxf_min = 0;        xxf_max =  0
-yyf_min = 0;        yyf_max =  0
-llf_min = -NP.inf;  llf_max =  NP.inf
-
-# Bounds on the states
-x_lb = NP.array([xx_min,yy_min,ll_min])
-x_ub = NP.array([xx_max,yy_max,ll_max])
-x_init = NP.array([xx_init,yy_init,ll_init])
-xf_lb = NP.array([xxf_min,yyf_min,llf_min])
-xf_ub = NP.array([xxf_max,yyf_max,llf_max])
+x_min =  [-inf, -inf, -inf]
+x_max =  [ inf,  inf,  inf]
+xi_min = [ 0.0,  1.0,  0.0]
+xi_max = [ 0.0,  1.0,  0.0]
+xf_min = [ 0.0,  0.0, -inf]
+xf_max = [ 0.0,  0.0,  inf]
+x_init = [ 0.0,  0.0,  0.0]
 
 # Initialize functions
-ffcn.init()  
-mfcn.init()
-#cfcn.init()
+f.init()  
+m.init()
 
 # Dimensions
-nx = len(x)
-nu = len(u)
-nc = 0
+nx = 3
+nu = 1
 
 # Legendre collocation points
 legendre_points1 = [0,0.500000]
@@ -81,153 +68,133 @@ RADAU = 1
 collocation_points = [legendre_points,radau_points]
 
 # Degree of interpolating polynomial
-K = 3
-
-# Number of finite elements
-N = 50
+deg = 3
 
 # Radau collocation points
 cp = RADAU
 
 # Size of the finite elements
-h = tf/N
+h = tf/nk
 
 # Coefficients of the collocation equation
-C = (K+1) * [[]]
+C = zeros((deg+1,deg+1))
 
 # Coefficients of the continuity equation
-D = (K+1) * [[]]
+D = zeros(deg+1)
 
 # Collocation point
-tau = SX("tau")
+tau = ssym("tau")
   
-# Roots
-tau_root = collocation_points[cp][K]
+# All collocation time points
+tau_root = collocation_points[cp][deg]
+T = zeros((nk,deg+1))
+for i in range(nk):
+  for j in range(deg+1):
+    T[i][j] = h*(i + tau_root[j])
 
-for j in range(K+1):
-  # Lagrange polynomials
-  L = SX(1)
-  for k in range(K+1):
-    if k != j:
-      L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
+# For all collocation points
+for j in range(deg+1):
+  # Construct Lagrange polynomials to get the polynomial basis at the collocation point
+  L = 1
+  for j2 in range(deg+1):
+    if j2 != j:
+      L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
+  lfcn = SXFunction([tau],[L])
+  lfcn.init()
   
-    # Lagrange polynomial function
-    lfcn = SXFunction([[tau]],[[L]])
-    lfcn.init()
-    
-    # Get the coefficients of the continuity equation
-    lfcn.setInput(1.0)
-    lfcn.evaluate()
-    D[j] = lfcn.output()[0]
+  # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+  lfcn.setInput(1.0)
+  lfcn.evaluate()
+  D[j] = lfcn.output()
 
-    # Get the coefficients of the collocation equation
-    C[j] = (K+1) * [[]]
-    for k in range(K+1):
-      lfcn.setInput(tau_root[k])
-      lfcn.setFwdSeed(1.0)
-      lfcn.evaluate(1,0)
-      C[j][k] = lfcn.fwdSens()[0]
-
-# Collocated times
-T = N * [[]]
-for i in range(N):
-  T[i] = (K+1) * [[]]
-  for j in range(K+1):
-    T[i][j] = h*(i + collocation_points[cp][K][j])
+  # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+  for j2 in range(deg+1):
+    lfcn.setInput(tau_root[j2])
+    lfcn.setFwdSeed(1.0)
+    lfcn.evaluate(1,0)
+    C[j][j2] = lfcn.fwdSens()
 
 # Total number of variables
-NX = N*(K+1)*nx
-NU = N*nu
-NXF = nx
+NX = nk*(deg+1)*nx      # Collocated states
+NU = nk*nu              # Parametrized controls
+NXF = nx                # Final state
 NV = NX+NU+NXF
 
 # NLP variable vector
 V = MX("V",NV)
-
-# Collocated states
-X = []
-
-# Parametrized control (piecewice constant)
-U = []
   
 # All variables with bounds and initial guess
-vars_lb = NP.zeros(NV)
-vars_ub = NP.zeros(NV)
-vars_init = NP.zeros(NV)
-vi = 0
+vars_lb = zeros(NV)
+vars_ub = zeros(NV)
+vars_init = zeros(NV)
+offset = 0
 
-# Loop over the finite elements
-for i in range(N):  
+# Get collocated states and parametrized control
+X = resize(array([],dtype=MX),(nk+1,deg+1))
+U = resize(array([],dtype=MX),nk)
+for k in range(nk):  
   # Collocated states
-  Xi = []
-  for j in range(K+1):
-    Xi.append(V[vi:vi+nx])
-    vars_init[vi:vi+nx] = x_init
-    if i==0 and j==0:
-      vars_lb[vi:vi+nx] = NP.array([0,1,0])
-      vars_ub[vi:vi+nx] = NP.array([0,1,0])
+  for j in range(deg+1):
+    # Get the expression for the state vector
+    X[k][j] = V[offset:offset+nx]
+    
+    # Add the initial condition
+    vars_init[offset:offset+nx] = x_init
+    
+    # Add bounds
+    if k==0 and j==0:
+      vars_lb[offset:offset+nx] = xi_min
+      vars_ub[offset:offset+nx] = xi_max
     else:
-      vars_lb[vi:vi+nx] = x_lb
-      vars_ub[vi:vi+nx] = x_ub
-    vi += nx
-        
-  X.append(Xi)
+      vars_lb[offset:offset+nx] = x_min
+      vars_ub[offset:offset+nx] = x_max
+    offset += nx
   
   # Parametrized controls
-  U.append(V[vi:vi+nu])
-  vars_lb[vi:vi+nu] = u_lb
-  vars_ub[vi:vi+nu] = u_ub
-  vars_init[vi:vi+nu] = u_init
-  vi += nu
+  U[k] = V[offset:offset+nu]
+  vars_lb[offset:offset+nu] = u_min
+  vars_ub[offset:offset+nu] = u_max
+  vars_init[offset:offset+nu] = u_init
+  offset += nu
   
 # State at end time
-XF = V[vi:vi+nx]
-vars_lb[vi:vi+nx] = xf_lb
-vars_ub[vi:vi+nx] = xf_ub
-vars_init[vi:vi+nx] = x_init
-vi += nx
+X[nk][0] = V[offset:offset+nx]
+vars_lb[offset:offset+nx] = xf_min
+vars_ub[offset:offset+nx] = xf_max
+vars_init[offset:offset+nx] = x_init
+offset += nx
   
 # Constraint function for the NLP
 g = []
 lbg = []
 ubg = []
 
-for i in range(N):
-  for k in range(1,K+1):
-    # augmented state vector
-    y_ik = [MX(T[i][k]), X[i][k], U[i]]
-    
-    # Add collocation equations to NLP
-    [temp] = ffcn.call(y_ik)
-    for j in range(temp.size()):
-      temp[j] *= h
-    for j in range (K+1):
-      for l in range(temp.size()):
-        temp[l] -= X[i][j][l]*C[j][k]
+# For all finite elements
+for k in range(nk):
+  
+  # For all collocation points
+  for j in range(1,deg+1):
+        
+    # Get an expression for the state derivative at the collocation point
+    xp_jk = 0
+    for j2 in range (deg+1):
+      xp_jk += C[j2][j]*X[k][j2]
       
-    g += [temp]
-    lbg.append(NP.zeros(nx)) # equality constraints
-    ubg.append(NP.zeros(nx)) # equality constraints
-      
-    # Add nonlinear constraints, if any
-    if nc>0:
-      g += cfcn.call(y_ik)
-      lbg.append(c_lb)
-      ubg.append(c_ub)
+    # Add collocation equations to the NLP
+    [fk] = f.call([T[k][j], X[k][j], U[k]])
+    g += [h*fk - xp_jk]
+    lbg.append(zeros(nx)) # equality constraints
+    ubg.append(zeros(nx)) # equality constraints
+
+  # Get an expression for the state at the end of the finite element
+  xf_k = 0
+  for j in range(deg+1):
+    xf_k += D[j]*X[k][j]
 
   # Add continuity equation to NLP
-  if i<N-1:
-    temp = MX(X[i+1][0])
-  else:
-    temp = MX(XF)
-    
-  for j in range(K+1):
-    for l in range(nx):
-      temp[l] -= D[j]*X[i][j][l]
-
-  g += [temp]
-  lbg.append(NP.zeros(nx))
-  ubg.append(NP.zeros(nx))
+  g += [X[k+1][0] - xf_k]
+  lbg.append(zeros(nx))
+  ubg.append(zeros(nx))
   
 # Variable vector (SX)
 V_sx = symbolic("V",NV)
@@ -236,8 +203,8 @@ V_sx = symbolic("V",NV)
 gfcn_nlp_mx = MXFunction([V],[vertcat(g)])
 
 # Objective function of the NLP
-y_f = [MX(T[N-1][K]),XF,U[N-1]]
-[f] = mfcn.call(y_f)
+y_f = [MX(T[nk-1][deg]),X[nk][0],U[nk-1]]
+[f] = m.call(y_f)
 ffcn_nlp_mx = MXFunction([V], [f])
 
 # Expand constraint function as an SX graph (move to NLP solver!)
@@ -270,12 +237,6 @@ HL = lfcn.hessian()
 # Allocate an NLP solver
 solver = IpoptSolver(ffcn_nlp,gfcn_nlp,HL)
 
-# Set options
-solver.setOption("tol",1e-10)
-solver.setOption("hessian_approximation","limited-memory")
-#solver.setOption("derivative_test","first-order")
-solver.setOption("max_iter",1000)
-
 # initialize the solver
 solver.init()
   
@@ -287,8 +248,8 @@ solver.setInput(vars_lb,NLP_LBX)
 solver.setInput(vars_ub,NLP_UBX)
 
 # Bounds on g
-solver.setInput(NP.concatenate(lbg),NLP_LBG)
-solver.setInput(NP.concatenate(ubg),NLP_UBG)
+solver.setInput(concatenate(lbg),NLP_LBG)
+solver.setInput(concatenate(ubg),NLP_UBG)
 
 # Solve the problem
 solver.solve()
@@ -297,25 +258,25 @@ solver.solve()
 print "optimal cost: ", float(solver.output(NLP_COST))
 
 # Retrieve the solution
-v_opt = NP.array(solver.output(NLP_X_OPT))
+v_opt = array(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-xx_opt = v_opt[0::(K+1)*nx+nu]
-yy_opt = v_opt[1::(K+1)*nx+nu]
-ll_opt = v_opt[2::(K+1)*nx+nu]
-uu_opt = v_opt[(K+1)*nx::(K+1)*nx+nu]
-tgrid = NP.linspace(0,10,N+1)
-tgrid_u = NP.linspace(0,10,N)
+x0_opt = v_opt[0::(deg+1)*nx+nu]
+x1_opt = v_opt[1::(deg+1)*nx+nu]
+x2_opt = v_opt[2::(deg+1)*nx+nu]
+u_opt = v_opt[(deg+1)*nx::(deg+1)*nx+nu]
+tgrid = linspace(0,10,nk+1)
+tgrid_u = linspace(0,10,nk)
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid,xx_opt,'--')
-plt.plot(tgrid,yy_opt,'-')
-plt.plot(tgrid_u,uu_opt,'-.')
+plt.plot(tgrid,x0_opt,'--')
+plt.plot(tgrid,x1_opt,'-')
+plt.plot(tgrid_u,u_opt,'-.')
 plt.title("Van der Pol optimization")
 plt.xlabel('time')
-plt.legend(['x trajectory','y trajectory','u trajectory'])
+plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()
 plt.show()
 
