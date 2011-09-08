@@ -763,6 +763,13 @@ std::string getOperatorRepresentation(const SX& x, const std::vector<std::string
   return s.str();
 }
 
+Matrix<SX> ssym(const std::string& name, int n, int m){
+  return symbolic(name,n,m);
+}
+
+Matrix<SX> ssym(const Matrix<double>& x){
+  return Matrix<SX>(x);
+}
 
 
 } // namespace CasADi

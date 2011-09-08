@@ -211,6 +211,16 @@ MX sum(const MX &x, int axis=0);
 /** \brief  Evaluate a polynomial with coefficeints p in x */
 MX polyval(const MX& p, const MX& x);
 
+/** \brief  Construct symbolic arrays and variables using CasADi's MX expression graph representation
+The "msym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an MX object.
+The MX expression graph is more general but also have considerably more overhead than the alternative SX expression graph.
+*/
+//@{
+MX msym(const std::string& name, int n=1, int m=1);
+MX msym(const Matrix<double>& x);
+//@}
+
+
 } // namespace CasADi
 
 #ifdef SWIG

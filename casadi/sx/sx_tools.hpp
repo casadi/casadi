@@ -398,6 +398,18 @@ int countNodes(const Matrix<SX>& A);
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
 
+/** \brief  Construct symbolic arrays and variables using CasADi's SX expression graph representation
+The "ssym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an SXMatrix object.
+The SX expression graph has much less overhead, but is also more restricted than the alternative MX expression graph.
+*/
+//@{
+
+/** \brief  Construct symbolic arrays and variables using CasADi's more restricted, but more efficient SX expression graph
+*/
+//@{
+Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
+Matrix<SX> ssym(const Matrix<double>& x);
+//@}
 
 } // namespace CasADi
 

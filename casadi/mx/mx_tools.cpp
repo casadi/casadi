@@ -498,6 +498,14 @@ bool isDense(const MX& ex){
   return ex.size() == ex.numel();
 }
 
+MX msym(const std::string& name, int n, int m){
+  return MX(name,n,m);
+}
+
+MX msym(const Matrix<double>& x){
+  return MX(x);
+}
+
 
 } // namespace CasADi
 
