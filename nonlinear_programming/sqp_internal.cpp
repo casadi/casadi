@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
+SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : NLPSolverInternal(F,G,H,J){
   casadi_warning("The SQP method is under development");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
@@ -51,21 +51,9 @@ SQPInternal::~SQPInternal(){
 }
 
 void SQPInternal::init(){
-  // Initialize the functions
-  F_.init();
-  G_.init();
-  n_ = F_.input().size();
-  m_ = G_.output().size();
-  
   // Call the init method of the base class
   NLPSolverInternal::init();
-  
-  // Create Jacobian if necessary
-  if(J_.isNull()){
-    J_ = G_.jacobian();
-  }
-  J_.init();
-  
+    
   // Read options
   maxiter_ = getOption("maxiter");
   maxiter_ls_ = getOption("maxiter_ls");

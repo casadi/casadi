@@ -37,12 +37,24 @@ namespace CasADi{
 class NLPSolverInternal : public FXInternal{
 
 public:
-  explicit NLPSolverInternal();
+  explicit NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J);
   virtual ~NLPSolverInternal() = 0;
 
   virtual void init();
 
-protected:
+  /// objective function
+  FX F_;
+  /// constraint function
+  FX G_;
+  /// Hessian of the Lagrangian function
+  FX H_;
+  /// Jacobian of the constraint function
+  FX J_; 
+
+  /// use exact hessian
+  bool exact_hessian_; 
+
+  /// Number of variables and constraints
   int n_,m_;
   
   int pn_,pm_; // (n x m) parameterspace

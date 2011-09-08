@@ -265,8 +265,8 @@ x0_opt = v_opt[0::(deg+1)*nx+nu]
 x1_opt = v_opt[1::(deg+1)*nx+nu]
 x2_opt = v_opt[2::(deg+1)*nx+nu]
 u_opt = v_opt[(deg+1)*nx::(deg+1)*nx+nu]
-tgrid = linspace(0,10,nk+1)
-tgrid_u = linspace(0,10,nk)
+tgrid = linspace(0,tf,nk+1)
+tgrid_u = linspace(0,tf,nk)
 
 # Plot the results
 plt.figure(1)

@@ -38,15 +38,6 @@ public:
   
   virtual void init();
   virtual void evaluate(int nfdir, int nadir);
-
-  /// objective function
-  FX F_;
-  /// constraint function
-  FX G_; 
-  /// Hessian of the Lagrangian function
-  FX H_;
-  /// Jacobian of the constraint function
-  FX J_; 
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;

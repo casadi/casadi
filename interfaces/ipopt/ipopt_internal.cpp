@@ -29,7 +29,7 @@ using namespace std;
 #include <coin/IpIpoptApplication.hpp>
 namespace CasADi{
 
-IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
+IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
   addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
   addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
   
@@ -213,96 +213,18 @@ IpoptInternal::~IpoptInternal(){
 }
 
 void IpoptInternal::init(){
-  // Initialize the functions
-  F_.init();
-  if(!G_.isNull() && !G_.isInit()) G_.init();
-  if(!H_.isNull() && !H_.isInit()) H_.init();
-  n_ = F_.input(0).numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).numel();
-  
-  int n=0;
-  int m=0;
-  
-  pn_=0;
-  pm_=0;
-  
-  int pn=0;
-  int pm=0;
-  
-  // Basic sanity checks
-  casadi_assert_message(F_.getNumInputs()==1 or F_.getNumInputs()==2, "Wrong number of input arguments to F. Must ");
-  casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
-  casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
-  
-  n=F_.input().numel();
-  if(!G_.isNull()) {
-    casadi_assert_message(G_.getNumInputs()>=1, "Wrong number of input arguments to G");
-    casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
-    casadi_assert_message(G_.input().numel()==n, "Inconsistent dimensions");
-    m=G_.output().numel();
-  }
-  
-  if(!H_.isNull()) {
-    casadi_assert_message(H_.getNumInputs()>=3, "Wrong number of input arguments to H");
-    casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
-    casadi_assert_message(H_.input(0).numel()==n,"Inconsistent dimensions");
-    casadi_assert_message(H_.output().size1()==n,"Inconsistent dimensions");
-    casadi_assert_message(H_.output().size2()==n,"Inconsistent dimensions");
-  }
-  if(!J_.isNull() && !G_.isNull()) {
-    casadi_assert_message(J_.getNumInputs()>=1, "Wrong number of input arguments to J");
-    casadi_assert_message(J_.getNumOutputs()>=1, "Wrong number of output arguments to J");
-    casadi_assert_message(J_.input().numel()==n,"Inconsistent dimensions");
-    casadi_assert_message(J_.output().size2()==n,"Inconsistent dimensions");
-  }
+  // Call the init method of the base class
+  NLPSolverInternal::init();
+
+  // Gradient of the objective function, remove?
+  if(!GF_.isNull()) GF_.init();
   if(!GF_.isNull()) {
     casadi_assert_message(GF_.getNumInputs()>=1, "Wrong number of input arguments to GF");
     casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
-    casadi_assert_message(GF_.input().numel()==n,"Inconsistent dimensions");
-    casadi_assert_message((GF_.output().size1()==n && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n),"Inconsistent dimensions");
+    casadi_assert_message(GF_.input().numel()==n_,"Inconsistent dimensions");
+    casadi_assert_message((GF_.output().size1()==n_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n_),"Inconsistent dimensions");
   }
-  
-  // Create a Jacobian if it does not already exists
-  if(!G_.isNull() && J_.isNull()){
-    J_ = G_.jacobian();
-  }
-  if(!J_.isNull()) J_.init();
-  if(!H_.isNull()) H_.init();
-  if(!GF_.isNull()) GF_.init();
-  
-  // Check if any of the functions have a second argument (i.e. to pass parameters)
-  std::vector<FX> functions;
-  functions.push_back(F_);
-  functions.push_back(G_);
-  functions.push_back(H_);
-  functions.push_back(J_);
-  functions.push_back(GF_);
-  
-  for (int k=0;k<functions.size();k++) {
-    const FX &f = functions[k];
-    if (f.isNull()) continue;
-    if (f.getNumInputs()!=2) continue;
-    pn = f.input(1).size1();
-    pm = f.input(1).size2();
-    
-    if (pn==0 or pm==0)
-     continue;
-    
-    if ((pn!=pn_ || pm!=pm_) && pn_!=0 && pm_!=0) {
-      stringstream s;
-      s << "One of your supplied functions had a second input argument, which was interpreted as a parameter of shape (" << pn_ << "x" << pm_ << ")." << std::endl;
-      s << "However, another function had a second input argument of shape (" << pn << "x" << pm << ")." << std::endl;
-      s << "This is inconsistent." << std::endl;
-      throw CasadiException(s.str());
-    }
-    pn_ = pn;
-    pm_ = pm;
 
-  }
-  
-  // Call the init method of the base class
-  NLPSolverInternal::init();
-  
     // Start the application
   app = new Ipopt::IpoptApplication();
 

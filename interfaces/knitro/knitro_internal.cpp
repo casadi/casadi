@@ -30,7 +30,7 @@
 using namespace std;
 namespace CasADi{
 
-KnitroInternal::KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
+KnitroInternal::KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
   casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
   kc_handle_ = 0;
   
@@ -47,21 +47,9 @@ KnitroInternal::~KnitroInternal(){
 }
 
 void KnitroInternal::init(){
-  // Initialize the functions
-  F_.init();
-  if(!G_.isNull()) G_.init();
-  n_ = F_.input(0).numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).numel();
-
   // Call the init method of the base class
   NLPSolverInternal::init();
 
-  // Create a Jacobian if it does not already exists
-  if(!G_.isNull() && J_.isNull()){
-    J_ = G_.jacobian();
-  }
-  if(!J_.isNull()) J_.init();
-  if(!H_.isNull()) H_.init();
   if(!GF_.isNull()) GF_.init();
 
   // Commented out since I have not found out how to change the bounds
