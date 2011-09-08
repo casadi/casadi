@@ -27,6 +27,7 @@
 #include "jacobian.hpp"
 #include "mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
+#include "../sx/sx_tools.hpp"
 
 using namespace std;
 
@@ -300,6 +301,17 @@ std::vector<MX> FXInternal::symbolicInput() const{
     stringstream name;
     name << "x_" << i;
     ret[i] = MX(name.str(),input(i).sparsity());
+  }
+  return ret;
+}
+
+std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
+  vector<SXMatrix> ret(getNumInputs());
+  casadi_assert(isInit());
+  for(int i=0; i<ret.size(); ++i){
+    stringstream name;
+    name << "x_" << i;
+    ret[i] = symbolic(name.str(),input(i).sparsity());
   }
   return ret;
 }

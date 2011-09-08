@@ -389,6 +389,9 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   /// Get a vector of symbolic variables with the same dimensions as the inputs
   std::vector<MX> symbolicInput() const;
   
+  /// Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+  std::vector<SXMatrix> symbolicInputSX() const;
+  
 };
 } // namespace CasADi
 

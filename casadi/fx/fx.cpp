@@ -271,6 +271,10 @@ std::vector<MX> FX::symbolicInput() const{
   return (*this)->symbolicInput();
 }
 
+std::vector<SXMatrix> FX::symbolicInputSX() const{
+  return (*this)->symbolicInputSX();
+}
+
 #if 0
 
 vector<DMatrix> FX::jac(const vector<DMatrix> &x, int iind){

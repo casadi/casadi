@@ -126,6 +126,8 @@ class MXFunctionInternal : public XFunctionInternal{
     DMatrixPtrVV mx_adjSeed_;
     DMatrixPtrVV mx_adjSens_;
 
+    /// Get a vector of symbolic variables with the same dimensions as the inputs
+    virtual std::vector<MX> symbolicInput() const{ return inputv;}
 };
 
 } // namespace CasADi

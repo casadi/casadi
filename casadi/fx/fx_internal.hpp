@@ -172,7 +172,10 @@ class FXInternal : public OptionsFunctionalityNode{
     CRSSparsity& jacSparsity(int iind, int oind);
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
-    std::vector<MX> symbolicInput() const;
+    virtual std::vector<MX> symbolicInput() const;
+  
+    /// Get a vector of symbolic variables with the same dimensions as the inputs
+    virtual std::vector<SXMatrix> symbolicInputSX() const;
   
     /// Get the Jacobian of all outputs with respect to all inputs
     void getFullJacobian();

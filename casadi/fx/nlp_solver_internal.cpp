@@ -21,6 +21,8 @@
  */
 
 #include "nlp_solver_internal.hpp"
+#include "mx_function.hpp"
+#include "sx_function.hpp"
 
 INPUTSCHEME(NLPInput)
 OUTPUTSCHEME(NLPOutput)
@@ -49,6 +51,49 @@ void NLPSolverInternal::init(){
   casadi_assert_message(!F_.isNull(),"No objective function");
   if(!F_.isInit()) F_.init();
   if(!G_.isNull() && !G_.isInit()) G_.init();
+
+  // Get dimensions
+  n_ = F_.input(0).numel();
+  m_ = G_.isNull() ? 0 : G_.output(0).numel();
+
+  // Basic sanity checks
+  casadi_assert_message(F_.getNumInputs()==1 or F_.getNumInputs()==2, "Wrong number of input arguments to F. Must ");
+  casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
+  casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
+  if(!G_.isNull()) {
+    casadi_assert_message(G_.getNumInputs()>=1, "Wrong number of input arguments to G");
+    casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
+    casadi_assert_message(G_.input().numel()==n_, "Inconsistent dimensions");
+  }
+  
+  // Find out if we are to expand the functions in terms of scalar operations
+  bool expand_f = getOption("expand_f");
+  if(expand_f){
+    // Cast to MXFunction
+    MXFunction F_mx = shared_cast<MXFunction>(F_);
+    if(F_mx.isNull()){
+      casadi_warning("Cannot expand objective function as it is not an MXFunction");
+    } else {
+      // Take use the input scheme of G if possible (it might be an SXFunction)
+      vector<SXMatrix> inputv;
+      if(!G_.isNull() && F_.getNumInputs()==G_.getNumInputs()){
+        inputv = G_.symbolicInputSX();
+      } else {
+        inputv = F_.symbolicInputSX();
+      }
+      
+      // Try to expand the MXFunction
+      F_ = F_mx.expand(inputv);
+      F_.setOption("number_of_fwd_dir",F_mx.getOption("number_of_fwd_dir"));
+      F_.setOption("number_of_adj_dir",F_mx.getOption("number_of_adj_dir"));
+      F_.init();
+    }
+  }
+  
+  
+  
+  
+  
   if(!H_.isNull() && !H_.isInit()) H_.init();
 
   // Create a Jacobian if it does not already exists
@@ -57,20 +102,6 @@ void NLPSolverInternal::init(){
   }
   if(!J_.isNull() && !J_.isInit()) J_.init();
 
-  // Get dimensions
-  n_ = F_.input(0).numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).numel();
-    
-  // Basic sanity checks
-  casadi_assert_message(F_.getNumInputs()==1 or F_.getNumInputs()==2, "Wrong number of input arguments to F. Must ");
-  casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
-  casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
-
-  if(!G_.isNull()) {
-    casadi_assert_message(G_.getNumInputs()>=1, "Wrong number of input arguments to G");
-    casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
-    casadi_assert_message(G_.input().numel()==n_, "Inconsistent dimensions");
-  }
   
   if(!H_.isNull()) {
     casadi_assert_message(H_.getNumInputs()>=3, "Wrong number of input arguments to H");
