@@ -196,46 +196,24 @@ for k in range(nk):
   lbg.append(zeros(nx))
   ubg.append(zeros(nx))
   
-# Variable vector (SX)
-V_sx = symbolic("V",NV)
-  
 # Nonlinear constraint function
-gfcn_nlp_mx = MXFunction([V],[vertcat(g)])
+gfcn = MXFunction([V],[vertcat(g)])
 
 # Objective function of the NLP
-y_f = [MX(T[nk-1][deg]),X[nk][0],U[nk-1]]
-[f] = m.call(y_f)
-ffcn_nlp_mx = MXFunction([V], [f])
-
-# Expand constraint function as an SX graph (move to NLP solver!)
-gfcn_nlp_mx.init()
-gfcn_nlp = gfcn_nlp_mx.expand([V_sx])
-g_sx = gfcn_nlp.outputSX()
+[f] = m.call([T[nk-1][deg],X[nk][0],U[nk-1]])
+ffcn = MXFunction([V], [f])
   
-# Expand objective function as an SX graph (move to NLP solver!)
-ffcn_nlp_mx.init()
-ffcn_nlp = ffcn_nlp_mx.expand([V_sx])
-f_sx = ffcn_nlp.outputSX()
-  
-# Lagrange multipliers
-lam = symbolic("lambda",g_sx.size1())
-
-# Objective function scaling
-sigma = symbolic("sigma")
-
-# Lagrangian function (move to NLP solver!)
-lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])
-lfcn.init()
-
-# Hessian of the Lagrangian
-HL = lfcn.hessian()
-
 ## ----
 ## SOLVE THE NLP
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(ffcn_nlp,gfcn_nlp,HL)
+solver = IpoptSolver(ffcn,gfcn)
+
+# Set options
+solver.setOption("expand_f",True)
+solver.setOption("expand_g",True)
+solver.setOption("generate_hessian",True)
 
 # initialize the solver
 solver.init()

@@ -194,9 +194,6 @@ ops_["wsmp_singularity_threshold"] = OT_REAL;
 for(map<string,opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
   addOption(it->first,it->second);
 
-  // Limited memory hessian by default if no hessian provided
-  if(H_.isNull()) setOption("hessian_approximation","limited-memory");
-
   app = 0;
   userclass = 0;
 }
@@ -235,8 +232,19 @@ void IpoptInternal::init(){
   uc = new IpoptUserClass(this);
     
   // read options
-  exact_hessian_ = !(hasSetOption("hessian_approximation") && getOption("hessian_approximation")=="limited-memory");
-  casadi_assert_message(!(exact_hessian_ && H_.isNull()), "No hessian has been provided");
+  exact_hessian_ = !H_.isNull();
+  if(hasSetOption("hessian_approximation")){
+    if(getOption("hessian_approximation")=="limited-memory"){
+      exact_hessian_ = false;
+    } else {
+      exact_hessian_ = true;
+      casadi_assert_message(!H_.isNull(), "No hessian has been provided");
+    }
+  } else {
+    if(!exact_hessian_){
+      setOption("hessian_approximation","limited-memory");
+    }
+  }
   
   if(verbose_){
     cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
@@ -398,6 +406,13 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
 bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
   try{
     log("eval_jac_g started");
+    
+    // Quich finish if no constraints
+    if(m==0){
+      log("eval_jac_g quick return (m==0)");
+      return true;
+    }
+    
     double time1 = clock();
     if (values == NULL) {
       int nz=0;

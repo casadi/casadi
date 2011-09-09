@@ -23,6 +23,7 @@
 #include "nlp_solver_internal.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
+#include "../sx/sx_tools.hpp"
 
 INPUTSCHEME(NLPInput)
 OUTPUTSCHEME(NLPOutput)
@@ -33,9 +34,9 @@ namespace CasADi{
 NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
-  addOption("exact_hessian",    OT_BOOLEAN,     GenericType(), "Use an exact Hessian [default: only if one has been provided]");
   addOption("expand_f",         OT_BOOLEAN,     false,         "Expand the objective function in terms of scalar operations, i.e. MX->SX");
   addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
+  addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian");
 
   n_ = 0;
   m_ = 0;
@@ -66,7 +67,7 @@ void NLPSolverInternal::init(){
     casadi_assert_message(G_.input().numel()==n_, "Inconsistent dimensions");
   }
   
-  // Find out if we are to expand the functions in terms of scalar operations
+  // Find out if we are to expand the objective function in terms of scalar operations
   bool expand_f = getOption("expand_f");
   if(expand_f){
     // Cast to MXFunction
@@ -91,9 +92,75 @@ void NLPSolverInternal::init(){
   }
   
   
+  // Find out if we are to expand the constraint function in terms of scalar operations
+  bool expand_g = getOption("expand_g");
+  if(expand_g){
+    // Cast to MXFunction
+    MXFunction G_mx = shared_cast<MXFunction>(G_);
+    if(G_mx.isNull()){
+      casadi_warning("Cannot expand constraint function as it is not an MXFunction");
+    } else {
+      // Take use the input scheme of F if possible (it might be an SXFunction)
+      vector<SXMatrix> inputv;
+      if(F_.getNumInputs()==G_.getNumInputs()){
+        inputv = F_.symbolicInputSX();
+      } else {
+        inputv = G_.symbolicInputSX();
+      }
+      
+      // Try to expand the MXFunction
+      G_ = G_mx.expand(inputv);
+      G_.setOption("number_of_fwd_dir",G_mx.getOption("number_of_fwd_dir"));
+      G_.setOption("number_of_adj_dir",G_mx.getOption("number_of_adj_dir"));
+      G_.init();
+    }
+  }
   
-  
-  
+  // Find out if we are to expand the constraint function in terms of scalar operations
+  bool generate_hessian = getOption("generate_hessian");
+  if(generate_hessian && H_.isNull()){
+    // Simple if unconstrained, but not implemented
+    casadi_assert_message(!G_.isNull(), "unconstrained not implemented");
+    
+    // Check if the functions are SXFunctions
+    SXFunction F_sx = shared_cast<SXFunction>(F_);
+    SXFunction G_sx = shared_cast<SXFunction>(G_);
+    
+    // Efficient if both functions are SXFunction
+    if(!F_sx.isNull() && !G_sx.isNull()){
+      // Parametric NLP not supported
+      casadi_assert_message(G_.getNumInputs()==1 && F_.getNumInputs()==1, "exact hessian generation currently not supported for parametric NLP");
+
+      // Expression for f and g
+      SXMatrix f = F_sx.outputSX();
+      SXMatrix g = G_sx.outputSX();
+      
+      // Substitute symbolic variables in f if different input variables from g
+      if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
+        f = substitute(f,F_sx.inputSX(),G_sx.inputSX());
+      }
+      
+      // Lagrange multipliers
+      SXMatrix lam = symbolic("lambda",g.size1());
+      
+      // Objective function scaling
+      SXMatrix sigma = symbolic("sigma");        
+      
+      // Lagrangian function
+      vector<SXMatrix> lfcn_in(3);
+      lfcn_in[0] = G_sx.inputSX();
+      lfcn_in[1] = lam;
+      lfcn_in[2] = sigma;
+      SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
+      lfcn.init();
+      
+      // Hessian of the Lagrangian
+      H_ = lfcn.hessian();
+      
+    } else {
+      casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G SXFunction");
+    }
+  }
   if(!H_.isNull() && !H_.isInit()) H_.init();
 
   // Create a Jacobian if it does not already exists
@@ -166,18 +233,6 @@ void NLPSolverInternal::init(){
 
   // Call the initialization method of the base class
   FXInternal::init();
-
-  
-  // 
-//   addOption("expand_f",         OT_BOOLEAN,     false,         "Expand the objective function in terms of scalar operations, i.e. MX->SX");
-//   addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
-//   addOption("exact_hessian",    OT_BOOLEAN,     GenericType(), "Use an exact Hessian [default: only if one has been provided]");
-//   addOption("bfgs_updates",     OT_BOOLEAN,     GenericType(), "Update the Hessian approximation with BFGS updates [default: if not exact_hessian]");
-
-  // Read options
-/*  bfgs_updates*/
-  
-  
 }
 
 
