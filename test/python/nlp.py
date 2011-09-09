@@ -244,13 +244,6 @@ class NLPtests(casadiTestCase):
     solver.input(NLP_LBX).set([-10])
     solver.input(NLP_UBX).set([10])
     solver.solve()
-    print "solver.output(NLP_COST) = ", solver.output(NLP_COST) 
-    print "----"
-    print "----"
-    print "----"
-    print "----"
-    print "solver.output(NLP_X_OPT) = ", solver.output(NLP_X_OPT)
-    
     self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
     
