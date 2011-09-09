@@ -220,6 +220,8 @@ MX msym(const std::string& name, int n=1, int m=1);
 MX msym(const Matrix<double>& x);
 //@}
 
+/** \brief  Check if two expressions are equal */
+bool isEqual(const MX& ex1,const MX &ex2);
 
 } // namespace CasADi
 

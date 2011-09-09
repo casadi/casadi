@@ -24,6 +24,7 @@
 #include "mx_function.hpp"
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
+#include "../mx/mx_tools.hpp"
 
 INPUTSCHEME(NLPInput)
 OUTPUTSCHEME(NLPOutput)
@@ -119,48 +120,126 @@ void NLPSolverInternal::init(){
   // Find out if we are to expand the constraint function in terms of scalar operations
   bool generate_hessian = getOption("generate_hessian");
   if(generate_hessian && H_.isNull()){
-    // Simple if unconstrained, but not implemented
-    casadi_assert_message(!G_.isNull(), "unconstrained not implemented");
-    
-    // Check if the functions are SXFunctions
-    SXFunction F_sx = shared_cast<SXFunction>(F_);
-    SXFunction G_sx = shared_cast<SXFunction>(G_);
-    
-    // Efficient if both functions are SXFunction
-    if(!F_sx.isNull() && !G_sx.isNull()){
-      // Parametric NLP not supported
-      casadi_assert_message(G_.getNumInputs()==1 && F_.getNumInputs()==1, "exact hessian generation currently not supported for parametric NLP");
-
-      // Expression for f and g
-      SXMatrix f = F_sx.outputSX();
-      SXMatrix g = G_sx.outputSX();
+    // Simple if unconstrained
+    if(G_.isNull()){
+      // Create Hessian of the objective function
+      FX HF = F_.hessian();
+      HF.init();
       
-      // Substitute symbolic variables in f if different input variables from g
-      if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
-        f = substitute(f,F_sx.inputSX(),G_sx.inputSX());
-      }
+      // Symbolic inputs of HF
+      vector<MX> HF_in = F_.symbolicInput();
       
       // Lagrange multipliers
-      SXMatrix lam = symbolic("lambda",g.size1());
+      MX lam("lam",0);
       
       // Objective function scaling
-      SXMatrix sigma = symbolic("sigma");        
+      MX sigma("sigma");
       
-      // Lagrangian function
-      vector<SXMatrix> lfcn_in(3);
-      lfcn_in[0] = G_sx.inputSX();
-      lfcn_in[1] = lam;
-      lfcn_in[2] = sigma;
-      SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
-      lfcn.init();
+      // Inputs of the Hessian function
+      vector<MX> H_in = HF_in;
+      H_in.insert(H_in.begin()+1, lam);
+      H_in.insert(H_in.begin()+2, sigma);
       
-      // Hessian of the Lagrangian
-      H_ = lfcn.hessian();
+      // Get an expression for the Hessian of F
+      MX hf = HF.call(HF_in).at(0);
       
-    } else {
-      casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G SXFunction");
-    }
-  }
+      // Create the scaled Hessian function
+      H_ = MXFunction(H_in, sigma*hf);
+      
+    } else { // G_.isNull()
+    
+      // Check if the functions are SXFunctions
+      SXFunction F_sx = shared_cast<SXFunction>(F_);
+      SXFunction G_sx = shared_cast<SXFunction>(G_);
+      
+      // Efficient if both functions are SXFunction
+      if(!F_sx.isNull() && !G_sx.isNull()){
+        // Parametric NLP not supported
+        casadi_assert_message(G_.getNumInputs()==1 && F_.getNumInputs()==1, "exact hessian generation currently not supported for parametric NLP");
+
+        // Expression for f and g
+        SXMatrix f = F_sx.outputSX();
+        SXMatrix g = G_sx.outputSX();
+        
+        // Substitute symbolic variables in f if different input variables from g
+        if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
+          f = substitute(f,F_sx.inputSX(),G_sx.inputSX());
+        }
+        
+        // Lagrange multipliers
+        SXMatrix lam = symbolic("lambda",g.size1());
+        
+        // Objective function scaling
+        SXMatrix sigma = symbolic("sigma");        
+        
+        // Lagrangian function
+        vector<SXMatrix> lfcn_in(3);
+        lfcn_in[0] = G_sx.inputSX();
+        lfcn_in[1] = lam;
+        lfcn_in[2] = sigma;
+        SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
+        lfcn.init();
+        
+        // Hessian of the Lagrangian
+        H_ = lfcn.hessian();
+        
+      } else { // !F_sx.isNull() && !G_sx.isNull()
+        // Check if the functions are SXFunctions
+        MXFunction F_mx = shared_cast<MXFunction>(F_);
+        MXFunction G_mx = shared_cast<MXFunction>(G_);
+        
+        // If they are, check if the arguments are the same
+        if(!F_mx.isNull() && !G_mx.isNull() && isEqual(F_mx.inputMX(),G_mx.inputMX())){
+          casadi_warning("Exact Hessian calculation for MX is still experimental");
+          
+          // Parametric NLP not supported
+          casadi_assert_message(G_mx.getNumInputs()==1 && F_mx.getNumInputs()==1, "exact hessian generation currently not supported for parametric NLP");
+          
+          // Expression for f and g
+          MX f = F_mx.outputMX();
+          MX g = G_mx.outputMX();
+          
+          // Lagrange multipliers
+          MX lam("lam",g.size1());
+      
+          // Objective function scaling
+          MX sigma("sigma");
+
+          // Inputs of the Lagrangian function
+          vector<MX> lfcn_in(3);
+          lfcn_in[0] = G_mx.inputMX();
+          lfcn_in[1] = lam;
+          lfcn_in[2] = sigma;
+
+          // Lagrangian function
+          MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
+          lfcn.init();
+      
+          bool adjoint_mode = true;
+          if(adjoint_mode){
+          
+            // Gradient of the lagrangian
+            MX gL = trans(lfcn.grad().at(0));
+            
+            MXFunction glfcn(lfcn_in,gL);
+            glfcn.setOption("number_of_fwd_dir",n_);
+            glfcn.init();
+            
+            // Hessian of the Lagrangian
+            H_ = glfcn.jacobian();
+          } else {
+
+            // Hessian of the Lagrangian
+            H_ = lfcn.hessian();
+            
+          }
+          
+        } else {
+          casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G both SXFunction or MXFunction ");
+        }
+      } // !F_sx.isNull() && !G_sx.isNull()
+    } // G_.isNull()
+  } // generate_hessian && H_.isNull()
   if(!H_.isNull() && !H_.isInit()) H_.init();
 
   // Create a Jacobian if it does not already exists

@@ -62,19 +62,16 @@ solver.solve()
 # Retrieve the solution
 u_opt = array(solver.output(NLP_X_OPT))
 
-# Get values at the beginning of each finite element
-tgrid = linspace(0,10,nk+1)
+# Time grid
+tgrid_x = linspace(0,10,nk+1)
 tgrid_u = linspace(0,10,nk)
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-#plt.plot(tgrid,x_opt,'--')
-#plt.plot(tgrid,y_opt,'-')
 plt.plot(tgrid_u,u_opt,'-.')
 plt.title("Van der Pol optimization - single shooting")
 plt.xlabel('time')
-#plt.legend(['x trajectory','y trajectory','u trajectory'])
 plt.legend(['u trajectory'])
 plt.grid()
 plt.show()

@@ -506,6 +506,12 @@ MX msym(const Matrix<double>& x){
   return MX(x);
 }
 
+bool isEqual(const MX& ex1,const MX &ex2){
+  if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size1()!=ex2.size1() || ex1.size2()!=ex2.size2())) return false;
+  MX difference = ex1 - ex2;  
+  return isZero(difference);
+}
+
 
 } // namespace CasADi
 
