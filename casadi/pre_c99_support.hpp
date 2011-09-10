@@ -23,6 +23,15 @@
 #ifndef PRE_C99_SUPPORT_HPP
 #define PRE_C99_SUPPORT_HPP
 
+// Get GCC version if GCC is used
+#ifdef __GNUC__
+#ifdef __GNUC_MINOR__
+#ifdef __GNUC_PATCHLEVEL__
+#define GCC_VERSION (__GNUC__ * 10000 +__GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif // __GNUC_PATCHLEVEL__
+#endif // __GNUC_MINOR__
+#endif // __GNUC__
+
 // Disable some Visual studio warnings
 #ifdef _MSC_VER
 
@@ -44,8 +53,15 @@ double fmin(double x, double y) throw();
 double fmax(double x, double y) throw();
 #endif // __STDC_VERSION__ < 199901L
 
-// Visual Studio workarounds
-#ifdef _MSC_VER
+// Do we need to define elementary operations for int?
+#ifdef GCC_VERSION
+#if GCC_VERSION>=402000
+#define WITHOUT_INT_MATH
+#endif
+#endif
+
+// Resolve ambigous overloading
+#ifndef WITHOUT_INT_MATH
 namespace std{
   double exp(int x) throw();
   double log(int x) throw();
@@ -60,7 +76,7 @@ namespace std{
   int floor(int x) throw();
   int ceil(int x) throw();
 } // namespace std
-#endif // _MSC_VER
+#endif // WITHOUT_INT_MATH
 
 
 

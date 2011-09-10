@@ -32,7 +32,7 @@ double fmin(double x, double y) throw(){ return std::min(x,y);}
 double fmax(double x, double y) throw(){ return std::max(x,y);}
 #endif // __STDC_VERSION__ < 199901L
 
-#ifdef _MSC_VER
+#ifndef WITHOUT_INT_MATH
 namespace std{
 
 	double exp(int x) throw(){ 
@@ -84,4 +84,4 @@ namespace std{
 	}
 
 } // namespace std
-#endif // _MSC_VER
+#endif // WITHOUT_INT_MATH
