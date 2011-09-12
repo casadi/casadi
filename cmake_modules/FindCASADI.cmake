@@ -1,5 +1,5 @@
 FIND_PATH(CASADI_INCLUDE_DIR 
-  casadi/sx/sx.hpp
+  casadi/casadi/sx/sx.hpp
 )
 
 IF (CASADI_INCLUDE_DIR)
