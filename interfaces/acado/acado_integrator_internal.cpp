@@ -20,40 +20,35 @@
  *
  */
 
-#include "acado_ocp_internal.hpp"
-
-#include <acado_optimal_control.hpp>
-
-#include <cassert>
-#include <limits>
+#include "acado_integrator_internal.hpp"
+#include "casadi/stl_vector_tools.hpp"
+#include "casadi/fx/linear_solver_internal.hpp"
+#include "casadi/fx/sx_function_internal.hpp"
+#include "casadi/fx/mx_function.hpp"
+#include "casadi/sx/sx_tools.hpp"
 
 using namespace std;
-
 namespace CasADi{
 
-AcadoOCPInterface::AcadoOCPInterface(){ 
+AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
+  // Return a deep copy
+  AcadoIntegratorInternal* node = new AcadoIntegratorInternal(f_,q_);
+  node->setOption(dictionary());
+  return node;
 }
 
-AcadoOCPInterface::AcadoOCPInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
-  assignNode(new AcadoOCPInternal(ffcn, mfcn, cfcn, rfcn));
+AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+  casadi_warning("AcadoIntegrator interface is under development");
 }
 
-void AcadoOCPInterface::setIntegrators(const vector<Integrator>& integrators){
-  (*this)->setIntegrators(integrators);
+AcadoIntegratorInternal::~AcadoIntegratorInternal(){ 
 }
 
-AcadoOCPInternal* AcadoOCPInterface::operator->(){
-  return (AcadoOCPInternal*)(FX::operator->());
-}
+void AcadoIntegratorInternal::init(){
 
-const AcadoOCPInternal* AcadoOCPInterface::operator->() const{
-   return (const AcadoOCPInternal*)(FX::operator->()); 
+  // Call the base class init
+  IntegratorInternal::init();
 }
-
-bool AcadoOCPInterface::checkNode() const{
-  return dynamic_cast<const AcadoOCPInternal*>(get());
-}
-
 
 } // namespace CasADi
 

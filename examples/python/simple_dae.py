@@ -34,7 +34,7 @@ ffcn = SXFunction(acado_in,[f])
 mfcn = SXFunction(acado_in,[[l]])
 
 # Create ACADO solver
-ocp_solver = AcadoOCPInterface(ffcn,mfcn)
+ocp_solver = AcadoOCP(ffcn,mfcn)
 
 # Set options
 t0 = 0.0

@@ -23,7 +23,7 @@
 #ifndef ACADO_OCP_INTERNAL_HPP
 #define ACADO_OCP_INTERNAL_HPP
 
-#include "acado_ocp_interface.hpp"
+#include "acado_ocp.hpp"
 #include "acado_function.hpp"
 #include "casadi/fx/fx_internal.hpp"
 #include <stack>
@@ -46,9 +46,9 @@ namespace CasADi{
 
   
 class AcadoOCPInternal : public FXInternal{
-  friend class AcadoOCPInterface;
+  friend class AcadoOCP;
   
-  /** \brief  Constructor only accessable from the AcadoOCPInterfaceSolver pointer class */
+  /** \brief  Constructor only accessable from the AcadoOCP pointer class */
   explicit AcadoOCPInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
   
   /** \brief  Set a user-provided integrator */

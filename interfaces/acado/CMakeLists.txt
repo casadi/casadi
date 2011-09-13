@@ -5,10 +5,14 @@ include_directories(${ACADO_INCLUDE_DIRS})
 set(ACADO_INTERFACE_SRCS
   acado_function.hpp
   acado_function.cpp
-  acado_ocp_interface.hpp
-  acado_ocp_interface.cpp
+  acado_ocp.hpp
+  acado_ocp.cpp
   acado_ocp_internal.hpp
   acado_ocp_internal.cpp
+  acado_integrator.hpp
+  acado_integrator.cpp
+  acado_integrator_internal.hpp
+  acado_integrator_internal.cpp
   acado_integrator_backend.hpp
   acado_integrator_backend.cpp
 )

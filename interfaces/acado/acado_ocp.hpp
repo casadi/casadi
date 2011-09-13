@@ -74,14 +74,14 @@ namespace CasADi{
   class AcadoOCPInternal;
  
   // Smart pointer class
-  class AcadoOCPInterface : public FX{
+  class AcadoOCP : public FX{
     public:
 
       /// Default constructor
-      AcadoOCPInterface();
+      AcadoOCP();
 
       /// Constructor taking a DAE rhs function, an objective function and a constraint function -- for use with ACADO integrators
-      explicit AcadoOCPInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+      explicit AcadoOCP(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
       /// Set a user-provided integrator
       void setIntegrators(const std::vector<Integrator>& integrators);
