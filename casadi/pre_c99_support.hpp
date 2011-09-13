@@ -23,6 +23,8 @@
 #ifndef PRE_C99_SUPPORT_HPP
 #define PRE_C99_SUPPORT_HPP
 
+#include <cmath>
+
 // Get GCC version if GCC is used
 #ifdef __GNUC__
 #ifdef __GNUC_MINOR__
