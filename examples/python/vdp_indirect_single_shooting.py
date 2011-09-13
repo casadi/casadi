@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 t = symbolic("t")
 
 # Declare variables (use simple, efficient DAG)
-x1=SX("x1"); x2=SX("x2")
-x = SXMatrix([x1,x2])
+x0=SX("x0"); x1=SX("x1")
+x = SXMatrix([x0,x1])
 
 # Control
 u = symbolic("u")
 
 # ODE right hand side
-xdot = [(1 - x2*x2)*x1 - x2 + u, x1]
+xdot = [(1 - x1*x1)*x0 - x1 + u, x0]
 
 # Lagrangian function
-L = x1*x1 + x2*x2 + u*u
+L = x0*x0 + x1*x1 + u*u
 
 # Costate
 lam = symbolic("lam",2)
@@ -88,9 +88,8 @@ F = MXFunction([l_init],[inner_prod(l_init,l_init)])
 
 # Allocate NLP solver
 solver = IpoptSolver(F,G)
-solver.setOption("hessian_approximation", \
-                "limited-memory")
-  
+solver.setOption("generate_hessian",True)
+
 # Initialize the NLP solver
 solver.init()
 
@@ -111,7 +110,7 @@ l_init_opt = array(solver.output(NLP_X_OPT).data())
 tgrid = linspace(0,10,100)
 
 # Output functions
-output_fcn = SXFunction(rhs_in,[x1,x2,u_opt])
+output_fcn = SXFunction(rhs_in,[x0,x1,u_opt])
 
 # Simulator to get optimal state and control trajectories
 simulator = Simulator(I, output_fcn, tgrid)
