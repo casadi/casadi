@@ -81,6 +81,12 @@ public:
 
   /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output 
   SXFunction(const std::vector< SXMatrix>& arg, const SXMatrix& res);
+
+  /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output 
+  SXFunction(const SXMatrix& arg, const std::vector< std::vector<SX> >& res);
+
+  /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output 
+  SXFunction(const SXMatrix& arg, const std::vector< SXMatrix>& res);
 #endif // SWIG
 
   /// Access functions of the node 

@@ -42,15 +42,13 @@ SXFunction::SXFunction(){
 }
 
 SXFunction::SXFunction(const SXMatrix& arg, const SXMatrix& res){
-  vector<SXMatrix> argv(1,arg);
-  vector<SXMatrix> resv(1,res);
-  assignNode(new SXFunctionInternal(argv,resv));
+  assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
+                                    vector<SXMatrix>(1,res)));
 }
 
 SXFunction::SXFunction(const vector< vector<SX> >& arg, const vector< vector<SX> >& res){
-  vector<SXMatrix> argv(arg.begin(),arg.end());
-  vector<SXMatrix> resv(res.begin(),res.end());
-  assignNode(new SXFunctionInternal(argv,resv));
+  assignNode(new SXFunctionInternal(vector<SXMatrix>(arg.begin(),arg.end()),
+                                    vector<SXMatrix>(res.begin(),res.end())));
 }
 
 SXFunction::SXFunction(const vector< SXMatrix>& arg, const vector<SXMatrix>& res){
@@ -58,15 +56,26 @@ SXFunction::SXFunction(const vector< SXMatrix>& arg, const vector<SXMatrix>& res
 }
 
 SXFunction::SXFunction(const vector< vector<SX> >& arg, const SXMatrix& res){
-  vector<SXMatrix> argv(arg.begin(),arg.end());
-  vector<SXMatrix> resv(1,res);
-  assignNode(new SXFunctionInternal(argv,resv));
+  assignNode(new SXFunctionInternal(vector<SXMatrix>(arg.begin(),arg.end()),
+                                    vector<SXMatrix>(1,res)));
 }
 
 SXFunction::SXFunction(const vector< SXMatrix>& arg, const SXMatrix& res){
-  vector<SXMatrix> resv(1,res);
-  assignNode(new SXFunctionInternal(arg,resv));
+  assignNode(new SXFunctionInternal(arg,
+                                    vector<SXMatrix>(1,res)));
 }
+
+SXFunction::SXFunction(const SXMatrix& arg, const std::vector< std::vector<SX> >& res){
+  assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
+                                    vector<SXMatrix>(res.begin(),res.end())));
+  
+}
+
+SXFunction::SXFunction(const SXMatrix& arg, const std::vector< SXMatrix>& res){
+  assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
+                                    res));
+}
+
 
 const SXFunctionInternal* SXFunction::operator->() const{
   return (const SXFunctionInternal*)FX::operator->();
