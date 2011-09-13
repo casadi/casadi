@@ -220,4 +220,3 @@ void Variable::setFree(bool free){
 
 } // namespace OptimalControl
 } // namespace CasADi
-

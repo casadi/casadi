@@ -200,3 +200,4 @@ namespace CasADi{
 
 
 #endif // VARIABLE_HPP
+
