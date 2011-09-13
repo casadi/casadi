@@ -49,10 +49,19 @@ NLPSolverInternal::~NLPSolverInternal(){
 }
 
 void NLPSolverInternal::init(){
+  // Read the verbosity option already now
+  verbose_ = getOption("verbose");
+  
   // Initialize the functions
   casadi_assert_message(!F_.isNull(),"No objective function");
-  if(!F_.isInit()) F_.init();
-  if(!G_.isNull() && !G_.isInit()) G_.init();
+  if(!F_.isInit()){
+    F_.init();
+    log("Objective function initialized");
+  }
+  if(!G_.isNull() && !G_.isInit()){
+    G_.init();
+    log("Constraint function initialized");
+  }
 
   // Get dimensions
   n_ = F_.input(0).numel();
@@ -71,6 +80,8 @@ void NLPSolverInternal::init(){
   // Find out if we are to expand the objective function in terms of scalar operations
   bool expand_f = getOption("expand_f");
   if(expand_f){
+    log("Expanding objective function");
+    
     // Cast to MXFunction
     MXFunction F_mx = shared_cast<MXFunction>(F_);
     if(F_mx.isNull()){
@@ -96,6 +107,8 @@ void NLPSolverInternal::init(){
   // Find out if we are to expand the constraint function in terms of scalar operations
   bool expand_g = getOption("expand_g");
   if(expand_g){
+    log("Expanding constraint function");
+    
     // Cast to MXFunction
     MXFunction G_mx = shared_cast<MXFunction>(G_);
     if(G_mx.isNull()){
@@ -120,6 +133,8 @@ void NLPSolverInternal::init(){
   // Find out if we are to expand the constraint function in terms of scalar operations
   bool generate_hessian = getOption("generate_hessian");
   if(generate_hessian && H_.isNull()){
+    log("generating hessian");
+    
     // Simple if unconstrained
     if(G_.isNull()){
       // Create Hessian of the objective function
@@ -145,6 +160,7 @@ void NLPSolverInternal::init(){
       
       // Create the scaled Hessian function
       H_ = MXFunction(H_in, sigma*hf);
+      log("Unconstrained Hessian function generated");
       
     } else { // G_.isNull()
     
@@ -182,6 +198,7 @@ void NLPSolverInternal::init(){
         
         // Hessian of the Lagrangian
         H_ = lfcn.hessian();
+        log("SX Hessian function generated");
         
       } else { // !F_sx.isNull() && !G_sx.isNull()
         // Check if the functions are SXFunctions
@@ -233,6 +250,7 @@ void NLPSolverInternal::init(){
             H_ = lfcn.hessian();
             
           }
+          log("MX Hessian function generated");
           
         } else {
           casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G both SXFunction or MXFunction ");
@@ -240,13 +258,20 @@ void NLPSolverInternal::init(){
       } // !F_sx.isNull() && !G_sx.isNull()
     } // G_.isNull()
   } // generate_hessian && H_.isNull()
-  if(!H_.isNull() && !H_.isInit()) H_.init();
+  if(!H_.isNull() && !H_.isInit()) {
+    H_.init();
+    log("Hessian function initialized");
+  }
 
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){
     J_ = G_.jacobian();
+    log("Jacobian function generated");
   }
-  if(!J_.isNull() && !J_.isInit()) J_.init();
+  if(!J_.isNull() && !J_.isInit()){
+    J_.init();
+    log("Jacobian function initialized");
+  }
 
   
   if(!H_.isNull()) {

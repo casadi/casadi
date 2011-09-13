@@ -113,25 +113,16 @@ int main(){
 
   // Solve the problem
   solver.solve();
-
-  // Create solution file
-  ofstream file;
-  file.open("rocket_ipopt_results.m");
-  file << "% Results file from " __FILE__ << endl;
-  file << "% Generated " __DATE__ " at " __TIME__ << endl;
-  file << endl;
   
   // Print the optimal cost
   double cost;
   solver.getOutput(cost,NLP_COST);
   cout << "optimal cost: " << cost << endl;
-  file << "cost = " << cost << ";" << endl;
 
   // Print the optimal solution
   vector<double> uopt(nu);
   solver.getOutput(uopt,NLP_X_OPT);
   cout << "optimal control: " << uopt << endl;
-  file << "u = " << uopt << ";" << endl;
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
@@ -147,34 +138,58 @@ int main(){
   xfcn.getOutput(sopt,0);
   xfcn.getOutput(vopt,1);
   xfcn.getOutput(mopt,2);
-  file << "t = linspace(0,10.0," << nu << ");"<< endl;
   cout << "position: " << sopt << endl;
-  file << "s = " << sopt << ";" << endl;
   cout << "velocity: " << vopt << endl;
-  file << "v = " << vopt << ";" << endl;
   cout << "mass:     " << mopt << endl;
+
+  // Create Matlab script to plot the solution
+  ofstream file;
+  string filename = "rocket_ipopt_results.m";
+  file.open(filename.c_str());
+  file << "% Results file from " __FILE__ << endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << endl;
+  file << endl;
+  file << "cost = " << cost << ";" << endl;
+  file << "u = " << uopt << ";" << endl;
+
+  // Save results to file
+  file << "t = linspace(0,10.0," << nu << ");"<< endl;
+  file << "s = " << sopt << ";" << endl;
+  file << "v = " << vopt << ";" << endl;
   file << "m = " << mopt << ";" << endl;
   
   // Finalize the results file
   file << endl;
   file << "% Plot the results" << endl;
   file << "figure(1);" << endl;
+  file << "clf;" << endl << endl;
+  
+  file << "subplot(2,2,1);" << endl;
   file << "plot(t,s);" << endl;
-  file << "xlabel('time');" << endl;
-  file << "ylabel('position');" << endl;
-  file << "figure(2);" << endl;
+  file << "grid on;" << endl;
+  file << "xlabel('time [s]');" << endl;
+  file << "ylabel('position [m]');" << endl << endl;
+  
+  file << "subplot(2,2,2);" << endl;
   file << "plot(t,v);" << endl;
-  file << "xlabel('time');" << endl;
-  file << "ylabel('velocity');" << endl;
-  file << "figure(3);" << endl;
+  file << "grid on;" << endl;
+  file << "xlabel('time [s]');" << endl;
+  file << "ylabel('velocity [m/s]');" << endl << endl;
+  
+  file << "subplot(2,2,3);" << endl;
   file << "plot(t,m);" << endl;
-  file << "xlabel('time');" << endl;
-  file << "ylabel('mass');" << endl;
-  file << "figure(4);" << endl;
+  file << "grid on;" << endl;
+  file << "xlabel('time [s]');" << endl;
+  file << "ylabel('mass [kg]');" << endl << endl;
+  
+  file << "subplot(2,2,4);" << endl;
   file << "plot(t,u);" << endl;
-  file << "xlabel('time');" << endl;
-  file << "ylabel('control');" << endl;
+  file << "grid on;" << endl;
+  file << "xlabel('time [s]');" << endl;
+  file << "ylabel('Thrust [kg m/s^2]');" << endl << endl;
+  
   file.close();
+  cout << "Results saved to \"" << filename << "\"" << endl;
 
   return 0;
 }
