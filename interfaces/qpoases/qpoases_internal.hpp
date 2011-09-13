@@ -25,7 +25,7 @@
 
 #include "casadi/fx/qp_solver_internal.hpp"
 
-#include <SQProblem.hpp>
+#include <qpOASES.hpp>
 
 namespace CasADi{
 namespace Interfaces {
