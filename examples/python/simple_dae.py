@@ -14,7 +14,7 @@ z = SX("z")
 u = SX("u")
 
 # Differential equation
-f = 3 * [0]
+f = [0,0,0]
 f[0] = -x + 0.5*x*x + u + 0.5*z
 f[1] =  x*x + 3.0*u*u
 f[2] =  z + exp(z) - 1.0 + x
@@ -72,25 +72,9 @@ t_opt = NP.linspace(t0,tf,num_nodes+1)
 x_opt = ocp_solver.output(ACADO_X_OPT)
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 3)
-plt.figure(1)
-plt.clf()
-plt.subplot(211)
-plt.plot(t_opt,x_opt[:,0])
-plt.title("DIFFERENTIAL STATE  x")
-
-plt.subplot(212)
-plt.plot(t_opt,x_opt[:,2])
-plt.title("ALGEBRAIC STATE  z")
 
 # Plot optimal control
 u_opt = ocp_solver.output(ACADO_U_OPT)
-plt.figure(2)
-plt.clf()
-plt.plot(t_opt,u_opt[:])
-plt.title("CONTROL u")
-
-plt.show()
-
 
 # State derivatives
 xdot = SX("xdot")
@@ -156,20 +140,45 @@ for i in range(num_nodes):
   xi = integrator.output(INTEGRATOR_XF)
   x_opt2[i+1] = xi.data()
 
+
+plt.figure(1)
+plt.clf()
+plt.hold(True)
+plt.plot(t_opt,x_opt[:,0],'*')
+plt.plot(t_opt,x_opt2[:,0],'-')
+plt.title("DIFFERENTIAL STATE  x")
+plt.legend(('ACADO','IDAS'))
+
+plt.figure(2)
+plt.clf()
+plt.hold(True)
+plt.plot(t_opt,x_opt[:,2],'*')
+plt.plot(t_opt,x_opt2[:,2],'-')
+plt.title("ALGEBRAIC STATE  z")
+plt.legend(('ACADO','IDAS'))
+
 plt.figure(3)
 plt.clf()
-plt.subplot(121)
-plt.plot(t_opt,x_opt[:,0])
-plt.title("ACADO x")
+plt.hold(True)
+plt.plot(t_opt,x_opt[:,1],'*')
+plt.plot(t_opt,x_opt2[:,1],'-')
+plt.title("Lagrange term l")
+plt.legend(('ACADO','IDAS'))
 
-plt.plot(t_opt,x_opt[:,1])
-plt.title("ACADO l")
+plt.figure(3)
+plt.clf()
+plt.hold(True)
+plt.plot(t_opt,x_opt[:,1],'*')
+plt.plot(t_opt,x_opt2[:,1],'-')
+plt.title("Lagrange term l")
+plt.legend(('ACADO','IDAS'))
 
-plt.subplot(122)
-plt.plot(t_opt,x_opt2[:,0])
-plt.title("CASADI x")
+plt.figure(4)
+plt.clf()
+plt.hold(True)
+plt.plot(t_opt,u_opt[:],'--')
+#plt.plot(t_opt,u_opt2[:],'-')
+plt.title("CONTROL u")
+#plt.legend(('ACADO','IDAS'))
 
-plt.plot(t_opt,x_opt2[:,1])
-plt.title("CASADI l")
-
-
+plt.show()
