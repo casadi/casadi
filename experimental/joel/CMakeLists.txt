@@ -23,6 +23,15 @@ target_link_libraries(biegler_10_1 ipopt_interface casadi ${IPOPT_LIBRARIES})
 # Exaple 10.2 from Biegler
 add_executable(biegler_10_2 biegler_10_2.cpp)
 target_link_libraries(biegler_10_2 ipopt_interface casadi ${IPOPT_LIBRARIES})
+
+# Simple OCP example
+add_executable(simple_ocp_sequential simple_ocp_sequential.cpp)
+target_link_libraries(simple_ocp_sequential ipopt_interface casadi ${IPOPT_LIBRARIES}  ${EXTRA_LIBS})
+
+add_executable(simple_ocp_simultaneous simple_ocp_simultaneous.cpp)
+target_link_libraries(simple_ocp_simultaneous ipopt_interface casadi ${IPOPT_LIBRARIES}  ${EXTRA_LIBS})
+
+
 ENDIF(IPOPT_FOUND)
 
 

@@ -21,13 +21,11 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <ctime>
-#include <casadi/stl_vector_tools.hpp>
+#include <casadi/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/fx/sx_function.hpp"
-#include <casadi/fx/jacobian.hpp>
-
+#include <casadi/stl_vector_tools.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -37,8 +35,8 @@ int main(){
   cout << "program started" << endl;
       
   // Dimensions
-  int nu = 200;  // Number of control segments
-  int nj = 200; // Number of integration steps per control segment
+  int nu = 50;  // Number of control segments
+  int nj = 100; // Number of integration steps per control segment
 
   // optimization variable
   vector<SX> u = create_symbolic("u",nu); // control
@@ -52,7 +50,7 @@ int main(){
   SX beta = 0.1; // fuel consumption rate
 
   // Trajectory
-//  vector<SX> v_traj(nu);
+  vector<SX> s_traj(nu), v_traj(nu), m_traj(nu);
 
   // Integrate over the interval with Euler forward
   SX s = s_0, v = v_0, m = m_0;
@@ -62,7 +60,9 @@ int main(){
       v += dt / m * (u[k]- alpha * v*v);
       m += -dt * beta*u[k]*u[k];
     }
-  //  v_traj[k] = v;
+    s_traj[k] = s;
+    v_traj[k] = v;
+    m_traj[k] = m;
   }
 
   // Objective function
@@ -74,54 +74,107 @@ int main(){
   vector<SX> g(2);
   g[0] = s;
   g[1] = v;
-/*  for(vector<SX>::const_iterator it=v_traj.begin(); it!=v_traj.end(); ++it)
-    g << *it;*/
+  g.insert(g.end(),v_traj.begin(),v_traj.end());
   
   // Create the NLP
   SXFunction ffcn(u,f); // objective function
   SXFunction gfcn(u,g); // constraint
-  gfcn.setOption("ad_mode","reverse");
   
   // Allocate an NLP solver
   IpoptSolver solver(ffcn,gfcn);
-//  IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
 
   // Set options
   solver.setOption("tol",1e-6);
-  solver.setOption("hessian_approximation","limited-memory");
+  solver.setOption("generate_hessian",true);
 
   // initialize the solver
   solver.init();
 
   // Bounds on u and initial condition
-  vector<double> umin(nu), umax(nu), usol(nu);
+  vector<double> umin(nu), umax(nu), uinit(nu);
   for(int i=0; i<nu; ++i){
     umin[i] = -10;
     umax[i] =  10;
-    usol[i] = 0.4;
+    uinit[i] = 0.4;
   }
   solver.setInput(umin,NLP_LBX);
   solver.setInput(umax,NLP_UBX);
-  solver.setInput(usol,NLP_X_INIT);
+  solver.setInput(uinit,NLP_X_INIT);
   
   // Bounds on g
-  vector<double> gmin(2,-numeric_limits<double>::infinity()), gmax(2,1.1);
+  vector<double> gmin(2), gmax(2);
   gmin[0] = gmax[0] = 10;
   gmin[1] = gmax[1] =  0;
+  gmin.resize(2+nu, -numeric_limits<double>::infinity());
+  gmax.resize(2+nu, 1.1);
+  
   solver.setInput(gmin,NLP_LBG);
   solver.setInput(gmax,NLP_UBG);
 
   // Solve the problem
   solver.solve();
 
+  // Create solution file
+  ofstream file;
+  file.open("rocket_ipopt_results.m");
+  file << "% Results file from " __FILE__ << endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << endl;
+  file << endl;
+  
   // Print the optimal cost
   double cost;
   solver.getOutput(cost,NLP_COST);
   cout << "optimal cost: " << cost << endl;
+  file << "cost = " << cost << ";" << endl;
 
   // Print the optimal solution
-  solver.getOutput(usol,NLP_X_OPT);
-  cout << "optimal solution: " << usol << endl;
+  vector<double> uopt(nu);
+  solver.getOutput(uopt,NLP_X_OPT);
+  cout << "optimal control: " << uopt << endl;
+  file << "u = " << uopt << ";" << endl;
+
+  // Get the state trajectory
+  vector<double> sopt(nu), vopt(nu), mopt(nu);
+  vector<Matrix<SX> > xfcn_in(1,u);
+  vector<Matrix<SX> > xfcn_out(3);
+  xfcn_out[0] = s_traj;
+  xfcn_out[1] = v_traj;
+  xfcn_out[2] = m_traj;
+  SXFunction xfcn(xfcn_in,xfcn_out);
+  xfcn.init();
+  xfcn.setInput(uopt);
+  xfcn.evaluate();
+  xfcn.getOutput(sopt,0);
+  xfcn.getOutput(vopt,1);
+  xfcn.getOutput(mopt,2);
+  file << "t = linspace(0,10.0," << nu << ");"<< endl;
+  cout << "position: " << sopt << endl;
+  file << "s = " << sopt << ";" << endl;
+  cout << "velocity: " << vopt << endl;
+  file << "v = " << vopt << ";" << endl;
+  cout << "mass:     " << mopt << endl;
+  file << "m = " << mopt << ";" << endl;
+  
+  // Finalize the results file
+  file << endl;
+  file << "% Plot the results" << endl;
+  file << "figure(1);" << endl;
+  file << "plot(t,s);" << endl;
+  file << "xlabel('time');" << endl;
+  file << "ylabel('position');" << endl;
+  file << "figure(2);" << endl;
+  file << "plot(t,v);" << endl;
+  file << "xlabel('time');" << endl;
+  file << "ylabel('velocity');" << endl;
+  file << "figure(3);" << endl;
+  file << "plot(t,m);" << endl;
+  file << "xlabel('time');" << endl;
+  file << "ylabel('mass');" << endl;
+  file << "figure(4);" << endl;
+  file << "plot(t,u);" << endl;
+  file << "xlabel('time');" << endl;
+  file << "ylabel('control');" << endl;
+  file.close();
 
   return 0;
 }
