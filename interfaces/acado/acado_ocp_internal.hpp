@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef ACADO_INTERNAL_HPP
-#define ACADO_INTERNAL_HPP
+#ifndef ACADO_OCP_INTERNAL_HPP
+#define ACADO_OCP_INTERNAL_HPP
 
-#include "acado_interface.hpp"
+#include "acado_ocp_interface.hpp"
 #include "acado_function.hpp"
 #include "casadi/fx/fx_internal.hpp"
 #include <stack>
@@ -45,11 +45,11 @@ namespace ACADO{
 namespace CasADi{
 
   
-class AcadoInternal : public FXInternal{
-  friend class AcadoInterface;
+class AcadoOCPInternal : public FXInternal{
+  friend class AcadoOCPInterface;
   
-  /** \brief  Constructor only accessable from the AcadoOCPSolver pointer class */
-  explicit AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
+  /** \brief  Constructor only accessable from the AcadoOCPInterfaceSolver pointer class */
+  explicit AcadoOCPInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
   
   /** \brief  Set a user-provided integrator */
   void setIntegrators(const std::vector<Integrator>& integrators);
@@ -57,10 +57,10 @@ class AcadoInternal : public FXInternal{
   public:
     
     /** \brief  Destructor */
-    virtual ~AcadoInternal();
+    virtual ~AcadoOCPInternal();
 
     // clone
-    virtual AcadoInternal* clone() const{ return new AcadoInternal(*this);}
+    virtual AcadoOCPInternal* clone() const{ return new AcadoOCPInternal(*this);}
     
     /** \brief  Initialize the solver */
     virtual void init();
@@ -123,4 +123,4 @@ class AcadoInternal : public FXInternal{
 
 } // namespace CasADi
 
-#endif //ACADO_INTERNAL_HPP
+#endif //ACADO_OCP_INTERNAL_HPP

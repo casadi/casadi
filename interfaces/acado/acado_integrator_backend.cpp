@@ -37,7 +37,7 @@ ACADO::Integrator* AcadoIntegratorBackend::create(void *user_data){
 }
 
 AcadoIntegratorBackend::AcadoIntegratorBackend(void *user_data){
-   ocp_solver_ = (CasADi::AcadoInternal*)user_data;
+   ocp_solver_ = (CasADi::AcadoOCPInternal*)user_data;
    my_ref_ = ocp_solver_->getRef(this);
    assert(ocp_solver_->integrators_.size()>my_ref_);
    integrator_ = ocp_solver_->integrators_[my_ref_];

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef ACADO_INTERFACE_HPP
-#define ACADO_INTERFACE_HPP
+#ifndef ACADO_OCP_HPP
+#define ACADO_OCP_HPP
 
 #include <casadi/fx/fx.hpp>
 #include <casadi/fx/integrator.hpp>
@@ -71,26 +71,26 @@ namespace CasADi{
   };
   
   // Forward declaration
-  class AcadoInternal;
+  class AcadoOCPInternal;
  
   // Smart pointer class
-  class AcadoInterface : public FX{
+  class AcadoOCPInterface : public FX{
     public:
 
       /// Default constructor
-      AcadoInterface();
+      AcadoOCPInterface();
 
       /// Constructor taking a DAE rhs function, an objective function and a constraint function -- for use with ACADO integrators
-      explicit AcadoInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+      explicit AcadoOCPInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
       /// Set a user-provided integrator
       void setIntegrators(const std::vector<Integrator>& integrators);
             
       /// Access functions and members of the node
-      AcadoInternal* operator->();
+      AcadoOCPInternal* operator->();
 
       /// Const access functions and members of the node
-      const AcadoInternal* operator->() const;
+      const AcadoOCPInternal* operator->() const;
       
       /// Check if the node is pointing to the right type of object
       virtual bool checkNode() const;
@@ -101,4 +101,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif //ACADO_INTERFACE_HPP
+#endif //ACADO_OCP_HPP

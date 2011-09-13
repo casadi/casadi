@@ -24,7 +24,7 @@
 #define ACADO_INTEGRATOR_BACKEND_HPP
 
 #include <acado/integrator/integrator.hpp>
-#include "acado_internal.hpp"
+#include "acado_ocp_internal.hpp"
 
 namespace CasADi{
 
@@ -42,7 +42,7 @@ class AcadoIntegratorBackend : public ACADO::Integrator{
   protected:
     
     // The calling acado interface
-    CasADi::AcadoInternal* ocp_solver_;
+    CasADi::AcadoOCPInternal* ocp_solver_;
     
     // Current derivative
     int ider_;

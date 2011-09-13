@@ -20,7 +20,7 @@
  *
  */
 
-#include "acado_internal.hpp"
+#include "acado_ocp_internal.hpp"
 
 #include <acado_optimal_control.hpp>
 
@@ -31,27 +31,27 @@ using namespace std;
 
 namespace CasADi{
 
-AcadoInterface::AcadoInterface(){ 
+AcadoOCPInterface::AcadoOCPInterface(){ 
 }
 
-AcadoInterface::AcadoInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
-  assignNode(new AcadoInternal(ffcn, mfcn, cfcn, rfcn));
+AcadoOCPInterface::AcadoOCPInterface(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
+  assignNode(new AcadoOCPInternal(ffcn, mfcn, cfcn, rfcn));
 }
 
-void AcadoInterface::setIntegrators(const vector<Integrator>& integrators){
+void AcadoOCPInterface::setIntegrators(const vector<Integrator>& integrators){
   (*this)->setIntegrators(integrators);
 }
 
-AcadoInternal* AcadoInterface::operator->(){
-  return (AcadoInternal*)(FX::operator->());
+AcadoOCPInternal* AcadoOCPInterface::operator->(){
+  return (AcadoOCPInternal*)(FX::operator->());
 }
 
-const AcadoInternal* AcadoInterface::operator->() const{
-   return (const AcadoInternal*)(FX::operator->()); 
+const AcadoOCPInternal* AcadoOCPInterface::operator->() const{
+   return (const AcadoOCPInternal*)(FX::operator->()); 
 }
 
-bool AcadoInterface::checkNode() const{
-  return dynamic_cast<const AcadoInternal*>(get());
+bool AcadoOCPInterface::checkNode() const{
+  return dynamic_cast<const AcadoOCPInternal*>(get());
 }
 
 

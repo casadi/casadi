@@ -20,7 +20,7 @@
  *
  */
 
-#include "acado_internal.hpp"
+#include "acado_ocp_internal.hpp"
 #include "acado_integrator_backend.hpp"
 
 #include <acado_optimal_control.hpp>
@@ -33,7 +33,7 @@ using namespace std;
 
 namespace CasADi{
 
-AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
+AcadoOCPInternal::AcadoOCPInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
   // Options
   addOption("integrator_tolerance",     OT_REAL);
   addOption("absolute_tolerance",       OT_REAL);
@@ -80,11 +80,11 @@ AcadoInternal::AcadoInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, con
   ACADO::Parameter().clearStaticCounters();
 }
 
-void AcadoInternal::setIntegrators(const vector<Integrator>& integrators){
+void AcadoOCPInternal::setIntegrators(const vector<Integrator>& integrators){
   integrators_ = integrators;
 }
 
-AcadoInternal::~AcadoInternal(){
+AcadoOCPInternal::~AcadoOCPInternal(){
 
   // Free memory
   if(t_) delete t_;
@@ -106,7 +106,7 @@ AcadoInternal::~AcadoInternal(){
 }
 
 
-void AcadoInternal::init(){
+void AcadoOCPInternal::init(){
   // Initialize the functions and get dimensions
   ffcn_.init();
   
@@ -228,7 +228,7 @@ void AcadoInternal::init(){
   
 }
 
-void AcadoInternal::evaluate(int nfdir, int nadir){ 
+void AcadoOCPInternal::evaluate(int nfdir, int nadir){ 
   // Initial constraint function
   if(!rfcn_.f_.isNull()){
     const Matrix<double>& lbr = input(ACADO_LBR);
@@ -318,17 +318,17 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
     #ifdef ACADO_HAS_USERDEF_INTEGRATOR
     else if(integ=="casadi"){
       if(ACADO::Integrator::integrator_creator_ || ACADO::Integrator::integrator_user_data_)
-        throw CasadiException("AcadoInternal::AcadoInternal: An instance already exists");
+        throw CasadiException("AcadoOCPInternal::AcadoOCPInternal: An instance already exists");
       
       if(integrators_.size() <= n_nodes_)
-        throw CasadiException("AcadoInternal::AcadoInternal: Number of integrators does not match number of shooting nodes");
+        throw CasadiException("AcadoOCPInternal::AcadoOCPInternal: Number of integrators does not match number of shooting nodes");
       
       ACADO::Integrator::integrator_creator_ = &AcadoIntegratorBackend::create;
       ACADO::Integrator::integrator_user_data_ = this;
       itype=ACADO::INT_UNKNOWN;
     }
     #endif
-  else throw CasadiException("AcadoInternal::evaluate: no such integrator: " + integ.toString());
+  else throw CasadiException("AcadoOCPInternal::evaluate: no such integrator: " + integ.toString());
     algorithm_->set(ACADO::INTEGRATOR_TYPE, itype);
   };
   
@@ -483,7 +483,7 @@ void AcadoInternal::evaluate(int nfdir, int nadir){
   output(ACADO_COST).set(cost);
 }
 
-int AcadoInternal::getRef(void *obj){
+int AcadoOCPInternal::getRef(void *obj){
   int ref;
   if(free_backends_.empty()){
     ref = backends_.size();
@@ -497,7 +497,7 @@ int AcadoInternal::getRef(void *obj){
   return ref;
 }
 
-void AcadoInternal::returnRef(int ref){
+void AcadoOCPInternal::returnRef(int ref){
   cout << "deleted ref = " << ref << endl;
   free_backends_.push(ref);
 }
