@@ -97,8 +97,8 @@ void IdasInternal::init(){
   }
   
   // Init ODE rhs function and quadrature functions, jacobian function
-  f_.init();
-  if(!q_.isNull()) q_.init();
+  if(!f_.isInit()) f_.init();
+  if(!q_.isNull() && !q_.isInit()) q_.init();
   
   log("IdasInternal::init","functions initialized");
   

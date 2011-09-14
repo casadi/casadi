@@ -84,7 +84,6 @@ int main(){
   IpoptSolver solver(ffcn,gfcn);
 
   // Set options
-  solver.setOption("tol",1e-6);
   solver.setOption("generate_hessian",true);
 
   // initialize the solver

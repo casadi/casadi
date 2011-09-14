@@ -24,12 +24,7 @@
 #define ACADO_FUNCTION_HPP
 
 #include <casadi/fx/fx.hpp>
-#include <acado/function/c_function.hpp>
-
-/** \brief  forward declarations */
-namespace ACADO{
-  class CFunction;
-}
+#include "acado_forward_declarations.hpp"
 
 namespace CasADi{
 

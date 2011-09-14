@@ -26,22 +26,9 @@
 #include "acado_ocp.hpp"
 #include "acado_function.hpp"
 #include "casadi/fx/fx_internal.hpp"
+#include "acado_forward_declarations.hpp"
 #include <stack>
 
-/** \brief  forward declarations */
-namespace ACADO{
-  class OCP;
-  class Time;
-  class DifferentialState;
-  class DifferentialStateDerivative;
-  class AlgebraicState;
-  class Control;
-  class Parameter;
-  class DifferentialEquation;
-  class IntermediateState;
-  class OCP;
-  class OptimizationAlgorithm;
-}
 namespace CasADi{
 
   

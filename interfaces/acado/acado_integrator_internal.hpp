@@ -24,8 +24,11 @@
 #define ACADO_INTEGRATOR_INTERNAL_HPP
 
 #include "acado_integrator.hpp"
+#include "acado_forward_declarations.hpp"
+#include "acado_function.hpp"
 #include "casadi/fx/integrator_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
+#include "casadi/fx/fx_internal.hpp"
 
 namespace CasADi{
   
@@ -59,7 +62,7 @@ class AcadoIntegratorInternal : public IntegratorInternal{
   virtual void resetAdj(){}
 
   /** \brief  Integrate until a specified time point */
-  virtual void integrate(double t_out){}
+  virtual void integrate(double t_out);
 
   /** \brief  Integrate backwards in time until a specified time point */
   virtual void integrateAdj(double t_out){}
@@ -78,6 +81,22 @@ class AcadoIntegratorInternal : public IntegratorInternal{
 
   /** \brief Get the Linear solver */
   virtual LinearSolver getLinearSolver(){}
+
+    // Dimensions
+    int nt_, nxd_, nxa_;
+        
+    /** \brief  Public pointers to ACADO classes  */
+    ACADO::TIME                 *t_;
+    ACADO::DifferentialState    *xd_;
+    ACADO::AlgebraicState       *xa_;
+    ACADO::Parameter            *p_;
+    ACADO::IntermediateState    *arg_;
+
+    ACADO::DifferentialEquation *diff_eq_;
+    ACADO::IntegratorBDF        *integrator_;
+
+    // DAE rhs
+    AcadoFunction rhs_;
 
 };
 
