@@ -38,5 +38,8 @@ namespace ACADO{
   class OptimizationAlgorithm;
   class CFunction;
   class IntegratorBDF;
+  class Grid;
+  class VariablesGrid;
+  class Vector;
 }
 #endif //ACADO_FORWARD_DECLARATIONS_HPP

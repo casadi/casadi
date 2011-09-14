@@ -52,11 +52,17 @@ class AcadoIntegratorInternal : public IntegratorInternal{
   /** \brief  Destructor */
   virtual ~AcadoIntegratorInternal();
 
+  /** \brief  Set all pointers to NULL */
+  void setNull();
+  
+  /** \brief  Deallocate memory */
+  void freeMem();
+  
   /** \brief  Initialize */
   virtual void init();
 
   /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfsens=0, int nasens=0){}
+  virtual void reset(int nfsens=0, int nasens=0);
 
   /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj(){}
@@ -98,6 +104,17 @@ class AcadoIntegratorInternal : public IntegratorInternal{
     // DAE rhs
     AcadoFunction rhs_;
 
+    // Integration grid
+    ACADO::Grid                 *interval_;
+    ACADO::VariablesGrid        *differentialStates_;
+    ACADO::VariablesGrid        *algebraicStates_;
+    ACADO::Vector               *tmp_;
+
+    // Number of interpolation time points
+    int num_grid_points_;
+    
+    // Has the system been integrated once after the last initialization?
+    bool has_been_integrated_;
 };
 
 

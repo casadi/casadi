@@ -35,8 +35,15 @@ namespace CasADi{
 AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("time_dependence",   OT_BOOLEAN,  true, "Explicit depencency of time in the DAE");
   addOption("num_algebraic",     OT_INTEGER,  0,    "Number of algebraic states");
+  addOption("num_grid_points",   OT_INTEGER,  2,  "Number of uniformly distributed grid points for obtaining the solution, does not influence the integration steps");
+  setNull();
+}
 
-  casadi_warning("AcadoIntegrator interface is under development");
+AcadoIntegratorInternal::~AcadoIntegratorInternal(){
+  freeMem();
+}
+
+void AcadoIntegratorInternal::setNull(){
   t_ = 0;
   xd_= 0;
   xa_ = 0;
@@ -44,9 +51,13 @@ AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& f, const FX& q) : Int
   arg_ = 0;
   diff_eq_ = 0;
   integrator_ = 0;
+  interval_ = 0;
+  algebraicStates_ = 0;
+  differentialStates_ = 0;
+  tmp_ = 0;
 }
 
-AcadoIntegratorInternal::~AcadoIntegratorInternal(){
+void AcadoIntegratorInternal::freeMem(){
   if(t_!= 0) delete t_;
   if(xd_!= 0) delete[] xd_;
   if(xa_!= 0) delete[] xa_;
@@ -54,6 +65,10 @@ AcadoIntegratorInternal::~AcadoIntegratorInternal(){
   if(arg_!= 0) delete arg_;
   if(diff_eq_!= 0) delete diff_eq_;
   if(integrator_ != 0) delete integrator_;
+  if(interval_ !=0) delete interval_;
+  if(differentialStates_!=0) delete differentialStates_;
+  if(algebraicStates_ !=0) delete algebraicStates_;
+  if(tmp_!=0) delete tmp_;
 }
 
 AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
@@ -64,6 +79,21 @@ AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
 }
 
 void AcadoIntegratorInternal::init(){
+  // Free memory and set pointers to NULL
+  freeMem();
+  setNull();
+  
+  // The following will make sure that no data lingers in ACADO
+  ACADO::AlgebraicState().clearStaticCounters();
+  ACADO::Control().clearStaticCounters();
+  ACADO::DifferentialState().clearStaticCounters();
+  ACADO::DifferentialStateDerivative().clearStaticCounters();
+  ACADO::Disturbance().clearStaticCounters();
+  ACADO::IntegerControl().clearStaticCounters();
+  ACADO::IntegerParameter().clearStaticCounters();
+  ACADO::IntermediateState().clearStaticCounters();
+  ACADO::Parameter().clearStaticCounters();
+  
   // Init ODE rhs function and quadrature functions, jacobian function
   if(!f_.isInit()) f_.init();
   casadi_assert(q_.isNull());
@@ -84,11 +114,6 @@ void AcadoIntegratorInternal::init(){
   rhs_ = AcadoFunction(f_);
   rhs_.init();
 
-  cout << "nxd_ = " << nxd_ << endl;
-  cout << "nxa_ = " << nxa_ << endl;
-  cout << "np_ = " << np_ << endl;
-  
-  
   // Declare ACADO variables
   t_ = new ACADO::TIME();
   xd_ = new ACADO::DifferentialState[nxd_];
@@ -109,44 +134,80 @@ void AcadoIntegratorInternal::init(){
 
   // Allocate an integrator
   integrator_ = new ACADO::IntegratorBDF(*diff_eq_);
+
+  // Grid points
+  num_grid_points_ = getOption("num_grid_points");
+  interval_ = new ACADO::Grid( t0_, tf_, num_grid_points_);
+  
+  // Variablesgrid for the solution
+  if(nxd_>0) differentialStates_ = new ACADO::VariablesGrid();
+  if(nxa_>0) algebraicStates_ = new ACADO::VariablesGrid();
+  
+  // Temporary
+  tmp_ = new ACADO::Vector();
+}
+
+void AcadoIntegratorInternal::reset(int nfsens, int nasens){
+  has_been_integrated_ = false;
 }
 
 void AcadoIntegratorInternal::integrate(double t_out){
-  
-    // DEFINE INITIAL VALUES:
-    // ----------------------
+  // Integrate the system if this has not already been done
+  if(!has_been_integrated_){
+    // Initial conditions
     double *x0 = getPtr(input(INTEGRATOR_X0));
     double *z0 = x0 + nxd_;
+    
+    // Parameters
     double *pp = getPtr(input(INTEGRATOR_P));
 
-    ACADO::Grid interval( 0.0, 1.0, 100 );
+    // Integrate
+    integrator_->integrate( *interval_, x0, z0, pp );
 
-
-    // START THE INTEGRATION:
-    // ----------------------
-    integrator_->integrate( interval, x0, z0, pp );
-
-    ACADO::VariablesGrid differentialStates;
-    ACADO::VariablesGrid algebraicStates   ;
-    ACADO::VariablesGrid intermediateStates;
-
-    integrator_->getX ( differentialStates );
-    integrator_->getXA( algebraicStates    );
-    integrator_->getI ( intermediateStates );
-
+    // Get solution
+    if(nxd_>0) integrator_->getX (*differentialStates_);
+    if(nxa_>0) integrator_->getXA(*algebraicStates_);
     
-    cout << "differentialStates:" << endl;
-    differentialStates.print();
-    cout << endl;
-
-    cout << "algebraicStates:" << endl;
-    algebraicStates.print();
-    cout << endl;
-
-    cout << "intermediateStates:" << endl;
-    intermediateStates.print();
-    cout << endl;
+    // Mark as integrated
+    has_been_integrated_ = true;
+  }
+  
+  // Get the grid point corresponding to the output time
+  double grid_point_cont = (num_grid_points_-1)*(t_out-t0_)/(tf_-t0_);
+  
+  // Get the time point before and after
+  int grid_point_before = std::floor(grid_point_cont);
+  int grid_point_after  = std::ceil(grid_point_cont);
+  
+  // Get data
+  for(int k=0; k< (nxa_==0 ? 1 : 2); ++k){
+    // Pointer to the data
+    double* xf = getPtr(output(INTEGRATOR_XF));
+    if(k==1) xf += nxd_;
+    
+    // Variablesgrid
+    ACADO::VariablesGrid* vgrid = k==0 ? differentialStates_ : algebraicStates_;
+    
+    // Get the value before the given time
+    *tmp_ = vgrid->getVector(grid_point_before);
+    xf << *tmp_;
+    
+    // Get the value after the given time and interpolate
+    if(grid_point_before!=grid_point_after){
+      *tmp_ = vgrid->getVector(grid_point_after);
+      
+      // Weights
+      double w_before = grid_point_after-grid_point_cont;
+      double w_after = grid_point_cont-grid_point_before;
+      
+      // Interpolate
+      for(int i=0; i<tmp_->getDim(); ++i){
+        xf[i] = w_before*xf[i] + w_after*(*tmp_)(i);
+      }
+    }
+  }
 }
+
 
 
 
