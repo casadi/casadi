@@ -302,9 +302,12 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       
       // Save sparsity
       ret[i] = SXMatrix(jacSparsity(iind,oind));
+      if(verbose()){
+        cout << "SXFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
+      }
     }
   }
-  
+
   if(verbose()) cout << "SXFunctionInternal::jac allocated return value" << endl;
   
   // Quick return if no jacobians to be calculated
@@ -1029,13 +1032,63 @@ void SXFunctionInternal::init(){
   if(jac_for_sens_){
     getFullJacobian();
   }
+  
+  // Print
+  if(verbose()){
+    cout << "SXFunctionInternal::init Initialized " << getOption("name") << " (" << algorithm_.size() << " elementary operations)" << endl;
+  }
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
-  SXFunction f;
-  f.assignNode(this);
-  Matrix<SX> H = f.hess(iind,oind);
-  return SXFunction(inputv_,H);
+  if(output(oind).numel() != 1)
+    throw CasadiException("SXFunctionInternal::hess: function must be scalar");
+  
+  // Reverse mode to calculate gradient
+  if(verbose()){
+    cout << "SXFunctionInternal::hessian: calculating gradient " << endl;
+  }
+  SXFunction this_;
+  this_.assignNode(this);
+  Matrix<SX> g = this_.grad(iind,oind);
+  if(verbose()){
+    cout << "SXFunctionInternal::hessian: calculating gradient done " << endl;
+  }
+
+  // Numeric or symbolic hessian
+  bool numeric_hessian = getOption("numeric_hessian");
+  
+  // Hessian function
+  FX hfcn;
+  
+  if(numeric_hessian){
+    // Create function including all inputs
+    SXFunction gfcn(inputv_,g);
+    gfcn.setOption("verbose",getOption("verbose"));
+    gfcn.setOption("numeric_jacobian",true);
+    gfcn.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    gfcn.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
+    gfcn.init();
+    
+    if(verbose()) cout << "SXFunctionInternal::hessian: calculating numeric Jacobian " << endl;
+    hfcn = static_cast<FX&>(gfcn).jacobian(iind,0); // TODO: SXFunction::Jacobian cannot return SXFunction!!!
+    
+  } else {
+    // Create function including only input to be differentiated
+    SXFunction gfcn(inputv_.at(iind),g);
+    gfcn.setOption("verbose",getOption("verbose"));
+    gfcn.setOption("numeric_jacobian",false);
+    gfcn.init();
+    
+    if(verbose()) cout << "SXFunctionInternal::hessian: calculating symbolic Jacobian" << endl;
+    SXMatrix h = gfcn.jac(0,0);
+    hfcn = SXFunction(inputv_,h);
+  }
+  
+  // Calculate jacobian of gradient
+  if(verbose()) cout << "SXFunctionInternal::hessian: calculating Hessian done" << endl;
+  
+  // Return jacobian of the gradient
+  return hfcn;
 }
 
 void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s, bool eliminate_constants){

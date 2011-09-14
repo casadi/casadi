@@ -123,13 +123,7 @@ SXMatrix SXFunction::hess(int iind, int oind){
   
   // Create function
   SXFunction gfcn(inputSX(iind),g);
-
-  // Make gradient verbose
-  if((*this)->verbose()){
-    gfcn.setOption("verbose",true);
-  }
-  
-  // Initialize
+  gfcn.setOption("verbose",getOption("verbose"));
   gfcn.init();
   
   // Calculate jacobian of gradient

@@ -163,7 +163,7 @@ void NLPSolverInternal::init(){
       log("Unconstrained Hessian function generated");
       
     } else { // G_.isNull()
-    
+      
       // Check if the functions are SXFunctions
       SXFunction F_sx = shared_cast<SXFunction>(F_);
       SXFunction G_sx = shared_cast<SXFunction>(G_);
@@ -176,6 +176,16 @@ void NLPSolverInternal::init(){
         // Expression for f and g
         SXMatrix f = F_sx.outputSX();
         SXMatrix g = G_sx.outputSX();
+        
+        // Numeric hessian
+        bool f_num_hess = F_sx.getOption("numeric_hessian");
+        bool g_num_hess = G_sx.getOption("numeric_hessian");
+        
+        // Number of derivative directions
+        bool f_num_fwd = F_sx.getOption("number_of_fwd_dir");
+        bool g_num_fwd = G_sx.getOption("number_of_fwd_dir");
+        bool f_num_adj = F_sx.getOption("number_of_adj_dir");
+        bool g_num_adj = G_sx.getOption("number_of_adj_dir");
         
         // Substitute symbolic variables in f if different input variables from g
         if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
@@ -194,10 +204,15 @@ void NLPSolverInternal::init(){
         lfcn_in[1] = lam;
         lfcn_in[2] = sigma;
         SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
+        lfcn.setOption("verbose",getOption("verbose"));
+        lfcn.setOption("numeric_hessian",f_num_hess || g_num_hess);
+        lfcn.setOption("number_of_fwd_dir",std::min(f_num_fwd,g_num_fwd));
+        lfcn.setOption("number_of_adj_dir",std::min(f_num_adj,g_num_adj));
         lfcn.init();
         
         // Hessian of the Lagrangian
-        H_ = lfcn.hessian();
+        H_ = static_cast<FX&>(lfcn).hessian();
+        H_.setOption("verbose",getOption("verbose"));
         log("SX Hessian function generated");
         
       } else { // !F_sx.isNull() && !G_sx.isNull()
