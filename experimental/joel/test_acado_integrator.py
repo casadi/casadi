@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 # CasADi
 from casadi import *
 
+# End time
+tf = 1.0
+
 # Variables
 t = ssym("t")
 x = ssym("x")
@@ -30,6 +33,7 @@ integrator = AcadoIntegrator(ffcn)
 integrator.setOption("time_dependence",False)
 integrator.setOption("num_algebraic",1)
 integrator.setOption("num_grid_points",100)
+integrator.setOption("tf",tf)
 integrator.init()
 
 # Initial conditions
@@ -38,11 +42,22 @@ pq0 = array([1.0, 1.0])
 integrator.setInput(xz0, INTEGRATOR_X0)
 integrator.setInput(pq0, INTEGRATOR_P)
 
-# Integrate
-integrator.evaluate()
+# Seeds
+integrator.setFwdSeed([0.,0.], INTEGRATOR_X0)
+integrator.setFwdSeed([1.,0.], INTEGRATOR_P)
+integrator.setAdjSeed([1.,0.], INTEGRATOR_XF)
+
+# Integrate with forward and adjoint sensitivities
+integrator.evaluate(1,0)
+#integrator.evaluate(1,1) # NOTE ACADO does not support adjoint mode AD using interfaced functions
+
+# Result
+print "final state =           ", integrator.output(INTEGRATOR_XF).data(), " (XF)"
+print "forward sensitivities = ", integrator.fwdSens(INTEGRATOR_XF).data(), " (XF)"
+#print "adjoint sensitivities = ", integrator.adjSens(INTEGRATOR_X0).data(), " (X0), ", integrator.adjSens(INTEGRATOR_P).data(), " (P)"
 
 # Create a simulator
-tgrid = numpy.linspace(0,1,100)
+tgrid = numpy.linspace(0,tf,100)
 simulator = Simulator(integrator,tgrid)
 simulator.init()
 simulator.setInput(xz0, INTEGRATOR_X0)

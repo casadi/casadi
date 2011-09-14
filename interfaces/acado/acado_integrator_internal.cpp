@@ -55,6 +55,8 @@ void AcadoIntegratorInternal::setNull(){
   algebraicStates_ = 0;
   differentialStates_ = 0;
   tmp_ = 0;
+  x_tmp_ = 0;
+  p_tmp_ = 0;
 }
 
 void AcadoIntegratorInternal::freeMem(){
@@ -69,6 +71,8 @@ void AcadoIntegratorInternal::freeMem(){
   if(differentialStates_!=0) delete differentialStates_;
   if(algebraicStates_ !=0) delete algebraicStates_;
   if(tmp_!=0) delete tmp_;
+  if(x_tmp_!=0) delete x_tmp_;
+  if(p_tmp_!=0) delete p_tmp_;
 }
 
 AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
@@ -120,6 +124,10 @@ void AcadoIntegratorInternal::init(){
   xa_ = new ACADO::AlgebraicState[nxa_];
   p_ = new ACADO::Parameter[np_];
 
+  // Temporary vector
+  x_tmp_ = new ACADO::Vector(nxd_);
+  if(np_>0) p_tmp_ = new ACADO::Vector(np_);
+  
   // Augmented state vector
   arg_ = new ACADO::IntermediateState(nt_+nxd_+nxa_+np_);
   int ind=0;
@@ -148,7 +156,13 @@ void AcadoIntegratorInternal::init(){
 }
 
 void AcadoIntegratorInternal::reset(int nfsens, int nasens){
+  if(nfsens>0 ||  nasens>0){
+    integrator_->freezeAll();
+  }
   has_been_integrated_ = false;
+  nfsens_ = nfsens;
+  nasens_ = nasens;
+  casadi_assert_message(nasens==0, "ACADO does not support adjoint directional derivatives for c_operator. Please contact the ACADO developers to request this feature.");
 }
 
 void AcadoIntegratorInternal::integrate(double t_out){
@@ -167,6 +181,60 @@ void AcadoIntegratorInternal::integrate(double t_out){
     // Get solution
     if(nxd_>0) integrator_->getX (*differentialStates_);
     if(nxa_>0) integrator_->getXA(*algebraicStates_);
+    
+    // Forward sensitivities
+    for(int dir=0; dir<nfsens_; ++dir){
+      // Order
+      const int order = 1;
+      
+      // Get pointer
+      double *xseed = getPtr(fwdSeed(INTEGRATOR_X0,dir));
+      double *pseed = getPtr(fwdSeed(INTEGRATOR_P,dir));
+      
+      // Pass seeds
+      *x_tmp_ << xseed;
+      if(np_>0) *p_tmp_ << pseed;
+      integrator_->setForwardSeed(order, *x_tmp_, *p_tmp_);
+      
+      // Calculate sensitivities
+      integrator_->integrateSensitivities();
+      
+      // Get pointer
+      x_tmp_->setZero();
+      integrator_->getForwardSensitivities(*x_tmp_, order);
+      double *xsens = getPtr(fwdSens(INTEGRATOR_XF,dir));
+      xsens << *x_tmp_;
+    }
+    
+    // Adjoint sensitivities
+    for(int dir=0; dir<nasens_; ++dir){
+      // Order
+      const int order = 1;
+      
+      // Get pointer
+      double *xseed = getPtr(adjSeed(INTEGRATOR_XF,dir));
+      
+      // Pass seeds
+      *x_tmp_ << xseed;
+      integrator_->setBackwardSeed(order, *x_tmp_);
+
+      // Clear forward seeds
+      x_tmp_->setZero();
+      p_tmp_->setZero();
+      integrator_->setForwardSeed(order, *x_tmp_, *p_tmp_);
+      
+      // Calculate sensitivities
+      integrator_->integrateSensitivities();
+      
+      // Get pointer
+      double *xsens = getPtr(adjSens(INTEGRATOR_X0,dir));
+      double *psens = getPtr(adjSens(INTEGRATOR_P,dir));
+      x_tmp_->setZero();
+      p_tmp_->setZero();
+/*      integrator_->getBackwardSensitivities(ACADO::emptyVector, ACADO::emptyVector, ACADO::emptyVector, ACADO::emptyVector, order);*/
+/*      xsens << *x_tmp_;
+      if(np_>0) psens << *p_tmp_;*/
+    }
     
     // Mark as integrated
     has_been_integrated_ = true;

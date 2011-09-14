@@ -109,12 +109,18 @@ class AcadoIntegratorInternal : public IntegratorInternal{
     ACADO::VariablesGrid        *differentialStates_;
     ACADO::VariablesGrid        *algebraicStates_;
     ACADO::Vector               *tmp_;
-
+    
+    // Seed/sensitivity vectors
+    ACADO::Vector               *x_tmp_, *p_tmp_;
+    
     // Number of interpolation time points
     int num_grid_points_;
     
     // Has the system been integrated once after the last initialization?
     bool has_been_integrated_;
+    
+    // Derivatives
+    int nfsens_, nasens_;
 };
 
 
