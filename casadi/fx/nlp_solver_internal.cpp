@@ -332,13 +332,16 @@ void NLPSolverInternal::init(){
     pm_ = pm;
   }
   
+  // Infinity
+  double inf = numeric_limits<double>::infinity();
+  
   // Allocate space for inputs
   input_.resize(NLP_NUM_IN);
   input(NLP_X_INIT)      = DMatrix(n_,1,0);
-  input(NLP_LBX)         = DMatrix(n_,1,0);
-  input(NLP_UBX)         = DMatrix(n_,1,0);
-  input(NLP_LBG)         = DMatrix(m_,1,0);
-  input(NLP_UBG)         = DMatrix(m_,1,0);
+  input(NLP_LBX)         = DMatrix(n_,1,-inf);
+  input(NLP_UBX)         = DMatrix(n_,1, inf);
+  input(NLP_LBG)         = DMatrix(m_,1,-inf);
+  input(NLP_UBG)         = DMatrix(m_,1, inf);
   input(NLP_LAMBDA_INIT) = DMatrix(m_,1,0);
   input(NLP_P)           = DMatrix(pn_,pm_,0);
   

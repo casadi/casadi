@@ -499,23 +499,22 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
     log("eval_g started");
     double time1 = clock();
 
-    casadi_assert(n == n_);
-    casadi_assert(m == m_);
+    if(m>0){
+      // Pass the argument to the function
+      G_.setInput(x);
 
-    // Pass the argument to the function
-    G_.setInput(x);
+      // Evaluate the function and tape
+      G_.evaluate();
 
-    // Evaluate the function and tape
-    G_.evaluate();
+      // Ge the result
+      G_.getOutput(g);
 
-    // Ge the result
-    G_.getOutput(g);
-
-    if(monitored("eval_x"))
-      cout << "x = " << G_.input() << endl;
-    // Printing
-    if(monitored("eval_g"))
-      cout << "g = " << G_.output() << endl;
+      if(monitored("eval_x"))
+        cout << "x = " << G_.input() << endl;
+      // Printing
+      if(monitored("eval_g"))
+        cout << "g = " << G_.output() << endl;
+    }
       
     double time2 = clock();
     t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -615,22 +614,24 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
 {
   try {
     bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
+    casadi_assert_warning(init_x,"Not initializing x");
     if (warmstart) {
-      input(NLP_X_INIT).getArray(x,n);
-      if (init_z) {
-        output(NLP_LAMBDA_LBX).getArray(z_L,n);
-        output(NLP_LAMBDA_UBX).getArray(z_U,n);
-      }
-      if (init_lambda)
-        input(NLP_LAMBDA_INIT).getArray(lambda,m);
-      return true;
-    } else {
-      casadi_assert(init_x == true);
-      casadi_assert(init_z == false);
-      casadi_assert(init_lambda == false);
-      input(NLP_X_INIT).getArray(x,n);
-      return true;
+      casadi_assert_warning(init_lambda,"Not initializing lambda");
+      casadi_assert_warning(init_z,"Not initializing z");
     }
+      
+    if(init_x) 
+      input(NLP_X_INIT).getArray(x,n);
+    
+    if (init_z) {
+      output(NLP_LAMBDA_LBX).getArray(z_L,n);
+      output(NLP_LAMBDA_UBX).getArray(z_U,n);
+    }
+    
+    if (init_lambda)
+      input(NLP_LAMBDA_INIT).getArray(lambda,m);
+    
+    return true;
   } catch (exception& ex){
     cerr << "get_starting_point failed: " << ex.what() << endl;
     return false;
