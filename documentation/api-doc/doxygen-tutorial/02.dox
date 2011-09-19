@@ -18,8 +18,8 @@ CMake (tested with version 2.8.2).
 <center>
 <table border="1" bordercolor="" style="background-color:" width="400" cellpadding="3" cellspacing="3">
         <tr>
-                <td>Package/interface</td>
-                <td>Dependency</td>
+                <td><b>Package/interface</b></td>
+                <td><b>Dependency</b></td>
         </tr>
         <tr>
                 <td>CasADi core</td>
@@ -79,9 +79,17 @@ Generate the <tt>Makefile</tt> by typing
 cmake ..
 \endcode
 Check the output of CMake if the dependencies are correctly located. The interfaces without underlying libraries and headers won't be compiled.
+Adjust CMake variables (e.g. CMAKE_INSTALL_PREFIX if you want to install headers and libraries) by typing
+\code
+ccmake ..
+\endcode
 Now compile the C++ libraries.
 \code
 make
+\endcode
+And install headers and libraries
+\code
+make install
 \endcode
 If you wish to use the python interface you can compile it with the <tt>python</tt> target.
 \code

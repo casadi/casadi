@@ -176,7 +176,7 @@ Now we define and evaluate a vector-vector function.
     10  fill(d.begin(), d.end(), 2);
     11  f.setInput(d);
     12  f.evaluate();
-    13  vector<double> value = f.output();
+    13  vector<double> value = f.output().data();
     14  cout << "[" << value.size() << "](";
     15  for(int i = 0; i < value.size(); ++i){
     16     cout << value[i] << ",";
@@ -192,8 +192,8 @@ Now we define and evaluate a vector-vector function.
    </tr>
    </table>
 This time both arguments of the constructor on line 7 are \c std::vector<SX>
- and the return value of the
- SXFunction.output() member function is a \c std::vector<double> (line 13).
+ and the function value is accessible via
+ SXFunction.output().data() (line 13).
 
 As the last example let's see a piece of code, where the function depends on a  <tt> std::vector<std::vector<SX> > </tt>. 
 Note that this covers the case when our function depends on a matrix.
@@ -220,7 +220,7 @@ Note that this covers the case when our function depends on a matrix.
     17  f.setInput(d0, 0);
     18  f.setInput(d1, 1);
     19  f.evaluate();
-    20  vector<double> value = f.output();
+    20  vector<double> value = f.output().data();
     21  cout << "[" << value.size() << "](";
     22  for(int i = 0; i < value.size(); ++i){
     23     cout << value[i] << ",";
@@ -305,11 +305,11 @@ In the following code we calculate the full Jacobian providing multiple directio
     16     f.setFwdSeed(fwd_seed, 0, i);
     17     fwd_seed[i] = 0;
     18  }
-    19  f.evaluate(1, 0);
+    19  f.evaluate(x.size(), 0);
     20  cout << "Function value: " << f.output() << endl;
     21  vector<double> jacobian_column;
     22  for(int i = 0; i < x.size(); ++i){
-    23     jacobian_column = f.fwdSens(0, i);
+    23     jacobian_column = f.fwdSens(0, i).data();
     24     cout << "[" << jacobian_column.size() << "](";
     25     for(int j = 0; j < jacobian_column.size(); ++j){
     26        cout << jacobian_column[j] << ",";
@@ -331,9 +331,9 @@ Function value: [24,3.34636]
  The first new thing is on line 7, we set an option called \c number_of_fwd_dir to the number
 of the forward directions in which we would like to differentiate. On line 16 we are inside a for loop
 and we provide the directions; now only columns of the identity matrix. The way of evaluation is also
-slightly different (line 19), so far we haven't given any arguments. The first argument indicates that we would like
-forward derivatives to be evaluated as well as function evaluation, the second is just the same,
- but with adjoint derivatives. We can collect our
+slightly different (line 19), so far we haven't given any arguments. The first argument indicates the number of
+forward derivatives to be evaluated, the second is just the same,
+ but with adjoint derivatives. In any case, the function itself is evaluated. We can collect our
 directional derivatives by the CasADi::SXFunction::fwdSens() member function (line 23). Note that the first argument addresses
 the the matrix input. Since we have only vector input now, this is always zero.
 
