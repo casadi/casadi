@@ -121,6 +121,9 @@ class AcadoIntegratorInternal : public IntegratorInternal{
     
     // Derivatives
     int nfsens_, nasens_;
+    
+    // Grid frozen
+    bool frozen_grid_;
 };
 
 

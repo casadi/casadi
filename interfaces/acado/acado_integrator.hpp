@@ -71,6 +71,12 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Freeze the grid from now on
+  void freeze();
+  
+  /// Unfreeze
+  void unFreeze();
+  
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

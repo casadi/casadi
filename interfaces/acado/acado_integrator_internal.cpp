@@ -57,6 +57,7 @@ void AcadoIntegratorInternal::setNull(){
   tmp_ = 0;
   x_tmp_ = 0;
   p_tmp_ = 0;
+  frozen_grid_ = false;
 }
 
 void AcadoIntegratorInternal::freeMem(){
@@ -234,6 +235,11 @@ void AcadoIntegratorInternal::integrate(double t_out){
 /*      integrator_->getBackwardSensitivities(ACADO::emptyVector, ACADO::emptyVector, ACADO::emptyVector, ACADO::emptyVector, order);*/
 /*      xsens << *x_tmp_;
       if(np_>0) psens << *p_tmp_;*/
+    }
+    
+    // Unfreeze the grid
+    if(!frozen_grid_){
+      integrator_->unfreeze();
     }
     
     // Mark as integrated

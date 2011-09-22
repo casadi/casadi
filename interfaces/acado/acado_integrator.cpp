@@ -46,6 +46,15 @@ bool AcadoIntegrator::checkNode() const{
   return dynamic_cast<const AcadoIntegratorInternal*>(get());
 }
 
+void AcadoIntegrator::freeze(){
+  (*this)->frozen_grid_ = true;
+}
+  
+void AcadoIntegrator::unFreeze(){
+  (*this)->frozen_grid_ = false;
+}
+
+
 } // namespace CasADi
 
 
