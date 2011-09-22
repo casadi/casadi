@@ -75,7 +75,7 @@ public:
   void freeze();
   
   /// Unfreeze
-  void unFreeze();
+  void unfreeze();
   
   /// Static creator function
   #ifdef SWIG

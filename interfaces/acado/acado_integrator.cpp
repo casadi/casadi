@@ -50,7 +50,7 @@ void AcadoIntegrator::freeze(){
   (*this)->frozen_grid_ = true;
 }
   
-void AcadoIntegrator::unFreeze(){
+void AcadoIntegrator::unfreeze(){
   (*this)->frozen_grid_ = false;
 }
 
