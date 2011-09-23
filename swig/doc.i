@@ -21,6 +21,418 @@ C++ includes: acado_function.hpp ";
 %feature("docstring")  CasADi::AcadoFunction::fcn_adj "";
 
 
+// File: classCasADi_1_1AcadoIntegrator.xml
+%feature("docstring") CasADi::AcadoIntegrator "
+
+Interface to ACADO Integrator from the ACADO Toolkit.
+
+Creates an integrator instance which solves initial value problems in
+differential-algebraic equations of the semi-explicit form:
+
+der(xd) = fd(t,[xd,xa],p)       0   = fa(t,[xd,xa],p)
+
+The DAE thus consists of an differential part (fd) and an algebraic part
+(fa). In the same way, the state vector is also composed of two parts, the
+differential states xd and the algebraic states xa. The complete state is
+thus x := [xd,xa]
+
+Joel Andersson
+
+C++ includes: acado_integrator.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::AcadoIntegrator::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::AcadoIntegrator::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::AcadoIntegrator::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::makeUnique "";
+
+%feature("docstring")  CasADi::AcadoIntegrator::AcadoIntegrator "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::AcadoIntegrator "
+
+Create an integrator for a fully implicit DAE with quadrature states (nz is
+the number of states not to be included in the state vector) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::freeze "
+
+Freeze the grid from now on. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::unfreeze "
+
+Unfreeze. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::printStats "
+
+Print solver statistics. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::reset "
+
+Reset the solver and bring the time back to t0. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::integrate "
+
+Integrate until a specified time point. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::resetAdj "
+
+Reset the solver of the adjoint problem and take time to tf. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::integrateAdj "
+
+Integrate backwards in time until a specified time point. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setInitialTime "
+
+Set initial time. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setFinalTime "
+
+Set final time. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setStopTime "
+
+Set a stop time for the forward integration. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setLinearSolver "
+
+Set linear solver. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getJacobian "
+
+Get the Jacobian. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getLinearSolver "
+
+Get the Linear solver. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getDAE "
+
+Get the DAE. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
+approach. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::call "
+
+Create a function call (evaluation mx node), single input. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::call "
+
+Evaluate numerically (shorthand) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::call "
+
+Evaluate symbolically (scalar graph) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::call "
+
+Evaluate symbolically (matrix graph) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::AcadoIntegrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
 // File: classCasADi_1_1AcadoIntegratorBackend.xml
 %feature("docstring") CasADi::AcadoIntegratorBackend "C++ includes:
 acado_integrator_backend.hpp ";
@@ -67,6 +479,324 @@ The (virtual) copy constructor ";
 CasADi::AcadoIntegratorBackend::getNumberOfRejectedSteps "";
 
 %feature("docstring")  CasADi::AcadoIntegratorBackend::getStepSize "";
+
+
+// File: classCasADi_1_1AcadoIntegratorInternal.xml
+%feature("docstring") CasADi::AcadoIntegratorInternal "
+
+Creates an integrator instance which solves initial value problems in
+differential-algebraic equations of the semi-explicit form:
+
+der(xd) = fd(t,[xd,xa],p)       0   = fa(t,[xd,xa],p)
+
+The DAE thus consists of an differential part (fd) and an algebraic part
+(fa). In the same way, the state vector is also composed of two parts, the
+differential states xd and the algebraic states xa. The complete state is
+thus x := [xd,xa]
+
+C++ includes: acado_integrator_internal.hpp ";
+
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::AcadoIntegratorInternal "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::create "
+
+Create a new integrator. ";
+
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::~AcadoIntegratorInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setNull "
+
+Set all pointers to NULL. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::freeMem "
+
+Deallocate memory. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::reset "
+
+Reset the solver and bring the time back to t0. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::resetAdj "
+
+Reset the solver of the adjoint problem and take time to tf. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::integrate "
+
+Integrate until a specified time point. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::integrateAdj "
+
+Integrate backwards in time until a specified time point. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setStopTime "
+
+Set the stop time of the forward integration. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::printStats "
+
+Print solver statistics. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setLinearSolver "
+
+Set linear solver. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getJacobian "
+
+Get the Jacobian. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getLinearSolver "
+
+Get the Linear solver. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::evaluate "
+
+evaluate ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::jac "
+
+Create an integrator which integrates the ODE/DAE augmented with the forward
+sensitivity equations. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setInitialTime "
+
+Set initial time. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setFinalTime "
+
+Set final time. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setDimensions "";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::print "
+
+Print. ";
+
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::isInit "
+
+Assert that the function has been initialized. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::repr "
+
+Print representation. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getCount "
+
+Get the reference count. ";
 
 
 // File: classCasADi_1_1AcadoInterface.xml
@@ -256,342 +986,7 @@ CasADi::AcadoIntegratorBackend::getNumberOfRejectedSteps "";
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: acado_interface.hpp ";
-
-/*  Setters  */
-
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
-
-*/
-
-%feature("docstring")  CasADi::AcadoInterface::setInput "
-
-Reads in the input argument from val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setOutput "
-
-Reads in the output argument from val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setFwdSeed "
-
-Reads in the forward seed from val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setFwdSens "
-
-Reads in the forward sensitivity from val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setAdjSeed "
-
-Reads in the adjoint seed from val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setAdjSens "
-
-Reads in the adjoint sensitivity from val. ";
-
-/*  Getters  */
-
-/* A group of accessor for numerical data that operate on preallocated data.
-get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
-
-*/
-
-%feature("docstring")  CasADi::AcadoInterface::getInput "
-
-Writes out the input argument into val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getOutput "
-
-Writes out the output argument into val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getFwdSeed "
-
-Writes out the forward seed into val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getFwdSens "
-
-Writes out the forward sensitivity into val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getAdjSeed "
-
-Writes out the adjoint seed into val. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getAdjSens "
-
-Writes out the adjoint sensitivity into val. ";
-
-/*  Option Functionality  */
-
-%feature("docstring")  CasADi::AcadoInterface::setOption "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setOption "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::AcadoInterface::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::AcadoInterface::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::AcadoInterface::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::AcadoInterface::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::AcadoInterface::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::AcadoInterface::makeUnique "
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object. ";
-
-%feature("docstring")  CasADi::AcadoInterface::makeUnique "";
-
-%feature("docstring")  CasADi::AcadoInterface::AcadoInterface "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::AcadoInterface::AcadoInterface "
-
-Constructor taking a DAE rhs function, an objective function and a
-constraint function -- for use with ACADO integrators. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setIntegrators "
-
-Set a user-provided integrator. ";
-
-%feature("docstring")  CasADi::AcadoInterface::checkNode "
-
-Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getNumInputs "
-
-Get number of inputs. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getNumOutputs "
-
-Get number of outputs. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setNumInputs "
-
-Set number of inputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::AcadoInterface::setNumOutputs "
-
-Set number of outputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::AcadoInterface::evaluate_old "
-
-Evaluate (old style) ";
-
-%feature("docstring")  CasADi::AcadoInterface::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::AcadoInterface::solve "
-
-the same as evaluate(0,0) ";
-
-%feature("docstring")  CasADi::AcadoInterface::jacobian "
-
-Calculate jacobian of output oind with respect to input iind.
-
-This method calls the method jacobian on the internal twin of this class.
-The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
-approach. ";
-
-%feature("docstring")  CasADi::AcadoInterface::jacobian "
-
-Calculate the jacobian of a number of function outputs with respect to a
-number of function inputs, optionally include the function outputs. ";
-
-%feature("docstring")  CasADi::AcadoInterface::hessian "
-
-Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::AcadoInterface::call "
-
-Create a function call (evaluation mx node), single input. ";
-
-%feature("docstring")  CasADi::AcadoInterface::call "
-
-Evaluate numerically (shorthand) ";
-
-%feature("docstring")  CasADi::AcadoInterface::call "
-
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::AcadoInterface::call "
-
-Evaluate symbolically (matrix graph) ";
-
-%feature("docstring")  CasADi::AcadoInterface::call "
-
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer. ";
-
-%feature("docstring")  CasADi::AcadoInterface::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::AcadoInterface::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::AcadoInterface::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInterface::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInterface::output "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInterface::output "
-
-Access output argument Note that copies in Python are shallow by default and
-fx.output() gives a reference/pointer to an internal data structure. So if
-you want save fx.output(), you need to make a deep copy using for example
-DMatrix(fx.output()). ";
-
-%feature("docstring")  CasADi::AcadoInterface::fwdSeed "
-
-Const access forward seed. ";
-
-%feature("docstring")  CasADi::AcadoInterface::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::AcadoInterface::fwdSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInterface::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInterface::adjSeed "
-
-Const access adjoint seed. ";
-
-%feature("docstring")  CasADi::AcadoInterface::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::AcadoInterface::adjSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInterface::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInterface::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::AcadoInterface::removeMonitor "
-
-Remove modules to be monitored. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::AcadoInterface::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::AcadoInterface::clone "
-
-Deep copy. ";
-
-%feature("docstring")  CasADi::AcadoInterface::assignNode "
-
-Assign the node to a node class pointer (or null) ";
-
-%feature("docstring")  CasADi::AcadoInterface::assignNodeNoCount "
-
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks! ";
-
-%feature("docstring")  CasADi::AcadoInterface::get "
-
-Get a const pointer to the node. ";
-
-%feature("docstring")  CasADi::AcadoInterface::get "
-
-Get a pointer to the node. ";
-
-%feature("docstring")  CasADi::AcadoInterface::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::AcadoInterface::swap "
-
-Swap content with another instance. ";
-
-%feature("docstring")  CasADi::AcadoInterface::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::AcadoInterface::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::AcadoInterface::init "
-
-Initialize the object: more documentation in the node class (
-SharedObjectNode and derived classes) ";
-
-%feature("docstring")  CasADi::AcadoInterface::isInit "
-
-Is initialized? ";
-
-%feature("docstring")  CasADi::AcadoInterface::isNull "
-
-Is a null pointer? ";
-
-%feature("docstring")  CasADi::AcadoInterface::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::AcadoInterface::getDescription "
-
-Return a string with a destription (for SWIG) ";
+C++ includes: b0_options.hpp ";
 
 
 // File: classCasADi_1_1AcadoInternal.xml
@@ -781,236 +1176,590 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: acado_internal.hpp ";
+C++ includes: b0_options.hpp ";
 
-%feature("docstring")  CasADi::AcadoInternal::~AcadoInternal "
 
-Destructor. ";
+// File: classCasADi_1_1AcadoOCP.xml
+%feature("docstring") CasADi::AcadoOCP "C++ includes: acado_ocp.hpp ";
 
-%feature("docstring")  CasADi::AcadoInternal::clone "
+/*  Setters  */
 
-Make a deep copy of the instance. ";
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
 
-%feature("docstring")  CasADi::AcadoInternal::init "
+*/
 
-Initialize the solver. ";
+%feature("docstring")  CasADi::AcadoOCP::setInput "
 
-%feature("docstring")  CasADi::AcadoInternal::evaluate "
+Reads in the input argument from val. ";
 
-Solve the problem. ";
+%feature("docstring")  CasADi::AcadoOCP::setOutput "
 
-%feature("docstring")  CasADi::AcadoInternal::getRef "";
+Reads in the output argument from val. ";
 
-%feature("docstring")  CasADi::AcadoInternal::returnRef "";
+%feature("docstring")  CasADi::AcadoOCP::setFwdSeed "
 
-%feature("docstring")  CasADi::AcadoInternal::evaluate_switch "
+Reads in the forward seed from val. ";
 
-Evaluate switch. ";
+%feature("docstring")  CasADi::AcadoOCP::setFwdSens "
 
-%feature("docstring")  CasADi::AcadoInternal::jacobian "
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::AcadoOCP::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::AcadoOCP::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::AcadoOCP::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::AcadoOCP::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::AcadoOCP::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::AcadoOCP::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::AcadoOCP::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::AcadoOCP::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::AcadoOCP::makeUnique "";
+
+%feature("docstring")  CasADi::AcadoOCP::AcadoOCP "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::AcadoOCP::AcadoOCP "
+
+Constructor taking a DAE rhs function, an objective function and a
+constraint function -- for use with ACADO integrators. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setIntegrators "
+
+Set a user-provided integrator. ";
+
+%feature("docstring")  CasADi::AcadoOCP::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::AcadoOCP::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::AcadoOCP::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::AcadoOCP::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::AcadoOCP::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::AcadoOCP::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
+approach. ";
+
+%feature("docstring")  CasADi::AcadoOCP::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
 number of function inputs, optionally include the function outputs. ";
 
-%feature("docstring")  CasADi::AcadoInternal::jacobian_switch "
-
-Switch between numeric and symbolic jacobian. ";
-
-%feature("docstring")  CasADi::AcadoInternal::numeric_jacobian "
-
-Numeric Jacobian. ";
-
-%feature("docstring")  CasADi::AcadoInternal::hessian "
+%feature("docstring")  CasADi::AcadoOCP::hessian "
 
 Hessian of output oind with respect to input iind. ";
 
-%feature("docstring")  CasADi::AcadoInternal::inputStruct "
+%feature("docstring")  CasADi::AcadoOCP::call "
 
-Access an input. ";
+Create a function call (evaluation mx node), single input. ";
 
-%feature("docstring")  CasADi::AcadoInternal::inputStruct "
+%feature("docstring")  CasADi::AcadoOCP::call "
 
-Const access an input. ";
+Evaluate numerically (shorthand) ";
 
-%feature("docstring")  CasADi::AcadoInternal::outputStruct "
+%feature("docstring")  CasADi::AcadoOCP::call "
 
-Access an output. ";
+Evaluate symbolically (scalar graph) ";
 
-%feature("docstring")  CasADi::AcadoInternal::outputStruct "
+%feature("docstring")  CasADi::AcadoOCP::call "
 
-Const access an output. ";
+Evaluate symbolically (matrix graph) ";
 
-%feature("docstring")  CasADi::AcadoInternal::print "
+%feature("docstring")  CasADi::AcadoOCP::call "
 
-Print. ";
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
 
-%feature("docstring")  CasADi::AcadoInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
-
-%feature("docstring")  CasADi::AcadoInternal::getPartition "
-
-Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::AcadoInternal::isInit "
-
-Assert that the function has been initialized. ";
-
-%feature("docstring")  CasADi::AcadoInternal::verbose "
-
-Verbose mode? ";
-
-%feature("docstring")  CasADi::AcadoInternal::monitored "
-
-Is function fcn being monitored. ";
-
-%feature("docstring")  CasADi::AcadoInternal::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInternal::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInternal::output "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInternal::output "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::AcadoInternal::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::AcadoInternal::fwdSeed "
-
-Const access forward seed. ";
-
-%feature("docstring")  CasADi::AcadoInternal::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInternal::fwdSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInternal::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::AcadoInternal::adjSeed "
-
-Const access adjoint seed. ";
-
-%feature("docstring")  CasADi::AcadoInternal::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInternal::adjSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoInternal::setNumInputs "
-
-Set the number of function inputs. ";
-
-%feature("docstring")  CasADi::AcadoInternal::setNumOutputs "
-
-Set the number of function outputs. ";
-
-%feature("docstring")  CasADi::AcadoInternal::getNumInputs "
-
-Get the number of function inputs. ";
-
-%feature("docstring")  CasADi::AcadoInternal::getNumOutputs "
-
-Get the number of function outputs. ";
-
-%feature("docstring")  CasADi::AcadoInternal::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::AcadoInternal::getStat "
-
-Get single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::AcadoInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::AcadoInternal::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::AcadoInternal::jacSparsity "
+%feature("docstring")  CasADi::AcadoOCP::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
-%feature("docstring")  CasADi::AcadoInternal::symbolicInput "
+%feature("docstring")  CasADi::AcadoOCP::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoOCP::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCP::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCP::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCP::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::AcadoOCP::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoOCP::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoOCP::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCP::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCP::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoOCP::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoOCP::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCP::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCP::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::AcadoOCP::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoOCP::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
-%feature("docstring")  CasADi::AcadoInternal::getFullJacobian "
+%feature("docstring")  CasADi::AcadoOCP::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::AcadoOCP::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::AcadoOCP::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::AcadoOCP::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::AcadoOCP::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::AcadoOCP::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::AcadoOCP::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::AcadoOCP::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::AcadoOCP::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::AcadoOCP::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::AcadoOCP::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::AcadoOCP::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::AcadoOCP::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::AcadoOCP::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1AcadoOCPInternal.xml
+%feature("docstring") CasADi::AcadoOCPInternal "C++ includes:
+acado_ocp_internal.hpp ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::~AcadoOCPInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::init "
+
+Initialize the solver. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::evaluate "
+
+Solve the problem. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getRef "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::returnRef "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::isInit "
+
+Assert that the function has been initialized. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getFullJacobian "
 
 Get the Jacobian of all outputs with respect to all inputs. ";
 
-%feature("docstring")  CasADi::AcadoInternal::log "
+%feature("docstring")  CasADi::AcadoOCPInternal::log "
 
 Log the status of the solver. ";
 
-%feature("docstring")  CasADi::AcadoInternal::log "
+%feature("docstring")  CasADi::AcadoOCPInternal::log "
 
 Log the status of the solver, function given. ";
 
-%feature("docstring")  CasADi::AcadoInternal::setOption "
+%feature("docstring")  CasADi::AcadoOCPInternal::setOption "
 
 set an option. The setOptions are in general only considered before the init
 function, if any. If properties changes, the init function should be called
 again. (Ticket #54) ";
 
-%feature("docstring")  CasADi::AcadoInternal::setOption "
+%feature("docstring")  CasADi::AcadoOCPInternal::setOption "
 
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
-%feature("docstring")  CasADi::AcadoInternal::hasOption "
+%feature("docstring")  CasADi::AcadoOCPInternal::hasOption "
 
 check if there is an option str ";
 
-%feature("docstring")  CasADi::AcadoInternal::hasSetOption "
+%feature("docstring")  CasADi::AcadoOCPInternal::hasSetOption "
 
 check if the user has there is an option str ";
 
-%feature("docstring")  CasADi::AcadoInternal::printOptions "
+%feature("docstring")  CasADi::AcadoOCPInternal::printOptions "
 
 Print options to a stream. ";
 
-%feature("docstring")  CasADi::AcadoInternal::getOption "
+%feature("docstring")  CasADi::AcadoOCPInternal::getOption "
 
 get an option value ";
 
-%feature("docstring")  CasADi::AcadoInternal::repr "
+%feature("docstring")  CasADi::AcadoOCPInternal::repr "
 
 Print representation. ";
 
-%feature("docstring")  CasADi::AcadoInternal::copyOptions "
+%feature("docstring")  CasADi::AcadoOCPInternal::copyOptions "
 
 Copy all options from another object. ";
 
-%feature("docstring")  CasADi::AcadoInternal::dictionary "
+%feature("docstring")  CasADi::AcadoOCPInternal::dictionary "
 
 Get the dictionary. ";
 
-%feature("docstring")  CasADi::AcadoInternal::deepCopyMembers "
+%feature("docstring")  CasADi::AcadoOCPInternal::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::AcadoInternal::getCount "
+%feature("docstring")  CasADi::AcadoOCPInternal::getCount "
 
 Get the reference count. ";
 
@@ -1926,6 +2675,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::CFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::CFunction::clone "
 
 Deep copy. ";
@@ -2287,6 +3041,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::CFunctionInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -2791,6 +3550,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::CplexInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::CplexInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -3376,6 +4140,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
+
+%feature("docstring")  CasADi::CplexSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
 
 %feature("docstring")  CasADi::CplexSolver::clone "
 
@@ -4262,6 +5031,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::clone "
 
 Deep copy. ";
@@ -4649,6 +5423,12 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::symbolicInputSX
+"
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -5488,6 +6268,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -6178,6 +6963,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -7112,6 +7902,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::ExternalFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::ExternalFunction::clone "
 
 Deep copy. ";
@@ -7472,6 +8267,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -8316,6 +9116,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::FX::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::FX::clone "
 
 Deep copy. ";
@@ -8672,6 +9477,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::FXInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::FXInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -9676,6 +10486,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::GSL::GslIntegrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::GSL::GslIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -10335,6 +11150,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::GSL::GslInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::GSL::GslInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -11178,6 +11998,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -11949,6 +12774,11 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::getFullJacobian "
 
 Get the Jacobian of all outputs with respect to all inputs. ";
@@ -12644,6 +13474,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::ImplicitFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::clone "
 
 Deep copy. ";
@@ -13011,6 +13846,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -13984,6 +14824,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Integrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Integrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -14643,6 +15488,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IntegratorInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -15696,6 +16546,11 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::IpoptInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
 %feature("docstring")  CasADi::IpoptInternal::getFullJacobian "
 
 Get the Jacobian of all outputs with respect to all inputs. ";
@@ -16596,6 +17451,12 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::symbolicInputSX
+"
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -17594,6 +18455,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::clone "
 
 Deep copy. ";
@@ -18531,6 +19397,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::IpoptSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::IpoptSolver::clone "
 
 Deep copy. ";
@@ -19061,6 +19932,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Jacobian::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Jacobian::clone "
 
 Deep copy. ";
@@ -19415,6 +20291,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::JacobianInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::JacobianInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -20114,6 +20995,11 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getFullJacobian "
 
 Get the Jacobian of all outputs with respect to all inputs. ";
@@ -20689,6 +21575,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Sundials::KinsolSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolSolver::clone "
 
 Deep copy. ";
@@ -21231,6 +22122,11 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::KnitroInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
 %feature("docstring")  CasADi::KnitroInternal::getFullJacobian "
 
 Get the Jacobian of all outputs with respect to all inputs. ";
@@ -21757,6 +22653,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::KnitroSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::KnitroSolver::clone "
 
 Deep copy. ";
@@ -22274,6 +23175,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::clone "
 
 Deep copy. ";
@@ -22684,6 +23590,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -23207,6 +24119,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::clone "
 
 Deep copy. ";
@@ -23607,6 +24524,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -24043,6 +24966,12 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::symbolicInputSX
+"
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -24581,6 +25510,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::clone "
 
 Deep copy. ";
@@ -25062,6 +25996,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::LinearSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::LinearSolver::clone "
 
 Deep copy. ";
@@ -25437,6 +26376,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::LinearSolverInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -27190,6 +28134,12 @@ CasADi::OptimalControl::MultipleShooting::symbolicInput "
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::clone "
 
 Deep copy. ";
@@ -27642,6 +28592,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -29429,6 +30385,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::MXFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::MXFunction::clone "
 
 Deep copy. ";
@@ -29705,6 +30666,11 @@ Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::updatePointers "";
 
+%feature("docstring")  CasADi::MXFunctionInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
 %feature("docstring")  CasADi::MXFunctionInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -29834,7 +30800,7 @@ Generate the sparsity of a Jacobian block. ";
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::symbolicInput "
+%feature("docstring")  CasADi::MXFunctionInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -30648,6 +31614,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::NLPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::NLPSolver::clone "
 
 Deep copy. ";
@@ -31054,6 +32025,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NLPSolverInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -33208,6 +34184,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::OCPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::OCPSolver::clone "
 
 Deep copy. ";
@@ -33613,6 +34594,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::OCPSolverInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -34149,6 +35135,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -34711,6 +35702,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::clone "
 
@@ -35633,6 +36629,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Parallelizer::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Parallelizer::clone "
 
 Deep copy. ";
@@ -36007,6 +37008,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::ParallelizerInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -36502,6 +37508,12 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::symbolicInputSX
+"
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -37069,6 +38081,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::clone "
 
 Deep copy. ";
@@ -37591,6 +38608,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::QPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::QPSolver::clone "
 
 Deep copy. ";
@@ -38001,6 +39023,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::QPSolverInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -39003,6 +40030,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::Simulator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::Simulator::clone "
 
 Deep copy. ";
@@ -39380,6 +40412,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SimulatorInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -40202,6 +41239,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::SuperLU::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::SuperLU::clone "
 
 Deep copy. ";
@@ -40625,6 +41667,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SuperLUInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -41211,6 +42258,16 @@ Multiple (vector valued) input, single (scalar/vector/matrix valued) output.
 Multiple (matrix valued) input, single (scalar/vector/matrix valued) output.
 ";
 
+%feature("docstring")  CasADi::SXFunction::SXFunction "
+
+Single (scalar/vector/matrix valued) input, multiple (vector valued) output.
+";
+
+%feature("docstring")  CasADi::SXFunction::SXFunction "
+
+Single (scalar/vector/matrix valued) input, multiple (matrix valued) output.
+";
+
 %feature("docstring")  CasADi::SXFunction::jacobian "
 
 Calculate the jacobian of output oind with respect to input iind.
@@ -41423,6 +42480,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
+
+%feature("docstring")  CasADi::SXFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
 
 %feature("docstring")  CasADi::SXFunction::clone "
 
@@ -41692,6 +42754,11 @@ symbolic evaluations are possible after this. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluate_switch "
 
@@ -43450,6 +44517,11 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::XFunction::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
 %feature("docstring")  CasADi::XFunction::clone "
 
 Deep copy. ";
@@ -43827,6 +44899,11 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::XFunctionInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
 %feature("docstring")  CasADi::XFunctionInternal::getFullJacobian "
 
 Get the Jacobian of all outputs with respect to all inputs. ";
@@ -44044,6 +45121,16 @@ Convenience function, convert vectors to vectors of pointers. ";
 
 %feature("docstring")  CasADi::GSL::ptrVec "";
 
+%feature("docstring")  CasADi::GSL::msym "
+
+Construct symbolic arrays and variables using CasADi's MX expression graph
+representation The \"msym\" function is intended to work in a similar way as
+\"sym\" used in the Symbolic Toolbox for Matlab but instead creating an MX
+object. The MX expression graph is more general but also have considerably
+more overhead than the alternative SX expression graph. ";
+
+%feature("docstring")  CasADi::GSL::msym "";
+
 %feature("docstring")  CasADi::GSL::deepcopy "
 
 Make a deep copy of an object (Note: default is a shallow copy!) ";
@@ -44063,6 +45150,19 @@ Uses CasADi::SXFunction::jac ";
 %feature("docstring")  CasADi::GSL::hessian "";
 
 %feature("docstring")  CasADi::GSL::hessian "";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Construct symbolic arrays and variables using CasADi's SX expression graph
+representation The \"ssym\" function is intended to work in a similar way as
+\"sym\" used in the Symbolic Toolbox for Matlab but instead creating an
+SXMatrix object. The SX expression graph has much less overhead, but is also
+more restricted than the alternative MX expression graph.
+
+Construct symbolic arrays and variables using CasADi's more restricted, but
+more efficient SX expression graph ";
+
+%feature("docstring")  CasADi::GSL::ssym "";
 
 %feature("docstring")  CasADi::GSL::timesTwo "";
 
@@ -44550,6 +45650,10 @@ check if vector ";
 %feature("docstring")  CasADi::GSL::isDense "
 
 check if vector ";
+
+%feature("docstring")  CasADi::GSL::isEqual "
+
+Check if two expressions are equal. ";
 
 %feature("docstring")  CasADi::GSL::vertcat "
 
@@ -45570,6 +46674,30 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 %feature("docstring")  std::ceil "";
 
+%feature("docstring")  std::exp "throw ()";
+
+%feature("docstring")  std::log "throw ()";
+
+%feature("docstring")  std::sqrt "throw ()";
+
+%feature("docstring")  std::pow "throw ()";
+
+%feature("docstring")  std::sin "throw ()";
+
+%feature("docstring")  std::cos "throw ()";
+
+%feature("docstring")  std::tan "throw ()";
+
+%feature("docstring")  std::asin "throw ()";
+
+%feature("docstring")  std::acos "throw ()";
+
+%feature("docstring")  std::atan "throw ()";
+
+%feature("docstring")  std::floor "throw ()";
+
+%feature("docstring")  std::ceil "throw ()";
+
 %feature("docstring")  std::sqrt "";
 
 %feature("docstring")  std::sin "";
@@ -45628,10 +46756,19 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 // File: a0__schemes_8hpp.xml
 
 
+// File: acado__forward__declarations_8hpp.xml
+
+
 // File: acado__function_8cpp.xml
 
 
 // File: acado__function_8hpp.xml
+
+
+// File: acado__integrator_8cpp.xml
+
+
+// File: acado__integrator_8hpp.xml
 
 
 // File: acado__integrator__backend_8cpp.xml
@@ -45640,16 +46777,22 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 // File: acado__integrator__backend_8hpp.xml
 
 
-// File: acado__interface_8cpp.xml
+// File: acado__integrator__internal_8cpp.xml
 
 
-// File: acado__interface_8hpp.xml
+// File: acado__integrator__internal_8hpp.xml
 
 
-// File: acado__internal_8cpp.xml
+// File: acado__ocp_8cpp.xml
 
 
-// File: acado__internal_8hpp.xml
+// File: acado__ocp_8hpp.xml
+
+
+// File: acado__ocp__internal_8cpp.xml
+
+
+// File: acado__ocp__internal_8hpp.xml
 
 
 // File: aeroplane_8cpp.xml
@@ -46311,27 +47454,27 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: pre__c99__support_8cpp.xml
-%feature("docstring")  isnan "throw ()";
+%feature("docstring")  std::isnan "throw ()";
 
-%feature("docstring")  isinf "throw ()";
+%feature("docstring")  std::isinf "throw ()";
 
-%feature("docstring")  erf "throw ()";
+%feature("docstring")  std::erf "throw ()";
 
-%feature("docstring")  fmin "throw ()";
+%feature("docstring")  std::fmin "throw ()";
 
-%feature("docstring")  fmax "throw ()";
+%feature("docstring")  std::fmax "throw ()";
 
 
 // File: pre__c99__support_8hpp.xml
-%feature("docstring")  isnan "throw ()";
+%feature("docstring")  std::isnan "throw ()";
 
-%feature("docstring")  isinf "throw ()";
+%feature("docstring")  std::isinf "throw ()";
 
-%feature("docstring")  erf "throw ()";
+%feature("docstring")  std::erf "throw ()";
 
-%feature("docstring")  fmin "throw ()";
+%feature("docstring")  std::fmin "throw ()";
 
-%feature("docstring")  fmax "throw ()";
+%feature("docstring")  std::fmax "throw ()";
 
 
 // File: printable__object_8cpp.xml
@@ -46477,6 +47620,19 @@ C99 elementary functions from the math.h header. ";
 
 %feature("docstring")  CasADi::getOperatorRepresentation "";
 
+%feature("docstring")  CasADi::ssym "
+
+Construct symbolic arrays and variables using CasADi's SX expression graph
+representation The \"ssym\" function is intended to work in a similar way as
+\"sym\" used in the Symbolic Toolbox for Matlab but instead creating an
+SXMatrix object. The SX expression graph has much less overhead, but is also
+more restricted than the alternative MX expression graph.
+
+Construct symbolic arrays and variables using CasADi's more restricted, but
+more efficient SX expression graph ";
+
+%feature("docstring")  CasADi::ssym "";
+
 
 // File: sx__tools_8hpp.xml
 
@@ -46583,6 +47739,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: group__QPSolver__doc.xml
+
+
+// File: group__AcadoIntegrator__doc.xml
 
 
 // File: group__IdasIntegrator__doc.xml

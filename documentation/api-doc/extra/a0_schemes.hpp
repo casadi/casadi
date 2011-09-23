@@ -282,6 +282,20 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
+/** \class CasADi::AcadoIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::AcadoIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::Interfaces::IpoptQPInternal
 \n
 \par
