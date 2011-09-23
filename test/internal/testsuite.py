@@ -4,6 +4,13 @@ from subprocess import *
 import time
 import re
 
+import signal
+
+class TimeoutEvent(Exception):
+    pass
+
+def alarm_handler(signum, frame):
+    raise TimeoutEvent
 
 
 def is_exe(root,name):
@@ -42,6 +49,9 @@ class TestSuite:
     
     """
     
+    signal.signal(signal.SIGALRM, alarm_handler)
+    signal.alarm(60*60) # 1 hour
+
     # Don't buffer
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
@@ -75,19 +85,23 @@ class TestSuite:
         print "Unknown argument: ", arg
 
   def run(self):
-    print "Running test in " + self.dirname
-    for root, dirs, files in os.walk(self.dirname):
-      if not(self.preRun is None):
-        self.preRun(root)
-      for name in files:
-        for skip in self.skipdirs:
-          if skip in dirs:
-            dirs.remove(skip)
-        if (self.suffix is None and is_exe(root,name)) or (not(self.suffix is None) and name.endswith('.'+self.suffix)):
-          if not(name in self.skipfiles):
-            self.test(root,name,self.command)
-      if not(self.postRun is None):
-        self.postRun(root)
+    try:
+      print "Running test in " + self.dirname
+      for root, dirs, files in os.walk(self.dirname):
+        if not(self.preRun is None):
+          self.preRun(root)
+        for name in files:
+          for skip in self.skipdirs:
+            if skip in dirs:
+              dirs.remove(skip)
+          if (self.suffix is None and is_exe(root,name)) or (not(self.suffix is None) and name.endswith('.'+self.suffix)):
+            if not(name in self.skipfiles):
+              self.test(root,name,self.command)
+        if not(self.postRun is None):
+          self.postRun(root)
+    except TimeoutEvent:
+      print "Timout."
+      sys.exit(1)
         
     print "Ran %d tests, %d fails." % (self.stats['numtests'],self.stats['numfails'])
 
