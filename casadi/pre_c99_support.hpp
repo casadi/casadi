@@ -55,7 +55,7 @@ double fmax(double x, double y) throw();
 
 // Do we need to define elementary operations for int?
 #ifdef GCC_VERSION
-#if GCC_VERSION>=402000
+#if GCC_VERSION>=40200
 #define WITHOUT_INT_MATH
 #endif
 #endif
