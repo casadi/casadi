@@ -3,11 +3,12 @@ from casadi import *
 from numpy import *
 import numpy as NP
 import matplotlib.pyplot as plt
+import copy
 
 # Excercise 2, chapter 10 from Larry Biegler's book 
 # Joel Andersson, K.U. Leuven 2010
 
-print "program started"
+nk = 50    # Control discretization
 
 # Time 
 t = SX("t")
@@ -22,27 +23,19 @@ Mc = SX("Mc")    # total mass of the crystals
 Cc = SX("Cc")    # solute concentration
 Tc = SX("Tc")    # cystillizer temperature
 
-# State vector
-x = [Ls, Nc, L, Ac, Vc, Mc, Cc, Tc]
-  
-# Bounds on the states
-x_lb = NP.repeat(-inf,len(x))
-x_ub = NP.repeat( inf,len(x))
-
 # Initial values
 Ls_init = 0.0005
-Nc_init = 0
-L_init = 0
-Ac_init = 0
-Vc_init = 0
+Nc_init = 0.
+L_init = 0.
+Ac_init = 0.
+Vc_init = 0.
 Mc_init = 2.0
 Cc_init = 5.4
-Tc_init = 75
-x_init = NP.array([Ls_init,Nc_init,L_init,Ac_init,Vc_init,Mc_init,Cc_init,Tc_init])
+Tc_init = 75.
 
 # Controls
 Tj = SX("Tj") # jacket temperature
-Tj_lb = 10;  Tj_ub = 60;  Tj_init = 50
+Tj_lb = 10.;  Tj_ub = 60.;  Tj_init = 50.
 
 # Constants
 Vs = 300. # volume of the solvent
@@ -72,12 +65,12 @@ Tequ = a[0] + a[1]*C_bar + a[2]*C_bar*C_bar + a[3]*C_bar*C_bar*C_bar # equilibri
 Ta = b[0] + b[1]*C_bar + b[2]*C_bar*C_bar + b[3]*C_bar*C_bar*C_bar # lower bound of Tj
 
 # degree of supercooling:
-# DeltaT = fmax(0,Tequ-Tc)   # Original formulation
+DeltaT = fmax(0,Tequ-Tc)   # Original formulation
 # DeltaT = fmax(1e-8,Tequ-Tc) # "epsilon" to avoid divide by zero
 # DeltaT = log(exp(1e-8)+exp(Tequ-Tc))   # Log sum exp
-epsilon = 1e-3
-DD = Tequ-Tc
-DeltaT = (sqrt( DD*DD + epsilon*epsilon )  + DD ) / 2
+#epsilon = 1e-3
+#DD = Tequ-Tc
+#DeltaT = (sqrt( DD*DD + epsilon*epsilon )  + DD ) / 2
 
 # Differential equations
 Ls_dot = Kg * sqrt(Ls) * DeltaT**eta1
@@ -86,16 +79,28 @@ L_dot = Nc * Ls_dot + L0 * Nc_dot
 Ac_dot = 2 * alpha * Nc * Ls_dot + L0**2 * Nc_dot
 Vc_dot = 3 * beta * Ac * Ls_dot + L0**3 * Nc_dot
 Mc_dot = 3 * Ws0/Ls0**3 * Ls**2 * Ls_dot + rho*Vs*Vc_dot
-Cc_dot = -1 / Vs * Mc_dot
+Cc_dot = -1. / Vs * Mc_dot
 Tc_dot = (Kc*Mc_dot - Ke*(Tc-Tj))/(W*Cp)
+
+# State vector
+x = [Ls, Nc, L, Ac, Vc, Mc, Cc, Tc]
+
+# State bounds and initial guess
+x_min = repeat(-inf,len(x))
+x_max = repeat( inf,len(x))
+xi_min = array([Ls_init,Nc_init,L_init,Ac_init,Vc_init,Mc_init,Cc_init,Tc_init])
+xi_max = copy.deepcopy(xi_min)
+xf_min = copy.deepcopy(x_min)
+xf_max = copy.deepcopy(x_max)
+x_init = copy.deepcopy(xi_min)
 
 # Control vector
 u = [Tj]
 u_init = NP.array([Tj_init])
-u_lb = NP.array([Tj_init])
-u_ub = NP.array([Tj_init])
-#u_lb = [Tj_lb]
-#u_ub = [Tj_ub]
+#u_min = NP.array(49.9)
+#u_max = NP.array(50.1)
+u_min = [Tj_lb]
+u_max = [Tj_ub]
 
 # ODE
 xdot = [Ls_dot, Nc_dot, L_dot, Ac_dot, Vc_dot, Mc_dot, Cc_dot, Tc_dot]
@@ -146,195 +151,162 @@ RADAU = 1
 collocation_points = [legendre_points,radau_points]
 
 # Degree of interpolating polynomial
-K = 3
+deg = 3
   
-# Number of finite elements
-N = 30
-
 # Radau collocation points
 cp = RADAU
 
 # Size of the finite elements
-h = tf/N
+h = tf/nk
 
 # Coefficients of the collocation equation
-C = (K+1) * [[]]
+C = zeros((deg+1,deg+1))
 
 # Coefficients of the continuity equation
-D = (K+1) * [[]]
-
+D = zeros(deg+1)
+  
 # Collocation point
 tau = SX("tau")
+
+# All collocation time points
+tau_root = collocation_points[cp][deg]
+T = zeros((nk,deg+1))
+for i in range(nk):
+  for j in range(deg+1):
+    T[i][j] = h*(i + tau_root[j])
+
+# For all collocation points
+for j in range(deg+1):
+  # Construct Lagrange polynomials to get the polynomial basis at the collocation point
+  L = 1
+  for j2 in range(deg+1):
+    if j2 != j:
+      L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
+  lfcn = SXFunction([tau],[L])
+  lfcn.init()
   
-# Roots
-tau_root = collocation_points[cp][K]
+  # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+  lfcn.setInput(1.0)
+  lfcn.evaluate()
+  D[j] = lfcn.output()
 
-for j in range(K+1):
-  # Lagrange polynomials
-  L = SX(1)
-  for k in range(K+1):
-    if k != j:
-      L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
-  
-    # Lagrange polynomial function
-    lfcn = SXFunction([[tau]],[[L]])
-    lfcn.init()
-    
-    # Get the coefficients of the continuity equation
-    lfcn.setInput(1.0)
-    lfcn.evaluate()
-    D[j] = lfcn.output()[0]
-
-    # Get the coefficients of the collocation equation
-    C[j] = (K+1) * [[]]
-    for k in range(K+1):
-      lfcn.setInput(tau_root[k])
-      lfcn.setFwdSeed(1.0)
-      lfcn.evaluate(1,0)
-      C[j][k] = lfcn.fwdSens()[0]
-
-# Collocated times
-T = N * [[]]
-for i in range(N):
-  T[i] = (K+1) * [[]]
-  for j in range(K+1):
-    T[i][j] = h*(i + collocation_points[cp][K][j])
+  # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+  for j2 in range(deg+1):
+    lfcn.setInput(tau_root[j2])
+    lfcn.setFwdSeed(1.0)
+    lfcn.evaluate(1,0)
+    C[j][j2] = lfcn.fwdSens()
 
 # Total number of variables
-NX = N*(K+1)*nx
-NU = N*nu
-NXF = nx
+NX = nk*(deg+1)*nx      # Collocated states
+NU = nk*nu              # Parametrized controls
+NXF = nx                # Final state
 NV = NX+NU+NXF
 
 # NLP variable vector
 V = MX("V",NV)
 
-# Collocated states
-X = []
-
-# Collocated control (piecewice constant)
-U = []
-  
 # All variables with bounds and initial guess
-vars_lb = NP.zeros(NV)
-vars_ub = NP.zeros(NV)
-vars_init = NP.zeros(NV)
-vi = 0
+vars_lb = zeros(NV)
+vars_ub = zeros(NV)
+vars_init = zeros(NV)
+offset = 0
 
-# Loop over the finite elements
-for i in range(N):
-  # Parametrized controls
-  U.append(V[vi:vi+nu])
-  vars_lb[vi:vi+nu] = u_lb
-  vars_ub[vi:vi+nu] = u_ub
-  vars_init[vi:vi+nu] = u_init
-  vi += nu
-  
+# Get collocated states and parametrized control
+X = resize(array([],dtype=MX),(nk+1,deg+1))
+U = resize(array([],dtype=MX),nk)
+for k in range(nk):
   # Collocated states
-  Xi = []
-  for j in range(K+1):
-    Xi.append(V[vi:vi+nx])
-    vars_init[vi:vi+nx] = x_init
-    if i==0 and j==0:
-      vars_lb[vi:vi+nx] = x_init
-      vars_ub[vi:vi+nx] = x_init
+  for j in range(deg+1):
+    # Get the expression for the state vector
+    X[k][j] = V[offset:offset+nx]
+    
+    # Add the initial condition
+    vars_init[offset:offset+nx] = x_init
+    
+    # Add bounds
+    if k==0 and j==0:
+      vars_lb[offset:offset+nx] = xi_min
+      vars_ub[offset:offset+nx] = xi_max
     else:
-      vars_lb[vi:vi+nx] = x_lb
-      vars_ub[vi:vi+nx] = x_ub
-    vi += nx
-        
-  X.append(Xi)
+      vars_lb[offset:offset+nx] = x_min
+      vars_ub[offset:offset+nx] = x_max
+    offset += nx
+  
+  # Parametrized controls
+  U[k] = V[offset:offset+nu]
+  vars_lb[offset:offset+nu] = u_min
+  vars_ub[offset:offset+nu] = u_max
+  vars_init[offset:offset+nu] = u_init
+  offset += nu
   
 # State at end time
-XF = V[vi:vi+nx]
-vars_lb[vi:vi+nx] = x_lb
-vars_ub[vi:vi+nx] = x_ub
-vars_init[vi:vi+nx] = x_init
-vi += nx
-  
+X[nk][0] = V[offset:offset+nx]
+vars_lb[offset:offset+nx] = xf_min
+vars_ub[offset:offset+nx] = xf_max
+vars_init[offset:offset+nx] = x_init
+offset += nx
+
 # Constraint function for the NLP
 g = []
 lbg = []
 ubg = []
 
-for i in range(N):
-  for k in range(1,K+1):
-    # augmented state vector
-    y_ik = [MX(T[i][k]), X[i][k], U[i]]
-    
-    # Add collocation equations to NLP
-    [temp] = ffcn.call(y_ik)
-    for j in range(temp.size()):
-      temp[j] *= h
-    for j in range (K+1):
-      for l in range(temp.size()):
-        temp[l] -= X[i][j][l]*C[j][k]
+# For all finite elements
+for k in range(nk):
+  
+  # For all collocation points
+  for j in range(1,deg+1):
+        
+    # Get an expression for the state derivative at the collocation point
+    xp_jk = 0
+    for j2 in range (deg+1):
+      xp_jk += C[j2][j]*X[k][j2]
       
-    g += [temp]
-    lbg.append(NP.zeros(nx)) # equality constraints
-    ubg.append(NP.zeros(nx)) # equality constraints
-      
+    # Add collocation equations to the NLP
+    [fk] = ffcn.call([T[k][j], X[k][j], U[k]])
+    g += [h*fk - xp_jk]
+    lbg.append(zeros(nx)) # equality constraints
+    ubg.append(zeros(nx)) # equality constraints
+
     # Add nonlinear constraints, if any
     if nc>0:
-      g += cfcn.call(y_ik)
+      g += cfcn.call([T[k][j], X[k][j], U[k]])
       lbg.append(c_lb)
       ubg.append(c_ub)
 
+  # Get an expression for the state at the end of the finite element
+  xf_k = 0
+  for j in range(deg+1):
+    xf_k += D[j]*X[k][j]
+
   # Add continuity equation to NLP
-  if i<N-1:
-    temp = MX(X[i+1][0])
-  else:
-    temp = MX(XF)
-    
-  for j in range(K+1):
-    for l in range(nx):
-      temp[l] -= D[j]*X[i][j][l]
+  g += [X[k+1][0] - xf_k]
+  lbg.append(zeros(nx))
+  ubg.append(zeros(nx))
 
-  g += [temp]
-  lbg.append(NP.zeros(nx))
-  ubg.append(NP.zeros(nx))
-  
-# Variable vector (SX)
-V_sx = symbolic("V",NV)
-  
 # Nonlinear constraint function
-gfcn_nlp_mx = MXFunction([V],[vertcat(g)])
-gfcn_nlp_mx.init()
-gfcn_nlp = gfcn_nlp_mx.expand([V_sx])
-g_sx = gfcn_nlp.outputSX()
-  
+gfcn_nlp = MXFunction([V],[vertcat(g)])
+
 # Objective function of the NLP
-y_f = [MX(T[N-1][K]),XF,U[N-1]]
-[f] = mfcn.call(y_f)
-ffcn_nlp_mx = MXFunction([V], [f])
-ffcn_nlp_mx.init()
-ffcn_nlp = ffcn_nlp_mx.expand([V_sx])
-f_sx = ffcn_nlp.outputSX()
-  
-# Hessian of the Lagrangian:
-# Lagrange multipliers
-lam = symbolic("lambda",g_sx.size1())
-
-# Objective function scaling
-sigma = symbolic("sigma")
-
-# Lagrangian function
-lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])
-  
-# Hessian of the Lagrangian
-HL = lfcn.hessian()
+[f] = mfcn.call([T[nk-1][deg],X[nk][0],U[nk-1]])
+ffcn_nlp = MXFunction([V], [f])
 
 ## ----
 ## SOLVE THE NLP
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(ffcn_nlp,gfcn_nlp,HL)
+solver = IpoptSolver(ffcn_nlp,gfcn_nlp)
 
 # Set options
-solver.setOption("tol",1e-6)
-#solver.setOption("hessian_approximation","limited-memory")
+#solver.setOption("tol",1e-6)
+solver.setOption("expand_f",True)
+solver.setOption("expand_g",True)
+#solver.setOption("generate_hessian",True)
+solver.setOption("hessian_approximation","limited-memory")
 #solver.setOption("derivative_test","first-order")
+#solver.setOption("bound_relax_factor",0.0)
 solver.setOption("max_iter",50)
 
 # initialize the solver
@@ -357,6 +329,9 @@ solver.solve()
 # Print the optimal cost
 print "optimal cost: ", solver.output(NLP_COST)[0]
 
+# Retrieve the solution
+v_opt = array(solver.output(NLP_X_OPT))
+
 # Get the solution
 vars_sol = solver.output(NLP_X_OPT)
 
@@ -364,42 +339,29 @@ vars_sol = solver.output(NLP_X_OPT)
 ## SAVE SOLUTION TO DISK
 ## ----
 
-# Get the optimal solution
-Tj_opt = N * [0.]
-Ls_opt = (N*(K+1)) * [0.]
-Nc_opt = (N*(K+1)) * [0.]
-L_opt = (N*(K+1)) * [0.]
-Ac_opt = (N*(K+1)) * [0.]
-Vc_opt = (N*(K+1)) * [0.]
-Mc_opt = (N*(K+1)) * [0.]
-Cc_opt = (N*(K+1)) * [0.]
-Tc_opt = (N*(K+1)) * [0.]
-t_opt = (N*(K+1)) * [0.]
-ind = 0 # index of var_sol
-for i in range(N):
-  Tj_opt[i] = vars_sol[ind]; ind += 1
-  for j in range(K+1):
-    ij = (K+1)*i+j
-    Ls_opt[ij] = vars_sol[ind]; ind += 1
-    Nc_opt[ij] = vars_sol[ind]; ind += 1
-    L_opt[ij] = vars_sol[ind]; ind += 1
-    Ac_opt[ij] = vars_sol[ind]; ind += 1
-    Vc_opt[ij] = vars_sol[ind]; ind += 1
-    Mc_opt[ij] = vars_sol[ind]; ind += 1
-    Cc_opt[ij] = vars_sol[ind]; ind += 1
-    Tc_opt[ij] = vars_sol[ind]; ind += 1
-    t_opt[ij] = T[i][j]
+Ls_opt = v_opt[0::(deg+1)*nx+nu]
+Nc_opt = v_opt[1::(deg+1)*nx+nu]
+L_opt = v_opt[2::(deg+1)*nx+nu]
+Ac_opt = v_opt[3::(deg+1)*nx+nu]
+Vc_opt = v_opt[4::(deg+1)*nx+nu]
+Mc_opt = v_opt[5::(deg+1)*nx+nu]
+Cc_opt = v_opt[6::(deg+1)*nx+nu]
+Tc_opt = v_opt[7::(deg+1)*nx+nu]
+Tj_opt = v_opt[(deg+1)*nx::(deg+1)*nx+nu]
+
+tgrid = linspace(0,tf,nk+1)
+tgrid_u = linspace(0,tf,nk)
   
 # plot to screen
 plt.figure(1)
 plt.clf()
-plt.plot(t_opt,Ls_opt)
+plt.plot(tgrid,Ls_opt)
 plt.xlabel("Time (h)")
 plt.ylabel("Mean Chrystal Size (m)")
 
 plt.figure(2)
 plt.clf()
-plt.plot(linspace(0,tf,N),Tj_opt)
+plt.plot(tgrid_u,Tj_opt)
 plt.xlabel("Time (h)")
 plt.ylabel("Jacket Temperature (C)")
 
