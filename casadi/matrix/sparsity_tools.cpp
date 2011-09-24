@@ -266,34 +266,41 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
 }
 
   CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping){
-    // This is a quick hack implementation, does not set mapping and only works when the nonzeros are already correctly ordered
-
-    // Vector of row offsets
-    vector<int> rowind(n+1,0);
+    // Assert dimensions
+    casadi_assert_message(row.size()==col.size(),"inconsistent lengths");
     
-    // Loop over rows
-    int k=0; // nonzero
-    for(int i=0; i<n; ++i){
-      while(k<row.size() && row[k]==i){
-        // Do something...
-
-        // Continue to the next nonzero
-        k++;
-      }
-
-      if(k!=row.size() && row[k]<=i){
-        cout << "row indices: " << row << ", column indices: " << col << endl;
-      }
-
-      // Make sure that the nonzeros are given row-wise
-      casadi_assert_message(k==row.size() || row[k]>i, "Only sparse triplet formats with nonzeros given row-wise currently supported (quick-hack)");
-      
-      // Save the nonzero offset of the row
-      rowind[i+1] = k;
+    // Nunber of elements on each row
+    vector<int> rowcount(n+1,0);
+    for(vector<int>::const_iterator it=row.begin(); it!=row.end(); ++it){
+      rowcount[*it+1]++;
     }
-
+    
+    // Cumsum to get index offset for each row
+    for(int i=0; i<n; ++i){
+      rowcount[i+1] += rowcount[i];
+    }
+    
+    // Create return object
+    CRSSparsity ret(n, m, col, rowcount);
+    
+    // Access column
+    vector<int>& newcol = ret.colRef();
+    
+    // Resize mapping
+    mapping.resize(col.size());
+    for(int k=0; k<row.size(); ++k){
+      // Get new index
+      int newk = rowcount[row[k]]++;
+      
+      // Update mapping
+      mapping[newk] = k;
+      
+      // Update column
+      newcol[newk] = col[k];
+    }
+    
     // Return the sparsity pattern
-    return CRSSparsity(n,m,col,rowind);
+    return ret;
   }
 
 

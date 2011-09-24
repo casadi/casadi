@@ -21,6 +21,7 @@
  */
 
 #include "crs_sparsity.hpp"
+#include "sparsity_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include <climits>
 
@@ -566,53 +567,13 @@ void CRSSparsity::bucketSort(vector<list<int> >& buckets, vector<int>& row) cons
 }
 
 CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
-  // Non-zero entries on each column
-  vector<list<int> > buckets;
-
-  // Create a vector with the rows for each non-zero element
-  vector<int> row;
-
-  // Do a bucket sorting
-  bucketSort(buckets,row);
-
-  // create the return object
-  CRSSparsity ret(size2(),size1());
   
-  // Get references to the column vector and row indices
-  vector<int> &rrowind = ret->rowind_;
-  vector<int> &rcol = ret->col_;
-  
-  // reserve space (to make the calculations quicker)
-  rcol.reserve(size());
+  // Get the sparsity of the transpose in sparse triplet form
+  const vector<int>& trans_row = col();
+  vector<int> trans_col = getRow();
 
-  // Store the mapping of the nonzero entries
-  mapping.clear();
-  mapping.reserve(size());
-
-  // loop over the rows of the resulting object
-  int nrow = size2();
-  for(int i=0; i<nrow; ++i){
-    
-    // Loop over the non-zero entries of the row
-    for(list<int>::const_iterator it=buckets[i].begin(); it!=buckets[i].end(); ++it){
-      // the index of the non-zero element
-     int el =  *it;
-     
-     // Get the column of the element
-     int j = row[el];
-     
-     // Store the mapping
-     mapping.push_back(el);
-     
-     // Store the column index
-     rcol.push_back(j);
-    }
-    // Log the row index
-    rrowind[i+1] = rcol.size();
-  }
-  
-  // Return the sparsity
-  return ret;
+  // Create the sparsity pattern
+  return sp_triplet(size2(),size1(),trans_row,trans_col,mapping);
 
 }
 
