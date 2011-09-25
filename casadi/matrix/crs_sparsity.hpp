@@ -260,6 +260,12 @@ class CRSSparsity : public SharedObject{
     /// Empty zero-by-zero
     static CRSSparsity emptySparsity;
     
+    /** \brief Calculate the elimination tree (see Direct Methods for Sparse Linear Systems by Davis, 2006) 
+        If the parameter ata is false, the algorithm is equivalent to Matlab's etree(A), except that
+        the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's etree(A,'col').
+    */
+    std::vector<int> eliminationTree(bool ata=false) const;
+    
     /// depth-first-search of the graph of a matrix, starting at node j (from CSparse)
     int depth_first_search(int j, int top, int *xi, int *pstack, const int *pinv);
 
@@ -295,6 +301,9 @@ class CRSSparsityNode : public SharedObjectNode{
     */
     void sanityCheck(bool complete=false) const;
 
+    /// Calculate the elimination tree (internal)
+    std::vector<int> eliminationTree(bool ata) const;
+    
     /// Clone
     virtual CRSSparsityNode* clone() const{ return new CRSSparsityNode(*this); }
 

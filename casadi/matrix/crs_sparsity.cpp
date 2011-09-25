@@ -1270,11 +1270,60 @@ CRSSparsity CRSSparsity::diag(std::vector<int>& mapping) const{
     s << "diag: wrong argument shape. Expecting square matrix or vector-like, but got " << dimString() << " instead." <<  std::endl;
     throw CasadiException(s.str());
   }
-  
 }
 
+std::vector<int> CRSSparsity::eliminationTree(bool ata) const{
+  return (*this)->eliminationTree(ata);
+}
 
+std::vector<int> CRSSparsityNode::eliminationTree(bool ata) const{
+  
+  // Allocate result
+  vector<int> parent(nrow_);
+  
+   // Allocate workspace 
+  vector<int> ancestor(nrow_);
+  vector<int> prev(ata ? ncol_ : 0, -1);
+  
+  // Loop over rows
+  for(int k=0; k<nrow_; ++k){
+    // Start with no parent or ancestor
+    parent[k] = -1;
+    ancestor[k] = -1;
+    
+    // Loop over nonzeros
+    for(int p=rowind_[k]; p<rowind_[k+1]; ++p){
+      
+      // What is this?
+      int i=ata ? (prev[col_[p]]) : (col_[p]);
+      
+      // Transverse from i to k
+      while(i!=-1 && i<k){
+        
+        // Next i is the ancestor of i
+        int inext = ancestor[i];
 
+        // Path compression
+        ancestor[i] = k;
+        
+        // No ancestor, parent is k
+        if(inext==-1) 
+          parent[i] = k;
+        
+        // Update i
+        i=inext;
+      }
+      
+      // What is this?
+      if(ata){
+        prev[col_[p]] = k;
+      }
+    }
+  }
+  
+  return parent;
+  
+}
 
 } // namespace CasADi
 
