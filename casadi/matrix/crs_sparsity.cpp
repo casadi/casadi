@@ -879,7 +879,7 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
   for(int rr=0; rr<ng; ++rr){
 
     // Mark the elements in the x row
-    fill(in_x_row.begin(),in_x_row.end(),0);
+    fill(in_x_row.begin(),in_x_row.end(),0); // NOTE: expensive?
     int_t b=1;
     for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
       for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
@@ -889,7 +889,7 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
     }
 
     // Get the sparsity pattern for the set of rows
-    fill(in_res_col.begin(),in_res_col.end(),0);
+    fill(in_res_col.begin(),in_res_col.end(),0); // NOTE: expensive?
     for(int j=0; j<y_ncol; ++j){
       
       // Loop over the nonzeros of the column of the second factor

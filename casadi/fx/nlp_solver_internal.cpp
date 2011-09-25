@@ -68,7 +68,7 @@ void NLPSolverInternal::init(){
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
 
   // Basic sanity checks
-  casadi_assert_message(F_.getNumInputs()==1 or F_.getNumInputs()==2, "Wrong number of input arguments to F. Must ");
+  casadi_assert_message(F_.getNumInputs()==1 || F_.getNumInputs()==2, "Wrong number of input arguments to F. Must be 1 or 2");
   casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
   casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
   if(!G_.isNull()) {
@@ -318,7 +318,7 @@ void NLPSolverInternal::init(){
     pn = ff[k]->input(1).size1();
     pm = ff[k]->input(1).size2();
     
-    if (pn==0 or pm==0)
+    if (pn==0 || pm==0)
      continue;
     
     if ((pn!=pn_ || pm!=pm_) && pn_!=0 && pm_!=0) {
