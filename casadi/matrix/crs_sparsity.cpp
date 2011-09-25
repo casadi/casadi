@@ -77,7 +77,11 @@ int CRSSparsity::numel() const{
 }
     
 int CRSSparsity::size() const{
-  return (*this)->col_.size();
+  return (*this)->size();
+}
+    
+int CRSSparsityNode::size() const{
+  return col_.size();
 }
     
 const vector<int>& CRSSparsity::col() const{
@@ -516,10 +520,15 @@ void CRSSparsityNode::print(ostream &stream) const{
   stream << "rowind: " << rowind_ << endl;
 }
 
-vector<int> CRSSparsity::getRow() const{
+
+std::vector<int> CRSSparsity::getRow() const{
+  return (*this)->getRow();
+}
+
+vector<int> CRSSparsityNode::getRow() const{
   vector<int> row(size());
-  for(int r=0; r<size1(); ++r){
-    for(int el = rowind(r); el < rowind(r+1); ++el){
+  for(int r=0; r<nrow_; ++r){
+    for(int el = rowind_[r]; el < rowind_[r+1]; ++el){
         row[el] = r;
       }
   }
@@ -567,13 +576,16 @@ void CRSSparsity::bucketSort(vector<list<int> >& buckets, vector<int>& row) cons
 }
 
 CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
-  
+  return (*this)->transpose(mapping);
+}
+
+CRSSparsity CRSSparsityNode::transpose(vector<int>& mapping) const{
   // Get the sparsity of the transpose in sparse triplet form
-  const vector<int>& trans_row = col();
+  const vector<int>& trans_row = col_;
   vector<int> trans_col = getRow();
 
   // Create the sparsity pattern
-  return sp_triplet(size2(),size1(),trans_row,trans_col,mapping);
+  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping);
 
 }
 
@@ -1077,39 +1089,6 @@ void CRSSparsity::enlargeColumns(int ncol, const std::vector<int>& jj){
   }
 }
 
-int CRSSparsity::depth_first_search(int j, int top, int *xi, int *pstack, const int *pinv){
-  int i, p, p2, done, jnew, head = 0, *Gp, *Gi;
-  Gp = getPtr(rowindRef()) ; Gi = getPtr(colRef());
-  xi[0] = j;                // initialize the recursion stack
-  while (head >= 0)
-  {
-    j = xi[head] ;         // get j from the top of the recursion stack
-    jnew = pinv ? pinv[j] : j ;
-    if (!marked(Gp, j))
-    {
-        mark(Gp, j) ;       // mark node j as visited
-        pstack[head] = (jnew < 0) ? 0 : unflip(Gp[jnew]) ;
-    }
-    done = 1 ;                  // node j done if no unvisited neighbors
-    p2 = (jnew < 0) ? 0 : unflip(Gp[jnew+1]) ;
-    for (p = pstack[head] ; p < p2 ; p++)  // examine all neighbors of j 
-    {
-        i = Gi[p] ;            // consider neighbor node i 
-        if (marked(Gp, i)) continue ;   // skip visited node i 
-        pstack[head] = p ;     // pause depth-first search of node j 
-        xi[++head] = i ;       // start dfs at node i 
-        done = 0 ;              // node j is not done 
-        break ;                 // break, to start dfs (i) 
-    }
-    if (done)               // depth-first search at node j is done 
-    {
-        head-- ;            // remove j from the recursion stack 
-        xi[--top] = j ;    // and place in the output stack 
-    }
-  }
-  return top;
-}
-
 CRSSparsity CRSSparsity::createDiagonal(int n){
   return createDiagonal(n,n);
 }
@@ -1134,10 +1113,9 @@ CRSSparsity CRSSparsity::createDiagonal(int n, int m){
   return ret;
 }
 
-
+#if 0
 void CRSSparsity::strongly_connected_components(){
   // not working
-  #if 0
   int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk;
     
   vector<int> AT_mapping;
@@ -1188,9 +1166,9 @@ void CRSSparsity::strongly_connected_components(){
   cout << rowind() << endl;
   cout << col() << endl;
   cout << "end" << endl;
-  #endif //0
   
 }
+#endif
 
 CRSSparsity CRSSparsity::makeDense(std::vector<int>& mapping) const{
   mapping.resize(size());
@@ -1324,6 +1302,143 @@ std::vector<int> CRSSparsityNode::eliminationTree(bool ata) const{
   return parent;
   
 }
+
+int CRSSparsity::depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const{
+  return (*this)->depthFirstSearch(j,top,xi,pstack,pinv,marked);
+}
+
+
+int CRSSparsityNode::depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const{
+  int i, p, p2, done, jnew, head = 0;
+  
+  // initialize the recursion stack
+  xi [0] = j;
+  while (head >= 0){
+    
+    // get j from the top of the recursion stack 
+    j = xi[head];
+    jnew = !pinv.empty() ? (pinv[j]) : j;
+    if (!marked[j]){
+      
+      // mark node j as visited
+      marked[j]=true;
+      pstack[head] = (jnew < 0) ? 0 : rowind_[jnew];
+    }
+    
+    // node j done if no unvisited neighbors
+    done = 1;
+    p2 = (jnew < 0) ? 0 : rowind_[jnew+1];
+    
+    // examine all neighbors of j
+    for (p = pstack[head] ; p < p2 ; p++){
+
+      // consider neighbor node i
+      i = col_[p];
+      
+      // skip visited node i
+      if (marked[i]) continue ;
+      
+      // pause depth-first search of node j
+      pstack[head] = p;
+      
+      // start dfs at node i
+      xi[++head] = i;
+      
+      // node j is not done
+      done = 0;
+      
+      // break, to start dfs (i)
+      break;
+    }
+    
+    //depth-first search at node j is done
+    if(done){
+      // remove j from the recursion stack
+      head--;
+      
+      // and place in the output stack
+      xi[--top] = j ;
+    }
+  }
+  return (top) ;
+}
+
+void CRSSparsity::stronglyConnectedComponents() const{
+  (*this)->stronglyConnectedComponents();
+}
+
+void CRSSparsityNode::stronglyConnectedComponents() const{
+  vector<int> tmp;
+  CRSSparsity AT = transpose(tmp);
+  tmp.clear();
+
+  vector<int> xi(2*nrow_+1);
+  vector<int>& Blk = xi;
+  
+  vector<int> rcopy(nrow_+1);
+  vector<int>& pstack = rcopy;
+  
+  vector<int> p(nrow_);
+  vector<int> r(nrow_+6);
+  
+  vector<bool> marked(nrow_,false);
+  
+  int top = nrow_;
+  
+  //first dfs(A) to find finish times (xi)
+  for(int i = 0; i<nrow_; ++i){
+    if(!marked[i]){
+      top = depthFirstSearch(i, top, xi, pstack, tmp, marked);
+    }
+  }
+
+  //restore A; unmark all nodes
+  fill(marked.begin(),marked.end(),false);
+  
+  top = nrow_;
+  int nb = nrow_;
+
+  // dfs(A') to find strongly connnected comp 
+  for (int k=0 ; k < nrow_ ; ++k){
+    // get i in reverse order of finish times
+    int i = xi[k];
+    
+    // skip node i if already ordered
+    if(marked[i]) continue;
+    
+    // node i is the start of a component in p
+    r[nb--] = top;
+    top = AT.depthFirstSearch(i, top, p, pstack, tmp, marked);
+  }
+  
+  // first block starts at zero; shift r up
+  r[nb] = 0;
+  for (int k = nb ; k <= nrow_ ; ++k) 
+    r[k-nb] = r[k] ;
+  
+  // nb = # of strongly connected components
+  nb = nrow_-nb;
+  
+  // sort each block in natural order
+  for(int b = 0 ; b < nb ; b++){
+    for (int k = r[b]; k<r[b+1] ; ++k) 
+      Blk[p[k]] = b ;
+  }
+  
+  for(int b=0; b <= nb; ++b){
+    rcopy[b] = r[b] ;
+  }
+  
+  for(int i=0; i<nrow_; ++i){
+    p[rcopy[Blk[i]]++] = i;
+  }
+  
+/*  return (cs_ddone (D, AT, xi, 1)) ;*/
+  
+}
+
+
+
 
 } // namespace CasADi
 

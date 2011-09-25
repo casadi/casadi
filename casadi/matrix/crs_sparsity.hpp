@@ -260,24 +260,22 @@ class CRSSparsity : public SharedObject{
     /// Empty zero-by-zero
     static CRSSparsity emptySparsity;
     
-    /** \brief Calculate the elimination tree (see Direct Methods for Sparse Linear Systems by Davis, 2006) 
+    /** \brief Calculate the elimination tree
+        See Direct Methods for Sparse Linear Systems by Davis (2006).
         If the parameter ata is false, the algorithm is equivalent to Matlab's etree(A), except that
         the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's etree(A,'col').
     */
     std::vector<int> eliminationTree(bool ata=false) const;
     
-    /// depth-first-search of the graph of a matrix, starting at node j (from CSparse)
-    int depth_first_search(int j, int top, int *xi, int *pstack, const int *pinv);
-
-    /// find the strongly connected components of a square matrix (from CSparse)
-    void strongly_connected_components();
-
-    int flip(int i){ return -(i)-2;}
-    int unflip(int i){ return (i < 0) ? flip(i) : i;}
-    int marked(int *w, int j){ return w[j] < 0; }
-    void mark(int *w, int j){
-      w[j] = flip(w[j]) ;
-    }
+    /** \brief Depth-first search on the adjacency graph of the sparsity
+        See Direct Methods for Sparse Linear Systems by Davis (2006).
+    */
+    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
+    
+    /** \brief Find the strongly connected components of a square matrix
+       See Direct Methods for Sparse Linear Systems by Davis (2006).
+    */
+    void stronglyConnectedComponents() const;
     
     std::string dimString() 	const;
 
@@ -304,6 +302,21 @@ class CRSSparsityNode : public SharedObjectNode{
     /// Calculate the elimination tree (internal)
     std::vector<int> eliminationTree(bool ata) const;
     
+    /// Find strongly connected components (internal)
+    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
+
+    /// Find the strongly connected components of a square matrix (internal)
+    void stronglyConnectedComponents() const;
+
+    /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix (internal)
+    CRSSparsity transpose(std::vector<int>& mapping) const;
+
+    /// Get the row for each nonzero
+    std::vector<int> getRow() const;
+
+    /// Number of structural non-zeros (internal)
+    int size() const;
+
     /// Clone
     virtual CRSSparsityNode* clone() const{ return new CRSSparsityNode(*this); }
 

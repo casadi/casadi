@@ -218,7 +218,8 @@ EquationSorter::EquationSorter(const std::vector<SX>& x, const std::vector<SX>& 
   fcn.init();
   SXMatrix jac = fcn.jac();
   
-  jac.sparsityRef().strongly_connected_components();
+  casadi_assert(0);
+  //jac.sparsity().stronglyConnectedComponents();
   
   // Get sparsity pattern (incidence matrix)
   I_[0] = jac.sparsity();
