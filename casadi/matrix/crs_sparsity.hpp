@@ -311,6 +311,18 @@ class CRSSparsityNode : public SharedObjectNode{
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix (internal)
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
+    /// Breadth-first search for coarse decomposition (C0,C1,R1 or R0,R3,C3)
+    void breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark);
+    
+    /// Collect matched rows and columns into p and q
+    static void matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark);
+    
+    /// Collect unmatched rows into the permutation vector p
+    static void unmatched(int m, const int *wi, int *p, int *rr, int set);
+    
+    /// return 1 if row i is in R2
+    static int rprune (int i, int j, double aij, void *other);
+    
     /// Get the row for each nonzero
     std::vector<int> getRow() const;
 

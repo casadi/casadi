@@ -1113,63 +1113,6 @@ CRSSparsity CRSSparsity::createDiagonal(int n, int m){
   return ret;
 }
 
-#if 0
-void CRSSparsity::strongly_connected_components(){
-  // not working
-  int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk;
-    
-  vector<int> AT_mapping;
-  CRSSparsity AT = transpose(AT_mapping);
-  n = size1() ; Ap = &rowindRef().front();
-  
-  vector<int> xi_data(2*n+1);
-  xi = &xi_data.front();
-  
-  vector<int> Dp(n);
-  vector<int> Dq(0);
-  vector<int> Dr(n+6);
-  vector<int> Ds(6);
-  int Dnb;
-  int Drr[5];
-  int Dcc[5];
-  
-  Blk = xi ; rcopy = pstack = xi + n ;
-  p = &Dp.front() ; r = &Dr.front() ; ATp = &AT.rowindRef().front();
-  
-  top = n ;
-  for (i = 0 ; i < n ; i++){
-      if (!marked(Ap, i)) top = depth_first_search(i, top, xi, pstack, NULL);
-  }
-  
-  for (i = 0 ; i < n ; i++) 
-    mark(Ap, i);
-  top = n;
-  nb = n;
-  for (k = 0 ; k < n ; k++){
-    i = xi [k] ;
-    if (marked(ATp, i)) continue ;
-    r [nb--] = top ;
-    top = AT.depth_first_search(i, top, p, pstack, NULL) ;
-  }
-  r[nb] = 0;
-  for (k = nb ; k <= n ; k++) r[k-nb] = r[k];
-  Dnb = nb = n-nb;
-  for (b = 0 ; b < nb ; b++){
-      for (k = r [b] ; k < r [b+1] ; k++) Blk [p [k]] = b ;
-  }
-  for (b = 0 ; b <= nb ; b++) rcopy [b] = r [b] ;
-  for (i = 0 ; i < n ; i++) p [rcopy [Blk [i]]++] = i ;
-  
-  cout << Dp << endl;
-  cout << Dr << endl;
-  cout << Dnb << endl;
-  cout << rowind() << endl;
-  cout << col() << endl;
-  cout << "end" << endl;
-  
-}
-#endif
-
 CRSSparsity CRSSparsity::makeDense(std::vector<int>& mapping) const{
   mapping.resize(size());
   for(int i=0; i<size1(); ++i){
@@ -1432,10 +1375,93 @@ void CRSSparsityNode::stronglyConnectedComponents() const{
   for(int i=0; i<nrow_; ++i){
     p[rcopy[Blk[i]]++] = i;
   }
-  
-/*  return (cs_ddone (D, AT, xi, 1)) ;*/
-  
+    
 }
+
+void CRSSparsityNode::breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark){
+  int *Ap, *Ai, head = 0, tail = 0, j, i, p, j2 ;
+  
+  // place all unmatched nodes in queue
+  for (j=0; j<n; ++j){
+    // skip j if matched
+    if(imatch[j] >= 0) continue;
+    
+    // j in set C0 (R0 if transpose)
+    wj[j] = 0;
+    
+    // place unmatched col j in queue
+    queue[tail++] = j;
+  }
+  
+  // quick return if no unmatched nodes
+  if(tail == 0) return;
+  
+  CRSSparsity C;
+  if(mark == 1){
+    C.assignNode(this);
+  } else {
+    vector<int> tmp;
+    C = transpose(tmp);
+  }
+  
+  Ap = &C.rowindRef().front();
+  Ai = &C.colRef().front();
+  
+  // while queue is not empty
+  while (head < tail){
+    
+    // get the head of the queue
+    j = queue[head++];
+    for(p = Ap [j] ; p < Ap [j+1] ; p++){
+      i = Ai [p] ;
+      
+      // skip if i is marked
+      if (wi [i] >= 0) continue;
+      
+      // i in set R1 (C3 if transpose)
+      wi [i] = mark;
+      
+      // traverse alternating path to j2
+      j2 = jmatch [i];
+      
+      // skip j2 if it is marked
+      if(wj [j2] >= 0) continue;
+      
+      // j2 in set C1 (R3 if transpose)
+      wj[j2] = mark;
+      
+      // add j2 to queue
+      queue [tail++] = j2;
+    }
+  }
+}
+
+void CRSSparsityNode::matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark){
+  int kc = cc [set], j ;
+  int kr = rr [set-1] ;
+  for (j = 0 ; j < n ; j++){
+      if (wj [j] != mark) continue ;      /* skip if j is not in C set */
+      p [kr++] = imatch [j] ;
+      q [kc++] = j ;
+  }
+  cc [set+1] = kc ;
+  rr [set] = kr ;
+}
+
+void CRSSparsityNode::unmatched(int m, const int *wi, int *p, int *rr, int set){
+  int i, kr = rr[set] ;
+  for (i=0; i<m; i++) 
+    if (wi[i] == 0) 
+      p[kr++] = i;
+    
+  rr[set+1] = kr;
+}
+
+int CRSSparsityNode::rprune(int i, int j, double aij, void *other){
+  int *rr = (int *) other;
+  return (i >= rr[1] && i < rr[2]) ;
+}
+
 
 
 
