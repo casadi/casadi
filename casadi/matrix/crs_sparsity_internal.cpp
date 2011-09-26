@@ -356,15 +356,18 @@ void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue
 
 void CRSSparsityInternal::matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark){
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-  int kc = cc [set], j ;
-  int kr = rr [set-1] ;
-  for (j = 0 ; j < n ; j++){
-      if (wj [j] != mark) continue ;      /* skip if j is not in C set */
-      p [kr++] = imatch [j] ;
-      q [kc++] = j ;
+  int kc = cc[set];
+  int kr = rr[set-1] ;
+  for(int j=0; j<n; ++j){
+    // skip if j is not in C set 
+    if (wj[j] != mark) continue;
+    
+    p[kr++] = imatch[j] ;
+    q[kc++] = j ;
   }
-  cc [set+1] = kc ;
-  rr [set] = kr ;
+  
+  cc[set+1] = kc ;
+  rr[set] = kr ;
 }
 
 void CRSSparsityInternal::unmatched(int m, const int *wi, int *p, int *rr, int set){
@@ -546,7 +549,7 @@ void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<i
       imatch[jmatch[i]] = i;
 }
 
-void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
+int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const{
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
 
   int k, cnz, nc, nb2, ok ;
@@ -573,14 +576,13 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
   // size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q)
   vector<int> s(n+6);
 
-  // # of blocks in fine dmperm decomposition
-  int Dnb;
-  
   // coarse row decomposition
-  int rr[5];
+  coarse_colblock.resize(5);
+  fill(coarse_colblock.begin(),coarse_colblock.end(),0);
   
   // coarse column decomposition
-  int cc[5];
+  coarse_rowblock.resize(5);
+  fill(coarse_rowblock.begin(),coarse_rowblock.end(),0);
 
   // max transversal
   vector<int> imatch, jmatch;
@@ -607,20 +609,20 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
   breadthFirstSearch(m, &wj.front(), &wi.front(), &p.front(), &jmatch.front(), &imatch.front(), 3);
 
   // unmatched set C0
-  unmatched(n, &wj.front(), &q.front(), cc, 0);
+  unmatched(n, &wj.front(), &q.front(), &coarse_rowblock.front(), 0);
 
   // set R1 and C1
-  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), cc, rr, 1, 1);
+  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), &coarse_rowblock.front(), &coarse_colblock.front(), 1, 1);
 
   // set R2 and C2
-  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), cc, rr, 2, -1);
+  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), &coarse_rowblock.front(), &coarse_colblock.front(), 2, -1);
 
   // set R3 and C3
-  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), cc, rr, 3, 3);
+  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), &coarse_rowblock.front(), &coarse_colblock.front(), 3, 3);
 
   // unmatched set R0
-  unmatched(m, &wi.front(), &p.front(), rr, 3);
-
+  unmatched(m, &wi.front(), &p.front(), &coarse_colblock.front(), 3);
+  
   // --- Fine decomposition -----------------------------------------------
   // pinv=p'
   vector<int> pinv = invertPermutation(&p.front(), m);
@@ -631,23 +633,23 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
   vector<int>& Cp = C.rowindRef();
 
   // delete cols C0, C1, and C3 from C 
-  nc = cc[3] - cc[2];
-  if(cc[2] > 0)
-    for(int j = cc[2]; j <= cc[3]; ++j)
-      Cp[j-cc[2]] = Cp[j];
+  nc = coarse_rowblock[3] - coarse_rowblock[2];
+  if(coarse_rowblock[2] > 0)
+    for(int j = coarse_rowblock[2]; j <= coarse_rowblock[3]; ++j)
+      Cp[j-coarse_rowblock[2]] = Cp[j];
   
   C->nrow_ = nc;
   C->rowind_.resize(nc+1);
   C->col_.resize(C->rowind_.back());
 
   // delete rows R0, R1, and R3 from C
-  if(rr[2] - rr[1] < m){
-    C->drop(rprune, rr) ;
+  if(coarse_colblock[2] - coarse_colblock[1] < m){
+    C->drop(rprune, &coarse_colblock.front()) ;
     cnz = Cp[nc];
     vector<int>& Ci = C->col_;
-    if(rr[1] > 0)
+    if(coarse_colblock[1] > 0)
       for(k=0; k<cnz; ++k)
-        Ci[k] -= rr[1];
+        Ci[k] -= coarse_colblock[1];
   }
   C->ncol_ = nc ;
 
@@ -667,43 +669,50 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
   int nb1 = scc_nb;
 
   for(k=0; k<nc; ++k)
-    wj [k] = q[ps[k] + cc[2]];
+    wj [k] = q[ps[k] + coarse_rowblock[2]];
   
   for(k=0; k<nc; ++k)
-    q[k + cc [2]] = wj [k];
+    q[k + coarse_rowblock[2]] = wj[k];
   
   for(k=0; k<nc; ++k)
-    wi[k] = p[ps[k] + rr[1]];
+    wi[k] = p[ps[k] + coarse_colblock[1]];
   
   for(k=0; k<nc; ++k)
-    p[k + rr[1]] = wi[k];
+    p[k + coarse_colblock[1]] = wi[k];
   
   // create the fine block partitions
   nb2 = 0;
   r[0] = s[0] = 0;
 
   // leading coarse block A (R1, [C0 C1])
-  if(cc [2] > 0)
+  if(coarse_rowblock[2] > 0)
     nb2++ ;
   
   // coarse block A (R2,C2)
   for (k=0; k<nb1; ++k){
     // A (R2,C2) splits into nb1 fine blocks 
-    r [nb2] = rs [k] + rr[1];
-    s [nb2] = rs [k] + cc[2] ;
+    r [nb2] = rs [k] + coarse_colblock[1];
+    s [nb2] = rs [k] + coarse_rowblock[2] ;
     nb2++ ;
   }
   
-  if(rr[2] < m){
+  if(coarse_colblock[2] < m){
     // trailing coarse block A ([R3 R0], C3)
-    r[nb2] = rr [2];
-    s[nb2] = cc [3];
+    r[nb2] = coarse_colblock[2];
+    s[nb2] = coarse_rowblock[3];
     nb2++ ;
   }
   
   r[nb2] = m ;
   s[nb2] = n ;
-  Dnb = nb2 ;
+  
+  
+  // Copy to output
+  rowperm = vector<int>(q.begin(), q.end());
+  colperm = vector<int>(p.begin(), p.end());
+  rowblock = vector<int>(s.begin(), s.end());
+  colblock = vector<int>(r.begin(), r.end());
+  return nb2;
 }
 
 std::vector<int> CRSSparsityInternal::randomPermutation(int n, int seed){

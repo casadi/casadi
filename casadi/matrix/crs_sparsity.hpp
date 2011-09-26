@@ -280,6 +280,13 @@ class CRSSparsity : public SharedObject{
     */
     int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
     
+    /** \brief Compute the Dulmage-Mendelsohn decomposition 
+       See Direct Methods for Sparse Linear Systems by Davis (2006).
+    */
+    int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const;
+
+    
+    
     std::string dimString() 	const;
 
 };

@@ -293,8 +293,12 @@ Matrix<SX> spy(const Matrix<SX>& A){
 }
 
 bool dependsOn(const Matrix<SX>& ex, const Matrix<SX> &arg){
-  Matrix<SX> g = gradient(vec(ex),arg);
-  return !isZero(g);
+  if(ex.size()==0) return false;
+
+  SXFunction temp(arg,ex);
+  temp.init();
+  CRSSparsity Jsp = temp.jacSparsity();
+  return Jsp.size()!=0;
 }
 
 

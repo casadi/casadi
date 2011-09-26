@@ -441,7 +441,6 @@ void OCP::makeExplicit(){
 
   cout << "Making explicit..." << endl;
   double time1 = clock();
-
   
   // Create Jacobian
   SXFunction fcn(implicit_var_,implicit_fcn_);
@@ -480,6 +479,8 @@ void OCP::makeExplicit(){
     
     // Block size
     int bs = rowblock_[b+1] - rowblock_[b];
+    
+/*    cout << "block " << b << ": size = " << bs << endl;*/
     
     // Get local variables
     vb.clear();
@@ -533,6 +534,7 @@ void OCP::makeExplicit(){
       addExplicitEquation(vb,x_k);
       
       // TODO: implement tearing
+      casadi_assert_message(0,"not implemented");
       if(false){ // not ready (but make sure it compiles)
       
         // Find out which dependencies are nonlinear and which are linear
@@ -632,6 +634,7 @@ void OCP::makeExplicit(){
   }
   
   // Eliminate the dependents
+  cout << "eliminating dependents" << endl;
   eliminateDependent();
 
   double time2 = clock();

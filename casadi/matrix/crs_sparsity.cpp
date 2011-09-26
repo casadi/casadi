@@ -1121,6 +1121,10 @@ int CRSSparsity::stronglyConnectedComponents(std::vector<int>& p, std::vector<in
   return (*this)->stronglyConnectedComponents(p,r);
 }
 
+int CRSSparsity::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const{
+  return (*this)->dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock, seed);
+}
+
 
 } // namespace CasADi
 

@@ -31,6 +31,9 @@ namespace CasADi{
   namespace Interfaces{
     
     BLT::BLT(CRSSparsity s, int seed){
+      nb = s.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock,seed);
+      
+      return;
       
       // Call CSparse to perform the BLT
       cs AT; // NOTE: transpose (since CasADi row major, CSparse column major)
@@ -41,6 +44,7 @@ namespace CasADi{
       AT.i = &s.colRef().front();
       AT.x = 0;
       AT.nz = -1;
+      cout << "calling cs_dmperm " << endl;
       csd *perm = cs_dmperm (&AT, seed);
        
       // Save to BLT structure // NOTE: swapping row<>col due to row/column major
