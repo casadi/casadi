@@ -1462,7 +1462,198 @@ int CRSSparsityNode::rprune(int i, int j, double aij, void *other){
   return (i >= rr[1] && i < rr[2]) ;
 }
 
+void CRSSparsityNode::augmentingPath(int k, int *jmatch, int *cheap, int *w, int *js, int *is, int *ps) const{
+#if 0
+    int found = 0, p, i = -1, *Ap = A->p, *Ai = A->i, head = 0, j ;
+    js [0] = k ;                        /* start with just node k in jstack */
+    while (head >= 0)
+    {
+        /* --- Start (or continue) depth-first-search at node j ------------- */
+        j = js [head] ;                 /* get j from top of jstack */
+        if (w [j] != k)                 /* 1st time j visited for kth path */
+        {
+            w [j] = k ;                 /* mark j as visited for kth path */
+            for (p = cheap [j] ; p < Ap [j+1] && !found ; p++)
+            {
+                i = Ai [p] ;            /* try a cheap assignment (i,j) */
+                found = (jmatch [i] == -1) ;
+            }
+            cheap [j] = p ;             /* start here next time j is traversed*/
+            if (found)
+            {
+                is [head] = i ;         /* column j matched with row i */
+                break ;                 /* end of augmenting path */
+            }
+            ps [head] = Ap [j] ;        /* no cheap match: start dfs for j */
+        }
+        /* --- Depth-first-search of neighbors of j ------------------------- */
+        for (p = ps [head] ; p < Ap [j+1] ; p++)
+        {
+            i = Ai [p] ;                /* consider row i */
+            if (w [jmatch [i]] == k) continue ; /* skip jmatch [i] if marked */
+            ps [head] = p + 1 ;         /* pause dfs of node j */
+            is [head] = i ;             /* i will be matched with j if found */
+            js [++head] = jmatch [i] ;  /* start dfs at column jmatch [i] */
+            break ;
+        }
+        if (p == Ap [j+1]) head-- ;     /* node j is done; pop from stack */
+    }                                   /* augment the match if path found: */
+    if (found) for (p = head ; p >= 0 ; p--) jmatch [is [p]] = js [p] ;
+#endif
+}
 
+void CRSSparsityNode::maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, int seed) const{
+#if 0
+    int i, j, k, n, m, p, n2 = 0, m2 = 0, *Ap, *jimatch, *w, *cheap, *js, *is,
+        *ps, *Ai, *Cp, *jmatch, *imatch, *q ;
+    cs *C ;
+    if (!CS_CSC (A)) return (NULL) ;                /* check inputs */
+    n = A->n ; m = A->m ; Ap = A->p ; Ai = A->i ;
+    w = jimatch = cs_calloc (m+n, sizeof (int)) ;   /* allocate result */
+    if (!jimatch) return (NULL) ;
+    for (k = 0, j = 0 ; j < n ; j++)    /* count nonempty rows and columns */
+    {
+        n2 += (Ap [j] < Ap [j+1]) ;
+        for (p = Ap [j] ; p < Ap [j+1] ; p++)
+        {
+            w [Ai [p]] = 1 ;
+            k += (j == Ai [p]) ;        /* count entries already on diagonal */
+        }
+    }
+    if (k == CS_MIN (m,n))              /* quick return if diagonal zero-free */
+    {
+        jmatch = jimatch ; imatch = jimatch + m ;
+        for (i = 0 ; i < k ; i++) jmatch [i] = i ;
+        for (      ; i < m ; i++) jmatch [i] = -1 ;
+        for (j = 0 ; j < k ; j++) imatch [j] = j ;
+        for (      ; j < n ; j++) imatch [j] = -1 ;
+        return (cs_idone (jimatch, NULL, NULL, 1)) ;
+    }
+    for (i = 0 ; i < m ; i++) m2 += w [i] ;
+    C = (m2 < n2) ? cs_transpose (A,0) : ((cs *) A) ; /* transpose if needed */
+    if (!C) return (cs_idone (jimatch, (m2 < n2) ? C : NULL, NULL, 0)) ;
+    n = C->n ; m = C->m ; Cp = C->p ;
+    jmatch = (m2 < n2) ? jimatch + n : jimatch ;
+    imatch = (m2 < n2) ? jimatch : jimatch + m ;
+    w = cs_malloc (5*n, sizeof (int)) ;             /* get workspace */
+    if (!w) return (cs_idone (jimatch, (m2 < n2) ? C : NULL, w, 0)) ;
+    cheap = w + n ; js = w + 2*n ; is = w + 3*n ; ps = w + 4*n ;
+    for (j = 0 ; j < n ; j++) cheap [j] = Cp [j] ;  /* for cheap assignment */
+    for (j = 0 ; j < n ; j++) w [j] = -1 ;          /* all columns unflagged */
+    for (i = 0 ; i < m ; i++) jmatch [i] = -1 ;     /* nothing matched yet */
+    q = cs_randperm (n, seed) ;                     /* q = random permutation */
+    for (k = 0 ; k < n ; k++)   /* augment, starting at column q[k] */
+    {
+        cs_augment (q ? q [k]: k, C, jmatch, cheap, w, js, is, ps) ;
+    }
+    cs_free (q) ;
+    for (j = 0 ; j < n ; j++) imatch [j] = -1 ;     /* find row match */
+    for (i = 0 ; i < m ; i++) if (jmatch [i] >= 0) imatch [jmatch [i]] = i ;
+    return (cs_idone (jimatch, (m2 < n2) ? C : NULL, w, 1)) ;
+#endif
+}
+
+void CRSSparsityNode::dulmageMendelsohn(int seed) const{
+  int i, j, k, cnz, nc, *wi, *wj, *pinv, *Cp, *Ci, *ps, *rs, nb1, nb2, ok ;
+
+  CRSSparsity C;
+  //  csd *D, *scc ;
+
+  // Part 1: Maximum matching
+  int m = ncol_;
+  int n = nrow_;
+
+  // row permutation 
+  vector<int> p(m);
+  
+  // column permutation 
+  vector<int> q(n);
+  
+  // size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q)
+  vector<int> r(m+6);
+  
+  // size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q)
+  vector<int> s(n+6);
+
+  // # of blocks in fine dmperm decomposition
+  int Dnb;
+  
+  // coarse row decomposition
+  int rr[5];
+  
+  // coarse column decomposition
+  int cc[5];
+
+  // max transversal
+  vector<int> imatch, jmatch;
+  maxTransversal(imatch,jmatch,seed);
+  
+#if 0  
+  imatch = jmatch + m ;                       /* imatch = inverse of jmatch */
+  if (!jmatch) return (cs_ddone (D, NULL, jmatch, 0)) ;
+  /* --- Coarse decomposition --------------------------------------------- */
+  wi = r ; wj = s ;                           /* use r and s as workspace */
+  for (j = 0 ; j < n ; j++) wj [j] = -1 ;     /* unmark all cols for bfs */
+  for (i = 0 ; i < m ; i++) wi [i] = -1 ;     /* unmark all rows for bfs */
+  cs_bfs (A, n, wi, wj, q, imatch, jmatch, 1) ;       /* find C1, R1 from C0*/
+  ok = cs_bfs (A, m, wj, wi, p, jmatch, imatch, 3) ;  /* find R3, C3 from R0*/
+  if (!ok) return (cs_ddone (D, NULL, jmatch, 0)) ;
+  cs_unmatched (n, wj, q, cc, 0) ;                    /* unmatched set C0 */
+  cs_matched (n, wj, imatch, p, q, cc, rr, 1, 1) ;    /* set R1 and C1 */
+  cs_matched (n, wj, imatch, p, q, cc, rr, 2, -1) ;   /* set R2 and C2 */
+  cs_matched (n, wj, imatch, p, q, cc, rr, 3, 3) ;    /* set R3 and C3 */
+  cs_unmatched (m, wi, p, rr, 3) ;                    /* unmatched set R0 */
+  cs_free (jmatch) ;
+  /* --- Fine decomposition ----------------------------------------------- */
+  pinv = cs_pinv (p, m) ;         /* pinv=p' */
+  if (!pinv) return (cs_ddone (D, NULL, NULL, 0)) ;
+  C = cs_permute (A, pinv, q, 0) ;/* C=A(p,q) (it will hold A(R2,C2)) */
+  cs_free (pinv) ;
+  if (!C) return (cs_ddone (D, NULL, NULL, 0)) ;
+  Cp = C->p ;
+  nc = cc [3] - cc [2] ;          /* delete cols C0, C1, and C3 from C */
+  if (cc [2] > 0) for (j = cc [2] ; j <= cc [3] ; j++) Cp [j-cc[2]] = Cp [j] ;
+  C->n = nc ;
+  if (rr [2] - rr [1] < m)        /* delete rows R0, R1, and R3 from C */
+  {
+      cs_fkeep (C, cs_rprune, rr) ;
+      cnz = Cp [nc] ;
+      Ci = C->i ;
+      if (rr [1] > 0) for (k = 0 ; k < cnz ; k++) Ci [k] -= rr [1] ;
+  }
+  C->m = nc ;
+  scc = cs_scc (C) ;              /* find strongly connected components of C*/
+  if (!scc) return (cs_ddone (D, C, NULL, 0)) ;
+  /* --- Combine coarse and fine decompositions --------------------------- */
+  ps = scc->p ;                   /* C(ps,ps) is the permuted matrix */
+  rs = scc->r ;                   /* kth block is rs[k]..rs[k+1]-1 */
+  nb1 = scc->nb  ;                /* # of blocks of A(R2,C2) */
+  for (k = 0 ; k < nc ; k++) wj [k] = q [ps [k] + cc [2]] ;
+  for (k = 0 ; k < nc ; k++) q [k + cc [2]] = wj [k] ;
+  for (k = 0 ; k < nc ; k++) wi [k] = p [ps [k] + rr [1]] ;
+  for (k = 0 ; k < nc ; k++) p [k + rr [1]] = wi [k] ;
+  nb2 = 0 ;                       /* create the fine block partitions */
+  r [0] = s [0] = 0 ;
+  if (cc [2] > 0) nb2++ ;         /* leading coarse block A (R1, [C0 C1]) */
+  for (k = 0 ; k < nb1 ; k++)     /* coarse block A (R2,C2) */
+  {
+      r [nb2] = rs [k] + rr [1] ; /* A (R2,C2) splits into nb1 fine blocks */
+      s [nb2] = rs [k] + cc [2] ;
+      nb2++ ;
+  }
+  if (rr [2] < m)
+  {
+      r [nb2] = rr [2] ;          /* trailing coarse block A ([R3 R0], C3) */
+      s [nb2] = cc [3] ;
+      nb2++ ;
+  }
+  r [nb2] = m ;
+  s [nb2] = n ;
+  D->nb = nb2 ;
+  cs_dfree (scc) ;
+  return (cs_ddone (D, C, NULL, 1)) ;
+#endif
+}
 
 
 

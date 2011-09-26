@@ -322,6 +322,15 @@ class CRSSparsityNode : public SharedObjectNode{
     
     /// return 1 if row i is in R2
     static int rprune (int i, int j, double aij, void *other);
+
+    /// Compute the Dulmage-Mendelsohn decomposition
+    void dulmageMendelsohn(int seed) const;
+    
+    /// Compute the maximum transversal (maximum matching)
+    void maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, int seed) const;
+    
+    /// Find an augmenting path
+    void augmentingPath(int k, int *jmatch, int *cheap, int *w, int *js, int *is, int *ps) const;
     
     /// Get the row for each nonzero
     std::vector<int> getRow() const;
