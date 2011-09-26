@@ -51,13 +51,13 @@ class CRSSparsityInternal : public SharedObjectNode{
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
     /// Breadth-first search for coarse decomposition
-    void breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark) const;
+    void breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj, std::vector<int>& queue, const std::vector<int>& imatch, const std::vector<int>& jmatch, int mark) const;
     
     /// Collect matched rows and columns into p and q
-    static void matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark);
+    static void matched(int n, const std::vector<int>& wj, const std::vector<int>& imatch, std::vector<int>& p, std::vector<int>& q, std::vector<int>& cc, std::vector<int>& rr, int set, int mark);
     
     /// Collect unmatched rows into the permutation vector p
-    static void unmatched(int m, const int *wi, int *p, int *rr, int set);
+    static void unmatched(int m, const std::vector<int>& wi, std::vector<int>& p, std::vector<int>& rr, int set);
     
     /// return 1 if row i is in R2
     static int rprune (int i, int j, double aij, void *other);
@@ -78,10 +78,10 @@ class CRSSparsityInternal : public SharedObjectNode{
     static std::vector<int> randomPermutation(int n, int seed);
 
     /// Invert a permutation matrix
-    static std::vector<int> invertPermutation(const int *p, int n);
+    static std::vector<int> invertPermutation(const std::vector<int>& p);
 
     /// C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1.
-    CRSSparsity permute(const int *pinv, const int *q, int values) const;
+    CRSSparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
 
     /// Get the row for each nonzero
     std::vector<int> getRow() const;

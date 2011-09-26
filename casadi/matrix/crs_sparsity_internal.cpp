@@ -170,16 +170,15 @@ std::vector<int> CRSSparsityInternal::eliminationTree(bool ata) const{
 }
 
 int CRSSparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const{
-  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-  int i, p, p2, done, jnew, head = 0;
+  int head = 0;
   
   // initialize the recursion stack
-  xi [0] = j;
+  xi[0] = j;
   while (head >= 0){
     
     // get j from the top of the recursion stack 
     j = xi[head];
-    jnew = !pinv.empty() ? (pinv[j]) : j;
+    int jnew = !pinv.empty() ? (pinv[j]) : j;
     if (!marked[j]){
       
       // mark node j as visited
@@ -188,14 +187,14 @@ int CRSSparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi, 
     }
     
     // node j done if no unvisited neighbors
-    done = 1;
-    p2 = (jnew < 0) ? 0 : rowind_[jnew+1];
+    int done = 1;
+    int p2 = (jnew < 0) ? 0 : rowind_[jnew+1];
     
     // examine all neighbors of j
-    for (p = pstack[head] ; p < p2 ; p++){
+    for(int p = pstack[head]; p< p2; ++p){
 
       // consider neighbor node i
-      i = col_[p];
+      int i = col_[p];
       
       // skip visited node i
       if (marked[i]) continue ;
@@ -294,12 +293,12 @@ int CRSSparsityInternal::stronglyConnectedComponents(std::vector<int>& p, std::v
   return nb;
 }
 
-void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark) const{
+void CRSSparsityInternal::breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj, std::vector<int>& queue, const std::vector<int>& imatch, const std::vector<int>& jmatch, int mark) const{
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int head = 0, tail = 0, j, i, p, j2 ;
   
   // place all unmatched nodes in queue
-  for (j=0; j<n; ++j){
+  for(j=0; j<n; ++j){
     // skip j if matched
     if(imatch[j] >= 0) continue;
     
@@ -322,16 +321,13 @@ void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue
     C = static_cast<const CRSSparsityInternal *>(trans.get());
   }
   
-  const int *Ap = &C->rowind_.front();
-  const int *Ai = &C->col_.front();
-  
   // while queue is not empty
   while (head < tail){
     
     // get the head of the queue
     j = queue[head++];
-    for(p = Ap [j] ; p < Ap [j+1] ; p++){
-      i = Ai [p] ;
+    for(p = C->rowind_[j] ; p < C->rowind_[j+1] ; p++){
+      i = C->col_[p] ;
       
       // skip if i is marked
       if (wi [i] >= 0) continue;
@@ -354,7 +350,7 @@ void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue
   }
 }
 
-void CRSSparsityInternal::matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark){
+void CRSSparsityInternal::matched(int n, const std::vector<int>& wj, const std::vector<int>& imatch, std::vector<int>& p, std::vector<int>& q, std::vector<int>& cc, std::vector<int>& rr, int set, int mark){
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int kc = cc[set];
   int kr = rr[set-1] ;
@@ -370,7 +366,7 @@ void CRSSparsityInternal::matched(int n, const int *wj, const int *imatch, int *
   rr[set] = kr ;
 }
 
-void CRSSparsityInternal::unmatched(int m, const int *wi, int *p, int *rr, int set){
+void CRSSparsityInternal::unmatched(int m, const std::vector<int>& wi, std::vector<int>& p, std::vector<int>& rr, int set){
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int i, kr = rr[set] ;
   for (i=0; i<m; i++) 
@@ -382,7 +378,7 @@ void CRSSparsityInternal::unmatched(int m, const int *wi, int *p, int *rr, int s
 
 int CRSSparsityInternal::rprune(int i, int j, double aij, void *other){
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-  int *rr = (int *) other;
+  vector<int> &rr = *static_cast<vector<int> *>(other);
   return (i >= rr[1] && i < rr[2]) ;
 }
 
@@ -390,9 +386,6 @@ void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *c
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
 
   int found = 0, p, i = -1, head = 0, j ;
-  
-  const int *Ap = &rowind_.front();
-  const int *Ai = &col_.front();
   
   // start with just node k in jstack
   js[0] = k ;
@@ -408,8 +401,8 @@ void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *c
       
       // mark j as visited for kth path 
       w[j] = k;
-      for(p = cheap [j] ; p < Ap[j+1] && !found; ++p){
-        i = Ai [p] ;            /* try a cheap assignment (i,j) */
+      for(p = cheap [j] ; p < rowind_[j+1] && !found; ++p){
+        i = col_[p] ;            /* try a cheap assignment (i,j) */
         found = (jmatch [i] == -1) ;
       }
       
@@ -424,14 +417,14 @@ void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *c
       }
       
       // no cheap match: start dfs for j
-      ps[head] = Ap[j];
+      ps[head] = rowind_[j];
     }
     
     // --- Depth-first-search of neighbors of j -------------------------
-    for(p = ps[head]; p<Ap[j+1]; ++p){
+    for(p = ps[head]; p<rowind_[j+1]; ++p){
       
       // consider row i
-      i = Ai[p];
+      i = col_[p];
       
       // skip jmatch [i] if marked
       if(w[jmatch[i]] == k) continue;
@@ -448,7 +441,7 @@ void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *c
     }
     
     // node j is done; pop from stack
-    if(p == Ap[j+1]) head--;
+    if(p == rowind_[j+1]) head--;
   } // augment the match if path found:
   
   if(found)
@@ -461,42 +454,36 @@ void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<i
 
   int n2 = 0, m2 = 0;
   
-  //cs *C ;
-  int n = nrow_;
-  int m = ncol_;
-  const int *Ap = &rowind_.front();
-  const int *Ai = &col_.front();
-  
   // allocate result
-  vector<int> jimatch(m+n);
-  jmatch.resize(m);
-  imatch.resize(n);
-  vector<int> w(m+n);
+  vector<int> jimatch(ncol_+nrow_);
+  jmatch.resize(ncol_);
+  imatch.resize(nrow_);
+  vector<int> w(ncol_+nrow_);
   
   // count nonempty rows and columns
   int k=0;
-  for(int j=0; j<n; ++j){
-    n2 += (Ap[j] < Ap[j+1]);
-    for(int p=Ap[j]; p < Ap[j+1]; ++p){
-      w[Ai[p]] = 1;
+  for(int j=0; j<nrow_; ++j){
+    n2 += (rowind_[j] < rowind_[j+1]);
+    for(int p=rowind_[j]; p < rowind_[j+1]; ++p){
+      w[col_[p]] = 1;
       
       // count entries already on diagonal
-      k += (j == Ai [p]);
+      k += (j == col_[p]);
     }
   }
   
   // quick return if diagonal zero-free
-  if(k == std::min(m,n)){
+  if(k == std::min(ncol_,nrow_)){
     int i;
     for(i=0; i<k; ++i) jmatch[i] = i;
-    for(;    i<m; ++i) jmatch[i] = -1;
+    for(;    i<ncol_; ++i) jmatch[i] = -1;
 
     int j;
     for(j=0; j<k; ++j) imatch[j] = j;
-    for(;    j<n; ++j) imatch[j] = -1;
+    for(;    j<nrow_; ++j) imatch[j] = -1;
   }
 
-  for(int i=0; i<m; ++i) m2 += w[i];
+  for(int i=0; i<ncol_; ++i) m2 += w[i];
   
   // transpose if needed
   if(m2 < n2 && trans.isNull())
@@ -505,76 +492,63 @@ void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<i
   // Get pointer to sparsity
   const CRSSparsityInternal* C = m2 < n2 ? static_cast<const CRSSparsityInternal*>(trans.get()) : this;
   
-  n = C->nrow_;
-  m = C->ncol_;
-  const int* Cp = &C->rowind_.front();
-
   std::vector<int>& Cjmatch = m2 < n2 ? imatch : jmatch;
   std::vector<int>& Cimatch = m2 < n2 ? jmatch : imatch;
   
   // get workspace 
-  w.resize(5*n);
+  w.resize( 5 * C->nrow_);
 
-  int *cheap = &w.front() + n;
-  int *js = &w.front() + 2*n;
-  int *is = &w.front() + 3*n; 
-  int *ps = &w.front() + 4*n;
+  int *cheap = &w.front() + C->nrow_;
+  int *js = &w.front() + 2*C->nrow_;
+  int *is = &w.front() + 3*C->nrow_; 
+  int *ps = &w.front() + 4*C->nrow_;
 
   // for cheap assignment
-  for(int j=0; j<n; ++j) 
-    cheap[j] = Cp[j];
+  for(int j=0; j<C->nrow_; ++j) 
+    cheap[j] = C->rowind_[j];
   
   // all columns unflagged 
-  for(int j=0; j<n; ++j)
+  for(int j=0; j<C->nrow_; ++j)
     w[j] = -1;
   
   // nothing matched yet
-  for(int i=0; i<m; ++i)
+  for(int i=0; i<C->ncol_; ++i)
     jmatch[i] = -1;
 
   // q = random permutation 
-  std::vector<int> q = randomPermutation(n,seed);
+  std::vector<int> q = randomPermutation(C->nrow_,seed);
 
   // augment, starting at column q[k]
-  for(k=0; k<n; ++k){
+  for(k=0; k<C->nrow_; ++k){
     C->augmentingPath(!q.empty() ? q[k]: k, jmatch, cheap, w, js, is, ps);
   }
 
   // find row match
-  for(int j=0; j<n; ++j)
+  for(int j=0; j<C->nrow_; ++j)
     imatch[j] = -1;
   
-  for(int i = 0; i<m; ++i)
+  for(int i = 0; i<C->ncol_; ++i)
     if(jmatch [i] >= 0)
       imatch[jmatch[i]] = i;
 }
 
 int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const{
-  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-
-  int k, cnz, nc, nb2, ok ;
-
   // The transpose of the expression
   CRSSparsity trans;
   
-  
-  //  csd *D, *scc ;
-
   // Part 1: Maximum matching
-  int m = ncol_;
-  int n = nrow_;
 
   // row permutation 
-  vector<int> p(m);
+  colperm.resize(ncol_);
   
   // column permutation 
-  vector<int> q(n);
+  rowperm.resize(nrow_);
   
   // size nb+1, block k is rows r[k] to r[k+1]-1 in A(p,q)
-  vector<int> r(m+6);
+  colblock.resize(ncol_+6);
   
   // size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q)
-  vector<int> s(n+6);
+  rowblock.resize(nrow_+6);
 
   // coarse row decomposition
   coarse_colblock.resize(5);
@@ -590,66 +564,66 @@ int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vecto
   
   // Coarse decomposition
   
-  // use r and s as workspace
-  vector<int>& wi = r;
-  vector<int>& wj = s;
+  // use colblock and rowblock as workspace
+  vector<int>& wi = colblock;
+  vector<int>& wj = rowblock;
   
   // unmark all cols for bfs
-  for(int j=0; j<n; ++j)
+  for(int j=0; j<nrow_; ++j)
     wj[j] = -1;
   
   // unmark all rows for bfs
-  for(int i=0; i<m; ++i)
+  for(int i=0; i<ncol_; ++i)
     wi[i] = -1 ;
   
   // find C1, R1 from C0
-  breadthFirstSearch(n, &wi.front(), &wj.front(), &q.front(), &imatch.front(), &jmatch.front(), 1);
+  breadthFirstSearch(nrow_, wi, wj, rowperm, imatch, jmatch, 1);
 
   // find R3, C3 from R0
-  breadthFirstSearch(m, &wj.front(), &wi.front(), &p.front(), &jmatch.front(), &imatch.front(), 3);
+  breadthFirstSearch(ncol_, wj, wi, colperm, jmatch, imatch, 3);
 
   // unmatched set C0
-  unmatched(n, &wj.front(), &q.front(), &coarse_rowblock.front(), 0);
+  unmatched(nrow_, wj, rowperm, coarse_rowblock, 0);
 
   // set R1 and C1
-  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), &coarse_rowblock.front(), &coarse_colblock.front(), 1, 1);
+  matched(nrow_, wj, imatch, colperm, rowperm, coarse_rowblock, coarse_colblock, 1, 1);
 
   // set R2 and C2
-  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), &coarse_rowblock.front(), &coarse_colblock.front(), 2, -1);
+  matched(nrow_, wj, imatch, colperm, rowperm, coarse_rowblock, coarse_colblock, 2, -1);
 
   // set R3 and C3
-  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), &coarse_rowblock.front(), &coarse_colblock.front(), 3, 3);
+  matched(nrow_, wj, imatch, colperm, rowperm, coarse_rowblock, coarse_colblock, 3, 3);
 
   // unmatched set R0
-  unmatched(m, &wi.front(), &p.front(), &coarse_colblock.front(), 3);
+  unmatched(ncol_, wi, colperm, coarse_colblock, 3);
   
   // --- Fine decomposition -----------------------------------------------
   // pinv=p'
-  vector<int> pinv = invertPermutation(&p.front(), m);
+  vector<int> pinv = invertPermutation(colperm);
 
   // C=A(p,q) (it will hold A(R2,C2))
-  CRSSparsity C = permute(&pinv.front(), &q.front(), 0);
+  CRSSparsity C = permute(pinv, rowperm, 0);
 
-  vector<int>& Cp = C.rowindRef();
+  vector<int>& rowind_C = C.rowindRef();
 
   // delete cols C0, C1, and C3 from C 
-  nc = coarse_rowblock[3] - coarse_rowblock[2];
+  int nc = coarse_rowblock[3] - coarse_rowblock[2];
   if(coarse_rowblock[2] > 0)
     for(int j = coarse_rowblock[2]; j <= coarse_rowblock[3]; ++j)
-      Cp[j-coarse_rowblock[2]] = Cp[j];
+      rowind_C[j-coarse_rowblock[2]] = rowind_C[j];
   
   C->nrow_ = nc;
   C->rowind_.resize(nc+1);
   C->col_.resize(C->rowind_.back());
 
   // delete rows R0, R1, and R3 from C
-  if(coarse_colblock[2] - coarse_colblock[1] < m){
-    C->drop(rprune, &coarse_colblock.front()) ;
-    cnz = Cp[nc];
-    vector<int>& Ci = C->col_;
+  if(coarse_colblock[2] - coarse_colblock[1] < ncol_){
+    C->drop(rprune, &coarse_colblock);
+    int cnz = rowind_C[nc];
+    vector<int>& col_C = C->col_;
     if(coarse_colblock[1] > 0)
-      for(k=0; k<cnz; ++k)
-        Ci[k] -= coarse_colblock[1];
+      for(int k=0; k<cnz; ++k)
+        col_C[k] -= coarse_colblock[1];
   }
   C->ncol_ = nc ;
 
@@ -668,56 +642,51 @@ int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vecto
   // # of blocks of A(R2,C2)
   int nb1 = scc_nb;
 
-  for(k=0; k<nc; ++k)
-    wj [k] = q[ps[k] + coarse_rowblock[2]];
+  for(int k=0; k<nc; ++k)
+    wj[k] = rowperm[ps[k] + coarse_rowblock[2]];
   
-  for(k=0; k<nc; ++k)
-    q[k + coarse_rowblock[2]] = wj[k];
+  for(int k=0; k<nc; ++k)
+    rowperm[k + coarse_rowblock[2]] = wj[k];
   
-  for(k=0; k<nc; ++k)
-    wi[k] = p[ps[k] + coarse_colblock[1]];
+  for(int k=0; k<nc; ++k)
+    wi[k] = colperm[ps[k] + coarse_colblock[1]];
   
-  for(k=0; k<nc; ++k)
-    p[k + coarse_colblock[1]] = wi[k];
+  for(int k=0; k<nc; ++k)
+    colperm[k + coarse_colblock[1]] = wi[k];
   
   // create the fine block partitions
-  nb2 = 0;
-  r[0] = s[0] = 0;
+  int nb2 = 0;
+  colblock[0] = rowblock[0] = 0;
 
   // leading coarse block A (R1, [C0 C1])
   if(coarse_rowblock[2] > 0)
     nb2++ ;
   
   // coarse block A (R2,C2)
-  for (k=0; k<nb1; ++k){
+  for(int k=0; k<nb1; ++k){
     // A (R2,C2) splits into nb1 fine blocks 
-    r [nb2] = rs [k] + coarse_colblock[1];
-    s [nb2] = rs [k] + coarse_rowblock[2] ;
+    colblock[nb2] = rs[k] + coarse_colblock[1];
+    rowblock[nb2] = rs[k] + coarse_rowblock[2] ;
     nb2++ ;
   }
   
-  if(coarse_colblock[2] < m){
+  if(coarse_colblock[2] < ncol_){
     // trailing coarse block A ([R3 R0], C3)
-    r[nb2] = coarse_colblock[2];
-    s[nb2] = coarse_rowblock[3];
+    colblock[nb2] = coarse_colblock[2];
+    rowblock[nb2] = coarse_rowblock[3];
     nb2++ ;
   }
   
-  r[nb2] = m ;
-  s[nb2] = n ;
+  colblock[nb2] = ncol_;
+  rowblock[nb2] = nrow_ ;
   
-  
-  // Copy to output
-  rowperm = vector<int>(q.begin(), q.end());
-  colperm = vector<int>(p.begin(), p.end());
-  rowblock = vector<int>(s.begin(), s.end());
-  colblock = vector<int>(r.begin(), r.end());
+  // Shrink colblock and rowblock
+  colblock.resize(nb2+1);
+  rowblock.resize(nb2+1);
   return nb2;
 }
 
 std::vector<int> CRSSparsityInternal::randomPermutation(int n, int seed){
-  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-
 // Return object
   std::vector<int> p;
   
@@ -749,81 +718,67 @@ std::vector<int> CRSSparsityInternal::randomPermutation(int n, int seed){
   return p;
 }
 
-std::vector<int> CRSSparsityInternal::invertPermutation(const int *p, int n){
-  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-
+std::vector<int> CRSSparsityInternal::invertPermutation(const std::vector<int>& p){
 // pinv = p', or p = pinv'
 
   // allocate result
-  vector<int> pinv(n);
+  vector<int> pinv(p.size());
   
   // invert the permutation
-  for(int k=0; k<n; ++k)
+  for(int k=0; k<p.size(); ++k)
     pinv[p[k]] = k;
   
   // return result
   return pinv;
 }
 
-CRSSparsity CRSSparsityInternal::permute(const int *pinv, const int *q, int values) const{
-  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
-
-int m = ncol_;
-  int n = nrow_;
-  const int *Ap = &rowind_.front();
-  const int *Ai = &col_.front();
-  
+CRSSparsity CRSSparsityInternal::permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const{
   // alloc result
   CRSSparsity C = CRSSparsity(nrow_,ncol_);
   
   // Row offset
-  vector<int>& Cp = C.rowindRef();
+  vector<int>& rowind_C = C.rowindRef();
   
   // Column for each nonzero
-  vector<int>& Ci = C.colRef();
-  Ci.resize(size());
+  vector<int>& col_C = C.colRef();
+  col_C.resize(size());
 
   int nz = 0;
-  for(int k = 0; k<n ; ++k){
+  for(int k = 0; k<nrow_; ++k){
     // column k of C is column q[k] of A
-    Cp[k] = nz;
+    rowind_C[k] = nz;
     
-    int j = q ? (q[k]) : k;
+    int j = !q.empty() ? (q[k]) : k;
     
-    for(int t = Ap[j]; t<Ap[j+1]; ++t){
-      Ci[nz++] = pinv ? (pinv[Ai[t]]) : Ai[t] ;
+    for(int t = rowind_[j]; t<rowind_[j+1]; ++t){
+      col_C[nz++] = !pinv.empty() ? (pinv[col_[t]]) : col_[t] ;
     }
   }
   
   // finalize the last column of C
-  Cp[n] = nz;
+  rowind_C[nrow_] = nz;
   return C;
 }
 
 int CRSSparsityInternal::drop(int (*fkeep) (int, int, double, void *), void *other){
-  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+  int nz = 0;
   
-  int j, p, nz = 0, n, *Ap, *Ai;
-  n = nrow_;
-  Ap = &rowind_.front();
-  Ai = &col_.front();
-  
-  for (j = 0 ; j < n ; j++){
+  for(int j = 0; j<nrow_; ++j){
     // get current location of col j
-    p = Ap[j];
+    int p = rowind_[j];
     
     // record new location of col j
-    Ap[j] = nz;
-    for ( ; p < Ap [j+1] ; ++p){
-      if (fkeep (Ai [p], j, 1, other)){
+    rowind_[j] = nz;
+    for ( ; p < rowind_[j+1] ; ++p){
+      if (fkeep(col_[p], j, 1, other)){
         // keep A(i,j)
-        Ai[nz++] = Ai[p] ;
+        col_[nz++] = col_[p] ;
       }
     }
   }
   
   // finalize A
-  Ap[n] = nz;
+  rowind_[nrow_] = nz;
   return nz ;
 }
 
