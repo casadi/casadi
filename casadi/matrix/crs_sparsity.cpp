@@ -1117,8 +1117,8 @@ int CRSSparsity::depthFirstSearch(int j, int top, std::vector<int>& xi, std::vec
 }
 
 
-void CRSSparsity::stronglyConnectedComponents() const{
-  (*this)->stronglyConnectedComponents();
+int CRSSparsity::stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const{
+  return (*this)->stronglyConnectedComponents(p,r);
 }
 
 

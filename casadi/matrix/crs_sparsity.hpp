@@ -278,7 +278,7 @@ class CRSSparsity : public SharedObject{
     /** \brief Find the strongly connected components of a square matrix
        See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
-    void stronglyConnectedComponents() const;
+    int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
     
     std::string dimString() 	const;
 

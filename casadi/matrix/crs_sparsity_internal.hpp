@@ -42,7 +42,7 @@ class CRSSparsityInternal : public SharedObjectNode{
     int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /// Find the strongly connected components of a square matrix
-    void stronglyConnectedComponents() const;
+    int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
 
     /// Transpose the matrix
     CRSSparsity transpose() const;
@@ -51,7 +51,7 @@ class CRSSparsityInternal : public SharedObjectNode{
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
     /// Breadth-first search for coarse decomposition
-    void breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark);
+    void breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark) const;
     
     /// Collect matched rows and columns into p and q
     static void matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark);
@@ -61,6 +61,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     
     /// return 1 if row i is in R2
     static int rprune (int i, int j, double aij, void *other);
+
+    /// drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1
+    int drop(int (*fkeep) (int, int, double, void *), void *other);
 
     /// Compute the Dulmage-Mendelsohn decomposition
     void dulmageMendelsohn(int seed) const;
@@ -73,6 +76,12 @@ class CRSSparsityInternal : public SharedObjectNode{
     
     /// return a random permutation vector, the identity perm, or p = n-1:-1:0.  seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.  otherwise p = random permutation.
     static std::vector<int> randomPermutation(int n, int seed);
+
+    /// Invert a permutation matrix
+    static std::vector<int> invertPermutation(const int *p, int n);
+
+    /// C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1.
+    CRSSparsity permute(const int *pinv, const int *q, int values) const;
 
     /// Get the row for each nonzero
     std::vector<int> getRow() const;

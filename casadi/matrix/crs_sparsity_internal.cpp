@@ -122,7 +122,6 @@ CRSSparsity CRSSparsityInternal::transpose(vector<int>& mapping) const{
 }
 
 std::vector<int> CRSSparsityInternal::eliminationTree(bool ata) const{
-  
   // Allocate result
   vector<int> parent(nrow_);
   
@@ -171,6 +170,7 @@ std::vector<int> CRSSparsityInternal::eliminationTree(bool ata) const{
 }
 
 int CRSSparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const{
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int i, p, p2, done, jnew, head = 0;
   
   // initialize the recursion stack
@@ -225,7 +225,8 @@ int CRSSparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi, 
   return (top) ;
 }
 
-void CRSSparsityInternal::stronglyConnectedComponents() const{
+int CRSSparsityInternal::stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const{
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   vector<int> tmp;
   CRSSparsity AT = transpose();
 
@@ -235,8 +236,8 @@ void CRSSparsityInternal::stronglyConnectedComponents() const{
   vector<int> rcopy(nrow_+1);
   vector<int>& pstack = rcopy;
   
-  vector<int> p(nrow_);
-  vector<int> r(nrow_+6);
+  p.resize(nrow_);
+  r.resize(nrow_+6);
   
   vector<bool> marked(nrow_,false);
   
@@ -256,7 +257,7 @@ void CRSSparsityInternal::stronglyConnectedComponents() const{
   int nb = nrow_;
 
   // dfs(A') to find strongly connnected comp 
-  for (int k=0 ; k < nrow_ ; ++k){
+  for(int k=0 ; k < nrow_ ; ++k){
     // get i in reverse order of finish times
     int i = xi[k];
     
@@ -289,11 +290,13 @@ void CRSSparsityInternal::stronglyConnectedComponents() const{
   for(int i=0; i<nrow_; ++i){
     p[rcopy[Blk[i]]++] = i;
   }
-    
+  
+  return nb;
 }
 
-void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark){
-  int *Ap, *Ai, head = 0, tail = 0, j, i, p, j2 ;
+void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark) const{
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+  int head = 0, tail = 0, j, i, p, j2 ;
   
   // place all unmatched nodes in queue
   for (j=0; j<n; ++j){
@@ -310,16 +313,17 @@ void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue
   // quick return if no unmatched nodes
   if(tail == 0) return;
   
-  CRSSparsity C;
+  CRSSparsity trans;
+  const CRSSparsityInternal *C;
   if(mark == 1){
-    C.assignNode(this);
+    C = this;
   } else {
-    vector<int> tmp;
-    C = transpose(tmp);
+    trans = transpose();
+    C = static_cast<const CRSSparsityInternal *>(trans.get());
   }
   
-  Ap = &C.rowindRef().front();
-  Ai = &C.colRef().front();
+  const int *Ap = &C->rowind_.front();
+  const int *Ai = &C->col_.front();
   
   // while queue is not empty
   while (head < tail){
@@ -351,6 +355,7 @@ void CRSSparsityInternal::breadthFirstSearch(int n, int *wi, int *wj, int *queue
 }
 
 void CRSSparsityInternal::matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark){
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int kc = cc [set], j ;
   int kr = rr [set-1] ;
   for (j = 0 ; j < n ; j++){
@@ -363,6 +368,7 @@ void CRSSparsityInternal::matched(int n, const int *wj, const int *imatch, int *
 }
 
 void CRSSparsityInternal::unmatched(int m, const int *wi, int *p, int *rr, int set){
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int i, kr = rr[set] ;
   for (i=0; i<m; i++) 
     if (wi[i] == 0) 
@@ -372,11 +378,14 @@ void CRSSparsityInternal::unmatched(int m, const int *wi, int *p, int *rr, int s
 }
 
 int CRSSparsityInternal::rprune(int i, int j, double aij, void *other){
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   int *rr = (int *) other;
   return (i >= rr[1] && i < rr[2]) ;
 }
 
 void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const{
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+
   int found = 0, p, i = -1, head = 0, j ;
   
   const int *Ap = &rowind_.front();
@@ -445,6 +454,8 @@ void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *c
 }
 
 void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, CRSSparsity& trans, int seed) const{
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+
   int n2 = 0, m2 = 0;
   
   //cs *C ;
@@ -536,13 +547,14 @@ void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<i
 }
 
 void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
-  int i, j, k, cnz, nc, *wi, *wj, *pinv, *Cp, *Ci, *ps, *rs, nb1, nb2, ok ;
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+
+  int k, cnz, nc, nb2, ok ;
 
   // The transpose of the expression
   CRSSparsity trans;
   
   
-  CRSSparsity C;
   //  csd *D, *scc ;
 
   // Part 1: Maximum matching
@@ -574,75 +586,130 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
   vector<int> imatch, jmatch;
   maxTransversal(imatch,jmatch,trans,seed);
   
-#if 0  
-  imatch = jmatch + m ;                       /* imatch = inverse of jmatch */
-  if (!jmatch) return (cs_ddone (D, NULL, jmatch, 0)) ;
-  /* --- Coarse decomposition --------------------------------------------- */
-  wi = r ; wj = s ;                           /* use r and s as workspace */
-  for (j = 0 ; j < n ; j++) wj [j] = -1 ;     /* unmark all cols for bfs */
-  for (i = 0 ; i < m ; i++) wi [i] = -1 ;     /* unmark all rows for bfs */
-  cs_bfs (A, n, wi, wj, q, imatch, jmatch, 1) ;       /* find C1, R1 from C0*/
-  ok = cs_bfs (A, m, wj, wi, p, jmatch, imatch, 3) ;  /* find R3, C3 from R0*/
-  if (!ok) return (cs_ddone (D, NULL, jmatch, 0)) ;
-  cs_unmatched (n, wj, q, cc, 0) ;                    /* unmatched set C0 */
-  cs_matched (n, wj, imatch, p, q, cc, rr, 1, 1) ;    /* set R1 and C1 */
-  cs_matched (n, wj, imatch, p, q, cc, rr, 2, -1) ;   /* set R2 and C2 */
-  cs_matched (n, wj, imatch, p, q, cc, rr, 3, 3) ;    /* set R3 and C3 */
-  cs_unmatched (m, wi, p, rr, 3) ;                    /* unmatched set R0 */
-  cs_free (jmatch) ;
-  /* --- Fine decomposition ----------------------------------------------- */
-  pinv = cs_pinv (p, m) ;         /* pinv=p' */
-  if (!pinv) return (cs_ddone (D, NULL, NULL, 0)) ;
-  C = cs_permute (A, pinv, q, 0) ;/* C=A(p,q) (it will hold A(R2,C2)) */
-  cs_free (pinv) ;
-  if (!C) return (cs_ddone (D, NULL, NULL, 0)) ;
-  Cp = C->p ;
-  nc = cc [3] - cc [2] ;          /* delete cols C0, C1, and C3 from C */
-  if (cc [2] > 0) for (j = cc [2] ; j <= cc [3] ; j++) Cp [j-cc[2]] = Cp [j] ;
-  C->n = nc ;
-  if (rr [2] - rr [1] < m)        /* delete rows R0, R1, and R3 from C */
-  {
-      cs_fkeep (C, cs_rprune, rr) ;
-      cnz = Cp [nc] ;
-      Ci = C->i ;
-      if (rr [1] > 0) for (k = 0 ; k < cnz ; k++) Ci [k] -= rr [1] ;
+  // Coarse decomposition
+  
+  // use r and s as workspace
+  vector<int>& wi = r;
+  vector<int>& wj = s;
+  
+  // unmark all cols for bfs
+  for(int j=0; j<n; ++j)
+    wj[j] = -1;
+  
+  // unmark all rows for bfs
+  for(int i=0; i<m; ++i)
+    wi[i] = -1 ;
+  
+  // find C1, R1 from C0
+  breadthFirstSearch(n, &wi.front(), &wj.front(), &q.front(), &imatch.front(), &jmatch.front(), 1);
+
+  // find R3, C3 from R0
+  breadthFirstSearch(m, &wj.front(), &wi.front(), &p.front(), &jmatch.front(), &imatch.front(), 3);
+
+  // unmatched set C0
+  unmatched(n, &wj.front(), &q.front(), cc, 0);
+
+  // set R1 and C1
+  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), cc, rr, 1, 1);
+
+  // set R2 and C2
+  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), cc, rr, 2, -1);
+
+  // set R3 and C3
+  matched(n, &wj.front(), &imatch.front(), &p.front(), &q.front(), cc, rr, 3, 3);
+
+  // unmatched set R0
+  unmatched(m, &wi.front(), &p.front(), rr, 3);
+
+  // --- Fine decomposition -----------------------------------------------
+  // pinv=p'
+  vector<int> pinv = invertPermutation(&p.front(), m);
+
+  // C=A(p,q) (it will hold A(R2,C2))
+  CRSSparsity C = permute(&pinv.front(), &q.front(), 0);
+
+  vector<int>& Cp = C.rowindRef();
+
+  // delete cols C0, C1, and C3 from C 
+  nc = cc[3] - cc[2];
+  if(cc[2] > 0)
+    for(int j = cc[2]; j <= cc[3]; ++j)
+      Cp[j-cc[2]] = Cp[j];
+  
+  C->nrow_ = nc;
+  C->rowind_.resize(nc+1);
+  C->col_.resize(C->rowind_.back());
+
+  // delete rows R0, R1, and R3 from C
+  if(rr[2] - rr[1] < m){
+    C->drop(rprune, rr) ;
+    cnz = Cp[nc];
+    vector<int>& Ci = C->col_;
+    if(rr[1] > 0)
+      for(k=0; k<cnz; ++k)
+        Ci[k] -= rr[1];
   }
-  C->m = nc ;
-  scc = cs_scc (C) ;              /* find strongly connected components of C*/
-  if (!scc) return (cs_ddone (D, C, NULL, 0)) ;
-  /* --- Combine coarse and fine decompositions --------------------------- */
-  ps = scc->p ;                   /* C(ps,ps) is the permuted matrix */
-  rs = scc->r ;                   /* kth block is rs[k]..rs[k+1]-1 */
-  nb1 = scc->nb  ;                /* # of blocks of A(R2,C2) */
-  for (k = 0 ; k < nc ; k++) wj [k] = q [ps [k] + cc [2]] ;
-  for (k = 0 ; k < nc ; k++) q [k + cc [2]] = wj [k] ;
-  for (k = 0 ; k < nc ; k++) wi [k] = p [ps [k] + rr [1]] ;
-  for (k = 0 ; k < nc ; k++) p [k + rr [1]] = wi [k] ;
-  nb2 = 0 ;                       /* create the fine block partitions */
-  r [0] = s [0] = 0 ;
-  if (cc [2] > 0) nb2++ ;         /* leading coarse block A (R1, [C0 C1]) */
-  for (k = 0 ; k < nb1 ; k++)     /* coarse block A (R2,C2) */
-  {
-      r [nb2] = rs [k] + rr [1] ; /* A (R2,C2) splits into nb1 fine blocks */
-      s [nb2] = rs [k] + cc [2] ;
-      nb2++ ;
+  C->ncol_ = nc ;
+
+  // find strongly connected components of C
+  vector<int> scc_p, scc_r;
+  int scc_nb = C->stronglyConnectedComponents(scc_p, scc_r);
+  
+  // --- Combine coarse and fine decompositions ---------------------------
+  
+  // C(ps,ps) is the permuted matrix
+  vector<int> ps = scc_p;
+  
+  // kth block is rs[k]..rs[k+1]-1
+  vector<int> rs = scc_r;
+  
+  // # of blocks of A(R2,C2)
+  int nb1 = scc_nb;
+
+  for(k=0; k<nc; ++k)
+    wj [k] = q[ps[k] + cc[2]];
+  
+  for(k=0; k<nc; ++k)
+    q[k + cc [2]] = wj [k];
+  
+  for(k=0; k<nc; ++k)
+    wi[k] = p[ps[k] + rr[1]];
+  
+  for(k=0; k<nc; ++k)
+    p[k + rr[1]] = wi[k];
+  
+  // create the fine block partitions
+  nb2 = 0;
+  r[0] = s[0] = 0;
+
+  // leading coarse block A (R1, [C0 C1])
+  if(cc [2] > 0)
+    nb2++ ;
+  
+  // coarse block A (R2,C2)
+  for (k=0; k<nb1; ++k){
+    // A (R2,C2) splits into nb1 fine blocks 
+    r [nb2] = rs [k] + rr[1];
+    s [nb2] = rs [k] + cc[2] ;
+    nb2++ ;
   }
-  if (rr [2] < m)
-  {
-      r [nb2] = rr [2] ;          /* trailing coarse block A ([R3 R0], C3) */
-      s [nb2] = cc [3] ;
-      nb2++ ;
+  
+  if(rr[2] < m){
+    // trailing coarse block A ([R3 R0], C3)
+    r[nb2] = rr [2];
+    s[nb2] = cc [3];
+    nb2++ ;
   }
-  r [nb2] = m ;
-  s [nb2] = n ;
-  D->nb = nb2 ;
-  cs_dfree (scc) ;
-  return (cs_ddone (D, C, NULL, 1)) ;
-#endif
+  
+  r[nb2] = m ;
+  s[nb2] = n ;
+  Dnb = nb2 ;
 }
 
 std::vector<int> CRSSparsityInternal::randomPermutation(int n, int seed){
-  // Return object
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+
+// Return object
   std::vector<int> p;
   
   // return p = empty (identity)
@@ -671,6 +738,84 @@ std::vector<int> CRSSparsityInternal::randomPermutation(int n, int seed){
   }
   
   return p;
+}
+
+std::vector<int> CRSSparsityInternal::invertPermutation(const int *p, int n){
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+
+// pinv = p', or p = pinv'
+
+  // allocate result
+  vector<int> pinv(n);
+  
+  // invert the permutation
+  for(int k=0; k<n; ++k)
+    pinv[p[k]] = k;
+  
+  // return result
+  return pinv;
+}
+
+CRSSparsity CRSSparsityInternal::permute(const int *pinv, const int *q, int values) const{
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+
+int m = ncol_;
+  int n = nrow_;
+  const int *Ap = &rowind_.front();
+  const int *Ai = &col_.front();
+  
+  // alloc result
+  CRSSparsity C = CRSSparsity(nrow_,ncol_);
+  
+  // Row offset
+  vector<int>& Cp = C.rowindRef();
+  
+  // Column for each nonzero
+  vector<int>& Ci = C.colRef();
+  Ci.resize(size());
+
+  int nz = 0;
+  for(int k = 0; k<n ; ++k){
+    // column k of C is column q[k] of A
+    Cp[k] = nz;
+    
+    int j = q ? (q[k]) : k;
+    
+    for(int t = Ap[j]; t<Ap[j+1]; ++t){
+      Ci[nz++] = pinv ? (pinv[Ai[t]]) : Ai[t] ;
+    }
+  }
+  
+  // finalize the last column of C
+  Cp[n] = nz;
+  return C;
+}
+
+int CRSSparsityInternal::drop(int (*fkeep) (int, int, double, void *), void *other){
+  // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
+  
+  int j, p, nz = 0, n, *Ap, *Ai;
+  n = nrow_;
+  Ap = &rowind_.front();
+  Ai = &col_.front();
+  
+  for (j = 0 ; j < n ; j++){
+    // get current location of col j
+    p = Ap[j];
+    
+    // record new location of col j
+    Ap[j] = nz;
+    for ( ; p < Ap [j+1] ; ++p){
+      if (fkeep (Ai [p], j, 1, other)){
+        // keep A(i,j)
+        Ai[nz++] = Ai[p] ;
+      }
+    }
+  }
+  
+  // finalize A
+  Ap[n] = nz;
+  return nz ;
 }
 
 
