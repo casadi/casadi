@@ -35,7 +35,7 @@
 namespace CasADi{
 
 // Forward declaration
-class CRSSparsityNode;
+class CRSSparsityInternal;
   
 /** \brief General sparsity class
  * 
@@ -62,6 +62,9 @@ class CRSSparsityNode;
   
   Since the object is reference counted (it inherits from SharedObject), severl matrices are allowed
   to share the same sparsity pattern.
+  
+  The implementations of some methods of this class has been taken from the CSparse package and modified
+  to use STL and CasADi data structures.
   
  * \see Matrix
  *
@@ -97,10 +100,10 @@ class CRSSparsity : public SharedObject{
     CRSSparsity diag(std::vector<int>& mapping) const;
     
     /// Access a member function or object
-    CRSSparsityNode* operator->();
+    CRSSparsityInternal* operator->();
 
     /// Const access a member function or object
-    const CRSSparsityNode* operator->() const;
+    const CRSSparsityInternal* operator->() const;
   
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
@@ -285,82 +288,6 @@ class CRSSparsity : public SharedObject{
 %extend CRSSparsity {
 std::string __repr__() { return $self->getRepresentation(); }
 }
-#endif // SWIG
-
-#ifndef SWIG
-class CRSSparsityNode : public SharedObjectNode{
-  public:
-    /// Construct a sparsity pattern from vectors
-    CRSSparsityNode(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
-    
-    /** \brief Check if the dimensions and rowind,col vectors are compatible.
-    * \param complete  set to true to also check elementwise
-    * throws an error as possible result
-    */
-    void sanityCheck(bool complete=false) const;
-
-    /// Calculate the elimination tree (internal)
-    std::vector<int> eliminationTree(bool ata) const;
-    
-    /// Find strongly connected components (internal)
-    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
-
-    /// Find the strongly connected components of a square matrix (internal)
-    void stronglyConnectedComponents() const;
-
-    /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix (internal)
-    CRSSparsity transpose(std::vector<int>& mapping) const;
-
-    /// Breadth-first search for coarse decomposition (C0,C1,R1 or R0,R3,C3)
-    void breadthFirstSearch(int n, int *wi, int *wj, int *queue, const int *imatch, const int *jmatch, int mark);
-    
-    /// Collect matched rows and columns into p and q
-    static void matched(int n, const int *wj, const int *imatch, int *p, int *q, int *cc, int *rr, int set, int mark);
-    
-    /// Collect unmatched rows into the permutation vector p
-    static void unmatched(int m, const int *wi, int *p, int *rr, int set);
-    
-    /// return 1 if row i is in R2
-    static int rprune (int i, int j, double aij, void *other);
-
-    /// Compute the Dulmage-Mendelsohn decomposition
-    void dulmageMendelsohn(int seed) const;
-    
-    /// Compute the maximum transversal (maximum matching)
-    void maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, int seed) const;
-    
-    /// Find an augmenting path
-    void augmentingPath(int k, int *jmatch, int *cheap, int *w, int *js, int *is, int *ps) const;
-    
-    /// Get the row for each nonzero
-    std::vector<int> getRow() const;
-
-    /// Number of structural non-zeros (internal)
-    int size() const;
-
-    /// Clone
-    virtual CRSSparsityNode* clone() const{ return new CRSSparsityNode(*this); }
-
-    /// Print representation
-    virtual void repr(std::ostream &stream) const;
-
-    /// Print description
-    virtual void print(std::ostream &stream) const;
-
-    /// Number of rows
-    int nrow_;
-    
-    /// Number of columns
-    int ncol_;
-    
-    /// vector of length nnz containing the columns for all the indices of the non-zero elements
-    std::vector<int> col_;
-    
-    /// vector of length n+1 containing the index of the last non-zero element up till each row 
-    std::vector<int> rowind_;
-    
-};
-
 #endif // SWIG
 
 } // namespace CasADi
