@@ -44,6 +44,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Find the strongly connected components of a square matrix
     void stronglyConnectedComponents() const;
 
+    /// Transpose the matrix
+    CRSSparsity transpose() const;
+
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;
 
@@ -63,11 +66,14 @@ class CRSSparsityInternal : public SharedObjectNode{
     void dulmageMendelsohn(int seed) const;
     
     /// Compute the maximum transversal (maximum matching)
-    void maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, int seed) const;
+    void maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, CRSSparsity& trans, int seed) const;
     
     /// Find an augmenting path
-    void augmentingPath(int k, int *jmatch, int *cheap, int *w, int *js, int *is, int *ps) const;
+    void augmentingPath(int k, std::vector<int>& jmatch, int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
     
+    /// return a random permutation vector, the identity perm, or p = n-1:-1:0.  seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.  otherwise p = random permutation.
+    static std::vector<int> randomPermutation(int n, int seed);
+
     /// Get the row for each nonzero
     std::vector<int> getRow() const;
 

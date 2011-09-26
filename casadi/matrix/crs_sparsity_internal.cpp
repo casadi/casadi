@@ -24,6 +24,7 @@
 #include "sparsity_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include <climits>
+#include <cstdlib>
 
 using namespace std;
 
@@ -101,6 +102,13 @@ vector<int> CRSSparsityInternal::getRow() const{
       }
   }
   return row;
+}
+
+CRSSparsity CRSSparsityInternal::transpose() const{
+  // Dummy mapping
+  vector<int> mapping;
+
+  return transpose(mapping);
 }
 
 CRSSparsity CRSSparsityInternal::transpose(vector<int>& mapping) const{
@@ -219,8 +227,7 @@ int CRSSparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi, 
 
 void CRSSparsityInternal::stronglyConnectedComponents() const{
   vector<int> tmp;
-  CRSSparsity AT = transpose(tmp);
-  tmp.clear();
+  CRSSparsity AT = transpose();
 
   vector<int> xi(2*nrow_+1);
   vector<int>& Blk = xi;
@@ -369,100 +376,172 @@ int CRSSparsityInternal::rprune(int i, int j, double aij, void *other){
   return (i >= rr[1] && i < rr[2]) ;
 }
 
-void CRSSparsityInternal::augmentingPath(int k, int *jmatch, int *cheap, int *w, int *js, int *is, int *ps) const{
-#if 0
-    int found = 0, p, i = -1, *Ap = A->p, *Ai = A->i, head = 0, j ;
-    js [0] = k ;                        /* start with just node k in jstack */
-    while (head >= 0)
-    {
-        /* --- Start (or continue) depth-first-search at node j ------------- */
-        j = js [head] ;                 /* get j from top of jstack */
-        if (w [j] != k)                 /* 1st time j visited for kth path */
-        {
-            w [j] = k ;                 /* mark j as visited for kth path */
-            for (p = cheap [j] ; p < Ap [j+1] && !found ; p++)
-            {
-                i = Ai [p] ;            /* try a cheap assignment (i,j) */
-                found = (jmatch [i] == -1) ;
-            }
-            cheap [j] = p ;             /* start here next time j is traversed*/
-            if (found)
-            {
-                is [head] = i ;         /* column j matched with row i */
-                break ;                 /* end of augmenting path */
-            }
-            ps [head] = Ap [j] ;        /* no cheap match: start dfs for j */
-        }
-        /* --- Depth-first-search of neighbors of j ------------------------- */
-        for (p = ps [head] ; p < Ap [j+1] ; p++)
-        {
-            i = Ai [p] ;                /* consider row i */
-            if (w [jmatch [i]] == k) continue ; /* skip jmatch [i] if marked */
-            ps [head] = p + 1 ;         /* pause dfs of node j */
-            is [head] = i ;             /* i will be matched with j if found */
-            js [++head] = jmatch [i] ;  /* start dfs at column jmatch [i] */
-            break ;
-        }
-        if (p == Ap [j+1]) head-- ;     /* node j is done; pop from stack */
-    }                                   /* augment the match if path found: */
-    if (found) for (p = head ; p >= 0 ; p--) jmatch [is [p]] = js [p] ;
-#endif
+void CRSSparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const{
+  int found = 0, p, i = -1, head = 0, j ;
+  
+  const int *Ap = &rowind_.front();
+  const int *Ai = &col_.front();
+  
+  // start with just node k in jstack
+  js[0] = k ;
+  
+  while (head >= 0){
+    // --- Start (or continue) depth-first-search at node j -------------
+    
+    // get j from top of jstack
+    j = js[head];
+    
+    // 1st time j visited for kth path
+    if (w [j] != k){
+      
+      // mark j as visited for kth path 
+      w[j] = k;
+      for(p = cheap [j] ; p < Ap[j+1] && !found; ++p){
+        i = Ai [p] ;            /* try a cheap assignment (i,j) */
+        found = (jmatch [i] == -1) ;
+      }
+      
+      // start here next time j is traversed
+      cheap[j] = p;
+      if(found){
+        // column j matched with row i
+        is[head] = i;
+        
+        // end of augmenting path
+        break;
+      }
+      
+      // no cheap match: start dfs for j
+      ps[head] = Ap[j];
+    }
+    
+    // --- Depth-first-search of neighbors of j -------------------------
+    for(p = ps[head]; p<Ap[j+1]; ++p){
+      
+      // consider row i
+      i = Ai[p];
+      
+      // skip jmatch [i] if marked
+      if(w[jmatch[i]] == k) continue;
+      
+      // pause dfs of node j
+      ps[head] = p + 1;
+      
+      // i will be matched with j if found
+      is[head] = i;
+      
+      // start dfs at column jmatch [i]
+      js[++head] = jmatch [i];
+      break ;
+    }
+    
+    // node j is done; pop from stack
+    if(p == Ap[j+1]) head--;
+  } // augment the match if path found:
+  
+  if(found)
+    for(p = head; p>=0; --p)
+      jmatch[is[p]] = js[p];
 }
 
-void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, int seed) const{
-#if 0
-    int i, j, k, n, m, p, n2 = 0, m2 = 0, *Ap, *jimatch, *w, *cheap, *js, *is,
-        *ps, *Ai, *Cp, *jmatch, *imatch, *q ;
-    cs *C ;
-    if (!CS_CSC (A)) return (NULL) ;                /* check inputs */
-    n = A->n ; m = A->m ; Ap = A->p ; Ai = A->i ;
-    w = jimatch = cs_calloc (m+n, sizeof (int)) ;   /* allocate result */
-    if (!jimatch) return (NULL) ;
-    for (k = 0, j = 0 ; j < n ; j++)    /* count nonempty rows and columns */
-    {
-        n2 += (Ap [j] < Ap [j+1]) ;
-        for (p = Ap [j] ; p < Ap [j+1] ; p++)
-        {
-            w [Ai [p]] = 1 ;
-            k += (j == Ai [p]) ;        /* count entries already on diagonal */
-        }
+void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, CRSSparsity& trans, int seed) const{
+  int n2 = 0, m2 = 0;
+  
+  //cs *C ;
+  int n = nrow_;
+  int m = ncol_;
+  const int *Ap = &rowind_.front();
+  const int *Ai = &col_.front();
+  
+  // allocate result
+  vector<int> jimatch(m+n);
+  jmatch.resize(m);
+  imatch.resize(n);
+  vector<int> w(m+n);
+  
+  // count nonempty rows and columns
+  int k=0;
+  for(int j=0; j<n; ++j){
+    n2 += (Ap[j] < Ap[j+1]);
+    for(int p=Ap[j]; p < Ap[j+1]; ++p){
+      w[Ai[p]] = 1;
+      
+      // count entries already on diagonal
+      k += (j == Ai [p]);
     }
-    if (k == CS_MIN (m,n))              /* quick return if diagonal zero-free */
-    {
-        jmatch = jimatch ; imatch = jimatch + m ;
-        for (i = 0 ; i < k ; i++) jmatch [i] = i ;
-        for (      ; i < m ; i++) jmatch [i] = -1 ;
-        for (j = 0 ; j < k ; j++) imatch [j] = j ;
-        for (      ; j < n ; j++) imatch [j] = -1 ;
-        return (cs_idone (jimatch, NULL, NULL, 1)) ;
-    }
-    for (i = 0 ; i < m ; i++) m2 += w [i] ;
-    C = (m2 < n2) ? cs_transpose (A,0) : ((cs *) A) ; /* transpose if needed */
-    if (!C) return (cs_idone (jimatch, (m2 < n2) ? C : NULL, NULL, 0)) ;
-    n = C->n ; m = C->m ; Cp = C->p ;
-    jmatch = (m2 < n2) ? jimatch + n : jimatch ;
-    imatch = (m2 < n2) ? jimatch : jimatch + m ;
-    w = cs_malloc (5*n, sizeof (int)) ;             /* get workspace */
-    if (!w) return (cs_idone (jimatch, (m2 < n2) ? C : NULL, w, 0)) ;
-    cheap = w + n ; js = w + 2*n ; is = w + 3*n ; ps = w + 4*n ;
-    for (j = 0 ; j < n ; j++) cheap [j] = Cp [j] ;  /* for cheap assignment */
-    for (j = 0 ; j < n ; j++) w [j] = -1 ;          /* all columns unflagged */
-    for (i = 0 ; i < m ; i++) jmatch [i] = -1 ;     /* nothing matched yet */
-    q = cs_randperm (n, seed) ;                     /* q = random permutation */
-    for (k = 0 ; k < n ; k++)   /* augment, starting at column q[k] */
-    {
-        cs_augment (q ? q [k]: k, C, jmatch, cheap, w, js, is, ps) ;
-    }
-    cs_free (q) ;
-    for (j = 0 ; j < n ; j++) imatch [j] = -1 ;     /* find row match */
-    for (i = 0 ; i < m ; i++) if (jmatch [i] >= 0) imatch [jmatch [i]] = i ;
-    return (cs_idone (jimatch, (m2 < n2) ? C : NULL, w, 1)) ;
-#endif
+  }
+  
+  // quick return if diagonal zero-free
+  if(k == std::min(m,n)){
+    int i;
+    for(i=0; i<k; ++i) jmatch[i] = i;
+    for(;    i<m; ++i) jmatch[i] = -1;
+
+    int j;
+    for(j=0; j<k; ++j) imatch[j] = j;
+    for(;    j<n; ++j) imatch[j] = -1;
+  }
+
+  for(int i=0; i<m; ++i) m2 += w[i];
+  
+  // transpose if needed
+  if(m2 < n2 && trans.isNull())
+    trans = transpose();
+  
+  // Get pointer to sparsity
+  const CRSSparsityInternal* C = m2 < n2 ? static_cast<const CRSSparsityInternal*>(trans.get()) : this;
+  
+  n = C->nrow_;
+  m = C->ncol_;
+  const int* Cp = &C->rowind_.front();
+
+  std::vector<int>& Cjmatch = m2 < n2 ? imatch : jmatch;
+  std::vector<int>& Cimatch = m2 < n2 ? jmatch : imatch;
+  
+  // get workspace 
+  w.resize(5*n);
+
+  int *cheap = &w.front() + n;
+  int *js = &w.front() + 2*n;
+  int *is = &w.front() + 3*n; 
+  int *ps = &w.front() + 4*n;
+
+  // for cheap assignment
+  for(int j=0; j<n; ++j) 
+    cheap[j] = Cp[j];
+  
+  // all columns unflagged 
+  for(int j=0; j<n; ++j)
+    w[j] = -1;
+  
+  // nothing matched yet
+  for(int i=0; i<m; ++i)
+    jmatch[i] = -1;
+
+  // q = random permutation 
+  std::vector<int> q = randomPermutation(n,seed);
+
+  // augment, starting at column q[k]
+  for(k=0; k<n; ++k){
+    C->augmentingPath(!q.empty() ? q[k]: k, jmatch, cheap, w, js, is, ps);
+  }
+
+  // find row match
+  for(int j=0; j<n; ++j)
+    imatch[j] = -1;
+  
+  for(int i = 0; i<m; ++i)
+    if(jmatch [i] >= 0)
+      imatch[jmatch[i]] = i;
 }
 
 void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
   int i, j, k, cnz, nc, *wi, *wj, *pinv, *Cp, *Ci, *ps, *rs, nb1, nb2, ok ;
 
+  // The transpose of the expression
+  CRSSparsity trans;
+  
+  
   CRSSparsity C;
   //  csd *D, *scc ;
 
@@ -493,7 +572,7 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
 
   // max transversal
   vector<int> imatch, jmatch;
-  maxTransversal(imatch,jmatch,seed);
+  maxTransversal(imatch,jmatch,trans,seed);
   
 #if 0  
   imatch = jmatch + m ;                       /* imatch = inverse of jmatch */
@@ -562,6 +641,37 @@ void CRSSparsityInternal::dulmageMendelsohn(int seed) const{
 #endif
 }
 
+std::vector<int> CRSSparsityInternal::randomPermutation(int n, int seed){
+  // Return object
+  std::vector<int> p;
+  
+  // return p = empty (identity)
+  if(seed==0) return p;
+  
+  // allocate result
+  p.resize(n);
+  
+  for(int k=0; k<n; ++k) 
+    p[k] = n-k-1;
+  
+  // return reverse permutation
+  if(seed==-1) return p;
+  
+  // get new random number seed
+  srand(seed);
+  
+  for(int k=0; k<n; ++k){
+    // j = rand int in range k to n-1
+    int j = k + (rand ( ) % (n-k));
+    
+    // swap p[k] and p[j]
+    int t = p[j];
+    p[j] = p[k];
+    p[k] = t;
+  }
+  
+  return p;
+}
 
 
 } // namespace CasADi
