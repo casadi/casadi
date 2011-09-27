@@ -4,8 +4,6 @@ from subprocess import *
 import time
 import re
 
-import signal
-
 class TimeoutEvent(Exception):
     pass
 
@@ -16,6 +14,65 @@ def alarm_handler(signum, frame):
 def is_exe(root,name):
   fpath = os.path.join(root,name)
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+  
+from os import kill
+from signal import alarm, signal, SIGALRM, SIGKILL
+from subprocess import PIPE, Popen
+
+# Snippet from http://stackoverflow.com/questions/1191374/subprocess-with-timeout
+def run(args, input=None, cwd = None, shell = False, kill_tree = True, timeout = -1, env = None):
+    '''
+    Run a command with a timeout after which it will be forcibly
+    killed.
+    '''
+    class Alarm(Exception):
+        pass
+    def alarm_handler(signum, frame):
+        raise Alarm
+    p = Popen(args, shell = shell, cwd = cwd, stdout = PIPE, stderr = PIPE, env = env)
+    if timeout != -1:
+        signal(SIGALRM, alarm_handler)
+        alarm(timeout)
+    try:
+        stdout, stderr = p.communicate()
+        if timeout != -1:
+            alarm(0)
+    except Alarm:
+        pids = [p.pid]
+        if kill_tree:
+            pids.extend(get_process_children(p.pid))
+        for pid in pids:
+            # process might have died before getting to this line
+            # so wrap to avoid OSError: no such process
+            try: 
+                kill(pid, SIGKILL)
+            except OSError:
+                pass
+        return -9, '', ''
+    return p.returncode, stdout, stderr
+
+def killProcess(pid):
+  pids = [pid]
+  if kill_tree:
+      pids.extend(get_process_children(p.pid))
+  for pid in pids:
+      # process might have died before getting to this line
+      # so wrap to avoid OSError: no such process
+      try: 
+          kill(pid, SIGKILL)
+      except OSError:
+          pass
+          
+def get_process_children(pid):
+    p = Popen('ps --no-headers -o pid --ppid %d' % pid, shell = True,
+              stdout = PIPE, stderr = PIPE)
+    stdout, stderr = p.communicate()
+    return [int(p) for p in stdout.split()]
+
+if __name__ == '__main__':
+    print run('find /', shell = True, timeout = 3)
+    print run('find', shell = True)
+
     
 class TestSuite:
   def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[]):
@@ -48,9 +105,7 @@ class TestSuite:
      
     
     """
-    
-    signal.signal(signal.SIGALRM, alarm_handler)
-    signal.alarm(60*60) # 1 hour
+    signal(SIGALRM, alarm_handler)
 
     # Don't buffer
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -85,23 +140,19 @@ class TestSuite:
         print "Unknown argument: ", arg
 
   def run(self):
-    try:
-      print "Running test in " + self.dirname
-      for root, dirs, files in os.walk(self.dirname):
-        if not(self.preRun is None):
-          self.preRun(root)
-        for name in files:
-          for skip in self.skipdirs:
-            if skip in dirs:
-              dirs.remove(skip)
-          if (self.suffix is None and is_exe(root,name)) or (not(self.suffix is None) and name.endswith('.'+self.suffix)):
-            if not(name in self.skipfiles):
-              self.test(root,name,self.command)
-        if not(self.postRun is None):
-          self.postRun(root)
-    except TimeoutEvent:
-      print "Timout."
-      sys.exit(1)
+    print "Running test in " + self.dirname
+    for root, dirs, files in os.walk(self.dirname):
+      if not(self.preRun is None):
+        self.preRun(root)
+      for name in files:
+        for skip in self.skipdirs:
+          if skip in dirs:
+            dirs.remove(skip)
+        if (self.suffix is None and is_exe(root,name)) or (not(self.suffix is None) and name.endswith('.'+self.suffix)):
+          if not(name in self.skipfiles):
+            self.test(root,name,self.command)
+      if not(self.postRun is None):
+        self.postRun(root)
         
     print "Ran %d tests, %d fails." % (self.stats['numtests'],self.stats['numfails'])
 
@@ -114,10 +165,19 @@ class TestSuite:
     print ("%02d. " % self.stats['numtests']) + fn
     t0 = time.clock()
     p=Popen(self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+
     inp = None
     if fn in self.inputs:
       inp = self.inputs[fn]
-    stdoutdata, stderrdata = p.communicate(inp)
+      
+          
+    alarm(60*60) # 1 hour
+    try:
+      stdoutdata, stderrdata = p.communicate(inp)
+    except TimeoutEvent:
+      killProcess(p.pid)
+      raise Exception("Timout.")
+    alarm(0) # Remove alarm
     t = time.clock() - t0
     
     stderr_trigger = False
@@ -143,7 +203,14 @@ class TestSuite:
       p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
       f=Popen(['grep','-E','-A','10', "definitely lost|leaks|ERROR SUMMARY|Invalid read"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
-      stdoutdata, stderrdata = f.communicate(inp)
+      alarm(60*60) # 1 hour
+      try:
+        stdoutdata, stderrdata = f.communicate(inp)
+      except TimeoutEven:
+        killProcess(p.pid)
+        killProcess(f.pid)
+        raise Exception("Timout.")
+      alarm(0) # Remove alarm
       m = re.search('definitely lost: (.*) bytes', stdoutdata)
       lost = "0"
       if m:
