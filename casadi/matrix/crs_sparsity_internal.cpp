@@ -782,6 +782,352 @@ int CRSSparsityInternal::drop(int (*fkeep) (int, int, double, void *), void *oth
   return nz ;
 }
 
+int CRSSparsityInternal::leaf (int i, int j, const int *first, int *maxfirst, int *prevleaf, int *ancestor, int *jleaf){
+  int q, s, sparent, jprev ;
+  if (!first || !maxfirst || !prevleaf || !ancestor || !jleaf) return (-1) ;
+  *jleaf = 0 ;
+  if (i <= j || first [j] <= maxfirst [i]) return (-1) ;  /* j not a leaf */
+  maxfirst [i] = first [j] ;      /* update max first[j] seen so far */
+  jprev = prevleaf [i] ;          /* jprev = previous leaf of ith subtree */
+  prevleaf [i] = j ;
+  *jleaf = (jprev == -1) ? 1: 2 ; /* j is first or subsequent leaf */
+  if (*jleaf == 1) return (i) ;   /* if 1st leaf, q = root of ith subtree */
+  for (q = jprev ; q != ancestor [q] ; q = ancestor [q]) ;
+  for (s = jprev ; s != q ; s = sparent)
+  {
+      sparent = ancestor [s] ;    /* path compression */
+      ancestor [s] = q ;
+  }
+  return (q) ;                    /* q = least common ancester (jprev,j) */
+}
+
+int CRSSparsityInternal::vcount(std::vector<int>& pinv, std::vector<int>& parent, std::vector<int>& leftmost, int& S_m2, double& S_lnz) const{
+  int i, k, p, pa;
+  int n = nrow_, m = ncol_;
+  const int* Ap = &rowind_.front();
+  const int* Ai = &col_.front();
+
+  // allocate pinv
+  pinv.resize(m+n);
+  
+  // and leftmost
+  leftmost.resize(m);
+  
+  // get workspace
+  vector<int> w(m+3*n);
+
+  int *next = &w.front();
+  int *head = &w.front() + m;
+  int *tail = &w.front() + m + n;
+  int *nque = &w.front() + m + 2*n;
+
+  // queue k is empty
+  for(k = 0 ; k < n ; k++)
+    head[k] = -1;
+  
+  for(k=0; k<n; ++k)
+    tail[k] = -1;
+  
+  for(k=0; k<n; ++k)
+    nque[k] = 0;
+  
+  for(i=0; i<m; ++i)
+    leftmost[i] = -1;
+  
+  for(k=n-1; k>=0; --k){
+    for(p=Ap[k]; p<Ap[k+1]; ++p){
+      // leftmost[i] = min(find(A(i,:)))
+      leftmost[Ai[p]] = k;
+    }
+  }
+  
+  // scan rows in reverse order
+  for (i = m-1; i >= 0; i--){
+    // row i is not yet ordered
+    pinv[i] = -1;
+    k = leftmost [i] ;
+    
+    // row i is empty
+    if (k == -1) continue;
+    
+    // first row in queue k
+    if(nque[k]++ == 0)
+      tail[k] = i;
+    
+    // put i at head of queue k 
+    next[i] = head[k];
+    head[k] = i;
+  }
+  S_lnz = 0;
+  S_m2 = m;
+  
+  // find row permutation and nnz(V)
+  for(k=0; k<n; ++k){
+    // remove row i from queue k
+    i = head[k];
+    
+    // count V(k,k) as nonzero 
+    S_lnz++;
+    
+    // add a fictitious row
+    if(i < 0)
+      i = S_m2++;
+    
+    // associate row i with V(:,k)
+    pinv [i] = k;
+    
+    // skip if V(k+1:m,k) is empty
+    if(--nque[k] <= 0) continue;
+    
+    // nque [k] is nnz (V(k+1:m,k))
+    S_lnz += nque[k];
+    
+    // move all rows to parent of k
+    if((pa = parent[k]) != -1){
+      if(nque[pa] == 0)
+        tail[pa] = tail[k];
+      
+      next[tail[k]] = head[pa] ;
+      head[pa] = next[i] ;
+      nque[pa] += nque[k] ;
+    }
+  }
+  for(i=0; i<m ; ++i)
+    if(pinv[i] < 0)
+      pinv[i] = k++;
+    
+  return 1;
+}
+
+std::vector<int> CRSSparsityInternal::postorder(const std::vector<int>& parent, int n){
+  int j, k = 0, *head, *next, *stack ;
+  
+  // allocate result
+  vector<int> post(n);
+  
+  // get workspace
+  vector<int> w(3*n);
+  
+  head = &w.front() ;
+  next = &w.front() + n ;
+  stack = &w.front() + 2*n;
+  
+  // empty linked lists
+  for(j=0; j<n; ++j)
+    head[j] = -1;
+  
+  // traverse nodes in reverse order
+  for (j=n-1; j>=0; --j){
+    // j is a root
+    if (parent [j] == -1) continue;
+    
+    // add j to list of its parent
+    next[j] = head[parent[j]];
+    head[parent[j]] = j ;
+  }
+  
+  for(j=0; j<n; ++j){
+    // skip j if it is not a root
+    if (parent [j] != -1) continue;
+
+    k = depthFirstSearchAndPostorder(j, k, head, next, &post.front(), stack);
+  }
+  
+  // success; return post
+  return post;
+}
+
+int CRSSparsityInternal::depthFirstSearchAndPostorder(int j, int k, int *head, const int *next, int *post, int *stack){
+  int i, p, top = 0;
+  
+  // place j on the stack
+  stack[0] = j;
+  
+  // while (stack is not empty)
+  while(top >= 0){
+    // p = top of stack
+    p = stack[top];
+    
+    // i = youngest child of p 
+    i = head[p];
+    if (i == -1){
+      // p has no unordered children left
+      top--;
+      
+      // node p is the kth postordered node
+      post[k++] = p;
+    } else {
+      // remove i from children of p
+      head[p] = next[i];
+      
+      // start dfs on child node i
+      stack[++top] = i;
+    }
+  }
+  
+  return k;
+}
+
+void CRSSparsityInternal::init_ata(const int *post, int *w, int **head, int **next) const{
+  int i, k, p, m = nrow_, n = ncol_;
+  const int *ATp = &rowind_.front();
+  const int *ATi = &col_.front();
+  *head = w+4*n, *next = w+5*n+1;
+  
+  // invert post
+  for(k=0; k<n; ++k)
+    w[post[k]] = k;
+  
+  for(i=0; i<m; ++i){
+    for(k=n, p=ATp[i]; p<ATp[i+1]; ++p)
+      k = std::min(k, w[ATi[p]]);
+    
+    // place row i in linked list k
+    (*next)[i] = (*head)[k];
+    (*head)[k] = i ;
+  }
+}
+
+#define HEAD(k,j) (ata ? head [k] : j)
+#define NEXT(J)   (ata ? next [J] : -1)
+std::vector<int> CRSSparsityInternal::counts(const int *parent, const int *post, int ata) const{
+  int i, j, k, n, m, J, s, p, q, jleaf, *maxfirst, *prevleaf, *ancestor, *head = NULL, *next = NULL, *first;
+
+  m = ncol_;
+  n = nrow_;
+  s = 4*n + (ata ? (n+m+1) : 0);
+
+  // allocate result
+  vector<int> colcount(n);
+  vector<int>& delta = colcount;
+  
+  // get workspace
+  vector<int> w(s);
+  
+  // AT = A'
+  CRSSparsity AT = transpose();
+
+  ancestor = &w.front();
+  maxfirst = &w.front()+n;
+  prevleaf = &w.front()+2*n;
+  first = &w.front()+3*n;
+  
+  // clear workspace w [0..s-1]
+  for(k=0; k<s; ++k)
+    w[k] = -1;
+  
+  // find first [j]
+  for(k=0; k<n; ++k){
+    j = post[k];
+
+    // delta[j]=1 if j is a leaf
+    delta[j] = (first[j] == -1) ? 1 : 0;
+
+    for (; j!=-1 && first [j] == -1; j=parent[j])
+      first[j] = k;
+  }
+
+  const int* ATp = &AT.rowind().front();
+  const int* ATi = &AT.col().front();
+  if (ata) AT->init_ata(post, &w.front(), &head, &next);
+  
+  // each node in its own set
+  for(i=0; i<n; ++i)
+    ancestor[i] = i;
+  
+  for(k=0; k<n; ++k){
+    // j is the kth node in postordered etree
+    j = post[k];
+    
+    // j is not a root
+    if (parent [j] != -1)
+      delta[parent [j]]--;
+      
+    // J=j for LL'=A case
+    for(J=HEAD(k,j); J != -1; J=NEXT(J)){
+      for(p = ATp[J]; p<ATp[J+1]; ++p){
+        i = ATi [p] ;
+        q = leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
+
+        // A(i,j) is in skeleton
+        if(jleaf >= 1)
+          delta[j]++ ;
+        
+        // account for overlap in q
+        if(jleaf == 2)
+          delta [q]-- ;
+      }
+    }
+    if(parent[j] != -1)
+      ancestor[j] = parent[j] ;
+  }
+  
+  // sum up delta's of each child
+  for(j = 0 ; j < n ; ++j){
+    if (parent[j] != -1)
+      colcount[parent [j]] += colcount[j] ;
+  }
+  
+  // success
+  return colcount;
+}
+#undef HEAD
+#undef NEXT
+
+#if 0
+
+
+/* symbolic ordering and analysis for QR or LU */
+css *cs_sqr (int order, const cs *A, int qr)
+{
+    int n, k, ok = 1, *post ;
+    css *S ;
+    if (!CS_CSC (A)) return (NULL) ;        /* check inputs */
+    n = A->n ;
+    S = cs_calloc (1, sizeof (css)) ;       /* allocate result S */
+    if (!S) return (NULL) ;                 /* out of memory */
+    S->q = cs_amd (order, A) ;              /* fill-reducing ordering */
+    if (order && !S->q) return (cs_sfree (S)) ;
+    if (qr)                                 /* QR symbolic analysis */
+    {
+        cs *C = order ? cs_permute (A, NULL, S->q, 0) : ((cs *) A) ;
+        S->parent = cs_etree (C, 1) ;       /* etree of C'*C, where C=A(:,q) */
+        post = cs_post (S->parent, n) ;
+        S->cp = cs_counts (C, S->parent, post, 1) ;  /* col counts chol(C'*C) */
+        cs_free (post) ;
+        ok = C && S->parent && S->cp && cs_vcount (C, S) ;
+        if (ok) for (S->unz = 0, k = 0 ; k < n ; k++) S->unz += S->cp [k] ;
+        ok = ok && S->lnz >= 0 && S->unz >= 0 ;     /* int overflow guard */
+        if (order) cs_spfree (C) ;
+    }
+    else
+    {
+        S->unz = 4*(A->p [n]) + n ;         /* for LU factorization only, */
+        S->lnz = S->unz ;                   /* guess nnz(L) and nnz(U) */
+    }
+    return (ok ? S : cs_sfree (S)) ;        /* return result S */
+}
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 } // namespace CasADi
 
