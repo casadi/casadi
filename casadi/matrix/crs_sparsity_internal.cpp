@@ -1710,150 +1710,48 @@ CRSSparsity CRSSparsityInternal::multiply(const CRSSparsity& B) const{
   return C;
 }
 
-
-#if 0
-
-
-/* symbolic ordering and analysis for QR or LU */
-css *cs_sqr (int order, const cs *A, int qr)
-{
-    int n, k, ok = 1, *post ;
-    css *S ;
-    if (!CS_CSC (A)) return (NULL) ;        /* check inputs */
-    n = A->n ;
-    S = cs_calloc (1, sizeof (css)) ;       /* allocate result S */
-    if (!S) return (NULL) ;                 /* out of memory */
-    S->q = cs_amd (order, A) ;              /* fill-reducing ordering */
-    if (order && !S->q) return (cs_sfree (S)) ;
-    if (qr)                                 /* QR symbolic analysis */
-    {
-        cs *C = order ? cs_permute (A, NULL, S->q, 0) : ((cs *) A) ;
-        S->parent = cs_etree (C, 1) ;       /* etree of C'*C, where C=A(:,q) */
-        post = cs_post (S->parent, n) ;
-        S->cp = cs_counts (C, S->parent, post, 1) ;  /* col counts chol(C'*C) */
-        cs_free (post) ;
-        ok = C && S->parent && S->cp && cs_vcount (C, S) ;
-        if (ok) for (S->unz = 0, k = 0 ; k < n ; k++) S->unz += S->cp [k] ;
-        ok = ok && S->lnz >= 0 && S->unz >= 0 ;     /* int overflow guard */
-        if (order) cs_spfree (C) ;
-    }
-    else
-    {
-        S->unz = 4*(A->p [n]) + n ;         /* for LU factorization only, */
-        S->lnz = S->unz ;                   /* guess nnz(L) and nnz(U) */
-    }
-    return (ok ? S : cs_sfree (S)) ;        /* return result S */
-}
-#endif
-
-
-
-#if 0
-CRSSparsity CRSSparsityInternal::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
-
-  // Assert dimensions
-  casadi_assert_message(nrow_==y.size1(), "The number of rows does not match");
-  casadi_assert_message(ncol_==y.size2(), "The number of columns does not match");
-
-  // Return object
-  CRSSparsity ret;
-
-  // Quick intersection if the patterns are equal
-  if(*this == y){
-    ret = *this;
-    mapping.resize(size());
-    fill(mapping.begin(),mapping.end(), 1 | 2);
-  } else {
+void CRSSparsityInternal::prefactorize(int order, int qr, std::vector<int>& S_pinv, std::vector<int>& S_q, std::vector<int>& S_parent, std::vector<int>& S_cp, std::vector<int>& S_leftmost, int& S_m2, double& S_lnz, double& S_unz) const{
+  int k, ok = 1;
+  int n = nrow_;
+  vector<int> post;
   
-    // Create return object
-    ret = CRSSparsity(size1(),size2());
-    
-    // Get refences to the sparsity vectors
-    vector<int>& r = ret.rowindRef();
-    vector<int>& c = ret.colRef();
-    
-    // Prepare the assembly of the rowind vector below
-    r.clear();
-    r.push_back(0);
-    
-    // Clear the mapping
-    mapping.clear();
-    
-    // Loop over rows of both patterns
-    for(int i=0; i<size1(); ++i){
-      // Non-zero element of the two matrices
-      int el1 = rowind(i);
-      int el2 = y.rowind(i);
-      
-      // End of the non-zero elements of the row for the two matrices
-      int el1_last = rowind(i+1);
-      int el2_last = y.rowind(i+1);
-      
-      // Loop over the non-zeros of both matrices
-      while(el1<el1_last || el2<el2_last){
-        // Get the columns
-        int col1 = el1<el1_last ? col(el1) : size2();
-        int col2 = el2<el2_last ? y.col(el2) : size2();
-
-        // Add to the return matrix
-        if(col1==col2){ //  both nonzero
-          c.push_back(col1);
-          mapping.push_back( 1 | 2);
-          el1++; el2++;
-        } else if(col1<col2){ //  only first argument is nonzero
-          if(!fx0_is_zero){
-            c.push_back(col1);
-            mapping.push_back(1);
-          } else {
-            mapping.push_back(1 | 4);
-          }
-          el1++;
-        } else { //  only second argument is nonzero
-          if(!f0x_is_zero){
-            c.push_back(col2);
-            mapping.push_back(2);
-          } else {
-            mapping.push_back(2 | 4);
-          }
-          el2++;
-        }
-      }
-      
-      // Save the index of the last nonzero on the row
-      r.push_back(c.size());
-    }
-  }
+  // fill-reducing ordering
+  S_q = approximateMinimumDegree(order);
   
-  // Check if we need to add extra nonzeros
-  if(f00_is_zero || ret.dense()){
-    // No nonzero elements in the return object or sparse entries evaluating to 0
-    return ret;
-  } else {
-    // Create a new sparsity pattern with the remaining nonzeros added
-    vector<unsigned char> mapping_dense(ret.numel(),0); // FIXME: this allocation can be avoided, just iterate in reverse order instead
-    
-    // Loop over rows
-    for(int i=0; i<ret.size1(); ++i){
-      // Loop over nonzeros
-      for(int el=ret.rowind(i); el<ret.rowind(i+1); ++el){
-        // Get column
-        int j=ret.col(el);
-        
-        // Get the nonzero of the dense matrix
-        int el_dense = j+i*ret.size2();
-        
-        // Save to mapping
-        mapping_dense[el_dense] = mapping[el];
-      }
+  // QR symbolic analysis
+  if (qr){
+    CRSSparsity C;
+    if(order!=0){
+      std::vector<int> pinv_tmp;
+      C = permute(pinv_tmp, S_q, 0);
+    } else {
+      C = shared_from_this<CRSSparsity>();
     }
     
-    // Use the dense mapping instead and return a dense sparsity
-    mapping_dense.swap(mapping);
-    return CRSSparsity(ret.size1(),ret.size2(),true);
+    // etree of C'*C, where C=A(:,q)
+    S_parent = eliminationTree(1);
+    
+    post = postorder(S_parent, n);
+
+    // col counts chol(C'*C)
+    S_cp = counts(&S_parent.front(), &post.front(), 1);
+    post.clear();
+    
+    vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
+    for(S_unz = 0, k = 0; k<n; k++)
+      S_unz += S_cp[k];
+      
+    // int overflow guard
+    casadi_assert(S_lnz >= 0);
+    casadi_assert(S_unz >= 0);
+  } else {
+    // for LU factorization only
+    S_unz = 4*(rowind_[n]) + n ;
+    
+    // guess nnz(L) and nnz(U)
+    S_lnz = S_unz;
   }
 }
-#endif
-
 
 CRSSparsity CRSSparsityInternal::diag(std::vector<int>& mapping) const{
   if (nrow_==ncol_) {

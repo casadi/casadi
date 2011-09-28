@@ -107,6 +107,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise. order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
     std::vector<int> approximateMinimumDegree(int order) const;
 
+    /// symbolic ordering and analysis for QR or LU: See cs_sqr in CSparse
+    void prefactorize(int order, int qr, std::vector<int>& pinv, std::vector<int>& q, std::vector<int>& parent, std::vector<int>& cp, std::vector<int>& leftmost, int& m2, double& lnz, double& unz) const;
+    
     /// clear w: cs_wclear in CSparse
     static int wclear(int mark, int lemax, int *w, int n);
     
