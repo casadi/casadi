@@ -35,6 +35,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Check if the dimensions and rowind,col vectors are compatible
     void sanityCheck(bool complete=false) const;
 
+    /// Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
+    CRSSparsity diag(std::vector<int>& mapping) const;
+
     /// Calculate the elimination tree: See cs_etree in CSparse
     std::vector<int> eliminationTree(bool ata) const;
     
@@ -101,11 +104,92 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Column counts: See cs_counts in CSparse
     std::vector<int> counts(const int *parent, const int *post, int ata) const;
 
+    /// Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise. order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
+    std::vector<int> approximateMinimumDegree(int order) const;
+
+    /// clear w: cs_wclear in CSparse
+    static int wclear(int mark, int lemax, int *w, int n);
+    
+    /// keep off-diagonal entries; drop diagonal entries: See cs_diag in CSparse
+    static int diag(int i, int j, double aij, void *other);
+
+    /// C = A*B: See cs_multiply in CSparse
+    CRSSparsity multiply(const CRSSparsity& B) const;
+
+    /// x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse: See cs_scatter in CSparse
+    int scatter(int j, std::vector<int>& w, int mark, CRSSparsity& C, int nz) const;
+    
     /// Get the row for each nonzero
     std::vector<int> getRow() const;
 
+    /// Resize
+    void resize(int nrow, int ncol);
+    
+    /// Reshape a sparsity, order of nonzeros remains the same
+    CRSSparsity reshape(int n, int m) const;
+
+    /// Pattern union
+    //CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
+
     /// Number of structural non-zeros
     int size() const;
+
+    /// Number of elements
+    int numel() const;
+
+    /// Number of non-zeros in the upper triangular half
+    int sizeU() const;
+
+    /// Number of non-zeros in the lower triangular half
+    int sizeL() const;
+
+    /// Is dense?
+    bool dense() const;
+    
+    /// Is diagonal?
+    bool diagonal() const;
+
+    /// Get the dimension as a string
+    std::string dimString() const;
+
+     /// Sparsity pattern for a matrix-matrix product (details in public class)
+    CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+
+     /// Sparsity pattern for a matrix-matrix product (details in public class)
+    CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
+
+    /// Union of two sparsity patterns
+    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
+
+    /// Check if two sparsity patterns are the same
+    bool isEqual(const CRSSparsity& y) const;
+
+    /// Enlarge the matrix along the first dimension (i.e. insert rows)
+    void enlargeRows(int nrow, const std::vector<int>& ii);
+
+    /// Enlarge the matrix along the second dimension (i.e. insert columns)
+    void enlargeColumns(int ncol, const std::vector<int>& jj);
+    
+    /// Make a patten dense
+    CRSSparsity makeDense(std::vector<int>& mapping) const;
+
+    /// Erase rows and/or columns
+    std::vector<int> erase(const std::vector<int>& ii, const std::vector<int>& jj);
+
+    /// Append another sparsity patten vertically
+    void append(const CRSSparsity& sp);
+
+    /// Reserve space
+    void reserve(int nnz, int nrow);
+    
+    /// Get a submatrix
+    CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+
+    /// Get the index of an existing non-zero element
+    int getNZ(int i, int j) const;
+
+    /// Get a set of non-zero element
+    std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
 
     /// Clone
     virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }

@@ -25,6 +25,7 @@
 #include "../stl_vector_tools.hpp"
 #include <climits>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
 
@@ -32,6 +33,10 @@ namespace CasADi{
 
 int CRSSparsityInternal::size() const{
   return col_.size();
+}
+    
+int CRSSparsityInternal::numel() const{
+  return nrow_*ncol_;
 }
     
 void CRSSparsityInternal::repr(ostream &stream) const{
@@ -1074,6 +1079,440 @@ std::vector<int> CRSSparsityInternal::counts(const int *parent, const int *post,
 #undef HEAD
 #undef NEXT
 
+int CRSSparsityInternal::wclear (int mark, int lemax, int *w, int n){
+    int k ;
+    if (mark < 2 || (mark + lemax < 0))
+    {
+        for (k = 0 ; k < n ; k++) if (w [k] != 0) w [k] = 1 ;
+        mark = 2 ;
+    }
+    return (mark) ;     /* at this point, w [0..n-1] < mark holds */
+}
+
+int CRSSparsityInternal::diag (int i, int j, double aij, void *other){
+  return (i != j) ;
+}
+
+std::vector<int> CRSSparsityInternal::approximateMinimumDegree(int order) const{
+  
+  int *Cp, *Ci, *last, *W, *len, *nv, *next, *P, *head, *elen, *degree, *w;
+  int *hhead, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1;
+  int k2, k3, jlast, ln, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi;
+  int ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, t;
+
+  unsigned int h;
+   //-- Construct matrix C -----------------------------------------------
+  CRSSparsity AT = transpose() ;              // compute A'
+  int m = ncol_;
+  int n = nrow_;
+  int dense = std::max(16, 10 * int(sqrt(double(n)))) ;   // find dense threshold
+  dense = std::min(n-2, dense);
+  CRSSparsity C;
+  if(order == 1 && n == m){
+    // C = A+A
+    std::vector<unsigned char> mapping;
+    //C = patternUnion(AT,mapping,true,false,false);
+  } else if (order == 2) {
+    // drop dense columns from AT
+    int* ATp = &AT.rowindRef().front();
+    int* ATi = &AT.colRef().front();
+    for (p2 = 0, j = 0 ; j < m ; j++){
+      p = ATp [j] ;                   // column j of AT starts here
+      ATp[j] = p2 ;                   // new column j starts here 
+      if (ATp [j+1] - p > dense) continue ;   // skip dense col j
+        for ( ; p < ATp [j+1] ; p++) ATi [p2++] = ATi [p] ;
+    }
+    
+    // finalize AT
+    ATp[m] = p2;
+    
+    // A2 = AT'
+    CRSSparsity A2 = AT->transpose();
+    
+    // C=A'*A with no dense rows
+    //C = cs_multiply(AT, A2);
+  } else {
+    // C=A'*A
+    //C = cs_multiply (AT, A);
+  }
+    
+#if 0
+    
+    cs_spfree (AT) ;
+    if (!C) return (NULL) ;
+    cs_fkeep (C, &cs_diag, NULL) ;          /* drop diagonal entries */
+    Cp = C->p ;
+    cnz = Cp [n] ;
+    P = cs_malloc (n+1, sizeof (int)) ;     /* allocate result */
+    W = cs_malloc (8*(n+1), sizeof (int)) ; /* get workspace */
+    t = cnz + cnz/5 + 2*n ;                 /* add elbow room to C */
+    if (!P || !W || !cs_sprealloc (C, t)) return (cs_idone (P, C, W, 0)) ;
+    len  = W           ; nv     = W +   (n+1) ; next   = W + 2*(n+1) ;
+    head = W + 3*(n+1) ; elen   = W + 4*(n+1) ; degree = W + 5*(n+1) ;
+    w    = W + 6*(n+1) ; hhead  = W + 7*(n+1) ;
+    last = P ;                              /* use P as workspace for last */
+    /* --- Initialize quotient graph ---------------------------------------- */
+    for (k = 0 ; k < n ; k++) len [k] = Cp [k+1] - Cp [k] ;
+    len [n] = 0 ;
+    nzmax = C->nzmax ;
+    Ci = C->i ;
+    for (i = 0 ; i <= n ; i++)
+    {
+        head [i] = -1 ;                     /* degree list i is empty */
+        last [i] = -1 ;
+        next [i] = -1 ;
+        hhead [i] = -1 ;                    /* hash list i is empty */
+        nv [i] = 1 ;                        /* node i is just one node */
+        w [i] = 1 ;                         /* node i is alive */
+        elen [i] = 0 ;                      /* Ek of node i is empty */
+        degree [i] = len [i] ;              /* degree of node i */
+    }
+    mark = cs_wclear (0, 0, w, n) ;         /* clear w */
+    elen [n] = -2 ;                         /* n is a dead element */
+    Cp [n] = -1 ;                           /* n is a root of assembly tree */
+    w [n] = 0 ;                             /* n is a dead element */
+    /* --- Initialize degree lists ------------------------------------------ */
+    for (i = 0 ; i < n ; i++)
+    {
+        d = degree [i] ;
+        if (d == 0)                         /* node i is empty */
+        {
+            elen [i] = -2 ;                 /* element i is dead */
+            nel++ ;
+            Cp [i] = -1 ;                   /* i is a root of assembly tree */
+            w [i] = 0 ;
+        }
+        else if (d > dense)                 /* node i is dense */
+        {
+            nv [i] = 0 ;                    /* absorb i into element n */
+            elen [i] = -1 ;                 /* node i is dead */
+            nel++ ;
+            Cp [i] = CS_FLIP (n) ;
+            nv [n]++ ;
+        }
+        else
+        {
+            if (head [d] != -1) last [head [d]] = i ;
+            next [i] = head [d] ;           /* put node i in degree list d */
+            head [d] = i ;
+        }
+    }
+    while (nel < n)                         /* while (selecting pivots) do */
+    {
+        /* --- Select node of minimum approximate degree -------------------- */
+        for (k = -1 ; mindeg < n && (k = head [mindeg]) == -1 ; mindeg++) ;
+        if (next [k] != -1) last [next [k]] = -1 ;
+        head [mindeg] = next [k] ;          /* remove k from degree list */
+        elenk = elen [k] ;                  /* elenk = |Ek| */
+        nvk = nv [k] ;                      /* # of nodes k represents */
+        nel += nvk ;                        /* nv[k] nodes of A eliminated */
+        /* --- Garbage collection ------------------------------------------- */
+        if (elenk > 0 && cnz + mindeg >= nzmax)
+        {
+            for (j = 0 ; j < n ; j++)
+            {
+                if ((p = Cp [j]) >= 0)      /* j is a live node or element */
+                {
+                    Cp [j] = Ci [p] ;       /* save first entry of object */
+                    Ci [p] = CS_FLIP (j) ;  /* first entry is now CS_FLIP(j) */
+                }
+            }
+            for (q = 0, p = 0 ; p < cnz ; ) /* scan all of memory */
+            {
+                if ((j = CS_FLIP (Ci [p++])) >= 0)  /* found object j */
+                {
+                    Ci [q] = Cp [j] ;       /* restore first entry of object */
+                    Cp [j] = q++ ;          /* new pointer to object j */
+                    for (k3 = 0 ; k3 < len [j]-1 ; k3++) Ci [q++] = Ci [p++] ;
+                }
+            }
+            cnz = q ;                       /* Ci [cnz...nzmax-1] now free */
+        }
+        /* --- Construct new element ---------------------------------------- */
+        dk = 0 ;
+        nv [k] = -nvk ;                     /* flag k as in Lk */
+        p = Cp [k] ;
+        pk1 = (elenk == 0) ? p : cnz ;      /* do in place if elen[k] == 0 */
+        pk2 = pk1 ;
+        for (k1 = 1 ; k1 <= elenk + 1 ; k1++)
+        {
+            if (k1 > elenk)
+            {
+                e = k ;                     /* search the nodes in k */
+                pj = p ;                    /* list of nodes starts at Ci[pj]*/
+                ln = len [k] - elenk ;      /* length of list of nodes in k */
+            }
+            else
+            {
+                e = Ci [p++] ;              /* search the nodes in e */
+                pj = Cp [e] ;
+                ln = len [e] ;              /* length of list of nodes in e */
+            }
+            for (k2 = 1 ; k2 <= ln ; k2++)
+            {
+                i = Ci [pj++] ;
+                if ((nvi = nv [i]) <= 0) continue ; /* node i dead, or seen */
+                dk += nvi ;                 /* degree[Lk] += size of node i */
+                nv [i] = -nvi ;             /* negate nv[i] to denote i in Lk*/
+                Ci [pk2++] = i ;            /* place i in Lk */
+                if (next [i] != -1) last [next [i]] = last [i] ;
+                if (last [i] != -1)         /* remove i from degree list */
+                {
+                    next [last [i]] = next [i] ;
+                }
+                else
+                {
+                    head [degree [i]] = next [i] ;
+                }
+            }
+            if (e != k)
+            {
+                Cp [e] = CS_FLIP (k) ;      /* absorb e into k */
+                w [e] = 0 ;                 /* e is now a dead element */
+            }
+        }
+        if (elenk != 0) cnz = pk2 ;         /* Ci [cnz...nzmax] is free */
+        degree [k] = dk ;                   /* external degree of k - |Lk\i| */
+        Cp [k] = pk1 ;                      /* element k is in Ci[pk1..pk2-1] */
+        len [k] = pk2 - pk1 ;
+        elen [k] = -2 ;                     /* k is now an element */
+        /* --- Find set differences ----------------------------------------- */
+        mark = cs_wclear (mark, lemax, w, n) ;  /* clear w if necessary */
+        for (pk = pk1 ; pk < pk2 ; pk++)    /* scan 1: find |Le\Lk| */
+        {
+            i = Ci [pk] ;
+            if ((eln = elen [i]) <= 0) continue ;/* skip if elen[i] empty */
+            nvi = -nv [i] ;                      /* nv [i] was negated */
+            wnvi = mark - nvi ;
+            for (p = Cp [i] ; p <= Cp [i] + eln - 1 ; p++)  /* scan Ei */
+            {
+                e = Ci [p] ;
+                if (w [e] >= mark)
+                {
+                    w [e] -= nvi ;          /* decrement |Le\Lk| */
+                }
+                else if (w [e] != 0)        /* ensure e is a live element */
+                {
+                    w [e] = degree [e] + wnvi ; /* 1st time e seen in scan 1 */
+                }
+            }
+        }
+        /* --- Degree update ------------------------------------------------ */
+        for (pk = pk1 ; pk < pk2 ; pk++)    /* scan2: degree update */
+        {
+            i = Ci [pk] ;                   /* consider node i in Lk */
+            p1 = Cp [i] ;
+            p2 = p1 + elen [i] - 1 ;
+            pn = p1 ;
+            for (h = 0, d = 0, p = p1 ; p <= p2 ; p++)    /* scan Ei */
+            {
+                e = Ci [p] ;
+                if (w [e] != 0)             /* e is an unabsorbed element */
+                {
+                    dext = w [e] - mark ;   /* dext = |Le\Lk| */
+                    if (dext > 0)
+                    {
+                        d += dext ;         /* sum up the set differences */
+                        Ci [pn++] = e ;     /* keep e in Ei */
+                        h += e ;            /* compute the hash of node i */
+                    }
+                    else
+                    {
+                        Cp [e] = CS_FLIP (k) ;  /* aggressive absorb. e->k */
+                        w [e] = 0 ;             /* e is a dead element */
+                    }
+                }
+            }
+            elen [i] = pn - p1 + 1 ;        /* elen[i] = |Ei| */
+            p3 = pn ;
+            p4 = p1 + len [i] ;
+            for (p = p2 + 1 ; p < p4 ; p++) /* prune edges in Ai */
+            {
+                j = Ci [p] ;
+                if ((nvj = nv [j]) <= 0) continue ; /* node j dead or in Lk */
+                d += nvj ;                  /* degree(i) += |j| */
+                Ci [pn++] = j ;             /* place j in node list of i */
+                h += j ;                    /* compute hash for node i */
+            }
+            if (d == 0)                     /* check for mass elimination */
+            {
+                Cp [i] = CS_FLIP (k) ;      /* absorb i into k */
+                nvi = -nv [i] ;
+                dk -= nvi ;                 /* |Lk| -= |i| */
+                nvk += nvi ;                /* |k| += nv[i] */
+                nel += nvi ;
+                nv [i] = 0 ;
+                elen [i] = -1 ;             /* node i is dead */
+            }
+            else
+            {
+                degree [i] = CS_MIN (degree [i], d) ;   /* update degree(i) */
+                Ci [pn] = Ci [p3] ;         /* move first node to end */
+                Ci [p3] = Ci [p1] ;         /* move 1st el. to end of Ei */
+                Ci [p1] = k ;               /* add k as 1st element in of Ei */
+                len [i] = pn - p1 + 1 ;     /* new len of adj. list of node i */
+                h %= n ;                    /* finalize hash of i */
+                next [i] = hhead [h] ;      /* place i in hash bucket */
+                hhead [h] = i ;
+                last [i] = h ;              /* save hash of i in last[i] */
+            }
+        }                                   /* scan2 is done */
+        degree [k] = dk ;                   /* finalize |Lk| */
+        lemax = CS_MAX (lemax, dk) ;
+        mark = cs_wclear (mark+lemax, lemax, w, n) ;    /* clear w */
+        /* --- Supernode detection ------------------------------------------ */
+        for (pk = pk1 ; pk < pk2 ; pk++)
+        {
+            i = Ci [pk] ;
+            if (nv [i] >= 0) continue ;         /* skip if i is dead */
+            h = last [i] ;                      /* scan hash bucket of node i */
+            i = hhead [h] ;
+            hhead [h] = -1 ;                    /* hash bucket will be empty */
+            for ( ; i != -1 && next [i] != -1 ; i = next [i], mark++)
+            {
+                ln = len [i] ;
+                eln = elen [i] ;
+                for (p = Cp [i]+1 ; p <= Cp [i] + ln-1 ; p++) w [Ci [p]] = mark;
+                jlast = i ;
+                for (j = next [i] ; j != -1 ; ) /* compare i with all j */
+                {
+                    ok = (len [j] == ln) && (elen [j] == eln) ;
+                    for (p = Cp [j] + 1 ; ok && p <= Cp [j] + ln - 1 ; p++)
+                    {
+                        if (w [Ci [p]] != mark) ok = 0 ;    /* compare i and j*/
+                    }
+                    if (ok)                     /* i and j are identical */
+                    {
+                        Cp [j] = CS_FLIP (i) ;  /* absorb j into i */
+                        nv [i] += nv [j] ;
+                        nv [j] = 0 ;
+                        elen [j] = -1 ;         /* node j is dead */
+                        j = next [j] ;          /* delete j from hash bucket */
+                        next [jlast] = j ;
+                    }
+                    else
+                    {
+                        jlast = j ;             /* j and i are different */
+                        j = next [j] ;
+                    }
+                }
+            }
+        }
+        /* --- Finalize new element------------------------------------------ */
+        for (p = pk1, pk = pk1 ; pk < pk2 ; pk++)   /* finalize Lk */
+        {
+            i = Ci [pk] ;
+            if ((nvi = -nv [i]) <= 0) continue ;/* skip if i is dead */
+            nv [i] = nvi ;                      /* restore nv[i] */
+            d = degree [i] + dk - nvi ;         /* compute external degree(i) */
+            d = CS_MIN (d, n - nel - nvi) ;
+            if (head [d] != -1) last [head [d]] = i ;
+            next [i] = head [d] ;               /* put i back in degree list */
+            last [i] = -1 ;
+            head [d] = i ;
+            mindeg = CS_MIN (mindeg, d) ;       /* find new minimum degree */
+            degree [i] = d ;
+            Ci [p++] = i ;                      /* place i in Lk */
+        }
+        nv [k] = nvk ;                      /* # nodes absorbed into k */
+        if ((len [k] = p-pk1) == 0)         /* length of adj list of element k*/
+        {
+            Cp [k] = -1 ;                   /* k is a root of the tree */
+            w [k] = 0 ;                     /* k is now a dead element */
+        }
+        if (elenk != 0) cnz = p ;           /* free unused space in Lk */
+    }
+    /* --- Postordering ----------------------------------------------------- */
+    for (i = 0 ; i < n ; i++) Cp [i] = CS_FLIP (Cp [i]) ;/* fix assembly tree */
+    for (j = 0 ; j <= n ; j++) head [j] = -1 ;
+    for (j = n ; j >= 0 ; j--)              /* place unordered nodes in lists */
+    {
+        if (nv [j] > 0) continue ;          /* skip if j is an element */
+        next [j] = head [Cp [j]] ;          /* place j in list of its parent */
+        head [Cp [j]] = j ;
+    }
+    for (e = n ; e >= 0 ; e--)              /* place elements in lists */
+    {
+        if (nv [e] <= 0) continue ;         /* skip unless e is an element */
+        if (Cp [e] != -1)
+        {
+            next [e] = head [Cp [e]] ;      /* place e in list of its parent */
+            head [Cp [e]] = e ;
+        }
+    }
+    for (k = 0, i = 0 ; i <= n ; i++)       /* postorder the assembly tree */
+    {
+        if (Cp [i] == -1) k = cs_tdfs (i, k, head, next, P, w) ;
+    }
+#endif
+  std::vector<int> ret;
+  return ret;
+//  return P;
+}
+
+int CRSSparsityInternal::scatter(int j, std::vector<int>& w, int mark, CRSSparsity& C, int nz) const{
+  int i, p;
+  const int *Ap = &rowind_.front();
+  const int *Ai = &col_.front();
+  int *Ci = &C.colRef().front();
+  
+  for(p = Ap[j]; p<Ap[j+1]; ++p){
+    // A(i,j) is nonzero
+    i = Ai [p];
+    
+    if (w[i] < mark){
+      // i is new entry in column j
+      w[i] = mark;
+      
+      // add i to pattern of C(:,j)
+      Ci[nz++] = i;
+    }
+  }
+  return nz;
+}
+
+CRSSparsity CRSSparsityInternal::multiply(const CRSSparsity& B) const{
+  int nz = 0;
+  casadi_assert_message(nrow_ == B.size2(), "Dimension mismatch.");
+  int m = ncol_;
+  int anz = rowind_[nrow_];
+  int n = B.size1();
+  const int* Bp = &B.rowind().front();
+  const int* Bi = &B.col().front();
+  int bnz = Bp[n];
+
+  // get workspace
+  vector<int> w(m);
+
+  // allocate result
+  CRSSparsity C(n,m);
+  C.rowindRef().resize(anz + bnz);
+  
+  int* Cp = &C.rowindRef().front();
+  for(int j=0; j<n; ++j){
+    if(nz+m > C.size()){
+      C.colRef().resize(2*(C.size())+m);
+    }
+    
+    // C->i and C->x may be reallocated
+    int* Ci = &C.colRef().front();
+
+    // column j of C starts here
+    Cp[j] = nz;
+    for(int p = Bp[j] ; p<Bp[j+1] ; ++p){
+      nz = scatter(Bi[p], w, j+1, C, nz);
+    }
+  }
+  
+  // finalize the last column of C
+  Cp[n] = nz;
+  C.colRef().resize(nz);
+
+  // Success
+  return C;
+}
+
+
 #if 0
 
 
@@ -1111,22 +1550,792 @@ css *cs_sqr (int order, const cs *A, int qr)
 
 
 
+#if 0
+CRSSparsity CRSSparsityInternal::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
+
+  // Assert dimensions
+  casadi_assert_message(nrow_==y.size1(), "The number of rows does not match");
+  casadi_assert_message(ncol_==y.size2(), "The number of columns does not match");
+
+  // Return object
+  CRSSparsity ret;
+
+  // Quick intersection if the patterns are equal
+  if(*this == y){
+    ret = *this;
+    mapping.resize(size());
+    fill(mapping.begin(),mapping.end(), 1 | 2);
+  } else {
+  
+    // Create return object
+    ret = CRSSparsity(size1(),size2());
+    
+    // Get refences to the sparsity vectors
+    vector<int>& r = ret.rowindRef();
+    vector<int>& c = ret.colRef();
+    
+    // Prepare the assembly of the rowind vector below
+    r.clear();
+    r.push_back(0);
+    
+    // Clear the mapping
+    mapping.clear();
+    
+    // Loop over rows of both patterns
+    for(int i=0; i<size1(); ++i){
+      // Non-zero element of the two matrices
+      int el1 = rowind(i);
+      int el2 = y.rowind(i);
+      
+      // End of the non-zero elements of the row for the two matrices
+      int el1_last = rowind(i+1);
+      int el2_last = y.rowind(i+1);
+      
+      // Loop over the non-zeros of both matrices
+      while(el1<el1_last || el2<el2_last){
+        // Get the columns
+        int col1 = el1<el1_last ? col(el1) : size2();
+        int col2 = el2<el2_last ? y.col(el2) : size2();
+
+        // Add to the return matrix
+        if(col1==col2){ //  both nonzero
+          c.push_back(col1);
+          mapping.push_back( 1 | 2);
+          el1++; el2++;
+        } else if(col1<col2){ //  only first argument is nonzero
+          if(!fx0_is_zero){
+            c.push_back(col1);
+            mapping.push_back(1);
+          } else {
+            mapping.push_back(1 | 4);
+          }
+          el1++;
+        } else { //  only second argument is nonzero
+          if(!f0x_is_zero){
+            c.push_back(col2);
+            mapping.push_back(2);
+          } else {
+            mapping.push_back(2 | 4);
+          }
+          el2++;
+        }
+      }
+      
+      // Save the index of the last nonzero on the row
+      r.push_back(c.size());
+    }
+  }
+  
+  // Check if we need to add extra nonzeros
+  if(f00_is_zero || ret.dense()){
+    // No nonzero elements in the return object or sparse entries evaluating to 0
+    return ret;
+  } else {
+    // Create a new sparsity pattern with the remaining nonzeros added
+    vector<unsigned char> mapping_dense(ret.numel(),0); // FIXME: this allocation can be avoided, just iterate in reverse order instead
+    
+    // Loop over rows
+    for(int i=0; i<ret.size1(); ++i){
+      // Loop over nonzeros
+      for(int el=ret.rowind(i); el<ret.rowind(i+1); ++el){
+        // Get column
+        int j=ret.col(el);
+        
+        // Get the nonzero of the dense matrix
+        int el_dense = j+i*ret.size2();
+        
+        // Save to mapping
+        mapping_dense[el_dense] = mapping[el];
+      }
+    }
+    
+    // Use the dense mapping instead and return a dense sparsity
+    mapping_dense.swap(mapping);
+    return CRSSparsity(ret.size1(),ret.size2(),true);
+  }
+}
+#endif
 
 
+CRSSparsity CRSSparsityInternal::diag(std::vector<int>& mapping) const{
+  if (nrow_==ncol_) {
+    // Return object
+    CRSSparsity ret(0,1);
+    ret.reserve(std::min(size(),nrow_),nrow_);
+    
+    // Mapping
+    mapping.clear();
+    
+    // Loop over nonzero
+    for(int i=0; i<nrow_; ++i){
+      
+      // Enlarge the return matrix
+      ret.resize(i+1,1);
+    
+      // Get to the right nonzero of the row
+      int el = rowind_[i];
+      while(el<rowind_[i+1] && col_[el]<i){
+        el++;
+      }
+      
+      if (el>=size()) return ret;
+      
+      // Add element if nonzero on diagonal
+      if(col_[el]==i){
+        ret.getNZ(i,0);
+        mapping.push_back(el);
+      }
+    }
+    
+    return ret;
+    
+  } else if (nrow_==1 || ncol_==1) {
+    CRSSparsity trans;
+    const CRSSparsityInternal *sp;
+    
+    // Have a row vector
+    if(nrow_ == 1){
+      sp = this;
+    } else {
+      trans = transpose();
+      sp = static_cast<const CRSSparsityInternal *>(trans.get());
+    }
+    
+    // Return object
+    CRSSparsity ret(sp->ncol_,sp->ncol_);
+    ret.reserve(size(),sp->ncol_);
+    
+    mapping.clear();
+    mapping.resize(size());
+        
+    // Loop over nonzero
+    for(int k=0;k<size();k++) {
+      mapping[k]=k; // mapping will just be a range(size())
+      
+      int i = sp->col_[k];
+      
+      ret.getNZ(i,i); // Create a nonzero into the ret sparsity pattern
+    }
+    
+    return ret;
+  } else {
+    stringstream s;
+    s << "diag: wrong argument shape. Expecting square matrix or vector-like, but got " << dimString() << " instead." <<  std::endl;
+    throw CasadiException(s.str());
+  }
+}
 
+std::string CRSSparsityInternal::dimString() const { 
+  std::stringstream ss;
+  ss << "(" << nrow_ << "x" << ncol_ << "=" << numel() << "|" << size() << ")";
+  return ss.str();
+}
 
+CRSSparsity CRSSparsityInternal::patternProduct(const CRSSparsity& y_trans) const{
+  // Dimensions
+  int x_nrow = nrow_;
+  int y_ncol = y_trans.size1();
 
+  // Quick return if both are dense
+  if(dense() && y_trans.dense()){
+    return CRSSparsity(x_nrow,y_ncol,true);
+  }
+  
+  // return object
+  CRSSparsity ret(x_nrow,y_ncol);
+  
+  // Get the vectors for the return pattern
+  vector<int>& c = ret.colRef();
+  vector<int>& r = ret.rowindRef();
+  
+  // Direct access to the arrays
+  const vector<int> &x_col = col_;
+  const vector<int> &y_row = y_trans.col();
+  const vector<int> &x_rowind = rowind_;
+  const vector<int> &y_colind = y_trans.rowind();
 
+  // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
+#if __STDC_VERSION__ >= 199901L
+  typedef unsigned long long int_t;
+#else
+  typedef unsigned long int_t;
+#endif
+  
+  // Number of directions we can deal with at a time
+  int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
 
+  // Number of such groups needed
+  int ng = x_nrow/nr;
+  if(ng*nr != x_nrow) ng++;
+  
+  // Which columns exist in a row of the first factor
+  vector<int_t> in_x_row(ncol_);
+  vector<int_t> in_res_col(y_ncol);
 
+  // Loop over the rows of the resulting matrix, nr rows at a time
+  for(int rr=0; rr<ng; ++rr){
 
+    // Mark the elements in the x row
+    fill(in_x_row.begin(),in_x_row.end(),0); // NOTE: expensive?
+    int_t b=1;
+    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+      for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
+        in_x_row[x_col[el1]] |= b;
+      }
+      b <<= 1;
+    }
 
+    // Get the sparsity pattern for the set of rows
+    fill(in_res_col.begin(),in_res_col.end(),0); // NOTE: expensive?
+    for(int j=0; j<y_ncol; ++j){
+      
+      // Loop over the nonzeros of the column of the second factor
+      for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
+        
+        // Get the row
+        int i_y = y_row[el2];
+        
+        // Add nonzero if the element matches an element in the x row
+        in_res_col[j] |= in_x_row[i_y];
+      }
+    }
 
+    b = 1;
+    for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
+      
+      // loop over the columns of the resulting matrix
+      for(int j=0; j<y_ncol; ++j){
+        
+        // Save nonzero, if any
+        if(in_res_col[j] & b){
+          c.push_back(j);
+        }
+      }
+      r[i+1] = c.size();
+      b <<=1;
+    }
+  }
+  return ret;
+}
 
+CRSSparsity CRSSparsityInternal::patternProduct(const CRSSparsity& y_trans, vector< vector< pair<int,int> > >& mapping) const{
+  // return object
+  CRSSparsity ret = patternProduct(y_trans);
+  
+  // Get the vectors for the return pattern
+  const vector<int>& c = ret.col();
+  const vector<int>& r = ret.rowind();
+  
+  // Direct access to the arrays
+  const vector<int> &x_col = col_;
+  const vector<int> &y_row = y_trans.col();
+  const vector<int> &x_rowind = rowind_;
+  const vector<int> &y_colind = y_trans.rowind();
 
+  // Clear the mapping
+  mapping.resize(ret.size());
 
+  // the entry of the matrix to be calculated
+  vector< pair<int,int> > d;
 
+  // loop over the row of the resulting matrix)
+  for(int i=0; i<nrow_; ++i){
+    // Loop over nonzeros
+    for(int el=r[i]; el<r[i+1]; ++el){
+      int j = c[el];
+      int el1 = x_rowind[i];
+      int el2 = y_colind[j];
+      d.clear();
+      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+        int j1 = x_col[el1];
+        int i2 = y_row[el2];      
+        if(j1==i2){
+          d.push_back(pair<int,int>(el1++,el2++));
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+      mapping[el] = d;
+    }
+  }
+  
+  return ret;
+}
 
+bool CRSSparsityInternal::dense() const{
+  return size() == numel();
+}
+
+bool CRSSparsityInternal::diagonal() const{
+  // Check if matrix is square
+  if(nrow_ != ncol_) return false;
+    
+  // Check if correct number of non-zeros (one per row)
+  if(size() != nrow_) return false;
+
+  // Check that the column indices are correct
+  for(int i=0; i<size(); ++i){
+    if(col_[i]!=i)
+      return false;
+  }
+   
+  // Make sure that the row indices are correct
+  for(int i=0; i<nrow_; ++i){
+    if(rowind_[i]!=i)
+      return false;
+  }
+  
+  // Diagonal if reached this point
+  return true;
+}
+
+int CRSSparsityInternal::sizeU() const{
+  int nnz = 0;
+  for(int r=0; r<nrow_; ++r){
+    for(int el = rowind_[r]; el < rowind_[r+1]; ++el){
+      nnz += col_[el]>=r;
+    }
+  }
+  return nnz;
+}
+
+int CRSSparsityInternal::sizeL() const{
+  int nnz = 0;
+  for(int r=0; r<nrow_; ++r){
+    for(int el = rowind_[r]; el < rowind_[r+1] && col_[el]<=r; ++el){
+      nnz ++;
+    }
+  }
+  return nnz;
+}
+
+vector<int> CRSSparsityInternal::erase(const vector<int>& ii, const vector<int>& jj){
+  // Mapping
+  vector<int> mapping;
+  
+  // Quick return if no elements
+  if(numel()==0)
+    return mapping;
+  
+  // Reserve memory
+  mapping.reserve(size());
+  
+  // Number of non-zeros
+  int nz=0;
+  
+  // Rows to be erased
+  vector<int>::const_iterator ie = ii.begin();
+  
+  // First and last index for the row
+  int el_first=0, el_last=0;
+  
+  // Loop over rows
+  for(int i=0; i<nrow_; ++i){
+    // Update beginning and end of non-zero indices
+    el_first = el_last;
+    el_last = rowind_[i+1];
+    
+    // Is it a row that can be deleted
+    bool deletable_row = ie!=ii.end() && *ie==i;
+    if(deletable_row){
+      ie++;
+      
+      // Columns to be erased
+      vector<int>::const_iterator je = jj.begin();
+
+      // Loop over nonzero elements of the row
+      for(int el=el_first; el<el_last; ++el){
+        // Column
+        int j=col_[el];
+        
+        // Continue to the next column to skip
+        for(; je!=jj.end() && *je<j; ++je);
+        
+        // Remove column if necessary
+        if(je!=jj.end() && *je==j){
+          je++;
+          continue;
+        }
+        
+        // Save old nonzero for each new nonzero
+        mapping.push_back(el);
+        
+        // Update column and increase nonzero counter
+        col_[nz++] = j;
+      }
+    } else {
+      // Loop over nonzero elements of the row
+      for(int el=el_first; el<el_last; ++el){
+        // Column
+        int j=col_[el];
+      
+        // Save old nonzero for each new nonzero
+        mapping.push_back(el);
+      
+        // Update column and increase nonzero counter
+        col_[nz++] = j;
+      }
+    }
+    
+    // Register last nonzero of the row
+    rowind_[i+1]=nz;
+  }
+  
+  // Truncate column matrix
+  col_.resize(nz);
+  
+  return mapping;
+}
+
+vector<int> CRSSparsityInternal::getNZ(vector<int> ii, vector<int> jj) const{
+  vector<int> ret;
+  for(vector<int>::const_iterator it=ii.begin(); it!=ii.end(); ++it){
+    int el=rowind_[*it];
+    for(vector<int>::const_iterator jt=jj.begin(); jt!=jj.end(); ++jt){
+      // Continue to the non-zero element
+      for(; el<rowind_[*it+1] && col_[el]<*jt; ++el){}
+      
+      // Add the non-zero element, if there was an element in the location exists
+      if(el<rowind_[*it+1] && col_[el]== *jt)
+        ret.push_back(el);
+      else
+        ret.push_back(-1);
+    }
+  }
+  return ret;
+}
+
+CRSSparsity CRSSparsityInternal::getSub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  // Get non-zeros
+  vector<int> kk = getNZ(ii,jj);
+
+  // count the number of non-zeros
+  int nnz = 0;
+  for(int k=0; k<kk.size(); ++k)
+    if(kk[k]!=-1)
+      nnz++;
+      
+  // Allocate sparsity vectors
+  vector<int> rowind(ii.size()+1,0);
+  vector<int> col(nnz);
+  mapping.resize(nnz);
+  
+  // Get sparsity
+  int k=0;
+  int el=0;
+  for(int i=0; i<ii.size(); ++i){
+    for(int j=0; j<jj.size(); ++j){
+      if(k<kk.size()){
+        if(kk[k]!=-1){
+          col[el] = j;
+          mapping[el] = kk[k];
+          el++;
+        }
+        k++;
+      }
+    }
+    rowind[i+1]=el;
+  }
+  
+  // Create sparsity pattern
+  CRSSparsity sp(ii.size(),jj.size(),col,rowind);
+  return sp;
+}
+
+CRSSparsity CRSSparsityInternal::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
+  // Assert dimensions
+  casadi_assert_message(nrow_==y.size1(), "The number of rows does not match");
+  casadi_assert_message(ncol_==y.size2(), "The number of columns does not match");
+
+  // Return object
+  CRSSparsity ret;
+
+  // Quick intersection if the patterns are equal
+  if(isEqual(y)){
+    ret.assignNode(const_cast<CRSSparsityInternal*>(this));
+    mapping.resize(size());
+    fill(mapping.begin(),mapping.end(), 1 | 2);
+  } else {
+  
+    // Create return object
+    ret = CRSSparsity(nrow_,ncol_);
+    
+    // Get refences to the sparsity vectors
+    vector<int>& r = ret.rowindRef();
+    vector<int>& c = ret.colRef();
+    
+    // Prepare the assembly of the rowind vector below
+    r.clear();
+    r.push_back(0);
+    
+    // Clear the mapping
+    mapping.clear();
+    
+    // Loop over rows of both patterns
+    for(int i=0; i<nrow_; ++i){
+      // Non-zero element of the two matrices
+      int el1 = rowind_[i];
+      int el2 = y.rowind(i);
+      
+      // End of the non-zero elements of the row for the two matrices
+      int el1_last = rowind_[i+1];
+      int el2_last = y.rowind(i+1);
+      
+      // Loop over the non-zeros of both matrices
+      while(el1<el1_last || el2<el2_last){
+        // Get the columns
+        int col1 = el1<el1_last ? col_[el1] : ncol_;
+        int col2 = el2<el2_last ? y.col(el2) : ncol_;
+
+        // Add to the return matrix
+        if(col1==col2){ //  both nonzero
+          c.push_back(col1);
+          mapping.push_back( 1 | 2);
+          el1++; el2++;
+        } else if(col1<col2){ //  only first argument is nonzero
+          if(!fx0_is_zero){
+            c.push_back(col1);
+            mapping.push_back(1);
+          } else {
+            mapping.push_back(1 | 4);
+          }
+          el1++;
+        } else { //  only second argument is nonzero
+          if(!f0x_is_zero){
+            c.push_back(col2);
+            mapping.push_back(2);
+          } else {
+            mapping.push_back(2 | 4);
+          }
+          el2++;
+        }
+      }
+      
+      // Save the index of the last nonzero on the row
+      r.push_back(c.size());
+    }
+  }
+  
+  // Check if we need to add extra nonzeros
+  if(f00_is_zero || ret.dense()){
+    // No nonzero elements in the return object or sparse entries evaluating to 0
+    return ret;
+  } else {
+    // Create a new sparsity pattern with the remaining nonzeros added
+    vector<unsigned char> mapping_dense(ret.numel(),0); // FIXME: this allocation can be avoided, just iterate in reverse order instead
+    
+    // Loop over rows
+    for(int i=0; i<ret.size1(); ++i){
+      // Loop over nonzeros
+      for(int el=ret.rowind(i); el<ret.rowind(i+1); ++el){
+        // Get column
+        int j=ret.col(el);
+        
+        // Get the nonzero of the dense matrix
+        int el_dense = j+i*ret.size2();
+        
+        // Save to mapping
+        mapping_dense[el_dense] = mapping[el];
+      }
+    }
+    
+    // Use the dense mapping instead and return a dense sparsity
+    mapping_dense.swap(mapping);
+    return CRSSparsity(ret.size1(),ret.size2(),true);
+  }
+}
+
+bool CRSSparsityInternal::isEqual(const CRSSparsity& y) const{
+  // Quick true if the objects are the same
+  if(this == y.get())
+    return true;
+  
+  // First check dimensions and number of non-zeros
+  if(size()!=y.size() || nrow_!=y.size1() || ncol_!=y.size2())
+    return false;
+
+  // Check if dense
+  if(size()==numel())
+    return true;
+  
+  // Check the number of non-zeros per row
+  if(!equal(rowind_.begin(),rowind_.end(),y.rowind().begin()))
+    return false;
+  
+  // Finally check the column indices
+  if(!equal(col_.begin(),col_.end(),y.col().begin()))
+    return false;
+  
+  // Equal if reached this point
+  return true;
+}
+
+void CRSSparsityInternal::reserve(int nnz, int nrow){
+  col_.reserve(nnz);
+  rowind_.reserve(nrow+1);
+}
+
+void CRSSparsityInternal::append(const CRSSparsity& sp){
+  // Assert dimensions
+  casadi_assert_message(ncol_==sp.size2(),"Dimension mismatch");
+  
+  // Get current number of non-zeros
+  int sz = size();
+  
+  // Add column indices
+  col_.insert(col_.end(),sp.col().begin(),sp.col().end());
+  
+  // Add row indices
+  rowind_.pop_back();
+  rowind_.insert(rowind_.end(),sp.rowind().begin(),sp.rowind().end());
+  for(int i = nrow_; i<rowind_.size(); ++i)
+    rowind_[i] += sz;
+  
+  // Update dimensions
+  nrow_ += sp.size1();
+}
+
+void CRSSparsityInternal::enlargeRows(int nrow, const std::vector<int>& ii){
+  // Assert dimensions
+  casadi_assert(ii.size() == nrow_);
+
+  // Update dimensions
+  nrow_ = nrow;
+
+  // Sparsify the rows
+  rowind_.resize(nrow+1,size());
+  int ik=ii.back(); // need only to update from the last new index
+  int nz=size(); // number of nonzeros up till this row
+  for(int i=ii.size()-1; i>=0; --i){
+    // Update rowindex for new rows
+    for(; ik>ii[i]; --ik){
+      rowind_[ik] = nz;
+    }
+    
+    // Update non-zero counter
+    nz = rowind_[i];
+    
+    // Update rowindex for old rows
+    rowind_[ii[i]] = nz;
+  }
+  
+  // Append zeros to the beginning
+  for(; ik>=0; --ik){
+    rowind_[ik] = 0;
+  }
+}
+
+void CRSSparsityInternal::enlargeColumns(int ncol, const std::vector<int>& jj){
+  // Assert dimensions
+  casadi_assert(jj.size() == ncol_);
+  
+    // Update dimensions
+  ncol_ = ncol;
+
+  // Begin by sparsify the columns
+  for(int k=0; k<col_.size(); ++k){
+    col_[k] = jj[col_[k]];
+  }
+}
+
+CRSSparsity CRSSparsityInternal::makeDense(std::vector<int>& mapping) const{
+  mapping.resize(size());
+  for(int i=0; i<nrow_; ++i){
+    for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
+      int j = col_[el];
+      mapping[el] = j + i*ncol_;
+    }
+  }
+  
+  return CRSSparsity(nrow_,ncol_,true);
+}
+
+int CRSSparsityInternal::getNZ(int i, int j) const{
+  casadi_assert_message(i<nrow_,"First index out of bounds");
+  casadi_assert_message(j<ncol_,"Second index out of bounds");
+  
+  if (i<0) i += nrow_;
+  if (j<0) j += ncol_;
+  
+  // Quick return if matrix is dense
+  if(numel()==size())
+    return j+i*ncol_;
+  
+  // Quick return if past the end
+  if(rowind_[i]==size() || (rowind_[i+1]==size() && col_.back()<j)){
+    return -1;
+  }
+
+  // Find sparse element
+  for(int ind=rowind_[i]; ind<rowind_[i+1]; ++ind){
+    if(col_[ind] == j){
+      return ind;     // element exists
+    }
+    else if(col_[ind] > j)
+      break;                // break at the place where the element should be added
+  }
+  return -1;
+}
+
+CRSSparsity CRSSparsityInternal::reshape(int n, int m) const{
+  casadi_assert_message(numel() == n*m, "reshape: number of elements must remain the same");
+  CRSSparsity ret(n,m);
+  ret.reserve(size(), n);
+  for(int i=0; i<nrow_; ++i){
+    for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
+      int j = col_[el];
+      
+      // Element number
+      int k_ret = j+i*ncol_;
+      
+      // Row and column in the new matrix
+      int i_ret = k_ret/m;
+      int j_ret = k_ret%m;
+      ret.getNZ(i_ret,j_ret);
+    }
+  }
+  return ret;
+}
+
+void CRSSparsityInternal::resize(int nrow, int ncol){
+  if(nrow != nrow_ || ncol != ncol_){
+    if(nrow < nrow_ || ncol < ncol_){
+      // Row and column index of the new
+      vector<int> col_new, rowind_new(nrow+1,0);
+
+      // Loop over the rows which may contain nonzeros
+      int i;
+      for(i=0; i<nrow_ && i<nrow; ++i){
+        // First nonzero element of the row
+        rowind_new[i] = col_new.size();
+        
+        // Record columns of the nonzeros
+        for(int el=rowind_[i]; el<rowind_[i+1] && col_[el]<ncol; ++el){
+          col_new.push_back(col_[el]);
+        }
+      }
+      
+      // Save row-indices for the rest of the rows
+      for(; i<nrow+1; ++i){
+        rowind_new[i] = col_new.size();
+      }
+        
+      // Save the sparsity
+      nrow_ = nrow;
+      ncol_ = ncol;
+      col_.swap(col_new);
+      rowind_.swap(rowind_new);
+      
+    } else {
+      // Make larger: Very cheap operation
+      nrow_ = nrow;
+      ncol_ = ncol;
+      rowind_.resize(nrow_+1,size());
+    }
+  }
+}
 
 
 } // namespace CasADi

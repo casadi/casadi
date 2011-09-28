@@ -185,9 +185,6 @@ class CRSSparsity : public SharedObject{
     /// Get the sparsity in sparse triplet format
     void getSparsity(std::vector<int>& row, std::vector<int> &col) const;
     
-    /// Bucket sort the elements by column
-    void bucketSort(std::vector<std::list<int> >& buckets, std::vector<int>& row) const;
-
     /// Get a submatrix
     CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     
