@@ -186,6 +186,10 @@ class SharedObjectNode{
     template<class B>
     B shared_from_this();
 
+    /// Get a shared object from the current internal object
+    template<class B>
+    const B shared_from_this() const;
+
     /// Has the function been initialized?
     bool is_init_;
 
@@ -252,6 +256,17 @@ template<class B>
 B SharedObjectNode::shared_from_this(){
   B ret;
   ret.assignNode(this);
+  
+  // Assert that the object is valid
+  casadi_assert(ret.checkNode());
+  
+  return ret;
+}
+
+template<class B>
+const B SharedObjectNode::shared_from_this() const{
+  B ret;
+  ret.assignNode(const_cast<SharedObjectNode*>(this));
   
   // Assert that the object is valid
   casadi_assert(ret.checkNode());
