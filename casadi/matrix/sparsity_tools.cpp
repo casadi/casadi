@@ -265,7 +265,8 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
   return ret;
 }
 
-  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping){
+  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted){
+    
     // Assert dimensions
     casadi_assert_message(row.size()==col.size(),"inconsistent lengths");
     
@@ -298,15 +299,41 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
       // Update column
       newcol[newk] = col[k];
     }
-    
+
+    // Transpose twice if we need to sort the columns
+    if(!columns_are_sorted && !ret.columnsSequential(false)){
+      
+      // Form the transpose
+      vector<int> trans_mapping;
+      CRSSparsity ret_trans = ret.transpose(trans_mapping);
+
+      // Update the mapping
+      for(vector<int>::iterator it=trans_mapping.begin(); it!=trans_mapping.end(); ++it)
+       *it = mapping[*it];
+      
+      // Form the transpose of the transpose
+      ret = ret_trans.transpose(mapping);
+
+      // Update the mapping
+      for(vector<int>::iterator it=mapping.begin(); it!=mapping.end(); ++it)
+        *it = trans_mapping[*it];
+    }
+
+    // If the columns are not strictly sorted, it means that there are duplicate entries
+    if(!columns_are_sorted && !ret.columnsSequential(true)){
+      // Remove duplicate entries
+      ret.removeDuplicates(mapping);
+      casadi_assert(ret.columnsSequential(true));
+    }
+
     // Return the sparsity pattern
     return ret;
   }
 
 
-  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col){
+  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, bool columns_are_sorted){
     std::vector<int> mapping;
-    return sp_triplet(n,m,row,col,mapping);
+    return sp_triplet(n,m,row,col,mapping,columns_are_sorted);
   }
 
 

@@ -353,4 +353,14 @@ int CRSSparsity::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& 
   return (*this)->dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock, seed);
 }
 
+bool CRSSparsity::columnsSequential(bool strictly) const{
+  return (*this)->columnsSequential(strictly);
+}
+
+void CRSSparsity::removeDuplicates(std::vector<int>& mapping){
+  makeUnique();
+  (*this)->removeDuplicates(mapping);
+}
+
+
 } // namespace CasADi

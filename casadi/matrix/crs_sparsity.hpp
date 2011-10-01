@@ -251,6 +251,12 @@ class CRSSparsity : public SharedObject{
     /// Is diagonal?
     bool diagonal() const;
     
+    /// Does the columns appear sequentially on each row (if strictly==true, then do not allow multiple entries)
+    bool columnsSequential(bool strictly=true) const;
+
+    /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
+    void removeDuplicates(std::vector<int>& mapping);
+
     /// (Dense) scalar
     static CRSSparsity scalarSparsity;
 

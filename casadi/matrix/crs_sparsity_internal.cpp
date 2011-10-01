@@ -122,7 +122,7 @@ CRSSparsity CRSSparsityInternal::transpose(vector<int>& mapping) const{
   vector<int> trans_col = getRow();
 
   // Create the sparsity pattern
-  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping);
+  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping,true);
 
 }
 
@@ -813,7 +813,8 @@ int CRSSparsityInternal::vcount(std::vector<int>& pinv, std::vector<int>& parent
   const int* Ai = &col_.front();
 
   // allocate pinv
-  pinv.resize(m+n);
+  pinv.resize(m); // NOTE: was m+n
+  fill(pinv.begin(),pinv.end(),0);
   
   // and leftmost
   leftmost.resize(m);
@@ -879,7 +880,7 @@ int CRSSparsityInternal::vcount(std::vector<int>& pinv, std::vector<int>& parent
       i = S_m2++;
     
     // associate row i with V(:,k)
-    pinv [i] = k;
+    pinv[i] = k;
     
     // skip if V(k+1:m,k) is empty
     if(--nque[k] <= 0) continue;
@@ -1103,8 +1104,10 @@ std::vector<int> CRSSparsityInternal::approximateMinimumDegree(int order) const{
   int ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, t;
 
   unsigned int h;
-   //-- Construct matrix C -----------------------------------------------
+
+  //-- Construct matrix C -----------------------------------------------
   CRSSparsity AT = transpose() ;              // compute A'
+  
   int m = ncol_;
   int n = nrow_;
   int dense = std::max(16, 10 * int(sqrt(double(n)))) ;   // find dense threshold
@@ -1113,20 +1116,33 @@ std::vector<int> CRSSparsityInternal::approximateMinimumDegree(int order) const{
   if(order == 1 && n == m){
     // C = A+A
     std::vector<unsigned char> mapping;
-    //C = patternUnion(AT,mapping,true,false,false);
-  } else if (order == 2) {
+    C = patternUnion(AT,mapping,true,false,false);
+  } else if(order==2){
+    
     // drop dense columns from AT
-    int* ATp = &AT.rowindRef().front();
-    int* ATi = &AT.colRef().front();
-    for (p2 = 0, j = 0 ; j < m ; j++){
-      p = ATp [j] ;                   // column j of AT starts here
-      ATp[j] = p2 ;                   // new column j starts here 
-      if (ATp [j+1] - p > dense) continue ;   // skip dense col j
-        for ( ; p < ATp [j+1] ; p++) ATi [p2++] = ATi [p] ;
+    vector<int>& AT_rowind = AT.rowindRef();
+    vector<int>& AT_col = AT.colRef();
+    for(p2=0, j=0; j<m; ++j){
+      
+      // column j of AT starts here
+      p = AT_rowind[j];
+      
+      // new column j starts here
+      AT_rowind[j] = p2;
+      
+      // skip dense col j
+      if(AT_rowind[j+1] - p > dense)
+        continue ;
+      
+      for ( ; p < AT_rowind[j+1] ; p++)
+        AT_col[p2++] = AT_col[p];
     }
     
     // finalize AT
-    ATp[m] = p2;
+    AT_rowind[m] = p2;
+    
+    // Resize column vector
+    AT_col.resize(p2);
     
     // A2 = AT'
     CRSSparsity A2 = AT->transpose();
@@ -1140,7 +1156,6 @@ std::vector<int> CRSSparsityInternal::approximateMinimumDegree(int order) const{
   
   // Free memory
   AT = CRSSparsity();
-    
   // drop diagonal entries
   C->drop(&diag, NULL);
   
@@ -1716,8 +1731,10 @@ void CRSSparsityInternal::prefactorize(int order, int qr, std::vector<int>& S_pi
   vector<int> post;
   
   // fill-reducing ordering
-  S_q = approximateMinimumDegree(order);
-  
+  if(order!=0){
+    S_q = approximateMinimumDegree(order);
+  }
+
   // QR symbolic analysis
   if (qr){
     CRSSparsity C;
@@ -1729,15 +1746,15 @@ void CRSSparsityInternal::prefactorize(int order, int qr, std::vector<int>& S_pi
     }
     
     // etree of C'*C, where C=A(:,q)
-    S_parent = eliminationTree(1);
+    S_parent = C->eliminationTree(1);
     
     post = postorder(S_parent, n);
 
     // col counts chol(C'*C)
-    S_cp = counts(&S_parent.front(), &post.front(), 1);
+    S_cp = C->counts(&S_parent.front(), &post.front(), 1);
     post.clear();
     
-    vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
+    C->vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
     for(S_unz = 0, k = 0; k<n; k++)
       S_unz += S_cp[k];
       
@@ -2431,6 +2448,76 @@ void CRSSparsityInternal::resize(int nrow, int ncol){
       rowind_.resize(nrow_+1,size());
     }
   }
+}
+
+bool CRSSparsityInternal::columnsSequential(bool strictly) const{
+  for(int i=0; i<nrow_; ++i){
+    int lastcol = -1;
+    for(int k=rowind_[i]; k<rowind_[i+1]; ++k){
+      
+      // check if not in sequence
+      if(col_[k] < lastcol)
+        return false;
+
+      // Check if duplicate
+      if(strictly && col_[k] == lastcol)
+        return false;
+
+      // update last column of the row
+      lastcol = col_[k]; 
+    }
+  }
+  
+  // sequential if reached this point
+  return true;
+}
+
+void CRSSparsityInternal::removeDuplicates(std::vector<int>& mapping){
+  casadi_assert(mapping.size()==size());
+  
+  // Nonzero counter without duplicates
+  int k_strict=0;
+  
+  // Loop over rows
+  for(int i=0; i<nrow_; ++i){
+    
+    // Last column encountered on the row so far
+    int lastcol = -1;
+    
+    // Save new row offset (cannot set it yet, since we will need the old value below)
+    int new_rowind = k_strict;
+    
+    // Loop over nonzeros (including duplicates)
+    for(int k=rowind_[i]; k<rowind_[i+1]; ++k){
+      
+      // Make sure that the columns appear sequentially
+      casadi_assert_message(col_[k] >= lastcol, "columns are not sequential");
+
+      // Skip if duplicate
+      if(col_[k] == lastcol)
+        continue;
+
+      // update last column encounterd on the row
+      lastcol = col_[k]; 
+
+      // Update mapping
+      mapping[k_strict] = mapping[k];
+      
+      // Update column index
+      col_[k_strict] = col_[k];
+      
+      // Increase the strict nonzero counter
+      k_strict++;
+    }
+    
+    // Update row offset
+    rowind_[i] = new_rowind;
+  }
+  
+  // Finalize the sparsity pattern
+  rowind_[nrow_] = k_strict;
+  col_.resize(k_strict);
+  mapping.resize(k_strict);
 }
 
 

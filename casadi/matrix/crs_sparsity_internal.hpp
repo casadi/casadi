@@ -190,10 +190,16 @@ class CRSSparsityInternal : public SharedObjectNode{
 
     /// Get the index of an existing non-zero element
     int getNZ(int i, int j) const;
-
+    
     /// Get a set of non-zero element
     std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
-
+    
+    /// Does the columns appear sequentially on each row
+    bool columnsSequential(bool strictly) const;
+    
+    /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
+    void removeDuplicates(std::vector<int>& mapping);
+    
     /// Clone
     virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }
 

@@ -59,6 +59,11 @@ target_link_libraries(convection_diffusion
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # Det minor from ADOL-C
+add_executable(symbolic_fact symbolic_fact.cpp)
+target_link_libraries(symbolic_fact csparse_interface casadi csparse)
+
+
+# Det minor from ADOL-C
 add_executable(det_minor det_minor.cpp)
 target_link_libraries(det_minor casadi ${CMAKE_DL_LIBS})
 
