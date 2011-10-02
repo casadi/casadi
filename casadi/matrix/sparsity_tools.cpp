@@ -265,24 +265,25 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
   return ret;
 }
 
-  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted){
+  CRSSparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted){
     
     // Assert dimensions
     casadi_assert_message(row.size()==col.size(),"inconsistent lengths");
     
     // Nunber of elements on each row
-    vector<int> rowcount(n+1,0);
+    vector<int> rowcount(nrow+1,0);
     for(vector<int>::const_iterator it=row.begin(); it!=row.end(); ++it){
+      casadi_assert_message(*it<nrow,"Row index out of bounds");
       rowcount[*it+1]++;
     }
     
     // Cumsum to get index offset for each row
-    for(int i=0; i<n; ++i){
+    for(int i=0; i<nrow; ++i){
       rowcount[i+1] += rowcount[i];
     }
     
     // Create return object
-    CRSSparsity ret(n, m, col, rowcount);
+    CRSSparsity ret(nrow, ncol, col, rowcount);
     
     // Access column
     vector<int>& newcol = ret.colRef();

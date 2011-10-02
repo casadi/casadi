@@ -29,6 +29,9 @@
 #include "casadi/matrix/crs_sparsity_internal.hpp"
 #include "casadi/matrix/sparsity_tools.hpp"
 #include "interfaces/csparse/csparse.hpp"
+extern "C"{
+#include "external_packages/CSparse/Include/cs.h"
+}
 
 #include <ctime>
 
@@ -129,6 +132,107 @@ int main(){
   L2.evaluate();
   
   
+  // Now test a nonsymmetric matrix
+  int rowind3[11] = {0,1,2,4,4,5,6,6,6,8,10};
+  int col3[10] = {0,1,0,1,2,4,2,3,3,4};
+  int nrow3 = 10;
+  int ncol3 = 5;
+  CRSSparsity S3(nrow3,ncol3,vector<int>(col3,col3+10),vector<int>(rowind3,rowind3+11));
+  
+  IMatrix(S3,1).printDense();
+
+  
+  cs AT_;
+  AT_.nzmax = S3.size();  // maximum number of entries 
+  AT_.m = S3.size2(); // number of rows
+  AT_.n = S3.size1(); // number of columns
+  AT_.p = &S3.rowindRef().front(); // column pointers (size n+1) or col indices (size nzmax)
+  AT_.i = &S3.colRef().front(); // row indices, size nzmax
+  AT_.x = 0; // row indices, size nzmax
+  AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-col 
+
+
+  int order = 3;
+  int qr = 1;
+  css *S_ = cs_sqr(order, &AT_, qr);
+
+  std::vector<int> pinv;
+  std::vector<int> q;
+  std::vector<int> parent; 
+  std::vector<int> cp;
+  std::vector<int> leftmost;
+  int m2;
+  double lnz;
+  double unz;
+  S3->prefactorize(order, qr, pinv, q, parent, cp, leftmost, m2, lnz, unz);
+
+  cout << "pinv" << endl;
+  cout << pinv << endl;
+  if(S_->pinv!=0)
+    cout << vector<int>(S_->pinv, S_->pinv + pinv.size()) << endl;
+  cout << endl;
+    
+  cout << "q" << endl;
+  cout << q << endl;
+  if(S_->q!=0)
+    cout << vector<int>(S_->q, S_->q + q.size()) << endl;
+  cout << endl;
+
+  cout << "parent" << endl;
+  cout << parent << endl;
+  if(S_->parent!=0)
+    cout << vector<int>(S_->parent, S_->parent + parent.size()) << endl;
+  cout << endl;
+
+  cout << "cp" << endl;
+  cout << cp << endl;
+  if(S_->cp!=0)
+    cout << vector<int>(S_->cp, S_->cp + cp.size()) << endl;
+  cout << endl;
+  
+  cout << "leftmost" << endl;
+  cout << leftmost << endl;
+  if(S_->leftmost!=0)
+    cout << vector<int>(S_->leftmost, S_->leftmost + leftmost.size()) << endl;
+  cout << endl;
+  
+  cs_sfree(S_);
+  
+  int dmseed = 0;
+  csd *perm = cs_dmperm (&AT_, dmseed);
+    
+  // Save to BLT structure // NOTE: swapping row<>col due to row/column major
+  vector<int> rowperm3(perm->q, perm->q + S3.size1());
+  vector<int> colperm3(perm->p, perm->p + S3.size2());
+  int nb3 = perm->nb;
+  vector<int> rowblock3(perm->s, perm->s + nb3 + 1);
+  vector<int> colblock3(perm->r, perm->r + nb3 + 1);
+  vector<int> coarse_rowblock3(perm->cc, perm->cc+5);
+  vector<int> coarse_colblock3(perm->rr, perm->rr+5);
+  
+  cout << "csparse" << endl;
+  cout << rowperm3 << endl;
+  cout << colperm3 << endl;
+  cout << rowblock3 << endl;
+  cout << colblock3 << endl;
+  cout << coarse_rowblock3 << endl;
+  cout << coarse_colblock3 << endl;
+  
+  
+  S3.dulmageMendelsohn(rowperm3, colperm3, rowblock3, colblock3, coarse_rowblock3, coarse_colblock3, dmseed);
+
+  cout << "casadi" << endl;
+  cout << rowperm3 << endl;
+  cout << colperm3 << endl;
+  cout << rowblock3 << endl;
+  cout << colblock3 << endl;
+  cout << coarse_rowblock3 << endl;
+  cout << coarse_colblock3 << endl;
+
+  
+  // Free allocated memory and return
+  cs_dfree(perm);
+
   
   return 0;
 }

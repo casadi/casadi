@@ -411,6 +411,14 @@ Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
 Matrix<SX> ssym(const Matrix<double>& x);
 //@}
 
+/** \brief  Make an implicit equation semi-explicit
+    Divides an equation f(x) = 0 and corresponding variable x into one explicit part x1 = fe(xe) and one implicit part
+    0 = fi(xi).
+*/
+void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, Matrix<SX>& fi, Matrix<SX>& xe, Matrix<SX>& xi);
+
+
+
 } // namespace CasADi
 
 #endif // SX_TOOLS_HPP

@@ -24,6 +24,7 @@
 #include "../fx/sx_function_internal.hpp"
 #include "../casadi_math.hpp"
 #include "../matrix/matrix_tools.hpp"
+#include "../stl_vector_tools.hpp"
 using namespace std;
 
 namespace CasADi{
@@ -773,6 +774,186 @@ Matrix<SX> ssym(const std::string& name, int n, int m){
 
 Matrix<SX> ssym(const Matrix<double>& x){
   return Matrix<SX>(x);
+}
+
+void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, Matrix<SX>& fi, Matrix<SX>& xe, Matrix<SX>& xi){
+  casadi_assert(f.dense());
+  casadi_assert(x.dense());
+  
+  // Create the implicit function
+  SXFunction fcn(x,f);
+  fcn.init();
+  
+  // Get the sparsity pattern of the Jacobian (no need to actually form the Jacobian)
+  CRSSparsity Jsp = fcn.jacSparsity();
+  
+  // Free the function
+  fcn = SXFunction();
+  
+  // Make a BLT sorting of the Jacobian (a Dulmage-Mendelsohn decomposition)
+  std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  Jsp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+  
+  // Make sure that the Jacobian is full rank
+  casadi_assert(coarse_rowblock[0]==0);
+  casadi_assert(coarse_rowblock[1]==0);
+  casadi_assert(coarse_rowblock[2]==0);
+  casadi_assert(coarse_rowblock[3]==coarse_rowblock[4]);
+
+  casadi_assert(coarse_colblock[0]==0);
+  casadi_assert(coarse_colblock[1]==0);
+  casadi_assert(coarse_colblock[2]==coarse_colblock[3]);
+  casadi_assert(coarse_colblock[3]==coarse_colblock[4]);
+
+  // Permuted equations
+  vector<SX> fp(f.size());
+  for(int i=0; i<fp.size(); ++i){
+    fp[i] = f.elem(rowperm[i]);
+  }
+  
+  // Permuted variables
+  vector<SX> xp(x.size());
+  for(int i=0; i<xp.size(); ++i){
+    xp[i]= x.elem(colperm[i]);
+  }
+  
+  // Number of blocks
+  int nb = rowblock.size()-1;
+
+  // Block equations
+  vector<SX> fb;
+
+  // Block variables
+  vector<SX> xb;
+
+  // Block variables that enter linearly and nonlinearily respectively
+  vector<SX> xb_lin, xb_nonlin;
+  
+  // The separated variables and equations
+  vector<SX> fev, fiv, xev, xiv;
+  
+  // Loop over blocks
+  for(int b=0; b<nb; ++b){
+    
+    // Get the local equations
+    fb.clear();
+    for(int i=rowblock[b]; i<rowblock[b+1]; ++i){
+      fb.push_back(fp[i]);
+    }
+    
+    // Get the local variables
+    xb.clear();
+    for(int i=colblock[b]; i<colblock[b+1]; ++i){
+      xb.push_back(xp[i]);
+    }
+
+    // We shall find out which variables enter nonlinearily in the equations, for this we need a function that will depend on all the variables
+    SXFunction fcnb_all(xb,inner_prod(SXMatrix(fb),symbolic("dum1",fb.size())));
+    fcnb_all.init();
+    
+    // Take the gradient of this function to find out which variables enter in the function (should be all)
+    SXMatrix fcnb_dep = fcnb_all.grad();
+    
+    // Make sure that this expression is dense (otherwise, some variables would not enter)
+    casadi_assert(fcnb_dep.dense());
+    
+    // Multiply this expression with a new dummy vector and take the jacobian to find out which variables enter nonlinearily
+    SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,symbolic("dum2",fcnb_dep.size())));
+    fcnb_nonlin.init();
+    CRSSparsity sp_nonlin = fcnb_nonlin.jacSparsity();
+    
+    // Get the subsets of variables that appear nonlinearily
+    vector<bool> nonlin(sp_nonlin.size2(),false);
+    for(int el=0; el<sp_nonlin.size(); ++el){
+      nonlin[sp_nonlin.col(el)] = true;
+    }
+/*    cout << "nonlin = " << nonlin << endl;*/
+    
+    // Separate variables
+    xb_lin.clear();
+    xb_nonlin.clear();
+    for(int i=0; i<nonlin.size(); ++i){
+      if(nonlin[i])
+        xb_nonlin.push_back(xb[i]);
+      else
+        xb_lin.push_back(xb[i]);
+    }
+    
+    // If there are only nonlinear variables
+    if(xb_lin.empty()){
+      // Substitute the already determined variables
+      fb = substitute(SXMatrix(fb),SXMatrix(xev),SXMatrix(fev)).data();
+      
+      // Add to the implicit variables and equations
+      fiv.insert(fiv.end(),fb.begin(),fb.end());
+      xiv.insert(xiv.end(),xb.begin(),xb.end());
+    } else {
+      // Write the equations as a function of the linear variables
+      SXFunction fcnb(xb_lin,fb);
+      fcnb.init();
+            
+      // Write the equation in matrix form
+      SXMatrix Jb = fcnb.jac();
+      SXMatrix rb = -fcnb.eval(SXMatrix(xb_lin.size(),1,0));
+      
+      // Simple solve if there are no nonlinear variables
+      if(xb_nonlin.empty()){
+        
+        // Check if 1-by-1 block
+        if(Jb.numel()==1){
+          // Simple division if Jb scalar
+          rb /= Jb;
+        } else {
+          // Solve system of equations
+          rb = solve(Jb,rb);
+        }
+        
+        // Substitute the already determined variables
+        rb = substitute(rb,SXMatrix(xev),SXMatrix(fev));
+        
+        // Add to the explicit variables and equations
+        fev.insert(fev.end(),rb.begin(),rb.end());
+        xev.insert(xev.end(),xb.begin(),xb.end());
+        
+      } else { // There are both linear and nonlinear variables
+        
+        // Make a Dulmage-Mendelsohn decomposition
+        std::vector<int> rowpermb, colpermb, rowblockb, colblockb, coarse_rowblockb, coarse_colblockb;
+        Jb.sparsity().dulmageMendelsohn(rowpermb, colpermb, rowblockb, colblockb, coarse_rowblockb, coarse_colblockb);
+        
+        Matrix<int>(Jb.sparsity(),1).printDense();
+        Jb.printDense();
+        
+        
+
+
+        
+
+        cout << rowpermb << endl;
+        cout << colpermb << endl;
+        cout << rowblockb << endl;
+        cout << colblockb << endl;
+        cout << coarse_rowblockb << endl;
+        cout << coarse_colblockb << endl;
+
+        casadi_warning("tearing not implemented");
+        
+        
+        // Substitute the already determined variables
+        fb = substitute(SXMatrix(fb),SXMatrix(xev),SXMatrix(fev)).data();
+        
+        // Add to the implicit variables and equations
+        fiv.insert(fiv.end(),fb.begin(),fb.end());
+        xiv.insert(xiv.end(),xb.begin(),xb.end());
+        
+      }
+    }
+  }
+  
+  fi = SXMatrix(fiv);
+  fe = SXMatrix(fev);
+  xi = SXMatrix(xiv);
+  xe = SXMatrix(xev);
 }
 
 

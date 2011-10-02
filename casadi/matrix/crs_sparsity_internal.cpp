@@ -232,8 +232,9 @@ int CRSSparsityInternal::depthFirstSearch(int j, int top, std::vector<int>& xi, 
 int CRSSparsityInternal::stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const{
   // NOTE: This implementation has been copied from CSparse and then modified, it needs cleaning up to be proper C++
   vector<int> tmp;
-  CRSSparsity AT = transpose();
 
+  CRSSparsity AT = transpose();
+  
   vector<int> xi(2*nrow_+1);
   vector<int>& Blk = xi;
   
@@ -460,7 +461,6 @@ void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<i
   int n2 = 0, m2 = 0;
   
   // allocate result
-  vector<int> jimatch(ncol_+nrow_);
   jmatch.resize(ncol_);
   imatch.resize(nrow_);
   vector<int> w(ncol_+nrow_);
@@ -518,23 +518,23 @@ void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<i
   
   // nothing matched yet
   for(int i=0; i<C->ncol_; ++i)
-    jmatch[i] = -1;
+    Cjmatch[i] = -1;
 
   // q = random permutation 
   std::vector<int> q = randomPermutation(C->nrow_,seed);
 
   // augment, starting at column q[k]
   for(k=0; k<C->nrow_; ++k){
-    C->augmentingPath(!q.empty() ? q[k]: k, jmatch, cheap, w, js, is, ps);
+    C->augmentingPath(!q.empty() ? q[k]: k, Cjmatch, cheap, w, js, is, ps);
   }
 
   // find row match
   for(int j=0; j<C->nrow_; ++j)
-    imatch[j] = -1;
+    Cimatch[j] = -1;
   
   for(int i = 0; i<C->ncol_; ++i)
-    if(jmatch [i] >= 0)
-      imatch[jmatch[i]] = i;
+    if(Cjmatch [i] >= 0)
+      Cimatch[Cjmatch[i]] = i;
 }
 
 int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const{
@@ -613,10 +613,13 @@ int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vecto
 
   // delete cols C0, C1, and C3 from C 
   int nc = coarse_rowblock[3] - coarse_rowblock[2];
-  if(coarse_rowblock[2] > 0)
+  if(coarse_rowblock[2] > 0){
     for(int j = coarse_rowblock[2]; j <= coarse_rowblock[3]; ++j)
       rowind_C[j-coarse_rowblock[2]] = rowind_C[j];
-  
+    for(int j=1; j < coarse_rowblock[3]-coarse_rowblock[2]; ++j)
+      rowind_C[j] -= rowind_C[0];
+    rowind_C[0] = 0;
+  }
   C->nrow_ = nc;
   C->rowind_.resize(nc+1);
   C->col_.resize(C->rowind_.back());
@@ -813,7 +816,7 @@ int CRSSparsityInternal::vcount(std::vector<int>& pinv, std::vector<int>& parent
   const int* Ai = &col_.front();
 
   // allocate pinv
-  pinv.resize(m); // NOTE: was m+n
+  pinv.resize(m+n);
   fill(pinv.begin(),pinv.end(),0);
   
   // and leftmost
@@ -902,6 +905,7 @@ int CRSSparsityInternal::vcount(std::vector<int>& pinv, std::vector<int>& parent
     if(pinv[i] < 0)
       pinv[i] = k++;
     
+  pinv.resize(m);
   return 1;
 }
 
