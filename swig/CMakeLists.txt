@@ -109,9 +109,11 @@ set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${CMAKE_DL_LIBS})
 ENDIF(ENABLE_SHARED)
 
 # Find python library and add include path for python headers
-find_package (PythonLibs REQUIRED)
+find_package (PythonLibs)
 
+IF(PYTHONLIBS_FOUND)
 include_directories (${PYTHON_INCLUDE_PATH})
+ENDIF(PYTHONLIBS_FOUND)
 
 find_package (NUMPY)
 if(NUMPY_FOUND)
