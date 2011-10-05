@@ -318,6 +318,7 @@ IF(PYTHONINTERP_FOUND)
     DESTINATION ${PYTHON_INSTALLATION_PATH}
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
+    PATTERN .svn EXCLUDE
   )
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
