@@ -1161,7 +1161,7 @@ std::vector<int> CRSSparsityInternal::approximateMinimumDegree(int order) const{
   // Free memory
   AT = CRSSparsity();
   // drop diagonal entries
-  C->drop(&diag, NULL);
+  C->drop(diag, NULL);
   
   Cp = &C.rowindRef().front();
   cnz = Cp[n] ;
