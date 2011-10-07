@@ -27,8 +27,18 @@
 
 /** Check if Guest object is of a particular SWIG type */
 bool istype(GUESTOBJECT, swig_type_info *type) {
-  void *dummy = 0 ;
-  return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0));
+  if (p.is_cell() && p.rows() == 1 && p.columns() == 1)
+    return istype(p.cell_value()(0),type);
+  if (!p.is_defined())
+    return false;
+  if (p.type_id() != octave_swig_ref::static_type_id())
+    return false;
+  octave_swig_ref *osr = static_cast < octave_swig_ref *>(p.internal_rep());
+  octave_swig_type *ost = osr->get_ptr();
+  void *vptr = ost->cast(type,0, 0);
+  if (!vptr)
+    return false;
+  return true;
 }
 
 template<class T>
