@@ -25,6 +25,7 @@
 #define GUESTOBJECT const octave_value& p
 #endif // SWIGOCTAVE
 
+#ifdef  SWIGOCTAVE
 /** Check if Guest object is of a particular SWIG type */
 bool istype(GUESTOBJECT, swig_type_info *type) {
   if (p.is_cell() && p.rows() == 1 && p.columns() == 1)
@@ -40,6 +41,15 @@ bool istype(GUESTOBJECT, swig_type_info *type) {
     return false;
   return true;
 }
+#endif // SWIGOCTAVE
+
+#ifdef  SWIGPYTHON
+/** Check if Guest object is of a particular SWIG type */
+bool istype(GUESTOBJECT, swig_type_info *type) {
+	void *dummy = 0 ; 
+  return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0)); 
+}
+#endif // SWIGPYTHON
 
 template<class T>
 class meta {
