@@ -199,6 +199,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     
     /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
     void removeDuplicates(std::vector<int>& mapping);
+  
+    /// Get element index for each nonzero
+    std::vector<int> getElementMapping() const;
     
     /// Clone
     virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }

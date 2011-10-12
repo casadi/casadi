@@ -2524,6 +2524,30 @@ void CRSSparsityInternal::removeDuplicates(std::vector<int>& mapping){
   mapping.resize(k_strict);
 }
 
+std::vector<int> CRSSparsityInternal::getElementMapping() const{
+
+  // Element for each nonzero
+  vector<int> el_map(size());
+    
+  // Loop over rows
+  for(int i=0; i<nrow_; ++i){
+      
+    // Loop over the nonzeros
+    for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
+        
+      // Get column
+      int j = col_[el];
+        
+      // Get the column of the jacobian
+      el_map[el] = j+i*ncol_;
+    }
+  }
+
+  // Return mapping
+  return el_map;
+}
+
+
 
 } // namespace CasADi
 

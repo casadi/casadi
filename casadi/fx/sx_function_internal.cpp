@@ -1456,35 +1456,29 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
       offset += bvec_size;
     }
   }
+
+
+  // Enlarge if sparse output
+  if(n_out!=ret.size1()){
+    casadi_assert(ret.size1()==nz_out);
+    
+    // New row for each old row
+    vector<int> row_map = output(oind).sparsity().getElementMapping();
+
+    // Insert rows
+    ret.enlargeRows(n_out,row_map);
+  }
+
   
   // Enlarge if sparse input
-  if(n_in!=nz_in){
+  if(n_in!=ret.size2()){
+    casadi_assert(ret.size2()==nz_in);
     
     // New column for each old column
-    vector<int> col_map(input(iind).size());
+    vector<int> col_map = input(iind).sparsity().getElementMapping();
     
-    // Loop over rows of the input
-    for(int i=0; i<input(iind).size1(); ++i){
-      
-      // Loop over the nonzeros
-      for(int el=input(iind).rowind(i); el<input(iind).rowind(i+1); ++el){
-        
-        // Get column
-        int j = input(iind).col(el);
-        
-        // Get the column of the jacobian
-        col_map[el] = j+i*input(iind).size2();
-      }
-    }
-    
-    // Enlarge matrix
-    ret.resize(ret.size1(),n_in);
-    
-    // Swap columns
-    vector<int>& col = ret.colRef();
-    for(vector<int>::iterator it=col.begin(); it!=col.end(); ++it){
-      *it = col_map[*it];
-    }
+    // Insert columns
+    ret.enlargeColumns(n_in,col_map);
   }
   
   // Return sparsity pattern
