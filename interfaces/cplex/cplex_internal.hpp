@@ -50,14 +50,6 @@ class CplexInternal : public NLPSolverInternal{
     std::vector<double> x_;
     /// used to store the solution
     std::vector<double> sol_;
-    /// objective function
-    FX F_;
-    /// constraint function
-    FX G_; 
-    /// Hessian of the Lagrangian function
-    FX H_;
-    /// Jacobian of the constraint function
-    FX J_; 
     /// Gradient of the objective function
     FX GF_;
     /// Hessian of the Lagrangian function (used for format conversion)

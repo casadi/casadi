@@ -9,7 +9,7 @@
 using namespace std;
 namespace CasADi{
 
-CplexInternal::CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
+  CplexInternal::CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
   casadi_warning("cplexInternal: the CPLEX interface is still experimental, more tests are needed");
 
   env_ = NULL;
