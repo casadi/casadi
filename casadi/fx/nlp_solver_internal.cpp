@@ -290,7 +290,7 @@ void NLPSolverInternal::init(){
 
   
   if(!H_.isNull()) {
-    casadi_assert_message(H_.getNumInputs()>=3, "Wrong number of input arguments to H");
+    casadi_assert_message(H_.getNumInputs()>=1, "Wrong number of input arguments to H");
     casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
     casadi_assert_message(H_.input(0).numel()==n_,"Inconsistent dimensions");
     casadi_assert_message(H_.output().size1()==n_,"Inconsistent dimensions");

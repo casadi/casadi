@@ -382,16 +382,29 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
          }
         }
     } else {
+      // Number of inputs to the hessian
+      int n_hess_in = H_.getNumInputs();
+      
       // Pass input
       H_.setInput(x);
-      H_.setInput(lambda,H_.getNumInputs()==4? 2 : 1);
-      H_.setInput(obj_factor,H_.getNumInputs()==4? 3 : 2);
+      if(n_hess_in>1){
+        H_.setInput(lambda, n_hess_in==4? 2 : 1);
+        H_.setInput(obj_factor, n_hess_in==4? 3 : 2);
+      }
 
       // Evaluate
       H_.evaluate();
 
+      // Scale objective
+      if(n_hess_in==1 && obj_factor!=1.0){
+        for(vector<double>::iterator it=H_.output().begin(); it!=H_.output().end(); ++it){
+          *it *= obj_factor;
+        }
+      }
+
       // Get results
       H_.output().get(values,SPARSESYM);
+      
     }
     double time2 = clock();
     t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
