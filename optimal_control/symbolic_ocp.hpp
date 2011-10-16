@@ -47,7 +47,7 @@ namespace CasADi{
   
   \author Joel Andersson 2011
 */
-struct OCP{
+struct SymbolicOCP{
   
   /// Time
   SXMatrix t;

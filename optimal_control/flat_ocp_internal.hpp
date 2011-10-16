@@ -95,7 +95,7 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
 
     /// The optimal control problem representation -- keep synchronized with the XML representation!
-    OCP ocp_;
+    SymbolicOCP ocp_;
 
     /// Parsed XML document
     XMLNode document_;

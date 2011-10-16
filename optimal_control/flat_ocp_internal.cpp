@@ -106,7 +106,7 @@ void FlatOCPInternal::parse(){
   binary_["Pow"]  = pow;
 
   // Clear the ocp
-  ocp_ = OCP();
+  ocp_ = SymbolicOCP();
   
  // Add model variables
   addModelVariables();

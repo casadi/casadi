@@ -76,10 +76,10 @@ class FlatOCP : public OptionsFunctionality{
     void parse();
 
     /// Get the OCP
-    OCP& ocp();
+    SymbolicOCP& ocp();
 
     /// Get the OCP (const ref)
-    const OCP& ocp() const;
+    const SymbolicOCP& ocp() const;
 
     /// Access to the internal class
     FlatOCPInternal* operator->();

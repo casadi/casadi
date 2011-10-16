@@ -37,11 +37,11 @@ void FlatOCP::parse(){
   (*this)->parse();
 }
 
-OCP& FlatOCP::ocp(){
+SymbolicOCP& FlatOCP::ocp(){
   return (*this)->ocp_;
 }
 
-const OCP& FlatOCP::ocp() const{
+const SymbolicOCP& FlatOCP::ocp() const{
   return (*this)->ocp_;
 }
 
