@@ -46,13 +46,7 @@ class FMIParserInternal : public SharedObjectNode{
     virtual FMIParserInternal* clone() const{ return new FMIParserInternal(*this);}
 
     /// Parse from XML to C++ format
-    OCP& parse();
-
-    /// Get the OCP
-    OCP& ocp();
-
-    /// Get the OCP (const ref)
-    const OCP& ocp() const;
+    void parse();
 
     ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
@@ -60,8 +54,6 @@ class FMIParserInternal : public SharedObjectNode{
     /// Print description 
     virtual void print(std::ostream &stream=std::cout) const;
 
-  protected:
-    
     /// Add model variables */
     void addModelVariables();
 
@@ -107,6 +99,129 @@ class FMIParserInternal : public SharedObjectNode{
 
     /// Filename
     std::string filename_;
+    
+    /// Sort variables according to type
+    void sortType();
+
+    /// Eliminate dependent equations
+    void eliminateDependent();
+    
+    /// Sort the variables and equations according to BLT, with or without including the differentiated states in the dependency graph
+    void sortBLT(bool with_x=false);
+    
+    /// Symbolically solve for xdot and z
+    void makeExplicit();
+
+    /// Replace all state derivatives by algebraic variables with the same name
+    void makeSemiExplicit();
+    
+    /// Add a binding equation
+    void addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front=false);
+    
+    /// Scale the variables
+    void scaleVariables();
+    
+    /// Scale the implicit equations
+    void scaleEquations();
+    
+    /// Create the implicit/explict ODE functions and quadrature state functions
+    void createFunctions(bool create_dae=true, bool create_ode=true, bool create_quad=true);
+    
+    /// Make a differential state algebraic by replacing its time derivative by 0
+    void makeAlgebraic(const Variable& v);
+    
+    /// Update the initial values for the dependent variables
+    void findConsistentIC();
+
+    /// Access the variables in a class hierarchy -- public data member
+    VariableTree variables_;
+    
+    /// Time
+    SX t_;
+    
+    /// Differential states
+    std::vector<Variable> x_;
+
+    /// Algebraic states
+    std::vector<Variable> z_;
+    
+    /// Controls
+    std::vector<Variable> u_;
+        
+    /// Free parameters
+    std::vector<Variable> p_;
+    
+    /// Dependent variables
+    std::vector<Variable> d_;
+
+    /// Explicit equations
+    std::vector<SX> explicit_var_, explicit_fcn_;
+    
+    /// Implicit equations
+    std::vector<SX> implicit_var_, implicit_fcn_;
+    
+    /// Initial equations
+    std::vector<SX> initial_eq_;
+
+    /// Constraint function with upper and lower bounds
+    std::vector<SX> path_fcn_;
+    std::vector<double> path_min_, path_max_;
+    FX pathfcn_;
+
+    /// Mayer objective terms
+    std::vector<SX> mterm;
+
+    /// Lagrange objective terms
+    std::vector<SX> lterm;
+    
+    /// Initial time
+    double t0;
+    double getStartTime() const{ return t0;}
+    
+    /// Initial time is free
+    bool t0_free;
+    
+    /// Final time
+    double tf;
+    double getFinalTime() const{ return tf;}
+    
+    /// Final time is free
+    bool tf_free;
+    
+    /// Is scaled?
+    bool scaled_variables_, scaled_equations_;
+
+    /// Has the dependents been eliminated
+    bool eliminated_dependents_;
+    
+    /// BLT blocks
+    std::vector<int> rowblock_;  // block k is rows r[k] to r[k+1]-1
+    std::vector<int> colblock_;  // block k is cols s[k] to s[k+1]-1
+    int nb_;
+
+    /// BLT sorted?
+    bool blt_sorted_;
+    
+    /// ODE right hand side function
+    FX oderhs_;
+    
+    /// ODE right hand side function with lagrange term
+    FX oderhs_with_lterm_;
+    
+    /// Output function
+    FX output_fcn_;
+    
+    /// DAE residual function
+    FX daeres_;
+    
+    /// Quadrature right hand side
+    FX quadrhs_;
+
+    /// Costs function
+    FX costfcn_;
+    
+    /// Get the explicit expression for a variable
+    SX getExplicit(const SX& v) const;
 };
 
 } // namespace OptimalControl

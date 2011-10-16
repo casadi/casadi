@@ -33,16 +33,16 @@ FMIParser::FMIParser(const std::string& filename){
   assignNode(new FMIParserInternal(filename));
 }
 
-OCP& FMIParser::parse(){
-  return (*this)->parse();
+void FMIParser::parse(){
+  (*this)->parse();
 }
 
 OCP& FMIParser::ocp(){
-  return (*this)->ocp();
+  return (*this)->ocp_;
 }
 
 const OCP& FMIParser::ocp() const{
-  return (*this)->ocp();
+  return (*this)->ocp_;
 }
 
 FMIParserInternal* FMIParser::operator->(){

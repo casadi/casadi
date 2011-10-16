@@ -25,9 +25,41 @@
 
 #include "optimica_ocp.hpp"
 #include "xml_node.hpp"
+#include "variable.hpp"
 
 namespace CasADi{
 namespace OptimalControl{
+
+  /// Tree structure for storing variables
+  class VariableTree{
+    public:
+      /// Access a sub-collection by name
+      VariableTree& subByName(const std::string& name, bool allocate=false);
+
+      /// Access a sub-collection by index
+      VariableTree& subByIndex(int ind, bool allocate=false);
+      
+      /// Get all variables
+      void getAll(std::vector<Variable>& v) const;
+  
+      /// Get all names
+      std::vector<std::string> getNames() const;
+      
+      /// Print node
+      #ifndef SWIG
+      void print(std::ostream &stream, int indent=0) const;
+      #endif // SWIG
+
+      /// Variable
+      Variable var_;
+      
+      /// Children nodes
+      std::vector<VariableTree> children_;
+      
+      /// Names of children
+      std::map<std::string,int> name_part_;
+              
+  };
 
 // Forward declaration
 class FMIParserInternal;
@@ -41,7 +73,7 @@ class FMIParser : public SharedObject{
     FMIParser(const std::string& filename);
 
     /// Parse from XML to C++ format
-    OCP& parse();
+    void parse();
 
     /// Get the OCP
     OCP& ocp();

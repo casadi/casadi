@@ -34,6 +34,7 @@
 #include <casadi/fx/jacobian.hpp>
 
 #include <optimal_control/fmi_parser.hpp>
+#include <optimal_control/fmi_parser_internal.hpp>
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
 #include <optimal_control/multiple_shooting.hpp>
@@ -50,45 +51,45 @@ int main(){
   FMIParser parser("../examples/xml_files/cstr.xml");
 
   // Obtain the symbolic representation of the OCP
-  OCP ocp = parser.parse();
+  parser.parse();
 
   // Print the ocp to screen
-  ocp.print();
+  parser.print();
 
   // Scale the variables
-  ocp.scaleVariables();
+  parser->scaleVariables();
 
   // Eliminate the dependent variables
-  ocp.eliminateDependent();
+  parser->eliminateDependent();
 
   // Scale the equations
-  ocp.scaleEquations();
+  parser->scaleEquations();
   
   // Correct the inital guess and bounds on variables
-  ocp.u_[0].setStart(280);
-  ocp.u_[0].setMin(230);
-  ocp.u_[0].setMax(370);
+  parser->u_[0].setStart(280);
+  parser->u_[0].setMin(230);
+  parser->u_[0].setMax(370);
   
   // Correct bound on state
-  ocp.x_[1].setMax(350);
+  parser->x_[1].setMax(350);
   
   // Variables
-  SX t = ocp.t_;
-  Matrix<SX> x = var(ocp.x_);
-  Matrix<SX> xdot = der(ocp.x_);
-  casadi_assert(ocp.z_.empty());
-  Matrix<SX> p = var(ocp.p_);
-  Matrix<SX> u = var(ocp.u_);
+  SX t = parser->t_;
+  Matrix<SX> x = var(parser->x_);
+  Matrix<SX> xdot = der(parser->x_);
+  casadi_assert(parser->z_.empty());
+  Matrix<SX> p = var(parser->p_);
+  Matrix<SX> u = var(parser->u_);
 
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x_,true);
-  vector<double> xmin = getMin(ocp.x_,true);
-  vector<double> xmax = getMax(ocp.x_,true);
+  vector<double> x0 = getStart(parser->x_,true);
+  vector<double> xmin = getMin(parser->x_,true);
+  vector<double> xmax = getMax(parser->x_,true);
   
   // Initial guess and bounds for the control
-  vector<double> u0 = getStart(ocp.u_,true);
-  vector<double> umin = getMin(ocp.u_,true);
-  vector<double> umax = getMax(ocp.u_,true);
+  vector<double> u0 = getStart(parser->u_,true);
+  vector<double> umin = getMin(parser->u_,true);
+  vector<double> umax = getMax(parser->u_,true);
   
   // Integrator instance
   Integrator integrator;
@@ -99,7 +100,7 @@ int main(){
   impres_in[1+DAE_T] = t;
   impres_in[1+DAE_Y] = x;
   impres_in[1+DAE_P] = u;
-  SXFunction impres(impres_in,ocp.implicit_fcn_);
+  SXFunction impres(impres_in,parser->implicit_fcn_);
   
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
@@ -113,7 +114,7 @@ int main(){
   dae_in[DAE_Y] = x;
   dae_in[DAE_YDOT] = xdot;
   dae_in[DAE_P] = u;
-  SXFunction dae(dae_in,ocp.implicit_fcn_);
+  SXFunction dae(dae_in,parser->implicit_fcn_);
 
   bool use_kinsol = false;
   if(use_kinsol){
@@ -138,7 +139,7 @@ int main(){
   integrator.setOption("abstol",1e-8);
   integrator.setOption("reltol",1e-8);
   integrator.setOption("store_jacobians",true);
-  integrator.setOption("tf",ocp.tf/num_nodes);
+  integrator.setOption("tf",parser->tf/num_nodes);
   integrator.init();
 
   // Mayer objective function
@@ -149,7 +150,7 @@ int main(){
   // Create a multiple shooting discretization
   MultipleShooting ms(integrator,mterm);
   ms.setOption("number_of_grid_points",num_nodes);
-  ms.setOption("final_time",ocp.tf);
+  ms.setOption("final_time",parser->tf);
   ms.setOption("parallelization","openmp");
 //  ms.setOption("parallelization","expand");
 
