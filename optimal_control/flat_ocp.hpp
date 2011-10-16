@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef FMI_PARSER_HPP
-#define FMI_PARSER_HPP
+#ifndef FLAT_OCP_HPP
+#define FLAT_OCP_HPP
 
-#include "optimica_ocp.hpp"
+#include "symbolic_ocp.hpp"
 #include "xml_node.hpp"
 #include "variable.hpp"
 
@@ -62,15 +62,15 @@ namespace OptimalControl{
   };
 
 // Forward declaration
-class FMIParserInternal;
+class FlatOCPInternal;
   
-class FMIParser : public SharedObject{
+class FlatOCP : public OptionsFunctionality{
   public:
     /// Default (empty) constructor
-    FMIParser();
+    FlatOCP();
     
     /// Create an FMI parser instance given the filename
-    FMIParser(const std::string& filename);
+    FlatOCP(const std::string& filename);
 
     /// Parse from XML to C++ format
     void parse();
@@ -82,17 +82,17 @@ class FMIParser : public SharedObject{
     const OCP& ocp() const;
 
     /// Access to the internal class
-    FMIParserInternal* operator->();
+    FlatOCPInternal* operator->();
 
     /// Const access to the internal class
-    const FMIParserInternal* operator->() const;
+    const FlatOCPInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 };
 
 #ifdef SWIG
-%extend FMIParser {
+%extend FlatOCP {
   // Not inherited
   std::string __repr__()  { return $self->getRepresentation(); }
 }
@@ -101,4 +101,4 @@ class FMIParser : public SharedObject{
 } // namespace OptimalControl
 } // namespace CasADi
 
-#endif //FMI_PARSER_HPP
+#endif //FLAT_OCP_HPP

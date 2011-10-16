@@ -20,41 +20,41 @@
  *
  */
 
-#include "fmi_parser_internal.hpp"
+#include "flat_ocp_internal.hpp"
 
 using namespace std;
 namespace CasADi{
 namespace OptimalControl{
 
-FMIParser::FMIParser(){
+FlatOCP::FlatOCP(){
 }
     
-FMIParser::FMIParser(const std::string& filename){
-  assignNode(new FMIParserInternal(filename));
+FlatOCP::FlatOCP(const std::string& filename){
+  assignNode(new FlatOCPInternal(filename));
 }
 
-void FMIParser::parse(){
+void FlatOCP::parse(){
   (*this)->parse();
 }
 
-OCP& FMIParser::ocp(){
+OCP& FlatOCP::ocp(){
   return (*this)->ocp_;
 }
 
-const OCP& FMIParser::ocp() const{
+const OCP& FlatOCP::ocp() const{
   return (*this)->ocp_;
 }
 
-FMIParserInternal* FMIParser::operator->(){
-  return (FMIParserInternal*)(SharedObject::operator->());
+FlatOCPInternal* FlatOCP::operator->(){
+  return (FlatOCPInternal*)(OptionsFunctionality::operator->());
 }
 
-const FMIParserInternal* FMIParser::operator->() const{
-  return (const FMIParserInternal*)(SharedObject::operator->());
+const FlatOCPInternal* FlatOCP::operator->() const{
+  return (const FlatOCPInternal*)(OptionsFunctionality::operator->());
 }
 
-bool FMIParser::checkNode() const{
-  return dynamic_cast<const FMIParserInternal*>(get())!=0;
+bool FlatOCP::checkNode() const{
+  return dynamic_cast<const FlatOCPInternal*>(get())!=0;
 }
 
 } // namespace OptimalControl

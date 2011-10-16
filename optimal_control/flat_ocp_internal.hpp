@@ -20,11 +20,11 @@
  *
  */
 
-#ifndef FMI_PARSER_INTERNAL_HPP
-#define FMI_PARSER_INTERNAL_HPP
+#ifndef FLAT_OCP_INTERNAL_HPP
+#define FLAT_OCP_INTERNAL_HPP
 
-#include "fmi_parser.hpp"
-#include "optimica_ocp.hpp"
+#include "flat_ocp.hpp"
+#include "symbolic_ocp.hpp"
 #include "xml_node.hpp"
 
 /** \brief  Forward declarations */
@@ -34,16 +34,19 @@ class TiXmlNode;
 namespace CasADi{
 namespace OptimalControl{
 
-class FMIParserInternal : public SharedObjectNode{
+class FlatOCPInternal : public OptionsFunctionalityNode{
   public:
     /// Constructor
-    explicit FMIParserInternal(const std::string& filename);
+    explicit FlatOCPInternal(const std::string& filename);
   
     /// destructor
-    virtual ~FMIParserInternal(); 
+    virtual ~FlatOCPInternal(); 
 
+    /// Initialize
+    virtual void init();
+    
     /// clone
-    virtual FMIParserInternal* clone() const{ return new FMIParserInternal(*this);}
+    virtual FlatOCPInternal* clone() const{ return new FlatOCPInternal(*this);}
 
     /// Parse from XML to C++ format
     void parse();
@@ -80,7 +83,7 @@ class FMIParserInternal : public SharedObjectNode{
     void addIntervalStartTime(const XMLNode& onode);
     void addIntervalFinalTime(const XMLNode& onode);
 
-    // NOTE 1: Joel: The FMIParserInternal class will later have to be changed to work with the MX class instead of SX, 
+    // NOTE 1: Joel: The FlatOCPInternal class will later have to be changed to work with the MX class instead of SX, 
     //               therefore I had to change the implementation so that it is more generic
 
     // NOTE 2: Joel: Will there really ever be so many functions that it will motivate a binary search of the functions rather than a simple linear search?
@@ -227,4 +230,4 @@ class FMIParserInternal : public SharedObjectNode{
 } // namespace OptimalControl
 } // namespace CasADi
 
-#endif //FMI_PARSER_INTERNAL_HPP
+#endif //FLAT_OCP_INTERNAL_HPP

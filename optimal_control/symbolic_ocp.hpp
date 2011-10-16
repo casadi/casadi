@@ -23,15 +23,67 @@
 #ifndef CASADI_OCP_HPP
 #define CASADI_OCP_HPP
 
-#include "casadi/printable_object.hpp"
+#include "casadi/casadi.hpp"
 
 namespace CasADi{
   namespace OptimalControl{
 
 /** \brief Symbolic representation of an optimal control problem (OCP) 
+  Variables:
+  t:     time
+  x:     differential states
+  xdot:  state derivatives
+  z:     algebraic states
+  y:     dependent variables
+  u:     control signals
+  p:     independent parameters
+  
+  Equations
+  fully implicit DAE:       0 == dae(t,x,xdot,z,u,p)
+  initial equations:        0 == ieq(t,x,xdot,z,u,p)
+  explicit ODE:          xdot == ode(t,x,z,u,p)
+  algebraic equations:      0 == alg(t,x,z,u,p)
+  dependent equations:      y == dep(t,x,z,u,p)
+  
   \author Joel Andersson 2011
 */
 struct OCP{
+  
+  /// Time
+  SXMatrix t;
+  
+  /// Differential states
+  SXMatrix x;
+
+  /// State derivative
+  SXMatrix xdot;
+
+  /// Algebraic states
+  SXMatrix z;
+  
+  /// Controls
+  SXMatrix u;
+      
+  /// Free parameters
+  SXMatrix p;
+  
+  /// Dependent variables
+  SXMatrix y;
+
+  /// Fully implicit DAE
+  SXMatrix dae;
+
+  /// Initial equations
+  SXMatrix ieq;
+
+  /// Explicit ODE
+  SXMatrix ode;
+  
+  /// Algebraic equations
+  SXMatrix alg;
+  
+  /// Dependent equations
+  SXMatrix dep;
   
 };
 

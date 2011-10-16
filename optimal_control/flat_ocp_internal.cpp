@@ -20,7 +20,7 @@
  *
  */
 
-#include "fmi_parser_internal.hpp"
+#include "flat_ocp_internal.hpp"
 #include "variable_internal.hpp"
 #include <map>
 #include <string>
@@ -43,7 +43,11 @@ using namespace std;
 namespace CasADi{
 namespace OptimalControl{
 
-FMIParserInternal::FMIParserInternal(const std::string& filename) : filename_(filename){
+FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filename){
+  addOption("scale_variables",          OT_BOOLEAN,      false, "Scale the variables so that they get unity order of magnitude");
+  addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be expressed as an expression of other variables");
+  addOption("scale_equations",          OT_BOOLEAN,      true,  "Scale the implicit equations so that they get unity order of magnitude");
+
   TiXmlDocument doc;
   bool flag = doc.LoadFile(filename.data());
 
@@ -64,11 +68,27 @@ FMIParserInternal::FMIParserInternal(const std::string& filename) : filename_(fi
   tf = numeric_limits<double>::quiet_NaN();
 }
 
-FMIParserInternal::~FMIParserInternal(){
+void FlatOCPInternal::init(){
+
+  // Obtain the symbolic representation of the OCP
+  parse();
+
+  // Scale the variables
+  scaleVariables();
+
+  // Eliminate the dependent variables
+  eliminateDependent();
+
+  // Scale the equations
+  scaleEquations();
+  
+}
+
+FlatOCPInternal::~FlatOCPInternal(){
 
 }
 
-void FMIParserInternal::parse(){
+void FlatOCPInternal::parse(){
   cout << "Parsing XML ..." << endl;
   double time1 = clock();
 
@@ -113,7 +133,7 @@ void FMIParserInternal::parse(){
   cout << "... parsing complete after " << tparse << " seconds" << endl;
 }
 
-void FMIParserInternal::addModelVariables(){
+void FlatOCPInternal::addModelVariables(){
 
   // Get a reference to the ModelVariables node
   const XMLNode& modvars = document_[0]["ModelVariables"];
@@ -208,7 +228,7 @@ void FMIParserInternal::addModelVariables(){
 }
 
 
-void FMIParserInternal::addBindingEquations(){
+void FlatOCPInternal::addBindingEquations(){
   // Get a reference to the BindingEquations node
   const XMLNode& bindeqs = document_[0]["equ:BindingEquations"];
   
@@ -253,7 +273,7 @@ void FMIParserInternal::addBindingEquations(){
   explicit_fcn_.insert(explicit_fcn_.begin(),beq_exp.begin(),beq_exp.end());
 }
 
-void FMIParserInternal::addDynamicEquations(){
+void FlatOCPInternal::addDynamicEquations(){
   // Get a reference to the DynamicEquations node
   const XMLNode& dyneqs = document_[0]["equ:DynamicEquations"];
 
@@ -269,7 +289,7 @@ void FMIParserInternal::addDynamicEquations(){
   }
 }
 
-void FMIParserInternal::addInitialEquations(){
+void FlatOCPInternal::addInitialEquations(){
   // Get a reference to the DynamicEquations node
   const XMLNode& initeqs = document_[0]["equ:InitialEquations"];
 
@@ -286,7 +306,7 @@ void FMIParserInternal::addInitialEquations(){
   }
 }
 
-void FMIParserInternal::addOptimization(){
+void FlatOCPInternal::addOptimization(){
   // Get a reference to the DynamicEquations node
   const XMLNode& opts = document_[0]["opt:Optimization"];
   
@@ -328,11 +348,11 @@ void FMIParserInternal::addOptimization(){
 //       addTimePoints(onode);
     } else if(onode.checkName("opt:Constraints")) {
       addConstraints(onode);
-    } else throw "FMIParserInternal::addOptimization: Unknown node";
+    } else throw "FlatOCPInternal::addOptimization: Unknown node";
   }
 }
 
-void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
+void FlatOCPInternal::addObjectiveFunction(const XMLNode& onode){
   // Add components
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
@@ -341,7 +361,7 @@ void FMIParserInternal::addObjectiveFunction(const XMLNode& onode){
   }
 }
 
-void FMIParserInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
+void FlatOCPInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
     SX v = readExpr(var);
@@ -349,16 +369,16 @@ void FMIParserInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
   }
 }
 
-void FMIParserInternal::addIntervalStartTime(const XMLNode& onode){
+void FlatOCPInternal::addIntervalStartTime(const XMLNode& onode){
   
 }
 
-void FMIParserInternal::addIntervalFinalTime(const XMLNode& onode){
+void FlatOCPInternal::addIntervalFinalTime(const XMLNode& onode){
   
 }
 
 
-void FMIParserInternal::addConstraints(const XMLNode& onode){
+void FlatOCPInternal::addConstraints(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
 
     const XMLNode& constr_i = onode[i];
@@ -382,12 +402,12 @@ void FMIParserInternal::addConstraints(const XMLNode& onode){
       path_max_.push_back(0.);
     } else {
       cerr << "unknown constraint type" << constr_i.getName() << endl;
-      throw "FMIParserInternal::addConstraints";
+      throw "FlatOCPInternal::addConstraints";
     }
   }
 }
 
-Variable& FMIParserInternal::readVariable(const XMLNode& node){
+Variable& FlatOCPInternal::readVariable(const XMLNode& node){
   // Get a pointer to the variable collection
   VariableTree *vn = &variables_;
   
@@ -410,11 +430,11 @@ Variable& FMIParserInternal::readVariable(const XMLNode& node){
 }
 
 
-SX FMIParserInternal::readExpr(const XMLNode& node){
+SX FlatOCPInternal::readExpr(const XMLNode& node){
   const string& fullname = node.getName();
   if (fullname.find("exp:")== string::npos) {
     stringstream ss;
-    ss << "FMIParserInternal::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname;
+    ss << "FlatOCPInternal::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname;
     throw CasadiException(ss.str());
   }
   
@@ -472,7 +492,7 @@ SX FMIParserInternal::readExpr(const XMLNode& node){
   if (uit!=unary_.end()) {
     // Make sure that there is exactly one child
     if ((node.size()) != 1)
-      throw CasadiException(string("FMIParserInternal::readExpr: Node \"") + fullname + "\" does not have one child");
+      throw CasadiException(string("FlatOCPInternal::readExpr: Node \"") + fullname + "\" does not have one child");
 
     // Call the function
     return (*uit->second)(readExpr(node[0]));
@@ -484,26 +504,26 @@ SX FMIParserInternal::readExpr(const XMLNode& node){
   if (bit!=binary_.end()) {
     // Make sure that there are exactly two children
     if ((node.size()) != 2)
-      throw CasadiException(string("FMIParserInternal::readExpr: Node \"") + fullname + "\" does not have two children");
+      throw CasadiException(string("FlatOCPInternal::readExpr: Node \"") + fullname + "\" does not have two children");
 
     // Call the function
     return (*bit->second)(readExpr(node[0]),readExpr(node[1]));
   }
 
   // throw error if reached this point
-  throw CasadiException(string("FMIParserInternal::readExpr: unknown node: ") + name);
+  throw CasadiException(string("FlatOCPInternal::readExpr: unknown node: ") + name);
   
 }
 
-void FMIParserInternal::repr(std::ostream &stream) const{
+void FlatOCPInternal::repr(std::ostream &stream) const{
   stream << "FMI parser (XML file: \"" << filename_ << "\")";
 }
 
-// void FMIParserInternal::print(std::ostream &stream) const{
+// void FlatOCPInternal::print(std::ostream &stream) const{
 //   stream << document_;
 // }
 
-// void FMIParserInternal::repr(ostream &stream) const{
+// void FlatOCPInternal::repr(ostream &stream) const{
 //   stream << "Optimal control problem (";
 //   stream << "#dae = " << implicit_fcn_.size() << ", ";
 //   stream << "#initial_eq_ = " << initial_eq_.size() << ", ";
@@ -512,7 +532,7 @@ void FMIParserInternal::repr(std::ostream &stream) const{
 //   stream << "#lterm = " << lterm.size() << ")";
 // }
 
-void FMIParserInternal::print(ostream &stream) const{
+void FlatOCPInternal::print(ostream &stream) const{
   // Variables in the class hierarchy
   stream << "Variables" << endl;
 
@@ -586,7 +606,7 @@ void FMIParserInternal::print(ostream &stream) const{
   
 }
 
-void FMIParserInternal::eliminateDependent(){
+void FlatOCPInternal::eliminateDependent(){
   cout << "eliminateDependent ..." << endl;
   double time1 = clock();
 
@@ -605,7 +625,7 @@ void FMIParserInternal::eliminateDependent(){
   cout << "... eliminateDependent complete after " << dt << " seconds." << endl;
 }
 
-void FMIParserInternal::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front){
+void FlatOCPInternal::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front){
   if(to_front){
     // Eliminate expression from the current binding equations
     Matrix<SX> explicit_fcn_eliminated = substitute(explicit_fcn_,var, bind_eq);
@@ -627,7 +647,7 @@ void FMIParserInternal::addExplicitEquation(const Matrix<SX>& var, const Matrix<
   }
 }
 
-void FMIParserInternal::sortType(){
+void FlatOCPInternal::sortType(){
   // Get all the variables
   vector<Variable> v;
   variables_.getAll(v);
@@ -698,7 +718,7 @@ void FMIParserInternal::sortType(){
 }
 
 
-void FMIParserInternal::scaleVariables(){
+void FlatOCPInternal::scaleVariables(){
   cout << "Scaling variables ..." << endl;
   double time1 = clock();
   
@@ -756,7 +776,7 @@ void FMIParserInternal::scaleVariables(){
   cout << "... variable scaling complete after " << dt << " seconds." << endl;
 }
     
-void FMIParserInternal::scaleEquations(){
+void FlatOCPInternal::scaleEquations(){
   
   // Make sure that the equations has not already been scaled
   casadi_assert(!scaled_equations_);
@@ -836,7 +856,7 @@ void FMIParserInternal::scaleEquations(){
   scaled_equations_ = true;
 }
 
-void FMIParserInternal::sortBLT(bool with_x){
+void FlatOCPInternal::sortBLT(bool with_x){
   cout << "BLT sorting ..." << endl;
   double time1 = clock();
   
@@ -890,7 +910,7 @@ void FMIParserInternal::sortBLT(bool with_x){
   cout << "... BLT sorting complete after " << dt << " seconds." << endl;
 }
 
-void FMIParserInternal::makeExplicit(){
+void FlatOCPInternal::makeExplicit(){
   casadi_assert_message(blt_sorted_,"OCP has not been BLT sorted, call sortBLT()");
 
   cout << "Making explicit..." << endl;
@@ -1096,7 +1116,7 @@ void FMIParserInternal::makeExplicit(){
   cout << "... makeExplicit complete after " << dt << " seconds." << endl;
 }
 
-void FMIParserInternal::createFunctions(bool create_dae, bool create_ode, bool create_quad){
+void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool create_quad){
   cout << "createFunctions ..." << endl;
   double time1 = clock();
 
@@ -1283,7 +1303,7 @@ void FMIParserInternal::createFunctions(bool create_dae, bool create_ode, bool c
 }
 
 
-void FMIParserInternal::makeSemiExplicit(){
+void FlatOCPInternal::makeSemiExplicit(){
   
   
 //     fcn = SXFunction([v_new],[dae_new])
@@ -1330,7 +1350,7 @@ void FMIParserInternal::makeSemiExplicit(){
 //       append(def_cum,fb_exp)
   
   
-  throw CasadiException("FMIParserInternal::makeSemiExplicit: Commented out");
+  throw CasadiException("FlatOCPInternal::makeSemiExplicit: Commented out");
 #if 0  
   // Move the fully implicit dynamic equations to the list of algebraic equations
   algeq.insert(algeq.end(), dyneq.begin(), dyneq.end());
@@ -1349,7 +1369,7 @@ void FMIParserInternal::makeSemiExplicit(){
 #endif
 }
 
-void FMIParserInternal::makeAlgebraic(const Variable& v){
+void FlatOCPInternal::makeAlgebraic(const Variable& v){
   // Find variable among the variables
   for(vector<Variable>::iterator it=x_.begin(); it!=x_.end(); ++it){
     if(it->get()==v.get()){
@@ -1459,7 +1479,7 @@ std::vector<std::string> VariableTree::getNames() const{
   return ret;
 }
 
-void FMIParserInternal::findConsistentIC(){
+void FlatOCPInternal::findConsistentIC(){
   // Evaluate the ODE functions
   oderhs_.init();
   oderhs_.setInput(0.0,DAE_T);
@@ -1487,7 +1507,7 @@ void FMIParserInternal::findConsistentIC(){
   }
 }
 
-SX FMIParserInternal::getExplicit(const SX& v) const{
+SX FlatOCPInternal::getExplicit(const SX& v) const{
   SXMatrix x = v;
   x = substitute(x,explicit_var_,explicit_fcn_);
   return x.toScalar();

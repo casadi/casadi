@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.0)
 
 SET(OPTIMAL_CONTROL
-  optimica_ocp.hpp          optimica_ocp.cpp
+  symbolic_ocp.hpp
   variable.hpp              variable.cpp            variable_internal.hpp             variable_internal.cpp
   variable_tools.hpp        variable_tools.cpp
-  fmi_parser.hpp            fmi_parser.cpp          fmi_parser_internal.hpp           fmi_parser_internal.cpp
+  flat_ocp.hpp              flat_ocp.cpp            flat_ocp_internal.hpp             flat_ocp_internal.cpp
   xml_node.hpp              xml_node.cpp
   xml_arg.hpp               xml_arg.cpp
   ocp_tools.hpp             ocp_tools.cpp
