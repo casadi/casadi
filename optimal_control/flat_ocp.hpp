@@ -32,7 +32,43 @@ namespace OptimalControl{
 
 // Forward declaration
 class FlatOCPInternal;
+
+/** \brief A flat OCP representation coupled to an XML file
+  Usage skeleton (starting with an XML file):
   
+  ** 1. Call constructor (pass an empty string ("") to start with an empty file
+  > FlatOCP ocp(xml_file_name)
+  
+  ** 2. Set options
+  > ocp.setOption(...,...)
+
+  ** 3. Initialize and parse XML
+  > ocp.init()
+
+  ** 4. Read variables from XML
+  > ocp.readVariables()
+  
+  ** 5. Modify/add variables
+  > ...
+  
+  ** 6. Read equations from XML
+  > ocp.readEquations()
+  
+  ** 7. Modify/add equations
+  > ...
+  
+  ** 6. Read optimization from XML
+  > ocp.readOptimization()
+  
+  ** 7. Modify/add optimization
+  > ...
+
+  ** 8. Export FMI XML
+  > ocp.exportFMI()
+
+  \date 2011
+  \author Joel Andersson
+*/
 class FlatOCP : public OptionsFunctionality{
   public:
     /// Default (empty) constructor
@@ -55,6 +91,9 @@ class FlatOCP : public OptionsFunctionality{
     
     /// Access a variable by name
     Variable& variable(const std::string& name);
+
+    /// Make a differential state algebraic by replacing its time derivative by 0
+    void makeAlgebraic(const std::string& name);
     
     /// Access to the internal class
     FlatOCPInternal* operator->();

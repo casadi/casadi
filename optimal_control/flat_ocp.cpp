@@ -65,6 +65,11 @@ void FlatOCP::addVariable(const std::string& name, const Variable& var){
   (*this)->addVariable(name,var);
 }
 
+void FlatOCP::makeAlgebraic(const std::string& name){
+  (*this)->makeAlgebraic(variable(name));
+}
+
+
 
 } // namespace OptimalControl
 } // namespace CasADi
