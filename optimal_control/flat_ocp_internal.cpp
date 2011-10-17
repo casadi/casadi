@@ -156,29 +156,12 @@ void FlatOCPInternal::addModelVariables(){
     if(alias.compare("alias") == 0 || alias.compare("negatedAlias") == 0)
       continue;
         
-    // Add to ocp
-    stringstream qn;
-    
+    // Get the name
     const XMLNode& nn = vnode["QualifiedName"];
-    for(int i=0; i<nn.size(); ++i){
-      string namepart = nn[i].attribute("name");
-      // Add a dot
-      if(i!=0) qn << ".";
-      
-      // Go to named child branch
-      qn << namepart;
-
-      // Go to indexed child branch
-      if(nn[i].size()>0){
-        
-        // Find the index
-        int ind = nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
-        qn << "[" << ind << "]";
-      }
-    }
+    string qn = qualifiedName(nn);
     
     // Find variable
-    map<string,int>::iterator it = varname_.find(qn.str());
+    map<string,int>::iterator it = varname_.find(qn);
     
     // Add variable, if not already added
     if(it == varname_.end()){
@@ -229,8 +212,7 @@ void FlatOCPInternal::addModelVariables(){
       if(props.hasAttribute("free"))         var.setFree(string(props.attribute("free")).compare("true") == 0);
       
       // Add to list of variables
-      vars_.push_back(var);
-      varname_[qn.str()] = vars_.size()-1;
+      addVariable(qn,var);
     }
   }
 }
@@ -414,28 +396,11 @@ void FlatOCPInternal::addConstraints(const XMLNode& onode){
 }
 
 Variable& FlatOCPInternal::readVariable(const XMLNode& node){
-  // Add to ocp
-  stringstream qn;
-  
-  // Get the name
-  for(int i=0; i<node.size(); ++i){
-    // Add a dot
-    if(i!=0) qn << ".";
-    
-    // Go to the right variable
-    string namepart = node[i].attribute("name");
-    qn << namepart;
-    
-    // Go to the right index, if there is any
-    if(node[i].size()>0){
-      // Go to the sub-collection
-      int ind = node[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
-      qn << "[" << ind << "]";
-    }
-  }
+  // Qualified name
+  string qn = qualifiedName(node);
   
   // Find and return the variable
-  return variable(qn.str());
+  return variable(qn);
 }
 
 
@@ -1451,13 +1416,50 @@ Variable& FlatOCPInternal::variable(const std::string& name){
   map<string,int>::iterator it = varname_.find(name);
   if(it==varname_.end()){
     stringstream ss;
-    ss << "No such variable: " << name;
+    ss << "No such variable: \"" << name << "\".";
     throw CasadiException(ss.str());
   }
   
   // Return the variable
   return vars_.at(it->second);
 }
+
+void FlatOCPInternal::addVariable(const std::string& name, const Variable& var){
+  // Try to find the name
+  map<string,int>::iterator it = varname_.find(name);
+  if(it!=varname_.end()){
+    stringstream ss;
+    ss << "Variable \"" << name << "\" has already been added.";
+    throw CasadiException(ss.str());
+  }
+  
+  vars_.push_back(var);
+  varname_[name] = vars_.size()-1;
+}
+
+std::string FlatOCPInternal::qualifiedName(const XMLNode& nn){
+  // Stringstream to assemble name
+  stringstream qn;
+  
+  for(int i=0; i<nn.size(); ++i){
+    // Add a dot
+    if(i!=0) qn << ".";
+    
+    // Get the name part
+    string namepart = nn[i].attribute("name");
+    qn << namepart;
+
+    // Get the index, if any
+    if(nn[i].size()>0){
+      int ind = nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
+      qn << "[" << ind << "]";
+    }
+  }
+  
+  // Return the name
+  return qn.str();
+}
+
 
 } // namespace OptimalControl
 } // namespace CasADi

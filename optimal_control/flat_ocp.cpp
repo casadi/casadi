@@ -61,6 +61,10 @@ Variable& FlatOCP::variable(const std::string& name){
   return (*this)->variable(name);
 }
 
+void FlatOCP::addVariable(const std::string& name, const Variable& var){
+  (*this)->addVariable(name,var);
+}
+
 
 } // namespace OptimalControl
 } // namespace CasADi

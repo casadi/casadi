@@ -136,9 +136,15 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Update the initial values for the dependent variables
     void findConsistentIC();
 
+    /// Add a variable
+    void addVariable(const std::string& name, const Variable& var);
+    
     /// Access a variable by name
     Variable& variable(const std::string& name);
 
+    /// Get the qualified name
+    static std::string qualifiedName(const XMLNode& nn);
+    
     /// Variables
     std::vector<Variable> vars_;
       

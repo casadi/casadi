@@ -49,7 +49,10 @@ class FlatOCP : public OptionsFunctionality{
 
     /// Get the OCP (const ref)
     const SymbolicOCP& ocp() const;
-
+    
+    /// Add a variable
+    void addVariable(const std::string& name, const Variable& var);
+    
     /// Access a variable by name
     Variable& variable(const std::string& name);
     
