@@ -62,6 +62,9 @@ int main(){
   ocp.print();
   
   // Correct the inital guess and bounds on variables
+/*  ocp.variables("u").setStart(280);
+  ocp.variables("u").setMin(230);
+  ocp.variables("u").setMax(370);*/
   ocp->u_[0].setStart(280);
   ocp->u_[0].setMin(230);
   ocp->u_[0].setMax(370);

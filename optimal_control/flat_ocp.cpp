@@ -57,5 +57,10 @@ bool FlatOCP::checkNode() const{
   return dynamic_cast<const FlatOCPInternal*>(get())!=0;
 }
 
+Variable& FlatOCP::variable(const std::string& name){
+  return (*this)->variable(name);
+}
+
+
 } // namespace OptimalControl
 } // namespace CasADi

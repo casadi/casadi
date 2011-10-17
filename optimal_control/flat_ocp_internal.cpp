@@ -36,7 +36,6 @@
 #include "variable_tools.hpp"
 #include "../casadi/matrix/matrix_tools.hpp"
 #include "../casadi/sx/sx_tools.hpp"
-#include "../interfaces/csparse/csparse_tools.hpp"
 #include "../casadi/fx/integrator.hpp"
 
 using namespace std;
@@ -47,6 +46,8 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   addOption("scale_variables",          OT_BOOLEAN,      false, "Scale the variables so that they get unity order of magnitude");
   addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be expressed as an expression of other variables");
   addOption("scale_equations",          OT_BOOLEAN,      true,  "Scale the implicit equations so that they get unity order of magnitude");
+  addOption("semi_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
+  addOption("fully_explicit",           OT_BOOLEAN,      false, "Make the DAE fully explicit (not always possible)");
 
   TiXmlDocument doc;
   bool flag = doc.LoadFile(filename.data());
@@ -156,31 +157,34 @@ void FlatOCPInternal::addModelVariables(){
       continue;
         
     // Add to ocp
-    VariableTree *vn = &variables_;
+    stringstream qn;
     
     const XMLNode& nn = vnode["QualifiedName"];
     for(int i=0; i<nn.size(); ++i){
       string namepart = nn[i].attribute("name");
+      // Add a dot
+      if(i!=0) qn << ".";
+      
       // Go to named child branch
-      vn = &vn->subByName(namepart,true);
+      qn << namepart;
 
       // Go to indexed child branch
       if(nn[i].size()>0){
         
         // Find the index
         int ind = nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
-        vn = &vn->subByIndex(ind,true);
+        qn << "[" << ind << "]";
       }
     }
     
-    // Reference to the variable
-    Variable &var = vn->var_;
+    // Find variable
+    map<string,int>::iterator it = varname_.find(qn.str());
     
     // Add variable, if not already added
-    if(var.isNull()){
+    if(it == varname_.end()){
       
       // Create variable
-      var = Variable(name);
+      Variable var(name);
       
       // Value reference
       var.setValueReference(valueReference);
@@ -223,6 +227,10 @@ void FlatOCPInternal::addModelVariables(){
       if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
       if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
       if(props.hasAttribute("free"))         var.setFree(string(props.attribute("free")).compare("true") == 0);
+      
+      // Add to list of variables
+      vars_.push_back(var);
+      varname_[qn.str()] = vars_.size()-1;
     }
   }
 }
@@ -251,11 +259,9 @@ void FlatOCPInternal::addBindingEquations(){
   }
   
   // Add binding equations to constant variables lacking this
-  vector<Variable> v_all;
   vector<SX> beq_var;
   vector<SX> beq_exp;
-  variables_.getAll(v_all);
-  for(vector<Variable>::iterator it=v_all.begin(); it!=v_all.end(); ++it){
+  for(vector<Variable>::iterator it=vars_.begin(); it!=vars_.end(); ++it){
     if(it->getVariability()==CONSTANT && it->var().getTemp()!=1){
       // Save binding equation
       beq_var.push_back(it->var());
@@ -408,25 +414,28 @@ void FlatOCPInternal::addConstraints(const XMLNode& onode){
 }
 
 Variable& FlatOCPInternal::readVariable(const XMLNode& node){
-  // Get a pointer to the variable collection
-  VariableTree *vn = &variables_;
+  // Add to ocp
+  stringstream qn;
   
-  // Find the variable
+  // Get the name
   for(int i=0; i<node.size(); ++i){
+    // Add a dot
+    if(i!=0) qn << ".";
+    
     // Go to the right variable
     string namepart = node[i].attribute("name");
-    vn = &vn->subByName(namepart);
+    qn << namepart;
     
     // Go to the right index, if there is any
     if(node[i].size()>0){
       // Go to the sub-collection
       int ind = node[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
-      vn = &vn->subByIndex(ind);
+      qn << "[" << ind << "]";
     }
   }
   
-  // Return the variable
-  return vn->var_;
+  // Find and return the variable
+  return variable(qn.str());
 }
 
 
@@ -648,10 +657,6 @@ void FlatOCPInternal::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX
 }
 
 void FlatOCPInternal::sortType(){
-  // Get all the variables
-  vector<Variable> v;
-  variables_.getAll(v);
-  
   // Clear variables
   x_.clear();
   z_.clear();
@@ -672,7 +677,7 @@ void FlatOCPInternal::sortType(){
   }
   
   // Loop over variables
-  for(vector<Variable>::iterator it=v.begin(); it!=v.end(); ++it){
+  for(vector<Variable>::iterator it=vars_.begin(); it!=vars_.end(); ++it){
     // If not dependent
     if(it->highest().getTemp()!=1){
       // Try to determine the type
@@ -882,26 +887,34 @@ void FlatOCPInternal::sortBLT(bool with_x){
   }
   
   // BLT transformation
-  Interfaces::BLT blt(sp);
+  std::vector<int> blt_rowperm; // row permutations
+  std::vector<int> blt_colperm; // column permutations
+  std::vector<int> blt_rowblock;  // block k is rows r[k] to r[k+1]-1
+  std::vector<int> blt_colblock;  // block k is cols s[k] to s[k+1]-1
+  int blt_nb;
+  std::vector<int> blt_coarse_rowblock;  // coarse row decomposition
+  std::vector<int> blt_coarse_colblock;  //coarse column decomposition
+
+  blt_nb = sp.dulmageMendelsohn(blt_rowperm,blt_colperm,blt_rowblock,blt_colblock,blt_coarse_rowblock,blt_coarse_colblock);
 
   // Permute equations
   vector<SX> implicit_fcn_new(implicit_fcn_.size());
   for(int i=0; i<implicit_fcn_.size(); ++i){
-    implicit_fcn_new[i] = implicit_fcn_[blt.rowperm[i]];
+    implicit_fcn_new[i] = implicit_fcn_[blt_rowperm[i]];
   }
   implicit_fcn_new.swap(implicit_fcn_);
   
   // Permute variables
   vector<SX> implicit_var_new(implicit_var_.size());
   for(int i=0; i<implicit_var_.size(); ++i){
-    implicit_var_new[i]= implicit_var_[blt.colperm[i]];
+    implicit_var_new[i]= implicit_var_[blt_colperm[i]];
   }
   implicit_var_new.swap(implicit_var_);
   
   // Save blocks
-  rowblock_ = blt.rowblock;
-  colblock_ = blt.colblock;
-  nb_ = blt.nb;
+  rowblock_ = blt_rowblock;
+  colblock_ = blt_colblock;
+  nb_ = blt_nb;
   
   blt_sorted_ = true;
 
@@ -1314,13 +1327,13 @@ void FlatOCPInternal::makeSemiExplicit(){
 //   vb_cum = SXMatrix()
 //   def_cum = SXMatrix()
 // 
-//   for b in range(blt.nb):
-//     Jb = J[blt.rowblock[b]:blt.rowblock[b+1],blt.colblock[b]:blt.colblock[b+1]]
-//     vb = v_new[blt.colblock[b]:blt.colblock[b+1]]
-//     fb = dae_new[blt.rowblock[b]:blt.rowblock[b+1]]
+//   for b in range(blt_nb):
+//     Jb = J[blt_rowblock[b]:blt_rowblock[b+1],blt_colblock[b]:blt_colblock[b+1]]
+//     vb = v_new[blt_colblock[b]:blt_colblock[b+1]]
+//     fb = dae_new[blt_rowblock[b]:blt_rowblock[b+1]]
 //     
 //     # Block size
-//     bs = blt.rowblock[b+1] - blt.rowblock[b]
+//     bs = blt_rowblock[b+1] - blt_rowblock[b]
 // 
 //     #print "block ", b,
 // 
@@ -1399,86 +1412,6 @@ void FlatOCPInternal::makeAlgebraic(const Variable& v){
   throw CasadiException("v not in list of differential states");
 }
 
-VariableTree& VariableTree::subByName(const string& name, bool allocate){
-  // try to locate the variable
-  map<string, int>::iterator it = name_part_.find(name);
-
-  // check if the variable exists
-  if(it==name_part_.end()){
-    // Allocate variable
-    if(!allocate){
-      stringstream ss;
-      ss << "No child \"" << name << "\"";
-      throw CasadiException(ss.str());
-    }
-    children_.push_back(VariableTree());
-    name_part_[name] = children_.size()-1;
-    return children_.back();
-  } else {
-    // Variable exists
-    return children_.at(it->second);  
-  }
-}
-
-VariableTree& VariableTree::subByIndex(int ind, bool allocate){
-  // Modelica is 1-based
-  const int base = 1; 
-  
-  casadi_assert(ind-base>=0);
-  if(ind-base<children_.size()){
-    // VariableTree exists
-    return children_[ind-base];
-  } else {
-    // Create VariableTree
-    if(!allocate){
-      stringstream ss;
-      ss << "Index [" << ind << "] out of bounds";
-      throw CasadiException(ss.str());
-    }
-    children_.resize(ind-base+1);
-    return children_.back();
-  }
-}
-
-void VariableTree::getAll(std::vector<Variable>& v) const{
-  /// Add variables
-  for(vector<VariableTree>::const_iterator it=children_.begin(); it!=children_.end(); ++it){
-    it->getAll(v);
-  }
-  
-  /// Add variable, if any
-  if(!var_.isNull())
-    v.push_back(var_);
-}
-
-void VariableTree::print(ostream &stream, int indent) const{
-  // Print variable
-  if(!var_.isNull()){
-    for(int i=0; i<indent; ++i) stream << " ";
-    stream << var_ << endl;
-  }
- 
-  for(std::map<std::string,int>::const_iterator it=name_part_.begin(); it!=name_part_.end(); ++it){
-    cout << it->first << ", " << it->second << endl;
-  }
- 
-  
-           ;
-
-  
-  for(vector<VariableTree>::const_iterator it = children_.begin(); it!=children_.end(); ++it){
-    it->print(stream,indent+2);
-  }
-}
-
-std::vector<std::string> VariableTree::getNames() const{
-  std::vector<std::string> ret(children_.size());
-  for(map<string,int>::const_iterator it=name_part_.begin(); it!=name_part_.end(); ++it){
-    ret[it->second] = it->first;
-  }
-  return ret;
-}
-
 void FlatOCPInternal::findConsistentIC(){
   // Evaluate the ODE functions
   oderhs_.init();
@@ -1513,9 +1446,18 @@ SX FlatOCPInternal::getExplicit(const SX& v) const{
   return x.toScalar();
 }
 
-
-
-
+Variable& FlatOCPInternal::variable(const std::string& name){
+  // Find the variable
+  map<string,int>::iterator it = varname_.find(name);
+  if(it==varname_.end()){
+    stringstream ss;
+    ss << "No such variable: " << name;
+    throw CasadiException(ss.str());
+  }
+  
+  // Return the variable
+  return vars_.at(it->second);
+}
 
 } // namespace OptimalControl
 } // namespace CasADi

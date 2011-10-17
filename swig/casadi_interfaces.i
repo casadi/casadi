@@ -58,10 +58,8 @@
 #ifdef WITH_CSPARSE
 %{
 #include "interfaces/csparse/csparse.hpp"
-#include "interfaces/csparse/csparse_tools.hpp"
 %}
 %include "interfaces/csparse/csparse.hpp"
-%include "interfaces/csparse/csparse_tools.hpp"
 #endif
 
 #ifdef WITH_GSL

@@ -30,37 +30,6 @@
 namespace CasADi{
 namespace OptimalControl{
 
-  /// Tree structure for storing variables
-  class VariableTree{
-    public:
-      /// Access a sub-collection by name
-      VariableTree& subByName(const std::string& name, bool allocate=false);
-
-      /// Access a sub-collection by index
-      VariableTree& subByIndex(int ind, bool allocate=false);
-      
-      /// Get all variables
-      void getAll(std::vector<Variable>& v) const;
-  
-      /// Get all names
-      std::vector<std::string> getNames() const;
-      
-      /// Print node
-      #ifndef SWIG
-      void print(std::ostream &stream, int indent=0) const;
-      #endif // SWIG
-
-      /// Variable
-      Variable var_;
-      
-      /// Children nodes
-      std::vector<VariableTree> children_;
-      
-      /// Names of children
-      std::map<std::string,int> name_part_;
-              
-  };
-
 // Forward declaration
 class FlatOCPInternal;
   
@@ -81,6 +50,9 @@ class FlatOCP : public OptionsFunctionality{
     /// Get the OCP (const ref)
     const SymbolicOCP& ocp() const;
 
+    /// Access a variable by name
+    Variable& variable(const std::string& name);
+    
     /// Access to the internal class
     FlatOCPInternal* operator->();
 

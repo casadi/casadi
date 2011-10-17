@@ -136,8 +136,14 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Update the initial values for the dependent variables
     void findConsistentIC();
 
-    /// Access the variables in a class hierarchy -- public data member
-    VariableTree variables_;
+    /// Access a variable by name
+    Variable& variable(const std::string& name);
+
+    /// Variables
+    std::vector<Variable> vars_;
+      
+    /// Find of variable by name
+    std::map<std::string,int> varname_;
     
     /// Time
     SX t_;
