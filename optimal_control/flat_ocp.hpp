@@ -102,7 +102,7 @@ class FlatOCP : public OptionsFunctionality{
 
     //@{
     /// Variables
-    SXMatrix t() const;             /// Time
+    SX t() const;                   /// Time
     std::vector<Variable>& s();     /// Implicitly defined states
     std::vector<Variable>& x();     /// Differential states
     std::vector<Variable>& z();     /// Algebraic states
@@ -128,18 +128,11 @@ class FlatOCP : public OptionsFunctionality{
     /// Optimization
     std::vector<SX>& mterm();       /// Mayer terms in the objective
     std::vector<SX>& lterm();       /// Lagrange terms in the objective
-    double& t0();                  /// Interval start time
-    double& tf();                  /// Interval final time
+    double& t0();                   /// Interval start time
+    double& tf();                   /// Interval final time
     bool& t0_free();                /// Interval start time is free
     bool& tf_free();                /// Interval final time is free
     //@}
-
-    /// Initial time
-    double getStartTime() const;
-    
-    /// Final time
-    double getFinalTime() const;
-
 };
 
 #ifdef SWIG

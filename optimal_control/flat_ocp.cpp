@@ -62,15 +62,7 @@ void FlatOCP::makeAlgebraic(const std::string& name){
   (*this)->makeAlgebraic(variable(name));
 }
 
-double FlatOCP::getStartTime() const{ 
-  return (*this)->t0_;
-}
-
-double FlatOCP::getFinalTime() const{ 
-  return (*this)->tf_;
-}
-
-SXMatrix FlatOCP::t() const{
+SX FlatOCP::t() const{
   return (*this)->t_;
 }
 
