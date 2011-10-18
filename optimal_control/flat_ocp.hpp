@@ -50,10 +50,16 @@ class FlatOCPInternal;
   dependent equations:      y == dep(t,s,x,z,u,p)
   initial equations:        0 == ieq(t,s,sdot,x,z,u,p)
 
+  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "s" 
+  and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
+  reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
 
-  Usage skeleton (starting with an XML file):
+  The functions for reformulation is are provided as member functions to this class or as independent
+  functions located in the header file "ocp_tools.hpp".
+
+  Usage skeleton:
   
-  ** 1. Call constructor (pass an empty string ("") to start with an empty file
+  ** 1. Call constructor with an FMI conformant XML file or pass an empty string ("") to build up the OCP from scratch
   > FlatOCP ocp(xml_file_name)
   
   ** 2. Set options
@@ -65,8 +71,9 @@ class FlatOCPInternal;
   ** 4. Modify/add variables, equations, optimization
   > ...
   
-  ** 5. Export FMI XML (not implemented)
-  > ocp.exportFMI()
+  When the optimal control problem is in a suitable form, it is possible to either generate functions
+  for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
+  The latter functionality is not yet available.
 
   \date 2011
   \author Joel Andersson
