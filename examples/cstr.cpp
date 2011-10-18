@@ -99,7 +99,7 @@ int main(){
   impres_in[1+DAE_T] = t;
   impres_in[1+DAE_Y] = x;
   impres_in[1+DAE_P] = u;
-  SXFunction impres(impres_in,ocp->implicit_fcn_);
+  SXFunction impres(impres_in,ocp.dae());
   
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
@@ -113,7 +113,7 @@ int main(){
   dae_in[DAE_Y] = x;
   dae_in[DAE_YDOT] = xdot;
   dae_in[DAE_P] = u;
-  SXFunction dae(dae_in,ocp->implicit_fcn_);
+  SXFunction dae(dae_in,ocp.dae());
 
   bool use_kinsol = false;
   if(use_kinsol){

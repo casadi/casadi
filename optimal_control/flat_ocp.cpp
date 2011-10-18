@@ -94,12 +94,48 @@ std::vector<Variable>& FlatOCP::u(){
   return (*this)->u_;
 }
 
+std::vector<SX>& FlatOCP::dae(){
+  return (*this)->dae_;
+}
+    
+std::vector<SX>& FlatOCP::ode(){
+  return (*this)->ode_;
+}
+    
+std::vector<SX>& FlatOCP::alg(){
+  return (*this)->alg_;
+}
+    
+std::vector<SX>& FlatOCP::quad(){
+  return (*this)->quad_;
+}
+    
+std::vector<SX>& FlatOCP::dep(){
+  return (*this)->dep_;
+}
+    
+std::vector<SX>& FlatOCP::initial(){
+  return (*this)->initial_;
+}
+
 std::vector<SX>& FlatOCP::mterm(){
   return (*this)->mterm_;
 }
 
 std::vector<SX>& FlatOCP::lterm(){
   return (*this)->lterm_;
+}
+
+std::vector<SX>& FlatOCP::path(){
+  return (*this)->path_;
+}
+
+std::vector<double>& FlatOCP::path_min(){
+  return (*this)->path_min_;
+}
+
+std::vector<double>& FlatOCP::path_max(){
+  return (*this)->path_max_;
 }
 
 double& FlatOCP::t0(){

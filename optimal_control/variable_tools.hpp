@@ -33,6 +33,9 @@ namespace OptimalControl{
   /// Get a vector of derivative expressions from a vector of variables
   std::vector<SX> der(const std::vector<Variable> v);
 
+  /// Get a vector of highest order undetermined expression from a vector of variables
+  std::vector<SX> highest(const std::vector<Variable> v);
+
 #ifndef SWIG
   /// Call a member function for all members of a vector (note: fcn pointer to member function)
   std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal=false);

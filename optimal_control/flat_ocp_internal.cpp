@@ -257,7 +257,7 @@ void FlatOCPInternal::addDynamicEquations(){
 
     // Add the differential equation
     SX de_new = readExpr(dnode[0]);
-    implicit_fcn_.push_back(de_new);
+    dae_.push_back(de_new);
   }
 }
 
@@ -273,7 +273,7 @@ void FlatOCPInternal::addInitialEquations(){
 
     // Add the differential equations
     for(int i=0; i<inode.size(); ++i){
-      initial_eq_.push_back(readExpr(inode[i]));
+      initial_.push_back(readExpr(inode[i]));
     }
   }
 }
@@ -355,19 +355,19 @@ void FlatOCPInternal::addConstraints(const XMLNode& onode){
     if(constr_i.checkName("opt:ConstraintLeq")){
       SX ex = readExpr(constr_i[0]);
       SX ub = readExpr(constr_i[1]);
-      path_fcn_.push_back(ex-ub);
+      path_.push_back(ex-ub);
       path_min_.push_back(-numeric_limits<double>::infinity());
       path_max_.push_back(0.);
     } else if(constr_i.checkName("opt:ConstraintGeq")){
       SX ex = readExpr(constr_i[0]);
       SX lb = readExpr(constr_i[1]);
-      path_fcn_.push_back(ex-lb);
+      path_.push_back(ex-lb);
       path_min_.push_back(0.);
       path_max_.push_back(numeric_limits<double>::infinity());
     } else if(constr_i.checkName("opt:ConstraintEq")){
       SX ex = readExpr(constr_i[0]);
       SX eq = readExpr(constr_i[1]);
-      path_fcn_.push_back(ex-eq);
+      path_.push_back(ex-eq);
       path_min_.push_back(0.);
       path_max_.push_back(0.);
     } else {
@@ -492,13 +492,13 @@ void FlatOCPInternal::print(ostream &stream) const{
   
   // Print the differential-algebraic equation
   stream << "Dynamic equations" << endl;
-  for(vector<SX>::const_iterator it=implicit_fcn_.begin(); it!=implicit_fcn_.end(); it++){
+  for(vector<SX>::const_iterator it=dae_.begin(); it!=dae_.end(); it++){
     stream << "0 == "<< *it << endl;
   }
   stream << endl;
 
   stream << "Initial equations" << endl;
-  for(vector<SX>::const_iterator it=initial_eq_.begin(); it!=initial_eq_.end(); it++){
+  for(vector<SX>::const_iterator it=initial_.begin(); it!=initial_.end(); it++){
     stream << "0 == " << *it << endl;
   }
   stream << endl;
@@ -532,8 +532,8 @@ void FlatOCPInternal::print(ostream &stream) const{
   
   // Constraint functions
   stream << "Constraint functions" << endl;
-  for(int i=0; i<path_fcn_.size(); ++i)
-    stream << path_min_[i] << " <= " << path_fcn_[i] << " <= " << path_max_[i] << endl;
+  for(int i=0; i<path_.size(); ++i)
+    stream << path_min_[i] << " <= " << path_[i] << " <= " << path_max_[i] << endl;
   stream << endl;
   
   // Constraint functions
@@ -550,9 +550,9 @@ void FlatOCPInternal::eliminateDependent(){
   Matrix<SX> v = explicit_var_;
   Matrix<SX> v_old = explicit_fcn_;
   
-  implicit_fcn_= substitute(implicit_fcn_,v,v_old).data();
-  initial_eq_= substitute(initial_eq_,v,v_old).data();
-  path_fcn_    = substitute(path_fcn_,v,v_old).data();
+  dae_= substitute(dae_,v,v_old).data();
+  initial_= substitute(initial_,v,v_old).data();
+  path_    = substitute(path_,v,v_old).data();
   mterm_   = substitute(mterm_,v,v_old).data();
   lterm_   = substitute(lterm_,v,v_old).data();
   eliminated_dependents_ = true;
@@ -586,6 +586,7 @@ void FlatOCPInternal::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX
 
 void FlatOCPInternal::sortType(){
   // Clear variables
+  s_.clear();
   x_.clear();
   z_.clear();
   u_.clear();
@@ -595,13 +596,6 @@ void FlatOCPInternal::sortType(){
   // Mark all dependent variables
   for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
     it->setTemp(1);
-  }
-  
-  // Get implicit variables
-  bool find_implicit = implicit_var_.size() != implicit_fcn_.size();
-  if(find_implicit){
-    implicit_var_.clear();
-    implicit_var_.reserve(implicit_fcn_.size());
   }
   
   // Loop over variables
@@ -617,15 +611,7 @@ void FlatOCPInternal::sortType(){
         }
       } else if(it->getVariability() == CONTINUOUS) {
         if(it->getCausality() == INTERNAL){
-          if(it->isDifferential()){
-            x_.push_back(*it);
-          } else {
-            z_.push_back(*it);
-          }
-          
-          // Add to list of implicit variables
-          if(find_implicit) implicit_var_.push_back(it->highest());
-
+          s_.push_back(*it);
         } else if(it->getCausality() == INPUT){
           u_.push_back(*it);
         }
@@ -637,17 +623,19 @@ void FlatOCPInternal::sortType(){
     }
   }
 
+  // Loop over variables
+  for(vector<Variable>::iterator it=s_.begin(); it!=s_.end(); ++it){
+    if(it->isDifferential()){
+      x_.push_back(*it);
+    } else {
+      z_.push_back(*it);
+    }
+  }
+
   // Unmark all dependent variables
   for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
     it->setTemp(0);
   }
-  
-  // Assert consistent number of equations and variables
-/*  cout << implicit_var_ << endl;
-  cout << implicit_fcn_ << endl;
-  cout << implicit_var_.size() << endl;
-  cout << implicit_fcn_.size() << endl;*/
-  casadi_assert(implicit_var_.size() == implicit_fcn_.size());
 }
 
 
@@ -697,9 +685,9 @@ void FlatOCPInternal::scaleVariables(){
 
   // Substitute equations
   explicit_fcn_= substitute(explicit_fcn_,v,v_old).data();
-  implicit_fcn_= substitute(implicit_fcn_,v,v_old).data();
-  initial_eq_= substitute(initial_eq_,v,v_old).data();
-  path_fcn_    = substitute(path_fcn_,v,v_old).data();
+  dae_= substitute(dae_,v,v_old).data();
+  initial_= substitute(initial_,v,v_old).data();
+  path_    = substitute(path_,v,v_old).data();
   mterm_   = substitute(mterm_,v,v_old).data();
   lterm_   = substitute(lterm_,v,v_old).data();
   
@@ -721,7 +709,7 @@ void FlatOCPInternal::scaleEquations(){
   casadi_assert(scaled_variables_);
   
   // Quick return if no implicit equations
-  if(implicit_fcn_.empty())
+  if(dae_.empty())
     return;
 
   cout << "Scaling equations ..." << endl;
@@ -743,7 +731,7 @@ void FlatOCPInternal::scaleEquations(){
   append(xz,v[Z]);
   append(xz,v[P]);
   append(xz,v[U]);
-  SXFunction fcn = SXFunction(xz,implicit_fcn_);
+  SXFunction fcn = SXFunction(xz,dae_);
   SXFunction J(v,fcn.jac());
 
   // Evaluate the Jacobian in the starting point
@@ -773,14 +761,14 @@ void FlatOCPInternal::scaleEquations(){
     
     // Make sure 
     if(scale[i]==0){
-      cout << "Warning: Could not generate a scaling factor for equation " << i << "(0 == " << implicit_fcn_[i] << "), selecting 1." << endl;
+      cout << "Warning: Could not generate a scaling factor for equation " << i << "(0 == " << dae_[i] << "), selecting 1." << endl;
       scale[i]=1.;
     }
   }
   
   // Scale the equations
-  for(int i=0; i<implicit_fcn_.size(); ++i){
-    implicit_fcn_[i] /= scale[i];
+  for(int i=0; i<dae_.size(); ++i){
+    dae_[i] /= scale[i];
   }
   
   double time2 = clock();
@@ -801,15 +789,15 @@ void FlatOCPInternal::sortBLT(bool with_x){
     SX invtau("invtau");
 
     // Replace x with invtau*xdot in order to get a Jacobian which also includes x
-    SXMatrix implicit_fcn_with_x = substitute(implicit_var_,var(x_),invtau*SXMatrix(var(x_)));
+    SXMatrix dae_with_x = substitute(highest(s_),var(x_),invtau*SXMatrix(var(x_)));
     
     // Create Jacobian in order to find the sparsity
-    SXFunction fcn(implicit_var_,implicit_fcn_with_x);
+    SXFunction fcn(highest(s_),dae_with_x);
     Matrix<SX> J = fcn.jac();
     sp = J.sparsity();
   } else {
     // Create Jacobian in order to find the sparsity
-    SXFunction fcn(implicit_var_,implicit_fcn_);
+    SXFunction fcn(highest(s_),dae_);
     Matrix<SX> J = fcn.jac();
     sp = J.sparsity();
   }
@@ -826,18 +814,18 @@ void FlatOCPInternal::sortBLT(bool with_x){
   blt_nb = sp.dulmageMendelsohn(blt_rowperm,blt_colperm,blt_rowblock,blt_colblock,blt_coarse_rowblock,blt_coarse_colblock);
 
   // Permute equations
-  vector<SX> implicit_fcn_new(implicit_fcn_.size());
-  for(int i=0; i<implicit_fcn_.size(); ++i){
-    implicit_fcn_new[i] = implicit_fcn_[blt_rowperm[i]];
+  vector<SX> dae_new(dae_.size());
+  for(int i=0; i<dae_.size(); ++i){
+    dae_new[i] = dae_[blt_rowperm[i]];
   }
-  implicit_fcn_new.swap(implicit_fcn_);
+  dae_new.swap(dae_);
   
   // Permute variables
-  vector<SX> implicit_var_new(implicit_var_.size());
-  for(int i=0; i<implicit_var_.size(); ++i){
-    implicit_var_new[i]= implicit_var_[blt_colperm[i]];
+  vector<Variable> s_new(s_.size());
+  for(int i=0; i<s_.size(); ++i){
+    s_new[i]= s_[blt_colperm[i]];
   }
-  implicit_var_new.swap(implicit_var_);
+  s_new.swap(s_);
   
   // Save blocks
   rowblock_ = blt_rowblock;
@@ -858,26 +846,15 @@ void FlatOCPInternal::makeExplicit(){
   double time1 = clock();
   
   // Create Jacobian
-  SXFunction fcn(implicit_var_,implicit_fcn_);
+  SXFunction fcn(highest(s_),dae_);
   SXMatrix J = fcn.jac();
 
-  // Mark the algebraic variables
-  for(int i=0; i<z_.size(); ++i){
-    z_[i].var().setTemp(i+1);
-  }
-  
   // Get initial values for all implicit variables
-  vector<double> implicit_var_guess(implicit_var_.size(),0);
-  for(int i=0; i<implicit_var_.size(); ++i){
-    int ind = implicit_var_[i].getTemp()-1;
-    if(ind>=0){
-      implicit_var_guess[i] = z_[ind].getStart()/z_[ind].getNominal();
+  vector<double> s_guess(s_.size(),0);
+  for(int i=0; i<s_.size(); ++i){
+    if(s_[i].isDifferential()){
+      s_guess[i] = s_[i].getStart()/s_[i].getNominal();
     }
-  }
-  
-  // Unmark the algebraic variables
-  for(int i=0; i<z_.size(); ++i){
-    z_[i].var().setTemp(0);
   }
   
   // Block variables and equations
@@ -887,7 +864,8 @@ void FlatOCPInternal::makeExplicit(){
   int old_nexp = explicit_var_.size();
 
   // New implicit equation and variables
-  vector<SX> implicit_var_new, implicit_fcn_new;
+  vector<SX> dae_new;
+  vector<Variable> s_new;
     
   // Loop over blocks
   for(int b=0; b<nb_; ++b){
@@ -895,17 +873,15 @@ void FlatOCPInternal::makeExplicit(){
     // Block size
     int bs = rowblock_[b+1] - rowblock_[b];
     
-/*    cout << "block " << b << ": size = " << bs << endl;*/
-    
     // Get local variables
     vb.clear();
     for(int i=colblock_[b]; i<colblock_[b+1]; ++i)
-      vb.push_back(implicit_var_[i]);
+      vb.push_back(s_[i].var());
 
     // Get local equations
     fb.clear();
     for(int i=rowblock_[b]; i<rowblock_[b+1]; ++i)
-      fb.push_back(implicit_fcn_[i]);
+      fb.push_back(dae_[i]);
 
     // Get local Jacobian
     SXMatrix Jb = J(range(rowblock_[b],rowblock_[b+1]),range(colblock_[b],colblock_[b+1]));
@@ -915,7 +891,7 @@ void FlatOCPInternal::makeExplicit(){
       SXMatrix x_k(vb.size(),1,0);
       int offset = rowblock_[b];
       for(int i=0; i<x_k.size(); ++i){
-        x_k.at(i) = implicit_var_guess[offset+i];
+        x_k.at(i) = s_guess[offset+i];
       }
       
       // Make Newton iterations
@@ -986,7 +962,7 @@ void FlatOCPInternal::makeExplicit(){
                   
       // Cannot solve for vb, add to list of implicit equations
 //      implicit_var_new.insert(implicit_var_new.end(),vb.begin(),vb.end());
-//      implicit_fcn_new.insert(implicit_fcn_new.end(),fb.begin(),fb.end());
+//      dae_new.insert(dae_new.end(),fb.begin(),fb.end());
       
 //      cout << "added " << fb << " and " << vb << " to list of implicit equations (" << vb.size() << " equations)" << endl;
       
@@ -1011,8 +987,8 @@ void FlatOCPInternal::makeExplicit(){
   }
 
   // Update implicit equations
-  implicit_var_new.swap(implicit_var_);
-  implicit_fcn_new.swap(implicit_fcn_);
+  s_new.swap(s_);
+  dae_new.swap(dae_);
 
   // Mark the variables made explicit
   for(vector<SX>::iterator it=explicit_var_.begin()+old_nexp; it!=explicit_var_.end(); ++it){
@@ -1031,7 +1007,7 @@ void FlatOCPInternal::makeExplicit(){
       
       // If upper or lower bounds are finite, add path constraint
       if(!isinf(it->getMin()) || !isinf(it->getMax())){
-        path_fcn_.push_back(it->var());
+        path_.push_back(it->var());
         path_min_.push_back(it->getMin()/it->getNominal());
         path_max_.push_back(it->getMax()/it->getNominal());
       }
@@ -1072,7 +1048,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
     makeExplicit();
     
     // The equation could be made explicit symbolically
-    if(implicit_fcn_.empty()){
+    if(dae_.empty()){
       casadi_assert(z_.empty());
       
       // Mark the explicit variables
@@ -1126,7 +1102,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
       }
       
     } else {
-      cout << implicit_fcn_.size() << " implicit equations" << endl;
+      cout << dae_.size() << " implicit equations" << endl;
       
       
     // A Newton algorithm is necessary
@@ -1138,7 +1114,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
 //     impres_in[1+DAE_T] = t
 //     impres_in[1+DAE_Y] = x
 //     impres_in[1+DAE_P] = u
-//     impres = SXFunction(impres_in,[ocp.implicit_fcn_])
+//     impres = SXFunction(impres_in,[ocp.dae_])
 //     impres.setOption("number_of_fwd_dir",len(x)+1)
 // 
 //     impres.init()
@@ -1208,7 +1184,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
     dae_in[DAE_P] = var(u_);
     
     // DAE residual
-    daeres_ = SXFunction(dae_in,implicit_fcn_);
+    daeres_ = SXFunction(dae_in,dae_);
 
     // DAE quadrature function
     if(create_quad){
@@ -1236,7 +1212,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
   cfcn_in[DAE_YDOT] = xzdot;
   append(cfcn_in[DAE_Y],symbolic("lterm")); // FIXME
   cfcn_in[DAE_P] = var(u_);
-  pathfcn_ = SXFunction(cfcn_in,path_fcn_);
+  pathfcn_ = SXFunction(cfcn_in,path_);
     
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
@@ -1324,15 +1300,8 @@ void FlatOCPInternal::makeAlgebraic(const Variable& v){
       x_.erase(it);
 
       // Replace xdot with x (z) in the list of implicitly defined variables
-      for(vector<SX>::iterator jt=implicit_var_.begin(); jt!=implicit_var_.end(); ++jt){
-        if(jt->get()==v.der().get()){
-          *jt = v.var();
-          return;
-        }
-      }
-
-      // Error if this point reached
-      throw CasadiException("variable could not be found in list of implicitly defined variables");
+      it->setDerivative(SX());
+      return;
     }
   }
   

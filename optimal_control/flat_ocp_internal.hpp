@@ -85,6 +85,9 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Parsed XML document
     XMLNode document_;
 
+    /// Time
+    SX t_;
+
     /// States (implicitly defined)
     std::vector<Variable> s_;
 
@@ -106,6 +109,24 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Dependent variables
     std::vector<Variable> y_;
 
+    /// fully implicit DAE
+    std::vector<SX> dae_;
+    
+    /// explicit OD
+    std::vector<SX> ode_;
+    
+    /// quadratures
+    std::vector<SX> quad_;
+    
+    /// algebraic equations
+    std::vector<SX> alg_;
+    
+    /// dependent equations
+    std::vector<SX> dep_;
+    
+    /// initial equations
+    std::vector<SX> initial_;
+    
     /// Filename
     std::string filename_;
     
@@ -157,21 +178,10 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Find of variable by name
     std::map<std::string,int> varname_;
     
-    /// Time
-    SX t_;
-
     /// Explicit equations
     std::vector<SX> explicit_var_, explicit_fcn_;
     
-    /// Implicit equations
-    std::vector<SX> implicit_var_, implicit_fcn_;
-    
-    /// Initial equations
-    std::vector<SX> initial_eq_;
-
-    /// Constraint function with upper and lower bounds
-    std::vector<SX> path_fcn_;
-    std::vector<double> path_min_, path_max_;
+    /// Constraint function
     FX pathfcn_;
 
     /// Mayer objective terms
@@ -179,6 +189,12 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
 
     /// Lagrange objective terms
     std::vector<SX> lterm_;
+
+    /// Path constraints
+    std::vector<SX> path_;
+
+    /// Path constraints upper and lower bounds
+    std::vector<double> path_min_, path_max_;
     
     /// Initial time
     double t0_;

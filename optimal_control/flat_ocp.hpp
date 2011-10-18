@@ -32,52 +32,56 @@ namespace OptimalControl{
 class FlatOCPInternal;
 
 /** \brief A flat OCP representation coupled to an XML file
-*
-*  <H3>Variables:  </H3>
-*    \f$ t \f$:     time <BR>
-*    \f$ s \f$:     implicitly defined states (differential or algebraic) <BR>
-*   \f$ x \f$:     differential states <BR>
-*    \f$ z \f$:     algebraic states <BR>
-*    \f$ q \f$:     quadrature states <BR>
-*    \f$ y \f$:     dependent variables <BR>
-*    \f$ p \f$:     independent parameters <BR>
-*    \f$ u \f$:     control signals <BR>
-*  
-*  <H3>Equations:  </H3>
-*  fully implicit DAE: \f$ 0 = \text{dae}(t,s,\dot{s},x,z,u,p)  \f$  <BR>
-*  explicit ODE:        \f$  \dot{x} = \text{ode}(t,s,x,z,u,p)       \f$ <BR>
-*  quadratures:         \f$  \dot{q} = \text{qua}(t,s,x,z,u,p)       \f$ <BR>
-*  algebraic equations: \f$     0 = \text{alg}(t,s,x,z,u,p)       \f$ <BR>
-*  dependent equations: \f$     y = \text{dep}(t,s,x,z,u,p)       \f$ <BR>
-*  initial equations:   \f$     0 = \text{ieq}(t,s,\dot{s},x,z,u,p)  \f$ <BR>
-*
-*  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "s" 
-*  and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
-*  reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
-*
-*  The functions for reformulation is are provided as member functions to this class or as independent
-*  functions located in the header file "ocp_tools.hpp".
-*
-*  <H3>Usage skeleton:</H3>
-*  
-*  1. Call constructor with an FMI conformant XML file or pass an empty string ("") to build up the OCP from scratch <BR>
-*  > FlatOCP ocp(xml_file_name)
-*  
-*  2. Set options <BR>
-*  > ocp.setOption(...,...)
-*
-*  3. Initialize and parse XML <BR>
-*  > ocp.init()
-*
-*  4. Modify/add variables, equations, optimization <BR>
-*  > ...
-*  
-*  When the optimal control problem is in a suitable form, it is possible to either generate functions
-*  for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
-*  The latter functionality is not yet available.
-*
-*  \date 2011
-*  \author Joel Andersson
+
+ <H3>Variables:  </H3>
+  \verbatim
+   t :     time
+   s :     implicitly defined states (differential or algebraic)
+   x :     differential states
+   z :     algebraic states
+   q :     quadrature states
+   y :     dependent variables
+   p :     independent parameters
+   u :     control signals
+  \endverbatim 
+  
+  <H3>Equations:  </H3>
+  \verbatim
+  fully implicit DAE:       0 = dae(t,s,sdot,x,z,u,p)
+  explicit OD:           xdot = ode(t,s,x,z,u,p)
+  quadratures:           qdot = quad(t,s,x,z,u,p)
+  algebraic equations:      0 = alg(t,s,x,z,u,p)
+  dependent equations:      y = dep(t,s,x,z,u,p)
+  initial equations:        0 = initial(t,s,\dot{s},x,z,u,p)
+  \endverbatim 
+
+  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "s" 
+  and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
+  reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
+
+  The functions for reformulation is are provided as member functions to this class or as independent
+  functions located in the header file "ocp_tools.hpp".
+
+  <H3>Usage skeleton:</H3>
+  
+  1. Call constructor with an FMI conformant XML file or pass an empty string ("") to build up the OCP from scratch <BR>
+  > FlatOCP ocp(xml_file_name)
+  
+  2. Set options <BR>
+  > ocp.setOption(...,...)
+
+  3. Initialize and parse XML <BR>
+  > ocp.init()
+
+  4. Modify/add variables, equations, optimization <BR>
+  > ...
+  
+  When the optimal control problem is in a suitable form, it is possible to either generate functions
+  for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
+  The latter functionality is not yet available.
+
+  \date 2011
+  \author Joel Andersson
 */
 class FlatOCP : public OptionsFunctionality{
   public:
@@ -137,7 +141,6 @@ class FlatOCP : public OptionsFunctionality{
     std::vector<Variable>& u();
     //@}
     
-    #if 0
     /** @name Equations
     *  Get all equations of a particular type 
     */
@@ -152,15 +155,14 @@ class FlatOCP : public OptionsFunctionality{
     std::vector<SX>& alg();
     
     /// Quadrature states (length == q().size())
-    std::vector<SX>& qua();
+    std::vector<SX>& quad();
     
     /// Dependent equations (length == y().size())
     std::vector<SX>& dep();
     
     /// Initial equations (remove?)
-    std::vector<SX>& ieq();
+    std::vector<SX>& initial();
     //@}
-    #endif
 
     /** @name Optimization
     *  Formulate the dynamic optimization problem. Note that the variable bounds are located inside
@@ -172,7 +174,16 @@ class FlatOCP : public OptionsFunctionality{
     
     /// Lagrange terms in the objective
     std::vector<SX>& lterm();
+
+    /// Path constraint functions
+    std::vector<SX>& path();
     
+    /// Path constraint functions upper bounds
+    std::vector<double>& path_min();
+
+    /// Path constraint functions upper bounds
+    std::vector<double>& path_max();
+
     /// Interval start time
     double& t0();
     
