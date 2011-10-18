@@ -65,36 +65,36 @@ int main(){
 /*  ocp.variables("u").setStart(280);
   ocp.variables("u").setMin(230);
   ocp.variables("u").setMax(370);*/
-  ocp->u_[0].setStart(280);
-  ocp->u_[0].setMin(230);
-  ocp->u_[0].setMax(370);
+  ocp.u()[0].setStart(280);
+  ocp.u()[0].setMin(230);
+  ocp.u()[0].setMax(370);
   
   // Correct bound on state
-  ocp->x_[1].setMax(350);
+  ocp.x()[1].setMax(350);
   
   // Variables
-  SX t = ocp->t_;
-  Matrix<SX> x = var(ocp->x_);
-  Matrix<SX> xdot = der(ocp->x_);
-  casadi_assert(ocp->z_.empty());
-  Matrix<SX> p = var(ocp->p_);
-  Matrix<SX> u = var(ocp->u_);
+  SXMatrix t = ocp.t();
+  SXMatrix x = var(ocp.x());
+  SXMatrix xdot = der(ocp.x());
+  casadi_assert(ocp.z().empty());
+  SXMatrix p = var(ocp.p());
+  SXMatrix u = var(ocp.u());
 
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp->x_,true);
-  vector<double> xmin = getMin(ocp->x_,true);
-  vector<double> xmax = getMax(ocp->x_,true);
+  vector<double> x0 = getStart(ocp.x(),true);
+  vector<double> xmin = getMin(ocp.x(),true);
+  vector<double> xmax = getMax(ocp.x(),true);
   
   // Initial guess and bounds for the control
-  vector<double> u0 = getStart(ocp->u_,true);
-  vector<double> umin = getMin(ocp->u_,true);
-  vector<double> umax = getMax(ocp->u_,true);
+  vector<double> u0 = getStart(ocp.u(),true);
+  vector<double> umin = getMin(ocp.u(),true);
+  vector<double> umax = getMax(ocp.u(),true);
   
   // Integrator instance
   Integrator integrator;
 
   // Create an implicit function residual
-  vector<Matrix<SX> > impres_in(DAE_NUM_IN+1);
+  vector<SXMatrix > impres_in(DAE_NUM_IN+1);
   impres_in[0] = xdot;
   impres_in[1+DAE_T] = t;
   impres_in[1+DAE_Y] = x;
@@ -108,7 +108,7 @@ int main(){
   ode.init();
   
   // DAE residual
-  vector<Matrix<SX> > dae_in(DAE_NUM_IN);
+  vector<SXMatrix > dae_in(DAE_NUM_IN);
   dae_in[DAE_T] = t;
   dae_in[DAE_Y] = x;
   dae_in[DAE_YDOT] = xdot;
@@ -142,7 +142,7 @@ int main(){
   integrator.init();
 
   // Mayer objective function
-  Matrix<SX> xf = symbolic("xf",x.size(),1);
+  SXMatrix xf = symbolic("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
   mterm.setOption("store_jacobians",true);
   

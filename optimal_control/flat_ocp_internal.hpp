@@ -91,6 +91,9 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Algebraic states
     std::vector<Variable> z_;
 
+    /// Quadrature states
+    std::vector<Variable> q_;
+
     /// Controls
     std::vector<Variable> u_;
         

@@ -36,6 +36,7 @@ class FlatOCPInternal;
   t:     time
   x:     differential states
   z:     algebraic states
+  q:     quadrature states
   y:     dependent variables
   p:     independent parameters
   u:     control signals
@@ -100,27 +101,27 @@ class FlatOCP : public OptionsFunctionality{
     virtual bool checkNode() const;
 
     //@{
-    /// Get model equations
-
-    /// Get fully implicit DAE
-//    SXMatrix dae() const;
-  
-    /// Get explicit ODE
-//    SXMatrix ode() const;
-    
-    /// Get quadrature states
-//    SXMatrix qua() const;
-    
-    /// Get algebraic equations
-//    SXMatrix alg() const;
-    
-    /// Get dependent equations
-//    SXMatrix dep() const;
-    
-    /// Get initial equations
-//    SXMatrix ieq() const;
-    
+    /// Get variables
+    SXMatrix t() const;             /// time
+    std::vector<Variable>& x();     /// differential states
+    std::vector<Variable>& z();     /// algebraic states
+    std::vector<Variable>& q();     /// quadrature states
+    std::vector<Variable>& y();     /// dependent variables
+    std::vector<Variable>& p();     /// independent parameters
+    std::vector<Variable>& u();     /// control signals
     //@}
+    
+    #if 0
+    //@{
+    /// Get model equations
+    std::vector<SX>& dae();         /// Get fully implicit DAE
+    std::vector<SX>& ode();         /// Get explicit ODE
+    std::vector<SX>& qua();         /// Get quadrature states
+    std::vector<SX>& alg();         /// Get algebraic equations
+    std::vector<SX>& dep();         /// Get dependent equations
+    std::vector<SX>& ieq();         /// Get initial equations
+    //@}
+    #endif
 
     /// Initial time
     double getStartTime() const;

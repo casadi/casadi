@@ -21,6 +21,7 @@
  */
 
 #include "flat_ocp_internal.hpp"
+#include "variable_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -67,6 +68,34 @@ double FlatOCP::getStartTime() const{
 
 double FlatOCP::getFinalTime() const{ 
   return (*this)->tf_;
+}
+
+SXMatrix FlatOCP::t() const{
+  return (*this)->t_;
+}
+
+std::vector<Variable>& FlatOCP::x(){
+  return (*this)->x_;
+}
+
+std::vector<Variable>& FlatOCP::z(){
+  return (*this)->z_;
+}
+
+std::vector<Variable>& FlatOCP::q(){
+  return (*this)->q_;
+}
+
+std::vector<Variable>& FlatOCP::y(){
+  return (*this)->y_;
+}
+
+std::vector<Variable>& FlatOCP::p(){
+  return (*this)->p_;
+}
+
+std::vector<Variable>& FlatOCP::u(){
+  return (*this)->u_;
 }
 
 
