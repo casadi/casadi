@@ -78,6 +78,10 @@ std::vector<Variable>& FlatOCP::x(){
   return (*this)->x_;
 }
 
+std::vector<Variable>& FlatOCP::s(){
+  return (*this)->s_;
+}
+
 std::vector<Variable>& FlatOCP::z(){
   return (*this)->z_;
 }

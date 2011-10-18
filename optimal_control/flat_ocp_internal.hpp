@@ -85,7 +85,10 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Parsed XML document
     XMLNode document_;
 
-    /// States
+    /// States (implicitly defined)
+    std::vector<Variable> s_;
+
+    /// Differential states
     std::vector<Variable> x_;
 
     /// Algebraic states

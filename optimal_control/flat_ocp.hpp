@@ -34,21 +34,21 @@ class FlatOCPInternal;
 /** \brief A flat OCP representation coupled to an XML file
   Variables:
   t:     time
+  s:     implicitly defined states (differential or algebraic)
   x:     differential states
   z:     algebraic states
   q:     quadrature states
   y:     dependent variables
   p:     independent parameters
   u:     control signals
-  xdot:  state derivatives
   
   Equations
-  fully implicit DAE:       0 == dae(t,x,xdot,z,u,p)
-  explicit ODE:          xdot == ode(t,x,z,u,p)
-  quadratures:           qdot == qua(t,x,z,u,p)
-  algebraic equations:      0 == alg(t,x,z,u,p)
-  dependent equations:      y == dep(t,x,z,u,p)
-  initial equations:        0 == ieq(t,x,xdot,z,u,p)
+  fully implicit DAE:       0 == dae(t,s,sdot,x,z,u,p)
+  explicit ODE:          xdot == ode(t,s,x,z,u,p)
+  quadratures:           qdot == qua(t,s,x,z,u,p)
+  algebraic equations:      0 == alg(t,s,x,z,u,p)
+  dependent equations:      y == dep(t,s,x,z,u,p)
+  initial equations:        0 == ieq(t,s,sdot,x,z,u,p)
 
 
   Usage skeleton (starting with an XML file):
@@ -101,25 +101,26 @@ class FlatOCP : public OptionsFunctionality{
     virtual bool checkNode() const;
 
     //@{
-    /// Get variables
-    SXMatrix t() const;             /// time
-    std::vector<Variable>& x();     /// differential states
-    std::vector<Variable>& z();     /// algebraic states
-    std::vector<Variable>& q();     /// quadrature states
-    std::vector<Variable>& y();     /// dependent variables
-    std::vector<Variable>& p();     /// independent parameters
-    std::vector<Variable>& u();     /// control signals
+    /// Access variables
+    SXMatrix t() const;             /// Time
+    std::vector<Variable>& s();     /// Implicitly defined states
+    std::vector<Variable>& x();     /// Differential states
+    std::vector<Variable>& z();     /// Algebraic states
+    std::vector<Variable>& q();     /// Quadrature states
+    std::vector<Variable>& y();     /// Dependent variables
+    std::vector<Variable>& p();     /// Independent parameters
+    std::vector<Variable>& u();     /// Control signals
     //@}
     
     #if 0
     //@{
-    /// Get model equations
-    std::vector<SX>& dae();         /// Get fully implicit DAE
-    std::vector<SX>& ode();         /// Get explicit ODE
-    std::vector<SX>& qua();         /// Get quadrature states
-    std::vector<SX>& alg();         /// Get algebraic equations
-    std::vector<SX>& dep();         /// Get dependent equations
-    std::vector<SX>& ieq();         /// Get initial equations
+    /// Access model equations
+    std::vector<SX>& dae();         /// Fully implicit DAE (length == s().size())
+    std::vector<SX>& ode();         /// Explicit ODE  (length == x().size())
+    std::vector<SX>& alg();         /// Algebraic equations (length == z().size())
+    std::vector<SX>& qua();         /// Quadrature states (length == q().size())
+    std::vector<SX>& dep();         /// Dependent equations (length == y().size())
+    std::vector<SX>& ieq();         /// Initial equations (remove?)
     //@}
     #endif
 
