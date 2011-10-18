@@ -175,10 +175,10 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     FX pathfcn_;
 
     /// Mayer objective terms
-    std::vector<SX> mterm;
+    std::vector<SX> mterm_;
 
     /// Lagrange objective terms
-    std::vector<SX> lterm;
+    std::vector<SX> lterm_;
     
     /// Initial time
     double t0_;

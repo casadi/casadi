@@ -327,7 +327,7 @@ void FlatOCPInternal::addObjectiveFunction(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
     SX v = readExpr(var);
-    mterm.push_back(v);
+    mterm_.push_back(v);
   }
 }
 
@@ -335,7 +335,7 @@ void FlatOCPInternal::addIntegrandObjectiveFunction(const XMLNode& onode){
   for(int i=0; i<onode.size(); ++i){
     const XMLNode& var = onode[i];
     SX v = readExpr(var);
-    lterm.push_back(v);
+    lterm_.push_back(v);
   }
 }
 
@@ -520,14 +520,14 @@ void FlatOCPInternal::print(ostream &stream) const{
 
   // Mayer terms
   stream << "Mayer objective terms" << endl;
-  for(int i=0; i<mterm.size(); ++i)
-    stream << mterm[i] << endl;
+  for(int i=0; i<mterm_.size(); ++i)
+    stream << mterm_[i] << endl;
   stream << endl;
   
   // Lagrange terms
   stream << "Lagrange objective terms" << endl;
-  for(int i=0; i<lterm.size(); ++i)
-    stream << lterm[i] << endl;
+  for(int i=0; i<lterm_.size(); ++i)
+    stream << lterm_[i] << endl;
   stream << endl;
   
   // Constraint functions
@@ -553,8 +553,8 @@ void FlatOCPInternal::eliminateDependent(){
   implicit_fcn_= substitute(implicit_fcn_,v,v_old).data();
   initial_eq_= substitute(initial_eq_,v,v_old).data();
   path_fcn_    = substitute(path_fcn_,v,v_old).data();
-  mterm   = substitute(mterm,v,v_old).data();
-  lterm   = substitute(lterm,v,v_old).data();
+  mterm_   = substitute(mterm_,v,v_old).data();
+  lterm_   = substitute(lterm_,v,v_old).data();
   eliminated_dependents_ = true;
 
   double time2 = clock();
@@ -700,8 +700,8 @@ void FlatOCPInternal::scaleVariables(){
   implicit_fcn_= substitute(implicit_fcn_,v,v_old).data();
   initial_eq_= substitute(initial_eq_,v,v_old).data();
   path_fcn_    = substitute(path_fcn_,v,v_old).data();
-  mterm   = substitute(mterm,v,v_old).data();
-  lterm   = substitute(lterm,v,v_old).data();
+  mterm_   = substitute(mterm_,v,v_old).data();
+  lterm_   = substitute(lterm_,v,v_old).data();
   
   scaled_variables_ = true;
   double time2 = clock();
@@ -1062,7 +1062,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
   double time1 = clock();
 
   // no quad if no quadrature states
-  if(lterm.empty()) create_quad=false;
+  if(lterm_.empty()) create_quad=false;
 
   if(create_ode){
     // Create an explicit ODE
@@ -1117,11 +1117,11 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
       
       // ODE quadrature function
       if(create_quad){
-        quadrhs_ = SXFunction(ode_in,lterm[0]);
+        quadrhs_ = SXFunction(ode_in,lterm_[0]);
         
         // ODE right hand side with lterm
         append(ode_in[DAE_Y],symbolic("lterm"));
-        append(ode_elim,SXMatrix(lterm[0]));
+        append(ode_elim,SXMatrix(lterm_[0]));
         oderhs_with_lterm_ = SXFunction(ode_in,ode_elim);
       }
       
@@ -1212,7 +1212,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
 
     // DAE quadrature function
     if(create_quad){
-      quadrhs_ = SXFunction(dae_in,lterm[0]/1e3);
+      quadrhs_ = SXFunction(dae_in,lterm_[0]/1e3);
     }
   }
 
@@ -1226,7 +1226,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
   SXMatrix xzdot = vertcat(SXMatrix(der(x_)),zdot);
   
   // Mayer objective function
-  SXMatrix xf = symbolic("xf",x_.size()+lterm.size(),1);
+  SXMatrix xf = symbolic("xf",x_.size()+lterm_.size(),1);
   costfcn_ = SXFunction(xf, xf.data().back());
 
   // Path constraint function

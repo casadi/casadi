@@ -102,7 +102,29 @@ std::vector<Variable>& FlatOCP::u(){
   return (*this)->u_;
 }
 
+std::vector<SX>& FlatOCP::mterm(){
+  return (*this)->mterm_;
+}
 
+std::vector<SX>& FlatOCP::lterm(){
+  return (*this)->lterm_;
+}
+
+double& FlatOCP::t0(){
+  return (*this)->t0_;
+}
+
+bool& FlatOCP::t0_free(){
+  return (*this)->t0_free_;
+}
+
+double& FlatOCP::tf(){
+  return (*this)->tf_;
+}
+
+bool& FlatOCP::tf_free(){
+  return (*this)->tf_free_;
+}
 
 } // namespace OptimalControl
 } // namespace CasADi

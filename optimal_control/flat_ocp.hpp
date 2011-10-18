@@ -101,7 +101,7 @@ class FlatOCP : public OptionsFunctionality{
     virtual bool checkNode() const;
 
     //@{
-    /// Access variables
+    /// Variables
     SXMatrix t() const;             /// Time
     std::vector<Variable>& s();     /// Implicitly defined states
     std::vector<Variable>& x();     /// Differential states
@@ -114,7 +114,7 @@ class FlatOCP : public OptionsFunctionality{
     
     #if 0
     //@{
-    /// Access model equations
+    /// Model equations
     std::vector<SX>& dae();         /// Fully implicit DAE (length == s().size())
     std::vector<SX>& ode();         /// Explicit ODE  (length == x().size())
     std::vector<SX>& alg();         /// Algebraic equations (length == z().size())
@@ -123,6 +123,16 @@ class FlatOCP : public OptionsFunctionality{
     std::vector<SX>& ieq();         /// Initial equations (remove?)
     //@}
     #endif
+
+    //@{
+    /// Optimization
+    std::vector<SX>& mterm();       /// Mayer terms in the objective
+    std::vector<SX>& lterm();       /// Lagrange terms in the objective
+    double& t0();                  /// Interval start time
+    double& tf();                  /// Interval final time
+    bool& t0_free();                /// Interval start time is free
+    bool& tf_free();                /// Interval final time is free
+    //@}
 
     /// Initial time
     double getStartTime() const;
