@@ -106,10 +106,7 @@ void FlatOCPInternal::parse(){
   
   binary_["Pow"]  = pow;
 
-  // Clear the ocp
-  ocp_ = SymbolicOCP();
-  
- // Add model variables
+  // Add model variables
   addModelVariables();
   
   // Add binding equations
@@ -627,7 +624,7 @@ void FlatOCPInternal::sortType(){
   z_.clear();
   u_.clear();
   p_.clear();
-  d_.clear();
+  y_.clear();
   
   // Mark all dependent variables
   for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
@@ -670,7 +667,7 @@ void FlatOCPInternal::sortType(){
         casadi_assert(0);
       }
     } else {
-      d_.push_back(*it);
+      y_.push_back(*it);
     }
   }
 
@@ -1064,7 +1061,7 @@ void FlatOCPInternal::makeExplicit(){
     // Check if marked
     if(it->var().getTemp()){
       // Make dependent
-      d_.push_back(*it);
+      y_.push_back(*it);
       
       // If upper or lower bounds are finite, add path constraint
       if(!isinf(it->getMin()) || !isinf(it->getMax())){
@@ -1126,9 +1123,9 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
       }
   
       // Find the dependency equations
-      vector<SX> dep(d_.size());
-      for(int i=0; i<d_.size(); ++i){
-        int ind = d_[i].var().getTemp()-1;
+      vector<SX> dep(y_.size());
+      for(int i=0; i<y_.size(); ++i){
+        int ind = y_[i].var().getTemp()-1;
         casadi_assert(ind>=0);
         dep[i] = explicit_fcn_[ind];
       }
@@ -1399,9 +1396,9 @@ void FlatOCPInternal::findConsistentIC(){
   output_fcn_.evaluate();
   
   // Save to the variables
-  for(int i=0; i<d_.size(); ++i){
-    double z0 = output_fcn_.output().at(i) * d_[i].getNominal();
-    d_[i].setStart(z0);
+  for(int i=0; i<y_.size(); ++i){
+    double z0 = output_fcn_.output().at(i) * y_[i].getNominal();
+    y_[i].setStart(z0);
   }
 }
 

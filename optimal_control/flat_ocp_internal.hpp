@@ -24,7 +24,6 @@
 #define FLAT_OCP_INTERNAL_HPP
 
 #include "flat_ocp.hpp"
-#include "symbolic_ocp.hpp"
 #include "xml_node.hpp"
 
 /** \brief  Forward declarations */
@@ -94,8 +93,20 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Look-up table mapping XML names to SX binary functions
     std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
 
-    /// The optimal control problem representation -- keep synchronized with the XML representation!
-    SymbolicOCP ocp_;
+      /// States
+    std::vector<Variable> x_;
+
+    /// Algebraic states
+    std::vector<Variable> z_;
+
+    /// Controls
+    std::vector<Variable> u_;
+        
+    /// Free parameters
+    std::vector<Variable> p_;
+
+    /// Dependent variables
+    std::vector<Variable> y_;
 
     /// Parsed XML document
     XMLNode document_;
@@ -153,21 +164,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     
     /// Time
     SX t_;
-    
-    /// Differential states
-    std::vector<Variable> x_;
-
-    /// Algebraic states
-    std::vector<Variable> z_;
-    
-    /// Controls
-    std::vector<Variable> u_;
-        
-    /// Free parameters
-    std::vector<Variable> p_;
-    
-    /// Dependent variables
-    std::vector<Variable> d_;
 
     /// Explicit equations
     std::vector<SX> explicit_var_, explicit_fcn_;

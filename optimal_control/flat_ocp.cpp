@@ -37,14 +37,6 @@ void FlatOCP::parse(){
   (*this)->parse();
 }
 
-SymbolicOCP& FlatOCP::ocp(){
-  return (*this)->ocp_;
-}
-
-const SymbolicOCP& FlatOCP::ocp() const{
-  return (*this)->ocp_;
-}
-
 FlatOCPInternal* FlatOCP::operator->(){
   return (FlatOCPInternal*)(OptionsFunctionality::operator->());
 }

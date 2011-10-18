@@ -23,8 +23,6 @@
 #ifndef FLAT_OCP_HPP
 #define FLAT_OCP_HPP
 
-#include "symbolic_ocp.hpp"
-#include "xml_node.hpp"
 #include "variable.hpp"
 
 namespace CasADi{
@@ -34,6 +32,24 @@ namespace OptimalControl{
 class FlatOCPInternal;
 
 /** \brief A flat OCP representation coupled to an XML file
+  Variables:
+  t:     time
+  x:     differential states
+  xdot:  state derivatives
+  z:     algebraic states
+  y:     dependent variables
+  u:     control signals
+  p:     independent parameters
+  
+  Equations
+  fully implicit DAE:       0 == dae(t,x,xdot,z,u,p)
+  explicit ODE:          xdot == ode(t,x,z,u,p)
+  quadratures:           qdot == qua(t,x,z,u,p)
+  algebraic equations:      0 == alg(t,x,z,u,p)
+  dependent equations:      y == dep(t,x,z,u,p)
+  initial equations:        0 == ieq(t,x,xdot,z,u,p)
+
+
   Usage skeleton (starting with an XML file):
   
   ** 1. Call constructor (pass an empty string ("") to start with an empty file
@@ -45,25 +61,10 @@ class FlatOCPInternal;
   ** 3. Initialize and parse XML
   > ocp.init()
 
-  ** 4. Read variables from XML
-  > ocp.readVariables()
-  
-  ** 5. Modify/add variables
+  ** 4. Modify/add variables, equations, optimization
   > ...
   
-  ** 6. Read equations from XML
-  > ocp.readEquations()
-  
-  ** 7. Modify/add equations
-  > ...
-  
-  ** 6. Read optimization from XML
-  > ocp.readOptimization()
-  
-  ** 7. Modify/add optimization
-  > ...
-
-  ** 8. Export FMI XML
+  ** 5. Export FMI XML (not implemented)
   > ocp.exportFMI()
 
   \date 2011
@@ -80,12 +81,6 @@ class FlatOCP : public OptionsFunctionality{
     /// Parse from XML to C++ format
     void parse();
 
-    /// Get the OCP
-    SymbolicOCP& ocp();
-
-    /// Get the OCP (const ref)
-    const SymbolicOCP& ocp() const;
-    
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
     

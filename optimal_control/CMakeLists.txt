@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.0)
 
 SET(OPTIMAL_CONTROL
-  symbolic_ocp.hpp
   variable.hpp              variable.cpp            variable_internal.hpp             variable_internal.cpp
   variable_tools.hpp        variable_tools.cpp
   flat_ocp.hpp              flat_ocp.cpp            flat_ocp_internal.hpp             flat_ocp_internal.cpp
