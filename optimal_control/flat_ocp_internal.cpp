@@ -65,8 +65,8 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   eliminated_dependents_ = false;
   blt_sorted_ = false;
   t_ = SX("t");
-  t0 = numeric_limits<double>::quiet_NaN();
-  tf = numeric_limits<double>::quiet_NaN();
+  t0_ = numeric_limits<double>::quiet_NaN();
+  tf_ = numeric_limits<double>::quiet_NaN();
 }
 
 void FlatOCPInternal::init(){
@@ -284,15 +284,13 @@ void FlatOCPInternal::addOptimization(){
   
   // Start time
   cout << "starttime (string) = " << string(opts["opt:IntervalStartTime"]["opt:Value"].getText()) << endl;
-  t0  = opts["opt:IntervalStartTime"]["opt:Value"].getText();
-  double t0 = t0;
-  cout << "starttime (double) = " << t0 << endl;
+  t0_  = opts["opt:IntervalStartTime"]["opt:Value"].getText();
+  cout << "starttime (double) = " << t0_ << endl;
 
   // Terminal time
   cout << "endtime (string) = " << string(opts["opt:IntervalFinalTime"]["opt:Value"].getText()) << endl;
-  tf = opts["opt:IntervalFinalTime"]["opt:Value"].getText();
-  double tf = tf;
-  cout << "endtime (double) = " << tf << endl;
+  tf_ = opts["opt:IntervalFinalTime"]["opt:Value"].getText();
+  cout << "endtime (double) = " << tf_ << endl;
 
   for(int i=0; i<opts.size(); ++i){
     
@@ -399,7 +397,7 @@ SX FlatOCPInternal::readExpr(const XMLNode& node){
   // Chop the 'exp:'
   string name = fullname.substr(4);
 
-  // The switch below is alphabetical, and can be thus made more efficient
+  // The switch below is alphabetical, and can be thus made more efficient, for example by using a switch statement of the first three letters, if it would ever become a bottleneck
   if(name.compare("Add")==0){
     return readExpr(node[0]) + readExpr(node[1]);
   } else if(name.compare("Acos")==0){
@@ -417,12 +415,11 @@ SX FlatOCPInternal::readExpr(const XMLNode& node){
   } else if(name.compare("Exp")==0){
     return exp(readExpr(node[0]));
   } else if(name.compare("Identifier")==0){
-    Variable var = readVariable(node);
-    return var.var();
+    return readVariable(node).var();
   } else if(name.compare("IntegerLiteral")==0){
     return int(node.getText());
   } else if(name.compare("Instant")==0){
-    return node.getText();
+    return double(node.getText());
   } else if(name.compare("Log")==0){
     return log(readExpr(node[0]));
   } else if(name.compare("LogLt")==0){ // Logical less than
@@ -541,8 +538,8 @@ void FlatOCPInternal::print(ostream &stream) const{
   
   // Constraint functions
   stream << "Time horizon" << endl;
-  stream << "t0 = " << t0 << endl;
-  stream << "tf = " << tf << endl;
+  stream << "t0 = " << t0_ << endl;
+  stream << "tf = " << tf_ << endl;
   
 }
 

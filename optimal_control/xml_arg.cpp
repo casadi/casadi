@@ -21,7 +21,6 @@
  */
 
 #include "xml_arg.hpp"
-#include <casadi/sx/sx_tools.hpp>
 
 namespace CasADi{
 namespace OptimalControl{
@@ -46,23 +45,6 @@ StrArg::operator double() const{
   buffer >> ret;
   return ret;
 }
-
-StrArg::operator SXMatrix() const{
-  std::istringstream buffer(str);
-  SXMatrix ret;
-  buffer >> ret;
-  return ret;
-}
-
-StrArg::operator SX() const{
-  SXMatrix m = *this;
-  return m.toScalar();
-}
-
-StrArg::operator MX() const{
-  return MX(str);
-}
-
 
 std::ostream& operator<<(std::ostream &stream, const StrArg& arg){
   return stream << arg.str;

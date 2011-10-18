@@ -100,7 +100,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Dependent variables
     std::vector<Variable> y_;
 
-
     /// Filename
     std::string filename_;
     
@@ -176,18 +175,16 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     std::vector<SX> lterm;
     
     /// Initial time
-    double t0;
-    double getStartTime() const{ return t0;}
+    double t0_;
     
     /// Initial time is free
-    bool t0_free;
+    bool t0_free_;
     
     /// Final time
-    double tf;
-    double getFinalTime() const{ return tf;}
+    double tf_;
     
     /// Final time is free
-    bool tf_free;
+    bool tf_free_;
     
     /// Is scaled?
     bool scaled_variables_, scaled_equations_;
@@ -202,6 +199,14 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
 
     /// BLT sorted?
     bool blt_sorted_;
+    
+    
+    
+    
+    
+    
+    
+    
     
     /// ODE right hand side function
     FX oderhs_;

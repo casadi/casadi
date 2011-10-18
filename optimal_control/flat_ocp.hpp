@@ -98,6 +98,36 @@ class FlatOCP : public OptionsFunctionality{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
+
+    //@{
+    /// Get model equations
+
+    /// Get fully implicit DAE
+//    SXMatrix dae() const;
+  
+    /// Get explicit ODE
+//    SXMatrix ode() const;
+    
+    /// Get quadrature states
+//    SXMatrix qua() const;
+    
+    /// Get algebraic equations
+//    SXMatrix alg() const;
+    
+    /// Get dependent equations
+//    SXMatrix dep() const;
+    
+    /// Get initial equations
+//    SXMatrix ieq() const;
+    
+    //@}
+
+    /// Initial time
+    double getStartTime() const;
+    
+    /// Final time
+    double getFinalTime() const;
+
 };
 
 #ifdef SWIG
