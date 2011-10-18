@@ -82,18 +82,10 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     void addIntervalStartTime(const XMLNode& onode);
     void addIntervalFinalTime(const XMLNode& onode);
 
-    // NOTE 1: Joel: The FlatOCPInternal class will later have to be changed to work with the MX class instead of SX, 
-    //               therefore I had to change the implementation so that it is more generic
+    /// Parsed XML document
+    XMLNode document_;
 
-    // NOTE 2: Joel: Will there really ever be so many functions that it will motivate a binary search of the functions rather than a simple linear search?
-
-    /// Look-up table mapping XML names to SX unary functions
-    std::map<std::string,SX (*)(const SX&)> unary_;
-
-    /// Look-up table mapping XML names to SX binary functions
-    std::map<std::string,SX (*)(const SX&,const SX&)> binary_;
-
-      /// States
+    /// States
     std::vector<Variable> x_;
 
     /// Algebraic states
@@ -108,8 +100,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Dependent variables
     std::vector<Variable> y_;
 
-    /// Parsed XML document
-    XMLNode document_;
 
     /// Filename
     std::string filename_;

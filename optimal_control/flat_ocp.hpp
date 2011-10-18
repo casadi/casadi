@@ -35,11 +35,11 @@ class FlatOCPInternal;
   Variables:
   t:     time
   x:     differential states
-  xdot:  state derivatives
   z:     algebraic states
   y:     dependent variables
-  u:     control signals
   p:     independent parameters
+  u:     control signals
+  xdot:  state derivatives
   
   Equations
   fully implicit DAE:       0 == dae(t,x,xdot,z,u,p)

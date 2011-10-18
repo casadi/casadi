@@ -93,19 +93,6 @@ void FlatOCPInternal::parse(){
   cout << "Parsing XML ..." << endl;
   double time1 = clock();
 
-  // Initialize function lookup tables
-  unary_["Exp"]  = exp;
-  unary_["Sin"]  = sin;
-  unary_["Cos"]  = cos;
-  unary_["Tan"]  = tan;
-  unary_["Log"]  = log;
-  unary_["Sqrt"]  = sqrt;
-  unary_["Asin"]  = asin;
-  unary_["Acos"]  = acos;
-  unary_["Atan"]  = atan;
-  
-  binary_["Pow"]  = pow;
-
   // Add model variables
   addModelVariables();
   
@@ -415,14 +402,20 @@ SX FlatOCPInternal::readExpr(const XMLNode& node){
   // The switch below is alphabetical, and can be thus made more efficient
   if(name.compare("Add")==0){
     return readExpr(node[0]) + readExpr(node[1]);
-  } else if(name.compare("StringLiteral")==0){
-    throw CasadiException(string(node.getText()));
+  } else if(name.compare("Acos")==0){
+    return acos(readExpr(node[0]));
+  } else if(name.compare("Asin")==0){
+    return asin(readExpr(node[0]));
+  } else if(name.compare("Atan")==0){
+    return atan(readExpr(node[0]));
+  } else if(name.compare("Cos")==0){
+    return cos(readExpr(node[0]));
   } else if(name.compare("Der")==0){
     return readVariable(node[0]).der(true);
-  } else if(name.compare("TimedVariable")==0){
-    return readVariable(node[0]).atTime(double(node[1].getText()),true);
   } else if(name.compare("Div")==0){
     return readExpr(node[0]) / readExpr(node[1]);
+  } else if(name.compare("Exp")==0){
+    return exp(readExpr(node[0]));
   } else if(name.compare("Identifier")==0){
     Variable var = readVariable(node);
     return var.var();
@@ -430,6 +423,8 @@ SX FlatOCPInternal::readExpr(const XMLNode& node){
     return int(node.getText());
   } else if(name.compare("Instant")==0){
     return node.getText();
+  } else if(name.compare("Log")==0){
+    return log(readExpr(node[0]));
   } else if(name.compare("LogLt")==0){ // Logical less than
     return readExpr(node[0]) < readExpr(node[1]);
   } else if(name.compare("LogGt")==0){ // Logical less than
@@ -449,36 +444,24 @@ SX FlatOCPInternal::readExpr(const XMLNode& node){
     for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i]),readExpr(node[i+1]),ex);
     
     return ex;
+  } else if(name.compare("Pow")==0){
+    return pow(readExpr(node[0]),readExpr(node[1]));
   } else if(name.compare("RealLiteral")==0){
     return double(node.getText());
+  } else if(name.compare("Sin")==0){
+    return sin(readExpr(node[0]));
+  } else if(name.compare("Sqrt")==0){
+    return sqrt(readExpr(node[0]));
+  } else if(name.compare("StringLiteral")==0){
+    throw CasadiException(string(node.getText()));
   } else if(name.compare("Sub")==0){
     return readExpr(node[0]) - readExpr(node[1]);
+  } else if(name.compare("Tan")==0){
+    return tan(readExpr(node[0]));
   } else if(name.compare("Time")==0){
     return t_;
-  }
-
-  // Check if it is a unary function
-  map<string,SX (*)(const SX&)>::iterator uit;
-  uit = unary_.find(name);
-  if (uit!=unary_.end()) {
-    // Make sure that there is exactly one child
-    if ((node.size()) != 1)
-      throw CasadiException(string("FlatOCPInternal::readExpr: Node \"") + fullname + "\" does not have one child");
-
-    // Call the function
-    return (*uit->second)(readExpr(node[0]));
-  }
-
-  // Check if it is a binary function
-  map<string,SX (*)(const SX&, const SX&)>::iterator bit;
-  bit = binary_.find(name);
-  if (bit!=binary_.end()) {
-    // Make sure that there are exactly two children
-    if ((node.size()) != 2)
-      throw CasadiException(string("FlatOCPInternal::readExpr: Node \"") + fullname + "\" does not have two children");
-
-    // Call the function
-    return (*bit->second)(readExpr(node[0]),readExpr(node[1]));
+  } else if(name.compare("TimedVariable")==0){
+    return readVariable(node[0]).atTime(double(node[1].getText()),true);
   }
 
   // throw error if reached this point
@@ -490,38 +473,24 @@ void FlatOCPInternal::repr(std::ostream &stream) const{
   stream << "FMI parser (XML file: \"" << filename_ << "\")";
 }
 
-// void FlatOCPInternal::print(std::ostream &stream) const{
-//   stream << document_;
-// }
-
-// void FlatOCPInternal::repr(ostream &stream) const{
-//   stream << "Optimal control problem (";
-//   stream << "#dae = " << implicit_fcn_.size() << ", ";
-//   stream << "#initial_eq_ = " << initial_eq_.size() << ", ";
-//   stream << "#path_fcn_ = " << path_fcn_.size() << ", ";
-//   stream << "#mterm = " << mterm.size() << ", ";
-//   stream << "#lterm = " << lterm.size() << ")";
-// }
-
 void FlatOCPInternal::print(ostream &stream) const{
   // Variables in the class hierarchy
   stream << "Variables" << endl;
 
   // Print the variables
-/*  stream << "{" << endl;
-  stream << "  t = " << t << endl;
-  stream << "  x =  " << x << endl;
-  stream << "  z =  " << z << endl;
-  stream << "  u =  " << u << endl;
-  stream << "  p =  " << p << endl;
-  stream << "  c =  " << c << endl;
-  stream << "  d =  " << d << endl;
-  stream << "}" << endl;*/
+  stream << "{" << endl;
+  stream << "  t = " << t_ << endl;
+  stream << "  x =  " << x_ << endl;
+  stream << "  z =  " << z_ << endl;
+  stream << "  p =  " << p_ << endl;
+  stream << "  u =  " << u_ << endl;
+  stream << "  y =  " << y_ << endl;
+  stream << "}" << endl;
   stream << "Dimensions: "; 
   stream << "#x = " << x_.size() << ", ";
   stream << "#z = " << z_.size() << ", ";
-  stream << "#u = " << u_.size() << ", ";
   stream << "#p = " << p_.size() << ", ";
+  stream << "#u = " << u_.size() << ", ";
   stream << endl << endl;
   
   // Print the differential-algebraic equation
