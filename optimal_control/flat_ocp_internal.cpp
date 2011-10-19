@@ -48,6 +48,7 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   addOption("scale_equations",          OT_BOOLEAN,      true,  "Scale the implicit equations so that they get unity order of magnitude");
   addOption("semi_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
   addOption("fully_explicit",           OT_BOOLEAN,      false, "Make the DAE fully explicit (not always possible)");
+  addOption("verbose",                  OT_BOOLEAN,      true,  "Verbose parsing");
 
   TiXmlDocument doc;
   bool flag = doc.LoadFile(filename.data());
@@ -62,7 +63,6 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
 
   scaled_variables_ = false;
   scaled_equations_ = false;
-  eliminated_dependents_ = false;
   blt_sorted_ = false;
   t_ = SX("t");
   t0_ = numeric_limits<double>::quiet_NaN();
@@ -71,6 +71,9 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
 
 void FlatOCPInternal::init(){
 
+  // Read options
+  verbose_ = getOption("verbose");
+  
   // Obtain the symbolic representation of the OCP
   parse();
 
@@ -112,6 +115,13 @@ void FlatOCPInternal::parse(){
   // Sort the variables according to type
   sortType();
   
+  // Make sure that the dimensions are consistent at this point
+  casadi_assert(s_.size()==dae_.size());
+  casadi_assert(x_.size()==ode_.size());
+  casadi_assert(z_.size()==alg_.size());
+  casadi_assert(q_.size()==quad_.size());
+  casadi_assert(y_.size()==dep_.size());
+  
   // Return a reference to the created ocp
   double time2 = clock();
   double tparse = double(time2-time1)/CLOCKS_PER_SEC;
@@ -145,10 +155,10 @@ void FlatOCPInternal::addModelVariables(){
     string qn = qualifiedName(nn);
     
     // Find variable
-    map<string,int>::iterator it = varname_.find(qn);
+    map<string,Variable>::iterator it = varmap_.find(qn);
     
     // Add variable, if not already added
-    if(it == varname_.end()){
+    if(it == varmap_.end()){
       
       // Create variable
       Variable var(name);
@@ -201,8 +211,11 @@ void FlatOCPInternal::addModelVariables(){
   }
 }
 
-
 void FlatOCPInternal::addBindingEquations(){
+  if(verbose_){
+    cout << "Adding binding equations." << endl;
+  }
+  
   // Get a reference to the BindingEquations node
   const XMLNode& bindeqs = document_[0]["equ:BindingEquations"];
   
@@ -216,33 +229,9 @@ void FlatOCPInternal::addBindingEquations(){
     SX bexpr = readExpr(beq[1][0]);
     
     // Add binding equation
-    addExplicitEquation(var.var(),bexpr);
+    y_.push_back(var);
+    dep_.push_back(bexpr);
   }
-  
-  // Mark all dependent variables
-  for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
-    it->setTemp(1);
-  }
-  
-  // Add binding equations to constant variables lacking this
-  vector<SX> beq_var;
-  vector<SX> beq_exp;
-  for(vector<Variable>::iterator it=vars_.begin(); it!=vars_.end(); ++it){
-    if(it->getVariability()==CONSTANT && it->var().getTemp()!=1){
-      // Save binding equation
-      beq_var.push_back(it->var());
-      beq_exp.push_back(it->getStart());
-    }
-  }
-  
-  // Unmark all dependent variables
-  for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
-    it->setTemp(0);
-  }
-  
-  // Add to the beginning of the list of binding equations (in case some binding equations depend on them)
-  explicit_var_.insert(explicit_var_.begin(),beq_var.begin(),beq_var.end());
-  explicit_fcn_.insert(explicit_fcn_.begin(),beq_exp.begin(),beq_exp.end());
 }
 
 void FlatOCPInternal::addDynamicEquations(){
@@ -471,29 +460,53 @@ void FlatOCPInternal::repr(std::ostream &stream) const{
 }
 
 void FlatOCPInternal::print(ostream &stream) const{
+  stream << "Dimensions: "; 
+  stream << "#s = " << s_.size() << ", ";
+  stream << "#x = " << x_.size() << ", ";
+  stream << "#z = " << z_.size() << ", ";
+  stream << "#q = " << q_.size() << ", ";
+  stream << "#y = " << y_.size() << ", ";
+  stream << "#p = " << p_.size() << ", ";
+  stream << "#u = " << u_.size() << ", ";
+  stream << endl << endl;
+
   // Variables in the class hierarchy
   stream << "Variables" << endl;
 
   // Print the variables
   stream << "{" << endl;
   stream << "  t = " << t_ << endl;
+  stream << "  s =  " << s_ << endl;
   stream << "  x =  " << x_ << endl;
   stream << "  z =  " << z_ << endl;
+  stream << "  q =  " << q_ << endl;
+  stream << "  y =  " << y_ << endl;
   stream << "  p =  " << p_ << endl;
   stream << "  u =  " << u_ << endl;
-  stream << "  y =  " << y_ << endl;
   stream << "}" << endl;
-  stream << "Dimensions: "; 
-  stream << "#x = " << x_.size() << ", ";
-  stream << "#z = " << z_.size() << ", ";
-  stream << "#p = " << p_.size() << ", ";
-  stream << "#u = " << u_.size() << ", ";
-  stream << endl << endl;
   
   // Print the differential-algebraic equation
-  stream << "Dynamic equations" << endl;
+  stream << "Implicit dynamic equations" << endl;
   for(vector<SX>::const_iterator it=dae_.begin(); it!=dae_.end(); it++){
     stream << "0 == "<< *it << endl;
+  }
+  stream << endl;
+  
+  stream << "Explicit differential equations" << endl;
+  for(int k=0; k<x_.size(); ++k){
+    stream << x_[k].der() << " == " << ode_[k] << endl;
+  }
+  stream << endl;
+
+  stream << "Algebraic equations" << endl;
+  for(int k=0; k<z_.size(); ++k){
+    stream << z_[k] << " == " << alg_[k] << endl;
+  }
+  stream << endl;
+  
+  stream << "Quadrature equations" << endl;
+  for(int k=0; k<q_.size(); ++k){
+    stream << q_[k].der() << " == " << quad_[k] << endl;
   }
   stream << endl;
 
@@ -503,19 +516,10 @@ void FlatOCPInternal::print(ostream &stream) const{
   }
   stream << endl;
 
-  // Print the explicit differential equations
-/*  stream << "Differential equations (explicit)" << endl;
-  for(vector<Variable>::const_iterator it=x_.begin(); it!=x_.end(); it++){
-    SX de = it->rhs();
-    if(!de->isNan())
-      stream << "der(" << *it << ") == " << de << endl;
-  }
-  stream << endl;*/
-  
   // Dependent equations
   stream << "Dependent equations" << endl;
-  for(int i=0; i<explicit_var_.size(); ++i)
-    stream << explicit_var_[i] << " == " << explicit_fcn_[i] << endl;
+  for(int i=0; i<y_.size(); ++i)
+    stream << y_[i] << " == " << dep_[i] << endl;
   stream << endl;
 
   // Mayer terms
@@ -543,45 +547,27 @@ void FlatOCPInternal::print(ostream &stream) const{
   
 }
 
-void FlatOCPInternal::eliminateDependent(){
-  cout << "eliminateDependent ..." << endl;
+void FlatOCPInternal::eliminateDependent(bool eliminate_dependents_with_bounds){
+  if(verbose_)
+    cout << "eliminateDependent ..." << endl;
   double time1 = clock();
 
-  Matrix<SX> v = explicit_var_;
-  Matrix<SX> v_old = explicit_fcn_;
+  Matrix<SX> v = var(y_);
+  Matrix<SX> v_old = dep_;
   
   dae_= substitute(dae_,v,v_old).data();
+  ode_= substitute(ode_,v,v_old).data();
+  alg_= substitute(alg_,v,v_old).data();
+  quad_= substitute(quad_,v,v_old).data();
   initial_= substitute(initial_,v,v_old).data();
   path_    = substitute(path_,v,v_old).data();
   mterm_   = substitute(mterm_,v,v_old).data();
   lterm_   = substitute(lterm_,v,v_old).data();
-  eliminated_dependents_ = true;
 
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "... eliminateDependent complete after " << dt << " seconds." << endl;
-}
-
-void FlatOCPInternal::addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front){
-  if(to_front){
-    // Eliminate expression from the current binding equations
-    Matrix<SX> explicit_fcn_eliminated = substitute(explicit_fcn_,var, bind_eq);
-
-    // Save in the old location
-    explicit_fcn_.swap(explicit_fcn_eliminated.data());
-    
-    // Add to list of equations
-    explicit_var_.insert(explicit_var_.end(),var.begin(),var.end());
-    explicit_fcn_.insert(explicit_fcn_.end(),bind_eq.begin(),bind_eq.end());
-    
-  } else {
-    // Eliminate previous binding equations from the expression
-    Matrix<SX> bind_eq_eliminated = substitute(bind_eq, explicit_var_, explicit_fcn_);
-    
-    // Add to list of equations
-    explicit_var_.insert(explicit_var_.end(),var.begin(),var.data().end());
-    explicit_fcn_.insert(explicit_fcn_.end(),bind_eq_eliminated.begin(),bind_eq_eliminated.data().end());
-  }
+  if(verbose_)
+    cout << "... eliminateDependent complete after " << dt << " seconds." << endl;
 }
 
 void FlatOCPInternal::sortType(){
@@ -591,53 +577,45 @@ void FlatOCPInternal::sortType(){
   z_.clear();
   u_.clear();
   p_.clear();
-  y_.clear();
   
   // Mark all dependent variables
-  for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
-    it->setTemp(1);
+  for(vector<Variable>::iterator it=y_.begin(); it!=y_.end(); ++it){
+    it->var().setTemp(1);
   }
   
   // Loop over variables
-  for(vector<Variable>::iterator it=vars_.begin(); it!=vars_.end(); ++it){
+  for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
+    // Get the variable
+    Variable& v = it->second;
+    
     // If not dependent
-    if(it->highest().getTemp()!=1){
+    if(v.var().getTemp()!=1){
       // Try to determine the type
-      if(it->getVariability() == PARAMETER){
-        if(it->getFree()){
-          p_.push_back(*it); 
+      if(v.getVariability() == PARAMETER){
+        if(v.getFree()){
+          p_.push_back(v); 
         } else {
+          cout << "v = " << v << endl;
           casadi_assert(0);
         }
-      } else if(it->getVariability() == CONTINUOUS) {
-        if(it->getCausality() == INTERNAL){
-          s_.push_back(*it);
-        } else if(it->getCausality() == INPUT){
-          u_.push_back(*it);
+      } else if(v.getVariability() == CONTINUOUS) {
+        if(v.getCausality() == INTERNAL){
+          s_.push_back(v);
+        } else if(v.getCausality() == INPUT){
+          u_.push_back(v);
         }
-      } else if(it->getVariability() == CONSTANT){
-        casadi_assert(0);
+      } else if(v.getVariability() == CONSTANT){
+        y_.push_back(v);
+        dep_.push_back(v.getNominal());
       }
-    } else {
-      y_.push_back(*it);
-    }
-  }
-
-  // Loop over variables
-  for(vector<Variable>::iterator it=s_.begin(); it!=s_.end(); ++it){
-    if(it->isDifferential()){
-      x_.push_back(*it);
-    } else {
-      z_.push_back(*it);
     }
   }
 
   // Unmark all dependent variables
-  for(vector<SX>::iterator it=explicit_var_.begin(); it!=explicit_var_.end(); ++it){
-    it->setTemp(0);
+  for(vector<Variable>::iterator it=y_.begin(); it!=y_.end(); ++it){
+    it->var().setTemp(0);
   }
 }
-
 
 void FlatOCPInternal::scaleVariables(){
   cout << "Scaling variables ..." << endl;
@@ -648,8 +626,9 @@ void FlatOCPInternal::scaleVariables(){
 
   // Variables
   Matrix<SX> t = t_;
+  Matrix<SX> s = var(s_);
+  Matrix<SX> sdot = der(s_);
   Matrix<SX> x = var(x_);
-  Matrix<SX> xdot = der(x_);
   Matrix<SX> z = var(z_);
   Matrix<SX> p = var(p_);
   Matrix<SX> u = var(u_);
@@ -657,16 +636,17 @@ void FlatOCPInternal::scaleVariables(){
   // Collect all the variables
   Matrix<SX> v;
   append(v,t);
+  append(v,s);
+  append(v,sdot);
   append(v,x);
-  append(v,xdot);
   append(v,z);
   append(v,p);
   append(v,u);
   
   // Nominal values
   Matrix<SX> t_n = 1.;
+  Matrix<SX> s_n = getNominal(s_);
   Matrix<SX> x_n = getNominal(x_);
-  Matrix<SX> xdot_n = getNominal(x_);
   Matrix<SX> z_n = getNominal(z_);
   Matrix<SX> p_n = getNominal(p_);
   Matrix<SX> u_n = getNominal(u_);
@@ -674,8 +654,9 @@ void FlatOCPInternal::scaleVariables(){
   // Get all the old variables in expressed in the nominal ones
   Matrix<SX> v_old;
   append(v_old,t*t_n);
+  append(v_old,s*s_n);
+  append(v_old,sdot*s_n);
   append(v_old,x*x_n);
-  append(v_old,xdot*xdot_n);
   append(v_old,z*z_n);
   append(v_old,p*p_n);
   append(v_old,u*u_n);
@@ -684,8 +665,11 @@ void FlatOCPInternal::scaleVariables(){
   Matrix<SX> temp;
 
   // Substitute equations
-  explicit_fcn_= substitute(explicit_fcn_,v,v_old).data();
   dae_= substitute(dae_,v,v_old).data();
+/*  ode_= substitute(ode_,v,v_old).data();
+  alg_= substitute(alg_,v,v_old).data();
+  quad_= substitute(quad_,v,v_old).data();
+  dep_= substitute(dep_,v,v_old).data();*/
   initial_= substitute(initial_,v,v_old).data();
   path_    = substitute(path_,v,v_old).data();
   mterm_   = substitute(mterm_,v,v_old).data();
@@ -703,7 +687,7 @@ void FlatOCPInternal::scaleEquations(){
   casadi_assert(!scaled_equations_);
   
   // Make sure that the dependents have been eliminated
-  casadi_assert(eliminated_dependents_);
+/*  casadi_assert(eliminated_dependents_);*/
   
   // Make sure that the variables have been scaled
   casadi_assert(scaled_variables_);
@@ -840,6 +824,8 @@ void FlatOCPInternal::sortBLT(bool with_x){
 }
 
 void FlatOCPInternal::makeExplicit(){
+  casadi_assert(0);
+#if 0
   casadi_assert_message(blt_sorted_,"OCP has not been BLT sorted, call sortBLT()");
 
   cout << "Making explicit..." << endl;
@@ -1031,9 +1017,12 @@ void FlatOCPInternal::makeExplicit(){
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... makeExplicit complete after " << dt << " seconds." << endl;
+#endif
 }
 
 void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool create_quad){
+  casadi_assert(0);
+#if 0
   cout << "createFunctions ..." << endl;
   double time1 = clock();
 
@@ -1217,6 +1206,7 @@ void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool cre
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... createFunctions complete after " << dt << " seconds." << endl;
+#endif
 }
 
 
@@ -1287,29 +1277,45 @@ void FlatOCPInternal::makeSemiExplicit(){
 }
 
 void FlatOCPInternal::makeAlgebraic(const Variable& v){
-  // Find variable among the variables
-  for(vector<Variable>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    if(it->get()==v.get()){
-      // Add dependent equation, xdot==0
-      addExplicitEquation(v.der(),0.0,true);
-            
-      // Add to list of algebraic variables
-      z_.push_back(v);
+  // Find variable among the explicit variables
+  for(int k=0; k<x_.size(); ++k){
+    if(x_[k].get()==v.get()){
       
-      // Remove from list of differential variables
-      x_.erase(it);
+      // Add to list of algebraic variables and to the list of algebraic equations
+      z_.push_back(v);
+      alg_.push_back(ode_[k]);
+      
+      // Remove from list of differential variables and the list of diffential equations
+      x_.erase(x_.begin()+k);
+      ode_.erase(ode_.begin()+k);
 
-      // Replace xdot with x (z) in the list of implicitly defined variables
-      it->setDerivative(SX());
+      // Successfull return
+      return;
+    }
+  }
+  
+  // Find the variable among the implicit variables
+  for(int k=0; k<s_.size(); ++k){
+    if(s_[k].get()==v.get()){
+      
+      // Substitute the state derivative with zero
+      dae_ = substitute(dae_,s_[k].der(),0.0).data();
+
+      // Remove the highest state derivative expression from the variable
+      s_[k].setDerivative(SX());
+
+      // Successfull return
       return;
     }
   }
   
   // Error if this point reached
-  throw CasadiException("v not in list of differential states");
+  throw CasadiException("v not a differential state");
 }
 
 void FlatOCPInternal::findConsistentIC(){
+  casadi_assert(0);
+  #if 0
   // Evaluate the ODE functions
   oderhs_.init();
   oderhs_.setInput(0.0,DAE_T);
@@ -1335,38 +1341,38 @@ void FlatOCPInternal::findConsistentIC(){
     double z0 = output_fcn_.output().at(i) * y_[i].getNominal();
     y_[i].setStart(z0);
   }
+  #endif
 }
 
 SX FlatOCPInternal::getExplicit(const SX& v) const{
   SXMatrix x = v;
-  x = substitute(x,explicit_var_,explicit_fcn_);
+  x = substitute(x,var(y_),dep_);
   return x.toScalar();
 }
 
 Variable& FlatOCPInternal::variable(const std::string& name){
   // Find the variable
-  map<string,int>::iterator it = varname_.find(name);
-  if(it==varname_.end()){
+  map<string,Variable>::iterator it = varmap_.find(name);
+  if(it==varmap_.end()){
     stringstream ss;
     ss << "No such variable: \"" << name << "\".";
     throw CasadiException(ss.str());
   }
   
   // Return the variable
-  return vars_.at(it->second);
+  return it->second;
 }
 
 void FlatOCPInternal::addVariable(const std::string& name, const Variable& var){
   // Try to find the name
-  map<string,int>::iterator it = varname_.find(name);
-  if(it!=varname_.end()){
+  map<string,Variable>::iterator it = varmap_.find(name);
+  if(it!=varmap_.end()){
     stringstream ss;
     ss << "Variable \"" << name << "\" has already been added.";
     throw CasadiException(ss.str());
   }
   
-  vars_.push_back(var);
-  varname_[name] = vars_.size()-1;
+  varmap_[name] = var;
 }
 
 std::string FlatOCPInternal::qualifiedName(const XMLNode& nn){

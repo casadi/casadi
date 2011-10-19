@@ -89,7 +89,6 @@ namespace CasADi{
             
       // Index
       int index_;
- 
   };
   
   

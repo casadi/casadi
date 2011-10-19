@@ -154,5 +154,9 @@ bool& FlatOCP::tf_free(){
   return (*this)->tf_free_;
 }
 
+void FlatOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
+  (*this)->eliminateDependent(eliminate_dependents_with_bounds);
+}
+
 } // namespace OptimalControl
 } // namespace CasADi

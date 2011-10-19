@@ -196,6 +196,16 @@ class FlatOCP : public OptionsFunctionality{
     /// Interval final time is free
     bool& tf_free();
     //@}
+    
+    /** @name Manipulation
+    *  Reformulate the dynamic optimization problem.
+    */
+    //@{
+    
+    /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
+    void eliminateDependent(bool eliminate_dependents_with_bounds=false);
+
+    //@}
 };
 
 #ifdef SWIG

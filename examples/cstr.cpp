@@ -62,28 +62,24 @@ int main(){
   ocp.print();
   
   // Correct the inital guess and bounds on variables
-/*  ocp.variables("u").setStart(280);
-  ocp.variables("u").setMin(230);
-  ocp.variables("u").setMax(370);*/
-  ocp.u()[0].setStart(280);
-  ocp.u()[0].setMin(230);
-  ocp.u()[0].setMax(370);
-  
+  ocp.variable("u").setStart(280);
+  ocp.variable("u").setMin(230);
+  ocp.variable("u").setMax(370);
+
   // Correct bound on state
-  ocp.x()[1].setMax(350);
+  ocp.variable("cstr.T").setMax(350);
   
   // Variables
   SXMatrix t = ocp.t();
-  SXMatrix x = var(ocp.x());
-  SXMatrix xdot = der(ocp.x());
-  casadi_assert(ocp.z().empty());
+  SXMatrix x = var(ocp.s());
+  SXMatrix xdot = der(ocp.s());
   SXMatrix p = var(ocp.p());
   SXMatrix u = var(ocp.u());
-
+  
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x(),true);
-  vector<double> xmin = getMin(ocp.x(),true);
-  vector<double> xmax = getMax(ocp.x(),true);
+  vector<double> x0 = getStart(ocp.s(),true);
+  vector<double> xmin = getMin(ocp.s(),true);
+  vector<double> xmax = getMax(ocp.s(),true);
   
   // Initial guess and bounds for the control
   vector<double> u0 = getStart(ocp.u(),true);
@@ -100,7 +96,7 @@ int main(){
   impres_in[1+DAE_Y] = x;
   impres_in[1+DAE_P] = u;
   SXFunction impres(impres_in,ocp.dae());
-  
+
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
   ode.setLinearSolver(CSparse(CRSSparsity()));

@@ -74,13 +74,15 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Add initial equations
     void addInitialEquations();
 
-    /// Add optimization */
+    //@{
+    /// Add optimization
     void addOptimization();
     void addObjectiveFunction(const XMLNode& onode);
     void addIntegrandObjectiveFunction(const XMLNode& onode);
     void addConstraints(const XMLNode& onode);
     void addIntervalStartTime(const XMLNode& onode);
     void addIntervalFinalTime(const XMLNode& onode);
+    //@}
 
     /// Parsed XML document
     XMLNode document_;
@@ -134,7 +136,7 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     void sortType();
 
     /// Eliminate dependent equations
-    void eliminateDependent();
+    void eliminateDependent(bool eliminate_dependents_with_bounds=false);
     
     /// Sort the variables and equations according to BLT, with or without including the differentiated states in the dependency graph
     void sortBLT(bool with_x=false);
@@ -144,9 +146,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
 
     /// Replace all state derivatives by algebraic variables with the same name
     void makeSemiExplicit();
-    
-    /// Add a binding equation
-    void addExplicitEquation(const Matrix<SX>& var, const Matrix<SX>& bind_eq, bool to_front=false);
     
     /// Scale the variables
     void scaleVariables();
@@ -172,14 +171,8 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Get the qualified name
     static std::string qualifiedName(const XMLNode& nn);
     
-    /// Variables
-    std::vector<Variable> vars_;
-      
     /// Find of variable by name
-    std::map<std::string,int> varname_;
-    
-    /// Explicit equations
-    std::vector<SX> explicit_var_, explicit_fcn_;
+    std::map<std::string,Variable> varmap_;
     
     /// Constraint function
     FX pathfcn_;
@@ -207,29 +200,28 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     
     /// Final time is free
     bool tf_free_;
+
+
+    /// Verbose parsing
+    bool verbose_;
+
+    
+    // The data members below should be removed
     
     /// Is scaled?
     bool scaled_variables_, scaled_equations_;
 
-    /// Has the dependents been eliminated
-    bool eliminated_dependents_;
-    
     /// BLT blocks
+    //@{
     std::vector<int> rowblock_;  // block k is rows r[k] to r[k+1]-1
     std::vector<int> colblock_;  // block k is cols s[k] to s[k+1]-1
     int nb_;
+    //@}
 
     /// BLT sorted?
     bool blt_sorted_;
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+#if 0    
     /// ODE right hand side function
     FX oderhs_;
     
@@ -247,6 +239,7 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
 
     /// Costs function
     FX costfcn_;
+#endif    
     
     /// Get the explicit expression for a variable
     SX getExplicit(const SX& v) const;
