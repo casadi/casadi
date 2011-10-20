@@ -162,6 +162,10 @@ void FlatOCP::eliminateInterdependencies(){
   (*this)->eliminateInterdependencies();
 }
 
+void FlatOCP::sortDAE(){
+  (*this)->sortDAE();
+}
+
 
 } // namespace OptimalControl
 } // namespace CasADi

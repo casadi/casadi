@@ -208,6 +208,9 @@ class FlatOCP : public OptionsFunctionality{
     /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
     void eliminateDependent(bool eliminate_dependents_with_bounds=false);
 
+    /// Sort the DAE equations and variables
+    void sortDAE();
+
     //@}
 };
 

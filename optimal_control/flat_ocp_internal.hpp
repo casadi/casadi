@@ -140,6 +140,9 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
 
     /// Eliminate dependent equations
     void eliminateDependent(bool eliminate_dependents_with_bounds=false);
+
+    /// Sort the DAE equations and variables
+    void sortDAE();
     
     /// Sort the variables and equations according to BLT, with or without including the differentiated states in the dependency graph
     void sortBLT(bool with_x=false);

@@ -85,6 +85,9 @@ void FlatOCPInternal::init(){
   // Eliminate the dependent variables
   eliminateDependent();
 
+  // Sort the equations and variables
+  sortDAE();
+
   // Scale the equations
 /*  scaleEquations();*/
   
@@ -557,6 +560,7 @@ void FlatOCPInternal::eliminateInterdependencies(){
 }
 
 void FlatOCPInternal::eliminateDependent(bool eliminate_dependents_with_bounds){
+  casadi_assert_message(eliminate_dependents_with_bounds=true,"Not implemented");
   if(verbose_)
     cout << "eliminateDependent ..." << endl;
   double time1 = clock();
@@ -764,6 +768,35 @@ void FlatOCPInternal::scaleEquations(){
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... equation scaling complete after " << dt << " seconds." << endl;
   scaled_equations_ = true;
+}
+
+void FlatOCPInternal::sortDAE(){
+  if(verbose_)
+    cout << "Sorting DAE" << endl;
+
+  // Get the sparsity of the Jacobian df/fx + tau*df/xdot
+  SXMatrix dae_only_x = substitute(dae_,der(x_),symbolic("tau")*var(x_));
+  SXFunction f(var(x_),dae_only_x);
+  f.init();
+  CRSSparsity sp = f.jacSparsity();
+  
+  // BLT transformation
+  std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+
+  // Permute equations
+  vector<SX> dae_new(dae_.size());
+  for(int i=0; i<dae_.size(); ++i){
+    dae_new[i] = dae_[rowperm[i]];
+  }
+  dae_new.swap(dae_);
+  
+  // Permute variables
+  vector<Variable> x_new(x_.size());
+  for(int i=0; i<x_.size(); ++i){
+    x_new[i]= x_[colperm[i]];
+  }
+  x_new.swap(x_);
 }
 
 void FlatOCPInternal::sortBLT(bool with_x){
