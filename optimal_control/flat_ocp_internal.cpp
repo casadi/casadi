@@ -63,7 +63,6 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
 
   scaled_variables_ = false;
   scaled_equations_ = false;
-  blt_sorted_ = false;
   t_ = SX("t");
   t0_ = numeric_limits<double>::quiet_NaN();
   tf_ = numeric_limits<double>::quiet_NaN();
@@ -80,6 +79,9 @@ void FlatOCPInternal::init(){
   // Scale the variables
   scaleVariables();
 
+  // Eliminate interdependencies
+  eliminateInterdependencies
+  
   // Eliminate the dependent variables
   eliminateDependent();
 
@@ -547,6 +549,11 @@ void FlatOCPInternal::print(ostream &stream) const{
   
 }
 
+void FlatOCPInternal::eliminateInterdependencies(){
+  bool eliminate_constants = true; // also simplify constant expressions
+  dep_ = substituteInPlace(var(y_),dep_,eliminate_constants).data();
+}
+
 void FlatOCPInternal::eliminateDependent(bool eliminate_dependents_with_bounds){
   if(verbose_)
     cout << "eliminateDependent ..." << endl;
@@ -686,9 +693,6 @@ void FlatOCPInternal::scaleEquations(){
   // Make sure that the equations has not already been scaled
   casadi_assert(!scaled_equations_);
   
-  // Make sure that the dependents have been eliminated
-/*  casadi_assert(eliminated_dependents_);*/
-  
   // Make sure that the variables have been scaled
   casadi_assert(scaled_variables_);
   
@@ -787,37 +791,30 @@ void FlatOCPInternal::sortBLT(bool with_x){
   }
   
   // BLT transformation
-  std::vector<int> blt_rowperm; // row permutations
-  std::vector<int> blt_colperm; // column permutations
-  std::vector<int> blt_rowblock;  // block k is rows r[k] to r[k+1]-1
-  std::vector<int> blt_colblock;  // block k is cols s[k] to s[k+1]-1
-  int blt_nb;
-  std::vector<int> blt_coarse_rowblock;  // coarse row decomposition
-  std::vector<int> blt_coarse_colblock;  //coarse column decomposition
+  std::vector<int> rowperm; // row permutations
+  std::vector<int> colperm; // column permutations
+  std::vector<int> rowblock;  // block k is rows r[k] to r[k+1]-1
+  std::vector<int> colblock;  // block k is cols s[k] to s[k+1]-1
+  int nb;
+  std::vector<int> coarse_rowblock;  // coarse row decomposition
+  std::vector<int> coarse_colblock;  //coarse column decomposition
 
-  blt_nb = sp.dulmageMendelsohn(blt_rowperm,blt_colperm,blt_rowblock,blt_colblock,blt_coarse_rowblock,blt_coarse_colblock);
+  nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
   vector<SX> dae_new(dae_.size());
   for(int i=0; i<dae_.size(); ++i){
-    dae_new[i] = dae_[blt_rowperm[i]];
+    dae_new[i] = dae_[rowperm[i]];
   }
   dae_new.swap(dae_);
   
   // Permute variables
   vector<Variable> x_new(x_.size());
   for(int i=0; i<x_.size(); ++i){
-    x_new[i]= x_[blt_colperm[i]];
+    x_new[i]= x_[colperm[i]];
   }
   x_new.swap(x_);
   
-  // Save blocks
-  rowblock_ = blt_rowblock;
-  colblock_ = blt_colblock;
-  nb_ = blt_nb;
-  
-  blt_sorted_ = true;
-
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... BLT sorting complete after " << dt << " seconds." << endl;
@@ -826,7 +823,7 @@ void FlatOCPInternal::sortBLT(bool with_x){
 void FlatOCPInternal::makeExplicit(){
   casadi_assert(0);
 #if 0
-  casadi_assert_message(blt_sorted_,"OCP has not been BLT sorted, call sortBLT()");
+  casadi_assert_message(sorted_,"OCP has not been BLT sorted, call sortBLT()");
 
   cout << "Making explicit..." << endl;
   double time1 = clock();
@@ -1031,13 +1028,13 @@ void FlatOCPInternal::makeSemiExplicit(){
 //   vb_cum = SXMatrix()
 //   def_cum = SXMatrix()
 // 
-//   for b in range(blt_nb):
-//     Jb = J[blt_rowblock[b]:blt_rowblock[b+1],blt_colblock[b]:blt_colblock[b+1]]
-//     vb = v_new[blt_colblock[b]:blt_colblock[b+1]]
-//     fb = dae_new[blt_rowblock[b]:blt_rowblock[b+1]]
+//   for b in range(nb):
+//     Jb = J[rowblock[b]:rowblock[b+1],colblock[b]:colblock[b+1]]
+//     vb = v_new[colblock[b]:colblock[b+1]]
+//     fb = dae_new[rowblock[b]:rowblock[b+1]]
 //     
 //     # Block size
-//     bs = blt_rowblock[b+1] - blt_rowblock[b]
+//     bs = rowblock[b+1] - rowblock[b]
 // 
 //     #print "block ", b,
 // 
@@ -1152,12 +1149,6 @@ void FlatOCPInternal::findConsistentIC(){
     y_[i].setStart(z0);
   }
   #endif
-}
-
-SX FlatOCPInternal::getExplicit(const SX& v) const{
-  SXMatrix x = v;
-  x = substitute(x,var(y_),dep_);
-  return x.toScalar();
 }
 
 Variable& FlatOCPInternal::variable(const std::string& name){

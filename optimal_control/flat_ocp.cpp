@@ -158,5 +158,10 @@ void FlatOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
   (*this)->eliminateDependent(eliminate_dependents_with_bounds);
 }
 
+void FlatOCP::eliminateInterdependencies(){
+  (*this)->eliminateInterdependencies();
+}
+
+
 } // namespace OptimalControl
 } // namespace CasADi

@@ -185,6 +185,47 @@ Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<
   return fcn.eval(expr);
 }
 
+Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &def, bool eliminate_constants){
+  casadi_assert_message(isSymbolic(var),"the variable is not symbolic");
+  casadi_assert_message(var.size1() == def.size1() && var.size2() == def.size2(),"the dimensions do not match");
+  casadi_assert_message(def.dense(),"Expression must be dense");
+  if(var.empty()) return def; // quick return if nothing to replace
+
+  // Write the mapping function
+  SXFunction f(var,def);
+  f.setOption("topological_sorting","depth-first");
+  f.init();
+
+  // Get references to the internal data structures
+  const std::vector<int>& input_ind = f->input_ind_.front();
+  std::vector<int>& output_ind = f->output_ind_.front();
+  std::vector<SXAlgEl>& algorithm = f->algorithm_;
+
+  // Create the filter
+  vector<int> filter = range(f->work_.size());
+  casadi_assert(input_ind.size()==output_ind.size());
+  for(int k=0; k<input_ind.size(); ++k){
+    filter[input_ind[k]] = output_ind[k];
+  }
+  
+  // Start by filtering out the replacement variables from the output_ind vector
+  for(vector<int>::iterator it=output_ind.begin(); it!=output_ind.end(); ++it){
+    *it = filter[*it];
+  }
+  
+  // Now filter out the variables from the algorithm
+  for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+    it->ch[0] = filter[it->ch[0]];
+    it->ch[1] = filter[it->ch[1]];
+  }
+  
+  // Replace expression
+  std::vector<Matrix<SX> > outputv = f->outputv_;
+  f->evaluateSX(f->inputv_, outputv, eliminate_constants);
+  
+  // Replace the result
+  return outputv.front();
+}
 
 #if 0
 void replaceDerivatives(Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &dvar){

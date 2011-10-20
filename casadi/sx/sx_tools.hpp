@@ -218,10 +218,15 @@ bool contains(const Matrix<SX> &list, const Matrix<SX> &e);
 
 /** \brief  Simplify an expression */
 void simplify(Matrix<SX> &ex);
+
 /// remove identical calculations
 void compress(Matrix<SX> &ex, int level=5); 
-/// substitute variable var with expression expr
+
+/// substitute variable var with expression expr in an expression ex
 Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr); 
+
+/// substitute variable var with expression expr in the expression itself
+Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &expr, bool eliminate_constants=false);
 
 // /** \brief  Make the expression smooth by replacing non-smooth nodes with binary variables */
 //void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr);

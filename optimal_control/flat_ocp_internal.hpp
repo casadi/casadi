@@ -134,6 +134,9 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     
     /// Sort variables according to type
     void sortType();
+    
+    /// Eliminate interdependencies in the dependent equations
+    void eliminateInterdependencies();
 
     /// Eliminate dependent equations
     void eliminateDependent(bool eliminate_dependents_with_bounds=false);
@@ -204,23 +207,12 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Verbose parsing
     bool verbose_;
     
-    // The data members below should be removed
-    
-    /// Is scaled?
-    bool scaled_variables_, scaled_equations_;
+    /// Have the variables been scaled
+    bool scaled_variables_;
 
-    /// BLT blocks
-    //@{
-    std::vector<int> rowblock_;  // block k is rows r[k] to r[k+1]-1
-    std::vector<int> colblock_;  // block k is cols s[k] to s[k+1]-1
-    int nb_;
-    //@}
-
-    /// BLT sorted?
-    bool blt_sorted_;
+    /// Have the equations been scaled
+    bool scaled_equations_;
     
-    /// Get the explicit expression for a variable
-    SX getExplicit(const SX& v) const;
 };
 
 } // namespace OptimalControl

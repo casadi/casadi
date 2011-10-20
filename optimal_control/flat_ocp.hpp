@@ -202,6 +202,9 @@ class FlatOCP : public OptionsFunctionality{
     */
     //@{
     
+    /// Eliminate interdependencies in the dependent equations
+    void eliminateInterdependencies();
+    
     /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
     void eliminateDependent(bool eliminate_dependents_with_bounds=false);
 
