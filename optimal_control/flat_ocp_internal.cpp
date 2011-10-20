@@ -80,7 +80,7 @@ void FlatOCPInternal::init(){
   scaleVariables();
 
   // Eliminate interdependencies
-  eliminateInterdependencies
+  eliminateInterdependencies();
   
   // Eliminate the dependent variables
   eliminateDependent();
