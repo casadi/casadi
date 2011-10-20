@@ -34,6 +34,7 @@ Variable::Variable(const string& name, bool create_expression){
   assignNode(new VariableInternal(name));
   if(create_expression){
     setExpression(SX(name));
+    setDerivative(SX("der_" + name));
   }
 }
 
@@ -49,20 +50,12 @@ const VariableInternal* Variable::operator->() const{
   return (const VariableInternal*)(SharedObject::operator->());
 }
   
-// Variable::operator SX() const{
-//   return var();  
-// }
-
-SX Variable::der(bool allocate) const{
-  return (*this)->der(allocate);  
-}
-
-SX Variable::der(bool allocate){
-  return (*this)->der(allocate);  
+SX Variable::der() const{
+  return (*this)->dx_;
 }
 
 SX Variable::var() const{
-  return (*this)->var();
+  return (*this)->sx_;
 }
 
 const string& Variable::getName() const{
@@ -198,7 +191,11 @@ void Variable::setIndex(int ind){
 }
     
 bool Variable::isDifferential() const{
-  return !(*this)->dx_.isNan();
+  return (*this)->is_differential_;
+}
+
+void Variable::setDifferential(bool is_differential){
+  (*this)->is_differential_ = is_differential;
 }
 
 SX Variable::highest() const{

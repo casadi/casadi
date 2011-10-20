@@ -61,11 +61,8 @@ namespace CasADi{
     /// Get the variable expression
     SX var() const;
     
-    /// Get differential expression (never allocate)
-    SX der(bool allocate=false) const;
-    
-    /// Get differential expression (allocate if necessary)
-    SX der(bool allocate=false);
+    /// Get differential expression
+    SX der() const;
     
     /// Get the highest order derivative (i.e. der() or var())
     SX highest() const;
@@ -174,6 +171,9 @@ namespace CasADi{
     
     /// Is differential?
     bool isDifferential() const;
+    
+    /// Set differential
+    void setDifferential(bool is_differential);
     
     /// Get the the free attribute
     bool getFree() const;

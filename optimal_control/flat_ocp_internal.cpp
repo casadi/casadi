@@ -86,7 +86,7 @@ void FlatOCPInternal::init(){
   eliminateDependent();
 
   // Scale the equations
-  scaleEquations();
+/*  scaleEquations();*/
   
 }
 
@@ -400,7 +400,9 @@ SX FlatOCPInternal::readExpr(const XMLNode& node){
   } else if(name.compare("Cos")==0){
     return cos(readExpr(node[0]));
   } else if(name.compare("Der")==0){
-    return readVariable(node[0]).der(true);
+    Variable v = readVariable(node[0]);
+    v.setDifferential(true);
+    return v.der();
   } else if(name.compare("Div")==0){
     return readExpr(node[0]) / readExpr(node[1]);
   } else if(name.compare("Exp")==0){
@@ -602,7 +604,6 @@ void FlatOCPInternal::sortType(){
         if(v.getFree()){
           p_.push_back(v); 
         } else {
-          cout << "v = " << v << endl;
           casadi_assert(0);
         }
       } else if(v.getVariability() == CONTINUOUS) {
@@ -673,10 +674,10 @@ void FlatOCPInternal::scaleVariables(){
 
   // Substitute equations
   dae_= substitute(dae_,v,v_old).data();
-/*  ode_= substitute(ode_,v,v_old).data();
+  ode_= substitute(ode_,v,v_old).data();
   alg_= substitute(alg_,v,v_old).data();
   quad_= substitute(quad_,v,v_old).data();
-  dep_= substitute(dep_,v,v_old).data();*/
+  dep_= substitute(dep_,v,v_old).data();
   initial_= substitute(initial_,v,v_old).data();
   path_    = substitute(path_,v,v_old).data();
   mterm_   = substitute(mterm_,v,v_old).data();
@@ -1109,7 +1110,7 @@ void FlatOCPInternal::makeAlgebraic(const Variable& v){
       dae_ = substitute(dae_,x_[k].der(),0.0).data();
 
       // Remove the highest state derivative expression from the variable
-      x_[k].setDerivative(SX());
+      x_[k].setDifferential(false);
 
       // Successfull return
       return;
