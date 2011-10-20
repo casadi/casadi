@@ -91,13 +91,13 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     SX t_;
 
     /// States (implicitly defined)
-    std::vector<Variable> s_;
-
-    /// Differential states
     std::vector<Variable> x_;
 
+    /// Differential states
+    std::vector<Variable> xd_;
+
     /// Algebraic states
-    std::vector<Variable> z_;
+    std::vector<Variable> xa_;
 
     /// Quadrature states
     std::vector<Variable> q_;
@@ -201,10 +201,8 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Final time is free
     bool tf_free_;
 
-
     /// Verbose parsing
     bool verbose_;
-
     
     // The data members below should be removed
     
@@ -220,26 +218,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
 
     /// BLT sorted?
     bool blt_sorted_;
-
-#if 0    
-    /// ODE right hand side function
-    FX oderhs_;
-    
-    /// ODE right hand side function with lagrange term
-    FX oderhs_with_lterm_;
-    
-    /// Output function
-    FX output_fcn_;
-    
-    /// DAE residual function
-    FX daeres_;
-    
-    /// Quadrature right hand side
-    FX quadrhs_;
-
-    /// Costs function
-    FX costfcn_;
-#endif    
     
     /// Get the explicit expression for a variable
     SX getExplicit(const SX& v) const;

@@ -70,12 +70,12 @@ std::vector<Variable>& FlatOCP::x(){
   return (*this)->x_;
 }
 
-std::vector<Variable>& FlatOCP::s(){
-  return (*this)->s_;
+std::vector<Variable>& FlatOCP::xd(){
+  return (*this)->xd_;
 }
 
-std::vector<Variable>& FlatOCP::z(){
-  return (*this)->z_;
+std::vector<Variable>& FlatOCP::xa(){
+  return (*this)->xa_;
 }
 
 std::vector<Variable>& FlatOCP::q(){

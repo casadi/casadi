@@ -36,9 +36,9 @@ class FlatOCPInternal;
  <H3>Variables:  </H3>
   \verbatim
    t :     time
-   s :     implicitly defined states (differential or algebraic)
-   x :     differential states
-   z :     algebraic states
+   x :     implicitly defined states (differential or algebraic)
+   xd:     differential states
+   xa:     algebraic states
    q :     quadrature states
    y :     dependent variables
    p :     independent parameters
@@ -47,12 +47,12 @@ class FlatOCPInternal;
   
   <H3>Equations:  </H3>
   \verbatim
-  fully implicit DAE:       0 = dae(t,s,sdot,x,z,u,p)
-  explicit OD:           xdot = ode(t,s,x,z,u,p)
-  quadratures:           qdot = quad(t,s,x,z,u,p)
-  algebraic equations:      0 = alg(t,s,x,z,u,p)
-  dependent equations:      y = dep(t,s,x,z,u,p)
-  initial equations:        0 = initial(t,s,\dot{s},x,z,u,p)
+  fully implicit DAE:       0 = dae(t,x,\dot{x},xd,xa,u,p)
+  explicit OD:       \dot{xd} = ode(t,x,xd,xa,u,p)
+  quadratures:        \dot{q} = quad(t,x,xd,xa,u,p)
+  algebraic equations:      0 = alg(t,x,xd,xa,u,p)
+  dependent equations:      y = dep(t,x,xd,xa,u,p)
+  initial equations:        0 = initial(t,x,\dot{x},xd,xa,u,p)
   \endverbatim 
 
   Note that when parsed, all dynamic states, differential and algebraic, end up in the category "s" 
@@ -120,13 +120,13 @@ class FlatOCP : public OptionsFunctionality{
     SX t() const;
     
     /// Implicitly defined states
-    std::vector<Variable>& s();
-    
-    /// Differential states
     std::vector<Variable>& x();
     
+    /// Differential states
+    std::vector<Variable>& xd();
+    
     /// Algebraic states
-    std::vector<Variable>& z();
+    std::vector<Variable>& xa();
     
     /// Quadrature states
     std::vector<Variable>& q();

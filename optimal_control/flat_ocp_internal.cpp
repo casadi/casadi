@@ -116,9 +116,9 @@ void FlatOCPInternal::parse(){
   sortType();
   
   // Make sure that the dimensions are consistent at this point
-  casadi_assert(s_.size()==dae_.size());
-  casadi_assert(x_.size()==ode_.size());
-  casadi_assert(z_.size()==alg_.size());
+  casadi_assert(x_.size()==dae_.size());
+  casadi_assert(xd_.size()==ode_.size());
+  casadi_assert(xa_.size()==alg_.size());
   casadi_assert(q_.size()==quad_.size());
   casadi_assert(y_.size()==dep_.size());
   
@@ -461,9 +461,9 @@ void FlatOCPInternal::repr(std::ostream &stream) const{
 
 void FlatOCPInternal::print(ostream &stream) const{
   stream << "Dimensions: "; 
-  stream << "#s = " << s_.size() << ", ";
-  stream << "#x = " << x_.size() << ", ";
-  stream << "#z = " << z_.size() << ", ";
+  stream << "#s = " << x_.size() << ", ";
+  stream << "#xd = " << xd_.size() << ", ";
+  stream << "#z = " << xa_.size() << ", ";
   stream << "#q = " << q_.size() << ", ";
   stream << "#y = " << y_.size() << ", ";
   stream << "#p = " << p_.size() << ", ";
@@ -476,9 +476,9 @@ void FlatOCPInternal::print(ostream &stream) const{
   // Print the variables
   stream << "{" << endl;
   stream << "  t = " << t_ << endl;
-  stream << "  s =  " << s_ << endl;
-  stream << "  x =  " << x_ << endl;
-  stream << "  z =  " << z_ << endl;
+  stream << "  s =  " << x_ << endl;
+  stream << "  xd = " << xd_ << endl;
+  stream << "  z =  " << xa_ << endl;
   stream << "  q =  " << q_ << endl;
   stream << "  y =  " << y_ << endl;
   stream << "  p =  " << p_ << endl;
@@ -493,14 +493,14 @@ void FlatOCPInternal::print(ostream &stream) const{
   stream << endl;
   
   stream << "Explicit differential equations" << endl;
-  for(int k=0; k<x_.size(); ++k){
-    stream << x_[k].der() << " == " << ode_[k] << endl;
+  for(int k=0; k<xd_.size(); ++k){
+    stream << xd_[k].der() << " == " << ode_[k] << endl;
   }
   stream << endl;
 
   stream << "Algebraic equations" << endl;
-  for(int k=0; k<z_.size(); ++k){
-    stream << z_[k] << " == " << alg_[k] << endl;
+  for(int k=0; k<xa_.size(); ++k){
+    stream << xa_[k] << " == " << alg_[k] << endl;
   }
   stream << endl;
   
@@ -572,9 +572,9 @@ void FlatOCPInternal::eliminateDependent(bool eliminate_dependents_with_bounds){
 
 void FlatOCPInternal::sortType(){
   // Clear variables
-  s_.clear();
   x_.clear();
-  z_.clear();
+  xd_.clear();
+  xa_.clear();
   u_.clear();
   p_.clear();
   
@@ -600,7 +600,7 @@ void FlatOCPInternal::sortType(){
         }
       } else if(v.getVariability() == CONTINUOUS) {
         if(v.getCausality() == INTERNAL){
-          s_.push_back(v);
+          x_.push_back(v);
         } else if(v.getCausality() == INPUT){
           u_.push_back(v);
         }
@@ -626,38 +626,38 @@ void FlatOCPInternal::scaleVariables(){
 
   // Variables
   Matrix<SX> t = t_;
-  Matrix<SX> s = var(s_);
-  Matrix<SX> sdot = der(s_);
   Matrix<SX> x = var(x_);
-  Matrix<SX> z = var(z_);
+  Matrix<SX> xdot = der(x_);
+  Matrix<SX> xd = var(xd_);
+  Matrix<SX> xa = var(xa_);
   Matrix<SX> p = var(p_);
   Matrix<SX> u = var(u_);
   
   // Collect all the variables
   Matrix<SX> v;
   append(v,t);
-  append(v,s);
-  append(v,sdot);
   append(v,x);
-  append(v,z);
+  append(v,xdot);
+  append(v,xd);
+  append(v,xa);
   append(v,p);
   append(v,u);
   
   // Nominal values
   Matrix<SX> t_n = 1.;
-  Matrix<SX> s_n = getNominal(s_);
   Matrix<SX> x_n = getNominal(x_);
-  Matrix<SX> z_n = getNominal(z_);
+  Matrix<SX> xd_n = getNominal(xd_);
+  Matrix<SX> xa_n = getNominal(xa_);
   Matrix<SX> p_n = getNominal(p_);
   Matrix<SX> u_n = getNominal(u_);
   
   // Get all the old variables in expressed in the nominal ones
   Matrix<SX> v_old;
   append(v_old,t*t_n);
-  append(v_old,s*s_n);
-  append(v_old,sdot*s_n);
   append(v_old,x*x_n);
-  append(v_old,z*z_n);
+  append(v_old,xdot*x_n);
+  append(v_old,xd*xd_n);
+  append(v_old,xa*xa_n);
   append(v_old,p*p_n);
   append(v_old,u*u_n);
   
@@ -703,9 +703,9 @@ void FlatOCPInternal::scaleEquations(){
   enum Variables{T,X,XDOT,Z,P,U,NUM_VAR};
   vector<Matrix<SX> > v(NUM_VAR); // all variables
   v[T] = t_;
-  v[X] = var(x_);
-  v[XDOT] = der(x_);
-  v[Z] = var(z_);
+  v[X] = var(xd_);
+  v[XDOT] = der(xd_);
+  v[Z] = var(xa_);
   v[P] = var(p_);
   v[U] = var(u_);
 
@@ -721,9 +721,9 @@ void FlatOCPInternal::scaleEquations(){
   // Evaluate the Jacobian in the starting point
   J.init();
   J.setInput(0.0,T);
-  J.setInput(getStart(x_,true),X);
+  J.setInput(getStart(xd_,true),X);
   J.input(XDOT).setAll(0.0);
-  J.setInput(getStart(z_,true),Z);
+  J.setInput(getStart(xa_,true),Z);
   J.setInput(getStart(p_,true),P);
   J.setInput(getStart(u_,true),U);
   J.evaluate();
@@ -773,15 +773,15 @@ void FlatOCPInternal::sortBLT(bool with_x){
     SX invtau("invtau");
 
     // Replace x with invtau*xdot in order to get a Jacobian which also includes x
-    SXMatrix dae_with_x = substitute(highest(s_),var(x_),invtau*SXMatrix(var(x_)));
+    SXMatrix dae_with_x = substitute(highest(x_),var(xd_),invtau*SXMatrix(var(xd_)));
     
     // Create Jacobian in order to find the sparsity
-    SXFunction fcn(highest(s_),dae_with_x);
+    SXFunction fcn(highest(x_),dae_with_x);
     Matrix<SX> J = fcn.jac();
     sp = J.sparsity();
   } else {
     // Create Jacobian in order to find the sparsity
-    SXFunction fcn(highest(s_),dae_);
+    SXFunction fcn(highest(x_),dae_);
     Matrix<SX> J = fcn.jac();
     sp = J.sparsity();
   }
@@ -805,11 +805,11 @@ void FlatOCPInternal::sortBLT(bool with_x){
   dae_new.swap(dae_);
   
   // Permute variables
-  vector<Variable> s_new(s_.size());
-  for(int i=0; i<s_.size(); ++i){
-    s_new[i]= s_[blt_colperm[i]];
+  vector<Variable> x_new(x_.size());
+  for(int i=0; i<x_.size(); ++i){
+    x_new[i]= x_[blt_colperm[i]];
   }
-  s_new.swap(s_);
+  x_new.swap(x_);
   
   // Save blocks
   rowblock_ = blt_rowblock;
@@ -832,14 +832,14 @@ void FlatOCPInternal::makeExplicit(){
   double time1 = clock();
   
   // Create Jacobian
-  SXFunction fcn(highest(s_),dae_);
+  SXFunction fcn(highest(x_),dae_);
   SXMatrix J = fcn.jac();
 
   // Get initial values for all implicit variables
-  vector<double> s_guess(s_.size(),0);
-  for(int i=0; i<s_.size(); ++i){
-    if(s_[i].isDifferential()){
-      s_guess[i] = s_[i].getStart()/s_[i].getNominal();
+  vector<double> x_guess(x_.size(),0);
+  for(int i=0; i<x_.size(); ++i){
+    if(x_[i].isDifferential()){
+      x_guess[i] = x_[i].getStart()/x_[i].getNominal();
     }
   }
   
@@ -851,7 +851,7 @@ void FlatOCPInternal::makeExplicit(){
 
   // New implicit equation and variables
   vector<SX> dae_new;
-  vector<Variable> s_new;
+  vector<Variable> x_new;
     
   // Loop over blocks
   for(int b=0; b<nb_; ++b){
@@ -862,7 +862,7 @@ void FlatOCPInternal::makeExplicit(){
     // Get local variables
     vb.clear();
     for(int i=colblock_[b]; i<colblock_[b+1]; ++i)
-      vb.push_back(s_[i].var());
+      vb.push_back(x_[i].var());
 
     // Get local equations
     fb.clear();
@@ -877,7 +877,7 @@ void FlatOCPInternal::makeExplicit(){
       SXMatrix x_k(vb.size(),1,0);
       int offset = rowblock_[b];
       for(int i=0; i<x_k.size(); ++i){
-        x_k.at(i) = s_guess[offset+i];
+        x_k.at(i) = x_guess[offset+i];
       }
       
       // Make Newton iterations
@@ -973,7 +973,7 @@ void FlatOCPInternal::makeExplicit(){
   }
 
   // Update implicit equations
-  s_new.swap(s_);
+  x_new.swap(x_);
   dae_new.swap(dae_);
 
   // Mark the variables made explicit
@@ -982,10 +982,10 @@ void FlatOCPInternal::makeExplicit(){
   }
   
   // New algebraic variables
-  vector<Variable> z_new;
+  vector<Variable> xa_new;
 
   // Loop over algebraic variables
-  for(vector<Variable>::iterator it=z_.begin(); it!=z_.end(); ++it){
+  for(vector<Variable>::iterator it=xa_.begin(); it!=xa_.end(); ++it){
     // Check if marked
     if(it->var().getTemp()){
       // Make dependent
@@ -998,12 +998,12 @@ void FlatOCPInternal::makeExplicit(){
         path_max_.push_back(it->getMax()/it->getNominal());
       }
     } else {
-      z_new.push_back(*it);
+      xa_new.push_back(*it);
     }
   }
   
-  // Update new z_
-  z_.swap(z_new);
+  // Update new xa_
+  xa_.swap(xa_new);
 
   // Unark the variables made explicit
   for(vector<SX>::iterator it=explicit_var_.begin()+old_nexp; it!=explicit_var_.end(); ++it){
@@ -1019,196 +1019,6 @@ void FlatOCPInternal::makeExplicit(){
   cout << "... makeExplicit complete after " << dt << " seconds." << endl;
 #endif
 }
-
-void FlatOCPInternal::createFunctions(bool create_dae, bool create_ode, bool create_quad){
-  casadi_assert(0);
-#if 0
-  cout << "createFunctions ..." << endl;
-  double time1 = clock();
-
-  // no quad if no quadrature states
-  if(lterm_.empty()) create_quad=false;
-
-  if(create_ode){
-    // Create an explicit ODE
-    sortBLT(false);
-
-    // Make the OCP explicit by eliminated all the algebraic states
-    makeExplicit();
-    
-    // The equation could be made explicit symbolically
-    if(dae_.empty()){
-      casadi_assert(z_.empty());
-      
-      // Mark the explicit variables
-      for(int i=0; i<explicit_var_.size(); ++i){
-        explicit_var_[i].setTemp(i+1);
-      }
-
-      // Find the ODE rhs
-      vector<SX> ode(x_.size());
-      for(int i=0; i<x_.size(); ++i){
-        int ind = x_[i].der().getTemp()-1;
-        casadi_assert(ind>=0);
-        ode[i] = explicit_fcn_[ind];
-      }
-  
-      // Find the dependency equations
-      vector<SX> dep(y_.size());
-      for(int i=0; i<y_.size(); ++i){
-        int ind = y_[i].var().getTemp()-1;
-        casadi_assert(ind>=0);
-        dep[i] = explicit_fcn_[ind];
-      }
-      
-      // Unmark the explicit variables
-      for(int i=0; i<explicit_var_.size(); ++i){
-        explicit_var_.at(i).setTemp(0);
-      }
-
-      // Evaluate constant expressions
-/*      Matrix<SX> ode_elim = evaluateConstants(ode);*/
-      Matrix<SX> ode_elim = ode;
-      
-      // ODE right hand side function
-      vector<SXMatrix> ode_in(DAE_NUM_IN);
-      ode_in[DAE_T] = t_;
-      ode_in[DAE_Y] = var(x_);
-      ode_in[DAE_P] = var(u_);
-      oderhs_ = SXFunction(ode_in,ode_elim);
-      
-      // Dependency function
-      output_fcn_ = SXFunction(ode_in,dep);
-      
-      // ODE quadrature function
-      if(create_quad){
-        quadrhs_ = SXFunction(ode_in,lterm_[0]);
-        
-        // ODE right hand side with lterm
-        append(ode_in[DAE_Y],symbolic("lterm"));
-        append(ode_elim,SXMatrix(lterm_[0]));
-        oderhs_with_lterm_ = SXFunction(ode_in,ode_elim);
-      }
-      
-    } else {
-      cout << dae_.size() << " implicit equations" << endl;
-      
-      
-    // A Newton algorithm is necessary
-    casadi_assert(0);
-    
-//     # Create an implicit function residual
-//     impres_in = (DAE_NUM_IN+1) * [[]]
-//     impres_in[0] = xdot+z
-//     impres_in[1+DAE_T] = t
-//     impres_in[1+DAE_Y] = x
-//     impres_in[1+DAE_P] = u
-//     impres = SXFunction(impres_in,[ocp.dae_])
-//     impres.setOption("number_of_fwd_dir",len(x)+1)
-// 
-//     impres.init()
-//     impres.setInput(xdot0+z0, 0)
-//     impres.setInput(0., 1+DAE_T)
-//     impres.setInput(x0, 1+DAE_Y)
-//     impres.setInput(u0, 1+DAE_P)
-//     impres.evaluate()
-// 
-//     # Create an implicit function (KINSOL)
-//     impsolver = KinsolSolver(impres)
-//     linsol = CSparse(CRSSparsity())
-//     impsolver.setLinearSolver(linsol)
-// 
-//     impsolver.setOption("linear_solver","user_defined")
-//     impsolver.setOption("max_krylov",100)
-//     impsolver.setOption("number_of_fwd_dir",len(x)+1)
-//     impsolver.setOption("number_of_adj_dir",0)
-//     impsolver.init()
-// 
-//     impsolver.setInput(0., DAE_T)
-//     impsolver.setInput(x0, DAE_Y)
-//     impsolver.setInput(u0, DAE_P)
-//     impsolver.output().set(xdot0+z0)
-//     impsolver.evaluate(1,0)
-//     #print "implicit function residual", impsolver.output()
-// 
-//     # Create the ODE residual
-//     ode_in_mx = DAE_NUM_IN * [[]]
-//     ode_in_mx[DAE_T] = MX("T")
-//     ode_in_mx[DAE_Y] = MX("X",len(x))
-//     ode_in_mx[DAE_P] = MX("U",len(u))
-//     [xdot_z] = impsolver.call(ode_in_mx)
-//     ode = MXFunction(ode_in_mx,[xdot_z[0:len(x)]])
-//     ode.setOption("number_of_fwd_dir",len(x)+1)
-// 
-//     # ODE quadrature function
-//     ode_in = DAE_NUM_IN * [[]]
-//     ode_in[DAE_T] = t
-//     ode_in[DAE_Y] = x
-//     ode_in[DAE_P] = u
-//     ode_lterm = SXFunction(ode_in,[[ocp.lterm[0]/1e3]])
-//     ode_lterm.setOption("number_of_fwd_dir",len(x)+1)
-      
-    }
-  } else if(create_dae) {
-    // BLT sorting
-    sortBLT(true);
-
-    // Scale the equations
-    scaleEquations();
-    
-    // Time deriative of the algebraic variables
-    SXMatrix zdot = symbolic("zdot",z_.size());
-    
-    // State
-    SXMatrix xz = vertcat(SXMatrix(var(x_)),SXMatrix(var(z_)));
-    
-    // State derivative
-    SXMatrix xzdot = vertcat(SXMatrix(der(x_)),zdot);
-    
-    // DAE residual arguments
-    vector<SXMatrix> dae_in(DAE_NUM_IN);
-    dae_in[DAE_T] = t_;
-    dae_in[DAE_Y] = xz;
-    dae_in[DAE_YDOT] = xzdot;
-    dae_in[DAE_P] = var(u_);
-    
-    // DAE residual
-    daeres_ = SXFunction(dae_in,dae_);
-
-    // DAE quadrature function
-    if(create_quad){
-      quadrhs_ = SXFunction(dae_in,lterm_[0]/1e3);
-    }
-  }
-
-  // Time deriative of the algebraic variables
-  SXMatrix zdot = symbolic("zdot",z_.size());
-    
-  // State
-  SXMatrix xz = vertcat(SXMatrix(var(x_)),SXMatrix(var(z_)));
-    
-  // State derivative
-  SXMatrix xzdot = vertcat(SXMatrix(der(x_)),zdot);
-  
-  // Mayer objective function
-  SXMatrix xf = symbolic("xf",x_.size()+lterm_.size(),1);
-  costfcn_ = SXFunction(xf, xf.data().back());
-
-  // Path constraint function
-  vector<SXMatrix> cfcn_in(DAE_NUM_IN);
-  cfcn_in[DAE_T] = t_;
-  cfcn_in[DAE_Y] = xz;
-  cfcn_in[DAE_YDOT] = xzdot;
-  append(cfcn_in[DAE_Y],symbolic("lterm")); // FIXME
-  cfcn_in[DAE_P] = var(u_);
-  pathfcn_ = SXFunction(cfcn_in,path_);
-    
-  double time2 = clock();
-  double dt = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "... createFunctions complete after " << dt << " seconds." << endl;
-#endif
-}
-
 
 void FlatOCPInternal::makeSemiExplicit(){
   
@@ -1278,15 +1088,15 @@ void FlatOCPInternal::makeSemiExplicit(){
 
 void FlatOCPInternal::makeAlgebraic(const Variable& v){
   // Find variable among the explicit variables
-  for(int k=0; k<x_.size(); ++k){
-    if(x_[k].get()==v.get()){
+  for(int k=0; k<xd_.size(); ++k){
+    if(xd_[k].get()==v.get()){
       
       // Add to list of algebraic variables and to the list of algebraic equations
-      z_.push_back(v);
+      xa_.push_back(v);
       alg_.push_back(ode_[k]);
       
       // Remove from list of differential variables and the list of diffential equations
-      x_.erase(x_.begin()+k);
+      xd_.erase(xd_.begin()+k);
       ode_.erase(ode_.begin()+k);
 
       // Successfull return
@@ -1295,14 +1105,14 @@ void FlatOCPInternal::makeAlgebraic(const Variable& v){
   }
   
   // Find the variable among the implicit variables
-  for(int k=0; k<s_.size(); ++k){
-    if(s_[k].get()==v.get()){
+  for(int k=0; k<x_.size(); ++k){
+    if(x_[k].get()==v.get()){
       
       // Substitute the state derivative with zero
-      dae_ = substitute(dae_,s_[k].der(),0.0).data();
+      dae_ = substitute(dae_,x_[k].der(),0.0).data();
 
       // Remove the highest state derivative expression from the variable
-      s_[k].setDerivative(SX());
+      x_[k].setDerivative(SX());
 
       // Successfull return
       return;
