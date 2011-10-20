@@ -8,6 +8,7 @@ PDF=$(PY:.py=.pdf)
 BUILDDIR=../../build
 
 CASADI_OBJECT=$(BUILDDIR)/swig/python/casadi/_casadi.so
+OCTAVE_PATH=$(BUILDDIR)/lib
 all: python cpp cpprun octave
 
 .PHONY = python cpp cpprun
@@ -38,7 +39,7 @@ $(LOG): %.log : %.run
 	$< > $@ 2>&1
 	
 $(OCTLOG): %.out : %.m
-	octave -q $< 2>&1 > $@ 
+	octave --no-init-file -p $(OCTAVE_PATH) -q $< 2>&1 > $@ 
 	
 ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make
 	cd ctemplate && python ctemplate.py && chmod +x compiler.sh linker.sh && cd ..
