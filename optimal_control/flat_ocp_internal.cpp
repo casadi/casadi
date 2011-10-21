@@ -46,6 +46,7 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   addOption("scale_variables",          OT_BOOLEAN,      false, "Scale the variables so that they get unity order of magnitude");
   addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be expressed as an expression of other variables");
   addOption("scale_equations",          OT_BOOLEAN,      true,  "Scale the implicit equations so that they get unity order of magnitude");
+  addOption("sort_equations",           OT_BOOLEAN,      true,  "Sort the dynamic equations");
   addOption("semi_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
   addOption("fully_explicit",           OT_BOOLEAN,      false, "Make the DAE fully explicit (not always possible)");
   addOption("verbose",                  OT_BOOLEAN,      true,  "Verbose parsing");
@@ -61,8 +62,6 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   document_.setName(filename);
   document_.addNode(&doc);
 
-  scaled_variables_ = false;
-  scaled_equations_ = false;
   t_ = SX("t");
   t0_ = numeric_limits<double>::quiet_NaN();
   tf_ = numeric_limits<double>::quiet_NaN();
@@ -72,24 +71,33 @@ void FlatOCPInternal::init(){
 
   // Read options
   verbose_ = getOption("verbose");
+  bool scale_variables = getOption("scale_variables");
+  bool scale_equations = getOption("scale_equations");
+  bool eliminate_dependent = getOption("eliminate_dependent");
+  bool sort_equations = getOption("sort_equations");
   
   // Obtain the symbolic representation of the OCP
   parse();
 
   // Scale the variables
-  scaleVariables();
+  if(scale_variables)
+    scaleVariables();
 
-  // Eliminate interdependencies
-  eliminateInterdependencies();
+  if(eliminate_dependent){
+    // Eliminate interdependencies
+    eliminateInterdependencies();
   
-  // Eliminate the dependent variables
-  eliminateDependent();
+    // Eliminate the dependent variables
+    eliminateDependent();
+  }
 
   // Sort the equations and variables
-  sortDAE();
+  if(sort_equations)
+    sortDAE();
 
   // Scale the equations
-/*  scaleEquations();*/
+  if(scale_equations)
+    scaleEquations();
   
 }
 
@@ -633,9 +641,6 @@ void FlatOCPInternal::scaleVariables(){
   cout << "Scaling variables ..." << endl;
   double time1 = clock();
   
-  //Make sure that the variables has not already been scaled
-  casadi_assert(!scaled_variables_);
-
   // Variables
   Matrix<SX> t = t_;
   Matrix<SX> x = var(x_);
@@ -687,19 +692,12 @@ void FlatOCPInternal::scaleVariables(){
   mterm_   = substitute(mterm_,v,v_old).data();
   lterm_   = substitute(lterm_,v,v_old).data();
   
-  scaled_variables_ = true;
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... variable scaling complete after " << dt << " seconds." << endl;
 }
     
 void FlatOCPInternal::scaleEquations(){
-  
-  // Make sure that the equations has not already been scaled
-  casadi_assert(!scaled_equations_);
-  
-  // Make sure that the variables have been scaled
-  casadi_assert(scaled_variables_);
   
   // Quick return if no implicit equations
   if(dae_.empty())
@@ -767,7 +765,6 @@ void FlatOCPInternal::scaleEquations(){
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "... equation scaling complete after " << dt << " seconds." << endl;
-  scaled_equations_ = true;
 }
 
 void FlatOCPInternal::sortDAE(){

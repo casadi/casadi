@@ -210,12 +210,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Verbose parsing
     bool verbose_;
     
-    /// Have the variables been scaled
-    bool scaled_variables_;
-
-    /// Have the equations been scaled
-    bool scaled_equations_;
-    
 };
 
 } // namespace OptimalControl

@@ -53,7 +53,7 @@ int main(){
   // Set options
   ocp.setOption("scale_variables",true);
   ocp.setOption("eliminate_dependent",true);
-  ocp.setOption("scale_equations",true);
+  ocp.setOption("scale_equations",false);
   
   // Initialize
   ocp.init();
