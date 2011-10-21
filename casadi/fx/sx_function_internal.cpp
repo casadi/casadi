@@ -779,13 +779,13 @@ void SXFunctionInternal::init(){
   stack<SXNode*> s;
 
   // Add the inputs to the stack
-  for(vector<Matrix<SX> >::const_iterator it = inputv_.begin(); it != inputv_.end(); ++it)
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
+  for(vector<Matrix<SX> >::const_reverse_iterator it = inputv_.rbegin(); it != inputv_.rend(); ++it)
+    for(vector<SX>::const_reverse_iterator itc = it->rbegin(); itc != it->rend(); ++itc)
       s.push(itc->get());
 
   // Add the outputs to the stack
-  for(vector<Matrix<SX> >::const_iterator it = outputv_.begin(); it != outputv_.end(); ++it)
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc)
+  for(vector<Matrix<SX> >::const_reverse_iterator it = outputv_.rbegin(); it != outputv_.rend(); ++it)
+    for(vector<SX>::const_reverse_iterator itc = it->rbegin(); itc != it->rend(); ++itc)
       s.push(itc->get());
 
   // Order the nodes in the order of dependencies using a depth-first topological sorting
@@ -1102,7 +1102,7 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
   
   // Assert input dimension
   assert(input_.size() == input_s.size());
-  
+
   // Copy the function arguments to the work vector
   for(int ind=0; ind<input_s.size(); ++ind){
     for(int i=0; i<input_ind_[ind].size(); ++i){
@@ -1110,9 +1110,10 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
     }
   }
   
-  // Evaluate the algorithm_
+  // Evaluate the algorithm
   for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-      // Get the arguments
+
+    // Get the arguments
     SX x = swork_[it->ch[0]];
     SX y = swork_[it->ch[1]];
     if(eliminate_constants && x.isConstant() && y.isConstant()){
@@ -1127,8 +1128,9 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
 
   // Get the results
   for(int ind=0; ind<output_.size(); ++ind){
-    for(int i=0; i<output_ind_[ind].size(); ++i)
+    for(int i=0; i<output_ind_[ind].size(); ++i){
       output_s[ind].data()[i] = swork_[output_ind_[ind][i]];
+    }
   }
 }
 

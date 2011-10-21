@@ -31,7 +31,7 @@ namespace CasADi{
 struct SXAlgEl{
   /// operator
   unsigned char op; 
-  /// index of the binary operaton to be evaluated
+  /// index of the result
   int ind; 
   /// indices of the arguments
   int ch[2]; 

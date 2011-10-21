@@ -56,7 +56,7 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Evaluate the function with partial derivatives up to order ord */
   virtual void evaluate(int nfdir, int nadir);
 
-  /** \brief  evaluate symbolically */
+  /** \brief  evaluate symbolically, possibly evaluating constants and/or replacing expressions */
   virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
 
   /** \brief  Check if smooth */

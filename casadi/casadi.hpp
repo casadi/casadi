@@ -23,13 +23,15 @@
 #ifndef CASADI_HPP
 #define CASADI_HPP
 
+// Scalar expressions (why do i need to put it up here?)
+#include "sx/sx.hpp"
+
 // Matrices
 #include "matrix/matrix.hpp"
 #include "matrix/matrix_tools.hpp"
 #include "matrix/sparsity_tools.hpp"
 
 // Scalar expressions
-#include "sx/sx.hpp"
 #include "sx/sx_tools.hpp"
 #include "fx/sx_function.hpp"
 

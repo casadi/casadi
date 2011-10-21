@@ -1040,7 +1040,8 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   
   // Get the Jacobian of the function
   MX J = jac(iind).at(oind);
-
+  // MX J = grad(oind).at(iind);
+  
   // Construct the gradient function
   MXFunction gfcn(inputv,trans(J));
   gfcn.init();
