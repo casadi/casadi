@@ -19,6 +19,7 @@ swig:
 
 full: dox
 	cd ../examples && make
+	cd ../tutorials/python && python make_tutorials.py
 	python extra/generate_options_doc.py
 	python extra/fetch_examples_pdf.py
 	sh extra/doc2swig.sh
