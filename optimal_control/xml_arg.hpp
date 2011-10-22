@@ -25,8 +25,6 @@
 
 #include <string>
 #include <sstream>
-#include <casadi/sx/sx.hpp>
-#include <casadi/mx/mx.hpp>
 
 namespace CasADi{
 namespace OptimalControl{
@@ -39,9 +37,6 @@ class StrArg{
   operator std::string() const;
   operator int() const;
   operator double() const;
-  operator SXMatrix() const;
-  operator MX() const;
-  operator SX() const;
 
 /** \brief  print */
   friend std::ostream& operator<<(std::ostream &stream, const StrArg& arg);

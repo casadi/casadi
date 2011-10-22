@@ -256,7 +256,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 #include "optimal_control/ocp_tools.hpp"
 #include "optimal_control/multiple_shooting.hpp"
-#include "optimal_control/fmi_parser.hpp"
+#include "optimal_control/flat_ocp.hpp"
 
 %}
 

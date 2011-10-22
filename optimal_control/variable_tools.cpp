@@ -39,6 +39,13 @@ vector<SX> der(const vector<Variable> v){
     ret[i] = v[i].der();
   return ret;
 }
+    
+vector<SX> highest(const vector<Variable> v){
+  vector<SX> ret(v.size());
+  for(int i=0; i<v.size(); ++i)
+    ret[i] = v[i].highest();
+  return ret;
+}
 
 vector<double> getNominal(const vector<Variable> v){
   vector<double> ret(v.size());

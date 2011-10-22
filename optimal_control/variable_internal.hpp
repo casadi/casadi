@@ -45,15 +45,6 @@ namespace CasADi{
       // Get name
       const std::string& getName() const;
 
-      // Variable/binding equation
-      SX var() const;  
-
-      // Derivative/differential equation (never allocate)
-      SX der(bool allocate) const;
-      
-      // Derivative/differential equation (allocate if necessary)
-      SX der(bool allocate);
-      
       // Timed variable (never allocate)
       SX atTime(double t, bool allocate) const;
 
@@ -89,7 +80,9 @@ namespace CasADi{
             
       // Index
       int index_;
- 
+      
+      // Does the expression appear differentiated
+      bool is_differential_;
   };
   
   

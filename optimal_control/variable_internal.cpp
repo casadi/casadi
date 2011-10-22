@@ -47,6 +47,7 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   unit_ = "";
   displayUnit_ = "";
   free_ = false;
+  is_differential_ = false;
 
   index_ = -1;
 }
@@ -56,32 +57,6 @@ VariableInternal::~VariableInternal(){
 
 const string& VariableInternal::getName() const{
   return name_;
-}
-
-SX VariableInternal::der(bool allocate) const{
-  casadi_assert(!allocate);
-  return const_cast<VariableInternal*>(this)->der(false);
-}
-
-SX VariableInternal::der(bool allocate){
-  if(dx_.isNan()){
-    if(allocate){
-      // Create derivative
-      stringstream varname;
-      varname << "der_" << var();
-      dx_ = SX(varname.str());
-    } else {
-      stringstream msg;
-      repr(msg);
-      msg << " has no derivative expression";
-      throw CasadiException(msg.str());
-    }
-  }
-  return dx_;
-}
-
-SX VariableInternal::var() const{
-  return sx_;
 }
 
 void VariableInternal::repr(ostream &stream) const{
@@ -107,7 +82,7 @@ SX VariableInternal::atTime(double t, bool allocate){
     if(allocate){
       // Create a timed variable
       stringstream ss;
-      ss << var() << ".atTime(" << t << ")";
+      ss << sx_ << ".atTime(" << t << ")";
       SX tvar(ss.str());
       
       // Save to map

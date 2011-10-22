@@ -1,15 +1,13 @@
 %{
 #include "optimal_control/variable.hpp"
-#include "optimal_control/optimica_ocp.hpp"
-#include "optimal_control/fmi_parser.hpp"
+#include "optimal_control/flat_ocp.hpp"
 #include "optimal_control/variable_tools.hpp"
 #include "optimal_control/ocp_tools.hpp"
 #include "optimal_control/multiple_shooting.hpp"
 %}
 
 %include "optimal_control/variable.hpp"
-%include "optimal_control/optimica_ocp.hpp"
-%include "optimal_control/fmi_parser.hpp"
+%include "optimal_control/flat_ocp.hpp"
 %include "optimal_control/variable_tools.hpp"
 %include "optimal_control/ocp_tools.hpp"
 %include "optimal_control/multiple_shooting.hpp"
@@ -22,7 +20,7 @@
       return repr(self.__dict__)
 %}
 
-%extend CasADi::OptimalControl::OCP{
+/*%extend CasADi::OptimalControl::OCP{
     %pythoncode %{
       def getSubTree(self,vars):
         if vars.var_.isNull():
@@ -38,7 +36,7 @@
         return self.getSubTree(self.variables_)
 
     %}
-};
+};*/
 #endif // SWIGPYTHON
 
 
