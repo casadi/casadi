@@ -47,8 +47,8 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be expressed as an expression of other variables");
   addOption("scale_equations",          OT_BOOLEAN,      true,  "Scale the implicit equations so that they get unity order of magnitude");
   addOption("sort_equations",           OT_BOOLEAN,      true,  "Sort the dynamic equations");
-  addOption("semi_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
-  addOption("fully_explicit",           OT_BOOLEAN,      false, "Make the DAE fully explicit (not always possible)");
+  addOption("make_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
+  addOption("eliminate_algebraic",      OT_BOOLEAN,      false, "Completely eliminate algebraic states");
   addOption("verbose",                  OT_BOOLEAN,      true,  "Verbose parsing");
   addOption("eliminate_dependents_with_bounds",  OT_BOOLEAN,      true,  "Verbose parsing");
   
@@ -76,7 +76,7 @@ void FlatOCPInternal::init(){
   bool scale_equations = getOption("scale_equations");
   bool eliminate_dependent = getOption("eliminate_dependent");
   bool sort_equations = getOption("sort_equations");
-  bool semi_explicit = getOption("semi_explicit");
+  bool make_explicit = getOption("make_explicit");
   
   // Obtain the symbolic representation of the OCP
   parse();
@@ -104,7 +104,7 @@ void FlatOCPInternal::init(){
     scaleEquations();
   
   // Transform to semi-explicit form
-  if(semi_explicit){
+  if(make_explicit){
     casadi_assert(eliminate_dependent);
     
     // Save the old number of dependent states
