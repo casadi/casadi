@@ -138,20 +138,36 @@ std::vector<double>& FlatOCP::path_max(){
   return (*this)->path_max_;
 }
 
-double& FlatOCP::t0(){
+double FlatOCP::t0() const{
   return (*this)->t0_;
 }
 
-bool& FlatOCP::t0_free(){
+bool FlatOCP::t0_free() const{
   return (*this)->t0_free_;
 }
 
-double& FlatOCP::tf(){
+double FlatOCP::tf() const{
   return (*this)->tf_;
 }
 
-bool& FlatOCP::tf_free(){
+bool FlatOCP::tf_free() const{
   return (*this)->tf_free_;
+}
+  
+void FlatOCP::set_t0(double t){
+  (*this)->t0_ = t;
+}
+
+void FlatOCP::set_tf(double t){
+  (*this)->tf_ = t;
+}
+
+void FlatOCP::set_t0_free(bool free){
+  (*this)->t0_free_ = free;
+}
+
+void FlatOCP::set_tf_free(bool free){
+  (*this)->tf_free_ = free;
 }
 
 void FlatOCP::eliminateDependent(){

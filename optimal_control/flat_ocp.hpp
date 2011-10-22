@@ -185,16 +185,28 @@ class FlatOCP : public OptionsFunctionality{
     std::vector<double>& path_max();
 
     /// Interval start time
-    double& t0();
+    double t0() const;
     
     /// Interval final time
-    double& tf();
+    double tf() const;
     
     /// Interval start time is free
-    bool& t0_free();
+    bool t0_free() const;
     
     /// Interval final time is free
-    bool& tf_free();
+    bool tf_free() const;
+    
+    /// Set interval start time
+    void set_t0(double t);
+    
+    /// Set interval final time
+    void set_tf(double t);
+    
+    /// Set interval start time as free or fixed
+    void set_t0_free(bool free);
+    
+    /// Set interval final time as free or fixed
+    void set_tf_free(bool free);
     //@}
     
     /** @name Manipulation

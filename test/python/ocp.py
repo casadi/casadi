@@ -177,44 +177,40 @@ class OCPtests(casadiTestCase):
     
   def test_XML(self):
     self.message("JModelica XML parsing")
-    parser = FMIParser('data/cstr.xml')
-    ocp = parser.parse()
+    ocp = FlatOCP('data/cstr.xml')
+    ocp.init()
     
-    self.assertEqual(ocp.t0,0)
-    self.assertEqual(ocp.tf,150)
+    self.assertEqual(ocp.t0(),0)
+    self.assertEqual(ocp.tf(),150)
     #self.assertFalse(ocp.t0_free)
     #self.assertFalse(ocp.tf_free)
-    self.assertTrue(len(ocp.lterm)==0)
-    self.assertTrue(len(ocp.mterm)==1)
-    m = ocp.mterm[0]
+    self.assertTrue(len(ocp.lterm())==0)
+    self.assertTrue(len(ocp.mterm())==1)
+    m = ocp.mterm()[0]
     self.assertTrue(isinstance(m,SX))
-    self.assertTrue(isinstance(ocp.t_,SX))
+    self.assertTrue(isinstance(ocp.t(),SX))
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
-    self.assertEquals(len(ocp.implicit_fcn_),3)
-    self.assertEquals(len(ocp.implicit_fcn_),3)
-    self.assertEquals(len(ocp.x_),3) # there are three states
-    (c,T,cost) = tuple(ocp.x_)
+    self.assertEquals(len(ocp.dae()),3)
+    self.assertEquals(len(ocp.x()),3) # there are three states
+    c = ocp.variable("cstr.c")
+    T = ocp.variable("cstr.T")
+    cost = ocp.variable("cost")
     self.assertTrue(isinstance(c,Variable))
+    
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
     self.assertEquals(cost.getName(),"cost")
     self.assertEquals(c.getNominal(),1000)
-    
-    w=ocp.variables_.subByName('cstr')
-    #self.assertEquals(w("T"),T)
-    self.assertEquals(w.subByName("T").var_.getName(),"cstr.T")
-   
+       
     #print c.atTime(0)
        
     c = c.var()
     T = T.var()
     cost = cost.var()
     
-    self.assertTrue(w.subByName("T").var_.var().isEqual(T)) 
-        
-    u = ocp.u_[0].var()
-    self.assertEquals(len(ocp.path_fcn_),3)
+    u = ocp.variable("u").var()
+    self.assertEquals(len(ocp.path()),3)
     #self.assertEquals(len(ocp.cfcn_lb),3)
     #self.assertEquals(len(ocp.cfcn_ub),3)
     #self.assertTrue(ocp.cfcn[0].isEqual(T)) 
@@ -226,10 +222,10 @@ class OCPtests(casadiTestCase):
     #self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
     #self.assertTrue(ocp.cfcn_ub[1].isInf())
     #self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
-    print ocp.initial_eq_
+    print ocp.initial()
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([[c,T,cost]],[ocp.initial_eq_])
+    f=SXFunction([[c,T,cost]],[ocp.initial()])
     f.init()
     return 
     f.evaluate()
