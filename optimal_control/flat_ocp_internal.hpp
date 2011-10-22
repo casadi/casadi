@@ -35,6 +35,7 @@ namespace OptimalControl{
 
 class FlatOCPInternal : public OptionsFunctionalityNode{
   public:
+    
     /// Constructor
     explicit FlatOCPInternal(const std::string& filename);
   
@@ -47,29 +48,23 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// clone
     virtual FlatOCPInternal* clone() const{ return new FlatOCPInternal(*this);}
 
-    /// Parse from XML to C++ format
-    void parse();
-
     ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
 
     /// Print description 
     virtual void print(std::ostream &stream=std::cout) const;
 
-    /// Add model variables */
+    /// Parse from XML to C++ format
+    void parse();
+
+    /// Add model variables
     void addModelVariables();
 
-    /// Add binding equations */
+    /// Add binding equations
     void addBindingEquations();
 
     /// Add dynamic equations
     void addDynamicEquations();
-
-    /// Read an equation
-    SX readExpr(const XMLNode& odenode);
-
-    /// Read a variable
-    Variable& readVariable(const XMLNode& node);
 
     /// Add initial equations
     void addInitialEquations();
@@ -84,6 +79,45 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     void addIntervalFinalTime(const XMLNode& onode);
     //@}
 
+    /// Read an equation
+    SX readExpr(const XMLNode& odenode);
+
+    /// Read a variable
+    Variable& readVariable(const XMLNode& node);
+
+    /// Sort variables according to type
+    void sortType();
+    
+    /// Eliminate interdependencies in the dependent equations
+    void eliminateInterdependencies();
+
+    /// Eliminate dependent equations
+    void eliminateDependent();
+
+    /// Sort the DAE equations and variables
+    void sortDAE();
+    
+    /// Transform the fully implicit DAE to a explicit or semi-explicit form
+    void makeExplicit();
+
+    /// Scale the variables
+    void scaleVariables();
+    
+    /// Scale the implicit equations
+    void scaleEquations();
+    
+    /// Make a differential state algebraic by replacing its time derivative by 0
+    void makeAlgebraic(const Variable& v);
+    
+    /// Add a variable
+    void addVariable(const std::string& name, const Variable& var);
+    
+    /// Access a variable by name
+    Variable& variable(const std::string& name);
+
+    /// Get the qualified name
+    static std::string qualifiedName(const XMLNode& nn);
+    
     /// Parsed XML document
     XMLNode document_;
 
@@ -131,46 +165,7 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     
     /// Filename
     std::string filename_;
-    
-    /// Sort variables according to type
-    void sortType();
-    
-    /// Eliminate interdependencies in the dependent equations
-    void eliminateInterdependencies();
-
-    /// Eliminate dependent equations
-    void eliminateDependent();
-
-    /// Sort the DAE equations and variables
-    void sortDAE();
-    
-    /// Transform the fully implicit DAE to a explicit or semi-explicit form
-    void makeExplicit();
-
-    /// Scale the variables
-    void scaleVariables();
-    
-    /// Scale the implicit equations
-    void scaleEquations();
-    
-    /// Create the implicit/explict ODE functions and quadrature state functions
-    void createFunctions(bool create_dae=true, bool create_ode=true, bool create_quad=true);
-    
-    /// Make a differential state algebraic by replacing its time derivative by 0
-    void makeAlgebraic(const Variable& v);
-    
-    /// Update the initial values for the dependent variables
-    void findConsistentIC();
-
-    /// Add a variable
-    void addVariable(const std::string& name, const Variable& var);
-    
-    /// Access a variable by name
-    Variable& variable(const std::string& name);
-
-    /// Get the qualified name
-    static std::string qualifiedName(const XMLNode& nn);
-    
+        
     /// Find of variable by name
     std::map<std::string,Variable> varmap_;
     

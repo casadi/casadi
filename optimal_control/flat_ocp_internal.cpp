@@ -995,37 +995,6 @@ void FlatOCPInternal::makeAlgebraic(const Variable& v){
   throw CasadiException("v not a differential state");
 }
 
-void FlatOCPInternal::findConsistentIC(){
-  casadi_assert(0);
-  #if 0
-  // Evaluate the ODE functions
-  oderhs_.init();
-  oderhs_.setInput(0.0,DAE_T);
-  oderhs_.setInput(getStart(x_,true),DAE_Y);
-  oderhs_.setInput(getStart(u_,true),DAE_P);
-  oderhs_.evaluate();
-  
-  // Save to the variables
-  for(int i=0; i<x_.size(); ++i){
-    double xdot0 = oderhs_.output().at(i) * x_[i].getNominal();
-    x_[i].setDerivativeStart(xdot0);
-  }
-  
-  // Evaluate the output functions
-  output_fcn_.init();
-  output_fcn_.setInput(0.0,DAE_T);
-  output_fcn_.setInput(getStart(x_,true),DAE_Y);
-  output_fcn_.setInput(getStart(u_,true),DAE_P);
-  output_fcn_.evaluate();
-  
-  // Save to the variables
-  for(int i=0; i<y_.size(); ++i){
-    double z0 = output_fcn_.output().at(i) * y_[i].getNominal();
-    y_[i].setStart(z0);
-  }
-  #endif
-}
-
 Variable& FlatOCPInternal::variable(const std::string& name){
   // Find the variable
   map<string,Variable>::iterator it = varmap_.find(name);
