@@ -50,7 +50,8 @@ FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filena
   addOption("semi_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
   addOption("fully_explicit",           OT_BOOLEAN,      false, "Make the DAE fully explicit (not always possible)");
   addOption("verbose",                  OT_BOOLEAN,      true,  "Verbose parsing");
-
+  addOption("eliminate_dependents_with_bounds",  OT_BOOLEAN,      true,  "Verbose parsing");
+  
   TiXmlDocument doc;
   bool flag = doc.LoadFile(filename.data());
 
@@ -75,6 +76,7 @@ void FlatOCPInternal::init(){
   bool scale_equations = getOption("scale_equations");
   bool eliminate_dependent = getOption("eliminate_dependent");
   bool sort_equations = getOption("sort_equations");
+  bool semi_explicit = getOption("semi_explicit");
   
   // Obtain the symbolic representation of the OCP
   parse();
@@ -92,13 +94,30 @@ void FlatOCPInternal::init(){
   }
 
   // Sort the equations and variables
-  if(sort_equations)
+  if(sort_equations){
+    casadi_assert(eliminate_dependent);
     sortDAE();
+  }
 
   // Scale the equations
   if(scale_equations)
     scaleEquations();
   
+  // Transform to semi-explicit form
+  if(semi_explicit){
+    casadi_assert(eliminate_dependent);
+    
+    // Save the old number of dependent states
+    int ny = y_.size();
+    
+    // Solve for the highest order derivatives
+    makeExplicit();
+    
+    // Eliminate dependents again if necessary
+    if(y_.size()!=ny){
+      eliminateDependent();
+    }
+  }
 }
 
 FlatOCPInternal::~FlatOCPInternal(){
@@ -567,8 +586,8 @@ void FlatOCPInternal::eliminateInterdependencies(){
   dep_ = substituteInPlace(var(y_),dep_,eliminate_constants).data();
 }
 
-void FlatOCPInternal::eliminateDependent(bool eliminate_dependents_with_bounds){
-  casadi_assert_message(eliminate_dependents_with_bounds=true,"Not implemented");
+void FlatOCPInternal::eliminateDependent(){
+  bool eliminate_dependents_with_bounds=getOption("eliminate_dependents_with_bounds");
   if(verbose_)
     cout << "eliminateDependent ..." << endl;
   double time1 = clock();
@@ -796,41 +815,20 @@ void FlatOCPInternal::sortDAE(){
   x_new.swap(x_);
 }
 
-void FlatOCPInternal::sortBLT(bool with_x){
-  cout << "BLT sorting ..." << endl;
-  double time1 = clock();
+void FlatOCPInternal::makeExplicit(){
+  // Quick return if there are no implicitly defined states
+  if(x_.empty()) return;
   
-  // Sparsity pattern
-  CRSSparsity sp;
-  
-  if(with_x){
-    // inverse time constant
-    SX invtau("invtau");
+  // Write the DAE as a function of the highest unknown derivatives (algebraic states and state derivatives)
+  SXFunction f(highest(x_),dae_);
+  f.init();
 
-    // Replace x with invtau*xdot in order to get a Jacobian which also includes x
-    SXMatrix dae_with_x = substitute(highest(x_),var(xd_),invtau*SXMatrix(var(xd_)));
-    
-    // Create Jacobian in order to find the sparsity
-    SXFunction fcn(highest(x_),dae_with_x);
-    Matrix<SX> J = fcn.jac();
-    sp = J.sparsity();
-  } else {
-    // Create Jacobian in order to find the sparsity
-    SXFunction fcn(highest(x_),dae_);
-    Matrix<SX> J = fcn.jac();
-    sp = J.sparsity();
-  }
-  
+  // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
+  CRSSparsity sp = f.jacSparsity();
+
   // BLT transformation
-  std::vector<int> rowperm; // row permutations
-  std::vector<int> colperm; // column permutations
-  std::vector<int> rowblock;  // block k is rows r[k] to r[k+1]-1
-  std::vector<int> colblock;  // block k is cols s[k] to s[k+1]-1
-  int nb;
-  std::vector<int> coarse_rowblock;  // coarse row decomposition
-  std::vector<int> coarse_colblock;  //coarse column decomposition
-
-  nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+  std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
   vector<SX> dae_new(dae_.size());
@@ -838,6 +836,7 @@ void FlatOCPInternal::sortBLT(bool with_x){
     dae_new[i] = dae_[rowperm[i]];
   }
   dae_new.swap(dae_);
+  dae_new.clear();
   
   // Permute variables
   vector<Variable> x_new(x_.size());
@@ -845,145 +844,71 @@ void FlatOCPInternal::sortBLT(bool with_x){
     x_new[i]= x_[colperm[i]];
   }
   x_new.swap(x_);
-  
-  double time2 = clock();
-  double dt = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "... BLT sorting complete after " << dt << " seconds." << endl;
-}
+  x_new.clear();
 
-void FlatOCPInternal::makeExplicit(){
-  casadi_assert(0);
-#if 0
-  casadi_assert_message(sorted_,"OCP has not been BLT sorted, call sortBLT()");
+  // Rewrite the sorted DAE as a function of the highest unknown derivatives
+  f = SXFunction(highest(x_),dae_);
+  f.init();
 
-  cout << "Making explicit..." << endl;
-  double time1 = clock();
-  
-  // Create Jacobian
-  SXFunction fcn(highest(x_),dae_);
-  SXMatrix J = fcn.jac();
-
-  // Get initial values for all implicit variables
-  vector<double> x_guess(x_.size(),0);
-  for(int i=0; i<x_.size(); ++i){
-    if(x_[i].isDifferential()){
-      x_guess[i] = x_[i].getStart()/x_[i].getNominal();
-    }
-  }
+  // Get the Jacobian
+  SXMatrix J = f.jac();
   
   // Block variables and equations
-  vector<SX> vb, fb;
+  vector<Variable> xb, xdb, xab;
+  vector<SX> fb;
 
-  // Save old number of explicit variables
-  int old_nexp = explicit_var_.size();
-
-  // New implicit equation and variables
-  vector<SX> dae_new;
-  vector<Variable> x_new;
-    
+  // Variables where we have found an explicit expression
+  vector<Variable> x_exp;
+  
+  // Explicit equations
+  vector<SX> f_exp;
+  
   // Loop over blocks
-  for(int b=0; b<nb_; ++b){
+  for(int b=0; b<nb; ++b){
     
     // Block size
-    int bs = rowblock_[b+1] - rowblock_[b];
+    int bs = rowblock[b+1] - rowblock[b];
     
     // Get local variables
-    vb.clear();
-    for(int i=colblock_[b]; i<colblock_[b+1]; ++i)
-      vb.push_back(x_[i].var());
+    xb.clear();
+    xdb.clear();
+    xab.clear();
+    for(int i=colblock[b]; i<colblock[b+1]; ++i){
+      xb.push_back(x_[i]);
+      if(x_[i].isDifferential()){
+        xdb.push_back(x_[i]);
+      } else {
+        xab.push_back(x_[i]);
+      }
+    }
 
     // Get local equations
     fb.clear();
-    for(int i=rowblock_[b]; i<rowblock_[b+1]; ++i)
+    for(int i=rowblock[b]; i<rowblock[b+1]; ++i)
       fb.push_back(dae_[i]);
 
     // Get local Jacobian
-    SXMatrix Jb = J(range(rowblock_[b],rowblock_[b+1]),range(colblock_[b],colblock_[b+1]));
-    if(dependsOn(Jb,vb)){
-      
-      // Guess for the solution
-      SXMatrix x_k(vb.size(),1,0);
-      int offset = rowblock_[b];
-      for(int i=0; i<x_k.size(); ++i){
-        x_k.at(i) = x_guess[offset+i];
-      }
-      
-      // Make Newton iterations
-      bool exact_newton = true;
-      SXFunction newtonIter; // Newton iteration function
-      
-      if(exact_newton){
-        // Use exact Newton (i.e. update Jacobian in every iteration)
-        newtonIter = SXFunction(vb,vb-solve(Jb,SXMatrix(fb)));
-      } else {
-        // Evaluate the Jacobian
-        SXMatrix Jb0 = substitute(Jb,vb,x_k);
-        
-        // Use quasi-Newton
-        newtonIter = SXFunction(vb,vb-solve(Jb0,SXMatrix(fb)));
-      }
-      newtonIter.init();
-      
-      // Make Newton iterations
-      const int n_newton = 3; // NOTE: the number of newton iterations is fixed!
-      for(int k=0; k<n_newton; ++k){
-        x_k = newtonIter.eval(x_k);
-      }
-      
-      cout << "Using " << (exact_newton ? "an exact " : "a quasi-") << "Newton iteration with "<< n_newton << " iterations to solve block " << b << " for the " << vb.size() << " variables " << vb << endl;
-      cout << "the implicit equation has " << countNodes(fb) << " nodes" << endl;
-      cout << "the Newton algorithm has " << newtonIter.algorithm().size() << " nodes" << endl;
-      cout << "the explicit expression has " << countNodes(x_k) << " nodes" << endl;
+    SXMatrix Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
 
-      // Add binding equations
-      addExplicitEquation(vb,x_k);
+    // If Jb depends on xb, then we cannot solve for it explicitly
+    if(dependsOn(Jb,highest(xb))){
       
-      // TODO: implement tearing
-      casadi_assert_message(0,"not implemented");
-      if(false){ // not ready (but make sure it compiles)
-      
-        // Find out which dependencies are nonlinear and which are linear
-        Matrix<int> Jb_lin(Jb.sparsity());
-        for(int i=0; i<Jb.size(); ++i){
-          Jb_lin.at(i) = dependsOn(Jb.at(i),vb) ? 2 : 1;
-        }
+      // If the block only contains algebraic states ...
+      if(xdb.empty()){
+        // ... we can simply add the equations to the list of algebraic equations ...
+        alg_.insert(alg_.end(),fb.begin(),fb.end());
         
-        // Loop over rows (equations)
-        for(int i=0; i<Jb_lin.size1(); ++i){
-          // Number of variables appearing linearly
-          int n_lin = 0;
-          int j_lin = -1; // index of a variable appearing linearily
-          
-          // Loop over non-zero elements
-          for(int el=Jb_lin.rowind(i); el<Jb_lin.rowind(i+1); ++el){
-            // Column (variable)
-            int j = Jb_lin.col(el);
-            
-            // Count number of variables appearing linearly
-            if(Jb_lin.at(el)==1){
-              j_lin = j;
-              n_lin ++;
-            }
-          }
-          
-          // Make causal if only one variable appears linearily
-          if(n_lin==1){
-            // 
-            
-          }
-        }
+        // ... and the variables accordingly
+        xa_.insert(xa_.end(),xab.begin(),xab.end());
+      } else { // The block contains differential states
+        stringstream ss;
+        ss << "Cannot find an explicit expression for variable(s) " << xdb;
+        throw CasadiException(ss.str());
       }
-                  
-      // Cannot solve for vb, add to list of implicit equations
-//      implicit_var_new.insert(implicit_var_new.end(),vb.begin(),vb.end());
-//      dae_new.insert(dae_new.end(),fb.begin(),fb.end());
-      
-//      cout << "added " << fb << " and " << vb << " to list of implicit equations (" << vb.size() << " equations)" << endl;
-      
-    } else {
+    } else { // The variables that we wish to determine enter linearly
       
       // Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
-      SXMatrix fb_res = substitute(fb,vb,SXMatrix(vb.size(),1,0));
+      SXMatrix fb_res = substitute(fb,var(xb),SXMatrix(xb.size(),1,0)).data();
       SXMatrix fb_exp;
       
       // Solve for vb
@@ -995,123 +920,42 @@ void FlatOCPInternal::makeExplicit(){
         fb_exp = solve(Jb,-fb_res);
       }
 
-      // Add explicit equation
-      addExplicitEquation(vb,fb_exp);
-    }
-  }
-
-  // Update implicit equations
-  x_new.swap(x_);
-  dae_new.swap(dae_);
-
-  // Mark the variables made explicit
-  for(vector<SX>::iterator it=explicit_var_.begin()+old_nexp; it!=explicit_var_.end(); ++it){
-    it->setTemp(1);
-  }
-  
-  // New algebraic variables
-  vector<Variable> xa_new;
-
-  // Loop over algebraic variables
-  for(vector<Variable>::iterator it=xa_.begin(); it!=xa_.end(); ++it){
-    // Check if marked
-    if(it->var().getTemp()){
-      // Make dependent
-      y_.push_back(*it);
-      
-      // If upper or lower bounds are finite, add path constraint
-      if(!isinf(it->getMin()) || !isinf(it->getMax())){
-        path_.push_back(it->var());
-        path_min_.push_back(it->getMin()/it->getNominal());
-        path_max_.push_back(it->getMax()/it->getNominal());
-      }
-    } else {
-      xa_new.push_back(*it);
+      // Add to explicitly determined equations and variables
+      x_exp.insert(x_exp.end(),xb.begin(),xb.end());
+      f_exp.insert(f_exp.end(),fb_exp.data().begin(),fb_exp.data().end());
     }
   }
   
-  // Update new xa_
-  xa_.swap(xa_new);
+  // Eliminate inter-dependencies in fb_exp
+  bool eliminate_constants = true; // also simplify constant expressions
+  f_exp = substituteInPlace(highest(x_exp),f_exp,eliminate_constants).data();
 
-  // Unark the variables made explicit
-  for(vector<SX>::iterator it=explicit_var_.begin()+old_nexp; it!=explicit_var_.end(); ++it){
-    it->setTemp(0);
-  }
+  // New dependent variables and binding equations
+  vector<Variable> y_new;
+  vector<SX> dep_new;
   
-  // Eliminate the dependents
-  cout << "eliminating dependents" << endl;
-  eliminateDependent();
-
-  double time2 = clock();
-  double dt = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "... makeExplicit complete after " << dt << " seconds." << endl;
-#endif
-}
-
-void FlatOCPInternal::makeSemiExplicit(){
-  
-  
-//     fcn = SXFunction([v_new],[dae_new])
-//   J = fcn.jac()
-//   #J.printDense()
-// 
-//   # Cumulative variables and definitions
-//   vb_cum = SXMatrix()
-//   def_cum = SXMatrix()
-// 
-//   for b in range(nb):
-//     Jb = J[rowblock[b]:rowblock[b+1],colblock[b]:colblock[b+1]]
-//     vb = v_new[colblock[b]:colblock[b+1]]
-//     fb = dae_new[rowblock[b]:rowblock[b+1]]
-//     
-//     # Block size
-//     bs = rowblock[b+1] - rowblock[b]
-// 
-//     #print "block ", b,
-// 
-//     if dependsOn(Jb,vb):
-//       # Cannot solve for vb, add to list of implicit equations
-//       raise Exception("Not implemented")
-//       vb_cum.append(vb)
-//       def_cum.append(vb)
-//       
-//     else:
-//       # Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
-//       fb_res = substitute(fb,vb,SXMatrix(len(vb),1,SX(0)))
-//       
-//       # Solve for vb
-//       if bs <= 3:
-//         # Calculate inverse and multiply for very small matrices
-//         fb_exp = dot(inv(Jb),-fb_res)
-//       else:
-//         # QR factorization
-//         fb_exp = solve(Jb,-fb_res)
-//         
-//       # Substitute variables that have already been defined
-//       if not def_cum.empty():
-//         fb_exp = substitute(fb_exp,vb_cum,def_cum)
-//       
-//       append(vb_cum,vb)
-//       append(def_cum,fb_exp)
-  
-  
-  throw CasadiException("FlatOCPInternal::makeSemiExplicit: Commented out");
-#if 0  
-  // Move the fully implicit dynamic equations to the list of algebraic equations
-  algeq.insert(algeq.end(), dyneq.begin(), dyneq.end());
-  dyneq.clear();
+  // Split the dependent variables from the state derivative expressions
+  for(int k=0; k<x_exp.size(); ++k){
     
-  // Introduce new explicit differential equations describing the relation between states and state derivatives
-  xd.insert(xd.end(), x.begin(), x.end());
-  diffeq.insert(diffeq.end(), xdot.begin(), xdot.end());
+    // Check if differential state
+    if(x_exp[k].isDifferential()){
+      // Add to the ODE
+      xd_.push_back(x_exp[k]);
+      ode_.push_back(f_exp[k]);
+    } else {
+      // Add to the list of the dependent variables
+      y_new.push_back(x_exp[k]);
+      dep_new.push_back(f_exp[k]);
+    }
+  }
   
-  // Put the state derivatives in the algebraic state category (inefficient!!!)
-  xa.insert(xa.end(), xdot.begin(), xdot.end());
-
-  // Remove from old location
-  xdot.clear();
-  x.clear();
-#endif
+  // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
+  y_.insert(y_.begin(),y_new.begin(),y_new.end());
+  dep_.insert(dep_.begin(),dep_new.begin(),dep_new.end());
+  
+  // Remove the eliminated variables and equations
+  x_.clear();
+  dae_.clear();
 }
 
 void FlatOCPInternal::makeAlgebraic(const Variable& v){

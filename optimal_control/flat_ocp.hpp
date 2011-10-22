@@ -206,10 +206,13 @@ class FlatOCP : public OptionsFunctionality{
     void eliminateInterdependencies();
     
     /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
-    void eliminateDependent(bool eliminate_dependents_with_bounds=false);
+    void eliminateDependent();
 
     /// Sort the DAE equations and variables
     void sortDAE();
+
+    /// Transform the fully implicit DAE to a explicit or semi-explicit form
+    void makeExplicit();
 
     //@}
 };

@@ -139,20 +139,14 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     void eliminateInterdependencies();
 
     /// Eliminate dependent equations
-    void eliminateDependent(bool eliminate_dependents_with_bounds=false);
+    void eliminateDependent();
 
     /// Sort the DAE equations and variables
     void sortDAE();
     
-    /// Sort the variables and equations according to BLT, with or without including the differentiated states in the dependency graph
-    void sortBLT(bool with_x=false);
-    
-    /// Symbolically solve for xdot and z
+    /// Transform the fully implicit DAE to a explicit or semi-explicit form
     void makeExplicit();
 
-    /// Replace all state derivatives by algebraic variables with the same name
-    void makeSemiExplicit();
-    
     /// Scale the variables
     void scaleVariables();
     
