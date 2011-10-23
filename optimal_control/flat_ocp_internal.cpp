@@ -45,7 +45,7 @@ namespace OptimalControl{
 FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filename){
   addOption("scale_variables",          OT_BOOLEAN,      false, "Scale the variables so that they get unity order of magnitude");
   addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be expressed as an expression of other variables");
-  addOption("scale_equations",          OT_BOOLEAN,      true,  "Scale the implicit equations so that they get unity order of magnitude");
+  addOption("scale_equations",          OT_BOOLEAN,      false,  "Scale the implicit equations so that they get unity order of magnitude");
   addOption("sort_equations",           OT_BOOLEAN,      true,  "Sort the dynamic equations");
   addOption("make_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
   addOption("eliminate_algebraic",      OT_BOOLEAN,      false, "Completely eliminate algebraic states");
@@ -586,23 +586,39 @@ void FlatOCPInternal::eliminateInterdependencies(){
   dep_ = substituteInPlace(var(y_),dep_,eliminate_constants).data();
 }
 
+vector<SXMatrix> FlatOCPInternal::substituteDependents(const vector<SXMatrix>& x) const{
+  return substitute(x,var(y_),dep_);
+}
+
 void FlatOCPInternal::eliminateDependent(){
   bool eliminate_dependents_with_bounds=getOption("eliminate_dependents_with_bounds");
   if(verbose_)
     cout << "eliminateDependent ..." << endl;
   double time1 = clock();
-
-  Matrix<SX> v = var(y_);
-  Matrix<SX> v_old = dep_;
   
-  dae_= substitute(dae_,v,v_old).data();
-  ode_= substitute(ode_,v,v_old).data();
-  alg_= substitute(alg_,v,v_old).data();
-  quad_= substitute(quad_,v,v_old).data();
-  initial_= substitute(initial_,v,v_old).data();
-  path_    = substitute(path_,v,v_old).data();
-  mterm_   = substitute(mterm_,v,v_old).data();
-  lterm_   = substitute(lterm_,v,v_old).data();
+  // All the functions to be replaced
+  vector<SXMatrix> fcn(8);
+  fcn[0] = dae_;
+  fcn[1] = ode_;
+  fcn[2] = alg_;
+  fcn[3] = quad_;
+  fcn[4] = initial_;
+  fcn[5] = path_;
+  fcn[6] = mterm_;
+  fcn[7] = lterm_;
+  
+  // Replace all at once
+  vector<SXMatrix> fcn_new = substituteDependents(fcn);
+  
+  // Save the new expressions
+  dae_= fcn_new[0].data();
+  ode_= fcn_new[1].data();
+  alg_= fcn_new[2].data();
+  quad_= fcn_new[3].data();
+  initial_= fcn_new[4].data();
+  path_    = fcn_new[5].data();
+  mterm_   = fcn_new[6].data();
+  lterm_   = fcn_new[7].data();
 
   double time2 = clock();
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
@@ -797,7 +813,7 @@ void FlatOCPInternal::sortDAE(){
   CRSSparsity sp = f.jacSparsity();
   
   // BLT transformation
-  std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
   int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
@@ -816,6 +832,7 @@ void FlatOCPInternal::sortDAE(){
 }
 
 void FlatOCPInternal::makeExplicit(){
+  
   // Quick return if there are no implicitly defined states
   if(x_.empty()) return;
   
@@ -827,7 +844,7 @@ void FlatOCPInternal::makeExplicit(){
   CRSSparsity sp = f.jacSparsity();
 
   // BLT transformation
-  std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
   int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
@@ -908,7 +925,7 @@ void FlatOCPInternal::makeExplicit(){
     } else { // The variables that we wish to determine enter linearly
       
       // Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
-      SXMatrix fb_res = substitute(fb,var(xb),SXMatrix(xb.size(),1,0)).data();
+      SXMatrix fb_res = substitute(fb,highest(xb),SXMatrix(xb.size(),1,0)).data();
       SXMatrix fb_exp;
       
       // Solve for vb
@@ -956,6 +973,53 @@ void FlatOCPInternal::makeExplicit(){
   // Remove the eliminated variables and equations
   x_.clear();
   dae_.clear();
+}
+
+vector<Variable> FlatOCPInternal::x_all() const{
+  vector<Variable> ret;
+  ret.insert(ret.end(),x_.begin(),x_.end());
+  ret.insert(ret.end(),xd_.begin(),xd_.end());
+  ret.insert(ret.end(),xa_.begin(),xa_.end());
+  return ret;
+}
+
+vector<SXMatrix> FlatOCPInternal::daeArg() const{
+  // All states
+  vector<Variable> x = x_all();
+  
+  // Return value
+  vector<SXMatrix> ret(DAE_NUM_IN);
+  ret[DAE_T] = t_;
+  ret[DAE_Y] = var(x);
+  ret[DAE_YDOT] = der(x);
+  ret[DAE_P] = vertcat<SX>(var(p_),var(u_));
+  return ret;
+}
+    
+FX FlatOCPInternal::daeFcn() const{
+  
+  // Get the DAE arguments
+  vector<SXMatrix> dae_in = daeArg();
+  
+  // Get the DAE right hand side
+  SXMatrix dae_out = dae_;
+  if(!xd_.empty()){
+    
+    // Explicit DAE part
+    SXMatrix ode_explicit = ode_;
+    ode_explicit -= der(xd_);
+    
+    // Append to DAE
+    dae_out = vertcat(dae_out,ode_explicit);
+  }
+  if(!xa_.empty()){
+    // Append algebraic equation
+    dae_out = vertcat<SX>(dae_out,alg_);
+  }
+    
+  // Create the DAE right hand side function
+  SXFunction daefcn(dae_in,dae_out);
+  return daefcn;
 }
 
 void FlatOCPInternal::makeAlgebraic(const Variable& v){

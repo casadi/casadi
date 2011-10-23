@@ -174,6 +174,12 @@ void compress(Matrix<SX> &ex, int level){
     compress(ex,level-1);
 }
 
+std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr){
+  SXFunction fcn(var,ex);
+  fcn.init();
+  return fcn.eval(vector<Matrix<SX> >(1,expr));
+}
+
 Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr){
   if(var.empty()) return ex; // quick return if empty
   casadi_assert_message(isSymbolic(var),"the variable is not symbolic");

@@ -186,5 +186,21 @@ void FlatOCP::makeExplicit(){
   (*this)->makeExplicit();
 }
 
+std::vector<Variable> FlatOCP::x_all() const{
+  return (*this)->x_all();
+}
+
+std::vector<SXMatrix> FlatOCP::daeArg() const{
+  return (*this)->daeArg();
+}
+    
+FX FlatOCP::daeFcn() const{
+  return (*this)->daeFcn();
+}
+
+vector<SXMatrix> FlatOCP::substituteDependents(const vector<SXMatrix>& x) const{
+  return (*this)->substituteDependents(x);
+}
+
 } // namespace OptimalControl
 } // namespace CasADi

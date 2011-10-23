@@ -223,7 +223,10 @@ void simplify(Matrix<SX> &ex);
 void compress(Matrix<SX> &ex, int level=5); 
 
 /// substitute variable var with expression expr in an expression ex
-Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr); 
+Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
+
+/// substitute variable var with expression expr in multiple expressions
+std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
 
 /// substitute variable var with expression expr in the expression itself
 Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &expr, bool eliminate_constants=false);

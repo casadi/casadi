@@ -31,29 +31,24 @@ def comp(name):
 # Compile the simplemost example (conservation of mass in control volume)
 comp("BasicVolumeMassConservation")
 
-# Allocate a parser and load the xml
-parser = FMIParser('BasicVolumeMassConservation.xml')
+# Read a model from XML
+ocp = FlatOCP('BasicVolumeMassConservation.xml')
 
-# Obtain the symbolic representation of the OCP
-ocp = parser.parse()
+# Set options
+ocp.setOption("make_explicit",True)
 
-# Create functions
-ocp.createFunctions()
+# Parse the model
+ocp.init()
 
 # Create an integrator
-integrator = CVodesIntegrator(ocp.oderhs_)
-
-# Get the variables
-vv = ocp.getVariables()
+integrator = CVodesIntegrator(ocp.daeFcn())
 
 # Output function
-output_expression = [[ocp.getExplicit(vv.m.var())],[ocp.getExplicit(vv.P.var())]]
-output_fcn_in = DAE_NUM_IN * [[]]
-output_fcn_in[DAE_T] = [ocp.t_]
-output_fcn_in[DAE_Y] = var(ocp.x_)
-output_fcn_in[DAE_YDOT] = der(ocp.x_)
-output_fcn_in[DAE_P] = var(ocp.p_)
-output_fcn = SXFunction(output_fcn_in,output_expression)
+m = ocp.variable("m").var()
+P = ocp.variable("P").var()
+output_fcn_out = ocp.substituteDependents([m,P])
+output_fcn_in = ocp.daeArg()
+output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,1,100)
@@ -61,7 +56,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x_)
+x0 = getStart(ocp.xd())
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -87,28 +82,22 @@ plt.draw()
 comp("BasicVolumeEnergyConservation")
 
 # Allocate a parser and load the xml
-parser = FMIParser('BasicVolumeEnergyConservation.xml')
+ocp = FlatOCP('BasicVolumeEnergyConservation.xml')
 
-# Obtain the symbolic representation of the OCP
-ocp = parser.parse()
+# Set options
+ocp.setOption("make_explicit",True)
 
-# Create functions
-ocp.createFunctions()
+# Parse the model
+ocp.init()
 
 # Create an integrator
-integrator = CVodesIntegrator(ocp.oderhs_)
-
-# Get the variables
-vv = ocp.getVariables()
+integrator = CVodesIntegrator(ocp.daeFcn())
 
 # Output function
-output_expression = [[ocp.getExplicit(vv.T.var())]]
-output_fcn_in = DAE_NUM_IN * [[]]
-output_fcn_in[DAE_T] = [ocp.t_]
-output_fcn_in[DAE_Y] = var(ocp.x_)
-output_fcn_in[DAE_YDOT] = der(ocp.x_)
-output_fcn_in[DAE_P] = var(ocp.p_)
-output_fcn = SXFunction(output_fcn_in,output_expression)
+T = ocp.variable("T").var()
+output_fcn_out = ocp.substituteDependents([T])
+output_fcn_in = ocp.daeArg()
+output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,10,100)
@@ -116,7 +105,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x_)
+x0 = getStart(ocp.xd())
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -135,28 +124,24 @@ plt.draw()
 comp("BasicVolumeTest")
 
 # Allocate a parser and load the xml
-parser = FMIParser('BasicVolumeTest.xml')
+ocp = FlatOCP('BasicVolumeTest.xml')
 
-# Obtain the symbolic representation of the OCP
-ocp = parser.parse()
+# Set options
+ocp.setOption("make_explicit",True)
 
-# Create functions
-ocp.createFunctions()
+# Parse the model
+ocp.init()
 
 # Create an integrator
-integrator = CVodesIntegrator(ocp.oderhs_)
-
-# Get the variables
-vv = ocp.getVariables()
+integrator = CVodesIntegrator(ocp.daeFcn())
 
 # Output function
-output_expression = [[ocp.getExplicit(vv.T.var())],[ocp.getExplicit(vv.U.var())],[ocp.getExplicit(vv.V.var())]]
-output_fcn_in = DAE_NUM_IN * [[]]
-output_fcn_in[DAE_T] = [ocp.t_]
-output_fcn_in[DAE_Y] = var(ocp.x_)
-output_fcn_in[DAE_YDOT] = der(ocp.x_)
-output_fcn_in[DAE_P] = var(ocp.p_)
-output_fcn = SXFunction(output_fcn_in,output_expression)
+T = ocp.variable("T").var()
+U = ocp.variable("U").var()
+V = ocp.variable("V").var()
+output_fcn_out = ocp.substituteDependents([T,U,V])
+output_fcn_in = ocp.daeArg()
+output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,2,100)
@@ -164,7 +149,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x_)
+x0 = getStart(ocp.xd())
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -191,13 +176,13 @@ plt.draw()
 comp("CtrlFlowSystem")
 
 # Allocate a parser and load the xml
-parser = FMIParser('CtrlFlowSystem.xml')
+ocp = FlatOCP('CtrlFlowSystem.xml')
 
-# Obtain the symbolic representation of the OCP
-ocp = parser.parse()
+# Set options
+ocp.setOption("make_explicit",True)
 
-# Elimiate dependent variables
-ocp.eliminateDependent()
+# Parse the model
+ocp.init()
 
 # Print the ocp
 print ocp

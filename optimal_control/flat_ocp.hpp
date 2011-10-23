@@ -128,6 +128,9 @@ class FlatOCP : public OptionsFunctionality{
     /// Algebraic states
     std::vector<Variable>& xa();
     
+    /// All states, differential and algebraic
+    std::vector<Variable> x_all() const;
+    
     /// Quadrature states
     std::vector<Variable>& q();
     
@@ -226,6 +229,16 @@ class FlatOCP : public OptionsFunctionality{
     /// Transform the fully implicit DAE to a explicit or semi-explicit form
     void makeExplicit();
 
+    /// Get the DAE input arguments
+    std::vector<SXMatrix> daeArg() const;
+    
+    /// Substitute the dependents from a set of expressions
+    std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
+    
+    /// Get the ODE/DAE right hand side function
+    FX daeFcn() const;
+    
+    
     //@}
 };
 

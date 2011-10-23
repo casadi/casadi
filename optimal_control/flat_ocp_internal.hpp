@@ -100,6 +100,18 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Transform the fully implicit DAE to a explicit or semi-explicit form
     void makeExplicit();
 
+    /// All states, differential and algebraic
+    std::vector<Variable> x_all() const;
+
+    /// Get the DAE input arguments
+    std::vector<SXMatrix> daeArg() const;
+
+    /// Substitute the dependents from a set of expressions
+    std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
+    
+    /// Get the ODE/DAE right hand side function
+    FX daeFcn() const;
+
     /// Scale the variables
     void scaleVariables();
     
