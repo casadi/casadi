@@ -202,5 +202,9 @@ vector<SXMatrix> FlatOCP::substituteDependents(const vector<SXMatrix>& x) const{
   return (*this)->substituteDependents(x);
 }
 
+void FlatOCP::generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops) const{
+  (*this)->generateMuscodDatFile(filename, mc2_ops);
+}
+
 } // namespace OptimalControl
 } // namespace CasADi

@@ -43,10 +43,11 @@ namespace CasADi{
     GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
+    GenericType(const std::string& s);
     GenericType(const std::vector<bool>& iv);
     GenericType(const std::vector<int>& iv);
     GenericType(const std::vector<double>& dv);
-    GenericType(const std::string& s);
+    GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const SharedObject& obj);
     #ifndef SWIG
@@ -73,6 +74,7 @@ namespace CasADi{
     operator const std::string& () const{ return toString();}
     operator const std::vector<int>& () const{ return toIntVector();}
     operator const std::vector<double>& () const{ return toDoubleVector();}
+    operator const std::vector<std::string>& () const{ return toStringVector();}
     operator const SharedObject& () const{ return toSharedObject();}
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
@@ -104,6 +106,9 @@ namespace CasADi{
     //! \brief Is a vector of doubles?
     bool isDoubleVector() const;
 
+    //! \brief Is a vector of strings
+    bool isStringVector() const;
+
     //! \brief Is a shared object?
     bool isSharedObject() const;
 
@@ -124,6 +129,9 @@ namespace CasADi{
     
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
+    
+    //! \brief Convert to vector of strings
+    const std::vector<std::string>& toStringVector() const;
 
     //! \brief Convert to shared object
     const SharedObject& toSharedObject() const;

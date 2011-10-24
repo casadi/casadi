@@ -238,6 +238,8 @@ class FlatOCP : public OptionsFunctionality{
     /// Get the ODE/DAE right hand side function
     FX daeFcn() const;
     
+    /// Generate a MUSCOD-II compatible DAT file
+    void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
     //@}
 };

@@ -112,6 +112,9 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Get the ODE/DAE right hand side function
     FX daeFcn() const;
 
+    /// Generate a MUSCOD-II compatible DAT file
+    void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops) const;
+
     /// Scale the variables
     void scaleVariables();
     
