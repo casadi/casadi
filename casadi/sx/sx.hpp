@@ -93,9 +93,10 @@ class SX{
 	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
 #ifndef SWIG
-    explicit SX(const char name[]);  // variable
 
-    explicit SX(SXNode* node); // (must be explicit, otherwise 0/NULL would be ambigous)
+    /// Create an expression from a node: extra dummy argument to avoid ambigousity for 0/NULL
+    SX(SXNode* node, bool dummy);
+    
     /** \brief Copy constructor */
     SX(const SX& scalar); // copy constructor
 
@@ -103,7 +104,7 @@ class SX{
     ~SX();
 
     /// Create an object given a node
-    static SX createFromNode(SXNode* node);
+    static SX create(SXNode* node);
     
     // Assignment
     SX& operator=(const SX& scalar);

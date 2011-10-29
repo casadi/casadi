@@ -133,11 +133,11 @@ for N in range(1,11):
   solver = IpoptSolver(obj,gfcn)
 
   # Set options
-  solver.setOption("tol",1e-10);
-  solver.setOption("hessian_approximation","limited-memory");
+  solver.setOption("tol",1e-10)
+  solver.setOption("hessian_approximation","limited-memory")
 
   # initialize the solver
-  solver.init();
+  solver.init()
 
   # Initial condition
   xinit = len(x) * [0]

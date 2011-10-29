@@ -39,7 +39,7 @@ xf_max = [ 0.0,  0.0,  inf]
 x_init = [ 0.0,  0.0,  0.0]
 
 # Initialize functions
-f.init()  
+f.init()
 m.init()
 
 # Dimensions

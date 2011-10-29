@@ -436,6 +436,9 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int elJ = mapping[v][el_out];
           
           // Get the output seed
+          casadi_assert(oind<output_ind_.size());
+          casadi_assert(r_out<output_ind_[oind].size());
+          
           ret[jblock_ind[v]].data()[elJ] = g[output_ind_[oind][r_out]];
         }
       }
@@ -930,7 +933,7 @@ void SXFunctionInternal::init(){
   // Allocate a vector containing expression corresponding to each binary operation
   binops_.resize(bnodes.size());
   for(int i=0; i<bnodes.size(); ++i){
-    binops_[i] = SX(bnodes[i]);
+    binops_[i] = SX::create(bnodes[i]);
   }
   bnodes.clear();
   
@@ -990,12 +993,12 @@ void SXFunctionInternal::init(){
   // Save the constants to the work vector
   for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
     work_[place[(**it).temp]] = (**it).getValue();
-    swork_[place[(**it).temp]] = SX(*it);
+    swork_[place[(**it).temp]] = SX::create(*it);
   }
 
   // Save the symbolic variables to the symbolic work vector
   for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
-    swork_[place[(**it).temp]] = SX(*it);
+    swork_[place[(**it).temp]] = SX::create(*it);
   }
 
   // Reset the temporary variables
@@ -1015,7 +1018,7 @@ void SXFunctionInternal::init(){
   free_vars_.clear();
   for(int el=0; el<snodes.size(); ++el){
     if(!snodes[el]->temp){
-      free_vars_.push_back(SX(snodes[el]));
+      free_vars_.push_back(SX::create(snodes[el]));
     }
   }
 

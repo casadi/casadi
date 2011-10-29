@@ -613,7 +613,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
 
   vector<SX> termsv(terms[thisind].size());
   for(int i=0; i<termsv.size(); ++i)
-    termsv[i] = SX(terms[thisind][i]);
+    termsv[i] = SX::create(terms[thisind][i]);
   tt = Matrix<SX>(termsv);
 }
 

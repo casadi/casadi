@@ -23,15 +23,16 @@ print "inp=", inp
 print "out=", out
 
 Jf=f.jacobian(0,0)
-print "We never get here"
+#print "We never get here"
 
-Jf.init()
+#Jf.init()
 
-n=[1.2,2.3,7,4.6]
-Jf.input().set(n)
+#n=[1.2,2.3,7,4.6]
+#Jf.input().set(n)
 
-Jf.evaluate()
-J = reference(*n)
+#Jf.evaluate()
+#J = reference(*n)
 
-print "What it should be= ", J
-print "What it is= ", Jf.output().toArray()
+#print "What it should be= ", J
+#print "What it is= ", Jf.output().toArray()
+
