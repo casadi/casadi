@@ -587,7 +587,6 @@ namespace CasADi{
 
 // The following functions must be placed in the standard namespace so that the old ones are not shadowed when CasADi namespace is used
 #ifndef SWIG
-namespace std{
 
   template<class T>
   CasADi::Matrix<T> sin(const CasADi::Matrix<T>& x){ return x.sin(); }
@@ -646,7 +645,6 @@ namespace std{
   template<class T>
   CasADi::Matrix<T> printme(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.printme(y); }
   
-} // namespace std
 #endif // SWIG
 
 #ifndef SWIG

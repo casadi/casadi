@@ -46,19 +46,19 @@ Matrix<SX> gauss_quadrature(Matrix<SX> f, const Matrix<SX> &x, const Matrix<SX> 
 
   // Gauss points
   vector<double> xi;
-  xi.push_back(-std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
-  xi.push_back(-std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
+  xi.push_back(-sqrt(5 + 2*sqrt(10.0/7))/3);
+  xi.push_back(-sqrt(5 - 2*sqrt(10.0/7))/3);
   xi.push_back(0);
-  xi.push_back(std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
-  xi.push_back(std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
+  xi.push_back(sqrt(5 - 2*sqrt(10.0/7))/3);
+  xi.push_back(sqrt(5 + 2*sqrt(10.0/7))/3);
 
   // Gauss weights
   vector<double> wi;
-  wi.push_back((322-13*std::sqrt(70.0))/900.0);
-  wi.push_back((322+13*std::sqrt(70.0))/900.0);
+  wi.push_back((322-13*sqrt(70.0))/900.0);
+  wi.push_back((322+13*sqrt(70.0))/900.0);
   wi.push_back(128/225.0);
-  wi.push_back((322+13*std::sqrt(70.0))/900.0);
-  wi.push_back((322-13*std::sqrt(70.0))/900.0);
+  wi.push_back((322+13*sqrt(70.0))/900.0);
+  wi.push_back((322-13*sqrt(70.0))/900.0);
   
   // Evaluate at the Gauss points
   SXFunction fcn(x,f);
@@ -145,7 +145,7 @@ Matrix<SX> rectangle(const Matrix<SX>& a){
 }
 
 Matrix<SX> triangle(const Matrix<SX>& a){
-  return rectangle(a.toScalar()/2)*(1-std::abs(a.toScalar()));
+  return rectangle(a.toScalar()/2)*(1-abs(a.toScalar()));
 }
 
 Matrix<SX> sign(const Matrix<SX>& a){

@@ -685,12 +685,13 @@ MX MX::__div__(const MX& b) const{    return *this / b;}
 MX MX::__constpow__(const MX& b) const {   return (*this).constpow(b);}
 MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__mldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
-MX MX::__mpower__(const MX& b) const  {   return std::pow(*this,b); throw CasadiException("mpower: Not implemented");}
+MX MX::__mpower__(const MX& b) const  {   return pow(*this,b); throw CasadiException("mpower: Not implemented");}
 
 } // namespace CasADi
 
+// GLobal namespace
+
 using namespace CasADi;
-namespace std{
 
 MX exp(const MX& x){
   return x.exp();
@@ -761,9 +762,6 @@ MX ceil(const MX& x){
   return x.ceil();
 }
 
-} // namespace std
-
-// GLobal namespace
 MX erf(const MX& x){
   return x.erf();
 }

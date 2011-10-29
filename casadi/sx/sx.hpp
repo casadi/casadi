@@ -387,27 +387,24 @@ class numeric_limits<CasADi::SX>{
 #define SX CasADi::SX
 
 /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
-
-namespace std{
-  inline SX sqrt(const SX &x){return x.sqrt();}
-  inline SX sin(const SX &x){return x.sin();}
-  inline SX cos(const SX &x){return x.cos();}
-  inline SX tan(const SX &x){return x.tan();}
-  inline SX atan(const SX &x){return x.arctan();}
-  inline SX asin(const SX &x){return x.arcsin();}
-  inline SX acos(const SX &x){return x.arccos();}
-  inline SX sinh(const SX &x){return x.sinh();}
-  inline SX cosh(const SX &x){return x.cosh();}
-  inline SX tanh(const SX &x){return x.tanh();}
-  inline SX exp(const SX &x){return x.exp();}
-  inline SX log(const SX &x){return x.log();}
-  inline SX pow(const SX &x, const SX &n){ return x.__pow__(n);}
-  inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
-  inline SX abs(const SX &x){return x.fabs();}
-  inline SX fabs(const SX &x){return x.fabs();}
-  inline SX floor(const SX &x){return x.floor();}
-  inline SX ceil(const SX &x){return x.ceil();}
-} // namespace std
+inline SX sqrt(const SX &x){return x.sqrt();}
+inline SX sin(const SX &x){return x.sin();}
+inline SX cos(const SX &x){return x.cos();}
+inline SX tan(const SX &x){return x.tan();}
+inline SX atan(const SX &x){return x.arctan();}
+inline SX asin(const SX &x){return x.arcsin();}
+inline SX acos(const SX &x){return x.arccos();}
+inline SX sinh(const SX &x){return x.sinh();}
+inline SX cosh(const SX &x){return x.cosh();}
+inline SX tanh(const SX &x){return x.tanh();}
+inline SX exp(const SX &x){return x.exp();}
+inline SX log(const SX &x){return x.log();}
+inline SX pow(const SX &x, const SX &n){ return x.__pow__(n);}
+inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
+inline SX abs(const SX &x){return x.fabs();}
+inline SX fabs(const SX &x){return x.fabs();}
+inline SX floor(const SX &x){return x.floor();}
+inline SX ceil(const SX &x){return x.ceil();}
 
 
 /** \brief  C99 elementary functions from the math.h header */

@@ -41,27 +41,27 @@ class casadi_operators{
     static T mul(const T&x, const T&y){ return x*y;}
     static T div(const T&x, const T&y){ return x/y;}
     static T neg(const T&x){ return -x;}
-    static T exp(const T&x){ return std::exp(x);}
-    static T log(const T&x){ return std::log(x);}
-    static T pow(const T&x, const T&y){ return std::pow(x,y);}
-    static T constpow(const T&x, const T&y){ return std::pow(x,y);}
-    static T sqrt(const T&x){ return std::sqrt(x);}
-    static T sin(const T&x){ return std::sin(x);}
-    static T cos(const T&x){ return std::cos(x);}
-    static T tan(const T&x){ return std::tan(x);}
-    static T asin(const T&x){ return std::asin(x);}
-    static T acos(const T&x){ return std::acos(x);}
-    static T atan(const T&x){ return std::atan(x);}
-    static T floor(const T&x){ return std::floor(x);}
-    static T ceil(const T&x){ return std::ceil(x);}
+    static T exp(const T&x){ return ::exp(x);}
+    static T log(const T&x){ return ::log(x);}
+    static T pow(const T&x, const T&y){ return ::pow(x,y);}
+    static T constpow(const T&x, const T&y){ return ::pow(x,y);}
+    static T sqrt(const T&x){ return ::sqrt(x);}
+    static T sin(const T&x){ return ::sin(x);}
+    static T cos(const T&x){ return ::cos(x);}
+    static T tan(const T&x){ return ::tan(x);}
+    static T asin(const T&x){ return ::asin(x);}
+    static T acos(const T&x){ return ::acos(x);}
+    static T atan(const T&x){ return ::atan(x);}
+    static T floor(const T&x){ return ::floor(x);}
+    static T ceil(const T&x){ return ::ceil(x);}
     static T equality(const T&x, const T&y){ return x==y;}
     static T fmin(const T&x, const T&y){ return std::min(x,y);}
     static T fmax(const T&x, const T&y){ return std::max(x,y);}
-    static T fabs(const T&x){ return std::abs(x);}
+    static T fabs(const T&x){ return ::fabs(x);}
     static T erf(const T&x){ return ::erf(x);}
-    static T sinh(const T&x){ return std::sinh(x);}
-    static T cosh(const T&x){ return std::cosh(x);}
-    static T tanh(const T&x){ return std::tanh(x);}
+    static T sinh(const T&x){ return ::sinh(x);}
+    static T cosh(const T&x){ return ::cosh(x);}
+    static T tanh(const T&x){ return ::tanh(x);}
     static T printme(const T&x, const T&y){ return printme(x,y);}
 };
 
@@ -72,7 +72,6 @@ class casadi_operators{
 } // namespace CasADi
 
 #define MX CasADi::MX
-namespace std{
 //@{
 /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
 MX sqrt(const MX &x);
@@ -96,7 +95,6 @@ MX cosh(const MX &x);
 MX tanh(const MX &x);
 MX printme(const MX &x, const MX &y);
 //@}
-} // namespace std
 
 /** \brief  C99 elementary functions from the math.h header */
 MX erf(const MX &x);
