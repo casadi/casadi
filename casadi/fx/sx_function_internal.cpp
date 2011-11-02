@@ -97,14 +97,14 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   if(nfdir==0 && nadir==0){
     // without taping
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-      casadi_math<double>::funNew(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind]);
+      casadi_math<double>::fun(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind]);
     }
   } else {
     // with taping
     vector<AlgEl>::iterator it = algorithm_.begin();
     vector<AlgElData>::iterator it1 = pder_.begin();
     for(; it<algorithm_.end(); ++it, ++it1){
-      casadi_math<double>::derFNew(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind],it1->d);
+      casadi_math<double>::derF(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind],it1->d);
     }
   }
 
@@ -276,7 +276,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       const SX& f = *f_it;
       const SX& x = f->dep(0);
       const SX& y = f->dep(1);
-      casadi_math<SX>::derNew(it->op,x,y,f,tmp);
+      casadi_math<SX>::der(it->op,x,y,f,tmp);
       if(!x->isConstant())  der1.push_back(tmp[0]);
       else                  der1.push_back(0);
 
@@ -464,7 +464,7 @@ void SXFunctionInternal::print(ostream &stream) const{
     s0 << "a" << i0;
     s1 << "a" << i1;
     stream << s.str() << " = ";
-    casadi_math<double>::print[op](stream,s0.str(),s1.str());
+    casadi_math<double>::print(op,stream,s0.str(),s1.str());
     stream << ";" << endl;
   }
 }
@@ -481,9 +481,9 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
 void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
   const AlgEl& ae = algorithm_[i];
   const SX& f = binops_[i];
-  casadi_math<double>::printPre[ae.op](stream);
-  for(int c=0; c<casadi_math<double>::ndeps[ae.op]; ++c){
-    if(c==1) casadi_math<double>::printSep[ae.op](stream);
+  casadi_math<double>::printPre(ae.op,stream);
+  for(int c=0; c<casadi_math<double>::ndeps(ae.op); ++c){
+    if(c==1) casadi_math<double>::printSep(ae.op,stream);
 
     if(f->dep(c)->isConstant()){
       double v = f->dep(c)->getValue();
@@ -498,7 +498,7 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
       stream << "a" << ae.ch[c];
     }
   }
-  casadi_math<double>::printPost[ae.op](stream);
+  casadi_math<double>::printPost(ae.op,stream);
 }
 
 void SXFunctionInternal::generateCode(const string& src_name){
@@ -1060,10 +1060,10 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
     if(eliminate_constants && x.isConstant() && y.isConstant()){
       // Check if both arguments are constants
       double temp;
-      casadi_math<double>::funNew(it->op,x.getValue(),y.getValue(),temp);
+      casadi_math<double>::fun(it->op,x.getValue(),y.getValue(),temp);
       swork_[it->ind] = temp;
     } else {
-      casadi_math<SX>::funNew(it->op,x,y,swork_[it->ind]);
+      casadi_math<SX>::fun(it->op,x,y,swork_[it->ind]);
     }
   }
 

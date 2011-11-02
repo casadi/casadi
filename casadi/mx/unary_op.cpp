@@ -32,7 +32,7 @@ namespace CasADi{
 
 UnaryOp::UnaryOp(Operation op, MX x) : op_(op){
   // Put a densifying node in between if necessary
-  if(!casadi_math<double>::f00_is_zero[op_]){
+  if(!casadi_math<double>::f00_is_zero(op_)){
     makeDense(x);
   }
   
@@ -45,7 +45,7 @@ UnaryOp* UnaryOp::clone() const{
 }
 
 void UnaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  casadi_math<double>::print[op_](stream,args.at(0),"nan");
+  casadi_math<double>::print(op_,stream,args.at(0),"nan");
 }
 
 void UnaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
@@ -58,15 +58,15 @@ void UnaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
   if(nfwd==0 && nadj==0){
     // No sensitivities
     for(int i=0; i<size(); ++i)
-      casadi_math<double>::funNew(op_,inputd[i],nan,outputd[i]);
+      casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
     
   } else {
     // Sensitivities
     double tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      casadi_math<double>::funNew(op_,inputd[i],nan,outputd[i]);
-      casadi_math<double>::derNew(op_,inputd[i],nan,outputd[i],tmp);
+      casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
+      casadi_math<double>::der(op_,inputd[i],nan,outputd[i],tmp);
       
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
@@ -87,7 +87,7 @@ void UnaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const 
   vector<SX> &od = output[0]->data();
   
   for(int el=0; el<size(); ++el){
-    casadi_math<SX>::funNew(op_,xd[el],0,od[el]);
+    casadi_math<SX>::fun(op_,xd[el],0,od[el]);
   }
 }
 
@@ -95,7 +95,7 @@ void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   // Evaluate function
   MX dummy;   // Dummy second argument
   if(!output_given){
-    casadi_math<MX>::funNew(op_,*input[0],dummy,*output[0]);
+    casadi_math<MX>::fun(op_,*input[0],dummy,*output[0]);
   }
 
   // Number of forward directions
@@ -104,7 +104,7 @@ void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   if(nfwd>0 || nadj>0){
     // Get partial derivatives
     MX pd[2];
-    casadi_math<MX>::derNew(op_,*input[0],dummy,*output[0],pd);
+    casadi_math<MX>::der(op_,*input[0],dummy,*output[0],pd);
     
     // Propagate forward seeds
     for(int d=0; d<nfwd; ++d){

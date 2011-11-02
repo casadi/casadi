@@ -352,7 +352,7 @@ class Matrix : public PrintableObject{
     static Matrix<T> matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y);
     static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
   //@}
-    static void binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping);
+    static void binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping);
 
     /** \brief  Unary function */
 #ifndef SWIG
@@ -1951,7 +1951,7 @@ Matrix<T> Matrix<T>::binary(int op, const Matrix<T> &x, const Matrix<T> &y){
 }
 
 template<class T>
-void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
+void Matrix<T>::binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
   std::vector<T>& rd = r.data();
   const std::vector<T> &xd = x.data();
   const std::vector<T> &yd = y.data();
@@ -1971,7 +1971,9 @@ void Matrix<T>::binary_no_alloc(T (*fcn)(const T&, const T&), const Matrix<T> &x
     bool skip_nz(m & 4);
     
     // Evaluate
-    if(!skip_nz) rd[el++] = fcn(nz0 ? xd[el0] : zero, nz1 ? yd[el1] : zero);
+    if(!skip_nz){
+      fcn(op, nz0 ? xd[el0] : zero, nz1 ? yd[el1] : zero, rd[el++]);
+    }
     
     // Go to next nonzero
     el0 += nz0;

@@ -326,7 +326,7 @@ bool SX::isLeaf() const {
 
 bool SX::isCommutative() const{
   if (!isBinary()) throw CasadiException("SX::isCommutative: must be binary");
-  return casadi_math<double>::isCommutative[getOp()];
+  return casadi_math<double>::isCommutative(getOp());
 }
 
 bool SX::isConstant() const{
@@ -395,7 +395,7 @@ SX SX::getDep(int ch) const{
 
 int SX::getNdeps() const {
   if (!isBinary()) throw CasadiException("SX::getNdeps: must be binary");
-  return casadi_math<double>::ndeps[getOp()];
+  return casadi_math<double>::ndeps(getOp());
 }
 
 long SX::__hash__() const {
