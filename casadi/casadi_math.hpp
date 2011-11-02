@@ -26,7 +26,6 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <vector>
 #include "casadi_exception.hpp"
 #include "pre_c99_support.hpp"
 
@@ -66,7 +65,7 @@ template<int I>
 class BinaryOperationE{
   public:
     /// Function evaluation
-    template<typename T> static T fcn(const T& x, const T& y){ 
+    template<typename T> inline static T fcn(const T& x, const T& y){ 
       T ret;
       BinaryOperation<I>::fcn(x,y,ret);
       return ret;
@@ -313,12 +312,11 @@ class BinaryOperation<PRINTME>{
     template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };
 
-
 #ifdef WITH_PRINTME 
-template<> inline
-void BinaryOperation<PRINTME>::fcn<double>(const double& x, const double& y, double& f) {
-       f = x; 
-       std::cout << "|> " << y << " : " << x << std::endl;
+template<>
+inline void BinaryOperation<PRINTME>::fcn<double>(const double& x, const double& y, double& f) {
+  f = x; 
+  std::cout << "|> " << y << " : " << x << std::endl;
 }
 #endif //WITH_PRINTME 
 

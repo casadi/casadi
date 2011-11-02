@@ -97,7 +97,47 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   if(nfdir==0 && nadir==0){
     // without taping
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
+// The following is slightly faster than the function below, which is strange, since the below function should be inlined anyway
+#if 1
+#define x work_[it->ch[0]]
+#define y work_[it->ch[1]]
+#define f work_[it->ind]
+      switch(it->op){
+        case ADD:       BinaryOperation<ADD>::fcn(x,y,f);           break;
+        case SUB:       BinaryOperation<SUB>::fcn(x,y,f);           break;
+        case MUL:       BinaryOperation<MUL>::fcn(x,y,f);           break;
+        case DIV:       BinaryOperation<DIV>::fcn(x,y,f);           break;
+        case NEG:       BinaryOperation<NEG>::fcn(x,y,f);           break;
+        case EXP:       BinaryOperation<EXP>::fcn(x,y,f);           break;
+        case LOG:       BinaryOperation<LOG>::fcn(x,y,f);           break;
+        case POW:       BinaryOperation<POW>::fcn(x,y,f);           break;
+        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,f);      break;
+        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,f);          break;
+        case SIN:       BinaryOperation<SIN>::fcn(x,y,f);           break;
+        case COS:       BinaryOperation<COS>::fcn(x,y,f);           break;
+        case TAN:       BinaryOperation<TAN>::fcn(x,y,f);           break;
+        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,f);          break;
+        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,f);          break;
+        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,f);          break;
+        case STEP:      BinaryOperation<STEP>::fcn(x,y,f);          break;
+        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,f);         break;
+        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,f);          break;
+        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,f);      break;
+        case ERF:       BinaryOperation<ERF>::fcn(x,y,f);           break;
+        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);          break;
+        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);          break;
+        case INV:      BinaryOperation<INV>::fcn(x,y,f);          break;
+        case SINH:       BinaryOperation<SINH>::fcn(x,y,f);           break;
+        case COSH:       BinaryOperation<COSH>::fcn(x,y,f);           break;
+        case TANH:       BinaryOperation<TANH>::fcn(x,y,f);           break;
+        case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);           break;
+      }
+#undef x
+#undef y
+#undef f
+#else
       casadi_math<double>::fun(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind]);
+#endif
     }
   } else {
     // with taping
