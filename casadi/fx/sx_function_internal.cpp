@@ -92,96 +92,22 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       work_[input_ind_[ind][i]] = arg.data()[i];
     }
   }
-
-  //#define NO_SWITCH_IN_VM
-  #define x work_[it->ch[0]]
-  #define y work_[it->ch[1]]
-  #define r work_[it->ind]
   
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){
     // without taping
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-      #ifndef NO_SWITCH_IN_VM
-      switch(it->op){
-        case ADD:       BinaryOperation<ADD>::fcn(x,y,r);           break;
-        case SUB:       BinaryOperation<SUB>::fcn(x,y,r);           break;
-        case MUL:       BinaryOperation<MUL>::fcn(x,y,r);           break;
-        case DIV:       BinaryOperation<DIV>::fcn(x,y,r);           break;
-        case NEG:       BinaryOperation<NEG>::fcn(x,y,r);           break;
-        case EXP:       BinaryOperation<EXP>::fcn(x,y,r);           break;
-        case LOG:       BinaryOperation<LOG>::fcn(x,y,r);           break;
-        case POW:       BinaryOperation<POW>::fcn(x,y,r);           break;
-        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,r);      break;
-        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,r);          break;
-        case SIN:       BinaryOperation<SIN>::fcn(x,y,r);           break;
-        case COS:       BinaryOperation<COS>::fcn(x,y,r);           break;
-        case TAN:       BinaryOperation<TAN>::fcn(x,y,r);           break;
-        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,r);          break;
-        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,r);          break;
-        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,r);          break;
-        case STEP:      BinaryOperation<STEP>::fcn(x,y,r);          break;
-        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,r);         break;
-        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,r);          break;
-        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,r);      break;
-        case ERF:       BinaryOperation<ERF>::fcn(x,y,r);           break;
-        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,r);          break;
-        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,r);          break;
-        case INV:      BinaryOperation<INV>::fcn(x,y,r);          break;
-        case SINH:       BinaryOperation<SINH>::fcn(x,y,r);           break;
-        case COSH:       BinaryOperation<COSH>::fcn(x,y,r);           break;
-        case TANH:       BinaryOperation<TANH>::fcn(x,y,r);           break;
-        case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,r);           break;
-      }
-      #else
-      casadi_math<double>::fun[it->op](x,y,r);
-      #endif
+      casadi_math<double>::funNew(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind]);
     }
   } else {
     // with taping
     vector<AlgEl>::iterator it = algorithm_.begin();
     vector<AlgElData>::iterator it1 = pder_.begin();
     for(; it<algorithm_.end(); ++it, ++it1){
-      // Get the arguments
-      double f;
-      switch(it->op){
-        case ADD:       BinaryOperation<ADD>::fcn(x,y,f);   BinaryOperation<ADD>::der(x,y,f,it1->d);        break;
-        case SUB:       BinaryOperation<SUB>::fcn(x,y,f);   BinaryOperation<SUB>::der(x,y,f,it1->d);        break;
-        case MUL:       BinaryOperation<MUL>::fcn(x,y,f);   BinaryOperation<MUL>::der(x,y,f,it1->d);        break;
-        case DIV:       BinaryOperation<DIV>::fcn(x,y,f);   BinaryOperation<DIV>::der(x,y,f,it1->d);        break;
-        case NEG:       BinaryOperation<NEG>::fcn(x,y,f);   BinaryOperation<NEG>::der(x,y,f,it1->d);        break;
-        case EXP:       BinaryOperation<EXP>::fcn(x,y,f);   BinaryOperation<EXP>::der(x,y,f,it1->d);        break;
-        case LOG:       BinaryOperation<LOG>::fcn(x,y,f);   BinaryOperation<LOG>::der(x,y,f,it1->d);        break;
-        case POW:       BinaryOperation<POW>::fcn(x,y,f);   BinaryOperation<POW>::der(x,y,f,it1->d);        break;
-        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,f);   BinaryOperation<CONSTPOW>::der(x,y,f,it1->d);   break;
-        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,f);   BinaryOperation<SQRT>::der(x,y,f,it1->d);       break;
-        case SIN:       BinaryOperation<SIN>::fcn(x,y,f);   BinaryOperation<SIN>::der(x,y,f,it1->d);        break;
-        case COS:       BinaryOperation<COS>::fcn(x,y,f);   BinaryOperation<COS>::der(x,y,f,it1->d);        break;
-        case TAN:       BinaryOperation<TAN>::fcn(x,y,f);   BinaryOperation<TAN>::der(x,y,f,it1->d);        break;
-        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,f);   BinaryOperation<ASIN>::der(x,y,f,it1->d);       break;
-        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,f);   BinaryOperation<ACOS>::der(x,y,f,it1->d);       break;
-        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,f);   BinaryOperation<ATAN>::der(x,y,f,it1->d);       break;
-        case STEP:      BinaryOperation<STEP>::fcn(x,y,f);   BinaryOperation<STEP>::der(x,y,f,it1->d);       break;
-        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,f);   BinaryOperation<FLOOR>::der(x,y,f,it1->d);      break;
-        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,f);   BinaryOperation<CEIL>::der(x,y,f,it1->d);       break;
-        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,f);   BinaryOperation<EQUALITY>::der(x,y,f,it1->d);   break;
-        case ERF:       BinaryOperation<ERF>::fcn(x,y,f);   BinaryOperation<ERF>::der(x,y,f,it1->d);        break;
-        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);   BinaryOperation<FMIN>::der(x,y,f,it1->d);       break;
-        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);   BinaryOperation<FMAX>::der(x,y,f,it1->d);       break;
-        case INV:      BinaryOperation<INV>::fcn(x,y,f);   BinaryOperation<INV>::der(x,y,f,it1->d);         break;
-        case SINH:       BinaryOperation<SINH>::fcn(x,y,f);   BinaryOperation<SINH>::der(x,y,f,it1->d);        break;
-        case COSH:       BinaryOperation<COSH>::fcn(x,y,f);   BinaryOperation<COSH>::der(x,y,f,it1->d);        break;
-        case TANH:       BinaryOperation<TANH>::fcn(x,y,f);   BinaryOperation<TANH>::der(x,y,f,it1->d);        break;
-        case PRINTME:    BinaryOperation<PRINTME>::fcn(x,y,f);   BinaryOperation<TANH>::der(x,y,f,it1->d);     break;
-      }
-      r = f;
+      casadi_math<double>::derFNew(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind],it1->d);
     }
   }
 
-#undef x
-#undef y
-#undef r
-  
   // Get the results
   for(int ind=0; ind<getNumOutputs(); ++ind){
     Matrix<double> &res = output(ind);
