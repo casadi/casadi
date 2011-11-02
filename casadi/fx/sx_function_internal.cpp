@@ -276,7 +276,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       const SX& f = *f_it;
       const SX& x = f->dep(0);
       const SX& y = f->dep(1);
-      casadi_math<SX>::der[it->op](x,y,f,tmp);
+      casadi_math<SX>::derNew(it->op,x,y,f,tmp);
       if(!x->isConstant())  der1.push_back(tmp[0]);
       else                  der1.push_back(0);
 
@@ -1060,10 +1060,10 @@ void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<M
     if(eliminate_constants && x.isConstant() && y.isConstant()){
       // Check if both arguments are constants
       double temp;
-      casadi_math<double>::fun[it->op](x.getValue(),y.getValue(),temp);
+      casadi_math<double>::funNew(it->op,x.getValue(),y.getValue(),temp);
       swork_[it->ind] = temp;
     } else {
-      casadi_math<SX>::fun[it->op](x,y,swork_[it->ind]);
+      casadi_math<SX>::funNew(it->op,x,y,swork_[it->ind]);
     }
   }
 

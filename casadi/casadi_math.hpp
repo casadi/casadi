@@ -67,10 +67,10 @@ class UnaryOperation{
     static bool f0_is_zero(){return false;}
 
     /// Function evaluation
-    template<typename T> static void fcn(const T& x, T& f);
+    template<typename T> inline static void fcn(const T& x, T& f);
     
     /// Partial derivatives
-    template<typename T> static void der(const T& x, const T& f, T* d);
+    template<typename T> inline static void der(const T& x, const T& f, T* d);
 };
 
 #define printRoutinesUnary(pre,post) \
@@ -113,10 +113,10 @@ class BinaryOperation{
     static bool isCommutative() { return true;}
     
     /// Function evaluation
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ UnaryOperation<I>::fcn(x,f);}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ UnaryOperation<I>::fcn(x,f);}
     
     /// Partial derivatives - binary function
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ UnaryOperation<I>::der(x,f,d); d[1]=0; }
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ UnaryOperation<I>::der(x,f,d); d[1]=0; }
 };
 
 template<int I>
@@ -155,8 +155,8 @@ class BinaryOperation<ADD>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x+y;}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=1;}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = x+y;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=1;}
 };
 
 /// Subtraction
@@ -169,8 +169,8 @@ class BinaryOperation<SUB>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return false;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x-y;}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=-1;}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = x-y;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=-1;}
 };
 
 /// Multiplication
@@ -183,8 +183,8 @@ class BinaryOperation<MUL>{
     static bool fx0_is_zero(){return true;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x*y;}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y; d[1]=x;}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = x*y;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y; d[1]=x;}
 };
 
 /// Division
@@ -197,8 +197,8 @@ class BinaryOperation<DIV>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return false;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x/y;}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1/y; d[1]=-f/y;}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = x/y;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1/y; d[1]=-f/y;}
 };
 
 /// Negation
@@ -209,8 +209,8 @@ class UnaryOperation<NEG>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = -x;}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=-1;}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = -x;}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=-1;}
 };
 
 /// Natural exponent
@@ -221,8 +221,8 @@ class UnaryOperation<EXP>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = exp(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=f;}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = exp(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=f;}
 };
 
 /// Natural logarithm
@@ -233,8 +233,8 @@ class UnaryOperation<LOG>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = log(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=1/x;}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = log(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=1/x;}
 };
 
 /// Power, defined only for x>=0
@@ -247,9 +247,9 @@ class BinaryOperation<POW>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return false;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = pow(x,y);}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = pow(x,y);}
     // See issue #104 why d[0] is no longer y*f/x
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*pow(x,y-1); d[1]=log(x)*f;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*pow(x,y-1); d[1]=log(x)*f;}
 };
 
 /// Power, defined only for y constant
@@ -262,8 +262,8 @@ class BinaryOperation<CONSTPOW>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return false;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = pow(x,y);}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*pow(x,y-1); d[1]=0;}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = pow(x,y);}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*pow(x,y-1); d[1]=0;}
 };
 
 /// Square root
@@ -274,8 +274,8 @@ class UnaryOperation<SQRT>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = sqrt(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=1/(timesTwo(f));}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = sqrt(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=1/(timesTwo(f));}
 };
 
 /// Sine
@@ -286,8 +286,8 @@ class UnaryOperation<SIN>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = sin(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=cos(x);}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = sin(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=cos(x);}
 };
 
 /// Cosine
@@ -298,8 +298,8 @@ class UnaryOperation<COS>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = cos(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=-sin(x);}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = cos(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=-sin(x);}
 };
 
 /// Tangent
@@ -310,8 +310,8 @@ class UnaryOperation<TAN>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = tan(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 1/square(cos(x));}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = tan(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 1/square(cos(x));}
 };
 
 /// Arcus sine
@@ -322,8 +322,8 @@ class UnaryOperation<ASIN>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = asin(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=1/sqrt(1-x*x);}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = asin(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=1/sqrt(1-x*x);}
 };
 
 /// Arcus cosine
@@ -334,8 +334,8 @@ class UnaryOperation<ACOS>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = acos(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0]=-1/sqrt(1-x*x);}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = acos(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=-1/sqrt(1-x*x);}
 };
 
 /// Arcus tangent
@@ -346,8 +346,8 @@ class UnaryOperation<ATAN>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = atan(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 1/(1+x*x);}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = atan(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 1/(1+x*x);}
 };
 
 /// Step function
@@ -358,8 +358,8 @@ class UnaryOperation<STEP>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = x >= T(0.);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 0;}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = x >= T(0.);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 0;}
 };
 
 /// Floor function
@@ -370,8 +370,8 @@ class UnaryOperation<FLOOR>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = floor(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 0;}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = floor(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 0;}
 };
 
 /// Ceil function
@@ -382,8 +382,8 @@ class UnaryOperation<CEIL>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = ceil(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 0;}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = ceil(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 0;}
 };
 
 /// Equality
@@ -396,8 +396,8 @@ class BinaryOperation<EQUALITY>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return false;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = x==y;}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = x==y;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 
 /// Minimum
@@ -410,8 +410,8 @@ class BinaryOperation<FMIN>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = fmin(x,y);}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=x<=y; d[1]=!d[0];}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = fmin(x,y);}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=x<=y; d[1]=!d[0];}
 };
 
 /// Maximum
@@ -424,8 +424,8 @@ class BinaryOperation<FMAX>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){ f = fmax(x,y);}
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=x>=y; d[1]=!d[0];}
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = fmax(x,y);}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=x>=y; d[1]=!d[0];}
 };
 
 /// Error function
@@ -436,8 +436,8 @@ class UnaryOperation<ERF>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = erf(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = (2/sqrt(M_PI))*exp(-x*x);}
+    template<typename T> inline static void fcn(const T& x, T& f){ f = erf(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = (2/sqrt(M_PI))*exp(-x*x);}
 };
 
 /// Elementwise inverse
@@ -448,8 +448,8 @@ class UnaryOperation<INV>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = 1./x;}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = -f*f; }
+    template<typename T> inline static void fcn(const T& x, T& f){ f = 1./x;}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = -f*f; }
 };
 
 /// Hyperbolic sine
@@ -460,8 +460,8 @@ class UnaryOperation<SINH>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = sinh(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = cosh(x); }
+    template<typename T> inline static void fcn(const T& x, T& f){ f = sinh(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = cosh(x); }
 };
 
 /// Hyperbolic cosine
@@ -472,8 +472,8 @@ class UnaryOperation<COSH>{
     static bool f0_is_zero(){return false;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = cosh(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = -sinh(x); }
+    template<typename T> inline static void fcn(const T& x, T& f){ f = cosh(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = -sinh(x); }
 };
 
 /// Hyperbolic tangent
@@ -484,8 +484,8 @@ class UnaryOperation<TANH>{
     static bool f0_is_zero(){return true;}
     static int ndeps() { return 1;}
     static bool isCommutative() {return true;}
-    template<typename T> static void fcn(const T& x, T& f){ f = tanh(x);}
-    template<typename T> static void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
+    template<typename T> inline static void fcn(const T& x, T& f){ f = tanh(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
 };
 
 /// Identity operator with the side effect of printing
@@ -498,9 +498,9 @@ class BinaryOperation<PRINTME>{
     static bool fx0_is_zero(){return false;}
     static int ndeps() { return 2;}
     static bool isCommutative() {return false;}
-    template<typename T> static void fcn(const T& x, const T& y, T& f){f = x; }
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){f = x; }
     
-    template<typename T> static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
+    template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };
 
 
@@ -538,17 +538,13 @@ class casadi_math{
     static std::vector<printCompFunT> printPost;
 
     /** \brief Vector of function pointers to all the built in functions */
-    static std::vector<funT> fun;
     static std::vector<funTE> funE;
     
     /** \brief Evaluate a built in function */
     static void funNew(unsigned char op, const T& x, const T& y, T& f);
     
-    /** \brief Vector of function derivative pointers to all the built in functions */
-    static std::vector<derT> der;
-
     /** \brief Evaluate a built in derivative function */
-    static void derNew(unsigned char op, const T& x, const T& y, T& f, T* d);
+    static void derNew(unsigned char op, const T& x, const T& y, const T& f, T* d);
 
     /** \brief Evaluate the function and the derivative function */
     static void derFNew(unsigned char op, const T& x, const T& y, T& f, T* d);
@@ -577,11 +573,7 @@ class casadi_math{
     static std::vector<printCompFunT> getPrintPostFun();
     
     /** \brief Create fun */
-    static std::vector<funT> getFun();
     static std::vector<funTE> getFunE();
-  
-    /** \brief Create der */
-    static std::vector<derT> getDer();
     
     /** \brief Create zero indicator vectors */
     static std::vector<bool> getF00_is_zero();
@@ -610,13 +602,7 @@ template<typename T>
 std::vector<typename casadi_math<T>::printCompFunT> casadi_math<T>::printPost = casadi_math<T>::getPrintPostFun();
 
 template<typename T>
-std::vector<typename casadi_math<T>::funT> casadi_math<T>::fun = casadi_math<T>::getFun();
-
-template<typename T>
 std::vector<typename casadi_math<T>::funTE> casadi_math<T>::funE = casadi_math<T>::getFunE();
-
-template<typename T>
-std::vector<typename casadi_math<T>::derT> casadi_math<T>::der = casadi_math<T>::getDer();
 
 template<typename T>
 std::vector<bool> casadi_math<T>::f00_is_zero = casadi_math<T>::getF00_is_zero();
@@ -690,58 +676,6 @@ populatePrintFun(getNdeps,ndeps(),int)
 populatePrintFun(getCommutative,isCommutative(),bool)
 
 template<typename T>
-std::vector<typename casadi_math<T>::funT> casadi_math<T>::getFun(){
-  
-  // Create return object
-  std::vector<typename casadi_math<T>::funT> ret(NUM_BUILT_IN_OPS,0);
-  
-  // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::fcn<T>;
-  ret[SUB] = BinaryOperation<SUB>::fcn<T>;
-  ret[MUL] = BinaryOperation<MUL>::fcn<T>;
-  ret[DIV] = BinaryOperation<DIV>::fcn<T>;
-    
-  ret[NEG] = BinaryOperation<NEG>::fcn<T>;
-  ret[EXP] = BinaryOperation<EXP>::fcn<T>;
-  ret[LOG] = BinaryOperation<LOG>::fcn<T>;
-  ret[POW] = BinaryOperation<POW>::fcn<T>;
-  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::fcn<T>;
-
-  ret[SQRT] = BinaryOperation<SQRT>::fcn<T>;
-  ret[SIN] = BinaryOperation<SIN>::fcn<T>;
-  ret[COS] = BinaryOperation<COS>::fcn<T>;
-  ret[TAN] = BinaryOperation<TAN>::fcn<T>;
-
-  ret[ASIN] = BinaryOperation<ASIN>::fcn<T>;
-  ret[ACOS] = BinaryOperation<ACOS>::fcn<T>;
-  ret[ATAN] = BinaryOperation<ATAN>::fcn<T>;
-
-  ret[STEP] = BinaryOperation<STEP>::fcn<T>;
-  ret[FLOOR] = BinaryOperation<FLOOR>::fcn<T>;
-  ret[CEIL] = BinaryOperation<CEIL>::fcn<T>;
-
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::fcn<T>;
-
-  ret[ERF] = BinaryOperation<ERF>::fcn<T>;
-  ret[FMIN] = BinaryOperation<FMIN>::fcn<T>;
-  ret[FMAX] = BinaryOperation<FMAX>::fcn<T>;
-
-  ret[INV] = BinaryOperation<INV>::fcn<T>;
-
-  ret[SINH] = BinaryOperation<SINH>::fcn<T>;
-  ret[COSH] = BinaryOperation<COSH>::fcn<T>;
-  ret[TANH] = BinaryOperation<TANH>::fcn<T>;
-
-  ret[PRINTME] = BinaryOperation<PRINTME>::fcn<T>;
-  // Make sure that all functions were specified
-  for(int i=0; i<ret.size(); ++i){
-    casadi_assert(ret[i]!=0);
-  }
-  
-  return ret;
-}
-
-template<typename T>
 std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
   
   // Create return object
@@ -786,60 +720,6 @@ std::vector<typename casadi_math<T>::funTE> casadi_math<T>::getFunE(){
 
   ret[PRINTME] = BinaryOperationE<PRINTME>::fcn<T>;
   
-  // Make sure that all functions were specified
-  for(int i=0; i<ret.size(); ++i){
-    casadi_assert(ret[i]!=0);
-  }
-  
-  return ret;
-}
-
-template<typename T>
-std::vector<typename casadi_math<T>::derT> casadi_math<T>::getDer(){
-  // Create return object
-  std::vector<typename casadi_math<T>::derT> ret(NUM_BUILT_IN_OPS,0);
-  
-  // Specify operations
-  ret[ADD] = BinaryOperation<ADD>::der<T>;
-  ret[SUB] = BinaryOperation<SUB>::der<T>;
-  ret[MUL] = BinaryOperation<MUL>::der<T>;
-  ret[DIV] = BinaryOperation<DIV>::der<T>;
-    
-  ret[NEG] = BinaryOperation<NEG>::der<T>;
-  ret[EXP] = BinaryOperation<EXP>::der<T>;
-  ret[LOG] = BinaryOperation<LOG>::der<T>;
-  ret[POW] = BinaryOperation<POW>::der<T>;
-  ret[CONSTPOW] = BinaryOperation<CONSTPOW>::der<T>;
-
-  ret[SQRT] = BinaryOperation<SQRT>::der<T>;
-  ret[SIN] = BinaryOperation<SIN>::der<T>;
-  ret[COS] = BinaryOperation<COS>::der<T>;
-  ret[TAN] = BinaryOperation<TAN>::der<T>;
-
-  ret[ASIN] = BinaryOperation<ASIN>::der<T>;
-  ret[ACOS] = BinaryOperation<ACOS>::der<T>;
-  ret[ATAN] = BinaryOperation<ATAN>::der<T>;
-
-  ret[STEP] = BinaryOperation<STEP>::der<T>;
-  ret[FLOOR] = BinaryOperation<FLOOR>::der<T>;
-  ret[CEIL] = BinaryOperation<CEIL>::der<T>;
-
-  ret[EQUALITY] = BinaryOperation<EQUALITY>::der<T>;
-
-  ret[ERF] = BinaryOperation<ERF>::der<T>;
-  ret[FMIN] = BinaryOperation<FMIN>::der<T>;
-  ret[FMAX] = BinaryOperation<FMAX>::der<T>;
-
-  ret[INV] = BinaryOperation<INV>::der<T>;
-
-  ret[SINH] = BinaryOperation<SINH>::der<T>;
-  ret[COSH] = BinaryOperation<COSH>::der<T>;
-  ret[TANH] = BinaryOperation<TANH>::der<T>;
-
-  ret[PRINTME] = BinaryOperation<PRINTME>::der<T>;
-
-
-
   // Make sure that all functions were specified
   for(int i=0; i<ret.size(); ++i){
     casadi_assert(ret[i]!=0);
@@ -990,7 +870,7 @@ std::vector<bool> casadi_math<T>::getFx0_is_zero(){
 }
 
 template<typename T>
-void casadi_math<T>::funNew(unsigned char op, const T& x, const T& y, T& f){
+inline void casadi_math<T>::funNew(unsigned char op, const T& x, const T& y, T& f){
   switch(op){
     case ADD:       BinaryOperation<ADD>::fcn(x,y,f);           break;
     case SUB:       BinaryOperation<SUB>::fcn(x,y,f);           break;
@@ -1024,7 +904,7 @@ void casadi_math<T>::funNew(unsigned char op, const T& x, const T& y, T& f){
 }
 
 template<typename T>
-void casadi_math<T>::derNew(unsigned char op, const T& x, const T& y, T& f, T* d){
+inline void casadi_math<T>::derNew(unsigned char op, const T& x, const T& y, const T& f, T* d){
   switch(op){
     case ADD:       BinaryOperation<ADD>::der(x,y,f,d);        break;
     case SUB:       BinaryOperation<SUB>::der(x,y,f,d);        break;
@@ -1059,7 +939,7 @@ void casadi_math<T>::derNew(unsigned char op, const T& x, const T& y, T& f, T* d
 
 
 template<typename T>
-void casadi_math<T>::derFNew(unsigned char op, const T& x, const T& y, T& f, T* d){
+inline void casadi_math<T>::derFNew(unsigned char op, const T& x, const T& y, T& f, T* d){
   // Copy result to temp since it might get overwritten if y or x have the same address as f
   T ff;
   
