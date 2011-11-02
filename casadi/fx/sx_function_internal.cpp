@@ -579,7 +579,9 @@ void SXFunctionInternal::generateCode(const string& src_name){
   casadi_assert(isInit());
   
    // Output
-  cout << "Generating: " << src_name << " (" << algorithm_.size() << " elementary operations)" << endl;
+  if(verbose()){
+    cout << "Generating: " << src_name << " (" << algorithm_.size() << " elementary operations)" << endl;
+  }
   // Create the c source file
   ofstream cfile;
   cfile.open (src_name.c_str());
@@ -834,7 +836,9 @@ void SXFunctionInternal::init(){
   // Use live variables?
   bool live_variables = getOption("live_variables");
   if(live_variables){
-    casadi_warning("Live variables is currently not compatible with symbolic calculations");
+    if(verbose()){
+      casadi_warning("Live variables is currently not compatible with symbolic calculations");
+    }
     
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(),0);
@@ -1055,8 +1059,14 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   SXFunction this_;
   this_.assignNode(this);
   Matrix<SX> g = this_.grad(iind,oind);
+
   if(verbose()){
     cout << "SXFunctionInternal::hessian: calculating gradient done " << endl;
+  }
+
+  makeDense(g);
+  if(verbose()){
+    cout << "SXFunctionInternal::hessian: made gradient dense (workaround!) " << endl;
   }
 
   // Numeric or symbolic hessian

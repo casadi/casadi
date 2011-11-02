@@ -120,7 +120,12 @@ SXMatrix SXFunction::hess(int iind, int oind){
   if((*this)->verbose()){
     cout << "SXFunction::hess: calculating gradient done " << endl;
   }
-  
+
+  makeDense(g);
+  if((*this)->verbose()){
+    cout << "SXFunction::hessian: made gradient dense (workaround!) " << endl;
+  }
+
   // Create function
   SXFunction gfcn(inputSX(iind),g);
   gfcn.setOption("verbose",getOption("verbose"));
