@@ -924,7 +924,9 @@ void SXFunctionInternal::init(){
     }
     #endif
     
-    cout << "Using live variables. Worksize is " << p << " instead of " << nodes.size() << "(" << bnodes.size() << " elementary operations)" << endl;
+    if(verbose()){
+      cout << "Using live variables. Worksize is " << p << " instead of " << nodes.size() << "(" << bnodes.size() << " elementary operations)" << endl;
+    }
     worksize_ = p;
   } else {
     worksize_ = nodes.size();
