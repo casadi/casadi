@@ -381,10 +381,10 @@ KinsolSolver KinsolInternal::jac(const std::vector<int> iind, int oind){
     Matrix<SX> f_der = prod(Jz,dz_dx) + Jx;
 
     // Append variables
-    append(f_in[0],vec(dz_dx));
+    f_in[0].append(vec(dz_dx));
       
     // Augment nonlinear equation
-    append(F_aug,vec(f_der));
+    F_aug.append(vec(f_der));
     
     // Number of right hand sides
     nrhs += nx;

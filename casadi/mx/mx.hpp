@@ -254,13 +254,8 @@ class MX : public SharedObject{
   static MX ones(const std::pair<int, int> &nm);
   //@}
   
-  
-  
   /** \brief  Identity matrix */  
   static MX eye(int nrow);
-
-  /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
-  MX jac(int iind=0);
 
   const MX getSub(int i, int j) const;
   const MX getSub(int i, const std::vector<int>& j) const;
@@ -276,16 +271,10 @@ class MX : public SharedObject{
   MX getNZ(const std::vector<int>& k) const;
   void setNZ(int k, const MX& el);
   void setNZ(const std::vector<int>& k, const MX& el);
-  
-  /// Numeric evaluation
-  Matrix<double> eval(const std::vector<Matrix<double> >& x);
-  
-  /// Symbolic evaluation (matrix graph)
-  Matrix<SX> eval(const std::vector<Matrix<SX> >& x);
-  
-  /// Symbolic evaluation (matrix graph)
-  MX eval(const std::vector<MX>& x);
 
+  /** \brief Append a matrix to the end. */
+  void append(const MX& y);
+  
   /** \brief Get string representation of dimensions.
   The representation is (nrow x ncol = numel | size)
   */

@@ -101,21 +101,6 @@ void make_symbolic(iter_type first, func_type last, const std::string& name){
 }
 #endif
 
-/** \brief  Concatenate */
-Matrix<SX>& operator<<(Matrix<SX>& expr, const Matrix<SX>& add); // remove when C++0X becomes available
-
-/** \brief  create an n-by-n identity matrix */
-Matrix<SX> eyeSX(int n); 
-
-/** \brief  create a matrix with all infinities */
-Matrix<SX> infSX(int n=1,int m=1);
-
-/** \brief  create a matrix with all ones */
-Matrix<SX> onesSX(int n, int m=1);
-
-/** \brief  create a matrix with all zeros */
-Matrix<SX> zerosSX(int n, int m=1);
-
 /** \brief Create a piecewise constant function 
   Create a piecewise constant function with n=val.size() intervals
 
@@ -262,11 +247,11 @@ Matrix<SX> blockmatrix(Matrix<SX> array[n][m]){
     
 /** \brief  append components to the row */
     for(int j=0; j<m; ++j){
-      row << array[i][j];
+      row.append(array[i][j]);
     }
     
 /** \brief  append row to matrix */
-    ret << trans(row);
+    ret.append(trans(row));
   }
 
   return ret;
@@ -281,7 +266,7 @@ Matrix<SX> blockmatrix(Matrix<SX> array[n]){
 /** \brief  loop over rows */
   for(int i=0; i<n; ++i){
 /** \brief  append components */
-    ret << array[i];
+    ret.append(array[i]);
   }
 
   return ret;
@@ -323,9 +308,6 @@ int getIntValue(const Matrix<SX> &ex, int i=0, int j=0);          // integer ver
 void getValue(const Matrix<SX> &ex, double *res); // for all constant expressions
 void getIntValue(const Matrix<SX> &ex, int *res); // integer version
 const std::string& getName(const Matrix<SX> &ex); // get the name (only for scalar variables)
-
-/** \brief  To and from string */
-std::istream& operator>>(std::istream &stream, Matrix<SX> &expr);
 
 Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b);
 Matrix<SX> operator>=(const Matrix<SX> &a, const Matrix<SX> &b);
@@ -418,12 +400,6 @@ The SX expression graph has much less overhead, but is also more restricted than
 Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
 Matrix<SX> ssym(const Matrix<double>& x);
 //@}
-
-/** \brief  Make an implicit equation semi-explicit
-    Divides an equation f(x) = 0 and corresponding variable x into one explicit part x1 = fe(xe) and one implicit part
-    0 = fi(xi).
-*/
-void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, Matrix<SX>& fi, Matrix<SX>& xe, Matrix<SX>& xi);
 
 
 

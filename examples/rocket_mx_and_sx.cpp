@@ -59,8 +59,12 @@ FX create_integrator(int nj, int nu){
 
   // State vector
   SXMatrix x, x0;
-  x << s << v << m;
-  x0 << s0 << v0 << m0;
+  x.append(s);
+  x.append(v);
+  x.append(m);
+  x0.append(s0);
+  x0.append(v0);
+  x0.append(m0);
 
   // Integrator
   vector<SXMatrix> input(2);

@@ -262,7 +262,10 @@ class Matrix : public PrintableObject{
     void setNZ(const Slice& k, const Matrix<T>& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const Matrix<T>& m);
     //@}
-    
+
+    /// Append a matrix to the end
+    void append(const Matrix<T>& y);
+
 #ifndef SWIG 
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
@@ -564,6 +567,12 @@ class Matrix : public PrintableObject{
 
     /** \brief  create a matrix with all zeros */
     static Matrix<T> zeros(const std::pair<int,int>& nm);
+
+    /** \brief  create a matrix with all inf */
+    static Matrix<T> inf(int nrow=1, int ncol=1);
+    
+    /** \brief  create a matrix with all nan */
+    static Matrix<T> nan(int nrow=1, int ncol=1);
     
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
@@ -583,9 +592,7 @@ namespace CasADi{
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 } // namespace CasADi
 
-
-
-// The following functions must be placed in the standard namespace so that the old ones are not shadowed when CasADi namespace is used
+// The following functions must be placed in the global namespace so that the old ones are not shadowed when CasADi namespace is used
 #ifndef SWIG
 
   template<class T>
@@ -644,7 +651,16 @@ namespace CasADi{
   
   template<class T>
   CasADi::Matrix<T> printme(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.printme(y); }
-  
+
+  template<class T>
+  CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
+
+  template<class T>
+  CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
+
+  template<class T>
+  CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
+
 #endif // SWIG
 
 #ifndef SWIG
@@ -2034,10 +2050,35 @@ Matrix<T> Matrix<T>::eye(int n){
   return Matrix<T>(CRSSparsity::createDiagonal(n),1);
 }
 
+template<class T>
+Matrix<T> Matrix<T>::inf(int n, int m){
+  casadi_assert_message(std::numeric_limits<T>::has_infinity,"Datatype cannot represent infinity");
+  return Matrix<T>(n,m,std::numeric_limits<T>::infinity());
+}
 
+template<class T>
+Matrix<T> Matrix<T>::nan(int n, int m){
+  casadi_assert_message(std::numeric_limits<T>::has_quiet_NaN,"Datatype cannot represent not-a-number");
+  return Matrix<T>(n,m,std::numeric_limits<T>::quiet_NaN());
+}
 
+template<class T>
+void Matrix<T>::append(const Matrix<T>& y){
+  // Quick return if we are adding an empty expression
+  if(y.empty()) return;
 
-
+  // Likewise if expr is empty
+  if(empty()){
+    *this=y;
+    return;
+  }
+  
+  // Append the sparsity pattern
+  sparsityRef().append(y.sparsity());
+  
+  // Add the non-zeros
+  data().insert(end(),y.begin(),y.end());
+}
 
 } // namespace CasADi
 #endif // SWIG

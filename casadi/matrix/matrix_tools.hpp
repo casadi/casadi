@@ -47,9 +47,6 @@ Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y);
 template<class T>
 Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y);
 
-template<class T>
-void append(Matrix<T>& expr, const Matrix<T>& add);
-
 /** \brief  check if the matrix has certain properties */
 template<class T>
 bool isConstant(const Matrix<T>& ex);
@@ -208,18 +205,6 @@ Matrix<T> sum(const Matrix<T> &x, int axis=0);
 template<class T>
 Matrix<T> repmat(const Matrix<T> &A, int n, int m);
 
-/** \brief  create an n-by-n identity matrix */
-template<class T>
-Matrix<T> eye(int n){ return Matrix<T>::eye(n);}
-
-/** \brief  create a matrix with all ones */
-template<class T>
-Matrix<T> ones(int n, int m=1){ return Matrix<T>::ones(n,m); }
-
-/** \brief  create a matrix with all zeros */
-template<class T>
-Matrix<T> zeros(int n, int m=1){ return Matrix<T>::zeros(n,m);}
-
 /** \brief  Evaluate a polynomial with coefficeints p in x */
 template<class T>
 Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x);
@@ -271,19 +256,8 @@ const T* getPtr(const Matrix<T> &v);
 } // namespace CasADi
 
 // Global namespace
-template<class T>
-CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
-
-template<class T>
-CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
-
-template<class T>
-CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
 
 #ifndef SWIG
-
-// Implementations of the functions in standard namespace
-
 #include <iterator>
 
 namespace CasADi{
@@ -302,24 +276,6 @@ Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y){
 template<class T>
 Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
   return x.prod(y);
-}
-
-template<class T>
-void append(Matrix<T>& expr, const Matrix<T>& add){
-  // Quick return if we are adding an empty expression
-  if(add.empty()) return;
-
-  // Likewise if expr is empty
-  if(expr.empty()){
-    expr=add;
-    return;
-  }
-  
-  // Append the sparsity pattern
-  expr.sparsityRef().append(add.sparsity());
-  
-  // Add the non-zeros
-  expr.data().insert(expr.end(),add.begin(),add.end());
 }
 
 template<class T>
@@ -519,7 +475,7 @@ template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v){
   Matrix<T> ret;
   for(int i=0; i<v.size(); ++i)
-    append(ret,v[i]);
+    ret.append(v[i]);
   return ret;
 }
 
@@ -527,14 +483,14 @@ template<class T>
 Matrix<T> horzcat(const std::vector<Matrix<T> > &v){
   Matrix<T> ret;
   for(int i=0; i<v.size(); ++i)
-    append(ret,trans(v[i]));
+    ret.append(trans(v[i]));
   return trans(ret);  
 }
 
 template<class T>
 Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y){
   Matrix<T> xy = x;
-  append(xy,y);
+  xy.append(y);
   return xy;
 }
 
@@ -634,8 +590,8 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
     qi /= ri(0,i);
 
     // Update RT and QT
-    append(QT,qi);
-    append(RT,ri);
+    QT.append(qi);
+    RT.append(ri);
   }
 
   // Save to output
@@ -937,7 +893,6 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
 #define MATRIX_TOOLS_TEMPLATES(T) \
 MTT_INST(T,trans) \
 MTT_INST(T,dot) \
-MTT_INST(T,append) \
 MTT_INST(T,isConstant) \
 MTT_INST(T,isDense) \
 MTT_INST(T,isEmpty) \

@@ -516,29 +516,10 @@ MX::MX(int nrow, int ncol, const MX& val){
   (*this)->addDependency(val,vector<int>(sp.size(),0));
 }
 
-Matrix<double> MX::eval(const vector<Matrix<double> >& x){
-  casadi_assert_message((*this)->ndep()==x.size(),"incorrect number of arguments");
-  return (*this)->eval(x);
-}
-
-Matrix<SX> MX::eval(const vector<Matrix<SX> >& x){
-  casadi_assert_message((*this)->ndep()==x.size(),"incorrect number of arguments");
-  return (*this)->eval(x);
-}
-
-MX MX::eval(const vector<MX>& x){
-  casadi_assert_message((*this)->ndep()==x.size(),"incorrect number of arguments");
-  return (*this)->eval(x);
-}
-
 std::string MX::dimString() const {
   std::stringstream ss;
   ss << "(" << size1() << "x" << size2() << "=" << numel() << "|" << size() << ")";
   return ss.str();
-}
-
-MX MX::jac(int iind){
-  return (*this)->jac(iind);
 }
 
 const Matrix<int>& MX::mapping() {
@@ -686,6 +667,10 @@ MX MX::__constpow__(const MX& b) const {   return (*this).constpow(b);}
 MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__mldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
 MX MX::__mpower__(const MX& b) const  {   return pow(*this,b); throw CasadiException("mpower: Not implemented");}
+
+void MX::append(const MX& y){
+  *this = vertcat(*this,y);
+}
 
 } // namespace CasADi
 

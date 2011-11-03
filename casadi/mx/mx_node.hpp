@@ -204,9 +204,6 @@ class MXNode : public SharedObjectNode{
     /// Is it a certain operation
     virtual bool isOperation(int op) const{ return false;}
     
-    /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
-    virtual MX jac(int iind);
-    
     /// Number of elements
     int numel() const;
     
@@ -224,21 +221,6 @@ class MXNode : public SharedObjectNode{
     The variable is initialized to zero
     */
     int temp;
-    
-    /// Numeric evaluation
-    virtual Matrix<double> eval(const std::vector<DMatrix>& x){
-      std::vector<DMatrix> ret(1,DMatrix(sparsity_));
-      const DMatrixPtrV mx_input = ptrVec(x);
-      DMatrixPtrV mx_output = ptrVec(ret);
-      evaluate(mx_input,mx_output);
-      return ret[0];
-    }
-
-    /// Symbolic evaluation (scalar graph)
-    virtual Matrix<SX> eval(const std::vector<Matrix<SX> >& x){return Matrix<SX>();}
-
-    /// Symbolic evaluation (matrix graph)
-    virtual MX eval(const std::vector<MX>& x){return MX();}
     
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;

@@ -30,7 +30,6 @@
 
 /** \brief  C/C++ */
 #include <iostream>
-//#include <fstream>
 #include <string>
 #include <sstream>
 #include <limits>
@@ -39,9 +38,8 @@
 
 namespace CasADi{
 
-  /** \brief  forward declaration of Node and Matrix */
+/** \brief  forward declaration of Node and Matrix */
 class SXNode; // include will follow in the end
-// class SXMatrix; 
 
 /** \brief The basic scalar symbolic class of CasADi
   \author Joel Andersson 
@@ -71,13 +69,6 @@ class SX{
 	\param val Numerical value
     */
     SX(double val);
-
-    /** \brief Type conversion from Matrix
-        \param Matrix<SX> object
-        
-        Convert a 1-by-1 Matrix<SX> to an SX
-    */
-    explicit SX(const Matrix<SX>& m);
     
     /** \brief Symbolic constructor
  	\param name Name of the symbol

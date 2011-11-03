@@ -144,10 +144,6 @@ void MXNode::print(std::ostream &stream) const{
   print(stream,args);
 }
 
-MX MXNode::jac(int iind){
-  throw CasadiException(string("MXNode::jac() not defined for class ") + typeid(*this).name());
-}
-
 FX& MXNode::getFunction(){
   throw CasadiException(string("MXNode::getFunction() not defined for class ") + typeid(*this).name());
 }

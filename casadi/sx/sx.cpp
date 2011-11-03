@@ -69,15 +69,6 @@ SX::SX(const std::string& name){
   node->count++;
 }
 
-SX::SX(const Matrix<SX>& m){
-  // Assign the node a temporary value
-  node = casadi_limits<SX>::zero.node;
-  node->count++;
-  
-  // Copy the value
-  *this = m.toScalar();
-}
-
 SX::~SX(){
   if(--node->count == 0) delete node;
 }

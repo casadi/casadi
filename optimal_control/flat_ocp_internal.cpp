@@ -687,13 +687,13 @@ void FlatOCPInternal::scaleVariables(){
   
   // Collect all the variables
   Matrix<SX> v;
-  append(v,t);
-  append(v,x);
-  append(v,xdot);
-  append(v,xd);
-  append(v,xa);
-  append(v,p);
-  append(v,u);
+  v.append(t);
+  v.append(x);
+  v.append(xdot);
+  v.append(xd);
+  v.append(xa);
+  v.append(p);
+  v.append(u);
   
   // Nominal values
   Matrix<SX> t_n = 1.;
@@ -705,13 +705,13 @@ void FlatOCPInternal::scaleVariables(){
   
   // Get all the old variables in expressed in the nominal ones
   Matrix<SX> v_old;
-  append(v_old,t*t_n);
-  append(v_old,x*x_n);
-  append(v_old,xdot*x_n);
-  append(v_old,xd*xd_n);
-  append(v_old,xa*xa_n);
-  append(v_old,p*p_n);
-  append(v_old,u*u_n);
+  v_old.append(t*t_n);
+  v_old.append(x*x_n);
+  v_old.append(xdot*x_n);
+  v_old.append(xd*xd_n);
+  v_old.append(xa*xa_n);
+  v_old.append(p*p_n);
+  v_old.append(u*u_n);
   
   // Temporary variable
   Matrix<SX> temp;
@@ -753,10 +753,10 @@ void FlatOCPInternal::scaleEquations(){
 
   // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
   Matrix<SX> xz;
-  append(xz,v[X]);
-  append(xz,v[Z]);
-  append(xz,v[P]);
-  append(xz,v[U]);
+  xz.append(v[X]);
+  xz.append(v[Z]);
+  xz.append(v[P]);
+  xz.append(v[U]);
   SXFunction fcn = SXFunction(xz,dae_);
   SXFunction J(v,fcn.jac());
 

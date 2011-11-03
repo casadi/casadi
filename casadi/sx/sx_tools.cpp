@@ -116,22 +116,6 @@ Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matr
   return if_false + (if_true-if_false)*cond;
 }
 
-Matrix<SX> onesSX(int n, int m){
-  return ones<SX>(n,m);
-}
-
-Matrix<SX> zerosSX(int n, int m){
-  return zeros<SX>(n,m);
-}
-
-Matrix<SX> infSX(int n, int m){
-  return Matrix<SX>(n,m,casadi_limits<SX>::inf);
-}
-
-Matrix<SX> eyeSX(int n){
-  return eye<SX>(n);
-}
-
 Matrix<SX> heaviside(const Matrix<SX>& a){
   return (1+sign(a))/2;
 }
@@ -421,28 +405,6 @@ const string& getName(const Matrix<SX>& ex) {
   return ex(0).toScalar()->getName();
 }
 
-istream& operator>>(istream &stream, Matrix<SX> &expr){
-    // try to read a double
-    double realvalue;
-    stream >> realvalue;
-    if(!stream.fail()){
-      // Check if the value is an integer
-      int intvalue = (int)realvalue;
-      if(intvalue == realvalue) expr = intvalue;
-      else                      expr = realvalue;
-      return stream;
-    }
-    stream.clear();
-
-    // Here try to read a vector or matrix
-
-    // else create a symbolic variable    
-    string str;
-    stream >> str;
-    expr = symbolic(str);
-    return stream;
-}
-
 Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b){
   casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
   return a.toScalar() <= b.toScalar();
@@ -486,11 +448,6 @@ Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b){
 Matrix<SX> operator!(const Matrix<SX> &a){
   casadi_assert_message(a.scalar(), "conditional operators only defined for scalars");
   return !a.toScalar();
-}
-
-Matrix<SX>& operator<<(Matrix<SX>& expr, const Matrix<SX>& add){
-  append(expr,add);
-  return expr;
 }
 
 void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
