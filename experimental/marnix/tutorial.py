@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 from casadi import *
 
 # Variables in the state equation
-x = symbolic("x",2)
-u = symbolic("u")
-w = symbolic("w")
+x = ssym("x",2)
+u = ssym("u")
+w = ssym("w")
 
 # Dimensions
 nx = 2
@@ -39,13 +39,13 @@ hzfcn.init()
 N = 1000
 
 # State
-X = symbolic("X",2,N)
+X = ssym("X",2,N)
 
 # Control
-U = symbolic("U",1,N)
+U = ssym("U",1,N)
 
 # Outputs to be constrained
-Z = symbolic("Z",1,N)
+Z = ssym("Z",1,N)
 
 # Assemble the NLP variable vector and bounds
 v = []

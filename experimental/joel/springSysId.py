@@ -50,7 +50,7 @@ def create_integrator_rk4():
     integrator_in[C.INTEGRATOR_P]  =  [u,k,b]
   
     # Create a dummy state derivative vector
-    xp0 = C.create_symbolic("x",len(x))
+    xp0 = C.ssym("x",len(x)).data()
     integrator_in[C.INTEGRATOR_XP0] = xp0
   
     # Create the explicit rk4 integrator

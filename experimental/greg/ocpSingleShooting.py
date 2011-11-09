@@ -8,8 +8,8 @@ class OcpSingleShooting(ocp.Ocp):
         self.t0 = t0
         self.tf = tf
 
-        #self.ssStates = C.MX("ssStates", self.ode._Nx(), self.N)
-        self.ssStates = C.symbolic("ssStates", self.ode._Nx(), self.N)
+        #self.ssStates = C.msym("ssStates", self.ode._Nx(), self.N)
+        self.ssStates = C.ssym("ssStates", self.ode._Nx(), self.N)
 
         self.ssStates[:,0] = self._getState0Vec()
 
@@ -36,8 +36,8 @@ class OcpSingleShooting(ocp.Ocp):
 
         self.N = N
 
-        #self.designVariables = C.MX('designVariables', self._getBigN())
-        self.designVariables = C.symbolic('designVariables', self._getBigN())
+        #self.designVariables = C.msym('designVariables', self._getBigN())
+        self.designVariables = C.ssym('designVariables', self._getBigN())
 
         self.lb = [-1e-15 for k in range(self._getBigN())]
         self.ub = [ 1e-15 for k in range(self._getBigN())]

@@ -65,12 +65,12 @@ Ddp::~Ddp() {}
 void Ddp::setupQFunctions()
 {
      /*************** inputs **************/
-     SXMatrix xk = create_symbolic("xk", ode.nx());
-     SXMatrix uk = create_symbolic("uk", ode.nu());
+     SXMatrix xk = ssym("xk", ode.nx());
+     SXMatrix uk = ssym("uk", ode.nu());
 
-     SXMatrix V_0_kp1(  create_symbolic(  "V_0_kp1",        1,        1) );
-     SXMatrix V_x_kp1(  create_symbolic(  "V_x_kp1", ode.nx(),        1) );
-     SXMatrix V_xx_kp1( create_symbolic( "V_xx_kp1", ode.nx(), ode.nx()) );
+     SXMatrix V_0_kp1(  ssym(  "V_0_kp1",        1,        1) );
+     SXMatrix V_x_kp1(  ssym(  "V_x_kp1", ode.nx(),        1) );
+     SXMatrix V_xx_kp1( ssym( "V_xx_kp1", ode.nx(), ode.nx()) );
 
      vector<SXMatrix> qInputs(NUM_Q_INPUTS);
      qInputs.at(IDX_Q_INPUTS_X_K)      = xk;
@@ -79,8 +79,8 @@ void Ddp::setupQFunctions()
      qInputs.at(IDX_Q_INPUTS_V_X_KP1)  = V_x_kp1;
      qInputs.at(IDX_Q_INPUTS_V_XX_KP1) = V_xx_kp1;
 
-     SXMatrix dx = create_symbolic("dx", ode.nx());
-     SXMatrix du = create_symbolic("du", ode.nu());
+     SXMatrix dx = ssym("dx", ode.nx());
+     SXMatrix du = ssym("du", ode.nu());
 
      /**************** dynamics *********************/
      // dummy params for now
@@ -171,14 +171,14 @@ void Ddp::setupQFunctions()
 void Ddp::setupBackwardSweepFunction()
 {
      /************ inputs ************/
-     SXMatrix uk(   create_symbolic(   "uk", ode.nu(),        1 ) );
+     SXMatrix uk(   ssym(   "uk", ode.nu(),        1 ) );
 
-     SXMatrix Q_0(  create_symbolic(  "Q_0",        1,        1 ) );
-     SXMatrix Q_x(  create_symbolic(  "Q_x", ode.nx(),        1 ) );
-     SXMatrix Q_u(  create_symbolic(  "Q_u", ode.nu(),        1 ) );
-     SXMatrix Q_xx( create_symbolic( "Q_xx", ode.nx(), ode.nx() ) );
-     SXMatrix Q_xu( create_symbolic( "Q_xu", ode.nx(), ode.nu() ) );
-     SXMatrix Q_uu( create_symbolic( "Q_uu", ode.nu(), ode.nu() ) );
+     SXMatrix Q_0(  ssym(  "Q_0",        1,        1 ) );
+     SXMatrix Q_x(  ssym(  "Q_x", ode.nx(),        1 ) );
+     SXMatrix Q_u(  ssym(  "Q_u", ode.nu(),        1 ) );
+     SXMatrix Q_xx( ssym( "Q_xx", ode.nx(), ode.nx() ) );
+     SXMatrix Q_xu( ssym( "Q_xu", ode.nx(), ode.nu() ) );
+     SXMatrix Q_uu( ssym( "Q_uu", ode.nu(), ode.nu() ) );
 
 
      vector<SXMatrix> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);

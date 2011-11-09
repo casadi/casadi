@@ -95,9 +95,9 @@ MultipleShooting & Ocp::addMultipleShooting(string name, Ode & ode, SX t0, SX tf
 
      int numNew = ode.nxu()*N;
      if (designVariables.size1() == 0)
-          designVariables = SXMatrix(create_symbolic(name, numNew));
+          designVariables = ssym(name, numNew);
      else
-          designVariables = vertcat( designVariables, SXMatrix(create_symbolic(name, numNew)) );
+          designVariables = vertcat( designVariables, ssym(name, numNew) );
 
      for (int k=0; k<numNew; k++){
           lb.push_back(-1e50);
@@ -143,8 +143,8 @@ SX & Ocp::addParam(string _newParam)
 
      int idx = designVariables.size1();
 
-     SXMatrix newDv = create_symbolic(_newParam, 1);
-//      designVariables = vertcat( designVariables, SXMatrix(create_symbolic(_newParam, 1)) );
+     SXMatrix newDv = ssym(_newParam, 1);
+//      designVariables = vertcat( designVariables, ssym(_newParam, 1) );
      if (designVariables.size1() == 0)
           designVariables = newDv;
      else

@@ -43,7 +43,7 @@ MultipleShooting::~MultipleShooting() {}
 
 SXMatrix MultipleShooting::getOutput(string o)
 {
-     SXMatrix ret = create_symbolic(o, N);
+     SXMatrix ret = ssym(o, N);
      for (int k=0; k<N; k++)
 	  ret.at(k) = getOutput(o, k);
 	
@@ -185,7 +185,7 @@ void MultipleShooting::boundStateAction(string xu, double lb_, double ub_)
 
 SXMatrix MultipleShooting::getStateMat(int timeStep)
 {
-     SXMatrix ret = create_symbolic("a_state", ode.nx());
+     SXMatrix ret = ssym("a_state", ode.nx());
      // SXMatrix ret(ode.nx(), 1);
      map<string,int>::const_iterator xIter;
      for (xIter = ode.states.begin(); xIter != ode.states.end(); xIter++)
@@ -216,7 +216,7 @@ DMatrix MultipleShooting::getAction(int timeStep, vector<double> & xopt)
 
 SXMatrix MultipleShooting::getActionMat(int timeStep)
 {
-     SXMatrix ret = create_symbolic("an_action", ode.nu());
+     SXMatrix ret = ssym("an_action", ode.nu());
      //	SXMatrix ret(ode.nu(),1);
      map<string,int>::const_iterator uIter;
      for (uIter = ode.actions.begin(); uIter != ode.actions.end(); uIter++)

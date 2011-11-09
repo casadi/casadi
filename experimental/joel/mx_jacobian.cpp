@@ -73,8 +73,8 @@ void evaluation(){
   cout << "evaluation test" << endl;
   
   // Create an SXFunction
-  SXMatrix x = symbolic("x",10);
-  SXMatrix y = symbolic("y");
+  SXMatrix x = ssym("x",10);
+  SXMatrix y = ssym("y");
   SXMatrix f = y*(sin(x)+x);
   cout << "f = " << f << endl;
   vector<SXMatrix> xy(2); xy[0] = x;  xy[1] = y;
@@ -199,8 +199,8 @@ void multiplication(){
   cout << "G (mx) = " << endl << Gfcn2.outputSX() << endl;
   cout << "nnz(G) = " << Gfcn2.outputSX().size() << endl;
   
-  SXMatrix x = symbolic("x",4);
-  SXMatrix y = symbolic("y",4);
+  SXMatrix x = ssym("x",4);
+  SXMatrix y = ssym("y",4);
   SXMatrix f = prod(reshape(x,2,2),reshape(y,2,2));
   vector<SXMatrix> xy(2); xy[0] = x; xy[1] = y;
   SXFunction fcn(xy,f);

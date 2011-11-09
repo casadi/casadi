@@ -50,10 +50,10 @@ void Ode::setupIntegrators(map<string,double> & params)
 {
      /*********** set up rk4Step and eulerStep SXFunctions **********/
      // inputs
-     SXMatrix xk = create_symbolic("xk", nx());
-     SXMatrix uk = create_symbolic("uk", nu());
-     SXMatrix t0 = create_symbolic("t0",    1);
-     SXMatrix dt = create_symbolic("dt",    1);
+     SXMatrix xk = ssym("xk", nx());
+     SXMatrix uk = ssym("uk", nu());
+     SXMatrix t0 = ssym("t0",    1);
+     SXMatrix dt = ssym("dt",    1);
 
      vector<SXMatrix> stepInputs(NUM_ODE_STEP_INPUTS);
      stepInputs.at(IDX_ODE_STEP_STATE)  = xk;
@@ -199,7 +199,7 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
      dxdt( xDotMap, dummyOutputMap, xMap, uMap, p, t );
 
      // make output SXMatrix
-     SXMatrix xDotMat = create_symbolic("an_xDotMat", nx());
+     SXMatrix xDotMat = ssym("an_xDotMat", nx());
      map<string,int>::const_iterator iter;
      for (iter = states.begin(); iter != states.end(); iter++)
 	  xDotMat[iter->second] = xDotMap[iter->first];

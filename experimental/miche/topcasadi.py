@@ -118,7 +118,7 @@ mbb = mbb2d(nelx,nely,rmin,penal,volfrac)
 nelem = mbb.nelem
 nfreedofs = mbb.nfreedofs
 
-x = vertcat([symbolic("x",nelem),symbolic("u",nfreedofs)])
+x = vertcat([ssym("x",nelem),ssym("u",nfreedofs)])
 for i in range(nelem,nelem+nfreedofs-2,2):
 	x[i]=-1;
 	

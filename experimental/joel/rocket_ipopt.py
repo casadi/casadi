@@ -41,7 +41,7 @@ def create_integrator_euler():
   integrator_in[INTEGRATOR_P]  =  [u]
 
   # Create a dummy state derivative vector
-  xp0 = create_symbolic("x",len(x))
+  xp0 = list(ssym("x",len(x)))
   integrator_in[INTEGRATOR_XP0] = xp0
 
   # Create the explicit Euler integrator

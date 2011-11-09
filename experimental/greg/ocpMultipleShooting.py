@@ -38,7 +38,7 @@ class OcpMultipleShooting(ocp.Ocp):
         self.N = N
 
         #self.designVariables = C.MX('designVariables', self._getBigN())
-        self.designVariables = C.symbolic('designVariables', self._getBigN())
+        self.designVariables = C.ssym('designVariables', self._getBigN())
 
         self.lb = [-1e-15 for k in range(self._getBigN())]
         self.ub = [ 1e-15 for k in range(self._getBigN())]

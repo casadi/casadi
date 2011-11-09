@@ -731,40 +731,19 @@ std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p){
   std::vector<Matrix<SX> > ret(p);
   for(int k=0; k<p; ++k){
     stringstream ss;
-    ss << name << k;
+    ss << name << "_" << k;
     ret[k] = ssym(ss.str(),n,m);
   }
   return ret;
 }
 
-vector<SX> create_symbolic(const string& name) {
-  vector<SX> ret;
-  istringstream iss(name);
-  while (iss) {
-    string varname;
-    iss >> varname;
-    if (varname.find_first_not_of(' ') != std::string::npos) // If the string isn't whitespace only
-      ret.push_back(SX(varname));
+std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, int n, int m, int p, int r){
+  std::vector<std::vector<Matrix<SX> > > ret(r);
+  for(int k=0; k<r; ++k){
+    stringstream ss;
+    ss << name << "_" << k;
+    ret[k] = ssym(ss.str(),n,m,p);
   }
-  return ret;
-}
-
-
-vector<SX> create_symbolic(const string& name, int n){
-  vector<SX> ret(n);
-  make_symbolic(ret,name);
-  return ret;
-}
-
-vector< vector<SX> > create_symbolic(const std::string& name, int n, int m){
-  vector< vector<SX> > ret(n,vector<SX>(m));
-  make_symbolic(ret,name);
-  return ret;
-}
-
-vector< vector< vector<SX> > > create_symbolic(const std::string& name, int n, int m, int p){
-  vector< vector< vector<SX> > > ret(n,vector< vector<SX> >(m, vector<SX>(p)));
-  make_symbolic(ret,name);
   return ret;
 }
 

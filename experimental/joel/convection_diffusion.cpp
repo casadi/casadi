@@ -90,7 +90,7 @@ void model(SymbolicOCP &ocp){
   int n = 30;
   
   // Temperatures
-  SXMatrix T = symbolic("T",n);
+  SXMatrix T = ssym("T",n);
   
   ocp.x = T;
   

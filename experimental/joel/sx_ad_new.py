@@ -1,7 +1,7 @@
 from casadi import *
 from numpy import *
 
-x = symbolic("x",5)
+x = ssym("x",5)
 f = sin(x) + x
 print "f = ", f
 

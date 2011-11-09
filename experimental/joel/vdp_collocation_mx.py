@@ -230,7 +230,7 @@ for i in range(N):
   ubg.append(NP.zeros(nx))
   
 # Variable vector (SX)
-V_sx = symbolic("V",NV)
+V_sx = ssym("V",NV)
   
 # Nonlinear constraint function
 gg = vertcat(g)
@@ -252,10 +252,10 @@ ffcn_nlp = ffcn_nlp_mx.expand([V_sx])
 f_sx = ffcn_nlp.outputSX()
   
 # Lagrange multipliers
-lam = symbolic("lambda",g_sx.size1())
+lam = ssym("lambda",g_sx.size1())
 
 # Objective function scaling
-sigma = symbolic("sigma")
+sigma = ssym("sigma")
 
 # Lagrangian function (move to NLP solver!)
 lfcn = SXFunction([V_sx,lam,sigma], [sigma*f_sx + inner_prod(lam,g_sx)])

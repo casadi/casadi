@@ -135,7 +135,7 @@ void test_sx(){
   int n=8;
   cout << "Testing pure SX only, n = " << n << endl;
   
-  SXMatrix x = symbolic("x",n,n);
+  SXMatrix x = ssym("x",n,n);
   time1 = clock();
   SXMatrix detx = det(x);
   time2 = clock();
@@ -272,7 +272,7 @@ void test_sx_mx(){
   
   int n=9;
   
-  SXMatrix x = symbolic("x",n,n);
+  SXMatrix x = ssym("x",n,n);
   time1 = clock();
   SXMatrix detx = det(x);
   time2 = clock();

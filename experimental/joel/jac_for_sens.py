@@ -1,7 +1,7 @@
 from casadi import *
 from numpy import *
-a = symbolic("a",5)
-b = symbolic("b",5)
+a = ssym("a",5)
+b = ssym("b",5)
 
 for jac_for_sens in (True,False):
   print "jac_for_sens = ", jac_for_sens, ":"

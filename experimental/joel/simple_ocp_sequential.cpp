@@ -54,7 +54,7 @@ int main(){
   int nu = 30;  // Number of control segments
 
   // Optimization variable
-  vector<SX> u = create_symbolic("u",nu); // control
+  vector<SX> u = ssym("u",nu),data(); // control
 
   double x_0 = 0.2; // Initial state
   

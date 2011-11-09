@@ -178,8 +178,7 @@ int main() {
         A[i] = new SX[n];
         SX* pt = A[i];
     }
-vector<SX> symA(n*n);
-make_symbolic(symA,"A");
+vector<SX> symA = ssym("A",n*n).data();
 for (int i=0; i<n*n; i++)
   A[i%n][i/n] = symA[i];
 

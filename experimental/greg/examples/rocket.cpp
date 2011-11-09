@@ -97,8 +97,8 @@ main()
 	ms.boundStateAction("v", 0, 0, ms.N-1);
 
 	// hessian
-	SXMatrix sigma = create_symbolic("sigma", 1);
-	SXMatrix lambda = create_symbolic("lambda", ocp.g.size1());
+	SXMatrix sigma = ssym("sigma");
+	SXMatrix lambda = ssym("lambda", ocp.g.size1());
 	SX lagrangian = sigma.at(0)*ocp.objFun;
 	for (int k=0; k<ocp.g.size1(); k++)
 		lagrangian += lambda.at(k)*ocp.g.at(k);

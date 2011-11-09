@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # the T1 (in Nocedal phi1) merit function is satisfied.
 
 # Controls
-u = symbolic("u",10)
+u = ssym("u",10)
 
 # Starting position
 s1=0

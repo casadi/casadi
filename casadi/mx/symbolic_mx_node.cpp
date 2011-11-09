@@ -29,12 +29,12 @@ namespace CasADi{
 
 SymbolicMatrix::SymbolicMatrix(const std::string& name, int n, int m) : name_(name) {
   setSparsity(CRSSparsity(n,m,true));
-/*  sv_ = symbolic(name,n,m);*/
+/*  sv_ = ssym(name,n,m);*/
 }
 
 SymbolicMatrix::SymbolicMatrix(const std::string& name, const CRSSparsity & sp) : name_(name) {
   setSparsity(sp);
-/*  sv_ = symbolic(name,n,m);*/
+/*  sv_ = ssym(name,n,m);*/
 }
 
 SymbolicMatrix* SymbolicMatrix::clone() const{

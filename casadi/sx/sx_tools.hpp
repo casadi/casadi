@@ -75,6 +75,9 @@ The SX expression graph has much less overhead, but is also more restricted than
   /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
   std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p);
 
+  /** \brief Create a vector of length r of vectors of length p with n-by-m matrices with symbolic variables */
+  std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, int n, int m, int p, int r);
+
   /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
   Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp);
 
@@ -83,23 +86,6 @@ The SX expression graph has much less overhead, but is also more restricted than
 
 //@}
 
-/** \brief Create a one-dimensional stl vector of length n with symbolic variables */
-std::vector<SX> create_symbolic(const std::string& name, int n);
-
-/** \brief Create a one-dimensional stl vector of symbolic variables, whose names are given in space-separated form 
-* Python example:
-* \code
-* (a,b,c) = create_symbolic("a b c")
-* \endcode
-*/
-std::vector<SX> create_symbolic(const std::string& name);
-
-/** \brief Create a two-dimensional stl vector of length n-by-m with symbolic variables */
-std::vector< std::vector<SX> > create_symbolic(const std::string& name, int n, int m);
-
-/** \brief Create a three-dimensional stl vector of length n-by-m-by-p with symbolic variables */
-std::vector< std::vector< std::vector< SX> > > create_symbolic(const std::string& name, int n, int m, int p);
-  
 /** \brief  Expand the expression as a weighted sum (with constant weights)  */
 void expand(const Matrix<SX>& ex, Matrix<SX> &weights, Matrix<SX>& terms);
 

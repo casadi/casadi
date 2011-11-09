@@ -61,8 +61,8 @@ print f.eval([[2]])
 print f.grad()
 #! The following code creates and evaluates a multi input (scalar valued), multi output (scalar valued) function.
 #$ The mathematical notation could be $ f_{i,j} : $\mathbb{R} \mapsto \mathbb{R} \quad  i,j \in [0,1]$
-x = symbolic("x") # 1 by 1 matrix serves as scalar
-y = symbolic("y") # 1 by 1 matrix serves as scalar
+x = ssym("x") # 1 by 1 matrix serves as scalar
+y = ssym("y") # 1 by 1 matrix serves as scalar
 f = SXFunction([x , y ], [x*y, x+y])
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
@@ -119,8 +119,8 @@ f.evaluate(1,0) # evaluate(int fsens_order=0, int asens_order=0)
 print f.fwdSens() # v
 #! Functions with matrix valued input
 #! ----------------------------------
-x = symbolic("x",2,2)
-y = symbolic("y",2,2)
+x = ssym("x",2,2)
+y = ssym("y",2,2)
 print x*y # Not a dot product
 f = SXFunction([x,y], [x*y])
 f.init()

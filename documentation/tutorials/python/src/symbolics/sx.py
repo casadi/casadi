@@ -47,11 +47,11 @@ print f
 print x+y
 #! Expression substitution
 #! ------------------------------------
-x=symbolic("x")
+x=ssym("x")
 
 y=x*x
 print y
-print substitute(y,x,symbolic("w"))
+print substitute(y,x,ssym("w"))
 print y
 #! More operators
 #! ------------------------------

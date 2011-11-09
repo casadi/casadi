@@ -37,7 +37,7 @@ assert(abs(solver.output()[0]-1)<1e-9)
 
 n = 5
 
-x=symbolic("x",n)
+x=ssym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
 f=SXFunction([x],[[c.dot((x-1).T,x-1)]])
 g=SXFunction([x],[[x[1]+x[2],x[0]]])

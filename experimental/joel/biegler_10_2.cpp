@@ -243,16 +243,16 @@ int main(){
   }
   
   // Collocated states
-  vector< vector< vector<SX> > > X = create_symbolic("X",N,K+1,x.size());
+  vector< vector< Matrix<SX> > > X = ssym("X",x.size(),1,K+1,N);
   
   // Collocated control (piecewice constant)
-  vector< vector<SX> > U = create_symbolic("U", N, u.size());  
+  vector< Matrix<SX> > U = ssym("U", u.size(),1,N);
   
   // State at end time
-  vector<SX> XF = create_symbolic("XF",x.size());
+  Matrix<SX> XF = ssym("XF",x.size());
     
   // All variables with bounds and initial guess
-  vector<SX> vars;
+  Matrix<SX> vars;
   vector<double> vars_lb;
   vector<double> vars_ub;
   vector<double> vars_sol;
@@ -260,9 +260,9 @@ int main(){
   // Loop over the finite elements
   for(int i=0; i<N; ++i){
     // collocated controls 
+    vars.append( U[i] );
     for(int r=0; r<u.size(); ++r){
       // Add to list of NLP variables
-      vars.push_back( U[i][r] );
       vars_lb.push_back(u_lb[r]);
       vars_ub.push_back(u_ub[r]);
       vars_sol.push_back(u_init[r]);
@@ -270,9 +270,9 @@ int main(){
 
     // Collocated states
     for(int j=0; j<=K; ++j){
+      vars.append(X[i][j]);
       for(int r=0; r<x.size(); ++r){
         // Add to list of NLP variables
-        vars.push_back(X[i][j][r]);
         vars_sol.push_back(x_init[r]);
         if(i==0 && j==0){
           // Initial constraints
@@ -288,51 +288,49 @@ int main(){
     }
   }
   
-// Add states at end time
+  // Add states at end time
+  vars.append(XF);
   for(int r=0; r<x.size(); ++r){
-    vars.push_back(XF[r]);
     vars_sol.push_back(x_init[r]);
     vars_lb.push_back(x_lb[r]);
     vars_ub.push_back(x_ub[r]);
   }
   
   // Constraint function for the NLP
-  vector<SX> g;
+  Matrix<SX> g;
   
   vector<double> lbg,ubg;
   for(int i=0; i<N; ++i){
     for(int k=1; k<=K; ++k){
       // augmented state vector
-      vector<vector<SX> > y_ik(3);
-      y_ik[0] = vector<SX>(1,T[i][k]);
+      vector<Matrix<SX> > y_ik(3);
+      y_ik[0] = T[i][k];
       y_ik[1] = X[i][k];
       y_ik[2] = U[i];
 
       // Add collocation equations to NLP
-      vector<SX> temp = ffcn.eval(y_ik)[0];
-      for(int j=0; j<temp.size(); ++j) temp[j] *= h;
+      Matrix<SX> temp = ffcn.eval(y_ik)[0];
+      temp *= h;
       for(int j=0; j<=K; ++j)
-        for(int l=0; l<temp.size(); ++l)
-          temp[l] -= X[i][j][l]*C[j][k];
+        temp -= X[i][j]*C[j][k];
       
-      g.insert(g.end(),temp.begin(),temp.end());
+      g.append(temp);
       lbg.insert(lbg.end(),x.size(),0); // equality constraints
       ubg.insert(ubg.end(),x.size(),0); // equality constraints
       
       // Add nonlinear constraints
       temp = cfcn.eval(y_ik)[0];
-      g.insert(g.end(),temp.begin(),temp.end()); 
+      g.append(temp);
       lbg.insert(lbg.end(),1,0);
       ubg.insert(ubg.end(),1,numeric_limits<double>::infinity());
     }
 
    // Add continuity equation to NLP
-   vector<SX> temp = i<N-1 ? X[i+1][0] : XF;
+   Matrix<SX> temp = i<N-1 ? X[i+1][0] : XF;
    for(int j=0; j<=K; ++j)
-     for(int l=0; l<x.size(); ++l)
-       temp[l] -= D[j]*X[i][j][l];
+     temp -= D[j]*X[i][j];
 
-   g.insert(g.end(),temp.begin(),temp.end());
+   g.append(temp);
    lbg.insert(lbg.end(),x.size(),0); // equality constraints
    ubg.insert(ubg.end(),x.size(),0); // equality constraints
   }
@@ -341,26 +339,27 @@ int main(){
   SXFunction gfcn_nlp(vars,g);
   
   // Objective function of the NLP
-  vector<vector<SX> > y_f(3);
-  y_f[0] = vector<SX>(1,T.back().back());
+  vector<Matrix<SX> > y_f(3);
+  y_f[0] = T.back().back();
   y_f[1] = XF;
   y_f[2] = U.back();
-  SX f = mfcn.eval(y_f)[0][0];
+  Matrix<SX> f = mfcn.eval(y_f)[0];
   SXFunction ffcn_nlp(vars, f);
   
   // Hessian of the Lagrangian:
   // Lagrange multipliers
-  vector<SX> lambda = create_symbolic("lambda",g.size());
+  Matrix<SX> lambda = ssym("lambda",g.size());
 
   // Objective function scaling
-  SX sigma("sigma");
+  Matrix<SX> sigma = ssym("sigma");
 
   // Lagrangian function
-  vector< vector<SX> > lfcn_input(3);
+  vector< Matrix<SX> > lfcn_input(3);
   lfcn_input[0] = vars;
   lfcn_input[1] = lambda;
-  lfcn_input[2] = vector<SX>(1,sigma);
-  SXFunction lfcn(lfcn_input, sigma*f + inner_prod(Matrix<SX>(lambda),Matrix<SX>(g)));
+  lfcn_input[2] = sigma;
+  SXFunction lfcn(lfcn_input, sigma*f + inner_prod(lambda,g));
+  lfcn.init();
   
   // Hessian of the Lagrangian
   SXFunction HL = lfcn.hessian();

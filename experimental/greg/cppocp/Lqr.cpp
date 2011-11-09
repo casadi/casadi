@@ -76,8 +76,8 @@ Lqr::~Lqr() {}
 void Lqr::setupCostFunctions()
 {
      // inputs
-     SXMatrix xk( create_symbolic( "xk", ode.nx(), 1 ) );
-     SXMatrix uk( create_symbolic( "uk", ode.nu(), 1 ) );
+     SXMatrix xk( ssym( "xk", ode.nx(), 1 ) );
+     SXMatrix uk( ssym( "uk", ode.nu(), 1 ) );
 
      vector<SXMatrix> costInputs(NUM_COST_INPUTS);
      costInputs.at(IDX_COST_INPUTS_X_K) = xk;
@@ -134,19 +134,19 @@ void Lqr::setupCostFunctions()
 void Lqr::setupBackwardSweepFunction()
 {
      /*************** inputs **************/
-     SXMatrix xk = create_symbolic("xk", ode.nx());
-     SXMatrix uk = create_symbolic("uk", ode.nu());
+     SXMatrix xk = ssym("xk", ode.nx());
+     SXMatrix uk = ssym("uk", ode.nu());
 
-     SXMatrix cost_0_k(  create_symbolic(  "cost_0",        1,        1 ) );
-     SXMatrix cost_x_k(  create_symbolic(  "cost_x", ode.nx(),        1 ) );
-     SXMatrix cost_u_k(  create_symbolic(  "cost_u", ode.nu(),        1 ) );
-     SXMatrix cost_xx_k( create_symbolic( "cost_xx", ode.nx(), ode.nx() ) );
-     SXMatrix cost_xu_k( create_symbolic( "cost_xu", ode.nx(), ode.nu() ) );
-     SXMatrix cost_uu_k( create_symbolic( "cost_uu", ode.nu(), ode.nu() ) );
+     SXMatrix cost_0_k(  ssym(  "cost_0",        1,        1 ) );
+     SXMatrix cost_x_k(  ssym(  "cost_x", ode.nx(),        1 ) );
+     SXMatrix cost_u_k(  ssym(  "cost_u", ode.nu(),        1 ) );
+     SXMatrix cost_xx_k( ssym( "cost_xx", ode.nx(), ode.nx() ) );
+     SXMatrix cost_xu_k( ssym( "cost_xu", ode.nx(), ode.nu() ) );
+     SXMatrix cost_uu_k( ssym( "cost_uu", ode.nu(), ode.nu() ) );
 
-     SXMatrix V_0_kp1(  create_symbolic(  "V_0_kp1",        1,        1) );
-     SXMatrix V_x_kp1(  create_symbolic(  "V_x_kp1", ode.nx(),        1) );
-     SXMatrix V_xx_kp1( create_symbolic( "V_xx_kp1", ode.nx(), ode.nx()) );
+     SXMatrix V_0_kp1(  ssym(  "V_0_kp1",        1,        1) );
+     SXMatrix V_x_kp1(  ssym(  "V_x_kp1", ode.nx(),        1) );
+     SXMatrix V_xx_kp1( ssym( "V_xx_kp1", ode.nx(), ode.nx()) );
 
      vector<SXMatrix> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_X_K)       = xk;

@@ -125,7 +125,7 @@ ocp_solver = AcadoInterface(ffcn,mfcn,cfcn,rfcn)
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = acado_in[ACADO_FCN_T]
 dae_in[DAE_Y] = acado_in[ACADO_FCN_XD] + acado_in[ACADO_FCN_XA]
-dae_in[DAE_YDOT] = acado_in[ACADO_FCN_XDOT] + list(create_symbolic("zdot",len(acado_in[ACADO_FCN_XA])))
+dae_in[DAE_YDOT] = acado_in[ACADO_FCN_XDOT] + list(ssym("zdot",len(acado_in[ACADO_FCN_XA])))
 dae_in[DAE_P] = acado_in[ACADO_FCN_P] + acado_in[ACADO_FCN_U]
 dae = SXFunction(dae_in,[ffcn_out])
 

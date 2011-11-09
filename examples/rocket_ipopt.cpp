@@ -39,7 +39,7 @@ int main(){
   int nj = 100; // Number of integration steps per control segment
 
   // optimization variable
-  vector<SX> u = create_symbolic("u",nu); // control
+  vector<SX> u = ssym("u",nu).data(); // control
 
   SX s_0 = 0; // initial position
   SX v_0 = 0; // initial speed

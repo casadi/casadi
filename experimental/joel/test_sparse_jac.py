@@ -2,7 +2,7 @@ from numpy import *
 from casadi import *
  
 # create a simple function with sparse jacobian
-x = symbolic("x",10)
+x = ssym("x",10)
 f = x+5
 f[2] = 44
 f[3] = 55

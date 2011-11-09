@@ -2,7 +2,7 @@
 casadi
 
 x = SX("x"); % A scalar symbolic
-y = symbolic("y",2,1); % A matrix symbolic
+y = ssym("y",2,1); % A matrix symbolic
 
 
 in = {x y}; % function inputs

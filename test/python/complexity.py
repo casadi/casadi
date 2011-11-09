@@ -148,8 +148,8 @@ class ComplexityTests(casadiTestCase):
     return
     self.message("SXFunction add column vectors")
     def setupfun(self,N):
-      A = symbolic("A",N,1)
-      B = symbolic("B",N,1)
+      A = ssym("A",N,1)
+      B = ssym("B",N,1)
       f = SXFunction([A,B],[A+B])
       f.init()
       return {'f':f}
@@ -162,8 +162,8 @@ class ComplexityTests(casadiTestCase):
     return
     self.message("SXFunction prod column vectors")
     def setupfun(self,N):
-      A = symbolic("A",N,1)
-      B = symbolic("B",N,1)
+      A = ssym("A",N,1)
+      B = ssym("B",N,1)
       f = SXFunction([A,B],[c.dot(A.T,B)])
       f.init()
       return {'f':f}
@@ -174,9 +174,9 @@ class ComplexityTests(casadiTestCase):
   def test_SXFunctionprodsparse(self):
     self.message("SXFunction prod sparse")
     def setupfun(self,N):
-      A = symbolic("A",sp_diag(N))
+      A = ssym("A",sp_diag(N))
       A[-1,0]=SX("off") # Have one of-diagonal element
-      B = symbolic("B",N,1)
+      B = ssym("B",N,1)
       f = SXFunction([A,B],[c.dot(A,B)])
       f.init()
       return {'f':f}

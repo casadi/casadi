@@ -22,7 +22,7 @@ f = SXFunction([[l]],[[y]])
 f.init()
 print f.eval([SX("w")])
 #! We expect w^2.
-k=symbolic("d",2,2)
+k=ssym("d",2,2)
 k[1] = x
 l=k[1]
 f = SXFunction([[l]],[[y]])

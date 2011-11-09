@@ -73,8 +73,7 @@ FX create_integrator_euler(double t0, double tf){
   input[INTEGRATOR_X0] = x0;
   input[INTEGRATOR_P] = u;
 
-  vector<SX> xp0(x0.size());
-  make_symbolic(xp0.begin(),xp0.end(),"xp0");
+  vector<SX> xp0 = ssym("xp0",x0.size()).data();
   input[INTEGRATOR_XP0] = xp0;
 
   SXMatrix output = x;

@@ -56,7 +56,7 @@ int main(){
   int nx = nu+1;	// State
 
   // Optimization variable
-  vector<SX> v = create_symbolic("v",nu+nx); // control and state
+  vector<SX> v = ssym("v",nu+nx).data(); // control and state
 
   // Objective function
   SX f = 0; //Could take x_0 into account, but since it is a constant...

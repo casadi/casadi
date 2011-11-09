@@ -16,9 +16,9 @@ using namespace std;
 int
 main()
 {
-	//Matrix<SX>x = create_symbolic("x", 2);
-	vector<SX>x = create_symbolic("x", 2);
-	//vector<SXMatrix>x = create_symbolic("x", 2);
+	//Matrix<SX>x = ssym("x", 2);
+	vector<SX>x = ssym("x", 2).data();
+	//vector<SXMatrix>x = ssym("x",2,1,1);
 
 	SX f;
 	vector<SX>g(2);
