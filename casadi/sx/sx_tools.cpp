@@ -620,18 +620,58 @@ void make_symbolic(SX& v, const std::string& name){
 Matrix<SX> ssym(const std::string& name, int n, int m){
   // Create a dense n-by-m matrix
   Matrix<SX> ret(n,m,0);
+
+  // Check if individial names have been provided
+  if(name[0]=='['){
+    // Make a copy of the string and modify it as to remove the special characters
+    string modname = name;
+    for(string::iterator it=modname.begin(); it!=modname.end(); ++it){
+      switch(*it){
+        case '[': 
+        case ']': 
+        case '{': 
+        case '}': 
+        case ',':
+        case ';': *it = ' ';
+      }
+    }
+    
+    istringstream iss(modname);
+    string varname;
+    
+    // Loop over elements
+    for(int i=0; i<n; ++i){
+      for(int j=0; j<m; ++j){
+        // Read the name
+        iss >> varname;
+        
+        // Make sure that the reading was successful
+        casadi_assert_message(!iss.fail(), "Not enough variable names in string");
+        
+        // Create the variable
+        ret.data()[j+i*m] = SX(varname);
+      }
+    }
+    
+    // Try to read one more element
+    iss >> varname;
+    
+    // Make sure that the reading failed
+    casadi_assert_message(iss.fail(), "Too many variable names in string");
+  } else {
   
-  // Fill with expressions
-  for(int i=0; i<n; ++i){
-    for(int j=0; j<m; ++j){
-      stringstream ss;
-      ss << name;
-      if(n>1)
-        ss << "_" << i;
-      if(m>1)
-        ss << "_" << j;
-      
-      ret.data()[j+i*m] = SX(ss.str());
+    // Fill with expressions
+    for(int i=0; i<n; ++i){
+      for(int j=0; j<m; ++j){
+        stringstream ss;
+        ss << name;
+        if(n>1)
+          ss << "_" << i;
+        if(m>1)
+          ss << "_" << j;
+        
+        ret.data()[j+i*m] = SX(ss.str());
+      }
     }
   }
       
