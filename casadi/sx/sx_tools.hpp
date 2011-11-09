@@ -38,21 +38,6 @@ namespace ublas = boost::numeric::ublas;
 
 namespace CasADi{
 
-#ifndef SWIG
-/** \brief Make a vector/matrix of symbolic variables - dimension 0 */
-void make_symbolic(SX& v, const std::string& name);
-
-/** \brief Make a vector/matrix of symbolic variables - higher dimension recursively */
-template<typename A>
-void make_symbolic(std::vector< A >& v, const std::string& name){
-  for(unsigned int i=0; i<v.size(); ++i){
-    std::stringstream ss;
-    ss << name << "_" << i;
-    make_symbolic(v[i],ss.str());
-  }
-}
-#endif
-
 /** \brief  Construct symbolic arrays and variables using CasADi's SX expression graph representation
 The "ssym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an SXMatrix object.
 The SX expression graph has much less overhead, but is also more restricted than the alternative MX expression graph.
@@ -91,19 +76,6 @@ void expand(const Matrix<SX>& ex, Matrix<SX> &weights, Matrix<SX>& terms);
 
 /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
 void simplify(SX& ex);
-
-#ifndef SWIG
-/** \brief Make a vector/matrix of symbolic variables */
-template <typename iter_type, typename func_type>
-void make_symbolic(iter_type first, func_type last, const std::string& name){
-  int count = 0;
-  for(iter_type cur=first; cur!=last; ++cur){
-    std::stringstream ss;
-    ss << name << "_" << count++;
-    *cur = SX(ss.str());
-  }
-}
-#endif
 
 /** \brief Create a piecewise constant function 
   Create a piecewise constant function with n=val.size() intervals

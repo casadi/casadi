@@ -613,10 +613,6 @@ void fill(Matrix<SX>& mat, const SX& val){
 //   return r;
 // }
 
-void make_symbolic(SX& v, const std::string& name){
-  v = SX(name);
-}
-
 Matrix<SX> ssym(const std::string& name){
   // Check if individial names have been provided
   if(name[0]=='['){
