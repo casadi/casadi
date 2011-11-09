@@ -42,6 +42,21 @@
         
 %}
 %enddef 
+%pythoncode %{
+  class MatrixIterator:
+    def __init__(self,matrix):
+      self.i = 0
+      self.matrix = matrix
+      self.len = len(matrix)
+    def __iter__(self):
+      return self
+    def next(self):
+      if self.i >= self.len:
+        raise StopIteration()
+      ret = self.matrix[self.i]
+      self.i += 1
+      return ret
+%}
 %define %python_matrix_helpers(Type)
 %pythoncode %{
     @property
@@ -64,6 +79,12 @@
         if isinstance(s,tuple) and len(s)==2:
           return self.__Csetitem__(s[0],s[1],val)  
         return self.__Csetitem__(s,val)
+        
+    def __len__(self):
+      return self.size()
+      
+    def __iter__(self):
+      return MatrixIterator(self)
      
 %}
 %enddef 
