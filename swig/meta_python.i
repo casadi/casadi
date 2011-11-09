@@ -71,7 +71,7 @@ int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
 
 template <> 
 bool meta< std::vector< double > >::couldbe(PyObject * p) {
-  return meta< std::vector< double > >::isa(p) || (is_array(p) && array_numdims(p)==1 && array_type(p)!=NPY_OBJECT) || (meta< double >::couldbe_sequence(p) && !is_array(p));
+  return meta< std::vector< double > >::isa(p) || (is_array(p) && array_numdims(p)==1 && array_type(p)!=NPY_OBJECT) || (meta< double >::couldbe_sequence(p) && !is_array(p) && !(meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)) );
 }
 
 /// std::vector<int>
@@ -112,7 +112,7 @@ int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
 
 template <> 
 bool meta< std::vector< int > >::couldbe(PyObject * p) {
-  return meta< std::vector< int > >::isa(p) || (is_array(p) && array_numdims(p)==1) || (meta< int >::couldbe_sequence(p) && !is_array(p));
+  return meta< std::vector< int > >::isa(p) || (is_array(p) && array_numdims(p)==1) || (meta< int >::couldbe_sequence(p) && !is_array(p) && !(meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)));
 }
 
 

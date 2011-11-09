@@ -67,9 +67,6 @@
         if isinstance(s,tuple) and len(s)==2:
           return self.__Csetitem__(s[0],s[1],val)  
         return self.__Csetitem__(s,val)
-        
-    def __len__(self):
-      return self.size()
      
 %}
 %enddef 
