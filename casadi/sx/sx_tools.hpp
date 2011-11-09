@@ -63,8 +63,11 @@ The SX expression graph has much less overhead, but is also more restricted than
 */
 //@{
 
+  /** \brief Create an matrix with symbolic variables, with the dimension given by the string */
+  Matrix<SX> ssym(const std::string& name);
+
   /** \brief Create an n-by-m matrix with symbolic variables */
-  Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
+  Matrix<SX> ssym(const std::string& name, int n, int m=1);
 
   /** \brief Create an n-by-m matrix with symbolic variables */
   Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm); 

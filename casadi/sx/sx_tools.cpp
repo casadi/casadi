@@ -617,6 +617,41 @@ void make_symbolic(SX& v, const std::string& name){
   v = SX(name);
 }
 
+Matrix<SX> ssym(const std::string& name){
+  // Check if individial names have been provided
+  if(name[0]=='['){
+    // Create a return object (empty)
+    Matrix<SX> ret;
+
+    // Make a copy of the string and modify it as to remove the special characters
+    string modname = name;
+    for(string::iterator it=modname.begin(); it!=modname.end(); ++it){
+      switch(*it){
+        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
+      }
+    }
+    
+    istringstream iss(modname);
+    string varname;
+    
+    // Loop over elements
+    while(!iss.fail()){
+      // Read the name
+      iss >> varname;
+      
+      // Append to the return vector
+      if(!iss.fail())
+        ret.append(SX(varname));
+    }
+    
+    return ret;
+  } else {
+    // Scalar
+    return SX(name);
+  }
+}
+
+
 Matrix<SX> ssym(const std::string& name, int n, int m){
   // Create a dense n-by-m matrix
   Matrix<SX> ret(n,m,0);
@@ -627,12 +662,7 @@ Matrix<SX> ssym(const std::string& name, int n, int m){
     string modname = name;
     for(string::iterator it=modname.begin(); it!=modname.end(); ++it){
       switch(*it){
-        case '[': 
-        case ']': 
-        case '{': 
-        case '}': 
-        case ',':
-        case ';': *it = ' ';
+        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
       }
     }
     
