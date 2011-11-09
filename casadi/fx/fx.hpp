@@ -200,10 +200,10 @@ class FX : public OptionsFunctionality{
   
   // Legacy code: change for something else, but what??
 #ifndef USE_FUNCTORS
-  /** \brief  Create a function call (generate mx node), single input: DEPRECIATED, USE "call" instead */
+  /** \brief  Create a function call (generate mx node), single input: DEPRECATED, USE "call" instead */
   MX operator()(const MX &x, int ind=0);
 
-  /** \brief  Create a function call (generate mx node): DEPRECIATED, USE "call" instead. */
+  /** \brief  Create a function call (generate mx node): DEPRECATED, USE "call" instead. */
   MX operator()(const std::vector<MX> &x, int ind=0);
 #endif // USE_FUNCTORS
   

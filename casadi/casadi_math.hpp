@@ -72,6 +72,30 @@ class BinaryOperationE{
     }
 };
 
+template<int I>
+class AddBinaryOperation{
+  public:
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f+= BinaryOperationE<I>::fcn(x,y);}
+};
+
+template<int I>
+class SubBinaryOperation{
+  public:
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f-= BinaryOperationE<I>::fcn(x,y);}
+};
+
+template<int I>
+class MulBinaryOperation{
+  public:
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f*= BinaryOperationE<I>::fcn(x,y);}
+};
+
+template<int I>
+class DivBinaryOperation{
+  public:
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f/= BinaryOperationE<I>::fcn(x,y);}
+};
+
 /// Enum for quick access to any node
 enum Operation{
   ADD,  SUB,  MUL,  DIV,
@@ -328,6 +352,9 @@ class casadi_math{
     /** \brief Evaluate a built in function */
     static void fun(unsigned char op, const T& x, const T& y, T& f);
     
+    /** \brief Evaluate inplace a built in function (experimental) */
+    static void inplacefun(unsigned char op, const T& x, const T& y, T& f);
+    
     /** \brief Evaluate a built in derivative function */
     static void der(unsigned char op, const T& x, const T& y, const T& f, T* d);
 
@@ -385,12 +412,54 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case ERF:       BinaryOperation<ERF>::fcn(x,y,f);           break;
     case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);          break;
     case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);          break;
-    case INV:      BinaryOperation<INV>::fcn(x,y,f);          break;
-    case SINH:       BinaryOperation<SINH>::fcn(x,y,f);           break;
-    case COSH:       BinaryOperation<COSH>::fcn(x,y,f);           break;
-    case TANH:       BinaryOperation<TANH>::fcn(x,y,f);           break;
-    case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);           break;
+    case INV:       BinaryOperation<INV>::fcn(x,y,f);           break;
+    case SINH:      BinaryOperation<SINH>::fcn(x,y,f);          break;
+    case COSH:      BinaryOperation<COSH>::fcn(x,y,f);          break;
+    case TANH:      BinaryOperation<TANH>::fcn(x,y,f);          break;
+    case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);       break;
   }
+}
+
+template<typename T>
+inline void casadi_math<T>::inplacefun(unsigned char op, const T& x, const T& y, T& f){
+#define FCASES(C,OFF) \
+    case ADD+OFF:       C<ADD>::fcn(x,y,f);           break;\
+    case SUB+OFF:       C<SUB>::fcn(x,y,f);           break;\
+    case MUL+OFF:       C<MUL>::fcn(x,y,f);           break;\
+    case DIV+OFF:       C<DIV>::fcn(x,y,f);           break;\
+    case NEG+OFF:       C<NEG>::fcn(x,y,f);           break;\
+    case EXP+OFF:       C<EXP>::fcn(x,y,f);           break;\
+    case LOG+OFF:       C<LOG>::fcn(x,y,f);           break;\
+    case POW+OFF:       C<POW>::fcn(x,y,f);           break;\
+    case CONSTPOW+OFF:  C<CONSTPOW>::fcn(x,y,f);      break;\
+    case SQRT+OFF:      C<SQRT>::fcn(x,y,f);          break;\
+    case SIN+OFF:       C<SIN>::fcn(x,y,f);           break;\
+    case COS+OFF:       C<COS>::fcn(x,y,f);           break;\
+    case TAN+OFF:       C<TAN>::fcn(x,y,f);           break;\
+    case ASIN+OFF:      C<ASIN>::fcn(x,y,f);          break;\
+    case ACOS+OFF:      C<ACOS>::fcn(x,y,f);          break;\
+    case ATAN+OFF:      C<ATAN>::fcn(x,y,f);          break;\
+    case STEP+OFF:      C<STEP>::fcn(x,y,f);          break;\
+    case FLOOR+OFF:     C<FLOOR>::fcn(x,y,f);         break;\
+    case CEIL+OFF:      C<CEIL>::fcn(x,y,f);          break;\
+    case EQUALITY+OFF:  C<EQUALITY>::fcn(x,y,f);      break;\
+    case ERF+OFF:       C<ERF>::fcn(x,y,f);           break;\
+    case FMIN+OFF:      C<FMIN>::fcn(x,y,f);          break;\
+    case FMAX+OFF:      C<FMAX>::fcn(x,y,f);          break;\
+    case INV+OFF:       C<INV>::fcn(x,y,f);           break;\
+    case SINH+OFF:      C<SINH>::fcn(x,y,f);          break;\
+    case COSH+OFF:      C<COSH>::fcn(x,y,f);          break;\
+    case TANH+OFF:      C<TANH>::fcn(x,y,f);          break;\
+    case PRINTME+OFF:   C<PRINTME>::fcn(x,y,f);       break;
+    
+  switch(op){
+    FCASES(BinaryOperation,0)
+    FCASES(AddBinaryOperation,NUM_BUILT_IN_OPS)
+    FCASES(SubBinaryOperation,2*NUM_BUILT_IN_OPS)
+    FCASES(MulBinaryOperation,3*NUM_BUILT_IN_OPS)
+    FCASES(DivBinaryOperation,4*NUM_BUILT_IN_OPS)
+  }
+#undef FCASES
 }
 
 template<typename T>
@@ -423,7 +492,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case SINH:      BinaryOperation<SINH>::der(x,y,f,d);       break;
     case COSH:      BinaryOperation<COSH>::der(x,y,f,d);       break;
     case TANH:      BinaryOperation<TANH>::der(x,y,f,d);       break;
-    case PRINTME:   BinaryOperation<TANH>::der(x,y,f,d);       break;
+    case PRINTME:   BinaryOperation<PRINTME>::der(x,y,f,d);    break;
   }
 }
 
@@ -458,11 +527,11 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case ERF:       BinaryOperation<ERF>::fcn(x,y,ff);   BinaryOperation<ERF>::der(x,y,ff,d);        break;
     case FMIN:      BinaryOperation<FMIN>::fcn(x,y,ff);   BinaryOperation<FMIN>::der(x,y,ff,d);       break;
     case FMAX:      BinaryOperation<FMAX>::fcn(x,y,ff);   BinaryOperation<FMAX>::der(x,y,ff,d);       break;
-    case INV:      BinaryOperation<INV>::fcn(x,y,ff);   BinaryOperation<INV>::der(x,y,ff,d);         break;
-    case SINH:       BinaryOperation<SINH>::fcn(x,y,ff);   BinaryOperation<SINH>::der(x,y,ff,d);        break;
-    case COSH:       BinaryOperation<COSH>::fcn(x,y,ff);   BinaryOperation<COSH>::der(x,y,ff,d);        break;
-    case TANH:       BinaryOperation<TANH>::fcn(x,y,ff);   BinaryOperation<TANH>::der(x,y,ff,d);        break;
-    case PRINTME:    BinaryOperation<PRINTME>::fcn(x,y,ff);   BinaryOperation<TANH>::der(x,y,ff,d);     break;
+    case INV:       BinaryOperation<INV>::fcn(x,y,ff);   BinaryOperation<INV>::der(x,y,ff,d);         break;
+    case SINH:      BinaryOperation<SINH>::fcn(x,y,ff);   BinaryOperation<SINH>::der(x,y,ff,d);        break;
+    case COSH:      BinaryOperation<COSH>::fcn(x,y,ff);   BinaryOperation<COSH>::der(x,y,ff,d);        break;
+    case TANH:      BinaryOperation<TANH>::fcn(x,y,ff);   BinaryOperation<TANH>::der(x,y,ff,d);        break;
+    case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,ff);   BinaryOperation<PRINTME>::der(x,y,ff,d);     break;
   }
   f = ff;
 }

@@ -42,6 +42,7 @@ using namespace std;
 SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : inputv_(inputv),  outputv_(outputv) {
   setOption("name","unnamed_sx_function");
   addOption("live_variables",OT_BOOLEAN,false,"Reuse variables in the work vector");
+  addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
 
   casadi_assert(!outputv_.empty());
 
@@ -95,13 +96,58 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){
+    #define x work_[it->ch[0]]
+    #define y work_[it->ch[1]]
+    #define f work_[it->ind]
+    if(evaluate_inplace_){
+      
+      #define FCASES(C,OFF) \
+      case ADD+OFF:       C<ADD>::fcn(x,y,f);           break;\
+      case SUB+OFF:       C<SUB>::fcn(x,y,f);           break;\
+      case MUL+OFF:       C<MUL>::fcn(x,y,f);           break;\
+      case DIV+OFF:       C<DIV>::fcn(x,y,f);           break;\
+      case NEG+OFF:       C<NEG>::fcn(x,y,f);           break;\
+      case EXP+OFF:       C<EXP>::fcn(x,y,f);           break;\
+      case LOG+OFF:       C<LOG>::fcn(x,y,f);           break;\
+      case POW+OFF:       C<POW>::fcn(x,y,f);           break;\
+      case CONSTPOW+OFF:  C<CONSTPOW>::fcn(x,y,f);      break;\
+      case SQRT+OFF:      C<SQRT>::fcn(x,y,f);          break;\
+      case SIN+OFF:       C<SIN>::fcn(x,y,f);           break;\
+      case COS+OFF:       C<COS>::fcn(x,y,f);           break;\
+      case TAN+OFF:       C<TAN>::fcn(x,y,f);           break;\
+      case ASIN+OFF:      C<ASIN>::fcn(x,y,f);          break;\
+      case ACOS+OFF:      C<ACOS>::fcn(x,y,f);          break;\
+      case ATAN+OFF:      C<ATAN>::fcn(x,y,f);          break;\
+      case STEP+OFF:      C<STEP>::fcn(x,y,f);          break;\
+      case FLOOR+OFF:     C<FLOOR>::fcn(x,y,f);         break;\
+      case CEIL+OFF:      C<CEIL>::fcn(x,y,f);          break;\
+      case EQUALITY+OFF:  C<EQUALITY>::fcn(x,y,f);      break;\
+      case ERF+OFF:       C<ERF>::fcn(x,y,f);           break;\
+      case FMIN+OFF:      C<FMIN>::fcn(x,y,f);          break;\
+      case FMAX+OFF:      C<FMAX>::fcn(x,y,f);          break;\
+      case INV+OFF:       C<INV>::fcn(x,y,f);           break;\
+      case SINH+OFF:      C<SINH>::fcn(x,y,f);          break;\
+      case COSH+OFF:      C<COSH>::fcn(x,y,f);          break;\
+      case TANH+OFF:      C<TANH>::fcn(x,y,f);          break;\
+      case PRINTME+OFF:   C<PRINTME>::fcn(x,y,f);       break;
+      
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
+        switch(it->op){
+          FCASES(BinaryOperation,0)
+          FCASES(AddBinaryOperation,NUM_BUILT_IN_OPS)
+          FCASES(SubBinaryOperation,2*NUM_BUILT_IN_OPS)
+          FCASES(MulBinaryOperation,3*NUM_BUILT_IN_OPS)
+          FCASES(DivBinaryOperation,4*NUM_BUILT_IN_OPS)
+        }
+      }
+      #undef FCASES
+      
+    } else {
+    
     // without taping
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-// The following is slightly faster than the function below, which is strange, since the below function should be inlined anyway
-#if 1
-#define x work_[it->ch[0]]
-#define y work_[it->ch[1]]
-#define f work_[it->ind]
+      // The following is slightly faster than the function below, which is strange, since the below function should be inlined anyway
+      #if 1
       switch(it->op){
         case ADD:       BinaryOperation<ADD>::fcn(x,y,f);           break;
         case SUB:       BinaryOperation<SUB>::fcn(x,y,f);           break;
@@ -132,13 +178,14 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case TANH:       BinaryOperation<TANH>::fcn(x,y,f);           break;
         case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);           break;
       }
-#undef x
-#undef y
-#undef f
-#else
-      casadi_math<double>::fun(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind]);
-#endif
+      #else
+      casadi_math<double>::fun(it->op,x,y,f);
+      #endif
     }
+    }
+  #undef x
+  #undef y
+  #undef f
   } else {
     // with taping
     vector<AlgEl>::iterator it = algorithm_.begin();
@@ -653,7 +700,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
    binops_[i]->temp = i+1;
  }
 
- // Count how many times a node is referenced in the algorithm_
+ // Count how many times a node is referenced in the algorithm
  refcount_.resize(binops_.size());
  fill(refcount_.begin(),refcount_.end(),0);
  for(int i=0; i<algorithm_.size(); ++i){
@@ -746,6 +793,7 @@ void SXFunctionInternal::init(){
   // Call the init function of the base class
   XFunctionInternal::init();
 
+
     // Stack
   stack<SXNode*> s;
 
@@ -801,6 +849,14 @@ void SXFunctionInternal::init(){
 
   // Use live variables?
   bool live_variables = getOption("live_variables");
+
+  // Evaluate with inplace operations (experimental)
+  evaluate_inplace_ = getOption("inplace");
+  vector<int> refcount_copy;
+  if(evaluate_inplace_){
+    casadi_assert_message(live_variables,"\"evaluate_inplace\" requires \"live_variables\"");
+  }
+
   if(live_variables){
     if(verbose()){
       casadi_warning("Live variables is currently not compatible with symbolic calculations");
@@ -821,11 +877,17 @@ void SXFunctionInternal::init(){
       }
     }
 
+
     // Stack with unused elements in the work vector
     stack<int> unused;
 
     // Place the work vector
     int p=0;
+
+    // Make a copy of refcount for later
+    if(evaluate_inplace_){
+      refcount_copy = refcount;
+    }
 
     #if 1 // sort by type, then by location in node vector
     // Place the constants in the work vector
@@ -833,13 +895,12 @@ void SXFunctionInternal::init(){
       place[(**it).temp] = p++;
       refcount[(**it).temp]++; // make sure constants are not overwritten
     }
-    
+
     // Then all symbolic variables
     for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
       place[(**it).temp] = p++;
     }
    
-     
     for(vector<SXNode*>::iterator it=bnodes.begin(); it!=bnodes.end(); ++it){
       int i = (**it).temp;
       
@@ -900,8 +961,6 @@ void SXFunctionInternal::init(){
       place[i] = i;
   }
 
-//  casadi_assert(0);
-
   // Allocate a vector containing expression corresponding to each binary operation
   binops_.resize(bnodes.size());
   for(int i=0; i<bnodes.size(); ++i){
@@ -909,21 +968,98 @@ void SXFunctionInternal::init(){
   }
   bnodes.clear();
   
+  // Number of inplace functions
+  int num_inplace=0;
+  
   // Add the binary operations
   algorithm_.clear();
   algorithm_.resize(binops_.size());
   pder_.resize(algorithm_.size());
-  for(int i=0; i<algorithm_.size(); ++i){
+  vector<AlgEl>::iterator it=algorithm_.begin();
+  for(int i=0; i<algorithm_.size(); ++i, ++it){
 
     // Save the node index
-    algorithm_[i].ind = place[binops_[i]->temp];
+    it->ind = place[binops_[i]->temp];
     
     // Save the indices of the children
-    algorithm_[i].ch[0] = place[binops_[i]->dep(0).get()->temp];
-    algorithm_[i].ch[1] = place[binops_[i]->dep(1).get()->temp];
+    it->ch[0] = place[binops_[i]->dep(0).get()->temp];
+    it->ch[1] = place[binops_[i]->dep(1).get()->temp];
 
     // Operation
-    algorithm_[i].op = binops_[i]->getOp();
+    it->op = binops_[i]->getOp();
+
+    // Replace inplace operations
+    if(evaluate_inplace_){
+      // Check if the operation can be performed inplace
+      if(it->ch[0]==it->ind){
+        int ip;
+        switch(it->op){
+          case ADD: ip=1; break;
+          case SUB: ip=2; break;
+          case MUL: ip=3; break;
+          case DIV: ip=4; break;
+          default:  ip=0; break;
+        }
+        
+        // if the operation can be performed inplace
+        if(ip!=0){
+          
+          // Reference to the child node
+          SX& c = binops_[i]->dep(1);
+          
+          // If the dependent variable is a binary variable
+          bool dep_is_binary = c.isBinary();
+          if(dep_is_binary){
+
+            // Check if the node is used exactly one time
+            bool used_one_time = refcount_copy.at(c.get()->temp)==1;
+            if(used_one_time){
+              
+              // Mark the node negative so that we can remove it later
+              refcount_copy.at(c.get()->temp) = -1;
+              
+              // Save the indices of the children
+              it->ch[0] = place[c->dep(0).get()->temp];
+              it->ch[1] = place[c->dep(1).get()->temp];
+
+              // Operation
+              it->op = c->getOp() + ip * NUM_BUILT_IN_OPS;
+              
+              // Increase the inplace counter
+              num_inplace++;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  if(num_inplace>0){
+    if(verbose()){
+      cout << "SXFunctionInternal::init Located " << num_inplace << " inplace operators" << endl;
+    }
+    
+    vector<AlgEl> algorithm_new;
+    algorithm_new.reserve(binops_.size()-num_inplace);
+    
+    for(int i=0; i<binops_.size(); ++i, ++it){
+      
+      // Check if marked
+      bool marked = refcount_copy[binops_[i].get()->temp]<0;
+      
+      // Add if not marked
+      if(marked){
+        num_inplace--;
+      } else {
+        algorithm_new.push_back(algorithm_[i]);
+      }
+    }
+    
+    // Consistency check
+    casadi_assert(num_inplace==0);
+    
+    // Save modified algorithm
+    algorithm_new.swap(algorithm_);
   }
 
   // Indices corresponding to the inputs

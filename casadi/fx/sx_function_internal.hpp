@@ -120,6 +120,9 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Outputs of the function (needed for symbolic calculations) */
   std::vector<Matrix<SX> > outputv_;
   
+  // Evaluate with inplace operations (experimental)
+  bool evaluate_inplace_;
+  
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
 
