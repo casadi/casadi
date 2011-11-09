@@ -107,7 +107,7 @@ int main(){
     input[1] = X;
 
     // Integrate
-    X = integrator(input);
+    X = integrator.call(input).at(0);
   }
 
   // Objective function
