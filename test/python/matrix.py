@@ -25,6 +25,23 @@ class Matrixtests(casadiTestCase):
     a = DMatrix([[1,2],[1,3]])
     self.checkarray(c.dot(c.inv(a),a),eye(2),"DMatrix inverse")
 
+  def test_iter(self):
+    self.message("iterator")
+    L = []
+    for i in DMatrix([5,6,7,8]):
+      L.append(i)
+    self.assertEquals(L[0],5)
+    self.assertEquals(L[1],6)
+    self.assertEquals(L[2],7)
+    self.assertEquals(L[3],8)
+    
+  def test_tuple_unpacking(self):
+    self.message("tuple unpacking")
+    (a,b,c,d) = DMatrix([5,6,7,8])
+    self.assertEquals(a,5)
+    self.assertEquals(b,6)
+    self.assertEquals(c,7)
+    self.assertEquals(d,8)
     
 if __name__ == '__main__':
     unittest.main()

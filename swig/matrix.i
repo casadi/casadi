@@ -39,24 +39,12 @@
     def toMatrix(self):
         import numpy as n
         return n.matrix(self.toArray())
+
+    def __iter__(self):
+      return self.data().__iter__()
         
 %}
 %enddef 
-%pythoncode %{
-  class MatrixIterator:
-    def __init__(self,matrix):
-      self.i = 0
-      self.matrix = matrix
-      self.len = len(matrix)
-    def __iter__(self):
-      return self
-    def next(self):
-      if self.i >= self.len:
-        raise StopIteration()
-      ret = self.matrix[self.i]
-      self.i += 1
-      return ret
-%}
 %define %python_matrix_helpers(Type)
 %pythoncode %{
     @property
@@ -82,9 +70,6 @@
         
     def __len__(self):
       return self.size()
-      
-    def __iter__(self):
-      return MatrixIterator(self)
      
 %}
 %enddef 
