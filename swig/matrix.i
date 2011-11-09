@@ -33,9 +33,6 @@
 %define %python_matrix_convertors
 %pythoncode %{
         
-    def toList(self):
-        return list(self.data())
-        
     def toMatrix(self):
         import numpy as n
         return n.matrix(self.toArray())
