@@ -1,9 +1,9 @@
 from casadi import *
 
-x = MX("x",5)
-y = MX("y")
-x2 = symbolic("x",5)
-y2 = symbolic("y")
+x = msym("x",5)
+y = msym("y")
+x2 = ssym("x",5)
+y2 = ssym("y")
 
 fcn = MXFunction([x,y],[4*vertcat((x[2:5],x[0:2])) + y*x])
 fcn.init()

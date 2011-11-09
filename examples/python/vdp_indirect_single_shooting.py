@@ -3,14 +3,14 @@ from numpy import *
 import matplotlib.pyplot as plt
 
 # time
-t = symbolic("t")
+t = ssym("t")
 
 # Declare variables (use simple, efficient DAG)
 x0=SX("x0"); x1=SX("x1")
 x = SXMatrix([x0,x1])
 
 # Control
-u = symbolic("u")
+u = ssym("u")
 
 # ODE right hand side
 xdot = [(1 - x1*x1)*x0 - x1 + u, x0]
@@ -19,7 +19,7 @@ xdot = [(1 - x1*x1)*x0 - x1 + u, x0]
 L = x0*x0 + x1*x1 + u*u
 
 # Costate
-lam = symbolic("lam",2)
+lam = ssym("lam",2)
 
 # Hamiltonian
 H = inner_prod(lam,xdot) + L

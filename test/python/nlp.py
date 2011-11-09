@@ -209,7 +209,7 @@ class NLPtests(casadiTestCase):
     def norm_2(mx):
       return inner_prod(mx,mx)
     N=10
-    x=symbolic("x",N)
+    x=ssym("x",N)
     x0=linspace(0,1,N)
     X0=DMatrix(x0)
     print norm_2(x-X0)
@@ -235,7 +235,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
     """ There is an assertion error thrown, but still it works"""
-    x=symbolic("x")
+    x=ssym("x")
     f=SXFunction([x],[(x-1)**2])
     solver = IpoptSolver(f)
     solver.setOption("tol",1e-10)

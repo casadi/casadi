@@ -15,9 +15,9 @@ except:
 class Integrationtests(casadiTestCase):
 
   def setUp(self):
-    t=symbolic("t")
-    q=symbolic("q")
-    p=symbolic("p")
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
     f = DAE_NUM_IN * [[]]
     f[DAE_T] = t
     f[DAE_Y] = q
@@ -182,7 +182,7 @@ class Integrationtests(casadiTestCase):
     te=0.4
 
     t=SX("t")
-    q=symbolic("y",3,1)
+    q=ssym("y",3,1)
     p=SX("p")
 
     dh = p+q[0]**2
@@ -373,9 +373,9 @@ class Integrationtests(casadiTestCase):
     B=array([[1,2.3,4],[-2,1.3,4.7],[-2,6,9]])
 
     te=0.7
-    t=symbolic("t")
-    q=symbolic("q",3,1)
-    p=symbolic("p",9,1)
+    t=ssym("t")
+    q=ssym("q",3,1)
+    p=ssym("p",9,1)
     f_in = SXMatrixVector(DAE_NUM_IN)
     f_in[DAE_T] = t
     f_in[DAE_Y] = q
@@ -410,9 +410,9 @@ class Integrationtests(casadiTestCase):
     B=array([[1,2.3,4],[-2,1.3,4.7],[-2,6,9]])
     te=0.7
     Be=expm(B*te)
-    t=symbolic("t")
-    q=symbolic("q",3,1)
-    p=symbolic("p",9,1)
+    t=ssym("t")
+    q=ssym("q",3,1)
+    p=ssym("p",9,1)
     f = DAE_NUM_IN * [[]]
     f[DAE_T] = t
     f[DAE_Y] = q
@@ -479,9 +479,9 @@ class Integrationtests(casadiTestCase):
     B=array([1.3,4.3,2.7])
     te=0.7
 
-    t=symbolic("t")
-    q=symbolic("q",2,1)
-    p=symbolic("p",3,1)
+    t=ssym("t")
+    q=ssym("q",2,1)
+    p=ssym("p",3,1)
 
     f=SXFunction([t,q,p,[]],[vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])])
     f.init()
@@ -527,9 +527,9 @@ class Integrationtests(casadiTestCase):
     yc0=dy0=A[1]
     te=0.4
 
-    t=symbolic("t")
-    q=symbolic("y",2,1)
-    p=symbolic("p",1,1)
+    t=ssym("t")
+    q=ssym("y",2,1)
+    p=ssym("p",1,1)
     # y
     # y'
     f=SXFunction([t,q,p,[]],[vertcat([q[1],p[0]+q[1]**2 ])])
@@ -666,8 +666,8 @@ class Integrationtests(casadiTestCase):
     x0_ = DMatrix([1,0.1])
     A_  = DMatrix([[3,1],[0.74,4]])
 
-    A = symbolic("A",N,N)
-    x = symbolic("x",N)
+    A = ssym("A",N,N)
+    x = ssym("x",N)
 
     ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A},[c.dot(A,x)])
     I = CVodesIntegrator(ode)

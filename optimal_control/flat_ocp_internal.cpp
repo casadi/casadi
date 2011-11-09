@@ -807,7 +807,7 @@ void FlatOCPInternal::sortDAE(){
     cout << "Sorting DAE" << endl;
 
   // Get the sparsity of the Jacobian df/fx + tau*df/xdot
-  SXMatrix dae_only_x = substitute(dae_,der(x_),symbolic("tau")*var(x_));
+  SXMatrix dae_only_x = substitute(dae_,der(x_),ssym("tau")*var(x_));
   SXFunction f(var(x_),dae_only_x);
   f.init();
   CRSSparsity sp = f.jacSparsity();

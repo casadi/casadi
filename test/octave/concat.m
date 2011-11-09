@@ -2,8 +2,8 @@ casadi
 
 a = zeros(2,3)
 b = DMatrix(2,3,1)
-c = symbolic("x",2,3)
-d = MX("x",2,3)
+c = ssym("x",2,3)
+d = msym("x",2,3)
 
 
 nums = {a,b};

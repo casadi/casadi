@@ -193,10 +193,10 @@ void NLPSolverInternal::init(){
         }
         
         // Lagrange multipliers
-        SXMatrix lam = symbolic("lambda",g.size1());
+        SXMatrix lam = ssym("lambda",g.size1());
         
         // Objective function scaling
-        SXMatrix sigma = symbolic("sigma");        
+        SXMatrix sigma = ssym("sigma");        
         
         // Lagrangian function
         vector<SXMatrix> lfcn_in(3);

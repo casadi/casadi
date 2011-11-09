@@ -1094,7 +1094,7 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
   vector<SXMatrix> arg(inputv.size());
   if(inputv_sx.empty()){ // No symbolic input provided
     for(int i=0; i<arg.size(); ++i){
-      arg[i] = symbolic(inputv[i]->getName(),inputv[i].sparsity());
+      arg[i] = ssym(inputv[i]->getName(),inputv[i].sparsity());
     }
   } else { // Use provided symbolic input
     // Make sure number of inputs matches

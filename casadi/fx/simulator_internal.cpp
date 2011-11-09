@@ -45,10 +45,10 @@ void SimulatorInternal::init(){
   
   // Generate an output function if there is none (returns the whole state)
   if(output_fcn_.isNull()){
-    SXMatrix t = symbolic("t");
-    SXMatrix x = symbolic("x",integrator_.input(INTEGRATOR_X0).sparsity());
-    SXMatrix xdot = symbolic("xp",integrator_.input(INTEGRATOR_XP0).sparsity());
-    SXMatrix p = symbolic("p",integrator_.input(INTEGRATOR_P).sparsity());
+    SXMatrix t = ssym("t");
+    SXMatrix x = ssym("x",integrator_.input(INTEGRATOR_X0).sparsity());
+    SXMatrix xdot = ssym("xp",integrator_.input(INTEGRATOR_XP0).sparsity());
+    SXMatrix p = ssym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
     vector<SXMatrix> arg(DAE_NUM_IN);
     arg[DAE_T] = t;

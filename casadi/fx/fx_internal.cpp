@@ -311,7 +311,7 @@ std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
   for(int i=0; i<ret.size(); ++i){
     stringstream name;
     name << "x_" << i;
-    ret[i] = symbolic(name.str(),input(i).sparsity());
+    ret[i] = ssym(name.str(),input(i).sparsity());
   }
   return ret;
 }

@@ -617,7 +617,7 @@ void make_symbolic(SX& v, const std::string& name){
   v = SX(name);
 }
 
-Matrix<SX> symbolic(const std::string& name, int n, int m){
+Matrix<SX> ssym(const std::string& name, int n, int m){
   // Create a dense n-by-m matrix
   Matrix<SX> ret(n,m,0);
   
@@ -625,7 +625,12 @@ Matrix<SX> symbolic(const std::string& name, int n, int m){
   for(int i=0; i<n; ++i){
     for(int j=0; j<m; ++j){
       stringstream ss;
-      ss << name << "_" << i << "_" << j;
+      ss << name;
+      if(n>1)
+        ss << "_" << i;
+      if(m>1)
+        ss << "_" << j;
+      
       ret.data()[j+i*m] = SX(ss.str());
     }
   }
@@ -634,11 +639,11 @@ Matrix<SX> symbolic(const std::string& name, int n, int m){
   return ret;
 }
 
-Matrix<SX> symbolic(const std::string& name, const std::pair<int,int> & nm) {
-  return symbolic(name,nm.first,nm.second);
+Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm) {
+  return ssym(name,nm.first,nm.second);
 }
 
-Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp){
+Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp){
   // Create a matrix
   Matrix<SX> ret(sp);
   
@@ -652,12 +657,12 @@ Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp){
   return ret;
 }
 
-std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p){
+std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p){
   std::vector<Matrix<SX> > ret(p);
   for(int k=0; k<p; ++k){
     stringstream ss;
     ss << name << k;
-    ret[k] = symbolic(ss.str(),n,m);
+    ret[k] = ssym(ss.str(),n,m);
   }
   return ret;
 }
@@ -772,10 +777,6 @@ std::string getOperatorRepresentation(const SX& x, const std::vector<std::string
   return s.str();
 }
 
-Matrix<SX> ssym(const std::string& name, int n, int m){
-  return symbolic(name,n,m);
-}
-
 Matrix<SX> ssym(const Matrix<double>& x){
   return Matrix<SX>(x);
 }
@@ -852,7 +853,7 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
     }
 
     // We shall find out which variables enter nonlinearily in the equations, for this we need a function that will depend on all the variables
-    SXFunction fcnb_all(xb,inner_prod(SXMatrix(fb),symbolic("dum1",fb.size())));
+    SXFunction fcnb_all(xb,inner_prod(SXMatrix(fb),ssym("dum1",fb.size())));
     fcnb_all.init();
     
     // Take the gradient of this function to find out which variables enter in the function (should be all)
@@ -862,7 +863,7 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
     casadi_assert(fcnb_dep.dense());
     
     // Multiply this expression with a new dummy vector and take the jacobian to find out which variables enter nonlinearily
-    SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,symbolic("dum2",fcnb_dep.size())));
+    SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,ssym("dum2",fcnb_dep.size())));
     fcnb_nonlin.init();
     CRSSparsity sp_nonlin = fcnb_nonlin.jacSparsity();
     

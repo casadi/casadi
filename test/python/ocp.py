@@ -18,8 +18,8 @@ class OCPtests(casadiTestCase):
     
     N=100
     
-    X=symbolic("X",N+1)
-    U=symbolic("U",N)
+    X=ssym("X",N+1)
+    U=ssym("U",N)
     
     V = vertcat([X,U])
     
@@ -58,9 +58,9 @@ class OCPtests(casadiTestCase):
     yc0=dy0=0
     te=0.4
 
-    t=symbolic("t")
-    q=symbolic("y",2,1)
-    p=symbolic("p",1,1)
+    t=ssym("t")
+    q=ssym("y",2,1)
+    p=ssym("p",1,1)
     # y
     # y'
     f=SXFunction([t,q,p,[]],[vertcat([q[1],p[0]+q[1]**2 ])])
@@ -116,9 +116,9 @@ class OCPtests(casadiTestCase):
     yc0=dy0=0.1
     te=0.4
 
-    t=symbolic("t")
-    q=symbolic("y",2,1)
-    p=symbolic("p",1,1)
+    t=ssym("t")
+    q=ssym("y",2,1)
+    p=ssym("p",1,1)
     # y
     # y'
     f=SXFunction([t,q,p,[]],[vertcat([q[1],p[0]+q[1]**2 ])])
@@ -244,9 +244,9 @@ class OCPtests(casadiTestCase):
     nh = 0
     tf = 0.2
     
-    x0 = symbolic("x0",nx)
-    p = symbolic("p",nu)
-    xp0 = symbolic("x0",nx)
+    x0 = ssym("x0",nx)
+    p = ssym("p",nu)
+    xp0 = ssym("x0",nx)
     xf = x0 + p[0]
     dynamics = SXFunction({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{'NUM': INTEGRATOR_NUM_OUT, INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
     mayer = SXFunction([x0],[7*x0[0]])
@@ -281,9 +281,9 @@ class OCPtests(casadiTestCase):
     nh = 2
     tf = 0.2
     
-    x0 = symbolic("x0",nx)
-    p = symbolic("p",nu+np)
-    xp0 = symbolic("x0",nx)
+    x0 = ssym("x0",nx)
+    p = ssym("p",nu+np)
+    xp0 = ssym("x0",nx)
     xf = x0 + p[0]
     dynamics = SXFunction({INTEGRATOR_X0: x0,INTEGRATOR_P: p, INTEGRATOR_XP0: xp0},{INTEGRATOR_XF: xf,INTEGRATOR_XPF: xp0})
     mayer = SXFunction([x0],[7*x0[0]])
@@ -337,8 +337,8 @@ class OCPtests(casadiTestCase):
     te = 2*pi
     N = 20
     t=SX("t")
-    y=symbolic("y",3,1)
-    yd=symbolic("yd",3,1)
+    y=ssym("y",3,1)
+    yd=ssym("yd",3,1)
     p=SX("p")
     f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_Y: y, DAE_P: p,DAE_YDOT: yd},[[y[1,0],-y[0,0],p*y[0,0]]])
     f.init()

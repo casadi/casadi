@@ -15,7 +15,7 @@ acos(x)
 
 disp('operators on SXMatrix')
 
-x = symbolic("x")
+x = ssym("x")
 x**2
 sin(x)
 acos(x)
@@ -31,7 +31,7 @@ jacobian([5],{x})
 
 #jacobian({x**5 x**4},{x})
 
-y=symbolic("y",1,1)
+y=ssym("y",1,1)
 jacobian(y**5,y)
 
 #SXFunction(x,x) deliberate fail
@@ -55,7 +55,7 @@ SXFunction({y x},{y x})
 
 disp('MX typemaps')
 
-x=MX("x",1,1)
+x=msym("x",1,1)
 
 
 MXFunction({x},{x x})
@@ -92,7 +92,7 @@ f.output(0)
 assert(f.output(0)(1).toScalar()==2.3**2)
 assert(f.output(0)(2).toScalar()==sin(2.3))
 
-y = symbolic("y",2,2)
+y = ssym("y",2,2)
 f = SXFunction({y},{y**2})
 f.init()
 f.input(0)
@@ -168,7 +168,7 @@ assert(s(2,1).toScalar()==78)
 
 disp('MX indexing')
 
-x = MX("x",7,8)
+x = msym("x",7,8)
 q = x(1:3,:)
 
 x(1,1) = 6;
@@ -185,8 +185,8 @@ assert(all(full(result)==full(eye(2))))
 disp('Operator overloading')
 
 S =               { {DMatrix([1 2; 3 4]),SX("x"),MX("x",1,1)},
-                  {3,symbolic("x",2,2),MX("x",2,2)},
-                  {DMatrix(3),symbolic("x",2,2),MX("y",2,2)},
+                  {3,ssym("x",2,2),msym("x",2,2)},
+                  {DMatrix(3),ssym("x",2,2),msym("y",2,2)},
 		  {[1 2; 3 4],SX("x"),MX("x",1,1)}
                   };
                   
@@ -214,7 +214,7 @@ for i=1:numel(S)
   end
 end
 
-S = {DMatrix(3),symbolic("x",2,2),SX("x"),MX("x",1,1)};
+S = {DMatrix(3),ssym("x",2,2),SX("x"),MX("x",1,1)};
 num = {6,DMatrix(6)}
 
 for i=1:numel(S)
@@ -231,7 +231,7 @@ for i=1:numel(S)
 end
 
 x = SX("x");
-y = symbolic("y",2,1);
+y = ssym("y",2,1);
 
 x*y
 y*x
@@ -243,7 +243,7 @@ x*y
 x/y
 
 num = {DMatrix([1 2; 3 4]),[1 2; 3 4]};
-sym = {symbolic("x",2,2),MX("x",2,2)};
+sym = {ssym("x",2,2),msym("x",2,2)};
 
 for i=1:2
   for j=1:2
@@ -293,7 +293,7 @@ integrator.setOption('is_differential',is_differential_gentype);
 disp("hier brandt de lamp")
 assert(integrator.getOption('is_differential').isDoubleVector())
 
-x=symbolic("x",3,4)
+x=ssym("x",3,4)
 size(x)
 
 disp("Issue 145")
@@ -312,7 +312,7 @@ ffcn_in
 SXFunction(ffcn_in,{t})
 
 
-x=symbolic("x",3,4)
+x=ssym("x",3,4)
 size(x)
 
 %[x x]

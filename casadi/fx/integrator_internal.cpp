@@ -361,8 +361,8 @@ Integrator IntegratorInternal::jac(bool with_x, bool with_p){
   int ns = ns_x + ns_p;
 
   // Sensitivities and derivatives of sensitivities
-  SXMatrix ysens = symbolic("ysens",ny_,ns);
-  SXMatrix ypsens = symbolic("ypsens",nyp,ns);
+  SXMatrix ysens = ssym("ysens",ny_,ns);
+  SXMatrix ypsens = ssym("ypsens",nyp,ns);
     
   // Sensitivity equation
   SXMatrix res_s = prod(f.jac(DAE_Y,DAE_RES),ysens);

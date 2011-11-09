@@ -53,17 +53,32 @@ void make_symbolic(std::vector< A >& v, const std::string& name){
 }
 #endif
 
-/** \brief Create an n-by-m matrix with symbolic variables */
-Matrix<SX> symbolic(const std::string& name, int n=1, int m=1);
+/** \brief  Construct symbolic arrays and variables using CasADi's SX expression graph representation
+The "ssym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an SXMatrix object.
+The SX expression graph has much less overhead, but is also more restricted than the alternative MX expression graph.
+*/
+//@{
 
-/** \brief Create an n-by-m matrix with symbolic variables */
-Matrix<SX> symbolic(const std::string& name, const std::pair<int,int> & nm); 
+/** \brief  Construct symbolic arrays and variables using CasADi's more restricted, but more efficient SX expression graph
+*/
+//@{
 
-/** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
-std::vector<Matrix<SX> > symbolic(const std::string& name, int n, int m, int p);
+  /** \brief Create an n-by-m matrix with symbolic variables */
+  Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
 
-/** \brief Create an matrix with symbolic variables, given a sparsity pattern */
-Matrix<SX> symbolic(const std::string& name, const CRSSparsity& sp);
+  /** \brief Create an n-by-m matrix with symbolic variables */
+  Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm); 
+
+  /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
+  std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p);
+
+  /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
+  Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp);
+
+  /** \brief Create a symbolic matrix out of a numeric one */
+  Matrix<SX> ssym(const Matrix<double>& x);
+
+//@}
 
 /** \brief Create a one-dimensional stl vector of length n with symbolic variables */
 std::vector<SX> create_symbolic(const std::string& name, int n);
@@ -387,21 +402,6 @@ int countNodes(const Matrix<SX>& A);
 
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
-
-/** \brief  Construct symbolic arrays and variables using CasADi's SX expression graph representation
-The "ssym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an SXMatrix object.
-The SX expression graph has much less overhead, but is also more restricted than the alternative MX expression graph.
-*/
-//@{
-
-/** \brief  Construct symbolic arrays and variables using CasADi's more restricted, but more efficient SX expression graph
-*/
-//@{
-Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
-Matrix<SX> ssym(const Matrix<double>& x);
-//@}
-
-
 
 } // namespace CasADi
 

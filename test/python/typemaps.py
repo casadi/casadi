@@ -274,7 +274,7 @@ class typemaptests(casadiTestCase):
     
     # numeric & SX
     for s in nums:
-      for z in [SX("x"), symbolic("x"), symbolic("x",2,2)]:
+      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -287,8 +287,8 @@ class typemaptests(casadiTestCase):
         tests(z,s)
         
     # SX & SX
-    for s in [SX("x"), symbolic("x"), symbolic("x",2,2)]:
-      for z in [SX("x"), symbolic("x"), symbolic("x",2,2)]:
+    for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -301,7 +301,7 @@ class typemaptests(casadiTestCase):
         tests(z,s)
         
     for (s,x,y) in [
-                  (matrix([[1,2],[3,4]]),symbolic("x",2,2),MX("x",2,2))    
+                  (matrix([[1,2],[3,4]]),ssym("x",2,2),MX("x",2,2))    
                   ]:
       for z,ztype in zip([x,y],[[type(SXMatrix()),type(SX())],[type(MX())]]):
         print "z = %s, s = %s" % (str(z),str(s))
@@ -572,11 +572,11 @@ class typemaptests(casadiTestCase):
     x * numpy.array(1)
     x * numpy.array(1.2)
 
-    symbolic("x") * numpy.array(1.0) 
+    ssym("x") * numpy.array(1.0) 
     MX("x") * numpy.array(1.0)
     
   def test_array_cat(self):
-    horzcat((symbolic("x",4,3),ones((4,3))))
+    horzcat((ssym("x",4,3),ones((4,3))))
     
     
   def test_issue(self):

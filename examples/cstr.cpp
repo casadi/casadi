@@ -138,7 +138,7 @@ int main(){
   integrator.init();
 
   // Mayer objective function
-  SXMatrix xf = symbolic("xf",x.size(),1);
+  SXMatrix xf = ssym("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
   mterm.setOption("store_jacobians",true);
   

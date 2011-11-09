@@ -45,7 +45,7 @@ int main(){
   SXFunction rhs(rhs_in,f);
   
   // DAE residual
-  SXMatrix xxdot = symbolic("xxdot",xx.size());
+  SXMatrix xxdot = ssym("xxdot",xx.size());
   vector<Matrix<SX> > res_in(DAE_NUM_IN);
   res_in[DAE_T] = t;
   res_in[DAE_Y] = xx;
@@ -77,7 +77,7 @@ int main(){
   int nu = 1;
   
   // Mayer objective function
-  Matrix<SX> xf = symbolic("xf",nx,1);
+  Matrix<SX> xf = ssym("xf",nx,1);
   SXFunction mterm(xf, xf[nx-1]);
 
   // Create a multiple shooting discretization

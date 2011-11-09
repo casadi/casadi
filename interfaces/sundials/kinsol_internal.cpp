@@ -375,7 +375,7 @@ KinsolSolver KinsolInternal::jac(const std::vector<int> iind, int oind){
     int nx = f.input(*it+1).numel();
 
     // Sensitivities
-    Matrix<SX> dz_dx = symbolic("dz_dx", nz, nx);
+    Matrix<SX> dz_dx = ssym("dz_dx", nz, nx);
     
     // Derivative equation
     Matrix<SX> f_der = prod(Jz,dz_dx) + Jx;
