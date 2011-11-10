@@ -235,7 +235,11 @@ class FlatOCP : public OptionsFunctionality{
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
     
-    /// Get the ODE/DAE right hand side function
+    /** \brief Get the ODE/DAE right hand side function
+    * The returned FX has the following input/output scheme:
+    * @copydoc scheme_DAEInput 
+    * @copydoc scheme_DAEOutput
+    */
     FX daeFcn() const;
     
     /// Generate a MUSCOD-II compatible DAT file
