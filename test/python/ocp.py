@@ -82,13 +82,13 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     par  = var[1]
-    qend=integrator([q0,par,MX(2,1)])
+    qend=integrator.call([q0,par,MX(2,1)])[0]
     
     parc = MX(0)
     
     f = MXFunction([var,parMX],[qend[0]])
     f.init()
-    fc = MXFunction([var],[-f([var,parc])])
+    fc = MXFunction([var],[-f.call([var,parc])[0]])
     fc.init()
     solver = IpoptSolver(fc)
     solver.setOption("tol",1e-12)
@@ -139,13 +139,13 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     parl  = var[1]
-    qend=integrator([q0,parl,MX(2,1)])
+    qend =integrator.call([q0,parl,MX(2,1)])[0]
     
     parc = MX(dy0)
     
     f = MXFunction([var,par],[qend[0]])
     f.init()
-    fc = MXFunction([var],[-f([var,parc])])
+    fc = MXFunction([var],[-f.call([var,parc])[0]])
     fc.init()
     
     g = MXFunction([var],[var[0]-var[1]])

@@ -117,17 +117,6 @@ vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& par
   return ret;
 }
 
-#ifndef USE_FUNCTORS
-MX FX::operator()(const MX &x, int ind){
-  vector<MX> dep(1,x);
-  return call(dep)[ind];
-}
-
-MX FX::operator()(const vector<MX> &x, int ind){
-  return call(x)[ind];
-}
-#endif // USE_FUNCTORS
-
 void FX::evaluate(int nfdir, int nadir){
   casadi_assert(isInit());
   casadi_assert(nfdir<=(*this)->nfdir_);
