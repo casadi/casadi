@@ -38,6 +38,394 @@ thus x := [xd,xa]
 
 Joel Andersson
 
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| INTEGRATOR_X0                      | Differential or algebraic state at |
+|                                    | t0 (dimension nx-by-1)             |
++------------------------------------+------------------------------------+
+| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
++------------------------------------+------------------------------------+
+| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
+|                                    | IDASIntegrator::evaluate()         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| abstol       | OT_REAL      | 1e-8         | absolute     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the IVP  | al           |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_abstol | OT_REAL      |              | absolute     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_iterat | OT_STRING    | \"gmres\"      | \"gmres\",     | CasADi::Inte |
+| ive_solver   |              |              | \"bcgstab\",   | gratorIntern |
+|              |              |              | \"tfqmr\"      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| asens_linear | OT_STRING    | \"dense\"      | \"dense\",     | CasADi::Inte |
+| _solver      |              |              | \"banded\" or  | gratorIntern |
+|              |              |              | \"iterative\"  | al           |
++--------------+--------------+--------------+--------------+--------------+
+| asens_lower_ | OT_INTEGER   |              | lower band-  | CasADi::Inte |
+| bandwidth    |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_max_kr | OT_INTEGER   | 10           | maximum      | CasADi::Inte |
+| ylov         |              |              | krylov       | gratorIntern |
+|              |              |              | subspace     | al           |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_pretyp | OT_STRING    | \"none\"       | \"none\",      | CasADi::Inte |
+| e            |              |              | \"left\",      | gratorIntern |
+|              |              |              | \"right\",     | al           |
+|              |              |              | \"both\"       |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_reltol | OT_REAL      |              | relative     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_upper_ | OT_INTEGER   |              | upper band-  | CasADi::Inte |
+| bandwidth    |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
+| an           |              |              |              | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| finite_diffe | OT_BOOLEAN   | false        | use finite   | CasADi::Inte |
+| rence_fsens  |              |              | differences  | gratorIntern |
+|              |              |              | to           | al           |
+|              |              |              | approximate  |              |
+|              |              |              | the forward  |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
+|              |              |              | (if AD is    |              |
+|              |              |              | not          |              |
+|              |              |              | available)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_abstol | OT_REAL      |              | absolute     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| n            |              |              | forward sens | gratorIntern |
+|              |              |              | itivities in | al           |
+|              |              |              | all error    |              |
+|              |              |              | controls     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_reltol | OT_REAL      |              | relative     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_scalin | OT_REALVECTO |              | scaling      | CasADi::Inte |
+| g_factors    | R            |              | factor for   | gratorIntern |
+|              |              |              | the          | al           |
+|              |              |              | components   |              |
+|              |              |              | if finite    |              |
+|              |              |              | differences  |              |
+|              |              |              | is used      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_sensit | OT_INTEGERVE |              | specifies    | CasADi::Inte |
+| iviy_paramet | CTOR         |              | which        | gratorIntern |
+| ers          |              |              | components   | al           |
+|              |              |              | will be used |              |
+|              |              |              | when         |              |
+|              |              |              | estimating   |              |
+|              |              |              | the          |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Inte |
+| n_type       |              |              | rpolation    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | adjoint sens |              |
+|              |              |              | itivities    |              |
+|              |              |              | (\"hermite\"   |              |
+|              |              |              | or \"polynomi |              |
+|              |              |              | al\")         |              |
++--------------+--------------+--------------+--------------+--------------+
+| is_different | OT_INTEGERVE |              | None         | CasADi::Inte |
+| ial          | CTOR         |              |              | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | \"gmres\",     | CasADi::Inte |
+| lver         |              |              | \"bcgstab\",   | gratorIntern |
+|              |              |              | \"tfqmr\"      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | \"dense\",     | CasADi::Inte |
+| r            |              |              | \"banded\" or  | gratorIntern |
+|              |              |              | \"iterative\"  | al           |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Inte |
+| r_creator    | VER          | )            | solver       | gratorIntern |
+|              |              |              | creator      | al           |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| r_options    | Y            | )            | be passed to | gratorIntern |
+|              |              |              | the linear   | al           |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   |              | lower band-  | CasADi::Inte |
+| dth          |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylov   | OT_INTEGER   | 10           | maximum      | CasADi::Inte |
+|              |              |              | krylov       | gratorIntern |
+|              |              |              | subspace     | al           |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_multiste | OT_INTEGER   | 5            |              | CasADi::Inte |
+| p_order      |              |              |              | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| max_num_step | OT_INTEGER   | 10000        | maximum      | CasADi::Inte |
+| s            |              |              | number of    | gratorIntern |
+|              |              |              | steps        | al           |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
+|              |              |              | right hand   | gratorIntern |
+|              |              |              | sides        | al           |
++--------------+--------------+--------------+--------------+--------------+
+| num_algebrai | OT_INTEGER   | 0            | Number of    | CasADi::Acad |
+| c            |              |              | algebraic    | oIntegratorI |
+|              |              |              | states       | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| num_grid_poi | OT_INTEGER   | 2            | Number of    | CasADi::Acad |
+| nts          |              |              | uniformly    | oIntegratorI |
+|              |              |              | distributed  | nternal      |
+|              |              |              | grid points  |              |
+|              |              |              | for          |              |
+|              |              |              | obtaining    |              |
+|              |              |              | the          |              |
+|              |              |              | solution,    |              |
+|              |              |              | does not     |              |
+|              |              |              | influence    |              |
+|              |              |              | the          |              |
+|              |              |              | integration  |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| pretype      | OT_STRING    | \"none\"       | \"none\",      | CasADi::Inte |
+|              |              |              | \"left\",      | gratorIntern |
+|              |              |              | \"right\",     | al           |
+|              |              |              | \"both\"       |              |
++--------------+--------------+--------------+--------------+--------------+
+| quad_err_con | OT_BOOLEAN   | false        | should the   | CasADi::Inte |
+|              |              |              | quadratures  | gratorIntern |
+|              |              |              | affect the   | al           |
+|              |              |              | step size    |              |
+|              |              |              | control      |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltol       | OT_REAL      | 1e-6         | relative     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the IVP  | al           |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sensitivity_ | OT_STRING    | \"simultaneou | \"simultaneou | CasADi::Inte |
+| method       |              | s\"           | s\" or        | gratorIntern |
+|              |              |              | \"staggered\"  | al           |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| steps_per_ch | OT_INTEGER   | 20           | number of    | CasADi::Inte |
+| eckpoint     |              |              | steps        | gratorIntern |
+|              |              |              | between two  | al           |
+|              |              |              | consecutive  |              |
+|              |              |              | checkpoints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Inte |
+|              |              |              | integrator   | gratorIntern |
+|              |              |              | at the end   | al           |
+|              |              |              | of the       |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0.0          | start of the | CasADi::Inte |
+|              |              |              | integration  | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1.0          | end of the   | CasADi::Inte |
+|              |              |              | integration  | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| time_depende | OT_BOOLEAN   | true         | Explicit     | CasADi::Acad |
+| nce          |              |              | depencency   | oIntegratorI |
+|              |              |              | of time in   | nternal      |
+|              |              |              | the DAE      |              |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Inte |
+| dth          |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | precondition | CasADi::Inte |
+| tioner       |              |              | an iterative | gratorIntern |
+|              |              |              | solver       | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 C++ includes: acado_integrator.hpp ";
 
 /*  Setters  */
@@ -494,6 +882,394 @@ The DAE thus consists of an differential part (fd) and an algebraic part
 differential states xd and the algebraic states xa. The complete state is
 thus x := [xd,xa]
 
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| INTEGRATOR_X0                      | Differential or algebraic state at |
+|                                    | t0 (dimension nx-by-1)             |
++------------------------------------+------------------------------------+
+| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
++------------------------------------+------------------------------------+
+| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
+|                                    | IDASIntegrator::evaluate()         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| abstol       | OT_REAL      | 1e-8         | absolute     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the IVP  | al           |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_abstol | OT_REAL      |              | absolute     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_iterat | OT_STRING    | \"gmres\"      | \"gmres\",     | CasADi::Inte |
+| ive_solver   |              |              | \"bcgstab\",   | gratorIntern |
+|              |              |              | \"tfqmr\"      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| asens_linear | OT_STRING    | \"dense\"      | \"dense\",     | CasADi::Inte |
+| _solver      |              |              | \"banded\" or  | gratorIntern |
+|              |              |              | \"iterative\"  | al           |
++--------------+--------------+--------------+--------------+--------------+
+| asens_lower_ | OT_INTEGER   |              | lower band-  | CasADi::Inte |
+| bandwidth    |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_max_kr | OT_INTEGER   | 10           | maximum      | CasADi::Inte |
+| ylov         |              |              | krylov       | gratorIntern |
+|              |              |              | subspace     | al           |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_pretyp | OT_STRING    | \"none\"       | \"none\",      | CasADi::Inte |
+| e            |              |              | \"left\",      | gratorIntern |
+|              |              |              | \"right\",     | al           |
+|              |              |              | \"both\"       |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_reltol | OT_REAL      |              | relative     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| asens_upper_ | OT_INTEGER   |              | upper band-  | CasADi::Inte |
+| bandwidth    |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
+| an           |              |              |              | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| finite_diffe | OT_BOOLEAN   | false        | use finite   | CasADi::Inte |
+| rence_fsens  |              |              | differences  | gratorIntern |
+|              |              |              | to           | al           |
+|              |              |              | approximate  |              |
+|              |              |              | the forward  |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
+|              |              |              | (if AD is    |              |
+|              |              |              | not          |              |
+|              |              |              | available)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_abstol | OT_REAL      |              | absolute     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| n            |              |              | forward sens | gratorIntern |
+|              |              |              | itivities in | al           |
+|              |              |              | all error    |              |
+|              |              |              | controls     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_reltol | OT_REAL      |              | relative     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_scalin | OT_REALVECTO |              | scaling      | CasADi::Inte |
+| g_factors    | R            |              | factor for   | gratorIntern |
+|              |              |              | the          | al           |
+|              |              |              | components   |              |
+|              |              |              | if finite    |              |
+|              |              |              | differences  |              |
+|              |              |              | is used      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_sensit | OT_INTEGERVE |              | specifies    | CasADi::Inte |
+| iviy_paramet | CTOR         |              | which        | gratorIntern |
+| ers          |              |              | components   | al           |
+|              |              |              | will be used |              |
+|              |              |              | when         |              |
+|              |              |              | estimating   |              |
+|              |              |              | the          |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Inte |
+| n_type       |              |              | rpolation    | gratorIntern |
+|              |              |              | for the      | al           |
+|              |              |              | adjoint sens |              |
+|              |              |              | itivities    |              |
+|              |              |              | (\"hermite\"   |              |
+|              |              |              | or \"polynomi |              |
+|              |              |              | al\")         |              |
++--------------+--------------+--------------+--------------+--------------+
+| is_different | OT_INTEGERVE |              | None         | CasADi::Inte |
+| ial          | CTOR         |              |              | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | \"gmres\",     | CasADi::Inte |
+| lver         |              |              | \"bcgstab\",   | gratorIntern |
+|              |              |              | \"tfqmr\"      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | \"dense\",     | CasADi::Inte |
+| r            |              |              | \"banded\" or  | gratorIntern |
+|              |              |              | \"iterative\"  | al           |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Inte |
+| r_creator    | VER          | )            | solver       | gratorIntern |
+|              |              |              | creator      | al           |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| r_options    | Y            | )            | be passed to | gratorIntern |
+|              |              |              | the linear   | al           |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   |              | lower band-  | CasADi::Inte |
+| dth          |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylov   | OT_INTEGER   | 10           | maximum      | CasADi::Inte |
+|              |              |              | krylov       | gratorIntern |
+|              |              |              | subspace     | al           |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_multiste | OT_INTEGER   | 5            |              | CasADi::Inte |
+| p_order      |              |              |              | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| max_num_step | OT_INTEGER   | 10000        | maximum      | CasADi::Inte |
+| s            |              |              | number of    | gratorIntern |
+|              |              |              | steps        | al           |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
+|              |              |              | right hand   | gratorIntern |
+|              |              |              | sides        | al           |
++--------------+--------------+--------------+--------------+--------------+
+| num_algebrai | OT_INTEGER   | 0            | Number of    | CasADi::Acad |
+| c            |              |              | algebraic    | oIntegratorI |
+|              |              |              | states       | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| num_grid_poi | OT_INTEGER   | 2            | Number of    | CasADi::Acad |
+| nts          |              |              | uniformly    | oIntegratorI |
+|              |              |              | distributed  | nternal      |
+|              |              |              | grid points  |              |
+|              |              |              | for          |              |
+|              |              |              | obtaining    |              |
+|              |              |              | the          |              |
+|              |              |              | solution,    |              |
+|              |              |              | does not     |              |
+|              |              |              | influence    |              |
+|              |              |              | the          |              |
+|              |              |              | integration  |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| pretype      | OT_STRING    | \"none\"       | \"none\",      | CasADi::Inte |
+|              |              |              | \"left\",      | gratorIntern |
+|              |              |              | \"right\",     | al           |
+|              |              |              | \"both\"       |              |
++--------------+--------------+--------------+--------------+--------------+
+| quad_err_con | OT_BOOLEAN   | false        | should the   | CasADi::Inte |
+|              |              |              | quadratures  | gratorIntern |
+|              |              |              | affect the   | al           |
+|              |              |              | step size    |              |
+|              |              |              | control      |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltol       | OT_REAL      | 1e-6         | relative     | CasADi::Inte |
+|              |              |              | tolerence    | gratorIntern |
+|              |              |              | for the IVP  | al           |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sensitivity_ | OT_STRING    | \"simultaneou | \"simultaneou | CasADi::Inte |
+| method       |              | s\"           | s\" or        | gratorIntern |
+|              |              |              | \"staggered\"  | al           |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| steps_per_ch | OT_INTEGER   | 20           | number of    | CasADi::Inte |
+| eckpoint     |              |              | steps        | gratorIntern |
+|              |              |              | between two  | al           |
+|              |              |              | consecutive  |              |
+|              |              |              | checkpoints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Inte |
+|              |              |              | integrator   | gratorIntern |
+|              |              |              | at the end   | al           |
+|              |              |              | of the       |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0.0          | start of the | CasADi::Inte |
+|              |              |              | integration  | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1.0          | end of the   | CasADi::Inte |
+|              |              |              | integration  | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| time_depende | OT_BOOLEAN   | true         | Explicit     | CasADi::Acad |
+| nce          |              |              | depencency   | oIntegratorI |
+|              |              |              | of time in   | nternal      |
+|              |              |              | the DAE      |              |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Inte |
+| dth          |              |              | width of     | gratorIntern |
+|              |              |              | banded       | al           |
+|              |              |              | jacobians    |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | precondition | CasADi::Inte |
+| tioner       |              |              | an iterative | gratorIntern |
+|              |              |              | solver       | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 C++ includes: acado_integrator_internal.hpp ";
 
 %feature("docstring")
@@ -799,388 +1575,194 @@ Get the dictionary. ";
 Get the reference count. ";
 
 
-// File: classCasADi_1_1AcadoInterface.xml
-%feature("docstring") CasADi::AcadoInterface "
-
->List of available options
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| absolute_tol | OT_REAL      |              | None         | CasADi::Acad |
-| erance       |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
-|              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
-+--------------+--------------+--------------+--------------+--------------+
-| auto_init    | OT_BOOLEAN   | false        | initialize   | CasADi::Acad |
-|              |              |              | differential | oInternal    |
-|              |              |              | and          |              |
-|              |              |              | angebraic    |              |
-|              |              |              | states by a  |              |
-|              |              |              | forward      |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| dynamic_sens | OT_STRING    |              | forward_sens | CasADi::Acad |
-| itivity      |              |              | itivities or | oInternal    |
-|              |              |              | backward_sen |              |
-|              |              |              | sitivities   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | true         |              | CasADi::Acad |
-| an           |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| final_time   | OT_REAL      | 1.0          |              | CasADi::Acad |
-|              |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| hessian_appr | OT_STRING    |              | None         | CasADi::Acad |
-| oximation    |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| integrator   | OT_STRING    |              | None         | CasADi::Acad |
-|              |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| integrator_t | OT_REAL      |              | None         | CasADi::Acad |
-| olerance     |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
-|              |              |              | returns a    |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | function     |              |
-|              |              |              | given a set  |              |
-|              |              |              | of desired   |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | blocks,      |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| kkt_toleranc | OT_REAL      |              | None         | CasADi::Acad |
-| e            |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| max_num_inte | OT_INTEGER   |              | None         | CasADi::Acad |
-| grator_steps |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| max_num_iter | OT_INTEGER   |              | None         | CasADi::Acad |
-| ations       |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_sh | OT_INTEGER   | 20           |              | CasADi::Acad |
-| ooting_nodes |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| periodic_bou | OT_INTEGERVE |              | None         | CasADi::Acad |
-| nds          | CTOR         |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| print_level  | OT_STRING    | \"low\"        | \"none\",      | CasADi::Acad |
-|              |              |              | \"low\",       | oInternal    |
-|              |              |              | \"medium\",    |              |
-|              |              |              | \"high\",      |              |
-|              |              |              | \"debug\"      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| relaxation_p | OT_REAL      |              | None         | CasADi::Acad |
-| arameter     |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
-+--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
-|              |              |              | provides     |              |
-|              |              |              | sparsity for |              |
-|              |              |              | a given      |              |
-|              |              |              | input output |              |
-|              |              |              | block,       |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| start_time   | OT_REAL      | 0.0          |              | CasADi::Acad |
-|              |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
-|              |              |              | to generated |              |
-|              |              |              | Jacobians in |              |
-|              |              |              | order to     |              |
-|              |              |              | avoid        |              |
-|              |              |              | generating   |              |
-|              |              |              | identical    |              |
-|              |              |              | Jacobians    |              |
-|              |              |              | multiple     |              |
-|              |              |              | times        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-C++ includes: b0_options.hpp ";
-
-
-// File: classCasADi_1_1AcadoInternal.xml
-%feature("docstring") CasADi::AcadoInternal "
-
->List of available options
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| absolute_tol | OT_REAL      |              | None         | CasADi::Acad |
-| erance       |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
-|              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
-+--------------+--------------+--------------+--------------+--------------+
-| auto_init    | OT_BOOLEAN   | false        | initialize   | CasADi::Acad |
-|              |              |              | differential | oInternal    |
-|              |              |              | and          |              |
-|              |              |              | angebraic    |              |
-|              |              |              | states by a  |              |
-|              |              |              | forward      |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| dynamic_sens | OT_STRING    |              | forward_sens | CasADi::Acad |
-| itivity      |              |              | itivities or | oInternal    |
-|              |              |              | backward_sen |              |
-|              |              |              | sitivities   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | true         |              | CasADi::Acad |
-| an           |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| final_time   | OT_REAL      | 1.0          |              | CasADi::Acad |
-|              |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| hessian_appr | OT_STRING    |              | None         | CasADi::Acad |
-| oximation    |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| integrator   | OT_STRING    |              | None         | CasADi::Acad |
-|              |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| integrator_t | OT_REAL      |              | None         | CasADi::Acad |
-| olerance     |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
-|              |              |              | returns a    |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | function     |              |
-|              |              |              | given a set  |              |
-|              |              |              | of desired   |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | blocks,      |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| kkt_toleranc | OT_REAL      |              | None         | CasADi::Acad |
-| e            |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| max_num_inte | OT_INTEGER   |              | None         | CasADi::Acad |
-| grator_steps |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| max_num_iter | OT_INTEGER   |              | None         | CasADi::Acad |
-| ations       |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_sh | OT_INTEGER   | 20           |              | CasADi::Acad |
-| ooting_nodes |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| periodic_bou | OT_INTEGERVE |              | None         | CasADi::Acad |
-| nds          | CTOR         |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| print_level  | OT_STRING    | \"low\"        | \"none\",      | CasADi::Acad |
-|              |              |              | \"low\",       | oInternal    |
-|              |              |              | \"medium\",    |              |
-|              |              |              | \"high\",      |              |
-|              |              |              | \"debug\"      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| relaxation_p | OT_REAL      |              | None         | CasADi::Acad |
-| arameter     |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
-+--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
-|              |              |              | provides     |              |
-|              |              |              | sparsity for |              |
-|              |              |              | a given      |              |
-|              |              |              | input output |              |
-|              |              |              | block,       |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| start_time   | OT_REAL      | 0.0          |              | CasADi::Acad |
-|              |              |              |              | oInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
-|              |              |              | to generated |              |
-|              |              |              | Jacobians in |              |
-|              |              |              | order to     |              |
-|              |              |              | avoid        |              |
-|              |              |              | generating   |              |
-|              |              |              | identical    |              |
-|              |              |              | Jacobians    |              |
-|              |              |              | multiple     |              |
-|              |              |              | times        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-C++ includes: b0_options.hpp ";
-
-
 // File: classCasADi_1_1AcadoOCP.xml
-%feature("docstring") CasADi::AcadoOCP "C++ includes: acado_ocp.hpp ";
+%feature("docstring") CasADi::AcadoOCP "
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| absolute_tol | OT_REAL      |              | None         | CasADi::Acad |
+| erance       |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| auto_init    | OT_BOOLEAN   | false        | initialize   | CasADi::Acad |
+|              |              |              | differential | oOCPInternal |
+|              |              |              | and          |              |
+|              |              |              | angebraic    |              |
+|              |              |              | states by a  |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| dynamic_sens | OT_STRING    |              | forward_sens | CasADi::Acad |
+| itivity      |              |              | itivities or | oOCPInternal |
+|              |              |              | backward_sen |              |
+|              |              |              | sitivities   |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | true         |              | CasADi::Acad |
+| an           |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| final_time   | OT_REAL      | 1.0          |              | CasADi::Acad |
+|              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    |              | None         | CasADi::Acad |
+| oximation    |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_STRING    |              | None         | CasADi::Acad |
+|              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_t | OT_REAL      |              | None         | CasADi::Acad |
+| olerance     |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| kkt_toleranc | OT_REAL      |              | None         | CasADi::Acad |
+| e            |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| max_num_inte | OT_INTEGER   |              | None         | CasADi::Acad |
+| grator_steps |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| max_num_iter | OT_INTEGER   |              | None         | CasADi::Acad |
+| ations       |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_sh | OT_INTEGER   | 20           |              | CasADi::Acad |
+| ooting_nodes |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| periodic_bou | OT_INTEGERVE |              | None         | CasADi::Acad |
+| nds          | CTOR         |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| print_level  | OT_STRING    | \"low\"        | \"none\",      | CasADi::Acad |
+|              |              |              | \"low\",       | oOCPInternal |
+|              |              |              | \"medium\",    |              |
+|              |              |              | \"high\",      |              |
+|              |              |              | \"debug\"      |              |
++--------------+--------------+--------------+--------------+--------------+
+| relaxation_p | OT_REAL      |              | None         | CasADi::Acad |
+| arameter     |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| start_time   | OT_REAL      | 0.0          |              | CasADi::Acad |
+|              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: acado_ocp.hpp ";
 
 /*  Setters  */
 
@@ -1524,8 +2106,193 @@ Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1AcadoOCPInternal.xml
-%feature("docstring") CasADi::AcadoOCPInternal "C++ includes:
-acado_ocp_internal.hpp ";
+%feature("docstring") CasADi::AcadoOCPInternal "
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| absolute_tol | OT_REAL      |              | None         | CasADi::Acad |
+| erance       |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| auto_init    | OT_BOOLEAN   | false        | initialize   | CasADi::Acad |
+|              |              |              | differential | oOCPInternal |
+|              |              |              | and          |              |
+|              |              |              | angebraic    |              |
+|              |              |              | states by a  |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| dynamic_sens | OT_STRING    |              | forward_sens | CasADi::Acad |
+| itivity      |              |              | itivities or | oOCPInternal |
+|              |              |              | backward_sen |              |
+|              |              |              | sitivities   |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | true         |              | CasADi::Acad |
+| an           |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| final_time   | OT_REAL      | 1.0          |              | CasADi::Acad |
+|              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    |              | None         | CasADi::Acad |
+| oximation    |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_STRING    |              | None         | CasADi::Acad |
+|              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_t | OT_REAL      |              | None         | CasADi::Acad |
+| olerance     |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| kkt_toleranc | OT_REAL      |              | None         | CasADi::Acad |
+| e            |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| max_num_inte | OT_INTEGER   |              | None         | CasADi::Acad |
+| grator_steps |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| max_num_iter | OT_INTEGER   |              | None         | CasADi::Acad |
+| ations       |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_sh | OT_INTEGER   | 20           |              | CasADi::Acad |
+| ooting_nodes |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| periodic_bou | OT_INTEGERVE |              | None         | CasADi::Acad |
+| nds          | CTOR         |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| print_level  | OT_STRING    | \"low\"        | \"none\",      | CasADi::Acad |
+|              |              |              | \"low\",       | oOCPInternal |
+|              |              |              | \"medium\",    |              |
+|              |              |              | \"high\",      |              |
+|              |              |              | \"debug\"      |              |
++--------------+--------------+--------------+--------------+--------------+
+| relaxation_p | OT_REAL      |              | None         | CasADi::Acad |
+| arameter     |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| start_time   | OT_REAL      | 0.0          |              | CasADi::Acad |
+|              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: acado_ocp_internal.hpp ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::~AcadoOCPInternal "
 
@@ -1764,6 +2531,11 @@ Deep copy data members. ";
 Get the reference count. ";
 
 
+// File: classCasADi_1_1AddBinaryOperation.xml
+%feature("docstring") CasADi::AddBinaryOperation "C++ includes:
+casadi_math.hpp ";
+
+
 // File: structCasADi_1_1AlgElData.xml
 %feature("docstring") CasADi::AlgElData "C++ includes:
 sx_function_internal.hpp ";
@@ -1944,11 +2716,6 @@ Add a dependency (mapping matrix) ";
 
 Add a dependency (mapping matrix) ";
 
-%feature("docstring")  CasADi::BinaryOp::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::BinaryOp::numel "
 
 Number of elements. ";
@@ -1964,18 +2731,6 @@ Get size. ";
 %feature("docstring")  CasADi::BinaryOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::BinaryOp::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::BinaryOp::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::BinaryOp::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::BinaryOp::getCount "
 
@@ -2002,8 +2757,6 @@ Addition.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::BinaryOperation< ADD >::printRoutines " ";
-
 
 // File: classCasADi_1_1BinaryOperation_3_01CONSTPOW_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< CONSTPOW > "
@@ -2011,9 +2764,6 @@ C++ includes: casadi_math.hpp ";
 Power, defined only for y constant.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::BinaryOperation< CONSTPOW >::printRoutines "
-";
 
 
 // File: classCasADi_1_1BinaryOperation_3_01DIV_01_4.xml
@@ -2023,8 +2773,6 @@ Division.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::BinaryOperation< DIV >::printRoutines " ";
-
 
 // File: classCasADi_1_1BinaryOperation_3_01EQUALITY_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< EQUALITY > "
@@ -2032,9 +2780,6 @@ C++ includes: casadi_math.hpp ";
 Equality.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::BinaryOperation< EQUALITY >::printRoutines "
-";
 
 
 // File: classCasADi_1_1BinaryOperation_3_01FMAX_01_4.xml
@@ -2044,8 +2789,6 @@ Maximum.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::BinaryOperation< FMAX >::printRoutines " ";
-
 
 // File: classCasADi_1_1BinaryOperation_3_01FMIN_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< FMIN > "
@@ -2053,8 +2796,6 @@ C++ includes: casadi_math.hpp ";
 Minimum.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::BinaryOperation< FMIN >::printRoutines " ";
 
 
 // File: classCasADi_1_1BinaryOperation_3_01MUL_01_4.xml
@@ -2064,8 +2805,6 @@ Multiplication.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::BinaryOperation< MUL >::printRoutines " ";
-
 
 // File: classCasADi_1_1BinaryOperation_3_01POW_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< POW > "
@@ -2073,8 +2812,6 @@ C++ includes: casadi_math.hpp ";
 Power, defined only for x>=0.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::BinaryOperation< POW >::printRoutines " ";
 
 
 // File: classCasADi_1_1BinaryOperation_3_01PRINTME_01_4.xml
@@ -2084,9 +2821,6 @@ Identity operator with the side effect of printing.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::BinaryOperation< PRINTME >::printRoutines "
-";
-
 
 // File: classCasADi_1_1BinaryOperation_3_01SUB_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< SUB > "
@@ -2094,8 +2828,6 @@ C++ includes: casadi_math.hpp ";
 Subtraction.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::BinaryOperation< SUB >::printRoutines " ";
 
 
 // File: classCasADi_1_1BinaryOperationE.xml
@@ -2188,18 +2920,6 @@ comparison ";
 %feature("docstring")  CasADi::BinarySXNode::print "
 
 print ";
-
-
-// File: classCasADi_1_1Interfaces_1_1BLT.xml
-%feature("docstring") CasADi::Interfaces::BLT "
-
-BLT decomposition.
-
-C++ includes: csparse_tools.hpp ";
-
-%feature("docstring")  CasADi::Interfaces::BLT::BLT "
-
-Constructor. ";
 
 
 // File: classCasADi_1_1casadi__limits.xml
@@ -3259,6 +3979,28 @@ print ";
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Cple |
 | an           |              |              |              | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
 | is_different | OT_INTEGERVE | Option()     |              | CasADi::Cple |
 | ial          | CTOR         |              |              | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -3738,6 +4480,28 @@ Carlo Savorgnan
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Cple |
 | an           |              |              |              | xInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | is_different | OT_INTEGERVE | Option()     |              | CasADi::Cple |
 | ial          | CTOR         |              |              | xInternal    |
@@ -4239,6 +5003,9 @@ arbitrary element in constant time.
 Since the object is reference counted (it inherits from SharedObject),
 severl matrices are allowed to share the same sparsity pattern.
 
+The implementations of some methods of this class has been taken from the
+CSparse package and modified to use STL and CasADi data structures.
+
 See:   Matrix
 
 Joel Andersson
@@ -4382,10 +5149,6 @@ Get the sparsity in CRS format. ";
 
 Get the sparsity in sparse triplet format. ";
 
-%feature("docstring")  CasADi::CRSSparsity::bucketSort "
-
-Bucket sort the elements by column. ";
-
 %feature("docstring")  CasADi::CRSSparsity::getSub "
 
 Get a submatrix. ";
@@ -4465,22 +5228,41 @@ Is dense? ";
 
 Is diagonal? ";
 
-%feature("docstring")  CasADi::CRSSparsity::depth_first_search "
+%feature("docstring")  CasADi::CRSSparsity::columnsSequential "
 
-depth-first-search of the graph of a matrix, starting at node j (from
-CSparse) ";
+Does the columns appear sequentially on each row (if strictly==true, then do
+not allow multiple entries) ";
 
-%feature("docstring")  CasADi::CRSSparsity::strongly_connected_components "
+%feature("docstring")  CasADi::CRSSparsity::removeDuplicates "
 
-find the strongly connected components of a square matrix (from CSparse) ";
+Remove duplicate entries: The same indices will be removed from the mapping
+vector, which must have the same length as the number of nonzeros. ";
 
-%feature("docstring")  CasADi::CRSSparsity::flip "";
+%feature("docstring")  CasADi::CRSSparsity::eliminationTree "
 
-%feature("docstring")  CasADi::CRSSparsity::unflip "";
+Calculate the elimination tree See Direct Methods for Sparse Linear Systems
+by Davis (2006). If the parameter ata is false, the algorithm is equivalent
+to Matlab's etree(A), except that the indices are zero- based. If ata is
+true, the algorithm is equivalent to Matlab's etree(A,'col'). ";
 
-%feature("docstring")  CasADi::CRSSparsity::marked "";
+%feature("docstring")  CasADi::CRSSparsity::depthFirstSearch "
 
-%feature("docstring")  CasADi::CRSSparsity::mark "";
+Depth-first search on the adjacency graph of the sparsity See Direct Methods
+for Sparse Linear Systems by Davis (2006). ";
+
+%feature("docstring")  CasADi::CRSSparsity::stronglyConnectedComponents "
+
+Find the strongly connected components of a square matrix See Direct Methods
+for Sparse Linear Systems by Davis (2006). ";
+
+%feature("docstring")  CasADi::CRSSparsity::dulmageMendelsohn "
+
+Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
+Linear Systems by Davis (2006). ";
+
+%feature("docstring")  CasADi::CRSSparsity::getElementMapping "
+
+Get element index for each nonzero. ";
 
 %feature("docstring")  CasADi::CRSSparsity::dimString "";
 
@@ -4543,45 +5325,234 @@ Return a string with a representation (for SWIG) ";
 Return a string with a destription (for SWIG) ";
 
 
-// File: classCasADi_1_1CRSSparsityNode.xml
-%feature("docstring") CasADi::CRSSparsityNode "C++ includes:
-crs_sparsity.hpp ";
+// File: classCasADi_1_1CRSSparsityInternal.xml
+%feature("docstring") CasADi::CRSSparsityInternal "C++ includes:
+crs_sparsity_internal.hpp ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::CRSSparsityNode "
+%feature("docstring")  CasADi::CRSSparsityInternal::CRSSparsityInternal "
 
 Construct a sparsity pattern from vectors. ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::sanityCheck "
+%feature("docstring")  CasADi::CRSSparsityInternal::sanityCheck "
 
-Check if the dimensions and rowind,col vectors are compatible.
+Check if the dimensions and rowind,col vectors are compatible. ";
 
-Parameters:
------------
+%feature("docstring")  CasADi::CRSSparsityInternal::diag "
 
-complete:  set to true to also check elementwise throws an error as possible
-result ";
+Get the diagonal of the matrix/create a diagonal matrix (mapping will
+contain the nonzero mapping) ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::clone "
+%feature("docstring")  CasADi::CRSSparsityInternal::eliminationTree "
+
+Calculate the elimination tree: See cs_etree in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::depthFirstSearch "
+
+Find strongly connected components: See cs_dfs in CSparse. ";
+
+%feature("docstring")
+CasADi::CRSSparsityInternal::stronglyConnectedComponents "
+
+Find the strongly connected components of a square matrix: See cs_scc in
+CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::transpose "
+
+Transpose the matrix. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::transpose "
+
+Transpose the matrix and get the reordering of the non-zero entries, i.e.
+the non-zeros of the original matrix for each non-zero of the new matrix. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::breadthFirstSearch "
+
+Breadth-first search for coarse decomposition: see cs_bfs in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::drop "
+
+drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1: :
+see cs_fkeep in CSparse ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::dulmageMendelsohn "
+
+Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::maxTransversal "
+
+Compute the maximum transversal (maximum matching): see cs_maxtrans in
+CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::augmentingPath "
+
+Find an augmenting path: see cs_augment in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::permute "
+
+C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1.: see
+cs_permute in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::vcount "
+
+compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:
+See cs_vcount in CSparse ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::init_ata "
+
+column counts of LL'=A or LL'=A'A, given parent & post ordering: see
+init_ata in CSparse ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::counts "
+
+Column counts: See cs_counts in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::approximateMinimumDegree
+"
+
+Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A)
+otherwise. order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::prefactorize "
+
+symbolic ordering and analysis for QR or LU: See cs_sqr in CSparse ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::multiply "
+
+C = A*B: See cs_multiply in CSparse. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::scatter "
+
+x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse: See
+cs_scatter in CSparse ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::getRow "
+
+Get the row for each nonzero. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::resize "
+
+Resize. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::reshape "
+
+Reshape a sparsity, order of nonzeros remains the same. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::size "
+
+Pattern union.
+
+Number of structural non-zeros ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::numel "
+
+Number of elements. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::sizeU "
+
+Number of non-zeros in the upper triangular half. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::sizeL "
+
+Number of non-zeros in the lower triangular half. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::dense "
+
+Is dense? ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::diagonal "
+
+Is diagonal? ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::dimString "
+
+Get the dimension as a string. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::patternProduct "
+
+Sparsity pattern for a matrix-matrix product (details in public class) ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::patternProduct "
+
+Sparsity pattern for a matrix-matrix product (details in public class) ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::patternUnion "
+
+Union of two sparsity patterns. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::isEqual "
+
+Check if two sparsity patterns are the same. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::enlargeRows "
+
+Enlarge the matrix along the first dimension (i.e. insert rows) ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::enlargeColumns "
+
+Enlarge the matrix along the second dimension (i.e. insert columns) ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::makeDense "
+
+Make a patten dense. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::erase "
+
+Erase rows and/or columns. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::append "
+
+Append another sparsity patten vertically. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::reserve "
+
+Reserve space. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::getSub "
+
+Get a submatrix. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::getNZ "
+
+Get the index of an existing non-zero element. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::getNZ "
+
+Get a set of non-zero element. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::columnsSequential "
+
+Does the columns appear sequentially on each row. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::removeDuplicates "
+
+Remove duplicate entries: The same indices will be removed from the mapping
+vector, which must have the same length as the number of nonzeros. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::getElementMapping "
+
+Get element index for each nonzero. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::clone "
 
 Clone. ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::repr "
+%feature("docstring")  CasADi::CRSSparsityInternal::repr "
 
 Print representation. ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::print "
+%feature("docstring")  CasADi::CRSSparsityInternal::print "
 
 Print description. ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::deepCopyMembers "
+%feature("docstring")  CasADi::CRSSparsityInternal::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::getCount "
+%feature("docstring")  CasADi::CRSSparsityInternal::getCount "
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::CRSSparsityNode::init "
+%feature("docstring")  CasADi::CRSSparsityInternal::init "
 
 Initialize the object. ";
 
@@ -7204,11 +8175,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Densification::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Densification::numel "
 
 Number of elements. ";
@@ -7225,18 +8191,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::Densification::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Densification::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Densification::eval "
-
-Symbolic evaluation (matrix graph) ";
-
 %feature("docstring")  CasADi::Densification::getCount "
 
 Get the reference count. ";
@@ -7248,6 +8202,11 @@ Initialize the object. ";
 %feature("docstring")  CasADi::Densification::repr "
 
 Print a representation of the object. ";
+
+
+// File: classCasADi_1_1DivBinaryOperation.xml
+%feature("docstring") CasADi::DivBinaryOperation "C++ includes:
+casadi_math.hpp ";
 
 
 // File: classCasADi_1_1OptimalControl_1_1EquationSorter.xml
@@ -7447,11 +8406,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Evaluation::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Evaluation::numel "
 
 Number of elements. ";
@@ -7467,18 +8421,6 @@ Get size. ";
 %feature("docstring")  CasADi::Evaluation::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Evaluation::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Evaluation::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Evaluation::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::Evaluation::getCount "
 
@@ -8337,152 +9279,682 @@ Deep copy data members. ";
 Get the reference count. ";
 
 
-// File: classCasADi_1_1OptimalControl_1_1FMIParser.xml
-%feature("docstring") CasADi::OptimalControl::FMIParser "C++ includes:
-fmi_parser.hpp ";
+// File: classCasADi_1_1OptimalControl_1_1FlatOCP.xml
+%feature("docstring") CasADi::OptimalControl::FlatOCP "
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::makeUnique "
+A flat OCP representation coupled to an XML file.
+
+Variables:
+
+t :     time    x :     implicitly defined states (differential or
+algebraic)    xd:     differential states    xa:     algebraic states q :
+quadrature states    y :     dependent variables    p : independent
+parameters    u :     control signals
+
+Equations:
+
+fully implicit DAE:       0 = dae(t,x,\\\\dot{x},xd,xa,u,p) explicit OD:
+\\\\dot{xd} = ode(t,x,xd,xa,u,p)   quadratures: \\\\dot{q} =
+quad(t,x,xd,xa,u,p)   algebraic equations:      0 = alg(t,x,xd,xa,u,p)
+dependent equations:      y = dep(t,x,xd,xa,u,p) initial equations:        0
+= initial(t,x,\\\\dot{x},xd,xa,u,p)
+
+Note that when parsed, all dynamic states, differential and algebraic, end
+up in the category \"s\" and all dynamic equations end up in the implicit
+category \"dae\". At a later state, the DAE can be reformulated, for example
+in semi-explicit form, possibly in addition to a set of quadrature states.
+
+The functions for reformulation is are provided as member functions to this
+class or as independent functions located in the header file
+\"ocp_tools.hpp\".
+
+Usage skeleton:
+
+1. Call constructor with an FMI conformant XML file or pass an empty string
+(\"\") to build up the OCP from scratch  > FlatOCP ocp(xml_file_name)
+
+2. Set options  > ocp.setOption(...,...)
+
+3. Initialize and parse XML  > ocp.init()
+
+4. Modify/add variables, equations, optimization  > ...
+
+When the optimal control problem is in a suitable form, it is possible to
+either generate functions for numeric/symbolic evaluation or exporting the
+OCP formulation into a new FMI conformant XML file. The latter functionality
+is not yet available.
+
+Joel Andersson
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| eliminate_al | OT_BOOLEAN   | false        | Completely   | CasADi::Opti |
+| gebraic      |              |              | eliminate    | malControl:: |
+|              |              |              | algebraic    | FlatOCPInter |
+|              |              |              | states       | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| eliminate_de | OT_BOOLEAN   | true         | Eliminate    | CasADi::Opti |
+| pendent      |              |              | variables    | malControl:: |
+|              |              |              | that can be  | FlatOCPInter |
+|              |              |              | expressed as | nal          |
+|              |              |              | an           |              |
+|              |              |              | expression   |              |
+|              |              |              | of other     |              |
+|              |              |              | variables    |              |
++--------------+--------------+--------------+--------------+--------------+
+| eliminate_de | OT_BOOLEAN   | true         | Verbose      | CasADi::Opti |
+| pendents_wit |              |              | parsing      | malControl:: |
+| h_bounds     |              |              |              | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| make_explici | OT_BOOLEAN   | false        | Make the DAE | CasADi::Opti |
+| t            |              |              | semi-        | malControl:: |
+|              |              |              | explicit     | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| scale_equati | OT_BOOLEAN   | false        | Scale the    | CasADi::Opti |
+| ons          |              |              | implicit     | malControl:: |
+|              |              |              | equations so | FlatOCPInter |
+|              |              |              | that they    | nal          |
+|              |              |              | get unity    |              |
+|              |              |              | order of     |              |
+|              |              |              | magnitude    |              |
++--------------+--------------+--------------+--------------+--------------+
+| scale_variab | OT_BOOLEAN   | false        | Scale the    | CasADi::Opti |
+| les          |              |              | variables so | malControl:: |
+|              |              |              | that they    | FlatOCPInter |
+|              |              |              | get unity    | nal          |
+|              |              |              | order of     |              |
+|              |              |              | magnitude    |              |
++--------------+--------------+--------------+--------------+--------------+
+| sort_equatio | OT_BOOLEAN   | true         | Sort the     | CasADi::Opti |
+| ns           |              |              | dynamic      | malControl:: |
+|              |              |              | equations    | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | true         | Verbose      | CasADi::Opti |
+|              |              |              | parsing      | malControl:: |
+|              |              |              |              | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: flat_ocp.hpp ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::makeUnique "
 
 If there are other references to the object, then make a deep copy of it and
 point to this new object. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::makeUnique "";
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::makeUnique "";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::FMIParser "
+/*  Variables  */
+
+/* Get all variables of a particular type
+
+*/
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::t "
+
+Time. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::x "
+
+Implicitly defined states. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::xd "
+
+Differential states. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::xa "
+
+Algebraic states. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::x_all "
+
+All states, differential and algebraic. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::q "
+
+Quadrature states. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::y "
+
+Dependent variables. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::p "
+
+Independent parameters. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::u "
+
+Control signals. ";
+
+/*  Equations  */
+
+/* Get all equations of a particular type
+
+*/
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::dae "
+
+Fully implicit DAE (length == s().size()) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::ode "
+
+Explicit ODE (length == x().size()) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::alg "
+
+Algebraic equations (length == z().size()) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::quad "
+
+Quadrature states (length == q().size()) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::dep "
+
+Dependent equations (length == y().size()) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::initial "
+
+Initial equations (remove?) ";
+
+/*  Optimization  */
+
+/* Formulate the dynamic optimization problem. Note that the variable bounds
+are located inside the respective variable.
+
+*/
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::mterm "
+
+Mayer terms in the objective. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::lterm "
+
+Lagrange terms in the objective. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::path "
+
+Path constraint functions. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::path_min "
+
+Path constraint functions upper bounds. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::path_max "
+
+Path constraint functions upper bounds. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::t0 "
+
+Interval start time. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::tf "
+
+Interval final time. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::t0_free "
+
+Interval start time is free. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::tf_free "
+
+Interval final time is free. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::set_t0 "
+
+Set interval start time. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::set_tf "
+
+Set interval final time. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::set_t0_free "
+
+Set interval start time as free or fixed. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::set_tf_free "
+
+Set interval final time as free or fixed. ";
+
+/*  Manipulation  */
+
+/* Reformulate the dynamic optimization problem.
+
+*/
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCP::eliminateInterdependencies "
+
+Eliminate interdependencies in the dependent equations. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::eliminateDependent "
+
+Eliminate dependent equations, by default sparing the dependent variables
+with upper or lower bounds. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::sortDAE "
+
+Sort the DAE equations and variables. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::makeExplicit "
+
+Transform the fully implicit DAE to a explicit or semi-explicit form. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::daeArg "
+
+Get the DAE input arguments. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::substituteDependents
+"
+
+Substitute the dependents from a set of expressions. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::daeFcn "
+
+Get the ODE/DAE right hand side function. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCP::generateMuscodDatFile "
+
+Generate a MUSCOD-II compatible DAT file. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::FlatOCP "
 
 Default (empty) constructor. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::FMIParser "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::FlatOCP "
 
 Create an FMI parser instance given the filename. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::parse "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::parse "
 
 Parse from XML to C++ format. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::ocp "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::addVariable "
 
-Get the OCP. ";
+Add a variable. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::ocp "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::variable "
 
-Get the OCP (const ref) ";
+Access a variable by name. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::checkNode "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::makeAlgebraic "
+
+Make a differential state algebraic by replacing its time derivative by 0.
+";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::checkNode "
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::clone "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::clone "
 
 Deep copy. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::assignNode "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::assignNode "
 
 Assign the node to a node class pointer (or null) ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::assignNodeNoCount
-"
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::assignNodeNoCount "
 
 Assign the node to a node class pointer without reference counting: inproper
 use will cause memory leaks! ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::get "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::get "
 
 Get a const pointer to the node. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::get "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::get "
 
 Get a pointer to the node. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::getCount "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getCount "
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::swap "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::swap "
 
 Swap content with another instance. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::repr "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::repr "
 
 Print a representation of the object. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::print "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::print "
 
 Print a destription of the object. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::init "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::init "
 
 Initialize the object: more documentation in the node class (
 SharedObjectNode and derived classes) ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::isInit "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::isInit "
 
 Is initialized? ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::isNull "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::isNull "
 
 Is a null pointer? ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::getRepresentation
-"
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParser::getDescription "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getDescription "
 
 Return a string with a destription (for SWIG) ";
 
 
-// File: classCasADi_1_1OptimalControl_1_1FMIParserInternal.xml
-%feature("docstring") CasADi::OptimalControl::FMIParserInternal "C++
-includes: fmi_parser_internal.hpp ";
+// File: classCasADi_1_1OptimalControl_1_1FlatOCPInternal.xml
+%feature("docstring") CasADi::OptimalControl::FlatOCPInternal "
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| eliminate_al | OT_BOOLEAN   | false        | Completely   | CasADi::Opti |
+| gebraic      |              |              | eliminate    | malControl:: |
+|              |              |              | algebraic    | FlatOCPInter |
+|              |              |              | states       | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| eliminate_de | OT_BOOLEAN   | true         | Eliminate    | CasADi::Opti |
+| pendent      |              |              | variables    | malControl:: |
+|              |              |              | that can be  | FlatOCPInter |
+|              |              |              | expressed as | nal          |
+|              |              |              | an           |              |
+|              |              |              | expression   |              |
+|              |              |              | of other     |              |
+|              |              |              | variables    |              |
++--------------+--------------+--------------+--------------+--------------+
+| eliminate_de | OT_BOOLEAN   | true         | Verbose      | CasADi::Opti |
+| pendents_wit |              |              | parsing      | malControl:: |
+| h_bounds     |              |              |              | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| make_explici | OT_BOOLEAN   | false        | Make the DAE | CasADi::Opti |
+| t            |              |              | semi-        | malControl:: |
+|              |              |              | explicit     | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| scale_equati | OT_BOOLEAN   | false        | Scale the    | CasADi::Opti |
+| ons          |              |              | implicit     | malControl:: |
+|              |              |              | equations so | FlatOCPInter |
+|              |              |              | that they    | nal          |
+|              |              |              | get unity    |              |
+|              |              |              | order of     |              |
+|              |              |              | magnitude    |              |
++--------------+--------------+--------------+--------------+--------------+
+| scale_variab | OT_BOOLEAN   | false        | Scale the    | CasADi::Opti |
+| les          |              |              | variables so | malControl:: |
+|              |              |              | that they    | FlatOCPInter |
+|              |              |              | get unity    | nal          |
+|              |              |              | order of     |              |
+|              |              |              | magnitude    |              |
++--------------+--------------+--------------+--------------+--------------+
+| sort_equatio | OT_BOOLEAN   | true         | Sort the     | CasADi::Opti |
+| ns           |              |              | dynamic      | malControl:: |
+|              |              |              | equations    | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | true         | Verbose      | CasADi::Opti |
+|              |              |              | parsing      | malControl:: |
+|              |              |              |              | FlatOCPInter |
+|              |              |              |              | nal          |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: flat_ocp_internal.hpp ";
 
 %feature("docstring")
-CasADi::OptimalControl::FMIParserInternal::FMIParserInternal "
+CasADi::OptimalControl::FlatOCPInternal::addOptimization "
+
+Add optimization. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addObjectiveFunction "";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addIntegrandObjectiveFunction "";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addConstraints "";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addIntervalStartTime "";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addIntervalFinalTime "";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::FlatOCPInternal "
 
 Constructor. ";
 
 %feature("docstring")
-CasADi::OptimalControl::FMIParserInternal::~FMIParserInternal "
+CasADi::OptimalControl::FlatOCPInternal::~FlatOCPInternal "
 
 destructor ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::clone "
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::clone "
 
 clone ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::parse "
-
-Parse from XML to C++ format. ";
-
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::ocp "
-
-Get the OCP. ";
-
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::ocp "
-
-Get the OCP (const ref) ";
-
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::repr "
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::repr "
 
 Print representation. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::print "
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::print "
 
 Print description. ";
 
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::parse "
+
+Parse from XML to C++ format. ";
+
 %feature("docstring")
-CasADi::OptimalControl::FMIParserInternal::deepCopyMembers "
+CasADi::OptimalControl::FlatOCPInternal::addModelVariables "
+
+Add model variables. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addBindingEquations "
+
+Add binding equations. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addDynamicEquations "
+
+Add dynamic equations. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::addInitialEquations "
+
+Add initial equations. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::readExpr "
+
+Read an equation. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::readVariable
+"
+
+Read a variable. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::sortType "
+
+Sort variables according to type. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::eliminateInterdependencies "
+
+Eliminate interdependencies in the dependent equations. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::eliminateDependent "
+
+Eliminate dependent equations. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::sortDAE "
+
+Sort the DAE equations and variables. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::makeExplicit
+"
+
+Transform the fully implicit DAE to a explicit or semi-explicit form. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::x_all "
+
+All states, differential and algebraic. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::daeArg "
+
+Get the DAE input arguments. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::substituteDependents "
+
+Substitute the dependents from a set of expressions. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::daeFcn "
+
+Get the ODE/DAE right hand side function. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::generateMuscodDatFile "
+
+Generate a MUSCOD-II compatible DAT file. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::scaleVariables "
+
+Scale the variables. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::scaleEquations "
+
+Scale the implicit equations. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::makeAlgebraic "
+
+Make a differential state algebraic by replacing its time derivative by 0.
+";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::addVariable
+"
+
+Add a variable. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::variable "
+
+Access a variable by name. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::hasSetOption
+"
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::printOptions
+"
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::copyOptions
+"
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::getCount "
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::getCount "
 
 Get the reference count. ";
-
-%feature("docstring")  CasADi::OptimalControl::FMIParserInternal::init "
-
-Initialize the object. ";
 
 
 // File: classKINEMATICS_1_1Frame.xml
@@ -9591,6 +11063,8 @@ point to this new object. ";
 
 %feature("docstring")  CasADi::GenericType::GenericType "";
 
+%feature("docstring")  CasADi::GenericType::GenericType "";
+
 %feature("docstring")  CasADi::GenericType::GenericType "
 
 Creator functions. ";
@@ -9631,6 +11105,10 @@ Is a vector of ints? ";
 
 Is a vector of doubles? ";
 
+%feature("docstring")  CasADi::GenericType::isStringVector "
+
+Is a vector of strings. ";
+
 %feature("docstring")  CasADi::GenericType::isSharedObject "
 
 Is a shared object? ";
@@ -9658,6 +11136,10 @@ Convert to vector of ints. ";
 %feature("docstring")  CasADi::GenericType::toDoubleVector "
 
 Convert to vector of doubles. ";
+
+%feature("docstring")  CasADi::GenericType::toStringVector "
+
+Convert to vector of strings. ";
 
 %feature("docstring")  CasADi::GenericType::toSharedObject "
 
@@ -13011,11 +14493,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::IfNode::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::IfNode::numel "
 
 Number of elements. ";
@@ -13031,18 +14508,6 @@ Get size. ";
 %feature("docstring")  CasADi::IfNode::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::IfNode::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::IfNode::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::IfNode::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::IfNode::getCount "
 
@@ -15729,11 +17194,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::InverseMapping::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::InverseMapping::numel "
 
 Number of elements. ";
@@ -15749,18 +17209,6 @@ Get size. ";
 %feature("docstring")  CasADi::InverseMapping::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::InverseMapping::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::InverseMapping::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::InverseMapping::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::InverseMapping::getCount "
 
@@ -15946,6 +17394,22 @@ number of constraints (A)
 | g_obj_at_res |              |              |              | tInternal    |
 | to_trial     |              |              |              |              |
 +--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
 | expect_infea | OT_STRING    |              |              | CasADi::Ipop |
 | sible_proble |              |              |              | tInternal    |
 | m            |              |              |              |              |
@@ -15970,6 +17434,12 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | fixed_variab | OT_STRING    |              |              | CasADi::Ipop |
 | le_treatment |              |              |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    |              |              | CasADi::Ipop |
 | oximation    |              |              |              | tInternal    |
@@ -18694,6 +20164,22 @@ number of constraints (A)
 | g_obj_at_res |              |              |              | tInternal    |
 | to_trial     |              |              |              |              |
 +--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
 | expect_infea | OT_STRING    |              |              | CasADi::Ipop |
 | sible_proble |              |              |              | tInternal    |
 | m            |              |              |              |              |
@@ -18718,6 +20204,12 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | fixed_variab | OT_STRING    |              |              | CasADi::Ipop |
 | le_treatment |              |              |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    |              |              | CasADi::Ipop |
 | oximation    |              |              |              | tInternal    |
@@ -20532,11 +22024,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::JacobianReference::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::JacobianReference::numel "
 
 Number of elements. ";
@@ -20552,18 +22039,6 @@ Get size. ";
 %feature("docstring")  CasADi::JacobianReference::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::JacobianReference::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::JacobianReference::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::JacobianReference::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::JacobianReference::getCount "
 
@@ -21841,6 +23316,28 @@ number of constraints (A)
 | contype      | OT_INTEGERVE |              | None         | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
 +--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -22266,6 +23763,28 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              | None         | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -24681,6 +26200,28 @@ number of constraints (A)
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -25114,6 +26655,28 @@ number of constraints (A)
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -26629,11 +28192,6 @@ Add a dependency. ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Mapping::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Mapping::numel "
 
 Number of elements. ";
@@ -26649,18 +28207,6 @@ Get size. ";
 %feature("docstring")  CasADi::Mapping::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Mapping::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Mapping::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Mapping::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::Mapping::getCount "
 
@@ -27049,6 +28595,10 @@ get a reference to an element ";
 
 get an element, do not allocate ";
 
+%feature("docstring")  CasADi::Matrix::append "
+
+Append a matrix to the end. ";
+
 %feature("docstring")  CasADi::Matrix::setZero "
 
 Set all elements to zero. ";
@@ -27401,6 +28951,11 @@ initialize the state ";
 %feature("docstring")  KINEMATICS::ModelSimulator::test "";
 
 
+// File: classCasADi_1_1MulBinaryOperation.xml
+%feature("docstring") CasADi::MulBinaryOperation "C++ includes:
+casadi_math.hpp ";
+
+
 // File: classCasADi_1_1MultipleOutput.xml
 %feature("docstring") CasADi::MultipleOutput "
 
@@ -27574,11 +29129,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::MultipleOutput::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::MultipleOutput::numel "
 
 Number of elements. ";
@@ -27594,18 +29144,6 @@ Get size. ";
 %feature("docstring")  CasADi::MultipleOutput::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::MultipleOutput::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::MultipleOutput::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::MultipleOutput::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::MultipleOutput::getCount "
 
@@ -28853,11 +30391,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Multiplication::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Multiplication::numel "
 
 Number of elements. ";
@@ -28873,18 +30406,6 @@ Get size. ";
 %feature("docstring")  CasADi::Multiplication::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Multiplication::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Multiplication::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Multiplication::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::Multiplication::getCount "
 
@@ -29504,11 +31025,6 @@ Check if the matrix expression is empty. ";
 
 Check if the matrix expression is dense. ";
 
-%feature("docstring")  CasADi::MX::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
@@ -29533,17 +31049,9 @@ argument. ";
 
 %feature("docstring")  CasADi::MX::setNZ "";
 
-%feature("docstring")  CasADi::MX::eval "
+%feature("docstring")  CasADi::MX::append "
 
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::MX::eval "
-
-Symbolic evaluation (matrix graph) ";
-
-%feature("docstring")  CasADi::MX::eval "
-
-Symbolic evaluation (matrix graph) ";
+Append a matrix to the end. ";
 
 %feature("docstring")  CasADi::MX::dimString "
 
@@ -29696,7 +31204,7 @@ Represents an MX that is only composed of a constant.
 
 Joel Andersson  A regular user is not supposed to work with this Node class.
 This user can call MX(double) directly, or even rely on implicit
-typecasting. See:   zeros , ones
+typecasting. See:  zeros , ones
 
 C++ includes: mx_constant.hpp ";
 
@@ -29866,11 +31374,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::MXConstant::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::MXConstant::numel "
 
 Number of elements. ";
@@ -29886,14 +31389,6 @@ Get size. ";
 %feature("docstring")  CasADi::MXConstant::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::MXConstant::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::MXConstant::eval "
-
-Symbolic evaluation (scalar graph) ";
 
 %feature("docstring")  CasADi::MXConstant::getCount "
 
@@ -31037,11 +32532,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::MXNode::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::MXNode::numel "
 
 Number of elements. ";
@@ -31057,18 +32547,6 @@ Get size. ";
 %feature("docstring")  CasADi::MXNode::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::MXNode::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::MXNode::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::MXNode::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::MXNode::getCount "
 
@@ -31240,6 +32718,28 @@ Joel Andersson
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -31757,6 +33257,28 @@ Joel Andersson
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -32292,11 +33814,6 @@ Add a dependency (mapping matrix) ";
 
 Add a dependency (mapping matrix) ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::NonzerosNonzerosOp::numel "
 
 Number of elements. ";
@@ -32312,18 +33829,6 @@ Get size. ";
 %feature("docstring")  CasADi::NonzerosNonzerosOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::getCount "
 
@@ -32516,11 +34021,6 @@ Add a dependency (mapping matrix) ";
 
 Add a dependency (mapping matrix) ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::NonzerosScalarOp::numel "
 
 Number of elements. ";
@@ -32536,18 +34036,6 @@ Get size. ";
 %feature("docstring")  CasADi::NonzerosScalarOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::getCount "
 
@@ -32738,11 +34226,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Norm::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Norm::numel "
 
 Number of elements. ";
@@ -32758,18 +34241,6 @@ Get size. ";
 %feature("docstring")  CasADi::Norm::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Norm::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Norm::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Norm::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::Norm::getCount "
 
@@ -32959,11 +34430,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Norm1::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Norm1::numel "
 
 Number of elements. ";
@@ -32979,18 +34445,6 @@ Get size. ";
 %feature("docstring")  CasADi::Norm1::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Norm1::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Norm1::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Norm1::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::Norm1::getCount "
 
@@ -33180,11 +34634,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Norm2::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::Norm2::numel "
 
 Number of elements. ";
@@ -33200,18 +34649,6 @@ Get size. ";
 %feature("docstring")  CasADi::Norm2::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Norm2::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::Norm2::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::Norm2::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::Norm2::getCount "
 
@@ -33401,11 +34838,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::NormF::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::NormF::numel "
 
 Number of elements. ";
@@ -33421,18 +34853,6 @@ Get size. ";
 %feature("docstring")  CasADi::NormF::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::NormF::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::NormF::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::NormF::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::NormF::getCount "
 
@@ -33622,11 +35042,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::NormInf::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::NormInf::numel "
 
 Number of elements. ";
@@ -33642,18 +35057,6 @@ Get size. ";
 %feature("docstring")  CasADi::NormInf::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::NormInf::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::NormInf::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::NormInf::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::NormInf::getCount "
 
@@ -33671,89 +35074,6 @@ Print a representation of the object. ";
 // File: classstd_1_1numeric__limits_3_01CasADi_1_1SX_01_4.xml
 %feature("docstring") std::numeric_limits< CasADi::SX > " C++ includes:
 sx.hpp ";
-
-
-// File: classCasADi_1_1OptimalControl_1_1OCP.xml
-%feature("docstring") CasADi::OptimalControl::OCP "
-
-Symbolic, object oriented representation of an optimal control problem (
-OCP)
-
-C++ includes: optimica_ocp.hpp ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::OCP "
-
-OCP. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::sortType "
-
-Sort variables according to type. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::eliminateDependent "
-
-Eliminate dependent equations. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::sortBLT "
-
-Sort the variables and equations according to BLT, with or without including
-the differentiated states in the dependency graph. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::makeExplicit "
-
-Symbolically solve for xdot and z. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::makeSemiExplicit "
-
-Replace all state derivatives by algebraic variables with the same name. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::addExplicitEquation "
-
-Add a binding equation. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::scaleVariables "
-
-Scale the variables. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::scaleEquations "
-
-Scale the implicit equations. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::createFunctions "
-
-Create the implicit/explict ODE functions and quadrature state functions. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::makeAlgebraic "
-
-Make a differential state algebraic by replacing its time derivative by 0.
-";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::findConsistentIC "
-
-Update the initial values for the dependent variables. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::getStartTime "";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::getFinalTime "";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::getExplicit "
-
-Get the explicit expression for a variable. ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::OptimalControl::OCP::getDescription "
-
-Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1OCPSolver.xml
@@ -36188,18 +37508,6 @@ Get size. ";
 %feature("docstring")  CasADi::OutputNode::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::OutputNode::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::OutputNode::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::OutputNode::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::OutputNode::getCount "
 
@@ -39359,11 +40667,6 @@ Add a dependency (mapping matrix) ";
 
 Add a dependency (mapping matrix) ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::ScalarNonzerosOp::numel "
 
 Number of elements. ";
@@ -39379,18 +40682,6 @@ Get size. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::getCount "
 
@@ -40679,11 +41970,6 @@ Add a dependency (mapping matrix) ";
 
 Add a dependency (mapping matrix) ";
 
-%feature("docstring")  CasADi::SparseSparseOp::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::SparseSparseOp::numel "
 
 Number of elements. ";
@@ -40699,18 +41985,6 @@ Get size. ";
 %feature("docstring")  CasADi::SparseSparseOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::SparseSparseOp::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::SparseSparseOp::getCount "
 
@@ -40730,6 +42004,11 @@ Print a representation of the object. ";
 xml_arg.hpp ";
 
 %feature("docstring")  CasADi::OptimalControl::StrArg::StrArg "";
+
+
+// File: classCasADi_1_1SubBinaryOperation.xml
+%feature("docstring") CasADi::SubBinaryOperation "C++ includes:
+casadi_math.hpp ";
 
 
 // File: classCasADi_1_1SubMatrix.xml
@@ -41765,17 +43044,6 @@ val:  Numerical value ";
 
 %feature("docstring")  CasADi::SX::SX "
 
-Type conversion from Matrix.
-
-Parameters:
------------
-
-Matrix<SX>:  object
-
-Convert a 1-by-1 Matrix<SX> to an SX ";
-
-%feature("docstring")  CasADi::SX::SX "
-
 Symbolic constructor.
 
 Parameters:
@@ -41798,9 +43066,8 @@ Name:  of the symbol
 
 This is the name that wil be used by the \"operator<<\" and \"toSTring\"
 methods. The name is not used as identifier; you may construct distinct SX
-objects with non-unique names. ";
-
-%feature("docstring")  CasADi::SX::SX "";
+objects with non-unique names. Create an expression from a node: extra dummy
+argument to avoid ambigousity for 0/NULL ";
 
 %feature("docstring")  CasADi::SX::SX "
 
@@ -42709,7 +43976,8 @@ Evaluate the function with partial derivatives up to order ord. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluateSX "
 
-evaluate symbolically ";
+evaluate symbolically, possibly evaluating constants and/or replacing
+expressions ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::isSmooth "
 
@@ -43222,11 +44490,6 @@ Add a dependency (mapping matrix) ";
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::SymbolicMatrix::numel "
 
 Number of elements. ";
@@ -43242,14 +44505,6 @@ Get size. ";
 %feature("docstring")  CasADi::SymbolicMatrix::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::SymbolicMatrix::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::SymbolicMatrix::eval "
-
-Symbolic evaluation (scalar graph) ";
 
 %feature("docstring")  CasADi::SymbolicMatrix::getCount "
 
@@ -43515,11 +44770,6 @@ Add a dependency (mapping matrix) ";
 
 Add a dependency (mapping matrix) ";
 
-%feature("docstring")  CasADi::UnaryOp::jac "
-
-Get the jacobian of an function evaluation with respect to the iind-th
-argument. ";
-
 %feature("docstring")  CasADi::UnaryOp::numel "
 
 Number of elements. ";
@@ -43535,18 +44785,6 @@ Get size. ";
 %feature("docstring")  CasADi::UnaryOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::UnaryOp::eval "
-
-Numeric evaluation. ";
-
-%feature("docstring")  CasADi::UnaryOp::eval "
-
-Symbolic evaluation (scalar graph) ";
-
-%feature("docstring")  CasADi::UnaryOp::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::UnaryOp::getCount "
 
@@ -43573,9 +44811,6 @@ Arcus cosine.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< ACOS >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01ASIN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< ASIN > "
@@ -43583,9 +44818,6 @@ C++ includes: casadi_math.hpp ";
 Arcus sine.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< ASIN >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01ATAN_01_4.xml
@@ -43595,9 +44827,6 @@ Arcus tangent.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< ATAN >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01CEIL_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< CEIL > "
@@ -43605,9 +44834,6 @@ C++ includes: casadi_math.hpp ";
 Ceil function.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< CEIL >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01COS_01_4.xml
@@ -43617,9 +44843,6 @@ Cosine.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< COS >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01COSH_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< COSH > "
@@ -43627,9 +44850,6 @@ C++ includes: casadi_math.hpp ";
 Hyperbolic cosine.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< COSH >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01ERF_01_4.xml
@@ -43639,9 +44859,6 @@ Error function.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< ERF >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01EXP_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< EXP > "
@@ -43649,9 +44866,6 @@ C++ includes: casadi_math.hpp ";
 Natural exponent.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< EXP >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01FLOOR_01_4.xml
@@ -43661,9 +44875,6 @@ Floor function.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< FLOOR >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01INV_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< INV > "
@@ -43671,9 +44882,6 @@ C++ includes: casadi_math.hpp ";
 Elementwise inverse.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< INV >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01LOG_01_4.xml
@@ -43683,9 +44891,6 @@ Natural logarithm.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< LOG >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01NEG_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< NEG > "
@@ -43693,9 +44898,6 @@ C++ includes: casadi_math.hpp ";
 Negation.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< NEG >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01SIN_01_4.xml
@@ -43705,9 +44907,6 @@ Sine.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< SIN >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01SINH_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< SINH > "
@@ -43715,9 +44914,6 @@ C++ includes: casadi_math.hpp ";
 Hyperbolic sine.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< SINH >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01SQRT_01_4.xml
@@ -43727,9 +44923,6 @@ Square root.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< SQRT >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01STEP_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< STEP > "
@@ -43737,9 +44930,6 @@ C++ includes: casadi_math.hpp ";
 Step function.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< STEP >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1UnaryOperation_3_01TAN_01_4.xml
@@ -43749,9 +44939,6 @@ Tangent.
 
 C++ includes: casadi_math.hpp ";
 
-%feature("docstring")  CasADi::UnaryOperation< TAN >::printRoutinesUnary "
-";
-
 
 // File: classCasADi_1_1UnaryOperation_3_01TANH_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< TANH > "
@@ -43759,9 +44946,6 @@ C++ includes: casadi_math.hpp ";
 Hyperbolic tangent.
 
 C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::UnaryOperation< TANH >::printRoutinesUnary "
-";
 
 
 // File: classCasADi_1_1OptimalControl_1_1Variable.xml
@@ -43793,11 +44977,7 @@ Get the variable expression. ";
 
 %feature("docstring")  CasADi::OptimalControl::Variable::der "
 
-Get differential expression (never allocate) ";
-
-%feature("docstring")  CasADi::OptimalControl::Variable::der "
-
-Get differential expression (allocate if necessary) ";
+Get differential expression. ";
 
 %feature("docstring")  CasADi::OptimalControl::Variable::highest "
 
@@ -43937,6 +45117,10 @@ Set the variable index. ";
 
 Is differential? ";
 
+%feature("docstring")  CasADi::OptimalControl::Variable::setDifferential "
+
+Set differential. ";
+
 %feature("docstring")  CasADi::OptimalControl::Variable::getFree "
 
 Get the the free attribute. ";
@@ -44023,12 +45207,6 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::OptimalControl::VariableInternal::getName "";
 
-%feature("docstring")  CasADi::OptimalControl::VariableInternal::var "";
-
-%feature("docstring")  CasADi::OptimalControl::VariableInternal::der "";
-
-%feature("docstring")  CasADi::OptimalControl::VariableInternal::der "";
-
 %feature("docstring")  CasADi::OptimalControl::VariableInternal::atTime "";
 
 %feature("docstring")  CasADi::OptimalControl::VariableInternal::atTime "";
@@ -44053,38 +45231,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::OptimalControl::VariableInternal::init "
 
 Initialize the object. ";
-
-
-// File: classCasADi_1_1OptimalControl_1_1VariableTree.xml
-%feature("docstring") CasADi::OptimalControl::VariableTree "
-
-Tree structure for storing variables.
-
-C++ includes: optimica_ocp.hpp ";
-
-%feature("docstring")  CasADi::OptimalControl::VariableTree::subByName "
-
-Access a sub-collection by name. ";
-
-%feature("docstring")  CasADi::OptimalControl::VariableTree::subByIndex "
-
-Access a sub-collection by index. ";
-
-%feature("docstring")  CasADi::OptimalControl::VariableTree::getAll "
-
-Get all variables.
-
-Add variables
-
-Add variable, if any ";
-
-%feature("docstring")  CasADi::OptimalControl::VariableTree::getNames "
-
-Get all names. ";
-
-%feature("docstring")  CasADi::OptimalControl::VariableTree::print "
-
-Print node. ";
 
 
 // File: classCasADi_1_1XFunction.xml
@@ -45139,6 +46285,43 @@ Make a deep copy of an object (Note: default is a shallow copy!) ";
 
 %feature("docstring")  CasADi::GSL::deepcopy "";
 
+%feature("docstring")  CasADi::GSL::ssym "
+
+Construct symbolic arrays and variables using CasADi's SX expression graph
+representation The \"ssym\" function is intended to work in a similar way as
+\"sym\" used in the Symbolic Toolbox for Matlab but instead creating an
+SXMatrix object. The SX expression graph has much less overhead, but is also
+more restricted than the alternative MX expression graph.
+
+Construct symbolic arrays and variables using CasADi's more restricted, but
+more efficient SX expression graphCreate an matrix with symbolic variables,
+with the dimension given by the string ";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Create an n-by-m matrix with symbolic variables. ";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Create an n-by-m matrix with symbolic variables. ";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Create an matrix with symbolic variables, given a sparsity pattern. ";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Create a vector of length p with n-by-m matrices with symbolic variables. ";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Create a vector of length r of vectors of length p with n-by-m matrices with
+symbolic variables. ";
+
+%feature("docstring")  CasADi::GSL::ssym "
+
+Create a symbolic matrix out of a numeric one. ";
+
 %feature("docstring")  CasADi::GSL::gradient "";
 
 %feature("docstring")  CasADi::GSL::jacobian "
@@ -45151,28 +46334,9 @@ Uses CasADi::SXFunction::jac ";
 
 %feature("docstring")  CasADi::GSL::hessian "";
 
-%feature("docstring")  CasADi::GSL::ssym "
-
-Construct symbolic arrays and variables using CasADi's SX expression graph
-representation The \"ssym\" function is intended to work in a similar way as
-\"sym\" used in the Symbolic Toolbox for Matlab but instead creating an
-SXMatrix object. The SX expression graph has much less overhead, but is also
-more restricted than the alternative MX expression graph.
-
-Construct symbolic arrays and variables using CasADi's more restricted, but
-more efficient SX expression graph ";
-
-%feature("docstring")  CasADi::GSL::ssym "";
-
 %feature("docstring")  CasADi::GSL::timesTwo "";
 
 %feature("docstring")  CasADi::GSL::square "";
-
-%feature("docstring")  CasADi::GSL::populatePrintFun "";
-
-%feature("docstring")  CasADi::GSL::populatePrintFun "";
-
-%feature("docstring")  CasADi::GSL::isCommutative "";
 
 %feature("docstring")  CasADi::GSL::getptr "";
 
@@ -45196,8 +46360,6 @@ means elementwise multiplication. ";
 %feature("docstring")  CasADi::GSL::dot "
 
 Product of two matrices - Python naming. ";
-
-%feature("docstring")  CasADi::GSL::append "";
 
 %feature("docstring")  CasADi::GSL::isConstant "
 
@@ -45324,18 +46486,6 @@ axis:  either 0 or 1 ";
 
 Repeat matrix A n times vertically and m times horizontally. ";
 
-%feature("docstring")  CasADi::GSL::eye "
-
-create an n-by-n identity matrix ";
-
-%feature("docstring")  CasADi::GSL::ones "
-
-create a matrix with all ones ";
-
-%feature("docstring")  CasADi::GSL::zeros "
-
-create a matrix with all zeros ";
-
 %feature("docstring")  CasADi::GSL::polyval "
 
 Evaluate a polynomial with coefficeints p in x. ";
@@ -45452,7 +46602,8 @@ Create a sparsity pattern given the nonzeros in sparse triplet form. ";
 %feature("docstring")  CasADi::GSL::sp_triplet "
 
 Create a sparsity pattern given the nonzeros in sparse triplet form (no
-nonzero mapping) ";
+nonzero mapping) columns_are_sorted==true means that the column entries
+already in increasing order for each row and without any duplicates. ";
 
 %feature("docstring")  CasADi::GSL::vertcat "";
 
@@ -45782,22 +46933,6 @@ as tval) ";
 
 %feature("docstring")  CasADi::GSL::if_else "";
 
-%feature("docstring")  CasADi::GSL::onesSX "
-
-create a matrix with all ones ";
-
-%feature("docstring")  CasADi::GSL::zerosSX "
-
-create a matrix with all zeros ";
-
-%feature("docstring")  CasADi::GSL::infSX "
-
-create a matrix with all infinities ";
-
-%feature("docstring")  CasADi::GSL::eyeSX "
-
-create an n-by-n identity matrix ";
-
 %feature("docstring")  CasADi::GSL::heaviside "
 
 Heaviside function.
@@ -45853,7 +46988,15 @@ remove identical calculations ";
 
 %feature("docstring")  CasADi::GSL::substitute "
 
-substitute variable var with expression expr ";
+substitute variable var with expression expr in multiple expressions ";
+
+%feature("docstring")  CasADi::GSL::substitute "
+
+substitute variable var with expression expr in an expression ex ";
+
+%feature("docstring")  CasADi::GSL::substituteInPlace "
+
+substitute variable var with expression expr in the expression itself ";
 
 %feature("docstring")  CasADi::GSL::spy "
 
@@ -45904,40 +47047,6 @@ Simplify the expression: formulates the expression as and eliminates terms.
 
 Fill the matrix with the value val, make empty sparse if zero. ";
 
-%feature("docstring")  CasADi::GSL::make_symbolic "
-
-Make a vector/matrix of symbolic variables - dimension 0. ";
-
-%feature("docstring")  CasADi::GSL::symbolic "
-
-Create an n-by-m matrix with symbolic variables. ";
-
-%feature("docstring")  CasADi::GSL::symbolic "
-
-Create an n-by-m matrix with symbolic variables. ";
-
-%feature("docstring")  CasADi::GSL::symbolic "
-
-Create an matrix with symbolic variables, given a sparsity pattern. ";
-
-%feature("docstring")  CasADi::GSL::symbolic "
-
-Create a vector of length p with n-by-m matrices with symbolic variables. ";
-
-%feature("docstring")  CasADi::GSL::create_symbolic "";
-
-%feature("docstring")  CasADi::GSL::create_symbolic "";
-
-%feature("docstring")  CasADi::GSL::create_symbolic "
-
-Create a two-dimensional stl vector of length n-by-m with symbolic
-variables. ";
-
-%feature("docstring")  CasADi::GSL::create_symbolic "
-
-Create a three-dimensional stl vector of length n-by-m-by-p with symbolic
-variables. ";
-
 %feature("docstring")  CasADi::GSL::taylor "
 
 univariate taylor series expansion
@@ -45957,24 +47066,6 @@ Do taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$. ";
 
 %feature("docstring")  CasADi::GSL::for "";
-
-%feature("docstring")  CasADi::GSL::make_symbolic "
-
-Make a vector/matrix of symbolic variables - higher dimension recursively.
-";
-
-%feature("docstring")  CasADi::GSL::create_symbolic "
-
-Create a one-dimensional stl vector of length n with symbolic variables. ";
-
-%feature("docstring")  CasADi::GSL::create_symbolic "
-
-Create a one-dimensional stl vector of symbolic variables, whose names are
-given in space-separated form Python example: ";
-
-%feature("docstring")  CasADi::GSL::make_symbolic "
-
-Make a vector/matrix of symbolic variables. ";
 
 %feature("docstring")  CasADi::GSL::contains "
 
@@ -46125,6 +47216,8 @@ Tarjan's algorithm. ";
 
 %feature("docstring")  CasADi::OptimalControl::der "";
 
+%feature("docstring")  CasADi::OptimalControl::highest "";
+
 %feature("docstring")  CasADi::OptimalControl::getNominal "";
 
 %feature("docstring")  CasADi::OptimalControl::getAll "
@@ -46147,6 +47240,11 @@ Get a vector of expressions from a vector of variables. ";
 %feature("docstring")  CasADi::OptimalControl::der "
 
 Get a vector of derivative expressions from a vector of variables. ";
+
+%feature("docstring")  CasADi::OptimalControl::highest "
+
+Get a vector of highest order undetermined expression from a vector of
+variables. ";
 
 %feature("docstring")  CasADi::OptimalControl::getNominal "
 
@@ -46560,120 +47658,6 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: namespacestd.xml
-%feature("docstring")  std::sqrt "
-
-Pre-C99 elementary functions from the math.h (cmath) header. ";
-
-%feature("docstring")  std::sin "";
-
-%feature("docstring")  std::cos "";
-
-%feature("docstring")  std::tan "";
-
-%feature("docstring")  std::atan "";
-
-%feature("docstring")  std::asin "";
-
-%feature("docstring")  std::acos "";
-
-%feature("docstring")  std::exp "";
-
-%feature("docstring")  std::log "";
-
-%feature("docstring")  std::log10 "";
-
-%feature("docstring")  std::constpow "";
-
-%feature("docstring")  std::pow "";
-
-%feature("docstring")  std::abs "";
-
-%feature("docstring")  std::fabs "";
-
-%feature("docstring")  std::floor "";
-
-%feature("docstring")  std::ceil "";
-
-%feature("docstring")  std::sinh "";
-
-%feature("docstring")  std::cosh "";
-
-%feature("docstring")  std::tanh "";
-
-%feature("docstring")  std::printme "";
-
-%feature("docstring")  std::sin "";
-
-%feature("docstring")  std::cos "";
-
-%feature("docstring")  std::tan "";
-
-%feature("docstring")  std::asin "";
-
-%feature("docstring")  std::acos "";
-
-%feature("docstring")  std::atan "";
-
-%feature("docstring")  std::sinh "";
-
-%feature("docstring")  std::cosh "";
-
-%feature("docstring")  std::tanh "";
-
-%feature("docstring")  std::exp "";
-
-%feature("docstring")  std::log "";
-
-%feature("docstring")  std::log10 "";
-
-%feature("docstring")  std::sqrt "";
-
-%feature("docstring")  std::floor "";
-
-%feature("docstring")  std::ceil "";
-
-%feature("docstring")  std::fabs "";
-
-%feature("docstring")  std::pow "";
-
-%feature("docstring")  std::constpow "";
-
-%feature("docstring")  std::printme "";
-
-%feature("docstring")  std::exp "";
-
-%feature("docstring")  std::log "";
-
-%feature("docstring")  std::log10 "";
-
-%feature("docstring")  std::sqrt "";
-
-%feature("docstring")  std::sin "";
-
-%feature("docstring")  std::cos "";
-
-%feature("docstring")  std::tan "";
-
-%feature("docstring")  std::atan "";
-
-%feature("docstring")  std::asin "";
-
-%feature("docstring")  std::acos "";
-
-%feature("docstring")  std::sinh "";
-
-%feature("docstring")  std::cosh "";
-
-%feature("docstring")  std::tanh "";
-
-%feature("docstring")  std::pow "";
-
-%feature("docstring")  std::constpow "";
-
-%feature("docstring")  std::floor "";
-
-%feature("docstring")  std::ceil "";
-
 %feature("docstring")  std::exp "throw ()";
 
 %feature("docstring")  std::log "throw ()";
@@ -46697,42 +47681,6 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 %feature("docstring")  std::floor "throw ()";
 
 %feature("docstring")  std::ceil "throw ()";
-
-%feature("docstring")  std::sqrt "";
-
-%feature("docstring")  std::sin "";
-
-%feature("docstring")  std::cos "";
-
-%feature("docstring")  std::tan "";
-
-%feature("docstring")  std::atan "";
-
-%feature("docstring")  std::asin "";
-
-%feature("docstring")  std::acos "";
-
-%feature("docstring")  std::sinh "";
-
-%feature("docstring")  std::cosh "";
-
-%feature("docstring")  std::tanh "";
-
-%feature("docstring")  std::exp "";
-
-%feature("docstring")  std::log "";
-
-%feature("docstring")  std::pow "";
-
-%feature("docstring")  std::constpow "";
-
-%feature("docstring")  std::abs "";
-
-%feature("docstring")  std::fabs "";
-
-%feature("docstring")  std::floor "";
-
-%feature("docstring")  std::ceil "";
 
 
 // File: 01_8dox.xml
@@ -46852,6 +47800,48 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 
 // File: casadi__operators_8hpp.xml
+%feature("docstring")  CasADi::sqrt "
+
+Pre-C99 elementary functions from the math.h (cmath) header. ";
+
+%feature("docstring")  CasADi::sin "";
+
+%feature("docstring")  CasADi::cos "";
+
+%feature("docstring")  CasADi::tan "";
+
+%feature("docstring")  CasADi::atan "";
+
+%feature("docstring")  CasADi::asin "";
+
+%feature("docstring")  CasADi::acos "";
+
+%feature("docstring")  CasADi::exp "";
+
+%feature("docstring")  CasADi::log "";
+
+%feature("docstring")  CasADi::log10 "";
+
+%feature("docstring")  CasADi::constpow "";
+
+%feature("docstring")  CasADi::pow "";
+
+%feature("docstring")  CasADi::abs "";
+
+%feature("docstring")  CasADi::fabs "";
+
+%feature("docstring")  CasADi::floor "";
+
+%feature("docstring")  CasADi::ceil "";
+
+%feature("docstring")  CasADi::sinh "";
+
+%feature("docstring")  CasADi::cosh "";
+
+%feature("docstring")  CasADi::tanh "";
+
+%feature("docstring")  CasADi::printme "";
+
 %feature("docstring")  CasADi::erf "
 
 C99 elementary functions from the math.h header. ";
@@ -46894,6 +47884,12 @@ C99 elementary functions from the math.h header. ";
 // File: crs__sparsity_8hpp.xml
 
 
+// File: crs__sparsity__internal_8cpp.xml
+
+
+// File: crs__sparsity__internal_8hpp.xml
+
+
 // File: csparse_8cpp.xml
 
 
@@ -46904,12 +47900,6 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: csparse__internal_8hpp.xml
-
-
-// File: csparse__tools_8cpp.xml
-
-
-// File: csparse__tools_8hpp.xml
 
 
 // File: ctemplate_8cpp.xml
@@ -46966,16 +47956,16 @@ This file does absolutely nothing but including all headers ";
 // File: external__function__internal_8hpp.xml
 
 
-// File: fmi__parser_8cpp.xml
+// File: flat__ocp_8cpp.xml
 
 
-// File: fmi__parser_8hpp.xml
+// File: flat__ocp_8hpp.xml
 
 
-// File: fmi__parser__internal_8cpp.xml
+// File: flat__ocp__internal_8cpp.xml
 
 
-// File: fmi__parser__internal_8hpp.xml
+// File: flat__ocp__internal_8hpp.xml
 
 
 // File: frame_8cpp.xml
@@ -47268,17 +48258,55 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: matrix_8hpp.xml
+%feature("docstring")  CasADi::sin "";
+
+%feature("docstring")  CasADi::cos "";
+
+%feature("docstring")  CasADi::tan "";
+
+%feature("docstring")  CasADi::asin "";
+
+%feature("docstring")  CasADi::acos "";
+
+%feature("docstring")  CasADi::atan "";
+
+%feature("docstring")  CasADi::sinh "";
+
+%feature("docstring")  CasADi::cosh "";
+
+%feature("docstring")  CasADi::tanh "";
+
+%feature("docstring")  CasADi::exp "";
+
+%feature("docstring")  CasADi::log "";
+
+%feature("docstring")  CasADi::log10 "";
+
+%feature("docstring")  CasADi::sqrt "";
+
+%feature("docstring")  CasADi::floor "";
+
+%feature("docstring")  CasADi::ceil "";
+
+%feature("docstring")  CasADi::fabs "";
+
+%feature("docstring")  CasADi::pow "";
+
+%feature("docstring")  CasADi::constpow "";
+
+%feature("docstring")  CasADi::printme "";
+
+%feature("docstring")  CasADi::fmin "";
+
+%feature("docstring")  CasADi::fmax "";
+
+%feature("docstring")  CasADi::erf "";
 
 
 // File: matrix__tools_8cpp.xml
 
 
 // File: matrix__tools_8hpp.xml
-%feature("docstring")  CasADi::fmin "";
-
-%feature("docstring")  CasADi::fmax "";
-
-%feature("docstring")  CasADi::erf "";
 
 
 // File: MX_2minmax_8hpp.xml
@@ -47336,6 +48364,40 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: mx_8cpp.xml
+%feature("docstring")  CasADi::exp "";
+
+%feature("docstring")  CasADi::log "";
+
+%feature("docstring")  CasADi::log10 "";
+
+%feature("docstring")  CasADi::sqrt "";
+
+%feature("docstring")  CasADi::sin "";
+
+%feature("docstring")  CasADi::cos "";
+
+%feature("docstring")  CasADi::tan "";
+
+%feature("docstring")  CasADi::atan "";
+
+%feature("docstring")  CasADi::asin "";
+
+%feature("docstring")  CasADi::acos "";
+
+%feature("docstring")  CasADi::sinh "";
+
+%feature("docstring")  CasADi::cosh "";
+
+%feature("docstring")  CasADi::tanh "";
+
+%feature("docstring")  CasADi::pow "";
+
+%feature("docstring")  CasADi::constpow "";
+
+%feature("docstring")  CasADi::floor "";
+
+%feature("docstring")  CasADi::ceil "";
+
 %feature("docstring")  CasADi::erf "";
 
 %feature("docstring")  CasADi::fmin "";
@@ -47427,12 +48489,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: ooqp__solver_8hpp.xml
-
-
-// File: optimica__ocp_8cpp.xml
-
-
-// File: optimica__ocp_8hpp.xml
 
 
 // File: options__functionality_8cpp.xml
@@ -47557,6 +48613,9 @@ This file does absolutely nothing but including all headers ";
 %feature("docstring")  main "";
 
 
+// File: ssym_8hpp.xml
+
+
 // File: stl__vector__tools_8cpp.xml
 
 
@@ -47582,6 +48641,44 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: sx_8hpp.xml
+%feature("docstring")  CasADi::sqrt "
+
+Pre-C99 elementary functions from the math.h (cmath) header. ";
+
+%feature("docstring")  CasADi::sin "";
+
+%feature("docstring")  CasADi::cos "";
+
+%feature("docstring")  CasADi::tan "";
+
+%feature("docstring")  CasADi::atan "";
+
+%feature("docstring")  CasADi::asin "";
+
+%feature("docstring")  CasADi::acos "";
+
+%feature("docstring")  CasADi::sinh "";
+
+%feature("docstring")  CasADi::cosh "";
+
+%feature("docstring")  CasADi::tanh "";
+
+%feature("docstring")  CasADi::exp "";
+
+%feature("docstring")  CasADi::log "";
+
+%feature("docstring")  CasADi::pow "";
+
+%feature("docstring")  CasADi::constpow "";
+
+%feature("docstring")  CasADi::abs "";
+
+%feature("docstring")  CasADi::fabs "";
+
+%feature("docstring")  CasADi::floor "";
+
+%feature("docstring")  CasADi::ceil "";
+
 %feature("docstring")  CasADi::erf "
 
 C99 elementary functions from the math.h header. ";
@@ -47620,18 +48717,9 @@ C99 elementary functions from the math.h header. ";
 
 %feature("docstring")  CasADi::getOperatorRepresentation "";
 
-%feature("docstring")  CasADi::ssym "
-
-Construct symbolic arrays and variables using CasADi's SX expression graph
-representation The \"ssym\" function is intended to work in a similar way as
-\"sym\" used in the Symbolic Toolbox for Matlab but instead creating an
-SXMatrix object. The SX expression graph has much less overhead, but is also
-more restricted than the alternative MX expression graph.
-
-Construct symbolic arrays and variables using CasADi's more restricted, but
-more efficient SX expression graph ";
-
 %feature("docstring")  CasADi::ssym "";
+
+%feature("docstring")  CasADi::makeSemiExplicit "";
 
 
 // File: sx__tools_8hpp.xml
@@ -47979,6 +49067,9 @@ more efficient SX expression graph ";
 
 
 // File: SX_2jacSparsity_8py-example.xml
+
+
+// File: SX_2ssym_8py-example.xml
 
 
 // File: SX_2SXaddition_8cc-example.xml

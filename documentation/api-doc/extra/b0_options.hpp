@@ -142,6 +142,40 @@
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
+/** \class CasADi::OptimalControl::FlatOCPInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>eliminate_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Completely eliminate algebraic states</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be expressed as an expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>make_explicit</td><td>OT_BOOLEAN</td><td>false</td><td>Make the DAE semi-explicit</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>scale_equations</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the implicit equations so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>scale_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the variables so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>sort_equations</td><td>OT_BOOLEAN</td><td>true</td><td>Sort the dynamic equations</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::OptimalControl::FlatOCP
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>eliminate_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Completely eliminate algebraic states</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be expressed as an expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>make_explicit</td><td>OT_BOOLEAN</td><td>false</td><td>Make the DAE semi-explicit</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>scale_equations</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the implicit equations so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>scale_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the variables so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>sort_equations</td><td>OT_BOOLEAN</td><td>true</td><td>Sort the dynamic equations</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::Interfaces::LapackLUDenseInternal
 \n
 \par
@@ -463,6 +497,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>inplace</td><td>OT_BOOLEAN</td><td>false</td><td>Evaluate with inplace operations (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
@@ -486,6 +521,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>inplace</td><td>OT_BOOLEAN</td><td>false</td><td>Evaluate with inplace operations (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
