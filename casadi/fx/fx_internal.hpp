@@ -86,6 +86,9 @@ class FXInternal : public OptionsFunctionalityNode{
       
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
+    
+    /** \brief  Print */
+    virtual void repr(std::ostream &stream) const;
   
     /** \brief  Inputs of the function */
     std::vector<FunctionIO> input_;

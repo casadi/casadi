@@ -244,13 +244,6 @@ class FlatOCP : public OptionsFunctionality{
     //@}
 };
 
-#ifdef SWIG
-%extend FlatOCP {
-  // Not inherited
-  std::string __repr__()  { return $self->getRepresentation(); }
-}
-#endif // SWIG
-
 } // namespace OptimalControl
 } // namespace CasADi
 

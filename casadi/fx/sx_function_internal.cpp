@@ -542,6 +542,8 @@ bool SXFunctionInternal::isSmooth() const{
 }
 
 void SXFunctionInternal::print(ostream &stream) const{
+ FXInternal::print(stream);
+ 
  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     int op = it->op;
     stringstream s,s0,s1;

@@ -454,7 +454,6 @@ class Matrix : public PrintableObject{
     virtual void print(std::ostream &stream=std::cout) const; // print print description
     virtual void repr(std::ostream &stream=std::cout) const; // print representation
 #endif
-    std::string __repr__() { return getRepresentation(); } // python default print
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
     void printVector(std::ostream &stream=std::cout) const; // print one row vector-style
     void printMatrix(std::ostream &stream=std::cout) const; // print one row, matrix-style
@@ -1761,7 +1760,14 @@ void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const st
 template<class T>
 std::string Matrix<T>::dimString() const {
   std::stringstream ss;
-  ss << "(" << size1() << " x " << size2() << " = " << numel() << " | " << size() << ")";
+  ss << "(" << size1() << " x " << size2();
+  if (size1()!=1 && size2()!=1)  ss << " = " << numel();
+  if (numel()==size()) {
+    ss << " dense";
+  } else {
+    ss << " | " << size();
+  }
+  ss << ")";
   return ss.str();
 }
 

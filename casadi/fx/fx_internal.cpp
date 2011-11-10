@@ -108,6 +108,25 @@ void FXInternal::init(){
 }
 
 void FXInternal::print(ostream &stream) const{
+  if (getNumInputs()==1) {
+    stream << " Input: " << input().dimString() << std::endl;
+  } else{
+    stream << " Inputs (" << getNumInputs() << "):" << std::endl;
+    for (int i=0;i<getNumInputs();i++) {
+       stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+    }
+  }
+  if (getNumOutputs()==1) {
+    stream << " Output: " << output().dimString() << std::endl;
+  } else {
+    stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
+    for (int i=0;i<getNumOutputs();i++) {
+       stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+    }
+  }
+}
+
+void FXInternal::repr(ostream &stream) const{
   stream << "function(\"" << getOption("name") << "\")";
 }
 

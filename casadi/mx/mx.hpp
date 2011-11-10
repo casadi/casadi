@@ -339,11 +339,6 @@ typedef std::vector<MXPtr> MXPtrV;
 typedef std::vector<MXPtrV> MXPtrVV;
 //@}
 
-#ifdef SWIG 
-%extend MX {
-  std::string __repr__() { return $self->getRepresentation();}
-}
-#endif // SWIG
 } // namespace CasADi
 
 #endif // MX_HPP

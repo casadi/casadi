@@ -296,12 +296,6 @@ class CRSSparsity : public SharedObject{
 
 };
 
-#ifdef SWIG
-%extend CRSSparsity {
-std::string __repr__() { return $self->getRepresentation(); }
-}
-#endif // SWIG
-
 } // namespace CasADi
 
 #endif // CRS_SPARSITY_HPP

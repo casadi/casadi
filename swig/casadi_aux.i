@@ -7,6 +7,16 @@
 #include "casadi/options_functionality.hpp"
 %}
 
+#ifdef SWIGPYTHON
+%pythoncode %{
+_swig_repr_default = _swig_repr
+def _swig_repr(self):
+  if hasattr(self,'getRepresentation'):
+    return self.getRepresentation()
+  else:
+    return self._swig_repr_default()
+%}
+#endif // SWIGPYTHON
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
 %include "casadi/casadi_types.hpp"

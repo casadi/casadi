@@ -187,13 +187,7 @@ namespace CasADi{
 } // namespace OptimalControl
 } // namespace CasADi
 
-  
-#ifdef SWIG  
-%extend CasADi::OptimalControl::Variable {
-  // Not inherited: Bug?
-  std::string __repr__()  { return $self->getRepresentation(); }
-}
-
+#ifdef SWIG
 // Template instantiations
 %template(VariableVector) std::vector<CasADi::OptimalControl::Variable>;
 #endif // SWIG  

@@ -68,13 +68,6 @@ public:
   
 };
 
-#ifdef SWIG
-%extend XFunction{
-  // Print (why is this not inherited?)
-  std::string __repr__()  { return $self->getRepresentation(); }
-}
-#endif
-
 } // namespace CasADi
 
 #endif // X_FUNCTION_HPP

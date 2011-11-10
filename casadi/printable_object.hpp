@@ -47,13 +47,14 @@ class PrintableObject{
 
     /// Print a representation of the object to a stream
     friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);
-    
+#endif // SWIG  
+
     /// Return a string with a representation (for SWIG)
     std::string getRepresentation() const;
 
     /// Return a string with a destription (for SWIG)
     std::string getDescription() const;
-#endif // SWIG    
+  
 };
 
 #ifdef SWIG

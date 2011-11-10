@@ -512,6 +512,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 }
 
 void MXFunctionInternal::print(ostream &stream) const{
+  FXInternal::print(stream);
   for(int i=0; i<alg.size(); ++i){
     stream << "i_" << i<< " =  ";
     vector<string> chname(alg[i].i_arg.size());

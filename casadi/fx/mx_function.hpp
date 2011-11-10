@@ -117,15 +117,6 @@ public:
   
 };
 
-#ifdef SWIG
-%extend MXFunction{
-  // Print (why is this not inherited?)
-  std::string __repr__()  { return $self->getRepresentation(); }
-}
-#endif
-
-
-  
 } // namespace CasADi
 
 
