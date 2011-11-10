@@ -25,6 +25,8 @@
 
 #include "collocation_integrator.hpp"
 #include "casadi/fx/integrator_internal.hpp"
+#include "casadi/fx/mx_function.hpp"
+#include "casadi/fx/implicit_function.hpp"
 
 namespace CasADi{
     
@@ -54,7 +56,7 @@ public:
   virtual void initAdj();
 
   /// Reset the solver and bring the time back to t0
-  virtual void reset(int fsens_order, int asens_order);
+  virtual void reset(int nfdir, int nadir);
 
   /// Reset the solver of the adjoint problem and take time to tf
   virtual void resetAdj();
@@ -80,6 +82,20 @@ public:
   /// Set the stop time of the forward integration
   virtual void setStopTime(double tf);
 
+  // Nonlinear system of equations
+  FX gfcn_;
+
+  // Implicit function solver
+  ImplicitFunction implicit_solver_;
+  
+  // With hotstart
+  bool hotstart_;
+  
+  // Has the system been integrated once
+  bool integrated_once_;
+  
+  // Number of sensitivity directions
+  int nfdir_, nadir_;
 };
 
 } // namespace CasADi

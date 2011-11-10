@@ -22,6 +22,9 @@
 // FX
 %include "casadi_fx.i"
 
+// Integration
+%include "casadi_integration.i"
+
 // optimal_control
 %include "casadi_optimal_control.i"
 

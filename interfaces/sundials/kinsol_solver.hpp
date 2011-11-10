@@ -85,7 +85,16 @@ public:
   
   /** \brief  Get Jacobian */
   FX getJacobian();
-  
+
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static ImplicitFunction creator(const FX& f){ return KinsolSolver(f);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
 
 
