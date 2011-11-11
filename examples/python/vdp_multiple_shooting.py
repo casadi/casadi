@@ -21,6 +21,9 @@ f = SXFunction([t,x,u,xp],[res])
 # Create an integrator
 if coll:
   f_d = CollocationIntegrator(f)
+  f_d.setOption("number_of_finite_elements",5)
+  f_d.setOption("interpolation_order",5)
+  f_d.setOption("collocation_scheme","legendre")
   f_d.setOption("implicit_solver",KinsolSolver)
   f_d.setOption("implicit_solver_options",\
     {'linear_solver_creator' : CSparse})
