@@ -88,6 +88,9 @@ public:
   // Quadrature right hand side function
   FX qfcn_;
 
+  // Startup integrator (generates an initial trajectory guess)
+  Integrator startup_integrator_;
+  
   // Implicit function solver
   ImplicitFunction implicit_solver_;
   
@@ -102,6 +105,9 @@ public:
   
   // Number of sensitivity directions
   int nfdir_, nadir_;
+  
+  // Collocated times
+  std::vector<double> times_;
 };
 
 } // namespace CasADi

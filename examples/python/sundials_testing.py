@@ -146,61 +146,21 @@ def create_CVODES():
   # Quadrature function
   qfcn = SXFunction(ffcn_in,[[u_dev]])
 
-  # Create an integrator
-  integrator = CVodesIntegrator(ffcn,qfcn)
+  if collocation_integrator:
+    # Create a collocation integrator
+    integrator = CollocationIntegrator(ffcn,qfcn)
   
-  # Return the integrator
-  return integrator
-
-# Create an CVODES instance (ODE integrator)
-def create_KINSOL():
-  # Time 
-  t = SX("t")
-
-  # Differential states
-  s = SX("s")
-  v = SX("v")
-  m = SX("m")
-  y = [s,v,m]
-  
-  # Control
-  u = SX("u")
-  
-  # Reference trajectory
-  u_ref = 3-sin(t)
-  
-  # Square deviation from the state trajectory
-  u_dev = u-u_ref
-  u_dev *= u_dev
-  
-  # Differential equation (fully implicit form)
-  rhs = [v, (u-0.02*v*v)/m, -0.01*u*u]
-
-  # Input of the DAE residual function
-  ffcn_in = DAE_NUM_IN * [[]]
-  ffcn_in[DAE_T] = [t]
-  ffcn_in[DAE_Y] = y
-  ffcn_in[DAE_P] = [u]
-
-  # DAE residual function
-  ffcn = SXFunction(ffcn_in,[rhs])
-  
-  # Quadrature function
-  qfcn = SXFunction(ffcn_in,[[u_dev]])
-
-  # Create an integrator
-  integrator = CollocationIntegrator(ffcn,qfcn)
-  
-  # Options to kinsol
-  kinsol_options = {}
-  kinsol_options['linear_solver_creator'] = CSparse
-  
-  # Set some options
-  integrator.setOption("implicit_solver",KinsolSolver)
-  integrator.setOption("implicit_solver_options",kinsol_options)
-  integrator.setOption("quadrature_solver",CSparse)
-  integrator.setOption("expand_f",True)
-  integrator.setOption("expand_q",True)
+    # Set some options
+    integrator.setOption("implicit_solver",KinsolSolver)
+    integrator.setOption("implicit_solver_options",{'linear_solver_creator' : CSparse})
+    integrator.setOption("quadrature_solver",CSparse)
+    integrator.setOption("startup_integrator",CVodesIntegrator)
+    integrator.setOption("expand_f",True)
+    integrator.setOption("expand_q",True)
+    
+  else:
+    # Create an integrator
+    integrator = CVodesIntegrator(ffcn,qfcn)
   
   # Return the integrator
   return integrator
@@ -221,14 +181,11 @@ y0 = [0,0,1]
 x0 = list(y0)
 x0.append(0)
 
-if collocation_integrator:
-  integrator = create_KINSOL()
+# Integrator
+if implicit_integrator:
+  integrator = create_IDAS()
 else:
-  # Integrator
-  if implicit_integrator:
-    integrator = create_IDAS()
-  else:
-    integrator = create_CVODES()
+  integrator = create_CVODES()
 
 
 # Attach user-defined linear solver

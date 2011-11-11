@@ -42,6 +42,8 @@ CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const 
   addOption("hotstart",                      OT_BOOLEAN,  true, "Initialize the trajectory at the previous solution");
   addOption("quadrature_solver",             OT_LINEARSOLVER,  GenericType(), "An linear solver to solver the quadrature equations");
   addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(), "Options to be passed to the quadrature solver");
+  addOption("startup_integrator",            OT_INTEGRATOR,  GenericType(), "An ODE/DAE integrator that can be used to generate a startup trajectory");
+  addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the startup integrator");
 }
 
 void CollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
@@ -115,6 +117,9 @@ void CollocationIntegratorInternal::init(){
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
 
+  // Collocated times
+  times_.clear();
+  
   // Size of the finite elements
   double h = (tf_-t0_)/nk;
   
@@ -237,7 +242,8 @@ void CollocationIntegratorInternal::init(){
     // For all collocation points
     for(int j=1; j<deg+1; ++j, ++jk){
       // Get the time
-      MX tk = h*(k + tau_root[j]);
+      times_.push_back(h*(k + tau_root[j]));
+      MX tk = times_.back();
         
       // Get an expression for the state derivative at the collocation point
       MX yp_jk = 0;
@@ -269,6 +275,9 @@ void CollocationIntegratorInternal::init(){
       }
     }
     
+    // Add end time
+    times_.push_back(h*(k + 1));
+
     // Get an expression for the state at the end of the finite element
     MX yf_k = 0;
     for(int j=0; j<deg+1; ++j){
@@ -392,6 +401,28 @@ void CollocationIntegratorInternal::init(){
     quadrature_solver_.prepare();
   }
   
+  if(hasSetOption("startup_integrator")){
+    
+    // Create the linear solver
+    integratorCreator startup_integrator_creator = getOption("startup_integrator");
+    
+    // Allocate an NLP solver
+    startup_integrator_ = startup_integrator_creator(f_,FX());
+    
+    // Pass options
+    startup_integrator_.setOption("number_of_fwd_dir",0); // not needed
+    startup_integrator_.setOption("number_of_adj_dir",0); // not needed
+    startup_integrator_.setOption("t0",times_.front());
+    startup_integrator_.setOption("tf",times_.back());
+    if(hasSetOption("startup_integrator_options")){
+      const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
+      startup_integrator_.setOption(startup_integrator_options);
+    }
+    
+    // Initialize the startup integrator
+    startup_integrator_.init();
+  }
+  
   // Mark the system not yet integrated
   integrated_once_ = false;
 }
@@ -431,11 +462,44 @@ void CollocationIntegratorInternal::reset(int nfdir, int nadir){
   }
   
   // Pass solution guess (if this is the first integration or if hotstart is disabled)
-  if(!hotstart_ || !integrated_once_){
+  if(hotstart_==false || integrated_once_==false){
     vector<double>& v = implicit_solver_.output().data();
-    for(int offs=0; offs<v.size(); offs+=ny_){
-      for(int i=0; i<ny_; ++i){
-        v[i+offs] = x0[i];
+      
+    // Check if an integrator for the startup trajectory has been supplied
+    if(!startup_integrator_.isNull()){
+      // Use supplied integrator, if any
+      startup_integrator_.input(INTEGRATOR_X0).setArray(&input(INTEGRATOR_X0).front(),ny_); // only the ny_ first elements
+      startup_integrator_.input(INTEGRATOR_XP0).setArray(&input(INTEGRATOR_XP0).front(),ny_); // only the ny_ first elements
+      startup_integrator_.input(INTEGRATOR_P).set(input(INTEGRATOR_P));
+      
+      // Reset the integrator
+      startup_integrator_.reset();
+      
+      // Integrate, stopping at all time points
+      int offs=0;
+      for(vector<double>::const_iterator it=times_.begin(); it!=times_.end(); ++it){
+        // Integrate to the time point
+        startup_integrator_.integrate(*it);
+        
+        // Save the solution
+        startup_integrator_.output().getArray(&v[offs],ny_);
+        
+        // Update the vector offset
+        offs+=ny_;
+      }
+      
+      // Print
+      if(verbose()){
+        cout << "startup trajectory generated, statistics:" << endl;
+        startup_integrator_.printStats();
+      }
+    
+    } else {
+      // Initialize with constant trajectory
+      for(int offs=0; offs<v.size(); offs+=ny_){
+        for(int i=0; i<ny_; ++i){
+          v[i+offs] = x0[i];
+        }
       }
     }
   }
