@@ -2,8 +2,9 @@ from casadi import *
 from numpy import *
 import matplotlib.pyplot as plt
 
-nk = 20    # Control discretization
-tf = 10.0  # End time
+nk = 20      # Control discretization
+tf = 10.0    # End time
+coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
 t  = ssym("t")    # time
@@ -18,10 +19,18 @@ res = [(1 - x[1]*x[1])*x[0] - x[1] + u, \
 f = SXFunction([t,x,u,xp],[res])
 
 # Create an integrator
-f_d = CVodesIntegrator(f)
-f_d.setOption("abstol",1e-8) # tolerance
-f_d.setOption("reltol",1e-8) # tolerance
-f_d.setOption("steps_per_checkpoint",1000)
+if coll:
+  f_d = CollocationIntegrator(f)
+  f_d.setOption("implicit_solver",KinsolSolver)
+  f_d.setOption("implicit_solver_options",\
+    {'linear_solver_creator' : CSparse})
+  f_d.setOption("expand_f",True)
+else:
+  f_d = CVodesIntegrator(f)
+  f_d.setOption("abstol",1e-8) # tolerance
+  f_d.setOption("reltol",1e-8) # tolerance
+  f_d.setOption("steps_per_checkpoint",1000)
+
 f_d.setOption("tf",tf/nk) # final time
 f_d.init()
 
