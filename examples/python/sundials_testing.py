@@ -198,7 +198,9 @@ def create_KINSOL():
   # Set some options
   integrator.setOption("implicit_solver",KinsolSolver)
   integrator.setOption("implicit_solver_options",kinsol_options)
-  integrator.setOption("expand",True)
+  integrator.setOption("quadrature_solver",CSparse)
+  integrator.setOption("expand_f",True)
+  integrator.setOption("expand_q",True)
   
   # Return the integrator
   return integrator

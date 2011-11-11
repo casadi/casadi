@@ -85,8 +85,14 @@ public:
   // Nonlinear system of equations
   FX gfcn_;
 
+  // Quadrature right hand side function
+  FX qfcn_;
+
   // Implicit function solver
   ImplicitFunction implicit_solver_;
+  
+  // Quadrature solver
+  LinearSolver quadrature_solver_;
   
   // With hotstart
   bool hotstart_;
