@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 # Use CVodes or IDAS
 implicit_integrator = False
 
-# Use a collocation based integrator + KINSOL?
+# Use a collocation based integrator + KINSOL
 collocation_integrator = False
 
 # test adjoint sensitivities
@@ -100,12 +100,25 @@ def create_IDAS():
   # Quadrature function
   qfcn = SXFunction(ffcn_in,[[u_dev]])
 
-  # Create an integrator
-  integrator = IdasIntegrator(ffcn,qfcn)
+  if collocation_integrator:
+    # Create a collocation integrator
+    integrator = CollocationIntegrator(ffcn,qfcn)
+  
+    # Set some options
+    integrator.setOption("implicit_solver",KinsolSolver)
+    integrator.setOption("implicit_solver_options",{'linear_solver_creator' : CSparse})
+    integrator.setOption("quadrature_solver",CSparse)
+    integrator.setOption("startup_integrator",IdasIntegrator)
+    integrator.setOption("expand_f",True)
+    integrator.setOption("expand_q",True)
+    
+  else:
+    # Create an integrator
+    integrator = IdasIntegrator(ffcn,qfcn)
 
-  # Set IDAS specific options
-  integrator.setOption("calc_ic",calc_ic)
-  integrator.setOption("is_differential",[1,1,1])
+    # Set IDAS specific options
+    integrator.setOption("calc_ic",calc_ic)
+    integrator.setOption("is_differential",[1,1,1])
 
   # Return the integrator
   return integrator

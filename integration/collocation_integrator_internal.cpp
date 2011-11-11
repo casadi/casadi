@@ -114,6 +114,9 @@ void CollocationIntegratorInternal::init(){
   // Interpolation order
   int deg = getOption("interpolation_order");
 
+  // Assume explicit ODE
+  bool explicit_ode = f_.input(DAE_YDOT).size()==0;
+  
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
 
@@ -256,8 +259,17 @@ void CollocationIntegratorInternal::init(){
       f_in[DAE_T] = tk;
       f_in[DAE_P] = P;
       f_in[DAE_Y] = Y[k][j];
-      vector<MX> f_out = f_.call(f_in);
-      g.push_back(h_mx*f_out[DAE_RES] - yp_jk);
+      
+      if(explicit_ode){
+        // Assume equation of the form ydot = f(t,y,p)
+        vector<MX> f_out = f_.call(f_in);
+        g.push_back(h_mx*f_out[DAE_RES] - yp_jk);
+      } else {
+        // Assume equation of the form 0 = f(t,y,ydot,p)
+        f_in[DAE_YDOT] = yp_jk/h_mx;
+        vector<MX> f_out = f_.call(f_in);
+        g.push_back(f_out[DAE_RES]);
+      }
       
       if(nq_>0){
         // Get an expression for the quadrature state derivative at the collocation point
