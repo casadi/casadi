@@ -585,6 +585,8 @@ INPUT                  = ../../casadi \
                          ../../interfaces \
                          ../../modelica \
                          ../../optimal_control \
+                         ../../integration \
+                         ../../nonlinear_programming \
                          ./doxygen-tutorial \
                          ../examples \
                          extra

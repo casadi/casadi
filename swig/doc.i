@@ -1406,6 +1406,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::AcadoIntegratorInternal::unidirectionalColoring "
 
@@ -1557,10 +1561,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::copyOptions "
 
@@ -2355,6 +2355,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -2509,10 +2513,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::copyOptions "
 
@@ -3655,6 +3655,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::CFunctionInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -3810,10 +3814,6 @@ Print options to a stream. ";
 
 get an option value ";
 
-%feature("docstring")  CasADi::CFunctionInternal::repr "
-
-Print representation. ";
-
 %feature("docstring")  CasADi::CFunctionInternal::copyOptions "
 
 Copy all options from another object. ";
@@ -3827,6 +3827,752 @@ Get the dictionary. ";
 Deep copy data members. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::getCount "
+
+Get the reference count. ";
+
+
+// File: classCasADi_1_1CollocationIntegrator.xml
+%feature("docstring") CasADi::CollocationIntegrator "
+
+Collocation integrator ODE/DAE integrator based on collocation.
+
+The method is still under development
+
+Joel Andersson
+
+C++ includes: collocation_integrator.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::CollocationIntegrator::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::CollocationIntegrator::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::CollocationIntegrator::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::makeUnique "";
+
+%feature("docstring")  CasADi::CollocationIntegrator::CollocationIntegrator
+"
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::CollocationIntegrator
+"
+
+Create an integrator for explicit ODEs.
+
+Parameters:
+-----------
+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::CollocationIntegrator::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::printStats "
+
+Print solver statistics. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::reset "
+
+Reset the solver and bring the time back to t0. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::integrate "
+
+Integrate until a specified time point. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::resetAdj "
+
+Reset the solver of the adjoint problem and take time to tf. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::integrateAdj "
+
+Integrate backwards in time until a specified time point. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setInitialTime "
+
+Set initial time. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setFinalTime "
+
+Set final time. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setStopTime "
+
+Set a stop time for the forward integration. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setLinearSolver "
+
+Set linear solver. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getJacobian "
+
+Get the Jacobian. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getLinearSolver "
+
+Get the Linear solver. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getDAE "
+
+Get the DAE. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
+approach. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::call "
+
+Create a function call (evaluation mx node), single input. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::call "
+
+Evaluate numerically (shorthand) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::call "
+
+Evaluate symbolically (scalar graph) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::call "
+
+Evaluate symbolically (matrix graph) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::CollocationIntegrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1CollocationIntegratorInternal.xml
+%feature("docstring") CasADi::CollocationIntegratorInternal "C++ includes:
+collocation_integrator_internal.hpp ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::CollocationIntegratorInternal "
+
+Constructor. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::create "
+
+Create a new integrator. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::~CollocationIntegratorInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::init "
+
+Initialize stage. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::initAdj "
+
+Initialize the adjoint problem (can only be called after the first
+integration) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::reset "
+
+Reset the solver and bring the time back to t0. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::resetAdj "
+
+Reset the solver of the adjoint problem and take time to tf. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::integrate "
+
+Integrate until a specified time point. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::integrateAdj "
+
+Integrate backwards in time until a specified time point. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getJacobian "
+
+Get the jacobian in the nonlinear iteration. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getLinearSolver "
+
+Get the Linear solver. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::setLinearSolver "
+
+Set linear solver. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::printStats "
+
+Print statistics. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setStopTime "
+
+Set the stop time of the forward integration. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::evaluate "
+
+evaluate ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::jac "
+
+Create an integrator which integrates the ODE/DAE augmented with the forward
+sensitivity equations. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getJacSparsity
+"
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setInitialTime
+"
+
+Set initial time. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setFinalTime "
+
+Set final time. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setDimensions
+"";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::repr "
+
+Print. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::isInit "
+
+Assert that the function has been initialized. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setNumOutputs
+"
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getNumOutputs
+"
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setJacSparsity
+"
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::symbolicInput
+"
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getCount "
 
 Get the reference count. ";
 
@@ -4186,6 +4932,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::CplexInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::CplexInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -4340,10 +5090,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::CplexInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::CplexInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::CplexInternal::copyOptions "
 
@@ -6287,6 +7033,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::CSparseInternal::unidirectionalColoring "
 
@@ -6444,10 +7194,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::copyOptions "
 
@@ -7831,6 +8577,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Sundials::CVodesInternal::unidirectionalColoring "
 
@@ -7982,10 +8732,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Sundials::CVodesInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::copyOptions "
 
@@ -9102,6 +9848,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::ExternalFunctionInternal::unidirectionalColoring "
 
@@ -9257,10 +10007,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::copyOptions "
 
@@ -9601,7 +10347,35 @@ Substitute the dependents from a set of expressions. ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::daeFcn "
 
-Get the ODE/DAE right hand side function. ";
+Get the ODE/DAE right hand side function The returned FX has the following
+input/output scheme:
+
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
+";
 
 %feature("docstring")
 CasADi::OptimalControl::FlatOCP::generateMuscodDatFile "
@@ -10843,6 +11617,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::FXInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::FXInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -10997,10 +11775,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::FXInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::FXInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::FXInternal::copyOptions "
 
@@ -12530,6 +13304,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::GSL::GslInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::GSL::GslInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -12680,10 +13458,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::GSL::GslInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::GSL::GslInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::GSL::GslInternal::copyOptions "
 
@@ -14149,6 +14923,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Sundials::IdasInternal::unidirectionalColoring "
 
@@ -14300,10 +15078,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::copyOptions "
 
@@ -15204,6 +15978,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::ImplicitFunctionInternal::unidirectionalColoring "
 
@@ -15359,10 +16137,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::copyOptions "
 
@@ -16851,6 +17625,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -17001,10 +17779,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::IntegratorInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::IntegratorInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::copyOptions "
 
@@ -17906,6 +18680,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::IpoptInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::IpoptInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -18060,10 +18838,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::IpoptInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::IpoptInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::IpoptInternal::copyOptions "
 
@@ -18814,6 +19588,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::IpoptQPInternal::unidirectionalColoring "
 
@@ -18971,10 +19749,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::copyOptions "
 
@@ -21677,6 +22451,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::JacobianInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::JacobianInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -21831,10 +22609,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::JacobianInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::JacobianInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::JacobianInternal::copyOptions "
 
@@ -22359,6 +23133,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Sundials::KinsolInternal::unidirectionalColoring "
 
@@ -22514,10 +23292,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Sundials::KinsolInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::copyOptions "
 
@@ -23509,6 +24283,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::KnitroInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::KnitroInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -23663,10 +24441,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::KnitroInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::KnitroInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::KnitroInternal::copyOptions "
 
@@ -24992,6 +25766,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::unidirectionalColoring "
 
@@ -25165,10 +25943,6 @@ Print options to a stream. ";
 "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::copyOptions "
@@ -25926,6 +26700,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::unidirectionalColoring "
 
@@ -26099,10 +26877,6 @@ Print options to a stream. ";
 "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::copyOptions "
@@ -26400,6 +27174,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::LiftoptInternal::unidirectionalColoring "
 
@@ -26557,10 +27335,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::copyOptions "
 
@@ -27832,6 +28606,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::LinearSolverInternal::unidirectionalColoring
 "
 
@@ -27987,10 +28765,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::LinearSolverInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::copyOptions "
 
@@ -28430,8 +29204,6 @@ Printing. ";
 %feature("docstring")  CasADi::Matrix::repr "
 
 Print a representation of the object. ";
-
-%feature("docstring")  CasADi::Matrix::__repr__ "";
 
 %feature("docstring")  CasADi::Matrix::printScalar "";
 
@@ -29998,6 +30770,11 @@ CasADi::OptimalControl::MultipleShootingInternal::print "
 Print. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::repr "
+
+Print. ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -30188,11 +30965,6 @@ Print options to a stream. ";
 CasADi::OptimalControl::MultipleShootingInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::copyOptions "
@@ -32194,6 +32966,10 @@ Access an output. ";
 
 Const access an output. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -32339,10 +33115,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::MXFunctionInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::copyOptions "
 
@@ -33441,6 +34213,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::NLPSolverInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -33595,10 +34371,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::NLPSolverInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::copyOptions "
 
@@ -35808,6 +36580,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -35962,10 +36738,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::OCPSolverInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::copyOptions "
 
@@ -36348,6 +37120,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::OOQPInternal::unidirectionalColoring "
 
@@ -36503,10 +37279,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::copyOptions "
 
@@ -38213,6 +38985,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::unidirectionalColoring
 "
 
@@ -38364,10 +39140,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::ParallelizerInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::copyOptions "
 
@@ -38709,6 +39481,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::repr "
+
+Print. ";
+
 %feature("docstring")
 CasADi::Interfaces::QPOasesInternal::unidirectionalColoring "
 
@@ -38866,10 +39642,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::copyOptions "
 
@@ -40225,6 +40997,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -40379,10 +41155,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::QPSolverInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::QPSolverInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::copyOptions "
 
@@ -41597,6 +42369,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -41751,10 +42527,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::SimulatorInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::SimulatorInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::copyOptions "
 
@@ -41997,6 +42769,598 @@ Initialize the object. ";
 %feature("docstring")  CasADi::SparseSparseOp::repr "
 
 Print a representation of the object. ";
+
+
+// File: classCasADi_1_1SQPInternal.xml
+%feature("docstring") CasADi::SQPInternal "C++ includes: sqp_internal.hpp
+";
+
+%feature("docstring")  CasADi::SQPInternal::SQPInternal "";
+
+%feature("docstring")  CasADi::SQPInternal::~SQPInternal "";
+
+%feature("docstring")  CasADi::SQPInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::SQPInternal::init "
+
+Initialize and make the object ready for setting arguments and evaluation.
+This method is typically called after setting options but before evaluating.
+If passed to another class (in the constructor), this class should invoke
+this function when initialized. ";
+
+%feature("docstring")  CasADi::SQPInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::SQPInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::SQPInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::SQPInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::SQPInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::SQPInternal::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::SQPInternal::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::SQPInternal::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::SQPInternal::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::SQPInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::SQPInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::SQPInternal::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::SQPInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::SQPInternal::isInit "
+
+Assert that the function has been initialized. ";
+
+%feature("docstring")  CasADi::SQPInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::SQPInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::SQPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SQPInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SQPInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SQPInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SQPInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::SQPInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::SQPInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::SQPInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::SQPInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SQPInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SQPInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SQPInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SQPInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::SQPInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::SQPInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SQPInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SQPInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::SQPInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::SQPInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::SQPInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::SQPInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::SQPInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::SQPInternal::getCount "
+
+Get the reference count. ";
+
+
+// File: classCasADi_1_1SQPMethod.xml
+%feature("docstring") CasADi::SQPMethod "
+
+Sequential Quadratic Programming method The algorithm is a Quasi- Newton
+method with damped BFGS updating to that assures positive definitenes of the
+Hessian approximation. Line search is carried out via backtracking until
+with the Armijo condition applied to the T1 (in Nocedal phi1) merit function
+is satisfied.
+
+The method is still under development
+
+Joel Andersson
+
+C++ includes: sqp_method.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::SQPMethod::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::SQPMethod::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::SQPMethod::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::SQPMethod::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::SQPMethod::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::SQPMethod::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::SQPMethod::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::SQPMethod::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::SQPMethod::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::SQPMethod::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::SQPMethod::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::SQPMethod::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::SQPMethod::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::SQPMethod::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::SQPMethod::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::SQPMethod::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::SQPMethod::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::SQPMethod::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::SQPMethod::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::SQPMethod::makeUnique "";
+
+%feature("docstring")  CasADi::SQPMethod::SQPMethod "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::SQPMethod::SQPMethod "
+
+Constuct an NLP with non-linear constraints and provided hessian
+approximation. ";
+
+%feature("docstring")  CasADi::SQPMethod::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::SQPMethod::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::SQPMethod::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::SQPMethod::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SQPMethod::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SQPMethod::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::SQPMethod::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::SQPMethod::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::SQPMethod::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
+approach. ";
+
+%feature("docstring")  CasADi::SQPMethod::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::SQPMethod::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::SQPMethod::call "
+
+Create a function call (evaluation mx node), single input. ";
+
+%feature("docstring")  CasADi::SQPMethod::call "
+
+Evaluate numerically (shorthand) ";
+
+%feature("docstring")  CasADi::SQPMethod::call "
+
+Evaluate symbolically (scalar graph) ";
+
+%feature("docstring")  CasADi::SQPMethod::call "
+
+Evaluate symbolically (matrix graph) ";
+
+%feature("docstring")  CasADi::SQPMethod::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::SQPMethod::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPMethod::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPMethod::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SQPMethod::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SQPMethod::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SQPMethod::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::SQPMethod::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::SQPMethod::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::SQPMethod::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPMethod::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPMethod::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::SQPMethod::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::SQPMethod::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPMethod::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SQPMethod::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::SQPMethod::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::SQPMethod::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SQPMethod::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SQPMethod::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SQPMethod::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::SQPMethod::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::SQPMethod::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::SQPMethod::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::SQPMethod::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::SQPMethod::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::SQPMethod::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::SQPMethod::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::SQPMethod::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::SQPMethod::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::SQPMethod::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::SQPMethod::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::SQPMethod::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::SQPMethod::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::SQPMethod::getDescription "
+
+Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1OptimalControl_1_1StrArg.xml
@@ -42840,6 +44204,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::SuperLUInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::SuperLUInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -42994,10 +44362,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::SuperLUInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::SuperLUInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::copyOptions "
 
@@ -43260,6 +44624,12 @@ Joel Andersson
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| inplace      | OT_BOOLEAN   | false        | Evaluate     | CasADi::SXFu |
+|              |              |              | with inplace | nctionIntern |
+|              |              |              | operations ( | al           |
+|              |              |              | experimental |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -43843,6 +45213,12 @@ Joel Andersson
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
+| inplace      | OT_BOOLEAN   | false        | Evaluate     | CasADi::SXFu |
+|              |              |              | with inplace | nctionIntern |
+|              |              |              | operations ( | al           |
+|              |              |              | experimental |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -44056,6 +45432,10 @@ Access an output. ";
 
 Const access an output. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -44201,10 +45581,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::copyOptions "
 
@@ -45935,6 +47311,10 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::XFunctionInternal::repr "
+
+Print. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::unidirectionalColoring "
 
 Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
@@ -46089,10 +47469,6 @@ Print options to a stream. ";
 %feature("docstring")  CasADi::XFunctionInternal::getOption "
 
 get an option value ";
-
-%feature("docstring")  CasADi::XFunctionInternal::repr "
-
-Print representation. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::copyOptions "
 
@@ -47857,6 +49233,18 @@ C99 elementary functions from the math.h header. ";
 // File: casadi__types_8hpp.xml
 
 
+// File: collocation__integrator_8cpp.xml
+
+
+// File: collocation__integrator_8hpp.xml
+
+
+// File: collocation__integrator__internal_8cpp.xml
+
+
+// File: collocation__integrator__internal_8hpp.xml
+
+
 // File: constant__sx__node_8hpp.xml
 
 
@@ -48613,6 +50001,18 @@ This file does absolutely nothing but including all headers ";
 %feature("docstring")  main "";
 
 
+// File: sqp__internal_8cpp.xml
+
+
+// File: sqp__internal_8hpp.xml
+
+
+// File: sqp__method_8cpp.xml
+
+
+// File: sqp__method_8hpp.xml
+
+
 // File: ssym_8hpp.xml
 
 
@@ -48934,6 +50334,9 @@ C99 elementary functions from the math.h header. ";
 // File: dir_32b8619070e9782b5121e45ec993864a.xml
 
 
+// File: dir_e8a4c331c240f7d2cb2425c8af2a8248.xml
+
+
 // File: dir_580751f974173c86697bdcd1140c3ad2.xml
 
 
@@ -48971,6 +50374,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: dir_67113a6d3675cbddfa7a019d5a056d94.xml
+
+
+// File: dir_852892827a66142bf3178701461240a9.xml
 
 
 // File: dir_5ccff051cb0f2733df13b03ffc913b3f.xml
