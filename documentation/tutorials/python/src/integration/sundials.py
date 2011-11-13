@@ -174,7 +174,7 @@ show()
 #! - a free symbolic input, held constant during integration interval
 u=MX("u")
 integrator.setFinalTime(tend)
-w=integrator({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: MX([1,0]), INTEGRATOR_P: u})
+w=integrator.call({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: MX([1,0]), INTEGRATOR_P: u})[0]
 
 #! We construct an MXfunction and a python help function 'out'
 f=MXFunction([u],[w])
