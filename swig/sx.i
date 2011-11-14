@@ -128,7 +128,7 @@ try:
       
   _defaultmax = max
   def max(*args,**kwargs):
-    if len(args)==2 and len(kwargs)==0 and (hasattr(args[0],'fmin') or hasattr(args[1],'fmin')):
+    if len(args)==2 and len(kwargs)==0 and (hasattr(args[0],'fmax') or hasattr(args[1],'fmax')):
       return _max_ufunc(*args)
     else:
       return _defaultmax(*args,**kwargs)

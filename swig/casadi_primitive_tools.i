@@ -6,6 +6,33 @@
 %import "casadi_primitive.i"
 #endif //WITH_SWIG_SPLIT
 
+#ifdef SWIGPYTHON
+%pythoncode%{
+try:
+  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh
+  from numpy import arcsin as asin
+  from numpy import arccos as acos
+  from numpy import arctan as atan
+except:
+  sin = lambda x: x.sin()
+  cos = lambda x: x.cos()
+  tan = lambda x: x.tan()
+  asin = lambda x: x.asin()
+  acos = lambda x: x.acos()
+  atan = lambda x: x.atan()
+  sqrt = lambda x: x.sqrt()
+  log = lambda x: x.log()
+  exp = lambda x: x.exp()
+  floor = lambda x: x.floor()
+  ceil = lambda x: x.ceil()
+  fmin = lambda x,y: x.fmin(y)
+  fmax = lambda x,y: x.fmax(y)
+  sinh = lambda x: x.asin()
+  cosh = lambda x: x.acos()
+  tanh = lambda x: x.atan()
+%}
+#endif // SWIGPYTHON
+
 // Matrix tools
 %include "casadi/matrix/matrix_tools.hpp"
 
