@@ -37,6 +37,11 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   if(it == allowed_options.end()){
     stringstream ss;
     ss << "Unknown option: " << name << endl;
+    ss << "(Available options are:";
+    for (map<string, opt_type>::const_iterator it=allowed_options.begin();it!=allowed_options.end();it++) {
+      ss << " " << it->first;
+    }
+    ss << ")" << endl;
     throw CasadiException(ss.str());
   }
 
@@ -56,6 +61,11 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
   if(it == dictionary_.end()){
     stringstream ss;
     ss << "Option: " << name << " has not been set." << endl;
+    ss << "(Available options are:";
+    for (map<string, opt_type>::const_iterator it=allowed_options.begin();it!=allowed_options.end();it++) {
+      ss << " " << it->first;
+    }
+    ss << ")" << endl;
     throw CasadiException(ss.str());
   }
   
