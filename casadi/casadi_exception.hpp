@@ -86,10 +86,10 @@ class CasadiException : public std::exception{
 #ifdef CASADI_NDEBUG
 // Release mode
 #define casadi_assert(x)
-#define casadi_assert_message(x,msg...)
-#define casadi_assert_warning(x,msg...)
-#define casadi_warning(msg...)
-#define casadi_error(msg...)
+#define casadi_assert_message(x,msg)
+#define casadi_assert_warning(x,msg)
+#define casadi_warning(msg)
+#define casadi_error(msg)
  
 #else // CASADI_NDEBUG
 // Debug mode
@@ -100,7 +100,7 @@ class CasadiException : public std::exception{
 // String denoting where the assertation is situated
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__)
 
-#define casadi_error(msg...) \
+#define casadi_error(msg) \
  {\
   std::stringstream ss_internal_; \
   ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
@@ -108,7 +108,7 @@ class CasadiException : public std::exception{
  }
 
 // This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
-#define casadi_assert_message(x,msg...) \
+#define casadi_assert_message(x,msg) \
 { \
   bool is_ok; \
   try{ \
@@ -127,13 +127,13 @@ class CasadiException : public std::exception{
 #define casadi_assert(x) casadi_assert_message(x,"Please notify the CasADi developers.")
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x,msg...) \
+#define casadi_assert_warning(x,msg) \
 if((x)==false){ \
   std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;\
 }
 
 // This is for warnings to be issued when casadi is not in release mode
-#define casadi_warning(msg...) \
+#define casadi_warning(msg) \
 std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
 
 #endif // CASADI_NDEBUG

@@ -183,9 +183,6 @@ class meta {
 #define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp; int result = meta<Type>::get_ptr(p,mp); if (!result) return false; m=*mp; return true;}
 %}
 
-%inline %{
-#define NATIVECOULDBE(Type...) if (meta<Type>::isa(p)) return true;
-%}
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
@@ -298,7 +295,6 @@ int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB >
 
 template <>
 bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
-  NATIVECOULDBE(std::pair< TypeA, TypeB >)
   if (meta< std::pair< TypeA, TypeB > >::isa(p)) return true; 
   if(!PySequence_Check(p)) return false;
   if(PySequence_Size(p)!=2) return false;

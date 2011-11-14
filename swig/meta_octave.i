@@ -22,7 +22,7 @@ int meta< std::vector<double> >::as(const octave_value& p, std::vector<double> &
 }
 
 template <> bool meta< std::vector<double> >::couldbe(const octave_value& p) { 
-  NATIVECOULDBE(std::vector<double>)
+  if (meta< std::vector<double> >::isa(p)) return true; 
   if(p.is_real_matrix() && p.is_numeric_type()){
     const Matrix &mat = p.matrix_value();
     return (mat.rows()==1 || mat.cols()==1);
@@ -53,7 +53,7 @@ int meta< std::vector<int> >::as(const octave_value& p, std::vector<int> &m) {
 }
 
 template <> bool meta< std::vector<int> >::couldbe(const octave_value& p) { 
-  NATIVECOULDBE(std::vector<int>)
+  if (meta< std::vector<int> >::isa(p)) return true; 
   if(p.is_real_matrix() && p.is_numeric_type()) {
     const Matrix &mat = p.matrix_value();
     return (mat.rows()==1 || mat.cols()==1);
