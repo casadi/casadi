@@ -197,29 +197,22 @@ if (user_work_){
     info_ = 0;
     dgstrf(&options_, &AC, relax, panel_size, getPtr(etree_), work_, lwork_, getPtr(perm_c_), getPtr(perm_r_), &L_, &U_, &stat_, &info_);
 
+    casadi_assert_message(info_>=0,"SuperLU: The " << (-info_) << "-th argument had an illegal value");
+    
     if(info_<0){
-      stringstream ss;
-      ss << "SuperLU: The " << (-info_) << "-th argument had an illegal value" << endl;
-      throw CasadiException(ss.str());
+      casadi_error("SuperLU: The " << (-info_) << "-th argument had an illegal value");
     } else if(info_>0){
-      if(info_<=A_.ncol){
-        stringstream ss;
-        ss << "SuperLU: U(" << info_ << "," << info_ << ") is exactly zero. "
+      casadi_assert_message(info_>A_.ncol,
+        "SuperLU: U(" << info_ << "," << info_ << ") is exactly zero. "
         "The factorization has been completed, but the factor U is exactly singular, "
-        "and division by zero will occur if it is used to solve a system of equations.";
-        throw CasadiException(ss.str());
-      } else {
-        if (user_work_){
-          // Allocate more memory and repeat
-          cout << "Allocating more memory" << endl;
-          lwork_ *= 2;
-          work_ = realloc(work_,lwork_);
-        } else { // user_work_
-          stringstream ss;
-          ss << "SuperLU: Allocation failed after " << (info_-A_.ncol) << " bytes allocated";
-          throw CasadiException(ss.str());
-        } // user_work_    
-      }
+        "and division by zero will occur if it is used to solve a system of equations."
+      );
+      casadi_assert_message(!user_work_,"SuperLU: Allocation failed after " << (info_-A_.ncol) << " bytes allocated"      );
+      
+      // Allocate more memory and repeat
+      cout << "Allocating more memory" << endl;
+      lwork_ *= 2;
+      work_ = realloc(work_,lwork_);
     }
   } while(info_!=0);
   

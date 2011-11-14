@@ -107,15 +107,11 @@ const std::string& SXNode::getName() const{
 }
 
 const SX& SXNode::dep(int i) const{
-  stringstream ss;
-  ss << "child() not defined for class " << typeid(*this).name() << std::endl;
-  throw CasadiException(ss.str());
+  casadi_error("child() not defined for class " << typeid(*this).name());
 }
 
 SX& SXNode::dep(int i){
-  stringstream ss;
-  ss << "child() not defined for class " << typeid(*this).name() << std::endl;
-  throw CasadiException(ss.str());
+  casadi_error("child() not defined for class " << typeid(*this).name());
 }
 
 bool SXNode::isSmooth() const{

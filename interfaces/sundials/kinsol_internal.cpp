@@ -268,11 +268,8 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
 
   // Solve the nonlinear system of equations
   int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
-  if(!(flag>=KIN_SUCCESS)){
-    stringstream ss;
-    ss << "KINSol flag was " << flag << endl;
-    throw CasadiException(ss.str());
-  }
+  
+  casadi_assert_message(flag>=KIN_SUCCESS,"KINSol flag was " << flag);
 
   // End of function if no sensitivities
   if(nfdir==0 && nadir==0)

@@ -48,12 +48,10 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const 
 
   // Check that inputs are symbolic
   for(int i=0; i<inputv.size(); ++i) {
-    if (!isSymbolicSparse(inputv[i])) {
-      stringstream ss;
-      ss << "SXFunctionInternal::SXFunctionInternal: SXfunction input arguments must be purely symbolic." << endl;
-      ss << "Argument #" << i << " is not symbolic." << endl;
-      throw CasadiException(ss.str());
-    }
+    casadi_assert_message(isSymbolicSparse(inputv[i]), 
+      "SXFunctionInternal::SXFunctionInternal: SXfunction input arguments must be purely symbolic." << endl <<
+      "Argument #" << i << " is not symbolic." << endl
+    );
   }
   
   // Input dimensions
@@ -78,14 +76,11 @@ SXFunctionInternal::~SXFunctionInternal(){
 
 
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
-  if(!free_vars_.empty()){
-    stringstream ss;
-    ss << "Cannot evaluate \"";
+  if (!free_vars_.empty()) {
+    std::stringstream ss;
     repr(ss);
-    ss << "\" since variables " << free_vars_ << " are free";
-    throw CasadiException(ss.str());
+    casadi_error("Cannot evaluate \"" << ss << "\" since variables " << free_vars_ << " are free.");
   }
-  
   // Copy the function arguments to the work vector
   for(int ind=0; ind<getNumInputs(); ++ind){
     const Matrix<double> &arg = input(ind);
@@ -832,9 +827,7 @@ void SXFunctionInternal::init(){
   } else if(getOption("topological_sorting")=="depth-first"){
     breadth_first_search = false;
   } else {
-    stringstream ss;
-    ss << "Unrecongnized topological_sorting: " << getOption("topological_sorting") << endl;
-    throw CasadiException(ss.str());
+    casadi_error("Unrecongnized topological_sorting: " << getOption("topological_sorting"));
   }
   
   // Resort the nodes in a more cache friendly order (Kahn 1962)

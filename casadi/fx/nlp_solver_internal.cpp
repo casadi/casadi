@@ -321,13 +321,12 @@ void NLPSolverInternal::init(){
     if (pn==0 || pm==0)
      continue;
     
-    if ((pn!=pn_ || pm!=pm_) && pn_!=0 && pm_!=0) {
-      stringstream s;
-      s << "One of your supplied functions had a second input argument, which was interpreted as a parameter of shape (" << pn_ << "x" << pm_ << ")." << std::endl;
-      s << "However, another function had a second input argument of shape (" << pn << "x" << pm << ")." << std::endl;
-      s << "This is inconsistent." << std::endl;
-      throw CasadiException(s.str());
-    }
+    casadi_assert_message((pn==pn_ && pm==pm_) || pn_==0 || pm_==0,
+      "One of your supplied functions had a second input argument, which was interpreted as a parameter of shape (" << pn_ << "x" << pm_ << ")." << std::endl <<
+      "However, another function had a second input argument of shape (" << pn << "x" << pm << ")." << std::endl <<
+      "This is inconsistent."
+    );
+
     pn_ = pn;
     pm_ = pm;
   }

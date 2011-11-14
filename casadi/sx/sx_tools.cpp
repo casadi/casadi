@@ -784,13 +784,12 @@ Matrix<SX> mtaylor_recursive(const Matrix<SX>& ex,const Matrix<SX>& x, const Mat
 /// \endcond
 
 Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions) {
-  if (ex.size()!=ex.numel() || x.size()!=x.numel())
-    throw CasadiException("mtaylor: not implemented for sparse matrices");
-  if (x.size()!=order_contributions.size()) {
-      stringstream ss;
-      ss << "mtaylor: number of non-zero elements in x (" <<  x.size() << ") must match size of order_contributions (" << order_contributions.size() << ")";
-      throw CasadiException(ss.str());
-  }
+  casadi_assert_message(ex.size()==ex.numel() && x.size()==x.numel(),"mtaylor: not implemented for sparse matrices");
+
+  casadi_assert_message(x.size()==order_contributions.size(),
+    "mtaylor: number of non-zero elements in x (" <<  x.size() << ") must match size of order_contributions (" << order_contributions.size() << ")"
+  );
+
   return trans(reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()));
 }
 

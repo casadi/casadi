@@ -41,12 +41,9 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
   // Load the dll
   handle_ = 0;
-  handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);    
-  if (!handle_) {
-    stringstream ss;
-    ss << "ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror();
-    throw CasadiException(ss.str());
-  }
+  handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);  
+  casadi_assert_message(handle_,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror())  ;
+
   dlerror(); // reset error
 
   // Initialize and get the number of inputs and outputs

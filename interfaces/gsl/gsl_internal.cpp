@@ -105,24 +105,18 @@ void GslInternal::init(){
   }
   
   // We only allow for 0-D time
-  if (f_.input(DAE_T).numel()!=1) {
-      stringstream ss;
-      ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")";
-      throw CasadiException(ss.str());
-  }
+  casadi_assert_message(f_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")");
   
   // ODE right hand side must be a dense matrix
   casadi_assert_message(f_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
   
   // States and RHS should match 
-  if (f_.output(DAE_RES).size()!=f_.input(DAE_Y).size()) {
-      stringstream ss;
-      ss << "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" << std::endl;
-      ss << "              ODE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << std::endl;
-      ss << "Mismatch between number of non-zeros" << std::endl;
-      throw CasadiException(ss.str());
-  }
-  
+  casadi_assert_message(f_.output(DAE_RES).size()==f_.input(DAE_Y).size(),
+    "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" << std::endl <<
+    "              ODE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << std::endl <<
+    "Mismatch between number of non-zeros"
+  );
+
   IntegratorInternal::init();
   
   jac_f_ = Jacobian(f_,DAE_Y,DAE_RES);
@@ -266,7 +260,7 @@ void GslInternal::gsl_error(const string& module, int flag){
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
   }
   ss << " Consult GSL documentation.";
-  throw CasadiException(ss.str());
+  casadi_error(ss);
 }
   
   

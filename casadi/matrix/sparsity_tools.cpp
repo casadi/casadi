@@ -130,21 +130,19 @@ CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int 
       rowind.at(++z)=cnt;                 
   }
   catch (out_of_range& oor) {
-    stringstream ss;
-    ss << "sp_rowcol: out-of-range error." << endl;
-    ss << "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")" << endl;
-    throw CasadiException(ss.str());
+    casadi_error(
+      "sp_rowcol: out-of-range error." << endl <<
+      "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")"
+    );
   }
   return CRSSparsity(nrow, ncol, col_new, rowind);
 }
 
 CRSSparsity sp_NZ(std::vector<int> row, std::vector<int> col, int nrow, int ncol, bool monotone) {
-  if (row.size()!=col.size()) {
-    stringstream ss;
-    ss << "sp_NZ: row and col vectors must be of same length." << endl;
-    ss << "row is length " << row.size() << " and " << " col has length " << col.size() << endl;
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(row.size()==col.size(),
+    "sp_NZ: row and col vectors must be of same length." << endl <<
+    "row is length " << row.size() << " and " << " col has length " << col.size()
+  );
   if (monotone == false)
     throw CasadiException("sp_NZ: Not implemented for monotone false");
   // the given col is fine, we just need to calculate rowind.
@@ -165,10 +163,10 @@ CRSSparsity sp_NZ(std::vector<int> row, std::vector<int> col, int nrow, int ncol
       rowind.at(++z)=cnt;
   }
   catch (out_of_range& oor) {
-    stringstream ss;
-    ss << "sp_NZ: out-of-range error." << endl;
-    ss << "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")." << endl;
-    throw CasadiException(ss.str());
+    casadi_error(
+      "sp_NZ: out-of-range error." << endl <<
+      "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")."
+    );
   }
   return CRSSparsity(nrow, ncol, col, rowind);
 }
@@ -185,14 +183,12 @@ std::vector<int> getNZDense(const CRSSparsity &sp) {
 }
 
 CRSSparsity reshape(const CRSSparsity& a, int n, int m){
-  casadi_assert_message(a.numel() == n*m, "resize: number of elements must remain the same");
-  if (a.numel() != n*m) {
-    stringstream ss;
-    ss << "reshape: number of elements must remain the same." << endl;
-    ss << "Input argument has shape " << a.size1() << " x " << a.size2() << " =  " << a.numel() << ", while you request a reshape to ";
-    ss << n << " x " << m << " =  " << n*m << endl;
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(a.numel() == n*m,
+     "reshape: number of elements must remain the same." << endl <<
+     "Input argument has shape " << a.size1() << " x " << a.size2() << " =  " << a.numel() << ", while you request a reshape to " <<
+     n << " x " << m << " =  " << n*m
+  );
+
   // our strategy is: (col,rowind) -> (col,row) -> modulus calculus -> (col_new, row_new) -> sp_NZ
   std::vector<int> row = a.getRow();
   const std::vector<int> &col = a.col();

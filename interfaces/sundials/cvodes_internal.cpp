@@ -109,13 +109,11 @@ void CVodesInternal::init(){
   casadi_assert_message(f_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
   
   // States and RHS should match 
-  if (f_.output(DAE_RES).size()!=f_.input(DAE_Y).size()) {
-      stringstream ss;
-      ss << "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" << std::endl;
-      ss << "              ODE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << std::endl;
-      ss << "Mismatch between number of non-zeros" << std::endl;
-      throw CasadiException(ss.str());
-  }
+  casadi_assert_message(f_.output(DAE_RES).size()==f_.input(DAE_Y).size(),
+   "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" <<
+   "              ODE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << 
+   "Mismatch between number of non-zeros"
+  );
   
   IntegratorInternal::init();
   
@@ -755,7 +753,7 @@ void CVodesInternal::cvodes_error(const string& module, int flag){
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
   }
   ss << " Consult Cvodes documentation.";
-  throw CasadiException(ss.str());
+  casadi_error(ss);
 }
   
 void CVodesInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){

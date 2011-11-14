@@ -36,6 +36,8 @@ int main(){
   // Warning
   casadi_warning("This function will fail.");
   
+  casadi_warning("This function will fail as sure as 1+1 ==" << "2");
+  
   // No warning here
   casadi_assert_warning(0==0, "Not here.");
   

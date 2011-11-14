@@ -131,9 +131,7 @@ void FXInternal::repr(ostream &stream) const{
 }
 
 FX FXInternal::hessian(int iind, int oind){
-  stringstream ss;
-  ss << "FXInternal::hessian: hessian not defined for class " << typeid(*this).name();
-  throw CasadiException(ss.str());
+  casadi_error("FXInternal::hessian: hessian not defined for class " << typeid(*this).name());
 }
 
 bool FXInternal::isInit() const{
@@ -141,11 +139,8 @@ bool FXInternal::isInit() const{
 }
 
 FunctionIO& FXInternal::inputStruct(int i){
-  if(i<0 || i>=input_.size()){
-    stringstream ss;
-    ss << "In function " << getOption("name") << ": input " << i << " not in interval [0," << input_.size() << "]"; 
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(i>=0 && i<input_.size(), "In function " << getOption("name") << ": input " << i << " not in interval [0," << input_.size() << "]");
+
   return input_.at(i);
 }
 
@@ -154,11 +149,8 @@ const FunctionIO& FXInternal::inputStruct(int i) const{
 }
   
 FunctionIO& FXInternal::outputStruct(int i){
-  if(i<0 || i>=output_.size()){
-    stringstream ss;
-    ss << "In function " << getOption("name") << ": output " << i << " not in interval [0," << output_.size() << "]"; 
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(i>=0 && i<output_.size(), "In function " << getOption("name") << ": output " << i << " not in interval [0," << output_.size() << "]");
+  
   return output_.at(i);
 }
 
@@ -213,7 +205,7 @@ Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
       ss << "Forward direction " << dir << " is out of range [0," << inputStruct(iind).dataF.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
+    casadi_error(ss);
   }
 }
     
@@ -232,7 +224,7 @@ Matrix<double>& FXInternal::fwdSens(int oind, int dir){
       ss << "Forward direction " << dir << " is out of range [0," << outputStruct(oind).dataF.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
+    casadi_error(ss);
   }
 }
     
@@ -251,7 +243,7 @@ Matrix<double>& FXInternal::adjSeed(int oind, int dir){
       ss << "Adjoint direction " << dir << " is out of range [0," << outputStruct(oind).dataA.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
+    casadi_error(ss);
   }
 }
     
@@ -270,7 +262,7 @@ Matrix<double>& FXInternal::adjSens(int iind, int dir){
       ss << "Adjoint direction " << dir << " is out of range [0," << inputStruct(iind).dataA.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
+    casadi_error(ss);
   }
 }
     
@@ -304,10 +296,7 @@ GenericType FXInternal::getStat(const string & name) const {
 
   // Check if found
   if(it == stats_.end()){
-    stringstream ss;
-    ss << "Statistic: " << name << " has not been set." << endl;
-    ss << "Note: statistcs are only set after an evaluate call" << endl;
-    throw CasadiException(ss.str());
+    casadi_error("Statistic: " << name << " has not been set." << endl <<  "Note: statistcs are only set after an evaluate call");
   }
 
   return GenericType(it->second);
@@ -532,9 +521,7 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSp
   } else if(getOption("ad_mode") == "automatic"){
     use_ad_fwd = input(iind).size() <= output(oind).size();
   } else {
-    stringstream ss;
-    ss << "FXInternal::jac: Unknown ad_mode \"" << getOption("ad_mode") << "\". Possible values are \"forward\", \"reverse\" and \"automatic\".";
-    throw CasadiException(ss.str());
+    casadi_error("FXInternal::jac: Unknown ad_mode \"" << getOption("ad_mode") << "\". Possible values are \"forward\", \"reverse\" and \"automatic\".");
   }
   
   // Get seed matrices by graph coloring

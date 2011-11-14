@@ -49,33 +49,29 @@ void CRSSparsityInternal::sanityCheck(bool complete) const{
     s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
     s << "  rowind.size() = nrow + 1, but got   rowind.size() = " << rowind_.size() << "   and   nrow = "  << nrow_ << std::endl;
     s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-    throw CasadiException(s.str());
+    casadi_error(s);
   }
   if (complete) {
   
     if (rowind_.size()>0) {
       for (int k=1;k<rowind_.size();k++) {
-        if (rowind_[k]<rowind_[k-1]) {
-          throw CasadiException("CRSSparsityInternal:Compressed Row Storage is not sane. rowind must be monotone. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
-        }
+        casadi_assert_message(rowind_[k]>=rowind_[k-1], "CRSSparsityInternal:Compressed Row Storage is not sane. rowind must be monotone. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
       }
       
-      if (rowind_[0]!=0) {
-        throw CasadiException("CRSSparsityInternal:Compressed Row Storage is not sane. First element of rowind must be zero. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
-      }
+      casadi_assert_message(rowind_[0]==0, "CRSSparsityInternal:Compressed Row Storage is not sane. First element of rowind must be zero. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
       if (rowind_[(rowind_.size()-1)]!=col_.size()) {
         std::stringstream s;
         s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
         s << "  rowind[lastElement] = col.size(), but got   rowind[lastElement] = " << rowind_[(rowind_.size()-1)] << "   and   col.size() = "  << col_.size() << std::endl;
         s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-        throw CasadiException(s.str());
+        casadi_error(s);
       }
       if (col_.size()>nrow_*ncol_) {
         std::stringstream s;
         s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
         s << "  col.size() <= nrow * ncol, but got   col.size()  = " << col_.size() << "   and   nrow * ncol = "  << nrow_*ncol_ << std::endl;
         s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-        throw CasadiException(s.str());
+        casadi_error(s);
       }
     }
     for (int k=0;k<col_.size();k++) {
@@ -84,7 +80,7 @@ void CRSSparsityInternal::sanityCheck(bool complete) const{
         s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
         s << "  0 <= col[i] < ncol for each i, but got   col[i] = " << col_[k] << "   and   ncol = "  << ncol_ << std::endl;
         s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-        throw CasadiException(s.str());
+        casadi_error(s);
       }
     }
   
@@ -1836,9 +1832,7 @@ CRSSparsity CRSSparsityInternal::diag(std::vector<int>& mapping) const{
     
     return ret;
   } else {
-    stringstream s;
-    s << "diag: wrong argument shape. Expecting square matrix or vector-like, but got " << dimString() << " instead." <<  std::endl;
-    throw CasadiException(s.str());
+    casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got " << dimString() << " instead.");
   }
 }
 
@@ -2370,8 +2364,8 @@ CRSSparsity CRSSparsityInternal::makeDense(std::vector<int>& mapping) const{
 }
 
 int CRSSparsityInternal::getNZ(int i, int j) const{
-  casadi_assert_message(i<nrow_,"First index out of bounds");
-  casadi_assert_message(j<ncol_,"Second index out of bounds");
+  casadi_assert_message(i<nrow_,"First index (" << i  << ") out of bounds. Attempting to slice [" << i << "," << j << " ] out of shape " << dimString() << ".");
+  casadi_assert_message(j<ncol_,"Second index (" << j  << ") out of bounds.  Attempting to slice [" << i << "," << j << " ] out of shape " << dimString() << ".");
   
   if (i<0) i += nrow_;
   if (j<0) j += ncol_;
@@ -2397,7 +2391,7 @@ int CRSSparsityInternal::getNZ(int i, int j) const{
 }
 
 CRSSparsity CRSSparsityInternal::reshape(int n, int m) const{
-  casadi_assert_message(numel() == n*m, "reshape: number of elements must remain the same");
+  casadi_assert_message(numel() == n*m, "reshape: number of elements must remain the same. Old shape is " << dimString() << ". New shape is " << n << "x" << m << "=" << n*m << ".");
   CRSSparsity ret(n,m);
   ret.reserve(size(), n);
   for(int i=0; i<nrow_; ++i){

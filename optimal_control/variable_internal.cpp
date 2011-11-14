@@ -91,10 +91,7 @@ SX VariableInternal::atTime(double t, bool allocate){
       // Return the expression
       return tvar;
     } else {
-      stringstream ss;
-      repr(ss);
-      ss << " has no timed variable with t = " << t << ".";
-      throw CasadiException(ss.str());
+      casadi_error(" has no timed variable with t = " << t << ".");
     }
     
   } else {

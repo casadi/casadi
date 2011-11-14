@@ -788,12 +788,9 @@ void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
       data().at(kk[k]) = m.data()[0];
     return;
   }
-  if (kk.size()!=m.size()) {
-    std::stringstream ss;
-    ss << "Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl;
-    ss << "must match size of rhs (" << m.size() << ")." << std::endl;
-    throw CasadiException(ss.str());
-  }
+  
+  casadi_assert_message(kk.size()==m.size(),"Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl << "must match size of rhs (" << m.size() << ").");
+  
   for(int k=0; k<kk.size(); ++k)
     data().at(kk[k]) = m.data()[k];
 }
@@ -807,12 +804,8 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
       data().at(kk.at(k)) = m.data()[0];
     return;
   }
-  if (!(kk.sparsity()==m.sparsity())) {
-    std::stringstream ss;
-    ss << "Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl;
-    ss << "must match sparsity of rhs " << m.dimString() << "." << std::endl;
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
+  
   for(int k=0; k<kk.size(); ++k)
     data().at(kk.at(k)) = m.data()[k];
 }
@@ -1109,13 +1102,11 @@ Matrix<T>::Matrix(const std::vector< std::vector<T> >& d){
     if (m==-1) {
       m = d[i].size();
     } else {
-      if (m!=d[i].size()) {
-        std::stringstream s;
-		    s << "Matrix<T>::Matrix(const std::vector< std::vector<T> >& d): shape mismatch" << std::endl;
-		    s << "Attempting to construct a matrix from a nested list." << std::endl;
-		    s << "I got convinced that the desired size is ("<< n << " x " << m << " ), but now I encounter a vector of size (" << d[i].size() <<  " )" << std::endl;
-		    throw CasadiException(s.str());
-      }
+      casadi_assert_message(m==d[i].size(), 
+        "Matrix<T>::Matrix(const std::vector< std::vector<T> >& d): shape mismatch" << std::endl <<
+        "Attempting to construct a matrix from a nested list." << std::endl <<
+        "I got convinced that the desired size is ("<< n << " x " << m << " ), but now I encounter a vector of size (" << d[i].size() <<  " )" << std::endl
+      );
     }
   }
   sparsity_ = CRSSparsity(n,m,true);
@@ -1269,12 +1260,10 @@ void Matrix<T>::matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>&
 
 template<class T>
 void Matrix<T>::matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
-if(x.size1() != y.size1() || x.size2() != y.size2()) {
-  std::stringstream s;
-  s << "matrix_matrix: dimension mismatch." << std::endl;
-  s << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString() << std::endl;
-  throw CasadiException(s.str());
-}
+  casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(),
+    "matrix_matrix: dimension mismatch." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString()
+  ); 
+  
   // Make a deep copy if *this and x or y is the same object
   if(this == &x)
     *this = x;
@@ -1492,18 +1481,10 @@ template<class T>
 void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
   const std::vector<T> &v = data();
   if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
-    if (len!=size()) {
-			std::stringstream s;
-		  s << "Matrix<T>::setArray: number of non-zero elements is expected to be " << size() << ", but got " << len << " instead.";
-      throw CasadiException(s.str());
-    }
+    casadi_assert_message(len==size(),"Matrix<T>::setArray: number of non-zero elements is expected to be " << size() << ", but got " << len << " instead.");
     copy(v.begin(),v.end(),val);
   } else if(sp==DENSE){
-    if (len!=numel()) {
-			std::stringstream s;
-		  s << "Matrix<T>::setArray: number of elements is expected to be " << numel() << ", but got " << len << " instead.";
-      throw CasadiException(s.str());
-    }
+    casadi_assert_message(len==numel(),"Matrix<T>::setArray: number of elements is expected to be " << numel() << ", but got " << len << " instead.");
     int k=0; // index of the result
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
@@ -1529,7 +1510,7 @@ void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
       }
     }
   } else {
-    throw CasadiException("Matrix<T>::getArray: not SPARSE or DENSE");
+    casadi_error("Matrix<T>::getArray: not SPARSE or DENSE");
   }
 }
 
@@ -1564,18 +1545,10 @@ template<class T>
 void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
   std::vector<T> &v = data();
   if(sp==SPARSE || (sp==DENSE && numel()==size())){
-    if (len!=size()) {
-			std::stringstream s;
-		  s << "Matrix<T>::setArray: number of non-zero elements is expected to be " << size() << ", but got " << len << " instead.";
-      throw CasadiException(s.str());
-    }
+    casadi_assert_message(len==size(),"Matrix<T>::setArray: number of non-zero elements is expected to be " << size() << ", but got " << len << " instead."); 
     copy(val,val+len,v.begin());
   } else if(sp==DENSE){
-    if (len!=numel()) {
-			std::stringstream s;
-		  s << "Matrix<T>::setArray: number of elements is expected to be " << numel() << ", but got " << len << " instead.";
-      throw CasadiException(s.str());
-    }
+    casadi_assert_message(len==numel(),"Matrix<T>::setArray: number of elements is expected to be " << numel() << ", but got " << len << " instead."); 
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
         // column
@@ -1774,12 +1747,13 @@ std::string Matrix<T>::dimString() const {
 template<class T>
 void Matrix<T>::sanityCheck(bool complete) const {
   sparsity_.sanityCheck(complete);
+  
   if (data_.size()!=sparsity_.col().size()) {
       std::stringstream s;
       s << "Matrix:Compressed Row Storage is not sane. The following must hold:" << std::endl;
       s << "  data.size() = ncol, but got   col.size()  = " << data_.size() << "   and   ncol = "  << sparsity_.col().size() << std::endl;
       s << "  Note that the signature is as follows: DMatrix (nrow, ncol, col, rowind, data)." << std::endl;
-      throw CasadiException(s.str());
+      casadi_error(s);
   }
 }
 
@@ -1797,12 +1771,11 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
     
   } else {
     // Matrix multiplication
-    if (x.size2() != y.size1()) {
-      std::stringstream ss;
-      ss << "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl;
-      ss << "with (" << y.size1() << " x " << y.size2() << ") matrix." << std::endl;
-      throw CasadiException(ss.str());
-    }
+    
+    casadi_assert_message(x.size2() == y.size1(),
+      "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl <<
+      "with (" << y.size1() << " x " << y.size2() << ") matrix."
+    );
 
     // Form the transpose of y
     Matrix<T> y_trans = y.trans();

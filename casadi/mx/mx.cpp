@@ -180,11 +180,7 @@ void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
 
 MX MX::getNZ(int k) const{
   if (k<0) k+=size();
-  if (k>=size()) {
-    stringstream ss;
-    ss << "MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(k<size(),"MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
   return getNZ(vector<int>(1,k));
 }
 
@@ -193,11 +189,7 @@ MX MX::getNZ(const vector<int>& k) const{
   MX ret;
   
   for (int i=0;i<k.size();i++) {
-    if (k[i] >= size() ) {
-      std::stringstream ss;
-      ss << "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size() << std::endl;
-      throw CasadiException(ss.str());
-    }
+    casadi_assert_message(k[i] < size(),"Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   
   ret.assignNode(new Mapping(sp));
@@ -208,30 +200,21 @@ MX MX::getNZ(const vector<int>& k) const{
 
 void MX::setNZ(int k, const MX& el){
   if (k<0) k+=size();
-  if (k>=size()) {
-    stringstream ss;
-    ss << "MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".";
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(k<size(),"MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
   setNZ(vector<int>(1,k),el);
 }
 
 void MX::setNZ(const vector<int>& k, const MX& el){
-  if (k.size()!=el.size() && el.size()!=1) {
-    std::stringstream ss;
-    ss << "MX::setNZ: length of non-zero indices (" << k.size() << ") " << std::endl;
-    ss << "must match size of rhs (" << el.size() << ")." << std::endl;
-    throw CasadiException(ss.str());
-  }
+  casadi_assert_message(k.size()==el.size() || el.size()==1,
+    "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
+    "must match size of rhs (" << el.size() << ")."
+  );
+
   MX ret;
   
   
   for (int i=0;i<k.size();i++) {
-    if (k[i] >= size() ) {
-      std::stringstream ss;
-      ss << "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size() << std::endl;
-      throw CasadiException(ss.str());
-    }
+    casadi_assert_message(k[i] < size(), "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   ret.assignNode(new Mapping(sparsity()));
   ret->addDependency(*this,range(size()));

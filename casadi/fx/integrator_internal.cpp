@@ -168,11 +168,7 @@ void IntegratorInternal::init(){
   }
   
   // We only allow for 0-D time
-  if (f_.input(DAE_T).numel()!=1) {
-      stringstream ss;
-      ss << "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")";
-      throw CasadiException(ss.str());
-  }
+  casadi_assert_message(f_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")");
   
   // Get the linear solver creator function
   if(linsol_.isNull() && hasSetOption("linear_solver_creator")){

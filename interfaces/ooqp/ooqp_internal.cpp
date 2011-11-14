@@ -356,7 +356,7 @@ void OOQPInternal::ooqp_error(const string& module, int flag){
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
   }
   ss << " Consult OOQP documentation.";
-  throw CasadiException(ss.str());
+  casadi_error(ss);
 }
 
 } // namespace Interfaces

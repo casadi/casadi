@@ -410,9 +410,7 @@ Variable& FlatOCPInternal::readVariable(const XMLNode& node){
 SX FlatOCPInternal::readExpr(const XMLNode& node){
   const string& fullname = node.getName();
   if (fullname.find("exp:")== string::npos) {
-    stringstream ss;
-    ss << "FlatOCPInternal::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname;
-    throw CasadiException(ss.str());
+    casadi_error("FlatOCPInternal::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname);
   }
   
   // Chop the 'exp:'
@@ -918,9 +916,7 @@ void FlatOCPInternal::makeExplicit(){
         // ... and the variables accordingly
         xa_.insert(xa_.end(),xab.begin(),xab.end());
       } else { // The block contains differential states
-        stringstream ss;
-        ss << "Cannot find an explicit expression for variable(s) " << xdb;
-        throw CasadiException(ss.str());
+        casadi_error("Cannot find an explicit expression for variable(s) " << xdb);
       }
     } else { // The variables that we wish to determine enter linearly
       
@@ -1063,9 +1059,7 @@ Variable& FlatOCPInternal::variable(const std::string& name){
   // Find the variable
   map<string,Variable>::iterator it = varmap_.find(name);
   if(it==varmap_.end()){
-    stringstream ss;
-    ss << "No such variable: \"" << name << "\".";
-    throw CasadiException(ss.str());
+    casadi_error("No such variable: \"" << name << "\".");
   }
   
   // Return the variable

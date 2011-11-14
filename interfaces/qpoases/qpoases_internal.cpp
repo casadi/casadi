@@ -192,7 +192,7 @@ void QPOasesInternal::qpoases_error(const string& module, int flag){
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
   }
   ss << " Consult qpOASES documentation.";
-  throw CasadiException(ss.str());
+  casadi_error(ss);
 }
 
 } // namespace Interfaces

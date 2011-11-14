@@ -42,7 +42,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
       ss << " " << it->first;
     }
     ss << ")" << endl;
-    throw CasadiException(ss.str());
+    casadi_error(ss);
   }
 
   // Save the option
@@ -66,7 +66,7 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
       ss << " " << it->first;
     }
     ss << ")" << endl;
-    throw CasadiException(ss.str());
+    casadi_error(ss);
   }
   
   // Return the option

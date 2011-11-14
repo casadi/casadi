@@ -47,15 +47,9 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
 
   for(int i=0; i<inputv_.size(); ++i) {
     if (inputv_[i].isNull()) {
-      stringstream ss;
-      ss << "MXFunctionInternal::MXFunctionInternal: MXfunction input arguments cannot be null." << endl;
-      ss << "Argument #" << i << " is null." << endl;
-      throw CasadiException(ss.str());
+      casadi_error("MXFunctionInternal::MXFunctionInternal: MXfunction input arguments cannot be null." << endl << "Argument #" << i << " is null.");
     } else if (!inputv_[i]->isSymbolic()) {
-      stringstream ss;
-      ss << "MXFunctionInternal::MXFunctionInternal: MXfunction input arguments must be purely symbolic." << endl;
-      ss << "Argument #" << i << " is not symbolic." << endl;
-      throw CasadiException(ss.str());
+      casadi_error("MXFunctionInternal::MXFunctionInternal: MXfunction input arguments must be purely symbolic." << endl << "Argument #" << i << " is not symbolic.");
     }
   }
   
@@ -114,9 +108,7 @@ void MXFunctionInternal::init(){
   } else if(getOption("topological_sorting")=="depth-first"){
     breadth_first_search = false;
   } else {
-    stringstream ss;
-    ss << "Unrecongnized topological_sorting: " << getOption("topological_sorting") << endl;
-    throw CasadiException(ss.str());
+    casadi_error("Unrecongnized topological_sorting: " << getOption("topological_sorting"));
   }
 
   // Resort the nodes in a more cache friendly order (Kahn 1962)
