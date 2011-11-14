@@ -45,8 +45,14 @@ Multiplication* Multiplication::clone() const{
   return new Multiplication(*this);
 }
 
-void Multiplication::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "prod(" << args.at(0) << "," << args.at(1) << ")";
+void Multiplication::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "prod(";
+  } else if(part==1){
+    stream << ",";
+  } else {
+    stream << ")";
+  }
 }
 
 void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){

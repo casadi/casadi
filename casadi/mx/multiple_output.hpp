@@ -81,8 +81,8 @@ class OutputNode : public MXNode{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return true;} 

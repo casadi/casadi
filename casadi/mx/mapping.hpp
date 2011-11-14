@@ -55,8 +55,8 @@ class Mapping : public MXNode{
     /// Propagate sparsity
     virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
 
-    /// Print
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /// Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
     
     /// Is a mapping matrix
     virtual bool isMapping() const{return true;}

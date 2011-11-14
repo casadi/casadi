@@ -53,8 +53,14 @@ Evaluation* Evaluation::clone() const{
   return new Evaluation(*this);
 }
 
-void Evaluation::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << fcn_ << ".call(" << args << ")";
+void Evaluation::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << fcn_ << ".call([";
+  } else if(part==ndep()){
+    stream << "])";
+  } else {
+    stream << ",";
+  }
 }
 
 void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){

@@ -87,11 +87,14 @@ class MXNode : public SharedObjectNode{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
     
     /** \brief  Print expression */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const=0;
-    
-    /** \brief  Print expression */
     virtual void print(std::ostream &stream) const;
+    
+    /** \brief  Print expression (make sure number of calls is not exceeded) */
+    virtual void print(std::ostream &stream, long& remaining_calls) const;
 
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const = 0;
+    
     /** \brief  Evaluate the function */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, 
                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 

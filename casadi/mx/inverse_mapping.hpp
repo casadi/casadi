@@ -62,8 +62,8 @@ class InverseMapping : public MultipleOutput{
     /** \brief  Get the sparsity of output oind */
     virtual const CRSSparsity& sparsity(int oind);
 
-    /// Print
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /// Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
     /// Sparsity of the outputs
     std::vector<CRSSparsity> sp_;

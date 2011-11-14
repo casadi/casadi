@@ -61,10 +61,17 @@ MX OutputNode::jac(int iind){
   return MX::create(new JacobianReference(MX::create(this),iind));
 }
 
-void OutputNode::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << args[0] << "{" << oind_ <<  "}";
+void OutputNode::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    if(ndep()>1)
+      stream << "[";
+  } else if(part==ndep()){
+    if(ndep()>1)
+      stream << "]";
+    stream << "{" << oind_ << "}";
+  } else {
+    stream << ",";
+  }
 }
-
-
 
 } // namespace CasADi

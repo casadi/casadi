@@ -71,8 +71,8 @@ class Norm2 : public Norm{
     /** \brief  Clone function */
     virtual Norm2* clone() const;
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 };
 
 /** \brief Represents a Frobenius norm
@@ -91,8 +91,8 @@ class NormF : public Norm{
     /** \brief  Clone function */
     virtual NormF* clone() const;
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 };
 
 /** \brief 1-norm
@@ -102,17 +102,17 @@ class NormF : public Norm{
 class Norm1 : public Norm{
   public:
 
-  /** \brief  Constructor */
-  Norm1(const MX& x);
+    /** \brief  Constructor */
+    Norm1(const MX& x);
 
-  /** \brief  Destructor */
-  virtual ~Norm1(){}
+    /** \brief  Destructor */
+    virtual ~Norm1(){}
 
-  /** \brief  Clone function */
-  virtual Norm1* clone() const;
+    /** \brief  Clone function */
+    virtual Norm1* clone() const;
 
-  /** \brief  Print */
-  virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
 };
 
@@ -132,8 +132,8 @@ class NormInf : public Norm{
     /** \brief  Clone function */
     virtual NormInf* clone() const;
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
 };
 

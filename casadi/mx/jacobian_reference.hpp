@@ -56,8 +56,8 @@ class JacobianReference : public MXNode{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
 
-    /// Print
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief  Check if jacobian reference */
     virtual bool isJacobian() const{return true;}

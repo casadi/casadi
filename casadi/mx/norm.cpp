@@ -58,8 +58,12 @@ Norm2* Norm2::clone() const{
   return new Norm2(*this);
 }
 
-void Norm2::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "||" << args.at(0) << "||_2"; 
+void Norm2::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "||";
+  } else {
+    stream << "||_2";
+  }
 }
 
 NormF::NormF(const MX& x) : Norm(x){
@@ -69,8 +73,12 @@ NormF* NormF::clone() const{
   return new NormF(*this);
 }
 
-void NormF::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "||" << args.at(0) << "||_F"; 
+void NormF::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "||";
+  } else {
+    stream << "||_F";
+  }
 }
 
 Norm1::Norm1(const MX& x) : Norm(x){
@@ -80,8 +88,12 @@ Norm1* Norm1::clone() const{
   return new Norm1(*this);
 }
 
-void Norm1::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "||" << args.at(0) << "||_1"; 
+void Norm1::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "||";
+  } else {
+    stream << "||_1";
+  }
 }
 
 NormInf::NormInf(const MX& x) : Norm(x){
@@ -91,8 +103,12 @@ NormInf* NormInf::clone() const{
   return new NormInf(*this);
 }
 
-void NormInf::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "||" << args.at(0) << "||_inf"; 
+void NormInf::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "||";
+  } else {
+    stream << "||_inf";
+  }
 }
 
 } // namespace CasADi

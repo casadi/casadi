@@ -34,7 +34,7 @@ namespace CasADi{
 CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
-  addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme (radau or legendre)");
+  addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme (\"radau\" or \"legendre\")");
   addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
   addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");
@@ -434,7 +434,42 @@ void CollocationIntegratorInternal::init(){
     // Initialize the startup integrator
     startup_integrator_.init();
   }
+
+  #if 0
+
+  // Create a function that maps X0 and P to X at all times
+  MX X0("X0",nx_);
   
+  // Split the differential and quadrature states
+  if(nq_>0){
+    Y0 = X0[range(ny_)];
+    Q0 = X0[range(ny_,nx_)];
+  } else {
+    Y0 = X0;
+    Q0 = MX();
+  }
+  
+  // Solve the implicit system of equations
+  vector<MX> implicit_solver_in(2);
+  implicit_solver_in[0] = Y0;
+  implicit_solver_in[1] = P;
+  vector<MX> implicit_solver_out = implicit_solver.call(implicit_solver_in);
+  MX Y_all = implicit_solver_out[0];
+ 
+  // Solve the quadrature equations
+  MX Q_all;
+  if(nq_>0){
+    // Evaluate the quadrature right hand side
+    
+    
+    vector<MX> quadrature_solver_in(2);
+    quadrature_solver_in[0] = qfcn_lhs_jac.output();
+    quadrature_solver_in[1] = 
+    quadrature_solver_.call
+  }
+
+  #endif
+
   // Mark the system not yet integrated
   integrated_once_ = false;
 }

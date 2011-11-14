@@ -78,23 +78,36 @@ bool Mapping::isReady() const{
   return true;
 }
     
-
-void Mapping::print(std::ostream &stream, const std::vector<std::string>& args) const{
+void Mapping::printPart(std::ostream &stream, int part) const{
   casadi_assert(isReady());
   const std::vector<int>& nzind_ = nzmap_.data();
-  
+
   if(numel()==1 && size()==1 && ndep()==1){
-    stream << args[0];
-    if(dep(0).numel()>1) stream << "[" << nzind_.at(0) << "]";
+    if(part==1)
+      if(dep(0).numel()>1)
+        stream << "[" << nzind_.at(0) << "]";
   }
-  else{
-    stream << "mapping(" << size1() << "-by-" << size2() << " matrix, nonzeros: [";
-    for(int i=0; i<nzind_.size(); ++i){
-      if(i!=0) stream << ",";
-      stream << args[depind_[i]];
-      if(dep(depind_[i]).numel()>1) stream << "[" << nzind_[i] << "]";
+  else {
+    if(part==0){
+      stream << "mapping(";
+      if(sparsity().dense())            stream << "dense";
+      else if(sparsity().diagonal())    stream << "diagonal";
+      else                              stream << "sparse";
+      stream << " " << size1() << "-by-" << size2() << " matrix, dependencies: [";
+    } else if(part==ndep()){
+      stream << "], nonzeros: [";
+      for(int k=0; k<nzind_.size(); ++k){
+        if(k!=0) stream << ",";
+        if(ndep()>1){
+          stream << nzind_[k] << "(" << depind_[k] << ")";
+        } else {
+          stream << nzind_[k];
+        }
+      }
+      stream << "])";
+    } else {
+      stream << ",";
     }
-    stream << "])";
   }
 }
 

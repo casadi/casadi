@@ -50,8 +50,14 @@ SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryO
   setSparsity(sp);
 }
 
-void BinaryOp::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  casadi_math<double>::print(op_,stream,args.at(0),args.at(1));
+void BinaryOp::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    casadi_math<double>::printPre(op_,stream);
+  } else if(part==1){
+    casadi_math<double>::printSep(op_,stream);
+  } else {
+    casadi_math<double>::printPost(op_,stream);
+  }
 }
 
 void SparseSparseOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){

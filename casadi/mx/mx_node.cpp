@@ -131,17 +131,32 @@ const CRSSparsity& MXNode::sparsity(int oind){
 }
 
 void MXNode::print(std::ostream &stream) const{
-  vector<string> args(ndep());
-  for(int i=0; i<ndep(); ++i){
-    stringstream ss;
-    if (dep(i).isNull()) {
-      args[i] = "MX()";
-      continue;
-    } 
-    dep(i)->print(ss);
-    args[i] = ss.str();
+  long remaining_calls = MX::max_num_calls_in_print;
+  print(stream,remaining_calls);
+}
+
+void MXNode::print(std::ostream &stream, long& remaining_calls) const{
+  if(remaining_calls>0){
+    remaining_calls--;
+    printPart(stream,0);
+    for(int i=0; i<ndep(); ++i){
+      if (dep(i).isNull()) {
+        stream << "MX()";
+      } else {
+        dep(i)->print(stream,remaining_calls);
+      }
+      printPart(stream,i+1);
+    }
+  } else {
+    stream << "...";
   }
-  print(stream,args);
+}
+
+void MXNode::printPart(std::ostream &stream, int part) const{
+  casadi_assert(ndep()>1);
+  casadi_assert(part>0);
+  casadi_assert(part<ndep());
+  stream << ",";
 }
 
 FX& MXNode::getFunction(){

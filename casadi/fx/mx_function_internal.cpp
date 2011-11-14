@@ -507,18 +507,16 @@ void MXFunctionInternal::print(ostream &stream) const{
   FXInternal::print(stream);
   for(int i=0; i<alg.size(); ++i){
     stream << "i_" << i<< " =  ";
-    vector<string> chname(alg[i].i_arg.size());
-    for(int j=0; j<chname.size(); ++j){
+    alg[i].mx->printPart(stream,0);
+    for(int j=0; j<alg[i].mx->ndep(); ++j){
       if(alg[i].i_arg[j]>=0){
-        stringstream ss;
-        ss << "i_" << alg[i].i_arg[j];
-        chname[j] = ss.str();
+        stream << "i_" << alg[i].i_arg[j];
       } else {
-        chname[j] = "[]";
+        stream << "[]";
       }
+      alg[i].mx->printPart(stream,j+1);
+      stream << endl;
     }
-    alg[i].mx->print(stream, chname);
-    stream << endl;
   }
 }
 

@@ -655,6 +655,8 @@ void MX::append(const MX& y){
   *this = vertcat(*this,y);
 }
 
+long MX::max_num_calls_in_print = 10000;
+
 } // namespace CasADi
 
 // GLobal namespace

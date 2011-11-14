@@ -68,8 +68,23 @@ void InverseMapping::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& ou
   casadi_assert_message(0,"not implemented");
 }
 
-void InverseMapping::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "inverse_mapping";
+void InverseMapping::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "inverse_mapping(" << size1() << "-by-" << size2() << " matrix, dependencies: [";
+  } else if(part==ndep()){
+    stream << "], nonzeros: [";
+    for(int k=0; k<nzind_.size(); ++k){
+      if(k!=0) stream << ",";
+      if(ndep()>1){
+        stream << nzind_[k] << "(" << depind_[k] << ")";
+      } else {
+        stream << nzind_[k];
+      }
+    }
+    stream << "])";
+  } else {
+    stream << ",";
+  }
 }
 
 void InverseMapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){

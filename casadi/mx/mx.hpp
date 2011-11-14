@@ -321,7 +321,9 @@ class MX : public SharedObject{
   */
   const Matrix<int>& mapping();
 
-  
+  // Maximum number of calls
+  static long max_num_calls_in_print;
+
 };
 
 //@{

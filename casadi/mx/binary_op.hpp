@@ -38,8 +38,8 @@ class BinaryOp : public MXNode{
     /** \brief  Destructor */
     virtual ~BinaryOp()=0;
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
     /// Is it a certain operation
     virtual bool isOperation(int op) const{ return op==op_;};

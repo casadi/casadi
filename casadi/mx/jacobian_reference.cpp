@@ -40,8 +40,10 @@ JacobianReference* JacobianReference::clone() const{
   return new JacobianReference(*this);
 }
 
-void JacobianReference::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << args[0] << ".jac(" << iind_ <<  ")";
+void JacobianReference::printPart(std::ostream &stream, int part) const{
+  if(part==1){
+    stream << ".jac(" << iind_ <<  ")";
+  }
 }
 
 void JacobianReference::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){

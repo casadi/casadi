@@ -44,8 +44,8 @@ class SymbolicMatrix : public MXNode{
     /** \brief  Clone function */
     virtual SymbolicMatrix* clone() const;
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream, const std::vector<std::string>& args) const;
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);

@@ -41,8 +41,16 @@ IfNode* IfNode::clone() const{
   return new IfNode(*this);
 }
 
-void IfNode::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "(" << args.at(0) << "?" <<  args.at(1) << ":" << args.at(2) << ")";
+void IfNode::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "(";
+  } else if(part==1){
+    stream << "?";
+  } else if(part==2){
+    stream << ":";
+  } else {
+    stream << ")";
+  }
 }
 
 void IfNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){

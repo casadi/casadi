@@ -39,8 +39,12 @@ Densification* Densification::clone() const{
   return new Densification(*this);
 }
 
-void Densification::print(std::ostream &stream, const std::vector<std::string>& args) const{
-  stream << "dense(" << args.at(0) << ")";
+void Densification::printPart(std::ostream &stream, int part) const{
+  if(part==0){
+    stream << "dense(";
+  } else {
+    stream << ")";
+  }
 }
 
 void Densification::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
