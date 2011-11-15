@@ -13,6 +13,8 @@
 \usepackage{verbatim}
 
 % \#c4ebff;
+
+\begin{htmlonly}
 \newcommand{\codebegin}{
 \begin{rawhtml}
 <div style="color: black; background-color: \#a9b8cb;  border-style: dotted; border-width: 1px;" >
@@ -23,7 +25,16 @@
 </div>
 \end{rawhtml}
 }
+\end{htmlonly}
 
+%begin{latexonly}
+\newcommand{\codebegin}{
+
+}
+\newcommand{\codeend}{
+
+}
+%end{latexonly}
 
 \author{Joel Andersson, Attila Kozma}
 \title{CasADi C++ Tutorial }
@@ -91,15 +102,15 @@ First, you have to get CasADi from \htmladdnormallink{here}{http://www.casadi.or
 \begin{verbatim}
 svn co https://casadi.svn.sourceforge.net/svnroot/casadi/trunk casadi
 \end{verbatim}
-\codeend\\
-Set the \texttt{CMAKE_PREFIX_PATH} to inform CMake where the dependecies are. 
+\codeend
+Set the \texttt{CMAKE\_PREFIX\_PATH} to inform CMake where the dependecies are. 
 For example if Sundials headers and libraries are installed under \texttt{\$HOME/local/}, then type
 \par
 \codebegin{
 \begin{verbatim}
 export CMAKE_PREFIX_PATH=$HOME/local/
 \end{verbatim}
-\codeend\\
+\codeend
 \par
 Go to directory of the source tree, create a directory called \texttt{build} where all compilation-related files will be created.
 \par
@@ -107,14 +118,14 @@ Go to directory of the source tree, create a directory called \texttt{build} whe
 \begin{verbatim}
 cd casadi; mkdir build; cd build
 \end{verbatim}
-\codeend\\
+\codeend
 Generate the \texttt{Makefile} by typing
 \par
 \codebegin
 \begin{verbatim}
 cmake ..
 \end{verbatim}
-\codeend\\
+\codeend
 Check the output of CMake if the dependencies are correctly located. The interfaces without underlying libraries and headers won't be compiled.
 Now compile the C++ libraries.
 \par
@@ -122,14 +133,14 @@ Now compile the C++ libraries.
 \begin{verbatim}
 make
 \end{verbatim}
-\codeend\\
+\codeend
 If you wish to use the python interface you can compile it with the \texttt{python} target.
 \par
 \codebegin
 \begin{verbatim}
 make python
 \end{verbatim}
-\codeend\\
+\codeend
 
 \chapter{Symbolic Core}
 In CasADi a very powerful symbolic abstraction of mathematical functions is implemented.
@@ -157,7 +168,7 @@ the \texttt{\htmladdnormallink{SX}{http://casadi.sourceforge.net/api/html/d2/db3
     12     cout << "expr: " << expr << endl;
     13  }
 \end{verbatim}
-\codeend\\
+\codeend
 And the output is
 \par
 \codebegin
@@ -167,7 +178,7 @@ And the output is
    expr: (((3*x)+(x*x))-sin(x))
    expr: ((((3*x)+(x*x))-sin(x))+((y/2)/x))
 \end{verbatim}
-\codeend\\
+\codeend
 On the 1st line we include the header file containing the \texttt{SX} class, on the 4th the \texttt{x} object
 is created and from here on the string \texttt{"x"} is assigned to this variable. We can also create 
 \texttt{SX} objects by invoking the default constructor (as we do on line 5), although this variable is not initialized to any symbolic
@@ -190,7 +201,7 @@ carried out by the \texttt{make\_symbolic} function. Now we demonstrate how this
      7  cout << "z[4]: " << z[4] << endl;
      8  ...
 \end{verbatim}
-\codeend\\
+\codeend
 After invoking \texttt{make\_symbolic} on the 6th line the elements of \texttt{z} are assigned to \texttt{z\_0, z\_1, $\dots$} and can be used later on in modelling.
 \section{Functions}
 Now that we can build up mathematical expressions we would like to evaluate them symbolically or numerically. We will see how this can be
@@ -218,7 +229,7 @@ First we create and evaluate a simple scalar-scalar function numerically.
      9  f.evaluate();
     10  cout << "Function value in x = " << d << " : " << f.output() << "\n";
 \end{verbatim}
-\codeend\\
+\codeend
 On the 4th line we create the expression that will represent our function. The \texttt{SXFunction}
 object is created on the 5th line with the variable \texttt{x} and the \texttt{f\_expr} object.
 Before passing any input to the function, we have to initialize it on line 6. Then we set the input
@@ -270,7 +281,7 @@ Now we define and evaluate a vector-vector function.
     17  }
     18  cout << "\b)\n";
 \end{verbatim}
-\codeend\\
+\codeend
 This time both arguments of the constructor on line 7 are \texttt{std::vector<SX>}
  and the return value of the
  \texttt{output()} member function is a \texttt{std::vector<double>} (line 13).
@@ -306,7 +317,7 @@ Note that this covers the case when our function depends on a matrix.
     24  }
     25  cout << "\b)\n";
 \end{verbatim}
-\codeend\\
+\codeend
 In variable \texttt{variables} we collect vectors of \texttt{SX} objects. On line 17 and 18 you can notice
 a new argument (which was always 0 until now) that addresses an input vector. In this example on the first coordinate
 we have a 3 long vector, on the second we have a 2 long vector, which correspond to the function definition (line 11).
@@ -334,7 +345,7 @@ integrators are exactly of this type.
     11  cout << f_expr[0] << " --> " << f_expr_subs[0] << endl;
     12  cout << f_expr[1] << " --> " << f_expr_subs[1] << endl;
 \end{verbatim}
-\codeend\\
+\codeend
 First we create a function depending on the vector \texttt{x} (line 1 \-- 7), then we create a vector of \texttt{SX} objects, whose
 size correspond to the function definition and we modify the first element by an arbitrary expression (line 9). As a result we get
 back the function expression in which the substitution has already been committed.
@@ -381,7 +392,7 @@ In the following code we calculate the full Jacobian providing multiple directio
     28     cout << "\b)\n";
     29  }
 \end{verbatim}
-\codeend\\
+\codeend
 The first new thing is on line 7, we set an option called \texttt{number\_of\_fwd\_dir} to the number
 of the forward directions in which we would like to differentiate. On line 16 we are inside a for loop
 and we provide the directions; now only columns of the identity matrix. The way of evaluation is also
@@ -414,7 +425,7 @@ The code is as follows:
     16  cout << "Function value: " << f.output() << endl;
     17  cout << "Adjoint derivative: " << f.adjSens(0, 0) << endl;
 \end{verbatim}
-\codeend\\
+\codeend
 This time we set the option \texttt{number\_of\_adj\_dir} (greater than 1 throws an error) and we invoke \texttt{evaluate(0, 1)}.
 The adjoint derivative we can access by the \texttt{adjSens(...)} method.
 \par
@@ -443,7 +454,7 @@ function symbolically representing the first derivative of the original function
     17  f_der.evaluate();
     18  cout << "Jacobian: " << f_der.output() << "\n"; 
 \end{verbatim}
-\codeend\\
+\codeend
 The code is very self-explanatory, we create a vector-vector function (line 1-9) and invoke the \texttt{jacobian()} method, which
 returns an \texttt{SXFunction} object. This object, since it's a function itself, can be evaluated and differentiated again.
 This way we may calculate higher-order derivatives.
@@ -501,7 +512,7 @@ In the following piece of code we show how easy it is to solve ODEs with quadrat
     36     }
     37     cout << "\b)\n";
 \end{verbatim}
-\codeend\\
+\codeend
 First of all we introduce a time variable (\texttt{t}), a control parameter (\texttt{u}) and three dynamic variables(\texttt{s, v, m}).
 Their data type do not differ, but their use will give them different meaning. We build up our ODE equations (line 2-5) and quadrature formula
 (line 6-8). Then we collect all our variables in a vector of vectors. In case of integrators one must respect the following rules regarding the
@@ -552,7 +563,7 @@ provide sensitivities with respect to the initial value and the parameters used 
     26  vector<double> adjoint_derivative_x = integrator.adjSens(INTEGRATOR_X0);
     27  vector<double> adjoint_derivative_p = integrator.adjSens(INTEGRATOR_P);
 \end{verbatim}
-\codeend\\
+\codeend
 %\end{rawhtml}
 %\par
 Similary as we did in case of plain functions, we have to set the number of directional derivatives (line 2-3). In
