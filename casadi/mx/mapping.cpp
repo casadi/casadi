@@ -82,12 +82,13 @@ void Mapping::printPart(std::ostream &stream, int part) const{
   casadi_assert(isReady());
   const std::vector<int>& nzind_ = nzmap_.data();
 
-  if(numel()==1 && size()==1 && ndep()==1){
+  if(ndep()==0){
+    stream << "zeros(" << size1() << "," << size2() << ")";
+  } else if(numel()==1 && size()==1 && ndep()==1){
     if(part==1)
       if(dep(0).numel()>1)
         stream << "[" << nzind_.at(0) << "]";
-  }
-  else {
+  } else {
     if(part==0){
       stream << "mapping(";
       if(sparsity().dense())            stream << "dense";
