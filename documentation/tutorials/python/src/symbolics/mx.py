@@ -17,7 +17,7 @@ for i in range(2):
 print x[1,1]
 print x[3] # Note that index is flattened. x[0,0] is illegal.
 print norm_2(x)
-z= prod(x,y)
+z= mul(x,y)
 print z
 #! Note how the operations on MXes are lazy on the matrix level.
 #! Any elementwise logic is postponed until evaluation demands it.

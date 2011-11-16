@@ -47,7 +47,7 @@ Multiplication* Multiplication::clone() const{
 
 void Multiplication::printPart(std::ostream &stream, int part) const{
   if(part==0){
-    stream << "prod(";
+    stream << "mul(";
   } else if(part==1){
     stream << ",";
   } else {
@@ -60,42 +60,42 @@ void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, con
   int nadj = adjSeed.size();
 
   fill(output[0]->begin(),output[0]->end(),0);
-  DMatrix::prod_no_alloc(*input[0],*input[1],*output[0]);
+  DMatrix::mul_no_alloc(*input[0],*input[1],*output[0]);
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){
     fill(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),0);
-    DMatrix::prod_no_alloc(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
-    DMatrix::prod_no_alloc(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
+    DMatrix::mul_no_alloc(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
+    DMatrix::mul_no_alloc(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
   }
 
   // Adjoint sensitivities
   for(int d=0; d<nadj; ++d){
-    DMatrix::prod_no_alloc1(*adjSens[d][0],*input[1],*adjSeed[d][0]);
-    DMatrix::prod_no_alloc2(*input[0],*adjSens[d][1],*adjSeed[d][0]);
+    DMatrix::mul_no_alloc1(*adjSens[d][0],*input[1],*adjSeed[d][0]);
+    DMatrix::mul_no_alloc2(*input[0],*adjSens[d][1],*adjSeed[d][0]);
   }
 }
 
 void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   fill(output[0]->begin(),output[0]->end(),0);
-  SXMatrix::prod_no_alloc(*input[0],*input[1],*output[0]);
+  SXMatrix::mul_no_alloc(*input[0],*input[1],*output[0]);
 }
 
 void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   if(!output_given)
-    *output[0] = prod(*input[0],trans(*input[1]));
+    *output[0] = mul(*input[0],trans(*input[1]));
 
   // Forward sensitivities
   int nfwd = fwdSens.size();
   for(int d=0; d<nfwd; ++d){
-    *fwdSens[d][0] = prod(*fwdSeed[d][0],trans(*input[1])) + prod(*input[0],trans(*fwdSeed[d][1]));
+    *fwdSens[d][0] = mul(*fwdSeed[d][0],trans(*input[1])) + mul(*input[0],trans(*fwdSeed[d][1]));
   }
   
   // Adjoint sensitivities
   int nadj = adjSeed.size();
   for(int d=0; d<nadj; ++d){
-    *adjSens[d][0] += prod(*adjSeed[d][0],*input[1]);
-    *adjSens[d][1] += prod(trans(*adjSeed[d][0]),*input[0]);
+    *adjSens[d][0] += mul(*adjSeed[d][0],*input[1]);
+    *adjSens[d][1] += mul(trans(*adjSeed[d][0]),*input[0]);
   }
 }
 

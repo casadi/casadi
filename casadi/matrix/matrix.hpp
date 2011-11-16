@@ -383,16 +383,16 @@ class Matrix : public PrintableObject{
     //@}
     
     /// Matrix product
-    Matrix<T> prod(const Matrix<T> &y) const;
+    Matrix<T> mul(const Matrix<T> &y) const;
 
-    /// Matrix product, no memory allocation: z += prod(x,y)
-    static void prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& r);
+    /// Matrix product, no memory allocation: z += mul(x,y)
+    static void mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& r);
 
-    /// Matrix product, no memory allocation: x += prod(z,trans(y))
-    static void prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z);
+    /// Matrix product, no memory allocation: x += mul(z,trans(y))
+    static void mul_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z);
 
-    /// Matrix product, no memory allocation: y += prod(trans(x),z)
-    static void prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
+    /// Matrix product, no memory allocation: y += mul(trans(x),z)
+    static void mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
     
     /// Matrix transpose
     Matrix<T> trans() const;
@@ -1758,7 +1758,7 @@ void Matrix<T>::sanityCheck(bool complete) const {
 }
 
 template<class T>
-Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::mul(const Matrix<T> &y) const{
   // First factor
   const Matrix<T>& x = *this;
   
@@ -1773,7 +1773,7 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
     // Matrix multiplication
     
     casadi_assert_message(x.size2() == y.size1(),
-      "Matrix<T>::prod: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl <<
+      "Matrix<T>::mul: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl <<
       "with (" << y.size1() << " x " << y.size2() << ") matrix."
     );
 
@@ -1787,14 +1787,14 @@ Matrix<T> Matrix<T>::prod(const Matrix<T> &y) const{
     ret = Matrix<T>(spres, 0);
   
     // Carry out the matrix product
-    prod_no_alloc(x,y_trans,ret);
+    mul_no_alloc(x,y_trans,ret);
   }
   
   return ret;
 }
 
 template<class T>
-void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z){
+void Matrix<T>::mul_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z){
 
   // Direct access to the arrays
   const std::vector<T> &z_data = z.data();
@@ -1830,7 +1830,7 @@ void Matrix<T>::prod_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Mat
 
 
 template<class T>
-void Matrix<T>::prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z){
+void Matrix<T>::mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z){
 
   // Direct access to the arrays
   const std::vector<T> &z_data = z.data();
@@ -1865,7 +1865,7 @@ void Matrix<T>::prod_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Mat
 }
 
 template<class T>
-void Matrix<T>::prod_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
+void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
   // Direct access to the arrays
   std::vector<T> &z_data = z.data();
   const std::vector<int> &z_col = z.col();

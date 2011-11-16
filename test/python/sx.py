@@ -51,7 +51,7 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
     #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: c.dot(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: c.mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
@@ -200,7 +200,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
-      self.assertRaises(RuntimeError, lambda : c.dot(x,y))
+      self.assertRaises(RuntimeError, lambda : c.mul(x,y))
 
   def test_SXMatrixbinarySparse(self):
       self.message("SXMatrix binary operations")
@@ -223,7 +223,7 @@ class SXtests(casadiTestCase):
         y0=DMatrix(3,4,[0,2,3],[0,2,2,3],[1.738,0.7,-6]).toArray()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SXMatrix",setx0=[x0,y0])
-      self.assertRaises(RuntimeError, lambda : c.dot(xx,yy))
+      self.assertRaises(RuntimeError, lambda : c.mul(xx,yy))
 
 
   def test_SXMatrixslicing(self):

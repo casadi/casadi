@@ -920,14 +920,14 @@ void FlatOCPInternal::makeExplicit(){
       }
     } else { // The variables that we wish to determine enter linearly
       
-      // Divide fb into a part which depends on vb and a part which doesn't according to "fb == prod(Jb,vb) + fb_res"
+      // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
       SXMatrix fb_res = substitute(fb,highest(xb),SXMatrix(xb.size(),1,0)).data();
       SXMatrix fb_exp;
       
       // Solve for vb
       if (bs <= 3){
         // Calculate inverse and multiply for very small matrices
-        fb_exp = prod(inv(Jb),-fb_res);
+        fb_exp = mul(inv(Jb),-fb_res);
       } else {
         // QR factorization
         fb_exp = solve(Jb,-fb_res);

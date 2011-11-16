@@ -37,15 +37,11 @@ std::vector<int> range(int start, int stop, int step=1, int len=std::numeric_lim
 
 /// Python's range function, start = 0
 std::vector<int> range(int stop);
-
-/// Matrix product of two matrices - not available in Python since prod in numpy means elementwise multiplication
-template<class T>
-Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y);
 #endif // SWIG
 
-/// Product of two matrices - Python naming
+/// Matrix product of two matrices
 template<class T>
-Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y);
+Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y);
 
 /** \brief  check if the matrix has certain properties */
 template<class T>
@@ -241,7 +237,7 @@ Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b);
 template<class T>
 Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
 
-/// same as: res += prod(A,v)
+/// same as: res += mul(A,v)
 template<typename T>
 void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A=false);
 
@@ -269,13 +265,8 @@ Matrix<T> trans(const Matrix<T> &x){
 }
 
 template<class T>
-Matrix<T> dot(const Matrix<T> &x, const Matrix<T> &y){
-  return prod<T>(x,y);
-}
-
-template<class T>
-Matrix<T> prod(const Matrix<T> &x, const Matrix<T> &y){
-  return x.prod(y);
+Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y){
+  return x.mul(y);
 }
 
 template<class T>
@@ -502,13 +493,13 @@ Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
   casadi_assert_message(x.vector() && y.vector(), "inner_prod: arguments must be vectors");
-  return prod(trans(x),y);
+  return mul(trans(x),y);
 }
 
 template<class T>
 Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
   casadi_assert_message(x.vector() && y.vector(), "outer_prod: arguments must be vectors");
-  return prod(x,trans(y));  
+  return mul(x,trans(y));  
 }
 
 template<class T>
@@ -525,9 +516,9 @@ template<class T>
 Matrix<T> sum(const Matrix<T> &x, int axis) {
   casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
   if (axis==1){
-    return prod(x,Matrix<T>::ones(x.size2(),1));
+    return mul(x,Matrix<T>::ones(x.size2(),1));
   } else {
-    return prod(Matrix<T>::ones(1,x.size1()),x);
+    return mul(Matrix<T>::ones(1,x.size1()),x);
   }
 }
 
@@ -578,7 +569,7 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
       // Get the j-th column of Q
       Matrix<T> qj = QT(j,ALL);
 
-      ri(0,j) = prod(qj,trans(qi))(0,0); // Modified Gram-Schmidt
+      ri(0,j) = mul(qj,trans(qi))(0,0); // Modified Gram-Schmidt
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
      
       // Remove projection in direction j
@@ -634,7 +625,7 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     qr(A,Q,R);
 
     // Solve the factorized system
-    return solve(R,prod(trans(Q),b));
+    return solve(R,mul(trans(Q),b));
   }
 }
 
@@ -892,7 +883,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES(T) \
 MTT_INST(T,trans) \
-MTT_INST(T,dot) \
+MTT_INST(T,mul) \
 MTT_INST(T,isConstant) \
 MTT_INST(T,isDense) \
 MTT_INST(T,isEmpty) \

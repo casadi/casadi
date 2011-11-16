@@ -38,7 +38,7 @@ q = MX(DMatrix(q))
 A = MX(DMatrix(A))
 
 # Objective function
-F = 0.5*prod(prod(trans(X),P),X) + prod(trans(q),X)
+F = 0.5*mul(mul(trans(X),P),X) + mul(trans(q),X)
 
 f = MXFunction([X],[F])
 f.init()

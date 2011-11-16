@@ -157,7 +157,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     DMatrix lambda_x_hat = qp_solver_.output(QP_DUAL_X);
     
     // Get the gradient of the Lagrangian
-    DMatrix gradL = F_.adjSens() - prod(trans(Jgk),lambda_hat) - lambda_x_hat;
+    DMatrix gradL = F_.adjSens() - mul(trans(Jgk),lambda_hat) - lambda_x_hat;
     
     // Pass adjoint seeds to g
     //gfcn.setAdjSeed(lambda_hat);
@@ -170,7 +170,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double feasviol = sum(fabs(gk)).at(0);
 
     // Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
-    double mu_lb = ((inner_prod(gfk,p) + sigma_/2.0*prod(trans(p),prod(Bk,p)))/(1.-rho_)/feasviol).at(0);
+    double mu_lb = ((inner_prod(gfk,p) + sigma_/2.0*mul(trans(p),mul(Bk,p)))/(1.-rho_)/feasviol).at(0);
 
     // Increase mu if it is below the lower bound
     if(mu < mu_lb){
@@ -267,10 +267,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
 
     // Complete the damped BFGS update (Procedure 18.2 in Nocedal)
-    DMatrix gradL_new = gfk - prod(trans(Jgk),lambda_k) - lambda_x_k;
+    DMatrix gradL_new = gfk - mul(trans(Jgk),lambda_k) - lambda_x_k;
     DMatrix yk = gradL_new - gradL;
-    DMatrix Bdx = prod(Bk,dx);
-    DMatrix dxBdx = prod(trans(dx),Bdx);
+    DMatrix Bdx = mul(Bk,dx);
+    DMatrix dxBdx = mul(trans(dx),Bdx);
     DMatrix ydx = inner_prod(dx,yk);
     DMatrix thetak;
     if(ydx.at(0) >= 0.2*dxBdx.at(0)){

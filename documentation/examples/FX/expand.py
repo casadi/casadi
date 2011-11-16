@@ -7,7 +7,7 @@ import casadi as c
 x = MX("x",1,2)
 y = MX("y",2,1)
 
-z = c.prod(x,y)
+z = c.mul(x,y)
 
 #! Let's construct an MXfunction
 f = MXFunction([x,y],[z])

@@ -177,31 +177,31 @@ void Lqr::setupBackwardSweepFunction()
      SXMatrix Q_0 = cost_0_k + V_0_kp1;
 
      // Q_x = cost_x + f_x'*V_x_kp1
-     SXMatrix Q_x = cost_x_k + prod( f_x.trans(), V_x_kp1 );
+     SXMatrix Q_x = cost_x_k + mul( f_x.trans(), V_x_kp1 );
 	
      // Q_u = cost_u + f_u'* V_x_kp1
-     SXMatrix Q_u = cost_u_k + prod( f_u.trans(), V_x_kp1 );
+     SXMatrix Q_u = cost_u_k + mul( f_u.trans(), V_x_kp1 );
 	
      // Q_xx = cost_xx + f_x'*V_xx_kp1*f_x
-     SXMatrix Q_xx = cost_xx_k + prod( f_x.trans(), prod( V_xx_kp1, f_x ) );
+     SXMatrix Q_xx = cost_xx_k + mul( f_x.trans(), mul( V_xx_kp1, f_x ) );
 
      // Q_xu = cost_xu + f_x'*V_xx_kp1*f_u
-     SXMatrix Q_xu = cost_xu_k + prod( f_x.trans(), prod( V_xx_kp1, f_u ) );
+     SXMatrix Q_xu = cost_xu_k + mul( f_x.trans(), mul( V_xx_kp1, f_u ) );
 
      // Q_uu = cost_uu + f_u'*V_xx_kp1*f_u
-     SXMatrix Q_uu = cost_uu_k + prod( f_u.trans(), prod( V_xx_kp1, f_u ) );
+     SXMatrix Q_uu = cost_uu_k + mul( f_u.trans(), mul( V_xx_kp1, f_u ) );
 
 
      /************** optimal control *******************/
      SXMatrix Q_uu_inv = inv( Q_uu );
-     SXMatrix u_feedforward_k = -prod( Q_uu_inv, Q_u );
-     SXMatrix feedbackGain_k  = -prod( Q_uu_inv, Q_xu.trans() );
+     SXMatrix u_feedforward_k = -mul( Q_uu_inv, Q_u );
+     SXMatrix feedbackGain_k  = -mul( Q_uu_inv, Q_xu.trans() );
 
 
      /************** value function propogation ********/
-     SXMatrix V_0_k  = Q_0  - prod( Q_u.trans(), prod( Q_uu_inv, Q_u ) );
-     SXMatrix V_x_k  = Q_x  - prod( Q_xu, prod( Q_uu_inv.trans(), Q_u ) );
-     SXMatrix V_xx_k = Q_xx - prod( Q_xu, prod( Q_uu_inv, Q_xu.trans() ) );
+     SXMatrix V_0_k  = Q_0  - mul( Q_u.trans(), mul( Q_uu_inv, Q_u ) );
+     SXMatrix V_x_k  = Q_x  - mul( Q_xu, mul( Q_uu_inv.trans(), Q_u ) );
+     SXMatrix V_xx_k = Q_xx - mul( Q_xu, mul( Q_uu_inv, Q_xu.trans() ) );
 
 
      /*************** backwardSweepFcn ****************/
@@ -433,7 +433,7 @@ void Lqr::takeForwardStep(int timestep)
      // open loop
      uTrajectory.at(timestep) = uOpenLoop.at(timestep);
      // add feedback
-     uTrajectory.at(timestep) += prod( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
+     uTrajectory.at(timestep) += mul( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
 
      // bound actions
 #define BOUND( var, lb, ub ){			\

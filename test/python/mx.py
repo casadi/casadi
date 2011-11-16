@@ -102,8 +102,8 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
-    #self.matrixbinarypool.append(lambda a: inner_prod(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_prod(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: c.prod(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"prod(Matrix,Matrix.T)")
+    #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
+    self.matrixbinarypool.append(lambda a: c.mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
 
   def test_indirection(self):
     self.message("MXFunction indirection")
@@ -840,14 +840,14 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      
-     z = c.prod(y.T,y)
+     z = c.mul(y.T,y)
      zr = numpy.dot(r.T,r)
      
      f = MXFunction([x],[z])
      f.init()
      f.input().set(xn)
      f.evaluate()
-     self.checkarray(f.output(),zr,"prod(mapping.T,mapping)")
+     self.checkarray(f.output(),zr,"mul(mapping.T,mapping)")
      
      x=MX("X",3,1)
      numpy.random.seed(42)
@@ -861,14 +861,14 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      
-     z = c.prod(y.T,y)
+     z = c.mul(y.T,y)
      zr = numpy.dot(r.T,r)
      
      f = MXFunction([x],[z])
      f.init()
      f.input().set(xn)
      f.evaluate()
-     self.checkarray(f.output(),zr,"prod(mapping.T,mapping)")
+     self.checkarray(f.output(),zr,"mul(mapping.T,mapping)")
      
      J=Jacobian(f)
      for mode in ["forward","adjoint"]:
@@ -876,7 +876,7 @@ class MXtests(casadiTestCase):
        J.init()
        J.input().set(xn)
        J.evaluate()
-       self.checkarray(J.output(),matrix(xn).T*2,"jacobian(prod(mapping.T,mapping))")
+       self.checkarray(J.output(),matrix(xn).T*2,"jacobian(mul(mapping.T,mapping))")
      
      x=MX("X",3,1)
      numpy.random.seed(42)
@@ -890,7 +890,7 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      
-     z = c.prod(y,y.T)
+     z = c.mul(y,y.T)
      zr = numpy.dot(r,r.T)
      
      f = MXFunction([x],[z[1:4,1]])
@@ -907,7 +907,7 @@ class MXtests(casadiTestCase):
        J.input().set(xn)
        J.evaluate()
        print J.output().toArray()
-       self.checkarray(J.output(),J_,"jacobian(prod(mapping.T,mapping))")
+       self.checkarray(J.output(),J_,"jacobian(mul(mapping.T,mapping))")
       
   def test_MXalgebraDense(self):
     self.message("Test some dense algebraic properties of matrices")
@@ -929,9 +929,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX("x",n,1)
     
-    Axb = casadi.prod(A,x)+b
-    Dxe = casadi.prod(D,x)+e
-    a = casadi.prod(casadi.prod(trans(Axb),C),Dxe)
+    Axb = casadi.mul(A,x)+b
+    Dxe = casadi.mul(D,x)+e
+    a = casadi.mul(casadi.mul(trans(Axb),C),Dxe)
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
@@ -996,9 +996,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX("x",n,1)
     
-    Axb = casadi.prod(A,x)+b
-    Dxe = casadi.prod(D,x)+e
-    a = casadi.prod(casadi.prod(trans(Axb),C),Dxe)
+    Axb = casadi.mul(A,x)+b
+    Dxe = casadi.mul(D,x)+e
+    a = casadi.mul(casadi.mul(trans(Axb),C),Dxe)
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
@@ -1068,9 +1068,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX("x",n,1)
     
-    Axb = casadi.prod(A,x)+b
-    Dxe = casadi.prod(D,x)+e
-    a = casadi.prod(casadi.prod(trans(Axb),C),Dxe)
+    Axb = casadi.mul(A,x)+b
+    Dxe = casadi.mul(D,x)+e
+    a = casadi.mul(casadi.mul(trans(Axb),C),Dxe)
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
@@ -1310,30 +1310,30 @@ class MXtests(casadiTestCase):
     def eye(n):
       return DMatrix(numpy.eye(n))
     
-    Axb = c.prod(A,x)-b
-    ab = c.prod(a,b.T)
+    Axb = c.mul(A,x)-b
+    ab = c.mul(a,b.T)
     tests = [
     (grad(x,x),eye(k)),
     (grad(x,x.T),eye(k)),
     (grad(x,Axb),A.T),
     #(grad(x,Axb.T),A)   incorrect?
-    (grad(x,c.prod(Axb.T,Axb)),2*c.prod(A.T,Axb)),
-    #(grad(x,norm_2(Axb)),c.prod(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
-    (grad(x,c.prod(c.prod(x.T,A),x)+2*c.prod(c.prod(x.T,B),y)+c.prod(c.prod(y.T,C),y)),c.prod((A+A.T),x)+2*c.prod(B,y)),
-    #(grad(x,c.prod(a.T,c.prod(x.T,x)*b)),2*c.prod(c.prod(x,a.T),b))
+    (grad(x,c.mul(Axb.T,Axb)),2*c.mul(A.T,Axb)),
+    #(grad(x,norm_2(Axb)),c.mul(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
+    (grad(x,c.mul(c.mul(x.T,A),x)+2*c.mul(c.mul(x.T,B),y)+c.mul(c.mul(y.T,C),y)),c.mul((A+A.T),x)+2*c.mul(B,y)),
+    #(grad(x,c.mul(a.T,c.mul(x.T,x)*b)),2*c.mul(c.mul(x,a.T),b))
     (grad(X,X),eye(k**2)),
     #(grad(X,X.T),eye(k**2))
-    (grad(X,c.prod(a.T,c.prod(X,b))),ab),
-    (grad(X,c.prod(b.T,c.prod(X.T,a))),ab),
-    (grad(X,c.prod(a.T,c.prod(c.prod(X,X),b))),c.prod(X.T,ab)+c.prod(ab,X.T)),
-    (grad(X,c.prod(a.T,c.prod(c.prod(X.T,X),b))),c.prod(X,ab + ab.T)),
+    (grad(X,c.mul(a.T,c.mul(X,b))),ab),
+    (grad(X,c.mul(b.T,c.mul(X.T,a))),ab),
+    (grad(X,c.mul(a.T,c.mul(c.mul(X,X),b))),c.mul(X.T,ab)+c.mul(ab,X.T)),
+    (grad(X,c.mul(a.T,c.mul(c.mul(X.T,X),b))),c.mul(X,ab + ab.T)),
     (grad(x,x*mu),MX(eye(k))*mu),
     (grad(X,c.trace(X*mu)),MX(eye(k))*mu),
-    (grad(X,c.trace(c.prod(X.T,Y))),Y),
-    (grad(X,c.trace(c.prod(Y,X.T))),Y),
-    (grad(X,c.trace(c.prod(Y.T,X))),Y),
-    (grad(X,c.trace(c.prod(X,Y.T))),Y),
-    (grad(X,c.trace(c.prod(a.T,c.prod(X,b)))),ab)
+    (grad(X,c.trace(c.mul(X.T,Y))),Y),
+    (grad(X,c.trace(c.mul(Y,X.T))),Y),
+    (grad(X,c.trace(c.mul(Y.T,X))),Y),
+    (grad(X,c.trace(c.mul(X,Y.T))),Y),
+    (grad(X,c.trace(c.mul(a.T,c.mul(X,b)))),ab)
     #(grad(X,log(c.det(X))),c.inv(X_)),
     ]
 

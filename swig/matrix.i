@@ -5,8 +5,8 @@
 %rename(__rel_div__) __rdiv__;
 %rename(__el_pow__) __pow__;
 %rename(__rel_pow__) __rpow__;
-%rename(__mul__) prod;
-%rename(__rmul__) rprod;
+%rename(__mul__) mul;
+%rename(__rmul__) rmul;
 %rename(__transpose__) trans;
 %rename(__div__) __mrdivide__;
 %rename(__rdiv__) __rmrdivide__;
@@ -94,7 +94,7 @@
     if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
       name = 'r' + name
       args.reverse()
-    if not(hasattr(selfM,name)):
+    if not(hasattr(selfM,name)) or name=='mul':
       name = '__' + name + '__'
     fun=getattr(selfM, name)
     return fun(*args[1:])

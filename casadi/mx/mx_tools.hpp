@@ -65,16 +65,20 @@ MX norm_2(const MX &x);
 Internally represented by Norm1
 */
 MX norm_1(const MX &x);
+
 /** \brief  Take the infinity-norm of a MX
 Internally represented by NormInf
 */
 MX norm_inf(const MX &x);
+
 /** \brief  Take the transpose of a MX 
 Internally represented by Transpose
 */
-MX trans(const MX &x); // transpose
+MX trans(const MX &x);
+
 /** \brief  Take the matrix product of 2 MX objects */
-MX prod(const MX &x, const MX &y); // matrix product
+MX mul(const MX &x, const MX &y);
+
 /** \brief  Take the inner product of two vectors 
         Equals
         \code
@@ -82,7 +86,8 @@ MX prod(const MX &x, const MX &y); // matrix product
         \endcode
         with x and y vectors
 */
-MX inner_prod(const MX &x, const MX &y); // 
+MX inner_prod(const MX &x, const MX &y);
+
 /** \brief  Take the outer product of two vectors 
         Equals
         \code
@@ -90,7 +95,7 @@ MX inner_prod(const MX &x, const MX &y); //
         \endcode
          with x and y vectors
 */
-MX outer_prod(const MX &x, const MX &y); // x*trans(y) with x and y vectors
+MX outer_prod(const MX &x, const MX &y);
 
 /** \brief Branching on MX nodes
 Ternary operator, "cond ? if_true : if_false"

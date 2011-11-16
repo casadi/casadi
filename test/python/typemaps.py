@@ -252,53 +252,53 @@ class typemaptests(casadiTestCase):
     
     
     def tests(z,s):
-      doit(z,s,lambda z,s: -z)
-      doit(z,s,lambda z,s: z+s)
-      doit(z,s,lambda z,s: s+z)
+      #doit(z,s,lambda z,s: -z)
+      #doit(z,s,lambda z,s: z+s)
+      #doit(z,s,lambda z,s: s+z)
       doit(z,s,lambda z,s: s*z)
-      doit(z,s,lambda z,s: z*s)
-      doit(z,s,lambda z,s: z-s)
-      doit(z,s,lambda z,s: s-z)
-      doit(z,s,lambda z,s: z/s)
-      doit(z,s,lambda z,s: s/z)
-      doit(z,s,lambda z,s: z**s)
-      doit(z,s,lambda z,s: s**z)
-      doit(z,s,lambda z,s: fmin(s,z))
-      doit(z,s,lambda z,s: fmax(s,z))
-      doit(z,s,lambda z,s: min(s,z))
-      doit(z,s,lambda z,s: max(s,z))
-      doit(z,s,lambda z,s: constpow(s,z))
-      doit(z,s,lambda z,s: constpow(z,s))
+      #doit(z,s,lambda z,s: z*s)
+      #doit(z,s,lambda z,s: z-s)
+      #doit(z,s,lambda z,s: s-z)
+      #doit(z,s,lambda z,s: z/s)
+      #doit(z,s,lambda z,s: s/z)
+      #doit(z,s,lambda z,s: z**s)
+      #doit(z,s,lambda z,s: s**z)
+      #doit(z,s,lambda z,s: fmin(s,z))
+      #doit(z,s,lambda z,s: fmax(s,z))
+      #doit(z,s,lambda z,s: min(s,z))
+      #doit(z,s,lambda z,s: max(s,z))
+      #doit(z,s,lambda z,s: constpow(s,z))
+      #doit(z,s,lambda z,s: constpow(z,s))
       
-    nums = [3,3.0,array(3),array(3.0),array([[3]]),array([[1,2],[3,4]]),DMatrix(3),DMatrix([[1,2],[3,4]])]
+    nums = [array([[1,2],[3,4]])]
     
-    # numeric & SX
-    for s in nums:
-      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
-        tests(z,s)
+    ## numeric & SX
+    #for s in nums:
+      #for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
+        #print "z = %s, s = %s" % (str(z),str(s))
+        #print "  z = %s, s = %s" % (type(z),type(s))
+        #tests(z,s)
        
     # numeric & MX
     for s in nums:
-      for z in [MX("x"),MX("x",2,2)]:
+      for z in [MX("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
         
     # SX & SX
-    for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
-        tests(z,s)
+    #for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
+      #for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
+        #print "z = %s, s = %s" % (str(z),str(s))
+        #print "  z = %s, s = %s" % (type(z),type(s))
+        #tests(z,s)
          
-    # MX & MX
-    for s in [MX("x"),MX("x",2,2)]:
-      for z in [MX("x"),MX("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
-        tests(z,s)
+    ## MX & MX
+    #for s in [MX("x"),MX("x",2,2)]:
+      #for z in [MX("x"),MX("x",2,2)]:
+        #print "z = %s, s = %s" % (str(z),str(s))
+        #print "  z = %s, s = %s" % (type(z),type(s))
+        #tests(z,s)
         
     for (s,x,y) in [
                   (matrix([[1,2],[3,4]]),ssym("x",2,2),MX("x",2,2))    

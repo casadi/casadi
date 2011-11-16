@@ -290,7 +290,7 @@ class MX : public SharedObject{
   MX __mrdivide__  (const MX& b) const;
   MX __mldivide__   (const MX& b) const;
   MX __mpower__(const MX& b) const;
-  MX prod(const MX& y) const;
+  MX mul(const MX& y) const;
   MX inner_prod(const MX& y) const;
   MX outer_prod(const MX& y) const;
   MX constpow(const MX& y) const;

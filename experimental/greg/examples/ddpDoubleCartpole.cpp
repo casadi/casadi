@@ -100,7 +100,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	vel.at(0) = th0d;
 	vel.at(1) = th1d;
 	vel.at(2) = th2d;
-	SXMatrix accel = prod( inv(D), - prod( C, vel ) - G + prod( H, SXMatrix(action["u"]) ) );
+	SXMatrix accel = mul( inv(D), - mul( C, vel ) - G + mul( H, SXMatrix(action["u"]) ) );
 
 	simplify(accel.at(0));
 	simplify(accel.at(1));

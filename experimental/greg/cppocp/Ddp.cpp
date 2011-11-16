@@ -112,8 +112,8 @@ void Ddp::setupQFunctions()
      for (int k=0; k<N; k++){
 
 	  // function
-	  SXMatrix Q_0_k(costFcnExt( xkMap, ukMap, k, N ) + V_0_kp1 + prod( V_x_kp1.trans(), df )
-			 + prod( df.trans(), prod( V_xx_kp1, df ) )/2 );
+	  SXMatrix Q_0_k(costFcnExt( xkMap, ukMap, k, N ) + V_0_kp1 + mul( V_x_kp1.trans(), df )
+			 + mul( df.trans(), mul( V_xx_kp1, df ) )/2 );
 
 	  // jacobian
 	  SXMatrix Q_x_k =  gradient( Q_0_k, dx );
@@ -192,14 +192,14 @@ void Ddp::setupBackwardSweepFunction()
 
      /************** optimal control *******************/
      SXMatrix Q_uu_inv = inv( Q_uu );
-     SXMatrix u_feedforward_k = -prod( Q_uu_inv, Q_u );
-     SXMatrix feedbackGain_k  = -prod( Q_uu_inv, Q_xu.trans() );
+     SXMatrix u_feedforward_k = -mul( Q_uu_inv, Q_u );
+     SXMatrix feedbackGain_k  = -mul( Q_uu_inv, Q_xu.trans() );
 
 
      /************** value function propogation ********/
-     SXMatrix V_0_k  = Q_0  - prod( Q_u.trans(), prod( Q_uu_inv, Q_u ) );
-     SXMatrix V_x_k  = Q_x  - prod( Q_xu, prod( Q_uu_inv.trans(), Q_u ) );
-     SXMatrix V_xx_k = Q_xx - prod( Q_xu, prod( Q_uu_inv, Q_xu.trans() ) );
+     SXMatrix V_0_k  = Q_0  - mul( Q_u.trans(), mul( Q_uu_inv, Q_u ) );
+     SXMatrix V_x_k  = Q_x  - mul( Q_xu, mul( Q_uu_inv.trans(), Q_u ) );
+     SXMatrix V_xx_k = Q_xx - mul( Q_xu, mul( Q_uu_inv, Q_xu.trans() ) );
 
      /*************** backwardSweepFcn ****************/
      // workaround bug where size() != size1()*size2()
@@ -311,7 +311,7 @@ void Ddp::takeForwardStep(int timestep)
      // open loop
      uTrajectory.at(timestep) = uOpenLoop.at(timestep);
      // add feedback
-     uTrajectory.at(timestep) += prod( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
+     uTrajectory.at(timestep) += mul( feedbackGain.at(timestep), xTrajectory.at(timestep) - xNominalTrajectory.at(timestep) );
 
      // bound actions
 #define BOUND( var, lb, ub ){			\

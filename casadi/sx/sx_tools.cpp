@@ -580,7 +580,7 @@ void simplify(SX& ex){
   expand(ex,weights,terms);
 
   // Make a scalar product to get the simplified expression
-  Matrix<SX> s = prod(trans(weights),terms);
+  Matrix<SX> s = mul(trans(weights),terms);
   ex = s.toScalar();
 }
 

@@ -175,7 +175,7 @@ void multiplication(){
   MX Y("Y",4);
   vector<MX> XY(2); XY[0] = X; XY[1] = Y;
   
-  MX F = prod(reshape(X,2,2),reshape(Y,2,2));
+  MX F = mul(reshape(X,2,2),reshape(Y,2,2));
   cout << "F = " << F << endl;
   
   MXFunction Fcn(XY,F);
@@ -201,7 +201,7 @@ void multiplication(){
   
   SXMatrix x = ssym("x",4);
   SXMatrix y = ssym("y",4);
-  SXMatrix f = prod(reshape(x,2,2),reshape(y,2,2));
+  SXMatrix f = mul(reshape(x,2,2),reshape(y,2,2));
   vector<SXMatrix> xy(2); xy[0] = x; xy[1] = y;
   SXFunction fcn(xy,f);
   fcn.init();

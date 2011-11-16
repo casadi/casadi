@@ -155,7 +155,7 @@ class Sparsitytests(casadiTestCase):
   def test_refcount(self):
       return #Ticket 147
       x = DMatrix(sp_tril(4),5)
-      s = c.prod(x,x).sparsity()
+      s = c.mul(x,x).sparsity()
       self.assertEqual(s.numel(),10)
       
   def test_splower(self):

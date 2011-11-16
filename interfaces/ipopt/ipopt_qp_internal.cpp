@@ -258,18 +258,18 @@ void IpoptQPInternal::init(){
   args.push_back(V);
     std::cout << "okay there" << std::endl;
   // The objective function looks exactly like a mathematical description of the NLP
-  MXFunction QP_f(args, prod(trans(G_),X) + 0.5*prod(prod(trans(X),H_),X));
+  MXFunction QP_f(args, mul(trans(G_),X) + 0.5*mul(mul(trans(X),H_),X));
   QP_f.init();
 
   // So does the constraint function
-  MXFunction QP_g(args, prod(A_,X));
+  MXFunction QP_g(args, mul(A_,X));
   std::cout << "okay here" << std::endl;
   // Jacobian of the constraints
   MXFunction QP_j(args,A_);
   
-  std:cout << (G_+prod(trans(H_),X)).dimString() << std::endl;
+  std:cout << (G_+mul(trans(H_),X)).dimString() << std::endl;
   // Gradient of the objective
-  MXFunction QP_gf(args,G_+prod(H_,X));
+  MXFunction QP_gf(args,G_+mul(H_,X));
   
   std::cout << "okay everyzhere" << std::endl;
   MX sigma("sigma");

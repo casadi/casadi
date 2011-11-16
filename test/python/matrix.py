@@ -23,7 +23,7 @@ class Matrixtests(casadiTestCase):
   def test_inv(self):
     self.message("Matrix inverse")
     a = DMatrix([[1,2],[1,3]])
-    self.checkarray(c.dot(c.inv(a),a),eye(2),"DMatrix inverse")
+    self.checkarray(c.mul(c.inv(a),a),eye(2),"DMatrix inverse")
 
   def test_iter(self):
     self.message("iterator")

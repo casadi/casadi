@@ -127,8 +127,8 @@ MX norm_inf(const MX &x){
   return ret;
 }
 
-MX prod(const MX &x, const MX &y){
-  return x.prod(y);
+MX mul(const MX &x, const MX &y){
+  return x.mul(y);
 }
 
 bool isZero(const MX& ex){
@@ -474,9 +474,9 @@ int countNodes(const MX& A){
 MX sum(const MX &x, int axis) {
   casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
   if (axis==1){
-    return prod(x,MX::ones(x.size2(),1));
+    return mul(x,MX::ones(x.size2(),1));
   } else {
-    return prod(MX::ones(1,x.size1()),x);
+    return mul(MX::ones(1,x.size1()),x);
   }
 }
 

@@ -361,8 +361,8 @@ Integrator IntegratorInternal::jac(bool with_x, bool with_p){
   SXMatrix ypsens = ssym("ypsens",nyp,ns);
     
   // Sensitivity equation
-  SXMatrix res_s = prod(f.jac(DAE_Y,DAE_RES),ysens);
-  if(nyp>0) res_s += prod(f.jac(DAE_YDOT,DAE_RES),ypsens);
+  SXMatrix res_s = mul(f.jac(DAE_Y,DAE_RES),ysens);
+  if(nyp>0) res_s += mul(f.jac(DAE_YDOT,DAE_RES),ypsens);
   if(with_p) res_s += horzcat(SXMatrix(ny_,ns_x),f.jac(DAE_P,DAE_RES));
 
   // Augmented DAE
@@ -386,8 +386,8 @@ Integrator IntegratorInternal::jac(bool with_x, bool with_p){
   if(!q.isNull()){
     
     // Sensitivity quadratures
-    SXMatrix q_s = prod(q.jac(DAE_Y,DAE_RES),ysens);
-    if(nyp>0) q_s += prod(q.jac(DAE_YDOT,DAE_RES),ypsens);
+    SXMatrix q_s = mul(q.jac(DAE_Y,DAE_RES),ysens);
+    if(nyp>0) q_s += mul(q.jac(DAE_YDOT,DAE_RES),ypsens);
     if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_RES));
 
     // Augmented quadratures

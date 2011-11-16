@@ -17,13 +17,13 @@ dummy = n.dot(x_s.T,x_s)
 print "Scipy pure = %.4f s" % (time()-t)
 
 t = time()
-dummy = c.dot(x.T,x)
+dummy = c.mul(x.T,x)
 print "CasADi pure = %.4f s" % (time()-t)
 
 X = MX("X",x.sparsity())
 
 t = time()
-f = MXFunction([X],[c.prod(X.T,X)])
+f = MXFunction([X],[c.mul(X.T,X)])
 f.init()
 print "CasADi MX wrapped init overhead = %.4f s" % (time()-t)
 f.input().set(x)
@@ -44,5 +44,5 @@ print "CasADi allocating resulting = %.4f s" % (time()-t)
 
 t = time()
 # Carry out the matrix product
-c.DMatrix.prod_no_alloc(x,x,ret)
+c.DMatrix.mul_no_alloc(x,x,ret)
 print "CasADi actual multiplication = %.4f s" % (time()-t)

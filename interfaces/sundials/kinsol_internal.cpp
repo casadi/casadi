@@ -375,7 +375,7 @@ KinsolSolver KinsolInternal::jac(const std::vector<int> iind, int oind){
     Matrix<SX> dz_dx = ssym("dz_dx", nz, nx);
     
     // Derivative equation
-    Matrix<SX> f_der = prod(Jz,dz_dx) + Jx;
+    Matrix<SX> f_der = mul(Jz,dz_dx) + Jx;
 
     // Append variables
     f_in[0].append(vec(dz_dx));

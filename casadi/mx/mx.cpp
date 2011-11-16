@@ -512,7 +512,7 @@ const Matrix<int>& MX::mapping() {
   return m->nzmap_;
 }
 
-MX MX::prod(const MX& y) const{
+MX MX::mul(const MX& y) const{
   const MX& x = *this;
 
   // Check if we can simplify the product
@@ -551,7 +551,7 @@ MX MX::inner_prod(const MX& y) const{
 }
 
 MX MX::outer_prod(const MX& y) const{
-  return prod(trans(y));
+  return mul(trans(y));
 }
 
 MX MX::__pow__(const MX& n) const{
