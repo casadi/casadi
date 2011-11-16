@@ -380,7 +380,7 @@ class Integrationtests(casadiTestCase):
     f_in[DAE_T] = t
     f_in[DAE_Y] = q
     f_in[DAE_P] = p
-    f_out = [c.mul(c.reshape(p,3,3),q)]
+    f_out = [mul(c.reshape(p,3,3),q)]
     f=SXFunction(f_in,f_out)
     f.init()
     integrator = CVodesIntegrator(f)
@@ -417,7 +417,7 @@ class Integrationtests(casadiTestCase):
     f[DAE_T] = t
     f[DAE_Y] = q
     f[DAE_P] = p
-    f=SXFunction(f,[c.mul(c.reshape(p,3,3),q)])
+    f=SXFunction(f,[mul(c.reshape(p,3,3),q)])
     f.init()
 
     integrator = CVodesIntegrator(f)
@@ -669,7 +669,7 @@ class Integrationtests(casadiTestCase):
     A = ssym("A",N,N)
     x = ssym("x",N)
 
-    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A},[c.mul(A,x)])
+    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A},[mul(A,x)])
     I = CVodesIntegrator(ode)
     I.init()
     I.setOption('reltol',1e-12)

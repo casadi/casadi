@@ -103,7 +103,7 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
     #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: c.mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
 
   def test_indirection(self):
     self.message("MXFunction indirection")
@@ -840,7 +840,7 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      
-     z = c.mul(y.T,y)
+     z = mul(y.T,y)
      zr = numpy.dot(r.T,r)
      
      f = MXFunction([x],[z])
@@ -861,7 +861,7 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      
-     z = c.mul(y.T,y)
+     z = mul(y.T,y)
      zr = numpy.dot(r.T,r)
      
      f = MXFunction([x],[z])
@@ -890,7 +890,7 @@ class MXtests(casadiTestCase):
      fy.input().set(xn)
      fy.evaluate()
      
-     z = c.mul(y,y.T)
+     z = mul(y,y.T)
      zr = numpy.dot(r,r.T)
      
      f = MXFunction([x],[z[1:4,1]])
@@ -929,9 +929,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX("x",n,1)
     
-    Axb = casadi.mul(A,x)+b
-    Dxe = casadi.mul(D,x)+e
-    a = casadi.mul(casadi.mul(trans(Axb),C),Dxe)
+    Axb = mul(A,x)+b
+    Dxe = mul(D,x)+e
+    a = mul(mul(trans(Axb),C),Dxe)
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
@@ -996,9 +996,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX("x",n,1)
     
-    Axb = casadi.mul(A,x)+b
-    Dxe = casadi.mul(D,x)+e
-    a = casadi.mul(casadi.mul(trans(Axb),C),Dxe)
+    Axb = mul(A,x)+b
+    Dxe = mul(D,x)+e
+    a = mul(mul(trans(Axb),C),Dxe)
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
@@ -1068,9 +1068,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX("x",n,1)
     
-    Axb = casadi.mul(A,x)+b
-    Dxe = casadi.mul(D,x)+e
-    a = casadi.mul(casadi.mul(trans(Axb),C),Dxe)
+    Axb = mul(A,x)+b
+    Dxe = mul(D,x)+e
+    a = mul(mul(trans(Axb),C),Dxe)
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
@@ -1310,30 +1310,30 @@ class MXtests(casadiTestCase):
     def eye(n):
       return DMatrix(numpy.eye(n))
     
-    Axb = c.mul(A,x)-b
-    ab = c.mul(a,b.T)
+    Axb = mul(A,x)-b
+    ab = mul(a,b.T)
     tests = [
     (grad(x,x),eye(k)),
     (grad(x,x.T),eye(k)),
     (grad(x,Axb),A.T),
     #(grad(x,Axb.T),A)   incorrect?
-    (grad(x,c.mul(Axb.T,Axb)),2*c.mul(A.T,Axb)),
-    #(grad(x,norm_2(Axb)),c.mul(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
-    (grad(x,c.mul(c.mul(x.T,A),x)+2*c.mul(c.mul(x.T,B),y)+c.mul(c.mul(y.T,C),y)),c.mul((A+A.T),x)+2*c.mul(B,y)),
-    #(grad(x,c.mul(a.T,c.mul(x.T,x)*b)),2*c.mul(c.mul(x,a.T),b))
+    (grad(x,mul(Axb.T,Axb)),2*mul(A.T,Axb)),
+    #(grad(x,norm_2(Axb)),mul(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
+    (grad(x,mul(mul(x.T,A),x)+2*mul(mul(x.T,B),y)+mul(mul(y.T,C),y)),mul((A+A.T),x)+2*mul(B,y)),
+    #(grad(x,mul(a.T,mul(x.T,x)*b)),2*mul(mul(x,a.T),b))
     (grad(X,X),eye(k**2)),
     #(grad(X,X.T),eye(k**2))
-    (grad(X,c.mul(a.T,c.mul(X,b))),ab),
-    (grad(X,c.mul(b.T,c.mul(X.T,a))),ab),
-    (grad(X,c.mul(a.T,c.mul(c.mul(X,X),b))),c.mul(X.T,ab)+c.mul(ab,X.T)),
-    (grad(X,c.mul(a.T,c.mul(c.mul(X.T,X),b))),c.mul(X,ab + ab.T)),
+    (grad(X,mul(a.T,mul(X,b))),ab),
+    (grad(X,mul(b.T,mul(X.T,a))),ab),
+    (grad(X,mul(a.T,mul(mul(X,X),b))),mul(X.T,ab)+mul(ab,X.T)),
+    (grad(X,mul(a.T,mul(mul(X.T,X),b))),mul(X,ab + ab.T)),
     (grad(x,x*mu),MX(eye(k))*mu),
     (grad(X,c.trace(X*mu)),MX(eye(k))*mu),
-    (grad(X,c.trace(c.mul(X.T,Y))),Y),
-    (grad(X,c.trace(c.mul(Y,X.T))),Y),
-    (grad(X,c.trace(c.mul(Y.T,X))),Y),
-    (grad(X,c.trace(c.mul(X,Y.T))),Y),
-    (grad(X,c.trace(c.mul(a.T,c.mul(X,b)))),ab)
+    (grad(X,c.trace(mul(X.T,Y))),Y),
+    (grad(X,c.trace(mul(Y,X.T))),Y),
+    (grad(X,c.trace(mul(Y.T,X))),Y),
+    (grad(X,c.trace(mul(X,Y.T))),Y),
+    (grad(X,c.trace(mul(a.T,mul(X,b)))),ab)
     #(grad(X,log(c.det(X))),c.inv(X_)),
     ]
 
