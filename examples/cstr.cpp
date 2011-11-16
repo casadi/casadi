@@ -99,8 +99,7 @@ int main(){
 
   // Create an implicit function (KINSOL)
   KinsolSolver ode(impres);
-  ode.setLinearSolver(CSparse(CRSSparsity()));
-  ode.setOption("linear_solver","user_defined");
+  ode.setOption("linear_solver_creator",CSparse::creator);
   ode.init();
   
   // DAE residual

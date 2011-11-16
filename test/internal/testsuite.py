@@ -73,9 +73,11 @@ if __name__ == '__main__':
     print run('find /', shell = True, timeout = 3)
     print run('find', shell = True)
 
+deprecated = re.compile("[dD]epr[ei]c[ie]?at[ei]")
+
     
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[]):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True):
     """
     
     dirname: The directory that should be crawled for test problems.
@@ -95,8 +97,11 @@ class TestSuite:
     workingdir: Specify the working directory for the process. The path may be relative to the /trunk/test path
     
     
-    stderr_trigger: list of strings/regexes. If any string is found in std_err, it is considered an error, regardless of the return_code.
+    stderr_trigger: list of strings/regexes. If any string is found in std_err, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
     
+    stdout_trigger: list of strings/regexes. If any string is found in std_out, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
+    
+    check_depreciation: raise an error if the output contains a depreciation warning
     
     args: a list of command line options:
        -skipfiles="file1 file2"   get's added to skipfiles
@@ -124,6 +129,10 @@ class TestSuite:
     self.workingdir = workingdir
     self.memcheck = False
     self.stderr_trigger = stderr_trigger
+    self.stdout_trigger = stdout_trigger
+    if check_depreciation:
+      self.stderr_trigger.append((deprecated,"deprecated"))
+      self.stdout_trigger.append((deprecated,"deprecated"))
     self.args=args
     for arg in args:
       okay = False
@@ -182,7 +191,24 @@ class TestSuite:
     
     stderr_trigger = False
     for trigger in self.stderr_trigger:
-      stderr_trigger = stderr_trigger or re.search(trigger, stderrdata)
+      trigger_message = str(trigger)
+      if isinstance(trigger,tuple):
+        trigger_message = trigger[1]
+        trigger = trigger[0]
+      trigger_raised = re.search(trigger, stderrdata)
+      if trigger_raised:
+        print "stderr_trigger '%s' was raised." % trigger_message
+        stderr_trigger = True
+    stdout_trigger = False
+    for trigger in self.stdout_trigger:
+      trigger_message = str(trigger)
+      if isinstance(trigger,tuple):
+        trigger_message = trigger[1]
+        trigger = trigger[0]
+      trigger_raised = re.search(trigger, stdoutdata)
+      if trigger_raised:
+        print "stdout_trigger '%s' was raised." % trigger_message
+        stdout_trigger = True
     if (not(stderr_trigger) and (p.returncode==0 or (p.returncode in self.allowable_returncodes))):
       pass
       #print "  > Succes: %0.2f [ms]" % (t*1000)

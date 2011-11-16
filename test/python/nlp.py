@@ -393,7 +393,7 @@ class NLPtests(casadiTestCase):
     f=SXFunction([y,x],[sin(x)-y])
     f.init()
     solver=KinsolSolver(f,1)
-    solver.setLinearSolver(CSparse(CRSSparsity())) # NOTE by Joel: Sensitivities of an implicit function requires a user-provided linear solver 
+    solver.setOption("linear_solver_creator",CSparse) # NOTE by Joel: Sensitivities of an implicit function requires a user-provided linear solver 
     solver.init()
     solver.fwdSeed().set(1)
     solver.adjSeed().set(1)
