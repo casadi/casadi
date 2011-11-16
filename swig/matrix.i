@@ -30,6 +30,12 @@
 %}
 
 #ifdef SWIGPYTHON
+%pythoncode %{
+def prod(self,*args):
+    raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
+def dot(self,*args):
+    raise Exception("'dot' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
+%}
 %define %python_matrix_convertors
 %pythoncode %{
         
@@ -64,6 +70,9 @@
         if isinstance(s,tuple) and len(s)==2:
           return self.__Csetitem__(s[0],s[1],val)  
         return self.__Csetitem__(s,val)
+        
+    def prod(self,*args):
+        raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
      
 %}
 %enddef 
@@ -102,6 +111,8 @@
      
   def __array__(self,*args,**kwargs):
     import numpy as n
+    if len(args)>0 and args[0]==n.dtype("object"):
+      raise Exception("It appears you are using numpy.dot to do matrix multiplication. Please use mul instead.")
     if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
       if len(args[1][1])==3:
         raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)

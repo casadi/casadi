@@ -4,7 +4,6 @@
 #! We demonstrate solving a dense system A.x=b by using different linear solvers.
 #!
 from casadi import *
-import casadi as c
 from numpy import *
 import time
 
@@ -14,7 +13,7 @@ A=DMatrix([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
 x=DMatrix([tan(i) for i in range(n)])
 
 #! We generate the b vector:
-b=c.dot(A,x)
+b=mul(A,x)
 
 #! We demonstrate the LinearSolver API with SuperLU:
 s = SuperLU(A.sparsity())

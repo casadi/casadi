@@ -2,7 +2,6 @@
 #! =====================
 from casadi import *
 from numpy import *
-import casadi as c
 
 #! In this example, we will solve a few optimization problems with increasing complexity
 #!
@@ -39,7 +38,7 @@ n = 5
 
 x=ssym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
-f=SXFunction([x],[[c.dot((x-1).T,x-1)]])
+f=SXFunction([x],[[mul((x-1).T,x-1)]])
 g=SXFunction([x],[[x[1]+x[2],x[0]]])
 
 solver = IpoptSolver(f,g)

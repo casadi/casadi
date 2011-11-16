@@ -191,7 +191,7 @@ memberbinopsr(Type,mpower) \
 memberbinopsr(Type,constpow) \
 memberbinopsr_un(Type,fmin) \
 memberbinopsr_un(Type,fmax) \
-memberbinopsr_nn(Type,mul)
+
 
 #define memberbinops(uname,argtype,argCast,selfCast,returntype) \
 returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \

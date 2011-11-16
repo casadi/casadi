@@ -226,7 +226,7 @@ namespace CasADi {
       for i in range(self.size1()):  # loop over rows
         for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
           j=self.col(el)  # column
-          r[i,j] = self[el] # add the non-zero element
+          r[i,j] = self.at(el) # add the non-zero element
 
       return r
     %}
