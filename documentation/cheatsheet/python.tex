@@ -1,0 +1,104 @@
+\documentclass[a4paper,8pt,twocolumn]{article}
+
+\usepackage{fullpage}
+
+\begin{document}
+\paragraph{Header}
+\begin{verbatim}
+  from casadi import *
+\end{verbatim}
+
+\paragraph{SX}
+\begin{verbatim}
+  x = ssym("x")
+  y = ssym("y",10,2)
+  a,b,c = ssym("[a,b,c]")
+\end{verbatim}
+
+\paragraph{MX}
+\begin{verbatim}
+  x = msym("x")
+  y = msym("y",10,2)
+  a,b,c = msym("[a,b,c]")
+\end{verbatim}
+
+\paragraph{Calculus}
+\begin{verbatim}
+  jacobian([sin(a)*b + c],[a,b,c])
+\end{verbatim}
+
+\paragraph{Transpose}
+\begin{verbatim}
+  B = A.T
+\end{verbatim}
+
+\paragraph{Products}
+\begin{verbatim}
+  v = mul(A,x)  # Matrix product
+  v = A*A       # Element-wise product
+\end{verbatim}
+
+\paragraph{Concatentation}
+\begin{verbatim}
+  x = vertcat([a,b,c])
+  x = horzcat([a,b,c])
+\end{verbatim}
+
+\paragraph{Flattening/vectorizing}
+\begin{verbatim}
+  column_matrix = vec(some_matrix)
+\end{verbatim}
+
+\paragraph{Slicing}
+\begin{verbatim}
+  x[0,0]
+  x[:,0]
+  x[-1,:]
+\end{verbatim}
+
+\paragraph{Function SISO}
+
+\begin{verbatim}
+  f = SXFunction([x],[x**2])
+  f.init()
+\end{verbatim}
+
+\paragraph{Function MIMO}
+\begin{verbatim}
+  g = SXFunction([x,y],[x**2,x*y,[x,2*x]])
+  g.init()
+\end{verbatim}
+
+\paragraph{Evaluate SISO}
+
+\begin{verbatim}
+  f.input().set(3)
+  f.evaluate()
+  print f.output()
+\end{verbatim}
+
+\paragraph{Evaluate MIMO}
+\begin{verbatim}
+  g.input(0).set(5)
+  g.input(1).set(range(20))
+  g.evaluate()
+  print g.output(0), g.output(1), g.output(2)
+\end{verbatim}
+
+\paragraph{Forward sensitivities}
+
+\begin{verbatim}
+  g.fwdSeed(1).set([1] + [0]*19)
+  g.evaluate(1,0)
+  print g.fwdSens(1)
+\end{verbatim}
+
+\paragraph{Adjoint sensitivities}
+
+\begin{verbatim}
+  g.adjSeed(2).set([0,1])
+  g.evaluate(0,1)
+  print g.adjSens(0)
+\end{verbatim}
+
+\end{document}
