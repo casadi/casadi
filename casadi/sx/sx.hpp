@@ -183,8 +183,8 @@ class SX{
     /** \brief Get the number of dependencies of a binary SX */
     int getNdeps() const;
 
-    /** \brief Returns a number that is uniaue for a given SXNode. 
-    * If the SX does not point to qny node, 0 is returned.
+    /** \brief Returns a number that is unique for a given SXNode. 
+    * If the SX does not point to any node, 0 is returned.
     */
     long __hash__() const;
 
@@ -199,7 +199,6 @@ class SX{
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
     
-    SX prod(const SX &b) const { return *this * b;}
     SX __mldivide__(const SX& b) const{  throw *this / b;}
     SX __mrdivide__(const SX& b) const{  return *this / b;}
     SX __mpower__(const SX& b) const {return (*this).__pow__(b);}

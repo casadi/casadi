@@ -28,7 +28,6 @@
 <tr><td>eval_g</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_grad_f</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_jac_g</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>eval_x</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
 /** \class CasADi::IpoptSolver
@@ -41,7 +40,6 @@
 <tr><td>eval_g</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_grad_f</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_jac_g</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>eval_x</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::CVodesInternal
