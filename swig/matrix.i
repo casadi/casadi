@@ -103,7 +103,7 @@ def dot(self,*args):
     if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
       name = 'r' + name
       args.reverse()
-    if not(hasattr(selfM,name)) or name=='mul':
+    if not(hasattr(selfM,name)) or ('mul' in name):
       name = '__' + name + '__'
     fun=getattr(selfM, name)
     return fun(*args[1:])

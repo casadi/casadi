@@ -321,7 +321,7 @@ disp("sparsity ref #147")
 
 
 X = DMatrix(sp_tril(4),5)
-s = casadi.mul(X,X).sparsity()
+s = (X*X).sparsity()
 
 
 disp("string confusion")
