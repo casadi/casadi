@@ -3947,8 +3947,8 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
 | scheme       |              |              | scheme       | ocationInteg |
-|              |              |              | (radau or    | ratorInterna |
-|              |              |              | legendre)    | l            |
+|              |              |              | (\"radau\" or  | ratorInterna |
+|              |              |              | \"legendre\")  | l            |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
 | an           |              |              |              | gratorIntern |
@@ -4801,8 +4801,8 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
 | scheme       |              |              | scheme       | ocationInteg |
-|              |              |              | (radau or    | ratorInterna |
-|              |              |              | legendre)    | l            |
+|              |              |              | (\"radau\" or  | ratorInterna |
+|              |              |              | \"legendre\")  | l            |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | false        |              | CasADi::Inte |
 | an           |              |              |              | gratorIntern |
@@ -19495,8 +19495,6 @@ number of constraints (A)
 +-------------+-----------------------+
 | eval_jac_g  | CasADi::IpoptInternal |
 +-------------+-----------------------+
-| eval_x      | CasADi::IpoptInternal |
-+-------------+-----------------------+
 
 >List of available stats
 +---------------+-----------------------+
@@ -22264,8 +22262,6 @@ number of constraints (A)
 | eval_grad_f | CasADi::IpoptInternal |
 +-------------+-----------------------+
 | eval_jac_g  | CasADi::IpoptInternal |
-+-------------+-----------------------+
-| eval_x      | CasADi::IpoptInternal |
 +-------------+-----------------------+
 
 >List of available stats
@@ -30964,9 +30960,9 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    |              | None         | CasADi::Opti |
-| ion          |              |              |              | malControl:: |
-|              |              |              |              | MultipleShoo |
+| parallelizat | OT_STRING    | GenericType( | Passed on to | CasADi::Opti |
+| ion          |              | )            | CasADi::Para | malControl:: |
+|              |              |              | llelizer     | MultipleShoo |
 |              |              |              |              | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
@@ -31534,9 +31530,9 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    |              | None         | CasADi::Opti |
-| ion          |              |              |              | malControl:: |
-|              |              |              |              | MultipleShoo |
+| parallelizat | OT_STRING    | GenericType( | Passed on to | CasADi::Opti |
+| ion          |              | )            | CasADi::Para | malControl:: |
+|              |              |              | llelizer     | MultipleShoo |
 |              |              |              |              | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
@@ -38579,11 +38575,12 @@ Check if the node is pointing to the right type of object. ";
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::reInit "
 
 Reinitialize the problem This method needs to be called before evaluate()
-whenever the nature of any constraint has changed. This occurs when: Any of
-LBA, UBA, LBX, UBX changes to/from (+-)infinity
+whenever the nature of any constraint has changed. This occurs when: .
+
+Any of LBA, UBA, LBX, UBX changes to/from (+-)infinity
 
 An entry of LBA becomes equal/unequal to UBA: this indicates that an
-inequality becomes an equality or visa versa. .
+inequality becomes an equality or visa versa.
 
 You do not need to call this method before doing the very first evaluate()
 run ";
@@ -45939,8 +45936,8 @@ Get the number of dependencies of a binary SX. ";
 
 %feature("docstring")  CasADi::SX::__hash__ "
 
-Returns a number that is uniaue for a given SXNode. If the SX does not point
-to qny node, 0 is returned. ";
+Returns a number that is unique for a given SXNode. If the SX does not point
+to any node, 0 is returned. ";
 
 %feature("docstring")  CasADi::SX::__add__ "";
 
@@ -45953,8 +45950,6 @@ to qny node, 0 is returned. ";
 %feature("docstring")  CasADi::SX::__pow__ "";
 
 %feature("docstring")  CasADi::SX::__constpow__ "";
-
-%feature("docstring")  CasADi::SX::prod "";
 
 %feature("docstring")  CasADi::SX::__mldivide__ "";
 
@@ -49882,7 +49877,38 @@ multivariate taylor series expansion
 Do taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$. ";
 
-%feature("docstring")  CasADi::GSL::for "";
+%feature("docstring")  CasADi::GSL::mtaylor "
+
+multivariate taylor series expansion
+
+Do taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+The argument order_contributions can denote how match each variable
+contributes to the aggregated order. If x=[x,y] and
+order_contributions=[1,2], then the aggregated order of $x^n y^m$ equals
+$1n+2m$.
+
+Example usage
+
+$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
+x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $ ";
+
+%feature("docstring")  CasADi::GSL::evaluateConstants "
+
+Eliminate constants Eliminate constants from an expression. This will make
+the graph of the expression smaller, meaning less operations need to be
+evaluated at runtime. At the same time, it degrate the cache utilization. ";
+
+%feature("docstring")  CasADi::GSL::countNodes "
+
+Count number of nodes. ";
+
+%feature("docstring")  CasADi::GSL::getOperatorRepresentation "
+
+Get a string representation for a binary SX, using custom arguments. ";
+
+%feature("docstring")  CasADi::GSL::makeSemiExplicit "";
 
 %feature("docstring")  CasADi::GSL::contains "
 
@@ -49919,37 +49945,6 @@ Return matrix
 loop over rows
 
 append components ";
-
-%feature("docstring")  CasADi::GSL::mtaylor "
-
-multivariate taylor series expansion
-
-Do taylor expansions until the aggregated order of a term is equal to
-'order'. The aggregated order of $x^n y^m$ equals $n+m$.
-
-The argument order_contributions can denote how match each variable
-contributes to the aggregated order. If x=[x,y] and
-order_contributions=[1,2], then the aggregated order of $x^n y^m$ equals
-$1n+2m$.
-
-Example usage
-
-$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
-x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $ ";
-
-%feature("docstring")  CasADi::GSL::evaluateConstants "
-
-Eliminate constants Eliminate constants from an expression. This will make
-the graph of the expression smaller, meaning less operations need to be
-evaluated at runtime. At the same time, it degrate the cache utilization. ";
-
-%feature("docstring")  CasADi::GSL::countNodes "
-
-Count number of nodes. ";
-
-%feature("docstring")  CasADi::GSL::getOperatorRepresentation "
-
-Get a string representation for a binary SX, using custom arguments. ";
 
 %feature("docstring")  CasADi::GSL::print_dat "
 
@@ -51550,17 +51545,6 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: sx__tools_8cpp.xml
-%feature("docstring")  CasADi::mtaylor "";
-
-%feature("docstring")  CasADi::evaluateConstants "";
-
-%feature("docstring")  CasADi::countNodes "";
-
-%feature("docstring")  CasADi::getOperatorRepresentation "";
-
-%feature("docstring")  CasADi::ssym "";
-
-%feature("docstring")  CasADi::makeSemiExplicit "";
 
 
 // File: sx__tools_8hpp.xml
