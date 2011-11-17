@@ -142,8 +142,14 @@ ops_["jacobian_regularization_value"] = OT_REAL;
 
 // Quasi-Newton
 ops_["hessian_approximation"] = OT_STRING;
+ops_["limited_memory_update_type"] = OT_STRING; 
 ops_["limited_memory_max_history"] = OT_INTEGER;
 ops_["limited_memory_max_skipping"] = OT_INTEGER;
+ops_["limited_memory_initialization"] = OT_STRING;
+ops_["limited_memory_init_val"] = OT_REAL;
+ops_["limited_memory_init_val_max"] = OT_REAL;
+ops_["limited_memory_init_val_min"] = OT_REAL;
+ops_["limited_memory_special_for_resto"] = OT_STRING;
 
 // Derivative Test
 ops_["derivative_test"] = OT_STRING;
