@@ -583,7 +583,6 @@ WARN_LOGFILE           =
 INPUT                  = ../../casadi \
                          ../../toolboxes \
                          ../../interfaces \
-                         ../../modelica \
                          ../../optimal_control \
                          ../../integration \
                          ../../nonlinear_programming \
