@@ -266,10 +266,21 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
   t_func_ = 0;
   t_jac_ = 0;
 
+  if(verbose()){
+	cout << "KinsolInternal::evaluate: Initial guess = " << output(0).data() << endl;
+  }
+  
   // Solve the nonlinear system of equations
   int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
-  
   casadi_assert_message(flag>=KIN_SUCCESS,"KINSol flag was " << flag);
+  
+  if(verbose()){
+	// Warn if not successful return
+	casadi_assert_warning(flag==KIN_SUCCESS, "Soft failure in KINSol. Return flag = " << flag << ". Check KINSol documentation.");
+	
+	// Print solution
+	cout << "KinsolInternal::evaluate: solution = " << output(0).data() << endl;
+  }
 
   // End of function if no sensitivities
   if(nfdir==0 && nadir==0)
@@ -416,6 +427,34 @@ void KinsolInternal::func(N_Vector u, N_Vector fval){
   // Get results
   f_.getOutput(NV_DATA_S(fval));
 
+  
+  // Get a referebce to the nonzeros of the function
+  const vector<double>& fdata = f_.output().data();
+  
+  // Make sure that all entries of the linear system are valid
+  for(int k=0; k<fdata.size(); ++k){
+	try{
+	  casadi_assert_message(!isnan(fdata[k]),"Nonzero " << k << " is not-a-number");
+	  casadi_assert_message(!isinf(fdata[k]),"Nonzero " << k << " is infinite");
+	} catch(exception& ex){
+	  stringstream ss;
+	  ss << ex.what() << endl;
+	  if(verbose()){
+		ss << "u = " << f_.input() << endl;
+		
+		// Print the expression for f[Jrow] if f is an SXFunction instance
+		SXFunction f_sx = shared_cast<SXFunction>(f_);
+		if(!f_sx.isNull()){
+		  f_sx.print(ss);
+		  ss << f_sx->work_ << endl;
+		  ss << "Equation " << k << " = " << f_sx.outputSX().at(k) << endl;
+		}
+	  }
+
+	  throw CasadiException(ss.str());
+	}
+  }
+  
   // Log time
   time2_ = clock();
   t_func_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -595,6 +634,50 @@ void KinsolInternal::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector
 
   // Evaluate jacobian
   J_.evaluate();
+
+  // Get a referebce to the nonzeros of Jacobian
+  const vector<double>& Jdata = J_.output().data();
+  
+  // Make sure that all entries of the linear system are valid
+  for(int k=0; k<Jdata.size(); ++k){
+	try{
+	  casadi_assert_message(!isnan(Jdata[k]),"Nonzero " << k << " is not-a-number");
+	  casadi_assert_message(!isinf(Jdata[k]),"Nonzero " << k << " is infinite");
+	} catch(exception& ex){
+	  stringstream ss;
+	  ss << ex.what() << endl;
+	  
+	  if(verbose()){
+	  
+		// Print inputs
+		ss << "Input vector is " << J_.input().data() << endl;
+		
+		// Get the row
+		int Jrow = J_.output().sparsity().getRow().at(k);
+
+		// Get the column
+		int Jcol = J_.output().sparsity().col(k);
+		
+		// Which equation
+		ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
+		
+		// Print the expression for f[Jrow] if f is an SXFunction instance
+		SXFunction f_sx = shared_cast<SXFunction>(f_);
+		if(!f_sx.isNull()){
+		  ss << "Variable " << Jcol << " = " << f_sx.inputSX().at(Jcol) << endl;
+		  ss << "Equation " << Jrow << " = " << f_sx.outputSX().at(Jrow) << endl;
+		}
+		
+		// Print the expression for J[k] if J is an SXFunction instance
+		SXFunction J_sx = shared_cast<SXFunction>(J_);
+		if(!J_sx.isNull()){
+		  ss << "J[" << Jrow << "," << Jcol << "] = " << J_sx.outputSX().at(k) << endl;
+		}
+	  }
+
+	  throw CasadiException(ss.str());
+	}
+  }
   
   // Log time duration
   time2_ = clock();
