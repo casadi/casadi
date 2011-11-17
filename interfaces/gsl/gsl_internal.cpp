@@ -260,7 +260,7 @@ void GslInternal::gsl_error(const string& module, int flag){
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
   }
   ss << " Consult GSL documentation.";
-  casadi_error(ss);
+  casadi_error(ss.str());
 }
   
   

@@ -102,7 +102,7 @@ void LapackLUDenseInternal::prepare(){
 
       
       if(allow_equilibration_failure_)  cout << "Warning: " << ss.str() << endl;
-      else                              casadi_error(ss);
+      else                              casadi_error(ss.str());
     }
   
     // Equilibriate the matrix if scaling was successful

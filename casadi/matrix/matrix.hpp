@@ -1753,7 +1753,7 @@ void Matrix<T>::sanityCheck(bool complete) const {
       s << "Matrix:Compressed Row Storage is not sane. The following must hold:" << std::endl;
       s << "  data.size() = ncol, but got   col.size()  = " << data_.size() << "   and   ncol = "  << sparsity_.col().size() << std::endl;
       s << "  Note that the signature is as follows: DMatrix (nrow, ncol, col, rowind, data)." << std::endl;
-      casadi_error(s);
+      casadi_error(s.str());
   }
 }
 

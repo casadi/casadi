@@ -753,7 +753,7 @@ void CVodesInternal::cvodes_error(const string& module, int flag){
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
   }
   ss << " Consult Cvodes documentation.";
-  casadi_error(ss);
+  casadi_error(ss.str());
 }
   
 void CVodesInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){

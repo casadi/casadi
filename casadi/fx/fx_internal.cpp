@@ -205,7 +205,7 @@ Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
       ss << "Forward direction " << dir << " is out of range [0," << inputStruct(iind).dataF.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss);
+    casadi_error(ss.str());
   }
 }
     
@@ -224,7 +224,7 @@ Matrix<double>& FXInternal::fwdSens(int oind, int dir){
       ss << "Forward direction " << dir << " is out of range [0," << outputStruct(oind).dataF.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss);
+    casadi_error(ss.str());
   }
 }
     
@@ -243,7 +243,7 @@ Matrix<double>& FXInternal::adjSeed(int oind, int dir){
       ss << "Adjoint direction " << dir << " is out of range [0," << outputStruct(oind).dataA.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss);
+    casadi_error(ss.str());
   }
 }
     
@@ -262,7 +262,7 @@ Matrix<double>& FXInternal::adjSens(int iind, int dir){
       ss << "Adjoint direction " << dir << " is out of range [0," << inputStruct(iind).dataA.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss);
+    casadi_error(ss.str());
   }
 }
     

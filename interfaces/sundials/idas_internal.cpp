@@ -1018,7 +1018,7 @@ void IdasInternal::idas_error(const string& module, int flag){
   ss << "Module \"" << module << "\" returned flag " << flag << " (\"" << flagname << "\").";
   ss << " Consult Idas documentation.";
   delete flagname;
-  casadi_error(ss);
+  casadi_error(ss.str());
 }
 
 int IdasInternal::rhsQ_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rhsQ, void *user_data){

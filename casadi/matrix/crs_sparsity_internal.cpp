@@ -49,7 +49,7 @@ void CRSSparsityInternal::sanityCheck(bool complete) const{
     s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
     s << "  rowind.size() = nrow + 1, but got   rowind.size() = " << rowind_.size() << "   and   nrow = "  << nrow_ << std::endl;
     s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-    casadi_error(s);
+    casadi_error(s.str());
   }
   if (complete) {
   
@@ -64,14 +64,14 @@ void CRSSparsityInternal::sanityCheck(bool complete) const{
         s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
         s << "  rowind[lastElement] = col.size(), but got   rowind[lastElement] = " << rowind_[(rowind_.size()-1)] << "   and   col.size() = "  << col_.size() << std::endl;
         s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-        casadi_error(s);
+        casadi_error(s.str());
       }
       if (col_.size()>nrow_*ncol_) {
         std::stringstream s;
         s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
         s << "  col.size() <= nrow * ncol, but got   col.size()  = " << col_.size() << "   and   nrow * ncol = "  << nrow_*ncol_ << std::endl;
         s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-        casadi_error(s);
+        casadi_error(s.str());
       }
     }
     for (int k=0;k<col_.size();k++) {
@@ -80,7 +80,7 @@ void CRSSparsityInternal::sanityCheck(bool complete) const{
         s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
         s << "  0 <= col[i] < ncol for each i, but got   col[i] = " << col_[k] << "   and   ncol = "  << ncol_ << std::endl;
         s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-        casadi_error(s);
+        casadi_error(s.str());
       }
     }
   
