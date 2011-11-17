@@ -526,9 +526,10 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
       G_.getOutput(g);
 
       // Printing
-      if(monitored("eval_g"))
+      if(monitored("eval_g")){
         cout << "x = " << G_.input() << endl;
         cout << "g = " << G_.output() << endl;
+      }
     }
       
     double time2 = clock();
