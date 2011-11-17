@@ -1,4 +1,4 @@
-all: dox
+all: doxpublish
 
 options:
 	python extra/generate_options_doc.py
@@ -10,14 +10,18 @@ examples:
 	cd ../examples && make
 	python extra/fetch_examples_pdf.py
 
-dox:
-	doxygen Doxyfile.in
+doxlocal:
+	doxygen Doxygen.in
+	cp style/casadi.png html/casadi.png
+	
+doxpublish:
+	patch -u Doxyfile.in publish.patch -o - | doxygen -
 	cp style/casadi.png html/casadi.png
 
 swig:
 	sh extra/doc2swig.sh
 
-full: dox
+full: doxpublish
 	cd ../examples && make
 	cd ../tutorials/python && python make_tutorials.py
 	cd ../tutorials/cpp && make
@@ -25,7 +29,7 @@ full: dox
 	python extra/generate_options_doc.py
 	python extra/fetch_examples_pdf.py
 	sh extra/doc2swig.sh
-	doxygen Doxyfile.in
+	patch -u Doxyfile.in publish.patch -o - | doxygen -
 
 publish: 
 	./publish.sh
