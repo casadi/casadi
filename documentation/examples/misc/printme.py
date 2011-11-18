@@ -11,7 +11,7 @@ a = SX("a")
 b = SX("b")
 
 c = a+b
-c = c.printme(SX(13))
+c = c.printme(13)
 
 d = c**2
 

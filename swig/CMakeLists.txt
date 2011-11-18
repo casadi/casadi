@@ -19,10 +19,6 @@ set(CASADI_SWIG_FLAGS "")
 # Find SWIG and include the use swig file
 include (../cmake_modules/UseSWIGMOD.cmake)
 
-if(WITH_PRINTME)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_PRINTME")
-endif(WITH_PRINTME)
-
 find_package (IPOPT QUIET)
 if(IPOPT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT")

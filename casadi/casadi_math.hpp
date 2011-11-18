@@ -336,13 +336,11 @@ class BinaryOperation<PRINTME>{
     template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };
 
-#ifdef WITH_PRINTME 
 template<>
 inline void BinaryOperation<PRINTME>::fcn<double>(const double& x, const double& y, double& f) {
   f = x; 
   std::cout << "|> " << y << " : " << x << std::endl;
 }
-#endif //WITH_PRINTME 
 
 /// Easy access to all the functions for a particular type
 template<typename T>
