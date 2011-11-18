@@ -1495,7 +1495,6 @@ class MXtests(casadiTestCase):
     self.assertEqual(y.size(),0)
 
   def test_indexinglimits(self):
-    return
     self.message("Limits of indexing")
     y = casadi.MX("y", 3) 
     self.assertRaises(RuntimeError,lambda : y[[0, 5]] )
@@ -1507,6 +1506,17 @@ class MXtests(casadiTestCase):
     y[[0, 2]]
     y[[0, 2]] = MX("a")
     
+  def test_printLimiting(self):
+    self.message("printLimiting")
+
+    x = SX("x")
+    for i in range(100):
+      x = sin(x)*x
+      
+    self.assertTrue(len(str(x)) <  4*cvar.SX_max_num_calls_in_print)
+
+    cvar.SX_max_num_calls_in_print = 5
+    self.assertTrue(len(str(x)) <  100)
     
 if __name__ == '__main__':
     unittest.main()

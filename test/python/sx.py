@@ -764,7 +764,19 @@ class SXtests(casadiTestCase):
     x = SX("x")
     #self.assertRaises(TypeError,lambda : SXMatrix([x,None]))  # FIXME: this is leaking memory
     self.assertRaises(NotImplementedError,lambda: SXFunction([[x], [None]], [[2 * x]]))
+    
+  def test_printLimiting(self):
+    self.message("printLimiting")
+
+    x = SX("x")
+    for i in range(100):
+      x = sin(x)*x
       
+    self.assertTrue(len(str(x)) <  4*cvar.SX_max_num_calls_in_print)
+
+    cvar.SX_max_num_calls_in_print = 5
+    self.assertTrue(len(str(x)) <  100)
+    
 if __name__ == '__main__':
     unittest.main()
 
