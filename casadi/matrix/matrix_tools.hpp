@@ -229,6 +229,10 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 template<class T>
 void makeDense(Matrix<T>& A);
 
+/** \brief  Make a matrix sparse by removing numerical */
+template<class T>
+void makeSparse(Matrix<T>& A);
+
 //template<class T>
 //Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b);
 
@@ -564,12 +568,13 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
     // The i-th column of R
     Matrix<T> ri(1,n);
   
-    // subtract the projection of of qi in the previous directions from ai
+    // subtract the projection of qi in the previous directions from ai
     for(int j=0; j<i; ++j){
+      
       // Get the j-th column of Q
       Matrix<T> qj = QT(j,ALL);
 
-      ri(0,j) = mul(qj,trans(qi))(0,0); // Modified Gram-Schmidt
+      ri(0,j) = mul(qj,trans(qi)); // Modified Gram-Schmidt
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
      
       // Remove projection in direction j
@@ -577,7 +582,7 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
     }
 
     // Normalize qi
-    ri(0,i) = norm_2(trans(qi)).at(0);
+    ri(0,i) = norm_2(trans(qi));
     qi /= ri(0,i);
 
     // Update RT and QT
@@ -620,12 +625,55 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     }
     return x;
   } else {
-    // Make a QR factorization
-    Matrix<T> Q,R;
-    qr(A,Q,R);
+    // Make a BLT transformation of A
+    std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+    A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
-    // Solve the factorized system
-    return solve(R,mul(trans(Q),b));
+    // Get the inverted column permutation
+    std::vector<int> inv_colperm(colperm.size());
+    for(int k=0; k<colperm.size(); ++k)
+      inv_colperm[colperm[k]] = k;
+    
+    // Permute the right hand side
+    Matrix<T> bperm(b.size1(),b.size2());
+    for(int i=0; i<b.size1(); ++i){
+      for(int el=b.rowind(rowperm[i]); el<b.rowind(rowperm[i]+1); ++el){
+        bperm(i,b.col(el)) = b[el];
+      }
+    }
+
+    // Permute the linear system
+    Matrix<T> Aperm(A.size1(),A.size2());
+    for(int i=0; i<A.size1(); ++i){
+      for(int el=A.rowind(rowperm[i]); el<A.rowind(rowperm[i]+1); ++el){
+        Aperm(i,inv_colperm[A.col(el)]) = A[el];
+      }
+    }
+    
+    // Permuted solution
+    Matrix<T> xperm;
+    
+    // Simple solution if lower triangular
+    if(isTril(Aperm)){
+      xperm = solve(Aperm,bperm);
+    } else {
+
+      // Make a QR factorization
+      Matrix<T> Q,R;
+      qr(Aperm,Q,R);
+
+      // Solve the factorized system
+      xperm = solve(R,mul(trans(Q),bperm));
+    }
+    
+    // Permute back the solution
+    Matrix<T> x(xperm.size1(),xperm.size2());
+    for(int i=0; i<xperm.size1(); ++i){
+      for(int el=xperm.rowind(inv_colperm[i]); el<xperm.rowind(inv_colperm[i]+1); ++el){
+        x(i,xperm.col(el)) = xperm[el];
+      }
+    }
+    return x;
   }
 }
 
@@ -793,6 +841,36 @@ void makeDense(Matrix<T>& A){
   A.makeDense(A.size1(),A.size2(),0);
 }
 
+template<class T>
+void makeSparse(Matrix<T>& A){
+  // Start with a matrix with no rows
+  Matrix<T> Asp(0,A.size2());
+
+  // Loop over the rows
+  for(int i=0; i<A.size1(); ++i){
+    // Resize the matrix to accomodate the row
+    Asp.resize(i+1,A.size2());
+    
+    // Loop over the existing, possible nonzeros
+    for(int el=A.rowind(i); el<A.rowind(i+1); ++el){
+      
+      // If it is not known to be a zero
+      if(!casadi_limits<T>::isZero(A.at(el))){
+        
+        // Get the column
+        int j=A.col(el);
+      
+        // Save to new, sparse matrix
+        Asp(i,j) = A.at(el);
+      }
+    }
+  }
+  
+  // Save to A, if any elements were indeed removed
+  if(A.size()!=Asp.size()){
+    A = Asp;
+  }
+}
 
 template<class T>
 Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
@@ -921,6 +999,7 @@ MTT_INST(T,sum) \
 MTT_INST(T,sum_all) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
+MTT_INST(T,makeSparse) \
 MTT_INST(T,diag) \
 MTT_INST(T,polyval) \
 MTT_INST(T,addMultiple) \
