@@ -40,7 +40,7 @@ QPOasesInternal* QPOasesInternal::clone() const{
 QPOasesInternal::QPOasesInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H,A){
   addOption("nWSR",       OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
   addOption("CPUtime",    OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
-  addOption("printLevel", OT_STRING,      GenericType(), "Defines the amount of text output during QP solution, see Section 5.7.: \"none\", \"low\", \"medium\" or \"high\"");
+  addOption("printLevel", OT_STRING,      GenericType(), "Defines the amount of text output during QP solution, see Section 5.7","none|low|medium|high");
   
   called_once_ = false;
   qp_ = 0;

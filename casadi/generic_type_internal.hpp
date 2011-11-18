@@ -36,7 +36,10 @@ namespace CasADi{
       virtual GenericTypeInternal<T>* clone() const{ return new GenericTypeInternal(d_);}
       virtual void print(std::ostream &stream) const{ stream << d_; }
       T d_;
+      opt_type type;
   };
+  
+  //template<> GenericTypeInternal<bool>::type = OT_BOOLEAN;
       
   // Implementations of public functions
   template<typename T>

@@ -28,7 +28,7 @@ using namespace std;
 namespace CasADi{
   
 ParallelizerInternal::ParallelizerInternal(const std::vector<FX>& funcs) : funcs_(funcs){
-  addOption("parallelization", OT_STRING, "serial"); // serial, openmp or mpi
+  addOption("parallelization", OT_STRING, "serial","","serial|openmp|mpi"); 
   addOption("save_corrected_input", OT_BOOLEAN, false);
 }
 

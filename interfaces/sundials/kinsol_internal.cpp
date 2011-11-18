@@ -39,10 +39,10 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
   addOption("iterative_solver",         OT_STRING,"gmres");
   addOption("f_scale",                  OT_REALVECTOR);
   addOption("u_scale",                  OT_REALVECTOR);
-  addOption("pretype",                  OT_STRING, "none"); // "none", "left", "right", "both"
+  addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
   addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
   addOption("constraints",              OT_INTEGERVECTOR);
-  addOption("strategy",                 OT_STRING, "none", "Globalization strategy (\"none\" or \"linesearch\")");
+  addOption("strategy",                 OT_STRING, "none", "Globalization strateg","none|linesearch");
   addOption("linear_solver_creator",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class");
   addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
 

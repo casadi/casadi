@@ -121,6 +121,20 @@ for enum in xmlNS.findall("//memberdef[@kind='enum']"):
       description += "\n" + enumvalue.findtext("detaileddescription/para").strip()
     enums[name].append({'name': name_, 'description': description.strip()})
     
+from pyparsing import *
+
+parse_quoted_string = dblQuotedString.copy().setParseAction(removeQuotes)
+parse_quoted_string_keep = dblQuotedString.copy().setParseAction(lambda x:x)
+parse_type = Word( srange("[A-Z]") + "_").setResultsName("type")
+
+comma = Suppress(Literal(","))
+
+parse_default = Or([parse_quoted_string_keep,Word(alphanums + ".:-_"), Literal("GenericType()")]).setResultsName("default")
+
+parse_allowed = parse_quoted_string.setResultsName("allowed")
+
+parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name") + comma + parse_type + Optional(comma + parse_default + Optional(comma + parse_quoted_string.setResultsName("description") +Optional(comma + parse_allowed ) )) +  Literal(")") + Optional(";" + Optional("//" + restOfLine.setResultsName("afterdescription")))
+    
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
   if not('CasADi::OptionsFunctionalityNode' in meta['hierarchy']) and not(name=='CasADi::OptionsFunctionalityNode'):
@@ -131,24 +145,29 @@ for name,meta in metadata.items():
   meta['monitors']={}
   f =file(source,"r")
   for l in f:
-    if not(l.find('addOption')==-1):
-      matched = False
-      m = re.search(r'addOption\(\s*"([^"]*?)"\s*,\s*([^,]*)\s*,\s*([^,]*)(,\s*(.*?))?\)\s*;(\s*// (.*))?',l)
-      if m:
-        matched = True
-        description=[]
-        if not(m.group(7) is None):
-          description.append(m.group(7))
-        if not(m.group(5) is None):
-          description.append(m.group(5)[1:-1])
-        meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': m.group(3),'description': '\n'.join(description), 'used': name}
-      m = re.search(r'addOption\(\s*"([^"]*)"\s*,\s*([^,]*)\s*\)\s*;(\s*// (.*))?',l)
-      if m:
-        matched = True
-        description=m.group(4)
-        meta['options'][m.group(1)]={'name': m.group(1),'type': m.group(2),'default': '','description': description, 'used': name}
-      if not(matched):
-        print l
+    if 'addOption' in l:
+      if ('//' in l and (l.find('addOption') > l.find('//'))) or '->first' in l or '::addOption' in l or 'allowed_vals_vec' in l:
+        continue
+      try:
+        result = parse_match.parseString(l).asDict()
+        for k,v in result.iteritems():
+          result[k]=v.strip()
+      except:
+        raise Exception(l)
+      d = meta['options'][result["name"]]={'name': result["name"],"type": result["type"],'used': name,'default':'','description':''}
+      if 'default' in result:
+        d["default"]= result["default"]
+        
+      description = []
+      if 'afterdescription' in result:
+        description.append(result["afterdescription"].strip())
+      if 'description' in result:
+        description.append(result["description"])
+      if 'allowed' in result:
+        description.append("(" + result["allowed"] +")")
+        
+      d["description"] = '\n'.join(description)
+      
     if not(l.find('ops_')==-1):
       m = re.search(r'ops_\["(.*?)"\]\s*=\s*(.*?);',l)
       if m:

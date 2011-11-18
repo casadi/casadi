@@ -38,6 +38,11 @@ namespace CasADi{
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
 
+opt_type GenericType::getType() const {
+  return OT_BOOLEAN;
+  //return get()->type;
+}
+
 bool GenericType::isBool() const{
   return is_a<bool>();
 }

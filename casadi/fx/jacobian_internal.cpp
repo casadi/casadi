@@ -34,7 +34,7 @@ using namespace std;
 namespace CasADi{
   
 JacobianInternal::JacobianInternal(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks) : fcn_(fcn), jblocks_(jblocks){
-  addOption("ad_mode",            OT_STRING,  "default");  // "forward", "adjoint" or "default" (default meaning checking both)
+  addOption("ad_mode",OT_STRING,  "default","default means both","forward|adjoint|default");
 }
   
 JacobianInternal::~JacobianInternal(){

@@ -88,6 +88,8 @@ namespace CasADi{
     operator SparsityGenerator() const;
     #endif // SWIG
     
+    opt_type getType() const;
+    
     //! \brief Is boolean?
     bool isBool() const;
 

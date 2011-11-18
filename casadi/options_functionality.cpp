@@ -44,7 +44,28 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
     ss << ")" << endl;
     casadi_error(ss.str());
   }
+  
+  // Some typechecking
+  //if (allowed_options[name] == OT_STRING && op)
 
+  // If allowed values are listed, check them.
+  if (!allowed_vals_[name].empty()) {
+    bool found = false;
+    for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();it!=allowed_vals_[name].end();it++) {
+     found = found || (*it) == op;
+    }
+    // If supplied op is not in allowed values, raise an error.
+    if (!found) {
+      stringstream ss;
+      ss << "Option '" << name << "' does not allow '" << op  << "'." << endl;
+      ss << "(Allowed values options are:";
+      for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();it!=allowed_vals_[name].end();it++) {
+        ss << " '" << *it << "'";
+      }
+      ss << ")" << endl;
+      casadi_error(ss.str());
+    }
+  }
   // Save the option
   dictionary_[name] = op;
 }
@@ -73,13 +94,30 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
   return GenericType(it->second);
 }
 
-void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val, const string& desc){
+void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val, const string& desc, const std::string &allowed_vals){
+  std::vector<GenericType> allowed_vals_vec;
+  
+  std::stringstream ss(allowed_vals);
+  std::string item;
+  
+  while(std::getline(ss, item, '|')) {
+      allowed_vals_vec.push_back(item);
+  }
+
+  addOption(name,type,def_val,desc,allowed_vals_vec);
+
+}
+
+
+void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val, const string& desc, const std::vector<GenericType> &allowed_vals){
   allowed_options[name] = type;
 
   if(!def_val.isNull())
     dictionary_[name] = def_val;
 
   description_[name] = desc;
+  
+  allowed_vals_[name] = allowed_vals;
 }
 
 void OptionsFunctionalityNode::printOptions(ostream &stream) const{

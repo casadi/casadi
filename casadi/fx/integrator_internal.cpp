@@ -38,21 +38,20 @@ namespace CasADi{
 
 IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   // set default options
-  setOption("name","unnamed_integrator"); // name of the function
-  
+  setOption("name","unnamed_integrator"); // name of the function  
   // IVP solution
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
   addOption("upper_bandwidth",             OT_INTEGER); // upper band-width of banded jacobians
   addOption("lower_bandwidth",             OT_INTEGER); // lower band-width of banded jacobians
-  addOption("linear_solver",               OT_STRING, "dense"); // "dense", "banded" or "iterative"
-  addOption("iterative_solver",            OT_STRING, "gmres"); // "gmres", "bcgstab", "tfqmr"
-  addOption("pretype",                     OT_STRING, "none"); // "none", "left", "right", "both"
+  addOption("linear_solver",               OT_STRING, "dense","","user_defined|dense|banded|iterative");
+  addOption("iterative_solver",            OT_STRING, "gmres","","gmres|bcgstab|tfqmr");
+  addOption("pretype",                     OT_STRING, "none","","none|left|right|both");
   addOption("exact_jacobian",              OT_BOOLEAN,  false);
   addOption("max_krylov",                  OT_INTEGER,  10);        // maximum krylov subspace size
   addOption("is_differential",             OT_INTEGERVECTOR);
-  addOption("sensitivity_method",          OT_STRING,  "simultaneous"); // "simultaneous" or "staggered"
+  addOption("sensitivity_method",          OT_STRING,  "simultaneous","","simultaneous|staggered");
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
   addOption("stop_at_end",                 OT_BOOLEAN, false); // Stop the integrator at the end of the interval
@@ -73,12 +72,12 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
 
   // Adjoint sensivity problem
   addOption("steps_per_checkpoint",        OT_INTEGER,20); // number of steps between two consecutive checkpoints
-  addOption("interpolation_type",          OT_STRING,"hermite"); // type of interpolation for the adjoint sensitivities ("hermite" or "polynomial")
+  addOption("interpolation_type",          OT_STRING,"hermite","type of interpolation for the adjoint sensitivities","hermite|polynomial");
   addOption("asens_upper_bandwidth",       OT_INTEGER); // upper band-width of banded jacobians
   addOption("asens_lower_bandwidth",       OT_INTEGER); // lower band-width of banded jacobians
-  addOption("asens_linear_solver",         OT_STRING, "dense"); // "dense", "banded" or "iterative"
-  addOption("asens_iterative_solver",      OT_STRING, "gmres"); // "gmres", "bcgstab", "tfqmr"
-  addOption("asens_pretype",               OT_STRING, "none"); // "none", "left", "right", "both"
+  addOption("asens_linear_solver",         OT_STRING, "dense","","dense|banded|iterative");
+  addOption("asens_iterative_solver",      OT_STRING, "gmres","","gmres|bcgstab|tfqmr");
+  addOption("asens_pretype",               OT_STRING, "none","","none|left|right|both");
   addOption("asens_max_krylov",            OT_INTEGER,  10);        // maximum krylov subspace size
   addOption("asens_reltol",                OT_REAL); // relative tolerence for the adjoint sensitivity solution [default: equal to reltol]
   addOption("asens_abstol",                OT_REAL); // absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]

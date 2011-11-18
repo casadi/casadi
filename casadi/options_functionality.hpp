@@ -161,8 +161,9 @@ virtual ~OptionsFunctionalityNode();
 
 protected:
 
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a");
-
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>());
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals);
+  
 private:
 /** \brief  Allowed options  */
   std::map<std::string, opt_type> allowed_options;
@@ -172,6 +173,9 @@ private:
 
 /** \brief  Description for the options */
   std::map<std::string, std::string> description_;
+  
+/** \brief  Allowed values for the options */
+  std::map<std::string, std::vector<GenericType> > allowed_vals_;
 
 };
 

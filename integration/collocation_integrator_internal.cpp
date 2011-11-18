@@ -34,7 +34,7 @@ namespace CasADi{
 CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
-  addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme (\"radau\" or \"legendre\")");
+  addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
   addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
   addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");
@@ -101,8 +101,6 @@ void CollocationIntegratorInternal::init(){
     use_radau = true;
   } else if(getOption("collocation_scheme")=="legendre"){
     use_radau = false;
-  } else {
-    throw CasadiException("Option \"collocation_scheme\" must be either \"radau\" or \"legendre\"");
   }
   
   // Hotstart?
