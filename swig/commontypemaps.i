@@ -4,8 +4,8 @@
 
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
-#define PRECEDENCE_SXMatrix 102
-#define PRECEDENCE_SX 103
+#define PRECEDENCE_SXMatrix 103
+#define PRECEDENCE_SX 102
 #define PRECEDENCE_SXMatrixVector 103
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
