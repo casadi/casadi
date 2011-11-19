@@ -39,7 +39,6 @@ namespace CasADi{
    *   np: Number of parameters: from option number_of_parameters\n
    *   nh: Number of point constraints: from cfcn.input(0).size()
    *
-   * MultipleShooting is an CasADi::FX mapping from CasADi::OCPInput to CasADi::OCPOutput
    *
    *   \author Joel Andersson
    *   \date 2011
@@ -49,9 +48,11 @@ class MultipleShooting : public OCPSolver{
     /// Default constructor
     MultipleShooting();
   
-    /// Create a multiple shooting OCP solver
-    /**
-    * \param ffcn Discrete time dynamics, CasADi::FX mapping from CasADi::IntegratorInput to CasADi::IntegratorOutput
+    /** \brief Create a multiple shooting OCP solver
+    * \param ffcn Discrete time dynamics, an CasADi::FX with the folowing mapping:
+    * \copydoc scheme_IntegratorInput
+    * \copydoc scheme_IntegratorOutput
+    * The first nu entries of the INTEGRATOR_P input are interpreted as controls to be optimized for each time interval, the remainder are interpreted as parameters to be optimized but constant over the whole domain.
     * \param mfcn Mayer term, mapping endstate (nx x 1) to cost (1 x 1)
     * \param cfcn Path constraints, CasADi::FX mapping from CasADi::DAEInput to (nh x 1)
     * \param rfcn Initial value constraints

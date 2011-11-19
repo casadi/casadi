@@ -29,7 +29,7 @@
 
 namespace CasADi{
  
-  /** \brief  Internal node class for OCPSolver
+/** \brief  Internal node class for OCPSolver
   \author Joel Andersson 
   \date 2010
 */

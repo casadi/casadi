@@ -223,11 +223,15 @@
 /** \class CasADi::OptimalControl::MultipleShootingInternal
 \n
 \par
+@copydoc scheme_OCPInput
+<br/>
 @copydoc scheme_OCPOutput
 */
 /** \class CasADi::OptimalControl::MultipleShooting
 \n
 \par
+@copydoc scheme_OCPInput
+<br/>
 @copydoc scheme_OCPOutput
 */
 /** \class CasADi::SimulatorInternal
@@ -411,11 +415,15 @@
 /** \class CasADi::OCPSolverInternal
 \n
 \par
+@copydoc scheme_OCPInput
+<br/>
 @copydoc scheme_OCPOutput
 */
 /** \class CasADi::OCPSolver
 \n
 \par
+@copydoc scheme_OCPInput
+<br/>
 @copydoc scheme_OCPOutput
 */
 /** \class CasADi::GSL::GslInternal

@@ -25,7 +25,7 @@
 
 
 INPUTSCHEME(OCPInput)
-INPUTSCHEME(OCPOutput)
+OUTPUTSCHEME(OCPOutput)
 
 using namespace std;
 

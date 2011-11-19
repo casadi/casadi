@@ -5191,6 +5191,11 @@ Reset the solver and bring the time back to t0. ";
 
 Reset the solver of the adjoint problem and take time to tf. ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::evaluate "
+
+Overload this method, since the number of derivative directions currently
+aren't passed. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::integrate "
 
 Integrate until a specified time point. ";
@@ -5220,10 +5225,6 @@ Print statistics. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::setStopTime "
 
 Set the stop time of the forward integration. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::evaluate "
-
-evaluate ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::jac "
 
@@ -12730,6 +12731,10 @@ point to this new object. ";
 
 %feature("docstring")  CasADi::GenericType::GenericType "";
 
+%feature("docstring")  CasADi::GenericType::get_description "
+
+Get a description of the object's type. ";
+
 %feature("docstring")  CasADi::GenericType::GenericType "";
 
 %feature("docstring")  CasADi::GenericType::GenericType "
@@ -12749,6 +12754,10 @@ Creator functions. ";
 %feature("docstring")  CasADi::GenericType::GenericType "";
 
 %feature("docstring")  CasADi::GenericType::getType "";
+
+%feature("docstring")  CasADi::GenericType::can_cast_to "";
+
+%feature("docstring")  CasADi::GenericType::can_cast_to "";
 
 %feature("docstring")  CasADi::GenericType::isBool "
 
@@ -30943,9 +30952,6 @@ of differential states: from ffcn.input(INTEGRATOR_X0).size()  nu: Number of
 controls: from ffcn.input(INTEGRATOR_P).size() - np  np: Number of
 parameters: from option number_of_parameters  nh: Number of point
 constraints: from cfcn.input(0).size()
-
-MultipleShooting is an CasADi::FX mapping from CasADi::OCPInput to
-CasADi::OCPOutput
 
 Joel Andersson
 
@@ -49401,7 +49407,23 @@ nearly linearly dependent See J. Demmel: Applied Numerical Linear Algebra
 
 %feature("docstring")  CasADi::GSL::solve "
 
-Solve a system of equations: A*x = b. ";
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. The algorithm used is
+the following: 1. A simple forward or backward substitution if A is upper or
+lower triangular 2. If the linear system is at most 3-by-3, form the inverse
+via minor expansion and multiply 3. Permute the variables and equations as
+to get a (structurally) nonzero diagonal, then perform a QR factorization
+without pivoting and solve the factorized system.
+
+Note 1: If there are entries of the linear system known to be zero, these
+will be removed. Elements that are very small, or will evaluate to be zero,
+can still cause numerical errors, due to the lack of pivoting (which is not
+possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular)
+transformation is formed. Only the permutation part of this is however used.
+An improvement would be to solve block-by-block if there are multiple BLT
+blocks. ";
 
 %feature("docstring")  CasADi::GSL::linspace "
 
@@ -49476,6 +49498,14 @@ Unite two matrices no overlapping sparsity. ";
 %feature("docstring")  CasADi::GSL::makeDense "
 
 Make a matrix dense. ";
+
+%feature("docstring")  CasADi::GSL::makeSparse "
+
+Make a matrix sparse by removing numerical. ";
+
+%feature("docstring")  CasADi::GSL::hasNonStructuralZeros "
+
+Check if the matrix has any zero entries which are not structural zeros. ";
 
 %feature("docstring")  CasADi::GSL::addMultiple "
 
