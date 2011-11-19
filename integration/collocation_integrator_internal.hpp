@@ -61,6 +61,9 @@ public:
   /// Reset the solver of the adjoint problem and take time to tf
   virtual void resetAdj();
 
+  /// Overload this method, since the number of derivative directions currently aren't passed
+  virtual void evaluate(int nfdir, int nadir);
+
   ///  Integrate until a specified time point
   virtual void integrate(double t_out);
 

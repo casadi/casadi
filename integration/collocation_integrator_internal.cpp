@@ -475,10 +475,16 @@ void CollocationIntegratorInternal::init(){
 void CollocationIntegratorInternal::initAdj(){
 }
 
-void CollocationIntegratorInternal::reset(int nfdir, int nadir){
+void CollocationIntegratorInternal::evaluate(int nfdir, int nadir){
   // Store the sensitivity directions
   nfdir_ = nfdir;
   nadir_ = nadir;
+  
+  // Call the base class method
+  IntegratorInternal::evaluate(nfdir,nadir);
+}
+
+void CollocationIntegratorInternal::reset(int nfdir, int nadir){
   
   // Pass the inputs
   const vector<double>& x0 = input(INTEGRATOR_X0).data();
