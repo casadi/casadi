@@ -10,7 +10,7 @@ for i in range(5):
 #! With default printlimit
 print x
 
-cvar.SX_max_num_calls_in_print = 3
+SX.setMaxNumCallsInPrint(3)
 
 print x
 
@@ -25,6 +25,6 @@ for i in range(5):
 #! With default printlimit
 print x
 
-cvar.MX_max_num_calls_in_print = 3
+MX.setMaxNumCallsInPrint(3)
 
 print x

@@ -238,8 +238,14 @@ class SX{
     // Set the temporary variable
     void setTemp(int t);
     
-    // Maximum number of calls
+    // Maximum number of calls in printing
     static long max_num_calls_in_print;
+    
+    // Set maximum number of calls in printing
+    static void setMaxNumCallsInPrint(long num=10000) { max_num_calls_in_print = num; }
+    
+    // Get maximum number of calls in printing
+    static long getMaxNumCallsInPrint() { return max_num_calls_in_print; }
 
   private:
 #ifndef SWIG

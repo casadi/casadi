@@ -1509,14 +1509,16 @@ class MXtests(casadiTestCase):
   def test_printLimiting(self):
     self.message("printLimiting")
 
-    x = SX("x")
+    x = MX("x")
     for i in range(100):
       x = sin(x)*x
       
-    self.assertTrue(len(str(x)) <  4*cvar.SX_max_num_calls_in_print)
+    self.assertTrue(len(str(x)) <  4*MX.getMaxNumCallsInPrint())
 
-    cvar.SX_max_num_calls_in_print = 5
+    MX.setMaxNumCallsInPrint(5)
     self.assertTrue(len(str(x)) <  100)
+
+    MX.setMaxNumCallsInPrint()
     
 if __name__ == '__main__':
     unittest.main()

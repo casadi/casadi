@@ -772,10 +772,13 @@ class SXtests(casadiTestCase):
     for i in range(100):
       x = sin(x)*x
       
-    self.assertTrue(len(str(x)) <  4*cvar.SX_max_num_calls_in_print)
-
-    cvar.SX_max_num_calls_in_print = 5
+      
+    self.assertTrue(len(str(x)) <  4*SX.getMaxNumCallsInPrint())
+    
+    SX.setMaxNumCallsInPrint(5)
     self.assertTrue(len(str(x)) <  100)
+    
+    SX.getMaxNumCallsInPrint()
     
 if __name__ == '__main__':
     unittest.main()
