@@ -664,16 +664,18 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
       inv_colperm[colperm[k]] = k;
     
     // Permute the right hand side
-    Matrix<T> bperm(b.size1(),b.size2());
+    Matrix<T> bperm(0,b.size2());
     for(int i=0; i<b.size1(); ++i){
+      bperm.resize(i+1,b.size2());
       for(int el=b.rowind(rowperm[i]); el<b.rowind(rowperm[i]+1); ++el){
         bperm(i,b.col(el)) = b[el];
       }
     }
 
     // Permute the linear system
-    Matrix<T> Aperm(A.size1(),A.size2());
+    Matrix<T> Aperm(0,A.size2());
     for(int i=0; i<A.size1(); ++i){
+      Aperm.resize(i+1,A.size2());
       for(int el=A.rowind(rowperm[i]); el<A.rowind(rowperm[i]+1); ++el){
         Aperm(i,inv_colperm[A.col(el)]) = A[el];
       }
@@ -704,8 +706,9 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     }
     
     // Permute back the solution
-    Matrix<T> x(xperm.size1(),xperm.size2());
+    Matrix<T> x(0,xperm.size2());
     for(int i=0; i<xperm.size1(); ++i){
+      x.resize(i+1,xperm.size2());
       for(int el=xperm.rowind(inv_colperm[i]); el<xperm.rowind(inv_colperm[i]+1); ++el){
         x(i,xperm.col(el)) = xperm[el];
       }
