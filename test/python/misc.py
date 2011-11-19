@@ -27,7 +27,7 @@ class Misctests(casadiTestCase):
     
     def print_sparsity():
         sparsity = calc_sparsity()
-        print(sparsity) # Segfault
+        str(sparsity) # Segfault
         
     print_sparsity()
     
@@ -40,8 +40,15 @@ class Misctests(casadiTestCase):
     self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[-3,2,1],[0,2,2,3],[0.738,0.39,0.99]))
     self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1,2],[0,2,2,3],[0.738,0.39,0.99]))
     self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[0,2,0,3],[0.738,0.39,0.99]))
+  
+  def test_setoptionerrors(self):
+    self.message("option errors")
+    x = SX("x")
+    f = SXFunction([x],[x])
     
-    
+    self.assertRaises(RuntimeError,lambda : f.getOption("foobar"))
+    self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
+    self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
     
 if __name__ == '__main__':
     unittest.main()

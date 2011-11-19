@@ -31,7 +31,7 @@
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_REALVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_VOIDPTR};
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_VOIDPTR, OT_UNKNOWN};
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -50,9 +50,18 @@ namespace CasADi{
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const SharedObject& obj);
+    //GenericType(const GenericType& obj);    
+    
     #ifndef SWIG
     GenericType(void* ptr);
     #endif // SWIG
+
+    /// Get a description of a type
+    static std::string get_type_description(opt_type type);
+    
+    /// Get a description of the object's type
+    std::string get_description() const { return get_type_description(type_); }
+
 
     typedef std::map<std::string, GenericType> Dictionary;
     GenericType(const Dictionary& dict);
@@ -89,6 +98,9 @@ namespace CasADi{
     #endif // SWIG
     
     opt_type getType() const;
+    
+    bool can_cast_to(opt_type other) const;
+    bool can_cast_to(const GenericType& other) const { return can_cast_to(other.type_) ;}
     
     //! \brief Is boolean?
     bool isBool() const;
@@ -155,6 +167,10 @@ namespace CasADi{
     template<typename T>
     bool is_a() const;
     #endif // SWIG
+    
+   private:  
+    opt_type type_;
+      
     
   };
   

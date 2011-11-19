@@ -39,9 +39,62 @@ namespace CasADi{
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
 
 opt_type GenericType::getType() const {
-  return OT_BOOLEAN;
-  //return get()->type;
+  return type_;
 }
+    
+bool GenericType::can_cast_to(opt_type other) const {
+  switch(other)
+    {
+      case OT_BOOLEAN: case OT_INTEGER: case OT_REAL:
+        return isBool() || isInt() || isDouble();
+      case OT_BOOLVECTOR: case OT_INTEGERVECTOR: case OT_REALVECTOR:
+        return isDoubleVector() || isIntVector();
+      default:
+        return type_ == other;
+  }
+}
+
+std::string GenericType::get_type_description(opt_type type) {
+  switch(type)
+    {
+      case OT_BOOLEAN:
+	      return "OT_BOOLEAN";
+      case OT_INTEGER:
+	      return "OT_INTEGER";
+      case OT_REAL:
+	      return "OT_REAL";
+      case OT_STRING:
+	      return "OT_STRING";
+      case OT_INTEGERVECTOR:
+	      return "OT_INTEGERVECTOR";
+      case OT_BOOLVECTOR:
+	      return "OT_BOOLVECTOR";
+      case OT_REALVECTOR:
+	      return "OT_REALVECTOR";
+      case OT_STRINGVECTOR:
+	      return "OT_STRINGVECTOR";
+      case OT_DICTIONARY:
+	      return "OT_DICTIONARY";
+      case OT_NLPSOLVER:
+	      return "OT_NLPSOLVER";
+      case OT_LINEARSOLVER:
+	      return "OT_LINEARSOLVER";
+      case OT_INTEGRATOR:
+	      return "OT_INTEGRATOR";
+      case OT_QPSOLVER:
+	      return "OT_QPSOLVER";
+      case OT_IMPLICITFUNCTION:
+	      return "OT_IMPLICITFUNCTION";
+      case OT_JACOBIANGENERATOR:
+	      return "OT_JACOBIANGENERATOR";
+      case OT_SPARSITYGENERATOR:
+	      return "OT_SPARSITYGENERATOR";
+      default:
+	      return "OT_UNKNOWN";
+	      
+    }
+};
+    
 
 bool GenericType::isBool() const{
   return is_a<bool>();
@@ -78,50 +131,56 @@ bool GenericType::isSharedObject() const{
 GenericType::GenericType(){
 }
 
+
 ostream& operator<<(ostream &stream, const GenericType& ref){
   ref->print(stream);
   return stream;
 }
 
-GenericType::GenericType(bool b){
+GenericType::GenericType(bool b) : type_(OT_BOOLEAN) {
   assignNode(new BoolType(b));
 }
 
-GenericType::GenericType(int i){
+GenericType::GenericType(int i) : type_(OT_INTEGER) {
   assignNode(new IntType(i));
 }
 
-GenericType::GenericType(double d){
+GenericType::GenericType(double d) : type_(OT_REAL) {
   assignNode(new DoubleType(d));
 }
 
-GenericType::GenericType(const vector<int>& iv){
+GenericType::GenericType(const vector<int>& iv) : type_(OT_INTEGERVECTOR){
   assignNode(new IntVectorType(iv));
 }
 
-GenericType::GenericType(const vector<bool>& b_vec){
+GenericType::GenericType(const vector<bool>& b_vec) : type_(OT_BOOLVECTOR){
   vector<int> i_vec(b_vec.size());
   copy(b_vec.begin(),b_vec.end(), i_vec.begin());
   assignNode(new IntVectorType(i_vec));
 }
 
-GenericType::GenericType(const vector<double>& dv){
+GenericType::GenericType(const vector<double>& dv) : type_(OT_REALVECTOR) {
   assignNode(new DoubleVectorType(dv));
 }
 
-GenericType::GenericType(const vector<string>& sv){
+GenericType::GenericType(const vector<string>& sv) : type_(OT_STRINGVECTOR) {
   assignNode(new StringVectorType(sv));
 }
 
-GenericType::GenericType(const string& s){
+GenericType::GenericType(const string& s) : type_(OT_STRING) {
   assignNode(new StringType(s));
 }
 
-GenericType::GenericType(const char s[]){ 
+GenericType::GenericType(const char s[])  : type_(OT_STRING) { 
   assignNode(new StringType(s));
 }
 
-GenericType::GenericType(const SharedObject& obj){
+//GenericType::GenericType(const GenericType& obj) {
+//  type_ = obj.type_;
+//  assignNode(new SharedObjectType(obj));
+//}
+
+GenericType::GenericType(const SharedObject& obj) : type_(OT_UNKNOWN) {
   assignNode(new SharedObjectType(obj));
 }
 
@@ -222,32 +281,32 @@ bool GenericType::operator!=(const GenericType& op2) const{
   // Different types
   return true;
 }
-
-GenericType::GenericType(NLPSolverCreator ptr){
+  
+GenericType::GenericType(NLPSolverCreator ptr)  : type_(OT_NLPSOLVER) {
   assignNode(new GenericTypeInternal<NLPSolverCreator>(ptr));
 }
 
-GenericType::GenericType(linearSolverCreator ptr){
+GenericType::GenericType(linearSolverCreator ptr) : type_(OT_LINEARSOLVER) {
   assignNode(new GenericTypeInternal<linearSolverCreator >(ptr));
 }
 
-GenericType::GenericType(integratorCreator ptr){
+GenericType::GenericType(integratorCreator ptr) : type_(OT_INTEGRATOR) {
   assignNode(new GenericTypeInternal<integratorCreator>(ptr));
 }
 
-GenericType::GenericType(QPSolverCreator ptr){
+GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
   assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
 }
 
-GenericType::GenericType(implicitFunctionCreator ptr){
+GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
 }
 
-GenericType::GenericType(JacobianGenerator ptr){
+GenericType::GenericType(JacobianGenerator ptr) : type_(OT_JACOBIANGENERATOR) {
   assignNode(new GenericTypeInternal<JacobianGenerator>(ptr));
 }
 
-GenericType::GenericType(SparsityGenerator ptr){
+GenericType::GenericType(SparsityGenerator ptr) : type_(OT_SPARSITYGENERATOR) {
   assignNode(new GenericTypeInternal<SparsityGenerator>(ptr));
 }
 
@@ -285,7 +344,7 @@ GenericType::operator SparsityGenerator() const{
   return static_cast<const GenericTypeInternal<SparsityGenerator>*>(get())->d_;
 }
 
-GenericType::GenericType(const Dictionary& dict){
+GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {
   assignNode(new GenericTypeInternal<Dictionary>(dict));
 }
 
@@ -304,7 +363,7 @@ void * GenericType::toVoidPointer() const {
   return static_cast<const GenericTypeInternal<void*>*>(get())->d_; 
 }
 
-GenericType::GenericType(void* ptr){
+GenericType::GenericType(void* ptr) : type_(OT_VOIDPTR){
   assignNode(new GenericTypeInternal<void*>(ptr));
 }
 

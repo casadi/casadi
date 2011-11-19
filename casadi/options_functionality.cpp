@@ -25,8 +25,6 @@
 #include "stl_vector_tools.hpp"
 #include "casadi_exception.hpp"
 
-const char *opt_type_name[] =  { "boolean", "integer", "real", "string", "integervector", "realvector", "Dictionary", "NLPSolver", "LinearSolver", "Integrator", "QPSolver", "ImplicitSolver", "JacobianGenerator", "SparsityGenerator", "void pointer"};
-
 using namespace std;
 
 namespace CasADi{
@@ -44,9 +42,21 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
     ss << ")" << endl;
     casadi_error(ss.str());
   }
-  
+
   // Some typechecking
-  //if (allowed_options[name] == OT_STRING && op)
+  if (!op.can_cast_to(allowed_options[name])) {
+    stringstream ss;
+    ss << "Option '" << name << "' expects a '" << GenericType::get_type_description(allowed_options[name]) << "' type." << endl;
+    ss << "You supplied a type '" << op.get_description() << "' instead." << endl;
+    if (!allowed_vals_[name].empty()) {
+      ss << "(Allowed values options are:";
+      for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();it!=allowed_vals_[name].end();it++) {
+        ss << " '" << *it << "'";
+      }
+      ss << ")" << endl;
+    }
+    casadi_error(ss.str());
+  }
 
   // If allowed values are listed, check them.
   if (!allowed_vals_[name].empty()) {
@@ -124,7 +134,7 @@ void OptionsFunctionalityNode::printOptions(ostream &stream) const{
   // Print allowed options
   stream << "\"Option name\" [type] = value" << endl;
   for(map<string, opt_type>::const_iterator it=allowed_options.begin(); it!=allowed_options.end(); ++it){
-    stream << "  \"" << it->first << "\" [" << opt_type_name[it->second] << "] ";
+    stream << "  \"" << it->first << "\" [" << GenericType::get_type_description(it->second) << "] ";
     
     // Check if it is has been set
     Dictionary::const_iterator j=dictionary_.find(it->first);
