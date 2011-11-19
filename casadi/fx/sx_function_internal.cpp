@@ -79,7 +79,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   if (!free_vars_.empty()) {
     std::stringstream ss;
     repr(ss);
-    casadi_error("Cannot evaluate \"" << ss << "\" since variables " << free_vars_ << " are free.");
+    casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
   }
   // Copy the function arguments to the work vector
   for(int ind=0; ind<getNumInputs(); ++ind){
