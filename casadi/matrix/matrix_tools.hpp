@@ -147,7 +147,23 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R);
 template<class T>
 std::vector<Matrix<T> > qr(const Matrix<T>& A);
 
-/** \brief  Solve a system of equations: A*x = b */
+/** \brief  Solve a system of equations: A*x = b 
+The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
+used is the following:
+  1. A simple forward or backward substitution if A is upper or lower triangular
+  2. If the linear system is at most 3-by-3, form the inverse via minor expansion and multiply
+  3. Permute the variables and equations as to get a (structurally) nonzero diagonal, then perform
+     a QR factorization without pivoting and solve the factorized system.
+
+Note 1: If there are entries of the linear system known to be zero, these will be removed. Elements
+  that are very small, or will evaluate to be zero, can still cause numerical errors, due to the lack
+  of pivoting (which is not possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular) transformation is formed.
+  Only the permutation part of this is however used. An improvement would be to solve block-by-block
+  if there are multiple BLT blocks.
+  
+*/
 template<class T>
 Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
 
@@ -232,6 +248,10 @@ void makeDense(Matrix<T>& A);
 /** \brief  Make a matrix sparse by removing numerical */
 template<class T>
 void makeSparse(Matrix<T>& A);
+
+/** \brief  Check if the matrix has any zero entries which are not structural zeros */
+template<class T>
+bool hasNonStructuralZeros(const Matrix<T>& A);
 
 //template<class T>
 //Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b);
@@ -600,8 +620,9 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
   // check dimensions
   casadi_assert_message(A.size1() == b.size1(),"solve: dimension mismatch");
   casadi_assert_message(A.size1() == A.size2(),"solve: A not square");
+  
   if(isTril(A)){
-    // forward substiution if lower triangular
+    // forward substitution if lower triangular
     Matrix<T> x = b;
     for(int i=0; i<A.size1(); ++i){ // loop over rows
       for(int k=0; k<b.size2(); ++k){ // for every right hand side
@@ -613,7 +634,7 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     }
     return x;
   } else if(isTriu(A)){
-    // backward substiution if upper triangular
+    // backward substitution if upper triangular
     Matrix<T> x = b;
     for(int i=A.size1()-1; i>=0; --i){ // loop over rows from the back
       for(int k=0; k<b.size2(); ++k){ // for every right hand side
@@ -624,7 +645,15 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
       }
     }
     return x;
+  } else if(hasNonStructuralZeros(A)){
+    
+    // If there are structurally nonzero entries that are known to be zero, remove these and rerun the algorithm
+    Matrix<T> A_sparse = A;
+    makeSparse(A_sparse);
+    return solve(A_sparse,b);
+
   } else {
+    
     // Make a BLT transformation of A
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
@@ -653,16 +682,24 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     // Permuted solution
     Matrix<T> xperm;
     
-    // Simple solution if lower triangular
+    // Solve permuted system
     if(isTril(Aperm)){
+      
+      // Forward substitution if lower triangular after sorting the equations
       xperm = solve(Aperm,bperm);
-    } else {
+      
+    } else if(A.size1()<=3){
+      
+      // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
+      xperm = mul(inv(A),bperm);
 
+    } else {
+      
       // Make a QR factorization
       Matrix<T> Q,R;
       qr(Aperm,Q,R);
 
-      // Solve the factorized system
+      // Solve the factorized system (note that solve will now be fast since it is triangular)
       xperm = solve(R,mul(trans(Q),bperm));
     }
     
@@ -843,6 +880,10 @@ void makeDense(Matrix<T>& A){
 
 template<class T>
 void makeSparse(Matrix<T>& A){
+  // Quick return if there are no structurally zero entries
+  if(!hasNonStructuralZeros(A))
+    return;
+  
   // Start with a matrix with no rows
   Matrix<T> Asp(0,A.size2());
 
@@ -866,10 +907,22 @@ void makeSparse(Matrix<T>& A){
     }
   }
   
-  // Save to A, if any elements were indeed removed
-  if(A.size()!=Asp.size()){
-    A = Asp;
+  // Save to A
+  A = Asp;
+}
+
+template<class T>
+bool hasNonStructuralZeros(const Matrix<T>& A){
+  // Loop over the structural nonzeros
+  for(int el=0; el<A.size(); ++el){
+    
+    // Check if the structural nonzero is known to be zero
+    if(casadi_limits<T>::isZero(A.at(el)))
+      return true;
   }
+  
+  // No known zeros amongst the structurally nonzero entries
+  return false;
 }
 
 template<class T>
@@ -1000,6 +1053,7 @@ MTT_INST(T,sum_all) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 MTT_INST(T,makeSparse) \
+MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
 MTT_INST(T,polyval) \
 MTT_INST(T,addMultiple) \
