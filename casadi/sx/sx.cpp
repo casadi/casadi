@@ -690,7 +690,15 @@ void SX::setTemp(int t){
   (*this)->temp = t;
 }
 
-long SX::max_num_calls_in_print = 10000;
+long SX::max_num_calls_in_print_ = 10000;
+
+void SX::setMaxNumCallsInPrint(long num){
+  max_num_calls_in_print_ = num;
+}
+
+long SX::getMaxNumCallsInPrint(){
+  return max_num_calls_in_print_;
+}
 
 
 } // namespace CasADi

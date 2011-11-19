@@ -655,7 +655,15 @@ void MX::append(const MX& y){
   *this = vertcat(*this,y);
 }
 
-long MX::max_num_calls_in_print = 10000;
+long MX::max_num_calls_in_print_ = 10000;
+
+void MX::setMaxNumCallsInPrint(long num){
+  max_num_calls_in_print_ = num;
+}
+
+long MX::getMaxNumCallsInPrint(){
+  return max_num_calls_in_print_;
+}
 
 } // namespace CasADi
 

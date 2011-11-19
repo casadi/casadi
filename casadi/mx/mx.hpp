@@ -321,16 +321,18 @@ class MX : public SharedObject{
   */
   const Matrix<int>& mapping();
 
-  // Maximum number of calls in printing
-  static long max_num_calls_in_print;
-  
-    
-  // Set maximum number of calls in printing
-  static void setMaxNumCallsInPrint(long num=10000) { max_num_calls_in_print = num; }
-  
-  // Get maximum number of calls in printing
-  static long getMaxNumCallsInPrint() { return max_num_calls_in_print; }
+  /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
+  static void setMaxNumCallsInPrint(long num=10000);
 
+  /** \brief Get the maximum number of calls to the printing function when printing an expression */
+  static long getMaxNumCallsInPrint();
+
+  #ifndef SWIG
+  private:
+    // Maximum number of calls
+    static long max_num_calls_in_print_;
+    
+  #endif // SWIG
 };
 
 //@{
