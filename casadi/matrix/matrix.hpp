@@ -38,6 +38,14 @@ namespace CasADi{
   /** Sparsity format for getting and setting inputs and outputs */
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
 
+  /** Helper class pretty printing of type */
+  template<class T>
+  class TypeName{
+    public:
+      static std::string name;
+  };
+  
+  
   /** \brief General sparse matrix class
   General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
   This philosophy makes it easy to use and to interface in particularily with Matlab and Python.\n
@@ -454,6 +462,7 @@ class Matrix : public PrintableObject{
     virtual void print(std::ostream &stream=std::cout) const; // print print description
     virtual void repr(std::ostream &stream=std::cout) const; // print representation
 #endif
+    static std::string className(); // name of the class
     void printScalar(std::ostream &stream=std::cout) const; // print scalar
     void printVector(std::ostream &stream=std::cout) const; // print one row vector-style
     void printMatrix(std::ostream &stream=std::cout) const; // print one row, matrix-style
@@ -665,6 +674,9 @@ namespace CasADi{
 #ifndef SWIG
 namespace CasADi{
 // Implementations
+
+template<class T>
+std::string TypeName<T>::name = "unknown_class";
 
 template<class T>
 const T& Matrix<T>::elem(int i, int j) const{
@@ -943,6 +955,9 @@ void Matrix<T>::makeEmpty(int n, int m){
 }
 
 template<class T>
+std::string Matrix<T>::className(){ return std::string("Matrix<") + TypeName<T>::name + std::string(">"); }
+
+template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {
   casadi_assert_message(numel()==1, "Not a scalar");
   stream << toScalar();
@@ -960,7 +975,7 @@ void Matrix<T>::printVector(std::ostream &stream) const {
     
     // Check if nonzero
     if(rowind(i)==rowind(i+1)){
-      stream << "0";
+      stream << "00";
     } else {
       stream << data()[rowind(i)];
     }
@@ -981,7 +996,7 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     for(int el=rowind(i); el<rowind(i+1); ++el){
       // Print leading zeros
       for(;j<col(el); ++j)
-        stream << "0" << (j==maxj? " " : ",  ");
+        stream << "00" << (j==maxj? " " : ",  ");
       
       // Print element
       stream << data()[el] << (j==maxj? " " : ",  ");
@@ -990,7 +1005,7 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     
     // Print trailing zeros
     for(;j<size2(); ++j)
-      stream << "0" << (j==maxj? " " : ",  ");
+      stream << "00" << (j==maxj? " " : ",  ");
     
     // New row
     if(i==size1()-1)
@@ -1002,25 +1017,31 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
 
 template<class T>
 void Matrix<T>::printDense(std::ostream &stream) const{
-  stream << size1() << "-by-" << size2() << " matrix:" << std::endl;
+  stream << className() << "(rows = " << size1() << ", cols = " << size2() << "):" << std::endl;
   printMatrix(stream);
 }
 
 
 template<class T>
 void Matrix<T>::printSparse(std::ostream &stream) const {
-  stream << "Sparse " << size1() << "-by-" << size2() << " matrix with " << size() << " structural non-zeros:" << std::endl;
+  stream << className() << "(rows = " << size1() << ", cols = " << size2() << ", nnz = " << size() << "):";
   for(int i=0; i<size1(); ++i)
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j=col(el);
-      stream << "(" << i << "," << j << "): " << data()[el] << std::endl;
+      stream << "[" << i << "," << j << "] -> " << data()[el] << std::endl;
     }
 }
 
 template<class T>
 void Matrix<T>::print(std::ostream &stream) const{
   if(dense()){
-    printDense(stream);
+    if (size()==1){
+      printScalar(stream);
+    } else if (size2()==1){
+      printVector(stream);
+    } else {
+      printDense(stream);
+    }
   } else {
     printSparse(stream);
   }
@@ -1028,14 +1049,18 @@ void Matrix<T>::print(std::ostream &stream) const{
 
 template<class T>
 void Matrix<T>::repr(std::ostream &stream) const{
-  if (empty())
+  stream << className() << "(";
+  if (empty()){
     stream << "[]";
-  else if (numel()==1)
+  } else if (numel()==1 && size()==1){
     printScalar(stream);
-  else if (size2()==1)
+  } else if (size2()==1){
     printVector(stream);
-  else
+  } else {
+    stream << std::endl;
     printMatrix(stream);
+  }
+  stream << ")";
 }
 
 template<class T>

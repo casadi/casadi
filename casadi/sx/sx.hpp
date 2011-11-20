@@ -340,6 +340,15 @@ class casadi_operators<SX>{
 #ifndef SWIG
 
 // Template specialization
+namespace CasADi{
+  // For pretty printing the name
+  template<> std::string TypeName<SX>::name;
+  template<> std::string TypeName<double>::name;
+  template<> std::string TypeName<float>::name;
+  template<> std::string TypeName<int>::name;
+  template<> std::string TypeName<long>::name;
+} // namespace CasADi
+
 namespace std{
 template<>
 class numeric_limits<CasADi::SX>{
