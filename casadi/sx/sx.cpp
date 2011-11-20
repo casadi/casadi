@@ -700,11 +700,7 @@ long SX::getMaxNumCallsInPrint(){
   return max_num_calls_in_print_;
 }
 
-template<> std::string TypeName<SX>::name = "SX";
-template<> std::string TypeName<double>::name = "double";
-template<> std::string TypeName<float>::name = "float";
-template<> std::string TypeName<int>::name = "int";
-template<> std::string TypeName<long>::name = "long";
+const char* TypeName<SX>::name = "SX";
 
 } // namespace CasADi
 

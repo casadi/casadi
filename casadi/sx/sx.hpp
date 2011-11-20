@@ -341,12 +341,7 @@ class casadi_operators<SX>{
 
 // Template specialization
 namespace CasADi{
-  // For pretty printing the name
-  template<> std::string TypeName<SX>::name;
-  template<> std::string TypeName<double>::name;
-  template<> std::string TypeName<float>::name;
-  template<> std::string TypeName<int>::name;
-  template<> std::string TypeName<long>::name;
+  template<> struct TypeName<SX>{ static const char* name; };
 } // namespace CasADi
 
 namespace std{

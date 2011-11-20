@@ -24,6 +24,7 @@
 #define MATRIX_HPP
 
 #include <vector>
+#include <typeinfo>
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
@@ -39,12 +40,19 @@ namespace CasADi{
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
 
   /** Helper class pretty printing of type */
-  template<class T>
-  class TypeName{
-    public:
-      static std::string name;
-  };
+  template<class T> struct TypeName{ static const char* name; };
   
+  /** Pretty print of double */
+  template<> struct TypeName<double>{ static const char* name; };
+
+  /** Pretty print of float */
+  template<> struct TypeName<float>{ static const char* name; };
+  
+  /** Pretty print of int */
+  template<> struct TypeName<int>{ static const char* name; };
+  
+  /** Pretty print of long */
+  template<> struct TypeName<long>{ static const char* name; };
   
   /** \brief General sparse matrix class
   General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
@@ -676,7 +684,7 @@ namespace CasADi{
 // Implementations
 
 template<class T>
-std::string TypeName<T>::name = "unknown_class";
+const char* TypeName<T>::name = typeid(T).name();
 
 template<class T>
 const T& Matrix<T>::elem(int i, int j) const{
