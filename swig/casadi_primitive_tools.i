@@ -14,17 +14,14 @@ except:
   pass
 
 try:
-  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh
-  from numpy import arcsin as asin
-  from numpy import arccos as acos
-  from numpy import arctan as atan
+  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan
 except:
   sin = lambda x: x.sin()
   cos = lambda x: x.cos()
   tan = lambda x: x.tan()
-  asin = lambda x: x.asin()
-  acos = lambda x: x.acos()
-  atan = lambda x: x.atan()
+  arcsin = lambda x: x.arcsin()
+  arccos = lambda x: x.arccos()
+  arctan = lambda x: x.arctan()
   sqrt = lambda x: x.sqrt()
   log = lambda x: x.log()
   exp = lambda x: x.exp()
