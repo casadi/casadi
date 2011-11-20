@@ -32,9 +32,9 @@ except:
   ceil = lambda x: x.ceil()
   fmin = lambda x,y: x.fmin(y)
   fmax = lambda x,y: x.fmax(y)
-  sinh = lambda x: x.asin()
-  cosh = lambda x: x.acos()
-  tanh = lambda x: x.atan()
+  sinh = lambda x: x.sinh()
+  cosh = lambda x: x.cosh()
+  tanh = lambda x: x.tanh()
 %}
 #endif // SWIGPYTHON
 
