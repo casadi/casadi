@@ -66,8 +66,10 @@ namespace CasADi{
     OCP_LBH,
     /// Point constraint upper bound (nh x (ns+1))
     OCP_UBH,
-    /// Bounds for the coupling constraints
-    OCP_LBG, OCP_UBG,
+    /// Lower bound for the coupling constraints
+    OCP_LBG,
+    /// Upper bound for the coupling constraints
+    OCP_UBG,
     /// Number of inputs to an OCP solver
     OCP_NUM_IN
   };

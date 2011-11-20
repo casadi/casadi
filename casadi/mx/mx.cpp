@@ -153,8 +153,10 @@ void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
       return;
     }
   }
-  casadi_assert_message(ii.size()==el.size1(),"right hand size must match dimension of left hand side in assignment");
-  casadi_assert_message(jj.size()==el.size2(),"right hand size must match dimension of left hand side in assignment");
+  
+  casadi_assert_message(ii.size()==el.size1(),"Dimension mismatch." << "lhs is " << ii.size() << " x " << jj.size() << ", while rhs is " << el.dimString());
+  casadi_assert_message(jj.size()==el.size2(),"Dimension mismatch." << "lhs is " << ii.size() << " x " << jj.size() << ", while rhs is " << el.dimString());
+
   if(dense() && el.dense()){
     // Dense mode
     int ld = size2(), ld_el = el.size2(); // leading dimensions
@@ -284,7 +286,7 @@ MX operator-(const MX &x, const MX &y){
 
 MX MX::binary(int op, const MX &x, const MX &y){
   // Make sure that dimensions match
-  casadi_assert_message((x.numel()==1 || y.numel()==1 || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch");
+  casadi_assert_message((x.numel()==1 || y.numel()==1 || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
   
   // Quick return if zero
   if((casadi_math<double>::f0x_is_zero(op) && isZero(x)) || 

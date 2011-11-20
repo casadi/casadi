@@ -54,7 +54,8 @@ class MultipleShooting : public OCPSolver{
     * \copydoc scheme_IntegratorOutput
     * The first nu entries of the INTEGRATOR_P input are interpreted as controls to be optimized for each time interval, the remainder are interpreted as parameters to be optimized but constant over the whole domain.
     * \param mfcn Mayer term, mapping endstate (nx x 1) to cost (1 x 1)
-    * \param cfcn Path constraints, CasADi::FX mapping from CasADi::DAEInput to (nh x 1)
+    * \param cfcn Path constraints, CasADi::FX mapping to (nh x 1)
+    * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
     explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());

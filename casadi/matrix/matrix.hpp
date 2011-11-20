@@ -719,7 +719,7 @@ void Matrix<T>::setSub(int i, int j, const Matrix<T>& el){
 
 template<class T>
 void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& el){
-  casadi_assert_message(el.numel()==1 || (ii.size() == el.size1() && jj.size() == el.size2()),"Dimension mismatch.");
+  casadi_assert_message(el.numel()==1 || (ii.size() == el.size1() && jj.size() == el.size2()),"Dimension mismatch." << std::endl << "lhs is " << ii.size() << " x " << jj.size() << ", while rhs is " << el.dimString());
   
   // If m is scalar
   if(el.numel() != ii.size() * jj.size()){
@@ -914,7 +914,7 @@ Matrix<T>::Matrix(const std::vector<T>& x) : data_(x){
 
 template<class T>
 Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : data_(x){
-  casadi_assert_message(x.size() == n*m, "dimension mismatch");
+  casadi_assert_message(x.size() == n*m, "Dimension mismatch." << std::endl << "You supplied a vector of length " << x.size() << ", but " << n << " x " << m << " = " << n*m);
   sparsity_ = CRSSparsity(n,m,true);
 }
 
@@ -944,7 +944,7 @@ void Matrix<T>::makeEmpty(int n, int m){
 
 template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {
-  casadi_assert_message(numel()==1, "not a scalar");
+  casadi_assert_message(numel()==1, "Not a scalar");
   stream << toScalar();
 }
   
@@ -1127,7 +1127,7 @@ Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
 
 template<class T>
 Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(d) {
-  casadi_assert_message(sparsity.size()==d.size(),"size mismatch");
+  casadi_assert_message(sparsity.size()==d.size(),"Size mismatch." << std::endl << "You supplied a sparsity of " << sparsity.dimString() << ", but the supplied vector is of length " << d.size());
   sparsity_ = sparsity;
 }
 
