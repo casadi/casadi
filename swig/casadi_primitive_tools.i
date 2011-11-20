@@ -9,6 +9,11 @@
 #ifdef SWIGPYTHON
 %pythoncode%{
 try:
+  from numpy import pi, inf
+except:
+  pass
+
+try:
   from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh
   from numpy import arcsin as asin
   from numpy import arccos as acos
