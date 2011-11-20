@@ -45,11 +45,13 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
   addOption("strategy",                 OT_STRING, "none", "Globalization strateg","none|linesearch");
   addOption("linear_solver_creator",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class");
   addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
+  addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
 
   mem_ = 0;
   u_ = 0;
   u_scale_ = 0;
   f_scale_ = 0;
+  disable_internal_warnings_ = false;
 }
 
 KinsolInternal* KinsolInternal::clone() const{
@@ -146,11 +148,17 @@ void KinsolInternal::init(){
   // KINSOL bugfix
   KINMem kin_mem = KINMem(mem_);
   kin_mem->kin_inexact_ls = FALSE;
-  
-  
+    
   // Set optional inputs
   flag = KINSetUserData(mem_, this);
   casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
+
+  // Disable internal warning messages?
+  disable_internal_warnings_ = getOption("disable_internal_warnings");
+  
+  // Set error handler function
+  flag = KINSetErrHandlerFn(mem_, ehfun_wrapper, this);
+  casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
   
   // Initialize KINSOL
   flag = KINInit(mem_,func_wrapper, u_);
@@ -790,6 +798,21 @@ void KinsolInternal::lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_
   *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
 }
 
+void KinsolInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){
+try{
+    casadi_assert(eh_data);
+    KinsolInternal *this_ = (KinsolInternal*)eh_data;
+    this_->ehfun(error_code,module,function,msg);        
+  } catch(exception& e){
+    cerr << "ehfun failed: " << e.what() << endl;
+  }
+}
+  
+void KinsolInternal::ehfun(int error_code, const char *module, const char *function, char *msg){
+  if(!disable_internal_warnings_){
+    cerr << msg << endl;
+  }
+}
 
 } // namespace Sundials
 } // namespace CasADi

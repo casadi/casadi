@@ -85,6 +85,7 @@ public:
   void psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp);
   void lsetup(KINMem kin_mem);
   void lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
+  void ehfun(int error_code, const char *module, const char *function, char *msg);
   
   /** \brief Wrappers */
   static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
@@ -95,6 +96,7 @@ public:
   static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp);
   static int lsetup_wrapper(KINMem kin_mem);
   static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
+  static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
   
   /// KINSOL memory block
   void* mem_;
@@ -124,6 +126,9 @@ public:
   // Linear solver
   LinearSolver linsol_;  
 
+  // Should KINSOL internal warning messages be ignored
+  bool disable_internal_warnings_;
+  
 };
 
 

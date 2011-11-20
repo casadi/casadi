@@ -469,6 +469,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     }
           
   if(nadir>0){
+    log("MXFunctionInternal::evaluate evaluating adjoint");
 
     // Clear the adjoint seeds
     for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); it++)

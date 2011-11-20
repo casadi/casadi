@@ -74,9 +74,6 @@ class SymbolicMatrix : public MXNode{
   protected:
     // Name of the varible
     std::string name_;
-    
-    // Here, put expansion in terms of SX
-/*    Matrix<SX> sv_;*/
 };
 
 } // namespace CasADi
