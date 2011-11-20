@@ -130,6 +130,12 @@ const CRSSparsity& MXNode::sparsity(int oind){
   return sparsity_;
 }
 
+void MXNode::repr(std::ostream &stream) const{
+  stream << "MX(";
+  print(stream);
+  stream << ")";
+}
+
 void MXNode::print(std::ostream &stream) const{
   long remaining_calls = MX::getMaxNumCallsInPrint();
   print(stream,remaining_calls);

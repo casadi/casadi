@@ -39,7 +39,7 @@ MXConstant* MXConstant::clone() const{
 }
 
 void MXConstant::printPart(std::ostream &stream, int part) const{
-  stream << x_;
+  x_.print(stream);
 }
 
 void MXConstant::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){

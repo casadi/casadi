@@ -86,7 +86,10 @@ class MXNode : public SharedObjectNode{
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
     
-    /** \brief  Print expression */
+    /** \brief  Print a representation */
+    virtual void repr(std::ostream &stream) const;
+    
+    /** \brief  Print a description */
     virtual void print(std::ostream &stream) const;
     
     /** \brief  Print expression (make sure number of calls is not exceeded) */
