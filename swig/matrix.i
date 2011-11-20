@@ -92,20 +92,15 @@ def dot(self,*args):
     if "vectorized" in name:
         name = name[:-len(" (vectorized)")]
     
-    selfM = self
-    
-    if isinstance(self,SX):  # SX get's promoted to SXMatrix first
-      selfM = SXMatrix(self)
-    
     conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
     if name in conversion:
       name = conversion[name]
     if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
       name = 'r' + name
       args.reverse()
-    if not(hasattr(selfM,name)) or ('mul' in name):
+    if not(hasattr(self,name)) or ('mul' in name):
       name = '__' + name + '__'
-    fun=getattr(selfM, name)
+    fun=getattr(self, name)
     return fun(*args[1:])
      
      

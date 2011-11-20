@@ -13,16 +13,16 @@ int main(int argc, char *argv[])
   std::cout << s << std::endl;
   
   std::cout << "Unlimited printing" << std::endl;
-  SX::max_num_calls_in_print = std::numeric_limits<long>::max();
+  SX::setMaxNumCallsInPrint(std::numeric_limits<long>::max());
 
   std::cout << s << std::endl;
   
   std::cout << "Limit to 10 calls" << std::endl;
-  SX::max_num_calls_in_print = 10;
+  SX::setMaxNumCallsInPrint(10);
   std::cout << s << std::endl;
   
   std::cout << "Limit to 100 calls" << std::endl;
-  SX::max_num_calls_in_print = 100;
+  SX::setMaxNumCallsInPrint(100);
   std::cout << s << std::endl;
   
   return 0;
