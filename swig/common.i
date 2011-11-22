@@ -7,11 +7,11 @@
 %pythoncode %{
 
 class _copyableObject(_object):
-  def __copy__(self,a):
-    return self.__class__(a)
+  def __copy__(self):
+    return self.__class__(self)
 
-  def __deepcopy__(self,a):
-    shallow = self.__class__(a)
+  def __deepcopy__(self,dummy=None):
+    shallow = self.__class__(self)
     if getattr(self,'makeUnique'):
       shallow.makeUnique()
     return shallow
