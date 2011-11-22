@@ -130,10 +130,10 @@ class SharedObject : public PrintableObject{
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
     
-#ifndef SWIG
     //@{
     /// If there are other references to the object, then make a deep copy of it and point to this new object
     void makeUnique(bool clone_members=true);
+#ifndef SWIG
     void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members=true);
     //@}
     

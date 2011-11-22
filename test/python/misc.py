@@ -49,6 +49,133 @@ class Misctests(casadiTestCase):
     self.assertRaises(RuntimeError,lambda : f.getOption("foobar"))
     self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
     self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
+
+  def test_copyconstr_norefcount(self):
+    self.message("Copy constructor for non-refcounted classes")
+    x = DMatrix(2,3,1)
+
+    y = DMatrix(x)
+    x[0,0] = 5
+    
+    self.assertFalse(id(x)==id(y))
+    self.assertEqual(x[0,0],5)
+    self.assertEqual(y[0,0],1)
+    
+  def test_copyconstr_refcount(self):
+    self.message("Copy constructor for refcounted classes")
+    x = sp_diag(4)
+
+    y = CRSSparsity(x)
+        
+    x.resize(2,8)
+    
+    self.assertFalse(id(x)==id(y))
+    self.assertTrue(x.numel(),y.numel())
+    self.checkarray(x.shape,(2,8),"shape")
+    self.checkarray(y.shape,(4,4),"shape")
+    
+
+  def test_copyconstr_refcount_lazy(self):
+    self.message("Copy constructor for refcounted classes - lazy")
+    x = SX("x")
+
+    f = SXFunction([x],[2*x])
+    f.init()
+    f.input(0).setAll(2)
+    g = SXFunction(f)
+
+    f.input(0).set(5)
+    f.evaluate()
+
+    self.assertEqual(g.input(0),5)
+    self.assertEqual(g.output(),10)
+
+    
+  def test_copy_norefcount(self):
+    self.message("Shallow copy for non-refcounted classes")
+    import copy
+    
+    x = DMatrix(2,3,1)
+
+    y = copy.copy(x)
+    x[0,0] = 5
+    
+    self.assertFalse(id(x)==id(y))
+    self.assertEqual(x[0,0],5)
+    self.assertEqual(y[0,0],1)
+    
+  def test_copy_refcount(self):
+    self.message("Shallow copy for refcounted classes")
+    import copy
+    x = sp_diag(4)
+
+    y = copy.copy(x)
+        
+    x.resize(2,8)
+    
+    self.assertFalse(id(x)==id(y))
+    self.assertTrue(x.numel(),y.numel())
+    self.checkarray(x.shape,(2,8),"shape")
+    self.checkarray(y.shape,(4,4),"shape")
+    
+  def test_copy_refcount_lazy(self):
+    self.message("Shallow copy for refcounted classes - lazy")
+    import copy
+    x = SX("x")
+
+    f = SXFunction([x],[2*x])
+    f.init()
+    f.input(0).setAll(2)
+    g = copy.copy(f)
+
+    f.input(0).set(5)
+    f.evaluate()
+
+    self.assertEqual(g.input(0),5)
+    self.assertEqual(g.output(),10)
+    
+  def test_deepcopy_norefcount(self):
+    self.message("Deep copy for non-refcounted classes")
+    import copy
+    
+    x = DMatrix(2,3,1)
+
+    y = copy.deepcopy(x)
+    x[0,0] = 5
+    
+    self.assertFalse(id(x)==id(y))
+    self.assertEqual(x[0,0],5)
+    self.assertEqual(y[0,0],1)
+    
+  def test_deepcopy_refcount(self):
+    self.message("Deep copy for refcounted classes")
+    import copy
+    x = sp_diag(4)
+
+    y = copy.deepcopy(x)
+        
+    x.resize(2,8)
+    
+    self.assertFalse(id(x)==id(y))
+    self.assertTrue(x.numel(),y.numel())
+    self.checkarray(x.shape,(2,8),"shape")
+    self.checkarray(y.shape,(4,4),"shape")
+    
+  def test_deepcopy_refcount_lazy(self):
+    self.message("Deep copy for refcounted classes - lazy")
+    import copy
+    x = SX("x")
+
+    f = SXFunction([x],[2*x])
+    f.init()
+    f.input(0).setAll(2)
+    g = copy.deepcopy(f)
+
+    f.input(0).set(5)
+    f.evaluate()
+
+    self.assertEqual(g.input(0),2)
+    self.assertEqual(g.output(),0)
     
 if __name__ == '__main__':
     unittest.main()

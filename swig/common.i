@@ -2,6 +2,24 @@
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303
 
+
+#ifdef SWIGPYTHON
+%pythoncode %{
+
+class _copyableObject(_object):
+  def __copy__(self,a):
+    return self.__class__(a)
+
+  def __deepcopy__(self,a):
+    shallow = self.__class__(a)
+    if getattr(self,'makeUnique'):
+      shallow.makeUnique()
+    return shallow
+
+_object = _copyableObject
+%}
+#endif // WITH_SWIGPYTHON
+
 %include "doc.i"
 
 %feature("autodoc", "1");
