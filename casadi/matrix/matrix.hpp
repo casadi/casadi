@@ -230,17 +230,32 @@ class Matrix : public PrintableObject{
     bool dense() const; // is the matrix dense
     //@}
 
+
+    #ifndef SWIG
     /// Get a non-zero element
     const T& at(int k) const{ if (k<0) k+=size(); return data().at(k); }
-
+    
     /// Access a non-zero element
     T& at(int k){if (k<0) k+=size(); return data().at(k); }
-
+    #endif // SWIG
+    
+    #ifdef SWIG
+    /// Access a non-zero element
+    T at(int k){if (k<0) k+=size(); return data().at(k); }
+    #endif // SWIG
+    
+    #ifndef SWIG
     /// get an element
     const T& elem(int i, int j=0) const;
     
     /// get a reference to an element
     T& elem(int i, int j=0);
+    #endif // SWIG
+    
+    #ifdef SWIG
+    /// Access a non-zero element
+    T elem(int i, int j=0) { return elem(i,j);}
+    #endif // SWIG
 
     /// get an element, do not allocate
     const T getElement(int i, int j=0) const{ return elem(i,j);}
