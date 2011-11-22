@@ -12,7 +12,7 @@ class _copyableObject(_object):
 
   def __deepcopy__(self,dummy=None):
     shallow = self.__class__(self)
-    if getattr(self,'makeUnique'):
+    if hasattr(self,'makeUnique'):
       shallow.makeUnique()
     return shallow
 
