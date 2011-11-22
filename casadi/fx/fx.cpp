@@ -72,11 +72,13 @@ vector<MX> FX::call(const vector<MX> &x){
 vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
   casadi_assert(isInit());
   
+  // Make sure not empty
+  casadi_assert_message(x.size()>1,"FX: call(vector<vector<MX> >): argument must be of length > 1. You supplied length " << x.size() << ".");
+  
   // Return object
   vector<vector<MX> > ret(x.size());
   
-  // Make sure not empty
-  casadi_assert(x.size()>1);
+
   
   // Check if we are bypassing the parallelizer
   Dictionary::const_iterator ii=paropt.find("parallelization");
