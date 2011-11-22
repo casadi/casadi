@@ -657,5 +657,9 @@ bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
   }
   return meta< std::vector<CasADi::MX> >::isa(p);
 }
+
+
+meta_vector(std::vector< CasADi::MX >);
 %}
+
 
