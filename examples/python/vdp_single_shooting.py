@@ -1,5 +1,5 @@
 from casadi import *
-from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 
 nk = 20    # Control discretization
@@ -50,21 +50,21 @@ solver = IpoptSolver(F,G)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(-0.75*ones(nk), NLP_LBX)
-solver.setInput(1.0*ones(nk), NLP_UBX)
-solver.setInput(zeros(nk),NLP_X_INIT)
-solver.setInput(zeros(2),NLP_LBG)
-solver.setInput(zeros(2),NLP_UBG)
+solver.setInput(-0.75*NP.ones(nk), NLP_LBX)
+solver.setInput(1.0*NP.ones(nk), NLP_UBX)
+solver.setInput(NP.zeros(nk),NLP_X_INIT)
+solver.setInput(NP.zeros(2),NLP_LBG)
+solver.setInput(NP.zeros(2),NLP_UBG)
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = array(solver.output(NLP_X_OPT))
+u_opt = NP.array(solver.output(NLP_X_OPT))
 
 # Time grid
-tgrid_x = linspace(0,10,nk+1)
-tgrid_u = linspace(0,10,nk)
+tgrid_x = NP.linspace(0,10,nk+1)
+tgrid_u = NP.linspace(0,10,nk)
 
 # Plot the results
 plt.figure(1)

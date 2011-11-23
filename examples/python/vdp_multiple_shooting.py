@@ -1,5 +1,5 @@
 from casadi import *
-from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 
 nk = 20      # Control discretization
@@ -50,8 +50,8 @@ X1 = V[nk+1:nv:3]
 X2 = V[nk+2:nv:3]
 
 # Variable bounds initialized to +/- inf
-VMIN = -inf*ones(nv)
-VMAX = inf*ones(nv)
+VMIN = -inf*NP.ones(nv)
+VMAX = inf*NP.ones(nv)
 
 # Control bounds
 VMIN[0:nk] = -0.75
@@ -67,7 +67,7 @@ VMIN[nv-3] = VMAX[nv-3] = 0
 VMIN[nv-2] = VMAX[nv-2] = 0
 
 # Initial solution guess
-VINIT = zeros(nv)
+VINIT = NP.zeros(nv)
 
 # State derivative (only relevant for DAEs)
 Xp = msym([0,0,0])
@@ -86,8 +86,8 @@ for k in range(nk):
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
-  g_min.append(zeros(Xk.size()))
-  g_max.append(zeros(Xk.size()))
+  g_min.append(NP.zeros(Xk.size()))
+  g_max.append(NP.zeros(Xk.size()))
 
 # Objective function: L(T)
 F = MXFunction([V],[X2[nk]])
@@ -105,8 +105,8 @@ solver.init()
 solver.setInput(VMIN,  NLP_LBX)
 solver.setInput(VMAX,  NLP_UBX)
 solver.setInput(VINIT, NLP_X_INIT)
-solver.setInput(concatenate(g_min),NLP_LBG)
-solver.setInput(concatenate(g_max),NLP_UBG)
+solver.setInput(NP.concatenate(g_min),NLP_LBG)
+solver.setInput(NP.concatenate(g_max),NLP_UBG)
 
 # Solve the problem
 solver.solve()
@@ -119,11 +119,11 @@ x1_opt = v_opt[nk+1::3]
 x2_opt = v_opt[nk+2::3]
 
 # Retrieve the solution
-v_opt = array(solver.output(NLP_X_OPT))
+v_opt = NP.array(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-tgrid_x = linspace(0,10,nk+1)
-tgrid_u = linspace(0,10,nk)
+tgrid_x = NP.linspace(0,10,nk+1)
+tgrid_u = NP.linspace(0,10,nk)
 
 # Plot the results
 plt.figure(1)

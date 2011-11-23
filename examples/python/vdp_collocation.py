@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from casadi import *
-from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 
 nk = 20    # Control discretization
@@ -25,9 +25,9 @@ u_min = -0.75
 u_max = 1.0
 u_init = 0.0
 
-u_lb = array([u_min])
-u_ub = array([u_max])
-u_init = array([u_init])
+u_lb = NP.array([u_min])
+u_ub = NP.array([u_max])
+u_init = NP.array([u_init])
 
 # State bounds and initial guess
 x_min =  [-inf, -inf, -inf]
@@ -77,17 +77,17 @@ cp = RADAU
 h = tf/nk
 
 # Coefficients of the collocation equation
-C = zeros((deg+1,deg+1))
+C = NP.zeros((deg+1,deg+1))
 
 # Coefficients of the continuity equation
-D = zeros(deg+1)
+D = NP.zeros(deg+1)
 
 # Collocation point
 tau = ssym("tau")
   
 # All collocation time points
 tau_root = collocation_points[cp][deg]
-T = zeros((nk,deg+1))
+T = NP.zeros((nk,deg+1))
 for i in range(nk):
   for j in range(deg+1):
     T[i][j] = h*(i + tau_root[j])
@@ -124,14 +124,14 @@ NV = NX+NU+NXF
 V = MX("V",NV)
   
 # All variables with bounds and initial guess
-vars_lb = zeros(NV)
-vars_ub = zeros(NV)
-vars_init = zeros(NV)
+vars_lb = NP.zeros(NV)
+vars_ub = NP.zeros(NV)
+vars_init = NP.zeros(NV)
 offset = 0
 
 # Get collocated states and parametrized control
-X = resize(array([],dtype=MX),(nk+1,deg+1))
-U = resize(array([],dtype=MX),nk)
+X = NP.resize(NP.array([],dtype=MX),(nk+1,deg+1))
+U = NP.resize(NP.array([],dtype=MX),nk)
 for k in range(nk):  
   # Collocated states
   for j in range(deg+1):
@@ -183,8 +183,8 @@ for k in range(nk):
     # Add collocation equations to the NLP
     [fk] = f.call([T[k][j], X[k][j], U[k]])
     g += [h*fk - xp_jk]
-    lbg.append(zeros(nx)) # equality constraints
-    ubg.append(zeros(nx)) # equality constraints
+    lbg.append(NP.zeros(nx)) # equality constraints
+    ubg.append(NP.zeros(nx)) # equality constraints
 
   # Get an expression for the state at the end of the finite element
   xf_k = 0
@@ -193,8 +193,8 @@ for k in range(nk):
 
   # Add continuity equation to NLP
   g += [X[k+1][0] - xf_k]
-  lbg.append(zeros(nx))
-  ubg.append(zeros(nx))
+  lbg.append(NP.zeros(nx))
+  ubg.append(NP.zeros(nx))
   
 # Nonlinear constraint function
 gfcn = MXFunction([V],[vertcat(g)])
@@ -226,8 +226,8 @@ solver.setInput(vars_lb,NLP_LBX)
 solver.setInput(vars_ub,NLP_UBX)
 
 # Bounds on g
-solver.setInput(concatenate(lbg),NLP_LBG)
-solver.setInput(concatenate(ubg),NLP_UBG)
+solver.setInput(NP.concatenate(lbg),NLP_LBG)
+solver.setInput(NP.concatenate(ubg),NLP_UBG)
 
 # Solve the problem
 solver.solve()
@@ -236,15 +236,15 @@ solver.solve()
 print "optimal cost: ", float(solver.output(NLP_COST))
 
 # Retrieve the solution
-v_opt = array(solver.output(NLP_X_OPT))
+v_opt = NP.array(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(deg+1)*nx+nu]
 x1_opt = v_opt[1::(deg+1)*nx+nu]
 x2_opt = v_opt[2::(deg+1)*nx+nu]
 u_opt = v_opt[(deg+1)*nx::(deg+1)*nx+nu]
-tgrid = linspace(0,tf,nk+1)
-tgrid_u = linspace(0,tf,nk)
+tgrid = NP.linspace(0,tf,nk+1)
+tgrid_u = NP.linspace(0,tf,nk)
 
 # Plot the results
 plt.figure(1)
