@@ -21,7 +21,7 @@ L = x0*x0 + x1*x1 + u*u
 # Costate
 lam = ssym("lam",2)
 
-# Hamiltonian
+# Hamiltonian function
 H = inner_prod(lam,xdot) + L
 Hfcn = SXFunction([x,lam,u,t],[H])
 Hfcn.init()
@@ -33,8 +33,8 @@ ldot = -Hfcn.grad(0,0)
 print "Hamiltonian: ", H
 
 # H is of a convect quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
-p = Hfcn.grad(2,0)
-p = substitute(p,u,0)
+p = Hfcn.grad(2,0)    # this gives us 2*u + p
+p = substitute(p,u,0) # replace u with zero: gives us p
 
 # H's unconstrained minimizer is: u = -p/2
 u_opt = -p/2

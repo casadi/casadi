@@ -52,7 +52,6 @@ legendre_points2 = [0,0.211325,0.788675]
 legendre_points3 = [0,0.112702,0.500000,0.887298]
 legendre_points4 = [0,0.069432,0.330009,0.669991,0.930568]
 legendre_points5 = [0,0.046910,0.230765,0.500000,0.769235,0.953090]
-legendre_points = [0,legendre_points1,legendre_points2,legendre_points3,legendre_points4,legendre_points5]
 
 # Radau collocation points
 radau_points1 = [0,1.000000]
@@ -60,45 +59,38 @@ radau_points2 = [0,0.333333,1.000000]
 radau_points3 = [0,0.155051,0.644949,1.000000]
 radau_points4 = [0,0.088588,0.409467,0.787659,1.000000]
 radau_points5 = [0,0.057104,0.276843,0.583590,0.860240,1.000000]
-radau_points = [0,radau_points1,radau_points2,radau_points3,radau_points4,radau_points5]
 
-# Type of collocation points
-LEGENDRE = 0
-RADAU = 1
-collocation_points = [legendre_points,radau_points]
+# Choose collocation points
+tau_root = radau_points3
 
 # Degree of interpolating polynomial
-deg = 3
-
-# Radau collocation points
-cp = RADAU
+d = len(tau_root)-1
 
 # Size of the finite elements
 h = tf/nk
 
 # Coefficients of the collocation equation
-C = NP.zeros((deg+1,deg+1))
+C = NP.zeros((d+1,d+1))
 
 # Coefficients of the continuity equation
-D = NP.zeros(deg+1)
+D = NP.zeros(d+1)
 
-# Collocation point
+# Dimensionless time inside one control interval
 tau = ssym("tau")
   
 # All collocation time points
-tau_root = collocation_points[cp][deg]
-T = NP.zeros((nk,deg+1))
-for i in range(nk):
-  for j in range(deg+1):
-    T[i][j] = h*(i + tau_root[j])
+T = NP.zeros((nk,d+1))
+for k in range(nk):
+  for j in range(d+1):
+    T[k,j] = h*(k + tau_root[j])
 
 # For all collocation points
-for j in range(deg+1):
+for j in range(d+1):
   # Construct Lagrange polynomials to get the polynomial basis at the collocation point
   L = 1
-  for j2 in range(deg+1):
-    if j2 != j:
-      L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
+  for r in range(d+1):
+    if r != j:
+      L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
   lfcn = SXFunction([tau],[L])
   lfcn.init()
   
@@ -108,14 +100,14 @@ for j in range(deg+1):
   D[j] = lfcn.output()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-  for j2 in range(deg+1):
-    lfcn.setInput(tau_root[j2])
+  for r in range(d+1):
+    lfcn.setInput(tau_root[r])
     lfcn.setFwdSeed(1.0)
     lfcn.evaluate(1,0)
-    C[j][j2] = lfcn.fwdSens()
+    C[j,r] = lfcn.fwdSens()
 
 # Total number of variables
-NX = nk*(deg+1)*nx      # Collocated states
+NX = nk*(d+1)*nx      # Collocated states
 NU = nk*nu              # Parametrized controls
 NXF = nx                # Final state
 NV = NX+NU+NXF
@@ -130,13 +122,13 @@ vars_init = NP.zeros(NV)
 offset = 0
 
 # Get collocated states and parametrized control
-X = NP.resize(NP.array([],dtype=MX),(nk+1,deg+1))
+X = NP.resize(NP.array([],dtype=MX),(nk+1,d+1))
 U = NP.resize(NP.array([],dtype=MX),nk)
 for k in range(nk):  
   # Collocated states
-  for j in range(deg+1):
+  for j in range(d+1):
     # Get the expression for the state vector
-    X[k][j] = V[offset:offset+nx]
+    X[k,j] = V[offset:offset+nx]
     
     # Add the initial condition
     vars_init[offset:offset+nx] = x_init
@@ -158,7 +150,7 @@ for k in range(nk):
   offset += nu
   
 # State at end time
-X[nk][0] = V[offset:offset+nx]
+X[nk,0] = V[offset:offset+nx]
 vars_lb[offset:offset+nx] = xf_min
 vars_ub[offset:offset+nx] = xf_max
 vars_init[offset:offset+nx] = x_init
@@ -173,34 +165,37 @@ ubg = []
 for k in range(nk):
   
   # For all collocation points
-  for j in range(1,deg+1):
+  for j in range(1,d+1):
         
     # Get an expression for the state derivative at the collocation point
     xp_jk = 0
-    for j2 in range (deg+1):
-      xp_jk += C[j2][j]*X[k][j2]
+    for r in range (d+1):
+      xp_jk += C[r,j]*X[k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k][j], X[k][j], U[k]])
-    g += [h*fk - xp_jk]
+    [fk] = f.call([T[k,j], X[k,j], U[k]])
+    g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
 
   # Get an expression for the state at the end of the finite element
   xf_k = 0
-  for j in range(deg+1):
-    xf_k += D[j]*X[k][j]
+  for r in range(d+1):
+    xf_k += D[r]*X[k,r]
 
   # Add continuity equation to NLP
-  g += [X[k+1][0] - xf_k]
+  g.append(X[k+1,0] - xf_k)
   lbg.append(NP.zeros(nx))
   ubg.append(NP.zeros(nx))
   
+# Concatenate constraints
+g = vertcat(g)
+  
 # Nonlinear constraint function
-gfcn = MXFunction([V],[vertcat(g)])
+gfcn = MXFunction([V],[g])
 
 # Objective function of the NLP
-[f] = m.call([T[nk-1][deg],X[nk][0],U[nk-1]])
+[f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
 ffcn = MXFunction([V], [f])
   
 ## ----
@@ -239,10 +234,10 @@ print "optimal cost: ", float(solver.output(NLP_COST))
 v_opt = NP.array(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-x0_opt = v_opt[0::(deg+1)*nx+nu]
-x1_opt = v_opt[1::(deg+1)*nx+nu]
-x2_opt = v_opt[2::(deg+1)*nx+nu]
-u_opt = v_opt[(deg+1)*nx::(deg+1)*nx+nu]
+x0_opt = v_opt[0::(d+1)*nx+nu]
+x1_opt = v_opt[1::(d+1)*nx+nu]
+x2_opt = v_opt[2::(d+1)*nx+nu]
+u_opt = v_opt[(d+1)*nx::(d+1)*nx+nu]
 tgrid = NP.linspace(0,tf,nk+1)
 tgrid_u = NP.linspace(0,tf,nk)
 
