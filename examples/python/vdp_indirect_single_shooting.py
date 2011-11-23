@@ -1,19 +1,19 @@
 from casadi import *
-from numpy import *
+import numpy as NP
 import matplotlib.pyplot as plt
 
 # time
 t = ssym("t")
 
 # Declare variables (use simple, efficient DAG)
-x0=SX("x0"); x1=SX("x1")
-x = SXMatrix([x0,x1])
+x0=ssym("x0"); x1=ssym("x1")
+x = vertcat((x0,x1))
 
 # Control
 u = ssym("u")
 
 # ODE right hand side
-xdot = [(1 - x1*x1)*x0 - x1 + u, x0]
+xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
 
 # Lagrangian function
 L = x0*x0 + x1*x1 + u*u
@@ -66,10 +66,10 @@ I.setOption("tf",10.0)
 I.init()
 
 # The initial state
-x_init = array([0.,1.])
+x_init = NP.array([0.,1.])
 
 # The initial costate
-l_init = MX("l_init",2)
+l_init = msym("l_init",2)
 
 # The initial condition for the shooting
 X = vertcat((x_init,l_init))
@@ -104,10 +104,10 @@ solver.setInput([   0,   0], NLP_UBG)
 solver.solve()
 
 # Retrieve the optimal solution
-l_init_opt = array(solver.output(NLP_X_OPT).data())
+l_init_opt = NP.array(solver.output(NLP_X_OPT).data())
 
 # Time grid for visualization
-tgrid = linspace(0,10,100)
+tgrid = NP.linspace(0,10,100)
 
 # Output functions
 output_fcn = SXFunction(rhs_in,[x0,x1,u_opt])
@@ -117,7 +117,7 @@ simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(concatenate((x_init,l_init_opt)),INTEGRATOR_X0)
+simulator.setInput(NP.concatenate((x_init,l_init_opt)),INTEGRATOR_X0)
 
 # Simulate to get the trajectories
 simulator.evaluate()
