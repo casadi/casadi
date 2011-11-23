@@ -14,22 +14,22 @@ ELSE (IPOPT_INCLUDE_DIR)
 ENDIF (IPOPT_INCLUDE_DIR)
 
 FIND_LIBRARY(IPOPT_LIBRARY 
-ipopt HINTS $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/  /usr/lib/coin /usr/local/lib/coin /usr/local/lib/coin/ThirdParty )
+ipopt HINTS $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/lib/coin /usr/local/lib/coin /usr/local/lib/coin/ThirdParty )
 
 FIND_LIBRARY(COIN_HSL_LIBRARY 
-coinhsl HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinhsl HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 FIND_LIBRARY(COIN_MUMPS_LIBRARY 
-coinmumps HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinmumps HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 FIND_LIBRARY(COIN_METIS_LIBRARY 
-coinmetis HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinmetis HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 FIND_LIBRARY(COIN_LAPACK_LIBRARY 
-coinlapack HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinlapack HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 FIND_LIBRARY(COIN_BLAS_LIBRARY 
-coinblas HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
+coinblas HINTS  $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/local/lib/coin /usr/local/lib/coin/ThirdParty)
 
 FIND_LIBRARY(MUMPS_LIBRARY_492 
 dmumps_seq-4.9.2)
