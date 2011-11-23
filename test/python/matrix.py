@@ -43,6 +43,19 @@ class Matrixtests(casadiTestCase):
     self.assertEquals(c,7)
     self.assertEquals(d,8)
     
+  def test_numpy(self):
+    self.message("numpy check")
+    # This is an example that failed on a windows machine
+    import numpy as NP
+    A = NP.zeros((3,4),dtype=SX)
+
+    x = ssym("x")
+    A[:,1] = x
+    A[1,:] = 5
+
+
+    print "A = ", NP.dot(A.T,A)
+    
 if __name__ == '__main__':
     unittest.main()
 
