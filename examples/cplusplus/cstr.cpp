@@ -48,7 +48,7 @@ using namespace std;
 int main(){
 
   // Allocate an OCP and load the xml
-  FlatOCP ocp("../examples/xml_files/cstr.xml");
+  FlatOCP ocp("../../examples/xml_files/cstr.xml");
 
   // Set options
   ocp.setOption("scale_variables",true);

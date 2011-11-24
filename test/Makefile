@@ -43,7 +43,7 @@ examples_indoc_cpp:
 	
 # No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../examples' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp"
+	python internal/test_cppcmake.py '../examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp"
 
 examples_indoc_oct:
 	python internal/test_oct.py '../documentation/examples'
