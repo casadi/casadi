@@ -189,6 +189,7 @@ public:
   int iter_; // nonlinear solver iteration
 
   bool monitor_rhsB_;
+  bool monitor_rhs_;
 
   bool disable_internal_warnings_;
   

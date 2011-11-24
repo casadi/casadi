@@ -119,6 +119,9 @@ void CVodesInternal::init(){
   
   // Read options
   monitor_rhsB_ = monitored("CVodesInternal::rhsB");
+  monitor_rhs_ = monitored("rhs");
+
+
   
   // Try to generate a jacobian of none provided
   if(!linsol_.isNull() && jac_.isNull()){
@@ -493,6 +496,10 @@ void CVodesInternal::initAdj(){
 }
 
 void CVodesInternal::rhs(double t, const double* y, double* ydot){
+  if(monitor_rhs_){
+      cout << "CVodesInternal::rhs: begin" << endl;
+  }
+
   // Get time
   time1 = clock();
 
@@ -501,15 +508,29 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   f_.setInput(y,DAE_Y);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
+  if(monitor_rhs_) {
+    cout << "t       = " << f_.input(DAE_T) << endl;
+    cout << "y       = " << f_.input(DAE_Y) << endl;
+    cout << "p       = " << f_.input(DAE_P) << endl;
+  }
     // Evaluate
   f_.evaluate();
+
+  if(monitor_rhs_) {
+    cout << "ydot       = " << f_.output(DAE_RES)<< endl;
+  }
     
-    // Get results
+  // Get results
   f_.getOutput(ydot);
 
   // Log time
   time2 = clock();
   t_res += double(time2-time1)/CLOCKS_PER_SEC;
+
+  if(monitor_rhs_){
+   cout << "CVodesInternal::rhs: end" << endl;
+  }
+
 }
 
 int CVodesInternal::rhs_wrapper(double t, N_Vector y, N_Vector ydot, void *user_data){
@@ -1002,6 +1023,7 @@ int CVodesInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector qB
 }
 
 void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* qBdot){
+
   // Pass input
   f_.setInput(t,DAE_T);
   f_.setInput(y,DAE_Y);
