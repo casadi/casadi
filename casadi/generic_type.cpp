@@ -54,6 +54,22 @@ bool GenericType::can_cast_to(opt_type other) const {
   }
 }
 
+GenericType GenericType::from_type(opt_type type) {
+  switch(type)
+    {
+      case OT_INTEGERVECTOR:
+	      return std::vector<int>();
+      case OT_BOOLVECTOR:
+	      return std::vector<bool>();
+      case OT_REALVECTOR:
+	      return std::vector<double>();
+      case OT_STRINGVECTOR:
+	      return std::vector<std::string>();
+      default:
+	      casadi_error("empty_from_type. Unsupported type " << type);
+    }
+}
+
 std::string GenericType::get_type_description(opt_type type) {
   switch(type)
     {
@@ -110,6 +126,10 @@ bool GenericType::isDouble() const{
     
 bool GenericType::isString() const{
   return is_a<string>();
+}
+
+bool GenericType::isEmptyVector() const{
+  return (isIntVector() && toIntVector().size()==0 ) || (isDoubleVector() && toDoubleVector().size()==0 ) || (isStringVector() && toStringVector().size()==0 );
 }
 
 bool GenericType::isIntVector() const{

@@ -336,3 +336,5 @@ B= [A A]
 C=DMatrix(B)
 
 assert(C.size(),2*7)
+
+disp('All was fine')

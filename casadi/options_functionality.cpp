@@ -42,6 +42,12 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
     ss << ")" << endl;
     casadi_error(ss.str());
   }
+  
+  // If we have an empty vector, than we are not strict about the type
+  if (op.isEmptyVector()) {
+    dictionary_[name] = GenericType::from_type(allowed_options[name]);
+    return;
+  }
 
   // Some typechecking
   if (!op.can_cast_to(allowed_options[name])) {

@@ -396,11 +396,37 @@ class typemaptests(casadiTestCase):
 
     for i in [(0,1,5)]:
 	    a=GenericType(i)
-	    #print a
-	    #self.assertTrue(a.isIntVector())
-	    #self.assertTrue(a.isDoubleVector())
-	    #self.assertEqual(a.toString(),i)
+	    self.assertTrue(a.isIntVector())
+	    self.assertFalse(a.isDoubleVector())
 
+    for i in [(0.3,1,5)]:
+	    a=GenericType(i)
+	    self.assertFalse(a.isIntVector())
+	    self.assertTrue(a.isDoubleVector())
+	    
+    a = GenericType(["foo","bar"])
+    self.assertTrue(a.isStringVector())
+    x = SX("x")
+    f = SXFunction([x],[x])
+    f.setOption("monitors",["foo","bar"])
+    self.assertEqual(f.getOption("monitors")[0],"foo")
+    self.assertEqual(f.getOption("monitors")[1],"bar")
+    f.setOption("monitors",["foo"])
+    self.assertEqual(f.getOption("monitors")[0],"foo")
+    f.setOption("monitors",[])
+    
+    t=SX("t")
+
+    x=SX("x") 
+    dx=SX("dx")
+
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,dx]},[[dx,-x]])
+    f.init()
+
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("fsens_scaling_factors",[5.0,7])
+    integrator.setOption("fsens_scaling_factors",[])
+    
   def testGenericType3(self):
     self.message("Generic type 3")
     

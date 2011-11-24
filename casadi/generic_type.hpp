@@ -40,6 +40,7 @@ namespace CasADi{
   class GenericType : public SharedObject{
     public:
     GenericType();
+    #ifndef SWIG
     GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
@@ -49,6 +50,7 @@ namespace CasADi{
     GenericType(const std::vector<double>& dv);
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
+    #endif // SWIG
     GenericType(const SharedObject& obj);
     //GenericType(const GenericType& obj);    
     
@@ -62,6 +64,8 @@ namespace CasADi{
     /// Get a description of the object's type
     std::string get_description() const { return get_type_description(type_); }
 
+    /// Construct a GenericType geiven an opt_type
+    static GenericType from_type(opt_type type);
 
     typedef std::map<std::string, GenericType> Dictionary;
     GenericType(const Dictionary& dict);
@@ -114,6 +118,9 @@ namespace CasADi{
     //! \brief Is a string?
     bool isString() const;
 
+    //! \brief Is an empty vector?
+    bool isEmptyVector() const;
+    
     //! \brief Is a vector of ints?
     bool isIntVector() const;
     
