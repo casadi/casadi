@@ -48,7 +48,20 @@ class FXtests(casadiTestCase):
     self.checkarray(array([0,cos(n2[1])]),p.adjSens(2),"adjSens")
     self.checkarray(1,p.adjSens(3),"adjSens")
 
-        
+  def test_set_wrong(self):
+    self.message("setter, wrong sparsity")
+    x = SX("x")
+
+    f = SXFunction([x],[x])
+    f.init()
+    A = DMatrix(1,1,4)
+    f.getFwdSeed(A,0)
+    A = DMatrix(1,1)
+    self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0))
+    B = DMatrix(1,2,2)
+    self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0))
+    
+      
 if __name__ == '__main__':
     unittest.main()
 
