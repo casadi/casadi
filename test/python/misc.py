@@ -59,9 +59,10 @@ class Misctests(casadiTestCase):
     print "IpoptSolver"
     g = IpoptSolver(f)
     
-    #f.setOption("monitor","abc")
+    #f.setOption("monitor",["abc"])
+    # Why oh why is there no Error thrown?
     #self.assertRaises(RuntimeError,lambda : f.setOption("monitor",["abc"]))
-    #f.setOption("monitor",["eval_f"])
+    f.setOption("monitor",["eval_f"])
     
     
   def test_copyconstr_norefcount(self):

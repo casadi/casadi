@@ -34,7 +34,7 @@ IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
   
   // Monitors
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f");
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f", true);
     
   // Output
   ops_["print_level"] = OT_INTEGER;
