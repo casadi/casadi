@@ -175,10 +175,17 @@ class SX{
     bool isMinusInf() const;
     const std::string& getName() const;
     int getOp() const;
+    bool isOp(int op) const;
     bool isEqual(const SX& scalar) const;
     double getValue() const;
     int getIntValue() const;
     SX getDep(int ch=0) const;
+    
+    /** \brief Check if the node is the sum of two equal expressions */
+    bool isDoubled() const;
+    
+    /** \brief Check if the node is an even square */
+    bool isSquared() const;
     
     /** \brief Get the number of dependencies of a binary SX */
     int getNdeps() const;
@@ -225,12 +232,13 @@ class SX{
     SX fmin(const SX &b) const;
     SX fmax(const SX &b) const;
     SX inv() const;
-    SX constpow(const SX& n) const;
     SX sinh() const;
     SX cosh() const;
     SX tanh() const;
     SX log10() const;
     SX printme(const SX &b) const;
+    SX sign() const;
+    SX constpow(const SX& n) const;
     
     // Get the temporary variable
     int getTemp() const;
@@ -251,8 +259,7 @@ class SX{
     
     // Pointer to node (SX is only a reference class)
     SXNode* node;
-    /** \brief  Function that do not have corresponding c-functions and are therefore not available publically */
-    friend SX sign(const SX &x);
+    
     /** \brief inline if-test */
     friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
 #endif // SWIG
@@ -303,7 +310,6 @@ class casadi_operators<SX>{
     static SX exp(const SX&x);
     static SX log(const SX&x);
     static SX pow(const SX&x, const SX&y);
-    static SX constpow(const SX&x, const SX&y);
     static SX sqrt(const SX&x);
     static SX sin(const SX&x);
     static SX cos(const SX&x);
@@ -322,6 +328,8 @@ class casadi_operators<SX>{
     static SX cosh(const SX&x);
     static SX tanh(const SX&x);
     static SX printme(const SX&x, const SX&y);
+    static SX sign(const SX&x);
+    static SX constpow(const SX&x, const SX&y);
 };
 
 #endif // SWIG
@@ -412,6 +420,7 @@ inline SX erf(const SX &x){return x.erf();}
 inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
 inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
 inline SX printme(const SX &x, const SX &y){ return x.printme(y);}
+inline SX sign(const SX &x){return x.sign();}
 #undef SX
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */

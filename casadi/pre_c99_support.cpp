@@ -85,3 +85,9 @@ namespace std{
 
 } // namespace std
 #endif // WITHOUT_INT_MATH
+
+double sign(double x) throw(){ 
+  return x<0 ? -1 : x>0 ? 1 : x; // NOTE: sign(nan) == nan
+}
+  
+

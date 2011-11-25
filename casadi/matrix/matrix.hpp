@@ -469,6 +469,7 @@ class Matrix : public PrintableObject{
     Matrix<T> floor() const;
     Matrix<T> ceil() const;
     Matrix<T> fabs() const;
+    Matrix<T> sign() const;
     Matrix<T> fmin(const Matrix<T>& y) const;
     Matrix<T> fmax(const Matrix<T>& y) const;
     Matrix<T> erf() const;
@@ -673,6 +674,9 @@ namespace CasADi{
 
   template<class T>
   CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
+
+  template<class T>
+  CasADi::Matrix<T> sign(const CasADi::Matrix<T>& x){return x.sign();}
 
   template<class T>
   CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y) { return x.__pow__(y);}
@@ -1733,6 +1737,11 @@ Matrix<T> Matrix<T>::ceil() const{
 template<class T>
 Matrix<T> Matrix<T>::fabs() const{
   return unary_old(CasADi::casadi_operators<T>::fabs);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sign() const{
+  return unary_old(CasADi::casadi_operators<T>::sign);
 }
 
 template<class T>

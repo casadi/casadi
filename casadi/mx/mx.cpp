@@ -640,6 +640,14 @@ MX MX::ceil() const{
   return unary(CEIL,*this);
 }
 
+MX MX::fabs() const{ 
+  return unary(FABS,*this);
+}
+
+MX MX::sign() const{ 
+  return unary(SIGN,*this);
+}
+
 MX MX::erf() const{ 
   return unary(ERF,*this);
 }
@@ -786,6 +794,14 @@ MX floor(const MX& x){
 
 MX ceil(const MX& x){
   return x.ceil();
+}
+
+MX fabs(const MX& x){
+  return x.fabs();
+}
+
+MX sign(const MX& x){
+  return x.sign();
 }
 
 MX erf(const MX& x){

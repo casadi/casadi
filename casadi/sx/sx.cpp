@@ -134,8 +134,11 @@ SX& operator/=(SX &ex, const SX &el){
   return ex = ex / el;
 }
 
-SX sign(const SX& x){
-  return timesTwo(x>=0)-1;
+SX SX::sign() const{
+  if(isConstant())
+    return ::sign(getValue());
+  else
+    return SX::create(new BinarySXNode(SIGN, *this));
 }
 
 
@@ -184,6 +187,14 @@ SX SX::mul(const SX& y) const{
     return SX::create(new BinarySXNode(MUL,*this,y));
 }
 
+bool SX::isDoubled() const{
+  return isOp(ADD) && node->dep(0).isEqual(node->dep(1));
+}
+    
+bool SX::isSquared() const{
+  return isOp(MUL) && node->dep(0).isEqual(node->dep(1));
+}
+
 SX SX::div(const SX& y) const{
   if(y->isZero()) // term2 is zero
     return casadi_limits<SX>::nan;
@@ -193,12 +204,18 @@ SX SX::div(const SX& y) const{
     return *this;
   else if(node->isEqual(y)) // terms are equal
     return 1;
-  else if(y.isEqual(2) && node->hasDep() && node->getOp()==ADD && node->dep(0).isEqual(node->dep(1)))
+  else if(isDoubled() && y.isEqual(2))
+    return node->dep(0);
+  else if(isOp(MUL) && y.isEqual(node->dep(0)))
+    return node->dep(1);
+  else if(isOp(MUL) && y.isEqual(node->dep(1)))
     return node->dep(0);
   else if(node->isOne())
     return y.inv();
   else if(y.isBinary() && y.getOp()==INV)
     return (*this)*y.inv();
+  else if(isDoubled() && y.isDoubled())
+    return node->dep(0) / y->dep(0);
   else // create a new branch
     return SX::create(new BinarySXNode(DIV,*this,y));
 }
@@ -235,7 +252,9 @@ SX operator<=(const SX &a, const SX &b){
 SX operator>=(const SX &a, const SX &b){
   // Move everything to one side
   SX x = a-b;
-  if(x->isConstant())
+  if(x.isSquared() || x.isOp(FABS))
+    return 1;
+  else if(x->isConstant())
     return x->getValue()>=0; // ok since the result will be either 0 or 1, i.e. no new nodes
   else
     return SX::create(new BinarySXNode(STEP,x));
@@ -368,6 +387,10 @@ int SX::getOp() const{
   return node->getOp();
 }
 
+bool SX::isOp(int op) const{
+  return isBinary() && op==getOp();
+}
+
 bool SX::isEqual(const SX& scalar) const{
   return node->isEqual(scalar);
 }
@@ -449,8 +472,8 @@ SX SX::log10() const{
 SX SX::sqrt() const{
   if(isOne() || isZero())
     return *this;
-  else if(isBinary() && getOp()==MUL && getDep(0).isEqual(getDep(1)))
-    return getDep().fabs();
+  else if(isSquared())
+    return node->dep(0).fabs();
   else
     return SX::create(new BinarySXNode(SQRT,*this));
 }
@@ -524,8 +547,12 @@ SX SX::erf() const{
 SX SX::fabs() const{
   if(isConstant() && getValue()>=0)
     return *this;
+  else if(isOp(FABS))
+    return *this;
+  else if(isSquared())
+    return *this;
   else
-    return sign(*this)**this;
+    return SX::create(new BinarySXNode(FABS,*this));
 }
 
 SX casadi_operators<SX>::add(const SX&x, const SX&y){
@@ -630,6 +657,10 @@ SX casadi_operators<SX>::fabs(const SX&x){
 
 SX casadi_operators<SX>::erf(const SX&x){ 
   return x.erf();
+}
+
+SX casadi_operators<SX>::sign(const SX&x){ 
+  return x.sign();
 }
 
 SX::operator Matrix<SX>() const{

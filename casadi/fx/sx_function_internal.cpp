@@ -117,6 +117,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       case FLOOR+OFF:     C<FLOOR>::fcn(x,y,f);         break;\
       case CEIL+OFF:      C<CEIL>::fcn(x,y,f);          break;\
       case EQUALITY+OFF:  C<EQUALITY>::fcn(x,y,f);      break;\
+      case FABS+OFF:      C<FABS>::fcn(x,y,f);          break;\
+      case SIGN+OFF:      C<SIGN>::fcn(x,y,f);          break;\
       case ERF+OFF:       C<ERF>::fcn(x,y,f);           break;\
       case FMIN+OFF:      C<FMIN>::fcn(x,y,f);          break;\
       case FMAX+OFF:      C<FMAX>::fcn(x,y,f);          break;\
@@ -164,6 +166,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,f);         break;
         case CEIL:      BinaryOperation<CEIL>::fcn(x,y,f);          break;
         case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,f);      break;
+        case FABS:      BinaryOperation<FABS>::fcn(x,y,f);           break;
+        case SIGN:      BinaryOperation<SIGN>::fcn(x,y,f);           break;
         case ERF:       BinaryOperation<ERF>::fcn(x,y,f);           break;
         case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);          break;
         case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);          break;
@@ -677,6 +681,9 @@ void SXFunctionInternal::generateCode(const string& src_name){
   cfile << "  return 0;" << endl;
   cfile << "}" << endl << endl;
 
+  // The sign function
+  cfile << "double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
+  
   // Evaluate function
   cfile << "int evaluate(const double** x, double** r){" << endl;
 

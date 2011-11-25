@@ -103,7 +103,7 @@ enum Operation{
   SQRT,  SIN,  COS,  TAN,  
   ASIN,  ACOS,  ATAN,  
   STEP,  
-  FLOOR,  CEIL,  EQUALITY,  
+  FLOOR,  CEIL,  EQUALITY, FABS, SIGN, 
   ERF,  FMIN,  FMAX,
   INV,
   SINH,  COSH,  TANH,
@@ -272,6 +272,30 @@ class BinaryOperation<EQUALITY>{
     template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 
+/// Error function
+template<>
+class UnaryOperation<ERF>{
+  public:
+    template<typename T> inline static void fcn(const T& x, T& f){ f = erf(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = (2/sqrt(M_PI))*exp(-x*x);}
+};
+
+/// Absolute value
+template<>
+class UnaryOperation<FABS>{
+  public:
+    template<typename T> inline static void fcn(const T& x, T& f){ f = fabs(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=sign(x);}
+};
+
+/// Sign
+template<>
+class UnaryOperation<SIGN>{
+  public:
+    template<typename T> inline static void fcn(const T& x, T& f){ f = sign(x);}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0]=0;}
+};
+
 /// Minimum
 template<>
 class BinaryOperation<FMIN>{
@@ -286,14 +310,6 @@ class BinaryOperation<FMAX>{
   public:
     template<typename T> inline static void fcn(const T& x, const T& y, T& f){ f = fmax(x,y);}
     template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=x>=y; d[1]=!d[0];}
-};
-
-/// Error function
-template<>
-class UnaryOperation<ERF>{
-  public:
-    template<typename T> inline static void fcn(const T& x, T& f){ f = erf(x);}
-    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = (2/sqrt(M_PI))*exp(-x*x);}
 };
 
 /// Elementwise inverse
@@ -407,6 +423,8 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,f);         break;
     case CEIL:      BinaryOperation<CEIL>::fcn(x,y,f);          break;
     case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,f);      break;
+    case FABS:      BinaryOperation<FABS>::fcn(x,y,f);          break;
+    case SIGN:     BinaryOperation<SIGN>::fcn(x,y,f);         break;
     case ERF:       BinaryOperation<ERF>::fcn(x,y,f);           break;
     case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);          break;
     case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);          break;
@@ -441,6 +459,8 @@ inline void casadi_math<T>::inplacefun(unsigned char op, const T& x, const T& y,
     case FLOOR+OFF:     C<FLOOR>::fcn(x,y,f);         break;\
     case CEIL+OFF:      C<CEIL>::fcn(x,y,f);          break;\
     case EQUALITY+OFF:  C<EQUALITY>::fcn(x,y,f);      break;\
+    case FABS+OFF:      C<FABS>::fcn(x,y,f);          break;\
+    case SIGN+OFF:     C<SIGN>::fcn(x,y,f);         break;\
     case ERF+OFF:       C<ERF>::fcn(x,y,f);           break;\
     case FMIN+OFF:      C<FMIN>::fcn(x,y,f);          break;\
     case FMAX+OFF:      C<FMAX>::fcn(x,y,f);          break;\
@@ -483,6 +503,8 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case FLOOR:     BinaryOperation<FLOOR>::der(x,y,f,d);      break;
     case CEIL:      BinaryOperation<CEIL>::der(x,y,f,d);       break;
     case EQUALITY:  BinaryOperation<EQUALITY>::der(x,y,f,d);   break;
+    case FABS:      BinaryOperation<FABS>::der(x,y,f,d);       break;
+    case SIGN:     BinaryOperation<SIGN>::der(x,y,f,d);      break;
     case ERF:       BinaryOperation<ERF>::der(x,y,f,d);        break;
     case FMIN:      BinaryOperation<FMIN>::der(x,y,f,d);       break;
     case FMAX:      BinaryOperation<FMAX>::der(x,y,f,d);       break;
@@ -522,6 +544,8 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,ff);   BinaryOperation<FLOOR>::der(x,y,ff,d);      break;
     case CEIL:      BinaryOperation<CEIL>::fcn(x,y,ff);   BinaryOperation<CEIL>::der(x,y,ff,d);       break;
     case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,ff);   BinaryOperation<EQUALITY>::der(x,y,ff,d);   break;
+    case FABS:      BinaryOperation<FABS>::fcn(x,y,ff);   BinaryOperation<FABS>::der(x,y,ff,d);        break;
+    case SIGN:     BinaryOperation<FABS>::fcn(x,y,ff);   BinaryOperation<SIGN>::der(x,y,ff,d);        break;
     case ERF:       BinaryOperation<ERF>::fcn(x,y,ff);   BinaryOperation<ERF>::der(x,y,ff,d);        break;
     case FMIN:      BinaryOperation<FMIN>::fcn(x,y,ff);   BinaryOperation<FMIN>::der(x,y,ff,d);       break;
     case FMAX:      BinaryOperation<FMAX>::fcn(x,y,ff);   BinaryOperation<FMAX>::der(x,y,ff,d);       break;
@@ -550,6 +574,8 @@ inline bool casadi_math<T>::f00_is_zero(unsigned char op){
     case CEIL:      return true;
     case FMIN:      return true;
     case FMAX:      return true;
+    case FABS:      return true;
+    case SIGN:     return true;
     case ERF:       return true;
     case SINH:      return true;
     case TANH:      return true;
@@ -570,6 +596,8 @@ inline bool casadi_math<T>::f0x_is_zero(unsigned char op){
     case ATAN:      return true;
     case FLOOR:     return true;
     case CEIL:      return true;
+    case FABS:      return true;
+    case SIGN:     return true;
     case ERF:       return true;
     case SINH:      return true;
     case TANH:      return true;
@@ -653,6 +681,8 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case FLOOR:     stream << "floor(";   break;
     case CEIL:      stream << "ceil(";    break;
     case EQUALITY:  stream << "(";        break;
+    case FABS:      stream << "fabs(";    break;
+    case SIGN:     stream << "sign(";   break;
     case ERF:       stream << "erf(";     break;
     case FMIN:      stream << "fmin(";    break;
     case FMAX:      stream << "fmax(";    break;

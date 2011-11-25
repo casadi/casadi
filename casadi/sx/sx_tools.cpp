@@ -133,7 +133,7 @@ Matrix<SX> triangle(const Matrix<SX>& a){
 }
 
 Matrix<SX> sign(const Matrix<SX>& a){
-  return (a>0) + (a>=0)-1;
+  return a.sign();
 }
 
 bool contains(const Matrix<SX> &list, const SX &e) {

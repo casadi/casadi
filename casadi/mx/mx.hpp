@@ -370,6 +370,8 @@ class MX : public SharedObject{
   MX arctan() const;
   MX floor() const;
   MX ceil() const;
+  MX fabs() const;
+  MX sign() const;
   MX erf() const;
   MX sinh() const;
   MX cosh() const;

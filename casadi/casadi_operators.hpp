@@ -44,7 +44,6 @@ class casadi_operators{
     static T exp(const T&x){ return ::exp(x);}
     static T log(const T&x){ return ::log(x);}
     static T pow(const T&x, const T&y){ return ::pow(x,y);}
-    static T constpow(const T&x, const T&y){ return ::pow(x,y);}
     static T sqrt(const T&x){ return ::sqrt(x);}
     static T sin(const T&x){ return ::sin(x);}
     static T cos(const T&x){ return ::cos(x);}
@@ -62,7 +61,9 @@ class casadi_operators{
     static T sinh(const T&x){ return ::sinh(x);}
     static T cosh(const T&x){ return ::cosh(x);}
     static T tanh(const T&x){ return ::tanh(x);}
+    static T constpow(const T&x, const T&y){ return ::pow(x,y);}
     static T printme(const T&x, const T&y){ return printme(x,y);}
+    static T sign(const T&x){ return x<0 ? -1 : x>0 ? 1 : x;} // NOTE: sign(nan) == nan
 };
 
 //@{
@@ -94,6 +95,7 @@ MX sinh(const MX &x);
 MX cosh(const MX &x);
 MX tanh(const MX &x);
 MX printme(const MX &x, const MX &y);
+MX sign(const MX &x);
 //@}
 
 /** \brief  C99 elementary functions from the math.h header */
