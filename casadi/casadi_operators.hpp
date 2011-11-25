@@ -85,7 +85,6 @@ MX acos(const MX &x);
 MX exp(const MX &x);
 MX log(const MX &x);
 MX log10(const MX &x);
-MX constpow(const MX &x, const MX &n);
 MX pow(const MX &x, const MX &n);
 MX abs(const MX &x);
 MX fabs(const MX &x); // same as abs
@@ -94,15 +93,24 @@ MX ceil(const MX &x);
 MX sinh(const MX &x);
 MX cosh(const MX &x);
 MX tanh(const MX &x);
-MX printme(const MX &x, const MX &y);
-MX sign(const MX &x);
 //@}
 
+//@{
 /** \brief  C99 elementary functions from the math.h header */
 MX erf(const MX &x);
 MX fmin(const MX &a, const MX &b);
 MX fmax(const MX &a, const MX &b);
+//@}
 #undef MX
+
+namespace CasADi{
+  //@{
+  /** \brief  CasADi additions to math.h */
+  MX constpow(const MX &x, const MX &n);
+  MX printme(const MX &x, const MX &y);
+  MX sign(const MX &x);
+  //@}
+}
 
 #endif // CASADI_OPERATORS_HPP
 

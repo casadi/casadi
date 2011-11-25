@@ -136,7 +136,7 @@ SX& operator/=(SX &ex, const SX &el){
 
 SX SX::sign() const{
   if(isConstant())
-    return ::sign(getValue());
+    return CasADi::sign(getValue());
   else
     return SX::create(new BinarySXNode(SIGN, *this));
 }

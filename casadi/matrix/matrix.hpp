@@ -624,77 +624,44 @@ namespace CasADi{
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 } // namespace CasADi
 
-// The following functions must be placed in the global namespace so that the old ones are not shadowed when CasADi namespace is used
 #ifndef SWIG
 
-  template<class T>
-  CasADi::Matrix<T> sin(const CasADi::Matrix<T>& x){ return x.sin(); }
+//@{
+/** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
+template<class T> CasADi::Matrix<T> sin(const CasADi::Matrix<T>& x){ return x.sin(); }
+template<class T> CasADi::Matrix<T> cos(const CasADi::Matrix<T>& x){ return x.cos(); }
+template<class T> CasADi::Matrix<T> tan(const CasADi::Matrix<T>& x){ return x.tan(); }
+template<class T> CasADi::Matrix<T> asin(const CasADi::Matrix<T>& x){ return x.arcsin(); }
+template<class T> CasADi::Matrix<T> acos(const CasADi::Matrix<T>& x){ return x.arccos(); }
+template<class T> CasADi::Matrix<T> atan(const CasADi::Matrix<T>& x){ return x.arctan(); }
+template<class T> CasADi::Matrix<T> sinh(const CasADi::Matrix<T>& x){ return x.sinh(); }
+template<class T> CasADi::Matrix<T> cosh(const CasADi::Matrix<T>& x){ return x.cosh(); }
+template<class T> CasADi::Matrix<T> tanh(const CasADi::Matrix<T>& x){ return x.tanh(); }
+template<class T> CasADi::Matrix<T> exp(const CasADi::Matrix<T>& x){ return x.exp();}
+template<class T> CasADi::Matrix<T> log(const CasADi::Matrix<T>& x){ return x.log(); }
+template<class T> CasADi::Matrix<T> log10(const CasADi::Matrix<T>& x){ return x.log10(); }
+template<class T> CasADi::Matrix<T> sqrt(const CasADi::Matrix<T>& x){ return x.sqrt();}
+template<class T> CasADi::Matrix<T> floor(const CasADi::Matrix<T>& x){ return x.floor();}
+template<class T> CasADi::Matrix<T> ceil(const CasADi::Matrix<T>& x){ return x.ceil();}
+template<class T> CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
+template<class T> CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y) { return x.__pow__(y);}
+//@}
 
-  template<class T>
-  CasADi::Matrix<T> cos(const CasADi::Matrix<T>& x){ return x.cos(); }
+//@{
+/** \brief  C99 elementary functions from the math.h header */
+template<class T> CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
+template<class T> CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
+template<class T> CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
+//@}
 
-  template<class T>
-  CasADi::Matrix<T> tan(const CasADi::Matrix<T>& x){ return x.tan(); }
-
-  template<class T>
-  CasADi::Matrix<T> asin(const CasADi::Matrix<T>& x){ return x.arcsin(); }
-
-  template<class T>
-  CasADi::Matrix<T> acos(const CasADi::Matrix<T>& x){ return x.arccos(); }
-
-  template<class T>
-  CasADi::Matrix<T> atan(const CasADi::Matrix<T>& x){ return x.arctan(); }
-
-  template<class T>
-  CasADi::Matrix<T> sinh(const CasADi::Matrix<T>& x){ return x.sinh(); }
-
-  template<class T>
-  CasADi::Matrix<T> cosh(const CasADi::Matrix<T>& x){ return x.cosh(); }
-
-  template<class T>
-  CasADi::Matrix<T> tanh(const CasADi::Matrix<T>& x){ return x.tanh(); }
-
-  template<class T>
-  CasADi::Matrix<T> exp(const CasADi::Matrix<T>& x){ return x.exp();}
-
-  template<class T>
-  CasADi::Matrix<T> log(const CasADi::Matrix<T>& x){ return x.log(); }
-
-  template<class T>
-  CasADi::Matrix<T> log10(const CasADi::Matrix<T>& x){ return x.log10(); }
-
-  template<class T>
-  CasADi::Matrix<T> sqrt(const CasADi::Matrix<T>& x){ return x.sqrt();}
-
-  template<class T>
-  CasADi::Matrix<T> floor(const CasADi::Matrix<T>& x){ return x.floor();}
-
-  template<class T>
-  CasADi::Matrix<T> ceil(const CasADi::Matrix<T>& x){ return x.ceil();}
-
-  template<class T>
-  CasADi::Matrix<T> fabs(const CasADi::Matrix<T>& x){return x.fabs();}
-
-  template<class T>
-  CasADi::Matrix<T> sign(const CasADi::Matrix<T>& x){return x.sign();}
-
-  template<class T>
-  CasADi::Matrix<T> pow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y) { return x.__pow__(y);}
-  
-  template<class T>
-  CasADi::Matrix<T> constpow(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.__constpow__(y);}
-  
-  template<class T>
-  CasADi::Matrix<T> printme(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.printme(y); }
-
-  template<class T>
-  CasADi::Matrix<T> fmin(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmin(y);}
-
-  template<class T>
-  CasADi::Matrix<T> fmax(const CasADi::Matrix<T>& x, const CasADi::Matrix<T>& y){ return x.fmax(y);}
-
-  template<class T>
-  CasADi::Matrix<T> erf(const CasADi::Matrix<T>& x){ return x.erf(); }
+namespace CasADi{
+  //@{
+  /** \brief  CasADi additions to math.h */
+  template<class T> Matrix<T> sign(const Matrix<T>& x){return x.sign();}
+  template<class T> Matrix<T> constpow(const Matrix<T>& x, const Matrix<T>& y){ return x.__constpow__(y);}
+  template<class T> Matrix<T> printme(const Matrix<T>& x, const Matrix<T>& y){ return x.printme(y); }
+  //@}
+}
 
 #endif // SWIG
 

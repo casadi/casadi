@@ -394,6 +394,7 @@ class numeric_limits<CasADi::SX>{
 // Shorthand for out-of-namespace declarations
 #define SX CasADi::SX
 
+//@{
 /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
 inline SX sqrt(const SX &x){return x.sqrt();}
 inline SX sin(const SX &x){return x.sin();}
@@ -408,20 +409,29 @@ inline SX tanh(const SX &x){return x.tanh();}
 inline SX exp(const SX &x){return x.exp();}
 inline SX log(const SX &x){return x.log();}
 inline SX pow(const SX &x, const SX &n){ return x.__pow__(n);}
-inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
 inline SX abs(const SX &x){return x.fabs();}
 inline SX fabs(const SX &x){return x.fabs();}
 inline SX floor(const SX &x){return x.floor();}
 inline SX ceil(const SX &x){return x.ceil();}
+//@}
 
-
+//@{
 /** \brief  C99 elementary functions from the math.h header */
 inline SX erf(const SX &x){return x.erf();}
 inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
 inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
-inline SX printme(const SX &x, const SX &y){ return x.printme(y);}
-inline SX sign(const SX &x){return x.sign();}
+//@}
 #undef SX
+
+namespace CasADi{
+  //@{
+  /** \brief  CasADi additions to math.h */
+  inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
+  inline SX printme(const SX &x, const SX &y){ return x.printme(y);}
+  inline SX sign(const SX &x){return x.sign();}
+  //@}
+}
+
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */
 #include "sx_node.hpp"

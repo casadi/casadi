@@ -783,11 +783,6 @@ MX pow(const MX& x, const MX& n){
   return x.__pow__(n);
 }
 
-MX constpow(const MX& x, const MX& n){
-  return x.constpow(n);
-}
-
-
 MX floor(const MX& x){
   return x.floor();
 }
@@ -798,10 +793,6 @@ MX ceil(const MX& x){
 
 MX fabs(const MX& x){
   return x.fabs();
-}
-
-MX sign(const MX& x){
-  return x.sign();
 }
 
 MX erf(const MX& x){
@@ -816,6 +807,17 @@ MX fmax(const MX& x, const MX& y){
   return x.fmax(y);
 }
 
-MX printme(const MX& x, const MX& y){
-  return x.printme(y);
-}
+namespace CasADi{
+  MX constpow(const MX& x, const MX& n){
+    return x.constpow(n);
+  }
+
+  MX sign(const MX& x){
+    return x.sign();
+  }
+
+  MX printme(const MX& x, const MX& y){
+    return x.printme(y);
+  }
+  
+} // namespace CasADi

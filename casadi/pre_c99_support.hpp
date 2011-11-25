@@ -79,6 +79,8 @@ namespace std{
 #endif // WITHOUT_INT_MATH
 
 // This is a nonstandard addition (the sign function) -- possibly move to another file
-double sign(double x) throw();
+namespace CasADi{
+  double sign(double x) throw();
+}
 
 #endif // PRE_C99_SUPPORT_HPP
