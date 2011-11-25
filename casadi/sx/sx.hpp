@@ -349,7 +349,7 @@ class casadi_operators<SX>{
 
 // Template specialization
 namespace CasADi{
-  template<> struct TypeName<SX>{ static const char* name; };
+  template<> inline const char* typeName<SX>() { return "SX"; }
 } // namespace CasADi
 
 namespace std{

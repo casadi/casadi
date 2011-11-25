@@ -731,8 +731,6 @@ long SX::getMaxNumCallsInPrint(){
   return max_num_calls_in_print_;
 }
 
-const char* TypeName<SX>::name = "SX";
-
 } // namespace CasADi
 
 using namespace CasADi;

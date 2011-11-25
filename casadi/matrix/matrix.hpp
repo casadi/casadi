@@ -38,22 +38,16 @@ namespace CasADi{
   
   /** Sparsity format for getting and setting inputs and outputs */
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
+  
+  //@{
+  /** \brief Get typename */
+  template <typename T> inline const char* typeName() { return typeid(T).name(); }
+  template<> inline const char* typeName<double>() { return "double"; }
+  template<> inline const char* typeName<float>() { return "float"; }
+  template<> inline const char* typeName<int>() { return "int"; }
+  template<> inline const char* typeName<long>() { return "long"; }
+  //@}
 
-  /** Helper class pretty printing of type */
-  template<class T> struct TypeName{ static const char* name; };
-  
-  /** Pretty print of double */
-  template<> struct TypeName<double>{ static const char* name; };
-
-  /** Pretty print of float */
-  template<> struct TypeName<float>{ static const char* name; };
-  
-  /** Pretty print of int */
-  template<> struct TypeName<int>{ static const char* name; };
-  
-  /** Pretty print of long */
-  template<> struct TypeName<long>{ static const char* name; };
-  
   /** \brief General sparse matrix class
   General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
   This philosophy makes it easy to use and to interface in particularily with Matlab and Python.\n
@@ -690,9 +684,6 @@ namespace CasADi{
 // Implementations
 
 template<class T>
-const char* TypeName<T>::name = typeid(T).name();
-
-template<class T>
 const T& Matrix<T>::elem(int i, int j) const{
   int ind = sparsity().getNZ(i,j);
   if(ind==-1)
@@ -969,7 +960,7 @@ void Matrix<T>::makeEmpty(int n, int m){
 }
 
 template<class T>
-std::string Matrix<T>::className(){ return std::string("Matrix<") + TypeName<T>::name + std::string(">"); }
+std::string Matrix<T>::className(){ return std::string("Matrix<") + typeName<T>() + std::string(">"); }
 
 template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {

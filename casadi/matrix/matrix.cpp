@@ -23,11 +23,5 @@
 #include "matrix.hpp"
 
 namespace CasADi{
-
-  const char* TypeName<double>::name = "double";
-  const char* TypeName<float>::name = "float";
-  const char* TypeName<int>::name = "int";
-  const char* TypeName<long>::name = "long";
-  
 } // namespace CasADi
 
