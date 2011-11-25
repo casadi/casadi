@@ -591,7 +591,7 @@ class Matrix : public PrintableObject{
     /** \brief  create a matrix with all ones */
     static Matrix<T> ones(int nrow, int ncol=1);
 
-    /** \brief  create a matrix with all zeros */
+    /** \brief  create a sparse matrix with all zeros */
     static Matrix<T> sparse(int nrow, int ncol=1);
     
     /** \brief  create a matrix with all ones */
@@ -605,7 +605,10 @@ class Matrix : public PrintableObject{
     
     /** \brief  create a matrix with all nan */
     static Matrix<T> nan(int nrow=1, int ncol=1);
-    
+
+    /** \brief  create a matrix by repeating an existing matrix */
+    static Matrix<T> repmat(const Matrix<T>& x, int nrow, int ncol=1);
+
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
@@ -889,7 +892,7 @@ bool Matrix<T>::empty() const{
 
 template<class T>
 bool Matrix<T>::scalar() const{
-  return size1()==1 && size2()==1;
+  return numel()==1;
 }
 
 template<class T>
@@ -2036,6 +2039,19 @@ Matrix<T> Matrix<T>::ones(int n, int m){
 template<class T>
 Matrix<T> Matrix<T>::sparse(int n, int m){
   return Matrix<T>(n,m);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::repmat(const Matrix<T>& x, int nrow, int ncol){
+  if(x.scalar()){
+    if(x.dense()){
+      return Matrix<T>(nrow,ncol,x.toScalar());
+    } else {
+      return sparse(nrow,ncol);
+    }
+  } else {
+    casadi_assert_message(0,"not implemented");
+  }
 }
 
 template<class T>

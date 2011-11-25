@@ -74,7 +74,7 @@ MX::MX(int nrow, int ncol){
 
 MX::MX(const CRSSparsity& sp, const MX& val){
   // Make sure that val is dense and scalar
-  casadi_assert(val.numel()==1);
+  casadi_assert(val.scalar());
   
   // Dense matrix if val dense
   if(val.dense()){
@@ -147,7 +147,7 @@ void MX::setSub(const std::vector<int>& i, int j, const MX& el){
 
 void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
   // Allow el to be a 1x1
-  if (el.size()==1 && el.numel()==1) {
+  if (el.dense() && el.scalar()) {
     if (ii.size()>1 || jj.size()>1) {
       setSub(ii,jj,MX(ii.size(),jj.size(),el));
       return;
@@ -256,9 +256,9 @@ int MX::size2() const{
 
 MX operator+(const MX &x, const MX &y){
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.numel()==1) && isZero(x)){
+  if((samedim || x.scalar()) && isZero(x)){
     return y;
-  } else if((samedim || y.numel()==1) && isZero(y)){
+  } else if((samedim || y.scalar()) && isZero(y)){
     return x;
   } else if(y->isOperation(NEG)){
     return x - y->dep(0);
@@ -271,9 +271,9 @@ MX operator+(const MX &x, const MX &y){
 
 MX operator-(const MX &x, const MX &y){
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.numel()==1) && isZero(x)){
+  if((samedim || x.scalar()) && isZero(x)){
     return -y;
-  } else if((samedim || y.numel()==1) && isZero(y)){
+  } else if((samedim || y.scalar()) && isZero(y)){
     return x;
   } else if(y->isOperation(NEG)){
     return x+y->dep(0);
@@ -286,7 +286,7 @@ MX operator-(const MX &x, const MX &y){
 
 MX MX::binary(int op, const MX &x, const MX &y){
   // Make sure that dimensions match
-  casadi_assert_message((x.numel()==1 || y.numel()==1 || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
+  casadi_assert_message((x.scalar() || y.scalar() || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
   
   // Quick return if zero
   if((casadi_math<double>::f0x_is_zero(op) && isZero(x)) || 
@@ -295,9 +295,9 @@ MX MX::binary(int op, const MX &x, const MX &y){
   }
   
   // Create binary node
-  if(x.numel()==1)
+  if(x.scalar())
     return scalar_matrix(op,x,y);
-  else if(y.numel()==1)  
+  else if(y.scalar())  
     return matrix_scalar(op,x,y);
   else
     return matrix_matrix(op,x,y);
@@ -358,13 +358,13 @@ MX MX::matrix_matrix(int op, const MX &x, const MX &y){
 
 MX operator*(const MX &x, const MX &y){
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.numel()==1) && isOne(x)){
+  if((samedim || x.scalar()) && isOne(x)){
     return y;
-  } else if((samedim || x.numel()==1) && isMinusOne(x)){
+  } else if((samedim || x.scalar()) && isMinusOne(x)){
     return -y;
-  } else if((samedim || y.numel()==1) && isOne(y)){
+  } else if((samedim || y.scalar()) && isOne(y)){
     return x;
-  } else if((samedim || y.numel()==1) && isMinusOne(y)){
+  } else if((samedim || y.scalar()) && isMinusOne(y)){
     return -x;
   } else {
     return MX::binary(MUL,x,y);
@@ -373,7 +373,7 @@ MX operator*(const MX &x, const MX &y){
 
 MX operator/(const MX &x, const MX &y){
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || y.numel()==1) && isOne(y)){
+  if((samedim || y.scalar()) && isOne(y)){
     return x;
   } else {
     return MX::binary(DIV,x,y);
@@ -410,6 +410,18 @@ bool MX::empty() const{
 
 bool MX::dense() const{
   return numel()==size();
+}
+
+bool MX::scalar() const{
+  return numel()==1;
+}
+
+MX MX::repmat(const MX& x, int nrow, int ncol){
+  if(x.scalar()){
+    return MX(nrow,ncol,x);
+  } else {
+    casadi_assert_message(0,"not implemented");
+  }
 }
 
 MX MX::sparse(int nrow, int ncol){
@@ -493,8 +505,8 @@ void MX::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& j
 
 MX::MX(int nrow, int ncol, const MX& val){
   // Make sure that val is scalar
-  casadi_assert(val.numel()==1);
-  casadi_assert(val.size()==1);
+  casadi_assert(val.scalar());
+  casadi_assert(val.dense());
   
   CRSSparsity sp(nrow,ncol,true);
   assignNode(new Mapping(sp));
@@ -530,7 +542,7 @@ MX MX::mul(const MX& y) const{
       return y;
     else
       return MX::sparse(x.size1(),y.size2());
-  } else if(x.numel()==1 || y.numel()==1){
+  } else if(x.scalar() || y.scalar()){
     return x*y;
   } else if(x.sparsity().diagonal() && y.size2()==1){
     return diag(x)*y;
@@ -657,8 +669,8 @@ MX MX::__sub__(const MX& b) const{    return *this - b;}
 MX MX::__mul__(const MX& b) const{    return *this * b;}
 MX MX::__div__(const MX& b) const{    return *this / b;}
 MX MX::__constpow__(const MX& b) const {   return (*this).constpow(b);}
-MX MX::__mrdivide__  (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-MX MX::__mldivide__   (const MX& b) const { if (MX(b).numel()==1) return *this/b; throw CasadiException("mldivide: Not implemented");}
+MX MX::__mrdivide__  (const MX& b) const { if (MX(b).scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+MX MX::__mldivide__   (const MX& b) const { if (MX(b).scalar()) return *this/b; throw CasadiException("mldivide: Not implemented");}
 MX MX::__mpower__(const MX& b) const  {   return pow(*this,b); throw CasadiException("mpower: Not implemented");}
 
 void MX::append(const MX& y){

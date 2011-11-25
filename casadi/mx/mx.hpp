@@ -225,6 +225,9 @@ class MX : public SharedObject{
   /** \brief  Check if the matrix expression is dense */
   bool dense() const;
   
+  /** \brief  Check if the matrix expression is scalar */
+  bool scalar() const;
+  
   //@{
   /** \brief  Access a member of the node */
   MXNode* operator->();
@@ -301,7 +304,7 @@ class MX : public SharedObject{
   //@}
 
   //@{
-  /** \brief  Matrix of all zeros */  
+  /** \brief  Sparse matrix of all zeros */  
   static MX sparse(int nrow, int ncol=1);
   static MX sparse(const CRSSparsity& sparsity);
   static MX sparse(const std::pair<int, int> &nm);
@@ -316,6 +319,9 @@ class MX : public SharedObject{
   /** \brief  Identity matrix */  
   static MX eye(int nrow);
 
+  /** \brief  create a matrix by repeating an existing matrix */
+  static MX repmat(const MX& x, int nrow, int ncol=1);
+  
   const MX getSub(int i, int j) const;
   const MX getSub(int i, const std::vector<int>& j) const;
   const MX getSub(const std::vector<int>& i, int j) const;
