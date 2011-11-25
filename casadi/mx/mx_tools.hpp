@@ -228,6 +228,10 @@ MX msym(const Matrix<double>& x);
 /** \brief  Check if two expressions are equal */
 bool isEqual(const MX& ex1,const MX &ex2);
 
+
+/** \brief Get a string representation for a binary MX, using custom arguments */
+std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
+
 } // namespace CasADi
 
 #ifdef SWIG

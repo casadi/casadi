@@ -667,6 +667,52 @@ long MX::getMaxNumCallsInPrint(){
   return max_num_calls_in_print_;
 }
 
+MX MX::getDep(int ch) const { return !isNull() ? (*this)->dep(ch) : MX(); }
+
+int MX::getNdeps() const { return !isNull() ? (*this)->ndep() : 0; }
+  
+std::string MX::getName() const { return !isNull() ? (*this)->getName() : "null"; }
+
+bool 	MX::isSymbolic () const { return !isNull() ? (*this)->isSymbolic() : false; }
+bool 	MX::isConstant () const { return !isNull() ? (*this)->isConstant() : false; }
+bool 	MX::isMapping () const { return !isNull() ? (*this)->isMapping() : false; }
+bool 	MX::isEvaluation () const { return !isNull() ? (*this)->isEvaluation() : false; }
+bool 	MX::isMultipleOutput () const { return !isNull() ? (*this)->isMultipleOutput() : false; }
+bool 	MX::isJacobian () const { return !isNull() ? (*this)->isJacobian() : false; }
+bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->isOperation(op) : false; }
+bool 	MX::isMultiplication () const { return !isNull() ? (*this)->isMultiplication() : false; }
+
+FX MX::getFunction () {  return (*this)->getFunction(); }
+ 	
+const Matrix<double> & MX::getConstant() const {
+  if (!isConstant()) casadi_error("MX::getConstant: must be constant");
+  return dynamic_cast<const MXConstant*>(get())->x_;
+}
+ 	  
+bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get()) != 0 : false;  }
+
+bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryOp*>(get()) != 0 : false;  }
+ 	
+Operation MX::getOp() const {
+  if (!isBinary() && !isUnary()) throw CasadiException("MX::getOp: must be binary or unary operation");
+  if (isBinary()) {
+    return dynamic_cast<const BinaryOp*>(get())->op_;
+  } else {
+    return dynamic_cast<const UnaryOp*>(get())->op_;
+  }
+}
+ 	
+bool MX::isCommutative() const {
+  if (isUnary()) return true;
+  if (!isBinary() && !isUnary()) throw CasadiException("MX::isCommutative: must be binary or unary");
+  return casadi_math<double>::isCommutative(getOp());
+}
+
+long MX::__hash__() const {
+   if (isNull()) return 0;
+   return (long) get();
+}
+ 	
 } // namespace CasADi
 
 // GLobal namespace

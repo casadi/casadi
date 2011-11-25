@@ -149,6 +149,9 @@ class MXNode : public SharedObjectNode{
     /** \brief  Check if jacobian reference */
     virtual bool isJacobian() const{return false;}
 
+    /** \brief  Check if matrix multiplication */
+    virtual bool isMultiplication() const {return false;}
+
     /** \brief  Get function reference */
     virtual FX& getFunction();
 

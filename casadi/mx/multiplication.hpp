@@ -56,6 +56,9 @@ class Multiplication : public MXNode{
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+    
+    /** \brief  Check if matrix multiplication */
+    virtual bool isMultiplication() const {return true;}
 };
 
 } // namespace CasADi

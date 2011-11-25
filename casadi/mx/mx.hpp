@@ -31,6 +31,7 @@ namespace CasADi{
   
 /** \brief  Forward declaration */
 class MXNode;
+class FX;
 
 
 /** \brief MX - Matrix expression
@@ -231,7 +232,65 @@ class MX : public SharedObject{
   /** \brief  Const access a member of the node */
   const MXNode* operator->() const;
   //@}
+  
+  /** \brief Get the nth dependency as MX */
+  MX getDep(int ch=0) const;
+  
+  /** \brief Get the number of dependencies of a binary SX */
+  int getNdeps() const;
+    
+  /// Get the name.
+  std::string getName() const;
+  
+  /// Get the constant - only valid when isConstant() is true
+  const Matrix<double> & getConstant() const; 
+ 	
+ 	/// Check if symbolic.
+  bool 	isSymbolic () const;
+ 	
+ 	/// Check if constant.
+  bool 	isConstant () const;
+ 	
+ 	/// Check if mapping.
+ 	bool 	isMapping () const;
 
+ 	/// Check if evaluation.
+ 	bool 	isEvaluation () const;
+
+ 	/// Check if evaluation output.
+ 	bool 	isMultipleOutput () const;
+
+ 	/// Check if jacobian reference.
+ 	bool 	isJacobian () const;
+ 	
+ 	/// Is it a certain operation.
+ 	bool 	isOperation (int op) const;
+
+ 	/// Check if multiplication.
+ 	bool 	isMultiplication () const;
+ 	
+ 	/// Check if commutative operation
+ 	bool isCommutative() const;
+
+  ///	Get function
+ 	FX getFunction();
+
+  /// Is binary operation
+  bool isBinary() const ;
+  
+  /// Is unary operation
+  bool isUnary() const;
+ 	
+ 	#ifndef SWIG
+ 	/// Get operation type
+  Operation getOp() const;
+ 	#endif // SWIG
+
+  /** \brief Returns a number that is unique for a given MXNode. 
+  * If the MX does not point to any node, 0 is returned.
+  */
+  long __hash__() const;
+    
   //@{
     /** \brief  Create nodes by their ID */
     static MX binary(int op, const MX &x, const MX &y);
