@@ -256,12 +256,18 @@ class MX : public SharedObject{
  	
  	/// Check if mapping.
  	bool 	isMapping () const;
+ 	
+ 	/// Check if densification
+ 	bool 	isDensification () const;
 
  	/// Check if evaluation.
  	bool 	isEvaluation () const;
 
  	/// Check if evaluation output.
- 	bool 	isMultipleOutput () const;
+ 	bool 	isEvaluationOutput () const;
+ 	
+ 	/// Get the index of evaluation output - only valid when isEvaluationoutput() is true
+ 	int getEvaluationOutput() const;
 
  	/// Check if jacobian reference.
  	bool 	isJacobian () const;
@@ -274,9 +280,21 @@ class MX : public SharedObject{
  	
  	/// Check if commutative operation
  	bool isCommutative() const;
+ 	
+ 	/// Check if if-test
+ 	bool isIfTest() const;
 
+ 	/// Check if norm
+ 	bool isNorm () const;
+ 	
   ///	Get function
  	FX getFunction();
+ 	    
+ 	/// When MX is a mapping, get the output non-zero to the dependency nonzero index
+ 	const Matrix<int>  & getNZMap() const;
+
+  /// When MX is a mapping, get the mapping from the output non-zero index of the dependency index
+ 	const std::vector<int>  & getDepInd() const;
 
   /// Is binary operation
   bool isBinary() const ;

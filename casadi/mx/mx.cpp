@@ -34,6 +34,9 @@
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "multiplication.hpp"
+#include "if_else_node.hpp"
+#include "densification.hpp"
+#include "norm.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -723,16 +726,37 @@ bool 	MX::isSymbolic () const { return !isNull() ? (*this)->isSymbolic() : false
 bool 	MX::isConstant () const { return !isNull() ? (*this)->isConstant() : false; }
 bool 	MX::isMapping () const { return !isNull() ? (*this)->isMapping() : false; }
 bool 	MX::isEvaluation () const { return !isNull() ? (*this)->isEvaluation() : false; }
-bool 	MX::isMultipleOutput () const { return !isNull() ? (*this)->isMultipleOutput() : false; }
+bool 	MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode() : false; }
+
+int 	MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionOutput() : -1; }
+
+    
 bool 	MX::isJacobian () const { return !isNull() ? (*this)->isJacobian() : false; }
 bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->isOperation(op) : false; }
 bool 	MX::isMultiplication () const { return !isNull() ? (*this)->isMultiplication() : false; }
 
+bool 	MX::isIfTest () const { return !isNull() ? dynamic_cast<const IfNode*>(get())!=0 : false; }
+
+bool 	MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
+
+bool 	MX::isDensification () const { return !isNull() ? dynamic_cast<const Densification*>(get())!=0 : false; }
+
+
 FX MX::getFunction () {  return (*this)->getFunction(); }
  	
 const Matrix<double> & MX::getConstant() const {
-  if (!isConstant()) casadi_error("MX::getConstant: must be constant");
+  casadi_assert_message(isConstant(),"MX::getConstant: must be constant");
   return dynamic_cast<const MXConstant*>(get())->x_;
+}
+
+const Matrix<int> & MX::getNZMap() const {
+  casadi_assert_message(isMapping(),"MX::getNZMap: must be mapping");
+  return dynamic_cast<const Mapping*>(get())->nzmap_;
+}
+
+const std::vector<int> & MX::getDepInd() const {
+  casadi_assert_message(isMapping(),"MX::getDepInd: must be mapping");
+  return dynamic_cast<const Mapping*>(get())->depind_;
 }
  	  
 bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get()) != 0 : false;  }
@@ -740,7 +764,7 @@ bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get
 bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryOp*>(get()) != 0 : false;  }
  	
 Operation MX::getOp() const {
-  if (!isBinary() && !isUnary()) throw CasadiException("MX::getOp: must be binary or unary operation");
+  casadi_assert_message(isBinary() || isUnary(),"MX::getOp: must be binary or unary operation");
   if (isBinary()) {
     return dynamic_cast<const BinaryOp*>(get())->op_;
   } else {
@@ -750,7 +774,7 @@ Operation MX::getOp() const {
  	
 bool MX::isCommutative() const {
   if (isUnary()) return true;
-  if (!isBinary() && !isUnary()) throw CasadiException("MX::isCommutative: must be binary or unary");
+  casadi_assert_message(isBinary() || isUnary(),"MX::isCommutative: must be binary or unary operation");
   return casadi_math<double>::isCommutative(getOp());
 }
 
