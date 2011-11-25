@@ -416,6 +416,10 @@ bool MX::scalar() const{
   return numel()==1;
 }
 
+MX MX::repmat(const MX& x, const std::pair<int, int> &nm){
+  return repmat(x,nm.first,nm.second);
+}
+
 MX MX::repmat(const MX& x, int nrow, int ncol){
   if(x.scalar()){
     return MX(nrow,ncol,x);
@@ -428,20 +432,42 @@ MX MX::sparse(int nrow, int ncol){
   return MX(nrow,ncol);
 }
 
-MX MX::sparse(const CRSSparsity& sparsity){
-  return DMatrix(sparsity,0);
+MX MX::sparse(const std::pair<int, int> &nm){
+  return sparse(nm.first,nm.second);
 }
 
-MX MX::sparse(const std::pair<int, int> &nm){
-  return MX(nm.first,nm.second);
+#ifdef WITH_ZEROS
+MX MX::zeros(int nrow, int ncol){
+  return MX(Matrix<double>::zeros(nrow,ncol));
 }
+
+MX MX::zeros(const std::pair<int, int> &nm){
+  return zeros(nm.first,nm.second);
+}
+#endif
 
 MX MX::ones(int nrow, int ncol){
-  return MX(Matrix<double>(nrow,ncol,1));
+  return MX(Matrix<double>::ones(nrow,ncol));
 }
 
 MX MX::ones(const std::pair<int, int> &nm){
-  return MX(Matrix<double>(nm.first,nm.second,1));
+  return ones(nm.first,nm.second);
+}
+
+MX MX::inf(int nrow, int ncol){
+  return MX(Matrix<double>::inf(nrow,ncol));
+}
+
+MX MX::inf(const std::pair<int, int> &nm){
+  return inf(nm.first,nm.second);
+}
+
+MX MX::nan(int nrow, int ncol){
+  return MX(Matrix<double>::nan(nrow,ncol));
+}
+
+MX MX::nan(const std::pair<int, int> &nm){
+  return nan(nm.first,nm.second);
 }
 
 MX MX::eye(int n){

@@ -585,29 +585,46 @@ class Matrix : public PrintableObject{
     // get the number if non-zeros for a given sparsity pattern
     int size(Sparsity sp) const;
     
-    /** \brief  create an n-by-n identity matrix */
-    static Matrix<T> eye(int nrow);
-
-    /** \brief  create a matrix with all ones */
-    static Matrix<T> ones(int nrow, int ncol=1);
-
+    //@{
     /** \brief  create a sparse matrix with all zeros */
     static Matrix<T> sparse(int nrow, int ncol=1);
-    
-    /** \brief  create a matrix with all ones */
-    static Matrix<T> ones(const std::pair<int,int>& nm);
-
-    /** \brief  create a matrix with all zeros */
     static Matrix<T> sparse(const std::pair<int,int>& nm);
+    //@}
 
+#ifdef WITH_ZEROS
+    //@{
+    /** \brief  create a dense matrix with all zeros */
+    static Matrix<T> zeros(int nrow, int ncol=1);
+    static Matrix<T> zeros(const std::pair<int,int>& nm);
+    //@}
+#endif
+
+    //@{
+    /** \brief  create a matrix with all ones */
+    static Matrix<T> ones(int nrow, int ncol=1);
+    static Matrix<T> ones(const std::pair<int,int>& nm);
+    //@}
+
+    //@{
     /** \brief  create a matrix with all inf */
     static Matrix<T> inf(int nrow=1, int ncol=1);
+    static Matrix<T> inf(const std::pair<int,int>& nm);
+    //@}
     
+    //@{
     /** \brief  create a matrix with all nan */
     static Matrix<T> nan(int nrow=1, int ncol=1);
+    static Matrix<T> nan(const std::pair<int,int>& nm);
+    //@}
 
+    //@{
     /** \brief  create a matrix by repeating an existing matrix */
     static Matrix<T> repmat(const Matrix<T>& x, int nrow, int ncol=1);
+    static Matrix<T> repmat(const Matrix<T>& x, const std::pair<int,int>& nm);
+    //@}
+
+    /** \brief  create an n-by-n identity matrix */
+    static Matrix<T> eye(int nrow);
 
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
@@ -2032,13 +2049,40 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
 }
 
 template<class T>
-Matrix<T> Matrix<T>::ones(int n, int m){
-  return Matrix<T>(n,m,1);
+Matrix<T> Matrix<T>::sparse(const std::pair<int,int> &nm){
+  return sparse(nm.first,nm.second);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sparse(int n, int m){
   return Matrix<T>(n,m);
+}
+
+#ifdef WITH_ZEROS
+template<class T>
+Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &nm){
+  return zeros(nm.first,nm.second);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::zeros(int n, int m){
+  return Matrix<T>(n,m,0);
+}
+#endif
+
+template<class T>
+Matrix<T> Matrix<T>::ones(const std::pair<int,int> &nm){
+  return ones(nm.first,nm.second);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::ones(int n, int m){
+  return Matrix<T>(n,m,1);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::repmat(const Matrix<T>& x, const std::pair<int,int>& nm){
+  return repmat(x,nm.first,nm.second);
 }
 
 template<class T>
@@ -2055,24 +2099,24 @@ Matrix<T> Matrix<T>::repmat(const Matrix<T>& x, int nrow, int ncol){
 }
 
 template<class T>
-Matrix<T> Matrix<T>::ones(const std::pair<int,int> &nm){
-  return Matrix<T>(nm.first,nm.second,1);
-}
-
-template<class T>
-Matrix<T> Matrix<T>::sparse(const std::pair<int,int> &nm){
-  return Matrix<T>(nm.first,nm.second);
-}
-
-template<class T>
 Matrix<T> Matrix<T>::eye(int n){
   return Matrix<T>(CRSSparsity::createDiagonal(n),1);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::inf(const std::pair<int,int>& nm){
+  return inf(nm.first, nm.second);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::inf(int n, int m){
   casadi_assert_message(std::numeric_limits<T>::has_infinity,"Datatype cannot represent infinity");
   return Matrix<T>(n,m,std::numeric_limits<T>::infinity());
+}
+
+template<class T>
+Matrix<T> Matrix<T>::nan(const std::pair<int,int>& nm){
+  return nan(nm.first, nm.second);
 }
 
 template<class T>

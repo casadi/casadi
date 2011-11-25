@@ -306,21 +306,44 @@ class MX : public SharedObject{
   //@{
   /** \brief  Sparse matrix of all zeros */  
   static MX sparse(int nrow, int ncol=1);
-  static MX sparse(const CRSSparsity& sparsity);
   static MX sparse(const std::pair<int, int> &nm);
   //@}
   
+#ifdef WITH_ZEROS
+  //@{
+  /** \brief  Dense matrix of all zeros */
+  static MX zeros(int nrow, int ncol=1); 
+  static MX zeros(const std::pair<int, int> &nm);
+  //@}
+#endif
+
   //@{
   /** \brief  Matrix of all ones */  
   static MX ones(int nrow, int ncol=1); 
   static MX ones(const std::pair<int, int> &nm);
   //@}
+
+  //@{
+  /** \brief  create a matrix with all inf */
+  static MX inf(int nrow=1, int ncol=1);
+  static MX inf(const std::pair<int,int>& nm);
+  //@}
   
+  //@{
+  /** \brief  create a matrix with all nan */
+  static MX nan(int nrow=1, int ncol=1);
+  static MX nan(const std::pair<int,int>& nm);
+  //@}
+  
+  //@{
+  /** \brief  create a matrix by repeating an existing matrix */
+  static MX repmat(const MX& x, int nrow, int ncol=1);
+  static MX repmat(const MX& x, const std::pair<int, int> &nm);
+  //@}
+
   /** \brief  Identity matrix */  
   static MX eye(int nrow);
 
-  /** \brief  create a matrix by repeating an existing matrix */
-  static MX repmat(const MX& x, int nrow, int ncol=1);
   
   const MX getSub(int i, int j) const;
   const MX getSub(int i, const std::vector<int>& j) const;

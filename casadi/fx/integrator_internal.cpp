@@ -245,8 +245,8 @@ FX IntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
     // Augmented initial condition
     MX y0_aug = vertcat(y0,MX(y0_sens));
     MX q0_aug = vertcat(q0,MX(q0_sens));
-    MX yp0_aug = vertcat(yp0,MX::sparse(y0_sens.sparsity()));
-    MX qp0_aug = vertcat(qp0,MX::sparse(q0_sens.sparsity()));
+    MX yp0_aug = vertcat(yp0,MX(y0_sens.sparsity(),0));
+    MX qp0_aug = vertcat(qp0,MX(q0_sens.sparsity(),0));
 
     // Finally, we are ready to pass the initial condition for the state and state derivative
     fwdint_in[INTEGRATOR_X0] = vertcat(y0_aug,q0_aug);
