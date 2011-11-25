@@ -118,12 +118,11 @@ void CVodesInternal::init(){
   IntegratorInternal::init();
   
   // Read options
-  monitor_rhsB_ = monitored("CVodesInternal::rhsB");
-  monitor_rhs_ = monitored("rhs");
-
-
+  monitor_rhsB_  = monitored("resB");
+  monitor_rhs_   = monitored("res");
+  monitor_rhsQB_ = monitored("resQB");
   
-  // Try to generate a jacobian of none provided
+  // Try to generate a jacobian if none provided
   if(!linsol_.isNull() && jac_.isNull()){
     SXFunction f = shared_cast<SXFunction>(f_);
     if(!f.isNull()){
@@ -546,7 +545,7 @@ try{
 }
   
 void CVodesInternal::reset(int fsens_order, int asens_order){
-  if(monitored("CVodesInternal::reset")){
+  if(monitored("reset")){
     cout << "initial state: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
@@ -1023,14 +1022,33 @@ int CVodesInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector qB
 }
 
 void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* qBdot){
+ if(monitor_rhsQB_){
+      cout << "CVodesInternal::rhsQB: begin" << endl;
+  }
 
+
+
+  
   // Pass input
   f_.setInput(t,DAE_T);
   f_.setInput(y,DAE_Y);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
+  
+  if(monitor_rhs_) {
+    cout << "t       = " << f_.input(DAE_T) << endl;
+    cout << "y       = " << f_.input(DAE_Y) << endl;
+    cout << "p       = " << f_.input(DAE_P) << endl;
+  }
+  
 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_RES);
+  
+
+  if(monitor_rhsQB_) {
+    cout << "adjSeed       = " << f_.adjSeed(DAE_RES) << endl;
+  }
+    
 
   // Evaluate
   f_.evaluate(0,1);
@@ -1038,6 +1056,11 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   // Save to output
   f_.getAdjSens(qBdot,DAE_P);
   
+  if(monitor_rhsQB_) {
+    cout << "adjSens       = " << f_.adjSens(DAE_P) << endl;
+  }
+    
+    
   // If quadratures are included
   if(nq_>0){
     // Pass input to quadratures
@@ -1048,12 +1071,21 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     // Pass adjoint seeds
     q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
 
+    if(monitor_rhsQB_) {
+      cout << "adjSeed  (quadrature) = " << q_.adjSeed(DAE_RES) << endl;
+    }
+    
     // Evaluate
     q_.evaluate(0,1);
     
     // Get the input seeds
     const vector<double>& qres = q_.adjSens(DAE_P).data();
     
+  
+    if(monitor_rhsQB_) {
+      cout << "adjSens   (quadrature)  = " << q_.adjSens(DAE_P) << endl;
+    }
+  
     // Copy to result
     for(int i=0; i<np_; ++i){
       qBdot[i] += qres[i];
@@ -1063,6 +1095,10 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   // Negate as we are integrating backwards
   for(int i=0; i<np_; ++i)
     qBdot[i] *= -1;
+    
+  if(monitor_rhsQB_){
+   cout << "CVodesInternal::rhsQB: end" << endl;
+  }
 }
 
 int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y, N_Vector fy, void *user_data, N_Vector tmp){

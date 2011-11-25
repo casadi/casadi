@@ -571,7 +571,7 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
         stringstream ss;
         ss << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << ".";
         log("IdasInternal::res",ss.str());
-        if(monitored("IdasInternal::res")){
+        if(monitored("res")){
           cout << "DAE_T    = " << t << endl;
           cout << "DAE_Y    = " << f_.input(DAE_Y) << endl;
           cout << "DAE_YDOT = " << f_.input(DAE_YDOT) << endl;
@@ -774,7 +774,7 @@ void IdasInternal::reset(int fsens_order, int asens_order){
   
 void IdasInternal::correctInitialConditions(){
   log("IdasInternal::correctInitialConditions","begin");
-  if(monitored("IdasInternal::correctInitialConditions")){
+  if(monitored("correctInitialConditions")){
     cout << "initial guess: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
@@ -810,7 +810,7 @@ void IdasInternal::correctInitialConditions(){
   
   // Print progress
   log("IdasInternal::correctInitialConditions","found consistent initial values");
-  if(monitored("IdasInternal::correctInitialConditions")){
+  if(monitored("correctInitialConditions")){
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
     cout << "xp0 = " << input(INTEGRATOR_XP0) << endl;

@@ -270,6 +270,9 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -1115,6 +1118,9 @@ thus x := [xd,xa]
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -1667,6 +1673,9 @@ Get the reference count. ";
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -2200,6 +2209,9 @@ Return a string with a destription (for SWIG) ";
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -2586,9 +2598,13 @@ Clone function. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::BinaryOp::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::BinaryOp::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::BinaryOp::print "
 
@@ -2649,6 +2665,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::BinaryOp::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::BinaryOp::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::BinaryOp::getFunction "
 
@@ -2751,10 +2771,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::BinaryOp::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::BinaryOp::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1BinaryOperation.xml
@@ -3051,6 +3067,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -3529,6 +3548,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -4129,6 +4151,9 @@ Joel Andersson
 | max_num_step | OT_INTEGER   | 10000        | maximum      | CasADi::Inte |
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -4985,6 +5010,9 @@ Return a string with a destription (for SWIG) ";
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -5658,6 +5686,9 @@ print ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_cpl |              | CasADi::Cple |
 |              |              | ex_problem\"  |              | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -6147,6 +6178,9 @@ Carlo Savorgnan
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_cpl |              | CasADi::Cple |
 |              |              | ex_problem\"  |              | xInternal    |
@@ -7241,6 +7275,9 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -7732,6 +7769,9 @@ Solves the linear system A.x = b for x
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -8351,6 +8391,9 @@ times t_i.
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -8495,9 +8538,13 @@ times t_i.
 +=======================+==================================+
 | CVodesInternal::reset | CasADi::Sundials::CVodesInternal |
 +-----------------------+----------------------------------+
-| CVodesInternal::rhsB  | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
 | integrate             | CasADi::Sundials::CVodesInternal |
++-----------------------+----------------------------------+
+| res                   | CasADi::Sundials::CVodesInternal |
++-----------------------+----------------------------------+
+| resB                  | CasADi::Sundials::CVodesInternal |
++-----------------------+----------------------------------+
+| resQB                 | CasADi::Sundials::CVodesInternal |
 +-----------------------+----------------------------------+
 
 C++ includes: cvodes_integrator.hpp ";
@@ -9178,6 +9225,9 @@ x0;
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -9322,9 +9372,13 @@ x0;
 +=======================+==================================+
 | CVodesInternal::reset | CasADi::Sundials::CVodesInternal |
 +-----------------------+----------------------------------+
-| CVodesInternal::rhsB  | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
 | integrate             | CasADi::Sundials::CVodesInternal |
++-----------------------+----------------------------------+
+| res                   | CasADi::Sundials::CVodesInternal |
++-----------------------+----------------------------------+
+| resB                  | CasADi::Sundials::CVodesInternal |
++-----------------------+----------------------------------+
+| resQB                 | CasADi::Sundials::CVodesInternal |
 +-----------------------+----------------------------------+
 
 C++ includes: cvodes_internal.hpp ";
@@ -9665,9 +9719,13 @@ Propagate sparsity. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::Densification::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Densification::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Densification::print "
 
@@ -9716,6 +9774,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::Densification::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Densification::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Densification::getFunction "
 
@@ -9823,10 +9885,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::Densification::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1DivBinaryOperation.xml
 %feature("docstring") CasADi::DivBinaryOperation "C++ includes:
@@ -9932,9 +9990,13 @@ Get the sparsity. ";
 
 Check if a multiple output node. ";
 
+%feature("docstring")  CasADi::Evaluation::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Evaluation::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Evaluation::print "
 
@@ -9975,6 +10037,10 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::Evaluation::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Evaluation::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Evaluation::dep "
 
@@ -10058,10 +10124,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::Evaluation::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1ExternalFunction.xml
 %feature("docstring") CasADi::ExternalFunction "
@@ -10116,6 +10178,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -10588,6 +10653,9 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -11897,6 +11965,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -12371,6 +12442,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -12775,6 +12849,10 @@ Is a double? ";
 
 Is a string? ";
 
+%feature("docstring")  CasADi::GenericType::isEmptyVector "
+
+Is an empty vector? ";
+
 %feature("docstring")  CasADi::GenericType::isIntVector "
 
 Is a vector of ints? ";
@@ -13173,6 +13251,9 @@ times t_i.
 | max_num_step | OT_INTEGER   | 10000        | maximum      | CasADi::Inte |
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -13947,6 +14028,9 @@ x0;
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -14680,6 +14764,9 @@ Joel Andersson
 | e            |              |              | size         | ials::IdasIn |
 |              |              |              |              | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -14821,13 +14908,13 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+----------------------------------------+--------------------------------+
-|                   Id                   |            Used in             |
-+========================================+================================+
-| IdasInternal::correctInitialConditions | CasADi::Sundials::IdasInternal |
-+----------------------------------------+--------------------------------+
-| IdasInternal::res                      | CasADi::Sundials::IdasInternal |
-+----------------------------------------+--------------------------------+
++--------------------------+--------------------------------+
+|            Id            |            Used in             |
++==========================+================================+
+| correctInitialConditions | CasADi::Sundials::IdasInternal |
++--------------------------+--------------------------------+
+| res                      | CasADi::Sundials::IdasInternal |
++--------------------------+--------------------------------+
 
 C++ includes: idas_integrator.hpp ";
 
@@ -15519,6 +15606,9 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | e            |              |              | size         | ials::IdasIn |
 |              |              |              |              | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -15660,13 +15750,13 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+----------------------------------------+--------------------------------+
-|                   Id                   |            Used in             |
-+========================================+================================+
-| IdasInternal::correctInitialConditions | CasADi::Sundials::IdasInternal |
-+----------------------------------------+--------------------------------+
-| IdasInternal::res                      | CasADi::Sundials::IdasInternal |
-+----------------------------------------+--------------------------------+
++--------------------------+--------------------------------+
+|            Id            |            Used in             |
++==========================+================================+
+| correctInitialConditions | CasADi::Sundials::IdasInternal |
++--------------------------+--------------------------------+
+| res                      | CasADi::Sundials::IdasInternal |
++--------------------------+--------------------------------+
 
 C++ includes: idas_internal.hpp ";
 
@@ -16045,9 +16135,13 @@ Propagate sparsity. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::IfNode::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::IfNode::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::IfNode::print "
 
@@ -16096,6 +16190,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::IfNode::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::IfNode::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::IfNode::getFunction "
 
@@ -16203,10 +16301,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::IfNode::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1ImplicitFunction.xml
 %feature("docstring") CasADi::ImplicitFunction "
@@ -16279,6 +16373,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -16747,6 +16844,9 @@ Internal class.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -17526,6 +17626,9 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -18285,6 +18388,9 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -18774,9 +18880,13 @@ Check if a multiple output node. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::InverseMapping::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::InverseMapping::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::InverseMapping::print "
 
@@ -18821,6 +18931,10 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::InverseMapping::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::InverseMapping::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::InverseMapping::getFunction "
 
@@ -18915,10 +19029,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::InverseMapping::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::InverseMapping::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1IpoptInternal.xml
@@ -19281,6 +19391,9 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | min_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
 | nt_steps     |              |              |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Ipop |
 |              |              |              |              | tInternal    |
@@ -20166,6 +20279,9 @@ decision variables (x)       nc: number of constraints (A)
 | min_refineme | OT_INTEGER   |              |              | CasADi::Inte |
 | nt_steps     |              |              |              | rfaces::Ipop |
 |              |              |              |              | tQPInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Inte |
 |              |              |              |              | rfaces::Ipop |
@@ -21080,6 +21196,9 @@ Joris Gillis
 | min_refineme | OT_INTEGER   |              |              | CasADi::Inte |
 | nt_steps     |              |              |              | rfaces::Ipop |
 |              |              |              |              | tQPInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Inte |
 |              |              |              |              | rfaces::Ipop |
@@ -22076,6 +22195,9 @@ number of constraints (A)
 | min_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
 | nt_steps     |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Ipop |
 |              |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -22807,6 +22929,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -23268,6 +23393,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -23650,9 +23778,13 @@ Get function reference. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::JacobianReference::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::JacobianReference::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::JacobianReference::print "
 
@@ -23697,6 +23829,10 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::JacobianReference::isMultipleOutput "
 
 Check if a multiple output node. ";
+
+%feature("docstring")  CasADi::JacobianReference::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::JacobianReference::dep "
 
@@ -23792,10 +23928,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::JacobianReference::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1Sundials_1_1KinsolInternal.xml
 %feature("docstring") CasADi::Sundials::KinsolInternal "
@@ -23833,6 +23965,12 @@ Print a representation of the object. ";
 | constraints  | OT_INTEGERVE |              |              | CasADi::Sund |
 |              | CTOR         |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
++--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable      | CasADi::Sund |
+| rnal_warning |              |              | KINSOL       | ials::Kinsol |
+| s            |              |              | internal     | Internal     |
+|              |              |              | warning      |              |
+|              |              |              | messages     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | true         |              | CasADi::Sund |
 | an           |              |              |              | ials::Kinsol |
@@ -23887,6 +24025,9 @@ Print a representation of the object. ";
 | max_krylov   | OT_INTEGER   | 0            |              | CasADi::Sund |
 |              |              |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -24063,6 +24204,8 @@ Residual. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::lsetup "";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::lsolve "";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::ehfun "";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::evaluate_switch "
 
@@ -24333,6 +24476,12 @@ See:   ImplicitFunction for more information
 |              | CTOR         |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable      | CasADi::Sund |
+| rnal_warning |              |              | KINSOL       | ials::Kinsol |
+| s            |              |              | internal     | Internal     |
+|              |              |              | warning      |              |
+|              |              |              | messages     |              |
++--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | true         |              | CasADi::Sund |
 | an           |              |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
@@ -24386,6 +24535,9 @@ See:   ImplicitFunction for more information
 | max_krylov   | OT_INTEGER   | 0            |              | CasADi::Sund |
 |              |              |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -25110,6 +25262,9 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -25560,6 +25715,9 @@ number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -26075,6 +26233,9 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -26579,6 +26740,9 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -27024,6 +27188,9 @@ therefore more expensive if A is invariant.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -27518,6 +27685,9 @@ Internal class.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -28016,6 +28186,9 @@ number of constraints (A)
 |              |              |              |              | rfaces::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -28474,6 +28647,9 @@ number of constraints (A)
 | lifted       | OT_BOOLEAN   | true         |              | CasADi::Inte |
 |              |              |              |              | rfaces::Lift |
 |              |              |              |              | optInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -28966,6 +29142,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -29450,6 +29629,9 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -29856,9 +30038,13 @@ Check if the mapping is ready. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::Mapping::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Mapping::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Mapping::print "
 
@@ -29903,6 +30089,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::Mapping::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Mapping::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Mapping::getFunction "
 
@@ -29997,10 +30187,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Mapping::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::Mapping::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1Matrix.xml
@@ -30222,6 +30408,8 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::Matrix::printSparse "";
 
 %feature("docstring")  CasADi::Matrix::printDense "";
+
+%feature("docstring")  CasADi::Matrix::className "";
 
 %feature("docstring")  CasADi::Matrix::Matrix "
 
@@ -30771,9 +30959,13 @@ Clone function. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::MultipleOutput::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::MultipleOutput::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::MultipleOutput::print "
 
@@ -30838,6 +31030,10 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::MultipleOutput::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::MultipleOutput::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::MultipleOutput::getFunction "
 
@@ -30937,10 +31133,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::MultipleOutput::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1OptimalControl_1_1MultipleShooting.xml
 %feature("docstring") CasADi::OptimalControl::MultipleShooting "
@@ -30954,6 +31146,53 @@ parameters: from option number_of_parameters  nh: Number of point
 constraints: from cfcn.input(0).size()
 
 Joel Andersson
+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
+|                                    | linspace(0,t_final,ns+1)           |
++------------------------------------+------------------------------------+
+| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
++------------------------------------+------------------------------------+
+| OCP_LBXP                           | States deriatives lower bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_UBXP                           | States deriatives upper bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_XP_INIT                        | States deriatives initial guess    |
+|                                    | (nx x (ns+1))                      |
++------------------------------------+------------------------------------+
+| OCP_LBU                            | Controls lower bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_UBU                            | Controls upper bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
++------------------------------------+------------------------------------+
+| OCP_LBP                            | Parameters lower bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_UBP                            | Parameters upper bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
++------------------------------------+------------------------------------+
+| OCP_LBH                            | Point constraint lower bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_UBH                            | Point constraint upper bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_LBG                            | Lower bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+| OCP_UBG                            | Upper bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
@@ -31018,6 +31257,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -31267,13 +31509,55 @@ Create a multiple shooting OCP solver.
 Parameters:
 -----------
 
-ffcn:  Discrete time dynamics, CasADi::FX mapping from
-CasADi::IntegratorInput to CasADi::IntegratorOutput
+ffcn:  Discrete time dynamics, an CasADi::FX with the folowing mapping:
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| INTEGRATOR_X0                      | Differential or algebraic state at |
+|                                    | t0 (dimension nx-by-1)             |
++------------------------------------+------------------------------------+
+| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
++------------------------------------+------------------------------------+
+| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit intergators. This input   |
+|                                    | may be changed during an           |
+|                                    | IDASIntegrator::evaluate()         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
++----------------+------------------------+
+|      Name      |      Description       |
++================+========================+
+| INTEGRATOR_XF  | State at tf            |
++----------------+------------------------+
+| INTEGRATOR_XPF | State derivative at tf |
++----------------+------------------------+
+
+The first nu entries of the INTEGRATOR_P input are interpreted as controls
+to be optimized for each time interval, the remainder are interpreted as
+parameters to be optimized but constant over the whole domain.
 
 mfcn:  Mayer term, mapping endstate (nx x 1) to cost (1 x 1)
 
-cfcn:  Path constraints, CasADi::FX mapping from CasADi::DAEInput to (nh x
-1)
+cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
+CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
 
 rfcn:  Initial value constraints ";
 
@@ -31528,6 +31812,53 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1OptimalControl_1_1MultipleShootingInternal.xml
 %feature("docstring") CasADi::OptimalControl::MultipleShootingInternal "
 
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
+|                                    | linspace(0,t_final,ns+1)           |
++------------------------------------+------------------------------------+
+| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
++------------------------------------+------------------------------------+
+| OCP_LBXP                           | States deriatives lower bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_UBXP                           | States deriatives upper bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_XP_INIT                        | States deriatives initial guess    |
+|                                    | (nx x (ns+1))                      |
++------------------------------------+------------------------------------+
+| OCP_LBU                            | Controls lower bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_UBU                            | Controls upper bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
++------------------------------------+------------------------------------+
+| OCP_LBP                            | Parameters lower bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_UBP                            | Parameters upper bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
++------------------------------------+------------------------------------+
+| OCP_LBH                            | Point constraint lower bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_UBH                            | Point constraint upper bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_LBG                            | Lower bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+| OCP_UBG                            | Upper bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
 |    Name    |             Description              |
@@ -31591,6 +31922,9 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -32044,13 +32378,21 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
+%feature("docstring")  CasADi::Multiplication::isMultiplication "
+
+Check if matrix multiplication. ";
+
 %feature("docstring")  CasADi::Multiplication::deepCopyMembers "
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::Multiplication::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Multiplication::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Multiplication::print "
 
@@ -32205,10 +32547,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Multiplication::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::Multiplication::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1MuscodFunction.xml
@@ -32816,6 +33154,79 @@ Check if the matrix expression is empty. ";
 
 Check if the matrix expression is dense. ";
 
+%feature("docstring")  CasADi::MX::getDep "
+
+Get the nth dependency as MX. ";
+
+%feature("docstring")  CasADi::MX::getNdeps "
+
+Get the number of dependencies of a binary SX. ";
+
+%feature("docstring")  CasADi::MX::getName "
+
+Get the name. ";
+
+%feature("docstring")  CasADi::MX::getConstant "
+
+Get the constant - only valid when isConstant() is true. ";
+
+%feature("docstring")  CasADi::MX::isSymbolic "
+
+Check if symbolic. ";
+
+%feature("docstring")  CasADi::MX::isConstant "
+
+Check if constant. ";
+
+%feature("docstring")  CasADi::MX::isMapping "
+
+Check if mapping. ";
+
+%feature("docstring")  CasADi::MX::isEvaluation "
+
+Check if evaluation. ";
+
+%feature("docstring")  CasADi::MX::isMultipleOutput "
+
+Check if evaluation output. ";
+
+%feature("docstring")  CasADi::MX::isJacobian "
+
+Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::MX::isOperation "
+
+Is it a certain operation. ";
+
+%feature("docstring")  CasADi::MX::isMultiplication "
+
+Check if multiplication. ";
+
+%feature("docstring")  CasADi::MX::isCommutative "
+
+Check if commutative operation. ";
+
+%feature("docstring")  CasADi::MX::getFunction "
+
+Get function. ";
+
+%feature("docstring")  CasADi::MX::isBinary "
+
+Is binary operation. ";
+
+%feature("docstring")  CasADi::MX::isUnary "
+
+Is unary operation. ";
+
+%feature("docstring")  CasADi::MX::getOp "
+
+Get operation type. ";
+
+%feature("docstring")  CasADi::MX::__hash__ "
+
+Returns a number that is unique for a given MXNode. If the MX does not point
+to any node, 0 is returned. ";
+
 %feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
@@ -33039,9 +33450,13 @@ Symbolic evaluation (matrix graph) ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::MXConstant::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::MXConstant::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::MXConstant::print "
 
@@ -33086,6 +33501,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::MXConstant::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::MXConstant::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::MXConstant::getFunction "
 
@@ -33193,10 +33612,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::MXConstant::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1MXFunction.xml
 %feature("docstring") CasADi::MXFunction "
@@ -33251,6 +33666,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -33794,6 +34212,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -34179,9 +34600,13 @@ Clone function. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::MXNode::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::MXNode::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::MXNode::print "
 
@@ -34250,6 +34675,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::MXNode::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::MXNode::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::MXNode::getFunction "
 
@@ -34356,10 +34785,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::MXNode::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::MXNode::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1NanSXNode.xml
@@ -34565,6 +34990,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -35108,6 +35536,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -35499,9 +35930,13 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::NonzerosNonzerosOp::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::NonzerosNonzerosOp::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::print "
 
@@ -35546,6 +35981,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::NonzerosNonzerosOp::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::getFunction "
 
@@ -35649,10 +36088,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1NonzerosScalarOp.xml
 %feature("docstring") CasADi::NonzerosScalarOp "
@@ -35710,9 +36145,13 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::NonzerosScalarOp::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::NonzerosScalarOp::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::print "
 
@@ -35757,6 +36196,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::NonzerosScalarOp::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::getFunction "
 
@@ -35860,10 +36303,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1Norm.xml
 %feature("docstring") CasADi::Norm "
@@ -35907,9 +36346,13 @@ Clone function. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::Norm::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Norm::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Norm::print "
 
@@ -35962,6 +36405,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::Norm::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Norm::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Norm::getFunction "
 
@@ -36069,10 +36516,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::Norm::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1Norm1.xml
 %feature("docstring") CasADi::Norm1 "
@@ -36131,9 +36574,13 @@ Propagate sparsity. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::Norm1::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Norm1::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Norm1::print "
 
@@ -36170,6 +36617,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::Norm1::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Norm1::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Norm1::getFunction "
 
@@ -36277,10 +36728,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::Norm1::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1Norm2.xml
 %feature("docstring") CasADi::Norm2 "
@@ -36339,9 +36786,13 @@ Propagate sparsity. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::Norm2::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::Norm2::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::Norm2::print "
 
@@ -36378,6 +36829,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::Norm2::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Norm2::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Norm2::getFunction "
 
@@ -36485,10 +36940,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::Norm2::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1NormF.xml
 %feature("docstring") CasADi::NormF "
@@ -36547,9 +36998,13 @@ Propagate sparsity. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::NormF::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::NormF::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::NormF::print "
 
@@ -36586,6 +37041,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::NormF::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::NormF::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NormF::getFunction "
 
@@ -36693,10 +37152,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::NormF::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1NormInf.xml
 %feature("docstring") CasADi::NormInf "
@@ -36755,9 +37210,13 @@ Propagate sparsity. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::NormInf::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::NormInf::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::NormInf::print "
 
@@ -36794,6 +37253,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::NormInf::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::NormInf::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NormInf::getFunction "
 
@@ -36901,10 +37364,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::NormInf::repr "
-
-Print a representation of the object. ";
-
 
 // File: classstd_1_1numeric__limits_3_01CasADi_1_1SX_01_4.xml
 %feature("docstring") std::numeric_limits< CasADi::SX > " C++ includes:
@@ -36917,6 +37376,53 @@ sx.hpp ";
 Base class for OCP solvers.
 
 Joel Andersson
+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
+|                                    | linspace(0,t_final,ns+1)           |
++------------------------------------+------------------------------------+
+| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
++------------------------------------+------------------------------------+
+| OCP_LBXP                           | States deriatives lower bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_UBXP                           | States deriatives upper bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_XP_INIT                        | States deriatives initial guess    |
+|                                    | (nx x (ns+1))                      |
++------------------------------------+------------------------------------+
+| OCP_LBU                            | Controls lower bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_UBU                            | Controls upper bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
++------------------------------------+------------------------------------+
+| OCP_LBP                            | Parameters lower bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_UBP                            | Parameters upper bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
++------------------------------------+------------------------------------+
+| OCP_LBH                            | Point constraint lower bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_UBH                            | Point constraint upper bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_LBG                            | Lower bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+| OCP_UBG                            | Upper bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
@@ -36981,6 +37487,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -37413,6 +37922,53 @@ Internal node class for OCPSolver.
 
 Joel Andersson
 
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
+|                                    | linspace(0,t_final,ns+1)           |
++------------------------------------+------------------------------------+
+| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
++------------------------------------+------------------------------------+
+| OCP_LBXP                           | States deriatives lower bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_UBXP                           | States deriatives upper bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_XP_INIT                        | States deriatives initial guess    |
+|                                    | (nx x (ns+1))                      |
++------------------------------------+------------------------------------+
+| OCP_LBU                            | Controls lower bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_UBU                            | Controls upper bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
++------------------------------------+------------------------------------+
+| OCP_LBP                            | Parameters lower bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_UBP                            | Parameters upper bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
++------------------------------------+------------------------------------+
+| OCP_LBH                            | Point constraint lower bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_UBH                            | Point constraint upper bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_LBG                            | Lower bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+| OCP_UBG                            | Upper bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
 +------------+--------------------------------------+
 |    Name    |             Description              |
@@ -37476,6 +38032,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -38020,6 +38579,9 @@ decision variables (x)       nc: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | mutol        | OT_REAL      | 1e-8         | tolerance as | CasADi::Inte |
 |              |              |              | provided     | rfaces::OOQP |
 |              |              |              | with         | Internal     |
@@ -38484,6 +39046,9 @@ reInit();
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mutol        | OT_REAL      | 1e-8         | tolerance as | CasADi::Inte |
 |              |              |              | provided     | rfaces::OOQP |
@@ -39221,9 +39786,13 @@ argument. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::OutputNode::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::OutputNode::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::OutputNode::print "
 
@@ -39268,6 +39837,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::OutputNode::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::OutputNode::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::OutputNode::getFunction "
 
@@ -39363,10 +39936,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::OutputNode::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1Parallelizer.xml
 %feature("docstring") CasADi::Parallelizer "
@@ -39421,6 +39990,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -39904,6 +40476,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -40379,6 +40954,9 @@ decision variables (x)       nc: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | nWSR         | OT_INTEGER   | GenericType( | The maximum  | CasADi::Inte |
 |              |              | )            | number of    | rfaces::QPOa |
@@ -40860,6 +41438,9 @@ Joris Gillis, Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | nWSR         | OT_INTEGER   | GenericType( | The maximum  | CasADi::Inte |
 |              |              | )            | number of    | rfaces::QPOa |
@@ -41412,6 +41993,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -41929,6 +42513,9 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -42393,9 +42980,13 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::ScalarNonzerosOp::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::ScalarNonzerosOp::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::print "
 
@@ -42440,6 +43031,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::getFunction "
 
@@ -42542,10 +43137,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1SharedObject.xml
@@ -42793,6 +43384,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -43310,6 +43904,9 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -43706,9 +44303,13 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::SparseSparseOp::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::SparseSparseOp::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::print "
 
@@ -43753,6 +44354,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::SparseSparseOp::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::getFunction "
 
@@ -43855,10 +44460,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::SparseSparseOp::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1SQPInternal.xml
@@ -43992,6 +44593,9 @@ Print a representation of the object. ";
 |              |              |              | number of    | nternal      |
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_safety    | OT_REAL      | 1.1          | Safety       | CasADi::SQPI |
 |              |              |              | factor for   | nternal      |
@@ -44489,6 +45093,9 @@ Joel Andersson
 |              |              |              | number of    | nternal      |
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_safety    | OT_REAL      | 1.1          | Safety       | CasADi::SQPI |
 |              |              |              | factor for   | nternal      |
@@ -45077,6 +45684,9 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -45611,6 +46221,9 @@ Solves the linear system A.x = b for x
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -46247,6 +46860,9 @@ Joel Andersson
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -46836,6 +47452,9 @@ Joel Andersson
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -47333,9 +47952,13 @@ Partial derivatives. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::SymbolicMatrix::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::SymbolicMatrix::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::SymbolicMatrix::print "
 
@@ -47376,6 +47999,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::SymbolicMatrix::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::SymbolicMatrix::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::SymbolicMatrix::getFunction "
 
@@ -47483,10 +48110,6 @@ Get the reference count. ";
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::repr "
-
-Print a representation of the object. ";
-
 
 // File: classCasADi_1_1SymbolicSXNode.xml
 %feature("docstring") CasADi::SymbolicSXNode "
@@ -47564,6 +48187,50 @@ Check if smooth. ";
 print ";
 
 
+// File: structCasADi_1_1TypeName.xml
+%feature("docstring") CasADi::TypeName "
+
+Helper class pretty printing of type
+
+C++ includes: matrix.hpp ";
+
+
+// File: structCasADi_1_1TypeName_3_01double_01_4.xml
+%feature("docstring") CasADi::TypeName< double > "
+
+Pretty print of double
+
+C++ includes: matrix.hpp ";
+
+
+// File: structCasADi_1_1TypeName_3_01float_01_4.xml
+%feature("docstring") CasADi::TypeName< float > "
+
+Pretty print of float
+
+C++ includes: matrix.hpp ";
+
+
+// File: structCasADi_1_1TypeName_3_01int_01_4.xml
+%feature("docstring") CasADi::TypeName< int > "
+
+Pretty print of int
+
+C++ includes: matrix.hpp ";
+
+
+// File: structCasADi_1_1TypeName_3_01long_01_4.xml
+%feature("docstring") CasADi::TypeName< long > "
+
+Pretty print of long
+
+C++ includes: matrix.hpp ";
+
+
+// File: structCasADi_1_1TypeName_3_01SX_01_4.xml
+%feature("docstring") CasADi::TypeName< SX > " C++ includes: sx.hpp ";
+
+
 // File: classCasADi_1_1UnaryOp.xml
 %feature("docstring") CasADi::UnaryOp "
 
@@ -47613,9 +48280,13 @@ Is it a certain operation. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::UnaryOp::repr "
+
+Print a representation. ";
+
 %feature("docstring")  CasADi::UnaryOp::print "
 
-Print expression. ";
+Print a description. ";
 
 %feature("docstring")  CasADi::UnaryOp::print "
 
@@ -47664,6 +48335,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::UnaryOp::isJacobian "
 
 Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::UnaryOp::isMultiplication "
+
+Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::UnaryOp::getFunction "
 
@@ -47766,10 +48441,6 @@ Get the reference count. ";
 %feature("docstring")  CasADi::UnaryOp::init "
 
 Initialize the object. ";
-
-%feature("docstring")  CasADi::UnaryOp::repr "
-
-Print a representation of the object. ";
 
 
 // File: classCasADi_1_1UnaryOperation.xml
@@ -48260,6 +48931,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -48754,6 +49428,9 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -49799,6 +50476,10 @@ check if vector ";
 %feature("docstring")  CasADi::GSL::isEqual "
 
 Check if two expressions are equal. ";
+
+%feature("docstring")  CasADi::GSL::getOperatorRepresentation "
+
+Get a string representation for a binary MX, using custom arguments. ";
 
 %feature("docstring")  CasADi::GSL::vertcat "
 
@@ -51266,6 +51947,9 @@ This file does absolutely nothing but including all headers ";
 // File: documentation_2examples_2MX_2mapping_8hpp.xml
 
 
+// File: matrix_8cpp.xml
+
+
 // File: matrix_8hpp.xml
 %feature("docstring")  CasADi::sin "";
 
@@ -51509,7 +52193,10 @@ This file does absolutely nothing but including all headers ";
 // File: parallelizer_8cpp.xml
 
 
-// File: parallelizer_8hpp.xml
+// File: casadi_2fx_2parallelizer_8hpp.xml
+
+
+// File: documentation_2examples_2FX_2parallelizer_8hpp.xml
 
 
 // File: parallelizer__internal_8cpp.xml
@@ -52032,6 +52719,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: FX_2expand_8py-example.xml
+
+
+// File: FX_2parallelizer_8py-example.xml
 
 
 // File: FX_2pyfunction_8py-example.xml

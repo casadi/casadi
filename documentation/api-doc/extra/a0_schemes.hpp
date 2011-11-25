@@ -174,8 +174,8 @@
 <tr><td>OCP_P_INIT</td><td>Parameters initial guess (np x 1)</td></tr>
 <tr><td>OCP_LBH</td><td>Point constraint lower bound (nh x (ns+1))</td></tr>
 <tr><td>OCP_UBH</td><td>Point constraint upper bound (nh x (ns+1))</td></tr>
-<tr><td>OCP_LBG</td><td>Bounds for the coupling constraints.</td></tr>
-<tr><td>OCP_UBG</td><td></td></tr>
+<tr><td>OCP_LBG</td><td>Lower bound for the coupling constraints.</td></tr>
+<tr><td>OCP_UBG</td><td>Upper bound for the coupling constraints.</td></tr>
 </table>
 */
 /** \class CasADi::NLPSolverInternal

@@ -190,7 +190,8 @@ public:
 
   bool monitor_rhsB_;
   bool monitor_rhs_;
-
+  bool monitor_rhsQB_;
+  
   bool disable_internal_warnings_;
   
 };

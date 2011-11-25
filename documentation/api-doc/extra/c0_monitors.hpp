@@ -48,9 +48,11 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>CVodesInternal::reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>CVodesInternal::rhsB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>integrate</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>res</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>resB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>resQB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::CVodesIntegrator
@@ -59,9 +61,11 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>CVodesInternal::reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>CVodesInternal::rhsB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>integrate</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>res</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>resB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>resQB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::IdasInternal
@@ -70,8 +74,8 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>IdasInternal::correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>IdasInternal::res</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>res</td><td>CasADi::Sundials::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
@@ -80,8 +84,8 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>IdasInternal::correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>IdasInternal::res</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>res</td><td>CasADi::Sundials::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::GSL::GslInternal
