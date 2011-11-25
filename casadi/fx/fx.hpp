@@ -255,11 +255,7 @@ class FX : public OptionsFunctionality{
   /// Access forward sensitivity
   Matrix<double>& adjSens(int iind=0, int dir=0);
   
-  /// Add modules to be monitored
-  void addMonitor(const std::string& mon);
-  
-  /// Remove modules to be monitored
-  void removeMonitor(const std::string& mon);
+
   
   
 #ifdef DOXYGENPROC
@@ -382,7 +378,12 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   
   /// Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
   std::vector<SXMatrix> symbolicInputSX() const;
+  private:
+  /// Add modules to be monitored
+  void addMonitor(const std::string& mon);
   
+  /// Remove modules to be monitored
+  void removeMonitor(const std::string& mon);
 };
 } // namespace CasADi
 

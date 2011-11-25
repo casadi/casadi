@@ -53,6 +53,7 @@ G = MXFunction([U],[X_01])
 
 # Allocate an NLP solver
 solver = IpoptSolver(F,G)
+solver.setOption("monitor",["eval_f"])
 solver.init()
 
 # Set bounds and initial guess

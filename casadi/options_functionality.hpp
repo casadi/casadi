@@ -161,8 +161,8 @@ virtual ~OptionsFunctionalityNode();
 
 protected:
 
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>());
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals);
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false);
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
   
 private:
 /** \brief  Allowed options  */

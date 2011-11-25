@@ -408,12 +408,12 @@ class typemaptests(casadiTestCase):
     self.assertTrue(a.isStringVector())
     x = SX("x")
     f = SXFunction([x],[x])
-    f.setOption("monitors",["foo","bar"])
-    self.assertEqual(f.getOption("monitors")[0],"foo")
-    self.assertEqual(f.getOption("monitors")[1],"bar")
-    f.setOption("monitors",["foo"])
-    self.assertEqual(f.getOption("monitors")[0],"foo")
-    f.setOption("monitors",[])
+    f.setOption("monitor",["foo","bar"])
+    self.assertEqual(f.getOption("monitor")[0],"foo")
+    self.assertEqual(f.getOption("monitor")[1],"bar")
+    f.setOption("monitor",["foo"])
+    self.assertEqual(f.getOption("monitor")[0],"foo")
+    f.setOption("monitor",[])
     
     t=SX("t")
 

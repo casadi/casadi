@@ -132,8 +132,9 @@ comma = Suppress(Literal(","))
 parse_default = Or([parse_quoted_string_keep,Word(alphanums + ".:-_"), Literal("GenericType()")]).setResultsName("default")
 
 parse_allowed = parse_quoted_string.setResultsName("allowed")
+parse_inherit = Word(alphanums).setResultsName("inherit").setParseAction(lambda x: x)
 
-parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name") + comma + parse_type + Optional(comma + parse_default + Optional(comma + parse_quoted_string.setResultsName("description") +Optional(comma + parse_allowed ) )) +  Literal(")") + Optional(";" + Optional("//" + restOfLine.setResultsName("afterdescription")))
+parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name") + comma + parse_type + Optional(comma + parse_default + Optional(comma + parse_quoted_string.setResultsName("description") +Optional(comma + parse_allowed + Optional(comma + parse_inherit )) )) +  Literal(")") + Optional(";" + Optional("//" + restOfLine.setResultsName("afterdescription")))
     
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
@@ -154,7 +155,7 @@ for name,meta in metadata.items():
           result[k]=v.strip()
       except:
         raise Exception(l)
-      d = meta['options'][result["name"]]={'name': result["name"],"type": result["type"],'used': name,'default':'','description':''}
+      d = meta['options'][result["name"]]={'name': result["name"],"type": result["type"],'used': name,'default':'','description':'','inherit': False}
       if 'default' in result:
         d["default"]= result["default"]
         
@@ -165,6 +166,8 @@ for name,meta in metadata.items():
         description.append(result["description"])
       if 'allowed' in result:
         description.append("(" + result["allowed"] +")")
+      if 'inherit' in result:
+        d['inherit'] = bool(eval(result["inherit"].capitalize()))
         
       d["description"] = '\n'.join(description)
       

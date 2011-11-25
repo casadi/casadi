@@ -47,7 +47,7 @@ FXInternal::FXInternal(){
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   addOption("jac_for_sens",             OT_BOOLEAN,             false,          "Create the a Jacobian function and use this to calculate forward sensitivities");
   addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
-  addOption("monitors",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated");
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated");
   
   verbose_ = false;
   numeric_jacobian_ = false;
@@ -106,8 +106,8 @@ void FXInternal::init(){
   }
   
   // Pass monitors
-  if(hasSetOption("monitors")){
-    const std::vector<std::string>& monitors = getOption("monitors");
+  if(hasSetOption("monitor")){
+    const std::vector<std::string>& monitors = getOption("monitor");
     for (std::vector<std::string>::const_iterator it=monitors.begin();it!=monitors.end();it++) {
       monitors_.insert(*it);
     }

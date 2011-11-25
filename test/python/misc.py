@@ -46,10 +46,24 @@ class Misctests(casadiTestCase):
     x = SX("x")
     f = SXFunction([x],[x])
     
+    f.setOption("name","foobar")
     self.assertRaises(RuntimeError,lambda : f.getOption("foobar"))
     self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
     self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
-
+    
+    self.assertRaises(RuntimeError,lambda : f.setOption("ad_mode","foo"))
+    
+    x = SX("x")
+    f = SXFunction([x],[x])
+    
+    print "IpoptSolver"
+    g = IpoptSolver(f)
+    
+    #f.setOption("monitor","abc")
+    #self.assertRaises(RuntimeError,lambda : f.setOption("monitor",["abc"]))
+    #f.setOption("monitor",["eval_f"])
+    
+    
   def test_copyconstr_norefcount(self):
     self.message("Copy constructor for non-refcounted classes")
     x = DMatrix(2,3,1)
@@ -176,6 +190,8 @@ class Misctests(casadiTestCase):
 
     self.assertEqual(g.input(0),2)
     self.assertEqual(g.output(),0)
+    
+
     
 if __name__ == '__main__':
     unittest.main()
