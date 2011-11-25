@@ -33,57 +33,18 @@ double fmax(double x, double y) throw(){ return std::max(x,y);}
 #endif // __STDC_VERSION__ < 199901L
 
 #ifndef WITHOUT_INT_MATH
-namespace std{
-
-	double exp(int x) throw(){ 
-		return exp(double(x));
-	}
-
-	double log(int x) throw(){ 
-		return log(double(x));
-	}
-
-	double sqrt(int x) throw(){ 
-		return sqrt(double(x));
-	}
-
-	double pow(int x, int y) throw(){ 
-		return pow(double(x),double(y));
-	}
-
-	double sin(int x) throw(){ 
-		return sin(double(x));
-	}
-
-	double cos(int x) throw(){ 
-		return cos(double(x));
-	}
-
-	double tan(int x) throw(){ 
-		return tan(double(x));
-	}
-
-	double asin(int x) throw(){ 
-		return asin(double(x));
-	}
-
-	double acos(int x) throw(){ 
-		return acos(double(x));
-	}
-
-	double atan(int x) throw(){ 
-		return atan(double(x));
-	}
-
-	int floor(int x) throw(){
-		return x;
-	}
-
-	int ceil(int x) throw(){ 
-		return x;
-	}
-
-} // namespace std
+double exp(int x) throw(){ return exp(double(x)); }
+double log(int x) throw(){ return log(double(x)); }
+double sqrt(int x) throw(){ return sqrt(double(x)); }
+double pow(int x, int y) throw(){ return pow(double(x),double(y)); }
+double sin(int x) throw(){ return sin(double(x)); }
+double cos(int x) throw(){ return cos(double(x)); }
+double tan(int x) throw(){ return tan(double(x)); }
+double asin(int x) throw(){ return asin(double(x)); }
+double acos(int x) throw(){ return acos(double(x)); }
+double atan(int x) throw(){ return atan(double(x)); }
+int floor(int x) throw(){ return x; }
+int ceil(int x) throw(){ return x; }
 #endif // WITHOUT_INT_MATH
 
 namespace CasADi{

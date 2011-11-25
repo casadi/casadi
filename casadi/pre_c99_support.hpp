@@ -62,20 +62,18 @@ double fmax(double x, double y) throw();
 
 // Resolve ambigous overloading
 #ifndef WITHOUT_INT_MATH
-namespace std{
-  double exp(int x) throw();
-  double log(int x) throw();
-  double sqrt(int x) throw();
-  double pow(int x, int y) throw();
-  double sin(int x) throw();
-  double cos(int x) throw();
-  double tan(int x) throw();
-  double asin(int x) throw();
-  double acos(int x) throw();
-  double atan(int x) throw();
-  int floor(int x) throw();
-  int ceil(int x) throw();
-} // namespace std
+double exp(int x) throw();
+double log(int x) throw();
+double sqrt(int x) throw();
+double pow(int x, int y) throw();
+double sin(int x) throw();
+double cos(int x) throw();
+double tan(int x) throw();
+double asin(int x) throw();
+double acos(int x) throw();
+double atan(int x) throw();
+int floor(int x) throw();
+int ceil(int x) throw();
 #endif // WITHOUT_INT_MATH
 
 // This is a nonstandard addition (the sign function) -- possibly move to another file
