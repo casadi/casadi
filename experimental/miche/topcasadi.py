@@ -55,7 +55,7 @@ class mbb2d:
 		freedofs = list(set(alldofs) - set(fixeddofs))
 
 		# (reduced) external force vector 
-		F = SXMatrix.zeros(nfreedofs,1)
+		F = SXMatrix.sparse(nfreedofs,1)
 		
 		F[0,0] = -1;
 

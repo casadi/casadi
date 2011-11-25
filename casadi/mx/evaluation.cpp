@@ -237,7 +237,7 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
           
           // If no contribution added, set to zero
           if(fwdSens[d][oind]->isNull()){
-            *fwdSens[d][oind] = MX::zeros(od1,od2);
+            *fwdSens[d][oind] = MX::sparse(od1,od2);
           }
         }
         

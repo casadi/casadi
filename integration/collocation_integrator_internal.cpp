@@ -231,7 +231,7 @@ void CollocationIntegratorInternal::init(){
   vector<MX> q_lhs, q_rhs;
   if(nq_>0){
     q_lhs.resize(nQ-1,0);
-    q_rhs.resize(nQ-1,MX::zeros(nq_));
+    q_rhs.resize(nQ-1,MX::sparse(nq_));
   }
   
   // Counter

@@ -739,7 +739,7 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
       // Access the input expression
       const MX& s = inputv[iind];
       if(d==0){
-        fseed[d][iind] = MX::zeros(s.size1(),s.size2());
+        fseed[d][iind] = MX::sparse(s.size1(),s.size2());
       } else {
         fseed[d][iind] = fseed[0][iind];
       }
@@ -795,7 +795,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
       // Access the input expression
       const MX& s = outputv[oind];
       if(d==0){
-        aseed[d][oind] = MX::zeros(s.size1(),s.size2());
+        aseed[d][oind] = MX::sparse(s.size1(),s.size2());
       } else {
         aseed[d][oind] = aseed[0][oind];
       }
@@ -890,7 +890,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
         // Give zero seed if null
         if(el>=0 && dwork[el][d].isNull()){
           if(d==0){
-            dwork[el][d] = MX::zeros(input_p[iind]->size1(),input_p[iind]->size2());
+            dwork[el][d] = MX::sparse(input_p[iind]->size1(),input_p[iind]->size2());
           } else {
             dwork[el][d] = dwork[el][0];
           }
@@ -991,7 +991,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
         
         // Provide a zero seed if no seed exists
         if(el>=0 && dwork[el][d].isNull()){
-          dwork[el][d] = MX::zeros(swork[el].size1(),swork[el].size2());
+          dwork[el][d] = MX::sparse(swork[el].size1(),swork[el].size2());
         }
       }
 
@@ -1002,7 +1002,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
         
         // Set sensitivities to zero if not yet used
         if(el>=0 && dwork[el][d].isNull()){
-          dwork[el][d] = MX::zeros(swork[el].size1(),swork[el].size2());
+          dwork[el][d] = MX::sparse(swork[el].size1(),swork[el].size2());
         }
       }
     }

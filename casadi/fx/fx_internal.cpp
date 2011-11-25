@@ -389,7 +389,7 @@ FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
         // Evaluate symbolically
         j_out.push_back(J.call(j_in).at(0));
       } else {
-        j_out.push_back(MX::zeros(output(it->first).numel(),input(it->second).numel()));
+        j_out.push_back(MX::sparse(output(it->first).numel(),input(it->second).numel()));
       }
     }
   }

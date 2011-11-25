@@ -83,7 +83,7 @@ void Mapping::printPart(std::ostream &stream, int part) const{
   const std::vector<int>& nzind_ = nzmap_.data();
 
   if(ndep()==0){
-    stream << "zeros(" << size1() << "," << size2() << ")";
+    stream << "sparse(" << size1() << "," << size2() << ")";
   } else if(numel()==1 && size()==1 && ndep()==1){
     if(part==1)
       if(dep(0).numel()>1)
@@ -342,7 +342,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   if(nfwd>0 && input.empty()){
     for(int oind=0; oind<output.size(); ++oind){
       if(fwdSens[0][oind]!=0){
-        *fwdSens[0][oind] = MX::zeros(d1,d2);
+        *fwdSens[0][oind] = MX::sparse(d1,d2);
         for(int d=0; d<nfwd; ++d){
           *fwdSens[d][oind] = *fwdSens[0][oind];
         }

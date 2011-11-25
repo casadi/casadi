@@ -84,7 +84,7 @@ MX::MX(const CRSSparsity& sp, const MX& val){
     simplifyMapping(*this);
   } else {
     // Empty matrix
-    *this = zeros(sp.size1(),sp.size2());
+    *this = sparse(sp.size1(),sp.size2());
   }
 }
 
@@ -278,7 +278,7 @@ MX operator-(const MX &x, const MX &y){
   } else if(y->isOperation(NEG)){
     return x+y->dep(0);
   } else if(y.get()==x.get()){
-    return MX::zeros(x.size1(),x.size2());
+    return MX::sparse(x.size1(),x.size2());
   } else {
     return MX::binary(SUB,x,y);
   }
@@ -291,7 +291,7 @@ MX MX::binary(int op, const MX &x, const MX &y){
   // Quick return if zero
   if((casadi_math<double>::f0x_is_zero(op) && isZero(x)) || 
     (casadi_math<double>::fx0_is_zero(op) && isZero(y))){
-    return zeros(std::max(x.size1(),y.size1()),std::max(x.size2(),y.size2()));
+    return sparse(std::max(x.size1(),y.size1()),std::max(x.size2(),y.size2()));
   }
   
   // Create binary node
@@ -306,7 +306,7 @@ MX MX::binary(int op, const MX &x, const MX &y){
 MX MX::unary(int op, const MX &x){
   // Quick return if zero
   if(casadi_math<double>::f0x_is_zero(op) && isZero(x)){
-    return zeros(x.size1(),x.size2());
+    return sparse(x.size1(),x.size2());
   } else {
     return create(new UnaryOp(Operation(op),x));
   }
@@ -412,15 +412,15 @@ bool MX::dense() const{
   return numel()==size();
 }
 
-MX MX::zeros(int nrow, int ncol){
+MX MX::sparse(int nrow, int ncol){
   return MX(nrow,ncol);
 }
 
-MX MX::zeros(const CRSSparsity& sparsity){
+MX MX::sparse(const CRSSparsity& sparsity){
   return DMatrix(sparsity,0);
 }
 
-MX MX::zeros(const std::pair<int, int> &nm){
+MX MX::sparse(const std::pair<int, int> &nm){
   return MX(nm.first,nm.second);
 }
 
@@ -529,7 +529,7 @@ MX MX::mul(const MX& y) const{
     else if(y.size()==0 && x.size1()==x.size2())
       return y;
     else
-      return MX::zeros(x.size1(),y.size2());
+      return MX::sparse(x.size1(),y.size2());
   } else if(x.numel()==1 || y.numel()==1){
     return x*y;
   } else if(x.sparsity().diagonal() && y.size2()==1){

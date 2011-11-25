@@ -302,9 +302,9 @@ class MX : public SharedObject{
 
   //@{
   /** \brief  Matrix of all zeros */  
-  static MX zeros(int nrow, int ncol=1);
-  static MX zeros(const CRSSparsity& sparsity);
-  static MX zeros(const std::pair<int, int> &nm);
+  static MX sparse(int nrow, int ncol=1);
+  static MX sparse(const CRSSparsity& sparsity);
+  static MX sparse(const std::pair<int, int> &nm);
   //@}
   
   //@{
