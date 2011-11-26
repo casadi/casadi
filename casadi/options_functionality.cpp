@@ -111,12 +111,16 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
   // Check if found
   if(it == dictionary_.end()){
     stringstream ss;
-    ss << "Option: " << name << " has not been set." << endl;
-    ss << "(Available options are:";
-    for (map<string, opt_type>::const_iterator it=allowed_options.begin();it!=allowed_options.end();it++) {
-      ss << " " << it->first;
+    ss << "Option: '" << name << "' has not been set." << endl;
+    ss << "Datatype of option: " << GenericType::get_type_description((*allowed_options.find(name)).second) << endl;
+    ss << "Description of option: " << (*description_.find(name)).second << endl;
+    const std::vector<GenericType> & allowed = (*allowed_vals_.find(name)).second;
+    if (allowed.size()>0) {
+      ss << "Allowed values of option: " << endl;
+      for (std::vector<GenericType>::const_iterator it=allowed.begin();it!=allowed.end();it++) {
+        ss << " '" << *it << "'";
+      }
     }
-    ss << ")" << endl;
     casadi_error(ss.str());
   }
   
