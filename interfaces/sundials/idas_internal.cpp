@@ -55,7 +55,8 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("cj_scaling",                  OT_BOOLEAN, false, "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false, "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable IDAS internal warning messages");
-  
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "correctInitialConditions|res", true);
+    
   mem_ = 0;
   
   y_  = 0; 

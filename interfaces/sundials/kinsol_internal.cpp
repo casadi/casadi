@@ -46,7 +46,8 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
   addOption("linear_solver_creator",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class");
   addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
   addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
-
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
+    
   mem_ = 0;
   u_ = 0;
   u_scale_ = 0;

@@ -46,7 +46,8 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton","","newton|functional");
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
   addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable CVodes internal warning messages");
-
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "integrate|res|resB|resQB|reset", true);
+    
   mem_ = 0;
 
   y0_ = y_ = 0;

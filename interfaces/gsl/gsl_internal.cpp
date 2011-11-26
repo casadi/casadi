@@ -47,6 +47,7 @@ GslInternal* GslInternal::clone() const{
   
 GslInternal::GslInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   is_init = false;
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "reset", true);
   std::cout << "Warning: GslIntegrator is highly experimental" << std::endl;
 }
 
@@ -150,7 +151,7 @@ void GslInternal::init(){
 }
   
 void GslInternal::reset(int fsens_order, int asens_order){
-  if(monitored("GslInternal::reset")){
+  if(monitored("reset")){
     cout << "initial state: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
