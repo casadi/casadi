@@ -744,14 +744,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::AcadoIntegrator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::AcadoIntegrator::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::AcadoIntegrator::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -2033,14 +2025,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::AcadoOCP::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::AcadoOCP::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::AcadoOCP::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::AcadoOCP::getStats "
 
@@ -3410,14 +3394,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::CFunction::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::CFunction::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::CFunction::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -4655,14 +4631,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::CollocationIntegrator::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::CollocationIntegrator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::CollocationIntegrator::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::getStats "
 
@@ -6530,14 +6498,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::CplexSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::CplexSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::CplexSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -7633,14 +7593,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Interfaces::CSparse::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::CSparse::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Interfaces::CSparse::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -8533,19 +8485,19 @@ times t_i.
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+-----------------------+----------------------------------+
-|          Id           |             Used in              |
-+=======================+==================================+
-| CVodesInternal::reset | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| integrate             | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| res                   | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| resB                  | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| resQB                 | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
++-----------+----------------------------------+
+|    Id     |             Used in              |
++===========+==================================+
+| integrate | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| res       | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| resB      | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| resQB     | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| reset     | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
 
 C++ includes: cvodes_integrator.hpp ";
 
@@ -8883,14 +8835,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Sundials::CVodesIntegrator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Sundials::CVodesIntegrator::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::getStats "
 
@@ -9367,19 +9311,19 @@ x0;
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+-----------------------+----------------------------------+
-|          Id           |             Used in              |
-+=======================+==================================+
-| CVodesInternal::reset | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| integrate             | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| res                   | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| resB                  | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
-| resQB                 | CasADi::Sundials::CVodesInternal |
-+-----------------------+----------------------------------+
++-----------+----------------------------------+
+|    Id     |             Used in              |
++===========+==================================+
+| integrate | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| res       | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| resB      | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| resQB     | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
+| reset     | CasADi::Sundials::CVodesInternal |
++-----------+----------------------------------+
 
 C++ includes: cvodes_internal.hpp ";
 
@@ -10518,14 +10462,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::ExternalFunction::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::ExternalFunction::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::ExternalFunction::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::ExternalFunction::getStats "
 
@@ -12303,14 +12239,6 @@ Access adjoint seed. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::FX::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::FX::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::FX::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -13706,14 +13634,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::GSL::GslIntegrator::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::GSL::GslIntegrator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::GSL::GslIntegrator::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::GSL::GslIntegrator::getStats "
 
@@ -15227,14 +15147,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Sundials::IdasIntegrator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Sundials::IdasIntegrator::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -16704,14 +16616,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::ImplicitFunction::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::ImplicitFunction::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::ImplicitFunction::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -18063,14 +17967,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Integrator::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Integrator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Integrator::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Integrator::getStats "
 
@@ -21745,14 +21641,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -22736,14 +22624,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::IpoptSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::IpoptSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::IpoptSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -23270,14 +23150,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Jacobian::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Jacobian::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Jacobian::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Jacobian::getStats "
 
@@ -24929,14 +24801,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Sundials::KinsolSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Sundials::KinsolSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Sundials::KinsolSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -26063,14 +25927,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::KnitroSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::KnitroSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::KnitroSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -26590,14 +26446,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Interfaces::LapackLUDense::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::LapackLUDense::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::getStats "
 
@@ -27546,14 +27394,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Interfaces::LapackQRDense::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::LapackQRDense::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::getStats "
 
@@ -29000,14 +28840,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::LiftoptSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -29491,14 +29323,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::LinearSolver::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::LinearSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::LinearSolver::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::LinearSolver::getStats "
 
@@ -30375,6 +30199,8 @@ compatibility. ";
 
 %feature("docstring")  CasADi::Matrix::fabs "";
 
+%feature("docstring")  CasADi::Matrix::sign "";
+
 %feature("docstring")  CasADi::Matrix::fmin "";
 
 %feature("docstring")  CasADi::Matrix::fmax "";
@@ -30410,6 +30236,36 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::Matrix::printDense "";
 
 %feature("docstring")  CasADi::Matrix::className "";
+
+%feature("docstring")  CasADi::Matrix::sparse "
+
+create a sparse matrix with all zeros ";
+
+%feature("docstring")  CasADi::Matrix::sparse "";
+
+%feature("docstring")  CasADi::Matrix::ones "
+
+create a matrix with all ones ";
+
+%feature("docstring")  CasADi::Matrix::ones "";
+
+%feature("docstring")  CasADi::Matrix::inf "
+
+create a matrix with all inf ";
+
+%feature("docstring")  CasADi::Matrix::inf "";
+
+%feature("docstring")  CasADi::Matrix::nan "
+
+create a matrix with all nan ";
+
+%feature("docstring")  CasADi::Matrix::nan "";
+
+%feature("docstring")  CasADi::Matrix::repmat "
+
+create a matrix by repeating an existing matrix ";
+
+%feature("docstring")  CasADi::Matrix::repmat "";
 
 %feature("docstring")  CasADi::Matrix::Matrix "
 
@@ -31715,16 +31571,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::OptimalControl::MultipleShooting::addMonitor
-"
-
-Add modules to be monitored. ";
-
-%feature("docstring")
-CasADi::OptimalControl::MultipleShooting::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::getStats "
 
@@ -33034,19 +32880,35 @@ Create nodes by their ID. ";
 
 %feature("docstring")  CasADi::MX::matrix_matrix "";
 
-%feature("docstring")  CasADi::MX::zeros "
+%feature("docstring")  CasADi::MX::sparse "
 
-Matrix of all zeros. ";
+Sparse matrix of all zeros. ";
 
-%feature("docstring")  CasADi::MX::zeros "";
-
-%feature("docstring")  CasADi::MX::zeros "";
+%feature("docstring")  CasADi::MX::sparse "";
 
 %feature("docstring")  CasADi::MX::ones "
 
 Matrix of all ones. ";
 
 %feature("docstring")  CasADi::MX::ones "";
+
+%feature("docstring")  CasADi::MX::inf "
+
+create a matrix with all inf ";
+
+%feature("docstring")  CasADi::MX::inf "";
+
+%feature("docstring")  CasADi::MX::nan "
+
+create a matrix with all nan ";
+
+%feature("docstring")  CasADi::MX::nan "";
+
+%feature("docstring")  CasADi::MX::repmat "
+
+create a matrix by repeating an existing matrix ";
+
+%feature("docstring")  CasADi::MX::repmat "";
 
 %feature("docstring")  CasADi::MX::makeUnique "
 
@@ -33154,6 +33016,10 @@ Check if the matrix expression is empty. ";
 
 Check if the matrix expression is dense. ";
 
+%feature("docstring")  CasADi::MX::scalar "
+
+Check if the matrix expression is scalar. ";
+
 %feature("docstring")  CasADi::MX::getDep "
 
 Get the nth dependency as MX. ";
@@ -33182,13 +33048,22 @@ Check if constant. ";
 
 Check if mapping. ";
 
+%feature("docstring")  CasADi::MX::isDensification "
+
+Check if densification. ";
+
 %feature("docstring")  CasADi::MX::isEvaluation "
 
 Check if evaluation. ";
 
-%feature("docstring")  CasADi::MX::isMultipleOutput "
+%feature("docstring")  CasADi::MX::isEvaluationOutput "
 
 Check if evaluation output. ";
+
+%feature("docstring")  CasADi::MX::getEvaluationOutput "
+
+Get the index of evaluation output - only valid when isEvaluationoutput() is
+true. ";
 
 %feature("docstring")  CasADi::MX::isJacobian "
 
@@ -33206,9 +33081,27 @@ Check if multiplication. ";
 
 Check if commutative operation. ";
 
+%feature("docstring")  CasADi::MX::isIfTest "
+
+Check if if-test. ";
+
+%feature("docstring")  CasADi::MX::isNorm "
+
+Check if norm. ";
+
 %feature("docstring")  CasADi::MX::getFunction "
 
 Get function. ";
+
+%feature("docstring")  CasADi::MX::getNZMap "
+
+When MX is a mapping, get the output non-zero to the dependency nonzero
+index. ";
+
+%feature("docstring")  CasADi::MX::getDepInd "
+
+When MX is a mapping, get the mapping from the output non-zero index of the
+dependency index. ";
 
 %feature("docstring")  CasADi::MX::isBinary "
 
@@ -33315,6 +33208,10 @@ Get string representation of dimensions. The representation is (nrow x ncol
 %feature("docstring")  CasADi::MX::floor "";
 
 %feature("docstring")  CasADi::MX::ceil "";
+
+%feature("docstring")  CasADi::MX::fabs "";
+
+%feature("docstring")  CasADi::MX::sign "";
 
 %feature("docstring")  CasADi::MX::erf "";
 
@@ -34072,14 +33969,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::MXFunction::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MXFunction::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::MXFunction::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::MXFunction::getStats "
 
@@ -35324,14 +35213,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::NLPSolver::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::NLPSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::NLPSolver::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::NLPSolver::getStats "
 
@@ -37830,14 +37711,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::OCPSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::OCPSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::OCPSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -39409,14 +39282,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::OOQPSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -40336,14 +40201,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Parallelizer::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Parallelizer::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Parallelizer::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Parallelizer::getStats "
 
@@ -41797,14 +41654,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Interfaces::QPOasesSolver::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -42326,14 +42175,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::QPSolver::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::QPSolver::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::QPSolver::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::QPSolver::getStats "
 
@@ -43748,14 +43589,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::Simulator::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Simulator::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Simulator::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::Simulator::getStats "
 
@@ -45468,14 +45301,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::SQPMethod::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::SQPMethod::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::SQPMethod::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -46056,14 +45881,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::SuperLU::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::SuperLU::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::SuperLU::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::SuperLU::getStats "
 
@@ -46689,6 +46506,8 @@ Check wether a binary SX is commutative. ";
 
 %feature("docstring")  CasADi::SX::getOp "";
 
+%feature("docstring")  CasADi::SX::isOp "";
+
 %feature("docstring")  CasADi::SX::isEqual "";
 
 %feature("docstring")  CasADi::SX::getValue "";
@@ -46696,6 +46515,14 @@ Check wether a binary SX is commutative. ";
 %feature("docstring")  CasADi::SX::getIntValue "";
 
 %feature("docstring")  CasADi::SX::getDep "";
+
+%feature("docstring")  CasADi::SX::isDoubled "
+
+Check if the node is the sum of two equal expressions. ";
+
+%feature("docstring")  CasADi::SX::isSquared "
+
+Check if the node is an even square. ";
 
 %feature("docstring")  CasADi::SX::getNdeps "
 
@@ -46769,8 +46596,6 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::inv "";
 
-%feature("docstring")  CasADi::SX::constpow "";
-
 %feature("docstring")  CasADi::SX::sinh "";
 
 %feature("docstring")  CasADi::SX::cosh "";
@@ -46780,6 +46605,10 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::log10 "";
 
 %feature("docstring")  CasADi::SX::printme "";
+
+%feature("docstring")  CasADi::SX::sign "";
+
+%feature("docstring")  CasADi::SX::constpow "";
 
 %feature("docstring")  CasADi::SX::getTemp "";
 
@@ -47300,14 +47129,6 @@ Const access forward sensitivity. ";
 %feature("docstring")  CasADi::SXFunction::adjSens "
 
 Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::SXFunction::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::SXFunction::removeMonitor "
-
-Remove modules to be monitored. ";
 
 %feature("docstring")  CasADi::SXFunction::getStats "
 
@@ -48187,50 +48008,6 @@ Check if smooth. ";
 print ";
 
 
-// File: structCasADi_1_1TypeName.xml
-%feature("docstring") CasADi::TypeName "
-
-Helper class pretty printing of type
-
-C++ includes: matrix.hpp ";
-
-
-// File: structCasADi_1_1TypeName_3_01double_01_4.xml
-%feature("docstring") CasADi::TypeName< double > "
-
-Pretty print of double
-
-C++ includes: matrix.hpp ";
-
-
-// File: structCasADi_1_1TypeName_3_01float_01_4.xml
-%feature("docstring") CasADi::TypeName< float > "
-
-Pretty print of float
-
-C++ includes: matrix.hpp ";
-
-
-// File: structCasADi_1_1TypeName_3_01int_01_4.xml
-%feature("docstring") CasADi::TypeName< int > "
-
-Pretty print of int
-
-C++ includes: matrix.hpp ";
-
-
-// File: structCasADi_1_1TypeName_3_01long_01_4.xml
-%feature("docstring") CasADi::TypeName< long > "
-
-Pretty print of long
-
-C++ includes: matrix.hpp ";
-
-
-// File: structCasADi_1_1TypeName_3_01SX_01_4.xml
-%feature("docstring") CasADi::TypeName< SX > " C++ includes: sx.hpp ";
-
-
 // File: classCasADi_1_1UnaryOp.xml
 %feature("docstring") CasADi::UnaryOp "
 
@@ -48512,6 +48289,14 @@ Natural exponent.
 C++ includes: casadi_math.hpp ";
 
 
+// File: classCasADi_1_1UnaryOperation_3_01FABS_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< FABS > "
+
+Absolute value.
+
+C++ includes: casadi_math.hpp ";
+
+
 // File: classCasADi_1_1UnaryOperation_3_01FLOOR_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< FLOOR > "
 
@@ -48540,6 +48325,14 @@ C++ includes: casadi_math.hpp ";
 %feature("docstring") CasADi::UnaryOperation< NEG > "
 
 Negation.
+
+C++ includes: casadi_math.hpp ";
+
+
+// File: classCasADi_1_1UnaryOperation_3_01SIGN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< SIGN > "
+
+Sign.
 
 C++ includes: casadi_math.hpp ";
 
@@ -49290,14 +49083,6 @@ Const access forward sensitivity. ";
 
 Access forward sensitivity. ";
 
-%feature("docstring")  CasADi::XFunction::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::XFunction::removeMonitor "
-
-Remove modules to be monitored. ";
-
 %feature("docstring")  CasADi::XFunction::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -49909,6 +49694,34 @@ Check if smooth. ";
 
 
 // File: namespaceCasADi.xml
+%feature("docstring")  CasADi::GSL::constpow "
+
+CasADi additions to math.h. ";
+
+%feature("docstring")  CasADi::GSL::printme "";
+
+%feature("docstring")  CasADi::GSL::sign "";
+
+%feature("docstring")  CasADi::GSL::typeName "
+
+Get typename. ";
+
+%feature("docstring")  CasADi::GSL::typeName< double > " ";
+
+%feature("docstring")  CasADi::GSL::typeName< float > " ";
+
+%feature("docstring")  CasADi::GSL::typeName< int > " ";
+
+%feature("docstring")  CasADi::GSL::typeName< long > " ";
+
+%feature("docstring")  CasADi::GSL::sign "
+
+CasADi additions to math.h. ";
+
+%feature("docstring")  CasADi::GSL::constpow "";
+
+%feature("docstring")  CasADi::GSL::printme "";
+
 %feature("docstring")  CasADi::GSL::ptrVec "
 
 Convenience function, convert vectors to vectors of pointers. ";
@@ -49936,6 +49749,14 @@ Make a deep copy of an object (Note: default is a shallow copy!) ";
 %feature("docstring")  CasADi::GSL::deepcopy "";
 
 %feature("docstring")  CasADi::GSL::deepcopy "";
+
+%feature("docstring")  CasADi::GSL::constpow "
+
+CasADi additions to math.h. ";
+
+%feature("docstring")  CasADi::GSL::printme "";
+
+%feature("docstring")  CasADi::GSL::sign "";
 
 %feature("docstring")  CasADi::GSL::ssym "
 
@@ -50501,6 +50322,8 @@ Apply a function f to each element in a vector ";
 
 Apply a function f to each element in a vector ";
 
+%feature("docstring")  CasADi::GSL::sign "throw ()";
+
 %feature("docstring")  CasADi::GSL::shared_cast "
 
 Typecast a shared object to a base class to a shared object to a derived
@@ -50571,9 +50394,9 @@ Get a pointer to the data contained in the vector. ";
 
 Get a pointer to the data contained in the vector. ";
 
-%feature("docstring")  CasADi::GSL::sign "";
-
 %feature("docstring")  CasADi::GSL::if_else "";
+
+%feature("docstring")  CasADi::GSL::typeName< SX > " ";
 
 %feature("docstring")  CasADi::GSL::gauss_quadrature "
 
@@ -50640,16 +50463,6 @@ triangle function
 
 \\\\[ \\\\begin{cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x) =
 1-|x| & |x| < 1 \\\\end{cases} \\\\] ";
-
-%feature("docstring")  CasADi::GSL::sign "
-
-sign function
-
-\\\\[ \\\\begin{cases} \\\\mathrm{sign}(x) = -1 & x<0 \\\\\\\\
-\\\\mathrm{sign}(x) = 0 & x=0 \\\\\\\\ \\\\mathrm{sign}(x) = 1 & x>0
-\\\\\\\\ \\\\end{cases} \\\\]
-
-Also called: signum ";
 
 %feature("docstring")  CasADi::GSL::contains "";
 
@@ -51333,29 +51146,6 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: namespacestd.xml
-%feature("docstring")  std::exp "throw ()";
-
-%feature("docstring")  std::log "throw ()";
-
-%feature("docstring")  std::sqrt "throw ()";
-
-%feature("docstring")  std::pow "throw ()";
-
-%feature("docstring")  std::sin "throw ()";
-
-%feature("docstring")  std::cos "throw ()";
-
-%feature("docstring")  std::tan "throw ()";
-
-%feature("docstring")  std::asin "throw ()";
-
-%feature("docstring")  std::acos "throw ()";
-
-%feature("docstring")  std::atan "throw ()";
-
-%feature("docstring")  std::floor "throw ()";
-
-%feature("docstring")  std::ceil "throw ()";
 
 
 // File: 01_8dox.xml
@@ -51497,8 +51287,6 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 %feature("docstring")  CasADi::log10 "";
 
-%feature("docstring")  CasADi::constpow "";
-
 %feature("docstring")  CasADi::pow "";
 
 %feature("docstring")  CasADi::abs "";
@@ -51514,8 +51302,6 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 %feature("docstring")  CasADi::cosh "";
 
 %feature("docstring")  CasADi::tanh "";
-
-%feature("docstring")  CasADi::printme "";
 
 %feature("docstring")  CasADi::erf "
 
@@ -51614,6 +51400,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: densification_8hpp.xml
+
+
+// File: dotdraw_8hpp.xml
 
 
 // File: evaluation_8cpp.xml
@@ -51951,7 +51740,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: matrix_8hpp.xml
-%feature("docstring")  CasADi::sin "";
+%feature("docstring")  CasADi::sin "
+
+Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 %feature("docstring")  CasADi::cos "";
 
@@ -51985,11 +51776,9 @@ This file does absolutely nothing but including all headers ";
 
 %feature("docstring")  CasADi::pow "";
 
-%feature("docstring")  CasADi::constpow "";
+%feature("docstring")  CasADi::fmin "
 
-%feature("docstring")  CasADi::printme "";
-
-%feature("docstring")  CasADi::fmin "";
+C99 elementary functions from the math.h header. ";
 
 %feature("docstring")  CasADi::fmax "";
 
@@ -52085,19 +51874,17 @@ This file does absolutely nothing but including all headers ";
 
 %feature("docstring")  CasADi::pow "";
 
-%feature("docstring")  CasADi::constpow "";
-
 %feature("docstring")  CasADi::floor "";
 
 %feature("docstring")  CasADi::ceil "";
+
+%feature("docstring")  CasADi::fabs "";
 
 %feature("docstring")  CasADi::erf "";
 
 %feature("docstring")  CasADi::fmin "";
 
 %feature("docstring")  CasADi::fmax "";
-
-%feature("docstring")  CasADi::printme "";
 
 
 // File: mx_8hpp.xml
@@ -52206,27 +51993,75 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: pre__c99__support_8cpp.xml
-%feature("docstring")  std::isnan "throw ()";
+%feature("docstring")  CasADi::isnan "throw ()";
 
-%feature("docstring")  std::isinf "throw ()";
+%feature("docstring")  CasADi::isinf "throw ()";
 
-%feature("docstring")  std::erf "throw ()";
+%feature("docstring")  CasADi::erf "throw ()";
 
-%feature("docstring")  std::fmin "throw ()";
+%feature("docstring")  CasADi::fmin "throw ()";
 
-%feature("docstring")  std::fmax "throw ()";
+%feature("docstring")  CasADi::fmax "throw ()";
+
+%feature("docstring")  CasADi::exp "throw ()";
+
+%feature("docstring")  CasADi::log "throw ()";
+
+%feature("docstring")  CasADi::sqrt "throw ()";
+
+%feature("docstring")  CasADi::pow "throw ()";
+
+%feature("docstring")  CasADi::sin "throw ()";
+
+%feature("docstring")  CasADi::cos "throw ()";
+
+%feature("docstring")  CasADi::tan "throw ()";
+
+%feature("docstring")  CasADi::asin "throw ()";
+
+%feature("docstring")  CasADi::acos "throw ()";
+
+%feature("docstring")  CasADi::atan "throw ()";
+
+%feature("docstring")  CasADi::floor "throw ()";
+
+%feature("docstring")  CasADi::ceil "throw ()";
 
 
 // File: pre__c99__support_8hpp.xml
-%feature("docstring")  std::isnan "throw ()";
+%feature("docstring")  CasADi::isnan "throw ()";
 
-%feature("docstring")  std::isinf "throw ()";
+%feature("docstring")  CasADi::isinf "throw ()";
 
-%feature("docstring")  std::erf "throw ()";
+%feature("docstring")  CasADi::erf "throw ()";
 
-%feature("docstring")  std::fmin "throw ()";
+%feature("docstring")  CasADi::fmin "throw ()";
 
-%feature("docstring")  std::fmax "throw ()";
+%feature("docstring")  CasADi::fmax "throw ()";
+
+%feature("docstring")  CasADi::exp "throw ()";
+
+%feature("docstring")  CasADi::log "throw ()";
+
+%feature("docstring")  CasADi::sqrt "throw ()";
+
+%feature("docstring")  CasADi::pow "throw ()";
+
+%feature("docstring")  CasADi::sin "throw ()";
+
+%feature("docstring")  CasADi::cos "throw ()";
+
+%feature("docstring")  CasADi::tan "throw ()";
+
+%feature("docstring")  CasADi::asin "throw ()";
+
+%feature("docstring")  CasADi::acos "throw ()";
+
+%feature("docstring")  CasADi::atan "throw ()";
+
+%feature("docstring")  CasADi::floor "throw ()";
+
+%feature("docstring")  CasADi::ceil "throw ()";
 
 
 // File: printable__object_8cpp.xml
@@ -52377,8 +52212,6 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 %feature("docstring")  CasADi::pow "";
 
-%feature("docstring")  CasADi::constpow "";
-
 %feature("docstring")  CasADi::abs "";
 
 %feature("docstring")  CasADi::fabs "";
@@ -52394,8 +52227,6 @@ C99 elementary functions from the math.h header. ";
 %feature("docstring")  CasADi::fmin "";
 
 %feature("docstring")  CasADi::fmax "";
-
-%feature("docstring")  CasADi::printme "";
 
 
 // File: sx__function_8cpp.xml
@@ -52734,6 +52565,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: integrators_2tolerance_8py-example.xml
+
+
+// File: misc_2dotdraw_8py-example.xml
 
 
 // File: misc_2limitPrinting_8py-example.xml

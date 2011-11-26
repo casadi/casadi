@@ -94,7 +94,7 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>GslInternal::reset</td><td>CasADi::GSL::GslInternal</td></tr>
+<tr><td>reset</td><td>CasADi::GSL::GslInternal</td></tr>
 </table>
 */
 /** \class CasADi::GSL::GslIntegrator
@@ -103,6 +103,6 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>GslInternal::reset</td><td>CasADi::GSL::GslInternal</td></tr>
+<tr><td>reset</td><td>CasADi::GSL::GslInternal</td></tr>
 </table>
 */
