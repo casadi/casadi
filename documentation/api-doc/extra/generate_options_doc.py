@@ -25,7 +25,7 @@ classes = xmlData.findall("//compound[@kind='class']")
 # The values are dicts with the following structure:
 # 
 # parents     - the list of classes from which this class inherits
-# hierarchy   - the list of ancestors of this class
+# hierarchy   - the list of ancestors of this class. First element is the parent.
 # file        - the absolute path to the hpp source file
 # xmlsource   - the relative path (wrt to xml) to the xml file describing the class
 # hasInternal - (optional) the internal class of this class (the relative path to the xml file)
@@ -169,7 +169,7 @@ for name,meta in metadata.items():
       if 'inherit' in result:
         d['inherit'] = bool(eval(result["inherit"].capitalize()))
         
-      d["description"] = '\n'.join(description)
+      d["description"] = ' '.join(description)
       
     if not(l.find('ops_')==-1):
       m = re.search(r'ops_\["(.*?)"\]\s*=\s*(.*?);',l)
@@ -197,8 +197,11 @@ for name,meta in metadata.items():
       del meta[k]
   f.close()
   
+def newline2br(a):
+  return a.replace("\n","<br />")
+  
 def optionsashtml(option):
-  return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],option['description'],option['used'])
+  return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(option['description']),newline2br(option['used']))
 
 def statsashtml(stat):
   return "<tr><td>%s</td><td>%s</td></tr>" %(stat['name'],stat['used'])
@@ -212,7 +215,19 @@ def update_no_overwrite(orig,new):
   for (k,v) in new.iteritems():
     if not(k in orig):
       orig[k] = v
-
+        
+def update_overwrite(orig,new):
+  import copy
+  for (k,v) in new.iteritems():
+    if not(k in orig):
+      orig[k] = copy.copy(v)
+    else:
+      if "inherit" in v and v["inherit"]:
+        orig[k]["description"] = orig[k]["description"] + "\n" +  v["description"]
+        orig[k]["used"] = orig[k]["used"] + "\n" + v["used"]
+      else:
+        orig[k] = copy.copy(v)
+        
 f = file(out+'b0_options.hpp','w')
 
 # Print out doxygen information - options
@@ -220,11 +235,16 @@ for name,meta in metadata.items():
   if not('options' in meta):
     meta['options'] = {}
 
-  alloptions = meta['options']
+  optionproviders = [meta['options']]
   for a in meta['hierarchy']:
     if 'options' in metadata[a]:
-      update_no_overwrite(alloptions,metadata[a]['options'])
+      optionproviders.append(metadata[a]['options'])
   
+  alloptions = {}
+  
+  for optionprovider in reversed(optionproviders):
+      update_overwrite(alloptions,optionprovider)
+      
   myoptionskeys = alloptions.keys()
   if len(myoptionskeys)==0:
     continue
