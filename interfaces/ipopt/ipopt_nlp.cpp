@@ -27,6 +27,14 @@ namespace CasADi{
 
 IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
   this->solver = solver;
+  n_ = solver->n_;
+  m_ = solver->m_;
+  
+  x_ = new double[n_];
+  g_ = new double[m_];
+  z_L_ = new double[n_];
+  z_U_ = new double[n_];
+  lambda_ = new double[m_];
 }
 
 IpoptUserClass::~IpoptUserClass(){
@@ -121,12 +129,6 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
                                        Index ls_trials,
                                        const IpoptData* ip_data,
                                        IpoptCalculatedQuantities* ip_cq) {
-                 
-  if (!x_) x_ = new double[n_];
-  if (!g_) g_ = new double[m_];
-  if (!z_L_) z_L_ = new double[n_];
-  if (!z_U_) z_U_ = new double[n_];
-  if (!lambda_) lambda_ = new double[m_];
   
   return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials);                   
 }
