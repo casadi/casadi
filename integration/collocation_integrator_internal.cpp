@@ -329,7 +329,7 @@ void CollocationIntegratorInternal::init(){
   
   // Expand f?
   bool expand_f = getOption("expand_f");
-  if(expand){
+  if(expand_f){
     gfcn.init();
     gfcn_ = SXFunction(gfcn);
   } else {
