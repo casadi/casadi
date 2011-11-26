@@ -110,20 +110,6 @@ Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matr
 */
 Matrix<SX> heaviside(const Matrix<SX> &x);
 
-/**  \brief sign function
-*  
-* \f[
-* \begin{cases}
-* \mathrm{sign}(x) = -1 & x<0 \\
-* \mathrm{sign}(x) = 0 & x=0 \\
-* \mathrm{sign}(x) = 1 & x>0 \\
-* \end{cases}
-* \f]
-*
-* Also called: signum
-*/
-Matrix<SX> sign(const Matrix<SX> &x);
-
 /** 
 * \brief rectangle function
 *

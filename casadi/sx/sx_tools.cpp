@@ -132,10 +132,6 @@ Matrix<SX> triangle(const Matrix<SX>& a){
   return rectangle(a.toScalar()/2)*(1-abs(a.toScalar()));
 }
 
-Matrix<SX> sign(const Matrix<SX>& a){
-  return a.sign();
-}
-
 bool contains(const Matrix<SX> &list, const SX &e) {
   for (int i=0;i<nnz(list);i++) {
     if (list(i).toScalar()->isEqual(e)) return true;
