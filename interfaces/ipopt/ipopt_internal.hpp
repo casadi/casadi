@@ -69,7 +69,8 @@ std::map<std::string,opt_type> ops_;
   void get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag);
   int get_number_of_nonlinear_variables() const;
   bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;
-
+  bool intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials);
+  
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f
   double t_eval_grad_f_; // time spent in eval_grad_f

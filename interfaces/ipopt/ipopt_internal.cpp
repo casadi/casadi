@@ -362,6 +362,33 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
 
 }
 
+bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {
+  try {
+    if (!callback_.isNull()) {
+      copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
+      copy(z_L,z_L+n_,callback_.input(NLP_LAMBDA_LBX).begin());
+      copy(z_U,z_U+n_,callback_.input(NLP_LAMBDA_UBX).begin());
+      copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_OPT).begin());
+      callback_.input(NLP_COST).at(0) = obj_value;
+      callback_->stats_["iter"] = iter;
+      callback_->stats_["inf_pr"] = inf_pr;
+      callback_->stats_["inf_du"] = inf_du;
+      callback_->stats_["mu"] = mu;
+      callback_->stats_["d_norm"] = d_norm;
+      callback_->stats_["regularization_size"] = regularization_size;
+      callback_->stats_["alpha_pr"] = alpha_pr;
+      callback_->stats_["alpha_du"] = alpha_du;
+      callback_->stats_["ls_trials"] = ls_trials;
+      callback_.evaluate();
+      return  !callback_.output(0).at(0);
+    } else {
+      return 1;
+    }
+  } catch (exception& ex){
+    cerr << "intermediate_callback: " << ex.what() << endl;
+  }
+}
+
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
   try {
     copy(x,x+n_,output(NLP_X_OPT).begin());

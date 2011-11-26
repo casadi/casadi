@@ -89,11 +89,30 @@ public:
                                  
  /** Specify which variables that appear in the Hessian */
  virtual bool get_list_of_nonlinear_variables(Index num_nonlin_vars, Index* pos_nonlin_vars);
+ 
+ /** This method is called at every iteration */
+ bool intermediate_callback(AlgorithmMode mode, Index iter, Number obj_value,
+                                       Number inf_pr, Number inf_du,
+                                       Number mu, Number d_norm,
+                                       Number regularization_size,
+                                       Number alpha_du, Number alpha_pr,
+                                       Index ls_trials,
+                                       const IpoptData* ip_data,
+                                       IpoptCalculatedQuantities* ip_cq);
 
 private:
   IpoptUserClass(const IpoptUserClass&);
   IpoptUserClass& operator=(const IpoptUserClass&);  
   IpoptInternal* solver;
+  
+  double * x_;
+  double * z_L_;
+  double * z_U_;
+  double * g_;
+  double * lambda_;
+  int n_;
+  int m_;
+  double obj_value_;
 };
 
 } // namespace CasADi

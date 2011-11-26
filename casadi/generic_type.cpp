@@ -25,6 +25,8 @@
 #include "casadi_exception.hpp"
 #include <cmath>
 
+#include "fx/fx.cpp"
+
 using namespace std;
 
 namespace CasADi{
@@ -37,7 +39,8 @@ namespace CasADi{
   typedef GenericTypeInternal<std::vector<int> > IntVectorType;
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
-
+  typedef GenericTypeInternal<FX> FXType;
+  
 opt_type GenericType::getType() const {
   return type_;
 }
@@ -105,6 +108,8 @@ std::string GenericType::get_type_description(opt_type type) {
 	      return "OT_JACOBIANGENERATOR";
       case OT_SPARSITYGENERATOR:
 	      return "OT_SPARSITYGENERATOR";
+      case OT_FX:
+	      return "OT_FX";
       default:
 	      return "OT_UNKNOWN";
 	      
@@ -148,6 +153,10 @@ bool GenericType::isSharedObject() const{
   return is_a<SharedObject>();
 }
   
+bool GenericType::isFX() const{
+  return is_a<FX>();
+}
+
 GenericType::GenericType(){
 }
 
@@ -202,6 +211,10 @@ GenericType::GenericType(const char s[])  : type_(OT_STRING) {
 
 GenericType::GenericType(const SharedObject& obj) : type_(OT_UNKNOWN) {
   assignNode(new SharedObjectType(obj));
+}
+
+GenericType::GenericType(const FX& f) : type_(OT_FX) {
+  assignNode(new FXType(f));
 }
 
 
@@ -261,6 +274,11 @@ const vector<string>& GenericType::toStringVector() const{
 const SharedObject& GenericType::toSharedObject() const{
   casadi_assert_message(isSharedObject(),"type mismatch");
   return static_cast<const SharedObjectType*>(get())->d_;
+}
+
+const FX& GenericType::toFX() const{
+  casadi_assert_message(isFX(),"type mismatch");
+  return static_cast<const FXType*>(get())->d_;
 }
 
 bool GenericType::operator==(const GenericType& op2) const{

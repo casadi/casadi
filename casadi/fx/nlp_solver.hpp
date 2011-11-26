@@ -44,20 +44,20 @@
 */
 
 namespace CasADi{
-
+  
 /// Input arguments of an NLP Solver
 enum NLPInput{
-/// Decision variables initial guess
+/// Decision variables initial guess (n x 1)
 NLP_X_INIT,
-/// Decision variables lower bound
+/// Decision variables lower bound (n x 1), default -inf
 NLP_LBX,
-/// Decision variables upper bound
+/// Decision variables upper bound (n x 1), default +inf
 NLP_UBX,
-/// Constraints lower bound
+/// Constraints lower bound (m x 1), default -inf
 NLP_LBG,
-/// Constraints upper bound
+/// Constraints upper bound (m x 1), default +inf
 NLP_UBG,
-/// Lambda multipliers initial guess
+/// Lambda multipliers initial guess (m x 1)
 NLP_LAMBDA_INIT,
 /// Static parameters on which the objective and constraints might depend
 NLP_P,
@@ -65,16 +65,16 @@ NLP_NUM_IN};
 
 /// Outputs arguments of an NLP Solver
 enum NLPOutput{
-/// Decision variables for optimal solution
+/// Decision variables for optimal solution (n x 1)
 NLP_X_OPT,
-/// Objective/cost function for optimal solution
+/// Objective/cost function for optimal solution (1 x 1)
 NLP_COST,
-///  Lambda multipliers function for optimal solution
+///  Lambda multipliers function for optimal solution (m x 1)
 NLP_LAMBDA_OPT,
-///  Lower bound multipliers for optimal solution
+///  Lower bound multipliers for optimal solution (n x 1)
 ///  When in warm start mode, this output will be used as input
-NLP_LAMBDA_LBX,
-///  Upper bound multipliers for optimal solution
+NLP_LAMBDA_LBX, 
+///  Upper bound multipliers for optimal solution (n x 1)
 ///  When in warm start mode, this output will be used as input
 NLP_LAMBDA_UBX,
 NLP_NUM_OUT};

@@ -59,6 +59,9 @@ public:
   
   int pn_,pm_; // (n x m) parameterspace
   
+  /// callback function, executed at each iteration
+  FX callback_;
+  
 };
 
 } // namespace CasADi

@@ -38,6 +38,7 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("expand_f",         OT_BOOLEAN,     false,         "Expand the objective function in terms of scalar operations, i.e. MX->SX");
   addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
   addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian");
+  addOption("iteration_callback", OT_FX,     FX(),            "A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.");
 
   n_ = 0;
   m_ = 0;
@@ -351,6 +352,23 @@ void NLPSolverInternal::init(){
   output(NLP_LAMBDA_OPT) = DMatrix(m_,1,0);
   output(NLP_LAMBDA_LBX) = DMatrix(n_,1,0);
   output(NLP_LAMBDA_UBX) = DMatrix(n_,1,0);
+  
+  
+  if (hasSetOption("iteration_callback")) {
+   callback_ = getOption("iteration_callback");
+   if (!callback_.isNull()) {
+     if (!callback_.isInit()) callback_.init();
+     casadi_assert_message(callback_.getNumOutputs()==1, "Callback function should have one output, a scalar that indicates wether to break. 0 = continue");
+     casadi_assert_message(callback_.output(0).size()==1, "Callback function should have one output, a scalar that indicates wether to break. 0 = continue");
+     casadi_assert_message(callback_.getNumInputs()==NLP_NUM_OUT, "Callback function should have the output scheme of NLPSolver as input scheme. i.e. " <<NLP_NUM_OUT << " inputs instead of the " << callback_.getNumInputs() << " you provided." );
+     for (int i=0;i<NLP_NUM_OUT;i++) {
+       casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
+         "Callback function should have the output scheme of NLPSolver as input scheme. " << 
+         "Input #" << i << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
+       );
+     }
+   }
+  }
 
   // Call the initialization method of the base class
   FXInternal::init();

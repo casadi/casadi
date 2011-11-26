@@ -13,6 +13,7 @@
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/mx/mx.hpp"
 #include "casadi/mx/mx_tools.hpp"
+#include "casadi/fx/fx.hpp"
 %}
 
 

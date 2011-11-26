@@ -30,6 +30,12 @@ IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
 }
 
 IpoptUserClass::~IpoptUserClass(){
+  delete [] x_;
+  delete [] g_;
+  delete [] z_U_;
+  delete [] z_L_;
+  delete [] lambda_;
+  
 }
 
 // returns the size of the problem
@@ -104,6 +110,25 @@ void IpoptUserClass::finalize_solution(SolverReturn status,
 				  IpoptCalculatedQuantities* ip_cq)
 {
   solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value);
+}
+
+
+bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Number obj_value,
+                                       Number inf_pr, Number inf_du,
+                                       Number mu, Number d_norm,
+                                       Number regularization_size,
+                                       Number alpha_du, Number alpha_pr,
+                                       Index ls_trials,
+                                       const IpoptData* ip_data,
+                                       IpoptCalculatedQuantities* ip_cq) {
+                 
+  if (x_==0) x_ = new double[n_];
+  if (g_==0) g_ = new double[m_];
+  if (z_L_==0) z_L_ = new double[n_];
+  if (z_U_==0) z_U_ = new double[n_];
+  if (lambda_==0) lambda_ = new double[m_];
+  
+  return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials);                   
 }
 
 Index IpoptUserClass::get_number_of_nonlinear_variables(){

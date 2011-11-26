@@ -216,6 +216,11 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     int result = meta< CasADi::GenericType >::as(c,s);
     Py_DECREF(c);
     return result;
+  } else if (meta< CasADi::FX >::couldbe(p)) {
+    CasADi::FX temp;
+    int ret = meta< CasADi::FX >::as(p,temp); 
+    if (!ret) return false;
+    s = CasADi::GenericType(temp);
   } else {
     PyObject* pPyObjectModuleName = PyString_FromString("casadi");
     if (!pPyObjectModuleName) { PyErr_Clear(); return false; }
@@ -249,7 +254,7 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
 
 template <>
 bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
-  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || ( PyType_Check(p) && PyObject_HasAttrString(p,"creator")) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
+  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || ( PyType_Check(p) && PyObject_HasAttrString(p,"creator")) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
 
   
   }

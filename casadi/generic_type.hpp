@@ -31,7 +31,7 @@
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_VOIDPTR, OT_UNKNOWN};
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_FX, OT_VOIDPTR, OT_UNKNOWN};
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -50,6 +50,7 @@ namespace CasADi{
     GenericType(const std::vector<double>& dv);
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
+    GenericType(const FX& f);
     #endif // SWIG
     GenericType(const SharedObject& obj);
     //GenericType(const GenericType& obj);    
@@ -89,6 +90,7 @@ namespace CasADi{
     operator const std::vector<double>& () const{ return toDoubleVector();}
     operator const std::vector<std::string>& () const{ return toStringVector();}
     operator const SharedObject& () const{ return toSharedObject();}
+    operator const FX& () const{ return toFX();}
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
     
@@ -133,6 +135,9 @@ namespace CasADi{
     //! \brief Is a shared object?
     bool isSharedObject() const;
 
+    //! \brief Is a shared object?
+    bool isFX() const;
+    
     //! \brief Convert to boolean
     bool toBool() const;
 
@@ -156,6 +161,9 @@ namespace CasADi{
 
     //! \brief Convert to shared object
     const SharedObject& toSharedObject() const;
+
+    //! \brief Convert to shared object
+    const FX& toFX() const;
     
     //! \brief Convert to void pointer
     void * toVoidPointer() const;
