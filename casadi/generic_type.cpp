@@ -25,7 +25,7 @@
 #include "casadi_exception.hpp"
 #include <cmath>
 
-#include "fx/fx.cpp"
+#include "fx/fx.hpp"
 
 using namespace std;
 
