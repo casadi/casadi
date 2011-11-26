@@ -19,6 +19,8 @@ SET(CASADI_LIBS_LIST
   csparse_interface
   knitro_interface
   optimal_control
+  integration
+  nonlinear_programming
   superlu
   csparse
   tinyxml
