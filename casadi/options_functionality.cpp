@@ -131,6 +131,8 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
   std::stringstream ss(allowed_vals);
   std::string item;
   
+  if (allowed_vals=="") allowed_vals_vec.push_back("");
+  
   while(std::getline(ss, item, '|')) {
       allowed_vals_vec.push_back(item);
   }
