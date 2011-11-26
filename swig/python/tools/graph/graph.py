@@ -69,7 +69,6 @@ class DotArtist:
     deps = getDeps(s)
     if s.size()==s.numel():
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
-      graph.add_edge(pydot.Edge(depid,id))
     else:
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
@@ -84,7 +83,8 @@ class DotArtist:
         label+="</TR>"
       label+="</TABLE>>"
       graph.add_node(pydot.Node(id,label=label,shape='plaintext'))
-
+    graph.add_edge(pydot.Edge(depid,id))
+    
 class MXSymbolicArtist(DotArtist):
   def hasPorts(self):
     return True
