@@ -166,6 +166,9 @@ for name,meta in metadata.items():
         description.append(result["description"])
       if 'allowed' in result:
         description.append("(" + result["allowed"] +")")
+        if result["name"] == "monitor":
+          for n in result["allowed"].split("|"):
+            meta['monitors'][n]={'name': n, 'used': name}
       if 'inherit' in result:
         d['inherit'] = bool(eval(result["inherit"].capitalize()))
         
@@ -179,10 +182,6 @@ for name,meta in metadata.items():
       m = re.search(r'stats_\["(.*?)"\]',l)
       if m:
         meta['stats'][m.group(1)]={'name': m.group(1), 'used': name}
-    if not(l.find('monitored')==-1):
-      m = re.search(r'monitored\("(.*?)"\)',l)
-      if m:
-        meta['monitors'][m.group(1)]={'name': m.group(1), 'used': name}
     if not(l.find('INPUTSCHEME')==-1):
       m = re.search(r'INPUTSCHEME\((.*?)\)',l)
       if m:
