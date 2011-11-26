@@ -30,11 +30,11 @@ IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
 }
 
 IpoptUserClass::~IpoptUserClass(){
-  delete [] x_;
-  delete [] g_;
-  delete [] z_U_;
-  delete [] z_L_;
-  delete [] lambda_;
+  if (x_) delete [] x_;
+  if (g_) delete [] g_;
+  if (z_U_) delete [] z_U_;
+  if (z_L_) delete [] z_L_;
+  if (lambda_) delete [] lambda_;
   
 }
 
@@ -122,11 +122,11 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
                                        const IpoptData* ip_data,
                                        IpoptCalculatedQuantities* ip_cq) {
                  
-  if (x_==0) x_ = new double[n_];
-  if (g_==0) g_ = new double[m_];
-  if (z_L_==0) z_L_ = new double[n_];
-  if (z_U_==0) z_U_ = new double[n_];
-  if (lambda_==0) lambda_ = new double[m_];
+  if (!x_) x_ = new double[n_];
+  if (!g_) g_ = new double[m_];
+  if (!z_L_) z_L_ = new double[n_];
+  if (!z_U_) z_U_ = new double[n_];
+  if (!lambda_) lambda_ = new double[m_];
   
   return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials);                   
 }
