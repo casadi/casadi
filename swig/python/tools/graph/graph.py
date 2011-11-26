@@ -80,7 +80,7 @@ class DotArtist:
           if k==-1:
             label+="<TD>.</TD>"
           else:
-            label+="<TD PORT='f%d' BGCOLOR='%s'> </TD>" % (self.sparsitycol,k)
+            label+="<TD PORT='f%d' BGCOLOR='%s'> </TD>" % (k,self.sparsitycol)
         label+="</TR>"
       label+="</TABLE>>"
       graph.add_node(pydot.Node(id,label=label,shape='plaintext'))
@@ -160,7 +160,6 @@ class MXMappingArtist(DotArtist):
               label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (kk,colors[k],kk)
           label+="</TR>"
         label+="</TABLE>>"
-        print str(d.__hash__())+"_0"
         graph.add_node(pydot.Node("mapinput" + str(d.__hash__()),label=label,shape='plaintext'))
       graph.add_edge(pydot.Edge("mapinput" + str(d.__hash__()),str(s.__hash__())))
       
