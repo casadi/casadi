@@ -6,6 +6,13 @@ import matplotlib.pyplot as plt
 # CasADi
 from casadi import *
 
+try:
+  ACADO_FCN_NUM_IN
+except:
+  print "This example needs ACADO"
+  import sys
+  sys.exit(0)
+  
 # Variables
 t = SX("t")
 x = SX("x")

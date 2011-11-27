@@ -7,10 +7,14 @@ import matplotlib.pyplot as plt
 import zipfile
 import time
 
-# JModelica
-from jmodelica.jmi import compile_jmu
-from jmodelica.jmi import JMUModel
-import jmodelica
+try:
+  # JModelica
+  from jmodelica.jmi import compile_jmu
+  from jmodelica.jmi import JMUModel
+  import jmodelica
+except:
+  print "This example requires a jmodelica insatllation"
+  sys.exit(0)
 
 # CasADi
 from casadi import *
