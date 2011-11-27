@@ -233,7 +233,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     string ineq_viol = "nan"; // sum(max(0,-hk)); % inequality constraint violation
 
     if (!callback_.isNull()) {
-      callback_.input(NLP_X_OPT).set(p);
+      callback_.input(NLP_X_OPT).set(x);
       callback_.input(NLP_COST).set(fk);
       callback_->stats_["iter"] = k;
       callback_->stats_["lsiter"] = lsiter;
