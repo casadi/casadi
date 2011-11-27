@@ -366,6 +366,7 @@ void NLPSolverInternal::init(){
          "Callback function should have the output scheme of NLPSolver as input scheme. " << 
          "Input #" << i << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
        );
+       callback_.input(i).setAll(0);
      }
    }
   }

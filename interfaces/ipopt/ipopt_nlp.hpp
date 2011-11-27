@@ -25,6 +25,19 @@
 
 #include "ipopt_solver.hpp"
 #include <coin/IpTNLP.hpp>
+#include <coin/IpIpoptCalculatedQuantities.hpp>
+
+#ifdef WITH_IPOPT_CALLBACK
+#define private public
+#include <coin/IpIpoptData.hpp>
+#include <coin/IpOrigIpoptNLP.hpp>
+#include <coin/IpTNLPAdapter.hpp>
+#include <coin/IpDenseVector.hpp>
+#include <coin/IpExpansionMatrix.hpp>
+#undef private
+#define private private
+#endif // WITH_IPOPT_CALLBACK
+
 #include <iostream>
 
 using namespace Ipopt;
@@ -32,6 +45,10 @@ namespace CasADi{
 
 class IpoptUserClass : public TNLP
 {
+#ifdef WITH_IPOPT_CALLBACK
+friend class TNLPAdapter;
+#endif // WITH_IPOPT_CALLBACK
+
 public:
   IpoptUserClass(IpoptInternal* ipoptInterface);
   virtual ~IpoptUserClass();
@@ -90,6 +107,7 @@ public:
  /** Specify which variables that appear in the Hessian */
  virtual bool get_list_of_nonlinear_variables(Index num_nonlin_vars, Index* pos_nonlin_vars);
  
+   
  /** This method is called at every iteration */
  bool intermediate_callback(AlgorithmMode mode, Index iter, Number obj_value,
                                        Number inf_pr, Number inf_du,
@@ -99,7 +117,8 @@ public:
                                        Index ls_trials,
                                        const IpoptData* ip_data,
                                        IpoptCalculatedQuantities* ip_cq);
-
+  
+  
 private:
   IpoptUserClass(const IpoptUserClass&);
   IpoptUserClass& operator=(const IpoptUserClass&);  

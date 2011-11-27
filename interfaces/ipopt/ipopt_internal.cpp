@@ -365,10 +365,12 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
 bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {
   try {
     if (!callback_.isNull()) {
+#ifdef WITH_IPOPT_CALLBACK 
       copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
       copy(z_L,z_L+n_,callback_.input(NLP_LAMBDA_LBX).begin());
       copy(z_U,z_U+n_,callback_.input(NLP_LAMBDA_UBX).begin());
       copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_OPT).begin());
+#endif // WITH_IPOPT_CALLBACK 
       callback_.input(NLP_COST).at(0) = obj_value;
       callback_->stats_["iter"] = iter;
       callback_->stats_["inf_pr"] = inf_pr;

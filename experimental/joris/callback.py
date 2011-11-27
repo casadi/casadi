@@ -1,6 +1,5 @@
 from casadi import *
 import numpy as NP
-import matplotlib.pyplot as plt
 
 x = ssym("x")
 y = ssym("y")
@@ -18,6 +17,7 @@ class Log:
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
     print "X_OPT = ", f.input(NLP_X_OPT)
+    print f.getStats()
     self.iter = self.iter + 1
     if self.iter > 5:
       print "This is quite enough."
@@ -36,4 +36,6 @@ solv.setInput([2.5,3.0,0.75],NLP_X_INIT)
 solv.setInput(0,NLP_UBG)
 solv.setInput(0,NLP_LBG)
 solv.solve()
+
+print solv.output(NLP_X_OPT)
 
