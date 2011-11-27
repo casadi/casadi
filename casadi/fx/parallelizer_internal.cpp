@@ -22,6 +22,10 @@
 
 #include "parallelizer_internal.hpp"
 #include "mx_function.hpp"
+#include <algorithm>
+#ifdef WITH_OPENMP
+#include <omp.h>
+#endif //WITH_OPENMP
 
 using namespace std;
 
@@ -109,9 +113,48 @@ void ParallelizerInternal::evaluate(int nfdir, int nadir){
     }
     case OPENMP:
     {
-      #pragma omp parallel for
-      for(int task=0; task<funcs_.size(); ++task)
+      #ifdef WITH_OPENMP
+      // Allocate some lists to collect statistics
+      std::vector<int> task_allocation(funcs_.size());
+      std::vector<int> task_order(funcs_.size());
+      std::vector<double> task_cputime(funcs_.size());
+      std::vector<double> task_starttime(funcs_.size());
+      std::vector<double> task_endtime(funcs_.size());
+      // A private counter
+      int cnt=0;
+      #pragma omp parallel for firstprivate(cnt)
+      for(int task=0; task<funcs_.size(); ++task) {
+        if (task==0) {
+          stats_["max_threads"] = omp_get_max_threads();
+          stats_["num_threads"] = omp_get_num_threads();
+        }
+        task_allocation[task] = omp_get_thread_num();
+        task_starttime[task] = omp_get_wtime();
+        
+        // Do the actual work
         evaluateTask(task,nfdir,nadir);
+        
+        task_endtime[task] = omp_get_wtime();
+        task_cputime[task] =  task_endtime[task] - task_starttime[task];
+        task_order[task] = cnt++;
+      }
+      stats_["task_allocation"] = task_allocation;
+      stats_["task_order"] = task_order;
+      stats_["task_cputime"] = task_cputime;
+      
+      // Measure all times relative to the earliest start_time.
+      double start = *std::min_element(task_starttime.begin(),task_starttime.end());
+      for (int task=0; task<funcs_.size(); ++task) {
+       task_starttime[task] =  task_starttime[task] - start;
+       task_endtime[task] = task_endtime[task] - start;
+      }
+      stats_["task_starttime"] = task_starttime;
+      stats_["task_endtime"] = task_endtime;
+      
+      #endif //WITH_OPENMP
+      #ifndef WITH_OPENMP
+        throw CasadiException("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
+      #endif //WITH_OPENMP
       break;
     }
     case MPI:

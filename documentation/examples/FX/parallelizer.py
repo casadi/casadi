@@ -2,7 +2,7 @@
 #! =============================
 from casadi import *
 
-n = 10
+n = 12
 
 #! Construct a functon that is expensive to evaluate
 x = msym("x",100,100)
@@ -25,4 +25,6 @@ p.init()
 assert(p.getNumInputs() == n*f.getNumInputs())
 
 p.evaluate(1,1)
+
+print p.getStats()
 
