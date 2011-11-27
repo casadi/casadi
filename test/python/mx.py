@@ -1118,7 +1118,7 @@ class MXtests(casadiTestCase):
     J.init()
     
     X=MX("X")
-    F=MXFunction([X],[J.call([X])[0]])
+    F=MXFunction([X],J.call([X]))
     F.init()
     
     

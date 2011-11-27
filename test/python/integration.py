@@ -33,7 +33,7 @@ class Integrationtests(casadiTestCase):
     integrator.init()
     q0   = MX("q0")
     par  = MX("p")
-    qend=integrator.call([q0,par,MX()])[0]
+    [qend,_]=integrator.call([q0,par,MX()])
     qe=MXFunction([q0,par],[qend])
     qe.init()
     self.integrator = integrator
@@ -54,7 +54,7 @@ class Integrationtests(casadiTestCase):
     qe=MXFunction([q0,par],[qend[0]])
     qe.init()
     
-    f = MXFunction([q0],[qe.call([q0,MX(num['p'])])[0]])
+    f = MXFunction([q0],qe.call([q0,MX(num['p'])]))
     f.init()
     f.input(0).set([num['q0']])
     f.evaluate()
@@ -121,7 +121,7 @@ class Integrationtests(casadiTestCase):
     integrator.setOption("tf",1)
     integrator.init()
 
-    qend = integrator.call([var,MX(),MX()])[0]
+    [qend,_] = integrator.call([var,MX(),MX()])
 
     f = MXFunction([var],[qend[0]])
     f.init()
@@ -201,7 +201,7 @@ class Integrationtests(casadiTestCase):
 
     q0   = MX("q0",3,1)
     par  = MX("p",1,1)
-    qend=integrator.call([q0,par,MX()])[0]
+    [qend,_] = integrator.call([q0,par,MX()])
     qe=MXFunction([q0,par],[qend])
     qe.init()
 
@@ -227,7 +227,7 @@ class Integrationtests(casadiTestCase):
 
     q0   = MX("q0",3,1)
     par  = MX("p",1,1)
-    qend=integrator.call([q0,par,MX()])[0]
+    [qend,_]=integrator.call([q0,par,MX()])
     qe=MXFunction([q0,par],[qend])
     qe.init()
 
@@ -285,7 +285,7 @@ class Integrationtests(casadiTestCase):
     q0=MX("q0")
     p=MX("p")
     dq0=MX("dq0")
-    Ji = MXFunction([q0,p,dq0],[J.call([q0,p,dq0])[0]])
+    Ji = MXFunction([q0,p,dq0],J.call([q0,p,dq0]))
     Ji.init()
     H=Jacobian(Ji,1)
     H.setOption("ad_mode","adjoint")
@@ -305,7 +305,7 @@ class Integrationtests(casadiTestCase):
     q0=MX("q0")
     p=MX("p")
     dq0=MX("dq0")
-    qe = MXFunction([q0,p,dq0],[self.integrator.call([q0,p,dq0])[0]])
+    qe = MXFunction([q0,p,dq0],self.integrator.call([q0,p,dq0]))
     qe.init()
 
     JT = MXFunction([q0,p,dq0],[qe.jac(1)[0].T])
@@ -331,7 +331,7 @@ class Integrationtests(casadiTestCase):
     q0=MX("q0")
     p=MX("p")
     dq0=MX("dq0")
-    qe = MXFunction([q0,p,dq0],[self.integrator.call([q0,p,dq0])[0]])
+    qe = MXFunction([q0,p,dq0],self.integrator.call([q0,p,dq0]))
     qe.init()
     
     H = qe.hessian(1)
@@ -390,10 +390,10 @@ class Integrationtests(casadiTestCase):
     integrator.init()
     q0   = MX("q0",3,1)
     par  = MX("p",9,1)
-    qend=integrator.call([q0,par,MX(3,1)])[0]
+    [qend,_] = integrator.call([q0,par,MX(3,1)])
     qe=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     qe.init()
-    qe=qe.call([q0,par,MX(3,1)])[0]
+    [qe] = qe.call([q0,par,MX(3,1)])
 
     qef=MXFunction([q0,par],[qe])
     qef.init()
@@ -432,19 +432,19 @@ class Integrationtests(casadiTestCase):
 
     q0   = MX("q0",3,1)
     par  = MX("p",9,1)
-    qend=integrator.call([q0,par,MX(3,1)])[0]
-    qe=MXFunction([q0,par],[qend])
+    [qend,_] =integrator.call([q0,par,MX(3,1)])
+    qe=MXFunction([q0,par],[qend,_])
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([q0,par,MX(3,1)])[0]
+    [qendJ] = qendJ.call([q0,par,MX(3,1)])
 
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
     qendJ2=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ2.init()
-    qendJ2=qendJ2.call([q0,par,MX(3,1)])[0]
+    [qendJ2] = qendJ2.call([q0,par,MX(3,1)])
 
     qeJ2=MXFunction([q0,par],[qendJ2])
     qeJ2.init()
@@ -498,12 +498,12 @@ class Integrationtests(casadiTestCase):
 
     q0   = MX("q0",2,1)
     par  = MX("p",3,1)
-    qend=integrator.call([q0,par,MX(2,1)])[0]
+    [qend,_] = integrator.call([q0,par,MX(2,1)])
     qe=MXFunction([q0,par],[qend])
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([q0,par,MX(2,1)])[0]
+    [qendJ] =qendJ.call([q0,par,MX(2,1)])
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -549,12 +549,12 @@ class Integrationtests(casadiTestCase):
     tend = MX(te)
     q0   = MX("q0",2,1)
     par  = MX("p",1,1)
-    qend=integrator.call([q0,par,MX(2,1)])[0]
+    [qend,_] = integrator.call([q0,par,MX(2,1)])
     qe=MXFunction([q0,par],[qend])
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([q0,par,MX(2,1)])[0]
+    [qendJ] = qendJ.call([q0,par,MX(2,1)])
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -622,7 +622,7 @@ class Integrationtests(casadiTestCase):
     
     qendJ=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     qendJ.init()
-    qendJ=qendJ.call([q0,par,MX(2,1)])[0]
+    [qendJ] = qendJ.call([q0,par,MX(2,1)])
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -680,7 +680,7 @@ class Integrationtests(casadiTestCase):
     q0=MX("q0",N)
     p=MX("p",N*N)
     dq0=MX("dq0",N)
-    qe = MXFunction([q0,p,dq0],[I.call([q0,p,dq0])[0]])
+    qe = MXFunction([q0,p,dq0],I.call([q0,p,dq0]))
     qe.init()
 
     JT = MXFunction([q0,p,dq0],[qe.jac(1)[0].T])

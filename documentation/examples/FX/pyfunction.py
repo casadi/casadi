@@ -30,7 +30,7 @@ print "4! = ", c.output().toScalar()
 #!==============================
 
 x = MX("x")
-y = c.call([x])[0]
+[y] = c.call([x])
 
 f = MXFunction([x],[y])
 f.init()
@@ -62,7 +62,7 @@ print c.output()
 #! Jacobians
 #!==============================
 x = MX("x",3,1)
-y = c.call([x])[0]
+[y] = c.call([x])
 
 f = MXFunction([x],[y])
 f.init()
