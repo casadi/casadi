@@ -227,18 +227,33 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     k = k+1;
 
     // Gather and print iteration information
-    DMatrix normdx = norm_2(dx); // step size
-    DMatrix normgradL = norm_2(gradL); // size of the Lagrangian gradient
-    DMatrix eq_viol = sum(fabs(gk)); // constraint violation
+    double normdx = norm_2(dx).at(0); // step size
+    double normgradL = norm_2(gradL).at(0); // size of the Lagrangian gradient
+    double eq_viol = sum(fabs(gk)).at(0); // constraint violation
     string ineq_viol = "nan"; // sum(max(0,-hk)); % inequality constraint violation
 
+    if (!callback_.isNull()) {
+      callback_.input(NLP_X_OPT).set(p);
+      callback_.input(NLP_COST).set(fk);
+      callback_->stats_["iter"] = k;
+      callback_->stats_["lsiter"] = lsiter;
+      callback_->stats_["normdx"] = normdx;
+      callback_->stats_["normgradL"] = normgradL;
+      callback_->stats_["eq_viol"] = eq_viol;
+      callback_.evaluate();
+      if (callback_.output(0).at(0)) {
+        cout << "Stop requested by user." << endl;
+        break;
+      }
+    }    
+    
     cout << setw(5) << k << setw(15) << fk << setw(5) << lsiter << setw(15) << normdx << setw(15) << normgradL << setw(15) << eq_viol << endl;
 
     // Check convergence on dx
-    if(normdx.at(0) < toldx_){
+    if(normdx < toldx_){
       cout << "Convergence (small dx)" << endl;
       break;
-    } else if(normgradL.at(0) < tolgl_){
+    } else if(normgradL < tolgl_){
       cout << "Convergence (small gradL)" << endl;
       break;
     }
