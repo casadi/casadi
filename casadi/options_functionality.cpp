@@ -26,10 +26,92 @@
 #include "casadi_exception.hpp"
 #include <algorithm>
 #include <string>
+#include <ctype.h>
+
+#include "matrix/matrix.hpp"
 
 using namespace std;
 
 namespace CasADi{
+
+
+
+double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::string &b) {
+  /// Levenshtein edit distance
+  
+  int m = a.size();
+  int n = b.size();
+  
+  Matrix<int> d(m+1,n+1,0);
+  
+  for (int i=0;i<m+1;++i)
+    d.elem(i,0) = i; // the distance of any first string to an empty second string
+  
+  for (int j=0;j<n+1;++j)
+    d.elem(0,j) = j; // the distance of any second string to an empty first string
+    
+  char s;
+  char t;
+  
+  for (int j=1;j<n+1;j++) {
+    for (int i=1;i<m+1;i++) {
+      s = a[i];tolower(s);
+      t = b[i];tolower(t);
+      if (s==t) {
+        d.elem(i,j) = d.elem(i-1,j-1);     // no operation required
+      } else {
+        d.elem(i,j) = min(min(
+                   d.elem(i-1,j)+1,    // a deletion
+                   d.elem(i,j-1)+1),   // an insertion
+                   d.elem(i-1,j-1)+5); // a substitution
+      }
+    }
+  }
+
+  return d.elem(m,n);
+}
+
+/// A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches
+struct mysortclass {
+  bool operator () (std::pair<std::string,double> a,std::pair<std::string,double> b) { return (a.second<b.second);}
+} mysorter;
+
+
+double OptionsFunctionalityNode::getBestMatches(const std::string & word, const std::vector<std::string> &dictionary, std::vector<std::string> &suggestions, int amount) {
+  // Make a list of (word,score) tuples
+  std::vector< std::pair<std::string,double> > candidates(dictionary.size());
+  
+  // Fill this list
+  for (int i=0;i<dictionary.size();i++) {
+    candidates[i].first  = dictionary[i];
+    candidates[i].second = wordDistance(word,dictionary[i]);
+  }
+  
+  // Sort it
+  sort (candidates.begin(), candidates.end(), mysorter);
+  
+  // Put the first 'amount' of them in suggestions 
+  suggestions.clear();
+  for (int i=0;i<amount;i++) {
+    if (i<candidates.size()) {
+      suggestions.push_back(candidates[i].first);
+    }
+  }
+}
+
+double OptionsFunctionalityNode::getBestMatches(const std::string &name, std::vector<std::string> &suggestions, int amount) const {
+  // Work towards a vector of option names
+  std::vector< std::string> dict;
+  
+  // Fill it by looping over the allowed_options map
+  for (map<string, opt_type>::const_iterator it=allowed_options.begin();it!=allowed_options.end();it++) {
+    dict.push_back(it->first);
+  }
+  
+  // Pass the work on to the more general method
+  return getBestMatches(name,dict,suggestions,amount);
+}
+
 
 void OptionsFunctionalityNode::setOption(const string &name, const GenericType &op){
   // First check if the option exists
@@ -37,11 +119,13 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   if(it == allowed_options.end()){
     stringstream ss;
     ss << "Unknown option: " << name << endl;
-    ss << "(Available options are:";
-    for (map<string, opt_type>::const_iterator it=allowed_options.begin();it!=allowed_options.end();it++) {
-      ss << " " << it->first;
-    }
-    ss << ")" << endl;
+    std::vector<std::string> suggestions;
+    getBestMatches(name,suggestions,5);
+    ss << endl;
+    ss << "Did you mean one of the following?" << endl;
+    for (int i=0;i<suggestions.size();++i)
+      printOption(suggestions[i],ss);
+    ss << "Use printOptions() to get a full list of options." << endl;
     casadi_error(ss.str());
   }
   
@@ -57,7 +141,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
     ss << "Option '" << name << "' expects a '" << GenericType::get_type_description(allowed_options[name]) << "' type." << endl;
     ss << "You supplied a type '" << op.get_description() << "' instead." << endl;
     if (!allowed_vals_[name].empty()) {
-      ss << "(Allowed values options are:";
+      ss << "(Allowed values are:";
       for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();it!=allowed_vals_[name].end();it++) {
         ss << " '" << *it << "'";
       }
@@ -113,22 +197,15 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
     stringstream ss;
     if (allowed_options.find(name)!=allowed_options.end()) {
       ss << "Option: '" << name << "' has not been set." << endl;
-      ss << "Datatype of option: " << GenericType::get_type_description((*allowed_options.find(name)).second) << endl;
-      ss << "Description of option: " << (*description_.find(name)).second << endl;
-      const std::vector<GenericType> & allowed = (*allowed_vals_.find(name)).second;
-      if (allowed.size()>0) {
-        ss << "Allowed values of option: " << endl;
-        for (std::vector<GenericType>::const_iterator it=allowed.begin();it!=allowed.end();it++) {
-          ss << " '" << *it << "'";
-        }
-      }
+      printOption(name,ss);
     } else {
-      ss << "Option: '" << name << "' does not exiast." << endl;
-      ss << "(Available options are:";
-      for (map<string, opt_type>::const_iterator it=allowed_options.begin();it!=allowed_options.end();it++) {
-        ss << " " << it->first;
-      }
-      ss << ")" << endl;
+      ss << "Option: '" << name << "' does not exist." << endl << endl;
+      std::vector<std::string> suggestions;
+      getBestMatches(name,suggestions,5);
+      ss << "Did you mean one of the following?" << endl;
+      for (int i=0;i<suggestions.size();++i)
+        printOption(suggestions[i],ss);
+      ss << "Use printOptions() to get a full list of options." << endl;
     }
     casadi_error(ss.str());
   }
@@ -147,7 +224,7 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
   if (allowed_vals=="") allowed_vals_vec.push_back("");
   
   while(std::getline(ss, item, '|')) {
-      allowed_vals_vec.push_back(item);
+    allowed_vals_vec.push_back(item);
   }
 
   addOption(name,type,def_val,desc,allowed_vals_vec,inherit);
@@ -183,7 +260,9 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
   // Inherit description
   std::stringstream s;
   if (inherit && description_.find(name)!=description_.end()) {
-    s << description_[name] << std::endl;
+    s << description_[name];
+    if (!desc.empty())
+      s << std::endl;
   }
   // Insert current description
   s << desc;
@@ -193,20 +272,49 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
 
 }
 
+void OptionsFunctionalityNode::printOption(const std::string &name, ostream &stream) const {
+   map<std::string,opt_type>::const_iterator allowed_option_it = allowed_options.find(name);
+   if (allowed_option_it!=allowed_options.end()) {
+   
+      // First print out the datatype
+      stream << "> \"" << name << "\"          [" << GenericType::get_type_description(allowed_option_it->second) << "] ";
+      
+      // Check if the option has been set, and print it's value if it is.
+      Dictionary::const_iterator dictionary_it=dictionary_.find(name);
+      if(dictionary_it==dictionary_.end())
+        stream << "(not set)";
+      else
+        stream << "= " << dictionary_it->second;
+      stream << endl;
+      
+      // Print out the description on a new line.
+      map<std::string,std::string>::const_iterator description_it =description_.find(name);
+      if (description_it!=description_.end()) {
+        if (description_it->second != "n/a")
+          stream << "     \"" << description_it->second << "\""<< std::endl;
+      }
+        
+      // Print out the allowed values if applicable
+      map< std::string,std::vector<GenericType> >::const_iterator allowed_it = allowed_vals_.find(name);
+      if (allowed_it!=allowed_vals_.end()) {
+        const std::vector<GenericType> & allowed = allowed_it->second;
+        if (allowed.size()>0) {
+          stream << "     Allowed values: ";
+          for (std::vector<GenericType>::const_iterator it=allowed.begin();it!=allowed.end();it++) {
+             stream << " '" << *it << "'";
+          }
+          stream << std::endl;
+        }
+      }
+   } else {
+     stream << "  \"" << name << "\" does not exist.";
+   }
+}
+
 void OptionsFunctionalityNode::printOptions(ostream &stream) const{
-  // Print allowed options
   stream << "\"Option name\" [type] = value" << endl;
   for(map<string, opt_type>::const_iterator it=allowed_options.begin(); it!=allowed_options.end(); ++it){
-    stream << "  \"" << it->first << "\" [" << GenericType::get_type_description(it->second) << "] ";
-    
-    // Check if it is has been set
-    Dictionary::const_iterator j=dictionary_.find(it->first);
-    if(j==dictionary_.end())
-      stream << "(not set)";
-    else
-      stream << "= " << j->second;
-    
-    stream << endl;
+    printOption(it->first,stream);
   }
   stream << endl;
 }

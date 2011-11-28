@@ -73,7 +73,7 @@ GenericType GenericType::from_type(opt_type type) {
     }
 }
 
-std::string GenericType::get_type_description(opt_type type) {
+std::string GenericType::get_type_description(const opt_type &type) {
   switch(type)
     {
       case OT_BOOLEAN:

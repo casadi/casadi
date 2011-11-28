@@ -143,6 +143,9 @@ virtual ~OptionsFunctionalityNode();
 
   /** \brief  Print options to a stream */
   void printOptions(std::ostream &stream=std::cout) const;
+  
+  /** \brief  Print all information there is to know about a certain option */
+  void printOption(const std::string &name,std::ostream &stream = std::cout) const;
     
   /** \brief  get an option value */
   GenericType getOption(const std::string &str) const;
@@ -158,6 +161,25 @@ virtual ~OptionsFunctionalityNode();
 
   /** \brief  Get the dictionary */
   const Dictionary& dictionary() const;
+  
+  /** \brief Get the best suggestions for a misspelled word using a dictionary 
+  *
+  *  \param[in] word  The word that is misspelled
+  *  \param[in] dictionary  A list of correct words
+  *  \param[out] suggestions The list of suggestions generated. This list will be cleared and filled.
+  *  \param[in] amount Maximum number of suggestions
+  * 
+  * \return Some metric for confidence about the best match
+  */
+  static double getBestMatches(const std::string & word, const std::vector<std::string> &dictionary, std::vector<std::string> &suggestions, int amount = 5);
+  
+  /** \brief Get th ebest suggestions of option names
+  */
+  double getBestMatches(const std::string & name, std::vector<std::string> &suggestions, int amount = 5) const;
+  
+  
+  /** \brief A distance metric between two words */
+  static double wordDistance(const std::string &a,const std::string &b);
 
 protected:
 
@@ -165,6 +187,7 @@ protected:
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
   
 private:
+
 /** \brief  Allowed options  */
   std::map<std::string, opt_type> allowed_options;
 

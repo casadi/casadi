@@ -60,12 +60,12 @@ namespace CasADi{
     #endif // SWIG
 
     /// Get a description of a type
-    static std::string get_type_description(opt_type type);
+    static std::string get_type_description(const opt_type &type);
     
     /// Get a description of the object's type
     std::string get_description() const { return get_type_description(type_); }
 
-    /// Construct a GenericType geiven an opt_type
+    /// Construct a GenericType given an opt_type
     static GenericType from_type(opt_type type);
 
     typedef std::map<std::string, GenericType> Dictionary;
