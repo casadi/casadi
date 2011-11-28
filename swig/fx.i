@@ -16,6 +16,7 @@
 #include "casadi/fx/parallelizer.hpp"
 #include "casadi/fx/c_function.hpp"
 #include "casadi/fx/fx_tools.hpp"
+#include "casadi/fx/xfunction_tools.hpp"
 %}
 
 %include "casadi/fx/function_io.hpp"
@@ -35,7 +36,7 @@
 %include "casadi/fx/parallelizer.hpp"
 %include "casadi/fx/c_function.hpp"
 %include "casadi/fx/fx_tools.hpp"
-
+%include "casadi/fx/xfunction_tools.hpp"
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
 

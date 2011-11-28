@@ -68,6 +68,7 @@ SET(CASADI_SRCS
   fx/qp_solver.hpp           fx/qp_solver.cpp           fx/qp_solver_internal.hpp           fx/qp_solver_internal.cpp
   fx/function_io.hpp         fx/function_io.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
+  fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
 
   # User include class with the most essential includes
   casadi.hpp

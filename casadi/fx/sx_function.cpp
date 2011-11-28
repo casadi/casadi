@@ -152,6 +152,15 @@ const SXMatrix& SXFunction::outputSX(int ind) const{
   return (*this)->outputv_.at(ind);
 }
 
+
+const std::vector<SXMatrix>& SXFunction::inputsSX() const {
+  return (*this)->inputv_;
+}
+  
+const std::vector<SXMatrix>& SXFunction::outputsSX() const {
+  return (*this)->outputv_;
+}
+
 void SXFunction::generateCode(const string& filename){
   (*this)->generateCode(filename);
 }

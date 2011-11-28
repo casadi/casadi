@@ -94,6 +94,12 @@ public:
   /// get function output argument
   const MX outputMX(int oind=0) const;
   
+  /// get function inputs argument 
+  const std::vector<MX> & inputsMX() const;
+  
+  /// get function outputs argument
+  const std::vector<MX> & outputsMX() const;
+  
   /** \brief Access the algorithm */
   const std::vector<MXAlgEl>& algorithm() const;
   

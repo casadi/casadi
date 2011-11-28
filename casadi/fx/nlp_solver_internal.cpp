@@ -39,7 +39,8 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
   addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian");
   addOption("iteration_callback", OT_FX,     FX(),            "A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.");
-
+  addOption("ignore_check_vec", OT_BOOLEAN,     false,            "If set to true, the input shape of F will not be checked.");
+  
   n_ = 0;
   m_ = 0;
   pn_ = 0;
@@ -70,12 +71,27 @@ void NLPSolverInternal::init(){
 
   // Basic sanity checks
   casadi_assert_message(F_.getNumInputs()==1 || F_.getNumInputs()==2, "Wrong number of input arguments to F. Must be 1 or 2");
+  casadi_assert_message(getOption("ignore_check_vec") || F_.input().size2()==1,
+     "To avoid confusion, the input argument to F must be vector. You supplied " << F_.input().dimString() << endl <<
+     " We suggest you make the following changes:" << endl <<
+     "   -  F is an SXFunction:  SXFunction([X],[rhs]) -> SXFunction([vec(X)],[rhs])" << endl <<
+     "             or            F -                   ->  F = vec(F) " << 
+     "   -  F is an MXFunction:  MXFunction([X],[rhs]) -> " <<  endl <<
+     "                                     X_vec = MX(\"X\",vec(X.sparsity())) " << endl <<
+     "                                     F_vec = MXFunction([X_flat],[F.call([X_flat.reshape(X.sparsity())])[0]]) " << endl <<
+     "             or            F -                   ->  F = vec(F) " << 
+     " You may ignore this warning by setting the 'ignore_check_vec' option to true." << endl
+  );
+  
   casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
   casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
+  casadi_assert_message(F_.input().dense(), "Input argument of F must be dense. You supplied " << F_.input().dimString());
+  
   if(!G_.isNull()) {
     casadi_assert_message(G_.getNumInputs()>=1, "Wrong number of input arguments to G");
     casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
     casadi_assert_message(G_.input().numel()==n_, "Inconsistent dimensions");
+    casadi_assert_message(G_.input().sparsity()==F_.input().sparsity(), "F and G input dimension must match. F " << F_.input().dimString() << ". G " << G_.input().dimString());
   }
   
   // Find out if we are to expand the objective function in terms of scalar operations
@@ -195,7 +211,7 @@ void NLPSolverInternal::init(){
         
         // Lagrange multipliers
         SXMatrix lam = ssym("lambda",g.size1());
-        
+
         // Objective function scaling
         SXMatrix sigma = ssym("sigma");        
         

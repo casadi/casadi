@@ -62,7 +62,7 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
       } else {
         d.elem(i,j) = min(min(
                    d.elem(i-1,j)+1,    // a deletion
-                   d.elem(i,j-1)+1),   // an insertion
+                   d.elem(i,j-1)+0),   // an insertion
                    d.elem(i-1,j-1)+5); // a substitution
       }
     }

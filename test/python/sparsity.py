@@ -202,6 +202,43 @@ class Sparsitytests(casadiTestCase):
     
     self.checkarray(array([0,1,2]),array(list(mapping)),"diag(vector)")
     
+  def test_vecMX(self):
+    self.message("vec MXFunction")
+    q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
+
+    X = MX("X",4,5)
+
+    F = MXFunction([X],[X**2])
+    F.init()
+    F.input(0).set(q)
+    F.evaluate()
+    F_ = vec(F.output(0))
+
+    G = vec(F)
+    G.input(0).set(vec(q))
+    G.evaluate()
+    G_ = G.output()
+
+    self.checkarray(F_,G_,"vec MX")
+    
+  def test_vecSX(self):
+    self.message("vec SXFunction")
+    q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
+
+    X = ssym("X",4,5)
+
+    F = SXFunction([X],[X**2])
+    F.init()
+    F.input(0).set(q)
+    F.evaluate()
+    F_ = vec(F.output(0))
+
+    G = vec(F)
+    G.input(0).set(vec(q))
+    G.evaluate()
+    G_ = G.output()
+
+    self.checkarray(F_,G_,"vec SX")
       
 if __name__ == '__main__':
     unittest.main()

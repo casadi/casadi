@@ -131,6 +131,12 @@ public:
   /** \brief get function output */
   const SXMatrix& outputSX(int ind=0) const;
   
+  /** \brief get function inputs */
+  const std::vector<SXMatrix>& inputsSX() const;
+  
+  /** \brief get function outputs */
+  const std::vector<SXMatrix> & outputsSX() const;
+  
   /** \brief Generate C code for the function */
   void generateCode(const std::string& filename);
   
