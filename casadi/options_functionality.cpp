@@ -97,6 +97,8 @@ double OptionsFunctionalityNode::getBestMatches(const std::string & word, const 
       suggestions.push_back(candidates[i].first);
     }
   }
+  
+  return -1; // No score metric yet
 }
 
 double OptionsFunctionalityNode::getBestMatches(const std::string &name, std::vector<std::string> &suggestions, int amount) const {
