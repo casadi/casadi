@@ -13,6 +13,8 @@ ddq = ssym("[ddx,ddy,ddu,ddv]",4)
 
 [m,g,L] = ssym("[m,g,L]",3)
 
+length = L
+gravity=g
 T = 0.5*m*mul(dx.T,dx)     # Kinetic    energy
 V = m*g*x[1]               # Potential  energy
 C = 0.5*(mul(x.T,x)-L**2)  # Constraint energy
@@ -130,25 +132,28 @@ print "We are screwed"
 
 print "Check that there's no second derivatives left: ", jacobian(sys,ddq).size()==0
 
-dae = SXFunction({'NUM': DAE_NUM_IN, DAE_Y: vertcat([q,lambd]), DAE_YDOT: vertcat([dq,SX("dlambda")]), DAE_P: vertcat([L,m])},[sys])
+dae = SXFunction({'NUM': DAE_NUM_IN, DAE_Y: vertcat([q,lambd]), DAE_YDOT: vertcat([dq,SX("dlambda")]), DAE_P: vertcat([length,m,gravity])},[sys])
 dae.init()
 
-p_ = [5,1]
-x_ = [1,2,0,0]
-dx_ = [0,0,0,0]
+p_ = [5,1,10]
+x_ = [1,2,0,0,0]
+dx_ = [0,0,0,0,0]
+
+J = SXFunction
 
 dae.input(DAE_Y).set(x_)
-dae.input(DAE_YDOT).set(p_)
-dae.input(DAE_P).set(dx_)
+dae.input(DAE_YDOT).set(dx_)
+dae.input(DAE_P).set(p_)
+
 dae.evaluate()
 print "res @ inital consitions: ", dae.output()
 
-integr = IdasIntegrator(f)
+integr = IdasIntegrator(dae)
+#integr.setOption('is_differential',[1]*4 + [0])
 integr.init()
 integr.input(INTEGRATOR_X0).set(x_)
 integr.input(INTEGRATOR_P).set(p_)
 integr.input(INTEGRATOR_XP0).set(dx_)
-
 integr.evaluate()
 
 print integr.output()
