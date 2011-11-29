@@ -50,7 +50,7 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("pretype",                     OT_STRING, "none","","none|left|right|both");
   addOption("exact_jacobian",              OT_BOOLEAN,  false);
   addOption("max_krylov",                  OT_INTEGER,  10);        // maximum krylov subspace size
-  addOption("is_differential",             OT_INTEGERVECTOR);
+  addOption("is_differential",             OT_INTEGERVECTOR, GenericType(), "A vector with a boolean describing the nature for each state.");
   addOption("sensitivity_method",          OT_STRING,  "simultaneous","","simultaneous|staggered");
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver

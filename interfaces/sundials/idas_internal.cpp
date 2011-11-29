@@ -1017,8 +1017,20 @@ void IdasInternal::idas_error(const string& module, int flag){
   const char* flagname = IDAGetReturnFlagName(flag);
   stringstream ss;
   ss << "Module \"" << module << "\" returned flag " << flag << " (\"" << flagname << "\").";
-  ss << " Consult Idas documentation.";
+  ss << " Consult Idas documentation." << std::endl;
   delete flagname;
+  
+  // Heuristics
+  if (
+    (module=="IDACalcIC" && (flag==IDA_CONV_FAIL || flag==IDA_NO_RECOVERY)) ||
+    (module=="IDASolve" && flag ==IDA_ERR_FAIL )
+    ) {
+    ss << "Some common causes for this error: " << std::endl;
+    ss << "  - forgetting to set the 'is_differential' option. " << std::endl;
+    ss << "  - providing an initial guess for which 0=g(y,z,t) is not invertible wrt y. " << std::endl;
+    ss << "  - having a DAE-index higher than 1 such that 0=g(y,z,t) is not invertible wrt y over the whole domain." << std::endl;
+  }
+  
   casadi_error(ss.str());
 }
 

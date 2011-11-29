@@ -73,7 +73,7 @@ I.input(INTEGRATOR_P).set(P_)
 I.input(INTEGRATOR_X0).set(Y_)
 I.input(INTEGRATOR_XP0).set(YDOT_)
 #! This system is not solvable with idas, because it is of DAE-index 3.
-#! It is impossible to lambda from the last element of the residual.
+#! It is impossible obtain lambda from the last element of the residual.
 
 try:
   I.evaluate()

@@ -70,6 +70,15 @@ public:
   IdasIntegrator();
   
   /// Create an integrator for a fully implicit DAE with quadrature states (nz is the number of states not to be included in the state vector)
+  
+    
+  /** \brief  Create an integrator for a fully implicit DAE with quadrature states 
+  * (nz is the number of states not to be included in the state vector)
+  *   \param f dynamical system
+  * \copydoc scheme_DAEInput
+  * \copydoc scheme_DAEOutput
+  *
+  */
   explicit IdasIntegrator(const FX& f, const FX& q=FX());
 
   /// Access functions of the node
