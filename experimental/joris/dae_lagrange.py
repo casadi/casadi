@@ -127,3 +127,29 @@ print sys
 
 print "But wait, there's too much symbols in there. This is not a closed system!"
 print "We are screwed"
+
+print "Check that there's no second derivatives left: ", jacobian(sys,ddq).size()==0
+
+dae = SXFunction({'NUM': DAE_NUM_IN, DAE_Y: vertcat([q,lambd]), DAE_YDOT: vertcat([dq,SX("dlambda")]), DAE_P: vertcat([L,m])},[sys])
+dae.init()
+
+p_ = [5,1]
+x_ = [1,2,0,0]
+dx_ = [0,0,0,0]
+
+dae.input(DAE_Y).set(x_)
+dae.input(DAE_YDOT).set(p_)
+dae.input(DAE_P).set(dx_)
+dae.evaluate()
+print "res @ inital consitions: ", dae.output()
+
+integr = IdasIntegrator(f)
+integr.init()
+integr.input(INTEGRATOR_X0).set(x_)
+integr.input(INTEGRATOR_P).set(p_)
+integr.input(INTEGRATOR_XP0).set(dx_)
+
+integr.evaluate()
+
+print integr.output()
+
