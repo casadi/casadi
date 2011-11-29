@@ -92,6 +92,10 @@ MX horzcat(const MX& a, const MX& b){
 }
 
 MX veccat(const vector<MX>& comp) {
+  return vertcat(applymap(vec,comp));
+}
+
+MX vecNZcat(const vector<MX>& comp) {
   return vertcat(applymap(vecNZ,comp));
 }
 

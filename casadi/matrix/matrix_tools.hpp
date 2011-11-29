@@ -98,11 +98,29 @@ template<class T>
 T trace(const Matrix<T>& a);
 
 /** \brief  make a vector
-  Reshapes/flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
+  Reshapes/flattens/vectorizes the Matrix<T> such that the shape becomes (expr.numel(),1).
   Columns are stacked on top of each other.
+  
+    a b
+    c d 
+    
+    turns into
+    
+    a
+    c
+    b
+    d
+    
  */
 template<class T>
 Matrix<T> vec(const Matrix<T>& a);
+
+/** \brief Returns a flattened version of the Matrix, preserving only nonzeros
+ */
+template<class T>
+Matrix<T> vecNZ(const Matrix<T>& a);
+
+
 
 template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v);
@@ -116,6 +134,28 @@ Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y);
 
 template<class T>
 Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y);
+#endif // SWIG
+
+template<class T>
+/** \brief  concatenate vertically while vectorizing all arguments with vec */
+Matrix<T> veccat(const std::vector< Matrix<T> >& comp);
+
+template<class T>
+/** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
+Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp);
+
+#ifndef SWIG
+/**
+Apply a function f to each element in a vector
+*/
+template<class T>
+std::vector< Matrix<T> > applymap(Matrix<T> (*f)(const Matrix<T>& ),const std::vector< Matrix<T> >&);
+
+/**
+Apply a function f to each element in a vector
+*/
+template<class T>
+void applymap(void (*f)(Matrix<T>&), std::vector< Matrix<T> >&);
 #endif // SWIG
 
 /** \brief Inner product of two vectors
@@ -487,6 +527,11 @@ Matrix<T> vec(const Matrix<T>& a){
 }
 
 template<class T>
+Matrix<T> vecNZ(const Matrix<T>& a){
+  return Matrix<T>(vec(a).data());
+}
+
+template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v){
   Matrix<T> ret;
   for(int i=0; i<v.size(); ++i)
@@ -513,6 +558,35 @@ template<class T>
 Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
   return trans(vertcat(trans(x),trans(y)));
 }
+
+template<class T>
+Matrix<T> veccat(const std::vector< Matrix<T> >& comp) {
+  return vertcat(applymap(vec,comp));
+}
+
+template<class T>
+Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
+  return vertcat(applymap(vecNZ,comp));
+}
+
+#ifndef SWIG
+template<class T>
+std::vector< Matrix<T> > applymap(Matrix<T> (*f)(const Matrix<T>&) ,const std::vector< Matrix<T> >& comp) {
+  std::vector< Matrix<T> > ret(comp.size());
+  for (int k=0;k<comp.size();k++) {
+    ret[k] = f(comp[k]);
+  }
+  return ret;
+}
+
+template<class T>
+void applymap(void (*f)(Matrix<T> &), std::vector< Matrix<T> >& comp) {
+  for (int k=0;k<comp.size();k++) {
+    f(comp[k]);
+  }
+}
+#endif //SWIG
+
 
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
@@ -1060,7 +1134,8 @@ MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
 MTT_INST(T,polyval) \
 MTT_INST(T,addMultiple) \
-
+MTT_INST(T,veccat) \
+MTT_INST(T,vecNZcat) \
 
 #endif //SWIG
 

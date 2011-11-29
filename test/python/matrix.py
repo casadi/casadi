@@ -56,6 +56,63 @@ class Matrixtests(casadiTestCase):
 
     print "A = ", NP.dot(A.T,A)
     
+  def test_vertcat(self):
+    self.message("vertcat")
+    A = DMatrix(2,3,1)
+    B = DMatrix(4,3)
+    C = vertcat([A,B])
+    
+    self.checkarray(C.shape,(6,3),"vertcat shape")
+    self.assertEqual(C.size(),A.size(),"vertcat size")
+    
+    self.assertRaises(RuntimeError,lambda : horzcat([A,B]))
+    
+  def test_horzcat(self):
+    self.message("horcat")
+    A = DMatrix(3,2,1)
+    B = DMatrix(3,4)
+    C = horzcat([A,B])
+    
+    self.checkarray(C.shape,(3,6),"horzcat shape")
+    self.assertEqual(C.size(),A.size(),"vertcat size")
+    
+    self.assertRaises(RuntimeError,lambda : vertcat([A,B]))
+    
+    
+  def test_veccat(self):
+    self.message("vecccat")
+    A = DMatrix(2,3)
+    A[0,1] = 2
+    A[1,0] = 1
+    A[1,2] = 3
+    B = DMatrix(3,1)
+    B[0,0] = 4
+    B[1,0] = 5
+    B[2,0] = 6
+    C = veccat([A,B])
+    
+    self.checkarray(C.shape,(9,1),"veccat shape")
+    self.assertEqual(C.size(),A.size()+B.size(),"veccat size")
+    
+    self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+    
+  def test_vecNZcat(self):
+    self.message("vecNZcat")
+    A = DMatrix(2,3)
+    A[0,1] = 2
+    A[1,0] = 1
+    A[1,2] = 3
+    B = DMatrix(3,1)
+    B[0,0] = 4
+    B[1,0] = 5
+    B[2,0] = 6
+    C = vecNZcat([A,B])
+    
+    self.checkarray(C.shape,(6,1),"vecNZcat shape")
+    self.assertEqual(C.size(),A.size()+B.size(),"vecNZcat size")
+    
+    self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+    
 if __name__ == '__main__':
     unittest.main()
 

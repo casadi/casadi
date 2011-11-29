@@ -33,8 +33,11 @@ MX vertcat(const std::vector<MX>& comp);
 /** \brief  concatenate horizontally */
 MX horzcat(const std::vector<MX>& comp);
 
-/** \brief  concatenate vertically while vectorizing all arguments with getNZ */
+/** \brief  concatenate vertically while vectorizing all arguments with vec */
 MX veccat(const std::vector<MX>& comp);
+
+/** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
+MX vecNZcat(const std::vector<MX>& comp);
 
 #ifndef SWIG
 /** \brief  concatenate vertically, two matrices */
@@ -121,6 +124,17 @@ MX reshape(const MX &x, const CRSSparsity& sp);
 /** \brief Returns a flattened version of the MX
     Flattening is a cheap (non-copying) operation
     Same as reshape(x, x.numel(),1)
+    
+    a b
+    c d 
+    
+    turns into
+    
+    a
+    c
+    b
+    d
+    
 */
 MX vec(const MX &x);
 
