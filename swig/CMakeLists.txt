@@ -93,9 +93,11 @@ endif(GSL_FOUND)
 endif(WITH_GSL)
 
 if(WITH_OOQP)
-find_package (OOQP REQUIRED QUIET)
+find_package (OOQP QUIET)
+if(OOQP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OOQP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ooqp_interface ${OOQP_LIBRARIES})
+endif(OOQP_FOUND)
 endif(WITH_OOQP)
 
 # enabling openmp support if requesed
