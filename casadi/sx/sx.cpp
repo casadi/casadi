@@ -153,9 +153,17 @@ SX SX::add(const SX& y) const{
     return sub(-y);
   else if(isBinary() && getOp()==NEG) // (-x) + y -> y - x
     return y.sub(getDep());
-  else if((*this).isEqual(y) && isBinary() && getOp()==MUL && getDep(0).isConstant() && getDep(0).getValue()==0.5) // 0.5x+0.5x = x
+  else if(isBinary() && getOp()==MUL && 
+          y.isBinary() && y.getOp()==MUL && 
+          getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
+          y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
+          y.getDep(1).isEqual(getDep(1))) // 0.5x+0.5x = x
     return getDep(1);
-  else if((*this).isEqual(y) && isBinary() && getOp()==DIV && getDep(1).isConstant() && getDep(1).getValue()==2) // x/2+x/2 = x
+  else if(isBinary() && getOp()==DIV && 
+          y.isBinary() && y.getOp()==DIV && 
+          getDep(1).isConstant() && getDep(1).getValue()==2 && 
+          y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
+          y.getDep(0).isEqual(getDep(0))) // x/2+x/2 = x
     return getDep(0);
     
   else // create a new branch

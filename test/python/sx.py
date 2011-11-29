@@ -826,6 +826,9 @@ class SXtests(casadiTestCase):
     ops.append(lambda x: 1*x)
     ops.append(lambda x: 1*(x*1))
     ops.append(lambda x: (1*x)*1)
+    ops.append(lambda x: (0.5*x)+(0.5*x))
+    ops.append(lambda x: (x/2)+(x/2))
+    ops.append(lambda x: (x*0.5)+(0.5*x))
     
     for op in ops:
       y = op(x)
