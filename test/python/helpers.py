@@ -52,7 +52,7 @@ class casadiTestCase(unittest.TestCase):
             continue
           if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
             continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],10,"In %s: %s evaluation error. %s <-> %s" % (name,failmessage, str(zt),str(zr)))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],10,"In %s: %s evaluation error.\n %s <->\n %s" % (name,failmessage, str(zt),str(zr)))
 
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.

@@ -205,6 +205,7 @@ class ADtests(casadiTestCase):
             for mode in ["forward","adjoint"]:
               self.message(" %s Jacobian on SX. Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+              #f.setOption("verbose",True)
               f.init()
               Jf=Jacobian(f,0,0)
               Jf.setOption("ad_mode",mode)
@@ -219,17 +220,61 @@ class ADtests(casadiTestCase):
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense"]:
-          for outputtype in ["dense"]:
+          for outputtype in ["dense","sparse"]:
             self.message("jacobian on SX (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+            #f.setOption("verbose",True)
             f.init()
             Jf=f.jacobian(0,0)
             Jf.init()
             Jf.input().set(n)
             Jf.evaluate()
             J = self.jacobians[inputtype][outputtype](*n)
-            self.checkarray(array(Jf.output()),J,"Jacobian")
+            self.checkarray(array(Jf.output()),J,"Jacobian.\n Input: %s %s\n Output: %s %s\n"% (inputshape, inputtype, outputshape, outputtype))
+
+              
+  def test_jacobianSX(self):
+    return
+    n=array([1.2,2.3,7,4.6])
+    for inputshape in ["column","row","matrix"]:
+      for outputshape in ["column","row","matrix"]:
+        for inputtype in ["dense","sparse"]:
+          for outputtype in ["dense","sparse"]:
+            self.message("jacobian on SX (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            Jf=SXFunction(
+              self.sxinputs[inputshape][inputtype],
+              [
+                  jacobian(
+                    SXMatrix(self.sxoutputs[outputshape][outputtype][0]),
+                    SXMatrix(self.sxinputs[inputshape][inputtype][0])
+                  )
+              ]
+            )
+            Jf.init()
+            Jf.input().set(n)
+            Jf.evaluate()
+            J = self.jacobians[inputtype][outputtype](*n)
+            self.checkarray(array(Jf.output()),J,"jacobian")
             
+  def test_jacSX(self):
+    n=array([1.2,2.3,7,4.6])
+    for inputshape in ["column","row","matrix"]:
+      for outputshape in ["column","row","matrix"]:
+        for inputtype in ["dense"]:
+          for outputtype in ["dense","sparse"]:
+            for mode in ["forward","reverse"]:
+              self.message(" %s jacobian on SX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
+              f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+              #f.setOption("verbose",True)
+              #f.setOption("ad_mode",mode)
+              f.init()
+              Jf=SXFunction(self.sxinputs[inputshape][inputtype],[f.jac(0)])
+              Jf.init()
+              Jf.input().set(n)
+              Jf.evaluate()
+              J = self.jacobians[inputtype][outputtype](*n)
+              self.checkarray(array(Jf.output()),J,"jac")
+              
   def test_jacsparsity(self):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
@@ -269,6 +314,7 @@ class ADtests(casadiTestCase):
             for mode in ["forward","adjoint"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+              #f.setOption("verbose",True)
               f.init()
               Jf=MXFunction(self.mxinputs[inputshape][inputtype],[f.jac(0)[0]])
               Jf.init()
@@ -286,8 +332,10 @@ class ADtests(casadiTestCase):
             for mode in ["forward","adjoint"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+              #f.setOption("verbose",True)
               f.init()
               Jf=f.jacobian(0,0)
+              #Jf.setOption("verbose",True)
               Jf.init()
               Jf.input().set(n)
               Jf.evaluate()
@@ -303,6 +351,7 @@ class ADtests(casadiTestCase):
             for mode in ["forward","adjoint"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+              #f.setOption("verbose",True)
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
