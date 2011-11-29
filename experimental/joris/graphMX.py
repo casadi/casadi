@@ -52,7 +52,7 @@ dotsave(z,filename='MX4.pdf')
 
 x = MX("x",4,1)
 
-z = norm_2(x)
+#z = norm_2(x)
 
 dotsave(z,filename='MX5.pdf')
 
