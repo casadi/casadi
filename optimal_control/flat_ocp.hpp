@@ -36,9 +36,9 @@ class FlatOCPInternal;
  <H3>Variables:  </H3>
   \verbatim
    t :     time
-   x :     implicitly defined states (differential or algebraic)
-   xd:     differential states
-   xa:     algebraic states
+   x :     differential and algebraic states defined by a fully-implicit DAE
+   xd:     differential states defined by an explicit ODE
+   xa:     algebraic states defined by an algebraic equation
    q :     quadrature states
    y :     dependent variables
    p :     independent parameters
@@ -48,16 +48,20 @@ class FlatOCPInternal;
   <H3>Equations:  </H3>
   \verbatim
   fully implicit DAE:       0 = dae(t,x,\dot{x},xd,xa,u,p)
-  explicit OD:       \dot{xd} = ode(t,x,xd,xa,u,p)
+  explicit ODE:      \dot{xd} = ode(t,x,xd,xa,u,p)
   quadratures:        \dot{q} = quad(t,x,xd,xa,u,p)
   algebraic equations:      0 = alg(t,x,xd,xa,u,p)
   dependent equations:      y = dep(t,x,xd,xa,u,p)
   initial equations:        0 = initial(t,x,\dot{x},xd,xa,u,p)
   \endverbatim 
 
-  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "s" 
+  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "x" 
   and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
   reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
+ 
+  Also note that division of the states into three categories for states defined by a DAE, states
+  defined by an ODE and states defined by an algebraic equation. The category "xd" does thus _not_
+  include differential states that are implicitly defined by the DAE.
 
   The functions for reformulation is are provided as member functions to this class or as independent
   functions located in the header file "ocp_tools.hpp".
@@ -119,22 +123,22 @@ class FlatOCP : public OptionsFunctionality{
     /// Time
     SX t() const;
     
-    /// Implicitly defined states
+    /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
     std::vector<Variable>& x();
     
-    /// Differential states
+    /// Differential states defined by an explicit ODE (length == ode().size())
     std::vector<Variable>& xd();
     
-    /// Algebraic states
+    /// Algebraic states defined by an algebraic equation (length == alg().size())
     std::vector<Variable>& xa();
     
-    /// All states, differential and algebraic
+    /// All states, differential and algebraic (includes x, xd and xa)
     std::vector<Variable> x_all() const;
     
-    /// Quadrature states
+    /// Quadrature states (length == quad().size())
     std::vector<Variable>& q();
     
-    /// Dependent variables
+    /// Dependent variables (length == dep().size())
     std::vector<Variable>& y();
     
     /// Independent parameters
@@ -148,13 +152,13 @@ class FlatOCP : public OptionsFunctionality{
     *  Get all equations of a particular type 
     */
     //@{
-    /// Fully implicit DAE (length == s().size())
+    /// Fully implicit DAE (length == x().size())
     std::vector<SX>& dae();
     
-    /// Explicit ODE  (length == x().size())
+    /// Explicit ODE  (length == xd().size())
     std::vector<SX>& ode();
     
-    /// Algebraic equations (length == z().size())
+    /// Algebraic equations (length == xa().size())
     std::vector<SX>& alg();
     
     /// Quadrature states (length == q().size())

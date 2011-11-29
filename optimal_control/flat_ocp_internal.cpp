@@ -44,13 +44,13 @@ namespace OptimalControl{
 
 FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filename){
   addOption("scale_variables",          OT_BOOLEAN,      false, "Scale the variables so that they get unity order of magnitude");
-  addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be expressed as an expression of other variables");
-  addOption("scale_equations",          OT_BOOLEAN,      false,  "Scale the implicit equations so that they get unity order of magnitude");
+  addOption("eliminate_dependent",      OT_BOOLEAN,      true,  "Eliminate variables that can be written as an explicit expression of other variables");
+  addOption("scale_equations",          OT_BOOLEAN,      false, "Scale the implicit equations so that they get unity order of magnitude");
   addOption("sort_equations",           OT_BOOLEAN,      true,  "Sort the dynamic equations");
   addOption("make_explicit",            OT_BOOLEAN,      false, "Make the DAE semi-explicit");
   addOption("eliminate_algebraic",      OT_BOOLEAN,      false, "Completely eliminate algebraic states");
   addOption("verbose",                  OT_BOOLEAN,      true,  "Verbose parsing");
-  addOption("eliminate_dependents_with_bounds",  OT_BOOLEAN,      true,  "Verbose parsing");
+  addOption("eliminate_dependents_with_bounds",  OT_BOOLEAN,      true,  "Eliminate dependent variables even if they have bounds that may become active (this may result in extra path constraints)");
   
   TiXmlDocument doc;
   bool flag = doc.LoadFile(filename.data());
