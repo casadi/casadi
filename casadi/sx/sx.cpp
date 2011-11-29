@@ -143,6 +143,8 @@ SX SX::sign() const{
 
 
 SX SX::add(const SX& y) const{
+  // Only simplifications that do not result in extra nodes area allowed
+    
   if(node->isZero())
     return y;
   else if(y->isZero()) // term2 is zero
@@ -151,11 +153,18 @@ SX SX::add(const SX& y) const{
     return sub(-y);
   else if(isBinary() && getOp()==NEG) // (-x) + y -> y - x
     return y.sub(getDep());
+  else if((*this).isEqual(y) && isBinary() && getOp()==MUL && getDep(0).isConstant() && getDep(0).getValue()==0.5) // 0.5x+0.5x = x
+    return getDep(1);
+  else if((*this).isEqual(y) && isBinary() && getOp()==DIV && getDep(1).isConstant() && getDep(1).getValue()==2) // x/2+x/2 = x
+    return getDep(0);
+    
   else // create a new branch
     return SX::create(new BinarySXNode(ADD, *this, y));
 }
 
 SX SX::sub(const SX& y) const{
+  // Only simplifications that do not result in extra nodes area allowed
+    
   if(y->isZero()) // term2 is zero
     return *this;
   if(node->isZero()) // term1 is zero
@@ -169,7 +178,10 @@ SX SX::sub(const SX& y) const{
 }
 
 SX SX::mul(const SX& y) const{
-  if(node->isZero() || y->isZero()) // one of the terms is zero
+  // Only simplifications that do not result in extra nodes area allowed
+  if(!isConstant() && y.isConstant())
+    return y.mul((*this));
+  else if(node->isZero() || y->isZero()) // one of the terms is zero
     return 0;
   else if(node->isOne()) // term1 is one
     return y;
@@ -183,6 +195,14 @@ SX SX::mul(const SX& y) const{
     return (*this)/y.inv();
   else if(isBinary() && getOp()==INV)
     return y/inv();
+  else if(isConstant() && y.isBinary() && y.getOp()==MUL && y.getDep(0).isConstant() && getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
+    return y.getDep(1);
+  else if(isConstant() && y.isBinary() && y.getOp()==DIV && y.getDep(1).isConstant() && getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
+    return y.getDep(0);
+  else if(isBinary() && getOp()==DIV && getDep(1).isEqual(y)) // ((2/x)*x)
+    return getDep(0);
+  else if(y.isBinary() && y.getOp()==DIV && y.getDep(1).isEqual((*this))) // ((2/x)*x)
+    return y.getDep(0);
   else     // create a new branch
     return SX::create(new BinarySXNode(MUL,*this,y));
 }
@@ -196,6 +216,8 @@ bool SX::isSquared() const{
 }
 
 SX SX::div(const SX& y) const{
+  // Only simplifications that do not result in extra nodes area allowed
+
   if(y->isZero()) // term2 is zero
     return casadi_limits<SX>::nan;
   else if(node->isZero()) // term1 is zero
@@ -216,6 +238,10 @@ SX SX::div(const SX& y) const{
     return (*this)*y.inv();
   else if(isDoubled() && y.isDoubled())
     return node->dep(0) / y->dep(0);
+  else if(y.isConstant() && isBinary() && getOp()==DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
+    return getDep(0);
+  else if(y.isBinary() && y.getOp()==MUL && y.getDep(1).isEqual((*this))) // x/(2*x) = 1/2
+    return SX::create(new BinarySXNode(DIV,1,y.getDep(0)));
   else // create a new branch
     return SX::create(new BinarySXNode(DIV,*this,y));
 }
