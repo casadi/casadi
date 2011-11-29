@@ -98,6 +98,14 @@ find_package (OOQP REQUIRED QUIET)
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ooqp_interface ${OOQP_LIBRARIES})
 endif(WITH_OOQP)
 
+# enabling openmp support if requesed
+if(WITH_OPENMP)
+find_package (OpenMP)
+if(OPENMP_FOUND)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OPENMP")
+endif(OPENMP_FOUND)
+endif(WITH_OPENMP)
+
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DOXDOC")
 endif()
