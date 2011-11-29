@@ -784,6 +784,13 @@ class SXtests(casadiTestCase):
     
     SX.getMaxNumCallsInPrint()
     
+  def test_isEquivalent(self):
+    self.message("equivalent")
+    x = SX("x")
+    a = x*x
+    b = x*x
+    self.assertTrue(a.isEquivalent(b))
+    
   def test_SXsimplifications(self):
     self.message("simplifications")
     x = SX("x")
@@ -806,7 +813,33 @@ class SXtests(casadiTestCase):
       return y+y
       
     ops.append(temp)
-
+    
+      
+    def temp(x):
+      y = x*x
+      return ((-y)/y)*(-x)
+      
+    ops.append(temp)
+    
+    ops.append(lambda x: ((-(x*x))/(x*x))*(-x))
+    
+    #ops.append(lambda x: ((-x*x)/(x*x))*(-x))
+    
+    def temp(x):
+      y = x*x
+      return (y/(-y))*(-x)
+      
+    ops.append(temp)
+    
+    def temp(x):
+      y = x*x
+      return ((-y)/(-y))*(x)
+      
+    ops.append(temp)
+    ops.append(lambda x: (x-x) + x)
+    ops.append(lambda x: ((x*x)-(x*x)) + x)
+    ops.append(lambda x: 5*(0.2*x))
+    ops.append(lambda x: 5*(x*0.2))
     ops.append(lambda x: 5*(0.2*x))
     ops.append(lambda x: 5*(x*0.2))
     ops.append(lambda x: (0.2*x)*5)
@@ -829,7 +862,15 @@ class SXtests(casadiTestCase):
     ops.append(lambda x: (0.5*x)+(0.5*x))
     ops.append(lambda x: (x/2)+(x/2))
     ops.append(lambda x: (x*0.5)+(0.5*x))
+    ops.append(lambda x: (SX(4)-SX(4))+x)
     
+    
+    y = SX("x")
+    
+    ops.append(lambda x: ((x+y)-(y+x))+x)
+    ops.append(lambda x: ((x*y)-(y*x))+x)
+    ops.append(lambda x: ((-x)-(-x))+x)
+
     for op in ops:
       y = op(x)
       f = SXFunction([x],[y])

@@ -189,6 +189,15 @@ class SX{
     
     /** \brief Get the number of dependencies of a binary SX */
     int getNdeps() const;
+    
+    /** \bief Check if two nodes are equivalent up to a given depth 
+    *  a = x*x
+    *  b = x*x
+    *
+    *  a.isEqual(b)  will return false, but a.isEquivalent(b) will return true
+    */
+    bool isEquivalent(const SX&y, int depth=1) const;
+
 
     /** \brief Returns a number that is unique for a given SXNode. 
     * If the SX does not point to any node, 0 is returned.

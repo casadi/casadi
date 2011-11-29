@@ -157,13 +157,13 @@ SX SX::add(const SX& y) const{
           y.isBinary() && y.getOp()==MUL && 
           getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
           y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
-          y.getDep(1).isEqual(getDep(1))) // 0.5x+0.5x = x
+          y.getDep(1).isEquivalent(getDep(1))) // 0.5x+0.5x = x
     return getDep(1);
   else if(isBinary() && getOp()==DIV && 
           y.isBinary() && y.getOp()==DIV && 
           getDep(1).isConstant() && getDep(1).getValue()==2 && 
           y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
-          y.getDep(0).isEqual(getDep(0))) // x/2+x/2 = x
+          y.getDep(0).isEquivalent(getDep(0))) // x/2+x/2 = x
     return getDep(0);
     
   else // create a new branch
@@ -177,7 +177,7 @@ SX SX::sub(const SX& y) const{
     return *this;
   if(node->isZero()) // term1 is zero
     return -y;
-  if(node->isEqual(y)) // the terms are equal
+  if(isEquivalent(y)) // the terms are equal
     return 0;
   else if(y.isBinary() && y.getOp()==NEG) // x - (-y) -> x + y
     return add(-y);
@@ -207,20 +207,32 @@ SX SX::mul(const SX& y) const{
     return y.getDep(1);
   else if(isConstant() && y.isBinary() && y.getOp()==DIV && y.getDep(1).isConstant() && getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
     return y.getDep(0);
-  else if(isBinary() && getOp()==DIV && getDep(1).isEqual(y)) // ((2/x)*x)
+  else if(isBinary() && getOp()==DIV && getDep(1).isEquivalent(y)) // ((2/x)*x)
     return getDep(0);
-  else if(y.isBinary() && y.getOp()==DIV && y.getDep(1).isEqual((*this))) // ((2/x)*x)
+  else if(y.isBinary() && y.getOp()==DIV && y.getDep(1).isEquivalent((*this))) // ((2/x)*x)
     return y.getDep(0);
   else     // create a new branch
     return SX::create(new BinarySXNode(MUL,*this,y));
 }
 
 bool SX::isDoubled() const{
-  return isOp(ADD) && node->dep(0).isEqual(node->dep(1));
+  return isOp(ADD) && node->dep(0).isEquivalent(node->dep(1));
 }
     
 bool SX::isSquared() const{
-  return isOp(MUL) && node->dep(0).isEqual(node->dep(1));
+  return isOp(MUL) && node->dep(0).isEquivalent(node->dep(1));
+}
+
+bool SX::isEquivalent(const SX&y, int depth) const{
+  if (isEqual(y)) return true;
+  if (isConstant() && y.isConstant() && y.getValue()==getValue());
+  if (depth==0) return false;
+  
+  if (isBinary() && y.isBinary() && getOp()==y.getOp()) {
+    if (getDep(0).isEquivalent(y.getDep(0),depth-1)  && getDep(1).isEquivalent(y.getDep(1),depth-1)) return true;
+    return (casadi_math<SX>::isCommutative(getOp()) && getDep(0).isEquivalent(y.getDep(1),depth-1)  && getDep(1).isEquivalent(y.getDep(0),depth-1));
+  }
+  return false;
 }
 
 SX SX::div(const SX& y) const{
@@ -232,13 +244,13 @@ SX SX::div(const SX& y) const{
     return 0;
   else if(y->isOne()) // term2 is one
     return *this;
-  else if(node->isEqual(y)) // terms are equal
+  else if(isEquivalent(y)) // terms are equal
     return 1;
   else if(isDoubled() && y.isEqual(2))
     return node->dep(0);
-  else if(isOp(MUL) && y.isEqual(node->dep(0)))
+  else if(isOp(MUL) && y.isEquivalent(node->dep(0)))
     return node->dep(1);
-  else if(isOp(MUL) && y.isEqual(node->dep(1)))
+  else if(isOp(MUL) && y.isEquivalent(node->dep(1)))
     return node->dep(0);
   else if(node->isOne())
     return y.inv();
@@ -248,8 +260,14 @@ SX SX::div(const SX& y) const{
     return node->dep(0) / y->dep(0);
   else if(y.isConstant() && isBinary() && getOp()==DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
     return getDep(0);
-  else if(y.isBinary() && y.getOp()==MUL && y.getDep(1).isEqual((*this))) // x/(2*x) = 1/2
+  else if(y.isBinary() && y.getOp()==MUL && y.getDep(1).isEquivalent((*this))) // x/(2*x) = 1/2
     return SX::create(new BinarySXNode(DIV,1,y.getDep(0)));
+  else if(isBinary() && getOp()==NEG && getDep(0).isEquivalent(y))      // (-x)/x = -1
+    return -1;
+  else if(y.isBinary() && y.getOp()==NEG && y.getDep(0).isEquivalent(*this))      // x/(-x) = 1
+    return -1;
+  else if(y.isBinary() && y.getOp()==NEG && isBinary() && getOp()==NEG && getDep(0).isEquivalent(y.getDep(0)))      // (-x)/(-x) = 1
+    return 1;
   else // create a new branch
     return SX::create(new BinarySXNode(DIV,*this,y));
 }
