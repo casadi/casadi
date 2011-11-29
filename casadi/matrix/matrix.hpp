@@ -1514,13 +1514,13 @@ void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
   if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
     casadi_assert_message(len==size(),
           "Matrix<T>::getArray: Dimension mismatch." << std::endl <<
-          "I am a matrix of shape " << size1() << " x " << size2() << " = " << numel() << " ready to fill something up with " << size() << " non-zero elements, " << std::endl <<
+          "I am a matrix of shape " << size1() << " x " << size2() << " = " << numel() << " ready to fill something up with " << size() << " non-zero elements," << std::endl <<
           "but you supplied something with " << len << " non-zero elements."); 
     copy(v.begin(),v.end(),val);
   } else if(sp==DENSE){
     casadi_assert_message(len==numel(),
         "Matrix<T>::getArray: Dimension mismatch." << std::endl <<
-        "I am a dense matrix of shape " << size1() << " x " << size2() << " ready to fill something up with " << numel() << " elements, " << std::endl <<
+        "I am a dense matrix of shape " << size1() << " x " << size2() << " ready to fill something up with " << numel() << " elements," << std::endl <<
         "but you supplied something with " << len << " elements."); 
     int k=0; // index of the result
     for(int i=0; i<size1(); ++i) // loop over rows
@@ -1584,13 +1584,13 @@ void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
   if(sp==SPARSE || (sp==DENSE && numel()==size())){
     casadi_assert_message(len==size(),
           "Matrix<T>::setArray: Dimension mismatch." << std::endl <<
-          "I am a matrix of shape " << size1() << " x " << size2() << " = " << numel() << " ready to be filled up with " << size() << " non-zero elements, " << std::endl <<
+          "I am a matrix of shape " << size1() << " x " << size2() << " = " << numel() << " ready to be filled up with " << size() << " non-zero elements," << std::endl <<
           "but you supplied something with " << len << " non-zero elements."); 
     copy(val,val+len,v.begin());
   } else if(sp==DENSE){
     casadi_assert_message(len==numel(),
           "Matrix<T>::setArray: Dimension mismatch." << std::endl <<
-          "I am a dense matrix of shape " << size1() << " x " << size2() << " ready to be filled up with " << numel() << " elements, " << std::endl <<
+          "I am a dense matrix of shape " << size1() << " x " << size2() << " ready to be filled up with " << numel() << " elements," << std::endl <<
           "but you supplied something with " << len << " elements."); 
     for(int i=0; i<size1(); ++i) // loop over rows
       for(int el=rowind(i); el<rowind(i+1); ++el){ // loop over the non-zero elements
