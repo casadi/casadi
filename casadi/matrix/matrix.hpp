@@ -585,13 +585,11 @@ class Matrix : public PrintableObject{
     static Matrix<T> sparse(const std::pair<int,int>& nm);
     //@}
 
-#ifdef WITH_ZEROS
     //@{
     /** \brief  create a dense matrix with all zeros */
     static Matrix<T> zeros(int nrow, int ncol=1);
     static Matrix<T> zeros(const std::pair<int,int>& nm);
     //@}
-#endif
 
     //@{
     /** \brief  create a matrix with all ones */
@@ -2062,7 +2060,6 @@ Matrix<T> Matrix<T>::sparse(int n, int m){
   return Matrix<T>(n,m);
 }
 
-#ifdef WITH_ZEROS
 template<class T>
 Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &nm){
   return zeros(nm.first,nm.second);
@@ -2072,7 +2069,6 @@ template<class T>
 Matrix<T> Matrix<T>::zeros(int n, int m){
   return Matrix<T>(n,m,0);
 }
-#endif
 
 template<class T>
 Matrix<T> Matrix<T>::ones(const std::pair<int,int> &nm){

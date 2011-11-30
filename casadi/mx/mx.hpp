@@ -327,13 +327,11 @@ class MX : public SharedObject{
   static MX sparse(const std::pair<int, int> &nm);
   //@}
   
-#ifdef WITH_ZEROS
   //@{
   /** \brief  Dense matrix of all zeros */
   static MX zeros(int nrow, int ncol=1); 
   static MX zeros(const std::pair<int, int> &nm);
   //@}
-#endif
 
   //@{
   /** \brief  Matrix of all ones */  

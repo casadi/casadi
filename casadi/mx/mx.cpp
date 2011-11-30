@@ -439,7 +439,6 @@ MX MX::sparse(const std::pair<int, int> &nm){
   return sparse(nm.first,nm.second);
 }
 
-#ifdef WITH_ZEROS
 MX MX::zeros(int nrow, int ncol){
   return MX(Matrix<double>::zeros(nrow,ncol));
 }
@@ -447,7 +446,6 @@ MX MX::zeros(int nrow, int ncol){
 MX MX::zeros(const std::pair<int, int> &nm){
   return zeros(nm.first,nm.second);
 }
-#endif
 
 MX MX::ones(int nrow, int ncol){
   return MX(Matrix<double>::ones(nrow,ncol));
