@@ -46,12 +46,12 @@
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X_INIT</td><td>Decision variables initial guess.</td></tr>
-<tr><td>NLP_LBX</td><td>Decision variables lower bound.</td></tr>
-<tr><td>NLP_UBX</td><td>Decision variables upper bound.</td></tr>
-<tr><td>NLP_LBG</td><td>Constraints lower bound.</td></tr>
-<tr><td>NLP_UBG</td><td>Constraints upper bound.</td></tr>
-<tr><td>NLP_LAMBDA_INIT</td><td>Lambda multipliers initial guess.</td></tr>
+<tr><td>NLP_X_INIT</td><td>Decision variables initial guess (n x 1)</td></tr>
+<tr><td>NLP_LBX</td><td>Decision variables lower bound (n x 1), default -inf.</td></tr>
+<tr><td>NLP_UBX</td><td>Decision variables upper bound (n x 1), default +inf.</td></tr>
+<tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf.</td></tr>
+<tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf.</td></tr>
+<tr><td>NLP_LAMBDA_INIT</td><td>Lambda multipliers initial guess (m x 1)</td></tr>
 <tr><td>NLP_P</td><td>Static parameters on which the objective and constraints might depend.</td></tr>
 </table>
 */
@@ -59,11 +59,11 @@
 <table>
 <caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution.</td></tr>
-<tr><td>NLP_COST</td><td>Objective/cost function for optimal solution.</td></tr>
-<tr><td>NLP_LAMBDA_OPT</td><td>Lambda multipliers function for optimal solution.</td></tr>
-<tr><td>NLP_LAMBDA_LBX</td><td>Lower bound multipliers for optimal solution When in warm start mode, this output will be used as input</td></tr>
-<tr><td>NLP_LAMBDA_UBX</td><td>Upper bound multipliers for optimal solution When in warm start mode, this output will be used as input</td></tr>
+<tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1)</td></tr>
+<tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1)</td></tr>
+<tr><td>NLP_LAMBDA_OPT</td><td>Lambda multipliers function for optimal solution (m x 1)</td></tr>
+<tr><td>NLP_LAMBDA_LBX</td><td>Lower bound multipliers for optimal solution (n x 1) When in warm start mode, this output will be used as input</td></tr>
+<tr><td>NLP_LAMBDA_UBX</td><td>Upper bound multipliers for optimal solution (n x 1) When in warm start mode, this output will be used as input</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput

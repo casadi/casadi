@@ -270,7 +270,7 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -1110,7 +1110,7 @@ thus x := [xd,xa]
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -1558,6 +1558,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getOption "
 
 get an option value ";
@@ -1569,6 +1573,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getCount "
 
@@ -1665,7 +1673,7 @@ Get the reference count. ";
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -2193,7 +2201,7 @@ Return a string with a destription (for SWIG) ";
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -2514,6 +2522,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::getOption "
 
 get an option value ";
@@ -2525,6 +2537,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::deepCopyMembers "
 
@@ -3052,7 +3068,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -3525,7 +3541,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -3828,6 +3844,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::CFunctionInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::getOption "
 
 get an option value ";
@@ -3839,6 +3859,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::CFunctionInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::deepCopyMembers "
 
@@ -4128,7 +4152,7 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -4978,7 +5002,7 @@ Return a string with a destription (for SWIG) ";
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -5446,6 +5470,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getOption "
 
 get an option value ";
@@ -5457,6 +5485,11 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getBestMatches
+"
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getCount "
 
@@ -5544,17 +5577,23 @@ print ";
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -5566,23 +5605,23 @@ print ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -5633,6 +5672,26 @@ print ";
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -5654,7 +5713,7 @@ print ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_cpl |              | CasADi::Cple |
@@ -5964,6 +6023,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::CplexInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::CplexInternal::getOption "
 
 get an option value ";
@@ -5975,6 +6038,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::CplexInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::CplexInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::CplexInternal::deepCopyMembers "
 
@@ -6037,17 +6104,23 @@ Carlo Savorgnan
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -6059,23 +6132,23 @@ Carlo Savorgnan
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -6126,6 +6199,26 @@ Carlo Savorgnan
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -6147,7 +6240,7 @@ Carlo Savorgnan
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_cpl |              | CasADi::Cple |
@@ -7235,7 +7328,7 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -7722,7 +7815,7 @@ Solves the linear system A.x = b for x
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -8055,6 +8148,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getOption "
 
 get an option value ";
@@ -8066,6 +8163,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::deepCopyMembers
 "
@@ -8343,8 +8444,11 @@ times t_i.
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (integrate|r | ADi::Sundial |
+|              |              |              | es|resB|resQ | s::CVodesInt |
+|              |              |              | B|reset)     | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -9169,8 +9273,11 @@ x0;
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (integrate|r | ADi::Sundial |
+|              |              |              | es|resB|resQ | s::CVodesInt |
+|              |              |              | B|reset)     | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -9601,6 +9708,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getOption "
 
 get an option value ";
@@ -9612,6 +9723,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getCount "
 
@@ -10123,7 +10238,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -10590,7 +10705,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -10896,6 +11011,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::getOption "
 
 get an option value ";
@@ -10907,6 +11026,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::deepCopyMembers "
 
@@ -10924,23 +11047,29 @@ A flat OCP representation coupled to an XML file.
 
 Variables:
 
-t :     time    x :     implicitly defined states (differential or
-algebraic)    xd:     differential states    xa:     algebraic states q :
-quadrature states    y :     dependent variables    p : independent
+t :     time    x :     differential and algebraic states defined by a
+fully-implicit DAE    xd:     differential states defined by an explicit ODE
+xa:     algebraic states defined by an algebraic equation    q :
+quadrature states    y :     dependent variables p :     independent
 parameters    u :     control signals
 
 Equations:
 
-fully implicit DAE:       0 = dae(t,x,\\\\dot{x},xd,xa,u,p) explicit OD:
+fully implicit DAE:       0 = dae(t,x,\\\\dot{x},xd,xa,u,p) explicit ODE:
 \\\\dot{xd} = ode(t,x,xd,xa,u,p)   quadratures: \\\\dot{q} =
 quad(t,x,xd,xa,u,p)   algebraic equations:      0 = alg(t,x,xd,xa,u,p)
 dependent equations:      y = dep(t,x,xd,xa,u,p) initial equations:        0
 = initial(t,x,\\\\dot{x},xd,xa,u,p)
 
 Note that when parsed, all dynamic states, differential and algebraic, end
-up in the category \"s\" and all dynamic equations end up in the implicit
+up in the category \"x\" and all dynamic equations end up in the implicit
 category \"dae\". At a later state, the DAE can be reformulated, for example
 in semi-explicit form, possibly in addition to a set of quadrature states.
+
+Also note that division of the states into three categories for states
+defined by a DAE, states defined by an ODE and states defined by an
+algebraic equation. The category \"xd\" does thus _not_ include differential
+states that are implicitly defined by the DAE.
 
 The functions for reformulation is are provided as member functions to this
 class or as independent functions located in the header file
@@ -10976,16 +11105,24 @@ Joel Andersson
 | eliminate_de | OT_BOOLEAN   | true         | Eliminate    | CasADi::Opti |
 | pendent      |              |              | variables    | malControl:: |
 |              |              |              | that can be  | FlatOCPInter |
-|              |              |              | expressed as | nal          |
-|              |              |              | an           |              |
+|              |              |              | written as   | nal          |
+|              |              |              | an explicit  |              |
 |              |              |              | expression   |              |
 |              |              |              | of other     |              |
 |              |              |              | variables    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eliminate_de | OT_BOOLEAN   | true         | Verbose      | CasADi::Opti |
-| pendents_wit |              |              | parsing      | malControl:: |
-| h_bounds     |              |              |              | FlatOCPInter |
-|              |              |              |              | nal          |
+| eliminate_de | OT_BOOLEAN   | true         | Eliminate    | CasADi::Opti |
+| pendents_wit |              |              | dependent    | malControl:: |
+| h_bounds     |              |              | variables    | FlatOCPInter |
+|              |              |              | even if they | nal          |
+|              |              |              | have bounds  |              |
+|              |              |              | that may     |              |
+|              |              |              | become       |              |
+|              |              |              | active (this |              |
+|              |              |              | may result   |              |
+|              |              |              | in extra     |              |
+|              |              |              | path         |              |
+|              |              |              | constraints) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | make_explici | OT_BOOLEAN   | false        | Make the DAE | CasADi::Opti |
 | t            |              |              | semi-        | malControl:: |
@@ -11085,27 +11222,29 @@ Time. ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::x "
 
-Implicitly defined states. ";
+Differential and algebraic states defined by a fully-implicit DAE (length ==
+dae().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::xd "
 
-Differential states. ";
+Differential states defined by an explicit ODE (length == ode().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::xa "
 
-Algebraic states. ";
+Algebraic states defined by an algebraic equation (length == alg().size())
+";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::x_all "
 
-All states, differential and algebraic. ";
+All states, differential and algebraic (includes x, xd and xa) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::q "
 
-Quadrature states. ";
+Quadrature states (length == quad().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::y "
 
-Dependent variables. ";
+Dependent variables (length == dep().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::p "
 
@@ -11123,15 +11262,15 @@ Control signals. ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::dae "
 
-Fully implicit DAE (length == s().size()) ";
+Fully implicit DAE (length == x().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::ode "
 
-Explicit ODE (length == x().size()) ";
+Explicit ODE (length == xd().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::alg "
 
-Algebraic equations (length == z().size()) ";
+Algebraic equations (length == xa().size()) ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::quad "
 
@@ -11377,16 +11516,24 @@ Return a string with a destription (for SWIG) ";
 | eliminate_de | OT_BOOLEAN   | true         | Eliminate    | CasADi::Opti |
 | pendent      |              |              | variables    | malControl:: |
 |              |              |              | that can be  | FlatOCPInter |
-|              |              |              | expressed as | nal          |
-|              |              |              | an           |              |
+|              |              |              | written as   | nal          |
+|              |              |              | an explicit  |              |
 |              |              |              | expression   |              |
 |              |              |              | of other     |              |
 |              |              |              | variables    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eliminate_de | OT_BOOLEAN   | true         | Verbose      | CasADi::Opti |
-| pendents_wit |              |              | parsing      | malControl:: |
-| h_bounds     |              |              |              | FlatOCPInter |
-|              |              |              |              | nal          |
+| eliminate_de | OT_BOOLEAN   | true         | Eliminate    | CasADi::Opti |
+| pendents_wit |              |              | dependent    | malControl:: |
+| h_bounds     |              |              | variables    | FlatOCPInter |
+|              |              |              | even if they | nal          |
+|              |              |              | have bounds  |              |
+|              |              |              | that may     |              |
+|              |              |              | become       |              |
+|              |              |              | active (this |              |
+|              |              |              | may result   |              |
+|              |              |              | in extra     |              |
+|              |              |              | path         |              |
+|              |              |              | constraints) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | make_explici | OT_BOOLEAN   | false        | Make the DAE | CasADi::Opti |
 | t            |              |              | semi-        | malControl:: |
@@ -11600,6 +11747,11 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::printOption
+"
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::getOption "
 
 get an option value ";
@@ -11612,6 +11764,11 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")
 CasADi::OptimalControl::FlatOCPInternal::deepCopyMembers "
@@ -11901,7 +12058,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -12370,7 +12527,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -12668,6 +12825,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::FXInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::FXInternal::getOption "
 
 get an option value ";
@@ -12679,6 +12840,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::FXInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::FXInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::FXInternal::clone "
 
@@ -12708,6 +12873,8 @@ If there are other references to the object, then make a deep copy of it and
 point to this new object. ";
 
 %feature("docstring")  CasADi::GenericType::makeUnique "";
+
+%feature("docstring")  CasADi::GenericType::GenericType "";
 
 %feature("docstring")  CasADi::GenericType::GenericType "";
 
@@ -12797,6 +12964,10 @@ Is a vector of strings. ";
 
 Is a shared object? ";
 
+%feature("docstring")  CasADi::GenericType::isFX "
+
+Is a shared object? ";
+
 %feature("docstring")  CasADi::GenericType::toBool "
 
 Convert to boolean. ";
@@ -12826,6 +12997,10 @@ Convert to vector of doubles. ";
 Convert to vector of strings. ";
 
 %feature("docstring")  CasADi::GenericType::toSharedObject "
+
+Convert to shared object. ";
+
+%feature("docstring")  CasADi::GenericType::toFX "
 
 Convert to shared object. ";
 
@@ -13180,8 +13355,10 @@ times t_i.
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (reset)      | ADi::GSL::Gs |
+|              |              |              |              | lInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -13318,11 +13495,11 @@ times t_i.
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+--------------------+--------------------------+
-|         Id         |         Used in          |
-+====================+==========================+
-| GslInternal::reset | CasADi::GSL::GslInternal |
-+--------------------+--------------------------+
++-------+--------------------------+
+|  Id   |         Used in          |
++=======+==========================+
+| reset | CasADi::GSL::GslInternal |
++-------+--------------------------+
 
 C++ includes: gsl_integrator.hpp ";
 
@@ -13948,8 +14125,10 @@ x0;
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (reset)      | ADi::GSL::Gs |
+|              |              |              |              | lInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -14086,11 +14265,11 @@ x0;
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+--------------------+--------------------------+
-|         Id         |         Used in          |
-+====================+==========================+
-| GslInternal::reset | CasADi::GSL::GslInternal |
-+--------------------+--------------------------+
++-------+--------------------------+
+|  Id   |         Used in          |
++=======+==========================+
+| reset | CasADi::GSL::GslInternal |
++-------+--------------------------+
 
 C++ includes: gsl_internal.hpp ";
 
@@ -14365,6 +14544,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::GSL::GslInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::GSL::GslInternal::getOption "
 
 get an option value ";
@@ -14376,6 +14559,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::GSL::GslInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::GSL::GslInternal::getCount "
 
@@ -14684,8 +14871,11 @@ Joel Andersson
 | e            |              |              | size         | ials::IdasIn |
 |              |              |              |              | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (correctInit | ADi::Sundial |
+|              |              |              | ialCondition | s::IdasInter |
+|              |              |              | s|res)       | nal          |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -15518,8 +15708,11 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | e            |              |              | size         | ials::IdasIn |
 |              |              |              |              | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (correctInit | ADi::Sundial |
+|              |              |              | ialCondition | s::IdasInter |
+|              |              |              | s|res)       | nal          |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -15985,6 +16178,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::getOption "
 
 get an option value ";
@@ -15996,6 +16193,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::getCount "
 
@@ -16286,7 +16487,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -16749,7 +16950,7 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -17056,6 +17257,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getOption "
 
 get an option value ";
@@ -17067,6 +17272,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::clone "
 
@@ -17530,7 +17739,7 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -18284,7 +18493,7 @@ Joel Andersson
 | s            |              |              | number of    | gratorIntern |
 |              |              |              | steps        | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -18698,6 +18907,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::getOption "
 
 get an option value ";
@@ -18709,6 +18922,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::IntegratorInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::getCount "
 
@@ -18939,17 +19156,23 @@ number of constraints (A)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -18961,23 +19184,23 @@ number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -19157,6 +19380,26 @@ number of constraints (A)
 | honor_origin | OT_STRING    |              |              | CasADi::Ipop |
 | al_bounds    |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_c_consta | OT_STRING    |              |              | CasADi::Ipop |
 | nt           |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -19288,8 +19531,12 @@ number of constraints (A)
 | min_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
 | nt_steps     |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (eval_f|eval | ADi::IpoptIn |
+|              |              |              | _g|eval_jac_ | ternal       |
+|              |              |              | g|eval_grad_ |              |
+|              |              |              | f)           |              |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Ipop |
 |              |              |              |              | tInternal    |
@@ -19569,11 +19816,29 @@ number of constraints (A)
 +-------------+-----------------------+
 
 >List of available stats
-+---------------+-----------------------+
-|      Id       |        Used in        |
-+===============+=======================+
-| return_status | CasADi::IpoptInternal |
-+---------------+-----------------------+
++---------------------+-----------------------+
+|         Id          |        Used in        |
++=====================+=======================+
+| alpha_du            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| alpha_pr            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| d_norm              | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| inf_du              | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| inf_pr              | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| iter                | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| ls_trials           | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| mu                  | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| regularization_size | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| return_status       | CasADi::IpoptInternal |
++---------------------+-----------------------+
 
 C++ includes: ipopt_internal.hpp ";
 
@@ -19792,6 +20057,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::IpoptInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::IpoptInternal::getOption "
 
 get an option value ";
@@ -19803,6 +20072,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::IpoptInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::IpoptInternal::deepCopyMembers "
 
@@ -20176,7 +20449,7 @@ decision variables (x)       nc: number of constraints (A)
 | nt_steps     |              |              |              | rfaces::Ipop |
 |              |              |              |              | tQPInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Inte |
@@ -20706,6 +20979,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getOption "
 
 get an option value ";
@@ -20717,6 +20994,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::deepCopyMembers
 "
@@ -21093,7 +21374,7 @@ Joris Gillis
 | nt_steps     |              |              |              | rfaces::Ipop |
 |              |              |              |              | tQPInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Inte |
@@ -21734,17 +22015,23 @@ number of constraints (A)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -21756,23 +22043,23 @@ number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -21952,6 +22239,26 @@ number of constraints (A)
 | honor_origin | OT_STRING    |              |              | CasADi::Ipop |
 | al_bounds    |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_c_consta | OT_STRING    |              |              | CasADi::Ipop |
 | nt           |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -22083,8 +22390,12 @@ number of constraints (A)
 | min_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
 | nt_steps     |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (eval_f|eval | ADi::IpoptIn |
+|              |              |              | _g|eval_jac_ | ternal       |
+|              |              |              | g|eval_grad_ |              |
+|              |              |              | f)           |              |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_init      | OT_REAL      |              |              | CasADi::Ipop |
 |              |              |              |              | tInternal    |
@@ -22364,11 +22675,29 @@ number of constraints (A)
 +-------------+-----------------------+
 
 >List of available stats
-+---------------+-----------------------+
-|      Id       |        Used in        |
-+===============+=======================+
-| return_status | CasADi::IpoptInternal |
-+---------------+-----------------------+
++---------------------+-----------------------+
+|         Id          |        Used in        |
++=====================+=======================+
+| alpha_du            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| alpha_pr            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| d_norm              | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| inf_du              | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| inf_pr              | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| iter                | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| ls_trials           | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| mu                  | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| regularization_size | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| return_status       | CasADi::IpoptInternal |
++---------------------+-----------------------+
 
 C++ includes: ipopt_solver.hpp ";
 
@@ -22759,6 +23088,13 @@ CasADi::IpoptUserClass::get_list_of_nonlinear_variables "
 
 Specify which variables that appear in the Hessian ";
 
+%feature("docstring")  CasADi::IpoptUserClass::intermediate_callback "
+
+This method is called at every iteration
+
+Code copied from TNLPAdapter::FinalizeSolution See also:http://list.coin-
+or.org/pipermail/ipopt/2010-July/002078.html ";
+
 
 // File: classCasADi_1_1Jacobian.xml
 %feature("docstring") CasADi::Jacobian "
@@ -22809,7 +23145,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -23265,7 +23601,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -23572,6 +23908,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::JacobianInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::JacobianInternal::getOption "
 
 get an option value ";
@@ -23583,6 +23923,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::JacobianInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::JacobianInternal::getCount "
 
@@ -23898,8 +24242,11 @@ Initialize the object. ";
 |              |              |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (eval_f|eval | ADi::Sundial |
+|              |              |              | _djac)       | s::KinsolInt |
+|              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -24276,6 +24623,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getOption "
 
 get an option value ";
@@ -24287,6 +24638,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::deepCopyMembers "
 
@@ -24408,8 +24763,11 @@ See:   ImplicitFunction for more information
 |              |              |              |              | ials::Kinsol |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (eval_f|eval | ADi::Sundial |
+|              |              |              | _djac)       | s::KinsolInt |
+|              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -25013,17 +25371,23 @@ number of constraints (A)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -25035,23 +25399,23 @@ number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -25105,6 +25469,26 @@ number of constraints (A)
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -25126,7 +25510,7 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -25434,6 +25818,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::KnitroInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::KnitroInternal::getOption "
 
 get an option value ";
@@ -25445,6 +25833,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::KnitroInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::KnitroInternal::deepCopyMembers "
 
@@ -25467,17 +25859,23 @@ number of constraints (A)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -25489,23 +25887,23 @@ number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -25559,6 +25957,26 @@ number of constraints (A)
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -25580,7 +25998,7 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -26089,7 +26507,7 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -26588,7 +27006,7 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -26937,6 +27355,11 @@ CasADi::Interfaces::LapackLUDenseInternal::printOptions "
 
 Print options to a stream. ";
 
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::getOption
 "
 
@@ -26951,6 +27374,11 @@ Copy all options from another object. ";
 "
 
 Get the dictionary. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::deepCopyMembers "
@@ -27037,7 +27465,7 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -27526,7 +27954,7 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -27875,6 +28303,11 @@ CasADi::Interfaces::LapackQRDenseInternal::printOptions "
 
 Print options to a stream. ";
 
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::getOption
 "
 
@@ -27889,6 +28322,11 @@ Copy all options from another object. ";
 "
 
 Get the dictionary. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::deepCopyMembers "
@@ -27912,17 +28350,23 @@ number of constraints (A)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -27934,23 +28378,23 @@ number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -28001,6 +28445,26 @@ number of constraints (A)
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -28026,7 +28490,7 @@ number of constraints (A)
 |              |              |              |              | rfaces::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -28340,6 +28804,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getOption "
 
 get an option value ";
@@ -28351,6 +28819,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::deepCopyMembers
 "
@@ -28374,17 +28846,23 @@ number of constraints (A)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -28396,23 +28874,23 @@ number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -28463,6 +28941,26 @@ number of constraints (A)
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -28488,7 +28986,7 @@ number of constraints (A)
 |              |              |              |              | rfaces::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -28974,7 +29472,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -29453,7 +29951,7 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -29772,6 +30270,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::LinearSolverInternal::getOption "
 
 get an option value ";
@@ -29783,6 +30285,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::LinearSolverInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::clone "
 
@@ -31114,7 +31620,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -31769,7 +32275,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -32157,6 +32663,11 @@ CasADi::OptimalControl::MultipleShootingInternal::printOptions "
 Print options to a stream. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::getOption "
 
 get an option value ";
@@ -32170,6 +32681,11 @@ Copy all options from another object. ";
 CasADi::OptimalControl::MultipleShootingInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::deepCopyMembers "
@@ -32774,6 +33290,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::MuscodInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::MuscodInternal::getOption "
 
 get an option value ";
@@ -32789,6 +33309,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::MuscodInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::MuscodInternal::deepCopyMembers "
 
@@ -33564,7 +34088,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -33799,6 +34323,14 @@ get function input argument ";
 %feature("docstring")  CasADi::MXFunction::outputMX "
 
 get function output argument ";
+
+%feature("docstring")  CasADi::MXFunction::inputsMX "
+
+get function inputs argument ";
+
+%feature("docstring")  CasADi::MXFunction::outputsMX "
+
+get function outputs argument ";
 
 %feature("docstring")  CasADi::MXFunction::algorithm "
 
@@ -34101,7 +34633,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -34447,6 +34979,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::getOption "
 
 get an option value ";
@@ -34458,6 +34994,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::MXFunctionInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::getCount "
 
@@ -34676,6 +35216,13 @@ Get the reference count. ";
 Initialize the object. ";
 
 
+// File: structCasADi_1_1mysortclass.xml
+%feature("docstring") CasADi::mysortclass "
+
+A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches.
+";
+
+
 // File: classCasADi_1_1NanSXNode.xml
 %feature("docstring") CasADi::NanSXNode "
 
@@ -34770,17 +35317,23 @@ Joel Andersson
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -34792,23 +35345,23 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -34859,6 +35412,26 @@ Joel Andersson
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -34880,7 +35453,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -35307,17 +35880,23 @@ Joel Andersson
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -35329,23 +35908,23 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -35396,6 +35975,26 @@ Joel Andersson
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -35417,7 +36016,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -35715,6 +36314,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::NLPSolverInternal::getOption "
 
 get an option value ";
@@ -35726,6 +36329,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::NLPSolverInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::clone "
 
@@ -37369,7 +37976,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -37906,7 +38513,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -38236,6 +38843,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::getOption "
 
 get an option value ";
@@ -38247,6 +38858,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::OCPSolverInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::clone "
 
@@ -38452,7 +39067,7 @@ decision variables (x)       nc: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mutol        | OT_REAL      | 1e-8         | tolerance as | CasADi::Inte |
@@ -38780,6 +39395,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getOption "
 
 get an option value ";
@@ -38791,6 +39410,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::deepCopyMembers "
 
@@ -38920,7 +39543,7 @@ reInit();
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mutol        | OT_REAL      | 1e-8         | tolerance as | CasADi::Inte |
@@ -39553,6 +40176,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::OptionsFunctionalityNode::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::OptionsFunctionalityNode::getOption "
 
 get an option value ";
@@ -39572,6 +40199,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::OptionsFunctionalityNode::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::OptionsFunctionalityNode::clone "
 
@@ -39856,7 +40487,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -39948,6 +40579,25 @@ Joel Andersson
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available stats
++-----------------+------------------------------+
+|       Id        |           Used in            |
++=================+==============================+
+| max_threads     | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| num_threads     | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_allocation | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_cputime    | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_endtime    | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_order      | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_starttime  | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
 
 C++ includes: parallelizer.hpp ";
 
@@ -40333,7 +40983,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -40425,6 +41075,25 @@ Joel Andersson
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available stats
++-----------------+------------------------------+
+|       Id        |           Used in            |
++=================+==============================+
+| max_threads     | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| num_threads     | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_allocation | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_cputime    | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_endtime    | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_order      | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
+| task_starttime  | CasADi::ParallelizerInternal |
++-----------------+------------------------------+
 
 C++ includes: parallelizer_internal.hpp ";
 
@@ -40649,6 +41318,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::getOption "
 
 get an option value ";
@@ -40660,6 +41333,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::ParallelizerInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::getCount "
 
@@ -40812,7 +41489,7 @@ decision variables (x)       nc: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | nWSR         | OT_INTEGER   | GenericType( | The maximum  | CasADi::Inte |
@@ -41152,6 +41829,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getOption "
 
 get an option value ";
@@ -41163,6 +41844,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::deepCopyMembers
 "
@@ -41296,7 +41981,7 @@ Joris Gillis, Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | nWSR         | OT_INTEGER   | GenericType( | The maximum  | CasADi::Inte |
@@ -41842,7 +42527,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -42354,7 +43039,7 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -42656,6 +43341,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::getOption "
 
 get an option value ";
@@ -42667,6 +43356,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::QPSolverInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::clone "
 
@@ -43226,7 +43919,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -43737,7 +44430,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -44040,6 +44733,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::getOption "
 
 get an option value ";
@@ -44051,6 +44748,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::SimulatorInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::deepCopyMembers "
 
@@ -44302,17 +45003,23 @@ Initialize the object. ";
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -44324,23 +45031,23 @@ Initialize the object. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -44396,6 +45103,26 @@ Initialize the object. ";
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -44427,7 +45154,7 @@ Initialize the object. ";
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_safety    | OT_REAL      | 1.1          | Safety       | CasADi::SQPI |
@@ -44546,6 +45273,21 @@ Initialize the object. ";
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available stats
++-----------+---------------------+
+|    Id     |       Used in       |
++===========+=====================+
+| eq_viol   | CasADi::SQPInternal |
++-----------+---------------------+
+| iter      | CasADi::SQPInternal |
++-----------+---------------------+
+| lsiter    | CasADi::SQPInternal |
++-----------+---------------------+
+| normdx    | CasADi::SQPInternal |
++-----------+---------------------+
+| normgradL | CasADi::SQPInternal |
++-----------+---------------------+
 
 C++ includes: sqp_internal.hpp ";
 
@@ -44764,6 +45506,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::SQPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::SQPInternal::getOption "
 
 get an option value ";
@@ -44775,6 +45521,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::SQPInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::SQPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::SQPInternal::deepCopyMembers "
 
@@ -44802,17 +45552,23 @@ Joel Andersson
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess.  |
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound.    |
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound.    |
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound.           |
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound.           |
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess.  |
+| NLP_LAMBDA_INIT                    | Lambda multipliers initial guess   |
+|                                    | (m x 1)                            |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -44824,23 +45580,23 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution.                          |
+|                                    | solution (n x 1)                   |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_OPT                     | Lambda multipliers function for    |
-|                                    | optimal solution.                  |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_LBX                     | Lower bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_UBX                     | Upper bound multipliers for        |
-|                                    | optimal solution When in warm      |
-|                                    | start mode, this output will be    |
-|                                    | used as input                      |
+|                                    | optimal solution (n x 1) When in   |
+|                                    | warm start mode, this output will  |
+|                                    | be used as input                   |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -44896,6 +45652,26 @@ Joel Andersson
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -44927,7 +45703,7 @@ Joel Andersson
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_safety    | OT_REAL      | 1.1          | Safety       | CasADi::SQPI |
@@ -45046,6 +45822,21 @@ Joel Andersson
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available stats
++-----------+---------------------+
+|    Id     |       Used in       |
++===========+=====================+
+| eq_viol   | CasADi::SQPInternal |
++-----------+---------------------+
+| iter      | CasADi::SQPInternal |
++-----------+---------------------+
+| lsiter    | CasADi::SQPInternal |
++-----------+---------------------+
+| normdx    | CasADi::SQPInternal |
++-----------+---------------------+
+| normgradL | CasADi::SQPInternal |
++-----------+---------------------+
 
 C++ includes: sqp_method.hpp ";
 
@@ -45509,7 +46300,7 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -46039,7 +46830,7 @@ Solves the linear system A.x = b for x
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -46378,6 +47169,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::SuperLUInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::SuperLUInternal::getOption "
 
 get an option value ";
@@ -46389,6 +47184,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::SuperLUInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::deepCopyMembers "
 
@@ -46527,6 +47326,12 @@ Check if the node is an even square. ";
 %feature("docstring")  CasADi::SX::getNdeps "
 
 Get the number of dependencies of a binary SX. ";
+
+%feature("docstring")  CasADi::SX::isEquivalent "
+
+Check if two nodes are equivalent up to a given depth a = x*x b = x*x
+
+a.isEqual(b) will return false, but a.isEquivalent(b) will return true ";
 
 %feature("docstring")  CasADi::SX::__hash__ "
 
@@ -46689,7 +47494,7 @@ Joel Andersson
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -46983,6 +47788,14 @@ get function input ";
 
 get function output ";
 
+%feature("docstring")  CasADi::SXFunction::inputsSX "
+
+get function inputs ";
+
+%feature("docstring")  CasADi::SXFunction::outputsSX "
+
+get function outputs ";
+
 %feature("docstring")  CasADi::SXFunction::generateCode "
 
 Generate C code for the function. ";
@@ -47273,7 +48086,7 @@ Joel Andersson
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -47607,6 +48420,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::getOption "
 
 get an option value ";
@@ -47618,6 +48435,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::SXFunctionInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::deepCopyMembers "
 
@@ -48725,7 +49546,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -49214,7 +50035,7 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitors     | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
@@ -49527,6 +50348,10 @@ check if the user has there is an option str ";
 
 Print options to a stream. ";
 
+%feature("docstring")  CasADi::XFunctionInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::getOption "
 
 get an option value ";
@@ -49538,6 +50363,10 @@ Copy all options from another object. ";
 %feature("docstring")  CasADi::XFunctionInternal::dictionary "
 
 Get the dictionary. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::clone "
 
@@ -49701,6 +50530,15 @@ CasADi additions to math.h. ";
 %feature("docstring")  CasADi::GSL::printme "";
 
 %feature("docstring")  CasADi::GSL::sign "";
+
+%feature("docstring")  CasADi::GSL::vec "
+
+Make a vector-valued function out of a matrix-valued one. In spirit, this
+function is like applying vec() to all inputs outputs.
+
+Get the SX input and output vectors ";
+
+%feature("docstring")  CasADi::GSL::vec "";
 
 %feature("docstring")  CasADi::GSL::typeName "
 
@@ -49871,8 +50709,18 @@ Check if a matrix is upper triangular (complexity ~ A.size1()) ";
 
 %feature("docstring")  CasADi::GSL::vec "
 
-make a vector Reshapes/flattens the Matrix<T> such that the shape becomes
-(expr.numel(),1). Columns are stacked on top of each other. ";
+make a vector Reshapes/flattens/vectorizes the Matrix<T> such that the shape
+becomes (expr.numel(),1). Columns are stacked on top of each other.
+
+a b c d
+
+turns into
+
+a c b d ";
+
+%feature("docstring")  CasADi::GSL::vecNZ "
+
+Returns a flattened version of the Matrix, preserving only nonzeros. ";
 
 %feature("docstring")  CasADi::GSL::vertcat "";
 
@@ -49881,6 +50729,22 @@ make a vector Reshapes/flattens the Matrix<T> such that the shape becomes
 %feature("docstring")  CasADi::GSL::vertcat "";
 
 %feature("docstring")  CasADi::GSL::horzcat "";
+
+%feature("docstring")  CasADi::GSL::veccat "
+
+concatenate vertically while vectorizing all arguments with vec ";
+
+%feature("docstring")  CasADi::GSL::vecNZcat "
+
+concatenate vertically while vectorizing all arguments with vecNZ ";
+
+%feature("docstring")  CasADi::GSL::applymap "
+
+Apply a function f to each element in a vector ";
+
+%feature("docstring")  CasADi::GSL::applymap "
+
+Apply a function f to each element in a vector ";
 
 %feature("docstring")  CasADi::GSL::inner_prod "
 
@@ -50111,6 +50975,8 @@ concatenate horizontally, two matrices ";
 
 %feature("docstring")  CasADi::GSL::veccat "";
 
+%feature("docstring")  CasADi::GSL::vecNZcat "";
+
 %feature("docstring")  CasADi::GSL::applymap "";
 
 %feature("docstring")  CasADi::GSL::applymap "";
@@ -50182,7 +51048,13 @@ Reshape the MX. ";
 %feature("docstring")  CasADi::GSL::vec "
 
 Returns a flattened version of the MX Flattening is a cheap (non-copying)
-operation Same as reshape(x, x.numel(),1) ";
+operation Same as reshape(x, x.numel(),1)
+
+a b c d
+
+turns into
+
+a c b d ";
 
 %feature("docstring")  CasADi::GSL::vecNZ "
 
@@ -50312,7 +51184,11 @@ concatenate horizontally ";
 
 %feature("docstring")  CasADi::GSL::veccat "
 
-concatenate vertically while vectorizing all arguments with getNZ ";
+concatenate vertically while vectorizing all arguments with vec ";
+
+%feature("docstring")  CasADi::GSL::vecNZcat "
+
+concatenate vertically while vectorizing all arguments with vecNZ ";
 
 %feature("docstring")  CasADi::GSL::applymap "
 
@@ -52328,6 +53204,12 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: x__function__internal_8hpp.xml
+
+
+// File: xfunction__tools_8cpp.xml
+
+
+// File: xfunction__tools_8hpp.xml
 
 
 // File: xml__arg_8cpp.xml

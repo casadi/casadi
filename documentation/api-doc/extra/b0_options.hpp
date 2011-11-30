@@ -8,6 +8,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
@@ -33,6 +35,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
@@ -153,8 +157,8 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>eliminate_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Completely eliminate algebraic states</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be expressed as an expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be written as an explicit expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate dependent variables even if they have bounds that may become active (this may result in extra path constraints)</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
 <tr><td>make_explicit</td><td>OT_BOOLEAN</td><td>false</td><td>Make the DAE semi-explicit</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>scale_equations</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the implicit equations so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
@@ -170,8 +174,8 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>eliminate_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Completely eliminate algebraic states</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be expressed as an expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be written as an explicit expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
+<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate dependent variables even if they have bounds that may become active (this may result in extra path constraints)</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
 <tr><td>make_explicit</td><td>OT_BOOLEAN</td><td>false</td><td>Make the DAE semi-explicit</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>scale_equations</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the implicit equations so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
@@ -745,6 +749,8 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>hessian_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
@@ -898,6 +904,8 @@
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>hessian_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
@@ -1721,6 +1729,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
@@ -1747,6 +1757,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
@@ -1772,6 +1784,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
@@ -1799,6 +1813,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
@@ -1944,6 +1960,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
@@ -1970,6 +1988,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
@@ -2383,6 +2403,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>maxiter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>CasADi::SQPInternal</td></tr>
@@ -2419,6 +2441,8 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>maxiter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>CasADi::SQPInternal</td></tr>
