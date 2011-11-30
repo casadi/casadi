@@ -143,33 +143,28 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   
   // Adjoint sensitivities
   if(nadir>0){
-    casadi_assert_message(0, "not implemented");
 
-    #if 0
-          // Clear the seeds (TODO: change this when XF is included as output of the simulator!)
-    vector<double> &xfs = integrator_.output(INTEGRATOR_XF).aseed();
-    fill(xfs.begin(),xfs.end(),0);
-    vector<double> &x0s = integrator_.input(INTEGRATOR_X0,1);
-    fill(x0s.begin(),x0s.end(),0);
-    vector<double> &ps = integrator_.input(INTEGRATOR_P,1);
-    fill(ps.begin(),ps.end(),0);
-    vector<double> &ps_sim = input(SIMULATOR_P).data(1);
-    fill(ps_sim.begin(),ps_sim.end(),0);
-    
+    // Clear the seeds
+    for(int dir=0; dir<nadir; ++dir){
+      integrator_.adjSeed(INTEGRATOR_XF,dir).setAll(0);
+    }
+
     // Reset the integrator for backward integration
-    integrator_->resetAdj();
-
-    // Seeds from the output function
-    const vector<double> &xf_seed = output(0).data(1); // TODO: output is here assumed to be trivial, returning the state
-    casadi_assert(xf_seed.size() == grid_.size()*xfs.size());
+    integrator_.resetAdj();
 
     // Integrate backwards
     for(int k=grid_.size()-1; k>=0; --k){
+      casadi_assert_message(0, "not implemented");
+      
       // Integrate back to the previous grid point
-      integrator_->integrateAdj(grid_[k]);
+      integrator_.integrateAdj(grid_[k]);
+      
+      // HERE I NEED THE STATE VECTOR!
+      
+      // Pass the state to the 
       
       // Pass adjoint seeds to integrator
-      for(int i=0; i<xfs.size(); ++i)
+/*      for(int i=0; i<xfs.size(); ++i)
         xfs.at(i) = x0s.at(i) + xf_seed.at(k*xfs.size() + i);
       
       // Add the contribution to the parameter sensitivity
@@ -177,14 +172,12 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
         ps_sim[i] += ps[i];
 
       // Reset the integrator to deal with the jump in seeds
-      integrator_->resetAdj();
+      integrator_->resetAdj();*/
     }
     
     // Save
-    vector<double> &x0_sim = input(SIMULATOR_X0).data(1);
-    copy(x0s.begin(),x0s.end(),x0_sim.begin());
-
-    #endif
+/*    vector<double> &x0_sim = input(SIMULATOR_X0).data(1);
+    copy(x0s.begin(),x0s.end(),x0_sim.begin());*/
     
   }
 
