@@ -90,14 +90,14 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
     
   // Pass sensitivities if fsens
-  if(nfdir>0){
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XF),INTEGRATOR_XF);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XPF),INTEGRATOR_XPF);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P),INTEGRATOR_P);
+  for(int dir=0; dir<nfdir; ++dir){
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XF,dir),INTEGRATOR_XF,dir);
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XPF,dir),INTEGRATOR_XPF,dir);
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),INTEGRATOR_P,dir);
   }
   
   // Reset the integrator_
-  integrator_.reset(nfdir>0, nadir>0);
+  integrator_.reset(nfdir, nadir);
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
@@ -105,42 +105,45 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     // Integrate to the output time
     integrator_.integrate(grid_[k]);
     
-    // Pass integrator_ output to the output function
-    if (output_fcn_.input(DAE_T).numel()!=0)    output_fcn_.setInput(grid_[k],DAE_T);
-    if (output_fcn_.input(DAE_Y).numel()!=0)    output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
-    if (output_fcn_.input(DAE_YDOT).numel()!=0) output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
-    if (output_fcn_.input(DAE_P).numel()!=0)    output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
+    // Pass integrator output to the output function
+    output_fcn_.setInput(grid_[k],DAE_T);
+    output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
+    output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
+    output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
 
-    // Evaluate output function
-    output_fcn_.evaluate();
-    
-    // Save the output of the function
-    for(int i=0; i<output_.size(); ++i){
-      const vector<double> &res = output_fcn_.output(i).data();
-      for(int j=0; j<res.size(); ++j){
-        output(i)(k,j) = res[j];
-      }
+    for(int dir=0; dir<nfdir; ++dir){
+      // Pass the forward seed to the output function
+      output_fcn_.setFwdSeed(0.0,DAE_T,dir);
+      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_Y,dir);
+      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_YDOT,dir);
+      output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir);
     }
     
-/*    if(nfdir>0){
-      
-      // Pass the forward seed to the output function
-      output_fcn_.setFwdSeed(integrator_.fwdSens(DAE_Y));
-      output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P),DAE_P);
-      
-      // Evaluate output function
-      output_fcn_.evaluate(nfdir,0);
+    // Evaluate output function
+    output_fcn_.evaluate(nfdir,0);
 
-      // Save the output of the function
-      for(int i=0; i<output_.size(); ++i){
-        const vector<double> &res = output_fcn_.fwdSens(i).data();
-        copy(res.begin(),res.end(),&fwdSens(i).at(k*res.size()));
+    // Save the output of the function
+    for(int i=0; i<output_.size(); ++i){
+      const Matrix<double> &res = output_fcn_.output(i);
+      Matrix<double> &ores = output(i);
+      for(int j=0; j<res.numel(); ++j){
+        ores(k,j) = res(j); // NOTE: inefficient implementation
       }
-    }*/
+      
+      // Save the forward sensitivities
+      for(int dir=0; dir<nfdir; ++dir){
+        const Matrix<double> &fres = output_fcn_.fwdSens(i,dir);
+        Matrix<double> &ofres = fwdSens(i,dir);
+        for(int j=0; j<fres.numel(); ++j){
+          ofres(k,j) = fres(j); // NOTE: inefficient implementation
+        }
+      }
+    }
   }
   
   // Adjoint sensitivities
   if(nadir>0){
+    casadi_assert_message(0, "not implemented");
 
     #if 0
           // Clear the seeds (TODO: change this when XF is included as output of the simulator!)
