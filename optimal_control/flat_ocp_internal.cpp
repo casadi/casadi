@@ -582,6 +582,9 @@ void FlatOCPInternal::print(ostream &stream) const{
 void FlatOCPInternal::eliminateInterdependencies(){
   bool eliminate_constants = true; // also simplify constant expressions
   dep_ = substituteInPlace(var(y_),dep_,eliminate_constants).data();
+  
+  // Make sure that the dependent variables have been properly eliminated from the dependent expressions
+  casadi_assert(!dependsOn(dep_,var(y_)));
 }
 
 vector<SXMatrix> FlatOCPInternal::substituteDependents(const vector<SXMatrix>& x) const{
