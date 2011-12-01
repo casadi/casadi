@@ -31,11 +31,16 @@ namespace CasADi{
   
     class MultipleShootingInternal;
     
+    
+
+  
+    
   /** \brief Multiple Shooting
    *
    *   ns: Number of shooting nodes: from option number_of_grid_points\n
    *   nx: Number of differential states: from ffcn.input(INTEGRATOR_X0).size() \n
-   *   nu: Number of controls: from ffcn.input(INTEGRATOR_P).size() - np \n
+   *   nc: Number of constants during intergation: ffcn.input(INTEGRATOR_P).size()
+   *   nu: Number of controls: from nc - np \n
    *   np: Number of parameters: from option number_of_parameters\n
    *   nh: Number of point constraints: from cfcn.input(0).size()
    *
@@ -53,7 +58,8 @@ class MultipleShooting : public OCPSolver{
     * \copydoc scheme_IntegratorInput
     * \copydoc scheme_IntegratorOutput
     * The first nu entries of the INTEGRATOR_P input are interpreted as controls to be optimized for each time interval, the remainder are interpreted as parameters to be optimized but constant over the whole domain.
-    * \param mfcn Mayer term, mapping endstate (nx x 1) to cost (1 x 1)
+    * \param mfcn Mayer term, CasADi::FX mapping to cost (1 x 1)
+    * @copydoc scheme_MayerInput
     * \param cfcn Path constraints, CasADi::FX mapping to (nh x 1)
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints

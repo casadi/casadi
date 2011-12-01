@@ -141,8 +141,19 @@ void MultipleShootingInternal::init(){
   G_ = MXFunction(V,g);
   G_.setOption("numeric_jacobian",false);
 
+
+  vector<MX> f;
   // Objective function
-  vector<MX> f = mfcn_.call(X.back());
+  if (mfcn_.getNumInputs()==1) {
+    f = mfcn_.call(X.back());
+  } else {
+    vector<MX> mfcn_argin(MAYER_NUM_IN); 
+    mfcn_argin[MAYER_X] = X.back();
+    mfcn_argin[MAYER_P] = V(range(np_));
+    std::cout << "hrey";
+    f = mfcn_.call(mfcn_argin);
+    std::cout << "hrey";
+  }
   F_ = MXFunction(V,f);
 
   // Objective scaling factor
