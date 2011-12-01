@@ -40,4 +40,4 @@ MXFunction vec (const FX &a);
 } // namespace CasADi
 
 
-#endif // FX_TOOLS_HPP
+#endif // XFUNCTION_TOOLS_HPP

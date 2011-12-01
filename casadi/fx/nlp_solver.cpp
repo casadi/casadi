@@ -40,6 +40,11 @@ bool NLPSolver::checkNode() const{
   return dynamic_cast<const NLPSolverInternal*>(get())!=0;
 }
 
+void NLPSolver::reportConstraints(std::ostream &stream) { 
+  (*this)->reportConstraints();
+}
+
+
 
 } // namespace CasADi
 

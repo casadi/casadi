@@ -37,5 +37,14 @@ OCPSolverInternal* OCPSolver::operator->(){
   return (OCPSolverInternal*)FX::operator->();
 }
 
+
+FX OCPSolver::getFfcn() const { return isNull() ? FX(): (*this)->ffcn_; }
+
+FX OCPSolver::getMfcn() const { return isNull() ? FX(): (*this)->mfcn_; }
+
+FX OCPSolver::getCfcn() const { return isNull() ? FX(): (*this)->cfcn_; }
+
+FX OCPSolver::getRfcn() const { return isNull() ? FX(): (*this)->rfcn_; }
+
 } // namespace CasADi
 

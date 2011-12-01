@@ -25,6 +25,7 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
+#include "../fx/fx_tools.hpp"
 
 INPUTSCHEME(NLPInput)
 OUTPUTSCHEME(NLPOutput)
@@ -390,6 +391,20 @@ void NLPSolverInternal::init(){
   // Call the initialization method of the base class
   FXInternal::init();
 }
+
+
+   
+
+  void NLPSolverInternal::reportConstraints(std::ostream &stream) { 
+  
+    stream << "Reporting NLP constraints" << endl;
+    CasADi::reportConstraints(stream,output(NLP_X_OPT),input(NLP_LBX),input(NLP_UBX), "decision bounds");
+    
+    G_.input(0).set(output(NLP_X_OPT));
+    if (G_.getNumInputs()==2)  G_.input(1).set(output(NLP_P));
+    G_.evaluate();
+    CasADi::reportConstraints(stream,G_.output(),input(NLP_LBG),input(NLP_UBG), "constraints");
+  }
 
 
 } // namespace CasADi

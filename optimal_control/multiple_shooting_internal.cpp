@@ -26,6 +26,7 @@
 #include "../casadi/matrix/matrix_tools.hpp"
 #include "../casadi/mx/mx_tools.hpp"
 #include "../casadi/stl_vector_tools.hpp"
+#include "../casadi/fx/fx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -333,6 +334,16 @@ void MultipleShootingInternal::evaluate(int nfdir, int nadir){
   
   // Save the optimal solution
   setOptimalSolution(nlp_solver_.output(NLP_X_OPT).data());
+}
+
+
+void MultipleShootingInternal::reportConstraints(std::ostream &stream) { 
+  stream << "Reporting MultipleShooting constraints" << endl;
+ 
+  CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
+  CasADi::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
+  CasADi::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+ 
 }
 
 

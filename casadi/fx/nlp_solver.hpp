@@ -100,6 +100,12 @@ class NLPSolver : public FX{
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  // Prints out a human readable report about possible constraint violations, after solving 
+  void reportConstraints(std::ostream &stream=std::cout);
+
+  std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
+    
 };
 
 } // namespace CasADi

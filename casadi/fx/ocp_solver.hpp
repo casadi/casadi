@@ -29,10 +29,24 @@
 
 namespace CasADi{
 
+
+  /// Input of a Mayer Term \n
+  ///   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
+  ///   np: Number of parameters: from option number_of_parameters\n
+  enum MayerInput{
+    /// States at the end of integration (nx x 1)
+    MAYER_X,
+    /// Problem parameters (np x 1)
+    MAYER_P,
+    /// Number of inputs to a mayer term
+    MAYER_NUM_IN
+  };
+
   /// Input arguments of an OCP Solver \n
   ///   ns: Number of shooting nodes: from option number_of_grid_points\n
   ///   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
-  ///   nu: Number of controls: from ffcn.input(INTEGRATOR_P).size() - np \n
+  ///   nc: Number of constants duting intergation: ffcn.input(INTEGRATOR_P).size()
+  ///   nu: Number of controls: from nc - np \n
   ///   np: Number of parameters: from option number_of_parameters\n
   ///   nh: Number of point constraints: from cfcn.input(0).size()
   enum OCPInput{
@@ -108,6 +122,19 @@ namespace CasADi{
 
     /// Const access functions of the node
     const OCPSolverInternal* operator->() const;
+    
+    // Access the underlying ffcn
+    FX getFfcn() const;
+    
+    // Access the underlying mfcn
+    FX getMfcn() const;
+    
+    // Access the underlying cfcn
+    FX getCfcn() const;
+    
+    // Access the underlying rfcn
+    FX getRfcn() const;
+    
     
   };
 

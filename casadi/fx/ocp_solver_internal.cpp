@@ -66,6 +66,13 @@ void OCPSolverInternal::init(){
   // Number of point coupling constraints
   ng_ = 0;
   
+  casadi_assert_message(mfcn_.getNumInputs()<=2, "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). So it needs to accept 2 matrix-valued inputs. You supplied " << mfcn_.getNumInputs());
+  
+  if (mfcn_.getNumInputs()==2) {
+      casadi_assert_message(mfcn_.input(1).size()==np_, "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). Shape of the second input " << mfcn_.input(1).dimString() << " must match the number of parameters np " << np_);
+  }
+  
+  
   // Specify the inputs
   setNumInputs(OCP_NUM_IN);
   input(OCP_T) = Matrix<double>(nk_+1,1,0);
@@ -85,6 +92,8 @@ void OCPSolverInternal::init(){
   
   // Call the init function of the base class
   FXInternal::init();
+  
+  
 }
 
 } // namespace CasADi

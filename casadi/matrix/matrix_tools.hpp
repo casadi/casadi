@@ -266,6 +266,16 @@ T sum_all(const Matrix<T> &x);
 template<class T>
 Matrix<T> sum(const Matrix<T> &x, int axis=0);
 
+#ifdef SWIG
+/// Returns true only if every element in the matrix is true
+template<class T>
+T all(const Matrix<T> &x); 
+
+/// Returns true if any element in the matrix is true
+template<class T>
+T any(const Matrix<T> &x); 
+#endif //SWIG
+
 /** \brief Repeat matrix A n times vertically and m times horizontally */
 template<class T>
 Matrix<T> repmat(const Matrix<T> &A, int n, int m);
@@ -310,6 +320,10 @@ bool hasNonStructuralZeros(const Matrix<T>& A);
 //Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b);
 
 Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b);
+
+Matrix<double> operator>=(const Matrix<double>& a, const Matrix<double>& b);
+
+Matrix<double> operator<=(const Matrix<double>& a, const Matrix<double>& b);
 
 template<class T>
 Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);

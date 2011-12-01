@@ -78,6 +78,17 @@ class MultipleShooting : public OCPSolver{
     /// Set the optimal solution
     void setOptimalSolution( const std::vector<double> &V_opt );
     
+    // Access the underlying NLPSolver object
+    NLPSolver getNLPSolver() const;
+
+    // Prints out a human readable report about possible constraint violations, after solving 
+    void reportConstraints(std::ostream &stream=std::cout);
+
+    std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
+
+    
+    
+    
 };
                         
                         
