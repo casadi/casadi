@@ -350,11 +350,32 @@ int countNodes(const Matrix<SX>& A);
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
 
-//@{
-/** \brief Mark a node to be lifted in a lifted-Newton type method */
-SX lift(const SX& x);
-Matrix<SX> lift(const Matrix<SX>& x);
-//@}
+/** \brief Helper class to allow introduction of intermediate variables into SX graphs
+    \author Joel Andersson 
+    \date 2011
+*/
+class SXLifter : public PrintableObject{
+  public:
+    /// Lift a scalar expression
+    void lift(SX& x);
+    
+    /// Lift a vector expression
+    void lift(std::vector<SX>& x);
+    
+    /// Lift a matrix expression
+    void lift(Matrix<SX>& x);
+    
+    /// Lifted variables
+    std::vector<SX> lvar;
+    
+    /// Definition of lifted variables
+    std::vector<SX> ldef;
+
+#ifndef SWIG
+    /// print description
+    virtual void print(std::ostream &stream=std::cout) const;
+#endif
+};
 
 } // namespace CasADi
 

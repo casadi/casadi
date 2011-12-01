@@ -367,11 +367,6 @@ MX clip(const MX& A, const CRSSparsity& sp) {
 }
 */
 
-MX lift(const MX& x){
-  casadi_warning("Lifting marking not yet functional");
-  return x;
-}
-
 MX densify(const MX& x){
   MX ret = x;
   makeDense(ret);
@@ -545,6 +540,23 @@ std::string getOperatorRepresentation(const MX& x, const std::vector<std::string
   std::stringstream s;
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
   return s.str();
+}
+
+void MXLifter::lift(MX& x){
+  // Save definition
+  ldef.push_back(x);
+  
+  // Create new symbolic variable with the same sparsity
+  std::stringstream ss;
+  ss << "i" << lvar.size();
+  x = MX(ss.str(),x.sparsity());
+
+  // Save variable 
+  lvar.push_back(x);
+}
+
+void MXLifter::print(std::ostream &stream) const{
+  stream << "MXLifter( " << lvar << " = [...] )";
 }
 
 } // namespace CasADi

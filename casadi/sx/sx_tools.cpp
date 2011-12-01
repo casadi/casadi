@@ -1001,24 +1001,33 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
   xe = SXMatrix(xev);
 }
 
-SX lift(const SX& x){
-  return SX::create(new BinarySXNode(LIFT,x));
+void SXLifter::lift(SX& x){
+  // Save definition
+  ldef.push_back(x);
+  
+  // Create new variable
+  std::stringstream ss;
+  ss << "i" << lvar.size();
+  x = SX(ss.str());
+
+  // Save variable 
+  lvar.push_back(x);
 }
 
-Matrix<SX> lift(const Matrix<SX>& x){
-  // Return value
-  Matrix<SX> ret = x;
-  vector<SX>& retd = ret.data();
-  
-  // Lift all binary nodes
-  for(int k=0; k<retd.size(); ++k){
-    if(retd[k].isBinary()){
-      retd[k] = lift(retd[k]);
-    }
+void SXLifter::lift(std::vector<SX>& x){
+  // Lift each variable
+  for(std::vector<SX>::iterator it=x.begin(); it!=x.end(); ++it){
+    lift(*it);
   }
-  
-  // Return the result
-  return ret;
+}
+    
+void SXLifter::lift(Matrix<SX>& x){
+  // Lift nonzeros
+  lift(x.data());
+}
+
+void SXLifter::print(std::ostream &stream) const{
+  stream << "SXLifter( " << lvar << " = [...] )";
 }
 
 } // namespace CasADi

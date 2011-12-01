@@ -179,9 +179,6 @@ Create a sparse matrix from a dense matrix A, with sparsity pattern sp
 **/
 //MX clip(const MX& A, const CRSSparsity& sp);
 
-/** \brief Mark a node to be lifted in a lifted-Newton type method */
-MX lift(const MX& x);
-
 /** \brief  Make the matrix dense */
 void makeDense(MX& x);
 
@@ -245,6 +242,29 @@ bool isEqual(const MX& ex1,const MX &ex2);
 
 /** \brief Get a string representation for a binary MX, using custom arguments */
 std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
+
+/** \brief Helper class to allow introduction of intermediate variables into MX graphs
+    \author Joel Andersson 
+    \date 2011
+*/
+class MXLifter : public PrintableObject{
+  public:
+    /// Lift an expression
+    void lift(MX& x);
+    
+    /// Lifted variables
+    std::vector<MX> lvar;
+    
+    /// Definition of lifted variables
+    std::vector<MX> ldef;
+
+#ifndef SWIG
+    /// print description
+    virtual void print(std::ostream &stream=std::cout) const;
+#endif
+
+};
+
 
 } // namespace CasADi
 

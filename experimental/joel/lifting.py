@@ -8,16 +8,19 @@ from matplotlib import pylab as plt
 # Original variables
 u = ssym("u")
 
-# Lifted variables
-x = ssym("x",4)
+# Lifter
+lifter = SXLifter()
 
 # Algorithm
-xdef = SXMatrix.zeros(4)
-xdef[0] = u**2
-xdef[1] = x[0]**2
-xdef[2] = x[1]**2
-xdef[3] = x[2]**2
-F = x[3] - 2
+x1 = u**2;     lifter.lift(x1)
+x2 = x1**2;    lifter.lift(x2)
+x3 = x2**2;    lifter.lift(x3)
+x4 = x3**2;    lifter.lift(x4)
+F = x4 - 2
+
+# Lifter variables and definition
+x = SXMatrix(lifter.lvar)
+xdef = SXMatrix(lifter.ldef)
 
 # Residual function G
 G = SXFunction([u,x],[xdef-x,F])

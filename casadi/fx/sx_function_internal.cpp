@@ -126,7 +126,6 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       case SINH+OFF:      C<SINH>::fcn(x,y,f);          break;\
       case COSH+OFF:      C<COSH>::fcn(x,y,f);          break;\
       case TANH+OFF:      C<TANH>::fcn(x,y,f);          break;\
-      case LIFT+OFF:      C<LIFT>::fcn(x,y,f);          break;\
       case PRINTME+OFF:   C<PRINTME>::fcn(x,y,f);       break;
       
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
@@ -176,7 +175,6 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case SINH:       BinaryOperation<SINH>::fcn(x,y,f);           break;
         case COSH:       BinaryOperation<COSH>::fcn(x,y,f);           break;
         case TANH:       BinaryOperation<TANH>::fcn(x,y,f);           break;
-        case LIFT:       BinaryOperation<LIFT>::fcn(x,y,f);           break;
         case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);           break;
       }
       #else
