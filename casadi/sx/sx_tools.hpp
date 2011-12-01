@@ -350,6 +350,12 @@ int countNodes(const Matrix<SX>& A);
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
 
+//@{
+/** \brief Mark a node to be lifted in a lifted-Newton type method */
+SX lift(const SX& x);
+Matrix<SX> lift(const Matrix<SX>& x);
+//@}
+
 } // namespace CasADi
 
 #endif // SX_TOOLS_HPP

@@ -179,7 +179,7 @@ Create a sparse matrix from a dense matrix A, with sparsity pattern sp
 **/
 //MX clip(const MX& A, const CRSSparsity& sp);
 
-/** \brief Lift a node */
+/** \brief Mark a node to be lifted in a lifted-Newton type method */
 MX lift(const MX& x);
 
 /** \brief  Make the matrix dense */

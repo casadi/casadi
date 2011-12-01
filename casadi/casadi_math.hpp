@@ -107,7 +107,7 @@ enum Operation{
   ERF,  FMIN,  FMAX,
   INV,
   SINH,  COSH,  TANH,
-  PRINTME,
+  LIFT, PRINTME,
   NUM_BUILT_IN_OPS
 };
 
@@ -344,6 +344,14 @@ class UnaryOperation<TANH>{
     template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
 };
 
+/// Lifting marker
+template<>
+class UnaryOperation<LIFT>{
+  public:
+    template<typename T> inline static void fcn(const T& x, T& f){ f = x;}
+    template<typename T> inline static void der(const T& x, const T& f, T* d){ d[0] = 1; }
+};
+
 /// Identity operator with the side effect of printing
 template<>
 class BinaryOperation<PRINTME>{
@@ -432,6 +440,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case SINH:      BinaryOperation<SINH>::fcn(x,y,f);          break;
     case COSH:      BinaryOperation<COSH>::fcn(x,y,f);          break;
     case TANH:      BinaryOperation<TANH>::fcn(x,y,f);          break;
+    case LIFT:      BinaryOperation<LIFT>::fcn(x,y,f);          break;
     case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);       break;
   }
 }
@@ -468,6 +477,7 @@ inline void casadi_math<T>::inplacefun(unsigned char op, const T& x, const T& y,
     case SINH+OFF:      C<SINH>::fcn(x,y,f);          break;\
     case COSH+OFF:      C<COSH>::fcn(x,y,f);          break;\
     case TANH+OFF:      C<TANH>::fcn(x,y,f);          break;\
+    case LIFT+OFF:      C<LIFT>::fcn(x,y,f);          break;\
     case PRINTME+OFF:   C<PRINTME>::fcn(x,y,f);       break;
     
   switch(op){
@@ -512,6 +522,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case SINH:      BinaryOperation<SINH>::der(x,y,f,d);       break;
     case COSH:      BinaryOperation<COSH>::der(x,y,f,d);       break;
     case TANH:      BinaryOperation<TANH>::der(x,y,f,d);       break;
+    case LIFT:      BinaryOperation<LIFT>::der(x,y,f,d);       break;
     case PRINTME:   BinaryOperation<PRINTME>::der(x,y,f,d);    break;
   }
 }
@@ -553,6 +564,7 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case SINH:      BinaryOperation<SINH>::fcn(x,y,ff);   BinaryOperation<SINH>::der(x,y,ff,d);        break;
     case COSH:      BinaryOperation<COSH>::fcn(x,y,ff);   BinaryOperation<COSH>::der(x,y,ff,d);        break;
     case TANH:      BinaryOperation<TANH>::fcn(x,y,ff);   BinaryOperation<TANH>::der(x,y,ff,d);        break;
+    case LIFT:      BinaryOperation<LIFT>::fcn(x,y,ff);   BinaryOperation<LIFT>::der(x,y,ff,d);        break;
     case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,ff);   BinaryOperation<PRINTME>::der(x,y,ff,d);     break;
   }
   f = ff;
@@ -579,6 +591,7 @@ inline bool casadi_math<T>::f00_is_zero(unsigned char op){
     case ERF:       return true;
     case SINH:      return true;
     case TANH:      return true;
+    case LIFT:      return true;
     default:        return false;
   }
 }
@@ -601,6 +614,7 @@ inline bool casadi_math<T>::f0x_is_zero(unsigned char op){
     case ERF:       return true;
     case SINH:      return true;
     case TANH:      return true;
+    case LIFT:      return true;
     default:        return false;
   }
 }
@@ -690,6 +704,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case SINH:      stream << "sinh(";    break;
     case COSH:      stream << "cosh(";    break;
     case TANH:      stream << "tanh(";    break;
+    case LIFT:      stream << "lift(";    break;
     case PRINTME:   stream << "printme("; break;
   }
 }

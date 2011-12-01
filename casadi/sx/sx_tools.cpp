@@ -1001,6 +1001,25 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
   xe = SXMatrix(xev);
 }
 
+SX lift(const SX& x){
+  return SX::create(new BinarySXNode(LIFT,x));
+}
+
+Matrix<SX> lift(const Matrix<SX>& x){
+  // Return value
+  Matrix<SX> ret = x;
+  vector<SX>& retd = ret.data();
+  
+  // Lift all binary nodes
+  for(int k=0; k<retd.size(); ++k){
+    if(retd[k].isBinary()){
+      retd[k] = lift(retd[k]);
+    }
+  }
+  
+  // Return the result
+  return ret;
+}
 
 } // namespace CasADi
 
