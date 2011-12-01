@@ -108,14 +108,16 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     // Pass integrator output to the output function
     output_fcn_.setInput(grid_[k],DAE_T);
     output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
-    output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
+    if(output_fcn_.input(DAE_YDOT).size()!=0)
+      output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
     output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
 
     for(int dir=0; dir<nfdir; ++dir){
       // Pass the forward seed to the output function
       output_fcn_.setFwdSeed(0.0,DAE_T,dir);
       output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_Y,dir);
-      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_YDOT,dir);
+      if(output_fcn_.input(DAE_YDOT).size()!=0)
+        output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_YDOT,dir);
       output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir);
     }
     
@@ -143,6 +145,7 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   
   // Adjoint sensitivities
   if(nadir>0){
+    casadi_assert_message(0, "not implemented");
 
     // Clear the seeds
     for(int dir=0; dir<nadir; ++dir){
@@ -154,7 +157,6 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
 
     // Integrate backwards
     for(int k=grid_.size()-1; k>=0; --k){
-      casadi_assert_message(0, "not implemented");
       
       // Integrate back to the previous grid point
       integrator_.integrateAdj(grid_[k]);
