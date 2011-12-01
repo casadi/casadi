@@ -634,6 +634,27 @@ Matrix<T> sum(const Matrix<T> &x, int axis) {
 }
 
 template<class T>
+T all(const Matrix<T> &x) {
+  if (!x.dense()) return false;
+  T ret=1;
+  for (int i=0;i<x.size();++i) {
+  ret = ret && x.at(i)==1;
+  }
+  return ret;
+}
+
+template<class T>
+T any(const Matrix<T> &x) {
+  if (!x.dense()) return false;
+  T ret=0;
+  for (int i=0;i<x.size();++i) {
+  ret = ret || x.at(i)==1;
+  }
+  return ret;
+}
+
+
+template<class T>
 Matrix<T> norm_1(const Matrix<T>& x){
   return sum_all(fabs(x));
 }
