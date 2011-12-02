@@ -104,7 +104,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
     // Pass the adjoint seed to the function
     for(int d=0; d<nadj_batch; ++d){
       for(int i=0; i<output.size(); ++i){	
-	if(adjSeed[offset_adj+d][0]!=0 && adjSeed[offset_adj+d][0]->size() != 0){
+	if(adjSeed[offset_adj+d][i]!=0 && adjSeed[offset_adj+d][i]->size() != 0){
 	  fcn_.setAdjSeed(adjSeed[offset_adj+d][i]->data(),i,d);
 	}
       }
