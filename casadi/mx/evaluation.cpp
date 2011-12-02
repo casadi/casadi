@@ -105,7 +105,7 @@ void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const D
     for(int d=0; d<nadj_batch; ++d){
       for(int i=0; i<output.size(); ++i){	
 	if(adjSeed[offset_adj+d][0]!=0 && adjSeed[offset_adj+d][0]->size() != 0){
-	  fcn_.setAdjSeed(adjSeed[offset_adj+d][0]->data(),i,d);
+	  fcn_.setAdjSeed(adjSeed[offset_adj+d][i]->data(),i,d);
 	}
       }
     }
