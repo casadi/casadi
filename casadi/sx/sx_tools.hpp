@@ -166,17 +166,20 @@ bool contains(const Matrix<SX> &list, const Matrix<SX> &e);
 /** \brief  Simplify an expression */
 void simplify(Matrix<SX> &ex);
 
-/// remove identical calculations
+/// Remove identical calculations
 void compress(Matrix<SX> &ex, int level=5); 
 
-/// substitute variable var with expression expr in an expression ex
-Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
+/// Substitute variable v with expression vdef in an expression ex
+Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef);
 
-/// substitute variable var with expression expr in multiple expressions
+/// Substitute variable var with expression expr in multiple expressions
 std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
 
-/// substitute variable var with expression expr in the expression itself
-Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &expr, bool eliminate_constants=false);
+/// Substitute variable var out of or into an expression expr
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse=false, bool eliminate_constants=false);
+
+/// Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse=false, bool eliminate_constants=false);
 
 // /** \brief  Make the expression smooth by replacing non-smooth nodes with binary variables */
 //void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr);
@@ -349,33 +352,6 @@ int countNodes(const Matrix<SX>& A);
 
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
-
-/** \brief Helper class to allow introduction of intermediate variables into SX graphs
-    \author Joel Andersson 
-    \date 2011
-*/
-class SXLifter : public PrintableObject{
-  public:
-    /// Lift a scalar expression
-    void lift(SX& x);
-    
-    /// Lift a vector expression
-    void lift(std::vector<SX>& x);
-    
-    /// Lift a matrix expression
-    void lift(Matrix<SX>& x);
-    
-    /// Lifted variables
-    std::vector<SX> lvar;
-    
-    /// Definition of lifted variables
-    std::vector<SX> ldef;
-
-#ifndef SWIG
-    /// print description
-    virtual void print(std::ostream &stream=std::cout) const;
-#endif
-};
 
 } // namespace CasADi
 

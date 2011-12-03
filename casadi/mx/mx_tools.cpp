@@ -542,22 +542,6 @@ std::string getOperatorRepresentation(const MX& x, const std::vector<std::string
   return s.str();
 }
 
-void MXLifter::lift(MX& x){
-  // Save definition
-  ldef.push_back(x);
-  
-  // Create new symbolic variable with the same sparsity
-  std::stringstream ss;
-  ss << "i" << lvar.size();
-  x = MX(ss.str(),x.sparsity());
-
-  // Save variable 
-  lvar.push_back(x);
-}
-
-void MXLifter::print(std::ostream &stream) const{
-  stream << "MXLifter( " << lvar << " = [...] )";
-}
 
 } // namespace CasADi
 

@@ -154,31 +154,42 @@ void compress(Matrix<SX> &ex, int level){
     compress(ex,level-1);
 }
 
-std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr){
-  SXFunction fcn(var,ex);
+std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &v, const Matrix<SX> &vdef){
+  SXFunction fcn(v,ex);
   fcn.init();
-  return fcn.eval(vector<Matrix<SX> >(1,expr));
+  return fcn.eval(vector<Matrix<SX> >(1,vdef));
 }
 
-Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr){
-  if(var.empty()) return ex; // quick return if empty
-  casadi_assert_message(isSymbolic(var),"the variable is not symbolic");
-  casadi_assert_message(var.size1() == expr.size1() && var.size2() == expr.size2(),"the dimensions do not match");
+Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef){
+  if(v.empty()) return ex; // quick return if empty
+  casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
+  casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"the dimensions do not match");
 
   // evaluate with var == expr
-  SXFunction fcn(var,ex);
+  SXFunction fcn(v,ex);
   fcn.init();
-  return fcn.eval(expr);
+  return fcn.eval(vdef);
 }
 
-Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &def, bool eliminate_constants){
-  casadi_assert_message(isSymbolic(var),"the variable is not symbolic");
-  casadi_assert_message(var.size1() == def.size1() && var.size2() == def.size2(),"the dimensions do not match");
-  casadi_assert_message(def.dense(),"Expression must be dense");
-  if(var.empty()) return def; // quick return if nothing to replace
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse, bool eliminate_constants){
+  // Empty vector
+  vector<Matrix<SX> > ex;
+  substituteInPlace(v,vdef,ex,reverse,eliminate_constants);
+}
 
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse, bool eliminate_constants){
+  casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
+  casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"the dimensions do not match");
+  casadi_assert_message(vdef.dense(),"Expression must be dense");
+  if(v.empty()) return; // quick return if nothing to replace
+
+  // Function outputs
+  std::vector<Matrix<SX> > f_out;
+  f_out.push_back(vdef);
+  f_out.insert(f_out.end(),ex.begin(),ex.end());
+    
   // Write the mapping function
-  SXFunction f(var,def);
+  SXFunction f(v,f_out);
   f.setOption("topological_sorting","depth-first");
   f.init();
 
@@ -191,12 +202,18 @@ Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &def, bool 
   vector<int> filter = range(f->work_.size());
   casadi_assert(input_ind.size()==output_ind.size());
   for(int k=0; k<input_ind.size(); ++k){
-    filter[input_ind[k]] = output_ind[k];
+    if(reverse){
+      filter[output_ind[k]] = input_ind[k];
+    } else {
+      filter[input_ind[k]] = output_ind[k];
+    }
   }
   
   // Start by filtering out the replacement variables from the output_ind vector
-  for(vector<int>::iterator it=output_ind.begin(); it!=output_ind.end(); ++it){
-    *it = filter[*it];
+  if(!reverse){
+    for(vector<int>::iterator it=output_ind.begin(); it!=output_ind.end(); ++it){
+      *it = filter[*it];
+    }
   }
   
   // Now filter out the variables from the algorithm
@@ -210,7 +227,12 @@ Matrix<SX> substituteInPlace(const Matrix<SX> &var, const Matrix<SX> &def, bool 
   f->evaluateSX(f->inputv_, outputv, eliminate_constants);
   
   // Replace the result
-  return outputv.front();
+  vdef = outputv.front();
+  
+  // Get the replaced expressions
+  for(int k=0; k<ex.size(); ++k){
+    ex[k] = outputv[k+1];
+  }
 }
 
 #if 0
@@ -999,35 +1021,6 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
   fe = SXMatrix(fev);
   xi = SXMatrix(xiv);
   xe = SXMatrix(xev);
-}
-
-void SXLifter::lift(SX& x){
-  // Save definition
-  ldef.push_back(x);
-  
-  // Create new variable
-  std::stringstream ss;
-  ss << "i" << lvar.size();
-  x = SX(ss.str());
-
-  // Save variable 
-  lvar.push_back(x);
-}
-
-void SXLifter::lift(std::vector<SX>& x){
-  // Lift each variable
-  for(std::vector<SX>::iterator it=x.begin(); it!=x.end(); ++it){
-    lift(*it);
-  }
-}
-    
-void SXLifter::lift(Matrix<SX>& x){
-  // Lift nonzeros
-  lift(x.data());
-}
-
-void SXLifter::print(std::ostream &stream) const{
-  stream << "SXLifter( " << lvar << " = [...] )";
 }
 
 } // namespace CasADi
