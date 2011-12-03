@@ -5,7 +5,7 @@ from matplotlib import pylab as plt
 # Example 5.2 in Albersmeyer paper
 # Solve F(u) = u**16 - 2 == 0
 
-# Original variables
+# Free variables
 u = ssym("u")
 
 # Algorithm
@@ -19,17 +19,17 @@ F = x4 - 2
 ffcn = SXFunction([u],[F])
 
 # Lifting function
-ifcn = SXFunction([u],[vertcat([x1,x2,x3,x4])])
+ifcn = SXFunction([u],[vertcat([x1,x2,x3,x4])]) # lifting
+#ifcn = SXFunction([u],[vertcat([u])])          # no lifting
 
 # Initial guess for u
 u_guess = 0.8
-
 
 # Problem formulation ends
 # Everything below should go into a lifted newton solver class
 
 # Options
-TOL = 1e-10     # Stopping tolerance
+TOL = 1e-6     # Stopping tolerance
 max_iter = 100  # Maximum number of iterations
 
 # Extract the free variable and expressions for F and xdef
@@ -41,9 +41,9 @@ xdef = ifcn.outputSX()
 x = ssym("x",xdef.size())
 
 # Substitute in the lifted variables x into the expressions for xdef and F
-ex = SXMatrixVector(1,f)
-substituteInPlace(x, xdef, ex, True,False)
-f = ex[0]
+ex = SXMatrixVector([f])
+substituteInPlace(x, xdef, ex, True, False)
+[f] = ex
 
 # Residual function G
 G = SXFunction([u,x],[xdef-x,f])
@@ -53,11 +53,10 @@ G.init()
 d = ssym("d",xdef.size())
 
 # Substitute out the x from the zdef
-zdef = xdef-d
-z = substituteOut(x,zdef)
-
-# Eliminate x from F
-f = substitute(f,x,z)
+z = xdef-d
+ex = SXMatrixVector([f])
+substituteInPlace(x, z, ex, False, False)
+[f] = ex
 
 # Modified function Z
 Z = SXFunction([u,d],[z,f])
@@ -65,7 +64,7 @@ Z.init()
 
 # Matrix A and B in lifted Newton
 A = Z.jac(0,0)
-B = Z.jac(0,1) # calculate together!
+B = Z.jac(0,1)
 AB  = SXFunction([u,d],[A,B])
 AB.init()
 
