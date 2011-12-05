@@ -21,6 +21,7 @@
  */
 
 #include "sx.hpp"
+#include "../matrix/matrix.hpp"
 #include <stack>
 #include <cassert>
 #include "../pre_c99_support.hpp"
@@ -278,6 +279,28 @@ SX SX::inv() const{
   } else {
     return SX::create(new BinarySXNode(INV,*this));
   }
+}
+
+Matrix<SX> SX::add(const Matrix<SX>& y) const {
+ return Matrix<SX>(*this)+y;
+}
+Matrix<SX> SX::sub(const Matrix<SX>& y) const {
+ return Matrix<SX>(*this)-y;
+}
+Matrix<SX> SX::mul(const Matrix<SX>& y) const {
+ return Matrix<SX>(*this)*y;
+}
+Matrix<SX> SX::div(const Matrix<SX>& y) const { 
+  return Matrix<SX>(*this)/y;
+}
+Matrix<SX> SX::fmin(const Matrix<SX>& b) const { 
+  return Matrix<SX>(*this).fmin(b);
+}
+Matrix<SX> SX::fmax(const Matrix<SX>& b) const {
+  return Matrix<SX>(*this).fmax(b);
+}
+Matrix<SX> SX::constpow(const Matrix<SX>& n) const {
+ return Matrix<SX>(*this).__constpow__(n);
 }
 
 SX operator+(const SX &x, const SX &y){

@@ -249,6 +249,14 @@ class SX{
     SX sign() const;
     SX constpow(const SX& n) const;
     
+    Matrix<SX> add(const Matrix<SX>& y) const;
+    Matrix<SX> sub(const Matrix<SX>& y) const;
+    Matrix<SX> mul(const Matrix<SX>& y) const;
+    Matrix<SX> div(const Matrix<SX>& y) const;
+    Matrix<SX> fmin(const Matrix<SX>& b) const;
+    Matrix<SX> fmax(const Matrix<SX>& b) const;
+    Matrix<SX> constpow(const Matrix<SX>& n) const;
+        
     // Get the temporary variable
     int getTemp() const;
     

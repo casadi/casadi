@@ -215,6 +215,9 @@ memberbinopsr_nn(Type,mul)
 returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \
 returntype __r##uname##__(argtype) const{ return argCast(b).__##uname##__(selfCast(*$self));} \
 
+#define memberbinops_un(uname,argtype,argCast,selfCast,returntype) \
+returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
+
 // These methods must be added since the implicit type cast does not work.
 // Consider a+b  with a DMatrix and b SXMatrix
 // In C++, operator+(SXMatrix,SXMatrix) will be called (implicit cast)
@@ -223,6 +226,9 @@ returntype __r##uname##__(argtype) const{ return argCast(b).__##uname##__(selfCa
 
 // This is a list of all operators:
 #define binopsFull(argtype,argCast,selfCast,returntype) \
+memberbinops_un(fmin,argtype,argCast,selfCast,returntype) \
+memberbinops_un(fmax,argtype,argCast,selfCast,returntype) \
+memberbinops(constpow,argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 memberbinops(add,argtype,argCast,selfCast,returntype) \
 memberbinops(sub,argtype,argCast,selfCast,returntype) \
