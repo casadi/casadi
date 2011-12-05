@@ -151,9 +151,14 @@ template <> bool meta< double >::couldbe(PyObject * p) {
    bool result = kk[0]=='f' || kk[0]=='i';
    Py_DECREF(k); Py_DECREF(r); Py_DECREF(m);
    return result;
+ } 
+ if (meta< CasADi::Matrix<double> >::isa(p)) {
+   CasADi::Matrix<double> *temp;
+   meta< CasADi::Matrix<double> >::get_ptr(p,temp);
+   if (temp->numel()==1 && temp->size()==1) return true;
  }
 
-  return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p) ;
+  return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p);
 }
 
 /// std::string
