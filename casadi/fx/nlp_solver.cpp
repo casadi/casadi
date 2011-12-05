@@ -44,6 +44,13 @@ void NLPSolver::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
+FX NLPSolver::getF() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->F_; }
+  
+FX NLPSolver::getG() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->G_; }
+
+FX NLPSolver::getH() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->H_; }
+  
+FX NLPSolver::getJ() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->J_; }
 
 
 } // namespace CasADi

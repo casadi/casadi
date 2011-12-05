@@ -105,6 +105,18 @@ class NLPSolver : public FX{
   void reportConstraints(std::ostream &stream=std::cout);
 
   std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
+  
+  /// Access the objective function F
+  FX getF() const;
+  
+  /// Access the objective function G
+  FX getG() const;
+
+  /// Access the hessian of the Lagrangian function H
+  FX getH() const;
+  
+  /// Access the jacobian of the constraint function J
+  FX getJ() const;
     
 };
 
