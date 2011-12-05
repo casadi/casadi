@@ -102,9 +102,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Get the unidirectional or bidirectional partition */
     virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2);
 
-    /// Assert that the function has been initialized
-    bool isInit() const;
-
     /// Verbose mode?
     bool verbose() const;
     

@@ -170,7 +170,7 @@ const vector<SXAlgEl>& SXFunction::algorithm() const{
 }
 
 int SXFunction::countNodes() const{
-  casadi_assert(isInit());
+  assertInit();
   return algorithm().size();
 }
 

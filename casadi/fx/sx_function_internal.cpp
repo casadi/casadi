@@ -588,7 +588,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
 }
 
 bool SXFunctionInternal::isSmooth() const{
-  casadi_assert(isInit());
+  assertInit();
     // Go through all nodes and check if any node is non-smooth
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op == STEP || it->op == FLOOR )
@@ -647,7 +647,7 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
 }
 
 void SXFunctionInternal::generateCode(const string& src_name){
-  casadi_assert(isInit());
+  assertInit();
   
    // Output
   if(verbose()){

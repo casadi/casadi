@@ -57,7 +57,7 @@ vector<MX> FX::call(const MX &x){
 }
 
 vector<MX> FX::call(const vector<MX> &x){
-  casadi_assert(isInit());
+  assertInit();
   
   MX ev;
   ev.assignNode(new Evaluation(*this,x));
@@ -70,7 +70,7 @@ vector<MX> FX::call(const vector<MX> &x){
 }
 
 vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
-  casadi_assert(isInit());
+  assertInit();
   
   // Make sure not empty
   casadi_assert_message(x.size()>1,"FX: call(vector<vector<MX> >): argument must be of length > 1. You supplied length " << x.size() << ".");
@@ -120,7 +120,7 @@ vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& par
 }
 
 void FX::evaluate(int nfdir, int nadir){
-  casadi_assert(isInit());
+  assertInit();
   casadi_assert(nfdir<=(*this)->nfdir_);
   casadi_assert(nadir<=(*this)->nadir_);
   (*this)->evaluate_switch(nfdir,nadir);
@@ -152,7 +152,7 @@ void FX::setNumOutputs(int num_out){
 }
 
 FX FX::jacobian(int iind, int oind){
-  casadi_assert(isInit());
+  assertInit();
   vector<pair<int,int> > jblocks;
   jblocks.push_back(pair<int,int>(oind,iind));
   
@@ -173,12 +173,12 @@ FX FX::jacobian(int iind, int oind){
 }
 
 FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks){
-  casadi_assert(isInit());
+  assertInit();
   return (*this)->jacobian_switch(jblocks);
 }
 
 FX FX::hessian(int iind, int oind){
-  casadi_assert(isInit());
+  assertInit();
   return (*this)->hessian(iind,oind);  
 }
 

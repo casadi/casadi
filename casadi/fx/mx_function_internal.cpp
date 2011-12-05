@@ -683,7 +683,7 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
   // Make sure initialized
-  casadi_assert(isInit());
+  assertInit();
   
   // Outputs of the Jacobian function
   vector<MX> j_out;
@@ -719,7 +719,7 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){
-  casadi_assert(isInit());
+  assertInit();
   casadi_assert_message(ider<input_.size(),"Index out of bounds");
 
   // Variable with respect to which we differentiate
@@ -775,7 +775,7 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
 }
 
 std::vector<MX> MXFunctionInternal::grad(int igrad){
-  casadi_assert(isInit());
+  assertInit();
   casadi_assert_message(igrad<output_.size(),"Index out of bounds");
 
   // Variable with respect to which we differentiate
@@ -831,7 +831,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
 }
 
 std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
-  casadi_assert(isInit());
+  assertInit();
 
   // Get the number of directions
   const int nfwd = fseed.size();
@@ -924,7 +924,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
 }
 
 std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::vector<MX> > & aseed){
-  casadi_assert(isInit());
+  assertInit();
 
   // Get the number of directions
   const int nadj = aseed.size();
@@ -1080,7 +1080,7 @@ void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std
 }
 
 SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
-  casadi_assert(isInit());
+  assertInit();
   
   // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
   vector<SXMatrix> arg(inputv.size());

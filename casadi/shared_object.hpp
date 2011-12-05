@@ -124,6 +124,9 @@ class SharedObject : public PrintableObject{
     /// Is initialized?
     bool isInit() const;
     
+    /// Assert that it is initialized
+    void assertInit() const;
+    
     /// Is a null pointer?
     bool isNull() const;
 
@@ -174,6 +177,12 @@ class SharedObjectNode{
 
   /// Initialize the object
   virtual void init();
+  
+  /// Check if the object has been initialized
+  bool isInit() const;
+  
+  /// Assert that the object has been initialized
+  void assertInit() const;
 
   /// Print a representation of the object
   virtual void repr(std::ostream &stream) const;

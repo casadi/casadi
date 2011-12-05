@@ -92,7 +92,7 @@ const std::vector<MXAlgEl>& MXFunction::algorithm() const{
 }
 
 int MXFunction::countNodes() const{
-  casadi_assert(isInit());
+  assertInit();
   return algorithm().size();
 }
 

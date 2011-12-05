@@ -208,9 +208,20 @@ void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>&
 }
 
 bool SharedObject::isInit() const{
-  return (*this)->is_init_;
+  return (*this)->isInit();
 }
 
+void SharedObject::assertInit() const{
+  (*this)->assertInit();
+}
+
+bool SharedObjectNode::isInit() const{
+  return is_init_;
+}
+
+void SharedObjectNode::assertInit() const{
+  casadi_assert_message(isInit(),"You must first initialize a Shared Object before you can use it." << std::endl <<  "Use something like f.init()");
+}
 
 
 } // namespace CasADi

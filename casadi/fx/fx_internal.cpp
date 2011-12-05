@@ -144,12 +144,13 @@ FX FXInternal::hessian(int iind, int oind){
   casadi_error("FXInternal::hessian: hessian not defined for class " << typeid(*this).name());
 }
 
-bool FXInternal::isInit() const{
-  return is_init_;
-}
-
 FunctionIO& FXInternal::inputStruct(int i){
-  casadi_assert_message(i>=0 && i<input_.size(), "In function " << getOption("name") << ": input " << i << " not in interval [0," << input_.size() << "]");
+  if (i<0 || i>=input_.size()) {
+    std::stringstream ss;
+    ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << input_.size() << "]";
+    if (!isInit()) ss << endl << "Did you forget to initialize?";
+    casadi_error(ss.str());
+  }
 
   return input_.at(i);
 }
@@ -159,8 +160,13 @@ const FunctionIO& FXInternal::inputStruct(int i) const{
 }
   
 FunctionIO& FXInternal::outputStruct(int i){
-  casadi_assert_message(i>=0 && i<output_.size(), "In function " << getOption("name") << ": output " << i << " not in interval [0," << output_.size() << "]");
-  
+  if (i<0 || i>=output_.size()) {
+    std::stringstream ss;
+    ss << "In function " << getOption("name") << ": output " << i << " not in interval [0," << output_.size() << "]";
+    if (!isInit()) ss << endl << "Did you forget to initialize?";
+    casadi_error(ss.str());
+  }
+
   return output_.at(i);
 }
 
@@ -314,7 +320,7 @@ GenericType FXInternal::getStat(const string & name) const {
 
 std::vector<MX> FXInternal::symbolicInput() const{
   vector<MX> ret(getNumInputs());
-  casadi_assert(isInit());
+  assertInit();
   for(int i=0; i<ret.size(); ++i){
     stringstream name;
     name << "x_" << i;
@@ -325,7 +331,7 @@ std::vector<MX> FXInternal::symbolicInput() const{
 
 std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
   vector<SXMatrix> ret(getNumInputs());
-  casadi_assert(isInit());
+  assertInit();
   for(int i=0; i<ret.size(); ++i){
     stringstream name;
     name << "x_" << i;
