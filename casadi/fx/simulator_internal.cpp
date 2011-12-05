@@ -40,6 +40,9 @@ SimulatorInternal::~SimulatorInternal(){
 }
 
 void SimulatorInternal::init(){
+  // Let the integration time start from the first point of the time grid.
+  if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
+
   // Initialize the integrator
   integrator_.init();
   

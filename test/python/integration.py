@@ -1,6 +1,7 @@
 from casadi import *
 import casadi as c
 from numpy import *
+import numpy as n
 import unittest
 from types import *
 from helpers import *
@@ -27,7 +28,7 @@ class Integrationtests(casadiTestCase):
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
-    integrator.setOption("verbose",True)
+    #integrator.setOption("verbose",True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",2.3)
     integrator.init()
@@ -43,6 +44,38 @@ class Integrationtests(casadiTestCase):
     self.par=par
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
+    
+  def test_simulator(self):
+    self.message("CVodes integration: simulator")
+    num=self.num
+    t = n.linspace(0,num['tend'],100)
+    sim = Simulator(self.integrator,t)
+    sim.init()
+    sim.input(0).set([num['q0']])
+    sim.input(1).set([num['p']])
+    sim.evaluate()
+
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+
+    self.assertAlmostEqual(sim.output()[-1],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+    
+  def test_simulator_time_offset(self):
+    self.message("CVodes integration: simulator time offset")
+    num=self.num
+    t = n.linspace(0.7,num['tend'],100)
+    sim = Simulator(self.integrator,t)
+    sim.init()
+    sim.input(0).set([num['q0']])
+    sim.input(1).set([num['p']])
+    sim.evaluate()
+
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+
+    self.assertAlmostEqual(sim.output()[-1],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
     
   def test_eval2(self):
     self.message('CVodes integration: evaluation with MXFunction indirection')
@@ -145,6 +178,24 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
     self.assertAlmostEqual(qe.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+    
+  def test_eval_time_offset(self):
+    self.message('CVodes integration: evaluation time offset')
+    num=self.num
+    integrator=Integrator(self.integrator)
+    integrator.setOption("t0",0.7)
+    integrator.init()
+
+    integrator.input(INTEGRATOR_X0).set([num['q0']])
+    integrator.input(INTEGRATOR_P).set([num['p']])
+    integrator.evaluate()
+
+    tend=num['tend']
+    q0=num['q0']
+    p=num['p']
+
+    self.assertAlmostEqual(integrator.output()[0],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
+    
     
   def test_jac1(self):
     self.message('CVodes integration: jacobian to q0')
