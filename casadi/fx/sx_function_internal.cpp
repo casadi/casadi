@@ -50,7 +50,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const 
   for(int i=0; i<inputv.size(); ++i) {
     casadi_assert_message(isSymbolicSparse(inputv[i]), 
       "SXFunctionInternal::SXFunctionInternal: SXfunction input arguments must be purely symbolic." << endl <<
-      "Argument #" << i << " is not symbolic." << endl
+      "Input argument #" << i << " is not symbolic." << endl
     );
   }
   
