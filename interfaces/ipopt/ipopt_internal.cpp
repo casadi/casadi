@@ -203,6 +203,9 @@ ops_["wsmp_singularity_threshold"] = OT_REAL;
 for(map<string,opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
   addOption(it->first,it->second);
 
+
+addOption("derivative_test", OT_STRING, GenericType(),  "", "first-order|second-order"); 
+
   app = 0;
   userclass = 0;
 }
