@@ -62,6 +62,19 @@ void MultipleShootingInternal::init(){
            nu_*nk_; // local control
            
   // Declare variable vector for the NLP
+  // The structure is as follows:
+  // np x 1  (parameters)
+  // ------
+  // nx x 1  (states at time i=0)
+  // nu x 1  (controls in interval i=0)
+  // ------
+  // nx x 1  (states at time i=1)
+  // nu x 1  (controls in interval i=1)
+  // ------
+  // .....
+  // ------
+  // nx x 1  (states at time i=nk)
+  
   MX V("V",NV);
 
   // Global parameters

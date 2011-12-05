@@ -57,7 +57,10 @@ class MultipleShooting : public OCPSolver{
     * \param ffcn Discrete time dynamics, an CasADi::FX with the folowing mapping:
     * \copydoc scheme_IntegratorInput
     * \copydoc scheme_IntegratorOutput
-    * The first nu entries of the INTEGRATOR_P input are interpreted as controls to be optimized for each time interval, the remainder are interpreted as parameters to be optimized but constant over the whole domain.
+    * Important notes:
+    *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1), but rather ( (np+nu) x 1 ).
+    *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls. 
+    *
     * \param mfcn Mayer term, CasADi::FX mapping to cost (1 x 1)
     * @copydoc scheme_MayerInput
     * \param cfcn Path constraints, CasADi::FX mapping to (nh x 1)
