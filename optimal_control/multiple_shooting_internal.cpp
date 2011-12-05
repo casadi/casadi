@@ -55,6 +55,14 @@ void MultipleShootingInternal::init(){
   // Set time grid
   for(int k=0; k<=nk_; ++k)
     input(OCP_T).at(k) = (k*tf)/nk_;
+    
+  // Set t0 and tf
+  if (ffcn_.hasOption("t0")) ffcn_.setOption("t0",0);
+  if (ffcn_.hasOption("tf")) ffcn_.setOption("tf",tf/nk_);
+  
+  if (ffcn_.hasOption("t0") || ffcn_.hasOption("tf")) ffcn_.init();
+  
+  
 
   // Count the total number of NLP variables
   int NV = np_ + // global parameters
