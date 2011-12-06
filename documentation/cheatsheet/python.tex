@@ -3,6 +3,10 @@
 \usepackage{fullpage}
 
 \begin{document}
+\title{CasADi Python cheatsheet}
+\date{}
+\maketitle
+
 \paragraph{Header}
 \begin{verbatim}
   from casadi import *
@@ -19,7 +23,7 @@
 \begin{verbatim}
   x = msym("x")
   y = msym("y",10,2)
-  a,b,c = msym("[a,b,c]")
+%   a,b,c = msym("[a,b,c]")
 \end{verbatim}
 
 \paragraph{Calculus}
