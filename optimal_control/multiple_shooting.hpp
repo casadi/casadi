@@ -60,6 +60,7 @@ class MultipleShooting : public OCPSolver{
     * Important notes:
     *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1), but rather ( (np+nu) x 1 ).
     *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls. 
+    *  - BEWARE: if the right hand side of ffcn is dependent on time, the results will be incorrect.
     *
     * \param mfcn Mayer term, CasADi::FX mapping to cost (1 x 1)
     * @copydoc scheme_MayerInput

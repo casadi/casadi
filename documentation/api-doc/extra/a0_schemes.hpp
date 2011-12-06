@@ -6,6 +6,14 @@
 <tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
+/** \defgroup scheme_MayerInput
+<table>
+<caption>Input scheme: CasADi::MayerInput  (MAYER_NUM_IN = 2) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>MAYER_X</td><td>States at the end of integration (nx x 1)</td></tr>
+<tr><td>MAYER_P</td><td>Problem parameters (np x 1)</td></tr>
+</table>
+*/
 /** \defgroup scheme_QPInput
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>

@@ -804,6 +804,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::isNull "
 
 Is a null pointer? ";
@@ -1420,10 +1424,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::AcadoIntegratorInternal::verbose "
 
 Verbose mode? ";
@@ -1581,6 +1581,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1AcadoOCP.xml
@@ -2098,6 +2106,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::AcadoOCP::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::AcadoOCP::isNull "
 
 Is a null pointer? ";
@@ -2380,10 +2392,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::AcadoOCPInternal::verbose "
 
 Verbose mode? ";
@@ -2549,6 +2557,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1AddBinaryOperation.xml
@@ -2771,6 +2787,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::BinaryOp::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::BinaryOp::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::BinaryOp::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1BinaryOperation.xml
@@ -3474,6 +3498,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::CFunction::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::CFunction::isNull "
 
 Is a null pointer? ";
@@ -3702,10 +3730,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::CFunctionInternal::verbose "
 
 Verbose mode? ";
@@ -3871,6 +3895,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::CFunctionInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1CollocationIntegrator.xml
@@ -4716,6 +4748,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::isNull "
 
 Is a null pointer? ";
@@ -5326,10 +5362,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::CollocationIntegratorInternal::verbose "
 
 Verbose mode? ";
@@ -5494,6 +5526,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1ConstantSXNode.xml
@@ -5827,6 +5867,8 @@ this function when initialized. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::CplexInternal::reportConstraints "";
+
 %feature("docstring")  CasADi::CplexInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -5880,10 +5922,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring")  CasADi::CplexInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::CplexInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")  CasADi::CplexInternal::verbose "
 
@@ -6050,6 +6088,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::CplexInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::CplexInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::CplexInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1CplexMatrix.xml
@@ -6466,6 +6512,26 @@ Set CPLEX double parameters. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::CplexSolver::reportConstraints "";
+
+%feature("docstring")  CasADi::CplexSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::CplexSolver::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::CplexSolver::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::CplexSolver::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::CplexSolver::getJ "
+
+Access the jacobian of the constraint function J. ";
+
 %feature("docstring")  CasADi::CplexSolver::getNumInputs "
 
 Get number of inputs. ";
@@ -6654,6 +6720,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::CplexSolver::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::CplexSolver::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::CplexSolver::isNull "
 
@@ -7011,6 +7081,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::CRSSparsity::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::CRSSparsity::isNull "
 
 Is a null pointer? ";
@@ -7254,6 +7328,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1CSparse.xml
@@ -7750,6 +7832,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::isNull "
 
 Is a null pointer? ";
@@ -8004,10 +8090,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::verbose "
 
 Verbose mode? ";
@@ -8176,6 +8258,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Sundials_1_1CVodesIntegrator.xml
@@ -9001,6 +9091,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::isNull "
 
 Is a null pointer? ";
@@ -9570,10 +9664,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Sundials::CVodesInternal::verbose "
 
 Verbose mode? ";
@@ -9731,6 +9821,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Densification.xml
@@ -9943,6 +10041,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Densification::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::Densification::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Densification::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1DivBinaryOperation.xml
@@ -10182,6 +10288,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Evaluation::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::Evaluation::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Evaluation::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1ExternalFunction.xml
@@ -10642,6 +10756,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::ExternalFunction::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::ExternalFunction::isNull "
 
 Is a null pointer? ";
@@ -10869,10 +10987,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::ExternalFunctionInternal::verbose "
 
 Verbose mode? ";
@@ -11038,6 +11152,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1OptimalControl_1_1FlatOCP.xml
@@ -11488,6 +11610,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::isNull "
 
 Is a null pointer? ";
@@ -11778,6 +11904,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classKINEMATICS_1_1Frame.xml
@@ -12460,6 +12594,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::FX::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::FX::isNull "
 
 Is a null pointer? ";
@@ -12683,10 +12821,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::FXInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::FXInternal::verbose "
 
 Verbose mode? ";
@@ -12856,6 +12990,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::FXInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::FXInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::FXInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1GenericType.xml
@@ -13059,6 +13201,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::GenericType::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::GenericType::isNull "
 
 Is a null pointer? ";
@@ -13103,6 +13249,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::GenericTypeInternal::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::GenericTypeInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::GenericTypeInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 %feature("docstring")  CasADi::GenericTypeInternal::repr "
 
@@ -13872,6 +14026,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::GSL::GslIntegrator::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::GSL::GslIntegrator::isNull "
 
 Is a null pointer? ";
@@ -14406,10 +14564,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::GSL::GslInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::GSL::GslInternal::verbose "
 
 Verbose mode? ";
@@ -14567,6 +14721,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::GSL::GslInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Sundials_1_1IdasIntegrator.xml
@@ -15149,7 +15311,40 @@ Default constructor. ";
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::IdasIntegrator "
 
 Create an integrator for a fully implicit DAE with quadrature states (nz is
-the number of states not to be included in the state vector) ";
+the number of states not to be included in the state vector)
+
+Create an integrator for a fully implicit DAE with quadrature states (nz is
+the number of states not to be included in the state vector)
+
+Parameters:
+-----------
+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
+";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::checkNode "
 
@@ -15396,6 +15591,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::isNull "
 
@@ -16040,10 +16239,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Sundials::IdasInternal::verbose "
 
 Verbose mode? ";
@@ -16201,6 +16396,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1IfNode.xml
@@ -16413,6 +16616,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::IfNode::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::IfNode::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::IfNode::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1ImplicitFunction.xml
@@ -16881,6 +17092,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::ImplicitFunction::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::isNull "
 
 Is a null pointer? ";
@@ -17115,10 +17330,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::ImplicitFunctionInternal::verbose "
 
 Verbose mode? ";
@@ -17288,6 +17499,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1IndexList.xml
@@ -18237,6 +18456,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Integrator::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Integrator::isNull "
 
 Is a null pointer? ";
@@ -18769,10 +18992,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::IntegratorInternal::verbose "
 
 Verbose mode? ";
@@ -18930,6 +19149,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::IntegratorInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1InverseMapping.xml
@@ -19142,6 +19369,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::InverseMapping::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::InverseMapping::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::InverseMapping::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1IpoptInternal.xml
@@ -19861,6 +20096,8 @@ this function when initialized. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::IpoptInternal::reportConstraints "";
+
 %feature("docstring")  CasADi::IpoptInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -19914,10 +20151,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring")  CasADi::IpoptInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::IpoptInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")  CasADi::IpoptInternal::verbose "
 
@@ -20084,6 +20317,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::IpoptInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::IpoptInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::IpoptInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1IpoptQPInternal.xml
@@ -20835,10 +21076,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::verbose "
 
 Verbose mode? ";
@@ -21007,6 +21244,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1IpoptQPSolver.xml
@@ -21987,6 +22232,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::isNull "
 
 Is a null pointer? ";
@@ -22828,6 +23077,26 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::IpoptSolver::reportConstraints "";
+
+%feature("docstring")  CasADi::IpoptSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::IpoptSolver::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getJ "
+
+Access the jacobian of the constraint function J. ";
+
 %feature("docstring")  CasADi::IpoptSolver::getNumInputs "
 
 Get number of inputs. ";
@@ -23016,6 +23285,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::IpoptSolver::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::IpoptSolver::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::IpoptSolver::isNull "
 
@@ -23551,6 +23824,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Jacobian::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Jacobian::isNull "
 
 Is a null pointer? ";
@@ -23766,10 +24043,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::JacobianInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::JacobianInternal::verbose "
 
 Verbose mode? ";
@@ -23931,6 +24204,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::JacobianInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::JacobianInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::JacobianInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1JacobianReference.xml
@@ -24143,6 +24424,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::JacobianReference::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::JacobianReference::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::JacobianReference::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Sundials_1_1KinsolInternal.xml
@@ -24481,10 +24770,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Sundials::KinsolInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Sundials::KinsolInternal::verbose "
 
 Verbose mode? ";
@@ -24650,6 +24935,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Sundials_1_1KinsolSolver.xml
@@ -25223,6 +25516,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Sundials::KinsolSolver::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolSolver::isNull "
 
 Is a null pointer? ";
@@ -25622,6 +25919,8 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::KnitroInternal::evalh "";
 
+%feature("docstring")  CasADi::KnitroInternal::reportConstraints "";
+
 %feature("docstring")  CasADi::KnitroInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -25675,10 +25974,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring")  CasADi::KnitroInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::KnitroInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")  CasADi::KnitroInternal::verbose "
 
@@ -25845,6 +26140,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::KnitroInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::KnitroInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::KnitroInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1KnitroSolver.xml
@@ -26220,6 +26523,26 @@ Set KNITRO double parameters. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::KnitroSolver::reportConstraints "";
+
+%feature("docstring")  CasADi::KnitroSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::KnitroSolver::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getJ "
+
+Access the jacobian of the constraint function J. ";
+
 %feature("docstring")  CasADi::KnitroSolver::getNumInputs "
 
 Get number of inputs. ";
@@ -26408,6 +26731,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::KnitroSolver::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::KnitroSolver::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::KnitroSolver::isNull "
 
@@ -26930,6 +27257,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::isNull "
 
 Is a null pointer? ";
@@ -27197,10 +27528,6 @@ CasADi::Interfaces::LapackLUDenseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::verbose "
 
 Verbose mode? ";
@@ -27388,6 +27715,15 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::assertInit
+"
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1LapackQRDense.xml
@@ -27888,6 +28224,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::isNull "
 
 Is a null pointer? ";
@@ -28145,10 +28485,6 @@ CasADi::Interfaces::LapackQRDenseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::verbose "
 
 Verbose mode? ";
@@ -28336,6 +28672,15 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::assertInit
+"
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1LiftoptInternal.xml
@@ -28602,6 +28947,9 @@ this function when initialized. ";
 
 Evaluate. ";
 
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::reportConstraints "";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::evaluate_switch
 "
 
@@ -28659,10 +29007,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::verbose "
 
@@ -28832,6 +29176,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1LiftoptSolver.xml
@@ -29213,6 +29565,28 @@ Node init? ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::nodeInit "";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::reportConstraints
+"";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getJ "
+
+Access the jacobian of the constraint function J. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::getNumInputs "
 
 Get number of inputs. ";
@@ -29402,6 +29776,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::isNull "
 
@@ -29886,6 +30264,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::LinearSolver::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::LinearSolver::isNull "
 
 Is a null pointer? ";
@@ -30128,10 +30510,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::LinearSolverInternal::verbose "
 
 Verbose mode? ";
@@ -30301,6 +30679,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::LinearSolverInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Mapping.xml
@@ -30517,6 +30903,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Mapping::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::Mapping::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Mapping::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Matrix.xml
@@ -30748,6 +31142,12 @@ Print a representation of the object. ";
 create a sparse matrix with all zeros ";
 
 %feature("docstring")  CasADi::Matrix::sparse "";
+
+%feature("docstring")  CasADi::Matrix::zeros "
+
+create a dense matrix with all zeros ";
+
+%feature("docstring")  CasADi::Matrix::zeros "";
 
 %feature("docstring")  CasADi::Matrix::ones "
 
@@ -31495,6 +31895,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::MultipleOutput::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::MultipleOutput::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1OptimalControl_1_1MultipleShooting.xml
 %feature("docstring") CasADi::OptimalControl::MultipleShooting "
@@ -31502,10 +31910,11 @@ Initialize the object. ";
 Multiple Shooting.
 
 ns: Number of shooting nodes: from option number_of_grid_points  nx: Number
-of differential states: from ffcn.input(INTEGRATOR_X0).size()  nu: Number of
-controls: from ffcn.input(INTEGRATOR_P).size() - np  np: Number of
-parameters: from option number_of_parameters  nh: Number of point
-constraints: from cfcn.input(0).size()
+of differential states: from ffcn.input(INTEGRATOR_X0).size()  nc: Number of
+constants during intergation: ffcn.input(INTEGRATOR_P).size() nu: Number of
+controls: from nc - np  np: Number of parameters: from option
+number_of_parameters  nh: Number of point constraints: from
+cfcn.input(0).size()
 
 Joel Andersson
 
@@ -31897,11 +32306,17 @@ ffcn:  Discrete time dynamics, an CasADi::FX with the folowing mapping:
 | INTEGRATOR_XPF | State derivative at tf |
 +----------------+------------------------+
 
-The first nu entries of the INTEGRATOR_P input are interpreted as controls
-to be optimized for each time interval, the remainder are interpreted as
-parameters to be optimized but constant over the whole domain.
+Important notes: In the above table, INTEGRATOR_P input is not really of
+shape (np x 1), but rather ( (np+nu) x 1 ).
 
-mfcn:  Mayer term, mapping endstate (nx x 1) to cost (1 x 1)
+The first np entries of the INTEGRATOR_P input are interpreted as parameters
+to be optimized but constant over the whole domain. The remainder are
+interpreted as controls.
+
+BEWARE: if the right hand side of ffcn is dependent on time, the results
+will be incorrect.
+
+mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1)
 
 cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
 CasADi::DAEInput (DAE_NUM_IN = 4)
@@ -31941,6 +32356,23 @@ Get the constraints. ";
 CasADi::OptimalControl::MultipleShooting::setOptimalSolution "
 
 Set the optimal solution. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getNLPSolver "";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::reportConstraints "";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getReportConstraints "";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::getFfcn "";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::getMfcn "";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::getCfcn "";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::getRfcn "";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShooting::getNumInputs "
@@ -32145,6 +32577,11 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::assertInit
+"
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::isNull "
 
@@ -32420,6 +32857,9 @@ CasADi::OptimalControl::MultipleShootingInternal::getConstraintBounds "";
 CasADi::OptimalControl::MultipleShootingInternal::setOptimalSolution "";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::reportConstraints "";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -32485,11 +32925,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 CasADi::OptimalControl::MultipleShootingInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::verbose "
@@ -32696,6 +33131,16 @@ Deep copy data members. ";
 CasADi::OptimalControl::MultipleShootingInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Multiplication.xml
@@ -32909,6 +33354,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Multiplication::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::Multiplication::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Multiplication::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1MuscodFunction.xml
@@ -33145,6 +33598,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::MuscodInterface::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::MuscodInterface::isNull "
 
 Is a null pointer? ";
@@ -33326,6 +33783,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::MuscodInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::MuscodInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1MX.xml
 %feature("docstring") CasADi::MX "
@@ -33409,6 +33874,12 @@ Create nodes by their ID. ";
 Sparse matrix of all zeros. ";
 
 %feature("docstring")  CasADi::MX::sparse "";
+
+%feature("docstring")  CasADi::MX::zeros "
+
+Dense matrix of all zeros. ";
+
+%feature("docstring")  CasADi::MX::zeros "";
 
 %feature("docstring")  CasADi::MX::ones "
 
@@ -33795,6 +34266,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::MX::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::MX::isNull "
 
 Is a null pointer? ";
@@ -34032,6 +34507,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::MXConstant::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::MXConstant::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::MXConstant::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1MXFunction.xml
@@ -34566,6 +35049,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::MXFunction::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::MXFunction::isNull "
 
 Is a null pointer? ";
@@ -34846,10 +35333,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::verbose "
 
 Verbose mode? ";
@@ -35002,6 +35485,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::MXFunctionInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1MXNode.xml
@@ -35214,6 +35705,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::MXNode::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::MXNode::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::MXNode::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: structCasADi_1_1mysortclass.xml
@@ -35662,6 +36161,26 @@ Default constructor. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::NLPSolver::reportConstraints "";
+
+%feature("docstring")  CasADi::NLPSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::NLPSolver::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::NLPSolver::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::NLPSolver::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::NLPSolver::getJ "
+
+Access the jacobian of the constraint function J. ";
+
 %feature("docstring")  CasADi::NLPSolver::getNumInputs "
 
 Get number of inputs. ";
@@ -35850,6 +36369,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::NLPSolver::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::NLPSolver::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::NLPSolver::isNull "
 
@@ -36114,6 +36637,8 @@ This method is typically called after setting options but before evaluating.
 If passed to another class (in the constructor), this class should invoke
 this function when initialized. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::reportConstraints "";
+
 %feature("docstring")  CasADi::NLPSolverInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -36171,10 +36696,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring")  CasADi::NLPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::verbose "
 
@@ -36345,6 +36866,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::NLPSolverInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1NonZeros.xml
@@ -36576,6 +37105,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::NonzerosNonzerosOp::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1NonzerosScalarOp.xml
 %feature("docstring") CasADi::NonzerosScalarOp "
@@ -36791,6 +37328,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::NonzerosScalarOp::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1Norm.xml
 %feature("docstring") CasADi::Norm "
@@ -37004,6 +37549,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::Norm::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Norm::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1Norm1.xml
 %feature("docstring") CasADi::Norm1 "
@@ -37215,6 +37768,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::Norm1::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::Norm1::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Norm1::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Norm2.xml
@@ -37428,6 +37989,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::Norm2::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Norm2::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1NormF.xml
 %feature("docstring") CasADi::NormF "
@@ -37640,6 +38209,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::NormF::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NormF::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1NormInf.xml
 %feature("docstring") CasADi::NormInf "
@@ -37851,6 +38428,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::NormInf::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::NormInf::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NormInf::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classstd_1_1numeric__limits_3_01CasADi_1_1SX_01_4.xml
@@ -38189,6 +38774,14 @@ point to this new object. ";
 
 Default constructor. ";
 
+%feature("docstring")  CasADi::OCPSolver::getFfcn "";
+
+%feature("docstring")  CasADi::OCPSolver::getMfcn "";
+
+%feature("docstring")  CasADi::OCPSolver::getCfcn "";
+
+%feature("docstring")  CasADi::OCPSolver::getRfcn "";
+
 %feature("docstring")  CasADi::OCPSolver::getNumInputs "
 
 Get number of inputs. ";
@@ -38381,6 +38974,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::OCPSolver::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::OCPSolver::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::OCPSolver::isNull "
 
@@ -38701,10 +39298,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::OCPSolverInternal::verbose "
 
 Verbose mode? ";
@@ -38874,6 +39467,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::OCPSolverInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1OneSXNode.xml
@@ -39253,10 +39854,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::verbose "
 
 Verbose mode? ";
@@ -39422,6 +40019,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1OOQPSolver.xml
@@ -39969,6 +40574,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::isNull "
 
 Is a null pointer? ";
@@ -40113,6 +40722,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::OptionsFunctionality::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::OptionsFunctionality::isNull "
 
 Is a null pointer? ";
@@ -40219,6 +40832,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::OptionsFunctionalityNode::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1OutputNode.xml
@@ -40431,6 +41052,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::OutputNode::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::OutputNode::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::OutputNode::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Parallelizer.xml
@@ -40916,6 +41545,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Parallelizer::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Parallelizer::isNull "
 
 Is a null pointer? ";
@@ -41180,10 +41813,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::ParallelizerInternal::verbose "
 
 Verbose mode? ";
@@ -41341,6 +41970,14 @@ Get th ebest suggestions of option names. ";
 %feature("docstring")  CasADi::ParallelizerInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1PrintableObject.xml
@@ -41685,10 +42322,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::verbose "
 
 Verbose mode? ";
@@ -41857,6 +42490,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1QPOasesSolver.xml
@@ -42404,6 +43045,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::isNull "
 
 Is a null pointer? ";
@@ -42925,6 +43570,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::QPSolver::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::QPSolver::isNull "
 
 Is a null pointer? ";
@@ -43199,10 +43848,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::QPSolverInternal::verbose "
 
 Verbose mode? ";
@@ -43372,6 +44017,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::QPSolverInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1RealtypeSXNode.xml
@@ -43672,6 +44325,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::ScalarNonzerosOp::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1SharedObject.xml
 %feature("docstring") CasADi::SharedObject "
@@ -43778,6 +44439,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::SharedObject::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::SharedObject::isNull "
 
 Is a null pointer? ";
@@ -43830,6 +44495,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::SharedObjectNode::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::SharedObjectNode::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SharedObjectNode::assertInit "
+
+Assert that the object has been initialized. ";
 
 %feature("docstring")  CasADi::SharedObjectNode::repr "
 
@@ -44347,6 +45020,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::Simulator::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::Simulator::isNull "
 
 Is a null pointer? ";
@@ -44591,10 +45268,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::SimulatorInternal::verbose "
 
 Verbose mode? ";
@@ -44760,6 +45433,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::SimulatorInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Slice.xml
@@ -44994,6 +45675,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::SparseSparseOp::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1SQPInternal.xml
@@ -45310,6 +45999,8 @@ this function when initialized. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::SQPInternal::reportConstraints "";
+
 %feature("docstring")  CasADi::SQPInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -45363,10 +46054,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring")  CasADi::SQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::SQPInternal::isInit "
-
-Assert that the function has been initialized. ";
 
 %feature("docstring")  CasADi::SQPInternal::verbose "
 
@@ -45533,6 +46220,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::SQPInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::SQPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SQPInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1SQPMethod.xml
@@ -45967,6 +46662,26 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::SQPMethod::reportConstraints "";
+
+%feature("docstring")  CasADi::SQPMethod::getReportConstraints "";
+
+%feature("docstring")  CasADi::SQPMethod::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::SQPMethod::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::SQPMethod::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::SQPMethod::getJ "
+
+Access the jacobian of the constraint function J. ";
+
 %feature("docstring")  CasADi::SQPMethod::getNumInputs "
 
 Get number of inputs. ";
@@ -46155,6 +46870,10 @@ SharedObjectNode and derived classes) ";
 %feature("docstring")  CasADi::SQPMethod::isInit "
 
 Is initialized? ";
+
+%feature("docstring")  CasADi::SQPMethod::assertInit "
+
+Assert that it is initialized. ";
 
 %feature("docstring")  CasADi::SQPMethod::isNull "
 
@@ -46737,6 +47456,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::SuperLU::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::SuperLU::isNull "
 
 Is a null pointer? ";
@@ -47027,10 +47750,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::SuperLUInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::SuperLUInternal::verbose "
 
 Verbose mode? ";
@@ -47196,6 +47915,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::SuperLUInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1SX.xml
@@ -47412,6 +48139,20 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::printme "";
 
 %feature("docstring")  CasADi::SX::sign "";
+
+%feature("docstring")  CasADi::SX::constpow "";
+
+%feature("docstring")  CasADi::SX::add "";
+
+%feature("docstring")  CasADi::SX::sub "";
+
+%feature("docstring")  CasADi::SX::mul "";
+
+%feature("docstring")  CasADi::SX::div "";
+
+%feature("docstring")  CasADi::SX::fmin "";
+
+%feature("docstring")  CasADi::SX::fmax "";
 
 %feature("docstring")  CasADi::SX::constpow "";
 
@@ -48007,6 +48748,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::SXFunction::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::SXFunction::isNull "
 
 Is a null pointer? ";
@@ -48287,10 +49032,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::verbose "
 
 Verbose mode? ";
@@ -48447,6 +49188,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1SXNode.xml
@@ -48752,6 +49501,14 @@ Get the reference count. ";
 
 Initialize the object. ";
 
+%feature("docstring")  CasADi::SymbolicMatrix::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SymbolicMatrix::assertInit "
+
+Assert that the object has been initialized. ";
+
 
 // File: classCasADi_1_1SymbolicSXNode.xml
 %feature("docstring") CasADi::SymbolicSXNode "
@@ -49039,6 +49796,14 @@ Get the reference count. ";
 %feature("docstring")  CasADi::UnaryOp::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::UnaryOp::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::UnaryOp::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1UnaryOperation.xml
@@ -49437,6 +50202,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::OptimalControl::Variable::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::OptimalControl::Variable::isNull "
 
 Is a null pointer? ";
@@ -49489,6 +50258,15 @@ Get the reference count. ";
 %feature("docstring")  CasADi::OptimalControl::VariableInternal::init "
 
 Initialize the object. ";
+
+%feature("docstring")  CasADi::OptimalControl::VariableInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::OptimalControl::VariableInternal::assertInit
+"
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1XFunction.xml
@@ -49968,6 +50746,10 @@ SharedObjectNode and derived classes) ";
 
 Is initialized? ";
 
+%feature("docstring")  CasADi::XFunction::assertInit "
+
+Assert that it is initialized. ";
+
 %feature("docstring")  CasADi::XFunction::isNull "
 
 Is a null pointer? ";
@@ -50206,10 +50988,6 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 Get the unidirectional or bidirectional partition. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::isInit "
-
-Assert that the function has been initialized. ";
-
 %feature("docstring")  CasADi::XFunctionInternal::verbose "
 
 Verbose mode? ";
@@ -50379,6 +51157,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::XFunctionInternal::getCount "
 
 Get the reference count. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1OptimalControl_1_1XMLNode.xml
@@ -50649,15 +51435,48 @@ Uses CasADi::SXFunction::jac ";
 
 %feature("docstring")  CasADi::GSL::square "";
 
+%feature("docstring")  CasADi::GSL::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+specific constraints.
+
+Constraint visualiser strip: o-------=-------o Indicates that the value is
+nicely inbetween the bounds o-=-------------o Indicates that the value is
+closer to the lower bound X---------------o Indicates that the lower bound
+is active 8---------------o Indicates that the lower bound is -inifinity
+o------------=--o Indicates that the value is closer to the upper bound o
+---------------X Indicates that the upper bound is active o---------------8
+Indicates that the upper bound is inifinity VIOLATED Indicates constraint
+violation ";
+
 %feature("docstring")  CasADi::GSL::getptr "";
 
 %feature("docstring")  CasADi::GSL::range "
 
-Python's range function. ";
+Range function
+
+Parameters:
+-----------
+
+start:
+
+stop:
+
+step:
+
+len:  Consider a infinitely long list [start, start+step, start+2*step, ...]
+Elements larger than or equal to stop are chopped off. ";
 
 %feature("docstring")  CasADi::GSL::range "
 
-Python's range function, start = 0. ";
+Range function
+
+Parameters:
+-----------
+
+stop:
+
+list [0,1,2...stop-1] ";
 
 %feature("docstring")  CasADi::GSL::trans "
 
@@ -50881,6 +51700,10 @@ Get a pointer to the data contained in the vector. ";
 
 Get a pointer to the data contained in the vector. ";
 
+%feature("docstring")  CasADi::GSL::all "";
+
+%feature("docstring")  CasADi::GSL::any "";
+
 %feature("docstring")  CasADi::GSL::sp_dense "
 
 Create a dense rectangular sparsity pattern. ";
@@ -51082,10 +51905,9 @@ check if symbolic ";
 
 Repeat matrix A n times vertically and m times horizontally. ";
 
-%feature("docstring")  CasADi::GSL::lift "
+%feature("docstring")  CasADi::GSL::densify "
 
-create a clipped view into a matrix Create a sparse matrix from a dense
-matrix A, with sparsity pattern sp
+Make the matrix dense.
 
 MX clip(const MX& A, const CRSSparsity& sp) { Join the sparsity patterns
 std::vector<int> mapping; CRSSparsity sp =
@@ -51101,17 +51923,14 @@ Create mapping MX ret; ret.assignNode(new Mapping(sp));
 ret->addDependency(A,range(nzA.size()),nzA);
 ret->addDependency(B,range(nzB.size()),nzB); return ret;
 
-}
-
-Lift a node ";
-
-%feature("docstring")  CasADi::GSL::densify "
-
-Make the matrix dense. ";
+} ";
 
 %feature("docstring")  CasADi::GSL::makeDense "
 
-Make the matrix dense. ";
+create a clipped view into a matrix Create a sparse matrix from a dense
+matrix A, with sparsity pattern sp
+
+Make the matrix dense ";
 
 %feature("docstring")  CasADi::GSL::createParent "
 
@@ -51348,19 +52167,24 @@ Simplify an expression. ";
 
 %feature("docstring")  CasADi::GSL::compress "
 
-remove identical calculations ";
+Remove identical calculations. ";
 
 %feature("docstring")  CasADi::GSL::substitute "
 
-substitute variable var with expression expr in multiple expressions ";
+Substitute variable var with expression expr in multiple expressions. ";
 
 %feature("docstring")  CasADi::GSL::substitute "
 
-substitute variable var with expression expr in an expression ex ";
+Substitute variable v with expression vdef in an expression ex. ";
 
 %feature("docstring")  CasADi::GSL::substituteInPlace "
 
-substitute variable var with expression expr in the expression itself ";
+Substitute variable var out of or into an expression expr. ";
+
+%feature("docstring")  CasADi::GSL::substituteInPlace "
+
+Substitute variable var out of or into an expression expr, with an arbitrary
+number of other expressions piggyback. ";
 
 %feature("docstring")  CasADi::GSL::spy "
 
@@ -52086,6 +52910,9 @@ h:  internal expressions which the user may wish to inspect ";
 
 // File: aeroplane_8cpp.xml
 %feature("docstring")  main "";
+
+
+// File: all_8hpp.xml
 
 
 // File: b0__options_8hpp.xml
@@ -52976,6 +53803,9 @@ C99 elementary functions from the math.h header. ";
 // File: qpoases__solver_8hpp.xml
 
 
+// File: range_8hpp.xml
+
+
 // File: shared__object_8cpp.xml
 
 
@@ -53449,6 +54279,9 @@ C99 elementary functions from the math.h header. ";
 // File: integrators_2tolerance_8py-example.xml
 
 
+// File: misc_2all_8cc-example.xml
+
+
 // File: misc_2dotdraw_8py-example.xml
 
 
@@ -53459,6 +54292,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: misc_2printme_8py-example.xml
+
+
+// File: misc_2range_8cc-example.xml
 
 
 // File: MX_2createParent_8py-example.xml
