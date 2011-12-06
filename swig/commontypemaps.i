@@ -1,9 +1,13 @@
 // Lower value means wil be checked first
-#define PRECEDENCE_DVector 98
-#define PRECEDENCE_IVector 99
+#define PRECEDENCE_DVector 96
+#define PRECEDENCE_IVector 97
+
+#define PRECEDENCE_IMatrix 98
+#define PRECEDENCE_IMatrixVector 99
 
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
+
 #define PRECEDENCE_SXMatrix 103
 #define PRECEDENCE_SX 102
 #define PRECEDENCE_SXMatrixVector 103
@@ -104,6 +108,7 @@ if (!ret) {
 
 
 #ifdef SWIGPYTHON
+%my_generic_const_typemap(PRECEDENCE_IMatrix,CasADi::Matrix<int>);
 %my_generic_const_typemap(PRECEDENCE_MXVectorVector,std::vector< std::vector< CasADi::MX > >);
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
 #endif // SWIGPYTHON

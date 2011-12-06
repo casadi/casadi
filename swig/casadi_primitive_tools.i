@@ -40,7 +40,8 @@ except:
 // Matrix tools
 %include "casadi/matrix/matrix_tools.hpp"
 
-// Instsantiate the functions
+// Instantiate the functions
+MATRIX_TOOLS_TEMPLATES(int)
 MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(CasADi::SX)
 

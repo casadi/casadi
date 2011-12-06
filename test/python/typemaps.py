@@ -623,5 +623,13 @@ class typemaptests(casadiTestCase):
     DMatrix(3,4,[1,2,1],[0,2,2,3],list(b))
     DMatrix(3,4,[1,2,1],[0,2,2,3],b)
     
+  def test_imatrix(self):
+    self.message("IMatrix")
+    
+    A = IMatrix(2,2,1)
+    B = A + 1
+    self.assertEqual(type(B),type(A))
+    self.checkarray(array(B),DMatrix(2,2,2),"Imatrix")
+    
 if __name__ == '__main__':
     unittest.main()

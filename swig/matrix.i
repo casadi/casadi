@@ -198,6 +198,13 @@ void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
 %python_matrix_helpers(CasADi::Matrix<double>)
 
 }
+%extend Matrix<int> {
+
+void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
+%python_matrix_convertors
+%python_matrix_helpers(CasADi::Matrix<int>)
+
+}
 }
 
 #ifdef SWIGPYTHON
@@ -309,6 +316,26 @@ binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasA
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 }; // extend Matrix<double>
+
+%extend Matrix<int> {
+
+  %python_array_wrappers(998.0)
+
+  %pythoncode %{
+    def toArray(self):
+      import numpy as n
+      r = n.zeros((self.size1(),self.size2()))
+      for i in range(r.shape[0]):
+        for j in range(r.shape[1]):
+          r[i,j] = self.elem(i,j)
+      return r
+  %}
+
+  binopsrFull(CasADi::Matrix<int>)
+  binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+  binopsFull(const CasADi::Matrix<double> & b,,CasADi::Matrix<double>,CasADi::Matrix<double>)
+  binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
+} // extend Matrix<int>
 } // namespace CasADi
 #endif // SWIGPYTHON
 

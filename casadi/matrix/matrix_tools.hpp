@@ -1155,6 +1155,7 @@ MTT_INST(T,adj) \
 MTT_INST(T,inv) \
 MTT_INST(T,reshape) \
 MTT_INST(T,vec) \
+MTT_INST(T,vecNZ) \
 MTT_INST(T,horzcat) \
 MTT_INST(T,vertcat) \
 MTT_INST(T,inner_prod) \

@@ -113,6 +113,40 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
     
+  def test_IMatrix_indexing(self):
+    self.message("IMatrix")
+    A = IMatrix(2,2)
+    A[0,0] = 1
+    A[1,1] = 3
+    A[0,1] = 2
+    A[1,0] = 4
+    
+    
+    B = DMatrix([1,2,3,4,5])
+    
+    B_ = B[A]
+    
+    self.checkarray(B_,DMatrix([[2,3],[5,4]]),"Imatrix indexing")
+
+    B[A] = DMatrix([[1,2],[3,4]])
+    
+    self.checkarray(B,DMatrix([1,1,2,4,3]),"Imatrix indexing assignement")
+    
+    #B[A].set(DMatrix([[10,20],[30,40]]))
+    
+    #self.checkarray(B,DMatrix([1,10,20,40,30]),"Imatrix indexing setting")
+    
+    B = IMatrix([1,2,3,4,5])
+    
+    B_ = B[A]
+    
+    self.checkarray(array(B_),DMatrix([[2,3],[5,4]]),"Imatrix indexing")
+
+    B[A] = IMatrix([[1,2],[3,4]])
+    
+    self.checkarray(array(B),DMatrix([1,1,2,4,3]),"Imatrix indexing assignement")
+    
+    
 if __name__ == '__main__':
     unittest.main()
 
