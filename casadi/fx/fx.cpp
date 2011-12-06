@@ -153,6 +153,9 @@ void FX::setNumOutputs(int num_out){
 
 FX FX::jacobian(int iind, int oind){
   assertInit();
+  casadi_assert(iind>=0 && iind<getNumInputs());
+  casadi_assert(oind>=0 && oind<getNumOutputs());
+
   vector<pair<int,int> > jblocks;
   jblocks.push_back(pair<int,int>(oind,iind));
   
