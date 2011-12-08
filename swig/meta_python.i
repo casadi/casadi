@@ -37,7 +37,12 @@ template <> bool meta< int >::couldbe(PyObject * p) {
    return result;
    
  }
- return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) ;
+ if (meta< CasADi::Matrix<int> >::isa(p)) {
+   CasADi::Matrix<int> *temp;
+   meta< CasADi::Matrix<int> >::get_ptr(p,temp);
+   if (temp->numel()==1 && temp->size()==1) return true;
+ }
+ return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p);
 }
 
 

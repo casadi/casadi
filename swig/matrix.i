@@ -291,7 +291,7 @@ PyObject* arrayView() {
 %pythoncode %{
   def __int__(self):
     if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to a float")
+      raise Exception("Only a scalar can be cast to an int")
     if self.size()==0:
       return 0
     return int(self.toScalar())
@@ -329,6 +329,25 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
         for j in range(r.shape[1]):
           r[i,j] = self.elem(i,j)
       return r
+  %}
+  
+  
+  %pythoncode %{
+    def __float__(self):
+      if self.numel()!=1:
+        raise Exception("Only a scalar can be cast to a float")
+      if self.size()==0:
+        return 0.0
+      return float(self.toScalar())
+  %}
+
+  %pythoncode %{
+    def __int__(self):
+      if self.numel()!=1:
+        raise Exception("Only a scalar can be cast to an int")
+      if self.size()==0:
+        return 0
+      return self.toScalar()
   %}
 
   binopsrFull(CasADi::Matrix<int>)
