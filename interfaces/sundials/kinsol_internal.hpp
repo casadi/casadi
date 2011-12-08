@@ -40,6 +40,8 @@
 namespace CasADi{
 namespace Sundials{
   
+typedef std::pair< std::string,std::string> Message;
+    
 class KinsolInternal : public ImplicitFunctionInternal{
   friend class KinsolSolver;
 public:
@@ -128,6 +130,16 @@ public:
 
   // Should KINSOL internal warning messages be ignored
   bool disable_internal_warnings_;
+  
+  // Calculate the error message map
+  static std::map<int, Message > calc_flagmap();
+  
+  // Error message map
+  static std::map<int,Message> flagmap;
+ 
+ 
+  // Raise an error specific to KinSol
+  void kinsol_error(const std::string& module, int flag, bool fatal=true);
   
 };
 
