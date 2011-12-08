@@ -30,7 +30,7 @@ class Variables(object):
             return self.getindex(name[2:])
         if name.endswith('_'):
             if isinstance(self._d[name[:-1]],Variables):
-                raise Exception("Variable %s has not numerical value, because it is a Variables object itself." % name[:-1])
+                raise Exception("Variable %s has no numerical value, because it is a Variables object itself." % name[:-1])
             self.doUpdates_(name[:-1])
             return self._d_[name[:-1]]
         return self._d[name]
@@ -229,8 +229,8 @@ class Variables(object):
             if isinstance(obj,Variables):
                 l.append(obj.veccat_())
             elif isinstance(obj,list):
-                for v in obj:
-                  l.append(v)
+                self.doUpdates_(k)
+                l.append(vecNZcat(self._d_[k]))
             else:
                 l.append(self._d_[k])
         return vecNZcat(l)
@@ -245,8 +245,8 @@ class Variables(object):
             if isinstance(obj,Variables):
                 l.append(obj.veccat_())
             elif isinstance(obj,list):
-                for v in obj:
-                  l.append(v)
+                self.doUpdates_(k)
+                l+=self._d_[k]
             else:
                 l.append(self._d_[k])
         return veccat(l)

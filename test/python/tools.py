@@ -51,6 +51,11 @@ class Toolstests(casadiTestCase):
       A = p.vecNZcat_()
       
       self.checkarray(A,DMatrix([5,8,0,7,7,0,0,0,0,0,0,1,5,2,6,3,7,4,8]),"vecNZcat")
+      
+      A = p.veccat_()
+      
+      self.checkarray(A,DMatrix([5,8,0,7,0,0,7,0,0,0,0,0,0,1,5,2,6,3,7,4,8]),"veccat")
+      
       self.checkarray(A[p.i_z],p.z_,"indexing round trip")
       self.checkarray(A[p.o_xother + p.xother.i_b],p.xother.b_,"indexing round trip 2")
 
@@ -76,11 +81,18 @@ class Toolstests(casadiTestCase):
       self.assertEqual(p.I_b[1],2,"Index")
       self.assertEqual(p.I_c,3,"Index")
       
-      p.a_[1].setAll(4)
+      
+      p.b_[1].setAll(4)
       
       A = p.vecNZcat_()
+ 
       self.checkarray(A,DMatrix([0,0,0,0,0,4,4,4,0]),"vecNZcat")
-      
+     
+      p.b_[0].setAll(3)
+      A = p.veccat_()
+
+      self.checkarray(A,DMatrix([0,0,3,3,3,4,4,4,0]),"vecNZcat")
+       
 
 if __name__ == '__main__':
     unittest.main()
