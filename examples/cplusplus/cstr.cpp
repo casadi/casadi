@@ -46,6 +46,7 @@ using namespace CasADi::OptimalControl;
 using namespace std;
 
 int main(){
+  bool use_kinsol = false;
 
   // Allocate an OCP and load the xml
   FlatOCP ocp("../examples/xml_files/cstr.xml");
@@ -86,43 +87,6 @@ int main(){
   vector<double> umin = getMin(ocp.u(),true);
   vector<double> umax = getMax(ocp.u(),true);
   
-  // Integrator instance
-  Integrator integrator;
-
-  // Create an implicit function residual
-  vector<SXMatrix > impres_in(DAE_NUM_IN+1);
-  impres_in[0] = xdot;
-  impres_in[1+DAE_T] = t;
-  impres_in[1+DAE_Y] = x;
-  impres_in[1+DAE_P] = u;
-  SXFunction impres(impres_in,ocp.dae());
-
-  // Create an implicit function (KINSOL)
-  KinsolSolver ode(impres);
-  ode.setOption("linear_solver_creator",CSparse::creator);
-  ode.init();
-  
-  // DAE residual
-  vector<SXMatrix > dae_in(DAE_NUM_IN);
-  dae_in[DAE_T] = t;
-  dae_in[DAE_Y] = x;
-  dae_in[DAE_YDOT] = xdot;
-  dae_in[DAE_P] = u;
-  SXFunction dae(dae_in,ocp.dae());
-
-  bool use_kinsol = false;
-  FX ffcn;
-  if(use_kinsol){
-    ffcn = ode;
-    // Create an ODE integrator (CVodes)
-    integrator = CVodesIntegrator(ode);
-    
-  } else {
-    ffcn = dae;
-    // Create DAE integrator (IDAS)
-    integrator = IdasIntegrator(dae);
-  }
-
   // Number of shooting nodes
   int num_nodes = 100;
 
@@ -137,8 +101,6 @@ int main(){
   integrator_options["reltol"]=1e-8;
   integrator_options["store_jacobians"]=true;
   integrator_options["tf"]=ocp.tf()/num_nodes;
-  integrator.setOption(integrator_options);
-  integrator.init();
 
   // Mayer objective function
   SXMatrix xf = ssym("xf",x.size(),1);
@@ -146,20 +108,45 @@ int main(){
   mterm.setOption("store_jacobians",true);
   
   // Create a multiple shooting discretization
-  MultipleShooting ms(0.1,integrator,mterm);
+  MultipleShooting ocp_solver;
   if(use_kinsol){
-    ms.setOption("integrator",CVodesIntegrator::creator);
+    // Create an implicit function residual
+    vector<SXMatrix > impres_in(DAE_NUM_IN+1);
+    impres_in[0] = xdot;
+    impres_in[1+DAE_T] = t;
+    impres_in[1+DAE_Y] = x;
+    impres_in[1+DAE_P] = u;
+    SXFunction impres(impres_in,ocp.dae());
+
+    // Create an implicit function (KINSOL)
+    KinsolSolver ode(impres);
+    ode.setOption("linear_solver_creator",CSparse::creator);
+    ode.init();
+    
+    // Create OCP solver
+    ocp_solver = MultipleShooting(ode,mterm);
+    ocp_solver.setOption("integrator",CVodesIntegrator::creator);
   } else {
-    ms.setOption("integrator",IdasIntegrator::creator);
+    
+    // DAE residual function
+    vector<SXMatrix > dae_in(DAE_NUM_IN);
+    dae_in[DAE_T] = t;
+    dae_in[DAE_Y] = x;
+    dae_in[DAE_YDOT] = xdot;
+    dae_in[DAE_P] = u;
+    SXFunction dae(dae_in,ocp.dae());
+    
+    ocp_solver = MultipleShooting(dae,mterm);
+    ocp_solver.setOption("integrator",IdasIntegrator::creator);
   }
-  ms.setOption("integrator_options",integrator_options);
-  ms.setOption("number_of_grid_points",num_nodes);
-  ms.setOption("final_time",ocp.tf());
-  ms.setOption("parallelization","openmp");
-//  ms.setOption("parallelization","expand");
+  ocp_solver.setOption("integrator_options",integrator_options);
+  ocp_solver.setOption("number_of_grid_points",num_nodes);
+  ocp_solver.setOption("final_time",ocp.tf());
+  ocp_solver.setOption("parallelization","openmp");
+//  ocp_solver.setOption("parallelization","expand");
 
   // NLP solver
-  ms.setOption("nlp_solver",IpoptSolver::creator);
+  ocp_solver.setOption("nlp_solver",IpoptSolver::creator);
   Dictionary nlp_solver_dict;
   nlp_solver_dict["tol"] = 1e-5;
   nlp_solver_dict["hessian_approximation"] = "limited-memory";
@@ -167,34 +154,34 @@ int main(){
   nlp_solver_dict["linear_solver"] = "ma57";
   //  nlp_solver_dict["derivative_test"] = "first-order";
   //  nlp_solver_dict["verbose"] = true;
-  ms.setOption("nlp_solver_options",nlp_solver_dict);
-  ms.init();
+  ocp_solver.setOption("nlp_solver_options",nlp_solver_dict);
+  ocp_solver.init();
 
   // Initial condition
   for(int i=0; i<x.size(); ++i){
-    ms.input(OCP_X_INIT)(i,0) = ms.input(OCP_LBX)(i,0) = ms.input(OCP_UBX)(i,0) = x0[i];
+    ocp_solver.input(OCP_X_INIT)(i,0) = ocp_solver.input(OCP_LBX)(i,0) = ocp_solver.input(OCP_UBX)(i,0) = x0[i];
   }
 
   // State bounds
   for(int k=1; k<=num_nodes; ++k){
     for(int i=0; i<x.size(); ++i){
-      ms.input(OCP_X_INIT)(i,k) = x0[i];
-      ms.input(OCP_LBX)(i,k) = xmin[i];
-      ms.input(OCP_UBX)(i,k) = xmax[i];
+      ocp_solver.input(OCP_X_INIT)(i,k) = x0[i];
+      ocp_solver.input(OCP_LBX)(i,k) = xmin[i];
+      ocp_solver.input(OCP_UBX)(i,k) = xmax[i];
     }
   }
 
   // Control bounds
   for(int k=0; k<num_nodes; ++k){
     for(int i=0; i<u.size(); ++i){
-      ms.input(OCP_U_INIT)(i,k) = u0[i];
-      ms.input(OCP_LBU)(i,k) = umin[i];
-      ms.input(OCP_UBU)(i,k) = umax[i];
+      ocp_solver.input(OCP_U_INIT)(i,k) = u0[i];
+      ocp_solver.input(OCP_LBU)(i,k) = umin[i];
+      ocp_solver.input(OCP_UBU)(i,k) = umax[i];
     }
   }
 
   // Solve the problem
-  ms.solve();
+  ocp_solver.solve();
   
     
   

@@ -40,14 +40,14 @@ class OCPSolverInternal : public FXInternal{
     /** \brief Constructor
     *  
     *
-    * \param ffcn Discrete time dynamics
+    * \param ffcn Continuous time dynamics
     * \param mfcn Mayer term
     * \param cfcn Path constraints
     * \param rfcn Initial value constraints
     *
     * The signatures (number and order of inputs/outputs) of these functions are not restricted at this stage.
     * 
-    * Only ffcn has a general requirement for input interface: { INTEGRATOR_X0 , INTEGRATOR_P, INTEGRATOR_Z0  } from CasADi::IntegratorInput
+    * Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y, DAE_P, DAE_YDOT } from CasADi::DAEInput
     *
     * For example:
     *

@@ -69,7 +69,9 @@ class MultipleShootingInternal : public OCPSolverInternal{
     void reportConstraints(std::ostream &stream=std::cout);
     
   protected:
-        
+    // ODE/DAE integrator
+    FX integrator_;
+    
     // NLP objective function
     MXFunction F_;
     

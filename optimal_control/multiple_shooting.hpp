@@ -54,9 +54,9 @@ class MultipleShooting : public OCPSolver{
     MultipleShooting();
   
     /** \brief Create a multiple shooting OCP solver
-    * \param ffcn Discrete time dynamics, an CasADi::FX with the folowing mapping:
-    * \copydoc scheme_IntegratorInput
-    * \copydoc scheme_IntegratorOutput
+    * \param ffcn Continuous time dynamics, an CasADi::FX with the folowing mapping:
+    * \copydoc scheme_DAEInput
+    * \copydoc scheme_DAEOutput
     * Important notes:
     *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1), but rather ( (np+nu) x 1 ).
     *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls. 
@@ -68,7 +68,7 @@ class MultipleShooting : public OCPSolver{
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
-    explicit MultipleShooting(double dummy, const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+    explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
     /// Access functions of the node
     MultipleShootingInternal* operator->();

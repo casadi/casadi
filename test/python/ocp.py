@@ -250,9 +250,9 @@ class OCPtests(casadiTestCase):
     xp0 = ssym("x0",nx)
     xf = x0 + p[0]
     daeres = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t,DAE_Y: x0,DAE_P: p, DAE_YDOT: xp0},{'NUM': DAE_NUM_OUT, DAE_RES: xf})
-    dynamics = CVodesIntegrator(daeres)
     mayer = SXFunction([x0],[7*x0[0]])
-    ms = MultipleShooting(1.1,dynamics,mayer)
+    ms = MultipleShooting(daeres,mayer)
+    ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
     ms.setOption("nlp_solver",IpoptSolver)
@@ -289,14 +289,14 @@ class OCPtests(casadiTestCase):
     xp0 = ssym("x0",nx)
     xf = x0 + p[0]
     daeres = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t,DAE_Y: x0,DAE_P: p, DAE_YDOT: xp0},{'NUM': DAE_NUM_OUT, DAE_RES: xf})
-    dynamics = CVodesIntegrator(daeres)
     mayer = SXFunction([x0],[7*x0[0]])
     
     t = SX("t")
     cfcn = SXFunction({DAE_T : t, DAE_Y: x0, DAE_P: p, DAE_YDOT: xp0},[x0[:nh,0]])
     cfcn.init()
     
-    ms = MultipleShooting(0.1,dynamics,mayer,cfcn)
+    ms = MultipleShooting(daeres,mayer,cfcn)
+    ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("number_of_parameters",np)
     ms.setOption("final_time",tf)
@@ -347,23 +347,22 @@ class OCPtests(casadiTestCase):
     f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_Y: y, DAE_P: p,DAE_YDOT: yd},[[y[1,0],-y[0,0],p*y[0,0]]])
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    # Options to be passed to the integrator
     integrator_options = {}
     integrator_options["reltol"]=1e-9
     integrator_options["abstol"]=1e-9
     integrator_options["steps_per_checkpoint"]=10000
     integrator_options["t0"]=0
     integrator_options["tf"]=te/N
-    integrator.setOption(integrator_options)
-    integrator.init()
     
     mayer = SXFunction([y],[-y[2]])
     mayer.init()
     
-    ms = MultipleShooting(0.1,integrator,mayer)
-    ms.setOption("number_of_grid_points",N);
-    ms.setOption("final_time",te);
-    
+    ms = MultipleShooting(f,mayer)
+    ms.setOption("integrator",CVodesIntegrator)
+    ms.setOption("integrator_options",integrator_options)
+    ms.setOption("number_of_grid_points",N)
+    ms.setOption("final_time",te)
     ms.setOption("nlp_solver",IpoptSolver)
     nlp_solver_options = {}
     nlp_solver_options["tol"] = 1e-10
@@ -424,20 +423,19 @@ class OCPtests(casadiTestCase):
     f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_Y: x, DAE_P: [a,u],DAE_YDOT: xd},[[a*x+u]])
     f.init()
     
-    integrator = CVodesIntegrator(f)
     integrator_options = {}
     integrator_options["reltol"]=1e-9
     integrator_options["abstol"]=1e-9
     integrator_options["steps_per_checkpoint"]=10000
     integrator_options["t0"]=0
     integrator_options["tf"]=te/N
-    integrator.setOption(integrator_options)
-    integrator.init()
     
     mayer = SXFunction([x],[-x])
     mayer.init()
     
-    ms = MultipleShooting(0.1,integrator,mayer)
+    ms = MultipleShooting(f,mayer)
+    ms.setOption("integrator",CVodesIntegrator)
+    ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N);
     ms.setOption("number_of_parameters",1);
     ms.setOption("final_time",te);

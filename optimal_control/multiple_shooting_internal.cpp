@@ -48,9 +48,19 @@ void MultipleShootingInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();
 
-  // Get final time
-  double tf = getOption("final_time");
+  // Create an integrator instance
+  integratorCreator integrator_creator = getOption("integrator");
+  integrator_ = integrator_creator(ffcn_,FX());
+  if(hasSetOption("integrator_options")){
+    integrator_.setOption(getOption("integrator_options"));
+  }
 
+  // Set t0 and tf
+  double tf = getOption("final_time");
+  integrator_.setOption("t0",0);
+  integrator_.setOption("tf",tf/nk_);
+  integrator_.init();
+  
   // Path constraints present?
   bool path_constraints = nh_>0;
   
@@ -58,14 +68,6 @@ void MultipleShootingInternal::init(){
   for(int k=0; k<=nk_; ++k)
     input(OCP_T).at(k) = (k*tf)/nk_;
     
-  // Set t0 and tf
-  if (ffcn_.hasOption("t0")) ffcn_.setOption("t0",0);
-  if (ffcn_.hasOption("tf")) ffcn_.setOption("tf",tf/nk_);
-  
-  if (ffcn_.hasOption("t0") || ffcn_.hasOption("tf")) ffcn_.init();
-  
-  
-
   // Count the total number of NLP variables
   int NV = np_ + // global parameters
            nx_*(nk_+1) + // local state
@@ -139,7 +141,7 @@ void MultipleShootingInternal::init(){
     paropt["parallelization"] = getOption("parallelization");
   
   // Evaluate function in parallel
-  vector<vector<MX> > pI_out = ffcn_.call(int_in,paropt);
+  vector<vector<MX> > pI_out = integrator_.call(int_in,paropt);
 
   // Evaluate path constraints in parallel
   vector<vector<MX> > pC_out;

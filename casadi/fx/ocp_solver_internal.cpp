@@ -52,13 +52,13 @@ void OCPSolverInternal::init(){
   nk_ = getOption("number_of_grid_points");
 
   // Get the number of differential states
-  nx_ = ffcn_.input(INTEGRATOR_X0).size();
+  nx_ = ffcn_.input(DAE_Y).size();
 
   // Get the number of parameters
   np_ = getOption("number_of_parameters");
 
   // Get the number of controls
-  nu_ = ffcn_.input(INTEGRATOR_P).size() - np_;
+  nu_ = ffcn_.input(DAE_P).size() - np_;
   
   // Number of point constraints
   nh_ = cfcn_.isNull() ? 0 : cfcn_.output().size();

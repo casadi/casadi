@@ -37,13 +37,6 @@ int main(){
   f[1] = x;
   f[2] = x*x + y*y + u*u;
   
-  //ODE right hand side function
-  vector<SXMatrix> rhs_in(DAE_NUM_IN);
-  rhs_in[DAE_T] = t;
-  rhs_in[DAE_Y] = xx;
-  rhs_in[DAE_P] = u;
-  SXFunction rhs(rhs_in,f);
-  
   // DAE residual
   SXMatrix xxdot = ssym("xxdot",xx.size());
   vector<Matrix<SX> > res_in(DAE_NUM_IN);
@@ -53,13 +46,6 @@ int main(){
   res_in[DAE_P] = u;
   SXFunction res(res_in,f-xxdot);
   
-  // Number of shooting nodes
-  //int num_nodes = 100;
-  
-  //Create an integrator (CVodes)
-  //IdasIntegrator I(res);
-  CVodesIntegrator I(rhs);
-  
   Dictionary integrator_options;
   integrator_options["abstol"]=1e-8; //abs. tolerance
   integrator_options["reltol"]=1e-8; //rel. tolerance
@@ -67,8 +53,6 @@ int main(){
   integrator_options["stop_at_end"]=true;
 //  integrator_options["calc_ic"]=true;
 //  integrator_options["numeric_jacobian"]=true;
-  I.setOption(integrator_options);
-  I.init();
   
   //Numboer of shooting nodes
   int ns = 50;
@@ -84,7 +68,7 @@ int main(){
   SXFunction mterm(xf, xf[nx-1]);
 
   // Create a multiple shooting discretization
-  MultipleShooting ms(0.1,I,mterm);
+  MultipleShooting ms(res,mterm);
   ms.setOption("integrator",CVodesIntegrator::creator);
   //ms.setOption("integrator",IdasIntegrator::creator);
   ms.setOption("integrator_options",integrator_options);
