@@ -197,22 +197,18 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   const std::vector<int>& input_ind = f->input_ind_.front();
   std::vector<int>& output_ind = f->output_ind_.front();
   std::vector<SXAlgEl>& algorithm = f->algorithm_;
-
+  
   // Create the filter
   vector<int> filter = range(f->work_.size());
   casadi_assert(input_ind.size()==output_ind.size());
+
+  // Replace expression
   for(int k=0; k<input_ind.size(); ++k){
     if(reverse){
       filter[output_ind[k]] = input_ind[k];
     } else {
+      output_ind[k] = filter[output_ind[k]];
       filter[input_ind[k]] = output_ind[k];
-    }
-  }
-  
-  // Start by filtering out the replacement variables from the output_ind vector
-  if(!reverse){
-    for(vector<int>::iterator it=output_ind.begin(); it!=output_ind.end(); ++it){
-      *it = filter[*it];
     }
   }
   
