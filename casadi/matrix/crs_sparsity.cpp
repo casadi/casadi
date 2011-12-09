@@ -80,6 +80,10 @@ int CRSSparsity::size() const{
   return (*this)->size();
 }
     
+std::pair<int,int> CRSSparsity::shape() const{
+  return (*this)->shape();
+}
+    
 const vector<int>& CRSSparsity::col() const{
   return (*this)->col_;
 }

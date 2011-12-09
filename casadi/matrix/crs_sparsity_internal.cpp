@@ -2022,6 +2022,10 @@ int CRSSparsityInternal::sizeL() const{
   return nnz;
 }
 
+std::pair<int,int> CRSSparsityInternal::shape() const{
+  return std::pair<int,int>(nrow_,ncol_);
+}
+
 vector<int> CRSSparsityInternal::erase(const vector<int>& ii, const vector<int>& jj){
   // Mapping
   vector<int> mapping;

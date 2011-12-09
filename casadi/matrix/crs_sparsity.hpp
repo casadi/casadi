@@ -133,6 +133,11 @@ class CRSSparsity : public SharedObject{
 
     /** \brief Number of non-zeros in the lower triangular half, i.e. the number of elements (i,j) with j<=i */
     int sizeL() const;
+
+    #ifndef SWIG
+    /** \brief  Get the shape */
+    std::pair<int,int> shape() const;
+    #endif
     /// @}
 
     /** \brief Get a reference to col-vector, containing columns for all non-zero elements (see class description) */

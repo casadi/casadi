@@ -184,6 +184,11 @@ class MX : public SharedObject{
     /** \brief get the first dimension (i.e. m for a n-by-m matrix) */
     int size2() const;
 
+    #ifndef SWIG  
+    /** \brief  Get the shape */
+    std::pair<int,int> shape() const;
+    #endif
+
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
 

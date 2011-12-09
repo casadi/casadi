@@ -146,6 +146,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Number of non-zeros in the lower triangular half
     int sizeL() const;
 
+    /// Shape
+    std::pair<int,int> shape() const;
+    
     /// Is dense?
     bool dense() const;
     

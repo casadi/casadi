@@ -257,6 +257,10 @@ int MX::size2() const{
   return sparsity().size2();
 }
 
+std::pair<int,int> MX::shape() const{
+  return sparsity().shape();
+}
+
 MX operator+(const MX &x, const MX &y){
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
   if((samedim || x.scalar()) && isZero(x)){

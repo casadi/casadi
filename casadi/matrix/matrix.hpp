@@ -216,6 +216,11 @@ class Matrix : public PrintableObject{
     /// get the second dimension
     int size2() const;
 
+    #ifndef SWIG
+    /// Get the shape
+    std::pair<int,int> shape() const;
+    #endif
+
     //@{
     /// Check type of matrix
     bool empty() const; // is the matrix empty
@@ -853,6 +858,11 @@ int Matrix<T>::size2() const{
 template<class T>
 int Matrix<T>::numel() const{
   return size1()*size2();
+}
+
+template<class T>
+std::pair<int,int> Matrix<T>::shape() const{
+  return sparsity_.shape();
 }
 
         
