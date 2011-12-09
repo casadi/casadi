@@ -23,8 +23,8 @@
 \begin{verbatim}
   x = msym("x")
   y = msym("y",10,2)
-%   a,b,c = msym("[a,b,c]")
 \end{verbatim}
+%   a,b,c = msym("[a,b,c]")
 
 \paragraph{Calculus}
 \begin{verbatim}
@@ -48,9 +48,10 @@
   x = horzcat([a,b,c])
 \end{verbatim}
 
-\paragraph{Flattening/vectorizing}
+\paragraph{Reshaping}
 \begin{verbatim}
   column_matrix = vec(some_matrix)
+  reshaped_matrix = reshape(some_matrix,[3,4])
 \end{verbatim}
 
 \paragraph{Slicing}
@@ -69,8 +70,13 @@
 
 \paragraph{Function MIMO}
 \begin{verbatim}
-  g = SXFunction([x,y],[x**2,x*y,[x,2*x]])
+  g = SXFunction([x,y],[x**2,x*y,vertcat([x,2*x])])
   g.init()
+\end{verbatim}
+
+\paragraph{Setting options}
+\begin{verbatim}
+  f.setOption("option_name",option value)
 \end{verbatim}
 
 \paragraph{Evaluate SISO}
