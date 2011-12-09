@@ -111,29 +111,33 @@ int main(){
   SXFunction dae(dae_in,ocp.dae());
 
   bool use_kinsol = false;
+  FX ffcn;
   if(use_kinsol){
+    ffcn = ode;
     // Create an ODE integrator (CVodes)
     integrator = CVodesIntegrator(ode);
     
   } else {
+    ffcn = dae;
     // Create DAE integrator (IDAS)
     integrator = IdasIntegrator(dae);
-    
   }
 
   // Number of shooting nodes
   int num_nodes = 100;
 
   // Set integrator options
-  integrator.setOption("number_of_fwd_dir",1);
-  integrator.setOption("number_of_adj_dir",0);
-  integrator.setOption("exact_jacobian",true);
-  integrator.setOption("fsens_err_con",true);
-  integrator.setOption("quad_err_con",true);
-  integrator.setOption("abstol",1e-8);
-  integrator.setOption("reltol",1e-8);
-  integrator.setOption("store_jacobians",true);
-  integrator.setOption("tf",ocp.tf()/num_nodes);
+  Dictionary integrator_options;
+  integrator_options["number_of_fwd_dir"]=1;
+  integrator_options["number_of_adj_dir"]=0;
+  integrator_options["exact_jacobian"]=true;
+  integrator_options["fsens_err_con"]=true;
+  integrator_options["quad_err_con"]=true;
+  integrator_options["abstol"]=1e-8;
+  integrator_options["reltol"]=1e-8;
+  integrator_options["store_jacobians"]=true;
+  integrator_options["tf"]=ocp.tf()/num_nodes;
+  integrator.setOption(integrator_options);
   integrator.init();
 
   // Mayer objective function
@@ -142,7 +146,13 @@ int main(){
   mterm.setOption("store_jacobians",true);
   
   // Create a multiple shooting discretization
-  MultipleShooting ms(integrator,mterm);
+  MultipleShooting ms(0.1,integrator,mterm);
+  if(use_kinsol){
+    ms.setOption("integrator",CVodesIntegrator::creator);
+  } else {
+    ms.setOption("integrator",IdasIntegrator::creator);
+  }
+  ms.setOption("integrator_options",integrator_options);
   ms.setOption("number_of_grid_points",num_nodes);
   ms.setOption("final_time",ocp.tf());
   ms.setOption("parallelization","openmp");

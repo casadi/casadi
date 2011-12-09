@@ -37,6 +37,8 @@ MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfc
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
+  addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
+  addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
 }
 
 MultipleShootingInternal::~MultipleShootingInternal(){

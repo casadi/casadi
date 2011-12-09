@@ -68,7 +68,7 @@ class MultipleShooting : public OCPSolver{
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
-    explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+    explicit MultipleShooting(double dummy, const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
     /// Access functions of the node
     MultipleShootingInternal* operator->();

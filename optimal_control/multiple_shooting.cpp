@@ -28,7 +28,7 @@ namespace CasADi{
 MultipleShooting::MultipleShooting(){
 }
     
-MultipleShooting::MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
+MultipleShooting::MultipleShooting(double dummy, const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
   assignNode(new MultipleShootingInternal(ffcn,mfcn,cfcn,rfcn));
 }
 

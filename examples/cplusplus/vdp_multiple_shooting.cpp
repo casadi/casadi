@@ -59,12 +59,15 @@ int main(){
   //Create an integrator (CVodes)
   //IdasIntegrator I(res);
   CVodesIntegrator I(rhs);
-  I.setOption("abstol",1e-8); //abs. tolerance
-  I.setOption("reltol",1e-8); //rel. tolerance
-  I.setOption("steps_per_checkpoint",500);
-  I.setOption("stop_at_end",true);
-//  I.setOption("calc_ic",true);
-//  I.setOption("numeric_jacobian",true);
+  
+  Dictionary integrator_options;
+  integrator_options["abstol"]=1e-8; //abs. tolerance
+  integrator_options["reltol"]=1e-8; //rel. tolerance
+  integrator_options["steps_per_checkpoint"]=500;
+  integrator_options["stop_at_end"]=true;
+//  integrator_options["calc_ic"]=true;
+//  integrator_options["numeric_jacobian"]=true;
+  I.setOption(integrator_options);
   I.init();
   
   //Numboer of shooting nodes
@@ -81,7 +84,10 @@ int main(){
   SXFunction mterm(xf, xf[nx-1]);
 
   // Create a multiple shooting discretization
-  MultipleShooting ms(I,mterm);
+  MultipleShooting ms(0.1,I,mterm);
+  ms.setOption("integrator",CVodesIntegrator::creator);
+  //ms.setOption("integrator",IdasIntegrator::creator);
+  ms.setOption("integrator_options",integrator_options);
   ms.setOption("number_of_grid_points",ns);
   ms.setOption("final_time",tf);
   ms.setOption("parallelization","openmp");
