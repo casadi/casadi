@@ -4,6 +4,10 @@ SET(INTEGRATION_SRCS
   collocation_integrator.cpp
   collocation_integrator_internal.hpp
   collocation_integrator_internal.cpp
+  rk_integrator.hpp
+  rk_integrator.cpp
+  rk_integrator_internal.hpp
+  rk_integrator_internal.cpp
 )
 
 if(ENABLE_STATIC)
