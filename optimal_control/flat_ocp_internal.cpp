@@ -125,7 +125,9 @@ FlatOCPInternal::~FlatOCPInternal(){
 }
 
 void FlatOCPInternal::parse(){
-  cout << "Parsing XML ..." << endl;
+  if(verbose_){
+    cout << "Parsing XML ..." << endl;
+  }
   double time1 = clock();
 
   // Add model variables
@@ -157,7 +159,9 @@ void FlatOCPInternal::parse(){
   // Return a reference to the created ocp
   double time2 = clock();
   double tparse = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "... parsing complete after " << tparse << " seconds" << endl;
+  if(verbose_){
+    cout << "... parsing complete after " << tparse << " seconds" << endl;
+  }
 }
 
 void FlatOCPInternal::addModelVariables(){
@@ -304,14 +308,10 @@ void FlatOCPInternal::addOptimization(){
   const XMLNode& opts = document_[0]["opt:Optimization"];
   
   // Start time
-  cout << "starttime (string) = " << string(opts["opt:IntervalStartTime"]["opt:Value"].getText()) << endl;
   t0_  = opts["opt:IntervalStartTime"]["opt:Value"].getText();
-  cout << "starttime (double) = " << t0_ << endl;
 
   // Terminal time
-  cout << "endtime (string) = " << string(opts["opt:IntervalFinalTime"]["opt:Value"].getText()) << endl;
   tf_ = opts["opt:IntervalFinalTime"]["opt:Value"].getText();
-  cout << "endtime (double) = " << tf_ << endl;
 
   for(int i=0; i<opts.size(); ++i){
     
@@ -323,7 +323,9 @@ void FlatOCPInternal::addOptimization(){
       try{
         addObjectiveFunction(onode);
       } catch(exception& ex){
-        cout << "WARNING: addObjectiveFunction" << ex.what() << endl;
+        if(verbose_){
+          cout << "WARNING: addObjectiveFunction" << ex.what() << endl;
+        }
       }
     } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
       try{
