@@ -46,8 +46,8 @@ ENDIF(IPOPT_FOUND)
 IF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
 # rocket example using sundials and ipopt
-add_executable(rocket_ipopt_sundials rocket_ipopt_sundials.cpp)
-target_link_libraries(rocket_ipopt_sundials sundials_interface ipopt_interface casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${EXTRA_LIBS})
+add_executable(rocket_single_shooting rocket_single_shooting.cpp)
+target_link_libraries(rocket_single_shooting sundials_interface ipopt_interface integration casadi ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${EXTRA_LIBS})
 
 # Van der pol with multiple shooting
 add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)

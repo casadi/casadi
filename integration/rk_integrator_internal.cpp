@@ -213,4 +213,16 @@ void RKIntegratorInternal::printStats(std::ostream &stream) const{
 void RKIntegratorInternal::setStopTime(double tf){
 }
 
+FX RKIntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+  return yf_fun_.jacobian(jblocks);
+}
+
+CRSSparsity RKIntegratorInternal::getJacSparsity(int iind, int oind){
+  if(iind==INTEGRATOR_XP0 || oind==INTEGRATOR_XPF){
+    return CRSSparsity();
+  } else {
+    return yf_fun_.jacSparsity(iind, oind);
+  }
+}
+
 } // namespace CasADi

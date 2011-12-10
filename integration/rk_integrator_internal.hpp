@@ -85,6 +85,12 @@ public:
   /// Set the stop time of the forward integration
   virtual void setStopTime(double tf);
 
+  /// Jacobian of the integrator
+  virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
+
+  /// Generate the sparsity of a Jacobian block
+  virtual CRSSparsity getJacSparsity(int iind, int oind);
+
   // Function which returns the state at the final time
   FX yf_fun_;
 
