@@ -103,11 +103,11 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,"X_opt")
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],0.2,8,"X_opt")
     
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_UBX)[0],1,8,"Cost should be linear in y0")
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_UBX)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
+    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[0],1,8,"Cost should be linear in y0")
+    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
     self.assertAlmostEqual(-solver.output(NLP_COST)[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[1],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[1],0,8,"Constraint is supposed to be unactive")
   
   def test_singleshooting2(self):
     self.message("Single shooting 2")
@@ -167,13 +167,13 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],0.2,6,"X_opt")
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],0.2,6,"X_opt")
     
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_UBX)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[0],0,8,"Constraint is supposed to be unactive")
     dfdp0 = (sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_UBX)[1],1+dfdp0,8)
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_OPT)[0],1,8)
+    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[1],1+dfdp0,8)
+    self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],1,8)
     self.assertAlmostEqual(-solver.output(NLP_COST)[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_LBX)[1],0,8,"Constraint is supposed to be unactive") 
+    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[1],0,8,"Constraint is supposed to be unactive") 
     
   def test_XML(self):
     self.message("JModelica XML parsing")

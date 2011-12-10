@@ -144,9 +144,8 @@ class NLPtests(casadiTestCase):
     solver.input(NLP_LBG).set([0])
     solver.input(NLP_UBG).set([1])
     solver.input(NLP_X_INIT).set(oldsolver.output(NLP_X_OPT))
-    solver.input(NLP_LAMBDA_INIT).set(oldsolver.output(NLP_LAMBDA_OPT))
-    solver.output(NLP_LAMBDA_LBX).set(oldsolver.output(NLP_LAMBDA_LBX))
-    solver.output(NLP_LAMBDA_UBX).set(oldsolver.output(NLP_LAMBDA_UBX))
+    solver.input(NLP_LAMBDA_INIT).set(oldsolver.output(NLP_LAMBDA_G))
+    solver.output(NLP_LAMBDA_X).set(oldsolver.output(NLP_LAMBDA_X))
     
     solver.solve()
     
