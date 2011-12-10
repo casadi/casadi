@@ -175,9 +175,7 @@ void MultipleShootingInternal::init(){
     vector<MX> mfcn_argin(MAYER_NUM_IN); 
     mfcn_argin[MAYER_X] = X.back();
     mfcn_argin[MAYER_P] = V(range(np_));
-    std::cout << "hrey";
     f = mfcn_.call(mfcn_argin);
-    std::cout << "hrey";
   }
   F_ = MXFunction(V,f);
 
@@ -294,10 +292,6 @@ void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<d
     V_max[max_el++] = x_max.elem(i,nk_);
   }
   
-/*  std::cout << "42: " << min_el << std::endl;
-  std::cout << "42: " << max_el << std::endl;
-  std::cout << "42: " << V_min.size() << std::endl;
-  std::cout << "42: " << V_max.size() << std::endl;*/
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
