@@ -146,6 +146,19 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(array(B),DMatrix([1,1,2,4,3]),"Imatrix indexing assignement")
     
+  def test_issue298(self):
+    self.message("Issue #298")
+    a = DMatrix(4,1)
+    b = c.reshape(a,2,2)
+    self.assertEqual(type(a),type(b))
+
+    #a = IMatrix(4,1)
+    #b = DMatrix(a)
+    #self.assertTrue(isinstance(b,DMatrix))
+    
+    #a = DMatrix(4,1)
+    #b = IMatrix(a)
+    #self.assertTrue(isinstance(b,IMatrix))
     
 if __name__ == '__main__':
     unittest.main()
