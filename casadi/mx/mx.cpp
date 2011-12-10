@@ -119,6 +119,18 @@ const MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
   return ret;
 }
 
+const MX MX::getSub(const Matrix<int>& k) const {
+  MX ret = MX::create(new Mapping(k.sparsity()));
+  int s = size();
+  const std::vector<int> & d = k.data();
+  for (int i=0;i< k.size();i++) {
+    if (d[i]>=s) casadi_error("MX::getSub: a non-zero element at position " << d[i] << " was requested, but MX is only " << dimString());
+  }
+  ret->addDependency(*this,k.data());
+  simplifyMapping(ret);
+  return ret;
+}
+
 const MX MX::getSub(int i, int j) const{
   int ind = sparsity().getNZ(i,j);
 
@@ -147,6 +159,21 @@ void MX::setSub(int i, const std::vector<int>& j, const MX& el){
 void MX::setSub(const std::vector<int>& i, int j, const MX& el){
   setSub(i,vector<int>(1,j),el);
 }
+
+void MX::setSub(const Matrix<int>& k, const MX& el){
+  // Allow el to be a 1x1
+  if (el.dense() && el.scalar()) {
+    if (k.numel()>1) {
+      setSub(k,MX(k.sparsity(),el));
+      return;
+    }
+  }
+  
+  casadi_assert_message(k.sparsity()==el.sparsity(),"Sparsity mismatch." << "lhs is " << k.dimString() << ", while rhs is " << el.dimString());
+  
+  casadi_error("MX::setSub not implemented yet");
+}
+
 
 void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
   // Allow el to be a 1x1

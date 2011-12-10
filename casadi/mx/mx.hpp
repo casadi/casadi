@@ -107,6 +107,9 @@ class MX : public SharedObject{
     /** \brief  Get Matrix element or slice */
     template<typename I, typename J>
     const MX operator()(const I& i, const J& j) const{ return getSub(i,j); }
+    
+    /** \brief  Get Matrix slice */
+    const MX operator()(const Matrix<int>& k) const{ return getSub(k); }
 
     /** \brief  Access vector element or slice */
     template<typename I>
@@ -115,6 +118,14 @@ class MX : public SharedObject{
     /** \brief  Access Matrix element or slice */
     template<typename I, typename J>
     SubMatrix<MX,I,J> operator()(const I& i, const J& j){ return SubMatrix<MX,I,J>(*this,i,j); }
+    
+    /** \brief  Access Matrix element or slice */
+    //template<>
+    //SubMatrix<MX> operator()(const Matrix<int>& k){ 
+    //  casadi_error("MX::operator()(Imatrix) not implemented yet");
+      //return SubMatrix<MX>(*this,k);
+    //}
+
 
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;
@@ -146,6 +157,9 @@ class MX : public SharedObject{
     const MX indexed(const Slice &i, const Slice &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
+    const MX indexed(const Matrix<int> &k) const{ 
+      return (*this)(k);
+    }
     
     /// set a non-zero
     void indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
@@ -166,6 +180,11 @@ class MX : public SharedObject{
     
     void indexed_assignment(const Slice &i, const Slice &j, const MX &m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
+    }
+    
+    void indexed_assignment(const Matrix<int>& k, const MX &m){
+      casadi_error("MX::operator()(Imatrix) not implemented yet");
+      //(*this)(k) = m;
     }
     //@}
     
@@ -370,11 +389,13 @@ class MX : public SharedObject{
   const MX getSub(int i, const std::vector<int>& j) const;
   const MX getSub(const std::vector<int>& i, int j) const;
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
-  
+  const MX getSub(const Matrix<int>& k) const;
+      
   void setSub(int i, int j, const MX& el);
   void setSub(int i, const std::vector<int>& j, const MX& el);
   void setSub(const std::vector<int>& i, int j, const MX& el);
   void setSub(const std::vector<int>& i, const std::vector<int>& j, const MX& el);
+  void setSub(const Matrix<int>& k, const MX& el);
   
   MX getNZ(int k) const;
   MX getNZ(const std::vector<int>& k) const;

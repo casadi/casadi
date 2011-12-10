@@ -9,6 +9,7 @@ class Variables(object):
         self._d_ = dict()
         self._orderflag = True
         self._offset = 0
+        self._type = "SX"
 
     def __getattr__(self,name):
         """
@@ -49,9 +50,29 @@ class Variables(object):
             getattr(self,name).set(value)
             return
         self._d[name] = value
+        if isinstance(value,MX) or self._type == "MX":
+           self._type = "MX"
+           self.createParent()
+        
         if not(isinstance(value,Variables)):
             self._d_[name] = self.get_(value)
             
+    def createParent(self):
+        self._V = msym("V",self.getSize())
+        for k in self.getOrder():
+            obj = self._d[k]
+            if isinstance(obj,Variables):
+                raise Exception("Not implemented")
+            elif isinstance(obj,list):
+                for i in range(len(obj)):
+                    self._d[k] = V[getattr(self,'i_'+k)[i]]
+            else:
+                print getattr(self,'i_'+k)
+                print self._V.shape, self._V.size()
+                print self._V[getattr(self,'i_'+k)] 
+                
+                self._d[k] = self._V[getattr(self,'i_'+k)]  
+                print "foo"      
             
     def get_(self,value):
         if isinstance(value,list):
@@ -175,7 +196,8 @@ class Variables(object):
                 
     def getOrder(self):
         """
-        Returns a list of variable names. This list defines the order of variables
+        Returns a list of variable names.
+        This list defines the order of variables.
         """
         return sorted(self._d.iterkeys())
         
@@ -191,6 +213,9 @@ class Variables(object):
         """
         Returns the result of a veccat operation to the list of all variables
         """
+        if self._type == "MX":
+          return self._V
+          
         l = []
         for k in self.getOrder():
             obj = self._d[k]
@@ -207,6 +232,8 @@ class Variables(object):
         """
         Returns the result of a veccat operation to the list of all variables
         """
+        if self._type == "MX":
+          return self._V
         l = []
         for k in self.getOrder():
             obj = self._d[k]

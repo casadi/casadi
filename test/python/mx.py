@@ -204,7 +204,7 @@ class MXtests(casadiTestCase):
     self.assertEqual(z.size1(),2,"MX fails to indicate its size1")
     self.assertEqual(z.size2(),3,"MX fails to indicate its size2")
 
-  def test_MXfunction1(self):
+  def test_MXFunction1(self):
     self.message("MXFunction single input, single output")
     # check if x->2*x
     # evaluates correctly for x=3
@@ -736,6 +736,19 @@ class MXtests(casadiTestCase):
     f.evaluate()
     self.checkarray(f.output(),nxn+nyn,"unite sparse")
      
+  def test_imatrix_index(self):
+    self.message("IMatrix indexing")
+    X = MX("x",2,2)
+    Y = X[IMatrix([[0,2],[1,1],[3,3]])]
+    
+    f = MXFunction([X],[Y])
+    f.init()
+    f.input().set([1,2,3,4])
+    f.evaluate()
+    
+    self.checkarray(f.output(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
+    
+    
   def test_subsass(self):
      self.message("Check subscripted assignment")
      

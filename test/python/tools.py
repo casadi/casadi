@@ -92,6 +92,16 @@ class Toolstests(casadiTestCase):
       A = p.veccat_()
 
       self.checkarray(A,DMatrix([0,0,3,3,3,4,4,4,0]),"vecNZcat")
+      
+      
+      
+      p = Variables()
+      p.a = msym("a",2)
+      #p.b = []
+      #p.b.append(msym("b1",3))
+      #p.b.append(msym("b2",3))
+      #p.c = msym("c")
+      
        
 
 if __name__ == '__main__':

@@ -1,6 +1,10 @@
 // Lower value means wil be checked first
-#define PRECEDENCE_DVector 96
-#define PRECEDENCE_IVector 97
+#define PRECEDENCE_DVector 94
+#define PRECEDENCE_IVector 95
+#define PRECEDENCE_PAIR_SLICE_SLICE 96
+#define PRECEDENCE_SLICE 97
+#define PRECEDENCE_IndexVector 98
+#define PRECEDENCE_PAIR_IVector_IVector 97
 
 #define PRECEDENCE_IMatrix 98
 #define PRECEDENCE_IMatrixVector 99
@@ -14,10 +18,7 @@
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_MXVectorVector 106
-#define PRECEDENCE_PAIR_SLICE_SLICE 204
-#define PRECEDENCE_SLICE 205
-#define PRECEDENCE_IndexVector 210
-#define PRECEDENCE_PAIR_IVector_IVector 206
+
 #define PRECEDENCE_GENERICTYPE 22
 #define PRECEDENCE_DICTIONARY 21
 
