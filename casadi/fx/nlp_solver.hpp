@@ -57,7 +57,7 @@ NLP_UBX,
 NLP_LBG,
 /// Constraints upper bound (m x 1), default +inf
 NLP_UBG,
-/// Lambda multipliers initial guess (m x 1)
+/// Lagrange multipliers initial guess (m x 1)
 NLP_LAMBDA_INIT,
 /// Static parameters on which the objective and constraints might depend
 NLP_P,
@@ -69,14 +69,10 @@ enum NLPOutput{
 NLP_X_OPT,
 /// Objective/cost function for optimal solution (1 x 1)
 NLP_COST,
-///  Lambda multipliers function for optimal solution (m x 1)
-NLP_LAMBDA_OPT,
-///  Lower bound multipliers for optimal solution (n x 1)
-///  When in warm start mode, this output will be used as input
-NLP_LAMBDA_LBX, 
-///  Upper bound multipliers for optimal solution (n x 1)
-///  When in warm start mode, this output will be used as input
-NLP_LAMBDA_UBX,
+/// Lagrange multipliers for the nonlinear bounds at the solution (m x 1)
+NLP_LAMBDA_G,
+/// Lagrange multipliers for the simple bounds at the solution (n x 1)
+NLP_LAMBDA_X, 
 NLP_NUM_OUT};
 
 class NLPSolverInternal;

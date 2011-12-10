@@ -170,9 +170,8 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   casadi_assert(status<=0); // make sure the NLP finished solving
     
   // Copy lagrange multipliers
-  output(NLP_LAMBDA_OPT).set(getPtr(lambda));
-  output(NLP_LAMBDA_LBX).set(&lambda[m_]);
-  output(NLP_LAMBDA_UBX).set(&lambda[m_]);
+  output(NLP_LAMBDA_G).set(getPtr(lambda));
+  output(NLP_LAMBDA_X).set(&lambda[m_]);
 
   // Free memory (move to destructor!)
   KTR_free(&kc_handle_);

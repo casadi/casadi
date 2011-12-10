@@ -236,9 +236,12 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
     if (!callback_.isNull()) {
 #ifdef WITH_IPOPT_CALLBACK 
       copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
-      copy(z_L,z_L+n_,callback_.input(NLP_LAMBDA_LBX).begin());
-      copy(z_U,z_U+n_,callback_.input(NLP_LAMBDA_UBX).begin());
-      copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_OPT).begin());
+      
+      vector<double>& lambda_x = callback_.input(NLP_LAMBDA_X).data();
+      for(int i=0; i<lambda_x.size(); ++i){
+        lambda_x[i] = z_U[i]-z_L[i];
+      }
+      copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
 #endif // WITH_IPOPT_CALLBACK 
       callback_.input(NLP_COST).at(0) = obj_value;
       callback_->stats_["iter"] = iter;
@@ -262,11 +265,20 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
 
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
   try {
+    // Get primal solution
     copy(x,x+n_,output(NLP_X_OPT).begin());
-    copy(z_L,z_L+n_,output(NLP_LAMBDA_LBX).begin());
-    copy(z_U,z_U+n_,output(NLP_LAMBDA_UBX).begin());
-    copy(lambda,lambda+m_,output(NLP_LAMBDA_OPT).begin());
+
+    // Get optimal cost
     output(NLP_COST).at(0) = obj_value;
+
+    // Get dual solution (simple bounds)
+    vector<double>& lambda_x = output(NLP_LAMBDA_X).data();
+    for(int i=0; i<lambda_x.size(); ++i){
+      lambda_x[i] = z_U[i]-z_L[i];
+    }
+
+    // Get dual solution (nonlinear bounds)
+    copy(lambda,lambda+m_,output(NLP_LAMBDA_G).begin());
   } catch (exception& ex){
     cerr << "finalize_solution failed: " << ex.what() << endl;
   }
@@ -541,8 +553,12 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
       input(NLP_X_INIT).getArray(x,n);
     
     if (init_z) {
-      output(NLP_LAMBDA_LBX).getArray(z_L,n);
-      output(NLP_LAMBDA_UBX).getArray(z_U,n);
+      // Get dual solution (simple bounds)
+      vector<double>& lambda_x = output(NLP_LAMBDA_X).data();
+      for(int i=0; i<lambda_x.size(); ++i){
+        z_L[i] = std::max(0.,-lambda_x[i]);
+        z_U[i] = std::max(0., lambda_x[i]);
+      }
     }
     
     if (init_lambda)
