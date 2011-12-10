@@ -208,9 +208,13 @@ Joel Andersson
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -762,6 +766,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -1052,9 +1080,13 @@ thus x := [xd,xa]
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -1545,6 +1577,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::hasOption "
 
@@ -2060,6 +2117,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::AcadoOCP::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::AcadoOCP::clone "
 
 Deep copy. ";
@@ -2517,6 +2598,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::hasOption "
 
@@ -3452,6 +3557,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::CFunction::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::CFunction::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::CFunction::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::CFunction::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::CFunction::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CFunction::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::CFunction::clone "
 
 Deep copy. ";
@@ -3856,6 +3985,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::CFunctionInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::hasOption "
 
 check if there is an option str ";
@@ -4122,9 +4275,13 @@ Joel Andersson
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -4706,6 +4863,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -4976,9 +5157,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -5489,6 +5674,36 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getOptionNames
+"
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getOptionType
+"
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::hasOption "
 
@@ -6048,6 +6263,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::CplexInternal::hasOption "
 
@@ -6675,6 +6914,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::CplexSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::CplexSolver::clone "
 
 Deep copy. ";
@@ -6813,6 +7076,10 @@ elements (i,j) with j>=i. ";
 
 Number of non-zeros in the lower triangular half, i.e. the number of
 elements (i,j) with j<=i. ";
+
+%feature("docstring")  CasADi::CRSSparsity::shape "
+
+Get the shape. ";
 
 %feature("docstring")  CasADi::CRSSparsity::makeUnique "
 
@@ -7227,6 +7494,10 @@ Number of non-zeros in the upper triangular half. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::sizeL "
 
 Number of non-zeros in the lower triangular half. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::shape "
+
+Shape. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::dense "
 
@@ -7786,6 +8057,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::clone "
 
 Deep copy. ";
@@ -8218,6 +8513,34 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::CSparseInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::CSparseInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getOptionDefault
+"
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getOptionAllowed
+"
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::hasOption "
 
 check if there is an option str ";
@@ -8468,9 +8791,13 @@ times t_i.
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -9048,6 +9375,34 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Sundials::CVodesIntegrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOptionAllowed
+"
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOptionDefault
+"
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -9301,9 +9656,13 @@ x0;
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -9785,6 +10144,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Sundials::CVodesInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::hasOption "
 
@@ -10710,6 +11094,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::ExternalFunction::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::ExternalFunction::clone "
 
 Deep copy. ";
@@ -11112,6 +11520,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::ExternalFunctionInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::hasOption "
 
@@ -11564,6 +11997,31 @@ Make a differential state algebraic by replacing its time derivative by 0.
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::clone "
 
 Deep copy. ";
@@ -11858,6 +12316,36 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::hasOption "
 
@@ -12548,6 +13036,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::FX::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::FX::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::FX::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::FX::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::FX::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::FX::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::FX::clone "
 
 Deep copy. ";
@@ -12946,6 +13458,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::FXInternal::hasOption "
 
@@ -13447,9 +13983,13 @@ times t_i.
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -13984,6 +14524,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::GSL::GslIntegrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::GSL::GslIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -14221,9 +14785,13 @@ x0;
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -14686,6 +15254,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::GSL::GslInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::GSL::GslInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::GSL::GslInternal::hasOption "
 
 check if there is an option str ";
@@ -14967,9 +15559,13 @@ Joel Andersson
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -15550,6 +16146,31 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Sundials::IdasIntegrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -15841,9 +16462,13 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -16360,6 +16985,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::hasOption "
 
@@ -17046,6 +17696,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::clone "
 
 Deep copy. ";
@@ -17455,6 +18129,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::ImplicitFunctionInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::hasOption "
 
@@ -17896,9 +18595,13 @@ Joel Andersson
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -18414,6 +19117,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Integrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Integrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Integrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Integrator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Integrator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Integrator::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Integrator::assignNode "
 
 Assign the node to a node class pointer (or null) ";
@@ -18654,9 +19381,13 @@ Joel Andersson
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE |              |              | CasADi::Inte |
-| ial          | CTOR         |              |              | gratorIntern |
-|              |              |              |              | al           |
+| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Inte |
+| ial          | CTOR         | )            | with a       | gratorIntern |
+|              |              |              | boolean      | al           |
+|              |              |              | describing   |              |
+|              |              |              | the nature   |              |
+|              |              |              | for each     |              |
+|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Inte |
 | lver         |              |              | ab|tfqmr)    | gratorIntern |
@@ -19114,6 +19845,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::IntegratorInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::hasOption "
 
 check if there is an option str ";
@@ -19442,31 +20197,78 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| accept_every | OT_STRING    |              |              | CasADi::Ipop |
-| _trial_step  |              |              |              | tInternal    |
+| accept_after | OT_INTEGER   | -1           | Accept a     | CasADi::Ipop |
+| _max_steps   |              |              | trial point  | tInternal    |
+|              |              |              | after        |              |
+|              |              |              | maximal this |              |
+|              |              |              | number of    |              |
+|              |              |              | steps. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_c | OT_REAL      |              |              | CasADi::Ipop |
-| ompl_inf_tol |              |              |              | tInternal    |
+| accept_every | OT_STRING    | no           | Always       | CasADi::Ipop |
+| _trial_step  |              |              | accept the   | tInternal    |
+|              |              |              | first trial  |              |
+|              |              |              | step. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_c | OT_REAL      |              |              | CasADi::Ipop |
-| onstr_viol_t |              |              |              | tInternal    |
-| ol           |              |              |              |              |
+| acceptable_c | OT_REAL      | 0.01         | \"Acceptance\" | CasADi::Ipop |
+| ompl_inf_tol |              |              | threshold    | tInternal    |
+|              |              |              | for the comp |              |
+|              |              |              | lementarity  |              |
+|              |              |              | conditions.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_d | OT_REAL      |              |              | CasADi::Ipop |
-| ual_inf_tol  |              |              |              | tInternal    |
+| acceptable_c | OT_REAL      | 0.01         | \"Acceptance\" | CasADi::Ipop |
+| onstr_viol_t |              |              | threshold    | tInternal    |
+| ol           |              |              | for the      |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_i | OT_INTEGER   |              |              | CasADi::Ipop |
-| ter          |              |              |              | tInternal    |
+| acceptable_d | OT_REAL      | 10000000000. | \"Acceptance\" | CasADi::Ipop |
+| ual_inf_tol  |              | 0            | threshold    | tInternal    |
+|              |              |              | for the dual |              |
+|              |              |              | infeasibilit |              |
+|              |              |              | y. (see      |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_o | OT_REAL      |              |              | CasADi::Ipop |
-| bj_change_to |              |              |              | tInternal    |
-| l            |              |              |              |              |
+| acceptable_i | OT_INTEGER   | 15           | Number of    | CasADi::Ipop |
+| ter          |              |              | \"acceptable\" | tInternal    |
+|              |              |              | iterates     |              |
+|              |              |              | before       |              |
+|              |              |              | triggering   |              |
+|              |              |              | termination. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_t | OT_REAL      |              |              | CasADi::Ipop |
-| ol           |              |              |              | tInternal    |
+| acceptable_o | OT_REAL      | 1e+20        | \"Acceptance\" | CasADi::Ipop |
+| bj_change_to |              |              | stopping     | tInternal    |
+| l            |              |              | criterion    |              |
+|              |              |              | based on     |              |
+|              |              |              | objective    |              |
+|              |              |              | function     |              |
+|              |              |              | change. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
+| acceptable_t | OT_REAL      | 1e-06        | \"Acceptable\" | CasADi::Ipop |
+| ol           |              |              | convergence  | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | (relative).  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Ipop |
+|              |              |              | calculate    | tInternal    |
 |              |              |              | the          |              |
 |              |              |              | Jacobians:   |              |
 |              |              |              | \"forward\"    |              |
@@ -19483,148 +20285,682 @@ number of constraints (A)
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| alpha_for_y  | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| adaptive_mu_ | OT_STRING    | obj-constr-  | Globalizatio | CasADi::Ipop |
+| globalizatio |              | filter       | n strategy   | tInternal    |
+| n            |              |              | for the      |              |
+|              |              |              | adaptive mu  |              |
+|              |              |              | selection    |              |
+|              |              |              | mode. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| alpha_for_y_ | OT_REAL      |              |              | CasADi::Ipop |
-| tol          |              |              |              | tInternal    |
+| adaptive_mu_ | OT_STRING    | 2-norm-      | Norm used    | CasADi::Ipop |
+| kkt_norm_typ |              | squared      | for the KKT  | tInternal    |
+| e            |              |              | error in the |              |
+|              |              |              | adaptive mu  |              |
+|              |              |              | globalizatio |              |
+|              |              |              | n            |              |
+|              |              |              | strategies.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| barrier_tol_ | OT_REAL      |              |              | CasADi::Ipop |
-| factor       |              |              |              | tInternal    |
+| adaptive_mu_ | OT_REAL      | 0.9999       | Sufficient   | CasADi::Ipop |
+| kkterror_red |              |              | decrease     | tInternal    |
+| _fact        |              |              | factor for   |              |
+|              |              |              | \"kkt-error\"  |              |
+|              |              |              | globalizatio |              |
+|              |              |              | n strategy.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_frac   | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| adaptive_mu_ | OT_INTEGER   | 4            | Maximum      | CasADi::Ipop |
+| kkterror_red |              |              | number of    | tInternal    |
+| _iters       |              |              | iterations   |              |
+|              |              |              | requiring    |              |
+|              |              |              | sufficient   |              |
+|              |              |              | progress.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_mult_i | OT_STRING    |              |              | CasADi::Ipop |
-| nit_method   |              |              |              | tInternal    |
+| adaptive_mu_ | OT_REAL      | 0.8          | Determines   | CasADi::Ipop |
+| monotone_ini |              |              | the initial  | tInternal    |
+| t_factor     |              |              | value of the |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter    |              |
+|              |              |              | when         |              |
+|              |              |              | switching to |              |
+|              |              |              | the monotone |              |
+|              |              |              | mode. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_mult_i | OT_REAL      |              |              | CasADi::Ipop |
-| nit_val      |              |              |              | tInternal    |
+| adaptive_mu_ | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| restore_prev |              |              | the previous | tInternal    |
+| ious_iterate |              |              | iterate      |              |
+|              |              |              | should be    |              |
+|              |              |              | restored if  |              |
+|              |              |              | the monotone |              |
+|              |              |              | mode is      |              |
+|              |              |              | entered.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_mult_r | OT_REAL      |              |              | CasADi::Ipop |
-| eset_thresho |              |              |              | tInternal    |
-| ld           |              |              |              |              |
+| adaptive_mu_ | OT_REAL      | 0.0          | (see IPOPT d | CasADi::Ipop |
+| safeguard_fa |              |              | ocumentation | tInternal    |
+| ctor         |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_push   | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| alpha_for_y  | OT_STRING    | primal       | Method to    | CasADi::Ipop |
+|              |              |              | determine    | tInternal    |
+|              |              |              | the step     |              |
+|              |              |              | size for     |              |
+|              |              |              | constraint   |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_relax_ | OT_REAL      |              |              | CasADi::Ipop |
-| factor       |              |              |              | tInternal    |
+| alpha_for_y_ | OT_REAL      | 10.0         | Tolerance    | CasADi::Ipop |
+| tol          |              |              | for          | tInternal    |
+|              |              |              | switching to |              |
+|              |              |              | full         |              |
+|              |              |              | equality     |              |
+|              |              |              | multiplier   |              |
+|              |              |              | steps. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| check_deriva | OT_STRING    |              |              | CasADi::Ipop |
-| tives_for_na |              |              |              | tInternal    |
-| ninf         |              |              |              |              |
+| alpha_min_fr | OT_REAL      | 0.05         | Safety       | CasADi::Ipop |
+| ac           |              |              | factor for   | tInternal    |
+|              |              |              | the minimal  |              |
+|              |              |              | step size    |              |
+|              |              |              | (before      |              |
+|              |              |              | switching to |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase). (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| compl_inf_to | OT_REAL      |              |              | CasADi::Ipop |
-| l            |              |              |              | tInternal    |
+| alpha_red_fa | OT_REAL      | 0.5          | Fractional   | CasADi::Ipop |
+| ctor         |              |              | reduction of | tInternal    |
+|              |              |              | the trial    |              |
+|              |              |              | step size in |              |
+|              |              |              | the          |              |
+|              |              |              | backtracking |              |
+|              |              |              | line search. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constr_mult_ | OT_REAL      |              |              | CasADi::Ipop |
-| init_max     |              |              |              | tInternal    |
+| barrier_tol_ | OT_REAL      | 10.0         | Factor for   | CasADi::Ipop |
+| factor       |              |              | mu in        | tInternal    |
+|              |              |              | barrier stop |              |
+|              |              |              | test. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constr_mult_ | OT_REAL      |              |              | CasADi::Ipop |
-| reset_thresh |              |              |              | tInternal    |
-| old          |              |              |              |              |
+| bound_frac   | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+|              |              |              | minimum      | tInternal    |
+|              |              |              | relative     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | point to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constr_viol_ | OT_REAL      |              |              | CasADi::Ipop |
-| tol          |              |              |              | tInternal    |
+| bound_mult_i | OT_STRING    | constant     | Initializati | CasADi::Ipop |
+| nit_method   |              |              | on method    | tInternal    |
+|              |              |              | for bound    |              |
+|              |              |              | multipliers  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| corrector_ty | OT_STRING    |              |              | CasADi::Ipop |
-| pe           |              |              |              | tInternal    |
+| bound_mult_i | OT_REAL      | 1.0          | Initial      | CasADi::Ipop |
+| nit_val      |              |              | value for    | tInternal    |
+|              |              |              | the bound    |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_STRING    |              |              | CasADi::Ipop |
-| est          |              |              |              | tInternal    |
+| bound_mult_r | OT_REAL      | 1000.0       | Threshold    | CasADi::Ipop |
+| eset_thresho |              |              | for          | tInternal    |
+| ld           |              |              | resetting    |              |
+|              |              |              | bound        |              |
+|              |              |              | multipliers  |              |
+|              |              |              | after the    |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_REAL      |              |              | CasADi::Ipop |
-| est_perturba |              |              |              | tInternal    |
-| tion         |              |              |              |              |
+| bound_push   | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+|              |              |              | minimum      | tInternal    |
+|              |              |              | absolute     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | point to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_STRING    |              |              | CasADi::Ipop |
-| est_print_al |              |              |              | tInternal    |
-| l            |              |              |              |              |
+| bound_relax_ | OT_REAL      | 1e-08        | Factor for   | CasADi::Ipop |
+| factor       |              |              | initial      | tInternal    |
+|              |              |              | relaxation   |              |
+|              |              |              | of the       |              |
+|              |              |              | bounds. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_REAL      |              |              | CasADi::Ipop |
-| est_tol      |              |              |              | tInternal    |
+| check_deriva | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| tives_for_na |              |              | whether it   | tInternal    |
+| ninf         |              |              | is desired   |              |
+|              |              |              | to check for |              |
+|              |              |              | Nan/Inf in   |              |
+|              |              |              | derivative   |              |
+|              |              |              | matrices     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| diverging_it | OT_REAL      |              |              | CasADi::Ipop |
-| erates_tol   |              |              |              | tInternal    |
+| chi_cup      | OT_REAL      | 1.5          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| dual_inf_tol | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| chi_hat      | OT_REAL      | 2.0          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| evaluate_ori | OT_STRING    |              |              | CasADi::Ipop |
-| g_obj_at_res |              |              |              | tInternal    |
-| to_trial     |              |              |              |              |
+| chi_tilde    | OT_REAL      | 5.0          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | objective    | olverInterna |
-|              |              |              | function in  | l            |
+| compl_inf_to | OT_REAL      | 0.0001       | Desired      | CasADi::Ipop |
+| l            |              |              | threshold    | tInternal    |
+|              |              |              | for the comp |              |
+|              |              |              | lementarity  |              |
+|              |              |              | conditions.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| constr_mult_ | OT_REAL      | 1000.0       | Maximum      | CasADi::Ipop |
+| init_max     |              |              | allowed      | tInternal    |
+|              |              |              | least-square |              |
+|              |              |              | guess of     |              |
+|              |              |              | constraint   |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| constr_mult_ | OT_REAL      | 0.0          | Threshold    | CasADi::Ipop |
+| reset_thresh |              |              | for          | tInternal    |
+| old          |              |              | resetting    |              |
+|              |              |              | equality and |              |
+|              |              |              | inequality   |              |
+|              |              |              | multipliers  |              |
+|              |              |              | after        |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| constr_viol_ | OT_REAL      | 0.0001       | Desired      | CasADi::Ipop |
+| tol          |              |              | threshold    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| constraint_v | OT_STRING    | 1-norm       | Norm to be   | CasADi::Ipop |
+| iolation_nor |              |              | used for the | tInternal    |
+| m_type       |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the line     |              |
+|              |              |              | search. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| corrector_co | OT_REAL      | 1.0          | Complementar | CasADi::Ipop |
+| mpl_avrg_red |              |              | ity          | tInternal    |
+| _fact        |              |              | tolerance    |              |
+|              |              |              | factor for   |              |
+|              |              |              | accepting    |              |
+|              |              |              | corrector    |              |
+|              |              |              | step (unsupp |              |
+|              |              |              | orted!).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| corrector_ty | OT_STRING    | none         | The type of  | CasADi::Ipop |
+| pe           |              |              | corrector    | tInternal    |
+|              |              |              | steps that   |              |
+|              |              |              | should be    |              |
+|              |              |              | taken (unsup |              |
+|              |              |              | ported!).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| delta        | OT_REAL      | 1.0          | Multiplier   | CasADi::Ipop |
+|              |              |              | for          | tInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the          |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| delta_y_max  | OT_REAL      | 1e+12        | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| dependency_d | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| etection_wit |              |              | the right    | tInternal    |
+| h_rhs        |              |              | hand sides   |              |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | should be    |              |
+|              |              |              | considered   |              |
+|              |              |              | during       |              |
+|              |              |              | dependency   |              |
+|              |              |              | detection    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| dependency_d | OT_STRING    | none         | Indicates    | CasADi::Ipop |
+| etector      |              |              | which linear | tInternal    |
+|              |              |              | solver       |              |
+|              |              |              | should be    |              |
+|              |              |              | used to      |              |
+|              |              |              | detect       |              |
+|              |              |              | linearly     |              |
+|              |              |              | dependent    |              |
+|              |              |              | equality     |              |
+|              |              |              | constraints. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_STRING    | none         | Enable       | CasADi::Ipop |
+| est          |              |              | derivative   | tInternal    |
+|              |              |              | checker (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_INTEGER   | -2           | Index of     | CasADi::Ipop |
+| est_first_in |              |              | first        | tInternal    |
+| dex          |              |              | quantity to  |              |
+|              |              |              | be checked   |              |
+|              |              |              | by           |              |
+|              |              |              | derivative   |              |
+|              |              |              | checker (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_REAL      | 1e-08        | Size of the  | CasADi::Ipop |
+| est_perturba |              |              | finite       | tInternal    |
+| tion         |              |              | difference   |              |
+|              |              |              | perturbation |              |
+|              |              |              | in           |              |
+|              |              |              | derivative   |              |
+|              |              |              | test. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| est_print_al |              |              | whether      | tInternal    |
+| l            |              |              | information  |              |
+|              |              |              | for all      |              |
+|              |              |              | estimated    |              |
+|              |              |              | derivatives  |              |
+|              |              |              | should be    |              |
+|              |              |              | printed.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_REAL      | 0.0001       | Threshold    | CasADi::Ipop |
+| est_tol      |              |              | for          | tInternal    |
+|              |              |              | indicating   |              |
+|              |              |              | wrong        |              |
+|              |              |              | derivative.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| diverging_it | OT_REAL      | 1e+20        | Threshold    | CasADi::Ipop |
+| erates_tol   |              |              | for maximal  | tInternal    |
+|              |              |              | value of     |              |
+|              |              |              | primal       |              |
+|              |              |              | iterates.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| dual_inf_tol | OT_REAL      | 1.0          | Desired      | CasADi::Ipop |
+|              |              |              | threshold    | tInternal    |
+|              |              |              | for the dual |              |
+|              |              |              | infeasibilit |              |
+|              |              |              | y. (see      |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsilon_c    | OT_REAL      | 0.01         | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| eta_min      | OT_REAL      | 10.0         | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| eta_penalty  | OT_REAL      | 1e-08        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the Armijo   |              |
+|              |              |              | condition    |              |
+|              |              |              | for the      |              |
+|              |              |              | penalty      |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| eta_phi      | OT_REAL      | 1e-08        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the Armijo   |              |
+|              |              |              | condition.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| evaluate_ori | OT_STRING    | yes          | Determines   | CasADi::Ipop |
+| g_obj_at_res |              |              | if the       | tInternal    |
+| to_trial     |              |              | original     |              |
+|              |              |              | objective    |              |
+|              |              |              | function     |              |
+|              |              |              | should be    |              |
+|              |              |              | evaluated at |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase trial  |              |
+|              |              |              | points. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | False        | Expand the   | CasADi::Ipop |
+|              |              |              | objective    | tInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | constraint   | olverInterna |
-|              |              |              | function in  | l            |
+| expand_g     | OT_BOOLEAN   | False        | Expand the   | CasADi::Ipop |
+|              |              |              | constraint   | tInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expect_infea | OT_STRING    |              |              | CasADi::Ipop |
-| sible_proble |              |              |              | tInternal    |
-| m            |              |              |              |              |
+| expect_infea | OT_STRING    | no           | Enable       | CasADi::Ipop |
+| sible_proble |              |              | heuristics   | tInternal    |
+| m            |              |              | to quickly   |              |
+|              |              |              | detect an    |              |
+|              |              |              | infeasible   |              |
+|              |              |              | problem.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expect_infea | OT_REAL      |              |              | CasADi::Ipop |
-| sible_proble |              |              |              | tInternal    |
-| m_ctol       |              |              |              |              |
+| expect_infea | OT_REAL      | 0.001        | Threshold    | CasADi::Ipop |
+| sible_proble |              |              | for          | tInternal    |
+| m_ctol       |              |              | disabling \"e |              |
+|              |              |              | xpect_infeas |              |
+|              |              |              | ible_problem |              |
+|              |              |              | \" option.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expect_infea | OT_REAL      |              |              | CasADi::Ipop |
-| sible_proble |              |              |              | tInternal    |
-| m_ytol       |              |              |              |              |
+| expect_infea | OT_REAL      | 100000000.0  | Multiplier   | CasADi::Ipop |
+| sible_proble |              |              | threshold    | tInternal    |
+| m_ytol       |              |              | for          |              |
+|              |              |              | activating \" |              |
+|              |              |              | expect_infea |              |
+|              |              |              | sible_proble |              |
+|              |              |              | m\" option.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| file_print_l | OT_INTEGER   |              |              | CasADi::Ipop |
-| evel         |              |              |              | tInternal    |
+| fast_des_fac | OT_REAL      | 0.1          | a parameter  | CasADi::Ipop |
+| t            |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| first_hessia | OT_REAL      |              |              | CasADi::Ipop |
-| n_perturbati |              |              |              | tInternal    |
-| on           |              |              |              |              |
+| fast_step_co | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| mputation    |              |              | the linear   | tInternal    |
+|              |              |              | system       |              |
+|              |              |              | should be    |              |
+|              |              |              | solved       |              |
+|              |              |              | quickly.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fixed_mu_ora | OT_STRING    |              |              | CasADi::Ipop |
-| cle          |              |              |              | tInternal    |
+| file_print_l | OT_INTEGER   | 5            | Verbosity    | CasADi::Ipop |
+| evel         |              |              | level for    | tInternal    |
+|              |              |              | output file. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fixed_variab | OT_STRING    |              |              | CasADi::Ipop |
-| le_treatment |              |              |              | tInternal    |
+| filter_margi | OT_REAL      | 1e-05        | Factor       | CasADi::Ipop |
+| n_fact       |              |              | determining  | tInternal    |
+|              |              |              | width of     |              |
+|              |              |              | margin for   |              |
+|              |              |              | obj-constr-  |              |
+|              |              |              | filter       |              |
+|              |              |              | adaptive glo |              |
+|              |              |              | balization   |              |
+|              |              |              | strategy.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
-| sian         |              |              | exact        | olverInterna |
-|              |              |              | Hessian of   | l            |
+| filter_max_m | OT_REAL      | 1.0          | Maximum      | CasADi::Ipop |
+| argin        |              |              | width of     | tInternal    |
+|              |              |              | margin in    |              |
+|              |              |              | obj-constr-  |              |
+|              |              |              | filter       |              |
+|              |              |              | adaptive glo |              |
+|              |              |              | balization   |              |
+|              |              |              | strategy.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| filter_reset | OT_INTEGER   | 5            | Number of    | CasADi::Ipop |
+| _trigger     |              |              | iterations   | tInternal    |
+|              |              |              | that trigger |              |
+|              |              |              | the filter   |              |
+|              |              |              | reset. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| findiff_pert | OT_REAL      | 1e-07        | Size of the  | CasADi::Ipop |
+| urbation     |              |              | finite       | tInternal    |
+|              |              |              | difference   |              |
+|              |              |              | perturbation |              |
+|              |              |              | for          |              |
+|              |              |              | derivative a |              |
+|              |              |              | pproximation |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| first_hessia | OT_REAL      | 0.0001       | Size of      | CasADi::Ipop |
+| n_perturbati |              |              | first x-s    | tInternal    |
+| on           |              |              | perturbation |              |
+|              |              |              | tried. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fixed_mu_ora | OT_STRING    | average_comp | Oracle for   | CasADi::Ipop |
+| cle          |              | l            | the barrier  | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | when         |              |
+|              |              |              | switching to |              |
+|              |              |              | fixed mode.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| fixed_variab | OT_STRING    | make_paramet | Determines   | CasADi::Ipop |
+| le_treatment |              | er           | how fixed    | tInternal    |
+|              |              |              | variables    |              |
+|              |              |              | should be    |              |
+|              |              |              | handled.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_hat    | OT_REAL      | 0.04         | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_phi    | OT_REAL      | 1e-08        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the filter   |              |
+|              |              |              | margin for   |              |
+|              |              |              | the barrier  |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_theta  | OT_REAL      | 1e-05        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the filter   |              |
+|              |              |              | margin for   |              |
+|              |              |              | the          |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_tilde  | OT_REAL      | 4.0          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Ipop |
+| sian         |              |              | exact        | tInternal    |
+|              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hessian_appr | OT_STRING    |              |              | CasADi::Ipop |
-| oximation    |              |              |              | tInternal    |
+| hessian_appr | OT_STRING    | exact        | Indicates    | CasADi::Ipop |
+| oximation    |              |              | what Hessian | tInternal    |
+|              |              |              | information  |              |
+|              |              |              | is to be     |              |
+|              |              |              | used. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hessian_cons | OT_STRING    |              |              | CasADi::Ipop |
-| tant         |              |              |              | tInternal    |
+| hessian_appr | OT_STRING    | nonlinear-   | Indicates in | CasADi::Ipop |
+| oximation_sp |              | variables    | which        | tInternal    |
+| ace          |              |              | subspace the |              |
+|              |              |              | Hessian      |              |
+|              |              |              | information  |              |
+|              |              |              | is to be app |              |
+|              |              |              | roximated.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| honor_origin | OT_STRING    |              |              | CasADi::Ipop |
-| al_bounds    |              |              |              | tInternal    |
+| hessian_cons | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| tant         |              |              | whether the  | tInternal    |
+|              |              |              | problem is a |              |
+|              |              |              | quadratic    |              |
+|              |              |              | problem (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| _vec         |              |              | true, the    | olverInterna |
-|              |              |              | input shape  | l            |
+| honor_origin | OT_STRING    | yes          | Indicates    | CasADi::Ipop |
+| al_bounds    |              |              | whether      | tInternal    |
+|              |              |              | final points |              |
+|              |              |              | should be    |              |
+|              |              |              | projected    |              |
+|              |              |              | into         |              |
+|              |              |              | original     |              |
+|              |              |              | bounds. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | False        | If set to    | CasADi::Ipop |
+| _vec         |              |              | true, the    | tInternal    |
+|              |              |              | input shape  |              |
 |              |              |              | of F will    |              |
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
-| llback       |              |              | that will be | olverInterna |
-|              |              |              | called at    | l            |
+| iteration_ca | OT_FX        |              | A function   | CasADi::Ipop |
+| llback       |              |              | that will be | tInternal    |
+|              |              |              | called at    |              |
 |              |              |              | each         |              |
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
@@ -19635,22 +20971,43 @@ number of constraints (A)
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_c_consta | OT_STRING    |              |              | CasADi::Ipop |
-| nt           |              |              |              | tInternal    |
+| jac_c_consta | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| nt           |              |              | whether all  | tInternal    |
+|              |              |              | equality     |              |
+|              |              |              | constraints  |              |
+|              |              |              | are linear   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_d_consta | OT_STRING    |              |              | CasADi::Ipop |
-| nt           |              |              |              | tInternal    |
+| jac_d_consta | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| nt           |              |              | whether all  | tInternal    |
+|              |              |              | inequality   |              |
+|              |              |              | constraints  |              |
+|              |              |              | are linear   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
+| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Ipop |
+|              |              |              | Jacobian     | tInternal    |
 |              |              |              | function and |              |
 |              |              |              | use this to  |              |
 |              |              |              | calculate    |              |
 |              |              |              | forward sens |              |
 |              |              |              | itivities    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
+| jacobian_app | OT_STRING    | exact        | Specifies    | CasADi::Ipop |
+| roximation   |              |              | technique to | tInternal    |
+|              |              |              | compute      |              |
+|              |              |              | constraint   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Ipop |
+| erator       | ENERATOR     |              | pointer that | tInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | function     |              |
@@ -19662,109 +21019,503 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_reg | OT_REAL      |              |              | CasADi::Ipop |
-| ularization_ |              |              |              | tInternal    |
-| value        |              |              |              |              |
+| jacobian_reg | OT_REAL      | 0.25         | Exponent for | CasADi::Ipop |
+| ularization_ |              |              | mu in the re | tInternal    |
+| exponent     |              |              | gularization |              |
+|              |              |              | for rank-    |              |
+|              |              |              | deficient    |              |
+|              |              |              | constraint   |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_REAL      |              |              | CasADi::Ipop |
-| ry_init_val  |              |              |              | tInternal    |
+| jacobian_reg | OT_REAL      | 1e-08        | Size of the  | CasADi::Ipop |
+| ularization_ |              |              | regularizati | tInternal    |
+| value        |              |              | on for rank- |              |
+|              |              |              | deficient    |              |
+|              |              |              | constraint   |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_REAL      |              |              | CasADi::Ipop |
-| ry_init_val_ |              |              |              | tInternal    |
-| max          |              |              |              |              |
+| kappa_d      | OT_REAL      | 1e-05        | Weight for   | CasADi::Ipop |
+|              |              |              | linear       | tInternal    |
+|              |              |              | damping term |              |
+|              |              |              | (to handle   |              |
+|              |              |              | one-sided    |              |
+|              |              |              | bounds).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_REAL      |              |              | CasADi::Ipop |
-| ry_init_val_ |              |              |              | tInternal    |
-| min          |              |              |              |              |
+| kappa_sigma  | OT_REAL      | 10000000000. | Factor       | CasADi::Ipop |
+|              |              | 0            | limiting the | tInternal    |
+|              |              |              | deviation of |              |
+|              |              |              | dual         |              |
+|              |              |              | variables    |              |
+|              |              |              | from primal  |              |
+|              |              |              | estimates.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_STRING    |              |              | CasADi::Ipop |
-| ry_initializ |              |              |              | tInternal    |
-| ation        |              |              |              |              |
+| kappa_soc    | OT_REAL      | 0.99         | Factor in    | CasADi::Ipop |
+|              |              |              | the          | tInternal    |
+|              |              |              | sufficient   |              |
+|              |              |              | reduction    |              |
+|              |              |              | rule for     |              |
+|              |              |              | second order |              |
+|              |              |              | correction.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_INTEGER   |              |              | CasADi::Ipop |
-| ry_max_histo |              |              |              | tInternal    |
-| ry           |              |              |              |              |
+| kappa_x_dis  | OT_REAL      | 100.0        | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_INTEGER   |              |              | CasADi::Ipop |
-| ry_max_skipp |              |              |              | tInternal    |
-| ing          |              |              |              |              |
+| kappa_y_dis  | OT_REAL      | 10000.0      | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_STRING    |              |              | CasADi::Ipop |
-| ry_special_f |              |              |              | tInternal    |
-| or_resto     |              |              |              |              |
+| least_square | OT_STRING    | no           | Least square | CasADi::Ipop |
+| _init_duals  |              |              | initializati | tInternal    |
+|              |              |              | on of all    |              |
+|              |              |              | dual         |              |
+|              |              |              | variables    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_STRING    |              |              | CasADi::Ipop |
-| ry_update_ty |              |              |              | tInternal    |
-| pe           |              |              |              |              |
+| least_square | OT_STRING    | no           | Least square | CasADi::Ipop |
+| _init_primal |              |              | initializati | tInternal    |
+|              |              |              | on of the    |              |
+|              |              |              | primal       |              |
+|              |              |              | variables    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_scali | OT_STRING    |              |              | CasADi::Ipop |
-| ng_on_demand |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | sherman-     | Strategy for | CasADi::Ipop |
+| ry_aug_solve |              | morrison     | solving the  | tInternal    |
+| r            |              |              | augmented    |              |
+|              |              |              | system for   |              |
+|              |              |              | low-rank     |              |
+|              |              |              | Hessian.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    |              |              | CasADi::Ipop |
-| r            |              |              |              | tInternal    |
+| limited_memo | OT_REAL      | 1.0          | Value for B0 | CasADi::Ipop |
+| ry_init_val  |              |              | in low-rank  | tInternal    |
+|              |              |              | update. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_syste | OT_STRING    |              |              | CasADi::Ipop |
-| m_scaling    |              |              |              | tInternal    |
+| limited_memo | OT_REAL      | 100000000.0  | Upper bound  | CasADi::Ipop |
+| ry_init_val_ |              |              | on value for | tInternal    |
+| max          |              |              | B0 in low-   |              |
+|              |              |              | rank update. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_la_init | OT_REAL      |              |              | CasADi::Ipop |
-| _factor      |              |              |              | tInternal    |
+| limited_memo | OT_REAL      | 1e-08        | Lower bound  | CasADi::Ipop |
+| ry_init_val_ |              |              | on value for | tInternal    |
+| min          |              |              | B0 in low-   |              |
+|              |              |              | rank update. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_liw_ini | OT_REAL      |              |              | CasADi::Ipop |
-| t_factor     |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | scalar1      | Initializati | CasADi::Ipop |
+| ry_initializ |              |              | on strategy  | tInternal    |
+| ation        |              |              | for the      |              |
+|              |              |              | limited      |              |
+|              |              |              | memory       |              |
+|              |              |              | quasi-Newton |              |
+|              |              |              | approximatio |              |
+|              |              |              | n. (see      |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_meminc_ | OT_REAL      |              |              | CasADi::Ipop |
-| factor       |              |              |              | tInternal    |
+| limited_memo | OT_INTEGER   | 6            | Maximum size | CasADi::Ipop |
+| ry_max_histo |              |              | of the       | tInternal    |
+| ry           |              |              | history for  |              |
+|              |              |              | the limited  |              |
+|              |              |              | quasi-Newton |              |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_pivtol  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| limited_memo | OT_INTEGER   | 2            | Threshold    | CasADi::Ipop |
+| ry_max_skipp |              |              | for          | tInternal    |
+| ing          |              |              | successive   |              |
+|              |              |              | iterations   |              |
+|              |              |              | where update |              |
+|              |              |              | is skipped.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_pivtolm | OT_REAL      |              |              | CasADi::Ipop |
-| ax           |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | no           | Determines   | CasADi::Ipop |
+| ry_special_f |              |              | if the       | tInternal    |
+| or_resto     |              |              | quasi-Newton |              |
+|              |              |              | updates      |              |
+|              |              |              | should be    |              |
+|              |              |              | special      |              |
+|              |              |              | during the   |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_automat | OT_STRING    |              |              | CasADi::Ipop |
-| ic_scaling   |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | bfgs         | Quasi-Newton | CasADi::Ipop |
+| ry_update_ty |              |              | update       | tInternal    |
+| pe           |              |              | formula for  |              |
+|              |              |              | the limited  |              |
+|              |              |              | memory appro |              |
+|              |              |              | ximation.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_block_s | OT_INTEGER   |              |              | CasADi::Ipop |
-| ize          |              |              |              | tInternal    |
+| line_search_ | OT_STRING    | filter       | Globalizatio | CasADi::Ipop |
+| method       |              |              | n method     | tInternal    |
+|              |              |              | used in      |              |
+|              |              |              | backtracking |              |
+|              |              |              | line search  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_node_am | OT_INTEGER   |              |              | CasADi::Ipop |
-| algamation   |              |              |              | tInternal    |
+| linear_scali | OT_STRING    | yes          | Flag         | CasADi::Ipop |
+| ng_on_demand |              |              | indicating   | tInternal    |
+|              |              |              | that linear  |              |
+|              |              |              | scaling is   |              |
+|              |              |              | only done if |              |
+|              |              |              | it seems     |              |
+|              |              |              | required.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pivot_o | OT_INTEGER   |              |              | CasADi::Ipop |
-| rder         |              |              |              | tInternal    |
+| linear_solve | OT_STRING    | ma27         | Linear       | CasADi::Ipop |
+| r            |              |              | solver used  | tInternal    |
+|              |              |              | for step com |              |
+|              |              |              | putations.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pivtol  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| linear_syste | OT_STRING    | mc19         | Method for   | CasADi::Ipop |
+| m_scaling    |              |              | scaling the  | tInternal    |
+|              |              |              | linear       |              |
+|              |              |              | system. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pivtolm | OT_REAL      |              |              | CasADi::Ipop |
-| ax           |              |              |              | tInternal    |
+| ma27_ignore_ | OT_STRING    | no           | Enables      | CasADi::Ipop |
+| singularity  |              |              | MA27's       | tInternal    |
+|              |              |              | ability to   |              |
+|              |              |              | solve a      |              |
+|              |              |              | linear       |              |
+|              |              |              | system even  |              |
+|              |              |              | if the       |              |
+|              |              |              | matrix is    |              |
+|              |              |              | singular.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pre_all | OT_REAL      |              |              | CasADi::Ipop |
-| oc           |              |              |              | tInternal    |
+| ma27_la_init | OT_REAL      | 5.0          | Real         | CasADi::Ipop |
+| _factor      |              |              | workspace    | tInternal    |
+|              |              |              | memory for   |              |
+|              |              |              | MA27. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_cpu_time | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| ma27_liw_ini | OT_REAL      | 5.0          | Integer      | CasADi::Ipop |
+| t_factor     |              |              | workspace    | tInternal    |
+|              |              |              | memory for   |              |
+|              |              |              | MA27. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_hessian_ | OT_REAL      |              |              | CasADi::Ipop |
-| perturbation |              |              |              | tInternal    |
+| ma27_meminc_ | OT_REAL      | 10.0         | Increment    | CasADi::Ipop |
+| factor       |              |              | factor for   | tInternal    |
+|              |              |              | workspace    |              |
+|              |              |              | size for     |              |
+|              |              |              | MA27. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_iter     | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| ma27_pivtol  | OT_REAL      | 1e-08        | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA27. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
-| nt_steps     |              |              |              | tInternal    |
+| ma27_pivtolm | OT_REAL      | 0.0001       | Maximum      | CasADi::Ipop |
+| ax           |              |              | pivot        | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA27. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_soc      | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| ma27_skip_in | OT_STRING    | no           | Always       | CasADi::Ipop |
+| ertia_check  |              |              | pretend      | tInternal    |
+|              |              |              | inertia is   |              |
+|              |              |              | correct.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mehrotra_alg | OT_STRING    |              |              | CasADi::Ipop |
-| orithm       |              |              |              | tInternal    |
+| ma28_pivtol  | OT_REAL      | 0.01         | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for linear   |              |
+|              |              |              | solver MA28. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| min_hessian_ | OT_REAL      |              |              | CasADi::Ipop |
-| perturbation |              |              |              | tInternal    |
+| ma57_automat | OT_STRING    | yes          | Controls     | CasADi::Ipop |
+| ic_scaling   |              |              | MA57         | tInternal    |
+|              |              |              | automatic    |              |
+|              |              |              | scaling (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| min_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
-| nt_steps     |              |              |              | tInternal    |
+| ma57_block_s | OT_INTEGER   | 16           | Controls     | CasADi::Ipop |
+| ize          |              |              | block size   | tInternal    |
+|              |              |              | used by      |              |
+|              |              |              | Level 3 BLAS |              |
+|              |              |              | in MA57BD    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_node_am | OT_INTEGER   | 16           | Node         | CasADi::Ipop |
+| algamation   |              |              | amalgamation | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pivot_o | OT_INTEGER   | 5            | Controls     | CasADi::Ipop |
+| rder         |              |              | pivot order  | tInternal    |
+|              |              |              | in MA57 (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pivtol  | OT_REAL      | 1e-08        | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA57. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pivtolm | OT_REAL      | 0.0001       | Maximum      | CasADi::Ipop |
+| ax           |              |              | pivot        | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA57. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pre_all | OT_REAL      | 1.05         | Safety       | CasADi::Ipop |
+| oc           |              |              | factor for   | tInternal    |
+|              |              |              | work space   |              |
+|              |              |              | memory       |              |
+|              |              |              | allocation   |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA57. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_small_p | OT_INTEGER   | 0            | If set to 1, | CasADi::Ipop |
+| ivot_flag    |              |              | then when    | tInternal    |
+|              |              |              | small        |              |
+|              |              |              | entries      |              |
+|              |              |              | defined by   |              |
+|              |              |              | CNTL(2) are  |              |
+|              |              |              | detected     |              |
+|              |              |              | they are     |              |
+|              |              |              | removed and  |              |
+|              |              |              | the correspo |              |
+|              |              |              | nding pivots |              |
+|              |              |              | placed at    |              |
+|              |              |              | the end of   |              |
+|              |              |              | the factoriz |              |
+|              |              |              | ation. This  |              |
+|              |              |              | can be       |              |
+|              |              |              | particularly |              |
+|              |              |              | efficient if |              |
+|              |              |              | the matrix   |              |
+|              |              |              | is highly    |              |
+|              |              |              | rank         |              |
+|              |              |              | deficient.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| magic_steps  | OT_STRING    | no           | Enables      | CasADi::Ipop |
+|              |              |              | magic steps. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_cpu_time | OT_REAL      | 1000000.0    | Maximum      | CasADi::Ipop |
+|              |              |              | number of    | tInternal    |
+|              |              |              | CPU seconds. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_filter_r | OT_INTEGER   | 5            | Maximal      | CasADi::Ipop |
+| esets        |              |              | allowed      | tInternal    |
+|              |              |              | number of    |              |
+|              |              |              | filter       |              |
+|              |              |              | resets (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_hessian_ | OT_REAL      | 1e+20        | Maximum      | CasADi::Ipop |
+| perturbation |              |              | value of reg | tInternal    |
+|              |              |              | ularization  |              |
+|              |              |              | parameter    |              |
+|              |              |              | for handling |              |
+|              |              |              | negative     |              |
+|              |              |              | curvature.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 3000         | Maximum      | CasADi::Ipop |
+|              |              |              | number of    | tInternal    |
+|              |              |              | iterations.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_refineme | OT_INTEGER   | 10           | Maximum      | CasADi::Ipop |
+| nt_steps     |              |              | number of    | tInternal    |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps per    |              |
+|              |              |              | linear       |              |
+|              |              |              | system       |              |
+|              |              |              | solve. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_resto_it | OT_INTEGER   | 3000000      | Maximum      | CasADi::Ipop |
+| er           |              |              | number of    | tInternal    |
+|              |              |              | successive   |              |
+|              |              |              | iterations   |              |
+|              |              |              | in           |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_soc      | OT_INTEGER   | 4            | Maximum      | CasADi::Ipop |
+|              |              |              | number of    | tInternal    |
+|              |              |              | second order |              |
+|              |              |              | correction   |              |
+|              |              |              | trial steps  |              |
+|              |              |              | at each      |              |
+|              |              |              | iteration.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_soft_res | OT_INTEGER   | 10           | Maximum      | CasADi::Ipop |
+| to_iters     |              |              | number of    | tInternal    |
+|              |              |              | iterations   |              |
+|              |              |              | performed    |              |
+|              |              |              | successively |              |
+|              |              |              | in soft      |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| mehrotra_alg | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| orithm       |              |              | we want to   | tInternal    |
+|              |              |              | do           |              |
+|              |              |              | Mehrotra's   |              |
+|              |              |              | algorithm.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_alpha_pr | OT_REAL      | 1e-13        | LIFENG       | CasADi::Ipop |
+| imal         |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_hessian_ | OT_REAL      | 1e-20        | Smallest     | CasADi::Ipop |
+| perturbation |              |              | perturbation | tInternal    |
+|              |              |              | of the       |              |
+|              |              |              | Hessian      |              |
+|              |              |              | block. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_refineme | OT_INTEGER   | 1            | Minimum      | CasADi::Ipop |
+| nt_steps     |              |              | number of    | tInternal    |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps per    |              |
+|              |              |              | linear       |              |
+|              |              |              | system       |              |
+|              |              |              | solve. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -19773,79 +21524,313 @@ number of constraints (A)
 |              |              |              | g|eval_grad_ |              |
 |              |              |              | f)           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_init      | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_allow_fas | OT_STRING    | yes          | Allow        | CasADi::Ipop |
+| t_monotone_d |              |              | skipping of  | tInternal    |
+| ecrease      |              |              | barrier      |              |
+|              |              |              | problem if   |              |
+|              |              |              | barrier test |              |
+|              |              |              | is already   |              |
+|              |              |              | met. (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_linear_de | OT_REAL      |              |              | CasADi::Ipop |
-| crease_facto |              |              |              | tInternal    |
-| r            |              |              |              |              |
+| mu_init      | OT_REAL      | 0.1          | Initial      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | the barrier  |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_max       | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_linear_de | OT_REAL      | 0.2          | Determines   | CasADi::Ipop |
+| crease_facto |              |              | linear       | tInternal    |
+| r            |              |              | decrease     |              |
+|              |              |              | rate of      |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_max_fact  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_max       | OT_REAL      | 100000.0     | Maximum      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_min       | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_max_fact  | OT_REAL      | 1000.0       | Factor for i | CasADi::Ipop |
+|              |              |              | nitializatio | tInternal    |
+|              |              |              | n of maximum |              |
+|              |              |              | value for    |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_oracle    | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_min       | OT_REAL      | 1e-11        | Minimum      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_strategy  | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_oracle    | OT_STRING    | quality-     | Oracle for a | CasADi::Ipop |
+|              |              | function     | new barrier  | tInternal    |
+|              |              |              | parameter in |              |
+|              |              |              | the adaptive |              |
+|              |              |              | strategy.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_superline | OT_REAL      |              |              | CasADi::Ipop |
-| ar_decrease_ |              |              |              | tInternal    |
-| power        |              |              |              |              |
+| mu_strategy  | OT_STRING    | monotone     | Update       | CasADi::Ipop |
+|              |              |              | strategy for | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_target    | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_superline | OT_REAL      | 1.5          | Determines   | CasADi::Ipop |
+| ar_decrease_ |              |              | superlinear  | tInternal    |
+| power        |              |              | decrease     |              |
+|              |              |              | rate of      |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_mem_pe | OT_INTEGER   |              |              | CasADi::Ipop |
-| rcent        |              |              |              | tInternal    |
+| mu_target    | OT_REAL      | 0.0          | Desired      | CasADi::Ipop |
+|              |              |              | value of com | tInternal    |
+|              |              |              | plementarity |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_permut | OT_INTEGER   |              |              | CasADi::Ipop |
-| ing_scaling  |              |              |              | tInternal    |
+| mult_diverg_ | OT_REAL      | 1e-07        | tolerance    | CasADi::Ipop |
+| feasibility_ |              |              | for deciding | tInternal    |
+| tol          |              |              | if the       |              |
+|              |              |              | multipliers  |              |
+|              |              |              | are          |              |
+|              |              |              | diverging    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_pivot_ | OT_INTEGER   |              |              | CasADi::Ipop |
-| order        |              |              |              | tInternal    |
+| mult_diverg_ | OT_REAL      | 100000000.0  | tolerance    | CasADi::Ipop |
+| y_tol        |              |              | for deciding | tInternal    |
+|              |              |              | if the       |              |
+|              |              |              | multipliers  |              |
+|              |              |              | are          |              |
+|              |              |              | diverging    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_pivtol | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mumps_dep_to | OT_REAL      | -1.0         | Pivot        | CasADi::Ipop |
+| l            |              |              | threshold    | tInternal    |
+|              |              |              | for          |              |
+|              |              |              | detection of |              |
+|              |              |              | linearly     |              |
+|              |              |              | dependent    |              |
+|              |              |              | constraints  |              |
+|              |              |              | in MUMPS.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_pivtol | OT_REAL      |              |              | CasADi::Ipop |
-| max          |              |              |              | tInternal    |
+| mumps_mem_pe | OT_INTEGER   | 1000         | Percentage   | CasADi::Ipop |
+| rcent        |              |              | increase in  | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | estimated    |              |
+|              |              |              | working      |              |
+|              |              |              | space for    |              |
+|              |              |              | MUMPS. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_scalin | OT_INTEGER   |              |              | CasADi::Ipop |
-| g            |              |              |              | tInternal    |
+| mumps_permut | OT_INTEGER   | 7            | Controls     | CasADi::Ipop |
+| ing_scaling  |              |              | permuting    | tInternal    |
+|              |              |              | and scaling  |              |
+|              |              |              | in MUMPS     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
+| mumps_pivot_ | OT_INTEGER   | 7            | Controls     | CasADi::Ipop |
+| order        |              |              | pivot order  | tInternal    |
+|              |              |              | in MUMPS     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_lower_bo | OT_REAL      |              |              | CasADi::Ipop |
-| und_inf      |              |              |              | tInternal    |
+| mumps_pivtol | OT_REAL      | 1e-06        | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | MUMPS. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_upper_bo | OT_REAL      |              |              | CasADi::Ipop |
-| und_inf      |              |              |              | tInternal    |
+| mumps_pivtol | OT_REAL      | 0.1          | Maximum      | CasADi::Ipop |
+| max          |              |              | pivot        | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | MUMPS. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
+| mumps_scalin | OT_INTEGER   | 77           | Controls     | CasADi::Ipop |
+| g            |              |              | scaling in   | tInternal    |
+|              |              |              | MUMPS (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Ipop |
+|              |              | ed_object    |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| neg_curv_tes | OT_REAL      | 0.0          | Tolerance    | CasADi::Ipop |
+| t_tol        |              |              | for          | tInternal    |
+|              |              |              | heuristic to |              |
+|              |              |              | ignore wrong |              |
+|              |              |              | inertia.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| never_use_fa | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
+| ct_cgpen_dir |              |              | switch off   | tInternal    |
+| ection       |              |              | the fast     |              |
+|              |              |              | Chen-        |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | direction    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| never_use_pi | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
+| ecewise_pena |              |              | switch off   | tInternal    |
+| lty_ls       |              |              | the          |              |
+|              |              |              | piecewise    |              |
+|              |              |              | penalty      |              |
+|              |              |              | method (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_lower_bo | OT_REAL      | -1e+19       | any bound    | CasADi::Ipop |
+| und_inf      |              |              | less or      | tInternal    |
+|              |              |              | equal this   |              |
+|              |              |              | value will   |              |
+|              |              |              | be           |              |
+|              |              |              | considered   |              |
+|              |              |              | -inf (i.e.   |              |
+|              |              |              | not lower    |              |
+|              |              |              | bounded).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 0.0          | Target value | CasADi::Ipop |
+| constr_targe |              |              | for          | tInternal    |
+| t_gradient   |              |              | constraint   |              |
+|              |              |              | function     |              |
+|              |              |              | gradient     |              |
+|              |              |              | size. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 100.0        | Maximum      | CasADi::Ipop |
+| max_gradient |              |              | gradient     | tInternal    |
+|              |              |              | after NLP    |              |
+|              |              |              | scaling.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_STRING    | gradient-    | Select the   | CasADi::Ipop |
+| method       |              | based        | technique    | tInternal    |
+|              |              |              | used for     |              |
+|              |              |              | scaling the  |              |
+|              |              |              | NLP. (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 1e-08        | Minimum      | CasADi::Ipop |
+| min_value    |              |              | value of     | tInternal    |
+|              |              |              | gradient-    |              |
+|              |              |              | based        |              |
+|              |              |              | scaling      |              |
+|              |              |              | values. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 0.0          | Target value | CasADi::Ipop |
+| obj_target_g |              |              | for          | tInternal    |
+| radient      |              |              | objective    |              |
+|              |              |              | function     |              |
+|              |              |              | gradient     |              |
+|              |              |              | size. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_upper_bo | OT_REAL      | 1e+19        | any bound    | CasADi::Ipop |
+| und_inf      |              |              | greater or   | tInternal    |
+|              |              |              | this value   |              |
+|              |              |              | will be      |              |
+|              |              |              | considered   |              |
+|              |              |              | +inf (i.e.   |              |
+|              |              |              | not upper    |              |
+|              |              |              | bounded).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nu_inc       | OT_REAL      | 0.0001       | Increment of | CasADi::Ipop |
+|              |              |              | the penalty  | tInternal    |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nu_init      | OT_REAL      | 1e-06        | Initial      | CasADi::Ipop |
+|              |              |              | value of the | tInternal    |
+|              |              |              | penalty      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| num_linear_v | OT_INTEGER   | 0            | Number of    | CasADi::Ipop |
+| ariables     |              |              | linear       | tInternal    |
+|              |              |              | variables    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::Ipop |
+| j_dir        |              |              | adjoint      | tInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::Ipop |
+| d_dir        |              |              | forward      | tInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
+| numeric_hess | OT_BOOLEAN   | False        | Calculate    | CasADi::Ipop |
+| ian          |              |              | Hessians     | tInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -19855,8 +21840,8 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
+| numeric_jaco | OT_BOOLEAN   | False        | Calculate    | CasADi::Ipop |
+| bian         |              |              | Jacobians    | tInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -19866,45 +21851,344 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| option_file_ | OT_STRING    |              |              | CasADi::Ipop |
-| name         |              |              |              | tInternal    |
+| obj_max_inc  | OT_REAL      | 5.0          | Determines   | CasADi::Ipop |
+|              |              |              | the upper    | tInternal    |
+|              |              |              | bound on the |              |
+|              |              |              | acceptable   |              |
+|              |              |              | increase of  |              |
+|              |              |              | barrier      |              |
+|              |              |              | objective    |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| output_file  | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| obj_scaling_ | OT_REAL      | 1.0          | Scaling      | CasADi::Ipop |
+| factor       |              |              | factor for   | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | objective    |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_matc | OT_STRING    |              |              | CasADi::Ipop |
-| hing_strateg |              |              |              | tInternal    |
-| y            |              |              |              |              |
+| option_file_ | OT_STRING    |              | File name of | CasADi::Ipop |
+| name         |              |              | options file | tInternal    |
+|              |              |              | (to          |              |
+|              |              |              | overwrite    |              |
+|              |              |              | default).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_msgl | OT_INTEGER   |              |              | CasADi::Ipop |
-| vl           |              |              |              | tInternal    |
+| output_file  | OT_STRING    |              | File name of | CasADi::Ipop |
+|              |              |              | desired      | tInternal    |
+|              |              |              | output file  |              |
+|              |              |              | (leave unset |              |
+|              |              |              | for no file  |              |
+|              |              |              | output).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_out_ | OT_INTEGER   |              |              | CasADi::Ipop |
-| of_core_powe |              |              |              | tInternal    |
-| r            |              |              |              |              |
+| pardiso_iter | OT_INTEGER   | 5000         | Maximum Size | CasADi::Ipop |
+| _coarse_size |              |              | of Coarse    | tInternal    |
+|              |              |              | Grid Matrix  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 0.5          | dropping     | CasADi::Ipop |
+| _dropping_fa |              |              | value for    | tInternal    |
+| ctor         |              |              | incomplete   |              |
+|              |              |              | factor (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 0.1          | dropping     | CasADi::Ipop |
+| _dropping_sc |              |              | value for    | tInternal    |
+| hur          |              |              | sparsify     |              |
+|              |              |              | schur        |              |
+|              |              |              | complement   |              |
+|              |              |              | factor (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 5000000.0    | (see IPOPT d | CasADi::Ipop |
+| _inverse_nor |              |              | ocumentation | tInternal    |
+| m_factor     |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_INTEGER   | 10000        | Maximum Size | CasADi::Ipop |
+| _max_levels  |              |              | of Grid      | tInternal    |
+|              |              |              | Levels (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_INTEGER   | 10000000     | max fill for | CasADi::Ipop |
+| _max_row_fil |              |              | each row     | tInternal    |
+| l            |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 1e-06        | Relative     | CasADi::Ipop |
+| _relative_to |              |              | Residual     | tInternal    |
+| l            |              |              | Convergence  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_STRING    | no           | Switch on    | CasADi::Ipop |
+| ative        |              |              | iterative    | tInternal    |
+|              |              |              | solver in    |              |
+|              |              |              | Pardiso      |              |
+|              |              |              | library (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_matc | OT_STRING    | complete+2x2 | Matching     | CasADi::Ipop |
+| hing_strateg |              |              | strategy to  | tInternal    |
+| y            |              |              | be used by   |              |
+|              |              |              | Pardiso (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_max_ | OT_INTEGER   | 4            | Maximal      | CasADi::Ipop |
+| droptol_corr |              |              | number of    | tInternal    |
+| ections      |              |              | decreases of |              |
+|              |              |              | drop         |              |
+|              |              |              | tolerance    |              |
+|              |              |              | during one   |              |
+|              |              |              | solve. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_max_ | OT_INTEGER   | 500          | Maximum      | CasADi::Ipop |
+| iter         |              |              | number of    | tInternal    |
+|              |              |              | Krylov-      |              |
+|              |              |              | Subspace     |              |
+|              |              |              | Iteration    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_msgl | OT_INTEGER   | 0            | Pardiso      | CasADi::Ipop |
+| vl           |              |              | message      | tInternal    |
+|              |              |              | level (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_out_ | OT_INTEGER   | 0            | Enables out- | CasADi::Ipop |
+| of_core_powe |              |              | of-core      | tInternal    |
+| r            |              |              | variant of   |              |
+|              |              |              | Pardiso (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_redo | OT_STRING    | no           | Toggle for   | CasADi::Ipop |
+| _symbolic_fa |              |              | handling     | tInternal    |
+| ct_only_if_i |              |              | case when    |              |
+| nertia_wrong |              |              | elements     |              |
+|              |              |              | were         |              |
+|              |              |              | perturbed by |              |
+|              |              |              | Pardiso.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_repe | OT_STRING    | no           | Interpretati | CasADi::Ipop |
+| ated_perturb |              |              | on of        | tInternal    |
+| ation_means_ |              |              | perturbed    |              |
+| singular     |              |              | elements.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_skip | OT_STRING    | no           | Always       | CasADi::Ipop |
+| _inertia_che |              |              | pretend      | tInternal    |
+| ck           |              |              | inertia is   |              |
+|              |              |              | correct.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | pass_nonline | OT_BOOLEAN   | true         |              | CasADi::Ipop |
 | ar_variables |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| perturb_dec_ | OT_REAL      |              |              | CasADi::Ipop |
-| fact         |              |              |              | tInternal    |
+| pen_des_fact | OT_REAL      | 0.2          | a parameter  | CasADi::Ipop |
+|              |              |              | used in      | tInternal    |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | computation  |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| perturb_inc_ | OT_REAL      |              |              | CasADi::Ipop |
-| fact         |              |              |              | tInternal    |
+| pen_init_fac | OT_REAL      | 50.0         | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | choose       |              |
+|              |              |              | initial      |              |
+|              |              |              | penalty para |              |
+|              |              |              | meterswhen   |              |
+|              |              |              | the          |              |
+|              |              |              | regularized  |              |
+|              |              |              | Newton       |              |
+|              |              |              | method is    |              |
+|              |              |              | used. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| perturb_inc_ | OT_REAL      |              |              | CasADi::Ipop |
-| fact_first   |              |              |              | tInternal    |
+| pen_theta_ma | OT_REAL      | 10000.0      | Determines   | CasADi::Ipop |
+| x_fact       |              |              | upper bound  | tInternal    |
+|              |              |              | for          |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the filter.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| point_pertur | OT_REAL      |              |              | CasADi::Ipop |
-| bation_radiu |              |              |              | tInternal    |
-| s            |              |              |              |              |
+| penalty_init | OT_REAL      | 100000.0     | Maximal      | CasADi::Ipop |
+| _max         |              |              | value for    | tInternal    |
+|              |              |              | the intial   |              |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_level  | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| penalty_init | OT_REAL      | 1.0          | Minimal      | CasADi::Ipop |
+| _min         |              |              | value for    | tInternal    |
+|              |              |              | the intial   |              |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | for line     |              |
+|              |              |              | search(for   |              |
+|              |              |              | Chen-        |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_option | OT_STRING    |              |              | CasADi::Ipop |
-| s_documentat |              |              |              | tInternal    |
-| ion          |              |              |              |              |
+| penalty_max  | OT_REAL      | 1e+30        | Maximal      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | the penalty  |              |
+|              |              |              | parameter    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| penalty_upda | OT_REAL      | 10.0         | LIFENG       | CasADi::Ipop |
+| te_compl_tol |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| penalty_upda | OT_REAL      | 1e-09        | Threshold    | CasADi::Ipop |
+| te_infeasibi |              |              | for infeasib | tInternal    |
+| lity_tol     |              |              | ility in     |              |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | update test. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_alwa | OT_STRING    | no           | Active       | CasADi::Ipop |
+| ys_cd        |              |              | permanent    | tInternal    |
+|              |              |              | perturbation |              |
+|              |              |              | of           |              |
+|              |              |              | constraint l |              |
+|              |              |              | inearization |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_dec_ | OT_REAL      | 0.3333333333 | Decrease     | CasADi::Ipop |
+| fact         |              | 33           | factor for   | tInternal    |
+|              |              |              | x-s perturba |              |
+|              |              |              | tion. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_inc_ | OT_REAL      | 8.0          | Increase     | CasADi::Ipop |
+| fact         |              |              | factor for   | tInternal    |
+|              |              |              | x-s perturba |              |
+|              |              |              | tion. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_inc_ | OT_REAL      | 100.0        | Increase     | CasADi::Ipop |
+| fact_first   |              |              | factor for   | tInternal    |
+|              |              |              | x-s          |              |
+|              |              |              | perturbation |              |
+|              |              |              | for very     |              |
+|              |              |              | first pertur |              |
+|              |              |              | bation. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| piecewisepen | OT_REAL      | 1e-13        | LIFENG       | CasADi::Ipop |
+| alty_gamma_i |              |              | WRITES THIS. | tInternal    |
+| nfeasi       |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| piecewisepen | OT_REAL      | 1e-13        | LIFENG       | CasADi::Ipop |
+| alty_gamma_o |              |              | WRITES THIS. | tInternal    |
+| bj           |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| point_pertur | OT_REAL      | 10.0         | Maximal      | CasADi::Ipop |
+| bation_radiu |              |              | perturbation | tInternal    |
+| s            |              |              | of an        |              |
+|              |              |              | evaluation   |              |
+|              |              |              | point. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_info_s | OT_STRING    | no           | Enables      | CasADi::Ipop |
+| tring        |              |              | printing of  | tInternal    |
+|              |              |              | additional   |              |
+|              |              |              | info string  |              |
+|              |              |              | at end of    |              |
+|              |              |              | iteration    |              |
+|              |              |              | output. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_level  | OT_INTEGER   | 5            | Output       | CasADi::Ipop |
+|              |              |              | verbosity    | tInternal    |
+|              |              |              | level. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_option | OT_STRING    | no           | Switch to    | CasADi::Ipop |
+| s_documentat |              |              | print all    | tInternal    |
+| ion          |              |              | algorithmic  |              |
+|              |              |              | options.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_option | OT_STRING    | no           | Undocumented | CasADi::Ipop |
+| s_latex_mode |              |              | (see IPOPT d | tInternal    |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_time   | OT_BOOLEAN   | true         | print        | CasADi::Ipop |
 |              |              |              | information  | tInternal    |
@@ -19912,38 +22196,340 @@ number of constraints (A)
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_user_o | OT_STRING    |              |              | CasADi::Ipop |
-| ptions       |              |              |              | tInternal    |
+| print_timing | OT_STRING    | no           | Switch to    | CasADi::Ipop |
+| _statistics  |              |              | print timing | tInternal    |
+|              |              |              | statistics.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| quality_func | OT_INTEGER   |              |              | CasADi::Ipop |
-| tion_max_sec |              |              |              | tInternal    |
-| tion_steps   |              |              |              |              |
+| print_user_o | OT_STRING    | no           | Print all    | CasADi::Ipop |
+| ptions       |              |              | options set  | tInternal    |
+|              |              |              | by the user. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| recalc_y     | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| quality_func | OT_STRING    | none         | The          | CasADi::Ipop |
+| tion_balanci |              |              | balancing    | tInternal    |
+| ng_term      |              |              | term         |              |
+|              |              |              | included in  |              |
+|              |              |              | the quality  |              |
+|              |              |              | function for |              |
+|              |              |              | centrality.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| recalc_y_fea | OT_REAL      |              |              | CasADi::Ipop |
-| s_tol        |              |              |              | tInternal    |
+| quality_func | OT_STRING    | none         | The penalty  | CasADi::Ipop |
+| tion_central |              |              | term for     | tInternal    |
+| ity          |              |              | centrality   |              |
+|              |              |              | that is      |              |
+|              |              |              | included in  |              |
+|              |              |              | quality      |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| required_inf | OT_REAL      |              |              | CasADi::Ipop |
-| easibility_r |              |              |              | tInternal    |
-| eduction     |              |              |              |              |
+| quality_func | OT_INTEGER   | 8            | Maximum      | CasADi::Ipop |
+| tion_max_sec |              |              | number of    | tInternal    |
+| tion_steps   |              |              | search steps |              |
+|              |              |              | during       |              |
+|              |              |              | direct       |              |
+|              |              |              | search       |              |
+|              |              |              | procedure    |              |
+|              |              |              | determining  |              |
+|              |              |              | the optimal  |              |
+|              |              |              | centering    |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| slack_bound_ | OT_REAL      |              |              | CasADi::Ipop |
-| frac         |              |              |              | tInternal    |
+| quality_func | OT_STRING    | 2-norm-      | Norm used    | CasADi::Ipop |
+| tion_norm_ty |              | squared      | for          | tInternal    |
+| pe           |              |              | components   |              |
+|              |              |              | of the       |              |
+|              |              |              | quality      |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| slack_bound_ | OT_REAL      |              |              | CasADi::Ipop |
-| push         |              |              |              | tInternal    |
+| quality_func | OT_REAL      | 0.0          | Tolerance    | CasADi::Ipop |
+| tion_section |              |              | for the      | tInternal    |
+| _qf_tol      |              |              | golden       |              |
+|              |              |              | section      |              |
+|              |              |              | search       |              |
+|              |              |              | procedure    |              |
+|              |              |              | determining  |              |
+|              |              |              | the optimal  |              |
+|              |              |              | centering    |              |
+|              |              |              | parameter    |              |
+|              |              |              | (in the      |              |
+|              |              |              | function     |              |
+|              |              |              | value        |              |
+|              |              |              | space). (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| soft_resto_p | OT_REAL      |              |              | CasADi::Ipop |
-| derror_reduc |              |              |              | tInternal    |
-| tion_factor  |              |              |              |              |
+| quality_func | OT_REAL      | 0.01         | Tolerance    | CasADi::Ipop |
+| tion_section |              |              | for the      | tInternal    |
+| _sigma_tol   |              |              | section      |              |
+|              |              |              | search       |              |
+|              |              |              | procedure    |              |
+|              |              |              | determining  |              |
+|              |              |              | the optimal  |              |
+|              |              |              | centering    |              |
+|              |              |              | parameter    |              |
+|              |              |              | (in sigma    |              |
+|              |              |              | space). (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
+| recalc_y     | OT_STRING    | no           | Tells the    | CasADi::Ipop |
+|              |              |              | algorithm to | tInternal    |
+|              |              |              | recalculate  |              |
+|              |              |              | the equality |              |
+|              |              |              | and          |              |
+|              |              |              | inequality   |              |
+|              |              |              | multipliers  |              |
+|              |              |              | as least     |              |
+|              |              |              | square       |              |
+|              |              |              | estimates.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
+| recalc_y_fea | OT_REAL      | 1e-06        | Feasibility  | CasADi::Ipop |
+| s_tol        |              |              | threshold    | tInternal    |
+|              |              |              | for recomput |              |
+|              |              |              | ation of     |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| replace_boun | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| ds           |              |              | all variable | tInternal    |
+|              |              |              | bounds       |              |
+|              |              |              | should be    |              |
+|              |              |              | replaced by  |              |
+|              |              |              | inequality   |              |
+|              |              |              | constraints  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| required_inf | OT_REAL      | 0.9          | Required     | CasADi::Ipop |
+| easibility_r |              |              | reduction of | tInternal    |
+| eduction     |              |              | infeasibilit |              |
+|              |              |              | y before     |              |
+|              |              |              | leaving      |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| residual_imp | OT_REAL      | 0.999999999  | Minimal      | CasADi::Ipop |
+| rovement_fac |              |              | required     | tInternal    |
+| tor          |              |              | reduction of |              |
+|              |              |              | residual     |              |
+|              |              |              | test ratio   |              |
+|              |              |              | in iterative |              |
+|              |              |              | refinement.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| residual_rat | OT_REAL      | 1e-10        | Iterative    | CasADi::Ipop |
+| io_max       |              |              | refinement   | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| residual_rat | OT_REAL      | 1e-05        | Threshold    | CasADi::Ipop |
+| io_singular  |              |              | for          | tInternal    |
+|              |              |              | declaring    |              |
+|              |              |              | linear       |              |
+|              |              |              | system       |              |
+|              |              |              | singular     |              |
+|              |              |              | after failed |              |
+|              |              |              | iterative    |              |
+|              |              |              | refinement.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| resto_failur | OT_REAL      | 0.0          | Threshold    | CasADi::Ipop |
+| e_feasibilit |              |              | for primal i | tInternal    |
+| y_threshold  |              |              | nfeasibility |              |
+|              |              |              | to declare   |              |
+|              |              |              | failure of   |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| resto_penalt | OT_REAL      | 1000.0       | Penalty      | CasADi::Ipop |
+| y_parameter  |              |              | parameter in | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase        |              |
+|              |              |              | objective    |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| resto_proxim | OT_REAL      | 1.0          | Weighting    | CasADi::Ipop |
+| ity_weight   |              |              | factor for   | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | proximity    |              |
+|              |              |              | term in      |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase        |              |
+|              |              |              | objective.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| rho          | OT_REAL      | 0.1          | Value in     | CasADi::Ipop |
+|              |              |              | penalty      | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | update       |              |
+|              |              |              | formula.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| s_max        | OT_REAL      | 100.0        | Scaling      | CasADi::Ipop |
+|              |              |              | threshold    | tInternal    |
+|              |              |              | for the NLP  |              |
+|              |              |              | error. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| s_phi        | OT_REAL      | 2.3          | Exponent for | CasADi::Ipop |
+|              |              |              | linear       | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | function     |              |
+|              |              |              | model in the |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| s_theta      | OT_REAL      | 1.1          | Exponent for | CasADi::Ipop |
+|              |              |              | current      | tInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the          |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sb           | OT_STRING    | no           | (see IPOPT d | CasADi::Ipop |
+|              |              |              | ocumentation | tInternal    |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| sigma_max    | OT_REAL      | 100.0        | Maximum      | CasADi::Ipop |
+|              |              |              | value of the | tInternal    |
+|              |              |              | centering    |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| sigma_min    | OT_REAL      | 1e-06        | Minimum      | CasADi::Ipop |
+|              |              |              | value of the | tInternal    |
+|              |              |              | centering    |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| skip_corr_if | OT_STRING    | yes          | Skip the     | CasADi::Ipop |
+| _neg_curv    |              |              | corrector    | tInternal    |
+|              |              |              | step in      |              |
+|              |              |              | negative     |              |
+|              |              |              | curvature    |              |
+|              |              |              | iteration (u |              |
+|              |              |              | nsupported!) |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| skip_corr_in | OT_STRING    | yes          | Skip the     | CasADi::Ipop |
+| _monotone_mo |              |              | corrector    | tInternal    |
+| de           |              |              | step during  |              |
+|              |              |              | monotone     |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter    |              |
+|              |              |              | mode (unsupp |              |
+|              |              |              | orted!).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| skip_finaliz | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| e_solution_c |              |              | call to NLP: | tInternal    |
+| all          |              |              | :FinalizeSol |              |
+|              |              |              | ution after  |              |
+|              |              |              | optimization |              |
+|              |              |              | should be    |              |
+|              |              |              | suppressed   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| slack_bound_ | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+| frac         |              |              | minimum      | tInternal    |
+|              |              |              | relative     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | slack to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| slack_bound_ | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+| push         |              |              | minimum      | tInternal    |
+|              |              |              | absolute     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | slack to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| slack_move   | OT_REAL      | 1.8189894035 | Correction   | CasADi::Ipop |
+|              |              | 5e-12        | size for     | tInternal    |
+|              |              |              | very small   |              |
+|              |              |              | slacks. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| soft_resto_p | OT_REAL      | 0.9999       | Required     | CasADi::Ipop |
+| derror_reduc |              |              | reduction in | tInternal    |
+| tion_factor  |              |              | primal-dual  |              |
+|              |              |              | error in the |              |
+|              |              |              | soft         |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Ipop |
+|              |              |              | sparse       | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Ipop |
+| erator       | ENERATOR     |              | that         | tInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
 |              |              |              | a given      |              |
@@ -19953,11 +22539,19 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| start_with_r | OT_STRING    |              |              | CasADi::Ipop |
-| esto         |              |              |              | tInternal    |
+| start_with_r | OT_STRING    | no           | Tells        | CasADi::Ipop |
+| esto         |              |              | algorithm to | tInternal    |
+|              |              |              | switch to    |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase in     |              |
+|              |              |              | first        |              |
+|              |              |              | iteration.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
+| store_jacobi | OT_BOOLEAN   | False        | keep         | CasADi::Ipop |
+| ans          |              |              | references   | tInternal    |
 |              |              |              | to generated |              |
 |              |              |              | Jacobians in |              |
 |              |              |              | order to     |              |
@@ -19968,11 +22562,76 @@ number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| tol          | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| suppress_all | OT_STRING    | no           | Undocumented | CasADi::Ipop |
+| _output      |              |              | (see IPOPT d | tInternal    |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
+| tau_min      | OT_REAL      | 0.99         | Lower bound  | CasADi::Ipop |
+|              |              |              | on fraction- | tInternal    |
+|              |              |              | to-the-      |              |
+|              |              |              | boundary     |              |
+|              |              |              | parameter    |              |
+|              |              |              | tau. (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| theta_max_fa | OT_REAL      | 10000.0      | Determines   | CasADi::Ipop |
+| ct           |              |              | upper bound  | tInternal    |
+|              |              |              | for          |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the filter.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| theta_min    | OT_REAL      | 1e-06        | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| theta_min_fa | OT_REAL      | 0.0001       | Determines   | CasADi::Ipop |
+| ct           |              |              | constraint   | tInternal    |
+|              |              |              | violation    |              |
+|              |              |              | threshold in |              |
+|              |              |              | the          |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| tiny_step_to | OT_REAL      | 2.2204460492 | Tolerance    | CasADi::Ipop |
+| l            |              | 5e-15        | for          | tInternal    |
+|              |              |              | detecting    |              |
+|              |              |              | numerically  |              |
+|              |              |              | insignifican |              |
+|              |              |              | t steps.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| tiny_step_y_ | OT_REAL      | 0.01         | Tolerance    | CasADi::Ipop |
+| tol          |              |              | for quitting | tInternal    |
+|              |              |              | because of   |              |
+|              |              |              | numerically  |              |
+|              |              |              | insignifican |              |
+|              |              |              | t steps.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol          | OT_REAL      | 1e-08        | Desired      | CasADi::Ipop |
+|              |              |              | convergence  | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | (relative).  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Ipop |
+|              |              |              | defined      | tInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
 |              |              |              | to identify  |              |
@@ -19981,60 +22640,139 @@ number of constraints (A)
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
+| vartheta     | OT_REAL      | 0.5          | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Ipop |
+|              |              |              | evaluation   | tInternal    |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_b | OT_REAL      |              |              | CasADi::Ipop |
-| ound_frac    |              |              |              | tInternal    |
+| warm_start_b | OT_REAL      | 0.001        | same as      | CasADi::Ipop |
+| ound_frac    |              |              | bound_frac   | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_b | OT_REAL      |              |              | CasADi::Ipop |
-| ound_push    |              |              |              | tInternal    |
+| warm_start_b | OT_REAL      | 0.001        | same as      | CasADi::Ipop |
+| ound_push    |              |              | bound_push   | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_i | OT_STRING    |              |              | CasADi::Ipop |
-| nit_point    |              |              |              | tInternal    |
+| warm_start_e | OT_STRING    | no           | Tells        | CasADi::Ipop |
+| ntire_iterat |              |              | algorithm    | tInternal    |
+| e            |              |              | whether to   |              |
+|              |              |              | use the GetW |              |
+|              |              |              | armStartIter |              |
+|              |              |              | ate method   |              |
+|              |              |              | in the NLP.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_m | OT_REAL      |              |              | CasADi::Ipop |
-| ult_bound_pu |              |              |              | tInternal    |
-| sh           |              |              |              |              |
+| warm_start_i | OT_STRING    | no           | Warm-start   | CasADi::Ipop |
+| nit_point    |              |              | for initial  | tInternal    |
+|              |              |              | point (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_m | OT_REAL      |              |              | CasADi::Ipop |
-| ult_init_max |              |              |              | tInternal    |
+| warm_start_m | OT_REAL      | 0.001        | same as mult | CasADi::Ipop |
+| ult_bound_pu |              |              | _bound_push  | tInternal    |
+| sh           |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_s | OT_REAL      |              |              | CasADi::Ipop |
-| lack_bound_f |              |              |              | tInternal    |
-| rac          |              |              |              |              |
+| warm_start_m | OT_REAL      | 1000000.0    | Maximum      | CasADi::Ipop |
+| ult_init_max |              |              | initial      | tInternal    |
+|              |              |              | value for    |              |
+|              |              |              | the equality |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_s | OT_REAL      |              |              | CasADi::Ipop |
-| lack_bound_p |              |              |              | tInternal    |
-| ush          |              |              |              |              |
+| warm_start_s | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| ame_structur |              |              | whether a    | tInternal    |
+| e            |              |              | problem with |              |
+|              |              |              | a structure  |              |
+|              |              |              | identical to |              |
+|              |              |              | the previous |              |
+|              |              |              | one is to be |              |
+|              |              |              | solved. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| watchdog_sho | OT_INTEGER   |              |              | CasADi::Ipop |
-| rtened_iter_ |              |              |              | tInternal    |
-| trigger      |              |              |              |              |
+| warm_start_s | OT_REAL      | 0.001        | same as slac | CasADi::Ipop |
+| lack_bound_f |              |              | k_bound_frac | tInternal    |
+| rac          |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| watchdog_tri | OT_INTEGER   |              |              | CasADi::Ipop |
-| al_iter_max  |              |              |              | tInternal    |
+| warm_start_s | OT_REAL      | 0.001        | same as slac | CasADi::Ipop |
+| lack_bound_p |              |              | k_bound_push | tInternal    |
+| ush          |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_num_thr | OT_INTEGER   |              |              | CasADi::Ipop |
-| eads         |              |              |              | tInternal    |
+| warm_start_t | OT_REAL      | 0.0          | Unsupported! | CasADi::Ipop |
+| arget_mu     |              |              | (see IPOPT d | tInternal    |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_orderin | OT_INTEGER   |              |              | CasADi::Ipop |
-| g_option     |              |              |              | tInternal    |
+| watchdog_sho | OT_INTEGER   | 10           | Number of    | CasADi::Ipop |
+| rtened_iter_ |              |              | shortened    | tInternal    |
+| trigger      |              |              | iterations   |              |
+|              |              |              | that trigger |              |
+|              |              |              | the          |              |
+|              |              |              | watchdog.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_pivtol  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| watchdog_tri | OT_INTEGER   | 3            | Maximum      | CasADi::Ipop |
+| al_iter_max  |              |              | number of    | tInternal    |
+|              |              |              | watchdog     |              |
+|              |              |              | iterations.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_pivtolm | OT_REAL      |              |              | CasADi::Ipop |
-| ax           |              |              |              | tInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_scaling | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_singula | OT_REAL      |              |              | CasADi::Ipop |
-| rity_thresho |              |              |              | tInternal    |
-| ld           |              |              |              |              |
+| wsmp_iterati | OT_STRING    | no           | Switches to  | CasADi::Ipop |
+| ve           |              |              | iterative    | tInternal    |
+|              |              |              | solver in    |              |
+|              |              |              | WSMP. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
@@ -20277,6 +23015,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::IpoptInternal::hasOption "
 
@@ -21203,6 +23965,34 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getOptionDefault
+"
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getOptionAllowed
+"
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::hasOption "
 
@@ -22185,6 +24975,32 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::clone "
 
 Deep copy. ";
@@ -22315,31 +25131,78 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| accept_every | OT_STRING    |              |              | CasADi::Ipop |
-| _trial_step  |              |              |              | tInternal    |
+| accept_after | OT_INTEGER   | -1           | Accept a     | CasADi::Ipop |
+| _max_steps   |              |              | trial point  | tInternal    |
+|              |              |              | after        |              |
+|              |              |              | maximal this |              |
+|              |              |              | number of    |              |
+|              |              |              | steps. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_c | OT_REAL      |              |              | CasADi::Ipop |
-| ompl_inf_tol |              |              |              | tInternal    |
+| accept_every | OT_STRING    | no           | Always       | CasADi::Ipop |
+| _trial_step  |              |              | accept the   | tInternal    |
+|              |              |              | first trial  |              |
+|              |              |              | step. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_c | OT_REAL      |              |              | CasADi::Ipop |
-| onstr_viol_t |              |              |              | tInternal    |
-| ol           |              |              |              |              |
+| acceptable_c | OT_REAL      | 0.01         | \"Acceptance\" | CasADi::Ipop |
+| ompl_inf_tol |              |              | threshold    | tInternal    |
+|              |              |              | for the comp |              |
+|              |              |              | lementarity  |              |
+|              |              |              | conditions.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_d | OT_REAL      |              |              | CasADi::Ipop |
-| ual_inf_tol  |              |              |              | tInternal    |
+| acceptable_c | OT_REAL      | 0.01         | \"Acceptance\" | CasADi::Ipop |
+| onstr_viol_t |              |              | threshold    | tInternal    |
+| ol           |              |              | for the      |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_i | OT_INTEGER   |              |              | CasADi::Ipop |
-| ter          |              |              |              | tInternal    |
+| acceptable_d | OT_REAL      | 10000000000. | \"Acceptance\" | CasADi::Ipop |
+| ual_inf_tol  |              | 0            | threshold    | tInternal    |
+|              |              |              | for the dual |              |
+|              |              |              | infeasibilit |              |
+|              |              |              | y. (see      |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_o | OT_REAL      |              |              | CasADi::Ipop |
-| bj_change_to |              |              |              | tInternal    |
-| l            |              |              |              |              |
+| acceptable_i | OT_INTEGER   | 15           | Number of    | CasADi::Ipop |
+| ter          |              |              | \"acceptable\" | tInternal    |
+|              |              |              | iterates     |              |
+|              |              |              | before       |              |
+|              |              |              | triggering   |              |
+|              |              |              | termination. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| acceptable_t | OT_REAL      |              |              | CasADi::Ipop |
-| ol           |              |              |              | tInternal    |
+| acceptable_o | OT_REAL      | 1e+20        | \"Acceptance\" | CasADi::Ipop |
+| bj_change_to |              |              | stopping     | tInternal    |
+| l            |              |              | criterion    |              |
+|              |              |              | based on     |              |
+|              |              |              | objective    |              |
+|              |              |              | function     |              |
+|              |              |              | change. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
+| acceptable_t | OT_REAL      | 1e-06        | \"Acceptable\" | CasADi::Ipop |
+| ol           |              |              | convergence  | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | (relative).  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Ipop |
+|              |              |              | calculate    | tInternal    |
 |              |              |              | the          |              |
 |              |              |              | Jacobians:   |              |
 |              |              |              | \"forward\"    |              |
@@ -22356,148 +25219,682 @@ number of constraints (A)
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| alpha_for_y  | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| adaptive_mu_ | OT_STRING    | obj-constr-  | Globalizatio | CasADi::Ipop |
+| globalizatio |              | filter       | n strategy   | tInternal    |
+| n            |              |              | for the      |              |
+|              |              |              | adaptive mu  |              |
+|              |              |              | selection    |              |
+|              |              |              | mode. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| alpha_for_y_ | OT_REAL      |              |              | CasADi::Ipop |
-| tol          |              |              |              | tInternal    |
+| adaptive_mu_ | OT_STRING    | 2-norm-      | Norm used    | CasADi::Ipop |
+| kkt_norm_typ |              | squared      | for the KKT  | tInternal    |
+| e            |              |              | error in the |              |
+|              |              |              | adaptive mu  |              |
+|              |              |              | globalizatio |              |
+|              |              |              | n            |              |
+|              |              |              | strategies.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| barrier_tol_ | OT_REAL      |              |              | CasADi::Ipop |
-| factor       |              |              |              | tInternal    |
+| adaptive_mu_ | OT_REAL      | 0.9999       | Sufficient   | CasADi::Ipop |
+| kkterror_red |              |              | decrease     | tInternal    |
+| _fact        |              |              | factor for   |              |
+|              |              |              | \"kkt-error\"  |              |
+|              |              |              | globalizatio |              |
+|              |              |              | n strategy.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_frac   | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| adaptive_mu_ | OT_INTEGER   | 4            | Maximum      | CasADi::Ipop |
+| kkterror_red |              |              | number of    | tInternal    |
+| _iters       |              |              | iterations   |              |
+|              |              |              | requiring    |              |
+|              |              |              | sufficient   |              |
+|              |              |              | progress.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_mult_i | OT_STRING    |              |              | CasADi::Ipop |
-| nit_method   |              |              |              | tInternal    |
+| adaptive_mu_ | OT_REAL      | 0.8          | Determines   | CasADi::Ipop |
+| monotone_ini |              |              | the initial  | tInternal    |
+| t_factor     |              |              | value of the |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter    |              |
+|              |              |              | when         |              |
+|              |              |              | switching to |              |
+|              |              |              | the monotone |              |
+|              |              |              | mode. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_mult_i | OT_REAL      |              |              | CasADi::Ipop |
-| nit_val      |              |              |              | tInternal    |
+| adaptive_mu_ | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| restore_prev |              |              | the previous | tInternal    |
+| ious_iterate |              |              | iterate      |              |
+|              |              |              | should be    |              |
+|              |              |              | restored if  |              |
+|              |              |              | the monotone |              |
+|              |              |              | mode is      |              |
+|              |              |              | entered.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_mult_r | OT_REAL      |              |              | CasADi::Ipop |
-| eset_thresho |              |              |              | tInternal    |
-| ld           |              |              |              |              |
+| adaptive_mu_ | OT_REAL      | 0.0          | (see IPOPT d | CasADi::Ipop |
+| safeguard_fa |              |              | ocumentation | tInternal    |
+| ctor         |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_push   | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| alpha_for_y  | OT_STRING    | primal       | Method to    | CasADi::Ipop |
+|              |              |              | determine    | tInternal    |
+|              |              |              | the step     |              |
+|              |              |              | size for     |              |
+|              |              |              | constraint   |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| bound_relax_ | OT_REAL      |              |              | CasADi::Ipop |
-| factor       |              |              |              | tInternal    |
+| alpha_for_y_ | OT_REAL      | 10.0         | Tolerance    | CasADi::Ipop |
+| tol          |              |              | for          | tInternal    |
+|              |              |              | switching to |              |
+|              |              |              | full         |              |
+|              |              |              | equality     |              |
+|              |              |              | multiplier   |              |
+|              |              |              | steps. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| check_deriva | OT_STRING    |              |              | CasADi::Ipop |
-| tives_for_na |              |              |              | tInternal    |
-| ninf         |              |              |              |              |
+| alpha_min_fr | OT_REAL      | 0.05         | Safety       | CasADi::Ipop |
+| ac           |              |              | factor for   | tInternal    |
+|              |              |              | the minimal  |              |
+|              |              |              | step size    |              |
+|              |              |              | (before      |              |
+|              |              |              | switching to |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase). (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| compl_inf_to | OT_REAL      |              |              | CasADi::Ipop |
-| l            |              |              |              | tInternal    |
+| alpha_red_fa | OT_REAL      | 0.5          | Fractional   | CasADi::Ipop |
+| ctor         |              |              | reduction of | tInternal    |
+|              |              |              | the trial    |              |
+|              |              |              | step size in |              |
+|              |              |              | the          |              |
+|              |              |              | backtracking |              |
+|              |              |              | line search. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constr_mult_ | OT_REAL      |              |              | CasADi::Ipop |
-| init_max     |              |              |              | tInternal    |
+| barrier_tol_ | OT_REAL      | 10.0         | Factor for   | CasADi::Ipop |
+| factor       |              |              | mu in        | tInternal    |
+|              |              |              | barrier stop |              |
+|              |              |              | test. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constr_mult_ | OT_REAL      |              |              | CasADi::Ipop |
-| reset_thresh |              |              |              | tInternal    |
-| old          |              |              |              |              |
+| bound_frac   | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+|              |              |              | minimum      | tInternal    |
+|              |              |              | relative     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | point to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constr_viol_ | OT_REAL      |              |              | CasADi::Ipop |
-| tol          |              |              |              | tInternal    |
+| bound_mult_i | OT_STRING    | constant     | Initializati | CasADi::Ipop |
+| nit_method   |              |              | on method    | tInternal    |
+|              |              |              | for bound    |              |
+|              |              |              | multipliers  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| corrector_ty | OT_STRING    |              |              | CasADi::Ipop |
-| pe           |              |              |              | tInternal    |
+| bound_mult_i | OT_REAL      | 1.0          | Initial      | CasADi::Ipop |
+| nit_val      |              |              | value for    | tInternal    |
+|              |              |              | the bound    |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_STRING    |              |              | CasADi::Ipop |
-| est          |              |              |              | tInternal    |
+| bound_mult_r | OT_REAL      | 1000.0       | Threshold    | CasADi::Ipop |
+| eset_thresho |              |              | for          | tInternal    |
+| ld           |              |              | resetting    |              |
+|              |              |              | bound        |              |
+|              |              |              | multipliers  |              |
+|              |              |              | after the    |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_REAL      |              |              | CasADi::Ipop |
-| est_perturba |              |              |              | tInternal    |
-| tion         |              |              |              |              |
+| bound_push   | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+|              |              |              | minimum      | tInternal    |
+|              |              |              | absolute     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | point to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_STRING    |              |              | CasADi::Ipop |
-| est_print_al |              |              |              | tInternal    |
-| l            |              |              |              |              |
+| bound_relax_ | OT_REAL      | 1e-08        | Factor for   | CasADi::Ipop |
+| factor       |              |              | initial      | tInternal    |
+|              |              |              | relaxation   |              |
+|              |              |              | of the       |              |
+|              |              |              | bounds. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_t | OT_REAL      |              |              | CasADi::Ipop |
-| est_tol      |              |              |              | tInternal    |
+| check_deriva | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| tives_for_na |              |              | whether it   | tInternal    |
+| ninf         |              |              | is desired   |              |
+|              |              |              | to check for |              |
+|              |              |              | Nan/Inf in   |              |
+|              |              |              | derivative   |              |
+|              |              |              | matrices     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| diverging_it | OT_REAL      |              |              | CasADi::Ipop |
-| erates_tol   |              |              |              | tInternal    |
+| chi_cup      | OT_REAL      | 1.5          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| dual_inf_tol | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| chi_hat      | OT_REAL      | 2.0          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| evaluate_ori | OT_STRING    |              |              | CasADi::Ipop |
-| g_obj_at_res |              |              |              | tInternal    |
-| to_trial     |              |              |              |              |
+| chi_tilde    | OT_REAL      | 5.0          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | objective    | olverInterna |
-|              |              |              | function in  | l            |
+| compl_inf_to | OT_REAL      | 0.0001       | Desired      | CasADi::Ipop |
+| l            |              |              | threshold    | tInternal    |
+|              |              |              | for the comp |              |
+|              |              |              | lementarity  |              |
+|              |              |              | conditions.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| constr_mult_ | OT_REAL      | 1000.0       | Maximum      | CasADi::Ipop |
+| init_max     |              |              | allowed      | tInternal    |
+|              |              |              | least-square |              |
+|              |              |              | guess of     |              |
+|              |              |              | constraint   |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| constr_mult_ | OT_REAL      | 0.0          | Threshold    | CasADi::Ipop |
+| reset_thresh |              |              | for          | tInternal    |
+| old          |              |              | resetting    |              |
+|              |              |              | equality and |              |
+|              |              |              | inequality   |              |
+|              |              |              | multipliers  |              |
+|              |              |              | after        |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| constr_viol_ | OT_REAL      | 0.0001       | Desired      | CasADi::Ipop |
+| tol          |              |              | threshold    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| constraint_v | OT_STRING    | 1-norm       | Norm to be   | CasADi::Ipop |
+| iolation_nor |              |              | used for the | tInternal    |
+| m_type       |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the line     |              |
+|              |              |              | search. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| corrector_co | OT_REAL      | 1.0          | Complementar | CasADi::Ipop |
+| mpl_avrg_red |              |              | ity          | tInternal    |
+| _fact        |              |              | tolerance    |              |
+|              |              |              | factor for   |              |
+|              |              |              | accepting    |              |
+|              |              |              | corrector    |              |
+|              |              |              | step (unsupp |              |
+|              |              |              | orted!).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| corrector_ty | OT_STRING    | none         | The type of  | CasADi::Ipop |
+| pe           |              |              | corrector    | tInternal    |
+|              |              |              | steps that   |              |
+|              |              |              | should be    |              |
+|              |              |              | taken (unsup |              |
+|              |              |              | ported!).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| delta        | OT_REAL      | 1.0          | Multiplier   | CasADi::Ipop |
+|              |              |              | for          | tInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the          |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| delta_y_max  | OT_REAL      | 1e+12        | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| dependency_d | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| etection_wit |              |              | the right    | tInternal    |
+| h_rhs        |              |              | hand sides   |              |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | should be    |              |
+|              |              |              | considered   |              |
+|              |              |              | during       |              |
+|              |              |              | dependency   |              |
+|              |              |              | detection    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| dependency_d | OT_STRING    | none         | Indicates    | CasADi::Ipop |
+| etector      |              |              | which linear | tInternal    |
+|              |              |              | solver       |              |
+|              |              |              | should be    |              |
+|              |              |              | used to      |              |
+|              |              |              | detect       |              |
+|              |              |              | linearly     |              |
+|              |              |              | dependent    |              |
+|              |              |              | equality     |              |
+|              |              |              | constraints. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_STRING    | none         | Enable       | CasADi::Ipop |
+| est          |              |              | derivative   | tInternal    |
+|              |              |              | checker (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_INTEGER   | -2           | Index of     | CasADi::Ipop |
+| est_first_in |              |              | first        | tInternal    |
+| dex          |              |              | quantity to  |              |
+|              |              |              | be checked   |              |
+|              |              |              | by           |              |
+|              |              |              | derivative   |              |
+|              |              |              | checker (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_REAL      | 1e-08        | Size of the  | CasADi::Ipop |
+| est_perturba |              |              | finite       | tInternal    |
+| tion         |              |              | difference   |              |
+|              |              |              | perturbation |              |
+|              |              |              | in           |              |
+|              |              |              | derivative   |              |
+|              |              |              | test. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| est_print_al |              |              | whether      | tInternal    |
+| l            |              |              | information  |              |
+|              |              |              | for all      |              |
+|              |              |              | estimated    |              |
+|              |              |              | derivatives  |              |
+|              |              |              | should be    |              |
+|              |              |              | printed.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_t | OT_REAL      | 0.0001       | Threshold    | CasADi::Ipop |
+| est_tol      |              |              | for          | tInternal    |
+|              |              |              | indicating   |              |
+|              |              |              | wrong        |              |
+|              |              |              | derivative.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| diverging_it | OT_REAL      | 1e+20        | Threshold    | CasADi::Ipop |
+| erates_tol   |              |              | for maximal  | tInternal    |
+|              |              |              | value of     |              |
+|              |              |              | primal       |              |
+|              |              |              | iterates.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| dual_inf_tol | OT_REAL      | 1.0          | Desired      | CasADi::Ipop |
+|              |              |              | threshold    | tInternal    |
+|              |              |              | for the dual |              |
+|              |              |              | infeasibilit |              |
+|              |              |              | y. (see      |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsilon_c    | OT_REAL      | 0.01         | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| eta_min      | OT_REAL      | 10.0         | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| eta_penalty  | OT_REAL      | 1e-08        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the Armijo   |              |
+|              |              |              | condition    |              |
+|              |              |              | for the      |              |
+|              |              |              | penalty      |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| eta_phi      | OT_REAL      | 1e-08        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the Armijo   |              |
+|              |              |              | condition.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| evaluate_ori | OT_STRING    | yes          | Determines   | CasADi::Ipop |
+| g_obj_at_res |              |              | if the       | tInternal    |
+| to_trial     |              |              | original     |              |
+|              |              |              | objective    |              |
+|              |              |              | function     |              |
+|              |              |              | should be    |              |
+|              |              |              | evaluated at |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase trial  |              |
+|              |              |              | points. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | False        | Expand the   | CasADi::Ipop |
+|              |              |              | objective    | tInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | constraint   | olverInterna |
-|              |              |              | function in  | l            |
+| expand_g     | OT_BOOLEAN   | False        | Expand the   | CasADi::Ipop |
+|              |              |              | constraint   | tInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expect_infea | OT_STRING    |              |              | CasADi::Ipop |
-| sible_proble |              |              |              | tInternal    |
-| m            |              |              |              |              |
+| expect_infea | OT_STRING    | no           | Enable       | CasADi::Ipop |
+| sible_proble |              |              | heuristics   | tInternal    |
+| m            |              |              | to quickly   |              |
+|              |              |              | detect an    |              |
+|              |              |              | infeasible   |              |
+|              |              |              | problem.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expect_infea | OT_REAL      |              |              | CasADi::Ipop |
-| sible_proble |              |              |              | tInternal    |
-| m_ctol       |              |              |              |              |
+| expect_infea | OT_REAL      | 0.001        | Threshold    | CasADi::Ipop |
+| sible_proble |              |              | for          | tInternal    |
+| m_ctol       |              |              | disabling \"e |              |
+|              |              |              | xpect_infeas |              |
+|              |              |              | ible_problem |              |
+|              |              |              | \" option.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expect_infea | OT_REAL      |              |              | CasADi::Ipop |
-| sible_proble |              |              |              | tInternal    |
-| m_ytol       |              |              |              |              |
+| expect_infea | OT_REAL      | 100000000.0  | Multiplier   | CasADi::Ipop |
+| sible_proble |              |              | threshold    | tInternal    |
+| m_ytol       |              |              | for          |              |
+|              |              |              | activating \" |              |
+|              |              |              | expect_infea |              |
+|              |              |              | sible_proble |              |
+|              |              |              | m\" option.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| file_print_l | OT_INTEGER   |              |              | CasADi::Ipop |
-| evel         |              |              |              | tInternal    |
+| fast_des_fac | OT_REAL      | 0.1          | a parameter  | CasADi::Ipop |
+| t            |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| first_hessia | OT_REAL      |              |              | CasADi::Ipop |
-| n_perturbati |              |              |              | tInternal    |
-| on           |              |              |              |              |
+| fast_step_co | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| mputation    |              |              | the linear   | tInternal    |
+|              |              |              | system       |              |
+|              |              |              | should be    |              |
+|              |              |              | solved       |              |
+|              |              |              | quickly.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fixed_mu_ora | OT_STRING    |              |              | CasADi::Ipop |
-| cle          |              |              |              | tInternal    |
+| file_print_l | OT_INTEGER   | 5            | Verbosity    | CasADi::Ipop |
+| evel         |              |              | level for    | tInternal    |
+|              |              |              | output file. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fixed_variab | OT_STRING    |              |              | CasADi::Ipop |
-| le_treatment |              |              |              | tInternal    |
+| filter_margi | OT_REAL      | 1e-05        | Factor       | CasADi::Ipop |
+| n_fact       |              |              | determining  | tInternal    |
+|              |              |              | width of     |              |
+|              |              |              | margin for   |              |
+|              |              |              | obj-constr-  |              |
+|              |              |              | filter       |              |
+|              |              |              | adaptive glo |              |
+|              |              |              | balization   |              |
+|              |              |              | strategy.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
-| sian         |              |              | exact        | olverInterna |
-|              |              |              | Hessian of   | l            |
+| filter_max_m | OT_REAL      | 1.0          | Maximum      | CasADi::Ipop |
+| argin        |              |              | width of     | tInternal    |
+|              |              |              | margin in    |              |
+|              |              |              | obj-constr-  |              |
+|              |              |              | filter       |              |
+|              |              |              | adaptive glo |              |
+|              |              |              | balization   |              |
+|              |              |              | strategy.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| filter_reset | OT_INTEGER   | 5            | Number of    | CasADi::Ipop |
+| _trigger     |              |              | iterations   | tInternal    |
+|              |              |              | that trigger |              |
+|              |              |              | the filter   |              |
+|              |              |              | reset. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| findiff_pert | OT_REAL      | 1e-07        | Size of the  | CasADi::Ipop |
+| urbation     |              |              | finite       | tInternal    |
+|              |              |              | difference   |              |
+|              |              |              | perturbation |              |
+|              |              |              | for          |              |
+|              |              |              | derivative a |              |
+|              |              |              | pproximation |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| first_hessia | OT_REAL      | 0.0001       | Size of      | CasADi::Ipop |
+| n_perturbati |              |              | first x-s    | tInternal    |
+| on           |              |              | perturbation |              |
+|              |              |              | tried. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fixed_mu_ora | OT_STRING    | average_comp | Oracle for   | CasADi::Ipop |
+| cle          |              | l            | the barrier  | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | when         |              |
+|              |              |              | switching to |              |
+|              |              |              | fixed mode.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| fixed_variab | OT_STRING    | make_paramet | Determines   | CasADi::Ipop |
+| le_treatment |              | er           | how fixed    | tInternal    |
+|              |              |              | variables    |              |
+|              |              |              | should be    |              |
+|              |              |              | handled.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_hat    | OT_REAL      | 0.04         | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_phi    | OT_REAL      | 1e-08        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the filter   |              |
+|              |              |              | margin for   |              |
+|              |              |              | the barrier  |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_theta  | OT_REAL      | 1e-05        | Relaxation   | CasADi::Ipop |
+|              |              |              | factor in    | tInternal    |
+|              |              |              | the filter   |              |
+|              |              |              | margin for   |              |
+|              |              |              | the          |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma_tilde  | OT_REAL      | 4.0          | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Ipop |
+| sian         |              |              | exact        | tInternal    |
+|              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hessian_appr | OT_STRING    |              |              | CasADi::Ipop |
-| oximation    |              |              |              | tInternal    |
+| hessian_appr | OT_STRING    | exact        | Indicates    | CasADi::Ipop |
+| oximation    |              |              | what Hessian | tInternal    |
+|              |              |              | information  |              |
+|              |              |              | is to be     |              |
+|              |              |              | used. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hessian_cons | OT_STRING    |              |              | CasADi::Ipop |
-| tant         |              |              |              | tInternal    |
+| hessian_appr | OT_STRING    | nonlinear-   | Indicates in | CasADi::Ipop |
+| oximation_sp |              | variables    | which        | tInternal    |
+| ace          |              |              | subspace the |              |
+|              |              |              | Hessian      |              |
+|              |              |              | information  |              |
+|              |              |              | is to be app |              |
+|              |              |              | roximated.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| honor_origin | OT_STRING    |              |              | CasADi::Ipop |
-| al_bounds    |              |              |              | tInternal    |
+| hessian_cons | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| tant         |              |              | whether the  | tInternal    |
+|              |              |              | problem is a |              |
+|              |              |              | quadratic    |              |
+|              |              |              | problem (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| _vec         |              |              | true, the    | olverInterna |
-|              |              |              | input shape  | l            |
+| honor_origin | OT_STRING    | yes          | Indicates    | CasADi::Ipop |
+| al_bounds    |              |              | whether      | tInternal    |
+|              |              |              | final points |              |
+|              |              |              | should be    |              |
+|              |              |              | projected    |              |
+|              |              |              | into         |              |
+|              |              |              | original     |              |
+|              |              |              | bounds. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | False        | If set to    | CasADi::Ipop |
+| _vec         |              |              | true, the    | tInternal    |
+|              |              |              | input shape  |              |
 |              |              |              | of F will    |              |
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
-| llback       |              |              | that will be | olverInterna |
-|              |              |              | called at    | l            |
+| iteration_ca | OT_FX        |              | A function   | CasADi::Ipop |
+| llback       |              |              | that will be | tInternal    |
+|              |              |              | called at    |              |
 |              |              |              | each         |              |
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
@@ -22508,22 +25905,43 @@ number of constraints (A)
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_c_consta | OT_STRING    |              |              | CasADi::Ipop |
-| nt           |              |              |              | tInternal    |
+| jac_c_consta | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| nt           |              |              | whether all  | tInternal    |
+|              |              |              | equality     |              |
+|              |              |              | constraints  |              |
+|              |              |              | are linear   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_d_consta | OT_STRING    |              |              | CasADi::Ipop |
-| nt           |              |              |              | tInternal    |
+| jac_d_consta | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| nt           |              |              | whether all  | tInternal    |
+|              |              |              | inequality   |              |
+|              |              |              | constraints  |              |
+|              |              |              | are linear   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
+| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Ipop |
+|              |              |              | Jacobian     | tInternal    |
 |              |              |              | function and |              |
 |              |              |              | use this to  |              |
 |              |              |              | calculate    |              |
 |              |              |              | forward sens |              |
 |              |              |              | itivities    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
+| jacobian_app | OT_STRING    | exact        | Specifies    | CasADi::Ipop |
+| roximation   |              |              | technique to | tInternal    |
+|              |              |              | compute      |              |
+|              |              |              | constraint   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Ipop |
+| erator       | ENERATOR     |              | pointer that | tInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | function     |              |
@@ -22535,109 +25953,503 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_reg | OT_REAL      |              |              | CasADi::Ipop |
-| ularization_ |              |              |              | tInternal    |
-| value        |              |              |              |              |
+| jacobian_reg | OT_REAL      | 0.25         | Exponent for | CasADi::Ipop |
+| ularization_ |              |              | mu in the re | tInternal    |
+| exponent     |              |              | gularization |              |
+|              |              |              | for rank-    |              |
+|              |              |              | deficient    |              |
+|              |              |              | constraint   |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_REAL      |              |              | CasADi::Ipop |
-| ry_init_val  |              |              |              | tInternal    |
+| jacobian_reg | OT_REAL      | 1e-08        | Size of the  | CasADi::Ipop |
+| ularization_ |              |              | regularizati | tInternal    |
+| value        |              |              | on for rank- |              |
+|              |              |              | deficient    |              |
+|              |              |              | constraint   |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_REAL      |              |              | CasADi::Ipop |
-| ry_init_val_ |              |              |              | tInternal    |
-| max          |              |              |              |              |
+| kappa_d      | OT_REAL      | 1e-05        | Weight for   | CasADi::Ipop |
+|              |              |              | linear       | tInternal    |
+|              |              |              | damping term |              |
+|              |              |              | (to handle   |              |
+|              |              |              | one-sided    |              |
+|              |              |              | bounds).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_REAL      |              |              | CasADi::Ipop |
-| ry_init_val_ |              |              |              | tInternal    |
-| min          |              |              |              |              |
+| kappa_sigma  | OT_REAL      | 10000000000. | Factor       | CasADi::Ipop |
+|              |              | 0            | limiting the | tInternal    |
+|              |              |              | deviation of |              |
+|              |              |              | dual         |              |
+|              |              |              | variables    |              |
+|              |              |              | from primal  |              |
+|              |              |              | estimates.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_STRING    |              |              | CasADi::Ipop |
-| ry_initializ |              |              |              | tInternal    |
-| ation        |              |              |              |              |
+| kappa_soc    | OT_REAL      | 0.99         | Factor in    | CasADi::Ipop |
+|              |              |              | the          | tInternal    |
+|              |              |              | sufficient   |              |
+|              |              |              | reduction    |              |
+|              |              |              | rule for     |              |
+|              |              |              | second order |              |
+|              |              |              | correction.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_INTEGER   |              |              | CasADi::Ipop |
-| ry_max_histo |              |              |              | tInternal    |
-| ry           |              |              |              |              |
+| kappa_x_dis  | OT_REAL      | 100.0        | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_INTEGER   |              |              | CasADi::Ipop |
-| ry_max_skipp |              |              |              | tInternal    |
-| ing          |              |              |              |              |
+| kappa_y_dis  | OT_REAL      | 10000.0      | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_STRING    |              |              | CasADi::Ipop |
-| ry_special_f |              |              |              | tInternal    |
-| or_resto     |              |              |              |              |
+| least_square | OT_STRING    | no           | Least square | CasADi::Ipop |
+| _init_duals  |              |              | initializati | tInternal    |
+|              |              |              | on of all    |              |
+|              |              |              | dual         |              |
+|              |              |              | variables    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| limited_memo | OT_STRING    |              |              | CasADi::Ipop |
-| ry_update_ty |              |              |              | tInternal    |
-| pe           |              |              |              |              |
+| least_square | OT_STRING    | no           | Least square | CasADi::Ipop |
+| _init_primal |              |              | initializati | tInternal    |
+|              |              |              | on of the    |              |
+|              |              |              | primal       |              |
+|              |              |              | variables    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_scali | OT_STRING    |              |              | CasADi::Ipop |
-| ng_on_demand |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | sherman-     | Strategy for | CasADi::Ipop |
+| ry_aug_solve |              | morrison     | solving the  | tInternal    |
+| r            |              |              | augmented    |              |
+|              |              |              | system for   |              |
+|              |              |              | low-rank     |              |
+|              |              |              | Hessian.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    |              |              | CasADi::Ipop |
-| r            |              |              |              | tInternal    |
+| limited_memo | OT_REAL      | 1.0          | Value for B0 | CasADi::Ipop |
+| ry_init_val  |              |              | in low-rank  | tInternal    |
+|              |              |              | update. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_syste | OT_STRING    |              |              | CasADi::Ipop |
-| m_scaling    |              |              |              | tInternal    |
+| limited_memo | OT_REAL      | 100000000.0  | Upper bound  | CasADi::Ipop |
+| ry_init_val_ |              |              | on value for | tInternal    |
+| max          |              |              | B0 in low-   |              |
+|              |              |              | rank update. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_la_init | OT_REAL      |              |              | CasADi::Ipop |
-| _factor      |              |              |              | tInternal    |
+| limited_memo | OT_REAL      | 1e-08        | Lower bound  | CasADi::Ipop |
+| ry_init_val_ |              |              | on value for | tInternal    |
+| min          |              |              | B0 in low-   |              |
+|              |              |              | rank update. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_liw_ini | OT_REAL      |              |              | CasADi::Ipop |
-| t_factor     |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | scalar1      | Initializati | CasADi::Ipop |
+| ry_initializ |              |              | on strategy  | tInternal    |
+| ation        |              |              | for the      |              |
+|              |              |              | limited      |              |
+|              |              |              | memory       |              |
+|              |              |              | quasi-Newton |              |
+|              |              |              | approximatio |              |
+|              |              |              | n. (see      |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_meminc_ | OT_REAL      |              |              | CasADi::Ipop |
-| factor       |              |              |              | tInternal    |
+| limited_memo | OT_INTEGER   | 6            | Maximum size | CasADi::Ipop |
+| ry_max_histo |              |              | of the       | tInternal    |
+| ry           |              |              | history for  |              |
+|              |              |              | the limited  |              |
+|              |              |              | quasi-Newton |              |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_pivtol  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| limited_memo | OT_INTEGER   | 2            | Threshold    | CasADi::Ipop |
+| ry_max_skipp |              |              | for          | tInternal    |
+| ing          |              |              | successive   |              |
+|              |              |              | iterations   |              |
+|              |              |              | where update |              |
+|              |              |              | is skipped.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_pivtolm | OT_REAL      |              |              | CasADi::Ipop |
-| ax           |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | no           | Determines   | CasADi::Ipop |
+| ry_special_f |              |              | if the       | tInternal    |
+| or_resto     |              |              | quasi-Newton |              |
+|              |              |              | updates      |              |
+|              |              |              | should be    |              |
+|              |              |              | special      |              |
+|              |              |              | during the   |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_automat | OT_STRING    |              |              | CasADi::Ipop |
-| ic_scaling   |              |              |              | tInternal    |
+| limited_memo | OT_STRING    | bfgs         | Quasi-Newton | CasADi::Ipop |
+| ry_update_ty |              |              | update       | tInternal    |
+| pe           |              |              | formula for  |              |
+|              |              |              | the limited  |              |
+|              |              |              | memory appro |              |
+|              |              |              | ximation.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_block_s | OT_INTEGER   |              |              | CasADi::Ipop |
-| ize          |              |              |              | tInternal    |
+| line_search_ | OT_STRING    | filter       | Globalizatio | CasADi::Ipop |
+| method       |              |              | n method     | tInternal    |
+|              |              |              | used in      |              |
+|              |              |              | backtracking |              |
+|              |              |              | line search  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_node_am | OT_INTEGER   |              |              | CasADi::Ipop |
-| algamation   |              |              |              | tInternal    |
+| linear_scali | OT_STRING    | yes          | Flag         | CasADi::Ipop |
+| ng_on_demand |              |              | indicating   | tInternal    |
+|              |              |              | that linear  |              |
+|              |              |              | scaling is   |              |
+|              |              |              | only done if |              |
+|              |              |              | it seems     |              |
+|              |              |              | required.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pivot_o | OT_INTEGER   |              |              | CasADi::Ipop |
-| rder         |              |              |              | tInternal    |
+| linear_solve | OT_STRING    | ma27         | Linear       | CasADi::Ipop |
+| r            |              |              | solver used  | tInternal    |
+|              |              |              | for step com |              |
+|              |              |              | putations.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pivtol  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| linear_syste | OT_STRING    | mc19         | Method for   | CasADi::Ipop |
+| m_scaling    |              |              | scaling the  | tInternal    |
+|              |              |              | linear       |              |
+|              |              |              | system. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pivtolm | OT_REAL      |              |              | CasADi::Ipop |
-| ax           |              |              |              | tInternal    |
+| ma27_ignore_ | OT_STRING    | no           | Enables      | CasADi::Ipop |
+| singularity  |              |              | MA27's       | tInternal    |
+|              |              |              | ability to   |              |
+|              |              |              | solve a      |              |
+|              |              |              | linear       |              |
+|              |              |              | system even  |              |
+|              |              |              | if the       |              |
+|              |              |              | matrix is    |              |
+|              |              |              | singular.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_pre_all | OT_REAL      |              |              | CasADi::Ipop |
-| oc           |              |              |              | tInternal    |
+| ma27_la_init | OT_REAL      | 5.0          | Real         | CasADi::Ipop |
+| _factor      |              |              | workspace    | tInternal    |
+|              |              |              | memory for   |              |
+|              |              |              | MA27. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_cpu_time | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| ma27_liw_ini | OT_REAL      | 5.0          | Integer      | CasADi::Ipop |
+| t_factor     |              |              | workspace    | tInternal    |
+|              |              |              | memory for   |              |
+|              |              |              | MA27. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_hessian_ | OT_REAL      |              |              | CasADi::Ipop |
-| perturbation |              |              |              | tInternal    |
+| ma27_meminc_ | OT_REAL      | 10.0         | Increment    | CasADi::Ipop |
+| factor       |              |              | factor for   | tInternal    |
+|              |              |              | workspace    |              |
+|              |              |              | size for     |              |
+|              |              |              | MA27. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_iter     | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| ma27_pivtol  | OT_REAL      | 1e-08        | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA27. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
-| nt_steps     |              |              |              | tInternal    |
+| ma27_pivtolm | OT_REAL      | 0.0001       | Maximum      | CasADi::Ipop |
+| ax           |              |              | pivot        | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA27. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_soc      | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| ma27_skip_in | OT_STRING    | no           | Always       | CasADi::Ipop |
+| ertia_check  |              |              | pretend      | tInternal    |
+|              |              |              | inertia is   |              |
+|              |              |              | correct.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mehrotra_alg | OT_STRING    |              |              | CasADi::Ipop |
-| orithm       |              |              |              | tInternal    |
+| ma28_pivtol  | OT_REAL      | 0.01         | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for linear   |              |
+|              |              |              | solver MA28. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| min_hessian_ | OT_REAL      |              |              | CasADi::Ipop |
-| perturbation |              |              |              | tInternal    |
+| ma57_automat | OT_STRING    | yes          | Controls     | CasADi::Ipop |
+| ic_scaling   |              |              | MA57         | tInternal    |
+|              |              |              | automatic    |              |
+|              |              |              | scaling (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| min_refineme | OT_INTEGER   |              |              | CasADi::Ipop |
-| nt_steps     |              |              |              | tInternal    |
+| ma57_block_s | OT_INTEGER   | 16           | Controls     | CasADi::Ipop |
+| ize          |              |              | block size   | tInternal    |
+|              |              |              | used by      |              |
+|              |              |              | Level 3 BLAS |              |
+|              |              |              | in MA57BD    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_node_am | OT_INTEGER   | 16           | Node         | CasADi::Ipop |
+| algamation   |              |              | amalgamation | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pivot_o | OT_INTEGER   | 5            | Controls     | CasADi::Ipop |
+| rder         |              |              | pivot order  | tInternal    |
+|              |              |              | in MA57 (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pivtol  | OT_REAL      | 1e-08        | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA57. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pivtolm | OT_REAL      | 0.0001       | Maximum      | CasADi::Ipop |
+| ax           |              |              | pivot        | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA57. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_pre_all | OT_REAL      | 1.05         | Safety       | CasADi::Ipop |
+| oc           |              |              | factor for   | tInternal    |
+|              |              |              | work space   |              |
+|              |              |              | memory       |              |
+|              |              |              | allocation   |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver MA57. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma57_small_p | OT_INTEGER   | 0            | If set to 1, | CasADi::Ipop |
+| ivot_flag    |              |              | then when    | tInternal    |
+|              |              |              | small        |              |
+|              |              |              | entries      |              |
+|              |              |              | defined by   |              |
+|              |              |              | CNTL(2) are  |              |
+|              |              |              | detected     |              |
+|              |              |              | they are     |              |
+|              |              |              | removed and  |              |
+|              |              |              | the correspo |              |
+|              |              |              | nding pivots |              |
+|              |              |              | placed at    |              |
+|              |              |              | the end of   |              |
+|              |              |              | the factoriz |              |
+|              |              |              | ation. This  |              |
+|              |              |              | can be       |              |
+|              |              |              | particularly |              |
+|              |              |              | efficient if |              |
+|              |              |              | the matrix   |              |
+|              |              |              | is highly    |              |
+|              |              |              | rank         |              |
+|              |              |              | deficient.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| magic_steps  | OT_STRING    | no           | Enables      | CasADi::Ipop |
+|              |              |              | magic steps. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_cpu_time | OT_REAL      | 1000000.0    | Maximum      | CasADi::Ipop |
+|              |              |              | number of    | tInternal    |
+|              |              |              | CPU seconds. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_filter_r | OT_INTEGER   | 5            | Maximal      | CasADi::Ipop |
+| esets        |              |              | allowed      | tInternal    |
+|              |              |              | number of    |              |
+|              |              |              | filter       |              |
+|              |              |              | resets (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_hessian_ | OT_REAL      | 1e+20        | Maximum      | CasADi::Ipop |
+| perturbation |              |              | value of reg | tInternal    |
+|              |              |              | ularization  |              |
+|              |              |              | parameter    |              |
+|              |              |              | for handling |              |
+|              |              |              | negative     |              |
+|              |              |              | curvature.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 3000         | Maximum      | CasADi::Ipop |
+|              |              |              | number of    | tInternal    |
+|              |              |              | iterations.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_refineme | OT_INTEGER   | 10           | Maximum      | CasADi::Ipop |
+| nt_steps     |              |              | number of    | tInternal    |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps per    |              |
+|              |              |              | linear       |              |
+|              |              |              | system       |              |
+|              |              |              | solve. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_resto_it | OT_INTEGER   | 3000000      | Maximum      | CasADi::Ipop |
+| er           |              |              | number of    | tInternal    |
+|              |              |              | successive   |              |
+|              |              |              | iterations   |              |
+|              |              |              | in           |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_soc      | OT_INTEGER   | 4            | Maximum      | CasADi::Ipop |
+|              |              |              | number of    | tInternal    |
+|              |              |              | second order |              |
+|              |              |              | correction   |              |
+|              |              |              | trial steps  |              |
+|              |              |              | at each      |              |
+|              |              |              | iteration.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_soft_res | OT_INTEGER   | 10           | Maximum      | CasADi::Ipop |
+| to_iters     |              |              | number of    | tInternal    |
+|              |              |              | iterations   |              |
+|              |              |              | performed    |              |
+|              |              |              | successively |              |
+|              |              |              | in soft      |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| mehrotra_alg | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| orithm       |              |              | we want to   | tInternal    |
+|              |              |              | do           |              |
+|              |              |              | Mehrotra's   |              |
+|              |              |              | algorithm.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_alpha_pr | OT_REAL      | 1e-13        | LIFENG       | CasADi::Ipop |
+| imal         |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_hessian_ | OT_REAL      | 1e-20        | Smallest     | CasADi::Ipop |
+| perturbation |              |              | perturbation | tInternal    |
+|              |              |              | of the       |              |
+|              |              |              | Hessian      |              |
+|              |              |              | block. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_refineme | OT_INTEGER   | 1            | Minimum      | CasADi::Ipop |
+| nt_steps     |              |              | number of    | tInternal    |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps per    |              |
+|              |              |              | linear       |              |
+|              |              |              | system       |              |
+|              |              |              | solve. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -22646,79 +26458,313 @@ number of constraints (A)
 |              |              |              | g|eval_grad_ |              |
 |              |              |              | f)           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_init      | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_allow_fas | OT_STRING    | yes          | Allow        | CasADi::Ipop |
+| t_monotone_d |              |              | skipping of  | tInternal    |
+| ecrease      |              |              | barrier      |              |
+|              |              |              | problem if   |              |
+|              |              |              | barrier test |              |
+|              |              |              | is already   |              |
+|              |              |              | met. (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_linear_de | OT_REAL      |              |              | CasADi::Ipop |
-| crease_facto |              |              |              | tInternal    |
-| r            |              |              |              |              |
+| mu_init      | OT_REAL      | 0.1          | Initial      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | the barrier  |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_max       | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_linear_de | OT_REAL      | 0.2          | Determines   | CasADi::Ipop |
+| crease_facto |              |              | linear       | tInternal    |
+| r            |              |              | decrease     |              |
+|              |              |              | rate of      |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_max_fact  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_max       | OT_REAL      | 100000.0     | Maximum      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_min       | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_max_fact  | OT_REAL      | 1000.0       | Factor for i | CasADi::Ipop |
+|              |              |              | nitializatio | tInternal    |
+|              |              |              | n of maximum |              |
+|              |              |              | value for    |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_oracle    | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_min       | OT_REAL      | 1e-11        | Minimum      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_strategy  | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_oracle    | OT_STRING    | quality-     | Oracle for a | CasADi::Ipop |
+|              |              | function     | new barrier  | tInternal    |
+|              |              |              | parameter in |              |
+|              |              |              | the adaptive |              |
+|              |              |              | strategy.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_superline | OT_REAL      |              |              | CasADi::Ipop |
-| ar_decrease_ |              |              |              | tInternal    |
-| power        |              |              |              |              |
+| mu_strategy  | OT_STRING    | monotone     | Update       | CasADi::Ipop |
+|              |              |              | strategy for | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mu_target    | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mu_superline | OT_REAL      | 1.5          | Determines   | CasADi::Ipop |
+| ar_decrease_ |              |              | superlinear  | tInternal    |
+| power        |              |              | decrease     |              |
+|              |              |              | rate of      |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_mem_pe | OT_INTEGER   |              |              | CasADi::Ipop |
-| rcent        |              |              |              | tInternal    |
+| mu_target    | OT_REAL      | 0.0          | Desired      | CasADi::Ipop |
+|              |              |              | value of com | tInternal    |
+|              |              |              | plementarity |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_permut | OT_INTEGER   |              |              | CasADi::Ipop |
-| ing_scaling  |              |              |              | tInternal    |
+| mult_diverg_ | OT_REAL      | 1e-07        | tolerance    | CasADi::Ipop |
+| feasibility_ |              |              | for deciding | tInternal    |
+| tol          |              |              | if the       |              |
+|              |              |              | multipliers  |              |
+|              |              |              | are          |              |
+|              |              |              | diverging    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_pivot_ | OT_INTEGER   |              |              | CasADi::Ipop |
-| order        |              |              |              | tInternal    |
+| mult_diverg_ | OT_REAL      | 100000000.0  | tolerance    | CasADi::Ipop |
+| y_tol        |              |              | for deciding | tInternal    |
+|              |              |              | if the       |              |
+|              |              |              | multipliers  |              |
+|              |              |              | are          |              |
+|              |              |              | diverging    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_pivtol | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| mumps_dep_to | OT_REAL      | -1.0         | Pivot        | CasADi::Ipop |
+| l            |              |              | threshold    | tInternal    |
+|              |              |              | for          |              |
+|              |              |              | detection of |              |
+|              |              |              | linearly     |              |
+|              |              |              | dependent    |              |
+|              |              |              | constraints  |              |
+|              |              |              | in MUMPS.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_pivtol | OT_REAL      |              |              | CasADi::Ipop |
-| max          |              |              |              | tInternal    |
+| mumps_mem_pe | OT_INTEGER   | 1000         | Percentage   | CasADi::Ipop |
+| rcent        |              |              | increase in  | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | estimated    |              |
+|              |              |              | working      |              |
+|              |              |              | space for    |              |
+|              |              |              | MUMPS. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_scalin | OT_INTEGER   |              |              | CasADi::Ipop |
-| g            |              |              |              | tInternal    |
+| mumps_permut | OT_INTEGER   | 7            | Controls     | CasADi::Ipop |
+| ing_scaling  |              |              | permuting    | tInternal    |
+|              |              |              | and scaling  |              |
+|              |              |              | in MUMPS     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
+| mumps_pivot_ | OT_INTEGER   | 7            | Controls     | CasADi::Ipop |
+| order        |              |              | pivot order  | tInternal    |
+|              |              |              | in MUMPS     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_lower_bo | OT_REAL      |              |              | CasADi::Ipop |
-| und_inf      |              |              |              | tInternal    |
+| mumps_pivtol | OT_REAL      | 1e-06        | Pivot        | CasADi::Ipop |
+|              |              |              | tolerance    | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | MUMPS. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_upper_bo | OT_REAL      |              |              | CasADi::Ipop |
-| und_inf      |              |              |              | tInternal    |
+| mumps_pivtol | OT_REAL      | 0.1          | Maximum      | CasADi::Ipop |
+| max          |              |              | pivot        | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | for the      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | MUMPS. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
+| mumps_scalin | OT_INTEGER   | 77           | Controls     | CasADi::Ipop |
+| g            |              |              | scaling in   | tInternal    |
+|              |              |              | MUMPS (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Ipop |
+|              |              | ed_object    |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| neg_curv_tes | OT_REAL      | 0.0          | Tolerance    | CasADi::Ipop |
+| t_tol        |              |              | for          | tInternal    |
+|              |              |              | heuristic to |              |
+|              |              |              | ignore wrong |              |
+|              |              |              | inertia.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| never_use_fa | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
+| ct_cgpen_dir |              |              | switch off   | tInternal    |
+| ection       |              |              | the fast     |              |
+|              |              |              | Chen-        |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | direction    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| never_use_pi | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
+| ecewise_pena |              |              | switch off   | tInternal    |
+| lty_ls       |              |              | the          |              |
+|              |              |              | piecewise    |              |
+|              |              |              | penalty      |              |
+|              |              |              | method (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_lower_bo | OT_REAL      | -1e+19       | any bound    | CasADi::Ipop |
+| und_inf      |              |              | less or      | tInternal    |
+|              |              |              | equal this   |              |
+|              |              |              | value will   |              |
+|              |              |              | be           |              |
+|              |              |              | considered   |              |
+|              |              |              | -inf (i.e.   |              |
+|              |              |              | not lower    |              |
+|              |              |              | bounded).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 0.0          | Target value | CasADi::Ipop |
+| constr_targe |              |              | for          | tInternal    |
+| t_gradient   |              |              | constraint   |              |
+|              |              |              | function     |              |
+|              |              |              | gradient     |              |
+|              |              |              | size. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 100.0        | Maximum      | CasADi::Ipop |
+| max_gradient |              |              | gradient     | tInternal    |
+|              |              |              | after NLP    |              |
+|              |              |              | scaling.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_STRING    | gradient-    | Select the   | CasADi::Ipop |
+| method       |              | based        | technique    | tInternal    |
+|              |              |              | used for     |              |
+|              |              |              | scaling the  |              |
+|              |              |              | NLP. (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 1e-08        | Minimum      | CasADi::Ipop |
+| min_value    |              |              | value of     | tInternal    |
+|              |              |              | gradient-    |              |
+|              |              |              | based        |              |
+|              |              |              | scaling      |              |
+|              |              |              | values. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_scaling_ | OT_REAL      | 0.0          | Target value | CasADi::Ipop |
+| obj_target_g |              |              | for          | tInternal    |
+| radient      |              |              | objective    |              |
+|              |              |              | function     |              |
+|              |              |              | gradient     |              |
+|              |              |              | size. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_upper_bo | OT_REAL      | 1e+19        | any bound    | CasADi::Ipop |
+| und_inf      |              |              | greater or   | tInternal    |
+|              |              |              | this value   |              |
+|              |              |              | will be      |              |
+|              |              |              | considered   |              |
+|              |              |              | +inf (i.e.   |              |
+|              |              |              | not upper    |              |
+|              |              |              | bounded).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nu_inc       | OT_REAL      | 0.0001       | Increment of | CasADi::Ipop |
+|              |              |              | the penalty  | tInternal    |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| nu_init      | OT_REAL      | 1e-06        | Initial      | CasADi::Ipop |
+|              |              |              | value of the | tInternal    |
+|              |              |              | penalty      |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| num_linear_v | OT_INTEGER   | 0            | Number of    | CasADi::Ipop |
+| ariables     |              |              | linear       | tInternal    |
+|              |              |              | variables    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::Ipop |
+| j_dir        |              |              | adjoint      | tInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::Ipop |
+| d_dir        |              |              | forward      | tInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
+| numeric_hess | OT_BOOLEAN   | False        | Calculate    | CasADi::Ipop |
+| ian          |              |              | Hessians     | tInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -22728,8 +26774,8 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
+| numeric_jaco | OT_BOOLEAN   | False        | Calculate    | CasADi::Ipop |
+| bian         |              |              | Jacobians    | tInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -22739,45 +26785,344 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| option_file_ | OT_STRING    |              |              | CasADi::Ipop |
-| name         |              |              |              | tInternal    |
+| obj_max_inc  | OT_REAL      | 5.0          | Determines   | CasADi::Ipop |
+|              |              |              | the upper    | tInternal    |
+|              |              |              | bound on the |              |
+|              |              |              | acceptable   |              |
+|              |              |              | increase of  |              |
+|              |              |              | barrier      |              |
+|              |              |              | objective    |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| output_file  | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| obj_scaling_ | OT_REAL      | 1.0          | Scaling      | CasADi::Ipop |
+| factor       |              |              | factor for   | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | objective    |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_matc | OT_STRING    |              |              | CasADi::Ipop |
-| hing_strateg |              |              |              | tInternal    |
-| y            |              |              |              |              |
+| option_file_ | OT_STRING    |              | File name of | CasADi::Ipop |
+| name         |              |              | options file | tInternal    |
+|              |              |              | (to          |              |
+|              |              |              | overwrite    |              |
+|              |              |              | default).    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_msgl | OT_INTEGER   |              |              | CasADi::Ipop |
-| vl           |              |              |              | tInternal    |
+| output_file  | OT_STRING    |              | File name of | CasADi::Ipop |
+|              |              |              | desired      | tInternal    |
+|              |              |              | output file  |              |
+|              |              |              | (leave unset |              |
+|              |              |              | for no file  |              |
+|              |              |              | output).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_out_ | OT_INTEGER   |              |              | CasADi::Ipop |
-| of_core_powe |              |              |              | tInternal    |
-| r            |              |              |              |              |
+| pardiso_iter | OT_INTEGER   | 5000         | Maximum Size | CasADi::Ipop |
+| _coarse_size |              |              | of Coarse    | tInternal    |
+|              |              |              | Grid Matrix  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 0.5          | dropping     | CasADi::Ipop |
+| _dropping_fa |              |              | value for    | tInternal    |
+| ctor         |              |              | incomplete   |              |
+|              |              |              | factor (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 0.1          | dropping     | CasADi::Ipop |
+| _dropping_sc |              |              | value for    | tInternal    |
+| hur          |              |              | sparsify     |              |
+|              |              |              | schur        |              |
+|              |              |              | complement   |              |
+|              |              |              | factor (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 5000000.0    | (see IPOPT d | CasADi::Ipop |
+| _inverse_nor |              |              | ocumentation | tInternal    |
+| m_factor     |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_INTEGER   | 10000        | Maximum Size | CasADi::Ipop |
+| _max_levels  |              |              | of Grid      | tInternal    |
+|              |              |              | Levels (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_INTEGER   | 10000000     | max fill for | CasADi::Ipop |
+| _max_row_fil |              |              | each row     | tInternal    |
+| l            |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_REAL      | 1e-06        | Relative     | CasADi::Ipop |
+| _relative_to |              |              | Residual     | tInternal    |
+| l            |              |              | Convergence  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_iter | OT_STRING    | no           | Switch on    | CasADi::Ipop |
+| ative        |              |              | iterative    | tInternal    |
+|              |              |              | solver in    |              |
+|              |              |              | Pardiso      |              |
+|              |              |              | library (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_matc | OT_STRING    | complete+2x2 | Matching     | CasADi::Ipop |
+| hing_strateg |              |              | strategy to  | tInternal    |
+| y            |              |              | be used by   |              |
+|              |              |              | Pardiso (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_max_ | OT_INTEGER   | 4            | Maximal      | CasADi::Ipop |
+| droptol_corr |              |              | number of    | tInternal    |
+| ections      |              |              | decreases of |              |
+|              |              |              | drop         |              |
+|              |              |              | tolerance    |              |
+|              |              |              | during one   |              |
+|              |              |              | solve. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_max_ | OT_INTEGER   | 500          | Maximum      | CasADi::Ipop |
+| iter         |              |              | number of    | tInternal    |
+|              |              |              | Krylov-      |              |
+|              |              |              | Subspace     |              |
+|              |              |              | Iteration    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_msgl | OT_INTEGER   | 0            | Pardiso      | CasADi::Ipop |
+| vl           |              |              | message      | tInternal    |
+|              |              |              | level (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_out_ | OT_INTEGER   | 0            | Enables out- | CasADi::Ipop |
+| of_core_powe |              |              | of-core      | tInternal    |
+| r            |              |              | variant of   |              |
+|              |              |              | Pardiso (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_redo | OT_STRING    | no           | Toggle for   | CasADi::Ipop |
+| _symbolic_fa |              |              | handling     | tInternal    |
+| ct_only_if_i |              |              | case when    |              |
+| nertia_wrong |              |              | elements     |              |
+|              |              |              | were         |              |
+|              |              |              | perturbed by |              |
+|              |              |              | Pardiso.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_repe | OT_STRING    | no           | Interpretati | CasADi::Ipop |
+| ated_perturb |              |              | on of        | tInternal    |
+| ation_means_ |              |              | perturbed    |              |
+| singular     |              |              | elements.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| pardiso_skip | OT_STRING    | no           | Always       | CasADi::Ipop |
+| _inertia_che |              |              | pretend      | tInternal    |
+| ck           |              |              | inertia is   |              |
+|              |              |              | correct.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | pass_nonline | OT_BOOLEAN   | true         |              | CasADi::Ipop |
 | ar_variables |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| perturb_dec_ | OT_REAL      |              |              | CasADi::Ipop |
-| fact         |              |              |              | tInternal    |
+| pen_des_fact | OT_REAL      | 0.2          | a parameter  | CasADi::Ipop |
+|              |              |              | used in      | tInternal    |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | computation  |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| perturb_inc_ | OT_REAL      |              |              | CasADi::Ipop |
-| fact         |              |              |              | tInternal    |
+| pen_init_fac | OT_REAL      | 50.0         | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | choose       |              |
+|              |              |              | initial      |              |
+|              |              |              | penalty para |              |
+|              |              |              | meterswhen   |              |
+|              |              |              | the          |              |
+|              |              |              | regularized  |              |
+|              |              |              | Newton       |              |
+|              |              |              | method is    |              |
+|              |              |              | used. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| perturb_inc_ | OT_REAL      |              |              | CasADi::Ipop |
-| fact_first   |              |              |              | tInternal    |
+| pen_theta_ma | OT_REAL      | 10000.0      | Determines   | CasADi::Ipop |
+| x_fact       |              |              | upper bound  | tInternal    |
+|              |              |              | for          |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the filter.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| point_pertur | OT_REAL      |              |              | CasADi::Ipop |
-| bation_radiu |              |              |              | tInternal    |
-| s            |              |              |              |              |
+| penalty_init | OT_REAL      | 100000.0     | Maximal      | CasADi::Ipop |
+| _max         |              |              | value for    | tInternal    |
+|              |              |              | the intial   |              |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_level  | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| penalty_init | OT_REAL      | 1.0          | Minimal      | CasADi::Ipop |
+| _min         |              |              | value for    | tInternal    |
+|              |              |              | the intial   |              |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | for line     |              |
+|              |              |              | search(for   |              |
+|              |              |              | Chen-        |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_option | OT_STRING    |              |              | CasADi::Ipop |
-| s_documentat |              |              |              | tInternal    |
-| ion          |              |              |              |              |
+| penalty_max  | OT_REAL      | 1e+30        | Maximal      | CasADi::Ipop |
+|              |              |              | value for    | tInternal    |
+|              |              |              | the penalty  |              |
+|              |              |              | parameter    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| penalty_upda | OT_REAL      | 10.0         | LIFENG       | CasADi::Ipop |
+| te_compl_tol |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| penalty_upda | OT_REAL      | 1e-09        | Threshold    | CasADi::Ipop |
+| te_infeasibi |              |              | for infeasib | tInternal    |
+| lity_tol     |              |              | ility in     |              |
+|              |              |              | penalty      |              |
+|              |              |              | parameter    |              |
+|              |              |              | update test. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_alwa | OT_STRING    | no           | Active       | CasADi::Ipop |
+| ys_cd        |              |              | permanent    | tInternal    |
+|              |              |              | perturbation |              |
+|              |              |              | of           |              |
+|              |              |              | constraint l |              |
+|              |              |              | inearization |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_dec_ | OT_REAL      | 0.3333333333 | Decrease     | CasADi::Ipop |
+| fact         |              | 33           | factor for   | tInternal    |
+|              |              |              | x-s perturba |              |
+|              |              |              | tion. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_inc_ | OT_REAL      | 8.0          | Increase     | CasADi::Ipop |
+| fact         |              |              | factor for   | tInternal    |
+|              |              |              | x-s perturba |              |
+|              |              |              | tion. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| perturb_inc_ | OT_REAL      | 100.0        | Increase     | CasADi::Ipop |
+| fact_first   |              |              | factor for   | tInternal    |
+|              |              |              | x-s          |              |
+|              |              |              | perturbation |              |
+|              |              |              | for very     |              |
+|              |              |              | first pertur |              |
+|              |              |              | bation. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| piecewisepen | OT_REAL      | 1e-13        | LIFENG       | CasADi::Ipop |
+| alty_gamma_i |              |              | WRITES THIS. | tInternal    |
+| nfeasi       |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| piecewisepen | OT_REAL      | 1e-13        | LIFENG       | CasADi::Ipop |
+| alty_gamma_o |              |              | WRITES THIS. | tInternal    |
+| bj           |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| point_pertur | OT_REAL      | 10.0         | Maximal      | CasADi::Ipop |
+| bation_radiu |              |              | perturbation | tInternal    |
+| s            |              |              | of an        |              |
+|              |              |              | evaluation   |              |
+|              |              |              | point. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_info_s | OT_STRING    | no           | Enables      | CasADi::Ipop |
+| tring        |              |              | printing of  | tInternal    |
+|              |              |              | additional   |              |
+|              |              |              | info string  |              |
+|              |              |              | at end of    |              |
+|              |              |              | iteration    |              |
+|              |              |              | output. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_level  | OT_INTEGER   | 5            | Output       | CasADi::Ipop |
+|              |              |              | verbosity    | tInternal    |
+|              |              |              | level. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_option | OT_STRING    | no           | Switch to    | CasADi::Ipop |
+| s_documentat |              |              | print all    | tInternal    |
+| ion          |              |              | algorithmic  |              |
+|              |              |              | options.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_option | OT_STRING    | no           | Undocumented | CasADi::Ipop |
+| s_latex_mode |              |              | (see IPOPT d | tInternal    |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_time   | OT_BOOLEAN   | true         | print        | CasADi::Ipop |
 |              |              |              | information  | tInternal    |
@@ -22785,38 +27130,340 @@ number of constraints (A)
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_user_o | OT_STRING    |              |              | CasADi::Ipop |
-| ptions       |              |              |              | tInternal    |
+| print_timing | OT_STRING    | no           | Switch to    | CasADi::Ipop |
+| _statistics  |              |              | print timing | tInternal    |
+|              |              |              | statistics.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| quality_func | OT_INTEGER   |              |              | CasADi::Ipop |
-| tion_max_sec |              |              |              | tInternal    |
-| tion_steps   |              |              |              |              |
+| print_user_o | OT_STRING    | no           | Print all    | CasADi::Ipop |
+| ptions       |              |              | options set  | tInternal    |
+|              |              |              | by the user. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| recalc_y     | OT_STRING    |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| quality_func | OT_STRING    | none         | The          | CasADi::Ipop |
+| tion_balanci |              |              | balancing    | tInternal    |
+| ng_term      |              |              | term         |              |
+|              |              |              | included in  |              |
+|              |              |              | the quality  |              |
+|              |              |              | function for |              |
+|              |              |              | centrality.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| recalc_y_fea | OT_REAL      |              |              | CasADi::Ipop |
-| s_tol        |              |              |              | tInternal    |
+| quality_func | OT_STRING    | none         | The penalty  | CasADi::Ipop |
+| tion_central |              |              | term for     | tInternal    |
+| ity          |              |              | centrality   |              |
+|              |              |              | that is      |              |
+|              |              |              | included in  |              |
+|              |              |              | quality      |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| required_inf | OT_REAL      |              |              | CasADi::Ipop |
-| easibility_r |              |              |              | tInternal    |
-| eduction     |              |              |              |              |
+| quality_func | OT_INTEGER   | 8            | Maximum      | CasADi::Ipop |
+| tion_max_sec |              |              | number of    | tInternal    |
+| tion_steps   |              |              | search steps |              |
+|              |              |              | during       |              |
+|              |              |              | direct       |              |
+|              |              |              | search       |              |
+|              |              |              | procedure    |              |
+|              |              |              | determining  |              |
+|              |              |              | the optimal  |              |
+|              |              |              | centering    |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| slack_bound_ | OT_REAL      |              |              | CasADi::Ipop |
-| frac         |              |              |              | tInternal    |
+| quality_func | OT_STRING    | 2-norm-      | Norm used    | CasADi::Ipop |
+| tion_norm_ty |              | squared      | for          | tInternal    |
+| pe           |              |              | components   |              |
+|              |              |              | of the       |              |
+|              |              |              | quality      |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| slack_bound_ | OT_REAL      |              |              | CasADi::Ipop |
-| push         |              |              |              | tInternal    |
+| quality_func | OT_REAL      | 0.0          | Tolerance    | CasADi::Ipop |
+| tion_section |              |              | for the      | tInternal    |
+| _qf_tol      |              |              | golden       |              |
+|              |              |              | section      |              |
+|              |              |              | search       |              |
+|              |              |              | procedure    |              |
+|              |              |              | determining  |              |
+|              |              |              | the optimal  |              |
+|              |              |              | centering    |              |
+|              |              |              | parameter    |              |
+|              |              |              | (in the      |              |
+|              |              |              | function     |              |
+|              |              |              | value        |              |
+|              |              |              | space). (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| soft_resto_p | OT_REAL      |              |              | CasADi::Ipop |
-| derror_reduc |              |              |              | tInternal    |
-| tion_factor  |              |              |              |              |
+| quality_func | OT_REAL      | 0.01         | Tolerance    | CasADi::Ipop |
+| tion_section |              |              | for the      | tInternal    |
+| _sigma_tol   |              |              | section      |              |
+|              |              |              | search       |              |
+|              |              |              | procedure    |              |
+|              |              |              | determining  |              |
+|              |              |              | the optimal  |              |
+|              |              |              | centering    |              |
+|              |              |              | parameter    |              |
+|              |              |              | (in sigma    |              |
+|              |              |              | space). (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
+| recalc_y     | OT_STRING    | no           | Tells the    | CasADi::Ipop |
+|              |              |              | algorithm to | tInternal    |
+|              |              |              | recalculate  |              |
+|              |              |              | the equality |              |
+|              |              |              | and          |              |
+|              |              |              | inequality   |              |
+|              |              |              | multipliers  |              |
+|              |              |              | as least     |              |
+|              |              |              | square       |              |
+|              |              |              | estimates.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
+| recalc_y_fea | OT_REAL      | 1e-06        | Feasibility  | CasADi::Ipop |
+| s_tol        |              |              | threshold    | tInternal    |
+|              |              |              | for recomput |              |
+|              |              |              | ation of     |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| replace_boun | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| ds           |              |              | all variable | tInternal    |
+|              |              |              | bounds       |              |
+|              |              |              | should be    |              |
+|              |              |              | replaced by  |              |
+|              |              |              | inequality   |              |
+|              |              |              | constraints  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| required_inf | OT_REAL      | 0.9          | Required     | CasADi::Ipop |
+| easibility_r |              |              | reduction of | tInternal    |
+| eduction     |              |              | infeasibilit |              |
+|              |              |              | y before     |              |
+|              |              |              | leaving      |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| residual_imp | OT_REAL      | 0.999999999  | Minimal      | CasADi::Ipop |
+| rovement_fac |              |              | required     | tInternal    |
+| tor          |              |              | reduction of |              |
+|              |              |              | residual     |              |
+|              |              |              | test ratio   |              |
+|              |              |              | in iterative |              |
+|              |              |              | refinement.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| residual_rat | OT_REAL      | 1e-10        | Iterative    | CasADi::Ipop |
+| io_max       |              |              | refinement   | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| residual_rat | OT_REAL      | 1e-05        | Threshold    | CasADi::Ipop |
+| io_singular  |              |              | for          | tInternal    |
+|              |              |              | declaring    |              |
+|              |              |              | linear       |              |
+|              |              |              | system       |              |
+|              |              |              | singular     |              |
+|              |              |              | after failed |              |
+|              |              |              | iterative    |              |
+|              |              |              | refinement.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| resto_failur | OT_REAL      | 0.0          | Threshold    | CasADi::Ipop |
+| e_feasibilit |              |              | for primal i | tInternal    |
+| y_threshold  |              |              | nfeasibility |              |
+|              |              |              | to declare   |              |
+|              |              |              | failure of   |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| resto_penalt | OT_REAL      | 1000.0       | Penalty      | CasADi::Ipop |
+| y_parameter  |              |              | parameter in | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase        |              |
+|              |              |              | objective    |              |
+|              |              |              | function.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| resto_proxim | OT_REAL      | 1.0          | Weighting    | CasADi::Ipop |
+| ity_weight   |              |              | factor for   | tInternal    |
+|              |              |              | the          |              |
+|              |              |              | proximity    |              |
+|              |              |              | term in      |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase        |              |
+|              |              |              | objective.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| rho          | OT_REAL      | 0.1          | Value in     | CasADi::Ipop |
+|              |              |              | penalty      | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | update       |              |
+|              |              |              | formula.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| s_max        | OT_REAL      | 100.0        | Scaling      | CasADi::Ipop |
+|              |              |              | threshold    | tInternal    |
+|              |              |              | for the NLP  |              |
+|              |              |              | error. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| s_phi        | OT_REAL      | 2.3          | Exponent for | CasADi::Ipop |
+|              |              |              | linear       | tInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | function     |              |
+|              |              |              | model in the |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| s_theta      | OT_REAL      | 1.1          | Exponent for | CasADi::Ipop |
+|              |              |              | current      | tInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the          |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sb           | OT_STRING    | no           | (see IPOPT d | CasADi::Ipop |
+|              |              |              | ocumentation | tInternal    |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| sigma_max    | OT_REAL      | 100.0        | Maximum      | CasADi::Ipop |
+|              |              |              | value of the | tInternal    |
+|              |              |              | centering    |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| sigma_min    | OT_REAL      | 1e-06        | Minimum      | CasADi::Ipop |
+|              |              |              | value of the | tInternal    |
+|              |              |              | centering    |              |
+|              |              |              | parameter.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| skip_corr_if | OT_STRING    | yes          | Skip the     | CasADi::Ipop |
+| _neg_curv    |              |              | corrector    | tInternal    |
+|              |              |              | step in      |              |
+|              |              |              | negative     |              |
+|              |              |              | curvature    |              |
+|              |              |              | iteration (u |              |
+|              |              |              | nsupported!) |              |
+|              |              |              | . (see IPOPT |              |
+|              |              |              | documentatio |              |
+|              |              |              | n)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| skip_corr_in | OT_STRING    | yes          | Skip the     | CasADi::Ipop |
+| _monotone_mo |              |              | corrector    | tInternal    |
+| de           |              |              | step during  |              |
+|              |              |              | monotone     |              |
+|              |              |              | barrier      |              |
+|              |              |              | parameter    |              |
+|              |              |              | mode (unsupp |              |
+|              |              |              | orted!).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| skip_finaliz | OT_STRING    | no           | Indicates if | CasADi::Ipop |
+| e_solution_c |              |              | call to NLP: | tInternal    |
+| all          |              |              | :FinalizeSol |              |
+|              |              |              | ution after  |              |
+|              |              |              | optimization |              |
+|              |              |              | should be    |              |
+|              |              |              | suppressed   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| slack_bound_ | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+| frac         |              |              | minimum      | tInternal    |
+|              |              |              | relative     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | slack to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| slack_bound_ | OT_REAL      | 0.01         | Desired      | CasADi::Ipop |
+| push         |              |              | minimum      | tInternal    |
+|              |              |              | absolute     |              |
+|              |              |              | distance     |              |
+|              |              |              | from the     |              |
+|              |              |              | initial      |              |
+|              |              |              | slack to     |              |
+|              |              |              | bound. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| slack_move   | OT_REAL      | 1.8189894035 | Correction   | CasADi::Ipop |
+|              |              | 5e-12        | size for     | tInternal    |
+|              |              |              | very small   |              |
+|              |              |              | slacks. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| soft_resto_p | OT_REAL      | 0.9999       | Required     | CasADi::Ipop |
+| derror_reduc |              |              | reduction in | tInternal    |
+| tion_factor  |              |              | primal-dual  |              |
+|              |              |              | error in the |              |
+|              |              |              | soft         |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase. (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Ipop |
+|              |              |              | sparse       | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Ipop |
+| erator       | ENERATOR     |              | that         | tInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
 |              |              |              | a given      |              |
@@ -22826,11 +27473,19 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| start_with_r | OT_STRING    |              |              | CasADi::Ipop |
-| esto         |              |              |              | tInternal    |
+| start_with_r | OT_STRING    | no           | Tells        | CasADi::Ipop |
+| esto         |              |              | algorithm to | tInternal    |
+|              |              |              | switch to    |              |
+|              |              |              | restoration  |              |
+|              |              |              | phase in     |              |
+|              |              |              | first        |              |
+|              |              |              | iteration.   |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
+| store_jacobi | OT_BOOLEAN   | False        | keep         | CasADi::Ipop |
+| ans          |              |              | references   | tInternal    |
 |              |              |              | to generated |              |
 |              |              |              | Jacobians in |              |
 |              |              |              | order to     |              |
@@ -22841,11 +27496,76 @@ number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| tol          | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| suppress_all | OT_STRING    | no           | Undocumented | CasADi::Ipop |
+| _output      |              |              | (see IPOPT d | tInternal    |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
+| tau_min      | OT_REAL      | 0.99         | Lower bound  | CasADi::Ipop |
+|              |              |              | on fraction- | tInternal    |
+|              |              |              | to-the-      |              |
+|              |              |              | boundary     |              |
+|              |              |              | parameter    |              |
+|              |              |              | tau. (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| theta_max_fa | OT_REAL      | 10000.0      | Determines   | CasADi::Ipop |
+| ct           |              |              | upper bound  | tInternal    |
+|              |              |              | for          |              |
+|              |              |              | constraint   |              |
+|              |              |              | violation in |              |
+|              |              |              | the filter.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| theta_min    | OT_REAL      | 1e-06        | LIFENG       | CasADi::Ipop |
+|              |              |              | WRITES THIS. | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| theta_min_fa | OT_REAL      | 0.0001       | Determines   | CasADi::Ipop |
+| ct           |              |              | constraint   | tInternal    |
+|              |              |              | violation    |              |
+|              |              |              | threshold in |              |
+|              |              |              | the          |              |
+|              |              |              | switching    |              |
+|              |              |              | rule. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| tiny_step_to | OT_REAL      | 2.2204460492 | Tolerance    | CasADi::Ipop |
+| l            |              | 5e-15        | for          | tInternal    |
+|              |              |              | detecting    |              |
+|              |              |              | numerically  |              |
+|              |              |              | insignifican |              |
+|              |              |              | t steps.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| tiny_step_y_ | OT_REAL      | 0.01         | Tolerance    | CasADi::Ipop |
+| tol          |              |              | for quitting | tInternal    |
+|              |              |              | because of   |              |
+|              |              |              | numerically  |              |
+|              |              |              | insignifican |              |
+|              |              |              | t steps.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol          | OT_REAL      | 1e-08        | Desired      | CasADi::Ipop |
+|              |              |              | convergence  | tInternal    |
+|              |              |              | tolerance    |              |
+|              |              |              | (relative).  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Ipop |
+|              |              |              | defined      | tInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
 |              |              |              | to identify  |              |
@@ -22854,60 +27574,139 @@ number of constraints (A)
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
+| vartheta     | OT_REAL      | 0.5          | a parameter  | CasADi::Ipop |
+|              |              |              | used to      | tInternal    |
+|              |              |              | check if the |              |
+|              |              |              | fast         |              |
+|              |              |              | direction    |              |
+|              |              |              | can be used  |              |
+|              |              |              | asthe line   |              |
+|              |              |              | search       |              |
+|              |              |              | direction    |              |
+|              |              |              | (for Chen-   |              |
+|              |              |              | Goldfarb     |              |
+|              |              |              | line         |              |
+|              |              |              | search).     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Ipop |
+|              |              |              | evaluation   | tInternal    |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_b | OT_REAL      |              |              | CasADi::Ipop |
-| ound_frac    |              |              |              | tInternal    |
+| warm_start_b | OT_REAL      | 0.001        | same as      | CasADi::Ipop |
+| ound_frac    |              |              | bound_frac   | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_b | OT_REAL      |              |              | CasADi::Ipop |
-| ound_push    |              |              |              | tInternal    |
+| warm_start_b | OT_REAL      | 0.001        | same as      | CasADi::Ipop |
+| ound_push    |              |              | bound_push   | tInternal    |
+|              |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_i | OT_STRING    |              |              | CasADi::Ipop |
-| nit_point    |              |              |              | tInternal    |
+| warm_start_e | OT_STRING    | no           | Tells        | CasADi::Ipop |
+| ntire_iterat |              |              | algorithm    | tInternal    |
+| e            |              |              | whether to   |              |
+|              |              |              | use the GetW |              |
+|              |              |              | armStartIter |              |
+|              |              |              | ate method   |              |
+|              |              |              | in the NLP.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_m | OT_REAL      |              |              | CasADi::Ipop |
-| ult_bound_pu |              |              |              | tInternal    |
-| sh           |              |              |              |              |
+| warm_start_i | OT_STRING    | no           | Warm-start   | CasADi::Ipop |
+| nit_point    |              |              | for initial  | tInternal    |
+|              |              |              | point (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_m | OT_REAL      |              |              | CasADi::Ipop |
-| ult_init_max |              |              |              | tInternal    |
+| warm_start_m | OT_REAL      | 0.001        | same as mult | CasADi::Ipop |
+| ult_bound_pu |              |              | _bound_push  | tInternal    |
+| sh           |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_s | OT_REAL      |              |              | CasADi::Ipop |
-| lack_bound_f |              |              |              | tInternal    |
-| rac          |              |              |              |              |
+| warm_start_m | OT_REAL      | 1000000.0    | Maximum      | CasADi::Ipop |
+| ult_init_max |              |              | initial      | tInternal    |
+|              |              |              | value for    |              |
+|              |              |              | the equality |              |
+|              |              |              | multipliers. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warm_start_s | OT_REAL      |              |              | CasADi::Ipop |
-| lack_bound_p |              |              |              | tInternal    |
-| ush          |              |              |              |              |
+| warm_start_s | OT_STRING    | no           | Indicates    | CasADi::Ipop |
+| ame_structur |              |              | whether a    | tInternal    |
+| e            |              |              | problem with |              |
+|              |              |              | a structure  |              |
+|              |              |              | identical to |              |
+|              |              |              | the previous |              |
+|              |              |              | one is to be |              |
+|              |              |              | solved. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| watchdog_sho | OT_INTEGER   |              |              | CasADi::Ipop |
-| rtened_iter_ |              |              |              | tInternal    |
-| trigger      |              |              |              |              |
+| warm_start_s | OT_REAL      | 0.001        | same as slac | CasADi::Ipop |
+| lack_bound_f |              |              | k_bound_frac | tInternal    |
+| rac          |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| watchdog_tri | OT_INTEGER   |              |              | CasADi::Ipop |
-| al_iter_max  |              |              |              | tInternal    |
+| warm_start_s | OT_REAL      | 0.001        | same as slac | CasADi::Ipop |
+| lack_bound_p |              |              | k_bound_push | tInternal    |
+| ush          |              |              | for the      |              |
+|              |              |              | regular      |              |
+|              |              |              | initializer. |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_num_thr | OT_INTEGER   |              |              | CasADi::Ipop |
-| eads         |              |              |              | tInternal    |
+| warm_start_t | OT_REAL      | 0.0          | Unsupported! | CasADi::Ipop |
+| arget_mu     |              |              | (see IPOPT d | tInternal    |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_orderin | OT_INTEGER   |              |              | CasADi::Ipop |
-| g_option     |              |              |              | tInternal    |
+| watchdog_sho | OT_INTEGER   | 10           | Number of    | CasADi::Ipop |
+| rtened_iter_ |              |              | shortened    | tInternal    |
+| trigger      |              |              | iterations   |              |
+|              |              |              | that trigger |              |
+|              |              |              | the          |              |
+|              |              |              | watchdog.    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_pivtol  | OT_REAL      |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
+| watchdog_tri | OT_INTEGER   | 3            | Maximum      | CasADi::Ipop |
+| al_iter_max  |              |              | number of    | tInternal    |
+|              |              |              | watchdog     |              |
+|              |              |              | iterations.  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_pivtolm | OT_REAL      |              |              | CasADi::Ipop |
-| ax           |              |              |              | tInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_scaling | OT_INTEGER   |              |              | CasADi::Ipop |
-|              |              |              |              | tInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_singula | OT_REAL      |              |              | CasADi::Ipop |
-| rity_thresho |              |              |              | tInternal    |
-| ld           |              |              |              |              |
+| wsmp_iterati | OT_STRING    | no           | Switches to  | CasADi::Ipop |
+| ve           |              |              | iterative    | tInternal    |
+|              |              |              | solver in    |              |
+|              |              |              | WSMP. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
@@ -23239,6 +28038,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionDefault "
+
+Get the default of a certain option. ";
 
 %feature("docstring")  CasADi::IpoptSolver::clone "
 
@@ -23778,6 +28601,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Jacobian::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Jacobian::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Jacobian::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Jacobian::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Jacobian::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Jacobian::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Jacobian::clone "
 
 Deep copy. ";
@@ -24168,6 +29015,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::JacobianInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::JacobianInternal::hasOption "
 
@@ -24715,6 +29586,8 @@ Residual. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::ehfun "";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::kinsol_error "";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -24895,6 +29768,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Sundials::KinsolInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::hasOption "
 
@@ -25469,6 +30367,31 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionDefault "
+
+Get the default of a certain option. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::clone "
 
@@ -26101,6 +31024,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::KnitroInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::KnitroInternal::hasOption "
 
 check if there is an option str ";
@@ -26686,6 +31633,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::KnitroSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::KnitroSolver::clone "
 
 Deep copy. ";
@@ -27210,6 +32181,32 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDense::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::clone "
 
 Deep copy. ";
@@ -27666,6 +32663,36 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::hasOption
 "
@@ -28177,6 +33204,32 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDense::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::clone "
 
 Deep copy. ";
@@ -28623,6 +33676,36 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::hasOption
 "
@@ -29135,6 +34218,34 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getOptionDefault
+"
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getOptionAllowed
+"
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::hasOption "
 
@@ -29730,6 +34841,32 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::clone "
 
 Deep copy. ";
@@ -30218,6 +35355,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::LinearSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::LinearSolver::clone "
 
 Deep copy. ";
@@ -30635,6 +35796,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::hasOption "
 
@@ -31304,6 +36489,10 @@ get the first dimension ";
 %feature("docstring")  CasADi::Matrix::size2 "
 
 get the second dimension ";
+
+%feature("docstring")  CasADi::Matrix::shape "
+
+Get the shape. ";
 
 %feature("docstring")  CasADi::Matrix::at "
 
@@ -32008,6 +37197,16 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Opti |
+|              | R            | )            | integrator   | malControl:: |
+|              |              |              | creator      | MultipleShoo |
+|              |              |              | function     | tingInternal |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Opti |
+| ptions       | Y            | )            | be passed to | malControl:: |
+|              |              |              | the          | MultipleShoo |
+|              |              |              | integrator   | tingInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -32280,31 +37479,32 @@ Create a multiple shooting OCP solver.
 Parameters:
 -----------
 
-ffcn:  Discrete time dynamics, an CasADi::FX with the folowing mapping:
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
+| DAE_T                              | Time. (1-by-1)                     |
 +------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
 +------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
 
 Important notes: In the above table, INTEGRATOR_P input is not really of
 shape (np x 1), but rather ( (np+nu) x 1 ).
@@ -32316,7 +37516,15 @@ interpreted as controls.
 BEWARE: if the right hand side of ffcn is dependent on time, the results
 will be incorrect.
 
-mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1)
+mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1) >Input scheme:
+CasADi::MayerInput (MAYER_NUM_IN = 2)
++---------+-------------------------------------------+ |  Name   |
+Description                |
++=========+===========================================+ | MAYER_X | States
+at the end of integration (nx x 1) |
++---------+-------------------------------------------+ | MAYER_P | Problem
+parameters (np x 1)               |
++---------+-------------------------------------------+
 
 cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
 CasADi::DAEInput (DAE_NUM_IN = 4)
@@ -32530,6 +37738,36 @@ CasADi::OptimalControl::MultipleShooting::symbolicInputSX "
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::clone "
 
 Deep copy. ";
@@ -32690,6 +37928,16 @@ Return a string with a destription (for SWIG) ";
 | final_time   | OT_REAL      | 1.0          |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Opti |
+|              | R            | )            | integrator   | malControl:: |
+|              |              |              | creator      | MultipleShoo |
+|              |              |              | function     | tingInternal |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Opti |
+| ptions       | Y            | )            | be passed to | malControl:: |
+|              |              |              | the          | MultipleShoo |
+|              |              |              | integrator   | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -33081,6 +38329,36 @@ CasADi::OptimalControl::MultipleShootingInternal::setOption "
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::hasOption "
@@ -33552,6 +38830,30 @@ Make sure that the pointer points towards a valid object. ";
 
 Solve the problem. ";
 
+%feature("docstring")  CasADi::MuscodInterface::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::MuscodInterface::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInterface::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInterface::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInterface::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInterface::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::MuscodInterface::clone "
 
 Deep copy. ";
@@ -33735,6 +39037,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::MuscodInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::MuscodInternal::hasOption "
 
 check if there is an option str ";
@@ -33837,6 +39163,8 @@ get a matrix element ";
 
 %feature("docstring")  CasADi::MX::indexed "";
 
+%feature("docstring")  CasADi::MX::indexed "";
+
 %feature("docstring")  CasADi::MX::indexed_one_based_assignment "
 
 set a non-zero ";
@@ -33852,6 +39180,8 @@ set a non-zero ";
 set a matrix element ";
 
 %feature("docstring")  CasADi::MX::indexed_zero_based_assignment "";
+
+%feature("docstring")  CasADi::MX::indexed_assignment "";
 
 %feature("docstring")  CasADi::MX::indexed_assignment "";
 
@@ -33962,7 +39292,9 @@ Destructor. ";
 
 %feature("docstring")  CasADi::MX::at "
 
-Get a non-zero element, with bounds checking. ";
+Access Matrix element or slice.
+
+Get a non-zero element, with bounds checking ";
 
 %feature("docstring")  CasADi::MX::at "
 
@@ -33985,6 +39317,10 @@ get the first dimension (i.e. n for a n-by-m matrix) ";
 %feature("docstring")  CasADi::MX::size2 "
 
 get the first dimension (i.e. m for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::MX::shape "
+
+Get the shape. ";
 
 %feature("docstring")  CasADi::MX::sparsity "
 
@@ -34122,6 +39458,10 @@ to any node, 0 is returned. ";
 %feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::setSub "";
 
 %feature("docstring")  CasADi::MX::setSub "";
 
@@ -35003,6 +40343,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::MXFunction::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::MXFunction::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunction::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunction::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunction::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunction::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::MXFunction::clone "
 
 Deep copy. ";
@@ -35449,6 +40813,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::hasOption "
 
@@ -36324,6 +41712,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::NLPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::NLPSolver::clone "
 
 Deep copy. ";
@@ -36822,6 +42234,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::hasOption "
 
@@ -38929,6 +44365,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::OCPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::OCPSolver::clone "
 
 Deep copy. ";
@@ -39212,7 +44672,7 @@ Constructor.
 Parameters:
 -----------
 
-ffcn:  Discrete time dynamics
+ffcn:  Continuous time dynamics
 
 mfcn:  Mayer term
 
@@ -39223,8 +44683,8 @@ rfcn:  Initial value constraints
 The signatures (number and order of inputs/outputs) of these functions are
 not restricted at this stage.
 
-Only ffcn has a general requirement for input interface: { INTEGRATOR_X0 ,
-INTEGRATOR_P, INTEGRATOR_Z0 } from CasADi::IntegratorInput
+Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y,
+DAE_P, DAE_YDOT } from CasADi::DAEInput
 
 For example:
 
@@ -39423,6 +44883,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::hasOption "
 
@@ -39980,6 +45464,31 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::OOQPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::hasOption "
 
 check if there is an option str ";
@@ -40528,6 +46037,31 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::clone "
 
 Deep copy. ";
@@ -40676,6 +46210,30 @@ Destructor. ";
 
 Assert that the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::OptionsFunctionality::clone "
 
 Deep copy. ";
@@ -40776,6 +46334,31 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::OptionsFunctionalityNode::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::OptionsFunctionalityNode::hasOption "
 
@@ -41499,6 +47082,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Parallelizer::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Parallelizer::clone "
 
 Deep copy. ";
@@ -41934,6 +47541,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::hasOption "
 
@@ -42449,6 +48080,34 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getOptionDefault
+"
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getOptionAllowed
+"
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::hasOption "
 
@@ -42998,6 +48657,32 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::clone "
 
 Deep copy. ";
@@ -43524,6 +49209,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::QPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::QPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::QPSolver::clone "
 
 Deep copy. ";
@@ -43974,6 +49683,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::QPSolverInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::hasOption "
 
 check if there is an option str ";
@@ -44109,6 +49842,790 @@ Check if smooth. ";
 Structure to hold the information about an entry
 
 C++ includes: muscod_aux.hpp ";
+
+
+// File: classCasADi_1_1RKIntegrator.xml
+%feature("docstring") CasADi::RKIntegrator "
+
+Fixed step Runge-Kutta integrator ODE integrator based on explicit Runge-
+Kutta methods.
+
+The method is still under development
+
+Joel Andersson
+
+C++ includes: rk_integrator.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::RKIntegrator::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::RKIntegrator::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::RKIntegrator::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::RKIntegrator::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::RKIntegrator::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::RKIntegrator::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::RKIntegrator::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::RKIntegrator::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::RKIntegrator::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::RKIntegrator::makeUnique "";
+
+%feature("docstring")  CasADi::RKIntegrator::RKIntegrator "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::RKIntegrator::RKIntegrator "
+
+Create an integrator for explicit ODEs.
+
+Parameters:
+-----------
+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::RKIntegrator::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::RKIntegrator::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::RKIntegrator::printStats "
+
+Print solver statistics. ";
+
+%feature("docstring")  CasADi::RKIntegrator::reset "
+
+Reset the solver and bring the time back to t0. ";
+
+%feature("docstring")  CasADi::RKIntegrator::integrate "
+
+Integrate until a specified time point. ";
+
+%feature("docstring")  CasADi::RKIntegrator::resetAdj "
+
+Reset the solver of the adjoint problem and take time to tf. ";
+
+%feature("docstring")  CasADi::RKIntegrator::integrateAdj "
+
+Integrate backwards in time until a specified time point. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setInitialTime "
+
+Set initial time. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setFinalTime "
+
+Set final time. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setStopTime "
+
+Set a stop time for the forward integration. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setLinearSolver "
+
+Set linear solver. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getJacobian "
+
+Get the Jacobian. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getLinearSolver "
+
+Get the Linear solver. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getDAE "
+
+Get the DAE. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::RKIntegrator::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::RKIntegrator::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::RKIntegrator::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::RKIntegrator::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::RKIntegrator::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
+approach. ";
+
+%feature("docstring")  CasADi::RKIntegrator::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::RKIntegrator::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::RKIntegrator::call "
+
+Create a function call (evaluation mx node), single input. ";
+
+%feature("docstring")  CasADi::RKIntegrator::call "
+
+Evaluate numerically (shorthand) ";
+
+%feature("docstring")  CasADi::RKIntegrator::call "
+
+Evaluate symbolically (scalar graph) ";
+
+%feature("docstring")  CasADi::RKIntegrator::call "
+
+Evaluate symbolically (matrix graph) ";
+
+%feature("docstring")  CasADi::RKIntegrator::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::RKIntegrator::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegrator::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegrator::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegrator::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::RKIntegrator::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::RKIntegrator::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::RKIntegrator::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegrator::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegrator::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::RKIntegrator::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::RKIntegrator::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegrator::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::RKIntegrator::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::RKIntegrator::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::RKIntegrator::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::RKIntegrator::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::RKIntegrator::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::RKIntegrator::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::RKIntegrator::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::RKIntegrator::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::RKIntegrator::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::RKIntegrator::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::RKIntegrator::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::RKIntegrator::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::RKIntegrator::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::RKIntegrator::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1RKIntegratorInternal.xml
+%feature("docstring") CasADi::RKIntegratorInternal "C++ includes:
+rk_integrator_internal.hpp ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::RKIntegratorInternal "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::create "
+
+Create a new integrator. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::~RKIntegratorInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::init "
+
+Initialize stage. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::initAdj "
+
+Initialize the adjoint problem (can only be called after the first
+integration) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::reset "
+
+Reset the solver and bring the time back to t0. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::resetAdj "
+
+Reset the solver of the adjoint problem and take time to tf. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::evaluate "
+
+Overload this method, since the number of derivative directions currently
+aren't passed. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::integrate "
+
+Integrate until a specified time point. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::integrateAdj "
+
+Integrate backwards in time until a specified time point. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getJacobian "
+
+Get the jacobian in the nonlinear iteration. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getLinearSolver "
+
+Get the Linear solver. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setLinearSolver "
+
+Set linear solver. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::printStats "
+
+Print statistics. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setStopTime "
+
+Set the stop time of the forward integration. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::jacobian "
+
+Jacobian of the integrator. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::jac "
+
+Create an integrator which integrates the ODE/DAE augmented with the forward
+sensitivity equations. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setInitialTime "
+
+Set initial time. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setFinalTime "
+
+Set final time. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setDimensions "";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::unidirectionalColoring
+"
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1ScalarNonzerosOp.xml
@@ -44974,6 +51491,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Simulator::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Simulator::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Simulator::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Simulator::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Simulator::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Simulator::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::Simulator::clone "
 
 Deep copy. ";
@@ -45393,6 +51934,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::hasOption "
 
@@ -46181,6 +52746,30 @@ set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
 
+%feature("docstring")  CasADi::SQPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
 %feature("docstring")  CasADi::SQPInternal::hasOption "
 
 check if there is an option str ";
@@ -46825,6 +53414,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::SQPMethod::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::SQPMethod::clone "
 
 Deep copy. ";
@@ -47410,6 +54023,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::SuperLU::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SuperLU::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLU::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLU::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLU::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLU::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::SuperLU::clone "
 
 Deep copy. ";
@@ -47875,6 +54512,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::hasOption "
 
@@ -48702,6 +55363,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::SXFunction::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SXFunction::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunction::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunction::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunction::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunction::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::SXFunction::clone "
 
 Deep copy. ";
@@ -49148,6 +55833,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::hasOption "
 
@@ -50700,6 +57409,30 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::XFunction::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::XFunction::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::XFunction::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::XFunction::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::XFunction::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::XFunction::getOptionDefault "
+
+Get the default of a certain option. ";
+
 %feature("docstring")  CasADi::XFunction::clone "
 
 Deep copy. ";
@@ -51113,6 +57846,30 @@ again. (Ticket #54) ";
 set a set of options. The setOptions are in general only considered before
 the init function, if any. If properties changes, the init function should
 be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::hasOption "
 
@@ -53806,6 +60563,18 @@ C99 elementary functions from the math.h header. ";
 // File: range_8hpp.xml
 
 
+// File: rk__integrator_8cpp.xml
+
+
+// File: rk__integrator_8hpp.xml
+
+
+// File: rk__integrator__internal_8cpp.xml
+
+
+// File: rk__integrator__internal_8hpp.xml
+
+
 // File: shared__object_8cpp.xml
 
 
@@ -54076,6 +60845,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: group__scheme__IntegratorOutput.xml
+
+
+// File: group__scheme__MayerInput.xml
 
 
 // File: group__scheme__QPInput.xml

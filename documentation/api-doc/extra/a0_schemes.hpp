@@ -59,19 +59,18 @@
 <tr><td>NLP_UBX</td><td>Decision variables upper bound (n x 1), default +inf.</td></tr>
 <tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf.</td></tr>
 <tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf.</td></tr>
-<tr><td>NLP_LAMBDA_INIT</td><td>Lambda multipliers initial guess (m x 1)</td></tr>
+<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers initial guess (m x 1)</td></tr>
 <tr><td>NLP_P</td><td>Static parameters on which the objective and constraints might depend.</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
 <table>
-<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1)</td></tr>
 <tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1)</td></tr>
-<tr><td>NLP_LAMBDA_OPT</td><td>Lambda multipliers function for optimal solution (m x 1)</td></tr>
-<tr><td>NLP_LAMBDA_LBX</td><td>Lower bound multipliers for optimal solution (n x 1) When in warm start mode, this output will be used as input</td></tr>
-<tr><td>NLP_LAMBDA_UBX</td><td>Upper bound multipliers for optimal solution (n x 1) When in warm start mode, this output will be used as input</td></tr>
+<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers for the nonlinear bounds at the solution (m x 1)</td></tr>
+<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers for the simple bounds at the solution (n x 1)</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
@@ -419,6 +418,20 @@
 @copydoc scheme_NLPInput
 <br/>
 @copydoc scheme_NLPOutput
+*/
+/** \class CasADi::RKIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::RKIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::OCPSolverInternal
 \n
