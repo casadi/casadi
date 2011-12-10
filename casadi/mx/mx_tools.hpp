@@ -220,9 +220,15 @@ If the input is vector-like, a diagonal matrix is constructed with it.
  */
 MX diag(const MX& x);
 
-/** \brief Return summation of elements along specific axis
-    \param axis either 0 or 1 */
-MX sum(const MX &x, int axis=0);
+
+/** \brief Return a row-wise summation of elements */
+MX sumRows(const MX &x);
+
+/** \brief Return a column-wise summation of elements */
+MX sumCols(const MX &x);
+
+/// Return summation of all elements
+MX sumAll(const MX &x); 
 
 /** \brief  Evaluate a polynomial with coefficeints p in x */
 MX polyval(const MX& p, const MX& x);

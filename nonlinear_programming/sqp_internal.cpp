@@ -167,7 +167,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double mu = merit_mu;
     
     // 1-norm of the feasability violations
-    double feasviol = sum(fabs(gk)).at(0);
+    double feasviol = sumRows(fabs(gk)).at(0);
 
     // Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
     double mu_lb = ((inner_prod(gfk,p) + sigma_/2.0*mul(trans(p),mul(Bk,p)))/(1.-rho_)/feasviol).at(0);
@@ -181,7 +181,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double T1 = fk + mu*feasviol;
 
     // Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
-    double DT1 = (inner_prod(gfk,p) - mu*sum(fabs(gk))).at(0);
+    double DT1 = (inner_prod(gfk,p) - mu*sumRows(fabs(gk))).at(0);
     
     int lsiter = 0;
     double alpha = 1;
@@ -196,7 +196,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       G_.setInput(x_new);
       G_.evaluate();
       DMatrix gk_new = G_.output();
-      DMatrix feasviol_new = sum(fabs(gk_new));
+      DMatrix feasviol_new = sumRows(fabs(gk_new));
 
       // New T1 function
       DMatrix T1_new = fk_new + mu*feasviol_new;
@@ -229,8 +229,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Gather and print iteration information
     double normdx = norm_2(dx).at(0); // step size
     double normgradL = norm_2(gradL).at(0); // size of the Lagrangian gradient
-    double eq_viol = sum(fabs(gk)).at(0); // constraint violation
-    string ineq_viol = "nan"; // sum(max(0,-hk)); % inequality constraint violation
+    double eq_viol = sumRows(fabs(gk)).at(0); // constraint violation
+    string ineq_viol = "nan"; // sumRows(max(0,-hk)); % inequality constraint violation
 
     if (!callback_.isNull()) {
       callback_.input(NLP_X_OPT).set(x);

@@ -470,14 +470,18 @@ int countNodes(const MX& A){
   return f.countNodes();
 }
 
-MX sum(const MX &x, int axis) {
-  casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
-  if (axis==1){
-    return mul(x,MX::ones(x.size2(),1));
-  } else {
-    return mul(MX::ones(1,x.size1()),x);
-  }
+MX sumRows(const MX &x) {
+  return mul(MX::ones(1,x.size1()),x);
 }
+
+MX sumCols(const MX &x) {
+  return mul(x,MX::ones(x.size2(),1));
+}
+
+MX sumAll(const MX &x) {
+  return sumCols(sumRows(x));
+}
+
 
 MX polyval(const MX& p, const MX& x){
   casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");

@@ -16,9 +16,8 @@ class Matrixtests(casadiTestCase):
   def test_sum(self):
     self.message("sum")
     D=DMatrix([[1,2,3],[4,5,6],[7,8,9]])
-    self.checkarray(c.sum(D),array([[12,15,18]]),'sum()')
-    self.checkarray(c.sum(D,0),array([[12,15,18]]),'sum()')
-    self.checkarray(c.sum(D,1),array([[6,15,24]]).T,'sum()')
+    self.checkarray(c.sumRows(D),array([[12,15,18]]),'sum()')
+    self.checkarray(c.sumCols(D),array([[6,15,24]]).T,'sum()')
     
   def test_inv(self):
     self.message("Matrix inverse")

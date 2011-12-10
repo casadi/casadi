@@ -259,12 +259,15 @@ Matrix<T> norm_22(const Matrix<T>& x);
 
 /// Return summation of all elements
 template<class T>
-T sum_all(const Matrix<T> &x); 
+T sumAll(const Matrix<T> &x); 
 
-/** \brief Return summation of elements along specific axis
-    \param axis either 0 or 1 */
+/** \brief Return a row-wise summation of elements */
 template<class T>
-Matrix<T> sum(const Matrix<T> &x, int axis=0);
+Matrix<T> sumRows(const Matrix<T> &x);
+
+/** \brief Return a column-wise summation of elements */
+template<class T>
+Matrix<T> sumCols(const Matrix<T> &x);
 
 #ifdef SWIG
 /// Returns true only if every element in the matrix is true
@@ -628,7 +631,7 @@ Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
 }
 
 template<class T>
-T sum_all(const Matrix<T> &x) {
+T sumAll(const Matrix<T> &x) {
   // Sum non-zero elements
   T res=0;
   for(int k=0; k<x.size(); k++){
@@ -638,13 +641,13 @@ T sum_all(const Matrix<T> &x) {
 }
 
 template<class T>
-Matrix<T> sum(const Matrix<T> &x, int axis) {
-  casadi_assert_message(axis==0 || axis==1,"axis argument should be zero or one");
-  if (axis==1){
-    return mul(x,Matrix<T>::ones(x.size2(),1));
-  } else {
-    return mul(Matrix<T>::ones(1,x.size1()),x);
-  }
+Matrix<T> sumRows(const Matrix<T> &x) {
+  return mul(Matrix<T>::ones(1,x.size1()),x);
+}
+
+template<class T>
+Matrix<T> sumCols(const Matrix<T> &x) {
+  return mul(x,Matrix<T>::ones(x.size2(),1));
 }
 
 template<class T>
@@ -670,12 +673,12 @@ T any(const Matrix<T> &x) {
 
 template<class T>
 Matrix<T> norm_1(const Matrix<T>& x){
-  return sum_all(fabs(x));
+  return sumAll(fabs(x));
 }
 
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x){
-  return sqrt(sum_all(x*x));
+  return sqrt(sumAll(x*x));
 }
 
 template<class T>
@@ -1174,8 +1177,9 @@ MTT_INST(T,isEqual) \
 MTT_INST(T,repmat) \
 MTT_INST(T,getSparseTriplet) \
 MTT_INST(T,unite) \
-MTT_INST(T,sum) \
-MTT_INST(T,sum_all) \
+MTT_INST(T,sumCols) \
+MTT_INST(T,sumRows) \
+MTT_INST(T,sumAll) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 MTT_INST(T,makeSparse) \
