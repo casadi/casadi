@@ -152,13 +152,12 @@ class Matrixtests(casadiTestCase):
     b = c.reshape(a,2,2)
     self.assertEqual(type(a),type(b))
 
-    #a = IMatrix(4,1)
-    #b = DMatrix(a)
-    #self.assertTrue(isinstance(b,DMatrix))
+    a = IMatrix(4,1)
+    b = DMatrix(a)
+    self.assertTrue(isinstance(b,DMatrix))
     
-    #a = DMatrix(4,1)
-    #b = IMatrix(a)
-    #self.assertTrue(isinstance(b,IMatrix))
+    a = DMatrix(4,1)
+    self.assertRaises(RuntimeError,lambda : IMatrix(a))
     
 if __name__ == '__main__':
     unittest.main()

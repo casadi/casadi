@@ -379,12 +379,43 @@ bool meta< CasADi::SX >::couldbe(PyObject * p) {
   return (meta< CasADi::SX >::isa(p) || meta< double >::couldbe(p));
 }
 
+
+/// CasADi::Matrix<int>
+template<> char meta< CasADi::Matrix<int> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, IMatrix";
+
+template <>
+int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
+  NATIVERETURN(CasADi::Matrix<int>,m)
+  if (meta< int >::couldbe(p)) {
+    int t;
+    int res = meta< int >::as(p,t);
+    m = t;
+    return res;
+  } else if ( meta< int >::couldbe_sequence(p)) {
+    std::vector <int> t;
+    int res = meta< int >::as_vector(p,t);
+    m = CasADi::Matrix<int>(t,t.size(),1);
+    return res;
+  } else {
+    SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
+    return false;
+  }
+  return true;
+}
+
+// Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
+template <>
+bool meta< CasADi::Matrix<int> >::couldbe(PyObject * p) {
+  return meta< int >::couldbe(p) || meta< int >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::isa(p);
+}
+
 /// CasADi::Matrix<double>
 template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
 
 template <>
 int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
   NATIVERETURN(CasADi::Matrix<double>,m)
+  NATIVERETURN(CasADi::Matrix<int>,m)
   if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
     if (array_numdims(p)==0) {
       double d;
@@ -477,36 +508,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
 template <>
 bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
-  return meta< double >::couldbe(p) || ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) || meta< double >::couldbe_sequence(p);
-}
-
-/// CasADi::Matrix<int>
-template<> char meta< CasADi::Matrix<int> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, IMatrix";
-
-template <>
-int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
-  NATIVERETURN(CasADi::Matrix<int>,m)
-  if (meta< int >::couldbe(p)) {
-    int t;
-    int res = meta< int >::as(p,t);
-    m = t;
-    return res;
-  } else if ( meta< int >::couldbe_sequence(p)) {
-    std::vector <int> t;
-    int res = meta< int >::as_vector(p,t);
-    m = CasADi::Matrix<int>(t,t.size(),1);
-    return res;
-  } else {
-    SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
-    return false;
-  }
-  return true;
-}
-
-// Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
-template <>
-bool meta< CasADi::Matrix<int> >::couldbe(PyObject * p) {
-  return meta< int >::couldbe(p) || meta< int >::couldbe_sequence(p);
+  return meta< double >::couldbe(p) || ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) || meta< double >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::couldbe(p);
 }
 
 meta_vector(CasADi::Matrix<double>)
