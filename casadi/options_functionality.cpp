@@ -477,6 +477,11 @@ std::vector<GenericType> OptionsFunctionalityNode::getOptionAllowed(const std::s
   return std::vector<GenericType>();
 }
 
+void OptionsFunctionalityNode::setDefault(const std::string &name, const GenericType &def_val) {
+  assert_exists(name);
+  defaults_[name] = def_val;
+}
+
 
 } // namespace CasADi
 

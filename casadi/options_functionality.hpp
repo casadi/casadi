@@ -224,7 +224,12 @@ protected:
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false);
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
   
-  void assert_exists(const std::string &str) const;
+void assert_exists(const std::string &str) const;
+
+
+/** \brief Sets the default value for an option without changing the current value
+*/  
+void setDefault(const std::string &str, const GenericType &def_val);
   
 private:
 
@@ -233,7 +238,7 @@ private:
 
 /** \brief  User-set options */
   Dictionary dictionary_;
-  
+
 /** \brief  Option defaults */
   Dictionary defaults_;
   
