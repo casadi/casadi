@@ -190,8 +190,30 @@ class Misctests(casadiTestCase):
     self.assertEqual(g.input(0),2)
     self.assertEqual(g.output(),0)
     
-
+  def test_options_introspection(self):
+    self.message("options introspection")
+    x=SX("x")
+    f = SXFunction([x],[x**2])
+    f.init()
+    i = IpoptSolver(f)
     
+    opts = i.getOptionNames()
+    self.assertTrue(isinstance(opts,tuple))
+    
+    n = opts[0]
+    self.assertTrue(type(n)==type(""))
+    
+    n = "monitor"
+    
+    d = i.getOptionDescription(n)
+    self.assertTrue(type(d)==type(""))
+    self.assertTrue(not("d"=="N/A"))
+    
+    d = i.getOptionTypeName(n)
+    self.assertEqual(d,"OT_STRINGVECTOR")
+
+    #d = i.getOptionAllowed(n)
+
 if __name__ == '__main__':
     unittest.main()
     

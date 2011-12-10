@@ -15,6 +15,8 @@ import os
 import re
 import fnmatch
 
+from generate_options_helpers import addExtra
+
 # We will use an XML parser for the main index XML file
 xmlData = etree.parse(xml+'index.xml')
 
@@ -154,7 +156,7 @@ for name,meta in metadata.items():
         for k,v in result.iteritems():
           result[k]=v.strip()
       except:
-        raise Exception(l)
+        print "Ignoring ", l
       d = meta['options'][result["name"]]={'name': result["name"],"type": result["type"],'used': name,'default':'','description':'','inherit': False}
       if 'default' in result:
         d["default"]= result["default"]
@@ -195,7 +197,9 @@ for name,meta in metadata.items():
     if len(meta[k])==0:
       del meta[k]
   f.close()
-  
+
+addExtra(metadata)
+
 def newline2br(a):
   return a.replace("\n","<br />")
   

@@ -66,7 +66,15 @@ IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J,
     }
     
     // Register the option in CasADi
-    addOption(opt_name, casadi_type, GenericType(), opt_desc);
+    if (casadi_type == OT_REAL) {
+      addOption(opt_name, casadi_type, it->second->DefaultNumber(), opt_desc);
+    } else if (casadi_type == OT_INTEGER) {
+      addOption(opt_name, casadi_type, it->second->DefaultInteger(), opt_desc);
+    } else if (casadi_type == OT_STRING) {
+      addOption(opt_name, casadi_type, it->second->DefaultString(), opt_desc);
+    } else {
+      addOption(opt_name, casadi_type, GenericType(), opt_desc);
+    }
 
     // Save to map containing IPOPT specific options
     ops_[opt_name] = casadi_type;

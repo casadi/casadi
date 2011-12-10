@@ -103,7 +103,25 @@ class OptionsFunctionality : public SharedObject{
 
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
+    
+    
+    /** \brief Get a list of all option names */
+    std::vector<std::string> getOptionNames() const;
+    
+    /** \brief Get the description of a certain option */
+    std::string getOptionDescription(const std::string &str) const;
+    
+    /** \brief Get the type of a certain option */
+    opt_type getOptionType(const std::string &str) const;
 
+    /** \brief Get the type name of a certain option */
+    std::string getOptionTypeName(const std::string &str) const;
+    
+    /** \brief Get the allowed values of a certain option */
+    std::vector<GenericType> getOptionAllowed(const std::string &str) const;
+
+    /** \brief Get the default of a certain option */
+    GenericType getOptionDefault(const std::string &str) const;
 
 };
 
@@ -134,7 +152,27 @@ virtual ~OptionsFunctionalityNode();
   (Ticket #54)
   */
   void setOption(const Dictionary& dict);
+  
+  /** \brief Get a list of all option names */
+  std::vector<std::string> getOptionNames() const;
+  
+  /** \brief Get the description of a certain option */
+  std::string getOptionDescription(const std::string &str) const;
+  
+  /** \brief Get the type of a certain option */
+  opt_type getOptionType(const std::string &str) const;
 
+  /** \brief Get the type name of a certain option */
+  std::string getOptionTypeName(const std::string &str) const;
+  
+  /** \brief Get the default of a certain option */
+  GenericType getOptionDefault(const std::string &str) const;
+  
+  #ifndef SWIG
+  /** \brief Get the allowed values of a certain option */
+  std::vector<GenericType> getOptionAllowed(const std::string &str) const;
+  #endif // SWIG
+  
   /** \brief  check if there is an option str */
   bool hasOption(const std::string &str) const;
 
@@ -186,6 +224,8 @@ protected:
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false);
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
   
+  void assert_exists(const std::string &str) const;
+  
 private:
 
 /** \brief  Allowed options  */
@@ -193,7 +233,10 @@ private:
 
 /** \brief  User-set options */
   Dictionary dictionary_;
-
+  
+/** \brief  Option defaults */
+  Dictionary defaults_;
+  
 /** \brief  Description for the options */
   std::map<std::string, std::string> description_;
   
