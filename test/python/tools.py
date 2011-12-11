@@ -97,10 +97,26 @@ class Toolstests(casadiTestCase):
       
       p = Variables()
       p.a = msym("a",2)
-      #p.b = []
-      #p.b.append(msym("b1",3))
-      #p.b.append(msym("b2",3))
-      #p.c = msym("c")
+      p.b = []
+      p.b.append(msym("b1",3))
+      p.b.append(msym("b2",3))
+      p.c = msym("c")
+      
+      
+      f = MXFunction([p.veccat()],[p.a,p.b[0],p.b[1],p.c])
+      f.init()
+      
+      print "i_a," ,p.i_a
+
+      print f.input()
+      f.input()[p.i_a]=[4,5]
+      
+      print f.input()
+      
+      f.evaluate()
+      
+      print f.output()
+      print p.veccat()
       
        
 

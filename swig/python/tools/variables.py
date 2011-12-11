@@ -34,7 +34,10 @@ class Variables(object):
                 raise Exception("Variable %s has no numerical value, because it is a Variables object itself." % name[:-1])
             self.doUpdates_(name[:-1])
             return self._d_[name[:-1]]
-        return self._d[name]
+        if name in self._d:
+          return self._d[name]
+        else:
+          raise Exception("Variable " + name + " does not exist. Existing ones are: " + ",".join(getorder()))
            
     def __setattr__(self,name,value):
         """
@@ -58,21 +61,18 @@ class Variables(object):
             self._d_[name] = self.get_(value)
             
     def createParent(self):
-        self._V = msym("V",self.getSize())
+     
+        self._V = msym("V[" + ",".join(self.getOrder()) + "]",self.getSize())
         for k in self.getOrder():
             obj = self._d[k]
             if isinstance(obj,Variables):
                 raise Exception("Not implemented")
             elif isinstance(obj,list):
                 for i in range(len(obj)):
-                    self._d[k] = V[getattr(self,'i_'+k)[i]]
+                    obj[i] = self._V[getattr(self,'i_'+k)[i]]
             else:
-                print getattr(self,'i_'+k)
-                print self._V.shape, self._V.size()
-                print self._V[getattr(self,'i_'+k)] 
-                
                 self._d[k] = self._V[getattr(self,'i_'+k)]  
-                print "foo"      
+   
             
     def get_(self,value):
         if isinstance(value,list):
