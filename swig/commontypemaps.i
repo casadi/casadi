@@ -1,9 +1,9 @@
 // Lower value means wil be checked first
-#define PRECEDENCE_DVector 94
-#define PRECEDENCE_IVector 95
-#define PRECEDENCE_PAIR_SLICE_SLICE 96
-#define PRECEDENCE_SLICE 97
-#define PRECEDENCE_IndexVector 98
+#define PRECEDENCE_DVector 92
+#define PRECEDENCE_IVector 93
+#define PRECEDENCE_PAIR_SLICE_SLICE 94
+#define PRECEDENCE_SLICE 95
+#define PRECEDENCE_IndexVector 96
 #define PRECEDENCE_PAIR_IVector_IVector 97
 
 #define PRECEDENCE_IMatrix 98

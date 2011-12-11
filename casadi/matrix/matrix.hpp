@@ -266,6 +266,13 @@ class Matrix : public PrintableObject{
     const Matrix<T> getSub(const std::vector<int>& i, int j) const{ return getSub(i,std::vector<int>(1,j));}
     const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
     const Matrix<T> getSub(const Slice& i, const Slice& j) const{ return getSub(i.getAll(size1()),j.getAll(size2()));}
+    const Matrix<T> getSub(int i, const Slice& j) const{ return getSub(std::vector<int>(1,i),j.getAll(size2()));}
+    const Matrix<T> getSub(const Slice& i, int j) const{ return getSub(i.getAll(size1()),std::vector<int>(1,j));}
+    const Matrix<T> getSub(const std::vector<int>& i, const Matrix<int>& k) const;
+    const Matrix<T> getSub(const Matrix<int>& k, const std::vector<int>& j) const;
+    const Matrix<T> getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
+    const Matrix<T> getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
+    const Matrix<T> getSub(const Matrix<int>& i, const Matrix<int>& j) const;
     //@}
 
     //@{
@@ -342,7 +349,17 @@ class Matrix : public PrintableObject{
     const Matrix<T> indexed(const IndexList &i, const IndexList &j) const{ 
       return (*this)(i.getAll(size1()),j.getAll(size2()));
     }
-    
+    const Matrix<T> indexed(const Slice &i, const Matrix<int>& k) const{ return (*this)(i,k); }
+    const Matrix<T> indexed(const IndexList &i, const Matrix<int>& k) const{ 
+      return (*this)(i.getAll(size1()),k);
+    }
+    const Matrix<T> indexed(const Matrix<int>& k, const Slice &j) const{ return (*this)(k,j); }
+    const Matrix<T> indexed(const Matrix<int>& k, const IndexList &j) const{ 
+      return (*this)(k,j.getAll(size2()));
+    }
+    const Matrix<T> indexed(const Matrix<int>& i, const Matrix<int>& j) const{ 
+      return (*this)(i,j);
+    }
     /// set a non-zero
     void indexed_one_based_assignment(int k, const T & m){ at(k-1) = m;}
     void indexed_zero_based_assignment(int k, const T & m){ at(k) = m;}
@@ -726,6 +743,42 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
   
   // Return (RVO)
   return ret;
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
+  std::vector< int > cols = range(size2());
+  std::vector< Matrix<T> > temp;
+
+  for (int i=0;i<ii.size();++i) {
+    temp.push_back(getSub(ii[i],cols)[k]);
+  }
+  
+  return vertcat(temp);
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& jj) const{
+  std::vector< int > rows = range(size1());
+  std::vector< Matrix<T> > temp;
+
+  for (int i=0;i<jj.size();++i) {
+    temp.push_back(getSub(rows,jj[i])[k]);
+  }
+  
+  return horzcat(temp);
+}
+
+template<class T>
+const Matrix<T> Matrix<T>::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"getSub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
+
+   Matrix<T> ret(i.sparsity());
+   for (int k=0;k<i.size();++k) {
+    ret.data()[k] = elem(i.at(k),j.at(k));
+   }
+
+   return ret;
 }
 
 template<class T>
