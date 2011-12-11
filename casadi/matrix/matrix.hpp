@@ -29,6 +29,7 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../casadi_operators.hpp"
+#include "../stl_vector_tools.hpp"
 #include "slice.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
@@ -282,6 +283,11 @@ class Matrix : public PrintableObject{
     void setSub(const std::vector<int>& i, int j, const Matrix<T>& m){ setSub(i,std::vector<int>(1,j),m);}
     void setSub(const std::vector<int>& i, const std::vector<int>& j, const Matrix<T>& m);
     void setSub(const Slice& i, const Slice& j, const Matrix<T>& m){ setSub(i.getAll(size1()),j.getAll(size2()),m);}
+    void setSub(const std::vector<int>& i, const Matrix<int>& k, const Matrix<T>& m);
+    void setSub(const Matrix<int>& k, const std::vector<int>& j, const Matrix<T>& m);
+    void setSub(const Slice& i, const Matrix<int>& k, const Matrix<T>& m) {return setSub(i.getAll(size1()),k,m);}
+    void setSub(const Matrix<int>& k, const Slice& j, const Matrix<T>& m) {return setSub(k,j.getAll(size2()),m);}
+    void setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& m);
     //@}
 
     //@{
@@ -377,6 +383,21 @@ class Matrix : public PrintableObject{
     void indexed_assignment(const IndexList &i, const IndexList &j, const Matrix<T>& m){
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
+    void indexed_assignment(const Slice &i, const Matrix<int>& j, const Matrix<T>& m){
+      (*this)(i,j) = m;
+    }
+    void indexed_assignment( const Matrix<int>& i, const Slice &j, const Matrix<T>& m){
+      (*this)(i,j) = m;
+    }
+    void indexed_assignment(const IndexList &i, const Matrix<int>& j, const Matrix<T>& m){
+      (*this)(i.getAll(size1()),j) = m;
+    }
+    void indexed_assignment( const Matrix<int>& i, const IndexList &j, const Matrix<T>& m){
+      (*this)(i,j.getAll(size1())) = m;
+    } 
+    void indexed_assignment( const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& m){
+      (*this)(i,j) = m;
+    } 
     //@}
     
     /// Set all elements to zero
@@ -751,7 +772,11 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>&
   std::vector< Matrix<T> > temp;
 
   for (int i=0;i<ii.size();++i) {
-    temp.push_back(getSub(ii[i],cols)[k]);
+    Matrix<T> m = k;
+    for (int j=0;j<m.size();++j) {
+      m.data()[j] = elem(i,k.at(j));
+    }
+    temp.push_back(m);
   }
   
   return vertcat(temp);
@@ -762,8 +787,12 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& 
   std::vector< int > rows = range(size1());
   std::vector< Matrix<T> > temp;
 
-  for (int i=0;i<jj.size();++i) {
-    temp.push_back(getSub(rows,jj[i])[k]);
+  for (int j=0;j<jj.size();++j) {
+    Matrix<T> m = k;
+    for (int i=0;i<m.size();++i) {
+      m.data()[i] = elem(k.at(i),j);
+    }
+    temp.push_back(m);
   }
   
   return horzcat(temp);
@@ -819,6 +848,67 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
 
     // Unite the sparsity patterns
     *this = unite(*this,el_ext);
+  }
+}
+
+template<class T>
+void Matrix<T>::setSub(const Matrix<int>& i, const std::vector<int>& jj, const Matrix<T>& el) {
+  // If el is scalar
+  if(el.scalar() && (jj.size() > 1 || i.size() > 1)){
+    setSub(i,jj,repmat(Matrix<T>(i.sparsity(),el.toScalar()),1,jj.size()));
+    return;
+  }
+  
+  casadi_assert(el.size() == jj.size()*i.size());
+  
+  std::vector<int> slice_i = range(i.size1());
+  
+  for(int k=0; k<jj.size(); ++k) {
+     Matrix<T> el_k = el(slice_i,range(k*i.size2(),(k+1)*i.size2()));
+     for (int j=0;j<i.size();++j) {
+       elem(i.at(j),jj[k])=el_k.at(j);
+     }
+  }
+  
+}
+
+template<class T>
+void Matrix<T>::setSub(const std::vector<int>& ii, const Matrix<int>& j, const Matrix<T>& el) {
+  
+  // If el is scalar
+  if(el.scalar() && (ii.size() > 1 || j.size() > 1)){
+    setSub(ii,j,repmat(Matrix<T>(j.sparsity(),el.toScalar()),ii.size(),1));
+    return;
+  }
+  
+  casadi_assert(el.size() == ii.size()*j.size());
+  
+  std::vector<int> slice_j = range(j.size2());
+  
+  for(int k=0; k<ii.size(); ++k) {
+     Matrix<T> el_k = el(range(k*j.size1(),(k+1)*j.size1()),slice_j);
+     for (int i=0;i<j.size();++i) {
+       elem(ii[k],j.at(i))=el_k.at(i);
+     }
+  }
+  
+}
+
+
+template<class T>
+void Matrix<T>::setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& el) {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"setSub(Imatrix i, Imatrix j, Imatrix el): sparsities must match. Got " << i.dimString() << " for i and " << j.dimString() << " for j.");
+
+  // If el is scalar
+  if(el.scalar() && i.numel() > 1){
+    setSub(i,j,Matrix<T>(i.sparsity(),el.toScalar()));
+    return;
+  }
+  
+  casadi_assert_message(el.sparsity()==i.sparsity(),"setSub(Imatrix i, Imatrix j, Imatrix el): sparsities must match. Got " << el.dimString() << " for el and " << j.dimString() << " for i and j.");
+  
+  for(int k=0; k<i.size(); ++k) {
+     elem(i.at(k),j.at(k)) = el.at(k); 
   }
 }
 
@@ -2157,7 +2247,7 @@ Matrix<T> Matrix<T>::repmat(const Matrix<T>& x, int nrow, int ncol){
       return sparse(nrow,ncol);
     }
   } else {
-    casadi_assert_message(0,"not implemented");
+    return horzcat(std::vector< Matrix<T> >(ncol,vertcat(std::vector< Matrix<T> >(nrow,x))));
   }
 }
 

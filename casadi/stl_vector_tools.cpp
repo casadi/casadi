@@ -24,6 +24,24 @@
 #include "stl_vector_tools.hpp"
 
 namespace CasADi{
+  std::vector<int> range(int start, int stop, int step, int len){
+    start = std::min(start,len);
+    stop = std::min(stop,len);
+    int nret = (stop-start)/step + ((stop-start)%step>0);
+    std::vector<int> ret(nret);
+    int ind = start;
+    for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it){
+      *it = ind;
+      ind += step;
+    }
+    return ret;
+  }
+  
+  std::vector<int> range(int stop){
+    return range(0,stop);
+  }
+  
+  
   
   bvec_t* get_bvec_t(std::vector<double>& v){
     if(v.empty()){

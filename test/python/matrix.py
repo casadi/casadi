@@ -144,6 +144,10 @@ class Matrixtests(casadiTestCase):
     B[A] = IMatrix([[1,2],[3,4]])
     
     self.checkarray(array(B),DMatrix([1,1,2,4,3]),"Imatrix indexing assignement")
+    
+    B = DMatrix(5,1)
+   
+    self.assertRaises(Exception, lambda : B[A])
   
   def test_IMatrix_index_slice(self):
     self.message("IMatrix combined with slice")
@@ -161,7 +165,51 @@ class Matrixtests(casadiTestCase):
     self.checkarray(B[:,A],DMatrix([[1,3],[1,2],[4,6],[4,5],[7,9],[7,8],[10,12],[10,11]]),"B[:,A]")
     self.checkarray(B[A,:],DMatrix([[1,7,2,8,3,9],[1,4,2,5,3,6]]),"B[A,:]")
     
+    self.assertRaises(Exception, lambda : F[:,A])
+    
+    B = DMatrix(4,3)
+    
+    print B[:,A]
+    
+  def test_IMatrix_index_slice_assignment(self):
+    self.message("IMatrix combined with slice assignment")
 
+    A = IMatrix(2,2)
+    A[0,0] = 0
+    A[1,1] = 1
+    A[0,1] = 2
+    A[1,0] = 0
+    
+    
+    B = DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
+    B_ = DMatrix(B)
+    B[:,A] = DMatrix([[1,3],[1,2],[4,6],[4,5],[7,9],[7,8],[10,12],[10,11]])*2
+    
+    self.checkarray(B,2*B_,"B[:,A] = ")
+    
+    B[:,A] = 7
+    
+    self.checkarray(B,DMatrix([[7,7,7],[7,7,7],[7,7,7],[7,7,7]]),"B[:,A] = ")
+    
+    B[A,:] = DMatrix([[1,7,2,8,3,9],[1,4,2,5,3,6]])
+    
+    self.checkarray(B,DMatrix([[1,2,3],[4,5,6],[7,8,9],[7,7,7]]),"B[A,:] = ")
+
+    B[A,:] = 6
+    
+    self.checkarray(B,DMatrix([[6,6,6],[6,6,6],[6,6,6],[7,7,7]]),"B[A,:] = ")
+    
+    B=DMatrix(3,4)
+    B[:,A] = 7
+    
+    self.checkarray(B,DMatrix([[7,7,7,0],[7,7,7,0],[7,7,7,0]]),"B[:,A] = ")
+    
+    B=DMatrix(4,4)
+    B[A,:] = 8
+
+    self.checkarray(B,DMatrix([[8,8,8,8],[8,8,8,8],[8,8,8,8],[0,0,0,0]]),"B[A,:] = ")
+    
+    
   def test_IMatrix_IMatrix_index(self):
     self.message("IMatrix IMatrix index")
 
@@ -176,13 +224,43 @@ class Matrixtests(casadiTestCase):
     B[0,1] = 0
     
     C = DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
-    print C
-    print A.data()
-    print B.data()
-    print C[list(A.data()),list(B.data())]
-    print C[A,B]
-    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
+    F = DMatrix([[1,2],[4,5]])
 
+    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
+    self.assertRaises(Exception, lambda : F[A,B])
+    
+    C = DMatrix(3,4)
+    C_ = C[A,B]
+    self.assertEqual(C_.size(),3)
+    self.checkarray(C_,DMatrix([[0,0],[0,0]]),"C[A,B]")
+
+  def test_IMatrix_IMatrix_index_assignment(self):
+    self.message("IMatrix IMatrix index assignment")
+
+    A = IMatrix(2,2)
+    A[0,0] = 0
+    A[1,1] = 1
+    A[0,1] = 2
+    
+    B = IMatrix(2,2)
+    B[0,0] = 2
+    B[1,1] = 1
+    B[0,1] = 0
+    
+    C = DMatrix.zeros((3,4))
+    C_ = DMatrix(2,2)
+    C_[0,0] = 3
+    C_[0,1] = 7
+    C_[1,1] = 5;
+    
+    C[A,B] = C_
+
+    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
+    
+    C = DMatrix(3,4)
+    C[A,B] = C_
+    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
+    
   def test_issue298(self):
     self.message("Issue #298")
     a = DMatrix(4,1)

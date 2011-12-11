@@ -53,6 +53,27 @@ namespace std{
 } // namespace std
 
 namespace CasADi{
+
+  #ifndef SWIG
+  /** Range function
+  * \param start
+  * \param stop
+  * \param step
+  * \param len
+  *
+  * Consider a infinitely long list [start, start+step, start+2*step, ...]
+  * Elements larger than or equal to stop are chopped off.
+  *
+  */
+  std::vector<int> range(int start, int stop, int step=1, int len=std::numeric_limits<int>::max());
+
+  /** Range function
+  * \param stop
+  *
+  * \return list [0,1,2...stop-1]
+  */
+  std::vector<int> range(int stop);
+  #endif // SWIG
   
   /// Print representation
   template<typename T>

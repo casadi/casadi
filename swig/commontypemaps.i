@@ -1,13 +1,26 @@
 // Lower value means wil be checked first
-#define PRECEDENCE_DVector 92
-#define PRECEDENCE_IVector 93
-#define PRECEDENCE_PAIR_SLICE_SLICE 94
-#define PRECEDENCE_SLICE 95
-#define PRECEDENCE_IndexVector 96
-#define PRECEDENCE_PAIR_IVector_IVector 97
+#define PRECEDENCE_IVector 92
+#define PRECEDENCE_PAIR_SLICE_SLICE 93
+// Why are SLICE and IndexVector the same precedence?
+// To circumvent an issue with typemap precedence.
+// Originally, we had slice precedence < IndexList precedence, but this caused the following order:
+//    indexed(Slice,Slice)
+//    indexed(Slice,Martix<int>)
+//    indexed(IndexList,IndexList)
+//    indexed(IndexList,Martix<int>)
+// While we intend it to be:
+//    indexed(Slice,Slice)
+//    indexed(IndexList,IndexList)
+//    indexed(Slice,Martix<int>)
+//    indexed(IndexList,Martix<int>)
+#define PRECEDENCE_SLICE 94
+#define PRECEDENCE_IndexVector 94
+#define PRECEDENCE_PAIR_IVector_IVector 96
 
-#define PRECEDENCE_IMatrix 98
-#define PRECEDENCE_IMatrixVector 99
+#define PRECEDENCE_IMatrix 97
+#define PRECEDENCE_IMatrixVector 98
+
+#define PRECEDENCE_DVector 99
 
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
