@@ -49,6 +49,11 @@ bool Simulator::checkNode() const{
   return dynamic_cast<const SimulatorInternal*>(get())!=0;
 }
 
+std::vector<double> Simulator::getGrid() const {
+  casadi_assert(checkNode());
+  return dynamic_cast<const SimulatorInternal*>(get())->grid_;
+}
+
 
 } // namespace CasADi
 

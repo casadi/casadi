@@ -27,6 +27,22 @@
 
 namespace CasADi{
 
+/// Input arguments of an integrator
+enum SimulatorInput{
+  /** Differential or algebraic state at t0  (dimension nx-by-1) */
+  SIMULATOR_X0, 
+  /** Parameters p  (dimension np-by-1) */
+  SIMULATOR_P,  
+  /** State derivative at t0  (dimension nx-by-1)
+  * Only relevant for implicit intergators.
+  * This input may be changed during an IDASIntegrator::evaluate()
+  */
+  SIMULATOR_XP0, 
+  /** Parameters that change over the integration intervals (dimension (ns-1)-by-nv) */
+  SIMULATOR_V, 
+  /** Number of input arguments of an integrator */
+  SIMULATOR_NUM_IN};
+  
 // Forward declaration of internal class
 class SimulatorInternal;
 
@@ -38,7 +54,23 @@ class SimulatorInternal;
   
   Simulator is an CasADi::FX mapping from CasADi::IntegratorInput to n. \\
   
-  The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (flattened) differential state for each time step.
+  The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (flattened) differential state for each time step:  number of rows equals ns*nf
+  
+  np  Number of parameters that do not change over the entire intergation time
+  nv  Number of parameters that change during the integration time, but not on a fine level
+  ns  The number of (coarse) grid points, as suplied in the constructor
+  nf  The number of fine grid points per coarse grid point interval
+  
+  nf = 1
+  ns = 5
+  
+  |||||
+  
+  nf = 3
+  ns = 5
+  
+  |..|..|..|..|
+  
   
   \author Joel Andersson 
   \date 2010
@@ -68,6 +100,9 @@ public:
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /// Get the (fine-scaled) time grid used by the integrator
+  std::vector<double> getGrid() const;
 };
   
 } // namespace CasADi

@@ -52,7 +52,27 @@ public:
 
   Integrator integrator_;
   FX output_fcn_;
+  
+  std::vector<double> gridr_;
+  
+  /** Fine grained grid */
   std::vector<double> grid_;
+  
+  /** \brief Number of static parameters */
+  int np_;
+  
+  /** \brief Number of variable parameters */
+  int nv_;
+  
+  /** \brief Number of fine-grained time steps */
+  int nf_;
+  
+  /** \brief The indices that constitue the static part of parameters */
+  std::vector< int > np_i;
+  
+  /** \brief The indices that constitue the dynamic part of parameters */
+  std::vector< int > nv_i;
+  
 };
   
 } // namespace CasADi

@@ -32,20 +32,59 @@ using namespace std;
 namespace CasADi{
 
   
-SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), grid_(grid){
+SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), gridr_(grid){
+  
   setOption("name","unnamed simulator");
+  addOption("np",OT_INTEGER,GenericType(),"The number of parameters. If this option is not set, all of input(INTEGRATOR_P) is considered static parameters. The remainder of nv = input(INTEGRATOR_P) is considered to be varying parameters.");
+  addOption("nf",OT_INTEGER,1,"Number of fine grained integration steps.");
 }
   
 SimulatorInternal::~SimulatorInternal(){
 }
 
 void SimulatorInternal::init(){
+  // Number of fine-grained steps
+  nf_ = getOption("nf");
+  
+  casadi_assert_message(nf_>=0,"Invalid parameter. nf must be at least 1.");
+  
+  if (nf_==1) {
+    // The default case: don't change the grid
+    grid_ = gridr_;
+  } else {
+    // Interpolate the grid.
+    grid_.resize((gridr_.size()-1)*nf_+1);
+    
+    std::vector< double > refined(nf_+1,0);
+
+    for (int k=0;k<gridr_.size()-1;++k) {
+      linspace(refined,gridr_[k],gridr_[k+1]);
+      std::copy(refined.begin(),refined.end()-1,grid_.begin()+k*nf_);
+    }
+    
+    grid_[grid_.size()-1] = gridr_[gridr_.size()-1];
+  }
+  
   // Let the integration time start from the first point of the time grid.
   if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
 
   // Initialize the integrator
   integrator_.init();
   
+  if (hasSetOption("np")) {
+    np_ = getOption("np");
+    casadi_assert_message(np_<=integrator_.input(INTEGRATOR_P).size(),"Invalid parameter. np (" << np_ << ") cannot be greater that input(INTEGRATOR_P), which is of size " << integrator_.input(INTEGRATOR_P).size() << ".");
+    casadi_assert_message(np_>0,"Invalid parameter. np (" << np_ << ") must be greater than zero.");
+    nv_ = integrator_.input(INTEGRATOR_P).size() - np_;
+  } else {
+    np_ = integrator_.input(INTEGRATOR_P).size();
+    nv_ = 0;
+  }
+  
+  // Cache some ranges
+  np_i = range(np_);
+  nv_i = range(np_,np_+nv_);
+
   // Generate an output function if there is none (returns the whole state)
   if(output_fcn_.isNull()){
     SXMatrix t = ssym("t");
@@ -69,12 +108,14 @@ void SimulatorInternal::init(){
 
   // Initialize the output function
   output_fcn_.init();
-
+  
   // Allocate inputs
-  input_.resize(INTEGRATOR_NUM_IN);
-  for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
-    input(i) = integrator_.input(i);
-  }
+  input_.resize(SIMULATOR_NUM_IN);
+  input(SIMULATOR_X0)  = integrator_.input(INTEGRATOR_X0);
+  input(SIMULATOR_P)   = integrator_.input(INTEGRATOR_P)[np_i];
+  input(SIMULATOR_XP0) = integrator_.input(INTEGRATOR_XP0);
+  input(SIMULATOR_V)   = repmat(integrator_.input(INTEGRATOR_P)[nv_i],gridr_.size()-1,1);
+
 
   // Allocate outputs
   output_.resize(output_fcn_->output_.size());
@@ -88,32 +129,44 @@ void SimulatorInternal::init(){
 
 void SimulatorInternal::evaluate(int nfdir, int nadir){
   // Pass the parameters and initial state
-  integrator_.setInput(input(INTEGRATOR_XF),INTEGRATOR_XF);
-  integrator_.setInput(input(INTEGRATOR_XPF),INTEGRATOR_XPF);
-  integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
-    
+  integrator_.setInput(input(SIMULATOR_X0),INTEGRATOR_X0);
+  integrator_.setInput(input(SIMULATOR_XP0),INTEGRATOR_XP0);
+  integrator_.input(INTEGRATOR_P)[np_i] = input(SIMULATOR_P);
+  integrator_.input(INTEGRATOR_P)[nv_i] = input(SIMULATOR_V)(0,ALL);
+  
   // Pass sensitivities if fsens
   for(int dir=0; dir<nfdir; ++dir){
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XF,dir),INTEGRATOR_XF,dir);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XPF,dir),INTEGRATOR_XPF,dir);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),INTEGRATOR_P,dir);
+    integrator_.setFwdSeed(fwdSeed(SIMULATOR_X0,dir),INTEGRATOR_X0,dir);
+    integrator_.setFwdSeed(fwdSeed(SIMULATOR_XP0,dir),INTEGRATOR_XP0,dir);
+    integrator_.fwdSeed(INTEGRATOR_P,dir)[np_i] = fwdSeed(SIMULATOR_P);
+    integrator_.fwdSeed(INTEGRATOR_P,dir)[nv_i] = fwdSeed(SIMULATOR_V)(0,ALL);
   }
   
   // Reset the integrator_
   integrator_.reset(nfdir, nadir);
   
+  // An index that only increments on coarse time grid steps
+  int k_coarse = -1;
+  
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
+   
+    if (k % nf_==0 && nv_ > 0) {
+      k_coarse++;
+      integrator_.input(INTEGRATOR_P)[nv_i] = input(SIMULATOR_V)(k_coarse,ALL);
+      // @TODO: reset the integration somehow.
+      // http://sundials.2283335.n4.nabble.com/ReInit-functions-in-sundialsTB-td3239946.html
+    }
 
     // Integrate to the output time
     integrator_.integrate(grid_[k]);
-    
+
     // Pass integrator output to the output function
     output_fcn_.setInput(grid_[k],DAE_T);
     output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
     if(output_fcn_.input(DAE_YDOT).size()!=0)
       output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
-    output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
+    output_fcn_.input(DAE_P) = integrator_.input(INTEGRATOR_P);
 
     for(int dir=0; dir<nfdir; ++dir){
       // Pass the forward seed to the output function
@@ -121,9 +174,10 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_Y,dir);
       if(output_fcn_.input(DAE_YDOT).size()!=0)
         output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_YDOT,dir);
-      output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir);
+      output_fcn_.fwdSeed(DAE_P,dir)[np_i] = fwdSeed(SIMULATOR_P,dir);
+      output_fcn_.fwdSeed(DAE_P,dir)[nv_i] = fwdSeed(SIMULATOR_V,dir)(k_coarse,ALL);
     }
-    
+      
     // Evaluate output function
     output_fcn_.evaluate(nfdir,0);
 
