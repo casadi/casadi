@@ -1,5 +1,47 @@
 from casadi import *
+import copy
 
+def flatten(l):
+  return [i for i in iter_flatten(l)]
+ 
+def iter_flatten(iterable):
+  if isinstance(iterable,list):
+    for e in iterable:
+      if isinstance(e, (list, tuple)):
+        for f in iter_flatten(e):
+          yield f
+      else:
+        yield e
+  else:
+    yield iterable
+    
+def iter_flatten_mutator(iterable,mutator=lambda i,x:x,counter=0):
+  if isinstance(iterable,list):    
+    for i in range(len(iterable)):
+      e = iterable[i] 
+      if isinstance(e, (list, tuple)):
+        for c,f in iter_flatten_mutator(e,mutator,counter=counter):
+          counter = c
+          yield (counter,f)
+          counter+=1
+      else:
+        iterable[i] = mutator(counter,e)
+        yield (counter,e)
+        counter+=1
+  else:
+     yield (counter,iterable)
+     counter+=1 
+      
+# fun must a function mapping from (flatcounter, item) to item    
+def map_nested_list(fun,iterable):
+  if isinstance(iterable,list): 
+    ret = copy.deepcopy(iterable)
+    for j in iter_flatten_mutator(ret,fun):
+      pass
+    return ret
+  else:
+    return fun(0,iterable)
+ 
 class Variables(object):
     """
     A simple to use Variables container class
@@ -15,6 +57,7 @@ class Variables(object):
         """
           f.foo   returns the 'foo' entry in the variable dictionary 
           f.i_foo returns the IMatrix index 
+          f.iv_foo same as list(f.i_foo)
           f.I_foo returns the flat index
           f.o_foo returns the offset 
           f._foo  returns the foo attribute of the object f
@@ -29,6 +72,8 @@ class Variables(object):
             return self.getIndex(name[2:])
         if name.startswith('i_') and len(name)>2:
             return self.getindex(name[2:])
+        if name.startswith('iv_') and len(name)>2:
+            return list(self.getindex(name[2:]))
         if name.endswith('_'):
             if isinstance(self._d[name[:-1]],Variables):
                 raise Exception("Variable %s has no numerical value, because it is a Variables object itself." % name[:-1])
@@ -37,7 +82,7 @@ class Variables(object):
         if name in self._d:
           return self._d[name]
         else:
-          raise Exception("Variable " + name + " does not exist. Existing ones are: " + ",".join(getorder()))
+          raise Exception("Variable " + name + " does not exist. Existing ones are: " + ",".join(self.getOrder()))
            
     def __setattr__(self,name,value):
         """
@@ -61,27 +106,17 @@ class Variables(object):
             self._d_[name] = self.get_(value)
             
     def createParent(self):
-     
         self._V = msym("V[" + ",".join(self.getOrder()) + "]",self.getSize())
         for k in self.getOrder():
             obj = self._d[k]
             if isinstance(obj,Variables):
                 raise Exception("Not implemented")
-            elif isinstance(obj,list):
-                for i in range(len(obj)):
-                    obj[i] = self._V[getattr(self,'i_'+k)[i]]
-            else:
-                self._d[k] = self._V[getattr(self,'i_'+k)]  
+            i = flatten(getattr(self,'i_'+k))
+            self._d[k] = map_nested_list(lambda c,x: self._V[i[c]],obj)
    
             
     def get_(self,value):
-        if isinstance(value,list):
-            ret = []
-            for v in value:
-              ret.append(self.get_(v))
-            return ret
-        else:
-            return DMatrix(self.getSparsity(value),0)
+      return map_nested_list(lambda c,x: DMatrix(self.getSparsity(x),0),value)
             
     def doUpdates_(self,name):
       if isinstance(self._d[name],list):
@@ -92,47 +127,31 @@ class Variables(object):
         if not(name in self._d):
             raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self.getOrder()))
             
-        if isinstance(self._d[name],list):
-            offset = self.getOffset(name)[0]
-            ret = []
-            for v in self._d[name]:
-              s = self.getSize(v)
-              i = IMatrix(self.getSparsity(v),range(s))
-              ivec = vecNZ(i)
-              i[ivec] = IMatrix(range(offset,s+offset))
-              ret.append(i)
-              offset += s
-            obj = self._d[name]
+        offsets = flatten(self.getOffset(name))
+        return  map_nested_list(lambda c,x: self.getIMatrix(x,offsets[c]),self._d[name])
             
-            return ret
-        else:
-            offset = self.getOffset(name)
-            obj = self._d[name]
-            s = self.getSize(obj)
-            
-            i = IMatrix(self.getSparsity(obj),range(s))
-            ivec = vecNZ(i)
-            i[ivec] = IMatrix(range(offset,s+offset))
-            return i
+    def getIMatrix(self,obj,offset=0):
+      s = self.getSize(obj)
+      
+      i = IMatrix(self.getSparsity(obj),range(s))
+      ivec = vecNZ(i)
+      i[ivec] = IMatrix(range(offset,s+offset))
+      return i
             
     def getIndex(self,name):
         if not(name in self._d):
             raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self.getOrder()))
             
-        if isinstance(self._d[name],list):
-            offset = self.getOrder().index(name)
-            return range(offset,offset+len(self._d[name]))
-        else:
-            i = 0
-            for k in self.getOrder():
-               if k is name:
-                  break
-               if isinstance(self._d[k],list):
-                  i+=len(self._d[k])
-               else:
-                  i+=1
+        i = 0
+        for k in self.getOrder():
+           if k is name:
+              break
+           if isinstance(self._d[k],list):
+              i+=len(flatten(self._d[k]))
+           else:
+              i+=1 
 
-            return i
+        return map_nested_list(lambda c,x: c+i,self._d[name])
              
     def setOffset(self,value):
         self._offset = value
@@ -141,22 +160,19 @@ class Variables(object):
         if not(name in self._d):
             raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self.getOrder()))
         i = self._offset
-        if isinstance(self._d[name],list):
-          for k in self.getOrder():
-              if k == name:
-                  ret = []
-                  for v in self._d[name]:
-                    ret.append(i)
-                    i += self.getSize(v)
-                  return ret
-              else:
-                  i += self.getSize(self._d[k])
-        else:
-          for k in self.getOrder():
-              if k == name:
-                  return i
-              else:
-                  i += self.getSize(self._d[k])
+
+        for k in self.getOrder():
+            if k == name:
+                sizes = [self.getSize(v) for v in iter_flatten(self._d[name])]
+                offsets = [i] * (len(sizes)+1)
+                
+                for j in range(len(sizes)):
+                  offsets[j+1] = offsets[j]+sizes[j]
+                
+                return map_nested_list(lambda c,x: offsets[c],self._d[name])
+            else:
+                i += self.getSize(self._d[k])
+
         
     def getSize(self,ob = None):
         if isinstance(ob,Variables):
@@ -226,7 +242,7 @@ class Variables(object):
                   l.append(v)
             else:
                 l.append(self._d[k])
-        return veccat(l)
+        return veccat(flatten(l))
         
     def vecNZcat(self):
         """
@@ -244,7 +260,7 @@ class Variables(object):
                   l.append(v)
             else:
                 l.append(self._d[k])
-        return vecNZcat(l)
+        return vecNZcat(flatten(l))
 
     def vecNZcat_(self):
         """
@@ -260,7 +276,7 @@ class Variables(object):
                 l.append(vecNZcat(self._d_[k]))
             else:
                 l.append(self._d_[k])
-        return vecNZcat(l)
+        return vecNZcat(flatten(l))
         
     def veccat_(self):
         """
@@ -276,7 +292,7 @@ class Variables(object):
                 l+=self._d_[k]
             else:
                 l.append(self._d_[k])
-        return veccat(l)
+        return veccat(flatten(l))
         
     def __str__(self):
         keys = self.getOrder()
@@ -285,4 +301,9 @@ class Variables(object):
         for i,k in enumerate(keys):
             s+= ("%2d. " % i ) + k + " = " +  str(self._d[k]) + "\n"
         return s
+   
+    @property
+    def shape(self):
+       return (getNumel(),1)
+       
        

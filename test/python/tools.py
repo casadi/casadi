@@ -118,6 +118,35 @@ class Toolstests(casadiTestCase):
       print f.output()
       print p.veccat()
       
+      p = Variables()
+      p.a = ssym("a",2)
+      p.b = []
+      p.b.append(ssym("b1",3))
+      p.b.append(ssym("b2",3))
+      p.b.append([ssym("b3",3),ssym("b4",3)])
+      p.c = ssym("c")
+      
+      self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
+      self.checkarray(array(p.i_b[0]),DMatrix([[2],[3],[4]]),"index")
+      self.checkarray(array(p.i_b[1]),DMatrix([[5],[6],[7]]),"index")
+      self.checkarray(array(p.i_b[2][0]),DMatrix([[8],[9],[10]]),"index")
+      self.checkarray(array(p.i_b[2][1]),DMatrix([[11],[12],[13]]),"index")
+      self.checkarray(array(p.c),DMatrix(14),"index")
+
+      self.assertEqual(p.o_a,0,"Offset")
+      self.assertEqual(p.o_b[0],2,"Offset")
+      self.assertEqual(p.o_b[1],5,"Offset")
+      self.assertEqual(p.o_b[2][0],8,"Offset")
+      self.assertEqual(p.o_b[2][1],11,"Offset")
+      self.assertEqual(p.o_c,14,"Offset")
+      
+      self.assertEqual(p.I_a,0,"Index")
+      self.assertEqual(p.I_b[0],1,"Index")
+      self.assertEqual(p.I_b[1],2,"Index")
+      self.assertEqual(p.I_b[2][0],3,"Index")
+      self.assertEqual(p.I_b[2][1],4,"Index")
+      self.assertEqual(p.I_c,5,"Index")
+      
        
 
 if __name__ == '__main__':
