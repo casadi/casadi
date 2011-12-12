@@ -11,8 +11,5 @@ int main(int argc, char *argv[])
   std::cout << range(1,11,2) << std::endl;
   std::cout << range(1,11,2,5) << std::endl;
   
-  std::cout << range(1) << std::endl;
-  std::cout << range(0) << std::endl;
-  
   return 0;
 }
