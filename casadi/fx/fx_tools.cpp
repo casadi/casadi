@@ -25,6 +25,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
+#include "integrator.hpp"
 #include <iostream>
 
 using namespace std;
@@ -119,6 +120,42 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
   stream.setf(fmtflags_backup);
   stream.precision(streamsize_backup);
 }
+
+MXFunction parameterizeTime(FX &dae) {
+   casadi_warning("This piece of code lacks a unittest");
+   
+   // dimensionless time
+   MX tau("tau");
+   
+   // The dae parameters augmented with t0 and tf
+   MX P("P",2+dae.input(DAE_P).size());
+   MX t0 = P[0];
+   MX tf = P[1];
+   
+   std::vector<MX> dae_in(DAE_NUM_IN);
+   if (dae.input(DAE_T).size()==1) {
+     dae_in[DAE_T]    = t0 + (tf-t0)*tau;
+   }
+   dae_in[DAE_P]    = reshape(P[range(2,dae.input(DAE_P).size())],dae.input(DAE_P).sparsity());
+   dae_in[DAE_Y]    = dae.input(DAE_Y);
+   dae_in[DAE_YDOT] = dae.input(DAE_YDOT);
+
+   std::vector<MX> ret_in(DAE_NUM_IN);
+   ret_in[DAE_T]    = tau;
+   ret_in[DAE_P]    = P;
+   ret_in[DAE_Y]    = dae.input(DAE_Y);
+   ret_in[DAE_YDOT] = dae.input(DAE_YDOT);
+
+   std::vector<MX> ret_out(DAE_NUM_OUT);
+   ret_out[DAE_RES] = (tf-t0)*dae.call(dae_in)[0];
+   
+   MXFunction ret(ret_in,ret_out);
+   
+   if (dae.isInit()) ret.init();
+   
+   return ret;
+   
+ }
 
 
 } // namespace CasADi

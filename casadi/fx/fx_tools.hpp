@@ -24,6 +24,7 @@
 #define FX_TOOLS_HPP
 
 #include "fx.hpp"
+#include "mx_function.hpp"
 
 namespace CasADi{
 
@@ -42,6 +43,12 @@ namespace CasADi{
     */
     void reportConstraints(std::ostream &stream, const Matrix<double> &v, const Matrix<double> &lb, const Matrix<double> &ub, const std::string &name, double tol=1e-8);
 
+    /** \brief make integration start and end time a parameter
+    Applies the conversion  t = t0 + (tf-t0)*tau to the supplied dae.
+    with tau dimensionless time.
+    The Input/OuputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
+    */
+    MXFunction parameterizeTime(FX &dae);
                         
 } // namespace CasADi
 
