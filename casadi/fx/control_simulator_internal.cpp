@@ -20,7 +20,7 @@
  *
  */
 
-#include "piecewise_simulator_internal.hpp"
+#include "control_simulator_internal.hpp"
 #include "integrator_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "sx_function.hpp"
@@ -28,13 +28,13 @@
 #include "../mx/mx_tools.hpp"
 #include "fx_tools.hpp"
 
-INPUTSCHEME(PiecewiseSimulatorInput)
+INPUTSCHEME(ControlSimulatorInput)
 
 using namespace std;
 namespace CasADi{
 
   
-PiecewiseSimulatorInternal::PiecewiseSimulatorInternal(const FX& dae, const FX& output_fcn, const vector<double>& gridc) : dae_(dae), output_fcn_(output_fcn), gridc_(gridc){
+ControlSimulatorInternal::ControlSimulatorInternal(const FX& dae, const FX& output_fcn, const vector<double>& gridc) : dae_(dae), output_fcn_(output_fcn), gridc_(gridc){
   setOption("name","unnamed piecewise simulator");
   addOption("np",OT_INTEGER,GenericType(),"The number of parameters. If this option is not set, all of input(INTEGRATOR_P) is considered static parameters. The remainder of nv = input(INTEGRATOR_P) is considered to be varying parameters.");
   addOption("nf",OT_INTEGER,1,"Number of fine grained integration steps.");
@@ -42,10 +42,10 @@ PiecewiseSimulatorInternal::PiecewiseSimulatorInternal(const FX& dae, const FX& 
   addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
 }
   
-PiecewiseSimulatorInternal::~PiecewiseSimulatorInternal(){
+ControlSimulatorInternal::~ControlSimulatorInternal(){
 }
 
-void PiecewiseSimulatorInternal::init(){
+void ControlSimulatorInternal::init(){
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
@@ -224,7 +224,7 @@ void PiecewiseSimulatorInternal::init(){
   
 }
 
-void PiecewiseSimulatorInternal::evaluate(int nfdir, int nadir){
+void ControlSimulatorInternal::evaluate(int nfdir, int nadir){
 
   // Copy all inputs
   for (int i=0;i<input_.size();++i) {
@@ -263,7 +263,7 @@ void PiecewiseSimulatorInternal::evaluate(int nfdir, int nadir){
   
 }
 
-Matrix<double> PiecewiseSimulatorInternal::getVFine() const {
+Matrix<double> ControlSimulatorInternal::getVFine() const {
  	  Matrix<double> ret(grid_.size()-1,nv_,0);
  	  for (int i=0;i<ns_-1;++i) {
  	    for (int k=0;k<nf_;++k) {

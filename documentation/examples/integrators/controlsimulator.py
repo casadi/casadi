@@ -1,10 +1,10 @@
-#! PiecewiseSimulator
+#! ControlSimulator
 #! =====================
 from casadi import *
 from numpy import *
 from pylab import *
 
-#! The PiecewiseSimulator is typically used for dynamic systems with piecewise constant control.
+#! The ControlSimulator is typically used for dynamic systems with piecewise constant control.
 #! We consider a very system, an excitated linear spring 
 #! m x'' + c x' + k x = u(t) 
 	 
@@ -32,7 +32,7 @@ f.init()
 #! Choose a time grid, we will have 10-1 = 9 control intervals
 ts = linspace(0,50,10)
 
-sim=PiecewiseSimulator(f,ts)
+sim=ControlSimulator(f,ts)
 sim.setOption("integrator",CVodesIntegrator)
 
 #! Of the list [k,c,m,u] the first 3 are static parameters

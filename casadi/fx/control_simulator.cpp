@@ -20,42 +20,42 @@
  *
  */
 
-#include "piecewise_simulator.hpp"
-#include "piecewise_simulator_internal.hpp"
+#include "control_simulator.hpp"
+#include "control_simulator_internal.hpp"
 
 using namespace std;
 namespace CasADi{
 
-PiecewiseSimulator::PiecewiseSimulator(){
+ControlSimulator::ControlSimulator(){
 }
 
-PiecewiseSimulator::PiecewiseSimulator(const FX& dae, const FX& output_fcn, const vector<double>& grid){
-  assignNode(new PiecewiseSimulatorInternal(dae,output_fcn,grid));
+ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const vector<double>& grid){
+  assignNode(new ControlSimulatorInternal(dae,output_fcn,grid));
 }
 
-PiecewiseSimulator::PiecewiseSimulator(const FX& dae, const vector<double>& grid){
-  assignNode(new PiecewiseSimulatorInternal(dae,FX(),grid));
+ControlSimulator::ControlSimulator(const FX& dae, const vector<double>& grid){
+  assignNode(new ControlSimulatorInternal(dae,FX(),grid));
 }
 
-PiecewiseSimulatorInternal* PiecewiseSimulator::operator->(){
-  return (PiecewiseSimulatorInternal*)(FX::operator->());
+ControlSimulatorInternal* ControlSimulator::operator->(){
+  return (ControlSimulatorInternal*)(FX::operator->());
 }
 
-const PiecewiseSimulatorInternal* PiecewiseSimulator::operator->() const{
-   return (const PiecewiseSimulatorInternal*)(FX::operator->()); 
+const ControlSimulatorInternal* ControlSimulator::operator->() const{
+   return (const ControlSimulatorInternal*)(FX::operator->()); 
 }
 
-bool PiecewiseSimulator::checkNode() const{
-  return dynamic_cast<const PiecewiseSimulatorInternal*>(get())!=0;
+bool ControlSimulator::checkNode() const{
+  return dynamic_cast<const ControlSimulatorInternal*>(get())!=0;
 }
 
-std::vector<double> PiecewiseSimulator::getGrid() const { 
+std::vector<double> ControlSimulator::getGrid() const { 
  	  casadi_assert(checkNode()); 
- 	  return dynamic_cast<const PiecewiseSimulatorInternal*>(get())->grid_; 
+ 	  return dynamic_cast<const ControlSimulatorInternal*>(get())->grid_; 
 } 
 
-Matrix<double> PiecewiseSimulator::getVFine() const {
- 	  return dynamic_cast<const PiecewiseSimulatorInternal*>(get())->getVFine(); 
+Matrix<double> ControlSimulator::getVFine() const {
+ 	  return dynamic_cast<const ControlSimulatorInternal*>(get())->getVFine(); 
 }
 
 } // namespace CasADi

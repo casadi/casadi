@@ -20,15 +20,15 @@
  *
  */
 
-#ifndef PIECEWISE_SIMULATOR_HPP
-#define PIECEWISE_SIMULATOR_HPP
+#ifndef CONTROLSIMULATOR_HPP
+#define CONTROLSIMULATOR_HPP
 
 #include "integrator.hpp"
 
 namespace CasADi{
 
 /// Input arguments of an integrator
-enum PiecewiseSimulatorInput{
+enum ControlSimulatorInput{
   /** Differential or algebraic state at t0  (dimension nx-by-1) */
   PW_SIMULATOR_X0, 
   /** Parameters that are fixed over the entire horizon  (dimension np-by-1) */
@@ -43,19 +43,19 @@ enum PiecewiseSimulatorInput{
   PW_SIMULATOR_NUM_IN};
   
 // Forward declaration of internal class
-class PiecewiseSimulatorInternal;
+class ControlSimulatorInternal;
 
 /** \brief Piecewise Simulation class
   A "piecewise simulator" can be seen as a chain of Simulators whereby some parameters change from one Simulator to the next.
   
   These changing parameters can typically be intrepreted as "controls" in the context of dynamic optimization.
   
-  The PiecewiseSimulator starts from a suplied continuous dynamics function, dae.
+  The ControlSimulator starts from a suplied continuous dynamics function, dae.
   
   We discriminate between the following tim steps:
    * Coarse time-steps. These are the time steps provided by the supplied grid.
    * Fine time-steps. These are time steps linearly interpolated from one coarse time-step to the next. The option 'nf' regulates how many fine time-steps are taken.
-   * Integration time-steps. Time steps that the supplied integrator might choose to integrate the continous dynamics. They are not important what PiecewiseSimulator is concerned.
+   * Integration time-steps. Time steps that the supplied integrator might choose to integrate the continous dynamics. They are not important what ControlSimulator is concerned.
   
   We divide the set of parameters dae.input(DAE) into static and non-static, i.e. parameters that are fixed over the entire time horizon and parameters that change at each coarse time steps. This division is carried out by an integer scalar, option 'np', that denotes the number of static parameters.
   
@@ -78,11 +78,11 @@ class PiecewiseSimulatorInternal;
   \date 2011
 */
 
-class PiecewiseSimulator : public FX{
+class ControlSimulator : public FX{
 public:
 
   /// Default constructor 
-  PiecewiseSimulator();
+  ControlSimulator();
   
     /** \brief Creates a piecewise simulator
     * \param ffcn Continuous time dynamics, an CasADi::FX with the folowing mapping:
@@ -97,16 +97,16 @@ public:
     * \copydoc scheme_DAEInput
     * 
     */
-  PiecewiseSimulator(const FX& dae, const FX& output_fcn, const std::vector<double>& grid);
+  ControlSimulator(const FX& dae, const FX& output_fcn, const std::vector<double>& grid);
   
   /// Output function equal to the state
-  PiecewiseSimulator(const FX& dae, const std::vector<double>& grid);
+  ControlSimulator(const FX& dae, const std::vector<double>& grid);
 
   /// Access functions of the node.
-  PiecewiseSimulatorInternal* operator->();
+  ControlSimulatorInternal* operator->();
 
   /// Const access functions of the node.
-  const PiecewiseSimulatorInternal* operator->() const;
+  const ControlSimulatorInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
@@ -125,4 +125,4 @@ public:
   
 } // namespace CasADi
 
-#endif //PIECEWISE_SIMULATOR_HPP
+#endif //CONTROLSIMULATOR_HPP

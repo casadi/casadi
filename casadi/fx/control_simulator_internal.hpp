@@ -20,30 +20,30 @@
  *
  */
 
-#ifndef PIECEWISE_SIMULATOR_INTERNAL_HPP
-#define PIECEWISE_SIMULATOR_INTERNAL_HPP
+#ifndef CONTROLSIMULATOR_INTERNAL_HPP
+#define CONTROLSIMULATOR_INTERNAL_HPP
 
-#include "piecewise_simulator.hpp"
+#include "control_simulator.hpp"
 #include "simulator.hpp"
 #include "fx_internal.hpp"
 
 namespace CasADi{
 
-/** \brief PiecewiseSimulator data storage classs
+/** \brief ControlSimulator data storage classs
   \author Joel Andersson 
   \date 2010
 */
-class PiecewiseSimulatorInternal : public FXInternal{
+class ControlSimulatorInternal : public FXInternal{
 public:
   
   /** \brief  Constructor */
-  PiecewiseSimulatorInternal(const FX& dae, const FX& output_fcn, const std::vector<double>& gridc);
+  ControlSimulatorInternal(const FX& dae, const FX& output_fcn, const std::vector<double>& gridc);
   
   /** \brief  Destructor */
-  virtual ~PiecewiseSimulatorInternal();
+  virtual ~ControlSimulatorInternal();
   
   /** \brief  Clone */
-  virtual PiecewiseSimulatorInternal* clone() const{ return new PiecewiseSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
+  virtual ControlSimulatorInternal* clone() const{ return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
 
   /** \brief  initialize */
   virtual void init();
@@ -88,4 +88,4 @@ public:
   
 } // namespace CasADi
 
-#endif // PIECEWISE_SIMULATOR_INTERNAL_HPP
+#endif // CONTROLSIMULATOR_INTERNAL_HPP
