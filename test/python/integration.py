@@ -108,7 +108,7 @@ class Integrationtests(casadiTestCase):
       integrator.evaluate()
       
       self.assertAlmostEqual(integrator.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
-      
+    
       # Integrate with time offset
       integrator.input(INTEGRATOR_P).set([t0,tend,p])
       integrator.input(INTEGRATOR_X0).set([q0])
@@ -116,7 +116,9 @@ class Integrationtests(casadiTestCase):
       integrator.evaluate()
       
       self.assertAlmostEqual(integrator.output()[0],q0*exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
-      
+      if intf is IdasIntegrator:
+        self.assertAlmostEqual(integrator.output(INTEGRATOR_XPF)[0]/(tend-t0),(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,9,"Evaluation output mismatch")
+  
       
       # Forward sensitivity to q0
       integrator.input(INTEGRATOR_X0).set([q0])

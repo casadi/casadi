@@ -160,6 +160,43 @@ MXFunction parameterizeTime(FX dae) {
    return ret;
    
  }
+ 
+MXFunction parameterizeTimeOutput(FX f) {
+  // dimensionless time
+   MX tau("tau");
+   
+   // The f parameters augmented with t0 and tf
+   MX P("P",2+f.input(DAE_P).size());
+   MX t0 = P[0];
+   MX tf = P[1];
+   
+   std::vector<MX> f_in(DAE_NUM_IN);
+   std::vector<MX> f_input = f.symbolicInput();
+   
+   if (f.input(DAE_T).size()==1) {
+     f_in[DAE_T]    = t0 + (tf-t0)*tau;
+   }
+   
+   f_in[DAE_P]    = reshape(P[range(2,2+f.input(DAE_P).size())],f.input(DAE_P).sparsity());
+   f_in[DAE_Y]    = f_input[DAE_Y];
+   if (f.input(DAE_YDOT).size()>0) {
+     f_in[DAE_YDOT] = f_input[DAE_YDOT]/(tf-t0);
+   }
+
+   std::vector<MX> ret_in(DAE_NUM_IN);
+   ret_in[DAE_T]    = tau;
+   ret_in[DAE_P]    = P;
+   ret_in[DAE_Y]    = f_input[DAE_Y];
+   ret_in[DAE_YDOT] = f_input[DAE_YDOT];
+
+   MXFunction ret(ret_in,f.call(f_in));
+   
+   if (f.isInit()) ret.init();
+   
+   return ret;
+
+
+}
 
 
 } // namespace CasADi

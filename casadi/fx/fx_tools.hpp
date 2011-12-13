@@ -49,6 +49,13 @@ namespace CasADi{
     The Input/OuputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
     */
     MXFunction parameterizeTime(FX dae);
+    
+    /** \brief adapts an output function such that start and end time are parameters
+    Applies the conversion  t = t0 + (tf-t0)*tau to the supplied dae.
+    with tau dimensionless time.
+    The InputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
+    */
+    MXFunction parameterizeTimeOutput(FX outputfcn);
                         
 } // namespace CasADi
 

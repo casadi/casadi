@@ -66,9 +66,16 @@ void SimulatorInternal::init(){
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
   }
-
+  
   // Initialize the output function
   output_fcn_.init();
+  
+  // Check if the output function accepts correct inputs
+  for (int i=0;i<INTEGRATOR_NUM_IN;++i) {
+    if (output_fcn_.input(i+1).numel()!=0) {
+      casadi_assert_message(output_fcn_.input(i+1).sparsity()==integrator_.input(i).sparsity(),"Simulator:: the output function is wrong. Input #" << i+1 << " of the output function has shape " << output_fcn_.input(i+1).dimString() << ", while " << integrator_.input(i).dimString() << " was expected, which corresponds to input #" << i << " of the integrator.");
+    }
+  }
 
   // Allocate inputs
   input_.resize(INTEGRATOR_NUM_IN);

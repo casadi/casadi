@@ -42,3 +42,4 @@ plot(array(sim.output())[:,0],array(sim.output())[:,1])
 xlabel("u")
 ylabel("u_dot")
 show()
+
