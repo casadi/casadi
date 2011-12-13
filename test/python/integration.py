@@ -16,14 +16,17 @@ except:
 class Integrationtests(casadiTestCase):
 
   def setUp(self):
+    # Reference solution is q0 e^((t^3-t0^3)/(3 p))
     t=ssym("t")
     q=ssym("q")
     p=ssym("p")
+    dp=ssym("dp")
     f = DAE_NUM_IN * [[]]
     f[DAE_T] = t
     f[DAE_Y] = q
     f[DAE_P] = p
-    f=SXFunction(f,[q/p*t**2])
+    f[DAE_YDOT] = dp
+    f=SXFunction(f,[q/p*t**2-dp])
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -42,6 +45,7 @@ class Integrationtests(casadiTestCase):
     self.qend=qend
     self.q0=q0
     self.par=par
+    self.f = f
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
     
@@ -76,6 +80,103 @@ class Integrationtests(casadiTestCase):
     p=num['p']
 
     self.assertAlmostEqual(sim.output()[-1],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
+    
+  def test_parameterize_time(self):
+    self.message("parametrizeTime")
+    num=self.num
+    f = self.f
+    
+    f_ = parameterizeTime(f)
+    for intf in [CVodesIntegrator, IdasIntegrator]:
+      integrator = intf(parameterizeTime(f))
+      integrator.setOption("reltol",1e-15)
+      integrator.setOption("abstol",1e-15)
+      #integrator.setOption("verbose",True)
+      integrator.setOption("t0",0)
+      integrator.setOption("tf",1)
+      integrator.init()
+      
+      tend = num['tend']
+      p = num['p']
+      q0 = num['q0']
+      
+      t0 = 0.7
+      
+      integrator.input(INTEGRATOR_P).set([0,tend,p])
+      integrator.input(INTEGRATOR_X0).set([q0])
+      
+      integrator.evaluate()
+      
+      self.assertAlmostEqual(integrator.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+      
+      # Integrate with time offset
+      integrator.input(INTEGRATOR_P).set([t0,tend,p])
+      integrator.input(INTEGRATOR_X0).set([q0])
+      
+      integrator.evaluate()
+      
+      self.assertAlmostEqual(integrator.output()[0],q0*exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
+      
+      
+      # Forward sensitivity to q0
+      integrator.input(INTEGRATOR_X0).set([q0])
+      integrator.fwdSeed(INTEGRATOR_X0).set(1)
+      integrator.evaluate(1,0)
+      
+      self.assertAlmostEqual(integrator.fwdSens()[0],exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
+      
+      # Forward sensitivity to p
+      integrator.fwdSeed(INTEGRATOR_X0).set(0)
+      integrator.fwdSeed(INTEGRATOR_P).set([0,0,1])
+      integrator.evaluate(1,0)
+      
+      self.assertAlmostEqual(integrator.fwdSens()[0],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
+      
+      # Forward sensitivity to tf
+      integrator.fwdSeed(INTEGRATOR_X0).set(0)
+      integrator.fwdSeed(INTEGRATOR_P).set([0,1,0])
+      integrator.evaluate(1,0)
+      
+      self.assertAlmostEqual(integrator.fwdSens()[0],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+      
+      # Forward sensitivity to t0
+      integrator.fwdSeed(INTEGRATOR_X0).set(0)
+      integrator.fwdSeed(INTEGRATOR_P).set([1,0,0])
+      integrator.input(INTEGRATOR_P).set([t0,tend,p])
+      integrator.evaluate(1,0)
+      
+      self.assertAlmostEqual(integrator.fwdSens()[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+
+      if not(intf is IdasIntegrator):
+        # (*) IDAS backward sens seems to fail for somewhat small tolerances
+        integrator.adjSeed(INTEGRATOR_X0).set(1)
+        integrator.input(INTEGRATOR_P).set([t0,tend,p])
+        integrator.evaluate(0,1)
+
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_X0)[0],exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_P)[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_P)[1],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_P)[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+    
+      # (*) Try IDAS again with very low tolerances
+      if 0:
+        integrator = IdasIntegrator(f_)
+        integrator.setOption("reltol",1e-6)
+        integrator.setOption("abstol",1e-6)
+        integrator.setOption("t0",0)
+        integrator.setOption("tf",1)
+        integrator.init()
+        
+        integrator.adjSeed(INTEGRATOR_X0).set(1)
+        integrator.input(INTEGRATOR_X0).set([q0])
+        integrator.input(INTEGRATOR_P).set([t0,tend,p])
+        integrator.evaluate(0,1)
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_X0)[0],exp((tend**3-t0**3)/(3*p)),2,"Evaluation output mismatch")
+        print integrator.adjSens(INTEGRATOR_P)[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2)
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_P)[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),2,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_P)[1],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,2,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.adjSens(INTEGRATOR_P)[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,2,"Evaluation output mismatch")
+      
     
   def test_eval2(self):
     self.message('CVodes integration: evaluation with MXFunction indirection')

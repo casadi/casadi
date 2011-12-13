@@ -48,7 +48,7 @@ namespace CasADi{
     with tau dimensionless time.
     The Input/OuputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
     */
-    MXFunction parameterizeTime(FX &dae);
+    MXFunction parameterizeTime(FX dae);
                         
 } // namespace CasADi
 

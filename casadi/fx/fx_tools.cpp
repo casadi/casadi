@@ -121,9 +121,8 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
   stream.precision(streamsize_backup);
 }
 
-MXFunction parameterizeTime(FX &dae) {
-   casadi_warning("This piece of code lacks a unittest");
-   
+MXFunction parameterizeTime(FX dae) {
+
    // dimensionless time
    MX tau("tau");
    
@@ -133,18 +132,23 @@ MXFunction parameterizeTime(FX &dae) {
    MX tf = P[1];
    
    std::vector<MX> dae_in(DAE_NUM_IN);
+   std::vector<MX> dae_input = dae.symbolicInput();
+   
    if (dae.input(DAE_T).size()==1) {
      dae_in[DAE_T]    = t0 + (tf-t0)*tau;
    }
-   dae_in[DAE_P]    = reshape(P[range(2,dae.input(DAE_P).size())],dae.input(DAE_P).sparsity());
-   dae_in[DAE_Y]    = dae.input(DAE_Y);
-   dae_in[DAE_YDOT] = dae.input(DAE_YDOT);
+   
+   dae_in[DAE_P]    = reshape(P[range(2,2+dae.input(DAE_P).size())],dae.input(DAE_P).sparsity());
+   dae_in[DAE_Y]    = dae_input[DAE_Y];
+   if (dae.input(DAE_YDOT).size()>0) {
+     dae_in[DAE_YDOT] = dae_input[DAE_YDOT]/(tf-t0);
+   }
 
    std::vector<MX> ret_in(DAE_NUM_IN);
    ret_in[DAE_T]    = tau;
    ret_in[DAE_P]    = P;
-   ret_in[DAE_Y]    = dae.input(DAE_Y);
-   ret_in[DAE_YDOT] = dae.input(DAE_YDOT)/(tf-t0);
+   ret_in[DAE_Y]    = dae_input[DAE_Y];
+   ret_in[DAE_YDOT] = dae_input[DAE_YDOT];
 
    std::vector<MX> ret_out(DAE_NUM_OUT);
    ret_out[DAE_RES] = (tf-t0)*dae.call(dae_in)[0];
