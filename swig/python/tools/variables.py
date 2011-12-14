@@ -192,7 +192,7 @@ class Variables(object):
         else:
             return 1
         
-    def getNumel(self):
+    def getNumel(self,ob = None):
         if isinstance(ob,Variables):
             return ob.getNumel()
         elif hasattr(ob,'numel'):
@@ -304,6 +304,6 @@ class Variables(object):
    
     @property
     def shape(self):
-       return (getNumel(),1)
+       return (self.getNumel(),1)
        
        
