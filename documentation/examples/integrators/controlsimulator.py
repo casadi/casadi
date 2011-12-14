@@ -40,10 +40,10 @@ sim.setOption("np",3)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input(PW_SIMULATOR_X0).set([0,0])
-sim.input(PW_SIMULATOR_P).set([1,0.1,1])
+sim.input(CONTROLSIMULATOR_X0).set([0,0])
+sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input(PW_SIMULATOR_V).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.input(CONTROLSIMULATOR_V).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
 sim.evaluate()
 
 #! Obtain the fine time grid
@@ -55,7 +55,7 @@ xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts[:-1],array(sim.input(PW_SIMULATOR_V))[:,0],'o') # Sampled on the coarse grid
+plot(ts[:-1],array(sim.input(CONTROLSIMULATOR_V))[:,0],'o') # Sampled on the coarse grid
 plot(tsf[:-1],array(sim.getVFine())[:,0],'.')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 show()

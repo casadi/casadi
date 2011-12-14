@@ -30,17 +30,17 @@ namespace CasADi{
 /// Input arguments of an integrator
 enum ControlSimulatorInput{
   /** Differential or algebraic state at t0  (dimension nx-by-1) */
-  PW_SIMULATOR_X0, 
+  CONTROLSIMULATOR_X0, 
   /** Parameters that are fixed over the entire horizon  (dimension np-by-1) */
-  PW_SIMULATOR_P, 
+  CONTROLSIMULATOR_P, 
   /** Parameters that change over the integration intervals (dimension (ns-1)-by-nv) */
-  PW_SIMULATOR_V, 
+  CONTROLSIMULATOR_V, 
   /** State derivative at t0  (dimension nx-by-1)
   * Only relevant for implicit integrators.
   */
-  PW_SIMULATOR_XP0, 
+  CONTROLSIMULATOR_XP0, 
   /** Number of input arguments of a piecewise simulator */
-  PW_SIMULATOR_NUM_IN};
+  CONTROLSIMULATOR_NUM_IN};
   
 // Forward declaration of internal class
 class ControlSimulatorInternal;

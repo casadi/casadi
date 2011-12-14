@@ -47,6 +47,9 @@ ControlSimulatorInternal::~ControlSimulatorInternal(){
 
 void ControlSimulatorInternal::init(){
 
+  // Initialize dae if necessary
+  if (!dae_.isInit()) dae_.init();
+ 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
   integrator_ = integrator_creator(parameterizeTime(dae_),FX());
@@ -83,7 +86,7 @@ void ControlSimulatorInternal::init(){
   if (hasSetOption("np")) {
     np_ = getOption("np");
     casadi_assert_message(np_<=dae_.input(DAE_P).size(),"Invalid parameter. np (" << np_ << ") cannot be greater that dae.input(DAE_P), which is of size " << dae_.input(DAE_P).size() << ".");
-    casadi_assert_message(np_>0,"Invalid parameter. np (" << np_ << ") must be greater than zero.");
+    casadi_assert_message(np_>=0,"Invalid parameter. np (" << np_ << ") must be greater than or equal to zero.");
     nv_ = dae_.input(DAE_P).size() - np_;
   } else {
     np_ = dae_.input(DAE_P).size();
@@ -145,11 +148,11 @@ void ControlSimulatorInternal::init(){
   simulator_.init();
   
   // Allocate inputs
-  input_.resize(PW_SIMULATOR_NUM_IN);
-  input(PW_SIMULATOR_X0)  = dae_.input(DAE_Y);
-  input(PW_SIMULATOR_P)   = dae_.input(DAE_P)[range(np_)];
-  input(PW_SIMULATOR_V)   = repmat(integrator_.input(INTEGRATOR_P)[range(np_,np_+nv_)],ns_-1,1);
-  input(PW_SIMULATOR_XP0) = dae_.input(DAE_YDOT);
+  input_.resize(CONTROLSIMULATOR_NUM_IN);
+  input(CONTROLSIMULATOR_X0)  = dae_.input(DAE_Y);
+  input(CONTROLSIMULATOR_P)   = dae_.input(DAE_P)[range(np_)];
+  input(CONTROLSIMULATOR_V)   = trans(repmat(integrator_.input(INTEGRATOR_P)[range(np_,np_+nv_)],1,ns_-1));
+  input(CONTROLSIMULATOR_XP0) = dae_.input(DAE_YDOT);
 
   // Allocate outputs
   output_.resize(output_fcn_->output_.size()-2);
@@ -161,17 +164,17 @@ void ControlSimulatorInternal::init(){
   
   
   // Variables on which the chain of simulator calls (all_output_) depend
-  MX Xk("Xk", input(PW_SIMULATOR_X0).size());
-  MX XPk("XPk", input(PW_SIMULATOR_XP0).size());
-  MX P("P",input(PW_SIMULATOR_P).size());
-  MX V("V",input(PW_SIMULATOR_V).sparsity());
+  MX Xk("Xk", input(CONTROLSIMULATOR_X0).size());
+  MX XPk("XPk", input(CONTROLSIMULATOR_XP0).size());
+  MX P("P",input(CONTROLSIMULATOR_P).size());
+  MX V("V",input(CONTROLSIMULATOR_V).sparsity());
  
   // Group these variables as an input list for all_output_
-  vector<MX> all_output_in(PW_SIMULATOR_NUM_IN);
-  all_output_in[PW_SIMULATOR_X0] = Xk;
-  all_output_in[PW_SIMULATOR_XP0] = XPk;
-  all_output_in[PW_SIMULATOR_P] = P;
-  all_output_in[PW_SIMULATOR_V] = V;
+  vector<MX> all_output_in(CONTROLSIMULATOR_NUM_IN);
+  all_output_in[CONTROLSIMULATOR_X0] = Xk;
+  all_output_in[CONTROLSIMULATOR_XP0] = XPk;
+  all_output_in[CONTROLSIMULATOR_P] = P;
+  all_output_in[CONTROLSIMULATOR_V] = V;
   
   // Placeholder with which simulator.input(INTEGRATOR_P) will be fed [t0 tf pfixed pvariable]
   vector<MX> P_eval(4);
@@ -191,7 +194,7 @@ void ControlSimulatorInternal::init(){
     simulator_in[INTEGRATOR_XP0] = XPk;
     P_eval[0] = MX(gridc_[k]);
     P_eval[1] = MX(gridc_[k+1]);
-    P_eval[3] = V(k,range(V.size2()));
+    P_eval[3] = trans(V(k,range(nv_)));
     simulator_in[INTEGRATOR_P] = vertcat(P_eval);
     
     simulator_out = simulator_.call(simulator_in);
@@ -267,7 +270,7 @@ Matrix<double> ControlSimulatorInternal::getVFine() const {
  	  Matrix<double> ret(grid_.size()-1,nv_,0);
  	  for (int i=0;i<ns_-1;++i) {
  	    for (int k=0;k<nf_;++k) {
- 	      copy(input(PW_SIMULATOR_V).data().begin()+i*nv_,input(PW_SIMULATOR_V).data().begin()+(i+1)*nv_,ret.begin()+i*nv_*nf_+k);
+ 	      copy(input(CONTROLSIMULATOR_V).data().begin()+i*nv_,input(CONTROLSIMULATOR_V).data().begin()+(i+1)*nv_,ret.begin()+i*nv_*nf_+k);
  	    }
  	  }
  	  return ret;
