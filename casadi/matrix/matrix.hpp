@@ -859,7 +859,11 @@ void Matrix<T>::setSub(const Matrix<int>& i, const std::vector<int>& jj, const M
     return;
   }
   
-  casadi_assert(el.size() == jj.size()*i.size());
+  CRSSparsity result_sparsity = repmat(i,1,jj.size()).sparsity();
+  
+  
+  casadi_assert_message(result_sparsity == el.sparsity(),"setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size() << "),Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix,1," << jj.size() << ") = " << result_sparsity.dimString()  << " must match the sparsity of Matrix<T> = "  << el.dimString() << ".");
+  
   
   std::vector<int> slice_i = range(i.size1());
   
@@ -881,7 +885,10 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const Matrix<int>& j, const M
     return;
   }
   
-  casadi_assert(el.size() == ii.size()*j.size());
+  CRSSparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
+  
+  
+  casadi_assert_message(result_sparsity == el.sparsity(),"setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString() << ",Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix," << ii.size() << ",1) = " << result_sparsity.dimString() << " must match the sparsity of Matrix<T> = " << el.dimString() << ".");
   
   std::vector<int> slice_j = range(j.size2());
   
