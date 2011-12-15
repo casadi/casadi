@@ -117,6 +117,13 @@ void IdasInternal::init(){
   setDimensions(ny_+nq_,np);
   ncheck_ = 0;
 
+  // States and RES should match 
+  casadi_assert_message(f_.output(DAE_RES).size()==f_.input(DAE_Y).size(),
+   "IntegratorInternal: residual of DAE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" <<
+   "              DAE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << 
+   "Dimension mismatch"
+  );
+  
   // Call the base class init
   IntegratorInternal::init();
   log("IdasInternal::init","begin");
