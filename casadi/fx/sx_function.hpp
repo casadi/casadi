@@ -149,6 +149,14 @@ public:
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
   
+#ifndef SWIG 
+  /// Construct a function that has only the k'th output
+  SXFunction operator[](int k) const;
+#endif //SWIG 
+
+SXFunction indexed_one_based(int k) const{ return operator[](k-1);}
+SXFunction indexed_zero_based(int k) const{ return operator[](k);}
+
 };
 
 } // namespace CasADi

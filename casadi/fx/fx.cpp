@@ -22,6 +22,7 @@
 
 #include "fx_internal.hpp"
 #include "../mx/evaluation.hpp"
+#include "../fx/mx_function.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
@@ -267,6 +268,31 @@ std::vector<MX> FX::symbolicInput() const{
 
 std::vector<SXMatrix> FX::symbolicInputSX() const{
   return (*this)->symbolicInputSX();
+}
+
+FX FX::operator[](int k) const {
+
+  // Argument checking
+  if (k<0) k+=getNumOutputs();
+  casadi_assert_message(k<getNumOutputs(),"FX[int k]:: Attempt to select the k'th output with k=" << k << ", but should be smaller or equal to number of outputs (" << getNumOutputs() << ").");
+  
+  // Get the inputs in MX form
+  std::vector< MX > in = symbolicInput();
+  
+  // Clone such that we can use const.
+  FX clone = *this;
+  
+  // Get the outputs
+  std::vector< MX > result = clone.call(in);
+  
+  // Construct an MXFunction with only the k'th output
+  MXFunction ret(in,result[k]);
+  
+  // Initialize it
+  ret.init();
+  
+  // And return it, will automatically cast to FX
+  return ret;
 }
 
 #if 0

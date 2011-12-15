@@ -20,6 +20,14 @@
 #include "casadi/fx/xfunction_tools.hpp"
 %}
 
+#ifdef SWIGOCTAVE
+%rename(__paren__) indexed_one_based;
+#endif
+
+#ifdef SWIGPYTHON
+%rename(__getitem__) indexed_zero_based;
+#endif
+
 %include "casadi/fx/function_io.hpp"
 %include "casadi/fx/fx.hpp"
 %include "casadi/fx/jacobian.hpp"

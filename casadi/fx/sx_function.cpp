@@ -188,6 +188,22 @@ SXFunction::SXFunction(const MXFunction& f){
   assignNode(t.get());
 }
 
+SXFunction SXFunction::operator[](int k) const {
+
+  // Delegate to FX
+  MXFunction temp = shared_cast<MXFunction>(shared_cast<FX>(*this)[k]);
+  
+  casadi_assert(!temp.isNull());
+  
+  // Expand to SXFunction
+  SXFunction ret = temp.expand(inputsSX());
+
+  ret.init();
+
+  return ret;
+}
+
+
 
 
 } // namespace CasADi

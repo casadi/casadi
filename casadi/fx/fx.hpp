@@ -157,6 +157,14 @@ class FX : public OptionsFunctionality{
 
   /// Generate the sparsity of a Jacobian block
   void setJacSparsity(const CRSSparsity& sp, int iind, int oind);
+  
+#ifndef SWIG 
+  /// Construct a function that has only the k'th output
+  FX operator[](int k) const;
+#endif //SWIG 
+
+  FX indexed_one_based(int k) const{ return operator[](k-1);}
+  FX indexed_zero_based(int k) const{ return operator[](k);}
 
 //#ifndef SWIG
 #if 0
