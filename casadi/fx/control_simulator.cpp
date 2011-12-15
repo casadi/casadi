@@ -58,5 +58,9 @@ Matrix<double> ControlSimulator::getVFine() const {
  	  return dynamic_cast<const ControlSimulatorInternal*>(get())->getVFine(); 
 }
 
+std::vector<int> ControlSimulator::getCoarseIndex() const {
+ 	  return dynamic_cast<const ControlSimulatorInternal*>(get())->getCoarseIndex(); 
+}
+
 } // namespace CasADi
 

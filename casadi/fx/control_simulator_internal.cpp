@@ -276,6 +276,11 @@ Matrix<double> ControlSimulatorInternal::getVFine() const {
  	  return ret;
 }
 
+std::vector< int > ControlSimulatorInternal::getCoarseIndex() const {
+   return range(0,grid_.size(),nf_);
+}
+ 	
+
 } // namespace CasADi
 
 

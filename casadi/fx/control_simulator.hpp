@@ -121,6 +121,11 @@ public:
   */
  	Matrix<double> getVFine() const; 
  	
+ 	
+ 	/** \brief Get the index i such that gridfine[i] == gridcoarse 
+  */
+ 	std::vector< int > getCoarseIndex() const; 
+ 	
 };
   
 } // namespace CasADi

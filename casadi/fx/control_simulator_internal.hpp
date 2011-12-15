@@ -53,6 +53,11 @@ public:
   
   /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
  	Matrix<double> getVFine() const; 
+ 	
+ 	/** \brief Get the index i such that gridfine[i] == gridcoarse 
+  */
+ 	std::vector< int > getCoarseIndex() const; 
+ 	
 
   Integrator integrator_;
   FX dae_;
