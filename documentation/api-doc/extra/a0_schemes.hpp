@@ -29,25 +29,14 @@
 <tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Input
+/** \defgroup scheme_ControlSimulatorInput
 <table>
-<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
+<caption>Input scheme: CasADi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_T</td><td></td></tr>
-<tr><td>MUSCOD_FCN_XD</td><td></td></tr>
-<tr><td>MUSCOD_FCN_XA</td><td></td></tr>
-<tr><td>MUSCOD_FCN_U</td><td></td></tr>
-<tr><td>MUSCOD_FCN_P</td><td></td></tr>
-</table>
-*/
-/** \defgroup scheme_DAEInput
-<table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
+<tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1)</td></tr>
+<tr><td>CONTROLSIMULATOR_V</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nv)</td></tr>
+<tr><td>CONTROLSIMULATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit integrators.</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPInput
@@ -61,6 +50,16 @@
 <tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf.</td></tr>
 <tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers initial guess (m x 1)</td></tr>
 <tr><td>NLP_P</td><td>Static parameters on which the objective and constraints might depend.</td></tr>
+</table>
+*/
+/** \defgroup scheme_DAEInput
+<table>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
+<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
+<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
@@ -113,6 +112,17 @@
 <tr><td>ACADO_UBC</td><td></td></tr>
 <tr><td>ACADO_LBR</td><td></td></tr>
 <tr><td>ACADO_UBR</td><td></td></tr>
+</table>
+*/
+/** \defgroup scheme_MUSCOD_FCN_Input
+<table>
+<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>MUSCOD_FCN_T</td><td></td></tr>
+<tr><td>MUSCOD_FCN_XD</td><td></td></tr>
+<tr><td>MUSCOD_FCN_XA</td><td></td></tr>
+<tr><td>MUSCOD_FCN_U</td><td></td></tr>
+<tr><td>MUSCOD_FCN_P</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_OCPOutput
@@ -446,6 +456,16 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
+*/
+/** \class CasADi::ControlSimulatorInternal
+\n
+\par
+@copydoc scheme_ControlSimulatorInput
+*/
+/** \class CasADi::ControlSimulator
+\n
+\par
+@copydoc scheme_ControlSimulatorInput
 */
 /** \class CasADi::GSL::GslInternal
 \n
