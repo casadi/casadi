@@ -56,6 +56,26 @@ namespace CasADi{
     The InputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
     */
     MXFunction parameterizeTimeOutput(FX outputfcn);
+    
+    /** \brief sample a function on a 1D grid
+    * \param fx an initialized function mapping from single 1-by-1 to single m-by-n
+    * \param a grid of numbers
+    *
+    *  For each point in the grid, fx is numerically evaluated and the output is put in a matrix
+    *
+    * If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
+    */
+    Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid);
+    
+    /** \brief sample a function on a 2D grid
+    * \param fx an initialized function mapping from (1-by-1,1-by-1) to single m-by-n
+    * \param a grid of numbers
+    *
+    *  For each point (i,j) in the grid, fx is numerically evaluated and the output is put in a matrix
+    *
+    *  If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
+    */
+    Matrix<double> numSample2D(FX &fx, const Matrix<double> &grid);
                         
 } // namespace CasADi
 

@@ -198,6 +198,29 @@ MXFunction parameterizeTimeOutput(FX f) {
 
 }
 
+Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid) {
+  // Can be parallelized
+  casadi_assert_message(grid.size1()==1 || grid.size2()==1,"numSample1D:: supplied grid must be vectorlike. You supplied a shape " << grid.dimString());
+  casadi_assert_message(fx.isInit(),"numSample1D:: supplied function must be initialized.");
+  casadi_assert_message(fx.getNumInputs()>=1,"numSample1D:: supplied function must have at least one input.");
+  casadi_assert_message(fx.input().dense() && fx.input().size()==1,"numSample1D:: supplied function must have a first input with 1-by-1 shape. The function you supplied has " << fx.input().dimString() << " as fist argument shape.");
+  std::vector< Matrix<double> > ret(grid.size());
+  for (int k=0;k<grid.size();++k) {
+    fx.input().set(grid[k]);
+    fx.evaluate();
+    ret[k] = Matrix<double>(fx.output());
+  }
+  if (grid.size2()==1) {
+    return vertcat(ret);
+  } else {
+    return horzcat(ret);
+  }
+}
+    
+Matrix<double> numSample2D(FX &fx, const Matrix<double> &grid) {
+  casadi_error("Not implemented yet");
+}
+
 
 } // namespace CasADi
 
