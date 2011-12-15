@@ -58,14 +58,24 @@ namespace CasADi{
     MXFunction parameterizeTimeOutput(FX outputfcn);
     
     /** \brief sample a function on a 1D grid
-    * \param fx an initialized function mapping from single 1-by-1 to single m-by-n
-    * \param a grid of numbers
+    * \param fx an initialized function mapping from single p-by-1 to single m-by-n
+    * \param a grid of numbers p-by-N
     *
-    *  For each point in the grid, fx is numerically evaluated and the output is put in a matrix
+    *  For each column in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m-by-n*p
     *
     * If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
     */
     Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid);
+    
+    /** \brief sample a function on a 1D grid
+    * \param fx an initialized function mapping from single p-by-1 to single m-by-n
+    * \param a grid of numbers p-by-N
+    *
+    *  For each column in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m*p-by-n
+    *
+    * If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
+    */
+    Matrix<double> numSample1DT(FX &fx, const Matrix<double> &grid);
     
     /** \brief sample a function on a 2D grid
     * \param fx an initialized function mapping from (1-by-1,1-by-1) to single m-by-n

@@ -200,23 +200,24 @@ MXFunction parameterizeTimeOutput(FX f) {
 
 Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid) {
   // Can be parallelized
-  casadi_assert_message(grid.size1()==1 || grid.size2()==1,"numSample1D:: supplied grid must be vectorlike. You supplied a shape " << grid.dimString());
   casadi_assert_message(fx.isInit(),"numSample1D:: supplied function must be initialized.");
   casadi_assert_message(fx.getNumInputs()>=1,"numSample1D:: supplied function must have at least one input.");
-  casadi_assert_message(fx.input().dense() && fx.input().size()==1,"numSample1D:: supplied function must have a first input with 1-by-1 shape. The function you supplied has " << fx.input().dimString() << " as fist argument shape.");
-  std::vector< Matrix<double> > ret(grid.size());
-  for (int k=0;k<grid.size();++k) {
-    fx.input().set(grid[k]);
+  casadi_assert_message(fx.input().size2()==1, "numSample1D:: supplied fx must have a column-matrix-like first input, but you supplied a shape " << fx.input().dimString() << ".");
+  casadi_assert_message(fx.input().dense()==1, "numSample1D:: supplied fx must have dense input, but you supplied " << fx.input().dimString() << ".");
+  casadi_assert_message(grid.size1()==fx.input().size1(), "numSample1D:: supplied grid has a shape " << grid.dimString() << ", but the column size does not match the column size of the supplied fx first input, which is " << fx.input().dimString() << ".");
+  std::vector< Matrix<double> > ret(grid.size2());
+  for (int j=0;j<grid.size2();++j) {
+    fx.input().set(grid(ALL,j));
     fx.evaluate();
-    ret[k] = Matrix<double>(fx.output());
+    ret[j] = Matrix<double>(fx.output());
   }
-  if (grid.size2()==1) {
-    return vertcat(ret);
-  } else {
-    return horzcat(ret);
-  }
+  return horzcat(ret);
 }
     
+Matrix<double> numSample1DT(FX &fx, const Matrix<double> &grid) {
+  casadi_error("Not implemented yet");
+}
+
 Matrix<double> numSample2D(FX &fx, const Matrix<double> &grid) {
   casadi_error("Not implemented yet");
 }
