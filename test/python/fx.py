@@ -207,6 +207,23 @@ class FXtests(casadiTestCase):
     B = DMatrix(1,2,2)
     self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0))
     
+  def test_issue304(self):
+    self.message("regression test for #304") # this code used to segfault
+    x = SX("x")
+
+    f = SXFunction([x],[x**2,x**3])
+    f.init()
+
+    X = [MX("X")]
+
+    z=f.call(X)
+
+    g = MXFunction(X,[z[0]])
+    g.init()
+
+    g.expand([x])
+
+
       
 if __name__ == '__main__':
     unittest.main()

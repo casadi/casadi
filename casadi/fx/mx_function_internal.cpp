@@ -1043,12 +1043,13 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
 }
 
 void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants){
-  
+
   // Create a work array
   vector<SXMatrix> swork(work.size());
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
     for(int i=0; i<it->i_res.size(); ++i){
-      swork[it->i_res[i]] = SXMatrix(it->mx->sparsity(i));
+      if (it->i_res[i]>=0)
+        swork[it->i_res[i]] = SXMatrix(it->mx->sparsity(i));
     }
   }
   
