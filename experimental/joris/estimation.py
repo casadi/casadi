@@ -135,7 +135,7 @@ dLm = numSample1D(dL,DMatrix(tau_root).T)  # d-by-d
 
 optvar = Variables()  # Decision variables we optimize for
 
-X   = optvar.X   = [ ssym("X", states.shape[0],d) for i in range(nk+1) ]
+X   = optvar.X   = [ ssym("X", states.shape[0],d) for i in range(nk) ]
 
 par = Variables()  # Fixed parameters for the nlp
 par.IMU   = ssym("imu",reference_imu.shape)  # IMU measurements
@@ -170,7 +170,7 @@ g.init()
 J = g.jac(0,0)
 
 # Objective function
-f = sumAll( (horzcat([i[states.i_X,0] for i in optvar.X]).T -par.Xref)**2 )
+f = sumAll( (horzcat([i[states.i_X,0] for i in optvar.X] + [optvar.X[-1][states.i_X,-1]]).T -par.Xref)**2 )
 f = SXFunction([optvar.veccat(),par.veccat()],[f])
 f.init()
 
@@ -209,18 +209,18 @@ class NLPSolutionInspector:
     
     if hasattr(self,'xlines'):
         for i in range(3):
-            self.xlines[i].set_ydata(X_opt[i,:-d].T)
+            self.xlines[i].set_ydata(X_opt[i,:].T)
         for i in range(R_opt.shape[0]):   
-            self.rlines[i].set_ydata(R_opt[i,:-d].T)
+            self.rlines[i].set_ydata(R_opt[i,:].T)
     else:
         subplot(311)
         self.xlines = []
         self.rlines = []
         for i in range(reference_Xf.shape[1]):
-          self.xlines.append(plot(tsc,X_opt[i,:-d].T,'-'+self.colors[i])[0])
+          self.xlines.append(plot(tsc,X_opt[i,:].T,'-'+self.colors[i])[0])
         subplot(312)
         for i in range(reference_Rf.shape[1]):
-          self.rlines.append(plot(tsc,R_opt[i,:-d].T,'-'+self.colors[i])[0])
+          self.rlines.append(plot(tsc,R_opt[i,:].T,'-'+self.colors[i])[0])
         
     if hasattr(self,'obj'):
         for i in range(4):
@@ -250,7 +250,7 @@ nlp.setOption('tol',1e-8)
 nlp.init()
 
 nlp.solve()
-for i in range(nk+1):  # intialize with (0,0,0,1) quaternion
+for i in range(nk):  # intialize with (0,0,0,1) quaternion
   nlp.input(NLP_X_INIT)[optvar.i_X[i][states.i_q[3],:]] = 1
 nlp.input(NLP_P).set(par.veccat_())
 nlp.input(NLP_LBG).setAll(0)
