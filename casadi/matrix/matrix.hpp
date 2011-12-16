@@ -1646,11 +1646,19 @@ void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
 
 template<class T>
 void Matrix<T>::set(const Matrix<T>& val, Sparsity sp){
+  if (!((size1()==0 || size2()==0) && (val.size1()==0 || val.size2()==0))) {
+    casadi_assert_message(size1()==val.size1() && size2()==val.size2(),"Matrix<T>::set(Imatrix): shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val.dimString() << ".");
+  }
+  //casadi_assert_message(val.sparsity()==sparsity(),"Matrix<T>::set(Imatrix): sparsity mismatch. Lhs is matrix of shape " << dimString() << ", while rhs is shape " << val.dimString() << ".");
   set(val.data(),sp);
 }
 
 template<class T>
 void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
+  if (!((size1()==0 || size2()==0) && (val.size1()==0 || val.size2()==0))) {
+    casadi_assert_message(size1()==val.size1() && size2()==val.size2(),"Matrix<T>::get(Imatrix): shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val.dimString() << ".");
+  }
+  //casadi_assert_message(val.sparsity()==sparsity(),"Matrix<T>::get(Imatrix): sparsity mismatch. Lhs is matrix of shape " << dimString() << ", while rhs is shape " << val.dimString() << ".");
   get(val.data(),sp);
 }
 
