@@ -774,7 +774,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>&
   for (int i=0;i<ii.size();++i) {
     Matrix<T> m = k;
     for (int j=0;j<m.size();++j) {
-      m.data()[j] = elem(i,k.at(j));
+      m.data()[j] = elem(ii.at(i),k.at(j));
     }
     temp.push_back(m);
   }
@@ -790,7 +790,7 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& 
   for (int j=0;j<jj.size();++j) {
     Matrix<T> m = k;
     for (int i=0;i<m.size();++i) {
-      m.data()[i] = elem(k.at(i),j);
+      m.data()[i] = elem(k.at(i),jj.at(j));
     }
     temp.push_back(m);
   }

@@ -167,9 +167,9 @@ class Matrixtests(casadiTestCase):
     
     self.assertRaises(Exception, lambda : F[:,A])
     
-    B = DMatrix(4,3)
+    self.checkarray(B[A,1],DMatrix([[2,8],[2,5]]),"B[A,1]")
     
-    print B[:,A]
+    self.checkarray(B[1,A],DMatrix([[4,6],[4,5]]),"B[1,A]")
     
   def test_IMatrix_index_slice_assignment(self):
     self.message("IMatrix combined with slice assignment")
@@ -260,6 +260,22 @@ class Matrixtests(casadiTestCase):
     C = DMatrix(3,4)
     C[A,B] = C_
     self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
+
+  def test_index_setting(self):
+    self.message("index setting")
+    B = DMatrix([1,2,3,4,5])
+    
+    B[0] = 8
+    self.checkarray(B,DMatrix([8,2,3,4,5]),"index setting")
+    B[1,0] = 4
+    self.checkarray(B,DMatrix([8,4,3,4,5]),"index setting")
+    B[:,0] = 7
+    self.checkarray(B,DMatrix([7,7,7,7,7]),"index setting")
+    #B[0].set(3)
+    #self.checkarray(B,DMatrix([3,7,7,7,7]),"index setting")
+    #B[0].setAll(4)
+    #self.checkarray(B,DMatrix([4,4,4,4,4]),"index setting")
+
     
   def test_issue298(self):
     self.message("Issue #298")
