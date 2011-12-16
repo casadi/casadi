@@ -270,7 +270,7 @@ Matrix<double> ControlSimulatorInternal::getVFine() const {
  	  Matrix<double> ret(grid_.size()-1,nv_,0);
  	  for (int i=0;i<ns_-1;++i) {
  	    for (int k=0;k<nf_;++k) {
- 	      copy(input(CONTROLSIMULATOR_V).data().begin()+i*nv_,input(CONTROLSIMULATOR_V).data().begin()+(i+1)*nv_,ret.begin()+i*nv_*nf_+k);
+ 	      copy(input(CONTROLSIMULATOR_V).data().begin()+i*nv_,input(CONTROLSIMULATOR_V).data().begin()+(i+1)*nv_,ret.begin()+i*nv_*nf_+k*nv_);
  	    }
  	  }
  	  return ret;
