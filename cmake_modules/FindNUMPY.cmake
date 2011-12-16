@@ -1,5 +1,5 @@
-find_package(PythonLibs,QUIET)
-find_package(PythonInterp,QUIET)
+find_package(PythonLibs QUIET)
+find_package(PythonInterp QUIET)
 if(PYTHON_EXECUTABLE AND NOT NUMPY_INCLUDE_DIR)
   exec_program ("${PYTHON_EXECUTABLE}" 
        ARGS "-c 'import numpy; print numpy.get_include()'"
