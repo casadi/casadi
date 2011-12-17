@@ -823,12 +823,12 @@ class Integrationtests(casadiTestCase):
     A = ssym("A",N,N)
     x = ssym("x",N)
 
-    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: A},[mul(A,x)])
+    ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: vec(A)},[mul(A,x)])
     I = CVodesIntegrator(ode)
     I.init()
     I.setOption('reltol',1e-12)
     I.input(INTEGRATOR_X0).set(x0_)
-    I.input(INTEGRATOR_P).set(A_)
+    I.input(INTEGRATOR_P).set(vec(A_))
     I.evaluate()
 
     q0=MX("q0",N)
