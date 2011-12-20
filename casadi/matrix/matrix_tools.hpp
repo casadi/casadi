@@ -528,11 +528,17 @@ Matrix<T> adj(const Matrix<T>& a){
   int n = a.size1();
   casadi_assert_message(n == a.size2(),"adj: matrix must be square");
 
+  // Temporary placeholder
+  T temp;
+  
   // Cofactor matrix
   Matrix<T> C(n,n);
   for(int i=0; i<n; ++i)
-    for(int j=0; j<n; ++j)
-      C(i,j) = cofactor(a,i,j);
+    for(int j=0; j<n; ++j) {
+      temp = cofactor(a,i,j);
+      if (!casadi_limits<T>::isZero(temp))
+        C(i,j) = temp;
+    }
   
   return trans(C);
 }
