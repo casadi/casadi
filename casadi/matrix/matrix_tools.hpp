@@ -24,6 +24,7 @@
 #define MATRIX_TOOLS_HPP
 
 #include "matrix.hpp"
+#include <algorithm>
 
 namespace CasADi{
 
@@ -426,17 +427,60 @@ T det(const Matrix<T>& a){
   // Trivial return if scalar
   if(isScalar(a)) return a.toScalar();
 
+  // Trivial case 2 x 2
+  if(n==2) return a.elem(0,0) * a.elem(1,1) - a.elem(1,0) * a.elem(0,1);
+  
   // Return expression
   Matrix<T> ret = 0;
+  
+  // Find out which is the best direction to expand along
 
-  // We expand the matrix along the first column
-  for(int i=0; i<n; ++i){
+  // Build up an IMatrix with ones on the non-zeros
+  Matrix<int> sp = IMatrix(a.sparsity(),1);
+  
+  // Have a count of the nonzeros for each column
+  Matrix<int> col_count = sumRows(sp);
+  
+  // A blank column? determinant is structurally zero
+  if (!col_count.dense()) return 0;
 
-    // Sum up the cofactors
-    ret += a(i,0)*cofactor(a,i,0);
+  // Have a count of the nonzeros for each row
+  Matrix<int> row_count = trans(sumCols(sp));
+  
+  // A blank row? determinant is structurally zero
+  if (!col_count.dense()) return 0;
+  
+  int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
+  int min_row = std::distance(row_count.data().begin(), std::min_element(row_count.data().begin(),row_count.data().end()));
+  
+  if (min_col <= min_row) {
+    // Expand along column j
+    int j = col_count.sparsity().col(min_col);
+    
+    Matrix<T> col = a(range(n),j);
 
+    std::vector< int > row_i = col.sparsity().getRow();
+
+    for(int k=0; k<col.size(); ++k) {
+      // Sum up the cofactors
+      ret += col.at(k)*cofactor(a,row_i.at(k),j);
+    }
+    return ret.toScalar();
+  } else {
+    // Expand along row i
+    int i = row_count.sparsity().col(min_row);
+
+    Matrix<T> row = a(i,range(n));
+    
+    const std::vector< int > &col_i = row.sparsity().col();
+
+    for(int k=0; k<row.size(); ++k) {
+      // Sum up the cofactors
+      ret += row.at(k)*cofactor(a,i,col_i.at(k));
+    }
+    return ret.toScalar();
   }
-  return ret.toScalar();
+ 
 }
 
 template<class T>
@@ -449,17 +493,22 @@ T getMinor(const Matrix<T> &x, int i, int j){
 
   // Remove row i and column j
   Matrix<T> M(n-1,n-1);
+  
+  std::vector<int> row = x.sparsity().getRow();
+  const std::vector<int> &col = x.sparsity().col();
 
-   for(int i1=0; i1<n; ++i1)
-       for(int j1=0; j1<n; ++j1){
-           if(i1 == i || j1 == j)
-              continue;
+  for(int k=0;k<x.size();++k) {
+    int i1 = row[k];
+    int j1 = col[k];
 
-            int i2 = (i1<i)?i1:i1-1;
-            int j2 = (j1<j)?j1:j1-1;
-    
-            M(i2,j2) = x(i1,j1);
-       }
+    if(i1 == i || j1 == j)
+      continue;
+
+    int i2 = (i1<i)?i1:i1-1;
+    int j2 = (j1<j)?j1:j1-1;
+
+    M(i2,j2) = x(i1,j1);
+  }
   return det(M);
 }
 
@@ -468,7 +517,6 @@ T cofactor(const Matrix<T> &x, int i, int j){
 
     // Calculate the i,j minor
     T minor_ij = getMinor(x,i,j);
-
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 

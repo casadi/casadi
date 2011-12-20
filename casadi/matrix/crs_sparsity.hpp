@@ -177,6 +177,8 @@ class CRSSparsity : public SharedObject{
          return -1 if the element does not exists */
     int getNZ(int i, int j) const;
 
+    /// Returns true if the pattern has a non-zero at location i,j
+    bool hasNZ(int i, int j) const;
 
     /** \brief Get a set of non-zero element
          return -1 if the element does not exists */

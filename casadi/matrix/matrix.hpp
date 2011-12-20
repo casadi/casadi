@@ -259,6 +259,9 @@ class Matrix : public PrintableObject{
 
     /// get an element, do not allocate
     const T getElement(int i, int j=0) const{ return elem(i,j);}
+    
+    /// Returns true if the matrix has a non-zero at location i,j
+    bool hasNZ(int i, int j) const { return sparsity().hasNZ(i,j); }
 
     //@{
     /// Get a submatrix

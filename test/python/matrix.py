@@ -170,7 +170,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(B[A,1],DMatrix([[2,8],[2,5]]),"B[A,1]")
     
     self.checkarray(B[1,A],DMatrix([[4,6],[4,5]]),"B[1,A]")
-    
+
   def test_IMatrix_index_slice_assignment(self):
     self.message("IMatrix combined with slice assignment")
 
@@ -289,6 +289,88 @@ class Matrixtests(casadiTestCase):
     
     a = DMatrix(4,1)
     self.assertRaises(RuntimeError,lambda : IMatrix(a))
+    
+  def test_det(self):
+    self.message("Determinant")
+    npy_det = numpy.linalg.det
+    
+    a = DMatrix(1,1)
+    a[0,0] = 5
+    self.checkarray(det(a),npy_det(a),"det()")
+
+    a = DMatrix(5,5)
+    for i in range(5):
+      a[i,i] = i+1
+
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(4):
+      a[i,i] = i+1
+    a[0,4] = 3
+    a[4,0] = 7
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(5):
+      for j in range(5):
+        a[i,j] = i+j
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+
+    a = DMatrix(5,5)
+    for i in range(4):
+      for j in range(5):
+        a[i,j] = i+j
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(5):
+      for j in range(4):
+        a[i,j] = i+j
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(4):
+      for j in range(5):
+        a[i,j] = i+j
+    a[4,1] = 12
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(5):
+      for j in range(4):
+        a[i,j] = i+j
+    a[1,4] = 12
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(4):
+      for j in range(5):
+        a[i,j] = i+j
+    a[4,2] = 12
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(5,5)
+    for i in range(5):
+      for j in range(4):
+        a[i,j] = i+j
+    a[2,4] = 12
+    
+    self.checkarray(det(a),npy_det(a),"det()")
+    
+    a = DMatrix(50,50)
+    for i in range(50):
+      a[i,i] = i+1
+
+    self.checkarray(det(a)/npy_det(a),1,"det()")
+    
     
 if __name__ == '__main__':
     unittest.main()

@@ -161,6 +161,11 @@ int CRSSparsity::getNZ(int i, int j){
   return ind;
 }
 
+bool CRSSparsity::hasNZ(int i, int j) const {
+  return (*this)->getNZ(i,j)!=-1;
+}
+
+
 int CRSSparsity::getNZ(int i, int j) const{
   return (*this)->getNZ(i,j);
 }
