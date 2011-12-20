@@ -371,6 +371,47 @@ class Matrixtests(casadiTestCase):
 
     self.checkarray(det(a)/npy_det(a),1,"det()")
     
+  def test_inv_sparsity(self):
+    self.message("sparsity pattern of inverse")
+
+    n = 8
+
+    sp = sp_tril(n)
+
+    x  = SXMatrix(sp,[SX("a%d" % i) for i in range(sp.size())])
+
+    
+    x_ = DMatrix(x.sparsity(),1)
+    
+    I_ = DMatrix(inv(x).sparsity(),1)
+    
+    # For a reducible matrix, struct(A^(-1)) = struct(A) 
+    self.checkarray(x_,I_,"inv")
+    
+    sp = sp_tril(n)
+
+    x  = SXMatrix(sp,[SX("a%d" % i) for i in range(sp.size())])
+    x[0,n-1] = 1 
+    
+    
+    I_ = DMatrix(inv(x).sparsity(),1)
+    
+    # An irreducible matrix has a dense inverse in general
+    self.checkarray(DMatrix.ones(n,n),I_,"inv")
+
+    x  = SXMatrix(sp,[SX("a%d" % i) for i in range(sp.size())])
+    x[0,n/2] = 1 
+    
+    s_ = DMatrix(sp,1)
+    s_[:,:n/2+1] = 1
+    
+    I_ = DMatrix(inv(x).sparsity(),1)
+    
+    makeDense(s_)
+    makeDense(I_)
+    # An irreducible matrix does not have to be dense per se
+    self.checkarray(s_,I_,"inv")
+
     
 if __name__ == '__main__':
     unittest.main()
