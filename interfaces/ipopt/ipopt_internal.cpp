@@ -186,7 +186,7 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   }
 
   // Reset the counters
-  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = 0;
+  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = 0;
   
   // Get back the smart pointer
   Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = (Ipopt::SmartPtr<Ipopt::TNLP>*)userclass;
@@ -202,6 +202,8 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
     cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
     cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
     cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+    cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+    cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
   }
 
   if (status == Solve_Succeeded)
@@ -241,6 +243,8 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
 
 bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {
   try {
+    log("intermediate_callback started");
+    double time1 = clock();
     if (!callback_.isNull()) {
 #ifdef WITH_IPOPT_CALLBACK 
       copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
@@ -262,6 +266,8 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
       callback_->stats_["alpha_du"] = alpha_du;
       callback_->stats_["ls_trials"] = ls_trials;
       callback_.evaluate();
+      double time2 = clock();
+      t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
       return  !callback_.output(0).at(0);
     } else {
       return 1;

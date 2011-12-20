@@ -25,7 +25,7 @@ class Log:
 
 log = Log()
 
-c = PyFunction( log, [sp_dense(3,1),sp_dense(1,1),sp_dense(1,1),sp_dense(3,1),sp_dense(3,1)], [sp_dense(1,1)] )
+c = PyFunction( log, [sp_dense(3,1),sp_dense(1,1),sp_dense(1,1),sp_dense(3,1)], [sp_dense(1,1)] )
 c.init()
 
 solv.setOption("iteration_callback",c)

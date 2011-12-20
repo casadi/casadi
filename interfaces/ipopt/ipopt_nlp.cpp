@@ -135,11 +135,15 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
                                        const IpoptData* ip_data,
                                        IpoptCalculatedQuantities* ip_cq) {
 
+  // Only do the callback every few iterations
+  if (iter % solver->callback_step_!=0) return true;
+
   /// Code copied from TNLPAdapter::FinalizeSolution
   /// See also: http://list.coin-or.org/pipermail/ipopt/2010-July/002078.html
   // http://list.coin-or.org/pipermail/ipopt/2010-April/001965.html
   
 #ifdef WITH_IPOPT_CALLBACK 
+  double time1 = clock();
   OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
   if (!orignlp) return true;
   TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
@@ -182,6 +186,8 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
       z_U_[tnlp_adapter->x_fixed_map_[i]] = Max(0., values[n_c_no_fixed+i]);
     }
   }
+  double time2 = clock();
+  solver->t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
 #endif // WITH_IPOPT_CALLBACK 
   
   return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials);

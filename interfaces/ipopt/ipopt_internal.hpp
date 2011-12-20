@@ -77,6 +77,8 @@ std::map<std::string,opt_type> ops_;
   double t_eval_g_; // time spent in eval_g
   double t_eval_jac_g_; // time spent in eval_jac_g
   double t_eval_h_; // time spent in eval_h
+  double t_callback_fun_;  // time spent in callback function
+  double t_callback_prepare_; // time spent in callback preparation
   
 };
 
