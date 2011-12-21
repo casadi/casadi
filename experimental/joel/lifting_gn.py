@@ -12,6 +12,9 @@ x0_test = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.20, 0.30]
 # Automatic initialization
 auto_init = False
 
+# Use the Gauss-Newton method
+gauss_newton = True
+
 for (i,x0) in enumerate(x0_test[:]):
 #for (i,x0) in enumerate([0.02]):
 
@@ -52,14 +55,8 @@ for (i,x0) in enumerate(x0_test[:]):
   # Objective terms
   F = []
 
-  # Constraint function
-  G = []
-
   # Get an expression for the state that the final time
   x = SXMatrix(x0)
-
-  # Lift the initial conditions
-  #L.append(x)
 
   for k in range(nk):
     # Get new value for X
@@ -69,27 +66,24 @@ for (i,x0) in enumerate(x0_test[:]):
     F.append(u[k])
     F.append(x)
     
-    # Append terms to constraint function
-    #G.append(x)
-    
     # Lift x
-    #if k==0: 
     L.append(x)
 
   # Bounds on G
-  #g_min = x_min*DMatrix.ones(nk)
-  #g_max = x_max*DMatrix.ones(nk)
-  #g_min[-1] = xf_min
-  #g_max[-1] = xf_max
-  G.append(x)
+  G = x
   g_min = xf_min
   g_max = xf_max
 
-  # Objective function (GN)
-  F1 = SXFunction([u],[F])
+  if gauss_newton:
+    # Objective function (GN)
+    F1 = SXFunction([u],[F])
+    
+  else:
+    # Objective function (SQP)
+    F1 = SXFunction([u],[inner_prod(F,F)])
 
   # Constraint function
-  F2 = SXFunction([u],[vertcat(G)])
+  F2 = SXFunction([u],[G])
 
   # Lifting function
   ifcn = SXFunction([u],[vertcat(L)])
@@ -107,6 +101,22 @@ for (i,x0) in enumerate(x0_test[:]):
   f2 = F2.outputSX()
   xdef = ifcn.outputSX()
 
+  if gauss_newton: # if Gauss-Newton no multipliers needed
+    mux = SXMatrix()
+    mug = SXMatrix()
+    
+  else: # If SQP, get the gradient of the lagrangian now
+    
+    # Lagrange multipliers
+    mux = ssym("mux",u.size())
+    mug = ssym("mug",f2.size())
+    
+    # Lagrange function
+    lag = f1 + mul(trans(mux),u) + mul(trans(mug),f2)
+
+    # Gradient of the Lagrangian
+    f1 = jacobian(lag,u)
+
   ## Lifted variables
   x = ssym("x",xdef.size())
 
@@ -116,7 +126,7 @@ for (i,x0) in enumerate(x0_test[:]):
   [f1,f2] = ex
 
   # Residual function G
-  G = SXFunction([u,x],[xdef-x,f1,f2])
+  G = SXFunction([u,x,mux,mug],[xdef-x,f1,f2])
   G.init()
 
   # Difference vector d
@@ -129,49 +139,50 @@ for (i,x0) in enumerate(x0_test[:]):
   [f1,f2] = ex
 
   # Modified function Z
-  Z = SXFunction([u,d],[z,f1,f2])
+  Z = SXFunction([u,d,mux,mug],[z,f1,f2])
   Z.init()
 
   # Matrix A and B in lifted Newton
   A = Z.jac(0,0)
   B1 = Z.jac(0,1)
   B2 = Z.jac(0,2)
-  AB  = SXFunction([u,d],[A,B1,B2])
+  AB  = SXFunction([u,d,mux,mug],[A,B1,B2])
   AB.init()
 
   # Variables
-  uk = u_guess
-  dk = DMatrix.zeros(xdef.size())
-  xk = DMatrix.zeros(xdef.size())
-  f1k = DMatrix.nan(f1.shape)
-  f2k = DMatrix.nan(f2.shape)
+  u_k = u_guess
+  x_k = DMatrix.zeros(x.shape)
+  d_k = DMatrix.zeros(x.shape)
+  mux_k = DMatrix.zeros(mux.shape)
+  dmux_k = DMatrix.zeros(mux.shape)
+  mug_k = DMatrix.zeros(mug.shape)
+  dmug_k = DMatrix.zeros(mug.shape)
+  f1_k = DMatrix.nan(f1.shape)
+  f2_k = DMatrix.nan(f2.shape)
 
   if auto_init:
     # Initialize x0 by function evaluation
-    Z.setInput(uk,0)
-    Z.setInput(dk,1)
+    Z.setInput(u_k,0)
+    Z.setInput(d_k,1)
+    Z.setInput(mux_k,2)
+    Z.setInput(mug_k,3)
     Z.evaluate()
-    Z.getOutput(xk,0)
-    Z.getOutput(f1k,1)
-    Z.getOutput(f2k,2)
+    Z.getOutput(x_k,0)
+    Z.getOutput(f1_k,1)
+    Z.getOutput(f2_k,2)
   else:
     # Initialize node values manually
-    G.setInput(uk,0)
-    G.setInput(xk,1)
+    G.setInput(u_k,0)
+    G.setInput(x_k,1)
+    G.setInput(mux_k,2)
+    G.setInput(mug_k,3)
     G.evaluate()
-    G.getOutput(dk,0)
-    G.getOutput(f1k,1)
-    G.getOutput(f2k,2)
+    G.getOutput(d_k,0)
+    G.getOutput(f1_k,1)
+    G.getOutput(f2_k,2)
     
-  #print float(norm_2(f1k))
-  #print float(norm_2(vertcat((max(f2k-g_max,0),max(g_min-f2k,0)))))
-  #print float(norm_2(max(f2k-g_max,0)+max(g_min-f2k)))
-  #print max(f2k-g_max,0)+max(g_min-f2k,0)
-  
-
-
   # Print header
-  print " %4s" % "iter", " %20s" % "norm_f1k", " %20s" % "norm_f2k", " %20s" % "norm_dk", " %20s" % "norm_du", " %20s" % "feas_viol"
+  print " %4s" % "iter", " %20s" % "norm_f1_k", " %20s" % "norm_f2_k", " %20s" % "norm_d_k", " %20s" % "norm_du_k", " %20s" % "feas_viol"
 
   # No seed in the u direction
   useed = DMatrix.zeros(u.shape)
@@ -180,80 +191,105 @@ for (i,x0) in enumerate(x0_test[:]):
   k = 0
   while True:
     
-    # Get Ak and Bk
-    AB.setInput(uk,0)
-    AB.setInput(dk,1)
+    # Get A_k and Bk
+    AB.setInput(u_k,0)
+    AB.setInput(d_k,1)
+    AB.setInput(mux_k,2)
+    AB.setInput(mug_k,3)
     AB.evaluate()
-    Ak = AB.output(0)
-    B1k = AB.output(1)
-    B2k = AB.output(2)
+    A_k = AB.output(0)
+    B1_k = AB.output(1)
+    B2_k = AB.output(2)
     
-    # Get ak and bk
-    Z.setInput(uk,0)
-    Z.setInput(dk,1)
+    # Get a_k and b_k
+    Z.setInput(u_k,0)
+    Z.setInput(d_k,1)
+    Z.setInput(mux_k,2)
+    Z.setInput(mug_k,3)
     Z.setFwdSeed(useed,0)
-    Z.setFwdSeed(dk,1)
+    Z.setFwdSeed(d_k,1)
     Z.evaluate(1,0)
-    #Z.getOutput(xk,0)
-    Z.getOutput(f1k,1)
-    Z.getOutput(f2k,2)
-    ak = -Z.fwdSens(0)
-    b1k = f1k-Z.fwdSens(1)
-    b2k = f2k-Z.fwdSens(2)
+    #Z.getOutput(x_k,0)
+    Z.getOutput(f1_k,1)
+    Z.getOutput(f2_k,2)
+    a_k = -Z.fwdSens(0)
+    b1_k = f1_k-Z.fwdSens(1)
+    b2_k = f2_k-Z.fwdSens(2)
 
-    # Gauss-Newton Hessian and linear term
-    H = mul(trans(B1k),B1k)
-    g = mul(trans(B1k),b1k)
-    A = B2k
-    
-    
+    if gauss_newton:
+      # Gauss-Newton Hessian
+      H = mul(trans(B1_k),B1_k)
+      g = mul(trans(B1_k),b1_k)
+      A = B2_k
+      a = b2_k
+    else:
+      # Exact Hessian
+      H = B1_k
+      g = b1_k-mul(B2_k,mug_k)
+      A = B2_k
+      a = b2_k
+        
     if k==0:
       # Allocate a QP solver
       qp_solver = OOQPSolver(H.sparsity(),A.sparsity())
       qp_solver.init()
-    
+
+    # Formulate the QP
     qp_solver.setInput(H,QP_H)
     qp_solver.setInput(g,QP_G)
     qp_solver.setInput(A,QP_A)
     qp_solver.setInput(u_min,QP_LBX)
     qp_solver.setInput(u_max,QP_UBX)
-    qp_solver.setInput(g_min-b2k,QP_LBA)
-    qp_solver.setInput(g_max-b2k,QP_UBA)
+    qp_solver.setInput(g_min-a,QP_LBA)
+    qp_solver.setInput(g_max-a,QP_UBA)
+
+    # Solve the QP
     qp_solver.evaluate()
-    du = qp_solver.output(QP_PRIMAL)
+
+    # Get the primal solution
+    du_k = qp_solver.output(QP_PRIMAL)
     
-    # Perform the Newton step
-    xk = xk + ak + mul(Ak,du)
-    uk = uk + du
+    # Get the dual solution
+    if not gauss_newton:
+      dmux_k = qp_solver.output(QP_DUAL_X)
+      dmug_k = qp_solver.output(QP_DUAL_A)
     
-    # Call algorithm 2 to obtain new dk and fk
-    G.setInput(uk,0)
-    G.setInput(xk,1)
+    # Perform the full Newton step
+    x_k = x_k + a_k + mul(A_k,du_k)
+    u_k = u_k + du_k
+    mux_k = mux_k + dmux_k
+    mug_k = mug_k + dmug_k
+    
+    # Call algorithm 2 to obtain new d_k and fk
+    G.setInput(u_k,0)
+    G.setInput(x_k,1)
+    G.setInput(mux_k,2)
+    G.setInput(mug_k,3)
     G.evaluate()
-    G.getOutput(dk,0)
-    G.getOutput(f1k,1)
-    G.getOutput(f2k,2)
+    G.getOutput(d_k,0)
+    G.getOutput(f1_k,1)
+    G.getOutput(f2_k,2)
     
     # Get error
-    norm_f1k = float(norm_2(f1k))
-    norm_f2k = float(norm_2(f2k))
-    norm_dk = float(norm_2(dk))
-    norm_du = float(norm_2(du))
+    norm_f1_k = float(norm_2(f1_k))
+    norm_f2_k = float(norm_2(f2_k))
+    norm_d_k = float(norm_2(d_k))
+    norm_du_k = float(norm_2(du_k))
     
     # Constraint violation
-    viol_umax = float(norm_2(max(uk-u_max,0)))
-    viol_umin = float(norm_2(max(u_min-uk,0)))
-    viol_xmax = float(norm_2(max(f2k-g_max,0)))
-    viol_xmin = float(norm_2(max(g_min-f2k,0)))
+    viol_umax = float(norm_2(max(u_k-u_max,0)))
+    viol_umin = float(norm_2(max(u_min-u_k,0)))
+    viol_xmax = float(norm_2(max(f2_k-g_max,0)))
+    viol_xmin = float(norm_2(max(g_min-f2_k,0)))
     viol_u = float(norm_2([viol_umin,viol_umax]))
     viol_x = float(norm_2([viol_xmin,viol_xmax]))
     feas_viol = float(norm_2([viol_u,viol_x]))
     
     # Print
-    print " %4d" % k, " %20e" % norm_f1k, " %20e" % norm_f2k, " %20e" % norm_dk, " %20e" % norm_du, " %20e" % feas_viol
+    print " %4d" % k, " %20e" % norm_f1_k, " %20e" % norm_f2_k, " %20e" % norm_d_k, " %20e" % norm_du_k, " %20e" % feas_viol
     
     # Check if stopping criteria achieved
-    if feas_viol + norm_dk  + norm_du < TOL:
+    if feas_viol + norm_d_k  + norm_du_k < TOL:
       print "Convergens achieved!"
       break
     
@@ -265,7 +301,7 @@ for (i,x0) in enumerate(x0_test[:]):
       print "Maximum number of iterations (", max_iter, ") reached"
       break
 
-    plotx = vertcat([x0,xk])
+    plotx = vertcat([x0,x_k])
     plott = NP.linspace(0,1,plotx.size1())
     plt.plot(plott,plotx,'*-')
     leg.append(str(k))
