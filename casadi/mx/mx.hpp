@@ -160,6 +160,17 @@ class MX : public SharedObject{
     const MX indexed(const Matrix<int> &k) const{ 
       return (*this)(k);
     }
+    const MX indexed(const Slice &i, const Matrix<int>& k) const{ return (*this)(i,k); }
+    const MX indexed(const IndexList &i, const Matrix<int>& k) const{ 
+      return (*this)(i.getAll(size1()),k);
+    }
+    const MX indexed(const Matrix<int>& k, const Slice &j) const{ return (*this)(k,j); }
+    const MX indexed(const Matrix<int>& k, const IndexList &j) const{ 
+      return (*this)(k,j.getAll(size2()));
+    }
+    const MX indexed(const Matrix<int>& i, const Matrix<int>& j) const{ 
+      return (*this)(i,j);
+    }
     
     /// set a non-zero
     void indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
@@ -390,6 +401,11 @@ class MX : public SharedObject{
   const MX getSub(const std::vector<int>& i, int j) const;
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
   const MX getSub(const Matrix<int>& k) const;
+  const MX getSub(const std::vector<int>& i, const Matrix<int>& k) const;
+  const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;
+  const MX getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
+  const MX getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
+  const MX getSub(const Matrix<int>& i, const Matrix<int>& j) const;
       
   void setSub(int i, int j, const MX& el);
   void setSub(int i, const std::vector<int>& j, const MX& el);

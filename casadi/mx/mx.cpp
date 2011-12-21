@@ -148,6 +148,51 @@ const MX MX::getSub(int i, int j) const{
   return ret;
 }
 
+const MX MX::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
+  std::vector< int > cols = range(size2());
+  std::vector< MX > temp;
+
+  for (int i=0;i<ii.size();++i) {
+    MX m(k.sparsity(),MX(0));
+    for (int j=0;j<m.size();++j) {
+      m[j] = getSub(ii.at(i),k.at(j));
+    }
+    std::cout << m << std::endl;
+    temp.push_back(m);
+  }
+  MX ret = vertcat(temp);
+  simplifyMapping(ret);
+  return ret;
+}
+
+const MX MX::getSub(const Matrix<int>& k, const std::vector<int>& jj) const{
+  std::vector< int > rows = range(size1());
+  std::vector< MX > temp;
+
+  for (int j=0;j<jj.size();++j) {
+    MX m(k.sparsity(),MX(0));
+    for (int i=0;i<m.size();++i) {
+      m[i] = getSub(k.at(i),jj.at(j));
+    }
+    std::cout << m << std::endl;
+    temp.push_back(m);
+  }
+  MX ret = horzcat(temp);
+  simplifyMapping(ret);
+  return ret;
+}
+
+const MX MX::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"getSub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
+
+   MX ret(i.sparsity(),MX(0));
+   for (int k=0;k<i.size();++k) {
+    ret[k] = getSub(i.at(k),j.at(k));
+   }
+   simplifyMapping(ret);
+   return ret;
+}
+
 void MX::setSub(int i, int j, const MX& el){
   setSub(vector<int>(1,i),vector<int>(1,j),el);
 }
