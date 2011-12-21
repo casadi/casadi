@@ -157,7 +157,6 @@ const MX MX::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
     for (int j=0;j<m.size();++j) {
       m[j] = getSub(ii.at(i),k.at(j));
     }
-    std::cout << m << std::endl;
     temp.push_back(m);
   }
   MX ret = vertcat(temp);
@@ -174,7 +173,6 @@ const MX MX::getSub(const Matrix<int>& k, const std::vector<int>& jj) const{
     for (int i=0;i<m.size();++i) {
       m[i] = getSub(k.at(i),jj.at(j));
     }
-    std::cout << m << std::endl;
     temp.push_back(m);
   }
   MX ret = horzcat(temp);
