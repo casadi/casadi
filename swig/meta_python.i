@@ -409,6 +409,8 @@ bool meta< CasADi::Matrix<int> >::couldbe(PyObject * p) {
   return meta< int >::couldbe(p) || meta< int >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::isa(p);
 }
 
+meta_vector(CasADi::Matrix<int>)
+
 /// CasADi::Matrix<double>
 template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
 

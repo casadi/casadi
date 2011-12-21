@@ -412,6 +412,11 @@ class Matrixtests(casadiTestCase):
     # An irreducible matrix does not have to be dense per se
     self.checkarray(s_,I_,"inv")
 
+  def test_Imatrix_operations(self):
+    self.message("IMatrix operations")
+    a = IMatrix(2,2,1)
+    b = horzcat([a,a])
+    self.assertTrue(isinstance(b,IMatrix))
     
 if __name__ == '__main__':
     unittest.main()

@@ -40,6 +40,7 @@
 %template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 %template(MXVector) std::vector<CasADi::MX>;
 %template(MXVectorVector) std::vector< std::vector<CasADi::MX> >;
+%template(IMatrixVector) std::vector<CasADi::Matrix<int> > ;
 %template(DMatrixVector) std::vector<CasADi::Matrix<double> > ;
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
 #endif //SWIG_MAIN_MODULE
@@ -48,6 +49,7 @@
 %template() std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 %template() std::vector<CasADi::MX>;
 %template() std::vector< std::vector<CasADi::MX> >;
+%template() std::vector<CasADi::Matrix<int> > ;
 %template() std::vector<CasADi::Matrix<double> > ;
 %template() std::vector< std::vector<CasADi::Matrix<double> > > ;
 #endif //SWIG_MAIN_MODULE
@@ -125,6 +127,7 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_IMatrix,CasADi::Matrix<int>);
 %my_generic_const_typemap(PRECEDENCE_MXVectorVector,std::vector< std::vector< CasADi::MX > >);
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
+%my_generic_const_typemap(PRECEDENCE_IMatrixVector,std::vector< CasADi::Matrix<int> >);
 #endif // SWIGPYTHON
 
 
