@@ -613,14 +613,23 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
       // Dependency to be checked
       b = 1;
 
+      // To reduce the order of sparsity appending from O(n) to O(1), we go low level.
+      vector<int>& colv = ret_trans.colRef();
+      vector<int>& rowindv = ret_trans.rowindRef();
+      
+      // This speeds up the loop with a factor of 3 when in debug mode
+      const vector<int>& oind_sp_rowind = oind_sp.rowind();
+       
       // Loop over seed directions
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        
+
+        rowindv[offset+i+1] = rowindv[offset+i];
+          
         // Loop over the rows of the output
         for(int ii=0; ii<oind_sp.size1(); ++ii){
           
           // Loop over the nonzeros of the output
-          for(int el=oind_sp.rowind(ii); el<oind_sp.rowind(ii+1); ++el){
+          for(int el=oind_sp_rowind[ii]; el<oind_sp_rowind[ii+1]; ++el){
             
             // If dependents on the variable
             if(b & iwork_out[el]){
@@ -628,8 +637,14 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
               // Column
               int jj = oind_sp.col(el);
               
-              // Add to pattern
-              ret_trans.getNZ(offset+i,jj + ii*oind_sp.size2());
+              // Append an element to the back
+              colv.push_back(jj + ii*oind_sp.size2());
+              
+              // Increase the rowind
+              rowindv[offset+i+1]++;
+              
+              // Add to pattern - this is too slow
+              //ret_trans.getNZ(offset+i,jj + ii*oind_sp.size2());
             }
           }
         }
