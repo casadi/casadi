@@ -41,6 +41,7 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian");
   addOption("iteration_callback", OT_FX,     FX(),            "A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.");
   addOption("iteration_callback_step", OT_INTEGER,     1,       "Only call the callback function every few iterations.");
+  addOption("iteration_callback_ignore_errors", OT_BOOLEAN,     false,      "If set to true, errors thrown by iteration_callback will be ignored.");
   addOption("ignore_check_vec", OT_BOOLEAN,     false,            "If set to true, the input shape of F will not be checked.");
   
   n_ = 0;

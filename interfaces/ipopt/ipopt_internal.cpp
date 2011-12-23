@@ -255,6 +255,12 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
       }
       copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
 #endif // WITH_IPOPT_CALLBACK 
+
+#ifndef WITH_IPOPT_CALLBACK 
+   if (iter==0) {
+      cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback to enable it." << endl;
+   }
+#endif // WITH_IPOPT_CALLBACK 
       callback_.input(NLP_COST).at(0) = obj_value;
       callback_->stats_["iter"] = iter;
       callback_->stats_["inf_pr"] = inf_pr;
@@ -273,7 +279,11 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
       return 1;
     }
   } catch (exception& ex){
-    cerr << "intermediate_callback: " << ex.what() << endl;
+    if (getOption("iteration_callback_ignore_errors")) {
+      cerr << "intermediate_callback: " << ex.what() << endl;
+    } else {
+      throw ex;
+    }
   }
 }
 

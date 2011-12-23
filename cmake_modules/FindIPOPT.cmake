@@ -9,7 +9,7 @@ HINTS $ENV{IPOPT}/include
 IF (EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpIpoptData.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpOrigIpoptNLP.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpTNLPAdapter.hpp"  AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpDenseVector.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpExpansionMatrix.hpp" )
    SET(IPOPT_FOUND_EXTRA TRUE)
 ELSE ()
-   MESSAGE(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, copy all Ipopt headers you can find to ${IPOPT_INCLUDE_DIR}. See https://sourceforge.net/apps/trac/casadi/wiki/knownissues")
+   MESSAGE(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
 ENDIF ()
 
 IF (IPOPT_INCLUDE_DIR)

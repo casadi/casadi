@@ -57,7 +57,7 @@ NLP_UBX,
 NLP_LBG,
 /// Constraints upper bound (m x 1), default +inf
 NLP_UBG,
-/// Lagrange multipliers initial guess (m x 1)
+/// Lagrange multipliers associated with G, initial guess (m x 1)
 NLP_LAMBDA_INIT,
 /// Static parameters on which the objective and constraints might depend
 NLP_P,
@@ -69,9 +69,11 @@ enum NLPOutput{
 NLP_X_OPT,
 /// Objective/cost function for optimal solution (1 x 1)
 NLP_COST,
-/// Lagrange multipliers for the nonlinear bounds at the solution (m x 1)
+/// Lagrange multipliers associated with G at the solution (m x 1)
 NLP_LAMBDA_G,
-/// Lagrange multipliers for the simple bounds at the solution (n x 1)
+/** Lagrange multipliers associated with bounds on X at the solution (n x 1)
+* When in warmstart mode, this output may be used as input (Ipopt)
+*/
 NLP_LAMBDA_X, 
 NLP_NUM_OUT};
 
