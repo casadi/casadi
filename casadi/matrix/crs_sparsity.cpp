@@ -22,6 +22,7 @@
 
 #include "crs_sparsity_internal.hpp"
 #include "sparsity_tools.hpp"
+#include "../matrix/matrix.hpp"
 #include "../stl_vector_tools.hpp"
 #include <climits>
 
@@ -276,6 +277,10 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vect
 
 bool CRSSparsity::operator==(const CRSSparsity& y) const{
   return (*this)->isEqual(y);
+}
+
+CRSSparsity CRSSparsity::operator+(const CRSSparsity& b) const {
+  return (DMatrix(*this,1)+DMatrix(b,1)).sparsity();
 }
 
 void CRSSparsity::reserve(int nnz, int nrow){

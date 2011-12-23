@@ -23,6 +23,8 @@
 #include "sparsity_tools.hpp"
 #include "../casadi_exception.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../matrix/matrix.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
@@ -331,6 +333,11 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
   CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, bool columns_are_sorted){
     std::vector<int> mapping;
     return sp_triplet(n,m,row,col,mapping,columns_are_sorted);
+  }
+  
+
+  CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
+    return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
   }
 
 
