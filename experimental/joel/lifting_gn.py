@@ -10,13 +10,13 @@ import numpy as NP
 x0_test = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.20, 0.30]
 
 # Automatic initialization
-auto_init = False
+manual_init = True
 
 # Use the Gauss-Newton method
-gauss_newton = True
+gauss_newton = False
 
-for (i,x0) in enumerate(x0_test[:]):
-#for (i,x0) in enumerate([0.02]):
+#for (i,x0) in enumerate(x0_test[:]):
+for (i,x0) in enumerate([0.02]):
 
   plt.figure(i+1)
   plt.clf()
@@ -160,17 +160,7 @@ for (i,x0) in enumerate(x0_test[:]):
   f1_k = DMatrix.nan(f1.shape)
   f2_k = DMatrix.nan(f2.shape)
 
-  if auto_init:
-    # Initialize x0 by function evaluation
-    Z.setInput(u_k,0)
-    Z.setInput(d_k,1)
-    Z.setInput(mux_k,2)
-    Z.setInput(mug_k,3)
-    Z.evaluate()
-    Z.getOutput(x_k,0)
-    Z.getOutput(f1_k,1)
-    Z.getOutput(f2_k,2)
-  else:
+  if manual_init:
     # Initialize node values manually
     G.setInput(u_k,0)
     G.setInput(x_k,1)
@@ -180,6 +170,16 @@ for (i,x0) in enumerate(x0_test[:]):
     G.getOutput(d_k,0)
     G.getOutput(f1_k,1)
     G.getOutput(f2_k,2)
+  else:
+    # Initialize x0 by function evaluation
+    Z.setInput(u_k,0)
+    Z.setInput(d_k,1)
+    Z.setInput(mux_k,2)
+    Z.setInput(mug_k,3)
+    Z.evaluate()
+    Z.getOutput(x_k,0)
+    Z.getOutput(f1_k,1)
+    Z.getOutput(f2_k,2)
     
   # Print header
   print " %4s" % "iter", " %20s" % "norm_f1_k", " %20s" % "norm_f2_k", " %20s" % "norm_d_k", " %20s" % "norm_du_k", " %20s" % "feas_viol"
@@ -230,6 +230,15 @@ for (i,x0) in enumerate(x0_test[:]):
       a = b2_k
         
     if k==0:
+      #H.printDense()
+      #g.printDense()
+      #A.printDense()
+      #a.printDense()
+      
+      #print "mug_k = ", mug_k
+      #print "b1_k = ", b1_k
+      #print g_min-a, ",", g_max-a
+      
       # Allocate a QP solver
       qp_solver = OOQPSolver(H.sparsity(),A.sparsity())
       qp_solver.init()
@@ -249,16 +258,25 @@ for (i,x0) in enumerate(x0_test[:]):
     # Get the primal solution
     du_k = qp_solver.output(QP_PRIMAL)
     
+    print "du_k = ", du_k
+    
     # Get the dual solution
     if not gauss_newton:
       dmux_k = qp_solver.output(QP_DUAL_X)
       dmug_k = qp_solver.output(QP_DUAL_A)
+      
+      print "dmux_k = ", dmux_k
+      print "dmug_k = ", dmug_k
     
     # Perform the full Newton step
     x_k = x_k + a_k + mul(A_k,du_k)
     u_k = u_k + du_k
-    mux_k = mux_k + dmux_k
-    mug_k = mug_k + dmug_k
+    #mux_k = mux_k + dmux_k
+    #mug_k = mug_k + dmug_k
+    mux_k = dmux_k
+    mug_k = dmug_k
+    
+    print "x_k = ", x_k
     
     # Call algorithm 2 to obtain new d_k and fk
     G.setInput(u_k,0)
