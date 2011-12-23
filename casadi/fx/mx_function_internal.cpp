@@ -735,6 +735,13 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 
 std::vector<MX> MXFunctionInternal::jac(int ider){
   assertInit();
+  
+  for (int i=0;i<inputv.size();i++) {
+    if (!inputv[i].dense()) {
+      casadi_error("MXFunctionInternal::jac is currently unsupported for sparse inputs.");
+    }
+  }
+  
   casadi_assert_message(ider<input_.size(),"Index out of bounds");
 
   // Variable with respect to which we differentiate

@@ -302,9 +302,14 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
     }
   }
   
+  for (int i=0;i<inputv_.size();i++) {
+    if (!inputv_[i].dense()) {
+      casadi_error("SXFunctionInternal::jac is currently unsupported for sparse inputs.");
+    }
+  }
+  
   if (sparse) {
      SXFunction temp(inputv_,outputv_v);
-     std::cout << "ho";
      temp.init();
      return temp->jac(jblocks);
   }

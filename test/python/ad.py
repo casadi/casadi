@@ -219,12 +219,15 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             self.message("jacobian on SX (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             #f.setOption("verbose",True)
             f.init()
+            if "sparse" in inputtype: # known bug
+                self.assertRaises(Exception, lambda : f.jacobian(0,0))
+                continue
             Jf=f.jacobian(0,0)
             Jf.init()
             Jf.input().set(n)
@@ -260,7 +263,7 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             for mode in ["forward","reverse"]:
               self.message(" %s jacobian on SX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
@@ -268,6 +271,9 @@ class ADtests(casadiTestCase):
               #f.setOption("verbose",True)
               #f.setOption("ad_mode",mode)
               f.init()
+              if "sparse" in inputtype: # known bug
+                self.assertRaises(Exception, lambda : f.jac(0))
+                continue
               Jf=SXFunction(self.sxinputs[inputshape][inputtype],[f.jac(0)])
               Jf.init()
               Jf.input().set(n)
@@ -309,13 +315,16 @@ class ADtests(casadiTestCase):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense"]:
+        for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
             for mode in ["forward","adjoint"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
               #f.setOption("verbose",True)
               f.init()
+              if "sparse" in inputtype: # known bug
+                self.assertRaises(Exception, lambda : f.jac(0))
+                continue
               Jf=MXFunction(self.mxinputs[inputshape][inputtype],[f.jac(0)[0]])
               Jf.init()
               Jf.input().set(n)
