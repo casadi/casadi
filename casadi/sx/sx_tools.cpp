@@ -201,7 +201,7 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   // Create the filter
   vector<int> filter = range(f->work_.size());
   casadi_assert(input_ind.size()==output_ind.size());
-
+  
   // Replace expression
   for(int k=0; k<input_ind.size(); ++k){
     if(reverse){
@@ -216,6 +216,14 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
     it->ch[0] = filter[it->ch[0]];
     it->ch[1] = filter[it->ch[1]];
+  }
+  
+  // Filter the variables from the dependent expressions
+  for(int i=0; i<ex.size(); ++i){
+    std::vector<int>& ex_ind = f->output_ind_.at(i+1);
+    for(std::vector<int>::iterator it=ex_ind.begin(); it!=ex_ind.end(); ++it){
+      *it = filter[*it];
+    }
   }
   
   // Replace expression
