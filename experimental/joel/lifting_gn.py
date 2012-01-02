@@ -4,7 +4,6 @@ from matplotlib import pylab as plt
 import numpy as NP
 
 # Example 5.3 in Albersmeyer paper
-# Solve F(u) = u**16 - 2 == 0
 
 # Automatic initialization
 manual_init = False
@@ -128,24 +127,19 @@ for (i,x0) in enumerate([0.08]):
     ## Derivatives of lifted variables
     xdot = ssym("xdot",x.size())
     
-    ## Gradient of the Lagrangian
-    #xdotdef = jacobian(mul(trans(xdot),xdef),x)
-    #raise Exception("a")
-    
     # Lagrange multipliers
-    mux = ssym("mux",u.size())
-    mug = ssym("mug",f2.size())
+    mux = ssym("mux",u.size1())
+    mug = ssym("mug",f2.size1())
 
     # Gradient of the Lagrangian
     xu = vertcat((u,x))
-    lgrad = jacobian(f1 - inner_prod(mug,f2) + inner_prod(xdot,xdef),xu)
-    lgrad = trans(lgrad)
+    lgrad = gradient(f1 - inner_prod(mug,f2) + inner_prod(xdot,xdef),xu)
 
     # Gradient of the Lagrangian
-    f1 = lgrad[:u.size(),0]
+    f1 = lgrad[:u.size1(),0] # + mux # What about the mux term?
 
     # Definition of xdot
-    xdotdef = lgrad[u.size():,0]
+    xdotdef = lgrad[u.size1():,0]
     
     # Reverse direction of x
     xdot[:,0] = list(reversed(list(xdot)))
@@ -198,7 +192,7 @@ for (i,x0) in enumerate([0.08]):
     G.setInput(mug_k,3)
     G.evaluate()
     G.getOutput(d_k,0)
-    G.getOutput(f1_k,1)
+    G.getOutput(f1_k,1) # mux is zero (initial multiplier guess)
     G.getOutput(f2_k,2)
   else:
     # Initialize x0 by function evaluation
@@ -208,7 +202,7 @@ for (i,x0) in enumerate([0.08]):
     Z.setInput(mug_k,3)
     Z.evaluate()
     Z.getOutput(x_k,0)
-    Z.getOutput(f1_k,1)
+    Z.getOutput(f1_k,1) # mux is zero (initial multiplier guess)
     Z.getOutput(f2_k,2)
     
   # Zero seeds
@@ -228,7 +222,7 @@ for (i,x0) in enumerate([0.08]):
     AB.setInput(mug_k,3)
     AB.evaluate()
     A_k = AB.output(0)
-    B1_k = AB.output(1)
+    B1_k = AB.output(1) # NOTE: # mux dissappears (constant term)
     B2_k = AB.output(2)
     
     # Get a_k and b_k
@@ -246,7 +240,7 @@ for (i,x0) in enumerate([0.08]):
     Z.getOutput(f1_k,1)
     Z.getOutput(f2_k,2)
     a_k = -Z.fwdSens(0)
-    b1_k = f1_k-Z.fwdSens(1)
+    b1_k = f1_k-Z.fwdSens(1) # mux disappears from Z (constant term)
     b2_k = f2_k-Z.fwdSens(2)
 
     if gauss_newton:
@@ -258,7 +252,7 @@ for (i,x0) in enumerate([0.08]):
     else:
       # Exact Hessian
       H = B1_k
-      g = b1_k
+      g = b1_k # +/- mux_k here?
       A = B2_k
       a = b2_k
 
@@ -290,7 +284,7 @@ for (i,x0) in enumerate([0.08]):
     
     # Calculate the step in x
     Z.setFwdSeed(du_k,0)
-    Z.setFwdSeed(d0seed,1)
+    Z.setFwdSeed(d0seed,1) # could the a_k term be moved here?
     Z.setFwdSeed(dmux_k,2)
     Z.setFwdSeed(dmug_k,3)
     Z.evaluate(1,0)
@@ -309,33 +303,31 @@ for (i,x0) in enumerate([0.08]):
     G.setInput(mug_k,3)
     G.evaluate()
     G.getOutput(d_k,0)
-    G.getOutput(f1_k,1)
+    G.getOutput(f1_k,1) # mux?
     G.getOutput(f2_k,2)
 
-    # Get error
-    norm_res = float(norm_2(d_k))
-    norm_du_k = float(norm_2(du_k))
-    norm_dmug_k = float(norm_2(dmug_k))
-    norm_step = float(norm_2([norm_du_k,norm_dmug_k]))
+    # Norm of residual error
+    norm_res = sqrt(sum(i*i for i in d_k))
 
-    # Constraint violation
-    viol_umax = float(norm_2(max(u_k-u_max,0)))
-    viol_umin = float(norm_2(max(u_min-u_k,0)))
-    viol_gmax = float(norm_2(max(f2_k-g_max,0)))
-    viol_gmin = float(norm_2(max(g_min-f2_k,0)))
-    viol_u = float(norm_2([viol_umin,viol_umax]))
-    viol_g = float(norm_2([viol_gmin,viol_gmax]))
-    feas_viol = float(norm_2([viol_u,viol_g]))
+    # Norm of step size
+    step_du_k = sum(i*i for i in du_k)
+    step_dmug_k = sum(i*i for i in dmug_k)
+    norm_step = sqrt(step_du_k + step_dmug_k) # add mux
 
-    # Print the header every 10 rows
+    # Norm of constraint violation
+    viol_umax = sum(max(i,0)**2 for i in u_k-u_max)
+    viol_umin = sum(max(i,0)**2 for i in u_min-u_k)
+    viol_gmax = sum(max(i,0)**2 for i in f2_k-g_max)
+    viol_gmin = sum(max(i,0)**2 for i in g_min-f2_k)
+    norm_viol = sqrt(viol_umax + viol_umin + viol_gmax + viol_gmin)
+
+    # Print progress (including the header every 10 rows)
     if k % 10 == 0:
-      print " %4s" % "iter", " %20s" % "norm_res", " %20s" % "norm_step", " %20s" % "feas_viol"
-
-    # Print
-    print " %4d" % k, " %20e" % norm_res, " %20e" % norm_step, " %20e" % feas_viol
+      print " %4s" % "iter", " %20s" % "norm_res", " %20s" % "norm_step", " %20s" % "norm_viol"
+    print   " %4d" %  k,     " %20e" %  norm_res,  " %20e" %  norm_step,  " %20e" %  norm_viol
     
-    # Check if stopping criteria achieved
-    if feas_viol + norm_res  + norm_step < tol:
+    # Check if stopping criteria is satisfied
+    if norm_viol + norm_res  + norm_step < tol:
       print "Convergens achieved!"
       break
     
@@ -347,6 +339,7 @@ for (i,x0) in enumerate([0.08]):
       print "Maximum number of iterations (", max_iter, ") reached"
       break
 
+    # Plot the progress
     plotx = vertcat([x0,x_k[:nk]])
     plott = NP.linspace(0,1,plotx.size1())
     plt.plot(plott,plotx,'*-')
