@@ -128,7 +128,14 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   if (!op.can_cast_to(allowed_options[name])) {
     stringstream ss;
     ss << "Option '" << name << "' expects a '" << GenericType::get_type_description(allowed_options[name]) << "' type." << endl;
-    ss << "You supplied a type '" << op.get_description() << "' instead." << endl;
+    if (op.getType() == OT_BOOLEAN) {
+      ss << "You supplied another type, possibly boolean." << endl;
+      if (allowed_options[name]==OT_REAL || allowed_options[name]==OT_INTEGER) {
+        ss << "(A common mistake is to use SXMatrix/MX instead of floats/DMatrix in this context)" << endl;
+      }
+    } else {
+      ss << "You supplied a type '" << op.get_description() << "' instead." << endl;
+    }
     if (!allowed_vals_[name].empty()) {
       ss << "(Allowed values are:";
       for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();it!=allowed_vals_[name].end();it++) {

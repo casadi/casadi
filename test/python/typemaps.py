@@ -443,6 +443,16 @@ class typemaptests(casadiTestCase):
     
     self.assertTrue(is_differential_gentype.isIntVector())
 
+  def testGenericTypeBoolean(self):
+    x=SX("x")
+
+    f = SXFunction([x],[x**2])
+    f.init()
+
+    nlp = IpoptSolver(f)
+    
+    self.assertRaises(RuntimeError,lambda : nlp.setOption('acceptable_tol',SX("x")))
+    nlp.setOption('acceptable_tol',DMatrix(1))
 	    
   def test_operators(self):
     self.message("Test operators on mixed numpy.array/Matrix")

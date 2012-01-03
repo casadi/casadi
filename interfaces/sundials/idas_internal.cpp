@@ -413,7 +413,7 @@ void IdasInternal::init(){
     }
 
     // Set optional inputs
-    int errconS = getOption("fsens_err_con");
+    bool errconS = getOption("fsens_err_con");
     flag = IDASetSensErrCon(mem_, errconS);
     if(flag != IDA_SUCCESS) idas_error("IDASetSensErrCon",flag);
 

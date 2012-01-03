@@ -48,9 +48,13 @@ opt_type GenericType::getType() const {
 bool GenericType::can_cast_to(opt_type other) const {
   switch(other)
     {
-      case OT_BOOLEAN: case OT_INTEGER: case OT_REAL:
+      case OT_BOOLEAN:
         return isBool() || isInt() || isDouble();
-      case OT_BOOLVECTOR: case OT_INTEGERVECTOR: case OT_REALVECTOR:
+      case OT_BOOLVECTOR:
+        return isIntVector() || isDoubleVector();
+      case OT_INTEGER: case OT_REAL:
+        return isInt() || isDouble();
+      case OT_INTEGERVECTOR: case OT_REALVECTOR:
         return isDoubleVector() || isIntVector();
       default:
         return type_ == other;

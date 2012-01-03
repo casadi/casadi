@@ -364,7 +364,7 @@ void CVodesInternal::init(){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensSStolerances",flag);
     
     // Set optional inputs
-    int errconS = getOption("fsens_err_con");
+    bool errconS = getOption("fsens_err_con");
     flag = CVodeSetSensErrCon(mem_, errconS);
     if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensErrCon",flag);
     

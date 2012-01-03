@@ -202,10 +202,10 @@ void NLPSolverInternal::init(){
         bool g_num_hess = G_sx.getOption("numeric_hessian");
         
         // Number of derivative directions
-        bool f_num_fwd = F_sx.getOption("number_of_fwd_dir");
-        bool g_num_fwd = G_sx.getOption("number_of_fwd_dir");
-        bool f_num_adj = F_sx.getOption("number_of_adj_dir");
-        bool g_num_adj = G_sx.getOption("number_of_adj_dir");
+        int f_num_fwd = F_sx.getOption("number_of_fwd_dir");
+        int g_num_fwd = G_sx.getOption("number_of_fwd_dir");
+        int f_num_adj = F_sx.getOption("number_of_adj_dir");
+        int g_num_adj = G_sx.getOption("number_of_adj_dir");
         
         // Substitute symbolic variables in f if different input variables from g
         if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
