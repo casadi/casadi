@@ -348,7 +348,7 @@ class UnaryOperation<TANH>{
 template<>
 class BinaryOperation<PRINTME>{
   public:
-    template<typename T> inline static void fcn(const T& x, const T& y, T& f){f = x; }
+    template<typename T> inline static void fcn(const T& x, const T& y, T& f){f = printme(x,y); }
     template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };
 
