@@ -697,6 +697,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::indexed_one_based "";
+
+%feature("docstring")  CasADi::AcadoIntegrator::indexed_zero_based "";
+
 %feature("docstring")  CasADi::AcadoIntegrator::input "
 
 Const access input argument. ";
@@ -2047,6 +2051,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::AcadoOCP::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoOCP::indexed_one_based "";
+
+%feature("docstring")  CasADi::AcadoOCP::indexed_zero_based "";
 
 %feature("docstring")  CasADi::AcadoOCP::input "
 
@@ -3488,6 +3496,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CFunction::indexed_one_based "";
+
+%feature("docstring")  CasADi::CFunction::indexed_zero_based "";
+
 %feature("docstring")  CasADi::CFunction::input "
 
 Const access input argument. ";
@@ -4794,6 +4806,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::indexed_one_based "";
+
+%feature("docstring")  CasADi::CollocationIntegrator::indexed_zero_based "";
+
 %feature("docstring")  CasADi::CollocationIntegrator::input "
 
 Const access input argument. ";
@@ -5860,6 +5876,194 @@ constructor nf The number of fine grid points per coarse grid point interval
 
 Joris Gillis
 
+>Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| CONTROLSIMULATOR_X0                | Differential or algebraic state at |
+|                                    | t0 (dimension nx-by-1)             |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_P                 | Parameters that are fixed over the |
+|                                    | entire horizon (dimension np-by-1) |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_V                 | Parameters that change over the    |
+|                                    | integration intervals (dimension   |
+|                                    | (ns-1)-by-nv)                      |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_XP0               | State derivative at t0 (dimension  |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit integrators.              |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Cont |
+|              | R            | )            | integrator   | rolSimulator |
+|              |              |              | creator      | Internal     |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Cont |
+| ptions       | Y            | )            | be passed to | rolSimulator |
+|              |              |              | the          | Internal     |
+|              |              |              | integrator   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nf           | OT_INTEGER   | 1            | Number of    | CasADi::Cont |
+|              |              |              | fine grained | rolSimulator |
+|              |              |              | integration  | Internal     |
+|              |              |              | steps.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| np           | OT_INTEGER   | GenericType( | The number   | CasADi::Cont |
+|              |              | )            | of           | rolSimulator |
+|              |              |              | parameters.  | Internal     |
+|              |              |              | If this      |              |
+|              |              |              | option is    |              |
+|              |              |              | not set, all |              |
+|              |              |              | of input(INT |              |
+|              |              |              | EGRATOR_P)   |              |
+|              |              |              | is           |              |
+|              |              |              | considered   |              |
+|              |              |              | static       |              |
+|              |              |              | parameters.  |              |
+|              |              |              | The          |              |
+|              |              |              | remainder of |              |
+|              |              |              | nv = input(I |              |
+|              |              |              | NTEGRATOR_P) |              |
+|              |              |              | is           |              |
+|              |              |              | considered   |              |
+|              |              |              | to be        |              |
+|              |              |              | varying      |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 C++ includes: control_simulator.hpp ";
 
 /*  Setters  */
@@ -6058,6 +6262,10 @@ Get the (fine-scaled) time grid The length is (ns-1)*nf + 1 ";
 Get the parameters that change on a coarse time scale, sampled on the fine
 timescale. Number of rows is (ns-1)*nf. ";
 
+%feature("docstring")  CasADi::ControlSimulator::getCoarseIndex "
+
+Get the index i such that gridfine[i] == gridcoarse. ";
+
 %feature("docstring")  CasADi::ControlSimulator::getNumInputs "
 
 Get number of inputs. ";
@@ -6131,6 +6339,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::ControlSimulator::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::ControlSimulator::indexed_one_based "";
+
+%feature("docstring")  CasADi::ControlSimulator::indexed_zero_based "";
 
 %feature("docstring")  CasADi::ControlSimulator::input "
 
@@ -6295,6 +6507,194 @@ ControlSimulator data storage classs.
 
 Joel Andersson
 
+>Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| CONTROLSIMULATOR_X0                | Differential or algebraic state at |
+|                                    | t0 (dimension nx-by-1)             |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_P                 | Parameters that are fixed over the |
+|                                    | entire horizon (dimension np-by-1) |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_V                 | Parameters that change over the    |
+|                                    | integration intervals (dimension   |
+|                                    | (ns-1)-by-nv)                      |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_XP0               | State derivative at t0 (dimension  |
+|                                    | nx-by-1) Only relevant for         |
+|                                    | implicit integrators.              |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Cont |
+|              | R            | )            | integrator   | rolSimulator |
+|              |              |              | creator      | Internal     |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Cont |
+| ptions       | Y            | )            | be passed to | rolSimulator |
+|              |              |              | the          | Internal     |
+|              |              |              | integrator   |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nf           | OT_INTEGER   | 1            | Number of    | CasADi::Cont |
+|              |              |              | fine grained | rolSimulator |
+|              |              |              | integration  | Internal     |
+|              |              |              | steps.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| np           | OT_INTEGER   | GenericType( | The number   | CasADi::Cont |
+|              |              | )            | of           | rolSimulator |
+|              |              |              | parameters.  | Internal     |
+|              |              |              | If this      |              |
+|              |              |              | option is    |              |
+|              |              |              | not set, all |              |
+|              |              |              | of input(INT |              |
+|              |              |              | EGRATOR_P)   |              |
+|              |              |              | is           |              |
+|              |              |              | considered   |              |
+|              |              |              | static       |              |
+|              |              |              | parameters.  |              |
+|              |              |              | The          |              |
+|              |              |              | remainder of |              |
+|              |              |              | nv = input(I |              |
+|              |              |              | NTEGRATOR_P) |              |
+|              |              |              | is           |              |
+|              |              |              | considered   |              |
+|              |              |              | to be        |              |
+|              |              |              | varying      |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 C++ includes: control_simulator_internal.hpp ";
 
 %feature("docstring")
@@ -6323,6 +6723,10 @@ Integrate. ";
 
 Get the parameters that change on a coarse time scale, sampled on the fine
 timescale. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getCoarseIndex "
+
+Get the index i such that gridfine[i] == gridcoarse. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::evaluate_switch "
 
@@ -6601,8 +7005,8 @@ Assert that the object has been initialized. ";
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -6619,13 +7023,13 @@ Assert that the object has been initialized. ";
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -6695,6 +7099,19 @@ Assert that the object has been initialized. ";
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -7153,8 +7570,8 @@ Carlo Savorgnan
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -7171,13 +7588,13 @@ Carlo Savorgnan
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -7247,6 +7664,19 @@ Carlo Savorgnan
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -7589,6 +8019,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CplexSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::CplexSolver::indexed_zero_based "";
+
 %feature("docstring")  CasADi::CplexSolver::input "
 
 Const access input argument. ";
@@ -7916,6 +8350,10 @@ copy object if it's not unique. ";
 
 Get the index of an existing non-zero element return -1 if the element does
 not exists. ";
+
+%feature("docstring")  CasADi::CRSSparsity::hasNZ "
+
+Returns true if the pattern has a non-zero at location i,j. ";
 
 %feature("docstring")  CasADi::CRSSparsity::getNZ "
 
@@ -8731,6 +9169,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Interfaces::CSparse::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::indexed_one_based "";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::indexed_zero_based "";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::input "
 
@@ -10049,6 +10491,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::indexed_one_based
+"";
+
+%feature("docstring")
+CasADi::Sundials::CVodesIntegrator::indexed_zero_based "";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::input "
 
@@ -11768,6 +12216,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::ExternalFunction::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::ExternalFunction::indexed_one_based "";
+
+%feature("docstring")  CasADi::ExternalFunction::indexed_zero_based "";
 
 %feature("docstring")  CasADi::ExternalFunction::input "
 
@@ -13707,6 +14159,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::FX::indexed_one_based "";
+
+%feature("docstring")  CasADi::FX::indexed_zero_based "";
+
 %feature("docstring")  CasADi::FX::checkNode "
 
 Check if the node is pointing to the right type of object. ";
@@ -15198,6 +15654,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::GSL::GslIntegrator::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::indexed_one_based "";
+
+%feature("docstring")  CasADi::GSL::GslIntegrator::indexed_zero_based "";
 
 %feature("docstring")  CasADi::GSL::GslIntegrator::input "
 
@@ -16821,6 +17281,11 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::indexed_one_based "";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::indexed_zero_based
+"";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::input "
 
 Const access input argument. ";
@@ -18371,6 +18836,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::indexed_one_based "";
+
+%feature("docstring")  CasADi::ImplicitFunction::indexed_zero_based "";
+
 %feature("docstring")  CasADi::ImplicitFunction::input "
 
 Const access input argument. ";
@@ -19792,6 +20261,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Integrator::indexed_one_based "";
+
+%feature("docstring")  CasADi::Integrator::indexed_zero_based "";
+
 %feature("docstring")  CasADi::Integrator::input "
 
 Const access input argument. ";
@@ -20905,8 +21378,8 @@ number of constraints (A)
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -20923,13 +21396,13 @@ number of constraints (A)
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -21697,6 +22170,16 @@ number of constraints (A)
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| inf_pr_outpu | OT_STRING    | original     | Determines   | CasADi::Ipop |
+| t            |              |              | what value   | tInternal    |
+|              |              |              | is printed   |              |
+|              |              |              | in the       |              |
+|              |              |              | \"inf_pr\"     |              |
+|              |              |              | output       |              |
+|              |              |              | column. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
 | iteration_ca | OT_FX        |              | A function   | CasADi::Ipop |
 | llback       |              |              | that will be | tInternal    |
 |              |              |              | called at    |              |
@@ -21709,6 +22192,19 @@ number of constraints (A)
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | False        | If set to    | CasADi::Ipop |
+| llback_ignor |              |              | true, errors | tInternal    |
+| e_errors     |              |              | thrown by it |              |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::Ipop |
+| llback_step  |              |              | the callback | tInternal    |
+|              |              |              | function     |              |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_c_consta | OT_STRING    | no           | Indicates    | CasADi::Ipop |
 | nt           |              |              | whether all  | tInternal    |
@@ -22140,6 +22636,48 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ma86_nemin   | OT_INTEGER   | 32           | Node         | CasADi::Ipop |
+|              |              |              | Amalgamation | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_print_l | OT_INTEGER   | 0            | Debug        | CasADi::Ipop |
+| evel         |              |              | printing     | tInternal    |
+|              |              |              | level for    |              |
+|              |              |              | the linear   |              |
+|              |              |              | solver MA86  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_small   | OT_REAL      | 1e-20        | Zero Pivot   | CasADi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_static  | OT_REAL      | 0.0          | Static       | CasADi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_u       | OT_REAL      | 1e-08        | Pivoting     | CasADi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_umax    | OT_REAL      | 0.0001       | Maximum      | CasADi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
 | magic_steps  | OT_STRING    | no           | Enables      | CasADi::Ipop |
 |              |              |              | magic steps. | tInternal    |
 |              |              |              | (see IPOPT d |              |
@@ -22455,9 +22993,9 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| never_use_co | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
-| ntrol_penalt |              |              | switch off   | tInternal    |
-| y_ls         |              |              | the          |              |
+| never_use_pi | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
+| ecewise_pena |              |              | switch off   | tInternal    |
+| lty_ls       |              |              | the          |              |
 |              |              |              | piecewise    |              |
 |              |              |              | penalty      |              |
 |              |              |              | method (see  |              |
@@ -22657,7 +23195,7 @@ number of constraints (A)
 | _inverse_nor |              |              | ocumentation | tInternal    |
 | m_factor     |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_iter | OT_INTEGER   | 10000        | Maximum Size | CasADi::Ipop |
+| pardiso_iter | OT_INTEGER   | 10           | Maximum Size | CasADi::Ipop |
 | _max_levels  |              |              | of Grid      | tInternal    |
 |              |              |              | Levels (see  |              |
 |              |              |              | IPOPT docume |              |
@@ -25645,6 +26183,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::indexed_one_based
+"";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::indexed_zero_based
+"";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::input "
 
 Const access input argument. ";
@@ -25834,8 +26378,8 @@ number of constraints (A)
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -25852,13 +26396,13 @@ number of constraints (A)
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -26626,6 +27170,16 @@ number of constraints (A)
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| inf_pr_outpu | OT_STRING    | original     | Determines   | CasADi::Ipop |
+| t            |              |              | what value   | tInternal    |
+|              |              |              | is printed   |              |
+|              |              |              | in the       |              |
+|              |              |              | \"inf_pr\"     |              |
+|              |              |              | output       |              |
+|              |              |              | column. (see |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
 | iteration_ca | OT_FX        |              | A function   | CasADi::Ipop |
 | llback       |              |              | that will be | tInternal    |
 |              |              |              | called at    |              |
@@ -26638,6 +27192,19 @@ number of constraints (A)
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | False        | If set to    | CasADi::Ipop |
+| llback_ignor |              |              | true, errors | tInternal    |
+| e_errors     |              |              | thrown by it |              |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::Ipop |
+| llback_step  |              |              | the callback | tInternal    |
+|              |              |              | function     |              |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_c_consta | OT_STRING    | no           | Indicates    | CasADi::Ipop |
 | nt           |              |              | whether all  | tInternal    |
@@ -27069,6 +27636,48 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ma86_nemin   | OT_INTEGER   | 32           | Node         | CasADi::Ipop |
+|              |              |              | Amalgamation | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_print_l | OT_INTEGER   | 0            | Debug        | CasADi::Ipop |
+| evel         |              |              | printing     | tInternal    |
+|              |              |              | level for    |              |
+|              |              |              | the linear   |              |
+|              |              |              | solver MA86  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_small   | OT_REAL      | 1e-20        | Zero Pivot   | CasADi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_static  | OT_REAL      | 0.0          | Static       | CasADi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_u       | OT_REAL      | 1e-08        | Pivoting     | CasADi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_umax    | OT_REAL      | 0.0001       | Maximum      | CasADi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
 | magic_steps  | OT_STRING    | no           | Enables      | CasADi::Ipop |
 |              |              |              | magic steps. | tInternal    |
 |              |              |              | (see IPOPT d |              |
@@ -27384,9 +27993,9 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| never_use_co | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
-| ntrol_penalt |              |              | switch off   | tInternal    |
-| y_ls         |              |              | the          |              |
+| never_use_pi | OT_STRING    | no           | Toggle to    | CasADi::Ipop |
+| ecewise_pena |              |              | switch off   | tInternal    |
+| lty_ls       |              |              | the          |              |
 |              |              |              | piecewise    |              |
 |              |              |              | penalty      |              |
 |              |              |              | method (see  |              |
@@ -27586,7 +28195,7 @@ number of constraints (A)
 | _inverse_nor |              |              | ocumentation | tInternal    |
 | m_factor     |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| pardiso_iter | OT_INTEGER   | 10000        | Maximum Size | CasADi::Ipop |
+| pardiso_iter | OT_INTEGER   | 10           | Maximum Size | CasADi::Ipop |
 | _max_levels  |              |              | of Grid      | tInternal    |
 |              |              |              | Levels (see  |              |
 |              |              |              | IPOPT docume |              |
@@ -28704,6 +29313,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::IpoptSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::IpoptSolver::indexed_zero_based "";
+
 %feature("docstring")  CasADi::IpoptSolver::input "
 
 Const access input argument. ";
@@ -29261,6 +29874,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Jacobian::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Jacobian::indexed_one_based "";
+
+%feature("docstring")  CasADi::Jacobian::indexed_zero_based "";
 
 %feature("docstring")  CasADi::Jacobian::checkNode "
 
@@ -31033,6 +31650,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::indexed_zero_based "";
+
 %feature("docstring")  CasADi::Sundials::KinsolSolver::input "
 
 Const access input argument. ";
@@ -31340,8 +31961,8 @@ number of constraints (A)
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -31358,13 +31979,13 @@ number of constraints (A)
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -31437,6 +32058,19 @@ number of constraints (A)
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -31853,8 +32487,8 @@ number of constraints (A)
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -31871,13 +32505,13 @@ number of constraints (A)
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -31950,6 +32584,19 @@ number of constraints (A)
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -32287,6 +32934,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::KnitroSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::KnitroSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::KnitroSolver::indexed_zero_based "";
 
 %feature("docstring")  CasADi::KnitroSolver::input "
 
@@ -32835,6 +33486,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::indexed_one_based
+"";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::indexed_zero_based
+"";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::input "
 
@@ -33859,6 +34516,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::indexed_one_based
+"";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::indexed_zero_based
+"";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::input "
 
 Const access input argument. ";
@@ -34517,8 +35180,8 @@ number of constraints (A)
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -34535,13 +35198,13 @@ number of constraints (A)
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -34611,6 +35274,19 @@ number of constraints (A)
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -35043,8 +35719,8 @@ number of constraints (A)
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -35061,13 +35737,13 @@ number of constraints (A)
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -35137,6 +35813,19 @@ number of constraints (A)
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -35485,6 +36174,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::indexed_one_based
+"";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::indexed_zero_based
+"";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::input "
 
@@ -35999,6 +36694,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::LinearSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::LinearSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::LinearSolver::indexed_zero_based "";
 
 %feature("docstring")  CasADi::LinearSolver::input "
 
@@ -37272,6 +37971,10 @@ get a reference to an element ";
 
 get an element, do not allocate ";
 
+%feature("docstring")  CasADi::Matrix::hasNZ "
+
+Returns true if the matrix has a non-zero at location i,j. ";
+
 %feature("docstring")  CasADi::Matrix::append "
 
 Append a matrix to the end. ";
@@ -38420,6 +39123,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 CasADi::OptimalControl::MultipleShooting::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::indexed_one_based "";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::indexed_zero_based "";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::checkNode "
 
@@ -39923,6 +40632,16 @@ get a matrix element ";
 
 %feature("docstring")  CasADi::MX::indexed "";
 
+%feature("docstring")  CasADi::MX::indexed "";
+
+%feature("docstring")  CasADi::MX::indexed "";
+
+%feature("docstring")  CasADi::MX::indexed "";
+
+%feature("docstring")  CasADi::MX::indexed "";
+
+%feature("docstring")  CasADi::MX::indexed "";
+
 %feature("docstring")  CasADi::MX::indexed_one_based_assignment "
 
 set a non-zero ";
@@ -40208,6 +40927,16 @@ Get operation type. ";
 
 Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned. ";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
 
@@ -41031,6 +41760,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::MXFunction::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::MXFunction::indexed_one_based "";
+
+%feature("docstring")  CasADi::MXFunction::indexed_zero_based "";
 
 %feature("docstring")  CasADi::MXFunction::input "
 
@@ -41977,8 +42710,8 @@ Joel Andersson
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -41995,13 +42728,13 @@ Joel Andersson
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -42071,6 +42804,19 @@ Joel Andersson
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -42396,6 +43142,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::NLPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::NLPSolver::indexed_zero_based "";
+
 %feature("docstring")  CasADi::NLPSolver::input "
 
 Const access input argument. ";
@@ -42583,8 +43333,8 @@ Joel Andersson
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -42601,13 +43351,13 @@ Joel Andersson
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -42677,6 +43427,19 @@ Joel Andersson
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -45040,6 +45803,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::OCPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::OCPSolver::indexed_zero_based "";
+
 %feature("docstring")  CasADi::OCPSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
@@ -46716,6 +47483,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::indexed_zero_based "";
+
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::input "
 
 Const access input argument. ";
@@ -47756,6 +48527,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Parallelizer::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Parallelizer::indexed_one_based "";
+
+%feature("docstring")  CasADi::Parallelizer::indexed_zero_based "";
 
 %feature("docstring")  CasADi::Parallelizer::checkNode "
 
@@ -49336,6 +50111,12 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::indexed_one_based
+"";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::indexed_zero_based
+"";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::input "
 
 Const access input argument. ";
@@ -49887,6 +50668,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::QPSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::QPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::QPSolver::indexed_zero_based "";
 
 %feature("docstring")  CasADi::QPSolver::input "
 
@@ -51278,6 +52063,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::RKIntegrator::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegrator::indexed_one_based "";
+
+%feature("docstring")  CasADi::RKIntegrator::indexed_zero_based "";
 
 %feature("docstring")  CasADi::RKIntegrator::input "
 
@@ -52957,6 +53746,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Simulator::indexed_one_based "";
+
+%feature("docstring")  CasADi::Simulator::indexed_zero_based "";
+
 %feature("docstring")  CasADi::Simulator::input "
 
 Const access input argument. ";
@@ -53807,8 +54600,8 @@ Assert that the object has been initialized. ";
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -53825,13 +54618,13 @@ Assert that the object has been initialized. ";
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -53906,6 +54699,19 @@ Assert that the object has been initialized. ";
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -54381,8 +55187,8 @@ Joel Andersson
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
 |                                    | default +inf.                      |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers initial guess |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Static parameters on which the     |
 |                                    | objective and constraints might    |
@@ -54399,13 +55205,13 @@ Joel Andersson
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1)           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers for the       |
-|                                    | nonlinear bounds at the solution   |
-|                                    | (m x 1)                            |
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers for the       |
-|                                    | simple bounds at the solution (n x |
-|                                    | 1)                                 |
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -54480,6 +55286,19 @@ Joel Andersson
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -54869,6 +55688,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::SQPMethod::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPMethod::indexed_one_based "";
+
+%feature("docstring")  CasADi::SQPMethod::indexed_zero_based "";
 
 %feature("docstring")  CasADi::SQPMethod::input "
 
@@ -55478,6 +56301,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::SuperLU::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SuperLU::indexed_one_based "";
+
+%feature("docstring")  CasADi::SuperLU::indexed_zero_based "";
 
 %feature("docstring")  CasADi::SuperLU::input "
 
@@ -56739,6 +57566,10 @@ Number of nodes in the algorithm. ";
 
 Clear the function from its symbolic representation, to free up memory, no
 symbolic evaluations are possible after this. ";
+
+%feature("docstring")  CasADi::SXFunction::indexed_one_based "";
+
+%feature("docstring")  CasADi::SXFunction::indexed_zero_based "";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
@@ -58865,6 +59696,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::XFunction::indexed_one_based "";
+
+%feature("docstring")  CasADi::XFunction::indexed_zero_based "";
+
 %feature("docstring")  CasADi::XFunction::input "
 
 Const access input argument. ";
@@ -59746,6 +60581,57 @@ dimensionless time. The InputScheme of the result is the same as the scheme
 of the dae, except for input(DAE_P), which is extended by t0 and tf at the
 top. ";
 
+%feature("docstring")  CasADi::GSL::numSample1D "
+
+sample a function on a 1D grid
+
+Parameters:
+-----------
+
+fx:  an initialized function mapping from single p-by-1 to single m-by-n
+
+a:  grid of numbers p-by-N
+
+For each column in the grid, fx is numerically evaluated and the output is
+put in a resulting matrix of size m-by-n*p
+
+If your fx is really multiple output, and you wish to use a particular
+output, use the slice operator on the fx. ";
+
+%feature("docstring")  CasADi::GSL::numSample1DT "
+
+sample a function on a 1D grid
+
+Parameters:
+-----------
+
+fx:  an initialized function mapping from single p-by-1 to single m-by-n
+
+a:  grid of numbers p-by-N
+
+For each column in the grid, fx is numerically evaluated and the output is
+put in a resulting matrix of size m*p-by-n
+
+If your fx is really multiple output, and you wish to use a particular
+output, use the slice operator on the fx. ";
+
+%feature("docstring")  CasADi::GSL::numSample2D "
+
+sample a function on a 2D grid
+
+Parameters:
+-----------
+
+fx:  an initialized function mapping from (1-by-1,1-by-1) to single m-by-n
+
+a:  grid of numbers
+
+For each point (i,j) in the grid, fx is numerically evaluated and the output
+is put in a matrix
+
+If your fx is really multiple output, and you wish to use a particular
+output, use the slice operator on the fx. ";
+
 %feature("docstring")  CasADi::GSL::getptr "";
 
 %feature("docstring")  CasADi::GSL::trans "
@@ -60052,6 +60938,10 @@ Create a sparsity pattern given the nonzeros in sparse triplet form. ";
 Create a sparsity pattern given the nonzeros in sparse triplet form (no
 nonzero mapping) columns_are_sorted==true means that the column entries
 already in increasing order for each row and without any duplicates. ";
+
+%feature("docstring")  CasADi::GSL::mul "
+
+Get the sparsity resulting from a matrix multiplication ";
 
 %feature("docstring")  CasADi::GSL::vertcat "";
 
@@ -61615,7 +62505,10 @@ This file does absolutely nothing but including all headers ";
 // File: jacobian_8cpp.xml
 
 
-// File: jacobian_8hpp.xml
+// File: casadi_2fx_2jacobian_8hpp.xml
+
+
+// File: documentation_2examples_2ad_2jacobian_8hpp.xml
 
 
 // File: jacobian__internal_8cpp.xml
@@ -62410,13 +63303,13 @@ C99 elementary functions from the math.h header. ";
 // File: group__scheme__QPInput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Input.xml
-
-
-// File: group__scheme__DAEInput.xml
+// File: group__scheme__ControlSimulatorInput.xml
 
 
 // File: group__scheme__NLPInput.xml
+
+
+// File: group__scheme__DAEInput.xml
 
 
 // File: group__scheme__NLPOutput.xml
@@ -62429,6 +63322,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: group__scheme__ACADO__Input.xml
+
+
+// File: group__scheme__MUSCOD__FCN__Input.xml
 
 
 // File: group__scheme__OCPOutput.xml
@@ -62468,6 +63364,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: dir_a51786397c36d6b57308245d29983693.xml
+
+
+// File: dir_b1bddaace3326d5ffc6cc6dcf1ac6e6f.xml
 
 
 // File: dir_44278afa8362399f60c3e75c59412fef.xml
@@ -62585,6 +63484,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: dir_e8c3cb1c9b8c67bcba787c317daa3a5f.xml
+
+
+// File: ad_2jacobian_8py-example.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml

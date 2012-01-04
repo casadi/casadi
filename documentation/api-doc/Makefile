@@ -1,3 +1,6 @@
+SVNREVISION=$(shell svn info | grep Revision | cut -d " " -f 2)$(shell git svn info | grep Revision | cut -d " " -f 2)
+
+
 all: doxpublish
 
 options:
@@ -15,7 +18,7 @@ doxlocal:
 	cp style/casadi.png html/casadi.png
 	
 doxpublish:
-	patch -u Doxyfile.in publish.patch -o - | doxygen -
+	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(SVNREVISION)/' | doxygen -
 	cp style/casadi.png html/casadi.png
 
 swig:

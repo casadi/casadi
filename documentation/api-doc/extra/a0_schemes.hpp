@@ -48,7 +48,7 @@
 <tr><td>NLP_UBX</td><td>Decision variables upper bound (n x 1), default +inf.</td></tr>
 <tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf.</td></tr>
 <tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf.</td></tr>
-<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers initial guess (m x 1)</td></tr>
+<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers associated with G, initial guess (m x 1)</td></tr>
 <tr><td>NLP_P</td><td>Static parameters on which the objective and constraints might depend.</td></tr>
 </table>
 */
@@ -68,8 +68,8 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1)</td></tr>
 <tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1)</td></tr>
-<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers for the nonlinear bounds at the solution (m x 1)</td></tr>
-<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers for the simple bounds at the solution (n x 1)</td></tr>
+<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1)</td></tr>
+<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) When in warmstart mode, this output may be used as input (</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
