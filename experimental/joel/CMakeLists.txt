@@ -89,4 +89,6 @@ target_link_libraries(test_ooqp ooqp_interface casadi ${OOQP_LIBRARIES} ${IPOPT_
 endif(OOQP_FOUND)
 endif(IPOPT_FOUND)
 
+add_executable(ticket_309 ticket_309.cpp )
+target_link_libraries(ticket_309 casadi ${CMAKE_DL_LIBS})
 
