@@ -641,5 +641,9 @@ class typemaptests(casadiTestCase):
     self.assertEqual(type(B),type(A))
     self.checkarray(array(B),DMatrix(2,2,2),"Imatrix")
     
+  def test_issue314(self):
+    self.message("regression test for #314: SXMatrix sparsity constructor")
+    SXMatrix(sp_diag(3),[1,2,3])
+    
 if __name__ == '__main__':
     unittest.main()

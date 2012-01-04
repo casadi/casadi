@@ -28,6 +28,7 @@
 #define PRECEDENCE_SXMatrix 103
 #define PRECEDENCE_SX 102
 #define PRECEDENCE_SXMatrixVector 103
+#define PRECEDENCE_SXVector 102
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_MXVectorVector 106
@@ -36,6 +37,7 @@
 #define PRECEDENCE_DICTIONARY 21
 
 #ifdef SWIG_MAIN_MODULE
+%template(SXVector) std::vector< CasADi::SX > ;
 %template(SXMatrixVector) std::vector<CasADi::Matrix<CasADi::SX> > ;
 %template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 %template(MXVector) std::vector<CasADi::MX>;
@@ -43,15 +45,20 @@
 %template(IMatrixVector) std::vector<CasADi::Matrix<int> > ;
 %template(DMatrixVector) std::vector<CasADi::Matrix<double> > ;
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
+%template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
+%template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
 #endif //SWIG_MAIN_MODULE
 #ifndef SWIG_MAIN_MODULE
 %template() std::vector<CasADi::Matrix<CasADi::SX> > ;
 %template() std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
 %template() std::vector<CasADi::MX>;
+%template() std::vector<CasADi::SX>;
 %template() std::vector< std::vector<CasADi::MX> >;
 %template() std::vector<CasADi::Matrix<int> > ;
 %template() std::vector<CasADi::Matrix<double> > ;
 %template() std::vector< std::vector<CasADi::Matrix<double> > > ;
+%template() std::vector<std::vector<CasADi::SX> > ;
+%template() std::vector< std::vector<std::vector<CasADi::SX> > > ;
 #endif //SWIG_MAIN_MODULE
 
 #ifdef SWIGPYTHON
@@ -105,6 +112,7 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 
 %my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
+%my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< CasADi::SX >);
 
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 

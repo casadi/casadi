@@ -252,8 +252,6 @@ namespace CasADi {
 
 #endif // SWIGPYTHON
 
-%template(SXVector)             std::vector<CasADi::SX>;
-%template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
-%template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
 %template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
+
 
