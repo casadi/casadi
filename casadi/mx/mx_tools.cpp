@@ -509,6 +509,10 @@ MX msym(const Matrix<double>& x){
   return MX(x);
 }
 
+MX msym(const std::string& name, const CRSSparsity& sp) {
+  return MX(name,sp);
+}
+
 bool isEqual(const MX& ex1,const MX &ex2){
   if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size1()!=ex2.size1() || ex1.size2()!=ex2.size2())) return false;
   MX difference = ex1 - ex2;  

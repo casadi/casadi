@@ -240,6 +240,8 @@ The MX expression graph is more general but also have considerably more overhead
 //@{
 MX msym(const std::string& name, int n=1, int m=1);
 MX msym(const Matrix<double>& x);
+MX msym(const std::string& name, const CRSSparsity& sp);
+
 //@}
 
 /** \brief  Check if two expressions are equal */
