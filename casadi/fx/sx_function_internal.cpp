@@ -1416,13 +1416,9 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         }
       }
       
-      // Integer seed for each direction
-      bvec_t b = 1;
-      
       // Give seeds to a set of directions
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork[input_ind_[iind][offset+i]] = b;
-        b <<= 1;
+        iwork[input_ind_[iind][offset+i]] = bvec_t(1) << i;
       }
 
       // Propagate the dependencies
@@ -1442,22 +1438,16 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
           // If there is a dependency in any of the directions
           if(0 != iwork[output_ind_[oind][el]]){
           
-            // Dependency to be checked
-            b = 1;
-      
             // Loop over seed directions
             for(int i=0; i<ndir_local; ++i){
               
               // If dependents on the variable
-              if(b & iwork[output_ind_[oind][el]]){
+              if((bvec_t(1) << i) & iwork[output_ind_[oind][el]]){
                 
                 // Add to pattern
                 detected_row.push_back(el);
                 detected_col.push_back(i);
               }
-              
-              // Go to next dependency
-              b <<= 1;
             }
           }
         }
@@ -1488,16 +1478,12 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         }
       }
       
-      // Integer seed for each direction
-      bvec_t b = 1;
-     
       // Remove all seeds
       fill_n(iwork,dwork_.size(),0);
 
       // Give seeds to a set of directions
       for(int i=0; i<bvec_size && offset+i<nz_out; ++i){
-        iwork[output_ind_[oind][offset+i]] |= b; // note that we may have several nonzeros using the same entry in the work vector, therefore |=
-        b <<= 1;
+        iwork[output_ind_[oind][offset+i]] |= bvec_t(1) << i; // note that we may have several nonzeros using the same entry in the work vector, therefore |=
       }
       
       // Propagate the dependencies
@@ -1517,22 +1503,16 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
         // If there is a dependency in any of the directions
         if(0 != iwork[input_ind_[iind][el]]){
           
-          // Output dependency to be checked
-          b = 1;
-          
           // Loop over seed directions
           for(int i=0; i<ndir_local ; ++i){
               
             // If the output is influenced by the variable
-            if(b & iwork[input_ind_[iind][el]]){
+            if((bvec_t(1) << i) & iwork[input_ind_[iind][el]]){
             
               // Add to pattern
               detected_row.push_back(i);
               detected_col.push_back(el);
             }
-
-            // Go to next dependency
-            b <<= 1;
           }
         }
       }
