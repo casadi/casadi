@@ -52,6 +52,10 @@ class Variables(object):
         self._orderflag = True
         self._offset = 0
         self._type = "SX"
+        self._frozen = False
+        
+    def freeze(self):
+      self._frozen = True
 
     def __getattr__(self,name):
         """
@@ -66,6 +70,8 @@ class Variables(object):
         """
         if name in self.__dict__:
             return object.__getattribute__(self,name)
+        if not(self._frozen):
+          raise Exception("You must first .freeze() this Variables instance before you can access its members ('%s' in this case). This is for your own protection" % name)
         if name.startswith('o_') and len(name)>2:
             return self.getOffset(name[2:])
         if name.startswith('I_') and len(name)>2:
@@ -97,6 +103,8 @@ class Variables(object):
         if name.endswith('_'): 
             getattr(self,name).set(value)
             return
+        if self._frozen:
+          raise Exception("This Variables instance is frozen. You cannot add more members ('%s' in this case). This is for your own protection." % name)
         self._d[name] = value
         if isinstance(value,MX) or self._type == "MX":
            self._type = "MX"

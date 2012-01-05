@@ -18,9 +18,14 @@ class Toolstests(casadiTestCase):
       p.z = ssym("z",2,4)
       p.y = ssym("y",3,2)
 
-      p.xother = Variables()
-      p.xother.a = SX("x")
-      p.xother.b = diag(ssym("[a,b]"))
+      xother = Variables()
+      xother.a = SX("x")
+      xother.b = diag(ssym("[a,b]"))
+      xother.freeze()
+      
+      p.xother = xother
+      
+      p.freeze()
 
       self.assertEqual(p.o_x,0)
       self.assertEqual(p.o_xother,2)
@@ -61,10 +66,12 @@ class Toolstests(casadiTestCase):
 
       p = Variables()
       p.a = ssym("a",2)
-      p.b = []
-      p.b.append(ssym("b1",3))
-      p.b.append(ssym("b2",3))
+      b = []
+      b.append(ssym("b1",3))
+      b.append(ssym("b2",3))
+      p.b = b
       p.c = ssym("c")
+      p.freeze()
       
       self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
       self.checkarray(array(p.i_b[0]),DMatrix([[2],[3],[4]]),"index")
@@ -97,11 +104,12 @@ class Toolstests(casadiTestCase):
       
       p = Variables()
       p.a = msym("a",2)
-      p.b = []
-      p.b.append(msym("b1",3))
-      p.b.append(msym("b2",3))
+      b = []
+      b.append(msym("b1",3))
+      b.append(msym("b2",3))
+      p.b = b
       p.c = msym("c")
-      
+      p.freeze()
       
       f = MXFunction([p.veccat()],[p.a,p.b[0],p.b[1],p.c])
       f.init()
@@ -120,11 +128,13 @@ class Toolstests(casadiTestCase):
       
       p = Variables()
       p.a = ssym("a",2)
-      p.b = []
-      p.b.append(ssym("b1",3))
-      p.b.append(ssym("b2",3))
-      p.b.append([ssym("b3",3),ssym("b4",3)])
+      b = []
+      b.append(ssym("b1",3))
+      b.append(ssym("b2",3))
+      b.append([ssym("b3",3),ssym("b4",3)])
+      p.b = b
       p.c = ssym("c")
+      p.freeze()
       
       self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
       self.checkarray(array(p.i_b[0]),DMatrix([[2],[3],[4]]),"index")
