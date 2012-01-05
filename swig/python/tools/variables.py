@@ -56,6 +56,8 @@ class Variables(object):
         
     def freeze(self):
       self._frozen = True
+      if self._type == "MX":
+        self.createParent()
 
     def __getattr__(self,name):
         """
@@ -71,7 +73,7 @@ class Variables(object):
         if name in self.__dict__:
             return object.__getattribute__(self,name)
         if not(self._frozen):
-          raise Exception("You must first .freeze() this Variables instance before you can access its members ('%s' in this case). This is for your own protection" % name)
+          raise Exception("You must first freeze() this Variables instance before you can access its members ('%s' in this case). This is for your own protection" % name)
         if name.startswith('o_') and len(name)>2:
             return self.getOffset(name[2:])
         if name.startswith('I_') and len(name)>2:
@@ -108,7 +110,7 @@ class Variables(object):
         self._d[name] = value
         if isinstance(value,MX) or self._type == "MX":
            self._type = "MX"
-           self.createParent()
+           #self.createParent()
         
         if not(isinstance(value,Variables)):
             self._d_[name] = self.get_(value)
