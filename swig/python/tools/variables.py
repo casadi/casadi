@@ -57,8 +57,12 @@ class Variables(object):
     def freeze(self):
       self._frozen = True
       self._order = sorted(self._d.iterkeys())
+      for k in self._order:
+        if isinstance(self._d[k],Variables):
+          self._d[k].freeze()
       if self._type == "MX":
         self.createParent()
+      self._numbers = Numbers(self,recycle=True)
 
     def __getattr__(self,name):
         """
@@ -86,8 +90,7 @@ class Variables(object):
         if name.endswith('_'):
             if isinstance(self._d[name[:-1]],Variables):
                 raise Exception("Variable %s has no numerical value, because it is a Variables object itself." % name[:-1])
-            self.doUpdates_(name[:-1])
-            return self._d_[name[:-1]]
+            return getattr(self._numbers,name[:-1])
         if name in self._d:
           return self._d[name]
         else:
@@ -104,17 +107,14 @@ class Variables(object):
             object.__setattr__(self,name,value)
             return
         if name.endswith('_'): 
-            getattr(self,name).set(value)
+            getattr(self._numbers,name[:-1]).set(value)
             return
         if self._frozen:
           raise Exception("This Variables instance is frozen. You cannot add more members ('%s' in this case). This is for your own protection." % name)
         self._d[name] = value
         if isinstance(value,MX) or self._type == "MX":
            self._type = "MX"
-           #self.createParent()
         
-        if not(isinstance(value,Variables)):
-            self._d_[name] = self.get_(value)
             
     def createParent(self):
         self._V = msym("V[" + ",".join(self._order) + "]",self.getSize())
@@ -124,15 +124,6 @@ class Variables(object):
                 raise Exception("Not implemented")
             i = flatten(getattr(self,'i_'+k))
             self._d[k] = map_nested_list(lambda c,x: self._V[i[c]],obj)
-   
-            
-    def get_(self,value):
-      return map_nested_list(lambda c,x: DMatrix(self.getSparsity(x),0),value)
-            
-    def doUpdates_(self,name):
-      if isinstance(self._d[name],list):
-        if not(len(self._d[name])==len(self._d_[name])):
-          self._d_[name] = self.get_(self._d[name])
       
     def getindex(self,name):
         if not(name in self._d):
@@ -245,6 +236,8 @@ class Variables(object):
         """
         Returns the result of a veccat operation to the list of all variables
         """
+        if not(self._frozen):
+          raise Exception("You must first freeze() this Variables instance. This is for your own protection")
         if self._type == "MX":
           return self._V
           
@@ -264,6 +257,8 @@ class Variables(object):
         """
         Returns the result of a veccat operation to the list of all variables
         """
+        if not(self._frozen):
+          raise Exception("You must first freeze() this Variables instance. This is for your own protection")
         if self._type == "MX":
           return self._V
         l = []
@@ -282,33 +277,17 @@ class Variables(object):
         """
         Returns the result of a veccat operation to the list of all variables values
         """
-        l = []
-        for k in self._order:
-            obj = self._d[k]
-            if isinstance(obj,Variables):
-                l.append(obj.veccat_())
-            elif isinstance(obj,list):
-                self.doUpdates_(k)
-                l.append(vecNZcat(self._d_[k]))
-            else:
-                l.append(self._d_[k])
-        return vecNZcat(flatten(l))
+        if not(self._frozen):
+          raise Exception("You must first freeze() this Variables instance. This is for your own protection")
+        return self._numbers.vecNZcat()
         
     def veccat_(self):
         """
         Returns the result of a veccat operation to the list of all variables values
         """
-        l = []
-        for k in self._order:
-            obj = self._d[k]
-            if isinstance(obj,Variables):
-                l.append(obj.veccat_())
-            elif isinstance(obj,list):
-                self.doUpdates_(k)
-                l+=self._d_[k]
-            else:
-                l.append(self._d_[k])
-        return veccat(flatten(l))
+        if not(self._frozen):
+          raise Exception("You must first freeze() this Variables instance. This is for your own protection")
+        return self._numbers.veccat()
         
     def __str__(self):
         keys = self._order
@@ -321,5 +300,86 @@ class Variables(object):
     @property
     def shape(self):
        return (self.getNumel(),1)
-       
-       
+          
+class Numbers(object):
+  def __init__(self,variables=None, recycle = False):
+    if (variables is None or not(isinstance(variables,Variables)) or not(variables._frozen)):
+      raise Exception("You must supply the Numbers constructor with a Variables instance in frozen configuration.")
+      
+    self._variables = variables
+    self._d_ = dict()
+    self._numbers = dict()
+    
+    for k in self._variables._order:
+      obj = self._variables._d[k]
+      if isinstance(obj,Variables):
+        if recycle:
+          self._numbers[k] = obj._numbers
+        else:
+          self._numbers[k] = Numbers(obj)
+      else:
+        self._d_[k] = map_nested_list(lambda c,x: DMatrix(self._variables.getSparsity(x),0),obj)
+      
+  def __getattr__(self,name):
+        """
+          f.foo   returns the 'foo' DMatrix entry in the variable dictionary 
+          
+        """
+        if name in self.__dict__:
+            return object.__getattribute__(self,name)
+            
+        if name in self._numbers:
+          return self._numbers[name]
+            
+        if name in self._d_:
+          return self._d_[name]
+        else:
+          raise Exception("Variable " + name + " does not exist. Existing ones are: " + ",".join(self._variables._order))
+           
+  def __setattr__(self,name,value):
+        """
+        have a leading underscore to bypass the dictionary
+        
+        f.foo 
+        
+        """
+        
+        if name.startswith('_'):
+            object.__setattr__(self,name,value)
+            return
+        
+        getattr(self,name).set(value)
+            
+  def vecNZcat(self):
+      """
+      Returns the result of a veccat operation to the list of all variables values
+      """
+      l = []
+      for k in self._variables._order:
+          obj = self._variables._d[k]
+          if isinstance(obj,Variables):
+              l.append(self._numbers[k].veccat())
+          elif isinstance(obj,list):
+              l.append(vecNZcat(self._d_[k]))
+          else:
+              l.append(self._d_[k])
+      return vecNZcat(flatten(l))
+      
+  def veccat(self):
+      """
+      Returns the result of a veccat operation to the list of all variables values
+      """
+      l = []
+      for k in self._variables._order:
+          obj = self._variables._d[k]
+          if isinstance(obj,Variables):
+              l.append(self._numbers[k].veccat())
+          elif isinstance(obj,list):
+              l+=self._d_[k]
+          else:
+              l.append(self._d_[k])
+      return veccat(flatten(l))
+      
+  def setAll(self,value):
+    for k in self._variables._order:
+      getattr(self,k).setAll(value)

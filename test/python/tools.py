@@ -49,7 +49,6 @@ class Toolstests(casadiTestCase):
       p.x_ = [5,8]
 
       p.xother.b_.setAll(7)
-
       p.z_ = DMatrix([[1,2,3,4],[5,6,7,8]])
 
 
@@ -114,17 +113,9 @@ class Toolstests(casadiTestCase):
       f = MXFunction([p.veccat()],[p.a,p.b[0],p.b[1],p.c])
       f.init()
       
-      print "i_a," ,p.i_a
-
-      print f.input()
       f.input()[p.i_a]=[4,5]
       
-      print f.input()
-      
       f.evaluate()
-      
-      print f.output()
-      print p.veccat()
       
       p = Variables()
       p.a = ssym("a",2)
@@ -157,7 +148,31 @@ class Toolstests(casadiTestCase):
       self.assertEqual(p.I_b[2][1],4,"Index")
       self.assertEqual(p.I_c,5,"Index")
       
-       
+  def test_Numbers(self):
+      p = Variables()
+
+      p.x = ssym("x",2)
+      p.z = ssym("z",2,4)
+      p.y = ssym("y",3,2)
+
+      xother = Variables()
+      xother.a = SX("x")
+      xother.b = diag(ssym("[a,b]"))
+      xother.freeze()
+      
+      p.xother = xother
+      
+      p.freeze()
+      
+      p_ = Numbers(p)
+      
+      p_.y.setAll(3)
+      
+      p_.x = [4,5]
+      
+      p_.xother.a=12
+
+      self.checkarray(p_.vecNZcat(),DMatrix([4,5,12,0,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0]),"vecNZcat")
 
 if __name__ == '__main__':
     unittest.main()
