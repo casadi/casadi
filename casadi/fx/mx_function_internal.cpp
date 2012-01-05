@@ -535,7 +535,47 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
   }
 }
 
+bvec_t& MXFunctionInternal::spGet(bool get_input, int ind, int sdir){
+  if(get_input){
+    return iwork_in_[sdir];
+  } else {
+    return iwork_out_[sdir];
+  }
+}
+
+void MXFunctionInternal::spProp(bool fwd){
+  if(fwd){
+    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+      if(it->mx->isSymbolic()) continue;
+      
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,0);
+
+      // Evaluate
+      it->mx->propagateSparsity(mx_input_, mx_output_);
+    }
+  }
+}
+
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
+  
+  // Start by setting all elements of the work vector to zero
+  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
+    //Get a pointer to the int array
+    bvec_t *iwork = get_bvec_t(it->data.data());
+    fill_n(iwork,it->data.size(),0);
+  }
+
+  // Pointer to the data vector for the input
+  int el_in = input_ind[iind];
+  iwork_in_ = get_bvec_t(work[el_in].data.data());
+  
+  // Pointer to the data vector for the output
+  int el_out = output_ind[oind];
+  iwork_out_ = get_bvec_t(work[el_out].data.data());
+
+  // Adjoint mode work does not yet work for MX
+  sp_adj_ok_ = false;
   
   // Number of input variables (columns of the Jacobian)
   int n_in = input(iind).numel();
@@ -566,21 +606,6 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   // Return sparsity
   CRSSparsity ret;
   
-  // Start by setting all elements of the work vector to zero
-  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
-    //Get a pointer to the int array
-    bvec_t *iwork = get_bvec_t(it->data.data());
-    fill_n(iwork,it->data.size(),0);
-  }
-  
-  // Pointer to the data vector for the input
-  int el_in = input_ind[iind];
-  bvec_t *iwork_in = get_bvec_t(work[el_in].data.data());
-  
-  // Pointer to the data vector for the output
-  int el_out = output_ind[oind];
-  bvec_t *iwork_out = get_bvec_t(work[el_out].data.data());
-  
   // We choose forward or adjoint based on whichever requires less sweeps
   if(true || nsweep_fwd <= nsweep_adj){ // forward mode
 
@@ -595,7 +620,7 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
       
       // Give seeds to a set of directions
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork_in[offset+i] = b;
+        iwork_in_[offset+i] = b;
         b <<= 1;
       }
       
@@ -632,7 +657,7 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
           for(int el=oind_sp_rowind[ii]; el<oind_sp_rowind[ii+1]; ++el){
             
             // If dependents on the variable
-            if(b & iwork_out[el]){
+            if(b & iwork_out_[el]){
               
               // Column
               int jj = oind_sp.col(el);
@@ -655,7 +680,7 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
     
       // Remove the seeds
       for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork_in[offset+i] = 0;
+        iwork_in_[offset+i] = 0;
       }
 
       // Update offset

@@ -132,6 +132,14 @@ class SXFunctionInternal : public XFunctionInternal{
   /// Get a vector of symbolic variables with the same dimensions as the inputs
   virtual std::vector<SXMatrix> symbolicInputSX() const{ return inputv_;}
 
+  /// Propagate the sparsity seeds
+  virtual void spProp(bool fwd);
+  
+  /// Get the forward/adjoint sparsity seed
+  virtual bvec_t& spGet(bool get_input, int ind, int sdir);
+  
+  /// Work vector for sparsity detection
+  bvec_t *iwork_;
 };
 
 

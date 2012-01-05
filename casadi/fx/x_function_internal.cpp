@@ -21,6 +21,7 @@
  */
 
 #include "x_function_internal.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
 namespace CasADi{
 
@@ -32,6 +33,187 @@ XFunctionInternal::XFunctionInternal(){
 }
 
 XFunctionInternal::~XFunctionInternal(){
+}
+
+CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
+  
+  // Number of input variables (columns of the Jacobian)
+  int n_in = input(iind).numel();
+  
+  // Number of output variables (rows of the Jacobian)
+  int n_out = output(oind).numel();
+  
+  // Number of nonzero inputs
+  int nz_in = input(iind).size();
+  
+  // Number of nonzero outputs
+  int nz_out = output(oind).size();
+
+  // Number of forward sweeps we must make
+  int nsweep_fwd = nz_in/bvec_size;
+  if(nz_in%bvec_size>0) nsweep_fwd++;
+  
+  // Number of adjoint sweeps we must make
+  int nsweep_adj = nz_out/bvec_size;
+  if(nz_out%bvec_size>0) nsweep_adj++;
+  
+  // Nonzero offset
+  int offset = 0;
+
+  // Progress
+  int progress = -10;
+
+  // Temporary vectors
+  vector<int> jrow, jcol;
+  
+  // We choose forward or adjoint based on whichever requires less sweeps
+  if(!sp_adj_ok_ || nsweep_fwd <= nsweep_adj){ // forward mode
+    if(verbose()) cout << "XFunctionInternal::getJacSparsity: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
+    
+    // Loop over the variables, ndir variables at a time
+    for(int s=0; s<nsweep_fwd; ++s){
+      // Print progress
+      if(verbose()){
+        int progress_new = (s*100)/nsweep_fwd;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          cout << progress << " %%"  << endl;
+        }
+      }
+      
+      // Give seeds to a set of directions
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        spGet(true,iind,offset+i) |= bvec_t(1)<<i;
+      }
+
+      // Propagate the dependencies
+      spProp(true);
+      
+      // Number of local seed directions
+      int ndir_local = std::min(bvec_size,nz_in-offset);
+      
+      // Loop over the nonzeros of the output
+      for(int el=0; el<nz_out; ++el){
+
+        // Get the sparsity sensitivity
+        bvec_t spsens = spGet(false,oind,el);
+        
+        // If there is a dependency in any of the directions
+        if(0 != spsens){
+        
+          // Loop over seed directions
+          for(int i=0; i<ndir_local; ++i){
+            
+            // If dependents on the variable
+            if((bvec_t(1) << i) & spsens){
+              
+              // Add to pattern
+              jrow.push_back(el);
+              jcol.push_back(i);
+            }
+          }
+        }
+      }
+      
+      // Remove the seeds
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        spGet(true,iind,offset+i) = 0;
+      }
+
+      // Update offset
+      offset += bvec_size;
+    }
+    
+  } else { // Adjoint mode
+    if(verbose()) cout << "XFunctionInternal::getJacSparsity: using adjoint mode: " << nsweep_adj << " sweeps needed for " << nz_out << " directions" << endl;
+    
+    // Loop over the variables, ndir variables at a time
+    for(int s=0; s<nsweep_adj; ++s){
+      
+      // Print progress
+      if(verbose()){
+        int progress_new = (s*100)/nsweep_adj;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          cout << progress << " %%"  << endl;
+        }
+      }
+      
+      // Give seeds to a set of directions
+      for(int i=0; i<bvec_size && offset+i<nz_out; ++i){
+        spGet(false,oind,offset+i) |= bvec_t(1)<<i;
+      }
+      
+      // Propagate the dependencies
+      spProp(false);
+
+      // Number of local seed directions
+      int ndir_local = std::min(bvec_size,nz_out-offset);
+      
+      // Loop over the nonzeros of the input
+      for(int el=0; el<nz_in; ++el){
+        // Get the sparsity sensitivity
+        bvec_t spsens = spGet(true,iind,el);
+
+        // If there is a dependency in any of the directions
+        if(0 != spsens){
+          
+          // Loop over seed directions
+          for(int i=0; i<ndir_local ; ++i){
+              
+            // If the output is influenced by the variable
+            if((bvec_t(1) << i) & spsens){
+            
+              // Add to pattern
+              jrow.push_back(i);
+              jcol.push_back(el);
+            }
+          }
+        }
+      }
+          
+      // Remove the seeds
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        spGet(true,iind,offset+i) = 0;
+      }
+      
+      // Update offset
+      offset += bvec_size;
+    }
+  }
+
+  // Modify rows if sparse output
+  if(n_out!=nz_out){
+    
+    // New row for each old row
+    vector<int> row_map = output(oind).sparsity().getElementMapping();
+    
+    // Update rows
+    for(vector<int>::iterator it=jrow.begin(); it!=jrow.end(); ++it){
+      *it = row_map[*it];
+    }
+  }
+
+  // Modify columns if sparse input
+  if(n_in!=nz_in){
+    
+    // New column for each old column
+    vector<int> col_map = input(iind).sparsity().getElementMapping();
+    
+    // Update columns
+    for(vector<int>::iterator it=jcol.begin(); it!=jcol.end(); ++it){
+      *it = col_map[*it];
+    }
+  }
+
+  // Construct sparsity pattern
+  CRSSparsity ret = sp_triplet(n_out,n_in,jrow,jcol);
+  
+  // Return sparsity pattern
+  if(verbose()) cout << "XFunctionInternal::getJacSparsity end " << endl;
+  return ret;
 }
 
 } // namespace CasADi
