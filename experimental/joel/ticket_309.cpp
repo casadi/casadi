@@ -21,7 +21,6 @@
  */
 
 #include "casadi/casadi.hpp"
-#include "casadi/fx/jacobian.hpp"
 #include <ctime>
 
 using namespace std;
@@ -29,7 +28,7 @@ using namespace CasADi;
 
 int main() {
   int N = 2000;
-  int n = 10;
+  int n = 100;
   SXMatrix x = ssym("x",N);
   SXFunction f(x,pow(x,SXMatrix(2)));
   f.init();
@@ -41,11 +40,17 @@ int main() {
     total += f.call(vector<MX>(1,Xcol))[0];
   }
   MXFunction F(X,total);
+  F.setOption("verbose",true);
   F.init();
-  std::cout << "Please have a coffee break" << std::endl;
-  FX J = Jacobian(F);
-  J.init();
-  std::cout << "Hooray, finished before the universe ended" << std::endl;
   
+  SXFunction FF(F);
+  FF.setOption("verbose",true);
+  FF.init();
+  
+  std::cout << "Please have a coffee break" << std::endl;
+  CRSSparsity Jsp = FF.jacSparsity();
+  std::cout << "Hooray, finished before the universe ended" << std::endl;
+  std::cout << "Jsp = " << Jsp << std::endl;
+
   return 0;
 }
