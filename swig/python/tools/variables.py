@@ -56,6 +56,7 @@ class Variables(object):
         
     def freeze(self):
       self._frozen = True
+      self._order = sorted(self._d.iterkeys())
       if self._type == "MX":
         self.createParent()
 
@@ -90,7 +91,7 @@ class Variables(object):
         if name in self._d:
           return self._d[name]
         else:
-          raise Exception("Variable " + name + " does not exist. Existing ones are: " + ",".join(self.getOrder()))
+          raise Exception("Variable " + name + " does not exist. Existing ones are: " + ",".join(self._order))
            
     def __setattr__(self,name,value):
         """
@@ -116,8 +117,8 @@ class Variables(object):
             self._d_[name] = self.get_(value)
             
     def createParent(self):
-        self._V = msym("V[" + ",".join(self.getOrder()) + "]",self.getSize())
-        for k in self.getOrder():
+        self._V = msym("V[" + ",".join(self._order) + "]",self.getSize())
+        for k in self._order:
             obj = self._d[k]
             if isinstance(obj,Variables):
                 raise Exception("Not implemented")
@@ -135,25 +136,37 @@ class Variables(object):
       
     def getindex(self,name):
         if not(name in self._d):
-            raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self.getOrder()))
-            
+            raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self._order))
+        if not(hasattr(self,'_indexCache')):
+          self._indexCache={}
+          
+        if name in self._indexCache:
+          return self._indexCache[name]
+        
         offsets = flatten(self.getOffset(name))
-        return  map_nested_list(lambda c,x: self.getIMatrix(x,offsets[c]),self._d[name])
+        res = map_nested_list(lambda c,x: self.getIMatrix(x,offsets[c]),self._d[name])
+        
+        self._indexCache[name] = res
+        
+        return res
             
     def getIMatrix(self,obj,offset=0):
+        
       s = self.getSize(obj)
       
       i = IMatrix(self.getSparsity(obj),range(s))
       ivec = vecNZ(i)
       i[ivec] = IMatrix(range(offset,s+offset))
+      
+      
       return i
             
     def getIndex(self,name):
         if not(name in self._d):
-            raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self.getOrder()))
+            raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self._order))
             
         i = 0
-        for k in self.getOrder():
+        for k in self._order:
            if k is name:
               break
            if isinstance(self._d[k],list):
@@ -168,10 +181,10 @@ class Variables(object):
         
     def getOffset(self,name):
         if not(name in self._d):
-            raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self.getOrder()))
+            raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self._order))
         i = self._offset
 
-        for k in self.getOrder():
+        for k in self._order:
             if k == name:
                 sizes = [self.getSize(v) for v in iter_flatten(self._d[name])]
                 offsets = [i] * (len(sizes)+1)
@@ -219,13 +232,6 @@ class Variables(object):
             return i
         else:
             return 0
-                
-    def getOrder(self):
-        """
-        Returns a list of variable names.
-        This list defines the order of variables.
-        """
-        return sorted(self._d.iterkeys())
         
     def getSparsity(self, obj = None):
         if obj is None:
@@ -243,7 +249,7 @@ class Variables(object):
           return self._V
           
         l = []
-        for k in self.getOrder():
+        for k in self._order:
             obj = self._d[k]
             if isinstance(obj,Variables):
                 l.append(obj.veccat())
@@ -261,7 +267,7 @@ class Variables(object):
         if self._type == "MX":
           return self._V
         l = []
-        for k in self.getOrder():
+        for k in self._order:
             obj = self._d[k]
             if isinstance(obj,Variables):
                 l.append(obj.vecNZcat())
@@ -277,7 +283,7 @@ class Variables(object):
         Returns the result of a veccat operation to the list of all variables values
         """
         l = []
-        for k in self.getOrder():
+        for k in self._order:
             obj = self._d[k]
             if isinstance(obj,Variables):
                 l.append(obj.veccat_())
@@ -293,7 +299,7 @@ class Variables(object):
         Returns the result of a veccat operation to the list of all variables values
         """
         l = []
-        for k in self.getOrder():
+        for k in self._order:
             obj = self._d[k]
             if isinstance(obj,Variables):
                 l.append(obj.veccat_())
@@ -305,7 +311,7 @@ class Variables(object):
         return veccat(flatten(l))
         
     def __str__(self):
-        keys = self.getOrder()
+        keys = self._order
         s=''
         s+= "Container holding %d variables.\n" % len(keys)
         for i,k in enumerate(keys):
