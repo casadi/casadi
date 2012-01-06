@@ -128,6 +128,15 @@ class MXFunctionInternal : public XFunctionInternal{
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const{ return inputv;}
+
+    /// Propagate the sparsity seeds
+    virtual void spProp(bool fwd);
+
+    /// Get the forward/adjoint sparsity seed
+    virtual bvec_t& spGet(bool get_input, int ind, int sdir);
+    
+    /// Work vector for sparsity detection
+    bvec_t *iwork_in_, *iwork_out_;
 };
 
 } // namespace CasADi
