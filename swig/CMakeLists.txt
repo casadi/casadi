@@ -100,6 +100,15 @@ if(OOQP_FOUND)
 endif(OOQP_FOUND)
 endif(WITH_OOQP)
 
+if(WITH_WORHP)
+find_package (WORHP QUIET)
+if(WORHP_FOUND)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_WORHP")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} worhp_interface ${WORHP_LIBRARIES})
+endif(WORHP_FOUND)
+endif(WITH_WORHP)
+
+
 # enabling openmp support if requesed
 if(WITH_OPENMP)
 find_package (OpenMP)

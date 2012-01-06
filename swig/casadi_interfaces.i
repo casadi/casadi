@@ -68,3 +68,10 @@
 %}
 %include "interfaces/gsl/gsl_integrator.hpp"
 #endif
+
+#ifdef WITH_WORHP
+%{
+#include "interfaces/worhp/worhp_solver.hpp"
+%}
+%include "interfaces/worhp/worhp_solver.hpp"
+#endif
