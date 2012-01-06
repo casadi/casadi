@@ -318,13 +318,13 @@ FX IntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 
-CRSSparsity IntegratorInternal::getJacSparsity(int iind, int oind){
+CRSSparsity IntegratorInternal::getJacSparsityOld(int iind, int oind){
   if(iind==INTEGRATOR_XP0){
     // Function value does not depend on the state derivative initial guess
     return CRSSparsity();
   } else {
     // Default (dense) sparsity
-    return FXInternal::getJacSparsity(iind,oind);
+    return FXInternal::getJacSparsityOld(iind,oind);
   }
 }
 

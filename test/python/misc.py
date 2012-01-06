@@ -23,7 +23,7 @@ class Misctests(casadiTestCase):
       x = casadi.SX("x")
       f = casadi.SXFunction([[x]], [[x ** 2]])
       f.init()
-      return f.jacSparsity()
+      return f.jacSparsityOld()
     
     def print_sparsity():
         sparsity = calc_sparsity()

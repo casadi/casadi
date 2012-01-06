@@ -68,7 +68,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
   
   // We choose forward or adjoint based on whichever requires less sweeps
   if(!sp_adj_ok_ || nsweep_fwd <= nsweep_adj){ // forward mode
-    if(verbose()) cout << "XFunctionInternal::getJacSparsity: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
+    if(verbose()) cout << "XFunctionInternal::spDetect: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_fwd; ++s){
@@ -126,7 +126,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
     }
     
   } else { // Adjoint mode
-    if(verbose()) cout << "XFunctionInternal::getJacSparsity: using adjoint mode: " << nsweep_adj << " sweeps needed for " << nz_out << " directions" << endl;
+    if(verbose()) cout << "XFunctionInternal::spDetect: using adjoint mode: " << nsweep_adj << " sweeps needed for " << nz_out << " directions" << endl;
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_adj; ++s){
@@ -208,7 +208,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
   CRSSparsity ret = sp_triplet(n_out,n_in,jrow,jcol);
   
   // Return sparsity pattern
-  if(verbose()) cout << "XFunctionInternal::getJacSparsity end " << endl;
+  if(verbose()) cout << "XFunctionInternal::spDetect end " << endl;
   return ret;
 }
 

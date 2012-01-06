@@ -566,7 +566,7 @@ void MXFunctionInternal::spProp(bool fwd){
   }
 }
 
-CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
+CRSSparsity MXFunctionInternal::getJacSparsityOld(int iind, int oind){
   
   // Start by setting all elements of the work vector to zero
   for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){

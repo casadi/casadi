@@ -319,7 +319,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
       if(output[oind]==0) continue;
 
       // Get the sparsity of the Jacobian block
-      CRSSparsity& sp = fcn_.jacSparsity(iind,oind);
+      CRSSparsity& sp = fcn_.jacSparsityOld(iind,oind);
       if(sp.isNull() || sp.size()==0) continue; // Skip if zero
       int d1 = sp.size1();
       int d2 = sp.size2();

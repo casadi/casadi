@@ -344,7 +344,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       //assert(output(oind).size2()==1);
       
       // Save sparsity
-      ret[i] = SXMatrix(jacSparsity(iind,oind));
+      ret[i] = SXMatrix(jacSparsityOld(iind,oind));
       if(verbose()){
         cout << "SXFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
         cout << "       ret[" << i << "] " << ret[i] << endl;
@@ -1383,8 +1383,8 @@ bvec_t& SXFunctionInternal::spGet(bool get_input, int ind, int sdir){
   }
 }
 
-CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
-  if(verbose()) cout << "SXFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << endl;
+CRSSparsity SXFunctionInternal::getJacSparsityOld(int iind, int oind){
+  if(verbose()) cout << "SXFunctionInternal::getJacSparsityOld begin (iind == " << iind <<", oind == " << oind << ")" << endl;
 
   // Make sure that dwork_, which we will now use, has been allocated
   if(dwork_.size() < worksize_) dwork_.resize(worksize_);

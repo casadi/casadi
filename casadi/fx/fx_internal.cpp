@@ -89,7 +89,7 @@ void FXInternal::init(){
   }
 
   // Resize the matrix that holds the sparsity of the Jacobian blocks
-  jac_sparsity_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
+  jac_sparsity_old_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
 
   // Get the Jacobian generator function, if any
   if(hasSetOption("jacobian_generator")){
@@ -404,26 +404,26 @@ FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
   return MXFunction(j_in,j_out);
 }
 
-CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
+CRSSparsity FXInternal::getJacSparsityOld(int iind, int oind){
   // Dense sparsity by default
   return CRSSparsity(output(oind).numel(),input(iind).numel(),true);
 }
 
-void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
-  jac_sparsity_[iind][oind] = sp;
+void FXInternal::setJacSparsityOld(const CRSSparsity& sp, int iind, int oind){
+  jac_sparsity_old_[iind][oind] = sp;
 }
 
-CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
+CRSSparsity& FXInternal::jacSparsityOld(int iind, int oind){
   casadi_assert_message(isInit(),"Function not initialized.");
   
   // Get a reference to the block
-  CRSSparsity& jsp = jac_sparsity_[iind][oind];
+  CRSSparsity& jsp = jac_sparsity_old_[iind][oind];
   
   // Generate, if null
   if(jsp.isNull()){
     if(spgen_==0){
       // Use internal routine to determine sparsity
-      jsp = getJacSparsity(iind,oind);
+      jsp = getJacSparsityOld(iind,oind);
     } else {
       // Create a temporary FX instance
       FX tmp;
@@ -523,7 +523,7 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSp
   int iind = blocks.front().second;
 
   // Sparsity pattern with transpose
-  CRSSparsity &A = jacSparsity(iind,oind);
+  CRSSparsity &A = jacSparsityOld(iind,oind);
   vector<int> mapping;
   CRSSparsity AT = A.transpose(mapping);
   mapping.clear();
@@ -557,7 +557,7 @@ void FXInternal::getFullJacobian(){
   jblocks.reserve((1+getNumInputs())+getNumOutputs());
   for(int oind=0; oind<getNumOutputs(); ++oind){
     for(int iind=-1; iind<getNumInputs(); ++iind){
-      if(iind>=0) jacSparsity(iind,oind);
+      if(iind>=0) jacSparsityOld(iind,oind);
       jblocks.push_back(pair<int,int>(oind,iind));
     }
   }

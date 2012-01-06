@@ -351,7 +351,7 @@ bool dependsOn(const Matrix<SX>& ex, const Matrix<SX> &arg){
 
   SXFunction temp(arg,ex);
   temp.init();
-  CRSSparsity Jsp = temp.jacSparsity();
+  CRSSparsity Jsp = temp.jacSparsityOld();
   return Jsp.size()!=0;
 }
 
@@ -856,7 +856,7 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
   fcn.init();
   
   // Get the sparsity pattern of the Jacobian (no need to actually form the Jacobian)
-  CRSSparsity Jsp = fcn.jacSparsity();
+  CRSSparsity Jsp = fcn.jacSparsityOld();
   
   // Free the function
   fcn = SXFunction();
@@ -931,7 +931,7 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
     // Multiply this expression with a new dummy vector and take the jacobian to find out which variables enter nonlinearily
     SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,ssym("dum2",fcnb_dep.size())));
     fcnb_nonlin.init();
-    CRSSparsity sp_nonlin = fcnb_nonlin.jacSparsity();
+    CRSSparsity sp_nonlin = fcnb_nonlin.jacSparsityOld();
     
     // Get the subsets of variables that appear nonlinearily
     vector<bool> nonlin(sp_nonlin.size2(),false);

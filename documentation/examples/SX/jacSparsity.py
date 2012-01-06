@@ -17,7 +17,7 @@ f = SXFunction([x],[y])
 f.init()
 
 #! And we visualize the sparsity of the jacobian
-spy(f.jacSparsity())
+spy(f.jacSparsityOld())
 
 show()
 

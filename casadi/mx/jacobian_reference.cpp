@@ -33,7 +33,7 @@ JacobianReference::JacobianReference(const MX& x, int iind) : iind_(iind){
   setDependencies(x);
   
   // Pass the sparsity
-  setSparsity(getFunction().jacSparsity(iind_,getFunctionOutput()));
+  setSparsity(getFunction().jacSparsityOld(iind_,getFunctionOutput()));
 }
 
 JacobianReference* JacobianReference::clone() const{
