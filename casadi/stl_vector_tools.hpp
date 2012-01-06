@@ -117,6 +117,18 @@ namespace CasADi{
   /// Get an pointer of sets of booleans from a double vector
   const bvec_t* get_bvec_t(const std::vector<double>& v);
   
+  /// Get an pointer of sets of booleans from a double vector
+  template<typename T>
+  bvec_t* get_bvec_t(std::vector<T>& v){
+    casadi_assert_message(0,"get_bvec_t only supported for double");
+  }
+
+  /// Get an pointer of sets of booleans from a double vector
+  template<typename T>
+  const bvec_t* get_bvec_t(const std::vector<T>& v){
+    casadi_assert_message(0,"get_bvec_t only supported for double");
+  }
+  
   /// Get a pointer to the data contained in the vector
   template<typename T>
   T* getPtr(std::vector<T> &v);
