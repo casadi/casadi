@@ -137,7 +137,7 @@ class SXFunctionInternal : public XFunctionInternal{
   
   /// Get the forward/adjoint sparsity seed
   virtual bvec_t& spGet(bool get_input, int ind, int sdir);
-  
+
   /// Work vector for sparsity detection
   bvec_t *iwork_;
 };

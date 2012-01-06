@@ -156,6 +156,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
       for(int el=0; el<nz_in; ++el){
         // Get the sparsity sensitivity
         bvec_t spsens = spGet(true,iind,el);
+        spGet(true,iind,el) = 0; // Clear the seeds for the next sweep
 
         // If there is a dependency in any of the directions
         if(0 != spsens){
@@ -174,11 +175,6 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
         }
       }
           
-      // Remove the seeds
-      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        spGet(true,iind,offset+i) = 0;
-      }
-      
       // Update offset
       offset += bvec_size;
     }
