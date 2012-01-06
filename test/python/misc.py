@@ -4,8 +4,13 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
-import scipy.special
-from scipy.linalg import expm
+
+scipy_available = True
+try:
+    import scipy.special
+    from scipy.linalg import expm
+except:
+    scipy_available = False
 
 class Misctests(casadiTestCase):
     
