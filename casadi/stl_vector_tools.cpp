@@ -41,8 +41,6 @@ namespace CasADi{
     return range(0,stop);
   }
   
-  
-  
   bvec_t* get_bvec_t(std::vector<double>& v){
     if(v.empty()){
       return 0;
@@ -59,5 +57,6 @@ namespace CasADi{
       return reinterpret_cast<const bvec_t*>(&v.front());
     }
   }
+  
 } // namespace CasADi
 

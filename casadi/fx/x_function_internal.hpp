@@ -58,6 +58,18 @@ class XFunctionInternal : public FXInternal{
   
     /** \brief  evaluate symbolically */
     virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false)=0;
+
+    /// Propagate the sparsity seeds
+    virtual void spProp(bool fwd) = 0;
+
+    /// Get the forward/adjoint sparsity seed
+    virtual bvec_t& spGet(bool get_input, int ind, int sdir) = 0;
+
+    /// Detect sparsity pattern
+    CRSSparsity spDetect(int iind, int oind);
+    
+    /// Allow adjoint mode for sparsity (remove when works for MX)
+    bool sp_adj_ok_;
 };
 
 // Template implementations

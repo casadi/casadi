@@ -457,13 +457,16 @@ class Matrix : public PrintableObject{
     Matrix<T> mul(const Matrix<T> &y) const;
 
     /// Matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& r);
+    static void mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z);
 
     /// Matrix product, no memory allocation: x += mul(z,trans(y))
     static void mul_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z);
 
     /// Matrix product, no memory allocation: y += mul(trans(x),z)
     static void mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
+    
+    /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(x,y)
+    static void mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd);
     
     /// Matrix transpose
     Matrix<T> trans() const;
@@ -2084,15 +2087,16 @@ void Matrix<T>::mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matr
 template<class T>
 void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
   // Direct access to the arrays
-  std::vector<T> &z_data = z.data();
   const std::vector<int> &z_col = z.col();
   const std::vector<int> &z_rowind = z.rowind();
-  const std::vector<T> &x_data = x.data();
   const std::vector<int> &x_col = x.col();
-  const std::vector<T> &y_trans_data = y_trans.data();
   const std::vector<int> &y_row = y_trans.col();
   const std::vector<int> &x_rowind = x.rowind();
   const std::vector<int> &y_colind = y_trans.rowind();
+
+  const std::vector<T> &x_data = x.data();
+  const std::vector<T> &y_trans_data = y_trans.data();
+  std::vector<T> &z_data = z.data();
 
   // loop over the rows of the resulting matrix)
   for(int i=0; i<z_rowind.size()-1; ++i){
@@ -2115,6 +2119,50 @@ void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matri
   }
 }
 
+template<class T>
+void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd){
+  // Direct access to the arrays
+  const std::vector<int> &z_col = z.col();
+  const std::vector<int> &z_rowind = z.rowind();
+  const std::vector<int> &x_col = x.col();
+  const std::vector<int> &y_row = y_trans.col();
+  const std::vector<int> &x_rowind = x.rowind();
+  const std::vector<int> &y_colind = y_trans.rowind();
+
+  // Convert data array to arrays of integers
+  bvec_t *x_data = get_bvec_t(x.data());
+  bvec_t *y_trans_data = get_bvec_t(y_trans.data());
+  bvec_t *z_data = get_bvec_t(z.data());
+  
+  // loop over the rows of the resulting matrix)
+  for(int i=0; i<z_rowind.size()-1; ++i){
+    for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
+      int j = z_col[el];
+      int el1 = x_rowind[i];
+      int el2 = y_colind[j];
+      if(fwd) z_data[el] = 0;
+      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+        int j1 = x_col[el1];
+        int i2 = y_row[el2];      
+        if(j1==i2){
+          // | and not & since we are propagating dependencies
+          if(fwd){
+            z_data[el] |= x_data[el1] | y_trans_data[el2];
+          } else {
+            x_data[el1] |= z_data[el];
+            y_trans_data[el2] |= z_data[el];
+          }
+          el1++;
+          el2++;
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+    }
+  }
+}
 
 template<class T>
 Matrix<T> Matrix<T>::trans() const{

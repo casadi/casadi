@@ -54,7 +54,7 @@ void OutputNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
 void OutputNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 }
 
-void OutputNode::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){ 
+void OutputNode::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){ 
 }
 
 MX OutputNode::jac(int iind){

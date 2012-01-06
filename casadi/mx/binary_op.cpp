@@ -325,36 +325,51 @@ void NonzerosNonzerosOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& out
   evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
 }
 
-void NonzerosNonzerosOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *input0 = get_bvec_t(input[0]->data());
-  const bvec_t *input1 = get_bvec_t(input[1]->data());
+void NonzerosNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  bvec_t *input0 = get_bvec_t(input[0]->data());
+  bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int el=0; el<output[0]->size(); ++el){
-    outputd[el] = input0[el] | input1[el];
+    if(fwd){
+      outputd[el] = input0[el] | input1[el];
+    } else {
+      input0[el] |= outputd[el];
+      input1[el] |= outputd[el];
+    }
   }
 }
 
-void NonzerosScalarOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *input0 = get_bvec_t(input[0]->data());
-  const bvec_t *input1 = get_bvec_t(input[1]->data());
+void NonzerosScalarOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  bvec_t *input0 = get_bvec_t(input[0]->data());
+  bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int el=0; el<output[0]->size(); ++el){
-    outputd[el] = input0[el] | input1[0];
+    if(fwd){
+      outputd[el] = input0[el] | input1[0];
+    } else {
+      input0[el] |= outputd[el];
+      input1[0]  |= outputd[el];
+    }
   }
 }
 
-void ScalarNonzerosOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *input0 = get_bvec_t(input[0]->data());
-  const bvec_t *input1 = get_bvec_t(input[1]->data());
+void ScalarNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  bvec_t *input0 = get_bvec_t(input[0]->data());
+  bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int el=0; el<output[0]->size(); ++el){
-    outputd[el] = input0[0] | input1[el];
+    if(fwd){
+      outputd[el] = input0[0] | input1[el];
+    } else {
+      input0[0]  |= outputd[el]; 
+      input1[el] |= outputd[el];
+    }
   }
 }
 
-void SparseSparseOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *input0 = get_bvec_t(input[0]->data());
-  const bvec_t *input1 = get_bvec_t(input[1]->data());
+void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  bvec_t *input0 = get_bvec_t(input[0]->data());
+  bvec_t *input1 = get_bvec_t(input[1]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
 
   // Argument values
@@ -372,7 +387,15 @@ void SparseSparseOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& ou
     bool skip_nz(m & 4);
     
     // Evaluate
-    if(!skip_nz) outputd[el++] = (nz0 ? input0[el0] : zero) | (nz1 ? input1[el1] : zero);
+    if(!skip_nz){
+      if(fwd){
+        outputd[el++] = (nz0 ? input0[el0] : zero) | (nz1 ? input1[el1] : zero);
+      } else {
+        if(nz0) input0[el0] |= outputd[el];
+        if(nz1) input1[el1] |= outputd[el];
+        el++;
+      }
+    }
     
     // Go to next nonzero
     el0 += nz0;

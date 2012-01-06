@@ -99,39 +99,8 @@ void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtr
   }
 }
 
-void Multiplication::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *x_data = get_bvec_t(input[0]->data());
-  const bvec_t *y_trans_data = get_bvec_t(input[1]->data());
-  bvec_t *z_data = get_bvec_t(output[0]->data());
-  
-  // Direct access to the arrays
-  const std::vector<int> &z_col = output[0]->col();
-  const std::vector<int> &z_rowind = output[0]->rowind();
-  const std::vector<int> &x_col = input[0]->col();
-  const std::vector<int> &y_row = input[1]->col();
-  const std::vector<int> &x_rowind = input[0]->rowind();
-  const std::vector<int> &y_colind = input[1]->rowind();
-
-  // loop over the rows of the resulting matrix)
-  for(int i=0; i<z_rowind.size()-1; ++i){
-    for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
-      int j = z_col[el];
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      z_data[el] = 0;
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          z_data[el] |= x_data[el1++] | y_trans_data[el2++];
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
-  }
+void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
 }
 
 } // namespace CasADi

@@ -535,36 +535,38 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
   }
 }
 
+bvec_t& MXFunctionInternal::spGet(bool get_input, int ind, int sdir){
+  if(get_input){
+    return iwork_in_[sdir];
+  } else {
+    return iwork_out_[sdir];
+  }
+}
+
+void MXFunctionInternal::spProp(bool fwd){
+  if(fwd){
+    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+      if(it->mx->isSymbolic()) continue;
+      
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,0);
+
+      // Evaluate
+      it->mx->propagateSparsity(mx_input_, mx_output_,true);
+    }
+  } else {
+    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
+      
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,0);
+      
+      // Evaluate
+      it->mx->propagateSparsity(mx_input_, mx_output_,false);
+    }
+  }
+}
+
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
-  
-  // Number of input variables (columns of the Jacobian)
-  int n_in = input(iind).numel();
-  
-  // Number of output variables (rows of the Jacobian)
-  int n_out = output(oind).numel();
-  
-  // Number of nonzero inputs
-  int nz_in = input(iind).size();
-  
-  // Number of nonzero outputs
-  int nz_out = output(oind).size();
-
-  // Number of forward sweeps we must make
-  int nsweep_fwd = nz_in/bvec_size;
-  if(nz_in%bvec_size>0) nsweep_fwd++;
-  
-  // Number of adjoint sweeps we must make
-  int nsweep_adj = nz_out/bvec_size;
-  if(nz_out%bvec_size>0) nsweep_adj++;
-
-  // Sparsity of the output
-  const CRSSparsity& oind_sp = output(oind).sparsity();
-
-  // Nonzero offset
-  int offset = 0;
-
-  // Return sparsity
-  CRSSparsity ret;
   
   // Start by setting all elements of the work vector to zero
   for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
@@ -572,128 +574,20 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
     bvec_t *iwork = get_bvec_t(it->data.data());
     fill_n(iwork,it->data.size(),0);
   }
-  
+
   // Pointer to the data vector for the input
   int el_in = input_ind[iind];
-  bvec_t *iwork_in = get_bvec_t(work[el_in].data.data());
+  iwork_in_ = get_bvec_t(work[el_in].data.data());
   
   // Pointer to the data vector for the output
   int el_out = output_ind[oind];
-  bvec_t *iwork_out = get_bvec_t(work[el_out].data.data());
+  iwork_out_ = get_bvec_t(work[el_out].data.data());
+
+  // Adjoint mode work does not yet work for MX
+  sp_adj_ok_ = false;
   
-  // We choose forward or adjoint based on whichever requires less sweeps
-  if(true || nsweep_fwd <= nsweep_adj){ // forward mode
-
-    // Return value (sparsity pattern)
-    CRSSparsity ret_trans(nz_in,n_out);
-    
-    // Loop over the variables, ndir variables at a time
-    for(int s=0; s<nsweep_fwd; ++s){
-      
-      // Integer seed for each direction
-      bvec_t b = 1;
-      
-      // Give seeds to a set of directions
-      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork_in[offset+i] = b;
-        b <<= 1;
-      }
-      
-      // Propagate the dependencies
-      for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-        if(it->mx->isSymbolic()) continue;
-
-        // Point pointers to the data corresponding to the element
-        updatePointers(*it,0,0);
-
-        // Evaluate
-        it->mx->propagateSparsity(mx_input_, mx_output_);
-      }
-
-      // Dependency to be checked
-      b = 1;
-
-      // To reduce the order of sparsity appending from O(n) to O(1), we go low level.
-      vector<int>& colv = ret_trans.colRef();
-      vector<int>& rowindv = ret_trans.rowindRef();
-      
-      // This speeds up the loop with a factor of 3 when in debug mode
-      const vector<int>& oind_sp_rowind = oind_sp.rowind();
-       
-      // Loop over seed directions
-      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-
-        rowindv[offset+i+1] = rowindv[offset+i];
-          
-        // Loop over the rows of the output
-        for(int ii=0; ii<oind_sp.size1(); ++ii){
-          
-          // Loop over the nonzeros of the output
-          for(int el=oind_sp_rowind[ii]; el<oind_sp_rowind[ii+1]; ++el){
-            
-            // If dependents on the variable
-            if(b & iwork_out[el]){
-              
-              // Column
-              int jj = oind_sp.col(el);
-              
-              // Append an element to the back
-              colv.push_back(jj + ii*oind_sp.size2());
-              
-              // Increase the rowind
-              rowindv[offset+i+1]++;
-              
-              // Add to pattern - this is too slow
-              //ret_trans.getNZ(offset+i,jj + ii*oind_sp.size2());
-            }
-          }
-        }
-        
-        // Go to next dependency
-        b <<= 1;
-      }
-    
-      // Remove the seeds
-      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        iwork_in[offset+i] = 0;
-      }
-
-      // Update offset
-      offset += bvec_size;
-    }
-  
-    // Return sparsity pattern
-    vector<int> mapping;
-    ret = ret_trans.transpose(mapping);
-  } else { // Adjoint mode
-    casadi_assert_message(0,"not implemented");
-  }
-
-  // Enlarge if sparse output
-  if(n_out!=ret.size1()){
-    casadi_assert(ret.size1()==nz_out);
-    
-    // New row for each old row
-    vector<int> row_map = output(oind).sparsity().getElementMapping();
-
-    // Insert rows
-    ret.enlargeRows(n_out,row_map);
-  }
-
-  
-  // Enlarge if sparse input
-  if(n_in!=ret.size2()){
-    casadi_assert(ret.size2()==nz_in);
-    
-    // New column for each old column
-    vector<int> col_map = input(iind).sparsity().getElementMapping();
-    
-    // Insert columns
-    ret.enlargeColumns(n_in,col_map);
-  }
-  
-  // Return sparsity pattern
-  return ret;
+  // Call the base class routine (common with SXFunction)
+  return spDetect(iind,oind);
 }
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
