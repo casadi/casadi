@@ -79,7 +79,7 @@ class OutputNode : public MXNode{
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

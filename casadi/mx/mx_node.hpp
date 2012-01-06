@@ -123,7 +123,7 @@ class MXNode : public SharedObjectNode{
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
     
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output) = 0;
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) = 0;
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;

@@ -552,7 +552,16 @@ void MXFunctionInternal::spProp(bool fwd){
       updatePointers(*it,0,0);
 
       // Evaluate
-      it->mx->propagateSparsity(mx_input_, mx_output_);
+      it->mx->propagateSparsity(mx_input_, mx_output_,true);
+    }
+  } else {
+    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
+      
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,0);
+      
+      // Evaluate
+      it->mx->propagateSparsity(mx_input_, mx_output_,false);
     }
   }
 }

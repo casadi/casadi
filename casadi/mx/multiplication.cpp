@@ -99,9 +99,11 @@ void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtr
   }
 }
 
-void Multiplication::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *x_data = get_bvec_t(input[0]->data());
-  const bvec_t *y_trans_data = get_bvec_t(input[1]->data());
+void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  casadi_assert_message(fwd,"Adj not implemented");
+  
+  bvec_t *x_data = get_bvec_t(input[0]->data());
+  bvec_t *y_trans_data = get_bvec_t(input[1]->data());
   bvec_t *z_data = get_bvec_t(output[0]->data());
   
   // Direct access to the arrays

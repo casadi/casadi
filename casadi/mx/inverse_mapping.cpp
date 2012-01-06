@@ -64,7 +64,7 @@ void InverseMapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, con
   }
 }
 
-void InverseMapping::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+void InverseMapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   casadi_assert_message(0,"not implemented");
 }
 

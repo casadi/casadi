@@ -122,10 +122,17 @@ void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
 }
 
-void UnaryOp::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
-  const bvec_t *inputd = get_bvec_t(input[0]->data());
+void UnaryOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  bvec_t *inputd = get_bvec_t(input[0]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
-  copy(inputd,inputd+size(),outputd);
+  if(fwd){
+    copy(inputd,inputd+size(),outputd);
+  } else {
+    int nz = input[0]->data().size();
+    for(int el=0; el<nz; ++el){
+      inputd[el] |= outputd[el];
+    }
+  }
 }
 
 } // namespace CasADi

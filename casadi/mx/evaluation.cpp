@@ -262,7 +262,9 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
   fcn_ = deepcopy(fcn_,already_copied);
 }
 
-void Evaluation::propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output){
+void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  casadi_assert_message(fwd,"Adj not implemented");
+  
   // Clear the outputs
   for(int oind=0; oind<output.size(); ++oind){
     // Skip of not used

@@ -75,7 +75,7 @@ class SparseSparseOp : public BinaryOp{
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
@@ -101,7 +101,7 @@ class NonzerosScalarOp : public BinaryOp{
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
@@ -128,7 +128,7 @@ class ScalarNonzerosOp : public BinaryOp{
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
@@ -155,7 +155,7 @@ class NonzerosNonzerosOp : public BinaryOp{
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(const DMatrixPtrV& input, DMatrixPtrV& output);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
