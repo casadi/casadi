@@ -114,6 +114,7 @@ class MXFunctionInternal : public XFunctionInternal{
 
     /// Generate the sparsity of a Jacobian block
     virtual CRSSparsity getJacSparsityOld(int iind, int oind);
+    virtual CRSSparsity getJacSparsity(int iind, int oind);
     
     // Update pointers to a particular element
     void updatePointers(const AlgEl& el, int nfwd, int nadj);

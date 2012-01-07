@@ -89,6 +89,7 @@ void FXInternal::init(){
   }
 
   // Resize the matrix that holds the sparsity of the Jacobian blocks
+  jac_sparsity_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
   jac_sparsity_old_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
 
   // Get the Jacobian generator function, if any
@@ -405,12 +406,46 @@ FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
 }
 
 CRSSparsity FXInternal::getJacSparsityOld(int iind, int oind){
+  // Get the new, compact sparsity pattern
+  CRSSparsity ret = jacSparsity(iind,oind);
+
+  // Enlarge if sparse output 
+  if(output(oind).numel()!=ret.size1()){
+    casadi_assert(ret.size1()==output(oind).size());
+    
+    // New row for each old row 
+    vector<int> row_map = output(oind).sparsity().getElementMapping();
+    
+    // Insert rows 
+    ret.enlargeRows(output(oind).numel(),row_map);
+  }
+  
+  // Enlarge if sparse input 
+  if(input(iind).numel()!=ret.size2()){
+    casadi_assert(ret.size2()==input(iind).size());
+    
+    // New column for each old column
+    vector<int> col_map = input(iind).sparsity().getElementMapping();
+    
+    // Insert columns
+    ret.enlargeColumns(input(iind).numel(),col_map);
+  }
+  
   // Dense sparsity by default
-  return CRSSparsity(output(oind).numel(),input(iind).numel(),true);
+  return ret;
+}
+
+CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
+  // Dense sparsity by default
+  return CRSSparsity(output(oind).size(),input(iind).size(),true);
 }
 
 void FXInternal::setJacSparsityOld(const CRSSparsity& sp, int iind, int oind){
   jac_sparsity_old_[iind][oind] = sp;
+}
+
+void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
+  jac_sparsity_[iind][oind] = sp;
 }
 
 CRSSparsity& FXInternal::jacSparsityOld(int iind, int oind){
@@ -437,6 +472,36 @@ CRSSparsity& FXInternal::jacSparsityOld(int iind, int oind){
   // If still null, not dependent
   if(jsp.isNull()){
     jsp = CRSSparsity(output(oind).numel(),input(iind).numel());
+  }
+  
+  // Return a reference to the block
+  return jsp;
+}
+
+CRSSparsity& FXInternal::jacSparsity(int iind, int oind){
+  casadi_assert_message(isInit(),"Function not initialized.");
+  
+  // Get a reference to the block
+  CRSSparsity& jsp = jac_sparsity_[iind][oind];
+  
+  // Generate, if null
+  if(jsp.isNull()){
+    if(spgen_==0){
+      // Use internal routine to determine sparsity
+      jsp = getJacSparsity(iind,oind);
+    } else {
+      // Create a temporary FX instance
+      FX tmp;
+      tmp.assignNode(this);
+
+      // Use user-provided routine to determine sparsity
+      jsp = spgen_(tmp,iind,oind,user_data_);
+    }
+  }
+  
+  // If still null, not dependent
+  if(jsp.isNull()){
+    jsp = CRSSparsity(output(oind).size(),input(iind).size());
   }
   
   // Return a reference to the block

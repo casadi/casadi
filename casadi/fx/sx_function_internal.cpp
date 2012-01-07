@@ -1398,6 +1398,24 @@ CRSSparsity SXFunctionInternal::getJacSparsityOld(int iind, int oind){
   sp_adj_ok_ = true;
   
   // Call the base class routine (common with MXFunction)
+  return spDetectOld(iind,oind);
+}
+
+CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
+  if(verbose()) cout << "SXFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << endl;
+
+  // Make sure that dwork_, which we will now use, has been allocated
+  if(dwork_.size() < worksize_) dwork_.resize(worksize_);
+  
+  // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
+  // we can save overhead by reusing the double array
+  iwork_ = get_bvec_t(dwork_);
+  fill_n(iwork_,dwork_.size(),0);
+
+  // Adjoint mode work fine for SX
+  sp_adj_ok_ = true;
+  
+  // Call the base class routine (common with MXFunction)
   return spDetect(iind,oind);
 }
 

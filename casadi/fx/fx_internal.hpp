@@ -164,12 +164,15 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /// Generate the sparsity of a Jacobian block
     virtual CRSSparsity getJacSparsityOld(int iind, int oind);
+    virtual CRSSparsity getJacSparsity(int iind, int oind);
     
     /// Generate the sparsity of a Jacobian block
     void setJacSparsityOld(const CRSSparsity& sp, int iind, int oind);
+    void setJacSparsity(const CRSSparsity& sp, int iind, int oind);
     
     /// Get, if necessary generate, the sparsity of a Jacobian block
     CRSSparsity& jacSparsityOld(int iind, int oind);
+    CRSSparsity& jacSparsity(int iind, int oind);
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
@@ -204,6 +207,7 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /// Sparsity of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_old_;
+    std::vector<std::vector<CRSSparsity> > jac_sparsity_;
 
     /// Use numeric jacobian instead of symbolic
     bool numeric_jacobian_;
