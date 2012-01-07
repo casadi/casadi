@@ -66,7 +66,6 @@ class XFunctionInternal : public FXInternal{
     virtual bvec_t& spGet(bool get_input, int ind, int sdir) = 0;
 
     /// Detect sparsity pattern
-    CRSSparsity spDetectOld(int iind, int oind);
     CRSSparsity spDetect(int iind, int oind);
     
     /// Allow adjoint mode for sparsity (remove when works for MX)

@@ -219,7 +219,7 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   }
 }
 
-CRSSparsity ParallelizerInternal::getJacSparsityOld(int iind, int oind){
+CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind){
   // Number of tasks
   int ntask = inind_.size()-1;
   
@@ -230,7 +230,7 @@ CRSSparsity ParallelizerInternal::getJacSparsityOld(int iind, int oind){
   // Check if the output index is also in this task
   if(oind>=outind_[task] && oind<outind_[task+1]){
     // Call the base class
-    return FXInternal::getJacSparsityOld(iind,oind);
+    return FXInternal::getJacSparsity(iind,oind);
   } else {
     // All-zero jacobian
     return CRSSparsity();

@@ -551,43 +551,29 @@ void MXFunctionInternal::spProp(bool fwd){
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
 
-      // Evaluate
+      // Propagate sparsity forwards
       it->mx->propagateSparsity(mx_input_, mx_output_,true);
     }
   } else {
     for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
+      if(it->mx->isSymbolic()) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
       
-      // Evaluate
+      // Propagate sparsity backwards
       it->mx->propagateSparsity(mx_input_, mx_output_,false);
+      
+      // Clear the seeds for the next sweep
+      for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
+        DMatrix* seed = *it;
+        if(seed){
+          bvec_t *iseed = get_bvec_t(seed->data());
+          fill_n(iseed,seed->size(),0);
+        }
+      }
     }
   }
-}
-
-CRSSparsity MXFunctionInternal::getJacSparsityOld(int iind, int oind){
-  
-  // Start by setting all elements of the work vector to zero
-  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
-    //Get a pointer to the int array
-    bvec_t *iwork = get_bvec_t(it->data.data());
-    fill_n(iwork,it->data.size(),0);
-  }
-
-  // Pointer to the data vector for the input
-  int el_in = input_ind[iind];
-  iwork_in_ = get_bvec_t(work[el_in].data.data());
-  
-  // Pointer to the data vector for the output
-  int el_out = output_ind[oind];
-  iwork_out_ = get_bvec_t(work[el_out].data.data());
-
-  // Adjoint mode work does not yet work for MX
-  sp_adj_ok_ = false;
-  
-  // Call the base class routine (common with SXFunction)
-  return spDetectOld(iind,oind);
 }
 
 CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){

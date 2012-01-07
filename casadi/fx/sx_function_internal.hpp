@@ -127,7 +127,6 @@ class SXFunctionInternal : public XFunctionInternal{
   void clearSymbolic();
 
   /// Generate the sparsity of a Jacobian block
-  virtual CRSSparsity getJacSparsityOld(int iind, int oind);
   virtual CRSSparsity getJacSparsity(int iind, int oind);
 
   /// Get a vector of symbolic variables with the same dimensions as the inputs

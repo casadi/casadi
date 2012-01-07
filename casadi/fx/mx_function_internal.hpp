@@ -113,7 +113,6 @@ class MXFunctionInternal : public XFunctionInternal{
     SXFunction expand(const std::vector<SXMatrix>& inputv );
 
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsityOld(int iind, int oind);
     virtual CRSSparsity getJacSparsity(int iind, int oind);
     
     // Update pointers to a particular element

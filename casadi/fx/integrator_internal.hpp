@@ -85,7 +85,7 @@ public:
   virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
   /// Generate the sparsity of a Jacobian block
-  virtual CRSSparsity getJacSparsityOld(int iind, int oind);
+  virtual CRSSparsity getJacSparsity(int iind, int oind);
 
   /// Get the Jacobian
   virtual FX getJacobian() = 0;

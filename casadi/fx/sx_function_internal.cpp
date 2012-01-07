@@ -344,7 +344,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       //assert(output(oind).size2()==1);
       
       // Save sparsity
-      ret[i] = SXMatrix(jacSparsityOld(iind,oind));
+      ret[i] = SXMatrix(jacSparsity(iind,oind,false));
       if(verbose()){
         cout << "SXFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
         cout << "       ret[" << i << "] " << ret[i] << endl;
@@ -1381,24 +1381,6 @@ bvec_t& SXFunctionInternal::spGet(bool get_input, int ind, int sdir){
   } else {
     return iwork_[output_ind_[ind][sdir]];
   }
-}
-
-CRSSparsity SXFunctionInternal::getJacSparsityOld(int iind, int oind){
-  if(verbose()) cout << "SXFunctionInternal::getJacSparsityOld begin (iind == " << iind <<", oind == " << oind << ")" << endl;
-
-  // Make sure that dwork_, which we will now use, has been allocated
-  if(dwork_.size() < worksize_) dwork_.resize(worksize_);
-  
-  // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
-  // we can save overhead by reusing the double array
-  iwork_ = get_bvec_t(dwork_);
-  fill_n(iwork_,dwork_.size(),0);
-
-  // Adjoint mode work fine for SX
-  sp_adj_ok_ = true;
-  
-  // Call the base class routine (common with MXFunction)
-  return spDetectOld(iind,oind);
 }
 
 CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){

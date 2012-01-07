@@ -66,7 +66,7 @@ class ParallelizerInternal : public FXInternal{
     virtual void init();
 
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsityOld(int iind, int oind);
+    virtual CRSSparsity getJacSparsity(int iind, int oind);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

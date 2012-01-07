@@ -73,7 +73,7 @@ void JacobianInternal::init(){
       output(i) = fcn_.output(oind);
     } else {
       // Jacobian of input iind with respect to output oind
-      output(i) = DMatrix(fcn_.jacSparsityOld(iind,oind),0);
+      output(i) = DMatrix(fcn_.jacSparsity(iind,oind),0);
     }
   }
   

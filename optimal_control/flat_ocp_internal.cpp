@@ -815,7 +815,7 @@ void FlatOCPInternal::sortDAE(){
   SXMatrix dae_only_x = substitute(dae_,der(x_),ssym("tau")*var(x_));
   SXFunction f(var(x_),dae_only_x);
   f.init();
-  CRSSparsity sp = f.jacSparsityOld();
+  CRSSparsity sp = f.jacSparsity();
   
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -846,7 +846,7 @@ void FlatOCPInternal::makeExplicit(){
   f.init();
 
   // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
-  CRSSparsity sp = f.jacSparsityOld();
+  CRSSparsity sp = f.jacSparsity();
 
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
