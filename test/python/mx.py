@@ -1111,7 +1111,10 @@ class MXtests(casadiTestCase):
       
       self.checkarray(J.output(),J_,"evaluation")
 
+  #@unittest.skipIf(not(scipy_available))
   def test_MXalgebraSparseSparse(self):
+    if not(scipy_available):
+        return
     self.message("Test some sparse algebraic properties of matrices")
     n = 8
     m = 10

@@ -182,6 +182,5 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
   return ret;
 }
 
-
 } // namespace CasADi
 
