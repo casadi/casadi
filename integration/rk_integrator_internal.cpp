@@ -221,7 +221,7 @@ CRSSparsity RKIntegratorInternal::getJacSparsity(int iind, int oind){
   if(iind==INTEGRATOR_XP0 || oind==INTEGRATOR_XPF){
     return CRSSparsity();
   } else {
-    return yf_fun_.jacSparsity(iind, oind);
+    return yf_fun_.jacSparsity(iind, oind, true);
   }
 }
 

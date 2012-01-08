@@ -344,7 +344,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       //assert(output(oind).size2()==1);
       
       // Save sparsity
-      ret[i] = SXMatrix(jacSparsity(iind,oind));
+      ret[i] = SXMatrix(jacSparsity(iind,oind,false));
       if(verbose()){
         cout << "SXFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
         cout << "       ret[" << i << "] " << ret[i] << endl;

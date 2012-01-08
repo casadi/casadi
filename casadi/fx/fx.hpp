@@ -153,10 +153,10 @@ class FX : public OptionsFunctionality{
   std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt=Dictionary());
 
   /// Get, if necessary generate, the sparsity of a Jacobian block
-  CRSSparsity& jacSparsity(int iind=0, int oind=0);
+  CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false);
 
   /// Generate the sparsity of a Jacobian block
-  void setJacSparsity(const CRSSparsity& sp, int iind, int oind);
+  void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
   
 #ifndef SWIG 
   /// Construct a function that has only the k'th output

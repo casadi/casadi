@@ -37,12 +37,6 @@ XFunctionInternal::~XFunctionInternal(){
 
 CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
   
-  // Number of input variables (columns of the Jacobian)
-  int n_in = input(iind).numel();
-  
-  // Number of output variables (rows of the Jacobian)
-  int n_out = output(oind).numel();
-  
   // Number of nonzero inputs
   int nz_in = input(iind).size();
   
@@ -68,7 +62,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
   
   // We choose forward or adjoint based on whichever requires less sweeps
   if(!sp_adj_ok_ || nsweep_fwd <= nsweep_adj){ // forward mode
-    if(verbose()) cout << "XFunctionInternal::getJacSparsity: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
+    if(verbose()) cout << "XFunctionInternal::spDetect: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_fwd; ++s){
@@ -78,7 +72,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
         // Print when entering a new decade
         if(progress_new / 10 > progress / 10){
           progress = progress_new;
-          cout << progress << " %%"  << endl;
+          cout << progress << " %"  << endl;
         }
       }
       
@@ -126,7 +120,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
     }
     
   } else { // Adjoint mode
-    if(verbose()) cout << "XFunctionInternal::getJacSparsity: using adjoint mode: " << nsweep_adj << " sweeps needed for " << nz_out << " directions" << endl;
+    if(verbose()) cout << "XFunctionInternal::spDetect: using adjoint mode: " << nsweep_adj << " sweeps needed for " << nz_out << " directions" << endl;
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep_adj; ++s){
@@ -137,7 +131,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
         // Print when entering a new decade
         if(progress_new / 10 > progress / 10){
           progress = progress_new;
-          cout << progress << " %%"  << endl;
+          cout << progress << " %"  << endl;
         }
       }
       
@@ -180,35 +174,11 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
     }
   }
 
-  // Modify rows if sparse output
-  if(n_out!=nz_out){
-    
-    // New row for each old row
-    vector<int> row_map = output(oind).sparsity().getElementMapping();
-    
-    // Update rows
-    for(vector<int>::iterator it=jrow.begin(); it!=jrow.end(); ++it){
-      *it = row_map[*it];
-    }
-  }
-
-  // Modify columns if sparse input
-  if(n_in!=nz_in){
-    
-    // New column for each old column
-    vector<int> col_map = input(iind).sparsity().getElementMapping();
-    
-    // Update columns
-    for(vector<int>::iterator it=jcol.begin(); it!=jcol.end(); ++it){
-      *it = col_map[*it];
-    }
-  }
-
   // Construct sparsity pattern
-  CRSSparsity ret = sp_triplet(n_out,n_in,jrow,jcol);
+  CRSSparsity ret = sp_triplet(nz_out,nz_in,jrow,jcol);
   
   // Return sparsity pattern
-  if(verbose()) cout << "XFunctionInternal::getJacSparsity end " << endl;
+  if(verbose()) cout << "XFunctionInternal::spDetect end " << endl;
   return ret;
 }
 

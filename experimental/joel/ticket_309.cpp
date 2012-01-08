@@ -48,7 +48,7 @@ int main() {
   FF.init();
   
   std::cout << "Please have a coffee break" << std::endl;
-  CRSSparsity Jsp = FF.jacSparsity();
+  CRSSparsity Jsp = FF.jacSparsityOld();
   std::cout << "Hooray, finished before the universe ended" << std::endl;
   std::cout << "Jsp = " << Jsp << std::endl;
 

@@ -263,54 +263,25 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
 }
 
 void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  casadi_assert_message(fwd,"Adj not implemented");
-  
-  // Clear the outputs
-  for(int oind=0; oind<output.size(); ++oind){
-    // Skip of not used
-    if(output[oind]==0) continue;
-        
-    // Get data array for output and clear it
-    bvec_t *outputd = get_bvec_t(output[oind]->data());
-    fill_n(outputd,output[oind]->size(),0);
+  if(fwd){
+    // Clear the outputs
+    for(int oind=0; oind<output.size(); ++oind){
+      // Skip of not used
+      if(output[oind]==0) continue;
+          
+      // Get data array for output and clear it
+      bvec_t *outputd = get_bvec_t(output[oind]->data());
+      fill_n(outputd,output[oind]->size(),0);
+    }
   }
-  
-  // Temporary variable to hold the input and output as a dense vectors
-  vector<bvec_t> input_dense, output_dense;
   
   // Loop over inputs
   for(int iind=0; iind<input.size(); ++iind){
     // Skip of not used
     if(input[iind]==0) continue;
 
-    // Get the sparsity of the input
-    const CRSSparsity& sp_in = input[iind]->sparsity();
-    int id1 = sp_in.size1();
-    int id2 = sp_in.size2();
-    casadi_assert(id1==fcn_.input(iind).size1());
-    casadi_assert(id2==fcn_.input(iind).size2());
-    const vector<int>& irowind = sp_in.rowind();
-    const vector<int>& icol = sp_in.col();
-
     // Get data array for input
     bvec_t *inputd = get_bvec_t(input[iind]->data());
-
-    // Resize input vector
-    input_dense.resize(sp_in.numel());
-    
-    // Copy the input vector
-    fill(input_dense.begin(),input_dense.end(),0);
-    
-    // Copy nonzeros
-    for(int i=0; i<id1; ++i){
-      for(int el=irowind[i]; el<irowind[i+1]; ++el){
-        // Get column
-        int j=icol[el];
-        
-        // Copy element
-        input_dense[j+i*id2] = inputd[el];
-      }
-    }
     
     // Loop over outputs
     for(int oind=0; oind<output.size(); ++oind){
@@ -319,45 +290,16 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
       if(output[oind]==0) continue;
 
       // Get the sparsity of the Jacobian block
-      CRSSparsity& sp = fcn_.jacSparsity(iind,oind);
+      CRSSparsity& sp = fcn_.jacSparsity(iind,oind,true);
       if(sp.isNull() || sp.size()==0) continue; // Skip if zero
-      int d1 = sp.size1();
-      int d2 = sp.size2();
+      const int d1 = sp.size1();
+      //const int d2 = sp.size2();
       const vector<int>& rowind = sp.rowind();
       const vector<int>& col = sp.col();
-
-      // Get the sparsity of the output
-      const CRSSparsity& sp_out = output[oind]->sparsity();
-      int od1 = sp_out.size1();
-      int od2 = sp_out.size2();
-      casadi_assert(od1==fcn_.output(oind).size1());
-      if(od2!=fcn_.output(oind).size2())
-        cout << fcn_.get() << ": iind = " << iind << ", oind = " << oind << endl;
-      casadi_assert(od2==fcn_.output(oind).size2());
-      const vector<int>& orowind = sp_out.rowind();
-      const vector<int>& ocol = sp_out.col();
-
-      // Make sure that the Jacobian dimensions are consistent with the inputs and outputs
-      casadi_assert(d1==sp_out.numel());
-      casadi_assert(d2==sp_in.numel());
 
       // Get data array for output
       bvec_t *outputd = get_bvec_t(output[oind]->data());
 
-      // Resize dense output vector
-      output_dense.resize(sp_out.numel());
-      
-      // Clear the output vector (the parts we will use)
-      for(int i=0; i<od1; ++i){
-        for(int el=orowind[i]; el<orowind[i+1]; ++el){
-          // Get column
-          int j=ocol[el];
-          
-          // Clear element
-          output_dense[j+i*od2] = 0;
-        }
-      }
-      
       // Carry out the sparse matrix-vector multiplication
       for(int i=0; i<d1; ++i){
         for(int el=rowind[i]; el<rowind[i+1]; ++el){
@@ -365,18 +307,11 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
           int j=col[el];
           
           // Propagate dependencies
-          output_dense[i] |= input_dense[j];
-        }
-      }
-      
-      // Get the dependencies
-      for(int i=0; i<od1; ++i){
-        for(int el=orowind[i]; el<orowind[i+1]; ++el){
-          // Get column
-          int j=ocol[el];
-          
-          // Clear element
-          outputd[el] |= output_dense[j+i*od2];
+          if(fwd){
+            outputd[i] |= inputd[j];
+          } else {
+            inputd[j] |= outputd[i];
+          }
         }
       }
     }

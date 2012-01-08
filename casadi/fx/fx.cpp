@@ -254,12 +254,12 @@ GenericType FX::getStat(const string& name) const{
   return (*this)->getStat(name);
 }
 
-CRSSparsity& FX::jacSparsity(int iind, int oind){
-  return (*this)->jacSparsity(iind,oind);
+CRSSparsity& FX::jacSparsity(int iind, int oind, bool compact){
+  return (*this)->jacSparsity(iind,oind,compact);
 }
 
-void FX::setJacSparsity(const CRSSparsity& sp, int iind, int oind){
-  (*this)->setJacSparsity(sp,iind,oind);
+void FX::setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact){
+  (*this)->setJacSparsity(sp,iind,oind,compact);
 }
 
 std::vector<MX> FX::symbolicInput() const{
