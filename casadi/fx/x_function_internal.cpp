@@ -61,7 +61,7 @@ CRSSparsity XFunctionInternal::spDetect(int iind, int oind){
   vector<int> jrow, jcol;
   
   // We choose forward or adjoint based on whichever requires less sweeps
-  if(!sp_adj_ok_ || nsweep_fwd <= nsweep_adj){ // forward mode
+  if(nsweep_fwd <= nsweep_adj){ // forward mode
     if(verbose()) cout << "XFunctionInternal::spDetect: using forward mode: " << nsweep_fwd << " sweeps needed for " << nz_in << " directions" << endl;
     
     // Loop over the variables, ndir variables at a time

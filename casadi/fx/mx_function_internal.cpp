@@ -593,9 +593,6 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   int el_out = output_ind[oind];
   iwork_out_ = get_bvec_t(work[el_out].data.data());
 
-  // Adjoint mode work does not yet work for MX
-  sp_adj_ok_ = true;
-  
   // Call the base class routine (common with SXFunction)
   return spDetect(iind,oind);
 }

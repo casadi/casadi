@@ -67,9 +67,6 @@ class XFunctionInternal : public FXInternal{
 
     /// Detect sparsity pattern
     CRSSparsity spDetect(int iind, int oind);
-    
-    /// Allow adjoint mode for sparsity (remove when works for MX)
-    bool sp_adj_ok_;
 };
 
 // Template implementations
