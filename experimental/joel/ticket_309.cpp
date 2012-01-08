@@ -43,12 +43,12 @@ int main() {
   F.setOption("verbose",true);
   F.init();
   
-  SXFunction FF(F);
+/*  SXFunction FF(F);
   FF.setOption("verbose",true);
-  FF.init();
+  FF.init();*/
   
   std::cout << "Please have a coffee break" << std::endl;
-  CRSSparsity Jsp = FF.jacSparsityOld();
+  CRSSparsity Jsp = F.jacSparsity();
   std::cout << "Hooray, finished before the universe ended" << std::endl;
   std::cout << "Jsp = " << Jsp << std::endl;
 
