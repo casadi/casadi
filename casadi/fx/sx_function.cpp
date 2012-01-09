@@ -97,11 +97,11 @@ bool SXFunction::checkNode() const{
   return dynamic_cast<const SXFunctionInternal*>(get())!=0;
 }
 
-SXMatrix SXFunction::jac(int iind, int oind){
+SXMatrix SXFunction::jac(int iind, int oind, bool compact){
   if(input(iind).empty() || output(oind).empty()) return Matrix<SX>(); // quick return
   vector<pair<int,int> > jblocks(1,pair<int,int>(oind,iind));
   if(!isInit()) init();
-  return jac(jblocks).front();
+  return jac(jblocks,compact).front();
 }
 
 SXMatrix SXFunction::grad(int iind, int oind){
@@ -178,8 +178,8 @@ void SXFunction::clearSymbolic(){
   (*this)->clearSymbolic();
 }
 
-vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks){
-  return (*this)->jac(jblocks);
+vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks, bool compact){
+  return (*this)->jac(jblocks,compact);
 }
 
 SXFunction::SXFunction(const MXFunction& f){

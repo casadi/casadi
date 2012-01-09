@@ -283,38 +283,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 }
 
-vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks){
+vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact){
   if(verbose()) cout << "SXFunctionInternal::jac begin" << endl;
-  
-  
   if(verbose()) cout << "SXFunctionInternal::jac output_ind_" << output_ind_ << endl;
-  
-  // BEGIN removeme #206
-  
-  vector< SXMatrix > outputv_v = outputv_;
-  
-  bool sparse = false;
-  
-  for (int i=0;i<outputv_.size();i++) {
-    if (!outputv_[i].dense()) {
-      makeDense(outputv_v[i]);
-      sparse = true;
-    }
-  }
-  
-  for (int i=0;i<inputv_.size();i++) {
-    if (!inputv_[i].dense()) {
-      casadi_error("SXFunctionInternal::jac is currently unsupported for sparse inputs.");
-    }
-  }
-  
-  if (sparse) {
-     SXFunction temp(inputv_,outputv_v);
-     temp.init();
-     return temp->jac(jblocks);
-  }
-  
-  // END removeme #206
   
   // Create return object
   vector<Matrix<SX> > ret(jblocks.size());
@@ -338,13 +309,8 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       jblocks_no_f.push_back(jblocks[i]);
       jblock_ind.push_back(i);
       
-      // Make sure that the function as well as variables are vectors
-      // -> Why? ticket #50   - disabling for now
-      //assert(input(iind).size2()==1);
-      //assert(output(oind).size2()==1);
-      
       // Save sparsity
-      ret[i] = SXMatrix(jacSparsity(iind,oind,false));
+      ret[i] = SXMatrix(jacSparsity(iind,oind,compact));
       if(verbose()){
         cout << "SXFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
         cout << "       ret[" << i << "] " << ret[i] << endl;
@@ -362,7 +328,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   
   // Get a bidirectional partition
   vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
-  getPartition(jblocks_no_f,D1,D2);
+  getPartition(jblocks_no_f,D1,D2,true);
   
   if(verbose())  {
     cout << "SXFunctionInternal::jac partitioning" << endl;
@@ -373,30 +339,6 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       cout << "                  rowind     " << D1[i].rowind() << endl;
       cout << "                  spy        " << DMatrix(D1[i],1) << endl;
       cout << "             D2[" << i << "] " << D2[i] << endl;
-    }
-  }
-  
-  // Bugfix for dealing with sparse jacobians
-  vector<int> nz;
-  if(!D2[0].isNull()){
-    casadi_assert(jblocks_no_f.size()==1);
-    int oind = jblocks_no_f.front().first;
-    
-    // Output sparsity
-    const CRSSparsity& sp = output(oind).sparsity();
-    
-    // The nonzero element for each element
-    nz.resize(sp.numel(),-1);
-    for(int i=0; i<sp.size1(); ++i){
-      for(int el=sp.rowind(i); el<sp.rowind(i+1); ++el){
-        int c = sp.col(el);
-        nz[c + i*sp.size2()] = el;
-      }
-    }
-      
-    if(verbose())  {
-      cout << "SXFunctionInternal::jac dealing with sparse jacobians" << endl;
-      cout << "   nz " << nz << endl;
     }
   }
   
@@ -435,7 +377,9 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
     mapping.resize(jblock_ind.size());
     sp_trans.resize(jblock_ind.size());
     for(int i=0; i<jblock_ind.size(); ++i){
-      sp_trans[i] = ret[jblock_ind[i]].sparsity().transpose(mapping[i]);
+      int oind = jblocks_no_f[i].first;
+      int iind = jblocks_no_f[i].second;
+      sp_trans[i] = jacSparsity(iind,oind,true).transpose(mapping[i]);
       if(verbose())  {
         cout << "   mapping[" << i << "] " << mapping[i] << endl;
         cout << "   sp_trans[" << i << "] " << DMatrix(sp_trans[i],1) << endl;
@@ -443,7 +387,6 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
         cout << "   sp_trans[" << i << "].rowind() " << sp_trans[i].rowind() << endl;
       }
     }
-
   }
 
   // Carry out the forward sweeps
@@ -488,32 +431,27 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   
     // For all the input variables
     for(int v=0; v<D1.size(); ++v){
-
       
       // Get the output index
       int oind = jblocks_no_f[v].first;
 
-
-      // For all the columns of the Jacobian treated in the sweep
+      // For all the input nonzeros treated in the sweep
       for(int el = D1[v].rowind(sweep); el<D1[v].rowind(sweep+1); ++el){
 
-        // Get column of the Jacobian
+        // Get the input nonzero
         int c = D1[v].col(el);
         
-        // Loop over the nonzero elements in column c
+        // Loop over the output nonzeros corresponding to this input nonzero
         for(int el_out = sp_trans[v].rowind(c); el_out<sp_trans[v].rowind(c+1); ++el_out){
           
+          // Get the output nonzero
           int r_out = sp_trans[v].col(el_out);
           
           // The nonzero of the Jacobian now treated
           int elJ = mapping[v][el_out];
           
           // Get the output seed
-          casadi_assert(oind<output_ind_.size());
-          casadi_assert(r_out<output_ind_[oind].size());
-          
           ret[jblock_ind[v]].data()[elJ] = g[output_ind_[oind][r_out]];
-
         }
       }
     }
@@ -538,8 +476,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
         int c = D2[v].col(el);
 
         // Give a seed in the direction
-        if(nz[c]>=0) // FIXME: ugly trick
-          g[output_ind_[oind][nz[c]]] = casadi_limits<SX>::one;
+        g[output_ind_[oind][c]] = casadi_limits<SX>::one;
       }
     }
     
@@ -561,24 +498,27 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       }
     }
     
-    // For all the output blocks
+    // For all the Jacobian blocks
     for(int v=0; v<D2.size(); ++v){
 
-      // Get the input index
+      // Get the input and output index of the block
+      int oind = jblocks_no_f[v].first;
       int iind = jblocks_no_f[v].second;
+      
+      // Get the (compact) Jacobian sparsity pattern
+      const CRSSparsity& sp = jacSparsity(iind,oind,true);
 
-      // For all the rows of the Jacobian treated in the sweep
+      // For all the output nonzeros treated in the sweep
       for(int el = D2[v].rowind(sweep); el<D2[v].rowind(sweep+1); ++el){
 
-        // Get row of the Jacobian
+        // Get the output nonzero
         int r = D2[v].col(el);
-        if(nz[r]<0) continue; // FIXME: ugly trick
 
-        // Loop over the nonzero elements in row r
-        for(int elJ = ret[jblock_ind[v]].sparsity().rowind(r); elJ<ret[jblock_ind[v]].sparsity().rowind(r+1); ++elJ){
+        // Loop over the input nonzeros that influences this output nonzero
+        for(int elJ = sp.rowind(r); elJ<sp.rowind(r+1); ++elJ){
           
-          // Get the input variable (i.e. column of the Jacobian)
-          int c = ret[jblock_ind[v]].sparsity().col(elJ);
+          // Get the input nonzero
+          int c = sp.col(elJ);
           
           // Get the input seed
           ret[jblock_ind[v]].data()[elJ] = g[input_ind_[iind][c]];
@@ -1272,6 +1212,14 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   
   // Return jacobian of the gradient
   return hfcn;
+}
+
+void SXFunctionInternal::evaluateSXNew(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
+                                       const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
+                                       const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens,
+                                       bool eliminate_constants){
+  // TODO: Move symbolic directional derivatives algorithm from ::jac here.
+  casadi_assert_message(0,"Not implemented");
 }
 
 void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s, bool eliminate_constants){

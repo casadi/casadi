@@ -100,7 +100,7 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual CRSSparsity unidirectionalColoring(const CRSSparsity& A, const CRSSparsity& AT);
 
     /** \brief Get the unidirectional or bidirectional partition */
-    virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2);
+    virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2, bool compact);
 
     /// Verbose mode?
     bool verbose() const;

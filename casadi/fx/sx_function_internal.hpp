@@ -53,11 +53,17 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Destructor */
   virtual ~SXFunctionInternal();
 
-  /** \brief  Evaluate the function with partial derivatives up to order ord */
+  /** \brief  Evaluate the function numerically */
   virtual void evaluate(int nfdir, int nadir);
 
-  /** \brief  evaluate symbolically, possibly evaluating constants and/or replacing expressions */
+  /** \brief  evaluate symbolically, possibly evaluating constants (old, to be depricated implementation)*/
   virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
+
+  /** \brief  evaluate symbolically while also propagating directional derivatives (new, not yet finished implementation) */
+  virtual void evaluateSXNew(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
+                             const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
+                             const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens,
+                             bool eliminate_constants=false);
 
   /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -72,7 +78,7 @@ class SXFunctionInternal : public XFunctionInternal{
   virtual FX hessian(int iind=0, int oind=0);
 
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  virtual std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks);
+  virtual std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false);
   
   /** \brief  DATA MEMBERS */
   

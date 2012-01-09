@@ -102,7 +102,7 @@ void JacobianInternal::init(){
       vector<pair<int,int> > jblocks_no_f(1,jblocks_[i]);
       D1_.resize(1);
       D2_.resize(1);
-      fcn_->getPartition(jblocks_no_f,D1_,D2_);
+      fcn_->getPartition(jblocks_no_f,D1_,D2_,false);
 
     
       if(verbose()){

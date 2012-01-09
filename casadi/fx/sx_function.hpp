@@ -111,7 +111,7 @@ public:
   *
   * \see CasADi::Jacobian for an AD approach
   */
-  SXMatrix jac(int iind=0, int oind=0);
+  SXMatrix jac(int iind=0, int oind=0, bool compact=false);
 
   /// Gradient via source code transformation
   SXMatrix grad(int iind=0, int oind=0);
@@ -120,7 +120,7 @@ public:
   SXMatrix hess(int iind=0, int oind=0);
   
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks);
+  std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false);
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;

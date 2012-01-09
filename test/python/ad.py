@@ -225,9 +225,6 @@ class ADtests(casadiTestCase):
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             #f.setOption("verbose",True)
             f.init()
-            if "sparse" in inputtype: # known bug
-                self.assertRaises(Exception, lambda : f.jacobian(0,0))
-                continue
             Jf=f.jacobian(0,0)
             Jf.init()
             Jf.input().set(n)
@@ -271,9 +268,6 @@ class ADtests(casadiTestCase):
               #f.setOption("verbose",True)
               #f.setOption("ad_mode",mode)
               f.init()
-              if "sparse" in inputtype: # known bug
-                self.assertRaises(Exception, lambda : f.jac(0))
-                continue
               Jf=SXFunction(self.sxinputs[inputshape][inputtype],[f.jac(0)])
               Jf.init()
               Jf.input().set(n)

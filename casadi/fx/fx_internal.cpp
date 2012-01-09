@@ -553,13 +553,13 @@ CRSSparsity FXInternal::unidirectionalColoring(const CRSSparsity& A, const CRSSp
   return ret;
 }
 
-void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2){
+void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2, bool compact){
   casadi_assert(blocks.size()==1);
   int oind = blocks.front().first;
   int iind = blocks.front().second;
 
   // Sparsity pattern with transpose
-  CRSSparsity &A = jacSparsity(iind,oind,false);
+  CRSSparsity &A = jacSparsity(iind,oind,compact);
   vector<int> mapping;
   CRSSparsity AT = A.transpose(mapping);
   mapping.clear();
