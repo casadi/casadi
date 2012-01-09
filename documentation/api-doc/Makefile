@@ -32,7 +32,7 @@ full: doxpublish
 	python extra/generate_options_doc.py
 	python extra/fetch_examples_pdf.py
 	sh extra/doc2swig.sh
-	patch -u Doxyfile.in publish.patch -o - | doxygen -
+	patch -u Doxyfile.in publish.patch -o -  | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(SVNREVISION)/' | doxygen -
 
 publish: 
 	./publish.sh
