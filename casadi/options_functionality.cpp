@@ -338,7 +338,7 @@ bool OptionsFunctionalityNode::hasOption(const string &str) const{
 }
 
 bool OptionsFunctionalityNode::hasSetOption(const string &str) const{
-  if(!hasOption(str)) throw CasadiException("OptionsFunctionalityNode::hasSetOption: no such option");
+  if(!hasOption(str)) casadi_error("OptionsFunctionalityNode::hasSetOption: no such option '" << str << "'");
   Dictionary::const_iterator it = dictionary_.find(str);
   return it != dictionary_.end();
 }
