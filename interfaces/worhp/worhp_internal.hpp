@@ -44,10 +44,10 @@ virtual void evaluate(int nfdir, int nadir);
 
 protected:
 
-  OptVar    whorhp_o;
-  Workspace whorhp_w;
-  Params    whorhp_p;
-  Control   whorhp_c;
+  OptVar    worhp_o;
+  Workspace worhp_w;
+  Params    worhp_p;
+  Control   worhp_c;
   
 void *userclass;
 std::map<std::string,opt_type> ops_;
@@ -57,14 +57,12 @@ std::map<std::string,opt_type> ops_;
   FX GF_; 
 
   // Worhp callback functions
-  bool eval_f(int n, const double* x, bool new_x, double& obj_value);
-  bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f);
-  bool eval_g(int n, const double* x, bool new_x, int m, double* g);
-  bool eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values);
-  bool eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values);
+  bool eval_f(const double* x, double& obj_value);
+  bool eval_grad_f(const double* x, double scale , double* grad_f);
+  bool eval_g(const double* x, double* g);
+  bool eval_jac_g(const double* x, double* values);
+  bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
   void finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value);
-  bool get_bounds_info(int n, double* x_l, double* x_u,int m, double* g_l, double* g_u);
-  bool get_starting_point(int n, bool init_x, double* x,bool init_z, double* z_L, double* z_U,int m, bool init_lambda,double* lambda);
   void get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag);
   int get_number_of_nonlinear_variables() const;
   bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;

@@ -22,6 +22,7 @@
 
 #include "worhp_internal.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include "casadi/matrix/matrix_tools.hpp"
 #include <ctime>
 
 using namespace std;
@@ -30,6 +31,9 @@ namespace CasADi{
 
 WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
   casadi_warning("This is just a boilerplate implementation - WorhpSolver does NOT work yet");
+  
+
+  
 /**
   addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
   addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
@@ -97,15 +101,18 @@ WorhpInternal::~WorhpInternal(){
 }
 
 void WorhpInternal::init(){
-/*
-  // Create a new application if one already exists
-  if(isInit()){
-    delete app;
-    app = new Worhp::WorhpApplication();
-  }
-  
-  // Call the init method of the base class
+
   NLPSolverInternal::init();
+  
+  worhp_o.initialised = false;
+  worhp_w.initialised = false;
+  worhp_p.initialised = false;
+  worhp_c.initialised = false;
+  
+  worhp_o.n = n_;  // Number of variables
+  worhp_o.m = m_;  // Number of constraints
+  
+  if (GF_.isNull()) GF_ = F_.jacobian();
   
   // Gradient of the objective function, remove?
   if(!GF_.isNull()) GF_.init();
@@ -115,65 +122,25 @@ void WorhpInternal::init(){
     casadi_assert_message(GF_.input().numel()==n_,"Inconsistent dimensions");
     casadi_assert_message((GF_.output().size1()==n_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n_),"Inconsistent dimensions");
   }
+  
+  
+  
+  worhp_w.DF.nnz = GF_.output().size(); // Gradient of f
+  worhp_w.DG.nnz = J_.output().size();  // Jacobian of G
+  worhp_w.HM.nnz = worhp_o.n;  // Todo: what to do here?                 
 
-  // Create an Worhp user class -- need to use Worhps spart pointer class
-  Worhp::SmartPtr<Worhp::TNLP> *ucptr = new Worhp::SmartPtr<Worhp::TNLP>();
-  userclass = (void*)ucptr;
-  Worhp::SmartPtr<Worhp::TNLP> &uc = *ucptr;
-  uc = new WorhpUserClass(this);
-  
-  // read options
-  exact_hessian_ = !H_.isNull();
-  if(hasSetOption("hessian_approximation")){
-    if(getOption("hessian_approximation")=="limited-memory"){
-      exact_hessian_ = false;
-    } else {
-      exact_hessian_ = true;
-      casadi_assert_message(!H_.isNull(), "No hessian has been provided");
-    }
-  } else {
-    if(!exact_hessian_){
-      setOption("hessian_approximation","limited-memory");
-    }
+  /* Data structure initialisation. */
+  WorhpInit(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+  if (worhp_c.status != FirstCall) {
+    casadi_error("Main: Initialisation failed.");
   }
   
-  if(verbose_){
-    cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
-    if(exact_hessian_) std::cout << "Using exact Hessian" << std::endl;
-    else             std::cout << "Using limited memory Hessian approximation" << std::endl;
-  }
- 
-  // Pass all the options to worhp
-  for(map<string,opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
-    if(hasSetOption(it->first)){
-      GenericType op = getOption(it->first);
-      switch(it->second){
-        case OT_REAL:
-          app->Options()->SetNumericValue(it->first,op.toDouble());
-          break;
-        case OT_INTEGER:
-          app->Options()->SetIntegerValue(it->first,op.toInt());
-          break;
-        case OT_STRING:
-          app->Options()->SetStringValue(it->first,op.toString());
-          break;
-        default:
-          throw CasadiException("Illegal type");
-      }
-    }
   
-  // Intialize the WorhpApplication and process the options
-  Worhp::ApplicationReturnStatus status = app->Initialize();
-  if (status != Solve_Succeeded) {
-    throw "Error during initialization!\n";
-  }
-  */
+  
 }
 
 void WorhpInternal::evaluate(int nfdir, int nadir){
-/*
   casadi_assert(nfdir==0 && nadir==0);
-
 
   // Set the static parameter
   if (!F_.isNull()) {
@@ -191,61 +158,98 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   if (!GF_.isNull()) {
     if (GF_.getNumInputs()==2) GF_.setInput(input(NLP_P),1);
   }
-
-  // Reset the counters
-  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = 0;
   
-  // Get back the smart pointer
-  Worhp::SmartPtr<Worhp::TNLP> *ucptr = (Worhp::SmartPtr<Worhp::TNLP>*)userclass;
-  Worhp::SmartPtr<Worhp::TNLP> &uc = *ucptr;
+  input(NLP_X_INIT).getArray(worhp_o.X,n_);
+  output(NLP_LAMBDA_X).getArray(worhp_o.Lambda,n_);
+  input(NLP_LAMBDA_INIT).getArray(worhp_o.Mu,m_);
+   
+  input(NLP_LBX).getArray(worhp_o.XL,n_);
+  input(NLP_UBX).getArray(worhp_o.XU,n_);
+  input(NLP_LBG).getArray(worhp_o.GL,m_);
+  input(NLP_UBG).getArray(worhp_o.GU,m_);
 
-  // Ask Worhp to solve the problem
-  Worhp::ApplicationReturnStatus status = app->OptimizeTNLP(uc);
-  
-  if (hasOption("print_time") && bool(getOption("print_time"))) {
-    // Write timings
-    cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
-    cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
-    cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
-    cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
-    cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
-    cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-    cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+
+  if (worhp_w.DF.NeedStructure) {
+    CRSSparsity GFT = trans(GF_.output()).sparsity();
+    const std::vector<int> & col = GFT.col();
+    for (int i=0;i<col.size();++i) worhp_w.DF.row[i] = col[i] + 1; // Index-1 based
   }
+  
+  if (worhp_w.DG.NeedStructure) {
+    CRSSparsity JT = trans(J_.output()).sparsity();
+    const std::vector<int> & col = JT.col();
+    const std::vector<int> & row = JT.rowind();
+    for (int i=0;i<col.size();++i) worhp_w.DG.row[i] = col[i] + 1;
+    for (int i=0;i<row.size();++i) worhp_w.DG.col[i] = row[i] + 1;
+  }
+  
+  std::cout << "clear" << std::endl;
+  
+  
+  /**
+  if (worhp_w.HM.NeedStructure) {
+    int nz=0;
+    vector<int> rowind,col;
+    trans(H_.output()).sparsity().getSparsityCRS(rowind,col);
+    for(int r=0; r<rowind.size()-1; ++r)
+      for(int el=rowind[r]; el<rowind[r+1]; ++el){
+       if(col[el]<=r){
+          worhp_w.HM.col[nz] = r;
+          worhp_w.HM.row[nz] = col[el];
+          nz++;
+       }
+      }
+  }
+  */
+  
+ 
+  
+  // Reverse Communication loop
+  while(worhp_c.status < TerminateSuccess &&  worhp_c.status > TerminateError) {
 
-  if (status == Solve_Succeeded)
-    stats_["return_status"] = "Solve_Succeeded";
-  if (status == Solved_To_Acceptable_Level)
-    stats_["return_status"] = "Solved_To_Acceptable_Level";
-  if (status == Infeasible_Problem_Detected)
-    stats_["return_status"] = "Infeasible_Problem_Detected";
-  if (status == Search_Direction_Becomes_Too_Small)
-    stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
-  if (status == Diverging_Iterates)
-    stats_["return_status"] = "Diverging_Iterates";
-  if (status == User_Requested_Stop)
-    stats_["return_status"] = "User_Requested_Stop";
-  if (status == Maximum_Iterations_Exceeded)
-    stats_["return_status"] = "Maximum_Iterations_Exceeded";
-  if (status == Restoration_Failed)
-    stats_["return_status"] = "Restoration_Failed";
-  if (status == Error_In_Step_Computation)
-    stats_["return_status"] = "Error_In_Step_Computation";
-  if (status == Not_Enough_Degrees_Of_Freedom)
-    stats_["return_status"] = "Not_Enough_Degrees_Of_Freedom";
-  if (status == Invalid_Problem_Definition)
-    stats_["return_status"] = "Invalid_Problem_Definition";
-  if (status == Invalid_Option)
-    stats_["return_status"] = "Invalid_Option";
-  if (status == Invalid_Number_Detected)
-    stats_["return_status"] = "Invalid_Number_Detected";
-  if (status == Unrecoverable_Exception)
-    stats_["return_status"] = "Unrecoverable_Exception";
-  if (status == NonWorhp_Exception_Thrown)
-    stats_["return_status"] = "NonWorhp_Exception_Thrown";
-  if (status == Insufficient_Memory)
-    stats_["return_status"] = "Insufficient_Memory";
-*/
+    if (GetUserAction(&worhp_c, callWorhp)) {
+      Worhp(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+    }
+
+    if (GetUserAction(&worhp_c, iterOutput)) {
+      IterationOutput(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+      DoneUserAction(&worhp_c, iterOutput);
+    }
+
+    if (GetUserAction(&worhp_c, evalF)) {
+      eval_f(worhp_o.X, worhp_o.F);
+      DoneUserAction(&worhp_c, evalF);
+    }
+
+    if (GetUserAction(&worhp_c, evalG)) {
+      eval_g(worhp_o.X, worhp_o.G);
+      DoneUserAction(&worhp_c, evalG);
+    }
+
+    if (GetUserAction(&worhp_c, evalDF)) {
+      eval_grad_f(worhp_o.X, worhp_w.ScaleObj, worhp_w.DF.val);
+      DoneUserAction(&worhp_c, evalDF);
+    }
+
+    if (GetUserAction(&worhp_c, evalDG)) {
+      eval_jac_g(worhp_o.X,worhp_w.DG.val);
+      DoneUserAction(&worhp_c, evalDG);
+    }
+
+    if (GetUserAction(&worhp_c, evalHM)) {
+      eval_h(worhp_o.X, worhp_w.ScaleObj, worhp_o.Mu, worhp_w.HM.val);
+      DoneUserAction(&worhp_c, evalHM);
+    }
+    
+    if (GetUserAction(&worhp_c, fidif)) {
+      WorhpFidif(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+    }
+
+  }
+  
+  StatusMsg(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+  WorhpFree(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+ 
 }
 
 bool WorhpInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {
@@ -325,48 +329,33 @@ void WorhpInternal::finalize_solution(const double* x, const double* z_L, const 
   */
 }
 
-bool WorhpInternal::eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values){
-/*
+bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lambda, double* values){
   try{
     log("eval_h started");
     double time1 = clock();
-    if (values == NULL) {
-      int nz=0;
-      vector<int> rowind,col;
-      H_.output().sparsity().getSparsityCRS(rowind,col);
-      for(int r=0; r<rowind.size()-1; ++r)
-        for(int el=rowind[r]; el<rowind[r+1]; ++el){
-         if(col[el]<=r){
-            iRow[nz] = r;
-            jCol[nz] = col[el];
-            nz++;
-         }
-        }
-    } else {
-      // Number of inputs to the hessian
-      int n_hess_in = H_.getNumInputs();
-      
-      // Pass input
-      H_.setInput(x);
-      if(n_hess_in>1){
-        H_.setInput(lambda, n_hess_in==4? 2 : 1);
-        H_.setInput(obj_factor, n_hess_in==4? 3 : 2);
-      }
-
-      // Evaluate
-      H_.evaluate();
-
-      // Scale objective
-      if(n_hess_in==1 && obj_factor!=1.0){
-        for(vector<double>::iterator it=H_.output().begin(); it!=H_.output().end(); ++it){
-          *it *= obj_factor;
-        }
-      }
-
-      // Get results
-      H_.output().get(values,SPARSESYM);
-      
+    // Number of inputs to the hessian
+    int n_hess_in = H_.getNumInputs();
+    
+    // Pass input
+    H_.setInput(x);
+    if(n_hess_in>1){
+      H_.setInput(lambda, n_hess_in==4? 2 : 1);
+      H_.setInput(obj_factor, n_hess_in==4? 3 : 2);
     }
+
+    // Evaluate
+    H_.evaluate();
+
+    // Scale objective
+    if(n_hess_in==1 && obj_factor!=1.0){
+      for(vector<double>::iterator it=H_.output().begin(); it!=H_.output().end(); ++it){
+        *it *= obj_factor;
+      }
+    }
+
+    // Get results
+    H_.output().get(values,SPARSESYM);
+      
     double time2 = clock();
     t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
     log("eval_h ok");
@@ -375,48 +364,33 @@ bool WorhpInternal::eval_h(const double* x, bool new_x, double obj_factor, const
     cerr << "eval_h failed: " << ex.what() << endl;
     return false;
   }
-  */
 }
 
-bool WorhpInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,double* values){
-/*
+bool WorhpInternal::eval_jac_g(const double* x,double* values){
   try{
     log("eval_jac_g started");
     
     // Quich finish if no constraints
-    if(m==0){
+    if(m_==0){
       log("eval_jac_g quick return (m==0)");
       return true;
     }
     
     double time1 = clock();
-    if (values == NULL) {
-      int nz=0;
-      vector<int> rowind,col;
-      J_.output().sparsity().getSparsityCRS(rowind,col);
-      for(int r=0; r<rowind.size()-1; ++r)
-        for(int el=rowind[r]; el<rowind[r+1]; ++el){
-  //        if(col[el]>=r){
-            iRow[nz] = r;
-            jCol[nz] = col[el];
-            nz++;
-    //      }
-        }
-    } else {
-      // Pass the argument to the function
-      J_.setInput(x);
-      
-       // Evaluate the function
-      J_.evaluate();
 
-      // Get the output
-      J_.getOutput(values);
-      
-      if(monitored("eval_jac_g")){
-        cout << "x = " << J_.input().data() << endl;
-        cout << "J = " << endl;
-        J_.output().printSparse();
-      }
+    // Pass the argument to the function
+    J_.setInput(x);
+    
+     // Evaluate the function
+    J_.evaluate();
+
+    // Get the output
+    J_.getOutput(values);
+    
+    if(monitored("eval_jac_g")){
+      cout << "x = " << J_.input().data() << endl;
+      cout << "J = " << endl;
+      J_.output().printSparse();
     }
     
     double time2 = clock();
@@ -428,18 +402,15 @@ bool WorhpInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
     cerr << "eval_jac_g failed: " << ex.what() << endl;
     return false;
   }
-  */
 }
 
-bool WorhpInternal::eval_f(int n, const double* x, bool new_x, double& obj_value)
+bool WorhpInternal::eval_f(const double* x, double& obj_value)
 {
-/*
   try {
     log("eval_f started");
     
     // Log time
     double time1 = clock();
-    casadi_assert(n == n_);
 
     // Pass the argument to the function
     F_.setInput(x);
@@ -465,32 +436,29 @@ bool WorhpInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
     cerr << "eval_f failed: " << ex.what() << endl;
     return false;
   }
-    */
 }
 
-bool WorhpInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
+bool WorhpInternal::eval_g(const double* x, double* g)
 {
-/*
   try {
     log("eval_g started");
     double time1 = clock();
 
-    if(m>0){
-      // Pass the argument to the function
-      G_.setInput(x);
+    // Pass the argument to the function
+    G_.setInput(x);
 
-      // Evaluate the function and tape
-      G_.evaluate();
+    // Evaluate the function and tape
+    G_.evaluate();
 
-      // Ge the result
-      G_.getOutput(g);
+    // Ge the result
+    G_.getOutput(g);
 
-      // Printing
-      if(monitored("eval_g")){
-        cout << "x = " << G_.input() << endl;
-        cout << "g = " << G_.output() << endl;
-      }
+    // Printing
+    if(monitored("eval_g")){
+      cout << "x = " << G_.input() << endl;
+      cout << "g = " << G_.output() << endl;
     }
+
       
     double time2 = clock();
     t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -501,16 +469,13 @@ bool WorhpInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
     cerr << "eval_g failed: " << ex.what() << endl;
     return false;
   }
-  */
 }
 
-bool WorhpInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f)
+bool WorhpInternal::eval_grad_f(const double* x,double scale , double* grad_f )
 {
-/*
   try {
     log("eval_grad_f started");
     double time1 = clock();
-    casadi_assert(n == n_);
     
     // If no gradient function has been provided, use AD adjoint
     if(GF_.isNull()){
@@ -519,7 +484,7 @@ bool WorhpInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       F_.setInput(x);
       
       // Give a seed to the function
-      F_.setAdjSeed(1.0);
+      F_.setAdjSeed(scale);
 
       // Evaluate, adjoint mode
       F_.evaluate(0,1);
@@ -540,6 +505,7 @@ bool WorhpInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       // Evaluate, adjoint mode
       GF_.evaluate();
 
+      GF_.output()*=scale;
       // Get the result
       GF_.getOutput(grad_f);
       
@@ -553,7 +519,7 @@ bool WorhpInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
     t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
 
     // Check the result for regularity
-    for(int i=0; i<n; ++i){
+    for(int i=0; i<n_; ++i){
         if(isnan(grad_f[i]) || isinf(grad_f[i])){
           log("eval_grad_f: result not regular");
           return false;
@@ -566,64 +532,8 @@ bool WorhpInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
     cerr << "eval_jac_f failed: " << ex.what() << endl;
     return false;
   }
-  */
 }
 
-bool WorhpInternal::get_bounds_info(int n, double* x_l, double* x_u,
-                                int m, double* g_l, double* g_u)
-{
-/*
-  try {
-    casadi_assert(n == n_);
-    casadi_assert(m == m_);
-    input(NLP_LBX).getArray(x_l,n);
-    input(NLP_UBX).getArray(x_u,n);
-    input(NLP_LBG).getArray(g_l,m);
-    input(NLP_UBG).getArray(g_u,m);
-    return true;
-  } catch (exception& ex){
-    cerr << "get_bounds_info failed: " << ex.what() << endl;
-    return false;
-  }
-  */
-}
-
-bool WorhpInternal::get_starting_point(int n, bool init_x, double* x,
-                                   bool init_z, double* z_L, double* z_U,
-                                   int m, bool init_lambda,
-                                   double* lambda)
-{
-/*
-  try {
-    bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
-    casadi_assert_warning(init_x,"Not initializing x");
-    if (warmstart) {
-      casadi_assert_warning(init_lambda,"Not initializing lambda");
-      casadi_assert_warning(init_z,"Not initializing z");
-    }
-      
-    if(init_x) 
-      input(NLP_X_INIT).getArray(x,n);
-    
-    if (init_z) {
-      // Get dual solution (simple bounds)
-      vector<double>& lambda_x = output(NLP_LAMBDA_X).data();
-      for(int i=0; i<lambda_x.size(); ++i){
-        z_L[i] = std::max(0.,-lambda_x[i]);
-        z_U[i] = std::max(0., lambda_x[i]);
-      }
-    }
-    
-    if (init_lambda)
-      input(NLP_LAMBDA_INIT).getArray(lambda,m);
-    
-    return true;
-  } catch (exception& ex){
-    cerr << "get_starting_point failed: " << ex.what() << endl;
-    return false;
-  }
-  */
-}
 
 void WorhpInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
 {
