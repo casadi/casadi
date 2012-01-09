@@ -17,3 +17,7 @@ spy = nullfun
 title = nullfun
 grid = nullfun
 loglog = nullfun
+subplot = nullfun
+contourf = nullfun
+colorbar = nullfun
+draw = nullfun
