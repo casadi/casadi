@@ -64,12 +64,13 @@
 */
 /** \defgroup scheme_NLPOutput
 <table>
-<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 4) </caption>
+<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1)</td></tr>
 <tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1)</td></tr>
 <tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1)</td></tr>
 <tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) When in warmstart mode, this output may be used as input (</td></tr>
+<tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1)</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
@@ -480,4 +481,18 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
 */

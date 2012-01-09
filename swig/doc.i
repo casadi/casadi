@@ -42147,6 +42147,18 @@ Generate the sparsity of a Jacobian block. ";
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::spProp "
+
+Propagate the sparsity seeds. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::spGet "
+
+Get the forward/adjoint sparsity seed. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::spDetect "
+
+Detect sparsity pattern. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -49158,6 +49170,231 @@ Return a string with a representation (for SWIG) ";
 %feature("docstring")  CasADi::PrintableObject::getDescription "
 
 Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1Printme.xml
+%feature("docstring") CasADi::Printme "
+
+Represents a node that does nothing with it's input but printing out and
+passing on to the output.
+
+Joris Gillis
+
+C++ includes: printme.hpp ";
+
+%feature("docstring")  CasADi::Printme::Printme "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::Printme::~Printme "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::Printme::clone "
+
+Clone function. ";
+
+%feature("docstring")  CasADi::Printme::printPart "
+
+Print a part of the expression. ";
+
+%feature("docstring")  CasADi::Printme::evaluate "
+
+Evaluate the function numerically. ";
+
+%feature("docstring")  CasADi::Printme::evaluateSX "
+
+Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::Printme::evaluateMX "
+
+Evaluate the function symbolically ( MX) ";
+
+%feature("docstring")  CasADi::Printme::propagateSparsity "
+
+Propagate sparsity. ";
+
+%feature("docstring")  CasADi::Printme::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::Printme::repr "
+
+Print a representation. ";
+
+%feature("docstring")  CasADi::Printme::print "
+
+Print a description. ";
+
+%feature("docstring")  CasADi::Printme::print "
+
+Print expression (make sure number of calls is not exceeded) ";
+
+%feature("docstring")  CasADi::Printme::evaluate "
+
+Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Printme::evaluateSX "
+
+Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::Printme::evaluateMX "
+
+Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Printme::propagateSparsity "
+
+Propagate sparsity. ";
+
+%feature("docstring")  CasADi::Printme::getName "
+
+Get the name. ";
+
+%feature("docstring")  CasADi::Printme::isSymbolic "
+
+Check if symbolic. ";
+
+%feature("docstring")  CasADi::Printme::isConstant "
+
+Check if constant. ";
+
+%feature("docstring")  CasADi::Printme::isMapping "
+
+Check if mapping. ";
+
+%feature("docstring")  CasADi::Printme::isEvaluation "
+
+Check if evaluation. ";
+
+%feature("docstring")  CasADi::Printme::isOutputNode "
+
+Check if evaluation output. ";
+
+%feature("docstring")  CasADi::Printme::isMultipleOutput "
+
+Check if a multiple output node. ";
+
+%feature("docstring")  CasADi::Printme::isJacobian "
+
+Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::Printme::isMultiplication "
+
+Check if matrix multiplication. ";
+
+%feature("docstring")  CasADi::Printme::getFunction "
+
+Get function reference. ";
+
+%feature("docstring")  CasADi::Printme::getFunctionInput "
+
+Get function input. ";
+
+%feature("docstring")  CasADi::Printme::getFunctionOutput "
+
+Get function output. ";
+
+%feature("docstring")  CasADi::Printme::dep "
+
+dependencies - functions that have to be evaluated before this one ";
+
+%feature("docstring")  CasADi::Printme::dep "";
+
+%feature("docstring")  CasADi::Printme::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::Printme::hasDep "
+
+Does the node depend on other nodes. ";
+
+%feature("docstring")  CasADi::Printme::getNumOutputs "
+
+Number of outputs. ";
+
+%feature("docstring")  CasADi::Printme::sparsity "
+
+Get the sparsity. ";
+
+%feature("docstring")  CasADi::Printme::sparsity "
+
+Get the sparsity of output oind. ";
+
+%feature("docstring")  CasADi::Printme::isNonLinear "
+
+Is the node nonlinear. ";
+
+%feature("docstring")  CasADi::Printme::setSparsity "
+
+Set the sparsity. ";
+
+%feature("docstring")  CasADi::Printme::setDependencies "
+
+Set unary dependency. ";
+
+%feature("docstring")  CasADi::Printme::setDependencies "
+
+Set binary dependencies. ";
+
+%feature("docstring")  CasADi::Printme::setDependencies "
+
+Set ternary dependencies. ";
+
+%feature("docstring")  CasADi::Printme::setDependencies "
+
+Set multiple dependencies. ";
+
+%feature("docstring")  CasADi::Printme::addDependency "
+
+Add a dependency. ";
+
+%feature("docstring")  CasADi::Printme::addDependency "
+
+Add a dependency (index given) ";
+
+%feature("docstring")  CasADi::Printme::addDependency "
+
+Add a dependency (mapping matrix) ";
+
+%feature("docstring")  CasADi::Printme::addDependency "
+
+Add a dependency (mapping matrix) ";
+
+%feature("docstring")  CasADi::Printme::isOperation "
+
+Is it a certain operation. ";
+
+%feature("docstring")  CasADi::Printme::numel "
+
+Number of elements. ";
+
+%feature("docstring")  CasADi::Printme::size "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Printme::size1 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Printme::size2 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Printme::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::Printme::init "
+
+Initialize the object. ";
+
+%feature("docstring")  CasADi::Printme::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Printme::assertInit "
+
+Assert that the object has been initialized. ";
 
 
 // File: classCasADi_1_1Interfaces_1_1QPOasesInternal.xml
@@ -57976,12 +58213,17 @@ Destructor. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluate "
 
-Evaluate the function with partial derivatives up to order ord. ";
+Evaluate the function numerically. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluateSX "
 
-evaluate symbolically, possibly evaluating constants and/or replacing
-expressions ";
+evaluate symbolically, possibly evaluating constants (old, to be depricated
+implementation) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::evaluateSXNew "
+
+evaluate symbolically while also propagating directional derivatives (new,
+not yet finished implementation) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::isSmooth "
 
@@ -58031,6 +58273,18 @@ Generate the sparsity of a Jacobian block. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::spProp "
+
+Propagate the sparsity seeds. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::spGet "
+
+Get the forward/adjoint sparsity seed. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::spDetect "
+
+Detect sparsity pattern. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluate_switch "
 
@@ -59334,6 +59588,737 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: classCasADi_1_1WorhpInternal.xml
+%feature("docstring") CasADi::WorhpInternal "
+
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
+
+C++ includes: worhp_internal.hpp ";
+
+%feature("docstring")  CasADi::WorhpInternal::WorhpInternal "
+
+addOption(\"pass_nonlinear_variables\", OT_BOOLEAN, true);
+addOption(\"print_time\", OT_BOOLEAN, true, \"print information about
+execution time\");
+
+Monitors addOption(\"monitor\", OT_STRINGVECTOR, GenericType(), \"\",
+\"eval_f|eval_g|eval_jac_g|eval_grad_f\", true);
+
+Set pointers to zero app = 0; userclass = 0;
+
+Start the application app = new Worhp::WorhpApplication();
+
+Get all options available in WORHP map<string,
+Worhp::SmartPtr<Worhp::RegisteredOption> > regops =
+app->RegOptions()->RegisteredOptionsList(); for(map<string,
+Worhp::SmartPtr<Worhp::RegisteredOption> >::const_iterator
+it=regops.begin(); it!=regops.end(); ++it){ Option identifier string
+opt_name = it->first;
+
+Short description goes here, even though we do have a longer description
+string opt_desc = it->second->ShortDescription() + \" (see WORHP
+documentation)\";
+
+Get the type Worhp::RegisteredOptionType worhp_type = it->second->Type();
+opt_type casadi_type;
+
+Map Worhp option category to a CasADi options type switch(worhp_type){ case
+Worhp::OT_Number: casadi_type = OT_REAL; break; case Worhp::OT_Integer:
+casadi_type = OT_INTEGER; break; case Worhp::OT_String: casadi_type =
+OT_STRING; break; case Worhp::OT_Unknown: continue; // NOTE: No mechanism to
+handle OT_Unknown options default: continue; // NOTE: Unknown Worhp options
+category }
+
+addOption(opt_name, casadi_type, GenericType(), opt_desc);
+
+Set default values of WORHP options if (casadi_type == OT_REAL) {
+setDefault(opt_name,it->second->DefaultNumber()); } else if (casadi_type ==
+OT_INTEGER) { setDefault(opt_name,it->second->DefaultInteger()); } else if
+(casadi_type == OT_STRING) {
+setDefault(opt_name,it->second->DefaultString()); };
+
+Save to map containing WORHP specific options ops_[opt_name] = casadi_type;
+} ";
+
+%feature("docstring")  CasADi::WorhpInternal::~WorhpInternal "
+
+if(app) delete app;
+
+delete the smart pointer; if(userclass != 0){ Worhp::SmartPtr<Worhp::TNLP>
+*ucptr = (Worhp::SmartPtr<Worhp::TNLP>*)userclass; delete ucptr; } ";
+
+%feature("docstring")  CasADi::WorhpInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::WorhpInternal::init "
+
+Initialize and make the object ready for setting arguments and evaluation.
+This method is typically called after setting options but before evaluating.
+If passed to another class (in the constructor), this class should invoke
+this function when initialized. ";
+
+%feature("docstring")  CasADi::WorhpInternal::evaluate "
+
+Evaluate.
+
+if (worhp_w.HM.NeedStructure) { int nz=0; vector<int> rowind,col;
+trans(H_.output()).sparsity().getSparsityCRS(rowind,col); for(int r=0;
+r<rowind.size()-1; ++r) for(int el=rowind[r]; el<rowind[r+1]; ++el){
+if(col[el]<=r){ worhp_w.HM.col[nz] = r; worhp_w.HM.row[nz] = col[el]; nz++;
+} } } ";
+
+%feature("docstring")  CasADi::WorhpInternal::reportConstraints "";
+
+%feature("docstring")  CasADi::WorhpInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::WorhpInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::WorhpInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::WorhpInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::WorhpInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::WorhpInternal::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::WorhpInternal::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::WorhpInternal::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::WorhpInternal::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::WorhpInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::WorhpInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::WorhpInternal::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::WorhpInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::WorhpInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::WorhpInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::WorhpInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::WorhpInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::WorhpInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::WorhpInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::WorhpInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::WorhpInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::WorhpInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::WorhpInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::WorhpInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::WorhpInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::WorhpInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::WorhpInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::WorhpInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::WorhpInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::WorhpInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::WorhpInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::WorhpInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::WorhpInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::WorhpInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::WorhpInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::WorhpInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::WorhpInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::WorhpInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::WorhpInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1WorhpSolver.xml
+%feature("docstring") CasADi::WorhpSolver "
+
+interface to WORHP NLP solver
+
+Solves the following nonlinear optimization problem:   min          F(x,p)
+x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
+<= UBX                      n: number of decision variables (x)       m:
+number of constraints (A)
+
+C++ includes: worhp_solver.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::WorhpSolver::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::WorhpSolver::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::WorhpSolver::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::WorhpSolver::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::WorhpSolver::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::WorhpSolver::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::WorhpSolver::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::WorhpSolver::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::WorhpSolver::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::WorhpSolver::makeUnique "";
+
+%feature("docstring")  CasADi::WorhpSolver::WorhpSolver "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::WorhpSolver::WorhpSolver "
+
+Constuct an NLP with non-linear constraints and provided hessian
+approximation. ";
+
+%feature("docstring")  CasADi::WorhpSolver::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::WorhpSolver::reportConstraints "";
+
+%feature("docstring")  CasADi::WorhpSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::WorhpSolver::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getJ "
+
+Access the jacobian of the constraint function J. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::WorhpSolver::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::WorhpSolver::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::WorhpSolver::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::WorhpSolver::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::WorhpSolver::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which takes an AD
+approach. ";
+
+%feature("docstring")  CasADi::WorhpSolver::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::WorhpSolver::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::WorhpSolver::call "
+
+Create a function call (evaluation mx node), single input. ";
+
+%feature("docstring")  CasADi::WorhpSolver::call "
+
+Evaluate numerically (shorthand) ";
+
+%feature("docstring")  CasADi::WorhpSolver::call "
+
+Evaluate symbolically (scalar graph) ";
+
+%feature("docstring")  CasADi::WorhpSolver::call "
+
+Evaluate symbolically (matrix graph) ";
+
+%feature("docstring")  CasADi::WorhpSolver::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::WorhpSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::WorhpSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::WorhpSolver::indexed_zero_based "";
+
+%feature("docstring")  CasADi::WorhpSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::WorhpSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::WorhpSolver::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::WorhpSolver::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::WorhpSolver::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::WorhpSolver::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::WorhpSolver::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpSolver::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpSolver::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::WorhpSolver::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::WorhpSolver::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpSolver::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::WorhpSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::WorhpSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::WorhpSolver::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::WorhpSolver::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::WorhpSolver::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::WorhpSolver::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::WorhpSolver::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::WorhpSolver::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::WorhpSolver::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::WorhpSolver::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::WorhpSolver::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::WorhpSolver::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::WorhpSolver::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::WorhpSolver::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::WorhpSolver::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
 // File: classCasADi_1_1XFunction.xml
 %feature("docstring") CasADi::XFunction "
 
@@ -60016,6 +61001,18 @@ Destructor. ";
 
 evaluate symbolically ";
 
+%feature("docstring")  CasADi::XFunctionInternal::spProp "
+
+Propagate the sparsity seeds. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::spGet "
+
+Get the forward/adjoint sparsity seed. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::spDetect "
+
+Detect sparsity pattern. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -60480,6 +61477,10 @@ representation The \"msym\" function is intended to work in a similar way as
 \"sym\" used in the Symbolic Toolbox for Matlab but instead creating an MX
 object. The MX expression graph is more general but also have considerably
 more overhead than the alternative SX expression graph. ";
+
+%feature("docstring")  CasADi::GSL::msym "";
+
+%feature("docstring")  CasADi::GSL::msym "";
 
 %feature("docstring")  CasADi::GSL::msym "";
 
@@ -61269,6 +62270,14 @@ Read matrix, matlab style. ";
 %feature("docstring")  CasADi::GSL::linspace "
 
 Matlab's linspace. ";
+
+%feature("docstring")  CasADi::GSL::get_bvec_t "
+
+Get an pointer of sets of booleans from a double vector. ";
+
+%feature("docstring")  CasADi::GSL::get_bvec_t "
+
+Get an pointer of sets of booleans from a double vector. ";
 
 %feature("docstring")  CasADi::GSL::getPtr "
 
@@ -62134,6 +63143,9 @@ h:  internal expressions which the user may wish to inspect ";
 // File: c__function__internal_8hpp.xml
 
 
+// File: callback_8hpp.xml
+
+
 // File: cartpendulum_8cpp.xml
 %feature("docstring")  main "";
 
@@ -62980,7 +63992,13 @@ C99 elementary functions from the math.h header. ";
 // File: printable__object_8hpp.xml
 
 
-// File: printme_8hpp.xml
+// File: printme_8cpp.xml
+
+
+// File: casadi_2mx_2printme_8hpp.xml
+
+
+// File: documentation_2examples_2misc_2printme_8hpp.xml
 
 
 // File: pyfunction_8hpp.xml
@@ -63243,6 +64261,18 @@ C99 elementary functions from the math.h header. ";
 // File: veccat_8hpp.xml
 
 
+// File: worhp__internal_8cpp.xml
+
+
+// File: worhp__internal_8hpp.xml
+
+
+// File: worhp__solver_8cpp.xml
+
+
+// File: worhp__solver_8hpp.xml
+
+
 // File: x__function_8cpp.xml
 
 
@@ -63486,6 +64516,9 @@ C99 elementary functions from the math.h header. ";
 // File: dir_e8c3cb1c9b8c67bcba787c317daa3a5f.xml
 
 
+// File: dir_f0ac5089042e7c5b9857b36f685e564c.xml
+
+
 // File: ad_2jacobian_8py-example.xml
 
 
@@ -63544,6 +64577,9 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: operators_2SX_2minmax_8py-example.xml
+
+
+// File: solvers_2callback_8py-example.xml
 
 
 // File: solvers_2exacthessian_8py-example.xml

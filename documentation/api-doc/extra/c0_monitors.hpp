@@ -106,3 +106,27 @@
 <tr><td>reset</td><td>CasADi::GSL::GslInternal</td></tr>
 </table>
 */
+/** \class CasADi::WorhpInternal
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
+</table>
+*/
