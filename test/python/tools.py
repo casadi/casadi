@@ -100,7 +100,44 @@ class Toolstests(casadiTestCase):
       self.checkarray(A,DMatrix([0,0,3,3,3,4,4,4,0]),"vecNZcat")
       
       
+      p = Variables()
+      p.a = ssym("a",2)
+      b = []
+      b.append(ssym("b1",3,2))
+      b.append(ssym("b2",3))
+      p.b = b
+      p.c = ssym("c")
+      p.freeze()
       
+
+      
+      self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
+      self.checkarray(array(p.i_b[0]),DMatrix([[2,5],[3,6],[4,7]]),"index")
+      self.checkarray(array(p.i_b[1]),DMatrix([[8],[9],[10]]),"index")
+      self.checkarray(array(p.c),DMatrix(11),"index")
+
+      self.assertEqual(p.o_a,0,"Offset")
+      self.assertEqual(p.o_b[0],2,"Offset")
+      self.assertEqual(p.o_b[1],8,"Offset")
+      self.assertEqual(p.o_c,11,"Offset")
+      
+      self.assertEqual(p.I_a,0,"Index")
+      self.assertEqual(p.I_b[0],1,"Index")
+      self.assertEqual(p.I_b[1],2,"Index")
+      self.assertEqual(p.I_c,3,"Index")
+      
+      p.b_[1].setAll(4)
+      
+      A = p.vecNZcat_()
+ 
+      self.checkarray(A,DMatrix([0,0,0,0,0,0,0,0,4,4,4,0]),"vecNZcat")
+     
+      p.b_[0].setAll(3)
+      p.b_[0][2,0] = 9
+      A = p.veccat_()
+
+      self.checkarray(A,DMatrix([0,0,3,3,9,3,3,3,4,4,4,0]),"vecNZcat")
+
       p = Variables()
       p.a = msym("a",2)
       b = []
