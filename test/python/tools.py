@@ -46,6 +46,31 @@ class Toolstests(casadiTestCase):
       self.checkarray(array(p.xother.i_a),DMatrix(0),"index")
       self.checkarray(array(p.xother.i_b),DMatrix([[1,0],[0,2]]),"index")
 
+
+      
+      self.assertTrue(p.lookup(('x',)) is p.x)
+      self.assertTrue(p.lookup(('x',(0,))).toScalar().isEqual(p.x[0].toScalar()))
+      self.assertTrue(p.lookup(('x',(1,))).toScalar().isEqual(p.x[1].toScalar()))
+      self.assertTrue(p.lookup(('y',)) is p.y)
+      for i in range(6):
+        self.assertTrue(p.lookup(('y',(i,))).toScalar().isEqual(p.y[i].toScalar()))
+      for i in range(3):
+        for j in range(2):
+          self.assertTrue(p.lookup(('y',(i,j))).toScalar().isEqual(p.y[i,j].toScalar()))
+      self.assertTrue(p.lookup(('z',)) is p.z)
+      self.assertTrue(p.lookup(('xother',)) is p.xother)
+      self.assertTrue(p.lookup(('xother','a')) is p.xother.a)
+      self.assertTrue(p.lookup(('xother','a',(0,))).isEqual(p.xother.a))
+      self.assertTrue(p.lookup(('xother','b')) is p.xother.b)
+      self.assertTrue(p.lookup(('xother','b',(1,1))).toScalar().isEqual(p.xother.b[1]))
+      
+      
+      for k in range(p.getSize()):
+        roundtrip = p.lookup(p.reverselookup(k))
+        if not(isinstance(roundtrip,SX)):
+          roundtrip = roundtrip.toScalar()
+        self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
+      
       p.x_ = [5,8]
 
       p.xother.b_.setAll(7)
@@ -72,6 +97,7 @@ class Toolstests(casadiTestCase):
       p.c = ssym("c")
       p.freeze()
       
+            
       self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
       self.checkarray(array(p.i_b[0]),DMatrix([[2],[3],[4]]),"index")
       self.checkarray(array(p.i_b[1]),DMatrix([[5],[6],[7]]),"index")
@@ -88,6 +114,20 @@ class Toolstests(casadiTestCase):
       self.assertEqual(p.I_c,3,"Index")
       
       
+      self.assertTrue(p.lookup(('b',)) is p.b)
+      self.assertTrue(p.lookup(('b',0)) is p.b[0])
+      self.assertTrue(p.lookup(('b',1)) is p.b[1])
+      
+      for i in range(3):
+        self.assertTrue(p.lookup(('b',1,(i,))).toScalar().isEqual(p.b[1][i].toScalar()))
+
+            
+      for k in range(p.getSize()):
+        roundtrip = p.lookup(p.reverselookup(k))
+        if not(isinstance(roundtrip,SX)):
+          roundtrip = roundtrip.toScalar()
+        self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
+        
       p.b_[1].setAll(4)
       
       A = p.vecNZcat_()
@@ -184,7 +224,13 @@ class Toolstests(casadiTestCase):
       self.assertEqual(p.I_b[2][0],3,"Index")
       self.assertEqual(p.I_b[2][1],4,"Index")
       self.assertEqual(p.I_c,5,"Index")
-      
+
+      for k in range(p.getSize()):
+        roundtrip = p.lookup(p.reverselookup(k))
+        if not(isinstance(roundtrip,SX)):
+          roundtrip = roundtrip.toScalar()
+        self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
+        
   def test_Numbers(self):
       p = Variables()
 

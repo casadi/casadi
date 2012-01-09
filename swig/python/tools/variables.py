@@ -15,6 +15,17 @@ def iter_flatten(iterable):
   else:
     yield iterable
     
+def iter_flatten_list(iterable):
+  if isinstance(iterable,list):
+    for e in iterable:
+      if isinstance(e, list):
+        for f in iter_flatten(e):
+          yield f
+      else:
+        yield e
+  else:
+    yield iterable
+    
 def iter_flatten_mutator(iterable,mutator=lambda i,x:x,counter=0):
   if isinstance(iterable,list):    
     for i in range(len(iterable)):
@@ -32,11 +43,39 @@ def iter_flatten_mutator(iterable,mutator=lambda i,x:x,counter=0):
      yield (counter,iterable)
      counter+=1 
       
+def iter_flatten_mutator_hierarchical(iterable,mutator=lambda i,j,x:x,counter=0,hierarchy=()):
+  if isinstance(iterable,list):    
+    for i in range(len(iterable)):
+      h = hierarchy + (i,)
+      e = iterable[i] 
+      if isinstance(e, (list, tuple)):
+        for c,f in iter_flatten_mutator_hierarchical(e,mutator,counter=counter,hierarchy=(i,) + hierarchy):
+          counter = c
+          yield (counter,f)
+          counter+=1
+      else:
+        iterable[i] = mutator(counter,h,e)
+        yield (counter,e)
+        counter+=1
+  else:
+     yield (counter,iterable)
+     counter+=1 
+      
 # fun must a function mapping from (flatcounter, item) to item    
 def map_nested_list(fun,iterable):
   if isinstance(iterable,list): 
     ret = copy.deepcopy(iterable)
     for j in iter_flatten_mutator(ret,fun):
+      pass
+    return ret
+  else:
+    return fun(0,iterable)
+    
+# fun must a function mapping from (flatcounter, hierarchicalcountertuple, item) to item    
+def map_nested_list_hierarchical(fun,iterable):
+  if isinstance(iterable,list): 
+    ret = copy.deepcopy(iterable)
+    for j in iter_flatten_mutator_hierarchical(ret,fun):
       pass
     return ret
   else:
@@ -63,7 +102,76 @@ class Variables(object):
       if self._type == "MX":
         self.createParent()
       self._numbers = Numbers(self,recycle=True)
-
+      self.buildlookuptable()
+                
+    def buildlookuptable(self):
+      self._reverselookup = [None]*self.getSize()
+      for k in self._order:
+          obj = self._d[k]
+          offset = self.getOffset(k)
+          size = self.getSize(obj)
+          if isinstance(obj,Variables):
+            self._reverselookup[offset:offset+size] = [ (k,)+i for i in obj._reverselookup]
+          elif isinstance(obj,list):
+            result = map_nested_list_hierarchical(lambda flati, hieri, item: (hieri, item ) ,self.getindex(k))
+            for hierarchy, imatrix in iter_flatten_list(result):
+              for i,j in enumerate(list(imatrix)):
+                self._reverselookup[j] = (k,)+ hierarchy + ((i,),)
+          else:
+           for i,j in enumerate(list(self.getindex(k))):
+             self._reverselookup[j] = (k,(i,))
+                
+                
+    def reverselookup(self,index):
+      return self._reverselookup[index]
+      
+    @property
+    def reverselookuptable(self):
+      return self._reverselookup
+      
+    def lookup(self,index,obj = None):
+      """
+      
+      index 
+      
+      ('x',)
+      ('x',(1,))
+      ('y',2,(1,))
+      
+      """
+      if obj is None:
+        obj = self
+      
+      if not(isinstance(index,tuple)):
+        index = (index,)
+      
+      if len(index)==0:
+        return obj
+        
+      first = index[0]
+      rest = index[1:]
+      
+      if isinstance(obj,list):
+        return self.lookup(rest,obj=obj[first]) 
+      elif isinstance(obj,Variables):
+        return self.lookup(rest,obj=obj.__getattr__(first)) 
+      elif isinstance(obj,SX):
+        if len(first)==1 and first[0]==0:
+          return obj
+        else:
+          raise Exception("Invalid index")
+      else:
+        return self.lookup(rest,obj=obj.__getitem__(first)) 
+      
+        
+      
+    def reverseNZindexRepr(self,index):
+      s = ""
+      for i in reverseNZindex(index):
+        if isinstance(i,StringType):
+          s+="[i_%s]"
+      self._reverselookup[index]
+      
     def __getattr__(self,name):
         """
           f.foo   returns the 'foo' entry in the variable dictionary 
