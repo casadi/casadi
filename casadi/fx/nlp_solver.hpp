@@ -75,6 +75,8 @@ NLP_LAMBDA_G,
 * When in warmstart mode, this output may be used as input (Ipopt)
 */
 NLP_LAMBDA_X, 
+/// The constraints evaluated at the optimal solution (m x 1)
+NLP_G,
 NLP_NUM_OUT};
 
 class NLPSolverInternal;

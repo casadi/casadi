@@ -254,6 +254,8 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
         lambda_x[i] = z_U[i]-z_L[i];
       }
       copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
+      copy(g,g+m_,callback_.input(NLP_G).begin());
+      
 #endif // WITH_IPOPT_CALLBACK 
 
 #ifndef WITH_IPOPT_CALLBACK 
@@ -303,6 +305,10 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
 
     // Get dual solution (nonlinear bounds)
     copy(lambda,lambda+m_,output(NLP_LAMBDA_G).begin());
+    
+    // Get the constraints
+    copy(g,g+m_,output(NLP_G).begin());
+    
   } catch (exception& ex){
     cerr << "finalize_solution failed: " << ex.what() << endl;
   }

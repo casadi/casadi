@@ -370,7 +370,7 @@ void NLPSolverInternal::init(){
   output(NLP_COST)       = DMatrix(1,1,0);
   output(NLP_LAMBDA_X)   = DMatrix(n_,1,0);
   output(NLP_LAMBDA_G)   = DMatrix(m_,1,0);
-  
+  output(NLP_G)          = DMatrix(m_,1,0);
   
   if (hasSetOption("iteration_callback")) {
    callback_ = getOption("iteration_callback");
@@ -403,10 +403,7 @@ void NLPSolverInternal::init(){
     stream << "Reporting NLP constraints" << endl;
     CasADi::reportConstraints(stream,output(NLP_X_OPT),input(NLP_LBX),input(NLP_UBX), "decision bounds");
     
-    G_.input(0).set(output(NLP_X_OPT));
-    if (G_.getNumInputs()==2)  G_.input(1).set(input(NLP_P));
-    G_.evaluate();
-    CasADi::reportConstraints(stream,G_.output(),input(NLP_LBG),input(NLP_UBG), "constraints");
+    CasADi::reportConstraints(stream,output(NLP_G),input(NLP_LBG),input(NLP_UBG), "constraints");
   }
 
 
