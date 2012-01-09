@@ -234,7 +234,6 @@ class ADtests(casadiTestCase):
 
               
   def test_jacobianSX(self):
-    return
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
@@ -266,7 +265,7 @@ class ADtests(casadiTestCase):
               self.message(" %s jacobian on SX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
               #f.setOption("verbose",True)
-              #f.setOption("ad_mode",mode)
+              f.setOption("ad_mode",mode)
               f.init()
               Jf=SXFunction(self.sxinputs[inputshape][inputtype],[f.jac(0)])
               Jf.init()
@@ -367,7 +366,6 @@ class ADtests(casadiTestCase):
      
               
   def test_hessian(self):
-    #return # not working
     self.message("Jacobian chaining")
     x=SX("x")
     y=SX("y")
