@@ -505,6 +505,10 @@ MX msym(const std::string& name, int n, int m){
   return MX(name,n,m);
 }
 
+MX msym(const std::string& name, const std::pair<int,int> & nm) {
+  return MX(name,nm.first,nm.second);
+}
+
 MX msym(const Matrix<double>& x){
   return MX(x);
 }
