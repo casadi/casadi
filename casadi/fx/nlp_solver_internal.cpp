@@ -272,10 +272,12 @@ void NLPSolverInternal::init(){
           
             // Gradient of the lagrangian
             MX gL = trans(lfcn.grad().at(0));
-            
+            log("MX Lagrangian gradient generated");
+
             MXFunction glfcn(lfcn_in,gL);
             glfcn.setOption("number_of_fwd_dir",n_);
             glfcn.init();
+            log("MX Lagrangian gradient function initialized");
             
             // Hessian of the Lagrangian
             H_ = glfcn.jacobian();
@@ -285,7 +287,7 @@ void NLPSolverInternal::init(){
             H_ = lfcn.hessian();
             
           }
-          log("MX Hessian function generated");
+          log("MX Lagrangian Hessian function generated");
           
         } else {
           casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G both SXFunction or MXFunction ");

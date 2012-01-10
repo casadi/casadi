@@ -28,6 +28,9 @@
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
 
+const bool NEW_MAPPING_NODE = false;
+const bool ELIMINATE_NESTED = true;
+
 using namespace std;
 
 namespace CasADi{
@@ -35,26 +38,89 @@ namespace CasADi{
 Mapping::Mapping(const CRSSparsity& sp) : nzmap_(sp,-1){
   setSparsity(sp);
   depind_.resize(sp.size(),-1);
+  
+  if(NEW_MAPPING_NODE){
+    assignments_.resize(1);
+    additions_.resize(1);
+  }
 }
 
 Mapping* Mapping::clone() const{
   return new Mapping(*this);
 }
 
+void Mapping::evaluateBlock(int iind, int oind, const vector<double>& idata, vector<double>& odata, bool fwd) const{
+  // Get references to the assignment and addition operations
+  const IOMap& assigns = assignments_[oind][iind];
+  const IOMap& adds = additions_[oind][iind];
+  
+  if(fwd){
+    
+    // Assignment operations
+    for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
+      odata[it->second] = idata[it->first];
+    
+    // Additions
+    for(IOMap::const_iterator it=adds.begin(); it!=adds.end(); ++it)
+      odata[it->second] += idata[it->first];
+    
+  } else {
+    // Assignment operations
+    for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
+      odata[it->first] += idata[it->second];
+
+    // Additions
+    for(IOMap::const_iterator it=adds.begin(); it!=adds.end(); ++it)
+      odata[it->first] += idata[it->second];
+  }
+}
+
 void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  // Number of sensitivities
   int nadj = adjSeed.size();
   int nfwd = fwdSens.size();
+
+  if(NEW_MAPPING_NODE){
+
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
+      
+      // Loop over outputs
+      for(int oind=0; oind<output.size(); ++oind){
+      
+        // Nondifferentiated outputs
+        if(input[iind]!=0 && output[oind]!=0)
+          evaluateBlock(iind,oind,input[iind]->data(),output[oind]->data(),true);
+
+        // Forward sensitivities
+        for(int d=0; d<nfwd; ++d){
+          if(fwdSeed[d][iind]!=0 && fwdSens[d][oind]!=0)
+            evaluateBlock(iind,oind,fwdSeed[d][iind]->data(),fwdSens[d][oind]->data(),true);
+        }
+        
+        // Adjoint sensitivities
+        for(int d=0; d<nadj; ++d){
+          if(adjSeed[d][oind]!=0 && adjSens[d][iind]!=0)
+            evaluateBlock(iind,oind,adjSeed[d][oind]->data(),adjSens[d][iind]->data(),false);
+        }
+      }
+    }
+  }
+  
+  // Old implementation
   const std::vector<int>& nzind_ = nzmap_.data();
   vector<double> &outputd = output[0]->data();
   
   for(int k=0; k<size(); ++k){
-    outputd[k] = input[depind_[k]]->data()[nzind_[k]];
+    if(!NEW_MAPPING_NODE){
+      outputd[k] = input[depind_[k]]->data()[nzind_[k]];
     
-    for(int d=0; d<nfwd; ++d)
-      fwdSens[d][0]->data()[k] = fwdSeed[d][depind_[k]]->data()[nzind_[k]];
-    
-    for(int d=0; d<nadj; ++d)
-      adjSens[d][depind_[k]]->data()[nzind_[k]] += adjSeed[d][0]->data()[k];
+      for(int d=0; d<nfwd; ++d)
+        fwdSens[d][0]->data()[k] = fwdSeed[d][depind_[k]]->data()[nzind_[k]];
+
+      for(int d=0; d<nadj; ++d)
+        adjSens[d][depind_[k]]->data()[nzind_[k]] += adjSeed[d][0]->data()[k];
+    }
   }
 }
 
@@ -128,7 +194,7 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
   // Quick return if no elements
   if(nz_d.empty()) return;
   
-  if(d->isMapping()){
+  if(ELIMINATE_NESTED && d->isMapping()){
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
@@ -151,6 +217,11 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
     if(it==depmap_.end()){
       depind = MXNode::addDependency(d);
       depmap_[static_cast<const MXNode*>(d.get())] = depind;
+
+      if(NEW_MAPPING_NODE){
+        assignments_[0].resize(ndep());
+        additions_[0].resize(ndep());
+      }
     } else {
       depind = it->second;
     }
@@ -166,6 +237,13 @@ void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std:
   for(int k=0; k<nz.size(); ++k){
     nzind_[nz[k]] = nz_d[k];
     depind_[nz[k]] = depind;
+  }
+  
+  if(NEW_MAPPING_NODE){
+    for(int k=0; k<nz.size(); ++k){
+      // TODO: Avoid duplicates
+      assignments_[0][depind].push_back(pair<int,int>(nz_d[k],nz[k]));
+    }
   }
 }
 
@@ -356,7 +434,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
   
   // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
-  vector<int> nzind_sens(nzind.size());
+  vector<int> nzind_sens(nzind.size()); // BUG? Initialize to -1?
   
   // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
   vector<int> fsens_ind;

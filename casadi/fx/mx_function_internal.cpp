@@ -754,6 +754,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
 }
 
 std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
+  if(verbose()) cout << "MXFunctionInternal::adFwd: begin (" << fseed.size() << " directions)" << endl;
   assertInit();
 
   // Get the number of directions
@@ -843,6 +844,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
       ret[d][oind] = dwork[el][d];
     }
   }
+  if(verbose()) cout << "MXFunctionInternal::adFwd: end" << endl;
   return ret;
 }
 
@@ -883,29 +885,30 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
       swork[it->i_res[0]] = it->mx;
     }
   }
+
+  // Arguments for the function evaluation
+  MXPtrVV fseed_p, fsens_p;
+  MXPtrVV aseed_p(nadj), asens_p(nadj);
+  MXPtrV input_p, output_p;
   
   // Loop over computational nodes in reverse order
   for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); ++it){
     
     // Get the arguments of the evaluation
-    MXPtrV input_p(it->i_arg.size());
+    input_p.resize(it->i_arg.size());
     for(int i=0; i<input_p.size(); ++i){
       int el = it->i_arg[i]; // index of the argument
       input_p[i] = el<0 ? 0 : &swork[el];
     }
         
     // Result of the evaluation
-    MXPtrV output_p(it->i_res.size());
+    output_p.resize(it->i_res.size());
     for(int i=0; i<output_p.size(); ++i){
       int el = it->i_res[i]; // index of the output
       output_p[i] = el<0 ? 0 : &swork[el];
     }
 
-    // Dummy arguments for the forward sensitivities
-    MXPtrVV fseed_p, fsens_p;
-
-    // Adjoint seeds and sensitivities
-    MXPtrVV aseed_p(nadj), asens_p(nadj);
+    // Sensitivity arguments
     for(int d=0; d<nadj; ++d){
       aseed_p[d].resize(it->i_res.size());
       for(int oind=0; oind<it->i_res.size(); ++oind){
@@ -943,6 +946,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
       ret[d][iind] = dwork[el][d];
     }
   }
+  cout << "f" << endl;
   return ret;
 }
 

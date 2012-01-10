@@ -81,6 +81,18 @@ class Mapping : public MXNode{
 
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
+
+    /// Operation sequence
+    typedef std::vector<std::pair<int,int> > IOMap;
+
+    /// Assignment operations
+    std::vector<std::vector<IOMap> > assignments_;
+
+    /// Addition operations
+    std::vector<std::vector<IOMap> > additions_;
+    
+    /// Evaluate a block given the data vectors
+    void evaluateBlock(int iind, int oind, const std::vector<double>& idata, std::vector<double>& odata, bool fwd) const;
 };
 
 } // namespace CasADi
