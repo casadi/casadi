@@ -93,7 +93,7 @@ MX getMinor(const MX &x, int i, int j){
   }
 
   // Make a function call
-  vector<MX> dM = detFuncs[n-1].call(vec(M));
+  vector<MX> dM = detFuncs[n-1].call(flatten(M));
   return dM[0];
 }
 

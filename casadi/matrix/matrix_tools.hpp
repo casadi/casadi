@@ -1218,6 +1218,7 @@ MTT_INST(T,adj) \
 MTT_INST(T,inv) \
 MTT_INST(T,reshape) \
 MTT_INST(T,vec) \
+MTT_INST(T,flatten) \
 MTT_INST(T,vecNZ) \
 MTT_INST(T,horzcat) \
 MTT_INST(T,vertcat) \

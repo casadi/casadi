@@ -689,7 +689,7 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
   vector<MX> tmp(nfwd);
   for(int oind=0; oind<outputv.size(); ++oind){
     for(int d=0; d<nfwd; ++d){
-      tmp[d] = vec(fsens[d][oind]);
+      tmp[d] = flatten(fsens[d][oind]);
     }
     ret[oind] = horzcat(tmp);
   }
@@ -745,7 +745,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   vector<MX> tmp(nadj);
   for(int iind=0; iind<inputv.size(); ++iind){
     for(int d=0; d<nadj; ++d){
-      tmp[d] = trans(vec(asens[d][iind]));
+      tmp[d] = trans(flatten(asens[d][iind]));
     }
     ret[iind] = vertcat(tmp);
   }

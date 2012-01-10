@@ -222,7 +222,7 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
         
         // Forward sensitivities
         for(int d=0; d<nfwd; ++d){
-          MX fsens_d = mul(J,vec(*fwdSeed[d][iind]));
+          MX fsens_d = mul(J,flatten(*fwdSeed[d][iind]));
           if(!isZero(fsens_d)){
             // Reshape sensitivity contribution if necessary
             if(od2>1) fsens_d = reshape(fsens_d,od1,od2);
@@ -243,7 +243,7 @@ void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
         
         // Adjoint sensitivities
         for(int d=0; d<nadj; ++d){
-          MX asens_d = mul(trans(J),vec(*adjSeed[d][oind]));
+          MX asens_d = mul(trans(J),flatten(*adjSeed[d][oind]));
           if(!isZero(asens_d)){
             // Reshape sensitivity contribution if necessary
             if(id2>1) asens_d = reshape(asens_d,id1,id2);
