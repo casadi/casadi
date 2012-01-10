@@ -259,14 +259,15 @@ MX vec(const MX &x) {
   if(x.size2()==1){
     return x;
   } else {
-    return reshape(x,x.numel(),1);
+    return reshape(trans(x),x.numel(),1);
   }
 }
 
 MX vecNZ(const MX &x) {
   // Create a mapping
   MX ret = MX::create(new Mapping(CRSSparsity(x.size(),1,true)));
-  ret->addDependency(x,range(x.size()));
+  IMatrix ind(x.sparsity(),range(x.size()));
+  ret->addDependency(x,trans(ind).data());
   simplifyMapping(ret);
   return ret;
 }

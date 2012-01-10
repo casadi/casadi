@@ -70,7 +70,7 @@ MXFunction vec (const FX &a_) {
     std::stringstream s;
     s << "X_flat_" << i;
     symbolicInputMX_vec[i] = MX(s.str(),vec(symbolicInputMX[i].sparsity()));
-    symbolicInputMX_vec_reshape[i] = reshape(symbolicInputMX_vec[i],symbolicInputMX[i].sparsity());
+    symbolicInputMX_vec_reshape[i] = trans(reshape(symbolicInputMX_vec[i],trans(symbolicInputMX[i].sparsity())));
   }
   
   // Call the original function with the vecced inputs

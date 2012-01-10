@@ -92,6 +92,10 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m);
 
 CRSSparsity vec(const CRSSparsity& a);
 
+/** \ brief Return the transpose of the sparsity pattern
+*/
+CRSSparsity trans(const CRSSparsity& a);
+
 /**
 * \brief Return the lower part of the sparsity pattern
 */

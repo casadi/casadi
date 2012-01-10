@@ -259,6 +259,10 @@ CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
   return (*this)->transpose(mapping);
 }
 
+CRSSparsity CRSSparsity::transpose() const{
+  return (*this)->transpose();
+}
+
 CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
   return (*this)->patternUnion(y, mapping, f00_is_zero, f0x_is_zero, fx0_is_zero);
 }

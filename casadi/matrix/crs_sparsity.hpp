@@ -200,6 +200,9 @@ class CRSSparsity : public SharedObject{
     
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping) const;
+    
+    /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
+    CRSSparsity transpose() const;
 
     /** \brief Union of two sparsity patterns
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements

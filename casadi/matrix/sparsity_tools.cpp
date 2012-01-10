@@ -211,7 +211,11 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m){
 }
 
 CRSSparsity vec(const CRSSparsity& a){
-  return reshape(a,a.numel(),1);
+  return reshape(trans(a),a.numel(),1);
+}
+
+CRSSparsity trans(const CRSSparsity& a) {
+  return a.transpose();
 }
 
 

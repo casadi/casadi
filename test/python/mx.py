@@ -440,25 +440,38 @@ class MXtests(casadiTestCase):
     for i in range(2):
       for j in range(3):
         self.assertAlmostEqual(Lr[i,j], ztr[j,i],10)
-    
-  def test_MXflatten(self):
-    self.message("trans(MX)")
-    x = MX("x",2,3)
-    z=vec(x)
-    self.assertEqual(z.size1(),6,"Flatten returns MX of wrong dimension")
-    self.assertEqual(z.size2(),1,"Flatten returns MX of wrong dimension")
-    f = MXFunction([x],[z])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
-    f.init()
-    L=[1,2,3,4,5,6]
-    f.setInput(L,0)
-    f.evaluate()
-    zt = f.output(0).toArray()
-    for i in range(len(L)):
-      self.assertAlmostEqual(L[i], zt[i],10)
       
+  def test_MXvec(self):
+
+    u = DMatrix([[10*j+i for i in range(3)] for j in range(4) ])
+
+    U = msym("u",u.shape)
+
+    f = MXFunction([U],[vec(U)])
+    f.init()
+    f.input().set(u)
+    f.evaluate()
     
+    self.checkarray(vec(u),f.output(),"vec")
+    
+  def test_MXvecNZ(self):
+
+    u = DMatrix(4,3)
+    u[0,0] = 7
+    u[1,1] = 8
+    u[2,2] = 6
+    u[1,0] = 9
+    u[0,1] = 11
+    
+    U = msym("u",u.sparsity())
+
+    f = MXFunction([U],[vecNZ(U)])
+    f.init()
+    f.input().set(u)
+    f.evaluate()
+    
+    self.checkarray(vecNZ(u),f.output(),"vec")
+
   def test_MXreshape(self):
     self.message("reshape(MX)")
     x = MX("x",2,3)
@@ -481,8 +494,8 @@ class MXtests(casadiTestCase):
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')
     checkMXoperations(self,lambda x: trans(x),lambda x: x.T,'trans(vertcat)')
     checkMXoperations(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(vertcat))')
-    checkMXoperations(self,lambda x: vec(trans(x)),lambda x: reshape(x.T,(prod(x.shape),1)),'vec(trans(vertcat))')
-    checkMXoperations(self,lambda x: trans(vec(x)),lambda x: reshape(x,(prod(x.shape),1)).T,'vec(trans(vertcat))')
+    checkMXoperations(self,lambda x: vec(trans(x)),lambda x: reshape(x,(prod(x.shape),1)),'vec(trans(vertcat))')
+    checkMXoperations(self,lambda x: trans(vec(x)),lambda x: reshape(x.T,(prod(x.shape),1)).T,'vec(trans(vertcat))')
     checkMXoperations(self,lambda x: c.reshape(x,(4,6)),lambda x: reshape(x,(4,6)),'reshape(vertcat)')
     checkMXoperations(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(vertcat))') 
     checkMXoperations(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
@@ -492,8 +505,8 @@ class MXtests(casadiTestCase):
     checkMXoperations2(self,lambda x: x,lambda x: x,'horzcat')
     checkMXoperations2(self,lambda x: trans(x),lambda x: x.T,'trans(horzcat)')
     checkMXoperations2(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(horzcat))')
-    checkMXoperations2(self,lambda x: vec(trans(x)),lambda x: reshape(x.T,(prod(x.shape),1)),'vec(trans(horzcat))')
-    checkMXoperations2(self,lambda x: trans(vec(x)),lambda x: reshape(x,(prod(x.shape),1)).T,'vec(trans(horzcat))')
+    checkMXoperations2(self,lambda x: vec(trans(x)),lambda x: reshape(x,(prod(x.shape),1)),'vec(trans(horzcat))')
+    checkMXoperations2(self,lambda x: trans(vec(x)),lambda x: reshape(x.T,(prod(x.shape),1)).T,'vec(trans(horzcat))')
     checkMXoperations2(self,lambda x: c.reshape(x,(4,6)),lambda x: reshape(x,(4,6)),'reshape(horzcat)')
     checkMXoperations2(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(horzcat))') 
     checkMXoperations2(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
@@ -503,8 +516,8 @@ class MXtests(casadiTestCase):
     checkMXoperations3(self,lambda x: x,lambda x: x,'snippet')
     checkMXoperations3(self,lambda x: trans(x),lambda x: x.T,'trans(snippet)')
     checkMXoperations3(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(snippet))')
-    checkMXoperations3(self,lambda x: vec(trans(x)),lambda x: reshape(x.T,(prod(x.shape),1)),'vec(trans(snippet))')
-    checkMXoperations3(self,lambda x: trans(vec(x)),lambda x: reshape(x,(prod(x.shape),1)).T,'vec(trans(snippet))')
+    checkMXoperations3(self,lambda x: vec(trans(x)),lambda x: reshape(x,(prod(x.shape),1)),'vec(trans(snippet))')
+    checkMXoperations3(self,lambda x: trans(vec(x)),lambda x: reshape(x.T,(prod(x.shape),1)).T,'vec(trans(snippet))')
     checkMXoperations3(self,lambda x: c.reshape(x,(4,6)),lambda x: reshape(x,(4,6)),'reshape(snippet)')
     checkMXoperations3(self,lambda x: c.reshape(trans(x),(4,6)),lambda x: reshape(x.T,(4,6)),'reshape(trans(snippet))') 
     checkMXoperations3(self,lambda x: trans(c.reshape(x,(4,6))),lambda x: reshape(x,(4,6)).T,'trans(reshape(snippet))') 
