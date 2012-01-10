@@ -121,9 +121,9 @@ MX reshape(const MX &x, const std::vector<int> sz);
 //! \brief Reshape the MX
 MX reshape(const MX &x, const CRSSparsity& sp);
 
-/** \brief Returns a flattened version of the MX
-    Flattening is a cheap (non-copying) operation
-    Same as reshape(x, x.numel(),1)
+/** \brief Returns a vectorized version of the MX
+    Vectorizing is an expensive operation, unlike flatten
+    Same as reshape(trans(x), x.numel(),1)
     
     a b
     c d 
@@ -137,6 +137,23 @@ MX reshape(const MX &x, const CRSSparsity& sp);
     
 */
 MX vec(const MX &x);
+
+/** \brief Returns a flattened version of the MX
+    Flattening is a cheap (non-copying) operation
+    Same as reshape(x, x.numel(),1)
+    
+    a b
+    c d 
+    
+    turns into
+    
+    a
+    b
+    c
+    d
+    
+*/
+MX flatten(const MX &x);
 
 /** \brief Returns a flattened version of the MX, preserving only nonzeros
 */

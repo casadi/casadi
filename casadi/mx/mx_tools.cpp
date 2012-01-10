@@ -263,6 +263,14 @@ MX vec(const MX &x) {
   }
 }
 
+MX flatten(const MX &x) {
+  if(x.size2()==1){
+    return x;
+  } else {
+    return reshape(x,x.numel(),1);
+  }
+}
+
 MX vecNZ(const MX &x) {
   // Create a mapping
   MX ret = MX::create(new Mapping(CRSSparsity(x.size(),1,true)));

@@ -91,8 +91,9 @@ template<class T>
 T trace(const Matrix<T>& a);
 
 /** \brief  make a vector
-  Reshapes/flattens/vectorizes the Matrix<T> such that the shape becomes (expr.numel(),1).
+  Reshapes/vectorizes the Matrix<T> such that the shape becomes (expr.numel(),1).
   Columns are stacked on top of each other.
+  Same as reshape(trans(expr), expr.numel(),1)
   
     a b
     c d 
@@ -107,6 +108,25 @@ T trace(const Matrix<T>& a);
  */
 template<class T>
 Matrix<T> vec(const Matrix<T>& a);
+
+/** \brief  make a vector
+  Flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
+  Transposed rows are stacked on top of each other.
+  Same as reshape(expr, expr.numel(),1)
+  
+    a b
+    c d 
+    
+    turns into
+    
+    a
+    b
+    c
+    d
+    
+ */
+template<class T>
+Matrix<T> flatten(const Matrix<T>& a);
 
 /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
  */
@@ -588,6 +608,13 @@ Matrix<T> vec(const Matrix<T>& a){
   Matrix<T> ret = reshape(trans(a),a.numel(),1);
   return ret;
 }
+
+template<class T>
+Matrix<T> flatten(const Matrix<T>& a){
+  Matrix<T> ret = reshape(a,a.numel(),1);
+  return ret;
+}
+
 
 template<class T>
 Matrix<T> vecNZ(const Matrix<T>& a){
