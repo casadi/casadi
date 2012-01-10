@@ -60,15 +60,12 @@ class Mapping : public MXNode{
     
     /// Is a mapping matrix
     virtual bool isMapping() const{return true;}
-    
-    /// Add a dependency (index given)
-    virtual void addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz);
-    
-    /// Add a dependency
-    virtual void addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz);
-    
-    /// Add a dependency
-    virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
+
+    /// Assign nonzeros (mapping matrix)
+    virtual void assign(const MX& d, const IOMap& iomap);
+
+    /// Assign nonzeros (index given) -> change to multiple indices?
+    virtual void assignIndex(int depind, const IOMap& iomap);
     
     /// Check if the mapping is ready
     bool isReady() const;
@@ -81,9 +78,6 @@ class Mapping : public MXNode{
 
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
-
-    /// Operation sequence
-    typedef std::vector<std::pair<int,int> > IOMap;
 
     /// Assignment operations
     std::vector<std::vector<IOMap> > assignments_;

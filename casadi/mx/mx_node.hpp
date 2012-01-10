@@ -201,6 +201,9 @@ class MXNode : public SharedObjectNode{
     /// Add a dependency
     int addDependency(const MX& dep);
 
+    /// Operation sequence
+    typedef std::vector<std::pair<int,int> > IOMap;
+    
     /// Add a dependency (index given)
     virtual void addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz);
 
@@ -209,6 +212,12 @@ class MXNode : public SharedObjectNode{
     
     /// Add a dependency (mapping matrix)
     virtual void addDependency(const MX& d, const std::vector<int>& nz_d);
+
+    /// Assign nonzeros (index given) -> change to multiple indices?
+    virtual void assignIndex(int depind, const IOMap& iomap);
+
+    /// Assign nonzeros (mapping matrix)
+    virtual void assign(const MX& d, const IOMap& iomap);
 
     /// Is it a certain operation
     virtual bool isOperation(int op) const{ return false;}

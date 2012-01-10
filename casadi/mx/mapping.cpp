@@ -182,40 +182,34 @@ void Mapping::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d){
-  addDependency(d,nz_d,range(nz_d.size()));
-}
-
-void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
-  casadi_assert(nz_d.size()==nz.size());
+void Mapping::assign(const MX& d, const IOMap& iomap){
   casadi_assert(!d.isNull());
   //const std::vector<int>& nzind_ = nzmap_.data();
   
   // Quick return if no elements
-  if(nz_d.empty()) return;
+  if(iomap.empty()) return;
   
   if(ELIMINATE_NESTED && d->isMapping()){
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
-    vector<vector<int> > nz_d2(d2.size());
-    vector<vector<int> > nz2(d2.size());
-    for(int i=0; i<nz.size(); ++i){
-      int depind_i = dnode->depind_.at(nz_d[i]);
-      nz_d2[depind_i].push_back(dnode->nzmap_.at(nz_d[i]));
-      nz2[depind_i].push_back(nz[i]);
+    vector<IOMap> iomap2(d2.size());
+    for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); it++){
+      int depind_i = dnode->depind_.at(it->first);
+      pair<int,int> assign_i(dnode->nzmap_.at(it->first), it->second);
+      iomap2[depind_i].push_back(assign_i);
     }
     
     // Call the function recursively
     for(int i=0; i<d2.size(); ++i){
-      addDependency(d2[i],nz_d2[i],nz2[i]);
+      assign(d2[i],iomap2[i]);
     }
   } else {
     // Add the node if it is not already a dependency
     std::map<const MXNode*, int>::const_iterator it = depmap_.find(static_cast<const MXNode*>(d.get()));
     int depind;
     if(it==depmap_.end()){
-      depind = MXNode::addDependency(d);
+      depind = addDependency(d);
       depmap_[static_cast<const MXNode*>(d.get())] = depind;
 
       if(NEW_MAPPING_NODE){
@@ -227,23 +221,20 @@ void Mapping::addDependency(const MX& d, const std::vector<int>& nz_d, const std
     }
     
     // Save the mapping
-    addDependency(depind,nz_d,nz);
+    assignIndex(depind,iomap);
   }
 }
 
-void Mapping::addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz){
-  casadi_assert(nz_d.size()==nz.size());
+void Mapping::assignIndex(int depind, const IOMap& iomap){
   std::vector<int>& nzind_ = nzmap_.data();
-  for(int k=0; k<nz.size(); ++k){
-    nzind_[nz[k]] = nz_d[k];
-    depind_[nz[k]] = depind;
+  for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
+    nzind_[it->second] = it->first;
+    depind_[it->second] = depind;
   }
   
   if(NEW_MAPPING_NODE){
-    for(int k=0; k<nz.size(); ++k){
-      // TODO: Avoid duplicates
-      assignments_[0][depind].push_back(pair<int,int>(nz_d[k],nz[k]));
-    }
+    // TODO: Avoid duplicates
+    assignments_[0][depind].insert(assignments_[0][depind].end(),iomap.begin(),iomap.end());
   }
 }
 
