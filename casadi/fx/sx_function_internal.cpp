@@ -335,9 +335,11 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
     for (int i=0;i<jblocks_no_f.size();++i) {
       cout << "   jblocks_no_f[" << i << "] " << jblocks_no_f[i] << endl;
       cout << "             D1[" << i << "] " << D1[i] << endl;
-      cout << "                  col        " << D1[i].col() << endl;
-      cout << "                  rowind     " << D1[i].rowind() << endl;
-      cout << "                  spy        " << DMatrix(D1[i],1) << endl;
+      if (!D1[i].isNull()) {
+        cout << "                  col        " << D1[i].col() << endl;
+        cout << "                  rowind     " << D1[i].rowind() << endl;
+        cout << "                  spy        " << DMatrix(D1[i],1) << endl;
+      }
       cout << "             D2[" << i << "] " << D2[i] << endl;
     }
   }
