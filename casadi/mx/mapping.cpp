@@ -211,34 +211,23 @@ void Mapping::init(){
   // Call init of the base class
   MXNode::init();
   
+  // Clear the runtime
+  assignments_.resize(1);
+  assignments_[0].resize(ndep());
+  for(int iind=0; iind<assignments_[0].size(); ++iind){
+    assignments_[0][iind].clear();
+  }
+  
+  // Add all the runtime elements
+  for(int onz=0; onz<output_sorted_.size(); ++onz){
+    assignments_[0][output_sorted_[onz].iind].push_back(pair<int,int>(output_sorted_[onz].inz,onz));
+  }
 }
 
 void Mapping::assignIndex(int depind, const IOMap& iomap){
   for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
     output_sorted_[it->second].inz = it->first;
     output_sorted_[it->second].iind = depind;
-  }
-    
-  if(NEW_MAPPING_NODE){
-    
-    
-    // QUICKFIX:
-    for(int iind=0; iind<ndep(); ++iind){
-      for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
-        for(int k=0; k<assignments_[0][iind].size(); ++k){
-          if(assignments_[0][iind][k].second==it->second){
-            assignments_[0][iind].erase(assignments_[0][iind].begin()+k);
-          }
-        }
-      }
-    }
-    
-    IOMap& assigns = assignments_[0][depind];
-    assigns.insert(assigns.begin(),iomap.begin(),iomap.end());
-    inplace_merge(assigns.begin(),assigns.begin()+iomap.size(),assigns.end(),outputSmaller);
-    IOMap::iterator new_end = unique(assigns.begin(),assigns.end(),outputEqual);
-/*    casadi_assert(assigns.size()==distance(assigns.begin(),new_end));*/
-    assigns.resize(distance(assigns.begin(),new_end));
   }
 }
 
