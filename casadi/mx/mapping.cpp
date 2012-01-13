@@ -28,16 +28,17 @@
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
 
-const bool NEW_MAPPING_NODE = false;
+const bool NEW_MAPPING_NODE = true;
 const bool ELIMINATE_NESTED = true;
 
 using namespace std;
 
 namespace CasADi{
 
-Mapping::Mapping(const CRSSparsity& sp) : nzmap_(sp,-1){
+Mapping::Mapping(const CRSSparsity& sp){
   setSparsity(sp);
   depind_.resize(sp.size(),-1);
+  nzind_ = depind_;
   
   if(NEW_MAPPING_NODE){
     assignments_.resize(1);
@@ -59,7 +60,7 @@ void Mapping::evaluateBlock(int iind, int oind, const vector<double>& idata, vec
     // Assignment operations
     for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
       odata[it->second] = idata[it->first];
-    
+
     // Additions
     for(IOMap::const_iterator it=adds.begin(); it!=adds.end(); ++it)
       odata[it->second] += idata[it->first];
@@ -105,14 +106,12 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
         }
       }
     }
-  }
+  } else {
+    
+    // Old implementation
+    vector<double> &outputd = output[0]->data();
   
-  // Old implementation
-  const std::vector<int>& nzind_ = nzmap_.data();
-  vector<double> &outputd = output[0]->data();
-  
-  for(int k=0; k<size(); ++k){
-    if(!NEW_MAPPING_NODE){
+    for(int k=0; k<size(); ++k){
       outputd[k] = input[depind_[k]]->data()[nzind_[k]];
     
       for(int d=0; d<nfwd; ++d)
@@ -125,7 +124,6 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
 }
 
 void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  const std::vector<int>& nzind_ = nzmap_.data();
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int k=0; k<size(); ++k){
     bvec_t *inputd = get_bvec_t(input[depind_[k]]->data());
@@ -138,7 +136,6 @@ void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
 }
 
 bool Mapping::isReady() const{
-  const std::vector<int>& nzind_ = nzmap_.data();
   casadi_assert(depind_.size()==size());
   casadi_assert(nzind_.size()==size());
   for(int k=0; k<size(); ++k){
@@ -150,7 +147,6 @@ bool Mapping::isReady() const{
     
 void Mapping::printPart(std::ostream &stream, int part) const{
   casadi_assert(isReady());
-  const std::vector<int>& nzind_ = nzmap_.data();
 
   if(ndep()==0){
     stream << "sparse(" << size1() << "," << size2() << ")";
@@ -196,7 +192,7 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
     vector<IOMap> iomap2(d2.size());
     for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); it++){
       int depind_i = dnode->depind_.at(it->first);
-      pair<int,int> assign_i(dnode->nzmap_.at(it->first), it->second);
+      pair<int,int> assign_i(dnode->nzind_.at(it->first), it->second);
       iomap2[depind_i].push_back(assign_i);
     }
     
@@ -225,16 +221,36 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
   }
 }
 
+void Mapping::init(){
+  
+}
+
 void Mapping::assignIndex(int depind, const IOMap& iomap){
-  std::vector<int>& nzind_ = nzmap_.data();
   for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
     nzind_[it->second] = it->first;
     depind_[it->second] = depind;
   }
-  
+    
   if(NEW_MAPPING_NODE){
-    // TODO: Avoid duplicates
-    assignments_[0][depind].insert(assignments_[0][depind].end(),iomap.begin(),iomap.end());
+    
+    
+    // QUICKFIX:
+    for(int iind=0; iind<ndep(); ++iind){
+      for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
+        for(int k=0; k<assignments_[0][iind].size(); ++k){
+          if(assignments_[0][iind][k].second==it->second){
+            assignments_[0][iind].erase(assignments_[0][iind].begin()+k);
+          }
+        }
+      }
+    }
+    
+    IOMap& assigns = assignments_[0][depind];
+    assigns.insert(assigns.begin(),iomap.begin(),iomap.end());
+    inplace_merge(assigns.begin(),assigns.begin()+iomap.size(),assigns.end(),outputSmaller);
+    IOMap::iterator new_end = unique(assigns.begin(),assigns.end(),outputEqual);
+/*    casadi_assert(assigns.size()==distance(assigns.begin(),new_end));*/
+    assigns.resize(distance(assigns.begin(),new_end));
   }
 }
 
@@ -250,9 +266,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   // Dimensions
   int d1=sp.size1(), d2=sp.size2();
   
-  // Nonzero indices
-  const std::vector<int> &nzind = nzmap_.data();
-
   // Number of derivative directions
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
@@ -284,7 +297,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
           
           // Add if index matches
           if(depind_[k]==iind){
-            input_nz.push_back(nzind[k]);
+            input_nz.push_back(nzind_[k]);
             output_el[iind].push_back(j + i*d2);
           }
         }
@@ -425,7 +438,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
   
   // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
-  vector<int> nzind_sens(nzind.size()); // BUG? Initialize to -1?
+  vector<int> nzind_sens(nzind_.size()); // BUG? Initialize to -1?
   
   // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
   vector<int> fsens_ind;
@@ -485,7 +498,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         if(depind_[el]==iind){
           
           // Point nzind_sens to the nonzero index of the sensitivity
-          nzind_sens[el] = fsens_ind[nzind[el]];
+          nzind_sens[el] = fsens_ind[nzind_[el]];
           
           // Count the number of nonzeros
           nnz += int(nzind_sens[el]>=0);
@@ -554,7 +567,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
 }
 
 void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  const std::vector<int> &nzind_ = nzmap_.data();
   for(int k=0; k<size(); ++k){
     (*output[0])[k] = (*input[depind_[k]])[nzind_[k]];
   }

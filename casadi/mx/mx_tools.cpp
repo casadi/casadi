@@ -184,7 +184,7 @@ MX outer_prod(const MX &x, const MX &y){
 
 void simplifyMapping(MX& ex){
   return;
-  
+#if 0  
   // Make sure that we have a mapping with one dependency
   if(!(ex->isMapping() && ex->ndep()==1))
     return;
@@ -205,6 +205,7 @@ void simplifyMapping(MX& ex){
     
   // Identity transformation if we reached this point
   ex = ex->dep(0);
+#endif
 }
 
 MX trans(const MX &x){

@@ -620,13 +620,6 @@ std::string MX::dimString() const {
   return ss.str();
 }
 
-const Matrix<int>& MX::mapping() {
-  const Mapping * m = dynamic_cast<const Mapping*>(get());
-  casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
-  casadi_assert_message(m->ndep()<=1, "mapping: argument MX should be a Mapping with one depency only (or zero dependencies)");
-  return m->nzmap_;
-}
-
 MX MX::mul(const MX& y) const{
   const MX& x = *this;
 
@@ -819,16 +812,6 @@ FX MX::getFunction () {  return (*this)->getFunction(); }
 const Matrix<double> & MX::getConstant() const {
   casadi_assert_message(isConstant(),"MX::getConstant: must be constant");
   return dynamic_cast<const MXConstant*>(get())->x_;
-}
-
-const Matrix<int> & MX::getNZMap() const {
-  casadi_assert_message(isMapping(),"MX::getNZMap: must be mapping");
-  return dynamic_cast<const Mapping*>(get())->nzmap_;
-}
-
-const std::vector<int> & MX::getDepInd() const {
-  casadi_assert_message(isMapping(),"MX::getDepInd: must be mapping");
-  return dynamic_cast<const Mapping*>(get())->depind_;
 }
  	  
 bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get()) != 0 : false;  }

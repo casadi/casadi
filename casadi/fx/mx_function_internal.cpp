@@ -155,6 +155,9 @@ void MXFunctionInternal::init(){
     // Get pointer to node
     MXNode* n = *it;
     
+    // Initialize the node
+    n->init();
+    
     // Add an element to the algorithm
     if(n->isOutputNode()){
       
@@ -258,7 +261,6 @@ void MXFunctionInternal::init(){
         alg.back().i_res.resize(1,work.size());
       }
     }
-    
     
     // Allocate memory for an element in the work vector
     work.resize(work.size()+1);

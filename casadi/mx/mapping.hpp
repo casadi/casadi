@@ -66,12 +66,15 @@ class Mapping : public MXNode{
 
     /// Assign nonzeros (index given) -> change to multiple indices?
     virtual void assignIndex(int depind, const IOMap& iomap);
-    
+
+    /// Initialize
+    virtual void init();
+
     /// Check if the mapping is ready
     bool isReady() const;
     
     /// Mapping from the output non-zero to the dependency nonzero index
-    Matrix<int> nzmap_;
+    std::vector<int> nzind_;
 
     /// Mapping from the output non-zero index of the dependency index
     std::vector<int> depind_;
@@ -79,14 +82,39 @@ class Mapping : public MXNode{
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
 
-    /// Assignment operations
+    /// Assignment operations (runtime)
     std::vector<std::vector<IOMap> > assignments_;
 
-    /// Addition operations
+    /// Addition operations (runtime)
     std::vector<std::vector<IOMap> > additions_;
+    
+    /// Unsorted operations
+    struct Unsorted{
+      // Constructor
+      Unsorted(int inz__=-1, int onz__=-1, int iind__=0, bool is_add__=false)
+      : inz(inz__), onz(onz__), iind(iind__), is_add(is_add__){}
+      
+      // Sorting by output nonzero
+      bool operator<(const Unsorted& other){ return onz<other.onz;}
+      
+      // Input/output nonzero and dependency index
+      int inz, onz, iind;
+      
+      // Is the operation an addition?
+      bool is_add;
+    };
+    
+    /// Not yet sorted operations
+    std::vector<Unsorted> unsorted_;
     
     /// Evaluate a block given the data vectors
     void evaluateBlock(int iind, int oind, const std::vector<double>& idata, std::vector<double>& odata, bool fwd) const;
+    
+    /// Compare output index
+    static bool outputSmaller(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second<el2.second;}
+    
+    /// Check equality for output index
+    static bool outputEqual(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second==el2.second;}
 };
 
 } // namespace CasADi
