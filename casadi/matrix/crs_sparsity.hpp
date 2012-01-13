@@ -114,6 +114,9 @@ class CRSSparsity : public SharedObject{
     /// Take the union of two sparsity patterns
     CRSSparsity operator+(const CRSSparsity& b) const;
 
+    /// Take the intersection of two sparsity patterns
+    CRSSparsity operator*(const CRSSparsity& b) const;
+    
     /// \name Size and element counting
     /// @{
     

@@ -25,18 +25,56 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.getNZ(i[0],i[1])
       
-    #w = IVector()
-    #c=a.patternUnion(b,w)
-    #self.assertEquals(w.size(),len(nza.union(nzb)))
-    #for k in range(w.size()):
-      #ind = (c.getRow()[k],c.col(k))
-      #if (ind in nza and ind in nzb):
-        #self.assertEquals(w[k],1 | 2)
-      #elif (ind in nza):
-        #self.assertEquals(w[k],1)
-      #elif (ind in nzb):
-        #self.assertEquals(w[k],2)
+    w = UCharVector()
+    c=a.patternUnion(b,w)
+    self.assertEquals(w.size(),len(nza.union(nzb)))
+    for k in range(w.size()):
+      ind = (c.getRow()[k],c.col(k))
+      if (ind in nza and ind in nzb):
+        self.assertEquals(w[k],1 | 2)
+      elif (ind in nza):
+        self.assertEquals(w[k],1)
+      elif (ind in nzb):
+        self.assertEquals(w[k],2)
         
+    c = a + b
+    self.assertEquals(c.size(),len(nza.union(nzb)))
+    for k in range(c.size()):
+      ind = (c.getRow()[k],c.col(k))
+      self.assertTrue(ind in nza or ind in nzb)
+
+  def test_intersection(self):
+    self.message("Sparsity intersection")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (3,1),
+             (2,3)])
+    nzb = set([  (0,2),
+             (0,0),
+             (2,2),
+             (2,3)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = CRSSparsity(4,5)  
+    for i in nzb:
+      b.getNZ(i[0],i[1])
+    
+    w = UCharVector()
+    c=a.patternUnion(b,w,True,True,True)
+    for k in range(c.size()):
+      ind = (c.getRow()[k],c.col(k))
+      self.assertTrue(ind in nza and ind in nzb)
+        
+    c = a * b
+    self.assertEquals(c.size(),len(nza.intersection(nzb)))
+    for k in range(c.size()):
+      ind = (c.getRow()[k],c.col(k))
+      self.assertTrue(ind in nza and ind in nzb)
+       
   def test_getNZDense(self):
     self.message("getNZDense")
     nza = set([  (0,0),(0,1),(2,0),(3,1)])

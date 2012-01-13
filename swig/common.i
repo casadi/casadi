@@ -41,6 +41,8 @@ _object = _copyableObject
 %template(BVectorVector)       std::vector<std::vector<bool> > ;
 %template(BVectorVectorVector) std::vector< std::vector<std::vector<bool> > > ;
 
+%template(UCharVector)         std::vector<unsigned char>;
+
 %template(IVector)             std::vector<int>;
 %template(IVectorVector)       std::vector<std::vector<int> > ;
 %template(IVectorVectorVector) std::vector< std::vector<std::vector<int> > > ;
@@ -57,6 +59,8 @@ _object = _copyableObject
 
 %template() std::vector<std::vector<bool> > ;
 %template() std::vector< std::vector<std::vector<bool> > > ;
+
+%template()  std::vector<unsigned char>;
 
 %template() std::vector<int>;
 %template() std::vector<std::vector<int> > ;

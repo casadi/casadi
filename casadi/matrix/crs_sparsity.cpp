@@ -268,7 +268,7 @@ CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char
 }
 
 CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsigned char>& mapping) const{
-  return CRSSparsity();
+  return (*this)->patternUnion(y, mapping, true, true, true);
 }
 
 CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{
@@ -285,6 +285,11 @@ bool CRSSparsity::operator==(const CRSSparsity& y) const{
 
 CRSSparsity CRSSparsity::operator+(const CRSSparsity& b) const {
   return (DMatrix(*this,1)+DMatrix(b,1)).sparsity();
+}
+
+CRSSparsity CRSSparsity::operator*(const CRSSparsity& b) const {
+  std::vector< unsigned char > mapping;
+  return patternIntersection(b, mapping);
 }
 
 void CRSSparsity::reserve(int nnz, int nrow){
