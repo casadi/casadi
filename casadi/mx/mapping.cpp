@@ -28,7 +28,6 @@
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
 
-const bool NEW_MAPPING_NODE = true;
 const bool ELIMINATE_NESTED = true;
 
 using namespace std;
@@ -38,10 +37,6 @@ namespace CasADi{
 Mapping::Mapping(const CRSSparsity& sp){
   setSparsity(sp);
   output_sorted_.resize(sp.size());
-  
-  if(NEW_MAPPING_NODE){
-    assignments_.resize(1);
-  }
 }
 
 Mapping* Mapping::clone() const{
@@ -49,7 +44,7 @@ Mapping* Mapping::clone() const{
 }
 
 void Mapping::evaluateBlock(int iind, int oind, const vector<double>& idata, vector<double>& odata, bool fwd) const{
-  // Get references to the assignment and addition operations
+  // Get references to the assignment operations
   const IOMap& assigns = assignments_[oind][iind];
   
   if(fwd){
@@ -69,56 +64,56 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
   int nadj = adjSeed.size();
   int nfwd = fwdSens.size();
 
-  if(NEW_MAPPING_NODE){
+  // Loop over outputs
+  for(int oind=0; oind<output.size(); ++oind){
 
     // Loop over inputs
     for(int iind=0; iind<input.size(); ++iind){
-      
-      // Loop over outputs
-      for(int oind=0; oind<output.size(); ++oind){
-      
-        // Nondifferentiated outputs
-        if(input[iind]!=0 && output[oind]!=0)
-          evaluateBlock(iind,oind,input[iind]->data(),output[oind]->data(),true);
+    
+      // Nondifferentiated outputs
+      if(input[iind]!=0 && output[oind]!=0)
+        evaluateBlock(iind,oind,input[iind]->data(),output[oind]->data(),true);
 
-        // Forward sensitivities
-        for(int d=0; d<nfwd; ++d){
-          if(fwdSeed[d][iind]!=0 && fwdSens[d][oind]!=0)
-            evaluateBlock(iind,oind,fwdSeed[d][iind]->data(),fwdSens[d][oind]->data(),true);
-        }
-        
-        // Adjoint sensitivities
-        for(int d=0; d<nadj; ++d){
-          if(adjSeed[d][oind]!=0 && adjSens[d][iind]!=0)
-            evaluateBlock(iind,oind,adjSeed[d][oind]->data(),adjSens[d][iind]->data(),false);
-        }
+      // Forward sensitivities
+      for(int d=0; d<nfwd; ++d){
+        if(fwdSeed[d][iind]!=0 && fwdSens[d][oind]!=0)
+          evaluateBlock(iind,oind,fwdSeed[d][iind]->data(),fwdSens[d][oind]->data(),true);
       }
-    }
-  } else {
-    
-    // Old implementation
-    vector<double> &outputd = output[0]->data();
-  
-    for(int k=0; k<size(); ++k){
-      outputd[k] = input[output_sorted_[k].iind]->data()[output_sorted_[k].inz];
-    
-      for(int d=0; d<nfwd; ++d)
-        fwdSens[d][0]->data()[k] = fwdSeed[d][output_sorted_[k].iind]->data()[output_sorted_[k].inz];
-
-      for(int d=0; d<nadj; ++d)
-        adjSens[d][output_sorted_[k].iind]->data()[output_sorted_[k].inz] += adjSeed[d][0]->data()[k];
+      
+      // Adjoint sensitivities
+      for(int d=0; d<nadj; ++d){
+        if(adjSeed[d][oind]!=0 && adjSens[d][iind]!=0)
+          evaluateBlock(iind,oind,adjSeed[d][oind]->data(),adjSens[d][iind]->data(),false);
+      }
     }
   }
 }
 
 void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  bvec_t *outputd = get_bvec_t(output[0]->data());
-  for(int k=0; k<size(); ++k){
-    bvec_t *inputd = get_bvec_t(input[output_sorted_[k].iind]->data());
-    if(fwd){
-      outputd[k] = inputd[output_sorted_[k].inz];
-    } else {
-      inputd[output_sorted_[k].inz] |= outputd[k];
+  
+  // Loop over outputs
+  for(int oind=0; oind<output.size(); ++oind){
+
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
+    
+      // Nondifferentiated outputs
+      if(input[iind]!=0 && output[oind]!=0){
+
+        // Get references to the assignment operations and data
+        const IOMap& assigns = assignments_[oind][iind];
+        bvec_t *outputd = get_bvec_t(output[oind]->data());
+        bvec_t *inputd = get_bvec_t(input[iind]->data());
+        
+        // Propate sparsity
+        for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+          if(fwd){
+            outputd[it->second] = inputd[it->first];
+          } else {
+            inputd[it->first] |= outputd[it->second];
+          }
+        }
+      }
     }
   }
 }
@@ -194,10 +189,6 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
     if(it==depmap_.end()){
       depind = addDependency(d);
       depmap_[static_cast<const MXNode*>(d.get())] = depind;
-
-      if(NEW_MAPPING_NODE){
-        assignments_[0].resize(ndep());
-      }
     } else {
       depind = it->second;
     }
