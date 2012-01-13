@@ -76,31 +76,21 @@ class Mapping : public MXNode{
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
 
-    /// Assignment operations (runtime)
-    std::vector<std::vector<IOMap> > assignments_;
-
-    /// Addition operations (runtime)
-    std::vector<std::vector<IOMap> > additions_;
-    
     /// Unsorted operations
-    struct Unsorted{
+    struct OutputNZ{
       // Constructor
-      Unsorted(int inz__=-1, int onz__=-1, int iind__=0, bool is_add__=false)
-      : inz(inz__), onz(onz__), iind(iind__), is_add(is_add__){}
+      OutputNZ(int inz__=-1, int iind__=0) : inz(inz__), iind(iind__){}
       
-      // Sorting by output nonzero
-      bool operator<(const Unsorted& other){ return onz<other.onz;}
-      
-      // Input/output nonzero and dependency index
-      int inz, onz, iind;
-      
-      // Is the operation an addition?
-      bool is_add;
+      // Input nonzero and dependency index
+      int inz, iind;
     };
     
-    /// Not yet sorted operations
-    std::vector<Unsorted> unsorted_;
-    
+    /// Operations sorted by output nonzero
+    std::vector<OutputNZ> output_sorted_;
+  
+    /// Operations sorted by input and output dependency (runtime)
+    std::vector<std::vector<IOMap> > assignments_;
+
     /// Evaluate a block given the data vectors
     void evaluateBlock(int iind, int oind, const std::vector<double>& idata, std::vector<double>& odata, bool fwd) const;
     
