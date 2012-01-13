@@ -278,6 +278,35 @@ class Sparsitytests(casadiTestCase):
     G_ = G.output()
 
     self.checkarray(F_,G_,"vec SX")
+    
+
+  def test_getSparsityCCS(self):
+    self.message("CCS format")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (3,3),
+             (2,4),
+             (3,1)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    
+    A1 = IVector()
+    B1 = IVector()
+    a.getSparsityCCS(A1,B1)
+    
+    A2 = IVector()
+    B2 = IVector()
+    (a.T).getSparsityCRS(A2,B2)
+    
+    print A1, B1
+    print A2, B2
+    
+    
       
 if __name__ == '__main__':
     unittest.main()

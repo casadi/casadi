@@ -195,6 +195,9 @@ class CRSSparsity : public SharedObject{
     /// Get the sparsity in CRS format
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;
 
+    /// Get the sparsity in CCS format
+    void getSparsityCCS(std::vector<int>& row, std::vector<int> &colind) const;
+    
     /// Get the sparsity in sparse triplet format
     void getSparsity(std::vector<int>& row, std::vector<int> &col) const;
     

@@ -36,6 +36,10 @@
         def shape(self):
             return (self.size1(),self.size2())
             
+        @property
+        def T(self):
+            return self.transpose()
+            
         def __array__(self,*args,**kwargs):
             return DMatrix(self,1).toArray()
     %}

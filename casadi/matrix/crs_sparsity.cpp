@@ -250,6 +250,11 @@ void CRSSparsity::getSparsityCRS(vector<int>& rowind, vector<int> &col) const{
   col = this->col();
 }
 
+void CRSSparsity::getSparsityCCS(std::vector<int>& row, std::vector<int> &colind) const {
+  transpose().getSparsityCRS(colind,row);
+}
+    
+
 void CRSSparsity::getSparsity(vector<int>& row, vector<int> &col) const{
   row = this->getRow();
   col = this->col();
