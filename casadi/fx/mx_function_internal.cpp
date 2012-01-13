@@ -155,9 +155,6 @@ void MXFunctionInternal::init(){
     // Get pointer to node
     MXNode* n = *it;
     
-    // Initialize the node
-    n->init();
-    
     // Add an element to the algorithm
     if(n->isOutputNode()){
       

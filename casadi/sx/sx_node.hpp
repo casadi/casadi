@@ -86,6 +86,9 @@ virtual const SX& dep(int i) const;
 /** \brief  get the reference of a child */
 virtual SX& dep(int i);
 
+/** \brief  Initialize the node (currently used only to give a similar interface to MXNode) */
+void init(){}
+
 /** \brief  Check if smooth */
 virtual bool isSmooth() const;
 

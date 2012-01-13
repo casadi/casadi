@@ -220,6 +220,17 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
 }
 
 void Mapping::init(){
+  // Call init of the base class
+  MXNode::init();
+  
+  // Clear current assignments
+/*  assignments_.clear();
+  additions_.clear();*/
+  
+  // Loop over the unsorted nodes
+/*  for(vector<Unsorted>::const_iterator it=unsorted_.begin(); it!=unsorted_.end(); ++it){
+    
+  }*/
   
 }
 

@@ -85,6 +85,9 @@ void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*
         // If a dependent node was added to the stack
         bool added_dep = false;
         
+        // Initialize the node
+        t->init();
+    
         // Add dependent nodes if not already added
         for(int i=0; i<t->ndep(); ++i){
           if(t->dep(i).get() !=0 && static_cast<Node*>(t->dep(i).get())->temp == 0) {
