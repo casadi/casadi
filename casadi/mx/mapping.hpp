@@ -64,9 +64,6 @@ class Mapping : public MXNode{
     /// Assign nonzeros (mapping matrix)
     virtual void assign(const MX& d, const IOMap& iomap);
 
-    /// Assign nonzeros (index given) -> change to multiple indices?
-    virtual void assignIndex(int depind, const IOMap& iomap);
-
     /// Initialize
     virtual void init();
 

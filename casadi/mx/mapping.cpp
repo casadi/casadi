@@ -167,7 +167,7 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
   // Quick return if no elements
   if(iomap.empty()) return;
   
-  if(ELIMINATE_NESTED && d->isMapping()){
+  if(ELIMINATE_NESTED && d->isMapping()){ // Move this logic to init!
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
@@ -194,7 +194,10 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
     }
     
     // Save the mapping
-    assignIndex(depind,iomap);
+    for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
+      output_sorted_[it->second].inz = it->first;
+      output_sorted_[it->second].iind = depind;
+    }
   }
 }
 
@@ -212,13 +215,6 @@ void Mapping::init(){
   // Add all the runtime elements
   for(int onz=0; onz<output_sorted_.size(); ++onz){
     assignments_[0][output_sorted_[onz].iind].push_back(pair<int,int>(output_sorted_[onz].inz,onz));
-  }
-}
-
-void Mapping::assignIndex(int depind, const IOMap& iomap){
-  for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
-    output_sorted_[it->second].inz = it->first;
-    output_sorted_[it->second].iind = depind;
   }
 }
 
