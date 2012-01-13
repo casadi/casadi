@@ -37,8 +37,7 @@ namespace CasADi{
 
 Mapping::Mapping(const CRSSparsity& sp){
   setSparsity(sp);
-  depind_.resize(sp.size(),-1);
-  nzind_ = depind_;
+  unsorted_.resize(sp.size());
   
   if(NEW_MAPPING_NODE){
     assignments_.resize(1);
@@ -112,13 +111,13 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
     vector<double> &outputd = output[0]->data();
   
     for(int k=0; k<size(); ++k){
-      outputd[k] = input[depind_[k]]->data()[nzind_[k]];
+      outputd[k] = input[unsorted_[k].iind]->data()[unsorted_[k].inz];
     
       for(int d=0; d<nfwd; ++d)
-        fwdSens[d][0]->data()[k] = fwdSeed[d][depind_[k]]->data()[nzind_[k]];
+        fwdSens[d][0]->data()[k] = fwdSeed[d][unsorted_[k].iind]->data()[unsorted_[k].inz];
 
       for(int d=0; d<nadj; ++d)
-        adjSens[d][depind_[k]]->data()[nzind_[k]] += adjSeed[d][0]->data()[k];
+        adjSens[d][unsorted_[k].iind]->data()[unsorted_[k].inz] += adjSeed[d][0]->data()[k];
     }
   }
 }
@@ -126,20 +125,19 @@ void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
 void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   bvec_t *outputd = get_bvec_t(output[0]->data());
   for(int k=0; k<size(); ++k){
-    bvec_t *inputd = get_bvec_t(input[depind_[k]]->data());
+    bvec_t *inputd = get_bvec_t(input[unsorted_[k].iind]->data());
     if(fwd){
-      outputd[k] = inputd[nzind_[k]];
+      outputd[k] = inputd[unsorted_[k].inz];
     } else {
-      inputd[nzind_[k]] |= outputd[k];
+      inputd[unsorted_[k].inz] |= outputd[k];
     }
   }
 }
 
 bool Mapping::isReady() const{
-  casadi_assert(depind_.size()==size());
-  casadi_assert(nzind_.size()==size());
+  casadi_assert(unsorted_.size()==size());
   for(int k=0; k<size(); ++k){
-    if(nzind_[k]<0 || depind_[k]<0)
+    if(unsorted_[k].inz<0 || unsorted_[k].iind<0)
       return false;
   }
   return true;
@@ -153,7 +151,7 @@ void Mapping::printPart(std::ostream &stream, int part) const{
   } else if(numel()==1 && size()==1 && ndep()==1){
     if(part==1)
       if(dep(0).numel()>1)
-        stream << "[" << nzind_.at(0) << "]";
+        stream << "[" << unsorted_.at(0).inz << "]";
   } else {
     if(part==0){
       stream << "mapping(";
@@ -163,12 +161,12 @@ void Mapping::printPart(std::ostream &stream, int part) const{
       stream << " " << size1() << "-by-" << size2() << " matrix, dependencies: [";
     } else if(part==ndep()){
       stream << "], nonzeros: [";
-      for(int k=0; k<nzind_.size(); ++k){
+      for(int k=0; k<unsorted_.size(); ++k){
         if(k!=0) stream << ",";
         if(ndep()>1){
-          stream << nzind_[k] << "(" << depind_[k] << ")";
+          stream << unsorted_[k].inz << "(" << unsorted_[k].iind << ")";
         } else {
-          stream << nzind_[k];
+          stream << unsorted_[k].inz;
         }
       }
       stream << "])";
@@ -191,8 +189,8 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
     vector<MX> d2 = dnode->dep_;
     vector<IOMap> iomap2(d2.size());
     for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); it++){
-      int depind_i = dnode->depind_.at(it->first);
-      pair<int,int> assign_i(dnode->nzind_.at(it->first), it->second);
+      int depind_i = dnode->unsorted_.at(it->first).iind;
+      pair<int,int> assign_i(dnode->unsorted_.at(it->first).inz, it->second);
       iomap2[depind_i].push_back(assign_i);
     }
     
@@ -227,8 +225,8 @@ void Mapping::init(){
 
 void Mapping::assignIndex(int depind, const IOMap& iomap){
   for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
-    nzind_[it->second] = it->first;
-    depind_[it->second] = depind;
+    unsorted_[it->second].inz = it->first;
+    unsorted_[it->second].iind = depind;
   }
     
   if(NEW_MAPPING_NODE){
@@ -296,8 +294,8 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
           int j=col[k];
           
           // Add if index matches
-          if(depind_[k]==iind){
-            input_nz.push_back(nzind_[k]);
+          if(unsorted_[k].iind==iind){
+            input_nz.push_back(unsorted_[k].inz);
             output_el[iind].push_back(j + i*d2);
           }
         }
@@ -438,7 +436,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
   
   // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
-  vector<int> nzind_sens(nzind_.size()); // BUG? Initialize to -1?
+  vector<int> nzind_sens(unsorted_.size()); // BUG? Initialize to -1?
   
   // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
   vector<int> fsens_ind;
@@ -495,10 +493,10 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       // Update nonzero vector
       for(int el=0; el<nzind_sens.size(); ++el){
         // Check if dependency index match
-        if(depind_[el]==iind){
+        if(unsorted_[el].iind==iind){
           
           // Point nzind_sens to the nonzero index of the sensitivity
-          nzind_sens[el] = fsens_ind[nzind_[el]];
+          nzind_sens[el] = fsens_ind[unsorted_[el].inz];
           
           // Count the number of nonzeros
           nnz += int(nzind_sens[el]>=0);
@@ -550,7 +548,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         if(nzind_sens[k]>=0){
         
           // If dependency matches
-          if(depind_[k]==dp){
+          if(unsorted_[k].iind==dp){
             nz.push_back(el);
             nzd.push_back(nzind_sens[k]);
           }
@@ -568,7 +566,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
 
 void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   for(int k=0; k<size(); ++k){
-    (*output[0])[k] = (*input[depind_[k]])[nzind_[k]];
+    (*output[0])[k] = (*input[unsorted_[k].iind])[unsorted_[k].inz];
   }
 }
 

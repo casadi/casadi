@@ -73,12 +73,6 @@ class Mapping : public MXNode{
     /// Check if the mapping is ready
     bool isReady() const;
     
-    /// Mapping from the output non-zero to the dependency nonzero index
-    std::vector<int> nzind_;
-
-    /// Mapping from the output non-zero index of the dependency index
-    std::vector<int> depind_;
-
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
 
