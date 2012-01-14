@@ -25,6 +25,7 @@
 
 #include "mx_node.hpp"
 #include <map>
+#include <stack>
 
 namespace CasADi{
   /** \brief Maps non-zero elements
@@ -73,23 +74,24 @@ class Mapping : public MXNode{
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
 
-    /// Unsorted operations
+    /// Input nonzero and dependency index
     struct OutputNZ{
-      // Constructor
-      OutputNZ(int inz__=-1, int iind__=0) : inz(inz__), iind(iind__){}
-      
-      // Input nonzero and dependency index
       int inz, iind;
     };
     
     /// Operations sorted by output nonzero
-    std::vector<OutputNZ> output_sorted_;
-  
-    /// Operations sorted by input and output dependency (runtime)
-    std::vector<std::vector<IOMap> > assignments_;
+    std::vector<std::vector<OutputNZ> > output_sorted_;
+    
+    /// Operations sorted by input and output index and then by output nonzero (this is the runtime)
+    std::vector<std::vector<IOMap> > index_output_sorted_;
 
     /// Evaluate a block given the data vectors
-    void evaluateBlock(int iind, int oind, const std::vector<double>& idata, std::vector<double>& odata, bool fwd) const;
+    template<typename T>
+    void evaluateBlock(int iind, int oind, const std::vector<T>& idata, std::vector<T>& odata, bool fwd) const;
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
     
     /// Compare output index
     static bool outputSmaller(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second<el2.second;}

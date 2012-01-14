@@ -2545,7 +2545,57 @@ std::vector<int> CRSSparsityInternal::getElementMapping() const{
   return el_map;
 }
 
+void CRSSparsityInternal::getNZInplace(std::vector<int>& indices) const{
+  // Quick return if no elements
+  if(indices.empty()) return;
 
+  // Iterator to input/output
+  vector<int>::iterator it=indices.begin();
+
+  // Current element sought
+  int el_row = *it % nrow_;
+  int el_col = *it / nrow_;
+  
+  // Loop over rows
+  for(int i=0; i<nrow_; ++i){
+    
+    // Loop over the nonzeros
+    for(int el=rowind_[i]; el<rowind_[i+1] && el_row<=i; ++el){
+        
+      // Get column
+      int j = col_[el];
+      
+      // Add leading elements not in pattern
+      while(i<el_row || (i==el_row && j<el_col)){
+        // Mark as not found
+        *it = -1;
+        
+        // Increase index and terminate if end of vector reached
+        if(++it==indices.end()) return;
+        
+        // Next element sought
+        el_row = *it % nrow_;
+        el_col = *it / nrow_;
+      }
+
+      // Add elements in pattern
+      while(i==el_row && j==el_col){
+        // Save element index
+        *it = el;
+        
+        // Increase index and terminate if end of vector reached
+        if(++it==indices.end()) return;
+
+        // Next element sought
+        el_row = *it % nrow_;
+        el_col = *it / nrow_;
+      }
+    }
+  }
+  
+  // Add trailing elements not in pattern
+  fill(it,indices.end(),-1);
+}
 
 } // namespace CasADi
 

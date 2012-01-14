@@ -196,6 +196,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     
     /// Get a set of non-zero element
     std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
+
+    /// Get the nonzero index for a set of elements (see descripion in public class)
+    void getNZInplace(std::vector<int>& indices) const;
     
     /// Does the columns appear sequentially on each row
     bool columnsSequential(bool strictly) const;

@@ -384,4 +384,9 @@ std::vector<int> CRSSparsity::getElementMapping() const{
   return (*this)->getElementMapping();
 }
 
+void CRSSparsity::getNZInplace(std::vector<int>& indices) const{
+  (*this)->getNZInplace(indices);
+}
+
+
 } // namespace CasADi
