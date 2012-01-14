@@ -60,9 +60,12 @@ void Mapping::evaluateBlock(int iind, int oind, const vector<T>& idata, vector<T
   }
 }
 
-
 void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
 }
 
 template<typename T, typename MatV, typename MatVV>
@@ -646,12 +649,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       // Save to return matrix
       (*fwdSens[d][0])->addDependency(*fwdSeed[d][dp],nzd,nz);
     }
-  }
-}
-
-void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  for(int k=0; k<size(); ++k){
-    (*output[0])[k] = (*input[output_sorted_[k][0].iind])[output_sorted_[k][0].inz];
   }
 }
 
