@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.0)
 
 include_directories(../)
 find_package(ACADO REQUIRED QUIET)
-include_directories(${ACADO_INCLUDE_DIRS})
+include_directories(${ACADO_INCLUDE_DIRS} ${ACADO_QPOASES_EMBEDDED_INC_DIRS})
 
 set(QPOASES_INTERFACE_SRCS
   qpoases_internal.hpp

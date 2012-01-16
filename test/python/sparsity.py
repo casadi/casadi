@@ -25,18 +25,56 @@ class Sparsitytests(casadiTestCase):
     for i in nzb:
       b.getNZ(i[0],i[1])
       
-    #w = IVector()
-    #c=a.patternUnion(b,w)
-    #self.assertEquals(w.size(),len(nza.union(nzb)))
-    #for k in range(w.size()):
-      #ind = (c.getRow()[k],c.col(k))
-      #if (ind in nza and ind in nzb):
-        #self.assertEquals(w[k],1 | 2)
-      #elif (ind in nza):
-        #self.assertEquals(w[k],1)
-      #elif (ind in nzb):
-        #self.assertEquals(w[k],2)
+    w = UCharVector()
+    c=a.patternUnion(b,w)
+    self.assertEquals(w.size(),len(nza.union(nzb)))
+    for k in range(w.size()):
+      ind = (c.getRow()[k],c.col(k))
+      if (ind in nza and ind in nzb):
+        self.assertEquals(w[k],1 | 2)
+      elif (ind in nza):
+        self.assertEquals(w[k],1)
+      elif (ind in nzb):
+        self.assertEquals(w[k],2)
         
+    c = a + b
+    self.assertEquals(c.size(),len(nza.union(nzb)))
+    for k in range(c.size()):
+      ind = (c.getRow()[k],c.col(k))
+      self.assertTrue(ind in nza or ind in nzb)
+
+  def test_intersection(self):
+    self.message("Sparsity intersection")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (3,1),
+             (2,3)])
+    nzb = set([  (0,2),
+             (0,0),
+             (2,2),
+             (2,3)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = CRSSparsity(4,5)  
+    for i in nzb:
+      b.getNZ(i[0],i[1])
+    
+    w = UCharVector()
+    c=a.patternUnion(b,w,True,True,True)
+    for k in range(c.size()):
+      ind = (c.getRow()[k],c.col(k))
+      self.assertTrue(ind in nza and ind in nzb)
+        
+    c = a * b
+    self.assertEquals(c.size(),len(nza.intersection(nzb)))
+    for k in range(c.size()):
+      ind = (c.getRow()[k],c.col(k))
+      self.assertTrue(ind in nza and ind in nzb)
+       
   def test_getNZDense(self):
     self.message("getNZDense")
     nza = set([  (0,0),(0,1),(2,0),(3,1)])
@@ -240,6 +278,96 @@ class Sparsitytests(casadiTestCase):
     G_ = G.output()
 
     self.checkarray(F_,G_,"vec SX")
+    
+  def test_sparsityindex(self):
+    self.message("sparsity indexing")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (3,3),
+             (2,4),
+             (3,1),
+             (4,1)])
+    
+    a = CRSSparsity(5,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = ssym("b",a)
+    
+    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    
+    d = sp_diag(5)
+    c = b[d]
+
+    self.assertTrue(c.sparsity()==d)
+    
+    f = SXFunction([b],[c])
+    f.init()
+    f.input().set(range(1,len(nza)+1))
+    f.evaluate()
+    
+    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    
+  def test_sparsityindex(self):
+    self.message("sparsity indexing")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (3,3),
+             (2,4),
+             (3,1),
+             (4,1)])
+    
+    a = CRSSparsity(5,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = msym("b",a)
+    
+    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    
+    d = sp_diag(5)
+    c = b[d]
+
+    self.assertTrue(c.sparsity()==d)
+    
+    f = MXFunction([b],[c])
+    f.init()
+    f.input().set(range(1,len(nza)+1))
+    f.evaluate()
+    
+    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    
+  def test_getSparsityCCS(self):
+    self.message("CCS format")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (3,3),
+             (2,4),
+             (3,1)])
+    
+    a = CRSSparsity(4,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    
+    A1 = IVector()
+    B1 = IVector()
+    a.getSparsityCCS(A1,B1)
+    
+    A2 = IVector()
+    B2 = IVector()
+    (a.T).getSparsityCRS(A2,B2)
+    
+    print A1, B1
+    print A2, B2
+    
+    
       
 if __name__ == '__main__':
     unittest.main()

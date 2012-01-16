@@ -277,6 +277,7 @@ class Matrix : public PrintableObject{
     const Matrix<T> getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
     const Matrix<T> getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
     const Matrix<T> getSub(const Matrix<int>& i, const Matrix<int>& j) const;
+    const Matrix<T> getSub(const CRSSparsity& sp, int dummy = 0) const;
     //@}
 
     //@{
@@ -291,6 +292,7 @@ class Matrix : public PrintableObject{
     void setSub(const Slice& i, const Matrix<int>& k, const Matrix<T>& m) {return setSub(i.getAll(size1()),k,m);}
     void setSub(const Matrix<int>& k, const Slice& j, const Matrix<T>& m) {return setSub(k,j.getAll(size2()),m);}
     void setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& m);
+    void setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& m);
     //@}
 
     //@{
@@ -324,6 +326,9 @@ class Matrix : public PrintableObject{
     /** \brief  Get vector element or slice */
     template<typename I>
     const Matrix<T> operator()(const I& i) const{ return getSub(i,0);}
+
+    /** \brief  Get Sparsity slice */
+    const Matrix<T> operator()(const CRSSparsity& sp) const{ return getSub(sp); }
     
     /** \brief  Get Matrix element or slice */
     template<typename I, typename J>
@@ -332,7 +337,7 @@ class Matrix : public PrintableObject{
     /** \brief  Access vector element or slice */
     template<typename I>
     SubMatrix<Matrix<T>,I,int> operator()(const I& i){ return SubMatrix<Matrix<T>,I,int>(*this,i,0); }
-    
+       
     /** \brief  Access Matrix element or slice */
     template<typename I, typename J>
     SubMatrix<Matrix<T>,I,J> operator()(const I& i, const J& j){ return SubMatrix<Matrix<T>,I,J>(*this,i,j); }
@@ -369,6 +374,8 @@ class Matrix : public PrintableObject{
     const Matrix<T> indexed(const Matrix<int>& i, const Matrix<int>& j) const{ 
       return (*this)(i,j);
     }
+    const Matrix<T> indexed(const CRSSparsity &sp) const{ return (*this)(sp); }
+    
     /// set a non-zero
     void indexed_one_based_assignment(int k, const T & m){ at(k-1) = m;}
     void indexed_zero_based_assignment(int k, const T & m){ at(k) = m;}
@@ -396,11 +403,14 @@ class Matrix : public PrintableObject{
       (*this)(i.getAll(size1()),j) = m;
     }
     void indexed_assignment( const Matrix<int>& i, const IndexList &j, const Matrix<T>& m){
-      (*this)(i,j.getAll(size1())) = m;
+      (*this)(i,j.getAll(size2())) = m;
     } 
     void indexed_assignment( const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& m){
       (*this)(i,j) = m;
     } 
+    void indexed_assignment(const CRSSparsity &sp,const Matrix<T>& m){
+      (*this)(sp) = m;
+    }
     //@}
     
     /// Set all elements to zero
@@ -817,6 +827,28 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& i, const Matrix<int>& j) co
 }
 
 template<class T>
+const Matrix<T> Matrix<T>::getSub(const CRSSparsity& sp, int dummy) const {
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+  Matrix<T> ret(sp);
+
+  std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
+
+  sparsity().patternUnion(sp,mapping,true, false, true);
+
+  int k = 0;     // Flat index into non-zeros of this matrix
+  int j = 0;     // Flat index into non-zeros of the resultant matrix;
+  for (int i=0;i<mapping.size();++i) {
+    if (mapping[i] & 1) { // If the original matrix has a non-zero entry in the union
+      if (!(mapping[i] & 4)) ret[j] = data()[k]; // If this non-zero entry appears in the intersection, add it to the mapping
+      k++;                 // Increment the original matrix' non-zero index counter
+    }
+    if (mapping[i] & 2) j++;
+  }
+
+  return ret;
+}
+
+template<class T>
 void Matrix<T>::setSub(int i, int j, const Matrix<T>& el){
   if(el.dense()){
     elem(i,j) = el.toScalar();
@@ -923,6 +955,12 @@ void Matrix<T>::setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<
   for(int k=0; k<i.size(); ++k) {
      elem(i.at(k),j.at(k)) = el.at(k); 
   }
+}
+
+template<class T>
+void Matrix<T>::setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& el) {
+   casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+   casadi_error("Not implemented yet");
 }
 
 template<class T>

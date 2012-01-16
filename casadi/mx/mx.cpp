@@ -191,6 +191,29 @@ const MX MX::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
    return ret;
 }
 
+const MX MX::getSub(const CRSSparsity& sp, int dummy) const {
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+  vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
+  
+  sparsity().patternUnion(sp,mappingc,true, false, true);
+  vector<int> mapping(sp.size(),-1); // -1 maps to identical zero
+  
+  int k = 0;     // Flat index into non-zeros of this matrix
+  int j = 0;     // Flat index into non-zeros of the resultant matrix
+  for (int i=0;i<mappingc.size();++i) {
+    if (mappingc[i] & 1) { // If the original matrix has a non-zero entry in the union
+      if (!(mappingc[i] & 4)) mapping[j] = k; // If this non-zero entry appears in the intersection, add it to the mapping
+      k++;                 // Increment the original matrix' non-zero index counter
+    }
+    if (mappingc[i] & 2) j++;
+  }
+  
+  MX ret = MX::create(new Mapping(sp));
+  ret->assign(*this,mapping);
+
+  return ret;
+}
+
 void MX::setSub(int i, int j, const MX& el){
   setSub(vector<int>(1,i),vector<int>(1,j),el);
 }
@@ -264,7 +287,7 @@ MX MX::getNZ(const vector<int>& k) const{
   MX ret;
   
   for (int i=0;i<k.size();i++) {
-    casadi_assert_message(k[i] < size(),"Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size());
+    casadi_assert_message(k[i] < size(),"Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   
   ret.assignNode(new Mapping(sp));
@@ -289,7 +312,7 @@ void MX::setNZ(const vector<int>& k, const MX& el){
   
   
   for (int i=0;i<k.size();i++) {
-    casadi_assert_message(k[i] < size(), "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size());
+    casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   ret.assignNode(new Mapping(sparsity()));
   ret->assign(*this,range(size()));

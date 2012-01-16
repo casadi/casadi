@@ -38,7 +38,9 @@ CRSSparsity sp_dense(int n, int m=1);
 CRSSparsity sp_sparse(int n, int m=1);
 
 /**
- \brief Create an upper triangular square sparsity pattern
+ \brief Create a lower triangular square sparsity pattern
+ 
+ \see lowerSparsity
 **/
 CRSSparsity sp_tril(int n);
 
@@ -98,8 +100,12 @@ CRSSparsity trans(const CRSSparsity& a);
 
 /**
 * \brief Return the lower part of the sparsity pattern
+* 
+* \param includeDiagonal specify wether the diaginal must be part of the result
+*
+* \see sp_tril
 */
-CRSSparsity lowerSparsity(const CRSSparsity& a);
+CRSSparsity lowerSparsity(const CRSSparsity& a, bool includeDiagonal = true);
 
 /**
 * \brief Return the non-zero entries that make up the lower part of the provided matrix
