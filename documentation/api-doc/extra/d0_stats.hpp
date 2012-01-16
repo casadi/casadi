@@ -90,37 +90,3 @@
 <tr><td>normgradL</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
-/** \class CasADi::WorhpInternal
-\n
-\par
-<table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>alpha_du</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>alpha_pr</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>d_norm</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>inf_du</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>inf_pr</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ls_trials</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>mu</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>regularization_size</td><td>CasADi::WorhpInternal</td></tr>
-</table>
-*/
-/** \class CasADi::WorhpSolver
-\n
-\par
-<table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>alpha_du</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>alpha_pr</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>d_norm</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>inf_du</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>inf_pr</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ls_trials</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>mu</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>regularization_size</td><td>CasADi::WorhpInternal</td></tr>
-</table>
-*/

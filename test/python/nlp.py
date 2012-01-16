@@ -5,28 +5,40 @@ import unittest
 from types import *
 from helpers import *
 
+solvers= []
+try:
+  solvers.append(IpoptSolver)
+except:
+  pass
+  
+try:
+  solvers.append(WorhpSolver)
+except:
+  pass
+
 class NLPtests(casadiTestCase):
   def testIPOPT(self):
-    self.message("trivial IPOPT")
+    
     x=SX("x")
     f=SXFunction([x],[[(x-1)**2]])
     g=SXFunction([x],[x])
     
-    solver = IpoptSolver(f,g)
-    solver.setOption("tol",1e-5)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",100)
-    solver.setOption("print_level",0)
-    solver.setOption("derivative_test","first-order")
-    solver.init()
-    solver.input(NLP_LBX).set([-10])
-    solver.input(NLP_UBX).set([10])
-    solver.input(NLP_LBG).set([-10])
-    solver.input(NLP_UBG).set([10])
-    solver.solve()
-    self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
-
+    for Solver in solvers:
+      self.message("trivial " + str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+       
+      solver.init()
+      solver.input(NLP_LBX).set([-10])
+      solver.input(NLP_UBX).set([10])
+      solver.input(NLP_LBG).set([-10])
+      solver.input(NLP_UBG).set([10])
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+    
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
     x=SX("x")
@@ -49,49 +61,49 @@ class NLPtests(casadiTestCase):
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
     
   def testIPOPTrb(self):
-    self.message("IPOPT rosenbrock, limited-memorey hessian approx")
+    self.message("rosenbrock, limited-memorey hessian approx")
     x=SX("x")
     y=SX("y")
     
     f=SXFunction([[x,y]],[(1-x)**2+100*(y-x**2)**2])
     
-    solver = IpoptSolver(f)
-    solver.setOption("tol",1e-8)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",100)
-    solver.setOption("print_level",0)
-    solver.setOption("derivative_test","first-order")
-    solver.init()
-    solver.input(NLP_LBX).set([-10]*2)
-    solver.input(NLP_UBX).set([10]*2)
-    solver.solve()
-    self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,"IPOPT")
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f)
+      for k,v in ({"tol":1e-8,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.init()
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,str(Solver))
 
     
   def testIPOPTrb(self):
-    self.message("IPOPT rosenbrock, limited-memorey hessian approx")
+    self.message("rosenbrock, limited-memorey hessian approx")
     x=SX("x")
     y=SX("y")
     
     f=SXFunction([[x,y]],[(1-x)**2+100*(y-x**2)**2])
     g=SXFunction([[x,y]],[x+y])
-    solver = IpoptSolver(f,g)
-    solver.setOption("tol",1e-8)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",100)
-    solver.setOption("derivative_test","first-order")
-    #solver.setOption("print_level",0)
-    solver.init()
-    solver.input(NLP_LBX).set([-10]*2)
-    solver.input(NLP_UBX).set([10]*2)
-    solver.input(NLP_LBG).set([-10])
-    solver.input(NLP_UBG).set([10])
-    solver.solve()
-    self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,"IPOPT")
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.init()
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.input(NLP_LBG).set([-10])
+      solver.input(NLP_UBG).set([10])
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
     
     
   def testIPOPTrhb2(self):
