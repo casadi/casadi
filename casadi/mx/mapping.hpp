@@ -62,8 +62,11 @@ class Mapping : public MXNode{
     /// Is a mapping matrix
     virtual bool isMapping() const{return true;}
 
-    /// Assign nonzeros (mapping matrix)
-    virtual void assign(const MX& d, const IOMap& iomap);
+    /// Assign/add nonzeros
+    virtual void assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add=false);
+
+    /// Assign/add nonzeros, outputs sequential
+    virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
     /// Initialize
     virtual void init();
@@ -78,6 +81,9 @@ class Mapping : public MXNode{
     struct OutputNZ{
       int inz, iind;
     };
+    
+    /// Operation sequence
+    typedef std::vector<std::pair<int,int> > IOMap;
     
     /// Operations sorted by output nonzero
     std::vector<std::vector<OutputNZ> > output_sorted_;

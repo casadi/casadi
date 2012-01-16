@@ -180,31 +180,35 @@ void Mapping::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void Mapping::assign(const MX& d, const IOMap& iomap){
+void Mapping::assign(const MX& d, const std::vector<int>& inz, bool add){
+  assign(d,inz,range(inz.size()),add);
+}
+
+void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
   casadi_assert(!d.isNull());
-  //const std::vector<int>& nzind_ = nzmap_.data();
   
   // Quick return if no elements
-  if(iomap.empty()) return;
+  if(inz.empty()) return;
   
   if(ELIMINATE_NESTED && d->isMapping()){ // Move this logic to init!
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
-    vector<IOMap> iomap2(d2.size());
-    for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); it++){
+    vector<vector<int> > inz2(d2.size()), onz2(d2.size());
+    for(int k=0; k<inz.size(); ++k){
       // Get the sum
-      const std::vector<OutputNZ>& sum = dnode->output_sorted_[it->first];
+      const std::vector<OutputNZ>& sum = dnode->output_sorted_[inz[k]];
       
       // Add the elements in the sum
       for(std::vector<OutputNZ>::const_iterator it2=sum.begin(); it2!=sum.end(); ++it2){
-        iomap2[it2->iind].push_back(pair<int,int>(it2->inz, it->second));
+        inz2[it2->iind].push_back(it2->inz);
+        onz2[it2->iind].push_back(onz[k]);
       }
     }
     
     // Call the function recursively
     for(int i=0; i<d2.size(); ++i){
-      assign(d2[i],iomap2[i]);
+      assign(d2[i],inz2[i],onz2[i]);
     }
   } else {
     // Add the node if it is not already a dependency
@@ -218,10 +222,10 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
     }
     
     // Save the mapping
-    for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
-      OutputNZ new_el = {it->first,depind};
-      output_sorted_[it->second].clear(); // FIXME
-      output_sorted_[it->second].push_back(new_el);
+    for(int k=0; k<inz.size(); ++k){
+      OutputNZ new_el = {inz[k],depind};
+      if(!add) output_sorted_[onz[k]].clear();
+      output_sorted_[onz[k]].push_back(new_el);
     }
   }
 }
@@ -432,7 +436,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         copy(f_onz.begin()+iind0,f_onz.begin()+iind1,onz_local.begin());
         
         // Save to mapping
-        (*fwdSens[d][oind])->addDependency(*fwdSeed[d][iind],inz_local,onz_local);
+        (*fwdSens[d][oind])->assign(*fwdSeed[d][iind],inz_local,onz_local,true);
       }
     }
   }
@@ -472,7 +476,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         copy(a_onz[d][iind].begin()+oind0,a_onz[d][iind].begin()+oind1,onz_local.begin());
         
         // Save to mapping
-        s->addDependency(*adjSeed[d][iind],onz_local,inz_local);
+        s->assign(*adjSeed[d][iind],onz_local,inz_local,true);
       }
       
       // Save to adjoint sensitivities
