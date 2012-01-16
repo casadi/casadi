@@ -292,65 +292,59 @@ class MX : public SharedObject{
   
   /// Get the constant - only valid when isConstant() is true
   const Matrix<double> & getConstant() const; 
- 	
- 	/// Check if symbolic.
+  
+  /// Check if symbolic
   bool 	isSymbolic () const;
- 	
- 	/// Check if constant.
-  bool 	isConstant () const;
- 	
- 	/// Check if mapping.
- 	bool 	isMapping () const;
- 	
- 	/// Check if densification
- 	bool 	isDensification () const;
-
- 	/// Check if evaluation.
- 	bool 	isEvaluation () const;
-
- 	/// Check if evaluation output.
- 	bool 	isEvaluationOutput () const;
- 	
- 	/// Get the index of evaluation output - only valid when isEvaluationoutput() is true
- 	int getEvaluationOutput() const;
-
- 	/// Check if jacobian reference.
- 	bool 	isJacobian () const;
- 	
- 	/// Is it a certain operation.
- 	bool 	isOperation (int op) const;
-
- 	/// Check if multiplication.
- 	bool 	isMultiplication () const;
- 	
- 	/// Check if commutative operation
- 	bool isCommutative() const;
- 	
- 	/// Check if if-test
- 	bool isIfTest() const;
-
- 	/// Check if norm
- 	bool isNorm () const;
- 	
-  ///	Get function
- 	FX getFunction();
- 	    
- 	/// When MX is a mapping, get the output non-zero to the dependency nonzero index
- 	const Matrix<int>  & getNZMap() const;
-
-  /// When MX is a mapping, get the mapping from the output non-zero index of the dependency index
- 	const std::vector<int>  & getDepInd() const;
+  
+  /// Check if constant
+  bool isConstant () const;
+  
+  /// Check if mapping
+  bool 	isMapping () const;
+  
+  /// Check if densification
+  bool isDensification () const;
+  
+  /// Check if evaluation
+  bool isEvaluation () const;
+  
+  /// Check if evaluation output
+  bool isEvaluationOutput () const;
+  
+  /// Get the index of evaluation output - only valid when isEvaluationoutput() is true
+  int getEvaluationOutput() const;
+  
+  /// Check if jacobian reference.
+  bool isJacobian() const;
+  
+  /// Is it a certain operation
+  bool isOperation (int op) const;
+  
+  /// Check if multiplication
+  bool isMultiplication() const;
+  
+  /// Check if commutative operation
+  bool isCommutative() const;
+  
+  /// Check if if-test
+  bool isIfTest() const;
+  
+  /// Check if norm
+  bool isNorm () const;
+  
+  /// Get function
+  FX getFunction();
 
   /// Is binary operation
-  bool isBinary() const ;
+  bool isBinary() const;
   
   /// Is unary operation
   bool isUnary() const;
- 	
- 	#ifndef SWIG
- 	/// Get operation type
+  
+  #ifndef SWIG
+  /// Get operation type
   Operation getOp() const;
- 	#endif // SWIG
+  #endif // SWIG
 
   /** \brief Returns a number that is unique for a given MXNode. 
   * If the MX does not point to any node, 0 is returned.
@@ -474,11 +468,6 @@ class MX : public SharedObject{
   MX sinh() const;
   MX cosh() const;
   MX tanh() const;
-
-  /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
-  *
-  */
-  const Matrix<int>& mapping();
 
   /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
   static void setMaxNumCallsInPrint(long num=10000);

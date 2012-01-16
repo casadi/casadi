@@ -21,143 +21,133 @@
  */
 
 #include "mapping.hpp"
-#include "inverse_mapping.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
-const bool NEW_MAPPING_NODE = false;
 const bool ELIMINATE_NESTED = true;
 
 using namespace std;
 
 namespace CasADi{
 
-Mapping::Mapping(const CRSSparsity& sp) : nzmap_(sp,-1){
+Mapping::Mapping(const CRSSparsity& sp){
   setSparsity(sp);
-  depind_.resize(sp.size(),-1);
-  
-  if(NEW_MAPPING_NODE){
-    assignments_.resize(1);
-    additions_.resize(1);
-  }
+  output_sorted_.resize(sp.size());
 }
 
 Mapping* Mapping::clone() const{
   return new Mapping(*this);
 }
 
-void Mapping::evaluateBlock(int iind, int oind, const vector<double>& idata, vector<double>& odata, bool fwd) const{
-  // Get references to the assignment and addition operations
-  const IOMap& assigns = assignments_[oind][iind];
-  const IOMap& adds = additions_[oind][iind];
+template<typename T>
+void Mapping::evaluateBlock(int iind, int oind, const vector<T>& idata, vector<T>& odata, bool fwd) const{
+  // Get references to the assignment operations
+  const IOMap& assigns = index_output_sorted_[oind][iind];
   
   if(fwd){
-    
     // Assignment operations
     for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
-      odata[it->second] = idata[it->first];
-    
-    // Additions
-    for(IOMap::const_iterator it=adds.begin(); it!=adds.end(); ++it)
       odata[it->second] += idata[it->first];
-    
+
   } else {
     // Assignment operations
     for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
-      odata[it->first] += idata[it->second];
-
-    // Additions
-    for(IOMap::const_iterator it=adds.begin(); it!=adds.end(); ++it)
       odata[it->first] += idata[it->second];
   }
 }
 
 void Mapping::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+}
+
+template<typename T, typename MatV, typename MatVV>
+void Mapping::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
   // Number of sensitivities
   int nadj = adjSeed.size();
   int nfwd = fwdSens.size();
 
-  if(NEW_MAPPING_NODE){
+  // Loop over outputs
+  for(int oind=0; oind<output.size(); ++oind){
 
+    // Clear output and forward sensitivities
+    if(output[oind]!=0)
+      output[oind]->setZero();
+    for(int d=0; d<nfwd; ++d)
+      if(fwdSens[d][oind]!=0)
+        fwdSens[d][oind]->setZero();
+    
     // Loop over inputs
     for(int iind=0; iind<input.size(); ++iind){
-      
-      // Loop over outputs
-      for(int oind=0; oind<output.size(); ++oind){
-      
-        // Nondifferentiated outputs
-        if(input[iind]!=0 && output[oind]!=0)
-          evaluateBlock(iind,oind,input[iind]->data(),output[oind]->data(),true);
-
-        // Forward sensitivities
-        for(int d=0; d<nfwd; ++d){
-          if(fwdSeed[d][iind]!=0 && fwdSens[d][oind]!=0)
-            evaluateBlock(iind,oind,fwdSeed[d][iind]->data(),fwdSens[d][oind]->data(),true);
-        }
-        
-        // Adjoint sensitivities
-        for(int d=0; d<nadj; ++d){
-          if(adjSeed[d][oind]!=0 && adjSens[d][iind]!=0)
-            evaluateBlock(iind,oind,adjSeed[d][oind]->data(),adjSens[d][iind]->data(),false);
-        }
-      }
-    }
-  }
-  
-  // Old implementation
-  const std::vector<int>& nzind_ = nzmap_.data();
-  vector<double> &outputd = output[0]->data();
-  
-  for(int k=0; k<size(); ++k){
-    if(!NEW_MAPPING_NODE){
-      outputd[k] = input[depind_[k]]->data()[nzind_[k]];
     
-      for(int d=0; d<nfwd; ++d)
-        fwdSens[d][0]->data()[k] = fwdSeed[d][depind_[k]]->data()[nzind_[k]];
+      // Nondifferentiated outputs
+      if(input[iind]!=0 && output[oind]!=0)
+        evaluateBlock(iind,oind,input[iind]->data(),output[oind]->data(),true);
 
-      for(int d=0; d<nadj; ++d)
-        adjSens[d][depind_[k]]->data()[nzind_[k]] += adjSeed[d][0]->data()[k];
+      // Forward sensitivities
+      for(int d=0; d<nfwd; ++d){
+        if(fwdSeed[d][iind]!=0 && fwdSens[d][oind]!=0)
+          evaluateBlock(iind,oind,fwdSeed[d][iind]->data(),fwdSens[d][oind]->data(),true);
+      }
+      
+      // Adjoint sensitivities
+      for(int d=0; d<nadj; ++d){
+        if(adjSeed[d][oind]!=0 && adjSens[d][iind]!=0)
+          evaluateBlock(iind,oind,adjSeed[d][oind]->data(),adjSens[d][iind]->data(),false);
+      }
     }
   }
 }
 
 void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  const std::vector<int>& nzind_ = nzmap_.data();
-  bvec_t *outputd = get_bvec_t(output[0]->data());
-  for(int k=0; k<size(); ++k){
-    bvec_t *inputd = get_bvec_t(input[depind_[k]]->data());
-    if(fwd){
-      outputd[k] = inputd[nzind_[k]];
-    } else {
-      inputd[nzind_[k]] |= outputd[k];
+  
+  // Loop over outputs
+  for(int oind=0; oind<output.size(); ++oind){
+
+    // Clear output
+    if(fwd && output[oind]!=0){
+      bvec_t *outputd = get_bvec_t(output[oind]->data());
+      fill_n(outputd,output[oind]->size(),0);
+    }
+    
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
+    
+      // Nondifferentiated outputs
+      if(input[iind]!=0 && output[oind]!=0){
+
+        // Get references to the assignment operations and data
+        const IOMap& assigns = index_output_sorted_[oind][iind];
+        bvec_t *outputd = get_bvec_t(output[oind]->data());
+        bvec_t *inputd = get_bvec_t(input[iind]->data());
+        
+        // Propate sparsity
+        for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+          if(fwd){
+            outputd[it->second] |= inputd[it->first];
+          } else {
+            inputd[it->first] |= outputd[it->second];
+          }
+        }
+      }
     }
   }
 }
 
-bool Mapping::isReady() const{
-  const std::vector<int>& nzind_ = nzmap_.data();
-  casadi_assert(depind_.size()==size());
-  casadi_assert(nzind_.size()==size());
-  for(int k=0; k<size(); ++k){
-    if(nzind_[k]<0 || depind_[k]<0)
-      return false;
-  }
-  return true;
-}
-    
 void Mapping::printPart(std::ostream &stream, int part) const{
-  casadi_assert(isReady());
-  const std::vector<int>& nzind_ = nzmap_.data();
-
   if(ndep()==0){
     stream << "sparse(" << size1() << "," << size2() << ")";
-  } else if(numel()==1 && size()==1 && ndep()==1){
+  } else if(numel()==1 && size()==1 && ndep()==1 && output_sorted_[0].size()==1){
     if(part==1)
       if(dep(0).numel()>1)
-        stream << "[" << nzind_.at(0) << "]";
+        stream << "[" << output_sorted_[0][0].inz << "]";
   } else {
     if(part==0){
       stream << "mapping(";
@@ -167,12 +157,14 @@ void Mapping::printPart(std::ostream &stream, int part) const{
       stream << " " << size1() << "-by-" << size2() << " matrix, dependencies: [";
     } else if(part==ndep()){
       stream << "], nonzeros: [";
-      for(int k=0; k<nzind_.size(); ++k){
-        if(k!=0) stream << ",";
-        if(ndep()>1){
-          stream << nzind_[k] << "(" << depind_[k] << ")";
-        } else {
-          stream << nzind_[k];
+      for(int k=0; k<output_sorted_.size(); ++k){
+        for(int kk=0; kk<output_sorted_[k].size(); ++kk){
+          if(ndep()>1){
+            stream << output_sorted_[k][kk].inz << "(" << output_sorted_[k][kk].iind << ")";
+          } else {
+            stream << output_sorted_[k][kk].inz;
+          }
+          stream << ",";
         }
       }
       stream << "])";
@@ -182,27 +174,45 @@ void Mapping::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void Mapping::assign(const MX& d, const IOMap& iomap){
+void Mapping::assign(const MX& d, const std::vector<int>& inz, bool add){
+  assign(d,inz,range(inz.size()),add);
+}
+
+void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
   casadi_assert(!d.isNull());
-  //const std::vector<int>& nzind_ = nzmap_.data();
   
   // Quick return if no elements
-  if(iomap.empty()) return;
+  if(inz.empty()) return;
   
-  if(ELIMINATE_NESTED && d->isMapping()){
+  if(ELIMINATE_NESTED && d->isMapping()){ // Move this logic to init!
+    // Clear the existing element if we are not adding
+    if(!add){
+      for(int k=0; k<onz.size(); ++k){
+        output_sorted_[onz[k]].clear();
+      }
+    }
+    
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
-    vector<IOMap> iomap2(d2.size());
-    for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); it++){
-      int depind_i = dnode->depind_.at(it->first);
-      pair<int,int> assign_i(dnode->nzmap_.at(it->first), it->second);
-      iomap2[depind_i].push_back(assign_i);
+    
+    // Split the vector according to dependency index
+    vector<vector<int> > inz2(d2.size()), onz2(d2.size());
+    for(int k=0; k<inz.size(); ++k){
+      
+      // Get the sum
+      const std::vector<OutputNZ>& sum = dnode->output_sorted_[inz[k]];
+      
+      // Add the elements in the sum
+      for(std::vector<OutputNZ>::const_iterator it2=sum.begin(); it2!=sum.end(); ++it2){
+        inz2[it2->iind].push_back(it2->inz);
+        onz2[it2->iind].push_back(onz[k]);
+      }
     }
     
     // Call the function recursively
     for(int i=0; i<d2.size(); ++i){
-      assign(d2[i],iomap2[i]);
+      assign(d2[i],inz2[i],onz2[i],true);
     }
   } else {
     // Add the node if it is not already a dependency
@@ -211,352 +221,268 @@ void Mapping::assign(const MX& d, const IOMap& iomap){
     if(it==depmap_.end()){
       depind = addDependency(d);
       depmap_[static_cast<const MXNode*>(d.get())] = depind;
-
-      if(NEW_MAPPING_NODE){
-        assignments_[0].resize(ndep());
-        additions_[0].resize(ndep());
-      }
     } else {
       depind = it->second;
     }
     
     // Save the mapping
-    assignIndex(depind,iomap);
+    for(int k=0; k<inz.size(); ++k){
+      OutputNZ new_el = {inz[k],depind};
+      if(!add) output_sorted_[onz[k]].clear();
+      output_sorted_[onz[k]].push_back(new_el);
+    }
   }
 }
 
-void Mapping::assignIndex(int depind, const IOMap& iomap){
-  std::vector<int>& nzind_ = nzmap_.data();
-  for(IOMap::const_iterator it=iomap.begin(); it!=iomap.end(); ++it){
-    nzind_[it->second] = it->first;
-    depind_[it->second] = depind;
+void Mapping::init(){
+  // Call init of the base class
+  MXNode::init();
+  
+  // Clear the runtime
+  index_output_sorted_.resize(1);
+  index_output_sorted_[0].resize(ndep());
+  for(int iind=0; iind<index_output_sorted_[0].size(); ++iind){
+    index_output_sorted_[0][iind].clear();
   }
   
-  if(NEW_MAPPING_NODE){
-    // TODO: Avoid duplicates
-    assignments_[0][depind].insert(assignments_[0][depind].end(),iomap.begin(),iomap.end());
+  // For all the outputs
+  for(int onz=0; onz<output_sorted_.size(); ++onz){
+
+    // Get the sum
+    const std::vector<OutputNZ>& sum = output_sorted_[onz];
+    
+    // For all elements in the sum
+    for(std::vector<OutputNZ>::const_iterator it=sum.begin(); it!=sum.end(); ++it){
+      
+      // Add the element to the runtime
+      index_output_sorted_[0][it->iind].push_back(pair<int,int>(it->inz,onz));
+    }
   }
 }
 
 void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   casadi_assert_message(output_given,"not implemented");
-  casadi_assert(isReady());
-
-    // Sparsity
+  
+  // Sparsity
   const CRSSparsity &sp = sparsity();
   const vector<int>& rowind = sp.rowind();
   const vector<int>& col = sp.col();
+  vector<int> row = sp.getRow();
 
   // Dimensions
   int d1=sp.size1(), d2=sp.size2();
   
-  // Nonzero indices
-  const std::vector<int> &nzind = nzmap_.data();
-
   // Number of derivative directions
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
 
-  if(nadj>0){
-    // Number of inputs
-    int n = input.size();
-    
-    // All the input and output nonzeros and indices
-    vector<vector<int> > input_el(n), input_el_sorted(n);
-    vector<vector<int> > output_el(n), output_el_sorted(n);
-    vector<int> input_nz;
-    
-    // Temporary vector
-    vector<int> temp;
-    
-    // For all inputs
-    for(int iind=0; iind<n; ++iind){
-      
-      // Find input/output pairs
-      input_nz.clear();
-      
-      // Loop over rows
-      for(int i=0; i<d1; ++i){
-        // Loop over nonzeros
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          // Get column
-          int j=col[k];
-          
-          // Add if index matches
-          if(depind_[k]==iind){
-            input_nz.push_back(nzind[k]);
-            output_el[iind].push_back(j + i*d2);
-          }
-        }
-      }
-      
-      // At this point we shall construct input_el and at the same time sort according to it
-      input_el[iind].resize(input_nz.size());
-      input_el_sorted[iind].resize(input_nz.size());
-      output_el_sorted[iind].resize(input_nz.size());
-      
-      // Get input sparsity
-      const CRSSparsity& sp_in = input[iind]->sparsity();
-      const vector<int>& c_in = sp_in.col();
-      const vector<int>& r_in = sp_in.rowind();
-      int d1_in = sp_in.size1();
-      int d2_in = sp_in.size2();
-      
-      // Add extra temporary elements if necessary
-      temp.resize(max(temp.size(),c_in.size()),-1);
-      
-      // Mark inputs
-      for(int k=0; k<input_nz.size(); ++k){
-        temp[input_nz[k]] = k;
-      }
-      
-      // Loop over rows
-      int el = 0;
-      for(int i=0; i<d1_in; ++i){
-        // Loop over nonzeros
-        for(int k=r_in[i]; k<r_in[i+1]; ++k){
-          // Get column
-          int j=c_in[k];
-          
-          // Save to vector if nonzero requested
-          if(temp[k]>=0){
-            input_el[iind][temp[k]] = input_el_sorted[iind][el] = j + i*d2_in;
-            output_el_sorted[iind][temp[k]] = output_el[iind][el];
-            el++;
-          }
-        }
-      }
-      casadi_assert(el==output_el[iind].size());
-      
-      // Unmark inputs
-      for(int k=0; k<input_nz.size(); ++k){
-        temp[input_nz[k]] = -1;
-      }
-      
-      // At this point we have two vector pairs, output_el and input_el containing the elements of the mapping matrix
-      // sorted according to output and output_el_sorted and input_el_sorted containing the same information but 
-      // sorted according to input
-  /*    cout << "output_el = " << output_el << endl;
-      cout << "input_el = " << input_el << endl;
-      cout << "output_el_sorted = " << output_el_sorted << endl;
-      cout << "input_el_sorted = " << input_el_sorted << endl;
-      cout << endl;*/
-    }
-    
-    // Now for all forward directions
-    for(int d=0; d<nfwd; ++d){
-      
-    }
-    
-    // Now for all adjoint directions NOTE: This is a quick-hack and need to be fixed for larger systems
-    for(int d=0; d<nadj; ++d){
-      for(int iind=0; iind<n; ++iind){
-        for(int k=0; k<input_el[iind].size(); ++k){
-          // Which element to get
-          int el = output_el[iind][k];
-          int o1 = el / adjSeed[d][0]->size2();
-          int o2 = el % adjSeed[d][0]->size2();
-          
-          // Get the seed
-          MX seed = (*adjSeed[d][0])(o1,o2);
-          if(!isZero(seed)){
-            int el = input_el[iind][k];
-            int i1 = el / adjSens[d][iind]->size2();
-            int i2 = el % adjSens[d][iind]->size2();
-            (*adjSens[d][iind])(i1,i2) += seed;
-          }
-        }
-      }
-      
-/*      // Sparsity of the adjoint sensitivities
-      vector<CRSSparsity> sp_adjsens(n);
-      for(int iind=0; iind<n; ++iind){
-        sp_adjsens[iind] = CRSSparsity(0,input[iind]->size1());
-      }
-      
-      // Loop over the rows of the adjoint seed
-      for(int i=0; i<d1; ++i){
-        
-        
-        
-      }*/
-      
-      
-        
-// /*        // Sparsity of the adjoint seed
-//         const CRSSparsity& sp_a = adjSeed[d][iind]->sparsity();
-//         const vector<int>& c_a = sp_a.col();
-//         const vector<int>& r_a = sp_a.rowind();
-//         int d1_a = sp_a.size1();
-//         int d2_a = sp_a.size2();*/
-
-        
-        
-        
-        
-//        sp_dep
-//      }
-      
-    }
-    return;
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // Quick return if no inputs
-  if(nfwd>0 && input.empty()){
-    for(int oind=0; oind<output.size(); ++oind){
-      if(fwdSens[0][oind]!=0){
-        *fwdSens[0][oind] = MX::sparse(d1,d2);
-        for(int d=0; d<nfwd; ++d){
-          *fwdSens[d][oind] = *fwdSens[0][oind];
-        }
-      }
-    }
-    return;
-  }
-  
-  // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
-  vector<int> nzind_sens(nzind.size()); // BUG? Initialize to -1?
-  
-  // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
-  vector<int> fsens_ind;
-
-  // Mapping for a specific input
-  vector<int> &nz = fsens_ind; // reuse memory
-  vector<int> nzd;
-
-  // For all forward directions
+  // Sensitivity matrices in sparse triplet format for all forward sensitivities
+  vector<vector<vector<int> > > f_row(nfwd), f_col(nfwd), f_inz(nfwd), f_offset(nfwd);
   for(int d=0; d<nfwd; ++d){
-
-    // Number of nonzeros of the output
-    int nnz=0;
+    int noind = output.size();
+    f_row[d].resize(noind);
+    f_col[d].resize(noind);
+    f_inz[d].resize(noind);
+    f_offset[d].resize(noind,vector<int>(1,0));
+  }
+  
+  // Sensitivity matrices in sparse triplet format for all adjoint sensitivities
+  vector<vector<vector<int> > > a_row(nadj), a_col(nadj), a_onz(nadj), a_offset(nadj);
+  for(int d=0; d<nadj; ++d){
+    int niind = input.size();
+    a_row[d].resize(niind);
+    a_col[d].resize(niind);
+    a_onz[d].resize(niind);
+    a_offset[d].resize(niind,vector<int>(1,0));
+  }
+    
+  // For all outputs
+  for(int oind=0; oind<output.size(); ++oind){
+    if(output[oind]==0) continue; // Skip if output doesn't exist
+    
+    // Output sparsity
+    const CRSSparsity &osp = sparsity(oind);
+    const vector<int>& ocol = osp.col();
+    vector<int> orow = osp.getRow();
     
     // For all inputs
     for(int iind=0; iind<input.size(); ++iind){
-      // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
-      fsens_ind.resize(input[iind]->size());
-      fill(fsens_ind.begin(),fsens_ind.end(),-1);
       
-      // Get sparsity of the input and forward sensitivity
-      int id1=input[iind]->size1(), id2=input[iind]->size2();
-      const vector<int>& rowind_i = input[iind]->sparsity().rowind();
-      const vector<int>& rowind_f = fwdSeed[d][iind]->sparsity().rowind();
-      const vector<int>& col_i = input[iind]->sparsity().col();
-      const vector<int>& col_f = fwdSeed[d][iind]->sparsity().col();
-      
-      // Loop over rows of input and forward sensitivities
-      for(int i=0; i<id1; ++i){
-        
-        // Nonzero of the forward sensitivity
-        int el_f = rowind_f[i];
+      // Skip if input doesn't exist
+      if(input[iind]==0) continue;
 
-        // Column of the forward sensitivity (-1 if no element)
-        int j_f = el_f==rowind_f[i+1] ? -1 : col_f[el_f];
-        
-        // Loop over nonzeros of the input
-        for(int el=rowind_i[i]; el<rowind_i[i+1]; ++el){
-          
-          // Column of the input
-          int j=col_i[el];
-          
-          // Continue to the same entry in the forward sensitivity matrix
-          while(el_f < rowind_f[i+1] && j_f<j){
-            el_f++;
-            j_f = col_f[el_f];
-          }
-          
-          // Add element to temp vector or -1 of no corresponding entry
-          fsens_ind[el] = j==j_f ? el_f : -1;
-        }
+      // Input sparsity
+      const CRSSparsity &isp = dep(iind).sparsity();
+      const vector<int>& icol = isp.col();
+      vector<int> irow = isp.getRow();
+
+      // Get references to the assignment operations
+      const IOMap& assigns = index_output_sorted_[oind][iind];
+
+      // Find out which matrix elements that we are trying to calculate
+      vector<int> el_wanted(assigns.size()); // TODO: Move outside loop
+      for(int k=0; k<assigns.size(); ++k){
+        el_wanted[k] = orow[assigns[k].second] + ocol[assigns[k].second]*osp.size1();
       }
 
-      // Update nonzero vector
-      for(int el=0; el<nzind_sens.size(); ++el){
-        // Check if dependency index match
-        if(depind_[el]==iind){
-          
-          // Point nzind_sens to the nonzero index of the sensitivity
-          nzind_sens[el] = fsens_ind[nzind[el]];
-          
-          // Count the number of nonzeros
-          nnz += int(nzind_sens[el]>=0);
-        }
-      }
-    }
-    
-    // Sparsity of the return matrix
-    CRSSparsity sp_fsens(d1,d2);
-    sp_fsens.reserve(nnz,d1);
-    
-    // Get references to the vectors
-    vector<int>& col_fsens = sp_fsens.colRef();
-    vector<int>& rowind_fsens = sp_fsens.rowindRef();
-    
-    // Loop over rows of the resulting matrix
-    for(int i=0; i<d1; ++i){
-      
-      // Loop over the nonzero elements of the resulting matrix
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-      
-        // If the corresponding entry exists in the sensitivity matrix
-        if(nzind_sens[el]>=0){
-          
-          // Get column
-          int j=col[el];
-          
-          // Add nonzero
-          col_fsens.push_back(j);
-        }
+      // We next need to resort the assigns vector with increasing inputs instead of outputs
+      // Start by counting the number of inputs corresponding to each nonzero
+      vector<int> inz_count(icol.size()+1,0);
+      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+        inz_count[it->first+1]++;
       }
       
-      // Save upper bound on nonzero index of the row
-      rowind_fsens[i+1] = col_fsens.size();
-    }
-    
-    // Return matrix
-    *fwdSens[d][0] = MX::create(new Mapping(sp_fsens));
-    
-    // Add the dependencies
-    for(int dp=0; dp<input.size(); ++dp){
+      // Cumsum to get index offset for input nonzero
+      for(int i=0; i<icol.size(); ++i){
+        inz_count[i+1] += inz_count[i];
+      }
       
-      // Get the local nonzeros
-      nz.clear();
-      nzd.clear();
-      int el=0;
-      for(int k=0; k<nzind_sens.size(); ++k){
-        // If a nonzero
-        if(nzind_sens[k]>=0){
+      // Get the order of assignments
+      vector<int> assigns_order(assigns.size()); // TODO: Move allocation outside loop
+      for(int k=0; k<assigns.size(); ++k){
+        // Save the new index
+        assigns_order[inz_count[assigns[k].first]++] = k;
+      }
+
+      // Find out which matrix elements that we are trying to calculate
+      vector<int> el_known(assigns.size()); // TODO: Move allocation outside loop
+      for(int k=0; k<assigns.size(); ++k){
+        // Get output nonzero
+        int inz_k = assigns[assigns_order[k]].first;
         
-          // If dependency matches
-          if(depind_[k]==dp){
-            nz.push_back(el);
-            nzd.push_back(nzind_sens[k]);
-          }
-          
-          // Next nonzero
-          el++;
-        }
+        // Get element
+        el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
+      }
+
+      // Temporary vectors
+      vector<int> temp = el_known;
+      
+      // Evaluate the nondifferentiated function
+      if(!output_given){
+        casadi_assert(0);
       }
       
-      // Save to return matrix
-      (*fwdSens[d][0])->addDependency(*fwdSeed[d][dp],nzd,nz);
+      // Forward sensitivities
+      for(int d=0; d<nfwd; ++d){
+        
+        // Get the matching nonzeros
+        copy(el_known.begin(),el_known.end(),temp.begin());
+        fwdSeed[d][iind]->sparsity().getNZInplace(temp);
+
+        // Add to sparsity pattern
+        for(int k=0; k<assigns.size(); ++k){
+          if(temp[k]!=-1){
+            f_inz[d][oind].push_back(temp[k]);
+            f_col[d][oind].push_back(ocol[assigns[assigns_order[k]].second]);
+            f_row[d][oind].push_back(orow[assigns[assigns_order[k]].second]);
+          }
+        }
+        f_offset[d][oind].push_back(f_inz[d][oind].size());
+      }
+      
+      // Continue of no adjoint sensitivities
+      if(nadj==0) continue;
+      
+      // Resize temp to be able to hold el_wanted
+      temp.resize(el_wanted.size());
+      
+      // Adjoint sensitivities
+      for(int d=0; d<nadj; ++d){
+        
+        // Get the matching nonzeros
+        copy(el_wanted.begin(),el_wanted.end(),temp.begin());
+        adjSeed[d][oind]->sparsity().getNZInplace(temp);
+
+        // Add to sparsity pattern
+        for(int k=0; k<assigns.size(); ++k){
+          if(temp[k]!=-1){
+            a_onz[d][iind].push_back(temp[k]);
+            a_col[d][iind].push_back(icol[assigns[k].first]);
+            a_row[d][iind].push_back(irow[assigns[k].first]);
+          }
+        }
+        a_offset[d][iind].push_back(a_onz[d][iind].size());
+      }
     }
   }
-}
+    
+  // Create the forward sensitivity matrices
+  vector<int> f_onz, inz_local, onz_local;
+  for(int d=0; d<nfwd; ++d){
+    
+    // For all outputs
+    for(int oind=0; oind<output.size(); ++oind){
+      if(output[oind]==0) continue; // Skip if output doesn't exist
 
-void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  const std::vector<int> &nzind_ = nzmap_.data();
-  for(int k=0; k<size(); ++k){
-    (*output[0])[k] = (*input[depind_[k]])[nzind_[k]];
+      // Output sparsity
+      const CRSSparsity &osp = sparsity(oind);
+
+      // Create a sparsity pattern from vectors
+      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d][oind],f_col[d][oind],f_onz,false,true);
+      
+      // Create a mapping matrix
+      *fwdSens[d][oind] = MX::create(new Mapping(f_sp));
+      
+      // Add all the dependencies
+      for(int iind=0; iind<input.size(); ++iind){
+        if(input[iind]==0) continue; // Skip if input doesn't exist
+        
+        // Get the elements corresponding to the input index
+        int iind0 = f_offset[d][oind][iind], iind1 = f_offset[d][oind][iind+1];
+
+        // Get the input nonzeros
+        inz_local.resize(iind1-iind0);
+        copy(f_inz[d][oind].begin()+iind0,f_inz[d][oind].begin()+iind1,inz_local.begin());
+        
+        // Get the output nonzeros
+        onz_local.resize(iind1-iind0);
+        copy(f_onz.begin()+iind0,f_onz.begin()+iind1,onz_local.begin());
+        
+        // Save to mapping
+        (*fwdSens[d][oind])->assign(*fwdSeed[d][iind],inz_local,onz_local,true);
+      }
+    }
+  }
+  
+  // Create the adjoint sensitivity matrices
+  vector<int>& a_inz=f_onz; // reuse
+  for(int d=0; d<nadj; ++d){
+
+    // For all inputs
+    for(int iind=0; iind<input.size(); ++iind){
+      if(input[iind]==0) continue; // Skip if input doesn't exist
+        
+      // Input sparsity
+      const CRSSparsity &isp = input[iind]->sparsity();
+      
+      // Create a sparsity pattern from vectors
+      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d][iind],a_col[d][iind],a_inz,false,true);
+      
+      // Create a mapping matrix
+      MX s = MX::create(new Mapping(a_sp));
+     
+      // Add all dependencies
+      for(int oind=0; oind<output.size(); ++oind){
+        if(output[oind]==0) continue; // Skip if output doesn't exist
+          
+        // Get the elements corresponding to the input index
+        int oind0 = a_offset[d][iind][oind], oind1 = a_offset[d][iind][oind+1];
+
+        // Get the input nonzeros
+        inz_local.resize(oind1-oind0);
+        copy(a_inz.begin()+oind0,a_inz.begin()+oind1,inz_local.begin());
+        
+        // Get the output nonzeros
+        onz_local.resize(oind1-oind0);
+        copy(a_onz[d][iind].begin()+oind0,a_onz[d][iind].begin()+oind1,onz_local.begin());
+        
+        // Save to mapping
+        s->assign(*adjSeed[d][oind],onz_local,inz_local,true);
+      }
+      
+      // Save to adjoint sensitivities
+      *adjSens[d][iind] += s;
+    }
   }
 }
 

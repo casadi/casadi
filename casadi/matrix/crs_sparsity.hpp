@@ -192,6 +192,13 @@ class CRSSparsity : public SharedObject{
 //    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j);
 //    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j) const;
 
+    /** \brief Get the nonzero index for a set of elements
+      The index vector is used both for input and outputs and must be sorted by increasing
+      nonzero index, i.e. row-wise.
+      Elements not found in the sparsity pattern are set to -1.
+    */
+    void getNZInplace(std::vector<int>& indices) const;
+
     /// Get the sparsity in CRS format
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int> &col) const;
 
@@ -205,7 +212,7 @@ class CRSSparsity : public SharedObject{
     CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
-    CRSSparsity transpose(std::vector<int>& mapping) const;
+    CRSSparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
     
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose() const;
@@ -309,7 +316,6 @@ class CRSSparsity : public SharedObject{
 
     /// Get element index for each nonzero
     std::vector<int> getElementMapping() const;
-    
     
     std::string dimString() 	const;
 

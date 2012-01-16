@@ -25,6 +25,7 @@
 
 #include "mx_node.hpp"
 #include <map>
+#include <stack>
 
 namespace CasADi{
   /** \brief Maps non-zero elements
@@ -61,32 +62,45 @@ class Mapping : public MXNode{
     /// Is a mapping matrix
     virtual bool isMapping() const{return true;}
 
-    /// Assign nonzeros (mapping matrix)
-    virtual void assign(const MX& d, const IOMap& iomap);
+    /// Assign/add nonzeros
+    virtual void assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add=false);
 
-    /// Assign nonzeros (index given) -> change to multiple indices?
-    virtual void assignIndex(int depind, const IOMap& iomap);
-    
-    /// Check if the mapping is ready
-    bool isReady() const;
-    
-    /// Mapping from the output non-zero to the dependency nonzero index
-    Matrix<int> nzmap_;
+    /// Assign/add nonzeros, outputs sequential
+    virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
-    /// Mapping from the output non-zero index of the dependency index
-    std::vector<int> depind_;
+    /// Initialize
+    virtual void init();
 
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
 
-    /// Assignment operations
-    std::vector<std::vector<IOMap> > assignments_;
-
-    /// Addition operations
-    std::vector<std::vector<IOMap> > additions_;
+    /// Input nonzero and dependency index
+    struct OutputNZ{
+      int inz, iind;
+    };
     
+    /// Operation sequence
+    typedef std::vector<std::pair<int,int> > IOMap;
+    
+    /// Operations sorted by output nonzero
+    std::vector<std::vector<OutputNZ> > output_sorted_;
+    
+    /// Operations sorted by input and output index and then by output nonzero (this is the runtime)
+    std::vector<std::vector<IOMap> > index_output_sorted_;
+
     /// Evaluate a block given the data vectors
-    void evaluateBlock(int iind, int oind, const std::vector<double>& idata, std::vector<double>& odata, bool fwd) const;
+    template<typename T>
+    void evaluateBlock(int iind, int oind, const std::vector<T>& idata, std::vector<T>& odata, bool fwd) const;
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+    
+    /// Compare output index
+    static bool outputSmaller(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second<el2.second;}
+    
+    /// Check equality for output index
+    static bool outputEqual(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second==el2.second;}
 };
 
 } // namespace CasADi

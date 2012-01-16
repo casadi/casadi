@@ -138,8 +138,6 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
     int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
     casadi_assert(nfwd || nadj);
     casadi_assert(!(nfwd && nadj));
-    cout << "nfwd = " << nfwd << endl;
-    cout << "nadj = " << nadj << endl;
 
     // Calculate the forward sensitivities, nfdir_fcn_ directions at a time
     for(int ofs=0; ofs<nfwd; ofs += nfdir_fcn_){

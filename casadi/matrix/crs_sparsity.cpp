@@ -260,8 +260,8 @@ void CRSSparsity::getSparsity(vector<int>& row, vector<int> &col) const{
   col = this->col();
 }
 
-CRSSparsity CRSSparsity::transpose(vector<int>& mapping) const{
-  return (*this)->transpose(mapping);
+CRSSparsity CRSSparsity::transpose(vector<int>& mapping, bool invert_mapping) const{
+  return (*this)->transpose(mapping,invert_mapping);
 }
 
 CRSSparsity CRSSparsity::transpose() const{
@@ -393,5 +393,10 @@ void CRSSparsity::removeDuplicates(std::vector<int>& mapping){
 std::vector<int> CRSSparsity::getElementMapping() const{
   return (*this)->getElementMapping();
 }
+
+void CRSSparsity::getNZInplace(std::vector<int>& indices) const{
+  (*this)->getNZInplace(indices);
+}
+
 
 } // namespace CasADi

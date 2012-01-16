@@ -269,12 +269,121 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
   return ret;
 }
 
-  CRSSparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted){
+CRSSparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted, bool invert_mapping){
+  // Assert dimensions
+  casadi_assert_message(row.size()==col.size(),"inconsistent lengths");
+  
+  if(invert_mapping){ // More memory efficient implementation, should be debugged for invert_mapping==false
     
-    // Assert dimensions
-    casadi_assert_message(row.size()==col.size(),"inconsistent lengths");
+    // Create the return sparsity pattern and access vectors
+    CRSSparsity ret(nrow,ncol);
+    vector<int> &r_rowind = ret.rowindRef();
+    vector<int> &r_col = ret.colRef();
+    r_col.reserve(col.size());
     
-    // Nunber of elements on each row
+    // Reuse data
+    vector<int>& mapping1 = invert_mapping ? r_col : mapping;
+    vector<int>& mapping2 = invert_mapping ? mapping : r_col;
+    
+    // Make sure that enough memory is allocated to use as a work vector
+    mapping1.reserve(std::max(ncol+1,int(row.size())));
+    
+    // Number of elements in each column
+    vector<int>& colcount = mapping1; // reuse memory
+    colcount.resize(ncol+1);
+    fill(colcount.begin(),colcount.end(),0);
+    for(vector<int>::const_iterator it=col.begin(); it!=col.end(); ++it){
+      casadi_assert_message(*it<ncol,"Col index out of bounds");
+      colcount[*it+1]++;
+    }
+    
+    // Cumsum to get index offset for each column
+    for(int i=0; i<ncol; ++i){
+      colcount[i+1] += colcount[i];
+    }
+    
+    // New column for each old column
+    mapping2.resize(col.size());
+    for(int k=0; k<col.size(); ++k){
+      // Save the new index
+      mapping2[colcount[col[k]]++] = k;
+    }
+    
+    // Number of elements in each row
+    vector<int>& rowcount = r_rowind; // reuse memory, r_rowind is already the right size and is filled with zeros
+    for(vector<int>::const_iterator it=mapping2.begin(); it!=mapping2.end(); ++it){
+      casadi_assert_message(row[*it]<nrow,"Row index out of bounds");
+      rowcount[row[*it]+1]++;
+    }
+    
+    // Cumsum to get index offset for each row
+    for(int i=0; i<nrow; ++i){
+      rowcount[i+1] += rowcount[i];
+    }
+
+    // New row for each old row
+    mapping1.resize(row.size());
+    for(vector<int>::const_iterator it=mapping2.begin(); it!=mapping2.end(); ++it){
+      mapping1[rowcount[row[*it]]++] = *it;
+    }
+
+    // Current element in the return matrix
+    int r_el = 0;
+    r_col.resize(row.size());
+
+    // Current nonzero
+    vector<int>::const_iterator it=mapping1.begin();
+
+    // Loop over rows
+    r_rowind[0] = 0;
+    for(int i=0; i<nrow; ++i){
+      
+      // Previous column (to detect duplicates)
+      int j_prev = -1;
+      
+      // Loop over nonzero elements of the row
+      while(it!=mapping1.end() && row[*it]==i){
+
+        // Get the element
+        int el = *it;
+        it++;
+
+        // Get the column
+        int j = col[el];
+        
+        // If not a duplicate, save to return matrix
+        if(j!=j_prev)
+          r_col[r_el++] = j;
+        
+        if(invert_mapping){
+          // Save to the inverse mapping
+          mapping2[el] = r_el-1;        
+        } else {
+          // If not a duplicate, save to the mapping vector
+          if(j!=j_prev)
+            mapping1[r_el-1] = el;
+        }
+        
+        // Save column
+        j_prev = j;
+      }
+      
+      // Update row offset
+      r_rowind[i+1] = r_el;
+    }
+
+    // Resize the column vector
+    r_col.resize(r_el);
+
+    // Resize mapping matrix
+    if(!invert_mapping){
+      mapping1.resize(r_el);
+    }
+    
+    return ret;
+    
+  } else { // Old implementation, TODO: replace with new implementation above
+    // Number of elements on each row
     vector<int> rowcount(nrow+1,0);
     for(vector<int>::const_iterator it=row.begin(); it!=row.end(); ++it){
       casadi_assert_message(*it<nrow,"Row index out of bounds");
@@ -299,7 +408,10 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
       int newk = rowcount[row[k]]++;
       
       // Update mapping
-      mapping[newk] = k;
+      if(invert_mapping)
+        mapping[k] = newk;
+      else
+        mapping[newk] = k;
       
       // Update column
       newcol[newk] = col[k];
@@ -310,41 +422,66 @@ std::vector<int> lowerNZ(const CRSSparsity& a) {
       
       // Form the transpose
       vector<int> trans_mapping;
-      CRSSparsity ret_trans = ret.transpose(trans_mapping);
+      CRSSparsity ret_trans = ret.transpose(trans_mapping,invert_mapping);
 
-      // Update the mapping
-      for(vector<int>::iterator it=trans_mapping.begin(); it!=trans_mapping.end(); ++it)
-       *it = mapping[*it];
-      
-      // Form the transpose of the transpose
-      ret = ret_trans.transpose(mapping);
+      if(invert_mapping){
+        // Update the mapping
+        for(vector<int>::iterator it=mapping.begin(); it!=mapping.end(); ++it)
+          *it = trans_mapping[*it];
+        
+        // Form the transpose of the transpose
+        ret = ret_trans.transpose(trans_mapping,invert_mapping);
+        
+        // Update the mapping
+        for(vector<int>::iterator it=mapping.begin(); it!=mapping.end(); ++it)
+          *it = trans_mapping[*it];
+        
+      } else {
+        // Update the mapping
+        for(vector<int>::iterator it=trans_mapping.begin(); it!=trans_mapping.end(); ++it)
+          *it = mapping[*it];
 
-      // Update the mapping
-      for(vector<int>::iterator it=mapping.begin(); it!=mapping.end(); ++it)
-        *it = trans_mapping[*it];
+        // Form the transpose of the transpose
+        ret = ret_trans.transpose(mapping);
+
+        // Update the mapping
+        for(vector<int>::iterator it=mapping.begin(); it!=mapping.end(); ++it)
+          *it = trans_mapping[*it];
+      }
     }
 
     // If the columns are not strictly sorted, it means that there are duplicate entries
     if(!columns_are_sorted && !ret.columnsSequential(true)){
-      // Remove duplicate entries
-      ret.removeDuplicates(mapping);
+      if(invert_mapping){
+        // Compress the matrix and find new elements for each old element
+        vector<int> temp = range(ret.size());
+        ret.removeDuplicates(temp);
+        
+        // Update mapping
+        for(vector<int>::iterator it=mapping.begin(); it!=mapping.end(); ++it)
+          *it = temp[*it];
+      } else {
+        // Remove duplicate entries
+        ret.removeDuplicates(mapping);
+      }
       casadi_assert(ret.columnsSequential(true));
     }
 
     // Return the sparsity pattern
     return ret;
   }
+}
 
 
-  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, bool columns_are_sorted){
-    std::vector<int> mapping;
-    return sp_triplet(n,m,row,col,mapping,columns_are_sorted);
-  }
-  
+CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, bool columns_are_sorted){
+  std::vector<int> mapping;
+  return sp_triplet(n,m,row,col,mapping,columns_are_sorted);
+}
 
-  CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
-    return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
-  }
+
+CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
+  return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
+}
 
 
   

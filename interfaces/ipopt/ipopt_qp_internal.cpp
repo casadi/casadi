@@ -208,10 +208,13 @@ void IpoptQPInternal::evaluate(int nfdir, int nadir) {
   
 
   // Pass inputs of QPInternal to IpoptInternal form 
+#if 0
   solver.input(NLP_P)[H_.mapping()] = input(QP_H);
   solver.input(NLP_P)[G_.mapping()] = input(QP_G);
   solver.input(NLP_P)[A_.mapping()] = input(QP_A);
-    
+#endif
+  casadi_assert(0);
+  
   solver.input(NLP_LBX).set(input(QP_LBX));
   solver.input(NLP_UBX).set(input(QP_UBX));
   

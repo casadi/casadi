@@ -44,7 +44,6 @@ SET(CASADI_SRCS
   mx/evaluation.cpp          mx/evaluation.hpp          # FX function evaluation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
-  mx/inverse_mapping.cpp     mx/inverse_mapping.hpp     # Maps non-zeros
   mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
   mx/if_else_node.cpp        mx/if_else_node.hpp        # An if-else branch
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs

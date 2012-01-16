@@ -61,7 +61,7 @@ MX vertcat(const vector<MX>& comp){
     int offset=0;
     for(int i=0; i<c.size(); ++i){
       int nz = c[i].size();
-      ret->addDependency(c[i],range(nz),range(offset,offset+nz));
+      ret->assign(c[i],range(nz),range(offset,offset+nz));
       offset += nz;
     }
     
@@ -184,7 +184,7 @@ MX outer_prod(const MX &x, const MX &y){
 
 void simplifyMapping(MX& ex){
   return;
-  
+#if 0  
   // Make sure that we have a mapping with one dependency
   if(!(ex->isMapping() && ex->ndep()==1))
     return;
@@ -205,6 +205,7 @@ void simplifyMapping(MX& ex){
     
   // Identity transformation if we reached this point
   ex = ex->dep(0);
+#endif
 }
 
 MX trans(const MX &x){
@@ -216,7 +217,7 @@ MX trans(const MX &x){
   vector<int> nzind;
   CRSSparsity sp = x->sparsity().transpose(nzind);
   MX ret = MX::create(new Mapping(sp));
-  ret->addDependency(x,nzind);
+  ret->assign(x,nzind);
   
   // Check if the matrix is in fact an identity mapping (this will make sure that trans(trans(x)) -> x
   simplifyMapping(ret);
@@ -247,7 +248,7 @@ MX reshape(const MX &x, const CRSSparsity& sp){
   
   // Create a mapping
   MX ret = MX::create(new Mapping(sp));
-  ret->addDependency(x,range(x.size()));
+  ret->assign(x,range(x.size()));
   
   // Simplify mapping if possible
   simplifyMapping(ret);
@@ -275,7 +276,7 @@ MX vecNZ(const MX &x) {
   // Create a mapping
   MX ret = MX::create(new Mapping(CRSSparsity(x.size(),1,true)));
   IMatrix ind(x.sparsity(),range(x.size()));
-  ret->addDependency(x,trans(ind).data());
+  ret->assign(x,trans(ind).data());
   simplifyMapping(ret);
   return ret;
 }
@@ -313,8 +314,8 @@ MX unite(const MX& A, const MX& B){
   // Create mapping
   MX ret;
   ret.assignNode(new Mapping(sp));
-  ret->addDependency(A,range(nzA.size()),nzA);
-  ret->addDependency(B,range(nzB.size()),nzB);
+  ret->assign(A,range(nzA.size()),nzA);
+  ret->assign(B,range(nzB.size()),nzB);
   simplifyMapping(ret);
   return ret;
 }
@@ -369,8 +370,8 @@ MX clip(const MX& A, const CRSSparsity& sp) {
   // Create mapping
   MX ret;
   ret.assignNode(new Mapping(sp));
-  ret->addDependency(A,range(nzA.size()),nzA);
-  ret->addDependency(B,range(nzB.size()),nzB);
+  ret->assign(A,range(nzA.size()),nzA);
+  ret->assign(B,range(nzB.size()),nzB);
   return ret;
   
 }
@@ -468,7 +469,7 @@ MX diag(const MX& x){
   
   // Create a mapping
   MX ret = MX::create(new Mapping(sp));
-  ret->addDependency(x,mapping);
+  ret->assign(x,mapping);
   simplifyMapping(ret);
   return ret;
 }

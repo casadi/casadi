@@ -112,10 +112,10 @@ CRSSparsity lowerSparsity(const CRSSparsity& a, bool includeDiagonal = true);
 */
 std::vector<int> lowerNZ(const CRSSparsity& a);
 
-/**
+  /**
  \brief Create a sparsity pattern given the nonzeros in sparse triplet form
 **/
-  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted=false);
+  CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool columns_are_sorted=false, bool invert_mapping=false);
 
 /**
  \brief Create a sparsity pattern given the nonzeros in sparse triplet form (no nonzero mapping)

@@ -83,7 +83,7 @@ MX::MX(const CRSSparsity& sp, const MX& val){
   if(val.dense()){
     // Create mapping
     assignNode(new Mapping(sp));
-    (*this)->addDependency(val,vector<int>(sp.size(),0));
+    (*this)->assign(val,vector<int>(sp.size(),0));
     simplifyMapping(*this);
   } else {
     // Empty matrix
@@ -114,7 +114,7 @@ const MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
  
   // Create return MX
   MX ret = MX::create(new Mapping(sp));
-  ret->addDependency(*this,mapping);
+  ret->assign(*this,mapping);
   simplifyMapping(ret);
   return ret;
 }
@@ -126,7 +126,7 @@ const MX MX::getSub(const Matrix<int>& k) const {
   for (int i=0;i< k.size();i++) {
     if (d[i]>=s) casadi_error("MX::getSub: a non-zero element at position " << d[i] << " was requested, but MX is only " << dimString());
   }
-  ret->addDependency(*this,k.data());
+  ret->assign(*this,k.data());
   simplifyMapping(ret);
   return ret;
 }
@@ -138,11 +138,11 @@ const MX MX::getSub(int i, int j) const{
   if (ind>=0) {
     const CRSSparsity& sp = CRSSparsity::scalarSparsity;
     ret.assignNode(new Mapping(sp));
-    ret->addDependency(*this,vector<int>(1,ind));
+    ret->assign(*this,vector<int>(1,ind));
   } else {
     const CRSSparsity& sp = CRSSparsity::scalarSparsitySparse;
     ret.assignNode(new Mapping(sp));
-    ret->addDependency(*this,vector<int>(0));
+    ret->assign(*this,vector<int>(0));
   }
 //  simplifyMapping(ret);
   return ret;
@@ -209,7 +209,7 @@ const MX MX::getSub(const CRSSparsity& sp, int dummy) const {
   }
   
   MX ret = MX::create(new Mapping(sp));
-  ret->addDependency(*this,mapping);
+  ret->assign(*this,mapping);
 
   return ret;
 }
@@ -287,11 +287,11 @@ MX MX::getNZ(const vector<int>& k) const{
   MX ret;
   
   for (int i=0;i<k.size();i++) {
-    casadi_assert_message(k[i] < size(),"Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size());
+    casadi_assert_message(k[i] < size(),"Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   
   ret.assignNode(new Mapping(sp));
-  ret->addDependency(*this,k);
+  ret->assign(*this,k);
   //simplifyMapping(ret);
   return ret;
 }
@@ -312,14 +312,14 @@ void MX::setNZ(const vector<int>& k, const MX& el){
   
   
   for (int i=0;i<k.size();i++) {
-    casadi_assert_message(k[i] < size(), "Mapping::addDependency: index vector reaches " << k[i] << ", while dependant is only of size " << size());
+    casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   ret.assignNode(new Mapping(sparsity()));
-  ret->addDependency(*this,range(size()));
+  ret->assign(*this,range(size()));
   if (el.size()==1) {
-    ret->addDependency(el,std::vector<int>(k.size(),0),k);
+    ret->assign(el,std::vector<int>(k.size(),0),k);
   } else {
-    ret->addDependency(el,range(k.size()),k);
+    ret->assign(el,range(k.size()),k);
   }
   simplifyMapping(ret);
   *this = ret;
@@ -609,7 +609,7 @@ void MX::erase(const vector<int>& ii, const vector<int>& jj){
   if(mapping.size()!=size()){
     MX ret;
     ret.assignNode(new Mapping(sp));
-    ret->addDependency(*this,mapping);
+    ret->assign(*this,mapping);
     simplifyMapping(ret);
     *this = ret;
   }
@@ -621,7 +621,7 @@ void MX::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& j
   
   MX ret;
   ret.assignNode(new Mapping(sp));
-  ret->addDependency(*this,range(size()));
+  ret->assign(*this,range(size()));
   simplifyMapping(ret);
 
   *this = ret;
@@ -634,20 +634,13 @@ MX::MX(int nrow, int ncol, const MX& val){
   
   CRSSparsity sp(nrow,ncol,true);
   assignNode(new Mapping(sp));
-  (*this)->addDependency(val,vector<int>(sp.size(),0));
+  (*this)->assign(val,vector<int>(sp.size(),0));
 }
 
 std::string MX::dimString() const {
   std::stringstream ss;
   ss << "(" << size1() << "x" << size2() << "=" << numel() << "|" << size() << ")";
   return ss.str();
-}
-
-const Matrix<int>& MX::mapping() {
-  const Mapping * m = dynamic_cast<const Mapping*>(get());
-  casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
-  casadi_assert_message(m->ndep()<=1, "mapping: argument MX should be a Mapping with one depency only (or zero dependencies)");
-  return m->nzmap_;
 }
 
 MX MX::mul(const MX& y) const{
@@ -842,16 +835,6 @@ FX MX::getFunction () {  return (*this)->getFunction(); }
 const Matrix<double> & MX::getConstant() const {
   casadi_assert_message(isConstant(),"MX::getConstant: must be constant");
   return dynamic_cast<const MXConstant*>(get())->x_;
-}
-
-const Matrix<int> & MX::getNZMap() const {
-  casadi_assert_message(isMapping(),"MX::getNZMap: must be mapping");
-  return dynamic_cast<const Mapping*>(get())->nzmap_;
-}
-
-const std::vector<int> & MX::getDepInd() const {
-  casadi_assert_message(isMapping(),"MX::getDepInd: must be mapping");
-  return dynamic_cast<const Mapping*>(get())->depind_;
 }
  	  
 bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get()) != 0 : false;  }

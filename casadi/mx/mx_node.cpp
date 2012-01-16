@@ -89,35 +89,11 @@ int MXNode::addDependency(const MX& dep){
   return dep_.size()-1;
 }
 
-void MXNode::addDependency(int depind, const std::vector<int>& nz_d, const std::vector<int>& nz){
-  casadi_assert(nz_d.size()==nz.size());
-  IOMap tmp(nz_d.size());
-  for(int k=0; k<tmp.size(); ++k){
-    tmp[k].first = nz_d[k];
-    tmp[k].second = nz[k];
-  }
-  assignIndex(depind,tmp);
-}
-
-void MXNode::addDependency(const MX& d, const std::vector<int>& nz_d, const std::vector<int>& nz){
-  casadi_assert(nz_d.size()==nz.size());
-  IOMap tmp(nz_d.size());
-  for(int k=0; k<tmp.size(); ++k){
-    tmp[k].first = nz_d[k];
-    tmp[k].second = nz[k];
-  }
-  assign(d,tmp);
-}
-    
-void MXNode::addDependency(const MX& d, const std::vector<int>& nz_d){
-  addDependency(d,nz_d,range(nz_d.size()));
-}
-
-void MXNode::assignIndex(int depind, const IOMap& iomap){
+void MXNode::assign(const MX& d, const std::vector<int>& inz, bool add){
   casadi_assert(0);
 }
 
-void MXNode::assign(const MX& d, const IOMap& iomap){
+void MXNode::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
   casadi_assert(0);
 }
 

@@ -259,7 +259,6 @@ void MXFunctionInternal::init(){
       }
     }
     
-    
     // Allocate memory for an element in the work vector
     work.resize(work.size()+1);
     FunctionIO &val = work.back();
@@ -946,7 +945,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
       ret[d][iind] = dwork[el][d];
     }
   }
-  cout << "f" << endl;
+/*  cout << "f" << endl;*/
   return ret;
 }
 
