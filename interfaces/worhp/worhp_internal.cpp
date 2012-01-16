@@ -23,6 +23,9 @@
 #include "worhp_internal.hpp"
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
+#include "casadi/mx/mx_tools.hpp"
+#include "casadi/matrix/sparsity_tools.hpp"
+#include "casadi/fx/mx_function.hpp"
 #include <ctime>
 
 using namespace std;
@@ -30,74 +33,13 @@ using namespace std;
 namespace CasADi{
 
 WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
-  casadi_warning("This is just a boilerplate implementation - WorhpSolver does NOT work yet");
-  
+  casadi_warning("WorhpSolver is not mature yet");
 
-  
-/**
-  addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
-  addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
-  
-  // Monitors
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f", true);
-
-  // Set pointers to zero
-  app = 0;
-  userclass = 0;
-
-  // Start the application
-  app = new Worhp::WorhpApplication();
-
-  // Get all options available in WORHP
-  map<string, Worhp::SmartPtr<Worhp::RegisteredOption> > regops = app->RegOptions()->RegisteredOptionsList();
-  for(map<string, Worhp::SmartPtr<Worhp::RegisteredOption> >::const_iterator it=regops.begin(); it!=regops.end(); ++it){
-    // Option identifier
-    string opt_name = it->first;
-    
-    // Short description goes here, even though we do have a longer description
-    string opt_desc = it->second->ShortDescription() + " (see WORHP documentation)";
-    
-    // Get the type
-    Worhp::RegisteredOptionType worhp_type = it->second->Type();
-    opt_type casadi_type;
-    
-    // Map Worhp option category to a CasADi options type
-    switch(worhp_type){
-      case Worhp::OT_Number:    casadi_type = OT_REAL;          break;
-      case Worhp::OT_Integer:   casadi_type = OT_INTEGER;       break;
-      case Worhp::OT_String:    casadi_type = OT_STRING;        break;
-      case Worhp::OT_Unknown:   continue; // NOTE: No mechanism to handle OT_Unknown options
-      default:                  continue; // NOTE: Unknown Worhp options category
-    }
-    
-    addOption(opt_name, casadi_type, GenericType(), opt_desc);
-    
-    // Set default values of WORHP options 
-    if (casadi_type == OT_REAL) {
-      setDefault(opt_name,it->second->DefaultNumber());
-    } else if (casadi_type == OT_INTEGER) {
-      setDefault(opt_name,it->second->DefaultInteger());
-    } else if (casadi_type == OT_STRING) {
-      setDefault(opt_name,it->second->DefaultString());
-    };
-    
-    // Save to map containing WORHP specific options
-    ops_[opt_name] = casadi_type;
-  }
-  */
 }
 
 
 WorhpInternal::~WorhpInternal(){
-/**
-  if(app) delete app;
 
-  // delete the smart pointer;
-  if(userclass != 0){
-    Worhp::SmartPtr<Worhp::TNLP> *ucptr = (Worhp::SmartPtr<Worhp::TNLP>*)userclass;
-    delete ucptr;
-  }
-  */
 }
 
 void WorhpInternal::init(){
@@ -124,19 +66,79 @@ void WorhpInternal::init(){
   }
   
   
+  // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
   
   worhp_w.DF.nnz = GF_.output().size(); // Gradient of f
   worhp_w.DG.nnz = J_.output().size();  // Jacobian of G
-  worhp_w.HM.nnz = worhp_o.n;  // Todo: what to do here?                 
+  
+  
+  if (hasSetOption("generate_hessian") && getOption("generate_hessian")) {
+    std::vector< MX > input = H_.symbolicInput();
+    MX H = H_.call(input)[0];
+    H = vertcat(vec(H(lowerSparsity(H.sparsity(),false))),vec(H(sp_diag(n_))));
+    
+    H_tril_ = MXFunction(input,H);
+    H_tril_.init();
+    
+    worhp_w.HM.nnz = H_tril_.output().size();
+  }
 
+         
   /* Data structure initialisation. */
   WorhpInit(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
   if (worhp_c.status != FirstCall) {
     casadi_error("Main: Initialisation failed.");
   }
   
+  if (worhp_w.DF.NeedStructure) {
+    vector<int> row,col;
+    GF_.output().sparsity().getSparsity(col,row); // transpose
+    for (int i=0;i<row.size();++i) worhp_w.DF.row[i] = row[i] + 1; // Index-1 based
+  }
   
+  if (worhp_w.DG.NeedStructure) {
+
+    
+    vector<int> row,col;
+    trans(J_.output()).sparsity().getSparsity(col,row);
+    std::vector< MX > J = J_.symbolicInput();
+      
+    casadi_assert(col.size()==worhp_w.DG.nnz);
+    casadi_assert(row.size()==worhp_w.DG.nnz);
+    
+    for (int i=0;i<col.size();++i) worhp_w.DG.col[i] = col[i] + 1;
+    for (int i=0;i<row.size();++i) worhp_w.DG.row[i] = row[i] + 1;
+    
+
+  }
   
+    
+
+  if (hasSetOption("generate_hessian") && getOption("generate_hessian")) {
+    log("generate_hessian sparsity");
+    int nz=0;
+    if (worhp_w.HM.NeedStructure) {
+      vector<int> row,col;
+      lowerSparsity(H_.output().sparsity(),false).getSparsity(row,col);
+
+      for (int i=0;i<col.size();++i) worhp_w.HM.col[i] = col[i] + 1;
+      for (int i=0;i<row.size();++i) worhp_w.HM.row[i] = row[i] + 1;
+      
+      vector<int> rowd,cold;
+      H_.output()(sp_diag(n_)).sparsity().getSparsity(rowd,cold);
+      
+      casadi_assert(worhp_w.HM.nnz<=worhp_w.HM.dim_row);
+      casadi_assert(worhp_w.HM.nnz<=worhp_w.HM.dim_col);
+      
+      casadi_assert(cold.size()+col.size()==worhp_w.HM.nnz);
+      casadi_assert(rowd.size()+row.size()==worhp_w.HM.nnz);
+      
+      for (int i=0;i<cold.size();++i) worhp_w.HM.col[i+col.size()] = cold[i] + 1;
+      for (int i=0;i<rowd.size();++i) worhp_w.HM.row[i+row.size()] = rowd[i] + 1;
+
+    }
+  }
+
 }
 
 void WorhpInternal::evaluate(int nfdir, int nadir){
@@ -149,8 +151,8 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   if (!G_.isNull()) {
     if (G_.getNumInputs()==2) G_.setInput(input(NLP_P),1);
   }
-  if (!H_.isNull()) {
-    if (H_.getNumInputs()==4) H_.setInput(input(NLP_P),1);
+  if (!H_tril_.isNull()) {
+    if (H_tril_.getNumInputs()==4) H_tril_.setInput(input(NLP_P),1);
   }
   if (!J_.isNull()) {
     if (J_.getNumInputs()==2) J_.setInput(input(NLP_P),1);
@@ -168,41 +170,6 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   input(NLP_LBG).getArray(worhp_o.GL,m_);
   input(NLP_UBG).getArray(worhp_o.GU,m_);
 
-
-  if (worhp_w.DF.NeedStructure) {
-    CRSSparsity GFT = trans(GF_.output()).sparsity();
-    const std::vector<int> & col = GFT.col();
-    for (int i=0;i<col.size();++i) worhp_w.DF.row[i] = col[i] + 1; // Index-1 based
-  }
-  
-  if (worhp_w.DG.NeedStructure) {
-    CRSSparsity JT = trans(J_.output()).sparsity();
-    const std::vector<int> & col = JT.col();
-    const std::vector<int> & row = JT.rowind();
-    for (int i=0;i<col.size();++i) worhp_w.DG.row[i] = col[i] + 1;
-    for (int i=0;i<row.size();++i) worhp_w.DG.col[i] = row[i] + 1;
-  }
-  
-  std::cout << "clear" << std::endl;
-  
-  
-  /**
-  if (worhp_w.HM.NeedStructure) {
-    int nz=0;
-    vector<int> rowind,col;
-    trans(H_.output()).sparsity().getSparsityCRS(rowind,col);
-    for(int r=0; r<rowind.size()-1; ++r)
-      for(int el=rowind[r]; el<rowind[r+1]; ++el){
-       if(col[el]<=r){
-          worhp_w.HM.col[nz] = r;
-          worhp_w.HM.row[nz] = col[el];
-          nz++;
-       }
-      }
-  }
-  */
-  
- 
   
   // Reverse Communication loop
   while(worhp_c.status < TerminateSuccess &&  worhp_c.status > TerminateError) {
@@ -212,6 +179,17 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
     }
 
     if (GetUserAction(&worhp_c, iterOutput)) {
+      if (!callback_.isNull()) {
+        // Copy outputs
+        copy(worhp_o.X,worhp_o.X+n_,callback_.input(NLP_X_OPT).begin());
+        callback_.input(NLP_COST)[0] = worhp_o.F;
+        copy(worhp_o.G,worhp_o.G+n_,callback_.input(NLP_G).begin());
+        copy(worhp_o.Lambda,worhp_o.Lambda+n_,callback_.input(NLP_LAMBDA_X).begin());
+        copy(worhp_o.Mu,worhp_o.Mu+n_,callback_.input(NLP_LAMBDA_G).begin());
+        
+        callback_.evaluate();
+      }
+    
       IterationOutput(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
       DoneUserAction(&worhp_c, iterOutput);
     }
@@ -247,86 +225,16 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
 
   }
   
+  // Copy outputs
+  copy(worhp_o.X,worhp_o.X+n_,output(NLP_X_OPT).begin());
+  output(NLP_COST)[0] = worhp_o.F;
+  copy(worhp_o.G,worhp_o.G+n_,output(NLP_G).begin());
+  copy(worhp_o.Lambda,worhp_o.Lambda+n_,output(NLP_LAMBDA_X).begin());
+  copy(worhp_o.Mu,worhp_o.Mu+n_,output(NLP_LAMBDA_G).begin());
+  
   StatusMsg(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
   WorhpFree(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
  
-}
-
-bool WorhpInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {
-/*
-  try {
-    log("intermediate_callback started");
-    double time1 = clock();
-    if (!callback_.isNull()) {
-#ifdef WITH_WORHP_CALLBACK 
-      copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
-      
-      vector<double>& lambda_x = callback_.input(NLP_LAMBDA_X).data();
-      for(int i=0; i<lambda_x.size(); ++i){
-        lambda_x[i] = z_U[i]-z_L[i];
-      }
-      copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
-      copy(g,g+m_,callback_.input(NLP_G).begin());
-      
-#endif // WITH_WORHP_CALLBACK 
-
-#ifndef WITH_WORHP_CALLBACK 
-   if (iter==0) {
-      cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://sourceforge.net/apps/trac/casadi/wiki/enableWorhpCallback to enable it." << endl;
-   }
-#endif // WITH_WORHP_CALLBACK 
-      callback_.input(NLP_COST).at(0) = obj_value;
-      callback_->stats_["iter"] = iter;
-      callback_->stats_["inf_pr"] = inf_pr;
-      callback_->stats_["inf_du"] = inf_du;
-      callback_->stats_["mu"] = mu;
-      callback_->stats_["d_norm"] = d_norm;
-      callback_->stats_["regularization_size"] = regularization_size;
-      callback_->stats_["alpha_pr"] = alpha_pr;
-      callback_->stats_["alpha_du"] = alpha_du;
-      callback_->stats_["ls_trials"] = ls_trials;
-      callback_.evaluate();
-      double time2 = clock();
-      t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
-      return  !callback_.output(0).at(0);
-    } else {
-      return 1;
-    }
-  } catch (exception& ex){
-    if (getOption("iteration_callback_ignore_errors")) {
-      cerr << "intermediate_callback: " << ex.what() << endl;
-    } else {
-      throw ex;
-    }
-  }
-  */
-}
-
-void WorhpInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
-/*
-  try {
-    // Get primal solution
-    copy(x,x+n_,output(NLP_X_OPT).begin());
-
-    // Get optimal cost
-    output(NLP_COST).at(0) = obj_value;
-
-    // Get dual solution (simple bounds)
-    vector<double>& lambda_x = output(NLP_LAMBDA_X).data();
-    for(int i=0; i<lambda_x.size(); ++i){
-      lambda_x[i] = z_U[i]-z_L[i];
-    }
-
-    // Get dual solution (nonlinear bounds)
-    copy(lambda,lambda+m_,output(NLP_LAMBDA_G).begin());
-    
-    // Get the constraints
-    copy(g,g+m_,output(NLP_G).begin());
-    
-  } catch (exception& ex){
-    cerr << "finalize_solution failed: " << ex.what() << endl;
-  }
-  */
 }
 
 bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lambda, double* values){
@@ -334,27 +242,27 @@ bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lam
     log("eval_h started");
     double time1 = clock();
     // Number of inputs to the hessian
-    int n_hess_in = H_.getNumInputs();
+    int n_hess_in = H_tril_.getNumInputs();
     
     // Pass input
-    H_.setInput(x);
+    H_tril_.setInput(x);
     if(n_hess_in>1){
-      H_.setInput(lambda, n_hess_in==4? 2 : 1);
-      H_.setInput(obj_factor, n_hess_in==4? 3 : 2);
+      H_tril_.setInput(lambda, n_hess_in==4? 2 : 1);
+      H_tril_.setInput(obj_factor, n_hess_in==4? 3 : 2);
     }
 
     // Evaluate
-    H_.evaluate();
+    H_tril_.evaluate();
 
     // Scale objective
     if(n_hess_in==1 && obj_factor!=1.0){
-      for(vector<double>::iterator it=H_.output().begin(); it!=H_.output().end(); ++it){
+      for(vector<double>::iterator it=H_tril_.output().begin(); it!=H_tril_.output().end(); ++it){
         *it *= obj_factor;
       }
     }
 
     // Get results
-    H_.output().get(values,SPARSESYM);
+    H_tril_.output().get(values);
       
     double time2 = clock();
     t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -385,7 +293,7 @@ bool WorhpInternal::eval_jac_g(const double* x,double* values){
     J_.evaluate();
 
     // Get the output
-    J_.getOutput(values);
+    trans(J_.output()).get(values);
     
     if(monitored("eval_jac_g")){
       cout << "x = " << J_.input().data() << endl;
@@ -534,80 +442,5 @@ bool WorhpInternal::eval_grad_f(const double* x,double scale , double* grad_f )
   }
 }
 
-
-void WorhpInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
-{
-/*
-  try {
-    n = n_;               // number of variables
-    m = m_;               // number of constraints
-
-    // Get Jacobian sparsity pattern
-    if(G_.isNull())
-      nnz_jac_g = 0;
-    else
-      nnz_jac_g = J_.output().size();
-
-    // Get Hessian sparsity pattern
-    if(exact_hessian_)
-      nnz_h_lag = H_.output().sparsity().sizeL();
-    else
-      nnz_h_lag = 0;
-  } catch (exception& ex){
-    cerr << "get_nlp_info failed: " << ex.what() << endl;
-  }
-  */
-}
-
-int WorhpInternal::get_number_of_nonlinear_variables() const{
-/*
-  try {
-    if(H_.isNull() || !bool(getOption("pass_nonlinear_variables"))){
-      // No Hessian has been interfaced
-      return -1;
-    } else {
-      // Number of variables that appear nonlinearily
-      int nv = 0;
-      
-      // Loop over the rows
-      for(int i=0; i<H_.output().size1(); ++i){
-        // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-        if(H_.output().rowind(i)!=H_.output().rowind(i+1))
-          nv++;
-      }
-      
-      // Return the number
-      return nv;
-    }
-  } catch (exception& ex){
-    cerr << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
-    return -1;
-  }
-  */
-}
-
-bool WorhpInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const{
-/*
-  try {
-    // Running index
-    int el = 0;
-    
-    // Loop over the rows
-    for(int i=0; i<H_.output().size1(); ++i){
-      // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-      if(H_.output().rowind(i)!=H_.output().rowind(i+1)){
-        pos_nonlin_vars[el++] = i;
-      }
-    }
-    
-    // Assert number and return
-    casadi_assert(el==num_nonlin_vars);
-    return true;
-  } catch (exception& ex){
-    cerr << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
-    return false;
-  }
-  */
-}
 
 } // namespace CasADi
