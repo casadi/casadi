@@ -945,7 +945,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
       ret[d][iind] = dwork[el][d];
     }
   }
-  cout << "f" << endl;
+/*  cout << "f" << endl;*/
   return ret;
 }
 
