@@ -2566,7 +2566,7 @@ void CRSSparsityInternal::getNZInplace(std::vector<int>& indices) const{
       int j = col_[el];
       
       // Add leading elements not in pattern
-      while(i<el_row || (i==el_row && j<el_col)){
+      while(i>el_row || (i==el_row && j>el_col)){
         // Mark as not found
         *it = -1;
         
@@ -2582,13 +2582,14 @@ void CRSSparsityInternal::getNZInplace(std::vector<int>& indices) const{
       while(i==el_row && j==el_col){
         // Save element index
         *it = el;
-        
+
         // Increase index and terminate if end of vector reached
         if(++it==indices.end()) return;
 
         // Next element sought
         el_row = *it % nrow_;
         el_col = *it / nrow_;
+        
       }
     }
   }

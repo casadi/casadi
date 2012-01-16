@@ -279,19 +279,9 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
     const CRSSparsity &osp = sparsity(oind);
     const vector<int>& ocol = osp.col();
     vector<int> orow = osp.getRow();
-
-    // Zero output
-    MX zero_output = MX::sparse(d1,d2);
     
-    // Initialize output to zero
-    if(!output_given){
-      *output[oind] = zero_output;
-    }
-    
-    // Initialize forward derivatives to zero
-    for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][oind] = zero_output;
-    }
+    // Forward derivatives in sparse triplet format for all forward sensitivities
+    vector<vector<int> > s_row(nfwd), s_col(nfwd), s_inz(nfwd), s_offset(nfwd,vector<int>(1,0));
     
     // For all inputs
     for(int iind=0; iind<input.size(); ++iind){
@@ -306,21 +296,45 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
 
       // Get references to the assignment operations
       const IOMap& assigns = index_output_sorted_[oind][iind];
-      
-      // Find out which matrix elements that we are trying to calculate
-      vector<int> row_wanted(assigns.size()), col_wanted(assigns.size()), el_wanted(assigns.size());
+
+      // Find out which matrix elements that we are trying to access
+      vector<int> el_known(assigns.size());
       for(int k=0; k<assigns.size(); ++k){
-        row_wanted[k] = orow[assigns[k].second];
-        col_wanted[k] = ocol[assigns[k].second];
-        el_wanted[k] = row_wanted[k] + col_wanted[k]*osp.size1();
+        el_known[k] = irow[assigns[k].first] + icol[assigns[k].first]*isp.size1();
+      }
+
+      // Temporary vectors
+      vector<int> temp = el_known;
+      
+      // Evaluate the nondifferentiated function
+      if(!output_given){
+        casadi_assert(0);
       }
       
-      // Find out which matrix elements that we are trying to access
-      vector<int> row_known(assigns.size()), col_known(assigns.size()), el_known(assigns.size());
+      // Forward sensitivities
+      for(int d=0; d<nfwd; ++d){
+        
+        // Get the requested nonzeros
+        copy(el_known.begin(),el_known.end(),temp.begin());
+        fwdSeed[d][iind]->sparsity().getNZInplace(temp);
+
+        // Add to sparsity pattern
+        for(int k=0; k<assigns.size(); ++k){
+          if(temp[k]!=-1){
+            s_inz[d].push_back(temp[k]);
+            s_col[d].push_back(ocol[assigns[k].second]);
+            s_row[d].push_back(orow[assigns[k].second]);
+          }
+        }
+        s_offset[d].push_back(s_inz[d].size());
+      }
+
+
+#if 0
+      // Find out which matrix elements that we are trying to calculate
+      vector<int> el_wanted(assigns.size());
       for(int k=0; k<assigns.size(); ++k){
-        row_known[k] = irow[assigns[k].first];
-        col_known[k] = icol[assigns[k].first];
-        el_known[k] = row_known[k] + col_known[k]*isp.size1();
+        el_wanted[k] = orow[assigns[k].second] + ocol[assigns[k].second]*osp.size1();
       }
       
       // Create a copy of assign which is order by increasing input nonzero
@@ -335,49 +349,51 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
           assigns2.push_back(pair<int,int>(inz,*it));
         }
       }
-      
-      // Temporary vectors
-      vector<int> temp = el_known;
-      vector<int> s_row, s_col, s_inz, s_mapping;
-      
-      // Evaluate the nondifferentiated function
-      if(!output_given){
-        // Get the requested nonzeros
-        input[iind]->sparsity().getNZInplace(temp);
-        
-        // Add to sparsity pattern
-        for(int k=0; k<assigns.size(); ++k){
-          if(temp[k]!=-1){
-            s_inz.push_back(temp[k]);
-            s_col.push_back(icol[assigns[k].second]);
-            s_row.push_back(irow[assigns[k].second]);
-          }
-        }
-        
-        // Create a sparsity pattern from vectors
-        CRSSparsity s_sp = sp_triplet(osp.size1(),osp.size2(),s_row,s_col,s_mapping);
-        
-        // Create a mapping matrix
-        MX s = MX::create(new Mapping(s_sp));
-        
-        // Add the dependencies
-        //s->addDependency(*input[iind],);
-      }
-      
-      // The elements in the block
-      vector<int> elems(assigns.size());
-      
-      // Forward sensitivities
-      for(int d=0; d<nfwd; ++d){
-        // Get the requested nonzeros
-        copy(el_known.begin(),el_known.end(),temp.begin());
-        fwdSeed[d][iind]->sparsity().getNZInplace(temp);
-      }
+#endif
       
       // Adjoint sensitivities
       for(int d=0; d<nadj; ++d){
         
       }
+    }
+    
+    
+    // Now create the outputs
+    vector<int> s_onz, s_inz_local, s_onz_local;
+    for(int d=0; d<nfwd; ++d){
+      
+      // Create a sparsity pattern from vectors
+      s_onz.clear();
+      CRSSparsity s_sp = sp_triplet(osp.size1(),osp.size2(),s_row[d],s_col[d],s_onz,false,true);
+      
+      // Create a mapping matrix
+      *fwdSens[d][oind] = MX::create(new Mapping(s_sp));
+      
+      // Add all the dependencies
+      for(int iind=0; iind<input.size(); ++iind){
+        if(input[iind]==0) continue; // Skip if input doesn't exist
+        
+        // Get the elements corresponding to the input index
+        int iind0 = s_offset[d][iind], iind1 = s_offset[d][iind+1];
+
+        // Get the input nonzeros
+        s_inz_local.resize(iind1-iind0);
+        copy(s_inz[d].begin()+iind0,s_inz[d].begin()+iind1,s_inz_local.begin());
+        
+        // Get the output nonzeros
+        s_onz_local.resize(iind1-iind0);
+        copy(s_onz.begin()+iind0,s_onz.begin()+iind1,s_onz_local.begin());
+        
+        // Save to mapping
+        (*fwdSens[d][oind])->addDependency(*fwdSeed[d][iind],s_inz_local,s_onz_local);
+      }
+    }
+  }
+  
+  vector<MX> bu(fwdSens.size());
+  for(int d=0; d<fwdSens.size(); ++d){
+    if(fwdSens[d][0]){
+      bu[d] = *fwdSens[d][0];
     }
   }
   
@@ -469,11 +485,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       cout << endl;*/
     }
     
-    // Now for all forward directions
-    for(int d=0; d<nfwd; ++d){
-      
-    }
-    
     // Now for all adjoint directions NOTE: This is a quick-hack and need to be fixed for larger systems
     for(int d=0; d<nadj; ++d){
       for(int iind=0; iind<n; ++iind){
@@ -493,188 +504,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
           }
         }
       }
-      
-/*      // Sparsity of the adjoint sensitivities
-      vector<CRSSparsity> sp_adjsens(n);
-      for(int iind=0; iind<n; ++iind){
-        sp_adjsens[iind] = CRSSparsity(0,input[iind]->size1());
-      }
-      
-      // Loop over the rows of the adjoint seed
-      for(int i=0; i<d1; ++i){
-        
-        
-        
-      }*/
-      
-      
-        
-// /*        // Sparsity of the adjoint seed
-//         const CRSSparsity& sp_a = adjSeed[d][iind]->sparsity();
-//         const vector<int>& c_a = sp_a.col();
-//         const vector<int>& r_a = sp_a.rowind();
-//         int d1_a = sp_a.size1();
-//         int d2_a = sp_a.size2();*/
-
-        
-        
-        
-        
-//        sp_dep
-//      }
-      
-    }
-    return;
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // Quick return if no inputs
-  if(nfwd>0 && input.empty()){
-    for(int oind=0; oind<output.size(); ++oind){
-      if(fwdSens[0][oind]!=0){
-        *fwdSens[0][oind] = MX::sparse(d1,d2);
-        for(int d=0; d<nfwd; ++d){
-          *fwdSens[d][oind] = *fwdSens[0][oind];
-        }
-      }
-    }
-    return;
-  }
-  
-  // Mapping each nonzero to a nonzero of the forward sensitivity matrix, of -1 if none
-  vector<int> nzind_sens(output_sorted_.size()); // BUG? Initialize to -1?
-  
-  // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
-  vector<int> fsens_ind;
-
-  // Mapping for a specific input
-  vector<int> &nz = fsens_ind; // reuse memory
-  vector<int> nzd;
-
-  // For all forward directions
-  for(int d=0; d<nfwd; ++d){
-
-    // Number of nonzeros of the output
-    int nnz=0;
-    
-    // For all inputs
-    for(int iind=0; iind<input.size(); ++iind){
-      // Mapping from input nonzero index to forward sensitivity nonzero index, or -1
-      fsens_ind.resize(input[iind]->size());
-      fill(fsens_ind.begin(),fsens_ind.end(),-1);
-      
-      // Get sparsity of the input and forward sensitivity
-      int id1=input[iind]->size1(), id2=input[iind]->size2();
-      const vector<int>& rowind_i = input[iind]->sparsity().rowind();
-      const vector<int>& rowind_f = fwdSeed[d][iind]->sparsity().rowind();
-      const vector<int>& col_i = input[iind]->sparsity().col();
-      const vector<int>& col_f = fwdSeed[d][iind]->sparsity().col();
-      
-      // Loop over rows of input and forward sensitivities
-      for(int i=0; i<id1; ++i){
-        
-        // Nonzero of the forward sensitivity
-        int el_f = rowind_f[i];
-
-        // Column of the forward sensitivity (-1 if no element)
-        int j_f = el_f==rowind_f[i+1] ? -1 : col_f[el_f];
-        
-        // Loop over nonzeros of the input
-        for(int el=rowind_i[i]; el<rowind_i[i+1]; ++el){
-          
-          // Column of the input
-          int j=col_i[el];
-          
-          // Continue to the same entry in the forward sensitivity matrix
-          while(el_f < rowind_f[i+1] && j_f<j){
-            el_f++;
-            j_f = col_f[el_f];
-          }
-          
-          // Add element to temp vector or -1 of no corresponding entry
-          fsens_ind[el] = j==j_f ? el_f : -1;
-        }
-      }
-
-      // Update nonzero vector
-      for(int el=0; el<nzind_sens.size(); ++el){
-        // Check if dependency index match
-        if(output_sorted_[el][0].iind==iind){
-          
-          // Point nzind_sens to the nonzero index of the sensitivity
-          nzind_sens[el] = fsens_ind[output_sorted_[el][0].inz];
-          
-          // Count the number of nonzeros
-          nnz += int(nzind_sens[el]>=0);
-        }
-      }
-    }
-    
-    // Sparsity of the return matrix
-    CRSSparsity sp_fsens(d1,d2);
-    sp_fsens.reserve(nnz,d1);
-    
-    // Get references to the vectors
-    vector<int>& col_fsens = sp_fsens.colRef();
-    vector<int>& rowind_fsens = sp_fsens.rowindRef();
-    
-    // Loop over rows of the resulting matrix
-    for(int i=0; i<d1; ++i){
-      
-      // Loop over the nonzero elements of the resulting matrix
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-      
-        // If the corresponding entry exists in the sensitivity matrix
-        if(nzind_sens[el]>=0){
-          
-          // Get column
-          int j=col[el];
-          
-          // Add nonzero
-          col_fsens.push_back(j);
-        }
-      }
-      
-      // Save upper bound on nonzero index of the row
-      rowind_fsens[i+1] = col_fsens.size();
-    }
-    
-    // Return matrix
-    *fwdSens[d][0] = MX::create(new Mapping(sp_fsens));
-    
-    // Add the dependencies
-    for(int dp=0; dp<input.size(); ++dp){
-      
-      // Get the local nonzeros
-      nz.clear();
-      nzd.clear();
-      int el=0;
-      for(int k=0; k<nzind_sens.size(); ++k){
-        // If a nonzero
-        if(nzind_sens[k]>=0){
-        
-          // If dependency matches
-          if(output_sorted_[k][0].iind==dp){
-            nz.push_back(el);
-            nzd.push_back(nzind_sens[k]);
-          }
-          
-          // Next nonzero
-          el++;
-        }
-      }
-      
-      // Save to return matrix
-      (*fwdSens[d][0])->addDependency(*fwdSeed[d][dp],nzd,nz);
     }
   }
 }
