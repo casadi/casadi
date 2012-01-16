@@ -71,9 +71,6 @@ class Mapping : public MXNode{
     /// Initialize
     virtual void init();
 
-    /// Check if the mapping is ready
-    bool isReady() const;
-    
     /// Map to locate the dependencies
     std::map<const MXNode*, int> depmap_;
 

@@ -28,7 +28,7 @@
 #include "../fx/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-const bool ELIMINATE_NESTED = false;
+const bool ELIMINATE_NESTED = true;
 
 using namespace std;
 
@@ -141,13 +141,7 @@ void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
   }
 }
 
-bool Mapping::isReady() const{
-  return true;
-}
-    
 void Mapping::printPart(std::ostream &stream, int part) const{
-  casadi_assert(isReady());
-
   if(ndep()==0){
     stream << "sparse(" << size1() << "," << size2() << ")";
   } else if(numel()==1 && size()==1 && ndep()==1 && output_sorted_[0].size()==1){
@@ -191,11 +185,21 @@ void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector
   if(inz.empty()) return;
   
   if(ELIMINATE_NESTED && d->isMapping()){ // Move this logic to init!
+    // Clear the existing element if we are not adding
+    if(!add){
+      for(int k=0; k<onz.size(); ++k){
+        output_sorted_[onz[k]].clear();
+      }
+    }
+    
     // Eliminate if a mapping node
     const Mapping* dnode = static_cast<const Mapping*>(d.get());
     vector<MX> d2 = dnode->dep_;
+    
+    // Split the vector according to dependency index
     vector<vector<int> > inz2(d2.size()), onz2(d2.size());
     for(int k=0; k<inz.size(); ++k){
+      
       // Get the sum
       const std::vector<OutputNZ>& sum = dnode->output_sorted_[inz[k]];
       
@@ -208,7 +212,7 @@ void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector
     
     // Call the function recursively
     for(int i=0; i<d2.size(); ++i){
-      assign(d2[i],inz2[i],onz2[i]);
+      assign(d2[i],inz2[i],onz2[i],true);
     }
   } else {
     // Add the node if it is not already a dependency
