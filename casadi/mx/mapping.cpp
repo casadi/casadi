@@ -27,6 +27,7 @@
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
 const bool ELIMINATE_NESTED = true;
 
@@ -306,7 +307,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       // Get references to the assignment operations
       const IOMap& assigns = index_output_sorted_[oind][iind];
       
-      // Step 1: Find out which matrix elements that we are trying to calculate
+      // Find out which matrix elements that we are trying to calculate
       vector<int> row_wanted(assigns.size()), col_wanted(assigns.size()), el_wanted(assigns.size());
       for(int k=0; k<assigns.size(); ++k){
         row_wanted[k] = orow[assigns[k].second];
@@ -314,7 +315,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         el_wanted[k] = row_wanted[k] + col_wanted[k]*osp.size1();
       }
       
-      // Step 2: Find out which matrix elements that we are trying to access
+      // Find out which matrix elements that we are trying to access
       vector<int> row_known(assigns.size()), col_known(assigns.size()), el_known(assigns.size());
       for(int k=0; k<assigns.size(); ++k){
         row_known[k] = irow[assigns[k].first];
@@ -322,21 +323,45 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         el_known[k] = row_known[k] + col_known[k]*isp.size1();
       }
       
-      // Find the order of the inputs in the inputs
-      vector<int> iorder(isp.size(),-1);
-      for(int k=0; k<assigns.size(); ++k) 
-        iorder[assigns[k].first] = k;
-      int iorderk=0;
-      for(vector<int>::const_iterator it=iorder.begin(); it!=iorder.end(); ++it){
-        if(*it>=0) iorder[iorderk++] = *it;
+      // Create a copy of assign which is order by increasing input nonzero
+      IOMap assigns2;
+      assigns2.reserve(assigns.size());
+      vector<vector<int> > iorder(isp.size());
+      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+        iorder[it->first].push_back(it->second);
       }
-      iorder.resize(iorderk);
+      for(int inz=0; inz<iorder.size(); ++inz){
+        for(vector<int>::const_iterator it=iorder[inz].begin(); it!=iorder[inz].end(); ++it){
+          assigns2.push_back(pair<int,int>(inz,*it));
+        }
+      }
+      
+      // Temporary vectors
+      vector<int> temp = el_known;
+      vector<int> s_row, s_col, s_inz, s_mapping;
       
       // Evaluate the nondifferentiated function
       if(!output_given){
-        // Get references to the data
-        MX& ip = *output[oind];
-        MX& op = *input[iind];
+        // Get the requested nonzeros
+        input[iind]->sparsity().getNZInplace(temp);
+        
+        // Add to sparsity pattern
+        for(int k=0; k<assigns.size(); ++k){
+          if(temp[k]!=-1){
+            s_inz.push_back(temp[k]);
+            s_col.push_back(icol[assigns[k].second]);
+            s_row.push_back(irow[assigns[k].second]);
+          }
+        }
+        
+        // Create a sparsity pattern from vectors
+        CRSSparsity s_sp = sp_triplet(osp.size1(),osp.size2(),s_row,s_col,s_mapping);
+        
+        // Create a mapping matrix
+        MX s = MX::create(new Mapping(s_sp));
+        
+        // Add the dependencies
+        //s->addDependency(*input[iind],);
       }
       
       // The elements in the block
@@ -344,7 +369,9 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       
       // Forward sensitivities
       for(int d=0; d<nfwd; ++d){
-        
+        // Get the requested nonzeros
+        copy(el_known.begin(),el_known.end(),temp.begin());
+        fwdSeed[d][iind]->sparsity().getNZInplace(temp);
       }
       
       // Adjoint sensitivities

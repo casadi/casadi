@@ -112,13 +112,13 @@ CRSSparsity CRSSparsityInternal::transpose() const{
   return transpose(mapping);
 }
 
-CRSSparsity CRSSparsityInternal::transpose(vector<int>& mapping) const{
+CRSSparsity CRSSparsityInternal::transpose(vector<int>& mapping, bool invert_mapping) const{
   // Get the sparsity of the transpose in sparse triplet form
   const vector<int>& trans_row = col_;
   vector<int> trans_col = getRow();
 
   // Create the sparsity pattern
-  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping,true);
+  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping,true,invert_mapping);
 
 }
 
