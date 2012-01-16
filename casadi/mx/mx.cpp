@@ -191,7 +191,7 @@ const MX MX::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
    return ret;
 }
 
-const MX MX::getSub(const CRSSparsity& sp) const {
+const MX MX::getSub(const CRSSparsity& sp, int dummy) const {
   casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
   vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
   

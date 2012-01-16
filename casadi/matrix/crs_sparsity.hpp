@@ -60,7 +60,7 @@ class CRSSparsityInternal;
   If the matrix is dense, i.e. length(col) == size1()*size2(), the format reduces to standard dense
   row major format, which allows access to an arbitrary element in constant time.
   
-  Since the object is reference counted (it inherits from SharedObject), severl matrices are allowed
+  Since the object is reference counted (it inherits from SharedObject), several matrices are allowed
   to share the same sparsity pattern.
   
   The implementations of some methods of this class has been taken from the CSparse package and modified
@@ -74,8 +74,8 @@ class CRSSparsityInternal;
 class CRSSparsity : public SharedObject{
   public:
   
-    /// Default constructor, optional int argument which must be zero to allows implicit type conversion
-    CRSSparsity(int null=0);
+    /// Default constructor
+    CRSSparsity();
     
     /// Construct a sparsity pattern (sparse/dense)
     CRSSparsity(int nrow, int ncol, bool dense=false);

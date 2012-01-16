@@ -102,7 +102,7 @@ class MX : public SharedObject{
 
     /** \brief  Get vector element or slice */
     template<typename I>
-    const MX operator()(const I& i) const{ return getSub(i,0);}
+    const MX operator()(const I& i) const{ return getSub(i);}
     
     /** \brief  Get Matrix element or slice */
     template<typename I, typename J>
@@ -411,7 +411,7 @@ class MX : public SharedObject{
   const MX getSub(const std::vector<int>& i, int j) const;
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
   const MX getSub(const Matrix<int>& k) const;
-  const MX getSub(const CRSSparsity& sp) const;
+  const MX getSub(const CRSSparsity& sp, int dummy=0) const;
   const MX getSub(const std::vector<int>& i, const Matrix<int>& k) const;
   const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;
   const MX getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}

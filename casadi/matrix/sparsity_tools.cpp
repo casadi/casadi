@@ -219,7 +219,7 @@ CRSSparsity trans(const CRSSparsity& a) {
 }
 
 
-CRSSparsity lowerSparsity(const CRSSparsity& a) {
+CRSSparsity lowerSparsity(const CRSSparsity& a, bool includeDiagonal) {
   const std::vector<int> & col= a.col();
   std::vector<int> row = a.getRow();
   
@@ -227,16 +227,18 @@ CRSSparsity lowerSparsity(const CRSSparsity& a) {
   std::vector<int> new_col;   // new col
   std::vector<int> new_row;   // new row
   
+  int offset = (includeDiagonal ? 1 : 0);
+  
   // Find size
   int n=0;
-  for (int k=0;k<row.size();k++) n+= row[k] >= col[k];
+  for (int k=0;k<row.size();k++) n+= row[k] + offset > col[k];
   new_col.resize(n);
   new_row.resize(n);
   
   // populate return vector
   int cnt=0;
   for (int k=0;k<row.size();k++) {
-    if (row[k] >= col[k]) {
+    if (row[k] + offset > col[k]) {
       new_col[cnt]=col[k];
       new_row[cnt]=row[k];
       cnt++;
