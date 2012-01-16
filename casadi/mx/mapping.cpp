@@ -28,7 +28,7 @@
 #include "../fx/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-const bool ELIMINATE_NESTED = true;
+const bool ELIMINATE_NESTED = false;
 
 using namespace std;
 
@@ -315,10 +315,39 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       // Get references to the assignment operations
       const IOMap& assigns = index_output_sorted_[oind][iind];
 
-      // Find out which matrix elements that we are trying to access
-      vector<int> el_known(assigns.size());
+      // Find out which matrix elements that we are trying to calculate
+      vector<int> el_wanted(assigns.size()); // TODO: Move outside loop
       for(int k=0; k<assigns.size(); ++k){
-        el_known[k] = irow[assigns[k].first] + icol[assigns[k].first]*isp.size1();
+        el_wanted[k] = orow[assigns[k].second] + ocol[assigns[k].second]*osp.size1();
+      }
+
+      // We next need to resort the assigns vector with increasing inputs instead of outputs
+      // Start by counting the number of inputs corresponding to each nonzero
+      vector<int> inz_count(icol.size()+1,0);
+      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+        inz_count[it->first+1]++;
+      }
+      
+      // Cumsum to get index offset for input nonzero
+      for(int i=0; i<icol.size(); ++i){
+        inz_count[i+1] += inz_count[i];
+      }
+      
+      // Get the order of assignments
+      vector<int> assigns_order(assigns.size()); // TODO: Move allocation outside loop
+      for(int k=0; k<assigns.size(); ++k){
+        // Save the new index
+        assigns_order[inz_count[assigns[k].first]++] = k;
+      }
+
+      // Find out which matrix elements that we are trying to calculate
+      vector<int> el_known(assigns.size()); // TODO: Move allocation outside loop
+      for(int k=0; k<assigns.size(); ++k){
+        // Get output nonzero
+        int inz_k = assigns[assigns_order[k]].first;
+        
+        // Get element
+        el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
       }
 
       // Temporary vectors
@@ -340,51 +369,22 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         for(int k=0; k<assigns.size(); ++k){
           if(temp[k]!=-1){
             f_inz[d][oind].push_back(temp[k]);
-            f_col[d][oind].push_back(ocol[assigns[k].second]);
-            f_row[d][oind].push_back(orow[assigns[k].second]);
+            f_col[d][oind].push_back(ocol[assigns[assigns_order[k]].second]);
+            f_row[d][oind].push_back(orow[assigns[assigns_order[k]].second]);
           }
         }
         f_offset[d][oind].push_back(f_inz[d][oind].size());
       }
       
       // Continue of no adjoint sensitivities
-      if(nfwd==0) continue;
-      
-      // We next need to resort the assigns vector with increasing inputs instead of outputs
-      // Start by counting the number of inputs corresponding to each nonzero
-      vector<int> inz_count(icol.size()+1,0);
-      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
-        inz_count[it->first+1]++;
-      }
-      
-      // Cumsum to get index offset for input nonzero
-      for(int i=0; i<icol.size(); ++i){
-        inz_count[i+1] += inz_count[i];
-      }
-      
-      // Get the order of assignments
-      vector<int> assigns_order(assigns.size()); // // TODO: Move outside loop
-      for(int k=0; k<assigns.size(); ++k){
-        // Save the new index
-        assigns_order[inz_count[assigns[k].first]++] = k;
-      }
-
-      // Find out which matrix elements that we are trying to calculate
-      vector<int> el_wanted(assigns.size()); // TODO: Move outside loop
-      for(int k=0; k<assigns.size(); ++k){
-        // Get output nonzero
-        int onz_k = assigns[el_wanted[k]].second;
-        
-        // Get element
-        el_wanted[k] = orow[onz_k] + ocol[onz_k]*osp.size1();
-      }
+      if(nadj==0) continue;
       
       // Resize temp to be able to hold el_wanted
       temp.resize(el_wanted.size());
       
       // Adjoint sensitivities
       for(int d=0; d<nadj; ++d){
-
+        
         // Get the matching nonzeros
         copy(el_wanted.begin(),el_wanted.end(),temp.begin());
         adjSeed[d][oind]->sparsity().getNZInplace(temp);
@@ -393,8 +393,8 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         for(int k=0; k<assigns.size(); ++k){
           if(temp[k]!=-1){
             a_onz[d][iind].push_back(temp[k]);
-            a_col[d][iind].push_back(icol[assigns[assigns_order[k]].second]);
-            a_row[d][iind].push_back(irow[assigns[assigns_order[k]].second]);
+            a_col[d][iind].push_back(icol[assigns[k].first]);
+            a_row[d][iind].push_back(irow[assigns[k].first]);
           }
         }
         a_offset[d][iind].push_back(a_onz[d][iind].size());
@@ -414,7 +414,6 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       const CRSSparsity &osp = sparsity(oind);
 
       // Create a sparsity pattern from vectors
-      f_onz.clear();
       CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d][oind],f_col[d][oind],f_onz,false,true);
       
       // Create a mapping matrix
@@ -444,19 +443,17 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   // Create the adjoint sensitivity matrices
   vector<int>& a_inz=f_onz; // reuse
   for(int d=0; d<nadj; ++d){
-    continue;
-  
+
     // For all inputs
     for(int iind=0; iind<input.size(); ++iind){
       if(input[iind]==0) continue; // Skip if input doesn't exist
         
       // Input sparsity
-      const CRSSparsity &isp = dep(iind).sparsity();
-        
+      const CRSSparsity &isp = input[iind]->sparsity();
+      
       // Create a sparsity pattern from vectors
-      a_inz.clear();
       CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d][iind],a_col[d][iind],a_inz,false,true);
-        
+      
       // Create a mapping matrix
       MX s = MX::create(new Mapping(a_sp));
      
@@ -476,125 +473,11 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
         copy(a_onz[d][iind].begin()+oind0,a_onz[d][iind].begin()+oind1,onz_local.begin());
         
         // Save to mapping
-        s->assign(*adjSeed[d][iind],onz_local,inz_local,true);
+        s->assign(*adjSeed[d][oind],onz_local,inz_local,true);
       }
       
       // Save to adjoint sensitivities
-      //*adjSens[d][iind] += s; // FIXME: DOES NOT YET WORK, DEBUGGING NEEDED
-    }
-  }
-  
-  // NOTE: Everything below should be deleted
-  
-//  return;
-  //casadi_assert(nadj==0);
-  
-  casadi_assert(isReady());
-  if(nadj>0){
-    // Number of inputs
-    int n = input.size();
-    
-    // All the input and output nonzeros and indices
-    vector<vector<int> > input_el(n), input_el_sorted(n);
-    vector<vector<int> > output_el(n), output_el_sorted(n);
-    vector<int> input_nz;
-    
-    // Temporary vector
-    vector<int> temp;
-    
-    // For all inputs
-    for(int iind=0; iind<n; ++iind){
-      
-      // Find input/output pairs
-      input_nz.clear();
-      
-      // Loop over rows
-      for(int i=0; i<d1; ++i){
-        // Loop over nonzeros
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          // Get column
-          int j=col[k];
-          
-          // Add if index matches
-          if(output_sorted_[k][0].iind==iind){
-            input_nz.push_back(output_sorted_[k][0].inz);
-            output_el[iind].push_back(j + i*d2);
-          }
-        }
-      }
-      
-      // At this point we shall construct input_el and at the same time sort according to it
-      input_el[iind].resize(input_nz.size());
-      input_el_sorted[iind].resize(input_nz.size());
-      output_el_sorted[iind].resize(input_nz.size());
-      
-      // Get input sparsity
-      const CRSSparsity& sp_in = input[iind]->sparsity();
-      const vector<int>& c_in = sp_in.col();
-      const vector<int>& r_in = sp_in.rowind();
-      int d1_in = sp_in.size1();
-      int d2_in = sp_in.size2();
-      
-      // Add extra temporary elements if necessary
-      temp.resize(max(temp.size(),c_in.size()),-1);
-      
-      // Mark inputs
-      for(int k=0; k<input_nz.size(); ++k){
-        temp[input_nz[k]] = k;
-      }
-      
-      // Loop over rows
-      int el = 0;
-      for(int i=0; i<d1_in; ++i){
-        // Loop over nonzeros
-        for(int k=r_in[i]; k<r_in[i+1]; ++k){
-          // Get column
-          int j=c_in[k];
-          
-          // Save to vector if nonzero requested
-          if(temp[k]>=0){
-            input_el[iind][temp[k]] = input_el_sorted[iind][el] = j + i*d2_in;
-            output_el_sorted[iind][temp[k]] = output_el[iind][el];
-            el++;
-          }
-        }
-      }
-      casadi_assert(el==output_el[iind].size());
-      
-      // Unmark inputs
-      for(int k=0; k<input_nz.size(); ++k){
-        temp[input_nz[k]] = -1;
-      }
-      
-      // At this point we have two vector pairs, output_el and input_el containing the elements of the mapping matrix
-      // sorted according to output and output_el_sorted and input_el_sorted containing the same information but 
-      // sorted according to input
-  /*    cout << "output_el = " << output_el << endl;
-      cout << "input_el = " << input_el << endl;
-      cout << "output_el_sorted = " << output_el_sorted << endl;
-      cout << "input_el_sorted = " << input_el_sorted << endl;
-      cout << endl;*/
-    }
-    
-    // Now for all adjoint directions NOTE: This is a quick-hack and need to be fixed for larger systems
-    for(int d=0; d<nadj; ++d){
-      for(int iind=0; iind<n; ++iind){
-        for(int k=0; k<input_el[iind].size(); ++k){
-          // Which element to get
-          int el = output_el[iind][k];
-          int o1 = el / adjSeed[d][0]->size2();
-          int o2 = el % adjSeed[d][0]->size2();
-          
-          // Get the seed
-          MX seed = (*adjSeed[d][0])(o1,o2);
-          if(!isZero(seed)){
-            int el = input_el[iind][k];
-            int i1 = el / adjSens[d][iind]->size2();
-            int i2 = el % adjSens[d][iind]->size2();
-            (*adjSens[d][iind])(i1,i2) += seed;
-          }
-        }
-      }
+      *adjSens[d][iind] += s;
     }
   }
 }
