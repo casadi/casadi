@@ -279,7 +279,68 @@ class Sparsitytests(casadiTestCase):
 
     self.checkarray(F_,G_,"vec SX")
     
+  def test_sparsityindex(self):
+    self.message("sparsity indexing")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (3,3),
+             (2,4),
+             (3,1),
+             (4,1)])
+    
+    a = CRSSparsity(5,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = ssym("b",a)
+    
+    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    
+    d = sp_diag(5)
+    c = b[d]
 
+    self.assertTrue(c.sparsity()==d)
+    
+    f = SXFunction([b],[c])
+    f.init()
+    f.input().set(range(1,len(nza)+1))
+    f.evaluate()
+    
+    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    
+  def test_sparsityindex(self):
+    self.message("sparsity indexing")
+    nza = set([  (0,0),
+             (0,1),
+             (2,0),
+             (2,3),
+             (3,3),
+             (2,4),
+             (3,1),
+             (4,1)])
+    
+    a = CRSSparsity(5,5)
+    for i in nza:
+      a.getNZ(i[0],i[1])
+      
+    b = msym("b",a)
+    
+    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    
+    d = sp_diag(5)
+    c = b[d]
+
+    self.assertTrue(c.sparsity()==d)
+    
+    f = MXFunction([b],[c])
+    f.init()
+    f.input().set(range(1,len(nza)+1))
+    f.evaluate()
+    
+    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    
   def test_getSparsityCCS(self):
     self.message("CCS format")
     nza = set([  (0,0),

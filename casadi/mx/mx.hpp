@@ -111,6 +111,9 @@ class MX : public SharedObject{
     /** \brief  Get Matrix slice */
     const MX operator()(const Matrix<int>& k) const{ return getSub(k); }
 
+    /** \brief  Get Sparsity slice */
+    const MX operator()(const CRSSparsity& sp) const{ return getSub(sp); }
+    
     /** \brief  Access vector element or slice */
     template<typename I>
     SubMatrix<MX,I,int> operator()(const I& i){ return SubMatrix<MX,I,int>(*this,i,0); }
@@ -160,6 +163,9 @@ class MX : public SharedObject{
     const MX indexed(const Matrix<int> &k) const{ 
       return (*this)(k);
     }
+    const MX indexed(const CRSSparsity &sp) const{ 
+      return (*this)(sp);
+    }
     const MX indexed(const Slice &i, const Matrix<int>& k) const{ return (*this)(i,k); }
     const MX indexed(const IndexList &i, const Matrix<int>& k) const{ 
       return (*this)(i.getAll(size1()),k);
@@ -196,6 +202,10 @@ class MX : public SharedObject{
     void indexed_assignment(const Matrix<int>& k, const MX &m){
       casadi_error("MX::operator()(Imatrix) not implemented yet");
       //(*this)(k) = m;
+    }
+    void indexed_assignment(const CRSSparsity& sp, const MX &m){
+      casadi_error("MX::operator()(CRSSparsity) not implemented yet");
+      //(*this)(sp) = m;
     }
     //@}
     
@@ -401,6 +411,7 @@ class MX : public SharedObject{
   const MX getSub(const std::vector<int>& i, int j) const;
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
   const MX getSub(const Matrix<int>& k) const;
+  const MX getSub(const CRSSparsity& sp) const;
   const MX getSub(const std::vector<int>& i, const Matrix<int>& k) const;
   const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;
   const MX getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
