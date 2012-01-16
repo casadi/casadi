@@ -341,13 +341,13 @@ CRSSparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const st
       
       // Loop over nonzero elements of the row
       while(it!=mapping1.end() && row[*it]==i){
-        
-        // Get the column
-        int j = col[*it];
-        
+
         // Get the element
         int el = *it;
         it++;
+
+        // Get the column
+        int j = col[el];
         
         // If not a duplicate, save to return matrix
         if(j!=j_prev)
@@ -356,7 +356,7 @@ CRSSparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const st
         if(invert_mapping){
           // Save to the inverse mapping
           mapping2[el] = r_el-1;        
-        
+        } else {
           // If not a duplicate, save to the mapping vector
           if(j!=j_prev)
             mapping1[r_el-1] = el;
