@@ -16,8 +16,9 @@ for m in L:
 
 V, (A,B,C,D) = createParent(L)
 
-print V[A.mapping()]
+# The code below has been commented out (it relies on the mapping() function which no longer exists
+#print V[A.mapping()]
 
-for m,n in zip(L,[A,B,C,D]):
-  print m, " => ", n, " = ", array(n.sparsity())
+#for m,n in zip(L,[A,B,C,D]):
+  #print m, " => ", n, " = ", array(n.sparsity())
 
