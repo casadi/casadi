@@ -486,4 +486,20 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
 }
 
+Matrix<int> Mapping::mapping(int iind) const {
+  casadi_assert_message(iind < ndep(),"Mapping::mapping(int): first argument (" << iind << ") must be smaller than ndep (" << ndep() << ").");
+  // TODO: make this efficient
+  std::vector< int > row;
+  std::vector< int > col;
+  sparsity().getSparsity(row,col);
+  Matrix<int> ret(size1(),size2());
+  for (int k=0;k<output_sorted_.size();++k) { // Loop over output non-zeros
+    for (int i=0;i<output_sorted_[k].size(); ++i) { // Loop over elements to be summed
+      const OutputNZ &el = output_sorted_[k][i];
+      if (el.iind==iind) ret(row[k],col[k]) = el.inz;
+    }
+  }
+  return ret;
+}
+
 } // namespace CasADi

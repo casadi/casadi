@@ -82,7 +82,10 @@ class Mapping : public MXNode{
     /// Operation sequence
     typedef std::vector<std::pair<int,int> > IOMap;
     
-    /// Operations sorted by output nonzero
+    /* Operations sorted by output nonzero - always available
+    *  The outer vector is size size()
+    *  The inner vector lists elements to be summed
+    */
     std::vector<std::vector<OutputNZ> > output_sorted_;
     
     /// Operations sorted by input and output index and then by output nonzero (this is the runtime)
@@ -101,6 +104,9 @@ class Mapping : public MXNode{
     
     /// Check equality for output index
     static bool outputEqual(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second==el2.second;}
+    
+    /// Construct the IMatrix that maps from the iind'th input to the output 
+    Matrix<int> mapping(int iind=0) const;
 };
 
 } // namespace CasADi

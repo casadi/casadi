@@ -1485,6 +1485,12 @@ class MXtests(casadiTestCase):
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
     
+  def test_mapping(self):
+    self.message("mapping")
+    V = msym("x",5,5)
+    
+    self.checkarray(V[:,1].mapping(),DMatrix([1,6,11,16,21]),"mapping")
+    
   # 2-norms currently not supported
   #def test_Norm2(self):
     #self.message("Norm_2")

@@ -860,6 +860,12 @@ long MX::__hash__() const {
    if (isNull()) return 0;
    return (long) get();
 }
+
+Matrix<int> MX::mapping(int iind) const {
+  const Mapping * m = dynamic_cast<const Mapping*>(get());
+  casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
+  return m->mapping(iind);
+}
  	
 } // namespace CasADi
 
