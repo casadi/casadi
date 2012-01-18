@@ -188,60 +188,31 @@ class NLPtests(casadiTestCase):
     self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,"IPOPT")
      
   def testIPOPTnorm(self):
-    return 
     self.message("IPOPT min ||x||^2_2")
     def norm_2(mx):
       return inner_prod(mx,mx)
     N=10
-    x=MX("x",N)
+    x=msym("x",N)
     x0=linspace(0,1,N)
     X0=MX(x0)
     f=MXFunction([x],[norm_2(x-X0)])
     g=MXFunction([x],[2*x])
-    solver = IpoptSolver(f,g)
-    solver.setOption("tol",1e-5)
-    #solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",103)
-    solver.setOption("print_level",0)
-    solver.setOption("derivative_test","first-order")
-    solver.init()
-    solver.input(NLP_LBX).set([-10]*N)
-    solver.input(NLP_UBX).set([10]*N)
-    solver.input(NLP_LBG).set([-10]*N)
-    solver.input(NLP_UBG).set([10]*N)
-    solver.solve()
-    print "residuals"
-    print array(solver.output(NLP_X_OPT)).squeeze()-x0
-    #self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
-    #self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
-    
-  def testIPOPTnormSX(self):
-    self.message("IPOPT min ||x||^2_2")
-    def norm_2(mx):
-      return inner_prod(mx,mx)
-    N=10
-    x=ssym("x",N)
-    x0=linspace(0,1,N)
-    X0=DMatrix(x0)
-    print norm_2(x-X0)
-    f=SXFunction([x],[norm_2(x-X0)])
-    #g=SXFunction([x],[2*x])
-    solver = IpoptSolver(f)
-    solver.setOption("tol",1e-5)
-    solver.setOption("hessian_approximation", "limited-memory")
-    solver.setOption("max_iter",103)
-    solver.setOption("derivative_test","first-order")
-    solver.setOption("print_level",0)
-    solver.init()
-    solver.input(NLP_LBX).set([-10]*N)
-    solver.input(NLP_UBX).set([10]*N)
-    #solver.input(NLP_LBG).set([-10]*N)
-    #solver.input(NLP_UBG).set([10]*N)
-    solver.solve()
-    print "residuals"
-    print array(solver.output(NLP_X_OPT)).squeeze()-x0
-    #self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,"IPOPT")
-    #self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,"IPOPT")
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.init()
+      solver.input(NLP_LBX).set([-10]*N)
+      solver.input(NLP_UBX).set([10]*N)
+      solver.input(NLP_LBG).set([-10]*N)
+      solver.input(NLP_UBG).set([10]*N)
+      solver.solve()
+      print "residuals"
+      print array(solver.output(NLP_X_OPT)).squeeze()-x0
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.checkarray(array(solver.output(NLP_X_OPT)).squeeze(),x0,str(Solver))
   
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
