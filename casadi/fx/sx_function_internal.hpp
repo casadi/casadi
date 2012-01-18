@@ -111,6 +111,9 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Initialize */
   virtual void init();
 
+  /** \brief  Update the number of sensitivity directions during or after initialization */
+  virtual void updateNumSens(bool recursive);
+
   /** \brief  Print to a c file */
   static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
 

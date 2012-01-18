@@ -56,12 +56,14 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
 
-    /** Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
-        If passed to another class (in the constructor), this class should invoke this function when initialized. */
+    /** \brief Initialize
+      Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
+      If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens();
+    /** \brief  Update the number of sensitivity directions during or after initialization, 
+        if recursive==true, updateNumSens is also invoked for the baseclass. */
+    virtual void updateNumSens(bool recursive);
     
     /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);

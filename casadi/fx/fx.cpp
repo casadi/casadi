@@ -296,7 +296,7 @@ FX FX::operator[](int k) const {
 }
 
 void FX::updateNumSens(){
-  return (*this)->updateNumSens();
+  return (*this)->updateNumSens(true);
 }
 
 #if 0

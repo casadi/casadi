@@ -261,11 +261,11 @@ void MXFunctionInternal::init(){
     
     // Allocate memory for an element in the work vector
     work.resize(work.size()+1);
-    FunctionIO &val = work.back();
-    val.data = Matrix<double>(n->sparsity(),0);
-    val.dataF.resize(nfdir_,val.data);
-    val.dataA.resize(nadir_,val.data);
+    work.back().data = Matrix<double>(n->sparsity(),0);
   }
+  
+  // Allocate memory for directional derivatives
+  MXFunctionInternal::updateNumSens(false);
 
   // Indices corresponding to the inputs
   input_ind.resize(inputv.size());
@@ -373,6 +373,17 @@ void MXFunctionInternal::init(){
   }
 
 log("MXFunctionInternal::init end");
+}
+
+void MXFunctionInternal::updateNumSens(bool recursive){
+  // Call the base class if needed
+  if(recursive) XFunctionInternal::updateNumSens(recursive);
+  
+  // Allocate work for directional derivatives
+  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); it++){
+    it->dataF.resize(nfdir_,it->data);
+    it->dataA.resize(nadir_,it->data);
+  }
 }
 
 void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_data){

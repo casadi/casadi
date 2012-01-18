@@ -801,8 +801,7 @@ void SXFunctionInternal::init(){
   // Call the init function of the base class
   XFunctionInternal::init();
 
-
-    // Stack
+  // Stack used to sort the computational graph
   stack<SXNode*> s;
 
   // Add the inputs to the stack
@@ -1143,9 +1142,8 @@ void SXFunctionInternal::init(){
     }
   }
 
-  if(nfdir_>0 || nadir_>0){
-    dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  }
+  // Allocate memory for directional derivatives
+  SXFunctionInternal::updateNumSens(false);
   
   // Get the full Jacobian already now
   if(jac_for_sens_){
@@ -1155,6 +1153,16 @@ void SXFunctionInternal::init(){
   // Print
   if(verbose()){
     cout << "SXFunctionInternal::init Initialized " << getOption("name") << " (" << algorithm_.size() << " elementary operations)" << endl;
+  }
+}
+
+void SXFunctionInternal::updateNumSens(bool recursive){
+  // Call the base class if needed
+  if(recursive) XFunctionInternal::updateNumSens(recursive);
+  
+  // Allocate a working array
+  if(nfdir_>0 || nadir_>0){
+    dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
   }
 }
 

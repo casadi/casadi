@@ -65,7 +65,9 @@ void FXInternal::init(){
   store_jacobians_ = getOption("store_jacobians");
   numeric_jacobian_ = getOption("numeric_jacobian");
   jac_for_sens_ = getOption("jac_for_sens");
-  updateNumSens();
+  
+  // Allocate data for sensitivities (only the method in this class)
+  FXInternal::updateNumSens(false);
   
   // Generate storage for generated Jacobians
   if(store_jacobians_){
@@ -105,7 +107,7 @@ void FXInternal::init(){
   is_init_ = true;
 }
 
-void FXInternal::updateNumSens(){
+void FXInternal::updateNumSens(bool recursive){
   nfdir_ = getOption("number_of_fwd_dir");
   nadir_ = getOption("number_of_adj_dir");
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
