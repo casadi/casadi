@@ -29,17 +29,6 @@ using namespace std;
 
 namespace CasADi{
 
-FunctionIO::FunctionIO(){
-}
-
-void FunctionIO::init(){
-  // Non-zeros
-  for(int i=0; i<dataF.size(); ++i)
-    dataF[i] = data;
-  for(int i=0; i<dataA.size(); ++i)
-    dataA[i] = data;
-}
-
 
 } // namespace CasADi
 

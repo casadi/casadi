@@ -111,6 +111,9 @@ class FX : public OptionsFunctionality{
   /** \brief  Set number of outputs  (normally invoked internally) */
   void setNumOutputs(int num_out);
   
+  /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
+  void updateNumSens();
+  
   /** \brief  Evaluate (old style) */
   void evaluate_old(int fsens_order=0, int asens_order=0);
   

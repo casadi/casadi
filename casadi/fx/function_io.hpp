@@ -34,12 +34,6 @@ namespace CasADi{
 */
 class FunctionIO{
   public:
-    /// Constructor
-    FunctionIO();
-
-    /// (Re)allocate the data
-    void init();
-    
     /// Input/output data
     Matrix<double> data;
     

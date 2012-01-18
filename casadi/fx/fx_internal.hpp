@@ -60,6 +60,9 @@ class FXInternal : public OptionsFunctionalityNode{
         If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
+    /** \brief  Update the number of sensitivity directions during or after initialization */
+    virtual void updateNumSens();
+    
     /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 

@@ -61,24 +61,11 @@ FXInternal::~FXInternal(){
 }
 
 void FXInternal::init(){
-  nfdir_ = getOption("number_of_fwd_dir");
-  nadir_ = getOption("number_of_adj_dir");
   verbose_ = getOption("verbose");
   store_jacobians_ = getOption("store_jacobians");
   numeric_jacobian_ = getOption("numeric_jacobian");
   jac_for_sens_ = getOption("jac_for_sens");
-
-  for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
-    it->dataF.resize(nfdir_);
-    it->dataA.resize(nadir_);
-    it->init();
-  }
-
-  for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
-    it->dataF.resize(nfdir_);
-    it->dataA.resize(nadir_);
-    it->init();
-  }
+  updateNumSens();
   
   // Generate storage for generated Jacobians
   if(store_jacobians_){
@@ -116,6 +103,20 @@ void FXInternal::init(){
 
   // Mark the function as initialized
   is_init_ = true;
+}
+
+void FXInternal::updateNumSens(){
+  nfdir_ = getOption("number_of_fwd_dir");
+  nadir_ = getOption("number_of_adj_dir");
+  for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
+    it->dataF.resize(nfdir_,it->data);
+    it->dataA.resize(nadir_,it->data);
+  }
+
+  for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
+    it->dataF.resize(nfdir_,it->data);
+    it->dataA.resize(nadir_,it->data);
+  }
 }
 
 void FXInternal::print(ostream &stream) const{

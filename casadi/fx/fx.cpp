@@ -295,6 +295,10 @@ FX FX::operator[](int k) const {
   return ret;
 }
 
+void FX::updateNumSens(){
+  return (*this)->updateNumSens();
+}
+
 #if 0
 
 vector<DMatrix> FX::jac(const vector<DMatrix> &x, int iind){

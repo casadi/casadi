@@ -263,9 +263,8 @@ void MXFunctionInternal::init(){
     work.resize(work.size()+1);
     FunctionIO &val = work.back();
     val.data = Matrix<double>(n->sparsity(),0);
-    val.dataF.resize(nfdir_);
-    val.dataA.resize(nadir_);
-    val.init();
+    val.dataF.resize(nfdir_,val.data);
+    val.dataA.resize(nadir_,val.data);
   }
 
   // Indices corresponding to the inputs
