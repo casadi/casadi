@@ -58,7 +58,7 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,
   disable_internal_warnings_ = false;
 }
 
-CVodesInternal::~CVodesInternal(){ 
+void CVodesInternal::freeCVodes(){
   if(mem_) CVodeFree(&mem_);
 
   // ODE integration
@@ -80,7 +80,19 @@ CVodesInternal::~CVodesInternal(){
   for(vector<N_Vector>::iterator it=yQB_.begin(); it != yQB_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
 }
 
+CVodesInternal::~CVodesInternal(){
+  freeCVodes();
+}
+
+void CVodesInternal::updateNumSens(bool recursive){
+  // Not supported re-initalization needed
+  init();
+}
+
 void CVodesInternal::init(){
+  // Free memory if already initialized
+  if(is_init) freeCVodes();
+  
   // Init ODE rhs function and quadrature functions
   f_.init();
   casadi_assert(f_.getNumInputs()==DAE_NUM_IN);
@@ -161,12 +173,6 @@ void CVodesInternal::init(){
   for(int i=0; i<nfdir_f_; ++i) f_.fwdSeed(DAE_YDOT,i).setAll(0);
   for(int i=0; i<nadir_f_; ++i) f_.adjSens(DAE_YDOT,i).setAll(0);
   
-  // Quick return if already initialized
-  if(is_init){
-    log("CVodesInternal::init","end, Idas already initialized");
-    return;
-  }
-
   // Sundials return flag
   int flag;
 

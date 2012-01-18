@@ -71,6 +71,10 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
 }
 
 IdasInternal::~IdasInternal(){ 
+  freeIDAS();
+}
+
+void IdasInternal::freeIDAS(){
   if(mem_) IDAFree(&mem_);
 
   // N-vectors for the DAE integration
@@ -88,10 +92,17 @@ IdasInternal::~IdasInternal(){
   for(vector<N_Vector>::iterator it=yB_.begin(); it != yB_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=yPB_.begin(); it != yPB_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=yBB_.begin(); it != yBB_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
+}
 
+void IdasInternal::updateNumSens(bool recursive){
+  // Not supported re-initalization needed
+  init();
 }
 
 void IdasInternal::init(){
+  // Free memory if already initialized
+  if(is_init) freeIDAS();
+  
   // Print
   if(verbose()){
     cout << "Initializing IDAS with ny_ = " << ny_ << ", nq_ = " << nq_ << ", np_ = " << np_ << endl;
@@ -153,12 +164,6 @@ void IdasInternal::init(){
   nadir_f_ = f_.getOption("number_of_adj_dir");
   nfdir_q_ = q_.isNull() ? 0 : int(q_.getOption("number_of_fwd_dir"));
   nadir_q_ = q_.isNull() ? 0 : int(q_.getOption("number_of_adj_dir"));
-
-  // Quick return if already initialized
-  if(is_init){
-    log("IdasInternal::init","end, Idas already initialized");
-    return;
-  }
 
   cj_scaling_ = getOption("cj_scaling");
   

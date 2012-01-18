@@ -102,8 +102,14 @@ class IdasInternal : public IntegratorInternal{
   /** \brief  Destructor */
   virtual ~IdasInternal();
 
+  /** \brief  Free all IDAS memory */
+  virtual void freeIDAS();
+
   /** \brief  Initialize */
   virtual void init();
+  
+  /** \brief  Update the number of sensitivity directions during or after initialization */
+  virtual void updateNumSens(bool recursive);
 
   /** \brief Initialize the taping */
   virtual void initTaping();
