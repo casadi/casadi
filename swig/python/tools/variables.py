@@ -93,13 +93,14 @@ class Variables(object):
         self._type = "SX"
         self._frozen = False
         
-    def freeze(self):
+    def freeze(self,parent=True):
+      self._createParent = parent
       self._frozen = True
       self._order = sorted(self._d.iterkeys())
       for k in self._order:
         if isinstance(self._d[k],Variables):
           self._d[k].freeze()
-      if self._type == "MX":
+      if self._type == "MX" and self._createParent:
         self.createParent()
       self._numbers = Numbers(self,recycle=True)
       self.buildlookuptable()
@@ -346,7 +347,7 @@ class Variables(object):
         """
         if not(self._frozen):
           raise Exception("You must first freeze() this Variables instance. This is for your own protection")
-        if self._type == "MX":
+        if self._type == "MX" and self._createParent:
           return self._V
           
         l = []
@@ -367,7 +368,7 @@ class Variables(object):
         """
         if not(self._frozen):
           raise Exception("You must first freeze() this Variables instance. This is for your own protection")
-        if self._type == "MX":
+        if self._type == "MX" and self._createParent:
           return self._V
         l = []
         for k in self._order:

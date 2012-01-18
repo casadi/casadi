@@ -231,6 +231,17 @@ class Toolstests(casadiTestCase):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
         
+        
+      x = msym("a",2,3)
+      
+      p = Variables()
+      p.a = x**2
+      p.b = [ x**3, sqrt(x)]
+      p.c = [1/x]
+      p.freeze(False)
+      
+      self.assertTrue(p.a.isBinary())
+      
   def test_Numbers(self):
       p = Variables()
 
