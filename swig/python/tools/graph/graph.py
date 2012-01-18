@@ -122,10 +122,11 @@ class MXMappingArtist(DotArtist):
     row = sp.getRow()
     
     
+    # Note: due to Mapping restructuring, this is no longer efficient code
     deps = getDeps(s)
     
     depind = s.getDepInd()
-    nzmap = s.getNZMap().data()
+    nzmap = sum([s.mapping(i) for i in range(len(deps))])
     
     for k,d in enumerate(deps):
       candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))

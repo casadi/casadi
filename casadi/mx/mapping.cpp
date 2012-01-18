@@ -502,4 +502,16 @@ Matrix<int> Mapping::mapping(int iind) const {
   return ret;
 }
 
+std::vector<int> Mapping::getDepInd() const {
+  // TODO: make this efficient
+  std::vector<int> ret(size());
+  for (int k=0;k<output_sorted_.size();++k) { // Loop over output non-zeros
+    for (int i=0;i<output_sorted_[k].size(); ++i) { // Loop over elements to be summed
+      const OutputNZ &el = output_sorted_[k][i];
+      ret[k] = el.iind;
+    }
+  }
+  return ret;
+}
+
 } // namespace CasADi

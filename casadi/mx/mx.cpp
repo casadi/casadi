@@ -866,6 +866,12 @@ Matrix<int> MX::mapping(int iind) const {
   casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
   return m->mapping(iind);
 }
+
+std::vector<int> MX::getDepInd() const {
+  const Mapping * m = dynamic_cast<const Mapping*>(get());
+  casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
+  return m->getDepInd();
+}
  	
 } // namespace CasADi
 

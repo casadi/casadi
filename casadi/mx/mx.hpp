@@ -474,6 +474,9 @@ class MX : public SharedObject{
   */
   Matrix<int> mapping(int iind=0) const;
   
+  /// Get mapping from the output non-zero index of the dependency index
+  std::vector<int> getDepInd() const;
+  
   /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
   static void setMaxNumCallsInPrint(long num=10000);
 

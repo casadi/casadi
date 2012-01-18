@@ -107,6 +107,9 @@ class Mapping : public MXNode{
     
     /// Construct the IMatrix that maps from the iind'th input to the output 
     Matrix<int> mapping(int iind=0) const;
+    
+    /// Get mapping from the output non-zero index of the dependency index
+    std::vector<int> getDepInd() const;
 };
 
 } // namespace CasADi
