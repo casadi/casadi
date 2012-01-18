@@ -31,6 +31,12 @@ class WorhpInternal;
   
 // List from worhp_internal.cpp
 /**
+*
+*  Worhp is less flexible then Ipopt:
+*   -  You may not set LBX and UBX to the same value, making parametric NLPs a must. 
+*   -  You cannot have a degenerate (constant) objective value
+*   -  You cannot have both bounds LBG and UBG infinity
+*
 * \brief interface to WORHP NLP solver
 * @copydoc NLPSolver_doc
 

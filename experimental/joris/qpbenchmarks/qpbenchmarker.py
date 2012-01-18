@@ -30,11 +30,12 @@ qp = OnlineQPBenchMark('diesel')
 V = Variables()
 
 V.x = ssym("x",int(qp.nV))
-V.g = ssym("g",int(qp.nV))
+#V.g = ssym("g",int(qp.nV))
+
 V.freeze()
 
 x = V.x
-g = V.g
+g = SXMatrix(qp.g[0,:])
 H = qp.H
 A = qp.A
 
@@ -42,10 +43,13 @@ f = SXFunction([V.veccat()],[0.5*mul(mul(x.T,H),x) + mul(g.T,x)])
 g = SXFunction([V.veccat()],[mul(A,x)])
 g.init()
 
-solver = IpoptSolver(f,g)
-solver.setOption("tol",1e-12)
-solver.setOption("hessian_approximation","exact")
+solver = WorhpSolver(f,g)
+#solver.setOption("tol",1e-12)
+#solver.setOption("hessian_approximation","exact")
 solver.setOption("generate_hessian",True)
+solver.setOption("UserHM",True)
+solver.setOption("TolOpti",1e-12)
+#solver.setOption("monitor",["eval_h","eval_f","eval_g","eval_jac_g","eval_grad_f"])
 solver.init()
 
 for i in range(1):
@@ -53,8 +57,9 @@ for i in range(1):
   solver.input(NLP_UBX)[V.i_x] = qp.ub[i,:].T
   solver.input(NLP_LBG).set(qp.lbA[i,:].T)
   solver.input(NLP_UBG).set(qp.ubA[i,:].T)
-  solver.input(NLP_LBX)[V.i_g] = qp.g[i,:].T
-  solver.input(NLP_UBX)[V.i_g] = qp.g[i,:].T
+  #solver.input(NLP_LBX)[V.i_g] = qp.g[i,:].T
+  #solver.input(NLP_UBX)[V.i_g] = qp.g[i,:].T
+  #solver.input(NLP_X_INIT)[V.i_g] = qp.g[i,:].T
   solver.evaluate()
   print "Error = ", max(fabs(solver.output()[V.i_x] - qp.x_opt[i,:]))
   
