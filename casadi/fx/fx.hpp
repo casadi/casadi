@@ -27,9 +27,23 @@
 #include <vector>
 #include <string>
 #include "../options_functionality.hpp"
-#include "function_io.hpp"
 
 namespace CasADi{
+
+/** \brief  Structure that contains the numerical values for the inputs or outputs of a function
+  \author Joel Andersson 
+  \date 2010-2011
+*/
+struct FunctionIO{
+    /// Input/output data
+    Matrix<double> data;
+    
+    /// Forward derivative data
+    std::vector< Matrix<double> > dataF;
+    
+    /// Adjoint derivative data
+    std::vector< Matrix<double> > dataA;
+};
   
 /** Forward declaration of internal class */
 class FXInternal;

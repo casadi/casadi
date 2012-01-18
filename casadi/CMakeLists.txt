@@ -66,7 +66,6 @@ SET(CASADI_SRCS
   fx/parallelizer.hpp        fx/parallelizer.cpp        fx/parallelizer_internal.hpp        fx/parallelizer_internal.cpp
   fx/ocp_solver.hpp          fx/ocp_solver.cpp          fx/ocp_solver_internal.hpp          fx/ocp_solver_internal.cpp
   fx/qp_solver.hpp           fx/qp_solver.cpp           fx/qp_solver_internal.hpp           fx/qp_solver_internal.cpp
-  fx/function_io.hpp         fx/function_io.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
   fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
 

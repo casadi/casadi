@@ -1,5 +1,4 @@
 %{
-#include "casadi/fx/function_io.hpp"
 #include "casadi/fx/fx.hpp"
 #include "casadi/fx/jacobian.hpp"
 #include "casadi/fx/x_function.hpp"
@@ -28,7 +27,6 @@
 %rename(__getitem__) indexed_zero_based;
 #endif
 
-%include "casadi/fx/function_io.hpp"
 %include "casadi/fx/fx.hpp"
 %include "casadi/fx/jacobian.hpp"
 %include "casadi/fx/x_function.hpp"
