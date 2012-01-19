@@ -32,6 +32,19 @@ namespace CasADi{
 
 KnitroInternal::KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
   casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
+
+  // Not yet ready
+#if 0  
+  addOption("algorithm",                OT_STRING, GenericType(), "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
+  addOption("bar_directinterval",       OT_INTEGER, GenericType(), "When using the Interior/Direct algorithm, this parameter controls the maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.");
+  addOption("bar_feasible",             OT_STRING, GenericType(), "Whether feasibility is given special emphasis. See KNITRO documentation.", "no|stay|get|get_stay");
+  addOption("bar_feasmodetol",          OT_REAL, GenericType(), "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
+  addOption("bar_initmu",               OT_INTEGER, GenericType(), "Initial value for the barrier parameter. See KNITRO documentation.");
+  addOption("bar_initpt",               OT_STRING, GenericType(), "Whether to use the initial point strategy with barrier algorithms.  See KNITRO documentation.", "auto|yes|no");
+  addOption("bar_maxbacktrack",         OT_INTEGER, GenericType(), "Maximum allowable number of backtracks during the linesearch of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.");
+  addOption("bar_maxrefactor",          OT_INTEGER, GenericType(), "Maximum number of refactorizations of the KKT system per iteration of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.");
+#endif  
+  
   kc_handle_ = 0;
   
   addOption("contype", OT_INTEGERVECTOR);

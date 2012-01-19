@@ -279,6 +279,9 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
   for(int iind=0; iind<input.size(); ++iind){
     // Skip of not used
     if(input[iind]==0) continue;
+  
+    // Skip if no seeds
+    if(fwd && input[iind]->empty()) continue;
 
     // Get data array for input
     bvec_t *inputd = get_bvec_t(input[iind]->data());
@@ -288,6 +291,9 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
 
       // Skip of not used
       if(output[oind]==0) continue;
+
+      // Skip if no seeds
+      if(!fwd && output[oind]->empty()) continue;
 
       // Get the sparsity of the Jacobian block
       CRSSparsity& sp = fcn_.jacSparsity(iind,oind,true);

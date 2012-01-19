@@ -276,9 +276,24 @@ void NLPSolverInternal::init(){
             log("MX Lagrangian gradient generated");
 
             MXFunction glfcn(lfcn_in,gL);
-            glfcn.setOption("number_of_fwd_dir",n_);
             glfcn.init();
             log("MX Lagrangian gradient function initialized");
+
+            // Get Hessian sparsity
+            CRSSparsity H_sp = glfcn.jacSparsity();
+            log("MX Lagrangian Hessian sparsity determined");
+            
+            // Uni-directional coloring (note, the hessian is symmetric)
+            CRSSparsity coloring = unidirectionalColoring(H_sp, H_sp);
+            log("MX Lagrangian Hessian coloring determined");
+
+            // Number of colors needed is the number of rows
+            int nfwd_glfcn = coloring.size1();
+            log("MX Lagrangian gradient function number of sensitivity directions determined");
+
+            glfcn.setOption("number_of_fwd_dir",nfwd_glfcn);
+            glfcn.updateNumSens();
+            log("MX Lagrangian gradient function number of sensitivity directions updated");
             
             // Hessian of the Lagrangian
             H_ = glfcn.jacobian();
