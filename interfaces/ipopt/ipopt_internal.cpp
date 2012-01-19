@@ -167,6 +167,7 @@ void IpoptInternal::init(){
 void IpoptInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
 
+  checkInitialBounds();
 
   // Set the static parameter
   if (!F_.isNull()) {
