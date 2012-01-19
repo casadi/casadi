@@ -72,7 +72,7 @@ CRSSparsity sp_banded(int n, int p);
   
   If you can guarantee that row is montone, pass the extra argument as true.
 */
-CRSSparsity sp_NZ(std::vector<int> row, std::vector<int> col,int nrow, int ncol, bool monotone=false);
+CRSSparsity sp_NZ(const std::vector<int> &row, const std::vector<int> &col,int nrow, int ncol, bool monotone=false);
 
 /** \brief Construct a block sparsity pattern from (row,col) vectors
 

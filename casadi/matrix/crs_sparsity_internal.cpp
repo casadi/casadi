@@ -2398,6 +2398,9 @@ CRSSparsity CRSSparsityInternal::reshape(int n, int m) const{
   casadi_assert_message(numel() == n*m, "reshape: number of elements must remain the same. Old shape is " << dimString() << ". New shape is " << n << "x" << m << "=" << n*m << ".");
   CRSSparsity ret(n,m);
   ret.reserve(size(), n);
+  
+  std::vector<int> row(size());
+  std::vector<int> col(size());
   for(int i=0; i<nrow_; ++i){
     for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
       int j = col_[el];
@@ -2408,10 +2411,11 @@ CRSSparsity CRSSparsityInternal::reshape(int n, int m) const{
       // Row and column in the new matrix
       int i_ret = k_ret/m;
       int j_ret = k_ret%m;
-      ret.getNZ(i_ret,j_ret);
+      row[el] = i_ret;
+      col[el] = j_ret;
     }
   }
-  return ret;
+  return sp_NZ(row,col,n,m,true);
 }
 
 void CRSSparsityInternal::resize(int nrow, int ncol){

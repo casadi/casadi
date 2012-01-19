@@ -140,13 +140,18 @@ CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int 
   return CRSSparsity(nrow, ncol, col_new, rowind);
 }
 
-CRSSparsity sp_NZ(std::vector<int> row, std::vector<int> col, int nrow, int ncol, bool monotone) {
-  casadi_assert_message(row.size()==col.size(),
+CRSSparsity sp_NZ(const std::vector<int> &row_, const std::vector<int> &col_, int nrow, int ncol, bool monotone) {
+  casadi_assert_message(row_.size()==col_.size(),
     "sp_NZ: row and col vectors must be of same length." << endl <<
-    "row is length " << row.size() << " and " << " col has length " << col.size()
+    "row is length " << row_.size() << " and " << " col has length " << col_.size()
   );
-  if (monotone == false)
+  std::vector<int> row = row_;
+  std::vector<int> col = col_;
+  if (monotone == false) { // Sort row and col such that it becomes monotone
+    
     throw CasadiException("sp_NZ: Not implemented for monotone false");
+    
+  }
   // the given col is fine, we just need to calculate rowind.
   std::vector<int> rowind(nrow+1);
   int cnt=0;  // cumulative non-zero counter
