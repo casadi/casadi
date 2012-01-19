@@ -110,6 +110,13 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
     }
   }
 
+  for(std::map<std::string, std::string>::iterator it=string_param_.begin(); it!=string_param_.end(); ++it){
+    status = KTR_set_char_param_by_name(kc_handle_, it->first.c_str(), it->second.c_str());
+    if(status!=0){
+      throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+    }
+  }
+
   // Type of constraints
   vector<int> cType(m_,KTR_CONTYPE_GENERAL);
   if(hasSetOption("contype")){

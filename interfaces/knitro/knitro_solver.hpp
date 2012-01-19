@@ -55,6 +55,9 @@ class KnitroSolver : public NLPSolver {
     /// Set KNITRO double parameters
     void setDoubleParam(const std::string& name, double val);
 
+    /// Set KNITRO string parameters
+    void setStringParam(const std::string& name, const std::string& val);
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 

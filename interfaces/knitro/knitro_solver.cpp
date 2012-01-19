@@ -53,5 +53,9 @@ void KnitroSolver::setDoubleParam(const std::string& name, double val){
   (*this)->double_param_[name] = val;
 }
 
+void KnitroSolver::setStringParam(const std::string& name, const std::string& val){
+  (*this)->string_param_[name] = val;
+}
+
 
 } // namespace CasADi

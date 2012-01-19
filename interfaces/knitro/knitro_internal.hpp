@@ -65,6 +65,9 @@ public:
   // KNITRO int parameter
   std::map<std::string, int> int_param_;
   
+  // KNITRO string parameter
+  std::map<std::string, std::string> string_param_;
+  
 };
 
 } // namespace CasADi
