@@ -144,7 +144,7 @@ SX SX::sign() const{
 
 
 SX SX::add(const SX& y) const{
-  // Only simplifications that do not result in extra nodes area allowed
+  // NOTE: Only simplifications that do not result in extra nodes area allowed
     
   if(node->isZero())
     return y;
