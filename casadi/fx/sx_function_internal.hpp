@@ -61,7 +61,7 @@ class SXFunctionInternal : public XFunctionInternal{
                           const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                           const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
                           bool output_given, bool eliminate_constants);
-
+                          
   /** \brief  Check if smooth */
   bool isSmooth() const;
 
