@@ -2321,6 +2321,10 @@ void CRSSparsityInternal::enlargeRows(int nrow, const std::vector<int>& ii){
 
   // Sparsify the rows
   rowind_.resize(nrow+1,size());
+  
+  // Quick return if matrix had no rows before
+  if(ii.empty()) return;
+  
   int ik=ii.back(); // need only to update from the last new index
   int nz=size(); // number of nonzeros up till this row
   for(int i=ii.size()-1; i>=0; --i){

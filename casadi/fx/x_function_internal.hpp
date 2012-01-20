@@ -420,7 +420,7 @@ template<typename M>
 std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
                                          const std::vector<M>& inputv, std::vector<M>& outputv){
   using namespace std;
-  if(verbose()) cout << "XFunctionInternal::jac begin" << endl;
+  if(verbose()) cout << "XFunctionInternal::jacGen begin" << endl;
   
   // Create return object
   vector<M> ret(jblocks.size());
