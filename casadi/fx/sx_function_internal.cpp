@@ -329,7 +329,11 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
   // Get a bidirectional partition
   vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
   getPartition(jblocks_no_f,D1,D2,true);
-  
+
+  // Get the number of forward and adjoint sweeps
+  int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
+  int nadj = D2.front().isNull() ? 0 : D2.front().size1();
+
   if(verbose())  {
     cout << "SXFunctionInternal::jac partitioning" << endl;
     for (int i=0;i<jblocks_no_f.size();++i) {
@@ -344,35 +348,85 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
     }
   }
   
-  // Calculate the partial derivatives
-  vector<SX> der1, der2;
-  der1.reserve(algorithm_.size());
-  der2.reserve(algorithm_.size());
-  SX tmp[2];
-  vector<SX>::const_iterator f_it=binops_.begin();
-  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it){
-      const SX& f = *f_it;
-      const SX& x = f->dep(0);
-      const SX& y = f->dep(1);
-      casadi_math<SX>::der(it->op,x,y,f,tmp);
-      if(!x->isConstant())  der1.push_back(tmp[0]);
-      else                  der1.push_back(0);
+  // Forward seeds
+  vector<vector<SXMatrix> > fseed(nfwd);
+  for(int dir=0; dir<nfwd; ++dir){
+    // initialize to zero
+    fseed[dir].resize(getNumInputs());
+    for(int iind=0; iind<fseed[dir].size(); ++iind){
+      fseed[dir][iind] = SXMatrix(input(iind).sparsity(),0);
+    }
+    
+    // Pass seeds
+    for(int v=0; v<D1.size(); ++v){
+      
+      // Get the input index
+      int iind = jblocks_no_f[v].second;
+      
+      // For all the directions
+      for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
+        
+        // Get the direction
+        int c = D1[v].col(el);
 
-      if(!y->isConstant())  der2.push_back(tmp[1]);
-      else                  der2.push_back(0);
+        // Give a seed in the direction
+        fseed[dir][iind].at(c) = casadi_limits<SX>::one;
+      }
+    }
+  }
+  
+  // Adjoint seeds
+  vector<vector<SXMatrix> > aseed(nadj);
+  for(int dir=0; dir<nadj; ++dir){
+    //initialize to zero
+    aseed[dir].resize(getNumOutputs());
+    for(int oind=0; oind<aseed[dir].size(); ++oind){
+      aseed[dir][oind] = SXMatrix(output(oind).sparsity(),0);
+    }
+    
+    // Pass seeds
+    for(int v=0; v<D2.size(); ++v){
+      
+      // Get the output index
+      int oind = jblocks_no_f[v].first;
+      
+      // For all the directions
+      for(int el = D2[v].rowind(dir); el<D2[v].rowind(dir+1); ++el){
+        
+        // Get the direction
+        int c = D2[v].col(el);
+
+        // Give a seed in the direction
+        aseed[dir][oind].at(c) = casadi_limits<SX>::one; // NOTE: should be +=, right?
+      }
+    }
   }
 
-  // Gradient (this is also the working array)
-  vector<SX> g(swork_.size(),casadi_limits<SX>::zero);
-  if(verbose())   cout << "SXFunctionInternal::jac gradient working array size " << swork_.size() << endl;
+  // Forward sensitivities
+  vector<vector<SXMatrix> > fsens(nfwd);
+  for(int dir=0; dir<nfwd; ++dir){
+    // initialize to zero
+    fsens[dir].resize(getNumOutputs());
+    for(int oind=0; oind<fsens[dir].size(); ++oind){
+      fsens[dir][oind] = SXMatrix(output(oind).sparsity(),0);
+    }
+  }
+
+  // Adjoint sensitivities
+  vector<vector<SXMatrix> > asens(nadj);
+  for(int dir=0; dir<nadj; ++dir){
+    // initialize to zero
+    asens[dir].resize(getNumInputs());
+    for(int iind=0; iind<asens[dir].size(); ++iind){
+      asens[dir][iind] = SXMatrix(input(iind).sparsity(),0);
+    }
+  }
   
-  // Get the number of forward and adjoint sweeps
-  int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
-  int nadj = D2.front().isNull() ? 0 : D2.front().size1();
-  
-  if(verbose())   cout << "SXFunctionInternal::jac transposes and mapping" << endl;
-        
+  // Evaluate symbolically
+  evaluateSX(inputv_,outputv_,fseed,fsens,aseed,asens,true,false);
+
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
+  if(verbose())   cout << "SXFunctionInternal::jac transposes and mapping" << endl;
   vector<vector<int> > mapping;
   vector<CRSSparsity> sp_trans;
   if(nfwd>0){
@@ -390,47 +444,10 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       }
     }
   }
-
-  // Carry out the forward sweeps
-  for(int sweep=0; sweep<nfwd; ++sweep){
-    
-    // Remove Seeds
-    fill(g.begin(),g.end(),0);
-    
-    // For all the input variables
-    for(int v=0; v<D1.size(); ++v){
-
-      // Get the input index
-      int iind = jblocks_no_f[v].second;
-
-      // For all the directions
-      for(int el = D1[v].rowind(sweep); el<D1[v].rowind(sweep+1); ++el){
-
-        // Get column of the Jacobian (i.e. input non-zero)
-        int c = D1[v].col(el);
-
-        // Give a seed in the direction
-        g[input_ind_[iind][c]] = casadi_limits<SX>::one;
-      }
-    }
-    
-    // forward sweep
-    for(int k = 0; k<algorithm_.size(); ++k){
-      const AlgEl& ae = algorithm_[k];
-      
-      // First argument
-      if(!g[ae.ch[0]]->isZero() &&  !der1[k]->isZero()){
-        g[ae.ind] += der1[k] * g[ae.ch[0]];
-      }
-      
-      // Second argument
-      if(!g[ae.ch[1]]->isZero() &&  !der2[k]->isZero()){
-        g[ae.ind] += der2[k] * g[ae.ch[1]];
-      }
-    }
-
-    if(verbose())   cout << "SXFunctionInternal::jac g " << g << endl;
   
+  // Carry out the forward sweeps
+  for(int dir=0; dir<nfwd; ++dir){
+    
     // For all the input variables
     for(int v=0; v<D1.size(); ++v){
       
@@ -438,7 +455,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       int oind = jblocks_no_f[v].first;
 
       // For all the input nonzeros treated in the sweep
-      for(int el = D1[v].rowind(sweep); el<D1[v].rowind(sweep+1); ++el){
+      for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
 
         // Get the input nonzero
         int c = D1[v].col(el);
@@ -453,52 +470,14 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int elJ = mapping[v][el_out];
           
           // Get the output seed
-          ret[jblock_ind[v]].data()[elJ] = g[output_ind_[oind][r_out]];
+          ret[jblock_ind[v]].data()[elJ] = fsens[dir][oind].at(r_out);
         }
       }
     }
   }
 
-  // And now the adjoint sweeps
-  for(int sweep=0; sweep<nadj; ++sweep){
-    
-    // Remove Seeds
-    fill(g.begin(),g.end(),0);
-
-    // For all the output blocks
-    for(int v=0; v<D2.size(); ++v){
-
-      // Get the output index
-      int oind = jblocks_no_f[v].first;
-
-      // For all the directions
-      for(int el = D2[v].rowind(sweep); el<D2[v].rowind(sweep+1); ++el){
-
-        // Get the direction
-        int c = D2[v].col(el);
-
-        // Give a seed in the direction
-        g[output_ind_[oind][c]] = casadi_limits<SX>::one;
-      }
-    }
-    
-    // backward sweep
-    for(int k = algorithm_.size()-1; k>=0; --k){
-      const AlgEl& ae = algorithm_[k];
-        
-      // Skip if the seed is zero
-      if(!g[ae.ind]->isZero()){
-        
-        if(!der1[k]->isZero())
-          g[ae.ch[0]] += der1[k] * g[ae.ind];
-          
-        if(!der2[k]->isZero())
-          g[ae.ch[1]] += der2[k] * g[ae.ind];
-          
-        // Remove the seed
-        g[ae.ind] = casadi_limits<SX>::zero;
-      }
-    }
+  // Add elements to the Jacobian matrix
+  for(int dir=0; dir<nadj; ++dir){
     
     // For all the Jacobian blocks
     for(int v=0; v<D2.size(); ++v){
@@ -511,7 +490,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
       const CRSSparsity& sp = jacSparsity(iind,oind,true);
 
       // For all the output nonzeros treated in the sweep
-      for(int el = D2[v].rowind(sweep); el<D2[v].rowind(sweep+1); ++el){
+      for(int el = D2[v].rowind(dir); el<D2[v].rowind(dir+1); ++el){
 
         // Get the output nonzero
         int r = D2[v].col(el);
@@ -523,7 +502,7 @@ vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblock
           int c = sp.col(elJ);
           
           // Get the input seed
-          ret[jblock_ind[v]].data()[elJ] = g[input_ind_[iind][c]];
+          ret[jblock_ind[v]].data()[elJ] = asens[dir][iind].at(c);
         }
       }
     }
