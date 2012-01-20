@@ -207,7 +207,7 @@ class CRSSparsityInternal : public SharedObjectNode{
     void removeDuplicates(std::vector<int>& mapping);
   
     /// Get element index for each nonzero
-    std::vector<int> getElementMapping() const;
+    std::vector<int> getElementMapping(bool row_major) const;
     
     /// Clone
     virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }

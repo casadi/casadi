@@ -226,9 +226,12 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
     }
   }
   
+  // No sensitivities
+  vector<vector<SXMatrix> > dummy;
+
   // Replace expression
   std::vector<Matrix<SX> > outputv = f->outputv_;
-  f->evaluateSX(f->inputv_, outputv, eliminate_constants);
+  f->evaluateSX(f->inputv_, outputv, dummy, dummy, dummy, dummy, false, eliminate_constants);
   
   // Replace the result
   vdef = outputv.front();
@@ -821,10 +824,13 @@ Matrix<SX> evaluateConstants(const Matrix<SX>& ex){
 
   SXFunction fcn(input_s,ex); // Note: no input argument necessary
   fcn.init();
-  
+
+  // No sensitivities
+  vector<vector<SXMatrix> > dummy;
+
   // Evaluate symbolically, eliminating constants
   std::vector<Matrix<SX> > output_s = fcn->outputv_;
-  fcn->evaluateSX(input_s,output_s,true);
+  fcn->evaluateSX(input_s,output_s,dummy,dummy,dummy,dummy,false,true);
   return output_s.front();
 }
 

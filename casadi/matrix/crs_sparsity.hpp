@@ -315,7 +315,7 @@ class CRSSparsity : public SharedObject{
     int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed=0) const;
 
     /// Get element index for each nonzero
-    std::vector<int> getElementMapping() const;
+    std::vector<int> getElementMapping(bool row_major=true) const;
     
     std::string dimString() 	const;
 

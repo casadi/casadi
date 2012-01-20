@@ -44,6 +44,34 @@ bool XFunction::checkNode() const{
 
 vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
   casadi_assert_message(isInit(),"Function has not been initialized");
+  
+  // Copy the arguments into a new vector with the right sparsity
+  casadi_assert(arg.size()==getNumInputs());
+  vector<SXMatrix> arg2 = arg;
+  for(int iind=0; iind<arg.size(); ++iind){
+    // If sparsities do not match, we need to map the nonzeros
+    if(!(arg2[iind].sparsity()==input(iind).sparsity())){
+      // The sparsity should be that of the inputs
+      arg2[iind] = SXMatrix(input(iind).sparsity(),0);
+
+      // Make sure that the dimensions match
+      casadi_assert(arg[iind].size1()==arg2[iind].size1());
+      casadi_assert(arg[iind].size2()==arg2[iind].size2());
+
+      // Get the indices of the known supplied arguments
+      vector<int> known_ind = arg[iind].sparsity().getElementMapping(false);
+      
+      // Find the corresponding nonzeros of the argument matrix
+      arg2[iind].sparsity().getNZInplace(known_ind);
+      
+      // Set the element values
+      for(int k=0; k<known_ind.size(); ++k){
+        if(known_ind[k]!=-1){
+          arg2[iind].at(known_ind[k]) = arg[iind].at(k);
+        }
+      }
+    }
+  }
 
   // Create result vector with correct sparsity for the result
   vector<SXMatrix> res(getNumOutputs());
@@ -51,8 +79,11 @@ vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
     res[i] = SXMatrix(output(i).sparsity());
   }
   
+  // No sensitivities
+  vector<vector<SXMatrix> > dummy;
+  
   // Evaluate the algorithm
-  (*this)->evaluateSX(arg,res);
+  (*this)->evaluateSX(arg2,res,dummy,dummy,dummy,dummy,false,false);
   
   // Return the result
   return res;

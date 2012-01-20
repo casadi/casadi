@@ -57,8 +57,11 @@ class XFunctionInternal : public FXInternal{
     static void resort_postpone(std::vector<Node*>& algnodes, std::vector<int>& lind);
   
     /** \brief  evaluate symbolically */
-    virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false)=0;
-
+    virtual void evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                            const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                            const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                            bool output_given, bool eliminate_constants)=0;
+                            
     /// Propagate the sparsity seeds
     virtual void spProp(bool fwd) = 0;
 

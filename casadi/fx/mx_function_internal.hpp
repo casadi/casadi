@@ -110,7 +110,10 @@ class MXFunctionInternal : public XFunctionInternal{
     FX hessian(int iind, int oind);
     
     /** \brief  evaluate symbolically, inlining */
-    virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
+    virtual void evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                            const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                            const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                            bool output_given, bool eliminate_constants);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SXMatrix>& inputv );

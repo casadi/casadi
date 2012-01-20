@@ -56,14 +56,11 @@ class SXFunctionInternal : public XFunctionInternal{
   /** \brief  Evaluate the function numerically */
   virtual void evaluate(int nfdir, int nadir);
 
-  /** \brief  evaluate symbolically, possibly evaluating constants (old, to be depricated implementation)*/
-  virtual void evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants=false);
-
-  /** \brief  evaluate symbolically while also propagating directional derivatives (new, not yet finished implementation) */
-  virtual void evaluateSXNew(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                             const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                             const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens,
-                             bool eliminate_constants=false);
+  /** \brief  evaluate symbolically while also propagating directional derivatives */
+  virtual void evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                          const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                          const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                          bool output_given, bool eliminate_constants);
 
   /** \brief  Check if smooth */
   bool isSmooth() const;

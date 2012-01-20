@@ -2526,7 +2526,7 @@ void CRSSparsityInternal::removeDuplicates(std::vector<int>& mapping){
   mapping.resize(k_strict);
 }
 
-std::vector<int> CRSSparsityInternal::getElementMapping() const{
+std::vector<int> CRSSparsityInternal::getElementMapping(bool row_major) const{
 
   // Element for each nonzero
   vector<int> el_map(size());
@@ -2541,7 +2541,11 @@ std::vector<int> CRSSparsityInternal::getElementMapping() const{
       int j = col_[el];
         
       // Get the column of the jacobian
-      el_map[el] = j+i*ncol_;
+      if(row_major){
+        el_map[el] = j+i*ncol_;
+      } else {
+        el_map[el] = i+j*nrow_;
+      }
     }
   }
 

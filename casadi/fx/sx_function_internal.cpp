@@ -1224,51 +1224,187 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   return hfcn;
 }
 
-void SXFunctionInternal::evaluateSXNew(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                                       const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                                       const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens,
-                                       bool eliminate_constants){
-  // TODO: Move symbolic directional derivatives algorithm from ::jac here.
-  casadi_assert_message(0,"Not implemented");
-}
-
-void SXFunctionInternal::evaluateSX(const vector<Matrix<SX> >& input_s, vector<Matrix<SX> >& output_s, bool eliminate_constants){
-  casadi_assert_message(inputv_.size() == input_s.size(),"SXFunctionInternal::evaluateSX: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input_s.size() << " instead.");
-  for(int i=0; i<inputv_.size(); ++i){
-    casadi_assert_message(input_s[i].size()==inputv_[i].size(), "SXFunctionInternal::evaluateSX: argument #" << i << " nonzero number does not match." << std::endl << "Expecting " << inputv_[i].dimString() << ", but got " << input_s[i].dimString() << " instead.");
-    // casadi_assert_message(input_s[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::evaluateSX: argument sparsity does not match");
+void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                                    const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                                    const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                                    bool output_given, bool eliminate_constants){
+  
+  if(verbose()) cout << "SXFunctionInternal::evaluateSXNew begin" << endl;
+  
+  casadi_assert_message(inputv_.size() == input.size(),"SXFunctionInternal::evaluateSX: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input.size() << " instead.");
+  for(int i=0; i<input.size(); ++i){
+    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::evaluateSX: argument sparsity inconsistent");
   }
   
-  // Assert input dimension
-  assert(input_.size() == input_s.size());
+  casadi_assert_message(outputv_.size() == output.size(),"SXFunctionInternal::evaluateSX: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << output.size() << " instead.");
+  for(int i=0; i<output.size(); ++i){
+    casadi_assert_message(output[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evaluateSX: result sparsity inconsistent");
+  }
+  
+  if(output_given){
+    // Iterator to the binary operations
+    vector<SX>::const_iterator f_it=binops_.begin();
+    
+    // Assign to the symbolic work vector
+    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it){
+      swork_[it->ind] = *f_it;
+    }
+    
+  } else {
+    // Copy the function arguments to the work vector
+    for(int ind=0; ind<input.size(); ++ind){
+      const vector<SX>& idata = input[ind].data();
+      for(int i=0; i<input_ind_[ind].size(); ++i){
+        swork_[input_ind_[ind][i]] = idata[i];
+      }
+    }
+    
+    // Evaluate the algorithm
+    for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
 
-  // Copy the function arguments to the work vector
-  for(int ind=0; ind<input_s.size(); ++ind){
-    for(int i=0; i<input_ind_[ind].size(); ++i){
-      swork_[input_ind_[ind][i]] = input_s[ind].data()[i];
+      // Get the arguments
+      SX x = swork_[it->ch[0]];
+      SX y = swork_[it->ch[1]];
+      if(eliminate_constants && x.isConstant() && y.isConstant()){
+        // Check if both arguments are constants
+        double temp;
+        casadi_math<double>::fun(it->op,x.getValue(),y.getValue(),temp);
+        swork_[it->ind] = temp;
+      } else {
+        casadi_math<SX>::fun(it->op,x,y,swork_[it->ind]);
+      }
+    }
+
+    // Get the results
+    for(int ind=0; ind<output.size(); ++ind){
+      vector<SX>& odata = output[ind].data();
+      for(int i=0; i<output_ind_[ind].size(); ++i){
+        odata[i] = swork_[output_ind_[ind][i]];
+      }
+    }
+  }
+
+  // Get the number of forward and adjoint sweeps
+  int nfwd = fwdSens.size();
+  int nadj = adjSeed.size();
+  
+  // Quick return if no sensitivities
+  if(nfwd==0 && nadj==0) return;
+  
+  // Calculate the partial derivatives
+  vector<SX> der1, der2;
+  der1.reserve(algorithm_.size());
+  der2.reserve(algorithm_.size());
+  SX tmp[2];
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+      const SX& f = swork_[it->ind];
+      const SX& x = f->dep(0);
+      const SX& y = f->dep(1);
+      casadi_math<SX>::der(it->op,x,y,f,tmp);
+      if(!x->isConstant())  der1.push_back(tmp[0]);
+      else                  der1.push_back(0);
+
+      if(!y->isConstant())  der2.push_back(tmp[1]);
+      else                  der2.push_back(0);
+  }
+
+  // Gradient (this is also the working array)
+  vector<SX> g(swork_.size(),casadi_limits<SX>::zero);
+  if(verbose())   cout << "SXFunctionInternal::evaluateSXNew gradient working array size " << swork_.size() << endl;
+
+  // Carry out the forward sweeps
+  for(int dir=0; dir<nfwd; ++dir){
+    
+    // Remove Seeds
+    fill(g.begin(),g.end(),0);
+    
+    // Pass the forward seeds
+    for(int iind=0; iind<input.size(); ++iind){
+      // Assert sparsity
+      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+
+      // Copy seeds to work vector
+      const vector<SX>& fdata = fwdSeed[dir][iind].data();
+      for(int k=0; k<fdata.size(); ++k){
+        g[input_ind_[iind][k]] = fdata[k];
+      }
+    }
+    
+    // forward sweep
+    for(int k = 0; k<algorithm_.size(); ++k){
+      const AlgEl& ae = algorithm_[k];
+      
+      // First argument
+      if(!g[ae.ch[0]]->isZero() &&  !der1[k]->isZero()){
+        g[ae.ind] += der1[k] * g[ae.ch[0]];
+      }
+      
+      // Second argument
+      if(!g[ae.ch[1]]->isZero() &&  !der2[k]->isZero()){
+        g[ae.ind] += der2[k] * g[ae.ch[1]];
+      }
+    }
+    
+    // Get the forward sensitivities
+    for(int oind=0; oind<output.size(); ++oind){
+      // Assert sparsity
+      casadi_assert_message(output[oind].sparsity()==fwdSens[dir][oind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      
+      // Copy sens from work vector
+      vector<SX>& fdata = fwdSens[dir][oind].data();
+      for(int k=0; k<fdata.size(); ++k){
+        fdata[k] = g[output_ind_[oind][k]];
+      }
     }
   }
   
-  // Evaluate the algorithm
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-
-    // Get the arguments
-    SX x = swork_[it->ch[0]];
-    SX y = swork_[it->ch[1]];
-    if(eliminate_constants && x.isConstant() && y.isConstant()){
-      // Check if both arguments are constants
-      double temp;
-      casadi_math<double>::fun(it->op,x.getValue(),y.getValue(),temp);
-      swork_[it->ind] = temp;
-    } else {
-      casadi_math<SX>::fun(it->op,x,y,swork_[it->ind]);
+  // And now the adjoint sweeps
+  for(int dir=0; dir<nadj; ++dir){
+    
+    // Remove Seeds
+    fill(g.begin(),g.end(),0);
+  
+    // Pass the adjoint seeds
+    for(int oind=0; oind<output.size(); ++oind){
+      // Assert sparsity
+      casadi_assert_message(output[oind].sparsity()==adjSeed[dir][oind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      
+      // Copy sens from work vector
+      const vector<SX>& adata = adjSeed[dir][oind].data();
+      for(int k=0; k<adata.size(); ++k){
+        g[output_ind_[oind][k]] = adata[k];
+      }
     }
-  }
+    
+    // backward sweep
+    for(int k = algorithm_.size()-1; k>=0; --k){
+      const AlgEl& ae = algorithm_[k];
 
-  // Get the results
-  for(int ind=0; ind<output_.size(); ++ind){
-    for(int i=0; i<output_ind_[ind].size(); ++i){
-      output_s[ind].data()[i] = swork_[output_ind_[ind][i]];
+      // Get the seed
+      SX seed = g[ae.ind];
+      
+      // Clear the seed
+      g[ae.ind] = 0;
+
+      // Propagate if the seed is not zero
+      if(!seed->isZero()){
+        if(!der1[k]->isZero())
+          g[ae.ch[0]] += der1[k] * seed;
+        if(!der2[k]->isZero())
+          g[ae.ch[1]] += der2[k] * seed;
+      }
+    }
+    
+    // Get the adjoint sensitivities
+    for(int iind=0; iind<input.size(); ++iind){
+      // Assert sparsity
+      casadi_assert_message(input[iind].sparsity()==adjSens[dir][iind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      
+      // Copy sens from work vector
+      vector<SX>& adata = adjSens[dir][iind].data();
+      for(int k=0; k<adata.size(); ++k){
+        adata[k] = g[input_ind_[iind][k]];
+      }
     }
   }
 }

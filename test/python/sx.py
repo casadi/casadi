@@ -749,7 +749,7 @@ class SXtests(casadiTestCase):
     
     self.assertRaises(RuntimeError, lambda : f.eval([y]))
     self.assertRaises(RuntimeError, lambda : f.eval([q]))
-    f.eval([z])
+    self.assertRaises(RuntimeError, lambda : f.eval([z]))
     
   def test_indexinglimits(self):
     self.message("Limits of indexing")

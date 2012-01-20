@@ -978,8 +978,13 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   return gfcn.jacobian(iind,0);
 }
 
-void MXFunctionInternal::evaluateSX(const std::vector<Matrix<SX> >& input_s, std::vector<Matrix<SX> >& output_s, bool eliminate_constants){
-
+void MXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
+                                    const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                                    const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                                    bool output_given, bool eliminate_constants){
+  casadi_assert_message(fwdSens.empty(),"Not implemented");
+  casadi_assert_message(adjSeed.empty(),"Not implemented");
+  
   // Create a work array
   vector<SXMatrix> swork(work.size());
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
@@ -1044,8 +1049,11 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
     res[i] = SXMatrix(outputv[i].sparsity());
   }
   
+  // No sensitivities
+  vector<vector<SXMatrix> > dummy;
+  
   // Evaluate symbolically
-  evaluateSX(arg,res);
+  evaluateSX(arg,res,dummy,dummy,dummy,dummy,false,false);
   
   // Create function
   SXFunction f(arg,res);
