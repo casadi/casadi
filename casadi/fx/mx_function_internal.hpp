@@ -84,7 +84,7 @@ class MXFunctionInternal : public XFunctionInternal{
 
     /** \brief Adjoint mode AD using source code transformation */
     std::vector<std::vector<MX> > adAdj(const std::vector<std::vector<MX> > & aseed);
-
+    
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 

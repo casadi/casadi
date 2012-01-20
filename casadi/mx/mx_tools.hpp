@@ -168,16 +168,16 @@ bool isSymbolic(const MX& ex);
 /** \brief  check if identity */
 bool isIdentity(const MX& ex);
 
-/** \brief  check if zero */
+/** \brief  check if zero (note that false negative answers are possible) */
 bool isZero(const MX& ex);
 
-/** \brief  check if zero */
+/** \brief  check if zero (note that false negative answers are possible) */
 bool isOne(const MX& ex);
 
 /** \brief  Simplify a mapping, if possible */
 void simplifyMapping(MX& ex);
 
-/** \brief  check if zero */
+/** \brief  check if zero (note that false negative answers are possible) */
 bool isMinusOne(const MX& ex);
 
 /** \brief  check if vector */

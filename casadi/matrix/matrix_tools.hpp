@@ -36,7 +36,7 @@ Matrix<T> trans(const Matrix<T> &x);
 template<class T>
 Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y);
 
-/** \brief  check if the matrix has certain properties */
+/** \brief  check if the matrix is constant (note that false negative answers are possible)*/
 template<class T>
 bool isConstant(const Matrix<T>& ex);
 
@@ -224,15 +224,19 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
 template<class T>
 Matrix<T> linspace(const Matrix<T> &a, const Matrix<T> &b, int nsteps);
 
+/** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
 template<class T>
 bool isZero(const Matrix<T>& ex);
 
+/** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
 template<class T>
 bool isOne(const Matrix<T>& ex);
 
+/** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
 template<class T>
 bool isMinusOne(const Matrix<T>& ex);
 
+/** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
 template<class T>
 bool isIdentity(const Matrix<T>& ex);
 
