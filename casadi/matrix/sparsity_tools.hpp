@@ -66,14 +66,6 @@ CRSSparsity sp_band(int n, int p);
 **/
 CRSSparsity sp_banded(int n, int p);
 
-/** \brief Construct a sparsity pattern from (row,col) vectors
-
-  row and column must be of same length.
-  
-  If you can guarantee that row is montone, pass the extra argument as true.
-*/
-CRSSparsity sp_NZ(const std::vector<int> &row, const std::vector<int> &col,int nrow, int ncol, bool monotone=false);
-
 /** \brief Construct a block sparsity pattern from (row,col) vectors
 
 */

@@ -2415,7 +2415,7 @@ CRSSparsity CRSSparsityInternal::reshape(int n, int m) const{
       col[el] = j_ret;
     }
   }
-  return sp_NZ(row,col,n,m,true);
+  return sp_triplet(n,m,row,col);
 }
 
 void CRSSparsityInternal::resize(int nrow, int ncol){

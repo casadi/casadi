@@ -140,44 +140,6 @@ CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int 
   return CRSSparsity(nrow, ncol, col_new, rowind);
 }
 
-CRSSparsity sp_NZ(const std::vector<int> &row_, const std::vector<int> &col_, int nrow, int ncol, bool monotone) {
-  casadi_assert_message(row_.size()==col_.size(),
-    "sp_NZ: row and col vectors must be of same length." << endl <<
-    "row is length " << row_.size() << " and " << " col has length " << col_.size()
-  );
-  std::vector<int> row = row_;
-  std::vector<int> col = col_;
-  if (monotone == false) { // Sort row and col such that it becomes monotone
-    
-    throw CasadiException("sp_NZ: Not implemented for monotone false");
-    
-  }
-  // the given col is fine, we just need to calculate rowind.
-  std::vector<int> rowind(nrow+1);
-  int cnt=0;  // cumulative non-zero counter
-  int z=0;
-  rowind[0]=0;
-  int k=0;
-  try {
-    for (k=0; k < row.size(); k++) {
-      // fill up rowind entries copies of the increment counter
-      while (z<row[k])
-        rowind.at(++z)=cnt;
-      // fill in the cumulative counter at the next row and increment counter 
-      rowind.at(row[k]+1)=cnt++;
-    }
-    while (z<nrow)
-      rowind.at(++z)=cnt;
-  }
-  catch (out_of_range& oor) {
-    casadi_error(
-      "sp_NZ: out-of-range error." << endl <<
-      "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")."
-    );
-  }
-  return CRSSparsity(nrow, ncol, col, rowind);
-}
-
 std::vector<int> getNZDense(const CRSSparsity &sp) {
   std::vector<int> ret(sp.size());
   std::vector<int> row = sp.getRow();
@@ -212,7 +174,7 @@ CRSSparsity reshape(const CRSSparsity& a, int n, int m){
     col_new[k] = z%m;
   }
   
-  return  sp_NZ(row_new,col_new,n,m,true);
+  return  sp_triplet(n,m,row_new,col_new);
 }
 
 CRSSparsity vec(const CRSSparsity& a){
@@ -249,7 +211,7 @@ CRSSparsity lowerSparsity(const CRSSparsity& a, bool includeDiagonal) {
       cnt++;
     }
   }
-  return sp_NZ(new_row, new_col,a.size1(), a.size2(), true);
+  return sp_triplet(a.size1(), a.size2(), new_row, new_col);
   
 }
 
