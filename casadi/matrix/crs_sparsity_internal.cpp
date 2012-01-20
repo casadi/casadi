@@ -118,7 +118,7 @@ CRSSparsity CRSSparsityInternal::transpose(vector<int>& mapping, bool invert_map
   vector<int> trans_col = getRow();
 
   // Create the sparsity pattern
-  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping,true,invert_mapping);
+  return sp_triplet(ncol_,nrow_,trans_row,trans_col,mapping,invert_mapping);
 
 }
 

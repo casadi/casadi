@@ -438,7 +438,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       const CRSSparsity &osp = sparsity(oind);
 
       // Create a sparsity pattern from vectors
-      CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row[oind],r_col[oind],r_onz,false,true);
+      CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row[oind],r_col[oind],r_onz,true);
       
       // Create a mapping matrix
       *output[oind] = MX::create(new Mapping(r_sp));
@@ -476,7 +476,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       const CRSSparsity &osp = sparsity(oind);
 
       // Create a sparsity pattern from vectors
-      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d][oind],f_col[d][oind],f_onz,false,true);
+      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d][oind],f_col[d][oind],f_onz,true);
       
       // Create a mapping matrix
       *fwdSens[d][oind] = MX::create(new Mapping(f_sp));
@@ -514,7 +514,7 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       const CRSSparsity &isp = input[iind]->sparsity();
       
       // Create a sparsity pattern from vectors
-      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d][iind],a_col[d][iind],a_inz,false,true);
+      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d][iind],a_col[d][iind],a_inz,true);
       
       // Create a mapping matrix
       MX s = MX::create(new Mapping(a_sp));

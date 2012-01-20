@@ -206,8 +206,8 @@ ffcn = MXFunction([V], [f])
 solver = IpoptSolver(ffcn,gfcn)
 
 # Set options
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
+#solver.setOption("expand_f",True)
+#solver.setOption("expand_g",True)
 solver.setOption("generate_hessian",True)
 
 # initialize the solver
