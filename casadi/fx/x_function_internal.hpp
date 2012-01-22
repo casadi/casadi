@@ -623,7 +623,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
           int elJ = mapping[v][el_out];
           
           // Get the output seed
-          ret[jblock_ind[v]].data()[elJ] = fsens[dir][oind].at(r_out);
+          ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(r_out);
         }
       }
     }
@@ -655,7 +655,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
           int c = sp.col(elJ);
           
           // Get the input seed
-          ret[jblock_ind[v]].data()[elJ] = asens[dir][iind].at(c);
+          ret[jblock_ind[v]].at(elJ) = asens[dir][iind].at(c);
         }
       }
     }

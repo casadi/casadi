@@ -763,207 +763,204 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
 }
 
 void MXFunctionInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
-                                const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-                                const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+                                const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+                                const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                                 bool output_given, bool eliminate_constants){
-  casadi_assert(0);
-  
-}
-
-std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
-  if(verbose()) cout << "MXFunctionInternal::adFwd: begin (" << fseed.size() << " directions)" << endl;
   assertInit();
+  
+  // Symbolic work, non-differentiated
+  std::vector<MX> swork(work.size());
+
+  if(output_given){
+    // Loop over computational nodes
+    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
+      // Copy the results of the evaluation, which is known, to the work vector
+      if(it->mx->isMultipleOutput()){
+        for(int oind=0; oind<it->i_res.size(); ++oind){
+          if(it->i_res[oind]>=0){
+            swork[it->i_res[oind]] = MX::create(new OutputNode(it->mx,oind));
+          }
+        }
+      } else {
+        swork[it->i_res[0]] = it->mx;
+      }
+    }
+  } else {
+    casadi_assert(0);
+  }
 
   // Get the number of directions
   const int nfwd = fseed.size();
+  const int nadj = aseed.size();
 
-  // Symbolic work
-  std::vector<MX> swork(work.size());
-
-  // Directional derivative for each node
-  std::vector<std::vector<MX> > dwork(work.size(),std::vector<MX>(nfwd));
+  // Quick return if no sensitivities
+  if(nfwd==0 && nadj==0) return;
   
-  // Pass the seed matrices for the symbolic variables
-  for(int iind=0; iind<input_.size(); ++iind){
-    int el = input_ind[iind];
+  if(nfwd>0){
+    // Work vector, forward derivatives
+    std::vector<std::vector<MX> > dwork(work.size(),std::vector<MX>(nfwd));
+
+    // Pass the seed matrices for the symbolic variables
+    for(int iind=0; iind<input_.size(); ++iind){
+      int el = input_ind[iind];
+      for(int d=0; d<nfwd; ++d){
+        dwork[el][d] = fseed[d][iind];
+      }
+    }
+    
+    // Loop over computational nodes
+    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
+      if(it->mx->isSymbolic()) continue;
+
+      // Get the arguments of the evaluation
+      MXPtrV input_p(it->i_arg.size());
+      for(int i=0; i<input_p.size(); ++i){
+        int el = it->i_arg[i]; // index of the argument
+        input_p[i] = el<0 ? 0 : &swork[el];
+      }
+          
+      // Result of the evaluation
+      MXPtrV output_p(it->i_res.size());
+      for(int i=0; i<output_p.size(); ++i){
+        int el = it->i_res[i]; // index of the output
+        output_p[i] = el<0 ? 0 : &swork[el];
+      }
+
+      // Forward seeds and sensitivities
+      MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
+      for(int d=0; d<nfwd; ++d){
+        fseed_p[d].resize(it->i_arg.size());
+        for(int iind=0; iind<it->i_arg.size(); ++iind){
+          int el = it->i_arg[iind];
+          fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
+          
+          // Give zero seed if null
+          if(el>=0 && dwork[el][d].isNull()){
+            if(d==0){
+              dwork[el][d] = MX::sparse(input_p[iind]->size1(),input_p[iind]->size2());
+            } else {
+              dwork[el][d] = dwork[el][0];
+            }
+          }
+        }
+
+        fsens_p[d].resize(it->i_res.size());
+        for(int oind=0; oind<it->i_res.size(); ++oind){
+          int el = it->i_res[oind];
+          fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
+        }
+      }
+
+      // Dummy arguments for the adjoint sensitivities
+      MXPtrVV aseed_p, asens_p;
+
+      // Call the evaluation function
+      it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
+    }
+
+    // Collect the symbolic forward sensitivities
+    fsens.resize(nfwd);
     for(int d=0; d<nfwd; ++d){
-      dwork[el][d] = fseed[d][iind];
+      fsens[d].resize(outputv.size());
+      for(int oind=0; oind<outputv.size(); ++oind){
+        int el = output_ind[oind];
+        fsens[d][oind] = dwork[el][d];
+      }
     }
   }
   
-  // Loop over computational nodes
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
-    // Copy the results of the evaluation, which is known, to the work vector
-    if(it->mx->isMultipleOutput()){
-      for(int oind=0; oind<it->i_res.size(); ++oind){
-        if(it->i_res[oind]>=0){
-          swork[it->i_res[oind]] = MX::create(new OutputNode(it->mx,oind));
-        }
+  if(nadj>0){
+
+    // Directional derivative for each node
+    std::vector<std::vector<MX> > dwork(work.size(),std::vector<MX>(nadj));
+
+    // Pass the seed matrices
+    for(int oind=0; oind<output_.size(); ++oind){
+      int el = output_ind[oind];
+      for(int d=0; d<nadj; ++d){
+        if(dwork[el][d].isNull())
+          dwork[el][d] = aseed[d][oind];
+        else
+          dwork[el][d] += aseed[d][oind];
       }
-    } else {
-      swork[it->i_res[0]] = it->mx;
     }
+
+    // Arguments for the function evaluation
+    MXPtrVV fseed_p, fsens_p;
+    MXPtrVV aseed_p(nadj), asens_p(nadj);
+    MXPtrV input_p, output_p;
     
-    if(it->mx->isSymbolic()) continue;
+    // Loop over computational nodes in reverse order
+    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); ++it){
+      
+      // Get the arguments of the evaluation
+      input_p.resize(it->i_arg.size());
+      for(int i=0; i<input_p.size(); ++i){
+        int el = it->i_arg[i]; // index of the argument
+        input_p[i] = el<0 ? 0 : &swork[el];
+      }
+          
+      // Result of the evaluation
+      output_p.resize(it->i_res.size());
+      for(int i=0; i<output_p.size(); ++i){
+        int el = it->i_res[i]; // index of the output
+        output_p[i] = el<0 ? 0 : &swork[el];
+      }
 
-    // Get the arguments of the evaluation
-    MXPtrV input_p(it->i_arg.size());
-    for(int i=0; i<input_p.size(); ++i){
-      int el = it->i_arg[i]; // index of the argument
-      input_p[i] = el<0 ? 0 : &swork[el];
-    }
-        
-    // Result of the evaluation
-    MXPtrV output_p(it->i_res.size());
-    for(int i=0; i<output_p.size(); ++i){
-      int el = it->i_res[i]; // index of the output
-      output_p[i] = el<0 ? 0 : &swork[el];
-    }
+      // Sensitivity arguments
+      for(int d=0; d<nadj; ++d){
+        aseed_p[d].resize(it->i_res.size());
+        for(int oind=0; oind<it->i_res.size(); ++oind){
+          int el = it->i_res[oind];
+          aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
+          
+          // Provide a zero seed if no seed exists
+          if(el>=0 && dwork[el][d].isNull()){
+            dwork[el][d] = MX::sparse(swork[el].size1(),swork[el].size2());
+          }
+        }
 
-    // Forward seeds and sensitivities
-    MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
-    for(int d=0; d<nfwd; ++d){
-      fseed_p[d].resize(it->i_arg.size());
-      for(int iind=0; iind<it->i_arg.size(); ++iind){
-        int el = it->i_arg[iind];
-        fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
-        
-        // Give zero seed if null
-        if(el>=0 && dwork[el][d].isNull()){
-          if(d==0){
-            dwork[el][d] = MX::sparse(input_p[iind]->size1(),input_p[iind]->size2());
-          } else {
-            dwork[el][d] = dwork[el][0];
+        asens_p[d].resize(it->i_arg.size());
+        for(int iind=0; iind<it->i_arg.size(); ++iind){
+          int el = it->i_arg[iind];
+          asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
+          
+          // Set sensitivities to zero if not yet used
+          if(el>=0 && dwork[el][d].isNull()){
+            dwork[el][d] = MX::sparse(swork[el].size1(),swork[el].size2());
           }
         }
       }
 
-      fsens_p[d].resize(it->i_res.size());
-      for(int oind=0; oind<it->i_res.size(); ++oind){
-        int el = it->i_res[oind];
-        fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
+      // Call the evaluation function
+      it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
+    }
+
+    // Collect the symbolic adjoint sensitivities
+    asens.resize(nadj);
+    for(int d=0; d<nadj; ++d){
+      asens[d].resize(inputv.size());
+      for(int iind=0; iind<inputv.size(); ++iind){
+        int el = input_ind[iind];
+        asens[d][iind] = dwork[el][d];
       }
     }
-
-    // Dummy arguments for the adjoint sensitivities
-    MXPtrVV aseed_p, asens_p;
-
-    // Call the evaluation function
-    it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
   }
+}
 
-  // Collect the symbolic forward sensitivities
-  vector<vector<MX> > ret(nfwd);
-  for(int d=0; d<nfwd; ++d){
-    ret[d].resize(outputv.size());
-    for(int oind=0; oind<outputv.size(); ++oind){
-      int el = output_ind[oind];
-      ret[d][oind] = dwork[el][d];
-    }
-  }
-  if(verbose()) cout << "MXFunctionInternal::adFwd: end" << endl;
+std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
+  // NOTE: Function to be removed
+  std::vector<std::vector<MX> > ret;
+  std::vector<std::vector<MX> > dummy;
+  evalMX(inputv,outputv,fseed,ret,dummy,dummy,true,false);
   return ret;
 }
 
 std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::vector<MX> > & aseed){
-  assertInit();
-
-  // Get the number of directions
-  const int nadj = aseed.size();
-
-  // Symbolic work
-  std::vector<MX> swork(work.size());
-
-  // Directional derivative for each node
-  std::vector<std::vector<MX> > dwork(work.size(),std::vector<MX>(nadj));
-
-  // Pass the seed matrices
-  for(int oind=0; oind<output_.size(); ++oind){
-    int el = output_ind[oind];
-    for(int d=0; d<nadj; ++d){
-      if(dwork[el][d].isNull())
-        dwork[el][d] = aseed[d][oind];
-      else
-        dwork[el][d] += aseed[d][oind];
-    }
-  }
-  
-  // Loop over computational nodes
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
-    
-    // Copy the results of the evaluation, which is known, to the work vector
-    if(it->mx->isMultipleOutput()){
-      for(int oind=0; oind<it->i_res.size(); ++oind){
-        if(it->i_res[oind]>=0){
-          swork[it->i_res[oind]] = MX::create(new OutputNode(it->mx,oind));
-        }
-      }
-    } else {
-      swork[it->i_res[0]] = it->mx;
-    }
-  }
-
-  // Arguments for the function evaluation
-  MXPtrVV fseed_p, fsens_p;
-  MXPtrVV aseed_p(nadj), asens_p(nadj);
-  MXPtrV input_p, output_p;
-  
-  // Loop over computational nodes in reverse order
-  for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); ++it){
-    
-    // Get the arguments of the evaluation
-    input_p.resize(it->i_arg.size());
-    for(int i=0; i<input_p.size(); ++i){
-      int el = it->i_arg[i]; // index of the argument
-      input_p[i] = el<0 ? 0 : &swork[el];
-    }
-        
-    // Result of the evaluation
-    output_p.resize(it->i_res.size());
-    for(int i=0; i<output_p.size(); ++i){
-      int el = it->i_res[i]; // index of the output
-      output_p[i] = el<0 ? 0 : &swork[el];
-    }
-
-    // Sensitivity arguments
-    for(int d=0; d<nadj; ++d){
-      aseed_p[d].resize(it->i_res.size());
-      for(int oind=0; oind<it->i_res.size(); ++oind){
-        int el = it->i_res[oind];
-        aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-        
-        // Provide a zero seed if no seed exists
-        if(el>=0 && dwork[el][d].isNull()){
-          dwork[el][d] = MX::sparse(swork[el].size1(),swork[el].size2());
-        }
-      }
-
-      asens_p[d].resize(it->i_arg.size());
-      for(int iind=0; iind<it->i_arg.size(); ++iind){
-        int el = it->i_arg[iind];
-        asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
-        
-        // Set sensitivities to zero if not yet used
-        if(el>=0 && dwork[el][d].isNull()){
-          dwork[el][d] = MX::sparse(swork[el].size1(),swork[el].size2());
-        }
-      }
-    }
-
-    // Call the evaluation function
-    it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,aseed_p,asens_p,true);
-  }
-
-  // Collect the symbolic adjoint sensitivities
-  vector<vector<MX> > ret(nadj);
-  for(int d=0; d<nadj; ++d){
-    ret[d].resize(inputv.size());
-    for(int iind=0; iind<inputv.size(); ++iind){
-      int el = input_ind[iind];
-      ret[d][iind] = dwork[el][d];
-    }
-  }
-/*  cout << "f" << endl;*/
+  // NOTE: Function to be removed
+  std::vector<std::vector<MX> > ret;
+  std::vector<std::vector<MX> > dummy;
+  evalMX(inputv,outputv,dummy,dummy,aseed,ret,true,false);
   return ret;
 }
 

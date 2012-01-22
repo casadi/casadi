@@ -65,7 +65,7 @@ class MX : public SharedObject{
     explicit MX(const std::string& name, const CRSSparsity & sp);
 
     /** \brief  Construct MX with a given sparsity */
-    explicit MX(const CRSSparsity& sp, const MX& val);
+    explicit MX(const CRSSparsity& sp, const MX& val=0);
     
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
