@@ -762,7 +762,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   return ret;
 }
 
-void MXFunctionInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                                 const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                                 const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                                 bool output_given, bool eliminate_constants){
@@ -785,48 +785,57 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& o
   std::vector<std::vector<MX> > dwork(work.size());
   fill(dwork.begin(),dwork.end(),std::vector<MX>(nfwd));
 
+  // Pass the inputs
+  if(!output_given){
+    for(int iind=0; iind<arg.size(); ++iind){
+      swork[input_ind[iind]] = arg[iind];
+    }
+  }
+  
   // Pass the forward seeds
   for(int iind=0; iind<input_.size(); ++iind){
-    int el = input_ind[iind];
     for(int d=0; d<nfwd; ++d){
-      dwork[el][d] = fseed[d][iind];
+      dwork[input_ind[iind]][d] = fseed[d][iind];
     }
   }
     
   // Loop over computational nodes in forward order
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
-
-    // Non-differentiated evaluation
-    if(output_given){
-      // Copy the results of the evaluation, which is known, to the work vector
-      if(it->mx->isMultipleOutput()){
-        for(int oind=0; oind<it->i_res.size(); ++oind){
-          if(it->i_res[oind]>=0){
-            swork[it->i_res[oind]] = MX::create(new OutputNode(it->mx,oind));
-          }
-        }
-      } else {
-        swork[it->i_res[0]] = it->mx;
-      }
-    } else {
-      casadi_assert(0);
-    }
     
-    if(it->mx->isSymbolic()) continue;
-
-    // Get the arguments of the evaluation
+    // Pointers to the arguments of the evaluation
     input_p.resize(it->i_arg.size());
     for(int i=0; i<input_p.size(); ++i){
       int el = it->i_arg[i]; // index of the argument
       input_p[i] = el<0 ? 0 : &swork[el];
     }
         
-    // Result of the evaluation
+    // Pointers to the result of the evaluation
     output_p.resize(it->i_res.size());
     for(int i=0; i<output_p.size(); ++i){
       int el = it->i_res[i]; // index of the output
       output_p[i] = el<0 ? 0 : &swork[el];
     }
+
+    // Copy answer of the evaluation, if known
+    if(output_given){
+      if(it->mx->isMultipleOutput()){
+        for(int oind=0; oind<output_p.size(); ++oind){
+          if(output_p[oind]!=0){
+            *output_p[oind] = MX::create(new OutputNode(it->mx,oind));
+          }
+        }
+      } else {
+        if(output_p[0]!=0){
+          *output_p[0] = it->mx;
+        }
+      }
+      
+      // Quick continue if no evaluation needed
+      if(nfwd==0) continue;
+    }
+    
+    // Skip node if it is given
+    if(it->mx->isSymbolic()) continue; 
 
     // Forward seeds and sensitivities
     for(int d=0; d<nfwd; ++d){
@@ -853,7 +862,16 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& o
     }
 
     // Call the evaluation function
-    it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,true);
+    it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+  }
+  
+  // Collect the results
+  if(!output_given){
+    res.resize(outputv.size());
+    for(int oind=0; oind<res.size(); ++oind){
+      int el = output_ind[oind];
+      res[oind] = swork[el];
+    }
   }
 
   // Collect the symbolic forward sensitivities
