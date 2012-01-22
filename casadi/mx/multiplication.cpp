@@ -55,7 +55,7 @@ void Multiplication::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void Multiplication::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
 

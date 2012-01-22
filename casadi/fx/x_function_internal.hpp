@@ -56,11 +56,29 @@ class XFunctionInternal : public FXInternal{
     template<typename Node>
     static void resort_postpone(std::vector<Node*>& algnodes, std::vector<int>& lind);
   
-    /** \brief  evaluate symbolically */
-    virtual void evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                            const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                            const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                            bool output_given, bool eliminate_constants)=0;
+    /** \brief  Evaluate symbolically, SX type */
+    virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                        const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                        bool output_given, bool eliminate_constants)=0;
+
+    /** \brief  Evaluate symbolically, MX type */
+    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+                        const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+                        bool output_given, bool eliminate_constants){casadi_assert_message(0,"not implemented");}
+                        
+    /** \brief  Evaluate symbolically, SX type (overloaded)*/
+    void eval(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+              const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+              const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+              bool output_given, bool eliminate_constants);
+
+    /** \brief  Evaluate symbolically, MX type (overloaded)*/
+    void eval(const std::vector<MX>& input, std::vector<MX>& output, 
+              const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+              const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+              bool output_given, bool eliminate_constants);
 
     /** \brief  Construct a complete Jacobian by compression */
     template<typename M>
@@ -558,7 +576,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   }
   
   // Evaluate symbolically
-  evaluateSX(inputv,outputv,fseed,fsens,aseed,asens,true,false);
+  eval(inputv,outputv,fseed,fsens,aseed,asens,true,false);
 
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
   if(verbose())   cout << "XFunctionInternal::jac transposes and mapping" << endl;

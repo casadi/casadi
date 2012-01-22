@@ -455,7 +455,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     updatePointers(*it,nfdir,0);
 
     // Evaluate
-    it->mx->evaluate(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+    it->mx->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
     // Lifting
     if(liftfun_ && it->mx->isNonLinear()){
       for(int i=0; i<it->i_res.size(); ++i){
@@ -499,7 +499,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       updatePointers(*it,0,nadir);
       
       // Evaluate
-      it->mx->evaluate(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+      it->mx->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
     }
 
     // Get the adjoint sensitivities
@@ -762,6 +762,14 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   return ret;
 }
 
+void MXFunctionInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+                                const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+                                const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+                                bool output_given, bool eliminate_constants){
+  casadi_assert(0);
+  
+}
+
 std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
   if(verbose()) cout << "MXFunctionInternal::adFwd: begin (" << fseed.size() << " directions)" << endl;
   assertInit();
@@ -978,10 +986,10 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   return gfcn.jacobian(iind,0);
 }
 
-void MXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
-                                    const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                                    const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                                    bool output_given, bool eliminate_constants){
+void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
+                                const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                                const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                                bool output_given, bool eliminate_constants){
   casadi_assert_message(fwdSens.empty(),"Not implemented");
   casadi_assert_message(adjSeed.empty(),"Not implemented");
   
@@ -1053,7 +1061,7 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
   vector<vector<SXMatrix> > dummy;
   
   // Evaluate symbolically
-  evaluateSX(arg,res,dummy,dummy,dummy,dummy,false,false);
+  eval(arg,res,dummy,dummy,dummy,dummy,false,false);
   
   // Create function
   SXFunction f(arg,res);

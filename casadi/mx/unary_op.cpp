@@ -52,7 +52,7 @@ void UnaryOp::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void UnaryOp::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void UnaryOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   double nan = numeric_limits<double>::quiet_NaN();
   vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();

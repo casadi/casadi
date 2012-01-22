@@ -173,9 +173,9 @@ int MXNode::getFunctionInput() const{
   throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
 }
 
-void MXNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output){
+void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output){
   DMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-  evaluate(input,output,fwdSeed, fwdSens, adjSeed, adjSens);
+  evaluateD(input,output,fwdSeed, fwdSens, adjSeed, adjSens);
 }
 
 void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output){

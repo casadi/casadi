@@ -53,7 +53,7 @@ void IfNode::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void IfNode::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void IfNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
   bool c = fabs(input[0]->data()[0])<tol;

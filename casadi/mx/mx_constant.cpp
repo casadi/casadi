@@ -42,7 +42,7 @@ void MXConstant::printPart(std::ostream &stream, int part) const{
   x_.print(stream);
 }
 
-void MXConstant::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void MXConstant::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nfwd = fwdSens.size();
   copy(x_.begin(),x_.end(),&output[0]->front());
   for(int d=0; d<nfwd; ++d){

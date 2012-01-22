@@ -83,7 +83,7 @@ vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
   vector<vector<SXMatrix> > dummy;
   
   // Evaluate the algorithm
-  (*this)->evaluateSX(arg2,res,dummy,dummy,dummy,dummy,false,false);
+  (*this)->eval(arg2,res,dummy,dummy,dummy,dummy,false,false);
   
   // Return the result
   return res;

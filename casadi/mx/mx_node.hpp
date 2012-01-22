@@ -99,12 +99,12 @@ class MXNode : public SharedObjectNode{
     virtual void printPart(std::ostream &stream, int part) const = 0;
     
     /** \brief  Evaluate the function */
-    virtual void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, 
-                          const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                          const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens) = 0;
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
+                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
+                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens) = 0;
 
     /** \brief  Evaluate the function, no derivatives*/
-    void evaluate(const DMatrixPtrV& input, DMatrixPtrV& output);
+    void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 

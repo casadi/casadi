@@ -63,7 +63,7 @@ void Evaluation::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void Evaluation::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void Evaluation::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   // Number of derivative directions to calculate
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();

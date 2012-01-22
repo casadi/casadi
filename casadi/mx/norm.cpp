@@ -34,7 +34,7 @@ Norm::Norm(const MX& x){
   setSparsity(CRSSparsity(1,1,true));
 }
 
-void Norm::evaluate(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void Norm::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   throw CasadiException("Norm::evaluate not implemented (by design, norms should be replaced in the syntax tree)");
 }
 

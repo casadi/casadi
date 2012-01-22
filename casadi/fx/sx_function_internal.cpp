@@ -977,21 +977,21 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   return hfcn;
 }
 
-void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                                    const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                                    const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                                    bool output_given, bool eliminate_constants){
+void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                                const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                                const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                                bool output_given, bool eliminate_constants){
   
-  if(verbose()) cout << "SXFunctionInternal::evaluateSXNew begin" << endl;
+  if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
   
-  casadi_assert_message(inputv_.size() == input.size(),"SXFunctionInternal::evaluateSX: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input.size() << " instead.");
+  casadi_assert_message(inputv_.size() == input.size(),"SXFunctionInternal::eval: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input.size() << " instead.");
   for(int i=0; i<input.size(); ++i){
-    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::evaluateSX: argument sparsity inconsistent");
+    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::eval: argument sparsity inconsistent");
   }
   
-  casadi_assert_message(outputv_.size() == output.size(),"SXFunctionInternal::evaluateSX: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << output.size() << " instead.");
+  casadi_assert_message(outputv_.size() == output.size(),"SXFunctionInternal::eval: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << output.size() << " instead.");
   for(int i=0; i<output.size(); ++i){
-    casadi_assert_message(output[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evaluateSX: result sparsity inconsistent");
+    casadi_assert_message(output[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evals: result sparsity inconsistent");
   }
   
   if(output_given){
@@ -1063,7 +1063,7 @@ void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vec
 
   // Gradient (this is also the working array)
   vector<SX> g(swork_.size(),casadi_limits<SX>::zero);
-  if(verbose())   cout << "SXFunctionInternal::evaluateSXNew gradient working array size " << swork_.size() << endl;
+  if(verbose())   cout << "SXFunctionInternal::evalNew gradient working array size " << swork_.size() << endl;
 
   // Carry out the forward sweeps
   for(int dir=0; dir<nfwd; ++dir){
@@ -1074,7 +1074,7 @@ void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vec
     // Pass the forward seeds
     for(int iind=0; iind<input.size(); ++iind){
       // Assert sparsity
-      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
 
       // Copy seeds to work vector
       const vector<SX>& fdata = fwdSeed[dir][iind].data();
@@ -1101,7 +1101,7 @@ void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vec
     // Get the forward sensitivities
     for(int oind=0; oind<output.size(); ++oind){
       // Assert sparsity
-      casadi_assert_message(output[oind].sparsity()==fwdSens[dir][oind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      casadi_assert_message(output[oind].sparsity()==fwdSens[dir][oind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
       
       // Copy sens from work vector
       vector<SX>& fdata = fwdSens[dir][oind].data();
@@ -1120,7 +1120,7 @@ void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vec
     // Pass the adjoint seeds
     for(int oind=0; oind<output.size(); ++oind){
       // Assert sparsity
-      casadi_assert_message(output[oind].sparsity()==adjSeed[dir][oind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      casadi_assert_message(output[oind].sparsity()==adjSeed[dir][oind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
       
       // Copy sens from work vector
       const vector<SX>& adata = adjSeed[dir][oind].data();
@@ -1151,7 +1151,7 @@ void SXFunctionInternal::evaluateSX(const std::vector<SXMatrix>& input, std::vec
     // Get the adjoint sensitivities
     for(int iind=0; iind<input.size(); ++iind){
       // Assert sparsity
-      casadi_assert_message(input[iind].sparsity()==adjSens[dir][iind].sparsity(), "SXFunctionInternal::evaluateSX: sparsity inconsistent");
+      casadi_assert_message(input[iind].sparsity()==adjSens[dir][iind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
       
       // Copy sens from work vector
       vector<SX>& adata = adjSens[dir][iind].data();

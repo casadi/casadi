@@ -109,11 +109,17 @@ class MXFunctionInternal : public XFunctionInternal{
     /** \brief Hessian of output oind with respect to input iind.  */
     FX hessian(int iind, int oind);
     
-    /** \brief  evaluate symbolically, inlining */
-    virtual void evaluateSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                            const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                            const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                            bool output_given, bool eliminate_constants);
+    /** \brief Evaluate symbolically, SX type*/
+    virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+                        const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+                        bool output_given, bool eliminate_constants);
+                        
+    /** \brief Evaluate symbolically, MX type */
+    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+                        const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+                        bool output_given, bool eliminate_constants);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SXMatrix>& inputv );
