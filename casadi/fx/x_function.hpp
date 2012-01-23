@@ -52,17 +52,26 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /// evaluate symbolically 
-  std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg);
+  /// evaluate symbolically, SX type (overloaded)
+  std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg){ return evalSX(arg);}
+  
+  /// evaluate symbolically, MX type (overloaded)
+  std::vector<MX> eval(const std::vector<MX>& arg){return evalMX(arg);}
+  
+  /// evaluate symbolically, MX type (unambiguous)
+  std::vector<MX> evalMX(const std::vector<MX>& arg);
+
+  /// evaluate symbolically, SX type (unambiguous)
+  std::vector<SXMatrix> evalSX(const std::vector<SXMatrix>& arg);
 
 #ifndef SWIG
-  /// evaluate symbolically (pass and get non-zero entries) 
+  /// evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE
   std::vector< std::vector<SX> > eval(const std::vector< std::vector<SX> >& arg);
 
   /// evaluate symbolically, single input, single output 
   SXMatrix eval(const SXMatrix& arg);
 
-  /// evaluate symbolically, single input, single output (pass and get non-zero entries) 
+  /// evaluate symbolically, single input, single output (pass and get non-zero entries) LEGACY - REMOVE
   std::vector<SX> eval(const std::vector<SX>& arg);
 #endif // SWIG
   

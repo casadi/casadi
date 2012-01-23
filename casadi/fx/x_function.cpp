@@ -42,7 +42,7 @@ bool XFunction::checkNode() const{
   return dynamic_cast<const XFunctionInternal*>(get())!=0;
 }
 
-vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
+vector<SXMatrix> XFunction::evalSX(const vector<SXMatrix>& arg){
   casadi_assert_message(isInit(),"Function has not been initialized");
   
   // Copy the arguments into a new vector with the right sparsity
@@ -86,6 +86,13 @@ vector<SXMatrix> XFunction::eval(const vector<SXMatrix>& arg){
   (*this)->eval(arg2,res,dummy,dummy,dummy,dummy,false,false);
   
   // Return the result
+  return res;
+}
+
+vector<MX> XFunction::evalMX(const vector<MX>& arg){
+  vector<MX> res;
+  vector<vector<MX> > dummy;
+  (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy,false,false);
   return res;
 }
 
