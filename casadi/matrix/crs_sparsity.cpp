@@ -390,8 +390,14 @@ void CRSSparsity::removeDuplicates(std::vector<int>& mapping){
   (*this)->removeDuplicates(mapping);
 }
 
-std::vector<int> CRSSparsity::getElementMapping(bool row_major) const{
-  return (*this)->getElementMapping(row_major);
+std::vector<int> CRSSparsity::getElements(bool row_major) const{
+  std::vector<int> loc;
+  getElements(loc,row_major);
+  return loc;
+}
+
+void CRSSparsity::getElements(std::vector<int>& loc, bool row_major) const{
+  (*this)->getElements(loc,row_major);
 }
 
 void CRSSparsity::getNZInplace(std::vector<int>& indices) const{

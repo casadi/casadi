@@ -597,6 +597,9 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       }
     }
   }
+
+  // The nonzeros of the sensitivity matrix
+  vector<int> nzmap;
   
   // Carry out the forward sweeps
   for(int dir=0; dir<nfwd; ++dir){
@@ -607,6 +610,10 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       // Get the output index
       int oind = jblocks_no_f[v].first;
 
+      // Locate the nonzeros of the forward sensitivity matrix
+      output(oind).sparsity().getElements(nzmap,false);
+      fsens[dir][oind].sparsity().getNZInplace(nzmap);
+      
       // For all the input nonzeros treated in the sweep
       for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
 
@@ -619,11 +626,15 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
           // Get the output nonzero
           int r_out = sp_trans[v].col(el_out);
           
+          // Get the forward sensitivity nonzero
+          int f_out = nzmap[r_out];
+          if(f_out<0) continue; // Skip if structurally zero
+          
           // The nonzero of the Jacobian now treated
           int elJ = mapping[v][el_out];
           
           // Get the output seed
-          ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(r_out);
+          ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
         }
       }
     }
@@ -639,6 +650,10 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       int oind = jblocks_no_f[v].first;
       int iind = jblocks_no_f[v].second;
       
+      // Locate the nonzeros of the adjoint sensitivity matrix
+      input(iind).sparsity().getElements(nzmap,false);
+      asens[dir][iind].sparsity().getNZInplace(nzmap);
+      
       // Get the (compact) Jacobian sparsity pattern
       const CRSSparsity& sp = jacSparsity(iind,oind,true);
 
@@ -652,10 +667,14 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
         for(int elJ = sp.rowind(r); elJ<sp.rowind(r+1); ++elJ){
           
           // Get the input nonzero
-          int c = sp.col(elJ);
+          int inz = sp.col(elJ);
+          
+          // Get the corresponding adjoint sensitivity nonzero
+          int anz = nzmap[inz];
+          if(anz<0) continue;
           
           // Get the input seed
-          ret[jblock_ind[v]].at(elJ) = asens[dir][iind].at(c);
+          ret[jblock_ind[v]].at(elJ) = asens[dir][iind].at(anz);
         }
       }
     }

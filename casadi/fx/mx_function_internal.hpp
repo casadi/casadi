@@ -72,7 +72,10 @@ class MXFunctionInternal : public XFunctionInternal{
 
     /** \brief Jacobian via source code transformation (identity matrix seed in a particular direction) */
     std::vector<MX> jac(int iind);
-    
+
+    /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
+    std::vector<MX> jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false);
+
     /** \brief Jacobian via source code transformation */
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
     
@@ -95,12 +98,12 @@ class MXFunctionInternal : public XFunctionInternal{
     std::vector<FunctionIO> work;
     
     /** \brief  Dependent expressions */
-    std::vector<MX> inputv;
-    std::vector<int> input_ind;
+    std::vector<MX> inputv_;
+    std::vector<int> input_ind_;
 
     /** \brief  Matrix expressions that are to be evaluated */
-    std::vector<MX> outputv;
-    std::vector<int> output_ind;
+    std::vector<MX> outputv_;
+    std::vector<int> output_ind_;
     
     // Lifting function
     LiftingFunction liftfun_;
@@ -139,7 +142,7 @@ class MXFunctionInternal : public XFunctionInternal{
     DMatrixPtrVV mx_adjSens_;
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
-    virtual std::vector<MX> symbolicInput() const{ return inputv;}
+    virtual std::vector<MX> symbolicInput() const{ return inputv_;}
 
     /// Propagate the sparsity seeds
     virtual void spProp(bool fwd);

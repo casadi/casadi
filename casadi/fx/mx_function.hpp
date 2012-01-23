@@ -118,6 +118,11 @@ public:
   /** \brief Gradient via source code transformation */
   std::vector<MX> grad(int oind=0);
 
+  /** \brief Jacobian via source code transformation (new, experimental implementation)
+      Calculate the expression for the jacobian of a number of function outputs with 
+      respect to a number of function inputs, optionally include the function outputs */
+  std::vector<MX> jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false);
+
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());
   

@@ -37,7 +37,7 @@ using namespace std;
 
 namespace CasADi{
 
-MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std::vector<MX>& outputv_) : inputv(inputv_), outputv(outputv_){
+MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) : inputv_(inputv), outputv_(outputv){
   setOption("name", "unnamed_mx_function");
   setOption("topological_sorting","depth-first"); // breadth-first not working
   setOption("numeric_jacobian", true);
@@ -45,23 +45,23 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv_, const std
   liftfun_ = 0;
   liftfun_ud_ = 0;
 
-  for(int i=0; i<inputv_.size(); ++i) {
-    if (inputv_[i].isNull()) {
+  for(int i=0; i<inputv.size(); ++i) {
+    if (inputv[i].isNull()) {
       casadi_error("MXFunctionInternal::MXFunctionInternal: MXfunction input arguments cannot be null." << endl << "Argument #" << i << " is null.");
-    } else if (!inputv_[i]->isSymbolic()) {
+    } else if (!inputv[i]->isSymbolic()) {
       casadi_error("MXFunctionInternal::MXFunctionInternal: MXfunction input arguments must be purely symbolic." << endl << "Argument #" << i << " is not symbolic.");
     }
   }
   
   // Allocate space for inputs
-  setNumInputs(inputv.size());
+  setNumInputs(inputv_.size());
   for(int i=0; i<input_.size(); ++i)
-    input(i) = DMatrix(inputv[i].sparsity());
+    input(i) = DMatrix(inputv_[i].sparsity());
 
   // Allocate space for outputs
-  setNumOutputs(outputv.size());
+  setNumOutputs(outputv_.size());
   for(int i=0; i<output_.size(); ++i)
-    output(i) = DMatrix(outputv[i].sparsity());
+    output(i) = DMatrix(outputv_[i].sparsity());
 }
 
 
@@ -86,11 +86,11 @@ void MXFunctionInternal::init(){
   stack<MXNode*> s;
 
   // Add the inputs to the stack
-  for(vector<MX>::iterator it = inputv.begin(); it!=inputv.end(); ++it)
+  for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it)
     if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
   // Add the outputs to the stack
-  for(vector<MX>::iterator it = outputv.begin(); it!=outputv.end(); ++it)
+  for(vector<MX>::iterator it = outputv_.begin(); it!=outputv_.end(); ++it)
     if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
   // All evaluation nodes in the order of evaluation
@@ -268,15 +268,15 @@ void MXFunctionInternal::init(){
   MXFunctionInternal::updateNumSens(false);
 
   // Indices corresponding to the inputs
-  input_ind.resize(inputv.size());
-  for(int i=0; i<input_ind.size(); ++i){
-    input_ind[i] = place_in_work[inputv[i]->temp];
+  input_ind_.resize(inputv_.size());
+  for(int i=0; i<input_ind_.size(); ++i){
+    input_ind_[i] = place_in_work[inputv_[i]->temp];
   }
 
   // Indices corresponding to the outputs
-  output_ind.resize(outputv.size());
-  for(int i=0; i<output_ind.size(); ++i){
-    output_ind[i] = place_in_work[outputv[i]->temp];
+  output_ind_.resize(outputv_.size());
+  for(int i=0; i<output_ind_.size(); ++i){
+    output_ind_[i] = place_in_work[outputv_[i]->temp];
   }
 
   // Reset the temporary variables
@@ -439,13 +439,13 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind){
-    work[input_ind[ind]].data.set(input(ind));
+    work[input_ind_[ind]].data.set(input(ind));
   }
 
   // Pass the forward seeds
   for(int dir=0; dir<nfdir; ++dir)
     for(int ind=0; ind<input_.size(); ++ind){
-      work[input_ind[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
+      work[input_ind_[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
     }
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
@@ -467,14 +467,14 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate evaluated forward");
 
   // Get the outputs
-  for(int ind=0; ind<outputv.size(); ++ind){
-    work[output_ind[ind]].data.get(output(ind));
+  for(int ind=0; ind<outputv_.size(); ++ind){
+    work[output_ind_[ind]].data.get(output(ind));
   }
 
   // Get the forward sensitivities
   for(int dir=0; dir<nfdir; ++dir)
-    for(int ind=0; ind<outputv.size(); ++ind){
-      work[output_ind[ind]].dataF.at(dir).get(fwdSens(ind,dir));
+    for(int ind=0; ind<outputv_.size(); ++ind){
+      work[output_ind_[ind]].dataF.at(dir).get(fwdSens(ind,dir));
     }
           
   if(nadir>0){
@@ -487,9 +487,9 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       }
 
     // Pass the adjoint seeds
-    for(int ind=0; ind<outputv.size(); ++ind)
+    for(int ind=0; ind<outputv_.size(); ++ind)
       for(int dir=0; dir<nadir; ++dir){
-        work[output_ind[ind]].dataA.at(dir).set(adjSeed(ind,dir));
+        work[output_ind_[ind]].dataA.at(dir).set(adjSeed(ind,dir));
       }
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
@@ -505,7 +505,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Get the adjoint sensitivities
     for(int ind=0; ind<input_.size(); ++ind)
       for(int dir=0; dir<nadir; ++dir){
-        work[input_ind[ind]].dataA.at(dir).get(adjSens(ind,dir));
+        work[input_ind_[ind]].dataA.at(dir).get(adjSens(ind,dir));
       }
     
     log("MXFunctionInternal::evaluate evaluated adjoint");
@@ -595,11 +595,11 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   }
 
   // Pointer to the data vector for the input
-  int el_in = input_ind[iind];
+  int el_in = input_ind_[iind];
   iwork_in_ = get_bvec_t(work[el_in].data.data());
   
   // Pointer to the data vector for the output
-  int el_out = output_ind[oind];
+  int el_out = output_ind_[oind];
   iwork_out_ = get_bvec_t(work[el_out].data.data());
 
   // Call the base class routine (common with SXFunction)
@@ -625,7 +625,7 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
     // If variable index is -1, we want nondifferentiated function output
     if(iind==-1){
       // Nondifferentiated function
-      j_out.push_back(outputv.at(oind));
+      j_out.push_back(outputv_.at(oind));
       
     } else {
       
@@ -640,14 +640,18 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
   }
   
   // Create function
-  return MXFunction(inputv,j_out);
+  return MXFunction(inputv_,j_out);
+}
+
+vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact){
+  return jacGen<MX>(jblocks,compact,inputv_,outputv_);
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){
   assertInit();
   
-  for (int i=0;i<inputv.size();i++) {
-    if (!inputv[i].dense()) {
+  for (int i=0;i<inputv_.size();i++) {
+    if (!inputv_[i].dense()) {
       casadi_error("MXFunctionInternal::jac is currently unsupported for sparse inputs.");
     }
   }
@@ -655,7 +659,7 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
   casadi_assert_message(ider<input_.size(),"Index out of bounds");
 
   // Variable with respect to which we differentiate
-  const MX& sder = inputv[ider];
+  const MX& sder = inputv_[ider];
 
   // Number of forward directions
   int nfwd = sder.size();
@@ -669,7 +673,7 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
     for(int iind=0; iind<input_.size(); ++iind){
       
       // Access the input expression
-      const MX& s = inputv[iind];
+      const MX& s = inputv_[iind];
       if(d==0){
         fseed[d][iind] = MX::sparse(s.size1(),s.size2());
       } else {
@@ -694,9 +698,9 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
   vector<vector<MX> > fsens = adFwd(fseed);
 
   // Collect the directions
-  vector<MX> ret(outputv.size());
+  vector<MX> ret(outputv_.size());
   vector<MX> tmp(nfwd);
-  for(int oind=0; oind<outputv.size(); ++oind){
+  for(int oind=0; oind<outputv_.size(); ++oind){
     for(int d=0; d<nfwd; ++d){
       tmp[d] = flatten(fsens[d][oind]);
     }
@@ -711,7 +715,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   casadi_assert_message(igrad<output_.size(),"Index out of bounds");
 
   // Variable with respect to which we differentiate
-  const MX& sgrad = outputv[igrad];
+  const MX& sgrad = outputv_[igrad];
 
   // Number of adjoint directions
   int nadj = sgrad.size();
@@ -725,7 +729,7 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
     for(int oind=0; oind<output_.size(); ++oind){
       
       // Access the input expression
-      const MX& s = outputv[oind];
+      const MX& s = outputv_[oind];
       if(d==0){
         aseed[d][oind] = MX::sparse(s.size1(),s.size2());
       } else {
@@ -750,9 +754,9 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   vector<vector<MX> > asens = adAdj(aseed);
 
   // Collect the sensitivities
-  vector<MX> ret(inputv.size());
+  vector<MX> ret(inputv_.size());
   vector<MX> tmp(nadj);
-  for(int iind=0; iind<inputv.size(); ++iind){
+  for(int iind=0; iind<inputv_.size(); ++iind){
     for(int d=0; d<nadj; ++d){
       tmp[d] = trans(flatten(asens[d][iind]));
     }
@@ -775,6 +779,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   const int nfwd = fseed.size();
   const int nadj = aseed.size();
 
+  cout << "nfwd = " << nfwd << endl;
+  cout << "nadj = " << nadj << endl;
+  
   // Arguments for the function evaluation
   MXPtrV input_p, output_p;
   MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
@@ -788,14 +795,14 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Pass the inputs
   if(!output_given){
     for(int iind=0; iind<arg.size(); ++iind){
-      swork[input_ind[iind]] = arg[iind];
+      swork[input_ind_[iind]] = arg[iind];
     }
   }
   
   // Pass the forward seeds
   for(int iind=0; iind<input_.size(); ++iind){
     for(int d=0; d<nfwd; ++d){
-      dwork[input_ind[iind]][d] = fseed[d][iind];
+      dwork[input_ind_[iind]][d] = fseed[d][iind];
     }
   }
     
@@ -867,9 +874,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   
   // Collect the results
   if(!output_given){
-    res.resize(outputv.size());
+    res.resize(outputv_.size());
     for(int oind=0; oind<res.size(); ++oind){
-      int el = output_ind[oind];
+      int el = output_ind_[oind];
       res[oind] = swork[el];
     }
   }
@@ -877,9 +884,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Collect the symbolic forward sensitivities
   fsens.resize(nfwd);
   for(int d=0; d<nfwd; ++d){
-    fsens[d].resize(outputv.size());
-    for(int oind=0; oind<outputv.size(); ++oind){
-      int el = output_ind[oind];
+    fsens[d].resize(outputv_.size());
+    for(int oind=0; oind<outputv_.size(); ++oind){
+      int el = output_ind_[oind];
       fsens[d][oind] = dwork[el][d];
     }
   }
@@ -889,7 +896,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   
   // Pass the adjoint seeds
   for(int oind=0; oind<output_.size(); ++oind){
-    int el = output_ind[oind];
+    int el = output_ind_[oind];
     for(int d=0; d<nadj; ++d){
       if(dwork[el][d].isNull())
         dwork[el][d] = aseed[d][oind];
@@ -949,9 +956,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Collect the symbolic adjoint sensitivities
   asens.resize(nadj);
   for(int d=0; d<nadj; ++d){
-    asens[d].resize(inputv.size());
-    for(int iind=0; iind<inputv.size(); ++iind){
-      int el = input_ind[iind];
+    asens[d].resize(inputv_.size());
+    for(int iind=0; iind<inputv_.size(); ++iind){
+      int el = input_ind_[iind];
       asens[d][iind] = dwork[el][d];
     }
   }
@@ -961,7 +968,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::v
   // NOTE: Function to be removed
   std::vector<std::vector<MX> > ret;
   std::vector<std::vector<MX> > dummy;
-  evalMX(inputv,outputv,fseed,ret,dummy,dummy,true,false);
+  evalMX(inputv_,outputv_,fseed,ret,dummy,dummy,true,false);
   return ret;
 }
 
@@ -969,7 +976,7 @@ std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::v
   // NOTE: Function to be removed
   std::vector<std::vector<MX> > ret;
   std::vector<std::vector<MX> > dummy;
-  evalMX(inputv,outputv,dummy,dummy,aseed,ret,true,false);
+  evalMX(inputv_,outputv_,dummy,dummy,aseed,ret,true,false);
   return ret;
 }
 
@@ -985,7 +992,7 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   // MX J = grad(oind).at(iind);
   
   // Construct the gradient function
-  MXFunction gfcn(inputv,trans(J));
+  MXFunction gfcn(inputv_,trans(J));
   gfcn.init();
   
   // And return the jacobian of that gradient function
@@ -1010,7 +1017,7 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind){
-    swork[input_ind[ind]].set(input_s[ind]);
+    swork[input_ind_[ind]].set(input_s[ind]);
   }
 
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
@@ -1031,36 +1038,36 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   }
   
   // Get the outputs
-  for(int ind=0; ind<outputv.size(); ++ind)
-    swork[output_ind[ind]].get(output_s[ind]);
+  for(int ind=0; ind<outputv_.size(); ++ind)
+    swork[output_ind_[ind]].get(output_s[ind]);
 }
 
-SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputv_sx ){
+SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   assertInit();
   
   // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
-  vector<SXMatrix> arg(inputv.size());
-  if(inputv_sx.empty()){ // No symbolic input provided
+  vector<SXMatrix> arg(inputv_.size());
+  if(inputvsx.empty()){ // No symbolic input provided
     for(int i=0; i<arg.size(); ++i){
-      arg[i] = ssym(inputv[i]->getName(),inputv[i].sparsity());
+      arg[i] = ssym(inputv_[i]->getName(),inputv_[i].sparsity());
     }
   } else { // Use provided symbolic input
     // Make sure number of inputs matches
-    casadi_assert(inputv_sx.size()==inputv.size());
+    casadi_assert(inputvsx.size()==inputv_.size());
     
     // Make sure that sparsity matches
-    for(int i=0; i<inputv_sx.size(); ++i){
-      casadi_assert(inputv_sx[i].sparsity() == inputv[i].sparsity());
+    for(int i=0; i<inputvsx.size(); ++i){
+      casadi_assert(inputvsx[i].sparsity() == inputv_[i].sparsity());
     }
 
     // Copy to argument vector
-    copy(inputv_sx.begin(),inputv_sx.end(),arg.begin());
+    copy(inputvsx.begin(),inputvsx.end(),arg.begin());
   }
 
   // Create output vector with correct sparsity
-  vector<SXMatrix> res(outputv.size());
+  vector<SXMatrix> res(outputv_.size());
   for(int i=0; i<res.size(); ++i){
-    res[i] = SXMatrix(outputv[i].sparsity());
+    res[i] = SXMatrix(outputv_[i].sparsity());
   }
   
   // No sensitivities

@@ -72,19 +72,19 @@ MXFunctionInternal* MXFunction::operator->(){
 }
 
 const MX MXFunction::inputMX(int iind) const{
-  return (*this)->inputv.at(iind);
+  return (*this)->inputv_.at(iind);
 }
 
 const MX MXFunction::outputMX(int oind) const{
-  return (*this)->outputv.at(oind);
+  return (*this)->outputv_.at(oind);
 }
 
 const std::vector<MX>& MXFunction::inputsMX() const {
-  return (*this)->inputv;
+  return (*this)->inputv_;
 }
   
 const std::vector<MX>& MXFunction::outputsMX() const {
-  return (*this)->outputv;
+  return (*this)->outputv_;
 }
 
 const std::vector<MXAlgEl>& MXFunction::algorithm() const{
@@ -106,6 +106,10 @@ std::vector<MX> MXFunction::jac(int iind){
 
 std::vector<MX> MXFunction::grad(int oind){
   return (*this)->grad(oind);
+}
+
+std::vector<MX> MXFunction::jac(const std::vector<std::pair<int,int> >& jblocks, bool compact){
+  return (*this)->jac(jblocks,compact);
 }
 
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){

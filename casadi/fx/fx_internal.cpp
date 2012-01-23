@@ -451,7 +451,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
         casadi_assert(sp.size1()==output(oind).size());
         
         // New row for each old row 
-        vector<int> row_map = output(oind).sparsity().getElementMapping();
+        vector<int> row_map = output(oind).sparsity().getElements();
     
         // Insert rows 
         sp.enlargeRows(output(oind).numel(),row_map);
@@ -462,7 +462,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
         casadi_assert(sp.size2()==input(iind).size());
         
         // New column for each old column
-        vector<int> col_map = input(iind).sparsity().getElementMapping();
+        vector<int> col_map = input(iind).sparsity().getElements();
         
         // Insert columns
         sp.enlargeColumns(input(iind).numel(),col_map);

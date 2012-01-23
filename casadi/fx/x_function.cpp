@@ -59,7 +59,7 @@ vector<SXMatrix> XFunction::evalSX(const vector<SXMatrix>& arg){
       casadi_assert(arg[iind].size2()==arg2[iind].size2());
 
       // Get the indices of the known supplied arguments
-      vector<int> known_ind = arg[iind].sparsity().getElementMapping(false);
+      vector<int> known_ind = arg[iind].sparsity().getElements(false);
       
       // Find the corresponding nonzeros of the argument matrix
       arg2[iind].sparsity().getNZInplace(known_ind);
