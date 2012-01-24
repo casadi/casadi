@@ -465,7 +465,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   }
   
   log("MXFunctionInternal::evaluate evaluated forward");
-
+  
   // Get the outputs
   for(int ind=0; ind<outputv_.size(); ++ind){
     work[output_ind_[ind]].data.get(output(ind));
@@ -779,9 +779,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   const int nfwd = fseed.size();
   const int nadj = aseed.size();
 
-  cout << "nfwd = " << nfwd << endl;
-  cout << "nadj = " << nadj << endl;
-  
   // Arguments for the function evaluation
   MXPtrV input_p, output_p;
   MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
