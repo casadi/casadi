@@ -50,7 +50,7 @@
 \clearpage
 
 \chapter{Introduction}
-{\color{red}Warning: The user's guide is not finished. This is only a working copy.}
+{\color{red}Warning: The users' guide is not finished. This is only a working copy.}
 This document gives a brief tutorial on the CasADi software package and on the interfaces that comes with it. We aim at
 introducing the most important capabilities of what CasADi can do. Our fundamental motivation is to provide open-source
 software for people working with numerical optimization, dynamic system simulation and optimal control.
@@ -156,7 +156,7 @@ The backbone of CasADi is centered around some fundamental classes:
 \end{itemize}
 
 \subsection{\texttt{SX} and \texttt{SXMatrix}}
-The \texttt{SX} type is used to represent symbolic expressions made up by a sequence of unary and binary operations. It uses a syntax similar to a numeric type such as \texttt{float} in Python (which corresponds to \texttt{double} in C/C++), but instead of calculating the expressions numerically, the \texttt{SX} will build up an expression. The type overloads most common operations and can also be used instead of Python's built-in types in container classes such as \texttt{numpy.array}.
+The \texttt{SX} type is used to represent symbolic expressions made up by a sequence of unary and binary operations. It uses a syntax similar to a numeric type such as \texttt{float} in Python or a \texttt{double} in C/C++, but instead of calculating the expressions numerically, the \texttt{SX} will build up an expression. The type overloads most common operations and can also be used instead of container classes such as \texttt{numpy.array} in Python or \texttt{std::vector<>} in C++'s Standard Template Library (STL).
 
 Though it is possible and somtimes benificial, we shall not work with the \texttt{SX} type directly in this tutorial. Instead we shall work with a \emph{sparse matrix type} called \texttt{SXMatrix}, whose elements are \texttt{SX} instances. \texttt{SXMatrix} uses an everything-is-a-matrix type syntax that should be familiar to Matlab users, which means that scalars can be represented as 1-by-1 matrices and vectors as $n$-by-1 matrices. To store its element, it uses a general sparse matrix format comparible to that used for sparse matrices in Matlab\footnote{To be more precise, the storage format used is \emph{compressed row storage}}.
 
@@ -196,7 +196,7 @@ Elements are accessed and set using a bracket syntax, which also updates the spa
 \begin{verbatim}
  print B1[0,0]   # print elements [0,0] (Python is zero-based!)
  print B2[-1,-1] # print the last element of the last row
- print B3[:,2]   # print all elements in the 2nd column
+ print B3[:,2]   # print all elements in the 3rd column
  B4[2:4,1]=[7,3] # set [2,1] to 7 and [3,1] to 3
 \end{verbatim}
 
@@ -214,12 +214,14 @@ There is a growing set of operations that can be performed with the \texttt{SXMa
 It is typically uncomplicated to add new such functions whenever they appear in applications.
 
 \subsection{\texttt{DMatrix}}
-\texttt{DMatrix} is very similar to \texttt{SXMatrix} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not \texttt{SX} expressions. Except for the function \texttt{ssym} above (which 
+\texttt{DMatrix} is very similar to \texttt{SXMatrix} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not \texttt{SX} expressions. The syntax is also the same, except for functions such as \texttt{ssym} or \texttt{jacobian} which has no equivalent.
 
-\texttt{DMatrix} is mainly used for storing matrices in CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices:
+\texttt{DMatrix} is mainly used for storing matrices in CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 \begin{verbatim}
  C = 4*DMatrix.ones(2,3)
  C[:,2] = 5
+
+ import numpy as NP
  C_numpy = NP.array(C)
 
  import scipy as SP
@@ -339,7 +341,7 @@ This output tend to become quite hard to understand. An alternative (not always 
 
 Using this feature, which is still under development, requires that you have installed the Python package \emph{pydot}. We actively work on getting the expressions more easier to grasp.
 
-\texttt{MX} expressions may contain calls to CasADi functions. To embed a call to an \texttt{FX}-derived function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}), you use the syntax:
+\texttt{MX} expressions may contain calls to CasADi functions. To embed a call to an \texttt{FX}-derived function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Section \ref{chapter:integrators}), you use the syntax:
 \begin{verbatim}
 [y1,y2,...,yn] = f.call([x1,x2,...,xn])
 \end{verbatim}
