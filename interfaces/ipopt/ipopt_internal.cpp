@@ -105,7 +105,11 @@ void IpoptInternal::init(){
   // Gradient of the objective function, remove?
   if(!GF_.isNull()) GF_.init();
   if(!GF_.isNull()) {
-    casadi_assert_message(GF_.getNumInputs()>=1, "Wrong number of input arguments to GF");
+    if (parametric_) {
+      casadi_assert_message(GF_.getNumInputs()==2, "Wrong number of input arguments to GF for parametric NLP. Must be 2, but got " << GF_.getNumInputs());
+    } else {
+      casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+    }
     casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
     casadi_assert_message(GF_.input().numel()==n_,"Inconsistent dimensions");
     casadi_assert_message((GF_.output().size1()==n_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n_),"Inconsistent dimensions");
@@ -170,20 +174,12 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   checkInitialBounds();
 
   // Set the static parameter
-  if (!F_.isNull()) {
-    if (F_.getNumInputs()==2) F_.setInput(input(NLP_P),1);
-  }
-  if (!G_.isNull()) {
-    if (G_.getNumInputs()==2) G_.setInput(input(NLP_P),1);
-  }
-  if (!H_.isNull()) {
-    if (H_.getNumInputs()==4) H_.setInput(input(NLP_P),1);
-  }
-  if (!J_.isNull()) {
-    if (J_.getNumInputs()==2) J_.setInput(input(NLP_P),1);
-  }
-  if (!GF_.isNull()) {
-    if (GF_.getNumInputs()==2) GF_.setInput(input(NLP_P),1);
+  if (parametric_) {
+    if (!F_.isNull()) F_.setInput(input(NLP_P),F_.getNumInputs()-1);
+    if (!G_.isNull()) G_.setInput(input(NLP_P),G_.getNumInputs()-1);
+    if (!H_.isNull()) H_.setInput(input(NLP_P),H_.getNumInputs()-1);
+    if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
+    if (!GF_.isNull()) GF_.setInput(input(NLP_P),GF_.getNumInputs()-1);
   }
 
   // Reset the counters
@@ -333,7 +329,7 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
         }
     } else {
       // Number of inputs to the hessian
-      int n_hess_in = H_.getNumInputs();
+      int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
       
       // Pass input
       H_.setInput(x);

@@ -298,7 +298,7 @@ void IpoptQPInternal::init(){
   solver.setOption("jac_c_constant","yes");
   solver.setOption("jac_d_constant","yes");
   solver.setOption("hessian_constant","yes");
-  
+  solver.setOption("parametric",true);
   solver.init();
 
 }

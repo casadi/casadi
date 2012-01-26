@@ -33,7 +33,10 @@ class IpoptInternal;
 /**
 * \brief interface to IPOPT NLP solver
 * @copydoc NLPSolver_doc
-
+*
+* NOTE: Even when max_iter == 0,  it is not guaranteed that input(NLP_X_INIT) == output(NLP_X_OPT). Indeed if bounds on X or constraints are unmet, they will differ.
+*       
+*
 */
 class IpoptSolver : public NLPSolver {
   public:

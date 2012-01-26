@@ -53,11 +53,15 @@ public:
 
   /// use exact hessian
   bool exact_hessian_; 
+  
+  /// use parametric NLP formulation
+  bool parametric_; 
 
   /// Number of variables and constraints
   int n_,m_;
   
-  int pn_,pm_; // (n x m) parameterspace
+  /// The sparsity of the parameters 
+  CRSSparsity sp_p;
   
   /// callback function, executed at each iteration
   FX callback_;

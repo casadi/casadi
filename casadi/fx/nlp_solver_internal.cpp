@@ -44,11 +44,11 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("iteration_callback_ignore_errors", OT_BOOLEAN,     false,      "If set to true, errors thrown by iteration_callback will be ignored.");
   addOption("ignore_check_vec", OT_BOOLEAN,     false,            "If set to true, the input shape of F will not be checked.");
   addOption("warn_initial_bounds", OT_BOOLEAN,     true,       "Warn if the initial guess does not satisfy LBX and UBX");
+  addOption("parametric", OT_BOOLEAN, false, "Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.");
   
   n_ = 0;
   m_ = 0;
-  pn_ = 0;
-  pm_ = 0;
+
 }
 
 NLPSolverInternal::~NLPSolverInternal(){
@@ -73,8 +73,18 @@ void NLPSolverInternal::init(){
   n_ = F_.input(0).numel();
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
 
+  parametric_ = getOption("parametric");
+  
+  if (parametric_) {
+    casadi_assert_message(F_.getNumInputs()==2, "Wrong number of input arguments to F for parametric NLP. Must be 2, but got " << F_.getNumInputs());
+  } else {
+    casadi_assert_message(F_.getNumInputs()==1, "Wrong number of input arguments to F for non-parametric NLP. Must be 1, but got " << F_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+  }
+
   // Basic sanity checks
   casadi_assert_message(F_.getNumInputs()==1 || F_.getNumInputs()==2, "Wrong number of input arguments to F. Must be 1 or 2");
+  
+  if (F_.getNumInputs()==2) parametric_=true;
   casadi_assert_message(getOption("ignore_check_vec") || F_.input().size2()==1,
      "To avoid confusion, the input argument to F must be vector. You supplied " << F_.input().dimString() << endl <<
      " We suggest you make the following changes:" << endl <<
@@ -92,7 +102,11 @@ void NLPSolverInternal::init(){
   casadi_assert_message(F_.input().dense(), "Input argument of F must be dense. You supplied " << F_.input().dimString());
   
   if(!G_.isNull()) {
-    casadi_assert_message(G_.getNumInputs()>=1, "Wrong number of input arguments to G");
+    if (parametric_) {
+      casadi_assert_message(G_.getNumInputs()==2, "Wrong number of input arguments to G for parametric NLP. Must be 2, but got " << G_.getNumInputs());
+    } else {
+      casadi_assert_message(G_.getNumInputs()==1, "Wrong number of input arguments to G for non-parametric NLP. Must be 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+    }
     casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
     casadi_assert_message(G_.input().numel()==n_, "Inconsistent dimensions");
     casadi_assert_message(G_.input().sparsity()==F_.input().sparsity(), "F and G input dimension must match. F " << F_.input().dimString() << ". G " << G_.input().dimString());
@@ -175,7 +189,7 @@ void NLPSolverInternal::init(){
       vector<MX> H_in = HF_in;
       H_in.insert(H_in.begin()+1, lam);
       H_in.insert(H_in.begin()+2, sigma);
-      
+
       // Get an expression for the Hessian of F
       MX hf = HF.call(HF_in).at(0);
       
@@ -191,9 +205,6 @@ void NLPSolverInternal::init(){
       
       // Efficient if both functions are SXFunction
       if(!F_sx.isNull() && !G_sx.isNull()){
-        // Parametric NLP not supported
-        casadi_assert_message(G_.getNumInputs()==1 && F_.getNumInputs()==1, "exact hessian generation currently not supported for parametric NLP");
-
         // Expression for f and g
         SXMatrix f = F_sx.outputSX();
         SXMatrix g = G_sx.outputSX();
@@ -220,10 +231,11 @@ void NLPSolverInternal::init(){
         SXMatrix sigma = ssym("sigma");        
         
         // Lagrangian function
-        vector<SXMatrix> lfcn_in(3);
+        vector<SXMatrix> lfcn_in(parametric_? 4: 3);
         lfcn_in[0] = G_sx.inputSX();
         lfcn_in[1] = lam;
         lfcn_in[2] = sigma;
+        if (parametric_) lfcn_in[3] = G_sx.inputSX(1);
         SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
         lfcn.setOption("verbose",getOption("verbose"));
         lfcn.setOption("numeric_hessian",f_num_hess || g_num_hess);
@@ -245,9 +257,6 @@ void NLPSolverInternal::init(){
         if(!F_mx.isNull() && !G_mx.isNull() && isEqual(F_mx.inputMX(),G_mx.inputMX())){
           casadi_warning("Exact Hessian calculation for MX is still experimental");
           
-          // Parametric NLP not supported
-          casadi_assert_message(G_mx.getNumInputs()==1 && F_mx.getNumInputs()==1, "exact hessian generation currently not supported for parametric NLP");
-          
           // Expression for f and g
           MX f = F_mx.outputMX();
           MX g = G_mx.outputMX();
@@ -259,10 +268,11 @@ void NLPSolverInternal::init(){
           MX sigma("sigma");
 
           // Inputs of the Lagrangian function
-          vector<MX> lfcn_in(3);
+          vector<MX> lfcn_in(parametric_? 4:3);
           lfcn_in[0] = G_mx.inputMX();
           lfcn_in[1] = lam;
           lfcn_in[2] = sigma;
+          if (parametric_) lfcn_in[3] = G_mx.inputMX(1);
 
           // Lagrangian function
           MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
@@ -328,7 +338,11 @@ void NLPSolverInternal::init(){
 
   
   if(!H_.isNull()) {
-    casadi_assert_message(H_.getNumInputs()>=1, "Wrong number of input arguments to H");
+    if (parametric_) {
+      casadi_assert_message(H_.getNumInputs()>=2, "Wrong number of input arguments to H for parametric NLP. Must be at least 2, but got " << G_.getNumInputs());
+    } else {
+      casadi_assert_message(H_.getNumInputs()>=1, "Wrong number of input arguments to H for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+    }
     casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
     casadi_assert_message(H_.input(0).numel()==n_,"Inconsistent dimensions");
     casadi_assert_message(H_.output().size1()==n_,"Inconsistent dimensions");
@@ -336,51 +350,37 @@ void NLPSolverInternal::init(){
   }
 
   if(!J_.isNull()){
-    casadi_assert_message(J_.getNumInputs()>=1, "Wrong number of input arguments to J");
+    if (parametric_) {
+      casadi_assert_message(J_.getNumInputs()==2, "Wrong number of input arguments to J for parametric NLP. Must be at least 2, but got " << G_.getNumInputs());
+    } else {
+      casadi_assert_message(J_.getNumInputs()==1, "Wrong number of input arguments to J for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+    }
     casadi_assert_message(J_.getNumOutputs()>=1, "Wrong number of output arguments to J");
     casadi_assert_message(J_.input().numel()==n_,"Inconsistent dimensions");
     casadi_assert_message(J_.output().size2()==n_,"Inconsistent dimensions");
   }
-  
-  pn_=0;
-  pm_=0;
-  
-  int pn=0;
-  int pm=0;
     
-  // Check if any of the functions have a second argument (i.e. to pass parameters)
-  FX* ff[4] = {&F_, &G_, &H_, &J_};
-  for (int k=0; k<4; ++k){
-    if (ff[k]->isNull()) continue;
-    if (ff[k]->getNumInputs()!=2) continue;
-    pn = ff[k]->input(1).size1();
-    pm = ff[k]->input(1).size2();
+  std::cout << "This NLP is parametric " << parametric_ << std::endl;
+  if (parametric_) {
+    sp_p = F_->input(1).sparsity();
     
-    if (pn==0 || pm==0)
-     continue;
-    
-    casadi_assert_message((pn==pn_ && pm==pm_) || pn_==0 || pm_==0,
-      "One of your supplied functions had a second input argument, which was interpreted as a parameter of shape (" << pn_ << "x" << pm_ << ")." << std::endl <<
-      "However, another function had a second input argument of shape (" << pn << "x" << pm << ")." << std::endl <<
-      "This is inconsistent."
-    );
-
-    pn_ = pn;
-    pm_ = pm;
+    if (!G_.isNull()) casadi_assert_message(sp_p == G_->input(G_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while G has got " << G_->input(G_->getNumInputs()-1).dimString());
+    if (!H_.isNull()) casadi_assert_message(sp_p == H_->input(H_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while H has got " << G_->input(G_->getNumInputs()-1).dimString());
+    if (!J_.isNull()) casadi_assert_message(sp_p == J_->input(J_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while J has got " << G_->input(G_->getNumInputs()-1).dimString());
   }
   
   // Infinity
   double inf = numeric_limits<double>::infinity();
   
   // Allocate space for inputs
-  input_.resize(NLP_NUM_IN);
+  input_.resize(NLP_NUM_IN - (parametric_? 0 : 1));
   input(NLP_X_INIT)      = DMatrix(n_,1,0);
   input(NLP_LBX)         = DMatrix(n_,1,-inf);
   input(NLP_UBX)         = DMatrix(n_,1, inf);
   input(NLP_LBG)         = DMatrix(m_,1,-inf);
   input(NLP_UBG)         = DMatrix(m_,1, inf);
   input(NLP_LAMBDA_INIT) = DMatrix(m_,1,0);
-  input(NLP_P)           = DMatrix(pn_,pm_,0);
+  if (parametric_) input(NLP_P) = DMatrix(sp_p,0);
   
   // Allocate space for outputs
   output_.resize(NLP_NUM_OUT);

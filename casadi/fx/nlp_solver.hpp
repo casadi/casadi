@@ -59,7 +59,7 @@ NLP_LBG,
 NLP_UBG,
 /// Lagrange multipliers associated with G, initial guess (m x 1)
 NLP_LAMBDA_INIT,
-/// Static parameters on which the objective and constraints might depend
+/// Only for parametric NLP - static parameters on which the objective and constraints might depend
 NLP_P,
 NLP_NUM_IN};
 

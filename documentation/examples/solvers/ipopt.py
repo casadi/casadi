@@ -69,6 +69,7 @@ a_ = 2
 f=SXFunction([x,a],[[(x-a)**2]])
 
 solver = IpoptSolver(f)
+solver.setOption("parametric",True)
 solver.init()
 solver.input(NLP_LBX).set([-10])
 solver.input(NLP_UBX).set([10])

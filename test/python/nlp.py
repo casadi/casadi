@@ -43,7 +43,31 @@ class NLPtests(casadiTestCase):
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+
+  def testIPOPT_par(self):
     
+    x=SX("x")
+    p=SX("p")
+    f=SXFunction([[x],[p]],[[(x-p)**2]])
+    g=SXFunction([[x],[p]],[x])
+    
+    for Solver in solvers:
+      self.message("trivial " + str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver }).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.setOption("parametric",True)
+      solver.init()
+      solver.input(NLP_LBX).set([-10])
+      solver.input(NLP_UBX).set([10])
+      solver.input(NLP_LBG).set([-10])
+      solver.input(NLP_UBG).set([10])
+      solver.input(NLP_P).set(1)
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+      
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
     x=SX("x")
@@ -159,7 +183,7 @@ class NLPtests(casadiTestCase):
     for Solver in solvers:
       self.message(str(Solver))
       solver = Solver(f,g,h)
-      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
           
@@ -196,7 +220,117 @@ class NLPtests(casadiTestCase):
     solver.output(NLP_LAMBDA_X).set(oldsolver.output(NLP_LAMBDA_X))
     
     solver.solve()
+
+  def testIPOPTrhb2_gen(self):
+    self.message("rosenbrock, exact hessian generated, constrained")
+    x=SX("x")
+    y=SX("y")
     
+    obj = (1-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y]],[obj])
+    g=SXFunction([[x,y]],[x**2+y**2])
+    
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+    
+    sigma=SX("sigma")
+    lambd=SX("lambd")
+  
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+          
+      solver.setOption("generate_hessian",True)
+      solver.init()
+      solver.input(NLP_X_INIT).set([0.5,0.5])
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.input(NLP_LBG).set([0])
+      solver.input(NLP_UBG).set([1])
+      solver.solve()
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],x_r[1],7,str(Solver))
+      
+  def testIPOPTrhb2_par(self):
+    self.message("rosenbrock, exact hessian, constrained, ")
+    x=SX("x")
+    y=SX("y")
+    p=SX("p")
+    
+    obj = (p-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y],[p]],[obj])
+    g=SXFunction([[x,y],[p]],[x**2+y**2])
+    
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+    
+    sigma=SX("sigma")
+    lambd=SX("lambd")
+    h=SXFunction([[x,y],[lambd],[sigma]],[sigma*hessian(obj,[x,y])+lambd*hessian(g.outputSX(0),[x,y])])
+
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g,h)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.setOption("parametric",True)
+      solver.init()
+      solver.input(NLP_X_INIT).set([0.5,0.5])
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.input(NLP_LBG).set([0])
+      solver.input(NLP_UBG).set([1])
+      solver.input(NLP_P).set([1])
+      solver.solve()
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],x_r[1],7,str(Solver))
+
+  def testIPOPTrhb2_gen_par(self):
+    self.message("rosenbrock, exact hessian generated, constrained, parametric")
+    x=SX("x")
+    y=SX("y")
+    p=SX("p")
+    
+    obj = (p-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y],p],[obj])
+    g=SXFunction([[x,y],p],[x**2+y**2])
+    
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+    
+    sigma=SX("sigma")
+    lambd=SX("lambd")
+  
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+          
+      solver.setOption("generate_hessian",True)
+      solver.setOption("parametric",True)
+      solver.init()
+      solver.input(NLP_X_INIT).set([0.5,0.5])
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.input(NLP_LBG).set([0])
+      solver.input(NLP_UBG).set([1])
+      solver.input(NLP_P).set([1])
+      solver.solve()
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],x_r[1],7,str(Solver))
+      
   def testIPOPTrhb(self):
     self.message("rosenbrock, exact hessian")
     x=SX("x")
@@ -222,7 +356,91 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,str(Solver))
-     
+
+  def testIPOPTrhb_gen(self):
+    self.message("rosenbrock, exact hessian generated")
+    x=SX("x")
+    y=SX("y")
+    
+    obj=(1-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y]],[obj])
+    
+    sigma=SX("sigma")
+    
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.setOption("verbose",True)
+      solver.setOption("generate_hessian",True)
+      solver.init()
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,str(Solver))
+      
+  def testIPOPTrhb_par(self):
+    self.message("rosenbrock, exact hessian, parametric")
+    x=SX("x")
+    y=SX("y")
+    
+    p=SX("p")
+    obj=(p-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y],p],[obj])
+    
+    sigma=SX("sigma")
+    
+    h=SXFunction([[x,y],[],[sigma],[p]],[sigma*hessian(obj,[x,y])])
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,FX(),h)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.setOption("verbose",True)
+      solver.setOption("parametric", True)
+      solver.init()
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.input(NLP_P).set(1)
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,str(Solver))
+
+  def testIPOPTrhb_gen_par(self):
+    self.message("rosenbrock, exact hessian generated, parametric")
+    x=SX("x")
+    y=SX("y")
+    
+    p=SX("p")
+    obj=(p-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y],p],[obj])
+    
+    sigma=SX("sigma")
+    
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.setOption("verbose",True)
+      solver.setOption("parametric", True)
+      solver.setOption("generate_hessian", True)
+      solver.init()
+      solver.input(NLP_LBX).set([-10]*2)
+      solver.input(NLP_UBX).set([10]*2)
+      solver.input(NLP_P).set(1)
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,10,str(Solver))
+      
   def testIPOPTnorm(self):
     self.message("IPOPT min ||x||^2_2")
     def norm_2(mx):
