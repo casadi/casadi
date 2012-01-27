@@ -55,7 +55,8 @@ This document gives a brief tutorial on the CasADi software package and on the i
 introducing the most important capabilities of what CasADi can do. Our fundamental motivation is to provide open-source
 software for people working with numerical optimization, dynamic system simulation and optimal control.
 
-Our discussion is mostly program code driven and we provide little mathematical background knowledge, the writers assume that the reader has already a fair knowledge of either C++ or Python programming, theory of differential equations and optimization theory. The goal of this document is to make the reader familiar with the syntax of CasADi and provide easily available building blocks to build dynamic optimization sofware.
+Our explaination is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with CasADi, and try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in chapter \ref{sec:syntax_differences}
+The goal of this document is to make the reader familiar with the syntax of CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software.
 
 After reading this users' guide, the reader should be able to formulate and manipulate symbolic expressions in CasADi, generate derivatives using automatic differentiation, to set up, solve and perform forward and adjoint sensitivity analysis for systems of ordinary differential equations (ODE) or differential-algebraic equations (DAE) as well as to solve nonlinear programming (NLP) problems and optimal control (OCP) problems.
 
@@ -160,12 +161,13 @@ The \texttt{SX} type is used to represent symbolic expressions made up by a sequ
 
 Though it is possible and somtimes benificial, we shall not work with the \texttt{SX} type directly in this tutorial. Instead we shall work with a \emph{sparse matrix type} called \texttt{SXMatrix}, whose elements are \texttt{SX} instances. \texttt{SXMatrix} uses an everything-is-a-matrix type syntax that should be familiar to Matlab users, which means that scalars can be represented as 1-by-1 matrices and vectors as $n$-by-1 matrices. To store its element, it uses a general sparse matrix format comparible to that used for sparse matrices in Matlab\footnote{To be more precise, the storage format used is \emph{compressed row storage}}.
 
-To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:
+To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "casadi/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
+
 \begin{verbatim}
   from casadi import *
 \end{verbatim}
 
-Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox):
+Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox)\footnote{In C++, since it is statically typed, you need to specify the return type, here \texttt{SXMatrix}. To find the return types for a CasADi function, use the C++ API docs on the website}:
 \begin{verbatim}
   x = ssym("x")
 \end{verbatim}
@@ -177,12 +179,12 @@ Note that the string passed is only the display name, not the identifier. Multip
 
 Note that \texttt{ssym} is a function which returns an \texttt{SXMatrix} instance. When variables have been declared, expressions can now be formed in an intuitive way: 
 \begin{verbatim}
-  f = x**2 + 10
+  f = x**2 + 10  # "x**y" corresponds to "pow(x,y)" in C++
   f = sqrt(f)
   print "f = ", f
 \end{verbatim}
 
-You can also create \texttt{SXMatrix} instances \emph{without} any symbolic variables:
+You can also create \texttt{SXMatrix} instances \emph{without} any symbolic variables\footnote{In C++, class}:
 \begin{verbatim}
  B1 = SXMatrix.zeros(4,5)  # a dense 4-by-5 empty matrix with all zeros
  B2 = SXMatrix.sparse(4,5) # a sparse 4-by-5 empty matrix with all zeros
@@ -325,9 +327,11 @@ print A
 # Output: mapping(diagonal 2-by-2 matrix, dependencies: [x,(x[0]+x[1])], \
 #                 nonzeros: [0(0),0(1)]
 \end{verbatim}
-This time expression \texttt{A} becomes a mapping from \texttt{x} to a sparse 2-by-2 matrix. Linear mappings, of the type you've seen here, is also the the result of several other operations that you might perform on an expression, including (but not limited to) matrix transposes, horizontal and vertical concatenations, resizings and reshapings.
+This time expression \texttt{A} becomes a mapping from \texttt{x} to a sparse 2-by-2 matrix. The interpretation of the cryptic output is that \texttt{A} is a linear mapping from $x$ and $x[0]+x[1]$ onto the diagonal of a (sparse) 2-by-2 matrix. The first nonzero of this mapping is the 0th nonzero of the 0th dependency ($x$) and the second nonzero is the 0th nonzero of the first dependency ($x[0]+x[1]$). 
 
-This output tend to become quite hard to understand. An alternative (not always better) way is to represent the function is as a graph:
+Linear mappings, of the type you have seen here, is also the the result of several other operations that you might perform on an expression, including (but not limited to) matrix transposes, horizontal and vertical concatenations, resizings and reshapings.
+
+This output tend to become quite hard to understand. An alternative (but not always better) way is to represent the function is as a graph:
 
 \begin{minipage}[t]{0.45\textwidth}
 \texttt{from casadi import tools} \\
@@ -1113,7 +1117,17 @@ x_{k+1,0} - \sum_{r=0}^{d}{D_r \, x_{k,r}} = 0, \qquad k=0,\ldots,n_k-1,
 
 These two sets of equations take the place of the continuity equation (represented by the integrator call) in direct multiple shooting. The above equations have been implemented in the script \texttt{vdp\_collocation.py}.
 
-
+\chapter{Syntax differences between CasADi in Python, C++ and Octave}\label{sec:syntax_differences}
+\scriptsize
+\begin{center}
+  \begin{tabular}{| p{2cm} | p{4cm} | p{4cm} | p{4cm} | }
+    \hline
+      & Python & C++ & Octave \\ \hline
+     Starting CasADi & \verb|from casadi import *| & \verb|#include "casadi/casadi.hpp"| & \verb|casadi| \\ \hline
+    Element access & \verb|A[i,j]|, 0-based & \verb|A(i,j)|, 0-based & \verb|A(i,j)|, (mostly) 1-based \\ \hline
+    Element assignment & \verb|A[i,j] = b|, 0-based & \verb|A(i,j) = b|, 0-based & \verb|A(i,j) = b|, (mostly) 1-based \\ \hline
+  \end{tabular}
+\end{center}
 
 %\bibliographystyle{plain}
 %\bibliography{optec}
