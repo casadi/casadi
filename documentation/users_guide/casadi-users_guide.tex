@@ -1120,12 +1120,21 @@ These two sets of equations take the place of the continuity equation (represent
 \chapter{Syntax differences between CasADi in Python, C++ and Octave}\label{sec:syntax_differences}
 \scriptsize
 \begin{center}
-  \begin{tabular}{| p{2cm} | p{4cm} | p{4cm} | p{4cm} | }
+  \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
     \hline
       & Python & C++ & Octave \\ \hline
-     Starting CasADi & \verb|from casadi import *| & \verb|#include "casadi/casadi.hpp"| & \verb|casadi| \\ \hline
-    Element access & \verb|A[i,j]|, 0-based & \verb|A(i,j)|, 0-based & \verb|A(i,j)|, (mostly) 1-based \\ \hline
-    Element assignment & \verb|A[i,j] = b|, 0-based & \verb|A(i,j) = b|, 0-based & \verb|A(i,j) = b|, (mostly) 1-based \\ \hline
+    Starting CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace CasADi;| & \verb|casadi| \\ \hline
+    Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
+    Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
+    Element access & \verb|A[i,j]|, \emph{0-based} & \verb|A(i,j)| and \verb|A(i)|, \emph{0-based} & \verb|A(i,j)|, \emph{1-based} \\ \hline
+    Element assignment & \verb|A[i,j] = b|, \emph{0-based} & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{0-based} & \verb|A(i,j) = b|, \emph{1-based} \\ \hline
+    Nonzero access & \verb|A[k]|, \emph{0-based} & \verb|A[k]|, \emph{0-based} & \verb|A(k)|, \emph{1-based} \\ \hline
+    Nonzero assignment & \verb|A[k] = b|, \emph{0-based} & \verb|A[k] = b|, \emph{0-based} & \verb|A(k) = b|, \emph{1-based} \\ \hline
+    Matrix multiplication & \verb|mul(x,y)| & \verb|mul(x,y)| & \verb|mul(x,y)| or \verb|x*y| \\ \hline
+    Elementwise multiplication & \verb|x*y| & \verb|x*y| & \verb|x.*y| \\ \hline
+    Elementwise division & \verb|x/y| & \verb|x/y| & \verb|x./y| \\ \hline
+    Power & \verb|x**y| & \verb|pow(x,y)| & \verb|x^y| or \verb|x.^y| \\ \hline
+    Transpose & \verb|trans(A)| or \verb|A.T| & \verb|trans(A)| & \verb|trans(A)| or \verb|A'| or \verb|A.'| \\ \hline
   \end{tabular}
 \end{center}
 
