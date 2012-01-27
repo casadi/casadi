@@ -1126,6 +1126,8 @@ These two sets of equations take the place of the continuity equation (represent
     Starting CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace CasADi;| & \verb|casadi| \\ \hline
     Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
+    Calling a class function & \verb|SXMatrix.zeros(3,4)| & \verb|SXMatrix::zeros(3,4)| & \verb|SXMatrix.zeros(3,4)|\\ \hline
+    Reference to a class (e.g. passed to a function as an option) & \verb|ClassName| or \verb|ClassName.creator| & \verb|ClassName::creator| & \verb|ClassName.creator|\\ \hline
     Element access & \verb|A[i,j]|, \emph{0-based} & \verb|A(i,j)| and \verb|A(i)|, \emph{0-based} & \verb|A(i,j)|, \emph{1-based} \\ \hline
     Element assignment & \verb|A[i,j] = b|, \emph{0-based} & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{0-based} & \verb|A(i,j) = b|, \emph{1-based} \\ \hline
     Nonzero access & \verb|A[k]|, \emph{0-based} & \verb|A[k]|, \emph{0-based} & \verb|A(k)|, \emph{1-based} \\ \hline
