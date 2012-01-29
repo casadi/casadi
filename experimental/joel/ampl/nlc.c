@@ -114,9 +114,7 @@ pdl {
 
 static pdl *pdlbusy, *pdlfree;
 
-static int
-new_pd(VOID)
-{
+static int new_pd(VOID){
   pdl *p;
   if (!iflevel)
     return npd++;
@@ -179,9 +177,7 @@ static void pdlrestore(pdl *opdb, int mts){
 
 #define NDVTGULP 1000
 
-static void
-dvtfree_inc(VOID)
-{
+static void dvtfree_inc(VOID){
   int i, j;
   i = ndvtmax;
   j = ndvtmax += NDVTGULP;
@@ -356,7 +352,7 @@ void introuble(char *who, char *x){
 void introuble2(char *who, char *x, char *y){
   if (!Fortran)
     printf("\tif (errno) in_trouble2(\"%s\",%s,%s);\n",
-           who, x, y);
+    who, x, y);
 }
 
 char *num(int x){
@@ -451,8 +447,8 @@ static void mpd(expr *e, real *dp, int deriv){
       else /* DEBUG */ {
         fprintf(Stderr, "Bug in mpd!\n");
         exit(13);
+      }
   }
-}
 }
 
 static int ewalk(expr*, int);
@@ -1467,9 +1463,9 @@ static void plcommon(int deriv){
   if (npd)
     printf(
     "\tcommon /pdcomn/ pd\n\tdouble precision pd(%d)\n\tsave /pdcomn/\n",
-           npd);
-           if (!deriv && needx0check)
-             printf("\tlogical xchk\n");
+          npd);
+          if (!deriv && needx0check)
+            printf("\tlogical xchk\n");
 }
 
 static char *rv_output(char *rv, char *eval, ograd *og){
@@ -1487,8 +1483,8 @@ static char *rv_output(char *rv, char *eval, ograd *og){
       while(og = og->next)
         if (og->coef)
           binop(rv, rv, "+",
-                vprod(og->coef, og->varno));
-                return rv;
+          vprod(og->coef, og->varno));
+        return rv;
     }
     if (Fortran)
       assign(rv, eval);
@@ -1545,8 +1541,7 @@ static char *con_linadd(int i, char *s){
     return s;
 }
 
-static void con_derivs(int i)
-{
+static void con_derivs(int i){
   cgrad *cg, *cg0;
   Adjoint *a;
   char buf[32];
@@ -1556,38 +1551,36 @@ static void con_derivs(int i)
   if (densejac)
     djoff = i;
   printf("\n%s   /*** derivatives for constraint %d ***/\n\n",
-         Fortstar, i+1);
-         dwalk(c->d, cg0 = Cgrad[i], zac[i], c_ifset[i]);
-         for(cg = cg0; cg; cg = cg->next) {
-           a = Adjp(&adjoints[cg->varno]);
-           a->storage = STOR_JAC;
-           a->stored = 0;
-           a->o.cg = cg;
-           stog[cg->varno] = (ograd *)cg;
-         }
-         stor_grad = STOR_JAC;
-         co_derivs(con_de[i].d, c_ifset[i], j0_fmt);
-         for(cg = cg0; cg; cg = cg->next) {
-           a = Adjp(&adjoints[cg->varno]);
-           if (!a->stored && (!intsk || !intsk[cg->varno])) {
-             g_fmt(buf, cg->coef);
-             j = densejac ? i + cg->varno*n_con : cg->goff;
-             printf(j0_fmt, j + Fortran, buf);
-           }
-         }
-         if (densejac) {
-           i1 = i + 1;
-           for(cg = cg0; cg; cg = cg->next)
-             rownos[cg->varno] = i1;
-           for(j = 0; j < nv1; j++)
-             if (rownos[j] != i1)
-               printf(j0_fmt, i + j*n_con + Fortran, Zero);
-         }
+  Fortstar, i+1);
+  dwalk(c->d, cg0 = Cgrad[i], zac[i], c_ifset[i]);
+  for(cg = cg0; cg; cg = cg->next) {
+    a = Adjp(&adjoints[cg->varno]);
+    a->storage = STOR_JAC;
+    a->stored = 0;
+    a->o.cg = cg;
+    stog[cg->varno] = (ograd *)cg;
+  }
+  stor_grad = STOR_JAC;
+  co_derivs(con_de[i].d, c_ifset[i], j0_fmt);
+  for(cg = cg0; cg; cg = cg->next) {
+    a = Adjp(&adjoints[cg->varno]);
+    if (!a->stored && (!intsk || !intsk[cg->varno])) {
+      g_fmt(buf, cg->coef);
+      j = densejac ? i + cg->varno*n_con : cg->goff;
+      printf(j0_fmt, j + Fortran, buf);
+    }
+  }
+  if (densejac) {
+    i1 = i + 1;
+    for(cg = cg0; cg; cg = cg->next)
+      rownos[cg->varno] = i1;
+    for(j = 0; j < nv1; j++)
+      if (rownos[j] != i1)
+        printf(j0_fmt, i + j*n_con + Fortran, Zero);
+  }
 }
 
-static int
-nzcgrad(VOID)
-{
+static int nzcgrad(VOID){
   cgrad *cg;
   int i;
   for(i = 0; i < n_con; i++)
@@ -1676,9 +1669,9 @@ static char *putout(expr *e, int i, int j, char *what, int k, int *z){
   if (i < j) {
     if (what)
       printf("\n\n%s\t/*** defined variables for %s %d ***/\n",
-             star, what, k);
-             for(c1 = cexps1 + i; i < j; i++, c1++)
-               com_out(c1->e, c1->L, c1->nlin, i + ncom0);
+      star, what, k);
+    for(c1 = cexps1 + i; i < j; i++, c1++)
+      com_out(c1->e, c1->L, c1->nlin, i + ncom0);
   }
   printf(what ? "\n%s  /***  %s %d  ***/\n\n"
   : "\n%s  /***  objective ***/\n\n", star, what, k);
@@ -1750,561 +1743,553 @@ static void funnel_set(funnel *f, char *gj0_fmt){
   fwalk = 0;
 }
 
-static void
-end(VOID)
-{
+static void end(VOID){
   printf(Fortran ? "\tend\n" : "}\n");
   branches = 0;
+}
+
+void fobj_output(int deriv){
+  int *c1, i, lbl;
+  char buf[24], *eval;
+  ograd *og;
+  static char *rv[2] = { "feval0", "feval" };
+  
+  sprintf(buf, n_obj ? "%d" : "*", o_vars);
+  printf(deriv ?
+  "\n\tdouble precision function feval(nobj, needfg, x, g)\n\
+  integer nobj, needfg\n\
+  double precision x(%s), g(%s)\n"
+  : "\n\tdouble precision function feval0(nobj, x)\n\
+  integer nobj\n\
+  double precision x(%s)\n", buf, buf);
+  
+  if (n_obj > 1)
+    printf("\tinteger nobj1\n");
+  else if (!n_obj) {
+    printf("\tend\n");
+    return;
   }
   
-  void fobj_output(int deriv){
-    int *c1, i, lbl;
-    char buf[24], *eval;
-    ograd *og;
-    static char *rv[2] = { "feval0", "feval" };
-    
-    sprintf(buf, n_obj ? "%d" : "*", o_vars);
-    printf(deriv ?
-    "\n\tdouble precision function feval(nobj, needfg, x, g)\n\
-    integer nobj, needfg\n\
-    double precision x(%s), g(%s)\n"
-    : "\n\tdouble precision function feval0(nobj, x)\n\
-    integer nobj\n\
-    double precision x(%s)\n", buf, buf);
-    
+  want_derivs = deriv;
+  for(og = 0, i = 0; i < n_obj; i++) {
+    for(og = Ograd[i]; og; og = og->next)
+      if (og->coef)
+        goto break2;
+  }
+  break2:
+  cde_dwalk(obj_de, n_obj, &omax, o_ifset, zao, (cgrad**)Ograd);
+  if (needx0check)
+    printf("%s\tlogical xcheck\n\texternal xcheck\n",
+    deriv ? "\tinteger wantfg\n" : "");
+  if (omax.nvt) {
+    printf("\n\tdouble precision v(%d)", omax.nvt);
+    if (omax.ndv > 1 && deriv)
+      printf(", dv(%d)", omax.ndv-1);
+    printf(og ? ", rv\n" : "\n");
+    if (omax.ncond > 1 && want_derivs)
+      printf("\tinteger cond(%d)\n", omax.ncond-1);
+  }
+  else if (og)
+    printf("\n\tdouble precision rv\n");
+  
+  if (omax.needT1)
+    printf("\tdouble precision t1, t2\n");
+  
+  plcommon(deriv);
+  
+  x0check(combc, ncom0, 2, deriv);
+  
+  if ((f_b || f_o) && deriv) {
+    printf("\tif (wantfg .ge. 2) then\n");
+    if (f_b)
+      printf("\t\tcall funelb(x)\n");
+    if (f_o)
+      funnel_set(f_o, g0_fmt);
+    printf("\t\tendif\n");
+  }
+  
+  if (n_obj > 1) {
+    printf("\tnobj1 = nobj + 1\n");
+    lbl = Switch("nobj1", n_obj);
+  }
+  c1 = o_cexp1st;
+  for(i = 0;; c1++) {
     if (n_obj > 1)
-      printf("\tinteger nobj1\n");
-    else if (!n_obj) {
+      Case(lbl+i);
+    if (deriv)
+      printf("\tif (mod(wantfg,2) .eq. 1) then\n");
+    eval = putout(obj_de[i].e, c1[0], c1[1],
+                  n_obj > 1 ? "objective" : NULL, i, zao[i]);
+                  rv_output(rv[deriv], eval, Ograd[i]);
+                  if (deriv) {
+                    printf("\n\tendif\n\n\tif (wantfg .gt. 1) then\n");
+                    obj_derivs(i);
+                    printf("\n\tendif\n");
+                  }
+                  if (++i >= n_obj)
+                    break;
+                  printf("\treturn\n");
+  }
+  end();
+}
+  
+void obj_output(int deriv){
+  int *c1, i;
+  ograd *og;
+  static char rv[] = "rv";
+  static char *header[4] = {
+    "0_(fint *nobj, real *x)",
+    "_(fint *nobj, fint *needfg, real *x, real *g)",
+    "0_(nobj, x)\n\tfint *nobj;\n real *x;",
+    "_(nobj, needfg, x, g)\n fint *nobj, *needfg;\n real *x, *g;"
+  };
+  char *eval, *s;
+  
+  printf(" real\nfeval%s\n", header[deriv + krflag]);
+  
+  if (!n_obj) {
+    /*{*/ printf("{ return 0.; }\n");
+    return;
+  }
+  want_derivs = deriv;
+  printf("{");
+  for(og = 0, i = 0; i < n_obj; i++) {
+    for(og = Ograd[i]; og; og = og->next)
+      if (og->coef)
+        goto break2;
+  }
+  break2:
+  cde_dwalk(obj_de, n_obj, &omax, o_ifset, zao, (cgrad**)Ograd);
+  if (omax.nvt) {
+    printf("\n\treal v[%d]", omax.nvt);
+    if (omax.ndv)
+      printf(", dv[%d]", omax.ndv);
+    printf("%s;\n", og ? ", rv" : "");
+  }
+  else if (og)
+    printf("\n\treal rv;\n");
+  
+  if (omax.ncond)
+    printf("\tstatic int cond[%d];\n", omax.ncond);
+  
+  if (omax.needT1)
+    printf("\treal t1, t2;\n");
+  
+  x0check(combc, ncom0, 2, deriv);
+  
+  if ((f_b || f_o) && deriv) {
+    printf("\tif (wantfg & 2) {\n");
+    if (f_b)
+      printf("\t\tfunnelb(x);\n");
+    if (f_o)
+      funnel_set(f_o, g0_fmt);
+    printf("\t\t}\n");
+  }
+  
+  printf(n_obj > 1 ? "\n\tswitch(*nobj) {\n" : "\n");
+  c1 = o_cexp1st;
+  for(i = 0; i < n_obj; i++, c1++) {
+    if (n_obj > 1)
+      printf("\n  case %d:\n", i);
+    if (deriv)
+      printf("\tif (wantfg & 1) {\n");
+    eval = putout(obj_de[i].e, c1[0], c1[1],
+                  n_obj > 1 ? "objective" : NULL, i, zao[i]);
+                  s = rv_output(rv, eval, Ograd[i]);
+                  if (deriv) {
+                    printf("\t;}\n\n\tif (wantfg & 2) {\n");
+                    obj_derivs(i);
+                    printf("\t}\n");
+                  }
+                  printf("\n\treturn %s;\n", s);
+      }
+      if (n_obj > 1)
+        printf("\n\t}\n");
+      end();
+  }
+  
+  void fcon_output(int deriv){
+    int *c1, i;
+    char *s;
+    
+    printf(deriv ? "\n\tsubroutine ceval(needfg, x, c, J)\n\
+    integer needfg\n\tdouble precision x(%d), c(%d), J(%ld)\n"
+    : "\n\tsubroutine ceval0(x, c)\n\
+    double precision x(%d), c(%d)\n",
+    c_vars ? c_vars : 1, n_con ? n_con : 1, nJ ? nJ : 1);
+    
+    if (!n_con) {
       printf("\tend\n");
       return;
     }
     
     want_derivs = deriv;
-    for(og = 0, i = 0; i < n_obj; i++) {
-      for(og = Ograd[i]; og; og = og->next)
-        if (og->coef)
-          goto break2;
-    }
-    break2:
-    cde_dwalk(obj_de, n_obj, &omax, o_ifset, zao, (cgrad**)Ograd);
+    cde_dwalk(con_de, n_con, &cmax, c_ifset, zac, Cgrad);
     if (needx0check)
       printf("%s\tlogical xcheck\n\texternal xcheck\n",
-             deriv ? "\tinteger wantfg\n" : "");
-             if (omax.nvt) {
-               printf("\n\tdouble precision v(%d)", omax.nvt);
-               if (omax.ndv > 1 && deriv)
-                 printf(", dv(%d)", omax.ndv-1);
-               printf(og ? ", rv\n" : "\n");
-               if (omax.ncond > 1 && want_derivs)
-                 printf("\tinteger cond(%d)\n", omax.ncond-1);
-             }
-             else if (og)
-               printf("\n\tdouble precision rv\n");
-             
-             if (omax.needT1)
-               printf("\tdouble precision t1, t2\n");
-             
-             plcommon(deriv);
-             
-             x0check(combc, ncom0, 2, deriv);
-             
-             if ((f_b || f_o) && deriv) {
-               printf("\tif (wantfg .ge. 2) then\n");
-               if (f_b)
-                 printf("\t\tcall funelb(x)\n");
-               if (f_o)
-                 funnel_set(f_o, g0_fmt);
-               printf("\t\tendif\n");
-             }
-             
-             if (n_obj > 1) {
-               printf("\tnobj1 = nobj + 1\n");
-               lbl = Switch("nobj1", n_obj);
-             }
-             c1 = o_cexp1st;
-             for(i = 0;; c1++) {
-               if (n_obj > 1)
-                 Case(lbl+i);
-               if (deriv)
-                 printf("\tif (mod(wantfg,2) .eq. 1) then\n");
-               eval = putout(obj_de[i].e, c1[0], c1[1],
-                             n_obj > 1 ? "objective" : NULL, i, zao[i]);
-                             rv_output(rv[deriv], eval, Ograd[i]);
-                             if (deriv) {
-                               printf("\n\tendif\n\n\tif (wantfg .gt. 1) then\n");
-                               obj_derivs(i);
-                               printf("\n\tendif\n");
-                             }
-                             if (++i >= n_obj)
-                               break;
-                             printf("\treturn\n");
-             }
-             end();
-    }
+      deriv ? "\tinteger wantfg\n" : "");
     
-    void obj_output(int deriv){
-      int *c1, i;
-      ograd *og;
-      static char rv[] = "rv";
-      static char *header[4] = {
-        "0_(fint *nobj, real *x)",
-                                    "_(fint *nobj, fint *needfg, real *x, real *g)",
-                                      "0_(nobj, x)\n\tfint *nobj;\n real *x;",
-                                      "_(nobj, needfg, x, g)\n fint *nobj, *needfg;\n real *x, *g;"
-      };
-      char *eval, *s;
-      
-      printf(" real\nfeval%s\n", header[deriv + krflag]);
-      
-      if (!n_obj) {
-        /*{*/ printf("{ return 0.; }\n");
-        return;
-        }
-        want_derivs = deriv;
-        printf("{");
-        for(og = 0, i = 0; i < n_obj; i++) {
-          for(og = Ograd[i]; og; og = og->next)
-            if (og->coef)
-              goto break2;
-        }
-        break2:
-        cde_dwalk(obj_de, n_obj, &omax, o_ifset, zao, (cgrad**)Ograd);
-        if (omax.nvt) {
-          printf("\n\treal v[%d]", omax.nvt);
-          if (omax.ndv)
-            printf(", dv[%d]", omax.ndv);
-          printf("%s;\n", og ? ", rv" : "");
-        }
-        else if (og)
-          printf("\n\treal rv;\n");
-        
-        if (omax.ncond)
-          printf("\tstatic int cond[%d];\n", omax.ncond);
-        
-        if (omax.needT1)
-          printf("\treal t1, t2;\n");
-        
-        x0check(combc, ncom0, 2, deriv);
-        
-        if ((f_b || f_o) && deriv) {
-          printf("\tif (wantfg & 2) {\n");
-          if (f_b)
-            printf("\t\tfunnelb(x);\n");
-          if (f_o)
-            funnel_set(f_o, g0_fmt);
-          printf("\t\t}\n");
-        }
-        
-        printf(n_obj > 1 ? "\n\tswitch(*nobj) {\n" : "\n");
-        c1 = o_cexp1st;
-        for(i = 0; i < n_obj; i++, c1++) {
-          if (n_obj > 1)
-            printf("\n  case %d:\n", i);
-          if (deriv)
-            printf("\tif (wantfg & 1) {\n");
-          eval = putout(obj_de[i].e, c1[0], c1[1],
-                        n_obj > 1 ? "objective" : NULL, i, zao[i]);
-                        s = rv_output(rv, eval, Ograd[i]);
-                        if (deriv) {
-                          printf("\t;}\n\n\tif (wantfg & 2) {\n");
-                          obj_derivs(i);
-                          printf("\t}\n");
-                        }
-                        printf("\n\treturn %s;\n", s);
-        }
-        if (n_obj > 1)
-          printf("\n\t}\n");
-        end();
-        }
-        
-        void fcon_output(int deriv){
-          int *c1, i;
-          char *s;
-          
-          printf(deriv ? "\n\tsubroutine ceval(needfg, x, c, J)\n\
-          integer needfg\n\tdouble precision x(%d), c(%d), J(%ld)\n"
-          : "\n\tsubroutine ceval0(x, c)\n\
-          double precision x(%d), c(%d)\n",
-                 c_vars ? c_vars : 1, n_con ? n_con : 1, nJ ? nJ : 1);
-                 
-                 if (!n_con) {
-                   printf("\tend\n");
-                   return;
-                 }
-                 
-                 want_derivs = deriv;
-                 cde_dwalk(con_de, n_con, &cmax, c_ifset, zac, Cgrad);
-                 if (needx0check)
-                   printf("%s\tlogical xcheck\n\texternal xcheck\n",
-                          deriv ? "\tinteger wantfg\n" : "");
-                          
-                          if (cmax.nvt) {
-                            printf("\n\tdouble precision v(%d)", cmax.nvt);
-                            printf(cmax.ndv > 1  && deriv ? ", dv(%d)\n" : "\n",
-                                                                  cmax.ndv-1);
-                          }
-                          if (cmax.ncond > 1)
-                            printf("\tinteger cond(%d)\n", cmax.ncond-1);
-                          
-                          if (cmax.needT1)
-                            printf("\tdouble precision t1, t2\n");
-                          else if (nzcgrad())
-                            printf("\tdouble precision t1\n");
-                          
-                          plcommon(deriv);
-                          
-                          x0check(comb, combc, 1, deriv);
-                          
-                          if (deriv)
-                            printf("\n\tif (mod(wantfg,2) .gt. 0) then\n");
-                          c1 = c_cexp1st;
-                          for(i = 0; i < n_con; i++, c1++) {
-                            s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
-                            printf("\tc(%d) = %s\n", i+1, con_linadd(i,s));
-                          }
-                          if (deriv) {
-                            printf("\tendif\n\n\tif (wantfg .gt. 1) then\n");
-                            if (f_b)
-                              printf("\t\tcall funelb(x)\n");
-                            if (f_c)
-                              funnel_set(f_c, j0_fmt);
-                            for(i = 0; i < n_con; i++)
-                              con_derivs(i);
-                            printf("\tendif\n");
-                            djoff = -1;
-                          }
-                          end();
-        }
-        
-        void con_output(int deriv){
-          int *c1, i;
-          char *s;
-          static char *header[4] = {
-            "0_(real *x, real *c)",
-                 "_(fint *needfg, real *x, real *c, real *J)",
-                 "0_(x, c)\n real *x, *c;",
-                 "_(needfg, x, c, J)\n fint *needfg;\n real *x, *c, *J;"
-          };
-          printf("\n void\nceval%s\n{", header[deriv + krflag]);
-          
-          if (!n_con) {
-            printf("}\n");
-            return;
-        } /*}*/
-        
-        want_derivs = deriv;
-        cde_dwalk(con_de, n_con, &cmax, c_ifset, zac, Cgrad);
-        if (cmax.nvt) {
-          printf("\n\treal v[%d]", cmax.nvt);
-          printf(cmax.ndv && deriv ? ", dv[%d];\n" : ";\n", cmax.ndv);
-        }
-        if (cmax.ncond)
-          printf("\tstatic int cond[%d];\n", cmax.ncond);
-        
-        if (cmax.needT1)
-          printf("\treal t1, t2;\n");
-        else if (nzcgrad())
-          printf("\treal t1;\n");
-        
-        x0check(comb, combc, 1, deriv);
-        if (deriv)
-          printf("\n\tif (wantfg & 1) {\n");
-        c1 = c_cexp1st;
-        for(i = 0; i < n_con; i++, c1++) {
-          s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
-          printf("\tc[%d] = %s;\n", i, con_linadd(i,s));
-        }
-        if (deriv) {
-          printf("\t;}\n\tif (wantfg & 2) {\n");
-          if (f_b)
-            printf("\tfunnelb(x);\n");
-          if (f_c)
-            funnel_set(f_c, j0_fmt);
-          for(i = 0; i < n_con; i++)
-            con_derivs(i);
-          printf("\t}\n");
-          djoff = -1;
+    if (cmax.nvt) {
+      printf("\n\tdouble precision v(%d)", cmax.nvt);
+      printf(cmax.ndv > 1  && deriv ? ", dv(%d)\n" : "\n",
+                                            cmax.ndv-1);
+    }
+    if (cmax.ncond > 1)
+      printf("\tinteger cond(%d)\n", cmax.ncond-1);
+    
+    if (cmax.needT1)
+      printf("\tdouble precision t1, t2\n");
+    else if (nzcgrad())
+      printf("\tdouble precision t1\n");
+    
+    plcommon(deriv);
+    
+    x0check(comb, combc, 1, deriv);
+    
+    if (deriv)
+      printf("\n\tif (mod(wantfg,2) .gt. 0) then\n");
+    c1 = c_cexp1st;
+    for(i = 0; i < n_con; i++, c1++) {
+      s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
+      printf("\tc(%d) = %s\n", i+1, con_linadd(i,s));
+    }
+    if (deriv) {
+      printf("\tendif\n\n\tif (wantfg .gt. 1) then\n");
+      if (f_b)
+        printf("\t\tcall funelb(x)\n");
+      if (f_c)
+        funnel_set(f_c, j0_fmt);
+      for(i = 0; i < n_con; i++)
+        con_derivs(i);
+      printf("\tendif\n");
+      djoff = -1;
     }
     end();
   }
   
-  void
-  output(VOID)
-  {
-    int i, j;
-    plterm *p;
-    expr *e;
-    real *b, *be;
-    dLR *LR;
-    char buf[32], *x0;
-    cexp *c;
-    static char *fhead[2] = { "(real *x)", "(x) real *x;" };
+  void con_output(int deriv){
+    int *c1, i;
+    char *s;
+    static char *header[4] = {
+      "0_(real *x, real *c)",
+      "_(fint *needfg, real *x, real *c, real *J)",
+      "0_(x, c)\n real *x, *c;",
+      "_(needfg, x, c, J)\n fint *needfg;\n real *x, *c, *J;"
+    };
+    printf("\n void\nceval%s\n{", header[deriv + krflag]);
     
-    printf("#include \"math.h\"\n#include \"errno.h\"\n\
-    #ifndef fint\n\
-    #ifndef Long\n\
-    #include \"arith.h\"	/* for Long */\n\
-    #ifndef Long\n\
-    #define Long long\n\
-    #endif\n\
-    #endif\n\
-    #define fint Long\n\
-    #endif\n\
-    #ifndef real\n\
-    #define real double\n\
-    #endif\n");
-    if (!krflag)
-      printf("#ifdef __cplusplus\nextern \"C\" {\n#endif\n");
-    if (krflag < 2)
-      printf(" %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n",
-             "real acosh_(real *);",
-             "real asinh_(real *);",
-             "real acoshd_(real *, real *);",
-             "real asinhd_(real *, real *);",
-             "void in_trouble(char *, real);",
-             "void in_trouble2(char *, real, real);",
-             "void domain_(char *, real *, fint);",
-             "void zerdiv_(real *);");
-             printf(" fint auxcom_[1] = { %d /* nlc */ };\n", nlc);
-             printf(" fint funcom_[%d] = {\n\
-             %d /* nvar */,\n\
-             %d /* nobj */,\n\
-             %d /* ncon */,\n\
-             %d /* nzc */,\n\
-             %d /* densejac */",
-                    n_con && !densejac ? nzc + nv1 + n_obj + 6 : n_obj + 5,
-                    nv1, n_obj, n_con, densejac ? nv1*n_con : nzc, densejac);
-                    
-                    if (n_obj) {
-                      printf(",\n\n\t/* objtype (0 = minimize, 1 = maximize) */\n");
-                      for(i = 0; i < n_obj; i++)
-                        printf("%s\n\t%d", i ? "," : "", objtype[i]);
+    if (!n_con) {
+      printf("}\n");
+      return;
+    } /*}*/
+    
+    want_derivs = deriv;
+    cde_dwalk(con_de, n_con, &cmax, c_ifset, zac, Cgrad);
+    if (cmax.nvt) {
+      printf("\n\treal v[%d]", cmax.nvt);
+      printf(cmax.ndv && deriv ? ", dv[%d];\n" : ";\n", cmax.ndv);
+    }
+    if (cmax.ncond)
+      printf("\tstatic int cond[%d];\n", cmax.ncond);
+    
+    if (cmax.needT1)
+      printf("\treal t1, t2;\n");
+    else if (nzcgrad())
+      printf("\treal t1;\n");
+    
+    x0check(comb, combc, 1, deriv);
+    if (deriv)
+      printf("\n\tif (wantfg & 1) {\n");
+    c1 = c_cexp1st;
+    for(i = 0; i < n_con; i++, c1++) {
+      s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
+      printf("\tc[%d] = %s;\n", i, con_linadd(i,s));
+    }
+    if (deriv) {
+      printf("\t;}\n\tif (wantfg & 2) {\n");
+      if (f_b)
+        printf("\tfunnelb(x);\n");
+      if (f_c)
+        funnel_set(f_c, j0_fmt);
+      for(i = 0; i < n_con; i++)
+        con_derivs(i);
+      printf("\t}\n");
+      djoff = -1;
+    }
+    end();
+      }
+      
+      void output(VOID){
+        int i, j;
+        plterm *p;
+        expr *e;
+        real *b, *be;
+        dLR *LR;
+        char buf[32], *x0;
+        cexp *c;
+        static char *fhead[2] = { "(real *x)", "(x) real *x;" };
+        
+        printf("#include \"math.h\"\n#include \"errno.h\"\n\
+        #ifndef fint\n\
+        #ifndef Long\n\
+        #include \"arith.h\"	/* for Long */\n\
+        #ifndef Long\n\
+        #define Long long\n\
+        #endif\n\
+        #endif\n\
+        #define fint Long\n\
+        #endif\n\
+        #ifndef real\n\
+        #define real double\n\
+        #endif\n");
+        if (!krflag)
+          printf("#ifdef __cplusplus\nextern \"C\" {\n#endif\n");
+        if (krflag < 2)
+          printf(" %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n",
+          "real acosh_(real *);",
+          "real asinh_(real *);",
+          "real acoshd_(real *, real *);",
+          "real asinhd_(real *, real *);",
+          "void in_trouble(char *, real);",
+          "void in_trouble2(char *, real, real);",
+          "void domain_(char *, real *, fint);",
+          "void zerdiv_(real *);");
+        printf(" fint auxcom_[1] = { %d /* nlc */ };\n", nlc);
+        printf(" fint funcom_[%d] = {\n\
+        %d /* nvar */,\n\
+        %d /* nobj */,\n\
+        %d /* ncon */,\n\
+        %d /* nzc */,\n\
+        %d /* densejac */",
+        n_con && !densejac ? nzc + nv1 + n_obj + 6 : n_obj + 5,
+        nv1, n_obj, n_con, densejac ? nv1*n_con : nzc, densejac);
+        
+        if (n_obj) {
+          printf(",\n\n\t/* objtype (0 = minimize, 1 = maximize) */\n");
+          for(i = 0; i < n_obj; i++)
+            printf("%s\n\t%d", i ? "," : "", objtype[i]);
+        }
+        
+        if (n_con && !densejac) {
+          printf(",\n\n\t/* colstarts */\n");
+          for(i = 0; i <= n_var; i++)
+            printf("\t%d,\n", A_colstarts[i]);
+          printf("\n\t/* rownos */\n\t1");
+          for(i = 1; i < nzc; i++)
+            printf(",\n\t%d", rownos[i]);
+        }
+        printf(" };\n\n");
+        
+        for(i = j = 0; i < N_OPS; i++)
+          if (seen[i] && declare[i])
+            printf(j++ ? ", %s_()" : " extern real %s_()",
+            declare[i]);
+          if (j)
+            printf(";\n");
+          for(e = Plterms; e; e = LR->o.ep) {
+            LR = dLRp(e->dR);
+            p = e->L.p;
+            i = 2*p->n - 1;
+            printf(" real bs%d[%d] = {\n", LR->kind, i);
+            for(b = p->bs, be = b + i; b < be; b++) {
+              g_fmt(buf, *b);
+              printf("\t%s%s\n", buf,
+                      b + 1 < be ? "," : "};\n");
+            }
+          }
+          
+          printf(
+          " real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {\n\t\t1.7e308",
+                  2*nv1, 2*n_con);
+                  b = bounds;
+                  be = b + 2*(n_con + nv1);
+                  while(b < be)
+                    printf(",\n\t\t%s", fpval(*b++));
+                  printf("};\n\n");
+                  
+                  printf(" real x0comn_[%d] = {\n", nv1);
+                  for(i = 0; i < nv1; i++)
+                    printf("%s\t\t%s", i ? ",\n" : "", fpval(X0[i]));
+                  printf(" };\n\n");
+                  
+                  if (npd)
+                    printf(" static real pd[%d];\n", npd);
+                  
+                  if (f_b && derkind & 2) {
+                    printf("\n static void\nfunnelb%s\n{\n", fhead[krflag>>1]);
+                    if ((i = bmax.ndv) > 0)
+                      printf("\treal dv[%d];\n", i);
+                    funnel_set(f_b, "Botch<%d> = %s;");
+                    printf("\t}\n");
+                  }
+                  
+                  if (needx0check) {
+                    printf("static real old_x[%d];\nstatic int xkind = -1;\n\n\
+                    static int\nxcheck%s\n{\n\treal", nv1, xcheckdcl);
+                    if (comb > 0) {
+                      printf(" *x0 = x,");
+                      x0 = "x0";
                     }
-                    
-                    if (n_con && !densejac) {
-                      printf(",\n\n\t/* colstarts */\n");
-                      for(i = 0; i <= n_var; i++)
-                        printf("\t%d,\n", A_colstarts[i]);
-                      printf("\n\t/* rownos */\n\t1");
-                      for(i = 1; i < nzc; i++)
-                        printf(",\n\t%d", rownos[i]);
-                    }
-                    printf(" };\n\n");
-                    
-                    for(i = j = 0; i < N_OPS; i++)
-                      if (seen[i] && declare[i])
-                        printf(j++ ? ", %s_()" : " extern real %s_()",
-                               declare[i]);
-                               if (j)
-                                 printf(";\n");
-                               for(e = Plterms; e; e = LR->o.ep) {
-                                 LR = dLRp(e->dR);
-                                 p = e->L.p;
-                                 i = 2*p->n - 1;
-                                 printf(" real bs%d[%d] = {\n", LR->kind, i);
-                                 for(b = p->bs, be = b + i; b < be; b++) {
-                                   g_fmt(buf, *b);
-                                   printf("\t%s%s\n", buf,
-                                          b + 1 < be ? "," : "};\n");
-                                 }
-                               }
-                               
-                               printf(
-                               " real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {\n\t\t1.7e308",
-                                      2*nv1, 2*n_con);
-                                      b = bounds;
-                                      be = b + 2*(n_con + nv1);
-                                      while(b < be)
-                                        printf(",\n\t\t%s", fpval(*b++));
-                                      printf("};\n\n");
-                                      
-                                      printf(" real x0comn_[%d] = {\n", nv1);
-                                      for(i = 0; i < nv1; i++)
-                                        printf("%s\t\t%s", i ? ",\n" : "", fpval(X0[i]));
-                                      printf(" };\n\n");
-                                      
-                                      if (npd)
-                                        printf(" static real pd[%d];\n", npd);
-                                      
-                                      if (f_b && derkind & 2) {
-                                        printf("\n static void\nfunnelb%s\n{\n", fhead[krflag>>1]);
-                                        if ((i = bmax.ndv) > 0)
-                                          printf("\treal dv[%d];\n", i);
-                                        funnel_set(f_b, "Botch<%d> = %s;");
-                                        printf("\t}\n");
-                                      }
-                                      
-                                      if (needx0check) {
-                                        printf("static real old_x[%d];\nstatic int xkind = -1;\n\n\
-                                        static int\nxcheck%s\n{\n\treal", nv1, xcheckdcl);
-                                        if (comb > 0) {
-                                          printf(" *x0 = x,");
-                                          x0 = "x0";
-                                        }
-                                        else
-                                          x0 = "x";
-                                        printf(" *x1 = old_x, *xe = x + %d;\n", nv1);
-                                        if ((i = bmax.nvt) > 0)
-                                          printf("\treal v[%d];\n", i);
-                                        printf("\terrno = 0;\n\
-                                        if (xkind >= 0) {\n\t\twhile(*%s++ == *x1++)\n\
-                                          \tif (%s == xe)\n\t\t\t\treturn 0;\n\t\t--%s, --x1;\n\t\t}\n\
-                                          do *x1++ = *%s++;\n\t\twhile(%s < xe);\n\txkind = 0;\n",
-                                            x0,x0,x0,x0,x0);
-                                          for(i = 0, c = cexps; i < comb; c++, i++)
-                                            com_out(c->e, c->L, c->nlin, i);
-                                          printf("\treturn 1;\n\t}\n");
-                                      }
-                                      for(i = 1; i < 3; i++) {
-                                        if (owant & i)
-                                          obj_output(i-1);
-                                        if (cwant & i)
-                                          con_output(i-1);
-                                      }
-                                      if (!krflag)
-                                        printf("#ifdef __cplusplus\n\t}\n#endif\n");
-    }
+                    else
+                      x0 = "x";
+                    printf(" *x1 = old_x, *xe = x + %d;\n", nv1);
+                    if ((i = bmax.nvt) > 0)
+                      printf("\treal v[%d];\n", i);
+                    printf("\terrno = 0;\n\
+                    if (xkind >= 0) {\n\t\twhile(*%s++ == *x1++)\n\
+                      \tif (%s == xe)\n\t\t\t\treturn 0;\n\t\t--%s, --x1;\n\t\t}\n\
+                      do *x1++ = *%s++;\n\t\twhile(%s < xe);\n\txkind = 0;\n",
+                        x0,x0,x0,x0,x0);
+                      for(i = 0, c = cexps; i < comb; c++, i++)
+                        com_out(c->e, c->L, c->nlin, i);
+                      printf("\treturn 1;\n\t}\n");
+  }
+  for(i = 1; i < 3; i++) {
+    if (owant & i)
+      obj_output(i-1);
+    if (cwant & i)
+      con_output(i-1);
+  }
+  if (!krflag)
+    printf("#ifdef __cplusplus\n\t}\n#endif\n");
+}
+
+void foutput(VOID){
+  
+  printf("entry point?\n");
+  
+  int colrow, i, j, nb, ncr;
+  plterm *p;
+  real *b, *be;
+  expr *e;
+  dLR *LR;
+  char buf[32];
+  cexp *c;
+  
+  ncr = n_obj;
+  if (colrow = n_con && !densejac)
+    ncr += nzc + n_var + 1;
+  printf(
+  "\tblock data\n\tcommon /funcom/ nvar, nobj, ncon, nzc, densej%s\n",
+          ncr ? ", colrow" : "");
+          printf("\tinteger nvar, nobj, ncon, nzc, densej");
+          if (ncr)
+            printf(", colrow(%d)", ncr);
+          
+          nb = 2*(n_con + o_vars);
+          printf("\n\n\tcommon /boundc/ bounds\n\
+          double precision bounds(%d)\n\
+          common /x0comn/ x0\n\tdouble precision x0(%d)\n",
+          nb + 1, nv1);
+          printf("\tcommon /auxcom/ nlc\n\tinteger nlc\n");
+          plcommon(1);
+          
+          printf("\tdata nvar/%d/, nobj/%d/, ncon/%d/, nzc/%d/, densej/%d/\n",
+          nv1, n_obj, n_con, colrow ? nzc : n_con*nv1, densejac);
+          if (n_obj) {
+            printf("\n*\t*** objtype (0 = minimize, 1 = maximize) ***\n");
+            for(i = 0; i < n_obj; i++)
+              printf("\tdata colrow(%d)/%d/\n", i+1, objtype[i]);
+          }
+          if (colrow) {
+            printf("\n*\t*** colstarts ***\n");
+            j = n_obj + 1;
+            for(i = 0; i <= n_var; i++)
+              printf("\tdata colrow(%d)/%d/\n", i+j, A_colstarts[i]+1);
+            j += n_var + 1;
+            printf("\n*\t*** rownos ***\n\tdata colrow(%d)/1/\n", j);
+            for(i = 1; i < nzc; i++)
+              printf("\tdata colrow(%d)/%d/\n", i+j, rownos[i]);
+          }
+          for(i = 0; i < nv1; i++)
+            printf("\tdata x0(%d)/%s/\n", i+1, fpval(X0[i]));
+          for(e = Plterms; e; e = LR->o.ep) {
+            LR = dLRp(e->dR);
+            p = e->L.p;
+            i = 2*p->n - 1;
+            j = 0;
+            for(b = p->bs, be = b + i; b < be; b++) {
+              g_fmt(buf, *b);
+              printf("\tdata bs%d(%d)/%s/\n", LR->kind, ++j, buf);
+            }
+          }
+          
+          b = bounds;
+          be = b + nb;
+          i = 2;
+          printf("\tdata bounds(1)/1.7e+308/\n");
+          while(b < be)
+            printf("\tdata bounds(%d)/%s/\n", i++, fpval(*b++));
+          printf("\tdata nlc/%d/\n", nlc);
+          printf("\tdata xkind/-1/\n\tend\n\n");
+          
+          if (f_b && derkind & 2) {
+            printf("\tsubroutine funelb(x)\n");
+            printf("\tdouble precision x(%d)\n", n_var);
+            plcommon(1);
+            if ((i = bmax.ndv) > 0)
+              printf("\tdouble precision dv(%d)\n", i);
+            funnel_set(f_b, "Botch<%d> = %s");
+            printf("\tend\n");
+          }
+          
+          if (needx0check) {
+            printf("\tlogical function xcheck(x)\n\
+            double precision x(%d)\n\
+            double precision oldx(%d)\n", nv1, nv1);
+            if ((i = bmax.nvt) > 0)
+              printf("\tdouble precision v(%d)\n", i);
+            if (comb > 0)
+              plcommon(1);
+            else
+              printf(
+              "\tcommon /xkindc/ xkind\n\tinteger xkind\n\tsave /xkindc/\n");
+            printf("\tif (xkind .lt. 0) then\n\t\ti = 1\n\t\tgoto 20\n\t\tendif\n\
+            do 10 i = 1, %d\n\t\tif (x(i) .ne. oldx(i)) goto 20\n 10\t\tcontinue\n\
+              xcheck = .false.\n\treturn\n 20 \tdo 30 i = i, %d\n\
+              30\t\toldx(i) = x(i)\n\txkind = 0\n", nv1, nv1);
+            for(i = 0, c = cexps; i < comb; c++, i++)
+              com_out(c->e, c->L, c->nlin, i);
+            printf("\txcheck = .true.\n\tend\n");
+          }
+          
+          for(i = 1; i < 3; i++) {
+            if (owant & i)
+              fobj_output(i-1);
+            if (cwant & i)
+              fcon_output(i-1);
+          }
+}
+
+static void usage(int rc){
+  static char *op[] = {
+    "-1 { produce feval0, ceval0 (function values only) }",
+    "-2 { produce feval, ceval (functions and gradients, default) }",
+    "-3 { produce feval0, ceval0, feval, ceval }",
+    "-4 { produce feval, ceval0 }",
+    "-5 { produce feval0, ceval }",
+    "-d { dense Jacobian }",
+    "-f { Fortran output }",
+    "-i { no derivatives for integer variables }",
+    "-k { K&R C output (default = ANSI C) }",
+    0};
+    char **o;
     
-    void
-    foutput(VOID)
-    {
-      
-      printf("entry point?\n");
-      
-      int colrow, i, j, nb, ncr;
-      plterm *p;
-      real *b, *be;
-      expr *e;
-      dLR *LR;
-      char buf[32];
-      cexp *c;
-      
-      ncr = n_obj;
-      if (colrow = n_con && !densejac)
-        ncr += nzc + n_var + 1;
-      printf(
-      "\tblock data\n\tcommon /funcom/ nvar, nobj, ncon, nzc, densej%s\n",
-             ncr ? ", colrow" : "");
-             printf("\tinteger nvar, nobj, ncon, nzc, densej");
-             if (ncr)
-               printf(", colrow(%d)", ncr);
-             
-             nb = 2*(n_con + o_vars);
-             printf("\n\n\tcommon /boundc/ bounds\n\
-             double precision bounds(%d)\n\
-             common /x0comn/ x0\n\tdouble precision x0(%d)\n",
-             nb + 1, nv1);
-             printf("\tcommon /auxcom/ nlc\n\tinteger nlc\n");
-             plcommon(1);
-             
-             printf("\tdata nvar/%d/, nobj/%d/, ncon/%d/, nzc/%d/, densej/%d/\n",
-           nv1, n_obj, n_con, colrow ? nzc : n_con*nv1, densejac);
-           if (n_obj) {
-             printf("\n*\t*** objtype (0 = minimize, 1 = maximize) ***\n");
-             for(i = 0; i < n_obj; i++)
-               printf("\tdata colrow(%d)/%d/\n", i+1, objtype[i]);
-           }
-           if (colrow) {
-             printf("\n*\t*** colstarts ***\n");
-             j = n_obj + 1;
-             for(i = 0; i <= n_var; i++)
-               printf("\tdata colrow(%d)/%d/\n", i+j, A_colstarts[i]+1);
-             j += n_var + 1;
-             printf("\n*\t*** rownos ***\n\tdata colrow(%d)/1/\n", j);
-             for(i = 1; i < nzc; i++)
-               printf("\tdata colrow(%d)/%d/\n", i+j, rownos[i]);
-           }
-           for(i = 0; i < nv1; i++)
-             printf("\tdata x0(%d)/%s/\n", i+1, fpval(X0[i]));
-           for(e = Plterms; e; e = LR->o.ep) {
-             LR = dLRp(e->dR);
-             p = e->L.p;
-             i = 2*p->n - 1;
-             j = 0;
-             for(b = p->bs, be = b + i; b < be; b++) {
-               g_fmt(buf, *b);
-               printf("\tdata bs%d(%d)/%s/\n", LR->kind, ++j, buf);
-             }
-           }
-           
-           b = bounds;
-           be = b + nb;
-           i = 2;
-           printf("\tdata bounds(1)/1.7e+308/\n");
-           while(b < be)
-             printf("\tdata bounds(%d)/%s/\n", i++, fpval(*b++));
-           printf("\tdata nlc/%d/\n", nlc);
-           printf("\tdata xkind/-1/\n\tend\n\n");
-           
-           if (f_b && derkind & 2) {
-             printf("\tsubroutine funelb(x)\n");
-             printf("\tdouble precision x(%d)\n", n_var);
-             plcommon(1);
-             if ((i = bmax.ndv) > 0)
-               printf("\tdouble precision dv(%d)\n", i);
-             funnel_set(f_b, "Botch<%d> = %s");
-             printf("\tend\n");
-           }
-           
-           if (needx0check) {
-             printf("\tlogical function xcheck(x)\n\
-             double precision x(%d)\n\
-             double precision oldx(%d)\n", nv1, nv1);
-             if ((i = bmax.nvt) > 0)
-               printf("\tdouble precision v(%d)\n", i);
-             if (comb > 0)
-               plcommon(1);
-             else
-               printf(
-               "\tcommon /xkindc/ xkind\n\tinteger xkind\n\tsave /xkindc/\n");
-             printf("\tif (xkind .lt. 0) then\n\t\ti = 1\n\t\tgoto 20\n\t\tendif\n\
-             do 10 i = 1, %d\n\t\tif (x(i) .ne. oldx(i)) goto 20\n 10\t\tcontinue\n\
-               xcheck = .false.\n\treturn\n 20 \tdo 30 i = i, %d\n\
-               30\t\toldx(i) = x(i)\n\txkind = 0\n", nv1, nv1);
-             for(i = 0, c = cexps; i < comb; c++, i++)
-               com_out(c->e, c->L, c->nlin, i);
-             printf("\txcheck = .true.\n\tend\n");
-           }
-           
-           for(i = 1; i < 3; i++) {
-             if (owant & i)
-               fobj_output(i-1);
-             if (cwant & i)
-               fcon_output(i-1);
-           }
-    }
+    fprintf(Stderr, "usage: %s [options] file[.nl]\noptions:\n", progname);
+    for(o = op; *o; o++)
+      fprintf(Stderr, "\t%s\n", *o);
+    exit(rc);
+}
     
-    static void usage(int rc){
-      static char *op[] = {
-        "-1 { produce feval0, ceval0 (function values only) }",
-                    "-2 { produce feval, ceval (functions and gradients, default) }",
-                    "-3 { produce feval0, ceval0, feval, ceval }",
-                    "-4 { produce feval, ceval0 }",
-                    "-5 { produce feval0, ceval }",
-                    "-d { dense Jacobian }",
-                    "-f { Fortran output }",
-                    "-i { no derivatives for integer variables }",
-                    "-k { K&R C output (default = ANSI C) }",
-                    0};
-                    char **o;
-                    
-                    fprintf(Stderr, "usage: %s [options] file[.nl]\noptions:\n", progname);
-                    for(o = op; *o; o++)
-                      fprintf(Stderr, "\t%s\n", *o);
-                    exit(rc);
-    }
-    
-    static void cant(char *s1, char *s2){
-      fprintf(Stderr, "Can't open %s", s1);
+static void cant(char *s1, char *s2){
+  fprintf(Stderr, "Can't open %s", s1);
       if (s2)
         fprintf(Stderr, " or %s.nl", s2);
       fputc('\n', Stderr);
       exit(1);
-    }
+}
     
-    static void
-    get_rownos(VOID)
-    {
+static void get_rownos(VOID){
       int i = n_con, i1, j, j1;
       cgrad *cg;
       memset((char *)rownos, 0, nzc*sizeof(int));
@@ -2338,259 +2323,257 @@ end(VOID)
                   cg->goff = --A_colstarts[cg->varno] - 1;
             }
           }
-    }
+}
     
-    static void
-    nlvzap(int i, int j)
-    {
+static void nlvzap(int i, int j){
       memset(intsk + i - j, 1, j);
-    }
+}
     
-    int main(int argc, char **argv){
-      argc = 3;
-      char *argv2[] = {"./nlc","-l","../examples/cork.nl"};
-      printf("entry point!\n");
-      printf("argc = %d!\n",argc);
-      FILE *nl;
-      char *s, *s0;
-      int i, ncom, nv;
-      fint L;
-      expr_nx *enx;
+int main(int argc, char **argv){
+  argc = 3;
+  char *argv2[] = {"./nlc","-l","../examples/cork.nl"};
+  printf("entry point!\n");
+  printf("argc = %d!\n",argc);
+  FILE *nl;
+  char *s, *s0;
+  int i, ncom, nv;
+  fint L;
+  expr_nx *enx;
+  
+  ASL_alloc(ASL_read_fg);
+  progname = *argv;
+  g_fmt_decpt = 1;
+  nextarg:
+  while ((s = *++argv) && *s == '-')
+    for(s0 = s, --argc;;)
+      switch(*++s) {
+        default:
+          fprintf(Stderr, "invalid option %s\n",s0);
+          usage(1);
+        case 0:
+          goto nextarg;
+        case '1':
+          want_derivs = 0;
+          cwant = owant = derkind = 1;
+          break;
+        case '2':
+        case '3':
+          want_derivs = 1;
+          cwant = owant = derkind = *s - '0';
+          break;
+        case '4':
+          want_derivs = cwant = 1;
+          derkind = owant = 2;
+          break;
+        case '5':
+          want_derivs = owant = 1;
+          derkind = cwant = 2;
+          break;
+        case 'd':
+          densejac = 1;
+          break;
+        case 'f':
+          Fortran = 1;
+          g_fmt_decpt = 2;
+          g_fmt_E = 'd';
+          Half = ".5d0";
+          One = "1d0";
+          Zero = "0.d+00";
+          Negone = "-1d0";
+          opEQ = ".eq.";
+          opGE = ".ge.";
+          opGT = ".gt.";
+          opLE = ".le.";
+          opLT = ".lt.";
+          opNE = ".ne.";
+          opAND = ".and.";
+          opOR = ".or.";
+          offlfmt1 = "%s";
+          offlfmt2 = "%s, %s";
+          assign_fmt = "\t%s = %s\n";
+          binop_fmt = "\t%s = %s %s %s\n";
+          goto_fmt = "\tgo to %d\n";
+          ifgo_fmt = "\tif (%s %s %s) go to %d\n";
+          label_fmt = "%5d continue\n";
+          ifstart_fmt = "\tif (%s %s %s) then\n";
+          elseif_fmt = "\telse if (%s %s %s) then\n";
+          else_fmt = "\telse\n";
+          endif_fmt = "\tendif\n";
+          call_fmt = "\t%s(%s)\n";
+          case_fmt = label_fmt;
+          cond_fmt = "cond(%d)";
+          break_fmt = goto_fmt;
+          endswitch_fmt = label_fmt;
+          zerdiv_fmt = "\tcall zerdiv(%s)\n";
+          dv_fmt = "dv(%d)";
+          Fortstar = "*";
+          pd_fmt = "pd(%d)";
+          tv_fmt = "v(%d)";
+          x_fmt = "x(%d)";
+          grad_fmt = "g(%d)";
+          jac_fmt = "J(%d)";
+          g0_fmt = "\tg(%d) = %s\n";
+          j0_fmt = "\tJ(%d) = %s\n";
+          star = "*";
+          eos = "\n";
+          xcheck = "\twantfg = needfg\n\
+          if (xcheck(x) .and. wantfg .eq. 2) wantfg = 3\n";
+          xcheck0 = "\txchk = xcheck(x)\n";
+          xkind =
+          "\tif (mod(xkind,2*%d) .lt. %d) then\n\t\txkind = xkind + %d\n";
+          break;
+        case 'i':
+          skip_int_derivs = 1;
+          break;
+        case 'k':
+          krflag = 2;
+          Void = "";
+          xcheckdcl = "(x) real *x;";
+          break;
+        case '?':
+          usage(0);
+      }
+      if (argc > 2 || !s)
+        usage(1);
+      return_nofile = 1;
+      nl = jacdim0(s, L = strlen(s));
+      if (!nl) {
+        if ((L -= 3) > 0 && !strcmp(s + L, ".nl")) {
+          s[L] = 0;
+          nl = jacdim0(s, L);
+          if (!nl)
+            cant(s, s);
+        }
+        else
+          cant(s, 0);
+      }
+      for(i = 0; i < N_OPS; i++)
+        r_ops[i] = (efunc *)i;
       
-      ASL_alloc(ASL_read_fg);
-      progname = *argv;
-      g_fmt_decpt = 1;
-      nextarg:
-      while ((s = *++argv) && *s == '-')
-        for(s0 = s, --argc;;)
-          switch(*++s) {
-            default:
-              fprintf(Stderr, "invalid option %s\n",s0);
-              usage(1);
-            case 0:
-              goto nextarg;
-            case '1':
-              want_derivs = 0;
-              cwant = owant = derkind = 1;
-              break;
-            case '2':
-            case '3':
-              want_derivs = 1;
-              cwant = owant = derkind = *s - '0';
-              break;
-            case '4':
-              want_derivs = cwant = 1;
-              derkind = owant = 2;
-              break;
-            case '5':
-              want_derivs = owant = 1;
-              derkind = cwant = 2;
-              break;
-            case 'd':
-              densejac = 1;
-              break;
-            case 'f':
-              Fortran = 1;
-              g_fmt_decpt = 2;
-              g_fmt_E = 'd';
-              Half = ".5d0";
-              One = "1d0";
-              Zero = "0.d+00";
-              Negone = "-1d0";
-              opEQ = ".eq.";
-              opGE = ".ge.";
-              opGT = ".gt.";
-              opLE = ".le.";
-              opLT = ".lt.";
-              opNE = ".ne.";
-              opAND = ".and.";
-              opOR = ".or.";
-              offlfmt1 = "%s";
-              offlfmt2 = "%s, %s";
-              assign_fmt = "\t%s = %s\n";
-              binop_fmt = "\t%s = %s %s %s\n";
-              goto_fmt = "\tgo to %d\n";
-              ifgo_fmt = "\tif (%s %s %s) go to %d\n";
-              label_fmt = "%5d continue\n";
-              ifstart_fmt = "\tif (%s %s %s) then\n";
-              elseif_fmt = "\telse if (%s %s %s) then\n";
-              else_fmt = "\telse\n";
-              endif_fmt = "\tendif\n";
-              call_fmt = "\t%s(%s)\n";
-              case_fmt = label_fmt;
-              cond_fmt = "cond(%d)";
-              break_fmt = goto_fmt;
-              endswitch_fmt = label_fmt;
-              zerdiv_fmt = "\tcall zerdiv(%s)\n";
-              dv_fmt = "dv(%d)";
-              Fortstar = "*";
-              pd_fmt = "pd(%d)";
-              tv_fmt = "v(%d)";
-              x_fmt = "x(%d)";
-              grad_fmt = "g(%d)";
-              jac_fmt = "J(%d)";
-              g0_fmt = "\tg(%d) = %s\n";
-              j0_fmt = "\tJ(%d) = %s\n";
-              star = "*";
-              eos = "\n";
-              xcheck = "\twantfg = needfg\n\
-              if (xcheck(x) .and. wantfg .eq. 2) wantfg = 3\n";
-              xcheck0 = "\txchk = xcheck(x)\n";
-              xkind =
-              "\tif (mod(xkind,2*%d) .lt. %d) then\n\t\txkind = xkind + %d\n";
-              break;
-            case 'i':
-              skip_int_derivs = 1;
-              break;
-            case 'k':
-              krflag = 2;
-              Void = "";
-              xcheckdcl = "(x) real *x;";
-              break;
-            case '?':
-              usage(0);
-          }
-          if (argc > 2 || !s)
-            usage(1);
-          return_nofile = 1;
-          nl = jacdim0(s, L = strlen(s));
-          if (!nl) {
-            if ((L -= 3) > 0 && !strcmp(s + L, ".nl")) {
-              s[L] = 0;
-              nl = jacdim0(s, L);
-              if (!nl)
-                cant(s, s);
-            }
-            else
-              cant(s, 0);
-          }
-          for(i = 0; i < N_OPS; i++)
-            r_ops[i] = (efunc *)i;
-          
-          nv1 = c_vars > o_vars ? c_vars : o_vars;
-          ncom = (i = comb + comc + como) + comc1 + como1;
-          nv2 = nv1 + ncom;
-          
-          c_cexp1st = (int *)Malloc((n_con + n_obj + 2)*sizeof(int));
-          o_cexp1st = c_cexp1st + n_con + 1;
-          zac = (int **)Malloc((n_con + n_obj + i)*sizeof(int*));
-          zao = zac + n_con;
-          zaC = zao + n_obj;
-          
-          if (n_con)
-            if (densejac) {
-              rownos = (int *)Malloc(nv1*sizeof(int));
-              memset((char *)rownos, 0, nv1*sizeof(int));
-            }
-            else {
-              rownos = (int *)Malloc((nzc + nv1 + 1)*sizeof(int));
-              A_colstarts = rownos + nzc;
-            }
-            
-            LUv = bounds = (real *)Malloc((3*nv1+2*n_con)*sizeof(real));
-          LUrhs = LUv + 2*nv1;
-          X0 = LUrhs + 2*n_con;
-          
-          size_expr_n = sizeof(expr_nx);
-          fg_read(nl,0);
-          
-          needx0check = comb > 0 || derkind & 2;
-          c_ifset = (list **)Malloc((n_con + n_obj + ncom0)*sizeof(list *));
-          o_ifset = c_ifset + n_con;
-          com_ifset = o_ifset + n_obj;
-          op_type[OP1POW] = 2;
-          op_type[OP2POW] = 11;
-          
-          stog = (ograd **)Malloc(nv1*sizeof(ograd *));
-          
-          declare[OP_asinh] = "asinh";
-          declare[OP_asinh+1] = "asinhd";
-          declare[OP_acosh] = "acosh";
-          declare[OP_acosh+1] = "acoshd";
-          declare[OPPLTERM] = "plterm";
-          
-          dvtfree = (int *)Malloc(NDVTGULP*sizeof(int));
-          ndvtmax = nvtfree = NDVTGULP;
-          
-          Fortran1 = Fortran - 1;
-          
-          if (skip_int_derivs) {
-            intsk = (char *)Malloc(nv1);
-            memset(intsk, 0, nv1);
-            if (nlvbi)
-              nlvzap(nlvb, nlvbi);
-            if (nlvci)
-              nlvzap(nlvb+nlvc, nlvci);
-            if (nlvoi)
-              nlvzap(nlvb+nlvc+nlvo, nlvoi);
-          }
-          if (n_con && !densejac)
-            get_rownos();
-          
-          vseen = (int *)Malloc((nv2 + ncom)*sizeof(int));
-          cvmap = vseen + nv2;
-          npd = 0;
-          for(i = 0; i < ncom0; i++)
-            cvmap[i] = -(++npd);
-          if (ncom1)
-            memset((char *)&cvmap[ncom0], 0, ncom1*sizeof(int));
-          
-          ndv = ncond = Fortran;
-          
-          dvset(&edagread_one, 1);
-          #ifdef X64_bit_pointers
-          {Adjoint *Ap = (Adjoint *)Malloc(amax*sizeof(Adjoint));
-          memset((char *)Ap, 0, amax*sizeof(Adjoint));
-          for(i = 0; i < amax; i++)
-            *(Adjoint **)&adjoints[i] = Ap++;
-          }
-          #else
-          memset((char *)adjoints, 0, amax*sizeof(real));
-          #endif
-          rdwalk_one = &adjoints[nv1];
-          dwalk_one = Adjp(rdwalk_one);
-          if ((i = amax - nv1) > 0) {
-            acount = (int *)Malloc(i*sizeof(int));
-            memset((char *)acount, 0, i*sizeof(int));
-          }
-          
-          comwalk(0,comb);
-          if (f_b)
-            funnelwalk(f_b);
-          max_save(&bmax);
-          comwalk(comb, combc);
-          if (f_c)
-            funnelwalk(f_c);
-          cde_walk(con_de, n_con, &cmax, c_ifset, c_cexp1st, zac);
-          max_restore(&bmax);
-          comwalk(combc, ncom0);
-          if (f_o)
-            funnelwalk(f_o);
-          cde_walk(obj_de, n_obj, &omax, o_ifset, o_cexp1st, zao);
-          
-          nv = nv1 + ncom;
-          for(i = 0; i < nv; i++)
-            var_e[i].op = (efunc *)f_OPVARVAL1;
-          
-          for(enx = nums; enx; enx = enx->next)
-            enx->op = f_OPNUM1;
-          
-          if (n_obj || n_con) {
-            output_time = 1;
-            if (Fortran)
-              foutput();
-            else
-              output();
-          }
-          return 0;
-  }
-  
-  char *e_val(expr *e, char *buf){
-    int i;
-    if ((i = e->a) >= 0)
-      sprintf(buf, tv_fmt, Fortran1 + i);
-    else
-      sprintf(buf, pd_fmt, Fortran1 - i);
-    return buf;
-  }
-  
+      nv1 = c_vars > o_vars ? c_vars : o_vars;
+      ncom = (i = comb + comc + como) + comc1 + como1;
+      nv2 = nv1 + ncom;
+      
+      c_cexp1st = (int *)Malloc((n_con + n_obj + 2)*sizeof(int));
+      o_cexp1st = c_cexp1st + n_con + 1;
+      zac = (int **)Malloc((n_con + n_obj + i)*sizeof(int*));
+      zao = zac + n_con;
+      zaC = zao + n_obj;
+      
+      if (n_con)
+        if (densejac) {
+          rownos = (int *)Malloc(nv1*sizeof(int));
+          memset((char *)rownos, 0, nv1*sizeof(int));
+        }
+        else {
+          rownos = (int *)Malloc((nzc + nv1 + 1)*sizeof(int));
+          A_colstarts = rownos + nzc;
+        }
+        
+        LUv = bounds = (real *)Malloc((3*nv1+2*n_con)*sizeof(real));
+      LUrhs = LUv + 2*nv1;
+      X0 = LUrhs + 2*n_con;
+      
+      size_expr_n = sizeof(expr_nx);
+      fg_read(nl,0);
+      
+      needx0check = comb > 0 || derkind & 2;
+      c_ifset = (list **)Malloc((n_con + n_obj + ncom0)*sizeof(list *));
+      o_ifset = c_ifset + n_con;
+      com_ifset = o_ifset + n_obj;
+      op_type[OP1POW] = 2;
+      op_type[OP2POW] = 11;
+      
+      stog = (ograd **)Malloc(nv1*sizeof(ograd *));
+      
+      declare[OP_asinh] = "asinh";
+      declare[OP_asinh+1] = "asinhd";
+      declare[OP_acosh] = "acosh";
+      declare[OP_acosh+1] = "acoshd";
+      declare[OPPLTERM] = "plterm";
+      
+      dvtfree = (int *)Malloc(NDVTGULP*sizeof(int));
+      ndvtmax = nvtfree = NDVTGULP;
+      
+      Fortran1 = Fortran - 1;
+      
+      if (skip_int_derivs) {
+        intsk = (char *)Malloc(nv1);
+        memset(intsk, 0, nv1);
+        if (nlvbi)
+          nlvzap(nlvb, nlvbi);
+        if (nlvci)
+          nlvzap(nlvb+nlvc, nlvci);
+        if (nlvoi)
+          nlvzap(nlvb+nlvc+nlvo, nlvoi);
+      }
+      if (n_con && !densejac)
+        get_rownos();
+      
+      vseen = (int *)Malloc((nv2 + ncom)*sizeof(int));
+      cvmap = vseen + nv2;
+      npd = 0;
+      for(i = 0; i < ncom0; i++)
+        cvmap[i] = -(++npd);
+      if (ncom1)
+        memset((char *)&cvmap[ncom0], 0, ncom1*sizeof(int));
+      
+      ndv = ncond = Fortran;
+      
+      dvset(&edagread_one, 1);
+      #ifdef X64_bit_pointers
+      {Adjoint *Ap = (Adjoint *)Malloc(amax*sizeof(Adjoint));
+      memset((char *)Ap, 0, amax*sizeof(Adjoint));
+      for(i = 0; i < amax; i++)
+        *(Adjoint **)&adjoints[i] = Ap++;
+      }
+      #else
+      memset((char *)adjoints, 0, amax*sizeof(real));
+      #endif
+      rdwalk_one = &adjoints[nv1];
+      dwalk_one = Adjp(rdwalk_one);
+      if ((i = amax - nv1) > 0) {
+        acount = (int *)Malloc(i*sizeof(int));
+        memset((char *)acount, 0, i*sizeof(int));
+      }
+      
+      comwalk(0,comb);
+      if (f_b)
+        funnelwalk(f_b);
+      max_save(&bmax);
+      comwalk(comb, combc);
+      if (f_c)
+        funnelwalk(f_c);
+      cde_walk(con_de, n_con, &cmax, c_ifset, c_cexp1st, zac);
+      max_restore(&bmax);
+      comwalk(combc, ncom0);
+      if (f_o)
+        funnelwalk(f_o);
+      cde_walk(obj_de, n_obj, &omax, o_ifset, o_cexp1st, zao);
+      
+      nv = nv1 + ncom;
+      for(i = 0; i < nv; i++)
+        var_e[i].op = (efunc *)f_OPVARVAL1;
+      
+      for(enx = nums; enx; enx = enx->next)
+        enx->op = f_OPNUM1;
+      
+      if (n_obj || n_con) {
+        output_time = 1;
+        if (Fortran)
+          foutput();
+        else
+          output();
+      }
+      return 0;
+}
+    
+char *e_val(expr *e, char *buf){
+  int i;
+  if ((i = e->a) >= 0)
+    sprintf(buf, tv_fmt, Fortran1 + i);
+  else
+    sprintf(buf, pd_fmt, Fortran1 - i);
+  return buf;
+}
+      
