@@ -855,37 +855,7 @@ static void areset(cgrad *cg){
 }
 
 static void dwalk(register derp *d, cgrad *cg, int *z, list *L){
-  register real *rp;
-  register derp *d1;
-  int i;
-  Adjoint *A;
-  static cgrad *cg0;
-  
-  areset(cg0);
-  cg0 = cg;
-  ndv = 0;
-  ndvfree = 0;
-  zset(z);
-  for(; L; L = L->next) {
-    i = L->item.i;
-    A = Adjp(&adjoints[var_e[i].a]);
-    A->seen = 1;
-    vseen[nvseen++] = i;
-    A->storage = STOR_DEFV;
-    A->o.i = ndv++;
-  }
-  if (d1 = d) {
-    dwalk_one->storage = STOR_IMPLICIT;
-    rp = d->b.rp;
-    do {
-      if (d1->b.rp == rp)
-        d1->b.rp = rdwalk_one;
-    }
-    while(d1 = d1->next);
-    dwalk1(d, 0);
-  }
-  if (ndvmax < ndv)
-    ndvmax = ndv;
+  assert(0);
 }
 
 static void cde_walk(cde *d, int n, maxinfo *m, list **ifset, int *c1st, int **z) {
@@ -917,8 +887,9 @@ static list **dstored;
 
 static void dstore(Adjoint *a, derp *d){
   a->stored = 1;
-  if (dstored)
+  if (dstored){
     (*dstored = new_list(*dstored))->item.D = d;
+  }
 }
 
 static char * vprod(real t, int k){
@@ -1001,38 +972,33 @@ static char *cv_name(linpart *L, char *buf){
 
 static void com_out(expr *e, linpart *L, int nlin, int k0){
   char buf[32], bufg[32], res[32], vn[32];
-  char *s;
-  double t;
-  linpart *Le;
-  int asg, j, k, op;
-  efuncb *eb;
-  dLR *d;
-  int Fortran1 = -1;
-  
   printf("\n%s\t/*** defined variable %d ***/\n\n", star, k0+1);
-  if ((j = cvmap[k0]) < 0) {
-    j = Fortran1 - j;
-    s = pd_fmt;
+  int j = cvmap[k0];
+  assert(j>=0);
+  efuncb *eb = (efuncb *)e->op;
+  if (eb != (efuncb *)OPNUM && eb != (efuncb *)OPVARVAL){
+    e->a = j;
   }
-  else {
-    eb = (efuncb *)e->op;
-    if (eb != (efuncb *)OPNUM && eb != (efuncb *)OPVARVAL)
-      e->a = j;
-    j += (-1);
-    s = tv_fmt;
-  }
+  j--;
+  char *s = tv_fmt;
   sprintf(res, s, j);
-  s = callb(e,buf);
-  if (!L) {
-    if (strcmp(res,s))
+  s = (*(efuncb *)e->op)(e, buf);
+  if(!L){
+    if(strcmp(res,s))
       assign(res, s);
     return;
   }
-  asg = !strcmp(s, Zero);
+  int asg = !strcmp(s, Zero);
+  
+  dLR *d;
+  int op;
+  double t;
+  int k;
+  linpart *Le;
   for(Le = L + nlin; L < Le; L++, asg = 0) {
     d = dLRp(L->fac);
     op = '+';
-    switch(k = d->kind) {
+    switch(k = d->kind){
       case dLR_negone:
         op = '-';
       case dLR_one:
@@ -1045,16 +1011,18 @@ static void com_out(expr *e, linpart *L, int nlin, int k0){
         }
         g_fmt(bufg, t);
         break;
-      default:/*DEBUG*/ fprintf(Stderr,
-        "Bad d->kind = %d in com_walk\n", d->kind);
-        /*DEBUG*/ exit(14);
+      default:
+        /*DEBUG*/ 
+        fprintf(Stderr,"Bad d->kind = %d in com_walk\n", d->kind);
+        exit(14);
     }
-    if (asg)
+    if(asg){
       printf(op == '-' ? "\t%s = -" : "\t%s = ", res);
-    else if (res != s)
+    } else if (res != s) {
       printf("\t%s = %s %c ", res, s, op);
-    else
+    } else {
       printf("\t%s %c= ", res, op);
+    }
     if (k == dLR_VP)
       printf("%s*", bufg);
     printf("%s%s", cv_name(L,vn), eos);
@@ -1069,101 +1037,73 @@ static char *putout(expr *e, int i, int j, char *what, int k, int *z){
   ++k;
   ndvtreset(z);
   if (i < j) {
-    if (what)
-      printf("\n\n%s\t/*** defined variables for %s %d ***/\n",
-      star, what, k);
-    for(c1 = cexps1 + i; i < j; i++, c1++)
+    if(what){
+      printf("\n\n%s\t/*** defined variables for %s %d ***/\n",star, what, k);
+    }
+    
+    for(c1 = cexps1 + i; i < j; i++, c1++){
       com_out(c1->e, c1->L, c1->nlin, i + ncom0);
+    }
   }
-  printf(what ? "\n%s  /***  %s %d  ***/\n\n"
-  : "\n%s  /***  objective ***/\n\n", star, what, k);
-  return callb(e,buf);
+  printf(what ? "\n%s  /***  %s %d  ***/\n\n" : "\n%s  /***  objective ***/\n\n", star, what, k);
+  return (*(efuncb *)e->op)(e, buf);
 }
 
 void obj_output(){
-  int *c1, i;
-  ograd *og;
   static char rv[] = "rv";
-  static char *header[4] = {
-    "0_(fint *nobj, real *x)",
-    "_(fint *nobj, fint *needfg, real *x, real *g)",
-    "0_(nobj, x)\n\tfint *nobj;\n real *x;",
-    "_(nobj, needfg, x, g)\n fint *nobj, *needfg;\n real *x, *g;"
-  };
+  assert(n_obj==1);
+  assert(krflag==0);
+  printf(" real feval0_(long *nobj, real *x){\n");
+  ograd *og;
+  for(og = Ograd[0]; og; og = og->next){
+    if (og->coef){
+      break;
+    }
+  }
+  assert(og==0);
+  printf(" /* Work vector */\n");
+  printf(" real v[%d];\n", omax.nvt);
+  if(omax.ncond){
+    printf(" static int cond[%d];\n", omax.ncond);
+  }
+  if (omax.needT1){
+    printf(" real t1, t2;\n");
+  }
+  
   char *eval, *s;
-  
-  printf(" real\nfeval%s\n", header[krflag]);
-  
-  if (!n_obj) {
-    /*{*/ printf("{ return 0.; }\n");
-    return;
+  int *c1 = o_cexp1st;
+  int i;
+  for(i = 0; i < n_obj; i++, c1++){
+    eval = putout(obj_de[i].e, c1[0], c1[1],n_obj > 1 ? "objective" : NULL, i, zao[i]);
+    s = rv_output(rv, eval, Ograd[i]);
+    printf("\n\treturn %s;\n", s);
   }
-  printf("{");
-  for(og = 0, i = 0; i < n_obj; i++) {
-    for(og = Ograd[i]; og; og = og->next)
-      if (og->coef)
-        goto break2;
-  }
-  break2:
-  if (omax.nvt) {
-    printf("\n\treal v[%d]", omax.nvt);
-    if (omax.ndv)
-      printf(", dv[%d]", omax.ndv);
-    printf("%s;\n", og ? ", rv" : "");
-  }
-  else if (og)
-    printf("\n\treal rv;\n");
   
-  if (omax.ncond)
-    printf("\tstatic int cond[%d];\n", omax.ncond);
-  
-  if (omax.needT1)
-    printf("\treal t1, t2;\n");
-  
-  
-  printf(n_obj > 1 ? "\n\tswitch(*nobj) {\n" : "\n");
-  c1 = o_cexp1st;
-  for(i = 0; i < n_obj; i++, c1++) {
-    if (n_obj > 1)
-      printf("\n  case %d:\n", i);
-    eval = putout(obj_de[i].e, c1[0], c1[1],
-                  n_obj > 1 ? "objective" : NULL, i, zao[i]);
-                  s = rv_output(rv, eval, Ograd[i]);
-                  printf("\n\treturn %s;\n", s);
-      }
-      if (n_obj > 1)
-        printf("\n\t}\n");
-      printf("}\n");
-      branches = 0;
-  }
+  printf("}\n");
+  branches = 0;
+}
   
 void con_output(){
+  assert(krflag==0);
 
   int *c1, i;
   char *s;
-  static char *header[4] = {
-    "0_(real *x, real *c)",
-    "_(fint *needfg, real *x, real *c, real *J)",
-    "0_(x, c)\n real *x, *c;",
-    "_(needfg, x, c, J)\n fint *needfg;\n real *x, *c, *J;"
-  };
-  printf("\n void\nceval%s\n{", header[krflag]);
+  printf("\n void ceval0_(real *x, real *c)\n{");
   
-  if (!n_con) {
+  if(!n_con){
     printf("}\n");
     return;
-  } /*}*/
-  
-  if (cmax.nvt) {
-    printf("\n\treal v[%d]", cmax.nvt);
-    printf(";\n", cmax.ndv);
   }
-  if (cmax.ncond)
+  
+  if(cmax.nvt){
+    printf("\n\treal v[%d];\n", cmax.nvt);
+  }
+  if(cmax.ncond)
     printf("\tstatic int cond[%d];\n", cmax.ncond);
   
   if (cmax.needT1)
     printf("\treal t1, t2;\n");
-  else if (nzcgrad())
+  else if(nzcgrad())
     printf("\treal t1;\n");
   
   c1 = c_cexp1st;
@@ -1183,11 +1123,7 @@ void output(){
   dLR *LR;
   char buf[32], *x0;
   cexp *c;
-  static char *fhead[2] = { "(real *x)", "(x) real *x;" };
-  
   printf("#include \"math.h\"\n#define real double\n");
-  if (!krflag)
-    printf("#ifdef __cplusplus\n extern \"C\" {\n#endif\n");
   
   for(i = j = 0; i < N_OPS; i++)
     if (seen[i] && declare[i])
@@ -1216,9 +1152,6 @@ void output(){
         
     obj_output();
     con_output();
-    
-  if (!krflag)
-    printf("#ifdef __cplusplus\n\t}\n#endif\n");
 }
 
 static void get_rownos(){
