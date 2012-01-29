@@ -88,7 +88,6 @@ static char *grad_fmt = "g[%d]", *jac_fmt = "J[%d]";
 static char *g0_fmt = "\tg[%d] = %s;\n", *j0_fmt = "\tJ[%d] = %s;\n";
 static char *eos = ";\n";
 static char *star = "";
-static char *Void = "void";
 static char *xcheck = "\tfint wantfg = *needfg;\n\
 if (xcheck(x) && wantfg == 2)\n\t\twantfg = 3;\n";
 static char *xcheck0 = "\txcheck(x);\n";
@@ -290,11 +289,9 @@ char *call2(char *what, char *a, char *b){
 }
 
 void introuble(char *who, char *x){
-  printf("\tif (errno) in_trouble(\"%s\",%s);\n",who, x);
 }
 
 void introuble2(char *who, char *x, char *y){
-  printf("\tif (errno) in_trouble2(\"%s\",%s,%s);\n",who, x, y);
 }
 
 char *num(int x){
@@ -942,28 +939,6 @@ static char * vprod(real t, int k){
   return buf;
 }
 
-static void plcommon(int deriv){
-  register plterm *p;
-  register expr *e;
-  register dLR *LR;
-  
-  for(e = Plterms; e; e = LR->o.ep) {
-    p = e->L.p;
-    LR = dLRp(e->dR);
-    printf("\tcommon /pltcom/ bs%d\n\
-    double precision bs%d(%d)\n", LR->kind, LR->kind, 2*p->n - 1);
-  }
-  printf(
-  "\tcommon /xkindc/ xkind\n\tinteger xkind\n\tsave /xkindc/\n");
-  
-  if (npd)
-    printf(
-    "\tcommon /pdcomn/ pd\n\tdouble precision pd(%d)\n\tsave /pdcomn/\n",
-          npd);
-          if (!deriv && needx0check)
-            printf("\tlogical xchk\n");
-}
-
 static char *rv_output(char *rv, char *eval, ograd *og){
   char *s;
   
@@ -1105,11 +1080,7 @@ static char *putout(expr *e, int i, int j, char *what, int k, int *z){
   return callb(e,buf);
 }
 
-static void funnel_set(funnel *f, char *gj0_fmt){
-  assert(0);
-}
-
-void obj_output(int deriv){
+void obj_output(){
   int *c1, i;
   ograd *og;
   static char rv[] = "rv";
@@ -1121,7 +1092,7 @@ void obj_output(int deriv){
   };
   char *eval, *s;
   
-  printf(" real\nfeval%s\n", header[deriv + krflag]);
+  printf(" real\nfeval%s\n", header[krflag]);
   
   if (!n_obj) {
     /*{*/ printf("{ return 0.; }\n");
@@ -1149,14 +1120,6 @@ void obj_output(int deriv){
   if (omax.needT1)
     printf("\treal t1, t2;\n");
   
-  if ((f_b || f_o) && deriv) {
-    printf("\tif (wantfg & 2) {\n");
-    if (f_b)
-      printf("\t\tfunnelb(x);\n");
-    if (f_o)
-      funnel_set(f_o, g0_fmt);
-    printf("\t\t}\n");
-  }
   
   printf(n_obj > 1 ? "\n\tswitch(*nobj) {\n" : "\n");
   c1 = o_cexp1st;
@@ -1174,8 +1137,7 @@ void obj_output(int deriv){
       branches = 0;
   }
   
-void con_output(int deriv){
-    assert(deriv==0);
+void con_output(){
 
   int *c1, i;
   char *s;
@@ -1223,56 +1185,9 @@ void output(){
   cexp *c;
   static char *fhead[2] = { "(real *x)", "(x) real *x;" };
   
-  printf("#include \"math.h\"\n#include \"errno.h\"\n\
-  #ifndef fint\n\
-  #ifndef Long\n\
-  #include \"arith.h\"	/* for Long */\n\
-  #ifndef Long\n\
-  #define Long long\n\
-  #endif\n\
-  #endif\n\
-  #define fint Long\n\
-  #endif\n\
-  #ifndef real\n\
-  #define real double\n\
-  #endif\n");
+  printf("#include \"math.h\"\n#define real double\n");
   if (!krflag)
-    printf("#ifdef __cplusplus\nextern \"C\" {\n#endif\n");
-  if (krflag < 2)
-    printf(" %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n",
-    "real acosh_(real *);",
-    "real asinh_(real *);",
-    "real acoshd_(real *, real *);",
-    "real asinhd_(real *, real *);",
-    "void in_trouble(char *, real);",
-    "void in_trouble2(char *, real, real);",
-    "void domain_(char *, real *, fint);",
-    "void zerdiv_(real *);");
-  printf(" fint auxcom_[1] = { %d /* nlc */ };\n", nlc);
-  printf(" fint funcom_[%d] = {\n\
-  %d /* nvar */,\n\
-  %d /* nobj */,\n\
-  %d /* ncon */,\n\
-  %d /* nzc */,\n\
-  %d /* densejac */",
-  n_con ? nzc + nv1 + n_obj + 6 : n_obj + 5,
-  nv1, n_obj, n_con, 0 ? nv1*n_con : nzc, 0);
-  
-  if (n_obj) {
-    printf(",\n\n\t/* objtype (0 = minimize, 1 = maximize) */\n");
-    for(i = 0; i < n_obj; i++)
-      printf("%s\n\t%d", i ? "," : "", objtype[i]);
-  }
-  
-  if (n_con) {
-    printf(",\n\n\t/* colstarts */\n");
-    for(i = 0; i <= n_var; i++)
-      printf("\t%d,\n", A_colstarts[i]);
-    printf("\n\t/* rownos */\n\t1");
-    for(i = 1; i < nzc; i++)
-      printf(",\n\t%d", rownos[i]);
-  }
-  printf(" };\n\n");
+    printf("#ifdef __cplusplus\n extern \"C\" {\n#endif\n");
   
   for(i = j = 0; i < N_OPS; i++)
     if (seen[i] && declare[i])
@@ -1292,116 +1207,76 @@ void output(){
       }
     }
     
-    printf(" real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {\n\t\t1.7e308",2*nv1, 2*n_con);
+    printf(" real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {1.7e308",2*nv1, 2*n_con);
     b = bounds;
     be = b + 2*(n_con + nv1);
     while(b < be)
-      printf(",\n\t\t%s", fpval(*b++));
+      printf(",q%s", fpval(*b++));
     printf("};\n\n");
+        
+    obj_output();
+    con_output();
     
-    printf(" real x0comn_[%d] = {\n", nv1);
-    for(i = 0; i < nv1; i++)
-      printf("%s\t\t%s", i ? ",\n" : "", fpval(X0[i]));
-    printf(" };\n\n");
-    
-    if (npd)
-      printf(" static real pd[%d];\n", npd);
-            
-      if (f_b && derkind & 2) {
-        printf("\n static void\nfunnelb%s\n{\n", fhead[krflag>>1]);
-        if ((i = bmax.ndv) > 0)
-          printf("\treal dv[%d];\n", i);
-        funnel_set(f_b, "Botch<%d> = %s;");
-        printf("\t}\n");
-      }
-            
-      if (needx0check) {
-        printf("static real old_x[%d];\nstatic int xkind = -1;\n\n\
-        static int\nxcheck%s\n{\n\treal", nv1, xcheckdcl);
-        if (comb > 0) {
-          printf(" *x0 = x,");
-          x0 = "x0";
-        } else {
-          x0 = "x";
-        }
-        printf(" *x1 = old_x, *xe = x + %d;\n", nv1);
-        if ((i = bmax.nvt) > 0)
-          printf("\treal v[%d];\n", i);
-        printf("\terrno = 0;\n\
-        if (xkind >= 0) {\n\t\twhile(*%s++ == *x1++)\n\
-          \tif (%s == xe)\n\t\t\t\treturn 0;\n\t\t--%s, --x1;\n\t\t}\n\
-          do *x1++ = *%s++;\n\t\twhile(%s < xe);\n\txkind = 0;\n",
-            x0,x0,x0,x0,x0);
-          for(i = 0, c = cexps; i < comb; c++, i++)
-            com_out(c->e, c->L, c->nlin, i);
-          printf("\treturn 1;\n\t}\n");
-  }
-  for(i = 1; i < 3; i++) {
-    if (owant & i)
-      obj_output(i-1);
-    if (cwant & i)
-      con_output(i-1);
-  }
   if (!krflag)
     printf("#ifdef __cplusplus\n\t}\n#endif\n");
 }
 
-static void cant(char *s1, char *s2){
-  fprintf(Stderr, "Can't open %s", s1);
-      if (s2)
-        fprintf(Stderr, " or %s.nl", s2);
-      fputc('\n', Stderr);
-      exit(1);
-}
-    
 static void get_rownos(){
   int i = n_con, i1, j, j1;
   cgrad *cg;
   memset((char *)rownos, 0, nzc*sizeof(int));
-  while(i1 = i)
-    for(cg = Cgrad[--i]; cg; cg = cg->next)
+  while(i1 = i){
+    for(cg = Cgrad[--i]; cg; cg = cg->next){
       rownos[cg->goff] = i1;
-    for(i = 0; i <= n_var; i++)
-      A_colstarts[i]++;
-    if (intsk) {
-      i1 = j = 0;
-      --intsk;
-      for(i = 1; i <= n_var; i++) {
-        j1 = A_colstarts[i] - 1;
-        if (!intsk[i])
-          for(; j < j1; j++)
-            rownos[i1++] = rownos[j];
-          A_colstarts[i] = i1 + 1;
-        j = j1;
+    }
+  }
+  
+  for(i = 0; i <= n_var; i++){
+    A_colstarts[i]++;
+  }
+  
+  if(intsk){
+    i1 = j = 0;
+    --intsk;
+    for(i = 1; i <= n_var; i++){
+      j1 = A_colstarts[i] - 1;
+      if (!intsk[i]){
+        for(; j < j1; j++){
+          rownos[i1++] = rownos[j];
+        }
       }
-      ++intsk;
-      nzc = i1;
-      if (nlvbi && (nlvci < nlvc || nlvoi < nlvo)
-        || nlvci && nlvoi < nlvo) {
-        for(i = 0; i < n_var; i++)
-          A_colstarts[i] = A_colstarts[i+1];
-        i = n_con;
-      while(--i >= 0)
-        for(cg = Cgrad[i]; cg; cg = cg->next)
-          if (!intsk[cg->varno])
+      
+      A_colstarts[i] = i1 + 1;
+      j = j1;
+    }
+    
+    ++intsk;
+    nzc = i1;
+    if(nlvbi && (nlvci < nlvc || nlvoi < nlvo) || nlvci && nlvoi < nlvo){
+      for(i = 0; i < n_var; i++){
+        A_colstarts[i] = A_colstarts[i+1];
+      }
+      i = n_con;
+      while(--i >= 0){
+        for(cg = Cgrad[i]; cg; cg = cg->next){
+          if (!intsk[cg->varno]){
             cg->goff = --A_colstarts[cg->varno] - 1;
+          }
+        }
       }
     }
-}
-    
-static void nlvzap(int i, int j){
-      memset(intsk + i - j, 1, j);
+  }
 }
     
 int main(int argc, char **argv){
   ASL_alloc(ASL_read_fg);
-  progname = "../examples/cork.nl";
   g_fmt_decpt = 1;
   want_derivs = 0;
   cwant = owant = derkind = 1;
   return_nofile = 1;
-  fint L;
-  FILE *nl = jacdim0(progname, L = strlen(progname));
+  progname = "../examples/cork.nl";
+  fint L = strlen(progname);
+  FILE *nl = jacdim0(progname, L);
 
   int i;
   for(i = 0; i < N_OPS; i++){
