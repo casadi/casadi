@@ -29,8 +29,6 @@ THIS SOFTWARE.
 #define asl ((ASL_fg*)cur_ASL)
 #include "assert.h"
 
-#define Egulp 400
-
 typedef struct maxinfo {
   int ncond;
   int ndv;
@@ -63,33 +61,12 @@ char *opEQ = "==", *opGE = ">=", *opGT = ">", *opLE = "<=",
 char *opAND = "&&", *opOR = "||";
 char *T = "t1", *T1 = "t2";	/* temporary variable names */
 char *offlfmt1 = "&%s", *offlfmt2 = "&%s, &%s";
-static char *assign_fmt = "\t%s = %s;\n";
-static char *binop_fmt = "\t%s = %s %s %s;\n";
-static char *goto_fmt = "\tgoto L%d;\n";
-static char *ifgo_fmt = "\tif (%s %s %s) goto L%d;\n";
-static char *label_fmt = " L%d:\n";
-static char *ifstart_fmt = "\tif (%s %s %s) {\n";
-static char *elseif_fmt = "\t} else if (%s %s %s) {\n";
-static char *else_fmt = "\t} else {\n";
-static char *endif_fmt = "\t}\n";
-static char *case_fmt = "   case %d:\n";
 char *cond_fmt = "cond[%d]";
-static char *break_fmt = "\tbreak;\n";
-static char *endswitch_fmt = "\t}\n";
-static char *zerdiv_fmt = "\tzerdiv_(&%s);";
-static char *call_fmt = "\t%s(&%s);\n";
-static char *dv_fmt = "dv[%d]";
-static char *Fortstar = "";
 char *pd_fmt = "pd[%d]";
 static char *tv_fmt = "v[%d]";
 static char *x_fmt = "x[%d]";
 static char seen[N_OPS], *declare[N_OPS];
-static char *grad_fmt = "g[%d]", *jac_fmt = "J[%d]";
-static char *g0_fmt = "\tg[%d] = %s;\n", *j0_fmt = "\tJ[%d] = %s;\n";
-static char *eos = ";\n";
-static char *star = "";
-static char *xcheck = "\tfint wantfg = *needfg;\n\
-if (xcheck(x) && wantfg == 2)\n\t\twantfg = 3;\n";
+static char *xcheck = "\tfint wantfg = *needfg;\nif (xcheck(x) && wantfg == 2)\n\t\twantfg = 3;\n";
 static char *xcheck0 = "\txcheck(x);\n";
 static char *xcheckdcl = "(real *x)";
 static char *xkind = "\tif (!(xkind & %d)) {\n\t\txkind |= %d;\n";
@@ -231,7 +208,7 @@ static char *fpval(real r){
 
 void assign(char *a, char *b){
   if(a)
-    printf(assign_fmt, a, b);
+    printf("\t%s = %s;\n", a, b);
 }
 
 void binop(char *a, char *b, char *op, char *c){
@@ -239,41 +216,41 @@ void binop(char *a, char *b, char *op, char *c){
     if(a == b){
       printf("\t%s %s= %s;\n", a, op, c);
     } else {
-      printf(binop_fmt, a, b, op, c);
+      printf("\t%s = %s %s %s;\n", a, b, op, c);
     }
   }
 }
 
-void Goto(int n){ printf(goto_fmt, n); }
+void Goto(int n){ printf("\tgoto L%d;\n", n); }
 
-void ifgo(char *a, char *op, char *b, int n){ 
-  printf(ifgo_fmt, a, op, b, n); 
+void ifgo(char *a, char *op, char *b, int n){
+  printf("\tif (%s %s %s) goto L%d;\n", a, op, b, n); 
 }
 
-void label(int n){ printf(label_fmt, n); }
+void label(int n){ printf(" L%d:\n", n); }
 
 void ifstart(char *a, char *op, char *b){ 
-  printf(ifstart_fmt, a, op, b); 
+  printf("\tif (%s %s %s) {\n", a, op, b); 
 }
 
 void elsestart(){ 
-  printf(else_fmt); 
+  printf("\t} else {\n"); 
 }
 
 void elseif(char *a, char *b, char *c){ 
-  printf(elseif_fmt, a, b, c);
+  printf("\t} else if (%s %s %s) {\n", a, b, c);
 }
 
-void endif(){ printf(endif_fmt); }
+void endif(){ printf("\t}\n"); }
 
-void endswitch(int lbl){ printf(endswitch_fmt, lbl); }
+void endswitch(int lbl){ printf("\t}\n", lbl); }
 
 void domain(char *s, char *x){
   printf("\tdomain_(\"%s\", &%s, %dL);\n", s, x, strlen(s));
 }
 
 void zerdiv(char *s){ 
-  printf(zerdiv_fmt, s); 
+  printf("\tzerdiv_(&%s);", s); 
 }
 
 char *call1(char *what, char *a){
@@ -913,22 +890,26 @@ static char * vprod(real t, int k){
 static char *rv_output(char *rv, char *eval, ograd *og){
   char *s;
   
-  for(; og; og = og->next)
-    if (og->coef)
+  for(; og; og = og->next){
+    if(og->coef){
       break;
-    if (og) {
-      s = vprod(og->coef, og->varno);
-      if (strcmp(eval, Zero))
-        binop(rv, eval, "+", s);
-      else
-        assign(rv, s);
-      while(og = og->next)
-        if (og->coef)
-          binop(rv, rv, "+",
-          vprod(og->coef, og->varno));
-        return rv;
     }
-    return eval;
+  }
+  if (og) {
+    s = vprod(og->coef, og->varno);
+    if (strcmp(eval, Zero)){
+      binop(rv, eval, "+", s);
+    } else {
+      printf("\t%s = %s;\n", rv, s);
+    }
+    while(og = og->next){
+      if (og->coef){
+        binop(rv, rv, "+",vprod(og->coef, og->varno));
+      }
+    }
+    return rv;
+  }
+  return eval;
 }
 
 static char *con_linadd(int i, char *s){
@@ -938,10 +919,11 @@ static char *con_linadd(int i, char *s){
   for(cg = Cgrad[i]; cg; cg = cg->next)
     if (cg->coef) {
       s1 = vprod(cg->coef, cg->varno);
-      if (strcmp(s,Zero))
+      if (strcmp(s,Zero)){
         binop(T, s, "+", s1);
-      else
-        assign(T, s1);
+      } else {
+        printf("\t%s = %s;\n", T, s1);
+      }
       s = T;
       while(cg = cg->next)
         if (cg->coef)
@@ -972,7 +954,7 @@ static char *cv_name(linpart *L, char *buf){
 
 static void com_out(expr *e, linpart *L, int nlin, int k0){
   char buf[32], bufg[32], res[32], vn[32];
-  printf("\n%s\t/*** defined variable %d ***/\n\n", star, k0+1);
+  printf("\n%s\t/*** defined variable %d ***/\n\n", "", k0+1);
   int j = cvmap[k0];
   assert(j>=0);
   efuncb *eb = (efuncb *)e->op;
@@ -984,8 +966,9 @@ static void com_out(expr *e, linpart *L, int nlin, int k0){
   sprintf(res, s, j);
   s = (*(efuncb *)e->op)(e, buf);
   if(!L){
-    if(strcmp(res,s))
-      assign(res, s);
+    if(strcmp(res,s)){
+      printf("\t%s = %s;\n", res, s);
+    }
     return;
   }
   int asg = !strcmp(s, Zero);
@@ -1025,7 +1008,7 @@ static void com_out(expr *e, linpart *L, int nlin, int k0){
     }
     if (k == dLR_VP)
       printf("%s*", bufg);
-    printf("%s%s", cv_name(L,vn), eos);
+    printf("%s%s", cv_name(L,vn), ";\n");
     s = res;
   }
 }
@@ -1038,14 +1021,14 @@ static char *putout(expr *e, int i, int j, char *what, int k, int *z){
   ndvtreset(z);
   if (i < j) {
     if(what){
-      printf("\n\n%s\t/*** defined variables for %s %d ***/\n",star, what, k);
+      printf("\n\n%s\t/*** defined variables for %s %d ***/\n","", what, k);
     }
     
     for(c1 = cexps1 + i; i < j; i++, c1++){
       com_out(c1->e, c1->L, c1->nlin, i + ncom0);
     }
   }
-  printf(what ? "\n%s  /***  %s %d  ***/\n\n" : "\n%s  /***  objective ***/\n\n", star, what, k);
+  printf(what ? "\n%s  /***  %s %d  ***/\n\n" : "\n%s  /***  objective ***/\n\n", "", what, k);
   return (*(efuncb *)e->op)(e, buf);
 }
 
@@ -1302,10 +1285,8 @@ int main(int argc, char **argv){
   for(enx = nums; enx; enx = enx->next)
     enx->op = f_OPNUM1;
   
-  if (n_obj || n_con) {
-    output_time = 1;
-    output();
-  }
+  output_time = 1;
+  output();
   return 0;
 }
     
@@ -1317,3 +1298,17 @@ char *e_val(expr *e, char *buf){
     sprintf(buf, pd_fmt, (-1) - i);
   return buf;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
