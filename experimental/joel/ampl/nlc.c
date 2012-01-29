@@ -51,7 +51,74 @@ static expr *Plterms;
 static char *intsk;
 efunc *r_ops[N_OPS];
 extern efunc *r_op[];
-#include "r_ops1.hd"
+#define f_OPPLUS        r_op[0]
+#define f_OPMINUS       r_op[1]
+#define f_OPMULT        r_op[2]
+#define f_OPDIV r_op[3]
+#define f_OPREM r_op[4]
+#define f_OPPOW r_op[5]
+#define f_OPLESS        r_op[6]
+#define f_MINLIST       r_op[11]
+#define f_MAXLIST       r_op[12]
+#define f_FLOOR r_op[13]
+#define f_CEIL  r_op[14]
+#define f_ABS   r_op[15]
+#define f_OPUMINUS      r_op[16]
+#define f_OPOR  r_op[20]
+#define f_OPAND r_op[21]
+#define f_LT    r_op[22]
+#define f_LE    r_op[23]
+#define f_EQ    r_op[24]
+#define f_GE    r_op[28]
+#define f_GT    r_op[29]
+#define f_NE    r_op[30]
+#define f_OPNOT r_op[34]
+#define f_OPIFnl        r_op[35]
+#define f_OP_tanh       r_op[37]
+#define f_OP_tan        r_op[38]
+#define f_OP_sqrt       r_op[39]
+#define f_OP_sinh       r_op[40]
+#define f_OP_sin        r_op[41]
+#define f_OP_log10      r_op[42]
+#define f_OP_log        r_op[43]
+#define f_OP_exp        r_op[44]
+#define f_OP_cosh       r_op[45]
+#define f_OP_cos        r_op[46]
+#define f_OP_atanh      r_op[47]
+#define f_OP_atan2      r_op[48]
+#define f_OP_atan       r_op[49]
+#define f_OP_asinh      r_op[50]
+#define f_OP_asin       r_op[51]
+#define f_OP_acosh      r_op[52]
+#define f_OP_acos       r_op[53]
+#define f_OPSUMLIST     r_op[54]
+#define f_OPintDIV      r_op[55]
+#define f_OPprecision   r_op[56]
+#define f_OPround       r_op[57]
+#define f_OPtrunc       r_op[58]
+#define f_OPCOUNT       r_op[59]
+#define f_OPNUMBEROF    r_op[60]
+#define f_OPNUMBEROFs   r_op[61]
+#define f_OPATLEAST     r_op[62]
+#define f_OPATMOST      r_op[63]
+#define f_OPPLTERM      r_op[64]
+#define f_OPIFSYM       r_op[65]
+#define f_OPEXACTLY     r_op[66]
+#define f_OPNOTATLEAST  r_op[67]
+#define f_OPNOTATMOST   r_op[68]
+#define f_OPNOTEXACTLY  r_op[69]
+#define f_ANDLIST       r_op[70]
+#define f_ORLIST        r_op[71]
+#define f_OPIMPELSE     r_op[72]
+#define f_OP_IFF        r_op[73]
+#define f_OPALLDIFF     r_op[74]
+#define f_OP1POW        r_op[75]
+#define f_OP2POW        r_op[76]
+#define f_OPCPOW        r_op[77]
+#define f_OPFUNCALL     r_op[78]
+#define f_OPNUM r_op[79]
+#define f_OPHOL r_op[80]
+#define f_OPVARVAL      r_op[81]
 
 static real *bounds;
 extern char *progname;
@@ -265,12 +332,6 @@ char *call2(char *what, char *a, char *b){
   return buf;
 }
 
-void introuble(char *who, char *x){
-}
-
-void introuble2(char *who, char *x, char *y){
-}
-
 char *num(int x){
   static char buf[16];
   sprintf(buf, "%d", x);
@@ -282,11 +343,8 @@ static char op_type[] = {
 };
 
 static void dvset(register real *dp, int deriv){
-  register dLR *d;
-  real t;
-  
-  t = *dp;
-  d = Make_dLR(dp);
+  real t = *dp;
+  register dLR *d = Make_dLR(dp);
   if (!deriv) {
     d->kind = dLR_UNUSED;
     return;
@@ -1298,17 +1356,3 @@ char *e_val(expr *e, char *buf){
     sprintf(buf, pd_fmt, (-1) - i);
   return buf;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
