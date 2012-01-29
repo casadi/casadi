@@ -26,8 +26,6 @@ THIS SOFTWARE.
 #include "nlc.h"
 #define asl cur_ASL
 
-#define callb(a,b) (*(efuncb *)a->op)(a, b)
-
 #ifdef __cplusplus
 	extern "C" real log(real);
 #else
@@ -43,20 +41,16 @@ static char *commute(expr *e, char *rv, char *op){
 	char buf1[32], buf2[32];
 	expr *e1;
 	e1 = e->L.e;
-	callb(e1, buf1);
+        (*(efuncb *)e1->op)(e1, buf1);
 	e1 = e->R.e;
-	callb(e1, buf2);
+        (*(efuncb *)e1->op)(e1, buf2);
 	e_val(e, rv);
-	if (Fortran)
-		printf("\t%s = %s %s %s\n", rv, buf1, op, buf2);
-	else {
 		if (!strcmp(rv,buf1))
 			printf("\t%s %s= %s;\n", rv, op, buf2);
 		else if (!strcmp(rv,buf2))
 			printf("\t%s %s= %s;\n", rv, op, buf1);
 		else
 			printf("\t%s = %s %s %s;\n", rv, buf1, op, buf2);
-		}
 	return rv;
 	}
 
@@ -70,19 +64,10 @@ static char *commute(expr *e, char *rv, char *op){
 	ep = e->L.ep;
 	epe = e->R.ep;
 	e1 = *ep++;
-	callb(e1, buf1);
+        (*(efuncb *)e1->op)(e1, buf1);
 	e1 = *ep++;
-	callb(e1, buf2);
+        (*(efuncb *)e1->op)(e1, buf2);
 	rv = e_val(e, buf);
-	if (Fortran) {
-		printf("\t%s = %s + %s\n", rv, buf1, buf2);
-		while(ep < epe) {
-			e1 = *ep++;
-			printf("\t%s = %s + %s\n", rv, rv,
-				callb(e1, buf1));
-			}
-		}
-	else {
 		if (!strcmp(rv,buf2))
 			printf("\t%s += %s;\n", rv, buf1);
 		else if (!strcmp(rv,buf1))
@@ -90,22 +75,17 @@ static char *commute(expr *e, char *rv, char *op){
 		else
 			printf("\t%s = %s + %s;\n", rv, buf1, buf2);
 		while(ep < epe) {
-			e1 = *ep++;
-			printf("\t%s += %s;\n", rv, callb(e1,buf1));
-			}
-		}
+                  e1 = *ep++;
+                  printf("\t%s += %s;\n", rv,(*(efuncb *)e1->op)(e1, buf1));
+                }
 	return rv;
 	}
 
  static char *binop1(char *a, char *b, char *op, char *c){
-	if (Fortran)
-		printf("\t%s = %s %s %s\n", a, b, op, c);
-	else {
 		if (!strcmp(a,b))
 			printf("\t%s %s= %s;\n", a, op, c);
 		else
 			printf("\t%s = %s %s %s;\n", a, b, op, c);
-		}
 	return a;
 	}
 
@@ -113,9 +93,9 @@ static char *commute(expr *e, char *rv, char *op){
 	char buf1[32], buf2[32];
 	expr *e1;
 	e1 = e->L.e;
-	callb(e1, buf1);
+        (*(efuncb *)e1->op)(e1, buf1);
 	e1 = e->R.e;
-	callb(e1, buf2);
+        (*(efuncb *)e1->op)(e1, buf2);
 	e_val(e, rv);
 	return binop1(rv, buf1, op, buf2);
 	}
@@ -131,9 +111,9 @@ static char *commute(expr *e, char *rv, char *op){
 	static char *fmt[] = { "\t%s = -%s %s %s;\n", "\t%s = -%s %s %s\n" };
 
 	e1 = e->L.e;
-	callb(e1, s1);
+        (*(efuncb *)e1->op)(e1, s1);
 	e1 = e->R.e;
-	callb(e1, s2);
+        (*(efuncb *)e1->op)(e1, s2);
 	if (e1->op != (efunc *)f_OPNUM1) {
 		ifstart(s2, opEQ, Zero);
 		zerdiv(s2);
@@ -162,33 +142,24 @@ static char *commute(expr *e, char *rv, char *op){
  static void opstart(register expr *e, char *who, char *val, char *L){
 	register expr *e1;
 	e1 = e->L.e;
-	callb(e1,L);
-	assign(e_val(e,val), call1(who, L));
+        (*(efuncb *)e1->op)(e1, L);
+	printf("\t%s = %s;\n", e_val(e,val), call1(who, L));
 	introuble(who, L);
 	}
 
  static void op2start(register expr *e, char *who, char *val, char *L, char *R){
 	register expr *e1;
 	e1 = e->L.e;
-	callb(e1,L);
+        (*(efuncb *)e1->op)(e1, L);
 	e1 = e->R.e;
-	callb(e1,R);
-	assign(e_val(e,val), call2(who, L, R));
+        (*(efuncb *)e1->op)(e1, R);
+	printf("\t%s = %s;\n", e_val(e,val), call2(who, L, R));
 	introuble2(who, L, R);
 	}
 
  static void foppowstart(register expr *e, char *val, char *L, char *R){
-	register expr *e1;
-
-	if (Fortran) {
-		e1 = e->L.e;
-		callb(e1,L);
-		e1 = e->R.e;
-		binop(e_val(e,val), L, "**", callb(e1,R));
-		}
-	else
-		op2start(e, "pow", val, L, R);
-	}
+   op2start(e, "pow", val, L, R);
+ }
 
  static char *f_OPREM(expr *e, char *rv){
 	char L[32], R[32];
@@ -230,19 +201,19 @@ static char *commute(expr *e, char *rv, char *op){
 		ifstart(L, opGT, Zero);
 		sprintf(buf, "(%s/%s) * %s", R, L, rv);
 		if (Ld->kind)
-			assign(pdval(Ld,pdL), buf);
+			printf("\t%s = %s;\n", pdval(Ld,pdL), buf);
 		if (Rd->kind)
 			binop(pdval(Rd,pdR), call1("log",L), "*", rv);
 		elseif(R, opGT, One);
 		if (Ld->kind)
-			assign(pdL, Zero);
+			printf("\t%s = %s;\n", pdL, Zero);
 		if (Rd->kind)
-			assign(pdR, Zero);
+			printf("\t%s = %s;\n", pdR, Zero);
 		elseif(R, opEQ, One);
 		if (Ld->kind)
-			assign(pdL, One);
+			printf("\t%s = %s;\n", pdL, One);
 		if (Rd->kind)
-			assign(pdR, Zero);
+			printf("\t%s = %s;\n", pdR, Zero);
 		elsestart();
 		introuble2("pow'", L, R);
 		endif();
@@ -279,12 +250,12 @@ static char *commute(expr *e, char *rv, char *op){
 			sprintf(buf, "%s*(%s*%s)", R, L, L);
 		else
 			sprintf(buf, "%s*(%s/%s)", R, rv, L);
-		assign(pdval(Ld,buf1), buf);
+		printf("\t%s = %s;\n", pdval(Ld,buf1), buf);
 		if (isint)
 			elsestart();
 		else
 			elseif(R, opGT, One);
-		assign(buf1, Zero);
+		printf("\t%s = %s;\n", buf1, Zero);
 		if (!isint) {
 			elsestart();
 			introuble2("pow'", L, R);
@@ -300,7 +271,7 @@ static char *commute(expr *e, char *rv, char *op){
 	dLR *Ld;
 
 	e1 = e->L.e;
-	callb(e1, L);
+        (*(efuncb *)e1->op)(e1, L);
 	binop1(e_val(e,rv), L, "*", L);
 	if (want_derivs) {
 		Ld = dLRp(e->dL);
@@ -315,23 +286,23 @@ static char *f_OPLESS(register expr *e, char *rv){
 	dLR *Ld, *Rd;
 
 	e1 = e->L.e;
-	callb(e1, L);
+        (*(efuncb *)e1->op)(e1, L);
 	e1 = e->R.e;
-	binop1(e_val(e,rv), L, "-", callb(e1,R));
+	binop1(e_val(e,rv), L, "-",(*(efuncb *)e1->op)(e1, R));
 	ifstart(rv, opLT, Zero);
-	assign(rv, Zero);
+	printf("\t%s = %s;\n", rv, Zero);
 	if (want_derivs) {
 		Ld = dLRp(e->dL);
 		Rd = dLRp(e->dR);
 		if (Ld->kind)
-			assign(pdval(Ld,L), Zero);
+			printf("\t%s = %s;\n", pdval(Ld,L), Zero);
 		if (Rd->kind)
-			assign(pdval(Rd,R), Zero);
+			printf("\t%s = %s;\n", pdval(Rd,R), Zero);
 		elsestart();
 		if (Ld->kind)
-			assign(L, One);
+			printf("\t%s = %s;\n", L, One);
 		if (Rd->kind)
-			assign(R, Negone);
+			printf("\t%s = %s;\n", R, Negone);
 		}
 	endif();
 	return rv;
@@ -344,18 +315,20 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 
 	d = e->L.d;
 	e1 = d->e;
-	callb(e1,buf);
-	if (strcmp(e_val((expr*)e,rv), buf))
-		assign(rv, buf);
+        (*(efuncb *)e1->op)(e1, buf);
+	if (strcmp(e_val((expr*)e,rv), buf)){
+          printf("\t%s = %s;\n", rv, buf);
+        }
 	if (want_derivs && e->R.D) {
 		sprintf(cbuf, cond_fmt, (int)e->next);
-		assign(cbuf, Fortran ? "1" : "0");
+                printf("\t%s = %s;\n", cbuf, Fortran ? "1" : "0");
 		}
 	for(d++; e1 = d->e; d++) {
-		ifstart(rv, cmp, callb(e1,buf));
-		if (d->d && want_derivs)
-			assign(cbuf, num((d - e->L.d) + Fortran));
-		assign(rv, buf);
+		ifstart(rv, cmp,(*(efuncb *)e1->op)(e1, buf));
+		if (d->d && want_derivs){
+                  printf("\t%s = %s;\n", cbuf, num((d - e->L.d) + Fortran));
+                }
+		printf("\t%s = %s;\n", rv, buf);
 		endif();
 		}
 	return rv;
@@ -370,7 +343,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	char buf[32];
 
 	e1 = e->L.e;
-	assign(rv, call1("floor", callb(e1,buf)));
+	printf("\t%s = %s;\n", rv, call1("floor",(*(efuncb *)e1->op)(e1, buf)));
 	return rv;
 	}
 
@@ -379,7 +352,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	char buf[32];
 
 	e1 = e->L.e;
-	assign(rv, call1("ceil", callb(e1,buf)));
+	printf("\t%s = %s;\n", rv, call1("ceil", (*(efuncb *)e1->op)(e1,buf)));
 	return rv;
 	}
 
@@ -390,7 +363,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	char buf[32], L[32];
 
 	e1 = e->L.e;
-	callb(e1,L+1);
+	(*(efuncb *)e1->op)(e1,L+1);
 	if (L[1] == '-') {
 		sn = L + 1;
 		sp = L + 2;
@@ -405,15 +378,15 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 		pp = One;
 		}
 	ifstart(sp, opLT, Zero);
-	assign(e_val(e,rv), sn);
+	printf("\t%s = %s;\n", e_val(e,rv), sn);
 	if (want_derivs) {
 		Ld = dLRp(e->dL);
-		assign(pdval(Ld,buf), pn);
+		printf("\t%s = %s;\n", pdval(Ld,buf), pn);
 		}
 	elsestart();
-	assign(rv, sp);
+	printf("\t%s = %s;\n", rv, sp);
 	if (want_derivs)
-		assign(buf, pp);
+		printf("\t%s = %s;\n", buf, pp);
 	endif();
 	return rv;
 	}
@@ -424,14 +397,14 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	register char *s;
 
 	e1 = e->L.e;
-	callb(e1,buf+1);
+	(*(efuncb *)e1->op)(e1,buf+1);
 	if (buf[1] == '-')
 		s = buf+2;
 	else {
 		buf[0] = '-';
 		s = buf;
 		}
-	assign(e_val(e,rv), s);
+	printf("\t%s = %s;\n", e_val(e,rv), s);
 	return rv;
 	}
 
@@ -442,7 +415,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "tanh", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
-		assign(pdval(Ld,pd), call1("cosh",L));
+		printf("\t%s = %s;\n", pdval(Ld,pd), call1("cosh",L));
 		introuble("tanh'", L);
 		binop(pd, pd, "*", pd);
 		}
@@ -456,7 +429,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "tan", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
-		assign(pdval(Ld,pd), call1("cos",L));
+		printf("\t%s = %s;\n", pdval(Ld,pd), call1("cos",L));
 		introuble("tan'", L);
 		binop(pd, pd, "*", pd);
 		}
@@ -485,7 +458,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "sinh", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
-		assign(pdval(Ld,pd), call1("cosh",L));
+		printf("\t%s = %s;\n", pdval(Ld,pd), call1("cosh",L));
 		introuble("sinh'", L);
 		}
 	return rv;
@@ -498,7 +471,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "sin", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
-		assign(pdval(Ld,pd), call1("cos",L));
+		printf("\t%s = %s;\n", pdval(Ld,pd), call1("cos",L));
 		introuble("sin'", L);
 		}
 	return rv;
@@ -536,7 +509,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "exp", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind)
-		assign(pdval(Ld,pd), rv);
+		printf("\t%s = %s;\n", pdval(Ld,pd), rv);
 	return rv;
 	}
 
@@ -547,7 +520,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "cosh", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
-		assign(pdval(Ld,pd), call1("sinh",L));
+		printf("\t%s = %s;\n", pdval(Ld,pd), call1("sinh",L));
 		introuble("cosh'", L);
 		}
 	return rv;
@@ -560,7 +533,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	opstart(e, "cos", rv, L);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind)
-		assign(pdval(Ld,pd), call1("-sin",L));
+		printf("\t%s = %s;\n", pdval(Ld,pd), call1("-sin",L));
 	return rv;
 	}
 
@@ -570,7 +543,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	dLR *Ld;
 
 	e1 = e->L.e;
-	callb(e1,L);
+	(*(efuncb *)e1->op)(e1,L);
 	ifstart(L, opLE, Negone);
 	domain("atanh", L);
 	endif();
@@ -579,11 +552,11 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	endif();
 	sprintf(buf, "%s * log((%s + %s) / (%s - %s))",
 		Half, One, L, One, L);
-	assign(e_val(e,rv), buf);
+	printf("\t%s = %s;\n", e_val(e,rv), buf);
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
 		sprintf(buf, "%s / (%s - %s*%s)", One, One, L, L);
-		assign(pdval(Ld,pd), buf);
+		printf("\t%s = %s;\n", pdval(Ld,pd), buf);
 		}
 	return rv;
 	}
@@ -598,13 +571,13 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	if (want_derivs && (Ld->kind || Rd->kind)) {
 		binop(T, L, "/", R);
 		sprintf(buf, "%s / (%s + %s*%s)", One, One, T, T);
-		assign(T1, buf);
+		printf("\t%s = %s;\n", T1, buf);
 		binop(T1, T1, "/", R);
 		if (Ld->kind)
-			assign(pdval(Ld,L), T1);
+			printf("\t%s = %s;\n", pdval(Ld,L), T1);
 		if (Rd->kind) {
 			sprintf(buf, "-%s*%s", T, T1);
-			assign(pdval(Rd,L), buf);
+			printf("\t%s = %s;\n", pdval(Rd,L), buf);
 			}
 		}
 	return rv;
@@ -618,7 +591,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
 		sprintf(buf, "%s / (%s + %s*%s)", One, One, L, L);
-		assign(pdval(Ld,pd), buf);
+		printf("\t%s = %s;\n", pdval(Ld,pd), buf);
 		}
 	return rv;
 	}
@@ -627,21 +600,16 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	register expr *e1;
 	char pd[32], L[32], buf[64];
 	dLR *Ld;
-
-	if (Fortran) {
-		who = whof;
-		whod = whofd;
-		}
 	e1 = e->L.e;
 	Ld = dLRp(e->dL);
-	callb(e1,L);
+	(*(efuncb *)e1->op)(e1,L);
 	if (want_derivs && Ld->kind) {
 		sprintf(buf, offlfmt2, L, pdval(Ld,pd));
 		who = whod;
 		}
 	else
 		sprintf(buf, offlfmt1, L);
-	assign(rv, call1(who, buf));
+	printf("\t%s = %s;\n", rv, call1(who, buf));
 	return rv;
 	}
 
@@ -655,7 +623,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
 		sprintf(buf, "%s / sqrt(%s - %s*%s)", One, One, L, L);
-		assign(pdval(Ld,pd), buf);
+		printf("\t%s = %s;\n", pdval(Ld,pd), buf);
 		}
 	return rv;
 	}
@@ -670,7 +638,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
 	Ld = dLRp(e->dL);
 	if (want_derivs && Ld->kind) {
 		sprintf(buf, "-%s / sqrt(%s - %s*%s)", One, One, L, L);
-		assign(pdval(Ld,pd), buf);
+		printf("\t%s = %s;\n", pdval(Ld,pd), buf);
 		}
 	return rv;
 	}
@@ -692,20 +660,20 @@ typedef void lfunc(expr *, int, int);
 	k = -1;
 	if (want_derivs && (k = (int)eif->next) != -1) {
 		sprintf(cbuf, cond_fmt, k);
-		assign(cbuf, "1");
+		printf("\t%s = %s;\n", cbuf, "1");
 		}
 	e = eif->T;
-	callb(e,e_val(e,val));
+	(*(efuncb *)e->op)(e,e_val(e,val));
 	if (strcmp(rv,val))
-		assign(rv, val);
+		printf("\t%s = %s;\n", rv, val);
 	Goto(endlabel);
 	label(elselabel);
 	if (k != -1)
-		assign(cbuf, "0");
+		printf("\t%s = %s;\n", cbuf, "0");
 	e = eif->F;
-	callb(e,val);
+	(*(efuncb *)e->op)(e,val);
 	if (strcmp(rv,val))
-		assign(rv, val);
+		printf("\t%s = %s;\n", rv, val);
 	label(endlabel);
 	return rv;
 	}
@@ -765,9 +733,9 @@ typedef void lfunc(expr *, int, int);
 	char L[32], R[32];
 
 	e1 = e->L.e;
-	callb(e1, L);
+	(*(efuncb *)e1->op)(e1, L);
 	e1 = e->R.e;
-	ifgo(L, cmp, callb(e1,R), lbl);
+	ifgo(L, cmp, (*(efuncb *)e1->op)(e1,R), lbl);
 	}
 
  static void vf_LT(expr *e, int TL, int FL){
