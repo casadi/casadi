@@ -117,11 +117,12 @@ static pdl *pdlbusy, *pdlfree;
 
 static int new_pd(){
   pdl *p;
-  if (!iflevel)
+  if (!iflevel){
     return npd++;
-  if (p = pdlfree)
+  }
+  if(p = pdlfree){
     pdlfree = p->next;
-  else {
+  } else {
     p = (pdl *)mem(sizeof(pdl));
     p->i = npd++;
   }
@@ -133,9 +134,9 @@ static int new_pd(){
 
 static int pdlsave(pdl **opdb){
   condlevel++;
-  if (iflevel++)
+  if (iflevel++){
     *opdb = pdlbusy;
-  else {
+  } else {
     pdlfree = 0;
     *opdb = 0;
   }
@@ -156,15 +157,15 @@ static void pdlreset(){
 static void pdlrestore(pdl *opdb, int mts){
   pdl *p, *pnext;
   condlevel--;
-  if (--iflevel) {
+  if (--iflevel){
     pnext = pdlbusy;
-    while(p = pnext) {
+    while(p = pnext){
       pnext = p->next;
       p->next = opdb;
       opdb = p;
     }
     pnext = pdlfree;
-    while((p = pnext) && p->ts >= mts) {
+    while((p = pnext) && p->ts >= mts){
       pnext = p->next;
       p->next = opdb;
       opdb = p;
@@ -218,45 +219,29 @@ static list *new_list(list *nxt){
   return rv;
 }
 
-static v_i *vi_freelist;
-
-static v_i *new_vi(real v, int i){
-  v_i *rv;
-  if (rv = vi_freelist)
-    vi_freelist = rv->u.next;
-  else
-    rv = (v_i *)mem(sizeof(v_i));
-  rv->u.v = v;
-  rv->i = i;
-  return rv;
-}
-
-static void free_vi(v_i *vi){
-  vi->u.next = vi_freelist;
-  vi_freelist = vi;
-}
-
 static char *fpval(real r){
   static char buf[32];
-  if (r >= Infinity)
+  if(r >= Infinity){
     return "1.7e308";
-  else if (r <= negInfinity)
+  } else if (r <= negInfinity){
     return "-1.7e308";
+  }
   g_fmt(buf, r);
   return buf;
 }
 
 void assign(char *a, char *b){
-  if (a)
+  if(a)
     printf(assign_fmt, a, b);
 }
 
 void binop(char *a, char *b, char *op, char *c){
-  if (a) {
-    if (a == b)
+  if(a){
+    if(a == b){
       printf("\t%s %s= %s;\n", a, op, c);
-    else
+    } else {
       printf(binop_fmt, a, b, op, c);
+    }
   }
 }
 
@@ -290,10 +275,6 @@ void domain(char *s, char *x){
 
 void zerdiv(char *s){ 
   printf(zerdiv_fmt, s); 
-}
-
-void call(char *what, char *arg){ 
-  printf(call_fmt, what, arg);
 }
 
 char *call1(char *what, char *a){
@@ -339,12 +320,10 @@ static void dvset(register real *dp, int deriv){
   if (t == -1.) {
     d->kind = dLR_negone;
     d->o.vp = &negone;
-  }
-  else if (t == 1.) {
+  } else if(t == 1.){
     d->kind = dLR_one;
     d->o.vp = &one;
-  }
-  else {
+  } else {
     d->kind = dLR_PD;
     d->o.i = new_pd();
   }
@@ -358,25 +337,15 @@ static void Lset(linpart *L, int nlin){
   for(Le = L + nlin; L < Le; L++) {
     t = L->fac;
     d = Make_dLR(&L->fac);
-    if (t == 1.)
+    if(t == 1.){
       d->kind = dLR_one;
-    else if (t == -1.)
+    } else if (t == -1.) {
       d->kind = dLR_negone;
-    else {
+    } else {
       d->kind = dLR_VP;
       *(d->o.vp = (real *)mem(sizeof(real))) = t;
     }
   }
-}
-
-static void mpd(expr *e, real *dp, int deriv){
-  assert(deriv==0);
-  int i, j;
-  register dLR *d = Make_dLR(dp);
-  
-  d->kind = dLR_UNUSED;
-  if (e->op != f_OPNUM && e->op != f_OPVARVAL && (i = e->a) > 0)
-    vt_free(i);
 }
 
 static int ewalk(expr*, int);
@@ -955,25 +924,6 @@ static void dstore(Adjoint *a, derp *d){
     (*dstored = new_list(*dstored))->item.D = d;
 }
 
-static void
-derprestore()
-{
-  Adjoint *a;
-  list *L, *Lnext;
-  
-  if (L = *dstored) {
-    *dstored = 0;
-    do {
-      Lnext = L->next;
-      a = Adjp(L->item.D->a.rp);
-      a->stored = 0;
-      L->next = list_freelist;
-      list_freelist = L;
-    }
-    while(L = Lnext);
-  }
-}
-
 static char * vprod(real t, int k){
   static char buf[64];
   int i;
@@ -1155,27 +1105,8 @@ static char *putout(expr *e, int i, int j, char *what, int k, int *z){
   return callb(e,buf);
 }
 
-static void x0check(int i, int j, int k, int deriv){
-  cexp *c;
-  
-  if (!needx0check)
-    return;
-  printf(deriv ? xcheck : xcheck0);
-  if (i < j) {
-    printf(xkind, k, k, k);
-    for(c = cexps + i; i < j; i++, c++)
-      com_out(c->e, c->L, c->nlin, i);
-    printf("\t%s", endif_fmt);
-  }
-}
-
 static void funnel_set(funnel *f, char *gj0_fmt){
   assert(0);
-}
-
-static void end(){
-  printf("}\n");
-  branches = 0;
 }
 
 void obj_output(int deriv){
@@ -1218,8 +1149,6 @@ void obj_output(int deriv){
   if (omax.needT1)
     printf("\treal t1, t2;\n");
   
-  x0check(combc, ncom0, 2, deriv);
-  
   if ((f_b || f_o) && deriv) {
     printf("\tif (wantfg & 2) {\n");
     if (f_b)
@@ -1241,7 +1170,8 @@ void obj_output(int deriv){
       }
       if (n_obj > 1)
         printf("\n\t}\n");
-      end();
+      printf("}\n");
+      branches = 0;
   }
   
 void con_output(int deriv){
@@ -1274,13 +1204,13 @@ void con_output(int deriv){
   else if (nzcgrad())
     printf("\treal t1;\n");
   
-  x0check(comb, combc, 1, 0);
   c1 = c_cexp1st;
   for(i = 0; i < n_con; i++, c1++) {
     s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
     printf("\tc[%d] = %s;\n", i, con_linadd(i,s));
   }
-  end();
+  printf("}\n");
+  branches = 0;
 }
       
 void output(){
