@@ -45,7 +45,7 @@ static int cwant = 2, derkind = 2, djoff = -1, owant = 2;
 static int needx0check, nvseen, output_time, *vseen;
 static list **c_ifset, **com_ifset, **o_ifset;
 int branches = 0;
-static int Fortran1, condlevel, fwalk, iflevel, maxa, ncond, ndv, ndvmax,
+static int condlevel, fwalk, iflevel, maxa, ncond, ndv, ndvmax,
 npd, nplterm, nv1, nv2, nvt, nvtmax;
 static int *cvmap;
 static fint nJ;
@@ -282,20 +282,6 @@ void elseif(char *a, char *b, char *c){
 
 void endif(){ printf(endif_fmt); }
 
-int Switch(char *v, int n){
-  int i, j, rv;
-  printf("\tswitch(%s) {\n", v);
-  return 0;
-}
-
-void Case(int k){ 
-  printf(case_fmt, k);
-}
-
-void Break(int k){ 
-  printf(break_fmt, k);
-}
-
 void endswitch(int lbl){ printf(endswitch_fmt, lbl); }
 
 void domain(char *s, char *x){
@@ -458,7 +444,6 @@ static char *f_OPVARVAL1(expr *e, char *buf){
         vseen[nvseen++] = e->a;
       }
       fmt = x_fmt;
-      k += Fortran;
     }
   }
   else {
@@ -962,7 +947,6 @@ static void cde_walk(cde *d, int n, maxinfo *m, list **ifset, int *c1st, int **z
   max_save(m);
 }
 
-static void derivs(derp *, derp *);
 static list **dstored;
 
 static void dstore(Adjoint *a, derp *d){
@@ -988,319 +972,6 @@ derprestore()
     }
     while(L = Lnext);
   }
-}
-
-static void cond_dmagic(dLR *LR){
-  expr_va *eva;
-  expr_if *eif;
-  derp *D, *D0;
-  de *d;
-  char cbuf[16];
-  int i, j, n;
-  list **ds0, *dstore1;
-  
-  ds0 = dstored;
-  dstored = &dstore1;
-  dstore1 = 0;
-  if (LR->kind == dLR_IF) {
-    eif = LR->o.eif;
-    D = eif->D;
-    D->c.rp = &edagread_one;
-    sprintf(cbuf, cond_fmt, Intcast eif->next);
-    if (eif->dT != eif->d0) {
-      printf(ifstart_fmt, cbuf, opNE, "0");
-      D->a.rp = eif->Tv.rp;
-      D->next = eif->dT;
-      derivs(D, eif->d0);
-      derprestore();
-      if (eif->dF != eif->d0) {
-        printf(else_fmt);
-        just_else:
-        D->a.rp = eif->Fv.rp;
-        D->next = eif->dF;
-        derivs(D, eif->d0);
-        derprestore();
-      }
-    }
-    else {
-      printf(ifstart_fmt, cbuf, opEQ, "0");
-      goto just_else;
-    }
-    printf(endif_fmt);
-    D->next = eif->d0;
-  }
-  else {
-    eva = LR->o.eva;
-    D = eva->R.D;
-    D->c.rp = &edagread_one;
-    sprintf(cbuf, cond_fmt, Intcast eva->next);
-    for(n = 0, d = eva->L.d; d->e; d++)
-      n++;
-    i = Switch(cbuf, n);
-    j = i + n;
-    D0 = eva->d0;
-    for(d = eva->L.d; ;) {
-      Case(i++);
-      D->a.rp = d->dv.rp;
-      D->next = d->d;
-      derivs(D, D0);
-      derprestore();
-      if (!(++d)->e)
-        break;
-      Break(j);
-    }
-    endswitch(j);
-  }
-  dstored = ds0;
-}
-
-static void derivs(derp *d, derp *d0){
-  Adjoint *a, *b;
-  dLR *c;
-  char *aop, *fmt, *ginc, *mult;
-  int havenum, i, neg, num2chk, stored;
-  derp *dnext;
-  char bufb[32], bufc[32], bufg[32], bufi[32];
-  double t, t1;
-  v_i *vi;
-  
-  for(; d != d0; d = dnext) {
-    dnext = d->next;
-    c = dLRp(*d->c.rp);
-    if (c->kind >= dLR_VARARG) {
-      cond_magic(c);
-      cond_dmagic(c);
-      continue;
-    }
-    b = Adjp(d->b.rp);
-    if (!b->storage)	/* defined var used only in if */
-      continue;
-    neg = b->neg;
-    a = Adjp(d->a.rp);
-    if (c->kind == dLR_one
-      && a->storage == b->storage && a->o.i == b->o.i) {
-      switch(a->storage) {
-        case STOR_GRAD:
-        case STOR_JAC:
-        case STOR_DEFV:
-          break;
-        default:
-          dstore(a,d);
-          a->neg = neg;
-          continue;
-      }
-    }
-    num2chk = 0;
-    stored = a->stored;
-    switch(a->storage) {
-      case STOR_VI:
-        i = a->o.vi->i;
-        fmt = dv_fmt;
-        break;
-      case STOR_PD:
-        if (b->storage == STOR_IMPLICIT
-          && (stor_grad != STOR_DEFV
-          || a->storage == STOR_PD
-          && c->kind == dLR_PD
-          && a->o.i == c->o.i))
-          continue;
-        stored = a->stored = 1;
-        if (a->neg)
-          neg = 1 - neg;
-        fmt = pd_fmt;
-        i = a->o.i;
-        break;
-      case STOR_DV:
-      case STOR_DEFV:
-        num2chk = 1;
-        i = a->o.i;
-        fmt = dv_fmt;
-        break;
-      case STOR_GRAD:
-        i = a->o.og->varno;
-        fmt = grad_fmt;
-        break;
-      case STOR_JAC:
-        i = (djoff >= 0
-        ? djoff + a->o.cg->varno*n_con
-        : a->o.cg->goff);
-        fmt = jac_fmt;
-        break;
-      default:
-        continue;
-    }
-    mult = "*";
-    havenum = 0;
-    switch(b->storage) {
-      case STOR_PD:
-        sprintf(bufb, pd_fmt, b->o.i + 0);
-        break;
-      case STOR_DV:
-      case STOR_DEFV:
-        sprintf(bufb, dv_fmt, b->o.i);
-        break;
-      case STOR_VARVAL:
-        sprintf(bufb, x_fmt, b->o.i);
-        break;
-      case STOR_VI:
-        t = b->o.vi->u.v;
-        goto have_t;
-      case STOR_VP:
-        t = *b->o.vp;
-        have_t:
-        havenum = 1;
-        if (t < 0) {
-          t = -t;
-          neg = 1 - neg;
-        }
-        g_fmt(bufb, t);
-        break;
-      case STOR_IMPLICIT:
-        havenum = 1;
-        t = 1.;
-        mult = "";
-        bufb[0] = 0;
-        break;
-      default:
-        /*DEBUG*/ fprintf(Stderr,
-        "\nBad b->storage = %d\n", b->storage);
-        /*DEBUG*/ exit(12);
-    }
-    switch(c->kind) {
-      case dLR_VP:
-        if (havenum) {
-          t *= *c->o.vp;
-          if (!stored && num2chk) {
-            havenum = 2;
-            break;
-          }
-          mult = "";
-          bufb[0] = 0;
-        }
-        else
-          t = *c->o.vp;
-        num_fmt:
-        if (t < 0) {
-          t = -t;
-          neg = 1 - neg;
-        }
-        g_fmt(bufc, t);
-        break;
-      case dLR_PD:
-        sprintf(bufc, pd_fmt, c->o.i);
-        break;
-      case dLR_VARVAL:
-        sprintf(bufc, x_fmt, c->o.i );
-        break;
-      case dLR_negone:
-        neg = 1 - neg;
-      case dLR_one:
-        if (havenum) {
-          if (!stored) {
-            havenum = 2;
-            if (*mult)
-              break;
-          }
-          goto num_fmt;
-        }
-        if (*mult) {
-          mult = "";
-          bufc[0] = 0;
-        }
-        else
-          strcpy(bufc, One);
-        break;
-      default:
-        /*DEBUG*/fprintf(Stderr,
-        "\nBad c->kind = %d\n", c->kind);
-        /*DEBUG*/ exit(11);
-    }
-    ginc = 0;
-    sprintf(bufg, fmt, i);
-    if (stored) {
-      aop = neg ? "-" : "+";
-      printf("\t%s %s= ", bufg, aop);
-    }
-    else {
-      if (neg && havenum)
-        t = -t;
-      switch(a->storage) {
-        case STOR_DV:
-        case STOR_DEFV:
-          if (havenum == 2) {
-            a->storage = STOR_VI;
-            a->o.vi = new_vi(t, a->o.i);
-            a->neg = 0;
-            continue;
-          }
-          break;
-        case STOR_VI:
-          if (havenum == 2) {
-            a->o.vi->u.v += t;
-            continue;
-          }
-          a->storage = STOR_DV;
-          a->o.i = (vi = a->o.vi)->i;
-          if (vi->u.v)
-            g_fmt(ginc = bufi, vi->u.v);
-          sprintf(bufg, dv_fmt, vi->i);
-          free_vi(vi);
-          break;
-        case STOR_GRAD:
-          t1 = a->o.og->coef;
-          goto t1_test;
-        case STOR_JAC:
-          t1 = a->o.cg->coef;
-          t1_test:
-          if (t1)
-            g_fmt(ginc = bufi, t1);
-      }
-      dstore(a,d);
-      if (!*mult && !neg
-        && (!bufb[0] && !strcmp(bufc,bufg))
-        || !bufc[0] && !strcmp(bufb,bufg))
-        continue;
-      if (!strcmp(bufg,bufb) && *mult == '*' && !neg && !ginc) {
-        printf("\t%s *= %s;\n", bufg, bufc);
-      continue;
-      }
-      printf("\t%s %s", bufg, neg ? "= -" : "= ");
-    }
-    printf("%s%s%s", bufb, mult, bufc);
-    if (ginc)
-      printf(" + %s", ginc);
-    printf(eos);
-  }
-}
-
-static void co_derivs(derp *d, list *L, char *gj0_fmt){
-  char buf[32];
-  Adjoint *a;
-  int j, k;
-  ograd *og;
-  
-  for(j = 0; L; L = L->next, j++) {
-    a = Adjp(&adjoints[var_e[k = L->item.i].a]);
-    if (k < nv1)
-      if (stor_grad == STOR_DEFV) {
-        sprintf(buf, dv_fmt, j);
-        assign(buf, Zero);
-      }
-      else {
-        og = stog[k];
-        g_fmt(buf, stor_grad == STOR_GRAD ? og->coef
-        : ((cgrad *)og)->coef);
-        printf(gj0_fmt, k + 0, buf);
-      }
-      else {
-        a->storage = STOR_DEFV;
-        a->o.i = j;
-        sprintf(buf, dv_fmt, j);
-        assign(buf, Zero);
-      }
-      a->stored = 1;
-  }
-  derivs(d,0);
 }
 
 static char * vprod(real t, int k){
@@ -1385,35 +1056,6 @@ static char *con_linadd(int i, char *s){
     return s;
 }
 
-static void con_derivs(int i){
-  cgrad *cg, *cg0;
-  Adjoint *a;
-  char buf[32];
-  int i1, j;
-  cde *c = con_de + i;
-  
-  printf("\n%s   /*** derivatives for constraint %d ***/\n\n",
-  Fortstar, i+1);
-  dwalk(c->d, cg0 = Cgrad[i], zac[i], c_ifset[i]);
-  for(cg = cg0; cg; cg = cg->next) {
-    a = Adjp(&adjoints[cg->varno]);
-    a->storage = STOR_JAC;
-    a->stored = 0;
-    a->o.cg = cg;
-    stog[cg->varno] = (ograd *)cg;
-  }
-  stor_grad = STOR_JAC;
-  co_derivs(con_de[i].d, c_ifset[i], j0_fmt);
-  for(cg = cg0; cg; cg = cg->next) {
-    a = Adjp(&adjoints[cg->varno]);
-    if (!a->stored && (!intsk || !intsk[cg->varno])) {
-      g_fmt(buf, cg->coef);
-      j = 0 ? i + cg->varno*n_con : cg->goff;
-      printf(j0_fmt, j, buf);
-    }
-  }
-}
-
 static int nzcgrad(){
   cgrad *cg;
   int i;
@@ -1440,6 +1082,7 @@ static void com_out(expr *e, linpart *L, int nlin, int k0){
   int asg, j, k, op;
   efuncb *eb;
   dLR *d;
+  int Fortran1 = -1;
   
   printf("\n%s\t/*** defined variable %d ***/\n\n", star, k0+1);
   if ((j = cvmap[k0]) < 0) {
@@ -1527,54 +1170,7 @@ static void x0check(int i, int j, int k, int deriv){
 }
 
 static void funnel_set(funnel *f, char *gj0_fmt){
-  cplist *cl;
-  dLR *d;
-  Adjoint *a;
-  int k;
-  list *Lp;
-  char *b, *b1, buf[32], bufb[32];
-  
-  stor_grad = STOR_DEFV;
-  fwalk = 1;
-  do {
-    printf("\n%s\t/*** funnel ***/\n\n", Fortstar);
-    k = f->ce - cexps;
-    dwalk(f->fcde.d, 0, zaC[k], Lp = com_ifset[k]);
-    co_derivs(f->fcde.d, Lp, gj0_fmt);
-    cl = f->cl;
-    do {
-      d = dLRp(*cl->cfa); /*!! was Make_dLR(cl->cfa) */
-      sprintf(buf, pd_fmt, d->o.i);
-      a = Adjp(cl->ca.rp);
-      b = bufb;
-      switch(a->storage) {
-        case STOR_IMPLICIT:
-          b = a->neg ? "-1" : "1";
-          break;
-        case STOR_VP:
-          g_fmt(b, *a->o.vp);
-          break;
-        case STOR_PD:
-          b1 = b;
-          if (a->neg)
-            *b1++ = '-';
-          sprintf(b1, pd_fmt, a->o.i);
-          break;
-        case STOR_DV:
-        case STOR_DEFV:
-          sprintf(b, dv_fmt, a->o.i);
-          break;
-        default:/*DEBUG*/ fprintf(Stderr,
-          "Bad a->storage in funnel_set\n");
-          /*DEBUG*/exit(15);
-      }
-      *a = A0;
-      assign(buf, b);
-    }
-    while(cl = cl->next);
-  }
-  while(f = f->next);
-  fwalk = 0;
+  assert(0);
 }
 
 static void end(){
@@ -1766,51 +1362,49 @@ void output(){
       }
     }
     
-    printf(
-    " real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {\n\t\t1.7e308",
-            2*nv1, 2*n_con);
-            b = bounds;
-            be = b + 2*(n_con + nv1);
-            while(b < be)
-              printf(",\n\t\t%s", fpval(*b++));
-            printf("};\n\n");
+    printf(" real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {\n\t\t1.7e308",2*nv1, 2*n_con);
+    b = bounds;
+    be = b + 2*(n_con + nv1);
+    while(b < be)
+      printf(",\n\t\t%s", fpval(*b++));
+    printf("};\n\n");
+    
+    printf(" real x0comn_[%d] = {\n", nv1);
+    for(i = 0; i < nv1; i++)
+      printf("%s\t\t%s", i ? ",\n" : "", fpval(X0[i]));
+    printf(" };\n\n");
+    
+    if (npd)
+      printf(" static real pd[%d];\n", npd);
             
-            printf(" real x0comn_[%d] = {\n", nv1);
-            for(i = 0; i < nv1; i++)
-              printf("%s\t\t%s", i ? ",\n" : "", fpval(X0[i]));
-            printf(" };\n\n");
+      if (f_b && derkind & 2) {
+        printf("\n static void\nfunnelb%s\n{\n", fhead[krflag>>1]);
+        if ((i = bmax.ndv) > 0)
+          printf("\treal dv[%d];\n", i);
+        funnel_set(f_b, "Botch<%d> = %s;");
+        printf("\t}\n");
+      }
             
-            if (npd)
-              printf(" static real pd[%d];\n", npd);
-            
-            if (f_b && derkind & 2) {
-              printf("\n static void\nfunnelb%s\n{\n", fhead[krflag>>1]);
-              if ((i = bmax.ndv) > 0)
-                printf("\treal dv[%d];\n", i);
-              funnel_set(f_b, "Botch<%d> = %s;");
-              printf("\t}\n");
-            }
-            
-            if (needx0check) {
-              printf("static real old_x[%d];\nstatic int xkind = -1;\n\n\
-              static int\nxcheck%s\n{\n\treal", nv1, xcheckdcl);
-              if (comb > 0) {
-                printf(" *x0 = x,");
-                x0 = "x0";
-              }
-              else
-                x0 = "x";
-              printf(" *x1 = old_x, *xe = x + %d;\n", nv1);
-              if ((i = bmax.nvt) > 0)
-                printf("\treal v[%d];\n", i);
-              printf("\terrno = 0;\n\
-              if (xkind >= 0) {\n\t\twhile(*%s++ == *x1++)\n\
-                \tif (%s == xe)\n\t\t\t\treturn 0;\n\t\t--%s, --x1;\n\t\t}\n\
-                do *x1++ = *%s++;\n\t\twhile(%s < xe);\n\txkind = 0;\n",
-                  x0,x0,x0,x0,x0);
-                for(i = 0, c = cexps; i < comb; c++, i++)
-                  com_out(c->e, c->L, c->nlin, i);
-                printf("\treturn 1;\n\t}\n");
+      if (needx0check) {
+        printf("static real old_x[%d];\nstatic int xkind = -1;\n\n\
+        static int\nxcheck%s\n{\n\treal", nv1, xcheckdcl);
+        if (comb > 0) {
+          printf(" *x0 = x,");
+          x0 = "x0";
+        } else {
+          x0 = "x";
+        }
+        printf(" *x1 = old_x, *xe = x + %d;\n", nv1);
+        if ((i = bmax.nvt) > 0)
+          printf("\treal v[%d];\n", i);
+        printf("\terrno = 0;\n\
+        if (xkind >= 0) {\n\t\twhile(*%s++ == *x1++)\n\
+          \tif (%s == xe)\n\t\t\t\treturn 0;\n\t\t--%s, --x1;\n\t\t}\n\
+          do *x1++ = *%s++;\n\t\twhile(%s < xe);\n\txkind = 0;\n",
+            x0,x0,x0,x0,x0);
+          for(i = 0, c = cexps; i < comb; c++, i++)
+            com_out(c->e, c->L, c->nlin, i);
+          printf("\treturn 1;\n\t}\n");
   }
   for(i = 1; i < 3; i++) {
     if (owant & i)
@@ -1870,25 +1464,22 @@ static void nlvzap(int i, int j){
 }
     
 int main(int argc, char **argv){
-  char *s0;
-  int i, ncom, nv;
-  fint L;
-  expr_nx *enx;
-    
   ASL_alloc(ASL_read_fg);
   progname = "../examples/cork.nl";
   g_fmt_decpt = 1;
-
   want_derivs = 0;
   cwant = owant = derkind = 1;
-  
   return_nofile = 1;
+  fint L;
   FILE *nl = jacdim0(progname, L = strlen(progname));
-  for(i = 0; i < N_OPS; i++)
+
+  int i;
+  for(i = 0; i < N_OPS; i++){
     r_ops[i] = (efunc *)i;
+  }
   
   nv1 = c_vars > o_vars ? c_vars : o_vars;
-  ncom = (i = comb + comc + como) + comc1 + como1;
+  int ncom = (i = comb + comc + como) + comc1 + como1;
   nv2 = nv1 + ncom;
         
   c_cexp1st = (int *)Malloc((n_con + n_obj + 2)*sizeof(int));
@@ -1917,6 +1508,7 @@ int main(int argc, char **argv){
   op_type[OP2POW] = 11;
       
   stog = (ograd **)Malloc(nv1*sizeof(ograd *));
+
   
   declare[OP_asinh] = "asinh";
   declare[OP_asinh+1] = "asinhd";
@@ -1927,18 +1519,6 @@ int main(int argc, char **argv){
   dvtfree = (int *)Malloc(NDVTGULP*sizeof(int));
   ndvtmax = nvtfree = NDVTGULP;
   
-  Fortran1 = Fortran - 1;
-  
-  if (skip_int_derivs) {
-    intsk = (char *)Malloc(nv1);
-    memset(intsk, 0, nv1);
-    if (nlvbi)
-      nlvzap(nlvb, nlvbi);
-    if (nlvci)
-      nlvzap(nlvb+nlvc, nlvci);
-    if (nlvoi)
-      nlvzap(nlvb+nlvc+nlvo, nlvoi);
-  }
   if (n_con) get_rownos();
   
   vseen = (int *)Malloc((nv2 + ncom)*sizeof(int));
@@ -1976,10 +1556,11 @@ int main(int argc, char **argv){
   comwalk(combc, ncom0);
   cde_walk(obj_de, n_obj, &omax, o_ifset, o_cexp1st, zao);
   
-  nv = nv1 + ncom;
+  int nv = nv1 + ncom;
   for(i = 0; i < nv; i++)
     var_e[i].op = (efunc *)f_OPVARVAL1;
   
+  expr_nx *enx;
   for(enx = nums; enx; enx = enx->next)
     enx->op = f_OPNUM1;
   
@@ -1998,4 +1579,3 @@ char *e_val(expr *e, char *buf){
     sprintf(buf, pd_fmt, (-1) - i);
   return buf;
 }
-      
