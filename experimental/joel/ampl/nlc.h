@@ -53,10 +53,10 @@ typedef struct Adjoint {
 #define STOR_JAC	7
 #define STOR_VI		8
 #define STOR_DEFV	9
-			unsigned neg:1;
-			unsigned ifset:1;
-			unsigned stored:1;
-			unsigned seen:1;
+                        unsigned neg:1;
+                        unsigned ifset:1;
+                        unsigned stored:1;
+                        unsigned seen:1;
 } Adjoint;
 
 typedef struct dLR {
@@ -79,26 +79,19 @@ typedef struct dLR {
 #define dLR_VARARG	6
 #define dLR_IF		7
 
-#ifdef X64_bit_pointers
-#define Adjp(x) (*(Adjoint **)x)
-#define dLRp(x) (*(dLR **)&x)
-#define Make_dLR(x) *(dLR **)x = (dLR *)mem(sizeof(dLR))
-#define Make_dLRp(x) (*(dLR ***)&x = (dLR **)mem(sizeof(dLR*)), (dLR **)x)
-#else
 #define Adjp(x) ((Adjoint *)x)
 #define dLRp(x) ((dLR *)&x)
 #define Make_dLR(x) (dLR *)x
 #define Make_dLRp(x) (dLR **)&x
-#endif
 
- typedef char *efuncb(expr *, char *);
+typedef char *efuncb(expr *, char *);
 
- typedef struct
+typedef struct
 expr_nx {	/* for numbers */
-	efuncb *op;
-	struct expr_nx *next;
-	real v;
-	} expr_nx;
+        efuncb *op;
+        struct expr_nx *next;
+        real v;
+        } expr_nx;
 
 extern char *e_val ANSI((expr*, char*));
 extern char *f_OPNUM1 ANSI((expr*, char*));

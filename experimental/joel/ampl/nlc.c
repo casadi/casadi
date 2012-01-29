@@ -122,29 +122,16 @@ extern efunc *r_op[];
 
 static real *bounds;
 extern char *progname;
-char *Half = "0.5", *One = "1.", *Negone = "-1.", *Zero = "0.";
-char *opEQ = "==", *opGE = ">=", *opGT = ">", *opLE = "<=",
-*opLT = "<", *opNE = "!=";
+char *opEQ = "==", *opGE = ">=", *opGT = ">", *opLE = "<=", *opLT = "<", *opNE = "!=";
 char *opAND = "&&", *opOR = "||";
 char *T = "t1", *T1 = "t2";	/* temporary variable names */
-char *offlfmt1 = "&%s", *offlfmt2 = "&%s, &%s";
-char *cond_fmt = "cond[%d]";
-char *pd_fmt = "pd[%d]";
-static char *tv_fmt = "v[%d]";
-static char *x_fmt = "x[%d]";
 static char seen[N_OPS], *declare[N_OPS];
-static char *xcheck = "\tfint wantfg = *needfg;\nif (xcheck(x) && wantfg == 2)\n\t\twantfg = 3;\n";
-static char *xcheck0 = "\txcheck(x);\n";
-static char *xcheckdcl = "(real *x)";
-static char *xkind = "\tif (!(xkind & %d)) {\n\t\txkind |= %d;\n";
 static real negone = -1.0, one = 1.0;
 extern real edagread_one;	/* &edagread_one = special derp->c value */
 
 static expr_nx *nums;
 static ograd **stog;
 
-static Adjoint *dwalk_one;
-static real *rdwalk_one;
 static Adjoint A0;
 static int *acount, *dvtfree, *rownos;
 static int densejac, krflag, ndvfree, ndvtmax, needT1, nvtfree,
@@ -157,23 +144,6 @@ pdl {
 } pdl;
 
 static pdl *pdlbusy, *pdlfree;
-
-static int new_pd(){
-  pdl *p;
-  if (!iflevel){
-    return npd++;
-  }
-  if(p = pdlfree){
-    pdlfree = p->next;
-  } else {
-    p = (pdl *)mem(sizeof(pdl));
-    p->i = npd++;
-  }
-  p->next = pdlbusy;
-  pdlbusy = p;
-  p->ts = pdts;
-  return p->i;
-}
 
 static int pdlsave(pdl **opdb){
   condlevel++;
@@ -240,7 +210,7 @@ static void dv_free(int k){
   dvtfree[ndvfree++] = k;
 }
 
-static int new_vt(int deriv){
+int new_vt(){
   return nvtfree < ndvtmax ? dvtfree[nvtfree++] : nvt++;
 }
 
@@ -342,25 +312,6 @@ static char op_type[] = {
   #include "op_type.hd"
 };
 
-static void dvset(register real *dp, int deriv){
-  real t = *dp;
-  register dLR *d = Make_dLR(dp);
-  if (!deriv) {
-    d->kind = dLR_UNUSED;
-    return;
-  }
-  if (t == -1.) {
-    d->kind = dLR_negone;
-    d->o.vp = &negone;
-  } else if(t == 1.){
-    d->kind = dLR_one;
-    d->o.vp = &one;
-  } else {
-    d->kind = dLR_PD;
-    d->o.i = new_pd();
-  }
-}
-
 static void Lset(linpart *L, int nlin){
   linpart *Le;
   double t;
@@ -380,7 +331,7 @@ static void Lset(linpart *L, int nlin){
   }
 }
 
-static int ewalk(expr*, int);
+static int ewalk(expr*);
 
 static void lwalk(expr **ep, int neg){
   int i, j;
@@ -419,8 +370,8 @@ static void lwalk(expr **ep, int neg){
     case NE:
       e->op = neg ? f_EQ : f_NE;
       compare:
-      i = ewalk(e->L.e,0);
-      j = ewalk(e->R.e,0);
+      i = ewalk(e->L.e);
+      j = ewalk(e->R.e);
       if (i > 0)
         vt_free(i);
       if (j > 0)
@@ -435,7 +386,7 @@ static char *f_OPVARVAL1(expr *e, char *buf){
   
   if ((k = e->a) < nv1) {
     if (k < 0) {
-      fmt = pd_fmt;
+      fmt = "pd[%d]";
       k = (-1) - k;
     }
     else {
@@ -444,17 +395,17 @@ static char *f_OPVARVAL1(expr *e, char *buf){
         A->seen = 1;
         vseen[nvseen++] = e->a;
       }
-      fmt = x_fmt;
+      fmt = "x[%d]";
     }
   }
   else {
     k = cvmap[(expr_v *)e - var_e - nv1];
     if (k < 0) {
-      fmt = pd_fmt;
+      fmt = "pd[%d]";
       k = (-1) - k;
     }
     else {
-      fmt = tv_fmt;
+      fmt = "v[%d]";
       k += (-1);
     }
   }
@@ -467,9 +418,8 @@ char *f_OPNUM1(register expr *e, char *rv){
   return rv;
 }
 
-static int ewalk(expr *e, int deriv){
-  assert(deriv==0);
-  int deriv1, i, j, k, k1, lderiv, mts, rderiv;
+static int ewalk(expr *e){
+  int i, j, k, k1, mts;
   expr *e1, **ep, **epe;
   expr_if *eif;
   expr_va *eva;
@@ -486,20 +436,17 @@ static int ewalk(expr *e, int deriv){
   
   k = Intcast e->op;
   e->op = r_op[k];
-  deriv1 = deriv & 1;
-  if (achk[k1 = op_type[k]] && e->a == nv1)
-    deriv = deriv1 = 0;
+  achk[k1 = op_type[k]];
   switch(k1) {
     case 11: /* OP2POW */
       e->dL = 0;
       /* no break */
       case 1: /* unary */
-        j = ewalk(e->L.e, deriv1);
-        i = new_vt(deriv);
+        j = ewalk(e->L.e);
+        i = new_vt();
         if (j > 0)
           vt_free(j);
         seen[k] = 1;
-        reti:
         return e->a = i;
         
       case 2: /* binary */
@@ -516,31 +463,25 @@ static int ewalk(expr *e, int deriv){
             default:
               e->dL = 0.;
         }
-        if (lderiv = rderiv = deriv1) {
-          lderiv = achk[op_type[Intcast e->L.e->op]]
-          && e->L.e->a != nv1 ? k1 : 0;
-          rderiv = achk[op_type[Intcast e->R.e->op]]
-          && e->R.e->a != nv1 ? k1 : 0;
-        }
-        i = ewalk(e->L.e,lderiv);
-        j = ewalk(e->R.e,rderiv);
+        i = ewalk(e->L.e);
+        j = ewalk(e->R.e);
         k = i;
-        i = new_vt(0);
+        i = new_vt();
         if (j > 0)
           vt_free(j);
         if (k > 0)
           vt_free(k);
-        goto reti;
+        return e->a = i;
         
             case 3: /* vararg (min, max) */
               eva = (expr_va *)e;
               d = eva->L.d;
               condlevel++;
-              if (!(i = ewalk(d->e,deriv)))
-                i = new_vt(deriv);
+              if (!(i = ewalk(d->e)))
+                i = new_vt();
               while(e1 = (++d)->e) {
                 pdlreset();
-                if ((j = ewalk(e1,deriv1)) > 0)
+                if ((j = ewalk(e1)) > 0)
                   vt_free(j);
               }
               condlevel--;
@@ -554,25 +495,24 @@ static int ewalk(expr *e, int deriv){
                 LR->kind = dLR_VARARG;
                 LR->o.eva = eva;
               }
-              goto reti;
+              return e->a = i;
               
             case 4: /* piece-wise linear */
               LR = Make_dLR(&e->dR);
               LR->kind = nplterm++;
               LR->o.ep = Plterms;
               Plterms = e;
-              retnew:
-              return e->a = new_vt(deriv);
+              return e->a = new_vt();
               
             case 5: /* if */
               eif = (expr_if *)e;
               eif->next = (expr_if*) -1;
               lwalk(&eif->e, 0);
               mts = pdlsave(&opdb);
-              if ((i = ewalk(eif->T,deriv1)) > 0)
+              if ((i = ewalk(eif->T)) > 0)
                 vt_free(i);
               pdlreset();
-              if ((i = ewalk(eif->F,deriv1)) > 0)
+              if ((i = ewalk(eif->F)) > 0)
                 vt_free(i);
               pdlrestore(opdb, mts);
               if (eif->a != nv1) {
@@ -585,36 +525,33 @@ static int ewalk(expr *e, int deriv){
                 LR->kind = dLR_IF;
                 LR->o.eif = eif;
               }
-              goto retnew;
+              return e->a = new_vt();
               
             case 6: /* sumlist */
               ep = e->L.ep;
               epe = e->R.ep;
-              i = ewalk(*ep++, deriv);
-              if (i < 0)
-                deriv = deriv1;
-              j = ewalk(*ep++, deriv);
+              i = ewalk(*ep++);
+              j = ewalk(*ep++);
               if (i > 0) {
                 if (j > 0)
                   vt_free(j);
               }
               else if (!(i = j))
-                i = new_vt(deriv);
+                i = new_vt();
               do {
-                if ((j = ewalk(*ep++, deriv1)) > 0)
+                if ((j = ewalk(*ep++)) > 0)
                   vt_free(j);
               }
               while(ep < epe);
-              goto reti;
+              return e->a = i;
               
             case 7: /* function call */
               ef = (expr_f *)e;
               i = k = 0;
               for(ap = ef->ap, ape = ef->ape; ap < ape; ap++)
-                if (j = ewalk(ap->e,deriv))
+                if (j = ewalk(ap->e))
                   if (j < 0) {
                     i = j;
-                    deriv = deriv1;
                   }
                   else
                     k++;
@@ -628,8 +565,8 @@ static int ewalk(expr *e, int deriv){
                         vt_free(j);
                     }
                     if (!i)
-                      goto retnew;
-                    goto reti;
+                      return e->a = new_vt();
+                    return e->a = i;
                     
             case 8: /* Hollerith */
               break;
@@ -690,7 +627,7 @@ static void vreset(list **ifset){
 
 static void ewalkvt(expr *e, list **ifset){
   nvtfree = ndvtmax;
-  ewalk(e,0);
+  ewalk(e);
   vreset(ifset);
 }
 
@@ -727,172 +664,6 @@ static void comwalk(int i, int n){
   }
 }
 
-static void dwalk0(derp *, derp*);
-static void dwalk1(derp *, derp*);
-
-static void dwalk0(derp *d, derp *d0){
-  int i;
-  
-  if (d == d0)
-    return;
-  do {
-    if ((i = d->b.rp - adjoints - nv1) > 0)
-      acount[i]++;
-  }
-  while((d = d->next) != d0);
-}
-
-static void cond_magic(dLR *LR){
-  expr_va *eva;
-  expr_if *eif;
-  derp *D, *D0, Dsave;
-  de *d;
-  int iftype;
-  
-  if (LR->kind == dLR_IF) {
-    eif = LR->o.eif;
-    D = eif->D;
-    iftype = 1;
-  }
-  else {
-    eva = LR->o.eva;
-    D = eva->R.D;
-    iftype = 0;
-  }
-  Dsave = *D;
-  D->c.rp = &edagread_one;
-  if (iftype) {
-    D->a.rp = eif->Tv.rp;
-    D->next = eif->dT;
-    dwalk1(D, eif->d0);
-    D->a.rp = eif->Fv.rp;
-    D->next = eif->dF;
-    dwalk1(D, eif->d0);
-  }
-  else {
-    D0 = eva->d0;
-    for(d = eva->L.d; d->e; d++) {
-      D->a.rp = d->dv.rp;
-      D->next = d->d;
-      dwalk1(D, D0);
-    }
-    *D = Dsave;
-  }
-  *D = Dsave;
-}
-
-static void dwalk1(derp *d,  derp *d0){
-  Adjoint *a, *b;
-  dLR *c;
-  int i, j, j0, neg;
-  
-  if (d == d0)
-    return;
-  dwalk0(d, d0);
-  do {
-    j = -1;
-    if ((j0 = d->b.rp - adjoints - nv1) > 0)
-      j = --acount[j0];
-    b = Adjp(d->b.rp);
-    if (!b->storage)	/* defined var used only in if */
-      continue;
-    i = d->a.rp - adjoints;
-    if (maxa < i)
-      maxa = i;
-    c = dLRp(*d->c.rp);
-    if (c->kind >= dLR_VARARG) {
-      if (!output_time)
-        cond_magic(c);
-      goto jfree;
-    }
-    if (i < nv1 && !fwalk)
-      continue;
-    a = Adjp(d->a.rp);
-    switch(a->storage) {
-      case STOR_VP:
-        a->storage = STOR_DV;
-        a->o.i = new_dv();
-      default:
-        goto jfree;
-      case 0:
-        break;
-    }
-    if (b->storage == STOR_IMPLICIT) {
-      a->neg = b->neg;
-      switch(c->kind) {
-        case dLR_negone:
-          a->neg = 1 - b->neg;
-          /* no break */
-          case dLR_one:
-            a->storage = STOR_IMPLICIT;
-            break;
-          case dLR_VP:
-            a->storage = STOR_VP;
-            a->o.vp = c->o.vp;
-            break;
-          case dLR_PD:
-            a->storage = STOR_PD;
-            a->o.i = c->o.i;
-            break;
-          case dLR_VARVAL:
-            a->storage = STOR_VARVAL;
-            a->o.i = c->o.i;
-            break;
-          default:
-            /*DEBUG*/ fprintf(Stderr,
-            "\nBad c->kind = %d with STOR_IMPLICIT\n",
-                              c->kind);
-                              /*DEBUG*/ exit(10);
-      }
-      jfree:
-      if (!j && b->storage == STOR_DV)
-        dv_free(b->o.i);
-      continue;
-    }
-    neg = b->neg;
-    switch(c->kind) {
-      case dLR_negone:
-        neg = 1 - neg;
-        /* no break */
-        case dLR_one:
-          if (j || fwalk && b->storage == STOR_PD)
-            break;
-          a->storage = b->storage;
-          a->o = b->o;
-          a->neg = neg;
-          continue;
-    }
-    a->storage = STOR_DV;
-    a->o.i = !j && b->storage == STOR_DV ? b->o.i : new_dv();
-  }
-  while((d = d->next) != d0);
-  if (b && b->storage == STOR_DV)
-    dv_free(b->o.i);
-}
-
-static void areset(cgrad *cg){
-  Adjoint *A;
-  int k;
-  while(nvseen) {
-    A = Adjp(&adjoints[var_e[vseen[--nvseen]].a]);
-    *A = A0;
-  }
-  
-  for(k = nv1; k <= maxa; k++) {
-    A = Adjp(&adjoints[k]);
-    *A = A0;
-  }
-  maxa = 0;
-  for(; cg; cg = cg->next) {
-    A = Adjp(&adjoints[cg->varno]);
-    *A = A0;
-  }
-}
-
-static void dwalk(register derp *d, cgrad *cg, int *z, list *L){
-  assert(0);
-}
-
 static void cde_walk(cde *d, int n, maxinfo *m, list **ifset, int *c1st, int **z) {
   cde *De;
   int i, i1, j, k;
@@ -906,7 +677,7 @@ static void cde_walk(cde *d, int n, maxinfo *m, list **ifset, int *c1st, int **z
     while(j < k) {
       c1 = cexps1 + j++;
       Lset(c1->L, c1->nlin);
-      ewalk(c1->e, 0);
+      ewalk(c1->e);
     }
     ewalkvt(d->e, ifset);
     while(i < k)
@@ -932,15 +703,15 @@ static char * vprod(real t, int k){
   int i;
   
   if (t == 1.)
-    sprintf(buf, x_fmt, k);
+    sprintf(buf, "x[%d]", k);
   else if (t == -1.) {
     buf[0] = '-';
-    sprintf(buf+1, x_fmt, k);
+    sprintf(buf+1, "x[%d]", k);
   }
   else {
     i = g_fmt(buf, t);
     buf[i++] = '*';
-    sprintf(buf+i, x_fmt, k);
+    sprintf(buf+i, "x[%d]", k);
   }
   return buf;
 }
@@ -955,7 +726,7 @@ static char *rv_output(char *rv, char *eval, ograd *og){
   }
   if (og) {
     s = vprod(og->coef, og->varno);
-    if (strcmp(eval, Zero)){
+    if (strcmp(eval, "0.")){
       binop(rv, eval, "+", s);
     } else {
       printf("\t%s = %s;\n", rv, s);
@@ -977,7 +748,7 @@ static char *con_linadd(int i, char *s){
   for(cg = Cgrad[i]; cg; cg = cg->next)
     if (cg->coef) {
       s1 = vprod(cg->coef, cg->varno);
-      if (strcmp(s,Zero)){
+      if (strcmp(s,"0.")){
         binop(T, s, "+", s1);
       } else {
         printf("\t%s = %s;\n", T, s1);
@@ -1004,9 +775,7 @@ static int nzcgrad(){
 
 static char *cv_name(linpart *L, char *buf){
   expr_v ev;
-  expr *ep;
-  
-  ep = (expr *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
+  expr *ep = (expr *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
   return f_OPVARVAL1(ep, buf);
 }
 
@@ -1020,7 +789,7 @@ static void com_out(expr *e, linpart *L, int nlin, int k0){
     e->a = j;
   }
   j--;
-  char *s = tv_fmt;
+  char *s = "v[%d]";
   sprintf(res, s, j);
   s = (*(efuncb *)e->op)(e, buf);
   if(!L){
@@ -1029,7 +798,7 @@ static void com_out(expr *e, linpart *L, int nlin, int k0){
     }
     return;
   }
-  int asg = !strcmp(s, Zero);
+  int asg = !strcmp(s, "0.");
   
   dLR *d;
   int op;
@@ -1310,18 +1079,7 @@ int main(int argc, char **argv){
   
   ndv = ncond = 0;
   
-  dvset(&edagread_one, 1);
-  #ifdef X64_bit_pointers
-  {Adjoint *Ap = (Adjoint *)Malloc(amax*sizeof(Adjoint));
-  memset((char *)Ap, 0, amax*sizeof(Adjoint));
-  for(i = 0; i < amax; i++)
-    *(Adjoint **)&adjoints[i] = Ap++;
-  }
-  #else
   memset((char *)adjoints, 0, amax*sizeof(real));
-  #endif
-  rdwalk_one = &adjoints[nv1];
-  dwalk_one = Adjp(rdwalk_one);
   if ((i = amax - nv1) > 0) {
     acount = (int *)Malloc(i*sizeof(int));
     memset((char *)acount, 0, i*sizeof(int));
@@ -1336,12 +1094,14 @@ int main(int argc, char **argv){
   cde_walk(obj_de, n_obj, &omax, o_ifset, o_cexp1st, zao);
   
   int nv = nv1 + ncom;
-  for(i = 0; i < nv; i++)
+  for(i = 0; i < nv; i++){
     var_e[i].op = (efunc *)f_OPVARVAL1;
+  }
   
   expr_nx *enx;
-  for(enx = nums; enx; enx = enx->next)
+  for(enx = nums; enx; enx = enx->next){
     enx->op = f_OPNUM1;
+  }
   
   output_time = 1;
   output();
@@ -1349,10 +1109,7 @@ int main(int argc, char **argv){
 }
     
 char *e_val(expr *e, char *buf){
-  int i;
-  if ((i = e->a) >= 0)
-    sprintf(buf, tv_fmt, (-1) + i);
-  else
-    sprintf(buf, pd_fmt, (-1) - i);
+  assert(e->a >= 0);
+  sprintf(buf, "v[%d]", (-1) + e->a);
   return buf;
 }

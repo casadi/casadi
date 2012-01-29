@@ -33,7 +33,7 @@ extern real log ANSI((real));
 #endif
 
 static char *pdval(dLR *d, char *buf){
-  sprintf(buf, pd_fmt, d->o.i + Fortran);
+  sprintf(buf, "pd[%d]", d->o.i + Fortran);
   return buf;
 }
 
@@ -111,7 +111,7 @@ static char *f_OPDIV(expr *e, char *rv){
   e1 = e->R.e;
   (*(efuncb *)e1->op)(e1, s2);
   if (e1->op != (efunc *)f_OPNUM1) {
-    ifstart(s2, opEQ, Zero);
+    ifstart(s2, opEQ, "0.");
     zerdiv(s2);
     endif();
   }
@@ -174,8 +174,8 @@ static char *f_OPLESS(register expr *e, char *rv){
   (*(efuncb *)e1->op)(e1, L);
   e1 = e->R.e;
   binop1(e_val(e,rv), L, "-",(*(efuncb *)e1->op)(e1, R));
-  ifstart(rv, opLT, Zero);
-  printf("\t%s = %s;\n", rv, Zero);
+  ifstart(rv, opLT, "0.");
+  printf("\t%s = %s;\n", rv, "0.");
   endif();
   return rv;
 }
@@ -223,16 +223,16 @@ static char *f_ABS(expr *e, char *rv){
   if (L[1] == '-') {
     sn = L + 1;
     sp = L + 2;
-    pn = One;
-    pp = Negone;
+    pn = "1.";
+    pp = "-1.";
   } else {
     L[0] = '-';
     sn = L;
     sp = L + 1;
-    pn = Negone;
-    pp = One;
+    pn = "-1.";
+    pp = "1.";
   }
-  ifstart(sp, opLT, Zero);
+  ifstart(sp, opLT, "0.");
   printf("\t%s = %s;\n", e_val(e,rv), sn);
   elsestart();
   printf("\t%s = %s;\n", rv, sp);
@@ -336,14 +336,14 @@ static char *f_OP_atanh(register expr *e, char *rv){
 
   e1 = e->L.e;
   (*(efuncb *)e1->op)(e1,L);
-  ifstart(L, opLE, Negone);
+  ifstart(L, opLE, "-1.");
   domain("atanh", L);
   endif();
-  ifstart(L, opGE, One);
+  ifstart(L, opGE, "1.");
   domain("atanh", L);
   endif();
   sprintf(buf, "%s * log((%s + %s) / (%s - %s))",
-          Half, One, L, One, L);
+          "0.5", "1.", L, "1.", L);
   printf("\t%s = %s;\n", e_val(e,rv), buf);
   dLR *Ld = dLRp(e->dL);
   return rv;
@@ -369,7 +369,7 @@ static char *offline(expr *e, char *who, char *whod, char *whof, char *whofd, ch
   register expr *e1 = e->L.e;
   dLR *Ld = dLRp(e->dL);
   (*(efuncb *)e1->op)(e1,L);
-  sprintf(buf, offlfmt1, L);
+  sprintf(buf, "&%s", L);
   printf("\t%s = %s;\n", rv, call1(who, buf));
   return rv;
 }
