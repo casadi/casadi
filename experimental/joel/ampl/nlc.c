@@ -40,11 +40,10 @@ typedef struct maxinfo {
 static maxinfo bmax, cmax, omax;
 
 static int cwant = 2, derkind = 2, djoff = -1, owant = 2;
-static int needx0check, nvseen, output_time, *vseen;
+int output_time;
 static list **c_ifset, **com_ifset, **o_ifset;
 int branches = 0;
-static int condlevel, fwalk, iflevel, maxa, ncond, ndv, ndvmax,
-npd, nplterm, nv1, nv2, nvt, nvtmax;
+static int condlevel, fwalk, iflevel, maxa, ncond, ndv, ndvmax,npd, nplterm, nv1, nv2, nvt, nvtmax;
 static int *cvmap;
 static fint nJ;
 static expr *Plterms;
@@ -132,61 +131,8 @@ extern real edagread_one;	/* &edagread_one = special derp->c value */
 static expr_nx *nums;
 static ograd **stog;
 
-static Adjoint A0;
 static int *acount, *dvtfree, *rownos;
-static int densejac, krflag, ndvfree, ndvtmax, needT1, nvtfree,
-pdts, stor_grad;
-
-typedef struct
-pdl {
-  struct pdl *next;
-  int i, ts;
-} pdl;
-
-static pdl *pdlbusy, *pdlfree;
-
-static int pdlsave(pdl **opdb){
-  condlevel++;
-  if (iflevel++){
-    *opdb = pdlbusy;
-  } else {
-    pdlfree = 0;
-    *opdb = 0;
-  }
-  pdlbusy = 0;
-  return ++pdts;
-}
-
-static void pdlreset(){
-  pdl *p, *pnext;
-  for(p = pdlbusy; p; p = pnext) {
-    pnext = p->next;
-    p->next = pdlfree;
-    pdlfree = p;
-  }
-  pdlbusy = 0;
-}
-
-static void pdlrestore(pdl *opdb, int mts){
-  pdl *p, *pnext;
-  condlevel--;
-  if (--iflevel){
-    pnext = pdlbusy;
-    while(p = pnext){
-      pnext = p->next;
-      p->next = opdb;
-      opdb = p;
-    }
-    pnext = pdlfree;
-    while((p = pnext) && p->ts >= mts){
-      pnext = p->next;
-      p->next = opdb;
-      opdb = p;
-    }
-    pdlfree = pnext;
-    pdlbusy = opdb;
-  }
-}
+int ndvfree, ndvtmax, needT1, nvtfree,pdts;
 
 #define NDVTGULP 1000
 
@@ -381,22 +327,11 @@ static void lwalk(expr **ep, int neg){
 
 static char *f_OPVARVAL1(expr *e, char *buf){
   int k;
-  Adjoint *A;
   char *fmt;
   
   if ((k = e->a) < nv1) {
-    if (k < 0) {
-      fmt = "pd[%d]";
-      k = (-1) - k;
-    }
-    else {
-      A = Adjp(&adjoints[k]);
-      if (!A->seen) {
-        A->seen = 1;
-        vseen[nvseen++] = e->a;
-      }
-      fmt = "x[%d]";
-    }
+    assert(k>=0);
+    fmt = "x[%d]";
   }
   else {
     k = cvmap[(expr_v *)e - var_e - nv1];
@@ -429,9 +364,7 @@ static int ewalk(expr *e){
   derp *dp;
   dLR *LR, **LRp;
   efunc *op;
-  Adjoint *A;
   double t;
-  pdl *opdb;
   static int achk[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 10, 11 };
   
   k = Intcast e->op;
@@ -474,13 +407,14 @@ static int ewalk(expr *e){
         return e->a = i;
         
             case 3: /* vararg (min, max) */
+              assert(0);
               eva = (expr_va *)e;
               d = eva->L.d;
               condlevel++;
               if (!(i = ewalk(d->e)))
                 i = new_vt();
               while(e1 = (++d)->e) {
-                pdlreset();
+                assert(0);
                 if ((j = ewalk(e1)) > 0)
                   vt_free(j);
               }
@@ -505,27 +439,7 @@ static int ewalk(expr *e){
               return e->a = new_vt();
               
             case 5: /* if */
-              eif = (expr_if *)e;
-              eif->next = (expr_if*) -1;
-              lwalk(&eif->e, 0);
-              mts = pdlsave(&opdb);
-              if ((i = ewalk(eif->T)) > 0)
-                vt_free(i);
-              pdlreset();
-              if ((i = ewalk(eif->F)) > 0)
-                vt_free(i);
-              pdlrestore(opdb, mts);
-              if (eif->a != nv1) {
-                eif->next = (expr_if *)ncond++;
-                /* arrange to find this expr_if */
-                /* when walking derps */
-                dp = eif->D;
-                LRp = Make_dLRp(dp->c.rp);
-                *LRp = LR = (dLR *)mem(sizeof(dLR));
-                LR->kind = dLR_IF;
-                LR->o.eif = eif;
-              }
-              return e->a = new_vt();
+              assert(0);
               
             case 6: /* sumlist */
               ep = e->L.ep;
@@ -580,12 +494,6 @@ static int ewalk(expr *e){
               
             case 10: /* variable value */
               i = (expr_v *)e - var_e;
-              A = Adjp(&adjoints[e->a]);
-              A->ifset = condlevel ? 1 : 0;
-              if (!A->seen) {
-                A->seen = 1;
-                vseen[nvseen++] = i;
-              }
               break;
               /*DEBUG*/default:
               /*DEBUG*/ fprintf(Stderr, "bad opnumber %d in ewalk\n", k);
@@ -610,25 +518,9 @@ static void max_restore(maxinfo *m){
   needT1 = m->needT1;
 }
 
-static void vreset(list **ifset){
-  Adjoint *A;
-  list *lastif = 0;
-  int k;
-  
-  while(nvseen) {
-    k = vseen[--nvseen];
-    A = Adjp(&adjoints[var_e[k].a]);
-    if (A->ifset)
-      (lastif = new_list(lastif))->item.i = k;
-    *A = A0;
-  }
-  *ifset = lastif;
-}
-
 static void ewalkvt(expr *e, list **ifset){
   nvtfree = ndvtmax;
   ewalk(e);
-  vreset(ifset);
 }
 
 static void zset(register int *z){
@@ -690,13 +582,6 @@ static void cde_walk(cde *d, int n, maxinfo *m, list **ifset, int *c1st, int **z
 }
 
 static list **dstored;
-
-static void dstore(Adjoint *a, derp *d){
-  a->stored = 1;
-  if (dstored){
-    (*dstored = new_list(*dstored))->item.D = d;
-  }
-}
 
 static char * vprod(real t, int k){
   static char buf[64];
@@ -862,7 +747,6 @@ static char *putout(expr *e, int i, int j, char *what, int k, int *z){
 void obj_output(){
   static char rv[] = "rv";
   assert(n_obj==1);
-  assert(krflag==0);
   printf(" real feval0_(long *nobj, real *x){\n");
   ograd *og;
   for(og = Ograd[0]; og; og = og->next){
@@ -894,7 +778,6 @@ void obj_output(){
 }
   
 void con_output(){
-  assert(krflag==0);
 
   int *c1, i;
   char *s;
@@ -1048,7 +931,6 @@ int main(int argc, char **argv){
   size_expr_n = sizeof(expr_nx);
   fg_read(nl,0);
         
-  needx0check = comb > 0 || derkind & 2;
   c_ifset = (list **)Malloc((n_con + n_obj + ncom0)*sizeof(list *));
   o_ifset = c_ifset + n_con;
   com_ifset = o_ifset + n_obj;
@@ -1068,9 +950,7 @@ int main(int argc, char **argv){
   ndvtmax = nvtfree = NDVTGULP;
   
   if (n_con) get_rownos();
-  
-  vseen = (int *)Malloc((nv2 + ncom)*sizeof(int));
-  cvmap = vseen + nv2;
+  cvmap = (int *)Malloc(ncom*sizeof(int));
   npd = 0;
   for(i = 0; i < ncom0; i++)
     cvmap[i] = -(++npd);
