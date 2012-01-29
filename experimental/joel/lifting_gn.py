@@ -25,7 +25,7 @@ x0_test = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.20, 0.30]
 #for (i,x0) in enumerate(x0_test[:]):
 #for (i,x0) in enumerate([0.02, 0.03, 0.04, 0.05, 0.06]):
 #for (i,x0) in enumerate([0.07, 0.08, 0.09, 0.10, 0.20, 0.30]):
-for (i,x0) in enumerate([0.08]):
+for (i,x0) in enumerate([0.03]):
 
   plt.figure(i+1)
   plt.clf()
@@ -94,6 +94,21 @@ for (i,x0) in enumerate([0.08]):
   # Constraint function
   F2 = SXFunction([u],[G])
 
+  # Solve with ipopt
+  nlp_solver = SQPMethod(F1,F2)
+  nlp_solver.setOption("qp_solver",QPOasesSolver)
+  nlp_solver.setOption("qp_solver_options",{"printLevel":"none"})
+  #nlp_solver = IpoptSolver(F1,F2)
+  nlp_solver.init()
+  nlp_solver.setInput(u_guess,NLP_X_INIT)
+  nlp_solver.setInput(u_min,NLP_LBX)
+  nlp_solver.setInput(u_max,NLP_UBX)
+  nlp_solver.setInput(g_min,NLP_LBG)
+  nlp_solver.setInput(g_max,NLP_UBG)
+  nlp_solver.solve()
+
+  #raise Exception("a")
+
   # Lifting function
   ifcn = SXFunction([u],[vertcat(L)])
 
@@ -124,7 +139,7 @@ for (i,x0) in enumerate([0.08]):
     
   else: # If SQP, get the gradient of the lagrangian now
     
-    ## Derivatives of lifted variables
+    # Derivatives of lifted variables
     xdot = ssym("xdot",x.size())
     
     # Lagrange multipliers
