@@ -66,12 +66,11 @@ typedef struct dLR {
 
 typedef char *efuncb(expr *, char *);
 
-typedef struct
-expr_nx {	/* for numbers */
-        efuncb *op;
-        struct expr_nx *next;
-        real v;
-        } expr_nx;
+typedef struct expr_nx {
+  efuncb *op;
+  struct expr_nx *next;
+  real v;
+} expr_nx;
 
 extern char *e_val ANSI((expr*, char*));
 extern char *f_OPNUM1 ANSI((expr*, char*));
@@ -169,3 +168,91 @@ extern char *cond_fmt, *offlfmt1, *offlfmt2, *progname;
 #define OPHOL           80
 #define OPVARVAL        81
 #define N_OPS           82
+
+
+static char op_type[] = {
+        2 /* OPPLUS */,
+        2 /* OPMINUS */,
+        2 /* OPMULT */,
+        2 /* OPDIV */,
+        2 /* OPREM */,
+        2 /* OPPOW */,
+        2 /* OPLESS */,
+        0,
+        0,
+        0,
+        0,
+        3 /* MINLIST */,
+        3 /* MAXLIST */,
+        1 /* FLOOR */,
+        1 /* CEIL */,
+        1 /* ABS */,
+        1 /* OPUMINUS */,
+        0,
+        0,
+        0,
+        2 /* OPOR */,
+        2 /* OPAND */,
+        2 /* LT */,
+        2 /* LE */,
+        2 /* EQ */,
+        0,
+        0,
+        0,
+        2 /* GE */,
+        2 /* GT */,
+        2 /* NE */,
+        0,
+        0,
+        0,
+        1 /* OPNOT */,
+        5 /* OPIFnl */,
+        0,
+        1 /* OP_tanh */,
+        1 /* OP_tan */,
+        1 /* OP_sqrt */,
+        1 /* OP_sinh */,
+        1 /* OP_sin */,
+        1 /* OP_log10 */,
+        1 /* OP_log */,
+        1 /* OP_exp */,
+        1 /* OP_cosh */,
+        1 /* OP_cos */,
+        1 /* OP_atanh */,
+        2 /* OP_atan2 */,
+        1 /* OP_atan */,
+        1 /* OP_asinh */,
+        1 /* OP_asin */,
+        1 /* OP_acosh */,
+        1 /* OP_acos */,
+        6 /* OPSUMLIST */,
+        2 /* OPintDIV */,
+        2 /* OPprecision */,
+        2 /* OPround */,
+        2 /* OPtrunc */,
+        11 /* OPCOUNT */,
+        11 /* OPNUMBEROF */,
+        11 /* OPNUMBEROFs */,
+        2 /* OPATLEAST */,
+        2 /* OPATMOST */,
+        4 /* OPPLTERM */,
+        5 /* OPIFSYM */,
+        2 /* OPEXACTLY */,
+        2 /* OPNOTATLEAST */,
+        2 /* OPNOTATMOST */,
+        2 /* OPNOTEXACTLY */,
+        6 /* ANDLIST */,
+        6 /* ORLIST */,
+        5 /* OPIMPELSE */,
+        2 /* OP_IFF */,
+        11 /* OPALLDIFF */,
+        1 /* OP1POW */,
+        1 /* f_OP2POW */,
+        1 /* f_OPCPOW */,
+        7 /* OPFUNCALL */,
+        9 /* OPNUM */,
+        8 /* OPHOL */,
+        10 /* OPVARVAL */
+};
+
+

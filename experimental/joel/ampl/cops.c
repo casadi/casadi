@@ -25,12 +25,54 @@ THIS SOFTWARE.
 #include "nlp.h"
 #include "nlc.h"
 #define asl cur_ASL
+#include "assert.h"
 
 #ifdef __cplusplus
 extern "C" real log(real);
 #else
 extern real log ANSI((real));
 #endif
+
+char *opEQ = "==", *opGE = ">=", *opGT = ">", *opLE = "<=", *opLT = "<", *opNE = "!=";
+char *opAND = "&&", *opOR = "||";
+
+void Goto(int n){ printf("\tgoto L%d;\n", n); }
+
+void ifgo(char *a, char *op, char *b, int n){
+  printf("\tif (%s %s %s) goto L%d;\n", a, op, b, n); 
+}
+
+void label(int n){ printf(" L%d:\n", n); }
+
+void ifstart(char *a, char *op, char *b){ 
+  printf("\tif (%s %s %s) {\n", a, op, b); 
+}
+
+void elsestart(){ 
+  printf("\t} else {\n"); 
+}
+
+void elseif(char *a, char *b, char *c){ 
+  printf("\t} else if (%s %s %s) {\n", a, b, c);
+}
+
+char *call1(char *what, char *a){
+  static char buf[48];
+  sprintf(buf, "%s(%s)", what, a);
+  return buf;
+}
+
+char *call2(char *what, char *a, char *b){
+  static char buf[64];
+  sprintf(buf, "%s(%s, %s)", what, a, b);
+  return buf;
+}
+
+char *num(int x){
+  static char buf[16];
+  sprintf(buf, "%d", x);
+  return buf;
+}
 
 static char *pdval(dLR *d, char *buf){
   sprintf(buf, "pd[%d]", d->o.i + Fortran);
@@ -79,6 +121,11 @@ static char *f_OPSUMLIST(register expr *e, char *buf){
   return rv;
 }
 
+void assign(char *a, char *b){
+  if(a)
+    printf("\t%s = %s;\n", a, b);
+}
+
 static char *binop1(char *a, char *b, char *op, char *c){
   if (!strcmp(a,b)){
     printf("\t%s %s= %s;\n", a, op, c);
@@ -112,8 +159,8 @@ static char *f_OPDIV(expr *e, char *rv){
   (*(efuncb *)e1->op)(e1, s2);
   if (e1->op != (efunc *)f_OPNUM1) {
     ifstart(s2, opEQ, "0.");
-    zerdiv(s2);
-    endif();
+    printf("\tzerdiv_(&%s);", s2); 
+    printf("\t}\n");
   }
   binop1(e_val(e,rv), s1, "/", s2);
   return rv;
@@ -176,7 +223,7 @@ static char *f_OPLESS(register expr *e, char *rv){
   binop1(e_val(e,rv), L, "-",(*(efuncb *)e1->op)(e1, R));
   ifstart(rv, opLT, "0.");
   printf("\t%s = %s;\n", rv, "0.");
-  endif();
+  printf("\t}\n");
   return rv;
 }
 
@@ -191,7 +238,7 @@ static char *minmax(expr_va *e, char *rv, char *cmp){
   for(d++; e1 = d->e; d++) {
     ifstart(rv, cmp,(*(efuncb *)e1->op)(e1, buf));
     printf("\t%s = %s;\n", rv, buf);
-    endif();
+    printf("\t}\n");
   }
   return rv;
 }
@@ -236,7 +283,7 @@ static char *f_ABS(expr *e, char *rv){
   printf("\t%s = %s;\n", e_val(e,rv), sn);
   elsestart();
   printf("\t%s = %s;\n", rv, sp);
-  endif();
+  printf("\t}\n");
   return rv;
 }
 
@@ -337,11 +384,11 @@ static char *f_OP_atanh(register expr *e, char *rv){
   e1 = e->L.e;
   (*(efuncb *)e1->op)(e1,L);
   ifstart(L, opLE, "-1.");
-  domain("atanh", L);
-  endif();
+  printf("\tdomain_(\"%s\", &%s, %dL);\n", "atanh", L, strlen("atanh"));
+  printf("\t}\n");
   ifstart(L, opGE, "1.");
-  domain("atanh", L);
-  endif();
+  printf("\tdomain_(\"%s\", &%s, %dL);\n", "atanh", L, strlen("atanh"));
+  printf("\t}\n");
   sprintf(buf, "%s * log((%s + %s) / (%s - %s))",
           "0.5", "1.", L, "1.", L);
   printf("\t%s = %s;\n", e_val(e,rv), buf);
@@ -594,3 +641,9 @@ efuncb *r_op[] = {
   f_OPintDIV,f_OPprecision,f_OPround,f_OPtrunc,0,0,0,0,0,f_OPPLTERM,f_OPIFSYM,0,0,0,0,0,0,0,0,0,f_OP1POW,
   f_OP2POW,f_OPCPOW,f_OPFUNCALL,f_OPNUM,f_OPHOL,f_OPVARVAL
 };
+
+char *e_val(expr *e, char *buf){
+  assert(e->a >= 0);
+  sprintf(buf, "v[%d]", (-1) + e->a);
+  return buf;
+}
