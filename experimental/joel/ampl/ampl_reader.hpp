@@ -22,6 +22,8 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 ****************************************************************/
 
+extern "C"{
+
 #define ANSI(x) x
 
 typedef struct v_i {
@@ -256,3 +258,4 @@ static char op_type[] = {
 };
 
 
+}

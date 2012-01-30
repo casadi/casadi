@@ -21,13 +21,29 @@ IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 ****************************************************************/
+/*#define CASADI_NDEBUG*/
+#include <casadi/casadi.hpp>
+
 
 #include "nlp.h"
 #undef f_OPNUM
 #include "opcode.hd"
-#include "nlc.h"
+#include "ampl_reader.hpp"
 #define asl ((ASL_fg*)cur_ASL)
 #include "assert.h"
+
+
+using namespace CasADi;
+
+// Variables
+std::vector<SX> vars;
+std::vector<SX> objs;
+std::vector<SX> cons;
+std::vector<SX> intermediates;
+
+
+
+extern "C"{
 
 typedef struct maxinfo {
   int ncond;
@@ -59,25 +75,23 @@ expr_nx *nums;
 int *dvtfree, *rownos;
 int ndvfree, ndvtmax, needT1, nvtfree;
 
-#define NDVTGULP 1000
-
-void dvtfree_inc(){
-  int i, j;
-  i = ndvtmax;
-  j = ndvtmax += NDVTGULP;
-  dvtfree = (int *)Realloc(dvtfree, j*sizeof(int));
-  while(i > nvtfree)
-    dvtfree[--j] = dvtfree[--i];
-  nvtfree += NDVTGULP;
-}
-
 int new_vt(){
-  return nvtfree < ndvtmax ? dvtfree[nvtfree++] : nvt++;
+  int ret = nvtfree < ndvtmax ? dvtfree[nvtfree++] : nvt++;
+  if(ret>=intermediates.size()){
+    intermediates.resize(ret+1);
+  }
+  return ret;
 }
 
+#define NDVTGULP 1000
 void vt_free(int k){
   if (ndvfree >= nvtfree){
-    dvtfree_inc();
+    int i = ndvtmax;
+    int j = ndvtmax += NDVTGULP;
+    dvtfree = (int *)Realloc(dvtfree, j*sizeof(int));
+    while(i > nvtfree)
+      dvtfree[--j] = dvtfree[--i];
+    nvtfree += NDVTGULP;
   }
   dvtfree[--nvtfree] = k;
 }
@@ -123,12 +137,10 @@ void Lset(linpart *L, int nlin){
   }
 }
 
-static int ewalk(expr*);
-
 char *f_OPVARVAL1(expr *e, char *buf){
   int k = e->a;
-  assert(k>=0);
-  assert(k<nv1);
+  casadi_assert(k>=0);
+  casadi_assert(k<nv1);
   sprintf(buf, "x[%d]", k);
   return buf;
 }
@@ -137,9 +149,28 @@ char *f_OPNUM1(register expr *e, char *rv){
   g_fmt(rv,((expr_nx *)e)->v);
   return rv;
 }
+SX get_expression(expr *e){
+  int k = (int)(e->op);
+  e->op = r_op[k];
+  int k1 = op_type[k];
+  double t;
+  int i;
+/*  if(e->a>0){
+    return intermediates.at(e->a);
+  } else {*/
+    switch(k1){
+      case 9: // number
+        t = ((expr_nx *)e)->v;
+        return t;
+      case 10: // variable value
+        i = (expr_v *)e - var_e;
+        return vars.at(i);
+    }
+/*  }*/
+  casadi_assert(0);
+}
 
-static int ewalk(expr *e){
-  static int achk[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 10, 11 };
+int ewalk(expr *e){
   int k = (int)(e->op);
   e->op = r_op[k];
   int k1 = op_type[k];
@@ -155,6 +186,7 @@ static int ewalk(expr *e){
   dLR *LR, **LRp;
   efunc *op;
   double t;
+  SX x,y,f,cx,cy;
   switch(k1){
     case 11: /* OP2POW */
       e->dL = 0;
@@ -167,10 +199,51 @@ static int ewalk(expr *e){
           vt_free(j);
         }
         e->a = i;
+        
+        if(j==0){
+          x = get_expression(e->L.e);
+        } else {
+          x = intermediates.at(j);
+        }
+        switch(k){
+          case FLOOR: f = floor(x); break;
+          case CEIL: f = ceil(x); break;
+          case ABS: f = abs(x); break;
+          case OPUMINUS: f = -x; break;
+          case OPNOT: f = !x; break;
+          case OP_tanh: f = tanh(x); break;
+          case OP_tan: f = tan(x); break;
+          case OP_sqrt: f = sqrt(x); break;
+          case OP_sinh: f = sinh(x); break;
+          case OP_sin: f = sin(x); break;
+/*          case OP_log10: f = log10(x); break;*/
+          case OP_log: f = log(x); break;
+          case OP_exp: f = exp(x); break;
+          case OP_cosh: f = cosh(x); break;
+          case OP_cos: f = cos(x); break;
+/*          case OP_atanh: f = atanh(x); break;*/
+          case OP_atan: f = atan(x); break;
+/*          case OP_asinh: f = asinh(x); break;*/
+          case OP_asin: f = asin(x); break;
+/*          case OP_acosh: f = acosh(x); break;*/
+          case OP_acos: f = acos(x); break;
+          case OPCOUNT: casadi_assert_message(0,"Unary operation OPCOUNT not implemented. What is it supposed to do?"); break;
+          case OPNUMBEROF: casadi_assert_message(0,"Unary operation OPNUMBEROF not implemented. What is it supposed to do?"); break;
+          case OPNUMBEROFs: casadi_assert_message(0,"Unary operation OPNUMBEROFs not implemented. What is it supposed to do?"); break;
+          case OPALLDIFF: casadi_assert_message(0,"Unary operation OPALLDIFF not implemented. What is it supposed to do?"); break;
+          case OP1POW: casadi_assert_message(0,"Unary operation OP1POW not implemented. What is it supposed to do?"); break;
+          case OP2POW: f = x*x; break;
+          case OPCPOW: casadi_assert_message(0,"Unary operation OPCPOW not implemented. What is it supposed to do?"); break;
+          default:
+            casadi_assert_message(0,"unknown: " << k);
+        };
+        intermediates.at(i) = f;
+        
         return i;
         
       case 2: /* binary */
         k1 = 1;
+/*        casadi_assert(0);*/
         switch(k) {
           case OPPLUS:
           case OPMINUS:
@@ -183,9 +256,8 @@ static int ewalk(expr *e){
             default:
               e->dL = 0.;
         }
-        i = ewalk(e->L.e);
+        k = ewalk(e->L.e);
         j = ewalk(e->R.e);
-        k = i;
         i = new_vt();
         if (j > 0){
           vt_free(j);
@@ -194,22 +266,74 @@ static int ewalk(expr *e){
           vt_free(k);
         }
         e->a = i;
+        if(k==0){
+          x = get_expression(e->L.e);
+        } else {
+          x = intermediates.at(k);
+        }
+        
+        if(j==0){
+          y = get_expression(e->R.e);
+        } else {
+          y = intermediates.at(j);
+        }
+        
+        cx = e->dL;
+        if(e->dL==0) cx = 1; // NOTE: Sometimes 0, why???
+        cy = e->dR;
+        if(e->dR==0) cy = 1; // NOTE: Sometimes 0, why???
+        
+        switch(k){
+          case OPPLUS: f = cx*x + cy*y; break;
+/*          case OPMINUS: f = cx*x - cy*y; break;*/
+          case OPMINUS: f = cx*x + cy*y; break; // NOTE: changed - -> +
+          case OPMULT: f = cx*x * cy*y; break;
+          case OPDIV: f = cx*x / cy*y; break;
+/*          case OPREM: f = cx*x ? cy*y; break;*/
+          case OPPOW: f = pow(cx*x,cy*y); break;
+/*          case OPLESS: f = cx*x ? cy*y; break;*/
+          case OPOR: f = cx*x || cy*y; break;
+          case OPAND: f = cx*x && cy*y; break;
+          case LT: f = cx*x < cy*y; break;
+          case LE: f = cx*x <= cy*y; break;
+          case EQ: f = cx*x == cy*y; break;
+          case GE: f = cx*x >= cy*y; break;
+          case GT: f = cx*x > cy*y; break;
+          case NE: f = cx*x != cy*y; break;
+/*          case OP_atan2: f = cx*x ? cy*y; break;*/
+/*          case OPintDIV: f = cx*x ? cy*y; break;*/
+/*          case OPprecision: f = cx*x ? cy*y; break;*/
+/*          case OPround: f = cx*x ? cy*y; break;*/
+/*          case OPtrunc: f = cx*x ? cy*y; break;*/
+/*          case OPATLEAST: f = cx*x ? cy*y; break;
+          case OPATMOST: f = cx*x ? cy*y; break;
+          case OPEXACTLY: f = cx*x ? cy*y; break;
+          case OPNOTATLEAST: f = cx*x ? cy*y; break;
+          case OPNOTATMOST: f = cx*x ? cy*y; break;
+          case OPNOTEXACTLY: f = cx*x ? cy*y; break;*/
+/*          case OP_IFF: f = cx*x ? cy*y; break;*/
+          case OP1POW: f = pow(cx*x,cy*y); break;
+          case OPCPOW: f = pow(cx*x,cy*y); break;
+          default:
+            casadi_assert_message(0,"unknown: " << k);
+        };
+        intermediates.at(i) = f;
         return i;
         
       case 3: /* vararg (min, max) */
-        assert(0);
+        casadi_assert(0);
         
       case 4: /* piece-wise linear */
-        assert(0);
+        casadi_assert(0);
         
       case 5: /* if */
-        assert(0);
+        casadi_assert(0);
         
       case 6: /* sumlist */
         ep = e->L.ep;
         epe = e->R.ep;
-        i = ewalk(*ep++);
-        j = ewalk(*ep++);
+        i = ewalk(e1 = *ep++);
+        j = ewalk(e1 = *ep++);
         if (i > 0) {
           if (j > 0)
             vt_free(j);
@@ -217,15 +341,32 @@ static int ewalk(expr *e){
           i = new_vt();
         } 
         do {
-          if ((j = ewalk(*ep++)) > 0){
+          if ((j = ewalk(e1 = *ep++)) > 0){
             vt_free(j);
           }
         } while(ep < epe);
-        return e->a = i;
+        ep = e->L.ep;
+        epe = e->R.ep;
+        f = 0;
+        while(ep < epe) {
+          e1 = *ep++;
+          if(e1->a==0){
+            x = get_expression(e1);
+          } else {
+            x = intermediates.at(e1->a);
+          }
+          f+=x;
+        }
+        
+        e->a = i;
+        intermediates.at(i) = f;
+        
+        return i;
         
       case 7: /* function call */
         ef = (expr_f *)e;
         i = k = 0;
+        casadi_assert(0);
         for(ap = ef->ap, ape = ef->ape; ap < ape; ap++){
           if (j = ewalk(ap->e)){
             if (j < 0) {
@@ -260,6 +401,14 @@ static int ewalk(expr *e){
         
       case 10: /* variable value */
         i = (expr_v *)e - var_e;
+        
+/*        printf("variable value = %d, vars.size() = %d, intermediates.empty() = %d\n",i,vars.size(),intermediates.empty());*/
+        if(intermediates.empty()){
+          intermediates.resize(1);
+        }
+/*        intermediates.at(0) = vars.at(i);*/
+        
+        
         break;
         /*DEBUG*/default:
         /*DEBUG*/ fprintf(Stderr, "bad opnumber %d in ewalk\n", k);
@@ -319,17 +468,12 @@ void comwalk(int i, int n){
   }
 }
 
-void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z){
-  int kk;
-  printf("c1st = {");
-  for(kk=0; kk<=n; ++kk){
-    printf("%d,",c1st[kk]);
-  }
-  printf("}\n");
+void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z, bool obj){
+  int ii=0;
   
   int j = *c1st++;
   cde *De = d + n;
-  for(; De > d; d++){
+  for(; De > d; d++, ii++){
     int i = j;
     int k = *c1st++;
     ndvtreset(*z++);
@@ -339,7 +483,17 @@ void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z){
       ewalk(c1->e);
     }
     nvtfree = ndvtmax;
-    ewalk(d->e);
+    int kk = ewalk(d->e);
+    
+    // What are we calculating?
+    SX& v = obj ? objs.at(ii) : cons.at(ii);
+    if(kk==0){
+      v = get_expression(d->e);
+      
+    } else {
+      v = intermediates.at(kk);
+    }
+    
     while(i < k){
       int i1 = i++ + ncom0;
       if (!cvmap[i1]){
@@ -372,24 +526,29 @@ static char * vprod(real t, int k){
 
 char *rv_output(char *rv, char *eval, ograd *og){
   char *s;
-  
   for(; og; og = og->next){
     if(og->coef){
       break;
     }
   }
   if (og) {
+    
+    SX f = og->coef * vars.at(og->varno);
+    
     s = vprod(og->coef, og->varno);
     if (strcmp(eval, "0.")){
       binop(rv, eval, "+", s);
+      f += objs.at(0);
     } else {
       printf("\t%s = %s;\n", rv, s);
     }
     while(og = og->next){
       if (og->coef){
         binop(rv, rv, "+",vprod(og->coef, og->varno));
+        f += og->coef * vars.at(og->varno);
       }
     }
+    objs.at(0) = f;
     return rv;
   }
   return eval;
@@ -401,6 +560,7 @@ char *con_linadd(int i, char *s){
   
   for(cg = Cgrad[i]; cg; cg = cg->next){
     if (cg->coef) {
+      SX f = cg->coef * vars.at(cg->varno);
       s1 = vprod(cg->coef, cg->varno);
       if (strcmp(s,"0.")){
         binop(T, s, "+", s1);
@@ -408,11 +568,14 @@ char *con_linadd(int i, char *s){
         printf("\t%s = %s;\n", T, s1);
       }
       s = T;
-      while(cg = cg->next)
-        if (cg->coef)
-          binop(s, s, "+",
-                vprod(cg->coef, cg->varno));
-                break;
+      while(cg = cg->next){
+        if (cg->coef){
+          f += cg->coef * vars.at(cg->varno);
+          binop(s, s, "+",vprod(cg->coef, cg->varno));
+        }
+      }
+      cons.at(i) = f;
+      break;
     }
   }
   return s;
@@ -438,7 +601,7 @@ void com_out(expr *e, linpart *L, int nlin, int k0){
   char buf[32], bufg[32], res[32], vn[32];
   printf("\n%s\t/*** defined variable %d ***/\n\n", "", k0+1);
   int j = cvmap[k0];
-  assert(j>=0);
+  casadi_assert(j>=0);
   efuncb *eb = (efuncb *)e->op;
   if (eb != (efuncb *)OPNUM && eb != (efuncb *)OPVARVAL){
     e->a = j;
@@ -517,7 +680,7 @@ char *putout(expr *e, int i, int j, char *what, int k, int *z){
 
 void obj_output(){
   static char rv[] = "rv";
-  assert(n_obj==1);
+  casadi_assert(n_obj==1);
   printf(" real feval0_(long *nobj, real *x){\n");
   ograd *og;
   for(og = Ograd[0]; og; og = og->next){
@@ -525,7 +688,7 @@ void obj_output(){
       break;
     }
   }
-  assert(og==0);
+  casadi_assert(og==0);
   printf(" /* Work vector */\n");
   printf(" real v[%d];\n", omax.nvt);
   if(omax.ncond){
@@ -539,7 +702,7 @@ void obj_output(){
   int *c1 = o_cexp1st;
   int i=0;
   for(; i < n_obj; i++, c1++){
-    eval = putout(obj_de[i].e, c1[0], c1[1],n_obj > 1 ? "objective" : NULL, i, zao[i]);
+    eval = putout(obj_de[i].e, c1[0], c1[1],n_obj > 1 ? const_cast<char*>("objective") : NULL, i, zao[i]);
     s = rv_output(rv, eval, Ograd[i]);
     printf("\n\treturn %s;\n", s);
   }
@@ -697,13 +860,26 @@ int main(int argc, char **argv){
   
   memset((char *)adjoints, 0, amax*sizeof(real));
   
+  
+  // Allocate CasADi variables
+  vars = ssym("x",n_var).data();
+  
+  // Allocate CasADi objective functions
+  objs.resize(n_obj);
+  
+  // Allocate CasADi constraint functions
+  cons.resize(n_con);
+  
+  
+  
+  
   comwalk(0,comb);
   max_save(&bmax);
   comwalk(comb, combc);
-  cde_walk(con_de, n_con, &cmax, c_cexp1st, zac);
+  cde_walk(con_de, n_con, &cmax, c_cexp1st, zac,false);
   max_restore(&bmax);
   comwalk(combc, ncom0);
-  cde_walk(obj_de, n_obj, &omax, o_cexp1st, zao);
+  cde_walk(obj_de, n_obj, &omax, o_cexp1st, zao,true);
 
   int nv = nv1 + ncom;
   for(i = 0; i < nv; i++){
@@ -715,7 +891,23 @@ int main(int argc, char **argv){
     enx->op = f_OPNUM1;
   }
   
+  
+  
+  
   output();
+  
+  std::cout << "objs = " << std::endl;
+  for(std::vector<SX>::const_iterator it=objs.begin(); it!=objs.end(); ++it){
+    std::cout << *it << std::endl;
+  }
+  
+  std::cout << "cons = " << std::endl;
+  for(std::vector<SX>::const_iterator it=cons.begin(); it!=cons.end(); ++it){
+    std::cout << *it << std::endl;
+  }
+  
+  
   return 0;
 }
     
+}

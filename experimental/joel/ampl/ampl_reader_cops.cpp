@@ -23,7 +23,7 @@ THIS SOFTWARE.
 ****************************************************************/
 
 #include "nlp.h"
-#include "nlc.h"
+#include "ampl_reader.hpp"
 #define asl cur_ASL
 #include "assert.h"
 
