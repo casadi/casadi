@@ -162,10 +162,12 @@ static int ewalk(expr *e){
       case 1: /* unary */
         j = ewalk(e->L.e);
         i = new_vt();
+        
         if (j > 0){
           vt_free(j);
         }
-        return e->a = i;
+        e->a = i;
+        return i;
         
       case 2: /* binary */
         k1 = 1;
@@ -191,7 +193,8 @@ static int ewalk(expr *e){
         if (k > 0){
           vt_free(k);
         }
-        return e->a = i;
+        e->a = i;
+        return i;
         
       case 3: /* vararg (min, max) */
         assert(0);
@@ -639,7 +642,7 @@ int main(int argc, char **argv){
   g_fmt_decpt = 1;
   want_derivs = 0;
   return_nofile = 1;
-  progname = "../examples/cork.nl";
+  progname = "/home/janderss/src/ampl/netlib.org/ampl/solvers/examples/cork.nl";
   fint L = strlen(progname);
   FILE *nl = jacdim0(progname, L);
 
