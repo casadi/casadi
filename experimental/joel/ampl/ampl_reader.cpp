@@ -23,6 +23,7 @@ THIS SOFTWARE.
 ****************************************************************/
 /*#define CASADI_NDEBUG*/
 #include <casadi/casadi.hpp>
+#include <interfaces/ipopt/ipopt_solver.hpp>
 
 
 #include "nlp.h"
@@ -67,7 +68,6 @@ extern efunc *r_op[];
 #define f_OPHOL r_op[80]
 #define f_OPVARVAL      r_op[81]
 
-real *bounds;
 extern char *progname;
 char *T = "t1";
 expr_nx *nums;
@@ -731,20 +731,12 @@ void con_output(){
 }
       
 void output(){
-  int i, j;
-  plterm *p;
-  expr *e;
-  real *b, *be;
-  dLR *LR;
-  char buf[32], *x0;
-  cexp *c;
   printf("#include \"math.h\"\n#define real double\n");
-    
   printf(" real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {1.7e308",2*nv1, 2*n_con);
-  b = bounds;
-  be = b + 2*(n_con + nv1);
+  real *b = LUv;
+  real *be = b + 2*(n_con + nv1);
   while(b < be){
-    printf(",q%s", fpval(*b++));
+    printf(",%s", fpval(*b++));
   }
   
   printf("};\n\n");
@@ -805,7 +797,9 @@ int main(int argc, char **argv){
   g_fmt_decpt = 1;
   want_derivs = 0;
   return_nofile = 1;
-  progname = "/home/janderss/src/ampl/netlib.org/ampl/solvers/examples/cork.nl";
+  // progname = "/home/janderss/src/ampl/netlib.org/ampl/solvers/examples/cork.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/corkscrw_small.nl";
+  progname = "/home/janderss/Desktop/ampl_test/corkscrw.nl";
   fint L = strlen(progname);
   FILE *nl = jacdim0(progname, L);
 
@@ -829,7 +823,7 @@ int main(int argc, char **argv){
     A_colstarts = rownos + nzc;
   }
     
-  LUv = bounds = (real *)Malloc((3*nv1+2*n_con)*sizeof(real));
+  LUv = (real *)Malloc((3*nv1+2*n_con)*sizeof(real));
   LUrhs = LUv + 2*nv1;
   X0 = LUrhs + 2*n_con;
       
@@ -895,17 +889,67 @@ int main(int argc, char **argv){
   
   
   output();
-  
-  std::cout << "objs = " << std::endl;
-  for(std::vector<SX>::const_iterator it=objs.begin(); it!=objs.end(); ++it){
-    std::cout << *it << std::endl;
+
+  if(false){
+    std::cout << "objs = " << std::endl;
+    for(std::vector<SX>::const_iterator it=objs.begin(); it!=objs.end(); ++it){
+      std::cout << *it << std::endl;
+    }
+    
+    std::cout << "cons = " << std::endl;
+    for(std::vector<SX>::const_iterator it=cons.begin(); it!=cons.end(); ++it){
+      std::cout << *it << std::endl;
+    }
+  }
+
+  using namespace std;
+
+  // Get the variable bounds
+  vector<double> x_lb(nv1), x_ub(nv1);
+  for(int i=0; i<nv1; ++i){
+    x_lb[i] = LUv[2*i];
+    x_ub[i] = LUv[2*i+1];
   }
   
-  std::cout << "cons = " << std::endl;
-  for(std::vector<SX>::const_iterator it=cons.begin(); it!=cons.end(); ++it){
-    std::cout << *it << std::endl;
+  // Get the constraint bounds
+  vector<double> g_lb(n_con), g_ub(n_con);
+  for(int i=0; i<n_con; ++i){
+    g_lb[i] = LUrhs[2*i];
+    g_ub[i] = LUrhs[2*i+1];
   }
+
+  // Get the starting guess
+  vector<double> x_guess(X0,X0+nv1);
   
+  // NLP expressions
+  SXMatrix x = vars;
+  SXMatrix f = objs;
+  SXMatrix g = cons;
+  
+  // NLP functions
+  SXFunction ffcn(x,f);
+  SXFunction gfcn(x,g);
+  
+  // NLP solver
+  IpoptSolver nlp_solver(ffcn,gfcn);
+  
+  // Set options
+  nlp_solver.setOption("linear_solver","ma57");
+  nlp_solver.setOption("generate_hessian",true);
+/*  nlp_solver.setOption("hessian_approximation","limited-memory");*/
+  
+  // Initialize NLP solver
+  nlp_solver.init();
+  
+  // Pass the bounds and initial guess
+  nlp_solver.setInput(x_lb,NLP_LBX);
+  nlp_solver.setInput(x_ub,NLP_UBX);
+  nlp_solver.setInput(g_lb,NLP_LBG);
+  nlp_solver.setInput(g_ub,NLP_UBG);
+  nlp_solver.setInput(x_guess,NLP_X_INIT);
+  
+  // Solve NLP
+  nlp_solver.solve();
   
   return 0;
 }
