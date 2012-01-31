@@ -7,71 +7,77 @@ import matplotlib.pyplot as plt
 #   
 #   Ph. Toint
 
-#t=1000 #original
+t=1000 #original
 #t=5000 #web
-t = 500 # cuter
+#t = 500 # cuter
 xt = 10.0
 mass = 0.37
 tol = 0.1
 
 h = xt/t
-w = xt*(t+1)/2
+w = xt*(t+1)/2.
 
 fmax = xt/t
 
-x = ssym("x", t+1)
-x_lb =  0.0 * NP.ones(t+1)
-x_ub =   xt * NP.ones(t+1)
-x_guess =  NP.array(list(i*h for i in range(t+1)))
+x = ssym("x", t)
+xe = vertcat((0.,x))
+x_lb =  0.0 * NP.ones(t)
+x_ub =   xt * NP.ones(t)
+x_guess =  NP.array(list(i*h for i in range(1,t+1)))
 
-x_lb[0] = 0.0
-x_ub[0] = 0.0
+#x_lb[0] = 0.0
+#x_ub[0] = 0.0
 
-y = ssym("y", t+1)
-y_lb = -inf * NP.ones(t+1)
-y_ub =  inf * NP.ones(t+1)
-y_guess = 0.0 * NP.ones(t+1)
+y = ssym("y", t)
+ye = vertcat((0.,y))
+y_lb = -inf * NP.ones(t)
+y_ub =  inf * NP.ones(t)
+y_guess = 0.0 * NP.ones(t)
 
-y_lb[0] = 0.0
-y_ub[0] = 0.0
+#y_lb[0] = 0.0
+#y_ub[0] = 0.0
 
-z = ssym("z", t+1)
-z_lb = -inf * NP.ones(t+1)
-z_ub =  inf * NP.ones(t+1)
-z_guess = 0.0 * NP.ones(t+1)
+z = ssym("z", t)
+ze = vertcat((1.,z))
+z_lb = -inf * NP.ones(t)
+z_ub =  inf * NP.ones(t)
+z_guess = 0.0 * NP.ones(t)
 
-z_lb[0] = 1.0
-z_ub[0] = 1.0
+#z_lb[0] = 1.0
+#z_ub[0] = 1.0
 
-vx = ssym("vx", t+1)
-vx_lb = -inf * NP.ones(t+1)
-vx_ub =  inf * NP.ones(t+1)
-vx_guess = 1.0 * NP.ones(t+1)
+vx = ssym("vx", t-1)
+vxe = vertcat((0.,vx,0.))
+vx_lb = -inf * NP.ones(t-1)
+vx_ub =  inf * NP.ones(t-1)
+vx_guess = 1.0 * NP.ones(t-1)
 
-vx_lb[0] = 0.0
-vx_ub[0] = 0.0
-vx_lb[t] = 0.0
-vx_ub[t] = 0.0
+#vx_lb[0] = 0.0
+#vx_ub[0] = 0.0
+#vx_lb[t-1] = 0.0
+#vx_ub[t-1] = 0.0
 
-vy = ssym("vy", t+1)
-vy_lb = -inf * NP.ones(t+1)
-vy_ub =  inf * NP.ones(t+1)
-vy_guess = 0.0 * NP.ones(t+1)
+vy = ssym("vy", t-1)
+vye = vertcat((0.,vy,0.))
+vy_lb = -inf * NP.ones(t-1)
+vy_ub =  inf * NP.ones(t-1)
+vy_guess = 0.0 * NP.ones(t-1)
 
-vy_lb[0] = 0.0
-vy_ub[0] = 0.0
-vy_lb[t] = 0.0
-vy_ub[t] = 0.0
+#vy_lb[0] = 0.0
+#vy_ub[0] = 0.0
+#vy_lb[t-1] = 0.0
+#vy_ub[t-1] = 0.0
 
-vz = ssym("vz", t+1)
-vz_lb = -inf * NP.ones(t+1)
-vz_ub =  inf * NP.ones(t+1)
-vz_guess = 0.0 * NP.ones(t+1)
+vz = ssym("vz", t-1)
+vze = vertcat((0.,vz,0.))
+vz_lb = -inf * NP.ones(t-1)
+vz_ub =  inf * NP.ones(t-1)
+vz_guess = 0.0 * NP.ones(t-1)
 
-vz_lb[0] = 0.0
-vz_ub[0] = 0.0
-vz_lb[t] = 0.0
-vz_ub[t] = 0.0
+#vz_lb[0] = 0.0
+#vz_ub[0] = 0.0
+#vz_lb[t-1] = 0.0
+#vz_ub[t-1] = 0.0
 
 ux = ssym("ux", t)
 ux_lb = -fmax * NP.ones(t)
@@ -96,23 +102,23 @@ v_guess = NP.concatenate([x_guess,y_guess,z_guess,vx_guess,vy_guess,vz_guess,ux_
 
 # Make xt, h, mass symbolic once
 xt = SXMatrix(xt)
-h = SXMatrix(h)
 mass = SXMatrix(mass)
 tol = SXMatrix(tol)
 
 # Objective function
 f = 0
 for i in range(1,t+1):
-  f += (i*h/w)*(x[i] - xt)**2
-  
+  f += (i*h/w)*(xe[i] - xt)**2
+
 ffcn = SXFunction([v],[f])
+h = SXMatrix(h)
 
 # Constraint functions
 acx = []
 acx_lb = []
 acx_ub = []
 for i in range(1,t+1):
-  acx.append(mass*(vx[i]-vx[i-1])/h - ux[i-1])
+  acx.append(mass*(vxe[i]-vxe[i-1])/h - ux[i-1])
   acx_lb.append(0)
   acx_ub.append(0)
   
@@ -120,7 +126,7 @@ acy = []
 acy_lb = []
 acy_ub = []
 for i in range(1,t+1):
-  acy.append(mass*(vy[i]-vy[i-1])/h - uy[i-1])
+  acy.append(mass*(vye[i]-vye[i-1])/h - uy[i-1])
   acy_lb.append(0)
   acy_ub.append(0)
   
@@ -128,7 +134,7 @@ acz = []
 acz_lb = []
 acz_ub = []
 for i in range(1,t+1):
-  acz.append(mass*(vz[i]-vz[i-1])/h - uz[i-1])
+  acz.append(mass*(vze[i]-vze[i-1])/h - uz[i-1])
   acz_lb.append(0)
   acz_ub.append(0)
 
@@ -136,7 +142,7 @@ psx = []
 psx_lb = []
 psx_ub = []
 for i in range(1,t+1):
-  psx.append((x[i]-x[i-1])/h - vx[i])
+  psx.append((xe[i]-xe[i-1])/h - vxe[i])
   psx_lb.append(0)
   psx_ub.append(0)
 
@@ -144,7 +150,7 @@ psy = []
 psy_lb = []
 psy_ub = []
 for i in range(1,t+1):
-  psy.append((y[i]-y[i-1])/h - vy[i])
+  psy.append((ye[i]-ye[i-1])/h - vye[i])
   psy_lb.append(0)
   psy_ub.append(0)
 
@@ -152,7 +158,7 @@ psz = []
 psz_lb = []
 psz_ub = []
 for i in range(1,t+1):
-  psz.append((z[i]-z[i-1])/h - vz[i])
+  psz.append((ze[i]-ze[i-1])/h - vze[i])
   psz_lb.append(0)
   psz_ub.append(0)
 
@@ -160,7 +166,7 @@ sc = []
 sc_lb = []
 sc_ub = []
 for i in range(1,t+1):
-  sc.append((y[i] - sin(x[i]))**2 + (z[i] - cos(x[i]))**2 - tol**2)
+  sc.append((ye[i] - sin(xe[i]))**2 + (ze[i] - cos(xe[i]))**2 - tol**2)
   sc_lb.append(-inf)
   sc_ub.append(0)
   

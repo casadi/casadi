@@ -171,11 +171,11 @@ SX get_expression(expr *e){
 }
 
 int ewalk(expr *e){
-  int k = (int)(e->op);
-  e->op = r_op[k];
-  int k1 = op_type[k];
+  int operation = (int)(e->op);
+  e->op = r_op[operation];
+  int k1 = op_type[operation];
 
-  int i, j;
+  int i, j, k;
   expr *e1, **ep, **epe;
   expr_if *eif;
   expr_va *eva;
@@ -205,7 +205,7 @@ int ewalk(expr *e){
         } else {
           x = intermediates.at(j);
         }
-        switch(k){
+        switch(operation){
           case FLOOR: f = floor(x); break;
           case CEIL: f = ceil(x); break;
           case ABS: f = abs(x); break;
@@ -235,7 +235,7 @@ int ewalk(expr *e){
           case OP2POW: f = x*x; break;
           case OPCPOW: casadi_assert_message(0,"Unary operation OPCPOW not implemented. What is it supposed to do?"); break;
           default:
-            casadi_assert_message(0,"unknown: " << k);
+            casadi_assert_message(0,"unknown: " << operation);
         };
         intermediates.at(i) = f;
         
@@ -244,7 +244,7 @@ int ewalk(expr *e){
       case 2: /* binary */
         k1 = 1;
 /*        casadi_assert(0);*/
-        switch(k) {
+        switch(operation) { // WHY THIS????
           case OPPLUS:
           case OPMINUS:
           case OPREM:
@@ -283,7 +283,7 @@ int ewalk(expr *e){
         cy = e->dR;
         if(e->dR==0) cy = 1; // NOTE: Sometimes 0, why???
         
-        switch(k){
+        switch(operation){
           case OPPLUS: f = cx*x + cy*y; break;
 /*          case OPMINUS: f = cx*x - cy*y; break;*/
           case OPMINUS: f = cx*x + cy*y; break; // NOTE: changed - -> +
@@ -315,8 +315,9 @@ int ewalk(expr *e){
           case OP1POW: f = pow(cx*x,cy*y); break;
           case OPCPOW: f = pow(cx*x,cy*y); break;
           default:
-            casadi_assert_message(0,"unknown: " << k);
+            casadi_assert_message(0,"unknown: " << operation);
         };
+        
         intermediates.at(i) = f;
         return i;
         
@@ -333,7 +334,20 @@ int ewalk(expr *e){
         ep = e->L.ep;
         epe = e->R.ep;
         i = ewalk(e1 = *ep++);
+        if(i==0){
+          x = get_expression(e1);
+        } else {
+          x = intermediates.at(i);
+        }
+        f = x;
+        
         j = ewalk(e1 = *ep++);
+        if(j==0){
+          x = get_expression(e1);
+        } else {
+          x = intermediates.at(j);
+        }
+        f += x;
         if (i > 0) {
           if (j > 0)
             vt_free(j);
@@ -344,19 +358,13 @@ int ewalk(expr *e){
           if ((j = ewalk(e1 = *ep++)) > 0){
             vt_free(j);
           }
-        } while(ep < epe);
-        ep = e->L.ep;
-        epe = e->R.ep;
-        f = 0;
-        while(ep < epe) {
-          e1 = *ep++;
-          if(e1->a==0){
+          if(j==0){
             x = get_expression(e1);
           } else {
-            x = intermediates.at(e1->a);
+            x = intermediates.at(j);
           }
-          f+=x;
-        }
+          f += x;
+        } while(ep < epe);
         
         e->a = i;
         intermediates.at(i) = f;
@@ -411,7 +419,7 @@ int ewalk(expr *e){
         
         break;
         /*DEBUG*/default:
-        /*DEBUG*/ fprintf(Stderr, "bad opnumber %d in ewalk\n", k);
+        /*DEBUG*/ fprintf(Stderr, "bad opnumber %d in ewalk\n", operation);
         /*DEBUG*/ exit(1);
   }
   return 0;
@@ -885,9 +893,6 @@ int main(int argc, char **argv){
     enx->op = f_OPNUM1;
   }
   
-  
-  
-  
   output();
 
   if(false){
@@ -920,12 +925,12 @@ int main(int argc, char **argv){
 
   // Get the starting guess
   vector<double> x_guess(X0,X0+nv1);
-  
+    
   // NLP expressions
   SXMatrix x = vars;
   SXMatrix f = objs;
   SXMatrix g = cons;
-  
+
   // NLP functions
   SXFunction ffcn(x,f);
   SXFunction gfcn(x,g);
