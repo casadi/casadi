@@ -74,6 +74,4 @@ for p in problems:
   except IOError:
     print "Failed to copy " + filename
 
-#print problems
-
 

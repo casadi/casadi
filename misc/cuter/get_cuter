@@ -14,3 +14,4 @@ echo "Done downloading cuter"
 echo " "
 
 mkdir -p cuter_selected
+mkdir -p cuter_nl
