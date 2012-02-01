@@ -359,8 +359,7 @@ void NLPSolverInternal::init(){
     casadi_assert_message(J_.input().numel()==n_,"Inconsistent dimensions");
     casadi_assert_message(J_.output().size2()==n_,"Inconsistent dimensions");
   }
-    
-  std::cout << "This NLP is parametric " << parametric_ << std::endl;
+
   if (parametric_) {
     sp_p = F_->input(1).sparsity();
     
