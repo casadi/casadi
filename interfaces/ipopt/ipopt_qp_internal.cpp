@@ -274,11 +274,13 @@ void IpoptQPInternal::init(){
 
   MX lambda("lambda",nc_,1);
 
-  args.push_back(lambda);
-  args.push_back(sigma);
-
+  args.insert(args.begin()+1, lambda);
+  args.insert(args.begin()+2, sigma);
+  
   // Hessian of the Lagrangian
   MXFunction QP_h(args,H_*sigma);
+  
+  std::cout << "QP_h: " << QP_h << std::endl;
 
   // Generate an IpoptSolver that uses this objective and constraint
   solver = IpoptSolver(QP_f,QP_g,QP_h,QP_j,QP_gf);
