@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 #ni = 500 # original
 #ni = 20000 # web
-ni = 2000 # cuter
+ni = 500 # cuter
 alpha = 350.0
 h = 1./ni
 

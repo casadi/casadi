@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 #   "A Projected Newton Method in a Cartesian Product of Balls",
 #   JOTA 59(1): 59-69, 1988.
 
-n = 500 # original
+n = 1000 # original
 #n = 10000 # website
 #n = 1000
 

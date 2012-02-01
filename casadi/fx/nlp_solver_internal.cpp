@@ -246,6 +246,8 @@ void NLPSolverInternal::init(){
         // Hessian of the Lagrangian
         H_ = static_cast<FX&>(lfcn).hessian();
         H_.setOption("verbose",getOption("verbose"));
+        H_.setOption("live_variables",true);
+/*        H_.setOption("inplace",true);*/
         log("SX Hessian function generated");
         
       } else { // !F_sx.isNull() && !G_sx.isNull()
@@ -277,6 +279,8 @@ void NLPSolverInternal::init(){
           // Lagrangian function
           MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
           lfcn.init();
+          
+/*          cout << "countNodes(lfcn.outputMX()) = " << countNodes(lfcn.outputMX()) << endl;*/
       
           bool adjoint_mode = true;
           if(adjoint_mode){
@@ -288,6 +292,7 @@ void NLPSolverInternal::init(){
             MXFunction glfcn(lfcn_in,gL);
             glfcn.init();
             log("MX Lagrangian gradient function initialized");
+//           cout << "countNodes(glfcn.outputMX()) = " << countNodes(glfcn.outputMX()) << endl;
 
             // Get Hessian sparsity
             CRSSparsity H_sp = glfcn.jacSparsity();
@@ -329,6 +334,11 @@ void NLPSolverInternal::init(){
   // Create a Jacobian if it does not already exists
   if(!G_.isNull() && J_.isNull()){
     J_ = G_.jacobian();
+    
+    // Use live variables if SXFunction
+    if(!shared_cast<SXFunction>(J_).isNull()){
+      J_.setOption("live_variables",true);
+    }
     log("Jacobian function generated");
   }
   if(!J_.isNull() && !J_.isInit()){

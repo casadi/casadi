@@ -922,7 +922,7 @@ void SXFunctionInternal::updateNumSens(bool recursive){
 FX SXFunctionInternal::hessian(int iind, int oind){
   if(output(oind).numel() != 1)
     throw CasadiException("SXFunctionInternal::hess: function must be scalar");
-  
+
   // Reverse mode to calculate gradient
   if(verbose()){
     cout << "SXFunctionInternal::hessian: calculating gradient " << endl;
@@ -967,12 +967,39 @@ FX SXFunctionInternal::hessian(int iind, int oind){
     
     if(verbose()) cout << "SXFunctionInternal::hessian: calculating symbolic Jacobian" << endl;
     SXMatrix h = gfcn.jac(0,0);
+    
+    if(false){ // Does not appear to help
+      // Calculate the transpose of the sparsity pattern
+      vector<int> mapping;
+      CRSSparsity h_sp_trans = h.sparsity().transpose(mapping);
+      
+      // Make sure that the Hesssian is indeed symmetric
+      casadi_assert(h_sp_trans == h.sparsity());
+      
+      // Access sparsity pattern
+      int h_nrow=h.sparsity().size1();
+      const vector<int> h_rowind =h.sparsity().rowind();
+      const vector<int> h_col =h.sparsity().col();
+      vector<SX>& h_data = h.data();
+      
+      // Loop over the rows of the hessian
+      for(int i=0; i<h_nrow; ++i){
+        // Loop over the strictly lower triangular part of the matrix
+        for(int el=h_rowind[i]; el<h_rowind[i+1] && h_col[el]<i; ++el){
+          // Mirror upper triangular part
+          // h_data[el] = h_data[mapping[el]];
+          h_data[mapping[el]] = h_data[el];
+        }
+      }
+    }
+    
+    // Create the hessian function
     hfcn = SXFunction(inputv_,h);
   }
   
   // Calculate jacobian of gradient
   if(verbose()) cout << "SXFunctionInternal::hessian: calculating Hessian done" << endl;
-  
+
   // Return jacobian of the gradient
   return hfcn;
 }

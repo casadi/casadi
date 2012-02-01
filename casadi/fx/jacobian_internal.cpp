@@ -80,13 +80,6 @@ void JacobianInternal::init(){
   // Only now, when we know the sparsity of the inputs and outputs, we are anle to call the init function of the base class
   FXInternal::init();
 
-  // Number of directions that we can calculate at a time
-  nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
-  nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
-  casadi_assert_message(nadir_fcn_>0 || nfdir_fcn_>0, "Function does not support directional derivatives, neither \"number_of_fwd_dir\" nor \"number_of_adj_dir\" is positive");
-  
-
-  
   // Quick hacks starting here!
   iind_ = -1;
   oind_ = -1;
@@ -104,14 +97,25 @@ void JacobianInternal::init(){
       D2_.resize(1);
       fcn_->getPartition(jblocks_no_f,D1_,D2_,false);
 
-    
+      // Increase the number of sensitivities in the user function
+      int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
+      int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
+      int nfdir_fcn_old = fcn_.getOption("number_of_fwd_dir");
+      int nadir_fcn_old = fcn_.getOption("number_of_adj_dir");
+      fcn_.setOption("number_of_fwd_dir",std::max(nfwd,nfdir_fcn_old));
+      fcn_.setOption("number_of_adj_dir",std::max(nadj,nadir_fcn_old));
+      fcn_.updateNumSens();
+      
       if(verbose()){
-        int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
-        int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
         cout << "JacobianInternal::init: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian" << endl;
       }
     }
   }
+  
+  // Number of directions that we can calculate at a time
+  nadir_fcn_ = fcn_.getOption("number_of_adj_dir");
+  nfdir_fcn_ = fcn_.getOption("number_of_fwd_dir");
+  casadi_assert_message(nadir_fcn_>0 || nfdir_fcn_>0, "Function does not support directional derivatives, neither \"number_of_fwd_dir\" nor \"number_of_adj_dir\" is positive");
 }
 
 void JacobianInternal::evaluate(int nfdir, int nadir){

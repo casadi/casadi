@@ -24,6 +24,8 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/matrix/sparsity_tools.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
+#include "casadi/fx/sx_function.hpp"
+#include "casadi/sx/sx_tools.hpp"
 /*#include "interfaces/qpoases/qpoases_solver.hpp"*/
 #include <ctime>
 #include <iomanip>
@@ -82,6 +84,58 @@ void SQPInternal::init(){
   }
 
   qp_solver_.init();
+  
+#if 0  
+  // Assume SXFunction for now
+  SXFunction F = shared_cast<SXFunction>(F_);
+  SXFunction G = shared_cast<SXFunction>(G_);
+  
+  // Get the expressions
+  SXMatrix x = F.inputSX();
+  SXMatrix f = F.outputSX();
+  SXMatrix g = G.outputSX();
+#endif
+  
+/*  cout << "x = " << x << endl;
+  cout << "f = " << f << endl;
+  cout << "g = " << g << endl;*/
+  
+  // Derivatives of lifted variables
+  // SXMatrix zdot = ssym("zdot",z.size());
+    
+  // Lagrange multipliers
+  //SXMatrix mux = ssym("mux",x.size1());
+/*  SXMatrix mug = ssym("mug",g.size1());
+
+  // Gradient of the Lagrangian
+  SXMatrix lgrad = gradient(f - inner_prod(mug,g),x);
+
+  // Combined Lagrangian gradient and constraint function
+  enum ZInput{Z_X,Z_MUG,Z_NUM_IN};
+  enum ZOutput{Z_L,Z_MUG,Z_NUM_IN};
+  Z = SXFunction([u,d,mux,mug],[z,f1,f2])*/
+  
+  
+/*  vector<SXMatrix> z_in(2);
+  z_in[0] = x;
+  z_in[1] = mug;
+  vector<SXMatrix> z_out(3);
+  z_in[0] = lgrad;
+  z_in[1] = g;
+  SXFunction z(z_in,z_out);
+  Z.init()
+
+  # Matrix A and B in lifted Newton
+  A = Z.jac(0,0)
+  B1 = Z.jac(0,1)
+  B2 = Z.jac(0,2)
+
+  
+  SXFunction z(z_in,lgrad);
+  lfcn.init();*/
+  
+  
+  
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){

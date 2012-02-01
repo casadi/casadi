@@ -98,10 +98,10 @@ void IpoptInternal::init(){
     delete app;
     app = new Ipopt::IpoptApplication();
   }
-  
+
   // Call the init method of the base class
   NLPSolverInternal::init();
-  
+    
   // Gradient of the objective function, remove?
   if(!GF_.isNull()) GF_.init();
   if(!GF_.isNull()) {

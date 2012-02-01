@@ -525,8 +525,8 @@ void MXFunctionInternal::print(ostream &stream) const{
         stream << "[]";
       }
       alg[i].mx->printPart(stream,j+1);
-      stream << endl;
     }
+    stream << endl;
   }
 }
 

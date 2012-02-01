@@ -36,6 +36,23 @@ class SQPInternal;
   carried out via backtracking until with the Armijo condition applied to
   the T1 (in Nocedal phi1) merit function is satisfied.
   
+  The method solved can be written in the form:
+  \verbatim
+  min          F(x1,x2)
+  x1,x2
+  
+  subject to
+            LBG1 <= G1(x1,x2) <= UBG1
+              x2 == G2(x1,x2)
+            LBX1 <=     x1    <= UBX1
+            LBX2 <=     x2    <= UBX2
+  \endverbatim
+  
+  We thus assume that the variable vector x can be divided into two parts,
+  where the second part is given recursively by the equations x2 == G2(x1,x2).
+  That is x2 is given recursively means that we assume that the Jacobian of 
+  G2 with respect to x2 is lower triangular with zeros along the diagonal.
+  
   The method is still under development
   
   \author Joel Andersson
@@ -48,10 +65,10 @@ class SQPMethod : public NLPSolver {
 
     /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
     explicit SQPMethod(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                         const FX& G = FX(),  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory): \f$ [\mathbf{R}^n, \mathbf{R}^m, \mathbf{R}] \mapsto [\mathbf{R}^{n x n}]\f$ \n The third input argument for H is \f$ \sigma \f$, a scaling factor for F. */
-                         const FX& J = FX()   /**< Jacobian of G (default -> differentiate): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^{m x n}]\f$ */
-                        );
+                       const FX& G = FX(),  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+                       const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory): \f$ [\mathbf{R}^n, \mathbf{R}^m, \mathbf{R}] \mapsto [\mathbf{R}^{n x n}]\f$ \n The third input argument for H is \f$ \sigma \f$, a scaling factor for F. */
+                       const FX& J = FX()   /**< Jacobian of G (default -> differentiate): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^{m x n}]\f$ */
+                       );
 
     /// Access functions of the node
     SQPInternal* operator->();

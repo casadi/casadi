@@ -466,7 +466,6 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       ret[i] = M(jacSparsity(iind,oind,compact));
       if(verbose()){
         cout << "XFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
-        cout << "       ret[" << i << "] " << ret[i] << endl;
       }
     }
   }
@@ -487,7 +486,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
   int nadj = D2.front().isNull() ? 0 : D2.front().size1();
 
-  if(verbose())  {
+  if(false)  { // commented out: too verbose
     cout << "XFunctionInternal::jac partitioning" << endl;
     for (int i=0;i<jblocks_no_f.size();++i) {
       cout << "   jblocks_no_f[" << i << "] " << jblocks_no_f[i] << endl;
@@ -589,7 +588,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       int oind = jblocks_no_f[i].first;
       int iind = jblocks_no_f[i].second;
       sp_trans[i] = jacSparsity(iind,oind,true).transpose(mapping[i]);
-      if(verbose())  {
+      if(false)  { // commented out, not interesting
         cout << "   mapping[" << i << "] " << mapping[i] << endl;
         cout << "   sp_trans[" << i << "] " << DMatrix(sp_trans[i],1) << endl;
         cout << "   sp_trans[" << i << "].col() " << sp_trans[i].col() << endl;

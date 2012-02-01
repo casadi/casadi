@@ -287,19 +287,19 @@ int ewalk(expr *e){
           case OPPLUS: f = cx*x + cy*y; break;
 /*          case OPMINUS: f = cx*x - cy*y; break;*/
           case OPMINUS: f = cx*x + cy*y; break; // NOTE: changed - -> +
-          case OPMULT: f = cx*x * cy*y; break;
-          case OPDIV: f = cx*x / cy*y; break;
+          case OPMULT: f = (cx*x) * (cy*y); break;
+          case OPDIV: f = (cx*x) / (cy*y); break;
 /*          case OPREM: f = cx*x ? cy*y; break;*/
           case OPPOW: f = pow(cx*x,cy*y); break;
 /*          case OPLESS: f = cx*x ? cy*y; break;*/
-          case OPOR: f = cx*x || cy*y; break;
-          case OPAND: f = cx*x && cy*y; break;
-          case LT: f = cx*x < cy*y; break;
-          case LE: f = cx*x <= cy*y; break;
-          case EQ: f = cx*x == cy*y; break;
-          case GE: f = cx*x >= cy*y; break;
-          case GT: f = cx*x > cy*y; break;
-          case NE: f = cx*x != cy*y; break;
+          case OPOR: f = (cx*x) || (cy*y); break;
+          case OPAND: f = (cx*x) && (cy*y); break;
+          case LT: f = (cx*x) < (cy*y); break;
+          case LE: f = (cx*x) <= (cy*y); break;
+          case EQ: f = (cx*x) == (cy*y); break;
+          case GE: f = (cx*x) >= (cy*y); break;
+          case GT: f = (cx*x) > (cy*y); break;
+          case NE: f = (cx*x) != (cy*y); break;
 /*          case OP_atan2: f = cx*x ? cy*y; break;*/
 /*          case OPintDIV: f = cx*x ? cy*y; break;*/
 /*          case OPprecision: f = cx*x ? cy*y; break;*/
@@ -317,6 +317,17 @@ int ewalk(expr *e){
           default:
             casadi_assert_message(0,"unknown: " << operation);
         };
+        
+        if(false){
+          using namespace std;
+          cout << "operation = " << operation << endl;
+          cout << "x = " << x << endl;
+          cout << "y = " << y << endl;
+          cout << "cx = " << cx << endl;
+          cout << "cy = " << cy << endl;
+          cout << "f = " << f << endl;
+        }
+        
         
         intermediates.at(i) = f;
         return i;
@@ -582,7 +593,7 @@ char *con_linadd(int i, char *s){
           binop(s, s, "+",vprod(cg->coef, cg->varno));
         }
       }
-      cons.at(i) = f;
+      cons.at(i) += f;
       break;
     }
   }
@@ -807,7 +818,22 @@ int main(int argc, char **argv){
   return_nofile = 1;
   // progname = "/home/janderss/src/ampl/netlib.org/ampl/solvers/examples/cork.nl";
   // progname = "/home/janderss/Desktop/ampl_test/corkscrw_small.nl";
-  progname = "/home/janderss/Desktop/ampl_test/corkscrw.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/corkscrw.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/clnlbeam.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/clnlbeam_small.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/optmass.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/clnlbeam_small.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/svanberg.nl";
+  // progname = "/home/janderss/Desktop/ampl_test/svanberg_small.nl";
+
+//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/aircrfta.nl";
+//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/allinitc.nl";
+//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/allinitc.nl";
+//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/alsotame.nl";
+  casadi_assert(argc==2);
+  progname = argv[1];
+  
+  
   fint L = strlen(progname);
   FILE *nl = jacdim0(progname, L);
 
@@ -906,8 +932,9 @@ int main(int argc, char **argv){
       std::cout << *it << std::endl;
     }
   }
-
+  
   using namespace std;
+  cout << "solving problem" << endl;
 
   // Get the variable bounds
   vector<double> x_lb(nv1), x_ub(nv1);
@@ -930,7 +957,7 @@ int main(int argc, char **argv){
   SXMatrix x = vars;
   SXMatrix f = objs;
   SXMatrix g = cons;
-
+  
   // NLP functions
   SXFunction ffcn(x,f);
   SXFunction gfcn(x,g);
@@ -939,7 +966,8 @@ int main(int argc, char **argv){
   IpoptSolver nlp_solver(ffcn,gfcn);
   
   // Set options
-  nlp_solver.setOption("linear_solver","ma57");
+  nlp_solver.setOption("verbose",true);
+//  nlp_solver.setOption("linear_solver","ma57");
   nlp_solver.setOption("generate_hessian",true);
 /*  nlp_solver.setOption("hessian_approximation","limited-memory");*/
   
