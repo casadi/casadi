@@ -33,6 +33,47 @@ for (name,classification) in cuter_file:
   if classification[0] in allowed_objective and classification[1] in allowed_constraints and classification[2] in allowed_smoothness:
     problems.append(name)
 
-print problems
+# Now copy the corresponding problems to a new directory
+import shutil
+for p in problems:
+  try:
+
+    # Filename
+    filename = p.lower() + ".mod"
+    
+    # Open the source file
+    source=open('cuter_source/'+filename, "r" )
+    
+    # Create the modified file
+    destination= open('cuter_selected/'+filename, "w" )
+
+    # Comment out remaining lines
+    comment_out_rest = False
+
+    # Copy line by line
+    for line in source:
+      # Look for solve command
+      if not comment_out_rest and line.startswith("solve"):
+        comment_out_rest = True
+      
+      # Comment out if necessary
+      if comment_out_rest:
+        destination.write("#")
+      
+      # Write the (rest of the) line
+      destination.write(line)
+      
+    # Specify filename to save to
+    destination.write("\nwrite g" + p.lower() + ";\n")
+    
+    # Close the files
+    source.close()
+    destination.close()
+  
+    print "Successfully copied " + filename
+  except IOError:
+    print "Failed to copy " + filename
+
+#print problems
 
 

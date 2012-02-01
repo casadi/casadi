@@ -5,9 +5,12 @@ echo "Downloading AMPL source files for the CUTEr test suite"
 echo " "
 
 wget -e robots=off -r -l1 --no-parent -A.mod http://orfe.princeton.edu/~rvdb/ampl/nlmodels/cute/
-mv orfe.princeton.edu/~rvdb/ampl/nlmodels/cute/*.mod .
+rm -rf cuter_source
+mv orfe.princeton.edu/~rvdb/ampl/nlmodels/cute cuter_source
 rm -rf orfe.princeton.edu
 
-echo " "
+.echo " "
 echo "Done downloading cuter"
 echo " "
+
+mkdir -p cuter_selected
