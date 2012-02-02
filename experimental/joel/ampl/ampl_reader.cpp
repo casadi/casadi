@@ -825,18 +825,6 @@ void get_rownos(){
 }
     
 int main(int argc, char **argv){
-  {
-    using namespace std;
-    cout << "erfinv(0.4) = " << erfinv(0.4) << endl;
-    cout << "erfinv(0.8) = " << erfinv(0.8) << endl;
-    cout << "erfinv(-0.8) = " << erfinv(-0.8) << endl;
-    cout << "erfinv(-1.4) = " << erfinv(-1.4) << endl;
-    cout << "erfinv(2.4) = " << erfinv(2.4) << endl;
-    cout << "erfinv(1.0) = " << erfinv(1.0) << endl;
-    cout << "erfinv(-1.0) = " << erfinv(-1.0) << endl;
-    return 0;
-  }
-  
   ASL_alloc(ASL_read_fg);
   g_fmt_decpt = 1;
   want_derivs = 0;
@@ -909,10 +897,12 @@ int main(int argc, char **argv){
     memset((char *)&cvmap[ncom0], 0, ncom1*sizeof(int));
   }
   
-  using namespace std;
+  
+  
+/*  using namespace std;
   cout << "ncom0 = " << ncom0 << endl;
   cout << "ncom1 = " << ncom1 << endl;
-  return 0;
+  return 0;*/
   
   ndv = ncond = 0;
   

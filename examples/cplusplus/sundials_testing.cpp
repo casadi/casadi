@@ -33,6 +33,7 @@
 #include "casadi/fx/jacobian.hpp"
 #include <casadi/fx/integrator_internal.hpp>
 #include <interfaces/sundials/idas_internal.hpp>
+#include <casadi/casadi_calculus.hpp>
 
 #include <fstream>
 #include <iostream>

@@ -25,7 +25,6 @@
 
 #include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
-#include "../sx/sx.hpp"
 #include <vector>
 namespace CasADi{
   
@@ -343,7 +342,7 @@ class MX : public SharedObject{
   
   #ifndef SWIG
   /// Get operation type
-  Operation getOp() const;
+  int getOp() const;
   #endif // SWIG
 
   /** \brief Returns a number that is unique for a given MXNode. 
@@ -494,14 +493,6 @@ class MX : public SharedObject{
 
 //@{
 /// Some typedefs
-typedef DMatrix* DMatrixPtr;
-typedef std::vector<DMatrixPtr> DMatrixPtrV;
-typedef std::vector<DMatrixPtrV> DMatrixPtrVV;
-
-typedef SXMatrix* SXMatrixPtr;
-typedef std::vector<SXMatrixPtr> SXMatrixPtrV;
-typedef std::vector<SXMatrixPtrV> SXMatrixPtrVV;
-
 typedef MX* MXPtr;
 typedef std::vector<MXPtr> MXPtrV;
 typedef std::vector<MXPtrV> MXPtrVV;

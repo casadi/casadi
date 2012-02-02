@@ -37,6 +37,7 @@
 #include "if_else_node.hpp"
 #include "densification.hpp"
 #include "norm.hpp"
+#include "../casadi_math.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -845,7 +846,7 @@ bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get
 
 bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryOp*>(get()) != 0 : false;  }
  	
-Operation MX::getOp() const {
+int MX::getOp() const {
   casadi_assert_message(isBinary() || isUnary(),"MX::getOp: must be binary or unary operation");
   if (isBinary()) {
     return dynamic_cast<const BinaryOp*>(get())->op_;

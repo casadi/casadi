@@ -24,7 +24,6 @@
 #define BINARY_SCALAR_HPP
 
 #include "sx_node.hpp"
-#include "../casadi_math.hpp"
 
 namespace CasADi{
 
@@ -36,13 +35,13 @@ class BinarySXNode : public SXNode{
 public:
 
 /** \brief  Constructors */
-BinarySXNode(Operation op_, const SX& child1_){
+BinarySXNode(unsigned char op_, const SX& child1_){
  op = op_;
  child[0] = child1_;
  child[1] = 0;
 }
 
-BinarySXNode(Operation op_, const SX& child1_, const SX& child2_){
+BinarySXNode(unsigned char op_, const SX& child1_, const SX& child2_){
  op = op_;
  child[0] = child1_;
  child[1] = child2_;
@@ -66,7 +65,7 @@ virtual SX& dep(int i);
 virtual int getOp() const{ return op;}
 
 /** \brief  Data members */
-Operation op;
+unsigned char op;
 SX      child[2];
 
 virtual void print(std::ostream &stream, long& remaining_calls) const;

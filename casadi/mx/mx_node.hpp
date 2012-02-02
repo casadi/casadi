@@ -24,7 +24,8 @@
 #define MX_NODE_HPP
 
 #include "mx.hpp"
-#include "../fx/fx.hpp"
+#include "../sx/sx.hpp"
+#include "../casadi_math.hpp"
 #include <vector>
 
 namespace CasADi{

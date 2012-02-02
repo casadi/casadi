@@ -62,24 +62,8 @@ double fmax(double x, double y) throw();
 #endif
 #endif
 
-// Resolve ambigous overloading
-#ifndef WITHOUT_INT_MATH
-double exp(int x) throw();
-double log(int x) throw();
-double sqrt(int x) throw();
-double pow(int x, int y) throw();
-double sin(int x) throw();
-double cos(int x) throw();
-double tan(int x) throw();
-double asin(int x) throw();
-double acos(int x) throw();
-double atan(int x) throw();
-int floor(int x) throw();
-int ceil(int x) throw();
-#endif // WITHOUT_INT_MATH
-
-// These are nonstandard additions -- possibly move to another file
 namespace CasADi{
+  // These are nonstandard additions -- possibly move to another file
   // Sign function
   double sign(double x) throw();
 

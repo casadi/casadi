@@ -24,12 +24,12 @@
 #define CASADI_OPERATORS_HPP
 
 #include "pre_c99_support.hpp"
+#include "casadi_types.hpp"
 
 /** \brief casadi_operators class
 \author Joel Andersson
 \date 2011
 */
-
 
 namespace CasADi{
 
@@ -66,53 +66,7 @@ class casadi_operators{
     static T sign(const T&x){ return CasADi::sign(x);}
     static T erfinv(const T&x){ return CasADi::erfinv(x); }
 };
-
-//@{
-/** \brief  Forward declarations */
-  class MX;
-  //@}
 } // namespace CasADi
-
-#define MX CasADi::MX
-//@{
-/** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
-MX sqrt(const MX &x);
-MX sin(const MX &x);
-MX cos(const MX &x);
-MX tan(const MX &x);
-MX atan(const MX &x);
-MX asin(const MX &x);
-MX acos(const MX &x);
-MX exp(const MX &x);
-MX log(const MX &x);
-MX log10(const MX &x);
-MX pow(const MX &x, const MX &n);
-MX abs(const MX &x);
-MX fabs(const MX &x); // same as abs
-MX floor(const MX &x);
-MX ceil(const MX &x);
-MX sinh(const MX &x);
-MX cosh(const MX &x);
-MX tanh(const MX &x);
-//@}
-
-//@{
-/** \brief  C99 elementary functions from the math.h header */
-MX erf(const MX &x);
-MX fmin(const MX &a, const MX &b);
-MX fmax(const MX &a, const MX &b);
-//@}
-#undef MX
-
-namespace CasADi{
-  //@{
-  /** \brief  CasADi additions to math.h */
-  MX constpow(const MX &x, const MX &n);
-  MX printme(const MX &x, const MX &y);
-  MX sign(const MX &x);
-  MX erfinv(const MX &x);
-  //@}
-}
 
 #endif // CASADI_OPERATORS_HPP
 

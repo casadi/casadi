@@ -269,7 +269,7 @@ class SX{
 
     /** \brief Get the maximum number of calls to the printing function when printing an expression */
     static long getMaxNumCallsInPrint();
-
+    
 #ifndef SWIG
   private:
     // Maximum number of calls
@@ -360,6 +360,10 @@ class casadi_operators<SX>{
   typedef std::vector<Matrix<SX> > SXMatrixVector;
   typedef std::vector< std::vector<Matrix<SX> > > SXMatrixVectorVector;
 
+  typedef SXMatrix* SXMatrixPtr;
+  typedef std::vector<SXMatrixPtr> SXMatrixPtrV;
+  typedef std::vector<SXMatrixPtrV> SXMatrixPtrVV;
+
 } // namespace CasADi
 
 
@@ -409,49 +413,6 @@ class numeric_limits<CasADi::SX>{
     static const float_round_style round_style = round_toward_zero;
 };
 } //namespace std
-
-// Shorthand for out-of-namespace declarations
-#define SX CasADi::SX
-
-//@{
-/** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
-inline SX sqrt(const SX &x){return x.sqrt();}
-inline SX sin(const SX &x){return x.sin();}
-inline SX cos(const SX &x){return x.cos();}
-inline SX tan(const SX &x){return x.tan();}
-inline SX atan(const SX &x){return x.arctan();}
-inline SX asin(const SX &x){return x.arcsin();}
-inline SX acos(const SX &x){return x.arccos();}
-inline SX sinh(const SX &x){return x.sinh();}
-inline SX cosh(const SX &x){return x.cosh();}
-inline SX tanh(const SX &x){return x.tanh();}
-inline SX exp(const SX &x){return x.exp();}
-inline SX log(const SX &x){return x.log();}
-inline SX pow(const SX &x, const SX &n){ return x.__pow__(n);}
-inline SX abs(const SX &x){return x.fabs();}
-inline SX fabs(const SX &x){return x.fabs();}
-inline SX floor(const SX &x){return x.floor();}
-inline SX ceil(const SX &x){return x.ceil();}
-//@}
-
-//@{
-/** \brief  C99 elementary functions from the math.h header */
-inline SX erf(const SX &x){return x.erf();}
-inline SX fmin(const SX &x, const SX &y){ return x.fmin(y);}
-inline SX fmax(const SX &x, const SX &y){ return x.fmax(y);}
-//@}
-#undef SX
-
-namespace CasADi{
-  //@{
-  /** \brief  CasADi additions to math.h */
-  inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
-  inline SX printme(const SX &x, const SX &y){ return x.printme(y);}
-  inline SX sign(const SX &x){return x.sign();}
-  inline SX erfinv(const SX &x){return x.erfinv();}
-  //@}
-}
-
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */
 #include "sx_node.hpp"

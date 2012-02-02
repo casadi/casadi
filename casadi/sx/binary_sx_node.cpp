@@ -21,6 +21,7 @@
  */
 
 #include "binary_sx_node.hpp"
+#include "../casadi_math.hpp"
 #include <cassert>
 #include <stack>
 

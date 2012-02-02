@@ -37,6 +37,7 @@
 #include "../casadi/matrix/matrix_tools.hpp"
 #include "../casadi/sx/sx_tools.hpp"
 #include "../casadi/fx/integrator.hpp"
+#include "../casadi/casadi_calculus.hpp"
 
 using namespace std;
 namespace CasADi{

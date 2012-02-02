@@ -31,6 +31,9 @@
 namespace CasADi{
   
   /// Forward declarations
+  class SX;
+  class MX;
+  template<class T> class Matrix;
   class FX;
   class CRSSparsity;
   class NLPSolver;
@@ -77,5 +80,6 @@ namespace CasADi{
 #endif // SWIG  
   
 } // namespace CasADi
+
 #endif // CASADI_TYPES_HPP
 

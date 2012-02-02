@@ -139,7 +139,7 @@ int main() {
   // Some random matrix
   DMatrix A0(n*n,1,0);
   for(int i=0; i<n*n; ++i)
-    A0[i] = 0.1 + sqrt(i*1323 % 124);
+    A0[i] = 0.1 + sqrt(double(i*1323 % 124));
   cout << A0 << endl;
   
   detFun.setInput(A0);

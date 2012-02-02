@@ -26,6 +26,7 @@
 #include "casadi/matrix/matrix_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
 #include "casadi/sx/sx_tools.hpp"
+#include "casadi/casadi_calculus.hpp"
 /*#include "interfaces/qpoases/qpoases_solver.hpp"*/
 #include <ctime>
 #include <iomanip>
