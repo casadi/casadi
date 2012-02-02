@@ -23,7 +23,7 @@
 #ifndef CASADI_OPERATORS_HPP
 #define CASADI_OPERATORS_HPP
 
-#include <cmath>
+#include "pre_c99_support.hpp"
 
 /** \brief casadi_operators class
 \author Joel Andersson
@@ -62,8 +62,9 @@ class casadi_operators{
     static T cosh(const T&x){ return ::cosh(x);}
     static T tanh(const T&x){ return ::tanh(x);}
     static T constpow(const T&x, const T&y){ return ::pow(x,y);}
-    static T printme(const T&x, const T&y){ return printme(x,y);}
-    static T sign(const T&x){ return x<0 ? -1 : x>0 ? 1 : x;} // NOTE: sign(nan) == nan
+    static T printme(const T&x, const T&y){ return printme(x,y);} // BUG? Infinite loop?
+    static T sign(const T&x){ return CasADi::sign(x);}
+    static T erfinv(const T&x){ return CasADi::erfinv(x); }
 };
 
 //@{
@@ -109,6 +110,7 @@ namespace CasADi{
   MX constpow(const MX &x, const MX &n);
   MX printme(const MX &x, const MX &y);
   MX sign(const MX &x);
+  MX erfinv(const MX &x);
   //@}
 }
 

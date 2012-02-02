@@ -23,6 +23,8 @@
 #ifndef PRE_C99_SUPPORT_HPP
 #define PRE_C99_SUPPORT_HPP
 
+#include <cmath>
+
 // Get GCC version if GCC is used
 #ifdef __GNUC__
 #ifdef __GNUC_MINOR__
@@ -76,9 +78,13 @@ int floor(int x) throw();
 int ceil(int x) throw();
 #endif // WITHOUT_INT_MATH
 
-// This is a nonstandard addition (the sign function) -- possibly move to another file
+// These are nonstandard additions -- possibly move to another file
 namespace CasADi{
+  // Sign function
   double sign(double x) throw();
+
+  // Inverse of the error function
+  double erfinv(double x) throw();
 }
 
 #endif // PRE_C99_SUPPORT_HPP

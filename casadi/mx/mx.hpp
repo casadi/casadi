@@ -464,6 +464,7 @@ class MX : public SharedObject{
   MX ceil() const;
   MX fabs() const;
   MX sign() const;
+  MX erfinv() const;
   MX erf() const;
   MX sinh() const;
   MX cosh() const;

@@ -142,6 +142,9 @@ SX SX::sign() const{
     return SX::create(new BinarySXNode(SIGN, *this));
 }
 
+SX SX::erfinv() const{
+  return SX::create(new BinarySXNode(ERFINV, *this));
+}
 
 SX SX::add(const SX& y) const{
   // NOTE: Only simplifications that do not result in extra nodes area allowed
@@ -736,6 +739,10 @@ SX casadi_operators<SX>::erf(const SX&x){
 
 SX casadi_operators<SX>::sign(const SX&x){ 
   return x.sign();
+}
+
+SX casadi_operators<SX>::erfinv(const SX&x){ 
+  return x.erfinv();
 }
 
 SX::operator Matrix<SX>() const{

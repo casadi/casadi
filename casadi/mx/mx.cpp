@@ -777,6 +777,10 @@ MX MX::sign() const{
   return unary(SIGN,*this);
 }
 
+MX MX::erfinv() const{ 
+  return unary(ERFINV,*this);
+}
+
 MX MX::erf() const{ 
   return unary(ERF,*this);
 }
@@ -966,6 +970,10 @@ namespace CasADi{
 
   MX sign(const MX& x){
     return x.sign();
+  }
+
+  MX erfinv(const MX& x){
+    return x.erfinv();
   }
 
   MX printme(const MX& x, const MX& y){

@@ -145,6 +145,21 @@ char *f_OPVARVAL1(expr *e, char *buf){
   return buf;
 }
 
+// char *f_OPVARVAL1(expr *e, char *buf){
+//   int k = e->a;
+//   casadi_assert(k>=0);
+//   if(k >= nv1) {
+//     k = cvmap[(expr_v *)e - var_e - nv1];
+//     k += 1;
+//   }
+//   sprintf(buf, "x[%d]", k);
+//   return buf;
+// }
+
+
+
+
+
 char *f_OPNUM1(register expr *e, char *rv){
   g_fmt(rv,((expr_nx *)e)->v);
   return rv;
@@ -164,7 +179,7 @@ SX get_expression(expr *e){
         return t;
       case 10: // variable value
         i = (expr_v *)e - var_e;
-        return vars.at(i);
+        return vars.at(std::min<int>(i,vars.size()-1));
     }
 /*  }*/
   casadi_assert(0);
@@ -231,9 +246,7 @@ int ewalk(expr *e){
           case OPNUMBEROF: casadi_assert_message(0,"Unary operation OPNUMBEROF not implemented. What is it supposed to do?"); break;
           case OPNUMBEROFs: casadi_assert_message(0,"Unary operation OPNUMBEROFs not implemented. What is it supposed to do?"); break;
           case OPALLDIFF: casadi_assert_message(0,"Unary operation OPALLDIFF not implemented. What is it supposed to do?"); break;
-          case OP1POW: casadi_assert_message(0,"Unary operation OP1POW not implemented. What is it supposed to do?"); break;
           case OP2POW: f = x*x; break;
-          case OPCPOW: casadi_assert_message(0,"Unary operation OPCPOW not implemented. What is it supposed to do?"); break;
           default:
             casadi_assert_message(0,"unknown: " << operation);
         };
@@ -707,7 +720,7 @@ void obj_output(){
       break;
     }
   }
-  casadi_assert(og==0);
+/*  casadi_assert(og==0);*/
   printf(" /* Work vector */\n");
   printf(" real v[%d];\n", omax.nvt);
   if(omax.ncond){
@@ -812,6 +825,18 @@ void get_rownos(){
 }
     
 int main(int argc, char **argv){
+  {
+    using namespace std;
+    cout << "erfinv(0.4) = " << erfinv(0.4) << endl;
+    cout << "erfinv(0.8) = " << erfinv(0.8) << endl;
+    cout << "erfinv(-0.8) = " << erfinv(-0.8) << endl;
+    cout << "erfinv(-1.4) = " << erfinv(-1.4) << endl;
+    cout << "erfinv(2.4) = " << erfinv(2.4) << endl;
+    cout << "erfinv(1.0) = " << erfinv(1.0) << endl;
+    cout << "erfinv(-1.0) = " << erfinv(-1.0) << endl;
+    return 0;
+  }
+  
   ASL_alloc(ASL_read_fg);
   g_fmt_decpt = 1;
   want_derivs = 0;
@@ -869,12 +894,12 @@ int main(int argc, char **argv){
   com_ifset = o_ifset + n_obj;
   op_type[OP1POW] = 2;
   op_type[OP2POW] = 11;
+  op_type[OPCPOW] = 2; // NOTE: Joel: I added this
   
   dvtfree = (int *)Malloc(NDVTGULP*sizeof(int));
   ndvtmax = nvtfree = NDVTGULP;
   
   if (n_con) get_rownos();
-  
   cvmap = (int *)Malloc(ncom*sizeof(int));
   npd = 0;
   for(i = 0; i < ncom0; i++){
@@ -883,6 +908,11 @@ int main(int argc, char **argv){
   if (ncom1){
     memset((char *)&cvmap[ncom0], 0, ncom1*sizeof(int));
   }
+  
+  using namespace std;
+  cout << "ncom0 = " << ncom0 << endl;
+  cout << "ncom1 = " << ncom1 << endl;
+  return 0;
   
   ndv = ncond = 0;
   
@@ -966,7 +996,8 @@ int main(int argc, char **argv){
   IpoptSolver nlp_solver(ffcn,gfcn);
   
   // Set options
-  nlp_solver.setOption("verbose",true);
+/*  nlp_solver.setOption("max_iter",10);*/
+/*  nlp_solver.setOption("verbose",true);*/
 //  nlp_solver.setOption("linear_solver","ma57");
   nlp_solver.setOption("generate_hessian",true);
 /*  nlp_solver.setOption("hessian_approximation","limited-memory");*/

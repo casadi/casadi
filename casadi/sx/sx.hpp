@@ -233,6 +233,7 @@ class SX{
     SX floor() const;
     SX ceil() const;
     SX erf() const;
+    SX erfinv() const;
     SX fabs() const;
     SX add(const SX& y) const;
     SX sub(const SX& y) const;
@@ -341,6 +342,7 @@ class casadi_operators<SX>{
     static SX fmax(const SX&x, const SX&y);
     static SX fabs(const SX&x);
     static SX erf(const SX&x);
+    static SX erfinv(const SX&x);
     static SX sinh(const SX&x);
     static SX cosh(const SX&x);
     static SX tanh(const SX&x);
@@ -446,6 +448,7 @@ namespace CasADi{
   inline SX constpow(const SX &x, const SX &n){ return x.constpow(n);}
   inline SX printme(const SX &x, const SX &y){ return x.printme(y);}
   inline SX sign(const SX &x){return x.sign();}
+  inline SX erfinv(const SX &x){return x.erfinv();}
   //@}
 }
 

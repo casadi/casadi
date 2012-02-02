@@ -126,6 +126,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       case SINH+OFF:      C<SINH>::fcn(x,y,f);          break;\
       case COSH+OFF:      C<COSH>::fcn(x,y,f);          break;\
       case TANH+OFF:      C<TANH>::fcn(x,y,f);          break;\
+      case ERFINV+OFF:    C<ERFINV>::fcn(x,y,f);        break;\
       case PRINTME+OFF:   C<PRINTME>::fcn(x,y,f);       break;
       
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
@@ -171,10 +172,11 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case ERF:       BinaryOperation<ERF>::fcn(x,y,f);           break;
         case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);          break;
         case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);          break;
-        case INV:      BinaryOperation<INV>::fcn(x,y,f);          break;
-        case SINH:       BinaryOperation<SINH>::fcn(x,y,f);           break;
-        case COSH:       BinaryOperation<COSH>::fcn(x,y,f);           break;
-        case TANH:       BinaryOperation<TANH>::fcn(x,y,f);           break;
+        case INV:       BinaryOperation<INV>::fcn(x,y,f);          break;
+        case SINH:      BinaryOperation<SINH>::fcn(x,y,f);           break;
+        case COSH:      BinaryOperation<COSH>::fcn(x,y,f);           break;
+        case TANH:      BinaryOperation<TANH>::fcn(x,y,f);           break;
+        case ERFINV:    BinaryOperation<ERFINV>::fcn(x,y,f);           break;
         case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);           break;
       }
       #else
