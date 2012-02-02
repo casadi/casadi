@@ -29,7 +29,7 @@ int isnan(double x) throw(){return x!=x;}
 int isinf(double x) throw(){return isnan(x-x);}
 double erf(double x) throw(){
   // Approximation found in sourceforge and modified, originally from numerical recepies in fortran
-  double sx = CasADi::sign(x);
+  double sx = x<0 ? -1 : x>0 ? 1 : x;
   double z = sx*x;
   double t = 1.0/(1.0+0.5*z);
   return 1.-sx*(t*exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+
@@ -41,10 +41,6 @@ double fmax(double x, double y) throw(){ return std::max(x,y);}
 #endif // __STDC_VERSION__ < 199901L
 
 namespace CasADi{
-  double sign(double x) throw(){ 
-    return x<0 ? -1 : x>0 ? 1 : x; // NOTE: sign(nan) == nan
-  }
-  
   double erfinv(double x) throw(){
     // Approximation found in sourceforge and modified: Not very efficent
     if(x>=1){

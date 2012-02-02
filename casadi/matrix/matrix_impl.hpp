@@ -664,55 +664,30 @@ void Matrix<T>::setAll(const T& val){
 }
 
 template<class T>
-Matrix<T> Matrix<T>::unary_old(T (*fcn)(const T&)) const{
-  Matrix<T> temp;
-  temp.unary_old(fcn,*this);
-  return temp;
-}
+Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
+  // Return value
+  Matrix<T> ret(x.sparsity());
+  
+  // Nonzeros
+  std::vector<T>& ret_data = ret.data();
+  const std::vector<T>& x_data = x.data();
+  
+  // Do the operation on all non-zero elements
+  for(int el=0; el<x.size(); ++el){
+    casadi_math<T>::fun(op,x_data[el],x_data[el],ret_data[el]);
+  }
 
-// template<class T>
-// Matrix<T> Matrix<T>::unary_old(int op, const Matrix<T> &x){
-//   // Return value
-//   Matrix<T> ret(x.sparsity());
-//   
-//   // Do the operation on all non-zero elements
-//   for(int el=0; el<size(); ++el)
-//     casadi_math<T>::fun[op](x.data()[el],0,ret.data()[el]);
-// 
-//   // Check the value of the structural zero-entries, if there are any
-//   if(!x.dense()){
-//     // Get the value for the structural zeros
-//     T fcn_0;
-//     casadi_math<T>::fun[op](0,0,fcn_0);
-//     if(!casadi_limits<T>::isZero(fcn_0)){
-//       ret.makeDense(ret.size1(),ret.size2(),fcn_0);
-//     }
-//   }
-//     
-//   return ret;
-// }
-
-template<class T>
-void Matrix<T>::unary_old(T (*fcn)(const T&), const Matrix<T>& x){
-  // First check the value of the zero-entries
-  T fcn_0 = fcn(0);
-  if(casadi_limits<T>::isZero(fcn_0)){
-    // Copy the matrix, including the sparsity pattern
-    *this = x;
-    
-    // Do the operation on all non-zero elements
-    for(int el=0; el<size(); ++el)
-      data()[el] = fcn(x.data()[el]);
-    
-  } else {
-    makeDense(x.size1(),x.size2(),fcn_0);
-    for(int i=0; i<size1(); ++i){ // loop over rows
-      for(int el=x.rowind(i); el<x.rowind(i+1); ++el){ // loop over non-zero elements
-        int j = x.col(el);
-        data()[j+i*size2()] = fcn(x.data()[el]);
-      }
+  // Check the value of the structural zero-entries, if there are any
+  if(!x.dense() && !casadi_math<T>::f0x_is_zero(op)){
+    // Get the value for the structural zeros
+    T fcn_0;
+    casadi_math<T>::fun(op,0,0,fcn_0);
+    if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
+      ret.makeDense(ret.size1(),ret.size2(),fcn_0);
     }
   }
+    
+  return ret;
 }
 
 template<class T>
@@ -848,9 +823,7 @@ void Matrix<T>::matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>&
 
 template<class T>
 Matrix<T> Matrix<T>::operator-() const{
-  Matrix<T> temp;
-  temp.unary_old(casadi_operators<T>::neg,*this);
-  return temp;
+  return unary(NEG,*this);
 }
 
 template<class T>
@@ -1146,62 +1119,62 @@ Matrix<T> Matrix<T>::__constpow__(const Matrix<T>& y) const{
 
 template<class T>
 Matrix<T> Matrix<T>::sin() const{
-  return unary_old(CasADi::casadi_operators<T>::sin);
+  return unary(SIN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::cos() const{
-  return unary_old(CasADi::casadi_operators<T>::cos);
+  return unary(COS,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::tan() const{
-  return unary_old(CasADi::casadi_operators<T>::tan);
+  return unary(TAN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::erf() const{
-  return unary_old(CasADi::casadi_operators<T>::erf);
+  return unary(ERF,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arcsin() const{
-  return unary_old(CasADi::casadi_operators<T>::asin);
+  return unary(ASIN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arccos() const{
-  return unary_old(CasADi::casadi_operators<T>::acos);
+  return unary(ACOS,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arctan() const{
-  return unary_old(CasADi::casadi_operators<T>::atan);
+  return unary(ATAN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sinh() const{
-  return unary_old(CasADi::casadi_operators<T>::sinh);
+  return unary(SINH,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::cosh() const{
-  return unary_old(CasADi::casadi_operators<T>::cosh);
+  return unary(COSH,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::tanh() const{
-  return unary_old(CasADi::casadi_operators<T>::tanh);
+  return unary(TANH,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::exp() const{
-  return unary_old(CasADi::casadi_operators<T>::exp);
+  return unary(EXP,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::log() const{
-  return unary_old(CasADi::casadi_operators<T>::log);
+  return unary(LOG,*this);
 }
 
 template<class T>
@@ -1211,32 +1184,32 @@ Matrix<T> Matrix<T>::log10() const{
 
 template<class T>
 Matrix<T> Matrix<T>::sqrt() const{
-  return unary_old(CasADi::casadi_operators<T>::sqrt);
+  return unary(SQRT,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::floor() const{
-  return unary_old(CasADi::casadi_operators<T>::floor);
+  return unary(FLOOR,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::ceil() const{
-  return unary_old(CasADi::casadi_operators<T>::ceil);
+  return unary(CEIL,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fabs() const{
-  return unary_old(CasADi::casadi_operators<T>::fabs);
+  return unary(FABS,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sign() const{
-  return unary_old(CasADi::casadi_operators<T>::sign);
+  return unary(SIGN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::erfinv() const{
-  return unary_old(CasADi::casadi_operators<T>::erfinv);
+  return unary(ERFINV,*this);
 }
 
 template<class T>
@@ -1571,13 +1544,6 @@ void Matrix<T>::binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&
     el0 += nz0;
     el1 += nz1;
   }
-}
-
-template<class T>
-Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
-  return ret;
 }
 
 template<class T>

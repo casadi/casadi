@@ -40,31 +40,12 @@ class casadi_operators{
     static T sub(const T&x, const T&y){ return x-y;}
     static T mul(const T&x, const T&y){ return x*y;}
     static T div(const T&x, const T&y){ return x/y;}
-    static T neg(const T&x){ return -x;}
-    static T exp(const T&x){ return ::exp(x);}
-    static T log(const T&x){ return ::log(x);}
     static T pow(const T&x, const T&y){ return ::pow(x,y);}
-    static T sqrt(const T&x){ return ::sqrt(x);}
-    static T sin(const T&x){ return ::sin(x);}
-    static T cos(const T&x){ return ::cos(x);}
-    static T tan(const T&x){ return ::tan(x);}
-    static T asin(const T&x){ return ::asin(x);}
-    static T acos(const T&x){ return ::acos(x);}
-    static T atan(const T&x){ return ::atan(x);}
-    static T floor(const T&x){ return ::floor(x);}
-    static T ceil(const T&x){ return ::ceil(x);}
     static T equality(const T&x, const T&y){ return x==y;}
     static T fmin(const T&x, const T&y){ return std::min(x,y);}
     static T fmax(const T&x, const T&y){ return std::max(x,y);}
-    static T fabs(const T&x){ return ::fabs(x);}
-    static T erf(const T&x){ return ::erf(x);}
-    static T sinh(const T&x){ return ::sinh(x);}
-    static T cosh(const T&x){ return ::cosh(x);}
-    static T tanh(const T&x){ return ::tanh(x);}
     static T constpow(const T&x, const T&y){ return ::pow(x,y);}
     static T printme(const T&x, const T&y){ return printme(x,y);} // BUG? Infinite loop?
-    static T sign(const T&x){ return CasADi::sign(x);}
-    static T erfinv(const T&x){ return CasADi::erfinv(x); }
 };
 } // namespace CasADi
 

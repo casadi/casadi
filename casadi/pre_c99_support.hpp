@@ -63,10 +63,6 @@ double fmax(double x, double y) throw();
 #endif
 
 namespace CasADi{
-  // These are nonstandard additions -- possibly move to another file
-  // Sign function
-  double sign(double x) throw();
-
   // Inverse of the error function
   double erfinv(double x) throw();
 }

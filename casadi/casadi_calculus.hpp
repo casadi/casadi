@@ -77,7 +77,7 @@ namespace CasADi{
   using std::exp;
   inline double exp(int x){return exp(double(x));}
 
-template<class T> T log(const T &x){return x.log();}
+  template<class T> T log(const T &x){return x.log();}
   using std::log;
   inline double log(int x){return log(double(x));}
 
@@ -129,9 +129,17 @@ template<class T> T log(const T &x){return x.log();}
   //@{
   /** \brief  CasADi additions */
   template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
+  
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
+  inline int printme(int x, int y){ return x;}
+
   template<class T> T sign(const T &x){return x.sign();}
+  inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;} // NOTE: sign(nan) == nan
+  inline int sign(int x){ return x<0 ? -1 : x>0 ? 1 : x; }
+
   template<class T> T erfinv(const T &x){return x.erfinv();}
+  inline double erfinv(int x){ return erfinv(double(x));}
+  
   //@}
 }
 

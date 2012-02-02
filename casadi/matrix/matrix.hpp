@@ -34,7 +34,7 @@
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
-#include "../casadi_calculus.hpp"
+#include "../casadi_math.hpp"
 
 namespace CasADi{
   
@@ -441,10 +441,8 @@ class Matrix : public PrintableObject{
 
     /** \brief  Unary function */
 #ifndef SWIG
-    Matrix<T> unary_old(T (*fcn)(const T&)) const;
     Matrix<T> binary_old(T (*fcn)(const T&, const T&), const Matrix<T>& y) const;
         
-    void unary_old(T (*fcn)(const T&), const Matrix<T>& x);
     void binary_old(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y);
     void matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y);
     void matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y);
