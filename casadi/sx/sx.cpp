@@ -634,42 +634,6 @@ SX SX::fabs() const{
     return SX::create(new BinarySXNode(FABS,*this));
 }
 
-SX casadi_operators<SX>::add(const SX&x, const SX&y){
-  return x.add(y);
-}
-
-SX casadi_operators<SX>::sub(const SX&x, const SX&y){
-  return x.sub(y);
-}
-
-SX casadi_operators<SX>::mul(const SX&x, const SX&y){
-  return x.mul(y);
-}
-
-SX casadi_operators<SX>::div(const SX&x, const SX&y){
-  return x.div(y);
-}
-
-SX casadi_operators<SX>::fmin(const SX&x, const SX&y){
-  return x.fmin(y);
-}
-
-SX casadi_operators<SX>::fmax(const SX&x, const SX&y){
-  return x.fmax(y);
-}
-
-SX casadi_operators<SX>::pow(const SX&x, const SX&y){
-  return x.__pow__(y);
-}
-
-SX casadi_operators<SX>::constpow(const SX&x, const SX&y){
-  return x.__constpow__(y);
-}
-
-SX casadi_operators<SX>::printme(const SX&x, const SX&y){
-  return x.printme(y);
-}
-
 SX::operator Matrix<SX>() const{
   return Matrix<SX>(1,1,*this);
 }

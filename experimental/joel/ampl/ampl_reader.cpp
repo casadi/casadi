@@ -140,10 +140,26 @@ void Lset(linpart *L, int nlin){
 char *f_OPVARVAL1(expr *e, char *buf){
   int k = e->a;
   casadi_assert(k>=0);
-  casadi_assert(k<nv1);
-  sprintf(buf, "x[%d]", k);
+  if(k>=nv1){
+    
+  } else {
+    //casadi_assert(k<nv1);
+    sprintf(buf, "x[%d]", k);
+  }
   return buf;
 }
+
+//                 k = cvmap[(expr_v *)e - var_e - nv1];
+//                 if (k < 0) {
+//                         fmt = pd_fmt;
+//                         k = Fortran1 - k;
+//                         }
+//                 else {
+//                         fmt = tv_fmt;
+//                         k += Fortran1;
+//                         }
+//                 }
+
 
 // char *f_OPVARVAL1(expr *e, char *buf){
 //   int k = e->a;

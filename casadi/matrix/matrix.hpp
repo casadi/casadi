@@ -28,7 +28,6 @@
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
-#include "../casadi_operators.hpp"
 #include "../stl_vector_tools.hpp"
 #include "slice.hpp"
 #include "submatrix.hpp"
@@ -437,17 +436,9 @@ class Matrix : public PrintableObject{
     static Matrix<T> matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y);
     static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
   //@}
+  
+    /// Perform binary operation without memory allocation
     static void binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping);
-
-    /** \brief  Unary function */
-#ifndef SWIG
-    Matrix<T> binary_old(T (*fcn)(const T&, const T&), const Matrix<T>& y) const;
-        
-    void binary_old(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y);
-    void matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y);
-    void matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y);
-    void scalar_matrix_old(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y);
-#endif
 
     //@{
     /// Elementwise operations -- Octave/Python naming

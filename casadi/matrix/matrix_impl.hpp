@@ -691,137 +691,6 @@ Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
 }
 
 template<class T>
-Matrix<T> Matrix<T>::binary_old(T (*fcn)(const T&, const T&), const Matrix<T>& y) const{
-  Matrix<T> temp;
-  temp.binary_old(fcn,*this,y);
-  return temp;
-}
-
-template<class T>
-void Matrix<T>::binary_old(T (*fcn)(const T&, const T&), const Matrix<T> &x, const Matrix<T> &y){
-  if(x.scalar())
-    if(y.scalar())
-      *this = fcn(x.toScalar(),y.toScalar());
-    else
-      scalar_matrix_old(fcn,x.toScalar(),y);
-  else if(y.scalar())
-    matrix_scalar_old(fcn,x,y.toScalar());
-  else
-    matrix_matrix_old(fcn,x,y);
-}
-
-template<class T>
-void Matrix<T>::scalar_matrix_old(T (*fcn)(const T&, const T&), const T& x, const Matrix<T>& y){
-  T fcn_x_0 = fcn(x,0);
-  if(casadi_limits<T>::isZero(fcn_x_0)){
-    // Start with an empty matrix: all elements are added to the end!
-    makeEmpty(y.size1(),y.size2());
-    
-    // Reserve space for the nonzeros
-    reserve(y.size());
-  } else {
-    // Start with an dense matrix: element access in constant time
-    makeDense(y.size1(),y.size2(),fcn_x_0);
-  }
-  
-  for(int i=0; i<size1(); ++i){ // loop over rows
-    for(int el=y.rowind(i); el<y.rowind(i+1); ++el){
-      int j = y.col(el);
-      elem(i,j) = fcn(x,y.at(el));
-    }
-  }
-}
-
-template<class T>
-void Matrix<T>::matrix_scalar_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const T& y){
-  T fcn_0_y = fcn(0,y);
-  if(casadi_limits<T>::isZero(fcn_0_y)){
-    // Start with an empty matrix: all elements are added to the end!
-    makeEmpty(x.size1(),x.size2());
-    
-    // Reserve space for the nonzeros
-    reserve(x.size());
-    
-  } else {
-    // Start with an dense matrix: element access in constant time
-    makeDense(x.size1(),x.size2(),fcn_0_y);
-  }
-  
-  for(int i=0; i<size1(); ++i){ // loop over rows
-    for(int el=x.rowind(i); el<x.rowind(i+1); ++el){
-      int j = x.col(el);
-      elem(i,j) = fcn(x.at(el),y);
-    }
-  }
-}
-
-template<class T>
-void Matrix<T>::matrix_matrix_old(T (*fcn)(const T&, const T&), const Matrix<T>& x, const Matrix<T>& y){
-  casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(),
-    "matrix_matrix: dimension mismatch." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString()
-  ); 
-  
-  // Make a deep copy if *this and x or y is the same object
-  if(this == &x)
-    *this = x;
-  else if(this == &y)
-    *this = y;
-
-  T fcn_0_0 = fcn(0,0);
-  if(casadi_limits<T>::isZero(fcn_0_0)){
-    // Start with an empty matrix: all elements are added to the end!
-    makeEmpty(0,x.size2());
-  
-    // Reserve space for the nonzeros
-    reserve(std::max(x.size(),y.size()),x.size1());
-  
-    for(int i=0; i<x.size1(); ++i){ // loop over rows
-      // Resize matrix
-      resize(i+1,x.size2());
-      
-      int el1 = x.rowind(i);
-      int el2 = y.rowind(i);
-      int k1 = x.rowind(i+1);
-      int k2 = y.rowind(i+1);
-      while(el1 < k1 || el2 < k2){
-        int j1 = (el1 < k1) ? x.col(el1) : size2() ;
-        int j2 = (el2 < k2) ? y.col(el2) : size2() ;
-        
-        if(j1==j2)
-          elem(i,j1) = fcn(x.data()[el1++],y.data()[el2++]); 
-        else if(j1>j2)
-          elem(i,j2) = fcn(0,y.data()[el2++]);
-        else
-          elem(i,j1) = fcn(x.data()[el1++],0);
-        }
-    }
-  
-  } else {
-    
-    // Start with an dense matrix: element access in constant time
-    makeDense(x.size1(),x.size2(),fcn_0_0);
-
-    for(int i=0; i<size1(); ++i){ // loop over rows
-    int el1 = x.rowind(i);
-    int el2 = y.rowind(i);
-    int k1 = x.rowind(i+1);
-    int k2 = y.rowind(i+1);
-    while(el1 < k1 || el2 < k2){
-      int j1 = (el1 < k1) ? x.col(el1) : size2() ;
-      int j2 = (el2 < k2) ? y.col(el2) : size2() ;
-      
-      if(j1==j2)
-        elem(i,j1) = fcn(x.data()[el1++],y.data()[el2++]); 
-      else if(j1>j2)
-        elem(i,j2) = fcn(0,y.data()[el2++]);
-      else
-        elem(i,j1) = fcn(x.data()[el1++],0);
-      }
-    }
-  }
-}
-
-template<class T>
 Matrix<T> Matrix<T>::operator-() const{
   return unary(NEG,*this);
 }
@@ -833,30 +702,22 @@ Matrix<T> Matrix<T>::operator+() const{
 
 template<class T>
 Matrix<T> Matrix<T>::__add__(const Matrix<T> &y) const{
-  Matrix<T> r;
-  r.binary_old(casadi_operators<T>::add,*this,y);
-  return r;
+  return binary(ADD,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__sub__(const Matrix<T> &y) const{
-  Matrix<T> r;
-  r.binary_old(casadi_operators<T>::sub,*this,y);
-  return r;
+  return binary(SUB,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__mul__(const Matrix<T> &y) const{
-  Matrix<T> r;
-  r.binary_old(casadi_operators<T>::mul,*this,y);
-  return r;
+  return binary(MUL,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
-  Matrix<T> r;
-  r.binary_old(casadi_operators<T>::div,*this,y);
-  return r;
+  return binary(DIV,*this,y);
 }
 
 // template<class T>
@@ -1109,12 +970,12 @@ int Matrix<T>::size(Sparsity sp) const{
 
 template<class T>
 Matrix<T> Matrix<T>::__pow__(const Matrix<T>& y) const{
-  return binary_old(CasADi::casadi_operators<T>::pow,y);
+  return binary(POW,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__constpow__(const Matrix<T>& y) const{
-  return binary_old(CasADi::casadi_operators<T>::constpow,y);
+  return binary(CONSTPOW,*this,y);
 }
 
 template<class T>
@@ -1214,17 +1075,17 @@ Matrix<T> Matrix<T>::erfinv() const{
 
 template<class T>
 Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
-  return binary_old(CasADi::casadi_operators<T>::fmin, y);
+  return binary(FMIN,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
-  return binary_old(CasADi::casadi_operators<T>::fmax, y);
+  return binary(FMAX,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::printme(const Matrix<T>& y) const{
-  return binary_old(CasADi::casadi_operators<T>::printme, y);
+  return binary(PRINTME,*this,y);
 }
 
 template<class T>
@@ -1548,23 +1409,114 @@ void Matrix<T>::binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&
 
 template<class T>
 Matrix<T> Matrix<T>::scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
+  // Return value
+  Matrix<T> ret(y.sparsity());
+  
+  // Nonzeros
+  std::vector<T>& ret_data = ret.data();
+  const std::vector<T>& x_data = x.data();
+  const T& x_val = x_data.empty() ? casadi_limits<T>::zero : x.front();
+  const std::vector<T>& y_data = y.data();
+  
+  // Do the operation on all non-zero elements
+  for(int el=0; el<y.size(); ++el){
+    casadi_math<T>::fun(op,x_val,y_data[el],ret_data[el]);
+  }
+
+  // Check the value of the structural zero-entries, if there are any
+  if(!y.dense() && !casadi_math<T>::fx0_is_zero(op)){
+    // Get the value for the structural zeros
+    T fcn_0;
+    casadi_math<T>::fun(op,x_val,casadi_limits<T>::zero,fcn_0);
+    if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
+      ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+    }
+  }
+    
   return ret;
 }
 
 template<class T>
 Matrix<T> Matrix<T>::matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
+  // Return value
+  Matrix<T> ret(x.sparsity());
+  
+  // Nonzeros
+  std::vector<T>& ret_data = ret.data();
+  const std::vector<T>& x_data = x.data();
+  const std::vector<T>& y_data = y.data();
+  const T& y_val = y_data.empty() ? casadi_limits<T>::zero : y.front();
+  
+  // Do the operation on all non-zero elements
+  for(int el=0; el<x.size(); ++el){
+    casadi_math<T>::fun(op,x_data[el],y_val,ret_data[el]);
+  }
+
+  // Check the value of the structural zero-entries, if there are any
+  if(!x.dense() && !casadi_math<T>::f0x_is_zero(op)){
+    // Get the value for the structural zeros
+    T fcn_0;
+    casadi_math<T>::fun(op,casadi_limits<T>::zero,y_val,fcn_0);
+    if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
+      ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+    }
+  }
+    
   return ret;
 }
 
 template<class T>
 Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
-  return ret;
+  casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(),
+    "matrix_matrix: dimension mismatch." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString()
+  ); 
+
+  // Nonzeros
+  const std::vector<T>& x_data = x.data();
+  const std::vector<T>& y_data = y.data();
+
+  // Sparsity patterns
+  const CRSSparsity& x_sp = x.sparsity();
+  const CRSSparsity& y_sp = y.sparsity();
+  
+  // Simpler algorithm if sparsity patterns are identical
+  if(x_sp==y_sp){
+    
+    // Return value
+    Matrix<T> ret(x_sp);
+    std::vector<T>& ret_data = ret.data();
+
+    // Do the operation on all non-zero elements
+    for(int el=0; el<x.size(); ++el){
+      casadi_math<T>::fun(op,x_data[el],y_data[el],ret_data[el]);
+    }
+    
+    // Check the value of the structural zero-entries, if there are any
+    if(!x.dense() && !casadi_math<T>::f00_is_zero(op)){
+      // Get the value for the structural zeros
+      T fcn_0;
+      casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
+      ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+    }
+    
+    return ret;
+    
+  } else {
+    // Get the sparsity pattern
+    std::vector<unsigned char> mapping;
+    CRSSparsity ret_sp = x_sp.patternUnion(y_sp,mapping,
+                                           casadi_math<T>::f00_is_zero(op),
+                                           casadi_math<T>::f0x_is_zero(op),
+                                           casadi_math<T>::fx0_is_zero(op));
+    
+    // Create return matrix
+    Matrix<T> ret(ret_sp);
+    
+    // Perform the operation
+    binary_no_alloc(casadi_math<T>::fun,op,x,y,ret,mapping);
+    
+    return ret;
+  }
 }
 
 template<class T>

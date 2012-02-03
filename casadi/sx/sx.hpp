@@ -317,21 +317,6 @@ class casadi_limits<SX>{
     static const SX minus_inf;
 };
 
-template<>
-class casadi_operators<SX>{
-  public:
-    static SX add(const SX&x, const SX&y);
-    static SX sub(const SX&x, const SX&y);
-    static SX mul(const SX&x, const SX&y);
-    static SX div(const SX&x, const SX&y);
-    static SX pow(const SX&x, const SX&y);
-    static SX equality(const SX&x, const SX&y);
-    static SX fmin(const SX&x, const SX&y);
-    static SX fmax(const SX&x, const SX&y);
-    static SX printme(const SX&x, const SX&y);
-    static SX constpow(const SX&x, const SX&y);
-};
-
 #endif // SWIG
 
   typedef std::vector<SX> SXVector;

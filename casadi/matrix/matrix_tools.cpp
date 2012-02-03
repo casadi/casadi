@@ -25,7 +25,7 @@
 namespace CasADi{
   
   Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b){
-    return a.binary_old(CasADi::casadi_operators<double>::equality, b);
+    return Matrix<double>::binary(EQUALITY,a,b);
   }
   
   Matrix<double> operator>=(const Matrix<double>& a, const Matrix<double>& b){
