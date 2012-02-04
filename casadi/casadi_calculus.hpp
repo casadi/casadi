@@ -131,7 +131,14 @@ namespace CasADi{
   template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
   
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
-  inline int printme(int x, int y){ return x;}
+  inline int printme(int x, int y){
+    std::cout << "|> " << y << " : " << x << std::endl;
+    return x;
+  }
+  inline double printme(double x, double y){ 
+    std::cout << "|> " << y << " : " << x << std::endl;
+    return x;
+  }
 
   template<class T> T sign(const T &x){return x.sign();}
   inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;} // NOTE: sign(nan) == nan
@@ -474,12 +481,6 @@ class BinaryOperation<PRINTME>{
     template<typename T> inline static void fcn(const T& x, const T& y, T& f){f = printme(x,y); }
     template<typename T> inline static void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };
-
-template<>
-inline void BinaryOperation<PRINTME>::fcn<double>(const double& x, const double& y, double& f) {
-  f = x; 
-  std::cout << "|> " << y << " : " << x << std::endl;
-}
 
 } // namespace CasADi
 

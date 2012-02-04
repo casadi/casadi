@@ -66,6 +66,65 @@ class casadi_math{
     
 };
 
+/// Specialize the class so that it can be used with integer type
+template<>
+class casadi_math<int>{
+  public:
+
+    /** \brief Evaluate a built in function */
+    static void fun(unsigned char op, const int& x, const int& y, int& f){
+      double f_real(f);
+      casadi_math<double>::fun(op,double(x),double(y),f_real);
+      f = int(f_real);
+    }
+    
+    /** \brief Evaluate inplace a built in function (experimental) */
+    static void inplacefun(unsigned char op, const int& x, const int& y, int& f){
+      double f_real(f);
+      casadi_math<double>::inplacefun(op,double(x),double(y),f_real);
+      f = int(f_real);
+    }
+    
+    /** \brief Evaluate a built in derivative function */
+    static void der(unsigned char op, const int& x, const int& y, const int& f, int* d){
+      double d_real[2] = {d[0],d[1]};
+      casadi_math<double>::der(op,double(x),double(y),double(f),d_real);
+      d[0] = int(d_real[0]);
+      d[1] = int(d_real[1]);
+    }
+
+    /** \brief Evaluate the function and the derivative function */
+    static void derF(unsigned char op, const int& x, const int& y, int& f, int* d){
+      double d_real[2] = {d[0],d[1]};
+      double f_real(f);
+      casadi_math<double>::derF(op,double(x),double(y),f_real,d_real);
+      f = int(f_real);
+      d[0] = int(d_real[0]);
+      d[1] = int(d_real[1]);
+    }
+    
+    /** \brief Is a function zero when evaluating with both arguments zero */
+    static bool f00_is_zero(unsigned char op){ return casadi_math<double>::f00_is_zero(op);}
+    
+    /** \brief Is a function zero when evaluating with the first arguments zero */
+    static bool f0x_is_zero(unsigned char op){ return casadi_math<double>::f0x_is_zero(op);}
+    
+    /** \brief Is a function zero when evaluating with the second arguments zero */
+    static bool fx0_is_zero(unsigned char op){ return casadi_math<double>::fx0_is_zero(op);}
+    
+    /** \brief Number of dependencies */
+    static int ndeps(unsigned char op){ return casadi_math<double>::ndeps(op);}
+    
+    /** \brief Is a function commutative? */
+    static bool isCommutative(unsigned char op){ return casadi_math<double>::isCommutative(op);}
+    
+    /** \brief Print */
+    static void print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y){ casadi_math<double>::print(op,stream,x,y);}
+    static void printPre(unsigned char op, std::ostream &stream){ casadi_math<double>::printPre(op,stream);}
+    static void printSep(unsigned char op, std::ostream &stream){ casadi_math<double>::printSep(op,stream);}
+    static void printPost(unsigned char op, std::ostream &stream){ casadi_math<double>::printPost(op,stream);}
+};
+
 // Template implementations
 
 template<typename T>

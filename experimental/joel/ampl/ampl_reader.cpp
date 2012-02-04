@@ -109,13 +109,6 @@ char *fpval(real r){
 
 
 void binop(char *a, char *b, char *op, char *c){
-  if(a){
-    if(a == b){
-      printf("\t%s %s= %s;\n", a, op, c);
-    } else {
-      printf("\t%s = %s %s %s;\n", a, b, op, c);
-    }
-  }
 }
 
 void Lset(linpart *L, int nlin){
@@ -140,44 +133,11 @@ void Lset(linpart *L, int nlin){
 char *f_OPVARVAL1(expr *e, char *buf){
   int k = e->a;
   casadi_assert(k>=0);
-  if(k>=nv1){
-    
-  } else {
-    //casadi_assert(k<nv1);
-    sprintf(buf, "x[%d]", k);
-  }
+  casadi_assert(k<nv1);
   return buf;
 }
 
-//                 k = cvmap[(expr_v *)e - var_e - nv1];
-//                 if (k < 0) {
-//                         fmt = pd_fmt;
-//                         k = Fortran1 - k;
-//                         }
-//                 else {
-//                         fmt = tv_fmt;
-//                         k += Fortran1;
-//                         }
-//                 }
-
-
-// char *f_OPVARVAL1(expr *e, char *buf){
-//   int k = e->a;
-//   casadi_assert(k>=0);
-//   if(k >= nv1) {
-//     k = cvmap[(expr_v *)e - var_e - nv1];
-//     k += 1;
-//   }
-//   sprintf(buf, "x[%d]", k);
-//   return buf;
-// }
-
-
-
-
-
 char *f_OPNUM1(register expr *e, char *rv){
-  g_fmt(rv,((expr_nx *)e)->v);
   return rv;
 }
 SX get_expression(expr *e){
@@ -450,7 +410,6 @@ int ewalk(expr *e){
       case 10: /* variable value */
         i = (expr_v *)e - var_e;
         
-/*        printf("variable value = %d, vars.size() = %d, intermediates.empty() = %d\n",i,vars.size(),intermediates.empty());*/
         if(intermediates.empty()){
           intermediates.resize(1);
         }
@@ -560,39 +519,26 @@ static char * vprod(real t, int k){
   int i;
   
   if (t == 1.){
-    sprintf(buf, "x[%d]", k);
   } else if (t == -1.) {
-    buf[0] = '-';
-    sprintf(buf+1, "x[%d]", k);
   } else {
     i = g_fmt(buf, t);
-    buf[i++] = '*';
-    sprintf(buf+i, "x[%d]", k);
   }
   return buf;
 }
 
 char *rv_output(char *rv, char *eval, ograd *og){
-  char *s;
   for(; og; og = og->next){
     if(og->coef){
       break;
     }
   }
   if (og) {
-    
     SX f = og->coef * vars.at(og->varno);
-    
-    s = vprod(og->coef, og->varno);
     if (strcmp(eval, "0.")){
-      binop(rv, eval, "+", s);
       f += objs.at(0);
-    } else {
-      printf("\t%s = %s;\n", rv, s);
     }
     while(og = og->next){
       if (og->coef){
-        binop(rv, rv, "+",vprod(og->coef, og->varno));
         f += og->coef * vars.at(og->varno);
       }
     }
@@ -604,22 +550,12 @@ char *rv_output(char *rv, char *eval, ograd *og){
 
 char *con_linadd(int i, char *s){
   cgrad *cg;
-  char *s1;
-  
   for(cg = Cgrad[i]; cg; cg = cg->next){
     if (cg->coef) {
       SX f = cg->coef * vars.at(cg->varno);
-      s1 = vprod(cg->coef, cg->varno);
-      if (strcmp(s,"0.")){
-        binop(T, s, "+", s1);
-      } else {
-        printf("\t%s = %s;\n", T, s1);
-      }
-      s = T;
       while(cg = cg->next){
         if (cg->coef){
           f += cg->coef * vars.at(cg->varno);
-          binop(s, s, "+",vprod(cg->coef, cg->varno));
         }
       }
       cons.at(i) += f;
@@ -645,105 +581,18 @@ char *cv_name(linpart *L, char *buf){
   return f_OPVARVAL1(ep, buf);
 }
 
-void com_out(expr *e, linpart *L, int nlin, int k0){
-  char buf[32], bufg[32], res[32], vn[32];
-  printf("\n%s\t/*** defined variable %d ***/\n\n", "", k0+1);
-  int j = cvmap[k0];
-  casadi_assert(j>=0);
-  efuncb *eb = (efuncb *)e->op;
-  if (eb != (efuncb *)OPNUM && eb != (efuncb *)OPVARVAL){
-    e->a = j;
-  }
-  j--;
-  char *s = "v[%d]";
-  sprintf(res, s, j);
-  s = (*(efuncb *)e->op)(e, buf);
-  if(!L){
-    if(strcmp(res,s)){
-      printf("\t%s = %s;\n", res, s);
-    }
-    return;
-  }
-  int asg = !strcmp(s, "0.");
-  
-  dLR *d;
-  int op;
-  double t;
-  int k;
-  linpart *Le;
-  for(Le = L + nlin; L < Le; L++, asg = 0) {
-    d = dLRp(L->fac);
-    op = '+';
-    switch(k = d->kind){
-      case dLR_negone:
-        op = '-';
-      case dLR_one:
-        break;
-      case dLR_VP:
-        t = *d->o.vp;
-        if (t < 0. && !asg) {
-          t = -t;
-          op = '-';
-        }
-        g_fmt(bufg, t);
-        break;
-      default:
-        /*DEBUG*/ 
-        fprintf(Stderr,"Bad d->kind = %d in com_walk\n", d->kind);
-        exit(14);
-    }
-    if(asg){
-      printf(op == '-' ? "\t%s = -" : "\t%s = ", res);
-    } else if (res != s) {
-      printf("\t%s = %s %c ", res, s, op);
-    } else {
-      printf("\t%s %c= ", res, op);
-    }
-    if (k == dLR_VP){
-      printf("%s*", bufg);
-    }
-    printf("%s%s", cv_name(L,vn), ";\n");
-    s = res;
-  }
-}
-
 char *putout(expr *e, int i, int j, char *what, int k, int *z){
-  static char buf[32];
-  cexp1 *c1;
-  
-  ++k;
-  ndvtreset(z);
-  if (i < j) {
-    if(what){
-      printf("\n\n%s\t/*** defined variables for %s %d ***/\n","", what, k);
-    }
-    
-    for(c1 = cexps1 + i; i < j; i++, c1++){
-      com_out(c1->e, c1->L, c1->nlin, i + ncom0);
-    }
-  }
-  printf(what ? "\n%s  /***  %s %d  ***/\n\n" : "\n%s  /***  objective ***/\n\n", "", what, k);
-  return (*(efuncb *)e->op)(e, buf);
+  return "aa";
 }
 
 void obj_output(){
   static char rv[] = "rv";
   casadi_assert(n_obj==1);
-  printf(" real feval0_(long *nobj, real *x){\n");
   ograd *og;
   for(og = Ograd[0]; og; og = og->next){
     if (og->coef){
       break;
     }
-  }
-/*  casadi_assert(og==0);*/
-  printf(" /* Work vector */\n");
-  printf(" real v[%d];\n", omax.nvt);
-  if(omax.ncond){
-    printf(" static int cond[%d];\n", omax.ncond);
-  }
-  if (omax.needT1){
-    printf(" real t1, t2;\n");
   }
   
   char *eval, *s;
@@ -752,43 +601,23 @@ void obj_output(){
   for(; i < n_obj; i++, c1++){
     eval = putout(obj_de[i].e, c1[0], c1[1],n_obj > 1 ? const_cast<char*>("objective") : NULL, i, zao[i]);
     s = rv_output(rv, eval, Ograd[i]);
-    printf("\n\treturn %s;\n", s);
   }
-  
-  printf("}\n");
   branches = 0;
 }
   
 void con_output(){
-  printf("\n void ceval0_(real *x, real *c)\n{");
-
   if(n_con){
-    printf("\n\treal v[%d];\n", cmax.nvt);
-    printf("\tstatic int cond[%d];\n", cmax.ncond);
-    printf("\treal t1, t2;\n");
-      
     int i;
     int *c1 = c_cexp1st;
     for(i = 0; i < n_con; i++, c1++) {
       char *s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
-      printf("\tc[%d] = %s;\n", i, con_linadd(i,s));
+      con_linadd(i,s);
     }
   }
-  printf("}\n");
   branches = 0;
 }
       
 void output(){
-  printf("#include \"math.h\"\n#define real double\n");
-  printf(" real boundc_[1+%d+%d] /* Infinity, variable bounds, constraint bounds */ = {1.7e308",2*nv1, 2*n_con);
-  real *b = LUv;
-  real *be = b + 2*(n_con + nv1);
-  while(b < be){
-    printf(",%s", fpval(*b++));
-  }
-  
-  printf("};\n\n");
-        
   obj_output();
   con_output();
 }
@@ -1003,7 +832,7 @@ int main(int argc, char **argv){
   
   // Set options
 /*  nlp_solver.setOption("max_iter",10);*/
-/*  nlp_solver.setOption("verbose",true);*/
+//   nlp_solver.setOption("verbose",true);
 //  nlp_solver.setOption("linear_solver","ma57");
   nlp_solver.setOption("generate_hessian",true);
 /*  nlp_solver.setOption("hessian_approximation","limited-memory");*/
