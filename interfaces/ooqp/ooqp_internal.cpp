@@ -26,8 +26,6 @@
 #include "casadi/matrix/matrix_tools.hpp"
 #include "casadi/stl_vector_tools.hpp"
 
-#include "casadi/pre_c99_support.hpp"
-
 #include "Status.h"
 // #define getPtr(x) (&(x).front())
 

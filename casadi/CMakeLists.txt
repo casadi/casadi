@@ -13,7 +13,6 @@ SET(CASADI_SRCS
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
   generic_type_internal.hpp   generic_type_internal.cpp # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
-  pre_c99_support.hpp         pre_c99_support.cpp       # Some functions that ensures compatibility with C++ compilers not supporting the C99 standard
   stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
 
   # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)

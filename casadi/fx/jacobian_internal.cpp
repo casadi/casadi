@@ -22,7 +22,6 @@
 
 #include "jacobian_internal.hpp"
 #include "../stl_vector_tools.hpp"
-#include "../pre_c99_support.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
 #include <stack>

@@ -31,7 +31,6 @@
 #include "external_packages/tinyxml/tinyxml.h"
 
 #include "../casadi/casadi_exception.hpp"
-#include "../casadi/pre_c99_support.hpp"
 #include "../casadi/stl_vector_tools.hpp"
 #include "variable_tools.hpp"
 #include "../casadi/matrix/matrix_tools.hpp"

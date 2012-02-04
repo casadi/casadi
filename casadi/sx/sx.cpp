@@ -24,7 +24,6 @@
 #include "../matrix/matrix.hpp"
 #include <stack>
 #include <cassert>
-#include "../pre_c99_support.hpp"
 #include "../casadi_math.hpp"
 
 using namespace std;
