@@ -35,95 +35,75 @@ namespace CasADi{
   /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
   template<class T> T sqrt(const T &x){return x.sqrt();}
   using std::sqrt;
-  inline double sqrt(int x){return sqrt(double(x));}
 
   template<class T> T sin(const T &x){return x.sin();}
   using std::sin;
-  inline double sin(int x){return sin(double(x));}
   
   template<class T> T cos(const T &x){return x.cos();}
   using std::cos;
-  inline double cos(int x){return cos(double(x));}
 
   template<class T> T tan(const T &x){return x.tan();}
   using std::tan;
-  inline double tan(int x){return tan(double(x));}
 
   template<class T> T atan(const T &x){return x.arctan();}
   using std::atan;
-  inline double atan(int x){return atan(double(x));}
 
   template<class T> T asin(const T &x){return x.arcsin();}
   using std::asin;
-  inline double asin(int x){return asin(double(x));}
 
   template<class T> T acos(const T &x){return x.arccos();}
   using std::acos;
-  inline double acos(int x){return acos(double(x));}
 
   template<class T> T sinh(const T &x){return x.sinh();}
   using std::sinh;
-  inline double sinh(int x){return sinh(double(x));}
 
   template<class T> T cosh(const T &x){return x.cosh();}
   using std::cosh;
-  inline double cosh(int x){return cosh(double(x));}
 
   template<class T> T tanh(const T &x){return x.tanh();}
   using std::tanh;
-  inline double tanh(int x){return tanh(double(x));}
 
   template<class T> T exp(const T &x){return x.exp();}
   using std::exp;
-  inline double exp(int x){return exp(double(x));}
 
   template<class T> T log(const T &x){return x.log();}
   using std::log;
-  inline double log(int x){return log(double(x));}
 
   template<class T> T log10(const T &x){return x.log10();}
   using std::log10;
-  inline double log10(int x){return log10(double(x));}
 
   template<class T> T pow(const T &x, const T &n){ return x.__pow__(n);}
   template<class T> T pow(const T &x,   double n){ return x.__pow__(n);}
   template<class T> T pow(double   x, const T &n){ return T(x).__pow__(n);}
   using std::pow;
-  inline double pow(int x, int y){return pow(double(x),double(y));}
 
   template<class T> T abs(const T &x){return x.fabs();}
   using std::abs;
     
   template<class T> T fabs(const T &x){return x.fabs();}
   using std::fabs;
-  inline int fabs(int x){return x>=0 ? x : -x; }
   
   template<class T> T floor(const T &x){return x.floor();}
   using std::floor;
-  inline int floor(int x){return x; }
   
   template<class T> T ceil(const T &x){return x.ceil();}
   using std::ceil;
-  inline int ceil(int x){return x; }
   //@}
 
   //@{
   /** \brief  C99 elementary functions from the math.h header */
   template<class T> T erf(const T &x){return x.erf();}
   using ::erf;
-  inline double erf(int x){return erf(double(x));}
   
   template<class T> T fmin(const T &x, const T &n){ return x.fmin(n);}
   template<class T> T fmin(const T &x,   double n){ return x.fmin(n);}
   template<class T> T fmin(double   x, const T &n){ return T(x).fmin(n);}
   using ::fmin;
-  inline int fmin(int x, int y){return x<=y ? x : y;}
 
   template<class T> T fmax(const T &x, const T &n){ return x.fmax(n);}
   template<class T> T fmax(const T &x,   double n){ return x.fmax(n);}
   template<class T> T fmax(double   x, const T &n){ return T(x).fmax(n);}
   using ::fmax;
-  inline int fmax(int x, int y){return x>=y ? x : y;}
   //@}
 
   //@{
@@ -131,10 +111,6 @@ namespace CasADi{
   template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
   
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
-  inline int printme(int x, int y){
-    std::cout << "|> " << y << " : " << x << std::endl;
-    return x;
-  }
   inline double printme(double x, double y){ 
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
@@ -142,10 +118,8 @@ namespace CasADi{
 
   template<class T> T sign(const T &x){return x.sign();}
   inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;} // NOTE: sign(nan) == nan
-  inline int sign(int x){ return x<0 ? -1 : x>0 ? 1 : x; }
 
   template<class T> T erfinv(const T &x){return x.erfinv();}
-  inline double erfinv(int x){ return erfinv(double(x));}
   
   //@}
 }

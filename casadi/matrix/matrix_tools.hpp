@@ -742,7 +742,7 @@ Matrix<T> norm_1(const Matrix<T>& x){
 
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x){
-  return sqrt(sumAll(x*x));
+  return sqrt(1.0*sumAll(x*x));
 }
 
 template<class T>
