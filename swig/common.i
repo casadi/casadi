@@ -154,12 +154,6 @@ _object = _copyableObject
 %}
 #endif
 
-#ifdef SWIGPYTHON
-#ifndef WITH_NUMPY
-//#warning "Not using numpy. option(WITH_NUMPY = OFF)"
-#endif
-
-
 // Exceptions handling
 %include "exception.i"
 %exception {
@@ -171,6 +165,11 @@ try {
     SWIG_exception(SWIG_RuntimeError, e);
   }
 }
+
+#ifdef SWIGPYTHON
+#ifndef WITH_NUMPY
+//#warning "Not using numpy. option(WITH_NUMPY = OFF)"
+#endif
 
 #ifdef WITH_NUMPY
 //#warning "Using numpy. option(WITH_NUMPY = ON)"
