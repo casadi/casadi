@@ -299,7 +299,7 @@ void NLPSolverInternal::init(){
             log("MX Lagrangian Hessian sparsity determined");
             
             // Uni-directional coloring (note, the hessian is symmetric)
-            CRSSparsity coloring = unidirectionalColoring(H_sp, H_sp);
+            CRSSparsity coloring = H_sp.unidirectionalColoring(H_sp);
             log("MX Lagrangian Hessian coloring determined");
 
             // Number of colors needed is the number of rows

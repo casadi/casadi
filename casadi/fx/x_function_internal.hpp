@@ -83,7 +83,8 @@ class XFunctionInternal : public FXInternal{
     /** \brief  Construct a complete Jacobian by compression */
     template<typename M>
     std::vector<M> jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
-                          const std::vector<M>& inputv, std::vector<M>& outputv);
+                          const std::vector<M>& inputv, std::vector<M>& outputv,
+                          const std::vector<bool>& symmetric_block);
                           
     /// Propagate the sparsity seeds
     virtual void spProp(bool fwd) = 0;
@@ -436,7 +437,8 @@ cout << "  "<< ii++ << ": ";
 
 template<typename M>
 std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
-                                         const std::vector<M>& inputv, std::vector<M>& outputv){
+                                         const std::vector<M>& inputv, std::vector<M>& outputv, 
+                                         const std::vector<bool>& symmetric_block){
   using namespace std;
   if(verbose()) cout << "XFunctionInternal::jacGen begin" << endl;
   
@@ -445,6 +447,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   
   // Which blocks are involved in the Jacobian
   vector<pair<int,int> > jblocks_no_f;
+  vector<bool> symmetric_block_no_f;
   vector<int> jblock_ind;
   
   // Add the information we already know
@@ -461,6 +464,8 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       // Mark block for evaluation
       jblocks_no_f.push_back(jblocks[i]);
       jblock_ind.push_back(i);
+/*      symmetric_block_no_f.push_back(!symmetric_block.empty() && symmetric_block[i]);*/
+      symmetric_block_no_f.push_back(false);
       
       // Save sparsity
       ret[i] = M(jacSparsity(iind,oind,compact));
@@ -480,7 +485,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   
   // Get a bidirectional partition
   vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
-  getPartition(jblocks_no_f,D1,D2,true);
+  getPartition(jblocks_no_f,D1,D2,true,symmetric_block_no_f);
 
   // Get the number of forward and adjoint sweeps
   int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
@@ -600,6 +605,9 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   // The nonzeros of the sensitivity matrix
   vector<int> nzmap;
   
+  // A vector used to resolve collitions between directions
+  vector<int> hits;
+  
   // Carry out the forward sweeps
   for(int dir=0; dir<nfwd; ++dir){
     
@@ -608,6 +616,34 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       
       // Get the output index
       int oind = jblocks_no_f[v].first;
+      int iind = jblocks_no_f[v].second;
+
+      // Is the block symmetric
+      bool symmetric = symmetric_block_no_f[v];
+      
+      // If symmetric, see how many times each output appears
+      if(symmetric){
+        // Initialize to zero
+        hits.resize(output(oind).sparsity().size());
+        fill(hits.begin(),hits.end(),0);
+        
+        // Get the sparsity of the Jacobian block
+        const CRSSparsity& jsp = jacSparsity(iind,oind,true);
+        const vector<int>& jsp_rowind = jsp.rowind();
+        const vector<int>& jsp_col = jsp.col();
+
+        // "Multiply" Jacobian sparsity by seed vector
+        for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
+          
+          // Get the input nonzero
+          int c = D1[v].col(el);
+          
+          // Propagate dependencies
+          for(int el_jsp=jsp_rowind[c]; el_jsp<jsp_rowind[c+1]; ++el_jsp){
+            hits[jsp_col[el_jsp]]++;
+          }
+        }
+      }
 
       // Locate the nonzeros of the forward sensitivity matrix
       output(oind).sparsity().getElements(nzmap,false);
@@ -632,8 +668,17 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
           // The nonzero of the Jacobian now treated
           int elJ = mapping[v][el_out];
           
-          // Get the output seed
-          ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
+          // If symmetric, also save the entries of the transpose
+          if(symmetric){
+            // If we are interested in the row
+            if(hits[el]==1){
+              ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
+              ret[jblock_ind[v]].at(el_out) = fsens[dir][oind].at(f_out);
+            }
+          } else {
+            // Get the output seed
+            ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
+          }
         }
       }
     }

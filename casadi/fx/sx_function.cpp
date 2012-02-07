@@ -97,11 +97,11 @@ bool SXFunction::checkNode() const{
   return dynamic_cast<const SXFunctionInternal*>(get())!=0;
 }
 
-SXMatrix SXFunction::jac(int iind, int oind, bool compact){
+SXMatrix SXFunction::jac(int iind, int oind, bool compact, bool symmetric){
   if(input(iind).empty() || output(oind).empty()) return Matrix<SX>(); // quick return
   vector<pair<int,int> > jblocks(1,pair<int,int>(oind,iind));
   if(!isInit()) init();
-  return jac(jblocks,compact).front();
+  return jac(jblocks,compact,vector<bool>(1,symmetric)).front();
 }
 
 SXMatrix SXFunction::grad(int iind, int oind){
@@ -135,7 +135,7 @@ SXMatrix SXFunction::hess(int iind, int oind){
   if((*this)->verbose()){
     cout << "SXFunction::hess: calculating Jacobian " << endl;
   }
-  SXMatrix ret = gfcn.jac();
+  SXMatrix ret = gfcn.jac(0,0,false,true);
   if((*this)->verbose()){
     cout << "SXFunction::hess: calculating Jacobian done" << endl;
   }
@@ -178,8 +178,8 @@ void SXFunction::clearSymbolic(){
   (*this)->clearSymbolic();
 }
 
-vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks, bool compact){
-  return (*this)->jac(jblocks,compact);
+vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
+  return (*this)->jac(jblocks,compact,symmetric_block);
 }
 
 SXFunction::SXFunction(const MXFunction& f){

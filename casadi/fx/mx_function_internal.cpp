@@ -643,8 +643,8 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
   return MXFunction(inputv_,j_out);
 }
 
-vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact){
-  return jacGen<MX>(jblocks,compact,inputv_,outputv_);
+vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
+  return jacGen<MX>(jblocks,compact,inputv_,outputv_,symmetric_block);
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){

@@ -2607,6 +2607,200 @@ void CRSSparsityInternal::getNZInplace(std::vector<int>& indices) const{
   fill(it,indices.end(),-1);
 }
 
+CRSSparsity CRSSparsityInternal::unidirectionalColoring(const CRSSparsity& AT) const{
+  // Allocate temporary vectors
+  vector<int> forbiddenColors;
+  forbiddenColors.reserve(nrow_);
+  vector<int> color(nrow_,0);
+  
+  // Access the sparsity of the transpose
+  const vector<int>& AT_rowind = AT.rowind();
+  const vector<int>& AT_col = AT.col();
+  
+  // Loop over rows
+  for(int i=0; i<nrow_; ++i){
+    
+    // Loop over nonzero elements
+    for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
+      
+      // Get column
+      int c = col_[el];
+        
+      // Loop over previous rows that have an element in column c
+      for(int el_prev=AT_rowind[c]; el_prev<AT_rowind[c+1]; ++el_prev){
+        
+        // Get the row
+        int i_prev = AT_col[el_prev];
+        
+        // Escape loop if we have arrived at the current row
+        if(i_prev>=i)
+          break;
+        
+        // Get the color of the row
+        int color_prev = color[i_prev];
+        
+        // Mark the color as forbidden for the current row
+        forbiddenColors[color_prev] = i;
+      }
+    }
+    
+    // Get the first nonforbidden color
+    int color_i;
+    for(color_i=0; color_i<forbiddenColors.size(); ++color_i){
+      // Break if color is ok
+      if(forbiddenColors[color_i]!=i) break;
+    }
+    color[i] = color_i;
+    
+    // Add color if reached end
+    if(color_i==forbiddenColors.size())
+      forbiddenColors.push_back(0);
+  }
+  
+  // Create return sparsity containing the coloring
+  CRSSparsity ret(forbiddenColors.size(),nrow_);
+  vector<int>& rowind = ret.rowindRef();
+  vector<int>& col = ret.colRef();
+  
+  // Get the number of columns for each row
+  for(int i=0; i<color.size(); ++i){
+    rowind[color[i]+1]++;
+  }
+  
+  // Cumsum
+  for(int j=0; j<forbiddenColors.size(); ++j){
+    rowind[j+1] += rowind[j];
+  }
+  
+  // Get column for each row
+  col.resize(color.size());
+  for(int j=0; j<col.size(); ++j){
+    col[rowind[color[j]]++] = j;
+  }
+  
+  // Swap index back one step
+  for(int j=rowind.size()-2; j>=0; --j){
+    rowind[j+1] = rowind[j];
+  }
+  rowind[0] = 0;
+  
+  // Return the coloring
+  return ret;
+}
+
+CRSSparsity CRSSparsityInternal::starColoring() const{
+  // Allocate temporary vectors
+  vector<int> forbiddenColors;
+  forbiddenColors.reserve(nrow_);
+  vector<int> color(nrow_,-1);
+
+  // 4: for i <- 1 to |V | do
+  for(int i=0; i<nrow_; ++i){
+        
+    // 5: for each w \in N1 (vi ) do
+    for(int w_el=rowind_[i]; w_el<rowind_[i+1]; ++w_el){
+      int w = col_[w_el];
+              
+      // 6: if w is colored then
+      if(color[w]!=-1){
+        
+        // 7: forbiddenColors[color[w]] <- v
+        forbiddenColors[color[w]] = i;
+        
+      } // 8: end if
+
+      // 9: for each colored vertex x \in N1 (w) do
+      for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
+        int x = col_[x_el];
+        if(color[x]==-1) continue;
+        
+        // 10: if w is not colored then
+        if(color[w]==-1){
+          
+          //11: forbiddenColors[color[x]] <- vi
+          forbiddenColors[color[x]] = i;
+          
+        } else { // 12: else
+          
+          // 13: for each colored vertex y \in N1 (x), y != w do
+          for(int y_el=rowind_[x]; y_el<rowind_[x+1]; ++y_el){
+            int y = col_[y_el];
+            if(color[y]==-1 || y==w) continue;
+            
+            // 14: if color[y] = color[w] then
+            if(color[y]==color[w]){
+              
+              // 15: forbiddenColors[color[x]] <- vi
+              forbiddenColors[color[x]] = i;
+              
+              // 16: break
+              break;
+              
+            } // 17: end if
+            
+          } // 18: end for
+          
+        } // 19: end if
+
+      } // 20 end for
+      
+    } // 21 end for
+    
+    // 22: color[v] <- min{c > 0 : forbiddenColors[c] = v}
+    bool new_color = true;
+    for(int color_i=0; color_i<forbiddenColors.size(); ++color_i){
+      // Break if color is ok
+      if(forbiddenColors[color_i]!=i){
+        color[i] = color_i;
+        new_color = false;
+        break;
+      }
+    }
+    
+    // New color if reached end
+    if(new_color){
+      color[i] = forbiddenColors.size();
+      forbiddenColors.push_back(-1);
+    }
+  
+  } // 23 end for
+  
+  // Create return sparsity containing the coloring
+  CRSSparsity ret(forbiddenColors.size(),nrow_);
+  vector<int>& rowind = ret.rowindRef();
+  vector<int>& col = ret.colRef();
+  
+  // Get the number of columns for each row
+  for(int i=0; i<color.size(); ++i){
+    rowind[color[i]+1]++;
+  }
+  
+  // Cumsum
+  for(int j=0; j<forbiddenColors.size(); ++j){
+    rowind[j+1] += rowind[j];
+  }
+  
+  // Get column for each row
+  col.resize(color.size());
+  for(int j=0; j<col.size(); ++j){
+    col[rowind[color[j]]++] = j;
+  }
+  
+  // Swap index back one step
+  for(int j=rowind.size()-2; j>=0; --j){
+    rowind[j+1] = rowind[j];
+  }
+  rowind[0] = 0;
+  
+  cout << "matrix:" << endl;
+  print(cout);
+  cout << "coloring:" << endl;
+  ret.print();
+  
+  // Return the coloring
+  return ret;
+}
+
 } // namespace CasADi
 
 

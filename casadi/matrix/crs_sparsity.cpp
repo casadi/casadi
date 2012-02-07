@@ -404,5 +404,17 @@ void CRSSparsity::getNZInplace(std::vector<int>& indices) const{
   (*this)->getNZInplace(indices);
 }
 
+CRSSparsity CRSSparsity::unidirectionalColoring(const CRSSparsity& AT) const{
+  if(AT.isNull()){
+    return (*this)->unidirectionalColoring(transpose());
+  } else {
+    return (*this)->unidirectionalColoring(AT);
+  }
+}
+
+CRSSparsity CRSSparsity::starColoring() const{
+  return (*this)->starColoring();
+}
+
 
 } // namespace CasADi

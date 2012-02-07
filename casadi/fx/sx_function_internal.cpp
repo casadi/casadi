@@ -285,8 +285,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 }
 
-vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact){
-  return jacGen<Matrix<SX> >(jblocks,compact,inputv_,outputv_);
+vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const vector<bool>& symmetric_block){
+  return jacGen<Matrix<SX> >(jblocks,compact,inputv_,outputv_,symmetric_block);
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -966,9 +966,8 @@ FX SXFunctionInternal::hessian(int iind, int oind){
     gfcn.setOption("verbose",getOption("verbose"));
     gfcn.setOption("numeric_jacobian",false);
     gfcn.init();
-    
     if(verbose()) cout << "SXFunctionInternal::hessian: calculating symbolic Jacobian" << endl;
-    SXMatrix h = gfcn.jac(0,0);
+    SXMatrix h = gfcn.jac(0,0,false,true);
     
     if(false){ // Does not appear to help
       // Calculate the transpose of the sparsity pattern
@@ -1069,6 +1068,12 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Get the number of forward and adjoint sweeps
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
+  
+/*  std::cout << "nfwd = " <<  nfwd << std::endl;
+  std::cout << "nadj = " <<  nadj << std::endl;*/
+  
+
+  
   
   // Quick return if no sensitivities
   if(nfwd==0 && nadj==0) return;

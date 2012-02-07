@@ -320,6 +320,12 @@ class CRSSparsity : public SharedObject{
     /// Get the location of all nonzero elements (inplace version)
     void getElements(std::vector<int>& loc, bool row_major=true) const;
     
+    /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
+    CRSSparsity unidirectionalColoring(const CRSSparsity& AT=CRSSparsity()) const;
+
+    /** \brief Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
+    CRSSparsity starColoring() const;
+    
     std::string dimString() 	const;
 
 };

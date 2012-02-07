@@ -94,7 +94,7 @@ void JacobianInternal::init(){
       vector<pair<int,int> > jblocks_no_f(1,jblocks_[i]);
       D1_.resize(1);
       D2_.resize(1);
-      fcn_->getPartition(jblocks_no_f,D1_,D2_,false);
+      fcn_->getPartition(jblocks_no_f,D1_,D2_,false,vector<bool>(jblocks_no_f.size(),false));
 
       // Increase the number of sensitivities in the user function
       int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();

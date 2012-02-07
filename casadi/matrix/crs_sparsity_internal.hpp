@@ -230,6 +230,12 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// vector of length n+1 containing the index of the last non-zero element up till each row 
     std::vector<int> rowind_;
     
+    /// Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
+    CRSSparsity unidirectionalColoring(const CRSSparsity& AT) const;
+
+    /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+    CRSSparsity starColoring() const;
+
 };
 
 } // namespace CasADi

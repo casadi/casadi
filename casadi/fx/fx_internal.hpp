@@ -101,11 +101,8 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Output of the function */
     std::vector<FunctionIO> output_;
 
-    /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
-    virtual CRSSparsity unidirectionalColoring(const CRSSparsity& A, const CRSSparsity& AT);
-
     /** \brief Get the unidirectional or bidirectional partition */
-    virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2, bool compact);
+    virtual void getPartition(const std::vector<std::pair<int,int> >& blocks, std::vector<CRSSparsity> &D1, std::vector<CRSSparsity> &D2, bool compact, const std::vector<bool>& symmetric_block);
 
     /// Verbose mode?
     bool verbose() const;

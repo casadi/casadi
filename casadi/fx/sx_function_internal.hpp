@@ -75,7 +75,7 @@ class SXFunctionInternal : public XFunctionInternal{
   virtual FX hessian(int iind=0, int oind=0);
 
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false);
+  std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false, const std::vector<bool>& symmetric_block=std::vector<bool>());
   
   /** \brief  DATA MEMBERS */
   

@@ -74,7 +74,7 @@ class MXFunctionInternal : public XFunctionInternal{
     std::vector<MX> jac(int iind);
 
     /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-    std::vector<MX> jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false);
+    std::vector<MX> jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false, const std::vector<bool>& symmetric_block=std::vector<bool>());
 
     /** \brief Jacobian via source code transformation */
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);

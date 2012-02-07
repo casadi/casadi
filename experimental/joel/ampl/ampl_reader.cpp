@@ -832,7 +832,7 @@ int main(int argc, char **argv){
   
   // Set options
 /*  nlp_solver.setOption("max_iter",10);*/
-//   nlp_solver.setOption("verbose",true);
+  nlp_solver.setOption("verbose",true);
 //  nlp_solver.setOption("linear_solver","ma57");
   nlp_solver.setOption("generate_hessian",true);
 /*  nlp_solver.setOption("hessian_approximation","limited-memory");*/
