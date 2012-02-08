@@ -43,7 +43,7 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("iteration_callback_step", OT_INTEGER,     1,       "Only call the callback function every few iterations.");
   addOption("iteration_callback_ignore_errors", OT_BOOLEAN,     false,      "If set to true, errors thrown by iteration_callback will be ignored.");
   addOption("ignore_check_vec", OT_BOOLEAN,     false,            "If set to true, the input shape of F will not be checked.");
-  addOption("warn_initial_bounds", OT_BOOLEAN,     true,       "Warn if the initial guess does not satisfy LBX and UBX");
+  addOption("warn_initial_bounds", OT_BOOLEAN,     false,       "Warn if the initial guess does not satisfy LBX and UBX");
   addOption("parametric", OT_BOOLEAN, false, "Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.");
   
   n_ = 0;
@@ -423,7 +423,7 @@ void NLPSolverInternal::init(){
 }
 
 void NLPSolverInternal::checkInitialBounds() { 
-  if (getOption("warn_initial_bounds")) {
+  if(bool(getOption("warn_initial_bounds"))){
     bool violated = false;
     for (int k=0;k<input(NLP_X_INIT).size();++k) {
       if (input(NLP_X_INIT).at(k)>input(NLP_UBX).at(k)) {

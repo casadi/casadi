@@ -482,7 +482,9 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
   return jsp;
 }
 
-void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSparsity> &D1, vector<CRSSparsity> &D2, bool compact, const std::vector<bool>& symmetric_block){
+void FXInternal::getPartition(const vector<pair<int,int> >& blocks, 
+                              vector<CRSSparsity> &D1, vector<CRSSparsity> &D2, 
+                              bool compact, const std::vector<bool>& symmetric_block){
   casadi_assert(blocks.size()==1);
   int oind = blocks.front().first;
   int iind = blocks.front().second;
