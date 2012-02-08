@@ -496,25 +496,39 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks, vector<CRSSp
   mapping.clear();
   
   // Which AD mode?
-  bool use_ad_fwd;
+  bool test_ad_fwd=true, test_ad_adj=true;
   if(getOption("ad_mode") == "forward"){
-    use_ad_fwd = true;
+    test_ad_adj = false;
   } else if(getOption("ad_mode") == "reverse"){
-    use_ad_fwd = false;
-  } else if(getOption("ad_mode") == "automatic"){
-    use_ad_fwd = input(iind).size() <= output(oind).size();
-  } else {
+    test_ad_fwd = false;
+  } else if(getOption("ad_mode") != "automatic"){
     casadi_error("FXInternal::jac: Unknown ad_mode \"" << getOption("ad_mode") << "\". Possible values are \"forward\", \"reverse\" and \"automatic\".");
   }
   
   // Get seed matrices by graph coloring
   if(symmetric){
+    // Star coloring if symmetric
     D1[0] = A.starColoring();
+    
   } else {
-    if(use_ad_fwd){
+    
+    // Test unidirectional coloring using forward mode
+    if(test_ad_fwd){
       D1[0] = AT.unidirectionalColoring(A);
-    } else {
+    }
+      
+    // Test unidirectional coloring using reverse mode
+    if(test_ad_adj){
       D2[0] = A.unidirectionalColoring(AT);
+    }
+
+    // Use whatever required less colors if we tried both (with preference to forward mode)
+    if(test_ad_fwd && test_ad_adj){
+      if((D1[0].size1() <= D2[0].size1())){
+        D2[0]=CRSSparsity();
+      } else {
+        D1[0]=CRSSparsity();
+      }
     }
   }
 }
