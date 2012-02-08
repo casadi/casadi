@@ -412,8 +412,16 @@ CRSSparsity CRSSparsity::unidirectionalColoring(const CRSSparsity& AT) const{
   }
 }
 
-CRSSparsity CRSSparsity::starColoring() const{
-  return (*this)->starColoring();
+CRSSparsity CRSSparsity::starColoring(int ordering) const{
+  return (*this)->starColoring(ordering);
+}
+
+std::vector<int> CRSSparsity::largestFirstOrdering() const{
+  return (*this)->largestFirstOrdering();
+}
+
+CRSSparsity CRSSparsity::pmult(const std::vector<int>& p, bool permute_rows, bool permute_columns, bool invert_permutation) const{
+  return (*this)->pmult(p,permute_rows,permute_columns,invert_permutation);
 }
 
 

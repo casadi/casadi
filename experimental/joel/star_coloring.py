@@ -22,10 +22,14 @@ print coloring
 coloring = A.sparsity().starColoring()
 print coloring
 
+# Largest first ordering
+ordering = A.sparsity().largestFirstOrdering()
+print "ordering = ", ordering
+
 # Create a function whose hessian has the corresponding sparsity pattern
 x = ssym("x",5)
-y = sin(x[0])
-f = y*(x[1]+x[2]+x[3]+x[4])
+y = sin(x[4])
+f = y*(x[0]+x[1]+x[2]+x[3])
 ff = SXFunction([x],[f])
 ff.init()
 
@@ -36,8 +40,10 @@ gff = SXFunction([x],[gf])
 gff.init()
 
 hf = gff.jac(0,0,False,True)
+hf.printDense()
 
 hff2 = ff.hess()
+hff2.printDense()
 
 
 

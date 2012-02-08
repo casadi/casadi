@@ -464,8 +464,8 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       // Mark block for evaluation
       jblocks_no_f.push_back(jblocks[i]);
       jblock_ind.push_back(i);
-/*      symmetric_block_no_f.push_back(!symmetric_block.empty() && symmetric_block[i]);*/
-      symmetric_block_no_f.push_back(false);
+      symmetric_block_no_f.push_back(!symmetric_block.empty() && symmetric_block[i]);
+/*      symmetric_block_no_f.push_back(false);*/
       
       // Save sparsity
       ret[i] = M(jacSparsity(iind,oind,compact));
@@ -603,12 +603,13 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   }
 
   // The nonzeros of the sensitivity matrix
-  vector<int> nzmap;
+  vector<int> nzmap, nzmap2;
   
   // A vector used to resolve collitions between directions
   vector<int> hits;
   
   // Carry out the forward sweeps
+  bool symmetric2=false;
   for(int dir=0; dir<nfwd; ++dir){
     
     // For all the input variables
@@ -620,6 +621,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
 
       // Is the block symmetric
       bool symmetric = symmetric_block_no_f[v];
+      symmetric2 = symmetric;
       
       // If symmetric, see how many times each output appears
       if(symmetric){
@@ -648,12 +650,22 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       // Locate the nonzeros of the forward sensitivity matrix
       output(oind).sparsity().getElements(nzmap,false);
       fsens[dir][oind].sparsity().getNZInplace(nzmap);
+
+      if(symmetric){
+        input(iind).sparsity().getElements(nzmap2,false);
+        fsens[dir][oind].sparsity().getNZInplace(nzmap2);
+      }
+      
       
       // For all the input nonzeros treated in the sweep
       for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
 
         // Get the input nonzero
         int c = D1[v].col(el);
+        int f2_out;
+        if(symmetric){
+          f2_out = nzmap2[c];
+        }
         
         // Loop over the output nonzeros corresponding to this input nonzero
         for(int el_out = sp_trans[v].rowind(c); el_out<sp_trans[v].rowind(c+1); ++el_out){
@@ -668,12 +680,10 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
           // The nonzero of the Jacobian now treated
           int elJ = mapping[v][el_out];
           
-          // If symmetric, also save the entries of the transpose
           if(symmetric){
-            // If we are interested in the row
-            if(hits[el]==1){
-              ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
+            if(hits[r_out]==1){
               ret[jblock_ind[v]].at(el_out) = fsens[dir][oind].at(f_out);
+              ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
             }
           } else {
             // Get the output seed
@@ -683,7 +693,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       }
     }
   }
-
+      
   // Add elements to the Jacobian matrix
   for(int dir=0; dir<nadj; ++dir){
     

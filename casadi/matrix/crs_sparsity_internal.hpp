@@ -234,8 +234,13 @@ class CRSSparsityInternal : public SharedObjectNode{
     CRSSparsity unidirectionalColoring(const CRSSparsity& AT) const;
 
     /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-    CRSSparsity starColoring() const;
+    CRSSparsity starColoring(int ordering) const;
 
+    /// Order the rows by decreasing degree
+    std::vector<int> largestFirstOrdering() const;
+
+    /// Permute rows and/or columns
+    CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
 };
 
 } // namespace CasADi

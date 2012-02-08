@@ -323,9 +323,22 @@ class CRSSparsity : public SharedObject{
     /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
     CRSSparsity unidirectionalColoring(const CRSSparsity& AT=CRSSparsity()) const;
 
-    /** \brief Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
-    CRSSparsity starColoring() const;
+    /** \brief Perform a star coloring of a symmetric matrix:
+      A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
+      Ordering options: None (0), largest first (1)
+      */
+    CRSSparsity starColoring(int ordering = 1) const;
     
+    /** \brief Order the rows by decreasing degree */
+    std::vector<int> largestFirstOrdering() const;
+    
+    /** \brief Permute rows and/or columns
+      Multiply the sparsity with a permutation matrix from the left and/or from the right
+      P * A * trans(P), A * trans(P) or A * trans(P) with P defined by an index vector 
+      containing the column for each row. As an alternative, P can be transposed (inverted).
+    */
+    CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
+      
     std::string dimString() 	const;
 
 };

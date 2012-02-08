@@ -26,6 +26,7 @@
 #include <climits>
 #include <cstdlib>
 #include <cmath>
+#include "matrix.hpp"
 
 using namespace std;
 
@@ -2608,6 +2609,7 @@ void CRSSparsityInternal::getNZInplace(std::vector<int>& indices) const{
 }
 
 CRSSparsity CRSSparsityInternal::unidirectionalColoring(const CRSSparsity& AT) const{
+  
   // Allocate temporary vectors
   vector<int> forbiddenColors;
   forbiddenColors.reserve(nrow_);
@@ -2688,12 +2690,29 @@ CRSSparsity CRSSparsityInternal::unidirectionalColoring(const CRSSparsity& AT) c
   return ret;
 }
 
-CRSSparsity CRSSparsityInternal::starColoring() const{
+CRSSparsity CRSSparsityInternal::starColoring(int ordering) const{
+  // Reorder, if necessary
+  if(ordering!=0){
+    casadi_assert(ordering==1);
+    
+    // Ordering
+    vector<int> ord = largestFirstOrdering();
+
+    // Create a new sparsity pattern 
+    CRSSparsity sp_permuted = pmult(ord,true,true,true);
+    
+    // Star coloring for the permuted matrix
+    CRSSparsity ret_permuted = sp_permuted.starColoring(0);
+        
+    // Permute result back
+    return ret_permuted.pmult(ord,false,true,false);
+  }
+  
   // Allocate temporary vectors
   vector<int> forbiddenColors;
   forbiddenColors.reserve(nrow_);
   vector<int> color(nrow_,-1);
-
+    
   // 4: for i <- 1 to |V | do
   for(int i=0; i<nrow_; ++i){
         
@@ -2764,42 +2783,100 @@ CRSSparsity CRSSparsityInternal::starColoring() const{
     }
   
   } // 23 end for
-  
-  // Create return sparsity containing the coloring
-  CRSSparsity ret(forbiddenColors.size(),nrow_);
-  vector<int>& rowind = ret.rowindRef();
-  vector<int>& col = ret.colRef();
-  
-  // Get the number of columns for each row
-  for(int i=0; i<color.size(); ++i){
-    rowind[color[i]+1]++;
-  }
-  
-  // Cumsum
-  for(int j=0; j<forbiddenColors.size(); ++j){
-    rowind[j+1] += rowind[j];
-  }
-  
-  // Get column for each row
-  col.resize(color.size());
-  for(int j=0; j<col.size(); ++j){
-    col[rowind[color[j]]++] = j;
-  }
-  
-  // Swap index back one step
-  for(int j=rowind.size()-2; j>=0; --j){
-    rowind[j+1] = rowind[j];
-  }
-  rowind[0] = 0;
-  
-  cout << "matrix:" << endl;
-  print(cout);
-  cout << "coloring:" << endl;
-  ret.print();
-  
-  // Return the coloring
-  return ret;
+
+  // Number of colors used
+  int num_colors = forbiddenColors.size();
+
+  // Return sparsity in sparse triplet format
+  return sp_triplet(num_colors,nrow_,color,range(color.size()));
 }
+
+std::vector<int> CRSSparsityInternal::largestFirstOrdering() const{
+  vector<int> degree = rowind_;
+  int max_degree = 0;
+  for(int k=0; k<nrow_; ++k){
+    degree[k] = degree[k+1]-degree[k];
+    max_degree = max(max_degree,1+degree[k]);
+  }
+  degree.resize(nrow_);
+
+  // Vector for binary sort
+  vector<int> degree_count(max_degree+1,0);
+  for(vector<int>::const_iterator it=degree.begin(); it!=degree.end(); ++it){
+    degree_count.at(*it+1)++;
+  }
+
+  // Cumsum to get the offset for each degree
+  for(int d=0; d<max_degree; ++d){
+    degree_count[d+1] += degree_count[d];
+  }
+  
+  // Now a bucket sort
+  vector<int> ordering(nrow_);
+  for(int k=nrow_-1; k>=0; --k){
+    ordering[degree_count[degree[k]]++] = k;
+  }
+  
+  // Invert the ordering
+  vector<int>& reverse_ordering = degree_count; // reuse memory
+  reverse_ordering.resize(ordering.size());
+  copy(ordering.begin(),ordering.end(),reverse_ordering.rbegin());
+  
+  // Return the ordering
+  return reverse_ordering;
+}
+
+CRSSparsity CRSSparsityInternal::pmult(const std::vector<int>& p, bool permute_rows, bool permute_columns, bool invert_permutation) const{
+  // Invert p, possibly
+  vector<int> p_inv;
+  if(invert_permutation){
+    p_inv.resize(p.size());
+    for(int k=0; k<p.size(); ++k){
+      p_inv[p[k]] = k;
+    }
+  }
+  const vector<int>& pp = invert_permutation ? p_inv : p;
+
+  // Get rows
+  vector<int> row = getRow();
+  
+  // Sparsity of the return matrix
+  vector<int> new_col(col_.size()), new_row(row.size());
+
+  // Possibly permute rows
+  if(permute_rows){
+    // Assert dimensions
+    casadi_assert(p.size()==nrow_);
+    
+    // Permute
+    for(int k=0; k<row.size(); ++k){
+      new_row[k] = pp[row[k]];
+    }
+    
+  } else {
+    // No permutation of rows
+    copy(row.begin(),row.end(),new_row.begin());
+  }
+  
+  // Possibly permute columns
+  if(permute_columns){
+    // Assert dimensions
+    casadi_assert(p.size()==ncol_);
+    
+    // Permute
+    for(int k=0; k<col_.size(); ++k){
+      new_col[k] = pp[col_[k]];
+    }
+    
+  } else {
+    // No permutation of columns
+    copy(col_.begin(),col_.end(),new_col.begin());
+  }
+  
+  // Return permuted matrix
+  return sp_triplet(nrow_,ncol_,new_row,new_col);
+}
+
 
 } // namespace CasADi
 
