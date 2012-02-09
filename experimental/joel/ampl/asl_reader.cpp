@@ -1,26 +1,24 @@
-/****************************************************************
-Copyright (C) 1997, 2001 Lucent Technologies
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name of Lucent or any of its entities
-not be used in advertising or publicity pertaining to
-distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
 /*#define CASADI_NDEBUG*/
 #include <casadi/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
@@ -29,7 +27,7 @@ THIS SOFTWARE.
 #include "nlp.h"
 #undef f_OPNUM
 #include "opcode.hd"
-#include "ampl_reader.hpp"
+#include "asl_reader.hpp"
 #define asl ((ASL_fg*)cur_ASL)
 #include "assert.h"
 
@@ -155,7 +153,21 @@ SX get_expression(expr *e){
         return t;
       case 10: // variable value
         i = (expr_v *)e - var_e;
-        return vars.at(std::min<int>(i,vars.size()-1));
+        if(i<vars.size()){
+          return vars.at(i);
+        } else {
+          casadi_assert_message(0,"Dependent variables not supported");
+ 
+          // The dependent expressions are available:
+          int i = comb;
+          int j = combc;
+          cexp *c;
+          for(c = cexps + i; i < j; i++, c++){
+            linpart *L = c->L;
+            expr *e = c->e;
+            int nlin = c->nlin;
+          }
+        }
     }
 /*  }*/
   casadi_assert(0);
