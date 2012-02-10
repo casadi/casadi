@@ -23,8 +23,6 @@
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <stack>
 
-#include "nlp.h"
-#include "opcode.hd"
 #include "asl_reader.hpp"
 #define asl ((ASL_fg*)cur_ASL)
 
@@ -37,16 +35,15 @@ std::vector<SX> objs;
 std::vector<SX> cons;
 std::vector<SX> intermediates;
 
+// Map of constants
+std::vector<SX> constants;
+
 // Number of used and a stack of unused intermediate variables
 int ndv;
 std::stack<int> vstack;
 std::vector<int> cvmap;
 
-extern "C"{
-
 int nv1, nvt;
-extern efunc *r_op[];
-expr_nx *nums;
 
 int new_vt(){
   int ret;
@@ -74,29 +71,36 @@ void Lset(linpart *L, int nlin){
   }
 }
 
-char *f_OPVARVAL1(expr *e, char *buf){
-  int k = e->a;
-  casadi_assert(k>=0);
-  casadi_assert(k<nv1);
-  return buf;
-}
-
-char *f_OPNUM1(expr *e, char *rv){
-  return rv;
-}
-
 SX get_expression(expr *e){
-  int k = (int)(e->op);
+  int operation = int(e->op);
   
-  
-  
-  e->op = r_op[k];
-  int i;
-  switch(op_type[k]){
-    case 9: // number
-      return double(((expr_nx *)e)->v);
-    case 10: // variable value
-      i = (expr_v *)e - var_e;
+  switch(operation){
+    case OPNUM: // number
+    {
+      // Get the value
+      double t(((expr_n *)e)->v);
+      
+      // Find out if the constant is aleady encountered
+      int k = e->a;
+      // NOTE: This should work no matter what e->a is initialized to
+      if(k>=0 && k<constants.size() && constants[k].getValue()==t){
+        
+        // The constant already has an expression
+        return constants[k];
+        
+      } else {
+        // Save to list of constants
+        // NOTE: Saving the location of this variable to a->a, should be safe
+        e->a = constants.size();
+        constants.push_back(t);
+        
+        // Return the new (symbolic) expression
+        return constants.back();
+      }
+    }
+    case OPVARVAL: // variable value
+    {
+      int i = (expr_v *)e - var_e;
       if(i<vars.size()){
         return vars.at(i);
       } else {
@@ -112,233 +116,263 @@ SX get_expression(expr *e){
           int nlin = c->nlin;
         }
       }
+    }
   }
   casadi_assert(0);
 }
 
 int ewalk(expr *e){
-  int operation = (int)(e->op);
-  e->op = r_op[operation];
+  int operation = int(e->op);
   int i, j, k;
   expr *e1, **ep, **epe;
   double t;
   SX x,y,f,cx,cy;
-  switch(op_type[operation]){
-    case 11: /* OP2POW */
+  
+  
+/*  std::cout << "operation = " << operation << std::endl;
+  std::cout << "e->a = " << e->a << std::endl;*/
+/*  casadi_assert((e->a != 32424232) || (operation == 79) || (operation == 81));
+  e->a = 32424232;
+  */
+  
+  switch(operation){
+    case OPCOUNT:  case OPNUMBEROF:  case OPNUMBEROFs:  case OPALLDIFF:      case OP2POW:
       e->dL = 0;
-      /* no break */
-      case 1: /* unary */
-        j = ewalk(e->L.e);
-        i = new_vt();
-        
-        if (j > 0){
-          vstack.push(j);
-        }
-        e->a = i;
-        
-        if(j==0){
-          x = get_expression(e->L.e);
-        } else {
-          x = intermediates.at(j);
-        }
-        switch(operation){
-          case FLOOR: f = floor(x); break;
-          case CEIL: f = ceil(x); break;
-          case ABS: f = abs(x); break;
-          case OPUMINUS: f = -x; break;
-          case OPNOT: f = !x; break;
-          case OP_tanh: f = tanh(x); break;
-          case OP_tan: f = tan(x); break;
-          case OP_sqrt: f = sqrt(x); break;
-          case OP_sinh: f = sinh(x); break;
-          case OP_sin: f = sin(x); break;
+      // No break, fall through
+      
+    // Unary operation
+    case FLOOR:   case CEIL:     case ABS:      case OPUMINUS: case OPNOT:   case OP_tanh:  case OP_tan: 
+    case OP_sqrt: case OP_sinh:  case OP_sin:   case OP_log10: case OP_log:  case OP_exp:   case OP_cosh: 
+    case OP_cos:  case OP_atanh: case OP_atan:  case OP_asinh: case OP_asin: case OP_acosh: case OP_acos: 
+      j = ewalk(e->L.e);
+      i = new_vt();
+      
+      if(j > 0) vstack.push(j);
+      e->a = i;
+
+      if(j==0){
+        x = get_expression(e->L.e);
+      } else {
+        x = intermediates.at(j);
+      }
+      switch(operation){
+        case FLOOR: f = floor(x); break;
+        case CEIL: f = ceil(x); break;
+        case ABS: f = abs(x); break;
+        case OPUMINUS: f = -x; break;
+        case OPNOT: f = !x; break;
+        case OP_tanh: f = tanh(x); break;
+        case OP_tan: f = tan(x); break;
+        case OP_sqrt: f = sqrt(x); break;
+        case OP_sinh: f = sinh(x); break;
+        case OP_sin: f = sin(x); break;
 /*          case OP_log10: f = log10(x); break;*/
-          case OP_log: f = log(x); break;
-          case OP_exp: f = exp(x); break;
-          case OP_cosh: f = cosh(x); break;
-          case OP_cos: f = cos(x); break;
+        case OP_log: f = log(x); break;
+        case OP_exp: f = exp(x); break;
+        case OP_cosh: f = cosh(x); break;
+        case OP_cos: f = cos(x); break;
 /*          case OP_atanh: f = atanh(x); break;*/
-          case OP_atan: f = atan(x); break;
+        case OP_atan: f = atan(x); break;
 /*          case OP_asinh: f = asinh(x); break;*/
-          case OP_asin: f = asin(x); break;
+        case OP_asin: f = asin(x); break;
 /*          case OP_acosh: f = acosh(x); break;*/
-          case OP_acos: f = acos(x); break;
-          case OPCOUNT: casadi_assert_message(0,"Unary operation OPCOUNT not implemented. What is it supposed to do?"); break;
-          case OPNUMBEROF: casadi_assert_message(0,"Unary operation OPNUMBEROF not implemented. What is it supposed to do?"); break;
-          case OPNUMBEROFs: casadi_assert_message(0,"Unary operation OPNUMBEROFs not implemented. What is it supposed to do?"); break;
-          case OPALLDIFF: casadi_assert_message(0,"Unary operation OPALLDIFF not implemented. What is it supposed to do?"); break;
-          case OP2POW: f = x*x; break;
+        case OP_acos: f = acos(x); break;
+        case OPCOUNT: casadi_assert_message(0,"Unary operation OPCOUNT not implemented. What is it supposed to do?"); break;
+        case OPNUMBEROF: casadi_assert_message(0,"Unary operation OPNUMBEROF not implemented. What is it supposed to do?"); break;
+        case OPNUMBEROFs: casadi_assert_message(0,"Unary operation OPNUMBEROFs not implemented. What is it supposed to do?"); break;
+        case OPALLDIFF: casadi_assert_message(0,"Unary operation OPALLDIFF not implemented. What is it supposed to do?"); break;
+        case OP2POW: f = x*x; break;
+        default:
+          casadi_assert_message(0,"unknown: " << operation);
+      };
+      intermediates.at(i) = f;
+      
+      return i;
+    
+    // Binary operation
+    case OPPLUS: case OPMINUS: case OPMULT: case OPDIV: case OPREM: case OPOR: case OPAND: case LT:
+    case LE: case EQ: case GE: case GT: case NE: case OP_atan2: case OPintDIV: case OPprecision:
+    case OPround: case OPtrunc: case OPATLEAST: case OPATMOST: case OPEXACTLY: case OPNOTATLEAST: 
+    case OPNOTATMOST: case OPNOTEXACTLY: case OP_IFF: case OPCPOW: case OP1POW:
+      switch(operation) {
+        case OPPLUS:
+        case OPMINUS:
+        case OPREM:
+          e->dL = 1.;
+          break;
+        case OPMULT:
+          /* no break */
           default:
-            casadi_assert_message(0,"unknown: " << operation);
-        };
-        intermediates.at(i) = f;
-        
-        return i;
-        
-      case 2: /* binary */
-/*        casadi_assert(0);*/
-        switch(operation) { // WHY THIS????
-          case OPPLUS:
-          case OPMINUS:
-          case OPREM:
-            e->dL = 1.;
-            break;
-          case OPMULT:
-            /* no break */
-            default:
-              e->dL = 0.;
-        }
-        k = ewalk(e->L.e);
-        j = ewalk(e->R.e);
-        i = new_vt();
-        if (j > 0){
-          vstack.push(j);
-        }
-        if (k > 0){
-          vstack.push(k);
-        }
-        e->a = i;
-        if(k==0){
-          x = get_expression(e->L.e);
-        } else {
-          x = intermediates.at(k);
-        }
-        
-        if(j==0){
-          y = get_expression(e->R.e);
-        } else {
-          y = intermediates.at(j);
-        }
-        
-        cx = e->dL;
-        if(e->dL==0) cx = 1; // NOTE: Sometimes 0, why???
-        cy = e->dR;
-        if(e->dR==0) cy = 1; // NOTE: Sometimes 0, why???
-        
-        switch(operation){
-          case OPPLUS: f = cx*x + cy*y; break;
+            e->dL = 0.;
+      }
+      k = ewalk(e->L.e);
+      j = ewalk(e->R.e);
+      i = new_vt();
+      if (j > 0){
+        vstack.push(j);
+      }
+      if (k > 0){
+        vstack.push(k);
+      }
+      e->a = i;
+      if(k==0){
+        x = get_expression(e->L.e);
+      } else {
+        x = intermediates.at(k);
+      }
+      
+      if(j==0){
+        y = get_expression(e->R.e);
+      } else {
+        y = intermediates.at(j);
+      }
+      
+      cx = e->dL;
+      if(e->dL==0) cx = 1; // NOTE: Sometimes 0, why???
+      cy = e->dR;
+      if(e->dR==0) cy = 1; // NOTE: Sometimes 0, why???
+      
+      switch(operation){
+        case OPPLUS: f = cx*x + cy*y; break;
 /*          case OPMINUS: f = cx*x - cy*y; break;*/
-          case OPMINUS: f = cx*x + cy*y; break; // NOTE: changed - -> +
-          case OPMULT: f = (cx*x) * (cy*y); break;
-          case OPDIV: f = (cx*x) / (cy*y); break;
+        case OPMINUS: f = cx*x + cy*y; break; // NOTE: changed - -> +
+        case OPMULT: f = (cx*x) * (cy*y); break;
+        case OPDIV: f = (cx*x) / (cy*y); break;
 /*          case OPREM: f = cx*x ? cy*y; break;*/
-          case OPPOW: f = pow(cx*x,cy*y); break;
+        case OPPOW: f = pow(cx*x,cy*y); break;
 /*          case OPLESS: f = cx*x ? cy*y; break;*/
-          case OPOR: f = (cx*x) || (cy*y); break;
-          case OPAND: f = (cx*x) && (cy*y); break;
-          case LT: f = (cx*x) < (cy*y); break;
-          case LE: f = (cx*x) <= (cy*y); break;
-          case EQ: f = (cx*x) == (cy*y); break;
-          case GE: f = (cx*x) >= (cy*y); break;
-          case GT: f = (cx*x) > (cy*y); break;
-          case NE: f = (cx*x) != (cy*y); break;
+        case OPOR: f = (cx*x) || (cy*y); break;
+        case OPAND: f = (cx*x) && (cy*y); break;
+        case LT: f = (cx*x) < (cy*y); break;
+        case LE: f = (cx*x) <= (cy*y); break;
+        case EQ: f = (cx*x) == (cy*y); break;
+        case GE: f = (cx*x) >= (cy*y); break;
+        case GT: f = (cx*x) > (cy*y); break;
+        case NE: f = (cx*x) != (cy*y); break;
 /*          case OP_atan2: f = cx*x ? cy*y; break;*/
 /*          case OPintDIV: f = cx*x ? cy*y; break;*/
 /*          case OPprecision: f = cx*x ? cy*y; break;*/
 /*          case OPround: f = cx*x ? cy*y; break;*/
 /*          case OPtrunc: f = cx*x ? cy*y; break;*/
 /*          case OPATLEAST: f = cx*x ? cy*y; break;
-          case OPATMOST: f = cx*x ? cy*y; break;
-          case OPEXACTLY: f = cx*x ? cy*y; break;
-          case OPNOTATLEAST: f = cx*x ? cy*y; break;
-          case OPNOTATMOST: f = cx*x ? cy*y; break;
-          case OPNOTEXACTLY: f = cx*x ? cy*y; break;*/
+        case OPATMOST: f = cx*x ? cy*y; break;
+        case OPEXACTLY: f = cx*x ? cy*y; break;
+        case OPNOTATLEAST: f = cx*x ? cy*y; break;
+        case OPNOTATMOST: f = cx*x ? cy*y; break;
+        case OPNOTEXACTLY: f = cx*x ? cy*y; break;*/
 /*          case OP_IFF: f = cx*x ? cy*y; break;*/
-          case OP1POW: f = pow(cx*x,cy*y); break;
-          case OPCPOW: f = pow(cx*x,cy*y); break;
-          default:
-            casadi_assert_message(0,"unknown: " << operation);
-        };
-        
-        if(false){
-          using namespace std;
-          cout << "operation = " << operation << endl;
-          cout << "x = " << x << endl;
-          cout << "y = " << y << endl;
-          cout << "cx = " << cx << endl;
-          cout << "cy = " << cy << endl;
-          cout << "f = " << f << endl;
+        case OP1POW: f = pow(cx*x,cy*y); break;
+        case OPCPOW: f = pow(cx*x,cy*y); break;
+        default:
+          casadi_assert_message(0,"unknown: " << operation);
+      };
+      
+      if(false){
+        using namespace std;
+        cout << "operation = " << operation << endl;
+        cout << "x = " << x << endl;
+        cout << "y = " << y << endl;
+        cout << "cx = " << cx << endl;
+        cout << "cy = " << cy << endl;
+        cout << "f = " << f << endl;
+      }
+      
+      
+      intermediates.at(i) = f;
+      return i;
+    
+    // 3
+    case MINLIST:
+    case MAXLIST:
+      casadi_assert(0);
+      break;
+
+    // 4
+    case OPPLTERM:
+      casadi_assert(0);
+      break;
+    
+    // 5
+    case OPIFnl:
+    case OPIFSYM:
+    case OPIMPELSE:
+      casadi_assert(0);
+      break;
+      
+    // 6
+    case OPSUMLIST:
+    case ANDLIST:
+    case ORLIST:
+      ep = e->L.ep;
+      epe = e->R.ep;
+      i = ewalk(e1 = *ep++);
+      if(i==0){
+        x = get_expression(e1);
+      } else {
+        x = intermediates.at(i);
+      }
+      f = x;
+      
+      j = ewalk(e1 = *ep++);
+      if(j==0){
+        x = get_expression(e1);
+      } else {
+        x = intermediates.at(j);
+      }
+      f += x;
+      if (i > 0) {
+        if (j > 0)
+          vstack.push(j);
+      } else if (!(i = j)){
+        i = new_vt();
+      } 
+      do {
+        if ((j = ewalk(e1 = *ep++)) > 0){
+          vstack.push(j);
         }
-        
-        
-        intermediates.at(i) = f;
-        return i;
-        
-      case 3: /* vararg (min, max) */
-        casadi_assert(0);
-        
-      case 4: /* piece-wise linear */
-        casadi_assert(0);
-        
-      case 5: /* if */
-        casadi_assert(0);
-        
-      case 6: /* sumlist */
-        ep = e->L.ep;
-        epe = e->R.ep;
-        i = ewalk(e1 = *ep++);
-        if(i==0){
-          x = get_expression(e1);
-        } else {
-          x = intermediates.at(i);
-        }
-        f = x;
-        
-        j = ewalk(e1 = *ep++);
         if(j==0){
           x = get_expression(e1);
         } else {
           x = intermediates.at(j);
         }
         f += x;
-        if (i > 0) {
-          if (j > 0)
-            vstack.push(j);
-        } else if (!(i = j)){
-          i = new_vt();
-        } 
-        do {
-          if ((j = ewalk(e1 = *ep++)) > 0){
-            vstack.push(j);
-          }
-          if(j==0){
-            x = get_expression(e1);
-          } else {
-            x = intermediates.at(j);
-          }
-          f += x;
-        } while(ep < epe);
-        
-        e->a = i;
-        intermediates.at(i) = f;
-        
-        return i;
-        
-      case 7: /* function call */
-        casadi_assert(0);
-              
-      case 8: /* Hollerith */
-        break;
-        
-      case 9: /* number */
-        t = ((expr_n *)e)->v;
-        ((expr_nx *)e)->v = t;
-        ((expr_nx *)e)->next = nums;
-        nums = (expr_nx *)e;
-        break;
-        
-      case 10: /* variable value */
-        i = (expr_v *)e - var_e;
-        
-        if(intermediates.empty()){
-          intermediates.resize(1);
-        }
-       
-        break;
-        /*DEBUG*/default:
-        /*DEBUG*/ fprintf(Stderr, "bad opnumber %d in ewalk\n", operation);
-        /*DEBUG*/ exit(1);
+      } while(ep < epe);
+      
+      e->a = i;
+      intermediates.at(i) = f;
+      
+      return i;
+    
+    // 7
+    case OPFUNCALL:
+      casadi_assert(0);
+      break;
+    
+    // 8
+    case OPHOL:
+    break;
+    
+    // 9
+    case OPNUM:
+      break;
+/*      t = ((expr_n *)e)->v;
+      i = new_vt();
+      intermediates.at(i) = t;
+      return i;*/
+    
+    // 10
+    case OPVARVAL:
+      i = (expr_v *)e - var_e;
+      
+      if(intermediates.empty()){
+        intermediates.resize(1);
+      }
+      
+      break;
+    default:
+      casadi_assert_message(0,"Unknown operation");
   }
+
   return 0;
 }
 
@@ -400,6 +434,7 @@ void cde_walk(cde *d, int n, int *c1st, int **z, bool obj){
       v = intermediates.at(kk);
     }
     
+    // Needed?
     while(i < k){
       int i1 = i++ + ncom0;
       if (!cvmap[i1]){
@@ -410,40 +445,48 @@ void cde_walk(cde *d, int n, int *c1st, int **z, bool obj){
 }
 
 int main(int argc, char **argv){
+  // Get the problem
+  casadi_assert(argc==2);
+  std::string problem = argv[1];
+  
+  // Allocate ASL memory block
   ASL_alloc(ASL_read_fg);
+  
+  // Modify some internal parameters (ugly!)
   g_fmt_decpt = 1;
   want_derivs = 0;
   return_nofile = 1;
-  casadi_assert(argc==2);
-  char *progname = argv[1];
   
-  fint L = strlen(progname);
-  FILE *nl = jacdim0(progname, L);
+  // Read NL file (right?)
+  FILE *nl = jacdim0(const_cast<char*>(problem.c_str()), problem.size());
 
+  // Ugly and dangerous (requires that int has the same size as a pointer)
   int i;
   for(i = 0; i < N_OPS; i++){
     r_ops[i] = (efunc *)i;
   }
   
+  // Get dimensions
   nv1 = c_vars > o_vars ? c_vars : o_vars;
   int ncom = (i = comb + comc + como) + comc1 + como1;
         
+  // Allocate some memory (is it ever freed?)
   c_cexp1st = (int *)Malloc((n_con + n_obj + 2)*sizeof(int));
   o_cexp1st = c_cexp1st + n_con + 1;
   zac = (int **)Malloc((n_con + n_obj + i)*sizeof(int*));
   zao = zac + n_con;
   zaC = zao + n_obj;
   
+  // Allocate memory for variable bounds and initial guess
   LUv = (real *)Malloc((3*nv1+2*n_con)*sizeof(real));
   LUrhs = LUv + 2*nv1;
   X0 = LUrhs + 2*n_con;
-      
-  size_expr_n = sizeof(expr_nx);
+  
+  // Modify size of the expressions (probably not needed anymore)
+  size_expr_n = sizeof(expr_n);
+  
+  // Read the expressions
   fg_read(nl,0);
-        
-  op_type[OP1POW] = 2;
-  op_type[OP2POW] = 11;
-  op_type[OPCPOW] = 2; // NOTE: Joel: I added this
       
   cvmap.resize(ncom);
   int npd = 0;
@@ -474,15 +517,6 @@ int main(int argc, char **argv){
   cde_walk(con_de, n_con, c_cexp1st, zac,false);
   comwalk(combc, ncom0);
   cde_walk(obj_de, n_obj, o_cexp1st, zao,true);
-  
-  int nv = nv1 + ncom;
-  for(i = 0; i < nv; i++){
-    var_e[i].op = (efunc *)f_OPVARVAL1;
-  }
-  
-  for(expr_nx *enx = nums; enx; enx = enx->next){
-    enx->op = f_OPNUM1;
-  }
   
   {
     // Objective
@@ -605,6 +639,4 @@ int main(int argc, char **argv){
   nlp_solver.solve();
   
   return 0;
-}
-    
 }
