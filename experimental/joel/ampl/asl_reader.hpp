@@ -24,8 +24,6 @@
 
 extern "C"{
 
-#define ANSI(x) x
-
 typedef struct v_i {
   union {
     real v;
@@ -62,10 +60,6 @@ typedef struct dLR {
 #define dLR_VARARG	6
 #define dLR_IF		7
 
-#define dLRp(x) ((dLR *)&x)
-#define Make_dLR(x) (dLR *)x
-#define Make_dLRp(x) (dLR **)&x
-
 typedef char *efuncb(expr *, char *);
 
 typedef struct expr_nx {
@@ -73,15 +67,6 @@ typedef struct expr_nx {
   struct expr_nx *next;
   real v;
 } expr_nx;
-
-extern char *e_val ANSI((expr*, char*));
-extern void zerdiv ANSI((char*));
-extern char *num ANSI((int));
-
-extern char *Half, *Negone, *One, *T, *T1, *Zero;
-extern char *opEQ, *opGE, *opGT, *opLE, *opLT, *opNE, *pd_fmt;
-extern int branches;
-extern char *cond_fmt, *offlfmt1, *offlfmt2, *progname;
 
 #define OPPLUS          0
 #define OPMINUS         1

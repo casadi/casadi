@@ -45,33 +45,25 @@ std::vector<SX> intermediates;
 extern "C"{
 
 typedef struct maxinfo {
-  int ncond;
   int ndv;
   int nvt;
-  int needT1;
-  /* !! plus goo for function evaluations */
 } maxinfo;
 
 maxinfo bmax, cmax, omax;
 
-list **c_ifset, **com_ifset, **o_ifset;
-int branches = 0;
-int condlevel, fwalk, iflevel, maxa, ncond, ndv, ndvmax, npd, nplterm, nv1, nv2, nvt, nvtmax;
+list **com_ifset;
+int ndv, ndvmax, npd, nv1, nv2, nvt, nvtmax;
 int *cvmap;
-fint nJ;
-expr *Plterms;
 char *intsk;
 extern efunc *r_op[];
 #define f_OPNUM r_op[79]
 #define f_OPHOL r_op[80]
 #define f_OPVARVAL      r_op[81]
 
-extern char *progname;
-char *T = "t1";
 expr_nx *nums;
 
 int *dvtfree, *rownos;
-int ndvfree, ndvtmax, needT1, nvtfree;
+int ndvfree, ndvtmax, nvtfree;
 
 int new_vt(){
   int ret = nvtfree < ndvtmax ? dvtfree[nvtfree++] : nvt++;
@@ -93,22 +85,6 @@ void vt_free(int k){
   }
   dvtfree[--nvtfree] = k;
 }
-
-char *fpval(real r){
-  static char buf[32];
-  if(r >= Infinity){
-    return "1.7e308";
-  } else if (r <= negInfinity){
-    return "-1.7e308";
-  }
-  g_fmt(buf, r);
-  return buf;
-}
-
-
-void binop(char *a, char *b, char *op, char *c){
-}
-
 void Lset(linpart *L, int nlin){
   linpart *Le;
   double t;
@@ -116,7 +92,7 @@ void Lset(linpart *L, int nlin){
   
   for(Le = L + nlin; L < Le; L++) {
     t = L->fac;
-    d = Make_dLR(&L->fac);
+    d = (dLR *)(&L->fac);
     if(t == 1.){
       d->kind = dLR_one;
     } else if (t == -1.) {
@@ -441,15 +417,6 @@ void max_save(maxinfo *m){
     nvtmax = nvt;
   m->nvt = nvtmax - 1;
   m->ndv = ndvmax;
-  m->ncond = ncond;
-  m->needT1 = needT1;
-}
-
-void max_restore(maxinfo *m){
-  nvtmax = m->nvt + 1;
-  ndvmax = m->ndv;
-  ncond = m->ncond;
-  needT1 = m->needT1;
 }
 
 void zset(register int *z){
@@ -526,78 +493,8 @@ void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z, bool obj){
   max_save(m);
 }
 
-static char * vprod(real t, int k){
-  static char buf[64];
-  int i;
-  
-  if (t == 1.){
-  } else if (t == -1.) {
-  } else {
-    i = g_fmt(buf, t);
-  }
-  return buf;
-}
-
-char *rv_output(char *rv, char *eval, ograd *og){
-  for(; og; og = og->next){
-    if(og->coef){
-      break;
-    }
-  }
-  if (og) {
-    SX f = og->coef * vars.at(og->varno);
-    if (strcmp(eval, "0.")){
-      f += objs.at(0);
-    }
-    while(og = og->next){
-      if (og->coef){
-        f += og->coef * vars.at(og->varno);
-      }
-    }
-    objs.at(0) = f;
-    return rv;
-  }
-  return eval;
-}
-
-char *con_linadd(int i, char *s){
-  cgrad *cg;
-  for(cg = Cgrad[i]; cg; cg = cg->next){
-    if (cg->coef) {
-      SX f = cg->coef * vars.at(cg->varno);
-      while(cg = cg->next){
-        if (cg->coef){
-          f += cg->coef * vars.at(cg->varno);
-        }
-      }
-      cons.at(i) += f;
-      break;
-    }
-  }
-  return s;
-}
-
-int nzcgrad(){
-  cgrad *cg;
-  int i;
-  for(i = 0; i < n_con; i++)
-    for(cg = Cgrad[i]; cg; cg = cg->next)
-      if (cg->coef)
-        return 1;
-      return 0;
-}
-
-char *cv_name(linpart *L, char *buf){
-  expr_v ev;
-  expr *ep = (expr *)((char *)L->v.rp - ((char *)&ev.v - (char *)&ev));
-  return f_OPVARVAL1(ep, buf);
-}
-
-char *putout(expr *e, int i, int j, char *what, int k, int *z){
-  return "aa";
-}
-
-void obj_output(){
+void output(){
+  // Objective
   static char rv[] = "rv";
   casadi_assert(n_obj==1);
   ograd *og;
@@ -607,31 +504,50 @@ void obj_output(){
     }
   }
   
-  char *eval, *s;
+  char *eval;
   int *c1 = o_cexp1st;
   int i=0;
   for(; i < n_obj; i++, c1++){
-    eval = putout(obj_de[i].e, c1[0], c1[1],n_obj > 1 ? const_cast<char*>("objective") : NULL, i, zao[i]);
-    s = rv_output(rv, eval, Ograd[i]);
+    ograd *og = Ograd[i];
+    for(; og; og = og->next){
+      if(og->coef){
+        break;
+      }
+    }
+    if (og) {
+      SX f = og->coef * vars.at(og->varno) + objs.at(0);
+      while(og = og->next){
+        if (og->coef){
+          f += og->coef * vars.at(og->varno);
+        }
+      }
+      objs.at(0) = f;
+    }
   }
-  branches = 0;
-}
   
-void con_output(){
+  // Constraints
   if(n_con){
     int i;
     int *c1 = c_cexp1st;
     for(i = 0; i < n_con; i++, c1++) {
-      char *s = putout(con_de[i].e, c1[0], c1[1], "constraint", i, zac[i]);
-      con_linadd(i,s);
+      char *s = const_cast<char*>("aa");
+      
+      // Add linear ?
+      cgrad *cg;
+      for(cg = Cgrad[i]; cg; cg = cg->next){
+        if (cg->coef) {
+          SX f = cg->coef * vars.at(cg->varno);
+          while(cg = cg->next){
+            if (cg->coef){
+              f += cg->coef * vars.at(cg->varno);
+            }
+          }
+          cons.at(i) += f;
+          break;
+        }
+      }
     }
   }
-  branches = 0;
-}
-      
-void output(){
-  obj_output();
-  con_output();
 }
 
 void get_rownos(){
@@ -686,23 +602,8 @@ int main(int argc, char **argv){
   g_fmt_decpt = 1;
   want_derivs = 0;
   return_nofile = 1;
-  // progname = "/home/janderss/src/ampl/netlib.org/ampl/solvers/examples/cork.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/corkscrw_small.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/corkscrw.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/clnlbeam.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/clnlbeam_small.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/optmass.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/clnlbeam_small.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/svanberg.nl";
-  // progname = "/home/janderss/Desktop/ampl_test/svanberg_small.nl";
-
-//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/aircrfta.nl";
-//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/allinitc.nl";
-//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/allinitc.nl";
-//   progname = "/home/janderss/dev/casadi/trunk/misc/cuter/cuter_nl/alsotame.nl";
   casadi_assert(argc==2);
-  progname = argv[1];
-  
+  char *progname = argv[1];
   
   fint L = strlen(progname);
   FILE *nl = jacdim0(progname, L);
@@ -734,8 +635,8 @@ int main(int argc, char **argv){
   size_expr_n = sizeof(expr_nx);
   fg_read(nl,0);
         
-  c_ifset = (list **)Malloc((n_con + n_obj + ncom0)*sizeof(list *));
-  o_ifset = c_ifset + n_con;
+  list **c_ifset = (list **)Malloc((n_con + n_obj + ncom0)*sizeof(list *));
+  list **o_ifset = c_ifset + n_con;
   com_ifset = o_ifset + n_obj;
   op_type[OP1POW] = 2;
   op_type[OP2POW] = 11;
@@ -754,14 +655,7 @@ int main(int argc, char **argv){
     memset((char *)&cvmap[ncom0], 0, ncom1*sizeof(int));
   }
   
-  
-  
-/*  using namespace std;
-  cout << "ncom0 = " << ncom0 << endl;
-  cout << "ncom1 = " << ncom1 << endl;
-  return 0;*/
-  
-  ndv = ncond = 0;
+  ndv = 0;
   
   memset((char *)adjoints, 0, amax*sizeof(real));
   
@@ -782,7 +676,8 @@ int main(int argc, char **argv){
   max_save(&bmax);
   comwalk(comb, combc);
   cde_walk(con_de, n_con, &cmax, c_cexp1st, zac,false);
-  max_restore(&bmax);
+  nvtmax = bmax.nvt + 1;
+  ndvmax = bmax.ndv;
   comwalk(combc, ncom0);
   cde_walk(obj_de, n_obj, &omax, o_cexp1st, zao,true);
 
@@ -791,8 +686,7 @@ int main(int argc, char **argv){
     var_e[i].op = (efunc *)f_OPVARVAL1;
   }
   
-  expr_nx *enx;
-  for(enx = nums; enx; enx = enx->next){
+  for(expr_nx *enx = nums; enx; enx = enx->next){
     enx->op = f_OPNUM1;
   }
   
