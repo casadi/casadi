@@ -5,7 +5,7 @@ import glob
 login = input('Enter remote host within string quotes: ')
 
 # For all the problems
-for fullname in glob.glob('cuter_selected' + '/*.mod'):
+for fullname in glob.glob('cuter_selected2' + '/*.mod'):
 
   # Filename
   modfile = os.path.basename(fullname)
@@ -22,7 +22,7 @@ for fullname in glob.glob('cuter_selected' + '/*.mod'):
   print 'results file should be: ' + nlfile
   
   # Get the results back
-  os.system('scp ' + login + ':ampl_tmp/'+ nlfile + ' cuter_nl/' + nlfile) 
+  os.system('scp ' + login + ':ampl_tmp/'+ nlfile + ' cuter_nl2/' + nlfile) 
   
   # Remove the temporaries
   os.system('ssh ' + login + ' "cd ampl_tmp; rm ' + nlfile + ' ' + modfile + '"')

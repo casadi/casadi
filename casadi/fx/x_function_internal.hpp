@@ -486,6 +486,7 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   // Get a bidirectional partition
   vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
   getPartition(jblocks_no_f,D1,D2,true,symmetric_block_no_f);
+  if(verbose()) cout << "XFunctionInternal::jac graph coloring completed" << endl;
 
   // Get the number of forward and adjoint sweeps
   int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
