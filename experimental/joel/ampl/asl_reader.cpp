@@ -19,17 +19,14 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-/*#define CASADI_NDEBUG*/
 #include <casadi/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-
+#include <stack>
 
 #include "nlp.h"
-#undef f_OPNUM
 #include "opcode.hd"
 #include "asl_reader.hpp"
 #define asl ((ASL_fg*)cur_ASL)
-#include "assert.h"
 
 
 using namespace CasADi;
@@ -40,65 +37,38 @@ std::vector<SX> objs;
 std::vector<SX> cons;
 std::vector<SX> intermediates;
 
-
+// Number of used and a stack of unused intermediate variables
+int ndv;
+std::stack<int> vstack;
+std::vector<int> cvmap;
 
 extern "C"{
 
-typedef struct maxinfo {
-  int ndv;
-  int nvt;
-} maxinfo;
-
-maxinfo bmax, cmax, omax;
-
-list **com_ifset;
-int ndv, ndvmax, npd, nv1, nv2, nvt, nvtmax;
-int *cvmap;
-char *intsk;
+int nv1, nvt;
 extern efunc *r_op[];
-#define f_OPNUM r_op[79]
-#define f_OPHOL r_op[80]
-#define f_OPVARVAL      r_op[81]
-
 expr_nx *nums;
 
-int *dvtfree, *rownos;
-int ndvfree, ndvtmax, nvtfree;
-
 int new_vt(){
-  int ret = nvtfree < ndvtmax ? dvtfree[nvtfree++] : nvt++;
-  if(ret>=intermediates.size()){
+  int ret;
+  if(vstack.empty()){
+    ret = nvt++;
     intermediates.resize(ret+1);
+  } else {
+    ret = vstack.top();
+    vstack.pop();
   }
   return ret;
 }
 
-#define NDVTGULP 1000
-void vt_free(int k){
-  if (ndvfree >= nvtfree){
-    int i = ndvtmax;
-    int j = ndvtmax += NDVTGULP;
-    dvtfree = (int *)Realloc(dvtfree, j*sizeof(int));
-    while(i > nvtfree)
-      dvtfree[--j] = dvtfree[--i];
-    nvtfree += NDVTGULP;
-  }
-  dvtfree[--nvtfree] = k;
-}
 void Lset(linpart *L, int nlin){
   linpart *Le;
   double t;
-  register dLR *d;
+  dLR *d;
   
   for(Le = L + nlin; L < Le; L++) {
     t = L->fac;
     d = (dLR *)(&L->fac);
-    if(t == 1.){
-      d->kind = dLR_one;
-    } else if (t == -1.) {
-      d->kind = dLR_negone;
-    } else {
-      d->kind = dLR_VP;
+    if(t != 1. && t != -1.) {
       *(d->o.vp = (real *)mem(sizeof(real))) = t;
     }
   }
@@ -111,62 +81,49 @@ char *f_OPVARVAL1(expr *e, char *buf){
   return buf;
 }
 
-char *f_OPNUM1(register expr *e, char *rv){
+char *f_OPNUM1(expr *e, char *rv){
   return rv;
 }
+
 SX get_expression(expr *e){
   int k = (int)(e->op);
+  
+  
+  
   e->op = r_op[k];
-  int k1 = op_type[k];
-  double t;
   int i;
-/*  if(e->a>0){
-    return intermediates.at(e->a);
-  } else {*/
-    switch(k1){
-      case 9: // number
-        t = ((expr_nx *)e)->v;
-        return t;
-      case 10: // variable value
-        i = (expr_v *)e - var_e;
-        if(i<vars.size()){
-          return vars.at(i);
-        } else {
-          casadi_assert_message(0,"Dependent variables not supported");
- 
-          // The dependent expressions are available:
-          int i = comb;
-          int j = combc;
-          cexp *c;
-          for(c = cexps + i; i < j; i++, c++){
-            linpart *L = c->L;
-            expr *e = c->e;
-            int nlin = c->nlin;
-          }
+  switch(op_type[k]){
+    case 9: // number
+      return double(((expr_nx *)e)->v);
+    case 10: // variable value
+      i = (expr_v *)e - var_e;
+      if(i<vars.size()){
+        return vars.at(i);
+      } else {
+        casadi_assert_message(0,"Dependent variables not supported");
+
+        // The dependent expressions are available:
+        int i = comb;
+        int j = combc;
+        cexp *c;
+        for(c = cexps + i; i < j; i++, c++){
+          linpart *L = c->L;
+          expr *e = c->e;
+          int nlin = c->nlin;
         }
-    }
-/*  }*/
+      }
+  }
   casadi_assert(0);
 }
 
 int ewalk(expr *e){
   int operation = (int)(e->op);
   e->op = r_op[operation];
-  int k1 = op_type[operation];
-
   int i, j, k;
   expr *e1, **ep, **epe;
-  expr_if *eif;
-  expr_va *eva;
-  expr_f *ef;
-  argpair *ap, *ape;
-  de *d;
-  derp *dp;
-  dLR *LR, **LRp;
-  efunc *op;
   double t;
   SX x,y,f,cx,cy;
-  switch(k1){
+  switch(op_type[operation]){
     case 11: /* OP2POW */
       e->dL = 0;
       /* no break */
@@ -175,7 +132,7 @@ int ewalk(expr *e){
         i = new_vt();
         
         if (j > 0){
-          vt_free(j);
+          vstack.push(j);
         }
         e->a = i;
         
@@ -219,7 +176,6 @@ int ewalk(expr *e){
         return i;
         
       case 2: /* binary */
-        k1 = 1;
 /*        casadi_assert(0);*/
         switch(operation) { // WHY THIS????
           case OPPLUS:
@@ -228,7 +184,6 @@ int ewalk(expr *e){
             e->dL = 1.;
             break;
           case OPMULT:
-            k1 = 3;
             /* no break */
             default:
               e->dL = 0.;
@@ -237,10 +192,10 @@ int ewalk(expr *e){
         j = ewalk(e->R.e);
         i = new_vt();
         if (j > 0){
-          vt_free(j);
+          vstack.push(j);
         }
         if (k > 0){
-          vt_free(k);
+          vstack.push(k);
         }
         e->a = i;
         if(k==0){
@@ -338,13 +293,13 @@ int ewalk(expr *e){
         f += x;
         if (i > 0) {
           if (j > 0)
-            vt_free(j);
+            vstack.push(j);
         } else if (!(i = j)){
           i = new_vt();
         } 
         do {
           if ((j = ewalk(e1 = *ep++)) > 0){
-            vt_free(j);
+            vstack.push(j);
           }
           if(j==0){
             x = get_expression(e1);
@@ -360,30 +315,7 @@ int ewalk(expr *e){
         return i;
         
       case 7: /* function call */
-        ef = (expr_f *)e;
-        i = k = 0;
         casadi_assert(0);
-        for(ap = ef->ap, ape = ef->ape; ap < ape; ap++){
-          if (j = ewalk(ap->e)){
-            if (j < 0) {
-              i = j;
-            } else {
-              k++;
-            }
-          }
-        }
-        if(k){
-          for(ap = ef->ap; ap < ape; ap++) {
-            op = ap->e->op;
-            if(op != f_OPNUM && op != f_OPHOL && op != f_OPVARVAL && (j = ap->e->a) > 0){
-              vt_free(j);
-            }
-          }
-        }
-        if(!i){
-          return e->a = new_vt();
-        }
-        return e->a = i;
               
       case 8: /* Hollerith */
         break;
@@ -401,9 +333,7 @@ int ewalk(expr *e){
         if(intermediates.empty()){
           intermediates.resize(1);
         }
-/*        intermediates.at(0) = vars.at(i);*/
-        
-        
+       
         break;
         /*DEBUG*/default:
         /*DEBUG*/ fprintf(Stderr, "bad opnumber %d in ewalk\n", operation);
@@ -412,15 +342,8 @@ int ewalk(expr *e){
   return 0;
 }
 
-void max_save(maxinfo *m){
-  if (nvtmax < nvt)
-    nvtmax = nvt;
-  m->nvt = nvtmax - 1;
-  m->ndv = ndvmax;
-}
-
-void zset(register int *z){
-  register int *ze;
+void zset(int *z){
+  int *ze;
   if(z){
     for(ze = z + 2**z; z < ze; z += 2){
       var_e[z[1]].a = z[2];
@@ -430,31 +353,29 @@ void zset(register int *z){
 
 void ndvtreset(int *z){
   nvt = 1;
-  nvtfree = ndvtmax;
+  
+  // Empty the stack
+  while(!vstack.empty()){
+    vstack.pop();
+  }
+  
   ndv = 0;
-  ndvfree = 0;
   zset(z);
 }
 
 void comwalk(int i, int n){
   if (i >= n) return;
   zset(zaC[i]);
-  list **ifset = com_ifset + i;
   cexp *c = cexps + i;
   cexp *ce;
   for(ce = cexps + n; c < ce; c++) {
     Lset(c->L, c->nlin);
     ndvtreset(zaC[i]);
-    nvtfree = ndvtmax;
     ewalk(c->e);
-    ifset++;
-    if (nvtmax < nvt){
-      nvtmax = nvt;
-    }
   }
 }
 
-void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z, bool obj){
+void cde_walk(cde *d, int n, int *c1st, int **z, bool obj){
   int ii=0;
   
   int j = *c1st++;
@@ -468,7 +389,6 @@ void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z, bool obj){
       Lset(c1->L, c1->nlin);
       ewalk(c1->e);
     }
-    nvtfree = ndvtmax;
     int kk = ewalk(d->e);
     
     // What are we calculating?
@@ -486,117 +406,9 @@ void cde_walk(cde *d, int n, maxinfo *m, int *c1st, int **z, bool obj){
         cvmap[i1] = nvt++;
       }
     }
-    if (nvtmax < nvt){
-      nvtmax = nvt;
-    }
-  }
-  max_save(m);
-}
-
-void output(){
-  // Objective
-  static char rv[] = "rv";
-  casadi_assert(n_obj==1);
-  ograd *og;
-  for(og = Ograd[0]; og; og = og->next){
-    if (og->coef){
-      break;
-    }
-  }
-  
-  char *eval;
-  int *c1 = o_cexp1st;
-  int i=0;
-  for(; i < n_obj; i++, c1++){
-    ograd *og = Ograd[i];
-    for(; og; og = og->next){
-      if(og->coef){
-        break;
-      }
-    }
-    if (og) {
-      SX f = og->coef * vars.at(og->varno) + objs.at(0);
-      while(og = og->next){
-        if (og->coef){
-          f += og->coef * vars.at(og->varno);
-        }
-      }
-      objs.at(0) = f;
-    }
-  }
-  
-  // Constraints
-  if(n_con){
-    int i;
-    int *c1 = c_cexp1st;
-    for(i = 0; i < n_con; i++, c1++) {
-      char *s = const_cast<char*>("aa");
-      
-      // Add linear ?
-      cgrad *cg;
-      for(cg = Cgrad[i]; cg; cg = cg->next){
-        if (cg->coef) {
-          SX f = cg->coef * vars.at(cg->varno);
-          while(cg = cg->next){
-            if (cg->coef){
-              f += cg->coef * vars.at(cg->varno);
-            }
-          }
-          cons.at(i) += f;
-          break;
-        }
-      }
-    }
   }
 }
 
-void get_rownos(){
-  int i = n_con, i1, j, j1;
-  cgrad *cg;
-  memset((char *)rownos, 0, nzc*sizeof(int));
-  while(i1 = i){
-    for(cg = Cgrad[--i]; cg; cg = cg->next){
-      rownos[cg->goff] = i1;
-    }
-  }
-  
-  for(i = 0; i <= n_var; i++){
-    A_colstarts[i]++;
-  }
-  
-  if(intsk){
-    i1 = j = 0;
-    --intsk;
-    for(i = 1; i <= n_var; i++){
-      j1 = A_colstarts[i] - 1;
-      if (!intsk[i]){
-        for(; j < j1; j++){
-          rownos[i1++] = rownos[j];
-        }
-      }
-      
-      A_colstarts[i] = i1 + 1;
-      j = j1;
-    }
-    
-    ++intsk;
-    nzc = i1;
-    if(nlvbi && (nlvci < nlvc || nlvoi < nlvo) || nlvci && nlvoi < nlvo){
-      for(i = 0; i < n_var; i++){
-        A_colstarts[i] = A_colstarts[i+1];
-      }
-      i = n_con;
-      while(--i >= 0){
-        for(cg = Cgrad[i]; cg; cg = cg->next){
-          if (!intsk[cg->varno]){
-            cg->goff = --A_colstarts[cg->varno] - 1;
-          }
-        }
-      }
-    }
-  }
-}
-    
 int main(int argc, char **argv){
   ASL_alloc(ASL_read_fg);
   g_fmt_decpt = 1;
@@ -615,7 +427,6 @@ int main(int argc, char **argv){
   
   nv1 = c_vars > o_vars ? c_vars : o_vars;
   int ncom = (i = comb + comc + como) + comc1 + como1;
-  nv2 = nv1 + ncom;
         
   c_cexp1st = (int *)Malloc((n_con + n_obj + 2)*sizeof(int));
   o_cexp1st = c_cexp1st + n_con + 1;
@@ -623,11 +434,6 @@ int main(int argc, char **argv){
   zao = zac + n_con;
   zaC = zao + n_obj;
   
-  if (n_con){
-    rownos = (int *)Malloc((nzc + nv1 + 1)*sizeof(int));
-    A_colstarts = rownos + nzc;
-  }
-    
   LUv = (real *)Malloc((3*nv1+2*n_con)*sizeof(real));
   LUrhs = LUv + 2*nv1;
   X0 = LUrhs + 2*n_con;
@@ -635,19 +441,12 @@ int main(int argc, char **argv){
   size_expr_n = sizeof(expr_nx);
   fg_read(nl,0);
         
-  list **c_ifset = (list **)Malloc((n_con + n_obj + ncom0)*sizeof(list *));
-  list **o_ifset = c_ifset + n_con;
-  com_ifset = o_ifset + n_obj;
   op_type[OP1POW] = 2;
   op_type[OP2POW] = 11;
   op_type[OPCPOW] = 2; // NOTE: Joel: I added this
-  
-  dvtfree = (int *)Malloc(NDVTGULP*sizeof(int));
-  ndvtmax = nvtfree = NDVTGULP;
-  
-  if (n_con) get_rownos();
-  cvmap = (int *)Malloc(ncom*sizeof(int));
-  npd = 0;
+      
+  cvmap.resize(ncom);
+  int npd = 0;
   for(i = 0; i < ncom0; i++){
     cvmap[i] = -(++npd);
   }
@@ -655,7 +454,6 @@ int main(int argc, char **argv){
     memset((char *)&cvmap[ncom0], 0, ncom1*sizeof(int));
   }
   
-  ndv = 0;
   
   memset((char *)adjoints, 0, amax*sizeof(real));
   
@@ -670,17 +468,13 @@ int main(int argc, char **argv){
   cons.resize(n_con);
   
   
-  
-  
+  ndv = 0;
   comwalk(0,comb);
-  max_save(&bmax);
   comwalk(comb, combc);
-  cde_walk(con_de, n_con, &cmax, c_cexp1st, zac,false);
-  nvtmax = bmax.nvt + 1;
-  ndvmax = bmax.ndv;
+  cde_walk(con_de, n_con, c_cexp1st, zac,false);
   comwalk(combc, ncom0);
-  cde_walk(obj_de, n_obj, &omax, o_cexp1st, zao,true);
-
+  cde_walk(obj_de, n_obj, o_cexp1st, zao,true);
+  
   int nv = nv1 + ncom;
   for(i = 0; i < nv; i++){
     var_e[i].op = (efunc *)f_OPVARVAL1;
@@ -690,7 +484,61 @@ int main(int argc, char **argv){
     enx->op = f_OPNUM1;
   }
   
-  output();
+  {
+    // Objective
+    casadi_assert(n_obj==1);
+    ograd *og;
+    for(og = Ograd[0]; og; og = og->next){
+      if (og->coef){
+        break;
+      }
+    }
+    
+    char *eval;
+    int *c1 = o_cexp1st;
+    int i=0;
+    for(; i < n_obj; i++, c1++){
+      ograd *og = Ograd[i];
+      for(; og; og = og->next){
+        if(og->coef){
+          break;
+        }
+      }
+      if (og) {
+        SX f = og->coef * vars.at(og->varno) + objs.at(0);
+        while(og = og->next){
+          if (og->coef){
+            f += og->coef * vars.at(og->varno);
+          }
+        }
+        objs.at(0) = f;
+      }
+    }
+    
+    // Constraints
+    if(n_con){
+      int i;
+      int *c1 = c_cexp1st;
+      for(i = 0; i < n_con; i++, c1++) {
+        char *s = const_cast<char*>("aa");
+        
+        // Add linear ?
+        cgrad *cg;
+        for(cg = Cgrad[i]; cg; cg = cg->next){
+          if (cg->coef) {
+            SX f = cg->coef * vars.at(cg->varno);
+            while(cg = cg->next){
+              if (cg->coef){
+                f += cg->coef * vars.at(cg->varno);
+              }
+            }
+            cons.at(i) += f;
+            break;
+          }
+        }
+      }
+    }
+  }
 
   if(false){
     std::cout << "objs = " << std::endl;

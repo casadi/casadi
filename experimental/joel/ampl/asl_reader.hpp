@@ -51,15 +51,6 @@ typedef struct dLR {
   } o;
 } dLR;
 
-#define dLR_UNUSED	0
-#define dLR_PD		1
-#define dLR_one		2
-#define dLR_negone	3
-#define dLR_VP		4
-#define dLR_VARVAL	5
-#define dLR_VARARG	6
-#define dLR_IF		7
-
 typedef char *efuncb(expr *, char *);
 
 typedef struct expr_nx {
