@@ -135,6 +135,8 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     using B::empty;
     using B::scalar;
     using B::dense;
+    using B::operator[];
+    using B::operator();
 
     /// Expose iterators
     typedef typename std::vector<T>::iterator iterator;
@@ -218,9 +220,7 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     
     /// Access a non-zero element
     T& at(int k){if (k<0) k+=size(); return data().at(k); }
-    #endif // SWIG
-    
-    #ifdef SWIG
+    #else // SWIG
     /// Access a non-zero element
     T at(int k){if (k<0) k+=size(); return data().at(k); }
     #endif // SWIG
@@ -231,9 +231,7 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     
     /// get a reference to an element
     T& elem(int i, int j=0);
-    #endif // SWIG
-    
-    #ifdef SWIG
+    #else // SWIG
     /// Access a non-zero element
     T elem(int i, int j=0) { return elem(i,j);}
     #endif // SWIG
@@ -295,28 +293,6 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     /// Append a matrix to the end
     void append(const Matrix<T>& y);
 
-#ifndef SWIG 
-    /** \brief  Get vector element or slice */
-    template<typename I>
-    const Matrix<T> operator()(const I& i) const{ return getSub(i,0);}
-
-    /** \brief  Get Sparsity slice */
-    const Matrix<T> operator()(const CRSSparsity& sp) const{ return getSub(sp); }
-    
-    /** \brief  Get Matrix element or slice */
-    template<typename I, typename J>
-    const Matrix<T> operator()(const I& i, const J& j) const{ return getSub(i,j); }
-
-    /** \brief  Access vector element or slice */
-    template<typename I>
-    SubMatrix<Matrix<T>,I,int> operator()(const I& i){ return SubMatrix<Matrix<T>,I,int>(*this,i,0); }
-       
-    /** \brief  Access Matrix element or slice */
-    template<typename I, typename J>
-    SubMatrix<Matrix<T>,I,J> operator()(const I& i, const J& j){ return SubMatrix<Matrix<T>,I,J>(*this,i,j); }
-    
-#endif // SWIG
-    
     //@{
     /// Indexing for interfaced languages
     /// get a non-zero

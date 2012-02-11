@@ -91,36 +91,6 @@ class MX : public GenericMatrix<MX>, public SharedObject{
    /** \brief  Create from node */
     static MX create(MXNode* node);
 
-    /** \brief  Get vector element or slice */
-    template<typename I>
-    const MX operator()(const I& i) const{ return getSub(i);}
-    
-    /** \brief  Get Matrix element or slice */
-    template<typename I, typename J>
-    const MX operator()(const I& i, const J& j) const{ return getSub(i,j); }
-    
-    /** \brief  Get Matrix slice */
-    const MX operator()(const Matrix<int>& k) const{ return getSub(k); }
-
-    /** \brief  Get Sparsity slice */
-    const MX operator()(const CRSSparsity& sp) const{ return getSub(sp); }
-    
-    /** \brief  Access vector element or slice */
-    template<typename I>
-    SubMatrix<MX,I,int> operator()(const I& i){ return SubMatrix<MX,I,int>(*this,i,0); }
-    
-    /** \brief  Access Matrix element or slice */
-    template<typename I, typename J>
-    SubMatrix<MX,I,J> operator()(const I& i, const J& j){ return SubMatrix<MX,I,J>(*this,i,j); }
-    
-    /** \brief  Access Matrix element or slice */
-    //template<>
-    //SubMatrix<MX> operator()(const Matrix<int>& k){ 
-    //  casadi_error("MX::operator()(Imatrix) not implemented yet");
-      //return SubMatrix<MX>(*this,k);
-    //}
-
-
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;
 
@@ -259,13 +229,13 @@ class MX : public GenericMatrix<MX>, public SharedObject{
   const Matrix<double> & getConstant() const; 
   
   /// Check if symbolic
-  bool 	isSymbolic () const;
+  bool isSymbolic () const;
   
   /// Check if constant
   bool isConstant () const;
   
   /// Check if mapping
-  bool 	isMapping () const;
+  bool isMapping () const;
   
   /// Check if densification
   bool isDensification () const;
@@ -369,7 +339,7 @@ class MX : public GenericMatrix<MX>, public SharedObject{
   const MX getSub(int i, const std::vector<int>& j) const;
   const MX getSub(const std::vector<int>& i, int j) const;
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
-  const MX getSub(const Matrix<int>& k) const;
+  const MX getSub(const Matrix<int>& k, int dummy=0) const;
   const MX getSub(const CRSSparsity& sp, int dummy=0) const;
   const MX getSub(const std::vector<int>& i, const Matrix<int>& k) const;
   const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;

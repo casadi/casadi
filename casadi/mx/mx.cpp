@@ -120,7 +120,7 @@ const MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
   return ret;
 }
 
-const MX MX::getSub(const Matrix<int>& k) const {
+const MX MX::getSub(const Matrix<int>& k, int dummy) const {
   MX ret = MX::create(new Mapping(k.sparsity()));
   int s = size();
   const std::vector<int> & d = k.data();
@@ -831,7 +831,10 @@ bool MX::isCommutative() const {
 
 long MX::__hash__() const {
    if (isNull()) return 0;
-   return (long) get();
+   // FIXME: This is bad coding, the pointer might on certain architectures be larger than the long,
+   // giving an error of type "error: cast from 'const SharedObjectInternal*' to 'int' loses precision"
+   // The solution is to convert to intptr_t, but this is not yet C++ standard
+   return long(get());
 }
 
 Matrix<int> MX::mapping(int iind) const {

@@ -107,6 +107,25 @@ class GenericMatrix{
     /** \brief  Access vector nonzero or slice of nonzeros */
     template<typename K>
     NonZeros<MatType,K> operator[](const K& k){ return NonZeros<MatType,K>(static_cast<MatType&>(*this),k); }
+
+    /** \brief  Get vector element or slice */
+    template<typename I>
+    const MatType operator()(const I& i) const{ return static_cast<const MatType*>(this)->getSub(i,0);}
+
+    /** \brief  Get Sparsity slice */
+    const MatType operator()(const CRSSparsity& sp) const{ return static_cast<const MatType*>(this)->getSub(sp); }
+    
+    /** \brief  Get Matrix element or slice */
+    template<typename I, typename J>
+    const MatType operator()(const I& i, const J& j) const{ return static_cast<const MatType*>(this)->getSub(i,j); }
+
+    /** \brief  Access vector element or slice */
+    template<typename I>
+    SubMatrix<MatType,I,int> operator()(const I& i){ return SubMatrix<MatType,I,int>(static_cast<MatType&>(*this),i,0); }
+       
+    /** \brief  Access Matrix element or slice */
+    template<typename I, typename J>
+    SubMatrix<MatType,I,J> operator()(const I& i, const J& j){ return SubMatrix<MatType,I,J>(static_cast<MatType&>(*this),i,j); }
     #endif // SWIG
 
 };
